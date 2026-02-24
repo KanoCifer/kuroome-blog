@@ -1,0 +1,32 @@
+__pycache__/
+# Environments
+.env
+.venv/
+# VS Code
+.vscode/
+.DS_Store
+.ruff_cache
+.prettierrc
+watchlist/data.db
+.opencode/
+openspec/
+uv.lock
+.pytest_cache/
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+.idea
+.env.docker
+idea/
+data.db
+watchlist/data-dev.db
+node_modules/
+dev.py
+.sisyphus/
+watchlist/static/.webassets-cache
+trans.sh
+extract_messages.py
+babel.cfg

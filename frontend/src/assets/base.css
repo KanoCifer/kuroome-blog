@@ -1,0 +1,192 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  body {
+    /* 使用 @apply 将 Tailwind 类应用到 body */
+    @apply m-0 min-h-screen bg-[url('/bg.webp')] bg-cover bg-fixed bg-center bg-no-repeat p-0 transition-colors duration-500 dark:bg-[url('/bg-dark.webp')];
+  }
+
+  /* 解决某些框架给 #app 默认加了高度/宽度的问题 */
+  #app {
+    @apply min-h-screen;
+  }
+}
+@theme {
+  --animate-bounce-up: bounce-up 2s infinite;
+
+  @keyframes bounce-up {
+    0%,
+    100% {
+      transform: translateY(25%);
+      animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+      transform: none;
+      animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+  }
+}
+footer {
+  @apply mx-auto w-auto min-w-0 p-4 text-center text-sm text-gray-400 dark:border-gray-700;
+}
+
+nav ul {
+  @apply mb-2 flex gap-6 overflow-visible rounded-2xl border-2 border-gray-200/20 bg-gray-50/30 p-2 py-3 shadow-xl outline-1 outline-offset-1 outline-blue-100 dark:border-gray-700 dark:bg-gray-800/70 dark:shadow-gray-300/10 dark:outline-gray-600;
+}
+
+nav li a {
+  @apply rounded-lg px-2 py-2 font-serif text-lg font-bold text-gray-600 no-underline transition-colors text-shadow-xs hover:text-gray-900 dark:text-gray-300 dark:hover:text-white;
+}
+
+a,
+button {
+  @apply cursor-pointer;
+}
+
+/* // tiptap编辑器样式 */
+.tiptap p.is-editor-empty:first-child::before {
+  @apply text-gray-400;
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* 链接 */
+.tiptap-link {
+  @apply cursor-pointer text-blue-500 underline;
+}
+.tiptap-link:hover {
+  @apply text-blue-600;
+}
+
+/* 图片 */
+.tiptap-image {
+  @apply h-auto max-w-full rounded-md;
+}
+
+/* 代码块 */
+.tiptap pre {
+  @apply overflow-x-auto rounded-md bg-slate-800 p-4;
+}
+.tiptap pre code {
+  @apply bg-transparent text-sm text-slate-200;
+}
+.tiptap code {
+  /* 原始 rgba 颜色保留以保持细微视觉一致性 */
+  background: rgba(0, 0, 0, 0.05);
+  @apply rounded-sm text-sm;
+}
+
+/* 激活按钮 */
+.tiptap-btn.is-active {
+  @apply bg-blue-500 text-white;
+}
+.tiptap-btn.is-active:hover {
+  @apply bg-blue-600;
+}
+
+/* 表格 */
+.tiptap table {
+  @apply my-4 w-full border-collapse text-sm;
+}
+.tiptap table th,
+.tiptap table td {
+  @apply border border-gray-200 px-3 py-2 text-left;
+  min-width: 3rem;
+}
+.tiptap table th {
+  @apply bg-gray-50 font-semibold;
+}
+.tiptap table td {
+  @apply bg-white;
+}
+.tiptap table tr:hover td {
+  @apply bg-gray-100;
+}
+.tiptap table .selectedCell:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: rgba(59, 130, 246, 0.15);
+}
+.tiptap table .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: -2px;
+  width: 4px;
+  @apply pointer-events-none bg-blue-500;
+}
+.tiptap table p {
+  @apply m-0;
+}
+.tiptap .tableWrapper {
+  @apply my-4 overflow-x-auto;
+}
+
+/* 暗色模式 */
+.dark .tiptap table th,
+.dark .tiptap table td {
+  @apply border-gray-700;
+}
+.dark .tiptap table th {
+  @apply bg-slate-800 text-gray-50;
+}
+.dark .tiptap table td {
+  @apply bg-slate-900 text-gray-300;
+}
+.dark .tiptap table tr:hover td {
+  @apply bg-slate-800;
+}
+.dark .tiptap table .selectedCell:after {
+  background: rgba(96, 165, 250, 0.25);
+}
+.dark .tiptap table .column-resize-handle {
+  background: #60a5fa;
+}
+
+/* Task list (Tailwind) */
+ul[data-type="taskList"] {
+  @apply ml-0 list-none p-0;
+}
+
+ul[data-type="taskList"] > li {
+  @apply flex flex-nowrap items-center gap-2 py-1; /* checkbox 与文字同行 */
+}
+
+ul[data-type="taskList"] > li > label {
+  @apply mr-0 inline-flex flex-none items-center select-none;
+}
+
+ul[data-type="taskList"] > li > label input[type="checkbox"] {
+  @apply m-0 h-4 w-4 align-middle;
+}
+
+ul[data-type="taskList"] > li > div {
+  @apply min-w-0 flex-1;
+}
+
+ul[data-type="taskList"] > li > div p {
+  @apply m-0;
+}
+
+/* checked state -> strike-through */
+ul[data-type="taskList"] > li[data-checked="true"] > div,
+ul[data-type="taskList"] > li[data-checked="true"] > div p {
+  @apply text-gray-500 line-through opacity-60;
+}
+
+/* nested taskList reset */
+ul[data-type="taskList"] ul[data-type="taskList"] {
+  @apply m-0;
+}
+
+/* dark mode adjustments */
+.dark ul[data-type="taskList"] > li[data-checked="true"] > div,
+.dark ul[data-type="taskList"] > li[data-checked="true"] > div p {
+  @apply text-gray-400;
+}

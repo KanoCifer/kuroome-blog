@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+{% block title %}{% if post %}Edit Post: {{ post.title }}{% else %}New Post{% endif %}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-4xl py-8">
+  <div class="mb-8">
+    <div class="mx-auto max-w-4xl">
+      <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+        {% if post %}Edit Post{% else %}New Post{% endif %}
+      </h1>
+      {% if post %}
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        ID: {{ post._id }} • Created:
+        {{ moment(post.created_at).format('LL') }}
+      </p>
+      {% endif %}
+    </div>
+  </div>
+
+  <form id="post-form" method="post" class="space-y-6">
+    <!-- Title -->
+    <div
+      class="group relative rounded-xl border border-gray-200 bg-white p-2 shadow-sm transition-all focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600">
+      <label for="title" class="sr-only">Post Title</label>
+      {{ form.title(class="block w-full border-0 bg-transparent px-4 py-3 text-xl font-bold text-gray-900
+      placeholder:text-gray-400 focus:ring-0 sm:text-2xl dark:text-white", placeholder="Enter post title...") }}
+    </div>
+
+    <!-- Category -->
+    <div>
+      <div class="group relative flex w-full max-w-xs items-center rounded-xl border border-gray-200 bg-white px-4 py-2 shadow-sm transition-all focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600">
+        <label for="category" class="mr-3 whitespace-nowrap text-sm font-medium text-gray-500 dark:text-gray-400">Category:</label>
+        {{ form.category(class="block w-full cursor-pointer border-0 bg-transparent p-0 text-sm font-medium text-gray-900 focus:ring-0 dark:text-white dark:bg-gray-800") }}
+      </div>
+      {% if form.category.errors %}
+      <p class="mt-1 text-sm text-red-500">{{ form.category.errors[0] }}</p>
+      {% endif %}
+    </div>
+
+    <!-- Tiptap Editor -->
+    <div class="tiptap-wrapper relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+      {{ form.hidden_tag() }}
+      {{ form.body(class="hidden", id="editor") }}
+
+      <!-- Toolbar -->
+      <div id="tiptap-toolbar"
+        class="flex flex-wrap items-center gap-0.5 border-b border-gray-200 bg-gray-50 px-2 py-1.5 dark:border-gray-700 dark:bg-gray-900">
+
+        <!-- Text Style Group -->
+        <div class="flex items-center gap-0.5">
+          <button type="button" data-action="bold" title="Bold (Ctrl+B)"
+            class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 4h8a4 4 0 014 4 4 4 0 01-4 4H6z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 12h9a4 4 0 014 4 4 4 0 01-4 4H6z" />
+            </svg>
+          </button>
+          <button type="button" data-action="italic" title="Italic (Ctrl+I)"
+            class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10 4h4m-2 0l-4 16m0 0h4M8 20h4" />
+            </svg>
+          </button>
+          <button type="button" data-action="underline" title="Underline (Ctrl+U)"
+            class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7 4v7a5 5 0 0010 0V4M5 20h14" />
+            </svg>
+          </button>
+          <button type="button" data-action="strike" title="Strikethrough"
+            class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16 4H9a3 3 0 000 6h2m4 0H9a3 3 0 000 6h7M4 12h16" />
+            </svg>
+          </button>
+          <button type="button" data-action="code" title="Inline Code"
+            class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="mx-1 h-5 w-px bg-gray-300 dark:bg-gray-600"></div>
+
+        <!-- Heading Group -->
+        <div class="flex items-center gap-0.5">
+          <button type="button" data-action="h1" title="Heading 1"
+            class="tiptap-btn rounded-md px-1.5 py-1 text-xs font-bold text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            H1
+          </button>
+          <button type="button" data-action="h2" title="Heading 2"
+            class="tiptap-btn rounded-md px-1.5 py-1 text-xs font-bold text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            H2
+          </button>
+          <button type="button" data-action="h3" title="Heading 3"
+            class="tiptap-btn rounded-md px-1.5 py-1 text-xs font-bold text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            H3
+          </button>
+          <button type="button" data-action="paragraph" title="Paragraph"
+            class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="mx-1 h-5 w-px bg-gray-300 dark:bg-gray-600"></div>
+
+        <!-- List & Block Group -->
+        <div class="flex items-center gap-0.5">
+          <button type="button" data-action="bulletList" title="Bullet List"
+            class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+            </svg>
+          </button>
+          <button type="button" data-action="orderedList" title="Ordered List"
+            class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M8.242 5.992h12m-12 6.003h12m-12 5.999h12M4.117 7.495v-3.75H2.99m1.125 3.75H2.99m1.125 0H5.24m-1.92 2.577a1.125 1.125 0 11-1.087 1.426m1.087-1.426L2.977 15.42m1.225-3.348H2.153" />
+            </svg>
+          </button>
+          <button type="button" data-action="blockquote" title="Blockquote"
+            class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179zm10 0C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179z" />
+            </svg>
+          </button>
+          <button type="button" data-action="codeBlock" title="Code Block"
+            class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
+            </svg>
+          </button>
+          
+          <!-- Code Language Selector (Hidden by default) -->
+          <select id="code-language" class="hidden h-7 rounded-md border-gray-300 bg-white py-0 pl-2 pr-7 text-xs text-gray-700 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
+            <option value="plaintext">Text</option>
+            <option value="python">Python</option>
+            <option value="javascript">JavaScript</option>
+            <option value="typescript">TypeScript</option>
+            <option value="css">CSS</option>
+          </select>
+          <button type="button" data-action="horizontalRule" title="Horizontal Rule"
+            class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="mx-1 h-5 w-px bg-gray-300 dark:bg-gray-600"></div>
+
+        <!-- Align Group -->
+        <div class="flex items-center gap-0.5">
+          <button type="button" data-action="alignLeft" title="Align Left"
+            class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h10.5m-10.5 5.25h16.5" />
+            </svg>
+          </button>
+          <button type="button" data-action="alignCenter" title="Align Center"
+            class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M6.75 12h10.5M3.75 17.25h16.5" />
+            </svg>
+          </button>
+          <button type="button" data-action="alignRight" title="Align Right"
+            class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M7.5 12h13.5M3.75 17.25h16.5" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="mx-1 h-5 w-px bg-gray-300 dark:bg-gray-600"></div>
+
+        <!-- Insert Group -->
+        <div class="flex items-center gap-0.5">
+          <button type="button" data-action="link" title="Insert Link"
+            class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+            </svg>
+          </button>
+          <button type="button" data-action="image" title="Insert Image"
+            class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="mx-1 h-5 w-px bg-gray-300 dark:bg-gray-600"></div>
+
+        <!-- Undo/Redo & Clear -->
+        <div class="flex items-center gap-0.5">
+          <button type="button" data-action="undo" title="Undo (Ctrl+Z)"
+            class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+            </svg>
+          </button>
+          <button type="button" data-action="redo" title="Redo (Ctrl+Shift+Z)"
+            class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 15l6-6m0 0l-6-6m6 6H9a6 6 0 000 12h3" />
+            </svg>
+          </button>
+          <button type="button" data-action="clearFormat" title="Clear Formatting"
+            class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Editor Content Area -->
+      <div id="tiptap-editor"></div>
+
+      {% for error in form.body.errors %}
+      <span class="mt-1 flex items-center px-4 py-2 text-sm text-red-500">
+        <svg class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {{ error }}
+      </span>
+      {% endfor %}
+    </div>
+
+    <div class="flex items-center justify-end gap-3 pt-4">
+      <a href="{% if post %}{{ url_for('blog.post', _id=post._id) }}{% else %}{{ url_for('blog.index') }}{% endif %}"
+        class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700">
+        Cancel
+      </a>
+      <button type="submit"
+        class="inline-flex cursor-pointer items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="mr-2 h-4 w-4">
+          <path fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+            clip-rule="evenodd" />
+        </svg>
+        {% if post %}Save Changes{% else %}Create Post{% endif %}
+      </button>
+    </div>
+  </form>
+</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ moment.include_moment() }}
+{{ moment.locale(auto_detect=True) }}
+<script src="{{ url_for('static', filename='dist/tiptap-editor.min.js') }}"></script>
+<link rel="stylesheet" href="{{url_for('static', filename='dist/onedark.min.css')}}">
+{% endblock %}

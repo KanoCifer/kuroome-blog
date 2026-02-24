@@ -1,0 +1,83 @@
+# Ruff configuration for Flask Reading List project
+# https://docs.astral.sh/ruff/
+
+# Target Python 3.14
+target-version = "py314"
+
+# Line length to match existing code style
+line-length = 79
+
+[lint]
+# Enable recommended rules plus Flask-specific ones
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort (import sorting)
+    "N",   # pep8-naming
+    "UP",  # pyupgrade (modernize Python code)
+    "B",   # flake8-bugbear (find likely bugs)
+    "C4",  # flake8-comprehensions
+    "DTZ", # flake8-datetimez (datetime without timezone)
+    "SIM", # flake8-simplify
+    "TID", # flake8-tidy-imports
+    "PTH", # flake8-use-pathlib
+    "RUF", # Ruff-specific rules
+]
+
+# Ignore specific rules that conflict with project style
+ignore = [
+    "E501",   # Line too long (handled by formatter)
+    "PTH123", # Allow open() instead of Path.open()
+    "PTH118", # Allow os.path.join() for Flask paths
+    "DTZ005", # Allow datetime.now() without timezone (used in models)
+    "N805",   # Allow first argument not named 'self' (Flask patterns)
+    "SIM108", # Allow if-else instead of ternary (readability)
+    "RUF001", # Allow ambiguous characters in strings (Chinese)
+    "RUF003", # Allow ambiguous characters in comments (Chinese)
+    "B008",   # Allow using mutable default arguments (e.g. dicts in Pydantic models)
+]
+
+# Allow unused variables when prefixed with underscore
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[lint.per-file-ignores]
+# Allow unused imports in __init__.py files
+"__init__.py" = ["F401"]
+# Ignore all issues in auto-generated migrations
+"migrations/**/*.py" = ["F401", "E402", "I001", "W291", "W293"]
+# Allow os.path in entry point files (wsgi, app files)
+"wsgi.py" = ["PTH120", "PTH110"]
+"app.py" = ["PTH120", "PTH110"]
+"app-dev.py" = ["PTH120", "PTH110"]
+
+[lint.isort]
+# Import sorting - match existing project style
+known-first-party = ["watchlist"]
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder",
+]
+
+[lint.flake8-tidy-imports]
+# Ban certain imports
+ban-relative-imports = "all"
+
+[format]
+# Use double quotes (match existing code)
+quote-style = "double"
+
+# Indent with 4 spaces
+indent-style = "space"
+
+# Unix line endings
+line-ending = "lf"
+
+# Format docstrings
+docstring-code-format = true
+
+# Respect magic trailing comma
+skip-magic-trailing-comma = false

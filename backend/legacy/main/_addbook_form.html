@@ -1,0 +1,136 @@
+<!-- 添加书籍表单 -->
+<div
+  class="mb-8 rounded-2xl bg-white/80 p-6 shadow-xl ring-1 ring-gray-900/5 transition-shadow hover:shadow-2xl dark:bg-gray-800 dark:ring-white/10"
+>
+  <div
+    class="mb-6 flex items-center gap-3 border-b border-gray-100 pb-4 dark:border-gray-700"
+  >
+    <div
+      class="flex items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="2"
+        stroke="currentColor"
+        class="h-6 w-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M12 4.5v15m7.5-7.5h-15"
+        />
+      </svg>
+    </div>
+    <p
+      class="mb-0 items-center text-xl font-bold text-gray-900 dark:text-white"
+    >
+      {{ _("Add to ReadingList") }}
+    </p>
+  </div>
+
+  <form method="post" class="space-y-5">
+    {{ form.hidden_tag() }}
+    <div class="grid gap-6 md:grid-cols-2">
+      <div class="group">
+        {{
+          form.title.label(class="mb-2 block text-sm font-semibold
+          text-gray-700 dark:text-gray-300")
+        }}
+        {{
+          form.title(class="form-control
+          transition-transform focus:scale-[1.01]", autocomplete="off",
+          placeholder="e.g. The Great Gatsby")
+        }}
+        {%
+          for error in
+          form.title.errors
+        %}
+          <span class="mt-1 flex items-center text-sm text-red-500">
+            <svg
+              class="mr-1 h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            {{ error }}
+          </span>
+        {% endfor %}
+      </div>
+      <div class="group">
+        {{
+          form.author.label(class="mb-2 block text-sm font-semibold
+          text-gray-700 dark:text-gray-300")
+        }}
+        {{
+          form.author(class="form-control
+          transition-transform focus:scale-[1.01]", autocomplete="off",
+          placeholder="e.g. F. Scott Fitzgerald")
+        }}
+        {%
+          for error in
+          form.author.errors
+        %}
+          <span class="mt-1 flex items-center text-sm text-red-500">
+            <svg
+              class="mr-1 h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            {{ error }}
+          </span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <label
+      class="group relative flex cursor-pointer items-center rounded-xl border border-gray-200 p-4 transition-all hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700/30"
+    >
+      {{ form.iscompleted(class="peer sr-only") }}
+      <div
+        class="mr-4 flex h-6 w-6 items-center justify-center rounded-md border-2 border-gray-300 bg-white transition-all peer-checked:border-blue-500 peer-checked:bg-blue-500 dark:border-gray-500 dark:bg-gray-700"
+      >
+        <svg
+          class="z-10 h-4 w-4 text-white opacity-0 transition-opacity peer-checked:opacity-100"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="3"
+            d="M5 13l4 4L19 7"
+          />
+        </svg>
+      </div>
+      <span class="font-medium text-gray-700 dark:text-gray-300"
+        >{{ form.iscompleted.label.text }}</span
+      >
+    </label>
+
+    <div class="flex justify-end">
+      {{
+        form.submit(class="btn-primary text-white flex items-center gap-2
+        rounded-xl px-8 py-2.5 font-bold shadow-lg shadow-blue-500/30
+        ring-offset-2 focus:ring-2 focus:ring-blue-500 dark:ring-offset-gray-800")
+      }}
+    </div>
+  </form>
+</div>

@@ -1,0 +1,383 @@
+{% extends "base.html" %}
+{% block title %}{{ post.title }}{% endblock %}
+
+{% macro render_comment(comment_node, level=0) %}
+  {% set comment = comment_node.comment if comment_node.comment is defined else comment_node %}
+  <div
+    class="group {% if level > 0 %}
+      ml-6 border-l-2 border-gray-100 pl-6 dark:border-gray-700 sm:ml-10
+    {% endif %} transition-all duration-200"
+    id="comment-{{ comment._id }}"
+  >
+    <div
+      class="{% if not comment.reviewed and current_user.is_authenticated and current_user.is_admin %}
+        border-yellow-300 bg-yellow-50 ring-4 ring-yellow-50/50
+        dark:border-yellow-700/50 dark:bg-yellow-900/20 dark:ring-yellow-900/30
+      {% else %}
+        bg-white dark:bg-gray-800
+      {% endif %} relative rounded-2xl border border-gray-100 p-5 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700"
+    >
+      <div class="mb-3 flex items-start justify-between">
+        <div class="flex items-center gap-3">
+          <!-- Avatar Placeholder -->
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-blue-50 to-blue-100 text-sm font-bold text-blue-600 dark:from-sky-900 dark:to-blue-900 dark:text-blue-300"
+          >
+            {{ comment.author[0] | upper }}
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-semibold text-gray-900 dark:text-gray-100"
+                >{{ comment.author }}</span
+              >
+              {% if comment.from_admin %}
+                <span
+                  class="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 ring-1 ring-blue-700/10 ring-inset dark:bg-blue-900/40 dark:text-blue-300 dark:ring-blue-300/20"
+                  >Author</span
+                >
+              {% endif %}
+              {% if not comment.reviewed %}
+                <span
+                  class="inline-flex items-center rounded-md bg-yellow-50 px-2 py-0.5 text-xs font-medium text-yellow-800 ring-1 ring-yellow-600/20 ring-inset dark:bg-yellow-900/40 dark:text-yellow-300 dark:ring-yellow-300/20"
+                  >Pending</span
+                >
+              {% endif %}
+            </div>
+            <div class="text-xs text-gray-500 dark:text-gray-400">
+              {{ moment(comment.created_at).fromNow() }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="prose prose-sm dark:prose-invert max-w-none text-gray-700 dark:text-gray-300"
+      >
+        <!-- Action Footer -->
+        <div
+          class="mt-4 flex items-center justify-between border-t border-gray-50 pt-3 dark:border-gray-700"
+        >
+          <div>
+            {% if current_user.is_authenticated %}
+              <button
+                type="button"
+                class="reply-btn inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
+                data-comment-id="{{ comment._id }}"
+                data-comment-author="{{ comment.author }}"
+              >
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+                  ></path>
+                </svg>
+                Reply
+              </button>
+            {% endif %}
+          </div>
+
+          {% if not comment.reviewed and current_user.is_authenticated and current_user.is_admin %}
+            <div class="flex gap-2">
+              <form
+                method="POST"
+                action="{{ url_for('blog.approve_comment', comment_id=comment._id) }}"
+                class="inline"
+              >
+                <button
+                  type="submit"
+                  class="rounded-md bg-green-50 px-2.5 py-1.5 text-xs font-medium text-green-700 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50"
+                >
+                  Approve
+                </button>
+              </form>
+              <form
+                method="POST"
+                action="{{ url_for('blog.delete_comment', comment_id=comment._id) }}"
+                class="inline"
+                onsubmit="return confirm('Delete this comment?');"
+              >
+                <button
+                  type="submit"
+                  class="rounded-md bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
+                >
+                  Delete
+                </button>
+              </form>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Reply Form (Hidden) -->
+        {% if current_user.is_authenticated %}
+          <form
+            method="POST"
+            action="{{ request.path }}"
+            class="reply-form mt-4 hidden rounded-xl bg-gray-50 p-4 ring-1 ring-gray-200 dark:bg-gray-800/50 dark:ring-gray-700"
+            id="reply-form-{{ comment._id }}"
+          >
+            {{ form.hidden_tag() }}
+            <input type="hidden" name="replied_id" value="{{ comment._id }}" />
+            <div class="mb-3">
+              <div
+                class="mb-2 flex items-center justify-between text-xs text-gray-500"
+              >
+                <span
+                  >Replying to
+                  <span class="font-medium text-gray-900 dark:text-white"
+                    >@{{ comment.author }}</span
+                  ></span
+                >
+              </div>
+              <textarea
+                name="body"
+                rows="3"
+                class="block w-full rounded-lg border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                placeholder="What are your thoughts?"
+              ></textarea>
+            </div>
+            <div class="flex justify-end gap-2">
+              <button
+                type="button"
+                class="cancel-reply-btn rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
+                data-comment-id="{{ comment._id }}"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                class="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+              >
+                Post Reply
+              </button>
+            </div>
+          </form>
+        {% endif %}
+      </div>
+
+      <!-- Nested Replies -->
+      {% if comment_node.replies %}
+        <div class="mt-4">
+          {% for reply in comment_node.replies %}
+            {{ render_comment(reply, level + 1) }}
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endmacro %}
+
+{% block styles %}
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='dist/onedark.min.css') }}"
+  />
+{% endblock %}
+
+{% block content %}
+  <div class="container mx-auto px-4 py-8">
+    <div class="flex flex-col gap-8 lg:flex-row">
+      <!-- Main Content -->
+      <div class="min-w-0 flex-1">
+        <h1 class="mb-6 text-3xl font-bold dark:text-white">
+          {{ post.title }}
+        </h1>
+        <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+          By {{ post.author }} on
+          {{ moment(post.created_at).format('YYYY-MM-DD HH:mm:ss') }}
+        </div>
+        {% if post.created_at != post.updated_at %}
+          <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+            Updated: {{ moment(post.updated_at).toNow() }}
+          </div>
+        {% endif %}
+        <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+          Category:
+          <a
+            href="{{ url_for('blog.category', category_id=post.category_id) }}"
+            class="text-blue-600 hover:text-blue-800 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+            >{{ post.category }}</a
+          >
+        </div>
+        <div
+          class="rounded-xl bg-white px-12 py-8 shadow-md dark:border dark:border-gray-700/50 dark:bg-zinc-900 dark:shadow-none"
+        >
+          <div
+            class="prose prose-sm sm:prose-base lg:prose-lg dark:prose-invert max-w-none"
+          >
+            {{ post_body }}
+          </div>
+          <hr class="my-8 dark:border-gray-700" />
+          <!-- Comments Section -->
+          <div class="mt-12" id="comments">
+            <div
+              class="mb-8 flex items-center justify-between border-b border-gray-100 pb-4 dark:border-gray-700"
+            >
+              <div class="flex items-center gap-3">
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-white">
+                  Comments
+                </h3>
+                {% if post.comments %}
+                  <span
+                    class="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                  >
+                    {{ post.comments|length }}
+                  </span>
+                {% endif %}
+              </div>
+            </div>
+
+            {% if comments %}
+              <div class="space-y-6">
+                {% for comment in comments %}
+                  {{ render_comment(comment) }}
+                {% endfor %}
+              </div>
+            {% else %}
+              <!-- Empty State -->
+              <div
+                class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gray-50/50 py-16 text-center dark:border-gray-700 dark:bg-gray-800/30"
+              >
+                <div
+                  class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-gray-100 dark:bg-gray-800 dark:ring-gray-700"
+                >
+                  <svg
+                    class="h-8 w-8 text-gray-400 dark:text-gray-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.5"
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                    ></path>
+                  </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                  No comments yet
+                </h3>
+                <p
+                  class="mx-auto mt-2 max-w-sm text-sm text-gray-500 dark:text-gray-400"
+                >
+                  Be the first to share your thoughts on this post. We'd love to
+                  hear from you!
+                </p>
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Comment Form -->
+          <div
+            class="mt-8 rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800"
+          >
+            <h4
+              class="mb-4 text-lg font-semibold text-gray-800 dark:text-gray-100"
+            >
+              Leave a Comment
+            </h4>
+            <form
+              method="POST"
+              action="{{ request.path }}"
+              id="main-comment-form"
+            >
+              {{ form.hidden_tag() }}
+              <div class="space-y-4">
+                {% if not current_user.is_authenticated or not current_user.is_admin %}
+                  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div>
+                      {{ form.author.label(class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+                      {{
+                        form.author(class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500
+                        focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white dark:placeholder-gray-400")
+                      }}
+                      {% if form.author.errors %}
+                        <p class="mt-1 text-sm text-red-600">
+                          {{ form.author.errors[0] }}
+                        </p>
+                      {% endif %}
+                    </div>
+                    <div>
+                      {{ form.email.label(class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+                      {{
+                        form.email(class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500
+                        focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white dark:placeholder-gray-400")
+                      }}
+                      {% if form.email.errors %}
+                        <p class="mt-1 text-sm text-red-600">
+                          {{ form.email.errors[0] }}
+                        </p>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div>
+                    {{ form.site.label(class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+                    {{
+                      form.site(class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500
+                      focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white dark:placeholder-gray-400")
+                    }}
+                    {% if form.site.errors %}
+                      <p class="mt-1 text-sm text-red-600">
+                        {{ form.site.errors[0] }}
+                      </p>
+                    {% endif %}
+                  </div>
+                {% endif %}
+                <div>
+                  {{ form.body.label(class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+                  {{
+                    form.body(class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500
+                    focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white dark:placeholder-gray-400", rows="5")
+                  }}
+                  {% if form.body.errors %}
+                    <p class="mt-1 text-sm text-red-600">
+                      {{ form.body.errors[0] }}
+                    </p>
+                  {% endif %}
+                </div>
+                <div>
+                  {{
+                    form.submit(class="btn-primary rounded-lg px-6 py-2 font-semibold text-white shadow-md transition
+                    hover:opacity-90")
+                  }}
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="mt-6 space-x-4">
+          <a
+            href="{{ url_for('blog.index') }}"
+            class="btn-primary mt-4 rounded-xl px-6 py-2 font-semibold text-white shadow-md"
+            >Back to Blog</a
+          >
+          {% if current_user.is_authenticated and current_user.is_admin %}
+            <a
+              href="{{ url_for('admin.edit_post', _id=post._id) }}"
+              class="btn-primary mt-4 rounded-xl px-6 py-2 font-semibold text-white shadow-md"
+              >Edit Post</a
+            >
+          {% endif %}
+        </div>
+      </div>
+      <!-- Category Sidebar -->
+      {% include "blog/_cat_sidebar.html" %}
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+  {{ moment.include_moment() }}
+  {{ moment.locale(auto_detect=True) }}
+  <script src="{{ url_for('static', filename='dist/highlight.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/post.js') }}"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+{% endblock %}

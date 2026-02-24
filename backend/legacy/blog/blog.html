@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block title %}{% if active_category %}{{ active_category.name }} - Blog{% else %}Blog{% endif %}{% endblock %}
+
+{% block content %}
+  <div class="container mx-auto px-4 py-8">
+    <div class="mb-6 flex items-center justify-between">
+      <h1 class="text-3xl font-bold text-shadow-md dark:text-white">
+        {% if active_category %}
+          Category: {{ active_category.name }}
+        {% else %}
+          Blog
+        {% endif %}
+      </h1>
+      {% if current_user.is_authenticated %}
+        <a
+          href="{{ url_for('admin.new_post') }}"
+          class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="mr-2 h-4 w-4"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          New Post
+        </a>
+      {% endif %}
+    </div>
+    <div class="flex flex-col gap-8 lg:flex-row">
+      <!-- Main Content -->
+      <div class="min-w-0 flex-1">
+        <div class="space-y-6">
+          {% if posts|length == 0 %}
+            <div
+              class="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 px-6 py-16 text-center dark:border-gray-700 dark:bg-gray-800/30"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="mb-4 h-12 w-12 text-gray-300 dark:text-gray-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
+                />
+              </svg>
+              <p class="text-lg font-medium text-gray-500">
+                No blog posts available.
+              </p>
+              <p class="mt-1 text-sm text-gray-400">
+                {% if active_category %}
+                  There are no posts in this category yet.
+                {% else %}
+                  Check back later for new content.
+                {% endif %}
+              </p>
+            </div>
+          {% endif %}
+          {% for post in posts %}
+            <div
+              class="rounded-xl bg-white p-6 shadow-md dark:border dark:border-gray-700/50 dark:bg-gray-900 dark:shadow-none"
+            >
+              <a
+                href="{{ url_for('blog.post', _id=post._id) }}"
+                class="mb-2 block text-2xl font-semibold hover:text-blue-600 dark:text-white dark:hover:text-blue-400"
+                >{{ post.title }}</a
+              >
+              <p class="my-4 text-sm text-gray-600 dark:text-gray-400">
+                Post on
+                {{ moment(post.created_at).format('YYYY-MM-DD HH:mm:ss') }}
+              </p>
+              <div
+                class="prose prose-sm dark:prose-invert line-clamp-5 max-w-none leading-relaxed text-gray-800 dark:text-gray-200"
+              >
+                {{ post.body_html }}
+              </div>
+              <div
+                class="mt-4 flex items-center justify-between border-t border-gray-100 pt-4 dark:border-gray-700"
+              >
+                <div
+                  class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400"
+                >
+                  <div class="flex items-center gap-1.5" title="Comments">
+                    <svg
+                      class="h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                      ></path>
+                    </svg>
+                    <span>{{ post.comments|length }}</span>
+                  </div>
+                  <a
+                    href="{{ url_for('blog.category', category_id=post.category.id) }}"
+                    class="flex items-center gap-1.5 transition-colors hover:text-blue-600 dark:hover:text-blue-400"
+                    title="Category"
+                  >
+                    <svg
+                      class="h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                      ></path>
+                    </svg>
+                    <span>{{ post.category.name }}</span>
+                  </a>
+                </div>
+                <a
+                  href="{{ url_for('blog.post', _id=post._id) }}"
+                  class="inline-flex items-center text-sm font-medium text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  Read more
+                  <svg
+                    class="ml-1 h-3 w-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M14 5l7 7m0 0l-7 7m7-7H3"
+                    ></path>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        <nav class="mt-6 flex justify-center">
+          <ul>
+            <li class="{% if not pagination.has_prev %}disabled{% endif %}">
+              {% if pagination.has_prev %}
+                <a
+                  href="{{ url_for(request.endpoint, page=pagination.prev_num, category_id=active_category.id if active_category else none) }}"
+                  class="rounded bg-gray-200 px-3 py-1 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                  >&laquo; Previous</a
+                >
+              {% else %}
+                <span
+                  class="cursor-not-allowed rounded bg-gray-200 px-3 py-1 text-gray-400 dark:bg-gray-800 dark:text-gray-600"
+                  >&laquo; Previous</span
+                >
+              {% endif %}
+            </li>
+            <li class="{% if not pagination.has_next %}disabled{% endif %}">
+              {% if pagination.has_next %}
+                <a
+                  href="{{ url_for(request.endpoint, page=pagination.next_num, category_id=active_category.id if active_category else none) }}"
+                  class="rounded bg-gray-200 px-3 py-1 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                  >Next &raquo;</a
+                >
+              {% else %}
+                <span
+                  class="cursor-not-allowed rounded bg-gray-200 px-3 py-1 text-gray-400 dark:bg-gray-800 dark:text-gray-600"
+                  >Next &raquo;</span
+                >
+              {% endif %}
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <!-- Category Sidebar -->
+      {% include "blog/_cat_sidebar.html" %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  {{ moment.include_moment() }}
+  {{ moment.locale(auto_detect=True) }}
+  <script src="{{ url_for('static', filename='dist/highlight.min.js') }}"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+{% endblock %}
+
+{% block styles %}
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='dist/onedark.min.css') }}"
+  />
+{% endblock %}
