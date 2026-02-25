@@ -373,7 +373,7 @@ const handleReply = async (commentId: string, body: string) => {
 
           <!-- 文章内容区 -->
           <div class="mb-8 px-8 py-8 md:px-12 md:py-10">
-            <div class="prose prose-sm dark:prose-invert max-w-none">
+            <div class="prose prose-base dark:prose-invert max-w-none">
               <!-- 使用 v-html 渲染 HTML 内容（取消转译） -->
               <div v-if="post.body" v-html="post.body" />
               <div v-else class="text-gray-400 italic">暂无内容</div>

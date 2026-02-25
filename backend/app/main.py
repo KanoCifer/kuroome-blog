@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from functools import lru_cache
 from pathlib import Path
 
+from beanie import init_beanie
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -16,7 +17,17 @@ from app.configs.config import settings
 from app.dependencies.database import close_db_connections
 from app.dependencies.mongo import closeclient, init_mongo
 from app.exceptions import register_exception_handlers
-from app.routers import auth, blog, books, messages, public, users, weread
+from app.models.mgmodel import MessageBoard, Post
+from app.routers import (
+    admin,
+    auth,
+    blog,
+    books,
+    messages,
+    public,
+    users,
+    weread,
+)
 
 
 # 缓存配置实例，避免重复创建
@@ -28,11 +39,16 @@ def get_settings():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan manager."""
-    await init_mongo()
+    await init_mongo(app)
+    await init_beanie(
+        database=app.state.mongo,
+        document_models=[MessageBoard, Post],
+    )
 
     yield
 
-    await closeclient()
+    await app.state.client.close()
+    await closeclient(app)
     await close_db_connections()
 
 
@@ -45,6 +61,7 @@ app = FastAPI(
 )
 
 # Include routers
+app.include_router(admin.router, prefix="/api/v1")
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(blog.router, prefix="/api/v1")
 app.include_router(books.router, prefix="/api/v1")

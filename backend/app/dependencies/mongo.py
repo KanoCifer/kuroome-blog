@@ -7,6 +7,7 @@ using Motor for async MongoDB access.
 # Global MongoDB client instance
 
 from pymongo import AsyncMongoClient
+from pymongo.asynchronous.database import AsyncDatabase
 
 from app.configs.config import settings
 
@@ -17,26 +18,27 @@ client: AsyncMongoClient | None = None
 mongo = None
 
 
-async def init_mongo() -> None:
+async def init_mongo(app) -> None:
     """Initialize the MongoDB client connection."""
-    global client, mongo
 
     client = AsyncMongoClient(settings.MONGO_URI)
 
     mongo = client["readinglist"]  # 替换为你的数据库名称
 
+    app.state.client = client
+    app.state.mongo = mongo
 
-async def closeclient() -> None:
+
+async def closeclient(app) -> None:
     """Close the MongoDB client connection."""
-    global client
 
-    if client is not None:
-        await client.close()
-        client = None
+    if app.state.client is not None:
+        await app.state.client.close()
+        app.state.client = None
 
 
-async def get_mongo_db():
+async def get_mongo_db(app) -> None | AsyncDatabase:
     """
     mongodb依赖注入。
     """
-    return mongo
+    return app.state.mongo

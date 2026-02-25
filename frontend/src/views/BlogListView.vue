@@ -319,11 +319,13 @@
         </nav>
       </div>
       <!-- Category Sidebar -->
-      <CategorySidebar
-        class="sticky top-40 h-fit self-start"
-        @filterPosts="handleFilterPosts"
-        @resetFilter="handleResetFilter"
-      />
+      <div class="space-y-6">
+        <CategorySidebar
+          class="sticky top-40 h-fit self-start"
+          @filterPosts="handleFilterPosts"
+          @resetFilter="handleResetFilter"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -410,8 +412,11 @@ const goToPage = (page: number) => {
 };
 
 onMounted(() => {
-  const pageParam = parseInt(route.query.page as string, 10);
-  fetchPosts(isNaN(pageParam) || pageParam < 1 ? 1 : pageParam);
+  // 如果 URL 中有 category 参数，由 CategorySidebar 处理筛选
+  if (!route.query.category) {
+    const pageParam = parseInt(route.query.page as string, 10);
+    fetchPosts(isNaN(pageParam) || pageParam < 1 ? 1 : pageParam);
+  }
 });
 
 watch(

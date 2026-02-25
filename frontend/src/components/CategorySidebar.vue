@@ -86,6 +86,7 @@ onMounted(() => {
   const categoryId = route.query.category;
   if (categoryId) {
     activeCategoryId.value = parseInt(categoryId as string, 10);
+    fetchPostsByCategory(activeCategoryId.value);
   }
 });
 

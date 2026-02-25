@@ -6,6 +6,7 @@ import { RouterLink, RouterView } from "vue-router";
 const githubLogo = "/images/github.webp";
 
 import BackToTop from "@/components/BackToTop.vue";
+import MemoModal from "@/components/MemoModal.vue";
 import ThemeToggle from "@/components/ThemeToggle.vue";
 import ToastContainer from "@/components/ToastContainer.vue";
 import { useAuthStore } from "@/stores/auth";
@@ -410,7 +411,9 @@ onUnmounted((): void => {
                   </div>
                 </transition>
               </li>
-
+              <li>
+                <MemoModal />
+              </li>
               <!-- 用户下拉菜单 User Menu Dropdown -->
               <li
                 ref="userMenuRef"

@@ -11,9 +11,9 @@ class Settings(BaseSettings):
     # 👇 新增：把报错里提到的这四个字段加进来
     MAIL_USERNAME: str = ""
     MAIL_PASSWORD: str = ""
-    API_VERSION: str = ""
-    API_TITLE: str = ""
-    API_DESCRIPTION: str = ""
+    API_VERSION: str = "2.0.0"
+    API_TITLE: str = "Reading List API"
+    API_DESCRIPTION: str = "API文档。Personal reading tracker API built with FastAPI, PostgreSQL, and MongoDB. Manage your reading list, track progress, and get book recommendations."
 
     model_config = SettingsConfigDict(
         env_file=".env",  # 指定环境变量文件路径

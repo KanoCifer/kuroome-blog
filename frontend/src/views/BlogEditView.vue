@@ -23,7 +23,9 @@ const editorRef = ref<InstanceType<typeof TiptapEditor> | null>(null);
 // 计算当前选中的分类名称
 const currentCategory = computed(() => {
   if (!category.value) return "";
-  const selectedCategory = categories.value.find((cat) => String(cat.id) === category.value);
+  const selectedCategory = categories.value.find(
+    (cat) => String(cat.id) === category.value,
+  );
   return selectedCategory ? selectedCategory.name : "";
 });
 
@@ -52,7 +54,9 @@ onMounted(async () => {
 const fetchCategories = async () => {
   try {
     const res =
-      await request.get<ApiResponse<{ categories: Category[] } | Category[]>>("/categories");
+      await request.get<ApiResponse<{ categories: Category[] } | Category[]>>(
+        "/categories",
+      );
     if (res.data.status === "success") {
       // 兼容新旧两种 API 格式
       const data = res.data.data;
@@ -144,7 +148,10 @@ const handleSubmit = async () => {
         throw new Error(res.data.message);
       }
     } else {
-      const res = await request.post<ApiResponse<{ _id: string }>>("/post/addpost", payload);
+      const res = await request.post<ApiResponse<{ _id: string }>>(
+        "/post/addpost",
+        payload,
+      );
       if (res.data.status === "success") {
         notification.success("文章创建成功");
       } else {
@@ -192,10 +199,15 @@ const handleCategoryMouseLeave = () => {
     >
       <!-- Header -->
       <div class="mb-8">
-        <h1 class="font-serif text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+        <h1
+          class="font-serif text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100"
+        >
           {{ isEdit ? "Edit Post" : "New Post" }}
         </h1>
-        <p v-if="isEdit && postId" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        <p
+          v-if="isEdit && postId"
+          class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+        >
           ID: {{ postId }}
         </p>
       </div>
@@ -226,7 +238,12 @@ const handleCategoryMouseLeave = () => {
       </div>
 
       <!-- Form -->
-      <form v-else @submit.prevent="handleSubmit" ref="formRef" class="space-y-6">
+      <form
+        v-else
+        @submit.prevent="handleSubmit"
+        ref="formRef"
+        class="space-y-6"
+      >
         <!-- Title, Category, and Pin -->
         <div class="space-y-4">
           <!-- Title -->
@@ -298,7 +315,8 @@ const handleCategoryMouseLeave = () => {
                       clip-rule="evenodd"
                     />
                   </svg>
-                  <span class="mr-2 text-sm font-medium text-gray-500 dark:text-gray-400"
+                  <span
+                    class="mr-2 text-sm font-medium text-gray-500 dark:text-gray-400"
                     >分类</span
                   >
                   <span class="text-sm font-medium">

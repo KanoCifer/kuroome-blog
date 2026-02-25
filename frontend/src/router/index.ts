@@ -1,10 +1,6 @@
 import { useAuthStore } from "@/stores/auth";
 import HomeView from "@/views/HomeView.vue";
-import {
-  createMemoryHistory,
-  createRouter,
-  createWebHistory,
-} from "vue-router";
+import { createMemoryHistory, createRouter, createWebHistory } from "vue-router";
 
 // 根据环境选择 history 类型
 const history = import.meta.env.SSR
@@ -147,15 +143,13 @@ router.beforeEach(async (to) => {
     await auth.hydrateAuth();
   }
 
-  // 4. 检查“要去的页面”是否需要登录才能访问
+  // 4. 检查"要去的页面"是否需要登录才能访问
   // （看路由配置里的 meta.requiresAuth 是不是 true）
-  const needsAuth = to.matched.some(
-    (route) => route.meta?.requiresAuth === true,
-  );
+  const needsAuth = to.matched.some((route) => route.meta?.requiresAuth === true);
 
   // 5. 如果这个页面需要登录，但用户现在没登录
   if (needsAuth && !auth.isAuthenticated) {
-    // 就跳转到登录页，并把“当前想去的页面路径”带上
+    // 就跳转到登录页，并把"当前想去的页面路径"带上
     // （这样登录成功后可以直接跳回这个页面，体验更好）
     return { name: "login", query: { redirect: to.fullPath } };
   }

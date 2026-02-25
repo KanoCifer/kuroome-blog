@@ -210,7 +210,7 @@ const fetchMessages = async () => {
   error.value = "";
   try {
     console.log("[MessageManage] Fetching messages...");
-    const response = await request.get("/messages/admin/messages");
+    const response = await request.get("/admin/messages");
 
     const result = response.data;
     if (response.status === 200) {
@@ -263,7 +263,7 @@ const handleApprove = async (itemId: string) => {
   actionLoading.value = itemId;
   try {
     if (activeTab.value === "messages") {
-      await request.post(`/messages/admin/messages/${itemId}/approve`);
+      await request.post(`/admin/messages/${itemId}/approve`);
       await fetchMessages();
     } else {
       await request.post(`/admin/comments/${itemId}/approve`);
@@ -282,7 +282,7 @@ const handleDelete = async (itemId: string) => {
   actionLoading.value = itemId;
   try {
     if (activeTab.value === "messages") {
-      await request.delete(`/messages/admin/messages/${itemId}/delete`);
+      await request.delete(`/admin/messages/${itemId}/delete`);
       await fetchMessages();
     } else {
       await request.delete(`/admin/comments/${itemId}/delete`);
