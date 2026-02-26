@@ -89,7 +89,9 @@ onMounted(() => {
         class="flex items-center gap-3 font-serif text-2xl font-bold text-gray-800 dark:text-gray-100"
       >
         Message Board
-        <span class="items-baseline text-sm text-gray-500 italic dark:text-gray-400">
+        <span
+          class="items-baseline text-sm text-gray-500 italic dark:text-gray-400"
+        >
           Say hello now!
         </span>
         <span
@@ -108,7 +110,9 @@ onMounted(() => {
       <form @submit.prevent="handleSubmit" class="mt-4">
         <div class="grid gap-6 md:grid-cols-2">
           <div class="form-group md:col-span-2">
-            <label class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+            <label
+              class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300"
+            >
               Username
             </label>
             <input
@@ -118,13 +122,18 @@ onMounted(() => {
               :disabled="submitting"
               placeholder="Your name"
             />
-            <div v-if="errors.name" class="mt-1 flex items-center text-sm text-red-500">
+            <div
+              v-if="errors.name"
+              class="mt-1 flex items-center text-sm text-red-500"
+            >
               {{ errors.name[0] }}
             </div>
           </div>
 
           <div class="form-group md:col-span-2">
-            <label class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+            <label
+              class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300"
+            >
               Message
             </label>
             <textarea
@@ -134,7 +143,10 @@ onMounted(() => {
               :disabled="submitting"
               placeholder="发布后请等待审核"
             ></textarea>
-            <div v-if="errors.message" class="mt-1 flex items-center text-sm text-red-500">
+            <div
+              v-if="errors.message"
+              class="mt-1 flex items-center text-sm text-red-500"
+            >
               {{ errors.message[0] }}
             </div>
           </div>
@@ -158,7 +170,10 @@ onMounted(() => {
         </div>
       </form>
 
-      <div v-if="loading" class="mt-6 text-center text-gray-500 dark:text-gray-400">
+      <div
+        v-if="loading"
+        class="mt-6 text-center text-gray-500 dark:text-gray-400"
+      >
         Loading messages...
       </div>
 

@@ -2,7 +2,7 @@
   <aside class="w-full lg:w-64 lg:shrink-0">
     <div
       v-if="toc.length > 0"
-      class="sticky top-24 rounded-3xl bg-white p-5 shadow-md dark:border dark:border-gray-700/50 dark:bg-gray-900 dark:shadow-none"
+      class="sticky top-24 rounded-3xl bg-white/80 p-5 shadow-md backdrop-blur-sm dark:border dark:border-gray-700/80 dark:bg-gray-900/80 dark:shadow-none"
     >
       <h3
         class="mb-4 flex items-center gap-2 font-serif text-base font-semibold text-gray-800 dark:text-white"
@@ -43,8 +43,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onUnmounted, nextTick } from "vue";
 import type { TocItem } from "@/types";
+import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 
 const props = defineProps<{
   content: string;

@@ -3,7 +3,7 @@ import TiptapEditor from "@/components/TiptapEditor.vue";
 import request from "@/request";
 import { useNotificationStore } from "@/stores/notification";
 import type { ApiResponse, Category, Post } from "@/types";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
@@ -14,18 +14,78 @@ const isEdit = ref(false);
 const postId = ref<string | null>(null);
 
 const title = ref("");
+const debouncedTitle = ref("");
 const category = ref("");
 const body = ref("");
 const pin = ref(false);
 const categoryMenuOpen = ref(false);
+const draftMenuOpen = ref(false);
 const editorRef = ref<InstanceType<typeof TiptapEditor> | null>(null);
+// 用于强制更新草稿列表的响应式触发器
+const draftListRefreshTrigger = ref(0);
+// 生成安全的 storage key
+const getSafeStorageKey = (key: string): string => {
+  if (!key || key.trim() === "") {
+    return "tiptap-draft-default";
+  }
+  const safeKey = key.trim().replace(/[^\w\u4e00-\u9fa5-]/g, "_");
+  return `tiptap-draft-${safeKey}`;
+};
+
+// 获取草稿列表
+const draftList = computed(() => {
+  // 访问触发器以建立响应式依赖
+  void draftListRefreshTrigger.value;
+  return editorRef.value?.getAllDrafts() || [];
+});
+
+// 切换到指定草稿
+const handleSwitchDraft = (draftKey: string, draftTitle: string) => {
+  // 清除防抖定时器，立即更新
+  if (titleDebounceTimer) {
+    clearTimeout(titleDebounceTimer);
+    titleDebounceTimer = null;
+  }
+  // 立即更新标题和防抖标题
+  const actualTitle = draftTitle === "未命名草稿" ? "" : draftTitle;
+  title.value = actualTitle;
+  debouncedTitle.value = actualTitle;
+  // 然后切换草稿
+  editorRef.value?.switchToDraft(draftKey, draftTitle);
+  draftMenuOpen.value = false;
+  notification.success(`已切换到草稿：${draftTitle}`);
+};
+
+// 删除草稿
+const handleDeleteDraft = (e: Event, draftKey: string, draftTitle: string) => {
+  e.stopPropagation();
+  if (confirm(`确定要删除草稿 "${draftTitle}" 吗？`)) {
+    editorRef.value?.deleteDraft(draftKey);
+    // 刷新草稿列表
+    draftListRefreshTrigger.value++;
+    notification.success(`已删除草稿：${draftTitle}`);
+  }
+};
+
+let draftCloseTimeout: ReturnType<typeof setTimeout> | null = null;
+const handleDraftMouseEnter = () => {
+  if (draftCloseTimeout) {
+    clearTimeout(draftCloseTimeout);
+    draftCloseTimeout = null;
+  }
+  draftMenuOpen.value = true;
+};
+
+const handleDraftMouseLeave = () => {
+  draftCloseTimeout = setTimeout(() => {
+    draftMenuOpen.value = false;
+  }, 200);
+};
 
 // 计算当前选中的分类名称
 const currentCategory = computed(() => {
   if (!category.value) return "";
-  const selectedCategory = categories.value.find(
-    (cat) => String(cat.id) === category.value,
-  );
+  const selectedCategory = categories.value.find((cat) => String(cat.id) === category.value);
   return selectedCategory ? selectedCategory.name : "";
 });
 
@@ -39,6 +99,16 @@ const handleSaveDraft = () => {
   editorRef.value?.saveDraft();
   notification.success("草稿已保存");
 };
+
+let titleDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+watch(title, (newTitle) => {
+  if (titleDebounceTimer) {
+    clearTimeout(titleDebounceTimer);
+  }
+  titleDebounceTimer = setTimeout(() => {
+    debouncedTitle.value = newTitle;
+  }, 5000);
+});
 
 onMounted(async () => {
   await fetchCategories();
@@ -54,9 +124,7 @@ onMounted(async () => {
 const fetchCategories = async () => {
   try {
     const res =
-      await request.get<ApiResponse<{ categories: Category[] } | Category[]>>(
-        "/categories",
-      );
+      await request.get<ApiResponse<{ categories: Category[] } | Category[]>>("/categories");
     if (res.data.status === "success") {
       // 兼容新旧两种 API 格式
       const data = res.data.data;
@@ -83,6 +151,7 @@ const fetchPost = async (id: string) => {
     if (res.data.status === "success" && res.data.data) {
       const post = res.data.data;
       title.value = post.title || "";
+      debouncedTitle.value = post.title || "";
       category.value = post.category_id ? String(post.category_id) : "";
       body.value = post.body || "";
       pin.value = Boolean(post.is_pinned);
@@ -148,10 +217,7 @@ const handleSubmit = async () => {
         throw new Error(res.data.message);
       }
     } else {
-      const res = await request.post<ApiResponse<{ _id: string }>>(
-        "/post/addpost",
-        payload,
-      );
+      const res = await request.post<ApiResponse<{ _id: string }>>("/post/addpost", payload);
       if (res.data.status === "success") {
         notification.success("文章创建成功");
       } else {
@@ -194,20 +260,15 @@ const handleCategoryMouseLeave = () => {
 <template>
   <div class="container mx-auto px-4 py-8">
     <div
-      class="mx-auto max-w-5xl rounded-[36px] bg-gray-100/90 px-12 py-8 shadow-2xl backdrop-blur-xl dark:bg-gray-900/90"
+      class="mx-auto max-w-6xl rounded-2xl bg-gray-100/90 px-12 py-8 shadow-2xl backdrop-blur-sm dark:bg-gray-900/90"
     >
       <!-- Header -->
       <!-- Header -->
       <div class="mb-8">
-        <h1
-          class="font-serif text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100"
-        >
+        <h1 class="font-serif text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
           {{ isEdit ? "Edit Post" : "New Post" }}
         </h1>
-        <p
-          v-if="isEdit && postId"
-          class="mt-1 text-sm text-gray-500 dark:text-gray-400"
-        >
+        <p v-if="isEdit && postId" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
           ID: {{ postId }}
         </p>
       </div>
@@ -238,12 +299,7 @@ const handleCategoryMouseLeave = () => {
       </div>
 
       <!-- Form -->
-      <form
-        v-else
-        @submit.prevent="handleSubmit"
-        ref="formRef"
-        class="space-y-6"
-      >
+      <form v-else @submit.prevent="handleSubmit" ref="formRef" class="space-y-6">
         <!-- Title, Category, and Pin -->
         <div class="space-y-4">
           <!-- Title -->
@@ -257,12 +313,12 @@ const handleCategoryMouseLeave = () => {
               type="text"
               required
               placeholder="Enter post title..."
-              class="block w-full border-0 bg-transparent px-4 py-3 text-3xl font-bold text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-2xl dark:text-white"
+              class="block w-full border-0 bg-transparent px-4 py-3 text-3xl font-bold text-gray-900 outline-0 placeholder:text-gray-400 focus:ring-0 sm:text-2xl dark:text-white"
             />
           </div>
 
           <!-- Category and Pin 分类选项和置顶按钮 -->
-          <div class="flex items-center gap-4">
+          <div class="flex items-center justify-center gap-4">
             <!-- Pin Button -->
             <button
               type="button"
@@ -315,8 +371,7 @@ const handleCategoryMouseLeave = () => {
                       clip-rule="evenodd"
                     />
                   </svg>
-                  <span
-                    class="mr-2 text-sm font-medium text-gray-500 dark:text-gray-400"
+                  <span class="mr-2 text-sm font-medium text-gray-500 dark:text-gray-400"
                     >分类</span
                   >
                   <span class="text-sm font-medium">
@@ -394,12 +449,112 @@ const handleCategoryMouseLeave = () => {
               </svg>
               保存草稿
             </button>
+            <!-- 草稿下拉菜单 -->
+            <div
+              class="group relative flex w-auto items-center"
+              @mouseenter="handleDraftMouseEnter"
+              @mouseleave="handleDraftMouseLeave"
+            >
+              <button
+                type="button"
+                @click="draftMenuOpen = !draftMenuOpen"
+                class="flex items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-600 shadow-sm transition-all duration-200 hover:border-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-500 dark:hover:bg-gray-700"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  class="h-4 w-4"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                <span>草稿</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  :class="[
+                    'h-4 w-4 text-gray-400 transition-transform duration-200',
+                    draftMenuOpen ? 'rotate-180' : '',
+                  ]"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </button>
+              <transition
+                enter-active-class="transition-all transform-gpu duration-200 ease-out"
+                enter-from-class="opacity-0 scale-95 -translate-y-1"
+                enter-to-class="opacity-100 scale-100 translate-y-0"
+                leave-active-class="transition-all transform-gpu duration-150 ease-in"
+                leave-from-class="opacity-100 scale-100 translate-y-0"
+                leave-to-class="opacity-0 scale-95 -translate-y-1"
+              >
+                <div
+                  v-if="draftMenuOpen"
+                  class="absolute top-full right-0 z-50 mt-1 max-h-64 w-64 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                >
+                  <div
+                    v-if="draftList.length === 0"
+                    class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"
+                  >
+                    暂无草稿
+                  </div>
+                  <div v-else class="py-1">
+                    <div
+                      v-for="draft in draftList"
+                      :key="draft.key"
+                      @click="handleSwitchDraft(draft.key, draft.title)"
+                      :class="[
+                        'flex w-full cursor-pointer items-center justify-between px-4 py-2 text-left text-sm transition-colors',
+                        getSafeStorageKey(title) === draft.key
+                          ? 'bg-blue-100 text-blue-900 dark:bg-blue-900/20 dark:text-blue-300'
+                          : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700',
+                      ]"
+                    >
+                      <span class="flex-1 truncate">
+                        {{ draft.title }}
+                        <span v-if="!draft.hasContent" class="ml-1 text-xs text-gray-400"
+                          >(空)</span
+                        >
+                      </span>
+                      <button
+                        type="button"
+                        @click="handleDeleteDraft($event, draft.key, draft.title)"
+                        class="ml-2 p-1 text-gray-400 hover:text-red-500"
+                        title="删除草稿"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          class="h-4 w-4"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19H12.4a2.75 2.75 0 002.734-2.483l.84-10.52.15.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 5c.646 0 1.283.02 1.912.06.332.022.66.045.985.07l.726 9.11a1.25 1.25 0 01-1.24 1.126H7.617a1.25 1.25 0 01-1.24-1.126l.726-9.11c.325-.025.653-.048.985-.07A39.533 39.533 0 0110 5zM8.28 7.75a.75.75 0 00-1.5 0v5.5a.75.75 0 001.5 0v-5.5zm4.94 0a.75.75 0 011.5 0v5.5a.75.75 0 01-1.5 0v-5.5z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </transition>
+            </div>
           </div>
         </div>
 
         <!-- Tiptap Editor -->
         <div>
-          <TiptapEditor ref="editorRef" v-model="body" />
+          <TiptapEditor ref="editorRef" v-model="body" v-model:storageKey="debouncedTitle" />
         </div>
 
         <!-- Action Buttons -->

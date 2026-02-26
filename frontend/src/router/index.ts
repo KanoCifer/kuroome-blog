@@ -1,7 +1,11 @@
 import { useAuthStore } from "@/stores/auth";
 import { reportVisitorData } from "@/utils/visitorTracker";
 import HomeView from "@/views/HomeView.vue";
-import { createMemoryHistory, createRouter, createWebHistory } from "vue-router";
+import {
+  createMemoryHistory,
+  createRouter,
+  createWebHistory,
+} from "vue-router";
 
 declare global {
   interface Window {
@@ -161,7 +165,9 @@ router.beforeEach(async (to) => {
 
   // 4. 检查"要去的页面"是否需要登录才能访问
   // （看路由配置里的 meta.requiresAuth 是不是 true）
-  const needsAuth = to.matched.some((route) => route.meta?.requiresAuth === true);
+  const needsAuth = to.matched.some(
+    (route) => route.meta?.requiresAuth === true,
+  );
 
   // 5. 如果这个页面需要登录，但用户现在没登录
   if (needsAuth && !auth.isAuthenticated) {

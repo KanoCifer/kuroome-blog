@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from "vue";
-import { RouterLink, RouterView, useRoute } from "vue-router";
+import { RouterLink, RouterView } from "vue-router";
 
 // Static assets from public directory
 const githubLogo = "/images/github.webp";
@@ -12,10 +12,7 @@ import ToastContainer from "@/components/ToastContainer.vue";
 import { useAuthStore } from "@/stores/auth";
 
 // Route and authentication state
-const route = useRoute();
-const isHome = computed(() => {
-  return route.path === "/";
-});
+
 const auth = useAuthStore();
 
 // Dropdown state
@@ -743,17 +740,6 @@ onUnmounted((): void => {
 
     <!-- Footer -->
     <footer>
-      <iframe
-        v-show="isHome"
-        loading="lazy"
-        preload="none"
-        class="mx-auto mb-4 w-full min-w-2xl transform-gpu rounded-2xl shadow-lg"
-        allow="autoplay *; encrypted-media *"
-        frameborder="0"
-        height="450"
-        sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
-        src="https://embed.music.apple.com/cn/playlist/%E7%B2%A4%E8%AF%AD-%E5%9B%BD%E8%AF%AD%E9%BB%84%E9%87%91%E5%B9%B4%E4%BB%A3%E7%B2%BE%E9%80%89/pl.u-76oNkm7sv60v0l3"
-      ></iframe>
       <p>Copyright &copy; 2026 All Rights Reserved.</p>
       <div class="flex items-end justify-center">
         <a

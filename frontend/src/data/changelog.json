@@ -1,5 +1,17 @@
 [
   {
+    "version": "2.0.2",
+    "date": "2026-02-26",
+    "title": "性能优化与用户体验提升",
+    "changes": [
+      { "type": "feat", "content": "优化数据库查询性能，提升响应速度" },
+      { "type": "feat", "content": "新增aps定时任务，批量处理Trace数据" },
+      { "type": "style", "content": "优化Changelog页面的UI设计" },
+      { "type": "feat", "content": "新增文章草稿功能" },
+      { "type": "fix", "content": "修复了一些小的UI问题和功能bug" }
+    ]
+  },
+  {
     "version": "2.0.1",
     "date": "2026-02-26",
     "title": "新增 Changelog 变更日志/新增Track",
@@ -12,7 +24,7 @@
   },
   {
     "version": "2.0.0",
-    "date": "2026-02-26",
+    "date": "2026-02-25",
     "title": "重大更新：项目重构与功能增强",
     "changes": [
       { "type": "fix", "content": "修复技术栈迁移的遗留bug" },
@@ -22,7 +34,7 @@
   },
   {
     "version": "1.5.0",
-    "date": "2026-02-25",
+    "date": "2026-02-24",
     "title": "重大更新：重构项目架构",
     "changes": [
       { "type": "feat", "content": "FastAPI 后端上线" },

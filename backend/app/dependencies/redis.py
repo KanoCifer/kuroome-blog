@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from redis.asyncio import Redis as AsyncRedis
 
 
@@ -17,4 +19,19 @@ async def get_async_redis():
         yield redis
     finally:
         # 异步关闭连接（归还到连接池）
+        await redis.close()
+
+
+async def get_redis():
+    """FastAPI dependency for async Redis client."""
+    redis: AsyncRedis = AsyncRedis(
+        host="localhost",
+        port=6379,
+        db=0,
+        decode_responses=True,
+        max_connections=10,
+    )
+    try:
+        yield redis
+    finally:
         await redis.close()

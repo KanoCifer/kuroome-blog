@@ -4,6 +4,8 @@ from contextlib import asynccontextmanager
 from functools import lru_cache
 from pathlib import Path
 
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.interval import IntervalTrigger
 from beanie import init_beanie
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,6 +16,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 import app.models
 from app.configs.config import settings
+from app.dependencies.aps import run_migration_job
 from app.dependencies.database import close_db_connections
 from app.dependencies.mongo import closeclient, init_mongo
 from app.exceptions import register_exception_handlers
@@ -45,11 +48,28 @@ async def lifespan(app: FastAPI):
         document_models=[MessageBoard, Post],
     )
 
+    # 初始化 APScheduler
+    scheduler = AsyncIOScheduler()
+
+    # 配置定时任务
+    scheduler.add_job(
+        run_migration_job,
+        trigger=IntervalTrigger(seconds=600),  # 每 10 分钟执行一次
+        id="redis_to_db_migration",
+        name="Redis 数据迁移",
+        replace_existing=True,
+        max_instances=1,  # 关键：防止上一次任务没跑完，下一次又开始了
+    )
+
+    scheduler.start()
+
     yield
 
-    await app.state.client.close()
+    # 应用关闭时的清理工作
+    await app.state.client.close()  # 关闭 MongoDB 连接
     await closeclient(app)
-    await close_db_connections()
+    await close_db_connections()  # 关闭数据库连接池
+    scheduler.shutdown()  # 关闭 APScheduler
 
 
 # 实例化 FastAPI 应用

@@ -76,7 +76,7 @@ async def get_session() -> AsyncGenerator[AsyncSession]:
         async def read_items(session: AsyncSession = Depends(get_session)):
             ...
     """
-    session = AsyncSessionFactory()
+    session = AsyncSessionFactory(bind=async_engine)
     try:
         yield session
 

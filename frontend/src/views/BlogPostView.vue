@@ -44,7 +44,8 @@ const fetchPost = async () => {
     }
   } catch (err: unknown) {
     console.error(err);
-    errorMessage.value = err instanceof Error ? err.message : "加载文章失败，请稍后重试。";
+    errorMessage.value =
+      err instanceof Error ? err.message : "加载文章失败，请稍后重试。";
     useNotificationStore().error(errorMessage.value);
   } finally {
     isLoading.value = false;
@@ -67,7 +68,9 @@ watch(
 
 // 设置页面 meta 标签
 useHead(() => ({
-  title: post.value ? `${post.value.title} - ReadingList` : "文章未找到 - ReadingList",
+  title: post.value
+    ? `${post.value.title} - ReadingList`
+    : "文章未找到 - ReadingList",
   meta: [
     {
       name: "description",
@@ -149,7 +152,10 @@ const goBack = () => {
 const handleReply = async (commentId: string, body: string) => {
   try {
     // 递归查找评论的方法
-    const findComment = (commentsList: Comment[], id: string): Comment | undefined => {
+    const findComment = (
+      commentsList: Comment[],
+      id: string,
+    ): Comment | undefined => {
       for (const comment of commentsList) {
         if (comment._id === id) {
           return comment;
@@ -181,7 +187,11 @@ const handleReply = async (commentId: string, body: string) => {
       author: auth.isAuthenticated && auth.user ? auth.user.username : "",
     });
 
-    if (res.data.status === "success" || res.status === 200 || res.status === 201) {
+    if (
+      res.data.status === "success" ||
+      res.status === 200 ||
+      res.status === 201
+    ) {
       useNotificationStore().success("评论已提交，待审核后显示");
       // 刷新文章数据以获取最新评论
       await fetchPost();
@@ -190,7 +200,37 @@ const handleReply = async (commentId: string, body: string) => {
     }
   } catch (err: unknown) {
     console.error("提交回复失败:", err);
-    const errorMsg = err instanceof Error ? err.message : "提交评论失败，请稍后重试";
+    const errorMsg =
+      err instanceof Error ? err.message : "提交评论失败，请稍后重试";
+    useNotificationStore().error(errorMsg);
+  }
+};
+
+// 处理删除文章
+const handleDelete = async () => {
+  if (!confirm(`确定要删除文章 "${post.value?.title}" 吗？此操作不可恢复！`)) {
+    return;
+  }
+
+  try {
+    const res = await request.post<{
+      status: string;
+      message: string;
+      data?: { _id: string };
+    }>("/admin/post/delete", {
+      id: postId.value,
+    });
+
+    if (res.data.status === "success") {
+      useNotificationStore().success("文章删除成功");
+      router.push("/blog");
+    } else {
+      throw new Error(res.data.message || "删除文章失败");
+    }
+  } catch (err: unknown) {
+    console.error("删除文章失败:", err);
+    const errorMsg =
+      err instanceof Error ? err.message : "删除文章失败，请稍后重试";
     useNotificationStore().error(errorMsg);
   }
 };
@@ -208,12 +248,20 @@ const handleReply = async (commentId: string, body: string) => {
         stroke="currentColor"
         viewBox="0 0 24 24"
       >
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M15 19l-7-7 7-7"
+        />
       </svg>
       返回博客列表
     </router-link>
     <!-- Loading State -->
-    <div v-if="isLoading" class="flex min-h-[60vh] flex-col items-center justify-center">
+    <div
+      v-if="isLoading"
+      class="flex min-h-[60vh] flex-col items-center justify-center"
+    >
       <div
         class="h-12 w-12 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"
       ></div>
@@ -262,9 +310,15 @@ const handleReply = async (commentId: string, body: string) => {
       v-else-if="notFound || !post"
       class="flex min-h-[60vh] flex-col items-center justify-center px-6 py-16 text-center"
     >
-      <div class="mb-4 text-9xl font-bold text-gray-200 dark:text-gray-700">404</div>
-      <h2 class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">文章未找到</h2>
-      <p class="mb-6 text-gray-600 dark:text-gray-400">抱歉，您请求的文章不存在或已被删除。</p>
+      <div class="mb-4 text-9xl font-bold text-gray-200 dark:text-gray-700">
+        404
+      </div>
+      <h2 class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
+        文章未找到
+      </h2>
+      <p class="mb-6 text-gray-600 dark:text-gray-400">
+        抱歉，您请求的文章不存在或已被删除。
+      </p>
       <button
         class="rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
         @click="goBack"
@@ -303,7 +357,12 @@ const handleReply = async (commentId: string, body: string) => {
                 </div>
                 <span class="text-gray-400">·</span>
                 <div class="flex items-center gap-1">
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    class="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -311,13 +370,21 @@ const handleReply = async (commentId: string, body: string) => {
                       d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                     />
                   </svg>
-                  <span v-if="post.created_at && post.updated_at !== post.created_at">{{
-                    formatDate(post.updated_at)
-                  }}</span>
+                  <span
+                    v-if="
+                      post.created_at && post.updated_at !== post.created_at
+                    "
+                    >{{ formatDate(post.updated_at) }}</span
+                  >
                   <span v-else>{{ formatDate(post.created_at) }}</span>
                 </div>
                 <span v-if="post.category" class="flex items-center gap-1">
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    class="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -349,7 +416,9 @@ const handleReply = async (commentId: string, body: string) => {
               <div
                 class="mb-8 flex items-center gap-4 border-b border-gray-100 pb-6 dark:border-gray-700"
               >
-                <h3 class="text-2xl font-bold text-gray-900 dark:text-white">评论</h3>
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-white">
+                  评论
+                </h3>
                 <span
                   v-if="post.comments && post.comments.length > 0"
                   class="rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"
@@ -390,8 +459,12 @@ const handleReply = async (commentId: string, body: string) => {
                     />
                   </svg>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">暂无评论</h3>
-                <p class="mx-auto mt-2 max-w-sm text-sm text-gray-500 dark:text-gray-400">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                  暂无评论
+                </h3>
+                <p
+                  class="mx-auto mt-2 max-w-sm text-sm text-gray-500 dark:text-gray-400"
+                >
                   成为第一个评论的人吧！
                 </p>
               </div>
@@ -400,13 +473,18 @@ const handleReply = async (commentId: string, body: string) => {
             </div>
 
             <!-- 底部导航 -->
-            <div class="mt-8 flex justify-center">
+            <div class="mt-8 flex justify-center gap-4">
               <router-link
                 v-if="showEditButton"
                 :to="`/blog/edit/${post._id}`"
-                class="ml-4 inline-flex items-center gap-2 rounded-xl bg-gray-100 px-6 py-3 font-semibold text-gray-700 shadow-md transition-all hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                class="inline-flex items-center gap-2 rounded-xl bg-gray-100 px-6 py-3 font-semibold text-gray-700 shadow-md transition-all hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
               >
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -416,6 +494,26 @@ const handleReply = async (commentId: string, body: string) => {
                 </svg>
                 编辑文章
               </router-link>
+              <button
+                v-if="showEditButton"
+                @click="handleDelete"
+                class="inline-flex items-center gap-2 rounded-xl bg-red-100 px-6 py-3 font-semibold text-red-700 shadow-md transition-all hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50"
+              >
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+                删除文章
+              </button>
             </div>
           </div>
         </div>

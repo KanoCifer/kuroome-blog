@@ -316,33 +316,23 @@ const handleSubmit = async () => {
 
   try {
     const payload = {
-      name: form.value.name,
-      username: form.value.username,
+      name: form.value.name || "",
+      username: form.value.username || "",
       gender: form.value.gender || null,
       email: form.value.email || null,
       mobile: form.value.mobile || null,
       password: form.value.password || null,
     };
 
-    const response = await request.post("/user/settings", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    const response = await request.put("/user/settings", payload);
 
-    if (response.data.data.status === "success") {
+    if (response.data.code === 200) {
       await authStore.fetchUser();
       form.value.password = "";
       message.value = "Profile updated successfully!";
       messageType.value = "success";
     } else {
-      if (response.data.data.error) {
-        message.value = response.data.data.error;
-      } else {
-        message.value = "Failed to update profile";
-      }
+      message.value = response.data.message || "Failed to update profile";
       messageType.value = "error";
     }
   } catch (error) {

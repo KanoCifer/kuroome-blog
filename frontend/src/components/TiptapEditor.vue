@@ -14,12 +14,7 @@ import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
-import {
-  Table,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "@tiptap/extension-table";
+import { Table, TableCell, TableHeader, TableRow } from "@tiptap/extension-table";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import TextAlign from "@tiptap/extension-text-align";
@@ -33,6 +28,7 @@ const lowlight = createLowlight(common);
 // v-model 双向绑定
 const emit = defineEmits<{
   "update:modelValue": [value: string];
+  "update:storageKey": [value: string];
 }>();
 
 const props = defineProps({
@@ -42,12 +38,34 @@ const props = defineProps({
   },
   storageKey: {
     type: String,
-    default: "tiptap-draft",
+    default: "",
   },
 });
 
-// 草稿功能 (手动保存)
-const draftContent = useLocalStorage<string>(props.storageKey, "");
+// 生成安全的 storage key
+const getSafeStorageKey = (key: string): string => {
+  if (!key || key.trim() === "") {
+    return "tiptap-draft-default";
+  }
+  // 移除特殊字符，只保留字母、数字、中文和常用符号
+  const safeKey = key.trim().replace(/[^\w\u4e00-\u9fa5-]/g, "_");
+  return `tiptap-draft-${safeKey}`;
+};
+
+// 计算当前使用的 storage key
+const currentStorageKey = computed(() => getSafeStorageKey(props.storageKey));
+
+// 草稿功能 (手动保存) - 使用响应式的 key
+const draftContent = computed({
+  get: () => {
+    const storage = useLocalStorage<string>(currentStorageKey.value, "");
+    return storage.value;
+  },
+  set: (value: string) => {
+    const storage = useLocalStorage<string>(currentStorageKey.value, "");
+    storage.value = value;
+  },
+});
 
 // 手动保存草稿
 const saveDraft = (): void => {
@@ -74,9 +92,86 @@ const restoreDraft = (): void => {
     emit("update:modelValue", draftContent.value);
   }
 };
+// 标记是否是切换草稿操作
+let isSwitchingDraft = false;
+// 监听 storageKey 变化，动态切换草稿
+let previousStorageKey = currentStorageKey.value;
+watch(currentStorageKey, (newKey) => {
+  if (newKey !== previousStorageKey && !isSwitchingDraft) {
+    // 只切换草稿，不自动保存（避免输入过程中创建多个草稿）
+    previousStorageKey = newKey;
+    // 如果新 key 有草稿，自动加载
+    if (hasDraft.value && editor.value && !props.modelValue) {
+      editor.value.commands.setContent(draftContent.value);
+      emit("update:modelValue", draftContent.value);
+    }
+  }
+});
+
+// 获取所有草稿列表
+const getAllDrafts = (): Array<{
+  key: string;
+  title: string;
+  hasContent: boolean;
+}> => {
+  const drafts: Array<{ key: string; title: string; hasContent: boolean }> = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith("tiptap-draft-")) {
+      const content = localStorage.getItem(key) || "";
+      let title = key.replace("tiptap-draft-", "");
+      // 还原下划线为空格（简单处理）
+      title = title.replace(/_/g, " ");
+      if (title === "default") {
+        title = "未命名草稿";
+      }
+      drafts.push({
+        key,
+        title,
+        hasContent: content.trim().length > 0,
+      });
+    }
+  }
+  // 按标题排序
+  return drafts.sort((a, b) => a.title.localeCompare(b.title));
+};
+
+// 切换到指定草稿
+const switchToDraft = (draftKey: string, draftTitle: string) => {
+  isSwitchingDraft = true;
+  // 先保存当前草稿
+  saveDraft();
+  // 加载目标草稿
+  const targetStorage = useLocalStorage<string>(draftKey, "");
+  if (editor.value && targetStorage.value) {
+    editor.value.commands.setContent(targetStorage.value);
+    emit("update:modelValue", targetStorage.value);
+  }
+  // 通知父组件更新标题
+  emit("update:storageKey", draftTitle === "未命名草稿" ? "" : draftTitle);
+  // 更新 previousStorageKey
+  previousStorageKey = draftKey;
+  // 延迟重置标志，确保 watch 不会触发
+  setTimeout(() => {
+    isSwitchingDraft = false;
+  }, 100);
+};
+
+// 删除指定草稿
+const deleteDraft = (draftKey: string) => {
+  localStorage.removeItem(draftKey);
+};
 
 // 暴露给父组件的方法
-defineExpose({ clearDraft, hasDraft, restoreDraft, saveDraft });
+defineExpose({
+  clearDraft,
+  hasDraft,
+  restoreDraft,
+  saveDraft,
+  getAllDrafts,
+  switchToDraft,
+  deleteDraft,
+});
 
 // 编辑器实例
 const editor = useEditor({
@@ -187,7 +282,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div
-    class="tiptap-wrapper relative overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
+    class="tiptap-wrapper relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
   >
     <TiptapToolbar v-if="editor" :editor="editor" />
     <drag-handle v-if="editor" :editor="editor">
@@ -198,11 +293,7 @@ onBeforeUnmount(() => {
         stroke-width="2"
         stroke="currentColor"
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M4 8h16M4 16h16"
-        />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 8h16M4 16h16" />
       </svg>
     </drag-handle>
     <EditorContent :editor="editor" />
@@ -262,13 +353,7 @@ onBeforeUnmount(() => {
         ]"
         title="斜体"
       >
-        <svg
-          class="h-4 w-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="2"
-          stroke="currentColor"
-        >
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -284,13 +369,7 @@ onBeforeUnmount(() => {
         title="Code Block"
         class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
       >
-        <svg
-          class="h-4 w-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="2"
-          stroke="currentColor"
-        >
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -310,13 +389,7 @@ onBeforeUnmount(() => {
         ]"
         title="插入链接"
       >
-        <svg
-          class="h-4 w-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="2"
-          stroke="currentColor"
-        >
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"

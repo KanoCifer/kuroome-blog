@@ -23,7 +23,7 @@ from app.dependencies.auth import manager
 from app.dependencies.database import get_session
 from app.models.models import Profile, User
 from app.schemas.response import APIResponse
-from app.schemas.schemas import UserSettingsIn, UserSettingsOut
+from app.schemas.schemas import UserSettingsIn
 
 router = APIRouter(
     prefix="/user",
@@ -126,9 +126,9 @@ def _save_upload_file(upload_file: UploadFile, user_id: int) -> str:
     return f"{user_id}/{filename}"
 
 
-@router.put("/settings", response_model=UserSettingsOut)
+@router.put("/settings")
 async def update_user_settings(
-    data: Annotated[UserSettingsIn, Depends()],
+    data: UserSettingsIn,
     user: User = Depends(manager),
     db: AsyncSession = Depends(get_session),
 ):

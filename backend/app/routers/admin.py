@@ -19,6 +19,7 @@ Endpoints:
 
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime
 
 from beanie import SortDirection
@@ -31,8 +32,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies.auth import manager
 from app.dependencies.database import get_session
+from app.dependencies.redis import get_redis
 from app.models.mgmodel import MessageBoard, Post
-from app.models.models import Category, User, VisitorTrack
+from app.models.models import Category, User
 from app.schemas.response import APIResponse
 from app.schemas.schemas import BlogPostIn, BlogPostUpdate
 
@@ -418,13 +420,13 @@ async def track_visitor(
     data: dict,
     request: Request,
     session: AsyncSession = Depends(get_session),
+    redis=Depends(get_redis),
 ):
     """Track visitor data sent from the frontend."""
     ip_address = get_remote_address(request)
     data["ip_address"] = ip_address
-    data["visit_time"] = datetime.now(UTC)
     try:
-        await some_async_storage_function(data, session)
+        await redis.rpush("migration_queue", json.dumps(data))
         return APIResponse.ok(message="Visitor data tracked successfully")
     except Exception as e:
         return APIResponse.error(
@@ -433,7 +435,7 @@ async def track_visitor(
         )
 
 
-async def some_async_storage_function(data: dict, session: AsyncSession):
-    new_track = VisitorTrack(**data)
-    session.add(new_track)
-    await session.commit()
+# async def some_async_storage_function(data: dict, session: AsyncSession):
+#     new_track = VisitorTrack(**data)
+#     session.add(new_track)
+#     await session.commit()
