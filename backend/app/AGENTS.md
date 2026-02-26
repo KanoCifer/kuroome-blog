@@ -53,9 +53,9 @@ def get_books(user: User = Depends(get_current_user)):
 - **Models:** SQLAlchemy 2.0 with `Mapped[]`, `mapped_column()`
 - **Auth:** JWT-based, use `get_current_user` dependency
 
-## Dev Proxy Issue
+## Dev Proxy
 
-Vite proxies `/api/*` → `http://localhost:5050` (Flask), but FastAPI runs on `:5555`. Update vite.config.ts if needed.
+Vite proxies `/api/v1/*` → `http://localhost:5555` (FastAPI)
 
 ## Status
 

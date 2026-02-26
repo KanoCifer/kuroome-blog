@@ -103,7 +103,7 @@ mongo.db.message_board.find().sort("created_at", -1)
 - **Indent:** 2, **Semicolons:** yes, **Quotes:** single (Vue), double (TS)
 - **Components:** PascalCase, `<script setup lang="ts">`
 - **Path:** `@/` → `./src/`
-- **Dev proxy:** `/api/*` → `http://localhost:5050` (NOTE: FastAPI on `:5555`)
+- **Dev proxy:** `/api/*` → `http://localhost:5555` (FastAPI)
 
 ### Dependencies
 - vue, vue-router, pinia, @vueuse/core, axios

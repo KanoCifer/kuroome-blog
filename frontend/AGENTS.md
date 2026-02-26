@@ -39,8 +39,8 @@ frontend/
 ## Dev Server
 
 - **URL:** `http://localhost:5173`
-- **Proxy:** `/api/*` → `http://localhost:5050` (Flask)
-- **NOTE:** FastAPI runs on `:5555`, not `:5050`
+- **Proxy:** `/api/v1/*` → `http://localhost:5555` (FastAPI)
+- **FastAPI:** `/api/v1/*` at `:5555`, **Flask:** legacy at `:5050`
 
 ## Code Style
 
@@ -91,6 +91,6 @@ npm run format          # Prettier
 
 ## Notes
 
-- Vite proxy points to wrong port (5050 Flask vs actual 5555 FastAPI)
+- Vite proxy correctly points to FastAPI at :5555
 - Use `@/` alias for imports from `./src/`
 - Follow Vue 3 Composition API patterns with `<script setup>`

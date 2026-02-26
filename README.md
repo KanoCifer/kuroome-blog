@@ -1,33 +1,41 @@
-# ReadingList-Flask
+# ReadingList
 
 [![Python](https://img.shields.io/badge/Python-v3.14%2B-3776AB?logo=python)](https://www.python.org/)
-[![Flask](https://img.shields.io/badge/Flask-v3.x-000000?logo=flask)](https://flask.palletsprojects.com/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-NEW-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
+[![Flask](https://img.shields.io/badge/Flask-LEGACY-000000?logo=flask)](https://flask.palletsprojects.com/)
 [![Vue](https://img.shields.io/badge/Vue-v3.5-42b883?logo=vue.js)](https://vuejs.org/)
 [![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-v2.0+-D71F00)](https://www.sqlalchemy.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-ES2024-3178c6?logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?logo=tailwindcss)](https://tailwindcss.com/)
 [![Playwright](https://img.shields.io/badge/Playwright-E2E-45ba4b?logo=playwright)](https://playwright.dev/)
 
-基于 **Flask 3.x + Vue 3 + SQLAlchemy 2.0** 的全栈阅读清单管理项目，包含用户认证、书籍管理、博客系统、数据迁移与 Playwright E2E 测试。
+基于 **FastAPI + Flask + Vue 3 + SQLAlchemy 2.0** 的全栈阅读清单管理项目，包含用户认证、书籍管理、博客系统、微信读书导入、数据迁移与 Playwright E2E 测试。
 
 ## 项目概述
 
-- **架构**: 完整的 SPA 应用（Vue 3 前端 + Flask API 后端）
-- **后端**: Flask 3.x (APIFlask)、SQLAlchemy 2.0、Python 3.14+、SQLite3 (开发)、PostgreSQL (生产)、Flask-PyMongo (MongoDB 用于留言板和博客)
+- **架构**: 完整的 SPA 应用（Vue 3 前端 + FastAPI/Flask API 后端）
+- **后端**:
+  - **FastAPI** (新版): 运行在 `:5555`，提供 `/api/v1` 端点
+  - **Flask** (遗留): 运行在 `:5050`，提供 `/api` 端点
+  - SQLAlchemy 2.0、Python 3.14+、SQLite3 (开发)、PostgreSQL (生产)
+  - Flask-PyMongo (MongoDB 用于留言板和博客)
 - **前端**: Vue 3.5、TypeScript、Vite、Tailwind CSS v4、Pinia、Vue Router
 - **测试**: Pytest (后端)、Vitest (前端)、Playwright (E2E)
 
 ## 技术栈
 
 ### 后端
-- **Flask 3.x (APIFlask)**: API 优先的 Flask 框架
+
+- **FastAPI** (新版): 现代高性能 API 框架
+- **Flask** (遗留): 传统 Flask 应用
 - **SQLAlchemy 2.0**: 类型安全的 ORM
-- **Flask-Migrate**: 数据库迁移
+- **Alembic**: 数据库迁移
 - **Flask-Login**: 用户认证
 - **Flask-PyMongo**: MongoDB 集成（留言板、博客文章）
 - **Flask-Mail**: 邮件发送
 
 ### 前端
+
 - **Vue 3.5**: 渐进式 JavaScript 框架
 - **TypeScript**: 类型安全
 - **Vite**: 下一代前端构建工具
@@ -36,11 +44,13 @@
 - **Vue Router**: Vue 路由
 
 ### 数据库
+
 - **SQLite**: 开发环境轻量级数据库
 - **PostgreSQL**: 生产环境高性能关系型数据库
 - **MongoDB**: 存储留言板和博客文章
 
 ### 测试
+
 - **Pytest**: Python 单元测试
 - **Vitest**: Vue 单元测试
 - **Playwright**: 端到端测试
@@ -68,9 +78,11 @@ cd backend
 flask db upgrade
 
 # 5. 启动开发服务器
-# 后端 (:5050) - 终端 1
+# FastAPI 后端 (:5555) - 终端 1
 cd backend && python dev.py
-# 前端 (:5173) - 终端 2
+# Flask 后端 (:5050) - 终端 2 (可选，遗留)
+cd backend && python -m flask --app watchlist run -p 5050
+# 前端 (:5173) - 终端 3
 cd frontend && npm run dev
 ```
 
@@ -100,7 +112,8 @@ flask db upgrade
 flask db downgrade
 
 # 开发服务器
-python dev.py           # Flask API on :5050
+python dev.py           # FastAPI on :5555 (NEW)
+python -m flask --app watchlist run -p 5050  # Flask on :5050 (LEGACY)
 ```
 
 ### 前端
@@ -130,7 +143,7 @@ npm run format:check    # 仅检查格式
 ### Playwright E2E
 
 ```bash
-# 需要后端 (:5050) 和前端 (:5173) 同时运行
+# 需要后端 (:5555) 和前端 (:5173) 同时运行
 npx playwright test
 npx playwright test tests/example.spec.ts   # 单个文件
 npx playwright test --headed                 # 可视化模式
@@ -141,12 +154,16 @@ npx playwright test --debug                  # 调试模式
 
 ```
 ├── backend/
-│   ├── watchlist/         # Flask 应用包
+│   ├── app/                # FastAPI 应用 (NEW :5555)
+│   │   ├── routers/       # API: auth, blog, books, messages, public, users, weread
+│   │   ├── models/        # SQLAlchemy 2.0 模型
+│   │   ├── schemas/       # Pydantic schemas
+│   │   └── dependencies/ # FastAPI 依赖注入
+│   ├── watchlist/         # Flask 应用 (LEGACY :5050)
 │   │   ├── api/           # RESTful API 路由
-│   │   ├── models.py      # SQLAlchemy 2.0 模型
-│   │   └── templates/     # 遗留 Jinja2 模板
+│   │   └── models.py      # 遗留 SQLAlchemy 模型
 │   ├── migrations/        # Alembic 迁移
-│   ├── dev.py             # 开发入口 (:5050)
+│   ├── dev.py             # FastAPI 开发入口 (:5555)
 │   ├── pyproject.toml     # Python 依赖 & Ruff 配置
 │   └── .env               # 环境变量配置
 ├── frontend/              # Vue 3 SPA
@@ -164,6 +181,27 @@ npx playwright test --debug                  # 调试模式
 ├── AGENTS.md              # 开发指南
 └── README.md              # 项目说明
 ```
+
+## API 端点
+
+### FastAPI (NEW :5555)
+
+| 路由 | 描述 |
+|------|------|
+| `/api/v1/auth` | 认证（登录、注册） |
+| `/api/v1/books` | 书籍管理 |
+| `/api/v1/users` | 用户管理 |
+| `/api/v1/blog` | 博客系统 |
+| `/api/v1/messages` | 留言板 |
+| `/api/v1/weread` | 微信读书导入 |
+
+### Flask (LEGACY :5050)
+
+| 路由 | 描述 |
+|------|------|
+| `/api/auth` | 认证 |
+| `/api/books` | 书籍 |
+| `/api/blog` | 博客 |
 
 ## 配置
 
@@ -188,7 +226,8 @@ MONGO_URI=mongodb://localhost:27017/readinglist
 详见 [AGENTS.md](./AGENTS.md) 了解：
 - 代码风格规范（Ruff、Prettier）
 - SQLAlchemy 2.0 模型写法
-- Flask API 模式
+- FastAPI API 模式
+- Flask API 模式（遗留）
 - Flask-PyMongo (MongoDB) 模式
 - Vue 3 / TypeScript 规范
 - 测试模式与 Fixtures
