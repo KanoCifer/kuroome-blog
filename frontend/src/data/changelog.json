@@ -1,0 +1,66 @@
+[
+  {
+    "version": "2.0.1",
+    "date": "2026-02-26",
+    "title": "新增 Changelog 变更日志/新增Track",
+    "changes": [
+      { "type": "feat", "content": "新增 Changelog 页面，展示网站更新历史" },
+      { "type": "feat", "content": "新增访客追踪功能" },
+      { "type": "style", "content": "代码块样式调整为MacOs风格" },
+      { "type": "fix", "content": "修复了一些bugs" }
+    ]
+  },
+  {
+    "version": "2.0.0",
+    "date": "2026-02-26",
+    "title": "重大更新：项目重构与功能增强",
+    "changes": [
+      { "type": "fix", "content": "修复技术栈迁移的遗留bug" },
+      { "type": "feat", "content": "更换Mongodb驱动为ODM异步Beanie" },
+      { "type": "docs", "content": "完善项目文档和开发指南" }
+    ]
+  },
+  {
+    "version": "1.5.0",
+    "date": "2026-02-25",
+    "title": "重大更新：重构项目架构",
+    "changes": [
+      { "type": "feat", "content": "FastAPI 后端上线" },
+      { "type": "feat", "content": "Vue 3 前端上线" },
+      { "type": "refactor", "content": "重构前端架构，提升性能和可维护性" },
+      { "type": "refactor", "content": "重构后端架构，优化数据库设计" },
+      { "type": "feat", "content": "新增用户权限管理功能" }
+    ]
+  },
+  {
+    "version": "1.2.0",
+    "date": "2026-02-20",
+    "title": "博客评论功能",
+    "changes": [
+      { "type": "feat", "content": "支持博客文章评论功能" },
+      { "type": "fix", "content": "修复书架加载性能问题" },
+      { "type": "style", "content": "优化移动端适配警告弹窗" }
+    ]
+  },
+  {
+    "version": "1.1.0",
+    "date": "2026-02-10",
+    "title": "Dark Mode 深色模式",
+    "changes": [
+      { "type": "feat", "content": "新增深色模式切换" },
+      { "type": "feat", "content": "背景视频播放/暂停控制" },
+      { "type": "refactor", "content": "升级至 Tailwind CSS v4" }
+    ]
+  },
+  {
+    "version": "1.0.0",
+    "date": "2026-01-25",
+    "title": "项目正式发布",
+    "changes": [
+      { "type": "feat", "content": "Flask后端上线" },
+      { "type": "feat", "content": "Jinja2前端上线" },
+      { "type": "feat", "content": "微信读书导入功能" },
+      { "type": "feat", "content": "博客系统与书架管理" }
+    ]
+  }
+]

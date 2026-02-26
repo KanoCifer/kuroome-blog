@@ -89,9 +89,7 @@ onMounted(() => {
         class="flex items-center gap-3 font-serif text-2xl font-bold text-gray-800 dark:text-gray-100"
       >
         Message Board
-        <span
-          class="items-baseline text-sm text-gray-500 italic dark:text-gray-400"
-        >
+        <span class="items-baseline text-sm text-gray-500 italic dark:text-gray-400">
           Say hello now!
         </span>
         <span
@@ -100,13 +98,17 @@ onMounted(() => {
           {{ messages.length }}
         </span>
       </h2>
+      <p class="my-4">
+        <span
+          class="rounded-full border border-blue-200 bg-blue-200/30 px-4 py-2 text-xs font-medium text-blue-400"
+          >*评论发布后请等待管理员审核</span
+        >
+      </p>
 
       <form @submit.prevent="handleSubmit" class="mt-4">
         <div class="grid gap-6 md:grid-cols-2">
           <div class="form-group md:col-span-2">
-            <label
-              class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300"
-            >
+            <label class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
               Username
             </label>
             <input
@@ -114,19 +116,15 @@ onMounted(() => {
               type="text"
               class="w-full rounded-3xl border border-gray-300 bg-gray-50 px-3 py-2 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
               :disabled="submitting"
+              placeholder="Your name"
             />
-            <div
-              v-if="errors.name"
-              class="mt-1 flex items-center text-sm text-red-500"
-            >
+            <div v-if="errors.name" class="mt-1 flex items-center text-sm text-red-500">
               {{ errors.name[0] }}
             </div>
           </div>
 
           <div class="form-group md:col-span-2">
-            <label
-              class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300"
-            >
+            <label class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
               Message
             </label>
             <textarea
@@ -134,11 +132,9 @@ onMounted(() => {
               rows="3"
               class="w-full rounded-3xl border border-gray-300 bg-gray-50 px-3 py-2 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
               :disabled="submitting"
+              placeholder="发布后请等待审核"
             ></textarea>
-            <div
-              v-if="errors.message"
-              class="mt-1 flex items-center text-sm text-red-500"
-            >
+            <div v-if="errors.message" class="mt-1 flex items-center text-sm text-red-500">
               {{ errors.message[0] }}
             </div>
           </div>
@@ -162,10 +158,7 @@ onMounted(() => {
         </div>
       </form>
 
-      <div
-        v-if="loading"
-        class="mt-6 text-center text-gray-500 dark:text-gray-400"
-      >
+      <div v-if="loading" class="mt-6 text-center text-gray-500 dark:text-gray-400">
         Loading messages...
       </div>
 

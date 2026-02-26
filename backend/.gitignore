@@ -31,3 +31,4 @@ watchlist/static/.webassets-cache
 trans.sh
 extract_messages.py
 babel.cfg
+legacy/

@@ -24,14 +24,15 @@ from datetime import UTC, datetime
 from beanie import SortDirection
 from bson import ObjectId
 from bson.errors import InvalidId
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from slowapi.util import get_remote_address
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies.auth import manager
 from app.dependencies.database import get_session
 from app.models.mgmodel import MessageBoard, Post
-from app.models.models import Category, User
+from app.models.models import Category, User, VisitorTrack
 from app.schemas.response import APIResponse
 from app.schemas.schemas import BlogPostIn, BlogPostUpdate
 
@@ -410,3 +411,29 @@ async def delete_message(
             message=f"Failed to delete message: {e!s}",
             code=500,
         )
+
+
+@router.post("/track")
+async def track_visitor(
+    data: dict,
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+):
+    """Track visitor data sent from the frontend."""
+    ip_address = get_remote_address(request)
+    data["ip_address"] = ip_address
+    data["visit_time"] = datetime.now(UTC)
+    try:
+        await some_async_storage_function(data, session)
+        return APIResponse.ok(message="Visitor data tracked successfully")
+    except Exception as e:
+        return APIResponse.error(
+            message=f"Failed to track visitor data: {e!s}",
+            code=500,
+        )
+
+
+async def some_async_storage_function(data: dict, session: AsyncSession):
+    new_track = VisitorTrack(**data)
+    session.add(new_track)
+    await session.commit()

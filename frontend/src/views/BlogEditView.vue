@@ -191,12 +191,12 @@ const handleCategoryMouseLeave = () => {
   }, 150);
 };
 </script>
-
 <template>
   <div class="container mx-auto px-4 py-8">
     <div
-      class="mx-auto max-w-5xl rounded-[40px] bg-gray-50/80 px-10 py-6 shadow-md backdrop-blur-lg dark:bg-gray-900"
+      class="mx-auto max-w-5xl rounded-[36px] bg-gray-100/90 px-12 py-8 shadow-2xl backdrop-blur-xl dark:bg-gray-900/90"
     >
+      <!-- Header -->
       <!-- Header -->
       <div class="mb-8">
         <h1

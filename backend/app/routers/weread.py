@@ -17,7 +17,7 @@ import asyncio
 from datetime import UTC, datetime
 
 import httpx
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Header, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -97,6 +97,7 @@ async def import_books(
     data: dict,
     user: User = Depends(manager),
     db: AsyncSession = Depends(get_session),
+    user_agent: str | None = Header(None),
 ):
     """异步从微信读书获取笔记并导入 (需要登录).
 
@@ -120,7 +121,7 @@ async def import_books(
 
     cookie = cookie.strip()
     headers = {
-        "User-Agent": "ReadingList/1.0 (+https://example.com)",
+        "User-Agent": user_agent or "ReadingList/2.0",
         "Accept-Encoding": "gzip, deflate, br",
         "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
         "Accept": "application/json, text/plain, */*",

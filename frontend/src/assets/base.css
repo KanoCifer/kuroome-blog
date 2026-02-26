@@ -66,19 +66,50 @@ button {
   @apply h-auto max-w-full rounded-md;
 }
 
-/* 代码块 */
-.tiptap pre {
-  @apply overflow-x-auto rounded-md bg-slate-800 p-4;
-}
-.tiptap pre code {
-  @apply bg-transparent text-sm text-slate-200;
-}
-.tiptap code {
-  /* 原始 rgba 颜色保留以保持细微视觉一致性 */
-  background: rgba(0, 0, 0, 0.05);
-  @apply rounded-sm text-sm;
+/* 代码块 - macOS 风格（同时支持编辑器和文章展示） */
+.tiptap pre,
+.prose pre {
+  @apply my-4 overflow-hidden rounded-xl border border-gray-200 bg-gray-900 shadow-lg dark:border-gray-700;
+  position: relative;
+  padding-top: 40px;
 }
 
+.tiptap pre::before,
+.prose pre::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  @apply flex items-center border-b border-gray-700 bg-gray-800 px-4;
+}
+
+.tiptap pre::after,
+.prose pre::after {
+  content: "";
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  @apply bg-red-500;
+  box-shadow:
+    20px 0 0 #eab308,
+    40px 0 0 #22c55e;
+}
+
+.tiptap pre code,
+.prose pre code {
+  @apply shadow-lg;
+  display: block;
+  background: transparent;
+  border: none;
+  padding: 1rem;
+  margin-top: 0;
+  @apply text-sm leading-relaxed text-slate-200;
+}
 /* 激活按钮 */
 .tiptap-btn.is-active {
   @apply bg-blue-500 text-white;

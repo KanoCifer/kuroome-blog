@@ -3,9 +3,10 @@
 > **Note:** 用户用中文提问时，请用中文回答
 
 ## Project Overview
+
 - **App:** ReadingList — personal reading tracker with WeRead import
 - **Architecture:** Full SPA (Vue 3 frontend + FastAPI backend)
-- **Backend:** FastAPI (NEW :5555), Flask (LEGACY :5050), SQLAlchemy 2.0, Python 3.14+
+- **Backend:** FastAPI (:5555), SQLAlchemy 2.0, Python 3.14+, Flask-PyMongo (MongoDB)
 - **Frontend:** Vue 3.5, TypeScript, Vite, Tailwind CSS v4, Pinia, Vue Router
 - **Testing:** Pytest, Vitest, Playwright E2E
 
@@ -13,12 +14,11 @@
 
 ```
 backend/
-├── app/               # FastAPI (NEW, :5555)
+├── app/               # FastAPI (:5555)
 │   ├── routers/      # API: auth, blog, books, messages, public, users, weread
 │   ├── models/       # SQLAlchemy 2.0
 │   ├── schemas/      # Pydantic
 │   └── dependencies/ # FastAPI DI
-├── watchlist/        # Flask (LEGACY, :5050)
 ├── migrations/       # Alembic
 └── dev.py            # FastAPI dev entry
 frontend/             # Vue 3.5 SPA (:5173)
@@ -34,8 +34,7 @@ tests/                # Pytest + Playwright E2E
 
 | Task | Location | Notes |
 |------|----------|-------|
-| FastAPI endpoints | `backend/app/routers/` | New API at `/api/v1` |
-| Flask endpoints | `backend/watchlist/api/` | Legacy API at `/api` |
+| FastAPI endpoints | `backend/app/routers/` | API at `/api/v1` |
 | Vue components | `frontend/src/components/` | 16 components |
 | Database models | `backend/app/models/` | SQLAlchemy 2.0 |
 | Auth | `backend/app/routers/auth.py` | JWT-based |
@@ -62,7 +61,7 @@ npm run format && npm run lint
 
 ### E2E
 ```bash
-# Requires backend (:5050) + frontend (:5173) running
+# Requires backend (:5555) + frontend (:5173) running
 npx playwright test
 # Credentials: admin/admin
 ```
@@ -103,7 +102,7 @@ mongo.db.message_board.find().sort("created_at", -1)
 - **Indent:** 2, **Semicolons:** yes, **Quotes:** single (Vue), double (TS)
 - **Components:** PascalCase, `<script setup lang="ts">`
 - **Path:** `@/` → `./src/`
-- **Dev proxy:** `/api/*` → `http://localhost:5555` (FastAPI)
+- **Dev proxy:** `/api/v1/*` → `http://localhost:5555` (FastAPI)
 
 ### Dependencies
 - vue, vue-router, pinia, @vueuse/core, axios
@@ -134,7 +133,7 @@ describe("C", () => { it("r", () => { expect(mount(C).text()).toContain("X"); })
 - `tests/*.spec.ts`, credentials: `admin/admin`
 
 ## Operational Rules
-1. **Never modify:** `node_modules/`, `.venv/`, `backend/legacy/`
+1. **Never modify:** `node_modules/`, `.venv/`
 2. **After backend:** `ruff format . && ruff check .`
 3. **After model:** `flask db migrate -m "desc" && flask db upgrade`
 4. **After frontend:** `npm run format && npm run lint`

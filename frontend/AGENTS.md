@@ -40,7 +40,7 @@ frontend/
 
 - **URL:** `http://localhost:5173`
 - **Proxy:** `/api/v1/*` → `http://localhost:5555` (FastAPI)
-- **FastAPI:** `/api/v1/*` at `:5555`, **Flask:** legacy at `:5050`
+- **FastAPI:** `/api/v1/*` at `:5555`
 
 ## Code Style
 

@@ -243,3 +243,28 @@ class Category(Base):
 
     def __repr__(self):
         return f"<Category {self.name}>"
+
+
+# VisitorTrack模型
+class VisitorTrack(Base):
+    __tablename__ = "visitor_track"
+    id: Mapped[int] = mapped_column(
+        Integer, primary_key=True, autoincrement=True
+    )
+    visitor_id: Mapped[str] = mapped_column(String(100), index=True)
+    page_url: Mapped[str] = mapped_column(String(200))
+    page_path: Mapped[str] = mapped_column(String(200))
+    referrer: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    browser: Mapped[str] = mapped_column(String(255))
+    screen_resolution: Mapped[str] = mapped_column(String(100))
+    language: Mapped[str] = mapped_column(String(50))
+    ip_address: Mapped[str] = mapped_column(String(100), index=True)
+    visit_time: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), index=True
+    )
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def __repr__(self):
+        return f"<VisitorTrack {self.ip_address} at {self.visit_time}>"

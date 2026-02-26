@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from "vue";
-import { RouterLink, RouterView } from "vue-router";
+import { RouterLink, RouterView, useRoute } from "vue-router";
 
 // Static assets from public directory
 const githubLogo = "/images/github.webp";
@@ -11,6 +11,11 @@ import ThemeToggle from "@/components/ThemeToggle.vue";
 import ToastContainer from "@/components/ToastContainer.vue";
 import { useAuthStore } from "@/stores/auth";
 
+// Route and authentication state
+const route = useRoute();
+const isHome = computed(() => {
+  return route.path === "/";
+});
 const auth = useAuthStore();
 
 // Dropdown state
@@ -175,7 +180,10 @@ interface MyIntersectionObserverEntry {
 
 // IntersectionObserverCallback 类型接口
 interface MyIntersectionObserverCallback {
-  (entries: MyIntersectionObserverEntry[], observer: IntersectionObserver): void;
+  (
+    entries: MyIntersectionObserverEntry[],
+    observer: IntersectionObserver,
+  ): void;
 }
 
 // 存储 IntersectionObserver 实例，用于后续销毁
@@ -258,7 +266,9 @@ onUnmounted((): void => {
 </script>
 
 <template>
-  <div class="grid min-h-svh grid-rows-[auto_1fr_auto] text-gray-800 dark:text-gray-200">
+  <div
+    class="grid min-h-svh grid-rows-[auto_1fr_auto] text-gray-800 dark:text-gray-200"
+  >
     <!-- Video Background with fallback image -->
     <div class="fixed inset-0 -z-50">
       <video
@@ -300,7 +310,10 @@ onUnmounted((): void => {
                 @mouseenter="openDropdown"
                 @mouseleave="closeDropdown"
               >
-                <button @click="toggleDropdown" class="flex cursor-pointer items-center gap-1">
+                <button
+                  @click="toggleDropdown"
+                  class="flex cursor-pointer items-center gap-1"
+                >
                   <span
                     class="shrink-0 font-serif text-2xl font-bold text-gray-700 text-shadow-lg hover:text-blue-600 dark:text-gray-300 dark:text-shadow-lg"
                   >
@@ -407,6 +420,29 @@ onUnmounted((): void => {
                           Bookshelf
                         </RouterLink>
                       </li>
+                      <li>
+                        <RouterLink
+                          to="/changelog"
+                          @click="closeDropdown"
+                          class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                        >
+                          <!-- Changelog Icon -->
+                          <svg
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            />
+                          </svg>
+                          Changelog
+                        </RouterLink>
+                      </li>
                     </ol>
                   </div>
                 </transition>
@@ -432,7 +468,13 @@ onUnmounted((): void => {
                     :alt="currentUserName"
                     class="h-6 w-6 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-600"
                   />
-                  <svg v-else class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg
+                    v-else
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -440,7 +482,9 @@ onUnmounted((): void => {
                       d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                     />
                   </svg>
-                  <span class="shrink-0 overflow-hidden">{{ currentUserName }}</span>
+                  <span class="shrink-0 overflow-hidden">{{
+                    currentUserName
+                  }}</span>
                   <svg
                     class="h-3 w-3 transform-gpu transition-transform"
                     :class="{ 'rotate-180': isUserMenuOpen }"
@@ -562,7 +606,9 @@ onUnmounted((): void => {
                             API Docs
                           </RouterLink>
                         </li>
-                        <li class="border-t border-gray-200 dark:border-gray-700">
+                        <li
+                          class="border-t border-gray-200 dark:border-gray-700"
+                        >
                           <button
                             @click.prevent="handleLogout"
                             :disabled="auth.loading"
@@ -658,7 +704,12 @@ onUnmounted((): void => {
                     <path d="M8 5v14l11-7z" />
                   </svg>
                   <!-- 暂停图标 -->
-                  <svg v-else class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    v-else
+                    class="h-4 w-4"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
                   </svg>
                 </button>
@@ -693,6 +744,7 @@ onUnmounted((): void => {
     <!-- Footer -->
     <footer>
       <iframe
+        v-show="isHome"
         loading="lazy"
         preload="none"
         class="mx-auto mb-4 w-full min-w-2xl transform-gpu rounded-2xl shadow-lg"
@@ -763,7 +815,12 @@ onUnmounted((): void => {
               <div
                 class="flex h-20 w-20 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400"
               >
-                <svg class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg
+                  class="h-10 w-10"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -783,7 +840,8 @@ onUnmounted((): void => {
 
             <!-- 说明文字 -->
             <p class="mb-8 text-center text-gray-600 dark:text-gray-400">
-              为了获得最佳体验，请使用桌面设备访问本网站。 移动端功能正在开发中，敬请期待！
+              为了获得最佳体验，请使用桌面设备访问本网站。
+              移动端功能正在开发中，敬请期待！
             </p>
 
             <!-- 确认按钮 -->

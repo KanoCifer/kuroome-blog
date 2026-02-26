@@ -1,7 +1,13 @@
 import { useAuthStore } from "@/stores/auth";
+import { reportVisitorData } from "@/utils/visitorTracker";
 import HomeView from "@/views/HomeView.vue";
 import { createMemoryHistory, createRouter, createWebHistory } from "vue-router";
 
+declare global {
+  interface Window {
+    visitorReportTimer?: ReturnType<typeof setTimeout>;
+  }
+}
 // 根据环境选择 history 类型
 const history = import.meta.env.SSR
   ? createMemoryHistory(import.meta.env.BASE_URL)
@@ -38,6 +44,16 @@ const router = createRouter({
         title: "关于我 - Kuroome's Blog",
         description: "关于 Kuroome's Blog 项目和作者的介绍",
         keywords: "关于,作者,项目介绍",
+      },
+    },
+    {
+      path: "/changelog",
+      name: "changelog",
+      component: () => import("@/views/ChangelogView.vue"),
+      meta: {
+        title: "变更日志 - Kuroome's Blog",
+        description: "网站更新历史与变更记录",
+        keywords: "变更日志,更新记录,版本历史",
       },
     },
     {
@@ -164,8 +180,12 @@ router.afterEach((to) => {
   if (to.meta.title && typeof document !== "undefined") {
     document.title = to.meta.title as string;
   }
-
-  // 设置其他 meta 标签（可以通过 @unhead/vue 更优雅地管理）
+  // 防抖：避免短时间内多次跳转重复上报
+  // 声明 window.visitorReportTimer 以消除 TS 报错
+  clearTimeout(window.visitorReportTimer);
+  window.visitorReportTimer = setTimeout(() => {
+    reportVisitorData();
+  }, 500);
 });
 
 // 导出 router 实例

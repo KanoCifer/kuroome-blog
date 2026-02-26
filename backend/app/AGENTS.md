@@ -1,10 +1,10 @@
-# backend/app/ — FastAPI Backend (NEW)
+# backend/app/ — FastAPI Backend
 
-> Modern FastAPI application. **In development** — gradually replacing `backend/watchlist/`.
+> FastAPI application at `/api/v1`. Uses SQLAlchemy 2.0, Pydantic schemas, dependency injection.
 
 ## Overview
 
-FastAPI v2 API at `/api/v1/*`. Uses SQLAlchemy 2.0, Pydantic schemas, dependency injection.
+FastAPI v2 API at `/api/v1`. Uses SQLAlchemy 2.0, Pydantic schemas, dependency injection.
 
 ## Structure
 
@@ -14,12 +14,13 @@ app/
 ├── exceptions.py        # Custom exception handlers
 ├── routers/             # API endpoints
 │   ├── auth.py         # Authentication (/auth)
-│   ├── blog.py        # Blog posts (/blog)
-│   ├── books.py       # Books management (/books)
-│   ├── messages.py    # Message board (/messages)
-│   ├── public.py      # Public endpoints (/public)
-│   ├── users.py       # User management (/users)
-│   └── weread.py     # WeRead import (/weread)
+│   ├── blog.py         # Blog posts (/blog)
+│   ├── books.py        # Books management (/books)
+│   ├── messages.py     # Message board (/messages)
+│   ├── public.py       # Public endpoints (/public)
+│   ├── users.py        # User management (/users)
+│   ├── weread.py       # WeRead import (/weread)
+│   └── admin.py        # Admin endpoints (/admin)
 ├── models/             # SQLAlchemy 2.0 models
 ├── schemas/            # Pydantic request/response schemas
 └── dependencies/       # FastAPI dependency injection
@@ -56,12 +57,6 @@ def get_books(user: User = Depends(get_current_user)):
 ## Dev Proxy
 
 Vite proxies `/api/v1/*` → `http://localhost:5555` (FastAPI)
-
-## Status
-
-- In development — not all endpoints migrated from Flask
-- Legacy Flask API still active at `backend/watchlist/` on `:5050`
-- New features go here, not in legacy
 
 ## Notes
 

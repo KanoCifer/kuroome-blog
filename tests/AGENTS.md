@@ -20,13 +20,13 @@ tests/
 ## Running Tests
 
 ```bash
-# Backend (Flask :5050 must run)
+# Backend (FastAPI :5555 must run)
 cd backend && python -m pytest
 
 # Frontend unit (Vitest)
 cd frontend && npm run test:unit
 
-# E2E (backend :5050 + frontend :5173)
+# E2E (backend :5555 + frontend :5173)
 npx playwright test
 npx playwright test --headed    # Visual mode
 npx playwright test --debug    # Debug mode
