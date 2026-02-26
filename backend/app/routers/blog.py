@@ -377,7 +377,10 @@ async def get_posts_by_category(
         }
         posts.append(post_data)
     return APIResponse.ok(
-        data={"posts": posts, "category": {"id": category.id, "name": category.name}},
+        data={
+            "posts": posts,
+            "category": {"id": category.id, "name": category.name},
+        },
         message=f"Posts in category '{category.name}' retrieved successfully",
     )
 

@@ -14,8 +14,8 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from starlette.middleware.sessions import SessionMiddleware
 
-import app.models
 from app.configs.config import settings
+from app.configs.logger import logger
 from app.dependencies.aps import run_migration_job
 from app.dependencies.database import close_db_connections
 from app.dependencies.mongo import closeclient, init_mongo
@@ -27,6 +27,7 @@ from app.routers import (
     blog,
     books,
     messages,
+    monitor,
     public,
     users,
     weread,
@@ -39,6 +40,7 @@ def get_settings():
     return settings
 
 
+# 生命周期，初始化和清理资源
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan manager."""
@@ -62,7 +64,10 @@ async def lifespan(app: FastAPI):
     )
 
     scheduler.start()
-
+    # 记录日志，确认 APScheduler 已启动
+    logger.info(
+        "Application startup complete. APScheduler started with migration job."
+    )
     yield
 
     # 应用关闭时的清理工作
@@ -89,6 +94,7 @@ app.include_router(messages.router, prefix="/api/v1")
 app.include_router(public.router, prefix="/api/v1")
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(weread.router, prefix="/api/v1")
+app.include_router(monitor.router, prefix="/api/v1")  # 添加监控路由
 
 register_exception_handlers(app)
 

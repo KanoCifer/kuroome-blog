@@ -142,6 +142,12 @@ const router = createRouter({
       },
     },
     {
+      path: "/analytics",
+      name: "analytics",
+      component: () => import("@/views/AnalyticsView.vue"),
+      meta: { requiresAuth: true, title: "数据分析" },
+    },
+    {
       // 通配符匹配所有未定义的路径
       path: "/:pathMatch(.*)*",
       name: "NotFound",

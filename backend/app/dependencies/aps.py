@@ -1,5 +1,7 @@
 import json
+from datetime import UTC, datetime
 
+from app.configs.logger import logger
 from app.dependencies.database import AsyncSessionFactory
 from app.dependencies.redis import get_redis
 from app.models.models import VisitorTrack
@@ -26,7 +28,7 @@ async def run_migration_job():
             valid_items = [item for item in items if item is not None]
 
             if not valid_items:
-                print("No items to migrate from Redis.")
+                logger.info("No items to migrate from Redis.")
                 return
 
             # 2. 批量解析 JSON
@@ -34,9 +36,17 @@ async def run_migration_job():
                 parsed_data_list = [json.loads(item) for item in valid_items]
             except json.JSONDecodeError:
                 # 注意：生产环境这里需要把解析失败的脏数据单独处理，不要丢回主队列
+                logger.warning("Error parsing JSON data. Skipping batch.")
                 return
 
-            # 3. 批量写入数据库 (一次 Session, 一次 Commit)
+            # 3. 处理时间字段，转换为 datetime 对象
+            for data in parsed_data_list:
+                if data["visit_time"] is not None:
+                    data["visit_time"] = datetime.fromisoformat(
+                        data["visit_time"]
+                    ).replace(tzinfo=UTC)
+
+            # 4. 批量写入数据库 (一次 Session, 一次 Commit)
             async with AsyncSessionFactory() as session:
                 # 构建所有 ORM 对象
                 track_objects = [
@@ -50,7 +60,7 @@ async def run_migration_job():
                 await session.commit()
 
                 processed_count = len(track_objects)
-                print(
+                logger.info(
                     f"Successfully migrated {processed_count} items from Redis to DB."
                 )
 

@@ -1,5 +1,14 @@
 [
   {
+    "version": "2.1.0",
+    "date": "2026-03-01",
+    "title": "新增后台监控系统",
+    "changes": [
+      { "type": "feat", "content": "新增后台监控系统" },
+      { "type": "fix", "content": "修复了一些小的UI问题和功能bug" }
+    ]
+  },
+  {
     "version": "2.0.2",
     "date": "2026-02-26",
     "title": "性能优化与用户体验提升",

@@ -15,6 +15,8 @@ from app.models import Base
 # access to the values within the .ini file in use.
 config = context.config
 
+
+"""新增：加载环境变量并配置数据库连接"""
 # 加载环境变量
 dotenv_path: Path = Path(__file__).resolve().parent.parent / ".env"
 if dotenv_path.exists():
@@ -23,6 +25,7 @@ if dotenv_path.exists():
 database_url: str | None = os.getenv("DATABASE_URL")
 if not database_url:
     raise RuntimeError("DATABASE_URL environment variable is not set.")
+"""将数据库 URL 配置到 Alembic 中"""
 config.set_main_option("sqlalchemy.url", database_url)
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -33,6 +36,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
+"""修改：直接使用 app.models 中定义的 Base.metadata，确保 Alembic 能正确识别所有 ORM 模型"""
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

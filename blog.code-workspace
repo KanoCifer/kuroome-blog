@@ -11,5 +11,13 @@
   ],
   "settings": {
     "Codegeex.Chat.fontSize": 16,
+    "python-envs.pythonProjects": [
+      {
+        "path": "dev.py",
+        "envManager": "ms-python.python:venv",
+        "packageManager": "ms-python.python:pip",
+        "workspace": "backend",
+      },
+    ],
   },
 }

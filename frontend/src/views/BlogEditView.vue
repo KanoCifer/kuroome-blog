@@ -85,7 +85,9 @@ const handleDraftMouseLeave = () => {
 // 计算当前选中的分类名称
 const currentCategory = computed(() => {
   if (!category.value) return "";
-  const selectedCategory = categories.value.find((cat) => String(cat.id) === category.value);
+  const selectedCategory = categories.value.find(
+    (cat) => String(cat.id) === category.value,
+  );
   return selectedCategory ? selectedCategory.name : "";
 });
 
@@ -124,7 +126,9 @@ onMounted(async () => {
 const fetchCategories = async () => {
   try {
     const res =
-      await request.get<ApiResponse<{ categories: Category[] } | Category[]>>("/categories");
+      await request.get<ApiResponse<{ categories: Category[] } | Category[]>>(
+        "/categories",
+      );
     if (res.data.status === "success") {
       // 兼容新旧两种 API 格式
       const data = res.data.data;
@@ -208,7 +212,7 @@ const handleSubmit = async () => {
     if (isEdit.value && postId.value) {
       const updatePayload = { ...payload, _id: postId.value };
       const res = await request.post<ApiResponse<{ _id: string }>>(
-        "/post/updatepost",
+        "/admin/post/update",
         updatePayload,
       );
       if (res.data.status === "success") {
@@ -217,7 +221,10 @@ const handleSubmit = async () => {
         throw new Error(res.data.message);
       }
     } else {
-      const res = await request.post<ApiResponse<{ _id: string }>>("/post/addpost", payload);
+      const res = await request.post<ApiResponse<{ _id: string }>>(
+        "/admin/post/add",
+        payload,
+      );
       if (res.data.status === "success") {
         notification.success("文章创建成功");
       } else {
@@ -265,10 +272,15 @@ const handleCategoryMouseLeave = () => {
       <!-- Header -->
       <!-- Header -->
       <div class="mb-8">
-        <h1 class="font-serif text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+        <h1
+          class="font-serif text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100"
+        >
           {{ isEdit ? "Edit Post" : "New Post" }}
         </h1>
-        <p v-if="isEdit && postId" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        <p
+          v-if="isEdit && postId"
+          class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+        >
           ID: {{ postId }}
         </p>
       </div>
@@ -299,7 +311,12 @@ const handleCategoryMouseLeave = () => {
       </div>
 
       <!-- Form -->
-      <form v-else @submit.prevent="handleSubmit" ref="formRef" class="space-y-6">
+      <form
+        v-else
+        @submit.prevent="handleSubmit"
+        ref="formRef"
+        class="space-y-6"
+      >
         <!-- Title, Category, and Pin -->
         <div class="space-y-4">
           <!-- Title -->
@@ -371,7 +388,8 @@ const handleCategoryMouseLeave = () => {
                       clip-rule="evenodd"
                     />
                   </svg>
-                  <span class="mr-2 text-sm font-medium text-gray-500 dark:text-gray-400"
+                  <span
+                    class="mr-2 text-sm font-medium text-gray-500 dark:text-gray-400"
                     >分类</span
                   >
                   <span class="text-sm font-medium">
@@ -521,13 +539,17 @@ const handleCategoryMouseLeave = () => {
                     >
                       <span class="flex-1 truncate">
                         {{ draft.title }}
-                        <span v-if="!draft.hasContent" class="ml-1 text-xs text-gray-400"
+                        <span
+                          v-if="!draft.hasContent"
+                          class="ml-1 text-xs text-gray-400"
                           >(空)</span
                         >
                       </span>
                       <button
                         type="button"
-                        @click="handleDeleteDraft($event, draft.key, draft.title)"
+                        @click="
+                          handleDeleteDraft($event, draft.key, draft.title)
+                        "
                         class="ml-2 p-1 text-gray-400 hover:text-red-500"
                         title="删除草稿"
                       >
@@ -554,7 +576,11 @@ const handleCategoryMouseLeave = () => {
 
         <!-- Tiptap Editor -->
         <div>
-          <TiptapEditor ref="editorRef" v-model="body" v-model:storageKey="debouncedTitle" />
+          <TiptapEditor
+            ref="editorRef"
+            v-model="body"
+            v-model:storageKey="debouncedTitle"
+          />
         </div>
 
         <!-- Action Buttons -->

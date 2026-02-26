@@ -32,3 +32,4 @@ extract_messages.py
 babel.cfg
 blog.code-workspace
 html5-cheatsheet.html
+backend/app.log

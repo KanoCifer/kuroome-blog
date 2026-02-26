@@ -425,6 +425,7 @@ async def track_visitor(
     """Track visitor data sent from the frontend."""
     ip_address = get_remote_address(request)
     data["ip_address"] = ip_address
+    data["visit_time"] = datetime.now(UTC).isoformat()
     try:
         await redis.rpush("migration_queue", json.dumps(data))
         return APIResponse.ok(message="Visitor data tracked successfully")
@@ -433,9 +434,3 @@ async def track_visitor(
             message=f"Failed to track visitor data: {e!s}",
             code=500,
         )
-
-
-# async def some_async_storage_function(data: dict, session: AsyncSession):
-#     new_track = VisitorTrack(**data)
-#     session.add(new_track)
-#     await session.commit()
