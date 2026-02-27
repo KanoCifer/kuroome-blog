@@ -29,6 +29,7 @@ from app.routers import (
     messages,
     monitor,
     public,
+    rss,
     users,
     weread,
 )
@@ -94,6 +95,7 @@ app.include_router(messages.router, prefix="/api/v1")
 app.include_router(public.router, prefix="/api/v1")
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(weread.router, prefix="/api/v1")
+app.include_router(rss.router, prefix="/api/v1")
 app.include_router(monitor.router, prefix="/api/v1")  # 添加监控路由
 
 register_exception_handlers(app)

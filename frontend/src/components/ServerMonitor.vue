@@ -14,7 +14,9 @@
         Server System Monitor
       </h2>
       <div class="flex items-center gap-3">
-        <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+        <div
+          class="flex items-center gap-2 rounded-xl bg-gray-50 px-4 py-2 text-sm text-gray-600 dark:bg-gray-700 dark:text-gray-400"
+        >
           <div
             :class="[
               refreshInterval
@@ -181,6 +183,7 @@
 
 <script setup lang="ts">
 import request from "@/request";
+import { useThemeStore } from "@/stores/theme";
 import dayjs from "dayjs";
 import { GaugeChart, LineChart } from "echarts/charts";
 import {
@@ -240,6 +243,22 @@ const serverStatus = ref<ServerStatus | null>(null);
 const history = ref<HistoryItem[]>([]);
 let refreshInterval: number | null = null;
 
+// theme store for dark/light detection
+const themeStore = useThemeStore();
+const isDark = computed(() => {
+  if (themeStore.theme === "dark") return true;
+  if (themeStore.theme === "light") return false;
+  // system setting
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+});
+
+// colors that adapt to mode
+const textColor = computed(() => (isDark.value ? "#f3f4f6" : "#1f2937"));
+const axisLineColor = computed(() => (isDark.value ? "#374151" : "#e5e7eb"));
+const tooltipBgColor = computed(() =>
+  isDark.value ? "rgba(0,0,0,0.75)" : "rgba(255,255,255,0.95)",
+);
+
 // Get status color based on percentage
 const getStatusColor = (percent: number): string => {
   if (percent < 50) return "#10b981";
@@ -289,7 +308,7 @@ const cpuGaugeOption = computed(() => ({
         fontSize: 32,
         fontWeight: "bold",
         formatter: "{value}%",
-        color: "#1f2937",
+        color: textColor.value,
       },
       data: [{ value: serverStatus.value?.cpu_percent ?? 0 }],
     },
@@ -325,7 +344,7 @@ const memoryGaugeOption = computed(() => ({
       axisLine: {
         lineStyle: {
           width: 18,
-          color: [[1, "#e5e7eb"]],
+          color: [[1, axisLineColor.value]],
         },
       },
       axisTick: { show: false },
@@ -338,7 +357,7 @@ const memoryGaugeOption = computed(() => ({
         fontSize: 32,
         fontWeight: "bold",
         formatter: "{value}%",
-        color: "#1f2937",
+        color: textColor.value,
       },
       data: [{ value: serverStatus.value?.mem_usage ?? 0 }],
     },
@@ -349,13 +368,14 @@ const memoryGaugeOption = computed(() => ({
 const historyChartOption = computed(() => ({
   tooltip: {
     trigger: "axis",
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
-    borderColor: "#e5e7eb",
-    textStyle: { color: "#374151" },
+    backgroundColor: tooltipBgColor.value,
+    borderColor: axisLineColor.value,
+    textStyle: { color: textColor.value },
   },
   legend: {
     data: ["CPU", "Memory"],
     top: 0,
+    textStyle: { color: textColor.value },
   },
   grid: {
     left: "3%",
@@ -368,16 +388,16 @@ const historyChartOption = computed(() => ({
     type: "category",
     boundaryGap: false,
     data: history.value.map((d) => dayjs(d.timestamp).format("HH:mm:ss")),
-    axisLine: { lineStyle: { color: "#e5e7eb" } },
-    axisLabel: { color: "#6b7280", fontSize: 10 },
+    axisLine: { lineStyle: { color: axisLineColor.value } },
+    axisLabel: { color: textColor.value, fontSize: 10 },
   },
   yAxis: {
     type: "value",
     min: 0,
     max: 100,
     axisLine: { show: false },
-    axisLabel: { color: "#6b7280", formatter: "{value}%" },
-    splitLine: { lineStyle: { color: "#f3f4f6" } },
+    axisLabel: { color: textColor.value, formatter: "{value}%" },
+    splitLine: { lineStyle: { color: isDark.value ? "#4b5563" : "#f3f4f6" } },
   },
   series: [
     {

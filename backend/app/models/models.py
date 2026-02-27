@@ -10,7 +10,6 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     String,
-    Text,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -79,23 +78,6 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(50), unique=True, index=True)
     password_hash: Mapped[str] = mapped_column(String(200))
 
-    # One-to-One relationship with Profile
-    profile: Mapped[Profile | None] = relationship(
-        back_populates="user", uselist=False
-    )
-    # 多对多关系与书籍
-    user_book: Mapped[list[UserBook]] = relationship(back_populates="user")
-
-    # Admin fields (merged from Admin model)
-    blog_title: Mapped[str | None] = mapped_column(String(100), nullable=True)
-    blog_sub_title: Mapped[str | None] = mapped_column(
-        String(100), nullable=True
-    )
-    about: Mapped[str | None] = mapped_column(Text, nullable=True)
-    custom_footer: Mapped[str | None] = mapped_column(Text, nullable=True)
-    custom_css: Mapped[str | None] = mapped_column(Text, nullable=True)
-    custom_js: Mapped[str | None] = mapped_column(Text, nullable=True)
-
     # ========== Trackable 功能字段（你重点关注的）==========
     last_login_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
@@ -111,6 +93,17 @@ class User(Base):
     )
     login_count: Mapped[int] = mapped_column(Integer, default=0)
     active: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    # One-to-One relationship with Profile
+    profile: Mapped[Profile | None] = relationship(
+        back_populates="user", uselist=False
+    )
+    # 多对多关系与书籍
+    user_book: Mapped[list[UserBook]] = relationship(back_populates="user")
+    # 一对多关系与RSS链接
+    rss_info: Mapped[list[RssInfo]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
 
     def __init__(self, *args, **kwargs):
         """允许在初始化时直接传入 password 参数并自动生成哈希值"""
@@ -268,3 +261,17 @@ class VisitorTrack(Base):
 
     def __repr__(self):
         return f"<VisitorTrack {self.ip_address} at {self.visit_time}>"
+
+
+class RssInfo(Base):
+    __tablename__ = "rss_info"
+    id: Mapped[int] = mapped_column(
+        Integer, primary_key=True, autoincrement=True
+    )
+    rss_url: Mapped[str] = mapped_column(String(200), index=True)
+
+    # 一对多关系，一个用户可以有多个RSS链接
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("user.id"), index=True
+    )
+    user: Mapped[User] = relationship(back_populates="rss_info")

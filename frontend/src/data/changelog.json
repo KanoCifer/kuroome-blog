@@ -1,9 +1,19 @@
 [
   {
+    "version": "2.1.6",
+    "date": "2026-02-27",
+    "title": "新增Rss解析功能",
+    "changes": [
+      { "type": "feat", "content": "可以解析并展示RSS源内容啦" },
+      { "type": "docs", "content": "Rss阅读器待完善" },
+      { "type": "fix", "content": "修复了一些小的UI问题和功能bug" }
+    ]
+  },
+  {
     "version": "2.1.2",
     "date": "2026-02-27",
     "title": "新增服务器资源监控",
-    "changes": [{ "type": "feat", "content": "新增系统资源监控图表" }]
+    "changes": [{ "type": "feat", "content": "新增服务器资源监控图表" }]
   },
   {
     "version": "2.1.0",

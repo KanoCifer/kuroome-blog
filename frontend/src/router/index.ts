@@ -28,6 +28,7 @@ const router = createRouter({
         title: "API 文档 - Kuroome's Blog",
         description: "查看 Kuroome's Blog 项目的 API 文档，了解后端接口详情",
         keywords: "API文档,接口文档,后端接口",
+        requiresAuth: true,
       },
     },
     {
@@ -145,7 +146,23 @@ const router = createRouter({
       path: "/analytics",
       name: "analytics",
       component: () => import("@/views/AnalyticsView.vue"),
-      meta: { requiresAuth: true, title: "数据分析" },
+      meta: {
+        requiresAuth: true,
+        title: "网站数据分析",
+        description: "查看网站访问数据和用户行为分析",
+        keywords: "网站分析,数据分析,用户行为",
+      },
+    },
+    {
+      path: "/rss",
+      name: "rss",
+      component: () => import("@/views/RSSParseView.vue"),
+      meta: {
+        title: "RSS 订阅 - Kuroome's Blog",
+        description:
+          "订阅 Kuroome's Blog 的 RSS 频道，第一时间获取最新文章更新",
+        keywords: "RSS订阅,博客更新,文章订阅",
+      },
     },
     {
       // 通配符匹配所有未定义的路径

@@ -7,7 +7,7 @@
       <h1
         class="flex items-center gap-3 text-2xl font-bold text-gray-800 sm:text-3xl dark:text-gray-100"
       >
-        <icon-analytics class="size-8" />
+        <icon-analytics class="size-8 text-gray-800 dark:text-gray-100" />
         Analytics Dashboard
         <span
           class="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-400"
@@ -18,7 +18,7 @@
       <div class="flex items-center gap-3">
         <div class="relative">
           <button
-            class="rounded-xl border border-gray-200 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+            class="rounded-xl border border-gray-200 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-600"
             @click="showDropdown = !showDropdown"
             @mouseenter="handleMouseIn"
             @mouseleave="handleMouseOut"
@@ -252,7 +252,7 @@
       <!-- Popular Pages Bar Chart -->
       <div class="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800/80">
         <h2 class="mb-4 text-lg font-bold text-gray-800 dark:text-gray-100">
-          <icon-popular class="inline-block size-6" /> Popular Pages
+          <icon-popular class="inline-block size-6 dark:text-gray-50" /> Popular Pages
         </h2>
         <div
           v-if="loading && !overviewData"
