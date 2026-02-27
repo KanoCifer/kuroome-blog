@@ -177,10 +177,7 @@ interface MyIntersectionObserverEntry {
 
 // IntersectionObserverCallback 类型接口
 interface MyIntersectionObserverCallback {
-  (
-    entries: MyIntersectionObserverEntry[],
-    observer: IntersectionObserver,
-  ): void;
+  (entries: MyIntersectionObserverEntry[], observer: IntersectionObserver): void;
 }
 
 // 存储 IntersectionObserver 实例，用于后续销毁
@@ -263,9 +260,7 @@ onUnmounted((): void => {
 </script>
 
 <template>
-  <div
-    class="grid min-h-svh grid-rows-[auto_1fr_auto] text-gray-800 dark:text-gray-200"
-  >
+  <div class="grid min-h-svh grid-rows-[auto_1fr_auto] text-gray-800 dark:text-gray-200">
     <!-- Video Background with fallback image -->
     <div class="fixed inset-0 -z-50">
       <video
@@ -274,7 +269,7 @@ onUnmounted((): void => {
         autoplay
         muted
         playsinline
-        poster="/poster.png"
+        poster="/poster.webp"
         loading="lazy"
         preload="metadata"
         disablePictureInPicture
@@ -307,10 +302,7 @@ onUnmounted((): void => {
                 @mouseenter="openDropdown"
                 @mouseleave="closeDropdown"
               >
-                <button
-                  @click="toggleDropdown"
-                  class="flex cursor-pointer items-center gap-1"
-                >
+                <button @click="toggleDropdown" class="flex cursor-pointer items-center gap-1">
                   <span
                     class="shrink-0 font-serif text-2xl font-bold text-gray-700 text-shadow-lg hover:text-blue-600 dark:text-gray-300 dark:text-shadow-lg"
                   >
@@ -343,9 +335,9 @@ onUnmounted((): void => {
                 >
                   <div
                     v-if="isDropdownOpen"
-                    class="absolute top-full z-9999 mt-2 w-fit rounded-xl border border-gray-200/60 bg-gray-50 shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-50/5"
+                    class="absolute top-full right-0 left-0 z-9999 mt-2 w-fit rounded-xl border border-gray-200/60 bg-gray-50 shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-50/5"
                   >
-                    <ol class="flex justify-center gap-6 px-4 py-2">
+                    <ol class="flex flex-col justify-center gap-6 px-4 py-2">
                       <li>
                         <RouterLink
                           to="/"
@@ -405,7 +397,7 @@ onUnmounted((): void => {
                             viewBox="0 0 24 24"
                             stroke-width="1.5"
                             stroke="currentColor"
-                            class="size-6"
+                            class="size-4"
                           >
                             <path
                               stroke-linecap="round"
@@ -465,13 +457,7 @@ onUnmounted((): void => {
                     :alt="currentUserName"
                     class="h-6 w-6 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-600"
                   />
-                  <svg
-                    v-else
-                    class="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
+                  <svg v-else class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -479,9 +465,7 @@ onUnmounted((): void => {
                       d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                     />
                   </svg>
-                  <span class="shrink-0 overflow-hidden">{{
-                    currentUserName
-                  }}</span>
+                  <span class="shrink-0 overflow-hidden">{{ currentUserName }}</span>
                   <svg
                     class="h-3 w-3 transform-gpu transition-transform"
                     :class="{ 'rotate-180': isUserMenuOpen }"
@@ -603,9 +587,30 @@ onUnmounted((): void => {
                             API Docs
                           </RouterLink>
                         </li>
-                        <li
-                          class="border-t border-gray-200 dark:border-gray-700"
-                        >
+                        <li>
+                          <RouterLink
+                            v-if="auth.user?.is_admin"
+                            to="/analytics"
+                            @click="closeUserMenuImmediately"
+                            class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                          >
+                            <svg
+                              class="h-4 w-4"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2h2.828l8.586-8.586z"
+                              />
+                            </svg>
+                            Analytics
+                          </RouterLink>
+                        </li>
+                        <li class="border-t border-gray-200 dark:border-gray-700">
                           <button
                             @click.prevent="handleLogout"
                             :disabled="auth.loading"
@@ -701,12 +706,7 @@ onUnmounted((): void => {
                     <path d="M8 5v14l11-7z" />
                   </svg>
                   <!-- 暂停图标 -->
-                  <svg
-                    v-else
-                    class="h-4 w-4"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg v-else class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
                   </svg>
                 </button>
@@ -801,12 +801,7 @@ onUnmounted((): void => {
               <div
                 class="flex h-20 w-20 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400"
               >
-                <svg
-                  class="h-10 w-10"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
+                <svg class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -826,8 +821,7 @@ onUnmounted((): void => {
 
             <!-- 说明文字 -->
             <p class="mb-8 text-center text-gray-600 dark:text-gray-400">
-              为了获得最佳体验，请使用桌面设备访问本网站。
-              移动端功能正在开发中，敬请期待！
+              为了获得最佳体验，请使用桌面设备访问本网站。 移动端功能正在开发中，敬请期待！
             </p>
 
             <!-- 确认按钮 -->

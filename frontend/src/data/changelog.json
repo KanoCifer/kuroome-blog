@@ -1,7 +1,13 @@
 [
   {
+    "version": "2.1.2",
+    "date": "2026-02-27",
+    "title": "新增服务器资源监控",
+    "changes": [{ "type": "feat", "content": "新增系统资源监控图表" }]
+  },
+  {
     "version": "2.1.0",
-    "date": "2026-03-01",
+    "date": "2026-02-26",
     "title": "新增后台监控系统",
     "changes": [
       { "type": "feat", "content": "新增后台监控系统" },

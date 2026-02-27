@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 
+import psutil
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,6 +18,7 @@ DEFAULT_DAYS = 7
 MAX_DAYS = 90
 
 
+# 访客统计相关接口，管理员权限访问
 @router.get("/overview")
 async def get_overview(
     days: int = Query(DEFAULT_DAYS, ge=1, le=MAX_DAYS, description="统计天数"),
@@ -24,7 +26,6 @@ async def get_overview(
     session: AsyncSession = Depends(get_session),
 ):
     """Get visitor overview data (admin only)"""
-    from datetime import UTC, datetime
 
     end_time = datetime.now(UTC)
     start_time = end_time - timedelta(days=days)
@@ -119,8 +120,6 @@ async def get_visitors(
     session: AsyncSession = Depends(get_session),
 ):
     """Get visitor list with pagination (admin only)"""
-    from datetime import UTC, datetime
-
     end_time = datetime.now(UTC)
     start_time = end_time - timedelta(days=days)
 
@@ -182,7 +181,6 @@ async def get_user_logins(
     session: AsyncSession = Depends(get_session),
 ):
     """Get user login logs with pagination (admin only)"""
-    from datetime import UTC, datetime
 
     end_time = datetime.now(UTC)
     start_time = end_time - timedelta(days=days)
@@ -221,6 +219,7 @@ async def get_user_logins(
                     ),
                     "last_login_ip": user.last_login_ip,
                     "current_login_ip": user.current_login_ip,
+                    "active": user.active,
                 }
             )
 
@@ -238,4 +237,37 @@ async def get_user_logins(
             "total_pages": (total + page_size - 1) // page_size,
         },
         message="User login logs retrieved successfully",
+    )
+
+
+@router.get("/server/status")
+async def get_server_status(current_user: User = Depends(get_admin_user)):
+    """获取服务器状态信息"""
+    # 获取Cpu信息
+    cpu_percent = psutil.cpu_percent(interval=1)
+    cpu_cores = psutil.cpu_count(logical=True)
+    # 获取内存信息
+    mem = psutil.virtual_memory()
+    mem_total = round(mem.total / 1024 / 1024)  # 总内存(MB)
+    mem_used = round(mem.used / 1024 / 1024)  # 已用内存(MB)
+    mem_usage = round(mem.percent, 2)  # 内存使用率(%)
+
+    # 3. 获取磁盘信息（取根目录/）
+    disk = psutil.disk_usage("/")
+    disk_total = round(disk.total / 1024 / 1024 / 1024, 2)  # 总磁盘(GB)
+    disk_used = round(disk.used / 1024 / 1024 / 1024, 2)  # 已用磁盘(GB)
+    disk_usage = round(disk.percent, 2)  # 磁盘使用率(%)
+
+    return APIResponse.ok(
+        data={
+            "cpu_percent": cpu_percent,
+            "cpu_cores": cpu_cores,
+            "mem_total": mem_total,
+            "mem_used": mem_used,
+            "mem_usage": mem_usage,
+            "disk_total": disk_total,
+            "disk_used": disk_used,
+            "disk_usage": disk_usage,
+        },
+        message="Server status retrieved successfully",
     )

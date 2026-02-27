@@ -2,12 +2,13 @@
   <div class="space-y-6">
     <!-- Header -->
     <div
-      class="mb-8 flex flex-col gap-4 rounded-3xl bg-gray-50/50 px-4 py-6 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between dark:bg-gray-900/30"
+      class="relative z-5 mb-8 flex flex-col gap-4 rounded-3xl bg-gray-50/50 px-4 py-6 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between dark:bg-gray-900/30"
     >
       <h1
         class="flex items-center gap-3 text-2xl font-bold text-gray-800 sm:text-3xl dark:text-gray-100"
       >
-        📊 Analytics Dashboard
+        <icon-analytics class="size-8" />
+        Analytics Dashboard
         <span
           class="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-400"
         >
@@ -15,13 +16,60 @@
         </span>
       </h1>
       <div class="flex items-center gap-3">
-        <select
-          v-model="selectedDays"
-          class="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
-        >
-          <option :value="7">Last 7 days</option>
-          <option :value="30">Last 30 days</option>
-        </select>
+        <div class="relative">
+          <button
+            class="rounded-xl border border-gray-200 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+            @click="showDropdown = !showDropdown"
+            @mouseenter="handleMouseIn"
+            @mouseleave="handleMouseOut"
+          >
+            {{ selectedDays }} Days
+            <svg
+              class="inline-block h-3 w-3 transform-gpu text-gray-700 transition-transform"
+              :class="{ 'rotate-180': showDropdown }"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+
+          <!-- 下拉菜单 -->
+          <transition
+            enter-active-class="transition-all transform-gpu duration-200 ease-out"
+            enter-from-class="opacity-0 scale-95 -translate-y-1"
+            enter-to-class="opacity-100 scale-100 translate-y-0"
+            leave-active-class="transition-all transform-gpu duration-150 ease-in"
+            leave-from-class="opacity-100 scale-100 translate-y-0"
+            leave-to-class="opacity-0 scale-95 -translate-y-1"
+          >
+            <div
+              v-if="showDropdown"
+              class="absolute top-full left-0 w-fit rounded-xl border border-gray-200/60 bg-gray-50 whitespace-nowrap shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-50/5"
+              @mouseenter="handleMouseIn"
+              @mouseleave="handleMouseOut"
+            >
+              <button
+                v-for="option in [7, 30, 90]"
+                :key="option"
+                @click="
+                  selectedDays = option;
+                  showDropdown = false;
+                "
+                class="block w-full rounded-xl px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/30"
+              >
+                Last {{ option }} days
+              </button>
+            </div>
+          </transition>
+        </div>
+
         <button
           type="button"
           :disabled="loading"
@@ -82,7 +130,7 @@
     <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
       <!-- Total Visits (PV) -->
       <div
-        class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 p-6 text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
+        class="group relative overflow-hidden rounded-2xl bg-linear-to-br from-blue-500 to-blue-600 p-6 text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
       >
         <div class="absolute -top-4 -right-4 h-24 w-24 rounded-full bg-white/10"></div>
         <div class="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-white/5"></div>
@@ -113,7 +161,7 @@
 
       <!-- Unique Visitors (UV) -->
       <div
-        class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 p-6 text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
+        class="group relative overflow-hidden rounded-2xl bg-linear-to-br from-emerald-500 to-emerald-600 p-6 text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
       >
         <div class="absolute -top-4 -right-4 h-24 w-24 rounded-full bg-white/10"></div>
         <div class="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-white/5"></div>
@@ -138,7 +186,7 @@
 
       <!-- Unique Visitor IDs -->
       <div
-        class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 p-6 text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
+        class="group relative overflow-hidden rounded-2xl bg-linear-to-br from-purple-500 to-purple-600 p-6 text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
       >
         <div class="absolute -top-4 -right-4 h-24 w-24 rounded-full bg-white/10"></div>
         <div class="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-white/5"></div>
@@ -163,7 +211,7 @@
 
       <!-- Avg Visits Per Day -->
       <div
-        class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 p-6 text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
+        class="group relative overflow-hidden rounded-2xl bg-linear-to-br from-orange-500 to-orange-600 p-6 text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
       >
         <div class="absolute -top-4 -right-4 h-24 w-24 rounded-full bg-white/10"></div>
         <div class="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-white/5"></div>
@@ -190,7 +238,7 @@
       <!-- Visit Trend Line Chart -->
       <div class="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800/80">
         <h2 class="mb-4 text-lg font-bold text-gray-800 dark:text-gray-100">
-          📈 Visit Trend (Last {{ selectedDays }} days)
+          <icon-trend class="inline-block size-6" /> Trend (Last {{ selectedDays }} days)
         </h2>
         <div
           v-if="loading && !overviewData"
@@ -203,7 +251,9 @@
 
       <!-- Popular Pages Bar Chart -->
       <div class="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800/80">
-        <h2 class="mb-4 text-lg font-bold text-gray-800 dark:text-gray-100">🔥 Popular Pages</h2>
+        <h2 class="mb-4 text-lg font-bold text-gray-800 dark:text-gray-100">
+          <icon-popular class="inline-block size-6" /> Popular Pages
+        </h2>
         <div
           v-if="loading && !overviewData"
           class="h-72 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-700/40"
@@ -214,9 +264,17 @@
       </div>
     </div>
 
+    <!-- Server Monitoring Section -->
+    <ServerMonitor ref="serverMonitorRef" :auto-start="true" />
+
+    <!-- User Login Logs Table -->
+
     <!-- User Login Logs Table -->
     <div class="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800/80">
-      <h2 class="mb-4 text-lg font-bold text-gray-800 dark:text-gray-100">🔐 User Login Logs</h2>
+      <h2 class="mb-4 text-lg font-bold text-gray-800 dark:text-gray-100">
+        <icon-user class="inline-block size-6" />
+        User Login Logs
+      </h2>
 
       <!-- Loading State -->
       <div v-if="loading && !loginLogsData" class="py-8">
@@ -263,6 +321,7 @@
               <th class="pb-3 font-medium">Current Login</th>
               <th class="pb-3 font-medium">Last IP</th>
               <th class="pb-3 font-medium">Current IP</th>
+              <th class="pb-3 font-medium">Active</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -305,6 +364,13 @@
               <td class="py-4 font-mono text-xs text-gray-500 dark:text-gray-400">
                 {{ log.current_login_ip || "-" }}
               </td>
+              <td>
+                <span
+                  class="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                >
+                  {{ log.active ? "Online" : "Offline" }}
+                </span>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -343,6 +409,11 @@
 </template>
 
 <script setup lang="ts">
+import IconAnalytics from "@/components/icons/IconAnalytics.vue";
+import IconPopular from "@/components/icons/IconPopular.vue";
+import IconTrend from "@/components/icons/IconTrend.vue";
+import IconUser from "@/components/icons/IconUser.vue";
+import ServerMonitor from "@/components/ServerMonitor.vue";
 import request from "@/request";
 import { useAuthStore } from "@/stores/auth";
 import dayjs from "dayjs";
@@ -400,6 +471,7 @@ interface LoginLog {
   current_login_at: string | null;
   last_login_ip: string | null;
   current_login_ip: string | null;
+  active: boolean;
 }
 
 interface LoginLogsResponse {
@@ -417,12 +489,14 @@ defineOptions({
 const auth = useAuthStore();
 const router = useRouter();
 
-const loading = ref(false);
-const error = ref("");
+const loading = ref<boolean>(false);
+const error = ref<string | null>(null);
 const selectedDays = ref(7);
 const overviewData = ref<OverviewData | null>(null);
 const loginLogsData = ref<LoginLogsResponse | null>(null);
 const loginLogsPage = ref(1);
+const serverMonitorRef = ref<InstanceType<typeof ServerMonitor> | null>(null);
+const showDropdown = ref<boolean>(false);
 
 // Computed
 const avgVisitsPerDay = computed(() => {
@@ -684,4 +758,20 @@ onMounted(async () => {
 
   await fetchAllData();
 });
+
+// Dropdown hover handlers to prevent it from disappearing when moving mouse
+let dropdownHoverTimeout: number | null = null;
+const handleMouseIn = () => {
+  if (dropdownHoverTimeout) {
+    clearTimeout(dropdownHoverTimeout);
+    dropdownHoverTimeout = null;
+  }
+
+  showDropdown.value = true;
+};
+const handleMouseOut = () => {
+  dropdownHoverTimeout = window.setTimeout(() => {
+    showDropdown.value = false;
+  }, 200);
+};
 </script>
