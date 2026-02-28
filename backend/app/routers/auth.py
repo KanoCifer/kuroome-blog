@@ -15,8 +15,10 @@ Endpoints:
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
+from venv import logger
 
-from fastapi import APIRouter, Depends, Request, status
+from email_validator import EmailNotValidError, validate_email
+from fastapi import APIRouter, BackgroundTasks, Depends, Request, status
 from fastapi.responses import JSONResponse
 from fastapi_mail import FastMail, MessageSchema, MessageType, NameEmail
 from pydantic import BaseModel, EmailStr
@@ -283,43 +285,16 @@ class EmailSchema(BaseModel):
     email: EmailStr
 
 
-@router.post("/email/code")
-async def send_email_code(
-    email: EmailSchema,
-    redis: AsyncRedis = Depends(get_async_redis),
+async def _send_email_code(
+    email: str,
+    verification_code: str,
 ):
-    """发送邮箱验证码.
-
-    Args:
-        session: Database session
-
-    Returns:
-        API response with success message
-    """
-
-    # 生成6位随机验证码
-    import random
-
-    code = [random.choice("012345678901234567890123456789") for _ in range(6)]
-    verification_code = "".join(code)
-
-    # 将验证码存储到redis中，并设置过期时间（10分钟）
-    try:
-        await redis.set(
-            f"signup_code:{email.email}", verification_code, ex=600
-        )
-    except RedisError as e:
-        return APIResponse.error(
-            message=f"验证码存储失败: {e!s}",
-            code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
-
     html = f"""<p>这是您的验证码：</p>
-<h2 style="color: blue;">{verification_code}</h2>
+<h2 style=\"color: blue;\">{verification_code}</h2>
 <p>请在10分钟内使用。</p>
 """
     # NameEmail 可以接收 name 和 email，如果没有 name，可以留空或填邮箱
-    recipients = [NameEmail(email=email.email, name="")]
+    recipients = [NameEmail(email=email, name="")]  # type: ignore
     message = MessageSchema(
         subject="ReadingList 注册验证码",
         recipients=recipients,
@@ -331,11 +306,55 @@ async def send_email_code(
     try:
         await fm.send_message(message)
     except Exception as e:
+        logger.error(f"发送验证码邮件失败: {e!s}")
+        raise e
+
+
+@router.post("/email/code")
+async def send_email_code(
+    email: EmailSchema,
+    background_tasks: BackgroundTasks,
+    redis: AsyncRedis = Depends(get_async_redis),
+):
+    """发送邮箱验证码."""
+    email = email.email  # type: ignore
+    try:
+        emailinfo = validate_email(email, check_deliverability=True)  # type: ignore
+
+        email = emailinfo.normalized  # type: ignore
+    except EmailNotValidError as e:
+        return APIResponse.error(
+            message=f"邮箱格式无效: {e!s}",
+            code=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # 生成6位随机验证码
+    import random
+
+    code = [random.choice("012345678901234567890123456789") for _ in range(6)]
+    verification_code = "".join(code)
+
+    # 将验证码存储到redis中，并设置过期时间（10分钟）
+    try:
+        await redis.set(f"signup_code:{email}", verification_code, ex=600)
+    except RedisError as e:
+        return APIResponse.error(
+            message=f"验证码存储失败: {e!s}",
+            code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+    try:
+        # 将发送邮件的任务添加到后台任务中
+        background_tasks.add_task(
+            _send_email_code,
+            email=email,  # type: ignore
+            verification_code=verification_code,  # type: ignore
+        )
+    except Exception as e:
         return APIResponse.error(
             message=f"验证码发送失败: {e!s}",
             code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
     return APIResponse.ok(
-        message="验证码发送成功",
-        code=status.HTTP_200_OK,
+        message="验证码发送成功，请检查您的邮箱！",
+        code=status.HTTP_202_ACCEPTED,
     )

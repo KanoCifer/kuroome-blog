@@ -10,7 +10,6 @@ __pycache__/
 watchlist/data.db
 .opencode/
 openspec/
-uv.lock
 .pytest_cache/
 # Playwright
 /test-results/

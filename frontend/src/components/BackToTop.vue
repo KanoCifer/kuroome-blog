@@ -1,18 +1,20 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
+import { useScroll } from "@vueuse/core";
+import { computed, ref } from "vue";
 
-const isVisible = ref(false);
 const isHovered = ref(false);
-const scrollProgress = ref(0);
 
-const checkScroll = () => {
-  // 显示按钮当滚动超过 300px
-  isVisible.value = window.scrollY > 300;
+// useScroll 会自动监听滚动事件并暴露 x/y 值
+const { y } = useScroll(window);
 
-  // 计算滚动进度 (0-100)
+// 页面滚动超过 300px 才显示按钮
+const isVisible = computed(() => y.value > 300);
+
+// 计算滚动进度 (0-100)
+const scrollProgress = computed(() => {
   const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-  scrollProgress.value = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
-};
+  return docHeight > 0 ? (y.value / docHeight) * 100 : 0;
+});
 
 const scrollToTop = () => {
   window.scrollTo({
@@ -20,15 +22,6 @@ const scrollToTop = () => {
     behavior: "smooth",
   });
 };
-
-onMounted(() => {
-  window.addEventListener("scroll", checkScroll, { passive: true });
-  checkScroll();
-});
-
-onUnmounted(() => {
-  window.removeEventListener("scroll", checkScroll);
-});
 </script>
 
 <template>
@@ -54,10 +47,7 @@ onUnmounted(() => {
       aria-label="回到顶部"
     >
       <!-- 背景进度环 -->
-      <svg
-        class="absolute inset-0 h-full w-full -rotate-90"
-        viewBox="0 0 56 56"
-      >
+      <svg class="absolute inset-0 h-full w-full -rotate-90" viewBox="0 0 56 56">
         <!-- 背景圆环 -->
         <circle
           cx="28"
@@ -95,11 +85,7 @@ onUnmounted(() => {
         stroke="currentColor"
         stroke-width="2"
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M5 10l7-7m0 0l7 7m-7-7v18"
-        />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
       </svg>
 
       <!-- Tooltip -->

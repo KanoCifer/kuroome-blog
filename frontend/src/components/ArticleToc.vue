@@ -1,18 +1,10 @@
 <template>
   <aside class="w-full lg:w-64 lg:shrink-0">
-    <div
-      v-if="toc.length > 0"
-      class="sticky top-24 rounded-3xl bg-white/80 p-5 shadow-md backdrop-blur-sm dark:border dark:border-gray-700/80 dark:bg-gray-900/80 dark:shadow-none"
-    >
+    <div v-if="toc.length > 0" class="sticky top-24 rounded-3xl p-5 shadow-md">
       <h3
         class="mb-4 flex items-center gap-2 font-serif text-base font-semibold text-gray-800 dark:text-white"
       >
-        <svg
-          class="h-5 w-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"

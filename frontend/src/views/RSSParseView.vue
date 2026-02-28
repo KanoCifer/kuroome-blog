@@ -1,6 +1,7 @@
 <template>
   <div
-    class="min-h-screen rounded-xl bg-blue-50/80 px-4 py-8 backdrop-blur-sm sm:px-6 lg:px-8 dark:bg-slate-900/80"
+    class="min-h-screen rounded-t-4xl bg-blue-50/80 px-4 py-8 backdrop-blur-sm sm:px-6 lg:px-8 dark:bg-slate-900/80"
+    :style="sectionStyle"
   >
     <div class="mx-auto max-w-4xl">
       <!-- 页面标题 -->
@@ -405,9 +406,8 @@
 <script setup lang="ts">
 import request from "@/request";
 import { useNotificationStore } from "@/stores/notification";
-import { useStorage } from "@vueuse/core";
-import { ref } from "vue";
-
+import { useScroll, useStorage } from "@vueuse/core";
+import { computed, ref } from "vue";
 interface RssMetadata {
   title: string;
   description: string;
@@ -558,4 +558,13 @@ const parseRss = async () => {
     isLoading.value = false;
   }
 };
+
+const { y } = useScroll(window);
+const sectionStyle = computed(() => {
+  // compute scale with a ceiling of 1 so the content does not grow indefinitely
+  const scale = Math.min(1, 0.9 + y.value * 0.001);
+  return {
+    transform: `scale(${scale})`, // 内容区稍快
+  };
+});
 </script>

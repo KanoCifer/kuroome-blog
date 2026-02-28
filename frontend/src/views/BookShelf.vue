@@ -1,8 +1,8 @@
 <template>
   <div
-    class="min-h-screen rounded-4xl bg-gray-50/70 px-4 py-8 backdrop-blur-lg sm:px-6 lg:px-8 dark:bg-gray-900/50"
+    class="mx-auto mb-24 min-h-screen max-w-5xl rounded-4xl bg-gray-50/70 px-4 py-8 backdrop-blur-lg sm:px-6 lg:px-8 dark:bg-gray-900/50"
   >
-    <div class="mx-auto max-w-7xl">
+    <div class="mx-auto">
       <!-- 页面标题 -->
       <div class="mb-8 flex items-center gap-3">
         <div
@@ -25,19 +25,13 @@
         </div>
         <div>
           <div class="flex items-center gap-6">
-            <h1
-              class="font-serif text-3xl font-bold text-gray-900 dark:text-white"
-            >
-              我的书架
-            </h1>
+            <h1 class="font-serif text-3xl font-bold text-gray-900 dark:text-white">我的书架</h1>
             <span
               class="self-center rounded-full border border-blue-300 bg-blue-200/60 px-4 py-2 text-xs text-blue-500 dark:bg-blue-200 dark:text-blue-900"
               >{{ books_count }}</span
             >
           </div>
-          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            管理您的阅读收藏
-          </p>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">管理您的阅读收藏</p>
         </div>
       </div>
 
@@ -131,9 +125,7 @@
             />
           </svg>
         </div>
-        <h3
-          class="mb-2 font-serif text-xl font-semibold text-gray-900 dark:text-white"
-        >
+        <h3 class="mb-2 font-serif text-xl font-semibold text-gray-900 dark:text-white">
           暂无书籍
         </h3>
         <p class="mb-6 text-center text-gray-500 dark:text-gray-400">
@@ -175,20 +167,13 @@
         </div>
       </transition>
       <!-- 分页 -->
-      <div
-        v-if="pagination && pagination.pages > 1"
-        class="mt-8 flex justify-center"
-      >
+      <div v-if="pagination && pagination.pages > 1" class="mt-8 flex justify-center">
         <nav class="flex items-center gap-2">
           <!-- 上一页 -->
           <button
             :disabled="!pagination.has_prev"
             class="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-800"
-            :class="
-              pagination?.has_prev
-                ? 'text-gray-700 dark:text-gray-300'
-                : 'text-gray-400'
-            "
+            :class="pagination?.has_prev ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400'"
             @click="goToPage(pagination!.prev_num!)"
             type="button"
           >
@@ -252,11 +237,7 @@
           <button
             :disabled="!pagination?.has_next"
             class="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-800"
-            :class="
-              pagination?.has_next
-                ? 'text-gray-700 dark:text-gray-300'
-                : 'text-gray-400'
-            "
+            :class="pagination?.has_next ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400'"
             @click="goToPage(pagination!.next_num!)"
             type="button"
           >
@@ -272,7 +253,7 @@
 import BookCard from "@/components/BookCard.vue";
 import request from "@/request";
 import type { BookItem, BookListResponse, Pagination } from "@/types";
-import { ref, computed } from "vue";
+import { computed, ref } from "vue";
 import { RouterLink } from "vue-router";
 
 // 响应式状态
@@ -292,11 +273,7 @@ const getVisiblePages = computed(() => {
   const visiblePages = [];
 
   // 显示当前页附近的页码
-  for (
-    let i = Math.max(2, current - 2);
-    i <= Math.min(totalPages - 1, current + 2);
-    i++
-  ) {
+  for (let i = Math.max(2, current - 2); i <= Math.min(totalPages - 1, current + 2); i++) {
     visiblePages.push(i);
   }
 
@@ -325,8 +302,7 @@ const fetchBooks = async (page: number = 1) => {
       response?: { data?: { message?: string } };
       message?: string;
     };
-    errorMessage.value =
-      error?.response?.data?.message || error?.message || "获取书籍列表失败";
+    errorMessage.value = error?.response?.data?.message || error?.message || "获取书籍列表失败";
   } finally {
     isLoading.value = false;
   }

@@ -2,10 +2,18 @@
 @plugin "@tailwindcss/typography";
 @custom-variant dark (&:where(.dark, .dark *));
 
+html,
+body {
+  margin: 0; /* 仅清除页面默认外边距 */
+  padding: 0; /* 仅清除页面默认内边距 */
+}
+* {
+  box-sizing: border-box; /* 只保留盒模型修复，不碰间距 */
+}
 @layer base {
   body {
     /* 使用 @apply 将 Tailwind 类应用到 body */
-    @apply m-0 min-h-screen bg-[url('/bg.webp')] bg-cover bg-fixed bg-center bg-no-repeat p-0 transition-colors duration-500 dark:bg-[url('/bg-dark.webp')];
+    @apply m-0;
   }
 
   /* 解决某些框架给 #app 默认加了高度/宽度的问题 */
@@ -29,7 +37,7 @@
   }
 }
 footer {
-  @apply mx-auto w-auto min-w-0 p-4 text-center text-sm text-gray-400 dark:border-gray-700;
+  @apply mx-auto w-full min-w-0 bg-gray-50 p-4 text-center text-sm text-gray-400 dark:border-gray-700 dark:bg-gray-900;
 }
 
 nav ul {
@@ -40,8 +48,7 @@ nav li a {
   @apply rounded-lg px-2 py-2 font-serif text-lg font-bold text-gray-600 no-underline transition-colors text-shadow-xs hover:text-gray-900 dark:text-gray-300 dark:hover:text-white;
 }
 
-a,
-button {
+a {
   @apply cursor-pointer;
 }
 
