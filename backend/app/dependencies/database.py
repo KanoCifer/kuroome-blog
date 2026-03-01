@@ -20,9 +20,17 @@ from sqlalchemy.ext.asyncio import (
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
 
 # 加载环境变量
-dotenv_path: Path = Path(__file__).resolve().parent.parent / ".env"
+dotenv_path: Path = Path(__file__).resolve().parent.parent.parent / ".env"
 if dotenv_path.exists():
     load_dotenv(dotenv_path)
+
+
+def print_path_info():
+    print(f"Current file path: {Path(__file__).resolve()}")
+    print(f"Parent directory: {Path(__file__).resolve().parent}")
+    print(f"Grandparent directory: {Path(__file__).resolve().parent.parent}")
+    print(f".env file path: {dotenv_path}")
+
 
 database_url: str | None = os.getenv("DATABASE_URL")
 
@@ -90,3 +98,7 @@ async def close_db_connections() -> None:
     Call this during application shutdown.
     """
     await async_engine.dispose()
+
+
+if __name__ == "__main__":
+    print_path_info()

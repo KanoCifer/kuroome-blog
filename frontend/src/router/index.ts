@@ -6,6 +6,7 @@ import {
   createRouter,
   createWebHistory,
 } from "vue-router";
+import EntryView from "@/views/EntryView.vue";
 
 declare global {
   interface Window {
@@ -39,6 +40,14 @@ const router = createRouter({
         title: "Kuroome's Blog - 个人阅读清单与博客",
         description: "个人阅读清单管理项目，包含博客系统、书籍管理和阅读记录",
         keywords: "阅读清单,博客,书籍管理,个人知识库",
+      },
+    },
+    {
+      path: "/entry",
+      name: "entry",
+      component: EntryView,
+      meta: {
+        title: "Entry - Kuroome's Blog",
       },
     },
     {
