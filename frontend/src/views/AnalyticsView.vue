@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="mx-auto mt-24 max-w-6xl space-y-6">
     <!-- Header -->
     <div
       class="relative z-5 mb-8 flex flex-col gap-4 rounded-3xl bg-gray-50/50 px-4 py-6 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between dark:bg-gray-900/30"

@@ -35,32 +35,43 @@
 </template>
 
 <script setup lang="ts">
+// ArticleToc.vue 目录组件的逻辑部分，使用 Vue 3 的 <script setup> 语法。
+// 该组件接收渲染后的文章 HTML 内容，通过解析出 h1/h2/h3 标题构建目录，
+// 并为文章中的标题添加 id 以支持点击跳转和滚动高亮。
+
 import type { TocItem } from "@/types";
 import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 
+// 定义组件 props，content 为传入的文章 HTML 字符串
 const props = defineProps<{
   content: string;
 }>();
 
+// toc 存放解析出的目录条目列表，activeId 保存当前滚动位置对应的标题 id
 const toc = ref<TocItem[]>([]);
 const activeId = ref<string>("");
 
-// 生成标题 ID
+// 辅助函数
+//---------
+// 生成一个唯一的 id，用于给 heading 元素和目录项排序使用
+// index 是标题在文档中的顺序，text 为标题文本的一部分
 const generateId = (index: number, text: string): string => {
+  // 只取前 20 个字符，去除空白并用 '-' 连接，确保 id 合法
   return `heading-${index}-${text.slice(0, 20).replace(/\s+/g, "-").toLowerCase()}`;
 };
 
-// 从 HTML 内容中提取标题
+// 根据传入的 HTML 字符串，提取出所有 h1/h2/h3 标题，返回目录条目数组
 const extractHeadings = (html: string): TocItem[] => {
   const headings: TocItem[] = [];
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, "text/html");
 
+  // querySelectorAll 返回 NodeList，我们遍历并构造 TocItem
   const elements = doc.querySelectorAll("h1, h2, h3");
   elements.forEach((el, index) => {
     const text = el.textContent?.trim() || "";
     if (text) {
-      const level = parseInt(el.tagName.charAt(1));
+      const level = parseInt(el.tagName.charAt(1)); // 'H2' -> 2
       const id = generateId(index, text);
       headings.push({ id, text, level });
     }
@@ -69,64 +80,82 @@ const extractHeadings = (html: string): TocItem[] => {
   return headings;
 };
 
-// 为文章中的标题元素添加 ID
+// 给页面中实际渲染的 heading 元素添加对应的 id，方便跳转和定位
 const addIdsToHeadings = () => {
-  // 查找文章内容容器中的标题元素
+  // 文章容器在样式中使用了 .prose 类
   const contentContainer = document.querySelector(".prose");
   if (!contentContainer) return;
 
   const headingElements = contentContainer.querySelectorAll("h1, h2, h3");
   headingElements.forEach((el, index) => {
     const text = el.textContent?.trim() || "";
+    // 若已有 id 则跳过，防止重复赋值
     if (text && !el.id) {
       el.id = generateId(index, text);
     }
   });
 };
 
-// 初始化标题 ID
+// 初始化目录并尝试给 DOM 元素绑定 id
 const initHeadings = async () => {
   if (!props.content) return;
+  // 先从 content 字符串中提取目录数据
   toc.value = extractHeadings(props.content);
   await nextTick();
-  // 多次尝试确保 DOM 渲染完成
+  // DOM 渲染后多次尝试，以保证内容节点存在
   setTimeout(addIdsToHeadings, 50);
   setTimeout(addIdsToHeadings, 200);
   setTimeout(addIdsToHeadings, 500);
 };
 
+// -----------------------------------------------------------------------------
+// 响应 props.content 变化
+// -----------------------------------------------------------------------------
 watch(
   () => props.content,
   (newContent) => {
     if (newContent) {
       initHeadings();
     } else {
+      // 如果 content 为空，则清空目录和激活状态
       toc.value = [];
       activeId.value = "";
     }
   },
-  { immediate: true },
+  { immediate: true }, // 组件挂载时立即触发一次
 );
 
+// -----------------------------------------------------------------------------
+// 用户交互相关
+// -----------------------------------------------------------------------------
+
+// 点击目录按钮时滚动到对应标题位置，同时设置 activeId
 const scrollToHeading = (id: string) => {
   const element = document.getElementById(id);
   if (element) {
-    const offset = 100;
-    const top = element.getBoundingClientRect().top + window.scrollY - offset;
-    window.scrollTo({ top, behavior: "smooth" });
+    element.scrollIntoView({ behavior: "smooth", block: "center" });
     activeId.value = id;
+    window.history.pushState(null, "", `#${id}`); // 更新 URL 中的 hash，便于分享链接
   }
 };
 
-// 监听滚动，更新当前激活的目录项
+// 监听hash变化（例如用户使用浏览器的前进/后退按钮），更新 activeId 以保持目录高亮同步
+window.addEventListener("hashchange", () => {
+  const hash = window.location.hash.slice(1); // 去掉 '#' 前缀
+  if (hash) {
+    scrollToHeading(hash);
+  }
+});
+
+// 监听页面滚动，根据当前滚动位置更新 activeId
 const handleScroll = () => {
   if (toc.value.length === 0) return;
 
-  // 重新查找标题元素（因为 DOM 可能已更新）
   const contentContainer = document.querySelector(".prose");
   if (!contentContainer) return;
 
   const headingElements: HTMLElement[] = [];
+  // 由于 DOM 可能已经发生变化，重新查找一遍当前所有标题元素
   toc.value.forEach((item) => {
     const el = document.getElementById(item.id);
     if (el) headingElements.push(el);
@@ -134,7 +163,7 @@ const handleScroll = () => {
 
   if (headingElements.length === 0) return;
 
-  const scrollPosition = window.scrollY + 120;
+  const scrollPosition = window.scrollY + 120; // 与上面 offset 保持一致
 
   // 找到最后一个在滚动位置之上的标题
   let foundIndex = -1;
@@ -158,13 +187,18 @@ const handleScroll = () => {
     toc.value.length > 0 &&
     toc.value[0]
   ) {
+    // 如果滚动位置在第一个标题之前，让第一个目录项高亮
     activeId.value = toc.value[0].id;
   }
 };
 
+// -----------------------------------------------------------------------------
+// 生命周期钩子
+// -----------------------------------------------------------------------------
+
 onMounted(() => {
   window.addEventListener("scroll", handleScroll, { passive: true });
-  // 延迟初始化确保 DOM 已渲染
+  // 挂载后短暂延迟再尝试标记标题，避免异步渲染延迟
   setTimeout(() => {
     addIdsToHeadings();
     handleScroll();

@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto max-w-6xl px-4 py-8">
+  <div class="container mx-auto mt-24 max-w-6xl px-4 py-8">
     <div class="mb-6 flex items-center justify-between">
       <h1 class="font-serif text-3xl font-bold text-shadow-md dark:text-white">
         {{ activeCategory ? `Category: ${activeCategory}` : "Blog" }}
@@ -31,7 +31,7 @@
           <!-- Loading State -->
           <div
             v-if="isLoading"
-            class="flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white px-6 py-16 text-center dark:border-gray-700 dark:bg-gray-800"
+            class="flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white px-6 py-16 text-center dark:border-gray-700"
           >
             <div
               class="mb-4 h-10 w-10 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"

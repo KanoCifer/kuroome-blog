@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen rounded-t-4xl bg-blue-50/80 px-4 py-8 backdrop-blur-sm sm:px-6 lg:px-8 dark:bg-slate-900/80"
+    class="mt-24 min-h-screen rounded-t-4xl bg-blue-50/80 px-4 py-8 backdrop-blur-sm sm:px-6 lg:px-8 dark:bg-slate-900/80"
     :style="sectionStyle"
   >
     <div class="mx-auto max-w-4xl">

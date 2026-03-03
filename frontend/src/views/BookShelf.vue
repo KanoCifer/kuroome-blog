@@ -1,6 +1,6 @@
 <template>
   <div
-    class="mx-auto mb-24 min-h-screen max-w-5xl rounded-4xl bg-gray-50/70 px-4 py-8 backdrop-blur-lg sm:px-6 lg:px-8 dark:bg-gray-900/50"
+    class="mx-auto my-24 min-h-screen max-w-5xl rounded-4xl bg-gray-50/70 px-4 py-8 backdrop-blur-lg sm:px-6 lg:px-8 dark:bg-gray-900/50"
   >
     <div class="mx-auto">
       <!-- 页面标题 -->

@@ -1,5 +1,5 @@
 <template>
-  <BentoCard class="flex flex-col justify-center">
+  <BentoCard>
     <nav class="flex flex-col gap-3">
       <a
         v-for="item in navItems"
@@ -74,11 +74,7 @@
           stroke="currentColor"
           stroke-width="2"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M9 5l7 7-7 7"
-          />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
         </svg>
       </a>
     </nav>

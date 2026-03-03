@@ -1,22 +1,15 @@
 <template>
   <BentoCard class="flex flex-col">
     <div class="mb-3 flex items-center justify-between">
-      <h3 class="text-lg font-semibold text-slate-800">
+      <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200">
         {{ monthLabel }}
       </h3>
-      <span class="text-sm text-slate-400">{{ yearLabel }}</span>
+      <span class="text-sm text-slate-400 dark:text-slate-500">{{ yearLabel }}</span>
     </div>
 
     <!-- Weekday headers -->
-    <div
-      class="mb-1 grid text-center"
-      style="grid-template-columns: repeat(7, 1fr)"
-    >
-      <span
-        v-for="day in weekdays"
-        :key="day"
-        class="py-1 text-xs font-medium text-slate-400"
-      >
+    <div class="mb-1 grid text-center" style="grid-template-columns: repeat(7, 1fr)">
+      <span v-for="day in weekdays" :key="day" class="py-1 text-xs font-medium text-slate-400">
         {{ day }}
       </span>
     </div>
@@ -34,7 +27,7 @@
         :class="
           day === today
             ? 'bg-orange-500 font-bold text-white'
-            : 'text-slate-700 hover:bg-orange-100'
+            : 'text-slate-700 hover:bg-orange-100 dark:text-slate-300 dark:hover:bg-orange-900/30'
         "
       >
         {{ day }}
@@ -44,8 +37,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
 import dayjs from "dayjs";
+import { computed } from "vue";
 import BentoCard from "./BentoCard.vue";
 
 const now = dayjs();

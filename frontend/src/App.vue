@@ -10,8 +10,7 @@ useHead({
     { name: "viewport", content: "width=device-width, initial-scale=1.0" },
     {
       name: "description",
-      content:
-        "ReadingList - 个人阅读追踪与管理应用，支持微信读书导入，记录阅读进度，分享阅读心得",
+      content: "ReadingList - 个人阅读追踪与管理应用，支持微信读书导入，记录阅读进度，分享阅读心得",
     },
     {
       name: "keywords",

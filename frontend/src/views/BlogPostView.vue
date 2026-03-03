@@ -7,10 +7,13 @@ import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
 import type { Comment, Post, PostResponse } from "@/types";
 import { formatDate } from "@/utils/formatdate";
+import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import { useHead } from "@unhead/vue";
 import { useScroll } from "@vueuse/core";
-import { computed, onMounted, ref, watch } from "vue";
+import { Modal } from "ant-design-vue";
+import { computed, createVNode, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+
 const route = useRoute();
 const router = useRouter();
 const postId = ref<string>(route.params.id as string);
@@ -23,6 +26,7 @@ const notFound = ref(false);
 const auth = useAuthStore();
 const showEditButton = computed(() => !!auth.user?.is_admin);
 
+// 获取文章详情的函数，包含错误处理和状态管理
 const fetchPost = async () => {
   if (!postId.value) {
     errorMessage.value = "无效的文章 ID";
@@ -195,12 +199,25 @@ const handleReply = async (commentId: string, body: string) => {
   }
 };
 
+const showDeleteConfirm = () => {
+  Modal.confirm({
+    title: "Are you sure delete this Post?",
+    icon: createVNode(ExclamationCircleOutlined),
+    content: "The action cannot be undone.",
+    okText: "Yes",
+    okType: "danger",
+    cancelText: "No",
+    centered: true,
+    wrapClassName: "modal",
+    onOk() {
+      handleDelete();
+    },
+    onCancel() {},
+  });
+};
+
 // 处理删除文章
 const handleDelete = async () => {
-  if (!confirm(`确定要删除文章 "${post.value?.title}" 吗？此操作不可恢复！`)) {
-    return;
-  }
-
   try {
     const res = await request.post<{
       status: string;
@@ -228,13 +245,83 @@ const { y } = useScroll(window);
 const titleStyle = computed(() => ({
   transform: `translateY(${y.value * 0.4}px)`, // 背景最慢
 }));
-
 const sectionStyle = computed(() => {
   // compute scale with a ceiling of 1 so the content does not grow indefinitely
   const scale = Math.min(1, 0.9 + y.value * 0.0005);
   return {
     transform: `scale(${scale})`, // 内容区稍快
   };
+});
+
+// 处理代码块的复制功能
+// 因为文章内容是异步加载的，初次 mounted 时可能还没有任何 <pre> 节点，
+// 所以把逻辑封装成一个可以重复调用的函数，并在 post.body 更新后执行。
+
+let clickHandler: (event: Event) => void;
+const setupCodeCopy = () => {
+  const contentContainer = document.querySelector(".prose");
+  if (!contentContainer) return;
+
+  // 如果之前已经注册过 listener，就先移除，避免重复绑定
+  if (clickHandler) {
+    contentContainer.removeEventListener("click", clickHandler);
+  }
+
+  clickHandler = (event: Event) => {
+    const target = event.target as HTMLElement;
+    if (target.classList.contains("copy-btn")) {
+      const codeBlock = target.closest("pre");
+      if (codeBlock) {
+        const codeElement = codeBlock.querySelector("code");
+        if (codeElement) {
+          const codeText = codeElement.innerText;
+          navigator.clipboard
+            .writeText(codeText)
+            .then(() => {
+              useNotificationStore().success("代码已复制到剪贴板");
+            })
+            .catch(() => {
+              useNotificationStore().error("复制失败，请手动复制");
+            });
+        }
+      }
+    }
+  };
+
+  contentContainer.addEventListener("click", clickHandler);
+
+  // 先删除旧按钮，避免重复插入
+  contentContainer.querySelectorAll(".copy-btn").forEach((btn) => btn.remove());
+
+  // 给所有代码块添加复制按钮
+  const codeBlocks = contentContainer.querySelectorAll("pre");
+  codeBlocks.forEach((block) => {
+    const button = document.createElement("button");
+    button.innerText = "复制";
+    button.className =
+      "copy-btn absolute top-2 right-2 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded bg-gray-200 px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-300 focus:outline-none";
+    block.style.position = "relative"; // 确保父元素是相对定位，以便按钮绝对定位
+    block.appendChild(button);
+  });
+};
+
+onMounted(() => {
+  // 文章加载完成后需要重新初始化一次复制按钮
+  watch(
+    () => post.value?.body,
+    async () => {
+      await nextTick();
+      setupCodeCopy();
+    },
+    { immediate: true },
+  );
+});
+
+onUnmounted(() => {
+  const contentContainer = document.querySelector(".prose");
+  if (contentContainer && clickHandler) {
+    contentContainer.removeEventListener("click", clickHandler);
+  }
 });
 </script>
 
@@ -253,18 +340,16 @@ const sectionStyle = computed(() => {
       </div>
 
       <div v-else>
-        <h1 class="text-center font-serif text-7xl">{{ post?.title }}</h1>
+        <h1 class="text-center font-serif text-7xl text-gray-50">{{ post?.title }}</h1>
         <!-- 作者和日期信息 -->
-        <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+        <div class="flex flex-wrap items-center gap-4 text-sm text-gray-400">
           <div class="flex items-center gap-2">
             <div
               class="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-sky-600 text-lg font-bold text-white"
             >
               {{ post?.author?.charAt(0).toUpperCase() || "K" }}
             </div>
-            <span class="font-medium text-gray-900 dark:text-gray-200"
-              >@{{ post?.author || "Kurroome" }}</span
-            >
+            <span class="font-medium text-gray-200">@{{ post?.author || "Kurroome" }}</span>
           </div>
           <span class="text-gray-50">·</span>
           <div class="flex items-center gap-1">
@@ -294,7 +379,7 @@ const sectionStyle = computed(() => {
             </svg>
             <router-link
               :to="`/blog/category/${post.category.id}`"
-              class="text-blue-600 hover:text-blue-800 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+              class="text-blue-400 hover:text-blue-800 hover:underline dark:hover:text-blue-300"
             >
               {{ post.category.name }}
             </router-link>
@@ -336,7 +421,7 @@ const sectionStyle = computed(() => {
       <!-- Error State -->
       <div
         v-else-if="errorMessage"
-        class="flex min-h-[60vh] flex-col items-center justify-center rounded-xl border border-red-200 bg-red-50 px-6 py-16 text-center dark:border-red-800 dark:bg-red-900/20"
+        class="flex min-h-[60vh] max-w-6xl flex-col items-center justify-center rounded-xl border border-red-200 bg-red-50 px-6 py-16 text-center dark:border-red-800 dark:bg-red-900/20"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -475,7 +560,7 @@ const sectionStyle = computed(() => {
                 </router-link>
                 <button
                   v-if="showEditButton"
-                  @click="handleDelete"
+                  @click="showDeleteConfirm"
                   class="inline-flex items-center gap-2 rounded-xl bg-red-100 px-6 py-3 font-semibold text-red-700 shadow-md transition-all hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50"
                 >
                   <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

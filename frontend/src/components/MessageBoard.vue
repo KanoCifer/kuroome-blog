@@ -82,7 +82,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="mx-auto mt-12 mb-4 rounded-3xl bg-white/80 p-4 py-8 shadow-lg ring-1 ring-gray-900/5 backdrop-blur-sm transition-all hover:scale-[1.01] hover:shadow-xl dark:bg-gray-800/80"
+    class="mx-auto mt-12 mb-4 rounded-3xl bg-white/80 p-4 py-8 shadow-lg ring-1 ring-gray-900/5 backdrop-blur-sm motion-safe:transition-shadow motion-safe:duration-300 hover:shadow-xl dark:bg-gray-800/80"
   >
     <div class="mx-4 my-2">
       <h2
@@ -108,43 +108,49 @@ onMounted(() => {
       </p>
 
       <form @submit.prevent="handleSubmit" class="mt-4">
-        <div class="grid gap-6 md:grid-cols-2">
-          <div class="form-group md:col-span-2">
+        <div class="space-y-4 flex flex-col">
+          <div class="form-group">
             <label
+              for="username-input"
               class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300"
             >
               Username
             </label>
             <input
+              id="username-input"
               v-model="name"
               type="text"
-              class="w-full rounded-3xl border border-gray-300 bg-gray-50 px-3 py-2 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
+              class="w-full rounded-3xl border border-gray-300 bg-gray-50 px-3 py-2 motion-safe:transition-all motion-safe:duration-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
               :disabled="submitting"
               placeholder="Your name"
             />
             <div
               v-if="errors.name"
+              aria-live="assertive"
               class="mt-1 flex items-center text-sm text-red-500"
             >
               {{ errors.name[0] }}
             </div>
           </div>
 
-          <div class="form-group md:col-span-2">
+          <div class="form-group">
             <label
+              for="message-input"
               class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300"
             >
               Message
             </label>
             <textarea
+              id="message-input"
               v-model="message"
               rows="3"
-              class="w-full rounded-3xl border border-gray-300 bg-gray-50 px-3 py-2 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
+              class="w-full rounded-3xl border border-gray-300 bg-gray-50 px-3 py-2 motion-safe:transition-all motion-safe:duration-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
               :disabled="submitting"
               placeholder="发布后请等待审核"
             ></textarea>
             <div
               v-if="errors.message"
+              aria-live="assertive"
               class="mt-1 flex items-center text-sm text-red-500"
             >
               {{ errors.message[0] }}
@@ -154,7 +160,7 @@ onMounted(() => {
           <div>
             <button
               type="submit"
-              class="flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-2.5 font-bold text-white shadow-lg shadow-blue-500/30 ring-offset-2 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 dark:ring-offset-gray-800"
+              class="flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-2.5 font-bold text-white shadow-lg shadow-blue-500/30 ring-offset-2 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer dark:ring-offset-gray-800"
               :disabled="submitting"
             >
               {{ submitting ? "Submitting..." : "Submit" }}
@@ -164,6 +170,7 @@ onMounted(() => {
 
         <div
           v-if="successMessage"
+          aria-live="polite"
           class="mt-4 rounded-lg bg-green-50 p-4 text-green-700 dark:bg-green-900/20 dark:text-green-400"
         >
           {{ successMessage }}
@@ -172,6 +179,7 @@ onMounted(() => {
 
       <div
         v-if="loading"
+        role="status"
         class="mt-6 text-center text-gray-500 dark:text-gray-400"
       >
         Loading messages...
@@ -182,9 +190,9 @@ onMounted(() => {
           v-for="msg in messages"
           :key="msg.id"
           :class="[
-            'mt-6 rounded-3xl p-4 shadow-sm transition-all duration-300 hover:shadow-md',
+            'mt-6 rounded-3xl p-4 shadow-sm motion-safe:transition-all motion-safe:duration-300 hover:shadow-md',
             msg.from_admin
-              ? 'bg-linear-to-br from-purple-50 via-fuchsia-50 to-pink-50 ring-2 ring-purple-400/50 dark:from-purple-950/40 dark:via-fuchsia-950/30 dark:to-pink-950/20 dark:ring-purple-500/40'
+              ? 'bg-violet-50 ring-2 ring-violet-400/50 dark:bg-violet-950/30 dark:ring-violet-500/40'
               : 'bg-gray-50 dark:bg-gray-700/30',
           ]"
         >
@@ -194,7 +202,7 @@ onMounted(() => {
                 :class="[
                   'flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold',
                   msg.from_admin
-                    ? 'bg-linear-to-br from-purple-500 via-fuchsia-500 to-pink-500 text-white shadow-md shadow-purple-500/30 dark:from-purple-400 dark:via-fuchsia-400 dark:to-pink-400'
+                    ? 'bg-violet-600 text-white'
                     : 'bg-linear-to-br from-blue-50 to-blue-100 text-blue-600 dark:from-sky-900 dark:to-blue-900 dark:text-blue-300',
                 ]"
               >
@@ -205,7 +213,7 @@ onMounted(() => {
                   :class="[
                     'text-lg font-semibold',
                     msg.from_admin
-                      ? 'text-purple-900 dark:text-purple-100'
+                      ? 'text-violet-900 dark:text-violet-100'
                       : 'text-gray-900 dark:text-gray-100',
                   ]"
                 >
@@ -213,7 +221,7 @@ onMounted(() => {
                 </h3>
                 <span
                   v-if="msg.from_admin"
-                  class="inline-flex items-center gap-1 rounded-md bg-linear-to-r from-purple-500 via-fuchsia-500 to-pink-500 px-2 py-0.5 text-xs font-bold text-white shadow-sm ring-1 ring-purple-400/50 dark:from-purple-400 dark:via-fuchsia-400 dark:to-pink-400 dark:ring-purple-300/30"
+                  class="inline-flex items-center gap-1 rounded-md bg-violet-600 px-2 py-0.5 text-xs font-bold text-white shadow-sm"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -235,7 +243,7 @@ onMounted(() => {
               :class="[
                 'text-sm',
                 msg.from_admin
-                  ? 'text-purple-600/70 dark:text-purple-300/70'
+                  ? 'text-violet-600/70 dark:text-violet-300/70'
                   : 'text-gray-500 dark:text-gray-400',
               ]"
             >
@@ -246,7 +254,7 @@ onMounted(() => {
             :class="[
               'mt-3',
               msg.from_admin
-                ? 'text-purple-800 dark:text-purple-200'
+                ? 'text-violet-800 dark:text-violet-200'
                 : 'text-gray-700 dark:text-gray-300',
             ]"
           >

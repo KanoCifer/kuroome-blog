@@ -8,7 +8,6 @@ import { useNotificationStore } from "@/stores/notification";
 import type { BookItem, BookListResponse, Pagination } from "@/types";
 import { useHead } from "@vueuse/head";
 import { computed, ref } from "vue";
-// 设置页面 meta 标签
 useHead({
   title: "Kuroome's Blog - 个人阅读清单与博客",
   meta: [
@@ -139,7 +138,7 @@ const goToPage = (page: number) => {
 </script>
 
 <template>
-  <div class="mx-auto mb-12 grid max-w-6xl grid-cols-1 gap-8 lg:grid-cols-3">
+  <div class="mx-auto my-24 grid max-w-6xl grid-cols-1 gap-8 lg:grid-cols-3">
     <!-- 左侧：书籍列表和添加表单 -->
     <div class="lg:col-span-2">
       <!-- 使用组件：AddBookForm（子组件通过 emit("book-added") 通知父组件） -->
@@ -148,9 +147,7 @@ const goToPage = (page: number) => {
       <!-- 主视图 -->
       <!-- 书籍列表 -->
       <div class="min-h-fit space-y-4">
-        <h2
-          class="mb-4 flex items-baseline font-serif text-2xl font-bold text-gray-50 dark:text-gray-800"
-        >
+        <h2 class="mb-4 flex items-baseline font-serif text-2xl font-bold dark:text-gray-800">
           Reading List
         </h2>
 

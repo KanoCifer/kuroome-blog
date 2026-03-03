@@ -4,17 +4,13 @@
       <div
         class="h-20 w-20 shrink-0 overflow-hidden rounded-full border-4 border-white/60 shadow-md"
       >
-        <img
-          src="/images/avatar.webp"
-          alt="Avatar"
-          class="h-full w-full object-cover"
-        />
+        <img src="/images/avatar.webp" alt="Avatar" class="h-full w-full object-cover" />
       </div>
       <div class="flex flex-col justify-center">
-        <h2 class="text-2xl font-bold tracking-tight text-slate-800">
+        <h2 class="text-2xl font-bold tracking-tight text-slate-800 dark:text-slate-100">
           {{ greeting }}
         </h2>
-        <p class="mt-1 text-sm font-medium text-slate-600">
+        <p class="mt-1 text-sm font-medium text-slate-600 dark:text-slate-400">
           Welcome back. Ready for a new read?
         </p>
       </div>

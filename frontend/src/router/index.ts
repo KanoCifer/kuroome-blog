@@ -1,12 +1,7 @@
 import { useAuthStore } from "@/stores/auth";
 import { reportVisitorData } from "@/utils/visitorTracker";
-import HomeView from "@/views/HomeView.vue";
-import {
-  createMemoryHistory,
-  createRouter,
-  createWebHistory,
-} from "vue-router";
 import EntryView from "@/views/EntryView.vue";
+import { createMemoryHistory, createRouter, createWebHistory } from "vue-router";
 
 declare global {
   interface Window {
@@ -33,9 +28,9 @@ const router = createRouter({
       },
     },
     {
-      path: "/",
+      path: "/home",
       name: "home",
-      component: HomeView,
+      component: () => import("@/views/HomeView.vue"),
       meta: {
         title: "Kuroome's Blog - 个人阅读清单与博客",
         description: "个人阅读清单管理项目，包含博客系统、书籍管理和阅读记录",
@@ -43,7 +38,7 @@ const router = createRouter({
       },
     },
     {
-      path: "/entry",
+      path: "/",
       name: "entry",
       component: EntryView,
       meta: {
@@ -168,8 +163,7 @@ const router = createRouter({
       component: () => import("@/views/RSSParseView.vue"),
       meta: {
         title: "RSS 订阅 - Kuroome's Blog",
-        description:
-          "订阅 Kuroome's Blog 的 RSS 频道，第一时间获取最新文章更新",
+        description: "订阅 Kuroome's Blog 的 RSS 频道，第一时间获取最新文章更新",
         keywords: "RSS订阅,博客更新,文章订阅",
       },
     },
@@ -197,9 +191,7 @@ router.beforeEach(async (to) => {
 
   // 4. 检查"要去的页面"是否需要登录才能访问
   // （看路由配置里的 meta.requiresAuth 是不是 true）
-  const needsAuth = to.matched.some(
-    (route) => route.meta?.requiresAuth === true,
-  );
+  const needsAuth = to.matched.some((route) => route.meta?.requiresAuth === true);
 
   // 5. 如果这个页面需要登录，但用户现在没登录
   if (needsAuth && !auth.isAuthenticated) {

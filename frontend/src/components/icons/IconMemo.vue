@@ -1,6 +1,6 @@
 <template>
   <svg
-    class="size-4 text-gray-500 dark:text-gray-400"
+    class="size-4 text-gray-500 dark:text-gray-50"
     aria-hidden="true"
     fill="none"
     stroke="currentColor"
