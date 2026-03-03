@@ -4,8 +4,12 @@
     <div
       class="mb-8 flex items-center justify-between rounded-3xl bg-gray-50/50 px-4 py-6 backdrop-blur-sm dark:bg-gray-900/30"
     >
-      <h1 class="mr-4 flex items-center gap-3 text-3xl font-bold text-gray-800 dark:text-gray-100">
-        {{ activeTab === "messages" ? "Message Management" : "Comment Management" }}
+      <h1
+        class="mr-4 flex items-center gap-3 text-3xl font-bold text-gray-800 dark:text-gray-100"
+      >
+        {{
+          activeTab === "messages" ? "Message Management" : "Comment Management"
+        }}
         <span
           class="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-400"
         >
@@ -216,7 +220,10 @@ const fetchMessages = async () => {
       pendingMessages.value = pending as Message[];
       approvedMessages.value = approved as Message[];
     } else {
-      error.value = result.error?.message || result.description || "Failed to load messages";
+      error.value =
+        result.error?.message ||
+        result.description ||
+        "Failed to load messages";
     }
   } catch {
     error.value = "Network error occurred";
@@ -240,7 +247,10 @@ const fetchComments = async () => {
       pendingComments.value = pending as Comment[];
       approvedComments.value = approved as Comment[];
     } else {
-      error.value = result.error?.message || result.description || "Failed to load comments";
+      error.value =
+        result.error?.message ||
+        result.description ||
+        "Failed to load comments";
     }
   } catch {
     error.value = "Network error occurred";
@@ -260,7 +270,8 @@ const handleApprove = async (itemId: string) => {
       await fetchComments();
     }
   } catch (err) {
-    if (err instanceof Error) error.value = err.message || "Network error occurred";
+    if (err instanceof Error)
+      error.value = err.message || "Network error occurred";
     else error.value = "Network error occurred";
   } finally {
     actionLoading.value = null;
@@ -278,7 +289,8 @@ const handleDelete = async (itemId: string) => {
       await fetchComments();
     }
   } catch (err) {
-    if (err instanceof Error) error.value = err.message || "Network error occurred";
+    if (err instanceof Error)
+      error.value = err.message || "Network error occurred";
     else error.value = "Network error occurred";
   } finally {
     actionLoading.value = null;

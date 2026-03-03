@@ -132,11 +132,20 @@
       <div
         class="group relative overflow-hidden rounded-2xl bg-linear-to-br from-blue-500 to-blue-600 p-6 text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
       >
-        <div class="absolute -top-4 -right-4 h-24 w-24 rounded-full bg-white/10"></div>
-        <div class="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-white/5"></div>
+        <div
+          class="absolute -top-4 -right-4 h-24 w-24 rounded-full bg-white/10"
+        ></div>
+        <div
+          class="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-white/5"
+        ></div>
         <div class="relative">
           <div class="mb-2 flex items-center gap-2 text-blue-100">
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -163,11 +172,20 @@
       <div
         class="group relative overflow-hidden rounded-2xl bg-linear-to-br from-emerald-500 to-emerald-600 p-6 text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
       >
-        <div class="absolute -top-4 -right-4 h-24 w-24 rounded-full bg-white/10"></div>
-        <div class="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-white/5"></div>
+        <div
+          class="absolute -top-4 -right-4 h-24 w-24 rounded-full bg-white/10"
+        ></div>
+        <div
+          class="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-white/5"
+        ></div>
         <div class="relative">
           <div class="mb-2 flex items-center gap-2 text-emerald-100">
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -188,11 +206,20 @@
       <div
         class="group relative overflow-hidden rounded-2xl bg-linear-to-br from-purple-500 to-purple-600 p-6 text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
       >
-        <div class="absolute -top-4 -right-4 h-24 w-24 rounded-full bg-white/10"></div>
-        <div class="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-white/5"></div>
+        <div
+          class="absolute -top-4 -right-4 h-24 w-24 rounded-full bg-white/10"
+        ></div>
+        <div
+          class="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-white/5"
+        ></div>
         <div class="relative">
           <div class="mb-2 flex items-center gap-2 text-purple-100">
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -213,11 +240,20 @@
       <div
         class="group relative overflow-hidden rounded-2xl bg-linear-to-br from-orange-500 to-orange-600 p-6 text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
       >
-        <div class="absolute -top-4 -right-4 h-24 w-24 rounded-full bg-white/10"></div>
-        <div class="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-white/5"></div>
+        <div
+          class="absolute -top-4 -right-4 h-24 w-24 rounded-full bg-white/10"
+        ></div>
+        <div
+          class="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-white/5"
+        ></div>
         <div class="relative">
           <div class="mb-2 flex items-center gap-2 text-orange-100">
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -228,7 +264,9 @@
             <span class="text-sm font-medium">Avg. Visits/Day</span>
           </div>
           <p class="text-4xl font-bold">{{ avgVisitsPerDay }}</p>
-          <p class="mt-1 text-sm text-orange-100">Last {{ selectedDays }} days</p>
+          <p class="mt-1 text-sm text-orange-100">
+            Last {{ selectedDays }} days
+          </p>
         </div>
       </div>
     </div>
@@ -238,28 +276,38 @@
       <!-- Visit Trend Line Chart -->
       <div class="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800/80">
         <h2 class="mb-4 text-lg font-bold text-gray-800 dark:text-gray-100">
-          <icon-trend class="inline-block size-6" /> Trend (Last {{ selectedDays }} days)
+          <icon-trend class="inline-block size-6" /> Trend (Last
+          {{ selectedDays }} days)
         </h2>
         <div
           v-if="loading && !overviewData"
           class="h-72 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-700/40"
         ></div>
         <div v-else class="h-72 w-full overflow-hidden">
-          <v-chart :option="trendChartOption" autoresize class="h-full w-full" />
+          <v-chart
+            :option="trendChartOption"
+            autoresize
+            class="h-full w-full"
+          />
         </div>
       </div>
 
       <!-- Popular Pages Bar Chart -->
       <div class="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800/80">
         <h2 class="mb-4 text-lg font-bold text-gray-800 dark:text-gray-100">
-          <icon-popular class="inline-block size-6 dark:text-gray-50" /> Popular Pages
+          <icon-popular class="inline-block size-6 dark:text-gray-50" /> Popular
+          Pages
         </h2>
         <div
           v-if="loading && !overviewData"
           class="h-72 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-700/40"
         ></div>
         <div v-else class="h-72 w-full overflow-hidden">
-          <v-chart :option="popularPagesChartOption" autoresize class="h-full w-full" />
+          <v-chart
+            :option="popularPagesChartOption"
+            autoresize
+            class="h-full w-full"
+          />
         </div>
       </div>
     </div>
@@ -341,7 +389,9 @@
                     <p class="font-medium text-gray-900 dark:text-gray-100">
                       {{ log.name || log.username }}
                     </p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">@{{ log.username }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                      @{{ log.username }}
+                    </p>
                   </div>
                 </div>
               </td>
@@ -358,10 +408,14 @@
               <td class="py-4 text-gray-600 dark:text-gray-300">
                 {{ formatDateTime(log.current_login_at) }}
               </td>
-              <td class="py-4 font-mono text-xs text-gray-500 dark:text-gray-400">
+              <td
+                class="py-4 font-mono text-xs text-gray-500 dark:text-gray-400"
+              >
                 {{ log.last_login_ip || "-" }}
               </td>
-              <td class="py-4 font-mono text-xs text-gray-500 dark:text-gray-400">
+              <td
+                class="py-4 font-mono text-xs text-gray-500 dark:text-gray-400"
+              >
                 {{ log.current_login_ip || "-" }}
               </td>
               <td>
@@ -384,7 +438,12 @@
         <p class="text-sm text-gray-500 dark:text-gray-400">
           Showing
           {{ (loginLogsData.page - 1) * loginLogsData.page_size + 1 }} to
-          {{ Math.min(loginLogsData.page * loginLogsData.page_size, loginLogsData.total) }}
+          {{
+            Math.min(
+              loginLogsData.page * loginLogsData.page_size,
+              loginLogsData.total,
+            )
+          }}
           of {{ loginLogsData.total }} results
         </p>
         <div class="flex gap-2">

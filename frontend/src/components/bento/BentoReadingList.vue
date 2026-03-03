@@ -17,7 +17,9 @@
           fill="#707070"
         ></path>
       </svg>
-      <RouterLink to="/home" class="font-serif text-xl text-gray-800 dark:text-white"
+      <RouterLink
+        to="/home"
+        class="font-serif text-xl text-gray-800 dark:text-white"
         >ReadingList</RouterLink
       >
     </div>

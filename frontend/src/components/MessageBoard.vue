@@ -82,7 +82,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="mx-auto mt-12 mb-4 rounded-3xl bg-white/80 p-4 py-8 shadow-lg ring-1 ring-gray-900/5 backdrop-blur-sm motion-safe:transition-shadow motion-safe:duration-300 hover:shadow-xl dark:bg-gray-800/80"
+    class="mx-auto mt-12 mb-4 rounded-3xl bg-white/80 p-4 py-8 shadow-lg ring-1 ring-gray-900/5 backdrop-blur-sm hover:shadow-xl motion-safe:transition-shadow motion-safe:duration-300 dark:bg-gray-800/80"
   >
     <div class="mx-4 my-2">
       <h2
@@ -108,7 +108,7 @@ onMounted(() => {
       </p>
 
       <form @submit.prevent="handleSubmit" class="mt-4">
-        <div class="space-y-4 flex flex-col">
+        <div class="flex flex-col space-y-4">
           <div class="form-group">
             <label
               for="username-input"
@@ -120,7 +120,7 @@ onMounted(() => {
               id="username-input"
               v-model="name"
               type="text"
-              class="w-full rounded-3xl border border-gray-300 bg-gray-50 px-3 py-2 motion-safe:transition-all motion-safe:duration-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
+              class="w-full rounded-3xl border border-gray-300 bg-gray-50 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none motion-safe:transition-all motion-safe:duration-300 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
               :disabled="submitting"
               placeholder="Your name"
             />
@@ -144,7 +144,7 @@ onMounted(() => {
               id="message-input"
               v-model="message"
               rows="3"
-              class="w-full rounded-3xl border border-gray-300 bg-gray-50 px-3 py-2 motion-safe:transition-all motion-safe:duration-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
+              class="w-full rounded-3xl border border-gray-300 bg-gray-50 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none motion-safe:transition-all motion-safe:duration-300 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
               :disabled="submitting"
               placeholder="发布后请等待审核"
             ></textarea>
@@ -160,7 +160,7 @@ onMounted(() => {
           <div>
             <button
               type="submit"
-              class="flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-2.5 font-bold text-white shadow-lg shadow-blue-500/30 ring-offset-2 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer dark:ring-offset-gray-800"
+              class="flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-8 py-2.5 font-bold text-white shadow-lg shadow-blue-500/30 ring-offset-2 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-800"
               :disabled="submitting"
             >
               {{ submitting ? "Submitting..." : "Submit" }}
@@ -190,7 +190,7 @@ onMounted(() => {
           v-for="msg in messages"
           :key="msg.id"
           :class="[
-            'mt-6 rounded-3xl p-4 shadow-sm motion-safe:transition-all motion-safe:duration-300 hover:shadow-md',
+            'mt-6 rounded-3xl p-4 shadow-sm hover:shadow-md motion-safe:transition-all motion-safe:duration-300',
             msg.from_admin
               ? 'bg-violet-50 ring-2 ring-violet-400/50 dark:bg-violet-950/30 dark:ring-violet-500/40'
               : 'bg-gray-50 dark:bg-gray-700/30',

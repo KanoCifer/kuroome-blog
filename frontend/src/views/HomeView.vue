@@ -51,7 +51,11 @@ const getVisiblePages = computed(() => {
   const visiblePages: number[] = [];
 
   // 显示当前页附近的页码
-  for (let i = Math.max(2, current - 2); i <= Math.min(totalPages - 1, current + 2); i++) {
+  for (
+    let i = Math.max(2, current - 2);
+    i <= Math.min(totalPages - 1, current + 2);
+    i++
+  ) {
     visiblePages.push(i);
   }
 
@@ -142,21 +146,33 @@ const goToPage = (page: number) => {
     <!-- 左侧：书籍列表和添加表单 -->
     <div class="lg:col-span-2">
       <!-- 使用组件：AddBookForm（子组件通过 emit("book-added") 通知父组件） -->
-      <AddBookForm ref="addBookFormRef" @book-added="fetchBooks" @book-updated="fetchBooks" />
+      <AddBookForm
+        ref="addBookFormRef"
+        @book-added="fetchBooks"
+        @book-updated="fetchBooks"
+      />
 
       <!-- 主视图 -->
       <!-- 书籍列表 -->
       <div class="min-h-fit space-y-4">
-        <h2 class="mb-4 flex items-baseline font-serif text-2xl font-bold dark:text-gray-800">
+        <h2
+          class="mb-4 flex items-baseline font-serif text-2xl font-bold dark:text-gray-800"
+        >
           Reading List
         </h2>
 
         <div v-if="isLoading" aria-hidden="true">
           <!-- Skeleton placeholders (fixed height) to reserve space and prevent layout shift -->
           <ul class="space-y-3">
-            <li class="h-20 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-700/40"></li>
-            <li class="h-20 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-700/40"></li>
-            <li class="h-20 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-700/40"></li>
+            <li
+              class="h-20 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-700/40"
+            ></li>
+            <li
+              class="h-20 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-700/40"
+            ></li>
+            <li
+              class="h-20 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-700/40"
+            ></li>
           </ul>
         </div>
         <div
@@ -181,7 +197,10 @@ const goToPage = (page: number) => {
             {{ errorMessage }}
           </p>
         </div>
-        <p v-else-if="books.length === 0" class="text-sm text-gray-500 dark:text-gray-400">
+        <p
+          v-else-if="books.length === 0"
+          class="text-sm text-gray-500 dark:text-gray-400"
+        >
           暂无书籍，先添加一本吧。
         </p>
 
@@ -210,7 +229,9 @@ const goToPage = (page: number) => {
                   >Reading</span
                 >
               </div>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">@ {{ book.author }}</p>
+              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                @ {{ book.author }}
+              </p>
             </div>
 
             <BookActionButtons
@@ -233,7 +254,11 @@ const goToPage = (page: number) => {
             <button
               :disabled="!pagination.has_prev"
               class="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-800"
-              :class="pagination?.has_prev ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400'"
+              :class="
+                pagination?.has_prev
+                  ? 'text-gray-700 dark:text-gray-300'
+                  : 'text-gray-400'
+              "
               @click="goToPage(pagination!.prev_num!)"
               type="button"
             >
@@ -297,7 +322,11 @@ const goToPage = (page: number) => {
             <button
               :disabled="!pagination?.has_next"
               class="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-800"
-              :class="pagination?.has_next ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400'"
+              :class="
+                pagination?.has_next
+                  ? 'text-gray-700 dark:text-gray-300'
+                  : 'text-gray-400'
+              "
               @click="goToPage(pagination!.next_num!)"
               type="button"
             >

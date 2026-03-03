@@ -3,7 +3,9 @@
     <div
       class="m-4 mx-auto mt-24 max-w-xl rounded-[40px] bg-white/80 p-8 shadow-xl backdrop-blur-xs dark:bg-gray-800/80"
     >
-      <p class="font-serif text-2xl font-bold dark:text-white">Import Your Bookshelf!</p>
+      <p class="font-serif text-2xl font-bold dark:text-white">
+        Import Your Bookshelf!
+      </p>
       <p class="mb-4 text-gray-500 italic dark:text-gray-400">
         Import your bookshelf from WEREAD here.
       </p>

@@ -3,7 +3,9 @@
   <div
     class="rounded-3xl border border-gray-100 bg-white/80 p-5 shadow-sm backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800/80"
   >
-    <h3 class="mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase">Tech Stack</h3>
+    <h3 class="mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase">
+      Tech Stack
+    </h3>
     <div class="flex flex-wrap gap-2">
       <span
         class="cursor-default rounded-md bg-blue-100 px-2.5 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50"

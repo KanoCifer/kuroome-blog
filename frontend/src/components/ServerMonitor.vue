@@ -2,8 +2,15 @@
   <!-- Server Monitoring Section -->
   <div class="space-y-6">
     <div class="flex items-center justify-between">
-      <h2 class="flex items-center gap-2 text-xl font-bold text-gray-800 dark:text-gray-100">
-        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <h2
+        class="flex items-center gap-2 text-xl font-bold text-gray-800 dark:text-gray-100"
+      >
+        <svg
+          class="h-6 w-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -93,11 +100,16 @@
             </div>
           </h3>
           <span class="text-sm font-semibold text-gray-600 dark:text-gray-400">
-            {{ serverStatus?.mem_used ?? 0 }} MB / {{ serverStatus?.mem_total ?? 0 }} MB
+            {{ serverStatus?.mem_used ?? 0 }} MB /
+            {{ serverStatus?.mem_total ?? 0 }} MB
           </span>
         </div>
         <div class="h-48">
-          <v-chart :option="memoryGaugeOption" autoresize class="h-full w-full" />
+          <v-chart
+            :option="memoryGaugeOption"
+            autoresize
+            class="h-full w-full"
+          />
         </div>
       </div>
 
@@ -144,7 +156,9 @@
               </span>
             </div>
           </div>
-          <div class="h-4 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+          <div
+            class="h-4 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700"
+          >
             <div
               :style="{
                 width: `${serverStatus?.disk_usage ?? 0}%`,
@@ -159,8 +173,15 @@
 
     <!-- Server History Chart -->
     <div class="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800/80">
-      <h3 class="mb-4 flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100">
-        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <h3
+        class="mb-4 flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100"
+      >
+        <svg
+          class="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -175,7 +196,11 @@
         class="h-72 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-700/40"
       ></div>
       <div v-else class="h-72 w-full overflow-hidden">
-        <v-chart :option="historyChartOption" autoresize class="h-full w-full" />
+        <v-chart
+          :option="historyChartOption"
+          autoresize
+          class="h-full w-full"
+        />
       </div>
     </div>
   </div>

@@ -18,7 +18,8 @@ watch(
     notEntryView.value = newPath === "/";
     showFooterBg.value =
       // 匹配 /blog/xxxx 但不包括 /blog 列表页
-      (newPath.startsWith("/blog/") && newPath !== "/blog") || newPath.includes("/rss");
+      (newPath.startsWith("/blog/") && newPath !== "/blog") ||
+      newPath.includes("/rss");
   },
   { immediate: true },
 );

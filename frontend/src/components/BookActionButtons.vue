@@ -71,7 +71,12 @@ const showDeleteConfirm = () => {
         viewBox="0 0 24 24"
         stroke="currentColor"
       >
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M5 13l4 4L19 7"
+        />
       </svg>
       {{ book.iscompleted ? "Undo" : "Finish" }}
     </button>
@@ -81,7 +86,12 @@ const showDeleteConfirm = () => {
       class="inline-flex items-center gap-1.5 rounded-xl bg-gray-100/50 px-4 py-2 text-sm font-medium backdrop-blur-sm transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-gray-700 dark:hover:bg-gray-600"
       @click="emit('edit-book', book)"
     >
-      <svg class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg
+        class="h-4 w-4 text-gray-500"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -97,7 +107,12 @@ const showDeleteConfirm = () => {
       class="inline-flex items-center gap-1.5 rounded-xl bg-gray-100/50 px-4 py-2 text-sm font-medium text-red-600 backdrop-blur-sm transition-colors hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-60 dark:text-red-400 dark:hover:bg-red-900/30"
       @click="showDeleteConfirm()"
     >
-      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg
+        class="h-4 w-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
         <path
           stroke-linecap="round"
           stroke-linejoin="round"

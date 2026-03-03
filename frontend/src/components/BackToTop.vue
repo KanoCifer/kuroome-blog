@@ -47,7 +47,10 @@ const scrollToTop = () => {
       aria-label="回到顶部"
     >
       <!-- 背景进度环 -->
-      <svg class="absolute inset-0 h-full w-full -rotate-90" viewBox="0 0 56 56">
+      <svg
+        class="absolute inset-0 h-full w-full -rotate-90"
+        viewBox="0 0 56 56"
+      >
         <!-- 背景圆环 -->
         <circle
           cx="28"
@@ -85,7 +88,11 @@ const scrollToTop = () => {
         stroke="currentColor"
         stroke-width="2"
       >
-        <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M5 10l7-7m0 0l7 7m-7-7v18"
+        />
       </svg>
 
       <!-- Tooltip -->

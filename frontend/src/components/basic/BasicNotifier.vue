@@ -12,7 +12,10 @@
       class="fixed inset-0 z-9999 flex items-center justify-center"
     >
       <!-- 背景遮罩 -->
-      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="closeMobileWarning"></div>
+      <div
+        class="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        @click="closeMobileWarning"
+      ></div>
 
       <!-- 弹窗内容 -->
       <div
@@ -23,7 +26,12 @@
           <div
             class="flex h-20 w-20 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400"
           >
-            <svg class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg
+              class="h-10 w-10"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -35,13 +43,16 @@
         </div>
 
         <!-- 标题 -->
-        <h2 class="mb-4 text-center font-serif text-2xl font-bold text-gray-800 dark:text-gray-200">
+        <h2
+          class="mb-4 text-center font-serif text-2xl font-bold text-gray-800 dark:text-gray-200"
+        >
           暂未适配移动端
         </h2>
 
         <!-- 说明文字 -->
         <p class="mb-8 text-center text-gray-600 dark:text-gray-400">
-          为了获得最佳体验，请使用桌面设备访问本网站。 移动端功能正在开发中，敬请期待！
+          为了获得最佳体验，请使用桌面设备访问本网站。
+          移动端功能正在开发中，敬请期待！
         </p>
 
         <!-- 确认按钮 -->

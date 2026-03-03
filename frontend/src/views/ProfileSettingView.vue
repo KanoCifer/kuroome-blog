@@ -12,7 +12,11 @@
         <div
           class="h-24 w-24 overflow-hidden rounded-full border-4 border-white shadow-lg dark:border-gray-700"
         >
-          <img :src="avatarUrl" alt="Avatar" class="h-full w-full object-cover" />
+          <img
+            :src="avatarUrl"
+            alt="Avatar"
+            class="h-full w-full object-cover"
+          />
         </div>
         <div class="absolute right-0 bottom-0">
           <input
@@ -54,7 +58,9 @@
     <form @submit.prevent="handleSubmit">
       <!-- Name -->
       <div class="mb-4">
-        <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Name
         </label>
         <input
@@ -71,7 +77,9 @@
 
       <!-- Username -->
       <div class="mb-4">
-        <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Username
           <span class="text-xs text-red-400 italic">* Login-in name</span>
         </label>
@@ -89,7 +97,9 @@
 
       <!-- Gender -->
       <div class="mb-4">
-        <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Gender
         </label>
         <div class="flex gap-4">
@@ -132,7 +142,9 @@
 
       <!-- Email -->
       <div class="mb-4">
-        <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Email
         </label>
         <input
@@ -149,7 +161,9 @@
 
       <!-- Mobile -->
       <div class="mb-4">
-        <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Mobile
         </label>
         <input
@@ -166,7 +180,9 @@
 
       <!-- Password -->
       <div class="mb-6">
-        <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Password
         </label>
         <input
@@ -199,7 +215,9 @@
       <div v-if="message" class="mt-4 text-center">
         <p
           :class="[
-            messageType === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600',
+            messageType === 'success'
+              ? 'bg-green-50 text-green-600'
+              : 'bg-red-50 text-red-600',
             'rounded-3xl px-4 py-2',
           ]"
         >

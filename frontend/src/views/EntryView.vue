@@ -1,66 +1,78 @@
 <template>
-  <div class="relative min-h-dvh w-full" ref="parentContainer">
-    <BentoNavCard
-      :initial="{ scale: 0.5 }"
-      :animate="{ scale: 1 }"
-      :transition="{ type: 'spring', duration: 0.5 }"
-      ref="navBox"
-      class="absolute top-[38%] w-68 -translate-x-1/2 -translate-y-1/2"
-      :style="navCardLeft"
-    />
-    <BentoTech
-      :initial="{ scale: 0.5 }"
-      :animate="{ scale: 1 }"
-      :transition="{ type: 'spring', duration: 0.5 }"
-      class="h-2xs absolute top-[81%] w-70 -translate-x-1/2 -translate-y-1/2 p-0!"
-      :style="navCardLeft"
+  <div
+    class="relative w-full max-sm:flex max-sm:flex-col max-sm:items-center max-sm:gap-4 max-sm:overflow-x-hidden max-sm:p-4 max-sm:pt-14"
+    :style="containerStyle"
+    ref="parentContainer"
+  >
+    <!-- Theme Toggle - 只在入口页面显示 -->
+    <div class="absolute top-4 right-4 z-50">
+      <ThemeToggle />
+    </div>
+    <BentoGreeting
+      :initial="{ scale: 0 }"
+      :animate="{ scale: 1, delay: 5 }"
+      :transition="{ type: 'spring' }"
+      :style="greetingPosition"
+      class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:w-full! max-sm:min-w-0 max-sm:translate-0!"
     />
     <BentoProfileCard
       :initial="{ scale: 0.9 }"
       :animate="{ scale: 1 }"
-      :transition="{ type: 'spring', duration: 0.5 }"
+      :transition="{ type: 'spring' }"
       ref="boxRef"
-      class="absolute top-1/2 left-1/2 w-md min-w-fit -translate-x-1/2 -translate-y-1/2"
+      :style="profilePosition"
+      class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:w-full! max-sm:min-w-0 max-sm:translate-0!"
     />
-    <BentoCalendar
-      :initial="{ scale: 0 }"
-      :animate="{ scale: 1 }"
-      :transition="{ type: 'spring', duration: 2.5 }"
-      ref="calRef"
-      :style="clockCardLeft"
-      class="absolute top-5/8 w-2xs -translate-x-1/2 -translate-y-1/2"
+    <BentoNavCard
+      :initial="{ scale: 0.5 }"
+      :animate="{ scale: 1, delay: 1 }"
+      :transition="{ type: 'spring' }"
+      ref="navBox"
+      class="absolute w-68 -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
+      :style="navCardPosition"
     />
     <BentoClock
       :initial="{ scale: 0 }"
       :animate="{ scale: 1 }"
       :transition="{ type: 'spring', duration: 2 }"
       ref="clockRef"
-      :style="clockCardLeft"
-      class="absolute top-3/9 w-auto -translate-x-1/2 -translate-y-1/2"
+      :style="clockCardPosition"
+      class="absolute w-auto -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
     />
-    <BentoGreeting
+    <BentoCalendar
       :initial="{ scale: 0 }"
       :animate="{ scale: 1 }"
-      :transition="{ type: 'spring', duration: 1.5 }"
-      class="absolute top-2/9 left-1/2 w-md min-w-fit -translate-x-1/2 -translate-y-1/2"
+      :transition="{ type: 'spring', duration: 2.5 }"
+      ref="calRef"
+      :style="calendarPosition"
+      class="absolute w-2xs -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
+    />
+    <BentoMemo
+      :style="memoCardPosition"
+      class="absolute -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
     />
     <BentoNewPost
-      :style="newCardLeft"
-      class="absolute top-40 w-auto -translate-x-1/2 -translate-y-1/2"
+      :style="newCardPosition"
+      class="absolute w-auto -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
+    />
+    <BentoTech
+      :initial="{ scale: 0.5 }"
+      :animate="{ scale: 1 }"
+      :transition="{ type: 'spring', duration: 0.5 }"
+      class="h-2xs absolute w-70 -translate-x-1/2 -translate-y-1/2 p-0! max-sm:static! max-sm:left-auto! max-sm:h-auto! max-sm:w-full! max-sm:translate-0!"
+      :style="techPosition"
     />
     <BentoReadingList
       :initial="{ scale: 0 }"
       :animate="{ scale: 1 }"
       :transition="{ type: 'spring', duration: 2.5 }"
-      :style="listCardLeft"
-      class="absolute top-6/8 w-auto -translate-x-1/2 -translate-y-1/2"
+      :style="listCardPosition"
+      class="absolute w-auto -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
     />
-    <BentoMemo :style="memoCardLeft" class="absolute top-[9%] -translate-x-1/2 -translate-y-1/2" />
-    <BentoCat class="absolute top-10/12 left-[45%] w-2xs -translate-x-1/2 -translate-y-1/2" />
-    <!-- Theme Toggle - 只在入口页面显示 -->
-    <div class="absolute top-4 right-4 z-50">
-      <ThemeToggle />
-    </div>
+    <BentoCat
+      :style="catPosition"
+      class="absolute w-2xs -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
+    />
   </div>
 </template>
 
@@ -76,8 +88,8 @@ import BentoProfileCard from "@/components/bento/BentoProfileCard.vue";
 import BentoReadingList from "@/components/bento/BentoReadingList.vue";
 import BentoTech from "@/components/bento/BentoTech.vue";
 import ThemeToggle from "@/components/ThemeToggle.vue";
-import { useDebounceFn, useEventListener } from "@vueuse/core";
-import { computed, onMounted, ref, type ComponentPublicInstance } from "vue";
+import { useDebounceFn } from "@vueuse/core";
+import { computed, onMounted, onUnmounted, ref, type ComponentPublicInstance } from "vue";
 
 const clockRef = ref<ComponentPublicInstance | null>(null);
 const navBox = ref<ComponentPublicInstance | null>(null);
@@ -89,45 +101,114 @@ const parentContainer = ref<HTMLElement | null>(null);
 const navoffsetWidth = ref<number>(0);
 const clockoffsetWidth = ref<number>(0);
 const parentWidth = ref<number>(0);
+// 视口高度（布局基准），用 window.innerHeight 而非容器高度
+// 这样在小屏时容器会撑高，卡片不会被压缩重叠
+const viewportHeight = ref<number>(0);
+
+// 布局设计基准高度：使用视口高度，但不低于 820px，保证卡片间距不被压缩
+const layoutHeight = computed<number>(() => Math.max(viewportHeight.value, 820));
+
+// 容器高度：至少撑满布局高度（让绝对定位的卡片不被裁剪）
+const containerStyle = computed(() => ({
+  minHeight: `${layoutHeight.value}px`,
+}));
+
 // 宽度的一半
 const halfWidth = computed<number>(() => {
   return parentWidth.value / 2;
 });
 
-const navCardLeft = computed(() => {
+// 计算所有卡片的动态位置，包含 left 和 top，以 layoutHeight 为基准
+// layoutHeight = max(视口高度, 820px)，保证小屏时卡片不重叠
+
+// 对应 BentoGreeting (top-2/9 left-1/2)
+const greetingPosition = computed(() => ({
+  top: `${(layoutHeight.value * 2) / 9}px`,
+  left: `${parentWidth.value / 2}px`,
+}));
+
+// 对应 BentoProfileCard (top-1/2 left-1/2)
+const profilePosition = computed(() => ({
+  top: `${layoutHeight.value / 2}px`,
+  left: `${parentWidth.value / 2}px`,
+}));
+
+// 对应 BentoNavCard (top-[38%])
+const navCardPosition = computed(() => {
   const totalLeft = halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224;
   return {
     left: `${totalLeft}px`,
-  };
-});
-const memoCardLeft = computed(() => {
-  const totalLeft = halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224;
-  return {
-    left: `${totalLeft + 220}px`,
+    top: `${layoutHeight.value * 0.38}px`,
   };
 });
 
-const clockCardLeft = computed(() => {
+// 对应 BentoMemo (top-[9%])
+const memoCardPosition = computed(() => {
+  const totalLeft = halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224;
+  return {
+    left: `${totalLeft + 220}px`,
+    top: `${layoutHeight.value * 0.09}px`,
+  };
+});
+
+// 对应 BentoClock (top-3/9)
+const clockCardPosition = computed(() => {
   const totalLeft = halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
   return {
     left: `${totalLeft + 24}px`,
+    top: `${(layoutHeight.value * 3) / 9}px`,
   };
 });
-const newCardLeft = computed(() => {
+
+// 对应 BentoCalendar (top-5/8)
+const calendarPosition = computed(() => {
+  const totalLeft = halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
+  return {
+    left: `${totalLeft + 24}px`,
+    top: `${(layoutHeight.value * 5) / 8}px`,
+  };
+});
+
+// 对应 BentoNewPost (top-40 即 160px，固定值)
+const newCardPosition = computed(() => {
   const totalLeft = halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
   return {
     left: `${totalLeft - 36}px`,
+    top: `160px`,
   };
 });
-const listCardLeft = computed(() => {
+
+// 对应 BentoTech (top-[81%])
+const techPosition = computed(() => {
+  const totalLeft = halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224;
+  return {
+    left: `${totalLeft}px`,
+    top: `${layoutHeight.value * 0.81}px`,
+  };
+});
+
+// 对应 BentoReadingList (top-6/8)
+const listCardPosition = computed(() => {
   const totalLeft = halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
   return {
     left: `${totalLeft - 240}px`,
+    top: `${(layoutHeight.value * 6) / 8}px`,
+  };
+});
+
+// 对应 BentoCat (top-10/12 left-[45%])
+const catPosition = computed(() => {
+  return {
+    left: `${parentWidth.value * 0.45}px`,
+    top: `${(layoutHeight.value * 10) / 12}px`,
   };
 });
 
 const updateDimensions = () => {
-  // 手动重新获取并更新父容器宽度
+  // 视口高度作为布局基准
+  viewportHeight.value = window.innerHeight;
+
+  // 更新父容器宽度
   if (parentContainer.value) {
     parentWidth.value = parentContainer.value.clientWidth;
   }
@@ -145,10 +226,27 @@ const debouncedFn = useDebounceFn(() => {
   updateDimensions();
 }, 10);
 
+let resizeObserver: ResizeObserver | null = null;
+
 onMounted(() => {
-  // 初始获取元素宽度
+  // 初始获取尺寸
   updateDimensions();
-  // 监听窗口尺寸变化
-  useEventListener(window, "resize", debouncedFn);
+  // ResizeObserver 监听容器宽度变化（左右布局响应式）
+  if (parentContainer.value) {
+    resizeObserver = new ResizeObserver(() => {
+      debouncedFn();
+    });
+    resizeObserver.observe(parentContainer.value);
+  }
+  // window resize 监听视口高度变化
+  window.addEventListener("resize", debouncedFn);
+});
+
+onUnmounted(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+    resizeObserver = null;
+  }
+  window.removeEventListener("resize", debouncedFn);
 });
 </script>
