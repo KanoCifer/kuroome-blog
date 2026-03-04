@@ -1,7 +1,18 @@
 [
   {
+    "version": "2.2.3",
+    "date": "2026-03-04",
+    "title": "新增Todo和Rss功能优化",
+    "changes": [
+      { "type": "feat", "content": "新增Todo功能，支持任务管理" },
+      { "type": "fix", "content": "修复了Todo功能中的一些小bug" },
+      { "type": "feat", "content": "优化Rss解析功能，提升性能和稳定性" },
+      { "type": "fix", "content": "修复了Rss解析功能中的一些小bug" }
+    ]
+  },
+  {
     "version": "2.2.2",
-    "date": "2026-03-3",
+    "date": "2026-03-03",
     "title": "网站入口重构",
     "changes": [
       { "type": "feat", "content": "优化网站入口页面布局和交互体验" },

@@ -69,3 +69,45 @@ class MessageBoard(Document):
             IndexModel([("review", ASCENDING)]),
             IndexModel([("created_at", DESCENDING)]),
         ]
+
+
+class RssFeed(Document):
+    """RSS feed document model."""
+
+    title: str
+    link: str
+    description: str
+    content: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+
+    class Settings:
+        name = "rss_feeds"
+        indexes: ClassVar[list] = [
+            IndexModel([("created_at", DESCENDING)]),
+        ]
+
+
+class RssArticle(Document):
+    """RSS article document model."""
+
+    guid: str
+    feed_url: str
+    title: str = ""
+    link: str = ""
+    summary: str = ""
+    content: str = ""
+    author: str | None = None
+    published: datetime | None = None
+    fetched_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    read_by: list[int] = Field(default_factory=list)
+
+    class Settings:
+        name = "rss_articles"
+        indexes: ClassVar[list] = [
+            IndexModel(
+                [("feed_url", ASCENDING), ("guid", ASCENDING)], unique=True
+            ),
+            IndexModel([("feed_url", ASCENDING), ("fetched_at", DESCENDING)]),
+        ]
+        bson_encoders: ClassVar[dict] = {PydanticObjectId: str}
+        model_config = ConfigDict(arbitrary_types_allowed=True)

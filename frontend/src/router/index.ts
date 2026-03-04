@@ -173,6 +173,33 @@ const router = createRouter({
       },
     },
     {
+      path: "/rss/subscriptions",
+      name: "rss-subscriptions",
+      component: () => import("@/views/RssSubscriptionsView.vue"),
+      meta: {
+        title: "我的订阅 - Kuroome's Blog",
+        requiresAuth: true,
+      },
+    },
+    {
+      path: "/rss/articles",
+      name: "rss-articles",
+      component: () => import("@/views/RssArticlesView.vue"),
+      meta: {
+        title: "RSS 文章 - Kuroome's Blog",
+        requiresAuth: true,
+      },
+    },
+    {
+      path: "/rss/articles/:id",
+      name: "rss-article",
+      component: () => import("@/views/RssArticleView.vue"),
+      meta: {
+        title: "RSS 阅读 - Kuroome's Blog",
+        requiresAuth: true,
+      },
+    },
+    {
       // 通配符匹配所有未定义的路径
       path: "/:pathMatch(.*)*",
       name: "NotFound",

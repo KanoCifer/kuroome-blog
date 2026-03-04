@@ -391,3 +391,51 @@ class AdminCommentsOut(BaseModel):
 
     pending: list[AdminCommentOut]
     approved: list[AdminCommentOut]
+
+
+# =============================================================================
+# RSS Schemas
+# =============================================================================
+
+
+class RssArticleResponse(BaseModel):
+    """RSS article response schema."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    guid: str
+    feed_url: str
+    title: str
+    link: str
+    summary: str
+    content: str
+    author: str | None
+    published: datetime | None
+    fetched_at: datetime
+    is_read: bool
+
+
+class RssArticleListResponse(BaseModel):
+    """RSS article list response with pagination."""
+
+    items: list[RssArticleResponse]
+    total: int
+    page: int
+    limit: int
+
+
+class RssSubscriptionResponse(BaseModel):
+    """RSS subscription response schema."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    rss_url: str
+    created_at: datetime | None
+
+
+class RssMarkReadRequest(BaseModel):
+    """Request to mark articles as read."""
+
+    article_ids: list[str]

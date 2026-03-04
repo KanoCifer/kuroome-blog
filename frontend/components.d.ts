@@ -69,5 +69,6 @@ declare module 'vue' {
     TiptapEditor: typeof import('./src/components/TiptapEditor.vue')['default']
     TiptapToolbar: typeof import('./src/components/TiptapToolbar.vue')['default']
     ToastContainer: typeof import('./src/components/ToastContainer.vue')['default']
+    TodoCard: typeof import('./src/components/bento/TodoCard.vue')['default']
   }
 }

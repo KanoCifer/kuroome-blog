@@ -15,10 +15,16 @@ Endpoints:
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
-from venv import logger
 
 from email_validator import EmailNotValidError, validate_email
-from fastapi import APIRouter, BackgroundTasks, Depends, Request, status
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    Request,
+    Response,
+    status,
+)
 from fastapi.responses import JSONResponse
 from fastapi_mail import FastMail, MessageSchema, MessageType, NameEmail
 from pydantic import BaseModel, EmailStr
@@ -27,7 +33,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.configs.logger import logger
 from app.dependencies.auth import manager
+from app.dependencies.csrf import csrf_manager
 from app.dependencies.database import get_session
 from app.dependencies.limiter import limiter
 from app.dependencies.mail import MailConfig
@@ -40,6 +48,17 @@ router = APIRouter(
     prefix="/auth",
     tags=["auth"],
 )
+
+
+@router.get("/csrf-token", response_model=APIResponse)
+async def csrf_token(response: Response):
+    csrf_manager.set_csrf_cookie(response)
+    return APIResponse.ok(
+        data={"csrf_token": "Cookie 已设置"},
+        message="CSRF token 已生成",
+    )
+
+
 # 速率限制器，限制登录接口每分钟最多5次请求
 
 

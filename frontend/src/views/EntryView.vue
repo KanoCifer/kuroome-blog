@@ -5,10 +5,13 @@
     ref="parentContainer"
   >
     <!-- Theme Toggle - 只在入口页面显示 -->
-    <div class="absolute top-4 right-4 z-50">
+    <div
+      class="squircle absolute top-4 right-4 z-50 rounded-2xl bg-amber-50 shadow-sm ring ring-amber-50/70 backdrop-blur-sm dark:bg-amber-900/80 dark:ring-amber-600"
+    >
       <ThemeToggle />
     </div>
     <BentoGreeting
+      v-if="show.BentoGreeting"
       :initial="{ scale: 0 }"
       :animate="{ scale: 1, delay: 5 }"
       :transition="{ type: 'spring' }"
@@ -16,6 +19,7 @@
       class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:w-full! max-sm:min-w-0 max-sm:translate-0!"
     />
     <BentoProfileCard
+      v-if="show.BentoProfileCard"
       :initial="{ scale: 0.9 }"
       :animate="{ scale: 1 }"
       :transition="{ type: 'spring' }"
@@ -24,6 +28,7 @@
       class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:w-full! max-sm:min-w-0 max-sm:translate-0!"
     />
     <BentoNavCard
+      v-if="show.BentoNavCard"
       :initial="{ scale: 0.5 }"
       :animate="{ scale: 1, delay: 1 }"
       :transition="{ type: 'spring' }"
@@ -32,6 +37,7 @@
       :style="navCardPosition"
     />
     <BentoClock
+      v-if="show.BentoClock"
       :initial="{ scale: 0 }"
       :animate="{ scale: 1 }"
       :transition="{ type: 'spring', duration: 2 }"
@@ -40,6 +46,7 @@
       class="absolute w-auto -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
     />
     <BentoCalendar
+      v-if="show.BentoCalendar"
       :initial="{ scale: 0 }"
       :animate="{ scale: 1 }"
       :transition="{ type: 'spring', duration: 2.5 }"
@@ -48,14 +55,17 @@
       class="absolute w-2xs -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
     />
     <BentoMemo
+      v-if="show.BentoMemo"
       :style="memoCardPosition"
       class="absolute -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
     />
     <BentoNewPost
+      v-if="show.BentoNewPost"
       :style="newCardPosition"
       class="absolute w-auto -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
     />
     <BentoTech
+      v-if="show.BentoTech"
       :initial="{ scale: 0.5 }"
       :animate="{ scale: 1 }"
       :transition="{ type: 'spring', duration: 0.5 }"
@@ -63,6 +73,7 @@
       :style="techPosition"
     />
     <BentoReadingList
+      v-if="show.BentoReadingList"
       :initial="{ scale: 0 }"
       :animate="{ scale: 1 }"
       :transition="{ type: 'spring', duration: 2.5 }"
@@ -70,9 +81,16 @@
       class="absolute w-auto -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
     />
     <BentoCat
+      v-if="show.BentoCat"
       :style="catPosition"
       class="absolute w-2xs -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
     />
+    <div
+      v-if="show.TodoCard"
+      class="absolute top-40 right-5 w-70 min-w-3xs -translate-x-1/2 -translate-y-1/2 max-sm:static!"
+    >
+      <TodoCard title="MyTasks" />
+    </div>
   </div>
 </template>
 
@@ -87,8 +105,10 @@ import BentoNewPost from "@/components/bento/BentoNewPost.vue";
 import BentoProfileCard from "@/components/bento/BentoProfileCard.vue";
 import BentoReadingList from "@/components/bento/BentoReadingList.vue";
 import BentoTech from "@/components/bento/BentoTech.vue";
+import TodoCard from "@/components/bento/TodoCard.vue";
 import ThemeToggle from "@/components/ThemeToggle.vue";
-import { useDebounceFn } from "@vueuse/core";
+import carddelay from "@/data/carddelay.json";
+import { useDebounceFn, useMediaQuery } from "@vueuse/core";
 import { computed, onMounted, onUnmounted, ref, type ComponentPublicInstance } from "vue";
 
 const clockRef = ref<ComponentPublicInstance | null>(null);
@@ -240,6 +260,58 @@ onMounted(() => {
   }
   // window resize 监听视口高度变化
   window.addEventListener("resize", debouncedFn);
+});
+
+// 响应式判断：是否为移动端（max-width: 640px）
+const isMobile = useMediaQuery("(max-width: 640px)");
+
+// 为每个卡片维护独立的显示状态
+const show = ref<Record<string, boolean>>({
+  BentoGreeting: false,
+  BentoProfileCard: false,
+  BentoNavCard: false,
+  BentoClock: false,
+  BentoCalendar: false,
+  BentoMemo: false,
+  BentoNewPost: false,
+  BentoTech: false,
+  BentoReadingList: false,
+  BentoCat: false,
+  TodoCard: false,
+});
+
+const ANIMATION_DELAY = 0.1; // 基础延迟时间（秒）
+
+// 卡片名称列表（与 carddelay.json 保持一致）
+const cardNames = [
+  "BentoProfileCard",
+  "BentoNavCard",
+  "BentoGreeting",
+  "BentoMemo",
+  "BentoClock",
+  "BentoCalendar",
+  "BentoReadingList",
+  "BentoCat",
+  "TodoCard",
+  "BentoTech",
+] as const;
+
+onMounted(() => {
+  // 移动端直接显示所有卡片，跳过延迟
+  if (isMobile.value) {
+    Object.keys(show.value).forEach((key) => {
+      show.value[key] = true;
+    });
+    return;
+  }
+  // 根据每个卡片的 order 计算延迟时间，触发显示
+  cardNames.forEach((cardName) => {
+    const order = carddelay?.[cardName]?.order || 0;
+    const delay = order * ANIMATION_DELAY * 1000;
+    setTimeout(() => {
+      show.value[cardName] = true;
+    }, delay);
+  });
 });
 
 onUnmounted(() => {
