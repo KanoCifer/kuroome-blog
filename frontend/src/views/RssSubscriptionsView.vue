@@ -1,7 +1,7 @@
 <template>
   <div
     :style="sectionStyle"
-    class="mt-24 min-h-screen rounded-t-4xl bg-blue-50/80 px-4 py-8 backdrop-blur-sm sm:px-6 lg:px-8 dark:bg-slate-900/80"
+    class="mt-24 min-h-screen rounded-t-[40px] bg-blue-50 px-4 py-8 backdrop-blur-sm sm:px-6 lg:px-8 dark:bg-slate-900"
   >
     <div class="mx-auto max-w-4xl">
       <!-- 页面标题 -->
@@ -234,9 +234,11 @@
 <script setup lang="ts">
 import request, { type ApiResponse } from "@/request";
 import type { RssSubscription } from "@/types";
+import { formatDate } from "@/utils/formatdate";
 import { useScroll } from "@vueuse/core";
 import { computed, onMounted, ref } from "vue";
 import { RouterLink } from "vue-router";
+
 const subscriptions = ref<RssSubscription[]>([]);
 const isLoading = ref<boolean>(false);
 const errorMessage = ref<string>("");
@@ -308,20 +310,6 @@ const handleDelete = async (id: number) => {
       message?: string;
     };
     alert(error?.response?.data?.message || error?.message || "删除订阅失败");
-  }
-};
-
-const formatDate = (dateString: string): string => {
-  if (!dateString) return "";
-  try {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("zh-CN", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  } catch {
-    return dateString;
   }
 };
 

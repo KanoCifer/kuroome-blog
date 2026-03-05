@@ -11,15 +11,8 @@ import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import { useHead } from "@unhead/vue";
 import { useScroll } from "@vueuse/core";
 import { Modal } from "ant-design-vue";
-import {
-  computed,
-  createVNode,
-  nextTick,
-  onMounted,
-  onUnmounted,
-  ref,
-  watch,
-} from "vue";
+import hljs from "highlight.js";
+import { computed, createVNode, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
@@ -56,8 +49,7 @@ const fetchPost = async () => {
     }
   } catch (err: unknown) {
     console.error(err);
-    errorMessage.value =
-      err instanceof Error ? err.message : "加载文章失败，请稍后重试。";
+    errorMessage.value = err instanceof Error ? err.message : "加载文章失败，请稍后重试。";
     useNotificationStore().error(errorMessage.value);
   } finally {
     isLoading.value = false;
@@ -78,11 +70,19 @@ watch(
   },
 );
 
+watch(
+  () => post.value?.body,
+  async (html) => {
+    if (html) {
+      await nextTick();
+      hljs.highlightAll();
+    }
+  },
+);
+
 // 设置页面 meta 标签
 useHead(() => ({
-  title: post.value
-    ? `${post.value.title} - ReadingList`
-    : "文章未找到 - ReadingList",
+  title: post.value ? `${post.value.title} - ReadingList` : "文章未找到 - ReadingList",
   meta: [
     {
       name: "description",
@@ -164,10 +164,7 @@ const goBack = () => {
 const handleReply = async (commentId: string, body: string) => {
   try {
     // 递归查找评论的方法
-    const findComment = (
-      commentsList: Comment[],
-      id: string,
-    ): Comment | undefined => {
+    const findComment = (commentsList: Comment[], id: string): Comment | undefined => {
       for (const comment of commentsList) {
         if (comment._id === id) {
           return comment;
@@ -199,11 +196,7 @@ const handleReply = async (commentId: string, body: string) => {
       author: auth.isAuthenticated && auth.user ? auth.user.username : "",
     });
 
-    if (
-      res.data.status === "success" ||
-      res.status === 200 ||
-      res.status === 201
-    ) {
+    if (res.data.status === "success" || res.status === 200 || res.status === 201) {
       useNotificationStore().success("评论已提交，待审核后显示");
       // 刷新文章数据以获取最新评论
       await fetchPost();
@@ -212,8 +205,7 @@ const handleReply = async (commentId: string, body: string) => {
     }
   } catch (err: unknown) {
     console.error("提交回复失败:", err);
-    const errorMsg =
-      err instanceof Error ? err.message : "提交评论失败，请稍后重试";
+    const errorMsg = err instanceof Error ? err.message : "提交评论失败，请稍后重试";
     useNotificationStore().error(errorMsg);
   }
 };
@@ -238,13 +230,11 @@ const showDeleteConfirm = () => {
 // 处理删除文章
 const handleDelete = async () => {
   try {
-    const res = await request.post<{
+    const res = await request.delete<{
       status: string;
       message: string;
       data?: { _id: string };
-    }>("/admin/post/delete", {
-      id: postId.value,
-    });
+    }>(`/admin/post/${postId.value}/delete`);
 
     if (res.data.status === "success") {
       useNotificationStore().success("文章删除成功");
@@ -254,8 +244,7 @@ const handleDelete = async () => {
     }
   } catch (err: unknown) {
     console.error("删除文章失败:", err);
-    const errorMsg =
-      err instanceof Error ? err.message : "删除文章失败，请稍后重试";
+    const errorMsg = err instanceof Error ? err.message : "删除文章失败，请稍后重试";
     useNotificationStore().error(errorMsg);
   }
 };
@@ -348,14 +337,11 @@ onUnmounted(() => {
 <template>
   <div>
     <div
-      class="relative -z-20 mx-0 flex h-[60vh] flex-col items-center justify-center bg-transparent"
+      class="relative -z-5 mx-0 flex h-[60vh] flex-col items-center justify-center bg-transparent"
       :style="titleStyle"
     >
       <!-- Loading State -->
-      <div
-        v-if="isLoading"
-        class="flex min-h-[60vh] flex-col items-center justify-center"
-      >
+      <div v-if="isLoading" class="flex min-h-[60vh] flex-col items-center justify-center">
         <div
           class="h-12 w-12 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"
         ></div>
@@ -374,18 +360,11 @@ onUnmounted(() => {
             >
               {{ post?.author?.charAt(0).toUpperCase() || "K" }}
             </div>
-            <span class="font-medium text-gray-200"
-              >@{{ post?.author || "Kurroome" }}</span
-            >
+            <span class="font-medium text-gray-200">@{{ post?.author || "Kurroome" }}</span>
           </div>
           <span class="text-gray-50">·</span>
           <div class="flex items-center gap-1">
-            <svg
-              class="h-4 w-4 text-gray-50"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg class="h-4 w-4 text-gray-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -401,12 +380,7 @@ onUnmounted(() => {
             <span v-else>{{ formatDate(post?.created_at) }}</span>
           </div>
           <span v-if="post?.category" class="flex items-center gap-1">
-            <svg
-              class="h-4 w-4 text-gray-50"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg class="h-4 w-4 text-gray-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -425,10 +399,7 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div
-      class="relative z-10 rounded-t-[40px] bg-gray-50 dark:bg-gray-900"
-      :style="sectionStyle"
-    >
+    <div class="relative z-10 rounded-t-[40px] bg-gray-50 dark:bg-gray-900" :style="sectionStyle">
       <div class="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
         <router-link
           to="/blog"
@@ -451,10 +422,7 @@ onUnmounted(() => {
         </router-link>
       </div>
       <!-- Loading State -->
-      <div
-        v-if="isLoading"
-        class="flex min-h-[60vh] flex-col items-center justify-center"
-      >
+      <div v-if="isLoading" class="flex min-h-[60vh] flex-col items-center justify-center">
         <div
           class="h-12 w-12 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"
         ></div>
@@ -480,9 +448,7 @@ onUnmounted(() => {
             d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
           />
         </svg>
-        <p class="text-lg font-medium text-red-600 dark:text-red-400">
-          加载失败
-        </p>
+        <p class="text-lg font-medium text-red-600 dark:text-red-400">加载失败</p>
         <p class="mt-1 text-sm text-red-500">{{ errorMessage }}</p>
         <div class="mt-4 space-x-4">
           <button
@@ -505,15 +471,9 @@ onUnmounted(() => {
         v-else-if="notFound || !post"
         class="flex min-h-[60vh] flex-col items-center justify-center px-6 py-16 text-center"
       >
-        <div class="mb-4 text-9xl font-bold text-gray-200 dark:text-gray-700">
-          404
-        </div>
-        <h2 class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
-          文章未找到
-        </h2>
-        <p class="mb-6 text-gray-600 dark:text-gray-400">
-          抱歉，您请求的文章不存在或已被删除。
-        </p>
+        <div class="mb-4 text-9xl font-bold text-gray-200 dark:text-gray-700">404</div>
+        <h2 class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">文章未找到</h2>
+        <p class="mb-6 text-gray-600 dark:text-gray-400">抱歉，您请求的文章不存在或已被删除。</p>
         <button
           class="rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
           @click="goBack"
@@ -542,9 +502,7 @@ onUnmounted(() => {
                 <div
                   class="mb-8 flex items-center gap-4 border-b border-gray-100 pb-6 dark:border-gray-700"
                 >
-                  <h3 class="text-2xl font-bold text-gray-900 dark:text-white">
-                    评论
-                  </h3>
+                  <h3 class="text-2xl font-bold text-gray-900 dark:text-white">评论</h3>
                   <span
                     v-if="post.comments && post.comments.length > 0"
                     class="rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"
@@ -585,14 +543,8 @@ onUnmounted(() => {
                       />
                     </svg>
                   </div>
-                  <h3
-                    class="text-lg font-semibold text-gray-900 dark:text-white"
-                  >
-                    暂无评论
-                  </h3>
-                  <p
-                    class="mx-auto mt-2 max-w-sm text-sm text-gray-500 dark:text-gray-400"
-                  >
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">暂无评论</h3>
+                  <p class="mx-auto mt-2 max-w-sm text-sm text-gray-500 dark:text-gray-400">
                     成为第一个评论的人吧！
                   </p>
                 </div>
@@ -607,12 +559,7 @@ onUnmounted(() => {
                   :to="`/blog/edit/${post._id}`"
                   class="inline-flex items-center gap-2 rounded-xl bg-gray-100 px-6 py-3 font-semibold text-gray-700 shadow-md transition-all hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
-                  <svg
-                    class="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -627,12 +574,7 @@ onUnmounted(() => {
                   @click="showDeleteConfirm"
                   class="inline-flex items-center gap-2 rounded-xl bg-red-100 px-6 py-3 font-semibold text-red-700 shadow-md transition-all hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50"
                 >
-                  <svg
-                    class="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"

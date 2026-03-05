@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-import asyncio
 from contextlib import asynccontextmanager
-from datetime import UTC, datetime
 from functools import lru_cache
 from pathlib import Path
 
-import feedparser
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
@@ -16,18 +13,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-from sqlalchemy import select
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.configs.config import settings
 from app.configs.logger import logger
-from app.dependencies.aps import run_migration_job
+from app.dependencies.aps import refresh_rss_feeds, run_migration_job
 from app.dependencies.csrf import setup_csrf
-from app.dependencies.database import AsyncSessionFactory, close_db_connections
+from app.dependencies.database import close_db_connections
 from app.dependencies.mongo import closeclient, init_mongo
 from app.exceptions import register_exception_handlers
 from app.models.mgmodel import MessageBoard, Post, RssArticle
-from app.models.models import RssInfo
 from app.routers import (
     admin,
     auth,
@@ -46,124 +41,6 @@ from app.routers import (
 @lru_cache
 def get_settings():
     return settings
-
-
-# RSS 动态刷新任务
-async def refresh_rss_feeds():
-    """Daily RSS refresh at 8 AM for all users, saves new articles to MongoDB."""
-    logger.info("Starting daily RSS feed refresh...")
-    try:
-        async with AsyncSessionFactory() as session:
-            # 查询所有不同的 feed_url
-            result = await session.execute(select(RssInfo.rss_url).distinct())
-            feed_urls = result.scalars().all()
-
-        if not feed_urls:
-            logger.info("No RSS feeds to refresh")
-            return
-
-        logger.info(f"Refreshing {len(feed_urls)} RSS feeds...")
-
-        # 使用信号量限制并发数
-        semaphore = asyncio.Semaphore(5)
-
-        async def fetch_and_save_feed(feed_url: str):
-            async with semaphore:
-                try:
-                    # 在线程池中运行 feedparser.parse（同步操作）
-                    loop = asyncio.get_event_loop()
-                    feed = await loop.run_in_executor(
-                        None, feedparser.parse, feed_url
-                    )
-
-                    if feed.bozo != 0:
-                        logger.warning(f"Failed to parse feed: {feed_url}")
-                        return 0
-
-                    saved_count = 0
-                    for entry in feed.entries:
-                        # 提取 guid
-                        guid = entry.get("id") or entry.get("link", "")
-                        if not guid:
-                            continue
-
-                        guid = str(guid)
-
-                        # 检查文章是否已存在
-                        existing = await RssArticle.find_one(
-                            RssArticle.feed_url == feed_url,
-                            RssArticle.guid == guid,
-                        )
-
-                        if existing:
-                            continue
-
-                        # 提取文章字段
-                        title = str(entry.get("title", ""))
-                        link = str(entry.get("link", ""))
-                        summary = str(entry.get("summary", ""))
-
-                        # 提取 content
-                        content_list = entry.get("content")
-                        if content_list:
-                            content = str(content_list[0].get("value", ""))
-                        else:
-                            content = summary
-
-                        # 提取 author
-                        raw_author = entry.get("author")
-                        author = (
-                            str(raw_author) if raw_author is not None else None
-                        )
-
-                        # 提取发布时间
-                        pub_dt: datetime | None = None
-                        published_parsed = entry.get("published_parsed")
-                        updated_parsed = entry.get("updated_parsed")
-
-                        if published_parsed:
-                            t = tuple(int(x) for x in published_parsed[:6])  # type: ignore[union-attr]
-                            pub_dt = datetime(*t, tzinfo=UTC)
-                        elif updated_parsed:
-                            t = tuple(int(x) for x in updated_parsed[:6])  # type: ignore[union-attr]
-                            pub_dt = datetime(*t, tzinfo=UTC)
-
-                        # 创建并插入新文章
-                        new_article = RssArticle(
-                            guid=guid,
-                            feed_url=feed_url,
-                            title=title,
-                            link=link,
-                            summary=summary,
-                            content=content,
-                            author=author,
-                            published=pub_dt,
-                            fetched_at=datetime.now(UTC),
-                            read_by=[],
-                        )
-                        await new_article.insert()
-                        saved_count += 1
-
-                    logger.info(
-                        f"RSS feed {feed_url}: saved {saved_count} new articles"
-                    )
-                    return saved_count
-
-                except Exception as e:
-                    logger.error(f"Error refreshing feed {feed_url}: {e!r}")
-                    return 0
-
-        # 并发刷新所有 feed
-        tasks = [fetch_and_save_feed(url) for url in feed_urls]
-        results = await asyncio.gather(*tasks)
-        total_saved = sum(results)
-
-        logger.info(
-            f"Daily RSS refresh completed. Total new articles: {total_saved}"
-        )
-
-    except Exception as e:
-        logger.error(f"Error in refresh_rss_feeds: {e!r}")
 
 
 # 生命周期，初始化和清理资源
@@ -186,7 +63,7 @@ async def lifespan(app: FastAPI):
         id="redis_to_db_migration",
         name="Redis 数据迁移",
         replace_existing=True,
-        max_instances=1,  # 关键：防止上一次任务没跑完，下一次又开始了
+        max_instances=1,  # 最大实例数为 1，避免任务重叠
     )
 
     scheduler.add_job(
@@ -201,13 +78,14 @@ async def lifespan(app: FastAPI):
     scheduler.start()
     # 记录日志，确认 APScheduler 已启动
     logger.info(
-        "Application startup complete. APScheduler started with migration job."
+        "FastApi and APScheduler started successfully. Scheduled jobs: %s",
+        scheduler.get_jobs(),
     )
     yield
 
     # 应用关闭时的清理工作
     await app.state.client.close()  # 关闭 MongoDB 连接
-    await closeclient(app)
+    await closeclient(app)  # 关闭 MongoDB 客户端
     await close_db_connections()  # 关闭数据库连接池
     scheduler.shutdown()  # 关闭 APScheduler
 

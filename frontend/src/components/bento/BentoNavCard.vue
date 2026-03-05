@@ -28,7 +28,12 @@
                   @click="closeUserMenuImmediately"
                   class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 dark:text-gray-300"
                 >
-                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -68,7 +73,12 @@
                   @click="closeUserMenuImmediately"
                   class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
-                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -86,7 +96,12 @@
                   @click="closeUserMenuImmediately"
                   class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
-                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -104,7 +119,12 @@
                   @click="closeUserMenuImmediately"
                   class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
-                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -121,7 +141,12 @@
                   :disabled="auth.loading"
                   class="flex w-full cursor-pointer items-center gap-2 rounded-xl px-4 py-2 font-serif font-bold text-red-600 dark:text-red-400"
                 >
-                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -140,7 +165,12 @@
                   @click="closeUserMenuImmediately"
                   class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 dark:text-gray-300"
                 >
-                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -157,7 +187,12 @@
                   @click="closeUserMenuImmediately"
                   class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 dark:text-gray-300"
                 >
-                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -186,7 +221,9 @@
         class="h-14 w-14 rounded-full object-cover shadow-sm ring-4 ring-white/50 dark:ring-gray-700/50"
       />
       <div class="flex items-baseline gap-2">
-        <span class="font-serif text-2xl font-bold text-gray-800 dark:text-gray-100">
+        <span
+          class="font-serif text-2xl font-bold text-gray-800 dark:text-gray-100"
+        >
           {{ currentUserName }}
         </span>
         <svg
@@ -207,7 +244,9 @@
     </div>
 
     <!-- 导航分类 -->
-    <div class="mb-4 px-3 text-sm font-bold tracking-wider text-gray-400 dark:text-gray-500">
+    <div
+      class="mb-4 px-3 text-sm font-bold tracking-wider text-gray-400 dark:text-gray-500"
+    >
       GENERAL
     </div>
 
@@ -219,7 +258,12 @@
           class="flex items-center gap-4 rounded-2xl px-5 py-3.5 font-medium text-gray-500 transition-all hover:bg-white/50 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-700/50 dark:hover:text-gray-200"
           active-class="!bg-white !text-red-600 shadow-sm dark:!bg-gray-700 dark:!text-red-400"
         >
-          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -236,7 +280,12 @@
           class="flex items-center gap-4 rounded-2xl px-5 py-3.5 font-medium text-gray-500 transition-all hover:bg-white/50 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-700/50 dark:hover:text-gray-200"
           active-class="!bg-white !text-red-600 shadow-sm dark:!bg-gray-700 dark:!text-red-400"
         >
-          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -253,7 +302,12 @@
           class="flex items-center gap-4 rounded-2xl px-5 py-3.5 font-medium text-gray-500 transition-all hover:bg-white/50 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-700/50 dark:hover:text-gray-200"
           active-class="!bg-white !text-red-600 shadow-sm dark:!bg-gray-700 dark:!text-red-400"
         >
-          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -270,7 +324,12 @@
           class="flex items-center gap-4 rounded-2xl px-5 py-3.5 font-medium text-gray-500 transition-all hover:bg-white/50 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-700/50 dark:hover:text-gray-200"
           active-class="!bg-white !text-red-600 shadow-sm dark:!bg-gray-700 dark:!text-red-400"
         >
-          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"

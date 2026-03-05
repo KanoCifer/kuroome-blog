@@ -32,7 +32,7 @@
   }
 }
 footer {
-  @apply mx-auto w-full min-w-0 p-4 text-center text-sm text-gray-100;
+  @apply mx-auto w-full min-w-0 p-4 text-center text-sm text-gray-300;
 }
 
 nav ul {
@@ -78,20 +78,13 @@ a {
 /* 代码块 - macOS 风格（同时支持编辑器和文章展示） */
 .tiptap pre,
 .prose pre {
-  @apply my-4 overflow-hidden rounded-xl border border-gray-200 bg-gray-900 shadow-lg dark:border-gray-700;
-  position: relative;
-  padding-top: 40px;
+  @apply relative pt-10 my-4 overflow-hidden rounded-xl border border-gray-200 bg-gray-900 shadow-lg dark:border-gray-700;
 }
 
 .tiptap pre::before,
 .prose pre::before {
   content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 40px;
-  @apply flex items-center border-b border-gray-700 bg-gray-800 px-4;
+  @apply absolute h-10 flex top-0 mb-1 inset-x-0 items-center border-b border-gray-700 bg-gray-800 py-2;
 }
 
 .tiptap pre::after,
@@ -99,25 +92,23 @@ a {
   content: "";
   position: absolute;
   top: 14px;
-  left: 16px;
+  left: 24px;
   width: 12px;
   height: 12px;
   border-radius: 50%;
   @apply bg-red-500;
   box-shadow:
-    20px 0 0 #eab308,
-    40px 0 0 #22c55e;
-}
+  20px 0 0 #eab308,
+  40px 0 0 #22c55e;
+
+  }
 
 .tiptap pre code,
 .prose pre code {
-  @apply shadow-lg;
   display: block;
   background: transparent;
   border: none;
-  padding: 1rem;
-  margin-top: 0;
-  @apply text-sm leading-relaxed text-slate-200;
+  @apply text-sm mt-2 p-1 leading-relaxed text-slate-200;
 }
 /* 激活按钮 */
 .tiptap-btn.is-active {
@@ -339,4 +330,13 @@ ul[data-type="taskList"] ul[data-type="taskList"] {
   --sidebar-accent-foreground: oklch(0.985 0.002 247.839);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.551 0.027 264.364);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

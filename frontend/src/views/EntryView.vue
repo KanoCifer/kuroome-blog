@@ -13,25 +13,22 @@
     <BentoGreeting
       v-if="show.BentoGreeting"
       :initial="{ scale: 0 }"
-      :animate="{ scale: 1, delay: 5 }"
-      :transition="{ type: 'spring' }"
+      :animate="{ scale: 1 }"
       :style="greetingPosition"
       class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:w-full! max-sm:min-w-0 max-sm:translate-0!"
     />
     <BentoProfileCard
       v-if="show.BentoProfileCard"
-      :initial="{ scale: 0.9 }"
-      :animate="{ scale: 1 }"
-      :transition="{ type: 'spring' }"
+      :initial="{ scale: 0.5, opacity: 0 }"
+      :animate="{ scale: 1, opacity: 1 }"
       ref="boxRef"
       :style="profilePosition"
       class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:w-full! max-sm:min-w-0 max-sm:translate-0!"
     />
     <BentoNavCard
       v-if="show.BentoNavCard"
-      :initial="{ scale: 0.5 }"
-      :animate="{ scale: 1, delay: 1 }"
-      :transition="{ type: 'spring' }"
+      :initial="{ scale: 0.5, opacity: 0 }"
+      :animate="{ scale: 1, opacity: 1 }"
       ref="navBox"
       class="absolute w-68 -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
       :style="navCardPosition"
@@ -40,7 +37,6 @@
       v-if="show.BentoClock"
       :initial="{ scale: 0 }"
       :animate="{ scale: 1 }"
-      :transition="{ type: 'spring', duration: 2 }"
       ref="clockRef"
       :style="clockCardPosition"
       class="absolute w-auto -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
@@ -49,7 +45,6 @@
       v-if="show.BentoCalendar"
       :initial="{ scale: 0 }"
       :animate="{ scale: 1 }"
-      :transition="{ type: 'spring', duration: 2.5 }"
       ref="calRef"
       :style="calendarPosition"
       class="absolute w-2xs -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
@@ -57,7 +52,7 @@
     <BentoMemo
       v-if="show.BentoMemo"
       :style="memoCardPosition"
-      class="absolute -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
+      class="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
     />
     <BentoNewPost
       v-if="show.BentoNewPost"
@@ -68,7 +63,6 @@
       v-if="show.BentoTech"
       :initial="{ scale: 0.5 }"
       :animate="{ scale: 1 }"
-      :transition="{ type: 'spring', duration: 0.5 }"
       class="h-2xs absolute w-70 -translate-x-1/2 -translate-y-1/2 p-0! max-sm:static! max-sm:left-auto! max-sm:h-auto! max-sm:w-full! max-sm:translate-0!"
       :style="techPosition"
     />
@@ -76,9 +70,8 @@
       v-if="show.BentoReadingList"
       :initial="{ scale: 0 }"
       :animate="{ scale: 1 }"
-      :transition="{ type: 'spring', duration: 2.5 }"
       :style="listCardPosition"
-      class="absolute w-auto -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
+      class="absolute w-auto -translate-x-1/2 -translate-y-1/2 cursor-pointer max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
     />
     <BentoCat
       v-if="show.BentoCat"
@@ -109,7 +102,7 @@ import TodoCard from "@/components/bento/TodoCard.vue";
 import ThemeToggle from "@/components/ThemeToggle.vue";
 import carddelay from "@/data/carddelay.json";
 import { useDebounceFn, useMediaQuery } from "@vueuse/core";
-import { computed, onMounted, onUnmounted, ref, type ComponentPublicInstance } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref, type ComponentPublicInstance } from "vue";
 
 const clockRef = ref<ComponentPublicInstance | null>(null);
 const navBox = ref<ComponentPublicInstance | null>(null);
@@ -296,7 +289,8 @@ const cardNames = [
   "BentoTech",
 ] as const;
 
-onMounted(() => {
+onMounted(async () => {
+  await nextTick(); // 确保 DOM 已更新，能正确获取元素尺寸
   // 移动端直接显示所有卡片，跳过延迟
   if (isMobile.value) {
     Object.keys(show.value).forEach((key) => {

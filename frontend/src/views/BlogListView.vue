@@ -58,9 +58,7 @@
                 d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
               />
             </svg>
-            <p class="text-lg font-medium text-red-600 dark:text-red-400">
-              加载失败
-            </p>
+            <p class="text-lg font-medium text-red-600 dark:text-red-400">加载失败</p>
             <p class="mt-1 text-sm text-red-500">{{ errorMessage }}</p>
             <button
               class="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
@@ -89,9 +87,7 @@
                 d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
               />
             </svg>
-            <p class="text-lg font-medium text-gray-500">
-              No blog posts available.
-            </p>
+            <p class="text-lg font-medium text-gray-500">No blog posts available.</p>
             <p class="mt-1 text-sm text-gray-400">
               {{
                 activeCategory
@@ -153,7 +149,7 @@
             <!-- HTML Content Preview -->
             <div
               :class="[
-                'post-preview prose prose-sm max-w-none truncate overflow-hidden rounded-xl p-4 leading-relaxed',
+                'post-preview prose prose-base dark:prose-invert max-h-72 max-w-none overflow-y-hidden rounded-xl p-4 leading-relaxed',
                 post.is_pinned
                   ? 'dark:prose-invert bg-white/70 ring-1 ring-blue-200/50 dark:bg-black/20 dark:ring-blue-800/30'
                   : 'dark:prose-invert bg-gray-50/80 ring-1 ring-gray-200/50 dark:bg-gray-800/50 dark:ring-gray-700/30',
@@ -188,12 +184,7 @@
                   title="Category"
                 >
                   <!-- tags icon -->
-                  <svg
-                    class="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -214,12 +205,7 @@
                 ]"
               >
                 阅读更多
-                <svg
-                  class="ml-1 h-3 w-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg class="ml-1 h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -233,10 +219,7 @@
         </div>
 
         <!-- Pagination -->
-        <nav
-          v-if="pagination && pagination.pages > 1"
-          class="mt-6 flex justify-center"
-        >
+        <nav v-if="pagination && pagination.pages > 1" class="mt-6 flex justify-center">
           <ul class="flex items-center gap-2">
             <!-- Previous Button -->
             <li>
@@ -334,11 +317,12 @@
 import CategorySidebar from "@/components/CategorySidebar.vue";
 import request from "@/request";
 import { useNotificationStore } from "@/stores/notification";
-
 import type { BlogPagination, BlogsResponse, Category, Post } from "@/types";
 import { formatDate } from "@/utils/formatdate";
 import { useHead } from "@unhead/vue";
-import { computed, onMounted, ref, watch } from "vue";
+import DOMPurify from "dompurify";
+import hljs from "highlight.js";
+import { computed, nextTick, onMounted, ref, watch, watchEffect } from "vue";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
@@ -367,11 +351,7 @@ const getVisiblePages = computed(() => {
   const visiblePages = [];
 
   // 显示当前页附近的页码
-  for (
-    let i = Math.max(2, current - 2);
-    i <= Math.min(totalPages - 1, current + 2);
-    i++
-  ) {
+  for (let i = Math.max(2, current - 2); i <= Math.min(totalPages - 1, current + 2); i++) {
     visiblePages.push(i);
   }
 
@@ -397,8 +377,7 @@ const fetchPosts = async (page: number = 1) => {
     }
   } catch (err: unknown) {
     console.error(err);
-    errorMessage.value =
-      err instanceof Error ? err.message : "加载文章列表失败，请稍后重试。";
+    errorMessage.value = err instanceof Error ? err.message : "加载文章列表失败，请稍后重试。";
     useNotificationStore().error(errorMessage.value);
   } finally {
     isLoading.value = false;
@@ -428,6 +407,11 @@ watch(
     }
   },
 );
+
+watchEffect(async () => {
+  await nextTick();
+  hljs.highlightAll();
+});
 
 // 设置页面 meta 标签
 useHead(() => ({
@@ -484,66 +468,12 @@ useHead(() => ({
   ],
 }));
 
-// 获取预览 HTML，限制内容长度
-const getPreviewHtml = (html: string, maxLength: number = 100) => {
+const getPreviewHtml = (html: string) => {
   if (!html) return "";
-  // 创建一个临时容器来安全地处理 HTML
-  const tmp = document.createElement("DIV");
-  tmp.innerHTML = html;
-
-  // 获取纯文本长度
-  const textContent = tmp.textContent || tmp.innerText || "";
-
-  if (textContent.length <= maxLength) {
-    return html;
-  }
-
-  // 需要截断，尝试保留 HTML 结构的同时限制长度
-  let currentLength = 0;
-  let result = "";
-  const traverse = (node: Node): boolean => {
-    if (currentLength >= maxLength) return false;
-
-    if (node.nodeType === Node.TEXT_NODE) {
-      const text = node.textContent || "";
-      const remaining = maxLength - currentLength;
-      if (text.length > remaining) {
-        result += text.slice(0, remaining);
-        currentLength = maxLength;
-        return false;
-      }
-      result += text;
-      currentLength += text.length;
-      return true;
-    }
-
-    if (node.nodeType === Node.ELEMENT_NODE) {
-      const el = node as Element;
-      const tag = el.tagName.toLowerCase();
-      result += `<${tag}`;
-      // 复制属性
-      for (const attr of el.attributes) {
-        result += ` ${attr.name}="${attr.value.replace(/"/g, "&quot;")}"`;
-      }
-      result += `>`;
-
-      for (const child of el.childNodes) {
-        if (!traverse(child)) {
-          result += `</${tag}>...`;
-          return false;
-        }
-      }
-      result += `</${tag}>`;
-      return true;
-    }
-    return true;
-  };
-
-  for (const child of tmp.childNodes) {
-    if (!traverse(child)) break;
-  }
-
-  return result || html.slice(0, maxLength);
+  const sanitizedHtml = DOMPurify.sanitize(html, {
+    USE_PROFILES: { html: true },
+  });
+  return sanitizedHtml;
 };
 
 // 处理分类过滤
@@ -610,6 +540,12 @@ const handleResetFilter = () => {
 .post-preview :deep(pre code) {
   padding: 0;
   background: transparent;
+}
+
+/* 预览卡片里统一覆盖语法高亮内联色，避免深色背景下文字不可见 */
+.post-preview :deep(pre code *) {
+  color: inherit !important;
+  background: transparent !important;
 }
 
 .post-preview :deep(blockquote) {

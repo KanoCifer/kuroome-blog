@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useNotificationStore } from "@/stores/notification";
+import { AnimatePresence, motion } from "motion-v";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import IconClose from "./icons/IconClose.vue";
-
 import IconInfo from "./icons/IconInfo.vue";
 import IconWarning from "./icons/IconWarning.vue";
 
@@ -68,20 +68,24 @@ function capitalize(s: string) {
 
 <template>
   <div
-    class="fixed top-4 left-1/2 z-9999 mb-4 flex w-11/12 max-w-md -translate-x-1/2 transform flex-col gap-3 sm:w-96"
+    class="fixed top-4 left-1/2 z-9999 mb-4 flex max-w-md -translate-x-1/2 transform flex-col gap-3 transition-all sm:w-96"
   >
-    <transition-group
+    <!-- <transition-group
       name="toast"
       tag="div"
       class="transform-gpu"
       enter-active-class="ease-out"
-    >
-      <div
+    > -->
+    <AnimatePresence>
+      <motion.div
+        :initial="{ opacity: 0, y: -50 }"
+        :animate="{ opacity: 1, y: 0 }"
+        :exit="{ opacity: 0, y: -50 }"
         v-for="t in toasts"
         :key="t.id"
         :class="[
-          'mb-4',
-          'flex items-center gap-3 rounded-xl border border-slate-200/20 bg-white/30 text-slate-900 shadow-xl backdrop-blur-sm transition-colors duration-200 dark:border-gray-700/30 dark:bg-gray-900/10 dark:text-gray-100',
+          'mb-2',
+          'flex items-center gap-3 rounded-2xl border border-slate-200/20 bg-white/30 text-slate-900 shadow-xl backdrop-blur-sm transition-colors duration-200 dark:border-gray-700/30 dark:bg-gray-900/10 dark:text-gray-100',
           classForType(t.type),
         ]"
       >
@@ -130,8 +134,9 @@ function capitalize(s: string) {
         >
           <IconClose />
         </button>
-      </div>
-    </transition-group>
+      </motion.div>
+    </AnimatePresence>
+    <!-- </transition-group> -->
   </div>
 </template>
 

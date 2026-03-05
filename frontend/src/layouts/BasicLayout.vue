@@ -72,9 +72,11 @@ const closeMobileWarning = () => {
 </script>
 
 <template>
-  <div class="grid min-h-dvh grid-rows-[auto_1fr_auto]">
+  <div class="relative isolate grid min-h-dvh grid-rows-[auto_1fr_auto]">
     <!-- 背景图 -->
-    <div class="fixed inset-0 -z-50 bg-[url('/bg.jpg')] bg-cover blur-md"></div>
+    <div
+      class="pointer-events-none fixed inset-0 -z-10 bg-[url('/bg.jpg')] bg-cover blur-md"
+    ></div>
     <header>
       <div class="mx-auto mt-6">
         <Teleport to="body">

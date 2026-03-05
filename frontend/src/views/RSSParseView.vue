@@ -1,13 +1,13 @@
 <template>
   <div
-    class="mt-24 min-h-screen rounded-t-4xl bg-blue-50/80 px-4 py-8 backdrop-blur-sm sm:px-6 lg:px-8 dark:bg-slate-900/80"
+    class="mt-24 min-h-screen rounded-t-[40px] bg-blue-50 px-4 py-8 backdrop-blur-sm sm:px-6 lg:px-8 dark:bg-slate-900"
     :style="sectionStyle"
   >
     <div class="mx-auto max-w-4xl">
       <!-- 页面标题 -->
       <div class="mb-8 flex items-center gap-3">
         <div
-          class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400"
+          class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -412,6 +412,7 @@
 import request from "@/request";
 import { useNotificationStore } from "@/stores/notification";
 import { useScroll, useStorage } from "@vueuse/core";
+import dayjs from "dayjs";
 import { computed, ref } from "vue";
 interface RssMetadata {
   title: string;
@@ -453,7 +454,6 @@ const notifier = useNotificationStore();
 // Example RSS feeds for quick testing
 const exampleFeeds: ExampleFeed[] = [
   { name: "少数派", url: "https://sspai.com/feed" },
-  { name: "掘金", url: "https://juejin.cn/feed" },
   { name: "GitHub", url: "https://github.com/blog.atom" },
   { name: "TechCrunch", url: "https://techcrunch.com/feed/" },
 ];
@@ -461,15 +461,14 @@ const exampleFeeds: ExampleFeed[] = [
 // Format date for display
 const formatDate = (dateString: string): string => {
   try {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const date = dayjs(dateString);
+    const now = dayjs();
+    const diffDays = now.diff(date, "day");
 
     if (diffDays === 0) {
-      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+      const diffHours = now.diff(date, "hour");
       if (diffHours === 0) {
-        const diffMins = Math.floor(diffMs / (1000 * 60));
+        const diffMins = now.diff(date, "minute");
         return diffMins <= 1 ? "刚刚" : `${diffMins} 分钟前`;
       }
       return diffHours === 1 ? "1 小时前" : `${diffHours} 小时前`;
@@ -478,11 +477,7 @@ const formatDate = (dateString: string): string => {
     } else if (diffDays < 7) {
       return `${diffDays} 天前`;
     } else {
-      return date.toLocaleDateString("zh-CN", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
+      return date.format("YYYY-MM-DD");
     }
   } catch {
     return dateString;

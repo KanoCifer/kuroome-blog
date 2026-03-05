@@ -28,9 +28,8 @@ const clearMemo = () => {
   <motion.div
     :initial="{ scale: 0 }"
     :animate="{ scale: 1 }"
-    :transition="{ type: 'spring', duration: 0.8 }"
-    :while-hover="{ scale: 1.05 }"
-    :while-press="{ scale: 0.9 }"
+    :whileHover="{ scale: 1.05 }"
+    :whilePress="{ scale: 0.95 }"
     class="w-auto"
   >
     <button

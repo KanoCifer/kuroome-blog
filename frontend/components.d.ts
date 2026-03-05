@@ -12,6 +12,8 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AddBookForm: typeof import('./src/components/AddBookForm.vue')['default']
+    AFlex: typeof import('ant-design-vue/es')['Flex']
+    AProgress: typeof import('ant-design-vue/es')['Progress']
     ArticleToc: typeof import('./src/components/ArticleToc.vue')['default']
     BackToTop: typeof import('./src/components/BackToTop.vue')['default']
     BasicFooter: typeof import('./src/components/basic/BasicFooter.vue')['default']

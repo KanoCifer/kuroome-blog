@@ -211,7 +211,7 @@ const handleSubmit = async () => {
 
     if (isEdit.value && postId.value) {
       const updatePayload = { ...payload, _id: postId.value };
-      const res = await request.post<ApiResponse<{ _id: string }>>(
+      const res = await request.put<ApiResponse<{ _id: string }>>(
         "/admin/post/update",
         updatePayload,
       );

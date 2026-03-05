@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import DragHandleExtension from "@tiptap/extension-drag-handle";
 import { DragHandle } from "@tiptap/extension-drag-handle-vue-3";
 import NodeRange from "@tiptap/extension-node-range";
 import StarterKit from "@tiptap/starter-kit";
+import { Extension } from "@tiptap/core";
 import { EditorContent, useEditor } from "@tiptap/vue-3";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
 import { useLocalStorage } from "@vueuse/core";
@@ -29,6 +29,19 @@ import { common, createLowlight } from "lowlight";
 import { Markdown } from "tiptap-markdown";
 
 const lowlight = createLowlight(common);
+
+const CodeBlockTabIndent = Extension.create({
+  name: "codeBlockTabIndent",
+  addKeyboardShortcuts() {
+    return {
+      Tab: () => {
+        if (!this.editor.isActive("codeBlock")) return false;
+        this.editor.commands.insertContent("\t");
+        return true;
+      },
+    };
+  },
+});
 
 // v-model 双向绑定
 const emit = defineEmits<{
@@ -185,16 +198,20 @@ const editor = useEditor({
     // 基础扩展
     StarterKit.configure({
       heading: { levels: [1, 2, 3, 4] },
-      codeBlock: false, // 使用 CodeBlockLowlight 替代
-      link: false, // 使用独立扩展
+      codeBlock: false,
+      link: false,
       underline: false,
     }),
 
-    // 代码高亮
-    CodeBlockLowlight.configure({ lowlight }),
+    CodeBlockLowlight.configure({
+      lowlight,
+      enableTabIndentation: true,
+    }),
+    CodeBlockTabIndent,
 
     // 链接与图片
     Link.configure({ openOnClick: false }),
+
     Image,
 
     // 占位符
@@ -216,8 +233,6 @@ const editor = useEditor({
 
     // 拖拽功能
     NodeRange,
-    DragHandleExtension,
-
     // Markdown 支持
     Markdown.configure({
       html: true,
@@ -237,6 +252,18 @@ const editor = useEditor({
     attributes: {
       class:
         "prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[800px] px-6 py-4",
+    },
+    handleDOMEvents: {
+      keydown: (view, event) => {
+        if (event.key !== "Tab") return false;
+        const { state } = view;
+        const { $from } = state.selection;
+        if ($from.parent.type.name !== "codeBlock") return false;
+        event.preventDefault();
+        const tr = state.tr.insertText("\t");
+        view.dispatch(tr);
+        return true;
+      },
     },
   },
 

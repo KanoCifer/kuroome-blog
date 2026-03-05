@@ -1,22 +1,3 @@
-"""Admin router for FastAPI.
-
-This module provides admin-only endpoints for managing blog posts,
-comments, and message board messages.
-
-Endpoints:
-    - POST /admin/post/add - Add a new blog post
-    - POST /admin/post/update - Update an existing blog post
-    - POST /admin/post/delete - Delete a blog post
-    - GET /admin/comments - Get all comments (pending and approved)
-    - POST /admin/comments/{comment_id}/approve - Approve a comment
-    - DELETE /admin/comments/{comment_id}/delete - Delete a comment
-    - GET /admin/messages - Get all messages (pending and approved)
-    - POST /admin/messages/{message_id}/approve - Approve a message
-    - DELETE /admin/messages/{message_id}/delete - Delete a message
-    - GET /admin/config - Get site configuration
-    - POST /admin/config - Update site configuration
-"""
-
 from __future__ import annotations
 
 import json
@@ -30,6 +11,7 @@ from slowapi.util import get_remote_address
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.configs.logger import logger
 from app.dependencies.auth import manager
 from app.dependencies.database import get_session
 from app.dependencies.redis import get_redis
@@ -104,7 +86,7 @@ async def add_post(
     )
 
 
-@router.post("/post/update")
+@router.put("/post/update")
 async def update_post(
     data: BlogPostUpdate,
     current_user: User = Depends(get_admin_user),
@@ -118,15 +100,15 @@ async def update_post(
     is_pinned = data.is_pinned
 
     try:
-        object_id = ObjectId(post_id)
+        oid = ObjectId(post_id)
     except InvalidId:
         return APIResponse.error(
-            message="Invalid blog post ID",
+            message="非法的博客ID",
             code=status.HTTP_400_BAD_REQUEST,
         )
 
     # Check if post exists
-    existing_post = await Post.get(object_id)
+    existing_post = await Post.find_one(Post.id == oid)
     if not existing_post:
         return APIResponse.error(
             message="Blog post not found",
@@ -143,15 +125,15 @@ async def update_post(
             message="Category not found",
             code=status.HTTP_404_NOT_FOUND,
         )
-
-    # Update the post
-    existing_post.title = title
-    existing_post.body = body
-    existing_post.category_id = category_id
-    existing_post.is_pinned = is_pinned
-    existing_post.updated_at = datetime.now(UTC)
-
-    await existing_post.save()
+    await Post.find_one(Post.id == oid).set(
+        {
+            "title": title,
+            "body": body,
+            "category_id": category_id,
+            "is_pinned": is_pinned,
+            "updated_at": datetime.now(UTC),
+        }
+    )
 
     return APIResponse.ok(
         data={"_id": post_id},
@@ -159,16 +141,15 @@ async def update_post(
     )
 
 
-@router.post("/post/delete")
+@router.delete("/post/{post_id}/delete")
 async def delete_post(
-    data: BlogPostUpdate,
+    post_id: str,
     current_user: User = Depends(get_admin_user),
 ):
     """Delete a blog post (admin only)."""
-    post_id = data.id
 
     try:
-        object_id = ObjectId(post_id)
+        oid = ObjectId(post_id)
     except InvalidId:
         return APIResponse.error(
             message="Invalid blog post ID",
@@ -176,14 +157,23 @@ async def delete_post(
         )
 
     # Check if post exists
-    existing_post = await Post.get(object_id)
+    existing_post = await Post.find_one(Post.id == oid)
     if not existing_post:
         return APIResponse.error(
             message="Blog post not found",
             code=status.HTTP_404_NOT_FOUND,
         )
 
-    await existing_post.delete()
+    try:
+        await Post.find_one(Post.id == oid).delete()
+        logger.info(
+            f"Blog post with ID {post_id} deleted by admin {current_user.username}"
+        )
+    except Exception as e:
+        return APIResponse.error(
+            message=f"Failed to delete blog post: {e!s}",
+            code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
     return APIResponse.ok(
         data={"_id": post_id},

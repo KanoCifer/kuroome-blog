@@ -1,5 +1,7 @@
 <template>
   <BentoCard
+    :initial="{ scale: 0.5, opacity: 0 }"
+    :animate="{ scale: 1, opacity: 1 }"
     drag
     :whileDrag="{ scale: 0.9 }"
     class="group/card relative flex h-full cursor-grab flex-col overflow-hidden p-0!"
@@ -101,7 +103,11 @@
                 :key="todo.id"
                 :initial="{ opacity: 0, y: -10, scale: 0.95 }"
                 :animate="{ opacity: 1, y: 0, scale: 1 }"
-                :exit="{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }"
+                :exit="{
+                  opacity: 0,
+                  scale: 0.9,
+                  transition: { duration: 0.2 },
+                }"
                 layout
                 class="group mb-2.5 flex items-center justify-between rounded-2xl border border-emerald-100/50 bg-white/80 p-3.5 shadow-sm transition-all hover:border-emerald-200 hover:shadow-md dark:border-emerald-900/30 dark:bg-gray-800/80 dark:hover:border-emerald-800"
               >
@@ -196,7 +202,7 @@
 
 <script setup lang="ts">
 import { useStorage } from "@vueuse/core";
-import { motion, AnimatePresence } from "motion-v";
+import { AnimatePresence, motion } from "motion-v";
 import { computed, ref } from "vue";
 import BentoCard from "./BentoCard.vue";
 

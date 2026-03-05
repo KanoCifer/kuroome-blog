@@ -1,7 +1,7 @@
 <template>
   <div
     :style="sectionStyle"
-    class="mt-24 min-h-screen rounded-t-4xl bg-blue-50/80 px-4 py-8 backdrop-blur-sm sm:px-6 lg:px-8 dark:bg-slate-900/80"
+    class="mt-24 min-h-screen rounded-t-[40px] bg-blue-50 px-4 py-8 backdrop-blur-sm sm:px-6 lg:px-8 dark:bg-slate-900"
   >
     <div class="mx-auto max-w-4xl">
       <!-- 页面标题 -->
@@ -28,6 +28,26 @@
           <h1 class="text-3xl font-bold text-blue-900 dark:text-white">RSS 文章列表</h1>
           <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">阅读已保存的订阅文章</p>
         </div>
+        <button
+          @click="router.push('/rss')"
+          class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:bg-slate-800 dark:text-blue-300 dark:hover:bg-slate-700"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="h-4 w-4"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+            />
+          </svg>
+          返回Rss解析
+        </button>
         <router-link
           to="/rss/subscriptions"
           class="ml-auto text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
@@ -89,10 +109,9 @@
                   {{ article.title || "无标题" }}
                 </router-link>
                 <span
-                  v-if="!article.is_read"
                   class="inline-flex shrink-0 items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/50 dark:text-blue-300"
                 >
-                  未读
+                  {{ article.is_read ? "已读" : "未读" }}
                 </span>
               </div>
 
@@ -110,6 +129,14 @@
                   来源: {{ article.feed_url }}
                 </span>
               </div>
+
+              <!-- 摘要 -->
+              <p
+                v-if="article.summary"
+                class="mt-3 line-clamp-2 text-sm text-blue-600 dark:text-blue-400"
+              >
+                {{ article.summary }}
+              </p>
             </div>
           </li>
         </ul>
@@ -159,6 +186,7 @@
 import request from "@/request";
 import { useNotificationStore } from "@/stores/notification";
 import type { ApiResponse, RssArticle, RssArticleListResponse } from "@/types";
+import { formatDate } from "@/utils/formatdate";
 import { useScroll } from "@vueuse/core";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -216,22 +244,6 @@ const goToPage = (page: number) => {
         page: page.toString(),
       },
     });
-  }
-};
-
-const formatDate = (dateString: string | null): string => {
-  if (!dateString) return "";
-  try {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("zh-CN", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  } catch {
-    return dateString;
   }
 };
 

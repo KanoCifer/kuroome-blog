@@ -1,5 +1,14 @@
 [
   {
+    "version": "2.2.4",
+    "date": "2026-03-05",
+    "title": "rss阅读器优化",
+    "changes": [
+      { "type": "feat", "content": "优化rss阅读器" },
+      { "type": "fix", "content": "修复了一些小bug" }
+    ]
+  },
+  {
     "version": "2.2.3",
     "date": "2026-03-04",
     "title": "新增Todo和Rss功能优化",

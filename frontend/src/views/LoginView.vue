@@ -3,6 +3,7 @@ import { useAuthStore } from "@/stores/auth";
 import type { LoginForm } from "@/types";
 import { ref } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
+
 const router = useRouter();
 const route = useRoute();
 const auth = useAuthStore();

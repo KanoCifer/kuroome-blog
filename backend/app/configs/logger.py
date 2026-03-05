@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import contextlib
 import logging
+import os
+from pathlib import Path
 
 # 日志格式（包含时间）
 LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -22,7 +25,23 @@ console_handler.setLevel(logging.INFO)
 console_handler.setFormatter(formatter)
 
 # 输出日志到文件
-file_handler = logging.FileHandler("app.log", encoding="utf-8")
+# 支持通过环境变量指定目录或完整路径，如果不提供则默认项目根下的 logs/ 目录
+base = Path(__file__).parent.parent  # app/configs/ -> 项目根
+
+log_path = None
+log_path_env = os.getenv("LOG_PATH")
+if log_path_env:
+    # 直接使用给定路径
+    log_path = Path(log_path_env)
+else:
+    log_dir = Path(os.getenv("LOG_DIR", base / "logs"))
+    log_path = log_dir / "app.log"
+
+# 确保日志目录存在
+with contextlib.suppress(Exception):
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+
+file_handler = logging.FileHandler(log_path, encoding="utf-8")
 file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(formatter)
 

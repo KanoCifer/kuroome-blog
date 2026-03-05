@@ -1,4 +1,6 @@
+import { initCSRF } from "@/utils/csrf";
 import axios, { AxiosError } from "axios";
+import router from "./router";
 
 export interface ApiResponse<T = unknown> {
   status: "success" | "error";
@@ -8,7 +10,7 @@ export interface ApiResponse<T = unknown> {
   errors?: Record<string, unknown>;
 }
 
-let onUnauthorizedCallback: (() => void) | null = null;
+let onUnauthorizedCallback: () => void = () => router.push("/login"); // 默认未授权时跳转到登录页
 
 export function setOnUnauthorized(callback: () => void) {
   onUnauthorizedCallback = callback;
@@ -19,6 +21,24 @@ const request = axios.create({
   timeout: 10000,
   withCredentials: true,
 });
+
+request.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError<ApiResponse>) => {
+    const config = error.config;
+    if (error.response?.data?.message.includes("CSRF") && config) {
+      // Track retry count on the config object to ensure it persists across retries
+      const _config = config as any;
+      _config._retryCount = (_config._retryCount || 0) + 1;
+
+      if (_config._retryCount <= 3) {
+        await initCSRF();
+        return request(config);
+      }
+    }
+    return Promise.reject(error);
+  },
+);
 
 request.interceptors.response.use(
   (response) => response,
