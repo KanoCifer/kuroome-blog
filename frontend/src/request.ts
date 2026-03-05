@@ -26,7 +26,8 @@ request.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<ApiResponse>) => {
     const config = error.config;
-    if (error.response?.data?.message.includes("CSRF") && config) {
+    const errorMessage = error.response?.data?.message;
+    if (errorMessage && errorMessage.includes("CSRF") && config) {
       // Track retry count on the config object to ensure it persists across retries
       const _config = config as any;
       _config._retryCount = (_config._retryCount || 0) + 1;
