@@ -78,13 +78,13 @@ a {
 /* 代码块 - macOS 风格（同时支持编辑器和文章展示） */
 .tiptap pre,
 .prose pre {
-  @apply relative pt-10 my-4 overflow-hidden rounded-xl border border-gray-200 bg-gray-900 shadow-lg dark:border-gray-700;
+  @apply relative my-4 overflow-hidden rounded-xl border border-gray-200 bg-gray-900 pt-10 shadow-lg dark:border-gray-700;
 }
 
 .tiptap pre::before,
 .prose pre::before {
   content: "";
-  @apply absolute h-10 flex top-0 mb-1 inset-x-0 items-center border-b border-gray-700 bg-gray-800 py-2;
+  @apply absolute inset-x-0 top-0 mb-1 flex h-10 items-center border-b border-gray-700 bg-gray-800 py-2;
 }
 
 .tiptap pre::after,
@@ -98,17 +98,16 @@ a {
   border-radius: 50%;
   @apply bg-red-500;
   box-shadow:
-  20px 0 0 #eab308,
-  40px 0 0 #22c55e;
-
-  }
+    20px 0 0 #eab308,
+    40px 0 0 #22c55e;
+}
 
 .tiptap pre code,
 .prose pre code {
   display: block;
   background: transparent;
   border: none;
-  @apply text-sm mt-2 p-1 leading-relaxed text-slate-200;
+  @apply mt-2 p-1 text-sm leading-relaxed text-slate-200;
 }
 /* 激活按钮 */
 .tiptap-btn.is-active {

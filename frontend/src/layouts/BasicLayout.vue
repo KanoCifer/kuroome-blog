@@ -56,18 +56,24 @@ onUnmounted(() => {
   window.removeEventListener("resize", handleResize);
 });
 
-const isMobileWarningVisible = ref(false);
-const isMobileDevice = ref(false);
+const isMobileWarningVisible = ref<boolean>(false);
+const accpetedMobileWarning = ref<boolean>(false);
+const isMobileDevice = ref<boolean>(false);
 // 处理窗口大小变化
 const handleResize = () => {
   isMobileDevice.value = window.innerWidth < 768;
-  if (isMobileDevice.value && !isMobileWarningVisible.value) {
+  if (
+    isMobileDevice.value &&
+    !isMobileWarningVisible.value &&
+    !accpetedMobileWarning.value
+  ) {
     isMobileWarningVisible.value = true;
   }
 };
 
 const closeMobileWarning = () => {
   isMobileWarningVisible.value = false;
+  accpetedMobileWarning.value = true;
 };
 </script>
 

@@ -2,10 +2,12 @@
   <BentoCard>
     <!-- Tech Stack Card -->
     <div
-      class="squircle border border-gray-100 bg-gray-50/10 p-5 shadow-sm backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800/10"
+      class="squircle border border-gray-100 bg-gray-50/10 p-4 shadow-sm backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800/10"
     >
-      <h3 class="mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase">
-        Tech Stack
+      <h3
+        class="mb-3 ml-2 font-serif text-xs font-bold tracking-wider text-gray-400 uppercase"
+      >
+        TechStack
       </h3>
       <div class="flex flex-wrap gap-2">
         <span

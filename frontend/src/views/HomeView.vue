@@ -177,7 +177,7 @@ const goToPage = (page: number) => {
         </div>
         <div
           v-else-if="errorMessage"
-          class="flex min-h-20 w-full flex-col items-center justify-center rounded-2xl border border-dotted bg-red-50/80 object-center py-4 text-center text-xl text-red-600 backdrop-blur-sm dark:bg-red-900/30 dark:text-red-400"
+          class="flex min-h-20 w-full flex-col items-center justify-center rounded-2xl border border-dotted bg-red-50/80 object-center py-4 text-center text-xl text-red-600 dark:bg-red-900/30 dark:text-red-400"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -208,7 +208,7 @@ const goToPage = (page: number) => {
           <li
             v-for="book in books"
             :key="book.id"
-            class="group relative flex min-h-20 flex-col gap-4 rounded-3xl bg-white/80 p-5 shadow-sm backdrop-blur-sm transition-all hover:bg-gray-50 hover:shadow-md sm:flex-row sm:items-center sm:justify-between dark:bg-gray-800/80 dark:hover:bg-gray-700/50"
+            class="group relative flex min-h-20 flex-col gap-4 rounded-3xl bg-white/80 p-5 shadow-sm transition-all hover:bg-gray-50 hover:shadow-md sm:flex-row sm:items-center sm:justify-between dark:bg-gray-800/80 dark:hover:bg-gray-700/50"
           >
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2">

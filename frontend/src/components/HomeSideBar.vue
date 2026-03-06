@@ -7,9 +7,7 @@
       <!-- 日历组件 -->
       <BentoCalendar />
       <!-- Tech Stack Card -->
-      <BentoTechCard />
-      <!-- 其他组件或内容 -->
-      <ImgCat />
+      <BentoTech class="h-2xs mx-auto w-70 p-0!" />
     </div>
   </div>
 </template>
@@ -17,6 +15,5 @@
 <script setup lang="ts">
 import BentoCalendar from "./bento/BentoCalendar.vue";
 import BentoProfileCard from "./bento/BentoProfileCard.vue";
-import BentoTechCard from "./bento/BentoTechCard.vue";
-import ImgCat from "./icons/ImgCat.vue";
+import BentoTech from "./bento/BentoTech.vue";
 </script>

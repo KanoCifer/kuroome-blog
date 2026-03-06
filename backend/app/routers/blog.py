@@ -8,6 +8,7 @@ from beanie import SortDirection
 from bson import ObjectId
 from bson.errors import InvalidId
 from fastapi import APIRouter, Depends, Query
+from fastapi.responses import JSONResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -60,7 +61,7 @@ async def _get_categories_with_counts(
 async def get_blogs(
     page: int = 1,
     session: AsyncSession = Depends(get_session),
-) -> APIResponse:
+) -> JSONResponse:
     """Get paginated list of blog articles."""
     per_page = 10  # 每页文章数量
 

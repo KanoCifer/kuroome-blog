@@ -14,7 +14,7 @@
       </div>
 
       <div v-else>
-        <h1 class="text-center font-serif text-7xl text-gray-50">
+        <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl">
           {{ article?.title }}
         </h1>
         <!-- 作者和日期信息 -->
@@ -221,7 +221,7 @@
                     d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
                   />
                 </svg>
-                <span class="max-w-[200px] truncate" :title="article.feed_url">{{
+                <span class="max-w-50 truncate" :title="article.feed_url">{{
                   article.feed_url
                 }}</span>
               </div>
@@ -371,6 +371,23 @@ onMounted(() => {
 watch(articleId, () => {
   fetchArticle();
 });
+
+// 阅读进度100%后自动标记已读
+watch(
+  percent,
+  async (newPercent) => {
+    if (newPercent === 100 && article.value && !article.value.is_read) {
+      try {
+        await request.post(`/rss/articles/${articleId.value}/read`);
+        article.value.is_read = true;
+        notifier.success("已读完！");
+      } catch {
+        notifier.error("自动标记已读失败，请手动点击标记");
+      }
+    }
+  },
+  { immediate: false },
+);
 </script>
 
 <style scoped>

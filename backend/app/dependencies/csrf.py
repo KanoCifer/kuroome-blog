@@ -25,6 +25,7 @@ from fastapi import Cookie, Depends, HTTPException, Request, Response, status
 from itsdangerous import SignatureExpired, TimestampSigner
 
 from app.configs.config import settings
+from app.schemas.response import APIResponse
 
 if TYPE_CHECKING:
     from fastapi import FastAPI
@@ -60,7 +61,7 @@ class CSRFManager:
         except SignatureExpired, Exception:
             return False
 
-    def set_csrf_cookie(self, response: Response) -> None:
+    def set_csrf_cookie(self, response: Response) -> str:
         token = self.generate_token()
         response.set_cookie(
             key=self.cookie_name,
@@ -68,7 +69,9 @@ class CSRFManager:
             httponly=False,
             samesite="lax",
             max_age=self.token_ttl,
+            secure=settings.CSRF_COOKIE_SECURE or True,
         )
+        return token
 
     def get_token_from_cookie(self, request: Request) -> str | None:
         return request.cookies.get(self.cookie_name)
@@ -132,10 +135,9 @@ def setup_csrf(app: FastAPI) -> None:
         client_token = csrf_from_header or csrf_from_cookie
 
         if not client_token or not csrf_manager.verify_token(client_token):
-            return Response(
-                content='{"detail": "CSRF token missing or invalid"}',
-                status_code=status.HTTP_403_FORBIDDEN,
-                media_type="application/json",
+            return APIResponse.error(
+                message="CSRF token missing or invalid",
+                code=status.HTTP_403_FORBIDDEN,
             )
 
         return await call_next(request)

@@ -136,9 +136,39 @@
                   class="truncate font-semibold text-blue-900 dark:text-white"
                   :title="sub.rss_url"
                 >
+                  {{ getSubscriptionTitle(sub.feed_title, sub.rss_url) }}
+                </p>
+                <p class="mt-1 truncate text-sm text-blue-500" :title="sub.rss_url">
                   {{ sub.rss_url }}
                 </p>
-                <div class="mt-2 flex items-center gap-3 text-sm text-blue-500">
+
+                <p
+                  v-if="sub.feed_description"
+                  class="mt-2 line-clamp-2 text-sm text-blue-600 dark:text-blue-300"
+                >
+                  {{ sub.feed_description }}
+                </p>
+
+                <div class="mt-2 flex flex-wrap items-center gap-2 text-xs">
+                  <span
+                    class="rounded-full border border-blue-200 bg-blue-50 px-2 py-1 text-blue-600 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
+                  >
+                    {{ getFeedHost(sub.rss_url) }}
+                  </span>
+                  <span
+                    class="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-emerald-600 dark:border-emerald-900/60 dark:bg-emerald-900/30 dark:text-emerald-300"
+                  >
+                    {{ getFeedProtocol(sub.rss_url) }}
+                  </span>
+                  <span
+                    v-if="sub.entry_count !== undefined"
+                    class="rounded-full border border-amber-200 bg-amber-50 px-2 py-1 text-amber-600 dark:border-amber-900/60 dark:bg-amber-900/30 dark:text-amber-300"
+                  >
+                    {{ sub.entry_count ?? 0 }} 篇可见文章
+                  </span>
+                </div>
+
+                <div class="mt-2 flex flex-wrap items-center gap-3 text-sm text-blue-500">
                   <span v-if="sub.created_at" class="flex items-center gap-1">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -156,6 +186,15 @@
                     </svg>
                     添加于 {{ formatDate(sub.created_at) }}
                   </span>
+                  <a
+                    v-if="sub.feed_link"
+                    :href="sub.feed_link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-300 dark:hover:text-blue-200"
+                  >
+                    访问网站
+                  </a>
                 </div>
               </div>
               <div class="flex shrink-0 items-center gap-3">
@@ -201,27 +240,51 @@
                   </svg>
                   {{ refreshingSubscriptionId === sub.id ? "刷新中..." : "刷新" }}
                 </button>
-                <button
-                  type="button"
-                  @click="handleDelete(sub.id)"
-                  class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 dark:border-red-900/50 dark:bg-slate-800 dark:text-red-400 dark:hover:bg-red-900/30"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="2"
-                    stroke="currentColor"
-                    class="h-4 w-4"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                    />
-                  </svg>
-                  删除
-                </button>
+
+                <AlertDialog>
+                  <AlertDialogTrigger>
+                    <button
+                      type="button"
+                      class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 dark:border-red-900/50 dark:bg-slate-800 dark:text-red-400 dark:hover:bg-red-900/30"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                        stroke="currentColor"
+                        class="h-4 w-4"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                        />
+                      </svg>
+                      删除
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent class="rounded-3xl">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>你确定要删除此订阅吗？</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        这将永久删除订阅，并且无法恢复。请确认你要删除的订阅 URL 是
+                        <span class="font-mono text-red-600 dark:text-red-400">{{
+                          sub.rss_url
+                        }}</span>
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>取消</AlertDialogCancel>
+                      <AlertDialogAction
+                        class="bg-red-500/70 hover:bg-red-500"
+                        @click="handleDelete(sub.id)"
+                      >
+                        确定</AlertDialogAction
+                      >
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
           </li>
@@ -232,17 +295,53 @@
 </template>
 
 <script setup lang="ts">
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import request, { type ApiResponse } from "@/request";
+import { useNotificationStore } from "@/stores/notification";
 import type { RssSubscription } from "@/types";
 import { formatDate } from "@/utils/formatdate";
 import { useScroll } from "@vueuse/core";
 import { computed, onMounted, ref } from "vue";
-import { RouterLink } from "vue-router";
 
 const subscriptions = ref<RssSubscription[]>([]);
 const isLoading = ref<boolean>(false);
 const errorMessage = ref<string>("");
 const refreshingSubscriptionId = ref<number | null>(null);
+const notificationStore = useNotificationStore();
+
+const getFeedHost = (url: string) => {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return "未知来源";
+  }
+};
+
+const getFeedProtocol = (url: string) => {
+  try {
+    return new URL(url).protocol.replace(":", "").toUpperCase();
+  } catch {
+    return "UNKNOWN";
+  }
+};
+
+const getSubscriptionTitle = (feedTitle: string | null | undefined, rssUrl: string) => {
+  const normalizedTitle = feedTitle?.trim();
+  if (normalizedTitle) {
+    return normalizedTitle;
+  }
+  return getFeedHost(rssUrl);
+};
 
 const fetchSubscriptions = async () => {
   isLoading.value = true;
@@ -277,7 +376,7 @@ const handleRefresh = async (id: number) => {
     );
     if (res.data.status === "success") {
       const savedCount = res.data.data?.saved_count ?? 0;
-      alert(`刷新完成，新增 ${savedCount} 篇文章`);
+      notificationStore.success(`订阅刷新成功，新增 ${savedCount} 篇文章`);
     } else {
       throw new Error(res.data.message || "刷新订阅失败");
     }
@@ -286,17 +385,13 @@ const handleRefresh = async (id: number) => {
       response?: { data?: { message?: string } };
       message?: string;
     };
-    alert(error?.response?.data?.message || error?.message || "刷新订阅失败");
+    notificationStore.error(error?.response?.data?.message || error?.message || "刷新订阅失败");
   } finally {
     refreshingSubscriptionId.value = null;
   }
 };
 
 const handleDelete = async (id: number) => {
-  if (!window.confirm("确定要删除此订阅吗？删除后该订阅的所有文章也会被删除。")) {
-    return;
-  }
-
   try {
     const res = await request.delete<ApiResponse<null>>(`/rss/subscriptions/${id}`);
     if (res.data.status === "success") {
@@ -309,7 +404,7 @@ const handleDelete = async (id: number) => {
       response?: { data?: { message?: string } };
       message?: string;
     };
-    alert(error?.response?.data?.message || error?.message || "删除订阅失败");
+    notificationStore.error(error?.response?.data?.message || error?.message || "删除订阅失败");
   }
 };
 
@@ -322,7 +417,7 @@ const sectionStyle = computed(() => {
   // compute scale with a ceiling of 1 so the content does not grow indefinitely
   const scale = Math.min(1, 0.9 + y.value * 0.001);
   return {
-    transform: `scale(${scale})`, // 内容区稍快
+    transform: `scale(${scale})`,
   };
 });
 </script>

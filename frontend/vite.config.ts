@@ -11,7 +11,7 @@ export default defineConfig({
   plugins: [
     vue(),
     vueDevTools({
-      launchEditor: "agy",
+      launchEditor: "code", // 可选：指定编辑器，默认为 "code"（VS Code）
     }),
     Components({
       resolvers: [

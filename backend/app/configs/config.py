@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     API_TITLE: str = "Reading List API"
     API_DESCRIPTION: str = "API文档。Personal reading tracker API built with FastAPI, PostgreSQL, and MongoDB. Manage your reading list, track progress, and get book recommendations."
     API_KEY: str = ""
+    CSRF_COOKIE_SECURE: bool = True
 
     model_config = SettingsConfigDict(
         env_file=".env",  # 指定环境变量文件路径

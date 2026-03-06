@@ -1,7 +1,7 @@
 <template>
   <BentoCard class="group relative h-full overflow-hidden">
     <div
-      class="absolute inset-0 bg-gradient-to-br from-green-500 to-teal-400 opacity-10 transition-opacity group-hover:opacity-20"
+      class="absolute inset-0 bg-linear-to-br from-green-500 to-teal-400 opacity-10 transition-opacity group-hover:opacity-20"
     ></div>
     <div class="relative z-10 flex h-full flex-col justify-between p-2">
       <!-- Icon / Logo -->

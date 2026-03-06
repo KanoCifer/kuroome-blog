@@ -1,12 +1,20 @@
 <template>
-  <div id="changelogView" class="flex min-h-full w-full flex-col items-center justify-center py-12">
+  <div
+    id="changelogView"
+    class="my-36 flex min-h-full w-full flex-col items-center justify-center py-12"
+  >
     <div class="w-full max-w-5xl px-4">
       <!-- Header Section -->
       <div class="mb-16 text-center">
         <div
           class="mb-6 inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
         >
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -49,14 +57,19 @@
             <!-- Content Card -->
             <div class="-mx-8 w-full md:w-1/2">
               <div
-                class="group cursor-pointer rounded-3xl border border-gray-100 bg-white/80 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl md:p-8 dark:border-gray-700 dark:bg-gray-800/80"
+                class="group squircle cursor-pointer border border-gray-100 bg-white/80 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl md:p-8 dark:border-gray-700 dark:bg-gray-800/80"
               >
                 <!-- Version Badge & Date -->
                 <div class="mb-4 flex flex-wrap items-center gap-3">
                   <span
                     class="inline-flex items-center gap-2 rounded-full bg-linear-to-r from-blue-500 to-cyan-500 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-blue-500/25"
                   >
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -66,8 +79,15 @@
                     </svg>
                     v{{ release.version }}
                   </span>
-                  <span class="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <span
+                    class="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400"
+                  >
+                    <svg
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -80,7 +100,9 @@
                 </div>
 
                 <!-- Release Title -->
-                <h2 class="mb-4 text-2xl font-bold text-gray-800 dark:text-gray-100">
+                <h2
+                  class="mb-4 text-2xl font-bold text-gray-800 dark:text-gray-100"
+                >
                   {{ release.title }}
                 </h2>
 
@@ -97,7 +119,9 @@
                         getTypeClass(change.type),
                       ]"
                     >
-                      <span v-if="getTypeIcon(change.type)">{{ getTypeIcon(change.type) }}</span>
+                      <span v-if="getTypeIcon(change.type)">{{
+                        getTypeIcon(change.type)
+                      }}</span>
                       {{ getTypeLabel(change.type) }}
                     </span>
                     <span class="text-gray-700 dark:text-gray-300">
@@ -118,16 +142,22 @@
               <div
                 class="relative flex h-full w-full items-center justify-center rounded-full bg-white ring-4 ring-blue-100 dark:bg-gray-800 dark:ring-gray-700"
               >
-                <div class="h-3 w-3 rounded-full bg-linear-to-r from-blue-400 to-indigo-500"></div>
+                <div
+                  class="h-3 w-3 rounded-full bg-linear-to-r from-blue-400 to-indigo-500"
+                ></div>
               </div>
             </div>
 
             <!-- Mobile Timeline Dot -->
-            <div class="absolute top-6 left-0 z-10 h-6 w-6 -translate-x-1/2 md:hidden">
+            <div
+              class="absolute top-6 left-0 z-10 h-6 w-6 -translate-x-1/2 md:hidden"
+            >
               <div
                 class="relative flex h-full w-full items-center justify-center rounded-full bg-white ring-3 ring-blue-100 dark:bg-gray-800 dark:ring-gray-700"
               >
-                <div class="h-2 w-2 rounded-full bg-linear-to-r from-blue-400 to-indigo-500"></div>
+                <div
+                  class="h-2 w-2 rounded-full bg-linear-to-r from-blue-400 to-indigo-500"
+                ></div>
               </div>
             </div>
 

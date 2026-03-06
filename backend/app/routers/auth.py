@@ -25,7 +25,6 @@ from fastapi import (
     Response,
     status,
 )
-from fastapi.responses import JSONResponse
 from fastapi_mail import FastMail, MessageSchema, MessageType, NameEmail
 from pydantic import BaseModel, EmailStr
 from redis.exceptions import RedisError
@@ -52,9 +51,10 @@ router = APIRouter(
 
 @router.get("/csrf-token", response_model=APIResponse)
 async def csrf_token(response: Response):
-    csrf_manager.set_csrf_cookie(response)
+    token = csrf_manager.set_csrf_cookie(response)
+    # return the raw token as well so clients can add it to headers
     return APIResponse.ok(
-        data={"csrf_token": "Cookie 已设置"},
+        data={"csrf_token": token},
         message="CSRF token 已生成",
     )
 
@@ -120,21 +120,19 @@ async def login(
 
     await session.commit()
 
-    response = JSONResponse(
-        content=APIResponse.ok(
-            data={
-                "id": user.id,
-                "username": user.username,
-                "is_admin": user.is_admin,
-                "name": user.name,
-                "email": profile.email if profile else None,
-                "gender": profile.gender if profile else None,
-                "mobile": profile.mobile if profile else None,
-                "photo": profile.photo if profile else None,
-            },
-            message="登录成功",
-            # access_token=access_token,
-        ).model_dump()
+    response = APIResponse.ok(
+        data={
+            "id": user.id,
+            "username": user.username,
+            "is_admin": user.is_admin,
+            "name": user.name,
+            "email": profile.email if profile else None,
+            "gender": profile.gender if profile else None,
+            "mobile": profile.mobile if profile else None,
+            "photo": profile.photo if profile else None,
+        },
+        message="登录成功",
+        # access_token=access_token,
     )
 
     manager.set_cookie(response=response, token=access_token)
@@ -163,11 +161,9 @@ async def logout(
     await session.commit()
 
     # Clear session
-    response = JSONResponse(
-        content=APIResponse.ok(
-            message="已退出登录",
-            code=status.HTTP_200_OK,
-        ).model_dump()
+    response = APIResponse.ok(
+        message="已退出登录",
+        code=status.HTTP_200_OK,
     )
     response.delete_cookie(key=manager.cookie_name)
     return response

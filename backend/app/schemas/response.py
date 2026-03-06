@@ -22,11 +22,11 @@ class APIResponse(BaseModel):
         code: int = 200,
     ):
         """成功响应的便捷方法"""
-        return cls(
-            status="success",
-            data=data,
-            message=message,
-            code=code,
+        return JSONResponse(
+            status_code=code,
+            content=cls(
+                status="success", data=data, message=message, code=code
+            ).model_dump(mode="json"),
         )
 
     @classmethod
@@ -34,7 +34,7 @@ class APIResponse(BaseModel):
         """错误响应的便捷方法 - 返回带 HTTP 状态码的 JSONResponse"""
         return JSONResponse(
             status_code=code,
-            content=cls(
-                status="error", message=message, code=code
-            ).model_dump(),
+            content=cls(status="error", message=message, code=code).model_dump(
+                mode="json"
+            ),
         )

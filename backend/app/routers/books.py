@@ -42,7 +42,7 @@ async def get_books(
     sort_order: str = Query(default="desc", pattern="^(asc|desc)$"),
     user: User = Depends(manager),
     db: AsyncSession = Depends(get_session),
-) -> APIResponse:
+):
     """Get user's books with pagination.
 
     This endpoint returns a paginated list of books in the user's collection

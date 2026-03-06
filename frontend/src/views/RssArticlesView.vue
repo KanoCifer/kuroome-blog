@@ -25,8 +25,12 @@
           </svg>
         </div>
         <div>
-          <h1 class="text-3xl font-bold text-blue-900 dark:text-white">RSS 文章列表</h1>
-          <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">阅读已保存的订阅文章</p>
+          <h1 class="text-3xl font-bold text-blue-900 dark:text-white">
+            RSS 文章列表
+          </h1>
+          <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">
+            阅读已保存的订阅文章
+          </p>
         </div>
         <button
           @click="router.push('/rss')"
@@ -74,7 +78,9 @@
         v-else-if="errorMessage"
         class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-red-200 bg-red-50 py-16 text-center dark:border-red-800 dark:bg-red-900/20"
       >
-        <p class="text-lg font-medium text-red-600 dark:text-red-400">加载失败</p>
+        <p class="text-lg font-medium text-red-600 dark:text-red-400">
+          加载失败
+        </p>
         <p class="mt-1 text-sm text-red-500">{{ errorMessage }}</p>
         <button
           class="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none"
@@ -118,7 +124,9 @@
               <div
                 class="mt-1 flex flex-wrap items-center gap-3 text-xs text-blue-500 dark:text-blue-400"
               >
-                <span v-if="article.author" class="font-medium">{{ article.author }}</span>
+                <span v-if="article.author" class="font-medium">{{
+                  article.author
+                }}</span>
                 <span v-if="article.published" class="flex items-center gap-1">
                   {{ formatDate(article.published) }}
                 </span>
@@ -158,7 +166,9 @@
                 上一页
               </button>
             </li>
-            <li class="px-2 text-sm font-medium text-blue-700 dark:text-blue-300">
+            <li
+              class="px-2 text-sm font-medium text-blue-700 dark:text-blue-300"
+            >
               第 {{ currentPage }} 页 / 共 {{ totalPages }} 页
             </li>
             <li>
@@ -215,9 +225,12 @@ const fetchArticles = async (page: number) => {
       params.feed_url = route.query.feed_url;
     }
 
-    const res = await request.get<ApiResponse<RssArticleListResponse>>("/rss/articles", {
-      params,
-    });
+    const res = await request.get<ApiResponse<RssArticleListResponse>>(
+      "/rss/articles",
+      {
+        params,
+      },
+    );
 
     if (res.data.status === "success" && res.data.data) {
       articles.value = res.data.data.items;
@@ -229,7 +242,9 @@ const fetchArticles = async (page: number) => {
   } catch (err: unknown) {
     console.error(err);
     errorMessage.value =
-      err instanceof Error ? err.message : String(err) || "加载文章列表失败，请稍后重试。";
+      err instanceof Error
+        ? err.message
+        : String(err) || "加载文章列表失败，请稍后重试。";
     notifier.error(errorMessage.value);
   } finally {
     isLoading.value = false;

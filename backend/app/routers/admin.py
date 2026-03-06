@@ -7,6 +7,7 @@ from beanie import SortDirection
 from bson import ObjectId
 from bson.errors import InvalidId
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.responses import Response
 from slowapi.util import get_remote_address
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -418,7 +419,7 @@ async def track_visitor(
     data["visit_time"] = datetime.now(UTC).isoformat()
     try:
         await redis.rpush("migration_queue", json.dumps(data))
-        return APIResponse.ok(message="Visitor data tracked successfully")
+        return Response(status_code=204)
     except Exception as e:
         return APIResponse.error(
             message=f"Failed to track visitor data: {e!s}",

@@ -1,13 +1,13 @@
 <template>
   <BentoCard class="group relative h-full overflow-hidden">
     <div
-      class="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-600 opacity-10 transition-opacity group-hover:opacity-20"
+      class="absolute inset-0 bg-linear-to-br from-indigo-500 to-purple-600 opacity-10 transition-opacity group-hover:opacity-20"
     ></div>
     <div class="relative z-10 flex h-full flex-col justify-between">
       <div class="mb-4 h-32 w-full overflow-hidden rounded-xl bg-gray-200">
         <!-- Mock Thumbnail -->
         <div
-          class="h-full w-full bg-gradient-to-r from-blue-400 to-indigo-500"
+          class="h-full w-full bg-linear-to-r from-blue-400 to-indigo-500"
         ></div>
       </div>
       <div>

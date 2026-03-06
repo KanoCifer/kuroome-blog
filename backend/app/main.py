@@ -25,6 +25,7 @@ from app.exceptions import register_exception_handlers
 from app.models.mgmodel import MessageBoard, Post, RssArticle
 from app.routers import (
     admin,
+    aiagent,
     auth,
     blog,
     books,
@@ -108,7 +109,8 @@ app.include_router(public.router, prefix="/api/v1")
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(weread.router, prefix="/api/v1")
 app.include_router(rss.router, prefix="/api/v1")
-app.include_router(monitor.router, prefix="/api/v1")  # 添加监控路由
+app.include_router(monitor.router, prefix="/api/v1")
+app.include_router(aiagent.router, prefix="/api/v1")
 
 register_exception_handlers(app)
 

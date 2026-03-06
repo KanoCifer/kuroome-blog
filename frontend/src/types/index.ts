@@ -210,6 +210,12 @@ export interface RssArticle {
 export interface RssSubscription {
   id: number;
   rss_url: string;
+  feed_title?: string | null;
+  feed_link?: string | null;
+  feed_description?: string | null;
+  feed_published_at?: string | null;
+  entry_count?: number;
+  last_fetched_at?: string | null;
   created_at: string | null;
 }
 

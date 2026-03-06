@@ -1,6 +1,8 @@
-import { initCSRF } from "@/utils/csrf";
 import axios, { AxiosError } from "axios";
 import router from "./router";
+
+// keep latest CSRF token so it can be sent in headers
+export let csrfToken: string | null = null;
 
 export interface ApiResponse<T = unknown> {
   status: "success" | "error";
@@ -15,11 +17,30 @@ let onUnauthorizedCallback: () => void = () => router.push("/login"); // 默认�
 export function setOnUnauthorized(callback: () => void) {
   onUnauthorizedCallback = callback;
 }
-
+// helper to initialise CSRF token and store the value
+export async function fetchAndStoreCSRF() {
+  try {
+    const res =
+      await request.get<ApiResponse<{ csrf_token: string }>>(
+        "/auth/csrf-token",
+      );
+    csrfToken = res.data.data.csrf_token;
+  } catch (error) {
+    console.error("Failed to initialize CSRF token:", error);
+  }
+}
 const request = axios.create({
   baseURL: import.meta.env.VITE_API_BASE || "/api/v1/",
   timeout: 10000,
   withCredentials: true,
+});
+
+// attach CSRF token header automatically when available
+request.interceptors.request.use((config) => {
+  if (csrfToken && config.headers) {
+    config.headers["X-CSRF-Token"] = csrfToken;
+  }
+  return config;
 });
 
 request.interceptors.response.use(
@@ -28,13 +49,18 @@ request.interceptors.response.use(
     const config = error.config;
     const errorMessage = error.response?.data?.message;
     if (errorMessage && errorMessage.includes("CSRF") && config) {
-      // Track retry count on the config object to ensure it persists across retries
-      const _config = config as any;
+      const _config = config as typeof config & { _retryCount?: number };
+      // increment retry counter (initialize to 0 if missing)
       _config._retryCount = (_config._retryCount || 0) + 1;
 
       if (_config._retryCount <= 3) {
-        await initCSRF();
-        return request(config);
+        // first fetch a new token and store it
+        await fetchAndStoreCSRF();
+        // also attach header directly in case interceptor isn't triggered
+        if (_config.headers) {
+          _config.headers["X-CSRF-Token"] = csrfToken || "";
+        }
+        return request(_config);
       }
     }
     return Promise.reject(error);

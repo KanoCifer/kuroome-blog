@@ -10,6 +10,7 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     String,
+    Text,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -269,6 +270,24 @@ class RssInfo(Base):
         Integer, primary_key=True, autoincrement=True
     )
     rss_url: Mapped[str] = mapped_column(String(200), index=True)
+    feed_title: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    feed_link: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    feed_description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    feed_published_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    entry_count: Mapped[int] = mapped_column(Integer, default=0)
+    last_fetched_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), index=True
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+    )
 
     # 一对多关系，一个用户可以有多个RSS链接
     user_id: Mapped[int] = mapped_column(

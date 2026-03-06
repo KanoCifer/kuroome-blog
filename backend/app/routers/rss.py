@@ -5,7 +5,7 @@ import feedparser
 from beanie.operators import In
 from bson import ObjectId
 from bson.errors import InvalidId
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,6 +26,106 @@ from app.schemas.schemas import (
 router = APIRouter(prefix="/rss", tags=["rss"])
 
 
+def _parse_feed_published_datetime(
+    feed: feedparser.FeedParserDict,
+) -> datetime | None:
+    published_parsed = getattr(feed.feed, "published_parsed", None)
+    updated_parsed = getattr(feed.feed, "updated_parsed", None)
+    parsed_time = published_parsed or updated_parsed
+    if not parsed_time:
+        return None
+    try:
+        t = tuple(int(x) for x in parsed_time[:6])  # type: ignore[index]
+        return datetime(*t, tzinfo=UTC)
+    except Exception:
+        return None
+
+
+def _build_feed_meta(feed: feedparser.FeedParserDict) -> dict[str, str | None]:
+    # 安全获取发布时间，兼容不同字段名
+    published: str | None = None
+    if hasattr(feed.feed, "published"):
+        published = feed.feed.published  # type: ignore[attr-defined]
+    elif hasattr(feed.feed, "updated"):
+        published = feed.feed.updated  # type: ignore[attr-defined]
+    elif hasattr(feed.feed, "pubDate"):
+        published = feed.feed.pubDate  # type: ignore[attr-defined]
+
+    return {
+        "title": str(getattr(feed.feed, "title", "") or ""),
+        "link": str(getattr(feed.feed, "link", "") or ""),
+        "description": str(getattr(feed.feed, "description", "") or ""),
+        "published": published,
+    }
+
+
+async def save_to_mongo(feed_url: str, entries: list, user_id: int):
+    """
+    Background task: Save RSS entries to MongoDB.
+
+    Args:
+        feed_url: The RSS feed URL
+        entries: List of entry dicts with title, link, published, summary, content
+        user_id: The user ID (currently not directly stored in RssArticle, but for logging)
+    """
+    saved_count = 0
+    try:
+        for entry in entries:
+            guid = str(entry.get("id") or entry.get("link", ""))
+            title = str(entry.get("title", ""))
+            link = str(entry.get("link", ""))
+            summary = str(entry.get("summary", ""))
+            author = entry.get("author")
+            author_str = str(author) if author is not None else None
+
+            # Extract content from entry
+            content_list = entry.get("content") or []
+            if content_list:
+                content = str(content_list[0].get("value", ""))
+            else:
+                content = summary
+
+            # Parse published datetime
+            pub_dt: datetime | None = None
+            published_parsed = entry.get("published_parsed")
+            updated_parsed = entry.get("updated_parsed")
+            if published_parsed:
+                t = tuple(int(x) for x in published_parsed[:6])  # type: ignore[union-attr]
+                pub_dt = datetime(*t, tzinfo=UTC)
+            elif updated_parsed:
+                t = tuple(int(x) for x in updated_parsed[:6])  # type: ignore[union-attr]
+                pub_dt = datetime(*t, tzinfo=UTC)
+
+            # Check if article already exists
+            existing = await RssArticle.find_one(
+                RssArticle.feed_url == feed_url,
+                RssArticle.guid == guid,
+            )
+            if not existing:
+                new_article = RssArticle(
+                    guid=guid,
+                    feed_url=feed_url,
+                    title=title,
+                    link=link,
+                    summary=summary,
+                    content=content,
+                    author=author_str,
+                    published=pub_dt,
+                    fetched_at=datetime.now(UTC),
+                    read_by=[],
+                )
+                await new_article.insert()
+                saved_count += 1
+
+        logger.info(
+            f"Background task: RSS {feed_url} saved {saved_count} new articles for user {user_id}"
+        )
+    except Exception as e:
+        logger.error(
+            f"Background task failed: Error saving RSS {feed_url} for user {user_id}: {e!r}"
+        )
+
+
 class RssRequest(BaseModel):
     rss_url: str
     save_to_db: bool = False
@@ -35,6 +135,7 @@ class RssRequest(BaseModel):
 @router.post("/parse-rss")
 async def parse_rss(
     rss_request: RssRequest,
+    tasks: BackgroundTasks,
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(manager),
     redis: AsyncRedis = Depends(get_async_redis),
@@ -43,6 +144,7 @@ async def parse_rss(
 
     rss_url = rss_request.rss_url
     save_to_db = rss_request.save_to_db
+    rss_info: RssInfo | None = None
 
     if save_to_db:
         # 检查用户是否已经保存了相同的RSS链接,避免重复保存
@@ -52,15 +154,12 @@ async def parse_rss(
                 & (RssInfo.rss_url == rss_url)
             )
         )
-        existing_rss = result.scalar_one_or_none()
-        if not existing_rss:
-            # 将RSS链接保存到数据库
-            rss_info = RssInfo(
-                user_id=current_user.id,
-                rss_url=rss_url,
-            )
+        rss_info = result.scalar_one_or_none()
+        if not rss_info:
+            # 先写入基础记录，后续在解析成功后更新meta
+            rss_info = RssInfo(user_id=current_user.id, rss_url=rss_url)
             session.add(rss_info)
-            await session.commit()
+            await session.flush()
             logger.info(
                 f"用户 {current_user.username} 保存了RSS链接: {rss_url}"
             )
@@ -77,26 +176,10 @@ async def parse_rss(
         feed: feedparser.FeedParserDict = feedparser.parse(rss_url)
         if feed.bozo != 0:
             return APIResponse.error(message="无法解析RSS链接", code=400)
-
-            # 安全获取发布时间,兼容不同字段名
-        published: str | None = None
-        # 优先检查常用的发布时间字段
-        if hasattr(feed.feed, "published"):
-            published = feed.feed.published  # type: ignore
-        elif hasattr(feed.feed, "updated"):  # Atom格式常用
-            published = feed.feed.updated  # type: ignore
-        elif hasattr(feed.feed, "pubDate"):  # RSS2.0常用
-            published = feed.feed.pubDate  # type: ignore
-
-        feed_meta = {
-            "title": feed.feed.title,  # type: ignore
-            "link": feed.feed.link,  # type: ignore
-            "description": feed.feed.description,  # type: ignore
-            "published": published,
-        }
+        feed_meta = _build_feed_meta(feed)
+        feed_published_at = _parse_feed_published_datetime(feed)
 
         # 解析RSS条目
-
         entries = []
         for entry in feed.entries:
             entries.append(
@@ -110,51 +193,23 @@ async def parse_rss(
                 }
             )
 
+        fetched_at = datetime.now(UTC)
+        if save_to_db and rss_info is not None:
+            rss_info.feed_title = feed_meta.get("title") or None
+            rss_info.feed_link = feed_meta.get("link") or None
+            rss_info.feed_description = feed_meta.get("description") or None
+            rss_info.feed_published_at = feed_published_at
+            rss_info.entry_count = len(entries)
+            rss_info.last_fetched_at = fetched_at
+            await session.commit()
+
         if save_to_db:
-            saved_count = 0
-            for entry in feed.entries:
-                guid = str(entry.get("id") or entry.get("link", ""))
-                title = str(entry.get("title", ""))
-                link = str(entry.get("link", ""))
-                summary = str(entry.get("summary", ""))
-                raw_author = entry.get("author")
-                author = str(raw_author) if raw_author is not None else None
-                content_list = entry.get("content") or []
-                if content_list:
-                    content = str(content_list[0].get("value", ""))
-                else:
-                    content = summary
-                pub_dt: datetime | None = None
-                published_parsed = entry.get("published_parsed")
-                updated_parsed = entry.get("updated_parsed")
-                if published_parsed:
-                    t = tuple(int(x) for x in published_parsed[:6])  # type: ignore[union-attr]
-                    pub_dt = datetime(*t, tzinfo=UTC)
-                elif updated_parsed:
-                    t = tuple(int(x) for x in updated_parsed[:6])  # type: ignore[union-attr]
-                    pub_dt = datetime(*t, tzinfo=UTC)
-
-                new_article = RssArticle(
-                    guid=guid,
-                    feed_url=rss_url,
-                    title=title,
-                    link=link,
-                    summary=summary,
-                    content=content,
-                    author=author,
-                    published=pub_dt,
-                    fetched_at=datetime.now(UTC),
-                    read_by=[],
-                )
-                existing = await RssArticle.find_one(
-                    RssArticle.feed_url == rss_url,
-                    RssArticle.guid == guid,
-                )
-                if not existing:
-                    await new_article.insert()
-                    saved_count += 1
-
-            logger.info(f"RSS {rss_url} 共保存 {saved_count} 篇新文章")
+            tasks.add_task(
+                save_to_mongo,
+                feed_url=rss_url,
+                entries=feed.entries,
+                user_id=current_user.id,
+            )
 
         # 将解析结果缓存到Redis,设置过期时间为1小时
         await redis.set(
@@ -165,6 +220,8 @@ async def parse_rss(
 
         return APIResponse.ok(data={"meta": feed_meta, "entries": entries})
     except Exception as e:
+        if save_to_db:
+            await session.rollback()
         logger.error(f"解析RSS链接失败: {e!r}")
         return APIResponse.error(message=f"解析RSS链接失败: {e!r}", code=500)
 
@@ -298,7 +355,15 @@ async def get_subscriptions(
     subscriptions = result.scalars().all()
     data = [
         RssSubscriptionResponse(
-            id=sub.id, rss_url=sub.rss_url, created_at=None
+            id=sub.id,
+            rss_url=sub.rss_url,
+            feed_title=sub.feed_title,
+            feed_link=sub.feed_link,
+            feed_description=sub.feed_description,
+            feed_published_at=sub.feed_published_at,
+            entry_count=sub.entry_count,
+            last_fetched_at=sub.last_fetched_at,
+            created_at=sub.created_at,
         )
         for sub in subscriptions
     ]
@@ -335,6 +400,9 @@ async def refresh_subscription(
         feed: feedparser.FeedParserDict = feedparser.parse(rss_url)
         if feed.bozo != 0:
             return APIResponse.error(message="无法解析RSS链接", code=400)
+        feed_meta = _build_feed_meta(feed)
+        feed_published_at = _parse_feed_published_datetime(feed)
+        fetched_at = datetime.now(UTC)
 
         saved_count = 0
         for entry in feed.entries:
@@ -376,11 +444,19 @@ async def refresh_subscription(
                 content=content,
                 author=author,
                 published=pub_dt,
-                fetched_at=datetime.now(UTC),
+                fetched_at=fetched_at,
                 read_by=[],
             )
             await new_article.insert()
             saved_count += 1
+
+        rss_info.feed_title = feed_meta.get("title") or None
+        rss_info.feed_link = feed_meta.get("link") or None
+        rss_info.feed_description = feed_meta.get("description") or None
+        rss_info.feed_published_at = feed_published_at
+        rss_info.entry_count = len(feed.entries)
+        rss_info.last_fetched_at = fetched_at
+        await session.commit()
 
         logger.info(
             f"用户 {current_user.username} 手动刷新RSS: {rss_url}, 新增 {saved_count} 篇文章"
@@ -393,6 +469,7 @@ async def refresh_subscription(
             }
         )
     except Exception as e:
+        await session.rollback()
         logger.error(f"手动刷新RSS失败: {e!r}")
         return APIResponse.error(message=f"手动刷新RSS失败: {e!r}", code=500)
 

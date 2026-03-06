@@ -1,4 +1,4 @@
-import request, { setOnUnauthorized } from "@/request";
+import request, { fetchAndStoreCSRF, setOnUnauthorized } from "@/request";
 import router from "@/router";
 import { useNotificationStore } from "@/stores/notification";
 import { defineStore } from "pinia";
@@ -100,8 +100,8 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   async function initCSRF() {
-    await request.get("/auth/csrf-token");
-    // Token 会自动写入 Cookie
+    // use the helper from request.ts so token is stored locally as well
+    await fetchAndStoreCSRF();
   }
 
   // 4. 登录

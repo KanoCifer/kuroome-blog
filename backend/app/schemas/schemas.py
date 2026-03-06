@@ -432,6 +432,12 @@ class RssSubscriptionResponse(BaseModel):
 
     id: int
     rss_url: str
+    feed_title: str | None = None
+    feed_link: str | None = None
+    feed_description: str | None = None
+    feed_published_at: datetime | None = None
+    entry_count: int = 0
+    last_fetched_at: datetime | None = None
     created_at: datetime | None
 
 

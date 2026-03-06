@@ -10,7 +10,7 @@
     ></div>
 
     <div
-      class="relative flex h-full min-h-[120px] w-full items-center justify-center rounded-2xl border-2 border-dashed border-white/50 bg-white/20 transition-colors hover:bg-white/30"
+      class="relative flex h-full min-h-30 w-full items-center justify-center rounded-2xl border-2 border-dashed border-white/50 bg-white/20 transition-colors hover:bg-white/30"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

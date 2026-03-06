@@ -69,8 +69,9 @@ async def run_migration_job():
                     f"Successfully migrated {processed_count} items from Redis to DB."
                 )
 
-    except Exception:
-        # 【重要】发生异常时，把取出来的数据塞回 Redis 头部，防止数据丢失
+    except Exception as e:
+        logger.error(f"Error occurred while migrating data: {e}")
+        # 异常时，把取出来的数据塞回 Redis 头部，防止数据丢失
         if "valid_items" in locals() and valid_items:
             # 注意要倒序塞回去，保证顺序不变
             for item in reversed(valid_items):

@@ -5,7 +5,7 @@
     :class="{ '-translate-y-[calc(100%+2rem)]': !isHeaderVisible }"
   >
     <nav
-      class="squircle mx-auto max-w-4xl transform-gpu backdrop-blur-sm transition-transform hover:scale-[1.01]"
+      class="squircle mx-auto max-w-4xl transform-gpu backdrop-blur-xs transition-transform hover:scale-[1.01]"
     >
       <ul class="squircle flex items-center justify-end-safe font-medium">
         <!-- Navigation Dropdown on Blog Title -->
@@ -20,7 +20,7 @@
             class="flex cursor-pointer items-center gap-1"
           >
             <span
-              class="shrink-0 font-serif text-2xl font-bold text-gray-700 text-shadow-lg hover:text-blue-600 dark:text-gray-300 dark:text-shadow-lg"
+              class="shrink-0 font-serif text-2xl font-bold text-gray-700 text-shadow-lg hover:text-blue-600 max-sm:hidden dark:text-gray-300 dark:text-shadow-lg"
             >
               Kuroome's Blog
             </span>
@@ -51,7 +51,7 @@
           >
             <div
               v-if="isDropdownOpen"
-              class="squircle absolute top-full left-0 z-9999 mt-4 w-72 rounded-[32px] border border-white/50 bg-white/80 p-6 shadow-xl backdrop-blur-sm dark:border-gray-700/50 dark:bg-gray-800/80"
+              class="squircle absolute top-full left-0 z-9999 mt-4 w-72 rounded-[40px] border border-white/50 bg-white/80 p-6 shadow-xl dark:border-gray-700/50 dark:bg-gray-800/80"
             >
               <!-- 用户信息区 -->
               <div class="mb-8 flex items-center gap-4 px-2">
@@ -235,7 +235,9 @@
                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
               />
             </svg>
-            <span class="shrink-0 overflow-hidden">{{ currentUserName }}</span>
+            <span class="shrink-0 overflow-hidden max-sm:hidden">{{
+              currentUserName
+            }}</span>
             <svg
               class="h-3 w-3 transform-gpu transition-transform"
               :class="{ 'rotate-180': isUserMenuOpen }"
@@ -589,7 +591,6 @@ const avatarUrl = computed(() => {
   if (auth.user?.photo) {
     return `/api/v1/media/${auth.user.photo}`;
   }
-  return "/api/v1/media/default.png";
+  return "/images/about.webp";
 });
 </script>
-<style scoped></style>

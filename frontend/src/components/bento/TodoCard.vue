@@ -84,7 +84,12 @@
               @click="addTodo"
               class="flex items-center justify-center rounded-2xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-emerald-500/20 transition-colors hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-500"
             >
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -159,7 +164,12 @@
                   class="ml-2 rounded-full p-1.5 text-gray-400 opacity-0 transition-all group-hover:opacity-100 hover:bg-red-50 hover:text-red-500 focus:opacity-100 dark:hover:bg-red-900/30"
                   title="删除"
                 >
-                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -229,7 +239,9 @@ useStorage("todos", todos);
 useStorage("todos-collapsed", isCollapsed);
 
 // 计算属性
-const completedCount = computed(() => todos.value.filter((t) => t.completed).length);
+const completedCount = computed(
+  () => todos.value.filter((t) => t.completed).length,
+);
 
 // 方法
 const addTodo = () => {
