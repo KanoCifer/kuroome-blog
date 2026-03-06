@@ -78,10 +78,8 @@ async def lifespan(app: FastAPI):
 
     scheduler.start()
     # 记录日志，确认 APScheduler 已启动
-    logger.info(
-        "FastApi and APScheduler started successfully. Scheduled jobs: %s",
-        scheduler.get_jobs(),
-    )
+    logger.info("FastApi and APScheduler started successfully.")
+
     yield
 
     # 应用关闭时的清理工作

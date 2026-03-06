@@ -6,7 +6,10 @@
       :style="titleStyle"
     >
       <!-- Loading State -->
-      <div v-if="isLoading" class="flex min-h-[60vh] flex-col items-center justify-center">
+      <div
+        v-if="isLoading"
+        class="flex min-h-[60vh] flex-col items-center justify-center"
+      >
         <div
           class="h-12 w-12 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"
         ></div>
@@ -14,22 +17,33 @@
       </div>
 
       <div v-else>
-        <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl">
+        <h1
+          class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl"
+        >
           {{ article?.title }}
         </h1>
         <!-- 作者和日期信息 -->
-        <div class="flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400">
+        <div
+          class="flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400"
+        >
           <div class="flex items-center gap-2">
             <div
               class="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-sky-600 text-lg font-bold text-white"
             >
               {{ article?.author?.charAt(0).toUpperCase() || "K" }}
             </div>
-            <span class="font-medium text-gray-200">@{{ article?.author || "Kurroome" }}</span>
+            <span class="font-medium text-gray-200"
+              >@{{ article?.author || "Kurroome" }}</span
+            >
           </div>
           <span class="text-gray-50">·</span>
           <div class="flex items-center gap-1">
-            <svg class="h-4 w-4 text-gray-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="h-4 w-4 text-gray-50"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -38,7 +52,9 @@
               />
             </svg>
             <span class="text-gray-50">
-              {{ article?.published ? formatDate(article.published) : "未知时间" }}
+              {{
+                article?.published ? formatDate(article.published) : "未知时间"
+              }}
             </span>
           </div>
         </div>
@@ -83,7 +99,12 @@
                 : 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
             "
           >
-            <svg v-if="isToggling" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+            <svg
+              v-if="isToggling"
+              class="h-4 w-4 animate-spin"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
               <circle
                 class="opacity-25"
                 cx="12"
@@ -149,7 +170,9 @@
           v-else-if="errorMessage"
           class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-red-200 bg-red-50 py-16 text-center dark:border-red-800 dark:bg-red-900/20"
         >
-          <p class="text-lg font-medium text-red-600 dark:text-red-400">加载失败</p>
+          <p class="text-lg font-medium text-red-600 dark:text-red-400">
+            加载失败
+          </p>
           <p class="mt-1 text-sm text-red-500">{{ errorMessage }}</p>
           <button
             class="mt-4 cursor-pointer rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
@@ -165,12 +188,19 @@
           class="overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
         >
           <div class="border-b border-blue-100 p-8 dark:border-slate-700">
-            <h1 class="mb-4 text-3xl leading-tight font-bold text-blue-900 dark:text-white">
+            <h1
+              class="mb-4 text-3xl leading-tight font-bold text-blue-900 dark:text-white"
+            >
               {{ article.title }}
             </h1>
 
-            <div class="flex flex-wrap gap-x-6 gap-y-3 text-sm text-blue-600 dark:text-blue-400">
-              <div v-if="article.author" class="flex items-center gap-1.5 font-medium">
+            <div
+              class="flex flex-wrap gap-x-6 gap-y-3 text-sm text-blue-600 dark:text-blue-400"
+            >
+              <div
+                v-if="article.author"
+                class="flex items-center gap-1.5 font-medium"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -253,6 +283,10 @@
           </div>
 
           <div class="p-8">
+            <ArticleSummaryCard
+              :title="article.title"
+              :content="article.content || article.summary || ''"
+            />
             <div
               class="prose prose-lg prose-blue prose-a:text-blue-600 prose-img:rounded-xl dark:prose-invert dark:prose-a:text-blue-400 max-w-none"
               v-html="safeContent"
@@ -276,6 +310,7 @@
 </template>
 
 <script setup lang="ts">
+import ArticleSummaryCard from "@/components/ArticleSummaryCard.vue";
 import request from "@/request";
 import { useNotificationStore } from "@/stores/notification";
 import type { ApiResponse, RssArticle } from "@/types";
@@ -298,8 +333,11 @@ const notifier = useNotificationStore();
 const { y } = useScroll(window);
 const percent = computed(() => {
   if (!article.value) return 0;
-  const contentHeight = document.documentElement.scrollHeight - window.innerHeight;
-  return contentHeight > 0 ? Math.min(100, Math.round((y.value / contentHeight) * 100)) : 0;
+  const contentHeight =
+    document.documentElement.scrollHeight - window.innerHeight;
+  return contentHeight > 0
+    ? Math.min(100, Math.round((y.value / contentHeight) * 100))
+    : 0;
 });
 
 // 计算不同元素的视差偏移，速率自定义
@@ -317,7 +355,9 @@ const sectionStyle = computed(() => {
 const articleId = computed(() => route.params.id as string);
 
 const safeContent = computed(() => {
-  return DOMPurify.sanitize(article.value?.content || article.value?.summary || "");
+  return DOMPurify.sanitize(
+    article.value?.content || article.value?.summary || "",
+  );
 });
 
 const fetchArticle = async () => {
@@ -325,7 +365,9 @@ const fetchArticle = async () => {
   isLoading.value = true;
   errorMessage.value = "";
   try {
-    const res = await request.get<ApiResponse<RssArticle>>(`/rss/articles/${articleId.value}`);
+    const res = await request.get<ApiResponse<RssArticle>>(
+      `/rss/articles/${articleId.value}`,
+    );
     if (res.data.status === "success" && res.data.data) {
       article.value = res.data.data;
     } else {
@@ -334,7 +376,9 @@ const fetchArticle = async () => {
   } catch (err: unknown) {
     console.error(err);
     errorMessage.value =
-      err instanceof Error ? err.message : String(err) || "加载文章失败，请稍后重试。";
+      err instanceof Error
+        ? err.message
+        : String(err) || "加载文章失败，请稍后重试。";
     notifier.error(errorMessage.value);
   } finally {
     isLoading.value = false;

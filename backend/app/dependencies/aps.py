@@ -46,9 +46,10 @@ async def run_migration_job():
 
             # 3. 处理时间字段，转换为 datetime 对象
             for data in parsed_data_list:
-                if data["visit_time"] is not None:
+                visit_time = data.get("visit_time")
+                if visit_time is not None:
                     data["visit_time"] = datetime.fromisoformat(
-                        data["visit_time"]
+                        visit_time
                     ).replace(tzinfo=UTC)
 
             # 4. 批量写入数据库 (一次 Session, 一次 Commit)

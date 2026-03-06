@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ArticleToc from "@/components/ArticleToc.vue";
+import ArticleSummaryCard from "@/components/ArticleSummaryCard.vue";
 import CommentForm from "@/components/CommentForm.vue";
 import CommentItem from "@/components/CommentItem.vue";
 import request from "@/request";
@@ -539,6 +540,10 @@ onUnmounted(() => {
             <div class="mb-12 w-full min-w-0 rounded-3xl p-8 shadow-xl">
               <!-- 文章内容区 -->
               <div class="mb-8 px-6">
+                <ArticleSummaryCard
+                  :title="post.title"
+                  :content="post.body || ''"
+                />
                 <div class="prose prose-base dark:prose-invert max-w-none">
                   <!-- 使用 v-html 渲染 HTML 内容（取消转译） -->
                   <div v-if="post.body" v-html="post.body" />

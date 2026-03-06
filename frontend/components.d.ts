@@ -23,6 +23,7 @@ declare module 'vue' {
     AlertDialogTitle: typeof import('./src/components/ui/alert-dialog/AlertDialogTitle.vue')['default']
     AlertDialogTrigger: typeof import('./src/components/ui/alert-dialog/AlertDialogTrigger.vue')['default']
     AProgress: typeof import('ant-design-vue/es')['Progress']
+    ArticleSummaryCard: typeof import('./src/components/ArticleSummaryCard.vue')['default']
     ArticleToc: typeof import('./src/components/ArticleToc.vue')['default']
     BackToTop: typeof import('./src/components/BackToTop.vue')['default']
     BasicFooter: typeof import('./src/components/basic/BasicFooter.vue')['default']

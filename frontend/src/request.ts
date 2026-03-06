@@ -3,6 +3,7 @@ import router from "./router";
 
 // keep latest CSRF token so it can be sent in headers
 export let csrfToken: string | null = null;
+let csrfFetchPromise: Promise<void> | null = null;
 
 export interface ApiResponse<T = unknown> {
   status: "success" | "error";
@@ -19,15 +20,25 @@ export function setOnUnauthorized(callback: () => void) {
 }
 // helper to initialise CSRF token and store the value
 export async function fetchAndStoreCSRF() {
-  try {
-    const res =
-      await request.get<ApiResponse<{ csrf_token: string }>>(
-        "/auth/csrf-token",
-      );
-    csrfToken = res.data.data.csrf_token;
-  } catch (error) {
-    console.error("Failed to initialize CSRF token:", error);
+  if (csrfFetchPromise) {
+    return csrfFetchPromise;
   }
+
+  csrfFetchPromise = (async () => {
+    try {
+      const res =
+        await request.get<ApiResponse<{ csrf_token: string }>>(
+          "/auth/csrf-token",
+        );
+      csrfToken = res.data.data.csrf_token;
+    } catch (error) {
+      console.error("Failed to initialize CSRF token:", error);
+    } finally {
+      csrfFetchPromise = null;
+    }
+  })();
+
+  return csrfFetchPromise;
 }
 const request = axios.create({
   baseURL: import.meta.env.VITE_API_BASE || "/api/v1/",
@@ -37,6 +48,19 @@ const request = axios.create({
 
 // attach CSRF token header automatically when available
 request.interceptors.request.use((config) => {
+  const method = config.method?.toUpperCase();
+  const shouldEnsureCSRF =
+    method && !["GET", "HEAD", "OPTIONS"].includes(method);
+
+  if (shouldEnsureCSRF && !csrfToken) {
+    return fetchAndStoreCSRF().then(() => {
+      if (csrfToken && config.headers) {
+        config.headers["X-CSRF-Token"] = csrfToken;
+      }
+      return config;
+    });
+  }
+
   if (csrfToken && config.headers) {
     config.headers["X-CSRF-Token"] = csrfToken;
   }
@@ -54,9 +78,7 @@ request.interceptors.response.use(
       _config._retryCount = (_config._retryCount || 0) + 1;
 
       if (_config._retryCount <= 3) {
-        // first fetch a new token and store it
         await fetchAndStoreCSRF();
-        // also attach header directly in case interceptor isn't triggered
         if (_config.headers) {
           _config.headers["X-CSRF-Token"] = csrfToken || "";
         }
