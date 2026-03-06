@@ -52,7 +52,7 @@ router = APIRouter(
 @router.get("/csrf-token", response_model=APIResponse)
 async def csrf_token(response: Response):
     token = csrf_manager.set_csrf_cookie(response)
-    # return the raw token as well so clients can add it to headers
+
     return APIResponse.ok(
         data={"csrf_token": token},
         message="CSRF token 已生成",
@@ -136,6 +136,7 @@ async def login(
     )
 
     manager.set_cookie(response=response, token=access_token)
+    csrf_manager.set_csrf_cookie(response)
 
     return response
 

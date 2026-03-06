@@ -69,7 +69,7 @@ class CSRFManager:
             httponly=False,
             samesite="lax",
             max_age=self.token_ttl,
-            secure=settings.CSRF_COOKIE_SECURE or True,
+            secure=settings.CSRF_COOKIE_SECURE,
         )
         return token
 

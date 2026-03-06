@@ -9,6 +9,7 @@ import Vue3Lottie from "vue3-lottie";
 import App from "./App.vue";
 import "./assets/main.css";
 import "./assets/squircle.css";
+import { fetchAndStoreCSRF } from "./request";
 import router from "./router";
 
 dayjs.extend(relativeTime);
@@ -22,4 +23,9 @@ app.use(router);
 app.use(head);
 app.use(Vue3Lottie);
 
-app.mount("#app");
+async function bootstrap() {
+  await fetchAndStoreCSRF();
+  app.mount("#app");
+}
+
+void bootstrap();
