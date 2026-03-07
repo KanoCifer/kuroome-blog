@@ -25,7 +25,6 @@ export const useAuthStore = defineStore("auth", () => {
   const user = ref<UserInfo | null>(null); // 当前用户信息
   const loading = ref(false); // 加载状态
   const isHydrated = ref(false); // 是否初始化过
-  const _accessToken = ref<string | null>(null); // 保留字段，暂未使用
 
   const notifier = useNotificationStore(); // 通知提示
 
@@ -100,7 +99,6 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   async function initCSRF() {
-    // use the helper from request.ts so token is stored locally as well
     await fetchAndStoreCSRF();
   }
 
@@ -120,7 +118,8 @@ export const useAuthStore = defineStore("auth", () => {
       user.value = userData;
       cacheUser(userData);
       notifier.success("登录成功");
-      router.back(); // 登录成功返回上一页
+      // 登录成功后返回上一页（如果有历史记录）
+      router.back();
       return res.data;
     } catch (err: unknown) {
       notifier.error(err instanceof Error ? err.message : "登录失败");
@@ -162,6 +161,6 @@ export const useAuthStore = defineStore("auth", () => {
     hydrateAuth,
     login,
     logout,
-    refreshUser, // 新增：用于更新资料后刷新
+    refreshUser,
   };
 });

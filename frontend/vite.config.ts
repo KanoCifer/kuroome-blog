@@ -33,26 +33,29 @@ export default defineConfig({
       ? {}
       : {
           output: {
-            manualChunks: {
+            manualChunks: (id) => {
+              // Highlight.js and lowlight are shared utilities
+              if (
+                id.includes("node_modules/highlight.js") ||
+                id.includes("node_modules/lowlight")
+              ) {
+                return "syntax-highlight";
+              }
+              // Tiptap core and extensions
+              if (id.includes("node_modules/@tiptap")) {
+                return "tiptap";
+              }
               // Core Vue ecosystem
-              "vue-core": ["vue", "vue-router", "pinia"],
-              // Tiptap editor and extensions (heavy chunk)
-              tiptap: [
-                "@tiptap/vue-3",
-                "@tiptap/starter-kit",
-                "@tiptap/extension-code-block-lowlight",
-                "@tiptap/extension-image",
-                "@tiptap/extension-link",
-                "@tiptap/extension-placeholder",
-                "@tiptap/extension-text-align",
-                "@tiptap/extension-underline",
-              ],
-              // Syntax highlighting
-              "syntax-highlight": ["lowlight", "highlight.js"],
-              // HTTP client
-              axios: ["axios"],
-              // Date utilities
-              dayjs: ["dayjs"],
+              if (
+                id.includes("node_modules/vue") ||
+                id.includes("node_modules/vue-router") ||
+                id.includes("node_modules/pinia")
+              ) {
+                return "vue-core";
+              }
+              // Other common heavy utilities
+              if (id.includes("node_modules/axios")) return "axios";
+              if (id.includes("node_modules/dayjs")) return "dayjs";
             },
           },
         },

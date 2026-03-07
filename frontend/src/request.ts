@@ -2,7 +2,6 @@ import axios, { AxiosError } from "axios";
 import router from "./router";
 
 // keep latest CSRF token so it can be sent in headers
-export let csrfToken: string | null = null;
 let csrfFetchPromise: Promise<void> | null = null;
 
 export interface ApiResponse<T = unknown> {
@@ -18,7 +17,7 @@ let onUnauthorizedCallback: () => void = () => router.push("/login"); // 默认�
 export function setOnUnauthorized(callback: () => void) {
   onUnauthorizedCallback = callback;
 }
-// helper to initialise CSRF token and store the value
+
 export async function fetchAndStoreCSRF() {
   if (csrfFetchPromise) {
     return csrfFetchPromise;
@@ -26,13 +25,12 @@ export async function fetchAndStoreCSRF() {
 
   csrfFetchPromise = (async () => {
     try {
-      const res =
-        await request.get<ApiResponse<{ csrf_token: string }>>(
-          "/auth/csrf-token",
-        );
-      csrfToken = res.data.data.csrf_token;
+      await request.get<ApiResponse<{ csrf_token: string }>>(
+        "/auth/csrf-token",
+      );
     } catch (error) {
-      console.error("Failed to initialize CSRF token:", error);
+      console.error("获取 CSRF Token 失败:", error);
+      throw error;
     } finally {
       csrfFetchPromise = null;
     }
@@ -44,27 +42,6 @@ const request = axios.create({
   baseURL: import.meta.env.VITE_API_BASE || "/api/v1/",
   timeout: 10000,
   withCredentials: true,
-});
-
-// attach CSRF token header automatically when available
-request.interceptors.request.use((config) => {
-  const method = config.method?.toUpperCase();
-  const shouldEnsureCSRF =
-    method && !["GET", "HEAD", "OPTIONS"].includes(method);
-
-  if (shouldEnsureCSRF && !csrfToken) {
-    return fetchAndStoreCSRF().then(() => {
-      if (csrfToken && config.headers) {
-        config.headers["X-CSRF-Token"] = csrfToken;
-      }
-      return config;
-    });
-  }
-
-  if (csrfToken && config.headers) {
-    config.headers["X-CSRF-Token"] = csrfToken;
-  }
-  return config;
 });
 
 request.interceptors.response.use(
@@ -79,9 +56,6 @@ request.interceptors.response.use(
 
       if (_config._retryCount <= 3) {
         await fetchAndStoreCSRF();
-        if (_config.headers) {
-          _config.headers["X-CSRF-Token"] = csrfToken || "";
-        }
         return request(_config);
       }
     }
@@ -102,14 +76,5 @@ request.interceptors.response.use(
     return Promise.reject(new Error(message));
   },
 );
-
-// // 在Auth头携带token
-// request.interceptors.request.use((config) => {
-//   const token = sessionStorage.getItem("access_token");
-//   if (token && config.headers) {
-//     config.headers["Authorization"] = `Bearer ${token}`;
-//   }
-//   return config;
-// });
 
 export default request;

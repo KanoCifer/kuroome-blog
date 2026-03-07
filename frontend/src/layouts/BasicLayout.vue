@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import BackToTop from "@/components/BackToTop.vue";
 import BasicFooter from "@/components/basic/BasicFooter.vue";
 import BasicNav from "@/components/basic/BasicNav.vue";
 import BasicNotifier from "@/components/basic/BasicNotifier.vue";
-import ToastContainer from "@/components/ToastContainer.vue";
+import BackToTop from "@/components/layout/BackToTop.vue";
+import ToastContainer from "@/components/layout/ToastContainer.vue";
 import { useScroll } from "@vueuse/core";
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import { RouterView, useRoute } from "vue-router";

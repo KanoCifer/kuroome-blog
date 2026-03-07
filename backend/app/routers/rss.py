@@ -1,11 +1,16 @@
+import ipaddress
 import json
+import socket
 from datetime import UTC, datetime
+from urllib.parse import urlparse
 
 import feedparser
+import httpx
 from beanie.operators import In
 from bson import ObjectId
 from bson.errors import InvalidId
-from fastapi import APIRouter, BackgroundTasks, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends, Query
+from fastapi.responses import Response
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,6 +29,8 @@ from app.schemas.schemas import (
 )
 
 router = APIRouter(prefix="/rss", tags=["rss"])
+_IMAGE_PROXY_TIMEOUT = httpx.Timeout(15.0, connect=10.0)
+_IMAGE_PROXY_MAX_BYTES = 10 * 1024 * 1024  # 10MB
 
 
 def _parse_feed_published_datetime(
@@ -57,6 +64,42 @@ def _build_feed_meta(feed: feedparser.FeedParserDict) -> dict[str, str | None]:
         "description": str(getattr(feed.feed, "description", "") or ""),
         "published": published,
     }
+
+
+def _is_private_address(host: str) -> bool:
+    try:
+        ip = ipaddress.ip_address(host)
+        return (
+            ip.is_private
+            or ip.is_loopback
+            or ip.is_link_local
+            or ip.is_reserved
+            or ip.is_multicast
+        )
+    except ValueError:
+        return False
+
+
+def _is_forbidden_target(hostname: str) -> bool:
+    host = hostname.strip().lower()
+    if not host:
+        return True
+    if host in {"localhost", "127.0.0.1", "::1"}:
+        return True
+    if _is_private_address(host):
+        return True
+
+    try:
+        addr_infos = socket.getaddrinfo(host, None, type=socket.SOCK_STREAM)
+    except OSError:
+        # DNS 解析失败时交由下游请求报错
+        return False
+
+    for _, _, _, _, sockaddr in addr_infos:
+        ip = sockaddr[0]
+        if _is_private_address(host=str(ip)):
+            return True
+    return False
 
 
 async def save_to_mongo(feed_url: str, entries: list, user_id: int):
@@ -129,6 +172,56 @@ async def save_to_mongo(feed_url: str, entries: list, user_id: int):
 class RssRequest(BaseModel):
     rss_url: str
     save_to_db: bool = False
+
+
+@router.get("/image-proxy")
+async def proxy_rss_image(
+    url: str = Query(..., min_length=8, max_length=2048),
+    current_user: User = Depends(manager),
+):
+    """代理 RSS 图片, 避免浏览器直接跨域加载失败。"""
+    _: int = current_user.id
+    parsed = urlparse(url)
+    if parsed.scheme not in {"http", "https"}:
+        return APIResponse.error(
+            message="仅支持 http/https 图片地址", code=400
+        )
+    if not parsed.hostname or _is_forbidden_target(parsed.hostname):
+        return APIResponse.error(message="不允许访问该图片地址", code=400)
+
+    try:
+        async with httpx.AsyncClient(
+            timeout=_IMAGE_PROXY_TIMEOUT,
+            follow_redirects=True,
+        ) as client:
+            upstream = await client.get(url)
+    except httpx.HTTPError:
+        return APIResponse.error(message="拉取图片失败", code=502)
+
+    if upstream.status_code >= 400:
+        return APIResponse.error(message="拉取图片失败", code=502)
+
+    content_type = upstream.headers.get("content-type", "")
+    if not content_type.lower().startswith("image/"):
+        return APIResponse.error(message="目标资源不是图片", code=400)
+
+    content = upstream.content
+    if len(content) > _IMAGE_PROXY_MAX_BYTES:
+        return APIResponse.error(message="图片过大，超过 10MB", code=413)
+
+    headers = {
+        "Cache-Control": "public, max-age=3600",
+    }
+    if upstream.headers.get("etag"):
+        headers["ETag"] = upstream.headers["etag"]
+    if upstream.headers.get("last-modified"):
+        headers["Last-Modified"] = upstream.headers["last-modified"]
+
+    return Response(
+        content=content,
+        media_type=content_type.split(";")[0].strip(),
+        headers=headers,
+    )
 
 
 # 解析RSS链接

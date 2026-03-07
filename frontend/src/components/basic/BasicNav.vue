@@ -481,8 +481,8 @@ defineProps({
   },
 });
 
-import MemoModal from "@/components/MemoModal.vue";
-import ThemeToggle from "@/components/ThemeToggle.vue";
+import ThemeToggle from "@/components/layout/ThemeToggle.vue";
+import MemoModal from "@/components/memo/MemoModal.vue";
 import { useAuthStore } from "@/stores/auth";
 
 const auth = useAuthStore();

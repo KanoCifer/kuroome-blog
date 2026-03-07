@@ -1,6 +1,6 @@
 import { useAuthStore } from "@/stores/auth";
 import { reportVisitorData } from "@/utils/visitorTracker";
-import EntryView from "@/views/EntryView.vue";
+import EntryView from "@/views/general/EntryView.vue";
 import {
   createMemoryHistory,
   createRouter,
@@ -23,7 +23,7 @@ const router = createRouter({
     {
       path: "/api-docs",
       name: "api-docs",
-      component: () => import("@/views/ApiDocs.vue"),
+      component: () => import("@/views/general/ApiDocs.vue"),
       meta: {
         title: "API 文档 - Kuroome's Blog",
         description: "查看 Kuroome's Blog 项目的 API 文档，了解后端接口详情",
@@ -34,7 +34,7 @@ const router = createRouter({
     {
       path: "/home",
       name: "home",
-      component: () => import("@/views/HomeView.vue"),
+      component: () => import("@/views/general/HomeView.vue"),
       meta: {
         title: "Kuroome's Blog - 个人阅读清单与博客",
         description: "个人阅读清单管理项目，包含博客系统、书籍管理和阅读记录",
@@ -52,7 +52,7 @@ const router = createRouter({
     {
       path: "/about",
       name: "about",
-      component: () => import("@/views/AboutView.vue"),
+      component: () => import("@/views/general/AboutView.vue"),
       meta: {
         title: "关于我 - Kuroome's Blog",
         description: "关于 Kuroome's Blog 项目和作者的介绍",
@@ -62,7 +62,7 @@ const router = createRouter({
     {
       path: "/changelog",
       name: "changelog",
-      component: () => import("@/views/ChangelogView.vue"),
+      component: () => import("@/views/general/ChangelogView.vue"),
       meta: {
         title: "变更日志 - Kuroome's Blog",
         description: "网站更新历史与变更记录",
@@ -72,7 +72,7 @@ const router = createRouter({
     {
       path: "/blog",
       name: "blog-list",
-      component: () => import("@/views/BlogListView.vue"),
+      component: () => import("@/views/blog/BlogListView.vue"),
       meta: {
         title: "博客列表 - Kuroome's Blog",
         description: "个人博客文章列表，分享技术心得和生活感悟",
@@ -82,19 +82,19 @@ const router = createRouter({
     {
       path: "/blog/new",
       name: "blog-new",
-      component: () => import("@/views/BlogEditView.vue"),
+      component: () => import("@/views/blog/BlogEditView.vue"),
       meta: { requiresAuth: true },
     },
     {
       path: "/blog/edit/:id",
       name: "blog-edit",
-      component: () => import("@/views/BlogEditView.vue"),
+      component: () => import("@/views/blog/BlogEditView.vue"),
       meta: { requiresAuth: true },
     },
     {
       path: "/blog/category/:categoryId",
       name: "blog-category",
-      component: () => import("@/views/BlogListView.vue"),
+      component: () => import("@/views/blog/BlogListView.vue"),
       meta: {
         title: "博客分类 - Kuroome's Blog",
         description: "按分类浏览博客文章",
@@ -104,7 +104,7 @@ const router = createRouter({
     {
       path: "/blog/:id",
       name: "blog-post",
-      component: () => import("@/views/BlogPostView.vue"),
+      component: () => import("@/views/blog/BlogPostView.vue"),
       meta: {
         title: "博客文章 - Kuroome's Blog",
         description: "博客文章详情页",
@@ -114,35 +114,35 @@ const router = createRouter({
     {
       path: "/login",
       name: "login",
-      component: () => import("@/views/LoginView.vue"),
+      component: () => import("@/views/auth/LoginView.vue"),
     },
     {
       path: "/register",
       name: "register",
-      component: () => import("@/views/RegisterView.vue"),
+      component: () => import("@/views/auth/RegisterView.vue"),
     },
     {
       path: "/messages",
       name: "message-manage",
-      component: () => import("@/views/MessageManageView.vue"),
+      component: () => import("@/views/general/MessageManageView.vue"),
       meta: { requiresAuth: true },
     },
     {
       path: "/settings",
       name: "settings",
-      component: () => import("@/views/ProfileSettingView.vue"),
+      component: () => import("@/views/auth/ProfileSettingView.vue"),
       meta: { requiresAuth: true },
     },
     {
       path: "/import",
       name: "import",
-      component: () => import("@/views/ImportBook.vue"),
+      component: () => import("@/views/books/ImportBook.vue"),
       meta: { requiresAuth: true },
     },
     {
       path: "/bookshelf",
       name: "bookshelf",
-      component: () => import("@/views/BookShelf.vue"),
+      component: () => import("@/views/books/BookShelf.vue"),
       meta: {
         title: "书架 - Kuroome's Blog",
         description: "个人书架，管理你的阅读清单和书籍信息",
@@ -153,7 +153,7 @@ const router = createRouter({
     {
       path: "/analytics",
       name: "analytics",
-      component: () => import("@/views/AnalyticsView.vue"),
+      component: () => import("@/views/general/AnalyticsView.vue"),
       meta: {
         requiresAuth: true,
         title: "网站数据分析",
@@ -164,7 +164,7 @@ const router = createRouter({
     {
       path: "/rss",
       name: "rss",
-      component: () => import("@/views/RSSParseView.vue"),
+      component: () => import("@/views/rss/RSSParseView.vue"),
       meta: {
         title: "RSS 订阅 - Kuroome's Blog",
         description:
@@ -175,7 +175,7 @@ const router = createRouter({
     {
       path: "/rss/subscriptions",
       name: "rss-subscriptions",
-      component: () => import("@/views/RssSubscriptionsView.vue"),
+      component: () => import("@/views/rss/RssSubscriptionsView.vue"),
       meta: {
         title: "我的订阅 - Kuroome's Blog",
         requiresAuth: true,
@@ -184,7 +184,7 @@ const router = createRouter({
     {
       path: "/rss/articles",
       name: "rss-articles",
-      component: () => import("@/views/RssArticlesView.vue"),
+      component: () => import("@/views/rss/RssArticlesView.vue"),
       meta: {
         title: "RSS 文章 - Kuroome's Blog",
         requiresAuth: true,
@@ -193,7 +193,7 @@ const router = createRouter({
     {
       path: "/rss/articles/:id",
       name: "rss-article",
-      component: () => import("@/views/RssArticleView.vue"),
+      component: () => import("@/views/rss/RssArticleView.vue"),
       meta: {
         title: "RSS 阅读 - Kuroome's Blog",
         requiresAuth: true,
@@ -203,7 +203,7 @@ const router = createRouter({
       // 通配符匹配所有未定义的路径
       path: "/:pathMatch(.*)*",
       name: "NotFound",
-      component: () => import("@/views/NotFound.vue"),
+      component: () => import("@/views/general/NotFound.vue"),
     },
   ],
 });

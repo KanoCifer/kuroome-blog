@@ -1,5 +1,14 @@
 [
   {
+    "version": "2.2.7",
+    "date": "2026-03-07",
+    "title": "新增AI总结功能",
+    "changes": [
+      { "type": "feat", "content": "新增AI总结功能，支持文章内容自动生成摘要" },
+      { "type": "fix", "content": "修复了一些小bug" }
+    ]
+  },
+  {
     "version": "2.2.4",
     "date": "2026-03-05",
     "title": "rss阅读器优化",

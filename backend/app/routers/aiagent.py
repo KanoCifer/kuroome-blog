@@ -87,19 +87,22 @@ async def summary_article_stream(
             }
             yield f"data:{json.dumps(data, ensure_ascii=False)}\n\n"
             yield f"data:{json.dumps({'content': '', 'is_end': True}, ensure_ascii=False)}\n\n"
+            # print(f"data:{json.dumps(data, ensure_ascii=False)}\n\n") 调试输出
             return
 
         full_summary = ""
         try:
-            async for chunk in article_summarizer.summarize_article_stream(
+            async for chunk in article_summarizer.run_summarization_astream(
                 content=payload.content,
                 title=payload.title,
             ):
+                # chunk 类型可能包含列表/字典等，统一转换为字符串
+                chunk_str = str(chunk)
                 data = {
-                    "content": chunk,
+                    "content": chunk_str,
                     "is_end": False,
                 }
-                full_summary += chunk
+                full_summary += chunk_str
                 yield f"data:{json.dumps(data, ensure_ascii=False)}\n\n"
 
             done = {

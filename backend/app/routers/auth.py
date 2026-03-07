@@ -25,6 +25,7 @@ from fastapi import (
     Response,
     status,
 )
+from fastapi.responses import JSONResponse
 from fastapi_mail import FastMail, MessageSchema, MessageType, NameEmail
 from pydantic import BaseModel, EmailStr
 from redis.exceptions import RedisError
@@ -51,12 +52,10 @@ router = APIRouter(
 
 @router.get("/csrf-token", response_model=APIResponse)
 async def csrf_token(response: Response):
-    token = csrf_manager.set_csrf_cookie(response)
+    res: JSONResponse = APIResponse.ok(message="CSRF token 已生成")
 
-    return APIResponse.ok(
-        data={"csrf_token": token},
-        message="CSRF token 已生成",
-    )
+    csrf_manager.set_csrf_cookie(res)
+    return res
 
 
 # 速率限制器，限制登录接口每分钟最多5次请求
