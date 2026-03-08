@@ -324,6 +324,7 @@ async def get_articles(
     page: int = 1,
     limit: int = 20,
     feed_url: str | None = None,
+    search: str | None = Query(None, min_length=1),
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(manager),
 ):
@@ -340,8 +341,6 @@ async def get_articles(
             ).model_dump()
         )
 
-    query = RssArticle.find(In(RssArticle.feed_url, user_feed_urls))
-
     if feed_url is not None:
         if feed_url not in user_feed_urls:
             return APIResponse.ok(
@@ -350,15 +349,30 @@ async def get_articles(
                 ).model_dump()
             )
         query = RssArticle.find(RssArticle.feed_url == feed_url)
+    else:
+        query = RssArticle.find(In(RssArticle.feed_url, user_feed_urls))
+
+    if search is not None:
+        query = query.find({"$text": {"$search": search}})  # type: ignore
+        sort_criteria = [
+            ("score", {"$meta": "textScore"}),
+            "-published",
+            "-fetched_at",
+        ]
+    else:
+        sort_criteria = ["-published", "-fetched_at"]
 
     total = await query.count()
     skip = (page - 1) * limit
-    # sort by published date descending; fallback to fetched_at when published is missing
+
     articles = (
-        await query.sort("-published", "-fetched_at")
-        .skip(skip)
-        .limit(limit)
-        .to_list()
+        await query.sort(*sort_criteria).skip(skip).limit(limit).to_list()
+    )
+    total = await query.count()
+    skip = (page - 1) * limit
+
+    articles = (
+        await query.sort(*sort_criteria).skip(skip).limit(limit).to_list()
     )
 
     items = [

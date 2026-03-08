@@ -60,31 +60,40 @@ async def _get_categories_with_counts(
 @router.get("/blogs")
 async def get_blogs(
     page: int = 1,
+    search: str | None = Query(None, min_length=1),
     session: AsyncSession = Depends(get_session),
 ) -> JSONResponse:
     """Get paginated list of blog articles."""
     per_page = 10  # 每页文章数量
 
+    # 构建查询条件
+    query = Post.find_all()
+
+    if search is not None:
+        query = query.find({"$text": {"$search": search}})
+        # 搜索结果按相关性排序，然后置顶，然后时间
+        sort_criteria = [
+            ("score", {"$meta": "textScore"}),
+            ("is_pinned", SortDirection.DESCENDING),
+            ("created_at", SortDirection.DESCENDING),
+        ]
+    else:
+        # 无搜索时按置顶和时间排序
+        sort_criteria = [
+            ("is_pinned", SortDirection.DESCENDING),
+            ("created_at", SortDirection.DESCENDING),
+        ]
+
     # 1. Get total count
-    total = await Post.find().count()  # 使用 Beanie 的 count 方法获取总数
+    total = await query.count()  # 使用 Beanie 的 count 方法获取总数
 
     # 2. Calculate pagination
     skip = (page - 1) * per_page
     pages = (total + per_page - 1) // per_page if per_page > 0 else 0
 
     # 3. Fetch posts
-
     posts: list[Post] = (
-        await Post.find_all()
-        .sort(
-            [
-                ("is_pinned", SortDirection.DESCENDING),  # 先按是否置顶排序
-                ("created_at", SortDirection.DESCENDING),  # 再按创建时间排序
-            ]
-        )
-        .skip(skip)
-        .limit(per_page)
-        .to_list()
+        await query.sort(sort_criteria).skip(skip).limit(per_page).to_list()
     )
 
     # 4. Get categories

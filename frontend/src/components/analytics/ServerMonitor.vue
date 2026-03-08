@@ -207,7 +207,6 @@
 </template>
 
 <script setup lang="ts">
-import request from "@/request";
 import { useThemeStore } from "@/stores/theme";
 import dayjs from "dayjs";
 import { GaugeChart, LineChart } from "echarts/charts";
@@ -476,29 +475,29 @@ const historyChartOption = computed(() => ({
 }));
 
 // Fetch server status
-const fetchStatus = async () => {
-  try {
-    const res = await request.get("/monitor/status/server/status");
-    if (res.data.code === 200) {
-      serverStatus.value = res.data.data;
-      emit("status-update", res.data.data);
+// const fetchStatus = async () => {
+//   try {
+//     const res = await request.get("/monitor/status/server/status");
+//     if (res.data.code === 200) {
+//       serverStatus.value = res.data.data;
+//       emit("status-update", res.data.data);
 
-      // Add to history
-      history.value.push({
-        timestamp: new Date().toISOString(),
-        cpu: res.data.data.cpu_percent,
-        memory: res.data.data.mem_usage,
-      });
+//       // Add to history
+//       history.value.push({
+//         timestamp: new Date().toISOString(),
+//         cpu: res.data.data.cpu_percent,
+//         memory: res.data.data.mem_usage,
+//       });
 
-      // Keep only last 100 records (~8 minutes of data at 5s intervals)
-      if (history.value.length > 100) {
-        history.value = history.value.slice(-100);
-      }
-    }
-  } catch (err) {
-    console.error("Failed to fetch server status:", err);
-  }
-};
+//       // Keep only last 100 records (~8 minutes of data at 5s intervals)
+//       if (history.value.length > 100) {
+//         history.value = history.value.slice(-100);
+//       }
+//     }
+//   } catch (err) {
+//     console.error("Failed to fetch server status:", err);
+//   }
+// };
 
 const fetchStatusSSE = async () => {
   // Close existing connection if any
@@ -566,7 +565,6 @@ const toggleAutoRefresh = () => {
 
 // Expose methods for parent component
 defineExpose({
-  fetchStatus,
   toggleAutoRefresh,
 });
 

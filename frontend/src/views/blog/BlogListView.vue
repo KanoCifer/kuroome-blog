@@ -1,28 +1,75 @@
 <template>
   <div class="container mx-auto mt-24 min-h-dvh max-w-6xl px-4 py-8">
-    <div class="mb-6 flex items-center justify-between">
-      <h1 class="font-serif text-3xl font-bold text-shadow-md dark:text-white">
-        {{ activeCategory ? `Category: ${activeCategory}` : "Blog" }}
-      </h1>
-      <router-link
-        v-if="user.isAuthenticated"
-        to="/blog/new"
-        class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="mr-2 h-4 w-4"
-          viewBox="0 0 20 20"
-          fill="currentColor"
+    <div class="mb-6 flex flex-col gap-4">
+      <div class="flex items-center justify-between">
+        <h1 class="font-serif text-3xl font-bold text-shadow-md dark:text-white">
+          {{ activeCategory ? `Category: ${activeCategory}` : "Blog" }}
+        </h1>
+        <router-link
+          v-if="user.isAuthenticated"
+          to="/blog/new"
+          class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
         >
-          <path
-            fill-rule="evenodd"
-            d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-            clip-rule="evenodd"
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="mr-2 h-4 w-4"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          New Post
+        </router-link>
+      </div>
+
+      <!-- 搜索框 -->
+      <div class="max-w-3xs">
+        <div class="relative">
+          <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="h-5 w-5 text-gray-500 dark:text-gray-400"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+              />
+            </svg>
+          </div>
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="搜索文章标题和内容..."
+            class="block w-full rounded-xl border border-gray-300 bg-white py-3 pr-4 pl-10 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-blue-500"
+            @keyup.enter="handleSearch"
           />
-        </svg>
-        New Post
-      </router-link>
+          <button
+            v-if="searchQuery"
+            @click="clearSearch"
+            class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="h-5 w-5"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
     </div>
     <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_18rem]">
       <!-- Main Content -->
@@ -58,9 +105,7 @@
                 d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
               />
             </svg>
-            <p class="text-lg font-medium text-red-600 dark:text-red-400">
-              加载失败
-            </p>
+            <p class="text-lg font-medium text-red-600 dark:text-red-400">加载失败</p>
             <p class="mt-1 text-sm text-red-500">{{ errorMessage }}</p>
             <button
               class="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
@@ -89,9 +134,7 @@
                 d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
               />
             </svg>
-            <p class="text-lg font-medium text-gray-500">
-              No blog posts available.
-            </p>
+            <p class="text-lg font-medium text-gray-500">No blog posts available.</p>
             <p class="mt-1 text-sm text-gray-400">
               {{
                 activeCategory
@@ -188,12 +231,7 @@
                   title="Category"
                 >
                   <!-- tags icon -->
-                  <svg
-                    class="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -214,12 +252,7 @@
                 ]"
               >
                 阅读更多
-                <svg
-                  class="ml-1 h-3 w-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg class="ml-1 h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -233,10 +266,7 @@
         </div>
 
         <!-- Pagination -->
-        <nav
-          v-if="pagination && pagination.pages > 1"
-          class="mt-6 flex justify-center"
-        >
+        <nav v-if="pagination && pagination.pages > 1" class="mt-6 flex justify-center">
           <ul class="flex items-center gap-2">
             <!-- Previous Button -->
             <li>
@@ -340,14 +370,16 @@ import { useHead } from "@unhead/vue";
 import DOMPurify from "dompurify";
 import hljs from "highlight.js/lib/common";
 import { computed, nextTick, onMounted, ref, watch, watchEffect } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
+const router = useRouter();
 const posts = ref<Post[]>([]);
 const categories = ref<Category[]>([]);
 const pagination = ref<BlogPagination | null>(null);
 const isLoading = ref(false);
 const errorMessage = ref("");
+const searchQuery = ref<string>("");
 
 const user = ref({
   isAuthenticated: true,
@@ -368,11 +400,7 @@ const getVisiblePages = computed(() => {
   const visiblePages = [];
 
   // 显示当前页附近的页码
-  for (
-    let i = Math.max(2, current - 2);
-    i <= Math.min(totalPages - 1, current + 2);
-    i++
-  ) {
+  for (let i = Math.max(2, current - 2); i <= Math.min(totalPages - 1, current + 2); i++) {
     visiblePages.push(i);
   }
 
@@ -384,8 +412,14 @@ const fetchPosts = async (page: number = 1) => {
   errorMessage.value = "";
 
   try {
+    const params: Record<string, string | number> = { page };
+    if (route.query.search && typeof route.query.search === "string") {
+      params.search = route.query.search;
+      searchQuery.value = route.query.search;
+    }
+
     const res = await request.get<BlogsResponse>("/blogs", {
-      params: { page },
+      params,
     });
 
     if (res.data.status === "success") {
@@ -398,8 +432,7 @@ const fetchPosts = async (page: number = 1) => {
     }
   } catch (err: unknown) {
     console.error(err);
-    errorMessage.value =
-      err instanceof Error ? err.message : "加载文章列表失败，请稍后重试。";
+    errorMessage.value = err instanceof Error ? err.message : "加载文章列表失败，请稍后重试。";
     useNotificationStore().error(errorMessage.value);
   } finally {
     isLoading.value = false;
@@ -408,8 +441,29 @@ const fetchPosts = async (page: number = 1) => {
 
 const goToPage = (page: number) => {
   if (page >= 1 && pagination.value && page <= pagination.value.pages) {
-    fetchPosts(page);
+    // 保留搜索参数
+    const query = { ...route.query, page: page.toString(), search: searchQuery.value || undefined };
+    if (!searchQuery.value) {
+      delete query.search;
+    }
+    router.push({ query });
   }
+};
+
+const handleSearch = () => {
+  // 搜索时回到第一页
+  const query = { ...route.query, page: "1", search: searchQuery.value || undefined };
+  if (searchQuery.value) {
+    query.search = searchQuery.value;
+  } else {
+    delete query.search;
+  }
+  router.push({ query });
+};
+
+const clearSearch = () => {
+  searchQuery.value = "";
+  handleSearch();
 };
 
 onMounted(() => {
@@ -427,6 +481,18 @@ watch(
     if (!isNaN(pageNum) && pageNum !== currentPage.value) {
       fetchPosts(pageNum);
     }
+  },
+);
+
+watch(
+  () => route.query.search,
+  (newSearch) => {
+    if (typeof newSearch === "string") {
+      searchQuery.value = newSearch;
+    } else {
+      searchQuery.value = "";
+    }
+    fetchPosts(1);
   },
 );
 
@@ -502,13 +568,23 @@ const getPreviewHtml = (html: string) => {
 const handleFilterPosts = (filteredPosts: Post[], categoryName: string) => {
   posts.value = filteredPosts;
   activeCategory.value = categoryName;
+  searchQuery.value = "";
   pagination.value = null; // 分类过滤结果不分页
+  // 清除URL中的search参数
+  const query = { ...route.query };
+  delete query.search;
+  router.push({ query });
 };
 
 // 重置过滤
 const handleResetFilter = () => {
   activeCategory.value = null;
-  fetchPosts(1); // 重新获取全部文章
+  searchQuery.value = "";
+  // 清除URL中的search和category参数
+  const query = { ...route.query };
+  delete query.category;
+  delete query.search;
+  router.push({ query });
 };
 </script>
 <style scoped>

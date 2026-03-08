@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime
-from typing import ClassVar
+from datetime import UTC, datetime, timedelta
+from typing import Annotated, ClassVar
 
+import pymongo
 from beanie import Document, Indexed, PydanticObjectId
 from pydantic import BaseModel, ConfigDict, Field
 from pymongo import ASCENDING, DESCENDING, IndexModel
@@ -26,6 +27,11 @@ class Comment(BaseModel):
         populate_by_name=True,
         arbitrary_types_allowed=True,
     )
+    bson_encoders: ClassVar[dict] = {PydanticObjectId: str}
+
+    class Settings:
+        use_cache = True
+        cache_expiration_time = timedelta(seconds=10)
 
 
 class Post(Document):
@@ -41,11 +47,14 @@ class Post(Document):
 
     class Settings:
         name = "posts"
+        use_cache = True
+        cache_expiration_time = timedelta(seconds=10)
         indexes: ClassVar[list] = [
             IndexModel(
                 [("is_pinned", DESCENDING), ("created_at", DESCENDING)]
             ),
             IndexModel([("category_id", ASCENDING)]),
+            IndexModel([("title", pymongo.TEXT), ("body", pymongo.TEXT)]),
         ]
         # 关键配置：告诉 Pydantic 如何序列化 ObjectId
         bson_encoders: ClassVar[dict] = {PydanticObjectId: str}
@@ -57,14 +66,16 @@ class Post(Document):
 class MessageBoard(Document):
     """Message board document model."""
 
-    name: Indexed(str)  # type: ignore
-    message: str
+    name: Annotated[str, Indexed()]
+    message: Annotated[str, Indexed()]
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
-    review: int = 0  # 0: pending, 1: approved
+    review: int = 0
     from_admin: bool = False
 
     class Settings:
         name = "message_board"
+        use_cache = True
+        cache_expiration_time = timedelta(seconds=10)
         indexes: ClassVar[list] = [
             IndexModel([("review", ASCENDING)]),
             IndexModel([("created_at", DESCENDING)]),
@@ -82,6 +93,8 @@ class RssFeed(Document):
 
     class Settings:
         name = "rss_feeds"
+        use_cache = True
+        cache_expiration_time = timedelta(seconds=10)
         indexes: ClassVar[list] = [
             IndexModel([("created_at", DESCENDING)]),
         ]
@@ -92,7 +105,7 @@ class RssArticle(Document):
 
     guid: str
     feed_url: str
-    title: str = ""
+    title: str = ""  # type: ignore
     link: str = ""
     summary: str = ""
     content: str = ""
@@ -103,11 +116,14 @@ class RssArticle(Document):
 
     class Settings:
         name = "rss_articles"
+        use_cache = True
+        cache_expiration_time = timedelta(seconds=10)
         indexes: ClassVar[list] = [
             IndexModel(
                 [("feed_url", ASCENDING), ("guid", ASCENDING)], unique=True
             ),
             IndexModel([("feed_url", ASCENDING), ("fetched_at", DESCENDING)]),
+            IndexModel([("title", pymongo.TEXT), ("content", pymongo.TEXT)]),
         ]
         bson_encoders: ClassVar[dict] = {PydanticObjectId: str}
         model_config = ConfigDict(arbitrary_types_allowed=True)

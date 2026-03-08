@@ -6,12 +6,9 @@
 
 from __future__ import annotations
 
-import os
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from pathlib import Path
 
-from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -19,20 +16,9 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
 
-# 加载环境变量
-dotenv_path: Path = Path(__file__).resolve().parent.parent.parent / ".env"
-if dotenv_path.exists():
-    load_dotenv(dotenv_path)
+from app.configs.config import settings
 
-
-def print_path_info():
-    print(f"Current file path: {Path(__file__).resolve()}")
-    print(f"Parent directory: {Path(__file__).resolve().parent}")
-    print(f"Grandparent directory: {Path(__file__).resolve().parent.parent}")
-    print(f".env file path: {dotenv_path}")
-
-
-database_url: str | None = os.getenv("DATABASE_URL")
+database_url: str | None = settings.DATABASE_URL
 
 if not database_url:
     raise RuntimeError("DATABASE_URL environment variable is not set.")
@@ -87,7 +73,10 @@ async def get_session() -> AsyncGenerator[AsyncSession]:
     session = AsyncSessionFactory(bind=async_engine)
     try:
         yield session
-
+        await session.commit()
+    except Exception:
+        await session.rollback()
+        raise
     finally:
         await session.close()
 
@@ -98,7 +87,3 @@ async def close_db_connections() -> None:
     Call this during application shutdown.
     """
     await async_engine.dispose()
-
-
-if __name__ == "__main__":
-    print_path_info()

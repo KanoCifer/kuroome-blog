@@ -1,5 +1,15 @@
 [
   {
+    "version": "2.2.9",
+    "date": "2026-03-08",
+    "title": "新增内容搜索功能",
+    "changes": [
+      { "type": "feat", "content": "新增内容搜索功能，支持文章和Rss源搜索" },
+      { "type": "fix", "content": "修复了一些小的UI问题和功能bug" },
+      { "type": "feat", "content": "完善网站安全机制，新增refresh token机制" }
+    ]
+  },
+  {
     "version": "2.2.8",
     "date": "2026-03-08",
     "title": "修复了一些bugs",

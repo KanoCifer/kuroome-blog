@@ -60,6 +60,57 @@
         </router-link>
       </div>
 
+      <!-- 搜索框 -->
+      <div class="mb-6">
+        <div class="relative">
+          <div
+            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="h-5 w-5 text-blue-500 dark:text-blue-400"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+              />
+            </svg>
+          </div>
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="搜索文章标题和内容..."
+            class="block w-full rounded-xl border border-blue-200 bg-white py-3 pr-4 pl-10 text-sm text-blue-900 placeholder:text-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-blue-500"
+            @keyup.enter="handleSearch"
+          />
+          <button
+            v-if="searchQuery"
+            @click="clearSearch"
+            class="absolute inset-y-0 right-0 flex items-center pr-3 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="h-5 w-5"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+
       <!-- 加载中 -->
       <div v-if="isLoading" class="space-y-4">
         <div
@@ -210,6 +261,7 @@ const currentPage = ref<number>(1);
 const isLoading = ref<boolean>(false);
 const errorMessage = ref<string>("");
 const notifier = useNotificationStore();
+const searchQuery = ref<string>("");
 
 const totalPages = computed(() => Math.ceil(totalItems.value / limit.value));
 
@@ -223,6 +275,10 @@ const fetchArticles = async (page: number) => {
     };
     if (route.query.feed_url && typeof route.query.feed_url === "string") {
       params.feed_url = route.query.feed_url;
+    }
+    if (route.query.search && typeof route.query.search === "string") {
+      params.search = route.query.search;
+      searchQuery.value = route.query.search;
     }
 
     const res = await request.get<ApiResponse<RssArticleListResponse>>(
@@ -262,6 +318,21 @@ const goToPage = (page: number) => {
   }
 };
 
+const handleSearch = () => {
+  router.push({
+    query: {
+      ...route.query,
+      page: "1",
+      search: searchQuery.value || undefined,
+    },
+  });
+};
+
+const clearSearch = () => {
+  searchQuery.value = "";
+  handleSearch();
+};
+
 onMounted(() => {
   const pageParam = parseInt(route.query.page as string, 10);
   fetchArticles(isNaN(pageParam) || pageParam < 1 ? 1 : pageParam);
@@ -280,6 +351,18 @@ watch(
 watch(
   () => route.query.feed_url,
   () => {
+    fetchArticles(1);
+  },
+);
+
+watch(
+  () => route.query.search,
+  (newSearch) => {
+    if (typeof newSearch === "string") {
+      searchQuery.value = newSearch;
+    } else {
+      searchQuery.value = "";
+    }
     fetchArticles(1);
   },
 );

@@ -1,17 +1,3 @@
-"""Authentication router for FastAPI.
-
-This module provides authentication endpoints migrated from
-backend/watchlist/api/auth.py to FastAPI.
-
-Endpoints:
-    - POST /api/auth/login - Login with username/password
-    - POST /api/auth/logout - Logout current user
-    - GET /api/auth/me - Get current user info
-    - GET /api/auth/csrf-token - Get CSRF token
-    - POST /api/auth/register - Register new user
-    - POST /api/auth/email/code - Send email verification code
-"""
-
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
@@ -20,6 +6,7 @@ from email_validator import EmailNotValidError, validate_email
 from fastapi import (
     APIRouter,
     BackgroundTasks,
+    Cookie,
     Depends,
     Request,
     Response,
@@ -58,12 +45,70 @@ async def csrf_token(response: Response):
     return res
 
 
-# 速率限制器，限制登录接口每分钟最多5次请求
+@router.post("/refresh-token")
+async def refresh_token(
+    refresh_token: str = Cookie(None),
+):
+    """刷新访问令牌.
+
+    Args:
+        refresh_token: 刷新令牌(从Cookie中读取)
+
+    Returns:
+        API响应包含新的访问令牌
+    """
+    if not refresh_token:
+        return APIResponse.error(
+            message="刷新令牌不存在",
+            code=status.HTTP_401_UNAUTHORIZED,
+        )
+
+    try:
+        # 验证refresh token并获取用户
+        user = await manager.get_current_user(refresh_token)
+        if user is None:
+            return APIResponse.error(
+                message="用户不存在",
+                code=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        # 生成新的access token
+        access_token = manager.create_access_token(
+            data={"sub": str(user.id)}, expires=timedelta(hours=12)
+        )
+
+        # 生成新的refresh token（滚动刷新策略，提升安全性）
+        new_refresh_token = manager.create_access_token(
+            data={"sub": str(user.id)}, expires=timedelta(days=30)
+        )
+
+        response = APIResponse.ok(
+            message="访问令牌已刷新",
+            code=status.HTTP_200_OK,
+        )
+        manager.set_cookie(response=response, token=access_token)
+        # 更新refresh token cookie
+        response.set_cookie(
+            key="refresh_token",
+            value=new_refresh_token,
+            httponly=True,
+            samesite="lax",
+            secure=True,
+        )
+        csrf_manager.set_csrf_cookie(response)
+
+        return response
+    except Exception as e:
+        logger.error(f"刷新令牌验证失败: {e!s}")
+        return APIResponse.error(
+            message="无效的刷新令牌或已过期",
+            code=status.HTTP_401_UNAUTHORIZED,
+        )
 
 
 # 用户登录、注册和邮箱验证码相关接口
 @router.post("/login", response_model=APIResponse)
-@limiter.limit("5/minute")
+@limiter.limit(limit_value="5/minute")
 async def login(
     request: Request,
     data: LoginIn,
@@ -103,9 +148,15 @@ async def login(
         access_token = manager.create_access_token(
             data={"sub": str(user.id)}, expires=timedelta(days=7)
         )
+        refresh_token = manager.create_access_token(
+            data={"sub": str(user.id)}, expires=timedelta(days=30)
+        )
     else:
         access_token = manager.create_access_token(
             data={"sub": str(user.id)}, expires=timedelta(hours=12)
+        )
+        refresh_token = manager.create_access_token(
+            data={"sub": str(user.id)}, expires=timedelta(days=7)
         )
 
     # Track login info
@@ -135,6 +186,13 @@ async def login(
     )
 
     manager.set_cookie(response=response, token=access_token)
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        samesite="lax",
+        secure=True,
+    )
     csrf_manager.set_csrf_cookie(response)
 
     return response

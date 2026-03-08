@@ -5,12 +5,17 @@ from functools import lru_cache
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+def get_env_file_path() -> str:
+    """Get the absolute path to .env file."""
+    from pathlib import Path
+
+    return str(Path(__file__).resolve().parent.parent / ".env")
+
+
 class Settings(BaseSettings):
-    # 在这里定义变量，类型会自动校验
-    DATABASE_URI: str = ""
+    DATABASE_URL: str = ""
     SECRET_KEY: str = ""
     MONGO_URI: str = ""
-    # 👇 新增：把报错里提到的这四个字段加进来
     MAIL_USERNAME: str = ""
     MAIL_PASSWORD: str = ""
     API_VERSION: str = "2.0.0"
@@ -20,9 +25,9 @@ class Settings(BaseSettings):
     CSRF_COOKIE_SECURE: bool = True
 
     model_config = SettingsConfigDict(
-        env_file=".env",  # 指定环境变量文件路径
-        env_file_encoding="utf-8",  # 指定环境变量文件编码
-        extra="ignore",  # 允许额外的环境变量而不报错
+        env_file=get_env_file_path(),
+        env_file_encoding="utf-8",
+        extra="ignore",
     )
 
 
