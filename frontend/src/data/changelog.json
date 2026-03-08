@@ -1,5 +1,11 @@
 [
   {
+    "version": "2.2.8",
+    "date": "2026-03-08",
+    "title": "修复了一些bugs",
+    "changes": [{ "type": "fix", "content": "修复了一些小的UI问题和功能bug" }]
+  },
+  {
     "version": "2.2.7",
     "date": "2026-03-07",
     "title": "新增AI总结功能",

@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import asyncio
+import json
 from datetime import UTC, datetime, timedelta
 
 import psutil
 from fastapi import APIRouter, Depends, Query
+from fastapi.responses import StreamingResponse
 from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -290,4 +293,45 @@ async def get_server_status(current_user: User = Depends(get_admin_user)):
             "disk_usage": disk_usage,
         },
         message="Server status retrieved successfully",
+    )
+
+
+@router.get("/server/status/stream")
+async def get_server_status_stream(
+    current_user: User = Depends(get_admin_user),
+):
+    """流式返回服务器状态信息"""
+
+    async def generate():
+        while True:
+            # 获取Cpu信息
+            cpu_percent = psutil.cpu_percent(interval=1)
+            cpu_cores = psutil.cpu_count(logical=True)
+            # 获取内存信息
+            mem = psutil.virtual_memory()
+            mem_total = round(mem.total / 1024 / 1024)  # 总内存(MB)
+            mem_used = round(mem.used / 1024 / 1024)  # 已用内存(MB)
+            mem_usage = round(mem.percent, 2)  # 内存使用率(%)
+
+            # 3. 获取磁盘信息（取根目录/）
+            disk = psutil.disk_usage("/")
+            disk_total = round(
+                disk.total / 1024 / 1024 / 1024, 2
+            )  # 总磁盘(GB)
+            disk_used = round(
+                disk.used / 1024 / 1024 / 1024, 2
+            )  # 已用磁盘(GB)
+            disk_usage = round(disk.percent, 2)  # 磁盘使用率(%)
+
+            yield f"data: {json.dumps({'cpu_percent': cpu_percent, 'cpu_cores': cpu_cores, 'mem_total': mem_total, 'mem_used': mem_used, 'mem_usage': mem_usage, 'disk_total': disk_total, 'disk_used': disk_used, 'disk_usage': disk_usage})}\n\n"
+            await asyncio.sleep(5)  # 每5秒发送一次数据
+
+    return StreamingResponse(
+        generate(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
     )

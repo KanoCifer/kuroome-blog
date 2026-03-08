@@ -1,7 +1,8 @@
 <template>
   <div class="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800/80">
     <h2 class="mb-4 text-lg font-bold text-gray-800 dark:text-gray-100">
-      <icon-analytics class="inline-block size-6" /> Operating System Distribution
+      <icon-analytics class="inline-block size-6" /> Operating System
+      Distribution
     </h2>
     <div
       v-if="loading && !osStats"

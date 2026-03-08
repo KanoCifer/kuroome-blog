@@ -14,7 +14,12 @@ import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
-import { Table, TableCell, TableHeader, TableRow } from "@tiptap/extension-table";
+import {
+  Table,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "@tiptap/extension-table";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import TextAlign from "@tiptap/extension-text-align";
@@ -330,7 +335,11 @@ onBeforeUnmount(() => {
         stroke-width="2"
         stroke="currentColor"
       >
-        <path stroke-linecap="round" stroke-linejoin="round" d="M4 8h16M4 16h16" />
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M4 8h16M4 16h16"
+        />
       </svg>
     </drag-handle>
     <EditorContent :editor="editor" />
@@ -390,7 +399,13 @@ onBeforeUnmount(() => {
         ]"
         title="斜体"
       >
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <svg
+          class="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -406,7 +421,13 @@ onBeforeUnmount(() => {
         title="Code Block"
         class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
       >
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <svg
+          class="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -426,7 +447,13 @@ onBeforeUnmount(() => {
         ]"
         title="插入链接"
       >
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <svg
+          class="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"

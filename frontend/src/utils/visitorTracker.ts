@@ -19,7 +19,7 @@ export function collectVisitorData() {
   const { navigator, screen, location } = window;
   const uaParser = new UAParser();
   const uaResult = uaParser.getResult();
-  console.log("UA解析结果:", uaResult); // 调试输出UA解析结果
+  // console.log("UA解析结果:", uaResult); // 调试输出UA解析结果
   return {
     visitor_id: getVisitorId(), // 访客唯一标识
     page_url: location.href, // 当前访问的完整URL

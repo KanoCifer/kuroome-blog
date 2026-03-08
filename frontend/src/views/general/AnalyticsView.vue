@@ -280,7 +280,10 @@
     <!-- Device & Browser Analytics Section -->
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
       <OsCharts :loading="loading" :os-stats="overviewData?.os_stats ?? []" />
-      <BrowserAnalytics :loading="loading" :browser-stats="overviewData?.browser_stats ?? []" />
+      <BrowserAnalytics
+        :loading="loading"
+        :browser-stats="overviewData?.browser_stats ?? []"
+      />
     </div>
 
     <!-- Server Monitoring Section -->
@@ -460,7 +463,11 @@ interface OverviewData {
   unique_visitors: number;
   unique_visitor_ids: number;
   top_pages: { page_path: string; count: number }[];
-  browser_stats: { browser_name: string; browser_version: string; count: number }[];
+  browser_stats: {
+    browser_name: string;
+    browser_version: string;
+    count: number;
+  }[];
   os_stats: { os_name: string; count: number }[];
   daily_trend: { date: string; count: number }[];
   period_days: number;

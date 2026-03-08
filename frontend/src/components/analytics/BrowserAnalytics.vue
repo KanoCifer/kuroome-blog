@@ -48,7 +48,28 @@ interface Props {
 const props = defineProps<Props>();
 
 const browserChartOption = computed(() => {
-  const data = props.browserStats ?? [];
+  const rawData = props.browserStats ?? [];
+
+  // 按访问量降序排序，取前9个，其余合并为Others（总共最多10项）
+  const sortedData = [...rawData].sort((a, b) => b.count - a.count);
+  let processedData: BrowserStat[] = [];
+
+  if (sortedData.length <= 10) {
+    processedData = sortedData;
+  } else {
+    const top9 = sortedData.slice(0, 9);
+    const othersCount = sortedData
+      .slice(9)
+      .reduce((sum, item) => sum + item.count, 0);
+    processedData = [
+      ...top9,
+      {
+        browser_name: "Others",
+        browser_version: "",
+        count: othersCount,
+      },
+    ];
+  }
 
   const colorPalette = [
     "#3b82f6", // Chrome 蓝
@@ -105,9 +126,11 @@ const browserChartOption = computed(() => {
         labelLine: {
           show: false,
         },
-        data: data.map((item, index) => ({
+        data: processedData.map((item, index) => ({
           value: item.count,
-          name: item.browser_name ? `${item.browser_name} ${item.browser_version || ''}`.trim() : "Unknown",
+          name: item.browser_name
+            ? `${item.browser_name} ${item.browser_version || ""}`.trim()
+            : "Unknown",
           itemStyle: {
             color: colorPalette[index % colorPalette.length],
           },

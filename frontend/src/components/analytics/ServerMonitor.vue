@@ -26,19 +26,19 @@
         >
           <div
             :class="[
-              refreshInterval
+              isSSEConnected
                 ? 'h-2 w-2 animate-pulse rounded-full bg-green-500'
                 : 'h-2 w-2 rounded-full bg-gray-400',
             ]"
           ></div>
-          {{ refreshInterval ? "Auto-refresh active" : "Auto-refresh paused" }}
+          {{ isSSEConnected ? "Auto-refresh active" : "Auto-refresh paused" }}
         </div>
         <button
           type="button"
           @click="toggleAutoRefresh"
           class="rounded-xl bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
         >
-          {{ refreshInterval ? "Pause" : "Start" }} Auto-refresh
+          {{ isSSEConnected ? "Pause" : "Start" }} Auto-refresh
         </button>
       </div>
     </div>
@@ -266,7 +266,8 @@ const emit = defineEmits<{
 const loading = ref(false);
 const serverStatus = ref<ServerStatus | null>(null);
 const history = ref<HistoryItem[]>([]);
-let refreshInterval: number | null = null;
+const eventSource = ref<EventSource | null>(null);
+const isSSEConnected = ref(false);
 
 // theme store for dark/light detection
 const themeStore = useThemeStore();
@@ -477,7 +478,7 @@ const historyChartOption = computed(() => ({
 // Fetch server status
 const fetchStatus = async () => {
   try {
-    const res = await request.get("/status/server/status");
+    const res = await request.get("/monitor/status/server/status");
     if (res.data.code === 200) {
       serverStatus.value = res.data.data;
       emit("status-update", res.data.data);
@@ -489,7 +490,7 @@ const fetchStatus = async () => {
         memory: res.data.data.mem_usage,
       });
 
-      // Keep only last 100 records (5 minutes of data at 3s intervals)
+      // Keep only last 100 records (~8 minutes of data at 5s intervals)
       if (history.value.length > 100) {
         history.value = history.value.slice(-100);
       }
@@ -499,16 +500,67 @@ const fetchStatus = async () => {
   }
 };
 
+const fetchStatusSSE = async () => {
+  // Close existing connection if any
+  if (eventSource.value) {
+    eventSource.value.close();
+    eventSource.value = null;
+  }
+
+  console.log("Establishing SSE connection for server status...");
+  try {
+    const es = new EventSource("/api/v1/status/server/status/stream", {
+      withCredentials: true,
+    });
+
+    es.onopen = () => {
+      console.log("SSE connection established");
+      isSSEConnected.value = true;
+    };
+
+    es.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      serverStatus.value = data;
+      emit("status-update", data);
+
+      // Add to history
+      history.value.push({
+        timestamp: new Date().toISOString(),
+        cpu: data.cpu_percent,
+        memory: data.mem_usage,
+      });
+
+      // Keep only last 100 records (~8 minutes of data at 5s intervals)
+      if (history.value.length > 100) {
+        history.value = history.value.slice(-100);
+      }
+    };
+
+    es.onerror = (err) => {
+      console.error("SSE error:", err);
+      es.close();
+      eventSource.value = null;
+      isSSEConnected.value = false;
+    };
+
+    eventSource.value = es;
+  } catch (err) {
+    console.error("Failed to establish SSE connection:", err);
+    isSSEConnected.value = false;
+  }
+};
+
 // Toggle auto refresh
 const toggleAutoRefresh = () => {
-  if (refreshInterval) {
-    clearInterval(refreshInterval);
-    refreshInterval = null;
+  if (isSSEConnected.value && eventSource.value) {
+    // Pause: close connection
+    eventSource.value.close();
+    eventSource.value = null;
+    isSSEConnected.value = false;
+    console.log("SSE connection closed");
   } else {
-    fetchStatus();
-    refreshInterval = window.setInterval(() => {
-      fetchStatus();
-    }, 3000);
+    // Start: establish new connection
+    fetchStatusSSE();
   }
 };
 
@@ -526,8 +578,11 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  if (refreshInterval) {
-    clearInterval(refreshInterval);
+  // Clean up SSE connection when component is destroyed
+  if (eventSource.value) {
+    eventSource.value.close();
+    eventSource.value = null;
+    isSSEConnected.value = false;
   }
 });
 </script>
