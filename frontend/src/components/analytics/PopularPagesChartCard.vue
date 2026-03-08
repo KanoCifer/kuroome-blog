@@ -1,8 +1,7 @@
 <template>
   <div class="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800/80">
     <h2 class="mb-4 text-lg font-bold text-gray-800 dark:text-gray-100">
-      <icon-popular class="inline-block size-6 dark:text-gray-50" /> Popular
-      Pages
+      <icon-popular class="inline-block size-6 dark:text-gray-50" /> Popular Pages
     </h2>
     <div
       v-if="loading && !overviewData"
@@ -28,32 +27,16 @@ import { CanvasRenderer } from "echarts/renderers";
 import { computed } from "vue";
 import VChart from "vue-echarts";
 
-use([
-  CanvasRenderer,
-  BarChart,
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent,
-  GridComponent,
-]);
-
-interface DailyTrend {
-  date: string;
-  count: number;
-}
-
-interface TopPage {
-  page_path: string;
-  count: number;
-}
+use([CanvasRenderer, BarChart, TitleComponent, TooltipComponent, LegendComponent, GridComponent]);
 
 interface OverviewData {
   total_visits: number;
   unique_visitors: number;
   unique_visitor_ids: number;
-  top_pages: TopPage[];
-  browser_stats: { browser: string; count: number }[];
-  daily_trend: DailyTrend[];
+  top_pages: { page_path: string; count: number }[];
+  browser_stats: { browser_name: string; browser_version: string; count: number }[];
+  os_stats: { os_name: string; count: number }[];
+  daily_trend: { date: string; count: number }[];
   period_days: number;
 }
 

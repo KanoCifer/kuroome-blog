@@ -421,7 +421,5 @@ async def track_visitor(
         await redis.rpush("migration_queue", json.dumps(data))
         return Response(status_code=204)
     except Exception as e:
-        return APIResponse.error(
-            message=f"Failed to track visitor data: {e!s}",
-            code=500,
-        )
+        logger.error(f"Failed to track visitor data: {e!s}")
+        return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)

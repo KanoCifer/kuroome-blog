@@ -4,7 +4,7 @@ from datetime import UTC, datetime, timedelta
 
 import psutil
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy import func, select
+from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies.database import get_session
@@ -70,20 +70,39 @@ async def get_overview(
     ]
 
     # 5. Browser stats
+    count_expr = func.count(VisitorTrack.id).label("count")
     result = await session.execute(
         select(
-            VisitorTrack.browser,
+            VisitorTrack.browser_name,
+            VisitorTrack.browser_version,
+            count_expr,
+        )
+        .where(VisitorTrack.visit_time >= start_time)
+        .group_by(VisitorTrack.browser_name, VisitorTrack.browser_version)
+        .order_by(desc("count"))
+    )
+    browser_stats = [
+        {"browser_name": row[0], "browser_version": row[1], "count": row[2]}
+        for row in result.fetchall()
+    ]
+
+    # OS stats
+    result = await session.execute(
+        select(
+            VisitorTrack.os_name,
+            VisitorTrack.os_version,
             func.count(VisitorTrack.id).label("count"),
         )
         .where(VisitorTrack.visit_time >= start_time)
-        .group_by(VisitorTrack.browser)
+        .group_by(VisitorTrack.os_name, VisitorTrack.os_version)
         .order_by(func.count(VisitorTrack.id).desc())
     )
-    browser_stats = [
-        {"browser": row[0], "count": row[1]} for row in result.fetchall()
+    os_stats = [
+        {"os_name": row[0], "os_version": row[1], "count": row[2]}
+        for row in result.fetchall()
     ]
 
-    # 6. Daily trend
+    # Daily trend
     result = await session.execute(
         select(
             func.date(VisitorTrack.visit_time).label("date"),
@@ -104,6 +123,7 @@ async def get_overview(
             "unique_visitor_ids": unique_visitor_ids,
             "top_pages": top_pages,
             "browser_stats": browser_stats,
+            "os_stats": os_stats,
             "daily_trend": daily_trend,
             "period_days": days,
         },

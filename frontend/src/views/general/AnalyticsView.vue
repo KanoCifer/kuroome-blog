@@ -277,6 +277,12 @@
       <PopularPagesChartCard :loading="loading" :overview-data="overviewData" />
     </div>
 
+    <!-- Device & Browser Analytics Section -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <OsCharts :loading="loading" :os-stats="overviewData?.os_stats ?? []" />
+      <BrowserAnalytics :loading="loading" :browser-stats="overviewData?.browser_stats ?? []" />
+    </div>
+
     <!-- Server Monitoring Section -->
     <ServerMonitor ref="serverMonitorRef" :auto-start="true" />
 
@@ -438,6 +444,8 @@
 import AreaChart from "@/components/analytics/AreaChart.vue";
 import PopularPagesChartCard from "@/components/analytics/PopularPagesChartCard.vue";
 import ServerMonitor from "@/components/analytics/ServerMonitor.vue";
+import OsCharts from "@/components/analytics/OsCharts.vue";
+import BrowserAnalytics from "@/components/analytics/BrowserAnalytics.vue";
 import IconAnalytics from "@/components/icons/IconAnalytics.vue";
 import IconUser from "@/components/icons/IconUser.vue";
 import request from "@/request";
@@ -452,7 +460,8 @@ interface OverviewData {
   unique_visitors: number;
   unique_visitor_ids: number;
   top_pages: { page_path: string; count: number }[];
-  browser_stats: { browser: string; count: number }[];
+  browser_stats: { browser_name: string; browser_version: string; count: number }[];
+  os_stats: { os_name: string; count: number }[];
   daily_trend: { date: string; count: number }[];
   period_days: number;
 }

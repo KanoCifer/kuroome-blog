@@ -1,6 +1,7 @@
 import asyncio
 import json
 from datetime import UTC, datetime
+from itertools import repeat
 
 import feedparser
 from sqlalchemy import select
@@ -23,7 +24,7 @@ async def run_migration_job():
             pipe = redis.pipeline()
 
             # 批量执行 POP
-            for _ in range(batch_size):
+            for _ in repeat(None, batch_size):
                 pipe.lpop(queue_key)
 
             # 执行并获取结果
@@ -40,7 +41,6 @@ async def run_migration_job():
             try:
                 parsed_data_list = [json.loads(item) for item in valid_items]
             except json.JSONDecodeError:
-                # 注意：生产环境这里需要把解析失败的脏数据单独处理，不要丢回主队列
                 logger.warning("Error parsing JSON data. Skipping batch.")
                 return
 
@@ -59,10 +59,7 @@ async def run_migration_job():
                     VisitorTrack(**data) for data in parsed_data_list
                 ]
 
-                # 批量添加
                 session.add_all(track_objects)
-
-                # 仅提交一次！
                 await session.commit()
 
                 processed_count = len(track_objects)

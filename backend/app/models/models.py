@@ -8,6 +8,7 @@ from sqlalchemy import (
     Boolean,
     DateTime,
     ForeignKey,
+    Index,
     Integer,
     String,
     Text,
@@ -255,6 +256,28 @@ class VisitorTrack(Base):
     ip_address: Mapped[str] = mapped_column(String(100), index=True)
     visit_time: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC), index=True
+    )
+    browser_name: Mapped[str] = mapped_column(String(255), nullable=True)
+    browser_version: Mapped[str] = mapped_column(String(255), nullable=True)
+    os_name: Mapped[str] = mapped_column(String(255), nullable=True)
+    os_version: Mapped[str] = mapped_column(String(255), nullable=True)
+    cpu: Mapped[str] = mapped_column(String(255), nullable=True)
+    device_type: Mapped[str] = mapped_column(String(255), nullable=True)
+
+    # 联合索引：覆盖查询条件 + 分组字段
+    __table_args__ = (
+        Index(
+            "idx_visit_browser_stats",
+            "visit_time",
+            "browser_name",
+            "browser_version",
+        ),
+        Index(
+            "idx_visit_os_stats",
+            "visit_time",
+            "os_name",
+            "os_version",
+        ),
     )
 
     def __init__(self, **kwargs):
