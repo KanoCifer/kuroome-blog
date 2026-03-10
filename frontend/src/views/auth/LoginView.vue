@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import request from "@/request";
 import { useAuthStore } from "@/stores/auth";
+import { useNotificationStore } from "@/stores/notification";
 import type { LoginForm } from "@/types";
+import { startAuthentication } from "@simplewebauthn/browser";
 import { ref } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
-
 const router = useRouter();
 const route = useRoute();
 const auth = useAuthStore();
@@ -17,9 +19,11 @@ const form = ref<LoginForm>({
 const errors = ref<{
   username?: string;
   password?: string;
+  passkey?: string;
 }>({});
 
 const isSubmitting = ref(false);
+const isPasskeySubmitting = ref(false);
 const showPassword = ref(false);
 
 // 处理登录表单提交
@@ -28,11 +32,7 @@ const handleSubmit = async () => {
   isSubmitting.value = true;
 
   try {
-    await auth.login(
-      form.value.username,
-      form.value.password,
-      form.value.rememberMe,
-    );
+    await auth.login(form.value.username, form.value.password, form.value.rememberMe);
     const redirect = (route.query.redirect as string) || "/";
     router.push(redirect);
   } catch (err: unknown) {
@@ -43,6 +43,39 @@ const handleSubmit = async () => {
     }
   } finally {
     isSubmitting.value = false;
+  }
+};
+
+// Passkey 登录
+const handlePasskeyLogin = async () => {
+  errors.value = {};
+  isPasskeySubmitting.value = true;
+
+  try {
+    // 获取认证选项
+    const optionsRes = await request.get("/auth/passkey/authentication-options");
+    const options = optionsRes.data.data;
+
+    // 调用浏览器 Passkey 认证
+    const assertion = await startAuthentication(options);
+
+    // 提交认证结果
+    await request.post("/auth/passkey/authenticate", {
+      response: assertion,
+    });
+
+    // 登录成功，更新用户信息
+    const notification = useNotificationStore();
+    notification.success("Passkey 登录成功！欢迎回来！");
+    await auth.fetchUser();
+    const redirect = (route.query.redirect as string) || "/";
+    router.push(redirect);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      errors.value.passkey = err.message;
+    }
+  } finally {
+    isPasskeySubmitting.value = false;
   }
 };
 </script>
@@ -72,9 +105,7 @@ const handleSubmit = async () => {
         </svg>
         Login
       </p>
-      <p
-        class="mb-12 text-center font-serif text-gray-500 italic dark:text-gray-400"
-      >
+      <p class="mb-12 text-center font-serif text-gray-500 italic dark:text-gray-400">
         Welcome back! Please enter your credentials to log in.
       </p>
       <!-- 登录表单 -->
@@ -88,17 +119,13 @@ const handleSubmit = async () => {
             placeholder="用户名"
             class="form-control my-4 w-full rounded-xl border border-gray-300 bg-gray-100/50 px-4 py-2 text-gray-900 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
           />
-          <span
-            v-if="errors.username"
-            class="mt-1 block text-sm text-red-600 dark:text-red-400"
-            >{{ errors.username }}</span
-          >
+          <span v-if="errors.username" class="mt-1 block text-sm text-red-600 dark:text-red-400">{{
+            errors.username
+          }}</span>
         </div>
 
         <!-- 密码 -->
-        <div
-          class="relative mt-4 transition-transform duration-200 focus-within:scale-[1.01]"
-        >
+        <div class="relative mt-4 transition-transform duration-200 focus-within:scale-[1.01]">
           <input
             v-model="form.password"
             :type="showPassword ? 'text' : 'password'"
@@ -148,11 +175,9 @@ const handleSubmit = async () => {
             </svg>
           </button>
 
-          <span
-            v-if="errors.password"
-            class="mt-1 block text-sm text-red-600 dark:text-red-400"
-            >{{ errors.password }}</span
-          >
+          <span v-if="errors.password" class="mt-1 block text-sm text-red-600 dark:text-red-400">{{
+            errors.password
+          }}</span>
         </div>
 
         <!-- 提交按钮和记住我 -->
@@ -167,11 +192,7 @@ const handleSubmit = async () => {
 
           <!-- Remember Me Checkbox -->
           <label class="group relative flex cursor-pointer">
-            <input
-              v-model="form.rememberMe"
-              type="checkbox"
-              class="peer sr-only"
-            />
+            <input v-model="form.rememberMe" type="checkbox" class="peer sr-only" />
             <div
               class="rounded-xl border-2 border-gray-100 bg-white px-3 py-2 shadow-sm transition-all duration-200 select-none group-active:scale-95 peer-checked:border-blue-500 peer-checked:bg-blue-50/50 peer-checked:shadow-blue-100/50 hover:border-blue-200 dark:border-gray-600 dark:bg-gray-700 dark:peer-checked:border-blue-500 dark:peer-checked:bg-blue-500/10 dark:peer-checked:shadow-none dark:hover:border-blue-500/50"
             >
@@ -183,14 +204,36 @@ const handleSubmit = async () => {
             </div>
           </label>
         </div>
+
+        <!-- Passkey 登录按钮 -->
+        <div class="mt-6">
+          <button
+            type="button"
+            @click="handlePasskeyLogin"
+            :disabled="isPasskeySubmitting"
+            class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-green-600 px-8 py-2.5 font-bold text-white shadow-lg shadow-green-500/30 transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-800"
+          >
+            <span v-if="isPasskeySubmitting" class="flex items-center justify-center gap-2">
+              <span
+                class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+              ></span>
+              Logging in with Passkey...
+            </span>
+            <span v-else>Login with Passkey</span>
+          </button>
+          <span
+            v-if="errors.passkey"
+            class="mt-1 block text-center text-sm text-red-600 dark:text-red-400"
+          >
+            {{ errors.passkey }}
+          </span>
+        </div>
+
         <p class="mt-8 text-center font-serif text-gray-400">Kuroome's Blog</p>
         <!-- 注册链接 -->
         <div class="mb-4 text-center text-gray-400 dark:text-gray-300">
           Don't have an account?
-          <RouterLink
-            to="/register"
-            class="underline transition duration-100 hover:text-blue-500"
-          >
+          <RouterLink to="/register" class="underline transition duration-100 hover:text-blue-500">
             Register here.
           </RouterLink>
         </div>

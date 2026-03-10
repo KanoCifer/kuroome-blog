@@ -2,7 +2,9 @@
   <div class="container mx-auto mt-24 min-h-dvh max-w-6xl px-4 py-8">
     <div class="mb-6 flex flex-col gap-4">
       <div class="flex items-center justify-between">
-        <h1 class="font-serif text-3xl font-bold text-shadow-md dark:text-white">
+        <h1
+          class="font-serif text-3xl font-bold text-shadow-md dark:text-white"
+        >
           {{ activeCategory ? `Category: ${activeCategory}` : "Blog" }}
         </h1>
         <router-link
@@ -29,7 +31,9 @@
       <!-- 搜索框 -->
       <div class="max-w-3xs">
         <div class="relative">
-          <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+          <div
+            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -65,7 +69,11 @@
               stroke="currentColor"
               class="h-5 w-5"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -105,7 +113,9 @@
                 d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
               />
             </svg>
-            <p class="text-lg font-medium text-red-600 dark:text-red-400">加载失败</p>
+            <p class="text-lg font-medium text-red-600 dark:text-red-400">
+              加载失败
+            </p>
             <p class="mt-1 text-sm text-red-500">{{ errorMessage }}</p>
             <button
               class="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
@@ -134,7 +144,9 @@
                 d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
               />
             </svg>
-            <p class="text-lg font-medium text-gray-500">No blog posts available.</p>
+            <p class="text-lg font-medium text-gray-500">
+              No blog posts available.
+            </p>
             <p class="mt-1 text-sm text-gray-400">
               {{
                 activeCategory
@@ -231,7 +243,12 @@
                   title="Category"
                 >
                   <!-- tags icon -->
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    class="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -252,7 +269,12 @@
                 ]"
               >
                 阅读更多
-                <svg class="ml-1 h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  class="ml-1 h-3 w-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -266,7 +288,10 @@
         </div>
 
         <!-- Pagination -->
-        <nav v-if="pagination && pagination.pages > 1" class="mt-6 flex justify-center">
+        <nav
+          v-if="pagination && pagination.pages > 1"
+          class="mt-6 flex justify-center"
+        >
           <ul class="flex items-center gap-2">
             <!-- Previous Button -->
             <li>
@@ -400,7 +425,11 @@ const getVisiblePages = computed(() => {
   const visiblePages = [];
 
   // 显示当前页附近的页码
-  for (let i = Math.max(2, current - 2); i <= Math.min(totalPages - 1, current + 2); i++) {
+  for (
+    let i = Math.max(2, current - 2);
+    i <= Math.min(totalPages - 1, current + 2);
+    i++
+  ) {
     visiblePages.push(i);
   }
 
@@ -432,7 +461,8 @@ const fetchPosts = async (page: number = 1) => {
     }
   } catch (err: unknown) {
     console.error(err);
-    errorMessage.value = err instanceof Error ? err.message : "加载文章列表失败，请稍后重试。";
+    errorMessage.value =
+      err instanceof Error ? err.message : "加载文章列表失败，请稍后重试。";
     useNotificationStore().error(errorMessage.value);
   } finally {
     isLoading.value = false;
@@ -442,7 +472,11 @@ const fetchPosts = async (page: number = 1) => {
 const goToPage = (page: number) => {
   if (page >= 1 && pagination.value && page <= pagination.value.pages) {
     // 保留搜索参数
-    const query = { ...route.query, page: page.toString(), search: searchQuery.value || undefined };
+    const query = {
+      ...route.query,
+      page: page.toString(),
+      search: searchQuery.value || undefined,
+    };
     if (!searchQuery.value) {
       delete query.search;
     }
@@ -452,7 +486,11 @@ const goToPage = (page: number) => {
 
 const handleSearch = () => {
   // 搜索时回到第一页
-  const query = { ...route.query, page: "1", search: searchQuery.value || undefined };
+  const query = {
+    ...route.query,
+    page: "1",
+    search: searchQuery.value || undefined,
+  };
   if (searchQuery.value) {
     query.search = searchQuery.value;
   } else {

@@ -98,13 +98,17 @@ class User(Base):
 
     # One-to-One relationship with Profile
     profile: Mapped[Profile | None] = relationship(
-        back_populates="user", uselist=False
+        back_populates="user", uselist=False, cascade="all, delete-orphan"
     )
     # 多对多关系与书籍
     user_book: Mapped[list[UserBook]] = relationship(back_populates="user")
     # 一对多关系与RSS链接
     rss_info: Mapped[list[RssInfo]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
+    )
+    # 一对一关系与PasskeyCredential
+    passkey_credential: Mapped[PasskeyCredential | None] = relationship(
+        back_populates="user", uselist=False, cascade="all, delete-orphan"
     )
 
     def __init__(self, *args, **kwargs):
@@ -317,3 +321,24 @@ class RssInfo(Base):
         Integer, ForeignKey("user.id"), index=True
     )
     user: Mapped[User] = relationship(back_populates="rss_info")
+
+
+class PasskeyCredential(Base):
+    __tablename__ = "passkey_credential"
+    id: Mapped[int] = mapped_column(
+        Integer, primary_key=True, autoincrement=True
+    )
+    credential_id: Mapped[str] = mapped_column(String(255), unique=True)
+    public_key: Mapped[str] = mapped_column(String(500))
+    sign_count: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), index=True
+    )
+
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("user.id"), index=True
+    )
+    # 一对一
+    user: Mapped[User] = relationship(
+        back_populates="passkey_credential", uselist=False
+    )

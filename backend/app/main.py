@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from contextlib import asynccontextmanager
 from functools import lru_cache
 from pathlib import Path
@@ -8,7 +9,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 from beanie import init_beanie
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from slowapi import _rate_limit_exceeded_handler
@@ -133,6 +134,17 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["Set-Cookie"],
 )
+
+
+# 中间件：记录请求处理时间
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time: float = time.perf_counter()
+    response = await call_next(request)
+    process_time: float = time.perf_counter() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
+
 
 # 挂载 media 文件夹为静态文件目录（使用相对于本文件的绝对路径，确保指向 app/media）
 # 访问路径：http://localhost:5555/api/v1/media/文件名

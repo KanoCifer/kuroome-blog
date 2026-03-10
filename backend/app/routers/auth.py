@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import base64
+import json
 from datetime import UTC, datetime, timedelta
 
 from email_validator import EmailNotValidError, validate_email
@@ -19,6 +21,17 @@ from redis.exceptions import RedisError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+from webauthn import options_to_json
+from webauthn.authentication.verify_authentication_response import (
+    VerifiedAuthentication,
+)
+from webauthn.helpers.structs import (
+    PublicKeyCredentialCreationOptions,
+    PublicKeyCredentialRequestOptions,
+)
+from webauthn.registration.verify_registration_response import (
+    VerifiedRegistration,
+)
 
 from app.configs.logger import logger
 from app.dependencies.auth import manager
@@ -27,9 +40,15 @@ from app.dependencies.database import get_session
 from app.dependencies.limiter import limiter
 from app.dependencies.mail import MailConfig
 from app.dependencies.redis import AsyncRedis, get_async_redis
-from app.models.models import User
+from app.models.models import PasskeyCredential, User
 from app.schemas.response import APIResponse
 from app.schemas.schemas import LoginIn, RegisterIn
+from app.utils.webauthn import (
+    generate_passkey_authentication_options,
+    generate_passkey_registration_options,
+    verify_passkey_authentication_response,
+    verify_passkey_registration_response,
+)
 
 router = APIRouter(
     prefix="/auth",
@@ -358,6 +377,14 @@ class EmailSchema(BaseModel):
     email: EmailStr
 
 
+class PasskeyRegistrationRequest(BaseModel):
+    response: dict
+
+
+class PasskeyAuthenticationRequest(BaseModel):
+    response: dict
+
+
 async def _send_email_code(
     email: str,
     verification_code: str,
@@ -431,3 +458,237 @@ async def send_email_code(
         message="验证码发送成功，请检查您的邮箱！",
         code=status.HTTP_202_ACCEPTED,
     )
+
+
+#################### Passkey 相关接口 ####################
+@router.get("/passkey/registration-options")
+async def passkey_registration_options(
+    user: User = Depends(manager),
+    redis: AsyncRedis = Depends(get_async_redis),
+):
+    """生成 Passkey 注册选项."""
+    options: PublicKeyCredentialCreationOptions = (
+        generate_passkey_registration_options(user_id=str(user.id))
+    )
+    # 先获取 challenge 字节，转换为 base64url 字符串存储
+    challenge_bytes: bytes = options.challenge
+    challenge: str = (
+        base64.urlsafe_b64encode(challenge_bytes).rstrip(b"=").decode("ascii")
+    )
+    # 存储 challenge 到 Redis，5 分钟过期，用于后续验证（安全要求：challenge 必须服务端存储）
+    await redis.set(
+        f"passkey:registration:challenge:{user.id}",
+        challenge,
+        ex=300,
+    )
+    # 使用 webauthn 官方方法序列化
+    return APIResponse.ok(
+        data=json.loads(options_to_json(options)),
+        message="Passkey 注册选项生成成功",
+    )
+
+
+@router.post("/passkey/register")
+async def passkey_register(
+    request: PasskeyRegistrationRequest,
+    user: User = Depends(manager),
+    session: AsyncSession = Depends(get_session),
+    redis: AsyncRedis = Depends(get_async_redis),
+):
+    """验证 Passkey 注册响应并绑定到用户."""
+    # 从 Redis 获取预期的 challenge
+    expected_challenge = await redis.get(
+        f"passkey:registration:challenge:{user.id}"
+    )
+    if not expected_challenge:
+        return APIResponse.error(
+            message="Passkey 注册会话已过期或不存在",
+            code=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # 删除 challenge，防止重放攻击
+    await redis.delete(f"passkey:registration:challenge:{user.id}")
+
+    # 验证注册响应
+    verification: VerifiedRegistration = verify_passkey_registration_response(
+        request.response, expected_challenge
+    )
+    if not verification:
+        return APIResponse.error(
+            message="Passkey 注册验证失败", code=status.HTTP_400_BAD_REQUEST
+        )
+
+    # 将 Passkey 凭证信息保存到数据库（转换为Base64URL字符串存储）
+    credential_id = (
+        base64.urlsafe_b64encode(verification.credential_id)
+        .rstrip(b"=")
+        .decode("ascii")
+    )
+    public_key = (
+        base64.urlsafe_b64encode(verification.credential_public_key)
+        .rstrip(b"=")
+        .decode("ascii")
+    )
+
+    credential = PasskeyCredential(
+        user_id=user.id,
+        credential_id=credential_id,
+        public_key=public_key,
+        sign_count=verification.sign_count,
+    )
+    session.add(credential)
+    await session.commit()
+    return APIResponse.ok(message="Passkey 注册成功")
+
+
+@router.get("/passkey/authentication-options")
+async def passkey_authentication_options(
+    redis: AsyncRedis = Depends(get_async_redis),
+):
+    """生成 Passkey 认证选项."""
+    options: PublicKeyCredentialRequestOptions = (
+        generate_passkey_authentication_options()
+    )
+    # 先获取 challenge 字节，转换为 base64url 字符串存储
+    challenge_bytes: bytes = options.challenge
+    challenge: str = (
+        base64.urlsafe_b64encode(challenge_bytes).rstrip(b"=").decode("ascii")
+    )
+    # 存储 challenge 到 Redis，5 分钟过期
+    await redis.set(
+        f"passkey:authentication:challenge:{challenge}",
+        challenge,
+        ex=300,
+    )
+    # 使用 webauthn 官方方法序列化
+    return APIResponse.ok(
+        data=json.loads(options_to_json(options)),
+        message="Passkey 认证选项生成成功",
+    )
+
+
+@router.post("/passkey/authenticate")
+async def passkey_authenticate(
+    http_request: Request,
+    request: PasskeyAuthenticationRequest,
+    session: AsyncSession = Depends(get_session),
+    redis: AsyncRedis = Depends(get_async_redis),
+):
+    """验证 Passkey 认证响应并登录用户."""
+    # 从响应中获取 clientDataJSON 并解码获取 challenge
+    try:
+        client_data_json_b64 = request.response["response"]["clientDataJSON"]
+        # 解码 Base64URL 字符串
+        client_data_json_bytes = base64.urlsafe_b64decode(
+            client_data_json_b64
+            + "=" * ((4 - len(client_data_json_b64) % 4) % 4)
+        )
+        client_data = json.loads(client_data_json_bytes)
+        challenge = client_data["challenge"]
+    except KeyError, ValueError, json.JSONDecodeError:
+        return APIResponse.error(
+            message="无效的 Passkey 认证响应", code=status.HTTP_400_BAD_REQUEST
+        )
+
+    # 从 Redis 获取预期的 challenge
+    expected_challenge = await redis.get(
+        f"passkey:authentication:challenge:{challenge}"
+    )
+    if not expected_challenge:
+        return APIResponse.error(
+            message="Passkey 认证会话已过期或不存在",
+            code=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # 删除 challenge，防止重放攻击
+    await redis.delete(f"passkey:authentication:challenge:{challenge}")
+
+    # 从响应中获取 credential ID
+    try:
+        credential_id = request.response["id"]
+    except KeyError:
+        return APIResponse.error(
+            message="无效的 Passkey 凭证 ID", code=status.HTTP_400_BAD_REQUEST
+        )
+
+    # 从数据库中查找对应的 Passkey 凭证
+    result = await session.execute(
+        select(PasskeyCredential)
+        .where(PasskeyCredential.credential_id == credential_id)
+        .options(
+            selectinload(PasskeyCredential.user).selectinload(User.profile)
+        )
+    )
+    credential = result.scalar_one_or_none()
+    if credential is None:
+        return APIResponse.error(
+            message="Passkey 凭证不存在", code=status.HTTP_400_BAD_REQUEST
+        )
+
+    user = credential.user
+    if user is None:
+        return APIResponse.error(
+            message="用户不存在", code=status.HTTP_400_BAD_REQUEST
+        )
+
+    # 验证认证响应
+    verification: VerifiedAuthentication = (
+        verify_passkey_authentication_response(
+            response=request.response,
+            expected_challenge=expected_challenge,
+            credential_public_key=credential.public_key,
+            sign_count=credential.sign_count,
+        )
+    )
+    if not verification:
+        return APIResponse.error(
+            message="Passkey 认证验证失败", code=status.HTTP_400_BAD_REQUEST
+        )
+
+    # 更新签名计数
+    credential.sign_count = verification.new_sign_count
+
+    # 更新用户登录信息（同常规登录）
+    user.active = True
+    user.last_login_at = user.current_login_at
+    user.current_login_at = datetime.now(UTC).replace(tzinfo=None)
+    user.last_login_ip = user.current_login_ip
+    user.current_login_ip = User.get_real_ip(http_request)
+    user.login_count += 1
+
+    await session.commit()
+
+    # 生成令牌并设置 Cookie（同常规登录）
+    access_token = manager.create_access_token(
+        data={"sub": str(user.id)}, expires=timedelta(hours=12)
+    )
+    refresh_token = manager.create_access_token(
+        data={"sub": str(user.id)}, expires=timedelta(days=7)
+    )
+
+    profile = user.profile
+    response = APIResponse.ok(
+        data={
+            "id": user.id,
+            "username": user.username,
+            "is_admin": user.is_admin,
+            "name": user.name,
+            "email": profile.email if profile else None,
+            "gender": profile.gender if profile else None,
+            "mobile": profile.mobile if profile else None,
+            "photo": profile.photo if profile else None,
+        },
+        message="Passkey 登录成功",
+    )
+
+    manager.set_cookie(response=response, token=access_token)
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        samesite="lax",
+        secure=True,
+    )
+    csrf_manager.set_csrf_cookie(response)
+
+    return response

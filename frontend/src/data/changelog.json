@@ -1,5 +1,14 @@
 [
   {
+    "version": "2.2.10",
+    "date": "2026-03-10",
+    "title": "新增Passksy认证功能",
+    "changes": [
+      { "type": "feat", "content": "新增Passksy认证功能，支持无密码登录" },
+      { "type": "fix", "content": "修复了一些小bug" }
+    ]
+  },
+  {
     "version": "2.2.9",
     "date": "2026-03-08",
     "title": "新增内容搜索功能",

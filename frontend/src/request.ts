@@ -72,9 +72,13 @@ request.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<ApiResponse>) => {
     const config = error.config as AxiosRequestConfig & { _retry?: boolean };
-    
+
     // 如果是401错误且不是刷新token的请求，且没有重试过
-    if (error.response?.status === 401 && config.url !== "/auth/refresh-token" && !config._retry) {
+    if (
+      error.response?.status === 401 &&
+      config.url !== "/auth/refresh-token" &&
+      !config._retry
+    ) {
       if (isRefreshing) {
         // 如果正在刷新，将请求加入队列
         return new Promise((resolve) => {
@@ -106,7 +110,10 @@ request.interceptors.response.use(
     }
 
     // 如果是刷新token的请求返回401，或者已经重试过，直接跳转到登录页
-    if (error.response?.status === 401 && (config.url === "/auth/refresh-token" || config._retry)) {
+    if (
+      error.response?.status === 401 &&
+      (config.url === "/auth/refresh-token" || config._retry)
+    ) {
       onUnauthorizedCallback?.();
       return Promise.reject(error);
     }
