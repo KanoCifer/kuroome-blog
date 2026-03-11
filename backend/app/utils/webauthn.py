@@ -19,7 +19,9 @@ from webauthn.registration.verify_registration_response import (
 from app.configs.config import settings
 
 
-def generate_passkey_registration_options(user_id: str):
+def generate_passkey_registration_options(
+    user_id: str,
+) -> PublicKeyCredentialCreationOptions:
     """生成 Passkey 注册选项"""
     options: PublicKeyCredentialCreationOptions = (
         generate_registration_options(
@@ -44,7 +46,9 @@ def verify_passkey_registration_response(
     return verification
 
 
-def generate_passkey_authentication_options():
+def generate_passkey_authentication_options() -> (
+    PublicKeyCredentialRequestOptions
+):
     """生成 Passkey 认证选项"""
     options: PublicKeyCredentialRequestOptions = (
         generate_authentication_options(

@@ -12,7 +12,11 @@
         <div
           class="h-24 w-24 overflow-hidden rounded-full border-4 border-white shadow-lg dark:border-gray-700"
         >
-          <img :src="avatarUrl" alt="Avatar" class="h-full w-full object-cover" />
+          <img
+            :src="avatarUrl"
+            alt="Avatar"
+            class="h-full w-full object-cover"
+          />
         </div>
         <div class="absolute right-0 bottom-0">
           <input
@@ -54,7 +58,9 @@
     <form @submit.prevent="handleSubmit">
       <!-- Name -->
       <div class="mb-4">
-        <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Name
         </label>
         <input
@@ -71,7 +77,9 @@
 
       <!-- Username -->
       <div class="mb-4">
-        <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Username
           <span class="text-xs text-red-400 italic">* Login-in name</span>
         </label>
@@ -89,7 +97,9 @@
 
       <!-- Gender -->
       <div class="mb-4">
-        <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Gender
         </label>
         <div class="flex gap-4">
@@ -132,7 +142,9 @@
 
       <!-- Email -->
       <div class="mb-4">
-        <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Email
         </label>
         <input
@@ -149,7 +161,9 @@
 
       <!-- Mobile -->
       <div class="mb-4">
-        <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Mobile
         </label>
         <input
@@ -166,7 +180,9 @@
 
       <!-- Password -->
       <div class="mb-6">
-        <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Password
         </label>
         <input
@@ -182,7 +198,9 @@
 
       <!-- Passkey Section -->
       <div class="mb-6">
-        <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Passkeys
         </label>
         <div class="space-y-3">
@@ -192,7 +210,10 @@
             :disabled="addingPasskey"
             class="w-full rounded-xl bg-green-600 px-6 py-2.5 font-semibold text-white shadow-md shadow-green-500/30 transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-gray-800"
           >
-            <span v-if="addingPasskey" class="flex items-center justify-center gap-2">
+            <span
+              v-if="addingPasskey"
+              class="flex items-center justify-center gap-2"
+            >
               <span
                 class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
               ></span>
@@ -203,7 +224,9 @@
           <p
             v-if="passkeyMessage"
             :class="[
-              passkeyMessageType === 'success' ? 'text-green-600' : 'text-red-600',
+              passkeyMessageType === 'success'
+                ? 'text-green-600'
+                : 'text-red-600',
               'text-center text-sm',
             ]"
           >
@@ -231,7 +254,9 @@
       <div v-if="message" class="mt-4 text-center">
         <p
           :class="[
-            messageType === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600',
+            messageType === 'success'
+              ? 'bg-green-50 text-green-600'
+              : 'bg-red-50 text-red-600',
             'rounded-3xl px-4 py-2',
           ]"
         >

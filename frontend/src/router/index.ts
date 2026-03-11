@@ -70,6 +70,16 @@ const router = createRouter({
       },
     },
     {
+      path: "/websites",
+      name: "websites",
+      component: () => import("@/views/general/WebsitesView.vue"),
+      meta: {
+        title: "推荐网站 - Kuroome's Blog",
+        description: "发现有趣的网站和工具",
+        keywords: "网站推荐,工具,资源",
+      },
+    },
+    {
       path: "/blog",
       name: "blog-list",
       component: () => import("@/views/blog/BlogListView.vue"),

@@ -47,6 +47,7 @@ declare module 'vue' {
     BentoSocial: typeof import('./src/components/bento/BentoSocial.vue')['default']
     BentoTech: typeof import('./src/components/bento/BentoTech.vue')['default']
     BentoTechCard: typeof import('./src/components/bento/BentoTechCard.vue')['default']
+    BentoWebsites: typeof import('./src/components/bento/BentoWebsites.vue')['default']
     BookActionButtons: typeof import('./src/components/books/BookActionButtons.vue')['default']
     BookCard: typeof import('./src/components/books/BookCard.vue')['default']
     BrowserAnalytics: typeof import('./src/components/analytics/BrowserAnalytics.vue')['default']

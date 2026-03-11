@@ -1,5 +1,17 @@
 [
   {
+    "version": "2.3.0",
+    "date": "2026-03-11",
+    "title": "新增网站推荐页面",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "新增网站推荐页面，展示精选的技术资源和工具"
+      },
+      { "type": "fix", "content": "完善token刷新机制，修复了一些bugs" }
+    ]
+  },
+  {
     "version": "2.2.10",
     "date": "2026-03-10",
     "title": "新增Passksy认证功能",

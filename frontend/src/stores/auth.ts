@@ -1,9 +1,9 @@
-import request, { fetchAndStoreCSRF, setOnUnauthorized } from "@/request";
+import request, { fetchAndStoreCSRF } from "@/request";
 import router from "@/router";
 import { useNotificationStore } from "@/stores/notification";
+import { useStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-
 // 用户信息类型定义
 export interface UserInfo {
   id: number;
@@ -25,6 +25,7 @@ export const useAuthStore = defineStore("auth", () => {
   const user = ref<UserInfo | null>(null); // 当前用户信息
   const loading = ref(false); // 加载状态
   const isHydrated = ref(false); // 是否初始化过
+  const refreshToken = useStorage("refresh_token", "");
 
   const notifier = useNotificationStore(); // 通知提示
 
@@ -53,14 +54,15 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
-  // ---------------------- 方法（Actions） ----------------------
+  const saveRefreshToken = (token: string) => {
+    refreshToken.value = token;
+  };
 
-  // 1. 设置 401 未授权回调（登录过期时触发）
-  setOnUnauthorized(() => {
-    user.value = null;
-    cacheUser(null); // 清除缓存
-    notifier.error("登录已过期，请重新登录");
-  });
+  function getRefreshToken() {
+    return refreshToken.value;
+  }
+
+  // ---------------------- 方法（Actions） ----------------------
 
   // 2. 获取当前登录用户信息（从后端获取最新数据）
   async function fetchUser() {
@@ -107,8 +109,8 @@ export const useAuthStore = defineStore("auth", () => {
     loading.value = true;
     try {
       const res = await request.post("/auth/login", {
-        username,
-        password,
+        username: username,
+        password: password,
         remember_me: rememberMe,
       });
       // 登录成功后获取 CSRF Token
@@ -117,8 +119,10 @@ export const useAuthStore = defineStore("auth", () => {
       const userData = res.data.data || null;
       user.value = userData;
       cacheUser(userData);
+
+      saveRefreshToken(res.data.data.refresh_token);
+
       notifier.success("登录成功");
-      // 登录成功后返回上一页（如果有历史记录）
       router.back();
       return res.data;
     } catch (err: unknown) {
@@ -162,5 +166,7 @@ export const useAuthStore = defineStore("auth", () => {
     login,
     logout,
     refreshUser,
+    getRefreshToken,
+    saveRefreshToken,
   };
 });

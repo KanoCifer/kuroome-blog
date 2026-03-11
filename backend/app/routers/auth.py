@@ -64,19 +64,22 @@ async def csrf_token(response: Response):
     return res
 
 
-@router.post("/refresh-token")
+@router.get("/refresh-token")
 async def refresh_token(
+    request: Request,
     refresh_token: str = Cookie(None),
 ):
     """刷新访问令牌.
 
     Args:
         refresh_token: 刷新令牌(从Cookie中读取)
+        或从请求体中读取
 
     Returns:
         API响应包含新的访问令牌
     """
-    if not refresh_token:
+    token = refresh_token or request.headers.get("refresh_token")
+    if not token:
         return APIResponse.error(
             message="刷新令牌不存在",
             code=status.HTTP_401_UNAUTHORIZED,
@@ -84,7 +87,7 @@ async def refresh_token(
 
     try:
         # 验证refresh token并获取用户
-        user = await manager.get_current_user(refresh_token)
+        user = await manager.get_current_user(token)
         if user is None:
             return APIResponse.error(
                 message="用户不存在",
@@ -104,6 +107,7 @@ async def refresh_token(
         response = APIResponse.ok(
             message="访问令牌已刷新",
             code=status.HTTP_200_OK,
+            data={"refresh_token": new_refresh_token},
         )
         manager.set_cookie(response=response, token=access_token)
         # 更新refresh token cookie
@@ -199,9 +203,9 @@ async def login(
             "gender": profile.gender if profile else None,
             "mobile": profile.mobile if profile else None,
             "photo": profile.photo if profile else None,
+            "refresh_token": refresh_token,
         },
         message="登录成功",
-        # access_token=access_token,
     )
 
     manager.set_cookie(response=response, token=access_token)
@@ -461,6 +465,27 @@ async def send_email_code(
 
 
 #################### Passkey 相关接口 ####################
+
+
+def base64url_encode(data: str | bytes) -> str:
+    """Base64URL 编码移除填充符"""
+    if isinstance(data, str):
+        data = data.encode("utf-8")
+    encoded = base64.urlsafe_b64encode(data).decode("ascii")
+    return encoded.rstrip("=")  # 移除末尾的 =
+
+
+def base64url_decode(encoded: str | bytes) -> str:
+    """Base64URL 解码自动补全填充符"""
+    if isinstance(encoded, str):
+        # 补全 padding
+        padding = 4 - len(encoded) % 4
+        if padding != 4:
+            encoded += "=" * padding
+    decoded = base64.urlsafe_b64decode(encoded)
+    return decoded.decode("utf-8")
+
+
 @router.get("/passkey/registration-options")
 async def passkey_registration_options(
     user: User = Depends(manager),
@@ -468,20 +493,17 @@ async def passkey_registration_options(
 ):
     """生成 Passkey 注册选项."""
     options: PublicKeyCredentialCreationOptions = (
-        generate_passkey_registration_options(user_id=str(user.id))
+        generate_passkey_registration_options(str(user.id))
     )
-    # 先获取 challenge 字节，转换为 base64url 字符串存储
-    challenge_bytes: bytes = options.challenge
-    challenge: str = (
-        base64.urlsafe_b64encode(challenge_bytes).rstrip(b"=").decode("ascii")
-    )
-    # 存储 challenge 到 Redis，5 分钟过期，用于后续验证（安全要求：challenge 必须服务端存储）
+
+    challenge: str = base64url_encode(options.challenge)
+
+    # 存储 challenge 到 Redis，5 分钟过期
     await redis.set(
         f"passkey:registration:challenge:{user.id}",
         challenge,
         ex=300,
     )
-    # 使用 webauthn 官方方法序列化
     return APIResponse.ok(
         data=json.loads(options_to_json(options)),
         message="Passkey 注册选项生成成功",
@@ -519,16 +541,8 @@ async def passkey_register(
         )
 
     # 将 Passkey 凭证信息保存到数据库（转换为Base64URL字符串存储）
-    credential_id = (
-        base64.urlsafe_b64encode(verification.credential_id)
-        .rstrip(b"=")
-        .decode("ascii")
-    )
-    public_key = (
-        base64.urlsafe_b64encode(verification.credential_public_key)
-        .rstrip(b"=")
-        .decode("ascii")
-    )
+    credential_id: str = base64url_encode(verification.credential_id)
+    public_key: str = base64url_encode(verification.credential_public_key)
 
     credential = PasskeyCredential(
         user_id=user.id,
@@ -549,11 +563,10 @@ async def passkey_authentication_options(
     options: PublicKeyCredentialRequestOptions = (
         generate_passkey_authentication_options()
     )
-    # 先获取 challenge 字节，转换为 base64url 字符串存储
+
     challenge_bytes: bytes = options.challenge
-    challenge: str = (
-        base64.urlsafe_b64encode(challenge_bytes).rstrip(b"=").decode("ascii")
-    )
+    challenge: str = base64url_encode(challenge_bytes)
+
     # 存储 challenge 到 Redis，5 分钟过期
     await redis.set(
         f"passkey:authentication:challenge:{challenge}",
@@ -579,12 +592,12 @@ async def passkey_authenticate(
     try:
         client_data_json_b64 = request.response["response"]["clientDataJSON"]
         # 解码 Base64URL 字符串
-        client_data_json_bytes = base64.urlsafe_b64decode(
+        client_data_json_bytes: bytes = base64url_decode(
             client_data_json_b64
-            + "=" * ((4 - len(client_data_json_b64) % 4) % 4)
-        )
+        ).encode("utf-8")
         client_data = json.loads(client_data_json_bytes)
         challenge = client_data["challenge"]
+
     except KeyError, ValueError, json.JSONDecodeError:
         return APIResponse.error(
             message="无效的 Passkey 认证响应", code=status.HTTP_400_BAD_REQUEST
@@ -619,13 +632,13 @@ async def passkey_authenticate(
             selectinload(PasskeyCredential.user).selectinload(User.profile)
         )
     )
-    credential = result.scalar_one_or_none()
+    credential: PasskeyCredential | None = result.scalar_one_or_none()
     if credential is None:
         return APIResponse.error(
             message="Passkey 凭证不存在", code=status.HTTP_400_BAD_REQUEST
         )
 
-    user = credential.user
+    user: User = credential.user
     if user is None:
         return APIResponse.error(
             message="用户不存在", code=status.HTTP_400_BAD_REQUEST
@@ -677,6 +690,7 @@ async def passkey_authenticate(
             "gender": profile.gender if profile else None,
             "mobile": profile.mobile if profile else None,
             "photo": profile.photo if profile else None,
+            "refresh_token": refresh_token,
         },
         message="Passkey 登录成功",
     )

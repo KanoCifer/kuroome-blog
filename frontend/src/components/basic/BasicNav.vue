@@ -63,7 +63,7 @@
                 />
                 <img
                   v-else
-                  src="/images/avatar.webp"
+                  src="/images/about.webp"
                   alt="Default Avatar"
                   class="h-14 w-14 rounded-full object-cover shadow-sm ring-4 ring-white/50 dark:ring-gray-700/50"
                 />

@@ -18,6 +18,12 @@
         "packageManager": "ms-python.python:pip",
         "workspace": "backend",
       },
+      {
+        "path": "src/utils",
+        "envManager": "ms-python.python:venv",
+        "packageManager": "ms-python.python:pip",
+        "workspace": "frontend",
+      },
     ],
   },
 }
