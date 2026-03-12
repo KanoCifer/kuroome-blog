@@ -66,12 +66,14 @@ const handlePasskeyLogin = async () => {
     const assertion = await startAuthentication(options);
 
     // 提交认证结果
-    await request.post("/auth/passkey/authenticate", {
+    const res = await request.post("/auth/passkey/authenticate", {
       response: assertion,
     });
 
     // 登录成功，更新用户信息
     const notification = useNotificationStore();
+    auth.saveRefreshToken(res.data.data.refresh_token);
+
     notification.success("Passkey 登录成功！欢迎回来！");
     await auth.fetchUser();
     const redirect = (route.query.redirect as string) || "/";

@@ -14,6 +14,7 @@ export interface UserInfo {
   photo?: string;
   gender?: string | null;
   mobile?: string | null;
+  has_passkey?: boolean;
 }
 
 // sessionStorage key
@@ -144,6 +145,9 @@ export const useAuthStore = defineStore("auth", () => {
     } finally {
       user.value = null; // 清空用户信息
       cacheUser(null); // 清除缓存
+
+      // 清除刷新令牌
+      saveRefreshToken("");
       router.push("/"); // 跳转到首页
       notifier.success("已退出登录");
       loading.value = false;

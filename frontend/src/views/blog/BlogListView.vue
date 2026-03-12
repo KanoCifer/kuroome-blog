@@ -51,7 +51,7 @@
           </div>
           <input
             v-model="searchQuery"
-            type="text"
+            type="search"
             placeholder="搜索文章标题和内容..."
             class="block w-full rounded-xl border border-gray-300 bg-white py-3 pr-4 pl-10 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-blue-500"
             @keyup.enter="handleSearch"

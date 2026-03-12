@@ -1,60 +1,75 @@
 <template>
-  <div id="ImportBook">
+  <div class="min-h-screen px-4 py-16">
     <div
-      class="m-4 mx-auto mt-24 max-w-xl rounded-[40px] bg-white/80 p-8 shadow-xl backdrop-blur-xs dark:bg-gray-800/80"
+      class="mx-auto mt-8 max-w-2xl rounded-3xl border border-white/20 bg-white/40 p-10 shadow-2xl backdrop-blur-xl dark:border-gray-700/30 dark:bg-gray-900/40"
+      style="animation: fadeInUp 0.6s ease-out"
     >
-      <p class="font-serif text-2xl font-bold dark:text-white">
-        Import Your Bookshelf!
-      </p>
-      <p class="mb-4 text-gray-500 italic dark:text-gray-400">
-        Import your bookshelf from WEREAD here.
-      </p>
-      <div class="flex items-center justify-center">
-        <form method="POST">
-          <div class="mb-4">
-            <label
-              for="weread_cookie"
-              class="mb-2 block text-center text-gray-700 dark:text-gray-300"
-              >WEREAD Cookie:</label
-            >
+      <!-- Header -->
+      <div class="mb-12 text-center">
+        <h1
+          class="bg-linear-to-r from-blue-600 to-sky-600 bg-clip-text text-[clamp(1.8rem,4vw,2.5rem)] font-bold text-transparent dark:from-blue-400 dark:to-sky-400"
+        >
+          Import Your Bookshelf
+        </h1>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          Import your books from WeRead by providing your account cookie
+        </p>
+      </div>
+
+      <!-- Form Section -->
+      <form @submit.prevent="submitImport" class="space-y-6">
+        <!-- Cookie Input -->
+        <div class="space-y-2">
+          <label
+            for="weread_cookie"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            WeRead Cookie
+          </label>
+          <div class="relative">
             <textarea
               id="weread_cookie"
               v-model="weread_cookie"
-              class="h-40 w-md rounded-3xl border-2 border-gray-500 p-2 transition-transform focus:scale-[1.01] dark:bg-gray-700 dark:text-white"
+              class="w-full rounded-2xl border border-gray-200 bg-white/70 px-4 py-3 text-sm transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800/50 dark:text-white"
+              rows="8"
+              placeholder="Paste your WeRead cookie here..."
             />
           </div>
-          <div class="mb-4 flex justify-center">
-            <button
-              @click="submitImport"
-              :disabled="loading"
-              class="flex w-full items-center justify-center rounded-xl bg-blue-600 px-8 py-2.5 font-bold text-white shadow-lg shadow-blue-500/30 transition-all hover:bg-blue-700 hover:shadow-blue-500/40 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-blue-600 dark:ring-offset-gray-800"
+          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            Your cookie will be saved locally in your browser for future use
+          </p>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          :disabled="loading"
+          class="w-full rounded-2xl bg-linear-to-r from-blue-500 to-sky-600 px-6 py-4 font-medium text-white shadow-lg shadow-blue-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-blue-500/30 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-gray-900"
+        >
+          <span v-if="loading" class="flex items-center justify-center gap-2">
+            <span
+              class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+            ></span>
+            Importing Books...
+          </span>
+          <span v-else class="flex items-center justify-center gap-2">
+            <svg
+              class="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <svg
-                v-if="loading"
-                class="h-5 w-5 animate-spin text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  class="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                ></circle>
-                <path
-                  class="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              <span>{{ loading ? "Importing..." : "Submit" }}</span>
-            </button>
-          </div>
-        </form>
-      </div>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+              ></path>
+            </svg>
+            Start Import
+          </span>
+        </button>
+      </form>
     </div>
   </div>
 </template>
@@ -102,3 +117,16 @@ const loadFromLocalStorage = () => {
 };
 onMounted(loadFromLocalStorage);
 </script>
+
+<style scoped>
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>

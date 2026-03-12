@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc"; // import "dayjs/locale/zh-cn";
+import "dayjs/locale/zh-cn";
+import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 
 export const formatDate = (dateStr: string | null | undefined) => {

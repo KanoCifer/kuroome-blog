@@ -155,7 +155,9 @@ async def login(
     user_result = await session.execute(
         select(User)
         .where(User.username == username)
-        .options(selectinload(User.profile))
+        .options(
+            selectinload(User.profile), selectinload(User.passkey_credential)
+        )
     )
     user = user_result.scalar_one_or_none()
 
@@ -204,6 +206,7 @@ async def login(
             "mobile": profile.mobile if profile else None,
             "photo": profile.photo if profile else None,
             "refresh_token": refresh_token,
+            "has_passkey": user.passkey_credential is not None,
         },
         message="登录成功",
     )
@@ -237,7 +240,6 @@ async def logout(
         API response with success message
     """
     # Set user as inactive
-
     user.active = False
     await session.commit()
 
@@ -246,6 +248,7 @@ async def logout(
         message="已退出登录",
         code=status.HTTP_200_OK,
     )
+    response.delete_cookie(key="refresh_token")
     response.delete_cookie(key=manager.cookie_name)
     return response
 
@@ -270,11 +273,13 @@ async def me(
 
     from app.models.models import Profile
 
-    # 1. 重新查询用户，并显式加载 profile
+    # 1. 重新查询用户，并显式加载 profile 和 passkey_credential
     result = await session.execute(
         select(User)
         .where(User.id == current_user.id)
-        .options(selectinload(User.profile))
+        .options(
+            selectinload(User.profile), selectinload(User.passkey_credential)
+        )
     )
     user = result.scalar_one()
     if not user.profile:
@@ -294,6 +299,7 @@ async def me(
             "gender": profile.gender if profile else None,
             "mobile": profile.mobile if profile else None,
             "photo": profile.photo if profile else None,
+            "has_passkey": user.passkey_credential is not None,
         },
         message="获取用户信息成功",
         code=status.HTTP_200_OK,
@@ -489,9 +495,20 @@ def base64url_decode(encoded: str | bytes) -> str:
 @router.get("/passkey/registration-options")
 async def passkey_registration_options(
     user: User = Depends(manager),
+    session: AsyncSession = Depends(get_session),
     redis: AsyncRedis = Depends(get_async_redis),
 ):
     """生成 Passkey 注册选项."""
+    # 检查用户是否已经有passkey
+    existing_credential = await session.execute(
+        select(PasskeyCredential).where(PasskeyCredential.user_id == user.id)
+    )
+    if existing_credential.scalar_one_or_none():
+        return APIResponse.error(
+            message="您的账户已经绑定了Passkey",
+            code=status.HTTP_400_BAD_REQUEST,
+        )
+
     options: PublicKeyCredentialCreationOptions = (
         generate_passkey_registration_options(str(user.id))
     )
@@ -518,6 +535,16 @@ async def passkey_register(
     redis: AsyncRedis = Depends(get_async_redis),
 ):
     """验证 Passkey 注册响应并绑定到用户."""
+    # 检查用户是否已经有passkey
+    existing_credential = await session.execute(
+        select(PasskeyCredential).where(PasskeyCredential.user_id == user.id)
+    )
+    if existing_credential.scalar_one_or_none():
+        return APIResponse.error(
+            message="您的账户已经绑定了Passkey",
+            code=status.HTTP_400_BAD_REQUEST,
+        )
+
     # 从 Redis 获取预期的 challenge
     expected_challenge = await redis.get(
         f"passkey:registration:challenge:{user.id}"
@@ -578,6 +605,29 @@ async def passkey_authentication_options(
         data=json.loads(options_to_json(options)),
         message="Passkey 认证选项生成成功",
     )
+
+
+@router.delete("/passkey/delete")
+async def passkey_delete(
+    user: User = Depends(manager),
+    session: AsyncSession = Depends(get_session),
+):
+    """删除用户绑定的 Passkey."""
+    # 查找用户的passkey
+    result = await session.execute(
+        select(PasskeyCredential).where(PasskeyCredential.user_id == user.id)
+    )
+    credential = result.scalar_one_or_none()
+
+    if not credential:
+        return APIResponse.error(
+            message="您的账户尚未绑定Passkey", code=status.HTTP_400_BAD_REQUEST
+        )
+
+    await session.delete(credential)
+    await session.commit()
+
+    return APIResponse.ok(message="Passkey 删除成功")
 
 
 @router.post("/passkey/authenticate")
@@ -690,6 +740,7 @@ async def passkey_authenticate(
             "gender": profile.gender if profile else None,
             "mobile": profile.mobile if profile else None,
             "photo": profile.photo if profile else None,
+            "has_passkey": True,
             "refresh_token": refresh_token,
         },
         message="Passkey 登录成功",

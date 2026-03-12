@@ -110,7 +110,14 @@ import TodoCard from "@/components/bento/TodoCard.vue";
 import ThemeToggle from "@/components/layout/ThemeToggle.vue";
 import carddelay from "@/data/carddelay.json";
 import { useDebounceFn, useMediaQuery } from "@vueuse/core";
-import { computed, nextTick, onMounted, onUnmounted, ref, type ComponentPublicInstance } from "vue";
+import {
+  computed,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  ref,
+  type ComponentPublicInstance,
+} from "vue";
 
 const clockRef = ref<ComponentPublicInstance | null>(null);
 const navBox = ref<ComponentPublicInstance | null>(null);
@@ -127,7 +134,9 @@ const parentWidth = ref<number>(0);
 const viewportHeight = ref<number>(0);
 
 // 布局设计基准高度：使用视口高度，但不低于 820px，保证卡片间距不被压缩
-const layoutHeight = computed<number>(() => Math.max(viewportHeight.value, 820));
+const layoutHeight = computed<number>(() =>
+  Math.max(viewportHeight.value, 820),
+);
 
 // 容器高度：至少撑满布局高度（让绝对定位的卡片不被裁剪）
 const containerStyle = computed(() => ({
@@ -156,7 +165,8 @@ const profilePosition = computed(() => ({
 
 // 对应 BentoNavCard (top-[38%])
 const navCardPosition = computed(() => {
-  const totalLeft = halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224;
+  const totalLeft =
+    halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224;
   return {
     left: `${totalLeft}px`,
     top: `${layoutHeight.value * 0.38}px`,
@@ -165,7 +175,8 @@ const navCardPosition = computed(() => {
 
 // 对应 BentoMemo (top-[9%])
 const memoCardPosition = computed(() => {
-  const totalLeft = halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224;
+  const totalLeft =
+    halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224;
   return {
     left: `${totalLeft + 220}px`,
     top: `${layoutHeight.value * 0.09}px`,
@@ -174,25 +185,28 @@ const memoCardPosition = computed(() => {
 
 // 对应 BentoClock (top-3/9)
 const clockCardPosition = computed(() => {
-  const totalLeft = halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
+  const totalLeft =
+    halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
   return {
     left: `${totalLeft + 24}px`,
-    top: `${(layoutHeight.value * 3) / 9}px`,
+    top: `${(layoutHeight.value * 3) / 7.5}px`,
   };
 });
 
 // 对应 BentoCalendar (top-5/8)
 const calendarPosition = computed(() => {
-  const totalLeft = halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
+  const totalLeft =
+    halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
   return {
     left: `${totalLeft + 24}px`,
-    top: `${(layoutHeight.value * 5) / 8}px`,
+    top: `${(layoutHeight.value * 4) / 6}px`,
   };
 });
 
 // 对应 BentoNewPost (top-40 即 160px，固定值)
 const newCardPosition = computed(() => {
-  const totalLeft = halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
+  const totalLeft =
+    halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
   return {
     left: `${totalLeft - 36}px`,
     top: `160px`,
@@ -201,7 +215,8 @@ const newCardPosition = computed(() => {
 
 // 对应 BentoTech (top-[81%])
 const techPosition = computed(() => {
-  const totalLeft = halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224;
+  const totalLeft =
+    halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224;
   return {
     left: `${totalLeft}px`,
     top: `${layoutHeight.value * 0.81}px`,
@@ -210,16 +225,18 @@ const techPosition = computed(() => {
 
 // 对应 BentoWebsites
 const websitesPosition = computed(() => {
-  const totalLeft = halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
+  const totalLeft =
+    halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
   return {
     left: `${totalLeft + 24}px`,
-    top: `${layoutHeight.value * 0.13}px`,
+    top: `${layoutHeight.value * 0.2}px`,
   };
 });
 
 // 对应 BentoReadingList (top-6/8)
 const listCardPosition = computed(() => {
-  const totalLeft = halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
+  const totalLeft =
+    halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
   return {
     left: `${totalLeft - 240}px`,
     top: `${(layoutHeight.value * 6) / 8}px`,

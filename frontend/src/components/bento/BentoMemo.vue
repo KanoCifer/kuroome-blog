@@ -30,11 +30,11 @@ const clearMemo = () => {
     :animate="{ scale: 1 }"
     :whileHover="{ scale: 1.05 }"
     :whilePress="{ scale: 0.95 }"
-    class="w-auto"
+    class="w-auto cursor-pointer"
   >
     <button
       @click="toggleMemo"
-      class="squircle flex w-auto items-center justify-center border border-white/60 bg-gray-50/50 px-6 py-4 text-gray-700 shadow-sm ring ring-gray-50 backdrop-blur-sm transition-colors dark:border-gray-700 dark:bg-gray-800/80 dark:text-gray-50 dark:ring-gray-600"
+      class="squircle flex w-auto cursor-pointer items-center justify-center border border-white/60 bg-gray-50/50 px-6 py-4 text-gray-700 shadow-sm ring ring-gray-50 backdrop-blur-sm transition-colors dark:border-gray-700 dark:bg-gray-800/80 dark:text-gray-50 dark:ring-gray-600"
       title="备忘录"
     >
       <IconMemo class="mr-2 size-8" />
@@ -44,10 +44,10 @@ const clearMemo = () => {
     <!-- Memo Modal -->
     <Teleport to="body">
       <transition
-        enter-active-class="transition-all duration-300 ease-out"
+        enter-active-class="transition-all transition-gpu transition-discrete duration-300 ease-out"
         enter-from-class="opacity-0"
         enter-to-class="opacity-100"
-        leave-active-class="transition-all duration-200 ease-in"
+        leave-active-class="transition-all transition-gpu transition-discrete duration-200 ease-in"
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
@@ -57,7 +57,9 @@ const clearMemo = () => {
           @click.self="closeMemo"
         >
           <!-- Background overlay -->
-          <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+          <div
+            class="background-overlay absolute inset-0 bg-black/60 backdrop-blur-sm transition-all"
+          ></div>
 
           <!-- Modal content -->
           <div

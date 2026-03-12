@@ -44,6 +44,11 @@
     }
   }
 }
+
+button {
+  @apply cursor-pointer;
+}
+
 footer {
   @apply mx-auto w-full min-w-0 p-4 text-center text-sm text-gray-300;
 }

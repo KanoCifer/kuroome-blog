@@ -33,7 +33,7 @@
           </p>
         </div>
         <RouterLink
-          to="/rss/subscriptions"
+          to="/rss"
           class="ml-auto text-sm font-medium text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
           >管理订阅</RouterLink
         >

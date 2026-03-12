@@ -174,21 +174,21 @@ const router = createRouter({
     {
       path: "/rss",
       name: "rss",
+      component: () => import("@/views/rss/RssSubscriptionsView.vue"),
+      meta: {
+        title: "我的订阅 - Kuroome's Blog",
+        requiresAuth: true,
+      },
+    },
+    {
+      path: "/rss/parse",
+      name: "rss-parse",
       component: () => import("@/views/rss/RSSParseView.vue"),
       meta: {
         title: "RSS 订阅 - Kuroome's Blog",
         description:
           "订阅 Kuroome's Blog 的 RSS 频道，第一时间获取最新文章更新",
         keywords: "RSS订阅,博客更新,文章订阅",
-      },
-    },
-    {
-      path: "/rss/subscriptions",
-      name: "rss-subscriptions",
-      component: () => import("@/views/rss/RssSubscriptionsView.vue"),
-      meta: {
-        title: "我的订阅 - Kuroome's Blog",
-        requiresAuth: true,
       },
     },
     {
@@ -220,31 +220,19 @@ const router = createRouter({
 
 // 全局路由守卫：每次路由跳转前都会执行
 router.beforeEach(async (to) => {
-  // 1. 路由跳转开始时，启动 Pace 进度条
-
-  // 2. 获取认证状态管理的 store
   const auth = useAuthStore();
 
-  // 3. 如果还没初始化过认证状态（比如刚刷新页面）
   if (!auth.isHydrated) {
-    // 就先等它初始化完成（恢复用户登录状态）
     await auth.hydrateAuth();
   }
 
-  // 4. 检查"要去的页面"是否需要登录才能访问
-  // （看路由配置里的 meta.requiresAuth 是不是 true）
   const needsAuth = to.matched.some(
     (route) => route.meta?.requiresAuth === true,
   );
 
-  // 5. 如果这个页面需要登录，但用户现在没登录
   if (needsAuth && !auth.isAuthenticated) {
-    // 就跳转到登录页，并把"当前想去的页面路径"带上
-    // （这样登录成功后可以直接跳回这个页面，体验更好）
     return { name: "login", query: { redirect: to.fullPath } };
   }
-
-  // 6. 上面的检查都通过了，就允许进入目标页面
   return true;
 });
 

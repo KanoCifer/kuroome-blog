@@ -1,5 +1,8 @@
 <template>
-  <BentoCard class="group relative h-full cursor-pointer overflow-hidden" @click="goToWebsites">
+  <BentoCard
+    class="group relative h-fit cursor-pointer overflow-hidden"
+    @click="goToWebsites"
+  >
     <div class="relative z-10 flex h-full flex-col justify-between px-6 py-4">
       <div
         class="text-xs font-bold tracking-wide text-neutral-500 uppercase transition-colors duration-300 group-hover:text-neutral-600 dark:text-neutral-400 dark:group-hover:text-neutral-300"
@@ -8,7 +11,7 @@
       </div>
       <div class="my-1 flex items-center">
         <div
-          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-4xl bg-neutral-100 text-neutral-700 transition-colors duration-300 group-hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:group-hover:bg-neutral-700"
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-neutral-100 text-neutral-700 transition-colors duration-300 group-hover:bg-neutral-200 dark:bg-neutral-700 dark:text-neutral-300 dark:group-hover:bg-neutral-600"
         >
           <img
             v-if="randomSite?.icon"

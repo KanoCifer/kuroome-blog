@@ -1,9 +1,12 @@
 <template>
-  <div
-    :style="sectionStyle"
-    class="mt-24 min-h-screen rounded-t-[40px] bg-blue-50 px-4 py-8 backdrop-blur-sm sm:px-6 lg:px-8 dark:bg-slate-900"
-  >
-    <div class="mx-auto max-w-4xl">
+  <div class="relative mt-24 min-h-screen">
+    <!-- 背景层 -->
+    <div
+      :style="sectionStyle"
+      class="absolute inset-y-0 left-1/2 -z-5 -translate-x-1/2 rounded-t-[40px] bg-blue-50 dark:bg-slate-900"
+    ></div>
+
+    <div class="mx-auto max-w-4xl pt-10">
       <!-- 页面标题 -->
       <div class="mb-8 flex items-center gap-3">
         <div
@@ -53,7 +56,7 @@
           返回Rss解析
         </button>
         <router-link
-          to="/rss/subscriptions"
+          to="/rss"
           class="ml-auto text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
         >
           管理订阅
@@ -83,7 +86,7 @@
           </div>
           <input
             v-model="searchQuery"
-            type="text"
+            type="search"
             placeholder="搜索文章标题和内容..."
             class="block w-full rounded-xl border border-blue-200 bg-white py-3 pr-4 pl-10 text-sm text-blue-900 placeholder:text-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-blue-500"
             @keyup.enter="handleSearch"
@@ -182,7 +185,7 @@
                   {{ formatDate(article.published) }}
                 </span>
                 <span
-                  class="max-w-[200px] truncate opacity-75 sm:max-w-xs"
+                  class="max-w-50 truncate opacity-75 sm:max-w-xs"
                   :title="article.feed_url"
                 >
                   来源: {{ article.feed_url }}
@@ -370,9 +373,9 @@ watch(
 const { y } = useScroll(window);
 const sectionStyle = computed(() => {
   // compute scale with a ceiling of 1 so the content does not grow indefinitely
-  const scale = Math.min(1, 0.9 + y.value * 0.001);
+  const width = Math.min(1, 0.9 + y.value * 0.001);
   return {
-    transform: `scale(${scale})`, // 内容区稍快
+    width: `${width * 100}%`,
   };
 });
 </script>

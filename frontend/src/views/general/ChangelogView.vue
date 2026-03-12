@@ -1,7 +1,7 @@
 <template>
   <div
     id="changelogView"
-    class="my-36 flex min-h-full w-full flex-col items-center justify-center py-12"
+    class="my-12 flex min-h-full w-full flex-col items-center justify-center py-12"
   >
     <div class="w-full max-w-5xl px-4">
       <!-- Header Section -->
@@ -137,14 +137,12 @@
               class="absolute top-1/2 left-1/2 z-10 hidden h-8 w-8 -translate-x-1/2 -translate-y-1/2 md:block"
             >
               <div
-                class="absolute inset-0 -m-2 rounded-full bg-linear-to-br from-blue-400 to-indigo-500 opacity-30 blur-md transition-all duration-300 group-hover:opacity-50 group-hover:blur-lg"
+                class="absolute inset-0 -m-2 rounded-full bg-blue-500 opacity-30 blur-md transition-all duration-300 group-hover:opacity-50 group-hover:blur-lg"
               ></div>
               <div
                 class="relative flex h-full w-full items-center justify-center rounded-full bg-white ring-4 ring-blue-100 dark:bg-gray-800 dark:ring-gray-700"
               >
-                <div
-                  class="h-3 w-3 rounded-full bg-linear-to-r from-blue-400 to-indigo-500"
-                ></div>
+                <div class="h-3 w-3 rounded-full bg-blue-400"></div>
               </div>
             </div>
 
@@ -155,9 +153,7 @@
               <div
                 class="relative flex h-full w-full items-center justify-center rounded-full bg-white ring-3 ring-blue-100 dark:bg-gray-800 dark:ring-gray-700"
               >
-                <div
-                  class="h-2 w-2 rounded-full bg-linear-to-r from-blue-400 to-indigo-500"
-                ></div>
+                <div class="h-2 w-2 rounded-full bg-blue-400"></div>
               </div>
             </div>
 

@@ -1,5 +1,16 @@
 [
   {
+    "version": "2.3.1",
+    "date": "2026-03-12",
+    "title": "修复了一些bugs",
+    "changes": [
+      {
+        "type": "fix",
+        "content": "修复了Passkey认证方式refreshToken无法刷新的bug"
+      }
+    ]
+  },
+  {
     "version": "2.3.0",
     "date": "2026-03-11",
     "title": "新增网站推荐页面",
