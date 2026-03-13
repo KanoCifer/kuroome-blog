@@ -45,6 +45,22 @@
   }
 }
 
+@theme {
+  --animate-shimmer: shimmer 2s linear infinite;
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+}
+
+.animate-shimmer {
+  @apply bg-linear-to-r from-gray-300 via-gray-400 to-gray-500 bg-size-[200%] bg-clip-text text-transparent;
+}
+
 button {
   @apply cursor-pointer;
 }
@@ -72,6 +88,7 @@ a {
 .modal-body {
   @apply text-lg text-gray-700;
 }
+
 /* // tiptap编辑器样式 */
 .tiptap p.is-editor-empty:first-child::before {
   @apply text-gray-400;
@@ -91,6 +108,97 @@ a {
 /* 图片 */
 .tiptap-image {
   @apply h-auto max-w-full rounded-md;
+}
+
+/* 图片缩放手柄（Tiptap ResizableNodeView） */
+.tiptap [data-resize-wrapper] {
+  @apply relative inline-block;
+}
+
+.tiptap [data-resize-state="true"] [data-resize-wrapper] {
+  @apply outline outline-blue-300;
+}
+
+.tiptap [data-resize-handle] {
+  @apply absolute z-10 h-2 w-2 rounded-full border border-white bg-blue-500 opacity-0 transition-opacity;
+}
+
+.tiptap [data-resize-wrapper]:hover [data-resize-handle] {
+  @apply opacity-100;
+}
+
+.tiptap [data-resize-handle="top"] {
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: ns-resize;
+}
+
+.tiptap [data-resize-handle="bottom"] {
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: ns-resize;
+}
+
+.tiptap [data-resize-handle="left"] {
+  left: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: ew-resize;
+}
+
+.tiptap [data-resize-handle="right"] {
+  right: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: ew-resize;
+}
+
+.dark .tiptap [data-resize-handle] {
+  @apply border-slate-900 bg-blue-400;
+}
+
+/* 拖拽手柄（Tiptap DragHandle 官方示例结构） */
+.drag-handle,
+.custom-drag-handle {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  cursor: grab;
+  position: relative;
+}
+
+.drag-handle::before,
+.custom-drag-handle::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  background:
+    radial-gradient(#9ca3af 2px, transparent 2px) 0 0 / 6px 6px,
+    radial-gradient(#9ca3af 2px, transparent 2px) 3px 3px / 6px 6px;
+}
+
+.drag-handle:active,
+.custom-drag-handle:active {
+  cursor: grabbing;
+}
+
+.dark .drag-handle,
+.dark .custom-drag-handle {
+  border-color: #334155;
+  background-color: #0f172a;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.dark .drag-handle::before,
+.dark .custom-drag-handle::before {
+  background:
+    radial-gradient(#94a3b8 2px, transparent 2px) 0 0 / 6px 6px,
+    radial-gradient(#94a3b8 2px, transparent 2px) 3px 3px / 6px 6px;
 }
 
 /* 代码块 - macOS 风格（同时支持编辑器和文章展示） */

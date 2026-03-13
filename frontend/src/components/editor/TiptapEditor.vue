@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import request, { type ApiResponse } from "@/request";
 import { Extension } from "@tiptap/core";
 import { DragHandle } from "@tiptap/extension-drag-handle-vue-3";
 import NodeRange from "@tiptap/extension-node-range";
@@ -11,20 +12,19 @@ import TiptapToolbar from "./TiptapToolbar.vue";
 
 // Tiptap 扩展（按需引入，减小体积）
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import Document from "@tiptap/extension-document";
+import FileHandler from "@tiptap/extension-file-handler";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
+import Paragraph from "@tiptap/extension-paragraph";
 import Placeholder from "@tiptap/extension-placeholder";
-import {
-  Table,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "@tiptap/extension-table";
+import { Table, TableCell, TableHeader, TableRow } from "@tiptap/extension-table";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
+import Text from "@tiptap/extension-text";
 import TextAlign from "@tiptap/extension-text-align";
 import Underline from "@tiptap/extension-underline";
-import { CharacterCount } from "@tiptap/extensions";
+import { CharacterCount, Dropcursor } from "@tiptap/extensions";
 import css from "highlight.js/lib/languages/css";
 import js from "highlight.js/lib/languages/javascript";
 import python from "highlight.js/lib/languages/python";
@@ -52,6 +52,25 @@ const CodeBlockTabIndent = Extension.create({
     };
   },
 });
+
+const uploadImage = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await request.post<ApiResponse<{ url: string; filename: string }>>(
+    "/blog/upload-image",
+    formData,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    },
+  );
+
+  if (res.data.status !== "success" || !res.data.data?.url) {
+    throw new Error(res.data.message || "Image upload failed.");
+  }
+
+  return res.data.data.url;
+};
 
 // v-model 双向绑定
 const emit = defineEmits<{
@@ -222,7 +241,20 @@ const editor = useEditor({
     // 链接与图片
     Link.configure({ openOnClick: false }),
 
-    Image,
+    Image.configure({
+      resize: {
+        enabled: true,
+        directions: ["top", "bottom", "left", "right"],
+        minWidth: 50,
+        minHeight: 50,
+        alwaysPreserveAspectRatio: true,
+      },
+      allowBase64: true,
+    }),
+    Document,
+    Paragraph,
+    Text,
+    Dropcursor,
 
     // 占位符
     Placeholder.configure({
@@ -256,12 +288,50 @@ const editor = useEditor({
     TableHeader,
     TableCell,
     CharacterCount,
+
+    FileHandler.configure({
+      allowedMimeTypes: ["image/png", "image/jpeg", "image/gif", "image/webp"],
+      onDrop: async (currentEditor, files, pos) => {
+        for (const file of files) {
+          try {
+            const url = await uploadImage(file);
+            currentEditor
+              .chain()
+              .insertContentAt(pos, {
+                type: "image",
+                attrs: { src: url },
+              })
+              .focus()
+              .run();
+          } catch (error) {
+            console.error("图片上传失败:", error);
+          }
+        }
+      },
+      onPaste: async (currentEditor, files) => {
+        for (const file of files) {
+          try {
+            const url = await uploadImage(file);
+            currentEditor
+              .chain()
+              .insertContentAt(currentEditor.state.selection.anchor, {
+                type: "image",
+                attrs: { src: url },
+              })
+              .focus()
+              .run();
+          } catch (error) {
+            console.error("图片上传失败:", error);
+          }
+        }
+      },
+    }),
   ],
 
   editorProps: {
     attributes: {
       class:
-        "prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[800px] px-6 py-4",
+        "tiptap prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[800px] px-6 py-4",
     },
     handleDOMEvents: {
       keydown: (view, event) => {
@@ -328,19 +398,7 @@ onBeforeUnmount(() => {
   >
     <TiptapToolbar v-if="editor" :editor="editor" />
     <drag-handle v-if="editor" :editor="editor">
-      <svg
-        class="h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="2"
-        stroke="currentColor"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M4 8h16M4 16h16"
-        />
-      </svg>
+      <div class="drag-handle custom-drag-handle"></div>
     </drag-handle>
     <EditorContent :editor="editor" />
 
@@ -399,13 +457,7 @@ onBeforeUnmount(() => {
         ]"
         title="斜体"
       >
-        <svg
-          class="h-4 w-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="2"
-          stroke="currentColor"
-        >
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -421,13 +473,7 @@ onBeforeUnmount(() => {
         title="Code Block"
         class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
       >
-        <svg
-          class="h-4 w-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="2"
-          stroke="currentColor"
-        >
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -447,13 +493,7 @@ onBeforeUnmount(() => {
         ]"
         title="插入链接"
       >
-        <svg
-          class="h-4 w-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="2"
-          stroke="currentColor"
-        >
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -473,3 +513,59 @@ onBeforeUnmount(() => {
     </div>
   </div>
 </template>
+
+<style lang="scss">
+.tiptap {
+  :first-child {
+    margin-top: 0;
+  }
+
+  img {
+    display: block;
+  }
+
+  [data-resize-handle] {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 2px;
+    z-index: 10;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.8);
+    }
+
+    /* Corner handles */
+    &[data-resize-handle="top-left"],
+    &[data-resize-handle="top-right"],
+    &[data-resize-handle="bottom-left"],
+    &[data-resize-handle="bottom-right"] {
+      width: 8px;
+      height: 8px;
+    }
+
+    &[data-resize-handle="top-left"] {
+      top: -4px;
+      left: -4px;
+      cursor: nwse-resize;
+    }
+
+    &[data-resize-handle="top-right"] {
+      top: -4px;
+      right: -4px;
+      cursor: nesw-resize;
+    }
+
+    &[data-resize-handle="bottom-left"] {
+      bottom: -4px;
+      left: -4px;
+      cursor: nesw-resize;
+    }
+
+    &[data-resize-handle="bottom-right"] {
+      bottom: -4px;
+      right: -4px;
+      cursor: nwse-resize;
+    }
+  }
+}
+</style>

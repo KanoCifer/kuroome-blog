@@ -1,0 +1,1 @@
+import{r as e}from"./rolldown-runtime-Dw2cE7zH.js";import{i as t,r as n,t as r}from"./dayjs-DtyCf08S.js";var i=e(t(),1);n();var a=e(r(),1);i.default.extend(a.default);var o=e=>e?(0,i.default)(e).local().format(`YYYY-MM-DD HH:mm:ss`):`未知时间`;export{o as t};

@@ -10,12 +10,9 @@ Endpoints:
 
 from __future__ import annotations
 
-import os
-import uuid
-from pathlib import Path
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, UploadFile, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -24,6 +21,8 @@ from app.dependencies.database import get_session
 from app.models.models import Profile, User
 from app.schemas.response import APIResponse
 from app.schemas.schemas import UserSettingsIn
+from app.utils.compress_image import compress_avartar
+from app.utils.media import _get_media_root, save_upload_image
 
 router = APIRouter(
     prefix="/user",
@@ -73,57 +72,6 @@ async def _check_username_exists(
         )
     )
     return result.scalar_one_or_none() is not None
-
-
-def _save_upload_file(upload_file: UploadFile, user_id: int) -> str:
-    """Save uploaded avatar file to media directory.
-
-    Args:
-        upload_file: The uploaded file object
-        user_id: The user ID for organizing files
-
-    Returns:
-        The filename of the saved file
-
-    Raises:
-        HTTPException: If file saving fails
-    """
-    # Generate unique filename
-    file_ext = Path(upload_file.filename or "avatar.jpg").suffix
-    filename = f"{uuid.uuid4().hex}{file_ext}"
-
-    # Determine media directory from env or default to backend/app/media
-    env_media = os.environ.get("MEDIA_PATH")
-    if env_media:
-        media_root = Path(env_media)
-    else:
-        # use the repository's app/media directory (relative to this file)
-        media_root = Path(__file__).resolve().parent.parent / "media"
-
-    # store per-user so files don't collide
-    user_dir = media_root / str(user_id)
-    try:
-        user_dir.mkdir(parents=True, exist_ok=True)
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to create media directory: {e!s}",
-        ) from e
-
-    file_path = user_dir / filename
-    try:
-        # ensure file pointer at start
-        upload_file.file.seek(0)
-        with file_path.open("wb") as f:
-            f.write(upload_file.file.read())
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to save avatar: {e!s}",
-        ) from e
-
-    # return relative path under media (e.g. "<user_id>/<filename>")
-    return f"{user_id}/{filename}"
 
 
 @router.put("/settings")
@@ -262,8 +210,13 @@ async def upload_avatar(
 
     # Handle image upload
     if image and image.filename:
-        image_filename = _save_upload_file(image, db_user.id)
-        db_profile.photo = image_filename
+        image_filename = save_upload_image(image, str(db_user.id))
+        media_root = _get_media_root()
+        original_path = media_root / image_filename
+        thumbnail_filename = image_filename.replace(".", "-256.")
+        thumbnail_path = media_root / thumbnail_filename
+        compress_avartar(str(original_path), str(thumbnail_path))
+        db_profile.photo = thumbnail_filename
 
     await db.commit()
 

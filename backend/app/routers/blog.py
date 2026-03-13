@@ -7,19 +7,45 @@ from typing import Annotated
 from beanie import SortDirection
 from bson import ObjectId
 from bson.errors import InvalidId
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, File, Query, UploadFile
 from fastapi.responses import JSONResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
+from app.dependencies.auth import manager
 from app.dependencies.database import get_session
 from app.models.mgmodel import Post
-from app.models.models import Category
+from app.models.models import Category, User
 from app.schemas import PostComment
 from app.schemas.response import APIResponse
+from app.utils.media import save_upload_image
 
 router = APIRouter(tags=["blog"])
+
+
+@router.post("/upload-image")
+@router.post("/blog/upload-image")
+async def upload_blog_image(
+    file: UploadFile = File(),
+    user: User = Depends(manager),
+) -> JSONResponse:
+    """Upload blog image and return public URL."""
+    if not file or not file.filename:
+        return APIResponse.error(
+            message="No image provided.",
+            code=status.HTTP_400_BAD_REQUEST,
+        )
+
+    relative_path = save_upload_image(file, f"posts/{user.id}")
+    return APIResponse.ok(
+        data={
+            "url": f"/api/v1/media/{relative_path}",
+            "filename": relative_path,
+        },
+        message="Image uploaded successfully.",
+        code=status.HTTP_200_OK,
+    )
 
 
 # 获取分类列表和每个分类的文章数量（修复：把这个函数放在外面，单独处理分类和数量的逻辑）

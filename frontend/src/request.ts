@@ -27,9 +27,7 @@ export async function fetchAndStoreCSRF() {
 
   csrfFetchPromise = (async () => {
     try {
-      await request.get<ApiResponse<{ csrf_token: string }>>(
-        "/auth/csrf-token",
-      );
+      await request.get<ApiResponse<{ csrf_token: string }>>("/auth/csrf-token");
     } catch (error) {
       console.error("获取 CSRF Token 失败:", error);
       throw error;
@@ -80,17 +78,14 @@ request.interceptors.response.use(
       _isRefreshToken?: boolean;
       _retry?: boolean;
     };
-    if (
-      error.response?.status === 401 &&
-      !isrefreshTokenRequest(_cfg) &&
-      !_cfg._retry
-    ) {
+    if (error.response?.status === 401 && !isrefreshTokenRequest(_cfg) && !_cfg._retry) {
       // 标记已重试，防止无限循环
       _cfg._retry = true;
 
       // 检查是否有refreshToken，没有的话直接跳转登录页，不需要刷新
       const authStore = useAuthStore();
       const refreshToken = authStore.getRefreshToken();
+      console.log("尝试刷新访问令牌，当前 refreshToken:", refreshToken);
       if (!refreshToken) {
         setTimeout(onUnauthorizedCallback, 1000); // 避免重复跳转
         return Promise.reject(error);

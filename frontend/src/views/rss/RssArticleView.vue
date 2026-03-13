@@ -4,14 +4,14 @@ import ArticleSummaryCard from "@/components/blog/ArticleSummaryCard.vue";
 import request from "@/request";
 import { useNotificationStore } from "@/stores/notification";
 import type { ApiResponse, RssArticle } from "@/types";
+import { formatDate } from "@/utils/formatdate";
 import { useScroll } from "@vueuse/core";
 import DOMPurify from "dompurify";
 import { motion } from "motion-v";
 import { computed, onMounted, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 
 const route = useRoute();
-const router = useRouter();
 const article = ref<RssArticle | null>(null);
 const isLoading = ref<boolean>(true);
 const isToggling = ref<boolean>(false);
@@ -21,11 +21,8 @@ const notifier = useNotificationStore();
 const { y } = useScroll(window);
 const percent = computed(() => {
   if (!article.value) return 0;
-  const contentHeight =
-    document.documentElement.scrollHeight - window.innerHeight;
-  return contentHeight > 0
-    ? Math.min(100, Math.round((y.value / contentHeight) * 100))
-    : 0;
+  const contentHeight = document.documentElement.scrollHeight - window.innerHeight;
+  return contentHeight > 0 ? Math.min(100, Math.round((y.value / contentHeight) * 100)) : 0;
 });
 
 const articleId = computed(() => route.params.id as string);
@@ -36,8 +33,7 @@ const buildProxyImageUrl = (rawUrl: string): string => {
 
   let resolved = trimmed;
   try {
-    const base =
-      article.value?.link || article.value?.feed_url || window.location.origin;
+    const base = article.value?.link || article.value?.feed_url || window.location.origin;
     resolved = new URL(trimmed, base).toString();
   } catch {
     resolved = trimmed;
@@ -92,9 +88,7 @@ const fetchArticle = async () => {
   isLoading.value = true;
   errorMessage.value = "";
   try {
-    const res = await request.get<ApiResponse<RssArticle>>(
-      `/rss/articles/${articleId.value}`,
-    );
+    const res = await request.get<ApiResponse<RssArticle>>(`/rss/articles/${articleId.value}`);
     if (res.data.status === "success" && res.data.data) {
       article.value = res.data.data;
     } else {
@@ -103,9 +97,7 @@ const fetchArticle = async () => {
   } catch (err: unknown) {
     console.error(err);
     errorMessage.value =
-      err instanceof Error
-        ? err.message
-        : String(err) || "加载文章失败，请稍后重试。";
+      err instanceof Error ? err.message : String(err) || "加载文章失败，请稍后重试。";
     notifier.error(errorMessage.value);
   } finally {
     isLoading.value = false;
@@ -187,12 +179,7 @@ watch(
             : 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
         "
       >
-        <svg
-          v-if="isToggling"
-          class="h-4 w-4 animate-spin"
-          viewBox="0 0 24 24"
-          fill="none"
-        >
+        <svg v-if="isToggling" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
           <circle
             class="opacity-25"
             cx="12"
@@ -239,19 +226,12 @@ watch(
       class="overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
     >
       <div class="border-b border-blue-100 p-8 dark:border-slate-700">
-        <h1
-          class="mb-4 text-3xl leading-tight font-bold text-blue-900 dark:text-white"
-        >
+        <h1 class="mb-4 text-3xl leading-tight font-bold text-blue-900 dark:text-white">
           {{ article.title }}
         </h1>
 
-        <div
-          class="flex flex-wrap gap-x-6 gap-y-3 text-sm text-blue-600 dark:text-blue-400"
-        >
-          <div
-            v-if="article.author"
-            class="flex items-center gap-1.5 font-medium"
-          >
+        <div class="flex flex-wrap gap-x-6 gap-y-3 text-sm text-blue-600 dark:text-blue-400">
+          <div v-if="article.author" class="flex items-center gap-1.5 font-medium">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -284,7 +264,7 @@ watch(
                 d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
               />
             </svg>
-            {{ article.published }}
+            {{ formatDate(article.published) }}
           </div>
 
           <div class="flex items-center gap-1.5">
@@ -302,9 +282,7 @@ watch(
                 d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
               />
             </svg>
-            <span class="max-w-50 truncate" :title="article.feed_url">{{
-              article.feed_url
-            }}</span>
+            <span class="max-w-50 truncate" :title="article.feed_url">{{ article.feed_url }}</span>
           </div>
 
           <a
