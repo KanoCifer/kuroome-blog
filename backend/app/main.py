@@ -21,9 +21,10 @@ from app.configs.logger import logger
 from app.dependencies.aps import refresh_rss_feeds, run_migration_job
 from app.dependencies.csrf import setup_csrf
 from app.dependencies.database import close_db_connections
+from app.dependencies.limiter import limiter
 from app.dependencies.mongo import closeclient, init_mongo
 from app.exceptions import register_exception_handlers
-from app.models.mgmodel import MessageBoard, Post, RssArticle
+from app.models.mgmodel import MessageBoard, Post, RssArticle, SiteStats
 from app.routers import (
     admin,
     aiagent,
@@ -52,7 +53,7 @@ async def lifespan(app: FastAPI):
     await init_mongo(app)
     await init_beanie(
         database=app.state.mongo,
-        document_models=[MessageBoard, Post, RssArticle],
+        document_models=[MessageBoard, Post, RssArticle, SiteStats],
     )
 
     # 初始化 APScheduler
@@ -70,7 +71,7 @@ async def lifespan(app: FastAPI):
 
     scheduler.add_job(
         refresh_rss_feeds,
-        trigger=CronTrigger(hour=8),
+        trigger=CronTrigger(hour=10),  # 每天上午 10 点执行一次
         id="rss_refresh",
         name="Daily RSS 刷新",
         replace_existing=True,
@@ -97,6 +98,9 @@ app = FastAPI(
     version=get_settings().API_VERSION,
     lifespan=lifespan,
 )
+
+# Attach slowapi limiter to app state
+app.state.limiter = limiter
 
 # Include routers
 app.include_router(admin.router, prefix="/api/v1")
@@ -156,6 +160,6 @@ app.mount(
 )
 
 app.add_exception_handler(
-    RateLimitExceeded,
+    exc_class_or_status_code=RateLimitExceeded,
     handler=_rate_limit_exceeded_handler,  # type: ignore
 )  # type: ignore

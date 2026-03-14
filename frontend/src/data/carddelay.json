@@ -9,5 +9,6 @@
   "BentoCat": { "order": 7 },
   "TodoCard": { "order": 8 },
   "BentoTech": { "order": 9 },
-  "BentoWebsites": { "order": 10 }
+  "BentoWebsites": { "order": 10 },
+  "BentoLike": { "order": 11 }
 }

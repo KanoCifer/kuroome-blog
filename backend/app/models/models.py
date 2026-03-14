@@ -74,6 +74,9 @@ class User(Base):
     id: Mapped[int] = mapped_column(
         Integer, primary_key=True, autoincrement=True
     )
+    github_id: Mapped[int | None] = mapped_column(
+        Integer, unique=True, index=True, nullable=True
+    )
     name: Mapped[str] = mapped_column(
         String(50), default=fake.name(), index=True
     )

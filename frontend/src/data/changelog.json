@@ -1,5 +1,16 @@
 [
   {
+    "version": "2.3.3",
+    "date": "2026-03-14",
+    "title": "增加Like卡片，GitHub登陆/绑定功能",
+    "changes": [
+      { "type": "feat", "content": "新增Like卡片" },
+      { "type": "feat", "content": "新增GitHub登录和绑定功能" },
+      { "type": "style", "content": "Toast堆叠样式优化" },
+      { "type": "fix", "content": "修复了一些小bug" }
+    ]
+  },
+  {
     "version": "2.3.2",
     "date": "2026-03-13",
     "title": "AI总结功能UI优化",

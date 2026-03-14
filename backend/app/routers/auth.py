@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import base64
 import json
+import secrets
 from datetime import UTC, datetime, timedelta
+from urllib.parse import urlencode
 
+import httpx
 from email_validator import EmailNotValidError, validate_email
 from fastapi import (
     APIRouter,
@@ -14,9 +17,9 @@ from fastapi import (
     Response,
     status,
 )
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi_mail import FastMail, MessageSchema, MessageType, NameEmail
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, SecretStr
 from redis.exceptions import RedisError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -33,6 +36,7 @@ from webauthn.registration.verify_registration_response import (
     VerifiedRegistration,
 )
 
+from app.configs.config import settings
 from app.configs.logger import logger
 from app.dependencies.auth import manager
 from app.dependencies.csrf import csrf_manager
@@ -40,9 +44,10 @@ from app.dependencies.database import get_session
 from app.dependencies.limiter import limiter
 from app.dependencies.mail import MailConfig
 from app.dependencies.redis import AsyncRedis, get_async_redis
-from app.models.models import PasskeyCredential, User
+from app.models.models import PasskeyCredential, Profile, User
 from app.schemas.response import APIResponse
 from app.schemas.schemas import LoginIn, RegisterIn
+from app.utils.security import generate_pkce_pair
 from app.utils.webauthn import (
     generate_passkey_authentication_options,
     generate_passkey_registration_options,
@@ -54,6 +59,24 @@ router = APIRouter(
     prefix="/auth",
     tags=["auth"],
 )
+
+
+async def _login_user(
+    user: User,
+    request: Request,
+    session: AsyncSession,
+):
+    """登录用户并更新登录信息."""
+    if not user.active:
+        user.active = True
+    user.last_login_at = user.current_login_at
+    user.current_login_at = datetime.now(UTC).replace(tzinfo=None)
+    user.last_login_ip = user.current_login_ip
+    # 获取用户ip
+    user.current_login_ip = User.get_real_ip(request)
+    user.login_count += 1
+
+    await session.commit()
 
 
 @router.get("/csrf-token", response_model=APIResponse)
@@ -104,7 +127,7 @@ async def refresh_token(
             data={"sub": str(user.id)}, expires=timedelta(days=30)
         )
 
-        response = APIResponse.ok(
+        response: JSONResponse = APIResponse.ok(
             message="访问令牌已刷新",
             code=status.HTTP_200_OK,
             data={"refresh_token": new_refresh_token},
@@ -159,7 +182,7 @@ async def login(
             selectinload(User.profile), selectinload(User.passkey_credential)
         )
     )
-    user = user_result.scalar_one_or_none()
+    user: User | None = user_result.scalar_one_or_none()
 
     if user is None or not user.validate_password(password):
         return APIResponse.error(
@@ -167,7 +190,7 @@ async def login(
             code=status.HTTP_401_UNAUTHORIZED,
         )
 
-    profile = user.profile
+    profile: Profile | None = user.profile
 
     if remember_me:
         access_token = manager.create_access_token(
@@ -184,18 +207,9 @@ async def login(
             data={"sub": str(user.id)}, expires=timedelta(days=7)
         )
 
-    # Track login info
-    user.active = True
-    user.last_login_at = user.current_login_at
-    user.current_login_at = datetime.now(UTC).replace(tzinfo=None)
-    user.last_login_ip = user.current_login_ip
-    # 获取用户ip
-    user.current_login_ip = User.get_real_ip(request)
-    user.login_count += 1
+    await _login_user(user=user, request=request, session=session)
 
-    await session.commit()
-
-    response = APIResponse.ok(
+    response: JSONResponse = APIResponse.ok(
         data={
             "id": user.id,
             "username": user.username,
@@ -206,7 +220,8 @@ async def login(
             "mobile": profile.mobile if profile else None,
             "photo": profile.photo if profile else None,
             "refresh_token": refresh_token,
-            "has_passkey": user.passkey_credential is not None,
+            "has_passkey": bool(user.passkey_credential),
+            "github_bound": bool(user.github_id),
         },
         message="登录成功",
     )
@@ -299,7 +314,8 @@ async def me(
             "gender": profile.gender if profile else None,
             "mobile": profile.mobile if profile else None,
             "photo": profile.photo if profile else None,
-            "has_passkey": user.passkey_credential is not None,
+            "has_passkey": bool(user.passkey_credential),
+            "github_bound": bool(user.github_id),
         },
         message="获取用户信息成功",
         code=status.HTTP_200_OK,
@@ -712,14 +728,7 @@ async def passkey_authenticate(
     credential.sign_count = verification.new_sign_count
 
     # 更新用户登录信息（同常规登录）
-    user.active = True
-    user.last_login_at = user.current_login_at
-    user.current_login_at = datetime.now(UTC).replace(tzinfo=None)
-    user.last_login_ip = user.current_login_ip
-    user.current_login_ip = User.get_real_ip(http_request)
-    user.login_count += 1
-
-    await session.commit()
+    await _login_user(user=user, request=http_request, session=session)
 
     # 生成令牌并设置 Cookie（同常规登录）
     access_token = manager.create_access_token(
@@ -742,6 +751,7 @@ async def passkey_authenticate(
             "photo": profile.photo if profile else None,
             "has_passkey": True,
             "refresh_token": refresh_token,
+            "github_bound": bool(user.github_id),
         },
         message="Passkey 登录成功",
     )
@@ -757,3 +767,302 @@ async def passkey_authenticate(
     csrf_manager.set_csrf_cookie(response)
 
     return response
+
+
+class GitHubOAuthConfig(BaseModel):
+    client_id: str
+    client_secret: SecretStr
+    redirect_uri: str
+    state: str
+    scope: str = "read:user user:email"
+    code_challenge: str
+    code_challenge_method: str = "S256"
+
+
+@router.get("/github")
+async def github_login(
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+):
+    """GitHub OAuth 登录."""
+    state = secrets.token_urlsafe(32)
+    code_verifier, code_challenge = generate_pkce_pair()
+
+    # 将 state 和 code_verifier 存储在 session 中，稍后验证
+    request.session["oauth_state"] = state
+    request.session["code_verifier"] = code_verifier
+    request.session["oauth_mode"] = "login"  # 标记为登录模式
+
+    # 构建 GitHub 授权 URL
+    github_config = GitHubOAuthConfig(
+        client_id=settings.GITHUB_CLIENT_ID,
+        client_secret=SecretStr(settings.GITHUB_CLIENT_SECRET),
+        redirect_uri=settings.GITHUB_REDIRECT_URI,
+        state=state,
+        scope="read:user user:email",
+        code_challenge=code_challenge,
+        code_challenge_method="S256",
+    )
+    auth_url = "https://github.com/login/oauth/authorize?" + urlencode(
+        github_config.model_dump(exclude={"client_secret"})
+    )
+
+    return RedirectResponse(auth_url)
+
+
+@router.get("/github/bind")
+async def github_bind(
+    request: Request,
+    current_user: User = Depends(manager),
+):
+    """绑定 GitHub 账号到当前登录用户."""
+    state = secrets.token_urlsafe(32)
+    code_verifier, code_challenge = generate_pkce_pair()
+
+    # 将 state 和 code_verifier 存储在 session 中，稍后验证
+    request.session["oauth_state"] = state
+    request.session["code_verifier"] = code_verifier
+    request.session["oauth_mode"] = "bind"  # 标记为绑定模式
+
+    # 构建 GitHub 授权 URL
+    github_config = GitHubOAuthConfig(
+        client_id=settings.GITHUB_CLIENT_ID,
+        client_secret=SecretStr(settings.GITHUB_CLIENT_SECRET),
+        redirect_uri=settings.GITHUB_REDIRECT_URI,
+        state=state,
+        scope="read:user user:email",
+        code_challenge=code_challenge,
+        code_challenge_method="S256",
+    )
+    auth_url = "https://github.com/login/oauth/authorize?" + urlencode(
+        github_config.model_dump(exclude={"client_secret"})
+    )
+
+    return RedirectResponse(auth_url)
+
+
+@router.post("/github/unbind")
+async def github_unbind(
+    current_user: User = Depends(manager),
+    session: AsyncSession = Depends(get_session),
+):
+    """解绑当前用户的 GitHub 账号."""
+    # URL
+    url = settings.FRONTEND_URL + "/settings?error=github_not_bound"
+    if not current_user.github_id:
+        return RedirectResponse(url=url)
+
+    current_user.github_id = None
+    await session.commit()
+    return RedirectResponse(
+        url=settings.FRONTEND_URL + "/settings?success=github_unbound"
+    )
+
+
+async def find_or_create_user(
+    session: AsyncSession,
+    github_id: int,
+    username: str,
+    email: str,
+    avatar_url: str | None = None,
+) -> User:
+    """根据 GitHub ID 查找或创建用户."""
+    result = await session.execute(
+        select(User)
+        .where(User.github_id == github_id)
+        .options(
+            selectinload(User.profile), selectinload(User.passkey_credential)
+        )
+    )
+    user: User | None = result.scalar_one_or_none()
+    if user:
+        return user
+
+    # 检查用户名是否已存在，避免冲突
+    existing_user = await session.execute(
+        select(User).where(User.username == username)
+    )
+    if existing_user.scalar_one_or_none():
+        # 如果用户名已存在，添加随机后缀
+        username = f"{username}_{secrets.token_urlsafe(4)}"
+
+    # 创建新用户 - 不手动指定id，让数据库自增
+    new_user = User(
+        username=username,
+        github_id=github_id,
+        raw_password=secrets.token_urlsafe(
+            16
+        ),  # 随机密码，用户无法使用密码登录
+        name=username,
+    )
+    session.add(new_user)
+    await session.flush()  # 刷新获取自增的 user.id
+
+    # 创建关联的 Profile
+    profile = Profile(
+        user_id=new_user.id,
+        email=email,
+        photo=avatar_url or "default.png",
+    )
+    session.add(profile)
+
+    # 提交后刷新用户对象，确保关系正确加载
+    await session.commit()
+    await session.refresh(new_user, ["profile", "passkey_credential"])
+
+    return new_user
+
+
+@router.get("/github/callback")
+async def github_callback(
+    request: Request,
+    code: str,
+    state: str,
+    session: AsyncSession = Depends(get_session),
+):
+    """处理 GitHub OAuth 回调."""
+    # 验证 state 和 code_verifier
+    if state != request.session.get("oauth_state"):
+        return RedirectResponse(
+            url=settings.FRONTEND_URL + "/login?error=invalid_oauth_state"
+        )
+
+    code_verifier = request.session.pop("code_verifier")
+    if not code_verifier:
+        return RedirectResponse(
+            url=settings.FRONTEND_URL + "/login?error=missing_pkce_info"
+        )
+
+    # 交换access_token
+    async with httpx.AsyncClient() as client:
+        token_resp = await client.post(
+            "https://github.com/login/oauth/access_token",
+            json={
+                "client_id": settings.GITHUB_CLIENT_ID,
+                "client_secret": settings.GITHUB_CLIENT_SECRET,
+                "code": code,
+                "redirect_uri": settings.GITHUB_REDIRECT_URI,
+                "code_verifier": code_verifier,
+            },
+            headers={"Accept": "application/json"},
+        )
+
+    token_data = token_resp.json()
+    if "error" in token_data:
+        error_msg = token_data.get("error_description", "github_auth_failed")
+        return RedirectResponse(
+            url=f"{settings.FRONTEND_URL}/login?error={error_msg}"
+        )
+
+    access_token = token_data["access_token"]
+
+    # 获取用户信息
+    async with httpx.AsyncClient() as client:
+        user_resp = await client.get(
+            "https://api.github.com/user",
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+        github_user = user_resp.json()
+
+    github_id = github_user["id"]
+    username = github_user["login"]
+    email = github_user.get("email") or f"{username}@github.com"
+    avatar_url = github_user.get("avatar_url")
+
+    # 获取 OAuth 模式，默认为登录模式
+    oauth_mode = request.session.pop("oauth_mode", "login")
+
+    if oauth_mode == "bind":
+        # 绑定模式：将 GitHub 账号绑定到当前登录用户
+        try:
+            current_user = await manager(request)
+        except Exception:
+            return RedirectResponse(
+                url=settings.FRONTEND_URL + "/settings?error=not_logged_in"
+            )
+
+        # 重新在当前session中查询用户并预加载profile关系
+        result = await session.execute(
+            select(User)
+            .where(User.id == current_user.id)
+            .options(selectinload(User.profile))
+        )
+        current_user = result.scalar_one()
+
+        # 检查该 GitHub 账号是否已被其他用户绑定
+        existing_user = await session.execute(
+            select(User).where(User.github_id == github_id)
+        )
+        if existing_user.scalar_one_or_none():
+            return RedirectResponse(
+                url=settings.FRONTEND_URL
+                + "/settings?error=github_already_bound"
+            )
+
+        # 绑定到当前用户
+        current_user.github_id = github_id
+
+        # 如果用户没有头像，使用 GitHub 头像
+        if current_user.profile and not current_user.profile.photo:
+            current_user.profile.photo = avatar_url
+
+        await session.commit()
+        return RedirectResponse(
+            url=settings.FRONTEND_URL + "/settings?success=github_bound"
+        )
+    else:
+        # 登录模式：先尝试通过邮箱匹配现有用户（可选功能）
+        # 检查 GitHub 邮箱是否已被注册
+        existing_user_by_email = None
+        if email and not email.endswith("@github.com"):
+            result = await session.execute(
+                select(User)
+                .join(Profile)
+                .where(Profile.email == email)
+                .options(
+                    selectinload(User.profile),
+                    selectinload(User.passkey_credential),
+                )
+            )
+            existing_user_by_email = result.scalar_one_or_none()
+
+        # 如果邮箱匹配且用户尚未绑定 GitHub，自动绑定
+        if existing_user_by_email and not existing_user_by_email.github_id:
+            existing_user_by_email.github_id = github_id
+            if (
+                existing_user_by_email.profile
+                and not existing_user_by_email.profile.photo
+            ):
+                existing_user_by_email.profile.photo = avatar_url
+            await session.commit()
+            user = existing_user_by_email
+        else:
+            # 否则查找或创建用户
+            user: User = await find_or_create_user(
+                session,
+                github_id=github_id,
+                username=username,
+                email=email,
+                avatar_url=avatar_url,
+            )
+
+        await _login_user(user=user, request=request, session=session)
+        # 生成令牌并设置 Cookie（同常规登录）
+        access_token = manager.create_access_token(
+            data={"sub": str(user.id)}, expires=timedelta(hours=12)
+        )
+        refresh_token = manager.create_access_token(
+            data={"sub": str(user.id)}, expires=timedelta(days=7)
+        )
+        response = RedirectResponse(url=settings.FRONTEND_URL)
+        manager.set_cookie(response=response, token=access_token)
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            httponly=True,
+            samesite="lax",
+            secure=True,
+        )
+        csrf_manager.set_csrf_cookie(response)
+
+        return response

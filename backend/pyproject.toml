@@ -27,7 +27,7 @@ dependencies = [
     "aiosmtplib>=5.1.0",
     "python-jose[cryptography]>=3.5.0",
     "passlib[bcrypt]>=1.7.4",
-    "cachetools>=7.0.4",
+    "cachetools>=7.0.5",
     "cryptography>=46.0.5",
     "fastapi-login>=1.10.3",
     "fastapi-mail>=1.6.2",
@@ -38,8 +38,8 @@ dependencies = [
     "feedparser>=6.0.12",
     "taskiq>=0.12.1",
     "taskiq-redis>=1.2.2",
-    "langchain>=1.2.10",
-    "langchain-openai>=1.1.10",
+    "langchain>=1.2.12",
+    "langchain-openai>=1.1.11",
     "webauthn>=2.7.1",
 ]
 

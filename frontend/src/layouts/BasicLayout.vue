@@ -8,14 +8,14 @@ import { useScroll } from "@vueuse/core";
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import { RouterView, useRoute } from "vue-router";
 const route = useRoute();
-const notEntryView = ref<boolean>(false);
+const isEntryView = ref<boolean>(false);
 const showFooterBg = ref<boolean>(false);
 
 // 监听路由变化
 watch(
   () => route.path,
   (newPath) => {
-    notEntryView.value = newPath === "/";
+    isEntryView.value = newPath === "/";
     showFooterBg.value =
       // 匹配 /blog/xxxx 但不包括 /blog 列表页
       (newPath.startsWith("/blog/") && newPath !== "/blog") ||
@@ -89,17 +89,10 @@ const closeMobileWarning = () => {
         <Teleport to="body">
           <ToastContainer />
         </Teleport>
-        <transition
-          mode="out-in"
-          enter-active-class="transition-all transform-gpu duration-300 ease-in-out"
-          enter-from-class="translate-y-[-100px]"
-          enter-to-class="translate-y-0"
-          leave-active-class="transition-all transform-gpu duration-300 ease-in"
-          leave-from-class="translate-y-0"
-          leave-to-class="translate-y-[-100px]"
-        >
-          <BasicNav v-if="!notEntryView" :isHeaderVisible="isHeaderVisible" />
-        </transition>
+        <BasicNav
+          :isEntryView="isEntryView"
+          :isHeaderVisible="isHeaderVisible"
+        />
       </div>
     </header>
 

@@ -27,7 +27,9 @@ export async function fetchAndStoreCSRF() {
 
   csrfFetchPromise = (async () => {
     try {
-      await request.get<ApiResponse<{ csrf_token: string }>>("/auth/csrf-token");
+      await request.get<ApiResponse<{ csrf_token: string }>>(
+        "/auth/csrf-token",
+      );
     } catch (error) {
       console.error("获取 CSRF Token 失败:", error);
       throw error;
@@ -78,7 +80,11 @@ request.interceptors.response.use(
       _isRefreshToken?: boolean;
       _retry?: boolean;
     };
-    if (error.response?.status === 401 && !isrefreshTokenRequest(_cfg) && !_cfg._retry) {
+    if (
+      error.response?.status === 401 &&
+      !isrefreshTokenRequest(_cfg) &&
+      !_cfg._retry
+    ) {
       // 标记已重试，防止无限循环
       _cfg._retry = true;
 

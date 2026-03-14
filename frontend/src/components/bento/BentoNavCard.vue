@@ -433,6 +433,9 @@ const handleLogout = () => {
 };
 
 const avatarUrl = computed(() => {
+  if (auth.user?.photo?.startsWith("http")) {
+    return auth.user.photo;
+  }
   if (auth.user?.photo) {
     return `/api/v1/media/${auth.user.photo}`;
   }

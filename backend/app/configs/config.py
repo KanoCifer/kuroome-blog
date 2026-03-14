@@ -27,6 +27,10 @@ class Settings(BaseSettings):
     # WebAuthn / Passkey settings
     WEBAUTHN_RP_ID: str = "kanocifer.com"
     WEBAUTHN_ORIGIN: str = "https://kanocifer.com"
+    GITHUB_CLIENT_ID: str = ""
+    GITHUB_CLIENT_SECRET: str = ""
+    GITHUB_REDIRECT_URI: str = ""
+    FRONTEND_URL: str = "http://localhost:5173"
 
     model_config = SettingsConfigDict(
         env_file=".env",

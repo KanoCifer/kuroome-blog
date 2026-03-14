@@ -15,6 +15,7 @@ export interface UserInfo {
   gender?: string | null;
   mobile?: string | null;
   has_passkey?: boolean;
+  github_bound?: boolean;
 }
 
 // sessionStorage key

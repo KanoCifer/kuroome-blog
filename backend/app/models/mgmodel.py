@@ -44,6 +44,7 @@ class Post(Document):
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     comments: list[Comment] = Field(default_factory=list)
+    likes: int = 0
 
     class Settings:
         name = "posts"
@@ -127,3 +128,16 @@ class RssArticle(Document):
         ]
         bson_encoders: ClassVar[dict] = {PydanticObjectId: str}
         model_config = ConfigDict(arbitrary_types_allowed=True)
+
+
+class SiteStats(Document):
+    """Site statistics document model."""
+
+    key: Annotated[str, Indexed(unique=True)]
+    value: int = 0
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+
+    class Settings:
+        name = "site_stats"
+        use_cache = True
+        cache_expiration_time = timedelta(seconds=10)

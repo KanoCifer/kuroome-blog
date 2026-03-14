@@ -56,7 +56,19 @@ export default defineConfig({
               // Other common heavy utilities
               if (id.includes("node_modules/axios")) return "axios";
               if (id.includes("node_modules/dayjs")) return "dayjs";
+              // Lottie animation library
+              if (id.includes("node_modules/lottie-web")) return "lottie-web";
             },
+          },
+          // 忽略lottie-web的eval警告（第三方库问题，无法修复）
+          onwarn(warning, warn) {
+            if (
+              warning.code === "EVAL" &&
+              warning.id?.includes("node_modules/lottie-web")
+            ) {
+              return;
+            }
+            warn(warning);
           },
         },
   },

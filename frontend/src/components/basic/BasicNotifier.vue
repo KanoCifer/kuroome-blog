@@ -1,14 +1,11 @@
 <template>
-  <transition
-    enter-active-class="transition-all duration-300 ease-out"
-    enter-from-class="opacity-0"
-    enter-to-class="opacity-100"
-    leave-active-class="transition-all duration-200 ease-in"
-    leave-from-class="opacity-100"
-    leave-to-class="opacity-0"
-  >
-    <div
+  <AnimatePresence mode="popLayout">
+    <motion.div
       v-if="props.isMobileWarningVisible"
+      :initial="{ opacity: 0, scale: 0.95, y: -20 }"
+      :animate="{ opacity: 1, scale: 1, y: 0 }"
+      :exit="{ opacity: 0, scale: 0.95, y: -20 }"
+      :transition="{ type: 'spring' }"
       class="fixed inset-0 z-9999 flex items-center justify-center"
     >
       <!-- 背景遮罩 -->
@@ -63,11 +60,12 @@
           知道了
         </button>
       </div>
-    </div>
-  </transition>
+    </motion.div>
+  </AnimatePresence>
 </template>
 
 <script setup lang="ts">
+import { AnimatePresence, motion } from "motion-v";
 const emit = defineEmits(["close", "update:isMobileWarningVisible"]);
 const props = defineProps<{
   isMobileWarningVisible: boolean;
@@ -78,5 +76,3 @@ const closeMobileWarning = () => {
   emit("update:isMobileWarningVisible", false);
 };
 </script>
-
-<style scoped></style>

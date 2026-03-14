@@ -44,14 +44,19 @@
         <!-- Releases -->
         <div class="space-y-12">
           <motion.div
-            :initial="{ opacity: 0, y: 20 }"
-            :animate="{ opacity: 1, y: 0 }"
-            :transition="{ duration: 0.5 }"
-            v-for="(release, index) in changelog"
-            :key="release.version"
+            :initial="{ opacity: 0, y: 40 }"
+            :whileInView="{ opacity: 1, y: 0 }"
+            :transition="{
+              type: 'spring',
+              duration: 1,
+              stiffness: 100,
+              damping: 20,
+            }"
+            v-for="(r, i) in changelog"
+            :key="r.version"
             :class="[
               'relative flex items-center',
-              index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse',
+              i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse',
             ]"
           >
             <!-- Content Card -->
@@ -77,7 +82,7 @@
                         d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
                       />
                     </svg>
-                    v{{ release.version }}
+                    v{{ r.version }}
                   </span>
                   <span
                     class="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400"
@@ -95,7 +100,7 @@
                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                       />
                     </svg>
-                    {{ release.date }}
+                    {{ r.date }}
                   </span>
                 </div>
 
@@ -103,13 +108,13 @@
                 <h2
                   class="mb-4 text-2xl font-bold text-gray-800 dark:text-gray-100"
                 >
-                  {{ release.title }}
+                  {{ r.title }}
                 </h2>
 
                 <!-- Changes List -->
                 <ul class="space-y-3">
                   <li
-                    v-for="(change, i) in release.changes"
+                    v-for="(change, i) in r.changes"
                     :key="i"
                     class="flex items-start gap-3"
                   >

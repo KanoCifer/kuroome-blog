@@ -26,7 +26,9 @@ const hasGenerated = ref<boolean>(false);
 const errorMessage = ref<string>("");
 const mode = ref<SummaryMode>(SummaryMode.STREAM);
 
-const pureContent = computed(() => props.content.replaceAll(/<[^>]+>/g, "").trim());
+const pureContent = computed(() =>
+  props.content.replaceAll(/<[^>]+>/g, "").trim(),
+);
 
 const canSummarize = computed(() => {
   return pureContent.value.length > 0 && !loading.value;
@@ -43,10 +45,13 @@ const generateSummary = async () => {
   errorMessage.value = "";
 
   try {
-    const res = await request.post<ApiResponse<SummaryPayload>>("/agent/summary", {
-      title: props.title || "",
-      content: pureContent.value,
-    });
+    const res = await request.post<ApiResponse<SummaryPayload>>(
+      "/agent/summary",
+      {
+        title: props.title || "",
+        content: pureContent.value,
+      },
+    );
 
     if (res.data.status === "success" && res.data.data?.summary) {
       summary.value = res.data.data.summary;
@@ -55,7 +60,8 @@ const generateSummary = async () => {
     }
     throw new Error(res.data.message || "生成总结失败");
   } catch (error: unknown) {
-    errorMessage.value = error instanceof Error ? error.message : "生成总结失败，请稍后重试";
+    errorMessage.value =
+      error instanceof Error ? error.message : "生成总结失败，请稍后重试";
     notifier.error(errorMessage.value);
   } finally {
     loading.value = false;
@@ -143,7 +149,8 @@ const generateSummaryStream = async () => {
       }
     }
   } catch (error: unknown) {
-    errorMessage.value = error instanceof Error ? error.message : "AI总结失败，请稍后重试";
+    errorMessage.value =
+      error instanceof Error ? error.message : "AI总结失败，请稍后重试";
     notifier.error(errorMessage.value);
   } finally {
     loading.value = false;
@@ -249,7 +256,12 @@ onUnmounted(() => {
           :disabled="!canSummarize"
           @click="onGenerate"
         >
-          <svg v-if="loading" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+          <svg
+            v-if="loading"
+            class="h-4 w-4 animate-spin"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
             <circle
               class="opacity-25"
               cx="12"
@@ -280,9 +292,17 @@ onUnmounted(() => {
         class="text-sm leading-7 whitespace-pre-line text-slate-700 dark:text-slate-200"
       >
         {{ summary
-        }}<span v-if="loading && mode === 'stream'" class="animate-breathe ml-0.5">|</span>
+        }}<span
+          v-if="loading && mode === 'stream'"
+          class="animate-breathe ml-0.5"
+          >|</span
+        >
       </p>
-      <p v-else key="placeholder" class="text-sm text-slate-500 dark:text-slate-400">
+      <p
+        v-else
+        key="placeholder"
+        class="text-sm text-slate-500 dark:text-slate-400"
+      >
         点击“生成总结”，快速提炼当前文章重点。
       </p>
     </Transition>

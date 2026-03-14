@@ -91,6 +91,11 @@
     >
       <TodoCard title="MyTasks" />
     </div>
+    <BentoLike
+      v-if="show.BentoLike"
+      :style="likePosition"
+      class="absolute w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto!"
+    />
   </div>
 </template>
 
@@ -99,6 +104,7 @@ import BentoCalendar from "@/components/bento/BentoCalendar.vue";
 import BentoCat from "@/components/bento/BentoCat.vue";
 import BentoClock from "@/components/bento/BentoClock.vue";
 import BentoGreeting from "@/components/bento/BentoGreeting.vue";
+import BentoLike from "@/components/bento/BentoLike.vue";
 import BentoMemo from "@/components/bento/BentoMemo.vue";
 import BentoNavCard from "@/components/bento/BentoNavCard.vue";
 import BentoNewPost from "@/components/bento/BentoNewPost.vue";
@@ -251,6 +257,14 @@ const catPosition = computed(() => {
   };
 });
 
+// BentoLike
+const likePosition = computed(() => {
+  return {
+    left: `${parentWidth.value * 0.55}px`,
+    top: `${(layoutHeight.value * 10) / 15}px`,
+  };
+});
+
 const updateDimensions = () => {
   // 视口高度作为布局基准
   viewportHeight.value = window.innerHeight;
@@ -305,6 +319,7 @@ const show = ref<Record<string, boolean>>({
   BentoWebsites: false,
   BentoReadingList: false,
   BentoCat: false,
+  BentoLike: false,
   TodoCard: false,
 });
 
@@ -320,6 +335,7 @@ const cardNames = [
   "BentoCalendar",
   "BentoReadingList",
   "BentoCat",
+  "BentoLike",
   "TodoCard",
   "BentoTech",
   "BentoWebsites",

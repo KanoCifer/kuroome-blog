@@ -32,11 +32,7 @@ const handleSubmit = async () => {
   isSubmitting.value = true;
 
   try {
-    await auth.login(
-      form.value.username,
-      form.value.password,
-      form.value.rememberMe,
-    );
+    await auth.login(form.value.username, form.value.password, form.value.rememberMe);
     const redirect = (route.query.redirect as string) || "/";
     router.push(redirect);
   } catch (err: unknown) {
@@ -57,9 +53,7 @@ const handlePasskeyLogin = async () => {
 
   try {
     // 获取认证选项
-    const optionsRes = await request.get(
-      "/auth/passkey/authentication-options",
-    );
+    const optionsRes = await request.get("/auth/passkey/authentication-options");
     const options = optionsRes.data.data;
 
     // 调用浏览器 Passkey 认证
@@ -86,13 +80,19 @@ const handlePasskeyLogin = async () => {
     isPasskeySubmitting.value = false;
   }
 };
+
+// GitHub 登录
+const handleGitHubLogin = () => {
+  // 直接跳转到后端 GitHub 授权接口，后端会处理后续流程
+  window.location.href = "/api/v1/auth/github";
+};
 </script>
 
 <template>
   <div>
     <!-- 标题卡片 -->
     <div
-      class="mx-auto mt-36 max-w-md rounded-[40px] bg-blue-50/80 px-12 py-14 shadow-2xl backdrop-blur-md dark:bg-gray-800/50"
+      class="squircle mx-auto mt-36 h-screen max-w-md bg-blue-50/50 px-12 py-14 shadow-2xl backdrop-blur-sm dark:bg-gray-800/50"
     >
       <p
         class="flex items-end justify-center text-center font-serif text-2xl font-bold text-shadow-md dark:text-white"
@@ -113,9 +113,7 @@ const handlePasskeyLogin = async () => {
         </svg>
         Login
       </p>
-      <p
-        class="mb-12 text-center font-serif text-gray-500 italic dark:text-gray-400"
-      >
+      <p class="mb-12 text-center font-serif text-gray-500 italic dark:text-gray-400">
         Welcome back! Please enter your credentials to log in.
       </p>
       <!-- 登录表单 -->
@@ -129,17 +127,13 @@ const handlePasskeyLogin = async () => {
             placeholder="用户名"
             class="form-control my-4 w-full rounded-xl border border-gray-300 bg-gray-100/50 px-4 py-2 text-gray-900 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
           />
-          <span
-            v-if="errors.username"
-            class="mt-1 block text-sm text-red-600 dark:text-red-400"
-            >{{ errors.username }}</span
-          >
+          <span v-if="errors.username" class="mt-1 block text-sm text-red-600 dark:text-red-400">{{
+            errors.username
+          }}</span>
         </div>
 
         <!-- 密码 -->
-        <div
-          class="relative mt-4 transition-transform duration-200 focus-within:scale-[1.01]"
-        >
+        <div class="relative mt-4 transition-transform duration-200 focus-within:scale-[1.01]">
           <input
             v-model="form.password"
             :type="showPassword ? 'text' : 'password'"
@@ -189,11 +183,9 @@ const handlePasskeyLogin = async () => {
             </svg>
           </button>
 
-          <span
-            v-if="errors.password"
-            class="mt-1 block text-sm text-red-600 dark:text-red-400"
-            >{{ errors.password }}</span
-          >
+          <span v-if="errors.password" class="mt-1 block text-sm text-red-600 dark:text-red-400">{{
+            errors.password
+          }}</span>
         </div>
 
         <!-- 提交按钮和记住我 -->
@@ -208,11 +200,7 @@ const handlePasskeyLogin = async () => {
 
           <!-- Remember Me Checkbox -->
           <label class="group relative flex cursor-pointer">
-            <input
-              v-model="form.rememberMe"
-              type="checkbox"
-              class="peer sr-only"
-            />
+            <input v-model="form.rememberMe" type="checkbox" class="peer sr-only" />
             <div
               class="rounded-xl border-2 border-gray-100 bg-white px-3 py-2 shadow-sm transition-all duration-200 select-none group-active:scale-95 peer-checked:border-blue-500 peer-checked:bg-blue-50/50 peer-checked:shadow-blue-100/50 hover:border-blue-200 dark:border-gray-600 dark:bg-gray-700 dark:peer-checked:border-blue-500 dark:peer-checked:bg-blue-500/10 dark:peer-checked:shadow-none dark:hover:border-blue-500/50"
             >
@@ -233,10 +221,7 @@ const handlePasskeyLogin = async () => {
             :disabled="isPasskeySubmitting"
             class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-green-600 px-8 py-2.5 font-bold text-white shadow-lg shadow-green-500/30 transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-800"
           >
-            <span
-              v-if="isPasskeySubmitting"
-              class="flex items-center justify-center gap-2"
-            >
+            <span v-if="isPasskeySubmitting" class="flex items-center justify-center gap-2">
               <span
                 class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
               ></span>
@@ -252,14 +237,27 @@ const handlePasskeyLogin = async () => {
           </span>
         </div>
 
+        <!-- GitHub 登录按钮 -->
+        <div class="mt-4">
+          <button
+            type="button"
+            @click="handleGitHubLogin"
+            class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-gray-900 px-8 py-2.5 font-bold text-white shadow-lg shadow-gray-500/30 transition-colors hover:bg-gray-900 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none dark:bg-gray-700 dark:ring-offset-gray-800 dark:hover:bg-gray-600"
+          >
+            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+              />
+            </svg>
+            Login with GitHub
+          </button>
+        </div>
+
         <p class="mt-8 text-center font-serif text-gray-400">Kuroome's Blog</p>
         <!-- 注册链接 -->
         <div class="mb-4 text-center text-gray-400 dark:text-gray-300">
           Don't have an account?
-          <RouterLink
-            to="/register"
-            class="underline transition duration-100 hover:text-blue-500"
-          >
+          <RouterLink to="/register" class="underline transition duration-100 hover:text-blue-500">
             Register here.
           </RouterLink>
         </div>

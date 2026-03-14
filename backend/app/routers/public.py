@@ -11,10 +11,12 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from xml.etree.ElementTree import Element, SubElement, tostring
 
-from fastapi import APIRouter, Depends
-from fastapi.responses import PlainTextResponse
+from fastapi import APIRouter, Body, Depends, Request
+from fastapi.responses import JSONResponse, PlainTextResponse
 
+from app.dependencies.limiter import limiter
 from app.dependencies.mongo import get_mongo_db
+from app.models.mgmodel import SiteStats
 from app.schemas.response import APIResponse
 
 router = APIRouter(tags=["public"])
@@ -86,8 +88,6 @@ async def get_sitemap_xml(
     Returns:
         PlainTextResponse: sitemap.xml content
     """
-    cache_key = "sitemap:xml"
-
     urlset = Element(
         "urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
     )
@@ -238,3 +238,47 @@ async def get_sitemap_xml(
 #             "Cache-Control": "public, max-age=86400",
 #         },
 #     )
+
+
+@router.post("/like")
+@limiter.limit("1/day")
+async def add_like(
+    request: Request,
+    likescounts: int = Body(
+        ..., gt=0, embed=True, description="Number of likes to add"
+    ),
+) -> JSONResponse:
+    """Add a like to the site.
+
+    Returns:
+        JSONResponse: Current total likes count
+    """
+    stats: SiteStats | None = await SiteStats.find_one({"key": "total_likes"})
+    if stats:
+        await stats.update({"$inc": {"value": likescounts}})
+        total: int = stats.value
+    else:
+        stats = SiteStats(key="total_likes", value=likescounts)
+        await stats.insert()
+        total = likescounts
+
+    return APIResponse.ok(
+        data={"likes_count": total},
+        message="Like added successfully",
+    )
+
+
+@router.get("/likes")
+async def get_likes() -> JSONResponse:
+    """Get total likes count.
+
+    Returns:
+        JSONResponse: Current total likes count
+    """
+    stats = await SiteStats.find_one({"key": "total_likes"})
+    total_likes = stats.value if stats else 0
+
+    return APIResponse.ok(
+        data={"likes_count": total_likes},
+        message="Likes count retrieved successfully",
+    )

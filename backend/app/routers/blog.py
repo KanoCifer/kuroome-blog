@@ -17,8 +17,8 @@ from app.dependencies.auth import manager
 from app.dependencies.database import get_session
 from app.models.mgmodel import Post
 from app.models.models import Category, User
-from app.schemas import PostComment
 from app.schemas.response import APIResponse
+from app.schemas.schemas import PostComment
 from app.utils.media import save_upload_image
 
 router = APIRouter(tags=["blog"])

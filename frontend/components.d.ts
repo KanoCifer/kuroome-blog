@@ -37,6 +37,7 @@ declare module 'vue' {
     BentoCat: typeof import('./src/components/bento/BentoCat.vue')['default']
     BentoClock: typeof import('./src/components/bento/BentoClock.vue')['default']
     BentoGreeting: typeof import('./src/components/bento/BentoGreeting.vue')['default']
+    BentoLike: typeof import('./src/components/bento/BentoLike.vue')['default']
     BentoMemo: typeof import('./src/components/bento/BentoMemo.vue')['default']
     BentoNav: typeof import('./src/components/bento/BentoNav.vue')['default']
     BentoNavCard: typeof import('./src/components/bento/BentoNavCard.vue')['default']

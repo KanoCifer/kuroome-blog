@@ -18,7 +18,12 @@ import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import Paragraph from "@tiptap/extension-paragraph";
 import Placeholder from "@tiptap/extension-placeholder";
-import { Table, TableCell, TableHeader, TableRow } from "@tiptap/extension-table";
+import {
+  Table,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "@tiptap/extension-table";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import Text from "@tiptap/extension-text";
@@ -57,13 +62,11 @@ const uploadImage = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("file", file);
 
-  const res = await request.post<ApiResponse<{ url: string; filename: string }>>(
-    "/blog/upload-image",
-    formData,
-    {
-      headers: { "Content-Type": "multipart/form-data" },
-    },
-  );
+  const res = await request.post<
+    ApiResponse<{ url: string; filename: string }>
+  >("/blog/upload-image", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 
   if (res.data.status !== "success" || !res.data.data?.url) {
     throw new Error(res.data.message || "Image upload failed.");
@@ -457,7 +460,13 @@ onBeforeUnmount(() => {
         ]"
         title="斜体"
       >
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <svg
+          class="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -473,7 +482,13 @@ onBeforeUnmount(() => {
         title="Code Block"
         class="tiptap-btn rounded-md p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
       >
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <svg
+          class="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -493,7 +508,13 @@ onBeforeUnmount(() => {
         ]"
         title="插入链接"
       >
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <svg
+          class="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
