@@ -946,12 +946,14 @@ async def github_callback(
                     "code_verifier": code_verifier,
                 },
                 headers={"Accept": "application/json"},
-                timeout=60.0,
+                timeout=httpx.Timeout(
+                    connect=10.0, read=30.0, write=10.0, pool=5.0
+                ),
                 follow_redirects=True,
             )
             token_resp.raise_for_status()
             token_data = token_resp.json()
-    except httpx.ReadTimeout:
+    except httpx.ReadTimeout, httpx.ConnectTimeout, httpx.PoolTimeout:
         return RedirectResponse(
             url=f"{settings.FRONTEND_URL}/login?error=github_timeout"
         )
@@ -959,6 +961,16 @@ async def github_callback(
         logger.error(f"GitHub token exchange failed: {e.response.text}")
         return RedirectResponse(
             url=f"{settings.FRONTEND_URL}/login?error=github_auth_failed"
+        )
+    except httpx.NetworkError as e:
+        logger.error(f"GitHub network error: {e!s}")
+        return RedirectResponse(
+            url=f"{settings.FRONTEND_URL}/login?error=github_network_error"
+        )
+    except ValueError as e:
+        logger.error(f"GitHub token JSON parse failed: {e!s}")
+        return RedirectResponse(
+            url=f"{settings.FRONTEND_URL}/login?error=github_invalid_response"
         )
 
     if "error" in token_data:
@@ -975,12 +987,14 @@ async def github_callback(
             user_resp = await client.get(
                 "https://api.github.com/user",
                 headers={"Authorization": f"Bearer {access_token}"},
-                timeout=60.0,
+                timeout=httpx.Timeout(
+                    connect=10.0, read=30.0, write=10.0, pool=5.0
+                ),
                 follow_redirects=True,
             )
             user_resp.raise_for_status()
             github_user = user_resp.json()
-    except httpx.ReadTimeout:
+    except httpx.ReadTimeout, httpx.ConnectTimeout, httpx.PoolTimeout:
         return RedirectResponse(
             url=f"{settings.FRONTEND_URL}/login?error=github_timeout"
         )
@@ -988,6 +1002,16 @@ async def github_callback(
         logger.error(f"GitHub user info failed: {e.response.text}")
         return RedirectResponse(
             url=f"{settings.FRONTEND_URL}/login?error=github_user_info_failed"
+        )
+    except httpx.NetworkError as e:
+        logger.error(f"GitHub network error: {e!s}")
+        return RedirectResponse(
+            url=f"{settings.FRONTEND_URL}/login?error=github_network_error"
+        )
+    except ValueError as e:
+        logger.error(f"GitHub user info JSON parse failed: {e!s}")
+        return RedirectResponse(
+            url=f"{settings.FRONTEND_URL}/login?error=github_invalid_response"
         )
 
     github_id = github_user["id"]
