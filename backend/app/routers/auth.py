@@ -934,20 +934,31 @@ async def github_callback(
         )
 
     # 交换access_token
-    async with httpx.AsyncClient() as client:
-        token_resp = await client.post(
-            "https://github.com/login/oauth/access_token",
-            json={
-                "client_id": settings.GITHUB_CLIENT_ID,
-                "client_secret": settings.GITHUB_CLIENT_SECRET,
-                "code": code,
-                "redirect_uri": settings.GITHUB_REDIRECT_URI,
-                "code_verifier": code_verifier,
-            },
-            headers={"Accept": "application/json"},
+    try:
+        async with httpx.AsyncClient() as client:
+            token_resp = await client.post(
+                "https://github.com/login/oauth/access_token",
+                json={
+                    "client_id": settings.GITHUB_CLIENT_ID,
+                    "client_secret": settings.GITHUB_CLIENT_SECRET,
+                    "code": code,
+                    "redirect_uri": settings.GITHUB_REDIRECT_URI,
+                    "code_verifier": code_verifier,
+                },
+                headers={"Accept": "application/json"},
+                timeout=10.0,
+            )
+            token_resp.raise_for_status()
+            token_data = token_resp.json()
+    except httpx.ReadTimeout:
+        return RedirectResponse(
+            url=f"{settings.FRONTEND_URL}/login?error=github_timeout"
+        )
+    except httpx.HTTPStatusError, ValueError:
+        return RedirectResponse(
+            url=f"{settings.FRONTEND_URL}/login?error=github_auth_failed"
         )
 
-    token_data = token_resp.json()
     if "error" in token_data:
         error_msg = token_data.get("error_description", "github_auth_failed")
         return RedirectResponse(
@@ -957,12 +968,23 @@ async def github_callback(
     access_token = token_data["access_token"]
 
     # 获取用户信息
-    async with httpx.AsyncClient() as client:
-        user_resp = await client.get(
-            "https://api.github.com/user",
-            headers={"Authorization": f"Bearer {access_token}"},
+    try:
+        async with httpx.AsyncClient() as client:
+            user_resp = await client.get(
+                "https://api.github.com/user",
+                headers={"Authorization": f"Bearer {access_token}"},
+                timeout=10.0,
+            )
+            user_resp.raise_for_status()
+            github_user = user_resp.json()
+    except httpx.ReadTimeout:
+        return RedirectResponse(
+            url=f"{settings.FRONTEND_URL}/login?error=github_timeout"
         )
-        github_user = user_resp.json()
+    except httpx.HTTPStatusError, ValueError:
+        return RedirectResponse(
+            url=f"{settings.FRONTEND_URL}/login?error=github_user_info_failed"
+        )
 
     github_id = github_user["id"]
     username = github_user["login"]
