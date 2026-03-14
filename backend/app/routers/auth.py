@@ -946,7 +946,7 @@ async def github_callback(
                     "code_verifier": code_verifier,
                 },
                 headers={"Accept": "application/json"},
-                timeout=10.0,
+                timeout=60.0,
                 follow_redirects=True,
             )
             token_resp.raise_for_status()
@@ -955,7 +955,8 @@ async def github_callback(
         return RedirectResponse(
             url=f"{settings.FRONTEND_URL}/login?error=github_timeout"
         )
-    except httpx.HTTPStatusError, ValueError:
+    except httpx.HTTPStatusError as e:
+        logger.error(f"GitHub token exchange failed: {e.response.text}")
         return RedirectResponse(
             url=f"{settings.FRONTEND_URL}/login?error=github_auth_failed"
         )
@@ -974,7 +975,7 @@ async def github_callback(
             user_resp = await client.get(
                 "https://api.github.com/user",
                 headers={"Authorization": f"Bearer {access_token}"},
-                timeout=10.0,
+                timeout=60.0,
                 follow_redirects=True,
             )
             user_resp.raise_for_status()
@@ -983,7 +984,8 @@ async def github_callback(
         return RedirectResponse(
             url=f"{settings.FRONTEND_URL}/login?error=github_timeout"
         )
-    except httpx.HTTPStatusError, ValueError:
+    except httpx.HTTPStatusError as e:
+        logger.error(f"GitHub user info failed: {e.response.text}")
         return RedirectResponse(
             url=f"{settings.FRONTEND_URL}/login?error=github_user_info_failed"
         )
