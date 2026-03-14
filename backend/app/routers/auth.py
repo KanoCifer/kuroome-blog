@@ -947,6 +947,7 @@ async def github_callback(
                 },
                 headers={"Accept": "application/json"},
                 timeout=10.0,
+                follow_redirects=True,
             )
             token_resp.raise_for_status()
             token_data = token_resp.json()
@@ -974,6 +975,7 @@ async def github_callback(
                 "https://api.github.com/user",
                 headers={"Authorization": f"Bearer {access_token}"},
                 timeout=10.0,
+                follow_redirects=True,
             )
             user_resp.raise_for_status()
             github_user = user_resp.json()
