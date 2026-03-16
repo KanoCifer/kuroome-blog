@@ -15,7 +15,14 @@ from app.models.models import RssInfo, VisitorTrack
 from app.tasks.broker import broker
 
 
-@broker.task
+@broker.task(
+    schedule=[
+        {
+            "interval": 1800,  # 每30分钟执行一次
+            "schedule_id": "redis_to_db_migration",
+        }
+    ]
+)
 async def run_migration_job():
     """迁移Redis访客数据到PostgreSQL"""
     start_time = time.perf_counter()
@@ -153,7 +160,14 @@ async def run_migration_job():
         }
 
 
-@broker.task
+@broker.task(
+    schedule=[
+        {
+            "cron": "0 10 * * *",
+            "schedule_id": "rss_refresh",
+        }
+    ]
+)
 async def refresh_rss_feeds():
     """Daily RSS refresh at 8 AM for all users, saves new articles to MongoDB."""
     start_time = time.perf_counter()
