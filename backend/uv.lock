@@ -3,6 +3,19 @@ revision = 3
 requires-python = ">=3.14"
 
 [[package]]
+name = "aio-pika"
+version = "9.6.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "aiormq" },
+    { name = "yarl" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/0e/3e/8e8513214ed7ceed6bad8b71f7fe196d54ef2277c135bf7960ed715d4227/aio_pika-9.6.1.tar.gz", hash = "sha256:7a130c51a413cfcd04c3322f6a0ab08c38eb9918de1e476f6d34bbf41fc8d2b0", size = 66809, upload-time = "2026-02-23T15:41:52.544Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2b/24/59a1644995f7a0245588a1761d4b515fc63b7a6038310ead2b07eb44cd8b/aio_pika-9.6.1-py3-none-any.whl", hash = "sha256:0fda50fbbdeb6c5b7399730a2286751074dfe6e52a20119a71aef112d4863fd1", size = 52022, upload-time = "2026-02-23T15:41:51.357Z" },
+]
+
+[[package]]
 name = "aiohappyeyeballs"
 version = "2.6.1"
 source = { registry = "https://pypi.org/simple" }
@@ -63,6 +76,19 @@ wheels = [
 ]
 
 [[package]]
+name = "aiormq"
+version = "6.9.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pamqp" },
+    { name = "yarl" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a2/b0/85cb8066acc2df8166f743bdcd793e7179f473a7db746a543bcd40fdac7b/aiormq-6.9.3.tar.gz", hash = "sha256:39f57d85650267aebefca162a523e9e000db02468d4fceccb3c5399f378ddabe", size = 45672, upload-time = "2026-02-22T21:04:49.745Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/70/9b/be86ea5a73010b437bb5f9511d1fcbb828cdf8eddde0c6f2b38006b9ce92/aiormq-6.9.3-py3-none-any.whl", hash = "sha256:fe2e9f7c99d24dde5f7e1ca8a7da2dc5bab9ae5758fd7599b60d34b6b278926e", size = 27939, upload-time = "2026-02-22T21:04:48.208Z" },
+]
+
+[[package]]
 name = "aiosignal"
 version = "1.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -81,6 +107,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e7/ad/240a7ce4e50713b111dff8b781a898d8d4770e5d6ad4899103f84c86005c/aiosmtplib-5.1.0.tar.gz", hash = "sha256:2504a23b2b63c9de6bc4ea719559a38996dba68f73f6af4eb97be20ee4c5e6c4", size = 66176, upload-time = "2026-01-25T01:51:11.408Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/37/82/70f2c452acd7ed18c558c8ace9a8cf4fdcc70eae9a41749b5bdc53eb6f45/aiosmtplib-5.1.0-py3-none-any.whl", hash = "sha256:368029440645b486b69db7029208a7a78c6691b90d24a5332ddba35d9109d55b", size = 27778, upload-time = "2026-01-25T01:51:10.026Z" },
+]
+
+[[package]]
+name = "aiostream"
+version = "0.7.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/8b/65/b9b69695702b76a878c9879f2ee80cefce75bc5cb864fc100460bc1c5380/aiostream-0.7.1.tar.gz", hash = "sha256:272aaa0d8f83beb906f5aa9022bb59046bb7a103fa3770f807c31f918595acf6", size = 44059, upload-time = "2025-10-13T20:02:06.961Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/52/a0/d7c6ca304140f3f49987d710e15bc164248924a35d8cdfac2f6e87fca041/aiostream-0.7.1-py3-none-any.whl", hash = "sha256:ea8739e9158ee6a606b3feedf3762721c3507344e540d09a10984c5e88a13b37", size = 41416, upload-time = "2025-10-13T20:02:05.535Z" },
 ]
 
 [[package]]
@@ -1183,6 +1221,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pamqp"
+version = "3.3.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/fb/62/35bbd3d3021e008606cd0a9532db7850c65741bbf69ac8a3a0d8cfeb7934/pamqp-3.3.0.tar.gz", hash = "sha256:40b8795bd4efcf2b0f8821c1de83d12ca16d5760f4507836267fd7a02b06763b", size = 30993, upload-time = "2024-01-12T20:37:25.085Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ac/8d/c1e93296e109a320e508e38118cf7d1fc2a4d1c2ec64de78565b3c445eb5/pamqp-3.3.0-py2.py3-none-any.whl", hash = "sha256:c901a684794157ae39b52cbf700db8c9aae7a470f13528b9d7b4e5f7202f8eb0", size = 33848, upload-time = "2024-01-12T20:37:21.359Z" },
+]
+
+[[package]]
 name = "passlib"
 version = "1.7.4"
 source = { registry = "https://pypi.org/simple" }
@@ -1601,6 +1648,7 @@ dependencies = [
     { name = "langchain-openai" },
     { name = "mako" },
     { name = "markupsafe" },
+    { name = "orjson" },
     { name = "passlib", extra = ["bcrypt"] },
     { name = "pillow" },
     { name = "pillow-heif" },
@@ -1614,6 +1662,7 @@ dependencies = [
     { name = "slowapi" },
     { name = "sqlalchemy", extra = ["asyncio"] },
     { name = "taskiq" },
+    { name = "taskiq-aio-pika" },
     { name = "taskiq-redis" },
     { name = "typing-extensions" },
     { name = "uvicorn", extra = ["standard"] },
@@ -1648,6 +1697,7 @@ requires-dist = [
     { name = "langchain-openai", specifier = ">=1.1.11" },
     { name = "mako", specifier = ">=1.3.10" },
     { name = "markupsafe", specifier = ">=3.0.3" },
+    { name = "orjson", specifier = ">=3.11.7" },
     { name = "passlib", extras = ["bcrypt"], specifier = ">=1.7.4" },
     { name = "pillow", specifier = ">=12.1.1" },
     { name = "pillow-heif", specifier = ">=1.3.0" },
@@ -1661,6 +1711,7 @@ requires-dist = [
     { name = "slowapi", specifier = ">=0.1.9" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.47" },
     { name = "taskiq", specifier = ">=0.12.1" },
+    { name = "taskiq-aio-pika", specifier = ">=0.6.0" },
     { name = "taskiq-redis", specifier = ">=1.2.2" },
     { name = "typing-extensions", specifier = ">=4.15.0" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.41.0" },
@@ -1940,6 +1991,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/92/cf/c4a47be05d85754f3e0ecc7b72131249adc067ea37517054459e94268fb1/taskiq-0.12.1.tar.gz", hash = "sha256:338dcf58eaca327e511a9380b2185bfa6a415dd79a5cf144546a2dbb95459298", size = 60536, upload-time = "2025-12-07T16:07:43.561Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/4c/e4/a2fda3bcbb8b61108dc8e9db1a2d19a23578953db73e981f66b9d44f1207/taskiq-0.12.1-py3-none-any.whl", hash = "sha256:a8ade45e2e23edbadb972a88dec44e68c7daef83383d01fa3af48594a24a712a", size = 90668, upload-time = "2025-12-07T16:07:42.296Z" },
+]
+
+[[package]]
+name = "taskiq-aio-pika"
+version = "0.6.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "aio-pika" },
+    { name = "aiostream" },
+    { name = "taskiq" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d5/05/e9f4e5cbc7f9777a09f493e502242922df2d3e3779364d0292313995d68c/taskiq_aio_pika-0.6.0.tar.gz", hash = "sha256:0a4ec304a5e860e205aaea5077d90d2a009a4842f3ee008b5185c29301992ed9", size = 9492, upload-time = "2026-02-28T12:24:20.505Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/74/57/b06600675ef8ab6352f30632c0ece20d592f922531b3f490a0559ed792ea/taskiq_aio_pika-0.6.0-py3-none-any.whl", hash = "sha256:6bff38b61b24afd7d41b78ea9ffca0702fe9653e82289ca1287b063a53af2145", size = 10789, upload-time = "2026-02-28T12:24:19.654Z" },
 ]
 
 [[package]]

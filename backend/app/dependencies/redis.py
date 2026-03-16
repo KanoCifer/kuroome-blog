@@ -19,7 +19,7 @@ async def get_async_redis():
         yield redis
     finally:
         # 异步关闭连接（归还到连接池）
-        await redis.close()
+        await redis.aclose()
 
 
 async def get_redis():
@@ -34,4 +34,4 @@ async def get_redis():
     try:
         yield redis
     finally:
-        await redis.close()
+        await redis.aclose()

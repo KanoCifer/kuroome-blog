@@ -19,6 +19,7 @@ from app.models.mgmodel import Post
 from app.models.models import Category, User
 from app.schemas.response import APIResponse
 from app.schemas.schemas import PostComment
+from app.utils import redis_cache
 from app.utils.media import save_upload_image
 
 router = APIRouter(tags=["blog"])
@@ -84,6 +85,7 @@ async def _get_categories_with_counts(
 
 
 @router.get("/blogs")
+@redis_cache(ttl=60, exclude=["session"])  # 缓存博客列表，过期时间为60秒
 async def get_blogs(
     page: int = 1,
     search: str | None = Query(None, min_length=1),
@@ -179,6 +181,7 @@ async def get_blogs(
 
 ### 获取单个博客文章详情（修复：增加了对 ObjectId 的验证，处理了分类信息和评论树的构建） ###
 @router.get("/post")
+@redis_cache(ttl=60, exclude=["session"])  # 缓存博客文章详情，过期时间为60秒
 async def get_blog_post(
     _id: Annotated[str | None, Query(description="Blog post ID")] = None,
     session: AsyncSession = Depends(get_session),
@@ -338,6 +341,9 @@ async def post_comment(
             message=f"Failed to submit comment: {e!s}",
             code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
+    # 清除缓存
+    await redis_cache.clear()
     return APIResponse.ok(
         data={"_id": str(comment["_id"])},
         message="Comment submitted successfully, pending review",

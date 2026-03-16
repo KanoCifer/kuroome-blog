@@ -20,6 +20,7 @@ from app.models.mgmodel import MessageBoard, Post
 from app.models.models import Category, User
 from app.schemas.response import APIResponse
 from app.schemas.schemas import BlogPostIn, BlogPostUpdate
+from app.utils import redis_cache
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -81,6 +82,8 @@ async def add_post(
             code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
     new_id = result.id
+
+    await redis_cache.clear()
     return APIResponse.ok(
         data={"_id": str(new_id)},
         message="Blog post added successfully",
@@ -136,6 +139,7 @@ async def update_post(
         }
     )
 
+    await redis_cache.clear()
     return APIResponse.ok(
         data={"_id": post_id},
         message="Blog post updated successfully",
@@ -176,6 +180,7 @@ async def delete_post(
             code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
+    await redis_cache.clear()
     return APIResponse.ok(
         data={"_id": post_id},
         message="Blog post deleted successfully",
@@ -271,6 +276,7 @@ async def approve_comment(
             code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
+    await redis_cache.clear()
     return APIResponse.ok(message="Comment approved successfully")
 
 
@@ -299,6 +305,7 @@ async def delete_comment(
             code=status.HTTP_404_NOT_FOUND,
         )
 
+    await redis_cache.clear()
     return APIResponse.ok(message="Comment deleted successfully")
 
 
@@ -398,6 +405,7 @@ async def delete_message(
     try:
         # Delete the message directly
         await MessageBoard.find(MessageBoard.id == obj_id).delete()
+        await redis_cache.clear()
         return APIResponse.ok(message="Message has been deleted.")
     except Exception as e:
         return APIResponse.error(

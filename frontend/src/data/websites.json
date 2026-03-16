@@ -80,6 +80,24 @@
       "icon": "https://tinypng.com/images/apple-touch-icon.png",
       "category": "工具",
       "tags": ["工具", "设计", "图片"]
+    },
+    {
+      "id": "10",
+      "name": "Unsplash",
+      "description": "一个提供高质量免费图片的网站，适合设计师和开发者寻找素材。",
+      "url": "https://unsplash.com/",
+      "icon": "https://unsplash.com/favicon-32x32.png",
+      "category": "资源",
+      "tags": ["资源", "设计", "图片"]
+    },
+    {
+      "id": "11",
+      "name": "Lorem Picsum",
+      "description": "一个提供随机占位图片的服务，适合开发者在开发过程中使用占位图片进行测试。",
+      "url": "https://picsum.photos/",
+      "icon": "https://picsum.photos/assets/images/favicon/favicon-32x32.png",
+      "category": "工具",
+      "tags": ["工具", "开发", "图片"]
     }
   ]
 }

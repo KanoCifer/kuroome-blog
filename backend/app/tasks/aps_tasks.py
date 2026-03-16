@@ -11,8 +11,10 @@ from app.dependencies.database import AsyncSessionFactory
 from app.dependencies.redis import get_redis
 from app.models.mgmodel import RssArticle
 from app.models.models import RssInfo, VisitorTrack
+from app.tasks.broker import broker
 
 
+@broker.task
 async def run_migration_job():
     queue_key = "migration_queue"
     batch_size = 100  # 每批处理 100 条，可根据服务器性能调整
@@ -77,7 +79,7 @@ async def run_migration_job():
                 await redis.lpush(queue_key, item)  # type: ignore
 
 
-# RSS 动态刷新任务
+@broker.task
 async def refresh_rss_feeds():
     """Daily RSS refresh at 8 AM for all users, saves new articles to MongoDB."""
     logger.info("Starting daily RSS feed refresh...")

@@ -1,5 +1,20 @@
 [
   {
+    "version": "2.3.4",
+    "date": "2026-03-16",
+    "title": "后端任务队列迁移至TaskIQ",
+    "changes": [
+      {
+        "type": "refactor",
+        "content": "将后端任务队列从APS迁移至TaskIQ，提升任务处理性能和可靠性"
+      },
+      {
+        "type": "fix",
+        "content": "修复了任务调度中的一些小bug，使用supervisor进行进程管理"
+      }
+    ]
+  },
+  {
     "version": "2.3.3",
     "date": "2026-03-14",
     "title": "增加Like卡片，GitHub登陆/绑定功能",

@@ -379,12 +379,14 @@ async def register(
     # Create new user
     new_user = User(username=username)
     new_user.raw_password = password
+    session.add(new_user)
     await session.flush()
 
     # Create profile
     new_profile = Profile(user_id=new_user.id)
     new_profile.email = email
     new_profile.photo = "default.png"
+    session.add(new_profile)
 
     await session.commit()
 

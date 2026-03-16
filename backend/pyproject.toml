@@ -38,9 +38,12 @@ dependencies = [
     "feedparser>=6.0.12",
     "taskiq>=0.12.1",
     "taskiq-redis>=1.2.2",
+    "taskiq-scheduler>=0.4.0",
     "langchain>=1.2.12",
     "langchain-openai>=1.1.11",
     "webauthn>=2.7.1",
+    "orjson>=3.11.7",
+    "taskiq-aio-pika>=0.6.0",
 ]
 
 [tool.setuptools.packages.find]

@@ -2,12 +2,8 @@ from __future__ import annotations
 
 import time
 from contextlib import asynccontextmanager
-from functools import lru_cache
 from pathlib import Path
 
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.triggers.cron import CronTrigger
-from apscheduler.triggers.interval import IntervalTrigger
 from beanie import init_beanie
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,9 +12,7 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from starlette.middleware.sessions import SessionMiddleware
 
-from app.configs.config import settings
-from app.configs.logger import logger
-from app.dependencies.aps import refresh_rss_feeds, run_migration_job
+from app.configs import get_settings, logger
 from app.dependencies.csrf import setup_csrf
 from app.dependencies.database import close_db_connections
 from app.dependencies.limiter import limiter
@@ -38,12 +32,7 @@ from app.routers import (
     users,
     weread,
 )
-
-
-# 缓存配置实例，避免重复创建
-@lru_cache
-def get_settings():
-    return settings
+from app.utils import redis_cache
 
 
 # 生命周期，初始化和清理资源
@@ -56,39 +45,15 @@ async def lifespan(app: FastAPI):
         document_models=[MessageBoard, Post, RssArticle, SiteStats],
     )
 
-    # 初始化 APScheduler
-    scheduler = AsyncIOScheduler()
-
-    # 配置定时任务
-    scheduler.add_job(
-        run_migration_job,
-        trigger=IntervalTrigger(seconds=600),  # 每 10 分钟执行一次
-        id="redis_to_db_migration",
-        name="Redis 数据迁移",
-        replace_existing=True,
-        max_instances=1,  # 最大实例数为 1，避免任务重叠
-    )
-
-    scheduler.add_job(
-        refresh_rss_feeds,
-        trigger=CronTrigger(hour=10),  # 每天上午 10 点执行一次
-        id="rss_refresh",
-        name="Daily RSS 刷新",
-        replace_existing=True,
-        max_instances=1,
-    )
-
-    scheduler.start()
-    # 记录日志，确认 APScheduler 已启动
-    logger.info("FastApi and APScheduler started successfully.")
+    logger.info("FastAPI started successfully.")
 
     yield
 
     # 应用关闭时的清理工作
+    await redis_cache.aclose()  # 关闭 Redis 连接
     await app.state.client.close()  # 关闭 MongoDB 连接
     await closeclient(app)  # 关闭 MongoDB 客户端
     await close_db_connections()  # 关闭数据库连接池
-    scheduler.shutdown()  # 关闭 APScheduler
 
 
 # 实例化 FastAPI 应用
