@@ -1,5 +1,7 @@
 from taskiq_redis import RedisAsyncResultBackend, RedisStreamBroker
 
+from app.configs.logger import logger
+
 result_backend = RedisAsyncResultBackend(
     redis_url="redis://localhost:6379/3",
 )
@@ -7,3 +9,5 @@ result_backend = RedisAsyncResultBackend(
 broker = RedisStreamBroker(
     url="redis://localhost:6379/3",
 ).with_result_backend(result_backend)
+
+logger.info("[Taskiq] ✅ Broker initialized successfully")

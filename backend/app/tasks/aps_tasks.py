@@ -1,5 +1,6 @@
 import asyncio
 import json
+import time
 from datetime import UTC, datetime
 from itertools import repeat
 
@@ -16,14 +17,21 @@ from app.tasks.broker import broker
 
 @broker.task
 async def run_migration_job():
+    """迁移Redis访客数据到PostgreSQL"""
+    start_time = time.perf_counter()
     queue_key = "migration_queue"
     batch_size = 100  # 每批处理 100 条，可根据服务器性能调整
     processed_count = 0
     valid_items = []
 
+    logger.info(
+        f"[MigrationJob] 🚀 Starting visitor data migration job | batch_size={batch_size}"
+    )
+
     try:
         async for redis in get_redis():
             # 1. 批量从 Redis 取出数据 (使用 Pipeline 减少网络 IO)
+            fetch_start = time.perf_counter()
             pipe = redis.pipeline()
 
             # 批量执行 POP
@@ -35,27 +43,66 @@ async def run_migration_job():
 
             # 过滤掉 None (队列空了返回的就是 None)
             valid_items = [item for item in items if item is not None]
+            fetch_duration = time.perf_counter() - fetch_start
 
             if not valid_items:
-                logger.info("No items to migrate from Redis.")
-                return
+                duration = time.perf_counter() - start_time
+                logger.info(
+                    f"[MigrationJob] ✅ Job completed | duration={duration:.2f}s | fetched 0 items, no migration needed"
+                )
+                return {
+                    "status": "success",
+                    "migrated": 0,
+                    "duration": f"{duration:.2f}s",
+                }
+
+            logger.info(
+                f"[MigrationJob] Fetched {len(valid_items)} items from Redis | fetch_duration={fetch_duration:.2f}s"
+            )
 
             # 2. 批量解析 JSON
+            parse_start = time.perf_counter()
             try:
                 parsed_data_list = [json.loads(item) for item in valid_items]
-            except json.JSONDecodeError:
-                logger.warning("Error parsing JSON data. Skipping batch.")
-                return
+                parse_duration = time.perf_counter() - parse_start
+                logger.info(
+                    f"[MigrationJob] Parsed {len(parsed_data_list)} JSON records | parse_duration={parse_duration:.2f}s"
+                )
+            except json.JSONDecodeError as e:
+                parse_duration = time.perf_counter() - parse_start
+                logger.warning(
+                    f"[MigrationJob] JSON parsing failed | error={e!s} | parse_duration={parse_duration:.2f}s"
+                )
+
+                # 把有效数据塞回Redis
+                for item in reversed(valid_items):
+                    redis.lpush(queue_key, item)
+
+                duration = time.perf_counter() - start_time
+                logger.error(
+                    f"[MigrationJob] ❌ Job failed | duration={duration:.2f}s | error=JSON parsing failed"
+                )
+                return {
+                    "status": "failed",
+                    "error": "JSON parsing failed",
+                    "duration": f"{duration:.2f}s",
+                }
 
             # 3. 处理时间字段，转换为 datetime 对象
+            transform_start = time.perf_counter()
             for data in parsed_data_list:
                 visit_time = data.get("visit_time")
                 if visit_time is not None:
                     data["visit_time"] = datetime.fromisoformat(
                         visit_time
                     ).replace(tzinfo=UTC)
+            transform_duration = time.perf_counter() - transform_start
+            logger.info(
+                f"[MigrationJob] Transformed {len(parsed_data_list)} records | transform_duration={transform_duration:.2f}s"
+            )
 
             # 4. 批量写入数据库 (一次 Session, 一次 Commit)
+            db_start = time.perf_counter()
             async with AsyncSessionFactory() as session:
                 # 构建所有 ORM 对象
                 track_objects = [
@@ -66,39 +113,85 @@ async def run_migration_job():
                 await session.commit()
 
                 processed_count = len(track_objects)
+                db_duration = time.perf_counter() - db_start
                 logger.info(
-                    f"Successfully migrated {processed_count} items from Redis to DB."
+                    f"[MigrationJob] Written {processed_count} records to PostgreSQL | db_duration={db_duration:.2f}s"
                 )
 
+            # 完成统计
+            duration = time.perf_counter() - start_time
+            logger.info(
+                f"[MigrationJob] ✅ Job completed | duration={duration:.2f}s | total={len(valid_items)} | migrated={processed_count}"
+            )
+            return {
+                "status": "success",
+                "total": len(valid_items),
+                "migrated": processed_count,
+                "duration": f"{duration:.2f}s",
+            }
+
     except Exception as e:
-        logger.error(f"Error occurred while migrating data: {e}")
+        duration = time.perf_counter() - start_time
+        logger.exception(
+            f"[MigrationJob] ❌ Job failed | duration={duration:.2f}s | error={e!s}"
+        )
         # 异常时，把取出来的数据塞回 Redis 头部，防止数据丢失
         if "valid_items" in locals() and valid_items:
             # 注意要倒序塞回去，保证顺序不变
+            restore_start = time.perf_counter()
             for item in reversed(valid_items):
                 await redis.lpush(queue_key, item)  # type: ignore
+            restore_duration = time.perf_counter() - restore_start
+            logger.info(
+                f"[MigrationJob] Restored {len(valid_items)} items back to Redis | restore_duration={restore_duration:.2f}s"
+            )
+
+        return {
+            "status": "failed",
+            "error": str(e),
+            "duration": f"{duration:.2f}s",
+        }
 
 
 @broker.task
 async def refresh_rss_feeds():
     """Daily RSS refresh at 8 AM for all users, saves new articles to MongoDB."""
-    logger.info("Starting daily RSS feed refresh...")
+    start_time = time.perf_counter()
+    logger.info("[RSSRefreshJob] 🔄 Starting RSS feed refresh job")
+
     try:
+        # 1. 获取所有RSS源
+        db_start = time.perf_counter()
         async with AsyncSessionFactory() as session:
             # 查询所有不同的 feed_url
             result = await session.execute(select(RssInfo.rss_url).distinct())
             feed_urls = result.scalars().all()
+        db_duration = time.perf_counter() - db_start
 
         if not feed_urls:
-            logger.info("No RSS feeds to refresh")
-            return
+            duration = time.perf_counter() - start_time
+            logger.info(
+                f"[RSSRefreshJob] ✅ Job completed | duration={duration:.2f}s | no RSS feeds configured"
+            )
+            return {
+                "status": "success",
+                "total_feeds": 0,
+                "new_articles": 0,
+                "duration": f"{duration:.2f}s",
+            }
 
-        logger.info(f"Refreshing {len(feed_urls)} RSS feeds...")
+        logger.info(
+            f"[RSSRefreshJob] Found {len(feed_urls)} RSS feeds to refresh | db_query_duration={db_duration:.2f}s"
+        )
 
         # 使用信号量限制并发数
         semaphore = asyncio.Semaphore(5)
+        success_count = 0
+        failed_feeds = []
 
         async def fetch_and_save_feed(feed_url: str):
+            nonlocal success_count
+            feed_start = time.perf_counter()
             async with semaphore:
                 try:
                     # 在线程池中运行 feedparser.parse（同步操作）
@@ -108,7 +201,17 @@ async def refresh_rss_feeds():
                     )
 
                     if feed.bozo != 0:
-                        logger.warning(f"Failed to parse feed: {feed_url}")
+                        feed_duration = time.perf_counter() - feed_start
+                        failed_feeds.append(
+                            {
+                                "url": feed_url,
+                                "error": f"Parse error (bozo={feed.bozo})",
+                                "duration": f"{feed_duration:.2f}s",
+                            }
+                        )
+                        logger.warning(
+                            f"[RSSRefreshJob] Failed to parse feed: {feed_url} | bozo={feed.bozo} | duration={feed_duration:.2f}s"
+                        )
                         return 0
 
                     saved_count = 0
@@ -175,13 +278,25 @@ async def refresh_rss_feeds():
                         await new_article.insert()
                         saved_count += 1
 
+                    feed_duration = time.perf_counter() - feed_start
+                    success_count += 1
                     logger.info(
-                        f"RSS feed {feed_url}: saved {saved_count} new articles"
+                        f"[RSSRefreshJob] Feed {feed_url} refreshed | saved={saved_count} new articles | duration={feed_duration:.2f}s"
                     )
                     return saved_count
 
                 except Exception as e:
-                    logger.error(f"Error refreshing feed {feed_url}: {e!r}")
+                    feed_duration = time.perf_counter() - feed_start
+                    failed_feeds.append(
+                        {
+                            "url": feed_url,
+                            "error": str(e),
+                            "duration": f"{feed_duration:.2f}s",
+                        }
+                    )
+                    logger.error(
+                        f"[RSSRefreshJob] Error refreshing feed {feed_url}: {e!r} | duration={feed_duration:.2f}s"
+                    )
                     return 0
 
         # 并发刷新所有 feed
@@ -189,9 +304,34 @@ async def refresh_rss_feeds():
         results = await asyncio.gather(*tasks)
         total_saved = sum(results)
 
+        # 完成统计
+        duration = time.perf_counter() - start_time
         logger.info(
-            f"Daily RSS refresh completed. Total new articles: {total_saved}"
+            f"[RSSRefreshJob] ✅ Job completed | duration={duration:.2f}s | total_feeds={len(feed_urls)} | success={success_count} | failed={len(failed_feeds)} | new_articles={total_saved}"
         )
 
+        if failed_feeds:
+            logger.warning(
+                f"[RSSRefreshJob] Failed feeds: {[feed['url'] for feed in failed_feeds]}"
+            )
+
+        return {
+            "status": "success",
+            "total_feeds": len(feed_urls),
+            "success": success_count,
+            "failed": len(failed_feeds),
+            "new_articles": total_saved,
+            "failed_feeds": failed_feeds,
+            "duration": f"{duration:.2f}s",
+        }
+
     except Exception as e:
-        logger.error(f"Error in refresh_rss_feeds: {e!r}")
+        duration = time.perf_counter() - start_time
+        logger.exception(
+            f"[RSSRefreshJob] ❌ Job failed | duration={duration:.2f}s | error={e!s}"
+        )
+        return {
+            "status": "failed",
+            "error": str(e),
+            "duration": f"{duration:.2f}s",
+        }
