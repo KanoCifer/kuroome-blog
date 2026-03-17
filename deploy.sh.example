@@ -1,0 +1,44 @@
+#!/bin/bash
+# 部署脚本示例，复制为deploy.sh并放在服务器项目根目录
+# 注意：需要给脚本执行权限：chmod +x deploy.sh
+
+set -e  # 任何命令失败就退出
+
+echo "====================================="
+echo "Starting deployment at $(date)"
+echo "====================================="
+
+# 1. 进入项目目录
+cd /var/www/readinglist || exit 1
+
+# 2. 拉取最新代码
+echo "Pulling latest code from git..."
+git pull origin main  # 根据你的实际分支修改
+
+# 3. 构建前端
+echo "Building frontend..."
+cd frontend || exit 1
+pnpm install --frozen-lockfile
+pnpm run build
+
+# 4. 安装后端依赖
+echo "Installing backend dependencies..."
+cd ../backend || exit 1
+source .venv/bin/activate  # 根据你的虚拟环境路径修改
+pip install -r requirements.txt
+
+# 5. 执行数据库迁移
+echo "Running database migrations..."
+alembic upgrade head
+
+# 6. 重启后端服务
+echo "Restarting backend service..."
+sudo systemctl restart readinglist-backend  # 根据你的服务名修改
+
+# 7. 可选：重启Nginx
+# echo "Reloading Nginx..."
+# sudo systemctl reload nginx
+
+echo "====================================="
+echo "Deployment completed successfully at $(date)"
+echo "====================================="

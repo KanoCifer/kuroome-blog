@@ -1,0 +1,153 @@
+<script setup lang="ts">
+import { useThemeStore, type Theme } from "@/stores/theme";
+import { computed, onMounted, onUnmounted, ref } from "vue";
+
+const themeStore = useThemeStore();
+const isOpen = ref(false);
+const dropdownRef = ref<HTMLElement | null>(null);
+
+const themes: { value: Theme; label: string; icon: string }[] = [
+  {
+    value: "system",
+    label: "System",
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+  },
+  {
+    value: "light",
+    label: "Light",
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`,
+  },
+  {
+    value: "dark",
+    label: "Dark",
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
+  },
+];
+
+const currentTheme = computed(
+  (): { value: Theme; label: string; icon: string } => {
+    const found = themes.find((t) => t.value === themeStore.theme);
+    return found || themes[0]!;
+  },
+);
+
+let closeTimeout: ReturnType<typeof setTimeout> | null = null;
+
+const toggleDropdown = () => {
+  isOpen.value = !isOpen.value;
+};
+
+const openDropdown = () => {
+  // 清除关闭延迟，避免快速移动时闪烁
+  if (closeTimeout) {
+    clearTimeout(closeTimeout);
+    closeTimeout = null;
+  }
+  isOpen.value = true;
+};
+
+const closeDropdown = () => {
+  // 延迟关闭，给用户时间移动到菜单上
+  closeTimeout = setTimeout(() => {
+    isOpen.value = false;
+  }, 150);
+};
+
+const selectTheme = (theme: Theme) => {
+  themeStore.theme = theme;
+  isOpen.value = false;
+};
+
+const handleClickOutside = (event: MouseEvent) => {
+  if (dropdownRef.value && dropdownRef.value.contains(event.target as Node)) {
+    return;
+  }
+  isOpen.value = false;
+};
+
+onMounted(() => {
+  document.addEventListener("click", handleClickOutside);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("click", handleClickOutside);
+});
+</script>
+
+<template>
+  <div
+    ref="dropdownRef"
+    class="relative"
+    @mouseenter="openDropdown"
+    @mouseleave="closeDropdown"
+  >
+    <button
+      @click.stop="toggleDropdown"
+      class="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-all hover:bg-gray-200 focus:ring-2 focus:ring-blue-300 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-600"
+      aria-label="Toggle theme"
+    >
+      <span v-html="currentTheme.icon"></span>
+      <span class="hidden sm:inline">{{ currentTheme.label }}</span>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="transition-transform duration-200"
+        :class="{ 'rotate-180': isOpen }"
+      >
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </button>
+
+    <transition
+      enter-active-class="transition-all duration-200 ease-out"
+      enter-from-class="opacity-0 scale-95 -translate-y-1"
+      enter-to-class="opacity-100 scale-100 translate-y-0"
+      leave-active-class="transition-all duration-150 ease-in"
+      leave-from-class="opacity-100 scale-100 translate-y-0"
+      leave-to-class="opacity-0 scale-95 -translate-y-1"
+    >
+      <div
+        v-if="isOpen"
+        class="absolute top-full right-0 z-9999 mt-2 w-36 rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+        @click.stop
+      >
+        <button
+          v-for="(theme, index) in themes"
+          :key="theme.value"
+          @click="selectTheme(theme.value)"
+          class="flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+          :class="{
+            'bg-gray-100 dark:bg-gray-700': themeStore.theme === theme.value,
+            'rounded-t-lg': index === 0,
+            'rounded-b-lg': index === themes.length - 1,
+          }"
+        >
+          <span v-html="theme.icon"></span>
+          <span>{{ theme.label }}</span>
+          <svg
+            v-if="themeStore.theme === theme.value"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="ml-auto text-blue-500"
+          >
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </button>
+      </div>
+    </transition>
+  </div>
+</template>

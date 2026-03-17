@@ -1,0 +1,54 @@
+[project]
+name = "ReadingList-Flask"
+version = "2.0.0"
+description = "Reading List API - SPA Backend"
+requires-python = ">=3.14"
+dependencies = [
+    "alembic>=1.18.4",
+    "email-validator>=2.3.0",
+    "faker>=40.8.0",
+    "itsdangerous>=2.2.0",
+    "mako>=1.3.10",
+    "markupsafe>=3.0.3",
+    "pillow>=12.1.1",
+    "pillow-heif>=1.3.0",
+    "pymongo>=4.16.0",
+    "python-dotenv>=1.2.2",
+    "redis>=7.3.0",
+    "requests>=2.32.5",
+    "httpx>=0.28.1",
+    "sqlalchemy[asyncio]>=2.0.47",
+    "typing-extensions>=4.15.0",
+    "werkzeug>=3.1.6",
+    "asyncpg>=0.31.0",
+    "uvicorn[standard]>=0.41.0",
+    "fastapi[standard]>=0.135.1",
+    "python-multipart>=0.0.22",
+    "aiosmtplib>=5.1.0",
+    "python-jose[cryptography]>=3.5.0",
+    "passlib[bcrypt]>=1.7.4",
+    "cachetools>=7.0.5",
+    "cryptography>=46.0.5",
+    "fastapi-login>=1.10.3",
+    "fastapi-mail>=1.6.2",
+    "slowapi>=0.1.9",
+    "beanie>=2.0.1",
+    "apscheduler>=3.11.2",
+    "psutil>=7.2.2",
+    "feedparser>=6.0.12",
+    "taskiq[reload]>=0.12.1",
+    "taskiq-redis>=1.2.2",
+    "langchain>=1.2.12",
+    "langchain-openai>=1.1.11",
+    "webauthn>=2.7.1",
+    "orjson>=3.11.7",
+    "taskiq-aio-pika>=0.6.0",
+    "uvloop>=0.22.1",
+    "gunicorn>=25.1.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["watchlist"]
+
+[dependency-groups]
+dev = ["pytest>=9.0.2", "watchdog>=6.0.0"]

@@ -1,0 +1,381 @@
+<template>
+  <div class="relative mt-24 min-h-screen">
+    <!-- 背景层 -->
+    <div
+      :style="sectionStyle"
+      class="absolute inset-y-0 left-1/2 -z-5 -translate-x-1/2 rounded-t-[40px] bg-blue-50 dark:bg-slate-900"
+    ></div>
+
+    <div class="mx-auto max-w-4xl pt-10">
+      <!-- 页面标题 -->
+      <div class="mb-8 flex items-center gap-3">
+        <div
+          class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="h-7 w-7"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.987 8.987 0 00-6 2.292m0-14.25v14.25"
+            />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-3xl font-bold text-blue-900 dark:text-white">
+            RSS 文章列表
+          </h1>
+          <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">
+            阅读已保存的订阅文章
+          </p>
+        </div>
+        <button
+          @click="router.push('/rss')"
+          class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:bg-slate-800 dark:text-blue-300 dark:hover:bg-slate-700"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="h-4 w-4"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+            />
+          </svg>
+          返回Rss解析
+        </button>
+        <router-link
+          to="/rss"
+          class="ml-auto text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+        >
+          管理订阅
+        </router-link>
+      </div>
+
+      <!-- 搜索框 -->
+      <div class="mb-6">
+        <div class="relative">
+          <div
+            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="h-5 w-5 text-blue-500 dark:text-blue-400"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+              />
+            </svg>
+          </div>
+          <input
+            v-model="searchQuery"
+            type="search"
+            placeholder="搜索文章标题和内容..."
+            class="block w-full rounded-xl border border-blue-200 bg-white py-3 pr-4 pl-10 text-sm text-blue-900 placeholder:text-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-blue-500"
+            @keyup.enter="handleSearch"
+          />
+          <button
+            v-if="searchQuery"
+            @click="clearSearch"
+            class="absolute inset-y-0 right-0 flex items-center pr-3 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="h-5 w-5"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- 加载中 -->
+      <div v-if="isLoading" class="space-y-4">
+        <div
+          v-for="i in 5"
+          :key="i"
+          class="animate-pulse overflow-hidden rounded-xl border border-blue-100 bg-white p-5 dark:border-slate-700 dark:bg-slate-800"
+        >
+          <div class="mb-3 h-6 w-3/4 rounded bg-blue-200 dark:bg-slate-700" />
+          <div class="mb-4 h-4 w-full rounded bg-blue-100 dark:bg-slate-700" />
+          <div class="h-4 w-1/3 rounded bg-blue-100 dark:bg-slate-700" />
+        </div>
+      </div>
+
+      <!-- 错误状态 -->
+      <div
+        v-else-if="errorMessage"
+        class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-red-200 bg-red-50 py-16 text-center dark:border-red-800 dark:bg-red-900/20"
+      >
+        <p class="text-lg font-medium text-red-600 dark:text-red-400">
+          加载失败
+        </p>
+        <p class="mt-1 text-sm text-red-500">{{ errorMessage }}</p>
+        <button
+          class="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none"
+          @click="fetchArticles(currentPage)"
+        >
+          重试
+        </button>
+      </div>
+
+      <!-- 空状态 -->
+      <div
+        v-else-if="articles.length === 0"
+        class="flex flex-col items-center justify-center rounded-2xl border border-blue-100 bg-white py-16 text-center dark:border-slate-700 dark:bg-slate-800"
+      >
+        <p class="text-lg font-medium text-blue-500">暂无文章</p>
+      </div>
+
+      <!-- 文章列表 -->
+      <div v-else class="space-y-4">
+        <ul class="space-y-4">
+          <li
+            v-for="article in articles"
+            :key="article.id"
+            class="group relative overflow-hidden rounded-xl border border-blue-100 bg-white p-6 shadow-sm transition-all hover:border-blue-300 hover:bg-blue-50/30 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600 dark:hover:bg-slate-700/50"
+          >
+            <div class="flex flex-col gap-3">
+              <div class="flex items-start justify-between gap-4">
+                <router-link
+                  :to="`/rss/articles/${article.id}`"
+                  class="block text-lg font-bold text-blue-900 transition-colors hover:text-blue-600 dark:text-white dark:hover:text-blue-400"
+                >
+                  {{ article.title || "无标题" }}
+                </router-link>
+                <span
+                  class="inline-flex shrink-0 items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/50 dark:text-blue-300"
+                >
+                  {{ article.is_read ? "已读" : "未读" }}
+                </span>
+              </div>
+
+              <div
+                class="mt-1 flex flex-wrap items-center gap-3 text-xs text-blue-500 dark:text-blue-400"
+              >
+                <span v-if="article.author" class="font-medium">{{
+                  article.author
+                }}</span>
+                <span v-if="article.published" class="flex items-center gap-1">
+                  {{ formatDate(article.published) }}
+                </span>
+                <span
+                  class="max-w-50 truncate opacity-75 sm:max-w-xs"
+                  :title="article.feed_url"
+                >
+                  来源: {{ article.feed_url }}
+                </span>
+              </div>
+
+              <!-- 摘要 -->
+              <p
+                v-if="article.summary"
+                class="mt-3 line-clamp-2 text-sm text-blue-600 dark:text-blue-400"
+              >
+                {{ article.summary }}
+              </p>
+            </div>
+          </li>
+        </ul>
+
+        <!-- 分页 -->
+        <nav v-if="totalPages > 1" class="mt-8 flex justify-center">
+          <ul class="flex items-center gap-2">
+            <li>
+              <button
+                :disabled="currentPage <= 1"
+                class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                :class="
+                  currentPage > 1
+                    ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
+                    : 'cursor-not-allowed bg-blue-100 text-blue-400 dark:bg-slate-800 dark:text-slate-600'
+                "
+                @click="goToPage(currentPage - 1)"
+              >
+                上一页
+              </button>
+            </li>
+            <li
+              class="px-2 text-sm font-medium text-blue-700 dark:text-blue-300"
+            >
+              第 {{ currentPage }} 页 / 共 {{ totalPages }} 页
+            </li>
+            <li>
+              <button
+                :disabled="currentPage >= totalPages"
+                class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                :class="
+                  currentPage < totalPages
+                    ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
+                    : 'cursor-not-allowed bg-blue-100 text-blue-400 dark:bg-slate-800 dark:text-slate-600'
+                "
+                @click="goToPage(currentPage + 1)"
+              >
+                下一页
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import request from "@/request";
+import { useNotificationStore } from "@/stores/notification";
+import type { ApiResponse, RssArticle, RssArticleListResponse } from "@/types";
+import { formatDate } from "@/utils/formatdate";
+import { useScroll } from "@vueuse/core";
+import { computed, onMounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+
+const route = useRoute();
+const router = useRouter();
+const articles = ref<RssArticle[]>([]);
+const totalItems = ref<number>(0);
+const limit = ref<number>(20);
+const currentPage = ref<number>(1);
+const isLoading = ref<boolean>(false);
+const errorMessage = ref<string>("");
+const notifier = useNotificationStore();
+const searchQuery = ref<string>("");
+
+const totalPages = computed(() => Math.ceil(totalItems.value / limit.value));
+
+const fetchArticles = async (page: number) => {
+  isLoading.value = true;
+  errorMessage.value = "";
+  try {
+    const params: Record<string, string | number | string[]> = {
+      page,
+      limit: limit.value,
+    };
+    if (route.query.feed_url && typeof route.query.feed_url === "string") {
+      params.feed_url = route.query.feed_url;
+    }
+    if (route.query.search && typeof route.query.search === "string") {
+      params.search = route.query.search;
+      searchQuery.value = route.query.search;
+    }
+
+    const res = await request.get<ApiResponse<RssArticleListResponse>>(
+      "/rss/articles",
+      {
+        params,
+      },
+    );
+
+    if (res.data.status === "success" && res.data.data) {
+      articles.value = res.data.data.items;
+      totalItems.value = res.data.data.total;
+      currentPage.value = res.data.data.page;
+    } else {
+      throw new Error(res.data.message || "获取文章列表失败");
+    }
+  } catch (err: unknown) {
+    console.error(err);
+    errorMessage.value =
+      err instanceof Error
+        ? err.message
+        : String(err) || "加载文章列表失败，请稍后重试。";
+    notifier.error(errorMessage.value);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const goToPage = (page: number) => {
+  if (page >= 1 && page <= totalPages.value) {
+    router.push({
+      query: {
+        ...route.query,
+        page: page.toString(),
+      },
+    });
+  }
+};
+
+const handleSearch = () => {
+  router.push({
+    query: {
+      ...route.query,
+      page: "1",
+      search: searchQuery.value || undefined,
+    },
+  });
+};
+
+const clearSearch = () => {
+  searchQuery.value = "";
+  handleSearch();
+};
+
+onMounted(() => {
+  const pageParam = parseInt(route.query.page as string, 10);
+  fetchArticles(isNaN(pageParam) || pageParam < 1 ? 1 : pageParam);
+});
+
+// Since we use push query string, watch the route query
+watch(
+  () => route.query.page,
+  (newPage) => {
+    const pageNum = parseInt(newPage as string, 10) || 1;
+    if (pageNum !== currentPage.value) {
+      fetchArticles(pageNum);
+    }
+  },
+);
+watch(
+  () => route.query.feed_url,
+  () => {
+    fetchArticles(1);
+  },
+);
+
+watch(
+  () => route.query.search,
+  (newSearch) => {
+    if (typeof newSearch === "string") {
+      searchQuery.value = newSearch;
+    } else {
+      searchQuery.value = "";
+    }
+    fetchArticles(1);
+  },
+);
+
+const { y } = useScroll(window);
+const sectionStyle = computed(() => {
+  // compute scale with a ceiling of 1 so the content does not grow indefinitely
+  const width = Math.min(1, 0.9 + y.value * 0.001);
+  return {
+    width: `${width * 100}%`,
+  };
+});
+</script>
