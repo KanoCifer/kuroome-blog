@@ -3,6 +3,7 @@
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from rich import print
 
 
 def get_env_file_path() -> str:
@@ -25,14 +26,14 @@ class Settings(BaseSettings):
     API_KEY: str = ""
     CSRF_COOKIE_SECURE: bool = True
     # WebAuthn / Passkey settings
-    WEBAUTHN_RP_ID: str = "kanocifer.com"
-    WEBAUTHN_ORIGIN: str = "https://kanocifer.com"
+    WEBAUTHN_RP_ID: str = "kanocifer.chat"
+    WEBAUTHN_ORIGIN: str = "https://kanocifer.chat"
     GITHUB_CLIENT_ID: str = ""
     GITHUB_CLIENT_SECRET: str = ""
     GITHUB_REDIRECT_URI: str = ""
-    FRONTEND_URL: str = "http://localhost:5173"
+    FRONTEND_URL: str = "https://kanocifer.chat"
     GITEE_WEBHOOK_SECRET: str | None = None
-    SEND_BOOTSTRAP_EMAILS: bool = True
+    SEND_BOOT_EMAIL: bool = True
     ADMIN_EMAIL: str = ""
 
     model_config = SettingsConfigDict(
@@ -53,8 +54,9 @@ def get_settings() -> Settings:
 
 if __name__ == "__main__":
     # 测试配置是否正确加载
+    get_settings.cache_clear()  # 清除缓存以确保重新加载配置
     print(get_settings().DATABASE_URL)
     print(get_settings().MONGO_URI)
     print(get_env_file_path())
-    print(f"SEND_BOOTSTRAP_EMAILS: {get_settings().SEND_BOOTSTRAP_EMAILS}")
+    print(f"SEND_BOOT_EMAIL: {get_settings().SEND_BOOT_EMAIL}")
     print(f"ADMIN_EMAIL: {get_settings().ADMIN_EMAIL}")
