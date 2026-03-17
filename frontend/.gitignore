@@ -12,7 +12,7 @@ node_modules
 dist-ssr
 coverage
 *.local
-
+dist
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

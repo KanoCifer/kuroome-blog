@@ -1,6 +1,7 @@
 import { fileURLToPath, URL } from "node:url";
 
 import vue from "@vitejs/plugin-vue";
+import tailwindcss from "@tailwindcss/vite";
 import { AntDesignVueResolver } from "unplugin-vue-components/resolvers";
 import Components from "unplugin-vue-components/vite";
 import { defineConfig } from "vite";
@@ -10,6 +11,7 @@ import vueDevTools from "vite-plugin-vue-devtools";
 export default defineConfig({
   plugins: [
     vue(),
+    tailwindcss(),
     vueDevTools({
       launchEditor: "code", // 可选：指定编辑器，默认为 "code"（VS Code）
     }),

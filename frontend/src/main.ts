@@ -7,7 +7,7 @@ import { createPinia } from "pinia";
 import { createApp } from "vue";
 import Vue3Lottie from "vue3-lottie";
 import App from "./App.vue";
-import "./assets/main.css";
+import "./assets/base.css";
 import "./assets/squircle.css";
 import router from "./router";
 

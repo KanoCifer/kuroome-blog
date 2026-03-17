@@ -866,6 +866,8 @@ const addImage = () => {
 </template>
 
 <style scoped>
+@reference "../../assets/base.css";
+
 .tiptap-btn.is-active {
   @apply bg-blue-500 text-white;
 }
