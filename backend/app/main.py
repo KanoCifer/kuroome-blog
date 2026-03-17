@@ -13,6 +13,7 @@ from slowapi.errors import RateLimitExceeded
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.configs import get_settings, logger
+from app.configs.logger import logger as app_logger
 from app.dependencies.csrf import setup_csrf
 from app.dependencies.database import close_db_connections
 from app.dependencies.limiter import limiter
@@ -32,7 +33,7 @@ from app.routers import (
     users,
     weread,
 )
-from app.tasks import broker, send_bootstrap_emails
+from app.tasks import send_bootstrap_emails
 from app.utils import redis_cache
 
 
@@ -45,17 +46,24 @@ async def lifespan(app: FastAPI):
         database=app.state.mongo,
         document_models=[MessageBoard, Post, RssArticle],
     )
-    await broker.startup()  # 启动 Celery Broker
 
     logger.debug(f"Settings:{get_settings().model_dump()}")
     logger.info("FastAPI started successfully.")
 
-    # 发送引导邮件给管理员
-    await send_bootstrap_emails.kiq(get_settings().ADMIN_EMAIL)
+    # 发送引导邮件给管理员（幂等性保护）
+    admin_email = get_settings().ADMIN_EMAIL
+    bootstrap_key = f"bootstrap_email_sent:{admin_email}"
+    redis = redis_cache.redis
+    if redis:
+        sent = await redis.get(bootstrap_key)
+        if not sent:
+            await send_bootstrap_emails.kiq(admin_email)
+            await redis.set(bootstrap_key, "1", ex=600)
+            app_logger.info(f"引导邮件任务已添加到队列: {admin_email}")
+        else:
+            app_logger.info(f"引导邮件已在24小时内发送过，跳过: {admin_email}")
 
     yield
-
-    await broker.shutdown()  # 关闭 Celery Broker
 
     # 应用关闭时的清理工作
     await redis_cache.aclose()  # 关闭 Redis 连接

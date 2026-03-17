@@ -22,9 +22,8 @@ class BootstrapEmailContent(BaseModel):
 async def send_bootstrap_emails(admin_email: str):
     """发送引导邮件给管理员"""
     settings = get_settings().SEND_BOOT_EMAIL
-    # print(f"引导邮件发送开关: {settings}")
-    # if not settings:
-    #     return
+    if not settings:
+        return
 
     # 验证管理员邮箱地址
     try:
