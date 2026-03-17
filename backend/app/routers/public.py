@@ -242,7 +242,7 @@ async def get_sitemap_xml(
 
 
 @router.post("/like")
-@limiter.limit("1/day")
+@limiter.limit("25/day")
 async def add_like(
     request: Request,
     redis: AsyncRedis = Depends(get_redis),

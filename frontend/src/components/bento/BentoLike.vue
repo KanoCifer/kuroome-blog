@@ -9,7 +9,7 @@
   >
     <span
       class="absolute top-2 right-0 z-10 flex translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-blue-500 px-1 py-0.5 text-[10px] text-white"
-      >{{ likesCountsFromBackend }}</span
+      >{{ likesCounts }}</span
     >
     <div ref="containerRef" class="bento-like-animation h-12 w-12"></div>
   </motion.div>
@@ -19,41 +19,22 @@
 import request from "@/request";
 import { useNotificationStore } from "@/stores/notification";
 import { AxiosError } from "axios";
+import type { AnimationItem } from "lottie-web";
 import { motion } from "motion-v";
 import { onMounted, onUnmounted, ref } from "vue";
-import type { AnimationItem } from "lottie-web";
 
 const notifier = useNotificationStore();
-const likesCountsFromBackend = ref<number>(0);
-const likesCount = ref<number>(0);
+const likesCounts = ref<number>(0);
 const containerRef = ref<HTMLElement | null>(null);
 const anim = ref<AnimationItem | null>(null);
+const isSubmitting = ref(false);
 
 const fetchLikesCount = async () => {
   try {
     const response = await request("/likes");
-    likesCountsFromBackend.value = response.data.data.likes_count || 0;
+    likesCounts.value = response.data.data.likes_count || 0;
   } catch (error) {
     console.error("Failed to fetch likes count:", error);
-  }
-};
-
-const updateLikesCount = async () => {
-  if (likesCount.value <= 0) return;
-  try {
-    await request.post("/like", { likescounts: likesCount.value });
-    likesCount.value = 0;
-  } catch (error) {
-    let errorMsg = "点赞失败，请稍后重试";
-    if (error instanceof AxiosError) {
-      if (error.response?.status === 429) {
-        errorMsg = "今天已经点赞很多次啦，明天再试试吧！";
-      } else if (error.response?.data?.detail) {
-        errorMsg = error.response.data.detail;
-      }
-    }
-    notifier.error(errorMsg);
-    console.error("Failed to update likes count:", error);
   }
 };
 
@@ -78,24 +59,38 @@ onMounted(async () => {
   });
 });
 
+const playAnimation = async () => {
+  if (isSubmitting.value || !anim.value) return;
+
+  isSubmitting.value = true;
+
+  anim.value.goToAndStop(0, true);
+  anim.value.play();
+
+  try {
+    await request.post("/like", { likescounts: likesCounts.value });
+    likesCounts.value += 1;
+  } catch (error) {
+    let errorMsg = "点赞失败，请稍后重试";
+    if (error instanceof AxiosError) {
+      if (error.response?.status === 429) {
+        errorMsg = "今天已经点赞很多次啦，明天再试试吧！";
+      } else if (error.response?.data?.detail) {
+        errorMsg = error.response.data.detail;
+      }
+    }
+    notifier.error(errorMsg);
+    console.error("Failed to update likes count:", error);
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
 onUnmounted(() => {
   if (anim.value) {
     anim.value.destroy();
   }
-  updateLikesCount();
 });
-
-const playAnimation = () => {
-  if (anim.value) {
-    anim.value.goToAndStop(0, true);
-    anim.value.play();
-  }
-  likesCount.value += 1;
-  likesCountsFromBackend.value += 1;
-  if (likesCount.value >= 20) {
-    updateLikesCount();
-  }
-};
 
 fetchLikesCount();
 </script>
