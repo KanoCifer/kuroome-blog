@@ -18,6 +18,7 @@ from slowapi.util import get_remote_address
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.configs import get_settings
 from app.configs.logger import logger
 from app.dependencies.auth import manager
 from app.dependencies.database import get_session
@@ -489,7 +490,7 @@ async def webhook_deploy(
     Gitee Webhook 自动部署接口
     """
     # 从环境变量获取webhook密钥，需要在.env中配置
-    webhook_secret = os.getenv("GITEE_WEBHOOK_SECRET", "@KuroomeBlogAdmin")
+    webhook_secret = get_settings().GITEE_WEBHOOK_SECRET
     if not webhook_secret:
         logger.error(
             "GITEE_WEBHOOK_SECRET is not set in environment variables"
@@ -500,8 +501,8 @@ async def webhook_deploy(
         )
 
     # 获取Gitee发送的签名头
-    gitee_token = request.headers.get("X-Gitee-Token")
-    signature_header = request.headers.get("X-Hub-Signature-256")
+    gitee_token: str | None = request.headers.get("X-Gitee-Token")
+    signature_header: str | None = request.headers.get("X-Hub-Signature-256")
 
     # 验证方式1：简单token验证（Gitee Webhook的"密码"字段）
     if gitee_token:

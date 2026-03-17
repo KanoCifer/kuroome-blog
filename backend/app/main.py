@@ -34,6 +34,7 @@ from app.routers import (
 )
 from app.tasks import broker
 from app.utils import redis_cache
+from app.utils.mailservice import send_bootstrap_emails
 
 
 # 生命周期，初始化和清理资源
@@ -47,7 +48,11 @@ async def lifespan(app: FastAPI):
     )
     await broker.startup()  # 启动 Celery Broker
 
+    logger.info(f"Settings:{get_settings().model_dump()}")
     logger.info("FastAPI started successfully.")
+
+    # 发送引导邮件给管理员
+    await send_bootstrap_emails(get_settings().ADMIN_EMAIL)
 
     yield
 

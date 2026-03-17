@@ -9,7 +9,7 @@ def get_env_file_path() -> str:
     """Get the absolute path to .env file."""
     from pathlib import Path
 
-    env = str(Path(__file__).resolve().parent.parent / ".env")
+    env = str(Path(__file__).resolve().parent.parent.parent / ".env")
     return env
 
 
@@ -31,9 +31,12 @@ class Settings(BaseSettings):
     GITHUB_CLIENT_SECRET: str = ""
     GITHUB_REDIRECT_URI: str = ""
     FRONTEND_URL: str = "http://localhost:5173"
+    GITEE_WEBHOOK_SECRET: str | None = None
+    SEND_BOOTSTRAP_EMAILS: bool = True
+    ADMIN_EMAIL: str = ""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=get_env_file_path(),
         env_file_encoding="utf-8",
         extra="ignore",
     )
@@ -53,3 +56,5 @@ if __name__ == "__main__":
     print(get_settings().DATABASE_URL)
     print(get_settings().MONGO_URI)
     print(get_env_file_path())
+    print(f"SEND_BOOTSTRAP_EMAILS: {get_settings().SEND_BOOTSTRAP_EMAILS}")
+    print(f"ADMIN_EMAIL: {get_settings().ADMIN_EMAIL}")

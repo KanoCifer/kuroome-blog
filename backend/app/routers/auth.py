@@ -7,7 +7,7 @@ from datetime import UTC, datetime, timedelta
 from urllib.parse import urlencode
 
 import httpx
-from email_validator import EmailNotValidError, validate_email
+from email_validator import EmailNotValidError, ValidatedEmail, validate_email
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -447,7 +447,10 @@ async def send_email_code(
     """发送邮箱验证码."""
     email = email.email  # type: ignore
     try:
-        emailinfo = validate_email(email, check_deliverability=True)  # type: ignore
+        emailinfo: ValidatedEmail = validate_email(
+            email,  # type: ignore
+            check_deliverability=True,  # type: ignore
+        )  # type: ignore
 
         email = emailinfo.normalized  # type: ignore
     except EmailNotValidError as e:
