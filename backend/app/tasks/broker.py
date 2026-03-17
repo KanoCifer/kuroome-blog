@@ -4,7 +4,7 @@ from app.configs.logger import logger
 
 result_backend = RedisAsyncResultBackend(
     redis_url="redis://localhost:6379/3",
-    results_expire=86400,
+    result_ex_time=86400,
 )
 
 broker: RedisStreamBroker = RedisStreamBroker(

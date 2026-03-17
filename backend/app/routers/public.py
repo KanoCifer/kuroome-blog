@@ -13,10 +13,11 @@ from xml.etree.ElementTree import Element, SubElement, tostring
 
 from fastapi import APIRouter, Body, Depends, Request
 from fastapi.responses import JSONResponse, PlainTextResponse
+from redis.asyncio import Redis as AsyncRedis
 
 from app.dependencies.limiter import limiter
 from app.dependencies.mongo import get_mongo_db
-from app.models.mgmodel import SiteStats
+from app.dependencies.redis import get_redis
 from app.schemas.response import APIResponse
 
 router = APIRouter(tags=["public"])
@@ -244,6 +245,7 @@ async def get_sitemap_xml(
 @limiter.limit("1/day")
 async def add_like(
     request: Request,
+    redis: AsyncRedis = Depends(get_redis),
     likescounts: int = Body(
         ..., gt=0, embed=True, description="Number of likes to add"
     ),
@@ -253,14 +255,8 @@ async def add_like(
     Returns:
         JSONResponse: Current total likes count
     """
-    stats: SiteStats | None = await SiteStats.find_one({"key": "total_likes"})
-    if stats:
-        await stats.update({"$inc": {"value": likescounts}})
-        total: int = stats.value
-    else:
-        stats = SiteStats(key="total_likes", value=likescounts)
-        await stats.insert()
-        total = likescounts
+    like_key = "site:total_likes"
+    total = await redis.incrby(like_key, likescounts)
 
     return APIResponse.ok(
         data={"likes_count": total},
@@ -269,14 +265,19 @@ async def add_like(
 
 
 @router.get("/likes")
-async def get_likes() -> JSONResponse:
+async def get_likes(
+    redis: AsyncRedis = Depends(get_redis),
+) -> JSONResponse:
     """Get total likes count.
 
     Returns:
         JSONResponse: Current total likes count
     """
-    stats = await SiteStats.find_one({"key": "total_likes"})
-    total_likes = stats.value if stats else 0
+    likse = await redis.get("site:total_likes")
+    if likse is not None:
+        total_likes = int(likse)
+    else:
+        total_likes = 0
 
     return APIResponse.ok(
         data={"likes_count": total_likes},

@@ -18,7 +18,7 @@ from app.dependencies.database import close_db_connections
 from app.dependencies.limiter import limiter
 from app.dependencies.mongo import closeclient, init_mongo
 from app.exceptions import register_exception_handlers
-from app.models.mgmodel import MessageBoard, Post, RssArticle, SiteStats
+from app.models.mgmodel import MessageBoard, Post, RssArticle
 from app.routers import (
     admin,
     aiagent,
@@ -43,7 +43,7 @@ async def lifespan(app: FastAPI):
     await init_mongo(app)
     await init_beanie(
         database=app.state.mongo,
-        document_models=[MessageBoard, Post, RssArticle, SiteStats],
+        document_models=[MessageBoard, Post, RssArticle],
     )
     await broker.startup()  # 启动 Celery Broker
 
