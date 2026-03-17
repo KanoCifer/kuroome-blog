@@ -489,7 +489,7 @@ async def webhook_deploy(
     Gitee Webhook 自动部署接口
     """
     # 从环境变量获取webhook密钥，需要在.env中配置
-    webhook_secret = os.getenv("GITEE_WEBHOOK_SECRET", "")
+    webhook_secret = os.getenv("GITEE_WEBHOOK_SECRET", "@KuroomeBlogAdmin")
     if not webhook_secret:
         logger.error(
             "GITEE_WEBHOOK_SECRET is not set in environment variables"
