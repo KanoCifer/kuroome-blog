@@ -32,6 +32,7 @@ from app.routers import (
     users,
     weread,
 )
+from app.tasks import broker
 from app.utils import redis_cache
 
 
@@ -44,10 +45,13 @@ async def lifespan(app: FastAPI):
         database=app.state.mongo,
         document_models=[MessageBoard, Post, RssArticle, SiteStats],
     )
+    await broker.startup()  # 启动 Celery Broker
 
     logger.info("FastAPI started successfully.")
 
     yield
+
+    await broker.shutdown()  # 关闭 Celery Broker
 
     # 应用关闭时的清理工作
     await redis_cache.aclose()  # 关闭 Redis 连接

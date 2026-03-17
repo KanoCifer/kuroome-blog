@@ -474,7 +474,7 @@ async def get_subscriptions(
         )
         for sub in subscriptions
     ]
-    return APIResponse.ok(data=[item.model_dump() for item in data])
+    return APIResponse.ok(data=data)
 
 
 # 手动刷新某个RSS订阅，拉取并保存最新文章
