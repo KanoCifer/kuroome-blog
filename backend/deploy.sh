@@ -23,9 +23,6 @@ pnpm run build
 sudo supervisorctl update
 sudo supervisorctl reload
 
-echo "Starting Nginx..."
-sudo systemctl start nginx
-
 echo "====================================="
 echo "Deployment completed successfully at $(date)"
 echo "====================================="

@@ -44,6 +44,7 @@ dependencies = [
     "orjson>=3.11.7",
     "taskiq-aio-pika>=0.6.0",
     "uvloop>=0.22.1",
+    "gunicorn>=25.1.0",
 ]
 
 [tool.setuptools.packages.find]
