@@ -48,7 +48,7 @@ async def lifespan(app: FastAPI):
     )
     await broker.startup()  # 启动 Celery Broker
 
-    logger.info(f"Settings:{get_settings().model_dump()}")
+    logger.debug(f"Settings:{get_settings().model_dump()}")
     logger.info("FastAPI started successfully.")
 
     # 发送引导邮件给管理员
