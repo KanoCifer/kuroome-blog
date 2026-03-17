@@ -32,9 +32,8 @@ from app.routers import (
     users,
     weread,
 )
-from app.tasks import broker
+from app.tasks import broker, send_bootstrap_emails
 from app.utils import redis_cache
-from app.utils.mailservice import send_bootstrap_emails
 
 
 # 生命周期，初始化和清理资源
@@ -52,7 +51,7 @@ async def lifespan(app: FastAPI):
     logger.info("FastAPI started successfully.")
 
     # 发送引导邮件给管理员
-    await send_bootstrap_emails(get_settings().ADMIN_EMAIL)
+    await send_bootstrap_emails.kiq(get_settings().ADMIN_EMAIL)
 
     yield
 
