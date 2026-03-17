@@ -18,6 +18,12 @@ logging.basicConfig(
     format=LOG_FORMAT,
 )
 
+# 精简Taskiq日志输出，仅保留警告及以上级别
+logging.getLogger("taskiq").setLevel(logging.WARNING)
+logging.getLogger("taskiq.worker").setLevel(logging.WARNING)
+logging.getLogger("taskiq.process-manager").setLevel(logging.WARNING)
+logging.getLogger("taskiq.receiver.receiver").setLevel(logging.WARNING)
+
 logger = logging.getLogger(__name__)
 
 # 创建 formatter 并设置到各处理器，确保文件也包含时间

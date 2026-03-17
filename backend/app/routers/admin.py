@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+import asyncio
+import hashlib
+import hmac
 import json
+import os
+import subprocess
 from datetime import UTC, datetime
 
 from beanie import SortDirection
@@ -8,6 +13,7 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import Response
+from redis.asyncio import Redis as AsyncRedis
 from slowapi.util import get_remote_address
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,6 +24,7 @@ from app.dependencies.database import get_session
 from app.dependencies.redis import get_redis
 from app.models.mgmodel import MessageBoard, Post
 from app.models.models import Category, User
+from app.schemas import VisitorData
 from app.schemas.response import APIResponse
 from app.schemas.schemas import BlogPostIn, BlogPostUpdate
 from app.utils import redis_cache
@@ -222,7 +229,7 @@ async def get_admin_comments(
                 "replied_id": str(comment.replied_id)
                 if comment.replied_id
                 else None,
-                "created_at": comment.created_at.isoformat()
+                "created_at": comment.created_at
                 if comment.created_at
                 else None,
             }
@@ -340,14 +347,11 @@ async def get_admin_messages(
                 "id": str(msg.id),
                 "name": msg.name,
                 "message": msg.message,
-                "created_at": (
-                    msg.created_at.isoformat() if msg.created_at else None
-                ),
+                "created_at": (msg.created_at),
                 "review": msg.review if hasattr(msg, "review") else 0,
             }
 
-        return APIResponse(
-            status="success",
+        return APIResponse.ok(
             data={
                 "pending": [format_message(msg) for msg in pending_messages],
                 "approved": [format_message(msg) for msg in approved_messages],
@@ -416,18 +420,145 @@ async def delete_message(
 
 @router.post("/track")
 async def track_visitor(
-    data: dict,
+    data: VisitorData,
     request: Request,
     session: AsyncSession = Depends(get_session),
-    redis=Depends(get_redis),
+    redis: AsyncRedis = Depends(get_redis),
 ):
     """Track visitor data sent from the frontend."""
     ip_address = get_remote_address(request)
-    data["ip_address"] = ip_address
-    data["visit_time"] = datetime.now(UTC).isoformat()
+    visitor_data = VisitorData(
+        **data.model_dump(exclude={"ip_address"}),
+        ip_address=ip_address,
+    )
     try:
-        await redis.rpush("migration_queue", json.dumps(data))
+        await redis.rpush(
+            "migration_queue", json.dumps(visitor_data.model_dump(mode="json"))
+        )  # type: ignore
         return Response(status_code=204)
     except Exception as e:
         logger.error(f"Failed to track visitor data: {e!s}")
         return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# =============================================================================
+# Webhook Deploy Endpoint
+# =============================================================================
+async def run_deployment() -> None:
+    """异步执行部署脚本不阻塞HTTP请求"""
+    try:
+        logger.info("Starting deployment process...")
+
+        # 部署脚本路径，根据你的实际情况修改
+        deploy_script = "/home/kano/blog/backend/deploy.sh"
+
+        if not os.path.exists(deploy_script):  # noqa: PTH110
+            logger.error(f"Deploy script not found at {deploy_script}")
+            return
+
+        # 执行部署脚本，捕获输出
+        process = await asyncio.create_subprocess_exec(
+            deploy_script,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd="/home/kano/blog/backend",  # 设置工作目录为项目根目录
+        )
+
+        stdout, stderr = await process.communicate()
+
+        if process.returncode == 0:
+            logger.info("Deployment completed successfully!")
+            logger.debug(f"Deploy output: {stdout.decode()}")
+        else:
+            logger.error(
+                f"Deployment failed with exit code {process.returncode}"
+            )
+            logger.error(f"STDOUT: {stdout.decode()}")
+            logger.error(f"STDERR: {stderr.decode()}")
+
+    except Exception as e:
+        logger.error(f"Deployment process failed: {e!s}")
+
+
+@router.post("/deploy")
+async def webhook_deploy(
+    request: Request,
+    redis: AsyncRedis = Depends(get_redis),
+):
+    """
+    Gitee Webhook 自动部署接口
+    """
+    # 从环境变量获取webhook密钥，需要在.env中配置
+    webhook_secret = os.getenv("GITEE_WEBHOOK_SECRET", "")
+    if not webhook_secret:
+        logger.error(
+            "GITEE_WEBHOOK_SECRET is not set in environment variables"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Webhook secret not configured",
+        )
+
+    # 获取Gitee发送的签名头
+    gitee_token = request.headers.get("X-Gitee-Token")
+    signature_header = request.headers.get("X-Hub-Signature-256")
+
+    # 验证方式1：简单token验证（Gitee Webhook的"密码"字段）
+    if gitee_token:
+        if not hmac.compare_digest(gitee_token, webhook_secret):
+            logger.warning(
+                f"Invalid X-Gitee-Token from {get_remote_address(request)}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Invalid token",
+            )
+    # 验证方式2：SHA256签名验证（更安全）
+    elif signature_header:
+        # 获取请求体
+        body = await request.body()
+
+        # 计算签名
+        expected_signature = hmac.new(
+            webhook_secret.encode(), body, hashlib.sha256
+        ).hexdigest()
+
+        # 比较签名，Gitee的签名格式是 sha256=xxxxxx
+        if not signature_header.startswith("sha256="):
+            logger.warning(
+                f"Invalid signature format from {get_remote_address(request)}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Invalid signature format",
+            )
+
+        received_signature = signature_header.split("=", 1)[1]
+        if not hmac.compare_digest(received_signature, expected_signature):
+            logger.warning(
+                f"Invalid signature from {get_remote_address(request)}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Invalid signature",
+            )
+    else:
+        logger.warning(
+            f"No authentication headers from {get_remote_address(request)}"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No authentication provided",
+        )
+
+    # 验证通过，触发异步部署
+    logger.info(
+        f"Deployment triggered by webhook from {get_remote_address(request)}"
+    )
+
+    # 使用asyncio.create_task在后台执行部署，不阻塞请求
+    asyncio.create_task(run_deployment())  # noqa: RUF006
+
+    return APIResponse.ok(
+        message="Deployment triggered successfully", data={"status": "pending"}
+    )

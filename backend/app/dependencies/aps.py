@@ -1,9 +1,9 @@
 import asyncio
-import json
 from datetime import UTC, datetime
 from itertools import repeat
 
 import feedparser
+import orjson
 from sqlalchemy import select
 
 from app.configs.logger import logger
@@ -11,6 +11,7 @@ from app.dependencies.database import AsyncSessionFactory
 from app.dependencies.redis import get_redis
 from app.models.mgmodel import RssArticle
 from app.models.models import RssInfo, VisitorTrack
+from app.schemas import VisitorData
 
 
 async def run_migration_job():
@@ -40,24 +41,19 @@ async def run_migration_job():
 
             # 2. 批量解析 JSON
             try:
-                parsed_data_list = [json.loads(item) for item in valid_items]
-            except json.JSONDecodeError:
+                parsed_data_list: list[VisitorData] = [
+                    VisitorData(**orjson.loads(item)) for item in valid_items
+                ]
+            except orjson.JSONDecodeError:
                 logger.warning("Error parsing JSON data. Skipping batch.")
                 return
-
-            # 3. 处理时间字段，转换为 datetime 对象
-            for data in parsed_data_list:
-                visit_time = data.get("visit_time")
-                if visit_time is not None:
-                    data["visit_time"] = datetime.fromisoformat(
-                        visit_time
-                    ).replace(tzinfo=UTC)
 
             # 4. 批量写入数据库 (一次 Session, 一次 Commit)
             async with AsyncSessionFactory() as session:
                 # 构建所有 ORM 对象
                 track_objects = [
-                    VisitorTrack(**data) for data in parsed_data_list
+                    VisitorTrack(**data.model_dump())
+                    for data in parsed_data_list
                 ]
 
                 session.add_all(track_objects)

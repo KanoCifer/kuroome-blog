@@ -5,6 +5,7 @@ from datetime import UTC, datetime
 from itertools import repeat
 
 import feedparser
+import orjson
 from sqlalchemy import select
 
 from app.configs.logger import logger
@@ -12,6 +13,7 @@ from app.dependencies.database import AsyncSessionFactory
 from app.dependencies.redis import get_redis
 from app.models.mgmodel import RssArticle
 from app.models.models import RssInfo, VisitorTrack
+from app.schemas import VisitorData
 from app.tasks.broker import broker
 
 
@@ -31,9 +33,10 @@ async def run_migration_job():
     processed_count = 0
     valid_items = []
 
-    logger.info(
-        f"[MigrationJob] 🚀 Starting visitor data migration job | batch_size={batch_size}"
-    )
+    # 可根据需要保留或删除启动日志
+    # logger.info(
+    #     f"[MigrationJob] 🚀 Starting visitor data migration job | batch_size={batch_size}"
+    # )
 
     try:
         async for redis in get_redis():
@@ -55,7 +58,7 @@ async def run_migration_job():
             if not valid_items:
                 duration = time.perf_counter() - start_time
                 logger.info(
-                    f"[MigrationJob] ✅ Job completed | duration={duration:.2f}s | fetched 0 items, no migration needed"
+                    f"[MigrationJob] ✅ Completed | duration={duration:.2f}s | 0 items to migrate"
                 )
                 return {
                     "status": "success",
@@ -63,18 +66,13 @@ async def run_migration_job():
                     "duration": f"{duration:.2f}s",
                 }
 
-            logger.info(
-                f"[MigrationJob] Fetched {len(valid_items)} items from Redis | fetch_duration={fetch_duration:.2f}s"
-            )
-
             # 2. 批量解析 JSON
             parse_start = time.perf_counter()
             try:
-                parsed_data_list = [json.loads(item) for item in valid_items]
+                parsed_data_list: list[VisitorData] = [
+                    VisitorData(**orjson.loads(item)) for item in valid_items
+                ]
                 parse_duration = time.perf_counter() - parse_start
-                logger.info(
-                    f"[MigrationJob] Parsed {len(parsed_data_list)} JSON records | parse_duration={parse_duration:.2f}s"
-                )
             except json.JSONDecodeError as e:
                 parse_duration = time.perf_counter() - parse_start
                 logger.warning(
@@ -97,23 +95,15 @@ async def run_migration_job():
 
             # 3. 处理时间字段，转换为 datetime 对象
             transform_start = time.perf_counter()
-            for data in parsed_data_list:
-                visit_time = data.get("visit_time")
-                if visit_time is not None:
-                    data["visit_time"] = datetime.fromisoformat(
-                        visit_time
-                    ).replace(tzinfo=UTC)
             transform_duration = time.perf_counter() - transform_start
-            logger.info(
-                f"[MigrationJob] Transformed {len(parsed_data_list)} records | transform_duration={transform_duration:.2f}s"
-            )
 
             # 4. 批量写入数据库 (一次 Session, 一次 Commit)
             db_start = time.perf_counter()
             async with AsyncSessionFactory() as session:
                 # 构建所有 ORM 对象
-                track_objects = [
-                    VisitorTrack(**data) for data in parsed_data_list
+                track_objects: list[VisitorTrack] = [
+                    VisitorTrack(**data.model_dump())
+                    for data in parsed_data_list
                 ]
 
                 session.add_all(track_objects)
@@ -121,14 +111,11 @@ async def run_migration_job():
 
                 processed_count = len(track_objects)
                 db_duration = time.perf_counter() - db_start
-                logger.info(
-                    f"[MigrationJob] Written {processed_count} records to PostgreSQL | db_duration={db_duration:.2f}s"
-                )
 
             # 完成统计
             duration = time.perf_counter() - start_time
             logger.info(
-                f"[MigrationJob] ✅ Job completed | duration={duration:.2f}s | total={len(valid_items)} | migrated={processed_count}"
+                f"[MigrationJob]✅ Completed | duration={duration:.2f}s | fetched={len(valid_items)} | migrated={processed_count} | fetch={fetch_duration:.2f}s | parse={parse_duration:.2f}s | db={db_duration:.2f}s"
             )
             return {
                 "status": "success",
