@@ -55,10 +55,10 @@ async def lifespan(app: FastAPI):
     bootstrap_key = f"bootstrap_email_sent:{admin_email}"
     redis = redis_cache.redis
     if redis:
-        sent = await redis.get(bootstrap_key)
-        if not sent:
+        # 使用 SETNX 原子操作，只有当key不存在时才设置，避免竞态条件
+        lock_acquired = await redis.set(bootstrap_key, "1", ex=600, nx=True)
+        if lock_acquired:
             await send_bootstrap_emails.kiq(admin_email)
-            await redis.set(bootstrap_key, "1", ex=600)
             app_logger.info(f"引导邮件任务已添加到队列: {admin_email}")
         else:
             app_logger.info(f"引导邮件已在24小时内发送过，跳过: {admin_email}")

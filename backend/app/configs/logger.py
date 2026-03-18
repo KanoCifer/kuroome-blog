@@ -19,10 +19,10 @@ logging.basicConfig(
 )
 
 # 精简Taskiq日志输出，仅保留警告及以上级别
-logging.getLogger("taskiq").setLevel(logging.WARNING)
-logging.getLogger("taskiq.worker").setLevel(logging.WARNING)
-logging.getLogger("taskiq.process-manager").setLevel(logging.WARNING)
-logging.getLogger("taskiq.receiver.receiver").setLevel(logging.WARNING)
+# logging.getLogger("taskiq").setLevel(logging.WARNING)
+# logging.getLogger("taskiq.worker").setLevel(logging.WARNING)
+# logging.getLogger("taskiq.process-manager").setLevel(logging.WARNING)
+# logging.getLogger("taskiq.receiver.receiver").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
@@ -44,11 +44,11 @@ else:
     log_path = log_dir / "app.log"
 
 # 确保日志目录存在
-with contextlib.suppress(Exception):
+with contextlib.suppress(FileNotFoundError):
     log_path.parent.mkdir(parents=True, exist_ok=True)
 
 file_handler = RotatingFileHandler(
-    log_path,
+    filename=log_path,
     encoding="utf-8",
     maxBytes=MAX_LOG_SIZE,
     backupCount=BACKUP_COUNT,

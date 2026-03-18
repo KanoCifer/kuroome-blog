@@ -68,7 +68,7 @@ const playAnimation = async () => {
   anim.value.play();
 
   try {
-    await request.post("/like", { likescounts: likesCounts.value });
+    await request.post("/like", { likescounts: 1 });
     likesCounts.value += 1;
   } catch (error) {
     let errorMsg = "点赞失败，请稍后重试";

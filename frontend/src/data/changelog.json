@@ -1,5 +1,17 @@
 [
   {
+    "version": "2.3.5",
+    "date": "2026-03-17",
+    "title": "新增CICD自动化部署",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "新增CICD自动化部署流程，使用Webhook实现代码自动构建和部署"
+      },
+      { "type": "fix", "content": "修复了一些小bug" }
+    ]
+  },
+  {
     "version": "2.3.4",
     "date": "2026-03-16",
     "title": "后端任务队列迁移至TaskIQ",
