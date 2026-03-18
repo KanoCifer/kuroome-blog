@@ -1,5 +1,4 @@
 import axios, { AxiosError } from "axios";
-import router from "./router";
 import { useAuthStore } from "./stores/auth";
 import { isrefreshTokenRequest, refreshAccessToken } from "./utils/refresh";
 // keep latest CSRF token so it can be sent in headers
@@ -13,11 +12,6 @@ export interface ApiResponse<T = unknown> {
   data: T;
   code?: number;
   errors?: Record<string, unknown>;
-}
-
-const onUnauthorizedCallback: () => void = () => router.push("/login");
-export function setOnUnauthorized() {
-  onUnauthorizedCallback();
 }
 
 export async function fetchAndStoreCSRF() {
@@ -55,7 +49,6 @@ request.interceptors.response.use(
     const errorMessage = error.response?.data?.message;
     if (errorMessage && errorMessage.includes("CSRF") && config) {
       const _config = config as typeof config & { _retryCount?: number };
-      // increment retry counter (initialize to 0 if missing)
       _config._retryCount = (_config._retryCount || 0) + 1;
 
       if (_config._retryCount <= 3) {
@@ -88,12 +81,9 @@ request.interceptors.response.use(
       // 标记已重试，防止无限循环
       _cfg._retry = true;
 
-      // 检查是否有refreshToken，没有的话直接跳转登录页，不需要刷新
       const authStore = useAuthStore();
       const refreshToken = authStore.getRefreshToken();
-      console.log("尝试刷新访问令牌，当前 refreshToken:", refreshToken);
       if (!refreshToken) {
-        setTimeout(onUnauthorizedCallback, 1000); // 避免重复跳转
         return Promise.reject(error);
       }
 
@@ -101,8 +91,6 @@ request.interceptors.response.use(
         await refreshAccessToken();
         return request(_cfg);
       } catch (error) {
-        console.error("刷新访问令牌失败:", error);
-        setTimeout(onUnauthorizedCallback, 1000); // 避免重复跳转
         return Promise.reject(error);
       }
     }

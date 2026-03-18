@@ -30,25 +30,6 @@
         />
       </svg>
 
-      <!-- Juejin Icon (using a generic coding icon for juejin) -->
-      <svg
-        v-else-if="social.icon === 'juejin'"
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-7 w-7"
-        fill="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          d="M12 2.222L1.05 8.012l2.67 1.411 8.28-4.375 8.28 4.375 2.67-1.411L12 2.222z"
-        />
-        <path
-          d="M12 11.233L4.99 7.53l-3.94 2.08L12 15.395l10.95-5.785-3.94-2.08L12 11.233z"
-        />
-        <path
-          d="M12 19.897L2.43 14.85l-1.38 2.08L12 22.7l10.95-5.77-1.38-2.08L12 19.897z"
-        />
-      </svg>
-
       <!-- Email Icon -->
       <svg
         v-else-if="social.icon === 'email'"
@@ -77,11 +58,6 @@ const socialLinks = [
     name: "GitHub",
     href: "https://github.com/KanoCifer/Flask-Example",
     icon: "github",
-  },
-  {
-    name: "Juejin",
-    href: "#",
-    icon: "juejin",
   },
   {
     name: "Email",

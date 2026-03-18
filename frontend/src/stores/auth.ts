@@ -24,15 +24,13 @@ const USER_INFO_KEY = "cached_user_info";
 // 定义认证状态管理
 export const useAuthStore = defineStore("auth", () => {
   // ---------------------- 状态（State） ----------------------
-  const user = ref<UserInfo | null>(null); // 当前用户信息
-  const loading = ref(false); // 加载状态
+  const user = ref<UserInfo | null>(null);
+  const loading = ref(false);
   const isHydrated = ref(false); // 是否初始化过
   const refreshToken = useStorage("refresh_token", "");
 
   const notifier = useNotificationStore(); // 通知提示
 
-  // ---------------------- 计算属性（Computed） ----------------------
-  // 是否已登录（根据 user 是否有值自动判断）
   const isAuthenticated = computed(() => !!user.value);
 
   // ---------------------- 辅助方法 ----------------------
@@ -66,7 +64,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   // ---------------------- 方法（Actions） ----------------------
 
-  // 2. 获取当前登录用户信息（从后端获取最新数据）
+  // 2. 获取当前登录用户信息
   async function fetchUser() {
     loading.value = true;
     try {
@@ -75,8 +73,7 @@ export const useAuthStore = defineStore("auth", () => {
       user.value = userData;
       cacheUser(userData); // 缓存到 sessionStorage
     } catch (err: unknown) {
-      console.error("获取用户信息失败:", err);
-      notifier.error(err instanceof Error ? err.message : "获取用户信息失败");
+      notifier.error("登陆过期，请重新登录！");
       user.value = null;
       cacheUser(null);
     } finally {
@@ -84,22 +81,27 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
-  // 3. 初始化认证状态（页面加载时调用一次）
-  // 优先从 sessionStorage 读取，失败再请求后端
   async function hydrateAuth() {
     if (isHydrated.value) return; // 避免重复初始化
 
-    // 1. 先尝试从缓存读取
-    const cachedUser = getCachedUser();
-    if (cachedUser) {
-      user.value = cachedUser;
-      isHydrated.value = true;
-      return;
-    }
+    try {
+      // 1. 先尝试从缓存读取
+      const cachedUser = getCachedUser();
+      if (cachedUser) {
+        user.value = cachedUser;
+        isHydrated.value = true;
+        return;
+      }
 
-    // 2. 缓存不存在，从后端获取
-    await fetchUser();
-    isHydrated.value = true;
+      // 2. 缓存不存在，从后端获取
+      await fetchUser();
+      isHydrated.value = true;
+    } catch (error) {
+      notifier.error("认证初始化失败");
+      user.value = null;
+      cacheUser(null);
+      isHydrated.value = true;
+    }
   }
 
   async function initCSRF() {
@@ -128,8 +130,7 @@ export const useAuthStore = defineStore("auth", () => {
       router.back();
       return res.data;
     } catch (err: unknown) {
-      notifier.error(err instanceof Error ? err.message : "登录失败");
-      throw err;
+      notifier.error("登录失败");
     } finally {
       loading.value = false;
     }
@@ -141,11 +142,11 @@ export const useAuthStore = defineStore("auth", () => {
     try {
       await request.post("/auth/logout"); // 调用后端登出接口
     } catch (err: unknown) {
-      console.error("登出失败:", err);
-      notifier.error(err instanceof Error ? err.message : "登出失败");
+      // console.error("登出失败:", err);
+      notifier.error("登出失败");
     } finally {
-      user.value = null; // 清空用户信息
-      cacheUser(null); // 清除缓存
+      user.value = null;
+      cacheUser(null);
 
       // 清除刷新令牌
       saveRefreshToken("");

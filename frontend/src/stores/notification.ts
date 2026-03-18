@@ -7,7 +7,7 @@ export interface ToastItem {
   id: number;
   message: string;
   type: ToastType;
-  timeout?: number; // ms
+  timeout?: number;
 }
 
 export const useNotificationStore = defineStore("notification", () => {
@@ -29,7 +29,7 @@ export const useNotificationStore = defineStore("notification", () => {
   }
 
   function error(message: string, timeout?: number) {
-    return push(message, "error", timeout ?? 6000);
+    return push(message, "error", timeout ?? 10000);
   }
 
   function info(message: string, timeout?: number) {

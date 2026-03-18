@@ -69,10 +69,11 @@ async def send_bootstrap_emails(admin_email: str):
     try:
         valid_email: ValidatedEmail = validate_email(admin_email)
         email: EmailStr = valid_email.email
-        now: str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         content = BootstrapEmailContent(
             subject="Kuroome's Blog API 引导邮件",
-            body=html.format(now=now),
+            body=html.format(
+                now=lambda: datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            ),
             recipient=email,
         )
     except EmailNotValidError:
@@ -93,7 +94,6 @@ async def send_bootstrap_emails(admin_email: str):
         logger.info("✅引导邮件已发送")
     except Exception as e:
         logger.error(f"❌发送引导邮件失败: {e!s}")
-        raise e
 
 
 class EmailCodeContent(BaseModel):
@@ -106,7 +106,7 @@ class EmailCodeContent(BaseModel):
 
 
 @broker.task
-async def _send_email_code(
+async def send_code(
     email: str,
     verification_code: str,
 ):

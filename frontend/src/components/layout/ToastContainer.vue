@@ -4,27 +4,18 @@ import IconInfo from "@/components/icons/IconInfo.vue";
 import IconWarning from "@/components/icons/IconWarning.vue";
 import { useNotificationStore } from "@/stores/notification";
 import { AnimatePresence, motion } from "motion-v";
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, onUnmounted, ref } from "vue";
 import { Vue3Lottie } from "vue3-lottie";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const successAnimationData = ref<Record<string, any> | null>(null);
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const errorAnimationData = ref<Record<string, any> | null>(null);
+import errorAnimationData from "@/assets/error.json";
+import successAnimationData from "@/assets/success.json";
 
-onMounted(async () => {
-  successAnimationData.value = (await import("@/assets/success.json")).default;
-  errorAnimationData.value = (await import("@/assets/error.json")).default;
-});
-onUnmounted(() => {
-  successAnimationData.value = null;
-  errorAnimationData.value = null;
-});
+const lottieContainer = ref<typeof Vue3Lottie | null>(null);
 const store = useNotificationStore();
 const toasts = computed(() => store.toasts);
 
-function getIconForType(t: string) {
-  switch (t) {
+function getIconForType(type: string) {
+  switch (type) {
     case "success":
       return "success-lottie";
     case "error":
@@ -36,8 +27,8 @@ function getIconForType(t: string) {
   }
 }
 
-function classForType(t: string) {
-  switch (t) {
+function classForType(type: string) {
+  switch (type) {
     case "success":
       return "border-l-4 border-green-500";
     case "error":
@@ -49,8 +40,8 @@ function classForType(t: string) {
   }
 }
 
-function iconColorForType(t: string) {
-  switch (t) {
+function iconColorForType(type: string) {
+  switch (type) {
     case "success":
       return "text-green-500";
     case "error":
@@ -62,14 +53,14 @@ function iconColorForType(t: string) {
   }
 }
 
-function capitalize(s: string) {
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
+onUnmounted(() => {
+  lottieContainer.value?.destroy();
+});
 </script>
 
 <template>
   <div
-    class="fixed top-4 left-1/2 z-9999 w-full max-w-md -translate-x-1/2 sm:w-96"
+    class="fixed top-4 left-1/2 z-9999 w-full -translate-x-1/2 sm:w-96"
     style="perspective: 1000px"
   >
     <AnimatePresence mode="popLayout">
@@ -78,8 +69,7 @@ function capitalize(s: string) {
         :key="t.id"
         :initial="{ opacity: 0, y: -40, scale: 0.9 }"
         :animate="{
-          opacity:
-            toasts.length - 1 - i >= 3 ? 0 : 1 - (toasts.length - 1 - i) * 0.15,
+          opacity: toasts.length - 1 - i >= 3 ? 0 : 1 - (toasts.length - 1 - i) * 0.15,
           y: (toasts.length - 1 - i) * 16,
           scale: 1 - (toasts.length - 1 - i) * 0.05,
           zIndex: i,
@@ -88,58 +78,52 @@ function capitalize(s: string) {
         :exit="{ opacity: 0, y: -40, scale: 0.9 }"
         :transition="{ type: 'spring', damping: 30, stiffness: 500 }"
         :class="[
-          'squircle absolute top-0 left-0 flex w-full items-center gap-3 border border-slate-200/20 bg-white/80 text-slate-900 shadow-xl backdrop-blur-sm transition-colors duration-200 dark:border-gray-700/80 dark:bg-gray-900/80 dark:text-gray-100',
+          'squircle absolute top-0 left-0 flex h-20 w-full items-center justify-between gap-3 border border-slate-200/20 bg-white/80 text-slate-900 shadow-xl backdrop-blur-sm transition-colors duration-200 dark:border-gray-700/80 dark:bg-gray-900/80 dark:text-gray-100',
           classForType(t.type),
         ]"
       >
-        <div class="flex w-full items-center gap-3 p-4">
-          <component
-            v-if="
-              getIconForType(t.type) !== 'success-lottie' &&
-              getIconForType(t.type) !== 'error-lottie'
-            "
-            :is="getIconForType(t.type)"
-            :class="['mt-0.5 shrink-0', iconColorForType(t.type)]"
-          />
-          <Vue3Lottie
-            v-else-if="
-              getIconForType(t.type) === 'success-lottie' &&
-              successAnimationData
-            "
-            :animationData="successAnimationData"
-            :height="40"
-            :width="40"
-            :loop="true"
-            :autoPlay="true"
-            class="shrink-0"
-          />
-          <Vue3Lottie
-            v-else-if="
-              getIconForType(t.type) === 'error-lottie' && errorAnimationData
-            "
-            :animationData="errorAnimationData"
-            :height="40"
-            :width="40"
-            :loop="false"
-            :autoPlay="true"
-            class="shrink-0"
-          />
-          <div class="flex-1 text-sm">
-            <div class="font-semibold text-slate-900 dark:text-gray-100">
-              {{ capitalize(t.type) }}
-            </div>
-            <div class="mt-0.5 leading-snug text-slate-600 dark:text-gray-100">
-              {{ t.message }}
-            </div>
-          </div>
-          <button
-            class="mr-2 shrink-0 cursor-pointer rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
-            @click="() => store.dismiss(t.id)"
-            aria-label="dismiss"
-          >
-            <IconClose />
-          </button>
+        <component
+          v-if="
+            getIconForType(t.type) !== 'success-lottie' && getIconForType(t.type) !== 'error-lottie'
+          "
+          :is="getIconForType(t.type)"
+          :class="['shrink-0', iconColorForType(t.type)]"
+        />
+        <Vue3Lottie
+          v-else-if="getIconForType(t.type) === 'success-lottie' && successAnimationData"
+          :animationData="successAnimationData"
+          :height="96"
+          :width="96"
+          :loop="true"
+          :autoPlay="true"
+          renderer="svg"
+          :noMargin="true"
+          class="z-10 shrink-0"
+          ref="lottieContainer"
+        />
+        <Vue3Lottie
+          v-else-if="getIconForType(t.type) === 'error-lottie' && errorAnimationData"
+          :animationData="errorAnimationData"
+          :loop="false"
+          :autoPlay="true"
+          renderer="svg"
+          :height="96"
+          :width="96"
+          :noMargin="true"
+          class="z-10 shrink-0"
+          ref="lottieContainer"
+        />
+
+        <div class="flex-1 text-sm leading-snug font-semibold text-slate-600 dark:text-gray-100">
+          {{ t.message }}
         </div>
+        <button
+          class="mr-2 shrink-0 cursor-pointer rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+          @click="() => store.dismiss(t.id)"
+          aria-label="dismiss"
+        >
+          <IconClose />
+        </button>
       </motion.div>
     </AnimatePresence>
   </div>

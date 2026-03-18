@@ -1,20 +1,45 @@
 <script setup lang="ts">
-import { useScroll } from "@vueuse/core";
-import { computed, ref } from "vue";
+import { useScroll, useWindowSize } from "@vueuse/core";
+import { computed, onBeforeUnmount, onMounted, ref, watchEffect } from "vue";
 
 const isHovered = ref(false);
 
 // useScroll 会自动监听滚动事件并暴露 x/y 值
 const { y } = useScroll(window);
+// 响应式窗口高度，用于在窗口尺寸变化时重新计算 maxScroll
+const { height } = useWindowSize();
 
 // 页面滚动超过 300px 才显示按钮
 const isVisible = computed(() => y.value > 300);
 
-// 计算滚动进度 (0-100)
-const scrollProgress = computed(() => {
-  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-  return docHeight > 0 ? (y.value / docHeight) * 100 : 0;
+// 最大可滚动距离（可被动态更新）
+const maxScroll = ref(Math.max(0, document.documentElement.scrollHeight - window.innerHeight));
+
+// 使用 watchEffect 在响应式的 window height 变化时重新计算 maxScroll
+watchEffect(() => {
+  maxScroll.value = Math.max(0, document.documentElement.scrollHeight - height.value);
 });
+
+let mo: MutationObserver | null = null;
+onMounted(() => {
+  mo = new MutationObserver(() => {
+    maxScroll.value = Math.max(0, document.documentElement.scrollHeight - height.value);
+  });
+  mo.observe(document.documentElement, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    characterData: true,
+  });
+});
+onBeforeUnmount(() => {
+  if (mo) mo.disconnect();
+});
+
+// 计算滚动进度 (0-100)
+const scrollProgress = computed(() =>
+  maxScroll.value > 0 ? (y.value / maxScroll.value) * 100 : 0,
+);
 
 const scrollToTop = () => {
   window.scrollTo({
@@ -47,10 +72,7 @@ const scrollToTop = () => {
       aria-label="回到顶部"
     >
       <!-- 背景进度环 -->
-      <svg
-        class="absolute inset-0 h-full w-full -rotate-90"
-        viewBox="0 0 56 56"
-      >
+      <svg class="absolute inset-0 h-full w-full -rotate-90" viewBox="0 0 56 56">
         <!-- 背景圆环 -->
         <circle
           cx="28"
@@ -88,11 +110,7 @@ const scrollToTop = () => {
         stroke="currentColor"
         stroke-width="2"
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M5 10l7-7m0 0l7 7m-7-7v18"
-        />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
       </svg>
 
       <!-- Tooltip -->

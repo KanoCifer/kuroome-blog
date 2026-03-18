@@ -74,9 +74,7 @@ const playAnimation = async () => {
     let errorMsg = "点赞失败，请稍后重试";
     if (error instanceof AxiosError) {
       if (error.response?.status === 429) {
-        errorMsg = "今天已经点赞很多次啦，明天再试试吧！";
-      } else if (error.response?.data?.detail) {
-        errorMsg = error.response.data.detail;
+        errorMsg = "🥳今天已经点赞很多次啦，明天再试试吧！";
       }
     }
     notifier.error(errorMsg);

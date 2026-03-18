@@ -67,7 +67,7 @@ async def lifespan(app: FastAPI):
     # 发送引导邮件
     admin_email: str = get_settings().ADMIN_EMAIL
     bootstrap_key: str = f"bootstrap_email_sent:{admin_email}"
-    if app.state.redis is not None:
+    if app.state.redis is not None and get_settings().SEND_BOOT_EMAIL:
         lock_acquired = await app.state.redis.set(
             name=bootstrap_key, value="1", ex=600, nx=True
         )

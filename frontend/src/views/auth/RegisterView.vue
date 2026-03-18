@@ -122,7 +122,7 @@ const handleSubmit = async () => {
   <div>
     <!-- 标题卡片和注册表单 -->
     <div
-      class="mx-auto mb-12 max-w-md rounded-[40px] bg-blue-50/80 px-12 py-14 shadow-2xl backdrop-blur-md dark:bg-gray-800/80"
+      class="mx-auto mt-36 mb-12 max-w-md rounded-[40px] bg-blue-50/80 px-12 py-14 shadow-2xl backdrop-blur-md dark:bg-gray-800/80"
     >
       <p
         class="text-center font-serif text-2xl font-bold text-shadow-md dark:text-white"

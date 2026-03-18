@@ -1,3 +1,52 @@
+<script setup lang="ts">
+import changelog from "@/data/changelog.json";
+import { motion } from "motion-v";
+const getTypeLabel = (type: string): string => {
+  const labels: Record<string, string> = {
+    feat: "新功能",
+    fix: "修复",
+    refactor: "重构",
+    style: "样式",
+    docs: "文档",
+    perf: "性能",
+    test: "测试",
+    chore: "构建",
+  };
+  return labels[type] || type;
+};
+
+const getTypeIcon = (type: string): string => {
+  const icons: Record<string, string> = {
+    feat: "✨",
+    fix: "🐛",
+    refactor: "♻️",
+    style: "🎨",
+    docs: "📝",
+    perf: "⚡",
+    test: "🧪",
+    chore: "🔧",
+  };
+  return icons[type] || "";
+};
+
+const getTypeClass = (type: string): string => {
+  const classes: Record<string, string> = {
+    feat: "bg-linear-to-r from-green-100 to-emerald-100 text-emerald-700 ring-1 ring-emerald-200/60 dark:from-green-900/30 dark:to-emerald-900/30 dark:text-emerald-300 dark:ring-emerald-800/60",
+    fix: "bg-linear-to-r from-red-100 to-rose-100 text-rose-700 ring-1 ring-rose-200/60 dark:from-red-900/30 dark:to-rose-900/30 dark:text-rose-300 dark:ring-rose-800/60",
+    refactor:
+      "bg-linear-to-r from-purple-100 to-violet-100 text-violet-700 ring-1 ring-violet-200/60 dark:from-purple-900/30 dark:to-violet-900/30 dark:text-violet-300 dark:ring-violet-800/60",
+    style:
+      "bg-linear-to-r from-pink-100 to-fuchsia-100 text-fuchsia-700 ring-1 ring-fuchsia-200/60 dark:from-pink-900/30 dark:to-fuchsia-900/30 dark:text-fuchsia-300 dark:ring-fuchsia-800/60",
+    docs: "bg-linear-to-r from-blue-100 to-sky-100 text-sky-700 ring-1 ring-sky-200/60 dark:from-blue-900/30 dark:to-sky-900/30 dark:text-sky-300 dark:ring-sky-800/60",
+    perf: "bg-linear-to-r from-amber-100 to-orange-100 text-orange-700 ring-1 ring-orange-200/60 dark:from-amber-900/30 dark:to-orange-900/30 dark:text-orange-300 dark:ring-orange-800/60",
+    test: "bg-linear-to-r from-cyan-100 to-teal-100 text-teal-700 ring-1 ring-teal-200/60 dark:from-cyan-900/30 dark:to-teal-900/30 dark:text-teal-300 dark:ring-teal-800/60",
+    chore:
+      "bg-linear-to-r from-gray-100 to-slate-100 text-slate-700 ring-1 ring-slate-200/60 dark:from-gray-900/30 dark:to-slate-900/30 dark:text-slate-300 dark:ring-slate-800/60",
+  };
+  return classes[type] ?? classes.chore ?? "";
+};
+</script>
+
 <template>
   <div
     id="changelogView"
@@ -9,12 +58,7 @@
         <div
           class="mb-6 inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
         >
-          <svg
-            class="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -69,12 +113,7 @@
                   <span
                     class="inline-flex items-center gap-2 rounded-full bg-linear-to-r from-blue-500 to-cyan-500 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-blue-500/25"
                   >
-                    <svg
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -84,15 +123,8 @@
                     </svg>
                     v{{ r.version }}
                   </span>
-                  <span
-                    class="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400"
-                  >
-                    <svg
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
+                  <span class="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -105,28 +137,20 @@
                 </div>
 
                 <!-- Release Title -->
-                <h2
-                  class="mb-4 text-2xl font-bold text-gray-800 dark:text-gray-100"
-                >
+                <h2 class="mb-4 text-2xl font-bold text-gray-800 dark:text-gray-100">
                   {{ r.title }}
                 </h2>
 
                 <!-- Changes List -->
                 <ul class="space-y-3">
-                  <li
-                    v-for="(change, i) in r.changes"
-                    :key="i"
-                    class="flex items-start gap-3"
-                  >
+                  <li v-for="(change, i) in r.changes" :key="i" class="flex items-start gap-3">
                     <span
                       :class="[
                         'mt-0.5 inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold tracking-wide uppercase transition-all duration-200',
                         getTypeClass(change.type),
                       ]"
                     >
-                      <span v-if="getTypeIcon(change.type)">{{
-                        getTypeIcon(change.type)
-                      }}</span>
+                      <span v-if="getTypeIcon(change.type)">{{ getTypeIcon(change.type) }}</span>
                       {{ getTypeLabel(change.type) }}
                     </span>
                     <span class="text-gray-700 dark:text-gray-300">
@@ -152,9 +176,7 @@
             </div>
 
             <!-- Mobile Timeline Dot -->
-            <div
-              class="absolute top-6 left-0 z-10 h-6 w-6 -translate-x-1/2 md:hidden"
-            >
+            <div class="absolute top-6 left-0 z-10 h-6 w-6 -translate-x-1/2 md:hidden">
               <div
                 class="relative flex h-full w-full items-center justify-center rounded-full bg-white ring-3 ring-blue-100 dark:bg-gray-800 dark:ring-gray-700"
               >
@@ -170,54 +192,3 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import changelog from "@/data/changelog.json";
-import { motion } from "motion-v";
-const getTypeLabel = (type: string): string => {
-  const labels: Record<string, string> = {
-    feat: "新功能",
-    fix: "修复",
-    refactor: "重构",
-    style: "样式",
-    docs: "文档",
-    perf: "性能",
-    test: "测试",
-    chore: "构建",
-  };
-  return labels[type] || type;
-};
-
-const getTypeIcon = (type: string): string => {
-  const icons: Record<string, string> = {
-    feat: "✨",
-    fix: "🐛",
-    refactor: "♻️",
-    style: "🎨",
-    docs: "📝",
-    perf: "⚡",
-    test: "🧪",
-    chore: "🔧",
-  };
-  return icons[type] || "";
-};
-
-const getTypeClass = (type: string): string => {
-  const classes: Record<string, string> = {
-    feat: "bg-linear-to-r from-green-100 to-emerald-100 text-emerald-700 ring-1 ring-emerald-200/60 dark:from-green-900/30 dark:to-emerald-900/30 dark:text-emerald-300 dark:ring-emerald-800/60",
-    fix: "bg-linear-to-r from-red-100 to-rose-100 text-rose-700 ring-1 ring-rose-200/60 dark:from-red-900/30 dark:to-rose-900/30 dark:text-rose-300 dark:ring-rose-800/60",
-    refactor:
-      "bg-linear-to-r from-purple-100 to-violet-100 text-violet-700 ring-1 ring-violet-200/60 dark:from-purple-900/30 dark:to-violet-900/30 dark:text-violet-300 dark:ring-violet-800/60",
-    style:
-      "bg-linear-to-r from-pink-100 to-fuchsia-100 text-fuchsia-700 ring-1 ring-fuchsia-200/60 dark:from-pink-900/30 dark:to-fuchsia-900/30 dark:text-fuchsia-300 dark:ring-fuchsia-800/60",
-    docs: "bg-linear-to-r from-blue-100 to-sky-100 text-sky-700 ring-1 ring-sky-200/60 dark:from-blue-900/30 dark:to-sky-900/30 dark:text-sky-300 dark:ring-sky-800/60",
-    perf: "bg-linear-to-r from-amber-100 to-orange-100 text-orange-700 ring-1 ring-orange-200/60 dark:from-amber-900/30 dark:to-orange-900/30 dark:text-orange-300 dark:ring-orange-800/60",
-    test: "bg-linear-to-r from-cyan-100 to-teal-100 text-teal-700 ring-1 ring-teal-200/60 dark:from-cyan-900/30 dark:to-teal-900/30 dark:text-teal-300 dark:ring-teal-800/60",
-    chore:
-      "bg-linear-to-r from-gray-100 to-slate-100 text-slate-700 ring-1 ring-slate-200/60 dark:from-gray-900/30 dark:to-slate-900/30 dark:text-slate-300 dark:ring-slate-800/60",
-  };
-  return classes[type] ?? classes.chore ?? "";
-};
-</script>
-
-<style scoped></style>

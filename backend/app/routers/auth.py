@@ -44,7 +44,7 @@ from app.dependencies.redis import AsyncRedis, get_async_redis
 from app.models.models import PasskeyCredential, Profile, User
 from app.schemas.response import APIResponse
 from app.schemas.schemas import LoginIn, RegisterIn
-from app.tasks import _send_email_code
+from app.tasks import send_code
 from app.utils.security import generate_pkce_pair
 from app.utils.webauthn import (
     generate_passkey_authentication_options,
@@ -447,17 +447,20 @@ async def send_email_code(
         )
     try:
         # 将发送邮件的任务添加到后台任务中
-        await _send_email_code.kiq(
+        task = await send_code.kiq(
             email=email,  # type: ignore
             verification_code=verification_code,
         )
+        result = await task.wait_result(timeout=30)
+        if not result.is_error:
+            logger.info("验证码发送成功")
     except Exception as e:
         return APIResponse.error(
             message=f"验证码发送失败: {e!s}",
             code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
     return APIResponse.ok(
-        message="验证码发送成功，请检查您的邮箱！",
+        message="验证码发送成功，请检查您的邮箱! (如果未收到邮件，请检查垃圾邮件箱)",
         code=status.HTTP_202_ACCEPTED,
     )
 

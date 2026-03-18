@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import BasicFooter from "@/components/basic/BasicFooter.vue";
-import BasicNav from "@/components/basic/BasicNav.vue";
-import BasicNotifier from "@/components/basic/BasicNotifier.vue";
+import { BasicFooter, BasicNav, BasicNotifier } from "@/components/basic";
 import BackToTop from "@/components/layout/BackToTop.vue";
 import ToastContainer from "@/components/layout/ToastContainer.vue";
 import { useScroll } from "@vueuse/core";
@@ -52,6 +50,40 @@ onMounted(() => {
   lastScrollY.value = y.value;
 });
 
+// 自动回顶逻辑（仅在桌面端首页生效）
+const isAutoScrolling = ref(false);
+let returnTopTimer: number | null = null;
+const scheduleReturnTop = () => {
+  // 仅在首页且非移动设备时启用
+  if (!isEntryView.value || isMobileDevice.value) return;
+  if (isAutoScrolling.value) return;
+  if (returnTopTimer) {
+    clearTimeout(returnTopTimer);
+  }
+  // 在滚动停止后 500ms 执行回顶
+  returnTopTimer = window.setTimeout(() => {
+    isAutoScrolling.value = true;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    // 1000ms 后解除自动滚动锁，允许后续用户操作
+    setTimeout(() => {
+      isAutoScrolling.value = false;
+    }, 1000);
+  }, 500);
+};
+
+onMounted(() => {
+  // 监听鼠标滚轮，结束后触发回顶（移动端被 isMobileDevice 拦截）
+  window.addEventListener("wheel", scheduleReturnTop, { passive: true });
+});
+
+onUnmounted(() => {
+  window.removeEventListener("wheel", scheduleReturnTop);
+  if (returnTopTimer) {
+    clearTimeout(returnTopTimer);
+    returnTopTimer = null;
+  }
+});
+
 onUnmounted(() => {
   window.removeEventListener("scroll", handleScroll);
   window.removeEventListener("resize", handleResize);
@@ -63,11 +95,7 @@ const isMobileDevice = ref<boolean>(false);
 // 处理窗口大小变化
 const handleResize = () => {
   isMobileDevice.value = window.innerWidth < 768;
-  if (
-    isMobileDevice.value &&
-    !isMobileWarningVisible.value &&
-    !accpetedMobileWarning.value
-  ) {
+  if (isMobileDevice.value && !isMobileWarningVisible.value && !accpetedMobileWarning.value) {
     isMobileWarningVisible.value = true;
   }
 };
@@ -81,23 +109,18 @@ const closeMobileWarning = () => {
 <template>
   <div class="relative isolate grid min-h-dvh grid-rows-[auto_1fr_auto]">
     <!-- 背景图 -->
-    <div
-      class="pointer-events-none fixed inset-0 -z-10 bg-[url('/bg.jpg')] bg-cover blur-md"
-    ></div>
+    <div class="pointer-events-none fixed inset-0 -z-10 bg-[url('/bg.jpg')] bg-cover blur-md"></div>
     <header>
       <div class="mx-auto mt-6">
         <Teleport to="body">
           <ToastContainer />
         </Teleport>
-        <BasicNav
-          :isEntryView="isEntryView"
-          :isHeaderVisible="isHeaderVisible"
-        />
+        <BasicNav :isEntryView="isEntryView" :isHeaderVisible="isHeaderVisible" />
       </div>
     </header>
 
     <!-- Main Content -->
-    <main class="relative">
+    <main class="relative snap-y snap-mandatory overflow-y-auto scroll-smooth">
       <RouterView v-slot="{ Component }">
         <KeepAlive :include="['MessageManageView']">
           <transition

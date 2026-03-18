@@ -1,11 +1,7 @@
 import { useAuthStore } from "@/stores/auth";
 import { reportVisitorData } from "@/utils/visitorTracker";
 import EntryView from "@/views/general/EntryView.vue";
-import {
-  createMemoryHistory,
-  createRouter,
-  createWebHistory,
-} from "vue-router";
+import { createMemoryHistory, createRouter, createWebHistory } from "vue-router";
 
 declare global {
   interface Window {
@@ -47,6 +43,8 @@ const router = createRouter({
       component: EntryView,
       meta: {
         title: "Entry - Kuroome's Blog",
+        description: "欢迎来到 Kuroome's Blog，探索个人阅读清单和博客文章",
+        keywords: "欢迎,入口,个人博客",
       },
     },
     {
@@ -125,11 +123,21 @@ const router = createRouter({
       path: "/login",
       name: "login",
       component: () => import("@/views/auth/LoginView.vue"),
+      meta: {
+        title: "登录 - Kuroome's Blog",
+        description: "登录 Kuroome's Blog",
+        keywords: "登录,用户认证,账户管理",
+      },
     },
     {
       path: "/register",
       name: "register",
       component: () => import("@/views/auth/RegisterView.vue"),
+      meta: {
+        title: "注册 - Kuroome's Blog",
+        description: "注册 Kuroome's Blog 账户",
+        keywords: "注册,用户认证,账户管理",
+      },
     },
     {
       path: "/messages",
@@ -141,13 +149,23 @@ const router = createRouter({
       path: "/settings",
       name: "settings",
       component: () => import("@/views/auth/ProfileSettingView.vue"),
-      meta: { requiresAuth: true },
+      meta: {
+        requiresAuth: true,
+        title: "个人设置 - Kuroome's Blog",
+        description: "管理个人账户信息和偏好设置",
+        keywords: "个人设置,账户信息,偏好设置",
+      },
     },
     {
       path: "/import",
       name: "import",
       component: () => import("@/views/books/ImportBook.vue"),
-      meta: { requiresAuth: true },
+      meta: {
+        requiresAuth: true,
+        title: "导入书籍 - Kuroome's Blog",
+        description: "从文件导入书籍信息到个人书架",
+        keywords: "导入书籍,书籍管理,个人书架",
+      },
     },
     {
       path: "/bookshelf",
@@ -186,8 +204,7 @@ const router = createRouter({
       component: () => import("@/views/rss/RSSParseView.vue"),
       meta: {
         title: "RSS 订阅 - Kuroome's Blog",
-        description:
-          "订阅 Kuroome's Blog 的 RSS 频道，第一时间获取最新文章更新",
+        description: "订阅 Kuroome's Blog 的 RSS 频道，第一时间获取最新文章更新",
         keywords: "RSS订阅,博客更新,文章订阅",
       },
     },
@@ -226,9 +243,7 @@ router.beforeEach(async (to) => {
     await auth.hydrateAuth();
   }
 
-  const needsAuth = to.matched.some(
-    (route) => route.meta?.requiresAuth === true,
-  );
+  const needsAuth = to.matched.some((route) => route.meta?.requiresAuth === true);
 
   if (needsAuth && !auth.isAuthenticated) {
     return { name: "login", query: { redirect: to.fullPath } };

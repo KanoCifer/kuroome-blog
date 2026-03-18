@@ -6,15 +6,11 @@
       :style="titleStyle"
     >
       <div>
-        <h1
-          class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl"
-        >
+        <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl">
           推荐网站
         </h1>
         <!-- Author and Date Info -->
-        <div
-          class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400"
-        >
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400">
           <span
             class="inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400"
           >
@@ -23,20 +19,21 @@
         </div>
       </div>
     </div>
-    <div
-      :style="sectionStyle"
-      class="mt-36 min-h-screen rounded-t-[40px] bg-blue-50 px-4 py-12 dark:bg-slate-900"
-    >
+    <div class="relative mt-36">
+      <div
+        :style="sectionStyle"
+        class="absolute left-1/2 -z-5 h-full -translate-x-1/2 rounded-t-[40px] bg-blue-50 dark:bg-slate-900"
+      ></div>
       <TransitionGroup
         tag="div"
         mode="out-in"
-        enter-active-class="transition-all transform-gpu duration-500 ease-in-out"
+        enter-active-class="transition-all transform-gpu duration-300 ease-out"
         enter-from-class="opacity-0 translate-y-4"
         enter-to-class="opacity-100 translate-y-0"
-        leave-active-class="transition-all transform-gpu duration-500 ease-in-out"
+        leave-active-class="transition-all transform-gpu duration-300 ease-out"
         leave-from-class="opacity-100 translate-y-0"
         leave-to-class="opacity-0 translate-y-4"
-        class="mx-auto grid max-w-6xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+        class="mx-auto grid max-w-6xl grid-cols-1 gap-6 pt-24 sm:grid-cols-2 lg:grid-cols-3"
       >
         <a
           v-for="site in sites"
@@ -87,9 +84,7 @@
             </div>
           </div>
 
-          <p
-            class="line-clamp-3 text-sm leading-relaxed text-gray-600 dark:text-gray-400"
-          >
+          <p class="line-clamp-3 text-sm leading-relaxed text-gray-600 dark:text-gray-400">
             {{ site.description }}
           </p>
 
@@ -174,7 +169,7 @@ const titleStyle = computed(() => ({
 const sectionStyle = computed(() => {
   const scale = Math.min(1, 0.95 + y.value * 0.0005);
   return {
-    transform: `scale(${scale})`,
+    width: `${100 * scale}%`,
   };
 });
 const sites = ref<Website[]>([]);

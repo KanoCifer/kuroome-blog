@@ -23,22 +23,22 @@
         <span
           class="cursor-default rounded-md bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700 transition-colors hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300 dark:hover:bg-green-900/50"
         >
-          (API)Flask
+          TaskIQ
         </span>
         <span
           class="cursor-default rounded-md bg-rose-100 px-2.5 py-1 text-xs font-medium text-rose-700 transition-colors hover:bg-rose-200 dark:bg-rose-900/30 dark:text-rose-300 dark:hover:bg-rose-900/50"
         >
-          Vue.js
+          Vue3
         </span>
         <span
           class="cursor-default rounded-md bg-teal-100 px-2.5 py-1 text-xs font-medium text-teal-700 transition-colors hover:bg-teal-200 dark:bg-teal-900/30 dark:text-teal-300 dark:hover:bg-teal-900/50"
         >
-          motion
+          Motion
         </span>
         <span
           class="cursor-default rounded-md bg-purple-100 px-2.5 py-1 text-xs font-medium text-purple-700 transition-colors hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:hover:bg-purple-900/50"
         >
-          TailwindCss
+          TailwindCSS
         </span>
         <span
           class="cursor-default rounded-md bg-indigo-100 px-2.5 py-1 text-xs font-medium text-indigo-700 transition-colors hover:bg-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:hover:bg-indigo-900/50"
@@ -63,7 +63,7 @@
         <span
           class="cursor-default rounded-md bg-fuchsia-100 px-2.5 py-1 text-xs font-medium text-fuchsia-700 transition-colors hover:bg-fuchsia-200 dark:bg-fuchsia-900/30 dark:text-fuchsia-300 dark:hover:bg-fuchsia-900/50"
         >
-          MongoDb
+          MongoDB
         </span>
       </div>
     </div>

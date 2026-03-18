@@ -1,17 +1,22 @@
+<script setup lang="ts">
+import BentoSocial from "@/components/bento/BentoSocial.vue";
+import { motion } from "motion-v";
+const AboutIMG = "/images/about.webp";
+</script>
+
 <template>
-  <div
-    class="mx-auto my-auto flex max-w-6xl flex-col items-center justify-center"
-  >
-    <div
+  <div class="mx-auto my-auto flex max-w-6xl flex-col items-center justify-center">
+    <motion.div
+      :initial="{ opacity: 0, y: 20 }"
+      :animate="{ opacity: 1, y: 0 }"
+      :while-hover="{ scale: 1.02 }"
       id="aboutView"
       class="mx-auto mt-36 flex min-h-full max-w-6xl flex-col items-center justify-center"
     >
       <div
         class="squircle border border-gray-100 bg-white/70 p-8 shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-md max-sm:mx-2 md:p-12 dark:border-gray-700 dark:bg-gray-800/80"
       >
-        <div
-          class="flex flex-col items-center gap-8 md:flex-row md:items-center md:gap-12"
-        >
+        <div class="flex flex-col items-center gap-8 md:flex-row md:items-center md:gap-12">
           <div class="group relative shrink-0">
             <div
               class="absolute -inset-1 rounded-full bg-linear-to-br from-pink-200 to-blue-200 opacity-50 blur transition duration-500 group-hover:opacity-75"
@@ -28,20 +33,12 @@
           ></div>
 
           <div class="flex-1 space-y-6 text-center md:text-left">
-            <div
-              class="space-y-4 text-lg leading-relaxed text-gray-600 dark:text-gray-300"
-            >
+            <div class="space-y-4 text-lg leading-relaxed text-gray-600 dark:text-gray-300">
               <p>
                 <span class="text-2xl font-bold">我是 Kuroome。</span>
-                你好！欢迎来到我的博客。
-                目前这个博客还不完善，还有很多内容正在建设中，请多多包涵。
+                你好！欢迎来到我的博客。 很多内容正在建设中...
               </p>
-              <p>
-                我是一名<span
-                  class="cursor-default font-medium text-gray-800 underline decoration-blue-400/60 decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400 dark:text-gray-100"
-                  >国际政治</span
-                >专业在读的学生，正在自学编程，这个网站是我的第一个web项目。
-              </p>
+              <p>这个网站是我的第一个web项目。</p>
 
               <p>
                 主要技术栈包括
@@ -56,7 +53,7 @@
                 、
                 <span
                   class="cursor-default font-medium text-gray-800 underline decoration-blue-400/60 decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400 dark:text-gray-100"
-                  >(API)Flask</span
+                  >TaskIQ</span
                 >
                 、
                 <span
@@ -71,12 +68,22 @@
                 、
                 <span
                   class="cursor-default font-medium text-gray-800 underline decoration-blue-400/60 decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400 dark:text-gray-100"
-                  >SQL</span
+                  >PostgreSQL</span
                 >
-                和
+                、
                 <span
                   class="cursor-default font-medium text-gray-800 underline decoration-blue-400/60 decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400 dark:text-gray-100"
                   >Vue3</span
+                >
+                、
+                <span
+                  class="cursor-default font-medium text-gray-800 underline decoration-blue-400/60 decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400 dark:text-gray-100"
+                  >Redis</span
+                >
+                、
+                <span
+                  class="cursor-default font-medium text-gray-800 underline decoration-blue-400/60 decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400 dark:text-gray-100"
+                  >MongoDB</span
                 >
                 等。
                 <br />
@@ -85,6 +92,11 @@
                 技术方向包含<span
                   class="cursor-default font-medium text-gray-800 underline decoration-blue-400/60 decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400 dark:text-gray-100"
                   >Web 开发</span
+                >
+                、
+                <span
+                  class="cursor-default font-medium text-gray-800 underline decoration-blue-400/60 decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400 dark:text-gray-100"
+                  >前后端</span
                 >
                 、
                 <span
@@ -103,9 +115,7 @@
               </p>
             </div>
 
-            <div
-              class="flex items-center justify-center gap-6 pt-4 md:justify-start"
-            >
+            <div class="flex items-center justify-center gap-6 pt-4 md:justify-start">
               <span class="font-medium text-gray-400">联系方式：</span>
 
               <a
@@ -114,12 +124,7 @@
                 class="transform text-gray-400 transition-colors hover:scale-110 hover:text-gray-800 dark:hover:text-white"
                 title="GitHub"
               >
-                <svg
-                  class="h-6 w-6"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
+                <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path
                     fill-rule="evenodd"
                     d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
@@ -133,12 +138,7 @@
                 class="transform text-gray-400 transition-colors hover:scale-110 hover:text-gray-800 dark:hover:text-white"
                 title="Email"
               >
-                <svg
-                  class="h-6 w-6"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
+                <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path
                     d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
                   />
@@ -148,17 +148,7 @@
           </div>
         </div>
       </div>
-    </div>
-    <BentoSocial
-      :initial="{ scale: 0 }"
-      :animate="{ scale: 1 }"
-      :transition="{ type: 'spring', duration: 3 }"
-      class="w-xs"
-    />
+    </motion.div>
+    <BentoSocial :initial="{ scale: 0 }" :animate="{ scale: 1 }" class="mt-4 w-fit" />
   </div>
 </template>
-
-<script setup lang="ts">
-const AboutIMG = "/images/about.webp";
-import BentoSocial from "@/components/bento/BentoSocial.vue";
-</script>
