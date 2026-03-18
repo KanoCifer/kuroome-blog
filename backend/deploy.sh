@@ -20,8 +20,10 @@ cd ../frontend || exit 1
 pnpm i
 pnpm run build
 
-sudo supervisorctl update
 sudo supervisorctl reload
+sudo supervisorctl update
+sudo supervisorctl status
+
 
 echo "====================================="
 echo "Deployment completed successfully at $(date)"

@@ -71,9 +71,7 @@ async def send_bootstrap_emails(admin_email: str):
         email: EmailStr = valid_email.email
         content = BootstrapEmailContent(
             subject="Kuroome's Blog API 引导邮件",
-            body=html.format(
-                now=lambda: datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            ),
+            body=html.format(now=datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
             recipient=email,
         )
     except EmailNotValidError:
