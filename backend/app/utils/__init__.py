@@ -1,3 +1,3 @@
-from app.utils.cache import cache, get_cache, get_redis_cache, redis_cache
+from app.utils.cache import get_redis_cache, redis_cache
 
-__all__ = ["cache", "get_cache", "get_redis_cache", "redis_cache"]
+__all__ = ["get_redis_cache", "redis_cache"]

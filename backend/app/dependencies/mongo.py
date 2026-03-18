@@ -1,11 +1,4 @@
-"""MongoDB dependency injection using Motor async driver.
-
-This module provides FastAPI dependencies for MongoDB operations
-using Motor for async MongoDB access.
-"""
-
-# Global MongoDB client instance
-
+from fastapi import Request
 from pymongo import AsyncMongoClient
 from pymongo.asynchronous.database import AsyncDatabase
 
@@ -23,13 +16,13 @@ async def init_mongo(app) -> None:
 
     client = AsyncMongoClient(settings.MONGO_URI)
 
-    mongo = client["readinglist"]  # 替换为你的数据库名称
+    mongo = client["readinglist"]
 
     app.state.client = client
     app.state.mongo = mongo
 
 
-async def closeclient(app) -> None:
+async def close_mongo_client(app) -> None:
     """Close the MongoDB client connection."""
 
     if app.state.client is not None:
@@ -37,8 +30,8 @@ async def closeclient(app) -> None:
         app.state.client = None
 
 
-async def get_mongo_db(app) -> None | AsyncDatabase:
+async def get_mongo_db(request: Request) -> None | AsyncDatabase:
     """
     mongodb依赖注入。
     """
-    return app.state.mongo
+    return request.app.state.mongo

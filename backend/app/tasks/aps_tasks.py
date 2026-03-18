@@ -6,11 +6,12 @@ from itertools import repeat
 
 import feedparser
 import orjson
+from redis.asyncio import Redis as AsyncRedis
 from sqlalchemy import select
+from taskiq import Context, TaskiqDepends
 
 from app.configs.logger import logger
 from app.dependencies.database import AsyncSessionFactory
-from app.dependencies.redis import get_redis
 from app.models.mgmodel import RssArticle
 from app.models.models import RssInfo, VisitorTrack
 from app.schemas import VisitorData
@@ -25,7 +26,7 @@ from app.tasks.broker import broker
         }
     ]
 )
-async def run_migration_job():
+async def run_migration_job(context: Context = TaskiqDepends()):
     """迁移Redis访客数据到PostgreSQL"""
     start_time = time.perf_counter()
     queue_key = "migration_queue"
@@ -39,90 +40,89 @@ async def run_migration_job():
     # )
 
     try:
-        async for redis in get_redis():
-            # 1. 批量从 Redis 取出数据 (使用 Pipeline 减少网络 IO)
-            fetch_start = time.perf_counter()
-            pipe = redis.pipeline()
+        redis: AsyncRedis = context.state.redis
+        # 1. 批量从 Redis 取出数据 (使用 Pipeline 减少网络 IO)
+        fetch_start = time.perf_counter()
+        pipe = redis.pipeline()
 
-            # 批量执行 POP
-            for _ in repeat(None, batch_size):
-                pipe.lpop(queue_key)
+        # 批量执行 POP
+        for _ in repeat(None, batch_size):
+            pipe.lpop(queue_key)
 
-            # 执行并获取结果
-            items = await pipe.execute()
+        # 执行并获取结果
+        items = await pipe.execute()
 
-            # 过滤掉 None (队列空了返回的就是 None)
-            valid_items = [item for item in items if item is not None]
-            fetch_duration = time.perf_counter() - fetch_start
+        # 过滤掉 None (队列空了返回的就是 None)
+        valid_items = [item for item in items if item is not None]
+        fetch_duration = time.perf_counter() - fetch_start
 
-            if not valid_items:
-                duration = time.perf_counter() - start_time
-                logger.info(
-                    f"[MigrationJob] ✅ Completed | duration={duration:.2f}s | 0 items to migrate"
-                )
-                return {
-                    "status": "success",
-                    "migrated": 0,
-                    "duration": f"{duration:.2f}s",
-                }
-
-            # 2. 批量解析 JSON
-            parse_start = time.perf_counter()
-            try:
-                parsed_data_list: list[VisitorData] = [
-                    VisitorData(**orjson.loads(item)) for item in valid_items
-                ]
-                parse_duration = time.perf_counter() - parse_start
-            except json.JSONDecodeError as e:
-                parse_duration = time.perf_counter() - parse_start
-                logger.warning(
-                    f"[MigrationJob] JSON parsing failed | error={e!s} | parse_duration={parse_duration:.2f}s"
-                )
-
-                # 把有效数据塞回Redis
-                for item in reversed(valid_items):
-                    redis.lpush(queue_key, item)
-
-                duration = time.perf_counter() - start_time
-                logger.error(
-                    f"[MigrationJob] ❌ Job failed | duration={duration:.2f}s | error=JSON parsing failed"
-                )
-                return {
-                    "status": "failed",
-                    "error": "JSON parsing failed",
-                    "duration": f"{duration:.2f}s",
-                }
-
-            # 3. 处理时间字段，转换为 datetime 对象
-            transform_start = time.perf_counter()
-            transform_duration = time.perf_counter() - transform_start
-
-            # 4. 批量写入数据库 (一次 Session, 一次 Commit)
-            db_start = time.perf_counter()
-            async with AsyncSessionFactory() as session:
-                # 构建所有 ORM 对象
-                track_objects: list[VisitorTrack] = [
-                    VisitorTrack(**data.model_dump())
-                    for data in parsed_data_list
-                ]
-
-                session.add_all(track_objects)
-                await session.commit()
-
-                processed_count = len(track_objects)
-                db_duration = time.perf_counter() - db_start
-
-            # 完成统计
+        if not valid_items:
             duration = time.perf_counter() - start_time
             logger.info(
-                f"[MigrationJob]✅ Completed | duration={duration:.2f}s | fetched={len(valid_items)} | migrated={processed_count} | fetch={fetch_duration:.2f}s | parse={parse_duration:.2f}s | db={db_duration:.2f}s"
+                f"[MigrationJob] ✅ Completed | duration={duration:.2f}s | 0 items to migrate"
             )
             return {
                 "status": "success",
-                "total": len(valid_items),
-                "migrated": processed_count,
+                "migrated": 0,
                 "duration": f"{duration:.2f}s",
             }
+
+        # 2. 批量解析 JSON
+        parse_start = time.perf_counter()
+        try:
+            parsed_data_list: list[VisitorData] = [
+                VisitorData(**orjson.loads(item)) for item in valid_items
+            ]
+            parse_duration = time.perf_counter() - parse_start
+        except json.JSONDecodeError as e:
+            parse_duration = time.perf_counter() - parse_start
+            logger.warning(
+                f"[MigrationJob] JSON parsing failed | error={e!s} | parse_duration={parse_duration:.2f}s"
+            )
+
+            # 把有效数据塞回Redis
+            for item in reversed(valid_items):
+                redis.lpush(queue_key, item)
+
+            duration = time.perf_counter() - start_time
+            logger.error(
+                f"[MigrationJob] ❌ Job failed | duration={duration:.2f}s | error=JSON parsing failed"
+            )
+            return {
+                "status": "failed",
+                "error": "JSON parsing failed",
+                "duration": f"{duration:.2f}s",
+            }
+
+        # 3. 处理时间字段，转换为 datetime 对象
+        transform_start = time.perf_counter()
+        transform_duration = time.perf_counter() - transform_start
+
+        # 4. 批量写入数据库 (一次 Session, 一次 Commit)
+        db_start = time.perf_counter()
+        async with AsyncSessionFactory() as session:
+            # 构建所有 ORM 对象
+            track_objects: list[VisitorTrack] = [
+                VisitorTrack(**data.model_dump()) for data in parsed_data_list
+            ]
+
+            session.add_all(track_objects)
+            await session.commit()
+
+            processed_count = len(track_objects)
+            db_duration = time.perf_counter() - db_start
+
+        # 完成统计
+        duration = time.perf_counter() - start_time
+        logger.info(
+            f"[MigrationJob]✅ Completed | duration={duration:.2f}s | fetched={len(valid_items)} | migrated={processed_count} | fetch={fetch_duration:.2f}s | parse={parse_duration:.2f}s | db={db_duration:.2f}s"
+        )
+        return {
+            "status": "success",
+            "total": len(valid_items),
+            "migrated": processed_count,
+            "duration": f"{duration:.2f}s",
+        }
 
     except Exception as e:
         duration = time.perf_counter() - start_time
@@ -152,11 +152,13 @@ async def run_migration_job():
         {
             "cron": "0 10 * * *",
             "schedule_id": "rss_refresh",
+            # 指定时区：Taskiq 支持在调度字典中使用 `cron_offset`（可为时区字符串或 timedelta）
+            "cron_offset": "Asia/Shanghai",
         }
     ]
 )
 async def refresh_rss_feeds():
-    """Daily RSS refresh at 8 AM for all users, saves new articles to MongoDB."""
+    """Daily RSS refresh at 10:00 (Asia/Shanghai) for all users, saves new articles to MongoDB."""
     start_time = time.perf_counter()
     logger.info("[RSSRefreshJob] 🔄 Starting RSS feed refresh job")
 

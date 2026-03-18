@@ -3,13 +3,15 @@ from __future__ import annotations
 import hashlib
 import json
 
-from fastapi import APIRouter, BackgroundTasks, Depends
+from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from redis.asyncio import Redis as AsyncRedis
 
+from app.configs import logger
 from app.dependencies.redis import get_redis
 from app.schemas.response import APIResponse
+from app.tasks import save_cache_to_redis
 from app.utils.agent import article_summarizer
 
 router = APIRouter(prefix="/agent", tags=["agent"])
@@ -27,16 +29,8 @@ def make_cache_key(content: str, title: str | None = None) -> str:
     return f"article_summary:{hash_val}"
 
 
-async def save_cache_to_redis(
-    redis: AsyncRedis, key: str, value: str, expire: int = 3600
-):
-    """将总结结果存储到 Redis,设置过期时间为 1 小时"""
-    await redis.set(key, value, ex=expire)
-
-
 @router.post("/summary")
 async def summary_article(
-    tasks: BackgroundTasks,
     payload: ArticleSummaryRequest,
     redis: AsyncRedis = Depends(get_redis),
 ):
@@ -52,9 +46,7 @@ async def summary_article(
             content=payload.content,
             title=payload.title,
         )
-        tasks.add_task(
-            save_cache_to_redis,
-            redis,
+        await save_cache_to_redis.kiq(
             cache_key,
             summary,
         )
@@ -72,7 +64,6 @@ async def summary_article(
 
 @router.post("/summary/stream")
 async def summary_article_stream(
-    tasks: BackgroundTasks,
     payload: ArticleSummaryRequest,
     redis: AsyncRedis = Depends(get_redis),
 ):
@@ -112,17 +103,20 @@ async def summary_article_stream(
             yield f"data:{json.dumps(done, ensure_ascii=False)}\n\n"
 
             if full_summary:
-                tasks.add_task(
-                    save_cache_to_redis,
-                    redis,
-                    cache_key,
-                    full_summary,
-                )
+                try:
+                    await save_cache_to_redis.kiq(
+                        cache_key,
+                        full_summary,
+                    )
+                except Exception as e:
+                    # 记录缓存保存失败的错误，但不影响主流程
+                    logger.error(f"⚠️ 保存总结到 Redis 失败: {e!r}")
         except ValueError as e:
-            yield f"data:{json.dumps({'content': f'[ERROR] {e!s}', 'is_end': True}, ensure_ascii=False)}\n\n"
+            yield f"data:{json.dumps({'content': f'[ERROR] {e!r}', 'is_end': True}, ensure_ascii=False)}\n\n"
         except RuntimeError as e:
-            yield f"data:{json.dumps({'content': f'[ERROR] {e!s}', 'is_end': True}, ensure_ascii=False)}\n\n"
-        except Exception:
+            yield f"data:{json.dumps({'content': f'[ERROR] {e!r}', 'is_end': True}, ensure_ascii=False)}\n\n"
+        except Exception as e:
+            logger.error(f"❌ 文章总结失败: {e!r}")
             yield f"data:{json.dumps({'content': '[ERROR] 文章总结失败,请稍后重试', 'is_end': True}, ensure_ascii=False)}\n\n"
 
     return StreamingResponse(

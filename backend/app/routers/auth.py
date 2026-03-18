@@ -10,7 +10,6 @@ import httpx
 from email_validator import EmailNotValidError, ValidatedEmail, validate_email
 from fastapi import (
     APIRouter,
-    BackgroundTasks,
     Cookie,
     Depends,
     Request,
@@ -18,7 +17,6 @@ from fastapi import (
     status,
 )
 from fastapi.responses import JSONResponse, RedirectResponse
-from fastapi_mail import FastMail, MessageSchema, MessageType, NameEmail
 from pydantic import BaseModel, EmailStr, SecretStr
 from redis.exceptions import RedisError
 from sqlalchemy import select
@@ -42,11 +40,11 @@ from app.dependencies.auth import manager
 from app.dependencies.csrf import csrf_manager
 from app.dependencies.database import get_session
 from app.dependencies.limiter import limiter
-from app.dependencies.mail import MailConfig
 from app.dependencies.redis import AsyncRedis, get_async_redis
 from app.models.models import PasskeyCredential, Profile, User
 from app.schemas.response import APIResponse
 from app.schemas.schemas import LoginIn, RegisterIn
+from app.tasks import _send_email_code
 from app.utils.security import generate_pkce_pair
 from app.utils.webauthn import (
     generate_passkey_authentication_options,
@@ -413,35 +411,9 @@ class PasskeyAuthenticationRequest(BaseModel):
     response: dict
 
 
-async def _send_email_code(
-    email: str,
-    verification_code: str,
-):
-    html = f"""<p>这是您的验证码：</p>
-<h2 style=\"color: blue;\">{verification_code}</h2>
-<p>请在10分钟内使用。</p>
-"""
-    # NameEmail 可以接收 name 和 email，如果没有 name，可以留空或填邮箱
-    recipients = [NameEmail(email=email, name="")]  # type: ignore
-    message = MessageSchema(
-        subject="ReadingList 注册验证码",
-        recipients=recipients,
-        body=html,
-        subtype=MessageType.html,
-    )
-    fm = FastMail(MailConfig.conf)
-
-    try:
-        await fm.send_message(message)
-    except Exception as e:
-        logger.error(f"发送验证码邮件失败: {e!s}")
-        raise e
-
-
 @router.post("/email/code")
 async def send_email_code(
     email: EmailSchema,
-    background_tasks: BackgroundTasks,
     redis: AsyncRedis = Depends(get_async_redis),
 ):
     """发送邮箱验证码."""
@@ -475,10 +447,9 @@ async def send_email_code(
         )
     try:
         # 将发送邮件的任务添加到后台任务中
-        background_tasks.add_task(
-            _send_email_code,
+        await _send_email_code.kiq(
             email=email,  # type: ignore
-            verification_code=verification_code,  # type: ignore
+            verification_code=verification_code,
         )
     except Exception as e:
         return APIResponse.error(

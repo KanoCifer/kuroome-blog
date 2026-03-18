@@ -50,7 +50,7 @@ async def get_async_session():
         async with get_async_session() as session:
             result = await session.execute(...)
     """
-    session = AsyncSessionFactory(bind=async_engine)
+    session: AsyncSession = AsyncSessionFactory(bind=async_engine)
     try:
         yield session
         await session.commit()
@@ -70,7 +70,7 @@ async def get_session() -> AsyncGenerator[AsyncSession]:
         async def read_items(session: AsyncSession = Depends(get_session)):
             ...
     """
-    session = AsyncSessionFactory(bind=async_engine)
+    session: AsyncSession = AsyncSessionFactory(bind=async_engine)
     try:
         yield session
         await session.commit()

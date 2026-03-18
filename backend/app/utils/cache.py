@@ -9,6 +9,7 @@ import orjson
 from cachetools.keys import hashkey
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from redis.asyncio import ConnectionPool
 from redis.asyncio import Redis as AsyncRedis
 from rich import print
 
@@ -210,43 +211,39 @@ class AsyncRedisCache(AsyncCache):
         await self.redis.aclose()
 
 
-cache = AsyncCache()
-redis_cache = AsyncRedisCache(
-    redis_client=AsyncRedis(
-        host="localhost",
-        port=6379,
-        db=0,
-        # 使用 bytes 存储，避免 Redis client 对响应做自动解码
-        decode_responses=False,
-        max_connections=10,
-    )
+CONNECTION_POOL1 = ConnectionPool(
+    host="localhost",
+    port=6379,
+    db=1,
+    decode_responses=True,
+    max_connections=10,
 )
 
 
+def init_redis_cache() -> AsyncRedis:
+    """Initialize Redis cache connection."""
+    redis_cache_client: AsyncRedis = AsyncRedis(
+        connection_pool=CONNECTION_POOL1
+    )
+    return redis_cache_client
+
+
+redis_cache = AsyncRedisCache(redis_client=init_redis_cache())
+
+
 # 依赖注入函数
-async def get_cache() -> AsyncCache:
-    return cache
-
-
+# async def get_cache() -> AsyncCache:
+#     return cache
 async def get_redis_cache() -> AsyncRedisCache:
     return redis_cache
 
 
+async def close_cache_redis():
+    await redis_cache.aclose()
+
+
 if __name__ == "__main__":
     import asyncio
-
-    async def test_cache():
-        @cache(ttl=5)
-        async def expensive_computation(x):
-            await asyncio.sleep(1)  # 模拟耗时操作
-            return x * x
-
-        print(await expensive_computation(2))  # 计算并缓存结果
-        print(await expensive_computation(2))  # 从缓存获取结果
-        await asyncio.sleep(6)  # 等待缓存过期
-        print(await expensive_computation(2))  # 重新计算并缓存结果
-
-    asyncio.run(test_cache())
 
     # 测试 Redis 缓存
     async def test_redis_cache():

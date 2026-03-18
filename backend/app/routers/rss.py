@@ -6,10 +6,11 @@ from urllib.parse import urlparse
 
 import feedparser
 import httpx
+import orjson
 from beanie.operators import In
 from bson import ObjectId
 from bson.errors import InvalidId
-from fastapi import APIRouter, BackgroundTasks, Depends, Query
+from fastapi import APIRouter, Depends, Query
 from fastapi.responses import Response
 from pydantic import BaseModel
 from sqlalchemy import select
@@ -27,6 +28,7 @@ from app.schemas.schemas import (
     RssArticleResponse,
     RssSubscriptionResponse,
 )
+from app.tasks import save_to_mongo
 
 router = APIRouter(prefix="/rss", tags=["rss"])
 _IMAGE_PROXY_TIMEOUT = httpx.Timeout(15.0, connect=10.0)
@@ -102,73 +104,6 @@ def _is_forbidden_target(hostname: str) -> bool:
     return False
 
 
-async def save_to_mongo(feed_url: str, entries: list, user_id: int):
-    """
-    Background task: Save RSS entries to MongoDB.
-
-    Args:
-        feed_url: The RSS feed URL
-        entries: List of entry dicts with title, link, published, summary, content
-        user_id: The user ID (currently not directly stored in RssArticle, but for logging)
-    """
-    saved_count = 0
-    try:
-        for entry in entries:
-            guid = str(entry.get("id") or entry.get("link", ""))
-            title = str(entry.get("title", ""))
-            link = str(entry.get("link", ""))
-            summary = str(entry.get("summary", ""))
-            author = entry.get("author")
-            author_str = str(author) if author is not None else None
-
-            # Extract content from entry
-            content_list = entry.get("content") or []
-            if content_list:
-                content = str(content_list[0].get("value", ""))
-            else:
-                content = summary
-
-            # Parse published datetime
-            pub_dt: datetime | None = None
-            published_parsed = entry.get("published_parsed")
-            updated_parsed = entry.get("updated_parsed")
-            if published_parsed:
-                t = tuple(int(x) for x in published_parsed[:6])  # type: ignore[union-attr]
-                pub_dt = datetime(*t, tzinfo=UTC)
-            elif updated_parsed:
-                t = tuple(int(x) for x in updated_parsed[:6])  # type: ignore[union-attr]
-                pub_dt = datetime(*t, tzinfo=UTC)
-
-            # Check if article already exists
-            existing = await RssArticle.find_one(
-                RssArticle.feed_url == feed_url,
-                RssArticle.guid == guid,
-            )
-            if not existing:
-                new_article = RssArticle(
-                    guid=guid,
-                    feed_url=feed_url,
-                    title=title,
-                    link=link,
-                    summary=summary,
-                    content=content,
-                    author=author_str,
-                    published=pub_dt,
-                    fetched_at=datetime.now(UTC),
-                    read_by=[],
-                )
-                await new_article.insert()
-                saved_count += 1
-
-        logger.info(
-            f"Background task: RSS {feed_url} saved {saved_count} new articles for user {user_id}"
-        )
-    except Exception as e:
-        logger.error(
-            f"Background task failed: Error saving RSS {feed_url} for user {user_id}: {e!r}"
-        )
-
-
 class RssRequest(BaseModel):
     rss_url: str
     save_to_db: bool = False
@@ -228,7 +163,6 @@ async def proxy_rss_image(
 @router.post("/parse-rss")
 async def parse_rss(
     rss_request: RssRequest,
-    tasks: BackgroundTasks,
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(manager),
     redis: AsyncRedis = Depends(get_async_redis),
@@ -297,17 +231,16 @@ async def parse_rss(
             await session.commit()
 
         if save_to_db:
-            tasks.add_task(
-                save_to_mongo,
-                feed_url=rss_url,
-                entries=feed.entries,
-                user_id=current_user.id,
-            )
-
+            try:
+                await save_to_mongo.kiq(
+                    feed_url=rss_url, entries=entries, user_id=current_user.id
+                )
+            except Exception as e:
+                logger.error(f"❌将RSS条目保存到MongoDB失败: {e!r}")
         # 将解析结果缓存到Redis,设置过期时间为1小时
         await redis.set(
             redis_key,
-            json.dumps({"meta": feed_meta, "entries": entries}),
+            orjson.dumps({"meta": feed_meta, "entries": entries}),
             ex=3600,
         )  # 缓存1小时
 

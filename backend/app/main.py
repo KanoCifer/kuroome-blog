@@ -17,7 +17,11 @@ from app.configs.logger import logger as app_logger
 from app.dependencies.csrf import setup_csrf
 from app.dependencies.database import close_db_connections
 from app.dependencies.limiter import limiter
-from app.dependencies.mongo import closeclient, init_mongo
+from app.dependencies.mongo import close_mongo_client, init_mongo
+from app.dependencies.redis import (
+    close_redis,
+    init_redis,
+)
 from app.exceptions import register_exception_handlers
 from app.models.mgmodel import MessageBoard, Post, RssArticle
 from app.routers import (
@@ -34,7 +38,16 @@ from app.routers import (
     weread,
 )
 from app.tasks import send_bootstrap_emails
-from app.utils import redis_cache
+from app.utils.cache import close_cache_redis
+
+
+async def cleanup_resources(app: FastAPI):
+    """关闭所有资源连接包括 Redis MongoDB PostgreSQL"""
+    await close_redis(app)  # 关闭 Redis 连接池
+    await close_cache_redis()  # 关闭缓存 Redis 连接
+    await app.state.client.close()  # 关闭 MongoDB 连接
+    await close_mongo_client(app)  # 关闭 MongoDB 客户端
+    await close_db_connections()  # 关闭数据库连接池
 
 
 # 生命周期，初始化和清理资源
@@ -46,19 +59,20 @@ async def lifespan(app: FastAPI):
         database=app.state.mongo,
         document_models=[MessageBoard, Post, RssArticle],
     )
+    app.state.redis, app.state.redis2 = await init_redis()
 
     logger.debug(f"Settings:{get_settings().model_dump()}")
     logger.info("FastAPI started successfully.")
 
-    # 发送引导邮件给管理员（幂等性保护）
-    admin_email = get_settings().ADMIN_EMAIL
-    bootstrap_key = f"bootstrap_email_sent:{admin_email}"
-    redis = redis_cache.redis
-    if redis:
-        # 使用 SETNX 原子操作，只有当key不存在时才设置，避免竞态条件
-        lock_acquired = await redis.set(bootstrap_key, "1", ex=600, nx=True)
+    # 发送引导邮件
+    admin_email: str = get_settings().ADMIN_EMAIL
+    bootstrap_key: str = f"bootstrap_email_sent:{admin_email}"
+    if app.state.redis is not None:
+        lock_acquired = await app.state.redis.set(
+            name=bootstrap_key, value="1", ex=600, nx=True
+        )
         if lock_acquired:
-            await send_bootstrap_emails.kiq(admin_email)
+            await send_bootstrap_emails.kiq(admin_email=admin_email)
             app_logger.info(f"引导邮件任务已添加到队列: {admin_email}")
         else:
             app_logger.info(f"引导邮件已在24小时内发送过，跳过: {admin_email}")
@@ -66,10 +80,7 @@ async def lifespan(app: FastAPI):
     yield
 
     # 应用关闭时的清理工作
-    await redis_cache.aclose()  # 关闭 Redis 连接
-    await app.state.client.close()  # 关闭 MongoDB 连接
-    await closeclient(app)  # 关闭 MongoDB 客户端
-    await close_db_connections()  # 关闭数据库连接池
+    await cleanup_resources(app=app)
 
 
 # 实例化 FastAPI 应用
@@ -99,16 +110,16 @@ app.include_router(aiagent.router, prefix="/api/v1")
 register_exception_handlers(app)
 
 app.add_middleware(
-    SessionMiddleware,
+    middleware_class=SessionMiddleware,
     secret_key=get_settings().SECRET_KEY,
 )
 
 setup_csrf(app)
 # 配置允许的源（例如你的前端地址）
-origins = [
+origins: list[str] = [
     "http://localhost",
-    "http://localhost:5173",  # 假设你的 Vue/React 跑在 3000 端口
-    "https://kanocifer.chat",  # 生产环境的前端地址
+    "http://localhost:5173",
+    "https://kanocifer.chat",
 ]
 
 app.add_middleware(
@@ -126,8 +137,8 @@ app.add_middleware(
 async def add_process_time_header(request: Request, call_next):
     start_time: float = time.perf_counter()
     response = await call_next(request)
-    process_time: float = time.perf_counter() - start_time
-    response.headers["X-Process-Time"] = str(process_time)
+    process_time: float = round(time.perf_counter() - start_time, 6)
+    response.headers["X-Process-Time"] = f"{process_time}s"
     return response
 
 
