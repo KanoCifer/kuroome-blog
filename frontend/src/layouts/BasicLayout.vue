@@ -18,7 +18,9 @@ watch(
       // 匹配 /blog/xxxx 但不包括 /blog 列表页
       (newPath.startsWith("/blog/") && newPath !== "/blog") ||
       newPath.includes("/rss") ||
-      newPath.includes("/websites");
+      newPath.includes("/websites") ||
+      newPath.includes("/analytics") ||
+      newPath.includes("/messages");
   },
   { immediate: true },
 );

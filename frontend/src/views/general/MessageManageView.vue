@@ -1,142 +1,208 @@
 <template>
-  <div class="mx-auto mt-24 max-w-5xl space-y-8">
-    <!-- Header -->
+  <div>
+    <!-- Title Section with Parallax -->
     <div
-      class="mb-8 flex items-center justify-between rounded-3xl bg-gray-50/50 px-4 py-6 backdrop-blur-sm dark:bg-gray-900/30"
+      class="relative -z-5 mx-0 mt-60 flex flex-col items-center justify-center bg-transparent"
+      :style="titleStyle"
     >
-      <h1
-        class="mr-4 flex items-center gap-3 text-3xl font-bold text-gray-800 dark:text-gray-100"
-      >
-        {{
-          activeTab === "messages" ? "Message Management" : "Comment Management"
-        }}
-        <span
-          class="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-400"
-        >
-          Admin Only
-        </span>
-      </h1>
-      <div class="flex gap-4">
-        <button
-          type="button"
-          @click="activeTab = 'messages'"
-          :class="[
-            activeTab === 'messages'
-              ? 'border-blue-600 text-blue-600 dark:text-blue-400'
-              : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200',
-            'border-b-2 px-1 py-4 text-sm font-medium transition-colors',
-          ]"
-        >
-          💬 Messages
-        </button>
-        <button
-          type="button"
-          @click="activeTab = 'comments'"
-          :class="[
-            activeTab === 'comments'
-              ? 'border-blue-600 text-blue-600 dark:text-blue-400'
-              : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200',
-            'border-b-2 px-1 py-4 text-sm font-medium transition-colors',
-          ]"
-        >
-          📝 Comments
-        </button>
-      </div>
-      <div class="flex items-center gap-3">
-        <button
-          @click="handleRefresh"
-          :disabled="loading"
-          class="group flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2.5 font-semibold text-white shadow-md transition-all select-none hover:bg-green-700 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <svg
-            :class="[
-              loading ? 'animate-spin' : 'group-hover:rotate-180',
-              'h-4 w-4 transition-transform',
-            ]"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+      <div>
+        <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl">
+          {{ activeTab === "messages" ? "留言管理" : "评论管理" }}
+        </h1>
+        <!-- Description -->
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400">
+          <span
+            class="inline-block rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-            />
-          </svg>
-          {{ loading ? "Refreshing..." : "Refresh" }}
-        </button>
-        <button
-          @click="goBack"
-          class="group flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 font-semibold text-white shadow-md transition-all select-none hover:bg-blue-700 hover:shadow-lg"
-        >
-          <svg
-            class="h-4 w-4 transition-transform group-hover:-translate-x-1"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          返回
-        </button>
-      </div>
-      <!-- Tab Navigation -->
-    </div>
-
-    <!-- Error Message -->
-    <div
-      v-if="error"
-      class="rounded-xl bg-red-50 p-4 text-red-800 dark:bg-red-900/20 dark:text-red-200"
-    >
-      <div class="flex items-center">
-        <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-          <path
-            fill-rule="evenodd"
-            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-            clip-rule="evenodd"
-          />
-        </svg>
-        {{ error }}
+            Admin Only
+          </span>
+          <span class="text-gray-500">审核和管理用户内容</span>
+        </div>
       </div>
     </div>
 
-    <!-- Loading State -->
-    <div v-if="loading" class="py-12 text-center">
+    <div class="relative mt-36">
       <div
-        class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"
+        :style="sectionStyle"
+        class="absolute left-1/2 -z-5 h-full -translate-x-1/2 rounded-t-[40px] bg-blue-50 dark:bg-slate-900"
       ></div>
-      <p class="mt-2 text-gray-600 dark:text-gray-400">
-        Loading {{ activeTab === "messages" ? "messages" : "comments" }}...
-      </p>
-    </div>
 
-    <!-- Dynamic Tab Content with KeepAlive -->
-    <div v-else class="relative">
-      <div v-show="activeTab === 'messages'" class="tab-content">
-        <MessagesTab
-          :pending-messages="pendingMessages"
-          :approved-messages="approvedMessages"
-          :loading="loading"
-          :action-loading="actionLoading"
-          @approve="handleApprove"
-          @delete="handleDelete"
-        />
-      </div>
-      <div v-show="activeTab === 'comments'" class="tab-content">
-        <CommentsTab
-          :pending-comments="pendingComments"
-          :approved-comments="approvedComments"
-          :loading="loading"
-          :action-loading="actionLoading"
-          @approve="handleApprove"
-          @delete="handleDelete"
-        />
+      <div class="mx-auto max-w-5xl space-y-6 pt-24 pb-12">
+        <!-- Action Bar -->
+        <div
+          class="relative z-10 flex flex-col items-center justify-between gap-4 rounded-2xl border border-gray-200/60 bg-white/80 p-4 shadow-sm backdrop-blur-md sm:flex-row dark:border-gray-800 dark:bg-gray-900/70"
+        >
+          <!-- Tab Navigation -->
+          <div class="flex gap-2">
+            <button
+              type="button"
+              @click="activeTab = 'messages'"
+              :class="[
+                'flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all',
+                activeTab === 'messages'
+                  ? 'bg-gray-900 text-white shadow-md dark:bg-gray-100 dark:text-gray-900'
+                  : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800',
+              ]"
+            >
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
+              </svg>
+              留言
+            </button>
+            <button
+              type="button"
+              @click="activeTab = 'comments'"
+              :class="[
+                'flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all',
+                activeTab === 'comments'
+                  ? 'bg-gray-900 text-white shadow-md dark:bg-gray-100 dark:text-gray-900'
+                  : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800',
+              ]"
+            >
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+                />
+              </svg>
+              评论
+            </button>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex items-center gap-3">
+            <button
+              @click="handleRefresh"
+              :disabled="loading"
+              class="group flex cursor-pointer items-center gap-2 rounded-xl bg-gray-900 px-5 py-2.5 font-medium text-white shadow-md transition-all select-none hover:bg-gray-800 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+            >
+              <svg
+                :class="[
+                  loading ? 'animate-spin' : 'group-hover:rotate-180',
+                  'h-4 w-4 transition-transform',
+                ]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+              {{ loading ? "刷新中..." : "刷新" }}
+            </button>
+            <button
+              @click="goBack"
+              class="group flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 font-medium text-gray-700 shadow-sm transition-all select-none hover:bg-gray-50 hover:shadow-md dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              <svg
+                class="h-4 w-4 transition-transform group-hover:-translate-x-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+              返回
+            </button>
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div
+          v-if="error"
+          class="rounded-xl border border-red-200 bg-red-50/80 p-4 text-red-800 backdrop-blur-sm dark:border-red-800 dark:bg-red-900/30 dark:text-red-200"
+        >
+          <div class="flex items-center gap-2">
+            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            {{ error }}
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div
+          v-if="loading"
+          class="squircle overflow-hidden rounded-2xl border border-gray-200/60 bg-white/30 p-6 shadow-sm backdrop-blur-md dark:border-gray-800 dark:bg-gray-900/70"
+        >
+          <div class="py-8">
+            <div class="space-y-4">
+              <div
+                v-for="i in 5"
+                :key="i"
+                class="h-16 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-700/40"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Tab Content -->
+        <div v-else class="relative">
+          <div v-show="activeTab === 'messages'" class="tab-content">
+            <MessagesTab
+              :pending-messages="pendingMessages"
+              :approved-messages="approvedMessages"
+              :loading="loading"
+              :action-loading="actionLoading"
+              @approve="handleApprove"
+              @delete="handleDelete"
+            />
+          </div>
+          <div v-show="activeTab === 'comments'" class="tab-content">
+            <CommentsTab
+              :pending-comments="pendingComments"
+              :approved-comments="approvedComments"
+              :loading="loading"
+              :action-loading="actionLoading"
+              @approve="handleApprove"
+              @delete="handleDelete"
+            />
+          </div>
+        </div>
+
+        <!-- Back to Home -->
+        <div class="mt-12 text-center">
+          <RouterLink
+            to="/"
+            class="inline-flex cursor-pointer items-center gap-2 rounded-full bg-gray-900 px-6 py-3 font-medium text-white transition-all duration-300 hover:bg-gray-800 hover:shadow-lg dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            返回首页
+          </RouterLink>
+        </div>
       </div>
     </div>
   </div>
@@ -148,9 +214,10 @@ import MessagesTab from "@/components/message/MessagesTab.vue";
 import request from "@/request";
 import { useAuthStore } from "@/stores/auth";
 import type { Comment, Message } from "@/types";
+import { useScroll } from "@vueuse/core";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
 // 组件名称，用于 KeepAlive 缓存
@@ -162,6 +229,7 @@ dayjs.extend(relativeTime);
 
 const auth = useAuthStore();
 const router = useRouter();
+const { y } = useScroll(window);
 
 const activeTab = ref<"messages" | "comments">("messages");
 const pendingMessages = ref<Message[]>([]);
@@ -172,10 +240,17 @@ const loading = ref(false);
 const error = ref("");
 const actionLoading = ref<string | null>(null);
 
-// // Computed property to get active component
-// const activeComponent = computed(() => {
-//   return activeTab.value === "messages" ? MessagesTab : CommentsTab;
-// });
+// Parallax computed styles
+const titleStyle = computed(() => ({
+  transform: `translateY(${y.value * 0.4}px)`,
+}));
+
+const sectionStyle = computed(() => {
+  const scale = Math.min(1, 0.95 + y.value * 0.0005);
+  return {
+    width: `${100 * scale}%`,
+  };
+});
 
 onMounted(async () => {
   if (auth.user === null && !auth.loading) {
@@ -191,25 +266,10 @@ onMounted(async () => {
   await Promise.all([fetchMessages(), fetchComments()]);
 });
 
-// 移除对 activeTab 的 watch，因为我们现在同时加载所有数据
-// watch(activeTab, () => {
-//   fetchData();
-// });
-
-// 保留 fetchData 函数，但不自动调用，只在需要刷新时手动调用
-// const fetchData = async () => {
-//   if (activeTab.value === "messages") {
-//     await fetchMessages();
-//   } else {
-//     await fetchComments();
-//   }
-// };
-
 const fetchMessages = async () => {
   loading.value = true;
   error.value = "";
   try {
-    console.log("[MessageManage] Fetching messages...");
     const response = await request.get("/admin/messages");
 
     const result = response.data;
@@ -236,7 +296,6 @@ const fetchComments = async () => {
   loading.value = true;
   error.value = "";
   try {
-    console.log("[CommentManage] Fetching comments...");
     const response = await request.get("/admin/comments");
 
     const result = response.data;
@@ -313,22 +372,15 @@ const goBack = () => {
 <style scoped>
 /* Tab transition animation for v-show */
 .tab-content {
-  position: absolute;
+  position: relative;
   width: 100%;
-  top: 0;
-  left: 0;
-  will-change: opacity, transform;
 }
 
 .tab-content[v-show="false"] {
-  opacity: 0;
-  filter: blur(2px);
-  pointer-events: none;
+  display: none;
 }
 
 .tab-content[v-show="true"] {
-  opacity: 1;
-  filter: blur(0);
-  pointer-events: auto;
+  display: block;
 }
 </style>

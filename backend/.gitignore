@@ -3,6 +3,7 @@ app/media
 # Environments
 .env
 .venv/
+logs/
 # VS Code
 .vscode/
 .DS_Store
