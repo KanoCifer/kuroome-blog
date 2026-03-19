@@ -13,7 +13,7 @@ jobs:
       - name: Send Notification
         uses: actions/github-script@v7
         env:
-          FEISHU_WEBHOOK_URL: ${{ secrets.WEBHOOKURL }}
+          WEBHOOKURL: ${{ secrets.WEBHOOKURL }}
         with:
           script: |
             const notification = {
@@ -22,7 +22,7 @@ jobs:
                 text: `There has been a push to the main branch. Check the details at: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
               }
             };
-            fetch(process.env.FEISHU_WEBHOOK_URL, {
+            fetch(process.env.WEBHOOKURL, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json'
