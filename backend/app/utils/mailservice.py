@@ -1,5 +1,6 @@
 import datetime
 
+import httpx
 from email_validator import EmailNotValidError, ValidatedEmail, validate_email
 from fastapi_mail import FastMail, MessageSchema, MessageType
 from pydantic import BaseModel, EmailStr
@@ -61,3 +62,21 @@ async def send_bootstrap_emails(admin_email: str):
         logger.error(f"发送引导邮件失败: {e!s}")
         # print(f"[red]发送引导邮件失败: {e!s}[/red]")
         raise e
+
+
+async def send_feishu_message():
+    """发送飞书消息"""
+    url = get_settings().FEISHU_WEBHOOK_URL
+    if not url:
+        return
+    payload = {
+        "msg_type": "text",
+        "content": {"text": "KUROOME BLOG API 已成功启动！"},
+    }
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url, json=payload)
+            response.raise_for_status()
+            logger.info("飞书消息已发送")
+    except Exception as e:
+        logger.error(f"发送飞书消息失败: {e!s}")

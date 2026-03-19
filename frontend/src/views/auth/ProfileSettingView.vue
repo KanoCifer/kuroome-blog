@@ -1,7 +1,7 @@
 <template>
   <div class="mt-12 min-h-screen px-4 py-16">
     <div
-      class="mx-auto max-w-2xl rounded-4xl border border-white/20 bg-white/40 p-10 shadow-2xl backdrop-blur-xl dark:border-gray-700/30 dark:bg-gray-900/40"
+      class="mx-auto max-w-2xl rounded-4xl border border-white/20 bg-white/40 p-10 shadow-2xl dark:border-gray-700/30 dark:bg-gray-900/40"
       style="animation: fadeInUp 0.6s ease-out"
     >
       <!-- Header -->
@@ -70,9 +70,7 @@
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
           <!-- Name -->
           <div class="space-y-2">
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Display Name
             </label>
             <div class="relative">
@@ -91,9 +89,7 @@
 
           <!-- Username -->
           <div class="space-y-2">
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Username
               <span class="ml-1 text-xs text-red-400">*</span>
             </label>
@@ -114,11 +110,7 @@
 
         <!-- Gender -->
         <div class="space-y-2">
-          <label
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
-            Gender
-          </label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300"> Gender </label>
           <div class="grid grid-cols-2 gap-4">
             <label class="group relative cursor-pointer">
               <input
@@ -161,9 +153,7 @@
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
           <!-- Email -->
           <div class="space-y-2">
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Email
             </label>
             <div class="relative">
@@ -182,9 +172,7 @@
 
           <!-- Mobile -->
           <div class="space-y-2">
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Mobile
             </label>
             <div class="relative">
@@ -204,9 +192,7 @@
 
         <!-- Password -->
         <div class="space-y-2">
-          <label
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Password
           </label>
           <div class="relative">
@@ -225,9 +211,7 @@
         <!-- Divider -->
         <div class="relative">
           <div class="absolute inset-0 flex items-center">
-            <div
-              class="w-full border-t border-gray-200 dark:border-gray-700"
-            ></div>
+            <div class="w-full border-t border-gray-200 dark:border-gray-700"></div>
           </div>
           <div class="relative flex justify-center">
             <span
@@ -240,9 +224,7 @@
 
         <!-- Passkey Section -->
         <div class="space-y-3">
-          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Passkeys
-          </h3>
+          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Passkeys</h3>
           <button
             v-if="!hasPasskey"
             type="button"
@@ -250,22 +232,14 @@
             :disabled="addingPasskey"
             class="w-full rounded-2xl bg-linear-to-r from-emerald-500 to-green-600 px-6 py-3.5 font-medium text-white shadow-lg shadow-emerald-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-emerald-500/30 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:outline-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-gray-900"
           >
-            <span
-              v-if="addingPasskey"
-              class="flex items-center justify-center gap-2"
-            >
+            <span v-if="addingPasskey" class="flex items-center justify-center gap-2">
               <span
                 class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
               ></span>
               Adding Passkey...
             </span>
             <span v-else class="flex items-center justify-center gap-2">
-              <svg
-                class="h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -283,22 +257,14 @@
                 :disabled="deletingPasskey"
                 class="w-full rounded-2xl bg-linear-to-r from-red-500 to-rose-600 px-6 py-3.5 font-medium text-white shadow-lg shadow-red-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-red-500/30 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-gray-900"
               >
-                <span
-                  v-if="deletingPasskey"
-                  class="flex items-center justify-center gap-2"
-                >
+                <span v-if="deletingPasskey" class="flex items-center justify-center gap-2">
                   <span
                     class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
                   ></span>
                   Deleting Passkey...
                 </span>
                 <span v-else class="flex items-center justify-center gap-2">
-                  <svg
-                    class="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -315,11 +281,9 @@
                 <AlertDialogTitle class="text-xl font-bold"
                   >Are you absolutely sure?</AlertDialogTitle
                 >
-                <AlertDialogDescription
-                  class="text-gray-600 dark:text-gray-400"
-                >
-                  This action cannot be undone. You will need to use your
-                  password to log in after deleting your passkey.
+                <AlertDialogDescription class="text-gray-600 dark:text-gray-400">
+                  This action cannot be undone. You will need to use your password to log in after
+                  deleting your passkey.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter class="gap-3">
@@ -353,9 +317,7 @@
 
         <!-- GitHub Section -->
         <div class="space-y-3">
-          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-            GitHub Account
-          </h3>
+          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">GitHub Account</h3>
           <button
             v-if="!hasGitHubBound"
             type="button"
@@ -363,10 +325,7 @@
             :disabled="bindingGitHub"
             class="w-full rounded-2xl bg-gray-900 px-6 py-3.5 font-medium text-white shadow-lg shadow-gray-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-gray-500/30 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-gray-900"
           >
-            <span
-              v-if="bindingGitHub"
-              class="flex items-center justify-center gap-2"
-            >
+            <span v-if="bindingGitHub" class="flex items-center justify-center gap-2">
               <span
                 class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
               ></span>
@@ -415,22 +374,14 @@
                 :disabled="unbindingGitHub"
                 class="w-full rounded-2xl bg-gray-900 px-6 py-3.5 font-medium text-white shadow-lg shadow-gray-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-gray-500/30 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-gray-900"
               >
-                <span
-                  v-if="unbindingGitHub"
-                  class="flex items-center justify-center gap-2"
-                >
+                <span v-if="unbindingGitHub" class="flex items-center justify-center gap-2">
                   <span
                     class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
                   ></span>
                   Unbinding GitHub...
                 </span>
                 <span v-else class="flex items-center justify-center gap-2">
-                  <svg
-                    class="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -447,11 +398,9 @@
                 <AlertDialogTitle class="text-xl font-bold"
                   >Are you absolutely sure?</AlertDialogTitle
                 >
-                <AlertDialogDescription
-                  class="text-gray-600 dark:text-gray-400"
-                >
-                  This action will unbind your GitHub account from your profile.
-                  You will no longer be able to log in with GitHub after this.
+                <AlertDialogDescription class="text-gray-600 dark:text-gray-400">
+                  This action will unbind your GitHub account from your profile. You will no longer
+                  be able to log in with GitHub after this.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter class="gap-3">
@@ -496,12 +445,7 @@
             Saving Changes...
           </span>
           <span v-else class="flex items-center justify-center gap-2">
-            <svg
-              class="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -539,13 +483,7 @@
                     d="M5 13l4 4L19 7"
                   ></path>
                 </svg>
-                <svg
-                  v-else
-                  class="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg v-else class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -798,8 +736,7 @@ onMounted(() => {
   if (error) {
     const errorMessages: Record<string, string> = {
       not_logged_in: "Please log in first to bind GitHub account",
-      github_already_bound:
-        "This GitHub account is already bound to another user",
+      github_already_bound: "This GitHub account is already bound to another user",
       github_not_bound: "Your account is not bound to GitHub",
       invalid_oauth_state: "Invalid OAuth state, please try again",
       missing_pkce_info: "Missing PKCE information, please try again",

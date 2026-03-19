@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     GITEE_WEBHOOK_SECRET: str | None = None
     SEND_BOOT_EMAIL: bool = True
     ADMIN_EMAIL: str = ""
+    FEISHU_WEBHOOK_URL: str = ""
 
     model_config = SettingsConfigDict(
         env_file=get_env_file_path(),
@@ -60,3 +61,4 @@ if __name__ == "__main__":
     print(get_env_file_path())
     print(f"SEND_BOOT_EMAIL: {get_settings().SEND_BOOT_EMAIL}")
     print(f"ADMIN_EMAIL: {get_settings().ADMIN_EMAIL}")
+    print(f"FEISHU_WEBHOOK_URL: {get_settings().FEISHU_WEBHOOK_URL}")

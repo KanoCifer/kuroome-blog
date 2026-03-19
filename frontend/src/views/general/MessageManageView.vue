@@ -30,7 +30,7 @@
       <div class="mx-auto max-w-5xl space-y-6 pt-24 pb-12">
         <!-- Action Bar -->
         <div
-          class="relative z-10 flex flex-col items-center justify-between gap-4 rounded-2xl border border-gray-200/60 bg-white/80 p-4 shadow-sm backdrop-blur-md sm:flex-row dark:border-gray-800 dark:bg-gray-900/70"
+          class="relative z-10 flex flex-col items-center justify-between gap-4 rounded-2xl border border-gray-200/60 bg-white/80 p-4 shadow-sm sm:flex-row dark:border-gray-800 dark:bg-gray-900/70"
         >
           <!-- Tab Navigation -->
           <div class="flex gap-2">
@@ -126,7 +126,7 @@
         <!-- Error Message -->
         <div
           v-if="error"
-          class="rounded-xl border border-red-200 bg-red-50/80 p-4 text-red-800 backdrop-blur-sm dark:border-red-800 dark:bg-red-900/30 dark:text-red-200"
+          class="rounded-xl border border-red-200 bg-red-50/80 p-4 text-red-800 dark:border-red-800 dark:bg-red-900/30 dark:text-red-200"
         >
           <div class="flex items-center gap-2">
             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -143,7 +143,7 @@
         <!-- Loading State -->
         <div
           v-if="loading"
-          class="squircle overflow-hidden rounded-2xl border border-gray-200/60 bg-white/30 p-6 shadow-sm backdrop-blur-md dark:border-gray-800 dark:bg-gray-900/70"
+          class="squircle overflow-hidden rounded-2xl border border-gray-200/60 bg-white/30 p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900/70"
         >
           <div class="py-8">
             <div class="space-y-4">
@@ -280,10 +280,7 @@ const fetchMessages = async () => {
       pendingMessages.value = pending as Message[];
       approvedMessages.value = approved as Message[];
     } else {
-      error.value =
-        result.error?.message ||
-        result.description ||
-        "Failed to load messages";
+      error.value = result.error?.message || result.description || "Failed to load messages";
     }
   } catch {
     error.value = "Network error occurred";
@@ -306,10 +303,7 @@ const fetchComments = async () => {
       pendingComments.value = pending as Comment[];
       approvedComments.value = approved as Comment[];
     } else {
-      error.value =
-        result.error?.message ||
-        result.description ||
-        "Failed to load comments";
+      error.value = result.error?.message || result.description || "Failed to load comments";
     }
   } catch {
     error.value = "Network error occurred";
@@ -329,8 +323,7 @@ const handleApprove = async (itemId: string) => {
       await fetchComments();
     }
   } catch (err) {
-    if (err instanceof Error)
-      error.value = err.message || "Network error occurred";
+    if (err instanceof Error) error.value = err.message || "Network error occurred";
     else error.value = "Network error occurred";
   } finally {
     actionLoading.value = null;
@@ -348,8 +341,7 @@ const handleDelete = async (itemId: string) => {
       await fetchComments();
     }
   } catch (err) {
-    if (err instanceof Error)
-      error.value = err.message || "Network error occurred";
+    if (err instanceof Error) error.value = err.message || "Network error occurred";
     else error.value = "Network error occurred";
   } finally {
     actionLoading.value = null;

@@ -18,7 +18,7 @@
       >
         <div
           v-if="isUserMenuOpen"
-          class="squircle absolute top-16 right-0 z-9999 mt-2 w-auto border border-gray-200/60 bg-gray-50/70 shadow-lg backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-50/5"
+          class="absolute top-16 right-0 z-9999 mt-2 w-auto rounded-3xl border border-gray-200/60 bg-gray-50/70 shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-50/5"
         >
           <ol>
             <template v-if="auth.isAuthenticated">
@@ -60,7 +60,7 @@
                   @click="closeUserMenuImmediately"
                   class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
-                  <IconDocumentation class="h-4 w-4" />
+                  <IconDocumentation class="size-4" />
                   API Docs
                 </RouterLink>
               </li>

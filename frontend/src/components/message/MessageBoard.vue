@@ -82,16 +82,14 @@ onMounted(() => {
 
 <template>
   <div
-    class="mx-auto mt-12 mb-4 rounded-3xl bg-white/80 p-4 py-8 shadow-lg ring-1 ring-gray-900/5 backdrop-blur-sm hover:shadow-xl motion-safe:transition-shadow motion-safe:duration-300 dark:bg-gray-800/80"
+    class="mx-auto mt-12 mb-4 rounded-3xl bg-white/80 p-4 py-8 shadow-lg ring-1 ring-gray-900/5 hover:shadow-xl motion-safe:transition-shadow motion-safe:duration-300 dark:bg-gray-800/80"
   >
     <div class="mx-4 my-2">
       <h2
         class="flex items-center gap-3 font-serif text-2xl font-bold text-gray-800 dark:text-gray-100"
       >
         Message Board
-        <span
-          class="items-baseline text-sm text-gray-500 italic dark:text-gray-400"
-        >
+        <span class="items-baseline text-sm text-gray-500 italic dark:text-gray-400">
           Say hello now!
         </span>
         <span
@@ -177,11 +175,7 @@ onMounted(() => {
         </div>
       </form>
 
-      <div
-        v-if="loading"
-        role="status"
-        class="mt-6 text-center text-gray-500 dark:text-gray-400"
-      >
+      <div v-if="loading" role="status" class="mt-6 text-center text-gray-500 dark:text-gray-400">
         Loading messages...
       </div>
 

@@ -19,20 +19,20 @@ logger.add(
 )
 
 base = Path(__file__).parent.parent
-base = base.parent
+base: Path = base.parent
 
-log_path_env = os.getenv("LOG_PATH")
+log_path_env: str | None = os.getenv("LOG_PATH")
 if log_path_env:
     log_path = Path(log_path_env)
 else:
     log_dir = Path(os.getenv("LOG_DIR", base / "logs"))
-    log_path = log_dir / "app.log"
+    log_path: Path = log_dir / "app.log"
 
 with contextlib.suppress(FileNotFoundError):
     log_path.parent.mkdir(parents=True, exist_ok=True)
 
-info_log_path = log_path.with_stem(f"{log_path.stem}_info")
-error_log_path = log_path.with_stem(f"{log_path.stem}_error")
+info_log_path: Path = log_path.with_stem(f"{log_path.stem}_info")
+error_log_path: Path = log_path.with_stem(f"{log_path.stem}_error")
 
 # INFO <= 级别 < ERROR 写入 app_info.log
 logger.add(

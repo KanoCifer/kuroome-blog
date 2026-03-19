@@ -47,19 +47,13 @@ const goBack = () => {
 };
 
 const displayDate = computed(() => {
-  if (
-    props.publishedDate &&
-    props.updatedDate &&
-    props.updatedDate !== props.publishedDate
-  ) {
+  if (props.publishedDate && props.updatedDate && props.updatedDate !== props.publishedDate) {
     return formatDate(props.updatedDate);
   }
   return props.publishedDate ? formatDate(props.publishedDate) : "";
 });
 
-const formattedDate = computed(() =>
-  props.publishedDate ? formatDate(props.publishedDate) : "",
-);
+const formattedDate = computed(() => (props.publishedDate ? formatDate(props.publishedDate) : ""));
 </script>
 
 <template>
@@ -70,10 +64,7 @@ const formattedDate = computed(() =>
       :style="titleStyle"
     >
       <!-- Loading State -->
-      <div
-        v-if="isLoading"
-        class="flex min-h-[60vh] flex-col items-center justify-center"
-      >
+      <div v-if="isLoading" class="flex min-h-[60vh] flex-col items-center justify-center">
         <div
           class="h-12 w-12 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"
         ></div>
@@ -81,37 +72,22 @@ const formattedDate = computed(() =>
       </div>
 
       <div v-else>
-        <h1
-          class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl"
-        >
+        <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl">
           {{ title }}
         </h1>
         <!-- Author and Date Info -->
-        <div
-          class="flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400"
-        >
+        <div class="flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400">
           <div class="flex items-center gap-2">
             <div
               class="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-sky-600 text-lg font-bold text-white"
             >
-              {{
-                author?.charAt(0).toUpperCase() ||
-                authorInitial?.charAt(0).toUpperCase() ||
-                "K"
-              }}
+              {{ author?.charAt(0).toUpperCase() || authorInitial?.charAt(0).toUpperCase() || "K" }}
             </div>
-            <span class="font-medium text-gray-200"
-              >@{{ author || "Kurroome" }}</span
-            >
+            <span class="font-medium text-gray-200">@{{ author || "Kurroome" }}</span>
           </div>
           <span class="text-gray-50">·</span>
           <div class="flex items-center gap-1">
-            <svg
-              class="h-4 w-4 text-gray-50"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg class="h-4 w-4 text-gray-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -124,12 +100,7 @@ const formattedDate = computed(() =>
             </span>
           </div>
           <span v-if="showCategory && category" class="flex items-center gap-1">
-            <svg
-              class="h-4 w-4 text-gray-50"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg class="h-4 w-4 text-gray-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -153,7 +124,7 @@ const formattedDate = computed(() =>
       <!-- 背景层 -->
       <div
         :style="sectionStyle"
-        class="absolute inset-y-0 left-1/2 -z-5 -translate-x-1/2 rounded-t-[40px] bg-blue-50 backdrop-blur-sm dark:bg-slate-900"
+        class="absolute inset-y-0 left-1/2 -z-5 -translate-x-1/2 rounded-t-[40px] bg-blue-50 dark:bg-slate-900"
       />
 
       <div class="mx-auto mt-20 max-w-4xl">
@@ -223,9 +194,7 @@ const formattedDate = computed(() =>
               d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
             />
           </svg>
-          <p class="text-lg font-medium text-red-600 dark:text-red-400">
-            加载失败
-          </p>
+          <p class="text-lg font-medium text-red-600 dark:text-red-400">加载失败</p>
           <p class="mt-1 text-sm text-red-500">{{ errorMessage }}</p>
           <button
             class="mt-4 cursor-pointer rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"

@@ -6,6 +6,7 @@ from app.tasks.task import (
     save_to_mongo,
     send_bootstrap_emails,
     send_code,
+    send_feishu_message,
 )
 
 __all__ = [
@@ -17,4 +18,5 @@ __all__ = [
     "scheduler",
     "send_bootstrap_emails",
     "send_code",
+    "send_feishu_message",
 ]

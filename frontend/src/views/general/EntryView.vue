@@ -6,7 +6,7 @@
   >
     <!-- Theme Toggle - 只在入口页面显示 -->
     <div
-      class="squircle absolute top-4 right-4 z-50 rounded-2xl bg-amber-50 shadow-sm ring ring-amber-50/70 backdrop-blur-sm dark:bg-amber-900/80 dark:ring-amber-600"
+      class="squircle absolute top-4 right-4 z-50 rounded-2xl bg-amber-50 shadow-sm ring ring-amber-50/70 dark:bg-amber-900/80 dark:ring-amber-600"
     >
       <ThemeToggle />
     </div>

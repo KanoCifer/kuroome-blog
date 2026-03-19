@@ -30,7 +30,7 @@
       <div class="mx-auto max-w-6xl space-y-6 pt-24 pb-12">
         <!-- Action Bar -->
         <div
-          class="squircle relative z-10 flex flex-col items-center justify-between gap-4 border border-gray-200/60 bg-white/80 p-4 shadow-sm backdrop-blur-md sm:flex-row dark:border-gray-800 dark:bg-gray-900/70"
+          class="squircle relative z-10 flex flex-col items-center justify-between gap-4 border border-gray-200/60 bg-white/80 p-4 shadow-sm sm:flex-row dark:border-gray-800 dark:bg-gray-900/70"
         >
           <!-- Days Filter -->
           <div class="relative">
@@ -130,7 +130,7 @@
         <!-- Error Message -->
         <div
           v-if="error"
-          class="rounded-xl border border-red-200 bg-red-50/80 p-4 text-red-800 backdrop-blur-sm dark:border-red-800 dark:bg-red-900/30 dark:text-red-200"
+          class="rounded-xl border border-red-200 bg-red-50/80 p-4 text-red-800 dark:border-red-800 dark:bg-red-900/30 dark:text-red-200"
         >
           <div class="flex items-center gap-2">
             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -159,7 +159,7 @@
           <template v-else>
             <!-- Total Visits (PV) -->
             <div
-              class="group squircle squircle cursor-pointer overflow-hidden border border-gray-200/60 bg-white/30 p-5 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900/70"
+              class="group squircle squircle cursor-pointer overflow-hidden border border-gray-200/60 bg-white/30 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900/70"
             >
               <div class="mb-3 flex items-center gap-2">
                 <div
@@ -192,7 +192,7 @@
 
             <!-- Unique Visitors (UV) -->
             <div
-              class="group squircle squircle cursor-pointer overflow-hidden border border-gray-200/60 bg-white/30 p-5 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900/70"
+              class="group squircle squircle cursor-pointer overflow-hidden border border-gray-200/60 bg-white/30 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900/70"
             >
               <div class="mb-3 flex items-center gap-2">
                 <div
@@ -219,7 +219,7 @@
 
             <!-- Unique Visitor IDs -->
             <div
-              class="group squircle squircle cursor-pointer overflow-hidden border border-gray-200/60 bg-white/30 p-5 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900/70"
+              class="group squircle squircle cursor-pointer overflow-hidden border border-gray-200/60 bg-white/30 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900/70"
             >
               <div class="mb-3 flex items-center gap-2">
                 <div
@@ -246,7 +246,7 @@
 
             <!-- Avg Visits Per Day -->
             <div
-              class="group squircle squircle cursor-pointer overflow-hidden border border-gray-200/60 bg-white/30 p-5 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900/70"
+              class="group squircle squircle cursor-pointer overflow-hidden border border-gray-200/60 bg-white/30 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900/70"
             >
               <div class="mb-3 flex items-center gap-2">
                 <div
@@ -298,7 +298,7 @@
 
         <!-- User Login Logs Table -->
         <div
-          class="squircle squircle overflow-hidden border border-gray-200/60 bg-white/30 p-6 shadow-sm backdrop-blur-md dark:border-gray-800 dark:bg-gray-900/70"
+          class="squircle squircle overflow-hidden border border-gray-200/60 bg-white/30 p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900/70"
         >
           <h2
             class="mb-4 flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100"

@@ -37,7 +37,7 @@ from app.routers import (
     users,
     weread,
 )
-from app.tasks import send_bootstrap_emails
+from app.tasks import send_bootstrap_emails, send_feishu_message
 from app.utils.cache import close_cache_redis
 
 
@@ -64,7 +64,7 @@ async def lifespan(app: FastAPI):
     logger.debug(f"Settings:{get_settings().model_dump()}")
     logger.info("FastAPI started successfully.")
 
-    # 发送引导邮件
+    # 发送引导邮件和飞书消息
     admin_email: str = get_settings().ADMIN_EMAIL
     bootstrap_key: str = f"bootstrap_email_sent:{admin_email}"
     if app.state.redis is not None and get_settings().SEND_BOOT_EMAIL:
@@ -72,10 +72,12 @@ async def lifespan(app: FastAPI):
             name=bootstrap_key, value="1", ex=600, nx=True
         )
         if lock_acquired:
+            # 发送飞书消息
+            await send_feishu_message.kiq()
             await send_bootstrap_emails.kiq(admin_email=admin_email)
-            app_logger.info(f"引导邮件任务已添加到队列: {admin_email}")
+            app_logger.info("✅启动通知任务已添加到队列")
         else:
-            app_logger.info(f"引导邮件已在24小时内发送过，跳过: {admin_email}")
+            app_logger.info("✅引导邮件已发送")
 
     yield
 

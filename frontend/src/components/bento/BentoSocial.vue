@@ -7,7 +7,7 @@
       target="_blank"
       rel="noopener noreferrer"
       :aria-label="social.name"
-      class="group relative flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-white/50 bg-white/60 text-slate-500 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-orange-100 hover:bg-orange-50 hover:text-orange-600 hover:shadow-md dark:bg-slate-700"
+      class="group relative flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-white/50 bg-white/60 text-slate-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-orange-100 hover:bg-orange-50 hover:text-orange-600 hover:shadow-md dark:bg-slate-700"
     >
       <span
         class="absolute -top-10 scale-0 rounded-lg bg-slate-800 px-3 py-1 text-sm font-medium text-white opacity-0 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100"

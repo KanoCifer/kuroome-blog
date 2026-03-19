@@ -37,11 +37,9 @@ const handleDeleteMessage = (messageId: string) => {
   <div class="space-y-6">
     <!-- Pending Messages Section -->
     <div
-      class="rounded-3xl bg-white/80 p-6 shadow-xl ring-1 ring-gray-900/5 backdrop-blur-sm dark:bg-gray-800/80 dark:ring-white/10"
+      class="rounded-3xl bg-white/80 p-6 shadow-xl ring-1 ring-gray-900/5 dark:bg-gray-800/80 dark:ring-white/10"
     >
-      <h2
-        class="mb-6 flex items-center gap-2 text-xl font-bold text-gray-800 dark:text-gray-100"
-      >
+      <h2 class="mb-6 flex items-center gap-2 text-xl font-bold text-gray-800 dark:text-gray-100">
         <span
           class="flex h-6 w-6 items-center justify-center rounded-full bg-orange-500 text-xs text-white"
         >
@@ -102,13 +100,7 @@ const handleDeleteMessage = (messageId: string) => {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              <svg
-                v-else
-                class="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
+              <svg v-else class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -145,13 +137,7 @@ const handleDeleteMessage = (messageId: string) => {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              <svg
-                v-else
-                class="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
+              <svg v-else class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -165,23 +151,16 @@ const handleDeleteMessage = (messageId: string) => {
         </div>
       </div>
 
-      <div
-        v-else
-        class="rounded-xl bg-gray-50/80 p-8 text-center backdrop-blur-sm dark:bg-gray-700/50"
-      >
-        <p class="text-gray-500 dark:text-gray-400">
-          No pending messages to review.
-        </p>
+      <div v-else class="rounded-xl bg-gray-50/80 p-8 text-center dark:bg-gray-700/50">
+        <p class="text-gray-500 dark:text-gray-400">No pending messages to review.</p>
       </div>
     </div>
 
     <!-- Approved Messages Section -->
     <div
-      class="rounded-3xl bg-white/80 p-6 shadow-xl ring-1 ring-gray-900/5 backdrop-blur-sm dark:bg-gray-800/80 dark:ring-white/10"
+      class="rounded-3xl bg-white/80 p-6 shadow-xl ring-1 ring-gray-900/5 dark:bg-gray-800/80 dark:ring-white/10"
     >
-      <h2
-        class="mb-6 flex items-center gap-2 text-xl font-bold text-gray-800 dark:text-gray-100"
-      >
+      <h2 class="mb-6 flex items-center gap-2 text-xl font-bold text-gray-800 dark:text-gray-100">
         <span
           class="flex h-6 w-6 items-center justify-center rounded-full bg-green-500 text-xs text-white"
         >
@@ -241,13 +220,7 @@ const handleDeleteMessage = (messageId: string) => {
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               ></path>
             </svg>
-            <svg
-              v-else
-              class="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+            <svg v-else class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -260,13 +233,8 @@ const handleDeleteMessage = (messageId: string) => {
         </div>
       </div>
 
-      <div
-        v-else
-        class="rounded-xl bg-gray-50 p-8 text-center dark:bg-gray-700/30"
-      >
-        <p class="text-gray-500 dark:text-gray-400">
-          No approved messages yet.
-        </p>
+      <div v-else class="rounded-xl bg-gray-50 p-8 text-center dark:bg-gray-700/30">
+        <p class="text-gray-500 dark:text-gray-400">No approved messages yet.</p>
       </div>
     </div>
   </div>

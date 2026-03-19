@@ -28,6 +28,7 @@ from app.models.models import Category, User
 from app.schemas import VisitorData
 from app.schemas.response import APIResponse
 from app.schemas.schemas import BlogPostIn, BlogPostUpdate
+from app.tasks import send_feishu_message
 from app.utils import redis_cache
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -448,8 +449,10 @@ async def track_visitor(
 async def run_deployment() -> None:
     """异步执行部署脚本不阻塞HTTP请求"""
     try:
-        logger.info("Starting deployment process...")
+        logger.info("启动自动化部署...")
+        import time
 
+        start_time = time.time()
         # 部署脚本路径，根据你的实际情况修改
         deploy_script = "/home/kano/blog/backend/deploy.sh"
 
@@ -468,12 +471,12 @@ async def run_deployment() -> None:
         stdout, stderr = await process.communicate()
 
         if process.returncode == 0:
-            logger.info("Deployment completed successfully!")
-            logger.debug(f"Deploy output: {stdout.decode()}")
+            end_time: float = time.time()
+            elapsed_time: float = end_time - start_time
+            logger.info(f"✅自动化部署完成，耗时 {elapsed_time:.2f} 秒")
+            logger.debug(f"✅Deploy output: {stdout.decode()}")
         else:
-            logger.error(
-                f"Deployment failed with exit code {process.returncode}"
-            )
+            logger.error(f"❌自动化部署失败，退出码: {process.returncode}")
             logger.error(f"STDOUT: {stdout.decode()}")
             logger.error(f"STDERR: {stderr.decode()}")
 
@@ -490,7 +493,7 @@ async def webhook_deploy(
     Gitee Webhook 自动部署接口
     """
     # 从环境变量获取webhook密钥，需要在.env中配置
-    webhook_secret = get_settings().GITEE_WEBHOOK_SECRET
+    webhook_secret: str | None = get_settings().GITEE_WEBHOOK_SECRET
     if not webhook_secret:
         logger.error(
             "GITEE_WEBHOOK_SECRET is not set in environment variables"
@@ -557,9 +560,29 @@ async def webhook_deploy(
         f"Deployment triggered by webhook from {get_remote_address(request)}"
     )
 
-    # 使用asyncio.create_task在后台执行部署，不阻塞请求
-    asyncio.create_task(run_deployment())  # noqa: RUF006
-
-    return APIResponse.ok(
-        message="Deployment triggered successfully", data={"status": "pending"}
+    lock_acquired = await redis.set(
+        name="deploy_lock", value="1", ex=300, nx=True
     )
+    if not lock_acquired:
+        logger.info("Deployment already in progress, skipping")
+        return APIResponse.ok(
+            message="Deployment already in progress",
+            data={"status": "in_progress"},
+        )
+    try:
+        logger.info(
+            f"Deployment triggered by webhook from {get_remote_address(request)}"
+        )
+        await send_feishu_message.kiq("API服务正在部署中，请稍候...")
+        asyncio.create_task(run_deployment())  # noqa: RUF006
+        return APIResponse.ok(
+            message="Deployment triggered successfully",
+            data={"status": "pending"},
+        )
+    except Exception as e:
+        await redis.delete("deploy_lock")
+        logger.error(f"Failed to trigger deployment: {e!s}")
+        return APIResponse.error(
+            message="Failed to trigger deployment",
+            code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )

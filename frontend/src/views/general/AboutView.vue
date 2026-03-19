@@ -14,7 +14,7 @@ const AboutIMG = "/images/about.webp";
       class="mx-auto mt-36 flex min-h-full max-w-6xl flex-col items-center justify-center"
     >
       <div
-        class="squircle border border-gray-100 bg-white/70 p-8 shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-md max-sm:mx-2 md:p-12 dark:border-gray-700 dark:bg-gray-800/80"
+        class="squircle border border-gray-100 bg-white/70 p-8 shadow-sm transition-all duration-300 hover:shadow-md max-sm:mx-2 md:p-12 dark:border-gray-700 dark:bg-gray-800/80"
       >
         <div class="flex flex-col items-center gap-8 md:flex-row md:items-center md:gap-12">
           <div class="group relative shrink-0">

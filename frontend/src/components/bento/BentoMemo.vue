@@ -34,7 +34,7 @@ const clearMemo = () => {
   >
     <button
       @click="toggleMemo"
-      class="squircle flex w-auto cursor-pointer items-center justify-center border border-white/60 bg-gray-50/50 px-6 py-4 text-gray-700 shadow-sm ring ring-gray-50 backdrop-blur-sm transition-colors dark:border-gray-700 dark:bg-gray-800/80 dark:text-gray-50 dark:ring-gray-600"
+      class="squircle flex w-auto cursor-pointer items-center justify-center border border-white/60 bg-gray-50/50 px-6 py-4 text-gray-700 shadow-sm ring ring-gray-50 transition-colors dark:border-gray-700 dark:bg-gray-800/80 dark:text-gray-50 dark:ring-gray-600"
       title="备忘录"
     >
       <IconMemo class="mr-2 size-8" />
@@ -70,12 +70,7 @@ const clearMemo = () => {
               @click="closeMemo"
               class="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
             >
-              <svg
-                class="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -105,9 +100,7 @@ const clearMemo = () => {
             <div class="flex items-center justify-between">
               <span class="text-xs text-gray-500 dark:text-gray-400">
                 自动保存
-                <span v-if="memoText" class="ml-2"
-                  >{{ memoText.length }} 字</span
-                >
+                <span v-if="memoText" class="ml-2">{{ memoText.length }} 字</span>
               </span>
               <button
                 @click="clearMemo"

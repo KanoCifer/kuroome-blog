@@ -1,5 +1,6 @@
 from datetime import UTC, datetime
 
+import httpx
 from beanie import init_beanie
 from email_validator import EmailNotValidError, ValidatedEmail, validate_email
 from fastapi_mail import FastMail, MessageSchema, MessageType
@@ -216,3 +217,33 @@ async def save_cache_to_redis(
         await context.state.redis.set(key, value, ex=expire)
     except Exception as e:
         logger.error(f"❌Failed to save cache to Redis: {e!r}")
+
+
+class FeishuMessageContent(BaseModel):
+    """飞书消息内容模型"""
+
+    msg_type: str = "text"
+    content: dict
+
+
+@broker.task
+async def send_feishu_message(message: str | None = None):
+    """发送飞书消息"""
+    url: str = get_settings().FEISHU_WEBHOOK_URL
+    now: str = datetime.now().strftime(format="%Y-%m-%d %H:%M:%S")
+    if message is None:
+        message = f"KUROOME BLOG API 已成功启动！时间：{now}"
+    message = message.strip()
+    if not url:
+        return
+    payload = FeishuMessageContent(
+        msg_type="text",
+        content={"text": message},
+    )
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url, json=payload)
+            response.raise_for_status()
+            logger.info("飞书消息已发送")
+    except Exception as e:
+        logger.error(f"发送飞书消息失败: {e!s}")

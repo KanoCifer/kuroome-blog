@@ -32,11 +32,7 @@ const handleSubmit = async () => {
   isSubmitting.value = true;
 
   try {
-    await auth.login(
-      form.value.username,
-      form.value.password,
-      form.value.rememberMe,
-    );
+    await auth.login(form.value.username, form.value.password, form.value.rememberMe);
     const redirect = (route.query.redirect as string) || "/";
     router.push(redirect);
   } catch (err: unknown) {
@@ -57,9 +53,7 @@ const handlePasskeyLogin = async () => {
 
   try {
     // 获取认证选项
-    const optionsRes = await request.get(
-      "/auth/passkey/authentication-options",
-    );
+    const optionsRes = await request.get("/auth/passkey/authentication-options");
     const options = optionsRes.data.data;
 
     // 调用浏览器 Passkey 认证
@@ -98,7 +92,7 @@ const handleGitHubLogin = () => {
   <div class="snap-y snap-mandatory">
     <!-- 标题卡片 -->
     <div
-      class="squircle mx-auto mt-36 max-w-md bg-blue-50/50 px-12 py-14 shadow-2xl backdrop-blur-sm dark:bg-gray-800/50"
+      class="squircle mx-auto mt-36 max-w-md bg-blue-50/50 px-12 py-14 shadow-2xl dark:bg-gray-800/50"
     >
       <p
         class="flex items-end justify-center text-center font-serif text-2xl font-bold text-shadow-md dark:text-white"
@@ -119,9 +113,7 @@ const handleGitHubLogin = () => {
         </svg>
         Login
       </p>
-      <p
-        class="mb-12 text-center font-serif text-gray-500 italic dark:text-gray-400"
-      >
+      <p class="mb-12 text-center font-serif text-gray-500 italic dark:text-gray-400">
         Welcome back! Please enter your credentials to log in.
       </p>
       <!-- 登录表单 -->
@@ -135,17 +127,13 @@ const handleGitHubLogin = () => {
             placeholder="用户名"
             class="form-control my-4 w-full rounded-xl border border-gray-300 bg-gray-100/50 px-4 py-2 text-gray-900 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
           />
-          <span
-            v-if="errors.username"
-            class="mt-1 block text-sm text-red-600 dark:text-red-400"
-            >{{ errors.username }}</span
-          >
+          <span v-if="errors.username" class="mt-1 block text-sm text-red-600 dark:text-red-400">{{
+            errors.username
+          }}</span>
         </div>
 
         <!-- 密码 -->
-        <div
-          class="relative mt-4 transition-transform duration-200 focus-within:scale-[1.01]"
-        >
+        <div class="relative mt-4 transition-transform duration-200 focus-within:scale-[1.01]">
           <input
             v-model="form.password"
             :type="showPassword ? 'text' : 'password'"
@@ -195,11 +183,9 @@ const handleGitHubLogin = () => {
             </svg>
           </button>
 
-          <span
-            v-if="errors.password"
-            class="mt-1 block text-sm text-red-600 dark:text-red-400"
-            >{{ errors.password }}</span
-          >
+          <span v-if="errors.password" class="mt-1 block text-sm text-red-600 dark:text-red-400">{{
+            errors.password
+          }}</span>
         </div>
 
         <!-- 提交按钮和记住我 -->
@@ -214,11 +200,7 @@ const handleGitHubLogin = () => {
 
           <!-- Remember Me Checkbox -->
           <label class="group relative flex cursor-pointer">
-            <input
-              v-model="form.rememberMe"
-              type="checkbox"
-              class="peer sr-only"
-            />
+            <input v-model="form.rememberMe" type="checkbox" class="peer sr-only" />
             <div
               class="rounded-xl border-2 border-gray-100 bg-white px-3 py-2 shadow-sm transition-all duration-200 select-none group-active:scale-95 peer-checked:border-blue-500 peer-checked:bg-blue-50/50 peer-checked:shadow-blue-100/50 hover:border-blue-200 dark:border-gray-600 dark:bg-gray-700 dark:peer-checked:border-blue-500 dark:peer-checked:bg-blue-500/10 dark:peer-checked:shadow-none dark:hover:border-blue-500/50"
             >
@@ -239,10 +221,7 @@ const handleGitHubLogin = () => {
             :disabled="isPasskeySubmitting"
             class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-green-600 px-8 py-2.5 font-bold text-white shadow-lg shadow-green-500/30 transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-800"
           >
-            <span
-              v-if="isPasskeySubmitting"
-              class="flex items-center justify-center gap-2"
-            >
+            <span v-if="isPasskeySubmitting" class="flex items-center justify-center gap-2">
               <span
                 class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
               ></span>
@@ -278,10 +257,7 @@ const handleGitHubLogin = () => {
         <!-- 注册链接 -->
         <div class="mb-4 text-center text-gray-400 dark:text-gray-300">
           Don't have an account?
-          <RouterLink
-            to="/register"
-            class="underline transition duration-100 hover:text-blue-500"
-          >
+          <RouterLink to="/register" class="underline transition duration-100 hover:text-blue-500">
             Register here.
           </RouterLink>
         </div>

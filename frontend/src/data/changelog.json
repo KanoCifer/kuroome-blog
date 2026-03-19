@@ -1,5 +1,14 @@
 [
   {
+    "version": "2.3.6",
+    "date": "2026-03-20",
+    "title": "更新部分UI设计和功能优化",
+    "changes": [
+      { "type": "style", "content": "更新了部分UI设计，提升用户体验" },
+      { "type": "fix", "content": "修复了一些小bug" }
+    ]
+  },
+  {
     "version": "2.3.5",
     "date": "2026-03-17",
     "title": "新增CICD自动化部署",

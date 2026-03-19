@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen px-4 py-16">
     <div
-      class="mx-auto mt-8 max-w-2xl rounded-3xl border border-white/20 bg-white/40 p-10 shadow-2xl backdrop-blur-xl dark:border-gray-700/30 dark:bg-gray-900/40"
+      class="mx-auto mt-8 max-w-2xl rounded-3xl border border-white/20 bg-white/40 p-10 shadow-2xl dark:border-gray-700/30 dark:bg-gray-900/40"
       style="animation: fadeInUp 0.6s ease-out"
     >
       <!-- Header -->
@@ -53,12 +53,7 @@
             Importing Books...
           </span>
           <span v-else class="flex items-center justify-center gap-2">
-            <svg
-              class="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"

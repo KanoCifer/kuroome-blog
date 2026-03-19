@@ -41,7 +41,7 @@
           :href="site.url"
           target="_blank"
           rel="noopener noreferrer"
-          class="group squircle relative cursor-pointer overflow-hidden border border-gray-200/60 bg-white/30 p-6 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900/70"
+          class="group squircle relative cursor-pointer overflow-hidden border border-gray-200/60 bg-white/30 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900/70"
         >
           <div class="mb-4 flex items-start gap-4">
             <div
