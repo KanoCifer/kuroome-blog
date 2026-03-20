@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import hashlib
 import re
 from collections.abc import AsyncIterator
 
-from langchain.agents import create_agent
-from langchain_core.messages import AIMessageChunk, HumanMessage, SystemMessage
-from langchain_openai import ChatOpenAI
-from pydantic import BaseModel, Field, SecretStr
+from agno.agent import Agent, RunOutputEvent
+from agno.db.base import SessionType
+from agno.db.redis import RedisDb
+from agno.models.openai.like import OpenAILike
+from agno.tools.websearch import WebSearchTools
+from pydantic import BaseModel, Field
 
 from app.configs.config import settings
 from app.configs.logger import logger
@@ -24,22 +27,41 @@ class ArticleSummarizer:
         "如果原文包含代码、配置片段、命令或技术实现细节，必须在总结中单独提及其作用与关键点。"
         "输出为纯文本，不要使用 Markdown 标题，不要编造原文没有的信息。"
     )
+    _CHAT_SYSTEM_PROMPT = (
+        "你是一个擅长与用户讨论文章内容的中文助手。"
+        "用户已经收到了一篇文章的总结，现在想和你深入讨论。"
+        "请基于对话历史和文章内容，准确、简洁地回答用户的问题。"
+        "如果问题超出文章范围，请使用搜索工具。"
+        "输出为纯文本，不要使用 Markdown 标题。"
+    )
     _MAX_INPUT_CHARS = 128_000
+    DB = RedisDb(db_url="redis://localhost:6379/0")
 
     def __init__(self) -> None:
-        self._model = ChatOpenAI(
-            model="Ling-2.5-1T",
-            api_key=SecretStr(settings.API_KEY),
+        self._model = OpenAILike(
+            id="Ling-2.5-1T",
+            api_key=settings.API_KEY,
+            base_url="https://api.tbox.cn/api/llm/v1",
             temperature=1,
             timeout=60,
-            base_url="https://api.tbox.cn/api/llm/v1",
         )
 
-        self._agent = create_agent(
+        self._agent = Agent(
             model=self._model,
-            system_prompt=self._SYSTEM_PROMPT,
-            tools=[],
-            # 目前不使用工具，直接让模型输出总结结果
+            instructions=self._SYSTEM_PROMPT,
+            tools=[WebSearchTools(backend="bing")],
+            db=ArticleSummarizer.DB,
+            add_history_to_context=True,
+            num_history_runs=10,
+        )
+
+        self._chat_agent = Agent(
+            model=self._model,
+            instructions=self._CHAT_SYSTEM_PROMPT,
+            tools=[WebSearchTools(backend="bing")],
+            db=ArticleSummarizer.DB,
+            add_history_to_context=True,
+            num_history_runs=10,
         )
 
     def _build_user_prompt(
@@ -60,33 +82,195 @@ class ArticleSummarizer:
         text = re.sub(r"\s+", " ", text).strip()
         return text[: self._MAX_INPUT_CHARS]
 
-    async def summarize_article(
-        self, content: str, title: str | None = None
+    @staticmethod
+    def _hash_article(title: str | None, content: str) -> str:
+        text = f"{title or ''}:{content[:5000]}"
+        return hashlib.md5(text.encode()).hexdigest()[:16]
+
+    @staticmethod
+    def _article_session_id(
+        user_id: str, article_hash: str, prefix: str = "summary"
     ) -> str:
-        if not settings.API_KEY:
-            logger.error("AI 服务未配置 API_KEY")
-            raise RuntimeError("AI 服务未配置 API_KEY")
+        return f"{prefix}:{user_id}:{article_hash}"
 
-        normalized = self._normalize_content(content)
-        if not normalized:
-            raise ValueError("文章内容不能为空")
+    async def get_summary_session(
+        self, user_id: str, title: str | None, content: str
+    ) -> dict | None:
+        article_hash = self._hash_article(title, content)
+        session_id = self._article_session_id(user_id, article_hash, "summary")
+        try:
+            all_sessions = ArticleSummarizer.DB.get_sessions(
+                session_type=SessionType.AGENT
+            )
+            for session in all_sessions:
+                sid = (
+                    session.get("session_id")
+                    if isinstance(session, dict)
+                    else getattr(session, "session_id", None)
+                )
+                if sid != session_id:
+                    continue
+                runs = (
+                    session.get("runs", [])
+                    if isinstance(session, dict)
+                    else getattr(session, "runs", [])
+                )
+                if not runs:
+                    return None
+                last_run = runs[-1]
+                response = (
+                    last_run.get("content")
+                    if isinstance(last_run, dict)
+                    else getattr(last_run, "content", None)
+                    or getattr(last_run, "response", None)
+                )
+                if response:
+                    return {
+                        "session_id": session_id,
+                        "summary": response,
+                        "created_at": (
+                            session.get("created_at")
+                            if isinstance(session, dict)
+                            else getattr(session, "created_at", None)
+                        ),
+                        "updated_at": (
+                            session.get("updated_at")
+                            if isinstance(session, dict)
+                            else getattr(session, "updated_at", None)
+                        ),
+                    }
+            logger.debug(f"无缓存 session: {session_id}")
+        except Exception as e:
+            logger.warning(f"获取总结缓存失败: {e}")
+        return None
 
-        user_prompt = self._build_user_prompt(
-            normalized_content=normalized,
-            title=title,
-        )
+    async def get_chat_session(
+        self, user_id: str, title: str | None, content: str
+    ) -> dict | None:
+        article_hash = self._hash_article(title, content)
+        session_id = self._article_session_id(user_id, article_hash, "chat")
+        try:
+            all_sessions = ArticleSummarizer.DB.get_sessions(
+                session_type=SessionType.AGENT
+            )
+            for session in all_sessions:
+                sid = (
+                    session.get("session_id")
+                    if isinstance(session, dict)
+                    else getattr(session, "session_id", None)
+                )
+                if sid != session_id:
+                    continue
+                runs = (
+                    session.get("runs", [])
+                    if isinstance(session, dict)
+                    else getattr(session, "runs", [])
+                )
+                if not runs:
+                    return None
+                messages = []
+                for run in runs:
+                    msg = (
+                        run.get("message")
+                        if isinstance(run, dict)
+                        else getattr(run, "message", None)
+                        or getattr(run, "input", None)
+                    )
+                    resp = (
+                        run.get("content")
+                        if isinstance(run, dict)
+                        else getattr(run, "content", None)
+                        or getattr(run, "response", None)
+                    )
+                    if msg:
+                        messages.append({"role": "user", "content": msg})
+                    if resp:
+                        messages.append({"role": "assistant", "content": resp})
+                return {
+                    "session_id": session_id,
+                    "messages": messages,
+                    "created_at": (
+                        session.get("created_at")
+                        if isinstance(session, dict)
+                        else getattr(session, "created_at", None)
+                    ),
+                    "updated_at": (
+                        session.get("updated_at")
+                        if isinstance(session, dict)
+                        else getattr(session, "updated_at", None)
+                    ),
+                }
+            logger.debug(f"无对话缓存: {session_id}")
+        except Exception as e:
+            logger.warning(f"获取对话历史失败: {e}")
+        return None
 
-        result = await self._model.ainvoke(
-            [
-                SystemMessage(content=self._SYSTEM_PROMPT),
-                HumanMessage(content=user_prompt),
-            ],
-        )
-        output = (result.content or "").strip()  # type: ignore
-        if not output:
-            logger.error("AI 未返回有效总结")
-            raise RuntimeError("AI 未返回有效总结")
-        return output
+    async def get_user_sessions(self, user_id: str) -> list[dict]:
+        try:
+            all_sessions = ArticleSummarizer.DB.get_sessions(
+                session_type=SessionType.AGENT
+            )
+            user_sessions = []
+            for session in all_sessions:
+                session_user_id = (
+                    session.get("user_id")
+                    if isinstance(session, dict)
+                    else getattr(session, "user_id", None)
+                )
+                if session_user_id != user_id:
+                    continue
+                runs = (
+                    session.get("runs", [])
+                    if isinstance(session, dict)
+                    else getattr(session, "runs", [])
+                )
+                if not runs:
+                    continue
+                last_run = runs[-1]
+                last_msg = (
+                    last_run.get("message")
+                    if isinstance(last_run, dict)
+                    else getattr(last_run, "message", None)
+                )
+                last_resp = (
+                    last_run.get("response")
+                    if isinstance(last_run, dict)
+                    else getattr(last_run, "response", None)
+                    or getattr(last_run, "content", None)
+                )
+                session_id = (
+                    session.get("session_id")
+                    if isinstance(session, dict)
+                    else getattr(session, "session_id", None)
+                )
+                user_sessions.append(
+                    {
+                        "session_id": session_id,
+                        "user_id": user_id,
+                        "last_message": last_msg[:100] if last_msg else None,
+                        "last_response_preview": (
+                            last_resp[:200] if last_resp else None
+                        ),
+                        "run_count": len(runs),
+                        "created_at": (
+                            session.get("created_at")
+                            if isinstance(session, dict)
+                            else getattr(session, "created_at", None)
+                        ),
+                        "updated_at": (
+                            session.get("updated_at")
+                            if isinstance(session, dict)
+                            else getattr(session, "updated_at", None)
+                        ),
+                    }
+                )
+            user_sessions.sort(
+                key=lambda x: x.get("updated_at") or 0, reverse=True
+            )
+            return user_sessions
+        except Exception as e:
+            logger.error(f"获取用户 session 列表失败: {e}")
+            return []
 
     async def summarize_article_stream(
         self, content: str, title: str | None = None
@@ -103,43 +287,70 @@ class ArticleSummarizer:
             normalized_content=normalized,
             title=title,
         )
-        messages = [
-            SystemMessage(content=self._SYSTEM_PROMPT),
-            HumanMessage(content=user_prompt),
-        ]
 
-        async for chunk in self._model.astream(messages):
-            output = str(chunk.content or "")
-            if output:
-                yield output
+        async for event in self._agent.arun(user_prompt, stream=True):
+            if isinstance(event, RunOutputEvent) and event.content:
+                yield str(event.content)
 
     async def run_summarization_astream(
-        self, content: str, title: str | None = None
+        self, content: str, user_id: str, title: str | None = None
     ) -> AsyncIterator[str]:
-        # 使用 astream 替代 invoke
-        async for event in self._agent.astream(
-            {
-                "messages": [
-                    SystemMessage(content=self._SYSTEM_PROMPT),
-                    HumanMessage(
-                        content=self._build_user_prompt(
-                            normalized_content=self._normalize_content(
-                                content
-                            ),
-                            title=title,
-                        )
-                    ),
-                ]
-            },
-            stream_mode="messages",
-        ):
-            # event 是一个元组，包含 [message, metadata]
-            message, _ = event
+        if not settings.API_KEY:
+            logger.error("AI 服务未配置 API_KEY")
+            raise RuntimeError("AI 服务未配置 API_KEY")
 
-            # 只输出 AI 的内容块
-            if isinstance(message, AIMessageChunk) and message.content:
-                # 类型可能并非 str，强制转换并返回
-                yield str(message.content)
+        normalized = self._normalize_content(content)
+        if not normalized:
+            raise ValueError("文章内容不能为空")
+
+        user_prompt = self._build_user_prompt(
+            normalized_content=normalized,
+            title=title,
+        )
+
+        article_hash = self._hash_article(title, content)
+        session_id = self._article_session_id(user_id, article_hash, "summary")
+
+        async for event in self._agent.arun(
+            user_prompt, stream=True, user_id=user_id, session_id=session_id
+        ):
+            if isinstance(event, RunOutputEvent) and event.content:
+                yield str(event.content)
+
+    async def chat_stream(
+        self,
+        message: str,
+        user_id: str,
+        session_id: str,
+        article_content: str | None = None,
+        article_title: str | None = None,
+    ) -> AsyncIterator[str]:
+        if not settings.API_KEY:
+            logger.error("AI 服务未配置 API_KEY")
+            raise RuntimeError("AI 服务未配置 API_KEY")
+
+        if not message.strip():
+            raise ValueError("消息不能为空")
+
+        context_prefix = ""
+        if article_content:
+            normalized = self._normalize_content(article_content)
+            if normalized:
+                context_prefix = (
+                    f"[文章上下文]\n标题: {article_title or '无标题'}\n"
+                    f"内容摘要: {normalized[:2000]}...\n\n"
+                )
+
+        full_message = f"{context_prefix}用户问题: {message}"
+
+        async for event in self._chat_agent.arun(
+            full_message,
+            session_id=session_id,
+            user_id=user_id,
+            stream=True,
+        ):
+            if isinstance(event, RunOutputEvent) and event.content:
+                yield str(event.content)
 
 
 article_summarizer = ArticleSummarizer()

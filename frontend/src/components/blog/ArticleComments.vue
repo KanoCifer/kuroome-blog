@@ -66,7 +66,7 @@ const handleReply = async (commentId: string, body: string) => {
     } else {
       throw new Error(res.data.message || "提交评论失败");
     }
-  } catch (err: unknown) {
+  } catch (err) {
     console.error("提交回复失败:", err);
     const errorMsg =
       err instanceof Error ? err.message : "提交评论失败，请稍后重试";

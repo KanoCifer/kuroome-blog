@@ -1,5 +1,18 @@
 [
   {
+    "version": "2.3.8",
+    "date": "2026-03-20",
+    "title": "AI框架替换为Agno",
+    "changes": [
+      {
+        "type": "refactor",
+        "content": "将AI框架从原有的框架替换为Agno，提升AI功能的性能和稳定性"
+      },
+      { "type": "feat", "content": "新增TodoList页面，使用redis持久化" },
+      { "type": "fix", "content": "修复了一些小bug" }
+    ]
+  },
+  {
     "version": "2.3.6",
     "date": "2026-03-20",
     "title": "更新部分UI设计和功能优化",

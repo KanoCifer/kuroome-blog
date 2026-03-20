@@ -125,7 +125,9 @@
         class="h-14 w-14 rounded-full object-cover shadow-sm ring-4 ring-white/50 dark:ring-gray-700/50"
       />
       <div class="flex items-baseline gap-2">
-        <span class="font-serif text-2xl font-bold text-gray-800 dark:text-gray-100">
+        <span
+          class="font-serif text-2xl font-bold text-gray-800 dark:text-gray-100"
+        >
           {{ currentUserName }}
         </span>
         <ChevronDownIcon
@@ -136,7 +138,9 @@
     </div>
 
     <!-- 导航分类 -->
-    <div class="mb-4 px-3 text-sm font-bold tracking-wider text-gray-400 dark:text-gray-500">
+    <div
+      class="mb-4 px-3 text-sm font-bold tracking-wider text-gray-400 dark:text-gray-500"
+    >
       GENERAL
     </div>
 

@@ -6,11 +6,15 @@
       :style="titleStyle"
     >
       <div>
-        <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl">
+        <h1
+          class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl"
+        >
           {{ activeTab === "messages" ? "留言管理" : "评论管理" }}
         </h1>
         <!-- Description -->
-        <div class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400">
+        <div
+          class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400"
+        >
           <span
             class="inline-block rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400"
           >
@@ -44,7 +48,12 @@
                   : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800',
               ]"
             >
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                class="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -64,7 +73,12 @@
                   : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800',
               ]"
             >
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                class="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -280,7 +294,10 @@ const fetchMessages = async () => {
       pendingMessages.value = pending as Message[];
       approvedMessages.value = approved as Message[];
     } else {
-      error.value = result.error?.message || result.description || "Failed to load messages";
+      error.value =
+        result.error?.message ||
+        result.description ||
+        "Failed to load messages";
     }
   } catch {
     error.value = "Network error occurred";
@@ -303,7 +320,10 @@ const fetchComments = async () => {
       pendingComments.value = pending as Comment[];
       approvedComments.value = approved as Comment[];
     } else {
-      error.value = result.error?.message || result.description || "Failed to load comments";
+      error.value =
+        result.error?.message ||
+        result.description ||
+        "Failed to load comments";
     }
   } catch {
     error.value = "Network error occurred";
@@ -323,7 +343,8 @@ const handleApprove = async (itemId: string) => {
       await fetchComments();
     }
   } catch (err) {
-    if (err instanceof Error) error.value = err.message || "Network error occurred";
+    if (err instanceof Error)
+      error.value = err.message || "Network error occurred";
     else error.value = "Network error occurred";
   } finally {
     actionLoading.value = null;
@@ -341,7 +362,8 @@ const handleDelete = async (itemId: string) => {
       await fetchComments();
     }
   } catch (err) {
-    if (err instanceof Error) error.value = err.message || "Network error occurred";
+    if (err instanceof Error)
+      error.value = err.message || "Network error occurred";
     else error.value = "Network error occurred";
   } finally {
     actionLoading.value = null;

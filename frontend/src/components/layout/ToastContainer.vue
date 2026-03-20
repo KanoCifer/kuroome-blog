@@ -69,7 +69,8 @@ onUnmounted(() => {
         :key="t.id"
         :initial="{ opacity: 0, y: -40, scale: 0.9 }"
         :animate="{
-          opacity: toasts.length - 1 - i >= 3 ? 0 : 1 - (toasts.length - 1 - i) * 0.15,
+          opacity:
+            toasts.length - 1 - i >= 3 ? 0 : 1 - (toasts.length - 1 - i) * 0.15,
           y: (toasts.length - 1 - i) * 16,
           scale: 1 - (toasts.length - 1 - i) * 0.05,
           zIndex: i,
@@ -84,13 +85,16 @@ onUnmounted(() => {
       >
         <component
           v-if="
-            getIconForType(t.type) !== 'success-lottie' && getIconForType(t.type) !== 'error-lottie'
+            getIconForType(t.type) !== 'success-lottie' &&
+            getIconForType(t.type) !== 'error-lottie'
           "
           :is="getIconForType(t.type)"
           :class="['shrink-0', iconColorForType(t.type)]"
         />
         <Vue3Lottie
-          v-else-if="getIconForType(t.type) === 'success-lottie' && successAnimationData"
+          v-else-if="
+            getIconForType(t.type) === 'success-lottie' && successAnimationData
+          "
           :animationData="successAnimationData"
           :height="96"
           :width="96"
@@ -102,7 +106,9 @@ onUnmounted(() => {
           ref="lottieContainer"
         />
         <Vue3Lottie
-          v-else-if="getIconForType(t.type) === 'error-lottie' && errorAnimationData"
+          v-else-if="
+            getIconForType(t.type) === 'error-lottie' && errorAnimationData
+          "
           :animationData="errorAnimationData"
           :loop="false"
           :autoPlay="true"
@@ -114,7 +120,9 @@ onUnmounted(() => {
           ref="lottieContainer"
         />
 
-        <div class="flex-1 text-sm leading-snug font-semibold text-slate-600 dark:text-gray-100">
+        <div
+          class="flex-1 text-sm leading-snug font-semibold text-slate-600 dark:text-gray-100"
+        >
           {{ t.message }}
         </div>
         <button

@@ -242,7 +242,7 @@ async def send_feishu_message(message: str | None = None):
     )
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.post(url, json=payload)
+            response = await client.post(url, json=payload.model_dump())
             response.raise_for_status()
             logger.info("飞书消息已发送")
     except Exception as e:

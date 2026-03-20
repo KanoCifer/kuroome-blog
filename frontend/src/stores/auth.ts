@@ -72,7 +72,7 @@ export const useAuthStore = defineStore("auth", () => {
       const userData = res.data.data || null;
       user.value = userData;
       cacheUser(userData); // 缓存到 sessionStorage
-    } catch (err: unknown) {
+    } catch (err) {
       notifier.error("登陆过期，请重新登录！");
       user.value = null;
       cacheUser(null);
@@ -96,7 +96,7 @@ export const useAuthStore = defineStore("auth", () => {
       // 2. 缓存不存在，从后端获取
       await fetchUser();
       isHydrated.value = true;
-    } catch (error) {
+    } catch {
       notifier.error("认证初始化失败");
       user.value = null;
       cacheUser(null);
@@ -129,7 +129,7 @@ export const useAuthStore = defineStore("auth", () => {
       notifier.success("登录成功");
       router.back();
       return res.data;
-    } catch (err: unknown) {
+    } catch {
       notifier.error("登录失败");
     } finally {
       loading.value = false;
@@ -141,7 +141,7 @@ export const useAuthStore = defineStore("auth", () => {
     loading.value = true;
     try {
       await request.post("/auth/logout"); // 调用后端登出接口
-    } catch (err: unknown) {
+    } catch {
       // console.error("登出失败:", err);
       notifier.error("登出失败");
     } finally {

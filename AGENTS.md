@@ -1,6 +1,8 @@
 # AGENTS.md — 开发指南
 
 > 用户用中文提问时，请用中文回答
+> 编辑的文件存在时，请直接使用edit工具编辑，不要使用write工具
+> 任务完成后不要运行build工具
 
 ## 项目架构
 
@@ -67,7 +69,6 @@ npm run lint                            # ESLint + Oxlint 检查
 - **命名**: 函数/变量 camelCase, 组件/类型 PascalCase, 常量 UPPER_SNAKE_CASE
 - **样式**: Tailwind CSS utility classes, 避免自定义 CSS
 - **异步**: 使用 `async/await`, 避免 `.then()` 链
-- **类型断言**: 优先类型断言函数而非 `as Type`
 
 ## 关键位置
 

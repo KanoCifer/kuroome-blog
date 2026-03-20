@@ -37,6 +37,25 @@
           </span>
         </h3>
         <div class="flex items-center gap-2">
+          <RouterLink
+            to="/todos"
+            class="cursor-pointer rounded-xl p-1.5 text-emerald-600 outline-0 transition-colors hover:bg-emerald-100 dark:text-emerald-400 dark:hover:bg-emerald-900/40"
+            title="查看详情"
+          >
+            <svg
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </RouterLink>
           <span
             v-if="!isCollapsed"
             class="rounded-full border border-emerald-200 bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-700 dark:border-emerald-800/50 dark:bg-emerald-900/60 dark:text-emerald-300"
@@ -211,9 +230,11 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage } from "@vueuse/core";
+import { useTodoStore } from "@/stores/todos";
+import { storeToRefs } from "pinia";
 import { AnimatePresence, motion } from "motion-v";
-import { computed, ref } from "vue";
+import { ref } from "vue";
+import { RouterLink } from "vue-router";
 import BentoCard from "./BentoCard.vue";
 
 interface Props {
@@ -224,47 +245,27 @@ withDefaults(defineProps<Props>(), {
   title: "待办事项",
 });
 
-interface Todo {
-  id: string;
-  text: string;
-  completed: boolean;
-}
+const todoStore = useTodoStore();
+const { todos, completedCount, isCollapsed } = storeToRefs(todoStore);
 
 // 内部状态
 const newTodo = ref("");
-const todos = ref<Todo[]>([]);
-const isCollapsed = ref(false);
-
-useStorage("todos", todos);
-useStorage("todos-collapsed", isCollapsed);
-
-// 计算属性
-const completedCount = computed(
-  () => todos.value.filter((t) => t.completed).length,
-);
 
 // 方法
 const addTodo = () => {
   const text = newTodo.value.trim();
   if (!text) return;
 
-  todos.value.unshift({
-    id: crypto.randomUUID(),
-    text,
-    completed: false,
-  });
+  todoStore.addTodo({ text });
   newTodo.value = "";
 };
 
 const toggleTodo = (id: string) => {
-  const todo = todos.value.find((t) => t.id === id);
-  if (todo) {
-    todo.completed = !todo.completed;
-  }
+  todoStore.toggleTodo(id);
 };
 
 const removeTodo = (id: string) => {
-  todos.value = todos.value.filter((t) => t.id !== id);
+  todoStore.removeTodo(id);
 };
 </script>
 

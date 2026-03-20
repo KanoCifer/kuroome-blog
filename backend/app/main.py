@@ -34,6 +34,7 @@ from app.routers import (
     monitor,
     public,
     rss,
+    todos,
     users,
     weread,
 )
@@ -101,6 +102,7 @@ app.include_router(admin.router, prefix="/api/v1")
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(blog.router, prefix="/api/v1")
 app.include_router(books.router, prefix="/api/v1")
+app.include_router(todos.router, prefix="/api/v1")
 app.include_router(messages.router, prefix="/api/v1")
 app.include_router(public.router, prefix="/api/v1")
 app.include_router(users.router, prefix="/api/v1")

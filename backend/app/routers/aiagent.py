@@ -1,99 +1,52 @@
 from __future__ import annotations
 
-import hashlib
 import json
 
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
-from redis.asyncio import Redis as AsyncRedis
 
 from app.configs import logger
-from app.dependencies.redis import get_redis
-from app.schemas.response import APIResponse
-from app.tasks import save_cache_to_redis
-from app.utils.agent import article_summarizer
+from app.dependencies.auth import manager
+from app.utils.agent import ArticleSummarizer, article_summarizer
 
 router = APIRouter(prefix="/agent", tags=["agent"])
 
 
 class ArticleSummaryRequest(BaseModel):
+    """文章总结请求体"""
+
     content: str = Field(min_length=1, description="文章正文")
     title: str | None = Field(default=None, description="文章标题")
 
 
-def make_cache_key(content: str, title: str | None = None) -> str:
-    """根据内容生成唯一的缓存 key"""
-    text = f"{title or ''}:{content}"
-    hash_val = hashlib.md5(text.encode(), usedforsecurity=False).hexdigest()
-    return f"article_summary:{hash_val}"
+class ChatRequest(BaseModel):
+    """对话请求体"""
 
-
-@router.post("/summary")
-async def summary_article(
-    payload: ArticleSummaryRequest,
-    redis: AsyncRedis = Depends(get_redis),
-):
-    cache_key = make_cache_key(payload.content, payload.title)
-    cached_summary = await redis.get(cache_key)
-    if cached_summary:
-        return APIResponse.ok(
-            data={"summary": cached_summary},
-            message="文章总结（缓存）生成成功",
-        )
-    try:
-        summary = await article_summarizer.summarize_article(
-            content=payload.content,
-            title=payload.title,
-        )
-        await save_cache_to_redis.kiq(
-            cache_key,
-            summary,
-        )
-        return APIResponse.ok(
-            data={"summary": summary},
-            message="文章总结生成成功",
-        )
-    except ValueError as exc:
-        return APIResponse.error(message=str(exc), code=400)
-    except RuntimeError as exc:
-        return APIResponse.error(message=str(exc), code=503)
-    except Exception:
-        return APIResponse.error(message="文章总结失败,请稍后重试", code=500)
+    message: str = Field(min_length=1, description="用户消息")
+    session_id: str = Field(min_length=1, description="会话 ID")
+    article_content: str | None = Field(default=None, description="文章正文")
+    article_title: str | None = Field(default=None, description="文章标题")
 
 
 @router.post("/summary/stream")
 async def summary_article_stream(
-    payload: ArticleSummaryRequest,
-    redis: AsyncRedis = Depends(get_redis),
+    payload: ArticleSummaryRequest, user=Depends(manager)
 ):
-    cache_key = make_cache_key(payload.content, payload.title)
-    cached_summary = await redis.get(cache_key)
+    """文章总结 - 使用 Server-Sent Events (SSE) 实时返回总结结果"""
 
     async def event_generator():
-        if cached_summary:
-            data = {
-                "content": cached_summary,
-                "is_end": True,
-            }
-            yield f"data:{json.dumps(data, ensure_ascii=False)}\n\n"
-            yield f"data:{json.dumps({'content': '', 'is_end': True}, ensure_ascii=False)}\n\n"
-            # print(f"data:{json.dumps(data, ensure_ascii=False)}\n\n") 调试输出
-            return
-
-        full_summary = ""
         try:
             async for chunk in article_summarizer.run_summarization_astream(
                 content=payload.content,
                 title=payload.title,
+                user_id=str(user.id),
             ):
-                # chunk 类型可能包含列表/字典等，统一转换为字符串
                 chunk_str = str(chunk)
                 data = {
                     "content": chunk_str,
                     "is_end": False,
                 }
-                full_summary += chunk_str
                 yield f"data:{json.dumps(data, ensure_ascii=False)}\n\n"
 
             done = {
@@ -101,16 +54,6 @@ async def summary_article_stream(
                 "is_end": True,
             }
             yield f"data:{json.dumps(done, ensure_ascii=False)}\n\n"
-
-            if full_summary:
-                try:
-                    await save_cache_to_redis.kiq(
-                        cache_key,
-                        full_summary,
-                    )
-                except Exception as e:
-                    # 记录缓存保存失败的错误，但不影响主流程
-                    logger.error(f"⚠️ 保存总结到 Redis 失败: {e!r}")
         except ValueError as e:
             yield f"data:{json.dumps({'content': f'[ERROR] {e!r}', 'is_end': True}, ensure_ascii=False)}\n\n"
         except RuntimeError as e:
@@ -128,3 +71,110 @@ async def summary_article_stream(
             "X-Accel-Buffering": "no",
         },
     )
+
+
+@router.post("/chat/stream")
+async def chat_stream(payload: ChatRequest, user=Depends(manager)):
+    """对话接口 - 使用 Server-Sent Events (SSE) 实时返回对话结果"""
+
+    async def event_generator():
+        try:
+            async for chunk in article_summarizer.chat_stream(
+                message=payload.message,
+                session_id=payload.session_id,
+                user_id=str(user.id),
+                article_content=payload.article_content,
+                article_title=payload.article_title,
+            ):
+                chunk_str = str(chunk)
+                data = {
+                    "content": chunk_str,
+                    "is_end": False,
+                }
+                yield f"data:{json.dumps(data, ensure_ascii=False)}\n\n"
+
+            done = {
+                "content": "",
+                "is_end": True,
+            }
+            yield f"data:{json.dumps(done, ensure_ascii=False)}\n\n"
+        except ValueError as e:
+            yield f"data:{json.dumps({'content': f'[ERROR] {e!r}', 'is_end': True}, ensure_ascii=False)}\n\n"
+        except RuntimeError as e:
+            yield f"data:{json.dumps({'content': f'[ERROR] {e!r}', 'is_end': True}, ensure_ascii=False)}\n\n"
+        except Exception as e:
+            logger.error(f"❌ 对话失败: {e!r}")
+            yield f"data:{json.dumps({'content': '[ERROR] 对话失败,请稍后重试', 'is_end': True}, ensure_ascii=False)}\n\n"
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
+
+@router.get("/history")
+async def get_user_history(user=Depends(manager)):
+    """获取用户的所有会话历史"""
+    sessions = await article_summarizer.get_user_sessions(user_id=str(user.id))
+    return {"sessions": sessions}
+
+
+class HistoryRequest(BaseModel):
+    """缓存查询请求体 - 用于查询历史总结/对话缓存 (POST 代替 GET, 避免 URL 过长导致 431 错误)"""
+
+    article_content: str = Field(min_length=1, description="文章正文")
+    article_title: str | None = Field(default=None, description="文章标题")
+
+
+@router.post("/history/summary")
+async def get_cached_summary(payload: HistoryRequest, user=Depends(manager)):
+    """查询指定文章的历史总结缓存"""
+    result = await article_summarizer.get_summary_session(
+        user_id=str(user.id),
+        title=payload.article_title,
+        content=payload.article_content,
+    )
+    if result:
+        return {"cached": True, **result}
+    return {"cached": False}
+
+
+@router.post("/history/chat")
+async def get_cached_chat(payload: HistoryRequest, user=Depends(manager)):
+    """查询指定文章的历史对话缓存"""
+    result = await article_summarizer.get_chat_session(
+        user_id=str(user.id),
+        title=payload.article_title,
+        content=payload.article_content,
+    )
+    if result:
+        return {"cached": True, **result}
+    return {"cached": False}
+
+
+@router.get("/debug/sessions")
+async def debug_sessions():
+    from agno.db.base import SessionType
+
+    sessions = ArticleSummarizer.DB.get_sessions(
+        session_type=SessionType.AGENT
+    )
+    result = []
+    for s in sessions[:5]:
+        if isinstance(s, dict):
+            result.append(s)
+        else:
+            result.append(
+                {
+                    "session_id": getattr(s, "session_id", None),
+                    "user_id": getattr(s, "user_id", None),
+                    "run_count": len(getattr(s, "runs", []) or []),
+                    "created_at": getattr(s, "created_at", None),
+                }
+            )
+    return {"total": len(sessions), "sessions": result}

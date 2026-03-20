@@ -445,3 +445,36 @@ class RssMarkReadRequest(BaseModel):
     """Request to mark articles as read."""
 
     article_ids: list[str]
+
+
+# --- Todo Schemas ---
+
+
+class TodoIn(BaseModel):
+    text: str
+    description: str | None = None
+    dueDate: str | None = None  # ISO date string  # noqa: N815
+    priority: str = "medium"  # low, medium, high
+    category: str | None = None
+    completed: bool = False
+    id: str | None = None  # optional client-supplied id
+
+
+class TodoUpdate(BaseModel):
+    text: str | None = None
+    description: str | None = None
+    dueDate: str | None = None  # noqa: N815
+    priority: str | None = None
+    category: str | None = None
+    completed: bool | None = None
+
+
+class TodoOut(BaseModel):
+    id: str
+    text: str
+    completed: bool
+    createdAt: str  # noqa: N815
+    description: str | None = None
+    dueDate: str | None = None  # noqa: N815
+    priority: str = "medium"
+    category: str | None = None

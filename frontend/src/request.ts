@@ -3,8 +3,6 @@ import { useAuthStore } from "./stores/auth";
 import { isrefreshTokenRequest, refreshAccessToken } from "./utils/refresh";
 // keep latest CSRF token so it can be sent in headers
 let csrfFetchPromise: Promise<void> | null = null;
-// 跳转锁，防止多次重复跳转到登录页
-const isRedirectingToLogin = false;
 
 export interface ApiResponse<T = unknown> {
   status: "success" | "error";

@@ -20,7 +20,8 @@ watch(
       newPath.includes("/rss") ||
       newPath.includes("/websites") ||
       newPath.includes("/analytics") ||
-      newPath.includes("/messages");
+      newPath.includes("/messages") ||
+      newPath.includes("/todos");
   },
   { immediate: true },
 );
@@ -97,7 +98,11 @@ const isMobileDevice = ref<boolean>(false);
 // 处理窗口大小变化
 const handleResize = () => {
   isMobileDevice.value = window.innerWidth < 768;
-  if (isMobileDevice.value && !isMobileWarningVisible.value && !accpetedMobileWarning.value) {
+  if (
+    isMobileDevice.value &&
+    !isMobileWarningVisible.value &&
+    !accpetedMobileWarning.value
+  ) {
     isMobileWarningVisible.value = true;
   }
 };
@@ -111,13 +116,18 @@ const closeMobileWarning = () => {
 <template>
   <div class="relative isolate grid min-h-dvh grid-rows-[auto_1fr_auto]">
     <!-- 背景图 -->
-    <div class="pointer-events-none fixed inset-0 -z-10 bg-[url('/bg.jpg')] bg-cover blur-md"></div>
+    <div
+      class="pointer-events-none fixed inset-0 -z-10 bg-[url('/bg.jpg')] bg-cover blur-md"
+    ></div>
     <header>
       <div class="mx-auto mt-6">
         <Teleport to="body">
           <ToastContainer />
         </Teleport>
-        <BasicNav :isEntryView="isEntryView" :isHeaderVisible="isHeaderVisible" />
+        <BasicNav
+          :isEntryView="isEntryView"
+          :isHeaderVisible="isHeaderVisible"
+        />
       </div>
     </header>
 

@@ -4,12 +4,21 @@
       <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200">
         {{ monthLabel }}
       </h3>
-      <span class="text-sm text-slate-400 dark:text-slate-500">{{ yearLabel }}</span>
+      <span class="text-sm text-slate-400 dark:text-slate-500">{{
+        yearLabel
+      }}</span>
     </div>
 
     <!-- Weekday headers -->
-    <div class="mb-1 grid text-center" style="grid-template-columns: repeat(7, 1fr)">
-      <span v-for="day in weekdays" :key="day" class="py-1 text-xs font-medium text-slate-400">
+    <div
+      class="mb-1 grid text-center"
+      style="grid-template-columns: repeat(7, 1fr)"
+    >
+      <span
+        v-for="day in weekdays"
+        :key="day"
+        class="py-1 text-xs font-medium text-slate-400"
+      >
         {{ day }}
       </span>
     </div>

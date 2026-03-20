@@ -1,74 +1,145 @@
 <script setup lang="ts">
-import request, { fetchAndStoreCSRF } from "@/request";
+import { fetchAndStoreCSRF } from "@/request";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
-import type { ApiResponse } from "@/types";
 import { AnimatePresence, motion } from "motion-v";
-import { computed, onUnmounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+
 interface SummaryPayload {
   summary: string;
 }
 
-enum SummaryMode {
-  NORMAL = "normal",
-  STREAM = "stream",
+interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+interface ChatPayload {
+  reply: string;
+}
+
+enum CardMode {
+  SUMMARY = "summary",
+  CHAT = "chat",
 }
 
 const props = defineProps<{
   title?: string;
   content: string;
 }>();
+
 const auth = useAuthStore();
 const notifier = useNotificationStore();
+
+const cardMode = ref<CardMode>(CardMode.SUMMARY);
 const loading = ref<boolean>(false);
 const summary = ref<string>("");
 const hasGenerated = ref<boolean>(false);
 const errorMessage = ref<string>("");
-const mode = ref<SummaryMode>(SummaryMode.STREAM);
+
+const messages = ref<ChatMessage[]>([]);
+const chatInput = ref<string>("");
+const sessionId = ref<string>("");
+const messagesContainer = ref<HTMLElement | null>(null);
 
 const pureContent = computed(() =>
   props.content.replaceAll(/<[^>]+>/g, "").trim(),
 );
 
-const canSummarize = computed(() => {
-  return pureContent.value.length > 0 && !loading.value;
+const canSummarize = computed(
+  () => pureContent.value.length > 0 && !loading.value,
+);
+
+const canChat = computed(
+  () =>
+    hasGenerated.value && chatInput.value.trim().length > 0 && !loading.value,
+);
+
+/** 生成对话会话 ID（新对话或清空时使用） */
+function generateSessionId() {
+  return `summary_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+}
+
+/**
+ * 检查是否有已缓存的文章总结
+ * 使用 POST + JSON body 传递文章内容，避免 GET 查询参数过长导致 431 错误
+ * 页面加载时自动调用，命中缓存则直接显示历史总结
+ */
+async function checkCachedSummary() {
+  if (!auth.isAuthenticated || !pureContent.value) return;
+  try {
+    const res = await fetch("/api/v1/agent/history/summary", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        article_content: pureContent.value,
+        article_title: props.title || undefined,
+      }),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.cached && data.summary) {
+      summary.value = data.summary;
+      hasGenerated.value = true;
+    }
+  } catch {
+    // 缓存查询失败不影响正常使用，静默忽略
+  }
+}
+
+/**
+ * 加载历史对话记录
+ * 切换到对话模式时调用，恢复之前与 AI 的聊天上下文
+ * 同样使用 POST 避免 431 错误
+ */
+async function loadChatHistory() {
+  if (!auth.isAuthenticated || !pureContent.value) return;
+  try {
+    const res = await fetch("/api/v1/agent/history/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        article_content: pureContent.value,
+        article_title: props.title || undefined,
+      }),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.cached && data.messages?.length > 0) {
+      messages.value = data.messages;
+      sessionId.value = data.session_id;
+    }
+  } catch {
+    // 缓存查询失败不影响正常使用，静默忽略
+  }
+}
+
+onMounted(async () => {
+  await fetchAndStoreCSRF();
+  // 页面加载时自动检查是否有已缓存的总结
+  await checkCachedSummary();
 });
 
-// 普通生成总结的函数
-const generateSummary = async () => {
-  if (!canSummarize.value) {
-    notifier.error("文章内容为空，无法总结");
-    return;
-  }
-
-  loading.value = true;
-  errorMessage.value = "";
-
-  try {
-    const res = await request.post<ApiResponse<SummaryPayload>>(
-      "/agent/summary",
-      {
-        title: props.title || "",
-        content: pureContent.value,
-      },
-    );
-
-    if (res.data.status === "success" && res.data.data?.summary) {
-      summary.value = res.data.data.summary;
-      hasGenerated.value = true;
-      return;
+// 登录状态变化时重新检查缓存（兼容登录后切换回页面的场景）
+watch(
+  () => auth.isAuthenticated,
+  async (isAuth) => {
+    if (isAuth && !summary.value && !loading.value) {
+      await checkCachedSummary();
     }
-    throw new Error(res.data.message || "生成总结失败");
-  } catch (error: unknown) {
-    errorMessage.value =
-      error instanceof Error ? error.message : "生成总结失败，请稍后重试";
-    notifier.error(errorMessage.value);
-  } finally {
-    loading.value = false;
+  },
+);
+
+async function scrollToBottom() {
+  await nextTick();
+  if (messagesContainer.value) {
+    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
   }
-};
-// 流式生成总结的函数
-const generateSummaryStream = async () => {
+}
+
+async function generateSummaryStream() {
   if (!canSummarize.value) {
     notifier.error("文章内容为空，无法总结");
     return;
@@ -79,72 +150,47 @@ const generateSummaryStream = async () => {
   summary.value = "";
 
   try {
-    // ========== 第1步：发送请求，获取响应流 ==========
     const response = await fetch("/api/v1/agent/summary/stream", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include", // 携带 Cookie
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({
         title: props.title || "",
         content: pureContent.value,
       }),
     });
 
-    // 检查 HTTP 状态码是否正常
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
-    // ========== 第2步：从响应中获取流读取器 ==========
-    // response.body 是浏览器提供的 ReadableStream 对象
     const reader = response.body?.getReader();
-    if (!reader) {
-      throw new Error("无法读取响应流");
-    }
+    if (!reader) throw new Error("无法读取响应流");
 
-    // 创建文本解码器，用于将字节流转换为字符串
     const decoder = new TextDecoder("utf-8");
     let buffer = "";
 
-    // ========== 第3步：循环读取流数据 ==========
     while (true) {
       const { done, value } = await reader.read();
-
       if (done) break;
 
       buffer += decoder.decode(value, { stream: true });
+      const parts = buffer.split("\n\n");
+      buffer = parts.pop() || "";
 
-      const messages = buffer.split("\n\n");
-      buffer = messages.pop() || ""; // 最后一部分保留在缓冲区
-
-      for (const msg of messages) {
-        if (msg.trim() === "") continue; // 跳过空消息
-
-        // SSE 事件格式：data: {...}\n\n
-        if (!msg.startsWith("data:")) {
-          console.warn("未知消息格式：", msg);
-          continue;
-        }
-
-        const jsonStr = msg.replace(/^data:\s*/, "").trim(); // 去掉 "data:" 前缀
+      for (const part of parts) {
+        if (!part.trim() || !part.startsWith("data:")) continue;
+        const jsonStr = part.replace(/^data:\s*/, "").trim();
         if (jsonStr === "[DONE]") {
-          // 服务器表示总结完成了
           hasGenerated.value = true;
           break;
         }
-
         try {
           const data = JSON.parse(jsonStr);
-          if (data.content) {
-            summary.value += data.content;
-          }
-          if (data.is_end) {
-            hasGenerated.value = true;
-          }
-        } catch (e) {
-          console.warn("JSON 解析失败错误：", e);
+          if (data.content) summary.value += data.content;
+          if (data.is_end) hasGenerated.value = true;
+        } catch {
+          // ignore parse errors
         }
       }
     }
@@ -155,22 +201,130 @@ const generateSummaryStream = async () => {
   } finally {
     loading.value = false;
   }
-};
+}
 
-const onGenerate = async () => {
+async function sendChatMessage() {
+  if (!canChat.value) return;
+
+  const userMessage = chatInput.value.trim();
+  chatInput.value = "";
+
+  if (!sessionId.value) {
+    sessionId.value = generateSessionId();
+  }
+
+  messages.value.push({ role: "user", content: userMessage });
+  messages.value.push({ role: "assistant", content: "" });
+  await scrollToBottom();
+
+  loading.value = true;
+  errorMessage.value = "";
+
+  const assistantIdx = messages.value.length - 1;
+  const isFirstMessage =
+    messages.value.filter((m) => m.role === "user").length === 1;
+
+  try {
+    const body: Record<string, string> = {
+      message: userMessage,
+      session_id: sessionId.value,
+    };
+    if (isFirstMessage) {
+      body.article_content = pureContent.value;
+      body.article_title = props.title || "";
+    }
+
+    const response = await fetch("/api/v1/agent/chat/stream", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const reader = response.body?.getReader();
+    if (!reader) throw new Error("无法读取响应流");
+
+    const decoder = new TextDecoder("utf-8");
+    let buffer = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const parts = buffer.split("\n\n");
+      buffer = parts.pop() || "";
+
+      for (const part of parts) {
+        if (!part.trim() || !part.startsWith("data:")) continue;
+        const jsonStr = part.replace(/^data:\s*/, "").trim();
+        if (jsonStr === "[DONE]") break;
+        try {
+          const data = JSON.parse(jsonStr);
+          if (data.content) {
+            messages.value[assistantIdx].content += data.content;
+            await scrollToBottom();
+          }
+          if (data.is_end) break;
+        } catch {
+          // ignore parse errors
+        }
+      }
+    }
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : "对话失败，请稍后重试";
+    messages.value[assistantIdx].content = `[ERROR] ${msg}`;
+    notifier.error(msg);
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function onGenerate() {
   if (!auth.isAuthenticated) {
-    notifier.error("请先登录以使用AI总结功能");
+    notifier.error("请先登录以使用AI功能");
     return;
   }
   await fetchAndStoreCSRF();
-  if (mode.value === SummaryMode.STREAM) {
-    await generateSummaryStream();
+  await generateSummaryStream();
+}
+
+async function onSendChat() {
+  if (!auth.isAuthenticated) {
+    notifier.error("请先登录以使用AI功能");
     return;
   }
-  await generateSummary();
-};
+  await fetchAndStoreCSRF();
+  await sendChatMessage();
+}
 
-// 处理流光文字
+function onChatKeydown(e: KeyboardEvent) {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    onSendChat();
+  }
+}
+
+/** 切换到对话模式：加载历史对话或创建新会话 */
+async function switchToChat() {
+  cardMode.value = CardMode.CHAT;
+  if (!sessionId.value) {
+    await loadChatHistory();
+    if (!sessionId.value) {
+      sessionId.value = generateSessionId();
+    }
+  }
+}
+
+function clearChat() {
+  messages.value = [];
+  sessionId.value = generateSessionId();
+}
+
 const textShimmer = ref<string[]>([
   "正在分析文章结构...",
   "正在提取关键信息...",
@@ -184,23 +338,17 @@ watch(
     if (newVal) {
       textShimmerInterval = setInterval(() => {
         const first = textShimmer.value.shift();
-        if (first) {
-          textShimmer.value.push(first);
-        }
+        if (first) textShimmer.value.push(first);
       }, 2000);
-    } else {
-      if (textShimmerInterval) {
-        clearInterval(textShimmerInterval);
-        textShimmerInterval = null;
-      }
+    } else if (textShimmerInterval) {
+      clearInterval(textShimmerInterval);
+      textShimmerInterval = null;
     }
   },
 );
 
 onUnmounted(() => {
-  if (textShimmerInterval) {
-    clearInterval(textShimmerInterval);
-  }
+  if (textShimmerInterval) clearInterval(textShimmerInterval);
 });
 </script>
 
@@ -211,7 +359,8 @@ onUnmounted(() => {
   >
     <div class="mb-3 flex items-center justify-between gap-3">
       <h3 class="text-base font-semibold text-blue-900 dark:text-blue-100">
-        AI 文章总结
+        <template v-if="cardMode === CardMode.SUMMARY"> AI 文章总结 </template>
+        <template v-else> AI 对话 </template>
         <AnimatePresence mode="wait">
           <motion.span
             v-if="loading"
@@ -230,28 +379,29 @@ onUnmounted(() => {
         <button
           class="cursor-pointer rounded-md px-2 py-1 text-xs"
           :class="
-            mode === SummaryMode.STREAM
+            cardMode === CardMode.SUMMARY
               ? 'bg-blue-600 text-white'
               : 'bg-blue-100 text-blue-700 dark:bg-slate-700 dark:text-slate-200'
           "
           :disabled="loading"
-          @click="mode = SummaryMode.STREAM"
+          @click="cardMode = CardMode.SUMMARY"
         >
-          流式
+          总结
         </button>
         <button
           class="cursor-pointer rounded-md px-2 py-1 text-xs"
           :class="
-            mode === SummaryMode.NORMAL
+            cardMode === CardMode.CHAT
               ? 'bg-blue-600 text-white'
               : 'bg-blue-100 text-blue-700 dark:bg-slate-700 dark:text-slate-200'
           "
           :disabled="loading"
-          @click="mode = SummaryMode.NORMAL"
+          @click="switchToChat"
         >
-          普通
+          对话
         </button>
         <button
+          v-if="cardMode === CardMode.SUMMARY"
           class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 dark:disabled:bg-slate-600"
           :disabled="!canSummarize"
           @click="onGenerate"
@@ -278,6 +428,14 @@ onUnmounted(() => {
           </svg>
           {{ loading ? "总结中..." : hasGenerated ? "重新总结" : "生成总结" }}
         </button>
+        <button
+          v-if="cardMode === CardMode.CHAT && messages.length > 0"
+          class="cursor-pointer rounded-md px-2 py-1 text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+          :disabled="loading"
+          @click="clearChat"
+        >
+          清空
+        </button>
       </div>
     </div>
 
@@ -285,27 +443,123 @@ onUnmounted(() => {
       {{ errorMessage }}
     </p>
 
-    <Transition name="summary-fade" mode="out-in">
-      <p
-        v-if="summary"
-        key="result"
-        class="text-sm leading-7 whitespace-pre-line text-slate-700 dark:text-slate-200"
-      >
-        {{ summary
-        }}<span
-          v-if="loading && mode === 'stream'"
-          class="animate-breathe ml-0.5"
-          >|</span
+    <template v-if="cardMode === CardMode.SUMMARY">
+      <Transition name="summary-fade" mode="out-in">
+        <p
+          v-if="summary"
+          key="result"
+          class="text-sm leading-7 whitespace-pre-line text-slate-700 dark:text-slate-200"
         >
-      </p>
-      <p
-        v-else
-        key="placeholder"
+          {{ summary
+          }}<span v-if="loading" class="animate-breathe ml-0.5">|</span>
+        </p>
+        <p
+          v-else
+          key="placeholder"
+          class="text-sm text-slate-500 dark:text-slate-400"
+        >
+          点击"生成总结"，快速提炼当前文章重点。
+        </p>
+      </Transition>
+    </template>
+
+    <template v-else>
+      <div
+        v-if="!hasGenerated"
         class="text-sm text-slate-500 dark:text-slate-400"
       >
-        点击“生成总结”，快速提炼当前文章重点。
-      </p>
-    </Transition>
+        请先生成文章总结，再开始对话。
+      </div>
+      <template v-else>
+        <div
+          ref="messagesContainer"
+          class="mb-1 max-h-80 space-y-3 overflow-y-auto pr-1"
+        >
+          <div
+            v-for="(msg, idx) in messages"
+            :key="idx"
+            class="flex"
+            :class="msg.role === 'user' ? 'justify-end' : 'justify-start'"
+          >
+            <div
+              class="max-w-[85%] rounded-xl px-3 py-2 text-sm leading-6 whitespace-pre-line"
+              :class="
+                msg.role === 'user'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white text-slate-700 shadow-sm dark:bg-slate-700 dark:text-slate-200'
+              "
+            >
+              <template v-if="msg.content">
+                {{ msg.content
+                }}<span
+                  v-if="
+                    loading &&
+                    idx === messages.length - 1 &&
+                    msg.role === 'assistant'
+                  "
+                  class="animate-breathe ml-0.5"
+                  >|</span
+                >
+              </template>
+              <template v-else-if="loading && idx === messages.length - 1">
+                <span class="animate-pulse text-slate-400">思考中...</span>
+              </template>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3 flex items-center gap-2">
+          <input
+            v-model="chatInput"
+            type="text"
+            placeholder="继续提问..."
+            class="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:placeholder-slate-400 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+            :disabled="loading"
+            @keydown="onChatKeydown"
+          />
+          <button
+            class="inline-flex cursor-pointer items-center justify-center rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 dark:disabled:bg-slate-600"
+            :disabled="!canChat"
+            @click="onSendChat"
+          >
+            <svg
+              v-if="loading"
+              class="h-4 w-4 animate-spin"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              />
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+              />
+            </svg>
+            <svg
+              v-else
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M5 12h14M12 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+        </div>
+      </template>
+    </template>
   </section>
 </template>
 
@@ -337,17 +591,6 @@ onUnmounted(() => {
 .summary-fade-leave-to {
   opacity: 0;
   transform: translateY(4px);
-}
-
-@keyframes caret-blink {
-  0%,
-  49% {
-    opacity: 1;
-  }
-  50%,
-  100% {
-    opacity: 0;
-  }
 }
 
 @keyframes card-breathe {

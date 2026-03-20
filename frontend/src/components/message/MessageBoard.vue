@@ -89,7 +89,9 @@ onMounted(() => {
         class="flex items-center gap-3 font-serif text-2xl font-bold text-gray-800 dark:text-gray-100"
       >
         Message Board
-        <span class="items-baseline text-sm text-gray-500 italic dark:text-gray-400">
+        <span
+          class="items-baseline text-sm text-gray-500 italic dark:text-gray-400"
+        >
           Say hello now!
         </span>
         <span
@@ -175,7 +177,11 @@ onMounted(() => {
         </div>
       </form>
 
-      <div v-if="loading" role="status" class="mt-6 text-center text-gray-500 dark:text-gray-400">
+      <div
+        v-if="loading"
+        role="status"
+        class="mt-6 text-center text-gray-500 dark:text-gray-400"
+      >
         Loading messages...
       </div>
 
