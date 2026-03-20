@@ -46,6 +46,7 @@ dependencies = [
     "loguru>=0.7.3",
     "agno>=2.5.10",
     "ddgs>=9.11.4",
+    "openai>=2.29.0",
 ]
 
 [tool.setuptools.packages.find]

@@ -6,15 +6,11 @@
       :style="titleStyle"
     >
       <div>
-        <h1
-          class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl"
-        >
+        <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl">
           Analytics Dashboard
         </h1>
         <!-- Admin Badge and Description -->
-        <div
-          class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400"
-        >
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400">
           <span
             class="inline-block rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400"
           >
@@ -169,12 +165,7 @@
                 <div
                   class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
                 >
-                  <svg
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -189,17 +180,14 @@
                     />
                   </svg>
                 </div>
-                <span
-                  class="text-sm font-medium text-gray-500 dark:text-gray-400"
+                <span class="text-sm font-medium text-gray-500 dark:text-gray-400"
                   >Total Visits</span
                 >
               </div>
               <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">
                 {{ formatNumber(overviewData?.total_visits ?? 0) }}
               </p>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                Page Views
-              </p>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Page Views</p>
             </div>
 
             <!-- Unique Visitors (UV) -->
@@ -210,12 +198,7 @@
                 <div
                   class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
                 >
-                  <svg
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -224,17 +207,14 @@
                     />
                   </svg>
                 </div>
-                <span
-                  class="text-sm font-medium text-gray-500 dark:text-gray-400"
+                <span class="text-sm font-medium text-gray-500 dark:text-gray-400"
                   >Unique Visitors</span
                 >
               </div>
               <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">
                 {{ formatNumber(overviewData?.unique_visitors ?? 0) }}
               </p>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                By IP address
-              </p>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">By IP address</p>
             </div>
 
             <!-- Unique Visitor IDs -->
@@ -245,12 +225,7 @@
                 <div
                   class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
                 >
-                  <svg
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -259,17 +234,14 @@
                     />
                   </svg>
                 </div>
-                <span
-                  class="text-sm font-medium text-gray-500 dark:text-gray-400"
+                <span class="text-sm font-medium text-gray-500 dark:text-gray-400"
                   >Visitor IDs</span
                 >
               </div>
               <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">
                 {{ formatNumber(overviewData?.unique_visitor_ids ?? 0) }}
               </p>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                By visitor ID
-              </p>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">By visitor ID</p>
             </div>
 
             <!-- Avg Visits Per Day -->
@@ -280,12 +252,7 @@
                 <div
                   class="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400"
                 >
-                  <svg
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -294,10 +261,7 @@
                     />
                   </svg>
                 </div>
-                <span
-                  class="text-sm font-medium text-gray-500 dark:text-gray-400"
-                  >Avg/Day</span
-                >
+                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Avg/Day</span>
               </div>
               <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">
                 {{ avgVisitsPerDay }}
@@ -321,11 +285,7 @@
 
         <!-- Device & Browser Analytics Section -->
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <OsCharts
-            class="squircle"
-            :loading="loading"
-            :os-stats="overviewData?.os_stats ?? []"
-          />
+          <OsCharts class="squircle" :loading="loading" :os-stats="overviewData?.os_stats ?? []" />
           <BrowserAnalytics
             class="squircle"
             :loading="loading"
@@ -334,11 +294,7 @@
         </div>
 
         <!-- Server Monitoring Section -->
-        <ServerMonitor
-          custom-class="squircle"
-          ref="serverMonitorRef"
-          :auto-start="true"
-        />
+        <ServerMonitor custom-class="squircle" ref="serverMonitorRef" :auto-start="true" />
 
         <!-- User Login Logs Table -->
         <div
@@ -347,7 +303,7 @@
           <h2
             class="mb-4 flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100"
           >
-            <icon-user class="inline-block size-auto" />
+            <icon-user class="inline-block size-4" />
             User Login Logs
           </h2>
 
@@ -416,9 +372,7 @@
                         <p class="font-medium text-gray-900 dark:text-gray-100">
                           {{ log.name || log.username }}
                         </p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">
-                          @{{ log.username }}
-                        </p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">@{{ log.username }}</p>
                       </div>
                     </div>
                   </td>
@@ -435,14 +389,10 @@
                   <td class="py-4 text-gray-600 dark:text-gray-300">
                     {{ formatDateTime(log.current_login_at) }}
                   </td>
-                  <td
-                    class="py-4 font-mono text-xs text-gray-500 dark:text-gray-400"
-                  >
+                  <td class="py-4 font-mono text-xs text-gray-500 dark:text-gray-400">
                     {{ log.last_login_ip || "-" }}
                   </td>
-                  <td
-                    class="py-4 font-mono text-xs text-gray-500 dark:text-gray-400"
-                  >
+                  <td class="py-4 font-mono text-xs text-gray-500 dark:text-gray-400">
                     {{ log.current_login_ip || "-" }}
                   </td>
                   <td>
@@ -465,12 +415,7 @@
             <p class="text-sm text-gray-500 dark:text-gray-400">
               Showing
               {{ (loginLogsData.page - 1) * loginLogsData.page_size + 1 }} to
-              {{
-                Math.min(
-                  loginLogsData.page * loginLogsData.page_size,
-                  loginLogsData.total,
-                )
-              }}
+              {{ Math.min(loginLogsData.page * loginLogsData.page_size, loginLogsData.total) }}
               of {{ loginLogsData.total }} results
             </p>
             <div class="flex gap-2">

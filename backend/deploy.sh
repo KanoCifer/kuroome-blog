@@ -9,6 +9,7 @@ nvm use 24
 
 
 cd /home/kano/blog || exit 1
+git checkout .
 git pull
 
 cd backend || exit 1
