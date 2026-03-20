@@ -85,7 +85,7 @@ let markerInstances: AMapMarkerInstance[] = [];
 
 const fetchSecurityKey = async (): Promise<string> => {
   try {
-    const response = await request.get("/public/amap/security-key");
+    const response = await request.get("/amap/security-key");
     const encodedKey = response.data?.data?.securityJsCode || "";
 
     // Decode base64 encoded key
