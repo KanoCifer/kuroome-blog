@@ -14,7 +14,7 @@
     "lint:oxlint": "oxlint src --fix",
     "lint:eslint": "eslint src . --fix --cache",
     "format": "prettier --write --experimental-cli src/",
-    "build:css": "tailwindcss -i ./src/assets/base.css -o ./src/assets/main.css",
+    "build:css": "tailwindcss -i ./src/assets/base.css -o ./src/assets/main.css --minify",
     "watch:css": "tailwindcss -i ./src/assets/base.css -o ./src/assets/main.css --watch",
     "preinstall": "npx only-allow pnpm"
   },

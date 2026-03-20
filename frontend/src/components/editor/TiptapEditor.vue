@@ -816,7 +816,7 @@ onBeforeUnmount(() => {
   }
 
   p {
-    @apply leading-relaxed;
+    line-height: 1.625;
   }
 
   img {
@@ -876,12 +876,30 @@ onBeforeUnmount(() => {
 
   /* 代码块样式 */
   pre {
-    @apply rounded-2xl bg-gray-100 p-4 text-sm dark:bg-gray-800;
+    border-radius: 1rem;
+    background-color: rgb(243 244 246);
+    padding: 1rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  .dark pre {
+    background-color: rgb(31 41 55);
   }
 
   /* 引用样式 */
   blockquote {
-    @apply rounded-r-xl border-l-4 border-blue-500 bg-blue-50 p-4 dark:border-blue-400 dark:bg-blue-900/20;
+    border-top-right-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+    border-left-width: 4px;
+    border-color: rgb(59 130 246);
+    background-color: rgb(239 246 255);
+    padding: 1rem;
+  }
+
+  .dark blockquote {
+    border-color: rgb(96 165 250);
+    background-color: rgb(30 58 138 / 0.2);
   }
 }
 
@@ -934,19 +952,19 @@ onBeforeUnmount(() => {
 }
 
 /* 编辑器内容块样式增强 */
-.tiptap :deep(h1),
-.tiptap :deep(h2),
-.tiptap :deep(h3),
-.tiptap :deep(h4) {
+.tiptap h1,
+.tiptap h2,
+.tiptap h3,
+.tiptap h4 {
   position: relative;
   font-weight: 700;
   scroll-margin-top: 2rem;
 }
 
-.tiptap :deep(h1)::before,
-.tiptap :deep(h2)::before,
-.tiptap :deep(h3)::before,
-.tiptap :deep(h4)::before {
+.tiptap h1::before,
+.tiptap h2::before,
+.tiptap h3::before,
+.tiptap h4::before {
   content: "";
   position: absolute;
   left: -1.25rem;
@@ -959,36 +977,36 @@ onBeforeUnmount(() => {
   transition: all 0.2s ease;
 }
 
-.tiptap :deep(h1:hover::before),
-.tiptap :deep(h2:hover::before),
-.tiptap :deep(h3:hover::before),
-.tiptap :deep(h4:hover::before) {
+.tiptap h1:hover::before,
+.tiptap h2:hover::before,
+.tiptap h3:hover::before,
+.tiptap h4:hover::before {
   opacity: 1;
   height: 70%;
 }
 
-.tiptap :deep(h1) {
+.tiptap h1 {
   font-size: 2rem;
   line-height: 2.5rem;
   margin-top: 2rem;
   margin-bottom: 1rem;
 }
 
-.tiptap :deep(h2) {
+.tiptap h2 {
   font-size: 1.5rem;
   line-height: 2rem;
   margin-top: 1.75rem;
   margin-bottom: 0.75rem;
 }
 
-.tiptap :deep(h3) {
+.tiptap h3 {
   font-size: 1.25rem;
   line-height: 1.75rem;
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
 }
 
-.tiptap :deep(h4) {
+.tiptap h4 {
   font-size: 1.125rem;
   line-height: 1.5rem;
   margin-top: 1.25rem;
@@ -996,33 +1014,54 @@ onBeforeUnmount(() => {
 }
 
 /* 列表样式 */
-.tiptap :deep(ul),
-.tiptap :deep(ol) {
+.tiptap ul,
+.tiptap ol {
   padding-left: 1.5rem;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
-.tiptap :deep(li) {
+.tiptap li {
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
 }
 
 /* 表格样式 */
-.tiptap :deep(table) {
-  @apply w-full border-collapse overflow-hidden rounded-xl shadow-sm;
+.tiptap table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
-.tiptap :deep(th),
-.tiptap :deep(td) {
-  @apply border border-gray-200 px-4 py-2 dark:border-gray-700;
+.tiptap th,
+.tiptap td {
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(229 231 235);
+  padding: 0.5rem 1rem;
 }
 
-.tiptap :deep(th) {
-  @apply bg-gray-100 font-semibold dark:bg-gray-800;
+.dark .tiptap th,
+.dark .tiptap td {
+  border-color: rgb(55 65 81);
 }
 
-.tiptap :deep(tr:nth-child(even)) {
-  @apply bg-gray-50 dark:bg-gray-900;
+.tiptap th {
+  background-color: rgb(243 244 246);
+  font-weight: 600;
+}
+
+.dark .tiptap th {
+  background-color: rgb(31 41 55);
+}
+
+.tiptap tr:nth-child(even) {
+  background-color: rgb(249 250 251);
+}
+
+.dark .tiptap tr:nth-child(even) {
+  background-color: rgb(17 24 39);
 }
 </style>
