@@ -72,7 +72,7 @@ export const useAuthStore = defineStore("auth", () => {
       const userData = res.data.data || null;
       user.value = userData;
       cacheUser(userData); // 缓存到 sessionStorage
-    } catch (err) {
+    } catch {
       notifier.error("登陆过期，请重新登录！");
       user.value = null;
       cacheUser(null);

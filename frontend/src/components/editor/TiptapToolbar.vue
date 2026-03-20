@@ -11,7 +11,6 @@ const props = defineProps<Props>();
 // 菜单状态
 const tableMenuOpen = ref(false);
 const headingMenuOpen = ref(false);
-const insertMenuOpen = ref(false);
 const toolbarCollapsed = ref(false);
 
 // 计算当前选中的标题类型
@@ -25,11 +24,7 @@ const currentHeading = computed(() => {
 
 // 表格操作
 const insertTable = (rows: number, cols: number) => {
-  props.editor
-    .chain()
-    .focus()
-    .insertTable({ rows, cols, withHeaderRow: true })
-    .run();
+  props.editor.chain().focus().insertTable({ rows, cols, withHeaderRow: true }).run();
   tableMenuOpen.value = false;
 };
 
@@ -41,12 +36,7 @@ const setLink = () => {
   if (url === "") {
     props.editor.chain().focus().extendMarkRange("link").unsetLink().run();
   } else {
-    props.editor
-      .chain()
-      .focus()
-      .extendMarkRange("link")
-      .setLink({ href: url })
-      .run();
+    props.editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   }
 };
 
@@ -205,12 +195,7 @@ const shortcuts = {
             class="toolbar-btn flex items-center gap-1 px-2 py-1 text-xs font-medium"
             title="Text Style"
           >
-            <span
-              :class="[
-                currentHeading !== 'P' ? 'font-bold' : '',
-                'min-w-[20px] text-center',
-              ]"
-            >
+            <span :class="[currentHeading !== 'P' ? 'font-bold' : '', 'min-w-[20px] text-center']">
               {{ currentHeading }}
             </span>
             <svg
@@ -245,11 +230,15 @@ const shortcuts = {
               v-for="level in [1, 2, 3, 4]"
               :key="level"
               @click="
-                editor.chain().focus().toggleHeading({ level }).run();
+                editor
+                  .chain()
+                  .focus()
+                  .toggleHeading({ level: level as any })
+                  .run();
                 headingMenuOpen = false;
               "
               :class="{
-                'is-active': editor.isActive('heading', { level }),
+                'is-active': editor.isActive('heading', { level: level as any }),
               }"
               class="dropdown-item"
             >
@@ -386,11 +375,7 @@ const shortcuts = {
             stroke-width="2"
             stroke="currentColor"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M3.75 12h16.5"
-            />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5" />
           </svg>
         </button>
       </div>
@@ -489,12 +474,7 @@ const shortcuts = {
             />
           </svg>
         </button>
-        <button
-          type="button"
-          @click="addImage"
-          title="Insert Image"
-          class="toolbar-btn"
-        >
+        <button type="button" @click="addImage" title="Insert Image" class="toolbar-btn">
           <svg
             class="h-4 w-4"
             fill="none"
@@ -534,9 +514,7 @@ const shortcuts = {
             </svg>
           </button>
           <div v-if="tableMenuOpen" class="toolbar-dropdown w-48">
-            <div class="mb-2 text-xs text-gray-500 dark:text-gray-400">
-              Insert Table
-            </div>
+            <div class="mb-2 text-xs text-gray-500 dark:text-gray-400">Insert Table</div>
             <div class="grid grid-cols-3 gap-1">
               <button
                 type="button"
@@ -656,11 +634,7 @@ const shortcuts = {
             stroke-width="2"
             stroke="currentColor"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 18 18 6M6 6l12 12"
-            />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
           </svg>
         </button>
         <button
@@ -676,11 +650,7 @@ const shortcuts = {
             stroke-width="2"
             stroke="currentColor"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 18 18 6M6 6l12 12"
-            />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
           </svg>
         </button>
         <button
@@ -841,11 +811,7 @@ const shortcuts = {
             stroke-width="2"
             stroke="currentColor"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M4.5 15.75l7.5-7.5 7.5 7.5"
-            />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
           </svg>
         </button>
       </div>

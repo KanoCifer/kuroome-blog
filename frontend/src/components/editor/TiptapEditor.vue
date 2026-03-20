@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import request, { type ApiResponse } from "@/request";
+import type { AxiosProgressEvent } from "axios";
 import { Extension } from "@tiptap/core";
 import NodeRange from "@tiptap/extension-node-range";
 import StarterKit from "@tiptap/starter-kit";
@@ -17,12 +18,7 @@ import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import Paragraph from "@tiptap/extension-paragraph";
 import Placeholder from "@tiptap/extension-placeholder";
-import {
-  Table,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "@tiptap/extension-table";
+import { Table, TableCell, TableHeader, TableRow } from "@tiptap/extension-table";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import Text from "@tiptap/extension-text";
@@ -84,6 +80,7 @@ const MarkdownShortcuts = Extension.create({
           });
           state.apply(tr);
         },
+        undoable: true,
       },
       {
         find: /^##\s$/,
@@ -95,6 +92,7 @@ const MarkdownShortcuts = Extension.create({
           });
           state.apply(tr);
         },
+        undoable: true,
       },
       {
         find: /^###\s$/,
@@ -106,6 +104,7 @@ const MarkdownShortcuts = Extension.create({
           });
           state.apply(tr);
         },
+        undoable: true,
       },
       // 无序列表
       {
@@ -116,6 +115,7 @@ const MarkdownShortcuts = Extension.create({
           state.apply(tr);
           this.editor.commands.toggleBulletList();
         },
+        undoable: true,
       },
       // 有序列表
       {
@@ -126,6 +126,7 @@ const MarkdownShortcuts = Extension.create({
           state.apply(tr);
           this.editor.commands.toggleOrderedList();
         },
+        undoable: true,
       },
       // 任务列表
       {
@@ -136,6 +137,7 @@ const MarkdownShortcuts = Extension.create({
           state.apply(tr);
           this.editor.commands.toggleTaskList();
         },
+        undoable: true,
       },
       // 引用
       {
@@ -146,6 +148,7 @@ const MarkdownShortcuts = Extension.create({
           state.apply(tr);
           this.editor.commands.toggleBlockquote();
         },
+        undoable: true,
       },
       // 代码块
       {
@@ -156,6 +159,7 @@ const MarkdownShortcuts = Extension.create({
           state.apply(tr);
           this.editor.commands.toggleCodeBlock();
         },
+        undoable: true,
       },
       // 水平线
       {
@@ -166,6 +170,7 @@ const MarkdownShortcuts = Extension.create({
           state.apply(tr);
           this.editor.commands.setHorizontalRule();
         },
+        undoable: true,
       },
     ];
   },
@@ -194,19 +199,20 @@ const uploadImage = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append("file", compressedFile);
 
-    const res = await request.post<
-      ApiResponse<{ url: string; filename: string }>
-    >("/blog/upload-image", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-      onUploadProgress: (progressEvent: any) => {
-        if (progressEvent.total) {
-          const uploadPercent = Math.round(
-            (progressEvent.loaded / progressEvent.total) * 50,
-          );
-          uploadProgress.value = 50 + uploadPercent; // 上传占 50% 进度
-        }
+    const res = await request.post<ApiResponse<{ url: string; filename: string }>>(
+      "/blog/upload-image",
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+        onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+          const total = progressEvent.total ?? 0;
+          if (total > 0) {
+            const uploadPercent = Math.round((progressEvent.loaded / total) * 50);
+            uploadProgress.value = 50 + uploadPercent; // 上传占 50% 进度
+          }
+        },
       },
-    });
+    );
 
     if (res.data.status !== "success" || !res.data.data?.url) {
       throw new Error(res.data.message || "Image upload failed.");
@@ -398,9 +404,10 @@ const handleSourceChange = (event: Event) => {
 // 编辑器内容的 Markdown 格式
 const markdownContent = computed(() => {
   if (!editor.value) return "";
-  // 使用 tiptap-markdown 扩展获取 Markdown
-  const storage = editor.value.storage.markdown;
-  if (storage && storage.getMarkdown) {
+  // 明确类型接口并做类型断言（推荐）
+  type MarkdownStorage = { getMarkdown?: () => string };
+  const storage = (editor.value.storage as { markdown?: MarkdownStorage }).markdown;
+  if (storage?.getMarkdown) {
     return storage.getMarkdown();
   }
   // 回退到 HTML
@@ -577,34 +584,6 @@ const characterCount = computed(() => {
   return { characters, words };
 });
 
-// 文档大纲（标题列表）
-const documentOutline = computed(() => {
-  if (!editor.value) return [];
-
-  const headings: Array<{ level: number; text: string; pos: number }> = [];
-  const doc = editor.value.state.doc;
-
-  doc.descendants((node, pos) => {
-    if (node.type.name === "heading") {
-      headings.push({
-        level: node.attrs.level,
-        text: node.textContent,
-        pos,
-      });
-    }
-  });
-
-  return headings;
-});
-
-// 跳转到标题
-const scrollToHeading = (pos: number) => {
-  if (!editor.value) return;
-
-  editor.value.commands.setTextSelection(pos);
-  editor.value.commands.scrollIntoView();
-};
-
 onBeforeUnmount(() => {
   if (editor.value) {
     editor.value.destroy();
@@ -638,40 +617,20 @@ onBeforeUnmount(() => {
         </div>
         <div class="flex items-center gap-2">
           <!-- Markdown 快捷键提示 -->
-          <div
-            class="hidden items-center gap-1 text-xs text-gray-400 md:flex dark:text-gray-500"
-          >
-            <span
-              class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"
-            >
-              #
-            </span>
+          <div class="hidden items-center gap-1 text-xs text-gray-400 md:flex dark:text-gray-500">
+            <span class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"> # </span>
             <span>标题</span>
-            <span
-              class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"
-            >
-              -
-            </span>
+            <span class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"> - </span>
             <span>列表</span>
-            <span
-              class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"
-            >
-              >
-            </span>
+            <span class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"> > </span>
             <span>引用</span>
-            <span
-              class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"
-            >
-              \`\`\`
-            </span>
+            <span class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"> \`\`\` </span>
             <span>代码</span>
           </div>
         </div>
 
         <!-- 字符计数 -->
-        <div
-          class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400"
-        >
+        <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
           <span>{{ characterCount.characters }} chars</span>
           <span>{{ characterCount.words }} words</span>
         </div>
