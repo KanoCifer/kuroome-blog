@@ -147,8 +147,10 @@ async def update_post(
             "updated_at": datetime.now(UTC),
         }
     )
-
-    await redis_cache.clear()
+    try:
+        await redis_cache.clear()
+    except Exception as e:
+        logger.error(f"Failed to clear cache after updating post: {e!s}")
     return APIResponse.ok(
         data={"_id": post_id},
         message="Blog post updated successfully",

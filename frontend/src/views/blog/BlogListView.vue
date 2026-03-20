@@ -79,9 +79,9 @@
         </router-link>
       </div>
     </div>
-    <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_18rem]">
+    <div class="flex flex-col gap-8 lg:flex-row">
       <!-- Main Content -->
-      <div class="min-w-0">
+      <div class="min-w-0 flex-1">
         <div class="space-y-6">
           <!-- Loading State -->
           <div
@@ -374,12 +374,13 @@
         </nav>
       </div>
       <!-- Category Sidebar -->
-      <div class="space-y-6">
-        <CategorySidebar
-          class="sticky top-40 h-fit self-start"
-          @filterPosts="handleFilterPosts"
-          @resetFilter="handleResetFilter"
-        />
+      <div class="w-full shrink-0 lg:w-72">
+        <div class="sticky top-24">
+          <CategorySidebar
+            @filterPosts="handleFilterPosts"
+            @resetFilter="handleResetFilter"
+          />
+        </div>
       </div>
     </div>
   </div>

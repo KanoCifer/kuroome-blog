@@ -13,6 +13,8 @@ from redis.asyncio import ConnectionPool
 from redis.asyncio import Redis as AsyncRedis
 from rich import print
 
+from app.configs import logger
+
 
 class CacheItem(BaseModel):
     value: Any
@@ -205,7 +207,10 @@ class AsyncRedisCache(AsyncCache):
     async def clear(self) -> None:
         keys = await self.redis.keys(pattern=self._cache_prefix + "*")
         if keys:
+            logger.info(f"Clearing {len(keys)} cache keys: {keys}")
             await self.redis.delete(*keys)
+        else:
+            logger.info("No cache keys to clear")
 
     async def aclose(self) -> None:
         await self.redis.aclose()

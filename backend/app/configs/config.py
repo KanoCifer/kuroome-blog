@@ -36,6 +36,8 @@ class Settings(BaseSettings):
     SEND_BOOT_EMAIL: bool = True
     ADMIN_EMAIL: str = ""
     FEISHU_WEBHOOK_URL: str = ""
+    VITE_JS_API_TOKEN: str = ""
+    AMAP_SECURITY_CODE: str = ""
 
     model_config = SettingsConfigDict(
         env_file=get_env_file_path(),

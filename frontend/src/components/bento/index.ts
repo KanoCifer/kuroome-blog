@@ -18,3 +18,4 @@ export { default as BentoTech } from "./BentoTech.vue";
 export { default as BentoTechCard } from "./BentoTechCard.vue";
 export { default as BentoWebsites } from "./BentoWebsites.vue";
 export { default as TodoCard } from "./TodoCard.vue";
+export { default as BentoMap } from "./BentoMap.vue";

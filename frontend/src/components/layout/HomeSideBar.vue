@@ -1,7 +1,7 @@
 <template>
   <div class="col-span-1 max-sm:hidden">
     <!-- 右侧边栏 -->
-    <div class="sticky top-30 space-y-6">
+    <div class="sticky top-30 h-fit space-y-6">
       <!-- 个人简介卡片 -->
       <BentoProfileCard />
       <!-- 日历组件 -->

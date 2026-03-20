@@ -10,5 +10,6 @@
   "TodoCard": { "order": 8 },
   "BentoTech": { "order": 9 },
   "BentoWebsites": { "order": 10 },
-  "BentoLike": { "order": 11 }
+  "BentoLike": { "order": 11 },
+  "BentoMap": { "order": 12 }
 }

@@ -4,6 +4,7 @@ This module provides public endpoints that do not require authentication:
 - API status checks
 - robots.txt and sitemap.xml for SEO
 - Media file serving
+- Amap security key proxy
 """
 
 from __future__ import annotations
@@ -15,6 +16,7 @@ from fastapi import APIRouter, Body, Depends, Request
 from fastapi.responses import JSONResponse, PlainTextResponse
 from redis.asyncio import Redis as AsyncRedis
 
+from app.configs.config import get_settings
 from app.dependencies.limiter import limiter
 from app.dependencies.mongo import get_mongo_db
 from app.dependencies.redis import get_redis
@@ -282,4 +284,35 @@ async def get_likes(
     return APIResponse.ok(
         data={"likes_count": total_likes},
         message="Likes count retrieved successfully",
+    )
+
+
+@router.get("/amap/security-key")
+@limiter.limit("100/hour")
+async def get_amap_security_key(request: Request) -> JSONResponse:
+    """Get Amap security key for frontend map integration.
+
+    Returns the securityJsCode needed for Amap API initialization.
+    The key is base64 encoded to prevent plain text exposure in network responses.
+    Rate limited to prevent abuse.
+
+    Security notes:
+    - Key is base64 encoded (obfuscation, not encryption)
+    - Rate limited to 100 requests/hour
+    - Use Amap console to restrict domains/IPs
+    - Consider rotating keys periodically
+
+    Returns:
+        JSONResponse: Amap security configuration with encoded key
+    """
+    import base64
+
+    settings = get_settings()
+    security_code = settings.AMAP_SECURITY_CODE
+
+    encoded_key = base64.b64encode(security_code.encode()).decode()
+
+    return APIResponse.ok(
+        data={"securityJsCode": encoded_key},
+        message="Amap security key retrieved successfully",
     )

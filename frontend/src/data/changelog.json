@@ -1,5 +1,17 @@
 [
   {
+    "version": "2.3.9",
+    "date": "2026-03-20",
+    "title": "新增钓点地图功能",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "新增钓点地图功能，展示钓点位置和相关信息（待完善）"
+      },
+      { "type": "fix", "content": "修复了一些小bug" }
+    ]
+  },
+  {
     "version": "2.3.8",
     "date": "2026-03-20",
     "title": "AI框架替换为Agno",
