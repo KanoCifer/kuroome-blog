@@ -8,12 +8,15 @@ result_backend = RedisAsyncResultBackend(
     redis_url="redis://localhost:6379/3",
     result_ex_time=86400,
 )
-
-broker: AioPikaBroker = (
+broker = (
     AioPikaBroker(
-        broker_url="amqp://guest:guest@localhost:5672/",
+        "amqp://guest:guest@localhost:5672/",
     )
-    .with_result_backend(result_backend=result_backend)
+    .with_result_backend(
+        RedisAsyncResultBackend(
+            "redis://localhost:6379/3", result_ex_time=86400
+        )
+    )
     .with_middlewares(
         SmartRetryMiddleware(
             default_retry_count=5,

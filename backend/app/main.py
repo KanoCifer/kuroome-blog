@@ -38,7 +38,9 @@ from app.routers import (
     users,
     weread,
 )
-from app.tasks import send_bootstrap_emails, send_feishu_message
+from app.tasks import send_bootstrap_emails
+from app.tasks.broker import broker
+from app.tasks.task import send_feishu_message
 from app.utils.cache import close_cache_redis
 
 
@@ -62,6 +64,13 @@ async def lifespan(app: FastAPI):
     )
     app.state.redis, app.state.redis2 = await init_redis()  # type: ignore
 
+    # 启动 Taskiq broker
+    try:
+        await broker.startup()
+        logger.info("Taskiq broker started successfully")
+    except Exception as e:
+        logger.warning(f"Taskiq broker failed to start: {e!s}")
+
     logger.debug(f"Settings:{get_settings().model_dump()}")
     logger.info("FastAPI started successfully.")
 
@@ -73,14 +82,23 @@ async def lifespan(app: FastAPI):
             name=bootstrap_key, value="1", ex=600, nx=True
         )
         if lock_acquired:
-            # 发送飞书消息
-            await send_feishu_message.kiq()
-            await send_bootstrap_emails.kiq(admin_email=admin_email)
-            app_logger.info("✅启动通知任务已添加到队列")
+            try:
+                await send_feishu_message.kiq()
+                await send_bootstrap_emails.kiq(admin_email=admin_email)
+                app_logger.info("✅启动通知任务已添加到队列")
+            except Exception as e:
+                logger.warning(f"Failed to queue bootstrap email: {e!s}")
         else:
             app_logger.info("✅引导邮件已发送")
 
     yield
+
+    # 关闭 Taskiq broker
+    try:
+        await broker.shutdown()
+        logger.info("Taskiq broker shutdown successfully")
+    except Exception as e:
+        logger.warning(f"Taskiq broker shutdown failed: {e!s}")
 
     # 应用关闭时的清理工作
     await cleanup_resources(app=app)
