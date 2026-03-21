@@ -157,6 +157,7 @@
             v-for="todo in displayTodos"
             :key="todo.id"
             class="group relative flex flex-col gap-4 rounded-2xl border border-gray-200/60 bg-white/50 p-5 shadow-sm transition-all duration-300 hover:border-gray-300 hover:shadow-md dark:border-gray-800 dark:bg-gray-900/60"
+            :class="[todo.archived ? 'opacity-70' : '']"
           >
             <div v-if="editingId === todo.id" class="w-full space-y-4">
               <!-- Edit Mode -->
@@ -297,6 +298,48 @@
                 class="flex shrink-0 items-center gap-1 opacity-0 transition-opacity duration-300 group-hover:opacity-100 max-sm:opacity-100"
               >
                 <button
+                  v-if="!todo.archived"
+                  @click="todoStore.archiveTodo(todo.id)"
+                  class="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-amber-50 hover:text-amber-600 dark:hover:bg-amber-900/20 dark:hover:text-amber-400"
+                  title="归档"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+                    />
+                  </svg>
+                </button>
+                <button
+                  v-if="todo.archived"
+                  @click="todoStore.unarchiveTodo(todo.id)"
+                  class="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-900/20 dark:hover:text-green-400"
+                  title="取消归档"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+                    />
+                  </svg>
+                </button>
+                <button
                   @click="startEdit(todo)"
                   class="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-blue-600 dark:hover:bg-gray-800 dark:hover:text-blue-400"
                   title="编辑"
@@ -362,16 +405,42 @@
             </svg>
           </div>
           <h3 class="text-xl font-medium text-gray-900 dark:text-gray-100">
-            暂无事项
+            {{ filter === "archived" ? "暂无归档" : "暂无事项" }}
           </h3>
-          <p class="mt-2 text-gray-500">记录下你接下来的计划吧！</p>
+          <p class="mt-2 text-gray-500">
+            {{
+              filter === "archived"
+                ? "归档的任务会显示在这里"
+                : "记录下你接下来的计划吧！"
+            }}
+          </p>
         </div>
 
-        <!-- Clear Completed -->
+        <!-- Clear / Archive Completed -->
         <div
           v-if="todoStore.completedCount > 0"
-          class="mt-8 flex justify-center"
+          class="mt-8 flex justify-center gap-3"
         >
+          <button
+            @click="todoStore.archiveCompleted()"
+            class="flex cursor-pointer items-center gap-2 rounded-xl bg-gray-100 px-6 py-2.5 text-sm font-medium text-gray-600 transition-all hover:bg-amber-50 hover:text-amber-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-amber-900/20 dark:hover:text-amber-400"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+              />
+            </svg>
+            归档已完成 ({{ todoStore.completedCount }})
+          </button>
           <button
             @click="todoStore.clearCompleted()"
             class="flex cursor-pointer items-center gap-2 rounded-xl bg-gray-100 px-6 py-2.5 text-sm font-medium text-gray-600 transition-all hover:bg-red-50 hover:text-red-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-red-900/20 dark:hover:text-red-400"
@@ -443,7 +512,8 @@ const sectionStyle = computed(() => {
 });
 
 const todoStore = useTodoStore();
-const { todos, activeTodos, completedTodos } = storeToRefs(todoStore);
+const { todos, activeTodos, completedTodos, archivedTodos } =
+  storeToRefs(todoStore);
 
 // Form State
 const newTodoForm = ref({
@@ -470,8 +540,8 @@ const submitAddTodo = () => {
 };
 
 // Filter & Sort State
-type FilterType = "all" | "active" | "completed";
-const filterTabs: FilterType[] = ["all", "active", "completed"];
+type FilterType = "all" | "active" | "completed" | "archived";
+const filterTabs: FilterType[] = ["all", "active", "completed", "archived"];
 const filter = ref<FilterType>("all");
 const sortMode = ref<"createdAt" | "priority" | "dueDate">("createdAt");
 
@@ -479,6 +549,7 @@ const filterLabels: Record<FilterType, string> = {
   all: "全部",
   active: "进行中",
   completed: "已完成",
+  archived: "归档",
 };
 
 const priorityLabels: Record<TodoPriority, string> = {
@@ -491,6 +562,7 @@ const getFilterCount = (f: FilterType) => {
   if (f === "all") return todos.value.length;
   if (f === "active") return activeTodos.value.length;
   if (f === "completed") return completedTodos.value.length;
+  if (f === "archived") return archivedTodos.value.length;
   return 0;
 };
 
@@ -498,6 +570,7 @@ const displayTodos = computed(() => {
   let list = todos.value;
   if (filter.value === "active") list = activeTodos.value;
   else if (filter.value === "completed") list = completedTodos.value;
+  else if (filter.value === "archived") list = archivedTodos.value;
 
   const priorityWeight: Record<TodoPriority, number> = {
     high: 3,

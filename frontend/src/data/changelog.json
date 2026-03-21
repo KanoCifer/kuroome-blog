@@ -1,5 +1,21 @@
 [
   {
+    "version": "2.3.10",
+    "date": "2026-03-21",
+    "title": "完善钓点地图功能",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "完善钓点地图功能，增加钓点详情展示和用户交互（待完善）"
+      },
+      {
+        "type": "refactor",
+        "content": "服务端数据库迁移至Docker，引入rabbitMQ"
+      },
+      { "type": "fix", "content": "修复了一些小bug" }
+    ]
+  },
+  {
     "version": "2.3.9",
     "date": "2026-03-20",
     "title": "新增钓点地图功能",

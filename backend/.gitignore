@@ -32,3 +32,4 @@ trans.sh
 extract_messages.py
 babel.cfg
 legacy/
+jwt

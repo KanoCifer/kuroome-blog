@@ -15,6 +15,8 @@ export interface Todo {
   dueDate?: string;
   priority: TodoPriority;
   category?: string;
+  archived?: boolean;
+  archivedAt?: string;
 }
 
 export const useTodoStore = defineStore("todos", () => {
@@ -27,6 +29,7 @@ export const useTodoStore = defineStore("todos", () => {
   );
   const activeTodos = computed(() => todos.value.filter((t) => !t.completed));
   const completedTodos = computed(() => todos.value.filter((t) => t.completed));
+  const archivedTodos = computed(() => todos.value.filter((t) => t.archived));
 
   const notifier = useNotificationStore();
 
@@ -134,17 +137,72 @@ export const useTodoStore = defineStore("todos", () => {
     }
   }
 
+  async function archiveTodo(id: string) {
+    try {
+      const res = await request.post(`/todos/${id}/archive`);
+      const updated = res.data.data.todo;
+      const idx = todos.value.findIndex((x) => x.id === id);
+      if (idx !== -1) todos.value[idx] = updated;
+    } catch (err) {
+      console.error(err);
+      notifier.error("归档待办失败");
+    }
+  }
+
+  async function unarchiveTodo(id: string) {
+    try {
+      const res = await request.post(`/todos/${id}/unarchive`);
+      const updated = res.data.data.todo;
+      const idx = todos.value.findIndex((x) => x.id === id);
+      if (idx !== -1) todos.value[idx] = updated;
+    } catch (err) {
+      console.error(err);
+      notifier.error("取消归档失败");
+    }
+  }
+
+  async function archiveCompleted() {
+    try {
+      await request.post("/todos/archive-completed");
+      const now = new Date().toISOString();
+      todos.value = todos.value.map((t) =>
+        t.completed && !t.archived
+          ? { ...t, archived: true, archivedAt: now }
+          : t,
+      );
+    } catch (err) {
+      console.error(err);
+      notifier.error("归档已完成待办失败");
+    }
+  }
+
+  async function fetchArchivedTodos() {
+    try {
+      const res = await request.get("/todos/archived");
+      return res.data.data?.todos ?? [];
+    } catch (err) {
+      console.error(err);
+      notifier.error("加载归档待办失败");
+      return [];
+    }
+  }
+
   return {
     todos,
     isCollapsed,
     completedCount,
     activeTodos,
     completedTodos,
+    archivedTodos,
     addTodo,
     toggleTodo,
     removeTodo,
     updateTodo,
     clearCompleted,
+    archiveTodo,
+    unarchiveTodo,
+    archiveCompleted,
+    fetchArchivedTodos,
     hydrateTodos,
   };
 });

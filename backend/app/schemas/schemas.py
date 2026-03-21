@@ -458,6 +458,8 @@ class TodoIn(BaseModel):
     category: str | None = None
     completed: bool = False
     id: str | None = None  # optional client-supplied id
+    archived: bool = False
+    archivedAt: str | None = None  # noqa: N815
 
 
 class TodoUpdate(BaseModel):
@@ -467,6 +469,8 @@ class TodoUpdate(BaseModel):
     priority: str | None = None
     category: str | None = None
     completed: bool | None = None
+    archived: bool | None = None
+    archivedAt: str | None = None  # noqa: N815
 
 
 class TodoOut(BaseModel):
@@ -478,3 +482,5 @@ class TodoOut(BaseModel):
     dueDate: str | None = None  # noqa: N815
     priority: str = "medium"
     category: str | None = None
+    archived: bool = False
+    archivedAt: str | None = None  # noqa: N815

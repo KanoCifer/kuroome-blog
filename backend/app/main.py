@@ -60,7 +60,7 @@ async def lifespan(app: FastAPI):
         database=app.state.mongo,
         document_models=[MessageBoard, Post, RssArticle],
     )
-    app.state.redis, app.state.redis2 = await init_redis()
+    app.state.redis, app.state.redis2 = await init_redis()  # type: ignore
 
     logger.debug(f"Settings:{get_settings().model_dump()}")
     logger.info("FastAPI started successfully.")

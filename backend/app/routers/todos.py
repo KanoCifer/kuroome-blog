@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime, timezone
 
 import orjson
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from redis.asyncio import Redis as AsyncRedis
 
 from app.dependencies.auth import manager
@@ -50,11 +50,15 @@ async def _release_lock(redis: AsyncRedis, lock_key: str) -> None:
 
 @router.get("")
 async def get_todos(
-    user: User = Depends(manager), redis: AsyncRedis = Depends(get_async_redis)
+    include_archived: bool = Query(False),
+    user: User = Depends(manager),
+    redis: AsyncRedis = Depends(get_async_redis),
 ):
-    """Get current user's todos."""
+    """Get current user's todos. Excludes archived by default."""
     key = f"todos:{user.id}"
     todos = await _read_todos(redis, key)
+    if not include_archived:
+        todos = [t for t in todos if not t.get("archived")]
     return APIResponse.ok(data={"todos": todos})
 
 
@@ -84,6 +88,8 @@ async def create_todo(
             "dueDate": data.dueDate,
             "priority": data.priority or "medium",
             "category": data.category,
+            "archived": bool(data.archived),
+            "archivedAt": data.archivedAt,
         }
         todos.insert(0, todo)
         await _write_todos(redis, key, todos)
@@ -128,6 +134,10 @@ async def patch_todo(
                     t["category"] = data.category
                 if data.completed is not None:
                     t["completed"] = bool(data.completed)
+                if data.archived is not None:
+                    t["archived"] = bool(data.archived)
+                if data.archivedAt is not None:
+                    t["archivedAt"] = data.archivedAt
                 todos[i] = t
                 updated = t
                 break
@@ -171,6 +181,8 @@ async def replace_todo(
                     "dueDate": data.dueDate,
                     "priority": data.priority or "medium",
                     "category": data.category,
+                    "archived": bool(data.archived),
+                    "archivedAt": data.archivedAt,
                 }
                 todos[i] = updated
                 break
@@ -241,6 +253,8 @@ async def import_todos(
                     "dueDate": item.dueDate,
                     "priority": item.priority or "medium",
                     "category": item.category,
+                    "archived": bool(item.archived),
+                    "archivedAt": item.archivedAt,
                 }
             )
         merged = new_items + existing
@@ -249,6 +263,112 @@ async def import_todos(
         await _release_lock(redis, lock_key)
 
     return APIResponse.ok(message="Todos imported")
+
+
+@router.get("/archived")
+async def get_archived_todos(
+    user: User = Depends(manager), redis: AsyncRedis = Depends(get_async_redis)
+):
+    """Get all archived todos for current user."""
+    key = f"todos:{user.id}"
+    todos = await _read_todos(redis, key)
+    archived = [t for t in todos if t.get("archived")]
+    return APIResponse.ok(data={"todos": archived})
+
+
+@router.post("/{todo_id}/archive")
+async def archive_todo(
+    todo_id: str,
+    user: User = Depends(manager),
+    redis: AsyncRedis = Depends(get_async_redis),
+):
+    """Archive a todo."""
+    key = f"todos:{user.id}"
+    lock_key = f"todos:lock:{user.id}"
+    if not await _acquire_lock(redis, lock_key):
+        return APIResponse.error(
+            message="Server busy, please retry.", code=status.HTTP_423_LOCKED
+        )
+    updated = None
+    try:
+        todos = await _read_todos(redis, key)
+        for i, t in enumerate(todos):
+            if t.get("id") == todo_id:
+                t["archived"] = True
+                t["archivedAt"] = datetime.now(timezone.utc).isoformat()  # noqa: UP017
+                todos[i] = t
+                updated = t
+                break
+        if updated is None:
+            return APIResponse.error(
+                message="Todo not found", code=status.HTTP_404_NOT_FOUND
+            )
+        await _write_todos(redis, key, todos)
+    finally:
+        await _release_lock(redis, lock_key)
+
+    return APIResponse.ok(data={"todo": updated}, message="Todo archived")
+
+
+@router.post("/{todo_id}/unarchive")
+async def unarchive_todo(
+    todo_id: str,
+    user: User = Depends(manager),
+    redis: AsyncRedis = Depends(get_async_redis),
+):
+    """Unarchive a todo."""
+    key = f"todos:{user.id}"
+    lock_key = f"todos:lock:{user.id}"
+    if not await _acquire_lock(redis, lock_key):
+        return APIResponse.error(
+            message="Server busy, please retry.", code=status.HTTP_423_LOCKED
+        )
+    updated = None
+    try:
+        todos = await _read_todos(redis, key)
+        for i, t in enumerate(todos):
+            if t.get("id") == todo_id:
+                t["archived"] = False
+                t["archivedAt"] = None
+                todos[i] = t
+                updated = t
+                break
+        if updated is None:
+            return APIResponse.error(
+                message="Todo not found", code=status.HTTP_404_NOT_FOUND
+            )
+        await _write_todos(redis, key, todos)
+    finally:
+        await _release_lock(redis, lock_key)
+
+    return APIResponse.ok(data={"todo": updated}, message="Todo unarchived")
+
+
+@router.post("/archive-completed")
+async def archive_completed(
+    user: User = Depends(manager), redis: AsyncRedis = Depends(get_async_redis)
+):
+    """Archive all completed (non-archived) todos."""
+    key = f"todos:{user.id}"
+    lock_key = f"todos:lock:{user.id}"
+    if not await _acquire_lock(redis, lock_key):
+        return APIResponse.error(
+            message="Server busy, please retry.", code=status.HTTP_423_LOCKED
+        )
+    try:
+        todos = await _read_todos(redis, key)
+        now = datetime.now(timezone.utc).isoformat()  # noqa: UP017
+        count = 0
+        for t in todos:
+            if t.get("completed") and not t.get("archived"):
+                t["archived"] = True
+                t["archivedAt"] = now
+                count += 1
+        await _write_todos(redis, key, todos)
+    finally:
+        await _release_lock(redis, lock_key)
+
+    return APIResponse.ok(message=f"Archived {count} completed todos")
 
 
 @router.post("/clear-completed")

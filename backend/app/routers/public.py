@@ -12,6 +12,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from xml.etree.ElementTree import Element, SubElement, tostring
 
+import httpx
 from fastapi import APIRouter, Body, Depends, Request
 from fastapi.responses import JSONResponse, PlainTextResponse
 from redis.asyncio import Redis as AsyncRedis
@@ -316,3 +317,93 @@ async def get_amap_security_key(request: Request) -> JSONResponse:
         data={"securityJsCode": encoded_key},
         message="Amap security key retrieved successfully",
     )
+
+
+@router.post("/weather")
+@limiter.limit("100/hour")
+async def get_weather(
+    request: Request,
+    city: str = Body(..., description="City adcode"),
+    extensions: str = Body("base", description="Weather type: base/all"),
+) -> JSONResponse:
+    """Get weather information from Amap API.
+
+    Args:
+        city: City adcode
+        extensions: Weather type (base for current, all for forecast)
+
+    Returns:
+        JSONResponse: Weather data from Amap API
+    """
+    url = "https://restapi.amap.com/v3/weather/weatherInfo"
+    params = {
+        "key": get_settings().AMAP_WEB_KEY,
+        "city": city,
+        "extensions": extensions,
+    }
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, params=params)
+        data = response.json()
+
+    return APIResponse.ok(
+        data=data,
+        message="Weather information retrieved successfully",
+    )
+
+
+@router.post("/geocode/regeo")
+@limiter.limit("100/hour")
+async def reverse_geocode(
+    request: Request,
+    location: str = Body(..., description="Location coordinates: lng,lat"),
+    extensions: str = Body("base", description="Extensions type"),
+) -> JSONResponse:
+    """Reverse geocode coordinates to address using Amap API.
+
+    Args:
+        location: Location coordinates in format "lng,lat"
+        extensions: Extensions type
+
+    Returns:
+        JSONResponse: Address information including city adcode
+    """
+    url = "https://restapi.amap.com/v3/geocode/regeo"
+    params = {
+        "key": get_settings().AMAP_WEB_KEY,
+        "location": location,
+        "extensions": extensions,
+    }
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, params=params)
+        data = response.json()
+
+    return APIResponse.ok(
+        data=data,
+        message="Reverse geocode completed successfully",
+    )
+
+
+# @router.post("/geocode/regeo")
+# @limiter.limit("100/hour")
+# async def reverse_geocode(
+#     request: Request,
+#     params: dict = Body(..., description="Reverse geocode parameters"),
+# ) -> JSONResponse:
+#     """Reverse geocode coordinates to address using Amap API.
+
+#     Args:
+#         params: Reverse geocode parameters including location coordinates
+
+#     Returns:
+#         JSONResponse: Address information including city adcode
+#     """
+#     url = "https://restapi.amap.com/v3/geocode/regeo"
+#     params["key"] = get_settings().AMAP_WEB_KEY
+#     async with httpx.AsyncClient() as client:
+#         response = await client.get(url, params=params)
+#         data = response.json()
+
+#     return APIResponse.ok(
+#         data=data,
+#         message="Reverse geocode completed successfully",
+#     )
