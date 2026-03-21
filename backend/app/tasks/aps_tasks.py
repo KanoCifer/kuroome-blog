@@ -21,7 +21,7 @@ from app.tasks.broker import broker
 @broker.task(
     schedule=[
         {
-            "interval": 1800,  # 每30分钟执行一次
+            "interval": 600,  # 每30分钟执行一次
             "schedule_id": "redis_to_db_migration",
         }
     ]
@@ -30,7 +30,7 @@ async def run_migration_job(context: Context = TaskiqDepends()):
     """迁移Redis访客数据到PostgreSQL"""
     start_time = time.perf_counter()
     queue_key = "migration_queue"
-    batch_size = 100  # 每批处理 100 条，可根据服务器性能调整
+    batch_size = 1000  # 每批处理 1000 条，可根据服务器性能调整
     processed_count = 0
     valid_items = []
 
@@ -115,7 +115,7 @@ async def run_migration_job(context: Context = TaskiqDepends()):
         # 完成统计
         duration = time.perf_counter() - start_time
         logger.info(
-            f"[MigrationJob]✅ Completed | duration={duration:.2f}s | fetched={len(valid_items)} | migrated={processed_count} | fetch={fetch_duration:.2f}s | parse={parse_duration:.2f}s | db={db_duration:.2f}s"
+            f"[MigrationJob]✅Completed | duration={duration:.2f}s | fetched={len(valid_items)} | migrated={processed_count} | fetch={fetch_duration:.2f}s | parse={parse_duration:.2f}s | db={db_duration:.2f}s"
         )
         return {
             "status": "success",
