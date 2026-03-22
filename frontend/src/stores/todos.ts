@@ -24,11 +24,18 @@ export const useTodoStore = defineStore("todos", () => {
   const isCollapsed = useStorage("todos-collapsed", false);
   const isHydrated = ref(false);
 
-  const completedCount = computed(
-    () => todos.value.filter((t) => t.completed).length,
+  const nonArchivedTodos = computed(() =>
+    todos.value.filter((t) => !t.archived),
   );
-  const activeTodos = computed(() => todos.value.filter((t) => !t.completed));
-  const completedTodos = computed(() => todos.value.filter((t) => t.completed));
+  const completedCount = computed(
+    () => nonArchivedTodos.value.filter((t) => t.completed).length,
+  );
+  const activeTodos = computed(() =>
+    nonArchivedTodos.value.filter((t) => !t.completed),
+  );
+  const completedTodos = computed(() =>
+    nonArchivedTodos.value.filter((t) => t.completed),
+  );
   const archivedTodos = computed(() => todos.value.filter((t) => t.archived));
 
   const notifier = useNotificationStore();
@@ -189,6 +196,7 @@ export const useTodoStore = defineStore("todos", () => {
 
   return {
     todos,
+    nonArchivedTodos,
     isCollapsed,
     completedCount,
     activeTodos,

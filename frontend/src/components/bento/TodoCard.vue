@@ -191,7 +191,7 @@ withDefaults(defineProps<Props>(), {
 });
 
 const todoStore = useTodoStore();
-const { todos, completedCount, isCollapsed } = storeToRefs(todoStore);
+const { nonArchivedTodos: todos, completedCount, isCollapsed } = storeToRefs(todoStore);
 
 onMounted(() => {
   todoStore.hydrateTodos();

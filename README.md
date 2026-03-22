@@ -29,8 +29,8 @@
 ## 技术栈
 
 - **后端**: FastAPI + SQLAlchemy 2.0 + Alembic + PostgreSQL + MongoDB (Beanie) + Redis
-- **前端**: Vue 3.5 + TypeScript + Vite + Tailwind CSS v4 + Pinia
-- **AI**: Langchain + OpenAI
+- **前端**: Vue 3.5 + TypeScript + Vite + Tailwind CSS v4 + Pinia + shadcn-vue
+- **AI**: Langchain + OpenAI (Agno)
 - **安全**: JWT 认证、CSRF 保护、输入验证
 
 ## 快速开始
@@ -49,7 +49,7 @@ alembic upgrade head
 
 # 4. 启动开发服务器
 python dev.py           # 后端 :5555
-cd ../frontend && npm i && npm run dev  # 前端 :5173
+cd ../frontend && pnpm install && pnpm run dev  # 前端 :5173
 ```
 
 访问 `http://localhost:5173`
@@ -60,24 +60,35 @@ cd ../frontend && npm i && npm run dev  # 前端 :5173
 
 ```bash
 cd backend
-ruff format . && ruff check .   # 格式化 + 检查
-ruff check . --fix              # 自动修复
+ruff format . && ruff check .           # 格式化 + 检查
+ruff check . --fix                      # 自动修复
 alembic revision --autogenerate -m "x"  # 生成迁移
-alembic upgrade head            # 执行迁移
-python dev.py                   # 启动 (:5555)
-python -m pytest                # 运行测试
-python -m pytest tests/test_x.py::test_func -v  # 单个测试
+alembic upgrade head                    # 执行迁移
+python dev.py                           # 启动 (:5555)
+
+# 测试
+python -m pytest                        # 运行所有测试
+python -m pytest tests/test_x.py -v     # 运行单个测试文件
+python -m pytest tests/test_x.py::test_func -v  # 运行单个测试函数
+python -m pytest -k "keyword"           # 按关键字过滤测试
 ```
 
 ### 前端
 
 ```bash
 cd frontend
-npm run dev                     # 启动 (:5173)
-npm run build                   # 构建
-npm run format && npm run lint  # 格式化 + 检查
-npm run test:unit               # 单元测试 (Vitest)
-npx playwright test             # E2E 测试
+pnpm run dev                            # 启动 (:5173)
+pnpm run build                          # 构建 (先 type-check 再 build)
+pnpm run build-only                     # 仅构建 (跳过 type-check)
+pnpm run format                         # Prettier 格式化
+pnpm run lint                           # Oxlint + ESLint 检查
+pnpm run type-check                     # Vue-tsc 类型检查
+
+# 测试
+pnpm run test:unit                      # Vitest 单元测试
+npx playwright test                     # E2E 测试
+npx playwright test --headed            # 可视化模式
+npx playwright test --debug             # 调试模式
 ```
 
 ## 项目结构
@@ -86,19 +97,28 @@ npx playwright test             # E2E 测试
 backend/
 ├── app/
 │   ├── routers/      # API: auth, books, blog, users, messages, weread, rss, admin, aiagent
-│   ├── models/       # SQLAlchemy 2.0 模型
+│   ├── models/       # SQLAlchemy 2.0 (models.py) + MongoDB (mgmodel.py)
 │   ├── schemas/      # Pydantic schemas
-│   └── dependencies/ # FastAPI 依赖注入
-├── migrations/       # Alembic 迁移
+│   ├── dependencies/ # FastAPI 依赖注入
+│   ├── middleware/    # 中间件
+│   ├── configs/      # 配置 (settings, logger)
+│   ├── utils/        # 工具函数
+│   └── tasks/        # Taskiq 异步任务
+├── alembic/          # 数据库迁移
 └── dev.py            # 入口 (:5555)
 
 frontend/src/
 ├── views/            # 页面 (auth, books, blog, rss, general)
 ├── components/       # Vue 组件
 ├── stores/           # Pinia 状态管理
-└── router/           # Vue Router
+├── router/           # Vue Router
+├── types/            # TypeScript 类型定义
+├── lib/              # 库封装
+├── utils/            # 工具函数
+└── layouts/          # 布局组件
 
-tests/                # Pytest + Vitest + Playwright
+tests/                # Pytest (后端) + Playwright (E2E)
+scripts/              # 工具脚本
 ```
 
 ## API 端点 (:5555)
@@ -119,7 +139,6 @@ tests/                # Pytest + Vitest + Playwright
 
 ```env
 SECRET_KEY=your-secret-key-here
-DATABASE_URL=sqlite:///data.db
 DATABASE_URL=postgresql+psycopg2://user:pass@localhost/readinglist
 MONGO_URI=mongodb://localhost:27017/readinglist
 REDIS_URL=redis://localhost:6379/0
@@ -134,7 +153,7 @@ REDIS_URL=redis://localhost:6379/0
 ## 部署
 
 - **在线演示**: [Kuroome's Blog](https://kanocifer.chat)
-- **本地端口**: 后端 :5555 / 前端 :5173
+- **本地端口**: 后端 `:5555` / 前端 `:5173`
 
 ## License
 

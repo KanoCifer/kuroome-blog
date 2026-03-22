@@ -437,9 +437,9 @@ async def get_qweather(
                 )
             data = response.json()
 
-        # 缓存数据8小时，过期后自动删除
+        # 缓存数据12小时，过期后自动删除
         cache_key = f"qweather:tide:{payload['location']}:{payload['date']}"
-        await redis.set(cache_key, orjson.dumps(data), ex=8 * 3600)
+        await redis.set(cache_key, orjson.dumps(data), ex=12 * 3600)
         return APIResponse.ok(
             data=data,
             message="QWeather information retrieved successfully",

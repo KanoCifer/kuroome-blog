@@ -512,7 +512,7 @@ const sectionStyle = computed(() => {
 });
 
 const todoStore = useTodoStore();
-const { todos, activeTodos, completedTodos, archivedTodos } =
+const { todos, nonArchivedTodos, activeTodos, completedTodos, archivedTodos } =
   storeToRefs(todoStore);
 
 onMounted(() => {
@@ -563,7 +563,7 @@ const priorityLabels: Record<TodoPriority, string> = {
 };
 
 const getFilterCount = (f: FilterType) => {
-  if (f === "all") return todos.value.length;
+  if (f === "all") return nonArchivedTodos.value.length;
   if (f === "active") return activeTodos.value.length;
   if (f === "completed") return completedTodos.value.length;
   if (f === "archived") return archivedTodos.value.length;
@@ -571,7 +571,7 @@ const getFilterCount = (f: FilterType) => {
 };
 
 const displayTodos = computed(() => {
-  let list = todos.value;
+  let list = nonArchivedTodos.value;
   if (filter.value === "active") list = activeTodos.value;
   else if (filter.value === "completed") list = completedTodos.value;
   else if (filter.value === "archived") list = archivedTodos.value;
