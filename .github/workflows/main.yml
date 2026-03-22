@@ -23,7 +23,7 @@ jobs:
             const notification = {
               msg_type: 'text',
               content: {
-                text: `There has been a push to the main branch. Check the details at: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+                text: `[GitHub Actions]✅有新的提交: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}`
               }
             };
             try {
