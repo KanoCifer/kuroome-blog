@@ -494,7 +494,7 @@
 <script setup lang="ts">
 import { useScroll } from "@vueuse/core";
 import { storeToRefs } from "pinia";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useTodoStore } from "@/stores/todos";
 import type { Todo, TodoPriority } from "@/stores/todos";
 
@@ -514,6 +514,10 @@ const sectionStyle = computed(() => {
 const todoStore = useTodoStore();
 const { todos, activeTodos, completedTodos, archivedTodos } =
   storeToRefs(todoStore);
+
+onMounted(() => {
+  todoStore.hydrateTodos();
+});
 
 // Form State
 const newTodoForm = ref({

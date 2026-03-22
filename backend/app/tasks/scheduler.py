@@ -11,5 +11,4 @@ scheduler = TaskiqScheduler(
     sources=[redis_source, LabelScheduleSource(broker)],
 )
 
-
 logger.info("[Taskiq] ✅ All scheduled tasks registered successfully")

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative min-h-dvh w-full snap-start space-y-2 max-sm:flex max-sm:flex-col max-sm:justify-center max-sm:gap-4 max-sm:overflow-x-hidden max-sm:p-4 max-sm:pt-14"
+    class="relative min-h-dvh w-full snap-start space-y-2 max-sm:flex max-sm:flex-col max-sm:gap-4 max-sm:overflow-x-hidden max-sm:p-4 max-sm:pt-14"
     :style="containerStyle"
     ref="parentContainer"
   >
@@ -15,7 +15,7 @@
       :initial="{ scale: 0 }"
       :animate="{ scale: 1 }"
       :style="greetingPosition"
-      class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:w-full! max-sm:min-w-0 max-sm:translate-0!"
+      class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:order-1 max-sm:w-full! max-sm:min-w-0 max-sm:translate-0!"
     />
     <BentoProfileCard
       v-if="show.BentoProfileCard"
@@ -23,14 +23,14 @@
       :animate="{ scale: 1, opacity: 1 }"
       ref="boxRef"
       :style="profilePosition"
-      class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:w-full! max-sm:min-w-0 max-sm:translate-0!"
+      class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:order-2 max-sm:w-full! max-sm:min-w-0 max-sm:translate-0!"
     />
     <BentoNavCard
       v-if="show.BentoNavCard"
       :initial="{ scale: 0.5, opacity: 0 }"
       :animate="{ scale: 1, opacity: 1 }"
       ref="navBox"
-      class="absolute w-68 -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
+      class="absolute w-68 -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-3 max-sm:w-full! max-sm:translate-0!"
       :style="navCardPosition"
     />
     <BentoClock
@@ -39,7 +39,7 @@
       :animate="{ scale: 1 }"
       ref="clockRef"
       :style="clockCardPosition"
-      class="absolute w-auto -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
+      class="absolute w-auto -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-5 max-sm:w-full! max-sm:translate-0!"
     />
     <BentoCalendar
       v-if="show.BentoCalendar"
@@ -47,30 +47,30 @@
       :animate="{ scale: 1 }"
       ref="calRef"
       :style="calendarPosition"
-      class="absolute w-2xs -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
+      class="absolute w-2xs -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-7 max-sm:w-full! max-sm:translate-0!"
     />
     <BentoMemo
       v-if="show.BentoMemo"
       :style="memoCardPosition"
-      class="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
+      class="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer max-sm:static! max-sm:left-auto! max-sm:order-6 max-sm:w-full! max-sm:translate-0!"
     />
     <BentoNewPost
       v-if="show.BentoNewPost"
       :style="newCardPosition"
-      class="absolute w-auto -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
+      class="absolute w-auto -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-4 max-sm:w-full! max-sm:translate-0!"
     />
     <BentoTech
       v-if="show.BentoTech"
       :initial="{ scale: 0.5 }"
       :animate="{ scale: 1 }"
-      class="h-2xs absolute w-70 -translate-x-1/2 -translate-y-1/2 p-0! max-sm:static! max-sm:left-auto! max-sm:h-auto! max-sm:w-full! max-sm:translate-0!"
+      class="h-2xs absolute w-70 -translate-x-1/2 -translate-y-1/2 p-0! max-sm:static! max-sm:left-auto! max-sm:order-11 max-sm:h-auto! max-sm:w-full! max-sm:translate-0!"
       :style="techPosition"
     />
     <BentoWebsites
       v-if="show.BentoWebsites"
       :initial="{ scale: 0.5 }"
       :animate="{ scale: 1 }"
-      class="absolute w-68 -translate-x-1/2 -translate-y-1/2 p-0! max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
+      class="absolute w-68 -translate-x-1/2 -translate-y-1/2 p-0! max-sm:static! max-sm:left-auto! max-sm:order-9 max-sm:w-full! max-sm:translate-0!"
       :style="websitesPosition"
     />
     <BentoReadingList
@@ -78,28 +78,28 @@
       :initial="{ scale: 0 }"
       :animate="{ scale: 1 }"
       :style="listCardPosition"
-      class="absolute w-auto -translate-x-1/2 -translate-y-1/2 cursor-pointer max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
+      class="absolute w-auto -translate-x-1/2 -translate-y-1/2 cursor-pointer max-sm:static! max-sm:left-auto! max-sm:order-8 max-sm:w-full! max-sm:translate-0!"
     />
     <BentoCat
       v-if="show.BentoCat"
       :style="catPosition"
-      class="absolute w-2xs -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:w-full! max-sm:translate-0!"
+      class="absolute w-2xs -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-12 max-sm:w-full! max-sm:translate-0!"
     />
     <div
       v-if="show.TodoCard"
-      class="absolute top-1/2 -right-20 w-70 min-w-3xs -translate-x-1/2 -translate-y-1/2 max-sm:static!"
+      class="absolute top-1/2 -right-20 w-70 min-w-3xs -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-10 max-sm:w-full! max-sm:translate-0!"
     >
       <TodoCard title="MyTasks" />
     </div>
     <BentoLike
       v-if="show.BentoLike"
       :style="likePosition"
-      class="absolute w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto!"
+      class="absolute w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-13 max-sm:mx-auto max-sm:translate-0!"
     />
     <BentoMap
       v-if="show.BentoMap"
       :style="mapPosition"
-      class="absolute w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto!"
+      class="absolute w-fit -translate-x-1/2 -translate-y-1/2 select-none max-sm:static! max-sm:left-auto! max-sm:order-14 max-sm:translate-0!"
     />
   </div>
 </template>
@@ -124,14 +124,7 @@ import {
 import ThemeToggle from "@/components/layout/ThemeToggle.vue";
 import carddelay from "@/data/carddelay.json";
 import { useDebounceFn, useMediaQuery } from "@vueuse/core";
-import {
-  computed,
-  nextTick,
-  onMounted,
-  onUnmounted,
-  ref,
-  type ComponentPublicInstance,
-} from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref, type ComponentPublicInstance } from "vue";
 
 const clockRef = ref<ComponentPublicInstance | null>(null);
 const navBox = ref<ComponentPublicInstance | null>(null);
@@ -148,9 +141,7 @@ const parentWidth = ref<number>(0);
 const viewportHeight = ref<number>(0);
 
 // 布局设计基准高度：使用视口高度，但不低于 820px，保证卡片间距不被压缩
-const layoutHeight = computed<number>(() =>
-  Math.max(viewportHeight.value, 820),
-);
+const layoutHeight = computed<number>(() => Math.max(viewportHeight.value, 820));
 
 // 容器高度：至少撑满布局高度（让绝对定位的卡片不被裁剪）
 const containerStyle = computed(() => ({
@@ -179,8 +170,7 @@ const profilePosition = computed(() => ({
 
 // 对应 BentoNavCard (top-[38%])
 const navCardPosition = computed(() => {
-  const totalLeft =
-    halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224;
+  const totalLeft = halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224;
   return {
     left: `${totalLeft}px`,
     top: `${layoutHeight.value * 0.38}px`,
@@ -189,8 +179,7 @@ const navCardPosition = computed(() => {
 
 // 对应 BentoMemo (top-[9%])
 const memoCardPosition = computed(() => {
-  const totalLeft =
-    halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224;
+  const totalLeft = halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224;
   return {
     left: `${totalLeft + 220}px`,
     top: `${layoutHeight.value * 0.09}px`,
@@ -199,8 +188,7 @@ const memoCardPosition = computed(() => {
 
 // 对应 BentoClock (top-3/9)
 const clockCardPosition = computed(() => {
-  const totalLeft =
-    halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
+  const totalLeft = halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
   return {
     left: `${totalLeft + 24}px`,
     top: `${(layoutHeight.value * 3) / 7.5}px`,
@@ -209,8 +197,7 @@ const clockCardPosition = computed(() => {
 
 // 对应 BentoCalendar (top-5/8)
 const calendarPosition = computed(() => {
-  const totalLeft =
-    halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
+  const totalLeft = halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
   return {
     left: `${totalLeft + 24}px`,
     top: `${(layoutHeight.value * 4) / 6}px`,
@@ -219,18 +206,16 @@ const calendarPosition = computed(() => {
 
 // 对应 BentoNewPost (top-40 即 160px，固定值)
 const newCardPosition = computed(() => {
-  const totalLeft =
-    halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
+  const totalLeft = halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
   return {
-    left: `${totalLeft - 36}px`,
-    top: `160px`,
+    left: `${totalLeft - 130}px`,
+    top: `${layoutHeight.value / 11}px`,
   };
 });
 
 // 对应 BentoTech (top-[81%])
 const techPosition = computed(() => {
-  const totalLeft =
-    halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224;
+  const totalLeft = halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224;
   return {
     left: `${totalLeft}px`,
     top: `${layoutHeight.value * 0.81}px`,
@@ -239,8 +224,7 @@ const techPosition = computed(() => {
 
 // 对应 BentoWebsites
 const websitesPosition = computed(() => {
-  const totalLeft =
-    halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
+  const totalLeft = halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
   return {
     left: `${totalLeft + 24}px`,
     top: `${layoutHeight.value * 0.2}px`,
@@ -249,8 +233,7 @@ const websitesPosition = computed(() => {
 
 // 对应 BentoReadingList (top-6/8)
 const listCardPosition = computed(() => {
-  const totalLeft =
-    halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
+  const totalLeft = halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224;
   return {
     left: `${totalLeft - 240}px`,
     top: `${(layoutHeight.value * 6) / 8}px`,
@@ -347,6 +330,7 @@ const cardNames = [
   "BentoProfileCard",
   "BentoNavCard",
   "BentoGreeting",
+  "BentoNewPost",
   "BentoMemo",
   "BentoClock",
   "BentoCalendar",

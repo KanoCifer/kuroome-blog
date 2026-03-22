@@ -33,3 +33,4 @@ extract_messages.py
 babel.cfg
 legacy/
 jwt
+response_data

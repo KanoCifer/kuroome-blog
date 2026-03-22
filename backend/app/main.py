@@ -33,12 +33,12 @@ from app.routers import (
     messages,
     monitor,
     public,
+    publish,
     rss,
     todos,
     users,
     weread,
 )
-from app.tasks import send_bootstrap_emails
 from app.tasks.broker import broker
 from app.tasks.task import send_feishu_message
 from app.utils.cache import close_cache_redis
@@ -84,7 +84,7 @@ async def lifespan(app: FastAPI):
         if lock_acquired:
             try:
                 await send_feishu_message.kiq()
-                await send_bootstrap_emails.kiq(admin_email=admin_email)
+                # await send_bootstrap_emails.kiq(admin_email=admin_email)
                 app_logger.info("✅启动通知任务已添加到队列")
             except Exception as e:
                 logger.warning(f"Failed to queue bootstrap email: {e!s}")
@@ -128,7 +128,9 @@ app.include_router(weread.router, prefix="/api/v1")
 app.include_router(rss.router, prefix="/api/v1")
 app.include_router(monitor.router, prefix="/api/v1")
 app.include_router(aiagent.router, prefix="/api/v1")
+app.include_router(publish.router, prefix="/api/v1")
 
+# 统一注册全局异常处理器
 register_exception_handlers(app)
 
 app.add_middleware(
@@ -144,6 +146,7 @@ origins: list[str] = [
     "https://kanocifer.chat",
 ]
 
+# 配置 CORS 中间件，允许前端访问 API，并暴露 Set-Cookie 头以支持跨域认证
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -160,6 +163,12 @@ async def add_process_time_header(request: Request, call_next):
     start_time: float = time.perf_counter()
     response = await call_next(request)
     process_time: float = round(time.perf_counter() - start_time, 6)
+
+    # 记录长时间异常请求
+    if process_time > 1.0:  # 1秒以上的请求视为慢请求
+        app_logger.warning(
+            f"Request to {request.url.path} took {process_time}s and returned status code {response.status_code}"
+        )
     response.headers["X-Process-Time"] = f"{process_time}s"
     return response
 
@@ -173,6 +182,7 @@ app.mount(
     name="media",
 )
 
+# 注册慢速API的速率限制异常处理器
 app.add_exception_handler(
     exc_class_or_status_code=RateLimitExceeded,
     handler=_rate_limit_exceeded_handler,  # type: ignore

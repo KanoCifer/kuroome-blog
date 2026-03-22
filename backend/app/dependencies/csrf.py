@@ -125,6 +125,7 @@ def setup_csrf(app: FastAPI) -> None:
             "/api/v1/auth/email/code",
             "/api/v1/admin/track",
             "/api/v1/admin/deploy",
+            "/api/v1/qweather/tide",
         ]
 
         if any(request.url.path.startswith(path) for path in skip_paths):

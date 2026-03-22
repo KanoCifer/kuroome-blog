@@ -180,6 +180,7 @@ import { storeToRefs } from "pinia";
 import { AnimatePresence, motion } from "motion-v";
 import { RouterLink } from "vue-router";
 import BentoCard from "./BentoCard.vue";
+import { onMounted } from "vue";
 
 interface Props {
   title?: string;
@@ -191,6 +192,10 @@ withDefaults(defineProps<Props>(), {
 
 const todoStore = useTodoStore();
 const { todos, completedCount, isCollapsed } = storeToRefs(todoStore);
+
+onMounted(() => {
+  todoStore.hydrateTodos();
+});
 </script>
 
 <style scoped>

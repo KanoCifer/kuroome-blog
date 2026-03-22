@@ -30,6 +30,7 @@ declare module 'vue' {
     ArticleSummaryCard: typeof import('./src/components/blog/ArticleSummaryCard.vue')['default']
     ArticleToc: typeof import('./src/components/blog/ArticleToc.vue')['default']
     BackToTop: typeof import('./src/components/layout/BackToTop.vue')['default']
+    BasicDetail: typeof import('./src/components/basic/BasicDetail.vue')['default']
     BasicFooter: typeof import('./src/components/basic/BasicFooter.vue')['default']
     BasicNav: typeof import('./src/components/basic/BasicNav.vue')['default']
     BasicNotifier: typeof import('./src/components/basic/BasicNotifier.vue')['default']
@@ -129,10 +130,13 @@ declare module 'vue' {
     SelectValue: typeof import('./src/components/ui/select/SelectValue.vue')['default']
     ServerMonitor: typeof import('./src/components/analytics/ServerMonitor.vue')['default']
     ThemeToggle: typeof import('./src/components/layout/ThemeToggle.vue')['default']
+    TideCard: typeof import('./src/components/map/TideCard.vue')['default']
+    TideChart: typeof import('./src/components/map/TideChart.vue')['default']
     TiptapEditor: typeof import('./src/components/editor/TiptapEditor.vue')['default']
     TiptapToolbar: typeof import('./src/components/editor/TiptapToolbar.vue')['default']
     ToastContainer: typeof import('./src/components/layout/ToastContainer.vue')['default']
     TodoCard: typeof import('./src/components/bento/TodoCard.vue')['default']
     TrendChartCard: typeof import('./src/components/analytics/TrendChartCard.vue')['default']
+    WeatherCard: typeof import('./src/components/map/WeatherCard.vue')['default']
   }
 }

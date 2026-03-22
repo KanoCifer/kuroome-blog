@@ -1,9 +1,6 @@
 <template>
-  <div
-    class="mt-24 min-h-screen rounded-t-[40px] bg-blue-50 px-4 py-8 sm:px-6 lg:px-8 dark:bg-slate-900"
-    :style="sectionStyle"
-  >
-    <div class="mx-auto max-w-4xl">
+  <BasicDetail title="RSS 阅读器" subtitle="解析并阅读 RSS/Atom 订阅源">
+    <div class="col-span-full mx-auto max-w-4xl">
       <!-- 页面标题 -->
       <div class="mb-8 flex items-center gap-3">
         <div
@@ -25,12 +22,8 @@
           </svg>
         </div>
         <div>
-          <h1 class="text-3xl font-bold text-blue-900 dark:text-white">
-            RSS 阅读器
-          </h1>
-          <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">
-            解析并阅读 RSS/Atom 订阅源
-          </p>
+          <h2 class="text-2xl font-bold text-blue-900 dark:text-white">解析订阅</h2>
+          <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">输入 RSS/Atom 地址开始阅读</p>
         </div>
         <RouterLink
           to="/rss"
@@ -43,10 +36,7 @@
       <div
         class="mb-8 rounded-2xl border border-blue-100 bg-white p-6 dark:border-slate-700 dark:bg-slate-800"
       >
-        <form
-          @submit.prevent="parseRss"
-          class="flex flex-col gap-4 sm:flex-row sm:items-end"
-        >
+        <form @submit.prevent="parseRss" class="flex flex-col gap-4 sm:flex-row sm:items-end">
           <div class="flex-1">
             <label
               for="rss-url"
@@ -55,9 +45,7 @@
               RSS/Atom 订阅地址
             </label>
             <div class="relative">
-              <div
-                class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4"
-              >
+              <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -152,9 +140,7 @@
 
         <!-- 快捷链接 -->
         <div class="mt-4 flex flex-wrap gap-2">
-          <span class="text-sm text-blue-600 dark:text-blue-400"
-            >快捷尝试:</span
-          >
+          <span class="text-sm text-blue-600 dark:text-blue-400">快捷尝试:</span>
           <button
             v-for="example in exampleFeeds"
             :key="example.url"
@@ -165,9 +151,7 @@
             {{ example.name }}
           </button>
 
-          <span class="text-sm text-blue-600 dark:text-blue-400"
-            >历史记录:</span
-          >
+          <span class="text-sm text-blue-600 dark:text-blue-400">历史记录:</span>
           <button
             v-for="history in rssHistory.slice(0, 3)"
             :key="history"
@@ -302,9 +286,7 @@
 
       <!-- RSS 条目列表 -->
       <div v-if="rssEntries.length > 0" class="space-y-4">
-        <h3
-          class="mb-4 flex items-center gap-2 text-lg font-bold text-blue-900 dark:text-white"
-        >
+        <h3 class="mb-4 flex items-center gap-2 text-lg font-bold text-blue-900 dark:text-white">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -328,9 +310,7 @@
             class="group relative overflow-hidden rounded-xl border border-blue-100 bg-white p-5 transition-all hover:border-blue-300 hover:bg-blue-50/30 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600 dark:hover:bg-slate-700/50"
             :style="{ '--index': index }"
           >
-            <div
-              class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
-            >
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div class="min-w-0 flex-1">
                 <a
                   :href="entry.link"
@@ -346,9 +326,7 @@
                 >
                   {{ truncateSummary(entry.summary) }}
                 </p>
-                <div
-                  class="mt-3 flex flex-wrap items-center gap-3 text-xs text-blue-500"
-                >
+                <div class="mt-3 flex flex-wrap items-center gap-3 text-xs text-blue-500">
                   <span v-if="entry.published" class="flex items-center gap-1">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -418,23 +396,22 @@
             />
           </svg>
         </div>
-        <h3 class="mb-2 text-xl font-bold text-blue-900 dark:text-white">
-          输入 RSS/Atom 订阅地址
-        </h3>
+        <h3 class="mb-2 text-xl font-bold text-blue-900 dark:text-white">输入 RSS/Atom 订阅地址</h3>
         <p class="mb-6 text-center text-blue-600 dark:text-blue-400">
           在上方输入框中粘贴 RSS 或 Atom 订阅链接，即可解析阅读
         </p>
       </div>
     </div>
-  </div>
+  </BasicDetail>
 </template>
 
 <script setup lang="ts">
+import { BasicDetail } from "@/components/basic";
 import request from "@/request";
 import { useNotificationStore } from "@/stores/notification";
-import { useScroll, useStorage } from "@vueuse/core";
+import { useStorage } from "@vueuse/core";
 import dayjs from "dayjs";
-import { computed, ref } from "vue";
+import { ref } from "vue";
 interface RssMetadata {
   title: string;
   description: string;
@@ -574,20 +551,9 @@ const parseRss = async () => {
     }
   } catch (error) {
     console.error("RSS parse error:", error);
-    notifier.error(
-      "解析失败: " + (error instanceof Error ? error.message : "未知错误"),
-    );
+    notifier.error("解析失败: " + (error instanceof Error ? error.message : "未知错误"));
   } finally {
     isLoading.value = false;
   }
 };
-
-const { y } = useScroll(window);
-const sectionStyle = computed(() => {
-  // compute scale with a ceiling of 1 so the content does not grow indefinitely
-  const scale = Math.min(1, 0.9 + y.value * 0.001);
-  return {
-    transform: `scale(${scale})`, // 内容区稍快
-  };
-});
 </script>

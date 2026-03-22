@@ -34,6 +34,7 @@ ignore = [
     "N805",   # Allow first argument not named 'self' (Flask patterns)
     "SIM108", # Allow if-else instead of ternary (readability)
     "RUF001", # Allow ambiguous characters in strings (Chinese)
+    "RUF002", # Allow ambiguous characters in docstrings (Chinese punctuation)
     "RUF003", # Allow ambiguous characters in comments (Chinese)
     "B008",   # Allow using mutable default arguments (e.g. dicts in Pydantic models)
 ]

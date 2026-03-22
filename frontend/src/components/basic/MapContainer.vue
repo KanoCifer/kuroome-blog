@@ -1,5 +1,5 @@
 <template>
-  <div ref="containerRef" class="map-container"></div>
+  <div ref="containerRef" class="map-container shadow-md"></div>
 </template>
 
 <script setup lang="ts">
@@ -31,7 +31,12 @@ const props = withDefaults(defineProps<Props>(), {
   center: () => [113.389549, 23.050067],
   zoom: 11,
   viewMode: "2D",
-  plugins: () => ["AMap.Scale", "AMap.ToolBar", "AMap.Geolocation", "AMap.Driving"],
+  plugins: () => [
+    "AMap.Scale",
+    "AMap.ToolBar",
+    "AMap.Geolocation",
+    "AMap.Driving",
+  ],
   markers: () => [],
   showToolBar: true,
   showScale: true,

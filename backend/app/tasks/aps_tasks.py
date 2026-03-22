@@ -5,11 +5,14 @@ from datetime import UTC, datetime
 from itertools import repeat
 
 import feedparser
+import httpx
 import orjson
+from pydantic import BaseModel
 from redis.asyncio import Redis as AsyncRedis
 from sqlalchemy import select
 from taskiq import Context, TaskiqDepends
 
+from app.configs import get_settings
 from app.configs.logger import logger
 from app.dependencies.database import AsyncSessionFactory
 from app.models.mgmodel import RssArticle
@@ -160,7 +163,12 @@ async def run_migration_job(context: Context = TaskiqDepends()):
 async def refresh_rss_feeds():
     """Daily RSS refresh at 10:00 (Asia/Shanghai) for all users, saves new articles to MongoDB."""
     start_time = time.perf_counter()
+    url: str = get_settings().FEISHU_WEBHOOK_URL
     logger.info("[RSSRefreshJob] 🔄 Starting RSS feed refresh job")
+    message = FeishuMessageContent(
+        msg_type="text",
+        content=None,
+    )
 
     try:
         # 1. 获取所有RSS源
@@ -176,6 +184,15 @@ async def refresh_rss_feeds():
             logger.info(
                 f"[RSSRefreshJob] ✅ Job completed | duration={duration:.2f}s | no RSS feeds configured"
             )
+            message.content = {
+                "text": "RSS 刷新完成，但没有配置任何 RSS 源。请前往设置页面添加 RSS 源。"
+            }
+            # 发送飞书消息
+            try:
+                async with httpx.AsyncClient() as client:
+                    await client.post(url, json=message.model_dump())
+            except Exception as e:
+                logger.error(f"Failed to send Feishu notification: {e!r}")
             return {
                 "status": "success",
                 "total_feeds": 0,
@@ -312,11 +329,21 @@ async def refresh_rss_feeds():
         logger.info(
             f"[RSSRefreshJob] ✅ Job completed | duration={duration:.2f}s | total_feeds={len(feed_urls)} | success={success_count} | failed={len(failed_feeds)} | new_articles={total_saved}"
         )
+        message.content = {
+            "text": f"✅RSS 刷新完成！\n\n总 RSS 源: {len(feed_urls)}\n成功刷新: {success_count}\n失败: {len(failed_feeds)}\n新增文章: {total_saved}\n总耗时: {duration:.2f}秒"
+        }
 
         if failed_feeds:
             logger.warning(
                 f"[RSSRefreshJob] Failed feeds: {[feed['url'] for feed in failed_feeds]}"
             )
+
+        # Send Feishu notification
+        try:
+            async with httpx.AsyncClient() as client:
+                await client.post(url, json=message.model_dump())
+        except Exception as e:
+            logger.error(f"Failed to send Feishu notification: {e!r}")
 
         return {
             "status": "success",
@@ -333,8 +360,75 @@ async def refresh_rss_feeds():
         logger.exception(
             f"[RSSRefreshJob] ❌ Job failed | duration={duration:.2f}s | error={e!s}"
         )
+        message.content = {
+            "text": f"❌RSS 刷新失败！\n错误信息: {e!s}\n耗时: {duration:.2f}秒"
+        }
+        # Send Feishu notification
+        try:
+            async with httpx.AsyncClient() as client:
+                await client.post(url, json=message.model_dump())
+        except Exception as e:
+            logger.error(f"Failed to send Feishu notification: {e!r}")
         return {
             "status": "failed",
             "error": str(e),
             "duration": f"{duration:.2f}s",
         }
+
+
+class FeishuMessageContent(BaseModel):
+    """飞书消息内容模型"""
+
+    msg_type: str = "text"
+    content: dict | None = None
+
+
+@broker.task
+async def send_daily_summary():
+    """每天早上8点发送前一天的访问统计摘要邮件给管理员"""
+    # 这里可以实现统计逻辑，生成摘要内容，并发送邮件
+    pass
+
+
+@broker.task(
+    schedule=[
+        {
+            "cron": "0 9 * * *",
+            "schedule_id": "daily_todo_reminder",
+            "cron_offset": "Asia/Shanghai",
+        }
+    ]
+)
+async def send_todo(context: Context = TaskiqDepends()):
+    """每天早上9点发送待办事项提醒给用户"""
+    todos = await context.state.redis_db2.get("todos:1")
+    url: str = get_settings().FEISHU_WEBHOOK_URL
+
+    uncompleted = (
+        [
+            todo
+            for todo in orjson.loads(todos)
+            if todo.get("completed") is False
+        ]
+        if todos
+        else []
+    )
+    if uncompleted:
+        # 构建飞书消息内容
+        message = FeishuMessageContent(
+            msg_type="text",
+            content={
+                "text": f"您有 {len(uncompleted)} 个待办事项未完成，请及时处理！\n"
+                + "\n".join(
+                    [
+                        f"- {todo['text']}- 截止日期: {todo['dueDate']}- 重要性: {todo['priority']}"
+                        for todo in uncompleted
+                    ]
+                )
+            },
+        )
+        try:
+            async with httpx.AsyncClient() as client:
+                await client.post(url, json=message.model_dump())
+        except Exception as e:
+            logger.error(f"Failed to send todo reminder: {e!r}")

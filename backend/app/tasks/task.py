@@ -2,7 +2,7 @@ from datetime import UTC, datetime
 
 import httpx
 from beanie import init_beanie
-from email_validator import EmailNotValidError, ValidatedEmail, validate_email
+from email_validator import validate_email
 from fastapi_mail import FastMail, MessageSchema, MessageType
 from pydantic import BaseModel, EmailStr
 from pymongo import AsyncMongoClient
@@ -24,11 +24,19 @@ CONNECTION_POOL = ConnectionPool(
     decode_responses=True,
     max_connections=10,
 )
+DB2_CONNECTION_POOL = ConnectionPool(
+    host="localhost",
+    port=6379,
+    db=2,
+    decode_responses=True,
+    max_connections=10,
+)
 
 
 @broker.on_event(TaskiqEvents.WORKER_STARTUP)
 async def startup(state: TaskiqState) -> None:
     state.redis = AsyncRedis(connection_pool=CONNECTION_POOL)
+    state.redis_db2 = AsyncRedis(connection_pool=DB2_CONNECTION_POOL)
 
     # 初始化MongoDB和Beanie
     state.mongo_client = AsyncMongoClient(app_settings.MONGO_URI)
@@ -43,6 +51,7 @@ async def startup(state: TaskiqState) -> None:
 @broker.on_event(TaskiqEvents.WORKER_SHUTDOWN)
 async def shutdown(state: TaskiqState) -> None:
     await state.redis.aclose()
+    await state.redis_db2.aclose()
     await state.mongo_client.close()
 
 
@@ -54,45 +63,45 @@ class BootstrapEmailContent(BaseModel):
     recipient: EmailStr
 
 
-@broker.task
-async def send_bootstrap_emails(admin_email: str):
-    """发送引导邮件给管理员"""
-    settings = get_settings().SEND_BOOT_EMAIL
-    if not settings:
-        return
-
-    html = """
-    <h1 style="color: #4CAF50;">Kuroome's Blog API 引导邮件</h1>
-    <p><strong>✅服务已成功启动！</strong></p>
-    <p>当前时间：{now}</p>
-    """
-    # 验证管理员邮箱地址
-    try:
-        valid_email: ValidatedEmail = validate_email(admin_email)
-        email: EmailStr = valid_email.email
-        content = BootstrapEmailContent(
-            subject="Kuroome's Blog API 引导邮件",
-            body=html.format(now=datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
-            recipient=email,
-        )
-    except EmailNotValidError:
-        logger.error(f"❌无效的管理员邮箱地址: {admin_email}")
-        return
-
-    message = MessageSchema(
-        subject=content.subject,
-        recipients=[content.recipient],  # type: ignore
-        body=content.body,
-        subtype=MessageType.html,
-    )
-
-    fm = FastMail(MailConfig.conf)
-
-    try:
-        await fm.send_message(message)
-        logger.info("✅引导邮件已发送")
-    except Exception as e:
-        logger.error(f"❌发送引导邮件失败: {e!s}")
+# @broker.task
+# async def send_bootstrap_emails(admin_email: str):
+#     """发送引导邮件给管理员"""
+#     settings = get_settings().SEND_BOOT_EMAIL
+#     if not settings:
+#         return
+#
+#     html = """
+#     <h1 style="color: #4CAF50;">Kuroome's Blog API 引导邮件</h1>
+#     <p><strong>✅服务已成功启动！</strong></p>
+#     <p>当前时间：{now}</p>
+#     """
+#     # 验证管理员邮箱地址
+#     try:
+#         valid_email: ValidatedEmail = validate_email(admin_email)
+#         email: EmailStr = valid_email.email
+#         content = BootstrapEmailContent(
+#             subject="Kuroome's Blog API 引导邮件",
+#             body=html.format(now=datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+#             recipient=email,
+#         )
+#     except EmailNotValidError:
+#         logger.error(f"❌无效的管理员邮箱地址: {admin_email}")
+#         return
+#
+#     message = MessageSchema(
+#         subject=content.subject,
+#         recipients=[content.recipient],  # type: ignore
+#         body=content.body,
+#         subtype=MessageType.html,
+#     )
+#
+#     fm = FastMail(MailConfig.conf)
+#
+#     try:
+#         await fm.send_message(message)
+#         logger.info("✅引导邮件已发送")
+#     except Exception as e:
+#         logger.error(f"❌发送引导邮件失败: {e!s}")
 
 
 class EmailCodeContent(BaseModel):

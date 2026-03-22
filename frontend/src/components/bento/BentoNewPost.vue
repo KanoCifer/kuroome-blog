@@ -2,8 +2,8 @@
   <motion.div
     :initial="{ scale: 0 }"
     :animate="{ scale: 1 }"
-    :transition="{ type: 'spring', duration: 2.8 }"
     :while-hover="{ scale: 1.1 }"
+    :while-press="{ scale: 0.9 }"
     class="w-auto"
   >
     <button

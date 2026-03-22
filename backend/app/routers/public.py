@@ -13,6 +13,7 @@ from datetime import UTC, datetime
 from xml.etree.ElementTree import Element, SubElement, tostring
 
 import httpx
+import orjson
 from fastapi import APIRouter, Body, Depends, Request
 from fastapi.responses import JSONResponse, PlainTextResponse
 from redis.asyncio import Redis as AsyncRedis
@@ -22,6 +23,7 @@ from app.dependencies.limiter import limiter
 from app.dependencies.mongo import get_mongo_db
 from app.dependencies.redis import get_redis
 from app.schemas.response import APIResponse
+from app.utils.qweather_jwt import encoded_jwt
 
 router = APIRouter(tags=["public"])
 
@@ -325,6 +327,7 @@ async def get_weather(
     request: Request,
     city: str = Body(..., description="City adcode"),
     extensions: str = Body("base", description="Weather type: base/all"),
+    redis: AsyncRedis = Depends(get_redis),
 ) -> JSONResponse:
     """Get weather information from Amap API.
 
@@ -335,6 +338,15 @@ async def get_weather(
     Returns:
         JSONResponse: Weather data from Amap API
     """
+
+    # 尝试命中缓存
+    cache_key = f"weather:{city}:{extensions}"
+    cached_data = await redis.get(cache_key)
+    if cached_data:
+        return APIResponse.ok(
+            data=orjson.loads(cached_data),
+            message="Weather information retrieved from cache",
+        )
     url = "https://restapi.amap.com/v3/weather/weatherInfo"
     params = {
         "key": get_settings().AMAP_WEB_KEY,
@@ -345,6 +357,10 @@ async def get_weather(
         response = await client.get(url, params=params)
         data = response.json()
 
+    # Redis缓存天气数据，过期时间60分钟
+    await redis.set(
+        f"weather:{city}:{extensions}", orjson.dumps(data), ex=60 * 60
+    )
     return APIResponse.ok(
         data=data,
         message="Weather information retrieved successfully",
@@ -383,27 +399,99 @@ async def reverse_geocode(
     )
 
 
-# @router.post("/geocode/regeo")
-# @limiter.limit("100/hour")
-# async def reverse_geocode(
-#     request: Request,
-#     params: dict = Body(..., description="Reverse geocode parameters"),
-# ) -> JSONResponse:
-#     """Reverse geocode coordinates to address using Amap API.
+@router.get("/qweather/tide")
+@limiter.limit("100/hour")
+async def get_qweather(
+    request: Request,
+    redis: AsyncRedis = Depends(get_redis),
+) -> JSONResponse:
+    """Get weather information from QWeather API."""
 
-#     Args:
-#         params: Reverse geocode parameters including location coordinates
+    # 尝试命中缓存
+    now = datetime.now().strftime("%Y%m%d")
+    cache_key = f"qweather:tide:P2352:{now}"
+    cached_data = await redis.get(cache_key)
+    if cached_data:
+        return APIResponse.ok(
+            data=orjson.loads(cached_data),
+            message="QWeather information retrieved from cache",
+        )
+    try:
+        url = "https://qk2tupqwuj.re.qweatherapi.com/v7/ocean/tide"
+        headers = {
+            "Authorization": f"Bearer {encoded_jwt}",
+        }
+        now = datetime.now().strftime("%Y%m%d")
+        payload = {
+            "location": "P2352",  # 黄埔港
+            "date": now,
+        }
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url, headers=headers, params=payload)
+            try:
+                response.raise_for_status()
+            except httpx.HTTPStatusError:
+                return APIResponse.error(
+                    message=f"QWeather API error: {response.status_code} - {response.text}",
+                    code=response.status_code,
+                )
+            data = response.json()
 
-#     Returns:
-#         JSONResponse: Address information including city adcode
-#     """
-#     url = "https://restapi.amap.com/v3/geocode/regeo"
-#     params["key"] = get_settings().AMAP_WEB_KEY
-#     async with httpx.AsyncClient() as client:
-#         response = await client.get(url, params=params)
-#         data = response.json()
+        # 缓存数据8小时，过期后自动删除
+        cache_key = f"qweather:tide:{payload['location']}:{payload['date']}"
+        await redis.set(cache_key, orjson.dumps(data), ex=8 * 3600)
+        return APIResponse.ok(
+            data=data,
+            message="QWeather information retrieved successfully",
+        )
+    except httpx.HTTPError as e:
+        return APIResponse.error(
+            message=f"Failed to fetch QWeather data: {e!s}",
+            code=503,
+        )
+    except Exception as e:
+        return APIResponse.error(
+            message=f"Internal server error: {e!s}",
+            code=500,
+        )
 
-#     return APIResponse.ok(
-#         data=data,
-#         message="Reverse geocode completed successfully",
-#     )
+
+@router.get("/qweather/location")
+@limiter.limit("100/hour")
+async def get_qweather_location(
+    request: Request,
+    location: str,
+    type: str = "scenic",
+) -> JSONResponse:
+    """Get location information from QWeather API."""
+    try:
+        url = "https://qk2tupqwuj.re.qweatherapi.com/geo/v2/poi/lookup"
+        headers = {
+            "Authorization": f"Bearer {encoded_jwt}",
+        }
+        params = {"location": location, "type": type}
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url, headers=headers, params=params)
+            try:
+                response.raise_for_status()
+            except httpx.HTTPStatusError:
+                return APIResponse.error(
+                    message=f"QWeather API error: {response.status_code} - {response.text}",
+                    code=response.status_code,
+                )
+            data = response.json()
+
+        return APIResponse.ok(
+            data=data,
+            message="QWeather location information retrieved successfully",
+        )
+    except httpx.HTTPError as e:
+        return APIResponse.error(
+            message=f"Failed to fetch QWeather location: {e!s}",
+            code=503,
+        )
+    except Exception as e:
+        return APIResponse.error(
+            message=f"Internal server error: {e!s}",
+            code=500,
+        )

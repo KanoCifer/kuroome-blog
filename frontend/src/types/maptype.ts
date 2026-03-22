@@ -50,7 +50,9 @@ export interface AMapMarkerInstance {
 }
 
 export interface AMapGeolocationInstance {
-  getCurrentPosition: (callback: (status: string, result: unknown) => void) => void;
+  getCurrentPosition: (
+    callback: (status: string, result: unknown) => void,
+  ) => void;
 }
 
 export interface AMapNamespace {

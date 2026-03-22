@@ -8,7 +8,7 @@ result_backend = RedisAsyncResultBackend(
     redis_url="redis://localhost:6379/3",
     result_ex_time=86400,
 )
-broker = (
+broker: AioPikaBroker = (
     AioPikaBroker(
         "amqp://guest:guest@localhost:5672/",
     )
