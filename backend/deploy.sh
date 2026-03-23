@@ -1,4 +1,3 @@
-set -e  # 任何命令失败就退出
 
 echo "====================================="
 echo "Starting deployment at $(date)"
