@@ -267,11 +267,13 @@ async def send_feishu_message(
     message: str | None = None,
     msg_type: str = "text",
     title: str | None = None,
+    context: Context = TaskiqDepends(),
 ):
     """发送飞书消息
     :param message: 消息内容，如果为 None 则使用默认启动消息
     :param msg_type: 消息类型，默认为 "text"，可选 "post"
     :param title: 消息标题，如果为 None 则使用默认标题
+    :param context: Taskiq 上下文对象，自动注入
     """
     url: str = get_settings().FEISHU_WEBHOOK_URL
     now: str = datetime.now().strftime(format="%Y-%m-%d %H:%M:%S")
@@ -282,33 +284,82 @@ async def send_feishu_message(
     if not url:
         return
 
-    if msg_type == "post":
-        content = {
-            "zh_cn": {
-                "title": title,
-                "content": [
-                    {"tag": "at", "user_id": "all", "user_name": "所有人"},
-                    {
-                        "tag": "text",
-                        "text": message,
-                    },
-                    {
-                        "tag": "a",
-                        "text": "网站首页",
-                        "href": "https://kanocifer.chat",
-                    },
-                ],
-            }
-        }
-        payload = FeishuRichTextContent(msg_type="post", content=content)
+    # 使用分布式锁确保在多实例部署时只发送一次消息
+    redis = context.state.redis
+    if redis is not None:
+        from app.utils import get_redis_lock
+
+        try:
+            async with get_redis_lock(redis, "feishu_message_lock", ttl=300):
+                if msg_type == "post":
+                    content = {
+                        "zh_cn": {
+                            "title": title,
+                            "content": [
+                                {
+                                    "tag": "at",
+                                    "user_id": "all",
+                                    "user_name": "所有人",
+                                },
+                                {
+                                    "tag": "text",
+                                    "text": message,
+                                },
+                                {
+                                    "tag": "a",
+                                    "text": "网站首页",
+                                    "href": "https://kanocifer.chat",
+                                },
+                            ],
+                        }
+                    }
+                    payload = FeishuRichTextContent(
+                        msg_type="post", content=content
+                    )
+                else:
+                    payload = FeishuMessageContent(
+                        msg_type=msg_type,
+                        content={"text": message},
+                    )
+                try:
+                    async with httpx.AsyncClient() as client:
+                        response = await client.post(
+                            url, json=payload.model_dump()
+                        )
+                        response.raise_for_status()
+                except Exception as e:
+                    logger.error(f"发送飞书消息失败: {e!s}")
+        except Exception as e:
+            logger.warning(f"获取分布式锁失败，跳过发送飞书消息: {e!s}")
     else:
-        payload = FeishuMessageContent(
-            msg_type=msg_type,
-            content={"text": message},
-        )
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post(url, json=payload.model_dump())
-            response.raise_for_status()
-    except Exception as e:
-        logger.error(f"发送飞书消息失败: {e!s}")
+        logger.warning("Redis 客户端不可用，跳过分布式锁检查")
+        if msg_type == "post":
+            content = {
+                "zh_cn": {
+                    "title": title,
+                    "content": [
+                        {"tag": "at", "user_id": "all", "user_name": "所有人"},
+                        {
+                            "tag": "text",
+                            "text": message,
+                        },
+                        {
+                            "tag": "a",
+                            "text": "网站首页",
+                            "href": "https://kanocifer.chat",
+                        },
+                    ],
+                }
+            }
+            payload = FeishuRichTextContent(msg_type="post", content=content)
+        else:
+            payload = FeishuMessageContent(
+                msg_type=msg_type,
+                content={"text": message},
+            )
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(url, json=payload.model_dump())
+                response.raise_for_status()
+        except Exception as e:
+            logger.error(f"发送飞书消息失败: {e!s}")

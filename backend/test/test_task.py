@@ -1,4 +1,3 @@
-
 from app.configs.config import get_settings
 
 # from app.utils.mailservice import send_bootstrap_emails
