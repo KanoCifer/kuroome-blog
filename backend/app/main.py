@@ -39,7 +39,6 @@ from app.routers import (
     users,
     weread,
 )
-from app.tasks.aps_tasks import send_daily_summary
 from app.tasks.broker import broker
 from app.tasks.task import send_feishu_message
 from app.utils import close_cache_redis, get_redis_lock
@@ -82,7 +81,6 @@ async def lifespan(app: FastAPI):
             app.state.redis, "bootstrap_notification", ttl=600
         ):
             try:
-                await send_daily_summary.kiq()
                 await send_feishu_message.kiq()
                 # await send_bootstrap_emails.kiq(admin_email=admin_email)
                 app_logger.info("✅启动通知任务已添加到队列")
