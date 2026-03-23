@@ -437,7 +437,8 @@ async def track_visitor(
     )
     try:
         await redis.rpush(
-            "migration_queue", json.dumps(visitor_data.model_dump(mode="json"))
+            "app:migration_queue",
+            json.dumps(visitor_data.model_dump(mode="json")),
         )  # type: ignore
         return Response(status_code=204)
     except Exception as e:

@@ -41,7 +41,7 @@ class MSGType(Enum):
 async def run_migration_job(context: Context = TaskiqDepends()):
     """迁移Redis访客数据到PostgreSQL"""
     start_time = time.perf_counter()
-    queue_key = "migration_queue"
+    queue_key = "app:migration_queue"
     batch_size = 200  # 每批处理 200 条，可根据服务器性能调整
     processed_count = 0
     valid_items = []
@@ -568,117 +568,65 @@ async def send_daily_summary():
         # 生成飞书消息内容
         yesterday_str = yesterday_start.strftime("%Y-%m-%d")
 
-        # 构建飞书富文本内容
-        content_items = [
-            {"tag": "at", "user_id": "all", "user_name": "所有人"},
-            {"tag": "text", "text": "\n📊 每日访问统计摘要\n\n"},
-        ]
+        # 构建纯文本消息 (通过 send_feishu_message 发送以获得分布式锁保护)
+        lines = [f"📊 每日访问统计 - {yesterday_str}\n"]
+        lines.append("📈 核心指标")
+        lines.append(f"• 总访问量: {total_visits} 次")
+        lines.append(f"• 独立访客: {unique_visitors} 人")
+        lines.append(f"• 独立IP: {unique_ips} 个\n")
 
-        # 核心指标
-        content_items.extend(
-            [
-                {"tag": "text", "text": "📈 核心指标\n"},
-                {"tag": "text", "text": f"• 总访问量: {total_visits} 次\n"},
-                {"tag": "text", "text": f"• 独立访客: {unique_visitors} 人\n"},
-                {"tag": "text", "text": f"• 独立IP: {unique_ips} 个\n\n"},
-            ]
-        )
-
-        # 热门页面
         if top_pages:
-            content_items.append(
-                {"tag": "text", "text": "🔥 热门页面 Top 5\n"}
-            )
+            lines.append("🔥 热门页面 Top 5")
             for page, count in top_pages:
                 percentage = (
                     count / total_visits * 100 if total_visits > 0 else 0
                 )
-                content_items.append(
-                    {
-                        "tag": "text",
-                        "text": f"• {page}: {count} 次 ({percentage:.1f}%)\n",
-                    }
-                )
-            content_items.append({"tag": "text", "text": "\n"})
+                lines.append(f"• {page}: {count} 次 ({percentage:.1f}%)")
+            lines.append("")
 
-        # 浏览器分布
         if browser_stats:
-            content_items.append({"tag": "text", "text": "🌐 浏览器分布\n"})
+            lines.append("🌐 浏览器分布")
             for browser, count in browser_stats:
                 percentage = (
                     count / unique_visitors * 100 if unique_visitors > 0 else 0
                 )
-                content_items.append(
-                    {
-                        "tag": "text",
-                        "text": f"• {browser or '未知'}: {count} 人 ({percentage:.1f}%)\n",
-                    }
+                lines.append(
+                    f"• {browser or '未知'}: {count} 人 ({percentage:.1f}%)"
                 )
-            content_items.append({"tag": "text", "text": "\n"})
+            lines.append("")
 
-        # 操作系统分布
         if os_stats:
-            content_items.append({"tag": "text", "text": "💻 操作系统分布\n"})
+            lines.append("💻 操作系统分布")
             for os_name, count in os_stats:
                 percentage = (
                     count / unique_visitors * 100 if unique_visitors > 0 else 0
                 )
-                content_items.append(
-                    {
-                        "tag": "text",
-                        "text": f"• {os_name or '未知'}: {count} 人 ({percentage:.1f}%)\n",
-                    }
+                lines.append(
+                    f"• {os_name or '未知'}: {count} 人 ({percentage:.1f}%)"
                 )
-            content_items.append({"tag": "text", "text": "\n"})
+            lines.append("")
 
-        # 设备类型分布
         if device_stats:
-            content_items.append({"tag": "text", "text": "📱 设备类型分布\n"})
+            lines.append("📱 设备类型分布")
             for device, count in device_stats:
                 percentage = (
                     count / unique_visitors * 100 if unique_visitors > 0 else 0
                 )
-                content_items.append(
-                    {
-                        "tag": "text",
-                        "text": f"• {device or '未知'}: {count} 人 ({percentage:.1f}%)\n",
-                    }
+                lines.append(
+                    f"• {device or '未知'}: {count} 人 ({percentage:.1f}%)"
                 )
-            content_items.append({"tag": "text", "text": "\n"})
+            lines.append("")
 
-        # 添加分隔线和来源说明
-        content_items.extend(
-            [
-                {"tag": "text", "text": "────────────────\n"},
-                {
-                    "tag": "text",
-                    "text": "📌 此消息由 ReadingList 系统自动发送",
-                },
-            ]
-        )
+        lines.append("────────────────")
+        lines.append("📌 此消息由 ReadingList 系统自动发送")
+        message = "\n".join(lines)
 
-        # 构建飞书消息负载
-        message_payload = FeishuMessageContent(
+        # 通过 send_feishu_message 发送 (自带分布式锁防重复)
+        await send_feishu_message.kiq(
+            message=message,
             msg_type="post",
-            content={
-                "zh_cn": {
-                    "title": f"📊 每日访问统计 - {yesterday_str}",
-                    "content": content_items,
-                }
-            },
+            title=f"📊 每日访问统计 - {yesterday_str}",
         )
-
-        # 发送飞书消息
-        url = settings.FEISHU_WEBHOOK_URL
-        try:
-            async with httpx.AsyncClient() as client:
-                response = await client.post(
-                    url, json=message_payload.model_dump()
-                )
-                response.raise_for_status()
-            logger.info("✅ 每日访问统计飞书消息已发送")
-        except Exception as e:
-            logger.error(f"❌ 发送飞书消息失败: {e!s}")
 
     except Exception as e:
         logger.error(f"❌ 发送每日统计飞书消息失败: {e!s}")

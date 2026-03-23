@@ -284,13 +284,13 @@ async def send_feishu_message(
     if not url:
         return
 
-    # 使用分布式锁确保在多实例部署时只发送一次消息
+    # 使用去重守卫确保在 TTL 窗口内只发送一次消息
     redis = context.state.redis
     if redis is not None:
-        from app.utils import get_redis_lock
+        from app.utils import dedup_guard
 
         try:
-            async with get_redis_lock(redis, "feishu_message_lock", ttl=300):
+            async with dedup_guard(redis, "feishu_message_lock", ttl=300):
                 if msg_type == "post":
                     content = {
                         "zh_cn": {
