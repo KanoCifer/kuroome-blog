@@ -200,7 +200,21 @@ async def parse_rss(
         logger.info(f"Redis缓存命中: {rss_url}")
         return APIResponse.ok(data=json.loads(cached_data))
     try:
-        feed: feedparser.FeedParserDict = feedparser.parse(rss_url)
+        # 异步获取feed内容，带超时控制
+        async with httpx.AsyncClient(
+            timeout=httpx.Timeout(10.0, connect=5.0), follow_redirects=True
+        ) as client:
+            resp = await client.get(rss_url)
+            resp.raise_for_status()
+            content = resp.content
+
+        # 在线程池中解析内容
+        import asyncio
+
+        loop = asyncio.get_running_loop()
+        feed: feedparser.FeedParserDict = await loop.run_in_executor(
+            None, feedparser.parse, content
+        )
         if feed.bozo != 0:
             return APIResponse.error(message="无法解析RSS链接", code=400)
         feed_meta = _build_feed_meta(feed)
@@ -437,7 +451,21 @@ async def refresh_subscription(
     await redis.delete(redis_key)
 
     try:
-        feed: feedparser.FeedParserDict = feedparser.parse(rss_url)
+        # 异步获取feed内容，带超时控制
+        async with httpx.AsyncClient(
+            timeout=httpx.Timeout(10.0, connect=5.0), follow_redirects=True
+        ) as client:
+            resp = await client.get(rss_url)
+            resp.raise_for_status()
+            content = resp.content
+
+        # 在线程池中解析内容
+        import asyncio
+
+        loop = asyncio.get_running_loop()
+        feed: feedparser.FeedParserDict = await loop.run_in_executor(
+            None, feedparser.parse, content
+        )
         if feed.bozo != 0:
             return APIResponse.error(message="无法解析RSS链接", code=400)
         feed_meta = _build_feed_meta(feed)

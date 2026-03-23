@@ -128,3 +128,7 @@ class RssArticle(Document):
         ]
         bson_encoders: ClassVar[dict] = {PydanticObjectId: str}
         model_config = ConfigDict(arbitrary_types_allowed=True)
+
+
+class RssArticleGuidProjection(BaseModel):
+    guid: str

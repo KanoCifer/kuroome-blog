@@ -1,24 +1,32 @@
 import asyncio
 import json
 import time
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
+from enum import Enum
 from itertools import repeat
 
 import feedparser
 import httpx
 import orjson
-from pydantic import BaseModel
+from beanie.operators import In
 from redis.asyncio import Redis as AsyncRedis
-from sqlalchemy import select
+from sqlalchemy import distinct, func, select
 from taskiq import Context, TaskiqDepends
 
 from app.configs import get_settings
 from app.configs.logger import logger
-from app.dependencies.database import AsyncSessionFactory
-from app.models.mgmodel import RssArticle
+from app.dependencies.database import AsyncSessionFactory, get_async_session
+from app.models.mgmodel import RssArticle, RssArticleGuidProjection
 from app.models.models import RssInfo, VisitorTrack
 from app.schemas import VisitorData
+from app.schemas.schemas import FeishuMessageContent
 from app.tasks.broker import broker
+from app.tasks.task import send_feishu_message
+
+
+class MSGType(Enum):
+    TEXT = "text"
+    POST = "post"
 
 
 @broker.task(
@@ -78,9 +86,10 @@ async def run_migration_job(context: Context = TaskiqDepends()):
             ]
             parse_duration = time.perf_counter() - parse_start
         except json.JSONDecodeError as e:
+            error_msg = str(e)
             parse_duration = time.perf_counter() - parse_start
             logger.warning(
-                f"[MigrationJob] JSON parsing failed | error={e!s} | parse_duration={parse_duration:.2f}s"
+                f"[MigrationJob] JSON parsing failed | error={error_msg} | parse_duration={parse_duration:.2f}s"
             )
 
             # 把有效数据塞回Redis
@@ -93,7 +102,7 @@ async def run_migration_job(context: Context = TaskiqDepends()):
             )
             return {
                 "status": "failed",
-                "error": "JSON parsing failed",
+                "error": error_msg,
                 "duration": f"{duration:.2f}s",
             }
 
@@ -163,12 +172,7 @@ async def run_migration_job(context: Context = TaskiqDepends()):
 async def refresh_rss_feeds():
     """Daily RSS refresh at 10:00 (Asia/Shanghai) for all users, saves new articles to MongoDB."""
     start_time = time.perf_counter()
-    url: str = get_settings().FEISHU_WEBHOOK_URL
     logger.info("[RSSRefreshJob] 🔄 Starting RSS feed refresh job")
-    message = FeishuMessageContent(
-        msg_type="text",
-        content=None,
-    )
 
     try:
         # 1. 获取所有RSS源
@@ -184,15 +188,14 @@ async def refresh_rss_feeds():
             logger.info(
                 f"[RSSRefreshJob] ✅ Job completed | duration={duration:.2f}s | no RSS feeds configured"
             )
-            message.content = {
-                "text": "RSS 刷新完成，但没有配置任何 RSS 源。请前往设置页面添加 RSS 源。"
-            }
+            message = "RSS 刷新完成，但没有配置任何 RSS 源。请前往设置页面添加 RSS 源。"
             # 发送飞书消息
-            try:
-                async with httpx.AsyncClient() as client:
-                    await client.post(url, json=message.model_dump())
-            except Exception as e:
-                logger.error(f"Failed to send Feishu notification: {e!r}")
+        try:
+            await send_feishu_message.kiq(
+                message=message, msg_type="post", title="✅Rss 刷新完成通知"
+            )
+        except Exception as feishu_e:
+            logger.error(f"Failed to send Feishu notification: {feishu_e!r}")
             return {
                 "status": "success",
                 "total_feeds": 0,
@@ -214,10 +217,19 @@ async def refresh_rss_feeds():
             feed_start = time.perf_counter()
             async with semaphore:
                 try:
-                    # 在线程池中运行 feedparser.parse（同步操作）
+                    # 先异步获取feed内容，带超时控制
+                    async with httpx.AsyncClient(
+                        timeout=httpx.Timeout(10.0, connect=5.0),
+                        follow_redirects=True,
+                    ) as client:
+                        resp = await client.get(feed_url)
+                        resp.raise_for_status()
+                        content = resp.content
+
+                    # 在线程池中运行 feedparser.parse（仅解析，无网络IO）
                     loop = asyncio.get_event_loop()
                     feed = await loop.run_in_executor(
-                        None, feedparser.parse, feed_url
+                        None, feedparser.parse, content
                     )
 
                     if feed.bozo != 0:
@@ -235,68 +247,93 @@ async def refresh_rss_feeds():
                         return 0
 
                     saved_count = 0
+
+                    # 1. 收集所有entry的guid和内容
+                    entries_map = {}
+                    guids = []
                     for entry in feed.entries:
-                        # 提取 guid
                         guid = entry.get("id") or entry.get("link", "")
                         if not guid:
                             continue
-
                         guid = str(guid)
+                        guids.append(guid)
+                        entries_map[guid] = entry
 
-                        # 检查文章是否已存在
-                        existing = await RssArticle.find_one(
-                            RssArticle.feed_url == feed_url,
-                            RssArticle.guid == guid,
+                    if guids:
+                        # 2. 批量查询已存在的文章
+                        existing_articles = (
+                            await RssArticle.find(
+                                RssArticle.feed_url == feed_url,
+                                In(RssArticle.guid, guids),
+                            )
+                            .project(RssArticleGuidProjection)
+                            .to_list()
                         )
 
-                        if existing:
-                            continue
+                        existing_guids = {
+                            article.guid for article in existing_articles
+                        }
+                        new_articles = []
+                        fetched_at = datetime.now(UTC)
 
-                        # 提取文章字段
-                        title = str(entry.get("title", ""))
-                        link = str(entry.get("link", ""))
-                        summary = str(entry.get("summary", ""))
+                        # 3. 处理新文章
+                        for guid in guids:
+                            if guid in existing_guids:
+                                continue
 
-                        # 提取 content
-                        content_list = entry.get("content")
-                        if content_list:
-                            content = str(content_list[0].get("value", ""))
-                        else:
-                            content = summary
+                            entry = entries_map[guid]
+                            # 提取文章字段
+                            title = str(entry.get("title", ""))
+                            link = str(entry.get("link", ""))
+                            summary = str(entry.get("summary", ""))
 
-                        # 提取 author
-                        raw_author = entry.get("author")
-                        author = (
-                            str(raw_author) if raw_author is not None else None
-                        )
+                            # 提取 content
+                            content_list = entry.get("content")
+                            if content_list:
+                                content = str(content_list[0].get("value", ""))
+                            else:
+                                content = summary
 
-                        # 提取发布时间
-                        pub_dt: datetime | None = None
-                        published_parsed = entry.get("published_parsed")
-                        updated_parsed = entry.get("updated_parsed")
+                            # 提取 author
+                            raw_author = entry.get("author")
+                            author = (
+                                str(raw_author)
+                                if raw_author is not None
+                                else None
+                            )
 
-                        if published_parsed:
-                            t = tuple(int(x) for x in published_parsed[:6])  # type: ignore[union-attr]
-                            pub_dt = datetime(*t, tzinfo=UTC)
-                        elif updated_parsed:
-                            t = tuple(int(x) for x in updated_parsed[:6])  # type: ignore[union-attr]
-                            pub_dt = datetime(*t, tzinfo=UTC)
+                            # 提取发布时间
+                            pub_dt: datetime | None = None
+                            published_parsed = entry.get("published_parsed")
+                            updated_parsed = entry.get("updated_parsed")
 
-                        # 创建并插入新文章
-                        new_article = RssArticle(
-                            guid=guid,
-                            feed_url=feed_url,
-                            title=title,
-                            link=link,
-                            summary=summary,
-                            content=content,
-                            author=author,
-                            published=pub_dt,
-                            fetched_at=datetime.now(UTC),
-                            read_by=[],
-                        )
-                        await new_article.insert()
-                        saved_count += 1
+                            if published_parsed:
+                                t = tuple(int(x) for x in published_parsed[:6])  # type: ignore[union-attr]
+                                pub_dt = datetime(*t, tzinfo=UTC)
+                            elif updated_parsed:
+                                t = tuple(int(x) for x in updated_parsed[:6])  # type: ignore[union-attr]
+                                pub_dt = datetime(*t, tzinfo=UTC)
+
+                            # 创建新文章对象
+                            new_articles.append(
+                                RssArticle(
+                                    guid=guid,
+                                    feed_url=feed_url,
+                                    title=title,
+                                    link=link,
+                                    summary=summary,
+                                    content=content,
+                                    author=author,
+                                    published=pub_dt,
+                                    fetched_at=fetched_at,
+                                    read_by=[],
+                                )
+                            )
+
+                        # 4. 批量插入新文章
+                        if new_articles:
+                            await RssArticle.insert_many(new_articles)
+                            saved_count = len(new_articles)
 
                     feed_duration = time.perf_counter() - feed_start
                     success_count += 1
@@ -329,9 +366,7 @@ async def refresh_rss_feeds():
         logger.info(
             f"[RSSRefreshJob] ✅ Job completed | duration={duration:.2f}s | total_feeds={len(feed_urls)} | success={success_count} | failed={len(failed_feeds)} | new_articles={total_saved}"
         )
-        message.content = {
-            "text": f"✅RSS 刷新完成！\n\n总 RSS 源: {len(feed_urls)}\n成功刷新: {success_count}\n失败: {len(failed_feeds)}\n新增文章: {total_saved}\n总耗时: {duration:.2f}秒"
-        }
+        message = f"✅RSS 刷新完成！\n\n总 RSS 源: {len(feed_urls)}\n成功刷新: {success_count}\n失败: {len(failed_feeds)}\n新增文章: {total_saved}\n总耗时: {duration:.2f}秒"
 
         if failed_feeds:
             logger.warning(
@@ -340,8 +375,9 @@ async def refresh_rss_feeds():
 
         # Send Feishu notification
         try:
-            async with httpx.AsyncClient() as client:
-                await client.post(url, json=message.model_dump())
+            await send_feishu_message.kiq(
+                message=message, msg_type="post", title="✅Rss 刷新完成通知"
+            )
         except Exception as e:
             logger.error(f"Failed to send Feishu notification: {e!r}")
 
@@ -356,19 +392,21 @@ async def refresh_rss_feeds():
         }
 
     except Exception as e:
+        error_msg = str(e)
         duration = time.perf_counter() - start_time
         logger.exception(
-            f"[RSSRefreshJob] ❌ Job failed | duration={duration:.2f}s | error={e!s}"
+            f"[RSSRefreshJob] ❌ Job failed | duration={duration:.2f}s | error={error_msg}"
         )
-        message.content = {
-            "text": f"❌RSS 刷新失败！\n错误信息: {e!s}\n耗时: {duration:.2f}秒"
-        }
+        message = (
+            f"❌RSS 刷新失败！\n错误信息: {error_msg}\n耗时: {duration:.2f}秒"
+        )
         # Send Feishu notification
         try:
-            async with httpx.AsyncClient() as client:
-                await client.post(url, json=message.model_dump())
-        except Exception as e:
-            logger.error(f"Failed to send Feishu notification: {e!r}")
+            await send_feishu_message.kiq(
+                message=message, msg_type="post", title="❌Rss 刷新失败通知"
+            )
+        except Exception as feishu_e:
+            logger.error(f"Failed to send Feishu notification: {feishu_e!r}")
         return {
             "status": "failed",
             "error": str(e),
@@ -376,18 +414,230 @@ async def refresh_rss_feeds():
         }
 
 
-class FeishuMessageContent(BaseModel):
-    """飞书消息内容模型"""
-
-    msg_type: str = "text"
-    content: dict | None = None
-
-
-@broker.task
+@broker.task(
+    schedule=[
+        {
+            "cron": "0 8 * * *",
+            "schedule_id": "daily_visitor_summary",
+            "cron_offset": "Asia/Shanghai",
+        }
+    ]
+)
 async def send_daily_summary():
-    """每天早上8点发送前一天的访问统计摘要邮件给管理员"""
-    # 这里可以实现统计逻辑，生成摘要内容，并发送邮件
-    pass
+    """每天早上8点发送前一天的访问统计摘要飞书消息给管理员"""
+    settings = get_settings()
+
+    # 检查飞书webhook配置
+    if not settings.FEISHU_WEBHOOK_URL:
+        logger.warning("⚠️ 未配置飞书webhook，跳过发送每日统计飞书消息")
+        return
+
+    # 计算昨天的时间范围 (UTC)
+    yesterday_start = (datetime.now(UTC) - timedelta(days=1)).replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
+    yesterday_end = yesterday_start + timedelta(days=1)
+
+    try:
+        # 获取数据库会话
+        async with get_async_session() as session:
+            # 1. 总访问量
+            total_visits = (
+                await session.scalar(
+                    select(func.count(VisitorTrack.id))
+                    .where(VisitorTrack.visit_time >= yesterday_start)
+                    .where(VisitorTrack.visit_time < yesterday_end)
+                )
+                or 0
+            )
+
+            # 2. 独立访客数 (按visitor_id)
+            unique_visitors = (
+                await session.scalar(
+                    select(func.count(distinct(VisitorTrack.visitor_id)))
+                    .where(VisitorTrack.visit_time >= yesterday_start)
+                    .where(VisitorTrack.visit_time < yesterday_end)
+                )
+                or 0
+            )
+
+            # 3. 独立IP数
+            unique_ips = (
+                await session.scalar(
+                    select(func.count(distinct(VisitorTrack.ip_address)))
+                    .where(VisitorTrack.visit_time >= yesterday_start)
+                    .where(VisitorTrack.visit_time < yesterday_end)
+                )
+                or 0
+            )
+
+            # 4. 访问量前5的页面
+            top_pages = await session.execute(
+                select(
+                    VisitorTrack.page_path,
+                    func.count(VisitorTrack.id).label("count"),
+                )
+                .where(VisitorTrack.visit_time >= yesterday_start)
+                .where(VisitorTrack.visit_time < yesterday_end)
+                .group_by(VisitorTrack.page_path)
+                .order_by(func.count(VisitorTrack.id).desc())
+                .limit(5)
+            )
+            top_pages = top_pages.all()
+
+            # 5. 浏览器分布
+            browser_stats = await session.execute(
+                select(
+                    VisitorTrack.browser_name,
+                    func.count(distinct(VisitorTrack.visitor_id)).label(
+                        "count"
+                    ),
+                )
+                .where(VisitorTrack.visit_time >= yesterday_start)
+                .where(VisitorTrack.visit_time < yesterday_end)
+                .where(VisitorTrack.browser_name.isnot(None))
+                .group_by(VisitorTrack.browser_name)
+                .order_by(func.count(distinct(VisitorTrack.visitor_id)).desc())
+            )
+            browser_stats = browser_stats.all()
+
+            # 6. 操作系统分布
+            os_stats = await session.execute(
+                select(
+                    VisitorTrack.os_name,
+                    func.count(distinct(VisitorTrack.visitor_id)).label(
+                        "count"
+                    ),
+                )
+                .where(VisitorTrack.visit_time >= yesterday_start)
+                .where(VisitorTrack.visit_time < yesterday_end)
+                .where(VisitorTrack.os_name.isnot(None))
+                .group_by(VisitorTrack.os_name)
+                .order_by(func.count(distinct(VisitorTrack.visitor_id)).desc())
+            )
+            os_stats = os_stats.all()
+
+            # 7. 设备类型分布
+            device_stats = await session.execute(
+                select(
+                    VisitorTrack.device_type,
+                    func.count(distinct(VisitorTrack.visitor_id)).label(
+                        "count"
+                    ),
+                )
+                .where(VisitorTrack.visit_time >= yesterday_start)
+                .where(VisitorTrack.visit_time < yesterday_end)
+                .where(VisitorTrack.device_type.isnot(None))
+                .group_by(VisitorTrack.device_type)
+                .order_by(func.count(distinct(VisitorTrack.visitor_id)).desc())
+            )
+            device_stats = device_stats.all()
+
+        # 生成飞书消息内容
+        yesterday_str = yesterday_start.strftime("%Y-%m-%d")
+
+        message_lines = [
+            f"# 📊 每日访问统计摘要 - {yesterday_str}",
+            "",
+            "## 📈 核心指标",
+            f"- **总访问量**: {total_visits} 次",
+            f"- **独立访客**: {unique_visitors} 人",
+            f"- **独立IP**: {unique_ips} 个",
+            "",
+        ]
+
+        # 热门页面
+        if top_pages:
+            message_lines.extend(
+                [
+                    "## 🔥 热门页面 Top 5",
+                    "| 页面路径 | 访问量 | 占比 |",
+                    "|---------|-------|-----|",
+                ]
+            )
+            for page, count in top_pages:
+                percentage = (
+                    count / total_visits * 100 if total_visits > 0 else 0
+                )
+                message_lines.append(
+                    f"| {page} | {count} | {percentage:.1f}% |"
+                )
+            message_lines.append("")
+
+        # 浏览器分布
+        if browser_stats:
+            message_lines.extend(
+                [
+                    "## 🌐 浏览器分布",
+                    "| 浏览器 | 用户数 | 占比 |",
+                    "|-------|-------|-----|",
+                ]
+            )
+            for browser, count in browser_stats:
+                percentage = (
+                    count / unique_visitors * 100 if unique_visitors > 0 else 0
+                )
+                message_lines.append(
+                    f"| {browser or '未知'} | {count} | {percentage:.1f}% |"
+                )
+            message_lines.append("")
+
+        # 操作系统分布
+        if os_stats:
+            message_lines.extend(
+                [
+                    "## 💻 操作系统分布",
+                    "| 操作系统 | 用户数 | 占比 |",
+                    "|---------|-------|-----|",
+                ]
+            )
+            for os_name, count in os_stats:
+                percentage = (
+                    count / unique_visitors * 100 if unique_visitors > 0 else 0
+                )
+                message_lines.append(
+                    f"| {os_name or '未知'} | {count} | {percentage:.1f}% |"
+                )
+            message_lines.append("")
+
+        # 设备类型分布
+        if device_stats:
+            message_lines.extend(
+                [
+                    "## 📱 设备类型分布",
+                    "| 设备类型 | 用户数 | 占比 |",
+                    "|---------|-------|-----|",
+                ]
+            )
+            for device, count in device_stats:
+                percentage = (
+                    count / unique_visitors * 100 if unique_visitors > 0 else 0
+                )
+                message_lines.append(
+                    f"| {device or '未知'} | {count} | {percentage:.1f}% |"
+                )
+            message_lines.append("")
+
+        message_lines.extend(
+            [
+                "---",
+                "📌 此消息由 ReadingList 系统自动发送",
+            ]
+        )
+
+        message_content = "\n".join(message_lines)
+
+        # 发送飞书富文本消息
+        await send_feishu_message.kiq(
+            message=message_content,
+            msg_type="post",
+            title=f"📊 每日访问统计 - {yesterday_str}",
+        )
+        logger.info("✅ 每日访问统计飞书消息已发送")
+
+    except Exception as e:
+        logger.error(f"❌ 发送每日统计飞书消息失败: {e!s}")
+        raise e
 
 
 @broker.task(

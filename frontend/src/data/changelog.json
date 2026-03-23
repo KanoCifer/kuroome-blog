@@ -12,7 +12,8 @@
         "type": "refactor",
         "content": "迁移redis数据库至db0，优化数据存储结构"
       },
-      { "type": "fix", "content": "修复了一些小bug" }
+      { "type": "feat", "content": "新增每日总结" },
+      { "type": "fix", "content": "修复rss订阅耗时的bug" }
     ]
   },
   {

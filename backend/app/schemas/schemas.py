@@ -451,6 +451,8 @@ class RssMarkReadRequest(BaseModel):
 
 
 class TodoIn(BaseModel):
+    """Todo creation schema."""
+
     text: str
     description: str | None = None
     dueDate: str | None = None  # ISO date string  # noqa: N815
@@ -463,6 +465,8 @@ class TodoIn(BaseModel):
 
 
 class TodoUpdate(BaseModel):
+    """Todo update schema."""
+
     text: str | None = None
     description: str | None = None
     dueDate: str | None = None  # noqa: N815
@@ -474,6 +478,8 @@ class TodoUpdate(BaseModel):
 
 
 class TodoOut(BaseModel):
+    """Todo output schema."""
+
     id: str
     text: str
     completed: bool
@@ -484,3 +490,18 @@ class TodoOut(BaseModel):
     category: str | None = None
     archived: bool = False
     archivedAt: str | None = None  # noqa: N815
+
+
+# --** Feishu Message Schemas *---
+class FeishuMessageContent(BaseModel):
+    """飞书消息内容模型"""
+
+    msg_type: str = "text"
+    content: dict | None = None
+
+
+class FeishuRichTextContent(BaseModel):
+    """飞书富文本内容模型"""
+
+    msg_type: str = "post"
+    content: dict | None = None

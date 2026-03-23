@@ -18,11 +18,11 @@ broker: AioPikaBroker = (
     )
     .with_middlewares(
         SmartRetryMiddleware(
-            default_retry_count=5,
-            default_delay=10,
+            default_retry_count=3,
+            default_delay=2,
             use_jitter=True,
             use_delay_exponent=True,
-            max_delay_exponent=120,
+            max_delay_exponent=6,
         )
     )
 )

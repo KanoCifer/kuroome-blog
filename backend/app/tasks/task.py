@@ -2,6 +2,7 @@ from datetime import UTC, datetime
 
 import httpx
 from beanie import init_beanie
+from beanie.operators import In
 from email_validator import validate_email
 from fastapi_mail import FastMail, MessageSchema, MessageType
 from pydantic import BaseModel, EmailStr
@@ -14,7 +15,14 @@ from app.configs import get_settings
 from app.configs.config import settings as app_settings
 from app.configs.logger import logger
 from app.dependencies.mail import MailConfig
-from app.models.mgmodel import MessageBoard, Post, RssArticle, RssFeed
+from app.models.mgmodel import (
+    MessageBoard,
+    Post,
+    RssArticle,
+    RssArticleGuidProjection,
+    RssFeed,
+)
+from app.schemas.schemas import FeishuMessageContent, FeishuRichTextContent
 from app.tasks.broker import broker
 
 CONNECTION_POOL = ConnectionPool.from_url(
@@ -147,8 +155,41 @@ async def save_to_mongo(feed_url: str, entries: list, user_id: int):
     """
     saved_count = 0
     try:
+        # 1. 收集所有entry的guid和内容
+        entries_map = {}
+        guids = []
         for entry in entries:
             guid = str(entry.get("id") or entry.get("link", ""))
+            if not guid:
+                continue
+            guids.append(guid)
+            entries_map[guid] = entry
+
+        if not guids:
+            logger.info(
+                f"Background task: RSS {feed_url} has no valid entries for user {user_id}"
+            )
+            return
+
+        # 2. 批量查询已存在的文章
+        existing_articles = (
+            await RssArticle.find(
+                RssArticle.feed_url == feed_url, In(RssArticle.guid, guids)
+            )
+            .project(RssArticleGuidProjection)
+            .to_list()
+        )
+
+        existing_guids = {article.guid for article in existing_articles}
+        new_articles = []
+        fetched_at = datetime.now(UTC)
+
+        # 3. 处理新文章
+        for guid in guids:
+            if guid in existing_guids:
+                continue
+
+            entry = entries_map[guid]
             title = str(entry.get("title", ""))
             link = str(entry.get("link", ""))
             summary = str(entry.get("summary", ""))
@@ -173,13 +214,9 @@ async def save_to_mongo(feed_url: str, entries: list, user_id: int):
                 t = tuple(int(x) for x in updated_parsed[:6])  # type: ignore[union-attr]
                 pub_dt = datetime(*t, tzinfo=UTC)
 
-            # Check if article already exists
-            existing = await RssArticle.find_one(
-                RssArticle.feed_url == feed_url,
-                RssArticle.guid == guid,
-            )
-            if not existing:
-                new_article = RssArticle(
+            # 创建新文章对象
+            new_articles.append(
+                RssArticle(
                     guid=guid,
                     feed_url=feed_url,
                     title=title,
@@ -188,11 +225,15 @@ async def save_to_mongo(feed_url: str, entries: list, user_id: int):
                     content=content,
                     author=author_str,
                     published=pub_dt,
-                    fetched_at=datetime.now(UTC),
+                    fetched_at=fetched_at,
                     read_by=[],
                 )
-                await new_article.insert()
-                saved_count += 1
+            )
+
+        # 4. 批量插入新文章
+        if new_articles:
+            await RssArticle.insert_many(new_articles)
+            saved_count = len(new_articles)
 
         logger.info(
             f"Background task: RSS {feed_url} saved {saved_count} new articles for user {user_id}"
@@ -210,38 +251,64 @@ async def save_cache_to_redis(
     expire: int = 3600,
     context: Context = TaskiqDepends(),
 ):
-    """将总结结果存储到 Redis,设置过期时间为 1 小时"""
+    """将总结结果存储到 Redis中，供后续查询使用
+    :param key: Redis 键
+    :param value: Redis 值
+    :param expire: 过期时间，单位为秒，默认为 3600（1小时）
+    :param context: Taskiq 上下文对象，自动注入"""
     try:
         await context.state.redis.set(key, value, ex=expire)
     except Exception as e:
         logger.error(f"❌Failed to save cache to Redis: {e!r}")
 
 
-class FeishuMessageContent(BaseModel):
-    """飞书消息内容模型"""
-
-    msg_type: str = "text"
-    content: dict
-
-
 @broker.task
-async def send_feishu_message(message: str | None = None):
-    """发送飞书消息"""
+async def send_feishu_message(
+    message: str | None = None,
+    msg_type: str = "text",
+    title: str | None = None,
+):
+    """发送飞书消息
+    :param message: 消息内容，如果为 None 则使用默认启动消息
+    :param msg_type: 消息类型，默认为 "text"，可选 "post"
+    :param title: 消息标题，如果为 None 则使用默认标题
+    """
     url: str = get_settings().FEISHU_WEBHOOK_URL
     now: str = datetime.now().strftime(format="%Y-%m-%d %H:%M:%S")
     if message is None:
-        message = f"KUROOME BLOG API 已成功启动！时间：{now}"
+        message = f"✅Kuroome Blog API 已成功启动！当前时间：{now}"
+        title = "💻Kuroome Blog API 启动通知"
     message = message.strip()
     if not url:
         return
-    payload = FeishuMessageContent(
-        msg_type="text",
-        content={"text": message},
-    )
+
+    if msg_type == "post":
+        content = {
+            "zh_cn": {
+                "title": title,
+                "content": [
+                    {"tag": "at", "user_id": "all", "user_name": "所有人"},
+                    {
+                        "tag": "text",
+                        "text": message,
+                    },
+                    {
+                        "tag": "a",
+                        "text": "网站首页",
+                        "href": "https://kanocifer.chat",
+                    },
+                ],
+            }
+        }
+        payload = FeishuRichTextContent(msg_type="post", content=content)
+    else:
+        payload = FeishuMessageContent(
+            msg_type=msg_type,
+            content={"text": message},
+        )
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(url, json=payload.model_dump())
             response.raise_for_status()
-            logger.info("飞书消息已发送")
     except Exception as e:
         logger.error(f"发送飞书消息失败: {e!s}")
