@@ -35,7 +35,7 @@ class ArticleSummarizer:
         "输出为纯文本，不要使用 Markdown 标题。"
     )
     _MAX_INPUT_CHARS = 128_000
-    DB = RedisDb(db_url="redis://localhost:6379/0")
+    DB = RedisDb(db_url=settings.REDIS_URL)
 
     def __init__(self) -> None:
         self._model = OpenAILike(

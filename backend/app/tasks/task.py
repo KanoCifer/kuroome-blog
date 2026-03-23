@@ -17,26 +17,16 @@ from app.dependencies.mail import MailConfig
 from app.models.mgmodel import MessageBoard, Post, RssArticle, RssFeed
 from app.tasks.broker import broker
 
-CONNECTION_POOL = ConnectionPool(
-    host="localhost",
-    port=6379,
-    db=0,
+CONNECTION_POOL = ConnectionPool.from_url(
+    app_settings.REDIS_URL,
     decode_responses=True,
-    max_connections=10,
-)
-DB2_CONNECTION_POOL = ConnectionPool(
-    host="localhost",
-    port=6379,
-    db=2,
-    decode_responses=True,
-    max_connections=10,
+    max_connections=app_settings.REDIS_MAX_CONNECTIONS,
 )
 
 
 @broker.on_event(TaskiqEvents.WORKER_STARTUP)
 async def startup(state: TaskiqState) -> None:
     state.redis = AsyncRedis(connection_pool=CONNECTION_POOL)
-    state.redis_db2 = AsyncRedis(connection_pool=DB2_CONNECTION_POOL)
 
     # 初始化MongoDB和Beanie
     state.mongo_client = AsyncMongoClient(app_settings.MONGO_URI)
@@ -51,7 +41,6 @@ async def startup(state: TaskiqState) -> None:
 @broker.on_event(TaskiqEvents.WORKER_SHUTDOWN)
 async def shutdown(state: TaskiqState) -> None:
     await state.redis.aclose()
-    await state.redis_db2.aclose()
     await state.mongo_client.close()
 
 

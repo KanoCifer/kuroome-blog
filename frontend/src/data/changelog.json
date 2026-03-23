@@ -1,5 +1,21 @@
 [
   {
+    "version": "2.3.12",
+    "date": "2026-03-23",
+    "title": "封装Redis分布式锁",
+    "changes": [
+      {
+        "type": "refactor",
+        "content": "封装Redis分布式锁，提升分布式环境下的任务调度和资源管理能力"
+      },
+      {
+        "type": "refactor",
+        "content": "迁移redis数据库至db0，优化数据存储结构"
+      },
+      { "type": "fix", "content": "修复了一些小bug" }
+    ]
+  },
+  {
     "version": "2.3.11",
     "date": "2026-03-22",
     "title": "钓点地图功能完善",

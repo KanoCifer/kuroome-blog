@@ -14,6 +14,7 @@ from redis.asyncio import Redis as AsyncRedis
 from rich import print
 
 from app.configs import logger
+from app.configs.config import settings
 
 
 class CacheItem(BaseModel):
@@ -216,19 +217,17 @@ class AsyncRedisCache(AsyncCache):
         await self.redis.aclose()
 
 
-CONNECTION_POOL1 = ConnectionPool(
-    host="localhost",
-    port=6379,
-    db=1,
+CONNECTION_POOL = ConnectionPool.from_url(
+    settings.REDIS_URL,
     decode_responses=True,
-    max_connections=10,
+    max_connections=settings.REDIS_MAX_CONNECTIONS,
 )
 
 
 def init_redis_cache() -> AsyncRedis:
     """Initialize Redis cache connection."""
     redis_cache_client: AsyncRedis = AsyncRedis(
-        connection_pool=CONNECTION_POOL1
+        connection_pool=CONNECTION_POOL
     )
     return redis_cache_client
 

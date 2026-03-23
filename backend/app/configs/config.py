@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     AMAP_SECURITY_CODE: str = ""
     AMAP_WEB_KEY: str = ""
     JWT_PRIVATE_KEY: str = ""
+    # Redis 配置
+    REDIS_URL: str = "redis://localhost:6379/0"
+    REDIS_MAX_CONNECTIONS: int = 10
 
     model_config = SettingsConfigDict(
         env_file=get_env_file_path(),

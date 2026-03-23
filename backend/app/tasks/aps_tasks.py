@@ -24,7 +24,7 @@ from app.tasks.broker import broker
 @broker.task(
     schedule=[
         {
-            "interval": 600,  # 每30分钟执行一次
+            "interval": 3600,
             "schedule_id": "redis_to_db_migration",
         }
     ]
@@ -401,7 +401,7 @@ async def send_daily_summary():
 )
 async def send_todo(context: Context = TaskiqDepends()):
     """每天早上9点发送待办事项提醒给用户"""
-    todos = await context.state.redis_db2.get("todos:1")
+    todos = await context.state.redis.get("todos:1")
     url: str = get_settings().FEISHU_WEBHOOK_URL
 
     uncompleted = (

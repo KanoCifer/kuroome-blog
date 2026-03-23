@@ -2,10 +2,11 @@ from taskiq.middlewares import SmartRetryMiddleware
 from taskiq_aio_pika import AioPikaBroker
 from taskiq_redis import RedisAsyncResultBackend
 
+from app.configs.config import settings
 from app.configs.logger import logger
 
 result_backend = RedisAsyncResultBackend(
-    redis_url="redis://localhost:6379/3",
+    redis_url=settings.REDIS_URL,
     result_ex_time=86400,
 )
 broker: AioPikaBroker = (
@@ -13,9 +14,7 @@ broker: AioPikaBroker = (
         "amqp://guest:guest@localhost:5672/",
     )
     .with_result_backend(
-        RedisAsyncResultBackend(
-            "redis://localhost:6379/3", result_ex_time=86400
-        )
+        RedisAsyncResultBackend(settings.REDIS_URL, result_ex_time=86400)
     )
     .with_middlewares(
         SmartRetryMiddleware(

@@ -29,7 +29,7 @@ from app.schemas import VisitorData
 from app.schemas.response import APIResponse
 from app.schemas.schemas import BlogPostIn, BlogPostUpdate
 from app.tasks import send_feishu_message
-from app.utils import redis_cache
+from app.utils import get_redis_lock, redis_cache
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -562,27 +562,24 @@ async def webhook_deploy(
         f"Deployment triggered by webhook from {get_remote_address(request)}"
     )
 
-    lock_acquired = await redis.set(
-        name="deploy_lock", value="1", ex=300, nx=True
-    )
-    if not lock_acquired:
-        logger.info("Deployment already in progress, skipping")
-        return APIResponse.ok(
-            message="Deployment already in progress",
-            data={"status": "in_progress"},
-        )
     try:
-        logger.info(
-            f"Deployment triggered by webhook from {get_remote_address(request)}"
-        )
-        await send_feishu_message.kiq("API服务正在部署中，请稍候...")
-        asyncio.create_task(run_deployment())  # noqa: RUF006
-        return APIResponse.ok(
-            message="Deployment triggered successfully",
-            data={"status": "pending"},
-        )
+        async with get_redis_lock(redis, "deploy_lock", ttl=300):
+            logger.info(
+                f"Deployment triggered by webhook from {get_remote_address(request)}"
+            )
+            await send_feishu_message.kiq("API服务正在部署中，请稍候...")
+            asyncio.create_task(run_deployment())  # noqa: RUF006
+            return APIResponse.ok(
+                message="Deployment triggered successfully",
+                data={"status": "pending"},
+            )
     except Exception as e:
-        await redis.delete("deploy_lock")
+        if "无法获取锁" in str(e):
+            logger.info("Deployment already in progress, skipping")
+            return APIResponse.ok(
+                message="Deployment already in progress",
+                data={"status": "in_progress"},
+            )
         logger.error(f"Failed to trigger deployment: {e!s}")
         return APIResponse.error(
             message="Failed to trigger deployment",

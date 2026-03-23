@@ -41,7 +41,7 @@ from app.routers import (
 )
 from app.tasks.broker import broker
 from app.tasks.task import send_feishu_message
-from app.utils.cache import close_cache_redis
+from app.utils import close_cache_redis, get_redis_lock
 
 
 async def cleanup_resources(app: FastAPI):
@@ -75,21 +75,17 @@ async def lifespan(app: FastAPI):
     logger.info("FastAPI started successfully.")
 
     # 发送引导邮件和飞书消息
-    admin_email: str = get_settings().ADMIN_EMAIL
-    bootstrap_key: str = f"bootstrap_email_sent:{admin_email}"
     if app.state.redis is not None and get_settings().SEND_BOOT_EMAIL:
-        lock_acquired = await app.state.redis.set(
-            name=bootstrap_key, value="1", ex=600, nx=True
-        )
-        if lock_acquired:
+        # 使用分布式锁确保在多实例部署时只发送一次启动通知
+        async with get_redis_lock(
+            app.state.redis, "bootstrap_notification", ttl=600
+        ):
             try:
                 await send_feishu_message.kiq()
                 # await send_bootstrap_emails.kiq(admin_email=admin_email)
                 app_logger.info("✅启动通知任务已添加到队列")
             except Exception as e:
-                logger.warning(f"Failed to queue bootstrap email: {e!s}")
-        else:
-            app_logger.info("✅引导邮件已发送")
+                logger.warning(f"❌发送启动通知失败: {e!s}")
 
     yield
 
