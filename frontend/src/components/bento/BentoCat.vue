@@ -2,7 +2,6 @@
   <motion.div
     :initial="{ scale: 0 }"
     :animate="{ scale: 1 }"
-    :transition="{ type: 'spring', duration: 2 }"
     :whileHover="{ scale: 1.05 }"
     :whileTap="{ scale: 0.9 }"
   >

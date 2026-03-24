@@ -98,6 +98,15 @@
       "icon": "https://picsum.photos/assets/images/favicon/favicon-32x32.png",
       "category": "工具",
       "tags": ["工具", "开发", "图片"]
+    },
+    {
+      "id": "12",
+      "name": "Easings",
+      "description": "一个在线动画缓动函数可视化工具，帮助开发者理解和选择合适的缓动函数。",
+      "url": "https://easings.net/zh-cn#",
+      "icon": "https://easings.net/96.8aa68ac4.png",
+      "category": "工具",
+      "tags": ["工具", "设计", "动画"]
     }
   ]
 }
