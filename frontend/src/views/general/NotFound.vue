@@ -109,9 +109,12 @@
 
 <script setup lang="ts">
 import animationJson from "@/assets/404.json";
-import { onMounted, ref } from "vue";
+import { defineAsyncComponent, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import { Vue3Lottie } from "vue3-lottie";
+
+const Vue3Lottie = defineAsyncComponent(() =>
+  import("vue3-lottie").then((m) => m.Vue3Lottie),
+);
 const animationData = ref<Record<string, unknown> | null>(null);
 onMounted(() => {
   animationData.value = animationJson;

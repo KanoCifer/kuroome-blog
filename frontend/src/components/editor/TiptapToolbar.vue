@@ -15,46 +15,17 @@ const toolbarCollapsed = ref(false);
 
 // 计算当前选中的标题类型
 const currentHeading = computed(() => {
-  if (props.editor.isActive("heading", { level: 1 })) return "H1";
-  if (props.editor.isActive("heading", { level: 2 })) return "H2";
-  if (props.editor.isActive("heading", { level: 3 })) return "H3";
-  if (props.editor.isActive("heading", { level: 4 })) return "H4";
+  if (props.editor.isActive("heading", { level: 1 })) return "H2";
+  if (props.editor.isActive("heading", { level: 2 })) return "H3";
+  if (props.editor.isActive("heading", { level: 3 })) return "H4";
+  if (props.editor.isActive("heading", { level: 4 })) return "H5";
   return "P";
 });
 
 // 表格操作
 const insertTable = (rows: number, cols: number) => {
-  props.editor
-    .chain()
-    .focus()
-    .insertTable({ rows, cols, withHeaderRow: true })
-    .run();
+  props.editor.chain().focus().insertTable({ rows, cols, withHeaderRow: true }).run();
   tableMenuOpen.value = false;
-};
-
-// 链接设置
-const setLink = () => {
-  const previousUrl = props.editor.getAttributes("link").href;
-  const url = window.prompt("Enter URL:", previousUrl || "https://");
-  if (url === null) return;
-  if (url === "") {
-    props.editor.chain().focus().extendMarkRange("link").unsetLink().run();
-  } else {
-    props.editor
-      .chain()
-      .focus()
-      .extendMarkRange("link")
-      .setLink({ href: url })
-      .run();
-  }
-};
-
-// 图片插入
-const addImage = () => {
-  const url = window.prompt("Enter image URL:", "https://");
-  if (url) {
-    props.editor.chain().focus().setImage({ src: url }).run();
-  }
 };
 
 // 快捷键提示
@@ -204,12 +175,7 @@ const shortcuts = {
             class="toolbar-btn flex items-center gap-1 px-2 py-1 text-xs font-medium"
             title="Text Style"
           >
-            <span
-              :class="[
-                currentHeading !== 'P' ? 'font-bold' : '',
-                'min-w-[20px] text-center',
-              ]"
-            >
+            <span :class="[currentHeading !== 'P' ? 'font-bold' : '', 'min-w-[20px] text-center']">
               {{ currentHeading }}
             </span>
             <svg
@@ -391,11 +357,7 @@ const shortcuts = {
             stroke-width="2"
             stroke="currentColor"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M3.75 12h16.5"
-            />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5" />
           </svg>
         </button>
       </div>
@@ -473,48 +435,6 @@ const shortcuts = {
 
       <!-- 第五组：插入 -->
       <div class="toolbar-group">
-        <button
-          type="button"
-          @click="setLink"
-          :class="{ 'is-active': editor.isActive('link') }"
-          :title="`Insert Link (${shortcuts.link})`"
-          class="toolbar-btn"
-        >
-          <svg
-            class="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
-            />
-          </svg>
-        </button>
-        <button
-          type="button"
-          @click="addImage"
-          title="Insert Image"
-          class="toolbar-btn"
-        >
-          <svg
-            class="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
-            />
-          </svg>
-        </button>
-
         <!-- 表格菜单 -->
         <div class="relative">
           <button
@@ -539,9 +459,7 @@ const shortcuts = {
             </svg>
           </button>
           <div v-if="tableMenuOpen" class="toolbar-dropdown w-48">
-            <div class="mb-2 text-xs text-gray-500 dark:text-gray-400">
-              Insert Table
-            </div>
+            <div class="mb-2 text-xs text-gray-500 dark:text-gray-400">Insert Table</div>
             <div class="grid grid-cols-3 gap-1">
               <button
                 type="button"
@@ -661,11 +579,7 @@ const shortcuts = {
             stroke-width="2"
             stroke="currentColor"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 18 18 6M6 6l12 12"
-            />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
           </svg>
         </button>
         <button
@@ -681,11 +595,7 @@ const shortcuts = {
             stroke-width="2"
             stroke="currentColor"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 18 18 6M6 6l12 12"
-            />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
           </svg>
         </button>
         <button
@@ -846,11 +756,7 @@ const shortcuts = {
             stroke-width="2"
             stroke="currentColor"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M4.5 15.75l7.5-7.5 7.5 7.5"
-            />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
           </svg>
         </button>
       </div>

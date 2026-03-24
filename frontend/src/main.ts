@@ -5,7 +5,6 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import "highlight.js/styles/atom-one-dark.css";
 import { createPinia } from "pinia";
 import { createApp } from "vue";
-import Vue3Lottie from "vue3-lottie";
 import App from "./App.vue";
 import "./assets/base.css";
 import "./assets/squircle.css";
@@ -20,6 +19,5 @@ const head = createHead();
 app.use(pinia);
 app.use(router);
 app.use(head);
-app.use(Vue3Lottie);
 
 app.mount("#app");

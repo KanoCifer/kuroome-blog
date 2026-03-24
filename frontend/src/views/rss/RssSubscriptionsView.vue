@@ -23,14 +23,18 @@
         </div>
         <div>
           <div class="flex items-center gap-4">
-            <h2 class="text-2xl font-bold text-blue-900 dark:text-white">订阅管理</h2>
+            <h2 class="text-2xl font-bold text-blue-900 dark:text-white">
+              订阅管理
+            </h2>
             <span
               class="rounded-full border border-blue-300 bg-blue-200/60 px-3 py-1 text-xs text-blue-500 dark:bg-blue-200 dark:text-blue-900"
             >
               {{ subscriptions.length }}
             </span>
           </div>
-          <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">查看和管理已保存的 RSS 订阅源</p>
+          <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">
+            查看和管理已保存的 RSS 订阅源
+          </p>
         </div>
         <button
           @click="router.push('/rss/parse')"
@@ -105,8 +109,12 @@
             />
           </svg>
         </div>
-        <h3 class="mb-2 text-xl font-bold text-blue-900 dark:text-white">暂无订阅</h3>
-        <p class="mb-6 text-center text-blue-600 dark:text-blue-400">暂无订阅，去添加一个吧</p>
+        <h3 class="mb-2 text-xl font-bold text-blue-900 dark:text-white">
+          暂无订阅
+        </h3>
+        <p class="mb-6 text-center text-blue-600 dark:text-blue-400">
+          暂无订阅，去添加一个吧
+        </p>
         <router-link
           to="/rss"
           class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 font-semibold text-white shadow-lg shadow-blue-500/30 transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none dark:ring-offset-slate-800"
@@ -119,7 +127,11 @@
             stroke="currentColor"
             class="h-5 w-5"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 4.5v15m7.5-7.5h-15"
+            />
           </svg>
           去添加
         </router-link>
@@ -133,7 +145,9 @@
             :key="sub.id"
             class="group relative overflow-hidden rounded-xl border border-blue-100 bg-white p-5 transition-all hover:border-blue-300 hover:bg-blue-50/30 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600 dark:hover:bg-slate-700/50"
           >
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div
+              class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+            >
               <div class="min-w-0 flex-1">
                 <p
                   class="truncate font-semibold text-blue-900 dark:text-white"
@@ -141,7 +155,10 @@
                 >
                   {{ getSubscriptionTitle(sub.feed_title, sub.rss_url) }}
                 </p>
-                <p class="mt-1 truncate text-sm text-blue-500" :title="sub.rss_url">
+                <p
+                  class="mt-1 truncate text-sm text-blue-500"
+                  :title="sub.rss_url"
+                >
                   {{ sub.rss_url }}
                 </p>
 
@@ -171,7 +188,9 @@
                   </span>
                 </div>
 
-                <div class="mt-2 flex flex-wrap items-center gap-3 text-sm text-blue-500">
+                <div
+                  class="mt-2 flex flex-wrap items-center gap-3 text-sm text-blue-500"
+                >
                   <span v-if="sub.created_at" class="flex items-center gap-1">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -241,7 +260,9 @@
                       d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865A8.25 8.25 0 0117.834 6.165l3.181 3.183"
                     />
                   </svg>
-                  {{ refreshingSubscriptionId === sub.id ? "刷新中..." : "刷新" }}
+                  {{
+                    refreshingSubscriptionId === sub.id ? "刷新中..." : "刷新"
+                  }}
                 </button>
 
                 <AlertDialog>
@@ -269,12 +290,16 @@
                   </AlertDialogTrigger>
                   <AlertDialogContent class="rounded-3xl">
                     <AlertDialogHeader>
-                      <AlertDialogTitle>你确定要删除此订阅吗？</AlertDialogTitle>
+                      <AlertDialogTitle
+                        >你确定要删除此订阅吗？</AlertDialogTitle
+                      >
                       <AlertDialogDescription>
-                        这将永久删除订阅，并且无法恢复。请确认你要删除的订阅 URL 是
-                        <span class="font-mono text-red-600 dark:text-red-400">{{
-                          sub.rss_url
-                        }}</span>
+                        这将永久删除订阅，并且无法恢复。请确认你要删除的订阅 URL
+                        是
+                        <span
+                          class="font-mono text-red-600 dark:text-red-400"
+                          >{{ sub.rss_url }}</span
+                        >
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -340,7 +365,10 @@ const getFeedProtocol = (url: string) => {
   }
 };
 
-const getSubscriptionTitle = (feedTitle: string | null | undefined, rssUrl: string) => {
+const getSubscriptionTitle = (
+  feedTitle: string | null | undefined,
+  rssUrl: string,
+) => {
   const normalizedTitle = feedTitle?.trim();
   if (normalizedTitle) {
     return normalizedTitle;
@@ -352,7 +380,8 @@ const fetchSubscriptions = async () => {
   isLoading.value = true;
   errorMessage.value = "";
   try {
-    const res = await request.get<ApiResponse<RssSubscription[]>>("/rss/subscriptions");
+    const res =
+      await request.get<ApiResponse<RssSubscription[]>>("/rss/subscriptions");
     if (res.data.status === "success") {
       subscriptions.value = res.data.data || [];
     } else {
@@ -363,7 +392,8 @@ const fetchSubscriptions = async () => {
       response?: { data?: { message?: string } };
       message?: string;
     };
-    errorMessage.value = error?.response?.data?.message || error?.message || "获取订阅列表失败";
+    errorMessage.value =
+      error?.response?.data?.message || error?.message || "获取订阅列表失败";
   } finally {
     isLoading.value = false;
   }
@@ -390,7 +420,9 @@ const handleRefresh = async (id: number) => {
       response?: { data?: { message?: string } };
       message?: string;
     };
-    notificationStore.error(error?.response?.data?.message || error?.message || "刷新订阅失败");
+    notificationStore.error(
+      error?.response?.data?.message || error?.message || "刷新订阅失败",
+    );
   } finally {
     refreshingSubscriptionId.value = null;
   }
@@ -398,7 +430,9 @@ const handleRefresh = async (id: number) => {
 
 const handleDelete = async (id: number) => {
   try {
-    const res = await request.delete<ApiResponse<null>>(`/rss/subscriptions/${id}`);
+    const res = await request.delete<ApiResponse<null>>(
+      `/rss/subscriptions/${id}`,
+    );
     if (res.data.status === "success") {
       subscriptions.value = subscriptions.value.filter((sub) => sub.id !== id);
     } else {
@@ -409,7 +443,9 @@ const handleDelete = async (id: number) => {
       response?: { data?: { message?: string } };
       message?: string;
     };
-    notificationStore.error(error?.response?.data?.message || error?.message || "删除订阅失败");
+    notificationStore.error(
+      error?.response?.data?.message || error?.message || "删除订阅失败",
+    );
   }
 };
 

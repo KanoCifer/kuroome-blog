@@ -58,7 +58,9 @@
         </div>
       </div>
 
-      <p class="line-clamp-3 text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+      <p
+        class="line-clamp-3 text-sm leading-relaxed text-gray-600 dark:text-gray-400"
+      >
         {{ site.description }}
       </p>
 

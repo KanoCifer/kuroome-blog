@@ -18,7 +18,12 @@ import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import Paragraph from "@tiptap/extension-paragraph";
 import Placeholder from "@tiptap/extension-placeholder";
-import { Table, TableCell, TableHeader, TableRow } from "@tiptap/extension-table";
+import {
+  Table,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "@tiptap/extension-table";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import Text from "@tiptap/extension-text";
@@ -30,18 +35,10 @@ import js from "highlight.js/lib/languages/javascript";
 import python from "highlight.js/lib/languages/python";
 import ts from "highlight.js/lib/languages/typescript";
 import html from "highlight.js/lib/languages/xml";
+import bash from "highlight.js/lib/languages/bash";
 import { createLowlight } from "lowlight";
 import { Markdown } from "tiptap-markdown";
-import imageCompression from "browser-image-compression";
-import MarkdownIt from "markdown-it";
-import DOMPurify from "dompurify";
-
-const md = new MarkdownIt({
-  html: true,
-  linkify: true,
-  typographer: true,
-  breaks: true,
-});
+import { compressImage } from "@/utils/imageCompressor";
 
 const lowlight = createLowlight();
 lowlight.register("html", html);
@@ -49,6 +46,7 @@ lowlight.register("css", css);
 lowlight.register("js", js);
 lowlight.register("ts", ts);
 lowlight.register("python", python);
+lowlight.register("bash", bash);
 
 // 代码块 Tab 缩进扩展
 const CodeBlockTabIndent = Extension.create({
@@ -64,155 +62,34 @@ const CodeBlockTabIndent = Extension.create({
   },
 });
 
-// Markdown 快捷输入扩展
-const MarkdownShortcuts = Extension.create({
-  name: "markdownShortcuts",
-  addInputRules() {
-    return [
-      // 标题快捷输入
-      {
-        find: /^#\s$/,
-        handler: ({ state, range }) => {
-          const { tr } = state;
-          tr.delete(range.from, range.to);
-          tr.setBlockType(range.from, range.from, state.schema.nodes.heading, {
-            level: 1,
-          });
-          state.apply(tr);
-        },
-        undoable: true,
-      },
-      {
-        find: /^##\s$/,
-        handler: ({ state, range }) => {
-          const { tr } = state;
-          tr.delete(range.from, range.to);
-          tr.setBlockType(range.from, range.from, state.schema.nodes.heading, {
-            level: 2,
-          });
-          state.apply(tr);
-        },
-        undoable: true,
-      },
-      {
-        find: /^###\s$/,
-        handler: ({ state, range }) => {
-          const { tr } = state;
-          tr.delete(range.from, range.to);
-          tr.setBlockType(range.from, range.from, state.schema.nodes.heading, {
-            level: 3,
-          });
-          state.apply(tr);
-        },
-        undoable: true,
-      },
-      // 无序列表
-      {
-        find: /^[-*]\s$/,
-        handler: ({ state, range }) => {
-          const { tr } = state;
-          tr.delete(range.from, range.to);
-          state.apply(tr);
-          this.editor.commands.toggleBulletList();
-        },
-        undoable: true,
-      },
-      // 有序列表
-      {
-        find: /^1\.\s$/,
-        handler: ({ state, range }) => {
-          const { tr } = state;
-          tr.delete(range.from, range.to);
-          state.apply(tr);
-          this.editor.commands.toggleOrderedList();
-        },
-        undoable: true,
-      },
-      // 任务列表
-      {
-        find: /^\[\]\s$/,
-        handler: ({ state, range }) => {
-          const { tr } = state;
-          tr.delete(range.from, range.to);
-          state.apply(tr);
-          this.editor.commands.toggleTaskList();
-        },
-        undoable: true,
-      },
-      // 引用
-      {
-        find: /^>\s$/,
-        handler: ({ state, range }) => {
-          const { tr } = state;
-          tr.delete(range.from, range.to);
-          state.apply(tr);
-          this.editor.commands.toggleBlockquote();
-        },
-        undoable: true,
-      },
-      // 代码块
-      {
-        find: /^```\s$/,
-        handler: ({ state, range }) => {
-          const { tr } = state;
-          tr.delete(range.from, range.to);
-          state.apply(tr);
-          this.editor.commands.toggleCodeBlock();
-        },
-        undoable: true,
-      },
-      // 水平线
-      {
-        find: /^---$/,
-        handler: ({ state, range }) => {
-          const { tr } = state;
-          tr.delete(range.from, range.to);
-          state.apply(tr);
-          this.editor.commands.setHorizontalRule();
-        },
-        undoable: true,
-      },
-    ];
-  },
-});
-
 // 图片上传
 const uploadImage = async (file: File): Promise<string> => {
   isUploadingImage.value = true;
   uploadProgress.value = 0;
 
   try {
-    // 图片压缩配置
-    const compressionOptions = {
-      maxSizeMB: 1, // 最大 1MB
-      maxWidthOrHeight: 1920, // 最大分辨率 1920px
-      useWebWorker: true,
+    const compressedFile = await compressImage(file, {
       onProgress: (progress: number) => {
-        uploadProgress.value = Math.round(progress * 50); // 压缩占 50% 进度
+        uploadProgress.value = Math.round(progress * 50);
       },
-    };
-
-    // 压缩图片
-    const compressedFile = await imageCompression(file, compressionOptions);
+    });
     uploadProgress.value = 50;
 
     const formData = new FormData();
     formData.append("file", compressedFile);
 
-    const res = await request.post<ApiResponse<{ url: string; filename: string }>>(
-      "/blog/upload-image",
-      formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-        onUploadProgress: (progressEvent: AxiosProgressEvent) => {
-          const total = progressEvent.total ?? 0;
-          if (total > 0) {
-            const uploadPercent = Math.round((progressEvent.loaded / total) * 50);
-            uploadProgress.value = 50 + uploadPercent; // 上传占 50% 进度
-          }
-        },
+    const res = await request.post<
+      ApiResponse<{ url: string; filename: string }>
+    >("/blog/upload-image", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+      onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+        const total = progressEvent.total ?? 0;
+        if (total > 0) {
+          const uploadPercent = Math.round((progressEvent.loaded / total) * 50);
+          uploadProgress.value = 50 + uploadPercent; // 上传占 50% 进度
+        }
       },
-    );
+    });
 
     if (res.data.status !== "success" || !res.data.data?.url) {
       throw new Error(res.data.message || "Image upload failed.");
@@ -360,59 +237,10 @@ const deleteDraft = (draftKey: string) => {
 const isUploadingImage = ref(false);
 const uploadProgress = ref(0);
 
-// 源代码编辑模式
-const sourceMode = ref(false);
-const sourceContent = ref("");
-
-// 获取当前内容（无论哪种模式）
-const getCurrentContent = () => {
-  if (sourceMode.value) {
-    // 源代码模式，将 Markdown 转换为 HTML
-    const rawHtml = md.render(sourceContent.value);
-    return DOMPurify.sanitize(rawHtml);
-  } else {
-    // 富文本模式，返回 HTML 内容
-    return editor.value?.getHTML() || "";
-  }
+// 获取当前编辑器内容
+const getContent = () => {
+  return editor.value?.getHTML() || "";
 };
-
-// 切换源代码模式
-const toggleSourceMode = () => {
-  if (!sourceMode.value) {
-    // 切换到源代码模式，获取当前 Markdown 内容
-    sourceContent.value = markdownContent.value;
-  } else {
-    // 切换到富文本模式，更新编辑器内容
-    if (editor.value) {
-      // 使用 setContent 直接设置内容，Tiptap 会自动处理
-      editor.value.commands.setContent(sourceContent.value);
-      // 更新 modelValue
-      emit("update:modelValue", editor.value.getHTML());
-    }
-  }
-  sourceMode.value = !sourceMode.value;
-};
-
-// 处理源代码内容变化
-const handleSourceChange = (event: Event) => {
-  const target = event.target as HTMLTextAreaElement;
-  sourceContent.value = target.value;
-  // 同时更新 modelValue
-  emit("update:modelValue", target.value);
-};
-
-// 编辑器内容的 Markdown 格式
-const markdownContent = computed(() => {
-  if (!editor.value) return "";
-  // 明确类型接口并做类型断言（推荐）
-  type MarkdownStorage = { getMarkdown?: () => string };
-  const storage = (editor.value.storage as { markdown?: MarkdownStorage }).markdown;
-  if (storage?.getMarkdown) {
-    return storage.getMarkdown();
-  }
-  // 回退到 HTML
-  return editor.value.getHTML();
-});
 
 // 暴露给父组件的方法
 defineExpose({
@@ -423,9 +251,7 @@ defineExpose({
   getAllDrafts,
   switchToDraft,
   deleteDraft,
-  toggleSourceMode,
-  sourceMode,
-  getCurrentContent,
+  getContent,
 });
 
 // 编辑器实例
@@ -444,7 +270,6 @@ const editor = useEditor({
       enableTabIndentation: true,
     }),
     CodeBlockTabIndent,
-    MarkdownShortcuts,
 
     Link.configure({ openOnClick: false }),
 
@@ -617,75 +442,53 @@ onBeforeUnmount(() => {
         </div>
         <div class="flex items-center gap-2">
           <!-- Markdown 快捷键提示 -->
-          <div class="hidden items-center gap-1 text-xs text-gray-400 md:flex dark:text-gray-500">
-            <span class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"> # </span>
+          <div
+            class="hidden items-center gap-1 text-xs text-gray-400 md:flex dark:text-gray-500"
+          >
+            <span
+              class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"
+            >
+              #
+            </span>
             <span>标题</span>
-            <span class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"> - </span>
+            <span
+              class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"
+            >
+              -
+            </span>
             <span>列表</span>
-            <span class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"> > </span>
+            <span
+              class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"
+            >
+              >
+            </span>
             <span>引用</span>
-            <span class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"> \`\`\` </span>
+            <span
+              class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"
+            >
+              \`\`\`
+            </span>
             <span>代码</span>
           </div>
         </div>
 
         <!-- 字符计数 -->
-        <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+        <div
+          class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400"
+        >
           <span>{{ characterCount.characters }} chars</span>
           <span>{{ characterCount.words }} words</span>
-        </div>
-
-        <!-- 模式切换 -->
-        <div class="flex items-center gap-2">
-          <!-- 源代码模式切换 -->
-          <button
-            type="button"
-            @click="toggleSourceMode"
-            :class="[
-              'flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-all duration-300',
-              sourceMode
-                ? 'bg-purple-100 text-purple-700 shadow-sm dark:bg-purple-900/30 dark:text-purple-300'
-                : 'text-gray-500 hover:bg-gray-200 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300',
-            ]"
-            title="Toggle Source Mode"
-          >
-            <svg
-              class="h-3.5 w-3.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="2"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"
-              />
-            </svg>
-            {{ sourceMode ? "富文本" : "源代码" }}
-          </button>
         </div>
       </div>
 
       <!-- 编辑器内容 -->
       <div class="relative flex-1 overflow-auto">
-        <!-- 源代码编辑模式 -->
-        <div v-if="sourceMode" class="h-full">
-          <textarea
-            :value="sourceContent"
-            @input="handleSourceChange"
-            class="h-full w-full resize-none border-0 bg-transparent p-6 font-mono text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:ring-0 dark:text-white"
-            placeholder="在此输入 Markdown 源代码..."
-            spellcheck="false"
-          ></textarea>
-        </div>
-        <!-- 富文本编辑模式 -->
-        <EditorContent v-else :editor="editor" />
+        <EditorContent :editor="editor" />
       </div>
 
       <!-- 气泡菜单 -->
       <BubbleMenu
-        v-if="editor && !sourceMode"
+        v-if="editor"
         :editor="editor"
         :should-show="
           ({ editor }) => {

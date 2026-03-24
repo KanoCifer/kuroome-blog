@@ -4,12 +4,14 @@ import IconInfo from "@/components/icons/IconInfo.vue";
 import IconWarning from "@/components/icons/IconWarning.vue";
 import { useNotificationStore } from "@/stores/notification";
 import { AnimatePresence, motion } from "motion-v";
-import { computed, onUnmounted, ref } from "vue";
-import { Vue3Lottie } from "vue3-lottie";
+import { computed, defineAsyncComponent, onUnmounted, ref } from "vue";
 
 import errorAnimationData from "@/assets/error.json";
 import successAnimationData from "@/assets/success.json";
 
+const Vue3Lottie = defineAsyncComponent(() =>
+  import("vue3-lottie").then((m) => m.Vue3Lottie),
+);
 const lottieContainer = ref<typeof Vue3Lottie | null>(null);
 const store = useNotificationStore();
 const toasts = computed(() => store.toasts);

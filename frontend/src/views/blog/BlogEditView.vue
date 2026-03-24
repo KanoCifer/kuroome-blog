@@ -216,8 +216,8 @@ const handleSubmit = async () => {
     return;
   }
 
-  // 获取当前内容（无论哪种模式）
-  const currentContent = editorRef.value?.getCurrentContent() || "";
+  // 获取当前内容
+  const currentContent = editorRef.value?.getContent() || "";
   if (!currentContent.trim()) {
     error.value = "内容不能为空";
     notification.error(error.value);
