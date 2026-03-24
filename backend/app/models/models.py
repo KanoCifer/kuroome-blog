@@ -153,8 +153,8 @@ class User(Base):
 
     @property
     def is_admin(self) -> bool:
-        """检查用户是否为管理员(id=1的用户为管理员)"""
-        return self.id == 1
+        """检查用户是否为管理员(id=1或id=2的用户为管理员)"""
+        return self.id == 1 or self.id == 2
 
     @property
     def raw_password(self):

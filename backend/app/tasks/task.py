@@ -292,25 +292,32 @@ async def send_feishu_message(
         try:
             async with dedup_guard(redis, "feishu_message_lock", ttl=300):
                 if msg_type == "post":
+                    # 飞书富文本消息格式需要包含 post 字段，content 是二维数组
                     content = {
-                        "zh_cn": {
-                            "title": title,
-                            "content": [
-                                {
-                                    "tag": "at",
-                                    "user_id": "all",
-                                    "user_name": "所有人",
-                                },
-                                {
-                                    "tag": "text",
-                                    "text": message,
-                                },
-                                {
-                                    "tag": "a",
-                                    "text": "网站首页",
-                                    "href": "https://kanocifer.chat",
-                                },
-                            ],
+                        "post": {
+                            "zh_cn": {
+                                "title": title,
+                                "content": [
+                                    [
+                                        {
+                                            "tag": "at",
+                                            "user_id": "all",
+                                            "user_name": "所有人",
+                                        },
+                                        {
+                                            "tag": "text",
+                                            "text": message,
+                                        },
+                                    ],
+                                    [
+                                        {
+                                            "tag": "a",
+                                            "text": "网站首页",
+                                            "href": "https://kanocifer.chat",
+                                        },
+                                    ],
+                                ],
+                            }
                         }
                     }
                     payload = FeishuRichTextContent(
@@ -334,21 +341,32 @@ async def send_feishu_message(
     else:
         logger.warning("Redis 客户端不可用，跳过分布式锁检查")
         if msg_type == "post":
+            # 飞书富文本消息格式需要包含 post 字段，content 是二维数组
             content = {
-                "zh_cn": {
-                    "title": title,
-                    "content": [
-                        {"tag": "at", "user_id": "all", "user_name": "所有人"},
-                        {
-                            "tag": "text",
-                            "text": message,
-                        },
-                        {
-                            "tag": "a",
-                            "text": "网站首页",
-                            "href": "https://kanocifer.chat",
-                        },
-                    ],
+                "post": {
+                    "zh_cn": {
+                        "title": title,
+                        "content": [
+                            [
+                                {
+                                    "tag": "at",
+                                    "user_id": "all",
+                                    "user_name": "所有人",
+                                },
+                                {
+                                    "tag": "text",
+                                    "text": message,
+                                },
+                            ],
+                            [
+                                {
+                                    "tag": "a",
+                                    "text": "网站首页",
+                                    "href": "https://kanocifer.chat",
+                                },
+                            ],
+                        ],
+                    }
                 }
             }
             payload = FeishuRichTextContent(msg_type="post", content=content)

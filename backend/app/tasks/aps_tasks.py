@@ -569,7 +569,7 @@ async def send_daily_summary():
         yesterday_str = yesterday_start.strftime("%Y-%m-%d")
 
         # 构建纯文本消息 (通过 send_feishu_message 发送以获得分布式锁保护)
-        lines = [f"📊 每日访问统计 - {yesterday_str}\n"]
+        lines = []
         lines.append("📈 核心指标")
         lines.append(f"• 总访问量: {total_visits} 次")
         lines.append(f"• 独立访客: {unique_visitors} 人")
@@ -618,7 +618,7 @@ async def send_daily_summary():
             lines.append("")
 
         lines.append("────────────────")
-        lines.append("📌 此消息由 ReadingList 系统自动发送")
+        lines.append("📌 此消息由 BOT 自动发送")
         message = "\n".join(lines)
 
         # 通过 send_feishu_message 发送 (自带分布式锁防重复)

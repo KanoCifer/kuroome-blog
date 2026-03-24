@@ -69,9 +69,6 @@ export default defineConfig({
               // ✅ 工具库
               if (id.includes("axios")) return "axios";
               if (id.includes("dayjs")) return "dayjs";
-
-              // ✅ 兜底
-              return "vendor";
             },
           },
           // 忽略lottie-web的eval警告（第三方库问题，无法修复）
