@@ -29,45 +29,54 @@ export default defineConfig({
     },
   },
   build: {
-    chunkSizeWarningLimit: 600,
+    minify: "oxc",
+    cssMinify: true,
+    sourcemap: false,
+    terserOptions: {
+      compress: {
+        drop_console: true, // 删除 console
+        drop_debugger: true,
+      },
+    },
     // 只在非 SSG 构建时使用 manualChunks
     rollupOptions: process.env.SSG_BUILD
       ? {}
       : {
           output: {
-            manualChunks: (id) => {
-              // Highlight.js and lowlight are shared utilities
-              if (
-                id.includes("node_modules/highlight.js") ||
-                id.includes("node_modules/lowlight")
-              ) {
-                return "syntax-highlight";
-              }
-              // Tiptap core and extensions
-              if (id.includes("node_modules/@tiptap")) {
+            manualChunks(id) {
+              if (!id.includes("node_modules")) return;
+
+              // ✅ 富文本（最大优先级）
+              if (id.includes("@tiptap")) {
                 return "tiptap";
               }
-              // Core Vue ecosystem
-              if (
-                id.includes("node_modules/vue") ||
-                id.includes("node_modules/vue-router") ||
-                id.includes("node_modules/pinia")
-              ) {
-                return "vue-core";
+
+              // ✅ 代码高亮
+              if (id.includes("highlight.js") || id.includes("lowlight")) {
+                return "syntax-highlight";
               }
-              // Other common heavy utilities
-              if (id.includes("node_modules/axios")) return "axios";
-              if (id.includes("node_modules/dayjs")) return "dayjs";
-              // Lottie animation library
-              if (id.includes("node_modules/lottie-web")) return "lottie-web";
+
+              // ✅ 动画
+              if (id.includes("lottie-web")) {
+                return "lottie";
+              }
+
+              // ✅ Vue 生态（注意顺序！）
+              if (id.includes("vue-router")) return "router";
+              if (id.includes("pinia")) return "store";
+              if (id.includes("node_modules/vue/")) return "vue";
+
+              // ✅ 工具库
+              if (id.includes("axios")) return "axios";
+              if (id.includes("dayjs")) return "dayjs";
+
+              // ✅ 兜底
+              return "vendor";
             },
           },
           // 忽略lottie-web的eval警告（第三方库问题，无法修复）
           onwarn(warning, warn) {
-            if (
-              warning.code === "EVAL" &&
-              warning.id?.includes("node_modules/lottie-web")
-            ) {
+            if (warning.code === "EVAL" && warning.id?.includes("node_modules/lottie-web")) {
               return;
             }
             warn(warning);

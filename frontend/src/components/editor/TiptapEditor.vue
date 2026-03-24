@@ -18,12 +18,7 @@ import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import Paragraph from "@tiptap/extension-paragraph";
 import Placeholder from "@tiptap/extension-placeholder";
-import {
-  Table,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "@tiptap/extension-table";
+import { Table, TableCell, TableHeader, TableRow } from "@tiptap/extension-table";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import Text from "@tiptap/extension-text";
@@ -204,18 +199,20 @@ const uploadImage = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append("file", compressedFile);
 
-    const res = await request.post<
-      ApiResponse<{ url: string; filename: string }>
-    >("/blog/upload-image", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-      onUploadProgress: (progressEvent: AxiosProgressEvent) => {
-        const total = progressEvent.total ?? 0;
-        if (total > 0) {
-          const uploadPercent = Math.round((progressEvent.loaded / total) * 50);
-          uploadProgress.value = 50 + uploadPercent; // 上传占 50% 进度
-        }
+    const res = await request.post<ApiResponse<{ url: string; filename: string }>>(
+      "/blog/upload-image",
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+        onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+          const total = progressEvent.total ?? 0;
+          if (total > 0) {
+            const uploadPercent = Math.round((progressEvent.loaded / total) * 50);
+            uploadProgress.value = 50 + uploadPercent; // 上传占 50% 进度
+          }
+        },
       },
-    });
+    );
 
     if (res.data.status !== "success" || !res.data.data?.url) {
       throw new Error(res.data.message || "Image upload failed.");
@@ -409,8 +406,7 @@ const markdownContent = computed(() => {
   if (!editor.value) return "";
   // 明确类型接口并做类型断言（推荐）
   type MarkdownStorage = { getMarkdown?: () => string };
-  const storage = (editor.value.storage as { markdown?: MarkdownStorage })
-    .markdown;
+  const storage = (editor.value.storage as { markdown?: MarkdownStorage }).markdown;
   if (storage?.getMarkdown) {
     return storage.getMarkdown();
   }
@@ -615,46 +611,26 @@ onBeforeUnmount(() => {
           class="absolute top-0 left-0 h-1 w-full bg-gray-200 dark:bg-gray-700"
         >
           <div
-            class="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
+            class="h-full bg-linear-to-r from-blue-500 to-purple-500 transition-all duration-300"
             :style="{ width: `${uploadProgress}%` }"
           ></div>
         </div>
         <div class="flex items-center gap-2">
           <!-- Markdown 快捷键提示 -->
-          <div
-            class="hidden items-center gap-1 text-xs text-gray-400 md:flex dark:text-gray-500"
-          >
-            <span
-              class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"
-            >
-              #
-            </span>
+          <div class="hidden items-center gap-1 text-xs text-gray-400 md:flex dark:text-gray-500">
+            <span class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"> # </span>
             <span>标题</span>
-            <span
-              class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"
-            >
-              -
-            </span>
+            <span class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"> - </span>
             <span>列表</span>
-            <span
-              class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"
-            >
-              >
-            </span>
+            <span class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"> > </span>
             <span>引用</span>
-            <span
-              class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"
-            >
-              \`\`\`
-            </span>
+            <span class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"> \`\`\` </span>
             <span>代码</span>
           </div>
         </div>
 
         <!-- 字符计数 -->
-        <div
-          class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400"
-        >
+        <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
           <span>{{ characterCount.characters }} chars</span>
           <span>{{ characterCount.words }} words</span>
         </div>

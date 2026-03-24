@@ -291,7 +291,7 @@ async def get_likes(
 
 
 @router.get("/amap/security-key")
-@limiter.limit("100/hour")
+@limiter.limit("10/hour")
 async def get_amap_security_key(request: Request) -> JSONResponse:
     """Get Amap security key for frontend map integration.
 
@@ -301,7 +301,7 @@ async def get_amap_security_key(request: Request) -> JSONResponse:
 
     Security notes:
     - Key is base64 encoded (obfuscation, not encryption)
-    - Rate limited to 100 requests/hour
+    - Rate limited to 10 requests/hour
     - Use Amap console to restrict domains/IPs
     - Consider rotating keys periodically
 
