@@ -26,16 +26,15 @@ fake = faker.Faker()
 class UserBook(Base):
     __tablename__ = "user_book"
     user_id: Mapped[int] = mapped_column(
-        ForeignKey("user.id"), primary_key=True, index=True
+        ForeignKey("user.id"), primary_key=True
     )
     book_id: Mapped[int] = mapped_column(
-        ForeignKey("book.id"), primary_key=True, index=True
+        ForeignKey("book.id"), primary_key=True
     )
     iscompleted: Mapped[bool] = mapped_column(default=False)
-    add_date: Mapped[datetime | None] = mapped_column(
+    add_date: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(UTC),
-        nullable=True,
         index=True,
     )
     update_date: Mapped[datetime] = mapped_column(
@@ -45,12 +44,8 @@ class UserBook(Base):
         index=True,
     )
     # Relationships
-    user: Mapped[User] = relationship(
-        back_populates="user_book", lazy="joined"
-    )
-    book: Mapped[Book] = relationship(
-        back_populates="user_book", lazy="joined"
-    )
+    user: Mapped[User] = relationship(back_populates="user_book")
+    book: Mapped[Book] = relationship(back_populates="user_book")
 
     def __init__(
         self,
@@ -62,7 +57,7 @@ class UserBook(Base):
         self.user_id = user_id
         self.book_id = book_id
         self.iscompleted = iscompleted
-        self.add_date = add_date or datetime.now(UTC)
+        self.add_date = add_date if add_date is not None else datetime.now(UTC)
 
     def __repr__(self):
         return f"<UserBook User ID: {self.user_id}, Book ID: {self.book_id}>"
@@ -75,12 +70,12 @@ class User(Base):
         Integer, primary_key=True, autoincrement=True
     )
     github_id: Mapped[int | None] = mapped_column(
-        Integer, unique=True, index=True, nullable=True
+        Integer, unique=True, nullable=True
     )
     name: Mapped[str] = mapped_column(
-        String(50), default=fake.name(), index=True
+        String(50), default=fake.name, index=True
     )
-    username: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    username: Mapped[str] = mapped_column(String(50), unique=True)
     password_hash: Mapped[str] = mapped_column(String(200))
 
     # ========== Trackable 功能字段（你重点关注的）==========
@@ -178,9 +173,9 @@ class Profile(Base):
     )
     gender: Mapped[str | None] = mapped_column(String(10), nullable=True)
     mobile: Mapped[str | None] = mapped_column(String(15), nullable=True)
-    # Foreign Key to User
+    # Foreign Key to User (unique=True ensures one-to-one)
     user_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("user.id"), index=True
+        Integer, ForeignKey("user.id"), unique=True
     )
     # One-to-One relationship with User
     user: Mapped[User] = relationship(back_populates="profile")
@@ -284,6 +279,26 @@ class VisitorTrack(Base):
             "visit_time",
             "os_name",
             "os_version",
+        ),
+        Index(
+            "idx_visit_time_page_path",
+            "visit_time",
+            "page_path",
+        ),
+        Index(
+            "idx_visit_time_device_type",
+            "visit_time",
+            "device_type",
+        ),
+        Index(
+            "idx_visit_time_visitor_id",
+            "visit_time",
+            "visitor_id",
+        ),
+        Index(
+            "idx_visit_time_ip_address",
+            "visit_time",
+            "ip_address",
         ),
     )
 

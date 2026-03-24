@@ -30,5 +30,5 @@ async def load_user(user_id: str) -> User | None:
         result = await session.execute(
             select(User).where(User.id == int(user_id))
         )
-        user = result.scalar_one_or_none()
+        user: User | None = result.scalar_one_or_none()
         return user
