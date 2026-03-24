@@ -264,24 +264,20 @@ async def save_cache_to_redis(
 
 @broker.task
 async def send_feishu_message(
-    message: str | None = None,
+    message: str,
     msg_type: str = "text",
     title: str | None = None,
     context: Context = TaskiqDepends(),
 ):
     """发送飞书消息
-    :param message: 消息内容，如果为 None 则使用默认启动消息
+    :param message: 消息内容
     :param msg_type: 消息类型，默认为 "text"，可选 "post"
-    :param title: 消息标题，如果为 None 则使用默认标题
+    :param title: 消息标题，仅 msg_type="post" 时生效
     :param context: Taskiq 上下文对象，自动注入
     """
     url: str = get_settings().FEISHU_WEBHOOK_URL
-    now: str = datetime.now().strftime(format="%Y-%m-%d %H:%M:%S")
-    if message is None:
-        message = f"✅Kuroome Blog API 已成功启动！当前时间：{now}"
-        title = "💻Kuroome Blog API 启动通知"
     message = message.strip()
-    if not url:
+    if not message or not url:
         return
 
     # 使用去重守卫确保在 TTL 窗口内只发送一次消息

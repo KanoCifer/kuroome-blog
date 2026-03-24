@@ -61,7 +61,7 @@ async def create_todo(
             f"todos:{user.id}",
             ttl=_LOCK_TTL,
             retries=8,
-            delay_ms=50,
+            retry_interval=0.05,
         ):
             todos = await _read_todos(redis, key)
             todo_id = data.id or uuid.uuid4().hex
@@ -111,7 +111,7 @@ async def patch_todo(
             f"todos:{user.id}",
             ttl=_LOCK_TTL,
             retries=8,
-            delay_ms=50,
+            retry_interval=0.05,
         ):
             todos = await _read_todos(redis, key)
             for i, t in enumerate(todos):
@@ -167,7 +167,7 @@ async def replace_todo(
             f"todos:{user.id}",
             ttl=_LOCK_TTL,
             retries=8,
-            delay_ms=50,
+            retry_interval=0.05,
         ):
             todos = await _read_todos(redis, key)
             for i, t in enumerate(todos):
@@ -217,7 +217,7 @@ async def delete_todo(
             f"todos:{user.id}",
             ttl=_LOCK_TTL,
             retries=8,
-            delay_ms=50,
+            retry_interval=0.05,
         ):
             todos = await _read_todos(redis, key)
             new_list = [t for t in todos if t.get("id") != todo_id]
@@ -251,7 +251,7 @@ async def import_todos(
             f"todos:{user.id}",
             ttl=_LOCK_TTL,
             retries=8,
-            delay_ms=50,
+            retry_interval=0.05,
         ):
             existing = await _read_todos(redis, key)
             new_items = []
@@ -311,7 +311,7 @@ async def archive_todo(
             f"todos:{user.id}",
             ttl=_LOCK_TTL,
             retries=8,
-            delay_ms=50,
+            retry_interval=0.05,
         ):
             todos = await _read_todos(redis, key)
             for i, t in enumerate(todos):
@@ -352,7 +352,7 @@ async def unarchive_todo(
             f"todos:{user.id}",
             ttl=_LOCK_TTL,
             retries=8,
-            delay_ms=50,
+            retry_interval=0.05,
         ):
             todos = await _read_todos(redis, key)
             for i, t in enumerate(todos):
@@ -390,7 +390,7 @@ async def archive_completed(
             f"todos:{user.id}",
             ttl=_LOCK_TTL,
             retries=8,
-            delay_ms=50,
+            retry_interval=0.05,
         ):
             todos = await _read_todos(redis, key)
             now = datetime.now(timezone.utc).isoformat()  # noqa: UP017
@@ -424,7 +424,7 @@ async def clear_completed(
             f"todos:{user.id}",
             ttl=_LOCK_TTL,
             retries=8,
-            delay_ms=50,
+            retry_interval=0.05,
         ):
             todos = await _read_todos(redis, key)
             remaining = [t for t in todos if not t.get("completed")]
