@@ -4,11 +4,31 @@
     :style="containerStyle"
     ref="parentContainer"
   >
-    <!-- Theme Toggle - 只在入口页面显示 -->
+    <!-- Theme Toggle + Background Switch - 只在入口页面显示 -->
     <div
-      class="squircle absolute top-4 right-4 z-50 rounded-2xl bg-amber-50 shadow-sm ring ring-amber-50/70 dark:bg-amber-900/80 dark:ring-amber-600"
+      class="squircle absolute top-4 right-4 z-50 flex gap-2 rounded-2xl bg-amber-50 p-2 shadow-sm ring ring-amber-50/70 dark:bg-amber-900/80 dark:ring-amber-600"
     >
       <ThemeToggle />
+      <!-- 背景图切换按钮 -->
+      <button
+        @click="switchBackground"
+        class="squircle rounded-xl p-2 transition-all hover:scale-110 hover:bg-amber-100 dark:hover:bg-amber-800"
+        title="切换背景图"
+      >
+        <svg
+          class="h-5 w-5 text-amber-600 dark:text-amber-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+          />
+        </svg>
+      </button>
     </div>
     <BentoGreeting
       v-if="show.BentoGreeting"
@@ -154,6 +174,21 @@ import {
   type ComponentPublicInstance,
 } from "vue";
 import { useStorage } from "@vueuse/core";
+
+const backgroundImages = [
+  "/bg.jpg",
+  "/background/nathan-broadbent-DkO2Isk9tjo-unsplash.jpg",
+  "/background/pexels-ing-do-2160128514-36535709.jpg",
+  "/background/pexels-jiafan-shi-2159816610-36320913.jpg",
+];
+
+// 当前背景图索引
+const currentBgIndex = useStorage<number>("readinglist_bg_index", 0);
+
+// 切换背景图
+const switchBackground = () => {
+  currentBgIndex.value = (currentBgIndex.value + 1) % backgroundImages.length;
+};
 
 const clockRef = ref<ComponentPublicInstance | null>(null);
 // 卡片边距

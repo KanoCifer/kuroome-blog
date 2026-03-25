@@ -2,9 +2,25 @@
 import { BasicFooter, BasicNav, BasicNotifier } from "@/components/basic";
 import BackToTop from "@/components/layout/BackToTop.vue";
 import ToastContainer from "@/components/layout/ToastContainer.vue";
-import { useScroll } from "@vueuse/core";
-import { onMounted, onUnmounted, ref, watch } from "vue";
+import { useScroll, useStorage } from "@vueuse/core";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { RouterView, useRoute } from "vue-router";
+
+// 背景图列表
+const backgroundImages = [
+  "/bg.jpg",
+  "/background/nathan-broadbent-DkO2Isk9tjo-unsplash.jpg",
+  "/background/pexels-ing-do-2160128514-36535709.jpg",
+  "/background/pexels-jiafan-shi-2159816610-36320913.jpg",
+];
+
+// 使用 localStorage 持久化当前背景图索引
+const currentBgIndex = useStorage<number>("readinglist_bg_index", 0);
+
+// 动态背景图 URL
+const backgroundUrl = computed(
+  () => backgroundImages[currentBgIndex.value] || backgroundImages[0],
+);
 const route = useRoute();
 const isEntryView = ref<boolean>(false);
 const showFooterBg = ref<boolean>(false);
@@ -118,7 +134,8 @@ const closeMobileWarning = () => {
   <div class="relative isolate grid min-h-dvh grid-rows-[auto_1fr_auto]">
     <!-- 背景图 -->
     <div
-      class="pointer-events-none fixed inset-0 -z-10 bg-[url('/bg.jpg')] bg-cover blur-md"
+      class="pointer-events-none fixed inset-0 -z-10 bg-cover blur-md transition-all duration-500"
+      :style="{ backgroundImage: `url('${backgroundUrl}')` }"
     ></div>
     <header>
       <div class="mx-auto mt-6">
