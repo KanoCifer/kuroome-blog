@@ -1,11 +1,6 @@
 import { useAuthStore } from "@/stores/auth";
 import { reportVisitorData } from "@/utils/visitorTracker";
-import EntryView from "@/views/general/EntryView.vue";
-import {
-  createMemoryHistory,
-  createRouter,
-  createWebHistory,
-} from "vue-router";
+import { createMemoryHistory, createRouter, createWebHistory } from "vue-router";
 
 declare global {
   interface Window {
@@ -21,17 +16,6 @@ const router = createRouter({
   history,
   routes: [
     {
-      path: "/api-docs",
-      name: "api-docs",
-      component: () => import("@/views/general/ApiDocs.vue"),
-      meta: {
-        title: "API 文档 - Kuroome's Blog",
-        description: "查看 Kuroome's Blog 项目的 API 文档，了解后端接口详情",
-        keywords: "API文档,接口文档,后端接口",
-        requiresAuth: true,
-      },
-    },
-    {
       path: "/home",
       name: "home",
       component: () => import("@/views/general/HomeView.vue"),
@@ -44,7 +28,7 @@ const router = createRouter({
     {
       path: "/",
       name: "entry",
-      component: EntryView,
+      component: () => import("@/views/general/EntryView.vue"),
       meta: {
         title: "Entry - Kuroome's Blog",
         description: "欢迎来到 Kuroome's Blog，探索个人阅读清单和博客文章",
@@ -228,8 +212,7 @@ const router = createRouter({
       component: () => import("@/views/rss/RSSParseView.vue"),
       meta: {
         title: "RSS 订阅 - Kuroome's Blog",
-        description:
-          "订阅 Kuroome's Blog 的 RSS 频道，第一时间获取最新文章更新",
+        description: "订阅 Kuroome's Blog 的 RSS 频道，第一时间获取最新文章更新",
         keywords: "RSS订阅,博客更新,文章订阅",
       },
     },
@@ -252,6 +235,26 @@ const router = createRouter({
       },
     },
     {
+      path: "/write",
+      name: "markdown-editor",
+      component: () => import("@/views/MarkdownEditor.vue"),
+      meta: {
+        title: "Markdown 编辑器 - Kuroome's Blog",
+        description: "在线 Markdown 编辑与实时预览",
+        keywords: "markdown,编辑器,实时预览",
+      },
+    },
+    {
+      path: "/toolbox/image-toolbox",
+      name: "image-toolbox",
+      component: () => import("@/views/toolbox/ImageToolboxView.vue"),
+      meta: {
+        title: "图片工具箱 - Kuroome's Blog",
+        description: "本地图片压缩与格式转换工具",
+        keywords: "图片工具,图片压缩,格式转换,webp,jpeg,png",
+      },
+    },
+    {
       // 通配符匹配所有未定义的路径
       path: "/:pathMatch(.*)*",
       name: "NotFound",
@@ -268,9 +271,7 @@ router.beforeEach(async (to) => {
     await auth.hydrateAuth();
   }
 
-  const needsAuth = to.matched.some(
-    (route) => route.meta?.requiresAuth === true,
-  );
+  const needsAuth = to.matched.some((route) => route.meta?.requiresAuth === true);
 
   if (needsAuth && !auth.isAuthenticated) {
     return { name: "login", query: { redirect: to.fullPath } };

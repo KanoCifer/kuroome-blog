@@ -241,6 +241,7 @@ async def login(
 async def logout(
     user: User = Depends(manager),
     session: AsyncSession = Depends(get_session),
+    redis: AsyncRedis = Depends(get_async_redis),
 ):
     """退出登录.
 
@@ -248,13 +249,16 @@ async def logout(
         request: FastAPI request object
         user: Current authenticated user
         session: Database session
+        redis: AsyncRedis instance
 
     Returns:
         API response with success message
     """
-    # Set user as inactive
     user.active = False
     await session.commit()
+
+    await redis.zrem("online_users_z", str(user.id))
+    await redis.delete(f"online:{user.id}")
 
     # Clear session
     response = APIResponse.ok(
@@ -264,6 +268,33 @@ async def logout(
     response.delete_cookie(key="refresh_token")
     response.delete_cookie(key=manager.cookie_name)
     return response
+
+
+@router.post("/heartbeat", response_model=APIResponse)
+@limiter.limit(limit_value="60/minute")
+async def heartbeat(
+    request: Request,
+    user: User = Depends(manager),
+    redis: AsyncRedis = Depends(get_async_redis),
+):
+    """用户心跳上报接口，用于更新用户在线状态.
+
+    Args:
+        user: Current authenticated user
+        redis: AsyncRedis instance
+
+    Returns:
+        API response with success message
+    """
+    now = int(datetime.now(UTC).timestamp())
+
+    await redis.zadd("online_users_z", {str(user.id): now})
+    await redis.set(f"online:{user.id}", str(now), ex=600)
+
+    return APIResponse.ok(
+        message="心跳上报成功",
+        code=status.HTTP_200_OK,
+    )
 
 
 # 查询当前用户信息接口

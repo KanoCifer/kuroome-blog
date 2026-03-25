@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { BasicFooter, BasicNav, BasicNotifier } from "@/components/basic";
+import { BasicFooter, BasicNotifier } from "@/components/basic";
+import BasicNav from "@/components/nav/BasicNav.vue";
 import BackToTop from "@/components/layout/BackToTop.vue";
 import ToastContainer from "@/components/layout/ToastContainer.vue";
 import { useScroll, useStorage } from "@vueuse/core";
@@ -8,37 +9,38 @@ import { RouterView, useRoute } from "vue-router";
 
 // 背景图列表
 const backgroundImages = [
-  "/bg.jpg",
-  "/background/nathan-broadbent-DkO2Isk9tjo-unsplash.jpg",
-  "/background/pexels-ing-do-2160128514-36535709.jpg",
-  "/background/pexels-jiafan-shi-2159816610-36320913.jpg",
+  "/background/bg.webp",
+  "/background/bg-1.webp",
+  "/background/bg-2.webp",
+  "/background/bg-3.webp",
+  "/background/bg-4.webp",
+  "/background/bg-5.webp",
+  "/background/bg-6.webp",
 ];
 
 // 使用 localStorage 持久化当前背景图索引
 const currentBgIndex = useStorage<number>("readinglist_bg_index", 0);
 
 // 动态背景图 URL
-const backgroundUrl = computed(
-  () => backgroundImages[currentBgIndex.value] || backgroundImages[0],
-);
+const backgroundUrl = computed(() => backgroundImages[currentBgIndex.value] || backgroundImages[0]);
 const route = useRoute();
 const isEntryView = ref<boolean>(false);
-const showFooterBg = ref<boolean>(false);
+const isAboutView = ref<boolean>(false);
+const showBasicNav = ref<boolean>(route.path !== "/");
 
 // 监听路由变化
 watch(
   () => route.path,
   (newPath) => {
     isEntryView.value = newPath === "/";
-    showFooterBg.value =
-      // 匹配 /blog/xxxx 但不包括 /blog 列表页
-      (newPath.startsWith("/blog/") && newPath !== "/blog") ||
-      newPath.includes("/rss") ||
-      newPath.includes("/websites") ||
-      newPath.includes("/analytics") ||
-      newPath.includes("/messages") ||
-      newPath.includes("/todos") ||
-      newPath.includes("/fishing-map");
+    isAboutView.value = newPath === "/about";
+
+    if (newPath === "/") {
+      showBasicNav.value = false;
+      return;
+    }
+
+    showBasicNav.value = true;
   },
   { immediate: true },
 );
@@ -115,11 +117,7 @@ const isMobileDevice = ref<boolean>(false);
 // 处理窗口大小变化
 const handleResize = () => {
   isMobileDevice.value = window.innerWidth < 768;
-  if (
-    isMobileDevice.value &&
-    !isMobileWarningVisible.value &&
-    !accpetedMobileWarning.value
-  ) {
+  if (isMobileDevice.value && !isMobileWarningVisible.value && !accpetedMobileWarning.value) {
     isMobileWarningVisible.value = true;
   }
 };
@@ -142,35 +140,30 @@ const closeMobileWarning = () => {
         <Teleport to="body">
           <ToastContainer />
         </Teleport>
-        <BasicNav
-          :isEntryView="isEntryView"
-          :isHeaderVisible="isHeaderVisible"
-        />
+        <BasicNav :isEntryView="isEntryView" :isVisible="showBasicNav" />
       </div>
     </header>
 
     <!-- Main Content -->
     <main class="relative scroll-smooth">
       <RouterView v-slot="{ Component }">
-        <KeepAlive :include="['MessageManageView']">
-          <transition
-            mode="out-in"
-            enter-active-class="transition-all transform-gpu duration-500 ease-in-out"
-            enter-from-class="-translate-y-20 opacity-0"
-            enter-to-class="translate-y-0 opacity-100"
-            leave-active-class="transition-all transform-gpu duration-500 ease-in-out"
-            leave-from-class="translate-y-0 opacity-100"
-            leave-to-class="translate-y-20 opacity-0 scale-95"
-          >
-            <component :is="Component" :key="$route.fullPath" />
-          </transition>
-        </KeepAlive>
+        <transition
+          mode="out-in"
+          enter-active-class="transition-all transform-gpu duration-300 ease-out"
+          enter-from-class="scale-95 opacity-0"
+          enter-to-class="scale-100 opacity-100"
+          leave-active-class="transition-all transform-gpu duration-300 ease-out"
+          leave-from-class="scale-100 opacity-100"
+          leave-to-class="scale-95 opacity-0"
+        >
+          <component :is="Component" :key="$route.fullPath" />
+        </transition>
         <!-- 路由出口 -->
       </RouterView>
     </main>
 
     <!-- Footer -->
-    <BasicFooter :showFooterBg="showFooterBg" />
+    <BasicFooter :isEntryView="isEntryView" :isAboutView="isAboutView" />
 
     <!-- Back to Top Button -->
     <BackToTop />

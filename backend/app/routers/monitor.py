@@ -11,6 +11,7 @@ from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies.database import get_session
+from app.dependencies.redis import AsyncRedis, get_async_redis
 from app.models.models import User, VisitorTrack
 from app.routers.admin import get_admin_user
 from app.schemas.response import APIResponse
@@ -293,6 +294,55 @@ async def get_server_status(current_user: User = Depends(get_admin_user)):
             "disk_usage": disk_usage,
         },
         message="Server status retrieved successfully",
+    )
+
+
+@router.get("/online-users")
+async def get_online_users(
+    include_user_details: bool = Query(
+        False, description="是否包含用户详细信息"
+    ),
+    current_user: User = Depends(get_admin_user),
+    redis: AsyncRedis = Depends(get_async_redis),
+    session: AsyncSession = Depends(get_session),
+):
+    """获取当前在线用户统计（管理员权限）"""
+    online_count = await redis.get("stats:online_count")
+    online_count = int(online_count) if online_count else 0
+
+    online_user_ids = await redis.zrange("online_users_z", 0, -1)
+    online_user_ids = [int(uid.decode()) for uid in online_user_ids]
+
+    user_details = []
+    if include_user_details and online_user_ids:
+        from sqlalchemy.orm import selectinload
+
+        result = await session.execute(
+            select(User)
+            .where(User.id.in_(online_user_ids))
+            .options(selectinload(User.profile))
+        )
+        users = result.scalars().all()
+        user_details = [
+            {
+                "id": user.id,
+                "username": user.username,
+                "name": user.name,
+                "email": user.profile.email if user.profile else None,
+                "avatar": user.profile.photo if user.profile else None,
+                "is_admin": user.is_admin,
+                "active": user.active,
+            }
+            for user in users
+        ]
+
+    return APIResponse.ok(
+        data={
+            "online_count": online_count,
+            "online_user_ids": online_user_ids,
+            "user_details": user_details,
+        },
+        message="在线用户数据获取成功",
     )
 
 

@@ -28,6 +28,7 @@ export const useAuthStore = defineStore("auth", () => {
   const loading = ref(false);
   const isHydrated = ref(false); // 是否初始化过
   const refreshToken = useStorage("refresh_token", "");
+  let heartbeatTimer: number | null = null; // 心跳定时器
 
   const notifier = useNotificationStore(); // 通知提示
 
@@ -62,6 +63,33 @@ export const useAuthStore = defineStore("auth", () => {
     return refreshToken.value;
   }
 
+  // 启动心跳上报
+  function startHeartbeat() {
+    // 先停止已有定时器
+    stopHeartbeat();
+    
+    // 每60秒上报一次心跳
+    heartbeatTimer = window.setInterval(async () => {
+      if (user.value) {
+        try {
+          await request.post("/auth/heartbeat");
+        } catch (err) {
+          console.error("心跳上报失败:", err);
+        }
+      } else {
+        stopHeartbeat();
+      }
+    }, 60000);
+  }
+
+  // 停止心跳上报
+  function stopHeartbeat() {
+    if (heartbeatTimer) {
+      clearInterval(heartbeatTimer);
+      heartbeatTimer = null;
+    }
+  }
+
   // ---------------------- 方法（Actions） ----------------------
 
   // 2. 获取当前登录用户信息
@@ -72,6 +100,8 @@ export const useAuthStore = defineStore("auth", () => {
       const userData = res.data.data || null;
       user.value = userData;
       cacheUser(userData); // 缓存到 sessionStorage
+      // 启动心跳上报
+      startHeartbeat();
     } catch {
       notifier.error("登陆过期，请重新登录！");
       user.value = null;
@@ -90,6 +120,8 @@ export const useAuthStore = defineStore("auth", () => {
       if (cachedUser) {
         user.value = cachedUser;
         isHydrated.value = true;
+        // 启动心跳上报
+        startHeartbeat();
         return;
       }
 
@@ -126,6 +158,9 @@ export const useAuthStore = defineStore("auth", () => {
 
       saveRefreshToken(res.data.data.refresh_token);
 
+      // 启动心跳上报
+      startHeartbeat();
+
       notifier.success("登录成功");
       router.back();
       return res.data;
@@ -147,6 +182,9 @@ export const useAuthStore = defineStore("auth", () => {
     } finally {
       user.value = null;
       cacheUser(null);
+
+      // 停止心跳上报
+      stopHeartbeat();
 
       // 清除刷新令牌
       saveRefreshToken("");
@@ -174,5 +212,7 @@ export const useAuthStore = defineStore("auth", () => {
     refreshUser,
     getRefreshToken,
     saveRefreshToken,
+    startHeartbeat,
+    stopHeartbeat,
   };
 });

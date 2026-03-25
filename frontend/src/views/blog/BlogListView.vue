@@ -1,13 +1,11 @@
 <template>
-  <div class="container mx-auto mt-24 min-h-dvh max-w-6xl px-4 py-8">
+  <BasicDetail 
+    :title="activeCategory ? `Category: ${activeCategory}` : 'Blog'"
+    subtitle="分享阅读心得、技术思考与读书笔记"
+  >
+    <div class="col-span-full container mx-auto min-h-dvh max-w-6xl px-4 py-8">
     <div class="mb-6 flex flex-col gap-4">
-      <div class="flex items-center justify-between">
-        <h1
-          class="font-serif text-3xl font-bold text-shadow-md dark:text-white"
-        >
-          {{ activeCategory ? `Category: ${activeCategory}` : "Blog" }}
-        </h1>
-      </div>
+
 
       <!-- 搜索框 -->
       <div class="flex w-full items-center justify-between gap-4">
@@ -383,11 +381,13 @@
         </div>
       </div>
     </div>
-  </div>
+    </div>
+  </BasicDetail>
 </template>
 
 <script setup lang="ts">
 import CategorySidebar from "@/components/blog/CategorySidebar.vue";
+import BasicDetail from "@/components/basic/BasicDetail.vue";
 import request from "@/request";
 import { useNotificationStore } from "@/stores/notification";
 import type { BlogPagination, BlogsResponse, Category, Post } from "@/types";

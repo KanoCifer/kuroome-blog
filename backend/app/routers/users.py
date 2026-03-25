@@ -13,11 +13,13 @@ from __future__ import annotations
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, UploadFile, status
+from redis.asyncio import Redis as AsyncRedis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies.auth import manager
 from app.dependencies.database import get_session
+from app.dependencies.redis import get_redis
 from app.models.models import Profile, User
 from app.schemas.response import APIResponse
 from app.schemas.schemas import UserSettingsIn
@@ -72,6 +74,17 @@ async def _check_username_exists(
         )
     )
     return result.scalar_one_or_none() is not None
+
+
+@router.get("/heartbeat")
+async def heartbeat(
+    user: User = Depends(manager), redis: AsyncRedis = Depends(get_redis)
+):
+    """定时检查用户在线状态，保持会话活跃"""
+    await redis.set(
+        f"heartbeat:{user.id}", 1, 600
+    )  # 设置心跳键，过期时间10分钟
+    return APIResponse.ok(code=status.HTTP_204_NO_CONTENT)
 
 
 @router.put("/settings")

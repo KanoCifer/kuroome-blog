@@ -243,15 +243,17 @@ async def get_admin_comments(
             else:
                 pending.append(comment_data)
 
+    def _sort_key(item: dict) -> float:
+        created_at = item.get("created_at")
+        if isinstance(created_at, datetime):
+            if created_at.tzinfo is None:
+                created_at = created_at.replace(tzinfo=UTC)
+            return created_at.timestamp()
+        return 0.0
+
     # Sort by created_at descending
-    pending.sort(
-        key=lambda x: x["created_at"] or "",
-        reverse=True,
-    )
-    approved.sort(
-        key=lambda x: x["created_at"] or "",
-        reverse=True,
-    )
+    pending.sort(key=_sort_key, reverse=True)
+    approved.sort(key=_sort_key, reverse=True)
 
     return APIResponse.ok(
         data={

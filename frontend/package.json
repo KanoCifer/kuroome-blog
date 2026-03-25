@@ -73,6 +73,7 @@
     "lucide-react": "^1.0.1",
     "lucide-vue-next": "^1.0.0",
     "markdown-it": "^14.1.1",
+    "marked": "^17.0.5",
     "mitt": "^3.0.1",
     "motion-v": "^2.2.0",
     "pace-js": "^1.2.4",

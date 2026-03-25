@@ -30,7 +30,7 @@
 
 - **后端**: FastAPI + SQLAlchemy 2.0 + Alembic + PostgreSQL + MongoDB (Beanie) + Redis
 - **前端**: Vue 3.5 + TypeScript + Vite + Tailwind CSS v4 + Pinia + shadcn-vue
-- **AI**: Langchain + OpenAI (Agno)
+- **AI**: Agno (Langchain 替代方案)
 - **安全**: JWT 认证、CSRF 保护、输入验证
 
 ## 快速开始
@@ -133,7 +133,7 @@ scripts/              # 工具脚本
 | `/api/v1/weread`   | 微信读书导入              |
 | `/api/v1/rss`      | RSS 订阅器                |
 | `/api/v1/admin`    | 管理员 (内容审核)         |
-| `/api/v1/agent`    | AI 助手 (文章摘要)        |
+| `/api/v1/aiagent`  | AI 助手 (文章摘要)        |
 
 ## 配置
 

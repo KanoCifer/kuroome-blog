@@ -14,7 +14,8 @@ Endpoints:
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Query, status
-from sqlalchemy import select
+from sqlalchemy import func, select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies.auth import manager
@@ -81,9 +82,9 @@ async def get_books(
 
     # Get total count
     count_result = await db.execute(
-        select(UserBook).where(UserBook.user_id == user.id)
+        select(func.count()).select_from(UserBook).where(UserBook.user_id == user.id)
     )
-    total = len(count_result.scalars().all())
+    total = count_result.scalar_one() or 0
 
     # Calculate pagination
     offset = (page - 1) * per_page
@@ -92,6 +93,7 @@ async def get_books(
     # Fetch books with pagination
     result = await db.execute(
         select(UserBook)
+        .options(selectinload(UserBook.book))
         .where(UserBook.user_id == user.id)
         .order_by(order_clause)
         .offset(offset)

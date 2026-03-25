@@ -4,22 +4,18 @@
       <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200">
         {{ monthLabel }}
       </h3>
-      <span class="text-sm text-slate-400 dark:text-slate-500">{{
-        yearLabel
-      }}</span>
+      <span class="text-sm text-slate-600 dark:text-slate-400">{{ yearLabel }}</span>
     </div>
 
     <!-- Weekday headers -->
-    <div
-      class="mb-1 grid text-center"
-      style="grid-template-columns: repeat(7, 1fr)"
-    >
+    <div class="mb-1 grid text-center" style="grid-template-columns: repeat(7, 1fr)">
       <span
-        v-for="day in weekdays"
-        :key="day"
-        class="py-1 text-xs font-medium text-slate-400"
+        v-for="(label, idx) in weekdays"
+        :key="idx"
+        class="py-1 text-xs font-medium"
+        :class="idx === weekdayToday ? 'text-blue-500' : 'text-slate-500'"
       >
-        {{ day }}
+        {{ label }}
       </span>
     </div>
 
@@ -36,7 +32,7 @@
         :class="
           day === today
             ? 'bg-blue-500 font-bold text-white'
-            : 'text-slate-700 hover:bg-orange-100 dark:text-slate-300 dark:hover:bg-blue-900/30'
+            : 'text-slate-700 hover:bg-blue-100 dark:text-slate-300 dark:hover:bg-blue-900/30'
         "
       >
         {{ day }}
@@ -52,8 +48,8 @@ import BentoCard from "./BentoCard.vue";
 
 const now = dayjs();
 
-const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
-
+const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const weekdayToday = computed(() => dayjs().day());
 const monthLabel = computed(() => now.format("MMMM"));
 const yearLabel = computed(() => now.format("YYYY"));
 

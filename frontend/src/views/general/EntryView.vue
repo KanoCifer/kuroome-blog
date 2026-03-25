@@ -45,13 +45,22 @@
       :style="profilePosition"
       class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:order-2 max-sm:w-full! max-sm:min-w-0 max-sm:translate-0!"
     />
-    <BentoNavCard
-      v-if="show.BentoNavCard"
-      :initial="{ scale: 0.5, opacity: 0 }"
-      :animate="{ scale: 1, opacity: 1 }"
-      class="absolute w-68 -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-3 max-sm:w-full! max-sm:translate-0!"
-      :style="navCardPosition"
-    />
+    <AnimatePresence>
+      <BentoNavCard
+        v-if="show.BentoNavCard"
+        layoutId="nav-card"
+        :initial="{ scale: 0.5, opacity: 0.8 }"
+        :animate="{ scale: 1, opacity: 1 }"
+        :exit="{ scale: 0.5, opacity: 0, transition: { duration: 0.2 } }"
+        :transition="{
+          type: 'spring',
+          stiffness: 400,
+          damping: 30,
+        }"
+        class="absolute w-68 -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-3 max-sm:w-full! max-sm:translate-0!"
+        :style="navCardPosition"
+      />
+    </AnimatePresence>
     <BentoClock
       v-if="show.BentoClock"
       :initial="{ scale: 0 }"
@@ -114,7 +123,7 @@
     <button
       v-if="show.TodoCard && !showTodoCard && !isMobile"
       @click="showTodoCard = true"
-      class="squircle fixed right-4 top-1/2 z-50 -translate-y-1/2 rounded-2xl bg-blue-50 p-3 shadow-sm ring ring-blue-50/70 transition-all hover:scale-110 dark:bg-blue-900/80 dark:ring-blue-600"
+      class="squircle fixed top-1/2 right-4 z-50 -translate-y-1/2 rounded-2xl bg-blue-50 p-3 shadow-sm ring ring-blue-50/70 transition-all hover:scale-110 dark:bg-blue-900/80 dark:ring-blue-600"
       title="显示待办卡片"
     >
       <svg
@@ -145,6 +154,7 @@
 </template>
 
 <script setup lang="ts">
+import { AnimatePresence } from "motion-v";
 import {
   BentoCalendar,
   BentoCat,
@@ -176,10 +186,13 @@ import {
 import { useStorage } from "@vueuse/core";
 
 const backgroundImages = [
-  "/bg.jpg",
-  "/background/nathan-broadbent-DkO2Isk9tjo-unsplash.jpg",
-  "/background/pexels-ing-do-2160128514-36535709.jpg",
-  "/background/pexels-jiafan-shi-2159816610-36320913.jpg",
+  "/background/bg.webp",
+  "/background/bg-1.webp",
+  "/background/bg-2.webp",
+  "/background/bg-3.webp",
+  "/background/bg-4.webp",
+  "/background/bg-5.webp",
+  "/background/bg-6.webp",
 ];
 
 // 当前背景图索引
@@ -352,6 +365,8 @@ const debouncedFn = useDebounceFn(() => {
   updateDimensions();
 }, 100);
 
+let clockResizeObserver: ResizeObserver | null = null;
+
 // Update dimensions when clock component is mounted and available
 watch(clockRef, (newVal) => {
   if (newVal) {
@@ -359,14 +374,13 @@ watch(clockRef, (newVal) => {
       updateDimensions();
       // Observe clock width changes (e.g. longer weekday names)
       const clockEl = (newVal.$el || newVal) as HTMLElement;
-      const clockResizeObserver = new ResizeObserver(() => {
+      if (clockResizeObserver) {
+        clockResizeObserver.disconnect();
+      }
+      clockResizeObserver = new ResizeObserver(() => {
         updateDimensions();
       });
       clockResizeObserver.observe(clockEl);
-      // Cleanup observer on unmount
-      onUnmounted(() => {
-        clockResizeObserver.disconnect();
-      });
     });
   }
 });
@@ -430,7 +444,7 @@ const cardNames = [
 
 onMounted(async () => {
   await nextTick(); // 确保 DOM 已更新，能正确获取元素尺寸
-  // 移动端直接显示所有卡片，跳过延迟
+  // 移动端或非首次加载直接显示所有卡片，跳过延迟
   if (isMobile.value) {
     Object.keys(show.value).forEach((key) => {
       show.value[key] = true;
@@ -466,6 +480,10 @@ onUnmounted(() => {
   if (resizeObserver) {
     resizeObserver.disconnect();
     resizeObserver = null;
+  }
+  if (clockResizeObserver) {
+    clockResizeObserver.disconnect();
+    clockResizeObserver = null;
   }
   window.removeEventListener("resize", debouncedFn);
 });

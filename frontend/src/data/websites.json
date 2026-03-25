@@ -107,6 +107,15 @@
       "icon": "https://easings.net/96.8aa68ac4.png",
       "category": "工具",
       "tags": ["工具", "设计", "动画"]
+    },
+    {
+      "id": "13",
+      "name": "图片压缩转换",
+      "description": "网站内置的图片压缩转换工具，支持多种格式的图片上传和转换，方便用户优化图片资源。",
+      "url": "/toolbox/image-toolbox",
+      "icon": "/about.webp",
+      "category": "工具",
+      "tags": ["工具", "图片", "优化"]
     }
   ]
 }

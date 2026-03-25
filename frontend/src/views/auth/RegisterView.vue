@@ -119,19 +119,13 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <div>
+  <div class="flex min-h-dvh items-center">
     <!-- 标题卡片和注册表单 -->
-    <div
-      class="mx-auto mt-36 mb-12 max-w-md rounded-[40px] bg-blue-50/80 px-12 py-14 shadow-2xl dark:bg-gray-800/80"
-    >
-      <p
-        class="text-center font-serif text-2xl font-bold text-shadow-md dark:text-white"
-      >
+    <div class="squircle mx-auto max-w-md bg-blue-50/50 px-12 py-14 shadow-2xl dark:bg-gray-800/50">
+      <p class="text-center font-serif text-2xl font-bold text-shadow-md dark:text-white">
         Register
       </p>
-      <p
-        class="mb-12 text-center font-serif text-gray-500 italic dark:text-gray-400"
-      >
+      <p class="mb-12 text-center font-serif text-gray-500 italic dark:text-gray-400">
         Create an account to start managing your reading list!
       </p>
 
@@ -146,11 +140,9 @@ const handleSubmit = async () => {
             class="form-control my-4 w-full rounded-xl border border-gray-300 bg-gray-100/50 px-4 py-2 text-gray-900 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
             required
           />
-          <span
-            v-if="errors.username"
-            class="mt-1 block text-sm text-red-600 dark:text-red-400"
-            >{{ errors.username }}</span
-          >
+          <span v-if="errors.username" class="mt-1 block text-sm text-red-600 dark:text-red-400">{{
+            errors.username
+          }}</span>
         </div>
 
         <!-- 邮箱 -->
@@ -163,11 +155,9 @@ const handleSubmit = async () => {
             class="form-control my-4 w-full rounded-xl border border-gray-300 bg-gray-100/50 px-4 py-2 text-gray-900 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
             required
           />
-          <span
-            v-if="errors.email"
-            class="mt-1 block text-sm text-red-600 dark:text-red-400"
-            >{{ errors.email }}</span
-          >
+          <span v-if="errors.email" class="mt-1 block text-sm text-red-600 dark:text-red-400">{{
+            errors.email
+          }}</span>
         </div>
 
         <!-- 密码 -->
@@ -180,11 +170,9 @@ const handleSubmit = async () => {
             class="form-control my-4 w-full rounded-xl border border-gray-300 bg-gray-100/50 px-4 py-2 text-gray-900 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
             required
           />
-          <span
-            v-if="errors.password"
-            class="mt-1 block text-sm text-red-600 dark:text-red-400"
-            >{{ errors.password }}</span
-          >
+          <span v-if="errors.password" class="mt-1 block text-sm text-red-600 dark:text-red-400">{{
+            errors.password
+          }}</span>
         </div>
 
         <!-- 确认密码 -->
@@ -255,10 +243,7 @@ const handleSubmit = async () => {
       <!-- 登录链接 -->
       <div class="mb-4 text-center text-gray-400 dark:text-gray-300">
         Already have an account?
-        <RouterLink
-          to="/login"
-          class="underline transition duration-100 hover:font-bold"
-        >
+        <RouterLink to="/login" class="underline transition duration-100 hover:font-bold">
           Login here.
         </RouterLink>
       </div>

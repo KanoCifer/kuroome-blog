@@ -74,14 +74,6 @@ footer {
   @apply mx-auto w-full min-w-0 p-4 text-center text-sm text-gray-300;
 }
 
-nav ul {
-  @apply mb-2 flex gap-6 overflow-visible border-2 border-gray-200/20 bg-gray-50/30 p-2 py-3 shadow-xl outline-1 outline-offset-1 outline-blue-100 dark:border-gray-700 dark:bg-gray-800/70 dark:shadow-gray-300/10 dark:outline-gray-600;
-}
-
-nav li a {
-  @apply rounded-lg px-2 py-2 font-serif text-lg font-bold text-gray-600 no-underline transition-colors text-shadow-xs hover:text-gray-900 dark:text-gray-300 dark:hover:text-white;
-}
-
 a {
   @apply cursor-pointer;
 }

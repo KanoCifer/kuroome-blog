@@ -90,18 +90,6 @@ export default defineConfig({
         target: "http://localhost:5555", // FastApi 后端地址
         changeOrigin: true,
       },
-      // 1. 代理 API 文档的静态页面
-      "/Docs": {
-        target: "http://localhost:5555", // 你的 FastAPI 地址
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/Docs/, "/docs"), // 注意大小写，FastAPI 默认是小写的 /docs
-      },
-      // 2. **关键步骤**：必须代理 OpenAPI 的 schema 文件 (openapi.json)
-      // 因为 Swagger UI 页面会去请求这个 JSON 文件来渲染内容
-      "/openapi.json": {
-        target: "http://localhost:5555",
-        changeOrigin: true,
-      },
     },
   },
 });

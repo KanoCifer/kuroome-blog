@@ -1,5 +1,22 @@
 [
   {
+    "version": "2.4.0",
+    "date": "2026-03-25",
+    "title": "功能优化与体验提升",
+    "changes": [
+      { "type": "feat", "content": "新增背景图切换功能" },
+      {
+        "type": "fix",
+        "content": "修复待办事项 API 参数错误，解耦飞书通知函数"
+      },
+      { "type": "style", "content": "优化首页布局设计" },
+      { "type": "feat", "content": "新增图片格式转换/压缩工具" },
+      { "type": "refactor", "content": "优化数据库表结构设计" },
+      { "type": "fix", "content": "更新项目打包配置和依赖版本" },
+      { "type": "fix", "content": "其他功能改进与优化" }
+    ]
+  },
+  {
     "version": "2.3.12",
     "date": "2026-03-23",
     "title": "封装Redis分布式锁",

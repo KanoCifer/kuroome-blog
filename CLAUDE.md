@@ -55,7 +55,7 @@ npx playwright test --debug             # 调试 E2E 测试
 ```
 ├── backend/                # FastAPI 后端
 │   ├── app/
-│   │   ├── routers/        # API 端点 (auth, books, blog, rss, admin, aiagent 等)
+│   │   ├── routers/        # API 端点 (auth, books, blog, users, messages, weread, rss, admin, aiagent 等)
 │   │   ├── models/         # 数据库模型 (SQLAlchemy 2.0 + MongoDB Beanie)
 │   │   ├── schemas/        # Pydantic 请求/响应 schema
 │   │   ├── dependencies/   # FastAPI 依赖注入
