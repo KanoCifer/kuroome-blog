@@ -33,7 +33,7 @@ class AsyncCache:
         self._lock = asyncio.Lock()
 
     # 装饰器
-    async def __call__(
+    def __call__(
         self,
         func: Any | None = None,
         ttl: int = 60,

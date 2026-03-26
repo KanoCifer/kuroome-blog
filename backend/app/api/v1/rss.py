@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse, Response
 
 from app.api.des.auth import manager
 from app.api.des.db import get_session
-from app.api.des.redis import AsyncRedis, get_async_redis
+from app.api.des.redis import AsyncRedis, get_redis
 from app.core.logger import logger
 from app.models.models import User
 from app.repositories.rss_repo import RssRepo
@@ -31,7 +31,7 @@ _IMAGE_PROXY_MAX_BYTES = 10 * 1024 * 1024  # 10MB
 
 def get_rss_service(
     session=Depends(get_session),
-    redis: AsyncRedis = Depends(get_async_redis),
+    redis: AsyncRedis = Depends(get_redis),
 ) -> RssService:
     return RssService(RssRepo(session), redis)
 

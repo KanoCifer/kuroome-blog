@@ -9,11 +9,6 @@ This module provides public endpoints that do not require authentication:
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
-from xml.etree.ElementTree import Element, SubElement, tostring
-
-import httpx
-import orjson
 from fastapi import APIRouter, Body, Depends, Request
 from fastapi.responses import JSONResponse, PlainTextResponse
 from redis.asyncio import Redis as AsyncRedis
@@ -21,15 +16,21 @@ from redis.asyncio import Redis as AsyncRedis
 from app.api.des.limiter import limiter
 from app.api.des.mongo import get_mongo_db
 from app.api.des.redis import get_redis
-from app.core.config import get_settings
+from app.repositories.public_repo import PublicRepository
 from app.schemas.response import APIResponse
-from app.utils.qweather_jwt import encoded_jwt
+from app.services.public_service import PublicDomainError, PublicService
 
 router = APIRouter(tags=["public"])
 
 
+def get_public_service(mongodb=Depends(get_mongo_db)) -> PublicService:
+    return PublicService(PublicRepository(mongodb))
+
+
 @router.get("/status")
-async def get_api_status() -> APIResponse:
+async def get_api_status(
+    public_service: PublicService = Depends(get_public_service),
+) -> APIResponse:
     """Get API status.
 
     Returns:
@@ -45,7 +46,7 @@ async def get_api_status() -> APIResponse:
 
     response = APIResponse(
         status="success",
-        data={"status": "ok"},
+        data=public_service.get_api_status(),
         message="API is running",
     )
 
@@ -55,7 +56,9 @@ async def get_api_status() -> APIResponse:
 
 
 @router.get("/robots.txt", response_class=PlainTextResponse)
-async def get_robots_txt() -> PlainTextResponse:
+async def get_robots_txt(
+    public_service: PublicService = Depends(get_public_service),
+) -> PlainTextResponse:
     """Return robots.txt file for search engines.
 
     Tells search engines which pages can be crawled.
@@ -64,15 +67,7 @@ async def get_robots_txt() -> PlainTextResponse:
         PlainTextResponse: robots.txt content
     """
 
-    robots_content = """User-agent: *
-Disallow: /api/
-Disallow: /admin/
-Allow: /
-Allow: /blog/
-Allow: /blog/*
-
-Sitemap: https://readinglist.example.com/api/sitemap.xml
-"""
+    robots_content = public_service.get_robots_txt()
 
     # Cache for 3600 seconds (1 hour)
 
@@ -85,7 +80,7 @@ Sitemap: https://readinglist.example.com/api/sitemap.xml
 
 @router.get("/sitemap.xml")
 async def get_sitemap_xml(
-    mongodb=Depends(get_mongo_db),
+    public_service: PublicService = Depends(get_public_service),
 ) -> PlainTextResponse:
     """Generate and return sitemap.xml for SEO.
 
@@ -94,84 +89,7 @@ async def get_sitemap_xml(
     Returns:
         PlainTextResponse: sitemap.xml content
     """
-    urlset = Element(
-        "urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-    )
-
-    today = datetime.now(UTC).isoformat().split("T")[0]
-
-    # Homepage
-    url = SubElement(urlset, "url")
-    loc = SubElement(url, "loc")
-    loc.text = "https://readinglist.example.com"
-    lastmod = SubElement(url, "lastmod")
-    lastmod.text = today
-    changefreq = SubElement(url, "changefreq")
-    changefreq.text = "daily"
-    priority = SubElement(url, "priority")
-    priority.text = "1.0"
-
-    # Blog list page
-    url = SubElement(urlset, "url")
-    loc = SubElement(url, "loc")
-    loc.text = "https://readinglist.example.com/blog"
-    lastmod = SubElement(url, "lastmod")
-    lastmod.text = today
-    changefreq = SubElement(url, "changefreq")
-    changefreq.text = "daily"
-    priority = SubElement(url, "priority")
-    priority.text = "0.9"
-
-    # Blog posts
-    try:
-        posts_collection = mongodb.collection("posts")
-        cursor = posts_collection.find({}, {"_id": 1, "updated_at": 1})
-        async for post in cursor:
-            url = SubElement(urlset, "url")
-            loc = SubElement(url, "loc")
-            loc.text = f"https://readinglist.example.com/blog/{post['_id']}"
-
-            if "updated_at" in post:
-                lastmod = SubElement(url, "lastmod")
-                lastmod_text = post["updated_at"]
-                if hasattr(lastmod_text, "isoformat"):
-                    lastmod.text = lastmod_text.isoformat().split("T")[0]
-                else:
-                    lastmod.text = str(lastmod_text)[:10]
-
-            changefreq = SubElement(url, "changefreq")
-            changefreq.text = "weekly"
-            priority = SubElement(url, "priority")
-            priority.text = "0.8"
-    except Exception:
-        # If MongoDB is not available, skip blog posts
-        pass
-
-    # About page
-    url = SubElement(urlset, "url")
-    loc = SubElement(url, "loc")
-    loc.text = "https://readinglist.example.com/about"
-    lastmod = SubElement(url, "lastmod")
-    lastmod.text = today
-    changefreq = SubElement(url, "changefreq")
-    changefreq.text = "monthly"
-    priority = SubElement(url, "priority")
-    priority.text = "0.7"
-
-    # Contact page
-    url = SubElement(urlset, "url")
-    loc = SubElement(url, "loc")
-    loc.text = "https://readinglist.example.com/contact"
-    lastmod = SubElement(url, "lastmod")
-    lastmod.text = today
-    changefreq = SubElement(url, "changefreq")
-    changefreq.text = "monthly"
-    priority = SubElement(url, "priority")
-    priority.text = "0.6"
-
-    xml_content = '<?xml version="1.0" encoding="UTF-8"?>\n' + tostring(
-        urlset, encoding="unicode"
-    )
+    xml_content = await public_service.build_sitemap_xml()
 
     # Cache for 3600 seconds (1 hour)
 
@@ -260,8 +178,7 @@ async def add_like(
     Returns:
         JSONResponse: Current total likes count
     """
-    like_key = "site:total_likes"
-    total = await redis.incrby(like_key, likescounts)
+    total = await PublicService.add_like(redis, likescounts)
 
     return APIResponse.ok(
         data={"likes_count": total},
@@ -278,11 +195,7 @@ async def get_likes(
     Returns:
         JSONResponse: Current total likes count
     """
-    likse = await redis.get("site:total_likes")
-    if likse is not None:
-        total_likes = int(likse)
-    else:
-        total_likes = 0
+    total_likes = await PublicService.get_likes(redis)
 
     return APIResponse.ok(
         data={"likes_count": total_likes},
@@ -308,12 +221,7 @@ async def get_amap_security_key(request: Request) -> JSONResponse:
     Returns:
         JSONResponse: Amap security configuration with encoded key
     """
-    import base64
-
-    settings = get_settings()
-    security_code = settings.AMAP_SECURITY_CODE
-
-    encoded_key = base64.b64encode(security_code.encode()).decode()
+    encoded_key = PublicService.get_amap_security_key()
 
     return APIResponse.ok(
         data={"securityJsCode": encoded_key},
@@ -338,29 +246,17 @@ async def get_weather(
     Returns:
         JSONResponse: Weather data from Amap API
     """
-
-    # 尝试命中缓存
-    cache_key = f"weather:{city}:{extensions}"
-    cached_data = await redis.get(cache_key)
-    if cached_data:
+    data, from_cache = await PublicService.get_weather(
+        redis=redis,
+        city=city,
+        extensions=extensions,
+    )
+    if from_cache:
         return APIResponse.ok(
-            data=orjson.loads(cached_data),
+            data=data,
             message="Weather information retrieved from cache",
         )
-    url = "https://restapi.amap.com/v3/weather/weatherInfo"
-    params = {
-        "key": get_settings().AMAP_WEB_KEY,
-        "city": city,
-        "extensions": extensions,
-    }
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url, params=params)
-        data = response.json()
 
-    # Redis缓存天气数据，过期时间60分钟
-    await redis.set(
-        f"weather:{city}:{extensions}", orjson.dumps(data), ex=60 * 60
-    )
     return APIResponse.ok(
         data=data,
         message="Weather information retrieved successfully",
@@ -383,15 +279,7 @@ async def reverse_geocode(
     Returns:
         JSONResponse: Address information including city adcode
     """
-    url = "https://restapi.amap.com/v3/geocode/regeo"
-    params = {
-        "key": get_settings().AMAP_WEB_KEY,
-        "location": location,
-        "extensions": extensions,
-    }
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url, params=params)
-        data = response.json()
+    data = await PublicService.reverse_geocode(location, extensions)
 
     return APIResponse.ok(
         data=data,
@@ -407,47 +295,22 @@ async def get_qweather(
 ) -> JSONResponse:
     """Get weather information from QWeather API."""
 
-    # 尝试命中缓存
-    now = datetime.now().strftime("%Y%m%d")
-    cache_key = f"qweather:tide:P2352:{now}"
-    cached_data = await redis.get(cache_key)
-    if cached_data:
-        return APIResponse.ok(
-            data=orjson.loads(cached_data),
-            message="QWeather information retrieved from cache",
-        )
     try:
-        url = "https://qk2tupqwuj.re.qweatherapi.com/v7/ocean/tide"
-        headers = {
-            "Authorization": f"Bearer {encoded_jwt}",
-        }
-        now = datetime.now().strftime("%Y%m%d")
-        payload = {
-            "location": "P2352",  # 黄埔港
-            "date": now,
-        }
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url, headers=headers, params=payload)
-            try:
-                response.raise_for_status()
-            except httpx.HTTPStatusError:
-                return APIResponse.error(
-                    message=f"QWeather API error: {response.status_code} - {response.text}",
-                    code=response.status_code,
-                )
-            data = response.json()
+        data, from_cache = await PublicService.get_qweather_tide(redis)
+        if from_cache:
+            return APIResponse.ok(
+                data=data,
+                message="QWeather information retrieved from cache",
+            )
 
-        # 缓存数据12小时，过期后自动删除
-        cache_key = f"qweather:tide:{payload['location']}:{payload['date']}"
-        await redis.set(cache_key, orjson.dumps(data), ex=12 * 3600)
         return APIResponse.ok(
             data=data,
             message="QWeather information retrieved successfully",
         )
-    except httpx.HTTPError as e:
+    except PublicDomainError as exc:
         return APIResponse.error(
-            message=f"Failed to fetch QWeather data: {e!s}",
-            code=503,
+            message=exc.message,
+            code=exc.code,
         )
     except Exception as e:
         return APIResponse.error(
@@ -465,30 +328,19 @@ async def get_qweather_location(
 ) -> JSONResponse:
     """Get location information from QWeather API."""
     try:
-        url = "https://qk2tupqwuj.re.qweatherapi.com/geo/v2/poi/lookup"
-        headers = {
-            "Authorization": f"Bearer {encoded_jwt}",
-        }
-        params = {"location": location, "type": type}
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url, headers=headers, params=params)
-            try:
-                response.raise_for_status()
-            except httpx.HTTPStatusError:
-                return APIResponse.error(
-                    message=f"QWeather API error: {response.status_code} - {response.text}",
-                    code=response.status_code,
-                )
-            data = response.json()
+        data = await PublicService.get_qweather_location(
+            location=location,
+            type_=type,
+        )
 
         return APIResponse.ok(
             data=data,
             message="QWeather location information retrieved successfully",
         )
-    except httpx.HTTPError as e:
+    except PublicDomainError as e:
         return APIResponse.error(
-            message=f"Failed to fetch QWeather location: {e!s}",
-            code=503,
+            message=e.message,
+            code=e.code,
         )
     except Exception as e:
         return APIResponse.error(

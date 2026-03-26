@@ -28,7 +28,7 @@ from app.api.des.auth import manager
 from app.api.des.csrf import csrf_manager
 from app.api.des.db import get_session
 from app.api.des.limiter import limiter
-from app.api.des.redis import AsyncRedis, get_async_redis
+from app.api.des.redis import AsyncRedis, get_redis
 from app.core.config import settings
 from app.core.logger import logger
 from app.models.models import User
@@ -203,7 +203,7 @@ async def login(
 @router.post("/logout", response_model=APIResponse)
 async def logout(
     user: User = Depends(manager),
-    redis: AsyncRedis = Depends(get_async_redis),
+    redis: AsyncRedis = Depends(get_redis),
     user_service: UserService = Depends(get_user_service),
 ):
     await user_service.logout(user, redis)
@@ -222,7 +222,7 @@ async def logout(
 async def heartbeat(
     request: Request,
     user: User = Depends(manager),
-    redis: AsyncRedis = Depends(get_async_redis),
+    redis: AsyncRedis = Depends(get_redis),
     user_service: UserService = Depends(get_user_service),
 ):
     await user_service.record_heartbeat(user, redis)
@@ -290,7 +290,7 @@ async def me(
 @router.post("/register")
 async def register(
     data: RegisterIn,
-    redis: AsyncRedis = Depends(get_async_redis),
+    redis: AsyncRedis = Depends(get_redis),
     user_service: UserService = Depends(get_user_service),
 ):
     user = await user_service.register_user(
@@ -320,7 +320,7 @@ async def register(
 @router.post("/email/code")
 async def send_email_code(
     email: EmailSchema,
-    redis: AsyncRedis = Depends(get_async_redis),
+    redis: AsyncRedis = Depends(get_redis),
     user_service: UserService = Depends(get_user_service),
 ):
     email_addr = email.email
@@ -372,7 +372,7 @@ async def send_email_code(
 async def passkey_registration_options(
     user: User = Depends(manager),
     user_service: UserService = Depends(get_user_service),
-    redis: AsyncRedis = Depends(get_async_redis),
+    redis: AsyncRedis = Depends(get_redis),
 ):
     if await user_service.has_passkey(user):
         return APIResponse.error(
@@ -401,7 +401,7 @@ async def passkey_register(
     request: PasskeyRegistrationRequest,
     user: User = Depends(manager),
     user_service: UserService = Depends(get_user_service),
-    redis: AsyncRedis = Depends(get_async_redis),
+    redis: AsyncRedis = Depends(get_redis),
 ):
     expected_challenge = await redis.get(
         f"passkey:registration:challenge:{user.id}"
@@ -428,7 +428,7 @@ async def passkey_register(
 
 @router.get("/passkey/authentication-options")
 async def passkey_authentication_options(
-    redis: AsyncRedis = Depends(get_async_redis),
+    redis: AsyncRedis = Depends(get_redis),
 ):
     options: PublicKeyCredentialRequestOptions = (
         generate_passkey_authentication_options()
@@ -467,7 +467,7 @@ async def passkey_authenticate(
     http_request: Request,
     request: PasskeyAuthenticationRequest,
     user_service: UserService = Depends(get_user_service),
-    redis: AsyncRedis = Depends(get_async_redis),
+    redis: AsyncRedis = Depends(get_redis),
 ):
     try:
         client_data_json_b64 = request.response["response"]["clientDataJSON"]

@@ -87,3 +87,17 @@ class BookRepository:
 
     async def get_book_by_id(self, book_id: int) -> Book | None:
         return await self.session.get(Book, book_id)
+
+    async def get_book_by_bookid(self, bookid: str) -> Book | None:
+        result = await self.session.execute(
+            select(Book).where(Book.bookid == bookid)
+        )
+        return result.scalar_one_or_none()
+
+    async def create_book_with_bookid(
+        self, *, title: str, author: str, bookid: str, cover: str | None = None
+    ) -> Book:
+        book = Book(title=title, author=author, bookid=bookid, cover=cover)
+        self.session.add(book)
+        await self.session.flush()
+        return book

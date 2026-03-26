@@ -62,7 +62,7 @@ async def lifespan(app: FastAPI):
         database=app.state.mongo,
         document_models=[MessageBoard, Post, RssArticle],
     )
-    app.state.redis, app.state.redis2 = await init_redis()  # type: ignore
+    app.state.redis = await init_redis()
 
     # 启动 Taskiq broker
     try:
