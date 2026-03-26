@@ -1,15 +1,22 @@
-from datetime import UTC, datetime
+from __future__ import annotations
+
+from typing import Any, cast
 
 import httpx
 from beanie import init_beanie
-from beanie.operators import In
 from email_validator import validate_email
 from fastapi_mail import FastMail, MessageSchema, MessageType
-from pydantic import EmailStr
+from pydantic import EmailStr, NameEmail
 from pymongo import AsyncMongoClient
 from redis.asyncio import ConnectionPool
 from redis.asyncio import Redis as AsyncRedis
-from taskiq import Context, TaskiqDepends, TaskiqEvents, TaskiqState
+from taskiq import (
+    AsyncTaskiqDecoratedTask,
+    Context,
+    TaskiqDepends,
+    TaskiqEvents,
+    TaskiqState,
+)
 
 from app.core import get_settings
 from app.core.config import settings as app_settings
@@ -19,12 +26,12 @@ from app.models.beanie import (
     MessageBoard,
     Post,
     RssArticle,
-    RssArticleGuidProjection,
     RssFeed,
 )
 from app.schemas.email import EmailCodeContent
 from app.schemas.schemas import FeishuMessageContent, FeishuRichTextContent
 from app.tasks.broker import broker
+
 
 CONNECTION_POOL = ConnectionPool.from_url(
     app_settings.REDIS_URL,
@@ -74,7 +81,7 @@ async def send_code(
 
     message = MessageSchema(
         subject=content.subject,
-        recipients=[content.recipient],  # type: ignore
+        recipients=[NameEmail(name="ReadingList", email=str(valid_email))],
         body=content.body,
         subtype=MessageType.html,
     )
@@ -88,96 +95,30 @@ async def send_code(
         raise e
 
 
+send_code = cast(AsyncTaskiqDecoratedTask[Any, Any], send_code)
+
+
 @broker.task
-async def save_to_mongo(feed_url: str, entries: list, user_id: int):
-    """
-    Taskiq将解析的RSS条目保存到MongoDB中。
+async def save_to_mongo(
+    feed_url: str,
+    entries: list,
+    user_id: int,
+    context: Context = TaskiqDepends(),
+):
+    """Taskiq将解析的RSS条目保存到MongoDB中。
+
     :param feed_url: RSS源链接
     :param entries: 解析后的RSS条目列表
     :param user_id: 当前用户ID
     """
-    saved_count = 0
+    from app.services.rss_service import RssService
+
     try:
-        # 1. 收集所有entry的guid和内容
-        entries_map = {}
-        guids = []
-        for entry in entries:
-            guid = str(entry.get("id") or entry.get("link", ""))
-            if not guid:
-                continue
-            guids.append(guid)
-            entries_map[guid] = entry
-
-        if not guids:
-            logger.info(
-                f"Background task: RSS {feed_url} has no valid entries for user {user_id}"
-            )
-            return
-
-        # 2. 批量查询已存在的文章
-        existing_articles = (
-            await RssArticle.find(
-                RssArticle.feed_url == feed_url, In(RssArticle.guid, guids)
-            )
-            .project(RssArticleGuidProjection)
-            .to_list()
+        rss_service = RssService(repo=None, redis=context.state.redis)
+        saved_count = await rss_service.save_entries_to_mongo(
+            feed_url=feed_url,
+            entries=entries,
         )
-
-        existing_guids = {article.guid for article in existing_articles}
-        new_articles = []
-        fetched_at = datetime.now(UTC)
-
-        # 3. 处理新文章
-        for guid in guids:
-            if guid in existing_guids:
-                continue
-
-            entry = entries_map[guid]
-            title = str(entry.get("title", ""))
-            link = str(entry.get("link", ""))
-            summary = str(entry.get("summary", ""))
-            author = entry.get("author")
-            author_str = str(author) if author is not None else None
-
-            # Extract content from entry
-            content_list = entry.get("content") or []
-            if content_list:
-                content = str(content_list[0].get("value", ""))
-            else:
-                content = summary
-
-            # Parse published datetime
-            pub_dt: datetime | None = None
-            published_parsed = entry.get("published_parsed")
-            updated_parsed = entry.get("updated_parsed")
-            if published_parsed:
-                t = tuple(int(x) for x in published_parsed[:6])  # type: ignore[union-attr]
-                pub_dt = datetime(*t, tzinfo=UTC)
-            elif updated_parsed:
-                t = tuple(int(x) for x in updated_parsed[:6])  # type: ignore[union-attr]
-                pub_dt = datetime(*t, tzinfo=UTC)
-
-            # 创建新文章对象
-            new_articles.append(
-                RssArticle(
-                    guid=guid,
-                    feed_url=feed_url,
-                    title=title,
-                    link=link,
-                    summary=summary,
-                    content=content,
-                    author=author_str,
-                    published=pub_dt,
-                    fetched_at=fetched_at,
-                    read_by=[],
-                )
-            )
-
-        # 4. 批量插入新文章
-        if new_articles:
-            await RssArticle.insert_many(new_articles)
-            saved_count = len(new_articles)
-
         logger.info(
             f"Background task: RSS {feed_url} saved {saved_count} new articles for user {user_id}"
         )
@@ -185,6 +126,9 @@ async def save_to_mongo(feed_url: str, entries: list, user_id: int):
         logger.error(
             f"Background task failed: Error saving RSS {feed_url} for user {user_id}: {e!r}"
         )
+
+
+save_to_mongo = cast(AsyncTaskiqDecoratedTask[Any, Any], save_to_mongo)
 
 
 @broker.task
@@ -203,6 +147,11 @@ async def save_cache_to_redis(
         await context.state.redis.set(key, value, ex=expire)
     except Exception as e:
         logger.error(f"❌Failed to save cache to Redis: {e!r}")
+
+
+save_cache_to_redis = cast(
+    AsyncTaskiqDecoratedTask[Any, Any], save_cache_to_redis
+)
 
 
 @broker.task
@@ -320,3 +269,8 @@ async def send_feishu_message(
                 response.raise_for_status()
         except Exception as e:
             logger.error(f"发送飞书消息失败: {e!s}")
+
+
+send_feishu_message = cast(
+    AsyncTaskiqDecoratedTask[Any, Any], send_feishu_message
+)

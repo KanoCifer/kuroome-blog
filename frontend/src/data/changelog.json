@@ -1,5 +1,44 @@
 [
   {
+    "version": "2.5.0",
+    "date": "2026-03-27",
+    "title": "后端架构重大重构",
+    "changes": [
+      {
+        "type": "refactor",
+        "content": "完成完整的Service/Repository架构重构，所有业务模块实现分层"
+      },
+      {
+        "type": "refactor",
+        "content": "覆盖10个业务模块：用户、书籍、博客、RSS、待办、AI、消息、监控、公共接口、微信读书"
+      },
+      {
+        "type": "refactor",
+        "content": "用户认证路由层从1116行精简至500行，用户管理从249行降至70行"
+      },
+      {
+        "type": "refactor",
+        "content": "RSS路由完全重构（647行），统一Redis分布式锁和缓存管理"
+      },
+      {
+        "type": "refactor",
+        "content": "博客系统统一SQL/MongoDB跨数据库聚合，消除路由数据访问耦合"
+      },
+      {
+        "type": "fix",
+        "content": "修复6处Python2语法错误、RSS DNS阻塞事件循环、21处显式事务提交冲突"
+      },
+      {
+        "type": "refactor",
+        "content": "微信读书修复异步/同步边界错误（高危），统一所有IO操作"
+      },
+      {
+        "type": "refactor",
+        "content": "代码规模：31个文件变化，2051行新增，1337行删除，可维护性显著提升"
+      }
+    ]
+  },
+  {
     "version": "2.4.0",
     "date": "2026-03-25",
     "title": "功能优化与体验提升",

@@ -20,9 +20,29 @@ class MonitorDomainError(Exception):
 
 
 class MonitorService:
-    def __init__(self, repo: MonitorRepository, redis: AsyncRedis) -> None:
+    def __init__(
+        self,
+        repo: MonitorRepository | None,
+        redis: AsyncRedis | None,
+    ) -> None:
         self.repo = repo
         self.redis = redis
+
+    def _require_repo(self) -> MonitorRepository:
+        if self.repo is None:
+            raise MonitorDomainError(
+                "Monitor repository is not configured",
+                500,
+            )
+        return self.repo
+
+    def _require_redis(self) -> AsyncRedis:
+        if self.redis is None:
+            raise MonitorDomainError(
+                "Redis client is not configured",
+                500,
+            )
+        return self.redis
 
     @staticmethod
     def _get_server_status_payload() -> dict[str, float | int | None]:
@@ -58,17 +78,17 @@ class MonitorService:
         end_time = datetime.now(UTC)
         start_time = end_time - timedelta(days=days)
 
-        total_visits = await self.repo.count_visits_since(start_time)
-        unique_visitors = await self.repo.count_unique_visitors_since(
+        repo = self._require_repo()
+
+        total_visits = await repo.count_visits_since(start_time)
+        unique_visitors = await repo.count_unique_visitors_since(start_time)
+        unique_visitor_ids = await repo.count_unique_visitor_ids_since(
             start_time
         )
-        unique_visitor_ids = await self.repo.count_unique_visitor_ids_since(
-            start_time
-        )
-        top_pages = await self.repo.get_top_pages_since(start_time, limit=10)
-        browser_stats = await self.repo.get_browser_stats_since(start_time)
-        os_stats = await self.repo.get_os_stats_since(start_time)
-        daily_trend = await self.repo.get_daily_trend_since(start_time)
+        top_pages = await repo.get_top_pages_since(start_time, limit=10)
+        browser_stats = await repo.get_browser_stats_since(start_time)
+        os_stats = await repo.get_os_stats_since(start_time)
+        daily_trend = await repo.get_daily_trend_since(start_time)
 
         return {
             "total_visits": total_visits,
@@ -85,9 +105,11 @@ class MonitorService:
         end_time = datetime.now(UTC)
         start_time = end_time - timedelta(days=days)
 
-        total = await self.repo.count_visits_since(start_time)
+        repo = self._require_repo()
+
+        total = await repo.count_visits_since(start_time)
         offset = (page - 1) * page_size
-        visitors = await self.repo.list_visitors_since(
+        visitors = await repo.list_visitors_since(
             start_time,
             offset=offset,
             limit=page_size,
@@ -128,7 +150,9 @@ class MonitorService:
         end_time = datetime.now(UTC)
         start_time = end_time - timedelta(days=days)
 
-        users = await self.repo.list_users_with_login_records()
+        repo = self._require_repo()
+
+        users = await repo.list_users_with_login_records()
 
         login_logs = []
         for user in users:
@@ -177,10 +201,12 @@ class MonitorService:
         return self._get_server_status_payload()
 
     async def get_online_users(self, include_user_details: bool) -> dict:
-        online_count_raw = await self.redis.get("stats:online_count")
+        redis = self._require_redis()
+
+        online_count_raw = await redis.get("stats:online_count")
         online_count = int(online_count_raw) if online_count_raw else 0
 
-        online_user_ids_raw = await self.redis.zrange("online_users_z", 0, -1)
+        online_user_ids_raw = await redis.zrange("online_users_z", 0, -1)
         online_user_ids = [
             int(uid.decode() if isinstance(uid, bytes) else str(uid))
             for uid in online_user_ids_raw
@@ -188,9 +214,8 @@ class MonitorService:
 
         user_details: list[dict] = []
         if include_user_details and online_user_ids:
-            users: list[User] = await self.repo.list_users_by_ids(
-                online_user_ids
-            )
+            repo = self._require_repo()
+            users: list[User] = await repo.list_users_by_ids(online_user_ids)
             user_details = [
                 {
                     "id": user.id,
@@ -215,3 +240,94 @@ class MonitorService:
             payload = self._get_server_status_payload()
             yield self._to_sse_event(payload)
             await asyncio.sleep(5)
+
+    async def get_daily_summary(self, date: datetime) -> dict:
+        """获取指定日期的访问统计摘要。
+
+        Args:
+            date: 日期（取其当天 00:00 ~ 次日 00:00）
+
+        Returns:
+            包含总访问量、独立访客、热门页面等统计信息的字典
+        """
+        start = date.replace(hour=0, minute=0, second=0, microsecond=0)
+        end = start + timedelta(days=1)
+
+        repo = self._require_repo()
+
+        total_visits = await repo.count_visits_between(start, end)
+        unique_visitors = await repo.count_unique_visitors_between(start, end)
+        unique_ips = await repo.count_unique_ips_between(start, end)
+        top_pages = await repo.get_top_pages_between(start, end, limit=5)
+        browser_stats = await repo.get_browser_stats_between(start, end)
+        os_stats = await repo.get_os_stats_between(start, end)
+        device_stats = await repo.get_device_stats_between(start, end)
+
+        return {
+            "date": start.strftime("%Y-%m-%d"),
+            "total_visits": total_visits,
+            "unique_visitors": unique_visitors,
+            "unique_ips": unique_ips,
+            "top_pages": top_pages,
+            "browser_stats": browser_stats,
+            "os_stats": os_stats,
+            "device_stats": device_stats,
+        }
+
+    async def cleanup_stale_heartbeats(
+        self, *, cutoff_seconds: int = 600
+    ) -> dict:
+        """清理过期心跳并同步用户在线状态到数据库。
+
+        Args:
+            cutoff_seconds: 超时秒数，默认 600 秒 (10 分钟)
+
+        Returns:
+            包含清理统计信息的字典
+        """
+        from sqlalchemy import update
+
+        from app.api.des.db import AsyncSessionFactory
+        from app.models.models import User
+
+        redis = self._require_redis()
+
+        now = int(datetime.now(UTC).timestamp())
+        cutoff_time = now - cutoff_seconds
+
+        removed_count = await redis.zremrangebyscore(
+            "online_users_z", 0, cutoff_time
+        )
+        online_count = await redis.zcard("online_users_z")
+
+        await redis.set("stats:online_count", str(online_count), ex=120)
+
+        online_user_ids = await redis.zrange("online_users_z", 0, -1)
+        online_user_ids = [
+            int(uid.decode() if isinstance(uid, bytes) else str(uid))
+            for uid in online_user_ids
+        ]
+
+        if online_user_ids:
+            async with AsyncSessionFactory() as session:
+                await session.execute(
+                    update(User)
+                    .where(User.id.in_(online_user_ids))
+                    .values(active=True)
+                    .execution_options(synchronize_session=False)
+                )
+                await session.execute(
+                    update(User)
+                    .where(
+                        User.id.not_in(online_user_ids),
+                        User.active,
+                    )
+                    .values(active=False)
+                    .execution_options(synchronize_session=False)
+                )
+                await session.commit()
+
+        return {
+            "removed_count": removed_count,
+            "online_count": online_count,
+        }

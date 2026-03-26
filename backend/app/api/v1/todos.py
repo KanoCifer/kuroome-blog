@@ -14,8 +14,6 @@ from app.services.todo_service import TodoService
 
 router = APIRouter(prefix="/todos", tags=["todos"])
 
-_LOCK_TTL = 5
-
 
 # ----依赖注入----
 def get_todo_service(

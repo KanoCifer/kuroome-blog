@@ -156,3 +156,130 @@ class MonitorRepository:
             .options(selectinload(User.profile))
         )
         return list(result.scalars().all())
+
+    async def count_visits_between(
+        self, start: datetime, end: datetime
+    ) -> int:
+        result = await self.session.execute(
+            select(func.count(VisitorTrack.id)).where(
+                VisitorTrack.visit_time >= start,
+                VisitorTrack.visit_time < end,
+            )
+        )
+        return int(result.scalar_one() or 0)
+
+    async def count_unique_visitors_between(
+        self, start: datetime, end: datetime
+    ) -> int:
+        result = await self.session.execute(
+            select(func.count(func.distinct(VisitorTrack.visitor_id))).where(
+                VisitorTrack.visit_time >= start,
+                VisitorTrack.visit_time < end,
+            )
+        )
+        return int(result.scalar_one() or 0)
+
+    async def count_unique_ips_between(
+        self, start: datetime, end: datetime
+    ) -> int:
+        result = await self.session.execute(
+            select(func.count(func.distinct(VisitorTrack.ip_address))).where(
+                VisitorTrack.visit_time >= start,
+                VisitorTrack.visit_time < end,
+            )
+        )
+        return int(result.scalar_one() or 0)
+
+    async def get_top_pages_between(
+        self, start: datetime, end: datetime, *, limit: int = 5
+    ) -> list[dict[str, int | str]]:
+        result = await self.session.execute(
+            select(
+                VisitorTrack.page_path,
+                func.count(VisitorTrack.id).label("count"),
+            )
+            .where(
+                VisitorTrack.visit_time >= start,
+                VisitorTrack.visit_time < end,
+            )
+            .group_by(VisitorTrack.page_path)
+            .order_by(func.count(VisitorTrack.id).desc())
+            .limit(limit)
+        )
+        return [
+            {"page_path": row[0], "count": row[1]} for row in result.fetchall()
+        ]
+
+    async def get_browser_stats_between(
+        self, start: datetime, end: datetime
+    ) -> list[dict[str, int | str | None]]:
+        result = await self.session.execute(
+            select(
+                VisitorTrack.browser_name,
+                func.count(func.distinct(VisitorTrack.visitor_id)).label(
+                    "count"
+                ),
+            )
+            .where(
+                VisitorTrack.visit_time >= start,
+                VisitorTrack.visit_time < end,
+                VisitorTrack.browser_name.isnot(None),
+            )
+            .group_by(VisitorTrack.browser_name)
+            .order_by(
+                func.count(func.distinct(VisitorTrack.visitor_id)).desc()
+            )
+        )
+        return [
+            {"browser_name": row[0], "count": row[1]}
+            for row in result.fetchall()
+        ]
+
+    async def get_os_stats_between(
+        self, start: datetime, end: datetime
+    ) -> list[dict[str, int | str | None]]:
+        result = await self.session.execute(
+            select(
+                VisitorTrack.os_name,
+                func.count(func.distinct(VisitorTrack.visitor_id)).label(
+                    "count"
+                ),
+            )
+            .where(
+                VisitorTrack.visit_time >= start,
+                VisitorTrack.visit_time < end,
+                VisitorTrack.os_name.isnot(None),
+            )
+            .group_by(VisitorTrack.os_name)
+            .order_by(
+                func.count(func.distinct(VisitorTrack.visitor_id)).desc()
+            )
+        )
+        return [
+            {"os_name": row[0], "count": row[1]} for row in result.fetchall()
+        ]
+
+    async def get_device_stats_between(
+        self, start: datetime, end: datetime
+    ) -> list[dict[str, int | str | None]]:
+        result = await self.session.execute(
+            select(
+                VisitorTrack.device_type,
+                func.count(func.distinct(VisitorTrack.visitor_id)).label(
+                    "count"
+                ),
+            )
+            .where(
+                VisitorTrack.visit_time >= start,
+                VisitorTrack.visit_time < end,
+                VisitorTrack.device_type.isnot(None),
+            )
+            .group_by(VisitorTrack.device_type)
+            .order_by(
+                func.count(func.distinct(VisitorTrack.visitor_id)).desc()
+            )
+        )
+        return [
+            {"device_type": row[0], "count": row[1]}
+            for row in result.fetchall()
+        ]

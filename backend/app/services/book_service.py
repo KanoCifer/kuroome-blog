@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime
-
 from app.models.models import UserBook
 from app.repositories.book_repo import BookRepository
 

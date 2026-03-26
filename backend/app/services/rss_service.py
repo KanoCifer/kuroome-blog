@@ -153,16 +153,31 @@ class RssDomainError(Exception):
 class RssService:
     """RSS 相关的业务逻辑处理类，负责处理 RSS 文章的相关操作。"""
 
-    def __init__(self, repo: RssRepo, redis: AsyncRedis):
-        self.repo = repo
-        self.redis = redis
+    def __init__(
+        self,
+        repo: RssRepo | None,
+        redis: AsyncRedis | None,
+    ):
+        self.repo: RssRepo | None = repo
+        self.redis: AsyncRedis | None = redis
+
+    def _require_repo(self) -> RssRepo:
+        if self.repo is None:
+            raise RssDomainError("RSS repository is not configured", 500)
+        return self.repo
+
+    def _require_redis(self) -> AsyncRedis:
+        if self.redis is None:
+            raise RssDomainError("Redis client is not configured", 500)
+        return self.redis
 
     @staticmethod
     def _build_rss_cache_key(url: str) -> str:
         return f"rss_cache:{url}"
 
     async def get_cached_feed(self, url: str) -> dict[str, Any] | None:
-        cached_data = await self.redis.get(self._build_rss_cache_key(url))
+        redis = self._require_redis()
+        cached_data = await redis.get(self._build_rss_cache_key(url))
         if not cached_data:
             return None
         try:
@@ -180,20 +195,23 @@ class RssService:
         ttl_seconds: int = 3600,
     ) -> None:
         payload = {"meta": feed_meta, "entries": entries}
-        await self.redis.set(
+        redis = self._require_redis()
+        await redis.set(
             self._build_rss_cache_key(url),
             orjson.dumps(payload),
             ex=ttl_seconds,
         )
 
     async def invalidate_feed_cache(self, url: str) -> None:
-        await self.redis.delete(self._build_rss_cache_key(url))
+        redis = self._require_redis()
+        await redis.delete(self._build_rss_cache_key(url))
 
     async def save_rss_info(self, url: str, user_id: int) -> RssInfo:
         """保存 RSS 信息到数据库中。"""
-        if await self.repo.check_rssurl_exists(url, user_id):
+        repo = self._require_repo()
+        if await repo.check_rssurl_exists(url, user_id):
             raise RssDomainError("RSS URL already exists for this user", 409)
-        rss_info = await self.repo.save_rss_url(url, user_id)
+        rss_info = await repo.save_rss_url(url, user_id)
         return rss_info
 
     async def fetch_and_parse_feed(
@@ -267,7 +285,8 @@ class RssService:
             rss_info.entry_count = len(entries)
             rss_info.last_fetched_at = fetched_at
 
-            await self.repo.save_rss_info(rss_info)
+            repo = self._require_repo()
+            await repo.save_rss_info(rss_info)
 
         return {
             "feed_meta": feed_meta,
@@ -276,7 +295,8 @@ class RssService:
 
     async def get_user_rss_info(self, user_id: int) -> list[str]:
         """获取用户订阅的 RSS 列表。"""
-        return await self.repo.get_user_rss_info(user_id)
+        repo = self._require_repo()
+        return await repo.get_user_rss_info(user_id)
 
     async def get_articles_for_user(
         self,
@@ -363,7 +383,8 @@ class RssService:
         if article is None:
             raise RssDomainError("文章不存在", 404)
 
-        is_allowed = await self.repo.is_user_subscribed_to_feed(
+        repo = self._require_repo()
+        is_allowed = await repo.is_user_subscribed_to_feed(
             user_id=user_id,
             feed_url=article.feed_url,
         )
@@ -388,7 +409,8 @@ class RssService:
         self,
         user_id: int,
     ) -> list[RssSubscriptionResponse]:
-        subscriptions = await self.repo.get_user_subscriptions(user_id)
+        repo = self._require_repo()
+        subscriptions = await repo.get_user_subscriptions(user_id)
         return [
             RssSubscriptionResponse.model_validate(sub)
             for sub in subscriptions
@@ -447,7 +469,8 @@ class RssService:
             user_id=user_id,
         )
         await RssArticle.find(RssArticle.feed_url == rss_info.rss_url).delete()
-        await self.repo.delete_subscription(rss_info)
+        repo = self._require_repo()
+        await repo.delete_subscription(rss_info)
         return rss_info.rss_url
 
     async def mark_article_read_state(
@@ -466,7 +489,8 @@ class RssService:
         if article is None:
             raise RssDomainError("文章不存在", 404)
 
-        is_allowed = await self.repo.is_user_subscribed_to_feed(
+        repo = self._require_repo()
+        is_allowed = await repo.is_user_subscribed_to_feed(
             user_id=user_id,
             feed_url=article.feed_url,
         )
@@ -498,7 +522,8 @@ class RssService:
         user_id: int,
     ) -> RssInfo:
         """获取用户拥有的 RSS 订阅信息，确保订阅存在且属于该用户。"""
-        rss_info = await self.repo.get_subscription_by_id(subscription_id)
+        repo = self._require_repo()
+        rss_info = await repo.get_subscription_by_id(subscription_id)
         if rss_info is None:
             raise RssDomainError("订阅不存在", 404)
         if rss_info.user_id != user_id:
