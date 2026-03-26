@@ -82,10 +82,12 @@ from app.tasks.task import (
     send_code,
     send_feishu_message,
 )
+from app.tasks.weread_task import import_books_from_weread
 
 __all__ = [
     "broker",
     "check_user_heartbeats",
+    "import_books_from_weread",
     "refresh_rss_feeds",
     "run_migration_job",
     "save_cache_to_redis",

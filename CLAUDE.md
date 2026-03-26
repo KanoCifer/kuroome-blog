@@ -1,8 +1,6 @@
-```
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-```
 
 ## 🤖 代理专属规则
 > 重要：以下规则仅对开发代理有效
@@ -53,46 +51,51 @@ npx playwright test --debug             # 调试 E2E 测试
 
 ## 架构概览
 ```
-├── backend/                # FastAPI 后端
+├── backend/                     # FastAPI 后端
 │   ├── app/
-│   │   ├── routers/        # API 端点 (auth, books, blog, users, messages, weread, rss, admin, aiagent 等)
-│   │   ├── models/         # 数据库模型 (SQLAlchemy 2.0 + MongoDB Beanie)
-│   │   ├── schemas/        # Pydantic 请求/响应 schema
-│   │   ├── dependencies/   # FastAPI 依赖注入
-│   │   ├── middleware/     # 请求中间件
-│   │   ├── configs/        # 应用配置
-│   │   ├── utils/          # 工具函数
-│   │   └── tasks/          # Taskiq 异步任务
-│   └── alembic/            # 数据库迁移
-├── frontend/               # Vue 3 + TypeScript 前端
+│   │   ├── api/v1/              # API 端点 (auth, books, blog, messages, weread, rss, admin, aiagent, todos 等)
+│   │   ├── models/              # 数据库模型 (SQLAlchemy 2.0 + MongoDB Beanie)
+│   │   ├── schemas/             # Pydantic 请求/响应 schema (按领域拆分的独立模块)
+│   │   ├── repositories/        # 数据访问层
+│   │   ├── services/            # 业务逻辑层
+│   │   ├── core/                # 核心配置、日志、AI Agent
+│   │   ├── utils/               # 工具函数
+│   │   ├── tasks/               # Taskiq 异步任务
+│   │   └── main.py              # FastAPI 应用入口
+│   ├── alembic/                 # 数据库迁移
+│   └── ruff.toml                # Ruff 配置
+├── frontend/                    # Vue 3 + TypeScript 前端
 │   └── src/
-│       ├── views/          # 页面组件
-│       ├── components/     # 可复用 Vue 组件
-│       ├── stores/         # Pinia 状态管理
-│       ├── router/         # Vue Router 配置
-│       ├── types/          # TypeScript 类型定义
-│       ├── lib/            # 第三方库封装
-│       ├── utils/          # 工具函数
-│       └── layouts/        # 布局组件
-├── tests/                  # Pytest 后端测试 + Playwright E2E 测试
-└── scripts/                # 工具脚本
+│       ├── views/               # 页面组件
+│       ├── components/          # 可复用 Vue 组件
+│       ├── stores/              # Pinia 状态管理
+│       ├── router/              # Vue Router 配置
+│       ├── types/               # TypeScript 类型定义
+│       ├── lib/                 # 第三方库封装
+│       ├── utils/               # 工具函数
+│       └── layouts/             # 布局组件
+├── tests/                       # Pytest 后端测试 + Playwright E2E 测试
+└── scripts/                     # 工具脚本
 ```
 
 ## 技术栈
-- **后端**: FastAPI, SQLAlchemy 2.0, Alembic, PostgreSQL, MongoDB (Beanie), Redis
+- **后端**: FastAPI, SQLAlchemy 2.0, Alembic, PostgreSQL, MongoDB (Beanie), Redis, Taskiq
 - **前端**: Vue 3.5, TypeScript, Vite, Tailwind CSS v4, Pinia, shadcn-vue
-- **AI**: Agno (Langchain 替代方案)
+- **AI**: Agno (替代 Langchain)
 - **端口**: 后端 `:5555`，前端 `:5173`
 
 ## 代码规范
 
 ### 后端 (Python)
-- Ruff 配置：行宽 79 字符，4 空格缩进，双引号
+- Ruff 配置 (`ruff.toml`)：行宽 79 字符，4 空格缩进，双引号，Python 3.14 目标
 - 类型注解：使用 Python 3.14+ 现代语法 (`list[str]` 而非 `List[str]`)
 - 命名：函数/变量用 `snake_case`，类用 `PascalCase`，常量用 `UPPER_SNAKE_CASE`
 - 禁止空 `except:` 块，必须指定异常类型
 - 所有公共函数/类需要 Google 风格 docstring
 - 数据库操作使用 async 驱动 + `async/await`
+- import 排序：标准库 → 第三方 → 本地 (isort)
+- 禁止相对导入，使用 `from app.xxx import ...` 绝对路径
+- Schema 按领域拆分到 `app/schemas/` 下独立文件 (auth, book, blog, rss 等)
 
 ### 前端 (Vue/TypeScript)
 - 使用 `<script setup lang="ts">` + Composition API (禁止使用 Options API)
@@ -105,8 +108,8 @@ npx playwright test --debug             # 调试 E2E 测试
 
 ### 数据库
 - SQLAlchemy 模型：`backend/app/models/models.py`
-- MongoDB Beanie 模型：`backend/app/models/mgmodel.py`
-- Pydantic  schema：`backend/app/schemas/`
+- MongoDB Beanie 模型：`backend/app/models/beanie.py`
+- Pydantic Schema：`backend/app/schemas/` (按领域拆分的独立模块)
 - 迁移文件：`backend/alembic/versions/`
 
 ## 提交规范

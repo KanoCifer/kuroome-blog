@@ -1,507 +1,133 @@
-"""Pydantic schemas for API validation and serialization.
+"""Backward-compatible re-export module.
 
-This module contains Pydantic models that mirror the existing APIFlask Schema
-definitions. These are used for request/response validation in the new
-FastAPI-compatible architecture.
+All schemas are now defined in individual sub-modules.
+This module re-exports everything so that
+``from app.schemas.schemas import ...`` continues to work.
 """
 
-from __future__ import annotations
-
-from datetime import datetime
-from typing import Any
-
-from pydantic import BaseModel, ConfigDict, Field
-
-# =============================================================================
-# Pagination Schemas
-# =============================================================================
-
-
-class PaginationSchema(BaseModel):
-    """Pagination metadata schema."""
-
-    model_config = ConfigDict(from_attributes=True)
-
-    page: int
-    per_page: int
-    total: int
-    pages: int
-    has_prev: bool
-    has_next: bool
-    prev_num: int | None
-    next_num: int | None
-
-
-# =============================================================================
-# Book Schemas
-# =============================================================================
-
-
-class BookQuery(BaseModel):
-    """Query parameters for fetching books."""
-
-    page: int = Field(default=1, ge=1)
-    per_page: int = Field(default=20, ge=1, le=100)
-    sort_by: str = Field(default="add_date")
-    sort_order: str = Field(default="desc", pattern="^(asc|desc)$")
-
-
-class BookOut(BaseModel):
-    """Book output schema."""
-
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    title: str
-    author: str
-    bookid: str
-    cover: str
-    iscompleted: bool
-    add_date: datetime
-    update_date: datetime
-
-
-class BooksOut(BaseModel):
-    """Books list output with pagination."""
-
-    books: list[BookOut]
-    pagination: PaginationSchema
-
-
-class BookStatusIn(BaseModel):
-    """Input schema for updating book status."""
-
-    iscompleted: bool
-
-
-class AddBookIn(BaseModel):
-    """Input schema for adding a new book."""
-
-    title: str
-    author: str
-    iscompleted: bool = False
-
-
-class UpdateBookIn(BaseModel):
-    """Input schema for updating a book."""
-
-    title: str
-    author: str
-    iscompleted: bool = False
-
-
-# =============================================================================
-# Authentication Schemas
-# =============================================================================
-
-
-class LoginIn(BaseModel):
-    """Login input schema."""
-
-    username: str
-    password: str
-    remember_me: bool = False
-
-
-class LoginOut(BaseModel):
-    """Login output schema."""
-
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    username: str
-    is_admin: bool
-
-
-class RegisterIn(BaseModel):
-    """Registration input schema."""
-
-    username: str
-    password: str
-    email: str
-    email_code: str
-
-
-class RegisterOut(BaseModel):
-    """Registration output schema."""
-
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    username: str
-    is_admin: bool
-
-
-class EmailCodeIn(BaseModel):
-    """Email verification code request schema."""
-
-    email: str
-
-
-# =============================================================================
-# Blog Schemas
-# =============================================================================
-
-
-class BlogIn(BaseModel):
-    """Blog query input schema."""
-
-    page: int = 1
-
-
-class BlogPostIn(BaseModel):
-    """Blog post creation input schema."""
-
-    title: str
-    body: str
-    category_id: int
-    is_pinned: int = 0
-
-
-class BlogPostUpdate(BaseModel):
-    """Blog post update input schema."""
-
-    id: str = Field(alias="_id")  # MongoDB _id field
-    title: str
-    body: str
-    category_id: int
-    is_pinned: int = 0
-
-
-class BlogPostDelete(BaseModel):
-    """Blog post deletion input schema."""
-
-    id: str = Field(alias="_id")  # MongoDB _id field
-
-
-class BlogPostGet(BaseModel):
-    """Blog post query by ID."""
-
-    post_id: str = Field(alias="_id")  # MongoDB _id field
-
-
-class CategoryIn(BaseModel):
-    """Category query input schema."""
-
-    category_id: int
-
-
-# =============================================================================
-# Comment Schemas
-# =============================================================================
-
-
-class GetComment(BaseModel):
-    """Get comments query schema."""
-
-    post_id: str
-
-
-class PostComment(BaseModel):
-    """Post comment input schema."""
-
-    post_id: str
-    body: str = Field(..., min_length=1, max_length=1000)
-    author: str = Field(..., min_length=1, max_length=50)
-    reply_to: str | None = None
-    reply_to_author: str | None = Field(None, max_length=50)
-
-
-class CommentOut(BaseModel):
-    """Comment output schema."""
-
-    id: str = Field(alias="_id")
-    author: str
-    body: str
-    created_at: datetime | None
-    reply_to_author: str
-    replied_id: str | None
-    reviewed: bool
-    comments: list[dict[str, Any]] = []  # Nested replies
-
-
-class CommentsOut(BaseModel):
-    """Comments list output."""
-
-    comments: list[CommentOut]
-
-
-# =============================================================================
-# Message Board Schemas
-# =============================================================================
-
-
-class MessageIn(BaseModel):
-    """Message board input schema."""
-
-    name: str = Field(..., min_length=1, max_length=20)
-    message: str = Field(..., min_length=1, max_length=500)
-
-
-class MessageOut(BaseModel):
-    """Message board output schema."""
-
-    model_config = ConfigDict(from_attributes=True)
-
-    id: str
-    name: str
-    message: str
-    created_at: datetime | None
-    from_admin: bool
-
-
-class MessagesOut(BaseModel):
-    """Messages list output."""
-
-    messages: list[MessageOut]
-
-
-class AdminMessageOut(BaseModel):
-    """Admin message output with review status."""
-
-    id: str
-    name: str
-    message: str
-    created_at: datetime | None
-    review: int  # 0 = pending, 1 = approved
-
-
-class AdminMessagesOut(BaseModel):
-    """Admin messages list output."""
-
-    pending: list[AdminMessageOut]
-    approved: list[AdminMessageOut]
-
-
-# =============================================================================
-# User Settings Schemas
-# =============================================================================
-
-
-class UserSettingsIn(BaseModel):
-    """User settings update input schema."""
-
-    name: str = Field(..., max_length=20)
-    username: str = Field(..., max_length=20)
-    gender: str | None = None
-    email: str | None = None
-    mobile: str | None = None
-    password: str | None = None
-
-
-class UserSettingsOut(BaseModel):
-    """User settings output schema."""
-
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    name: str
-    username: str
-    gender: str | None
-    email: str | None
-    mobile: str | None
-    photo: str | None
-    message: str | None
-
-
-# =============================================================================
-# User Profile Schemas
-# =============================================================================
-
-
-class UserOut(BaseModel):
-    """User output schema."""
-
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    username: str
-    is_admin: bool
-
-
-class UserProfileOut(BaseModel):
-    """User profile output schema."""
-
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    name: str
-    username: str
-    gender: str | None
-    email: str | None
-    mobile: str | None
-    photo: str | None
-    about: str | None
-
-
-# =============================================================================
-# Image Upload Schemas
-# =============================================================================
-
-
-class ImageUploadOut(BaseModel):
-    """Image upload output schema."""
-
-    filename: str
-
-
-# =============================================================================
-# Blog Category Schemas
-# =============================================================================
-
-
-class CategoryOut(BaseModel):
-    """Category output schema."""
-
-    id: int
-    name: str
-    post_count: int
-
-
-class CategoriesOut(BaseModel):
-    """Categories list output."""
-
-    categories: list[CategoryOut]
-    category_counts: dict[int, int]
-
-
-# =============================================================================
-# Admin Comment Schemas
-# =============================================================================
-
-
-class AdminCommentOut(BaseModel):
-    """Admin comment output with post info."""
-
-    id: str
-    post_id: str
-    post_title: str
-    author: str
-    email: str
-    body: str
-    site: str
-    from_admin: bool
-    reviewed: bool
-    replied_id: str | None
-    created_at: datetime | None
-
-
-class AdminCommentsOut(BaseModel):
-    """Admin comments list output."""
-
-    pending: list[AdminCommentOut]
-    approved: list[AdminCommentOut]
-
-
-# =============================================================================
-# RSS Schemas
-# =============================================================================
-
-
-class RssArticleResponse(BaseModel):
-    """RSS article response schema."""
-
-    model_config = ConfigDict(from_attributes=True)
-
-    id: str
-    guid: str
-    feed_url: str
-    title: str
-    link: str
-    summary: str
-    content: str
-    author: str | None
-    published: datetime | None
-    fetched_at: datetime
-    is_read: bool
-
-
-class RssArticleListResponse(BaseModel):
-    """RSS article list response with pagination."""
-
-    items: list[RssArticleResponse]
-    total: int
-    page: int
-    limit: int
-
-
-class RssSubscriptionResponse(BaseModel):
-    """RSS subscription response schema."""
-
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    rss_url: str
-    feed_title: str | None = None
-    feed_link: str | None = None
-    feed_description: str | None = None
-    feed_published_at: datetime | None = None
-    entry_count: int = 0
-    last_fetched_at: datetime | None = None
-    created_at: datetime | None
-
-
-class RssMarkReadRequest(BaseModel):
-    """Request to mark articles as read."""
-
-    article_ids: list[str]
-
-
-# --- Todo Schemas ---
-
-
-class TodoIn(BaseModel):
-    """Todo creation schema."""
-
-    text: str
-    description: str | None = None
-    dueDate: str | None = None  # ISO date string  # noqa: N815
-    priority: str = "medium"  # low, medium, high
-    category: str | None = None
-    completed: bool = False
-    id: str | None = None  # optional client-supplied id
-    archived: bool = False
-    archivedAt: str | None = None  # noqa: N815
-
-
-class TodoUpdate(BaseModel):
-    """Todo update schema."""
-
-    text: str | None = None
-    description: str | None = None
-    dueDate: str | None = None  # noqa: N815
-    priority: str | None = None
-    category: str | None = None
-    completed: bool | None = None
-    archived: bool | None = None
-    archivedAt: str | None = None  # noqa: N815
-
-
-class TodoOut(BaseModel):
-    """Todo output schema."""
-
-    id: str
-    text: str
-    completed: bool
-    createdAt: str  # noqa: N815
-    description: str | None = None
-    dueDate: str | None = None  # noqa: N815
-    priority: str = "medium"
-    category: str | None = None
-    archived: bool = False
-    archivedAt: str | None = None  # noqa: N815
-
-
-# --** Feishu Message Schemas *---
-class FeishuMessageContent(BaseModel):
-    """飞书消息内容模型"""
-
-    msg_type: str = "text"
-    content: dict | None = None
-
-
-class FeishuRichTextContent(BaseModel):
-    """飞书富文本内容模型"""
-
-    msg_type: str = "post"
-    content: dict | None = None
+from app.schemas.aiagent import (
+    ArticleSummaryRequest,
+    ChatRequest,
+    HistoryRequest,
+    SummaryInput,
+)
+from app.schemas.auth import (
+    EmailCodeIn,
+    EmailSchema,
+    GitHubOAuthConfig,
+    LoginIn,
+    LoginOut,
+    PasskeyAuthenticationRequest,
+    PasskeyRegistrationRequest,
+    RegisterIn,
+    RegisterOut,
+)
+from app.schemas.blog import (
+    BlogIn,
+    BlogPostDelete,
+    BlogPostGet,
+    BlogPostIn,
+    BlogPostUpdate,
+    CategoryIn,
+)
+from app.schemas.book import (
+    AddBookIn,
+    BookOut,
+    BookQuery,
+    BooksOut,
+    BookStatusIn,
+    UpdateBookIn,
+)
+from app.schemas.category import CategoriesOut, CategoryOut
+from app.schemas.comment import (
+    AdminCommentOut,
+    AdminCommentsOut,
+    CommentOut,
+    CommentsOut,
+    GetComment,
+    PostComment,
+)
+from app.schemas.email import BootstrapEmailContent, EmailCodeContent
+from app.schemas.feishu import FeishuMessageContent, FeishuRichTextContent
+from app.schemas.message import (
+    AdminMessageOut,
+    AdminMessagesOut,
+    MessageIn,
+    MessageOut,
+    MessagesOut,
+)
+from app.schemas.pagination import PaginationSchema
+from app.schemas.rss import (
+    RssArticleListResponse,
+    RssArticleResponse,
+    RssMarkReadRequest,
+    RssRequest,
+    RssSubscriptionResponse,
+)
+from app.schemas.todo import TodoIn, TodoOut, TodoUpdate
+from app.schemas.user import (
+    ImageUploadOut,
+    UserOut,
+    UserProfileOut,
+    UserSettingsIn,
+    UserSettingsOut,
+)
+
+__all__ = [
+    "AddBookIn",
+    "AdminCommentOut",
+    "AdminCommentsOut",
+    "AdminMessageOut",
+    "AdminMessagesOut",
+    "ArticleSummaryRequest",
+    "BlogIn",
+    "BlogPostDelete",
+    "BlogPostGet",
+    "BlogPostIn",
+    "BlogPostUpdate",
+    "BookOut",
+    "BookQuery",
+    "BookStatusIn",
+    "BooksOut",
+    "BootstrapEmailContent",
+    "CategoriesOut",
+    "CategoryIn",
+    "CategoryOut",
+    "ChatRequest",
+    "CommentOut",
+    "CommentsOut",
+    "EmailCodeContent",
+    "EmailCodeIn",
+    "EmailSchema",
+    "FeishuMessageContent",
+    "FeishuRichTextContent",
+    "GetComment",
+    "GitHubOAuthConfig",
+    "HistoryRequest",
+    "ImageUploadOut",
+    "LoginIn",
+    "LoginOut",
+    "MessageIn",
+    "MessageOut",
+    "MessagesOut",
+    "PaginationSchema",
+    "PasskeyAuthenticationRequest",
+    "PasskeyRegistrationRequest",
+    "PostComment",
+    "RegisterIn",
+    "RegisterOut",
+    "RssArticleListResponse",
+    "RssArticleResponse",
+    "RssMarkReadRequest",
+    "RssRequest",
+    "RssSubscriptionResponse",
+    "SummaryInput",
+    "TodoIn",
+    "TodoOut",
+    "TodoUpdate",
+    "UpdateBookIn",
+    "UserOut",
+    "UserProfileOut",
+    "UserSettingsIn",
+    "UserSettingsOut",
+]

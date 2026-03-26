@@ -2,8 +2,8 @@ from taskiq.middlewares import SmartRetryMiddleware
 from taskiq_aio_pika import AioPikaBroker
 from taskiq_redis import RedisAsyncResultBackend
 
-from app.configs.config import settings
-from app.configs.logger import logger
+from app.core.config import settings
+from app.core.logger import logger
 
 result_backend = RedisAsyncResultBackend(
     redis_url=settings.REDIS_URL,

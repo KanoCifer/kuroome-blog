@@ -9,7 +9,7 @@ from datetime import datetime
 import httpx
 import pytest
 
-from app.configs import get_settings
+from app.core import get_settings
 from app.schemas.schemas import FeishuMessageContent, FeishuRichTextContent
 
 

@@ -13,10 +13,10 @@ from redis.asyncio import Redis as AsyncRedis
 from sqlalchemy import distinct, func, select
 from taskiq import Context, TaskiqDepends
 
-from app.configs import get_settings
-from app.configs.logger import logger
-from app.dependencies.database import AsyncSessionFactory, get_async_session
-from app.models.mgmodel import RssArticle, RssArticleGuidProjection
+from app.api.des.db import AsyncSessionFactory, get_async_session
+from app.core import get_settings
+from app.core.logger import logger
+from app.models.beanie import RssArticle, RssArticleGuidProjection
 from app.models.models import RssInfo, VisitorTrack
 from app.schemas import VisitorData
 from app.schemas.schemas import FeishuMessageContent

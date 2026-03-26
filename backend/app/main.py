@@ -13,21 +13,17 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from starlette.middleware.sessions import SessionMiddleware
 
-from app.configs import get_settings, logger
-from app.configs.logger import logger as app_logger
-from app.dependencies.csrf import setup_csrf
-from app.dependencies.database import close_db_connections
-from app.dependencies.limiter import limiter
-from app.dependencies.mongo import close_mongo_client, init_mongo
-from app.dependencies.redis import (
+from app.api.des.csrf import setup_csrf
+from app.api.des.db import close_db_connections
+from app.api.des.limiter import limiter
+from app.api.des.mongo import close_mongo_client, init_mongo
+from app.api.des.redis import (
     close_redis,
     init_redis,
 )
-from app.exceptions import register_exception_handlers
-from app.models.mgmodel import MessageBoard, Post, RssArticle
-from app.routers import (
+from app.api.v1 import (
     admin,
-    aiagent,
+    ai,
     auth,
     blog,
     books,
@@ -37,9 +33,12 @@ from app.routers import (
     publish,
     rss,
     todos,
-    users,
     weread,
 )
+from app.core import get_settings, logger
+from app.core.exceptions import register_exception_handlers
+from app.core.logger import logger as app_logger
+from app.models.beanie import MessageBoard, Post, RssArticle
 from app.tasks.broker import broker
 from app.tasks.task import send_feishu_message
 from app.utils import close_cache_redis
@@ -121,11 +120,10 @@ app.include_router(books.router, prefix="/api/v1")
 app.include_router(todos.router, prefix="/api/v1")
 app.include_router(messages.router, prefix="/api/v1")
 app.include_router(public.router, prefix="/api/v1")
-app.include_router(users.router, prefix="/api/v1")
 app.include_router(weread.router, prefix="/api/v1")
 app.include_router(rss.router, prefix="/api/v1")
 app.include_router(monitor.router, prefix="/api/v1")
-app.include_router(aiagent.router, prefix="/api/v1")
+app.include_router(ai.router, prefix="/api/v1")
 app.include_router(publish.router, prefix="/api/v1")
 
 # 统一注册全局异常处理器
@@ -171,9 +169,8 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 
-# 挂载 media 文件夹为静态文件目录（使用相对于本文件的绝对路径，确保指向 app/media）
-# 访问路径：http://localhost:5555/api/v1/media/文件名
-media_dir = Path(__file__).resolve().parent / "media"
+# 挂载 media 文件夹为静态文件目录（使用相对于本文件的绝对路径，确保指向 /media）
+media_dir = Path(__file__).resolve().parent.parent / "media"
 app.mount(
     "/api/v1/media/",
     StaticFiles(directory=str(media_dir), check_dir=True),

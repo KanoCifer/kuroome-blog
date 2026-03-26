@@ -186,13 +186,16 @@ import {
 import { useStorage } from "@vueuse/core";
 
 const backgroundImages = [
-  "/background/bg.webp",
   "/background/bg-1.webp",
   "/background/bg-2.webp",
   "/background/bg-3.webp",
   "/background/bg-4.webp",
   "/background/bg-5.webp",
   "/background/bg-6.webp",
+  "/background/bg-7.webp",
+  "/background/bg-8.webp",
+  "/background/bg-9.webp",
+  "/background/bg-10.webp",
 ];
 
 // 当前背景图索引

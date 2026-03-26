@@ -1,7 +1,7 @@
 import time
 
 import jwt
-from app.configs import get_settings
+from app.core import get_settings
 
 # Open PEM
 private_key = get_settings().JWT_PRIVATE_KEY.replace("\\n", "\n")

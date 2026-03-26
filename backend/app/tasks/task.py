@@ -5,23 +5,24 @@ from beanie import init_beanie
 from beanie.operators import In
 from email_validator import validate_email
 from fastapi_mail import FastMail, MessageSchema, MessageType
-from pydantic import BaseModel, EmailStr
+from pydantic import EmailStr
 from pymongo import AsyncMongoClient
 from redis.asyncio import ConnectionPool
 from redis.asyncio import Redis as AsyncRedis
 from taskiq import Context, TaskiqDepends, TaskiqEvents, TaskiqState
 
-from app.configs import get_settings
-from app.configs.config import settings as app_settings
-from app.configs.logger import logger
-from app.dependencies.mail import MailConfig
-from app.models.mgmodel import (
+from app.core import get_settings
+from app.core.config import settings as app_settings
+from app.core.logger import logger
+from app.core.mail import MailConfig
+from app.models.beanie import (
     MessageBoard,
     Post,
     RssArticle,
     RssArticleGuidProjection,
     RssFeed,
 )
+from app.schemas.email import EmailCodeContent
 from app.schemas.schemas import FeishuMessageContent, FeishuRichTextContent
 from app.tasks.broker import broker
 
@@ -50,14 +51,6 @@ async def startup(state: TaskiqState) -> None:
 async def shutdown(state: TaskiqState) -> None:
     await state.redis.aclose()
     await state.mongo_client.close()
-
-
-class BootstrapEmailContent(BaseModel):
-    """引导邮件内容模型"""
-
-    subject: str
-    body: str
-    recipient: EmailStr
 
 
 # @broker.task
@@ -99,15 +92,6 @@ class BootstrapEmailContent(BaseModel):
 #         logger.info("✅引导邮件已发送")
 #     except Exception as e:
 #         logger.error(f"❌发送引导邮件失败: {e!s}")
-
-
-class EmailCodeContent(BaseModel):
-    """验证码邮件内容模型"""
-
-    subject: str = "ReadingList 注册验证码"
-    recipient: EmailStr
-    verification_code: str
-    body: str = ""  # 可选的邮件正文内容
 
 
 @broker.task

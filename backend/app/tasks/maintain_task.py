@@ -3,8 +3,8 @@ from datetime import UTC, datetime
 from redis.asyncio import Redis as AsyncRedis
 from taskiq import Context, TaskiqDepends
 
-from app.configs.logger import logger
-from app.dependencies.database import AsyncSessionFactory
+from app.api.des.db import AsyncSessionFactory
+from app.core.logger import logger
 from app.models.models import User
 from app.tasks.broker import broker
 from app.utils.redis_lock import get_redis_lock

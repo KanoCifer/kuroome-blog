@@ -11,10 +11,15 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from redis.asyncio import ConnectionPool
 from redis.asyncio import Redis as AsyncRedis
-from rich import print
 
-from app.configs import logger
-from app.configs.config import settings
+from app.core import logger
+from app.core.config import settings
+
+CONNECTION_POOL = ConnectionPool.from_url(
+    settings.REDIS_URL,
+    decode_responses=True,
+    max_connections=settings.REDIS_MAX_CONNECTIONS,
+)
 
 
 class CacheItem(BaseModel):
@@ -28,7 +33,7 @@ class AsyncCache:
         self._lock = asyncio.Lock()
 
     # 装饰器
-    def __call__(
+    async def __call__(
         self,
         func: Any | None = None,
         ttl: int = 60,
@@ -77,13 +82,13 @@ class AsyncCache:
         """生成唯一的缓存键"""
         return hashkey(*args, **kwargs)
 
-    def __setitem__(self, key: str, value: Any) -> None:
+    async def __setitem__(self, key: str, value: Any) -> None:
         """支持 cache[key] = value 方式设置缓存"""
-        asyncio.run(self.set(key, value))
+        await self.set(key, value)
 
-    def __getitem__(self, key: str) -> Any:
+    async def __getitem__(self, key: str) -> Any:
         """支持 cache[key] 方式获取缓存"""
-        return asyncio.run(self.get(key))
+        return await self.get(key)
 
     async def set(self, key, value: Any, ttl: int = 60) -> None:
         expires_at: datetime = datetime.now() + timedelta(seconds=ttl)
@@ -217,13 +222,6 @@ class AsyncRedisCache(AsyncCache):
         await self.redis.aclose()
 
 
-CONNECTION_POOL = ConnectionPool.from_url(
-    settings.REDIS_URL,
-    decode_responses=True,
-    max_connections=settings.REDIS_MAX_CONNECTIONS,
-)
-
-
 def init_redis_cache() -> AsyncRedis:
     """Initialize Redis cache connection."""
     redis_cache_client: AsyncRedis = AsyncRedis(
@@ -244,23 +242,3 @@ async def get_redis_cache() -> AsyncRedisCache:
 
 async def close_cache_redis():
     await redis_cache.aclose()
-
-
-if __name__ == "__main__":
-    import asyncio
-
-    # 测试 Redis 缓存
-    async def test_redis_cache():
-        @redis_cache(ttl=5)
-        async def get_data_from_db(x):
-            await asyncio.sleep(1)  # 模拟数据库查询
-            return f"Data for {x}"
-
-        print(await get_data_from_db(1))  # 从缓存获取结果
-
-        await redis_cache.set("test_key", "test_value", ttl=5)
-        print(await redis_cache.get("test_key"))  # 输出: test_value
-        await asyncio.sleep(6)
-        print(await redis_cache.get("test_key"))  # 输出: None (已过期)
-
-    asyncio.run(test_redis_cache())

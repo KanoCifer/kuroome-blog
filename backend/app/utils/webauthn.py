@@ -16,7 +16,7 @@ from webauthn.registration.verify_registration_response import (
     VerifiedRegistration,
 )
 
-from app.configs.config import settings
+from app.core.config import settings
 
 
 def generate_passkey_registration_options(

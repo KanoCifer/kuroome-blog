@@ -578,7 +578,7 @@ const handlePhotoUpload = async (event: Event) => {
   formData.append("image", file);
 
   try {
-    const response = await request.put("/user/upload-pic", formData, {
+    const response = await request.put("/auth/upload-pic", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -705,7 +705,7 @@ const handleSubmit = async () => {
       password: form.value.password || null,
     };
 
-    const response = await request.put("/user/settings", payload);
+    const response = await request.put("/auth/settings", payload);
 
     if (response.data.code === 200) {
       await authStore.fetchUser();
