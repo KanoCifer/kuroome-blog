@@ -8,9 +8,11 @@ from typing import Any
 
 import feedparser
 import httpx
+import orjson
 from beanie.operators import In
 from bson import ObjectId
 from bson.errors import InvalidId
+from redis.asyncio import Redis as AsyncRedis
 
 from app.core.logger import logger
 from app.models.beanie import RssArticle, RssArticleGuidProjection
@@ -28,6 +30,7 @@ from app.schemas.rss import (
 def _parse_feed_published_datetime(
     feed: feedparser.FeedParserDict,
 ) -> datetime | None:
+    """安全解析 feed 的发布时间，兼容不同字段名和格式。"""
     published_parsed = getattr(feed.feed, "published_parsed", None)
     updated_parsed = getattr(feed.feed, "updated_parsed", None)
     parsed_time = published_parsed or updated_parsed
@@ -41,7 +44,7 @@ def _parse_feed_published_datetime(
 
 
 def _build_feed_meta(feed: feedparser.FeedParserDict) -> dict[str, str | None]:
-    # 安全获取发布时间，兼容不同字段名
+    """构建 feed 的元信息。"""
     published: str | None = None
     if hasattr(feed.feed, "published"):
         published = feed.feed.published  # type: ignore[attr-defined]
@@ -59,6 +62,7 @@ def _build_feed_meta(feed: feedparser.FeedParserDict) -> dict[str, str | None]:
 
 
 def _is_private_address(host: str) -> bool:
+    """判断给定的主机地址是否属于私有地址范围，支持 IPv4 和 IPv6。"""
     try:
         ip = ipaddress.ip_address(host)
         return (
@@ -73,6 +77,11 @@ def _is_private_address(host: str) -> bool:
 
 
 async def _is_forbidden_target(hostname: str) -> bool:
+    """判断给定的主机名是否属于禁止访问的目标，主要用于防止 SSRF 攻击。禁止访问的目标包括：
+    - 空主机名
+    - 本地回环地址（localhost、127.0.0.1、::1）
+    - 私有地址范围（如 192.168.0.0/16）
+    - 以及通过 DNS 解析得到的任何私有地址"""
     host = hostname.strip().lower()
     if not host:
         return True
@@ -97,6 +106,7 @@ async def _is_forbidden_target(hostname: str) -> bool:
 
 
 def _normalize_struct_time(value: Any) -> list[int] | None:
+    """将 feedparser 解析得到的 struct_time 对象转换为标准的 datetime 参数列表，兼容不同字段名和格式。"""
     if value is None:
         return None
     try:
@@ -106,6 +116,7 @@ def _normalize_struct_time(value: Any) -> list[int] | None:
 
 
 def _parse_entry_published_datetime(entry: dict[str, Any]) -> datetime | None:
+    """解析 RSS 条目的发布时间，尝试多个可能的字段名和格式，返回标准化的 datetime 对象。"""
     for field in ("published_parsed", "updated_parsed"):
         parsed = entry.get(field)
         if not parsed:
@@ -119,6 +130,7 @@ def _parse_entry_published_datetime(entry: dict[str, Any]) -> datetime | None:
 
 
 def _extract_entry_content(entry: dict[str, Any]) -> str:
+    """从 RSS 条目中提取内容，优先使用 content 字段，如果 content 是一个列表则取第一个元素的 value 字段，否则使用 summary 字段作为内容。"""
     raw_content = entry.get("content")
     if isinstance(raw_content, list) and raw_content:
         first = raw_content[0]
@@ -130,6 +142,8 @@ def _extract_entry_content(entry: dict[str, Any]) -> str:
 
 
 class RssDomainError(Exception):
+    """RSS 领域错误，表示在处理 RSS 相关业务逻辑时发生的错误，包含错误消息和 HTTP 状态码。"""
+
     def __init__(self, message: str, code: int = 400) -> None:
         super().__init__(message)
         self.message = message
@@ -139,8 +153,41 @@ class RssDomainError(Exception):
 class RssService:
     """RSS 相关的业务逻辑处理类，负责处理 RSS 文章的相关操作。"""
 
-    def __init__(self, repo: RssRepo):
+    def __init__(self, repo: RssRepo, redis: AsyncRedis):
         self.repo = repo
+        self.redis = redis
+
+    @staticmethod
+    def _build_rss_cache_key(url: str) -> str:
+        return f"rss_cache:{url}"
+
+    async def get_cached_feed(self, url: str) -> dict[str, Any] | None:
+        cached_data = await self.redis.get(self._build_rss_cache_key(url))
+        if not cached_data:
+            return None
+        try:
+            payload = orjson.loads(cached_data)
+        except Exception:
+            return None
+        return payload if isinstance(payload, dict) else None
+
+    async def set_cached_feed(
+        self,
+        *,
+        url: str,
+        feed_meta: dict[str, Any],
+        entries: list[dict[str, Any]],
+        ttl_seconds: int = 3600,
+    ) -> None:
+        payload = {"meta": feed_meta, "entries": entries}
+        await self.redis.set(
+            self._build_rss_cache_key(url),
+            orjson.dumps(payload),
+            ex=ttl_seconds,
+        )
+
+    async def invalidate_feed_cache(self, url: str) -> None:
+        await self.redis.delete(self._build_rss_cache_key(url))
 
     async def save_rss_info(self, url: str, user_id: int) -> RssInfo:
         """保存 RSS 信息到数据库中。"""
@@ -239,6 +286,7 @@ class RssService:
         feed_url: str | None = None,
         search: str | None = None,
     ) -> RssArticleListResponse:
+        """获取用户的 RSS 文章列表，支持分页、按 feed_url 过滤和全文搜索。"""
         user_feed_urls = await self.get_user_rss_info(user_id)
         if not user_feed_urls:
             return RssArticleListResponse(
@@ -305,6 +353,7 @@ class RssService:
         article_id: str,
         user_id: int,
     ) -> RssArticleResponse:
+        """获取用户的 RSS 文章详情，确保用户有权限访问该文章。"""
         try:
             oid = ObjectId(article_id)
         except (InvalidId, ValueError) as exc:
@@ -350,10 +399,12 @@ class RssService:
         subscription_id: int,
         user_id: int,
     ) -> dict[str, Any]:
+        """刷新用户的 RSS 订阅，重新获取和解析 feed 内容，并保存新的文章到数据库中。返回刷新结果和统计信息。"""
         rss_info = await self._get_owned_subscription(
             subscription_id=subscription_id,
             user_id=user_id,
         )
+        await self.invalidate_feed_cache(rss_info.rss_url)
 
         result = await self.fetch_and_parse_feed(
             url=rss_info.rss_url,
@@ -378,6 +429,7 @@ class RssService:
         subscription_id: int,
         user_id: int,
     ) -> str:
+        """获取用户的 RSS 订阅 URL，确保用户有权限访问该订阅。"""
         rss_info = await self._get_owned_subscription(
             subscription_id=subscription_id,
             user_id=user_id,
@@ -389,6 +441,7 @@ class RssService:
         subscription_id: int,
         user_id: int,
     ) -> str:
+        """删除用户的 RSS 订阅，确保用户有权限操作该订阅，并删除相关的 RSS 文章。返回被删除的 RSS URL。"""
         rss_info = await self._get_owned_subscription(
             subscription_id=subscription_id,
             user_id=user_id,
@@ -403,6 +456,7 @@ class RssService:
         user_id: int,
         read: bool,
     ) -> None:
+        """标记用户的 RSS 文章为已读或未读，确保用户有权限访问该文章，并更新文章的 read_by 字段。"""
         try:
             oid = ObjectId(article_id)
         except (InvalidId, ValueError) as exc:
@@ -443,6 +497,7 @@ class RssService:
         subscription_id: int,
         user_id: int,
     ) -> RssInfo:
+        """获取用户拥有的 RSS 订阅信息，确保订阅存在且属于该用户。"""
         rss_info = await self.repo.get_subscription_by_id(subscription_id)
         if rss_info is None:
             raise RssDomainError("订阅不存在", 404)
@@ -455,6 +510,7 @@ class RssService:
         feed_url: str,
         entries: list[dict[str, Any]],
     ) -> int:
+        """将解析得到的 RSS 条目保存到 MongoDB 中，避免重复保存已有的条目。返回新保存的条目数量。"""
         entries_map: dict[str, dict[str, Any]] = {}
         guids: list[str] = []
 

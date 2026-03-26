@@ -1,8 +1,6 @@
-import json
 from urllib.parse import urlparse
 
 import httpx
-import orjson
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import JSONResponse, Response
 
@@ -33,8 +31,9 @@ _IMAGE_PROXY_MAX_BYTES = 10 * 1024 * 1024  # 10MB
 
 def get_rss_service(
     session=Depends(get_session),
+    redis: AsyncRedis = Depends(get_async_redis),
 ) -> RssService:
-    return RssService(RssRepo(session))
+    return RssService(RssRepo(session), redis)
 
 
 @router.get("/image-proxy")
@@ -91,7 +90,6 @@ async def proxy_rss_image(
 async def parse_rss(
     rss_request: RssRequest,
     current_user: User = Depends(manager),
-    redis: AsyncRedis = Depends(get_async_redis),
     rss_service: RssService = Depends(get_rss_service),
 ):
     """解析RSS链接返回RSS内容"""
@@ -111,12 +109,10 @@ async def parse_rss(
         except RssDomainError as exc:
             return APIResponse.error(message=exc.message, code=exc.code)
 
-    # 先检查Redis缓存中是否有解析结果
-    redis_key = f"rss_cache:{rss_url}"
-    cached_data = await redis.get(redis_key)
-
-    if cached_data and not save_to_db:
-        return APIResponse.ok(data=json.loads(cached_data))
+    if not save_to_db:
+        cached_payload = await rss_service.get_cached_feed(rss_url)
+        if cached_payload:
+            return APIResponse.ok(data=cached_payload)
 
     try:
         result = await rss_service.fetch_and_parse_feed(
@@ -145,12 +141,11 @@ async def parse_rss(
                 exc.message,
             )
 
-    # 将解析结果缓存到Redis,设置过期时间为1小时
-    await redis.set(
-        redis_key,
-        orjson.dumps({"meta": feed_meta, "entries": entries}),
-        ex=3600,
-    )  # 缓存1小时
+    await rss_service.set_cached_feed(
+        url=rss_url,
+        feed_meta=feed_meta,
+        entries=entries,
+    )
 
     return APIResponse.ok(data={"meta": feed_meta, "entries": entries})
 
@@ -215,17 +210,10 @@ async def get_subscriptions(
 async def refresh_subscription(
     subscription_id: int,
     current_user: User = Depends(manager),
-    redis: AsyncRedis = Depends(get_async_redis),
     rss_service: RssService = Depends(get_rss_service),
 ):
     """手动刷新指定订阅并保存新文章"""
     try:
-        rss_url = await rss_service.get_subscription_url_for_user(
-            subscription_id=subscription_id,
-            user_id=current_user.id,
-        )
-        await redis.delete(f"rss_cache:{rss_url}")
-
         result = await rss_service.refresh_subscription(
             subscription_id=subscription_id,
             user_id=current_user.id,
