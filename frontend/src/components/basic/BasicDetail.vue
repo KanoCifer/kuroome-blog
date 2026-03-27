@@ -2,7 +2,7 @@
   <div>
     <!-- Title Section with Parallax -->
     <div
-      class="relative -z-5 mx-0 mt-60 flex flex-col items-center justify-center bg-transparent"
+      class="relative -z-5 mx-0 mt-60 flex flex-col items-center justify-center bg-transparent max-sm:mt-30"
       :style="titleStyle"
     >
       <div>

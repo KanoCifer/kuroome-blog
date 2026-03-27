@@ -35,7 +35,9 @@ const renderedMarkdown = computed<string>(() => {
             <div
               class="flex h-12 shrink-0 items-center border-b border-slate-200 px-4 dark:border-slate-800"
             >
-              <h1 class="text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400">
+              <h1
+                class="text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400"
+              >
                 MARKDOWN
               </h1>
             </div>
@@ -51,12 +53,16 @@ const renderedMarkdown = computed<string>(() => {
             <div
               class="flex h-12 shrink-0 items-center border-b border-slate-200 px-4 dark:border-slate-800"
             >
-              <h2 class="text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400">
+              <h2
+                class="text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400"
+              >
                 PREVIEW
               </h2>
             </div>
             <!-- Use Tailwind Typography plugin (prose) for styling the markdown output -->
-            <div class="prose prose-slate dark:prose-invert max-w-none flex-1 overflow-y-auto p-6">
+            <div
+              class="prose prose-slate dark:prose-invert max-w-none flex-1 overflow-y-auto p-6"
+            >
               <div v-html="renderedMarkdown"></div>
             </div>
           </div>

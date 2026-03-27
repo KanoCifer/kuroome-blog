@@ -41,6 +41,22 @@ const clearMemo = () => {
       </p>
     </div>
 
+    <Teleport to="body">
+      <transition
+        enter-active-class="transition-opacity duration-300 ease-out"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-opacity duration-200 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <!-- Background overlay -->
+        <div
+          v-if="isMemoOpen"
+          class="background-overlay fixed inset-0 bg-black/20 backdrop-blur-[2px] transition-all"
+        ></div>
+      </transition>
+    </Teleport>
     <!-- Memo Modal -->
     <Teleport to="body">
       <transition
@@ -56,11 +72,6 @@ const clearMemo = () => {
           class="fixed inset-0 z-9999 flex items-center justify-center"
           @click.stop="closeMemo"
         >
-          <!-- Background overlay -->
-          <div
-            class="background-overlay absolute inset-0 bg-black/60 backdrop-blur-sm transition-all"
-          ></div>
-
           <!-- Modal content -->
           <div
             class="relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl bg-white p-6 shadow-2xl dark:bg-gray-800"

@@ -12,7 +12,9 @@
       <div class="flex h-full flex-col p-6">
         <!-- Header -->
         <div class="mb-4 flex items-center justify-between">
-          <h3 class="text-sm font-semibold tracking-wide text-gray-900 dark:text-gray-100">
+          <h3
+            class="text-sm font-semibold tracking-wide text-gray-900 dark:text-gray-100"
+          >
             {{ title }}
           </h3>
           <div class="flex items-center gap-2">
@@ -27,7 +29,12 @@
               class="cursor-pointer rounded-md p-1 text-gray-400 outline-0 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-gray-100"
               title="查看详情"
             >
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -42,7 +49,12 @@
               class="cursor-pointer rounded-md p-1 text-gray-400 outline-0 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-gray-100"
               title="隐藏待办卡片"
             >
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -106,7 +118,9 @@
               v-if="todos.length === 0"
               class="flex h-full flex-col items-center justify-center py-6 text-gray-400 dark:text-gray-600"
             >
-              <span class="text-sm font-medium tracking-wide">所有任务已完成</span>
+              <span class="text-sm font-medium tracking-wide"
+                >所有任务已完成</span
+              >
             </div>
           </div>
         </div>
@@ -139,7 +153,11 @@ const emit = defineEmits<{
 }>();
 
 const todoStore = useTodoStore();
-const { nonArchivedTodos: todos, completedCount, isCollapsed } = storeToRefs(todoStore);
+const {
+  nonArchivedTodos: todos,
+  completedCount,
+  isCollapsed,
+} = storeToRefs(todoStore);
 
 onMounted(() => {
   todoStore.hydrateTodos();

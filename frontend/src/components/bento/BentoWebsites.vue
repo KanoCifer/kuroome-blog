@@ -1,5 +1,8 @@
 <template>
-  <BentoCard class="group relative h-fit cursor-pointer overflow-hidden" @click="goToWebsites">
+  <BentoCard
+    class="group relative h-fit cursor-pointer overflow-hidden"
+    @click="goToWebsites"
+  >
     <div
       class="relative z-10 flex h-full flex-col justify-between px-6 py-4 max-sm:px-2 max-sm:py-1"
     >

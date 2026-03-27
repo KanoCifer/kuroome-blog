@@ -38,6 +38,43 @@ body {
 }
 
 @theme {
+  --animate-scale-easeOutElastic: scale-easeOutElastic 0.5s;
+  @keyframes scale-easeOutElastic {
+    0% {
+      transform: scale(1);
+    }
+
+    16% {
+      transform: scale(-0.32);
+    }
+
+    28% {
+      transform: scale(0.13);
+    }
+
+    44% {
+      transform: scale(-0.05);
+    }
+
+    59% {
+      transform: scale(0.02);
+    }
+
+    73% {
+      transform: scale(-0.01);
+    }
+
+    88% {
+      transform: scale(0);
+    }
+
+    100% {
+      transform: scale(0);
+    }
+  }
+}
+
+@theme {
   --animate-breathe: breathe 1s infinite;
   @keyframes breathe {
     0%,

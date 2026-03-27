@@ -5,17 +5,28 @@
     :animate="{ y: 0, opacity: 1 }"
     :exit="{ y: -10, opacity: 0 }"
     :transition="{ type: 'spring', damping: 20, stiffness: 300 }"
-    class="fixed top-0 left-0 z-50 flex w-full items-center justify-between rounded-b-[2rem] bg-white/60 px-6 py-4 shadow-[0_20px_40px_rgba(21,28,39,0.06)] backdrop-blur-xl dark:bg-slate-900/60 dark:shadow-[0_20px_40px_rgba(0,0,0,0.2)]"
+    class="fixed top-0 left-0 z-50 flex w-full items-center justify-between rounded-b-[2rem] border-b border-b-white bg-white/60 px-6 py-4 shadow-[0_20px_40px_rgba(21,28,39,0.06)] backdrop-blur-xl dark:border-b-gray-700 dark:bg-slate-900/60 dark:shadow-[0_20px_40px_rgba(0,0,0,0.2)]"
   >
     <div class="flex items-center gap-3">
       <div class="h-10 w-10 overflow-hidden rounded-full border-2 border-blue-600/20">
-        <img src="/images/about.webp" alt="Avatar" class="h-full w-full object-cover" />
+        <img
+          :src="user?.photo || '/images/about.webp'"
+          alt="Avatar"
+          class="h-full w-full object-cover"
+        />
       </div>
       <h1
-        class="font-['Plus_Jakarta_Sans'] text-lg font-bold tracking-tight text-blue-700 dark:text-blue-400"
+        v-if="$route.path === '/'"
+        class="font-serif font-bold tracking-tight text-blue-700 italic dark:text-blue-400"
       >
-        Dashboard
+        {{ user?.username ? `Welcome, ${user.username}!` : "Welcome!" }}
       </h1>
+      <ArrowLeft
+        v-else
+        @click.stop="$router.back()"
+        class="size-6 cursor-pointer text-blue-500 dark:text-blue-400"
+        title="返回上一页"
+      />
     </div>
     <div class="flex items-center gap-2">
       <ThemeToggle class="scale-90" />
@@ -44,6 +55,12 @@
 
 <script setup lang="ts">
 import { motion } from "motion-v";
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "@/stores/auth";
+import ArrowLeft from "../icons/ArrowLeft.vue";
+
+const authStore = useAuthStore();
+const { user } = storeToRefs(authStore);
 </script>
 
 <style scoped></style>

@@ -1,40 +1,8 @@
 <template>
-  <div class="relative mt-24 min-h-screen">
-    <!-- 背景层 -->
-    <div
-      :style="sectionStyle"
-      class="absolute inset-y-0 left-1/2 -z-5 -translate-x-1/2 rounded-t-[40px] bg-blue-50 dark:bg-slate-900"
-    ></div>
-
-    <div class="mx-auto max-w-4xl pt-10">
-      <!-- 页面标题 -->
-      <div class="mb-8 flex items-center gap-3">
-        <div
-          class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-            class="h-7 w-7"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.987 8.987 0 00-6 2.292m0-14.25v14.25"
-            />
-          </svg>
-        </div>
-        <div>
-          <h1 class="text-3xl font-bold text-blue-900 dark:text-white">
-            RSS 文章列表
-          </h1>
-          <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">
-            阅读已保存的订阅文章
-          </p>
-        </div>
+  <BasicDetail title="RSS 文章列表" subtitle="阅读已保存的订阅文章">
+    <div class="col-span-full mx-auto w-full max-w-4xl">
+      <!-- 顶部操作栏 -->
+      <div class="mb-6 flex items-center gap-3">
         <button
           @click="router.push('/rss')"
           class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:bg-slate-800 dark:text-blue-300 dark:hover:bg-slate-700"
@@ -243,15 +211,15 @@
         </nav>
       </div>
     </div>
-  </div>
+  </BasicDetail>
 </template>
 
 <script setup lang="ts">
+import BasicDetail from "@/components/basic/BasicDetail.vue";
 import request from "@/request";
 import { useNotificationStore } from "@/stores/notification";
 import type { ApiResponse, RssArticle, RssArticleListResponse } from "@/types";
 import { formatDate } from "@/utils/formatdate";
-import { useScroll } from "@vueuse/core";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -369,13 +337,4 @@ watch(
     fetchArticles(1);
   },
 );
-
-const { y } = useScroll(window);
-const sectionStyle = computed(() => {
-  // compute scale with a ceiling of 1 so the content does not grow indefinitely
-  const width = Math.min(1, 0.9 + y.value * 0.001);
-  return {
-    width: `${width * 100}%`,
-  };
-});
 </script>

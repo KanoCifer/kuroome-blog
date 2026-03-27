@@ -27,7 +27,9 @@ const backgroundImages = [
 const currentBgIndex = useStorage<number>("readinglist_bg_index", 0);
 
 // 动态背景图 URL
-const backgroundUrl = computed(() => backgroundImages[currentBgIndex.value] || backgroundImages[0]);
+const backgroundUrl = computed(
+  () => backgroundImages[currentBgIndex.value] || backgroundImages[0],
+);
 const route = useRoute();
 const isEntryView = ref<boolean>(false);
 const isAboutView = ref<boolean>(false);
@@ -188,14 +190,21 @@ onUnmounted(() => {
       class="pointer-events-none fixed inset-0 -z-10 transform-gpu bg-cover bg-fixed blur-md transition-all duration-800"
       :style="{ backgroundImage: `url('${backgroundUrl}')` }"
     ></div>
-    <MobileHeader v-if="isMobileDevice" @switchBackground="debouncedSwitchBackground" />
+    <MobileHeader
+      v-if="isMobileDevice"
+      @switchBackground="debouncedSwitchBackground"
+    />
     <MobileNav v-if="isMobileDevice" />
     <header>
       <div class="mx-auto mt-6">
         <Teleport to="body">
           <ToastContainer />
         </Teleport>
-        <BasicNav :isEntryView="isEntryView" :isVisible="showBasicNav" v-if="!isMobileDevice" />
+        <BasicNav
+          :isEntryView="isEntryView"
+          :isVisible="showBasicNav"
+          v-if="!isMobileDevice"
+        />
       </div>
     </header>
 

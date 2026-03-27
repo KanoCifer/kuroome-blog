@@ -27,7 +27,9 @@
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             ></path>
           </svg>
-          <span class="text-blue-600 dark:text-blue-400"> 正在规划路线... </span>
+          <span class="text-blue-600 dark:text-blue-400">
+            正在规划路线...
+          </span>
         </div>
 
         <div
@@ -36,7 +38,9 @@
         >
           <div class="flex items-center justify-between">
             <div>
-              <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">路线信息</h3>
+              <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">
+                路线信息
+              </h3>
               <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 距离:
                 {{
@@ -154,7 +158,10 @@ const handleMarkerClick = async (index: number) => {
     }
 
     // 规划路线
-    const result = await mapContainerRef.value.planRoute(userPosition, spot.position);
+    const result = await mapContainerRef.value.planRoute(
+      userPosition,
+      spot.position,
+    );
 
     routeInfo.value = result;
   } catch (error) {

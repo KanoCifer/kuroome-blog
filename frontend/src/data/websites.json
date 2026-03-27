@@ -116,6 +116,15 @@
       "icon": "/about.webp",
       "category": "工具",
       "tags": ["工具", "图片", "优化"]
+    },
+    {
+      "id": "14",
+      "name": "字节跳动IconPark",
+      "description": "一个由字节跳动开源的图标库，提供了丰富的图标资源，适合各种设计和开发需求。",
+      "url": "https://iconpark.oceanengine.com/home",
+      "icon": "https://lf-iconpark-cdn-cn.bytetos.com/obj/iconpark-site/bydesign/iconparksite/logo.svg",
+      "category": "资源",
+      "tags": ["资源", "设计", "图标"]
     }
   ]
 }

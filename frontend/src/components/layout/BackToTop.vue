@@ -13,17 +13,25 @@ const { height } = useWindowSize();
 const isVisible = computed(() => y.value > 300);
 
 // 最大可滚动距离（可被动态更新）
-const maxScroll = ref(Math.max(0, document.documentElement.scrollHeight - window.innerHeight));
+const maxScroll = ref(
+  Math.max(0, document.documentElement.scrollHeight - window.innerHeight),
+);
 
 // 使用 watchEffect 在响应式的 window height 变化时重新计算 maxScroll
 watchEffect(() => {
-  maxScroll.value = Math.max(0, document.documentElement.scrollHeight - height.value);
+  maxScroll.value = Math.max(
+    0,
+    document.documentElement.scrollHeight - height.value,
+  );
 });
 
 let mo: MutationObserver | null = null;
 onMounted(() => {
   mo = new MutationObserver(() => {
-    maxScroll.value = Math.max(0, document.documentElement.scrollHeight - height.value);
+    maxScroll.value = Math.max(
+      0,
+      document.documentElement.scrollHeight - height.value,
+    );
   });
   mo.observe(document.documentElement, {
     childList: true,
@@ -73,7 +81,10 @@ const scrollToTop = () => {
       aria-label="回到顶部"
     >
       <!-- 背景进度环 -->
-      <svg class="absolute inset-0 h-full w-full -rotate-90" viewBox="0 0 56 56">
+      <svg
+        class="absolute inset-0 h-full w-full -rotate-90"
+        viewBox="0 0 56 56"
+      >
         <!-- 背景圆环 -->
         <circle
           cx="28"
@@ -111,7 +122,11 @@ const scrollToTop = () => {
         stroke="currentColor"
         stroke-width="2"
       >
-        <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M5 10l7-7m0 0l7 7m-7-7v18"
+        />
       </svg>
 
       <!-- Tooltip -->
