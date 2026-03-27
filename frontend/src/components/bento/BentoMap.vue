@@ -1,9 +1,9 @@
 <template>
-  <BentoCard :initial="{ scale: 0 }" :animate="{ scale: 1 }">
-    <div class="flex items-center justify-center">
+  <BentoCard :initial="{ scale: 0 }" :animate="{ scale: 1 }" class="min-w-0">
+    <div class="flex min-w-0 flex-col items-center justify-center gap-2 sm:flex-row sm:gap-0">
       <svg
         t="1774018631215"
-        class="icon mr-2"
+        class="icon sm:mr-2"
         viewBox="0 0 1024 1024"
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
@@ -39,7 +39,7 @@
       </svg>
       <RouterLink
         to="/fishing-map"
-        class="font-serif text-xl text-gray-800 dark:text-white"
+        class="max-w-full truncate font-serif text-sm text-gray-800 sm:text-xl dark:text-white"
         >MyFishingMAP</RouterLink
       >
     </div>

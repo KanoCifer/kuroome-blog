@@ -11,10 +11,12 @@ import vueDevTools from "vite-plugin-vue-devtools";
 export default defineConfig({
   plugins: [
     vue(),
-    tailwindcss(),
     vueDevTools({
-      launchEditor: "code", // 可选：指定编辑器，默认为 "code"（VS Code）
+      // 移除 appendTo 以使用插件默认的脚本注入方式，便于排查显示问题
+      componentInspector: true,
+      launchEditor: "code",
     }),
+    tailwindcss(),
     Components({
       resolvers: [
         AntDesignVueResolver({

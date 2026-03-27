@@ -118,6 +118,7 @@ declare module 'vue' {
     MobileBentoProfileCard: typeof import('./src/components/bento/mobile/MobileBentoProfileCard.vue')['default']
     MobileBentoTech: typeof import('./src/components/bento/mobile/MobileBentoTech.vue')['default']
     MobileDashboard: typeof import('./src/components/bento/mobile/MobileDashboard.vue')['default']
+    MobileHeader: typeof import('./src/components/basic/MobileHeader.vue')['default']
     MobileNav: typeof import('./src/components/basic/MobileNav.vue')['default']
     OsCharts: typeof import('./src/components/analytics/OsCharts.vue')['default']
     PopularPagesChartCard: typeof import('./src/components/analytics/PopularPagesChartCard.vue')['default']

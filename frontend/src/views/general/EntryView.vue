@@ -1,24 +1,136 @@
 <template>
-  <MobileDashboard v-show="isMobile" @switchBackground="switchBackground" />
-  <div
-    v-show="!isMobile"
-    class="relative min-h-dvh w-full snap-start space-y-2 max-sm:flex max-sm:flex-col max-sm:gap-4 max-sm:overflow-x-hidden max-sm:p-4 max-sm:pt-14"
-    :style="containerStyle"
-    ref="parentContainer"
-  >
-    <!-- Theme Toggle + Background Switch - 只在入口页面显示 -->
+  <div>
+    <MobileDashboard v-show="useDeviceStore().isMobile" @switchBackground="switchBackground" />
     <div
-      class="squircle absolute top-4 right-4 z-50 flex gap-2 rounded-2xl bg-amber-50 p-2 shadow-sm ring ring-amber-50/70 dark:bg-amber-900/80 dark:ring-amber-600"
+      v-show="!useDeviceStore().isMobile"
+      class="relative min-h-dvh w-full snap-start space-y-2 max-sm:flex max-sm:flex-col max-sm:gap-4 max-sm:overflow-x-hidden max-sm:p-4 max-sm:pt-14"
+      :style="containerStyle"
+      ref="parentContainer"
     >
-      <ThemeToggle />
-      <!-- 背景图切换按钮 -->
+      <!-- Theme Toggle + Background Switch - 只在入口页面显示 -->
+      <div
+        class="squircle absolute top-4 right-4 z-50 flex gap-2 rounded-2xl bg-blue-50 p-2 shadow-sm ring ring-blue-50/70 dark:bg-blue-900/80 dark:ring-blue-600"
+      >
+        <ThemeToggle />
+        <!-- 背景图切换按钮 -->
+        <button
+          @click="debouncedSwitchBackground()"
+          class="squircle rounded-xl p-2 transition-all hover:scale-110 hover:bg-blue-100 dark:hover:bg-blue-800"
+          title="切换背景图"
+        >
+          <svg
+            class="h-5 w-5 text-blue-600 dark:text-blue-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
+          </svg>
+        </button>
+      </div>
+      <BentoGreeting
+        v-if="show.BentoGreeting"
+        :initial="{ scale: 0 }"
+        :animate="{ scale: 1 }"
+        :style="greetingPosition"
+        class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:order-1 max-sm:w-full! max-sm:min-w-0 max-sm:translate-0!"
+      />
+      <BentoProfileCard
+        v-if="show.BentoProfileCard"
+        :initial="{ scale: 0.5, opacity: 0 }"
+        :animate="{ scale: 1, opacity: 1 }"
+        ref="boxRef"
+        :style="profilePosition"
+        class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:order-2 max-sm:w-full! max-sm:min-w-0 max-sm:translate-0!"
+      />
+      <AnimatePresence>
+        <BentoNavCard
+          v-if="show.BentoNavCard"
+          layoutId="nav-card"
+          :initial="{ scale: 0.5, opacity: 0.8 }"
+          :animate="{ scale: 1, opacity: 1 }"
+          :exit="{ scale: 0.5, opacity: 0, transition: { duration: 0.2 } }"
+          :transition="{
+            type: 'spring',
+            stiffness: 400,
+            damping: 30,
+          }"
+          class="absolute w-68 -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-3 max-sm:w-full! max-sm:translate-0!"
+          :style="navCardPosition"
+        />
+      </AnimatePresence>
+      <BentoClock
+        v-if="show.BentoClock"
+        :initial="{ scale: 0 }"
+        :animate="{ scale: 1 }"
+        ref="clockRef"
+        :style="clockCardPosition"
+        class="absolute w-auto -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-5 max-sm:w-full! max-sm:translate-0!"
+      />
+      <BentoCalendar
+        v-if="show.BentoCalendar"
+        :initial="{ scale: 0 }"
+        :animate="{ scale: 1 }"
+        ref="calRef"
+        :style="calendarPosition"
+        class="absolute w-2xs -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-7 max-sm:w-full! max-sm:translate-0!"
+      />
+      <BentoMemo
+        v-if="show.BentoMemo"
+        :style="memoCardPosition"
+        class="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer max-sm:static! max-sm:left-auto! max-sm:order-6 max-sm:w-full! max-sm:translate-0!"
+      />
+      <BentoNewPost
+        v-if="show.BentoNewPost"
+        :style="newCardPosition"
+        class="absolute w-auto -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-4 max-sm:w-full! max-sm:translate-0!"
+      />
+      <BentoTech
+        v-if="show.BentoTech"
+        :initial="{ scale: 0.5 }"
+        :animate="{ scale: 1 }"
+        class="h-2xs absolute w-70 -translate-x-1/2 -translate-y-1/2 p-0! max-sm:static! max-sm:left-auto! max-sm:order-11 max-sm:h-auto! max-sm:w-full! max-sm:translate-0!"
+        :style="techPosition"
+      />
+      <BentoWebsites
+        v-if="show.BentoWebsites"
+        :initial="{ scale: 0.5 }"
+        :animate="{ scale: 1 }"
+        class="absolute w-68 -translate-x-1/2 -translate-y-1/2 p-0! max-sm:static! max-sm:left-auto! max-sm:order-9 max-sm:w-full! max-sm:translate-0!"
+        :style="websitesPosition"
+      />
+      <BentoReadingList
+        v-if="show.BentoReadingList"
+        :initial="{ scale: 0 }"
+        :animate="{ scale: 1 }"
+        :style="listCardPosition"
+        class="absolute w-auto -translate-x-1/2 -translate-y-1/2 cursor-pointer max-sm:static! max-sm:left-auto! max-sm:order-8 max-sm:w-full! max-sm:translate-0!"
+      />
+      <BentoCat
+        v-if="show.BentoCat"
+        :style="catPosition"
+        class="absolute w-2xs -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-12 max-sm:w-full! max-sm:translate-0!"
+      />
+      <div
+        v-if="show.TodoCard && showTodoCard"
+        class="absolute top-1/2 -right-20 w-70 min-w-3xs -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-10 max-sm:w-full! max-sm:translate-0!"
+      >
+        <TodoCard title="MyTasks" hideable @hide="showTodoCard = false" />
+      </div>
+      <!-- 显示 TodoCard 的按钮，隐藏时显示 -->
       <button
-        @click="switchBackground"
-        class="squircle rounded-xl p-2 transition-all hover:scale-110 hover:bg-amber-100 dark:hover:bg-amber-800"
-        title="切换背景图"
+        v-if="show.TodoCard && !showTodoCard && !isMobile"
+        @click="showTodoCard = true"
+        class="squircle fixed top-1/2 right-4 z-50 -translate-y-1/2 rounded-2xl bg-blue-50 p-3 shadow-sm ring ring-blue-50/70 transition-all hover:scale-110 dark:bg-blue-900/80 dark:ring-blue-600"
+        title="显示待办卡片"
       >
         <svg
-          class="h-5 w-5 text-amber-600 dark:text-amber-400"
+          class="h-5 w-5 text-blue-600 dark:text-blue-400"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -27,131 +139,21 @@
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
           />
         </svg>
       </button>
-    </div>
-    <BentoGreeting
-      v-if="show.BentoGreeting"
-      :initial="{ scale: 0 }"
-      :animate="{ scale: 1 }"
-      :style="greetingPosition"
-      class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:order-1 max-sm:w-full! max-sm:min-w-0 max-sm:translate-0!"
-    />
-    <BentoProfileCard
-      v-if="show.BentoProfileCard"
-      :initial="{ scale: 0.5, opacity: 0 }"
-      :animate="{ scale: 1, opacity: 1 }"
-      ref="boxRef"
-      :style="profilePosition"
-      class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:order-2 max-sm:w-full! max-sm:min-w-0 max-sm:translate-0!"
-    />
-    <AnimatePresence>
-      <BentoNavCard
-        v-if="show.BentoNavCard"
-        layoutId="nav-card"
-        :initial="{ scale: 0.5, opacity: 0.8 }"
-        :animate="{ scale: 1, opacity: 1 }"
-        :exit="{ scale: 0.5, opacity: 0, transition: { duration: 0.2 } }"
-        :transition="{
-          type: 'spring',
-          stiffness: 400,
-          damping: 30,
-        }"
-        class="absolute w-68 -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-3 max-sm:w-full! max-sm:translate-0!"
-        :style="navCardPosition"
+      <BentoLike
+        v-if="show.BentoLike"
+        :style="likePosition"
+        class="absolute w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-13 max-sm:mx-auto max-sm:translate-0!"
       />
-    </AnimatePresence>
-    <BentoClock
-      v-if="show.BentoClock"
-      :initial="{ scale: 0 }"
-      :animate="{ scale: 1 }"
-      ref="clockRef"
-      :style="clockCardPosition"
-      class="absolute w-auto -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-5 max-sm:w-full! max-sm:translate-0!"
-    />
-    <BentoCalendar
-      v-if="show.BentoCalendar"
-      :initial="{ scale: 0 }"
-      :animate="{ scale: 1 }"
-      ref="calRef"
-      :style="calendarPosition"
-      class="absolute w-2xs -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-7 max-sm:w-full! max-sm:translate-0!"
-    />
-    <BentoMemo
-      v-if="show.BentoMemo"
-      :style="memoCardPosition"
-      class="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer max-sm:static! max-sm:left-auto! max-sm:order-6 max-sm:w-full! max-sm:translate-0!"
-    />
-    <BentoNewPost
-      v-if="show.BentoNewPost"
-      :style="newCardPosition"
-      class="absolute w-auto -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-4 max-sm:w-full! max-sm:translate-0!"
-    />
-    <BentoTech
-      v-if="show.BentoTech"
-      :initial="{ scale: 0.5 }"
-      :animate="{ scale: 1 }"
-      class="h-2xs absolute w-70 -translate-x-1/2 -translate-y-1/2 p-0! max-sm:static! max-sm:left-auto! max-sm:order-11 max-sm:h-auto! max-sm:w-full! max-sm:translate-0!"
-      :style="techPosition"
-    />
-    <BentoWebsites
-      v-if="show.BentoWebsites"
-      :initial="{ scale: 0.5 }"
-      :animate="{ scale: 1 }"
-      class="absolute w-68 -translate-x-1/2 -translate-y-1/2 p-0! max-sm:static! max-sm:left-auto! max-sm:order-9 max-sm:w-full! max-sm:translate-0!"
-      :style="websitesPosition"
-    />
-    <BentoReadingList
-      v-if="show.BentoReadingList"
-      :initial="{ scale: 0 }"
-      :animate="{ scale: 1 }"
-      :style="listCardPosition"
-      class="absolute w-auto -translate-x-1/2 -translate-y-1/2 cursor-pointer max-sm:static! max-sm:left-auto! max-sm:order-8 max-sm:w-full! max-sm:translate-0!"
-    />
-    <BentoCat
-      v-if="show.BentoCat"
-      :style="catPosition"
-      class="absolute w-2xs -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-12 max-sm:w-full! max-sm:translate-0!"
-    />
-    <div
-      v-if="show.TodoCard && showTodoCard"
-      class="absolute top-1/2 -right-20 w-70 min-w-3xs -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-10 max-sm:w-full! max-sm:translate-0!"
-    >
-      <TodoCard title="MyTasks" hideable @hide="showTodoCard = false" />
+      <BentoMap
+        v-if="show.BentoMap"
+        :style="mapPosition"
+        class="absolute w-fit -translate-x-1/2 -translate-y-1/2 select-none max-sm:static! max-sm:left-auto! max-sm:order-14 max-sm:translate-0!"
+      />
     </div>
-    <!-- 显示 TodoCard 的按钮，隐藏时显示 -->
-    <button
-      v-if="show.TodoCard && !showTodoCard && !isMobile"
-      @click="showTodoCard = true"
-      class="squircle fixed top-1/2 right-4 z-50 -translate-y-1/2 rounded-2xl bg-blue-50 p-3 shadow-sm ring ring-blue-50/70 transition-all hover:scale-110 dark:bg-blue-900/80 dark:ring-blue-600"
-      title="显示待办卡片"
-    >
-      <svg
-        class="h-5 w-5 text-blue-600 dark:text-blue-400"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-        />
-      </svg>
-    </button>
-    <BentoLike
-      v-if="show.BentoLike"
-      :style="likePosition"
-      class="absolute w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-13 max-sm:mx-auto max-sm:translate-0!"
-    />
-    <BentoMap
-      v-if="show.BentoMap"
-      :style="mapPosition"
-      class="absolute w-fit -translate-x-1/2 -translate-y-1/2 select-none max-sm:static! max-sm:left-auto! max-sm:order-14 max-sm:translate-0!"
-    />
   </div>
 </template>
 
@@ -187,6 +189,7 @@ import {
   type ComponentPublicInstance,
 } from "vue";
 import { useStorage } from "@vueuse/core";
+import { useDeviceStore } from "@/stores/device";
 
 const backgroundImages = [
   "/background/bg-1.webp",
@@ -204,10 +207,18 @@ const backgroundImages = [
 // 当前背景图索引
 const currentBgIndex = useStorage<number>("readinglist_bg_index", 0);
 
-// 切换背景图
+// 切换背景（带防抖）
 const switchBackground = () => {
   currentBgIndex.value = (currentBgIndex.value + 1) % backgroundImages.length;
 };
+
+const debouncedSwitchBackground = useDebounceFn(switchBackground, 400);
+
+onUnmounted(() => {
+  // 如果防抖函数支持 cancel，则在卸载时取消
+  const maybe = debouncedSwitchBackground as unknown as { cancel?: () => void };
+  maybe.cancel?.();
+});
 
 const clockRef = ref<ComponentPublicInstance | null>(null);
 // 卡片边距
@@ -226,9 +237,7 @@ const viewportHeight = ref<number>(0);
 const showTodoCard = useStorage<boolean>("readinglist_show_todo_card", true);
 
 // 布局设计基准高度：使用视口高度，但不低于 820px，保证卡片间距不被压缩
-const layoutHeight = computed<number>(() =>
-  Math.max(viewportHeight.value, 820),
-);
+const layoutHeight = computed<number>(() => Math.max(viewportHeight.value, 820));
 
 // 容器高度：至少撑满布局高度（让绝对定位的卡片不被裁剪）
 const containerStyle = computed(() => ({
@@ -473,9 +482,7 @@ onMounted(async () => {
   });
 
   // Update dimensions after all cards have been rendered
-  const maxOrder = Math.max(
-    ...Object.values(carddelay).map((item) => item.order),
-  );
+  const maxOrder = Math.max(...Object.values(carddelay).map((item) => item.order));
   setTimeout(
     () => {
       updateDimensions();

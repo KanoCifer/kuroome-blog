@@ -3,10 +3,12 @@ import { BasicFooter, MobileNav } from "@/components/basic";
 import BasicNav from "@/components/nav/BasicNav.vue";
 import BackToTop from "@/components/layout/BackToTop.vue";
 import ToastContainer from "@/components/layout/ToastContainer.vue";
-import { useScroll, useStorage } from "@vueuse/core";
+import { useScroll, useStorage, useDebounceFn } from "@vueuse/core";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { useHead } from "@vueuse/head";
 import { RouterView, useRoute } from "vue-router";
-
+import MobileHeader from "@/components/basic/MobileHeader.vue";
+import { useDeviceStore } from "@/stores/device";
 // 背景图列表
 const backgroundImages = [
   "/background/bg-1.webp",
@@ -69,9 +71,6 @@ const handleScroll = () => {
 
 onMounted(() => {
   window.addEventListener("scroll", handleScroll, { passive: true });
-  window.addEventListener("resize", handleResize);
-  // 初始化时检查窗口大小
-  handleResize();
   lastScrollY.value = y.value;
 });
 
@@ -80,7 +79,7 @@ const isAutoScrolling = ref(false);
 let returnTopTimer: number | null = null;
 const scheduleReturnTop = () => {
   // 仅在首页且非移动设备时启用
-  if (!isEntryView.value || isMobileDevice.value) return;
+  if (!isEntryView.value || isMobileDevice) return;
   if (isAutoScrolling.value) return;
   if (returnTopTimer) {
     clearTimeout(returnTopTimer);
@@ -111,23 +110,85 @@ onUnmounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener("scroll", handleScroll);
-  window.removeEventListener("resize", handleResize);
 });
 
-const isMobileDevice = ref<boolean>(false);
-// 处理窗口大小变化
-const handleResize = () => {
-  isMobileDevice.value = window.innerWidth < 768;
+const isMobileDevice = useDeviceStore().isMobile;
+
+// 切换背景（带防抖）
+const switchBackground = () => {
+  currentBgIndex.value = (currentBgIndex.value + 1) % backgroundImages.length;
 };
+
+const debouncedSwitchBackground = useDebounceFn(switchBackground, 400);
+
+onUnmounted(() => {
+  // 如果防抖函数支持 cancel，则在卸载时取消
+  const maybe = debouncedSwitchBackground as unknown as { cancel?: () => void };
+  maybe.cancel?.();
+});
+
+// 使用 useHead 在 head 中预加载当前与下一张背景图（移动端禁用）
+const headPreload = computed(() => {
+  if (isMobileDevice) return { link: [] };
+  const links: Array<Record<string, string>> = [];
+  const len = backgroundImages.length;
+  if (len === 0) return { link: [] };
+  const cur = backgroundImages[currentBgIndex.value] || backgroundImages[0];
+  links.push({ rel: "preload", as: "image", href: cur });
+  if (len > 1) {
+    const next = backgroundImages[(currentBgIndex.value + 1) % len];
+    links.push({ rel: "preload", as: "image", href: next });
+  }
+  return { link: links };
+});
+useHead(headPreload);
+
+// 自动轮播背景图（仅桌面端）
+const BACKGROUND_ROTATE_INTERVAL = 60000; // 毫秒，60s
+let bgRotateTimer: number | null = null;
+
+const stopBackgroundRotation = () => {
+  if (bgRotateTimer) {
+    clearInterval(bgRotateTimer);
+    bgRotateTimer = null;
+  }
+};
+
+const startBackgroundRotation = () => {
+  // 如果是移动设备或只有一张图则不启动
+  if (isMobileDevice || backgroundImages.length <= 1) return;
+  stopBackgroundRotation();
+  bgRotateTimer = window.setInterval(() => {
+    currentBgIndex.value = (currentBgIndex.value + 1) % backgroundImages.length;
+  }, BACKGROUND_ROTATE_INTERVAL);
+};
+
+onMounted(() => {
+  startBackgroundRotation();
+});
+
+// 设备类型变化时启动或停止轮播
+watch(
+  () => useDeviceStore().isMobile,
+  (mobile) => {
+    if (mobile) stopBackgroundRotation();
+    else startBackgroundRotation();
+  },
+);
+
+onUnmounted(() => {
+  stopBackgroundRotation();
+});
 </script>
 
 <template>
   <div class="relative isolate grid min-h-dvh grid-rows-[auto_1fr_auto]">
     <!-- 背景图 -->
     <div
-      class="pointer-events-none fixed inset-0 -z-10 bg-cover blur-md transition-all duration-500"
+      class="pointer-events-none fixed inset-0 -z-10 transform-gpu bg-cover bg-fixed blur-md transition-all duration-800"
       :style="{ backgroundImage: `url('${backgroundUrl}')` }"
     ></div>
+    <MobileHeader v-if="isMobileDevice" @switchBackground="debouncedSwitchBackground" />
     <MobileNav v-if="isMobileDevice" />
     <header>
       <div class="mx-auto mt-6">
@@ -137,8 +198,6 @@ const handleResize = () => {
         <BasicNav :isEntryView="isEntryView" :isVisible="showBasicNav" v-if="!isMobileDevice" />
       </div>
     </header>
-
-    <MobileNav :isVisible="true" />
 
     <!-- Main Content -->
     <main class="relative scroll-smooth">

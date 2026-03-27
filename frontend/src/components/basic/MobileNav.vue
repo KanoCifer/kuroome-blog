@@ -32,11 +32,12 @@
         >Blogs</span
       >
     </div>
-    <button
-      class="-mt-12 flex h-14 w-14 items-center justify-center rounded-full border-4 border-blue-400/20 bg-blue-300 text-white shadow-xl shadow-blue-500/40"
+    <router-link
+      to="/blog/new"
+      class="-mt-20 flex h-18 w-18 items-center justify-center rounded-full border-4 border-blue-400/20 bg-blue-300 text-white shadow-xl shadow-blue-500/40"
     >
-      <span class="text-[10px] font-bold">New</span>
-    </button>
+      <span class="text-base font-bold">New</span>
+    </router-link>
     <!-- Documentation/Stories -->
     <div class="group flex flex-col items-center gap-1">
       <router-link

@@ -1,31 +1,26 @@
 <template>
   <MobileBentoCard
-    class="relative overflow-hidden !border-blue-500/30 bg-linear-to-br from-blue-600/90 to-blue-800/90 !p-8 shadow-xl"
+    class="relative overflow-hidden border-blue-500/30! bg-linear-to-br from-blue-600/90 to-blue-800/90 p-8 shadow-xl"
   >
     <div class="relative z-10 flex flex-col justify-center">
-      <h3
-        class="mb-1 font-serif text-sm font-medium text-white/80 dark:text-blue-100"
-      >
+      <h3 class="mb-1 font-serif text-sm font-medium text-white/80 dark:text-blue-100">
         {{ greeting }}
       </h3>
-      <h4
-        class="mb-4 font-serif text-3xl leading-tight font-extrabold text-white"
-      >
+      <h4 class="mb-4 font-serif text-3xl leading-tight font-extrabold text-white">
         Ready for a productive session?
       </h4>
       <div class="mt-2">
         <button
+          @click="$router.push('/todos')"
           class="rounded-full bg-white/20 px-6 py-2.5 text-sm font-semibold text-white backdrop-blur-md transition-all hover:bg-white/30 active:scale-95"
         >
-          Start Focus Mode
+          Check Today's Tasks
         </button>
       </div>
     </div>
 
     <!-- Decorative Abstract Shape -->
-    <div
-      class="absolute -right-10 -bottom-10 h-48 w-48 rounded-full bg-white/10 blur-3xl"
-    ></div>
+    <div class="absolute -right-10 -bottom-10 h-48 w-48 rounded-full bg-white/10 blur-3xl"></div>
     <div class="absolute top-1/2 right-4 -translate-y-1/2 opacity-20">
       <svg class="h-24 w-24 text-white" fill="currentColor" viewBox="0 0 24 24">
         <path

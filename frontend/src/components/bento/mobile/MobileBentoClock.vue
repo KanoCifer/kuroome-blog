@@ -1,6 +1,6 @@
 <template>
   <MobileBentoCard
-    class="flex aspect-square flex-col justify-between !p-6 max-sm:aspect-auto max-sm:h-40"
+    class="flex aspect-square flex-col justify-between p-6 max-sm:aspect-auto max-sm:h-40"
   >
     <div>
       <svg

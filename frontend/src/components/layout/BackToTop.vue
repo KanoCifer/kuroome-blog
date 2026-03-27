@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useScroll, useWindowSize } from "@vueuse/core";
 import { computed, onBeforeUnmount, onMounted, ref, watchEffect } from "vue";
-
+import { useDeviceStore } from "@/stores/device";
 const isHovered = ref(false);
 
 // useScroll 会自动监听滚动事件并暴露 x/y 值
@@ -13,25 +13,17 @@ const { height } = useWindowSize();
 const isVisible = computed(() => y.value > 300);
 
 // 最大可滚动距离（可被动态更新）
-const maxScroll = ref(
-  Math.max(0, document.documentElement.scrollHeight - window.innerHeight),
-);
+const maxScroll = ref(Math.max(0, document.documentElement.scrollHeight - window.innerHeight));
 
 // 使用 watchEffect 在响应式的 window height 变化时重新计算 maxScroll
 watchEffect(() => {
-  maxScroll.value = Math.max(
-    0,
-    document.documentElement.scrollHeight - height.value,
-  );
+  maxScroll.value = Math.max(0, document.documentElement.scrollHeight - height.value);
 });
 
 let mo: MutationObserver | null = null;
 onMounted(() => {
   mo = new MutationObserver(() => {
-    maxScroll.value = Math.max(
-      0,
-      document.documentElement.scrollHeight - height.value,
-    );
+    maxScroll.value = Math.max(0, document.documentElement.scrollHeight - height.value);
   });
   mo.observe(document.documentElement, {
     childList: true,
@@ -71,19 +63,17 @@ const scrollToTop = () => {
       @click="scrollToTop"
       @mouseenter="isHovered = true"
       @mouseleave="isHovered = false"
-      class="fixed right-0 bottom-16 z-50 flex h-14 w-14 -translate-x-1/2 transform-gpu cursor-pointer items-center justify-center overflow-hidden rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:shadow-2xl focus:outline-none"
+      class="fixed z-50 flex h-14 w-14 -translate-x-1/2 transform-gpu cursor-pointer items-center justify-center overflow-hidden rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:shadow-2xl focus:outline-none"
       :class="[
         isHovered
           ? 'bg-blue-600/30 text-white dark:bg-blue-500/10'
           : 'bg-gray-50/30 text-gray-700 dark:bg-gray-800/10 dark:text-gray-200',
+        useDeviceStore().isMobile ? 'bottom-30 left-10' : 'right-0 bottom-16',
       ]"
       aria-label="回到顶部"
     >
       <!-- 背景进度环 -->
-      <svg
-        class="absolute inset-0 h-full w-full -rotate-90"
-        viewBox="0 0 56 56"
-      >
+      <svg class="absolute inset-0 h-full w-full -rotate-90" viewBox="0 0 56 56">
         <!-- 背景圆环 -->
         <circle
           cx="28"
@@ -121,11 +111,7 @@ const scrollToTop = () => {
         stroke="currentColor"
         stroke-width="2"
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M5 10l7-7m0 0l7 7m-7-7v18"
-        />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
       </svg>
 
       <!-- Tooltip -->
