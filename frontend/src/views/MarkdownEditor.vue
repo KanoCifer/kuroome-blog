@@ -21,12 +21,22 @@ const renderedMarkdown = computed<string>(() => {
 
 <template>
   <BasicDetail title="Markdown 编辑器" subtitle="实时预览">
-    <div class="col-span-full h-[700px] overflow-hidden rounded-2xl bg-white shadow-lg dark:bg-slate-900">
+    <div
+      class="col-span-full h-[700px] overflow-hidden rounded-2xl bg-white shadow-lg dark:bg-slate-900"
+    >
       <div class="flex h-full w-full flex-col md:flex-row">
         <!-- Left Column: Editor -->
-        <div class="flex h-1/2 w-full flex-col border-b border-slate-200 md:h-full md:w-1/2 md:border-b-0 md:border-r dark:border-slate-800">
-          <div class="flex h-12 flex-shrink-0 items-center border-b border-slate-200 px-4 dark:border-slate-800">
-            <h1 class="text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400">MARKDOWN</h1>
+        <div
+          class="flex h-1/2 w-full flex-col border-b border-slate-200 md:h-full md:w-1/2 md:border-b-0 md:border-r dark:border-slate-800"
+        >
+          <div
+            class="flex h-12 flex-shrink-0 items-center border-b border-slate-200 px-4 dark:border-slate-800"
+          >
+            <h1
+              class="text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400"
+            >
+              MARKDOWN
+            </h1>
           </div>
           <textarea
             v-model="markdownText"
@@ -37,11 +47,19 @@ const renderedMarkdown = computed<string>(() => {
 
         <!-- Right Column: Preview -->
         <div class="flex h-1/2 w-full flex-col md:h-full md:w-1/2">
-          <div class="flex h-12 flex-shrink-0 items-center border-b border-slate-200 px-4 dark:border-slate-800">
-            <h2 class="text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400">PREVIEW</h2>
+          <div
+            class="flex h-12 flex-shrink-0 items-center border-b border-slate-200 px-4 dark:border-slate-800"
+          >
+            <h2
+              class="text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400"
+            >
+              PREVIEW
+            </h2>
           </div>
           <!-- Use Tailwind Typography plugin (prose) for styling the markdown output -->
-          <div class="prose prose-slate dark:prose-invert max-w-none flex-1 overflow-y-auto p-6">
+          <div
+            class="prose prose-slate dark:prose-invert max-w-none flex-1 overflow-y-auto p-6"
+          >
             <div v-html="renderedMarkdown"></div>
           </div>
         </div>

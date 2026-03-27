@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { BasicFooter, BasicNotifier } from "@/components/basic";
+import { BasicFooter } from "@/components/basic";
+import MobileNav from "@/components/basic/MobileNav.vue";
 import BasicNav from "@/components/nav/BasicNav.vue";
 import BackToTop from "@/components/layout/BackToTop.vue";
 import ToastContainer from "@/components/layout/ToastContainer.vue";
@@ -111,20 +112,10 @@ onUnmounted(() => {
   window.removeEventListener("resize", handleResize);
 });
 
-const isMobileWarningVisible = ref<boolean>(false);
-const accpetedMobileWarning = ref<boolean>(false);
 const isMobileDevice = ref<boolean>(false);
 // 处理窗口大小变化
 const handleResize = () => {
   isMobileDevice.value = window.innerWidth < 768;
-  if (isMobileDevice.value && !isMobileWarningVisible.value && !accpetedMobileWarning.value) {
-    isMobileWarningVisible.value = true;
-  }
-};
-
-const closeMobileWarning = () => {
-  isMobileWarningVisible.value = false;
-  accpetedMobileWarning.value = true;
 };
 </script>
 
@@ -143,6 +134,8 @@ const closeMobileWarning = () => {
         <BasicNav :isEntryView="isEntryView" :isVisible="showBasicNav" />
       </div>
     </header>
+
+    <MobileNav :isVisible="true" />
 
     <!-- Main Content -->
     <main class="relative scroll-smooth">
@@ -167,13 +160,5 @@ const closeMobileWarning = () => {
 
     <!-- Back to Top Button -->
     <BackToTop />
-
-    <!-- 移动端适配警告弹窗 -->
-    <Teleport to="body">
-      <BasicNotifier
-        :isMobileWarningVisible="isMobileWarningVisible"
-        @update:isMobileWarningVisible="closeMobileWarning"
-      />
-    </Teleport>
   </div>
 </template>

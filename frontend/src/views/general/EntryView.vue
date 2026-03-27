@@ -223,7 +223,9 @@ const viewportHeight = ref<number>(0);
 const showTodoCard = useStorage<boolean>("readinglist_show_todo_card", true);
 
 // 布局设计基准高度：使用视口高度，但不低于 820px，保证卡片间距不被压缩
-const layoutHeight = computed<number>(() => Math.max(viewportHeight.value, 820));
+const layoutHeight = computed<number>(() =>
+  Math.max(viewportHeight.value, 820),
+);
 
 // 容器高度：至少撑满布局高度（让绝对定位的卡片不被裁剪）
 const containerStyle = computed(() => ({
@@ -468,7 +470,9 @@ onMounted(async () => {
   });
 
   // Update dimensions after all cards have been rendered
-  const maxOrder = Math.max(...Object.values(carddelay).map((item) => item.order));
+  const maxOrder = Math.max(
+    ...Object.values(carddelay).map((item) => item.order),
+  );
   setTimeout(
     () => {
       updateDimensions();

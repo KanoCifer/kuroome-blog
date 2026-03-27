@@ -12,7 +12,9 @@
       <div class="flex h-full flex-col bg-blue-50/50 p-6 dark:bg-gray-800/80">
         <!-- Header -->
         <div class="flex items-center justify-between">
-          <h3 class="flex items-center gap-2 text-lg font-bold text-blue-900 dark:text-blue-100">
+          <h3
+            class="flex items-center gap-2 text-lg font-bold text-blue-900 dark:text-blue-100"
+          >
             <svg
               class="h-5 w-5 text-blue-600 dark:text-blue-400"
               fill="none"
@@ -40,7 +42,12 @@
               class="cursor-pointer rounded-xl p-1.5 text-blue-600 outline-0 transition-colors hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-blue-900/40"
               title="查看详情"
             >
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -61,7 +68,12 @@
               class="cursor-pointer rounded-xl p-1.5 text-blue-600 outline-0 transition-colors hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-blue-900/40"
               title="隐藏待办卡片"
             >
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -78,7 +90,9 @@
 
       <div class="contents">
         <!-- List area -->
-        <div class="custom-scrollbar mt-1 mb-3 min-h-37.5 flex-1 overflow-y-auto px-4">
+        <div
+          class="custom-scrollbar mt-1 mb-3 min-h-37.5 flex-1 overflow-y-auto px-4"
+        >
           <div
             v-for="todo in todos.slice(0, 3)"
             :key="todo.id"
@@ -173,7 +187,11 @@ const emit = defineEmits<{
 }>();
 
 const todoStore = useTodoStore();
-const { nonArchivedTodos: todos, completedCount, isCollapsed } = storeToRefs(todoStore);
+const {
+  nonArchivedTodos: todos,
+  completedCount,
+  isCollapsed,
+} = storeToRefs(todoStore);
 
 onMounted(() => {
   todoStore.hydrateTodos();

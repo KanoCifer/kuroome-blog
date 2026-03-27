@@ -67,7 +67,7 @@ export const useAuthStore = defineStore("auth", () => {
   function startHeartbeat() {
     // 先停止已有定时器
     stopHeartbeat();
-    
+
     // 每60秒上报一次心跳
     heartbeatTimer = window.setInterval(async () => {
       if (user.value) {

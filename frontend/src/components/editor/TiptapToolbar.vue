@@ -24,7 +24,11 @@ const currentHeading = computed(() => {
 
 // 表格操作
 const insertTable = (rows: number, cols: number) => {
-  props.editor.chain().focus().insertTable({ rows, cols, withHeaderRow: true }).run();
+  props.editor
+    .chain()
+    .focus()
+    .insertTable({ rows, cols, withHeaderRow: true })
+    .run();
   tableMenuOpen.value = false;
 };
 
@@ -175,7 +179,12 @@ const shortcuts = {
             class="toolbar-btn flex items-center gap-1 px-2 py-1 text-xs font-medium"
             title="Text Style"
           >
-            <span :class="[currentHeading !== 'P' ? 'font-bold' : '', 'min-w-[20px] text-center']">
+            <span
+              :class="[
+                currentHeading !== 'P' ? 'font-bold' : '',
+                'min-w-[20px] text-center',
+              ]"
+            >
               {{ currentHeading }}
             </span>
             <svg
@@ -357,7 +366,11 @@ const shortcuts = {
             stroke-width="2"
             stroke="currentColor"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3.75 12h16.5"
+            />
           </svg>
         </button>
       </div>
@@ -459,7 +472,9 @@ const shortcuts = {
             </svg>
           </button>
           <div v-if="tableMenuOpen" class="toolbar-dropdown w-48">
-            <div class="mb-2 text-xs text-gray-500 dark:text-gray-400">Insert Table</div>
+            <div class="mb-2 text-xs text-gray-500 dark:text-gray-400">
+              Insert Table
+            </div>
             <div class="grid grid-cols-3 gap-1">
               <button
                 type="button"
@@ -579,7 +594,11 @@ const shortcuts = {
             stroke-width="2"
             stroke="currentColor"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18 18 6M6 6l12 12"
+            />
           </svg>
         </button>
         <button
@@ -595,7 +614,11 @@ const shortcuts = {
             stroke-width="2"
             stroke="currentColor"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18 18 6M6 6l12 12"
+            />
           </svg>
         </button>
         <button
@@ -756,7 +779,11 @@ const shortcuts = {
             stroke-width="2"
             stroke="currentColor"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M4.5 15.75l7.5-7.5 7.5 7.5"
+            />
           </svg>
         </button>
       </div>

@@ -58,7 +58,12 @@ const getTypeClass = (type: string): string => {
         <div
           class="mb-6 inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
         >
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -113,7 +118,12 @@ const getTypeClass = (type: string): string => {
                   <span
                     class="inline-flex items-center gap-2 rounded-full bg-linear-to-r from-blue-500 to-cyan-500 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-blue-500/25"
                   >
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -123,8 +133,15 @@ const getTypeClass = (type: string): string => {
                     </svg>
                     v{{ r.version }}
                   </span>
-                  <span class="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <span
+                    class="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400"
+                  >
+                    <svg
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -137,20 +154,28 @@ const getTypeClass = (type: string): string => {
                 </div>
 
                 <!-- Release Title -->
-                <h2 class="mb-4 text-2xl font-bold text-gray-800 dark:text-gray-100">
+                <h2
+                  class="mb-4 text-2xl font-bold text-gray-800 dark:text-gray-100"
+                >
                   {{ r.title }}
                 </h2>
 
                 <!-- Changes List -->
                 <ul class="space-y-3">
-                  <li v-for="(change, i) in r.changes" :key="i" class="flex items-start gap-3">
+                  <li
+                    v-for="(change, i) in r.changes"
+                    :key="i"
+                    class="flex items-start gap-3"
+                  >
                     <span
                       :class="[
                         'mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold tracking-wide uppercase transition-all duration-200',
                         getTypeClass(change.type),
                       ]"
                     >
-                      <span v-if="getTypeIcon(change.type)">{{ getTypeIcon(change.type) }}</span>
+                      <span v-if="getTypeIcon(change.type)">{{
+                        getTypeIcon(change.type)
+                      }}</span>
                       {{ getTypeLabel(change.type) }}
                     </span>
                     <span class="text-gray-700 dark:text-gray-300">
@@ -176,7 +201,9 @@ const getTypeClass = (type: string): string => {
             </div>
 
             <!-- Mobile Timeline Dot -->
-            <div class="absolute top-6 left-0 z-10 h-6 w-6 -translate-x-1/2 md:hidden">
+            <div
+              class="absolute top-6 left-0 z-10 h-6 w-6 -translate-x-1/2 md:hidden"
+            >
               <div
                 class="relative flex h-full w-full items-center justify-center rounded-full bg-white ring-3 ring-blue-100 dark:bg-gray-800 dark:ring-gray-700"
               >
