@@ -3,7 +3,6 @@
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from rich import print
 
 
 def get_env_file_path() -> str:
@@ -43,6 +42,7 @@ class Settings(BaseSettings):
     # Redis 配置
     REDIS_URL: str = "redis://localhost:6379/0"
     REDIS_MAX_CONNECTIONS: int = 10
+    RABBITMQ_URL: str = "amqp://guest:guest@localhost:5672/"
 
     model_config = SettingsConfigDict(
         env_file=get_env_file_path(),
@@ -58,18 +58,3 @@ settings = Settings()
 @lru_cache
 def get_settings() -> Settings:
     return settings
-
-
-if __name__ == "__main__":
-    # 测试配置是否正确加载
-    get_settings.cache_clear()  # 清除缓存以确保重新加载配置
-    print(get_settings().DATABASE_URL)
-    print(get_settings().MONGO_URI)
-    print(get_env_file_path())
-    print(f"SEND_BOOT_EMAIL: {get_settings().SEND_BOOT_EMAIL}")
-    print(f"ADMIN_EMAIL: {get_settings().ADMIN_EMAIL}")
-    print(f"FEISHU_WEBHOOK_URL: {get_settings().FEISHU_WEBHOOK_URL}")
-    print(f"VITE_JS_API_TOKEN: {get_settings().VITE_JS_API_TOKEN}")
-    print(f"AMAP_SECURITY_CODE: {get_settings().AMAP_SECURITY_CODE}")
-    print(f"AMAP_WEB_KEY: {get_settings().AMAP_WEB_KEY}")
-    print(f"JWT_PRIVATE_KEY: {get_settings().JWT_PRIVATE_KEY}")

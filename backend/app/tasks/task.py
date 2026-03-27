@@ -18,8 +18,7 @@ from taskiq import (
     TaskiqState,
 )
 
-from app.core import MailConfig, get_settings, logger
-from app.core.container import get_rss_service
+from app.core import MailConfig, get_rss_service, get_settings, logger
 from app.models.beanie import (
     MessageBoard,
     Post,
@@ -32,6 +31,7 @@ from app.schemas import (
     FeishuRichTextContent,
 )
 from app.tasks.broker import broker
+from app.utils import dedup_guard
 
 CONNECTION_POOL = ConnectionPool.from_url(
     get_settings().REDIS_URL,
@@ -172,58 +172,56 @@ async def send_feishu_message(
 
     # 使用去重守卫确保在 TTL 窗口内只发送一次消息
     redis = context.state.redis
-    if redis is not None:
-        from app.utils import dedup_guard
 
-        try:
-            async with dedup_guard(redis, "feishu_message_lock", ttl=300):
-                if msg_type == "post":
-                    # 飞书富文本消息格式需要包含 post 字段，content 是二维数组
-                    content = {
-                        "post": {
-                            "zh_cn": {
-                                "title": title,
-                                "content": [
-                                    [
-                                        {
-                                            "tag": "at",
-                                            "user_id": "all",
-                                            "user_name": "所有人",
-                                        },
-                                        {
-                                            "tag": "text",
-                                            "text": message,
-                                        },
-                                    ],
-                                    [
-                                        {
-                                            "tag": "a",
-                                            "text": "网站首页",
-                                            "href": "https://kanocifer.chat",
-                                        },
-                                    ],
+    try:
+        async with dedup_guard(redis, "feishu_message_lock", ttl=300):
+            if msg_type == "post":
+                # 飞书富文本消息格式需要包含 post 字段，content 是二维数组
+                content = {
+                    "post": {
+                        "zh_cn": {
+                            "title": title,
+                            "content": [
+                                [
+                                    {
+                                        "tag": "at",
+                                        "user_id": "all",
+                                        "user_name": "所有人",
+                                    },
+                                    {
+                                        "tag": "text",
+                                        "text": message,
+                                    },
                                 ],
-                            }
+                                [
+                                    {
+                                        "tag": "a",
+                                        "text": "网站首页",
+                                        "href": "https://kanocifer.chat",
+                                    },
+                                ],
+                            ],
                         }
                     }
-                    payload = FeishuRichTextContent(
-                        msg_type="post", content=content
+                }
+                payload = FeishuRichTextContent(
+                    msg_type="post", content=content
+                )
+            else:
+                payload = FeishuMessageContent(
+                    msg_type=msg_type,
+                    content={"text": message},
+                )
+            try:
+                async with httpx.AsyncClient() as client:
+                    response = await client.post(
+                        url, json=payload.model_dump()
                     )
-                else:
-                    payload = FeishuMessageContent(
-                        msg_type=msg_type,
-                        content={"text": message},
-                    )
-                try:
-                    async with httpx.AsyncClient() as client:
-                        response = await client.post(
-                            url, json=payload.model_dump()
-                        )
-                        response.raise_for_status()
-                except Exception as e:
-                    logger.error(f"发送飞书消息失败: {e!s}")
-        except Exception as e:
-            logger.warning(f"获取分布式锁失败，跳过发送飞书消息: {e!s}")
+                    response.raise_for_status()
+            except Exception as e:
+                logger.error(f"发送飞书消息失败: {e!s}")
+    except Exception as e:
+        logger.warning(f"获取分布式锁失败，跳过发送飞书消息: {e!s}")
     else:
         logger.warning("Redis 客户端不可用，跳过分布式锁检查")
         if msg_type == "post":

@@ -22,27 +22,11 @@ class MonitorDomainError(Exception):
 class MonitorService:
     def __init__(
         self,
-        repo: MonitorRepo | None,
-        redis: AsyncRedis | None,
+        repo: MonitorRepo,
+        redis: AsyncRedis,
     ) -> None:
         self.repo = repo
         self.redis = redis
-
-    def _require_repo(self) -> MonitorRepo:
-        if self.repo is None:
-            raise MonitorDomainError(
-                "Monitor repository is not configured",
-                500,
-            )
-        return self.repo
-
-    def _require_redis(self) -> AsyncRedis:
-        if self.redis is None:
-            raise MonitorDomainError(
-                "Redis client is not configured",
-                500,
-            )
-        return self.redis
 
     @staticmethod
     def _get_server_status_payload() -> dict[str, float | int | None]:
@@ -78,7 +62,7 @@ class MonitorService:
         end_time = datetime.now(UTC)
         start_time = end_time - timedelta(days=days)
 
-        repo = self._require_repo()
+        repo = self.repo
 
         total_visits = await repo.count_visits_since(start_time)
         unique_visitors = await repo.count_unique_visitors_since(start_time)
@@ -105,7 +89,7 @@ class MonitorService:
         end_time = datetime.now(UTC)
         start_time = end_time - timedelta(days=days)
 
-        repo = self._require_repo()
+        repo = self.repo
 
         total = await repo.count_visits_since(start_time)
         offset = (page - 1) * page_size
@@ -150,7 +134,7 @@ class MonitorService:
         end_time = datetime.now(UTC)
         start_time = end_time - timedelta(days=days)
 
-        repo = self._require_repo()
+        repo = self.repo
 
         users = await repo.list_users_with_login_records()
 
@@ -201,7 +185,7 @@ class MonitorService:
         return self._get_server_status_payload()
 
     async def get_online_users(self, include_user_details: bool) -> dict:
-        redis = self._require_redis()
+        redis = self.redis
 
         online_count_raw = await redis.get("stats:online_count")
         online_count = int(online_count_raw) if online_count_raw else 0
@@ -214,7 +198,7 @@ class MonitorService:
 
         user_details: list[dict] = []
         if include_user_details and online_user_ids:
-            repo = self._require_repo()
+            repo = self.repo
             users: list[User] = await repo.list_users_by_ids(online_user_ids)
             user_details = [
                 {
@@ -253,7 +237,7 @@ class MonitorService:
         start = date.replace(hour=0, minute=0, second=0, microsecond=0)
         end = start + timedelta(days=1)
 
-        repo = self._require_repo()
+        repo = self.repo
 
         total_visits = await repo.count_visits_between(start, end)
         unique_visitors = await repo.count_unique_visitors_between(start, end)
@@ -290,7 +274,7 @@ class MonitorService:
         from app.api.des.db import AsyncSessionFactory
         from app.models.models import User
 
-        redis = self._require_redis()
+        redis = self.redis
 
         now = int(datetime.now(UTC).timestamp())
         cutoff_time = now - cutoff_seconds

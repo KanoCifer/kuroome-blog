@@ -342,7 +342,7 @@ async def send_daily_summary():
         lines.append("📌 此消息由 BOT 自动发送")
         message = "\n".join(lines)
 
-        # 通过 send_feishu_message 发送 (自带分布式锁防重复)
+        # 通过 send_feishu_message 发送
         await send_feishu_message.kiq(
             message=message,
             msg_type="post",

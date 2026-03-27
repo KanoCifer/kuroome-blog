@@ -10,7 +10,7 @@ result_backend = RedisAsyncResultBackend(
 )
 broker: AioPikaBroker = (
     AioPikaBroker(
-        "amqp://guest:guest@localhost:5672/",
+        get_settings().RABBITMQ_URL,
     )
     .with_result_backend(
         RedisAsyncResultBackend(get_settings().REDIS_URL, result_ex_time=86400)
