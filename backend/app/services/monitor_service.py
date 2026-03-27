@@ -56,7 +56,7 @@ class MonitorService:
 
     @staticmethod
     def _to_sse_event(payload: dict[str, float | int | None]) -> str:
-        return f"data: {json.dumps(payload)}\\n\\n"
+        return f"data: {json.dumps(payload)}\n\n"
 
     async def get_overview(self, days: int) -> dict:
         end_time = datetime.now(UTC)

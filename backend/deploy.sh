@@ -52,8 +52,7 @@ ok "Frontend built"
 
 step "Restarting services"
 sudo supervisorctl reload || true
-sudo supervisorctl update
-sudo supervisorctl status
+sudo supervisorctl update || true
 ok "Services restarted"
 
 echo ""

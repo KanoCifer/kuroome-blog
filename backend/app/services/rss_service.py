@@ -9,13 +9,11 @@ from typing import Any
 import feedparser
 import httpx
 import orjson
-from beanie.operators import In
 from bson import ObjectId
 from bson.errors import InvalidId
 from redis.asyncio import Redis as AsyncRedis
 
 from app.core.logger import logger
-from app.models.beanie import RssArticle, RssArticleGuidProjection
 from app.models.models import RssInfo
 from app.repositories.rss_repo import RssRepo
 from app.schemas.rss import (
@@ -23,8 +21,6 @@ from app.schemas.rss import (
     RssArticleResponse,
     RssSubscriptionResponse,
 )
-
-# ======= RSS 相关工具函数 =======
 
 
 def _parse_feed_published_datetime(
@@ -116,7 +112,6 @@ def _normalize_struct_time(value: Any) -> list[int] | None:
 
 
 def _parse_entry_published_datetime(entry: dict[str, Any]) -> datetime | None:
-    """解析 RSS 条目的发布时间，尝试多个可能的字段名和格式，返回标准化的 datetime 对象。"""
     for field in ("published_parsed", "updated_parsed"):
         parsed = entry.get(field)
         if not parsed:
@@ -130,7 +125,6 @@ def _parse_entry_published_datetime(entry: dict[str, Any]) -> datetime | None:
 
 
 def _extract_entry_content(entry: dict[str, Any]) -> str:
-    """从 RSS 条目中提取内容，优先使用 content 字段，如果 content 是一个列表则取第一个元素的 value 字段，否则使用 summary 字段作为内容。"""
     raw_content = entry.get("content")
     if isinstance(raw_content, list) and raw_content:
         first = raw_content[0]
@@ -164,22 +158,12 @@ class RssService:
         self.repo: RssRepo = repo
         self.redis: AsyncRedis = redis
 
-    def _require_repo(self) -> RssRepo:
-        if self.repo is None:
-            raise RssDomainError("RSS repository is not configured", 500)
-        return self.repo
-
-    def _require_redis(self) -> AsyncRedis:
-        if self.redis is None:
-            raise RssDomainError("Redis client is not configured", 500)
-        return self.redis
-
     @staticmethod
     def _build_rss_cache_key(url: str) -> str:
         return f"rss_cache:{url}"
 
     async def get_cached_feed(self, url: str) -> dict[str, Any] | None:
-        redis = self._require_redis()
+        redis = self.redis
         cached_data = await redis.get(self._build_rss_cache_key(url))
         if not cached_data:
             return None
@@ -198,7 +182,7 @@ class RssService:
         ttl_seconds: int = 3600,
     ) -> None:
         payload = {"meta": feed_meta, "entries": entries}
-        redis = self._require_redis()
+        redis = self.redis
         await redis.set(
             self._build_rss_cache_key(url),
             orjson.dumps(payload),
@@ -206,12 +190,12 @@ class RssService:
         )
 
     async def invalidate_feed_cache(self, url: str) -> None:
-        redis = self._require_redis()
+        redis = self.redis
         await redis.delete(self._build_rss_cache_key(url))
 
     async def save_rss_info(self, url: str, user_id: int) -> RssInfo:
         """保存 RSS 信息到数据库中。"""
-        repo = self._require_repo()
+        repo = self.repo
         if await repo.check_rssurl_exists(url, user_id):
             raise RssDomainError("RSS URL already exists for this user", 409)
         rss_info = await repo.save_rss_url(url, user_id)
@@ -223,7 +207,6 @@ class RssService:
         save_to_db: bool = False,
         rss_info: RssInfo | None = None,
     ) -> dict[str, Any]:
-        """异步获取 RSS feed 内容并解析，返回解析结果和 feed meta 信息。"""
         try:
             # 异步获取feed内容，带超时控制
             async with httpx.AsyncClient(
@@ -288,7 +271,7 @@ class RssService:
             rss_info.entry_count = len(entries)
             rss_info.last_fetched_at = fetched_at
 
-            repo = self._require_repo()
+            repo = self.repo
             await repo.save_rss_info(rss_info)
 
         return {
@@ -298,7 +281,7 @@ class RssService:
 
     async def get_user_rss_info(self, user_id: int) -> list[str]:
         """获取用户订阅的 RSS 列表。"""
-        repo = self._require_repo()
+        repo = self.repo
         return await repo.get_user_rss_info(user_id)
 
     async def get_articles_for_user(
@@ -309,42 +292,13 @@ class RssService:
         feed_url: str | None = None,
         search: str | None = None,
     ) -> RssArticleListResponse:
-        """获取用户的 RSS 文章列表，支持分页、按 feed_url 过滤和全文搜索。"""
         user_feed_urls = await self.get_user_rss_info(user_id)
-        if not user_feed_urls:
-            return RssArticleListResponse(
-                items=[],
-                total=0,
-                page=page,
-                limit=limit,
-            )
-
-        if feed_url is not None:
-            if feed_url not in user_feed_urls:
-                return RssArticleListResponse(
-                    items=[],
-                    total=0,
-                    page=page,
-                    limit=limit,
-                )
-            query = RssArticle.find(RssArticle.feed_url == feed_url)
-        else:
-            query = RssArticle.find(In(RssArticle.feed_url, user_feed_urls))
-
-        if search is not None:
-            query = query.find({"$text": {"$search": search}})
-            sort_criteria = [
-                ("score", {"$meta": "textScore"}),
-                "-published",
-                "-fetched_at",
-            ]
-        else:
-            sort_criteria = ["-published", "-fetched_at"]
-
-        total = await query.count()
-        skip = (page - 1) * limit
-        articles = (
-            await query.sort(*sort_criteria).skip(skip).limit(limit).to_list()
+        articles, total = await self.repo.list_articles_for_user(
+            user_feed_urls=user_feed_urls,
+            page=page,
+            limit=limit,
+            feed_url=feed_url,
+            search=search,
         )
 
         items = [
@@ -376,17 +330,16 @@ class RssService:
         article_id: str,
         user_id: int,
     ) -> RssArticleResponse:
-        """获取用户的 RSS 文章详情，确保用户有权限访问该文章。"""
         try:
             oid = ObjectId(article_id)
         except (InvalidId, ValueError) as exc:
             raise RssDomainError("文章不存在 文章ID错误", 404) from exc
 
-        article = await RssArticle.find_one(RssArticle.id == oid)
+        article = await self.repo.get_article_by_id(oid)
         if article is None:
             raise RssDomainError("文章不存在", 404)
 
-        repo = self._require_repo()
+        repo = self.repo
         is_allowed = await repo.is_user_subscribed_to_feed(
             user_id=user_id,
             feed_url=article.feed_url,
@@ -412,7 +365,7 @@ class RssService:
         self,
         user_id: int,
     ) -> list[RssSubscriptionResponse]:
-        repo = self._require_repo()
+        repo = self.repo
         subscriptions = await repo.get_user_subscriptions(user_id)
         return [
             RssSubscriptionResponse.model_validate(sub)
@@ -420,7 +373,7 @@ class RssService:
         ]
 
     async def get_all_rss_urls(self) -> list[str]:
-        repo = self._require_repo()
+        repo = self.repo
         return await repo.get_all_rss_urls()
 
     async def refresh_all_feeds(self) -> dict[str, int]:
@@ -520,14 +473,12 @@ class RssService:
         subscription_id: int,
         user_id: int,
     ) -> str:
-        """删除用户的 RSS 订阅，确保用户有权限操作该订阅，并删除相关的 RSS 文章。返回被删除的 RSS URL。"""
         rss_info = await self._get_owned_subscription(
             subscription_id=subscription_id,
             user_id=user_id,
         )
-        await RssArticle.find(RssArticle.feed_url == rss_info.rss_url).delete()
-        repo = self._require_repo()
-        await repo.delete_subscription(rss_info)
+        await self.repo.delete_articles_by_feed_url(rss_info.rss_url)
+        await self.repo.delete_subscription(rss_info)
         return rss_info.rss_url
 
     async def mark_article_read_state(
@@ -536,32 +487,16 @@ class RssService:
         user_id: int,
         read: bool,
     ) -> None:
-        """标记用户的 RSS 文章为已读或未读，确保用户有权限访问该文章，并更新文章的 read_by 字段。"""
         try:
             oid = ObjectId(article_id)
         except (InvalidId, ValueError) as exc:
             raise RssDomainError("文章不存在", 404) from exc
 
-        article = await RssArticle.find_one(RssArticle.id == oid)
-        if article is None:
-            raise RssDomainError("文章不存在", 404)
-
-        repo = self._require_repo()
-        is_allowed = await repo.is_user_subscribed_to_feed(
+        await self.repo.update_article_read_state(
+            oid=oid,
             user_id=user_id,
-            feed_url=article.feed_url,
+            read=read,
         )
-        if not is_allowed:
-            raise RssDomainError("文章不存在", 404)
-
-        if read:
-            if user_id not in article.read_by:
-                article.read_by.append(user_id)
-        else:
-            article.read_by = [
-                uid for uid in article.read_by if uid != user_id
-            ]
-        await article.save()
 
     async def save_entries_to_mongo(
         self,
@@ -579,8 +514,7 @@ class RssService:
         user_id: int,
     ) -> RssInfo:
         """获取用户拥有的 RSS 订阅信息，确保订阅存在且属于该用户。"""
-        repo = self._require_repo()
-        rss_info = await repo.get_subscription_by_id(subscription_id)
+        rss_info = await self.repo.get_subscription_by_id(subscription_id)
         if rss_info is None:
             raise RssDomainError("订阅不存在", 404)
         if rss_info.user_id != user_id:
@@ -592,63 +526,11 @@ class RssService:
         feed_url: str,
         entries: list[dict[str, Any]],
     ) -> int:
-        """将解析得到的 RSS 条目保存到 MongoDB 中，避免重复保存已有的条目。返回新保存的条目数量。"""
-        entries_map: dict[str, dict[str, Any]] = {}
-        guids: list[str] = []
-
-        for entry in entries:
-            guid = str(entry.get("id") or entry.get("link", ""))
-            if not guid:
-                continue
-            guids.append(guid)
-            entries_map[guid] = entry
-
-        if not guids:
-            return 0
-
-        existing_articles = (
-            await RssArticle.find(
-                RssArticle.feed_url == feed_url,
-                In(RssArticle.guid, guids),
-            )
-            .project(RssArticleGuidProjection)
-            .to_list()
-        )
-        existing_guids = {article.guid for article in existing_articles}
-
-        fetched_at = datetime.now(UTC)
-        new_articles: list[RssArticle] = []
-        for guid in guids:
-            if guid in existing_guids:
-                continue
-
-            entry = entries_map[guid]
-            summary = str(entry.get("summary", ""))
-            content = _extract_entry_content(entry)
-            raw_author = entry.get("author")
-            author = str(raw_author) if raw_author is not None else None
-
-            new_articles.append(
-                RssArticle(
-                    guid=guid,
-                    feed_url=feed_url,
-                    title=str(entry.get("title", "")),
-                    link=str(entry.get("link", "")),
-                    summary=summary,
-                    content=content or summary,
-                    author=author,
-                    published=_parse_entry_published_datetime(entry),
-                    fetched_at=fetched_at,
-                    read_by=[],
-                )
-            )
-
-        if not new_articles:
-            return 0
-
         try:
-            await RssArticle.insert_many(new_articles)
-            return len(new_articles)
+            return await self.repo.save_entries_to_mongo(
+                feed_url=feed_url,
+                entries=entries,
+            )
         except Exception as exc:
             logger.error(
                 "同步写入 RSS 文章失败: feed_url=%s, error=%r",

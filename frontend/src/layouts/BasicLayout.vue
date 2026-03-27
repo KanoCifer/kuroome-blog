@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BasicFooter, BasicNotifier } from "@/components/basic";
+import { BasicFooter, MobileNav } from "@/components/basic";
 import BasicNav from "@/components/nav/BasicNav.vue";
 import BackToTop from "@/components/layout/BackToTop.vue";
 import ToastContainer from "@/components/layout/ToastContainer.vue";
@@ -9,20 +9,25 @@ import { RouterView, useRoute } from "vue-router";
 
 // 背景图列表
 const backgroundImages = [
-  "/background/bg.webp",
   "/background/bg-1.webp",
   "/background/bg-2.webp",
   "/background/bg-3.webp",
   "/background/bg-4.webp",
   "/background/bg-5.webp",
   "/background/bg-6.webp",
+  "/background/bg-7.webp",
+  "/background/bg-8.webp",
+  "/background/bg-9.webp",
+  "/background/bg-10.webp",
 ];
 
 // 使用 localStorage 持久化当前背景图索引
 const currentBgIndex = useStorage<number>("readinglist_bg_index", 0);
 
 // 动态背景图 URL
-const backgroundUrl = computed(() => backgroundImages[currentBgIndex.value] || backgroundImages[0]);
+const backgroundUrl = computed(
+  () => backgroundImages[currentBgIndex.value] || backgroundImages[0],
+);
 const route = useRoute();
 const isEntryView = ref<boolean>(false);
 const isAboutView = ref<boolean>(false);
@@ -111,20 +116,10 @@ onUnmounted(() => {
   window.removeEventListener("resize", handleResize);
 });
 
-const isMobileWarningVisible = ref<boolean>(false);
-const accpetedMobileWarning = ref<boolean>(false);
 const isMobileDevice = ref<boolean>(false);
 // 处理窗口大小变化
 const handleResize = () => {
   isMobileDevice.value = window.innerWidth < 768;
-  if (isMobileDevice.value && !isMobileWarningVisible.value && !accpetedMobileWarning.value) {
-    isMobileWarningVisible.value = true;
-  }
-};
-
-const closeMobileWarning = () => {
-  isMobileWarningVisible.value = false;
-  accpetedMobileWarning.value = true;
 };
 </script>
 
@@ -135,12 +130,17 @@ const closeMobileWarning = () => {
       class="pointer-events-none fixed inset-0 -z-10 bg-cover blur-md transition-all duration-500"
       :style="{ backgroundImage: `url('${backgroundUrl}')` }"
     ></div>
+    <MobileNav v-if="isMobileDevice" />
     <header>
       <div class="mx-auto mt-6">
         <Teleport to="body">
           <ToastContainer />
         </Teleport>
-        <BasicNav :isEntryView="isEntryView" :isVisible="showBasicNav" />
+        <BasicNav
+          :isEntryView="isEntryView"
+          :isVisible="showBasicNav"
+          v-if="!isMobileDevice"
+        />
       </div>
     </header>
 
@@ -169,11 +169,5 @@ const closeMobileWarning = () => {
     <BackToTop />
 
     <!-- 移动端适配警告弹窗 -->
-    <Teleport to="body">
-      <BasicNotifier
-        :isMobileWarningVisible="isMobileWarningVisible"
-        @update:isMobileWarningVisible="closeMobileWarning"
-      />
-    </Teleport>
   </div>
 </template>

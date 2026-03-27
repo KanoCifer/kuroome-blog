@@ -37,7 +37,9 @@
           p-id="1665"
         ></path>
       </svg>
-      <RouterLink to="/fishing-map" class="font-serif text-xl text-gray-800 dark:text-white"
+      <RouterLink
+        to="/fishing-map"
+        class="font-serif text-xl text-gray-800 dark:text-white"
         >MyFishingMAP</RouterLink
       >
     </div>
