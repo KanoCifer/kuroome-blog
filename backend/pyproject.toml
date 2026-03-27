@@ -53,5 +53,9 @@ dependencies = [
 [tool.setuptools.packages.find]
 include = ["watchlist"]
 
+[tool.pytest.ini_options]
+testpaths = ["./test"]
+pythonpath = [".", ".."]
+
 [dependency-groups]
 dev = ["pytest>=9.0.2", "watchdog>=6.0.0"]

@@ -349,7 +349,12 @@ class UserRepo:
             select(PasskeyCredential)
             .where(PasskeyCredential.credential_id == credential_id)
             .options(
-                selectinload(PasskeyCredential.user).selectinload(User.profile)
+                selectinload(PasskeyCredential.user).selectinload(
+                    User.profile
+                ),
+                selectinload(PasskeyCredential.user).selectinload(
+                    User.passkey_credential
+                ),
             )
         )
         return result.scalar_one_or_none()
