@@ -3,17 +3,17 @@ import time
 from datetime import UTC, datetime, timedelta
 from itertools import repeat
 
-import httpx
 import orjson
 from redis.asyncio import Redis as AsyncRedis
 from taskiq import Context, TaskiqDepends
 
-from app.api.des import AsyncSessionFactory
-from app.core import get_settings, logger
-from app.core.container import get_monitor_service, get_rss_service
+from app.api.des.db import AsyncSessionFactory
+from app.core.config import get_settings
+from app.core.logger import logger
 from app.models.models import VisitorTrack
-from app.schemas import FeishuMessageContent, VisitorData
-from app.tasks import broker, send_feishu_message
+from app.schemas import VisitorData
+from app.tasks.broker import broker
+from app.tasks.feishu_task import send_feishu_message
 from app.utils import get_redis_lock
 
 
@@ -184,13 +184,15 @@ async def run_migration_job(context: Context = TaskiqDepends()):
         }
     ]
 )
-async def refresh_rss_feeds():
+async def refresh_rss_feeds(context: Context = TaskiqDepends()):
     """Daily RSS refresh at 10:00 (Asia/Shanghai) for all users."""
     start_time = time.perf_counter()
     logger.info("[RSSRefreshJob] 🔄 Starting RSS feed refresh job")
 
     try:
-        async with get_rss_service() as rss_service:
+        from app.core.container import get_rss_service
+
+        async with get_rss_service(context.state.redis) as rss_service:
             stats = await rss_service.refresh_all_feeds()
 
         duration = time.perf_counter() - start_time
@@ -256,7 +258,9 @@ async def refresh_rss_feeds():
         }
     ]
 )
-async def send_daily_summary():
+async def send_daily_summary(
+    context: Context = TaskiqDepends(),
+):
     """每天早上8点发送前一天的访问统计摘要飞书消息给管理员"""
     settings = get_settings()
 
@@ -271,7 +275,9 @@ async def send_daily_summary():
     )
 
     try:
-        async with get_monitor_service() as monitor_service:
+        from app.core.container import get_monitor_service
+
+        async with get_monitor_service(context.state.redis) as monitor_service:
             stats = await monitor_service.get_daily_summary(yesterday)
 
         total_visits = stats["total_visits"]
@@ -366,7 +372,6 @@ async def send_daily_summary():
 async def send_todo(context: Context = TaskiqDepends()):
     """每天早上9点发送待办事项提醒给用户"""
     todos = await context.state.redis.get("todos:1")
-    url: str = get_settings().FEISHU_WEBHOOK_URL
 
     uncompleted = (
         [
@@ -378,21 +383,14 @@ async def send_todo(context: Context = TaskiqDepends()):
         else []
     )
     if uncompleted:
-        # 构建飞书消息内容
-        message = FeishuMessageContent(
-            msg_type="text",
-            content={
-                "text": f"您有 {len(uncompleted)} 个待办事项未完成，请及时处理！\n"
-                + "\n".join(
-                    [
-                        f"- {todo['text']}- 截止日期: {todo['dueDate']}- 重要性: {todo['priority']}"
-                        for todo in uncompleted
-                    ]
-                )
-            },
+        await send_feishu_message.kiq(
+            message=f"您有 {len(uncompleted)} 个待办事项未完成，请及时处理！\n"
+            + "\n".join(
+                [
+                    f"- {todo['text']}- 截止日期: {todo['dueDate']}- 重要性: {todo['priority']}"
+                    for todo in uncompleted
+                ]
+            ),
+            msg_type="post",
+            title="📌 待办事项提醒",
         )
-        try:
-            async with httpx.AsyncClient() as client:
-                await client.post(url, json=message.model_dump())
-        except Exception as e:
-            logger.error(f"Failed to send todo reminder: {e!r}")

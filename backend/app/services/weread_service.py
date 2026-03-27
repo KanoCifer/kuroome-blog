@@ -1,6 +1,6 @@
 import httpx
 
-from app.tasks import import_books_from_weread
+from app.tasks.weread_task import import_books_from_weread
 
 
 class WereadService:

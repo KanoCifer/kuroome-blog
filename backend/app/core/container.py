@@ -3,8 +3,8 @@ from contextlib import asynccontextmanager
 from pymongo.asynchronous.database import AsyncDatabase
 from redis.asyncio import Redis as AsyncRedis
 
-from app.api.des import get_async_session
-from app.core import ArticleSummarizer, article_summarizer
+from app.api.des.db import get_async_session
+from app.core.agent import ArticleSummarizer, article_summarizer
 from app.repositories import (
     AdminRepo,
     AiRepo,
@@ -18,19 +18,17 @@ from app.repositories import (
     UserRepo,
     WereadRepo,
 )
-from app.services import (
-    AdminService,
-    AiService,
-    BlogService,
-    BookService,
-    MessageService,
-    MonitorService,
-    PublicService,
-    RssService,
-    TodoService,
-    UserService,
-    WereadService,
-)
+from app.services.admin_service import AdminService
+from app.services.ai_service import AiService
+from app.services.blog_service import BlogService
+from app.services.book_service import BookService
+from app.services.message_service import MessageService
+from app.services.monitor_service import MonitorService
+from app.services.public_service import PublicService
+from app.services.rss_service import RssService
+from app.services.todo_service import TodoService
+from app.services.user_service import UserService
+from app.services.weread_service import WereadService
 from app.utils import redis_cache
 
 
@@ -74,7 +72,7 @@ async def get_message_service():
 
 
 @asynccontextmanager
-async def get_monitor_service(redis: AsyncRedis | None = None):
+async def get_monitor_service(redis: AsyncRedis):
     async with get_async_session() as session:
         monitor_repo = MonitorRepo(session)
         service = MonitorService(repo=monitor_repo, redis=redis)
@@ -82,14 +80,14 @@ async def get_monitor_service(redis: AsyncRedis | None = None):
 
 
 @asynccontextmanager
-async def get_public_service(mongodb: AsyncDatabase | None = None):
+async def get_public_service(mongodb: AsyncDatabase):
     public_repo = PublicRepo(mongodb=mongodb)
     service = PublicService(repo=public_repo)
     yield service
 
 
 @asynccontextmanager
-async def get_rss_service(redis: AsyncRedis | None = None):
+async def get_rss_service(redis: AsyncRedis):
     async with get_async_session() as session:
         rss_repo = RssRepo(session)
         service = RssService(repo=rss_repo, redis=redis)

@@ -2,7 +2,6 @@ from datetime import UTC, datetime
 
 from taskiq import Context, TaskiqDepends
 
-from app.core.container import get_monitor_service
 from app.core.logger import logger
 from app.tasks.broker import broker
 from app.utils.redis_lock import get_redis_lock
@@ -24,6 +23,8 @@ async def check_user_heartbeats(context: Context = TaskiqDepends()):
         return {"status": "skipped", "reason": "no redis"}
 
     try:
+        from app.core.container import get_monitor_service
+
         async with get_redis_lock(
             redis=redis, key="heartbeat_check_lock", ttl=300
         ):

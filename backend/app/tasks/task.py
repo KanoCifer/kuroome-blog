@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-from typing import Any, cast
-
-import httpx
 from beanie import init_beanie
 from email_validator import validate_email
 from fastapi_mail import FastMail, MessageSchema, MessageType
@@ -11,14 +8,15 @@ from pymongo import AsyncMongoClient
 from redis.asyncio import ConnectionPool
 from redis.asyncio import Redis as AsyncRedis
 from taskiq import (
-    AsyncTaskiqDecoratedTask,
     Context,
     TaskiqDepends,
     TaskiqEvents,
     TaskiqState,
 )
 
-from app.core import MailConfig, get_rss_service, get_settings, logger
+from app.core.config import get_settings
+from app.core.logger import logger
+from app.core.mail import MailConfig
 from app.models.beanie import (
     MessageBoard,
     Post,
@@ -27,11 +25,8 @@ from app.models.beanie import (
 )
 from app.schemas import (
     EmailCodeContent,
-    FeishuMessageContent,
-    FeishuRichTextContent,
 )
 from app.tasks.broker import broker
-from app.utils import dedup_guard
 
 CONNECTION_POOL = ConnectionPool.from_url(
     get_settings().REDIS_URL,
@@ -95,9 +90,6 @@ async def send_code(
         raise e
 
 
-send_code = cast(AsyncTaskiqDecoratedTask[Any, Any], send_code)
-
-
 @broker.task
 async def save_to_mongo(
     feed_url: str,
@@ -112,6 +104,8 @@ async def save_to_mongo(
     :param user_id: 当前用户ID
     """
     try:
+        from app.core.container import get_rss_service
+
         async with get_rss_service(redis=context.state.redis) as rss_service:
             saved_count = await rss_service.save_entries_to_mongo(
                 feed_url=feed_url,
@@ -124,9 +118,6 @@ async def save_to_mongo(
         logger.error(
             f"Background task failed: Error saving RSS {feed_url} for user {user_id}: {e!r}"
         )
-
-
-save_to_mongo = cast(AsyncTaskiqDecoratedTask[Any, Any], save_to_mongo)
 
 
 @broker.task
@@ -145,128 +136,3 @@ async def save_cache_to_redis(
         await context.state.redis.set(key, value, ex=expire)
     except Exception as e:
         logger.error(f"❌Failed to save cache to Redis: {e!r}")
-
-
-save_cache_to_redis = cast(
-    AsyncTaskiqDecoratedTask[Any, Any], save_cache_to_redis
-)
-
-
-@broker.task
-async def send_feishu_message(
-    message: str,
-    msg_type: str = "text",
-    title: str | None = None,
-    context: Context = TaskiqDepends(),
-):
-    """发送飞书消息
-    :param message: 消息内容
-    :param msg_type: 消息类型，默认为 "text"，可选 "post"
-    :param title: 消息标题，仅 msg_type="post" 时生效
-    :param context: Taskiq 上下文对象，自动注入
-    """
-    url: str = get_settings().FEISHU_WEBHOOK_URL
-    message = message.strip()
-    if not message or not url:
-        return
-
-    # 使用去重守卫确保在 TTL 窗口内只发送一次消息
-    redis = context.state.redis
-
-    try:
-        async with dedup_guard(redis, "feishu_message_lock", ttl=300):
-            if msg_type == "post":
-                # 飞书富文本消息格式需要包含 post 字段，content 是二维数组
-                content = {
-                    "post": {
-                        "zh_cn": {
-                            "title": title,
-                            "content": [
-                                [
-                                    {
-                                        "tag": "at",
-                                        "user_id": "all",
-                                        "user_name": "所有人",
-                                    },
-                                    {
-                                        "tag": "text",
-                                        "text": message,
-                                    },
-                                ],
-                                [
-                                    {
-                                        "tag": "a",
-                                        "text": "网站首页",
-                                        "href": "https://kanocifer.chat",
-                                    },
-                                ],
-                            ],
-                        }
-                    }
-                }
-                payload = FeishuRichTextContent(
-                    msg_type="post", content=content
-                )
-            else:
-                payload = FeishuMessageContent(
-                    msg_type=msg_type,
-                    content={"text": message},
-                )
-            try:
-                async with httpx.AsyncClient() as client:
-                    response = await client.post(
-                        url, json=payload.model_dump()
-                    )
-                    response.raise_for_status()
-            except Exception as e:
-                logger.error(f"发送飞书消息失败: {e!s}")
-    except Exception as e:
-        logger.warning(f"获取分布式锁失败，跳过发送飞书消息: {e!s}")
-    else:
-        logger.warning("Redis 客户端不可用，跳过分布式锁检查")
-        if msg_type == "post":
-            # 飞书富文本消息格式需要包含 post 字段，content 是二维数组
-            content = {
-                "post": {
-                    "zh_cn": {
-                        "title": title,
-                        "content": [
-                            [
-                                {
-                                    "tag": "at",
-                                    "user_id": "all",
-                                    "user_name": "所有人",
-                                },
-                                {
-                                    "tag": "text",
-                                    "text": message,
-                                },
-                            ],
-                            [
-                                {
-                                    "tag": "a",
-                                    "text": "网站首页",
-                                    "href": "https://kanocifer.chat",
-                                },
-                            ],
-                        ],
-                    }
-                }
-            }
-            payload = FeishuRichTextContent(msg_type="post", content=content)
-        else:
-            payload = FeishuMessageContent(
-                msg_type=msg_type,
-                content={"text": message},
-            )
-        try:
-            async with httpx.AsyncClient() as client:
-                response = await client.post(url, json=payload.model_dump())
-                response.raise_for_status()
-        except Exception as e:
-            logger.error(f"发送飞书消息失败: {e!s}")
-
-
-send_feishu_message = cast(
-    AsyncTaskiqDecoratedTask[Any, Any], send_feishu_message
-)

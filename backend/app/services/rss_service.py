@@ -158,11 +158,11 @@ class RssService:
 
     def __init__(
         self,
-        repo: RssRepo | None,
-        redis: AsyncRedis | None,
+        repo: RssRepo,
+        redis: AsyncRedis,
     ):
-        self.repo: RssRepo | None = repo
-        self.redis: AsyncRedis | None = redis
+        self.repo: RssRepo = repo
+        self.redis: AsyncRedis = redis
 
     def _require_repo(self) -> RssRepo:
         if self.repo is None:

@@ -1,5 +1,5 @@
 from app.tasks.broker import broker
-from app.tasks.task import send_feishu_message
+from app.tasks.feishu_task import send_feishu_message
 
 __all__ = [
     "broker",

@@ -1,4 +1,3 @@
-from app.core.container import get_book_service
 from app.tasks.broker import broker
 
 
@@ -13,6 +12,8 @@ async def import_books_from_weread(book_data: dict, user_id: int):
     Returns:
         导入的书籍数量
     """
+    from app.core.container import get_book_service
+
     async with get_book_service() as service:
         imported_count = await service.import_books_from_data(
             book_data=book_data, user_id=user_id

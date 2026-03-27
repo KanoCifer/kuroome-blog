@@ -17,4 +17,4 @@ headers = {"alg": "EdDSA", "kid": "CKPM9U7FMW"}
 encoded_jwt = jwt.encode(
     payload, private_key, algorithm="EdDSA", headers=headers
 )
-print(encoded_jwt)
+# print(encoded_jwt)
