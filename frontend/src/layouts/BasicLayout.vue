@@ -25,9 +25,7 @@ const backgroundImages = [
 const currentBgIndex = useStorage<number>("readinglist_bg_index", 0);
 
 // 动态背景图 URL
-const backgroundUrl = computed(
-  () => backgroundImages[currentBgIndex.value] || backgroundImages[0],
-);
+const backgroundUrl = computed(() => backgroundImages[currentBgIndex.value] || backgroundImages[0]);
 const route = useRoute();
 const isEntryView = ref<boolean>(false);
 const isAboutView = ref<boolean>(false);
@@ -136,13 +134,11 @@ const handleResize = () => {
         <Teleport to="body">
           <ToastContainer />
         </Teleport>
-        <BasicNav
-          :isEntryView="isEntryView"
-          :isVisible="showBasicNav"
-          v-if="!isMobileDevice"
-        />
+        <BasicNav :isEntryView="isEntryView" :isVisible="showBasicNav" v-if="!isMobileDevice" />
       </div>
     </header>
+
+    <MobileNav :isVisible="true" />
 
     <!-- Main Content -->
     <main class="relative scroll-smooth">

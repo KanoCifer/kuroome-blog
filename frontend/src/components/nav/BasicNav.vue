@@ -5,7 +5,7 @@
       :exit="{ width: 0, opacity: 0, transition: { duration: 0.2 } }"
       :transition="{ type: 'spring', stiffness: 500, damping: 30 }"
       layoutId="nav-card"
-      class="group fixed top-4 left-4 z-50"
+      class="group fixed top-4 left-4 z-50 hidden md:block"
     >
       <nav
         class="squircle flex items-center gap-2 bg-white/80 px-1 py-2 shadow-lg backdrop-blur-sm dark:bg-gray-800/80"

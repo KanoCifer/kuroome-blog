@@ -15,9 +15,7 @@
       >
         <home-icon class="h-6 w-6" />
       </router-link>
-      <span
-        :style="homePage"
-        class="font-['Inter'] text-[10px] font-medium text-slate-500"
+      <span :style="homePage" class="font-['Inter'] text-[10px] font-medium text-slate-500"
         >Home</span
       >
     </div>
@@ -30,9 +28,7 @@
       >
         <blog-icon class="h-6 w-6" />
       </router-link>
-      <span
-        :style="blogPage"
-        class="font-['Inter'] text-[10px] font-medium text-slate-500"
+      <span :style="blogPage" class="font-['Inter'] text-[10px] font-medium text-slate-500"
         >Blogs</span
       >
     </div>
@@ -50,9 +46,7 @@
       >
         <rss-icon class="h-6 w-6" />
       </router-link>
-      <span
-        :style="rssPage"
-        class="font-['Inter'] text-[10px] font-medium text-slate-500"
+      <span :style="rssPage" class="font-['Inter'] text-[10px] font-medium text-slate-500"
         >Rss</span
       >
     </div>
@@ -63,9 +57,7 @@
       >
         <icon-more class="h-6 w-6" />
       </button>
-      <span class="font-['Inter'] text-[10px] font-medium text-slate-500"
-        >More</span
-      >
+      <span class="font-['Inter'] text-[10px] font-medium text-slate-500">More</span>
     </div>
   </motion.nav>
 </template>
