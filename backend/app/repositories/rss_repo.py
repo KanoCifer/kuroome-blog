@@ -74,3 +74,8 @@ class RssRepo:
     async def delete_subscription(self, rss_info: RssInfo) -> None:
         """删除订阅记录。"""
         await self.session.delete(rss_info)
+
+    async def get_all_rss_urls(self) -> list[str]:
+        """获取所有 RSS 源 URL（去重）。"""
+        result = await self.session.execute(select(RssInfo.rss_url).distinct())
+        return list(result.scalars().all())

@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 
 from app.api.des.auth import manager
-from app.repositories.ai_repo import AiRepository
+from app.api.des.des import ai_service_dep
 from app.schemas.aiagent import (
     ArticleSummaryRequest,
     ChatRequest,
@@ -15,15 +15,11 @@ from app.services.ai_service import AiService
 router = APIRouter(prefix="/agent", tags=["agent"])
 
 
-def get_ai_service() -> AiService:
-    return AiService(AiRepository())
-
-
 @router.post("/summary/stream")
 async def summary_article_stream(
     payload: ArticleSummaryRequest,
     user=Depends(manager),
-    ai_service: AiService = Depends(get_ai_service),
+    ai_service: AiService = Depends(ai_service_dep),
 ):
     event_generator = ai_service.summary_stream(payload, str(user.id))
 
@@ -42,7 +38,7 @@ async def summary_article_stream(
 async def chat_stream(
     payload: ChatRequest,
     user=Depends(manager),
-    ai_service: AiService = Depends(get_ai_service),
+    ai_service: AiService = Depends(ai_service_dep),
 ):
     event_generator = ai_service.chat_stream(payload, str(user.id))
 
@@ -60,7 +56,7 @@ async def chat_stream(
 @router.get("/history")
 async def get_user_history(
     user=Depends(manager),
-    ai_service: AiService = Depends(get_ai_service),
+    ai_service: AiService = Depends(ai_service_dep),
 ):
     return await ai_service.get_user_history(str(user.id))
 
@@ -69,7 +65,7 @@ async def get_user_history(
 async def get_cached_summary(
     payload: HistoryRequest,
     user=Depends(manager),
-    ai_service: AiService = Depends(get_ai_service),
+    ai_service: AiService = Depends(ai_service_dep),
 ):
     return await ai_service.get_cached_summary(payload, str(user.id))
 
@@ -78,13 +74,13 @@ async def get_cached_summary(
 async def get_cached_chat(
     payload: HistoryRequest,
     user=Depends(manager),
-    ai_service: AiService = Depends(get_ai_service),
+    ai_service: AiService = Depends(ai_service_dep),
 ):
     return await ai_service.get_cached_chat(payload, str(user.id))
 
 
 @router.get("/debug/sessions")
 async def debug_sessions(
-    ai_service: AiService = Depends(get_ai_service),
+    ai_service: AiService = Depends(ai_service_dep),
 ):
     return ai_service.get_debug_sessions()

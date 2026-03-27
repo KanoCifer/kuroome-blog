@@ -7,9 +7,8 @@ from fastapi.responses import JSONResponse
 from starlette import status
 
 from app.api.des.auth import manager
-from app.api.des.db import get_session
+from app.api.des.des import blog_service_dep
 from app.models.models import User
-from app.repositories.blog_repo import BlogRepository
 from app.schemas.response import APIResponse
 from app.schemas.schemas import PostComment
 from app.services.blog_service import BlogDomainError, BlogService
@@ -17,10 +16,6 @@ from app.utils import redis_cache
 from app.utils.media import save_upload_image
 
 router = APIRouter(tags=["blog"])
-
-
-def get_blog_service(session=Depends(get_session)) -> BlogService:
-    return BlogService(BlogRepository(session), redis_cache)
 
 
 @router.post("/upload-image")
@@ -52,7 +47,7 @@ async def upload_blog_image(
 async def get_blogs(
     page: int = 1,
     search: str | None = Query(None, min_length=1),
-    blog_service: BlogService = Depends(get_blog_service),
+    blog_service: BlogService = Depends(blog_service_dep),
 ) -> JSONResponse:
     """Get paginated list of blog articles."""
     try:
@@ -67,7 +62,7 @@ async def get_blogs(
 @redis_cache(ttl=60, exclude=["blog_service"])
 async def get_blog_post(
     _id: Annotated[str | None, Query(description="Blog post ID")] = None,
-    blog_service: BlogService = Depends(get_blog_service),
+    blog_service: BlogService = Depends(blog_service_dep),
 ):
     """Get a single blog post by ID."""
     try:
@@ -82,7 +77,7 @@ async def get_blog_post(
 @router.post("/comments")
 async def post_comment(
     data: PostComment,
-    blog_service: BlogService = Depends(get_blog_service),
+    blog_service: BlogService = Depends(blog_service_dep),
 ):
     """Submit a new comment to a blog post."""
     try:
@@ -98,7 +93,7 @@ async def post_comment(
 
 @router.get("/categories")
 async def get_categories(
-    blog_service: BlogService = Depends(get_blog_service),
+    blog_service: BlogService = Depends(blog_service_dep),
 ):
     """Get all categories with post counts."""
     try:
@@ -115,7 +110,7 @@ async def get_categories(
 @router.post("/category")
 async def get_posts_by_category(
     category_id: Annotated[int, Query(..., description="Category ID")],
-    blog_service: BlogService = Depends(get_blog_service),
+    blog_service: BlogService = Depends(blog_service_dep),
 ):
     """Get posts by category."""
     try:

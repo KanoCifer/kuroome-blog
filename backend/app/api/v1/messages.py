@@ -9,9 +9,9 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, Request
 
 from app.api.des.auth import manager
+from app.api.des.des import message_service_dep
 from app.api.des.limiter import limiter
 from app.models.models import User
-from app.repositories.message_repo import MessageRepository
 from app.schemas.response import APIResponse
 from app.schemas.schemas import (
     MessageIn,
@@ -21,13 +21,9 @@ from app.services.message_service import MessageDomainError, MessageService
 router = APIRouter(prefix="/messages", tags=["messages"])
 
 
-def get_message_service() -> MessageService:
-    return MessageService(MessageRepository())
-
-
 @router.get("", response_model=APIResponse)
 async def get_messages(
-    message_service: MessageService = Depends(get_message_service),
+    message_service: MessageService = Depends(message_service_dep),
 ):
     """Get approved messages from message board."""
     try:
@@ -50,7 +46,7 @@ async def create_message(
     request: Request,
     message_in: MessageIn,
     user: User | None = Depends(manager),
-    message_service: MessageService = Depends(get_message_service),
+    message_service: MessageService = Depends(message_service_dep),
 ):
     """Submit a new message to message board (pending review)."""
     is_admin = user is not None and user.is_admin

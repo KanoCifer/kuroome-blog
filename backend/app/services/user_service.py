@@ -11,12 +11,12 @@ from fastapi import Request
 from redis.asyncio import Redis as AsyncRedis
 
 from app.api.des.auth import manager
-from app.utils.base64url import base64url_decode, base64url_encode
 from app.core.config import settings
 from app.core.security import generate_pkce_pair
 from app.models.models import Profile, User
-from app.repositories.user_repo import UserRepository
+from app.repositories.user_repo import UserRepo
 from app.schemas.schemas import UserSettingsIn
+from app.utils.base64url import base64url_decode, base64url_encode
 from app.utils.compress_image import compress_avartar
 from app.utils.media import _get_media_root, save_upload_image
 from app.utils.webauthn import (
@@ -32,7 +32,7 @@ class UserService:
     passkey operations, and GitHub OAuth integration.
     """
 
-    def __init__(self, repo: UserRepository):
+    def __init__(self, repo: UserRepo):
         self.repo = repo
 
     # ------------------------------------------------------------------ #

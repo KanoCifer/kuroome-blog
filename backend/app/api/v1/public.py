@@ -13,23 +13,18 @@ from fastapi import APIRouter, Body, Depends, Request
 from fastapi.responses import JSONResponse, PlainTextResponse
 from redis.asyncio import Redis as AsyncRedis
 
+from app.api.des.des import public_service_dep
 from app.api.des.limiter import limiter
-from app.api.des.mongo import get_mongo_db
 from app.api.des.redis import get_redis
-from app.repositories.public_repo import PublicRepository
 from app.schemas.response import APIResponse
 from app.services.public_service import PublicDomainError, PublicService
 
 router = APIRouter(tags=["public"])
 
 
-def get_public_service(mongodb=Depends(get_mongo_db)) -> PublicService:
-    return PublicService(PublicRepository(mongodb))
-
-
 @router.get("/status")
 async def get_api_status(
-    public_service: PublicService = Depends(get_public_service),
+    public_service: PublicService = Depends(public_service_dep),
 ) -> APIResponse:
     """Get API status.
 
@@ -57,7 +52,7 @@ async def get_api_status(
 
 @router.get("/robots.txt", response_class=PlainTextResponse)
 async def get_robots_txt(
-    public_service: PublicService = Depends(get_public_service),
+    public_service: PublicService = Depends(public_service_dep),
 ) -> PlainTextResponse:
     """Return robots.txt file for search engines.
 
@@ -80,7 +75,7 @@ async def get_robots_txt(
 
 @router.get("/sitemap.xml")
 async def get_sitemap_xml(
-    public_service: PublicService = Depends(get_public_service),
+    public_service: PublicService = Depends(public_service_dep),
 ) -> PlainTextResponse:
     """Generate and return sitemap.xml for SEO.
 

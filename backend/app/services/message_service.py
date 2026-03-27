@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from html import escape
 
-from app.repositories.message_repo import MessageRepository
+from app.repositories.message_repo import MessageRepo
 from app.schemas.message import MessageIn
 
 
@@ -14,7 +14,7 @@ class MessageDomainError(Exception):
 
 
 class MessageService:
-    def __init__(self, repo: MessageRepository) -> None:
+    def __init__(self, repo: MessageRepo) -> None:
         self.repo = repo
 
     async def get_messages(self) -> dict[str, list[dict]]:

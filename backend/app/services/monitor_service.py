@@ -9,7 +9,7 @@ import psutil
 from redis.asyncio import Redis as AsyncRedis
 
 from app.models.models import User
-from app.repositories.monitor_repo import MonitorRepository
+from app.repositories.monitor_repo import MonitorRepo
 
 
 class MonitorDomainError(Exception):
@@ -22,13 +22,13 @@ class MonitorDomainError(Exception):
 class MonitorService:
     def __init__(
         self,
-        repo: MonitorRepository | None,
+        repo: MonitorRepo | None,
         redis: AsyncRedis | None,
     ) -> None:
         self.repo = repo
         self.redis = redis
 
-    def _require_repo(self) -> MonitorRepository:
+    def _require_repo(self) -> MonitorRepo:
         if self.repo is None:
             raise MonitorDomainError(
                 "Monitor repository is not configured",

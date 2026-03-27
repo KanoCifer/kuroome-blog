@@ -1,4 +1,3 @@
-import asyncio
 import json
 import time
 from datetime import UTC, datetime, timedelta
@@ -7,18 +6,15 @@ from itertools import repeat
 import httpx
 import orjson
 from redis.asyncio import Redis as AsyncRedis
-from sqlalchemy import select
 from taskiq import Context, TaskiqDepends
 
-from app.api.des.db import AsyncSessionFactory
-from app.core import get_settings
-from app.core.logger import logger
-from app.models.models import RssInfo, VisitorTrack
-from app.schemas import VisitorData
-from app.schemas.schemas import FeishuMessageContent
-from app.tasks.broker import broker
-from app.tasks.task import send_feishu_message
-from app.utils.redis_lock import get_redis_lock
+from app.api.des import AsyncSessionFactory
+from app.core import get_settings, logger
+from app.core.container import get_monitor_service, get_rss_service
+from app.models.models import VisitorTrack
+from app.schemas import FeishuMessageContent, VisitorData
+from app.tasks import broker, send_feishu_message
+from app.utils import get_redis_lock
 
 
 @broker.task(
@@ -189,108 +185,33 @@ async def run_migration_job(context: Context = TaskiqDepends()):
     ]
 )
 async def refresh_rss_feeds():
-    """Daily RSS refresh at 10:00 (Asia/Shanghai) for all users, saves new articles to MongoDB."""
-    from app.services.rss_service import RssService
-
+    """Daily RSS refresh at 10:00 (Asia/Shanghai) for all users."""
     start_time = time.perf_counter()
     logger.info("[RSSRefreshJob] 🔄 Starting RSS feed refresh job")
 
     try:
-        # 1. 获取所有RSS源
-        db_start = time.perf_counter()
-        async with AsyncSessionFactory() as session:
-            # 查询所有不同的 feed_url
-            result = await session.execute(select(RssInfo.rss_url).distinct())
-            feed_urls = result.scalars().all()
-        db_duration = time.perf_counter() - db_start
+        async with get_rss_service() as rss_service:
+            stats = await rss_service.refresh_all_feeds()
 
-        if not feed_urls:
-            duration = time.perf_counter() - start_time
-            logger.info(
-                f"[RSSRefreshJob] ✅ Job completed | duration={duration:.2f}s | no RSS feeds configured"
-            )
-            message = "RSS 刷新完成，但没有配置任何 RSS 源。请前往设置页面添加 RSS 源。"
-            # 发送飞书消息
-            try:
-                await send_feishu_message.kiq(
-                    message=message,
-                    msg_type="post",
-                    title="✅Rss 刷新完成通知",
-                )
-            except Exception as feishu_e:
-                logger.error(
-                    f"Failed to send Feishu notification: {feishu_e!r}"
-                )
-            return {
-                "status": "success",
-                "total_feeds": 0,
-                "new_articles": 0,
-                "duration": f"{duration:.2f}s",
-            }
-
-        logger.info(
-            f"[RSSRefreshJob] Found {len(feed_urls)} RSS feeds to refresh | db_query_duration={db_duration:.2f}s"
-        )
-
-        # 使用信号量限制并发数
-        semaphore = asyncio.Semaphore(5)
-        success_count = 0
-        failed_feeds = []
-
-        async def fetch_and_save_feed(feed_url: str):
-            nonlocal success_count
-            feed_start = time.perf_counter()
-            async with semaphore:
-                try:
-                    rss_service = RssService(repo=None, redis=None)
-
-                    result = await rss_service.fetch_and_parse_feed(
-                        url=feed_url
-                    )
-                    saved_count = await rss_service.save_entries_to_mongo(
-                        feed_url=feed_url,
-                        entries=result["entries"],
-                    )
-
-                    feed_duration = time.perf_counter() - feed_start
-                    success_count += 1
-                    logger.info(
-                        f"[RSSRefreshJob] Feed {feed_url} refreshed | saved={saved_count} new articles | duration={feed_duration:.2f}s"
-                    )
-                    return saved_count
-
-                except Exception as e:
-                    feed_duration = time.perf_counter() - feed_start
-                    failed_feeds.append(
-                        {
-                            "url": feed_url,
-                            "error": str(e),
-                            "duration": f"{feed_duration:.2f}s",
-                        }
-                    )
-                    logger.error(
-                        f"[RSSRefreshJob] Error refreshing feed {feed_url}: {e!r} | duration={feed_duration:.2f}s"
-                    )
-                    return 0
-
-        # 并发刷新所有 feed
-        tasks = [fetch_and_save_feed(url) for url in feed_urls]
-        results = await asyncio.gather(*tasks)
-        total_saved = sum(results)
-
-        # 完成统计
         duration = time.perf_counter() - start_time
         logger.info(
-            f"[RSSRefreshJob] ✅ Job completed | duration={duration:.2f}s | total_feeds={len(feed_urls)} | success={success_count} | failed={len(failed_feeds)} | new_articles={total_saved}"
+            f"[RSSRefreshJob] ✅ Job completed | duration={duration:.2f}s | "
+            f"total_feeds={stats['total_feeds']} | success={stats['success']} | "
+            f"failed={stats['failed']} | new_articles={stats['new_articles']}"
         )
-        message = f"✅RSS 刷新完成！\n\n总 RSS 源: {len(feed_urls)}\n成功刷新: {success_count}\n失败: {len(failed_feeds)}\n新增文章: {total_saved}\n总耗时: {duration:.2f}秒"
 
-        if failed_feeds:
-            logger.warning(
-                f"[RSSRefreshJob] Failed feeds: {[feed['url'] for feed in failed_feeds]}"
+        if stats["total_feeds"] == 0:
+            message = "RSS 刷新完成，但没有配置任何 RSS 源。请前往设置页面添加 RSS 源。"
+        else:
+            message = (
+                f"✅RSS 刷新完成！\n\n"
+                f"总 RSS 源: {stats['total_feeds']}\n"
+                f"成功刷新: {stats['success']}\n"
+                f"失败: {stats['failed']}\n"
+                f"新增文章: {stats['new_articles']}\n"
+                f"总耗时: {duration:.2f}秒"
             )
 
-        # Send Feishu notification
         try:
             await send_feishu_message.kiq(
                 message=message, msg_type="post", title="✅Rss 刷新完成通知"
@@ -300,11 +221,7 @@ async def refresh_rss_feeds():
 
         return {
             "status": "success",
-            "total_feeds": len(feed_urls),
-            "success": success_count,
-            "failed": len(failed_feeds),
-            "new_articles": total_saved,
-            "failed_feeds": failed_feeds,
+            **stats,
             "duration": f"{duration:.2f}s",
         }
 
@@ -317,7 +234,6 @@ async def refresh_rss_feeds():
         message = (
             f"❌RSS 刷新失败！\n错误信息: {error_msg}\n耗时: {duration:.2f}秒"
         )
-        # Send Feishu notification
         try:
             await send_feishu_message.kiq(
                 message=message, msg_type="post", title="❌Rss 刷新失败通知"
@@ -355,13 +271,7 @@ async def send_daily_summary():
     )
 
     try:
-        from app.api.des.db import AsyncSessionFactory
-        from app.repositories.monitor_repo import MonitorRepository
-        from app.services.monitor_service import MonitorService
-
-        async with AsyncSessionFactory() as session:
-            repo = MonitorRepository(session)
-            monitor_service = MonitorService(repo=repo, redis=None)
+        async with get_monitor_service() as monitor_service:
             stats = await monitor_service.get_daily_summary(yesterday)
 
         total_visits = stats["total_visits"]

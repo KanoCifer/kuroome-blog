@@ -416,6 +416,60 @@ class RssService:
             for sub in subscriptions
         ]
 
+    async def get_all_rss_urls(self) -> list[str]:
+        repo = self._require_repo()
+        return await repo.get_all_rss_urls()
+
+    async def refresh_all_feeds(self) -> dict[str, int]:
+        feed_urls = await self.get_all_rss_urls()
+        if not feed_urls:
+            return {
+                "total_feeds": 0,
+                "success": 0,
+                "failed": 0,
+                "new_articles": 0,
+            }
+
+        semaphore = asyncio.Semaphore(5)
+        success_count = 0
+        failed_count = 0
+        total_saved = 0
+
+        async def _refresh_one(feed_url: str) -> int:
+            nonlocal success_count, failed_count
+            async with semaphore:
+                try:
+                    result = await self.fetch_and_parse_feed(url=feed_url)
+                    saved = await self._save_entries_to_mongo(
+                        feed_url=feed_url,
+                        entries=result["entries"],
+                    )
+                    success_count += 1
+                    return saved
+                except Exception:
+                    failed_count += 1
+                    return 0
+
+        results = await asyncio.gather(
+            *[_refresh_one(url) for url in feed_urls]
+        )
+        total_saved = sum(results)
+
+        logger.info(
+            "[RSSRefreshJob] total=%d, success=%d, failed=%d, new=%d",
+            len(feed_urls),
+            success_count,
+            failed_count,
+            total_saved,
+        )
+
+        return {
+            "total_feeds": len(feed_urls),
+            "success": success_count,
+            "failed": failed_count,
+            "new_articles": total_saved,
+        }
+
     async def refresh_subscription(
         self,
         subscription_id: int,

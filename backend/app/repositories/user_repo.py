@@ -11,7 +11,7 @@ from werkzeug.security import generate_password_hash
 from app.models.models import PasskeyCredential, Profile, User
 
 
-class UserRepository:
+class UserRepo:
     """用户数据访问层，封装所有用户相关的数据库查询操作。"""
 
     def __init__(self, session: AsyncSession):

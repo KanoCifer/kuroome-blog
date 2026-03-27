@@ -14,12 +14,10 @@ Dependencies:
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Header, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.des.auth import manager
-from app.api.des.db import get_session
+from app.api.des.des import weread_service_dep
 from app.models.models import User
-from app.repositories.weread_repo import WereadRepo
 from app.schemas.response import APIResponse
 from app.schemas.weread import ImportBooksIn
 from app.services.weread_service import WereadService
@@ -31,20 +29,12 @@ router = APIRouter(
 )
 
 
-# --- Dependency Injection ---
-def get_weread_service(
-    session: AsyncSession = Depends(get_session),
-) -> WereadService:
-    repo = WereadRepo(session)
-    return WereadService(repo)
-
-
 @router.post("")
 async def import_books(
     data: ImportBooksIn,
     user: User = Depends(manager),
     user_agent: str | None = Header(None),
-    weread_service: WereadService = Depends(get_weread_service),
+    weread_service: WereadService = Depends(weread_service_dep),
 ):
     """异步从微信读书获取笔记并导入 (需要登录).
 

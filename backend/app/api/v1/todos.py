@@ -2,24 +2,15 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Query, status
 from fastapi.responses import JSONResponse
-from redis.asyncio import Redis as AsyncRedis
 
 from app.api.des.auth import manager
-from app.api.des.redis import get_redis
+from app.api.des.des import todo_service_dep
 from app.models.models import User
-from app.repositories.todo_repo import TodoRepo
 from app.schemas.response import APIResponse
 from app.schemas.schemas import TodoIn, TodoUpdate
 from app.services.todo_service import TodoService
 
 router = APIRouter(prefix="/todos", tags=["todos"])
-
-
-# ----依赖注入----
-def get_todo_service(
-    redis: AsyncRedis = Depends(get_redis),
-) -> TodoService:
-    return TodoService(TodoRepo(redis))
 
 
 # ----API Endpoints----
@@ -29,7 +20,7 @@ def get_todo_service(
 async def get_todos(
     include_archived: bool = Query(False),
     user: User = Depends(manager),
-    todo_service: TodoService = Depends(get_todo_service),
+    todo_service: TodoService = Depends(todo_service_dep),
 ):
     """Get current user's todos. Excludes archived by default."""
     todos = await todo_service.get_todos(user.id, include_archived)
@@ -40,7 +31,7 @@ async def get_todos(
 async def create_todo(
     data: TodoIn,
     user: User = Depends(manager),
-    todo_service: TodoService = Depends(get_todo_service),
+    todo_service: TodoService = Depends(todo_service_dep),
 ):
     """Create a new todo for current user."""
     try:
@@ -67,7 +58,7 @@ async def patch_todo(
     todo_id: str,
     data: TodoUpdate,
     user: User = Depends(manager),
-    todo_service: TodoService = Depends(get_todo_service),
+    todo_service: TodoService = Depends(todo_service_dep),
 ) -> JSONResponse:
     """Partial update of a todo."""
     updated = None
@@ -93,7 +84,7 @@ async def replace_todo(
     todo_id: str,
     data: TodoIn,
     user: User = Depends(manager),
-    todo_service: TodoService = Depends(get_todo_service),
+    todo_service: TodoService = Depends(todo_service_dep),
 ):
     """Replace a todo (full update)."""
     updated = None
@@ -120,7 +111,7 @@ async def replace_todo(
 async def delete_todo(
     todo_id: str,
     user: User = Depends(manager),
-    todo_service: TodoService = Depends(get_todo_service),
+    todo_service: TodoService = Depends(todo_service_dep),
 ):
     """Delete a todo."""
     try:
@@ -139,7 +130,7 @@ async def delete_todo(
 @router.get("/archived")
 async def get_archived_todos(
     user: User = Depends(manager),
-    todo_service: TodoService = Depends(get_todo_service),
+    todo_service: TodoService = Depends(todo_service_dep),
 ):
     """Get all archived todos for current user."""
     return APIResponse.ok(
@@ -151,7 +142,7 @@ async def get_archived_todos(
 async def archive_todo(
     todo_id: str,
     user: User = Depends(manager),
-    todo_service: TodoService = Depends(get_todo_service),
+    todo_service: TodoService = Depends(todo_service_dep),
 ):
     """Archive a todo."""
     updated = None
@@ -172,7 +163,7 @@ async def archive_todo(
 async def unarchive_todo(
     todo_id: str,
     user: User = Depends(manager),
-    todo_service: TodoService = Depends(get_todo_service),
+    todo_service: TodoService = Depends(todo_service_dep),
 ):
     """Unarchive a todo."""
     updated = None
@@ -192,7 +183,7 @@ async def unarchive_todo(
 @router.post("/archive-completed")
 async def archive_completed(
     user: User = Depends(manager),
-    todo_service: TodoService = Depends(get_todo_service),
+    todo_service: TodoService = Depends(todo_service_dep),
 ):
     """Archive all completed (non-archived) todos."""
     try:
@@ -211,7 +202,7 @@ async def archive_completed(
 @router.post("/clear-completed")
 async def clear_completed(
     user: User = Depends(manager),
-    todo_service: TodoService = Depends(get_todo_service),
+    todo_service: TodoService = Depends(todo_service_dep),
 ):
     """Remove all completed todos for current user."""
     try:

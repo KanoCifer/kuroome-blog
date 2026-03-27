@@ -43,7 +43,7 @@ AsyncSessionFactory: async_sessionmaker[AsyncSession] = async_sessionmaker(
 
 
 @asynccontextmanager
-async def get_async_session():
+async def get_async_session() -> AsyncGenerator[AsyncSession]:
     """数据库会话的上下文管理器。
 
     用法:

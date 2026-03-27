@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from app.models.models import UserBook
-from app.repositories.book_repo import BookRepository
+from app.repositories.book_repo import BookRepo
 
 
 class BookDomainError(Exception):
@@ -12,7 +12,7 @@ class BookDomainError(Exception):
 
 
 class BookService:
-    def __init__(self, repo: BookRepository) -> None:
+    def __init__(self, repo: BookRepo) -> None:
         self.repo = repo
 
     async def get_books(

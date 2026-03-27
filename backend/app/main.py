@@ -13,13 +13,14 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from starlette.middleware.sessions import SessionMiddleware
 
-from app.api.des.csrf import setup_csrf
-from app.api.des.db import close_db_connections
-from app.api.des.limiter import limiter
-from app.api.des.mongo import close_mongo_client, init_mongo
-from app.api.des.redis import (
+from app.api.des import (
+    close_db_connections,
+    close_mongo_client,
     close_redis,
+    init_mongo,
     init_redis,
+    limiter,
+    setup_csrf,
 )
 from app.api.v1 import (
     admin,
@@ -35,12 +36,10 @@ from app.api.v1 import (
     todos,
     weread,
 )
-from app.core import get_settings, logger
-from app.core.exceptions import register_exception_handlers
-from app.core.logger import logger as app_logger
+from app.core import get_settings, register_exception_handlers
+from app.core import logger as app_logger
 from app.models.beanie import MessageBoard, Post, RssArticle
-from app.tasks.broker import broker
-from app.tasks.task import send_feishu_message
+from app.tasks import broker, send_feishu_message
 from app.utils import close_cache_redis
 
 
@@ -67,12 +66,12 @@ async def lifespan(app: FastAPI):
     # 启动 Taskiq broker
     try:
         await broker.startup()
-        logger.info("Taskiq broker started successfully")
+        app_logger.info("Taskiq broker started successfully")
     except Exception as e:
-        logger.warning(f"Taskiq broker failed to start: {e!s}")
+        app_logger.warning(f"Taskiq broker failed to start: {e!s}")
 
-    logger.debug(f"Settings:{get_settings().model_dump()}")
-    logger.info("FastAPI started successfully.")
+    app_logger.debug(f"Settings:{get_settings().model_dump()}")
+    app_logger.info("FastAPI started successfully.")
 
     # 发送引导邮件和飞书消息
     if app.state.redis is not None and get_settings().SEND_BOOT_EMAIL:
@@ -86,16 +85,16 @@ async def lifespan(app: FastAPI):
             # await send_bootstrap_emails.kiq(admin_email=admin_email)
             app_logger.info("✅启动通知任务已添加到队列")
         except Exception as e:
-            logger.warning(f"❌发送启动通知失败: {e!s}")
+            app_logger.warning(f"❌发送启动通知失败: {e!s}")
 
     yield
 
     # 关闭 Taskiq broker
     try:
         await broker.shutdown()
-        logger.info("Taskiq broker shutdown successfully")
+        app_logger.info("Taskiq broker shutdown successfully")
     except Exception as e:
-        logger.warning(f"Taskiq broker shutdown failed: {e!s}")
+        app_logger.warning(f"Taskiq broker shutdown failed: {e!s}")
 
     # 应用关闭时的清理工作
     await cleanup_resources(app=app)

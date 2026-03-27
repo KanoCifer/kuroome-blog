@@ -18,25 +18,25 @@ from taskiq import (
     TaskiqState,
 )
 
-from app.core import get_settings
-from app.core.config import settings as app_settings
-from app.core.logger import logger
-from app.core.mail import MailConfig
+from app.core import MailConfig, get_settings, logger
+from app.core.container import get_rss_service
 from app.models.beanie import (
     MessageBoard,
     Post,
     RssArticle,
     RssFeed,
 )
-from app.schemas.email import EmailCodeContent
-from app.schemas.schemas import FeishuMessageContent, FeishuRichTextContent
+from app.schemas import (
+    EmailCodeContent,
+    FeishuMessageContent,
+    FeishuRichTextContent,
+)
 from app.tasks.broker import broker
 
-
 CONNECTION_POOL = ConnectionPool.from_url(
-    app_settings.REDIS_URL,
+    get_settings().REDIS_URL,
     decode_responses=True,
-    max_connections=app_settings.REDIS_MAX_CONNECTIONS,
+    max_connections=get_settings().REDIS_MAX_CONNECTIONS,
 )
 
 
@@ -45,7 +45,7 @@ async def startup(state: TaskiqState) -> None:
     state.redis = AsyncRedis(connection_pool=CONNECTION_POOL)
 
     # 初始化MongoDB和Beanie
-    state.mongo_client = AsyncMongoClient(app_settings.MONGO_URI)
+    state.mongo_client = AsyncMongoClient(get_settings().MONGO_URI)
     mongo_db = state.mongo_client["readinglist"]
     await init_beanie(
         database=mongo_db,
@@ -111,14 +111,12 @@ async def save_to_mongo(
     :param entries: 解析后的RSS条目列表
     :param user_id: 当前用户ID
     """
-    from app.services.rss_service import RssService
-
     try:
-        rss_service = RssService(repo=None, redis=context.state.redis)
-        saved_count = await rss_service.save_entries_to_mongo(
-            feed_url=feed_url,
-            entries=entries,
-        )
+        async with get_rss_service(redis=context.state.redis) as rss_service:
+            saved_count = await rss_service.save_entries_to_mongo(
+                feed_url=feed_url,
+                entries=entries,
+            )
         logger.info(
             f"Background task: RSS {feed_url} saved {saved_count} new articles for user {user_id}"
         )

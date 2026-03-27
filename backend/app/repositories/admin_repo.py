@@ -9,7 +9,7 @@ from app.models.beanie import MessageBoard, Post
 from app.models.models import Category
 
 
-class AdminRepository:
+class AdminRepo:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
@@ -46,12 +46,12 @@ class AdminRepository:
         return await Post.find_one({"comments._id": comment_id}).update(
             {"$set": {"comments.$[com].reviewed": True}},
             array_filters=[{"com._id": comment_id}],
-        )
+        )  # type: ignore
 
     async def delete_comment(self, comment_id: ObjectId):
         return await Post.find_one({"comments._id": comment_id}).update(
             {"$pull": {"comments": {"_id": comment_id}}},
-        )
+        )  # type: ignore
 
     async def list_messages(self, *, review: int, limit: int | None = None):
         query = MessageBoard.find({"review": review}).sort(

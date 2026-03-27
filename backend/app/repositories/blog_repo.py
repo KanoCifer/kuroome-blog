@@ -11,7 +11,7 @@ from app.models.beanie import Comment, Post
 from app.models.models import Category
 
 
-class BlogRepository:
+class BlogRepo:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 

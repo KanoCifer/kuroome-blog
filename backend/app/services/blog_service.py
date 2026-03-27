@@ -7,7 +7,7 @@ from typing import Any
 from bson import ObjectId
 from bson.errors import InvalidId
 
-from app.repositories.blog_repo import BlogRepository
+from app.repositories.blog_repo import BlogRepo
 from app.schemas.comment import PostComment
 
 
@@ -19,7 +19,7 @@ class BlogDomainError(Exception):
 
 
 class BlogService:
-    def __init__(self, repo: BlogRepository, cache) -> None:
+    def __init__(self, repo: BlogRepo, cache) -> None:
         self.repo = repo
         self.cache = cache
 

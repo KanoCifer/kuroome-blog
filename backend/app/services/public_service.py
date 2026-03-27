@@ -9,7 +9,7 @@ import orjson
 from redis.asyncio import Redis as AsyncRedis
 
 from app.core.config import get_settings
-from app.repositories.public_repo import PublicRepository
+from app.repositories.public_repo import PublicRepo
 from app.utils.qweather_jwt import encoded_jwt
 
 
@@ -21,7 +21,7 @@ class PublicDomainError(Exception):
 
 
 class PublicService:
-    def __init__(self, repo: PublicRepository) -> None:
+    def __init__(self, repo: PublicRepo) -> None:
         self.repo = repo
 
     @staticmethod

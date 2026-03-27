@@ -6,7 +6,7 @@ from typing import Any
 
 from app.core import logger
 from app.core.agent import ArticleSummarizer, article_summarizer
-from app.repositories.ai_repo import AiRepository
+from app.repositories.ai_repo import AiRepo
 from app.schemas.aiagent import (
     ArticleSummaryRequest,
     ChatRequest,
@@ -17,7 +17,7 @@ from app.schemas.aiagent import (
 class AiService:
     def __init__(
         self,
-        repo: AiRepository,
+        repo: AiRepo,
         summarizer: ArticleSummarizer = article_summarizer,
     ) -> None:
         self.repo = repo

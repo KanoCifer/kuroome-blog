@@ -1,6 +1,4 @@
-from app.api.des.db import get_session
-from app.repositories.book_repo import BookRepository
-from app.services.book_service import BookService
+from app.core.container import get_book_service
 from app.tasks.broker import broker
 
 
@@ -15,11 +13,8 @@ async def import_books_from_weread(book_data: dict, user_id: int):
     Returns:
         导入的书籍数量
     """
-    async for db in get_session():
-        repo = BookRepository(db)
-        service = BookService(repo)
+    async with get_book_service() as service:
         imported_count = await service.import_books_from_data(
             book_data=book_data, user_id=user_id
         )
-        await db.commit()
-        return imported_count
+    return imported_count

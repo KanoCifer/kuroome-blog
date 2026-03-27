@@ -9,7 +9,7 @@ from sqlalchemy.orm import selectinload
 from app.models.models import User, VisitorTrack
 
 
-class MonitorRepository:
+class MonitorRepo:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 

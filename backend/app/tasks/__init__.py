@@ -1,3 +1,12 @@
+from app.tasks.broker import broker
+from app.tasks.task import send_feishu_message
+
+__all__ = [
+    "broker",
+    "send_feishu_message",
+]
+
+
 """
 后台任务模块 - Taskiq 异步任务调度系统
 
@@ -73,14 +82,12 @@
 """
 
 from app.tasks.aps_tasks import refresh_rss_feeds, run_migration_job
-from app.tasks.broker import broker
 from app.tasks.maintain_task import check_user_heartbeats
 from app.tasks.scheduler import scheduler
 from app.tasks.task import (
     save_cache_to_redis,
     save_to_mongo,
     send_code,
-    send_feishu_message,
 )
 from app.tasks.weread_task import import_books_from_weread
 

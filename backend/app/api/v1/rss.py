@@ -5,11 +5,9 @@ from fastapi import APIRouter, Depends, Query
 from fastapi.responses import JSONResponse, Response
 
 from app.api.des.auth import manager
-from app.api.des.db import get_session
-from app.api.des.redis import AsyncRedis, get_redis
+from app.api.des.des import rss_service_dep
 from app.core.logger import logger
 from app.models.models import User
-from app.repositories.rss_repo import RssRepo
 from app.schemas.response import APIResponse
 from app.schemas.schemas import (
     RssRequest,
@@ -23,17 +21,6 @@ from app.services.rss_service import (
 router = APIRouter(prefix="/rss", tags=["rss"])
 _IMAGE_PROXY_TIMEOUT = httpx.Timeout(15.0, connect=10.0)
 _IMAGE_PROXY_MAX_BYTES = 10 * 1024 * 1024  # 10MB
-
-# ------------------------------------------------------------------ #
-# Dependency injection
-# ------------------------------------------------------------------ #
-
-
-def get_rss_service(
-    session=Depends(get_session),
-    redis: AsyncRedis = Depends(get_redis),
-) -> RssService:
-    return RssService(RssRepo(session), redis)
 
 
 @router.get("/image-proxy")
@@ -90,7 +77,7 @@ async def proxy_rss_image(
 async def parse_rss(
     rss_request: RssRequest,
     current_user: User = Depends(manager),
-    rss_service: RssService = Depends(get_rss_service),
+    rss_service: RssService = Depends(rss_service_dep),
 ):
     """解析RSS链接返回RSS内容"""
 
@@ -157,7 +144,7 @@ async def get_articles(
     feed_url: str | None = None,
     search: str | None = Query(None, min_length=1),
     current_user: User = Depends(manager),
-    rss_service: RssService = Depends(get_rss_service),
+    rss_service: RssService = Depends(rss_service_dep),
 ) -> JSONResponse:
     result = await rss_service.get_articles_for_user(
         user_id=current_user.id,
@@ -173,7 +160,7 @@ async def get_articles(
 async def get_article(
     article_id: str,
     current_user: User = Depends(manager),
-    rss_service: RssService = Depends(get_rss_service),
+    rss_service: RssService = Depends(rss_service_dep),
 ):
     try:
         response = await rss_service.get_article_for_user(
@@ -195,7 +182,7 @@ async def get_article(
 @router.get("/subscriptions")
 async def get_subscriptions(
     current_user: User = Depends(manager),
-    rss_service: RssService = Depends(get_rss_service),
+    rss_service: RssService = Depends(rss_service_dep),
 ):
     """获取当前用户的RSS订阅列表"""
     subscriptions = await rss_service.get_subscriptions_for_user(
@@ -210,7 +197,7 @@ async def get_subscriptions(
 async def refresh_subscription(
     subscription_id: int,
     current_user: User = Depends(manager),
-    rss_service: RssService = Depends(get_rss_service),
+    rss_service: RssService = Depends(rss_service_dep),
 ):
     """手动刷新指定订阅并保存新文章"""
     try:
@@ -244,7 +231,7 @@ async def refresh_subscription(
 async def delete_subscription(
     subscription_id: int,
     current_user: User = Depends(manager),
-    rss_service: RssService = Depends(get_rss_service),
+    rss_service: RssService = Depends(rss_service_dep),
 ):
     """删除RSS订阅及其关联的所有文章"""
     try:
@@ -263,7 +250,7 @@ async def delete_subscription(
 async def mark_article_read(
     article_id: str,
     current_user: User = Depends(manager),
-    rss_service: RssService = Depends(get_rss_service),
+    rss_service: RssService = Depends(rss_service_dep),
 ):
     """标记文章为已读(将用户ID添加到read_by列表,使用$addToSet实现幂等性)"""
     try:
@@ -284,7 +271,7 @@ async def mark_article_read(
 async def mark_article_unread(
     article_id: str,
     current_user: User = Depends(manager),
-    rss_service: RssService = Depends(get_rss_service),
+    rss_service: RssService = Depends(rss_service_dep),
 ):
     """标记文章为未读(从read_by列表中移除用户ID)"""
     try:

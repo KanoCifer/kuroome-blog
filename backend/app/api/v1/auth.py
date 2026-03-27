@@ -17,7 +17,6 @@ from fastapi import (
     status,
 )
 from fastapi.responses import JSONResponse, RedirectResponse
-from sqlalchemy.ext.asyncio import AsyncSession
 from webauthn import options_to_json
 from webauthn.helpers.structs import (
     PublicKeyCredentialCreationOptions,
@@ -26,13 +25,12 @@ from webauthn.helpers.structs import (
 
 from app.api.des.auth import manager
 from app.api.des.csrf import csrf_manager
-from app.api.des.db import get_session
+from app.api.des.des import user_service_dep
 from app.api.des.limiter import limiter
 from app.api.des.redis import AsyncRedis, get_redis
 from app.core.config import settings
 from app.core.logger import logger
 from app.models.models import User
-from app.repositories.user_repo import UserRepository
 from app.schemas.auth import (
     EmailSchema,
     PasskeyAuthenticationRequest,
@@ -52,16 +50,6 @@ router = APIRouter(
     prefix="/auth",
     tags=["auth"],
 )
-
-# ------------------------------------------------------------------ #
-# Dependency injection
-# ------------------------------------------------------------------ #
-
-
-def get_user_service(
-    session: AsyncSession = Depends(get_session),
-) -> UserService:
-    return UserService(UserRepository(session))
 
 
 # ------------------------------------------------------------------ #
@@ -177,7 +165,7 @@ async def refresh_token(
 async def login(
     request: Request,
     data: LoginIn,
-    user_service: UserService = Depends(get_user_service),
+    user_service: UserService = Depends(user_service_dep),
 ) -> JSONResponse:
     """使用用户名和密码登录，成功后返回访问令牌和刷新令牌。
 
@@ -204,7 +192,7 @@ async def login(
 async def logout(
     user: User = Depends(manager),
     redis: AsyncRedis = Depends(get_redis),
-    user_service: UserService = Depends(get_user_service),
+    user_service: UserService = Depends(user_service_dep),
 ):
     await user_service.logout(user, redis)
 
@@ -223,7 +211,7 @@ async def heartbeat(
     request: Request,
     user: User = Depends(manager),
     redis: AsyncRedis = Depends(get_redis),
-    user_service: UserService = Depends(get_user_service),
+    user_service: UserService = Depends(user_service_dep),
 ):
     await user_service.record_heartbeat(user, redis)
     return APIResponse.ok(
@@ -236,7 +224,7 @@ async def heartbeat(
 async def update_user_settings(
     data: UserSettingsIn,
     user: User = Depends(manager),
-    user_service: UserService = Depends(get_user_service),
+    user_service: UserService = Depends(user_service_dep),
 ):
     try:
         result = await user_service.update_settings(user, data)
@@ -257,7 +245,7 @@ async def update_user_settings(
 async def upload_avatar(
     image: Annotated[UploadFile, File()],
     user: User = Depends(manager),
-    user_service: UserService = Depends(get_user_service),
+    user_service: UserService = Depends(user_service_dep),
 ):
     result = await user_service.upload_avatar(user, image)
 
@@ -271,7 +259,7 @@ async def upload_avatar(
 @router.get("/me")
 async def me(
     current_user: User = Depends(manager),
-    user_service: UserService = Depends(get_user_service),
+    user_service: UserService = Depends(user_service_dep),
 ):
     result = await user_service.get_user_with_profile(current_user.id)
     if result is None:
@@ -291,7 +279,7 @@ async def me(
 async def register(
     data: RegisterIn,
     redis: AsyncRedis = Depends(get_redis),
-    user_service: UserService = Depends(get_user_service),
+    user_service: UserService = Depends(user_service_dep),
 ):
     user = await user_service.register_user(
         username=data.username,
@@ -321,7 +309,7 @@ async def register(
 async def send_email_code(
     email: EmailSchema,
     redis: AsyncRedis = Depends(get_redis),
-    user_service: UserService = Depends(get_user_service),
+    user_service: UserService = Depends(user_service_dep),
 ):
     email_addr = email.email
     try:
@@ -371,7 +359,7 @@ async def send_email_code(
 @router.get("/passkey/registration-options")
 async def passkey_registration_options(
     user: User = Depends(manager),
-    user_service: UserService = Depends(get_user_service),
+    user_service: UserService = Depends(user_service_dep),
     redis: AsyncRedis = Depends(get_redis),
 ):
     if await user_service.has_passkey(user):
@@ -400,7 +388,7 @@ async def passkey_registration_options(
 async def passkey_register(
     request: PasskeyRegistrationRequest,
     user: User = Depends(manager),
-    user_service: UserService = Depends(get_user_service),
+    user_service: UserService = Depends(user_service_dep),
     redis: AsyncRedis = Depends(get_redis),
 ):
     expected_challenge = await redis.get(
@@ -451,7 +439,7 @@ async def passkey_authentication_options(
 @router.delete("/passkey/delete")
 async def passkey_delete(
     user: User = Depends(manager),
-    user_service: UserService = Depends(get_user_service),
+    user_service: UserService = Depends(user_service_dep),
 ):
     success = await user_service.delete_passkey(user)
     if not success:
@@ -466,7 +454,7 @@ async def passkey_delete(
 async def passkey_authenticate(
     http_request: Request,
     request: PasskeyAuthenticationRequest,
-    user_service: UserService = Depends(get_user_service),
+    user_service: UserService = Depends(user_service_dep),
     redis: AsyncRedis = Depends(get_redis),
 ):
     try:
@@ -516,7 +504,7 @@ async def passkey_authenticate(
 @router.get("/github")
 async def github_login(
     request: Request,
-    user_service: UserService = Depends(get_user_service),
+    user_service: UserService = Depends(user_service_dep),
 ):
     auth_url, state, code_verifier, mode = user_service.generate_oauth_url(
         mode="login"
@@ -531,7 +519,7 @@ async def github_login(
 async def github_bind(
     request: Request,
     current_user: User = Depends(manager),
-    user_service: UserService = Depends(get_user_service),
+    user_service: UserService = Depends(user_service_dep),
 ):
     auth_url, state, code_verifier, mode = user_service.generate_oauth_url(
         mode="bind"
@@ -545,7 +533,7 @@ async def github_bind(
 @router.post("/github/unbind")
 async def github_unbind(
     current_user: User = Depends(manager),
-    user_service: UserService = Depends(get_user_service),
+    user_service: UserService = Depends(user_service_dep),
 ):
     url = settings.FRONTEND_URL + "/settings?error=github_not_bound"
     if not current_user.github_id:
@@ -562,7 +550,7 @@ async def github_callback(
     request: Request,
     code: str,
     state: str,
-    user_service: UserService = Depends(get_user_service),
+    user_service: UserService = Depends(user_service_dep),
 ):
     if state != request.session.get("oauth_state"):
         return RedirectResponse(

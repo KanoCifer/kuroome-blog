@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Query, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.des.auth import manager
-from app.api.des.db import get_session
+from app.api.des.des import book_service_dep
 from app.models.models import User
-from app.repositories.book_repo import BookRepository
 from app.schemas.response import APIResponse
 from app.schemas.schemas import (
     AddBookIn,
@@ -20,12 +18,6 @@ router = APIRouter(
 )
 
 
-def get_book_service(
-    session: AsyncSession = Depends(get_session),
-) -> BookService:
-    return BookService(BookRepository(session))
-
-
 @router.get(
     "/book",
 )
@@ -35,7 +27,7 @@ async def get_books(
     sort_by: str = Query(default="add_date"),
     sort_order: str = Query(default="desc", pattern="^(asc|desc)$"),
     user: User = Depends(manager),
-    book_service: BookService = Depends(get_book_service),
+    book_service: BookService = Depends(book_service_dep),
 ):
     response_data = await book_service.get_books(
         user_id=user.id,
@@ -56,7 +48,7 @@ async def get_books(
 async def add_book(
     data: AddBookIn,
     user: User = Depends(manager),
-    book_service: BookService = Depends(get_book_service),
+    book_service: BookService = Depends(book_service_dep),
 ):
     try:
         await book_service.add_book(
@@ -85,7 +77,7 @@ async def add_book(
 async def delete_book(
     book_id: int,
     user: User = Depends(manager),
-    book_service: BookService = Depends(get_book_service),
+    book_service: BookService = Depends(book_service_dep),
 ):
     try:
         await book_service.delete_book(user_id=user.id, book_id=book_id)
@@ -110,7 +102,7 @@ async def update_book_status(
     book_id: int,
     data: BookStatusIn,
     user: User = Depends(manager),
-    book_service: BookService = Depends(get_book_service),
+    book_service: BookService = Depends(book_service_dep),
 ):
     try:
         payload = await book_service.update_book_status(
@@ -139,7 +131,7 @@ async def update_book(
     book_id: int,
     data: UpdateBookIn,
     user: User = Depends(manager),
-    book_service: BookService = Depends(get_book_service),
+    book_service: BookService = Depends(book_service_dep),
 ):
     try:
         await book_service.update_book(

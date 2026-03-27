@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 from app.models.models import Book, UserBook
 
 
-class BookRepository:
+class BookRepo:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 

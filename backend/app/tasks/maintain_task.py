@@ -2,9 +2,8 @@ from datetime import UTC, datetime
 
 from taskiq import Context, TaskiqDepends
 
-from app.api.des.db import AsyncSessionFactory
+from app.core.container import get_monitor_service
 from app.core.logger import logger
-from app.repositories.monitor_repo import MonitorRepository
 from app.tasks.broker import broker
 from app.utils.redis_lock import get_redis_lock
 
@@ -25,16 +24,10 @@ async def check_user_heartbeats(context: Context = TaskiqDepends()):
         return {"status": "skipped", "reason": "no redis"}
 
     try:
-        from app.services.monitor_service import MonitorService
-
         async with get_redis_lock(
             redis=redis, key="heartbeat_check_lock", ttl=300
         ):
-            async with AsyncSessionFactory() as session:
-                service = MonitorService(
-                    repo=MonitorRepository(session),
-                    redis=redis,
-                )
+            async with get_monitor_service(redis=redis) as service:
                 result = await service.cleanup_stale_heartbeats()
 
             logger.info(

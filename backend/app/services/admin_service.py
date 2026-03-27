@@ -6,7 +6,7 @@ from bson import ObjectId
 from bson.errors import InvalidId
 
 from app.models.beanie import MessageBoard, Post
-from app.repositories.admin_repo import AdminRepository
+from app.repositories.admin_repo import AdminRepo
 
 
 class AdminDomainError(Exception):
@@ -17,7 +17,7 @@ class AdminDomainError(Exception):
 
 
 class AdminService:
-    def __init__(self, repo: AdminRepository, cache) -> None:
+    def __init__(self, repo: AdminRepo, cache) -> None:
         self.repo = repo
         self.cache = cache
 

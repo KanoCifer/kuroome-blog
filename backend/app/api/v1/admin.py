@@ -15,26 +15,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.des.auth import get_admin_user
 from app.api.des.db import get_session
+from app.api.des.des import admin_service_dep
 from app.api.des.redis import get_redis
 from app.core import get_settings
 from app.core.logger import logger
 from app.models.models import User
-from app.repositories.admin_repo import AdminRepository
 from app.schemas import VisitorData
 from app.schemas.response import APIResponse
 from app.schemas.schemas import BlogPostIn, BlogPostUpdate
 from app.services.admin_service import AdminDomainError, AdminService
 from app.tasks import send_feishu_message
-from app.utils import get_redis_lock, redis_cache
+from app.utils import get_redis_lock
 
 router = APIRouter(prefix="/admin", tags=["admin"])
-
-
-def get_admin_service(
-    session: AsyncSession = Depends(get_session),
-) -> AdminService:
-    return AdminService(AdminRepository(session), redis_cache)
-
 
 # =============================================================================
 # Blog Post Management Endpoints
@@ -45,7 +38,7 @@ def get_admin_service(
 async def add_post(
     data: BlogPostIn,
     current_user: User = Depends(get_admin_user),
-    admin_service: AdminService = Depends(get_admin_service),
+    admin_service: AdminService = Depends(admin_service_dep),
 ):
     try:
         new_id = await admin_service.add_post(
@@ -67,7 +60,7 @@ async def add_post(
 async def update_post(
     data: BlogPostUpdate,
     current_user: User = Depends(get_admin_user),
-    admin_service: AdminService = Depends(get_admin_service),
+    admin_service: AdminService = Depends(admin_service_dep),
 ):
     try:
         await admin_service.update_post(
@@ -90,7 +83,7 @@ async def update_post(
 async def delete_post(
     post_id: str,
     current_user: User = Depends(get_admin_user),
-    admin_service: AdminService = Depends(get_admin_service),
+    admin_service: AdminService = Depends(admin_service_dep),
 ):
     try:
         await admin_service.delete_post(post_id=post_id)
@@ -114,7 +107,7 @@ async def delete_post(
 @router.get("/comments")
 async def get_admin_comments(
     current_user: User = Depends(get_admin_user),
-    admin_service: AdminService = Depends(get_admin_service),
+    admin_service: AdminService = Depends(admin_service_dep),
 ):
     payload = await admin_service.get_admin_comments()
 
@@ -128,7 +121,7 @@ async def get_admin_comments(
 async def approve_comment(
     comment_id: str,
     current_user: User = Depends(get_admin_user),
-    admin_service: AdminService = Depends(get_admin_service),
+    admin_service: AdminService = Depends(admin_service_dep),
 ):
     try:
         await admin_service.approve_comment(comment_id=comment_id)
@@ -142,7 +135,7 @@ async def approve_comment(
 async def delete_comment(
     comment_id: str,
     current_user: User = Depends(get_admin_user),
-    admin_service: AdminService = Depends(get_admin_service),
+    admin_service: AdminService = Depends(admin_service_dep),
 ):
     try:
         await admin_service.delete_comment(comment_id=comment_id)
@@ -160,7 +153,7 @@ async def delete_comment(
 @router.get("/messages", response_model=APIResponse)
 async def get_admin_messages(
     current_user: User = Depends(get_admin_user),
-    admin_service: AdminService = Depends(get_admin_service),
+    admin_service: AdminService = Depends(admin_service_dep),
 ):
     try:
         payload = await admin_service.get_admin_messages()
@@ -177,7 +170,7 @@ async def get_admin_messages(
 async def approve_message(
     message_id: str,
     current_user: User = Depends(get_admin_user),
-    admin_service: AdminService = Depends(get_admin_service),
+    admin_service: AdminService = Depends(admin_service_dep),
 ):
     try:
         await admin_service.approve_message(message_id=message_id)
@@ -190,7 +183,7 @@ async def approve_message(
 async def delete_message(
     message_id: str,
     current_user: User = Depends(get_admin_user),
-    admin_service: AdminService = Depends(get_admin_service),
+    admin_service: AdminService = Depends(admin_service_dep),
 ):
     try:
         await admin_service.delete_message(message_id=message_id)

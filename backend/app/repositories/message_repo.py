@@ -7,7 +7,7 @@ from beanie import SortDirection
 from app.models.beanie import MessageBoard
 
 
-class MessageRepository:
+class MessageRepo:
     async def list_approved_messages(self) -> list[MessageBoard]:
         return await (
             MessageBoard.find({"review": 1})
