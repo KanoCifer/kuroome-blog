@@ -102,14 +102,14 @@ const router = createRouter({
     {
       path: "/blog/new",
       name: "blog-new",
-      component: () => import("@/views/blog/BlogEditView.vue"),
-      meta: { requiresAuth: true },
+      component: () => import("@/views/blog/BlogEditorView.vue"),
+      meta: { requiresAuth: true, title: "发布文章 - Kuroome's Blog" },
     },
     {
       path: "/blog/edit/:id",
       name: "blog-edit",
-      component: () => import("@/views/blog/BlogEditView.vue"),
-      meta: { requiresAuth: true },
+      component: () => import("@/views/blog/BlogEditorView.vue"),
+      meta: { requiresAuth: true, title: "编辑文章 - Kuroome's Blog" },
     },
     {
       path: "/blog/category/:categoryId",
@@ -241,12 +241,13 @@ const router = createRouter({
     },
     {
       path: "/write",
-      name: "markdown-editor",
-      component: () => import("@/views/MarkdownEditor.vue"),
+      name: "blog-write",
+      component: () => import("@/views/blog/BlogEditorView.vue"),
       meta: {
-        title: "Markdown 编辑器 - Kuroome's Blog",
-        description: "在线 Markdown 编辑与实时预览",
-        keywords: "markdown,编辑器,实时预览",
+        requiresAuth: true,
+        title: "写文章 - Kuroome's Blog",
+        description: "支持富文本和 Markdown 双模式的博客编辑器",
+        keywords: "写文章,博客编辑器,markdown,富文本",
       },
     },
     {

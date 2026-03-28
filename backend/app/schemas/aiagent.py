@@ -33,3 +33,9 @@ class SummaryInput(BaseModel):
 
     content: str = Field(description="需要总结的文章正文")
     title: str | None = Field(default=None, description="文章标题")
+
+
+class WeatherAnalysisInput(BaseModel):
+    """天气分析输入模型"""
+
+    weather_data: dict = Field(..., description="需要分析的天气数据")

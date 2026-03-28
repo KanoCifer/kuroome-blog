@@ -8,7 +8,9 @@
     class="fixed top-0 left-0 z-50 flex w-full items-center justify-between rounded-b-[2rem] border-b border-b-white bg-white/60 px-6 py-4 shadow-[0_20px_40px_rgba(21,28,39,0.06)] backdrop-blur-xl dark:border-b-gray-700 dark:bg-slate-900/60 dark:shadow-[0_20px_40px_rgba(0,0,0,0.2)]"
   >
     <div class="flex items-center gap-3">
-      <div class="h-10 w-10 overflow-hidden rounded-full border-2 border-blue-600/20">
+      <div
+        class="h-10 w-10 overflow-hidden rounded-full border-2 border-blue-600/20"
+      >
         <img
           :src="user?.photo || '/images/about.webp'"
           alt="Avatar"

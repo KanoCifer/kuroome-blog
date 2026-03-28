@@ -12,10 +12,12 @@ from __future__ import annotations
 from fastapi import APIRouter, Body, Depends, Request
 from fastapi.responses import JSONResponse, PlainTextResponse
 from redis.asyncio import Redis as AsyncRedis
+from starlette.responses import StreamingResponse
 
 from app.api.des.des import public_service_dep
 from app.api.des.limiter import limiter
 from app.api.des.redis import get_redis
+from app.schemas.aiagent import WeatherAnalysisInput
 from app.schemas.response import APIResponse
 from app.services.public_service import PublicDomainError, PublicService
 
@@ -93,70 +95,6 @@ async def get_sitemap_xml(
         media_type="application/xml",
         headers={"Cache-Control": "public, max-age=3600"},
     )
-
-
-# @router.get("/media/{filename}")
-# async def get_media_file(
-#     filename: str,
-# ) -> StreamingResponse:
-#     """Serve media files.
-
-#     Args:
-#         filename: Media file path
-#         request: FastAPI request object
-
-#     Returns:
-#         StreamingResponse: Media file content
-
-#     Note:
-#         Ensure MEDIA_PATH is configured correctly and securely
-#         to prevent directory traversal attacks.
-#     """
-#     media_path = os.getenv("MEDIA_PATH", "app/media")
-
-#     # Security: Prevent directory traversal
-#     safe_filename = Path(filename).name
-#     if safe_filename != filename.replace("\\", "/"):
-#         raise HTTPException(status_code=404, detail="File not found")
-
-#     file_path = os.path.join(media_path, safe_filename)
-
-#     # Check if file exists and is a file
-#     if not Path(file_path).is_file():
-#         raise HTTPException(status_code=404, detail="File not found")
-
-#     # Determine content type based on file extension
-#     content_type = "application/octet-stream"
-#     ext = Path(safe_filename).suffix.lower()
-#     content_types = {
-#         ".jpg": "image/jpeg",
-#         ".jpeg": "image/jpeg",
-#         ".png": "image/png",
-#         ".gif": "image/gif",
-#         ".webp": "image/webp",
-#         ".svg": "image/svg+xml",
-#         ".mp4": "video/mp4",
-#         ".webm": "video/webm",
-#         ".mp3": "audio/mpeg",
-#         ".wav": "audio/wav",
-#         ".pdf": "application/pdf",
-#     }
-#     if ext in content_types:
-#         content_type = content_types[ext]
-
-#     def file_iterator(file_path: str, chunk_size: int = 8192):
-#         with open(file_path, "rb") as f:
-#             while chunk := f.read(chunk_size):
-#                 yield chunk
-
-#     return StreamingResponse(
-#         file_iterator(file_path),
-#         media_type=content_type,
-#         headers={
-#             "Content-Disposition": f'inline; filename="{safe_filename}"',
-#             "Cache-Control": "public, max-age=86400",
-#         },
-#     )
 
 
 @router.post("/like")
@@ -342,3 +280,27 @@ async def get_qweather_location(
             message=f"Internal server error: {e!s}",
             code=500,
         )
+
+
+@router.post("/llm/weather-analysis")
+@limiter.limit("50/hour")
+async def analyze_weather(
+    request: Request,
+    weather_data: WeatherAnalysisInput = Body(
+        ..., description="Weather data to analyze"
+    ),
+    public_service: PublicService = Depends(public_service_dep),
+) -> StreamingResponse:
+    """根据天气数据进行分析并生成报告。
+    param weather_data: 需要分析的天气数据。
+    """
+    event_generator = public_service.analyze_weather(weather_data)
+    return StreamingResponse(
+        event_generator,
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )

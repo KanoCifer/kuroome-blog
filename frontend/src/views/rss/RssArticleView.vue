@@ -173,10 +173,7 @@ watch(
 </script>
 
 <template>
-  <BasicDetail
-    :title="article?.title || ''"
-    :subtitle="subtitle"
-  >
+  <BasicDetail :title="article?.title || ''" :subtitle="subtitle">
     <div class="col-span-full mx-auto w-full max-w-4xl">
       <!-- Loading State -->
       <div v-if="isLoading" class="py-12 text-center">

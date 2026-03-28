@@ -307,6 +307,18 @@ const props = withDefaults(
   },
 );
 
+const emit = defineEmits<{
+  (
+    e: "update",
+    payload: {
+      liveWeather: LiveWeather;
+      forecasts: ForecastDay[];
+      locationName: string;
+      adcode: string;
+    },
+  ): void;
+}>();
+
 const liveWeather = ref<LiveWeather | null>(null);
 const forecasts = ref<ForecastDay[]>([]);
 const isLoading = ref(false);
@@ -372,6 +384,15 @@ const fetchWeather = async (location: [number, number]) => {
       forecastResult?.forecasts?.length > 0
     ) {
       forecasts.value = forecastResult.forecasts[0]?.casts || [];
+    }
+
+    if (liveWeather.value) {
+      emit("update", {
+        liveWeather: liveWeather.value,
+        forecasts: forecasts.value,
+        locationName: liveWeather.value.city || "钓鱼地点",
+        adcode,
+      });
     }
   } catch (err) {
     console.error("获取天气失败:", err);

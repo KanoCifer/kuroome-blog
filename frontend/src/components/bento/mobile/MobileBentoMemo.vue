@@ -31,12 +31,18 @@ const clearMemo = () => {
     class="glass-card squircle flex aspect-square cursor-pointer flex-col justify-between border border-white/40 bg-white/50 p-6 shadow-[0_20px_40px_rgba(21,28,39,0.06)] max-sm:aspect-auto max-sm:h-40 dark:border-white/10 dark:bg-slate-800/40 dark:shadow-none"
     @click="toggleMemo"
   >
-    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/20">
+    <div
+      class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/20"
+    >
       <IconMemo class="size-6 text-amber-600 dark:text-amber-400" />
     </div>
     <div>
-      <h5 class="text-sm font-bold text-slate-800 dark:text-slate-100">Quick Memo</h5>
-      <p class="mt-1 line-clamp-2 text-[11px] leading-tight text-slate-600 dark:text-slate-400">
+      <h5 class="text-sm font-bold text-slate-800 dark:text-slate-100">
+        Quick Memo
+      </h5>
+      <p
+        class="mt-1 line-clamp-2 text-[11px] leading-tight text-slate-600 dark:text-slate-400"
+      >
         {{ memoText ? memoText : "Tap to write down your thoughts..." }}
       </p>
     </div>
@@ -82,7 +88,12 @@ const clearMemo = () => {
               @click="closeMemo"
               class="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
             >
-              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg
+                class="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -112,7 +123,9 @@ const clearMemo = () => {
             <div class="flex items-center justify-between">
               <span class="text-xs text-gray-500 dark:text-gray-400">
                 自动保存
-                <span v-if="memoText" class="ml-2">{{ memoText.length }} 字</span>
+                <span v-if="memoText" class="ml-2"
+                  >{{ memoText.length }} 字</span
+                >
               </span>
               <button
                 @click="clearMemo"

@@ -39,7 +39,11 @@ const handleSubmit = async () => {
   isSubmitting.value = true;
 
   try {
-    await auth.login(form.value.username, form.value.password, form.value.rememberMe);
+    await auth.login(
+      form.value.username,
+      form.value.password,
+      form.value.rememberMe,
+    );
     const redirect = (route.query.redirect as string) || "/";
     router.push(redirect);
   } catch (err: unknown) {
@@ -60,7 +64,9 @@ const handlePasskeyLogin = async () => {
 
   try {
     // 获取认证选项
-    const optionsRes = await request.get("/auth/passkey/authentication-options");
+    const optionsRes = await request.get(
+      "/auth/passkey/authentication-options",
+    );
     const options = optionsRes.data.data;
 
     // 调用浏览器 Passkey 认证
@@ -113,9 +119,13 @@ const handleGitHubLogin = () => {
           <h2
             class="font-headline text-center text-[28px] font-extrabold tracking-tight text-[#111827] dark:text-white"
           >
-            Kanocifer<span class="text-[#2563eb] dark:text-blue-400">.chat</span>
+            Kanocifer<span class="text-[#2563eb] dark:text-blue-400"
+              >.chat</span
+            >
           </h2>
-          <p class="mt-1 text-center text-[15px] font-medium text-[#4b5563] dark:text-gray-400">
+          <p
+            class="mt-1 text-center text-[15px] font-medium text-[#4b5563] dark:text-gray-400"
+          >
             Welcome back to the reading space.
           </p>
         </div>
@@ -143,7 +153,9 @@ const handleGitHubLogin = () => {
           </div>
 
           <!-- 密码 -->
-          <div class="relative mt-4 transition-transform duration-200 focus-within:scale-[1.01]">
+          <div
+            class="relative mt-4 transition-transform duration-200 focus-within:scale-[1.01]"
+          >
             <div
               class="pointer-events-none absolute top-2.5 left-0 flex items-center pl-4 text-[#9ca3af]"
             >
@@ -217,7 +229,11 @@ const handleGitHubLogin = () => {
 
             <!-- Remember Me Checkbox -->
             <label class="group relative flex cursor-pointer">
-              <input v-model="form.rememberMe" type="checkbox" class="peer sr-only" />
+              <input
+                v-model="form.rememberMe"
+                type="checkbox"
+                class="peer sr-only"
+              />
               <div
                 class="rounded-xl border-2 border-gray-100 bg-white px-3 py-2 shadow-sm transition-all duration-200 select-none group-active:scale-95 peer-checked:border-blue-500 peer-checked:bg-blue-50/50 peer-checked:shadow-blue-100/50 hover:border-blue-200 dark:border-gray-600 dark:bg-gray-700 dark:peer-checked:border-blue-500 dark:peer-checked:bg-blue-500/10 dark:peer-checked:shadow-none dark:hover:border-blue-500/50"
               >
@@ -239,7 +255,10 @@ const handleGitHubLogin = () => {
               class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-green-600 px-8 py-2.5 font-bold text-white shadow-lg shadow-green-500/30 transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-800"
             >
               <IconKey />
-              <span v-if="isPasskeySubmitting" class="flex items-center justify-center gap-2">
+              <span
+                v-if="isPasskeySubmitting"
+                class="flex items-center justify-center gap-2"
+              >
                 <span
                   class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
                 ></span>
@@ -271,7 +290,9 @@ const handleGitHubLogin = () => {
             </button>
           </div>
 
-          <p class="mt-8 text-center font-serif text-gray-400">Kuroome's Blog</p>
+          <p class="mt-8 text-center font-serif text-gray-400">
+            Kuroome's Blog
+          </p>
           <!-- 注册链接 -->
           <div class="mb-4 text-center text-gray-400 dark:text-gray-300">
             Don't have an account?

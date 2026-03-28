@@ -1,8 +1,9 @@
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
+import { computed, ref, watch } from "vue";
 import request from "@/request";
 import { useNotificationStore } from "@/stores/notification";
 import { useStorage } from "@vueuse/core";
+import { useAuthStore } from "@/stores/auth";
 
 export type TodoPriority = "low" | "medium" | "high";
 
@@ -23,6 +24,9 @@ export const useTodoStore = defineStore("todos", () => {
   const todos = ref<Todo[]>([]);
   const isCollapsed = useStorage("todos-collapsed", false);
   const isHydrated = ref(false);
+  const hydrationScope = ref<"guest" | "auth" | null>(null);
+  const auth = useAuthStore();
+  let hydrationPromise: Promise<void> | null = null;
 
   const nonArchivedTodos = computed(() =>
     todos.value.filter((t) => !t.archived),
@@ -44,10 +48,11 @@ export const useTodoStore = defineStore("todos", () => {
     try {
       const res = await request.get("/todos");
       todos.value = res.data.data?.todos ?? [];
-      isHydrated.value = true;
+      return true;
     } catch (err) {
       console.error("fetchTodos error", err);
       notifier.error("加载待办事项失败");
+      return false;
     }
   }
 
@@ -74,10 +79,47 @@ export const useTodoStore = defineStore("todos", () => {
   }
 
   async function hydrateTodos() {
-    if (isHydrated.value) return;
-    await fetchTodos();
-    await importLocalTodosIfAny();
+    if (hydrationPromise) return hydrationPromise;
+
+    hydrationPromise = (async () => {
+      if (!auth.isAuthenticated) {
+        hydrationScope.value = "guest";
+        isHydrated.value = true;
+        todos.value = [];
+        return;
+      }
+
+      if (hydrationScope.value === "auth" && isHydrated.value) return;
+
+      const loaded = await fetchTodos();
+      if (loaded) {
+        await importLocalTodosIfAny();
+      }
+      hydrationScope.value = "auth";
+      isHydrated.value = true;
+    })().finally(() => {
+      hydrationPromise = null;
+    });
+
+    return hydrationPromise;
   }
+
+  watch(
+    () => auth.isAuthenticated,
+    (authenticated) => {
+      if (!authenticated) {
+        hydrationScope.value = "guest";
+        isHydrated.value = true;
+        todos.value = [];
+        return;
+      }
+
+      if (hydrationScope.value !== "auth") {
+        void hydrateTodos();
+      }
+    },
+    { immediate: true },
+  );
 
   async function addTodo(payload: {
     text: string;

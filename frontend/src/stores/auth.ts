@@ -2,6 +2,7 @@ import request, { fetchAndStoreCSRF } from "@/request";
 import router from "@/router";
 import { useNotificationStore } from "@/stores/notification";
 import { useStorage } from "@vueuse/core";
+import { isAxiosError } from "axios";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 // 用户信息类型定义
@@ -93,7 +94,9 @@ export const useAuthStore = defineStore("auth", () => {
   // ---------------------- 方法（Actions） ----------------------
 
   // 2. 获取当前登录用户信息
-  async function fetchUser() {
+  async function fetchUser(
+    options: { silentOnUnauthenticated?: boolean } = {},
+  ) {
     loading.value = true;
     try {
       const res = await request.get("/auth/me");
@@ -102,8 +105,12 @@ export const useAuthStore = defineStore("auth", () => {
       cacheUser(userData); // 缓存到 sessionStorage
       // 启动心跳上报
       startHeartbeat();
-    } catch {
-      notifier.error("登陆过期，请重新登录！");
+    } catch (err) {
+      const status = isAxiosError(err) ? err.response?.status : undefined;
+      const isUnauthenticated = status === 401;
+      if (!(options.silentOnUnauthenticated && isUnauthenticated)) {
+        notifier.error("登陆过期，请重新登录！");
+      }
       user.value = null;
       cacheUser(null);
     } finally {
@@ -126,7 +133,7 @@ export const useAuthStore = defineStore("auth", () => {
       }
 
       // 2. 缓存不存在，从后端获取
-      await fetchUser();
+      await fetchUser({ silentOnUnauthenticated: true });
       isHydrated.value = true;
     } catch {
       notifier.error("认证初始化失败");

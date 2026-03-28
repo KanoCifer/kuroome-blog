@@ -1,6 +1,8 @@
 <template>
   <BentoCard class="min-w-0">
-    <div class="flex min-w-0 flex-col items-center justify-center gap-2 sm:flex-row sm:gap-0">
+    <div
+      class="flex min-w-0 flex-col items-center justify-center gap-2 sm:flex-row sm:gap-0"
+    >
       <div
         class="flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/40"
       >

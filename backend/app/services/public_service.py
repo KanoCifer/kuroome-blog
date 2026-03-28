@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+import json
 from datetime import UTC, datetime
 from xml.etree.ElementTree import Element, SubElement, tostring
 
@@ -10,6 +11,7 @@ from redis.asyncio import Redis as AsyncRedis
 
 from app.core.config import get_settings
 from app.repositories.public_repo import PublicRepo
+from app.schemas.aiagent import WeatherAnalysisInput
 from app.utils.qweather_jwt import encoded_jwt
 
 
@@ -238,3 +240,25 @@ Sitemap: https://readinglist.example.com/api/sitemap.xml
                 f"Failed to fetch QWeather location: {exc!s}",
                 503,
             ) from exc
+
+    @staticmethod
+    def _to_sse_event(content: str, is_end: bool) -> str:
+        data = {"content": content, "is_end": is_end}
+        return f"data:{json.dumps(data, ensure_ascii=False)}\n\n"
+
+    async def analyze_weather(self, weather_data: WeatherAnalysisInput):
+        """根据天气数据进行分析并生成报告。"""
+        from app.core.agent import weather_analyzer
+
+        try:
+            async for chunk in weather_analyzer.analyze_weather_stream(
+                weather_data=weather_data
+            ):
+                yield self._to_sse_event(chunk, False)
+            yield self._to_sse_event("", True)
+        except ValueError as exc:
+            yield self._to_sse_event(f"[ERROR] {exc!r}", True)
+        except RuntimeError as exc:
+            yield self._to_sse_event(f"[ERROR] {exc!r}", True)
+        except Exception as exc:
+            yield self._to_sse_event(f"[ERROR] 天气分析失败: {exc!r}", True)

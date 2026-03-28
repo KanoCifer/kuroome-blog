@@ -12,6 +12,7 @@ from agno.tools.websearch import WebSearchTools
 
 from app.core.config import settings
 from app.core.logger import logger
+from app.schemas.aiagent import WeatherAnalysisInput
 
 
 class ArticleSummarizer:
@@ -348,3 +349,58 @@ class ArticleSummarizer:
 
 
 article_summarizer = ArticleSummarizer()
+
+
+class WeatherAnalyzer:
+    _SYSTEM_PROMPT = (
+        "你是一个天气分析助手，能够根据用户提供的天气信息进行分析和建议, 提供是否适合外出/路亚/钓鱼的建议。"
+        "请根据用户输入的天气数据，提供准确的分析和实用的建议。"
+        "输出为纯文本，不要使用 Markdown 标题。"
+    )
+    DB = RedisDb(db_url=settings.REDIS_URL)
+
+    def __init__(self) -> None:
+        self._model = OpenAILike(
+            id="Ling-2.5-1T",
+            api_key=settings.API_KEY,
+            base_url="https://api.tbox.cn/api/llm/v1",
+            temperature=0.8,
+            timeout=30,
+        )
+
+        self._agent = Agent(
+            model=self._model,
+            instructions=self._SYSTEM_PROMPT,
+            db=WeatherAnalyzer.DB,
+            tools=[WebSearchTools(backend="bing")],
+            add_history_to_context=True,
+            num_history_runs=5,
+        )
+
+    def _build_user_prompt(self, weather_data: WeatherAnalysisInput) -> str:
+        return f"请分析以下天气数据，并提供是否适合外出/路亚/钓鱼的建议：\n\n{weather_data}"
+
+    async def analyze_weather_stream(
+        self, weather_data: WeatherAnalysisInput
+    ) -> AsyncIterator[str]:
+        if not settings.API_KEY:
+            logger.error("AI 服务未配置 API_KEY")
+            raise RuntimeError("AI 服务未配置 API_KEY")
+
+        data = (
+            str(weather_data)
+            if isinstance(weather_data, WeatherAnalysisInput)
+            else weather_data
+        )
+
+        if not data.strip():
+            raise ValueError("天气数据不能为空")
+
+        user_prompt = self._build_user_prompt(weather_data)
+
+        async for event in self._agent.arun(user_prompt, stream=True):
+            if isinstance(event, RunOutputEvent) and event.content:
+                yield str(event.content)
+
+
+weather_analyzer = WeatherAnalyzer()

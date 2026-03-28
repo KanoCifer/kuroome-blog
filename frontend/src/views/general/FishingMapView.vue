@@ -13,23 +13,14 @@
             fill="none"
             viewBox="0 0 24 24"
           >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            ></circle>
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path
               class="opacity-75"
               fill="currentColor"
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             ></path>
           </svg>
-          <span class="text-blue-600 dark:text-blue-400">
-            正在规划路线...
-          </span>
+          <span class="text-blue-600 dark:text-blue-400"> 正在规划路线... </span>
         </div>
 
         <div
@@ -38,9 +29,7 @@
         >
           <div class="flex items-center justify-between">
             <div>
-              <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">
-                路线信息
-              </h3>
+              <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">路线信息</h3>
               <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 距离:
                 {{
@@ -69,14 +58,12 @@
           v-else
           class="squircle overflow-hidden border border-gray-200/60 bg-white/30 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900/70"
         >
-          <p class="text-sm text-gray-600 dark:text-gray-400">
-            点击地图上的钓点标记，自动规划从您当前位置到钓点的路线
-          </p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">点击地图上的钓点标记，自动规划从您当前位置到钓点的路线</p>
         </div>
       </div>
       <!-- Map Container -->
       <div
-        class="squircle relative overflow-hidden border border-gray-200/60 bg-white/30 shadow-md dark:border-gray-800 dark:bg-gray-900/70"
+        class="squircle relative overflow-hidden border border-gray-200/60 bg-white/30 shadow-md max-sm:h-80 dark:border-gray-800 dark:bg-gray-900/70"
       >
         <MapContainer
           ref="mapContainerRef"
@@ -94,22 +81,69 @@
       <!-- Map Controls and Info -->
       <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2">
         <!-- Tide Card -->
-        <TideCard />
+        <TideCard @update="handleTideUpdate" />
 
         <!-- Weather Card -->
-        <WeatherCard :location="[113.389549, 23.050067]" />
+        <WeatherCard :location="[113.389549, 23.050067]" @update="handleWeatherUpdate" />
       </div>
+    </div>
+
+    <!-- Floating AI Analysis -->
+    <div class="fixed right-6 bottom-0 z-50 max-sm:bottom-45 max-sm:left-4">
+      <transition
+        enter-active-class="transition-all duration-300 ease-out"
+        enter-from-class="opacity-0 translate-y-4 scale-95"
+        enter-to-class="opacity-100 translate-y-0 scale-100"
+        leave-active-class="transition-all duration-200 ease-in"
+        leave-from-class="opacity-100 translate-y-0 scale-100"
+        leave-to-class="opacity-0 translate-y-4 scale-95"
+      >
+        <div v-show="analysisOpen" class="relative mb-4 w-90 max-w-[85vw] origin-bottom-right sm:w-105">
+          <div class="absolute top-4 right-4 z-10">
+            <button
+              class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/80 text-gray-500 shadow-sm backdrop-blur hover:bg-white dark:bg-gray-800/80 dark:text-gray-200"
+              @click="analysisOpen = false"
+              aria-label="关闭分析"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <WeatherAnalysis :weather_data="analysisPayload" :autoAnalyze="analysisOpen" />
+        </div>
+      </transition>
+
+      <button
+        class="group squircle relative flex h-14 w-14 items-center justify-center border border-white/40 bg-linear-to-br from-slate-900/90 to-slate-700/80 text-white shadow-lg backdrop-blur transition-all hover:-translate-y-1 hover:shadow-xl dark:border-gray-700/60 dark:from-gray-100 dark:to-gray-300 dark:text-gray-900"
+        @click="analysisOpen = !analysisOpen"
+      >
+        <span class="absolute -top-1 -right-1 flex h-3 w-3" v-if="analysisHasData">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"></span>
+          <span class="relative inline-flex h-3 w-3 rounded-full bg-emerald-500"></span>
+        </span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      </button>
     </div>
   </BasicDetail>
 </template>
 
 <script setup lang="ts">
+import WeatherAnalysis from "@/components/ai/WeatherAnalysis.vue";
 import BasicDetail from "@/components/basic/BasicDetail.vue";
 import MapContainer from "@/components/basic/MapContainer.vue";
-import { ref, useTemplateRef } from "vue";
-import fishingSpotsData from "@/data/fishing-spots.json";
 import TideCard from "@/components/map/TideCard.vue";
 import WeatherCard from "@/components/map/WeatherCard.vue";
+import fishingSpotsData from "@/data/fishing-spots.json";
+import { computed, ref, useTemplateRef } from "vue";
 
 export interface AMapMarker {
   position: [number, number];
@@ -118,12 +152,40 @@ export interface AMapMarker {
 }
 
 interface MapContainerInstance {
-  planRoute: (
-    start: [number, number],
-    end: [number, number],
-  ) => Promise<{ distance: number; time: number }>;
+  planRoute: (start: [number, number], end: [number, number]) => Promise<{ distance: number; time: number }>;
   clearRoute: () => void;
   getCurrentPosition: () => Promise<[number, number]>;
+}
+
+interface LiveWeather {
+  province: string;
+  city: string;
+  adcode: string;
+  weather: string;
+  temperature: string;
+  winddirection: string;
+  windpower: string;
+  humidity: string;
+  reporttime: string;
+}
+
+interface ForecastDay {
+  date: string;
+  week: string;
+  dayweather: string;
+  nightweather: string;
+  daytemp: string;
+  nighttemp: string;
+  daywind: string;
+  nightwind: string;
+  daypower: string;
+  nightpower: string;
+}
+
+interface TideData {
+  updateTime: string;
+  tideTable: { fxTime: string; height: number | string; type: "H" | "L" }[];
+  tideHourly: { fxTime: string; height: number | string }[];
 }
 
 // 钓点数据
@@ -134,6 +196,44 @@ const mapContainerRef = useTemplateRef<MapContainerInstance>("mapContainerRef");
 const isPlanningRoute = ref(false);
 const routeInfo = ref<{ distance: number; time: number } | null>(null);
 const selectedSpotIndex = ref<number | null>(null);
+
+const analysisOpen = ref(false);
+const liveWeather = ref<LiveWeather | null>(null);
+const forecasts = ref<ForecastDay[]>([]);
+const tideData = ref<TideData | null>(null);
+const locationName = ref<string>("");
+const tideSpotName = ref<string>("黄埔港");
+
+const analysisPayload = computed(() => {
+  if (!liveWeather.value && forecasts.value.length === 0 && !tideData.value) {
+    return null;
+  }
+  return {
+    liveWeather: liveWeather.value,
+    forecasts: forecasts.value,
+    tideData: tideData.value,
+    locationName: locationName.value || liveWeather.value?.city,
+    tideSpotName: tideSpotName.value,
+  };
+});
+
+const analysisHasData = computed(() => !!liveWeather.value || forecasts.value.length > 0 || !!tideData.value);
+
+const handleWeatherUpdate = (payload: {
+  liveWeather: LiveWeather;
+  forecasts: ForecastDay[];
+  locationName: string;
+  adcode: string;
+}) => {
+  liveWeather.value = payload.liveWeather;
+  forecasts.value = payload.forecasts;
+  locationName.value = payload.locationName;
+};
+
+const handleTideUpdate = (payload: { tideData: TideData | null; spotName: string }) => {
+  tideData.value = payload.tideData;
+  tideSpotName.value = payload.spotName;
+};
 
 // 地图事件处理
 const handleMarkerClick = async (index: number) => {
@@ -158,10 +258,7 @@ const handleMarkerClick = async (index: number) => {
     }
 
     // 规划路线
-    const result = await mapContainerRef.value.planRoute(
-      userPosition,
-      spot.position,
-    );
+    const result = await mapContainerRef.value.planRoute(userPosition, spot.position);
 
     routeInfo.value = result;
   } catch (error) {

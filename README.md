@@ -29,7 +29,7 @@
 ## 技术栈
 
 - **后端**: FastAPI + SQLAlchemy 2.0 + Alembic + PostgreSQL + MongoDB (Beanie) + Redis
-- **前端**: Vue 3.5 + TypeScript + Vite + Tailwind CSS v4 + Pinia + shadcn-vue
+- **前端**: Vue 3.5 + TypeScript + Vite + Tailwind CSS v4 + Pinia + shadcn-vue + motion-v
 - **AI**: Agno (Langchain 替代方案)
 - **安全**: JWT 认证、CSRF 保护、输入验证
 
@@ -60,17 +60,18 @@ cd ../frontend && pnpm install && pnpm run dev  # 前端 :5173
 
 ```bash
 cd backend
+python dev.py                           # 启动 (:5555)
 ruff format . && ruff check .           # 格式化 + 检查
 ruff check . --fix                      # 自动修复
 alembic revision --autogenerate -m "x"  # 生成迁移
 alembic upgrade head                    # 执行迁移
-python dev.py                           # 启动 (:5555)
 
 # 测试
-python -m pytest                        # 运行所有测试
-python -m pytest tests/test_x.py -v     # 运行单个测试文件
-python -m pytest tests/test_x.py::test_func -v  # 运行单个测试函数
-python -m pytest -k "keyword"           # 按关键字过滤测试
+python -m pytest                                  # 运行所有测试
+python -m pytest tests/test_books.py -v           # 单个测试文件
+python -m pytest tests/test_books.py::test_list -v # 单个测试函数
+python -m pytest -k "keyword"                     # 按关键字过滤
+python -m pytest --tb=short                        # 简短 traceback
 ```
 
 ### 前端
@@ -78,11 +79,11 @@ python -m pytest -k "keyword"           # 按关键字过滤测试
 ```bash
 cd frontend
 pnpm run dev                            # 启动 (:5173)
-pnpm run build                          # 构建 (先 type-check 再 build)
-pnpm run build-only                     # 仅构建 (跳过 type-check)
 pnpm run format                         # Prettier 格式化
 pnpm run lint                           # Oxlint + ESLint 检查
-pnpm run type-check                     # Vue-tsc 类型检查
+pnpm run type-check                     # TypeScript 类型检查
+pnpm run build                          # 完整构建 (type-check + compile)
+pnpm run build-only                     # 仅构建 (跳过 type-check)
 
 # 测试
 pnpm run test:unit                      # Vitest 单元测试
@@ -94,38 +95,37 @@ npx playwright test --debug             # 调试模式
 ## 项目结构
 
 ```
-backend/
-├── app/
-│   ├── routers/      # API: auth, books, blog, users, messages, weread, rss, admin, aiagent
-│   ├── models/       # SQLAlchemy 2.0 (models.py) + MongoDB (mgmodel.py)
-│   ├── schemas/      # Pydantic schemas
-│   ├── dependencies/ # FastAPI 依赖注入
-│   ├── middleware/    # 中间件
-│   ├── configs/      # 配置 (settings, logger)
-│   ├── utils/        # 工具函数
-│   └── tasks/        # Taskiq 异步任务
-├── alembic/          # 数据库迁移
-└── dev.py            # 入口 (:5555)
+backend/app/
+├── api/v1/              # API 端点 (auth, books, blog, messages, weread, rss, admin, ai, todos, monitor)
+├── models/              # 数据库模型 (SQLAlchemy 2.0 + MongoDB Beanie)
+├── schemas/             # Pydantic schemas (按领域拆分)
+├── repositories/        # 数据访问层
+├── services/            # 业务逻辑层
+├── core/                # 配置、日志、AI Agent
+├── utils/               # 工具函数
+├── tasks/               # Taskiq 异步任务
+└── main.py              # FastAPI 入口
 
 frontend/src/
-├── views/            # 页面 (auth, books, blog, rss, general)
-├── components/       # Vue 组件
-├── stores/           # Pinia 状态管理
-├── router/           # Vue Router
-├── types/            # TypeScript 类型定义
-├── lib/              # 库封装
-├── utils/            # 工具函数
-└── layouts/          # 布局组件
+├── views/               # 页面组件 (auth, blog, rss, books, general)
+├── components/          # 可复用组件 (ui/, bento/, basic/, icons/, editor/)
+├── stores/              # Pinia 状态管理
+├── router/              # Vue Router
+├── types/               # TypeScript 类型定义
+├── lib/                 # 第三方库封装
+├── utils/               # 工具函数
+├── layouts/             # 布局组件
+└── assets/              # 静态资源
 
-tests/                # Pytest (后端) + Playwright (E2E)
-scripts/              # 工具脚本
+tests/                   # Pytest (后端) + Playwright (E2E)
+scripts/                 # 工具脚本
 ```
 
 ## API 端点 (:5555)
 
 | 路由               | 描述                      |
 | ------------------ | ------------------------- |
-| `/api/v1/auth`     | 认证 (登录/注册/登出)     |
+| `/api/v1/auth`     | 认证 (登录/注册/Passkey/OAuth) |
 | `/api/v1/books`    | 书籍管理 (CRUD、阅读进度) |
 | `/api/v1/users`    | 用户资料 (设置、头像)     |
 | `/api/v1/blog`     | 博客系统 (文章/评论/分类) |
@@ -133,7 +133,9 @@ scripts/              # 工具脚本
 | `/api/v1/weread`   | 微信读书导入              |
 | `/api/v1/rss`      | RSS 订阅器                |
 | `/api/v1/admin`    | 管理员 (内容审核)         |
-| `/api/v1/aiagent`  | AI 助手 (文章摘要)        |
+| `/api/v1/ai`       | AI 助手 (文章摘要)        |
+| `/api/v1/todos`    | 待办事项                  |
+| `/api/v1/monitor`  | 系统监控                  |
 
 ## 配置
 
@@ -148,7 +150,14 @@ REDIS_URL=redis://localhost:6379/0
 
 - **后端**: Ruff (79字符, 4空格, 双引号), Python 3.14+ 类型注解
 - **前端**: Prettier + ESLint + Oxlint, Tailwind CSS, `<script setup>`
-- **详细规范**: 见 [AGENTS.md](./AGENTS.md)
+- **详细规范**: 见 [CLAUDE.md](./CLAUDE.md)
+
+## 提交规范
+
+1. 后端提交前: `cd backend && ruff format . && ruff check .`
+2. 前端提交前: `cd frontend && pnpm format && pnpm lint && pnpm type-check`
+3. 提交信息: Conventional Commits (`feat:`, `fix:`, `docs:`, `style:`, `refactor:`, `perf:`, `test:`, `chore:`)
+4. 分支命名: `feature/xxx`, `fix/xxx`, `refactor/xxx`
 
 ## 部署
 

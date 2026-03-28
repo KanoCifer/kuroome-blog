@@ -94,6 +94,8 @@ declare module 'vue' {
     DropdownMenuSubTrigger: typeof import('./src/components/ui/dropdown-menu/DropdownMenuSubTrigger.vue')['default']
     DropdownMenuTrigger: typeof import('./src/components/ui/dropdown-menu/DropdownMenuTrigger.vue')['default']
     EditIcon: typeof import('./src/components/icons/EditIcon.vue')['default']
+    EyeOff: typeof import('./src/components/icons/EyeOff.vue')['default']
+    EyeOn: typeof import('./src/components/icons/EyeOn.vue')['default']
     HomeIcon: typeof import('./src/components/icons/HomeIcon.vue')['default']
     HomeSideBar: typeof import('./src/components/layout/HomeSideBar.vue')['default']
     IconAnalytics: typeof import('./src/components/icons/IconAnalytics.vue')['default']
@@ -104,6 +106,7 @@ declare module 'vue' {
     IconDocumentation: typeof import('./src/components/icons/IconDocumentation.vue')['default']
     IconEcosystem: typeof import('./src/components/icons/IconEcosystem.vue')['default']
     IconError: typeof import('./src/components/icons/IconError.vue')['default']
+    IconGithub: typeof import('./src/components/icons/IconGithub.vue')['default']
     IconGlobal: typeof import('./src/components/icons/IconGlobal.vue')['default']
     IconInfo: typeof import('./src/components/icons/IconInfo.vue')['default']
     IconKey: typeof import('./src/components/icons/IconKey.vue')['default']
@@ -124,6 +127,7 @@ declare module 'vue' {
     LoginIcon: typeof import('./src/components/icons/LoginIcon.vue')['default']
     LogoutIcon: typeof import('./src/components/icons/LogoutIcon.vue')['default']
     MapContainer: typeof import('./src/components/basic/MapContainer.vue')['default']
+    MarkdownEditor: typeof import('./src/components/editor/MarkdownEditor.vue')['default']
     MarkdownPreview: typeof import('./src/components/editor/MarkdownPreview.vue')['default']
     MemoModal: typeof import('./src/components/memo/MemoModal.vue')['default']
     MemoSidebar: typeof import('./src/components/memo/MemoSidebar.vue')['default']
@@ -166,6 +170,7 @@ declare module 'vue' {
     ToastContainer: typeof import('./src/components/layout/ToastContainer.vue')['default']
     TodoCard: typeof import('./src/components/bento/TodoCard.vue')['default']
     TrendChartCard: typeof import('./src/components/analytics/TrendChartCard.vue')['default']
+    WeatherAnalysis: typeof import('./src/components/ai/WeatherAnalysis.vue')['default']
     WeatherCard: typeof import('./src/components/map/WeatherCard.vue')['default']
   }
 }

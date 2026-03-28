@@ -1,0 +1,300 @@
+<script setup lang="ts">
+import request from "@/request";
+import DOMPurify from "dompurify";
+import { marked } from "marked";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
+
+// v-model support
+const emit = defineEmits<{
+  "update:modelValue": [value: string];
+}>();
+
+const props = defineProps({
+  modelValue: {
+    type: String,
+    default: "",
+  },
+});
+
+const markdownText = ref<string>(props.modelValue);
+const fileInputRef = ref<HTMLInputElement | null>(null);
+const replaceInputRef = ref<HTMLInputElement | null>(null);
+
+// blob URL → File 映射，用于发布时批量上传
+const blobFileMap = ref<Map<string, File>>(new Map());
+
+// Image editor state
+const isImageEditorOpen = ref<boolean>(false);
+const editingImageUrl = ref<string>("");
+const editingImageAlt = ref<string>("");
+const editingImageTitle = ref<string>("");
+const editingImageWidth = ref<string>("");
+const editingImageHeight = ref<string>("");
+const editingImageAlign = ref<"left" | "center" | "right">("center");
+const editingImageFile = ref<File | null>(null);
+
+// Watch for external changes
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue !== markdownText.value) {
+      markdownText.value = newValue;
+    }
+  },
+);
+
+// Update parent when content changes
+watch(markdownText, (newValue) => {
+  emit("update:modelValue", newValue);
+});
+
+const handleInsertImage = (url: string) => {
+  const md = `![image](${url})`;
+  markdownText.value += `${md}\n\n`;
+};
+
+const handleImageUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  if (!target.files || target.files.length === 0) return;
+
+  const file = target.files[0];
+  const blobUrl = URL.createObjectURL(file);
+  blobFileMap.value.set(blobUrl, file);
+  handleInsertImage(blobUrl);
+  target.value = "";
+};
+
+const openImageEditor = (img: HTMLImageElement) => {
+  editingImageUrl.value = img.currentSrc || img.src;
+  editingImageAlt.value = img.alt || "";
+  editingImageTitle.value = img.getAttribute("title") || "";
+  editingImageWidth.value = img.getAttribute("width") || "";
+  editingImageHeight.value = img.getAttribute("height") || "";
+  editingImageAlign.value = "center";
+  editingImageFile.value = null;
+  isImageEditorOpen.value = true;
+};
+
+const closeImageEditor = () => {
+  isImageEditorOpen.value = false;
+  editingImageUrl.value = "";
+  editingImageAlt.value = "";
+  editingImageTitle.value = "";
+  editingImageWidth.value = "";
+  editingImageHeight.value = "";
+  editingImageAlign.value = "center";
+  editingImageFile.value = null;
+};
+
+const handlePreviewClick = (event: MouseEvent) => {
+  const target = event.target as HTMLElement | null;
+  if (!target || target.tagName !== "IMG") return;
+  openImageEditor(target as HTMLImageElement);
+};
+
+const handleReplaceImageUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  if (!target.files || target.files.length === 0) return;
+
+  const file = target.files[0];
+  const newBlobUrl = URL.createObjectURL(file);
+  blobFileMap.value.set(newBlobUrl, file);
+  editingImageUrl.value = newBlobUrl;
+  editingImageFile.value = file;
+  if (!editingImageAlt.value) {
+    editingImageAlt.value = file.name;
+  }
+  target.value = "";
+};
+
+const openImageInNewTab = (url: string) => {
+  window.open(url);
+};
+
+// Configure marked
+marked.setOptions({
+  gfm: true,
+  breaks: true,
+});
+
+const renderedMarkdown = computed<string>(() => {
+  if (!markdownText.value) return "";
+  const rawHtml = marked.parse(markdownText.value, { async: false }) as string;
+  return DOMPurify.sanitize(rawHtml, {
+    ADD_ATTR: ["data-md-id", "data-align"],
+    ALLOWED_URI_REGEXP: /^(?:(?:https?|blob):|[^a-z]*|[a-z0-9.+-]*$)/i,
+  });
+});
+
+// 上传单个图片到服务器
+const uploadImageToServer = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await request.post("/upload-image", formData);
+  return response.data.data.url;
+};
+
+// 发布前上传所有 blob 图片并返回最终内容
+const getContentForPublish = async (): Promise<string> => {
+  let content = markdownText.value;
+
+  for (const [blobUrl, file] of blobFileMap.value) {
+    try {
+      const serverUrl = await uploadImageToServer(file);
+      content = content.replaceAll(blobUrl, serverUrl);
+      URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("图片上传失败:", error);
+      throw error;
+    }
+  }
+
+  blobFileMap.value.clear();
+  return content;
+};
+
+// 暴露方法给父组件
+defineExpose({ getContentForPublish });
+
+onBeforeUnmount(() => {
+  // 清理所有 blob URL
+  for (const blobUrl of blobFileMap.value.keys()) {
+    URL.revokeObjectURL(blobUrl);
+  }
+  blobFileMap.value.clear();
+});
+</script>
+
+<template>
+  <div class="flex h-full flex-col md:flex-row">
+    <!-- Editor -->
+    <div
+      class="flex h-1/2 w-full flex-col border-b border-slate-200 md:h-full md:w-1/2 md:border-r md:border-b-0 dark:border-slate-800"
+    >
+      <div class="flex h-12 shrink-0 items-center border-b border-slate-200 px-4 dark:border-slate-800">
+        <div class="flex w-full items-center justify-between">
+          <h1 class="text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400">MARKDOWN</h1>
+          <div class="flex items-center gap-2">
+            <input ref="fileInputRef" type="file" accept="image/*" class="hidden" @change="handleImageUpload" />
+            <button
+              type="button"
+              class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              @click="fileInputRef?.click()"
+            >
+              插入图片
+            </button>
+          </div>
+        </div>
+      </div>
+      <textarea
+        v-model="markdownText"
+        class="flex-1 resize-none bg-transparent p-6 font-mono text-sm leading-relaxed outline-none placeholder:text-slate-300 focus:ring-0 dark:placeholder:text-slate-700"
+        placeholder="# 在此编写 Markdown 内容&#10;&#10;- 支持列表&#10;- **粗体**&#10;- *斜体*&#10;&#10;```js&#10;console.log('Hello!');&#10;```"
+      ></textarea>
+    </div>
+
+    <!-- Preview -->
+    <div class="flex h-1/2 w-full flex-col md:h-full md:w-1/2">
+      <div class="flex h-12 shrink-0 items-center border-b border-slate-200 px-4 dark:border-slate-800">
+        <h2 class="text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400">PREVIEW</h2>
+      </div>
+      <div class="prose prose-slate dark:prose-invert max-w-none flex-1 overflow-y-auto p-6">
+        <div v-html="renderedMarkdown" @click="handlePreviewClick"></div>
+      </div>
+    </div>
+
+    <!-- Image Editor Modal -->
+    <teleport to="body">
+      <transition
+        enter-active-class="transition duration-300 ease-out"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition duration-200 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div
+          v-if="isImageEditorOpen"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+          @click.self="closeImageEditor"
+        >
+          <div class="w-full max-w-md rounded-3xl bg-white shadow-2xl dark:bg-slate-900">
+            <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4 dark:border-slate-800">
+              <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100">编辑图片</h3>
+              <button
+                type="button"
+                class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                @click="closeImageEditor"
+              >
+                关闭
+              </button>
+            </div>
+
+            <div class="p-6">
+              <div class="mb-4 flex items-center justify-center rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
+                <img
+                  :src="editingImageUrl"
+                  :alt="editingImageAlt"
+                  class="max-h-[200px] w-full rounded-xl object-contain"
+                  @click.stop="openImageInNewTab(editingImageUrl)"
+                />
+              </div>
+
+              <div class="space-y-3">
+                <input
+                  v-model="editingImageAlt"
+                  type="text"
+                  placeholder="图片说明 (Alt)"
+                  class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                />
+
+                <div class="grid grid-cols-2 gap-3">
+                  <input
+                    v-model="editingImageWidth"
+                    type="number"
+                    min="0"
+                    placeholder="宽度"
+                    class="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                  />
+                  <input
+                    v-model="editingImageHeight"
+                    type="number"
+                    min="0"
+                    placeholder="高度"
+                    class="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between border-t border-slate-200 px-6 py-4 dark:border-slate-800">
+              <div>
+                <input
+                  ref="replaceInputRef"
+                  type="file"
+                  accept="image/*"
+                  class="hidden"
+                  @change="handleReplaceImageUpload"
+                />
+                <button
+                  type="button"
+                  class="rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                  @click="replaceInputRef?.click()"
+                >
+                  替换图片
+                </button>
+              </div>
+              <button
+                type="button"
+                class="rounded-xl bg-slate-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"
+                @click="closeImageEditor"
+              >
+                完成
+              </button>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </teleport>
+  </div>
+</template>

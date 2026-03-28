@@ -22,7 +22,7 @@ def _get_media_root() -> Path:
     env_media = os.environ.get("MEDIA_PATH")
     if env_media:
         return Path(env_media)
-    return Path(__file__).resolve().parent.parent / "media"
+    return Path(__file__).resolve().parent.parent.parent / "media"
 
 
 def _guess_extension(upload_file: UploadFile) -> str:

@@ -6,11 +6,15 @@
       :style="titleStyle"
     >
       <div>
-        <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl">
+        <h1
+          class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl"
+        >
           {{ title }}
         </h1>
         <!-- Info -->
-        <div class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400">
+        <div
+          class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400"
+        >
           <span
             class="inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400"
           >

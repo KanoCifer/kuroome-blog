@@ -178,6 +178,10 @@ const tideData = ref<TideData | null>(null);
 const loading = ref<boolean>(false);
 const isDarkMode = ref<boolean>(false);
 
+const emit = defineEmits<{
+  (e: "update", payload: { tideData: TideData | null; spotName: string }): void;
+}>();
+
 const todayStr = dayjs().format("YYYY-MM-DD");
 
 // 检测深色模式
@@ -192,6 +196,7 @@ const fetchTideData = async () => {
     const res = await request.get("/qweather/tide");
     if (res.status === 200) {
       tideData.value = res.data.data;
+      emit("update", { tideData: tideData.value, spotName: "黄埔港" });
     }
   } catch {
     notifier.error("获取潮汐信息失败，请稍后再试");

@@ -10,22 +10,15 @@
             class="w-full shrink-0 border-b border-gray-200/60 p-6 lg:w-80 lg:border-r lg:border-b-0 dark:border-gray-700/60"
           >
             <header class="mb-8">
-              <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">
-                参数配置
-              </h2>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                本地处理，保护隐私安全
-              </p>
+              <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">参数配置</h2>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">本地处理，保护隐私安全</p>
             </header>
 
             <div class="space-y-8">
               <!-- 尺寸限制 -->
               <div class="space-y-3">
                 <div class="flex items-center justify-between">
-                  <label
-                    for="max-width"
-                    class="text-sm font-semibold text-gray-700 dark:text-gray-300"
-                  >
+                  <label for="max-width" class="text-sm font-semibold text-gray-700 dark:text-gray-300">
                     最大宽度限制
                   </label>
                   <input
@@ -43,37 +36,18 @@
                     :disabled="!enableMaxWidth"
                     class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm transition-all focus:border-gray-900 focus:ring-0 focus:outline-none disabled:bg-gray-50 disabled:text-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:focus:border-gray-100"
                   />
-                  <span
-                    class="absolute top-1/2 right-4 -translate-y-1/2 text-xs text-gray-400"
-                  >
-                    px
-                  </span>
+                  <span class="absolute top-1/2 right-4 -translate-y-1/2 text-xs text-gray-400"> px </span>
                 </div>
               </div>
 
               <!-- 压缩质量 -->
               <div class="space-y-3">
                 <div class="flex items-center justify-between">
-                  <label
-                    for="quality"
-                    class="text-sm font-semibold text-gray-700 dark:text-gray-300"
-                  >
-                    压缩质量
-                  </label>
-                  <span class="font-mono text-xs font-medium text-gray-500">
-                    {{ Math.round(quality * 100) }}%
-                  </span>
+                  <label for="quality" class="text-sm font-semibold text-gray-700 dark:text-gray-300"> 压缩质量 </label>
+                  <span class="font-mono text-xs font-medium text-gray-500"> {{ Math.round(quality * 100) }}% </span>
                 </div>
-                <Slider
-                  :default-value="[0.8]"
-                  :min="0.3"
-                  :max="1"
-                  :step="0.1"
-                  v-model="qualityArray"
-                />
-                <div
-                  class="flex justify-between text-[10px] text-gray-400 uppercase"
-                >
+                <Slider :default-value="[0.8]" :min="0.3" :max="1" :step="0.1" v-model="qualityArray" />
+                <div class="flex justify-between text-[10px] text-gray-400 uppercase">
                   <span>高压缩</span>
                   <span>原画</span>
                 </div>
@@ -81,11 +55,7 @@
 
               <!-- 输出格式 -->
               <div class="space-y-3">
-                <span
-                  class="text-sm font-semibold text-gray-700 dark:text-gray-300"
-                >
-                  输出格式
-                </span>
+                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300"> 输出格式 </span>
                 <div class="grid grid-cols-3 gap-2">
                   <button
                     v-for="option in outputTypes"
@@ -112,10 +82,7 @@
                   class="group relative overflow-hidden rounded-xl bg-gray-900 py-3 text-sm font-bold text-white transition-all hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
                   @click="handleProcess"
                 >
-                  <span
-                    v-if="processing"
-                    class="flex items-center justify-center gap-2"
-                  >
+                  <span v-if="processing" class="flex items-center justify-center gap-2">
                     <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24">
                       <circle
                         class="opacity-25"
@@ -143,12 +110,7 @@
                   class="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white py-3 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                   @click="downloadProcessedImage"
                 >
-                  <svg
-                    class="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -197,12 +159,7 @@
                     <div
                       class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-50 text-gray-400 transition-transform group-hover:scale-110 dark:bg-gray-800"
                     >
-                      <svg
-                        class="h-8 w-8"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
+                      <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path
                           stroke-linecap="round"
                           stroke-linejoin="round"
@@ -212,34 +169,20 @@
                       </svg>
                     </div>
                     <div>
-                      <p
-                        class="text-base font-bold text-gray-900 dark:text-gray-100"
-                      >
+                      <p class="text-base font-bold text-gray-900 dark:text-gray-100">
                         {{ isOverDropZone ? "即刻上传" : "点击或拖拽图片" }}
                       </p>
-                      <p class="mt-1 text-xs text-gray-500">
-                        支持 JPG, PNG, WebP, GIF, AVIF (最大 20MB)
-                      </p>
+                      <p class="mt-1 text-xs text-gray-500">支持 JPG, PNG, WebP, GIF, AVIF (最大 20MB)</p>
                     </div>
                   </div>
 
-                  <div
-                    v-else
-                    class="flex flex-wrap items-center justify-center gap-6"
-                  >
+                  <div v-else class="flex flex-wrap items-center justify-center gap-6">
                     <div class="flex items-center gap-4">
-                      <div
-                        class="h-12 w-12 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700"
-                      >
-                        <img
-                          :src="originalPreviewUrl"
-                          class="h-full w-full object-cover"
-                        />
+                      <div class="h-12 w-12 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700">
+                        <img :src="originalPreviewUrl" class="h-full w-full object-cover" />
                       </div>
                       <div class="text-left">
-                        <p
-                          class="max-w-[200px] truncate text-sm font-bold text-gray-900 dark:text-gray-100"
-                        >
+                        <p class="max-w-50 truncate text-sm font-bold text-gray-900 dark:text-gray-100">
                           {{ originalFile.name }}
                         </p>
                         <p class="text-xs text-gray-500">
@@ -257,36 +200,19 @@
                   </div>
                 </div>
 
-                <input
-                  ref="fileInputRef"
-                  type="file"
-                  accept="image/*"
-                  class="hidden"
-                  @change="handleFileChange"
-                />
+                <input ref="fileInputRef" type="file" accept="image/*" class="hidden" @change="handleFileChange" />
               </div>
 
               <!-- 预览对比区 -->
-              <div
-                v-if="originalFile"
-                class="grid grid-cols-1 gap-6 md:grid-cols-2"
-              >
+              <div v-if="originalFile" class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <!-- 原图预览 -->
                 <div
                   class="group relative flex flex-col overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-gray-800"
                 >
-                  <div
-                    class="flex items-center justify-between border-b border-gray-50 p-4 dark:border-gray-700/50"
-                  >
-                    <span
-                      class="text-xs font-bold tracking-wider text-gray-400 uppercase"
-                      >原始图像</span
-                    >
+                  <div class="flex items-center justify-between border-b border-gray-50 p-4 dark:border-gray-700/50">
+                    <span class="text-xs font-bold tracking-wider text-gray-400 uppercase">原始图像</span>
                     <div class="flex items-center gap-2">
-                      <span class="text-[10px] text-gray-500"
-                        >缩放:
-                        {{ Math.round(originalPreviewZoom * 100) }}%</span
-                      >
+                      <span class="text-[10px] text-gray-500">缩放: {{ Math.round(originalPreviewZoom * 100) }}%</span>
                       <button
                         @click="originalPreviewZoom = 1"
                         class="text-[10px] text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
@@ -332,15 +258,10 @@
                 <div
                   class="group relative flex flex-col overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-gray-800"
                 >
-                  <div
-                    class="flex items-center justify-between border-b border-gray-50 p-4 dark:border-gray-700/50"
-                  >
+                  <div class="flex items-center justify-between border-b border-gray-50 p-4 dark:border-gray-700/50">
                     <div class="flex items-center gap-2">
-                      <span
-                        class="text-xs font-bold tracking-wider text-gray-400 uppercase"
-                        >处理后:{{
-                          formatBytes(processedBlob?.size ?? 0) || "0 KB"
-                        }}</span
+                      <span class="text-xs font-bold tracking-wider text-gray-400 uppercase"
+                        >处理后:{{ formatBytes(processedBlob?.size ?? 0) || "0 KB" }}</span
                       >
                       <span
                         v-if="processedBlob"
@@ -350,10 +271,7 @@
                       </span>
                     </div>
                     <div class="flex items-center gap-2">
-                      <span class="text-[10px] text-gray-500"
-                        >缩放:
-                        {{ Math.round(processedPreviewZoom * 100) }}%</span
-                      >
+                      <span class="text-[10px] text-gray-500">缩放: {{ Math.round(processedPreviewZoom * 100) }}%</span>
                       <button
                         @click="processedPreviewZoom = 1"
                         class="text-[10px] text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
@@ -365,10 +283,7 @@
                   <div
                     class="relative flex min-h-[320px] items-center justify-center overflow-auto bg-gray-50/50 p-8 dark:bg-gray-900/50"
                   >
-                    <div
-                      v-if="processing"
-                      class="flex flex-col items-center gap-3"
-                    >
+                    <div v-if="processing" class="flex flex-col items-center gap-3">
                       <div
                         class="h-8 w-8 animate-spin rounded-full border-2 border-gray-900 border-t-transparent dark:border-gray-100"
                       ></div>
@@ -391,12 +306,7 @@
                       />
                     </button>
                     <div v-else class="text-center text-gray-300">
-                      <svg
-                        class="mx-auto h-12 w-12 opacity-20"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
+                      <svg class="mx-auto h-12 w-12 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path
                           stroke-linecap="round"
                           stroke-linejoin="round"
@@ -470,10 +380,10 @@
 
 <script setup lang="ts">
 import { BasicDetail } from "@/components/basic";
+import { Slider } from "@/components/ui/slider";
 import { formatBytes, getFileExtension, processImage } from "@/utils/handlePic";
 import { useDropZone } from "@vueuse/core";
 import { computed, onMounted, onUnmounted, ref, useTemplateRef } from "vue";
-import { Slider } from "@/components/ui/slider";
 
 interface OutputTypeOption {
   label: string;
@@ -538,13 +448,7 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
     }
   },
   multiple: false,
-  dataTypes: [
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-    "image/gif",
-    "image/avif",
-  ],
+  dataTypes: ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"],
 });
 
 const compressionRatio = computed(() => {
@@ -552,10 +456,7 @@ const compressionRatio = computed(() => {
     return "-";
   }
 
-  const ratio =
-    ((originalFile.value.size - processedBlob.value.size) /
-      originalFile.value.size) *
-    100;
+  const ratio = ((originalFile.value.size - processedBlob.value.size) / originalFile.value.size) * 100;
   return `${ratio.toFixed(1)}%`;
 });
 
@@ -613,6 +514,7 @@ function handleSelectedFile(selectedFile: File) {
   resetProcessedState();
   originalPreviewZoom.value = 1;
 
+  // 释放之前的预览 URL，避免内存泄漏
   revokePreviewUrl(originalPreviewUrl.value);
   originalPreviewUrl.value = URL.createObjectURL(selectedFile);
 }
