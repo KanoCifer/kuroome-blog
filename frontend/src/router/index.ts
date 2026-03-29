@@ -1,10 +1,6 @@
 import { useAuthStore } from "@/stores/auth";
 import { reportVisitorData } from "@/utils/visitorTracker";
-import {
-  createMemoryHistory,
-  createRouter,
-  createWebHistory,
-} from "vue-router";
+import { createMemoryHistory, createRouter, createWebHistory } from "vue-router";
 
 declare global {
   interface Window {
@@ -202,6 +198,16 @@ const router = createRouter({
       },
     },
     {
+      path: "/gallery",
+      name: "gallery",
+      component: () => import("@/views/pic/PicGallery.vue"),
+      meta: {
+        title: "图片画廊 - Kuroome's Blog",
+        description: "展示精选图片的画廊，支持拖拽浏览",
+        keywords: "图片画廊,精选图片,拖拽浏览",
+      },
+    },
+    {
       path: "/rss",
       name: "rss",
       component: () => import("@/views/rss/RssSubscriptionsView.vue"),
@@ -216,8 +222,7 @@ const router = createRouter({
       component: () => import("@/views/rss/RSSParseView.vue"),
       meta: {
         title: "RSS 订阅 - Kuroome's Blog",
-        description:
-          "订阅 Kuroome's Blog 的 RSS 频道，第一时间获取最新文章更新",
+        description: "订阅 Kuroome's Blog 的 RSS 频道，第一时间获取最新文章更新",
         keywords: "RSS订阅,博客更新,文章订阅",
       },
     },
@@ -277,9 +282,7 @@ router.beforeEach(async (to) => {
     await auth.hydrateAuth();
   }
 
-  const needsAuth = to.matched.some(
-    (route) => route.meta?.requiresAuth === true,
-  );
+  const needsAuth = to.matched.some((route) => route.meta?.requiresAuth === true);
 
   if (needsAuth && !auth.isAuthenticated) {
     return { name: "login", query: { redirect: to.fullPath } };

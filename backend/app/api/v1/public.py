@@ -9,17 +9,22 @@ This module provides public endpoints that do not require authentication:
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Body, Depends, Request
+from fastapi import APIRouter, Body, Depends, File, Request, UploadFile
 from fastapi.responses import JSONResponse, PlainTextResponse
 from redis.asyncio import Redis as AsyncRedis
+from starlette import status
 from starlette.responses import StreamingResponse
 
+from app.api.des.auth import manager
 from app.api.des.des import public_service_dep
 from app.api.des.limiter import limiter
 from app.api.des.redis import get_redis
+from app.models.models import User
 from app.schemas.aiagent import WeatherAnalysisInput
+from app.schemas.gallery import GalleryImage, GalleryInput
 from app.schemas.response import APIResponse
 from app.services.public_service import PublicDomainError, PublicService
+from app.utils.media import save_upload_image
 
 router = APIRouter(tags=["public"])
 
@@ -304,3 +309,67 @@ async def analyze_weather(
             "X-Accel-Buffering": "no",
         },
     )
+
+
+@router.post("/upload-gallery-image")
+async def upload_blog_image(
+    request: Request,
+    file: UploadFile = File(),
+    user: User = Depends(manager),
+) -> JSONResponse:
+    """Upload blog image and return public URL."""
+    if not file or not file.filename:
+        return APIResponse.error(
+            message="No image provided.",
+            code=status.HTTP_400_BAD_REQUEST,
+        )
+    relative_path = save_upload_image(file, f"gallery/{user.id}")
+
+    return APIResponse.ok(
+        data={
+            "url": f"/api/v1/media/{relative_path}",
+            "filename": relative_path,
+        },
+        message="Image uploaded successfully.",
+        code=status.HTTP_200_OK,
+    )
+
+
+@router.post("/set-pic-gallery")
+async def set_pic_gallery(
+    redis: AsyncRedis = Depends(get_redis),
+    images: GalleryInput = Body(..., description="List of image data to set"),
+    public_service: PublicService = Depends(public_service_dep),
+) -> JSONResponse:
+    """Set picture gallery data."""
+    try:
+        await public_service.set_pic_gallery(
+            redis=redis,
+            images=images,
+        )
+        return APIResponse.ok(
+            message="Picture gallery updated successfully",
+        )
+    except PublicDomainError as exc:
+        return APIResponse.error(message=exc.message, code=exc.code)
+    except Exception as exc:
+        return APIResponse.error(
+            message=f"Failed to update picture gallery: {exc!s}",
+            code=500,
+        )
+
+
+@router.get("/pic-gallery")
+async def get_pic_gallery(
+    redis: AsyncRedis = Depends(get_redis),
+    public_service: PublicService = Depends(public_service_dep),
+):
+    """从图像库中获取图片列表。"""
+    try:
+        images = await public_service.get_pic_gallery(redis=redis)
+        return APIResponse.ok(
+            data={"images": images},
+            message="Picture gallery retrieved successfully",
+        )
+    except PublicDomainError as exc:
+        return APIResponse.error(message=exc.message, code=exc.code)

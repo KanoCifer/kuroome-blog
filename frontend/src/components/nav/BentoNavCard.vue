@@ -195,6 +195,7 @@ import {
   RssIcon,
   IconTooling,
 } from "@/components/icons";
+import { Image } from "lucide-vue-next";
 import { useAuthStore } from "@/stores/auth";
 
 const auth = useAuthStore();
@@ -212,6 +213,7 @@ const navItems = [
   { path: "/", label: "首页", icon: HomeIcon },
   { path: "/blog", label: "近期文章", icon: BlogIcon },
   { path: "/bookshelf", label: "我的书架", icon: BookshelfIcon },
+  { path: "/gallery", label: "图片画廊", icon: Image },
   { path: "/changelog", label: "更新日志", icon: ChangelogIcon },
   { path: "/rss", label: "RSS 订阅", icon: RssIcon },
   { path: "/toolbox/image-toolbox", label: "图片工具", icon: IconTooling },

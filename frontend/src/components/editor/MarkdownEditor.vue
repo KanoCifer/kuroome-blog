@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import request from "@/request";
 import DOMPurify from "dompurify";
+import hljs from "highlight.js/lib/common";
+import "highlight.js/styles/github-dark.css";
 import { marked } from "marked";
+import TurndownService from "turndown"; // HTML → Markdown 转换
 import { computed, onBeforeUnmount, ref, watch } from "vue";
+
+const turndownService = new TurndownService();
 
 // v-model support
 const emit = defineEmits<{
@@ -16,7 +21,16 @@ const props = defineProps({
   },
 });
 
-const markdownText = ref<string>(props.modelValue);
+// 检测字符串是否像 HTML（简单检测）
+const isHtmlLike = (str: string): boolean => {
+  if (!str) return false;
+  return /<\/?[a-z][\s\S]*>/i.test(str) || str.includes("&lt;") || str.includes("&gt;");
+};
+
+// 初始化时如果是 HTML 则转换为 Markdown
+const initialContent = isHtmlLike(props.modelValue) ? turndownService.turndown(props.modelValue) : props.modelValue;
+
+const markdownText = ref<string>(initialContent);
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const replaceInputRef = ref<HTMLInputElement | null>(null);
 
@@ -38,9 +52,10 @@ watch(
   () => props.modelValue,
   (newValue) => {
     if (newValue !== markdownText.value) {
-      markdownText.value = newValue;
+      markdownText.value = turndownService.turndown(newValue);
     }
   },
+  { immediate: true },
 );
 
 // Update parent when content changes
@@ -120,6 +135,7 @@ marked.setOptions({
 const renderedMarkdown = computed<string>(() => {
   if (!markdownText.value) return "";
   const rawHtml = marked.parse(markdownText.value, { async: false }) as string;
+  hljs.highlightAll();
   return DOMPurify.sanitize(rawHtml, {
     ADD_ATTR: ["data-md-id", "data-align"],
     ALLOWED_URI_REGEXP: /^(?:(?:https?|blob):|[^a-z]*|[a-z0-9.+-]*$)/i,
@@ -235,7 +251,7 @@ onBeforeUnmount(() => {
                 <img
                   :src="editingImageUrl"
                   :alt="editingImageAlt"
-                  class="max-h-[200px] w-full rounded-xl object-contain"
+                  class="max-h-50 w-full rounded-xl object-contain"
                   @click.stop="openImageInNewTab(editingImageUrl)"
                 />
               </div>

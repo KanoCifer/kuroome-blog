@@ -12,6 +12,7 @@ from redis.asyncio import Redis as AsyncRedis
 from app.core.config import get_settings
 from app.repositories.public_repo import PublicRepo
 from app.schemas.aiagent import WeatherAnalysisInput
+from app.schemas.gallery import GalleryInput
 from app.utils.qweather_jwt import encoded_jwt
 
 
@@ -24,7 +25,7 @@ class PublicDomainError(Exception):
 
 class PublicService:
     def __init__(self, repo: PublicRepo) -> None:
-        self.repo = repo
+        self.repo: PublicRepo = repo
 
     @staticmethod
     def get_api_status() -> dict[str, str]:
@@ -262,3 +263,27 @@ Sitemap: https://readinglist.example.com/api/sitemap.xml
             yield self._to_sse_event(f"[ERROR] {exc!r}", True)
         except Exception as exc:
             yield self._to_sse_event(f"[ERROR] 天气分析失败: {exc!r}", True)
+
+    async def set_pic_gallery(
+        self, redis: AsyncRedis, images: GalleryInput
+    ) -> None:
+        """设置图片画廊数据。"""
+        if not images.images:
+            await redis.delete("pic_gallery:images")
+            return
+
+        await redis.delete("pic_gallery:images")
+        pipeline = redis.pipeline()
+        for image in images.images:
+            pipeline.rpush(
+                "pic_gallery:images",
+                orjson.dumps(image.model_dump()),
+            )
+        await pipeline.execute()
+
+    async def get_pic_gallery(self, redis: AsyncRedis) -> list[dict]:
+        """获取图片画廊数据。"""
+        return [
+            orjson.loads(image)
+            for image in await redis.lrange("pic_gallery:images", 0, -1)  # type: ignore
+        ]  # type: ignore

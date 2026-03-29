@@ -31,9 +31,7 @@
             class="flex flex-col items-center gap-2 rounded-2xl border border-white/20 bg-white/40 p-4 transition-transform active:scale-95 dark:bg-white/5"
             @click="handleNav('/bookshelf')"
           >
-            <div
-              class="flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/40"
-            >
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/40">
               <svg
                 class="h-6 w-6 text-orange-500"
                 fill="none"
@@ -56,9 +54,7 @@
             class="flex flex-col items-center gap-2 rounded-2xl border border-white/20 bg-white/40 p-4 transition-transform active:scale-95 dark:bg-white/5"
             @click="handleNav('/messages')"
           >
-            <div
-              class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/40"
-            >
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/40">
               <svg
                 class="h-6 w-6 text-emerald-500"
                 fill="none"
@@ -81,16 +77,8 @@
             class="flex flex-col items-center gap-2 rounded-2xl border border-white/20 bg-white/40 p-4 transition-transform active:scale-95 dark:bg-white/5"
             @click="handleNav('/analytics')"
           >
-            <div
-              class="flex h-12 w-12 items-center justify-center rounded-full bg-cyan-100 dark:bg-cyan-900/40"
-            >
-              <svg
-                class="h-6 w-6 text-cyan-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
-              >
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-cyan-100 dark:bg-cyan-900/40">
+              <svg class="h-6 w-6 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -106,9 +94,7 @@
             class="flex flex-col items-center gap-2 rounded-2xl border border-white/20 bg-white/40 p-4 transition-transform active:scale-95 dark:bg-white/5"
             @click="handleNav('/import')"
           >
-            <div
-              class="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/40"
-            >
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/40">
               <svg
                 class="h-6 w-6 text-indigo-500"
                 fill="none"
@@ -131,26 +117,14 @@
             class="flex flex-col items-center gap-2 rounded-2xl border border-white/20 bg-white/40 p-4 transition-transform active:scale-95 dark:bg-white/5"
             @click="handleNav('/settings')"
           >
-            <div
-              class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/40"
-            >
-              <svg
-                class="h-6 w-6 text-blue-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
-              >
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/40">
+              <svg class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
                 />
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
             <span class="text-xs font-bold">Settings</span>
@@ -161,9 +135,7 @@
             class="flex flex-col items-center gap-2 rounded-2xl border border-white/20 bg-white/40 p-4 transition-transform active:scale-95 dark:bg-white/5"
             @click="toggleTheme"
           >
-            <div
-              class="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/40"
-            >
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/40">
               <svg
                 class="h-6 w-6 text-purple-500"
                 fill="none"
@@ -186,9 +158,7 @@
             class="flex flex-col items-center gap-2 rounded-2xl border border-white/20 bg-white/40 p-4 transition-transform active:scale-95 dark:bg-white/5"
             @click="handleNav('/about')"
           >
-            <div
-              class="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/40"
-            >
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/40">
               <svg
                 class="h-6 w-6 text-amber-500"
                 fill="none"
@@ -206,6 +176,16 @@
             <span class="text-xs font-bold">About</span>
           </button>
 
+          <button
+            class="flex flex-col items-center gap-2 rounded-2xl border border-white/20 bg-white/40 p-4 transition-transform active:scale-95 dark:bg-white/5"
+            @click="handleNav('/gallery')"
+          >
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900/40">
+              <Image class="h-6 w-6 text-violet-500" />
+            </div>
+            <span class="text-xs font-bold">Gallery</span>
+          </button>
+
           <!-- Login/Register or Logout -->
           <template v-if="!authStore.isAuthenticated">
             <!-- Login -->
@@ -213,9 +193,7 @@
               class="flex flex-col items-center gap-2 rounded-2xl border border-white/20 bg-white/40 p-4 transition-transform active:scale-95 dark:bg-white/5"
               @click="handleNav('/login')"
             >
-              <div
-                class="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40"
-              >
+              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40">
                 <svg
                   class="h-6 w-6 text-green-500"
                   fill="none"
@@ -238,9 +216,7 @@
               class="flex flex-col items-center gap-2 rounded-2xl border border-white/20 bg-white/40 p-4 transition-transform active:scale-95 dark:bg-white/5"
               @click="handleNav('/register')"
             >
-              <div
-                class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/40"
-              >
+              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/40">
                 <svg
                   class="h-6 w-6 text-blue-500"
                   fill="none"
@@ -264,9 +240,7 @@
               class="flex flex-col items-center gap-2 rounded-2xl border border-white/20 bg-white/40 p-4 text-red-500 transition-transform active:scale-95 dark:bg-white/5"
               @click="handleLogout"
             >
-              <div
-                class="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40"
-              >
+              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40">
                 <svg
                   class="h-6 w-6 text-red-500"
                   fill="none"
@@ -309,11 +283,7 @@
         </router-link>
         <span
           class="text-[10px] font-medium tracking-wide transition-colors duration-200"
-          :class="
-            route.path === '/'
-              ? 'text-blue-500 dark:text-blue-400'
-              : 'text-slate-400 dark:text-slate-500'
-          "
+          :class="route.path === '/' ? 'text-blue-500 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'"
         >
           Home
         </span>
@@ -330,11 +300,7 @@
         </router-link>
         <span
           class="text-[10px] font-medium tracking-wide transition-colors duration-200"
-          :class="
-            route.path === '/blog'
-              ? 'text-blue-500 dark:text-blue-400'
-              : 'text-slate-400 dark:text-slate-500'
-          "
+          :class="route.path === '/blog' ? 'text-blue-500 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'"
         >
           Blogs
         </span>
@@ -345,18 +311,8 @@
         to="/blog/new"
         class="-mt-10 flex h-14 w-14 items-center justify-center rounded-full border-[3px] border-white/50 bg-linear-to-br from-blue-400 to-blue-600 text-white shadow-xl shadow-blue-500/35 transition-all duration-200 hover:scale-110 hover:shadow-2xl hover:shadow-blue-500/40 active:scale-95 dark:border-slate-800/50 dark:shadow-blue-400/30"
       >
-        <svg
-          class="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2.5"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M12 4.5v15m7.5-7.5h-15"
-          />
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
       </router-link>
 
@@ -371,11 +327,7 @@
         </router-link>
         <span
           class="text-[10px] font-medium tracking-wide transition-colors duration-200"
-          :class="
-            route.path === '/rss'
-              ? 'text-blue-500 dark:text-blue-400'
-              : 'text-slate-400 dark:text-slate-500'
-          "
+          :class="route.path === '/rss' ? 'text-blue-500 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'"
         >
           RSS
         </span>
@@ -386,21 +338,20 @@
         <button
           @click="showMoreMenu = !showMoreMenu"
           class="flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200 hover:scale-110 active:scale-95"
-          :class="
+          :class="[
             showMoreMenu
               ? 'text-blue-500 dark:text-blue-400'
-              : 'text-slate-500 hover:text-blue-500 dark:text-slate-400 dark:hover:text-blue-400'
-          "
+              : 'text-slate-500 hover:text-blue-500 dark:text-slate-400 dark:hover:text-blue-400',
+            isMore
+              ? 'bg-linear-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30 dark:shadow-blue-400/30'
+              : 'bg-transparent',
+          ]"
         >
           <IconMore class="h-5 w-5" />
         </button>
         <span
           class="text-[10px] font-medium tracking-wide transition-colors duration-200"
-          :class="
-            showMoreMenu
-              ? 'text-blue-500 dark:text-blue-400'
-              : 'text-slate-400 dark:text-slate-500'
-          "
+          :class="[showMoreMenu || isMore ? 'text-blue-500 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500']"
         >
           More
         </span>
@@ -410,13 +361,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { motion } from "motion-v";
-import { useDark, useToggle } from "@vueuse/core";
-import { RssIcon, BlogIcon, HomeIcon } from "../icons";
-import IconMore from "../icons/IconMore.vue";
 import { useAuthStore } from "@/stores/auth";
+import { useDark, useToggle } from "@vueuse/core";
+import { Image } from "lucide-vue-next";
+import { motion } from "motion-v";
+import { computed, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { BlogIcon, HomeIcon, RssIcon } from "../icons";
+import IconMore from "../icons/IconMore.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -424,6 +376,10 @@ const authStore = useAuthStore();
 const showMoreMenu = ref(false);
 const isDark = useDark();
 const toggleDark = useToggle(isDark);
+
+const isMore = computed(() => {
+  return route.path === "/" || route.path === "/blog" || route.path === "/rss" ? false : true;
+});
 
 const handleNav = (path: string) => {
   showMoreMenu.value = false;

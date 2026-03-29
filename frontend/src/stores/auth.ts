@@ -34,6 +34,7 @@ export const useAuthStore = defineStore("auth", () => {
   const notifier = useNotificationStore(); // 通知提示
 
   const isAuthenticated = computed(() => !!user.value);
+  const isAdmin = computed(() => !!user.value?.is_admin);
 
   // ---------------------- 辅助方法 ----------------------
 
@@ -211,6 +212,7 @@ export const useAuthStore = defineStore("auth", () => {
     user,
     loading,
     isAuthenticated,
+    isAdmin,
     isHydrated,
     fetchUser,
     hydrateAuth,

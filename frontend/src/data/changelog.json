@@ -1,16 +1,31 @@
 [
   {
+    "version": "2.6.0",
+    "date": "2026-03-29",
+    "title": "新增照片画廊功能",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "新增照片画廊功能"
+      },
+      {
+        "type": "fix",
+        "content": "修复了一些bugs"
+      }
+    ]
+  },
+  {
     "version": "2.5.3",
     "date": "2026-03-29",
-    "title": "适配markdownwn编辑模式",
+    "title": "适配Markdown编辑模式",
     "changes": [
       {
         "type": "fix",
-        "content": "修复markdownwn编辑模式下的预览功能，提升编辑体验"
+        "content": "修复Markdown编辑模式下的预览功能，提升编辑体验"
       },
       {
         "type": "style",
-        "content": "优化markdownwn编辑器的UI设计，提升用户体验"
+        "content": "优化Markdown编辑器的UI设计，提升用户体验"
       },
       {
         "type": "feat",

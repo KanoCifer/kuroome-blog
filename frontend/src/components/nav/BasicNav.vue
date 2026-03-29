@@ -8,7 +8,7 @@
       class="group fixed top-4 left-4 z-50 hidden md:block"
     >
       <nav
-        class="squircle flex items-center gap-2 bg-white/80 px-1 py-2 shadow-lg backdrop-blur-sm dark:bg-gray-800/80"
+        class="squircle z-9999 flex items-center gap-2 bg-white/80 px-1 py-2 shadow-lg backdrop-blur-sm dark:bg-gray-800/80"
       >
         <ul class="flex items-center gap-2 font-medium">
           <!-- Avatar -->
@@ -30,6 +30,11 @@
           </li>
           <!-- Navigation Icons -->
           <li class="relative flex items-center gap-4 px-2">
+            <motion.div
+              class="pointer-events-none absolute top-0 left-0 z-1 h-12 w-12 rounded-full bg-white shadow-sm dark:bg-gray-700"
+              :animate="{ x: indicatorX }"
+              :transition="{ type: 'spring', stiffness: 320, damping: 30 }"
+            />
             <!-- Nav Items -->
             <RouterLink
               v-for="(item, index) in navItems"
@@ -52,18 +57,13 @@
 </template>
 
 <script setup lang="ts">
+import { BlogIcon, BookshelfIcon, ChangelogIcon, HomeIcon, IconTooling, RssIcon } from "@/components/icons";
+import { useAuthStore } from "@/stores/auth";
+import { useDebounce } from "@vueuse/core";
+import { Image } from "lucide-vue-next";
 import { AnimatePresence, motion } from "motion-v";
 import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import {
-  HomeIcon,
-  BlogIcon,
-  BookshelfIcon,
-  ChangelogIcon,
-  IconTooling,
-  RssIcon,
-} from "@/components/icons";
-import { useAuthStore } from "@/stores/auth";
 
 const auth = useAuthStore();
 const route = useRoute();
@@ -74,15 +74,14 @@ const props = defineProps<{
   isVisible?: boolean;
 }>();
 
-const isVisible = computed(() =>
-  props.isVisible !== undefined ? props.isVisible : !props.isEntryView,
-);
+const isVisible = computed(() => (props.isVisible !== undefined ? props.isVisible : !props.isEntryView));
 
 // Navigation items config
 const navItems = [
   { to: "/", icon: HomeIcon },
   { to: "/blog", icon: BlogIcon },
   { to: "/bookshelf", icon: BookshelfIcon },
+  { to: "/gallery", icon: Image },
   { to: "/toolbox/image-toolbox", icon: IconTooling },
   { to: "/changelog", icon: ChangelogIcon },
   { to: "/rss", icon: RssIcon },
@@ -91,15 +90,23 @@ const navItems = [
 // State
 const hoveredIndex = ref(0);
 const activeIndex = ref(0);
+const debouncedHoveredIndex = useDebounce(hoveredIndex, 40);
+const indicatorX = computed(() => debouncedHoveredIndex.value * 64 + 8);
 
 // Check if route is active
-const isActive = (path: string) => route.path === path;
+const isActive = (path: string) => {
+  if (path === "/") {
+    return route.path === "/";
+  }
+
+  return route.path === path || route.path.startsWith(`${path}/`);
+};
 
 // Update active index when route changes
 watch(
   () => route.path,
-  (newPath) => {
-    const index = navItems.findIndex((item) => item.to === newPath);
+  () => {
+    const index = navItems.findIndex((item) => isActive(item.to));
     if (index !== -1) {
       activeIndex.value = index;
       hoveredIndex.value = index;

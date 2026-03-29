@@ -1,9 +1,6 @@
 <template>
   <div>
-    <MobileDashboard
-      v-show="useDeviceStore().isMobile"
-      @switchBackground="switchBackground"
-    />
+    <MobileDashboard v-show="useDeviceStore().isMobile" @switchBackground="switchBackground" />
     <div
       v-show="!useDeviceStore().isMobile"
       class="relative min-h-dvh w-full snap-start space-y-2 max-sm:flex max-sm:flex-col max-sm:gap-4 max-sm:overflow-x-hidden max-sm:p-4 max-sm:pt-14"
@@ -21,12 +18,7 @@
           class="squircle rounded-xl p-2 transition-all hover:scale-110 hover:bg-blue-100 dark:hover:bg-blue-800"
           title="切换背景图"
         >
-          <svg
-            class="h-5 w-5 text-blue-600 dark:text-blue-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
+          <svg class="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -37,11 +29,12 @@
         </button>
       </div>
       <BentoGreeting
+        @click.stop="$router.push('/gallery')"
         v-if="show.BentoGreeting"
         :initial="{ scale: 0 }"
         :animate="{ scale: 1 }"
         :style="greetingPosition"
-        class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:order-1 max-sm:w-full! max-sm:min-w-0 max-sm:translate-0!"
+        class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 cursor-pointer max-sm:static! max-sm:order-1 max-sm:w-full! max-sm:min-w-0 max-sm:translate-0!"
       />
       <BentoProfileCard
         v-if="show.BentoProfileCard"
@@ -132,12 +125,7 @@
         class="squircle fixed top-1/2 right-4 z-50 -translate-y-1/2 rounded-2xl bg-blue-50 p-3 shadow-sm ring ring-blue-50/70 transition-all hover:scale-110 dark:bg-blue-900/80 dark:ring-blue-600"
         title="显示待办卡片"
       >
-        <svg
-          class="h-5 w-5 text-blue-600 dark:text-blue-400"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
+        <svg class="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -161,14 +149,13 @@
 </template>
 
 <script setup lang="ts">
-import { AnimatePresence } from "motion-v";
-import MobileDashboard from "@/components/bento/mobile/MobileDashboard.vue";
 import {
   BentoCalendar,
   BentoCat,
   BentoClock,
   BentoGreeting,
   BentoLike,
+  BentoMap,
   BentoMemo,
   BentoNavCard,
   BentoNewPost,
@@ -177,22 +164,14 @@ import {
   BentoTech,
   BentoWebsites,
   TodoCard,
-  BentoMap,
 } from "@/components/bento";
+import MobileDashboard from "@/components/bento/mobile/MobileDashboard.vue";
 import ThemeToggle from "@/components/layout/ThemeToggle.vue";
 import carddelay from "@/data/carddelay.json";
-import { useDebounceFn, useMediaQuery } from "@vueuse/core";
-import {
-  computed,
-  nextTick,
-  onMounted,
-  onUnmounted,
-  ref,
-  watch,
-  type ComponentPublicInstance,
-} from "vue";
-import { useStorage } from "@vueuse/core";
 import { useDeviceStore } from "@/stores/device";
+import { useDebounceFn, useMediaQuery, useStorage } from "@vueuse/core";
+import { AnimatePresence } from "motion-v";
+import { computed, nextTick, onMounted, onUnmounted, ref, watch, type ComponentPublicInstance } from "vue";
 
 const backgroundImages = [
   "/background/bg-1.webp",
@@ -240,9 +219,7 @@ const viewportHeight = ref<number>(0);
 const showTodoCard = useStorage<boolean>("readinglist_show_todo_card", true);
 
 // 布局设计基准高度：使用视口高度，但不低于 820px，保证卡片间距不被压缩
-const layoutHeight = computed<number>(() =>
-  Math.max(viewportHeight.value, 820),
-);
+const layoutHeight = computed<number>(() => Math.max(viewportHeight.value, 820));
 
 // 容器高度：至少撑满布局高度（让绝对定位的卡片不被裁剪）
 const containerStyle = computed(() => ({
@@ -255,14 +232,10 @@ const halfWidth = computed<number>(() => {
 });
 
 // 左侧卡片公共偏移量（导航、备忘录、技术栈用，从屏幕中线向左偏移）
-const leftTotal = computed<number>(
-  () => halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224,
-);
+const leftTotal = computed<number>(() => halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224);
 
 // 右侧卡片公共偏移量（时钟、日历、网站、阅读列表用，从屏幕中线向右偏移）
-const rightTotal = computed<number>(
-  () => halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224,
-);
+const rightTotal = computed<number>(() => halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224);
 
 // 计算所有卡片的动态位置，包含 left 和 top，以 layoutHeight 为基准
 // layoutHeight = max(视口高度, 820px)，保证小屏时卡片不重叠
@@ -487,9 +460,7 @@ onMounted(async () => {
   });
 
   // Update dimensions after all cards have been rendered
-  const maxOrder = Math.max(
-    ...Object.values(carddelay).map((item) => item.order),
-  );
+  const maxOrder = Math.max(...Object.values(carddelay).map((item) => item.order));
   setTimeout(
     () => {
       updateDimensions();

@@ -286,22 +286,26 @@
           <!-- Pagination -->
           <nav
             v-if="pagination && pagination.pages > 1"
-            class="mt-6 flex justify-center"
+            class="mt-10"
+            aria-label="博客分页"
           >
-            <ul class="flex items-center gap-2">
+            <ul
+              class="mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border border-gray-200/80 bg-white/90 p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2 dark:border-gray-700/70 dark:bg-gray-900/80"
+            >
               <!-- Previous Button -->
               <li>
                 <button
                   :disabled="!pagination?.has_prev"
-                  class="rounded px-3 py-1 text-sm font-medium transition-colors"
+                  class="inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 focus-visible:outline-none dark:focus-visible:ring-offset-gray-900"
                   :class="
                     pagination?.has_prev
-                      ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
-                      : 'cursor-not-allowed bg-gray-200 text-gray-400 dark:bg-gray-800 dark:text-gray-600'
+                      ? 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-white'
+                      : 'cursor-not-allowed text-gray-400 dark:text-gray-600'
                   "
                   @click="goToPage(pagination!.prev_num!)"
                 >
-                  &laquo; 上一页
+                  <span aria-hidden="true">&laquo;</span>
+                  <span class="hidden sm:inline">上一页</span>
                 </button>
               </li>
 
@@ -309,7 +313,7 @@
               <!-- 显示第一页 -->
               <li v-if="pagination && pagination.page > 3">
                 <button
-                  class="min-w-10 rounded px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:border dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                  class="inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 focus-visible:outline-none dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white dark:focus-visible:ring-offset-gray-900"
                   @click="goToPage(1)"
                 >
                   1
@@ -318,17 +322,17 @@
 
               <!-- 省略号 -->
               <li v-if="pagination && pagination.page > 4">
-                <span class="px-1 text-gray-500 dark:text-gray-400">...</span>
+                <span class="px-1 text-sm text-gray-400 dark:text-gray-500">...</span>
               </li>
 
               <!-- 显示当前页附近的页码 -->
               <li v-for="pageNum in getVisiblePages" :key="pageNum">
                 <button
-                  class="min-w-10 rounded px-3 py-1 text-sm font-medium transition-colors"
+                  class="inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 focus-visible:outline-none dark:focus-visible:ring-offset-gray-900"
                   :class="
                     pageNum === pagination?.page
-                      ? 'bg-blue-600 text-white dark:bg-blue-500'
-                      : 'bg-white text-gray-700 hover:bg-gray-100 dark:border dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+                      ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25 dark:bg-blue-500 dark:shadow-blue-500/20'
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white'
                   "
                   @click="goToPage(pageNum)"
                 >
@@ -338,13 +342,13 @@
 
               <!-- 省略号 -->
               <li v-if="pagination && pagination.page < pagination.pages - 3">
-                <span class="px-1 text-gray-500 dark:text-gray-400">...</span>
+                <span class="px-1 text-sm text-gray-400 dark:text-gray-500">...</span>
               </li>
 
               <!-- 显示最后一页 -->
               <li v-if="pagination && pagination.page < pagination.pages - 2">
                 <button
-                  class="min-w-10 rounded px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:border dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                  class="inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 focus-visible:outline-none dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white dark:focus-visible:ring-offset-gray-900"
                   @click="goToPage(pagination.pages)"
                 >
                   {{ pagination.pages }}
@@ -355,15 +359,16 @@
               <li>
                 <button
                   :disabled="!pagination?.has_next"
-                  class="rounded px-3 py-1 text-sm font-medium transition-colors"
+                  class="inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 focus-visible:outline-none dark:focus-visible:ring-offset-gray-900"
                   :class="
                     pagination?.has_next
-                      ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
-                      : 'cursor-not-allowed bg-gray-200 text-gray-400 dark:bg-gray-800 dark:text-gray-600'
+                      ? 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-white'
+                      : 'cursor-not-allowed text-gray-400 dark:text-gray-600'
                   "
                   @click="goToPage(pagination!.next_num!)"
                 >
-                  下一页 &raquo;
+                  <span class="hidden sm:inline">下一页</span>
+                  <span aria-hidden="true">&raquo;</span>
                 </button>
               </li>
             </ul>
@@ -393,7 +398,7 @@ import { formatDate } from "@/utils/formatdate";
 import { useHead } from "@unhead/vue";
 import DOMPurify from "dompurify";
 import hljs from "highlight.js/lib/common";
-import { computed, nextTick, onMounted, ref, watch, watchEffect } from "vue";
+import { computed, nextTick, ref, watch, watchEffect } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
@@ -414,6 +419,15 @@ const user = ref({
 const activeCategory = ref<string | null>(null);
 
 const currentPage = ref(1);
+
+const parsePageFromQuery = (pageQuery: unknown): number => {
+  if (typeof pageQuery !== "string") {
+    return 1;
+  }
+
+  const parsedPage = Number.parseInt(pageQuery, 10);
+  return Number.isNaN(parsedPage) || parsedPage < 1 ? 1 : parsedPage;
+};
 
 // 获取可见页码范围
 const getVisiblePages = computed(() => {
@@ -503,34 +517,29 @@ const clearSearch = () => {
   handleSearch();
 };
 
-onMounted(() => {
-  // 如果 URL 中有 category 参数，由 CategorySidebar 处理筛选
-  if (!route.query.category) {
-    const pageParam = parseInt(route.query.page as string, 10);
-    fetchPosts(isNaN(pageParam) || pageParam < 1 ? 1 : pageParam);
-  }
-});
-
 watch(
-  () => route.query.page,
-  (newPage) => {
-    const pageNum = parseInt(newPage as string, 10);
-    if (!isNaN(pageNum) && pageNum !== currentPage.value) {
-      fetchPosts(pageNum);
-    }
-  },
-);
+  () => [
+    route.query.page,
+    route.query.search,
+    route.query.category,
+    route.params.categoryId,
+  ],
+  ([pageQuery, searchParam, categoryQuery, categoryParam]) => {
+    searchQuery.value = typeof searchParam === "string" ? searchParam : "";
 
-watch(
-  () => route.query.search,
-  (newSearch) => {
-    if (typeof newSearch === "string") {
-      searchQuery.value = newSearch;
-    } else {
-      searchQuery.value = "";
+    const hasCategoryQuery =
+      typeof categoryQuery === "string" && categoryQuery.length > 0;
+    const hasCategoryParam =
+      typeof categoryParam === "string" && categoryParam.length > 0;
+
+    if (hasCategoryQuery || hasCategoryParam) {
+      return;
     }
-    fetchPosts(1);
+
+    const pageNum = parsePageFromQuery(pageQuery);
+    fetchPosts(pageNum);
   },
+  { immediate: true },
 );
 
 watchEffect(async () => {
