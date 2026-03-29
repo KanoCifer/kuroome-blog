@@ -190,7 +190,7 @@ class MonitorService:
         online_count_raw = await redis.get("stats:online_count")
         online_count = int(online_count_raw) if online_count_raw else 0
 
-        online_user_ids_raw = await redis.zrange("online_users_z", 0, -1)
+        online_user_ids_raw = await redis.zrange("online:users", 0, -1)
         online_user_ids = [
             int(uid.decode() if isinstance(uid, bytes) else str(uid))
             for uid in online_user_ids_raw
@@ -280,13 +280,13 @@ class MonitorService:
         cutoff_time = now - cutoff_seconds
 
         removed_count = await redis.zremrangebyscore(
-            "online_users_z", 0, cutoff_time
+            "online:users", 0, cutoff_time
         )
-        online_count = await redis.zcard("online_users_z")
+        online_count = await redis.zcard("online:users")
 
         await redis.set("stats:online_count", str(online_count), ex=120)
 
-        online_user_ids = await redis.zrange("online_users_z", 0, -1)
+        online_user_ids = await redis.zrange("online:users", 0, -1)
         online_user_ids = [
             int(uid.decode() if isinstance(uid, bytes) else str(uid))
             for uid in online_user_ids

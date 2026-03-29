@@ -96,8 +96,8 @@
       >
         <!-- Polaroid Frame -->
         <div
-          class="group relative flex flex-col items-center rounded-sm bg-white p-3 shadow-xl ring-1 ring-black/5 transition-shadow hover:shadow-2xl dark:bg-gray-800 dark:ring-white/10"
-          :style="{ width: `${getImageSize(index) + 24}px` }"
+          class="group relative flex flex-col items-center rounded-sm bg-white p-2 shadow-xl ring-1 ring-black/5 transition-shadow hover:shadow-2xl sm:p-3 dark:bg-gray-800 dark:ring-white/10"
+          :style="{ width: `${getImageSize(index) + (isMobileDevice ? 16 : 24)}px` }"
         >
           <div
             class="relative w-full overflow-hidden rounded-sm bg-gray-100 dark:bg-gray-900"
@@ -573,6 +573,9 @@ const getImageStyle = (index: number) => {
 const getImageSize = (index: number) => {
   // Use index to consistently determine size for the same image
   const seed = (index * 137) % 100;
+  if (isMobileDevice.value) {
+    return 120 + (seed % 46);
+  }
   return 220 + seed;
 };
 

@@ -31,7 +31,7 @@ ok "Node.js $(node -v)"
 
 step "Pulling latest code"
 cd /home/kano/blog || exit 1
-git checkout .
+git checkout . || true
 git pull
 ok "Git pull completed"
 

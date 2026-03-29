@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+
 import httpx
 from taskiq import (
     Context,
@@ -57,6 +59,14 @@ def _create_feishu_message(
         )
 
 
+def _build_feishu_dedup_key(
+    message: str, msg_type: str, title: str | None
+) -> str:
+    source = f"{msg_type}|{title or ''}|{message}"
+    digest = hashlib.sha256(source.encode("utf-8")).hexdigest()
+    return f"feishu_message_lock:{digest}"
+
+
 @broker.task
 async def send_feishu_message(
     message: str,
@@ -70,28 +80,49 @@ async def send_feishu_message(
     :param title: 消息标题，仅 msg_type="post" 时生效
     :param context: Taskiq 上下文对象，自动注入
     """
+    message = message.strip()
     url: str = get_settings().FEISHU_WEBHOOK_URL
-    if not message or not url:
+
+    if not message:
+        logger.warning("飞书消息内容为空，跳过发送")
         return
 
-    # 使用去重守卫确保在 TTL 窗口内只发送一次消息
-    redis = context.state.redis
+    if not url:
+        logger.warning("未配置 FEISHU_WEBHOOK_URL，跳过发送飞书消息")
+        return
+
+    redis = getattr(context.state, "redis", None)
+    if redis is None:
+        logger.warning("Taskiq Redis 未初始化，跳过发送飞书消息")
+        return
+
+    dedup_key = _build_feishu_dedup_key(
+        message=message, msg_type=msg_type, title=title
+    )
 
     try:
-        async with dedup_guard(
-            redis=redis, key="feishu_message_lock", ttl=300
-        ):
+        async with dedup_guard(redis=redis, key=dedup_key, ttl=60):
             payload: FeishuMessageContent | FeishuRichTextContent = (
                 _create_feishu_message(
                     message=message, msg_type=msg_type, title=title
                 )
             )
             try:
-                async with httpx.AsyncClient() as client:
+                async with httpx.AsyncClient(
+                    timeout=httpx.Timeout(10.0)
+                ) as client:
                     response: httpx.Response = await client.post(
                         url=url, json=payload.model_dump()
                     )
                     response.raise_for_status()
+                    body = response.json() if response.content else {}
+                    if isinstance(body, dict):
+                        code = body.get("code", body.get("StatusCode"))
+                        if code not in (0, "0"):
+                            logger.error(
+                                "飞书 API 响应异常: %s",
+                                body,
+                            )
             except Exception as e:
                 logger.error(f"发送飞书消息失败: {e!r}")
     except Exception as e:

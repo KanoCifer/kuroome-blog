@@ -82,7 +82,7 @@ class UserService:
     async def logout(self, user: User, redis: AsyncRedis) -> None:
         """Mark user offline and remove from online tracking."""
         await self.repo.set_active(user, False)
-        await redis.zrem("online_users_z", str(user.id))
+        await redis.zrem("online:users", str(user.id))
         await redis.delete(f"online:{user.id}")
 
     async def record_heartbeat(self, user: User, redis: AsyncRedis) -> None:
@@ -93,7 +93,7 @@ class UserService:
         """
 
         now = int(time.time())
-        await redis.zadd("online_users_z", {str(user.id): now})
+        await redis.zadd("online:users", {str(user.id): now})
         await redis.set(f"online:{user.id}", str(now), ex=600)
 
     # ------------------------------------------------------------------ #

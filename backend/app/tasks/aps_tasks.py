@@ -1,5 +1,6 @@
 import json
 import time
+from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime, timedelta
 from itertools import repeat
 
@@ -15,6 +16,23 @@ from app.schemas import VisitorData
 from app.tasks.broker import broker
 from app.tasks.feishu_task import send_feishu_message
 from app.utils import get_redis_lock
+
+FeishuKiqCallable = Callable[..., Awaitable[object]]
+
+
+async def _enqueue_feishu_message(
+    *,
+    message: str,
+    msg_type: str = "text",
+    title: str | None = None,
+) -> None:
+    kiq_sender: FeishuKiqCallable | None = getattr(
+        send_feishu_message, "kiq", None
+    )
+    if kiq_sender is None:
+        logger.warning("send_feishu_message.kiq 不可用，跳过发送飞书消息")
+        return
+    await kiq_sender(message=message, msg_type=msg_type, title=title)
 
 
 @broker.task(
@@ -188,6 +206,10 @@ async def refresh_rss_feeds(context: Context = TaskiqDepends()):
     """Daily RSS refresh at 10:00 (Asia/Shanghai) for all users."""
     start_time = time.perf_counter()
     logger.info("[RSSRefreshJob] 🔄 Starting RSS feed refresh job")
+    settings = get_settings()
+
+    if not settings.FEISHU_WEBHOOK_URL:
+        logger.warning("⚠️ 未配置飞书webhook，RSS 刷新结果将不发送飞书通知")
 
     try:
         from app.core.container import get_rss_service
@@ -215,7 +237,7 @@ async def refresh_rss_feeds(context: Context = TaskiqDepends()):
             )
 
         try:
-            await send_feishu_message.kiq(
+            await _enqueue_feishu_message(
                 message=message, msg_type="post", title="✅Rss 刷新完成通知"
             )
         except Exception as e:
@@ -237,7 +259,7 @@ async def refresh_rss_feeds(context: Context = TaskiqDepends()):
             f"❌RSS 刷新失败！\n错误信息: {error_msg}\n耗时: {duration:.2f}秒"
         )
         try:
-            await send_feishu_message.kiq(
+            await _enqueue_feishu_message(
                 message=message, msg_type="post", title="❌Rss 刷新失败通知"
             )
         except Exception as feishu_e:
@@ -277,7 +299,12 @@ async def send_daily_summary(
     try:
         from app.core.container import get_monitor_service
 
-        async with get_monitor_service(context.state.redis) as monitor_service:
+        redis = getattr(context.state, "redis", None)
+        if redis is None:
+            logger.warning("Taskiq Redis 未初始化，跳过发送每日统计飞书消息")
+            return
+
+        async with get_monitor_service(redis) as monitor_service:
             stats = await monitor_service.get_daily_summary(yesterday)
 
         total_visits = stats["total_visits"]
@@ -349,14 +376,23 @@ async def send_daily_summary(
         message = "\n".join(lines)
 
         # 通过 send_feishu_message 发送
-        await send_feishu_message.kiq(
+        await _enqueue_feishu_message(
             message=message,
             msg_type="post",
             title=f"📊 每日访问统计 - {yesterday_str}",
         )
 
     except Exception as e:
-        logger.error(f"❌ 发送每日统计飞书消息失败: {e!s}")
+        error_msg = str(e)
+        logger.error(f"❌ 发送每日统计飞书消息失败: {error_msg}")
+        try:
+            await _enqueue_feishu_message(
+                message=f"❌每日访问统计发送失败！\n错误信息: {error_msg}",
+                msg_type="post",
+                title="❌每日访问统计失败通知",
+            )
+        except Exception as feishu_e:
+            logger.error(f"发送每日统计失败通知消息失败: {feishu_e!r}")
         raise
 
 
@@ -371,7 +407,17 @@ async def send_daily_summary(
 )
 async def send_todo(context: Context = TaskiqDepends()):
     """每天早上9点发送待办事项提醒给用户"""
-    todos = await context.state.redis.get("todos:1")
+    settings = get_settings()
+    if not settings.FEISHU_WEBHOOK_URL:
+        logger.warning("⚠️ 未配置飞书webhook，跳过发送待办提醒飞书消息")
+        return
+
+    redis = getattr(context.state, "redis", None)
+    if redis is None:
+        logger.warning("Taskiq Redis 未初始化，跳过发送待办提醒飞书消息")
+        return
+
+    todos = await redis.get("todos:1")
 
     uncompleted = (
         [
@@ -383,7 +429,7 @@ async def send_todo(context: Context = TaskiqDepends()):
         else []
     )
     if uncompleted:
-        await send_feishu_message.kiq(
+        await _enqueue_feishu_message(
             message=f"您有 {len(uncompleted)} 个待办事项未完成，请及时处理！\n"
             + "\n".join(
                 [
