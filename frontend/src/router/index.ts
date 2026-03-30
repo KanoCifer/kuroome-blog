@@ -14,6 +14,27 @@ const history = import.meta.env.SSR
 
 const router = createRouter({
   history,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    }
+
+    if (to.hash) {
+      return {
+        el: to.hash,
+        behavior: "smooth",
+      };
+    }
+
+    if (to.path !== from.path) {
+      return {
+        left: 0,
+        top: 0,
+      };
+    }
+
+    return false;
+  },
   routes: [
     {
       path: "/home",
@@ -28,7 +49,7 @@ const router = createRouter({
     {
       path: "/",
       name: "entry",
-      component: () => import("@/views/general/EntryView.vue"),
+      component: () => import("@/views/entry/EntryView.vue"),
       meta: {
         title: "Entry - Kuroome's Blog",
         description: "欢迎来到 Kuroome's Blog，探索个人阅读清单和博客文章",
@@ -189,7 +210,7 @@ const router = createRouter({
     {
       path: "/analytics",
       name: "analytics",
-      component: () => import("@/views/general/AnalyticsView.vue"),
+      component: () => import("@/views/analyse/AnalyticsView.vue"),
       meta: {
         requiresAuth: true,
         title: "网站数据分析",
@@ -212,27 +233,31 @@ const router = createRouter({
       name: "rss",
       component: () => import("@/views/rss/RssSubscriptionsView.vue"),
       meta: {
-        title: "我的订阅 - Kuroome's Blog",
+        title: "RSS 工作台 - Kuroome's Blog",
         requiresAuth: true,
       },
     },
     {
       path: "/rss/parse",
       name: "rss-parse",
-      component: () => import("@/views/rss/RSSParseView.vue"),
+      redirect: () => ({
+        name: "rss",
+        hash: "#rss-parse",
+      }),
       meta: {
-        title: "RSS 订阅 - Kuroome's Blog",
-        description: "订阅 Kuroome's Blog 的 RSS 频道，第一时间获取最新文章更新",
-        keywords: "RSS订阅,博客更新,文章订阅",
+        title: "RSS 工作台 - Kuroome's Blog",
       },
     },
     {
       path: "/rss/articles",
       name: "rss-articles",
-      component: () => import("@/views/rss/RssArticlesView.vue"),
+      redirect: (to) => ({
+        name: "rss",
+        query: to.query,
+        hash: "#rss-articles",
+      }),
       meta: {
-        title: "RSS 文章 - Kuroome's Blog",
-        requiresAuth: true,
+        title: "RSS 工作台 - Kuroome's Blog",
       },
     },
     {

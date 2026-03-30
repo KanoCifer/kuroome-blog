@@ -3,18 +3,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from "vue";
-import AMapLoader from "@amap/amap-jsapi-loader";
-import request from "@/request";
+import request from "@/api/request";
 import type {
-  AMapMapInstance,
-  AMapMarkerInstance,
-  AMapSecurityConfig,
-  AMapNamespace,
-  AMapMarker,
   AMapDriving,
+  AMapMapInstance,
+  AMapMarker,
+  AMapMarkerInstance,
+  AMapNamespace,
   AMapPolyline,
+  AMapSecurityConfig,
 } from "@/types/maptype";
+import AMapLoader from "@amap/amap-jsapi-loader";
+import { onMounted, onUnmounted, ref, watch } from "vue";
 
 export interface Props {
   center?: [number, number];
@@ -31,12 +31,7 @@ const props = withDefaults(defineProps<Props>(), {
   center: () => [113.389549, 23.050067],
   zoom: 11,
   viewMode: "2D",
-  plugins: () => [
-    "AMap.Scale",
-    "AMap.ToolBar",
-    "AMap.Geolocation",
-    "AMap.Driving",
-  ],
+  plugins: () => ["AMap.Scale", "AMap.ToolBar", "AMap.Geolocation", "AMap.Driving"],
   markers: () => [],
   showToolBar: true,
   showScale: true,
@@ -219,10 +214,7 @@ watch(
 );
 
 // 规划路线
-const planRoute = (
-  start: [number, number],
-  end: [number, number],
-): Promise<{ distance: number; time: number }> => {
+const planRoute = (start: [number, number], end: [number, number]): Promise<{ distance: number; time: number }> => {
   return new Promise((resolve, reject) => {
     if (!map) {
       reject(new Error("地图未初始化"));

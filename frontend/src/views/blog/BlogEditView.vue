@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import request from "@/api/request";
 import BasicDetail from "@/components/basic/BasicDetail.vue";
 import TiptapEditor from "@/components/editor/TiptapEditor.vue";
 import IconDel from "@/components/icons/IconDel.vue";
@@ -14,7 +15,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import request from "@/request";
 import { useNotificationStore } from "@/stores/notification";
 import type { ApiResponse, Category, Post } from "@/types";
 import { computed, onMounted, ref, watch } from "vue";
@@ -96,9 +96,7 @@ const handleDraftMouseLeave = () => {
 // 计算当前选中的分类名称
 const currentCategory = computed(() => {
   if (!category.value) return "";
-  const selectedCategory = categories.value.find(
-    (cat) => String(cat.id) === category.value,
-  );
+  const selectedCategory = categories.value.find((cat) => String(cat.id) === category.value);
   return selectedCategory ? selectedCategory.name : "";
 });
 
@@ -136,10 +134,7 @@ onMounted(async () => {
 
 const fetchCategories = async () => {
   try {
-    const res =
-      await request.get<ApiResponse<{ categories: Category[] } | Category[]>>(
-        "/categories",
-      );
+    const res = await request.get<ApiResponse<{ categories: Category[] } | Category[]>>("/categories");
     if (res.data.status === "success") {
       // 兼容新旧两种 API 格式
       const data = res.data.data;
@@ -224,20 +219,14 @@ const handleSubmit = async () => {
 
     if (isEdit.value && postId.value) {
       const updatePayload = { ...payload, _id: postId.value };
-      const res = await request.put<ApiResponse<{ _id: string }>>(
-        "/admin/post/update",
-        updatePayload,
-      );
+      const res = await request.put<ApiResponse<{ _id: string }>>("/admin/post/update", updatePayload);
       if (res.data.status === "success") {
         notification.success("文章更新成功");
       } else {
         throw new Error(res.data.message);
       }
     } else {
-      const res = await request.post<ApiResponse<{ _id: string }>>(
-        "/admin/post/add",
-        payload,
-      );
+      const res = await request.post<ApiResponse<{ _id: string }>>("/admin/post/add", payload);
       if (res.data.status === "success") {
         notification.success("文章创建成功");
       } else {
@@ -284,10 +273,7 @@ const handleCategoryMouseLeave = () => {
   >
     <div class="col-span-full mx-auto w-full max-w-4xl">
       <!-- Error Message -->
-      <div
-        v-if="error"
-        class="mb-6 rounded-lg bg-red-50 p-4 text-red-800 dark:bg-red-900/20 dark:text-red-200"
-      >
+      <div v-if="error" class="mb-6 rounded-lg bg-red-50 p-4 text-red-800 dark:bg-red-900/20 dark:text-red-200">
         <div class="flex items-center">
           <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
             <path
@@ -302,19 +288,12 @@ const handleCategoryMouseLeave = () => {
 
       <!-- Loading State -->
       <div v-if="loading && isEdit" class="py-12 text-center">
-        <div
-          class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"
-        ></div>
+        <div class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"></div>
         <p class="mt-2 text-gray-600 dark:text-gray-400">Loading post...</p>
       </div>
 
       <!-- Form -->
-      <form
-        v-else
-        @submit.prevent="handleSubmit"
-        ref="formRef"
-        class="space-y-6"
-      >
+      <form v-else @submit.prevent="handleSubmit" ref="formRef" class="space-y-6">
         <!-- Title, Category, and Pin -->
         <div class="space-y-4">
           <!-- Title -->
@@ -349,10 +328,7 @@ const handleCategoryMouseLeave = () => {
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
                 fill="currentColor"
-                :class="[
-                  'h-4 w-4 transition-transform duration-200',
-                  pin ? 'rotate-0' : 'rotate-45',
-                ]"
+                :class="['h-4 w-4 transition-transform duration-200', pin ? 'rotate-0' : 'rotate-45']"
               >
                 <path
                   d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 4.5a.75.75 0 001.09 0l4.25-4.5a.75.75 0 00-1.09-1.03l-2.955 3.129V2.75z"
@@ -386,10 +362,7 @@ const handleCategoryMouseLeave = () => {
                       clip-rule="evenodd"
                     />
                   </svg>
-                  <span
-                    class="mr-2 text-sm font-medium text-gray-500 dark:text-gray-400"
-                    >分类</span
-                  >
+                  <span class="mr-2 text-sm font-medium text-gray-500 dark:text-gray-400">分类</span>
                   <span class="text-sm font-medium">
                     {{ currentCategory || "请选择分类..." }}
                   </span>
@@ -464,12 +437,7 @@ const handleCategoryMouseLeave = () => {
                 @click="draftMenuOpen = !draftMenuOpen"
                 class="flex items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-600 shadow-sm transition-all duration-200 hover:border-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-500 dark:hover:bg-gray-700"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  class="h-4 w-4"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
                   <path
                     fill-rule="evenodd"
                     d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z"
@@ -505,10 +473,7 @@ const handleCategoryMouseLeave = () => {
                   v-show="draftMenuOpen"
                   class="absolute top-full right-0 z-50 mt-1 max-h-64 w-64 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
                 >
-                  <div
-                    v-if="draftList.length === 0"
-                    class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"
-                  >
+                  <div v-if="draftList.length === 0" class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
                     暂无草稿
                   </div>
                   <div v-else class="py-1">
@@ -522,43 +487,26 @@ const handleCategoryMouseLeave = () => {
                           : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700',
                       ]"
                     >
-                      <span
-                        class="flex-1 cursor-pointer truncate"
-                        @click="handleSwitchDraft(draft.key, draft.title)"
-                      >
+                      <span class="flex-1 cursor-pointer truncate" @click="handleSwitchDraft(draft.key, draft.title)">
                         {{ draft.title }}
-                        <span
-                          v-if="!draft.hasContent"
-                          class="ml-1 text-xs text-gray-400"
-                          >(空)</span
-                        >
+                        <span v-if="!draft.hasContent" class="ml-1 text-xs text-gray-400">(空)</span>
                       </span>
                       <AlertDialog>
                         <AlertDialogTrigger>
-                          <button
-                            type="button"
-                            class="ml-2 p-1 text-gray-400 hover:text-red-500"
-                            title="删除草稿"
-                          >
+                          <button type="button" class="ml-2 p-1 text-gray-400 hover:text-red-500" title="删除草稿">
                             <IconDel />
                           </button>
                         </AlertDialogTrigger>
                         <AlertDialogContent class="rounded-3xl">
                           <AlertDialogHeader>
-                            <AlertDialogTitle
-                              >你确定要删除此草稿吗？</AlertDialogTitle
-                            >
-                            <AlertDialogDescription>
-                              这将永久删除草稿，并且无法恢复。
-                            </AlertDialogDescription>
+                            <AlertDialogTitle>你确定要删除此草稿吗？</AlertDialogTitle>
+                            <AlertDialogDescription> 这将永久删除草稿，并且无法恢复。 </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>取消</AlertDialogCancel>
                             <AlertDialogAction
                               class="bg-red-500/70 hover:bg-red-500"
-                              @click.stop="
-                                handleDeleteDraft(draft.key, draft.title)
-                              "
+                              @click.stop="handleDeleteDraft(draft.key, draft.title)"
                             >
                               确定</AlertDialogAction
                             >
@@ -575,11 +523,7 @@ const handleCategoryMouseLeave = () => {
 
         <!-- Tiptap Editor -->
         <div>
-          <TiptapEditor
-            ref="editorRef"
-            v-model="body"
-            v-model:storageKey="debouncedTitle"
-          />
+          <TiptapEditor ref="editorRef" v-model="body" v-model:storageKey="debouncedTitle" />
         </div>
 
         <!-- Action Buttons -->
@@ -603,27 +547,14 @@ const handleCategoryMouseLeave = () => {
               fill="none"
               viewBox="0 0 24 24"
             >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path
                 class="opacity-75"
                 fill="currentColor"
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               ></path>
             </svg>
-            <svg
-              v-else
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              class="mr-2 h-4 w-4"
-            >
+            <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="mr-2 h-4 w-4">
               <path
                 fill-rule="evenodd"
                 d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"

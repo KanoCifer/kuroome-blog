@@ -220,7 +220,7 @@ onUnmounted(() => {
           leave-from-class="scale-100 opacity-100"
           leave-to-class="scale-95 opacity-0"
         >
-          <component :is="Component" :key="$route.fullPath" />
+          <component :is="Component" :key="$route.path" />
         </transition>
         <!-- 路由出口 -->
       </RouterView>

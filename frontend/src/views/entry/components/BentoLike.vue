@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import request from "@/request";
+import request from "@/api/request";
 import { useNotificationStore } from "@/stores/notification";
 import { AxiosError } from "axios";
 import type { AnimationItem } from "lottie-web";

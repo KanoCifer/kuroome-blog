@@ -21,10 +21,7 @@ const notifier = useNotificationStore();
 
 const handleReply = async (commentId: string, body: string) => {
   try {
-    const findComment = (
-      commentsList: Comment[],
-      id: string,
-    ): Comment | undefined => {
+    const findComment = (commentsList: Comment[], id: string): Comment | undefined => {
       for (const comment of commentsList) {
         if (comment._id === id) {
           return comment;
@@ -46,7 +43,7 @@ const handleReply = async (commentId: string, body: string) => {
       return;
     }
 
-    const { default: request } = await import("@/request");
+    const { default: request } = await import("@/api/request");
 
     const res = await request.post("/comments", {
       post_id: props.postId,
@@ -56,11 +53,7 @@ const handleReply = async (commentId: string, body: string) => {
       author: auth.isAuthenticated && auth.user ? auth.user.username : "",
     });
 
-    if (
-      res.data.status === "success" ||
-      res.status === 200 ||
-      res.status === 201
-    ) {
+    if (res.data.status === "success" || res.status === 200 || res.status === 201) {
       notifier.success("评论已提交，待审核后显示");
       emit("refresh");
     } else {
@@ -68,8 +61,7 @@ const handleReply = async (commentId: string, body: string) => {
     }
   } catch (err) {
     console.error("提交回复失败:", err);
-    const errorMsg =
-      err instanceof Error ? err.message : "提交评论失败，请稍后重试";
+    const errorMsg = err instanceof Error ? err.message : "提交评论失败，请稍后重试";
     notifier.error(errorMsg);
   }
 };
@@ -77,9 +69,7 @@ const handleReply = async (commentId: string, body: string) => {
 
 <template>
   <div id="comments" class="border-t border-blue-100 p-8 dark:border-slate-700">
-    <div
-      class="mb-8 flex items-center gap-4 border-b border-gray-100 pb-6 dark:border-gray-700"
-    >
+    <div class="mb-8 flex items-center gap-4 border-b border-gray-100 pb-6 dark:border-gray-700">
       <h3 class="text-2xl font-bold text-gray-900 dark:text-white">评论</h3>
       <span
         v-if="comments && comments.length > 0"
@@ -106,12 +96,7 @@ const handleReply = async (commentId: string, body: string) => {
       <div
         class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-gray-100 dark:bg-gray-800 dark:ring-gray-700"
       >
-        <svg
-          class="h-8 w-8 text-gray-400 dark:text-gray-500"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg class="h-8 w-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -120,12 +105,8 @@ const handleReply = async (commentId: string, body: string) => {
           />
         </svg>
       </div>
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-        暂无评论
-      </h3>
-      <p class="mx-auto mt-2 max-w-sm text-sm text-gray-500 dark:text-gray-400">
-        成为第一个评论的人吧！
-      </p>
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">暂无评论</h3>
+      <p class="mx-auto mt-2 max-w-sm text-sm text-gray-500 dark:text-gray-400">成为第一个评论的人吧！</p>
     </div>
 
     <CommentForm :post-id="postId" />

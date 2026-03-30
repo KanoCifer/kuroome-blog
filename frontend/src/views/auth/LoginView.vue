@@ -1,17 +1,15 @@
 <script setup lang="ts">
-import request from "@/request";
+import IconCloud from "@/components/icons/IconCloud.vue";
+import IconKey from "@/components/icons/IconKey.vue";
+import IconLock from "@/components/icons/IconLock.vue";
+import IconUser from "@/components/icons/IconUser.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useDeviceStore } from "@/stores/device";
-import { useNotificationStore } from "@/stores/notification";
 import type { LoginForm } from "@/types";
 import { startAuthentication } from "@simplewebauthn/browser";
 import { ref } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 import MobileLogin from "./MobileLogin.vue";
-import IconKey from "@/components/icons/IconKey.vue";
-import IconCloud from "@/components/icons/IconCloud.vue";
-import IconUser from "@/components/icons/IconUser.vue";
-import IconLock from "@/components/icons/IconLock.vue";
 const router = useRouter();
 const route = useRoute();
 const auth = useAuthStore();
@@ -39,11 +37,7 @@ const handleSubmit = async () => {
   isSubmitting.value = true;
 
   try {
-    await auth.login(
-      form.value.username,
-      form.value.password,
-      form.value.rememberMe,
-    );
+    await auth.login(form.value.username, form.value.password, form.value.rememberMe);
     const redirect = (route.query.redirect as string) || "/";
     router.push(redirect);
   } catch (err: unknown) {
@@ -64,25 +58,13 @@ const handlePasskeyLogin = async () => {
 
   try {
     // 获取认证选项
-    const optionsRes = await request.get(
-      "/auth/passkey/authentication-options",
-    );
-    const options = optionsRes.data.data;
+    const options = await auth.getPasskeyAuthenticationOptions();
 
     // 调用浏览器 Passkey 认证
-    const assertion = await startAuthentication(options);
-
-    // 提交认证结果
-    const res = await request.post("/auth/passkey/authenticate", {
-      response: assertion,
+    const assertion = await startAuthentication({
+      optionsJSON: options,
     });
-
-    // 登录成功，更新用户信息
-    const notification = useNotificationStore();
-    auth.saveRefreshToken(res.data.data.refresh_token);
-
-    notification.success("Passkey 登录成功！欢迎回来！");
-    await auth.fetchUser();
+    await auth.loginWithPasskey(assertion);
     const redirect = (route.query.redirect as string) || "/";
     router.push(redirect);
   } catch (err: unknown) {
@@ -106,9 +88,7 @@ const handleGitHubLogin = () => {
     <MobileLogin v-if="device.isMobile" />
     <div v-else class="flex h-screen items-center">
       <!-- 标题卡片 -->
-      <div
-        class="squircle mx-auto max-w-md bg-blue-50/50 px-12 py-14 shadow-2xl dark:bg-gray-800/50"
-      >
+      <div class="squircle mx-auto max-w-md bg-blue-50/50 px-12 py-14 shadow-2xl dark:bg-gray-800/50">
         <!-- Hero Section -->
         <div class="mb-8 flex flex-col items-center justify-center">
           <div
@@ -119,13 +99,9 @@ const handleGitHubLogin = () => {
           <h2
             class="font-headline text-center text-[28px] font-extrabold tracking-tight text-[#111827] dark:text-white"
           >
-            Kanocifer<span class="text-[#2563eb] dark:text-blue-400"
-              >.chat</span
-            >
+            Kanocifer<span class="text-[#2563eb] dark:text-blue-400">.chat</span>
           </h2>
-          <p
-            class="mt-1 text-center text-[15px] font-medium text-[#4b5563] dark:text-gray-400"
-          >
+          <p class="mt-1 text-center text-[15px] font-medium text-[#4b5563] dark:text-gray-400">
             Welcome back to the reading space.
           </p>
         </div>
@@ -133,9 +109,7 @@ const handleGitHubLogin = () => {
         <form @submit.prevent="handleSubmit">
           <!-- 用户名 -->
           <div class="form-group relative">
-            <div
-              class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]"
-            >
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
               <IconUser class="size-6 dark:text-white" />
             </div>
             <input
@@ -145,20 +119,14 @@ const handleGitHubLogin = () => {
               placeholder="用户名"
               class="form-control my-4 w-full rounded-xl border border-gray-300 bg-gray-100/50 py-2 pr-4 pl-11 text-gray-900 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
             />
-            <span
-              v-if="errors.username"
-              class="mt-1 block text-sm text-red-600 dark:text-red-400"
-              >{{ errors.username }}</span
-            >
+            <span v-if="errors.username" class="mt-1 block text-sm text-red-600 dark:text-red-400">{{
+              errors.username
+            }}</span>
           </div>
 
           <!-- 密码 -->
-          <div
-            class="relative mt-4 transition-transform duration-200 focus-within:scale-[1.01]"
-          >
-            <div
-              class="pointer-events-none absolute top-2.5 left-0 flex items-center pl-4 text-[#9ca3af]"
-            >
+          <div class="relative mt-4 transition-transform duration-200 focus-within:scale-[1.01]">
+            <div class="pointer-events-none absolute top-2.5 left-0 flex items-center pl-4 text-[#9ca3af]">
               <IconLock class="size-6 dark:text-white" />
             </div>
             <input
@@ -210,11 +178,9 @@ const handleGitHubLogin = () => {
               </svg>
             </button>
 
-            <span
-              v-if="errors.password"
-              class="mt-1 block text-sm text-red-600 dark:text-red-400"
-              >{{ errors.password }}</span
-            >
+            <span v-if="errors.password" class="mt-1 block text-sm text-red-600 dark:text-red-400">{{
+              errors.password
+            }}</span>
           </div>
 
           <!-- 提交按钮和记住我 -->
@@ -229,11 +195,7 @@ const handleGitHubLogin = () => {
 
             <!-- Remember Me Checkbox -->
             <label class="group relative flex cursor-pointer">
-              <input
-                v-model="form.rememberMe"
-                type="checkbox"
-                class="peer sr-only"
-              />
+              <input v-model="form.rememberMe" type="checkbox" class="peer sr-only" />
               <div
                 class="rounded-xl border-2 border-gray-100 bg-white px-3 py-2 shadow-sm transition-all duration-200 select-none group-active:scale-95 peer-checked:border-blue-500 peer-checked:bg-blue-50/50 peer-checked:shadow-blue-100/50 hover:border-blue-200 dark:border-gray-600 dark:bg-gray-700 dark:peer-checked:border-blue-500 dark:peer-checked:bg-blue-500/10 dark:peer-checked:shadow-none dark:hover:border-blue-500/50"
               >
@@ -255,21 +217,13 @@ const handleGitHubLogin = () => {
               class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-green-600 px-8 py-2.5 font-bold text-white shadow-lg shadow-green-500/30 transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-800"
             >
               <IconKey />
-              <span
-                v-if="isPasskeySubmitting"
-                class="flex items-center justify-center gap-2"
-              >
-                <span
-                  class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
-                ></span>
+              <span v-if="isPasskeySubmitting" class="flex items-center justify-center gap-2">
+                <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
                 Logging in with Passkey...
               </span>
               <span v-else>Login with Passkey</span>
             </button>
-            <span
-              v-if="errors.passkey"
-              class="mt-1 block text-center text-sm text-red-600 dark:text-red-400"
-            >
+            <span v-if="errors.passkey" class="mt-1 block text-center text-sm text-red-600 dark:text-red-400">
               {{ errors.passkey }}
             </span>
           </div>
@@ -290,16 +244,11 @@ const handleGitHubLogin = () => {
             </button>
           </div>
 
-          <p class="mt-8 text-center font-serif text-gray-400">
-            Kuroome's Blog
-          </p>
+          <p class="mt-8 text-center font-serif text-gray-400">Kuroome's Blog</p>
           <!-- 注册链接 -->
           <div class="mb-4 text-center text-gray-400 dark:text-gray-300">
             Don't have an account?
-            <RouterLink
-              to="/register"
-              class="underline transition duration-100 hover:text-blue-500"
-            >
+            <RouterLink to="/register" class="underline transition duration-100 hover:text-blue-500">
               Register here.
             </RouterLink>
           </div>

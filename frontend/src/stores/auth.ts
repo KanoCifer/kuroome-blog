@@ -1,26 +1,12 @@
-import request, { fetchAndStoreCSRF } from "@/request";
-import router from "@/router";
-import { useNotificationStore } from "@/stores/notification";
-import { useStorage } from "@vueuse/core";
+import { createAuthGateway } from "@/auth/authGateway";
+import { createHeartbeat } from "@/auth/heartbeat";
+import { getAuthSideEffects } from "@/auth/sideEffects";
+import { tokenService } from "@/auth/tokenService";
+import type { UserInfo } from "@/auth/types";
+import { userCache } from "@/auth/userCache";
 import { isAxiosError } from "axios";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-// 用户信息类型定义
-export interface UserInfo {
-  id: number;
-  username: string;
-  is_admin: boolean;
-  name?: string;
-  email?: string;
-  photo?: string;
-  gender?: string | null;
-  mobile?: string | null;
-  has_passkey?: boolean;
-  github_bound?: boolean;
-}
-
-// sessionStorage key
-const USER_INFO_KEY = "cached_user_info";
 
 // 定义认证状态管理
 export const useAuthStore = defineStore("auth", () => {
@@ -28,92 +14,55 @@ export const useAuthStore = defineStore("auth", () => {
   const user = ref<UserInfo | null>(null);
   const loading = ref(false);
   const isHydrated = ref(false); // 是否初始化过
-  const refreshToken = useStorage("refresh_token", "");
-  let heartbeatTimer: number | null = null; // 心跳定时器
-
-  const notifier = useNotificationStore(); // 通知提示
+  const authGateway = createAuthGateway();
+  const sideEffects = getAuthSideEffects();
 
   const isAuthenticated = computed(() => !!user.value);
   const isAdmin = computed(() => !!user.value?.is_admin);
 
+  const heartbeat = createHeartbeat({
+    isAuthenticated: () => !!user.value,
+    postHeartbeat: () => authGateway.postHeartbeat(),
+    onError: (error: unknown) => {
+      console.error("心跳上报失败:", error);
+    },
+  });
+
   // ---------------------- 辅助方法 ----------------------
 
-  // 从 sessionStorage 读取缓存的用户信息
-  function getCachedUser(): UserInfo | null {
-    try {
-      const cached = sessionStorage.getItem(USER_INFO_KEY);
-      return cached ? JSON.parse(cached) : null;
-    } catch {
-      return null;
-    }
-  }
-
-  // 缓存用户信息到 sessionStorage
-  function cacheUser(userInfo: UserInfo | null): void {
-    if (userInfo) {
-      sessionStorage.setItem(USER_INFO_KEY, JSON.stringify(userInfo));
-    } else {
-      sessionStorage.removeItem(USER_INFO_KEY);
-    }
-  }
-
   const saveRefreshToken = (token: string) => {
-    refreshToken.value = token;
+    tokenService.save(token);
   };
-
-  function getRefreshToken() {
-    return refreshToken.value;
-  }
 
   // 启动心跳上报
   function startHeartbeat() {
-    // 先停止已有定时器
-    stopHeartbeat();
-
-    // 每60秒上报一次心跳
-    heartbeatTimer = window.setInterval(async () => {
-      if (user.value) {
-        try {
-          await request.post("/auth/heartbeat");
-        } catch (err) {
-          console.error("心跳上报失败:", err);
-        }
-      } else {
-        stopHeartbeat();
-      }
-    }, 60000);
+    heartbeat.start();
   }
 
   // 停止心跳上报
   function stopHeartbeat() {
-    if (heartbeatTimer) {
-      clearInterval(heartbeatTimer);
-      heartbeatTimer = null;
-    }
+    heartbeat.stop();
   }
 
   // ---------------------- 方法（Actions） ----------------------
 
   // 2. 获取当前登录用户信息
-  async function fetchUser(
-    options: { silentOnUnauthenticated?: boolean } = {},
-  ) {
+  async function fetchUser(options: { silentOnUnauthenticated?: boolean } = {}) {
     loading.value = true;
     try {
-      const res = await request.get("/auth/me");
-      const userData = res.data.data || null;
+      const userData = await authGateway.fetchUser();
       user.value = userData;
-      cacheUser(userData); // 缓存到 sessionStorage
+      userCache.set(userData); // 缓存到 sessionStorage
       // 启动心跳上报
       startHeartbeat();
     } catch (err) {
       const status = isAxiosError(err) ? err.response?.status : undefined;
       const isUnauthenticated = status === 401;
       if (!(options.silentOnUnauthenticated && isUnauthenticated)) {
-        notifier.error("登陆过期，请重新登录！");
+        sideEffects.notifyError("登陆过期，请重新登录！");
       }
       user.value = null;
-      cacheUser(null);
+      userCache.clear();
     } finally {
       loading.value = false;
     }
@@ -124,7 +73,7 @@ export const useAuthStore = defineStore("auth", () => {
 
     try {
       // 1. 先尝试从缓存读取
-      const cachedUser = getCachedUser();
+      const cachedUser = userCache.get();
       if (cachedUser) {
         user.value = cachedUser;
         isHydrated.value = true;
@@ -137,43 +86,63 @@ export const useAuthStore = defineStore("auth", () => {
       await fetchUser({ silentOnUnauthenticated: true });
       isHydrated.value = true;
     } catch {
-      notifier.error("认证初始化失败");
+      sideEffects.notifyError("认证初始化失败");
       user.value = null;
-      cacheUser(null);
+      userCache.clear();
       isHydrated.value = true;
     }
   }
 
   async function initCSRF() {
-    await fetchAndStoreCSRF();
+    await authGateway.initCSRF();
+  }
+
+  async function getPasskeyAuthenticationOptions() {
+    return authGateway.getPasskeyAuthenticationOptions();
   }
 
   // 4. 登录
   async function login(username: string, password: string, rememberMe = false) {
     loading.value = true;
     try {
-      const res = await request.post("/auth/login", {
-        username: username,
-        password: password,
-        remember_me: rememberMe,
-      });
+      const res = await authGateway.login(username, password, rememberMe);
       // 登录成功后获取 CSRF Token
-      initCSRF();
+      await initCSRF();
       // 登录响应中已包含用户信息，直接使用并缓存
-      const userData = res.data.data || null;
+      const userData = res.user;
       user.value = userData;
-      cacheUser(userData);
+      userCache.set(userData);
 
-      saveRefreshToken(res.data.data.refresh_token);
+      saveRefreshToken(res.refreshToken);
 
       // 启动心跳上报
       startHeartbeat();
 
-      notifier.success("登录成功");
-      router.back();
-      return res.data;
-    } catch {
-      notifier.error("登录失败");
+      sideEffects.notifySuccess("登录成功");
+      return res.raw;
+    } catch (error) {
+      sideEffects.notifyError("登录失败");
+      throw error;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function loginWithPasskey(assertion: unknown) {
+    loading.value = true;
+
+    try {
+      const res = await authGateway.loginWithPasskey(assertion);
+
+      await initCSRF();
+      saveRefreshToken(res.refreshToken);
+      await fetchUser();
+
+      sideEffects.notifySuccess("Passkey 登录成功！欢迎回来！");
+      return res.raw;
+    } catch (error) {
+      sideEffects.notifyError("Passkey 登录失败");
+      throw error;
     } finally {
       loading.value = false;
     }
@@ -183,21 +152,27 @@ export const useAuthStore = defineStore("auth", () => {
   async function logout() {
     loading.value = true;
     try {
-      await request.post("/auth/logout"); // 调用后端登出接口
+      await authGateway.logout(); // 调用后端登出接口
     } catch {
       // console.error("登出失败:", err);
-      notifier.error("登出失败");
+      sideEffects.notifyError("登出失败");
     } finally {
       user.value = null;
-      cacheUser(null);
+      userCache.clear();
 
       // 停止心跳上报
       stopHeartbeat();
 
       // 清除刷新令牌
       saveRefreshToken("");
-      router.push("/"); // 跳转到首页
-      notifier.success("已退出登录");
+
+      try {
+        await sideEffects.navigateToHome();
+      } catch (error) {
+        console.error("跳转首页失败:", error);
+      }
+
+      sideEffects.notifySuccess("已退出登录");
       loading.value = false;
     }
   }
@@ -216,12 +191,10 @@ export const useAuthStore = defineStore("auth", () => {
     isHydrated,
     fetchUser,
     hydrateAuth,
+    getPasskeyAuthenticationOptions,
     login,
+    loginWithPasskey,
     logout,
     refreshUser,
-    getRefreshToken,
-    saveRefreshToken,
-    startHeartbeat,
-    stopHeartbeat,
   };
 });

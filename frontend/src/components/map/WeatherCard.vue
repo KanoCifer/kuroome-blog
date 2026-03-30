@@ -14,11 +14,7 @@
     <!-- Header -->
     <div class="relative z-10 mb-4 flex items-start justify-between">
       <div>
-        <h3
-          class="text-lg font-bold tracking-tight text-gray-900 dark:text-white"
-        >
-          实时天气
-        </h3>
+        <h3 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">实时天气</h3>
         <p class="mt-1 text-gray-500 dark:text-gray-400">
           {{ liveWeather?.city || "钓鱼地点" }}
         </p>
@@ -48,25 +44,17 @@
     </div>
 
     <!-- Loading State -->
-    <div
-      v-if="isLoading"
-      class="relative z-10 flex flex-1 flex-col items-center justify-center"
-    >
+    <div v-if="isLoading" class="relative z-10 flex flex-1 flex-col items-center justify-center">
       <div class="relative">
         <div
           class="h-12 w-12 animate-spin rounded-full border-4 border-sky-100 border-t-sky-500 dark:border-gray-700 dark:border-t-sky-400"
         ></div>
       </div>
-      <span class="mt-4 text-gray-500 dark:text-gray-400">
-        获取天气数据...
-      </span>
+      <span class="mt-4 text-gray-500 dark:text-gray-400"> 获取天气数据... </span>
     </div>
 
     <!-- Error State -->
-    <div
-      v-else-if="error"
-      class="relative z-10 rounded-xl bg-red-50 p-4 dark:bg-red-900/20"
-    >
+    <div v-else-if="error" class="relative z-10 rounded-xl bg-red-50 p-4 dark:bg-red-900/20">
       <div class="flex items-center gap-3">
         <div class="rounded-full bg-red-100 p-2 dark:bg-red-900/40">
           <svg
@@ -110,9 +98,7 @@
       <!-- Current Details -->
       <div class="mb-4 grid grid-cols-3 gap-3">
         <div class="rounded-xl bg-white/50 p-2.5 dark:bg-gray-800/50">
-          <div
-            class="mb-1 flex items-center justify-center gap-1 text-gray-400"
-          >
+          <div class="mb-1 flex items-center justify-center gap-1 text-gray-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="h-3.5 w-3.5"
@@ -120,25 +106,16 @@
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M14 5l7 7m0 0l-7 7m7-7H3"
-              />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
             <span class="text-xs">风向</span>
           </div>
-          <p
-            class="text-center text-xs font-semibold text-gray-900 dark:text-white"
-          >
+          <p class="text-center text-xs font-semibold text-gray-900 dark:text-white">
             {{ liveWeather.winddirection }}
           </p>
         </div>
         <div class="rounded-xl bg-white/50 p-2.5 dark:bg-gray-800/50">
-          <div
-            class="mb-1 flex items-center justify-center gap-1 text-gray-400"
-          >
+          <div class="mb-1 flex items-center justify-center gap-1 text-gray-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="h-3.5 w-3.5"
@@ -146,25 +123,14 @@
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M13 10V3L4 14h7v7l9-11h-7z"
-              />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
             <span class="text-xs">风力</span>
           </div>
-          <p
-            class="text-center text-xs font-semibold text-gray-900 dark:text-white"
-          >
-            {{ liveWeather.windpower }}级
-          </p>
+          <p class="text-center text-xs font-semibold text-gray-900 dark:text-white">{{ liveWeather.windpower }}级</p>
         </div>
         <div class="rounded-xl bg-white/50 p-2.5 dark:bg-gray-800/50">
-          <div
-            class="mb-1 flex items-center justify-center gap-1 text-gray-400"
-          >
+          <div class="mb-1 flex items-center justify-center gap-1 text-gray-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="h-3.5 w-3.5"
@@ -181,19 +147,13 @@
             </svg>
             <span class="text-xs">湿度</span>
           </div>
-          <p
-            class="text-center text-xs font-semibold text-gray-900 dark:text-white"
-          >
-            {{ liveWeather.humidity }}%
-          </p>
+          <p class="text-center text-xs font-semibold text-gray-900 dark:text-white">{{ liveWeather.humidity }}%</p>
         </div>
       </div>
 
       <!-- Forecast -->
       <div v-if="forecasts.length > 0" class="flex-1">
-        <div
-          class="mb-2 ml-6 flex w-full items-center gap-2 text-xs text-gray-500 dark:text-gray-400"
-        >
+        <div class="mb-2 ml-6 flex w-full items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="h-3.5 w-3.5"
@@ -220,34 +180,23 @@
               {{ day.date }}
             </p>
             <p class="mb-1 text-lg">{{ getWeatherIcon(day.dayweather) }}</p>
-            <p class="text-xs font-medium text-gray-900 dark:text-white">
-              {{ day.daytemp }}° / {{ day.nighttemp }}°
-            </p>
+            <p class="text-xs font-medium text-gray-900 dark:text-white">{{ day.daytemp }}° / {{ day.nighttemp }}°</p>
           </div>
         </div>
         <div>
-          <p class="mt-3 text-center text-sm text-gray-500 dark:text-gray-400">
-            更多预报请访问和风天气官网
-          </p>
+          <p class="mt-3 text-center text-sm text-gray-500 dark:text-gray-400">更多预报请访问和风天气官网</p>
         </div>
       </div>
 
       <!-- Update Time -->
       <div class="mt-3 text-center">
-        <span class="text-xs text-gray-400">
-          更新于 {{ liveWeather.reporttime }}
-        </span>
+        <span class="text-xs text-gray-400"> 更新于 {{ liveWeather.reporttime }} </span>
       </div>
     </div>
 
     <!-- No Data State -->
-    <div
-      v-else
-      class="relative z-10 flex flex-1 flex-col items-center justify-center py-4"
-    >
-      <div
-        class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800"
-      >
+    <div v-else class="relative z-10 flex flex-1 flex-col items-center justify-center py-4">
+      <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="h-8 w-8 text-gray-400"
@@ -270,8 +219,8 @@
 </template>
 
 <script setup lang="ts">
+import request from "@/api/request";
 import { onMounted, ref } from "vue";
-import request from "@/request";
 
 interface LiveWeather {
   province: string;
@@ -350,10 +299,7 @@ const fetchWeather = async (location: [number, number]) => {
     });
 
     const regeoData = regeoResponse.data?.data;
-    if (
-      regeoData?.status !== "1" ||
-      !regeoData?.regeocode?.addressComponent?.adcode
-    ) {
+    if (regeoData?.status !== "1" || !regeoData?.regeocode?.addressComponent?.adcode) {
       throw new Error("无法获取城市信息");
     }
 
@@ -379,10 +325,7 @@ const fetchWeather = async (location: [number, number]) => {
     });
 
     const forecastResult = forecastResponse.data?.data;
-    if (
-      forecastResult?.status === "1" &&
-      forecastResult?.forecasts?.length > 0
-    ) {
+    if (forecastResult?.status === "1" && forecastResult?.forecasts?.length > 0) {
       forecasts.value = forecastResult.forecasts[0]?.casts || [];
     }
 

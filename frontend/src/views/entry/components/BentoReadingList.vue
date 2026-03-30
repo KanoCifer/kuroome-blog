@@ -27,7 +27,5 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from "./BentoCard.vue";
+import BentoCard from "@/components/bento/BentoCard.vue";
 </script>
-
-<style scoped></style>

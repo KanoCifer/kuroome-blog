@@ -68,9 +68,9 @@ alembic upgrade head                    # 执行迁移
 
 # 测试
 python -m pytest                                  # 运行所有测试
-python -m pytest tests/test_books.py -v           # 单个测试文件
-python -m pytest tests/test_books.py::test_list -v # 单个测试函数
-python -m pytest -k "keyword"                     # 按关键字过滤
+python -m pytest test/test_main.py -v             # 单个测试文件
+python -m pytest test/core/test_config.py::test_config_loading -v # 单个测试函数
+python -m pytest -k "config" -v                   # 按关键字过滤
 python -m pytest --tb=short                        # 简短 traceback
 ```
 
@@ -87,6 +87,10 @@ pnpm run build-only                     # 仅构建 (跳过 type-check)
 
 # 测试
 pnpm run test:unit                      # Vitest 单元测试
+pnpm run test:unit -- src/path/to/file.test.ts # 单个测试文件
+pnpm run test:unit -- -t "should render title" # 按测试名过滤
+pnpm run test:unit -- src/path/to/file.test.ts -t "should render title" # 文件 + 测试名
+pnpm run test:unit -- src/path/to/file.test.ts:42 # 文件 + 行号
 npx playwright test                     # E2E 测试
 npx playwright test --headed            # 可视化模式
 npx playwright test --debug             # 调试模式
@@ -110,6 +114,8 @@ frontend/src/
 ├── views/               # 页面组件 (auth, blog, rss, books, general)
 ├── components/          # 可复用组件 (ui/, bento/, basic/, icons/, editor/)
 ├── stores/              # Pinia 状态管理
+├── auth/                # 认证逻辑
+├── service/             # API 调用和业务逻辑
 ├── router/              # Vue Router
 ├── types/               # TypeScript 类型定义
 ├── lib/                 # 第三方库封装
@@ -120,6 +126,48 @@ frontend/src/
 tests/                   # Pytest (后端) + Playwright (E2E)
 scripts/                 # 工具脚本
 ```
+
+## 架构设计
+
+### 总体架构（前后端分离）
+
+- **Frontend (Vue 3 + TypeScript)**：负责页面渲染、交互状态管理、路由与鉴权守卫。
+- **Backend (FastAPI)**：负责 REST API、业务编排、认证授权、任务调度。
+- **Data Layer**：PostgreSQL（核心业务数据）+ MongoDB（文档型数据）+ Redis（缓存/会话/异步队列）。
+
+```mermaid
+flowchart LR
+    U[User Browser] --> F[Frontend\nVue3 + TS + Vite]
+    F -->|HTTP / Cookie / CSRF| B[Backend API\nFastAPI]
+    B --> PG[(PostgreSQL)]
+    B --> MG[(MongoDB)]
+    B --> RD[(Redis)]
+    B --> TQ[Taskiq Worker]
+```
+
+### 后端分层设计
+
+- **API 层 (`api/v1`)**：参数校验、鉴权、响应封装，不承载复杂业务。
+- **Service 层 (`services`)**：核心业务逻辑，组合仓储与外部依赖。
+- **Repository 层 (`repositories`)**：数据访问抽象，隔离 SQL/ORM 查询细节。
+- **Schema 层 (`schemas`)**：请求/响应模型定义，保证输入输出契约稳定。
+- **Core/Tasks 层 (`core`, `tasks`)**：配置、日志、异常处理、异步任务与定时任务。
+
+### 前端模块设计
+
+- **Views (`views/`)**：页面级容器，按业务领域组织。
+- **Components (`components/`)**：可复用 UI 组件，减少重复实现。
+- **Stores (`stores/`)**：Pinia 全局状态（用户、主题、通知、业务状态）。
+- **Auth + Service (`auth/`, `service/`)**：认证副作用、token 续期、API 调用封装。
+- **Router (`router/`)**：路由注册、权限拦截、页面元信息管理。
+
+### 关键设计原则
+
+1. **分层解耦**：高内聚，低耦合。UI、业务、数据访问分离，降低耦合便于演进。
+2. **类型优先**：前端 TypeScript + 后端 Pydantic，减少接口漂移。
+3. **安全默认**：JWT/Cookie + CSRF 防护 + 输入校验。
+4. **异步扩展**：Taskiq + Redis/RabbitMQ 支撑耗时任务与后台处理。
+5. **可维护性**：统一 lint/format/type-check/test 流程，保持代码一致性。
 
 ## API 端点 (:5555)
 

@@ -40,7 +40,19 @@ const clearMemo = () => {
       <IconMemo class="mr-2 size-8" />
       备忘录
     </button>
-
+    <Teleport to="body">
+      <!-- Background overlay -->
+      <transition
+        enter-active-class="transition-opacity duration-300 ease-out"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-opacity duration-200 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div v-if="isMemoOpen" class="background-overlay absolute inset-0 z-9998 bg-black/60 backdrop-blur-sm"></div>
+      </transition>
+    </Teleport>
     <!-- Memo Modal -->
     <Teleport to="body">
       <transition
@@ -51,16 +63,7 @@ const clearMemo = () => {
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
-        <div
-          v-if="isMemoOpen"
-          class="fixed inset-0 z-9999 flex items-center justify-center"
-          @click.self="closeMemo"
-        >
-          <!-- Background overlay -->
-          <div
-            class="background-overlay absolute inset-0 bg-black/60 backdrop-blur-sm transition-all"
-          ></div>
-
+        <div v-if="isMemoOpen" class="fixed inset-0 z-9999 flex items-center justify-center" @click.self="closeMemo">
           <!-- Modal content -->
           <div
             class="relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl bg-white p-6 shadow-2xl dark:bg-gray-800"
@@ -70,25 +73,13 @@ const clearMemo = () => {
               @click="closeMemo"
               class="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
             >
-              <svg
-                class="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
             <!-- Header -->
-            <h3
-              class="mb-4 flex items-center gap-2 font-serif text-xl font-bold text-gray-800 dark:text-white"
-            >
+            <h3 class="mb-4 flex items-center gap-2 font-serif text-xl font-bold text-gray-800 dark:text-white">
               <IconMemo class="size-5" />
               备忘录
             </h3>
@@ -105,9 +96,7 @@ const clearMemo = () => {
             <div class="flex items-center justify-between">
               <span class="text-xs text-gray-500 dark:text-gray-400">
                 自动保存
-                <span v-if="memoText" class="ml-2"
-                  >{{ memoText.length }} 字</span
-                >
+                <span v-if="memoText" class="ml-2">{{ memoText.length }} 字</span>
               </span>
               <button
                 @click="clearMemo"

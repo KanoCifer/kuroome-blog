@@ -1,4 +1,4 @@
-import request from "@/request";
+import request from "@/api/request";
 import { useStorage } from "@vueuse/core";
 import { UAParser } from "ua-parser-js";
 import { v4 } from "uuid";

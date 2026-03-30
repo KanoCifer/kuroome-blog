@@ -13,14 +13,8 @@
     <!-- Header -->
     <div class="relative z-10 mb-4 flex items-start justify-between">
       <div>
-        <h3
-          class="text-lg font-bold tracking-tight text-gray-900 dark:text-white"
-        >
-          潮汐预报
-        </h3>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          黄埔港 · {{ todayStr }}
-        </p>
+        <h3 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">潮汐预报</h3>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">黄埔港 · {{ todayStr }}</p>
       </div>
       <div
         class="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-cyan-400 to-blue-500 shadow-lg shadow-cyan-500/25 transition-transform duration-300 group-hover:scale-110"
@@ -43,27 +37,18 @@
     </div>
 
     <!-- Loading State -->
-    <div
-      v-if="loading"
-      class="relative z-10 flex flex-col items-center justify-center py-12"
-    >
+    <div v-if="loading" class="relative z-10 flex flex-col items-center justify-center py-12">
       <div class="relative">
         <div
           class="h-12 w-12 animate-spin rounded-full border-4 border-cyan-100 border-t-cyan-500 dark:border-gray-700 dark:border-t-cyan-400"
         ></div>
       </div>
-      <span class="mt-4 text-sm text-gray-500 dark:text-gray-400">
-        获取潮汐数据...
-      </span>
+      <span class="mt-4 text-sm text-gray-500 dark:text-gray-400"> 获取潮汐数据... </span>
     </div>
 
     <!-- Chart -->
     <div v-else-if="tideData" class="relative z-10">
-      <v-chart
-        :option="tideOptions"
-        style="width: 100%; height: 280px"
-        autoresize
-      />
+      <v-chart :option="tideOptions" style="width: 100%; height: 280px" autoresize />
 
       <!-- Tide Summary -->
       <div class="mt-4 grid grid-cols-2 gap-3">
@@ -76,12 +61,7 @@
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M5 10l7-7m0 0l7 7m-7-7v18"
-              />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
             </svg>
             <span class="text-xs">最高潮</span>
           </div>
@@ -100,12 +80,7 @@
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 14l-7 7m0 0l-7-7m7 7V3"
-              />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
             </svg>
             <span class="text-xs">最低潮</span>
           </div>
@@ -119,9 +94,7 @@
 
     <!-- No Data -->
     <div v-else class="relative z-10 py-4 text-center">
-      <div
-        class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800"
-      >
+      <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="h-8 w-8 text-gray-400"
@@ -143,29 +116,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-import request from "@/request";
+import request from "@/api/request";
 import { useNotificationStore } from "@/stores/notification";
-import { use } from "echarts/core";
-import { LineChart } from "echarts/charts";
-import {
-  TooltipComponent,
-  GridComponent,
-  MarkLineComponent,
-  MarkPointComponent,
-} from "echarts/components";
-import { SVGRenderer } from "echarts/renderers";
-import VChart from "vue-echarts";
 import dayjs from "dayjs";
+import { LineChart } from "echarts/charts";
+import { GridComponent, MarkLineComponent, MarkPointComponent, TooltipComponent } from "echarts/components";
+import { use } from "echarts/core";
+import { SVGRenderer } from "echarts/renderers";
+import { computed, onMounted, ref } from "vue";
+import VChart from "vue-echarts";
 
-use([
-  TooltipComponent,
-  GridComponent,
-  MarkLineComponent,
-  MarkPointComponent,
-  LineChart,
-  SVGRenderer,
-]);
+use([TooltipComponent, GridComponent, MarkLineComponent, MarkPointComponent, LineChart, SVGRenderer]);
 
 interface TideData {
   updateTime: string;
@@ -208,8 +169,7 @@ const fetchTideData = async () => {
 // 计算最高潮和最低潮
 const highTide = computed(() => {
   if (!tideData.value) return null;
-  const highs: { height: number | string; fxTime: string }[] =
-    tideData.value.tideTable.filter((t) => t.type === "H");
+  const highs: { height: number | string; fxTime: string }[] = tideData.value.tideTable.filter((t) => t.type === "H");
   if (highs.length === 0) return null;
   let maxEntry = highs[0];
   for (const h of highs) {
@@ -226,8 +186,7 @@ const highTide = computed(() => {
 // 计算最低潮及其时间
 const lowTide = computed(() => {
   if (!tideData.value) return null;
-  const lows: { height: number | string; fxTime: string }[] =
-    tideData.value.tideTable.filter((t) => t.type === "L");
+  const lows: { height: number | string; fxTime: string }[] = tideData.value.tideTable.filter((t) => t.type === "L");
   if (lows.length === 0) return null;
   let minEntry = lows[0];
   for (const l of lows) {
@@ -261,9 +220,7 @@ const tideOptions = computed(() => {
   return {
     tooltip: {
       trigger: "axis",
-      backgroundColor: isDarkMode.value
-        ? "rgba(30, 41, 59, 0.95)"
-        : "rgba(255, 255, 255, 0.95)",
+      backgroundColor: isDarkMode.value ? "rgba(30, 41, 59, 0.95)" : "rgba(255, 255, 255, 0.95)",
       borderColor: isDarkMode.value ? "#475569" : "#e5e7eb",
       borderWidth: 1,
       borderRadius: 8,
@@ -375,8 +332,7 @@ const tideOptions = computed(() => {
             color: textColor,
             fontSize: 10,
             fontWeight: "600",
-            formatter: (p: { name: string; value: string }) =>
-              `${p.name}\n${p.value}`,
+            formatter: (p: { name: string; value: string }) => `${p.name}\n${p.value}`,
             lineHeight: 14,
           },
         },
@@ -388,8 +344,6 @@ const tideOptions = computed(() => {
 onMounted(() => {
   checkDarkMode();
   fetchTideData();
-  window
-    .matchMedia("(prefers-color-scheme: dark)")
-    .addEventListener("change", checkDarkMode);
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", checkDarkMode);
 });
 </script>

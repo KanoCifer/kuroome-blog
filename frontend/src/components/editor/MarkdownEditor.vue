@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import request from "@/request";
+import request from "@/api/request";
 import DOMPurify from "dompurify";
 import hljs from "highlight.js/lib/common";
 import "highlight.js/styles/github-dark.css";

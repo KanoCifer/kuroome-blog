@@ -1,8 +1,8 @@
 import axios, { AxiosError } from "axios";
-import { useAuthStore } from "./stores/auth";
-import { isrefreshTokenRequest, refreshAccessToken } from "./utils/refresh";
+import { fetchAndStoreCSRF } from "./csrf";
+import { isrefreshTokenRequest, refreshAccessToken } from "./refresh";
+import { getRefreshTokenFromStorage } from "./refreshToken";
 // keep latest CSRF token so it can be sent in headers
-let csrfFetchPromise: Promise<void> | null = null;
 
 export interface ApiResponse<T = unknown> {
   status: "success" | "error";
@@ -10,27 +10,6 @@ export interface ApiResponse<T = unknown> {
   data: T;
   code?: number;
   errors?: Record<string, unknown>;
-}
-
-export async function fetchAndStoreCSRF() {
-  if (csrfFetchPromise) {
-    return csrfFetchPromise;
-  }
-
-  csrfFetchPromise = (async () => {
-    try {
-      await request.get<ApiResponse<{ csrf_token: string }>>(
-        "/auth/csrf-token",
-      );
-    } catch (error) {
-      console.error("获取 CSRF Token 失败:", error);
-      throw error;
-    } finally {
-      csrfFetchPromise = null;
-    }
-  })();
-
-  return csrfFetchPromise;
 }
 
 const request = axios.create({
@@ -71,16 +50,11 @@ request.interceptors.response.use(
       _isRefreshToken?: boolean;
       _retry?: boolean;
     };
-    if (
-      error.response?.status === 401 &&
-      !isrefreshTokenRequest(_cfg) &&
-      !_cfg._retry
-    ) {
+    if (error.response?.status === 401 && !isrefreshTokenRequest(_cfg) && !_cfg._retry) {
       // 标记已重试，防止无限循环
       _cfg._retry = true;
 
-      const authStore = useAuthStore();
-      const refreshToken = authStore.getRefreshToken();
+      const refreshToken = getRefreshTokenFromStorage();
       if (!refreshToken) {
         return Promise.reject(error);
       }

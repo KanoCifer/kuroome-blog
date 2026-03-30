@@ -20,10 +20,7 @@
       <form @submit.prevent="submitImport" class="space-y-6">
         <!-- Cookie Input -->
         <div class="space-y-2">
-          <label
-            for="weread_cookie"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
+          <label for="weread_cookie" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
             WeRead Cookie
           </label>
           <div class="relative">
@@ -47,18 +44,11 @@
           class="w-full rounded-2xl bg-linear-to-r from-blue-500 to-sky-600 px-6 py-4 font-medium text-white shadow-lg shadow-blue-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-blue-500/30 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-gray-900"
         >
           <span v-if="loading" class="flex items-center justify-center gap-2">
-            <span
-              class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
-            ></span>
+            <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
             Importing Books...
           </span>
           <span v-else class="flex items-center justify-center gap-2">
-            <svg
-              class="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -75,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import request from "@/request";
+import request from "@/api/request";
 import { useNotificationStore } from "@/stores/notification";
 import { onMounted, ref } from "vue";
 const weread_cookie = ref("");

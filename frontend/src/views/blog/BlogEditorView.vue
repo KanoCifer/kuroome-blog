@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import request from "@/api/request";
 import BasicDetail from "@/components/basic/BasicDetail.vue";
 import MarkdownEditor from "@/components/editor/MarkdownEditor.vue";
 import TiptapEditor from "@/components/editor/TiptapEditor.vue";
 import IconSave from "@/components/icons/IconSave.vue";
-import request from "@/request";
 import { useNotificationStore } from "@/stores/notification";
 import type { ApiResponse, Category, Post } from "@/types";
 import { marked } from "marked";
@@ -43,9 +43,7 @@ const categoryMenuOpen = ref(false);
 // Computed current category name
 const currentCategory = computed(() => {
   if (!category.value) return "";
-  const selectedCategory = categories.value.find(
-    (cat) => String(cat.id) === category.value,
-  );
+  const selectedCategory = categories.value.find((cat) => String(cat.id) === category.value);
   return selectedCategory ? selectedCategory.name : "";
 });
 
@@ -119,10 +117,7 @@ const handleModeSwitch = (newMode: EditorMode) => {
 // Fetch categories
 const fetchCategories = async () => {
   try {
-    const res =
-      await request.get<ApiResponse<{ categories: Category[] } | Category[]>>(
-        "/categories",
-      );
+    const res = await request.get<ApiResponse<{ categories: Category[] } | Category[]>>("/categories");
     if (res.data.status === "success") {
       const data = res.data.data;
       if (Array.isArray(data)) {
@@ -227,20 +222,14 @@ const handleSubmit = async () => {
 
     if (isEdit.value && postId.value) {
       const updatePayload = { ...payload, _id: postId.value };
-      const res = await request.put<ApiResponse<{ _id: string }>>(
-        "/admin/post/update",
-        updatePayload,
-      );
+      const res = await request.put<ApiResponse<{ _id: string }>>("/admin/post/update", updatePayload);
       if (res.data.status === "success") {
         notification.success("文章更新成功");
       } else {
         throw new Error(res.data.message);
       }
     } else {
-      const res = await request.post<ApiResponse<{ _id: string }>>(
-        "/admin/post/add",
-        payload,
-      );
+      const res = await request.post<ApiResponse<{ _id: string }>>("/admin/post/add", payload);
       if (res.data.status === "success") {
         notification.success("文章发布成功");
       } else {
@@ -280,10 +269,7 @@ onMounted(async () => {
   >
     <div class="col-span-full mx-auto w-full">
       <!-- Error Message -->
-      <div
-        v-if="error"
-        class="mb-6 rounded-lg bg-red-50 p-4 text-red-800 dark:bg-red-900/20 dark:text-red-200"
-      >
+      <div v-if="error" class="mb-6 rounded-lg bg-red-50 p-4 text-red-800 dark:bg-red-900/20 dark:text-red-200">
         <div class="flex items-center">
           <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
             <path
@@ -298,19 +284,12 @@ onMounted(async () => {
 
       <!-- Loading State -->
       <div v-if="loading && isEdit" class="py-12 text-center">
-        <div
-          class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"
-        ></div>
+        <div class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"></div>
         <p class="mt-2 text-gray-600 dark:text-gray-400">加载文章中...</p>
       </div>
 
       <!-- Form -->
-      <form
-        v-else
-        @submit.prevent="handleSubmit"
-        ref="formRef"
-        class="space-y-4"
-      >
+      <form v-else @submit.prevent="handleSubmit" ref="formRef" class="space-y-4">
         <!-- Title and Controls Bar -->
         <div class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -328,7 +307,9 @@ onMounted(async () => {
             <!-- Controls -->
             <div class="flex flex-wrap items-center gap-3">
               <!-- Mode Toggle -->
-              <div class="flex items-center rounded-full border border-slate-200 bg-slate-50 p-1 dark:border-slate-700 dark:bg-slate-800">
+              <div
+                class="flex items-center rounded-full border border-slate-200 bg-slate-50 p-1 dark:border-slate-700 dark:bg-slate-800"
+              >
                 <button
                   type="button"
                   @click="handleModeSwitch('tiptap')"
@@ -367,26 +348,35 @@ onMounted(async () => {
                 ]"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3.5 w-3.5">
-                  <path d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 4.5a.75.75 0 001.09 0l4.25-4.5a.75.75 0 00-1.09-1.03l-2.955 3.129V2.75z" />
-                  <path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z" />
+                  <path
+                    d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 4.5a.75.75 0 001.09 0l4.25-4.5a.75.75 0 00-1.09-1.03l-2.955 3.129V2.75z"
+                  />
+                  <path
+                    d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z"
+                  />
                 </svg>
                 {{ pin ? "已置顶" : "置顶" }}
               </button>
 
               <!-- Category Selector -->
-              <div
-                class="group relative"
-                @mouseenter="handleCategoryMouseEnter"
-                @mouseleave="handleCategoryMouseLeave"
-              >
+              <div class="group relative" @mouseenter="handleCategoryMouseEnter" @mouseleave="handleCategoryMouseLeave">
                 <button
                   type="button"
                   @click="categoryMenuOpen = !categoryMenuOpen"
                   class="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs font-semibold text-slate-700 transition-all hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
                 >
                   <span>{{ currentCategory || "选择分类" }}</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3.5 w-3.5 text-slate-400">
-                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    class="h-3.5 w-3.5 text-slate-400"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                      clip-rule="evenodd"
+                    />
                   </svg>
                 </button>
                 <transition
@@ -406,7 +396,10 @@ onMounted(async () => {
                         type="button"
                         v-for="cat in categories"
                         :key="cat.id"
-                        @click="category = String(cat.id); categoryMenuOpen = false"
+                        @click="
+                          category = String(cat.id);
+                          categoryMenuOpen = false;
+                        "
                         :class="[
                           'w-full rounded-lg px-3 py-2 text-left text-sm transition-colors',
                           category === String(cat.id)
@@ -435,14 +428,12 @@ onMounted(async () => {
         </div>
 
         <!-- Editor Area -->
-        <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div
+          class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900"
+        >
           <!-- Tiptap Editor -->
           <div v-show="editorMode === 'tiptap'" class="h-[calc(100vh-320px)] min-h-[500px]">
-            <TiptapEditor
-              ref="tiptapEditorRef"
-              v-model="tiptapBody"
-              v-model:storageKey="debouncedTitle"
-            />
+            <TiptapEditor ref="tiptapEditorRef" v-model="tiptapBody" v-model:storageKey="debouncedTitle" />
           </div>
 
           <!-- Markdown Editor -->
@@ -473,7 +464,11 @@ onMounted(async () => {
               viewBox="0 0 24 24"
             >
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
             </svg>
             {{ isEdit ? "保存修改" : "发布文章" }}
           </button>

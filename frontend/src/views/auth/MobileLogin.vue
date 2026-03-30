@@ -3,9 +3,7 @@ import { IconUser } from "@/components/icons";
 import IconCloud from "@/components/icons/IconCloud.vue";
 import IconKey from "@/components/icons/IconKey.vue";
 import IconLock from "@/components/icons/IconLock.vue";
-import request from "@/request";
 import { useAuthStore } from "@/stores/auth";
-import { useNotificationStore } from "@/stores/notification";
 import type { LoginForm } from "@/types";
 import { startAuthentication } from "@simplewebauthn/browser";
 import { onMounted, ref } from "vue";
@@ -48,11 +46,7 @@ const handleSubmit = async () => {
   isSubmitting.value = true;
 
   try {
-    await auth.login(
-      loginForm.value.username,
-      loginForm.value.password,
-      loginForm.value.rememberMe,
-    );
+    await auth.login(loginForm.value.username, loginForm.value.password, loginForm.value.rememberMe);
     const redirect = (route.query.redirect as string) || "/";
     router.push(redirect);
   } catch (err: unknown) {
@@ -70,22 +64,12 @@ const handlePasskeyLogin = async () => {
   isPasskeySubmitting.value = true;
 
   try {
-    const optionsRes = await request.get(
-      "/auth/passkey/authentication-options",
-    );
-    const options = optionsRes.data.data;
+    const options = await auth.getPasskeyAuthenticationOptions();
 
-    const assertion = await startAuthentication(options);
-
-    const res = await request.post("/auth/passkey/authenticate", {
-      response: assertion,
+    const assertion = await startAuthentication({
+      optionsJSON: options,
     });
-
-    const notification = useNotificationStore();
-    auth.saveRefreshToken(res.data.data.refresh_token);
-
-    notification.success("Passkey 登录成功！欢迎回来！");
-    await auth.fetchUser();
+    await auth.loginWithPasskey(assertion);
     const redirect = (route.query.redirect as string) || "/";
     router.push(redirect);
   } catch (err: unknown) {
@@ -110,23 +94,17 @@ const handleGitHubLogin: () => void = () => {
       <!-- Hero Section -->
       <div
         class="mb-8 flex flex-col items-center justify-center transition-all duration-700 ease-out"
-        :class="
-          isReady ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-        "
+        :class="isReady ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'"
       >
         <div
           class="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[#2563eb] text-white shadow-[0_8px_16px_rgba(37,99,235,0.25)]"
         >
           <IconCloud class="size-8" />
         </div>
-        <h2
-          class="font-headline text-center text-[28px] font-extrabold tracking-tight text-[#111827] dark:text-white"
-        >
+        <h2 class="font-headline text-center text-[28px] font-extrabold tracking-tight text-[#111827] dark:text-white">
           Kanocifer<span class="text-[#2563eb] dark:text-blue-400">.chat</span>
         </h2>
-        <p
-          class="mt-1 text-center text-[15px] font-medium text-[#4b5563] dark:text-gray-400"
-        >
+        <p class="mt-1 text-center text-[15px] font-medium text-[#4b5563] dark:text-gray-400">
           Welcome back to the reading space.
         </p>
       </div>
@@ -134,21 +112,14 @@ const handleGitHubLogin: () => void = () => {
       <!-- Login Card -->
       <div
         class="w-full max-w-100 rounded-[32px] border border-white/50 bg-white/70 p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] backdrop-blur-xl transition-all delay-100 duration-700 ease-out dark:border-slate-700/50 dark:bg-slate-800/60"
-        :class="
-          isReady ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-        "
+        :class="isReady ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'"
       >
         <form class="flex flex-col" @submit.prevent="handleSubmit">
           <!-- Username Field -->
           <div class="mb-5">
-            <label
-              class="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300"
-              >Username</label
-            >
+            <label class="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">Username</label>
             <div class="relative">
-              <div
-                class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]"
-              >
+              <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
                 <IconUser class="size-6 text-white" />
               </div>
               <input
@@ -159,24 +130,16 @@ const handleGitHubLogin: () => void = () => {
                 class="w-full rounded-2xl border-0 bg-white py-3.5 pr-4 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white"
               />
             </div>
-            <span
-              v-if="errors.username"
-              class="mt-1 block pl-1 text-[12px] font-medium text-red-500"
-            >
+            <span v-if="errors.username" class="mt-1 block pl-1 text-[12px] font-medium text-red-500">
               {{ errors.username }}
             </span>
           </div>
 
           <!-- Password Field -->
           <div class="mb-5">
-            <label
-              class="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300"
-              >Password</label
-            >
+            <label class="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">Password</label>
             <div class="relative">
-              <div
-                class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]"
-              >
+              <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
                 <IconLock class="dark:text-white" />
               </div>
               <input
@@ -197,10 +160,7 @@ const handleGitHubLogin: () => void = () => {
                 <EyeOn v-else />
               </button>
             </div>
-            <span
-              v-if="errors.password"
-              class="mt-1 block pl-1 text-[12px] font-medium text-red-500"
-            >
+            <span v-if="errors.password" class="mt-1 block pl-1 text-[12px] font-medium text-red-500">
               {{ errors.password }}
             </span>
           </div>
@@ -208,11 +168,7 @@ const handleGitHubLogin: () => void = () => {
           <!-- Remember Me & Forgot Password -->
           <div class="mb-6 flex items-center justify-between px-1">
             <label class="group flex cursor-pointer items-center space-x-2.5">
-              <input
-                v-model="loginForm.rememberMe"
-                type="checkbox"
-                class="peer sr-only"
-              />
+              <input v-model="loginForm.rememberMe" type="checkbox" class="peer sr-only" />
               <div
                 class="z-5 flex h-5.5 w-5.5 items-center justify-center rounded-lg border-2 border-gray-300 bg-white transition-all duration-200 peer-checked:border-[#2563eb] peer-checked:bg-[#2563eb] peer-focus:ring-2 peer-focus:ring-[#2563eb]/20 dark:border-slate-600 dark:bg-slate-700 dark:peer-checked:border-blue-500 dark:peer-checked:bg-blue-500"
               >
@@ -228,18 +184,9 @@ const handleGitHubLogin: () => void = () => {
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               </div>
-              <span
-                class="text-[14px] font-medium text-[#4b5563] dark:text-gray-300"
-              >
-                Remember Me
-              </span>
+              <span class="text-[14px] font-medium text-[#4b5563] dark:text-gray-300"> Remember Me </span>
             </label>
-            <a
-              href="#"
-              class="text-[14px] font-bold text-[#1d4ed8] hover:underline dark:text-blue-400"
-            >
-              Forgot?
-            </a>
+            <a href="#" class="text-[14px] font-bold text-[#1d4ed8] hover:underline dark:text-blue-400"> Forgot? </a>
           </div>
 
           <!-- Login Button -->
@@ -270,9 +217,7 @@ const handleGitHubLogin: () => void = () => {
         <!-- Divider -->
         <div class="my-6 flex items-center justify-center text-center">
           <div class="h-px flex-1 bg-gray-200 dark:bg-slate-700"></div>
-          <span
-            class="px-3 text-[11px] font-bold tracking-wider text-[#6b7280] uppercase dark:text-gray-400"
-          >
+          <span class="px-3 text-[11px] font-bold tracking-wider text-[#6b7280] uppercase dark:text-gray-400">
             OR CONTINUE WITH
           </span>
           <div class="h-px flex-1 bg-gray-200 dark:bg-slate-700"></div>
@@ -289,14 +234,9 @@ const handleGitHubLogin: () => void = () => {
 
         <!-- Register Link -->
         <div class="mt-8 text-center">
-          <p
-            class="text-[14.5px] font-medium text-[#4b5563] dark:text-gray-300"
-          >
+          <p class="text-[14.5px] font-medium text-[#4b5563] dark:text-gray-300">
             Don't have an account?
-            <RouterLink
-              to="/register"
-              class="ml-1 font-bold text-[#1d4ed8] hover:underline dark:text-blue-400"
-            >
+            <RouterLink to="/register" class="ml-1 font-bold text-[#1d4ed8] hover:underline dark:text-blue-400">
               Register here
             </RouterLink>
           </p>

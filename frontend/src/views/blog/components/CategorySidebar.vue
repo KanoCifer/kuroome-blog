@@ -3,9 +3,7 @@
     <div
       class="rounded-3xl bg-white/80 p-6 shadow-md dark:border dark:border-gray-700/50 dark:bg-gray-900/80 dark:shadow-none"
     >
-      <h3
-        class="mb-4 flex items-center gap-2 font-serif text-lg font-semibold text-gray-800 italic dark:text-white"
-      >
+      <h3 class="mb-4 flex items-center gap-2 font-serif text-lg font-semibold text-gray-800 italic dark:text-white">
         <IconTags class="size-5!"></IconTags>
         Tags
       </h3>
@@ -61,8 +59,8 @@
 </template>
 
 <script setup lang="ts">
+import request from "@/api/request";
 import IconTags from "@/components/icons/IconTags.vue";
-import request from "@/request";
 import type { Category, CategoryResponseItem, Post } from "@/types";
 import { onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -107,13 +105,11 @@ const fetchCategories = async () => {
   try {
     const response = await request.get("/categories");
     if (response.data.status === "success") {
-      categories.value = response.data.data.map(
-        (cat: CategoryResponseItem) => ({
-          id: cat.id,
-          name: cat.name,
-          post_count: cat.post_count || 0,
-        }),
-      );
+      categories.value = response.data.data.map((cat: CategoryResponseItem) => ({
+        id: cat.id,
+        name: cat.name,
+        post_count: cat.post_count || 0,
+      }));
     }
   } catch (error) {
     console.error("Failed to fetch categories:", error);

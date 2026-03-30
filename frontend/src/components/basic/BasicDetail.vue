@@ -6,15 +6,11 @@
       :style="titleStyle"
     >
       <div>
-        <h1
-          class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl"
-        >
+        <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl">
           {{ title }}
         </h1>
         <!-- Info -->
-        <div
-          class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400"
-        >
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400">
           <span
             class="inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400"
           >
@@ -23,16 +19,16 @@
         </div>
       </div>
     </div>
-    <div class="relative mt-36">
+    <div class="relative mt-36 w-full">
       <div
         :style="sectionStyle"
         class="absolute left-1/2 -z-5 h-full -translate-x-1/2 rounded-t-[40px] bg-blue-50 dark:bg-slate-900"
       ></div>
-      <div
-        class="mx-auto grid max-w-6xl grid-cols-1 gap-6 pt-24 max-sm:mx-2 sm:grid-cols-2 lg:grid-cols-3"
-      >
-        <!-- Content slots -->
-        <slot />
+      <div class="mx-auto max-w-6xl">
+        <div class="mx-8 grid grid-cols-1 gap-6 pt-24 max-sm:mx-2 sm:grid-cols-2 lg:grid-cols-3">
+          <!-- Content slots -->
+          <slot />
+        </div>
       </div>
 
       <div class="mt-12 text-center">
@@ -40,19 +36,8 @@
           @click="$router.back()"
           class="mb-12 inline-flex cursor-pointer items-center gap-2 rounded-full bg-gray-900 px-6 py-3 font-medium text-white transition-all duration-300 hover:bg-gray-800 hover:shadow-lg dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           返回上一页
         </button>
@@ -62,9 +47,8 @@
 </template>
 
 <script setup lang="ts">
-import { useScroll } from "@vueuse/core";
+import { useMediaQuery, useScroll } from "@vueuse/core";
 import { computed, onMounted } from "vue";
-import { useMediaQuery } from "@vueuse/core";
 const { y } = useScroll(window);
 
 defineProps<{

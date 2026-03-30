@@ -1,455 +1,764 @@
 <template>
-  <BasicDetail title="我的订阅" subtitle="管理您的 RSS 订阅源">
-    <div class="col-span-full mx-auto max-w-4xl">
-      <!-- 页面标题 -->
-      <div class="mb-8 flex items-center gap-3">
-        <div
-          class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400"
+  <BasicDetail title="RSS 工作台" subtitle="在一个页面里完成解析、订阅管理与文章阅读">
+    <div class="col-span-full mx-auto w-full max-w-6xl space-y-8">
+      <div class="flex flex-wrap items-center gap-3">
+        <a
+          href="#rss-parse"
+          class="rounded-lg bg-blue-100 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:bg-slate-800 dark:text-blue-300 dark:hover:bg-slate-700"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-            class="h-7 w-7"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12.75 3.03v.568c0 .334.148.65.405.864l1.068.89c.442.369.535 1.01.216 1.49l-.51.766a2.25 2.25 0 01-1.161.886l-.143.048a1.107 1.107 0 00-.57 1.664c.369.555.169 1.307-.427 1.605L9 13.125l.423 1.059a.956.956 0 01-1.652.928l-.679-.906a1.125 1.125 0 00-1.906.172L4.5 15.75l-.612.153M12.75 3.031a9 9 0 00-8.862 12.872M12.75 3.031a9 9 0 016.69 14.036m0 0l-.177-.529A2.25 2.25 0 0017.128 15H16.5l-.324.324a1.454 1.454 0 01-2.106 0L3.955 15.41c-.87-.88-1.22-1.964-.7-2.299l.485-.491a2.025 2.025 0 011.515-.39l.583.284a1.75 1.75 0 001.934 0l.584-.284c.52-.335.64-.86.7-1.299l.486-.491"
-            />
-          </svg>
-        </div>
-        <div>
-          <div class="flex items-center gap-4">
-            <h2 class="text-2xl font-bold text-blue-900 dark:text-white">
-              订阅管理
-            </h2>
-            <span
-              class="rounded-full border border-blue-300 bg-blue-200/60 px-3 py-1 text-xs text-blue-500 dark:bg-blue-200 dark:text-blue-900"
-            >
-              {{ subscriptions.length }}
-            </span>
-          </div>
-          <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">
-            查看和管理已保存的 RSS 订阅源
-          </p>
-        </div>
-        <button
-          @click="router.push('/rss/parse')"
-          class="ml-auto inline-flex cursor-pointer items-center gap-2 rounded-xl bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:bg-slate-800 dark:text-blue-300 dark:hover:bg-slate-700"
+          解析订阅
+        </a>
+        <a
+          href="#rss-subscriptions"
+          class="rounded-lg bg-blue-100 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:bg-slate-800 dark:text-blue-300 dark:hover:bg-slate-700"
         >
-          RSS 解析
-        </button>
+          我的订阅
+        </a>
+        <a
+          href="#rss-articles"
+          class="rounded-lg bg-blue-100 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:bg-slate-800 dark:text-blue-300 dark:hover:bg-slate-700"
+        >
+          文章列表
+        </a>
       </div>
 
-      <!-- 错误状态 -->
-      <div
-        v-if="errorMessage"
-        class="mb-6 rounded-2xl border border-red-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
-      >
-        <div class="flex items-center gap-3 text-red-600 dark:text-red-400">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="h-6 w-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+      <section id="rss-parse" class="rounded-2xl border border-blue-100 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
+        <div class="mb-5 flex items-center justify-between gap-3">
+          <div>
+            <h2 class="text-xl font-bold text-blue-900 dark:text-white">解析订阅地址</h2>
+            <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">支持 RSS/Atom，解析后可直接保存到我的订阅</p>
+          </div>
+        </div>
+
+        <form class="flex flex-col gap-4 lg:flex-row lg:items-end" @submit.prevent="parseRss">
+          <div class="flex-1">
+            <label for="rss-url" class="mb-2 block text-sm font-medium text-blue-800 dark:text-blue-200">
+              RSS/Atom 地址
+            </label>
+            <input
+              id="rss-url"
+              v-model="rssForm.rssUrl"
+              type="text"
+              placeholder="https://example.com/feed.xml"
+              class="w-full rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-blue-900 transition-all placeholder:text-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-slate-600 dark:bg-slate-700/50 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-blue-400"
             />
-          </svg>
-          <p>{{ errorMessage }}</p>
+          </div>
+
           <button
-            @click="fetchSubscriptions"
-            class="ml-auto rounded-lg bg-red-50 px-3 py-1 text-sm font-medium text-red-600 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50"
+            type="button"
+            class="rounded-xl border border-blue-300 bg-blue-100 px-5 py-3 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:border-slate-700 dark:bg-slate-700/50 dark:text-blue-300 dark:hover:bg-slate-600/50"
+            @click="rssForm.saveToDb = !rssForm.saveToDb"
           >
-            重试
+            {{ rssForm.saveToDb ? "已启用保存" : "保存到订阅" }}
+          </button>
+
+          <button
+            type="submit"
+            :disabled="parseLoading"
+            class="rounded-xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-orange-600 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-orange-500 dark:ring-offset-slate-800"
+          >
+            {{ parseLoading ? "解析中..." : "开始解析" }}
+          </button>
+        </form>
+
+        <div class="mt-4 flex flex-wrap items-center gap-2">
+          <span class="text-sm text-blue-600 dark:text-blue-400">快捷尝试:</span>
+          <button
+            v-for="example in exampleFeeds"
+            :key="example.url"
+            type="button"
+            class="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:bg-slate-700 dark:text-blue-300 dark:hover:bg-slate-600"
+            @click="rssForm.rssUrl = example.url"
+          >
+            {{ example.name }}
           </button>
         </div>
-      </div>
 
-      <!-- 加载状态 -->
-      <div v-if="isLoading" aria-hidden="true" class="space-y-4">
-        <div
-          v-for="i in 3"
-          :key="i"
-          class="animate-pulse overflow-hidden rounded-xl border border-blue-100 bg-white p-5 dark:border-slate-700 dark:bg-slate-800"
-        >
-          <div class="mb-3 h-6 w-3/4 rounded bg-blue-200 dark:bg-slate-700" />
-          <div class="h-4 w-1/3 rounded bg-blue-100 dark:bg-slate-700" />
+        <div v-if="rssHistory.length > 0" class="mt-3 flex flex-wrap items-center gap-2">
+          <span class="text-sm text-blue-600 dark:text-blue-400">历史记录:</span>
+          <button
+            v-for="historyUrl in rssHistory.slice(0, 3)"
+            :key="historyUrl"
+            type="button"
+            class="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:bg-slate-700 dark:text-blue-300 dark:hover:bg-slate-600"
+            @click="rssForm.rssUrl = historyUrl"
+          >
+            {{ historyUrl }}
+          </button>
         </div>
-      </div>
 
-      <!-- 空状态 -->
-      <div
-        v-else-if="subscriptions.length === 0"
-        class="flex flex-col items-center justify-center rounded-2xl border border-blue-100 bg-white py-16 dark:border-slate-700 dark:bg-slate-800"
-      >
-        <div
-          class="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-blue-100 text-blue-400 dark:bg-slate-700 dark:text-blue-500"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="h-10 w-10"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        </div>
-        <h3 class="mb-2 text-xl font-bold text-blue-900 dark:text-white">
-          暂无订阅
-        </h3>
-        <p class="mb-6 text-center text-blue-600 dark:text-blue-400">
-          暂无订阅，去添加一个吧
-        </p>
-        <router-link
-          to="/rss"
-          class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 font-semibold text-white shadow-lg shadow-blue-500/30 transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none dark:ring-offset-slate-800"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-            class="h-5 w-5"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 4.5v15m7.5-7.5h-15"
-            />
-          </svg>
-          去添加
-        </router-link>
-      </div>
-
-      <!-- 订阅列表 -->
-      <div v-else class="space-y-4">
-        <ul class="space-y-3">
-          <li
-            v-for="sub in subscriptions"
-            :key="sub.id"
-            class="group relative overflow-hidden rounded-xl border border-blue-100 bg-white p-5 transition-all hover:border-blue-300 hover:bg-blue-50/30 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600 dark:hover:bg-slate-700/50"
-          >
-            <div
-              class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        <div v-if="parseMetadata" class="mt-6 rounded-xl border border-blue-100 bg-blue-50/40 p-5 dark:border-slate-700 dark:bg-slate-700/20">
+          <h3 class="text-lg font-bold text-blue-900 dark:text-white">{{ parseMetadata.title }}</h3>
+          <p v-if="parseMetadata.description" class="mt-2 text-sm text-blue-600 dark:text-blue-400">
+            {{ parseMetadata.description }}
+          </p>
+          <div class="mt-3 flex flex-wrap items-center gap-3 text-xs text-blue-500 dark:text-blue-400">
+            <span v-if="parseMetadata.published">更新时间: {{ formatDate(parseMetadata.published) }}</span>
+            <a
+              :href="parseMetadata.link"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
             >
-              <div class="min-w-0 flex-1">
-                <p
-                  class="truncate font-semibold text-blue-900 dark:text-white"
-                  :title="sub.rss_url"
-                >
-                  {{ getSubscriptionTitle(sub.feed_title, sub.rss_url) }}
-                </p>
-                <p
-                  class="mt-1 truncate text-sm text-blue-500"
-                  :title="sub.rss_url"
-                >
-                  {{ sub.rss_url }}
-                </p>
+              访问原站
+            </a>
+          </div>
+        </div>
 
-                <p
-                  v-if="sub.feed_description"
-                  class="mt-2 line-clamp-2 text-sm text-blue-600 dark:text-blue-300"
-                >
-                  {{ sub.feed_description }}
-                </p>
+        <div v-if="parseEntries.length > 0" class="mt-5 space-y-3">
+          <div class="text-sm font-semibold text-blue-700 dark:text-blue-300">最新解析文章（{{ parseEntries.length }}）</div>
+          <ul class="space-y-2">
+            <li
+              v-for="(entry, index) in parseEntries"
+              :key="`${entry.link}-${index}`"
+              class="rounded-xl border border-blue-100 bg-white p-4 dark:border-slate-700 dark:bg-slate-800"
+            >
+              <a
+                :href="entry.link"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="font-medium text-blue-900 hover:text-blue-600 dark:text-white dark:hover:text-blue-400"
+              >
+                {{ entry.title }}
+              </a>
+              <p v-if="entry.summary" class="mt-2 line-clamp-2 text-sm text-blue-600 dark:text-blue-400">
+                {{ truncateSummary(entry.summary) }}
+              </p>
+              <div class="mt-2 text-xs text-blue-500 dark:text-blue-400">
+                {{ formatDate(entry.published) }}
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
 
-                <div class="mt-2 flex flex-wrap items-center gap-2 text-xs">
+      <section
+        id="rss-subscriptions"
+        class="rounded-2xl border border-blue-100 bg-white p-6 dark:border-slate-700 dark:bg-slate-800"
+      >
+        <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-xl font-bold text-blue-900 dark:text-white">我的订阅</h2>
+            <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">共 {{ subscriptions.length }} 个订阅源</p>
+          </div>
+          <button
+            type="button"
+            class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+            :disabled="subscriptionsLoading"
+            @click="fetchSubscriptions"
+          >
+            {{ subscriptionsLoading ? "刷新中..." : "刷新订阅列表" }}
+          </button>
+        </div>
+
+        <div
+          v-if="subscriptionsError"
+          class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400"
+        >
+          {{ subscriptionsError }}
+        </div>
+
+        <div v-else-if="subscriptionsLoading" class="space-y-3">
+          <div
+            v-for="skeleton in 3"
+            :key="skeleton"
+            class="h-24 animate-pulse rounded-xl border border-blue-100 bg-blue-50 dark:border-slate-700 dark:bg-slate-700/40"
+          />
+        </div>
+
+        <div
+          v-else-if="subscriptions.length === 0"
+          class="rounded-xl border border-dashed border-blue-200 bg-blue-50/60 p-8 text-center text-sm text-blue-600 dark:border-slate-700 dark:bg-slate-700/20 dark:text-blue-400"
+        >
+          暂无订阅，先在上方解析并保存一个 RSS 地址吧。
+        </div>
+
+        <ul v-else class="space-y-3">
+          <li
+            v-for="subscription in subscriptions"
+            :key="subscription.id"
+            class="rounded-xl border p-4 transition-all dark:border-slate-700"
+            :class="
+              activeSubscriptionId === subscription.id
+                ? 'border-blue-300 bg-blue-50/60 dark:border-blue-700 dark:bg-blue-900/10'
+                : 'border-blue-100 bg-white hover:border-blue-200 dark:bg-slate-800'
+            "
+          >
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-2">
+                  <h3 class="truncate text-base font-semibold text-blue-900 dark:text-white">
+                    {{ getSubscriptionTitle(subscription) }}
+                  </h3>
                   <span
-                    class="rounded-full border border-blue-200 bg-blue-50 px-2 py-1 text-blue-600 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
+                    class="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-slate-700 dark:text-blue-300"
                   >
-                    {{ getFeedHost(sub.rss_url) }}
-                  </span>
-                  <span
-                    class="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-emerald-600 dark:border-emerald-900/60 dark:bg-emerald-900/30 dark:text-emerald-300"
-                  >
-                    {{ getFeedProtocol(sub.rss_url) }}
-                  </span>
-                  <span
-                    v-if="sub.entry_count !== undefined"
-                    class="rounded-full border border-amber-200 bg-amber-50 px-2 py-1 text-amber-600 dark:border-amber-900/60 dark:bg-amber-900/30 dark:text-amber-300"
-                  >
-                    {{ sub.entry_count ?? 0 }} 篇可见文章
+                    {{ getFeedProtocol(subscription.rss_url) }}
                   </span>
                 </div>
-
-                <div
-                  class="mt-2 flex flex-wrap items-center gap-3 text-sm text-blue-500"
-                >
-                  <span v-if="sub.created_at" class="flex items-center gap-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="h-4 w-4"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
-                      />
-                    </svg>
-                    添加于 {{ formatDate(sub.created_at) }}
-                  </span>
-                  <a
-                    v-if="sub.feed_link"
-                    :href="sub.feed_link"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-300 dark:hover:text-blue-200"
-                  >
-                    访问网站
-                  </a>
+                <p class="mt-1 break-all text-xs text-blue-500 dark:text-blue-400">{{ subscription.rss_url }}</p>
+                <div class="mt-2 flex flex-wrap items-center gap-3 text-xs text-blue-500 dark:text-blue-400">
+                  <span>文章数: {{ subscription.entry_count ?? 0 }}</span>
+                  <span>最近抓取: {{ formatDate(subscription.last_fetched_at) }}</span>
+                  <span>创建时间: {{ formatDate(subscription.created_at) }}</span>
                 </div>
               </div>
-              <div class="flex shrink-0 items-center gap-3">
-                <router-link
-                  :to="`/rss/articles?feed_url=${encodeURIComponent(sub.rss_url)}`"
-                  class="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="2"
-                    stroke="currentColor"
-                    class="h-4 w-4"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.987 8.987 0 00-6 2.292m0-14.25v14.25"
-                    />
-                  </svg>
-                  查看文章
-                </router-link>
+
+              <div class="flex shrink-0 flex-wrap items-center gap-2">
                 <button
                   type="button"
-                  @click="handleRefresh(sub.id)"
-                  :disabled="refreshingSubscriptionId === sub.id"
-                  class="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-white px-4 py-2 text-sm font-medium text-emerald-600 transition-colors hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-70 dark:border-emerald-900/50 dark:bg-slate-800 dark:text-emerald-400 dark:hover:bg-emerald-900/30"
+                  class="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                  @click="filterByFeed(subscription)"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="2"
-                    stroke="currentColor"
-                    class="h-4 w-4"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865A8.25 8.25 0 0117.834 6.165l3.181 3.183"
-                    />
-                  </svg>
-                  {{
-                    refreshingSubscriptionId === sub.id ? "刷新中..." : "刷新"
-                  }}
+                  查看文章
                 </button>
-
-                <AlertDialog>
-                  <AlertDialogTrigger>
-                    <button
-                      type="button"
-                      class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 dark:border-red-900/50 dark:bg-slate-800 dark:text-red-400 dark:hover:bg-red-900/30"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="2"
-                        stroke="currentColor"
-                        class="h-4 w-4"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                        />
-                      </svg>
-                      删除
-                    </button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent class="rounded-3xl">
-                    <AlertDialogHeader>
-                      <AlertDialogTitle
-                        >你确定要删除此订阅吗？</AlertDialogTitle
-                      >
-                      <AlertDialogDescription>
-                        这将永久删除订阅，并且无法恢复。请确认你要删除的订阅 URL
-                        是
-                        <span
-                          class="font-mono text-red-600 dark:text-red-400"
-                          >{{ sub.rss_url }}</span
-                        >
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>取消</AlertDialogCancel>
-                      <AlertDialogAction
-                        class="bg-red-500/70 hover:bg-red-500"
-                        @click="handleDelete(sub.id)"
-                      >
-                        确定</AlertDialogAction
-                      >
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                <button
+                  type="button"
+                  class="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-emerald-700"
+                  @click="handleRefresh(subscription)"
+                >
+                  刷新文章
+                </button>
+                <button
+                  type="button"
+                  class="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-red-700"
+                  @click="handleDelete(subscription)"
+                >
+                  删除订阅
+                </button>
               </div>
             </div>
           </li>
         </ul>
-      </div>
+      </section>
+
+      <section id="rss-articles" class="rounded-2xl border border-blue-100 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
+        <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-xl font-bold text-blue-900 dark:text-white">文章列表</h2>
+            <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">搜索与分页阅读已保存文章</p>
+          </div>
+          <button
+            type="button"
+            class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+            :disabled="articlesLoading"
+            @click="fetchArticles(currentPage)"
+          >
+            {{ articlesLoading ? "加载中..." : "刷新文章" }}
+          </button>
+        </div>
+
+        <div class="mb-4 flex flex-col gap-3 lg:flex-row">
+          <div class="relative flex-1">
+            <input
+              v-model="searchQuery"
+              type="search"
+              placeholder="搜索文章标题和内容..."
+              class="w-full rounded-xl border border-blue-200 bg-white py-3 pr-24 pl-4 text-sm text-blue-900 placeholder:text-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400"
+              @keyup.enter="handleSearch"
+            />
+            <div class="absolute inset-y-0 right-2 flex items-center gap-1">
+              <button
+                type="button"
+                class="rounded-md px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-100 hover:text-blue-800 dark:text-blue-400 dark:hover:bg-slate-700 dark:hover:text-blue-300"
+                @click="handleSearch"
+              >
+                搜索
+              </button>
+              <button
+                v-if="searchQuery"
+                type="button"
+                class="rounded-md px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-100 hover:text-blue-800 dark:text-blue-400 dark:hover:bg-slate-700 dark:hover:text-blue-300"
+                @click="clearSearch"
+              >
+                清空
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="selectedFeedUrl" class="mb-4 flex items-center gap-2">
+          <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+            当前来源: {{ selectedFeedUrl }}
+          </span>
+          <button
+            type="button"
+            class="rounded-lg border border-blue-300 px-2.5 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 dark:border-slate-600 dark:text-blue-300 dark:hover:bg-slate-700"
+            @click="clearFeedFilter"
+          >
+            清除筛选
+          </button>
+        </div>
+
+        <div
+          v-if="articlesError"
+          class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400"
+        >
+          {{ articlesError }}
+        </div>
+
+        <div v-else-if="articlesLoading" class="space-y-3">
+          <div
+            v-for="skeleton in 5"
+            :key="skeleton"
+            class="h-24 animate-pulse rounded-xl border border-blue-100 bg-blue-50 dark:border-slate-700 dark:bg-slate-700/40"
+          />
+        </div>
+
+        <div
+          v-else-if="articles.length === 0"
+          class="rounded-xl border border-dashed border-blue-200 bg-blue-50/60 p-8 text-center text-sm text-blue-600 dark:border-slate-700 dark:bg-slate-700/20 dark:text-blue-400"
+        >
+          暂无文章，尝试刷新订阅或更换搜索条件。
+        </div>
+
+        <div v-else>
+          <ul class="space-y-3">
+            <li
+              v-for="article in articles"
+              :key="article.id"
+              class="rounded-xl border border-blue-100 bg-white p-4 transition-all hover:border-blue-300 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600"
+            >
+              <div class="flex flex-col gap-3">
+                <div class="flex flex-wrap items-start justify-between gap-2">
+                  <router-link
+                    :to="`/rss/articles/${article.id}`"
+                    class="text-base font-semibold text-blue-900 hover:text-blue-600 dark:text-white dark:hover:text-blue-400"
+                  >
+                    {{ article.title || "无标题" }}
+                  </router-link>
+                  <span
+                    class="rounded-full px-2 py-0.5 text-xs font-medium"
+                    :class="
+                      article.is_read
+                        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
+                        : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                    "
+                  >
+                    {{ article.is_read ? "已读" : "未读" }}
+                  </span>
+                </div>
+                <p v-if="article.summary" class="line-clamp-2 text-sm text-blue-600 dark:text-blue-400">
+                  {{ article.summary }}
+                </p>
+                <div class="flex flex-wrap items-center gap-3 text-xs text-blue-500 dark:text-blue-400">
+                  <span v-if="article.author">作者: {{ article.author }}</span>
+                  <span>发布时间: {{ formatDate(article.published) }}</span>
+                  <span class="truncate">来源: {{ article.feed_url }}</span>
+                  <a
+                    :href="article.link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                  >
+                    阅读原文
+                  </a>
+                </div>
+              </div>
+            </li>
+          </ul>
+
+          <nav v-if="totalPages > 1" class="mt-6 flex items-center justify-center gap-3">
+            <button
+              type="button"
+              :disabled="currentPage <= 1"
+              class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+              :class="
+                currentPage > 1
+                  ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
+                  : 'cursor-not-allowed bg-blue-100 text-blue-400 dark:bg-slate-800 dark:text-slate-600'
+              "
+              @click="goToPage(currentPage - 1)"
+            >
+              上一页
+            </button>
+            <span class="text-sm font-medium text-blue-700 dark:text-blue-300">
+              第 {{ currentPage }} 页 / 共 {{ totalPages }} 页
+            </span>
+            <button
+              type="button"
+              :disabled="currentPage >= totalPages"
+              class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+              :class="
+                currentPage < totalPages
+                  ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
+                  : 'cursor-not-allowed bg-blue-100 text-blue-400 dark:bg-slate-800 dark:text-slate-600'
+              "
+              @click="goToPage(currentPage + 1)"
+            >
+              下一页
+            </button>
+          </nav>
+        </div>
+      </section>
     </div>
   </BasicDetail>
 </template>
 
 <script setup lang="ts">
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import request from "@/api/request";
 import { BasicDetail } from "@/components/basic";
-import request, { type ApiResponse } from "@/request";
 import { useNotificationStore } from "@/stores/notification";
-import type { RssSubscription } from "@/types";
+import type {
+  ApiResponse,
+  RssArticle,
+  RssArticleListResponse,
+  RssSubscription,
+} from "@/types";
 import { formatDate } from "@/utils/formatdate";
-import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import { useStorage } from "@vueuse/core";
+import { computed, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
+interface RssMetadata {
+  title: string;
+  description: string;
+  link: string;
+  published?: string;
+}
+
+interface RssEntry {
+  title: string;
+  link: string;
+  summary: string;
+  published: string;
+  content?: string;
+}
+
+interface ParseForm {
+  rssUrl: string;
+  saveToDb: boolean;
+}
+
+interface ExampleFeed {
+  name: string;
+  url: string;
+}
+
+const route = useRoute();
 const router = useRouter();
-const subscriptions = ref<RssSubscription[]>([]);
-const isLoading = ref<boolean>(false);
-const errorMessage = ref<string>("");
-const refreshingSubscriptionId = ref<number | null>(null);
-const notificationStore = useNotificationStore();
+const notifier = useNotificationStore();
 
-const getFeedHost = (url: string) => {
+const rssForm = ref<ParseForm>({
+  rssUrl: "",
+  saveToDb: false,
+});
+const rssHistory = useStorage<string[]>("rssHistory", []);
+const parseMetadata = ref<RssMetadata | null>(null);
+const parseEntries = ref<RssEntry[]>([]);
+const parseLoading = ref(false);
+
+const subscriptions = ref<RssSubscription[]>([]);
+const subscriptionsLoading = ref(false);
+const subscriptionsError = ref("");
+const activeSubscriptionId = ref<number | null>(null);
+
+const articles = ref<RssArticle[]>([]);
+const articlesLoading = ref(false);
+const articlesError = ref("");
+const currentPage = ref(1);
+const totalItems = ref(0);
+const limit = 20;
+const searchQuery = ref("");
+const selectedFeedUrl = ref("");
+
+const exampleFeeds: ExampleFeed[] = [
+  { name: "少数派", url: "https://sspai.com/feed" },
+  { name: "GitHub", url: "https://github.com/blog.atom" },
+  { name: "TechCrunch", url: "https://techcrunch.com/feed/" },
+];
+
+const totalPages = computed(() => Math.ceil(totalItems.value / limit));
+
+const truncateSummary = (summary: string, maxLength = 160): string => {
+  if (!summary) {
+    return "";
+  }
+
+  const plainText = summary.replace(/<[^>]*>/g, "").trim();
+  if (plainText.length <= maxLength) {
+    return plainText;
+  }
+
+  return `${plainText.slice(0, maxLength)}...`;
+};
+
+const getFeedHost = (url: string): string => {
   try {
     return new URL(url).hostname;
   } catch {
-    return "未知来源";
+    return url;
   }
 };
 
-const getFeedProtocol = (url: string) => {
+const getFeedProtocol = (url: string): string => {
   try {
     return new URL(url).protocol.replace(":", "").toUpperCase();
   } catch {
-    return "UNKNOWN";
+    return "URL";
   }
 };
 
-const getSubscriptionTitle = (
-  feedTitle: string | null | undefined,
-  rssUrl: string,
-) => {
-  const normalizedTitle = feedTitle?.trim();
-  if (normalizedTitle) {
-    return normalizedTitle;
+const getSubscriptionTitle = (subscription: RssSubscription): string => {
+  if (subscription.feed_title && subscription.feed_title.trim()) {
+    return subscription.feed_title;
   }
-  return getFeedHost(rssUrl);
+
+  return getFeedHost(subscription.rss_url);
 };
 
-const fetchSubscriptions = async () => {
-  isLoading.value = true;
-  errorMessage.value = "";
+const syncRouteQuery = async (page: number): Promise<void> => {
+  const query: Record<string, string> = {};
+  if (page > 1) {
+    query.page = String(page);
+  }
+  if (selectedFeedUrl.value.trim()) {
+    query.feed_url = selectedFeedUrl.value.trim();
+  }
+  if (searchQuery.value.trim()) {
+    query.search = searchQuery.value.trim();
+  }
+
   try {
-    const res =
-      await request.get<ApiResponse<RssSubscription[]>>("/rss/subscriptions");
-    if (res.data.status === "success") {
-      subscriptions.value = res.data.data || [];
-    } else {
-      throw new Error(res.data.message || "获取订阅列表失败");
-    }
-  } catch (err: unknown) {
-    const error = err as {
-      response?: { data?: { message?: string } };
-      message?: string;
-    };
-    errorMessage.value =
-      error?.response?.data?.message || error?.message || "获取订阅列表失败";
-  } finally {
-    isLoading.value = false;
+    await router.replace({
+      path: "/rss",
+      query,
+    });
+  } catch {
+    // 同一路由重复更新 query 时可忽略
   }
 };
 
-const handleRefresh = async (id: number) => {
-  if (refreshingSubscriptionId.value !== null) {
+const parseRss = async (): Promise<void> => {
+  const rssUrl = rssForm.value.rssUrl.trim();
+  if (!rssUrl) {
+    notifier.error("请输入 RSS 订阅地址");
     return;
   }
 
-  refreshingSubscriptionId.value = id;
-  try {
-    const res = await request.post<ApiResponse<{ saved_count: number }>>(
-      `/rss/subscriptions/${id}/refresh`,
-    );
-    if (res.data.status === "success") {
-      const savedCount = res.data.data?.saved_count ?? 0;
-      notificationStore.success(`订阅刷新成功，新增 ${savedCount} 篇文章`);
-    } else {
-      throw new Error(res.data.message || "刷新订阅失败");
+  parseLoading.value = true;
+
+  if (!rssHistory.value.includes(rssUrl)) {
+    rssHistory.value.unshift(rssUrl);
+    if (rssHistory.value.length > 3) {
+      rssHistory.value.splice(3);
     }
-  } catch (err: unknown) {
-    const error = err as {
-      response?: { data?: { message?: string } };
-      message?: string;
+  }
+
+  try {
+    const response = await request.post("/rss/parse-rss", {
+      rss_url: rssUrl,
+      save_to_db: rssForm.value.saveToDb,
+    });
+
+    const parsedData = response.data?.data as
+      | {
+          meta: RssMetadata;
+          entries: RssEntry[];
+        }
+      | undefined;
+
+    if (!parsedData) {
+      throw new Error("解析结果为空");
+    }
+
+    parseMetadata.value = {
+      title: parsedData.meta.title,
+      description: parsedData.meta.description,
+      link: parsedData.meta.link,
+      published: parsedData.meta.published,
     };
-    notificationStore.error(
-      error?.response?.data?.message || error?.message || "刷新订阅失败",
+    parseEntries.value = parsedData.entries.map((entry) => ({
+      title: entry.title,
+      link: entry.link,
+      summary: entry.summary,
+      published: entry.published,
+      content: entry.content,
+    }));
+
+    notifier.success("RSS 解析成功");
+
+    if (rssForm.value.saveToDb) {
+      await fetchSubscriptions();
+      await fetchArticles(1);
+    }
+  } catch (error: unknown) {
+    console.error("RSS parse error:", error);
+    notifier.error(
+      `解析失败: ${error instanceof Error ? error.message : "未知错误"}`,
     );
   } finally {
-    refreshingSubscriptionId.value = null;
+    parseLoading.value = false;
   }
 };
 
-const handleDelete = async (id: number) => {
+const fetchSubscriptions = async (): Promise<void> => {
+  subscriptionsLoading.value = true;
+  subscriptionsError.value = "";
+
   try {
-    const res = await request.delete<ApiResponse<null>>(
-      `/rss/subscriptions/${id}`,
+    const response = await request.get<ApiResponse<RssSubscription[]>>(
+      "/rss/subscriptions",
     );
-    if (res.data.status === "success") {
-      subscriptions.value = subscriptions.value.filter((sub) => sub.id !== id);
-    } else {
-      throw new Error(res.data.message || "删除订阅失败");
+    const data = response.data.data;
+
+    if (!Array.isArray(data)) {
+      throw new Error(response.data.message || "订阅列表格式错误");
     }
-  } catch (err: unknown) {
-    const error = err as {
-      response?: { data?: { message?: string } };
-      message?: string;
+
+    subscriptions.value = data;
+
+    if (selectedFeedUrl.value) {
+      const active = subscriptions.value.find(
+        (subscription) => subscription.rss_url === selectedFeedUrl.value,
+      );
+      activeSubscriptionId.value = active ? active.id : null;
+    }
+  } catch (error: unknown) {
+    console.error("fetch subscriptions error:", error);
+    subscriptionsError.value =
+      error instanceof Error ? error.message : "加载订阅失败";
+    notifier.error(subscriptionsError.value);
+  } finally {
+    subscriptionsLoading.value = false;
+  }
+};
+
+const fetchArticles = async (page = 1): Promise<void> => {
+  articlesLoading.value = true;
+  articlesError.value = "";
+
+  try {
+    const params: Record<string, number | string> = {
+      page,
+      limit,
     };
-    notificationStore.error(
-      error?.response?.data?.message || error?.message || "删除订阅失败",
+
+    const feedUrl = selectedFeedUrl.value.trim();
+    if (feedUrl) {
+      params.feed_url = feedUrl;
+    }
+
+    const search = searchQuery.value.trim();
+    if (search) {
+      params.search = search;
+    }
+
+    const response = await request.get<ApiResponse<RssArticleListResponse>>(
+      "/rss/articles",
+      { params },
+    );
+
+    if (response.data.status !== "success" || !response.data.data) {
+      throw new Error(response.data.message || "获取文章列表失败");
+    }
+
+    articles.value = response.data.data.items;
+    totalItems.value = response.data.data.total;
+    currentPage.value = response.data.data.page;
+  } catch (error: unknown) {
+    console.error("fetch articles error:", error);
+    articlesError.value = error instanceof Error ? error.message : "加载文章失败";
+    notifier.error(articlesError.value);
+  } finally {
+    articlesLoading.value = false;
+  }
+};
+
+const handleRefresh = async (subscription: RssSubscription): Promise<void> => {
+  try {
+    await request.post(`/rss/subscriptions/${subscription.id}/refresh`);
+    notifier.success(`已刷新：${getSubscriptionTitle(subscription)}`);
+    await fetchSubscriptions();
+
+    if (selectedFeedUrl.value === subscription.rss_url) {
+      await fetchArticles(1);
+    }
+  } catch (error: unknown) {
+    console.error("refresh subscription error:", error);
+    notifier.error(
+      `刷新失败: ${error instanceof Error ? error.message : "未知错误"}`,
     );
   }
 };
 
-onMounted(() => {
-  fetchSubscriptions();
+const handleDelete = async (subscription: RssSubscription): Promise<void> => {
+  const confirmed = window.confirm(
+    `确定删除订阅「${getSubscriptionTitle(subscription)}」及其相关文章吗？`,
+  );
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    await request.delete(`/rss/subscriptions/${subscription.id}`);
+    notifier.success("订阅删除成功");
+
+    if (selectedFeedUrl.value === subscription.rss_url) {
+      selectedFeedUrl.value = "";
+      activeSubscriptionId.value = null;
+      await syncRouteQuery(1);
+      await fetchArticles(1);
+    }
+
+    await fetchSubscriptions();
+  } catch (error: unknown) {
+    console.error("delete subscription error:", error);
+    notifier.error(
+      `删除失败: ${error instanceof Error ? error.message : "未知错误"}`,
+    );
+  }
+};
+
+const filterByFeed = async (subscription: RssSubscription): Promise<void> => {
+  selectedFeedUrl.value = subscription.rss_url;
+  activeSubscriptionId.value = subscription.id;
+  await syncRouteQuery(1);
+  await fetchArticles(1);
+};
+
+const clearFeedFilter = async (): Promise<void> => {
+  selectedFeedUrl.value = "";
+  activeSubscriptionId.value = null;
+  await syncRouteQuery(1);
+  await fetchArticles(1);
+};
+
+const handleSearch = async (): Promise<void> => {
+  await syncRouteQuery(1);
+  await fetchArticles(1);
+};
+
+const clearSearch = async (): Promise<void> => {
+  searchQuery.value = "";
+  await handleSearch();
+};
+
+const goToPage = async (page: number): Promise<void> => {
+  if (page < 1 || page > totalPages.value) {
+    return;
+  }
+
+  await syncRouteQuery(page);
+  await fetchArticles(page);
+};
+
+onMounted(async () => {
+  if (typeof route.query.feed_url === "string") {
+    selectedFeedUrl.value = route.query.feed_url;
+  }
+  if (typeof route.query.search === "string") {
+    searchQuery.value = route.query.search;
+  }
+
+  const pageFromQuery =
+    typeof route.query.page === "string"
+      ? Number.parseInt(route.query.page, 10)
+      : 1;
+  const initialPage = Number.isNaN(pageFromQuery) || pageFromQuery < 1
+    ? 1
+    : pageFromQuery;
+
+  await Promise.all([fetchSubscriptions(), fetchArticles(initialPage)]);
 });
 </script>

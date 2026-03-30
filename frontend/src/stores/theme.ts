@@ -4,16 +4,12 @@ import { ref, watch } from "vue";
 export type Theme = "light" | "dark" | "system";
 
 export const useThemeStore = defineStore("theme", () => {
-  const theme = ref<Theme>(
-    (localStorage.getItem("theme") as Theme) || "system",
-  );
+  const theme = ref<Theme>((localStorage.getItem("theme") as Theme) || "system");
 
   const applyTheme = (newTheme: Theme) => {
     const root = document.documentElement;
     const isDark =
-      newTheme === "dark" ||
-      (newTheme === "system" &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches);
+      newTheme === "dark" || (newTheme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
     if (isDark) {
       root.classList.add("dark");
@@ -48,8 +44,26 @@ export const useThemeStore = defineStore("theme", () => {
     theme.value = newTheme;
   };
 
+  // Cleanup listener on unmount
+  const cleanup = () => {
+    mediaQuery.removeEventListener("change", handleSystemChange);
+  };
+
+  const toggleTheme = () => {
+    if (theme.value === "light") {
+      setTheme("dark");
+    } else if (theme.value === "dark") {
+      setTheme("light");
+    } else {
+      // If system, toggle based on current system preference
+      const isCurrentlyDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setTheme(isCurrentlyDark ? "light" : "dark");
+    }
+  };
+
   return {
     theme,
     setTheme,
+    toggleTheme,
   };
 });

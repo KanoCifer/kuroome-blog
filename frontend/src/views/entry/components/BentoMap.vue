@@ -14,6 +14,6 @@
 </template>
 
 <script setup lang="ts">
-import IconGlobal from "../icons/IconGlobal.vue";
-import BentoCard from "./BentoCard.vue";
+import BentoCard from "@/components/bento/BentoCard.vue";
+import IconGlobal from "@/components/icons/IconGlobal.vue";
 </script>

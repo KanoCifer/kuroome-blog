@@ -30,8 +30,9 @@
           </li>
           <!-- Navigation Icons -->
           <li class="relative flex items-center gap-4 px-2">
+            <!-- Indicator -->
             <motion.div
-              class="pointer-events-none absolute top-0 left-0 z-1 h-12 w-12 rounded-full bg-white shadow-sm dark:bg-gray-700"
+              class="pointer-events-none absolute top-0 left-0 z-1 h-12 w-12 rounded-full bg-gray-100 shadow-sm dark:bg-gray-700"
               :animate="{ x: indicatorX }"
               :transition="{ type: 'spring', stiffness: 320, damping: 30 }"
             />

@@ -1,8 +1,7 @@
 <script setup lang="ts">
+import request from "@/api/request";
 import ArticleDetailLayout from "@/components/article/ArticleDetailLayout.vue";
-import ArticleComments from "@/components/blog/ArticleComments.vue";
 import ArticleSummaryCard from "@/components/blog/ArticleSummaryCard.vue";
-import request from "@/request";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
 import type { Post, PostResponse } from "@/types";
@@ -12,19 +11,12 @@ import { useHead } from "@unhead/vue";
 import { Modal } from "ant-design-vue";
 import hljs from "highlight.js/lib/common";
 import "highlight.js/styles/github-dark.css";
-import {
-  computed,
-  createVNode,
-  nextTick,
-  onMounted,
-  onUnmounted,
-  ref,
-  watch,
-} from "vue";
+import { computed, createVNode, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import CalendarIcon from "../../components/icons/CalendarIcon.vue";
 import DelIcon from "../../components/icons/DelIcon.vue";
 import EditIcon from "../../components/icons/EditIcon.vue";
+import ArticleComments from "./components/ArticleComments.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -58,8 +50,7 @@ const fetchPost = async () => {
     }
   } catch (err: unknown) {
     console.error(err);
-    errorMessage.value =
-      err instanceof Error ? err.message : "加载文章失败，请稍后重试。";
+    errorMessage.value = err instanceof Error ? err.message : "加载文章失败，请稍后重试。";
     useNotificationStore().error(errorMessage.value);
   } finally {
     isLoading.value = false;
@@ -95,9 +86,7 @@ watch(
 );
 
 useHead(() => ({
-  title: post.value
-    ? `${post.value.title} - ReadingList`
-    : "文章未找到 - ReadingList",
+  title: post.value ? `${post.value.title} - ReadingList` : "文章未找到 - ReadingList",
   meta: [
     {
       name: "description",
@@ -204,8 +193,7 @@ const handleDelete = async () => {
     }
   } catch (err: unknown) {
     console.error("删除文章失败:", err);
-    const errorMsg =
-      err instanceof Error ? err.message : "删除文章失败，请稍后重试";
+    const errorMsg = err instanceof Error ? err.message : "删除文章失败，请稍后重试";
     useNotificationStore().error(errorMsg);
   }
 };
@@ -313,15 +301,11 @@ onUnmounted(() => {
       class="overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
     >
       <div class="border-b border-blue-100 p-8 dark:border-slate-700">
-        <h1
-          class="mb-4 text-3xl leading-tight font-bold text-blue-900 dark:text-white"
-        >
+        <h1 class="mb-4 text-3xl leading-tight font-bold text-blue-900 dark:text-white">
           {{ post.title }}
         </h1>
 
-        <div
-          class="flex flex-wrap gap-x-6 gap-y-3 text-sm text-blue-600 dark:text-blue-400"
-        >
+        <div class="flex flex-wrap gap-x-6 gap-y-3 text-sm text-blue-600 dark:text-blue-400">
           <div v-if="post.author" class="flex items-center gap-1.5 font-medium">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -355,11 +339,7 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <ArticleComments
-        :post-id="postId"
-        :comments="comments"
-        @refresh="fetchPost"
-      />
+      <ArticleComments :post-id="postId" :comments="comments" @refresh="fetchPost" />
     </div>
   </ArticleDetailLayout>
 </template>

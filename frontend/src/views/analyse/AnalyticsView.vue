@@ -1,20 +1,11 @@
 <template>
   <div>
     <!-- Title Section with Parallax -->
-    <div
-      class="relative z-10 mx-0 mt-60 flex flex-col items-center justify-center bg-transparent"
-      :style="titleStyle"
-    >
+    <div class="relative z-10 mx-0 mt-60 flex flex-col items-center justify-center bg-transparent" :style="titleStyle">
       <div>
-        <h1
-          class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl"
-        >
-          Analytics Dashboard
-        </h1>
+        <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl">Analytics Dashboard</h1>
         <!-- Admin Badge and Description -->
-        <div
-          class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400"
-        >
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400">
           <span
             class="inline-block rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400"
           >
@@ -44,12 +35,7 @@
               @mouseenter="handleMouseIn"
               @mouseleave="handleMouseOut"
             >
-              <svg
-                class="h-4 w-4 text-gray-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg class="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -65,12 +51,7 @@
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 9l-7 7-7-7"
-                />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
 
@@ -112,10 +93,7 @@
             class="group flex cursor-pointer items-center gap-2 rounded-xl bg-gray-900 px-5 py-2.5 font-medium text-white shadow-md transition-all select-none hover:bg-gray-800 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
           >
             <svg
-              :class="[
-                loading ? 'animate-spin' : 'group-hover:rotate-180',
-                'h-4 w-4 transition-transform',
-              ]"
+              :class="[loading ? 'animate-spin' : 'group-hover:rotate-180', 'h-4 w-4 transition-transform']"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -152,11 +130,7 @@
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <!-- Loading Skeleton -->
           <template v-if="loading && !overviewData">
-            <div
-              v-for="i in 4"
-              :key="i"
-              class="squircle h-32 animate-pulse bg-white/60 dark:bg-gray-800/60"
-            ></div>
+            <div v-for="i in 4" :key="i" class="squircle h-32 animate-pulse bg-white/60 dark:bg-gray-800/60"></div>
           </template>
 
           <!-- Actual Cards -->
@@ -169,12 +143,7 @@
                 <div
                   class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
                 >
-                  <svg
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -189,17 +158,12 @@
                     />
                   </svg>
                 </div>
-                <span
-                  class="text-sm font-medium text-gray-500 dark:text-gray-400"
-                  >Total Visits</span
-                >
+                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Visits</span>
               </div>
               <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">
                 {{ formatNumber(overviewData?.total_visits ?? 0) }}
               </p>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                Page Views
-              </p>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Page Views</p>
             </div>
 
             <!-- Unique Visitors (UV) -->
@@ -210,12 +174,7 @@
                 <div
                   class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
                 >
-                  <svg
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -224,17 +183,12 @@
                     />
                   </svg>
                 </div>
-                <span
-                  class="text-sm font-medium text-gray-500 dark:text-gray-400"
-                  >Unique Visitors</span
-                >
+                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Unique Visitors</span>
               </div>
               <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">
                 {{ formatNumber(overviewData?.unique_visitors ?? 0) }}
               </p>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                By IP address
-              </p>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">By IP address</p>
             </div>
 
             <!-- Unique Visitor IDs -->
@@ -245,12 +199,7 @@
                 <div
                   class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
                 >
-                  <svg
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -259,17 +208,12 @@
                     />
                   </svg>
                 </div>
-                <span
-                  class="text-sm font-medium text-gray-500 dark:text-gray-400"
-                  >Visitor IDs</span
-                >
+                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Visitor IDs</span>
               </div>
               <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">
                 {{ formatNumber(overviewData?.unique_visitor_ids ?? 0) }}
               </p>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                By visitor ID
-              </p>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">By visitor ID</p>
             </div>
 
             <!-- Avg Visits Per Day -->
@@ -280,12 +224,7 @@
                 <div
                   class="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400"
                 >
-                  <svg
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -294,17 +233,12 @@
                     />
                   </svg>
                 </div>
-                <span
-                  class="text-sm font-medium text-gray-500 dark:text-gray-400"
-                  >Avg/Day</span
-                >
+                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Avg/Day</span>
               </div>
               <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">
                 {{ avgVisitsPerDay }}
               </p>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                Last {{ selectedDays }} days
-              </p>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Last {{ selectedDays }} days</p>
             </div>
           </template>
         </div>
@@ -312,41 +246,23 @@
         <!-- Charts Section -->
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <AreaChart class="squircle dark:bg-gray-900/80" />
-          <PopularPagesChartCard
-            :loading="loading"
-            :overview-data="overviewData"
-            class="squircle"
-          />
+          <PopularPagesChartCard :loading="loading" :overview-data="overviewData" class="squircle" />
         </div>
 
         <!-- Device & Browser Analytics Section -->
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <OsCharts
-            class="squircle"
-            :loading="loading"
-            :os-stats="overviewData?.os_stats ?? []"
-          />
-          <BrowserAnalytics
-            class="squircle"
-            :loading="loading"
-            :browser-stats="overviewData?.browser_stats ?? []"
-          />
+          <OsCharts class="squircle" :loading="loading" :os-stats="overviewData?.os_stats ?? []" />
+          <BrowserAnalytics class="squircle" :loading="loading" :browser-stats="overviewData?.browser_stats ?? []" />
         </div>
 
         <!-- Server Monitoring Section -->
-        <ServerMonitor
-          custom-class="squircle"
-          ref="serverMonitorRef"
-          :auto-start="true"
-        />
+        <ServerMonitor custom-class="squircle" ref="serverMonitorRef" :auto-start="true" />
 
         <!-- User Login Logs Table -->
         <div
           class="squircle squircle overflow-hidden border border-gray-200/60 bg-white/30 p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900/70"
         >
-          <h2
-            class="mb-4 flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100"
-          >
+          <h2 class="mb-4 flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100">
             <icon-user class="inline-block size-4" />
             User Login Logs
           </h2>
@@ -354,19 +270,12 @@
           <!-- Loading State -->
           <div v-if="loading && !loginLogsData" class="py-8">
             <div class="space-y-3">
-              <div
-                v-for="i in 5"
-                :key="i"
-                class="h-12 animate-pulse rounded-lg bg-gray-100 dark:bg-gray-700/40"
-              ></div>
+              <div v-for="i in 5" :key="i" class="h-12 animate-pulse rounded-lg bg-gray-100 dark:bg-gray-700/40"></div>
             </div>
           </div>
 
           <!-- Empty State -->
-          <div
-            v-else-if="loginLogsData?.list.length === 0"
-            class="py-12 text-center text-gray-500 dark:text-gray-400"
-          >
+          <div v-else-if="loginLogsData?.list.length === 0" class="py-12 text-center text-gray-500 dark:text-gray-400">
             <svg
               class="mx-auto mb-4 h-12 w-12 text-gray-300 dark:text-gray-600"
               fill="none"
@@ -416,9 +325,7 @@
                         <p class="font-medium text-gray-900 dark:text-gray-100">
                           {{ log.name || log.username }}
                         </p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">
-                          @{{ log.username }}
-                        </p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">@{{ log.username }}</p>
                       </div>
                     </div>
                   </td>
@@ -435,14 +342,10 @@
                   <td class="py-4 text-gray-600 dark:text-gray-300">
                     {{ formatDateTime(log.current_login_at) }}
                   </td>
-                  <td
-                    class="py-4 font-mono text-xs text-gray-500 dark:text-gray-400"
-                  >
+                  <td class="py-4 font-mono text-xs text-gray-500 dark:text-gray-400">
                     {{ log.last_login_ip || "-" }}
                   </td>
-                  <td
-                    class="py-4 font-mono text-xs text-gray-500 dark:text-gray-400"
-                  >
+                  <td class="py-4 font-mono text-xs text-gray-500 dark:text-gray-400">
                     {{ log.current_login_ip || "-" }}
                   </td>
                   <td>
@@ -465,12 +368,7 @@
             <p class="text-sm text-gray-500 dark:text-gray-400">
               Showing
               {{ (loginLogsData.page - 1) * loginLogsData.page_size + 1 }} to
-              {{
-                Math.min(
-                  loginLogsData.page * loginLogsData.page_size,
-                  loginLogsData.total,
-                )
-              }}
+              {{ Math.min(loginLogsData.page * loginLogsData.page_size, loginLogsData.total) }}
               of {{ loginLogsData.total }} results
             </p>
             <div class="flex gap-2">
@@ -505,12 +403,7 @@
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             返回首页
           </RouterLink>
@@ -521,18 +414,18 @@
 </template>
 
 <script setup lang="ts">
-import AreaChart from "@/components/analytics/AreaChart.vue";
-import BrowserAnalytics from "@/components/analytics/BrowserAnalytics.vue";
-import OsCharts from "@/components/analytics/OsCharts.vue";
-import PopularPagesChartCard from "@/components/analytics/PopularPagesChartCard.vue";
-import ServerMonitor from "@/components/analytics/ServerMonitor.vue";
+import request from "@/api/request";
 import IconUser from "@/components/icons/IconUser.vue";
-import request from "@/request";
 import { useAuthStore } from "@/stores/auth";
 import { useScroll } from "@vueuse/core";
 import dayjs from "dayjs";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
+import AreaChart from "./components/AreaChart.vue";
+import BrowserAnalytics from "./components/BrowserAnalytics.vue";
+import OsCharts from "./components/OsCharts.vue";
+import PopularPagesChartCard from "./components/PopularPagesChartCard.vue";
+import ServerMonitor from "./components/ServerMonitor.vue";
 
 // Types
 interface OverviewData {

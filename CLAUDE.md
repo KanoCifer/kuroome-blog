@@ -28,9 +28,9 @@ alembic upgrade head                    # Run all migrations
 
 # Testing
 python -m pytest                                  # All tests
-python -m pytest tests/test_books.py -v           # Single file
-python -m pytest tests/test_books.py::test_list -v # Single function
-python -m pytest -k "keyword"                     # Filter by keyword
+python -m pytest test/test_main.py -v             # Single file
+python -m pytest test/core/test_config.py::test_config_loading -v # Single function
+python -m pytest -k "config" -v                   # Filter by keyword
 python -m pytest --tb=short                        # Short traceback
 ```
 
@@ -45,6 +45,10 @@ pnpm run build-only                     # Build only (skip type-check)
 
 # Testing
 pnpm run test:unit                      # Vitest unit tests
+pnpm run test:unit -- src/path/to/file.test.ts # Single file
+pnpm run test:unit -- -t "should render title" # By test name
+pnpm run test:unit -- src/path/to/file.test.ts -t "should render title" # File + test name
+pnpm run test:unit -- src/path/to/file.test.ts:42 # File + line
 npx playwright test                     # Playwright E2E
 npx playwright test --headed            # E2E with browser UI
 npx playwright test --debug             # Debug E2E
@@ -64,8 +68,10 @@ backend/app/
 └── main.py              # FastAPI entry point
 
 frontend/src/
-├── views/               # Page components (auth, blog, rss, books, general)
-├── components/          # Reusable Vue components (ui/, bento/, basic/, icons/, editor/)
+├── views/               # Page components
+├── components/          # Reusable Vue components
+├── auth/                # Authentication logic
+├── service/            # API calls and business logic
 ├── stores/              # Pinia state management
 ├── router/              # Vue Router config
 ├── types/               # TypeScript type definitions

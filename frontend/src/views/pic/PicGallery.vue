@@ -408,8 +408,8 @@
 </template>
 
 <script setup lang="ts">
+import request from "@/api/request";
 import { Button } from "@/components/ui/button";
-import request from "@/request";
 import { useAuthStore } from "@/stores/auth";
 import { useDeviceStore } from "@/stores/device";
 import { useNotificationStore } from "@/stores/notification";

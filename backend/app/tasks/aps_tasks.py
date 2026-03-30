@@ -3,6 +3,7 @@ import time
 from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime, timedelta
 from itertools import repeat
+from zoneinfo import ZoneInfo
 
 import orjson
 from redis.asyncio import Redis as AsyncRedis
@@ -18,6 +19,127 @@ from app.tasks.feishu_task import send_feishu_message
 from app.utils import get_redis_lock
 
 FeishuKiqCallable = Callable[..., Awaitable[object]]
+SHANGHAI_TZ = ZoneInfo("Asia/Shanghai")
+
+
+def _build_daily_summary_message(
+    *,
+    total_visits: int,
+    unique_visitors: int,
+    unique_ips: int,
+    top_pages: list[dict[str, int | str]],
+    browser_stats: list[dict[str, int | str | None]],
+    os_stats: list[dict[str, int | str | None]],
+    device_stats: list[dict[str, int | str | None]],
+) -> str:
+    lines: list[str] = []
+    lines.append("📈 核心指标")
+    lines.append(f"• 总访问量: {total_visits} 次")
+    lines.append(f"• 独立访客: {unique_visitors} 人")
+    lines.append(f"• 独立IP: {unique_ips} 个\n")
+
+    if top_pages:
+        lines.append("🔥 热门页面 Top 5")
+        for item in top_pages:
+            count = _to_int(item.get("count"))
+            page_path = str(item.get("page_path") or "未知页面")
+            percentage = count / total_visits * 100 if total_visits > 0 else 0
+            lines.append(f"• {page_path}: {count} 次 ({percentage:.1f}%)")
+        lines.append("")
+
+    if browser_stats:
+        lines.append("🌐 浏览器分布")
+        for item in browser_stats:
+            count = _to_int(item.get("count"))
+            percentage = (
+                count / unique_visitors * 100 if unique_visitors > 0 else 0
+            )
+            browser_name = str(item.get("browser_name") or "未知")
+            lines.append(f"• {browser_name}: {count} 人 ({percentage:.1f}%)")
+        lines.append("")
+
+    if os_stats:
+        lines.append("💻 操作系统分布")
+        for item in os_stats:
+            count = _to_int(item.get("count"))
+            percentage = (
+                count / unique_visitors * 100 if unique_visitors > 0 else 0
+            )
+            os_name = str(item.get("os_name") or "未知")
+            lines.append(f"• {os_name}: {count} 人 ({percentage:.1f}%)")
+        lines.append("")
+
+    if device_stats:
+        lines.append("📱 设备类型分布")
+        for item in device_stats:
+            count = _to_int(item.get("count"))
+            percentage = (
+                count / unique_visitors * 100 if unique_visitors > 0 else 0
+            )
+            device_type = str(item.get("device_type") or "未知")
+            lines.append(f"• {device_type}: {count} 人 ({percentage:.1f}%)")
+        lines.append("")
+
+    lines.append("────────────────")
+    lines.append("📌 此消息由 BOT 自动发送")
+    return "\n".join(lines)
+
+
+def _split_message_by_utf8_bytes(
+    text: str, *, max_bytes: int = 12_000
+) -> list[str]:
+    stripped = text.strip()
+    if not stripped:
+        return []
+
+    chunks: list[str] = []
+    current: list[str] = []
+
+    def current_text() -> str:
+        return "\n".join(current)
+
+    for line in stripped.split("\n"):
+        candidate_lines = [*current, line]
+        candidate = "\n".join(candidate_lines)
+        if len(candidate.encode("utf-8")) <= max_bytes:
+            current = candidate_lines
+            continue
+
+        if current:
+            chunks.append(current_text())
+            current = []
+
+        if len(line.encode("utf-8")) <= max_bytes:
+            current = [line]
+            continue
+
+        buffer = ""
+        for char in line:
+            candidate_buffer = f"{buffer}{char}"
+            if len(candidate_buffer.encode("utf-8")) <= max_bytes:
+                buffer = candidate_buffer
+                continue
+            if buffer:
+                chunks.append(buffer)
+            buffer = char
+        if buffer:
+            current = [buffer]
+
+    if current:
+        chunks.append(current_text())
+
+    return [chunk for chunk in chunks if chunk.strip()]
+
+
+def _to_int(value: int | str | None) -> int:
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str):
+        try:
+            return int(value)
+        except ValueError:
+            return 0
+    return 0
 
 
 async def _enqueue_feishu_message(
@@ -291,10 +413,11 @@ async def send_daily_summary(
         logger.warning("⚠️ 未配置飞书webhook，跳过发送每日统计飞书消息")
         return
 
-    # 计算昨天的时间 (UTC)
-    yesterday = (datetime.now(UTC) - timedelta(days=1)).replace(
+    today_shanghai = datetime.now(SHANGHAI_TZ).replace(
         hour=0, minute=0, second=0, microsecond=0
     )
+    target_day_shanghai = today_shanghai - timedelta(days=1)
+    target_day_utc = target_day_shanghai.astimezone(UTC)
 
     try:
         from app.core.container import get_monitor_service
@@ -305,7 +428,7 @@ async def send_daily_summary(
             return
 
         async with get_monitor_service(redis) as monitor_service:
-            stats = await monitor_service.get_daily_summary(yesterday)
+            stats = await monitor_service.get_daily_summary(target_day_utc)
 
         total_visits = stats["total_visits"]
         unique_visitors = stats["unique_visitors"]
@@ -316,71 +439,31 @@ async def send_daily_summary(
         device_stats = stats["device_stats"]
         yesterday_str = stats["date"]
 
-        # 构建纯文本消息
-        lines = []
-        lines.append("📈 核心指标")
-        lines.append(f"• 总访问量: {total_visits} 次")
-        lines.append(f"• 独立访客: {unique_visitors} 人")
-        lines.append(f"• 独立IP: {unique_ips} 个\n")
-
-        if top_pages:
-            lines.append("🔥 热门页面 Top 5")
-            for item in top_pages:
-                count = item["count"]
-                percentage = (
-                    count / total_visits * 100 if total_visits > 0 else 0
-                )
-                lines.append(
-                    f"• {item['page_path']}: {count} 次 ({percentage:.1f}%)"
-                )
-            lines.append("")
-
-        if browser_stats:
-            lines.append("🌐 浏览器分布")
-            for item in browser_stats:
-                count = item["count"]
-                percentage = (
-                    count / unique_visitors * 100 if unique_visitors > 0 else 0
-                )
-                lines.append(
-                    f"• {item['browser_name'] or '未知'}: {count} 人 ({percentage:.1f}%)"
-                )
-            lines.append("")
-
-        if os_stats:
-            lines.append("💻 操作系统分布")
-            for item in os_stats:
-                count = item["count"]
-                percentage = (
-                    count / unique_visitors * 100 if unique_visitors > 0 else 0
-                )
-                lines.append(
-                    f"• {item['os_name'] or '未知'}: {count} 人 ({percentage:.1f}%)"
-                )
-            lines.append("")
-
-        if device_stats:
-            lines.append("📱 设备类型分布")
-            for item in device_stats:
-                count = item["count"]
-                percentage = (
-                    count / unique_visitors * 100 if unique_visitors > 0 else 0
-                )
-                lines.append(
-                    f"• {item['device_type'] or '未知'}: {count} 人 ({percentage:.1f}%)"
-                )
-            lines.append("")
-
-        lines.append("────────────────")
-        lines.append("📌 此消息由 BOT 自动发送")
-        message = "\n".join(lines)
-
-        # 通过 send_feishu_message 发送
-        await _enqueue_feishu_message(
-            message=message,
-            msg_type="post",
-            title=f"📊 每日访问统计 - {yesterday_str}",
+        message = _build_daily_summary_message(
+            total_visits=total_visits,
+            unique_visitors=unique_visitors,
+            unique_ips=unique_ips,
+            top_pages=top_pages,
+            browser_stats=browser_stats,
+            os_stats=os_stats,
+            device_stats=device_stats,
         )
+        chunks = _split_message_by_utf8_bytes(message, max_bytes=12_000)
+        if not chunks:
+            logger.warning("每日统计消息为空，跳过发送")
+            return
+
+        for index, chunk in enumerate(chunks, start=1):
+            title = (
+                f"📊 每日访问统计 - {yesterday_str} ({index}/{len(chunks)})"
+                if len(chunks) > 1
+                else f"📊 每日访问统计 - {yesterday_str}"
+            )
+            await _enqueue_feishu_message(
+                message=chunk,
+                msg_type="post",
+                title=title,
+            )
 
     except Exception as e:
         error_msg = str(e)

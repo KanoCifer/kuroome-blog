@@ -1,24 +1,11 @@
-import { defineStore } from "pinia";
-import { computed, ref, watch } from "vue";
-import request from "@/request";
+import { todoService } from "@/service/todoService";
+import type { Todo } from "@/service/todoService/types";
+import { type CreateTodoPayload } from "@/service/todoService/types";
+import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
 import { useStorage } from "@vueuse/core";
-import { useAuthStore } from "@/stores/auth";
-
-export type TodoPriority = "low" | "medium" | "high";
-
-export interface Todo {
-  id: string;
-  text: string;
-  completed: boolean;
-  createdAt: string;
-  description?: string;
-  dueDate?: string;
-  priority: TodoPriority;
-  category?: string;
-  archived?: boolean;
-  archivedAt?: string;
-}
+import { defineStore } from "pinia";
+import { computed, ref, watch } from "vue";
 
 export const useTodoStore = defineStore("todos", () => {
   const todos = ref<Todo[]>([]);
@@ -28,26 +15,18 @@ export const useTodoStore = defineStore("todos", () => {
   const auth = useAuthStore();
   let hydrationPromise: Promise<void> | null = null;
 
-  const nonArchivedTodos = computed(() =>
-    todos.value.filter((t) => !t.archived),
-  );
-  const completedCount = computed(
-    () => nonArchivedTodos.value.filter((t) => t.completed).length,
-  );
-  const activeTodos = computed(() =>
-    nonArchivedTodos.value.filter((t) => !t.completed),
-  );
-  const completedTodos = computed(() =>
-    nonArchivedTodos.value.filter((t) => t.completed),
-  );
+  const nonArchivedTodos = computed(() => todos.value.filter((t) => !t.archived));
+  const completedCount = computed(() => nonArchivedTodos.value.filter((t) => t.completed).length);
+  const activeTodos = computed(() => nonArchivedTodos.value.filter((t) => !t.completed));
+  const completedTodos = computed(() => nonArchivedTodos.value.filter((t) => t.completed));
   const archivedTodos = computed(() => todos.value.filter((t) => t.archived));
 
   const notifier = useNotificationStore();
 
-  async function fetchTodos() {
+  // 加载待办事项
+  async function fetchTodos(): Promise<boolean> {
     try {
-      const res = await request.get("/todos");
-      todos.value = res.data.data?.todos ?? [];
+      todos.value = await todoService.fetchTodos();
       return true;
     } catch (err) {
       console.error("fetchTodos error", err);
@@ -56,29 +35,8 @@ export const useTodoStore = defineStore("todos", () => {
     }
   }
 
-  async function importLocalTodosIfAny() {
-    try {
-      const raw = localStorage.getItem("todos");
-      if (!raw) return;
-      const localTodos: Todo[] = JSON.parse(raw) || [];
-      if (!localTodos.length) {
-        localStorage.removeItem("todos");
-        return;
-      }
-      const serverRes = await request.get("/todos");
-      const serverTodos = serverRes.data.data?.todos ?? [];
-      if (serverTodos.length === 0) {
-        await request.post("/todos/import", localTodos);
-        localStorage.removeItem("todos");
-        await fetchTodos();
-        notifier.success("本地待办已同步到服务器");
-      }
-    } catch (err) {
-      console.warn("Failed to import local todos (non-fatal):", err);
-    }
-  }
-
-  async function hydrateTodos() {
+  // 初始化数据，登录状态变化时也会调用
+  async function hydrateTodos(): Promise<void> {
     if (hydrationPromise) return hydrationPromise;
 
     hydrationPromise = (async () => {
@@ -91,10 +49,7 @@ export const useTodoStore = defineStore("todos", () => {
 
       if (hydrationScope.value === "auth" && isHydrated.value) return;
 
-      const loaded = await fetchTodos();
-      if (loaded) {
-        await importLocalTodosIfAny();
-      }
+      await fetchTodos();
       hydrationScope.value = "auth";
       isHydrated.value = true;
     })().finally(() => {
@@ -121,16 +76,9 @@ export const useTodoStore = defineStore("todos", () => {
     { immediate: true },
   );
 
-  async function addTodo(payload: {
-    text: string;
-    description?: string;
-    dueDate?: string;
-    priority?: TodoPriority;
-    category?: string;
-  }) {
+  async function addTodo(payload: CreateTodoPayload) {
     try {
-      const res = await request.post("/todos", payload);
-      const todo = res.data.data.todo;
+      const todo = await todoService.addTodo(payload);
       if (todo) todos.value.unshift(todo);
     } catch (err) {
       console.error(err);
@@ -142,12 +90,9 @@ export const useTodoStore = defineStore("todos", () => {
     const t = todos.value.find((x) => x.id === id);
     if (!t) return;
     try {
-      const res = await request.patch(`/todos/${id}`, {
-        completed: !t.completed,
-      });
-      const updated = res.data.data.todo;
+      const updated = await todoService.toggleTodo(id, !t.completed);
       const idx = todos.value.findIndex((x) => x.id === id);
-      if (idx !== -1) todos.value[idx] = updated;
+      if (idx !== -1 && updated) todos.value[idx] = updated;
     } catch (err) {
       console.error(err);
       notifier.error("更新待办失败");
@@ -156,7 +101,7 @@ export const useTodoStore = defineStore("todos", () => {
 
   async function removeTodo(id: string) {
     try {
-      await request.delete(`/todos/${id}`);
+      await todoService.removeTodo(id);
       todos.value = todos.value.filter((t) => t.id !== id);
     } catch (err) {
       console.error(err);
@@ -166,10 +111,9 @@ export const useTodoStore = defineStore("todos", () => {
 
   async function updateTodo(id: string, patch: Partial<Todo>) {
     try {
-      const res = await request.put(`/todos/${id}`, patch);
-      const updated = res.data.data.todo;
+      const updated = await todoService.updateTodo(id, patch);
       const idx = todos.value.findIndex((x) => x.id === id);
-      if (idx !== -1) todos.value[idx] = updated;
+      if (idx !== -1 && updated) todos.value[idx] = updated;
     } catch (err) {
       console.error(err);
       notifier.error("更新待办失败");
@@ -178,7 +122,7 @@ export const useTodoStore = defineStore("todos", () => {
 
   async function clearCompleted() {
     try {
-      await request.post("/todos/clear-completed");
+      await todoService.clearCompleted();
       todos.value = todos.value.filter((t) => !t.completed);
     } catch (err) {
       console.error(err);
@@ -188,10 +132,9 @@ export const useTodoStore = defineStore("todos", () => {
 
   async function archiveTodo(id: string) {
     try {
-      const res = await request.post(`/todos/${id}/archive`);
-      const updated = res.data.data.todo;
+      const updated = await todoService.archiveTodo(id);
       const idx = todos.value.findIndex((x) => x.id === id);
-      if (idx !== -1) todos.value[idx] = updated;
+      if (idx !== -1 && updated) todos.value[idx] = updated;
     } catch (err) {
       console.error(err);
       notifier.error("归档待办失败");
@@ -200,10 +143,9 @@ export const useTodoStore = defineStore("todos", () => {
 
   async function unarchiveTodo(id: string) {
     try {
-      const res = await request.post(`/todos/${id}/unarchive`);
-      const updated = res.data.data.todo;
+      const updated = await todoService.unarchiveTodo(id);
       const idx = todos.value.findIndex((x) => x.id === id);
-      if (idx !== -1) todos.value[idx] = updated;
+      if (idx !== -1 && updated) todos.value[idx] = updated;
     } catch (err) {
       console.error(err);
       notifier.error("取消归档失败");
@@ -212,12 +154,10 @@ export const useTodoStore = defineStore("todos", () => {
 
   async function archiveCompleted() {
     try {
-      await request.post("/todos/archive-completed");
+      await todoService.archiveCompleted();
       const now = new Date().toISOString();
       todos.value = todos.value.map((t) =>
-        t.completed && !t.archived
-          ? { ...t, archived: true, archivedAt: now }
-          : t,
+        t.completed && !t.archived ? { ...t, archived: true, archivedAt: now } : t,
       );
     } catch (err) {
       console.error(err);
@@ -227,8 +167,7 @@ export const useTodoStore = defineStore("todos", () => {
 
   async function fetchArchivedTodos() {
     try {
-      const res = await request.get("/todos/archived");
-      return res.data.data?.todos ?? [];
+      return await todoService.fetchArchivedTodos();
     } catch (err) {
       console.error(err);
       notifier.error("加载归档待办失败");

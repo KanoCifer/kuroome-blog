@@ -18,16 +18,10 @@
           stroke="currentColor"
           class="h-6 w-6"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M12 4.5v15m7.5-7.5h-15"
-          />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
       </div>
-      <p
-        class="mb-0 items-center font-serif text-xl font-bold text-gray-900 dark:text-white"
-      >
+      <p class="mb-0 items-center font-serif text-xl font-bold text-gray-900 dark:text-white">
         {{ isEditing ? "Edit Book" : "Add to ReadingList" }}
       </p>
       <button
@@ -47,16 +41,9 @@
           viewBox="0 0 24 24"
           stroke-width="2"
           stroke="currentColor"
-          :class="[
-            'h-5 w-5 transition-transform',
-            isCollapsed ? '' : 'rotate-180',
-          ]"
+          :class="['h-5 w-5 transition-transform', isCollapsed ? '' : 'rotate-180']"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-          />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
         </svg>
       </button>
     </div>
@@ -87,11 +74,7 @@
         <label
           class="group relative flex cursor-pointer items-center rounded-xl border border-gray-100 bg-gray-50 p-4 transition-all hover:bg-gray-50/50 dark:border-gray-700 dark:bg-gray-700/30 dark:hover:bg-gray-700/30"
         >
-          <input
-            v-model="form.iscompleted"
-            type="checkbox"
-            class="peer sr-only"
-          />
+          <input v-model="form.iscompleted" type="checkbox" class="peer sr-only" />
           <div
             class="mr-4 flex h-6 w-6 items-center justify-center rounded-md border-2 border-gray-300 bg-white transition-all peer-checked:border-blue-500 peer-checked:bg-blue-500 dark:border-gray-500 dark:bg-gray-700"
           >
@@ -104,17 +87,10 @@
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="3"
-                d="M5 13l4 4L19 7"
-              />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <span class="font-medium text-gray-700 dark:text-gray-300"
-            >Mark as completed</span
-          >
+          <span class="font-medium text-gray-700 dark:text-gray-300">Mark as completed</span>
         </label>
 
         <div class="flex justify-end">
@@ -137,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import request from "@/request";
+import request from "@/api/request";
 import { useNotificationStore } from "@/stores/notification";
 import type { ADDBookForm, BookItem } from "@/types";
 import { reactive, ref } from "vue";
@@ -185,11 +161,7 @@ async function submitForm() {
       resetForm();
     }
   } catch {
-    useNotificationStore().error(
-      isEditing.value
-        ? "更新书籍失败，请稍后重试。"
-        : "添加书籍失败，请稍后重试。",
-    );
+    useNotificationStore().error(isEditing.value ? "更新书籍失败，请稍后重试。" : "添加书籍失败，请稍后重试。");
   } finally {
     submitting.value = false;
   }

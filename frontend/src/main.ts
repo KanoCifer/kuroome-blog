@@ -1,9 +1,11 @@
+import { configureAuthSideEffects } from "@/auth/sideEffects";
+import { useNotificationStore } from "@/stores/notification";
 import { createHead } from "@vueuse/head";
 import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "highlight.js/styles/atom-one-dark.css";
-import { createPinia } from "pinia";
+import { createPinia, setActivePinia } from "pinia";
 import { createApp } from "vue";
 import App from "./App.vue";
 import "./assets/base.css";
@@ -15,6 +17,18 @@ dayjs.locale("zh-cn");
 const app = createApp(App);
 const pinia = createPinia();
 const head = createHead();
+
+setActivePinia(pinia);
+const notifier = useNotificationStore(pinia);
+configureAuthSideEffects({
+  notifySuccess: (message: string) => {
+    notifier.success(message);
+  },
+  notifyError: (message: string) => {
+    notifier.error(message);
+  },
+  navigateToHome: async () => await router.push("/"),
+});
 
 app.use(pinia);
 app.use(router);

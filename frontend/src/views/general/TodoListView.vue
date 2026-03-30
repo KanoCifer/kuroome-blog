@@ -23,10 +23,7 @@
 
           <div class="flex flex-wrap items-center gap-4">
             <div class="flex items-center gap-2">
-              <label
-                class="text-sm font-medium text-gray-500 dark:text-gray-400"
-                >优先级</label
-              >
+              <label class="text-sm font-medium text-gray-500 dark:text-gray-400">优先级</label>
               <select
                 v-model="newTodoForm.priority"
                 class="cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
@@ -38,10 +35,7 @@
             </div>
 
             <div class="flex items-center gap-2">
-              <label
-                class="text-sm font-medium text-gray-500 dark:text-gray-400"
-                >截止日期</label
-              >
+              <label class="text-sm font-medium text-gray-500 dark:text-gray-400">截止日期</label>
               <input
                 v-model="newTodoForm.dueDate"
                 type="date"
@@ -62,12 +56,7 @@
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 4v16m8-8H4"
-                  />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
                 <span>添加</span>
               </button>
@@ -95,9 +84,7 @@
         </div>
 
         <div class="flex items-center gap-2">
-          <span class="text-sm font-medium text-gray-500 dark:text-gray-400"
-            >排序:</span
-          >
+          <span class="text-sm font-medium text-gray-500 dark:text-gray-400">排序:</span>
           <select
             v-model="sortMode"
             class="cursor-pointer rounded-lg border border-gray-200 bg-white/50 px-3 py-1.5 text-sm font-medium backdrop-blur-sm outline-none dark:border-gray-700 dark:bg-gray-900/50 dark:text-gray-200"
@@ -198,12 +185,8 @@
             <div class="min-w-0 flex-1">
               <div class="flex flex-wrap items-center gap-3">
                 <h3
-                  class="text-lg font-medium break-words transition-all duration-300"
-                  :class="[
-                    todo.completed
-                      ? 'text-gray-400 line-through'
-                      : 'text-gray-900 dark:text-gray-100',
-                  ]"
+                  class="text-lg font-medium wrap-break-word transition-all duration-300"
+                  :class="[todo.completed ? 'text-gray-400 line-through' : 'text-gray-900 dark:text-gray-100']"
                 >
                   {{ todo.text }}
                 </h3>
@@ -232,12 +215,7 @@
                       : 'border-gray-200 bg-gray-50 text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400'
                   "
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-3 w-3"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                     <path
                       fill-rule="evenodd"
                       d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
@@ -256,9 +234,7 @@
                 {{ todo.description }}
               </p>
 
-              <div class="mt-3 text-xs text-gray-400 dark:text-gray-500">
-                创建于 {{ formatDate(todo.createdAt) }}
-              </div>
+              <div class="mt-3 text-xs text-gray-400 dark:text-gray-500">创建于 {{ formatDate(todo.createdAt) }}</div>
             </div>
 
             <!-- Actions -->
@@ -354,9 +330,7 @@
 
       <!-- Empty State -->
       <div v-if="displayTodos.length === 0" class="mt-20 text-center">
-        <div
-          class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-3xl bg-gray-100 dark:bg-gray-800"
-        >
+        <div class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-3xl bg-gray-100 dark:bg-gray-800">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="h-10 w-10 text-gray-400"
@@ -376,30 +350,17 @@
           {{ filter === "archived" ? "暂无归档" : "暂无事项" }}
         </h3>
         <p class="mt-2 text-gray-500">
-          {{
-            filter === "archived"
-              ? "归档的任务会显示在这里"
-              : "记录下你接下来的计划吧！"
-          }}
+          {{ filter === "archived" ? "归档的任务会显示在这里" : "记录下你接下来的计划吧！" }}
         </p>
       </div>
 
       <!-- Clear / Archive Completed -->
-      <div
-        v-if="todoStore.completedCount > 0"
-        class="mt-8 flex justify-center gap-3"
-      >
+      <div v-if="todoStore.completedCount > 0" class="mt-8 flex justify-center gap-3">
         <button
           @click="todoStore.archiveCompleted()"
           class="flex cursor-pointer items-center gap-2 rounded-xl bg-gray-100 px-6 py-2.5 text-sm font-medium text-gray-600 transition-all hover:bg-amber-50 hover:text-amber-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-amber-900/20 dark:hover:text-amber-400"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -413,13 +374,7 @@
           @click="todoStore.clearCompleted()"
           class="flex cursor-pointer items-center gap-2 rounded-xl bg-gray-100 px-6 py-2.5 text-sm font-medium text-gray-600 transition-all hover:bg-red-50 hover:text-red-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-red-900/20 dark:hover:text-red-400"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -435,15 +390,14 @@
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from "pinia";
-import { onMounted, ref, computed } from "vue";
 import BasicDetail from "@/components/basic/BasicDetail.vue";
+import type { Todo, TodoPriority } from "@/service/todoService/types";
 import { useTodoStore } from "@/stores/todos";
-import type { Todo, TodoPriority } from "@/stores/todos";
+import { storeToRefs } from "pinia";
+import { computed, onMounted, ref } from "vue";
 
 const todoStore = useTodoStore();
-const { nonArchivedTodos, activeTodos, completedTodos, archivedTodos } =
-  storeToRefs(todoStore);
+const { nonArchivedTodos, activeTodos, completedTodos, archivedTodos } = storeToRefs(todoStore);
 
 onMounted(() => {
   todoStore.hydrateTodos();
@@ -520,10 +474,7 @@ const displayTodos = computed(() => {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     }
     if (sortMode.value === "dueDate") {
-      if (!a.dueDate && !b.dueDate)
-        return (
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
+      if (!a.dueDate && !b.dueDate) return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       if (!a.dueDate) return 1;
       if (!b.dueDate) return -1;
       return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();

@@ -23,9 +23,10 @@
       >
         <div
           v-if="isUserMenuOpen"
-          class="absolute top-16 right-0 z-9999 mt-2 w-auto rounded-3xl border border-gray-200/60 bg-gray-50 shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-50/5"
+          class="absolute top-16 right-0 z-9999 mt-2 w-auto rounded-3xl bg-gray-200/60 p-px shadow-lg dark:bg-gray-700 dark:shadow-gray-50/5"
         >
-          <ol>
+          <div class="rounded-[23px] bg-gray-50 dark:bg-gray-800">
+            <ol>
             <template v-if="auth.isAuthenticated">
               <li>
                 <RouterLink
@@ -70,7 +71,8 @@
                   Analytics
                 </RouterLink>
               </li>
-              <li class="border-t border-gray-200 dark:border-gray-700">
+              <li>
+                <div class="mx-4 h-px bg-gray-200 dark:bg-gray-700" />
                 <button
                   @click.prevent="handleLogout"
                   :disabled="auth.loading"
@@ -103,7 +105,8 @@
                 </RouterLink>
               </li>
             </template>
-          </ol>
+            </ol>
+          </div>
         </div>
       </transition>
 

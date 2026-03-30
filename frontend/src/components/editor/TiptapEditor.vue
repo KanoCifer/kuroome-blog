@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import request, { type ApiResponse } from "@/request";
-import type { AxiosProgressEvent } from "axios";
+import request, { type ApiResponse } from "@/api/request";
 import { Extension } from "@tiptap/core";
 import NodeRange from "@tiptap/extension-node-range";
 import StarterKit from "@tiptap/starter-kit";
 import { EditorContent, useEditor } from "@tiptap/vue-3";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
 import { useLocalStorage } from "@vueuse/core";
+import type { AxiosProgressEvent } from "axios";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import TiptapToolbar from "./TiptapToolbar.vue";
 
 // Tiptap 扩展
+import { compressImage } from "@/utils/imageCompressor";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Document from "@tiptap/extension-document";
 import FileHandler from "@tiptap/extension-file-handler";
@@ -18,27 +19,21 @@ import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import Paragraph from "@tiptap/extension-paragraph";
 import Placeholder from "@tiptap/extension-placeholder";
-import {
-  Table,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "@tiptap/extension-table";
+import { Table, TableCell, TableHeader, TableRow } from "@tiptap/extension-table";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import Text from "@tiptap/extension-text";
 import TextAlign from "@tiptap/extension-text-align";
 import Underline from "@tiptap/extension-underline";
 import { CharacterCount, Dropcursor } from "@tiptap/extensions";
+import bash from "highlight.js/lib/languages/bash";
 import css from "highlight.js/lib/languages/css";
 import js from "highlight.js/lib/languages/javascript";
 import python from "highlight.js/lib/languages/python";
 import ts from "highlight.js/lib/languages/typescript";
 import html from "highlight.js/lib/languages/xml";
-import bash from "highlight.js/lib/languages/bash";
 import { createLowlight } from "lowlight";
 import { Markdown } from "tiptap-markdown";
-import { compressImage } from "@/utils/imageCompressor";
 
 const lowlight = createLowlight();
 lowlight.register("html", html);
@@ -78,9 +73,7 @@ const uploadImage = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append("file", compressedFile);
 
-    const res = await request.post<
-      ApiResponse<{ url: string; filename: string }>
-    >("/blog/upload-image", formData, {
+    const res = await request.post<ApiResponse<{ url: string; filename: string }>>("/blog/upload-image", formData, {
       headers: { "Content-Type": "multipart/form-data" },
       onUploadProgress: (progressEvent: AxiosProgressEvent) => {
         const total = progressEvent.total ?? 0;
@@ -356,8 +349,7 @@ const editor = useEditor({
 
   editorProps: {
     attributes: {
-      class:
-        "tiptap prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[800px] px-6 py-4",
+      class: "tiptap prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[800px] px-6 py-4",
     },
     handleDOMEvents: {
       keydown: (view, event) => {
@@ -431,10 +423,7 @@ onBeforeUnmount(() => {
         class="relative flex items-center justify-between border-b border-gray-200 bg-gray-50/50 px-4 py-1.5 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/50"
       >
         <!-- 上传进度条 -->
-        <div
-          v-if="isUploadingImage"
-          class="absolute top-0 left-0 h-1 w-full bg-gray-200 dark:bg-gray-700"
-        >
+        <div v-if="isUploadingImage" class="absolute top-0 left-0 h-1 w-full bg-gray-200 dark:bg-gray-700">
           <div
             class="h-full bg-linear-to-r from-blue-500 to-purple-500 transition-all duration-300"
             :style="{ width: `${uploadProgress}%` }"
@@ -442,40 +431,20 @@ onBeforeUnmount(() => {
         </div>
         <div class="flex items-center gap-2">
           <!-- Markdown 快捷键提示 -->
-          <div
-            class="hidden items-center gap-1 text-xs text-gray-400 md:flex dark:text-gray-500"
-          >
-            <span
-              class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"
-            >
-              #
-            </span>
+          <div class="hidden items-center gap-1 text-xs text-gray-400 md:flex dark:text-gray-500">
+            <span class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"> # </span>
             <span>标题</span>
-            <span
-              class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"
-            >
-              -
-            </span>
+            <span class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"> - </span>
             <span>列表</span>
-            <span
-              class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"
-            >
-              >
-            </span>
+            <span class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"> > </span>
             <span>引用</span>
-            <span
-              class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"
-            >
-              \`\`\`
-            </span>
+            <span class="rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800"> \`\`\` </span>
             <span>代码</span>
           </div>
         </div>
 
         <!-- 字符计数 -->
-        <div
-          class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400"
-        >
+        <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
           <span>{{ characterCount.characters }} chars</span>
           <span>{{ characterCount.words }} words</span>
         </div>
@@ -510,23 +479,9 @@ onBeforeUnmount(() => {
           ]"
           title="Bold"
         >
-          <svg
-            class="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2.5"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 4h8a4 4 0 014 4 4 4 0 01-4 4H6z"
-            />
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 12h9a4 4 0 014 4 4 4 0 01-4 4H6z"
-            />
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 4h8a4 4 0 014 4 4 4 0 01-4 4H6z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 12h9a4 4 0 014 4 4 4 0 01-4 4H6z" />
           </svg>
         </button>
         <button
@@ -541,18 +496,8 @@ onBeforeUnmount(() => {
           ]"
           title="Italic"
         >
-          <svg
-            class="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M10 4h4m-2 0l-4 16m0 0h4M8 20h4"
-            />
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 4h4m-2 0l-4 16m0 0h4M8 20h4" />
           </svg>
         </button>
         <div class="mx-1 h-4 w-px bg-gray-300 dark:bg-gray-600"></div>
@@ -567,13 +512,7 @@ onBeforeUnmount(() => {
           ]"
           title="Code Block"
         >
-          <svg
-            class="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-          >
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -593,13 +532,7 @@ onBeforeUnmount(() => {
           ]"
           title="Insert Link"
         >
-          <svg
-            class="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-          >
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"

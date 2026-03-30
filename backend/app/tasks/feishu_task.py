@@ -120,7 +120,8 @@ async def send_feishu_message(
                         code = body.get("code", body.get("StatusCode"))
                         if code not in (0, "0"):
                             logger.error(
-                                "飞书 API 响应异常: %s",
+                                "飞书 API 响应异常 code={} body={}",
+                                code,
                                 body,
                             )
             except Exception as e:

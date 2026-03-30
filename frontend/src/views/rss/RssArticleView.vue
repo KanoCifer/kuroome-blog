@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import request from "@/api/request";
 import BasicDetail from "@/components/basic/BasicDetail.vue";
 import ArticleSummaryCard from "@/components/blog/ArticleSummaryCard.vue";
-import request from "@/request";
 import { useNotificationStore } from "@/stores/notification";
 import type { ApiResponse, RssArticle } from "@/types";
 import { formatDate } from "@/utils/formatdate";
@@ -21,11 +21,8 @@ const notifier = useNotificationStore();
 const { y } = useScroll(window);
 const percent = computed(() => {
   if (!article.value) return 0;
-  const contentHeight =
-    document.documentElement.scrollHeight - window.innerHeight;
-  return contentHeight > 0
-    ? Math.min(100, Math.round((y.value / contentHeight) * 100))
-    : 0;
+  const contentHeight = document.documentElement.scrollHeight - window.innerHeight;
+  return contentHeight > 0 ? Math.min(100, Math.round((y.value / contentHeight) * 100)) : 0;
 });
 
 const articleId = computed(() => route.params.id as string);
@@ -44,8 +41,7 @@ const buildProxyImageUrl = (rawUrl: string): string => {
 
   let resolved = trimmed;
   try {
-    const base =
-      article.value?.link || article.value?.feed_url || window.location.origin;
+    const base = article.value?.link || article.value?.feed_url || window.location.origin;
     resolved = new URL(trimmed, base).toString();
   } catch {
     resolved = trimmed;
@@ -100,9 +96,7 @@ const fetchArticle = async () => {
   isLoading.value = true;
   errorMessage.value = "";
   try {
-    const res = await request.get<ApiResponse<RssArticle>>(
-      `/rss/articles/${articleId.value}`,
-    );
+    const res = await request.get<ApiResponse<RssArticle>>(`/rss/articles/${articleId.value}`);
     if (res.data.status === "success" && res.data.data) {
       article.value = res.data.data;
     } else {
@@ -110,10 +104,7 @@ const fetchArticle = async () => {
     }
   } catch (err: unknown) {
     console.error(err);
-    errorMessage.value =
-      err instanceof Error
-        ? err.message
-        : String(err) || "加载文章失败，请稍后重试。";
+    errorMessage.value = err instanceof Error ? err.message : String(err) || "加载文章失败，请稍后重试。";
     notifier.error(errorMessage.value);
   } finally {
     isLoading.value = false;
@@ -177,9 +168,7 @@ watch(
     <div class="col-span-full mx-auto w-full max-w-4xl">
       <!-- Loading State -->
       <div v-if="isLoading" class="py-12 text-center">
-        <div
-          class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"
-        ></div>
+        <div class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"></div>
         <p class="mt-2 text-gray-600 dark:text-gray-400">Loading...</p>
       </div>
 
@@ -211,20 +200,8 @@ watch(
                 : 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
             "
           >
-            <svg
-              v-if="isToggling"
-              class="h-4 w-4 animate-spin"
-              viewBox="0 0 24 24"
-              fill="none"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
+            <svg v-if="isToggling" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path
                 class="opacity-75"
                 fill="currentColor"
@@ -262,19 +239,12 @@ watch(
           class="overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
         >
           <div class="border-b border-blue-100 p-8 dark:border-slate-700">
-            <h1
-              class="mb-4 text-3xl leading-tight font-bold text-blue-900 dark:text-white"
-            >
+            <h1 class="mb-4 text-3xl leading-tight font-bold text-blue-900 dark:text-white">
               {{ article.title }}
             </h1>
 
-            <div
-              class="flex flex-wrap gap-x-6 gap-y-3 text-sm text-blue-600 dark:text-blue-400"
-            >
-              <div
-                v-if="article.author"
-                class="flex items-center gap-1.5 font-medium"
-              >
+            <div class="flex flex-wrap gap-x-6 gap-y-3 text-sm text-blue-600 dark:text-blue-400">
+              <div v-if="article.author" class="flex items-center gap-1.5 font-medium">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -325,9 +295,7 @@ watch(
                     d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
                   />
                 </svg>
-                <span class="max-w-50 truncate" :title="article.feed_url">{{
-                  article.feed_url
-                }}</span>
+                <span class="max-w-50 truncate" :title="article.feed_url">{{ article.feed_url }}</span>
               </div>
 
               <a
@@ -357,10 +325,7 @@ watch(
           </div>
 
           <div class="p-8">
-            <ArticleSummaryCard
-              :title="article.title"
-              :content="article.content || article.summary || ''"
-            />
+            <ArticleSummaryCard :title="article.title" :content="article.content || article.summary || ''" />
             <div
               class="prose prose-lg prose-blue prose-a:text-blue-600 prose-img:rounded-xl dark:prose-invert dark:prose-a:text-blue-400 max-w-none"
               v-html="safeContent"

@@ -1,11 +1,6 @@
 <template>
   <div>
-    <v-chart
-      v-if="!loading && tideData"
-      :option="tideOptions"
-      style="width: 100%; height: 300px"
-      autoresize
-    />
+    <v-chart v-if="!loading && tideData" :option="tideOptions" style="width: 100%; height: 300px" autoresize />
     <div v-else class="flex h-64 items-center justify-center">
       <span class="text-gray-500 dark:text-gray-400">正在加载潮汐数据...</span>
     </div>
@@ -13,31 +8,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-import request from "@/request";
+import request from "@/api/request";
 import { useNotificationStore } from "@/stores/notification";
-import { use } from "echarts/core";
+import dayjs from "dayjs";
 import { LineChart } from "echarts/charts";
 import {
-  TitleComponent,
-  TooltipComponent,
   GridComponent,
   MarkLineComponent,
   MarkPointComponent,
+  TitleComponent,
+  TooltipComponent,
 } from "echarts/components";
+import { use } from "echarts/core";
 import { SVGRenderer } from "echarts/renderers";
+import { computed, onMounted, ref } from "vue";
 import VChart from "vue-echarts";
-import dayjs from "dayjs";
 
-use([
-  TitleComponent,
-  TooltipComponent,
-  GridComponent,
-  MarkLineComponent,
-  MarkPointComponent,
-  LineChart,
-  SVGRenderer,
-]);
+use([TitleComponent, TooltipComponent, GridComponent, MarkLineComponent, MarkPointComponent, LineChart, SVGRenderer]);
 
 interface TideData {
   updateTime: string;
@@ -99,9 +86,7 @@ const tideOptions = computed(() => {
     },
     tooltip: {
       trigger: "axis",
-      backgroundColor: isDarkMode.value
-        ? "rgba(30, 41, 59, 0.9)"
-        : "rgba(255, 255, 255, 0.95)",
+      backgroundColor: isDarkMode.value ? "rgba(30, 41, 59, 0.9)" : "rgba(255, 255, 255, 0.95)",
       borderColor: isDarkMode.value ? "#475569" : "#e5e7eb",
       textStyle: {
         color: textColor,
@@ -220,9 +205,7 @@ const tideOptions = computed(() => {
             color: textColor,
             fontSize: 11,
             fontWeight: "bold",
-            backgroundColor: isDarkMode.value
-              ? "rgba(30, 41, 59, 0.9)"
-              : "rgba(255, 255, 255, 0.95)",
+            backgroundColor: isDarkMode.value ? "rgba(30, 41, 59, 0.9)" : "rgba(255, 255, 255, 0.95)",
             padding: [4, 8],
             borderRadius: 4,
             borderColor: isDarkMode.value ? "#475569" : "#e5e7eb",
@@ -230,9 +213,7 @@ const tideOptions = computed(() => {
           },
           data: tideData.value.tideTable.map((t) => {
             const index = tideData.value!.tideHourly.findIndex(
-              (h) =>
-                dayjs(h.fxTime).isAfter(dayjs(t.fxTime)) ||
-                dayjs(h.fxTime).isSame(dayjs(t.fxTime)),
+              (h) => dayjs(h.fxTime).isAfter(dayjs(t.fxTime)) || dayjs(h.fxTime).isSame(dayjs(t.fxTime)),
             );
             const timeStr = dayjs(t.fxTime).format("HH:mm");
             const heightNum = Number(t.height);
@@ -253,8 +234,6 @@ onMounted(() => {
   fetchTideData();
 
   // 监听深色模式变化
-  window
-    .matchMedia("(prefers-color-scheme: dark)")
-    .addEventListener("change", checkDarkMode);
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", checkDarkMode);
 });
 </script>

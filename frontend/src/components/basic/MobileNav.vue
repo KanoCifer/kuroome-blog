@@ -362,7 +362,7 @@
 
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
-import { useDark, useToggle } from "@vueuse/core";
+import { useThemeStore } from "@/stores/theme";
 import { Image } from "lucide-vue-next";
 import { motion } from "motion-v";
 import { computed, ref } from "vue";
@@ -373,9 +373,8 @@ import IconMore from "../icons/IconMore.vue";
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
-const showMoreMenu = ref(false);
-const isDark = useDark();
-const toggleDark = useToggle(isDark);
+const showMoreMenu = ref<boolean>(false);
+const theme = useThemeStore();
 
 const isMore = computed(() => {
   return route.path === "/" || route.path === "/blog" || route.path === "/rss" ? false : true;
@@ -392,7 +391,7 @@ const handleLogout = () => {
 };
 
 const toggleTheme = () => {
-  toggleDark();
+  theme.toggleTheme();
   showMoreMenu.value = false;
 };
 </script>

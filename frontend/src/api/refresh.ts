@@ -1,5 +1,8 @@
-import { useAuthStore } from "@/stores/auth";
 import axios from "axios";
+import {
+  getRefreshTokenFromStorage,
+  saveRefreshTokenToStorage,
+} from "./refreshToken";
 
 const refreshTokenEndpoint = "/auth/refresh-token";
 
@@ -26,8 +29,8 @@ export async function refreshAccessToken() {
   return promise;
 }
 
-export async function refreshToken() {
-  const refreshToken = useAuthStore().getRefreshToken();
+export async function refreshToken(): Promise<void> {
+  const refreshToken = getRefreshTokenFromStorage();
 
   // 如果没有refreshToken，直接抛出错误，不需要请求
   if (!refreshToken) {
@@ -42,7 +45,7 @@ export async function refreshToken() {
   });
 
   const newRefreshToken = res.data.data.refresh_token;
-  useAuthStore().saveRefreshToken(newRefreshToken);
+  saveRefreshTokenToStorage(newRefreshToken);
 }
 
 export function isrefreshTokenRequest(config: {
