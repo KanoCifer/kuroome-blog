@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from datetime import timedelta
 from typing import Annotated
 
@@ -17,7 +16,7 @@ from fastapi import (
     status,
 )
 from fastapi.responses import JSONResponse, RedirectResponse
-from webauthn import options_to_json
+from webauthn.helpers import options_to_json_dict
 
 from app.api.des.auth import manager
 from app.api.des.csrf import csrf_manager
@@ -354,8 +353,9 @@ async def passkey_registration_options(
     redis: AsyncRedis = Depends(get_redis),
 ):
     try:
+        options = await user_service.create_registration_options(redis, user)
         return APIResponse.ok(
-            data=await user_service.create_registration_options(redis, user),
+            data=options_to_json_dict(options),
             message="Passkey 注册选项生成成功",
         )
     except ValueError:
@@ -390,7 +390,7 @@ async def passkey_authentication_options(
 ):
     options = await user_service.create_options(redis)
     return APIResponse.ok(
-        data=json.loads(options_to_json(options)),
+        data=options_to_json_dict(options),
         message="Passkey 认证选项生成成功",
     )
 

@@ -8,9 +8,7 @@ from urllib.parse import urlencode
 
 import orjson
 from fastapi import Request
-from PIL.XVThumbImagePlugin import g
 from redis.asyncio import Redis as AsyncRedis
-from webauthn import options_to_json
 from webauthn.helpers.structs import (
     PublicKeyCredentialCreationOptions,
     PublicKeyCredentialRequestOptions,
@@ -274,7 +272,7 @@ class UserService:
             challenge,
             ex=300,
         )
-        return orjson.loads(options_to_json(options))
+        return options
 
     async def create_options(
         self, redis: AsyncRedis
@@ -292,7 +290,7 @@ class UserService:
             challenge,
             ex=300,
         )
-        return orjson.loads(options_to_json(options))
+        return options
 
     async def register_passkey(
         self,
