@@ -9,17 +9,27 @@ from urllib.parse import urlencode
 import orjson
 from fastapi import Request
 from redis.asyncio import Redis as AsyncRedis
+from webauthn import options_to_json
+from webauthn.helpers.structs import (
+    PublicKeyCredentialCreationOptions,
+    PublicKeyCredentialRequestOptions,
+)
 
 from app.api.des.auth import manager
 from app.core.config import settings
-from app.core.security import generate_pkce_pair
+from app.core.security import (
+    generate_passkey_authentication_options,
+    generate_passkey_registration_options,
+    generate_pkce_pair,
+)
 from app.models.models import Profile, User
 from app.repositories.user_repo import UserRepo
 from app.schemas.schemas import UserSettingsIn
+from app.schemas.user import UserInfo, UserProfileOut
 from app.utils.base64url import base64url_decode, base64url_encode
 from app.utils.compress_image import compress_avartar
 from app.utils.media import _get_media_root, save_upload_image
-from app.utils.webauthn import (
+from app.utils.security import (
     verify_passkey_authentication_response,
     verify_passkey_registration_response,
 )
@@ -113,20 +123,22 @@ class UserService:
             await self.repo.ensure_profile(user)
         return user, user.profile
 
-    def user_to_dict(self, user: User, profile: Profile | None = None) -> dict:
+    def user_to_dict(
+        self, user: User, profile: Profile | None = None
+    ) -> UserInfo:
         """Serialize user + profile to dict for API responses."""
-        return {
-            "id": user.id,
-            "username": user.username,
-            "is_admin": user.is_admin,
-            "name": user.name,
-            "email": profile.email if profile else None,
-            "gender": profile.gender if profile else None,
-            "mobile": profile.mobile if profile else None,
-            "photo": profile.photo if profile else None,
-            "has_passkey": bool(user.passkey_credential),
-            "github_bound": bool(user.github_id),
-        }
+        user_info = UserInfo(
+            id=user.id,
+            username=user.username,
+            is_admin=user.is_admin,
+            name=user.name,
+            email=profile.email if profile else None,
+            mobile=profile.mobile if profile else None,
+            photo=profile.photo if profile else None,
+            has_passkey=bool(user.passkey_credential),
+            github_bound=bool(user.github_id),
+        )
+        return user_info.model_dump()
 
     # ------------------------------------------------------------------ #
     # Registration
@@ -177,7 +189,9 @@ class UserService:
     # Profile management
     # ------------------------------------------------------------------ #
 
-    async def update_settings(self, user: User, data: UserSettingsIn) -> dict:
+    async def update_settings(
+        self, user: User, data: UserSettingsIn
+    ) -> UserProfileOut:
         """Update user profile fields, raising ValueError on duplicate username."""
         if data.username != user.username:
             if await self.repo.is_username_taken(
@@ -202,16 +216,15 @@ class UserService:
             mobile=data.mobile,
         )
 
-        return {
-            "id": user.id,
-            "name": user.name,
-            "username": user.username,
-            "gender": profile.gender,
-            "email": profile.email,
-            "mobile": profile.mobile,
-            "photo": profile.photo,
-            "message": "Profile updated successfully.",
-        }
+        return UserProfileOut(
+            id=user.id,
+            name=user.name,
+            username=user.username,
+            gender=profile.gender,
+            email=profile.email,
+            mobile=profile.mobile,
+            photo=profile.photo,
+        ).model_dump()
 
     async def upload_avatar(self, user: User, image) -> dict:
         """Upload and compress avatar to 256px thumbnail."""
@@ -247,6 +260,43 @@ class UserService:
         """Check if user has a registered passkey credential."""
         cred = await self.repo.get_passkey_by_user_id(user.id)
         return cred is not None
+
+    async def create_registration_options(
+        self, redis: AsyncRedis, user: User
+    ) -> PublicKeyCredentialCreationOptions:
+        """创建Passkey注册选项并存储挑战码到Redis"""
+        if await self.has_passkey(user):
+            raise ValueError("用户已注册 Passkey")
+
+        options: PublicKeyCredentialCreationOptions = (
+            generate_passkey_registration_options(str(user.id))
+        )
+
+        challenge: str = base64url_encode(options.challenge)
+        await redis.set(
+            f"passkey:registration:challenge:{user.id}",
+            challenge,
+            ex=300,
+        )
+        return orjson.loads(options_to_json(options))
+
+    async def create_options(
+        self, redis: AsyncRedis
+    ) -> PublicKeyCredentialRequestOptions:
+        """创建Passkey认证选项并存储挑战码到Redis"""
+        options: PublicKeyCredentialRequestOptions = (
+            generate_passkey_authentication_options()
+        )
+
+        challenge_bytes: bytes = options.challenge
+        challenge: str = base64url_encode(challenge_bytes)
+
+        await redis.set(
+            f"passkey:authentication:challenge:{challenge}",
+            challenge,
+            ex=300,
+        )
+        return orjson.loads(options_to_json(options))
 
     async def register_passkey(
         self,
@@ -329,6 +379,72 @@ class UserService:
         )
         await self.record_login(user, request)
         return user, None
+
+    async def complete_passkey_login(
+        self,
+        assertion_response: dict,
+        redis: AsyncRedis,
+        request: Request,
+    ) -> tuple[User, dict[str, str], None] | tuple[None, None, str]:
+        """Complete passkey login flow: validate challenge → authenticate → create tokens.
+
+        Returns (user, tokens, None) on success, (None, None, error_msg) on failure.
+        """
+        # Parse challenge from clientDataJSON
+        try:
+            client_data_json_b64 = assertion_response["response"][
+                "clientDataJSON"
+            ]
+            client_data_json_bytes = base64url_decode(client_data_json_b64)
+            client_data = orjson.loads(client_data_json_bytes)
+            challenge = client_data["challenge"]
+        except KeyError, ValueError, orjson.JSONDecodeError:
+            return None, None, "无效的 Passkey 认证响应"
+
+        # Validate and consume Redis challenge
+        expected_challenge = await redis.get(
+            f"passkey:authentication:challenge:{challenge}"
+        )
+        if not expected_challenge:
+            return None, None, "Passkey 认证会话已过期或不存在"
+
+        await redis.delete(f"passkey:authentication:challenge:{challenge}")
+
+        # Authenticate and create tokens
+        user, error = await self.authenticate_passkey(
+            assertion_response, expected_challenge, request
+        )
+        if error or user is None:
+            return None, None, error or "认证失败"
+
+        tokens = self.create_tokens(user)
+        return user, tokens, None
+
+    async def complete_passkey_registration(
+        self,
+        user: User,
+        response: dict,
+        redis: AsyncRedis,
+    ) -> str | None:
+        """Complete passkey registration flow: validate challenge → register credential.
+
+        Returns None on success, error message on failure.
+        """
+        expected_challenge = await redis.get(
+            f"passkey:registration:challenge:{user.id}"
+        )
+        if not expected_challenge:
+            return "Passkey 注册会话已过期或不存在"
+
+        await redis.delete(f"passkey:registration:challenge:{user.id}")
+
+        success = await self.register_passkey(
+            user, response, expected_challenge
+        )
+        if not success:
+            return "您的账户已经绑定了Passkey或验证失败"
+
+        return None
 
     async def delete_passkey(self, user: User) -> bool:
         """Delete user's passkey credential. Returns False if none exists."""

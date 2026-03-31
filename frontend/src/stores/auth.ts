@@ -148,6 +148,10 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
+  const loginWithGitHub = () => {
+    authGateway.loginWithGitHub();
+  };
+
   // 5. 登出
   async function logout() {
     loading.value = true;
@@ -194,6 +198,7 @@ export const useAuthStore = defineStore("auth", () => {
     getPasskeyAuthenticationOptions,
     login,
     loginWithPasskey,
+    loginWithGitHub,
     logout,
     refreshUser,
   };

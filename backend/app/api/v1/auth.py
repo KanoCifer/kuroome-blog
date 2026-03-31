@@ -18,10 +18,6 @@ from fastapi import (
 )
 from fastapi.responses import JSONResponse, RedirectResponse
 from webauthn import options_to_json
-from webauthn.helpers.structs import (
-    PublicKeyCredentialCreationOptions,
-    PublicKeyCredentialRequestOptions,
-)
 
 from app.api.des.auth import manager
 from app.api.des.csrf import csrf_manager
@@ -33,18 +29,13 @@ from app.core.logger import logger
 from app.models.models import User
 from app.schemas.auth import (
     EmailSchema,
-    PasskeyAuthenticationRequest,
+    PasskeyAuthRequest,
     PasskeyRegistrationRequest,
 )
 from app.schemas.response import APIResponse
 from app.schemas.schemas import LoginIn, RegisterIn, UserSettingsIn
 from app.services.user_service import UserService
 from app.tasks import send_code
-from app.utils.base64url import base64url_decode, base64url_encode
-from app.utils.webauthn import (
-    generate_passkey_authentication_options,
-    generate_passkey_registration_options,
-)
 
 router = APIRouter(
     prefix="/auth",
@@ -362,26 +353,16 @@ async def passkey_registration_options(
     user_service: UserService = Depends(user_service_dep),
     redis: AsyncRedis = Depends(get_redis),
 ):
-    if await user_service.has_passkey(user):
+    try:
+        return APIResponse.ok(
+            data=await user_service.create_registration_options(redis, user),
+            message="Passkey 注册选项生成成功",
+        )
+    except ValueError:
         return APIResponse.error(
             message="您的账户已经绑定了Passkey",
             code=status.HTTP_400_BAD_REQUEST,
         )
-
-    options: PublicKeyCredentialCreationOptions = (
-        generate_passkey_registration_options(str(user.id))
-    )
-
-    challenge: str = base64url_encode(options.challenge)
-    await redis.set(
-        f"passkey:registration:challenge:{user.id}",
-        challenge,
-        ex=300,
-    )
-    return APIResponse.ok(
-        data=json.loads(options_to_json(options)),
-        message="Passkey 注册选项生成成功",
-    )
 
 
 @router.post("/passkey/register")
@@ -391,24 +372,12 @@ async def passkey_register(
     user_service: UserService = Depends(user_service_dep),
     redis: AsyncRedis = Depends(get_redis),
 ):
-    expected_challenge = await redis.get(
-        f"passkey:registration:challenge:{user.id}"
+    error = await user_service.complete_passkey_registration(
+        user, request.response, redis
     )
-    if not expected_challenge:
+    if error:
         return APIResponse.error(
-            message="Passkey 注册会话已过期或不存在",
-            code=status.HTTP_400_BAD_REQUEST,
-        )
-
-    await redis.delete(f"passkey:registration:challenge:{user.id}")
-
-    success = await user_service.register_passkey(
-        user, request.response, expected_challenge
-    )
-    if not success:
-        return APIResponse.error(
-            message="您的账户已经绑定了Passkey或验证失败",
-            code=status.HTTP_400_BAD_REQUEST,
+            message=error, code=status.HTTP_400_BAD_REQUEST
         )
 
     return APIResponse.ok(message="Passkey 注册成功")
@@ -417,19 +386,9 @@ async def passkey_register(
 @router.get("/passkey/authentication-options")
 async def passkey_authentication_options(
     redis: AsyncRedis = Depends(get_redis),
+    user_service: UserService = Depends(user_service_dep),
 ):
-    options: PublicKeyCredentialRequestOptions = (
-        generate_passkey_authentication_options()
-    )
-
-    challenge_bytes: bytes = options.challenge
-    challenge: str = base64url_encode(challenge_bytes)
-
-    await redis.set(
-        f"passkey:authentication:challenge:{challenge}",
-        challenge,
-        ex=300,
-    )
+    options = await user_service.create_options(redis)
     return APIResponse.ok(
         data=json.loads(options_to_json(options)),
         message="Passkey 认证选项生成成功",
@@ -452,47 +411,29 @@ async def passkey_delete(
 
 @router.post("/passkey/authenticate")
 async def passkey_authenticate(
-    http_request: Request,
-    request: PasskeyAuthenticationRequest,
+    request: Request,
+    assertion: PasskeyAuthRequest,
     user_service: UserService = Depends(user_service_dep),
     redis: AsyncRedis = Depends(get_redis),
 ):
-    try:
-        client_data_json_b64 = request.response["response"]["clientDataJSON"]
-        client_data_json_bytes = base64url_decode(client_data_json_b64).encode(
-            "utf-8"
-        )
-        client_data = json.loads(client_data_json_bytes)
-        challenge = client_data["challenge"]
-    except KeyError, ValueError, json.JSONDecodeError:
-        return APIResponse.error(
-            message="无效的 Passkey 认证响应",
-            code=status.HTTP_400_BAD_REQUEST,
-        )
-
-    expected_challenge = await redis.get(
-        f"passkey:authentication:challenge:{challenge}"
+    user, tokens, error = await user_service.complete_passkey_login(
+        assertion.response, redis, request
     )
-    if not expected_challenge:
-        return APIResponse.error(
-            message="Passkey 认证会话已过期或不存在",
-            code=status.HTTP_400_BAD_REQUEST,
-        )
-
-    await redis.delete(f"passkey:authentication:challenge:{challenge}")
-
-    user, error = await user_service.authenticate_passkey(
-        request.response, expected_challenge, http_request
-    )
-    if error or user is None:
+    if error or user is None or tokens is None:
         return APIResponse.error(
             message=error or "认证失败", code=status.HTTP_400_BAD_REQUEST
         )
 
-    tokens = user_service.create_tokens(user)
-    profile = user.profile
     return _build_login_response(
-        user, profile, tokens, message="Passkey 登录成功"
+        user, user.profile, tokens, message="Passkey 登录成功"
+    )
+    if error:
+        return APIResponse.error(
+            message=error, code=status.HTTP_400_BAD_REQUEST
+        )
+
+    return _build_login_response(
+        user, user.profile, tokens, message="Passkey 登录成功"
     )
 
 

@@ -41,7 +41,7 @@ def _build_daily_summary_message(
     if top_pages:
         lines.append("🔥 热门页面 Top 5")
         for item in top_pages:
-            count = _to_int(item.get("count"))
+            count = int(item.get("count") or 0)
             page_path = str(item.get("page_path") or "未知页面")
             percentage = count / total_visits * 100 if total_visits > 0 else 0
             lines.append(f"• {page_path}: {count} 次 ({percentage:.1f}%)")
@@ -50,7 +50,7 @@ def _build_daily_summary_message(
     if browser_stats:
         lines.append("🌐 浏览器分布")
         for item in browser_stats:
-            count = _to_int(item.get("count"))
+            count = int(item.get("count") or 0)
             percentage = (
                 count / unique_visitors * 100 if unique_visitors > 0 else 0
             )
@@ -61,7 +61,7 @@ def _build_daily_summary_message(
     if os_stats:
         lines.append("💻 操作系统分布")
         for item in os_stats:
-            count = _to_int(item.get("count"))
+            count = int(item.get("count") or 0)
             percentage = (
                 count / unique_visitors * 100 if unique_visitors > 0 else 0
             )
@@ -72,7 +72,7 @@ def _build_daily_summary_message(
     if device_stats:
         lines.append("📱 设备类型分布")
         for item in device_stats:
-            count = _to_int(item.get("count"))
+            count = int(item.get("count") or 0)
             percentage = (
                 count / unique_visitors * 100 if unique_visitors > 0 else 0
             )
@@ -83,78 +83,6 @@ def _build_daily_summary_message(
     lines.append("────────────────")
     lines.append("📌 此消息由 BOT 自动发送")
     return "\n".join(lines)
-
-
-def _split_message_by_utf8_bytes(
-    text: str, *, max_bytes: int = 12_000
-) -> list[str]:
-    stripped = text.strip()
-    if not stripped:
-        return []
-
-    chunks: list[str] = []
-    current: list[str] = []
-
-    def current_text() -> str:
-        return "\n".join(current)
-
-    for line in stripped.split("\n"):
-        candidate_lines = [*current, line]
-        candidate = "\n".join(candidate_lines)
-        if len(candidate.encode("utf-8")) <= max_bytes:
-            current = candidate_lines
-            continue
-
-        if current:
-            chunks.append(current_text())
-            current = []
-
-        if len(line.encode("utf-8")) <= max_bytes:
-            current = [line]
-            continue
-
-        buffer = ""
-        for char in line:
-            candidate_buffer = f"{buffer}{char}"
-            if len(candidate_buffer.encode("utf-8")) <= max_bytes:
-                buffer = candidate_buffer
-                continue
-            if buffer:
-                chunks.append(buffer)
-            buffer = char
-        if buffer:
-            current = [buffer]
-
-    if current:
-        chunks.append(current_text())
-
-    return [chunk for chunk in chunks if chunk.strip()]
-
-
-def _to_int(value: int | str | None) -> int:
-    if isinstance(value, int):
-        return value
-    if isinstance(value, str):
-        try:
-            return int(value)
-        except ValueError:
-            return 0
-    return 0
-
-
-async def _enqueue_feishu_message(
-    *,
-    message: str,
-    msg_type: str = "text",
-    title: str | None = None,
-) -> None:
-    kiq_sender: FeishuKiqCallable | None = getattr(
-        send_feishu_message, "kiq", None
-    )
-    if kiq_sender is None:
-        logger.warning("send_feishu_message.kiq 不可用，跳过发送飞书消息")
-        return
-    await kiq_sender(message=message, msg_type=msg_type, title=title)
 
 
 @broker.task(
@@ -359,7 +287,7 @@ async def refresh_rss_feeds(context: Context = TaskiqDepends()):
             )
 
         try:
-            await _enqueue_feishu_message(
+            await send_feishu_message.kiq(
                 message=message, msg_type="post", title="✅Rss 刷新完成通知"
             )
         except Exception as e:
@@ -381,7 +309,7 @@ async def refresh_rss_feeds(context: Context = TaskiqDepends()):
             f"❌RSS 刷新失败！\n错误信息: {error_msg}\n耗时: {duration:.2f}秒"
         )
         try:
-            await _enqueue_feishu_message(
+            await send_feishu_message.kiq(
                 message=message, msg_type="post", title="❌Rss 刷新失败通知"
             )
         except Exception as feishu_e:
@@ -395,6 +323,10 @@ async def refresh_rss_feeds(context: Context = TaskiqDepends()):
 
 @broker.task(
     schedule=[
+        # {
+        #     "interval": 3600,
+        #     "schedule_id": "daily_summary",
+        # }
         {
             "cron": "0 8 * * *",
             "schedule_id": "daily_visitor_summary",
@@ -422,7 +354,7 @@ async def send_daily_summary(
     try:
         from app.core.container import get_monitor_service
 
-        redis = getattr(context.state, "redis", None)
+        redis = context.state.redis
         if redis is None:
             logger.warning("Taskiq Redis 未初始化，跳过发送每日统计飞书消息")
             return
@@ -448,28 +380,23 @@ async def send_daily_summary(
             os_stats=os_stats,
             device_stats=device_stats,
         )
-        chunks = _split_message_by_utf8_bytes(message, max_bytes=12_000)
-        if not chunks:
+        if not message.strip():
             logger.warning("每日统计消息为空，跳过发送")
             return
 
-        for index, chunk in enumerate(chunks, start=1):
-            title = (
-                f"📊 每日访问统计 - {yesterday_str} ({index}/{len(chunks)})"
-                if len(chunks) > 1
-                else f"📊 每日访问统计 - {yesterday_str}"
-            )
-            await _enqueue_feishu_message(
-                message=chunk,
-                msg_type="post",
-                title=title,
-            )
+        title = f"📊 昨日访问统计 - {yesterday_str}"
+
+        await send_feishu_message.kiq(
+            message=message,
+            msg_type="post",
+            title=title,
+        )
 
     except Exception as e:
         error_msg = str(e)
         logger.error(f"❌ 发送每日统计飞书消息失败: {error_msg}")
         try:
-            await _enqueue_feishu_message(
+            await send_feishu_message.kiq(
                 message=f"❌每日访问统计发送失败！\n错误信息: {error_msg}",
                 msg_type="post",
                 title="❌每日访问统计失败通知",
@@ -512,7 +439,7 @@ async def send_todo(context: Context = TaskiqDepends()):
         else []
     )
     if uncompleted:
-        await _enqueue_feishu_message(
+        await send_feishu_message.kiq(
             message=f"您有 {len(uncompleted)} 个待办事项未完成，请及时处理！\n"
             + "\n".join(
                 [

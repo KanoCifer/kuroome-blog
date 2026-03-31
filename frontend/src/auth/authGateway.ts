@@ -34,6 +34,7 @@ export interface AuthGateway {
   loginWithPasskey: (assertion: unknown) => Promise<PasskeyLoginResult>;
   logout: () => Promise<void>;
   postHeartbeat: () => Promise<void>;
+  loginWithGitHub: () => void;
 }
 
 function extractData<T>(value: unknown): T | undefined {
@@ -79,12 +80,9 @@ export function createAuthGateway(): AuthGateway {
     },
 
     async loginWithPasskey(assertion: unknown): Promise<PasskeyLoginResult> {
-      const res = await request.post<ApiEnvelope<PasskeyLoginPayload>>(
-        "/auth/passkey/authenticate",
-        {
-          response: assertion,
-        },
-      );
+      const res = await request.post<ApiEnvelope<PasskeyLoginPayload>>("/auth/passkey/authenticate", {
+        assertion: assertion,
+      });
 
       const payload = res.data.data;
       return {
@@ -99,6 +97,10 @@ export function createAuthGateway(): AuthGateway {
 
     async postHeartbeat(): Promise<void> {
       await request.post("/auth/heartbeat");
+    },
+
+    loginWithGitHub(): void {
+      window.location.href = "/api/v1/auth/github";
     },
   };
 }

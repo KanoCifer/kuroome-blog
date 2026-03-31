@@ -17,7 +17,6 @@ from app.schemas.auth import (
     GitHubOAuthConfig,
     LoginIn,
     LoginOut,
-    PasskeyAuthenticationRequest,
     PasskeyRegistrationRequest,
     RegisterIn,
     RegisterOut,

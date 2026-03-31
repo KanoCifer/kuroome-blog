@@ -79,7 +79,7 @@ const handlePasskeyLogin = async () => {
 // GitHub 登录
 const handleGitHubLogin = () => {
   // 直接跳转到后端 GitHub 授权接口，后端会处理后续流程
-  window.location.href = "/api/v1/auth/github";
+  auth.loginWithGitHub();
 };
 </script>
 

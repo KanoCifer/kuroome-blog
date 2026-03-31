@@ -1,122 +1,188 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Repository guidance for agentic coding assistants in this project.
 
-## 🤖 Agent Rules
-> Important: The following rules apply to development agents only
-- When the user asks in Chinese, respond in Chinese
-- When editing existing files, prefer the `edit` tool over the `write` tool
-- After editing frontend code, run `pnpm type-check`. **Do NOT auto-run `pnpm build`** unless explicitly requested
-- Before committing code, run the corresponding language's formatting and linting commands
-- Do NOT add code comments unless explicitly asked
-- Keep responses concise and technical; avoid conversational filler
+## 1) Agent Rules (Highest Priority)
+
+- 用户使用中文提问时，使用中文回复。
+- 编辑已有文件时，使用增量修改，不做无关重写。
+- 修改前端代码后，必须运行：`pnpm run type-check`。
+- **不要自动运行 `pnpm run build`**，除非用户明确要求。
+- 提交前执行对应语言的格式化与 lint。
+- 未经用户要求，不主动添加代码注释。
+- 回复保持简洁、技术化。
+- `/init-deep` 类任务仅更新 `CLAUDE.md`，不要创建/修改 `AGENTS.md`。
 
 ---
 
-## Project Overview
-Full-stack reading list management and personal blog system built with FastAPI + Vue 3. Features include user authentication, book management, WeRead import, blog system, guestbook, RSS reader, AI assistant, and admin monitoring.
+## 2) Project Overview
 
-## Common Commands
+- Stack: FastAPI + Vue 3 + TypeScript
+- Ports: backend `:5555`, frontend `:5173`
+- Main domains: auth, books, blog, messages, RSS, AI, admin/monitoring
 
-### Backend (run from `backend/`)
+### Key directories
+
+```text
+backend/
+  app/api/v1/        # route layer
+  app/services/      # business logic
+  app/repositories/  # data access
+  app/schemas/       # request/response contracts
+  app/models/        # SQLAlchemy + Beanie
+  app/core/          # config/security/logging
+  app/tasks/         # async jobs
+  app/main.py        # FastAPI entry
+  test/              # pytest tests
+  dev.py             # backend dev entry
+
+frontend/
+  src/views/         # page-level components
+  src/components/    # reusable UI
+  src/auth/          # auth logic
+  src/service/       # API adapters
+  src/stores/        # Pinia stores
+  src/router/        # route and guards
+  src/types/         # shared TS types
+  package.json       # command entry
+  vitest.config.ts   # unit test config
+
+scripts/
+  package.json       # utility scripts
+```
+
+---
+
+## 3) Build / Lint / Test Commands
+
+> Commands should run in the indicated directory.
+
+### Backend (`cd backend`)
+
 ```bash
-python dev.py                           # Start dev server (:5555)
-ruff format . && ruff check .           # Format + lint
-ruff check . --fix                      # Auto-fix lint issues
-alembic revision --autogenerate -m "desc" # Generate migration
-alembic upgrade head                    # Run all migrations
+# run dev server
+python dev.py
 
-# Testing
-python -m pytest                                  # All tests
-python -m pytest test/test_main.py -v             # Single file
-python -m pytest test/core/test_config.py::test_config_loading -v # Single function
-python -m pytest -k "config" -v                   # Filter by keyword
-python -m pytest --tb=short                        # Short traceback
+# format + lint
+ruff format . && ruff check .
+ruff check . --fix
+
+# migrations
+alembic revision --autogenerate -m "desc"
+alembic upgrade head
+
+# tests
+python -m pytest
+python -m pytest test/test_main.py -v
+python -m pytest test/core/test_config.py::test_config_loading -v
+python -m pytest -k "config" -v
+python -m pytest --tb=short
 ```
 
-### Frontend (run from `frontend/`)
+### Frontend (`cd frontend`)
+
 ```bash
-pnpm run dev                            # Start dev server (:5173)
-pnpm run format                         # Prettier format
-pnpm run lint                           # Oxlint + ESLint check
-pnpm run type-check                     # TypeScript type-check (vue-tsc)
-pnpm run build                          # Full build (type-check + compile)
-pnpm run build-only                     # Build only (skip type-check)
+# dev and quality
+pnpm run dev
+pnpm run format
+pnpm run lint
+pnpm run type-check
 
-# Testing
-pnpm run test:unit                      # Vitest unit tests
-pnpm run test:unit -- src/path/to/file.test.ts # Single file
-pnpm run test:unit -- -t "should render title" # By test name
-pnpm run test:unit -- src/path/to/file.test.ts -t "should render title" # File + test name
-pnpm run test:unit -- src/path/to/file.test.ts:42 # File + line
-npx playwright test                     # Playwright E2E
-npx playwright test --headed            # E2E with browser UI
-npx playwright test --debug             # Debug E2E
+# build (only if user asks)
+pnpm run build
+pnpm run build-only
+
+# vitest
+pnpm run test:unit
+pnpm run test:unit -- src/path/to/file.test.ts
+pnpm run test:unit -- -t "should render title"
+pnpm run test:unit -- src/path/to/file.test.ts -t "should render title"
+pnpm run test:unit -- src/path/to/file.test.ts:42
+
+# playwright
+npx playwright test
+npx playwright test --headed
+npx playwright test --debug
+npx playwright test tests/foo.spec.ts:42
+npx playwright test -g "should login"
 ```
 
-## Architecture
-```
-backend/app/
-├── api/v1/              # API endpoints (auth, books, blog, messages, weread, rss, admin, ai, todos, monitor)
-├── models/              # SQLAlchemy 2.0 (models.py) + MongoDB Beanie (beanie.py)
-├── schemas/             # Pydantic schemas (per-domain: auth, book, blog, rss, etc.)
-├── repositories/        # Data access layer
-├── services/            # Business logic
-├── core/                # Config, logging, AI agent
-├── utils/               # Utility functions
-├── tasks/               # Taskiq async tasks
-└── main.py              # FastAPI entry point
+### Scripts (`cd scripts`)
 
-frontend/src/
-├── views/               # Page components
-├── components/          # Reusable Vue components
-├── auth/                # Authentication logic
-├── service/            # API calls and business logic
-├── stores/              # Pinia state management
-├── router/              # Vue Router config
-├── types/               # TypeScript type definitions
-├── lib/                 # Third-party library wrappers
-├── utils/               # Utility functions
-├── layouts/             # Layout components
-└── assets/              # Static assets
+```bash
+npm run parse-ua
 ```
 
-## Tech Stack
-- **Backend**: FastAPI, SQLAlchemy 2.0, Alembic, PostgreSQL, MongoDB (Beanie), Redis, Taskiq
-- **Frontend**: Vue 3.5, TypeScript, Vite, Tailwind CSS v4, Pinia, shadcn-vue, motion-v
-- **AI**: Agno
-- **Ports**: Backend `:5555`, Frontend `:5173`
+### Single-test strategy
 
-## Code Style
+- Pytest: prefer exact node id (`file::test_name`).
+- Vitest: prefer `file:line`, fallback to `-t`.
+- Playwright: prefer `file:line`, fallback to `-g`.
+- Use fuzzy matching only when exact location is unknown.
+
+---
+
+## 4) Code Style Guidelines
 
 ### Backend (Python)
-- Ruff config (`ruff.toml`): 79 char line width, 4-space indent, double quotes, Python 3.14 target
-- Type annotations: modern Python 3.14+ syntax (`list[str]` not `List[str]`)
-- Naming: `snake_case` for functions/variables, `PascalCase` for classes, `UPPER_SNAKE_CASE` for constants
-- No bare `except:` — always specify exception type
-- Google-style docstrings for all public functions/classes
-- Use `async/await` for all database operations
-- Import order: stdlib → third-party → local (isort)
-- Absolute imports only: `from app.xxx import ...`
-- Schemas split by domain in `app/schemas/` (auth, book, blog, rss, etc.)
 
-### Frontend (Vue/TypeScript)
-- Always use `<script setup lang="ts">` + Composition API (no Options API)
-- Strict TypeScript: avoid `any`, use `unknown` + type guards
-- Naming: `camelCase` for functions/variables, `PascalCase` for components/types
-- Component files: `PascalCase.vue`, utility files: `camelCase.ts`
-- Prefer Tailwind CSS utilities over custom CSS
-- Use `@/` alias for imports from `frontend/src/`
-- Package manager: `pnpm` only, never `npm`
+- Python: `>=3.14`; Ruff target: `py314`
+- Formatting: line length `79`, 4-space indent, double quotes, LF
+- Imports:
+  - absolute imports only (`from app...`)
+  - no relative imports
+  - order: stdlib → third-party → first-party/local
+- Types: modern annotations (`list[str]`, `dict[str, str]`, `A | B`)
+- Naming:
+  - functions/variables: `snake_case`
+  - classes: `PascalCase`
+  - constants: `UPPER_SNAKE_CASE`
+- Error handling:
+  - never use bare `except:`
+  - services raise domain errors, API layer maps HTTP responses
+  - never swallow errors silently
+- Async: prefer async/await for DB-related operations
 
-### Error Handling
-- Backend: raise custom exceptions in services, catch in API layer with proper HTTP status codes
-- Frontend: use try/catch in async handlers, show user-friendly messages via notification store
-- Never swallow errors silently — always log or notify
+### Frontend (Vue + TypeScript)
 
-## Commit Guidelines
-1. Backend pre-commit: `cd backend && ruff format . && ruff check .`
-2. Frontend pre-commit: `cd frontend && pnpm format && pnpm lint && pnpm type-check`
-3. Commit messages: Conventional Commits (`feat:`, `fix:`, `docs:`, `style:`, `refactor:`, `perf:`, `test:`, `chore:`)
-4. Branch naming: `feature/xxx`, `fix/xxx`, `refactor/xxx`
-5. Never commit: `.env`, `node_modules/`, `.venv/`, `__pycache__/`, temp files
+- Use `<script setup lang="ts">` + Composition API
+- Type safety:
+  - avoid `any`
+  - use `unknown` + narrowing for external inputs
+  - keep props/emits/store types explicit
+- Naming:
+  - variables/functions: `camelCase`
+  - components/types: `PascalCase`
+  - component file: `PascalCase.vue`
+  - utility file: `camelCase.ts`
+- Imports: use alias `@/` for `frontend/src/*`
+- Styling: prefer Tailwind utilities
+- Package manager: frontend uses `pnpm` only
+- Error handling:
+  - async flows use try/catch
+  - narrow caught values before property access
+  - route user-visible failures to notification flows
+
+---
+
+## 5) Architecture & Boundaries
+
+- Backend layering: `api -> service -> repository`
+- Keep business logic in services; keep data access in repositories
+- Keep request/response contracts in schemas
+- Frontend layering:
+  - `views/`: page composition
+  - `components/`: reusable UI
+  - `stores/`: state management
+  - `service/`: API communication
+  - `router/`: route definitions and guards
+
+## 6) Cursor / Copilot Rules Status
+
+Checked in repository:
+
+- `.cursorrules`: not found
+- `.cursor/rules/`: not found
+- `.github/copilot-instructions.md`: not found
+
+If these files are added later, merge their explicit constraints here.

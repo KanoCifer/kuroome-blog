@@ -60,3 +60,18 @@ class ImageUploadOut(BaseModel):
     """Image upload output schema."""
 
     filename: str
+
+
+class UserInfo(BaseModel):
+    """User info output schema."""
+
+    id: int
+    username: str
+    is_admin: bool
+    name: str
+    email: str | None
+    mobile: str | None
+    gender: str | None
+    photo: str | None
+    has_passkey: bool
+    github_bound: bool

@@ -60,7 +60,7 @@ class PasskeyRegistrationRequest(BaseModel):
     response: dict
 
 
-class PasskeyAuthenticationRequest(BaseModel):
+class PasskeyAuthRequest(BaseModel):
     """Passkey authentication request schema."""
 
     response: dict
