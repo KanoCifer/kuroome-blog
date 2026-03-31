@@ -63,7 +63,7 @@ class PasskeyRegistrationRequest(BaseModel):
 class PasskeyAuthRequest(BaseModel):
     """Passkey authentication request schema."""
 
-    response: dict
+    assertion: dict
 
 
 class GitHubOAuthConfig(BaseModel):

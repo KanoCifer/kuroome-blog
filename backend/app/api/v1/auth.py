@@ -417,7 +417,7 @@ async def passkey_authenticate(
     redis: AsyncRedis = Depends(get_redis),
 ):
     user, tokens, error = await user_service.complete_passkey_login(
-        assertion.response, redis, request
+        assertion.assertion, redis, request
     )
     if error or user is None or tokens is None:
         return APIResponse.error(
