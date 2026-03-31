@@ -53,7 +53,6 @@ class UserProfileOut(BaseModel):
     email: str | None
     mobile: str | None
     photo: str | None
-    about: str | None
 
 
 class ImageUploadOut(BaseModel):

@@ -8,6 +8,7 @@ from urllib.parse import urlencode
 
 import orjson
 from fastapi import Request
+from PIL.XVThumbImagePlugin import g
 from redis.asyncio import Redis as AsyncRedis
 from webauthn import options_to_json
 from webauthn.helpers.structs import (
@@ -21,6 +22,8 @@ from app.core.security import (
     generate_passkey_authentication_options,
     generate_passkey_registration_options,
     generate_pkce_pair,
+    verify_passkey_authentication_response,
+    verify_passkey_registration_response,
 )
 from app.models.models import Profile, User
 from app.repositories.user_repo import UserRepo
@@ -29,10 +32,6 @@ from app.schemas.user import UserInfo, UserProfileOut
 from app.utils.base64url import base64url_decode, base64url_encode
 from app.utils.compress_image import compress_avartar
 from app.utils.media import _get_media_root, save_upload_image
-from app.utils.security import (
-    verify_passkey_authentication_response,
-    verify_passkey_registration_response,
-)
 
 
 class UserService:
@@ -123,15 +122,14 @@ class UserService:
             await self.repo.ensure_profile(user)
         return user, user.profile
 
-    def user_to_dict(
-        self, user: User, profile: Profile | None = None
-    ) -> UserInfo:
+    def user_to_dict(self, user: User, profile: Profile | None = None) -> dict:
         """Serialize user + profile to dict for API responses."""
         user_info = UserInfo(
             id=user.id,
             username=user.username,
             is_admin=user.is_admin,
             name=user.name,
+            gender=profile.gender if profile else None,
             email=profile.email if profile else None,
             mobile=profile.mobile if profile else None,
             photo=profile.photo if profile else None,
@@ -189,9 +187,7 @@ class UserService:
     # Profile management
     # ------------------------------------------------------------------ #
 
-    async def update_settings(
-        self, user: User, data: UserSettingsIn
-    ) -> UserProfileOut:
+    async def update_settings(self, user: User, data: UserSettingsIn) -> dict:
         """Update user profile fields, raising ValueError on duplicate username."""
         if data.username != user.username:
             if await self.repo.is_username_taken(
