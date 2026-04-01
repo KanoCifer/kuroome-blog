@@ -5,7 +5,7 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 
-class TodoCreate(BaseModel):
+class TodoIn(BaseModel):
     """Todo creation request body."""
 
     text: str = Field(..., min_length=1, max_length=500)
@@ -13,6 +13,12 @@ class TodoCreate(BaseModel):
     dueDate: str | None = None  # noqa: N815
     priority: str = Field(default="medium", pattern="^(low|medium|high)$")
     category: str | None = None
+
+
+class TodoCreate(TodoIn):
+    """Todo creation request body (alias for TodoIn)."""
+
+    pass
 
 
 class TodoUpdate(BaseModel):
