@@ -1,7 +1,7 @@
-import { fetchAndStoreCSRF } from "@/api/csrf";
-import request from "@/api/request";
-import type { UserInfo } from "@/auth/types";
 import type { PublicKeyCredentialRequestOptionsJSON } from "@simplewebauthn/browser";
+import { fetchAndStoreCSRF } from "../api/csrf";
+import request from "../api/request";
+import type { UserInfo } from "../auth/types";
 
 interface ApiResponse<T> {
   data: T;
@@ -39,16 +39,18 @@ export interface AuthGateway {
   getPasskeyAuthenticationOptions: () => Promise<PublicKeyCredentialRequestOptionsJSON>;
   login: (username: string, password: string, rememberMe: boolean) => Promise<LoginResult>;
   loginWithPasskey: (assertion: unknown) => Promise<PasskeyLoginResult>;
+  loginWithGitHub: () => void
   logout: () => Promise<void>;
   postHeartbeat: () => Promise<void>;
-  loginWithGitHub: () => void;
 }
 
-function unwrapEnvelope<T>(res: { data: ApiResponse<T> }): T | undefined {
+
+// 辅助方法
+const  extractData = (res: { data: ApiResponse<unknown> }): unknown => {
   return res.data.data;
-}
+};
 
-function buildLoginResult(data: LoginResponseData): LoginResult {
+const  buildLoginResult = (data: LoginResponseData): LoginResult => {
   const { refresh_token, ...userFields } = data;
   return {
     user: userFields as UserInfo,
@@ -56,10 +58,9 @@ function buildLoginResult(data: LoginResponseData): LoginResult {
     raw: data,
   };
 }
-
-function emptyLoginResult(): LoginResult {
+const  emptyLoginResult = (): LoginResult => {
   return { user: null, refreshToken: "", raw: undefined };
-}
+};
 
 export function createAuthGateway(): AuthGateway {
   return {
@@ -86,17 +87,19 @@ export function createAuthGateway(): AuthGateway {
         remember_me: rememberMe,
       });
 
-      const data = unwrapEnvelope(res);
-      return data ? buildLoginResult(data) : emptyLoginResult();
+      const data = extractData(res);
+      return data ? buildLoginResult(data as LoginResponseData) : emptyLoginResult();
     },
 
     async loginWithPasskey(assertion: unknown): Promise<PasskeyLoginResult> {
-      const res = await request.post<ApiResponse<LoginResponseData>>("/auth/passkey/authenticate", {
-        assertion: assertion,
-      });
+      const res = await request.post<ApiResponse<LoginResponseData>>("/auth/passkey/authenticate",
+        {
+          response: assertion,
+        },
+      );
 
-      const data = unwrapEnvelope(res);
-      return data ? buildLoginResult(data) : emptyLoginResult();
+      const data = extractData(res);
+      return data ? buildLoginResult(data as LoginResponseData) : emptyLoginResult();
     },
 
     async logout(): Promise<void> {

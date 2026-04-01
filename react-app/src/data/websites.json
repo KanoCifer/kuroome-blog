@@ -1,0 +1,130 @@
+{
+  "sites": [
+    {
+      "id": "1",
+      "name": "GitHub",
+      "description": "全球最大的代码托管平台，为开发者提供 Git 仓库托管、代码审查、项目管理等功能。",
+      "url": "https://github.com",
+      "icon": "https://github.githubassets.com/favicons/favicon.svg",
+      "category": "开发",
+      "tags": ["代码", "开源", "协作"]
+    },
+    {
+      "id": "2",
+      "name": "aish",
+      "description": "我的开源项目，aish (AI Shell 智能命令行)，让命令行更智能、更高效。",
+      "url": "https://github.com/KanoCifer/aish",
+      "icon": "https://github.githubassets.com/favicons/favicon.svg",
+      "category": "个人项目",
+      "tags": ["技术"]
+    },
+    {
+      "id": "3",
+      "name": "MDN Web Docs",
+      "description": "Mozilla 开发的 Web 技术文档库，是前端开发者的必备参考。",
+      "url": "https://developer.mozilla.org",
+      "icon": "https://developer.mozilla.org/favicon.ico",
+      "category": "文档",
+      "tags": ["文档", "前端", "参考"]
+    },
+    {
+      "id": "4",
+      "name": "RGBA Color Picker",
+      "description": "一个在线 RGBA 颜色选择器，帮助设计师和开发者快速选择和调整颜色。",
+      "url": "https://rgbacolorpicker.com/",
+      "icon": "https://rgbacolorpicker.com/favicon.svg",
+      "category": "工具",
+      "tags": ["工具", "设计", "颜色"]
+    },
+    {
+      "id": "5",
+      "name": "Image Converter Skill",
+      "description": "我的开源Skills，将图片转换成网页友好的webp格式，提升网页加载速度。",
+      "url": "https://github.com/KanoCifer/image-convert-skill",
+      "icon": "https://github.githubassets.com/favicons/favicon.svg",
+      "category": "个人项目",
+      "tags": ["技术", "工具", "AI"]
+    },
+    {
+      "id": "6",
+      "name": "Typer",
+      "description": "一个现代化的 Python 命令行工具库，简化命令行应用的开发。文档写的很好，很容易学习使用的一个框架！",
+      "url": "https://typer.fastapi.org.cn/",
+      "icon": "https://typer.fastapi.org.cn/img/favicon.png",
+      "category": "工具",
+      "tags": ["工具", "Python", "命令行"]
+    },
+    {
+      "id": "7",
+      "name": "FastAPI",
+      "description": "一个现代、快速（高性能）的 Web 框架。也是本网站的后端技术栈。",
+      "url": "https://fastapi.tiangolo.com/",
+      "icon": "https://fastapi.tiangolo.com/img/favicon.png",
+      "category": "工具",
+      "tags": ["工具", "Python", "Web 框架"]
+    },
+    {
+      "id": "8",
+      "name": "Beanie",
+      "description": "一个基于 Motor 和 Pydantic 的异步 ODM，简化了 MongoDB 在 Python 中的使用。也是本网站的后端技术栈。",
+      "url": "https://beanie-odm.dev/",
+      "icon": "https://beanie-odm.dev/assets/favicon.png",
+      "category": "工具",
+      "tags": ["工具", "Python", "MongoDB"]
+    },
+    {
+      "id": "9",
+      "name": "TinyPNG",
+      "description": "一个在线图片压缩工具，支持 PNG 和 JPEG 格式，帮助用户减小图片文件大小，提高网页加载速度。",
+      "url": "https://tinypng.com/",
+      "icon": "https://tinypng.com/images/apple-touch-icon.png",
+      "category": "工具",
+      "tags": ["工具", "设计", "图片"]
+    },
+    {
+      "id": "10",
+      "name": "Unsplash",
+      "description": "一个提供高质量免费图片的网站，适合设计师和开发者寻找素材。",
+      "url": "https://unsplash.com/",
+      "icon": "https://unsplash.com/favicon-32x32.png",
+      "category": "资源",
+      "tags": ["资源", "设计", "图片"]
+    },
+    {
+      "id": "11",
+      "name": "Lorem Picsum",
+      "description": "一个提供随机占位图片的服务，适合开发者在开发过程中使用占位图片进行测试。",
+      "url": "https://picsum.photos/",
+      "icon": "https://picsum.photos/assets/images/favicon/favicon-32x32.png",
+      "category": "工具",
+      "tags": ["工具", "开发", "图片"]
+    },
+    {
+      "id": "12",
+      "name": "Easings",
+      "description": "一个在线动画缓动函数可视化工具，帮助开发者理解和选择合适的缓动函数。",
+      "url": "https://easings.net/zh-cn#",
+      "icon": "https://easings.net/96.8aa68ac4.png",
+      "category": "工具",
+      "tags": ["工具", "设计", "动画"]
+    },
+    {
+      "id": "13",
+      "name": "图片压缩转换",
+      "description": "网站内置的图片压缩转换工具，支持多种格式的图片上传和转换，方便用户优化图片资源。",
+      "url": "/toolbox/image-toolbox",
+      "icon": "/about.webp",
+      "category": "工具",
+      "tags": ["工具", "图片", "优化"]
+    },
+    {
+      "id": "14",
+      "name": "字节跳动IconPark",
+      "description": "一个由字节跳动开源的图标库，提供了丰富的图标资源，适合各种设计和开发需求。",
+      "url": "https://iconpark.oceanengine.com/home",
+      "icon": "https://lf-iconpark-cdn-cn.bytetos.com/obj/iconpark-site/bydesign/iconparksite/logo.svg",
+      "category": "资源",
+      "tags": ["资源", "设计", "图标"]
+    }
+  ]
+}

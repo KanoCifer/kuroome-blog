@@ -1,0 +1,445 @@
+[
+  {
+    "version": "2.6.2",
+    "date": "2026-03-30",
+    "title": "修复照片画廊功能的bug",
+    "changes": [
+      {
+        "type": "fix",
+        "content": "修复照片画廊功能中的一些小bug，提升用户体验"
+      },
+      {
+        "type": "refactor",
+        "content": "优化前端代码架构，提升代码可维护性"
+      }
+    ]
+  },
+  {
+    "version": "2.6.0",
+    "date": "2026-03-29",
+    "title": "新增照片画廊功能",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "新增照片画廊功能"
+      },
+      {
+        "type": "fix",
+        "content": "修复了一些bugs"
+      }
+    ]
+  },
+  {
+    "version": "2.5.3",
+    "date": "2026-03-29",
+    "title": "适配Markdown编辑模式",
+    "changes": [
+      {
+        "type": "fix",
+        "content": "修复Markdown编辑模式下的预览功能，提升编辑体验"
+      },
+      {
+        "type": "style",
+        "content": "优化Markdown编辑器的UI设计，提升用户体验"
+      },
+      {
+        "type": "feat",
+        "content": "新增AI分析天气，提供天气趋势预测和出行建议"
+      }
+    ]
+  },
+  {
+    "version": "2.5.1",
+    "date": "2026-03-28",
+    "title": "移动端UI适配和后端架构重构修复",
+    "changes": [
+      {
+        "type": "fix",
+        "content": "修复后端架构重构中遗留bug"
+      },
+      {
+        "type": "style",
+        "content": "优化移动端UI适配，修复部分页面显示问题"
+      }
+    ]
+  },
+  {
+    "version": "2.5.0",
+    "date": "2026-03-27",
+    "title": "后端架构重大重构",
+    "changes": [
+      {
+        "type": "refactor",
+        "content": "完成完整的Service/Repository架构重构，所有业务模块实现分层"
+      },
+      {
+        "type": "refactor",
+        "content": "覆盖10个业务模块：用户、书籍、博客、RSS、待办、AI、消息、监控、公共接口、微信读书"
+      },
+      {
+        "type": "refactor",
+        "content": "用户认证路由层从1116行精简至500行，用户管理从249行降至70行"
+      },
+      {
+        "type": "refactor",
+        "content": "RSS路由完全重构（647行），统一Redis分布式锁和缓存管理"
+      },
+      {
+        "type": "refactor",
+        "content": "博客系统统一SQL/MongoDB跨数据库聚合，消除路由数据访问耦合"
+      },
+      {
+        "type": "fix",
+        "content": "修复6处Python2语法错误、RSS DNS阻塞事件循环、21处显式事务提交冲突"
+      },
+      {
+        "type": "refactor",
+        "content": "微信读书修复异步/同步边界错误（高危），统一所有IO操作"
+      },
+      {
+        "type": "refactor",
+        "content": "代码规模：31个文件变化，2051行新增，1337行删除，可维护性显著提升"
+      }
+    ]
+  },
+  {
+    "version": "2.4.0",
+    "date": "2026-03-25",
+    "title": "功能优化与体验提升",
+    "changes": [
+      { "type": "feat", "content": "新增背景图切换功能" },
+      {
+        "type": "fix",
+        "content": "修复待办事项 API 参数错误，解耦飞书通知函数"
+      },
+      { "type": "style", "content": "优化首页布局设计" },
+      { "type": "feat", "content": "新增图片格式转换/压缩工具" },
+      { "type": "refactor", "content": "优化数据库表结构设计" },
+      { "type": "fix", "content": "更新项目打包配置和依赖版本" },
+      { "type": "fix", "content": "其他功能改进与优化" }
+    ]
+  },
+  {
+    "version": "2.3.12",
+    "date": "2026-03-23",
+    "title": "封装Redis分布式锁",
+    "changes": [
+      {
+        "type": "refactor",
+        "content": "封装Redis分布式锁，提升分布式环境下的任务调度和资源管理能力"
+      },
+      {
+        "type": "refactor",
+        "content": "迁移redis数据库至db0，优化数据存储结构"
+      },
+      { "type": "feat", "content": "新增每日总结" },
+      { "type": "fix", "content": "修复rss订阅耗时的bug" }
+    ]
+  },
+  {
+    "version": "2.3.11",
+    "date": "2026-03-22",
+    "title": "钓点地图功能完善",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "完善钓点地图功能，增加天气和潮汐信息展示"
+      },
+      { "type": "fix", "content": "修复了一些小bug" }
+    ]
+  },
+  {
+    "version": "2.3.10",
+    "date": "2026-03-21",
+    "title": "完善钓点地图功能",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "完善钓点地图功能，增加钓点详情展示和用户交互（待完善）"
+      },
+      {
+        "type": "refactor",
+        "content": "服务端数据库迁移至Docker，引入rabbitMQ"
+      },
+      { "type": "fix", "content": "修复了一些小bug" }
+    ]
+  },
+  {
+    "version": "2.3.9",
+    "date": "2026-03-20",
+    "title": "新增钓点地图功能",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "新增钓点地图功能，展示钓点位置和相关信息（待完善）"
+      },
+      { "type": "fix", "content": "修复了一些小bug" }
+    ]
+  },
+  {
+    "version": "2.3.8",
+    "date": "2026-03-20",
+    "title": "AI框架替换为Agno",
+    "changes": [
+      {
+        "type": "refactor",
+        "content": "将AI框架从原有的框架替换为Agno，提升AI功能的性能和稳定性"
+      },
+      { "type": "feat", "content": "新增TodoList页面，使用redis持久化" },
+      { "type": "fix", "content": "修复了一些小bug" }
+    ]
+  },
+  {
+    "version": "2.3.6",
+    "date": "2026-03-20",
+    "title": "更新部分UI设计和功能优化",
+    "changes": [
+      { "type": "style", "content": "更新了部分UI设计，提升用户体验" },
+      { "type": "fix", "content": "修复了一些小bug" }
+    ]
+  },
+  {
+    "version": "2.3.5",
+    "date": "2026-03-17",
+    "title": "新增CICD自动化部署",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "新增CICD自动化部署流程，使用Webhook实现代码自动构建和部署"
+      },
+      { "type": "fix", "content": "修复了一些小bug" }
+    ]
+  },
+  {
+    "version": "2.3.4",
+    "date": "2026-03-16",
+    "title": "后端任务队列迁移至TaskIQ",
+    "changes": [
+      {
+        "type": "refactor",
+        "content": "将后端任务队列从APS迁移至TaskIQ，提升任务处理性能和可靠性"
+      },
+      {
+        "type": "fix",
+        "content": "修复了任务调度中的一些小bug，使用supervisor进行进程管理"
+      }
+    ]
+  },
+  {
+    "version": "2.3.3",
+    "date": "2026-03-14",
+    "title": "增加Like卡片，GitHub登陆/绑定功能",
+    "changes": [
+      { "type": "feat", "content": "新增Like卡片" },
+      { "type": "feat", "content": "新增GitHub登录和绑定功能" },
+      { "type": "style", "content": "Toast堆叠样式优化" },
+      { "type": "fix", "content": "修复了一些小bug" }
+    ]
+  },
+  {
+    "version": "2.3.2",
+    "date": "2026-03-13",
+    "title": "AI总结功能UI优化",
+    "changes": [
+      {
+        "type": "style",
+        "content": "修改了AI总结功能的UI设计，提升用户体验"
+      },
+      { "type": "feat", "content": "新增Blog图片支持" }
+    ]
+  },
+  {
+    "version": "2.3.1",
+    "date": "2026-03-12",
+    "title": "修复了一些bugs",
+    "changes": [
+      {
+        "type": "fix",
+        "content": "修复了Passkey认证方式refreshToken无法刷新的bug"
+      }
+    ]
+  },
+  {
+    "version": "2.3.0",
+    "date": "2026-03-11",
+    "title": "新增网站推荐页面",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "新增网站推荐页面，展示精选的技术资源和工具"
+      },
+      { "type": "fix", "content": "完善token刷新机制，修复了一些bugs" }
+    ]
+  },
+  {
+    "version": "2.2.10",
+    "date": "2026-03-10",
+    "title": "新增Passksy认证功能",
+    "changes": [
+      { "type": "feat", "content": "新增Passksy认证功能，支持无密码登录" },
+      { "type": "fix", "content": "修复了一些小bug" }
+    ]
+  },
+  {
+    "version": "2.2.9",
+    "date": "2026-03-08",
+    "title": "新增内容搜索功能",
+    "changes": [
+      { "type": "feat", "content": "新增内容搜索功能，支持文章和Rss源搜索" },
+      { "type": "fix", "content": "修复了一些小的UI问题和功能bug" },
+      { "type": "feat", "content": "完善网站安全机制，新增refresh token机制" }
+    ]
+  },
+  {
+    "version": "2.2.8",
+    "date": "2026-03-08",
+    "title": "修复了一些bugs",
+    "changes": [{ "type": "fix", "content": "修复了一些小的UI问题和功能bug" }]
+  },
+  {
+    "version": "2.2.7",
+    "date": "2026-03-07",
+    "title": "新增AI总结功能",
+    "changes": [
+      { "type": "feat", "content": "新增AI总结功能，支持文章内容自动生成摘要" },
+      { "type": "fix", "content": "修复了一些小bug" }
+    ]
+  },
+  {
+    "version": "2.2.4",
+    "date": "2026-03-05",
+    "title": "rss阅读器优化",
+    "changes": [
+      { "type": "feat", "content": "优化rss阅读器" },
+      { "type": "fix", "content": "修复了一些小bug" }
+    ]
+  },
+  {
+    "version": "2.2.3",
+    "date": "2026-03-04",
+    "title": "新增Todo和Rss功能优化",
+    "changes": [
+      { "type": "feat", "content": "新增Todo功能，支持任务管理" },
+      { "type": "fix", "content": "修复了Todo功能中的一些小bug" },
+      { "type": "feat", "content": "优化Rss解析功能，提升性能和稳定性" },
+      { "type": "fix", "content": "修复了Rss解析功能中的一些小bug" }
+    ]
+  },
+  {
+    "version": "2.2.2",
+    "date": "2026-03-03",
+    "title": "网站入口重构",
+    "changes": [
+      { "type": "feat", "content": "优化网站入口页面布局和交互体验" },
+      { "type": "style", "content": "调整入口页面的动画效果和视觉设计" },
+      { "type": "fix", "content": "修复了入口页面在某些设备上的显示问题" }
+    ]
+  },
+  {
+    "version": "2.1.7",
+    "date": "2026-02-28",
+    "title": "样式优化：文章详情新增视差滚动特效",
+    "changes": [{ "type": "style", "content": "文章详情新增视差滚动特效" }]
+  },
+  {
+    "version": "2.1.6",
+    "date": "2026-02-27",
+    "title": "新增Rss解析功能",
+    "changes": [
+      { "type": "feat", "content": "可以解析并展示RSS源内容啦" },
+      { "type": "docs", "content": "Rss阅读器待完善" },
+      { "type": "fix", "content": "修复了一些小的UI问题和功能bug" }
+    ]
+  },
+  {
+    "version": "2.1.2",
+    "date": "2026-02-27",
+    "title": "新增服务器资源监控",
+    "changes": [{ "type": "feat", "content": "新增服务器资源监控图表" }]
+  },
+  {
+    "version": "2.1.0",
+    "date": "2026-02-26",
+    "title": "新增后台监控系统",
+    "changes": [
+      { "type": "feat", "content": "新增后台监控系统" },
+      { "type": "fix", "content": "修复了一些小的UI问题和功能bug" }
+    ]
+  },
+  {
+    "version": "2.0.2",
+    "date": "2026-02-26",
+    "title": "性能优化与用户体验提升",
+    "changes": [
+      { "type": "feat", "content": "优化数据库查询性能，提升响应速度" },
+      { "type": "feat", "content": "新增aps定时任务，批量处理Trace数据" },
+      { "type": "style", "content": "优化Changelog页面的UI设计" },
+      { "type": "feat", "content": "新增文章草稿功能" },
+      { "type": "fix", "content": "修复了一些小的UI问题和功能bug" }
+    ]
+  },
+  {
+    "version": "2.0.1",
+    "date": "2026-02-26",
+    "title": "新增 Changelog 变更日志/新增Track",
+    "changes": [
+      { "type": "feat", "content": "新增 Changelog 页面，展示网站更新历史" },
+      { "type": "feat", "content": "新增访客追踪功能" },
+      { "type": "style", "content": "代码块样式调整为MacOs风格" },
+      { "type": "fix", "content": "修复了一些bugs" }
+    ]
+  },
+  {
+    "version": "2.0.0",
+    "date": "2026-02-25",
+    "title": "重大更新：项目重构与功能增强",
+    "changes": [
+      { "type": "fix", "content": "修复技术栈迁移的遗留bug" },
+      { "type": "feat", "content": "更换Mongodb驱动为ODM异步Beanie" },
+      { "type": "docs", "content": "完善项目文档和开发指南" }
+    ]
+  },
+  {
+    "version": "1.5.0",
+    "date": "2026-02-24",
+    "title": "重大更新：重构项目架构",
+    "changes": [
+      { "type": "feat", "content": "FastAPI 后端上线" },
+      { "type": "feat", "content": "Vue 3 前端上线" },
+      { "type": "refactor", "content": "重构前端架构，提升性能和可维护性" },
+      { "type": "refactor", "content": "重构后端架构，优化数据库设计" },
+      { "type": "feat", "content": "新增用户权限管理功能" }
+    ]
+  },
+  {
+    "version": "1.2.0",
+    "date": "2026-02-20",
+    "title": "博客评论功能",
+    "changes": [
+      { "type": "feat", "content": "支持博客文章评论功能" },
+      { "type": "fix", "content": "修复书架加载性能问题" },
+      { "type": "style", "content": "优化移动端适配警告弹窗" }
+    ]
+  },
+  {
+    "version": "1.1.0",
+    "date": "2026-02-10",
+    "title": "Dark Mode 深色模式",
+    "changes": [
+      { "type": "feat", "content": "新增深色模式切换" },
+      { "type": "feat", "content": "背景视频播放/暂停控制" },
+      { "type": "refactor", "content": "升级至 Tailwind CSS v4" }
+    ]
+  },
+  {
+    "version": "1.0.0",
+    "date": "2026-01-25",
+    "title": "项目正式发布",
+    "changes": [
+      { "type": "feat", "content": "Flask后端上线" },
+      { "type": "feat", "content": "Jinja2前端上线" },
+      { "type": "feat", "content": "微信读书导入功能" },
+      { "type": "feat", "content": "博客系统与书架管理" }
+    ]
+  }
+]

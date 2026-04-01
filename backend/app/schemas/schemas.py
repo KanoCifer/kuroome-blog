@@ -63,7 +63,7 @@ from app.schemas.rss import (
     RssRequest,
     RssSubscriptionResponse,
 )
-from app.schemas.todo import TodoIn, TodoOut, TodoUpdate
+from app.schemas.todo import BatchAction, TodoCreate, TodoOut, TodoUpdate
 from app.schemas.user import (
     ImageUploadOut,
     UserOut,
@@ -79,6 +79,7 @@ __all__ = [
     "AdminMessageOut",
     "AdminMessagesOut",
     "ArticleSummaryRequest",
+    "BatchAction",
     "BlogIn",
     "BlogPostDelete",
     "BlogPostGet",
@@ -121,7 +122,7 @@ __all__ = [
     "RssRequest",
     "RssSubscriptionResponse",
     "SummaryInput",
-    "TodoIn",
+    "TodoCreate",
     "TodoOut",
     "TodoUpdate",
     "UpdateBookIn",

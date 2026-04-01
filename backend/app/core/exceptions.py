@@ -63,6 +63,15 @@ class UnauthorizedError(APIError):
         super().__init__(message=message, code=401, **kwargs)
 
 
+class TodoLockError(APIError):
+    """Lock acquisition failed for todo operations."""
+
+    def __init__(
+        self, message: str = "Server busy, please retry.", **kwargs: Any
+    ) -> None:
+        super().__init__(message=message, code=423, **kwargs)
+
+
 class ForbiddenError(APIError):
     """Forbidden access error."""
 

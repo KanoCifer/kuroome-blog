@@ -2,25 +2,21 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
-class TodoIn(BaseModel):
-    """Todo creation schema."""
+class TodoCreate(BaseModel):
+    """Todo creation request body."""
 
-    text: str
+    text: str = Field(..., min_length=1, max_length=500)
     description: str | None = None
-    dueDate: str | None = None  # ISO date string  # noqa: N815
-    priority: str = "medium"  # low, medium, high
+    dueDate: str | None = None  # noqa: N815
+    priority: str = Field(default="medium", pattern="^(low|medium|high)$")
     category: str | None = None
-    completed: bool = False
-    id: str | None = None  # optional client-supplied id
-    archived: bool = False
-    archivedAt: str | None = None  # noqa: N815
 
 
 class TodoUpdate(BaseModel):
-    """Todo update schema."""
+    """Partial update fields — only provided fields are applied."""
 
     text: str | None = None
     description: str | None = None
@@ -29,7 +25,6 @@ class TodoUpdate(BaseModel):
     category: str | None = None
     completed: bool | None = None
     archived: bool | None = None
-    archivedAt: str | None = None  # noqa: N815
 
 
 class TodoOut(BaseModel):
@@ -45,3 +40,9 @@ class TodoOut(BaseModel):
     category: str | None = None
     archived: bool = False
     archivedAt: str | None = None  # noqa: N815
+
+
+class BatchAction(BaseModel):
+    """Batch operation request."""
+
+    action: str = Field(..., pattern="^(archiveCompleted|clearCompleted)$")

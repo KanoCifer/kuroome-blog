@@ -136,7 +136,12 @@ export const useAuthStore = defineStore("auth", () => {
 
       await initCSRF();
       saveRefreshToken(res.refreshToken);
-      await fetchUser();
+
+      const userData = res.user;
+      user.value = userData;
+      userCache.set(userData);
+
+      startHeartbeat();
 
       sideEffects.notifySuccess("Passkey 登录成功！欢迎回来！");
       return res.raw;

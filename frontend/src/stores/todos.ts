@@ -90,7 +90,7 @@ export const useTodoStore = defineStore("todos", () => {
     const t = todos.value.find((x) => x.id === id);
     if (!t) return;
     try {
-      const updated = await todoService.toggleTodo(id, !t.completed);
+      const updated = await todoService.updateTodo(id, { completed: !t.completed });
       const idx = todos.value.findIndex((x) => x.id === id);
       if (idx !== -1 && updated) todos.value[idx] = updated;
     } catch (err) {
@@ -122,7 +122,7 @@ export const useTodoStore = defineStore("todos", () => {
 
   async function clearCompleted() {
     try {
-      await todoService.clearCompleted();
+      await todoService.batchAction("clearCompleted");
       todos.value = todos.value.filter((t) => !t.completed);
     } catch (err) {
       console.error(err);
@@ -132,7 +132,7 @@ export const useTodoStore = defineStore("todos", () => {
 
   async function archiveTodo(id: string) {
     try {
-      const updated = await todoService.archiveTodo(id);
+      const updated = await todoService.updateTodo(id, { archived: true });
       const idx = todos.value.findIndex((x) => x.id === id);
       if (idx !== -1 && updated) todos.value[idx] = updated;
     } catch (err) {
@@ -143,7 +143,7 @@ export const useTodoStore = defineStore("todos", () => {
 
   async function unarchiveTodo(id: string) {
     try {
-      const updated = await todoService.unarchiveTodo(id);
+      const updated = await todoService.updateTodo(id, { archived: false });
       const idx = todos.value.findIndex((x) => x.id === id);
       if (idx !== -1 && updated) todos.value[idx] = updated;
     } catch (err) {
@@ -154,7 +154,7 @@ export const useTodoStore = defineStore("todos", () => {
 
   async function archiveCompleted() {
     try {
-      await todoService.archiveCompleted();
+      await todoService.batchAction("archiveCompleted");
       const now = new Date().toISOString();
       todos.value = todos.value.map((t) =>
         t.completed && !t.archived ? { ...t, archived: true, archivedAt: now } : t,
@@ -162,16 +162,6 @@ export const useTodoStore = defineStore("todos", () => {
     } catch (err) {
       console.error(err);
       notifier.error("归档已完成待办失败");
-    }
-  }
-
-  async function fetchArchivedTodos() {
-    try {
-      return await todoService.fetchArchivedTodos();
-    } catch (err) {
-      console.error(err);
-      notifier.error("加载归档待办失败");
-      return [];
     }
   }
 
@@ -191,7 +181,6 @@ export const useTodoStore = defineStore("todos", () => {
     archiveTodo,
     unarchiveTodo,
     archiveCompleted,
-    fetchArchivedTodos,
     hydrateTodos,
   };
 });
