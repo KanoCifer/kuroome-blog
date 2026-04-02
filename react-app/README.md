@@ -2,6 +2,18 @@
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+## 常用命令
+
+```bash
+pnpm run dev                            # 启动开发服务器
+pnpm run build                          # 完整构建 (type-check + compile)
+pnpm run build-only                     # 仅构建 (跳过 type-check)
+pnpm run type-check                     # TypeScript 类型检查
+pnpm run lint                           # ESLint 检查
+pnpm run lint:fix                       # ESLint 自动修复
+pnpm run preview                        # 预览构建产物
+```
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)

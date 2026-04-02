@@ -1,11 +1,7 @@
-import request, { extractData } from "../../api/request.ts";
-import { type Todo } from "../../stores/todoState.ts";
+import request, { extractData } from '@/api/request.ts';
+import { type Todo } from '@/stores/todoState.ts';
 
-import type {
-  BatchAction,
-  CreateTodoPayload
-} from "./types";
-
+import type { BatchAction, CreateTodoPayload } from './types';
 
 export interface TodoService {
   fetchTodos(includeArchived?: boolean): Promise<Todo[]>;
@@ -17,7 +13,7 @@ export interface TodoService {
 
 export const todoService = (): TodoService => ({
   async fetchTodos(includeArchived = false): Promise<Todo[]> {
-    const res = await request.get("/todos", {
+    const res = await request.get('/todos', {
       params: { include_archived: includeArchived },
     });
     const data = extractData(res) as { todos?: Todo[] } | undefined;
@@ -25,7 +21,7 @@ export const todoService = (): TodoService => ({
   },
 
   async addTodo(payload: CreateTodoPayload): Promise<Todo | null> {
-    const res = await request.post("/todos", payload);
+    const res = await request.post('/todos', payload);
     const data = extractData(res) as { todo?: Todo } | undefined;
     return data?.todo ?? null;
   },
@@ -41,6 +37,6 @@ export const todoService = (): TodoService => ({
   },
 
   async batchAction(action: BatchAction): Promise<void> {
-    await request.post("/todos/batch", { action });
+    await request.post('/todos/batch', { action });
   },
 });

@@ -2,15 +2,8 @@
   <MobileBentoCard>
     <!-- Tech Stack Card -->
     <div class="squircle p-2">
-      <h3
-        class="mb-4 flex items-center gap-2 font-serif text-sm font-bold text-slate-800 dark:text-slate-200"
-      >
-        <svg
-          class="h-5 w-5 text-indigo-500"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
+      <h3 class="mb-4 flex items-center gap-2 font-serif text-sm font-bold text-slate-800 dark:text-slate-200">
+        <svg class="h-5 w-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -29,7 +22,7 @@
         <span
           class="cursor-default rounded-full border border-yellow-200 bg-yellow-100 px-3 py-1.5 text-xs font-semibold text-yellow-700 transition-colors hover:bg-yellow-200 dark:border-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 dark:hover:bg-yellow-900/50"
         >
-          JS/TS
+          TS
         </span>
         <span
           class="cursor-default rounded-full border border-green-200 bg-green-100 px-3 py-1.5 text-xs font-semibold text-green-700 transition-colors hover:bg-green-200 dark:border-green-800 dark:bg-green-900/30 dark:text-green-300 dark:hover:bg-green-900/50"

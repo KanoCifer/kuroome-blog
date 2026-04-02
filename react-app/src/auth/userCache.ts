@@ -1,6 +1,6 @@
-import type { UserInfo } from "../auth/types";
+import type { UserInfo } from '@/auth/types';
 
-const USER_INFO_KEY = "cached_user_info";
+const USER_INFO_KEY = 'cached_user_info';
 
 export const userCache = {
   get(): UserInfo | null {

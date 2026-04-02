@@ -1,5 +1,4 @@
-@import "tailwindcss";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
 @plugin "@tailwindcss/typography";
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -148,7 +147,7 @@ a {
   @apply relative inline-block;
 }
 
-.tiptap [data-resize-state="true"] [data-resize-wrapper] {
+.tiptap [data-resize-state='true'] [data-resize-wrapper] {
   @apply outline outline-blue-300;
 }
 
@@ -160,28 +159,28 @@ a {
   @apply opacity-100;
 }
 
-.tiptap [data-resize-handle="top"] {
+.tiptap [data-resize-handle='top'] {
   top: -4px;
   left: 50%;
   transform: translateX(-50%);
   cursor: ns-resize;
 }
 
-.tiptap [data-resize-handle="bottom"] {
+.tiptap [data-resize-handle='bottom'] {
   bottom: -4px;
   left: 50%;
   transform: translateX(-50%);
   cursor: ns-resize;
 }
 
-.tiptap [data-resize-handle="left"] {
+.tiptap [data-resize-handle='left'] {
   left: -4px;
   top: 50%;
   transform: translateY(-50%);
   cursor: ew-resize;
 }
 
-.tiptap [data-resize-handle="right"] {
+.tiptap [data-resize-handle='right'] {
   right: -4px;
   top: 50%;
   transform: translateY(-50%);
@@ -207,7 +206,7 @@ a {
 
 .drag-handle::before,
 .custom-drag-handle::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 4px;
   background:
@@ -242,13 +241,13 @@ a {
 
 .tiptap pre::before,
 .prose pre::before {
-  content: "";
+  content: '';
   @apply absolute inset-x-0 top-0 mb-1 flex h-10 items-center border-b border-gray-700 bg-gray-800 py-2;
 }
 
 .tiptap pre::after,
 .prose pre::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 14px;
   left: 24px;
@@ -295,7 +294,7 @@ a {
   @apply bg-gray-100;
 }
 .tiptap table .selectedCell:after {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -339,44 +338,44 @@ a {
 }
 
 /* Task list (Tailwind) */
-ul[data-type="taskList"] {
+ul[data-type='taskList'] {
   @apply ml-0 list-none p-0;
 }
 
-ul[data-type="taskList"] > li {
+ul[data-type='taskList'] > li {
   @apply flex flex-nowrap items-center gap-2 py-1; /* checkbox 与文字同行 */
 }
 
-ul[data-type="taskList"] > li > label {
+ul[data-type='taskList'] > li > label {
   @apply mr-0 inline-flex flex-none items-center select-none;
 }
 
-ul[data-type="taskList"] > li > label input[type="checkbox"] {
+ul[data-type='taskList'] > li > label input[type='checkbox'] {
   @apply m-0 h-4 w-4 align-middle;
 }
 
-ul[data-type="taskList"] > li > div {
+ul[data-type='taskList'] > li > div {
   @apply min-w-0 flex-1;
 }
 
-ul[data-type="taskList"] > li > div p {
+ul[data-type='taskList'] > li > div p {
   @apply m-0;
 }
 
 /* checked state -> strike-through */
-ul[data-type="taskList"] > li[data-checked="true"] > div,
-ul[data-type="taskList"] > li[data-checked="true"] > div p {
+ul[data-type='taskList'] > li[data-checked='true'] > div,
+ul[data-type='taskList'] > li[data-checked='true'] > div p {
   @apply text-gray-500 line-through opacity-60;
 }
 
 /* nested taskList reset */
-ul[data-type="taskList"] ul[data-type="taskList"] {
+ul[data-type='taskList'] ul[data-type='taskList'] {
   @apply m-0;
 }
 
 /* dark mode adjustments */
-.dark ul[data-type="taskList"] > li[data-checked="true"] > div,
-.dark ul[data-type="taskList"] > li[data-checked="true"] > div p {
+.dark ul[data-type='taskList'] > li[data-checked='true'] > div,
+.dark ul[data-type='taskList'] > li[data-checked='true'] > div p {
   @apply text-gray-400;
 }
 

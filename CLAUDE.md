@@ -9,16 +9,16 @@ Repository guidance for agentic coding assistants in this project.
 - 修改前端代码后，必须运行：`pnpm run type-check`。
 - **不要自动运行 `pnpm run build`**，除非用户明确要求。
 - 提交前执行对应语言的格式化与 lint。
-- 未经用户要求，不主动添加代码注释。
+- 添加必要的代码注释和Docstring。
 - 回复保持简洁、技术化。
-- `/init-deep` 类任务仅更新 `CLAUDE.md`，不要创建/修改 `AGENTS.md`。
+- `/init` 类任务仅更新 `CLAUDE.md`，不要创建/修改 `AGENTS.md`。
 
 ---
 
 ## 2) Project Overview
 
-- Stack: FastAPI + Vue 3 + TypeScript
-- Ports: backend `:5555`, frontend `:5173`
+- Stack: FastAPI + Vue 3(desktop) + React(mobile) + TypeScript
+- Ports: backend `:5555`, frontend `:5173`, mobile frontend `:5174`
 - Main domains: auth, books, blog, messages, RSS, AI, admin/monitoring
 
 ### Key directories
@@ -26,17 +26,18 @@ Repository guidance for agentic coding assistants in this project.
 ```text
 backend/
   app/api/v1/        # route layer
+  app/api/des        # DI
   app/services/      # business logic
   app/repositories/  # data access
   app/schemas/       # request/response contracts
   app/models/        # SQLAlchemy + Beanie
-  app/core/          # config/security/logging
+  app/core/          # config/security/logging/DI container
   app/tasks/         # async jobs
   app/main.py        # FastAPI entry
   test/              # pytest tests
   dev.py             # backend dev entry
 
-frontend/
+frontend/            # desktop-focused Vue frontend
   src/views/         # page-level components
   src/components/    # reusable UI
   src/auth/          # auth logic
@@ -47,8 +48,15 @@ frontend/
   package.json       # command entry
   vitest.config.ts   # unit test config
 
-scripts/
-  package.json       # utility scripts
+react-app/           # mobile-focused React frontend
+  src/views/         # page-level components
+  src/components/    # reusable UI
+  src/router/        # route definitions
+  src/types/         # shared TS types
+  src/auth/          # auth logic
+  src/service/       # API adapters
+  src/stores/        # Zustand stores
+  src/api/           # API client
 ```
 
 ---
@@ -61,7 +69,7 @@ scripts/
 
 ```bash
 # run dev server
-python dev.py
+python3 dev.py
 
 # format + lint
 ruff format . && ruff check .
@@ -72,11 +80,6 @@ alembic revision --autogenerate -m "desc"
 alembic upgrade head
 
 # tests
-python -m pytest
-python -m pytest test/test_main.py -v
-python -m pytest test/core/test_config.py::test_config_loading -v
-python -m pytest -k "config" -v
-python -m pytest --tb=short
 ```
 
 ### Frontend (`cd frontend`)
@@ -93,34 +96,7 @@ pnpm run build
 pnpm run build-only
 
 # vitest
-pnpm run test:unit
-pnpm run test:unit -- src/path/to/file.test.ts
-pnpm run test:unit -- -t "should render title"
-pnpm run test:unit -- src/path/to/file.test.ts -t "should render title"
-pnpm run test:unit -- src/path/to/file.test.ts:42
-
-# playwright
-npx playwright test
-npx playwright test --headed
-npx playwright test --debug
-npx playwright test tests/foo.spec.ts:42
-npx playwright test -g "should login"
 ```
-
-### Scripts (`cd scripts`)
-
-```bash
-npm run parse-ua
-```
-
-### Single-test strategy
-
-- Pytest: prefer exact node id (`file::test_name`).
-- Vitest: prefer `file:line`, fallback to `-t`.
-- Playwright: prefer `file:line`, fallback to `-g`.
-- Use fuzzy matching only when exact location is unknown.
-
----
 
 ## 4) Code Style Guidelines
 
@@ -153,9 +129,9 @@ npm run parse-ua
 - Naming:
   - variables/functions: `camelCase`
   - components/types: `PascalCase`
-  - component file: `PascalCase.vue`
+  - component file: `PascalCase.vue/tsx`
   - utility file: `camelCase.ts`
-- Imports: use alias `@/` for `frontend/src/*`
+- Imports: use alias `@/` for `./src/*`
 - Styling: prefer Tailwind utilities
 - Package manager: frontend uses `pnpm` only
 - Error handling:
@@ -176,13 +152,3 @@ npm run parse-ua
   - `stores/`: state management
   - `service/`: API communication
   - `router/`: route definitions and guards
-
-## 6) Cursor / Copilot Rules Status
-
-Checked in repository:
-
-- `.cursorrules`: not found
-- `.cursor/rules/`: not found
-- `.github/copilot-instructions.md`: not found
-
-If these files are added later, merge their explicit constraints here.

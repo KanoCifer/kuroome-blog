@@ -1,7 +1,7 @@
-import type { PublicKeyCredentialRequestOptionsJSON } from "@simplewebauthn/browser";
-import { fetchAndStoreCSRF } from "../api/csrf";
-import request from "../api/request";
-import type { UserInfo } from "../auth/types";
+import { fetchAndStoreCSRF } from '@/api/csrf';
+import request from '@/api/request';
+import type { UserInfo } from '@/auth/types';
+import type { PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/browser';
 
 interface ApiResponse<T> {
   data: T;
@@ -37,35 +37,38 @@ export interface AuthGateway {
   fetchUser: () => Promise<UserInfo | null>;
   initCSRF: () => Promise<void>;
   getPasskeyAuthenticationOptions: () => Promise<PublicKeyCredentialRequestOptionsJSON>;
-  login: (username: string, password: string, rememberMe: boolean) => Promise<LoginResult>;
+  login: (
+    username: string,
+    password: string,
+    rememberMe: boolean,
+  ) => Promise<LoginResult>;
   loginWithPasskey: (assertion: unknown) => Promise<PasskeyLoginResult>;
-  loginWithGitHub: () => void
+  loginWithGitHub: () => void;
   logout: () => Promise<void>;
   postHeartbeat: () => Promise<void>;
 }
 
-
 // 辅助方法
-const  extractData = (res: { data: ApiResponse<unknown> }): unknown => {
+const extractData = (res: { data: ApiResponse<unknown> }): unknown => {
   return res.data.data;
 };
 
-const  buildLoginResult = (data: LoginResponseData): LoginResult => {
+const buildLoginResult = (data: LoginResponseData): LoginResult => {
   const { refresh_token, ...userFields } = data;
   return {
     user: userFields as UserInfo,
     refreshToken: refresh_token,
     raw: data,
   };
-}
-const  emptyLoginResult = (): LoginResult => {
-  return { user: null, refreshToken: "", raw: undefined };
+};
+const emptyLoginResult = (): LoginResult => {
+  return { user: null, refreshToken: '', raw: undefined };
 };
 
 export function createAuthGateway(): AuthGateway {
   return {
     async fetchUser(): Promise<UserInfo | null> {
-      const res = await request.get<ApiResponse<UserInfo | null>>("/auth/me");
+      const res = await request.get<ApiResponse<UserInfo | null>>('/auth/me');
       return res.data.data || null;
     },
 
@@ -74,44 +77,56 @@ export function createAuthGateway(): AuthGateway {
     },
 
     async getPasskeyAuthenticationOptions(): Promise<PublicKeyCredentialRequestOptionsJSON> {
-      const res = await request.get<ApiResponse<PublicKeyCredentialRequestOptionsJSON>>(
-        "/auth/passkey/authentication-options",
-      );
+      const res = await request.get<
+        ApiResponse<PublicKeyCredentialRequestOptionsJSON>
+      >('/auth/passkey/authentication-options');
       return res.data.data;
     },
 
-    async login(username: string, password: string, rememberMe: boolean): Promise<LoginResult> {
-      const res = await request.post<ApiResponse<LoginResponseData>>("/auth/login", {
-        username: username,
-        password: password,
-        remember_me: rememberMe,
-      });
+    async login(
+      username: string,
+      password: string,
+      rememberMe: boolean,
+    ): Promise<LoginResult> {
+      const res = await request.post<ApiResponse<LoginResponseData>>(
+        '/auth/login',
+        {
+          username: username,
+          password: password,
+          remember_me: rememberMe,
+        },
+      );
 
       const data = extractData(res);
-      return data ? buildLoginResult(data as LoginResponseData) : emptyLoginResult();
+      return data
+        ? buildLoginResult(data as LoginResponseData)
+        : emptyLoginResult();
     },
 
     async loginWithPasskey(assertion: unknown): Promise<PasskeyLoginResult> {
-      const res = await request.post<ApiResponse<LoginResponseData>>("/auth/passkey/authenticate",
+      const res = await request.post<ApiResponse<LoginResponseData>>(
+        '/auth/passkey/authenticate',
         {
           response: assertion,
         },
       );
 
       const data = extractData(res);
-      return data ? buildLoginResult(data as LoginResponseData) : emptyLoginResult();
+      return data
+        ? buildLoginResult(data as LoginResponseData)
+        : emptyLoginResult();
     },
 
     async logout(): Promise<void> {
-      await request.post("/auth/logout");
+      await request.post('/auth/logout');
     },
 
     async postHeartbeat(): Promise<void> {
-      await request.post("/auth/heartbeat");
+      await request.post('/auth/heartbeat');
     },
 
     loginWithGitHub(): void {
-      window.location.href = "/api/v1/auth/github";
+      window.location.href = '/api/v1/auth/github';
     },
   };
 }

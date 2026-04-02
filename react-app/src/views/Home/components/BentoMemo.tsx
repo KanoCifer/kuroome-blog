@@ -1,0 +1,145 @@
+import { BentoCard } from '@/components/bento/BentoCard';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { MemoIcon } from './icon/MemoIcon';
+
+const memoKey = 'bento-memo';
+
+export function BentoMemo() {
+  const [isMemoOpen, setIsMemoOpen] = useState(false);
+  const [memoText, setMemoText] = useState(localStorage.getItem(memoKey) || '');
+
+  useEffect(() => {
+    localStorage.setItem(memoKey, memoText);
+  }, [memoText]);
+
+  const toggleMemo = () => {
+    setIsMemoOpen(!isMemoOpen);
+  };
+
+  const closeMemo = () => {
+    setIsMemoOpen(false);
+  };
+
+  const clearMemo = () => {
+    setMemoText('');
+    localStorage.removeItem(memoKey);
+  };
+
+  useEffect(() => {
+    const handleEscKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isMemoOpen) {
+        closeMemo();
+      }
+    };
+    window.addEventListener('keydown', handleEscKey);
+    return () => window.removeEventListener('keydown', handleEscKey);
+  }, [isMemoOpen]);
+
+  return (
+    <>
+      <div onClick={toggleMemo} className="cursor-pointer">
+        <BentoCard>
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/20">
+            <MemoIcon className="size-6 text-amber-600 dark:text-amber-400" />
+          </div>
+          <div>
+            <h5 className="text-sm font-bold text-slate-800 dark:text-slate-100">
+              Quick Memo
+            </h5>
+            <p className="mt-1 line-clamp-2 text-[11px] leading-tight text-slate-600 dark:text-slate-400">
+              {memoText ? memoText : 'Tap to write down your thoughts...'}
+            </p>
+          </div>
+        </BentoCard>
+      </div>
+
+      <AnimatePresence>
+        {isMemoOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closeMemo}
+              className="fixed inset-0 z-50 bg-black/20 backdrop-blur-[2px]"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+            >
+              <div
+                className="relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl bg-white p-6 shadow-2xl dark:bg-gray-800 pointer-events-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  onClick={closeMemo}
+                  className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+                >
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+
+                <h3 className="mb-4 flex items-center gap-2 font-serif text-xl font-bold text-gray-800 dark:text-white">
+                  <MemoIcon className="size-5" />
+                  Quick Memo
+                </h3>
+
+                <textarea
+                  value={memoText}
+                  onChange={(e) => setMemoText(e.target.value)}
+                  placeholder="在这里写下你的想法..."
+                  className="mb-4 w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-500"
+                  rows={10}
+                  autoFocus
+                />
+
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    自动保存
+                    {memoText && (
+                      <span className="ml-2">{memoText.length} 字</span>
+                    )}
+                  </span>
+                  <button
+                    onClick={clearMemo}
+                    className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-800 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="size-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                    清空
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}

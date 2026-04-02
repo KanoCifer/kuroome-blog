@@ -1,24 +1,28 @@
-import { create } from "zustand";
-import { createAuthGateway } from "../auth/authGateway";
-import { createHeartbeat } from "../auth/heartbeat";
-import type { UserInfo } from "../auth/types";
-import { userCache } from "../auth/userCache";
+import { createAuthGateway } from '@/auth/authGateway';
+import { createHeartbeat } from '@/auth/heartbeat';
+import type { UserInfo } from '@/auth/types';
+import { userCache } from '@/auth/userCache';
+import { create } from 'zustand';
 
 const authGateway = createAuthGateway();
 const heartbeat = createHeartbeat({
   isAuthenticated: () => !!userCache.get(),
   postHeartbeat: () => authGateway.postHeartbeat(),
   onError: (error: unknown) => {
-    console.error("心跳上报失败:", error);
+    console.error('心跳上报失败:', error);
   },
 });
 
 interface AuthState {
   isAuthenticated: boolean;
   user: UserInfo | null;
-  isHydrated: boolean
+  isHydrated: boolean;
   hydrateAuth: () => Promise<void>;
-  login: (username: string, password: string, rememberMe: boolean) => Promise<void>;
+  login: (
+    username: string,
+    password: string,
+    rememberMe: boolean,
+  ) => Promise<void>;
   logout: () => void;
   loginWithPasskey: (assertion: unknown) => Promise<void>;
   loginWithGitHub: () => void;
@@ -30,9 +34,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   isHydrated: false,
   user: null,
 
-
   // 初始化
-  hydrateAuth: async() => {
+  hydrateAuth: async () => {
     if (userCache.get()) {
       set({
         isAuthenticated: true,
@@ -43,7 +46,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
 
     await authGateway.initCSRF();
-     if (!userCache.get()) {
+    if (!userCache.get()) {
       try {
         const userData = await authGateway.fetchUser();
         set({
@@ -55,7 +58,7 @@ export const useAuthStore = create<AuthState>((set) => ({
           heartbeat.start();
         }
       } catch (err) {
-        console.error("获取用户信息失败:", err);
+        console.error('获取用户信息失败:', err);
         set({
           isAuthenticated: false,
           user: null,
@@ -63,8 +66,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         });
       }
     }
-
-
   },
 
   login: async (username, password, rememberMe) => {
@@ -98,6 +99,4 @@ export const useAuthStore = create<AuthState>((set) => ({
   loginWithGitHub: () => {
     authGateway.loginWithGitHub();
   },
-
-  
 }));
