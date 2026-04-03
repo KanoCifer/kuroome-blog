@@ -21,7 +21,7 @@ from app.api.des.limiter import limiter
 from app.api.des.redis import get_redis
 from app.models.models import User
 from app.schemas.aiagent import WeatherAnalysisInput
-from app.schemas.gallery import GalleryImage, GalleryInput
+from app.schemas.gallery import GalleryInput
 from app.schemas.response import APIResponse
 from app.services.public_service import PublicDomainError, PublicService
 from app.utils.media import save_upload_image
@@ -263,12 +263,13 @@ async def get_qweather_location(
     request: Request,
     location: str,
     type: str = "scenic",
+    public_service: PublicService = Depends(public_service_dep),
+    redis: AsyncRedis = Depends(get_redis),
 ) -> JSONResponse:
     """Get location information from QWeather API."""
     try:
-        data = await PublicService.get_qweather_location(
-            location=location,
-            type_=type,
+        data = await public_service.get_qweather_location(
+            location=location, type_=type, redis=redis
         )
 
         return APIResponse.ok(

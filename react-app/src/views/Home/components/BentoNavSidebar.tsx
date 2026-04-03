@@ -41,13 +41,7 @@ const navItems = [
   { path: '/about', label: '关于网站', icon: Info },
 ];
 
-interface BentoNavSidebarProps {
-  children?: React.ReactNode;
-}
-
-export const BentoNavSidebar: React.FC<BentoNavSidebarProps> = ({
-  children,
-}) => {
+export const BentoNavSidebar: React.FC = () => {
   const auth = useAuthStore();
   const location = useLocation();
   const activeIndex = navItems.findIndex(
@@ -78,7 +72,7 @@ export const BentoNavSidebar: React.FC<BentoNavSidebarProps> = ({
   }, [location.pathname]);
 
   return (
-    <div className="flex min-h-screen bg-base-200 overflow-hidden">
+    <>
       {/* Mobile Header / Sidebar Toggle */}
       <div className="lg:hidden fixed top-0 left-0 w-full z-50 p-4 pointer-events-none">
         <button
@@ -221,11 +215,6 @@ export const BentoNavSidebar: React.FC<BentoNavSidebarProps> = ({
           ))}
         </ul>
       </aside>
-
-      {/* Main Content Area */}
-      <main className="flex-1 w-full flex flex-col min-w-0 max-h-screen overflow-y-auto">
-        {children}
-      </main>
-    </div>
+    </>
   );
 };

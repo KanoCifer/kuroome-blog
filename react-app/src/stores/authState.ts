@@ -3,6 +3,7 @@ import { createHeartbeat } from '@/auth/heartbeat';
 import type { UserInfo } from '@/auth/types';
 import { userCache } from '@/auth/userCache';
 import { create } from 'zustand';
+import type { PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/browser';
 
 const authGateway = createAuthGateway();
 const heartbeat = createHeartbeat({
@@ -25,6 +26,7 @@ interface AuthState {
   ) => Promise<void>;
   logout: () => void;
   loginWithPasskey: (assertion: unknown) => Promise<void>;
+  getPasskeyAuthenticationOptions: () => Promise<PublicKeyCredentialRequestOptionsJSON>;
   loginWithGitHub: () => void;
 }
 
@@ -94,6 +96,10 @@ export const useAuthStore = create<AuthState>((set) => ({
       isAuthenticated: true,
       user: result.user,
     });
+  },
+
+  getPasskeyAuthenticationOptions: async () => {
+    return authGateway.getPasskeyAuthenticationOptions();
   },
 
   loginWithGitHub: () => {

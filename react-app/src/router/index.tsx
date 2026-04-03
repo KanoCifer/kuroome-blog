@@ -1,7 +1,15 @@
 import { BasicLayout } from '@/components/basic/BasicLayout';
 import { Suspense } from 'react';
 import { createBrowserRouter, redirect } from 'react-router-dom';
-import { Home, Login, FishingMap } from './lazy';
+import {
+  About,
+  FishingMap,
+  Home,
+  Login,
+  NotFound,
+  ProfileSetting,
+  Register,
+} from './lazy';
 
 // 认证守卫 loader
 async function authLoader() {
@@ -28,11 +36,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: (
-          <Suspense>
-            <Home />
-          </Suspense>
-        ),
+        element: <Home />,
       },
 
       {
@@ -40,12 +44,25 @@ export const router = createBrowserRouter([
         element: <Login />,
       },
       {
+        path: '/register',
+        element: <Register />,
+      },
+      {
+        path: '/settings',
+        element: <ProfileSetting />,
+        loader: authLoader,
+      },
+      {
         path: '/fishing-map',
-        element: (
-          <Suspense>
-            <FishingMap />
-          </Suspense>
-        ),
+        element: <FishingMap />,
+      },
+      {
+        path: '/about',
+        element: <About />,
+      },
+      {
+        path: '*',
+        element: <NotFound />,
       },
     ],
   },

@@ -21,19 +21,12 @@
 </template>
 
 <script setup lang="ts">
-import MobileBentoProfileCard from "./MobileBentoProfileCard.vue";
-import MobileBentoGreeting from "./MobileBentoGreeting.vue";
+import { BentoCalendar, BentoMap, BentoNavCard, BentoReadingList, BentoWebsites, TodoCard } from "@/components/bento";
 import MobileBentoClock from "./MobileBentoClock.vue";
+import MobileBentoGreeting from "./MobileBentoGreeting.vue";
 import MobileBentoMemo from "./MobileBentoMemo.vue";
+import MobileBentoProfileCard from "./MobileBentoProfileCard.vue";
 import MobileBentoTech from "./MobileBentoTech.vue";
-import {
-  BentoCalendar,
-  BentoReadingList,
-  BentoNavCard,
-  BentoWebsites,
-  BentoMap,
-  TodoCard,
-} from "@/components/bento";
 
 defineEmits(["switchBackground"]);
 </script>

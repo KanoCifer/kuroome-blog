@@ -1,0 +1,394 @@
+import { IconGitHub } from '@/components/basic/icon/IconGitHub';
+import { useAuthStore } from '@/stores/authState';
+import { startAuthentication } from '@simplewebauthn/browser';
+import { Eye, EyeOff } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+
+function IconCloud({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="24"
+      height="24"
+      viewBox="0 0 48 48"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 33C8.66666 33 4 31.5 4 25.5C4 18.5 11 17 13 17C14 13.5 16 8 24 8C31 8 34 12 35 15.5C35 15.5 44 16.5 44 25C44 31 40 33 36 33"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M18 33L24 38L32 28"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function IconUser({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 1024 1024"
+      version="1.1"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="currentColor"
+    >
+      <path d="M515.541449 7.082899c-280.359429 0-508.458551 228.120391-508.458551 508.458551s228.120391 508.458551 508.458551 508.458551 508.458551-228.120391 508.458551-508.458551S795.900879 7.082899 515.541449 7.082899zM515.541449 981.864196c-257.132626 0-466.301477-209.190121-466.301477-466.322747 0-257.132626 209.168851-466.322747 466.301477-466.322747s466.301477 209.190121 466.301477 466.322747S772.674075 981.864196 515.541449 981.864196zM614.574414 524.177056 614.574414 524.177056c47.751075-31.96876 79.230625-86.398604 79.230625-148.187857 0-98.437405-79.804915-178.24232-178.24232-178.24232-98.437405 0-178.24232 79.804915-178.24232 178.24232 0 61.810523 31.479551 116.219097 79.251895 148.187857-100.266622 39.519598-171.244501 137.170014-171.244501 251.453545 0 0.23397 0 0.446669 0.02127 0.659369 0 0.04254-0.02127 0.10635-0.02127 0.14889 0 15.612155 12.65563 28.246516 28.267786 28.246516 15.590885 0 21.886796-12.63436 21.886796-28.246516 0-0.340319-0.08508-0.659369-0.10635-1.020958 0.10635-118.005774 102.159649-219.995264 220.207964-219.995264 118.112124 0 220.207964 102.095839 220.207964 220.207964 0 0.14889-1.467628 29.054774 21.971875 29.054774 15.505806 0 28.076356-12.57055 28.076356-28.055086 0-0.06381-0.02127-0.12762-0.02127-0.2127 0-0.25524 0.02127-0.510479 0.02127-0.786989C785.797645 661.34707 714.798496 563.696654 614.574414 524.177056zM515.541449 510.734437c-74.402343 0-134.723968-60.321625-134.723968-134.723968 0-74.423613 60.321625-134.723968 134.723968-134.723968 74.423613 0 134.723968 60.321625 134.723968 134.723968S589.943792 510.734437 515.541449 510.734437z"></path>
+    </svg>
+  );
+}
+
+function IconLock({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 48 48"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle
+        cx="24"
+        cy="30"
+        r="14"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        d="M31 18V11C31 7.13401 27.866 4 24 4V4C20.134 4 17 7.13401 17 11V18"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M24 26L24 34"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function IconKey({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 48 48"
+      fill="currentColor"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M22.8682 24.2982C25.4105 26.7935 26.4138 30.4526 25.4971 33.8863C24.5805 37.32 21.8844 40.0019 18.4325 40.9137C14.9806 41.8256 11.3022 40.8276 8.79375 38.2986C5.02208 34.4141 5.07602 28.2394 8.91499 24.4206C12.754 20.6019 18.9613 20.5482 22.8664 24.3L22.8682 24.2982Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M23 24L40 7"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M30.3052 16.9001L35.7337 22.3001L42.0671 16.0001L36.6385 10.6001L30.3052 16.9001Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export default function Login() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const auth = useAuthStore();
+
+  const [loginForm, setLoginForm] = useState({
+    username: '',
+    password: '',
+    rememberMe: false,
+  });
+
+  const [errors, setErrors] = useState<{
+    username?: string;
+    password?: string;
+    passkey?: string;
+  }>({});
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPasskeySubmitting, setIsPasskeySubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsReady(true);
+    }, 50);
+  }, []);
+
+  const handleSubmit = async (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    setErrors({});
+    setIsSubmitting(true);
+
+    try {
+      await auth.login(
+        loginForm.username,
+        loginForm.password,
+        loginForm.rememberMe,
+      );
+      const redirect =
+        new URLSearchParams(location.search).get('redirect') || '/';
+      navigate(redirect);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setErrors({ password: err.message });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handlePasskeyLogin = async () => {
+    setErrors({});
+    setIsPasskeySubmitting(true);
+
+    try {
+      const options = await auth.getPasskeyAuthenticationOptions();
+      const assertion = await startAuthentication({
+        optionsJSON: options,
+      });
+      await auth.loginWithPasskey(assertion);
+      const redirect =
+        new URLSearchParams(location.search).get('redirect') || '/';
+      navigate(redirect);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setErrors({ passkey: err.message });
+      }
+    } finally {
+      setIsPasskeySubmitting(false);
+    }
+  };
+
+  const handleGitHubLogin = () => {
+    window.location.href = '/api/v1/auth/github';
+  };
+
+  return (
+    <div className="font-body relative min-h-screen overflow-hidden">
+      {/* Main Content */}
+      <main className="relative z-10 mt-4 flex flex-col items-center px-5 pt-8 pb-10">
+        {/* Hero Section */}
+        <div
+          className={`mb-8 flex flex-col items-center justify-center transition-all duration-700 ease-out ${
+            isReady ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+          }`}
+        >
+          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[#2563eb] text-white shadow-[0_8px_16px_rgba(37,99,235,0.25)]">
+            <IconCloud className="size-8" />
+          </div>
+          <h2 className="font-headline text-center text-[28px] font-extrabold tracking-tight text-[#111827] dark:text-white">
+            Kanocifer
+            <span className="text-[#2563eb] dark:text-blue-400">.chat</span>
+          </h2>
+          <p className="mt-1 text-center text-[15px] font-medium text-[#4b5563] dark:text-gray-400">
+            Welcome back to the reading space.
+          </p>
+        </div>
+
+        {/* Login Card */}
+        <div
+          className={`w-full max-w-100 rounded-[32px] border border-white/50 bg-white/70 p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] backdrop-blur-xl transition-all delay-100 duration-700 ease-out dark:border-slate-700/50 dark:bg-slate-800/60 ${
+            isReady ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+          }`}
+        >
+          <form className="flex flex-col" onSubmit={handleSubmit}>
+            {/* Username Field */}
+            <div className="mb-5">
+              <label className="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">
+                Username
+              </label>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
+                  <IconUser className="size-6 text-white" />
+                </div>
+                <input
+                  type="text"
+                  autoComplete="off"
+                  placeholder="Enter your username"
+                  value={loginForm.username}
+                  onChange={(e) =>
+                    setLoginForm({ ...loginForm, username: e.target.value })
+                  }
+                  className="w-full rounded-2xl border-0 bg-white py-3.5 pr-4 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white"
+                />
+              </div>
+              {errors.username && (
+                <span className="mt-1 block pl-1 text-[12px] font-medium text-red-500">
+                  {errors.username}
+                </span>
+              )}
+            </div>
+
+            {/* Password Field */}
+            <div className="mb-5">
+              <label className="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">
+                Password
+              </label>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
+                  <IconLock className="dark:text-white size-5" />
+                </div>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="off"
+                  placeholder="••••••••"
+                  value={loginForm.password}
+                  onChange={(e) =>
+                    setLoginForm({ ...loginForm, password: e.target.value })
+                  }
+                  className="w-full rounded-2xl border-0 bg-white py-3.5 pr-12 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#9ca3af] transition-all duration-200 hover:text-[#2563eb] dark:hover:text-blue-400"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="size-5" />
+                  ) : (
+                    <Eye className="size-5" />
+                  )}
+                </button>
+              </div>
+              {errors.password && (
+                <span className="mt-1 block pl-1 text-[12px] font-medium text-red-500">
+                  {errors.password}
+                </span>
+              )}
+            </div>
+
+            {/* Remember Me & Forgot Password */}
+            <div className="mb-6 flex items-center justify-between px-1">
+              <label className="group flex cursor-pointer items-center space-x-2.5">
+                <input
+                  type="checkbox"
+                  checked={loginForm.rememberMe}
+                  onChange={(e) =>
+                    setLoginForm({
+                      ...loginForm,
+                      rememberMe: e.target.checked,
+                    })
+                  }
+                  className="peer sr-only"
+                />
+                <div className="z-5 flex h-5.5 w-5.5 items-center justify-center rounded-lg border-2 border-gray-300 bg-white transition-all duration-200 peer-checked:border-[#2563eb] peer-checked:bg-[#2563eb] peer-focus:ring-2 peer-focus:ring-[#2563eb]/20 dark:border-slate-600 dark:bg-slate-700 dark:peer-checked:border-blue-500 dark:peer-checked:bg-blue-500">
+                  <svg
+                    className="z-5 h-3 w-3 text-white opacity-0 transition-all duration-200 peer-checked:opacity-100"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <span className="text-[14px] font-medium text-[#4b5563] dark:text-gray-300">
+                  {' '}
+                  Remember Me{' '}
+                </span>
+              </label>
+              <a
+                href="#"
+                className="text-[14px] font-bold text-[#1d4ed8] hover:underline dark:text-blue-400"
+              >
+                {' '}
+                Forgot?{' '}
+              </a>
+            </div>
+
+            {/* Login Button */}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="mb-4 w-full rounded-full bg-[#1e3a8a] py-4 text-[15px] font-bold text-white shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all hover:bg-[#1e3a8a]/90 active:scale-[0.98] disabled:opacity-70 dark:bg-blue-600 dark:hover:bg-blue-600/90"
+            >
+              {isSubmitting ? 'Logging in...' : 'Login'}
+            </button>
+
+            {/* Passkey Button */}
+            <button
+              type="button"
+              disabled={isPasskeySubmitting}
+              className="flex w-full items-center justify-center space-x-2 rounded-full bg-white py-4 text-[15px] font-bold text-[#111827] shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition-all hover:bg-gray-50 active:scale-[0.98] disabled:opacity-70 dark:bg-slate-700 dark:text-white dark:hover:bg-slate-600"
+              onClick={handlePasskeyLogin}
+            >
+              <IconKey className="size-5" />
+              {isPasskeySubmitting ? (
+                <span className="h-4.5 w-4.5 animate-spin rounded-full border-2 border-[#111827] border-t-transparent dark:border-white"></span>
+              ) : (
+                <span>Login with Passkey</span>
+              )}
+            </button>
+          </form>
+
+          {/* Divider */}
+          <div className="my-6 flex items-center justify-center text-center">
+            <div className="h-px flex-1 bg-gray-200 dark:bg-slate-700"></div>
+            <span className="px-3 text-[11px] font-bold tracking-wider text-[#6b7280] uppercase dark:text-gray-400">
+              OR CONTINUE WITH
+            </span>
+            <div className="h-px flex-1 bg-gray-200 dark:bg-slate-700"></div>
+          </div>
+
+          {/* GitHub Button */}
+          <button
+            className="flex w-full items-center justify-center space-x-2.5 rounded-full bg-[#0f172a] py-4 text-[15px] font-bold text-white shadow-md transition-all hover:bg-black active:scale-[0.98] dark:border dark:border-white/10 dark:bg-black/50"
+            onClick={handleGitHubLogin}
+          >
+            <IconGitHub />
+            <span>Login with GitHub</span>
+          </button>
+
+          {/* Passkey Error */}
+          {errors.passkey && (
+            <div className="mt-4 text-center text-[12px] font-medium text-red-500">
+              {errors.passkey}
+            </div>
+          )}
+
+          {/* Register Link */}
+          <div className="mt-8 text-center">
+            <p className="text-[14.5px] font-medium text-[#4b5563] dark:text-gray-300">
+              Don't have an account?
+              <Link
+                to="/register"
+                className="ml-1 font-bold text-[#1d4ed8] hover:underline dark:text-blue-400"
+              >
+                Register here
+              </Link>
+            </p>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}

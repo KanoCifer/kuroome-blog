@@ -13,7 +13,7 @@ from app.core.config import get_settings
 from app.repositories.public_repo import PublicRepo
 from app.schemas.aiagent import WeatherAnalysisInput
 from app.schemas.gallery import GalleryInput
-from app.utils.qweather_jwt import encoded_jwt
+from app.utils.qweather_jwt import generate_qweather_jwt
 
 
 class PublicDomainError(Exception):
@@ -177,10 +177,23 @@ Sitemap: https://readinglist.example.com/api/sitemap.xml
             return response.json()
 
     @staticmethod
+    async def get_qweather_jwt(redis: AsyncRedis) -> str:
+        cache_key = "qweather:jwt"
+        cached_jwt = await redis.get(cache_key)
+        if cached_jwt:
+            return cached_jwt.decode()
+
+        encoded_jwt = generate_qweather_jwt()
+        await redis.set(cache_key, encoded_jwt, ex=24 * 3600)
+        return encoded_jwt
+
+    @staticmethod
     async def get_qweather_tide(redis: AsyncRedis) -> tuple[dict, bool]:
         now = datetime.now().strftime("%Y%m%d")
         cache_key = f"qweather:tide:P2352:{now}"
         cached_data = await redis.get(cache_key)
+
+        encoded_jwt = await PublicService.get_qweather_jwt(redis)
         if cached_data:
             return orjson.loads(cached_data), True
 
@@ -216,8 +229,11 @@ Sitemap: https://readinglist.example.com/api/sitemap.xml
         return data, False
 
     @staticmethod
-    async def get_qweather_location(location: str, type_: str) -> dict:
+    async def get_qweather_location(
+        location: str, type_: str, redis: AsyncRedis
+    ) -> dict:
         url = "https://qk2tupqwuj.re.qweatherapi.com/geo/v2/poi/lookup"
+        encoded_jwt = await PublicService.get_qweather_jwt(redis)
         headers = {"Authorization": f"Bearer {encoded_jwt}"}
         params = {"location": location, "type": type_}
 

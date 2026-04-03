@@ -1,4 +1,3 @@
-import { createPortal } from 'react-dom';
 import { BentoCalendar } from './components/BentoCalendar';
 import { BentoClock } from './components/BentoClock';
 import { BentoGreeting } from './components/BentoGreeting';
@@ -8,10 +7,13 @@ import { BentoNavSidebar } from './components/BentoNavSidebar';
 import { BentoProfile } from './components/BentoProfile';
 import { BentoReadingList } from './components/BentoReadingList';
 import { BentoTech } from './components/BentoTech';
+import { BentoTodo } from './components/BentoTodo';
+import { BentoWeb } from './components/BentoWeb';
 
 export default function Home() {
   return (
     <>
+      <BentoNavSidebar />
       <div className="flex flex-col items-center justify-center relative min-h-screen">
         {/* Bento Grid */}
         <div className="relative mx-auto flex min-h-dvh w-full max-w-md flex-row flex-wrap content-start gap-4 overflow-x-hidden p-5 pt-24 pb-32">
@@ -39,10 +41,16 @@ export default function Home() {
           <div className="order-8 w-[calc(50%-0.5rem)] min-w-0">
             <BentoMap />
           </div>
+
+          <div className="order-9 w-full min-w-0">
+            <BentoTodo />
+          </div>
+
+          <div className="order-10 w-full min-w-0">
+            <BentoWeb />
+          </div>
         </div>
       </div>
-
-      {createPortal(<BentoNavSidebar />, document.body)}
     </>
   );
 }
