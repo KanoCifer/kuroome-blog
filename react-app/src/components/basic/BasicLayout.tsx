@@ -1,8 +1,9 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Outlet } from 'react-router-dom';
 import { BackToTop } from './BackToTop';
-import { BasicFooter } from './BasicFooter';
 import { BasicNav } from './BasicNav';
+import { Notifier } from './NotificationContainer';
 
 export function BasicLayout() {
   const backgroundImages = [
@@ -22,19 +23,22 @@ export function BasicLayout() {
   );
 
   return (
-    <div className="relative isolate grid min-h-dvh grid-rows-[auto_1fr_auto]">
-      <div
-        style={{ backgroundImage: `url(${backgroundUrl})` }}
-        className="pointer-events-none fixed inset-0 -z-10 transform-gpu bg-cover bg-fixed blur-md transition-all duration-800"
-      />
-      <header>
-        <BasicNav />
-      </header>
-      <main className="relative scroll-smooth">
-        <Outlet />
-      </main>
-      <BasicFooter />
-      <BackToTop className="fixed bottom-30 right-4" />
-    </div>
+    <>
+      <div className="relative isolate grid min-h-dvh grid-rows-[auto_1fr_auto]">
+        <div
+          style={{ backgroundImage: `url(${backgroundUrl})` }}
+          className="pointer-events-none fixed inset-0 -z-10 transform-gpu bg-cover bg-fixed blur-md transition-all duration-800"
+        />
+        <header>
+          <BasicNav />
+        </header>
+        <main className="relative scroll-smooth">
+          <Outlet />
+        </main>
+        <BackToTop className="fixed bottom-30 right-4" />
+      </div>
+
+      {createPortal(<Notifier />, document.body)}
+    </>
   );
 }

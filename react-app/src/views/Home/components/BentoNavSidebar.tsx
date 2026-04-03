@@ -1,3 +1,5 @@
+import { BasicFooter } from '@/components/basic/BasicFooter';
+import { useAuthStore } from '@/stores/authState';
 import { motion } from 'framer-motion';
 import {
   BarChart,
@@ -18,17 +20,6 @@ import {
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-
-const useAuthStore = () => ({
-  isAuthenticated: false,
-  loading: false,
-  user: {
-    name: 'User',
-    photo: '',
-    is_admin: true,
-  },
-  logout: () => console.log('Logout'),
-});
 
 const navItems = [
   { path: '/', label: '首页', icon: Home },
@@ -52,6 +43,7 @@ export const BentoNavSidebar: React.FC = () => {
   );
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const currentUserName = auth.isAuthenticated
     ? auth.user?.name || '用户'
@@ -62,6 +54,19 @@ export const BentoNavSidebar: React.FC = () => {
         ? auth.user.photo
         : `/api/v1/media/${auth.user.photo}`
       : '/images/about.webp';
+
+  const handleLoginout = () => {
+    try {
+      setIsLoading(true);
+      if (auth.isAuthenticated) {
+        auth.logout();
+      }
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     const index = navItems.findIndex((item) => location.pathname === item.path);
@@ -74,10 +79,10 @@ export const BentoNavSidebar: React.FC = () => {
   return (
     <>
       {/* Mobile Header / Sidebar Toggle */}
-      <div className="lg:hidden fixed top-0 left-0 w-full z-50 p-4 pointer-events-none">
+      <div className="fixed top-0 left-0 w-full z-50 p-4 pointer-events-none">
         <button
           onClick={() => setIsOpen(true)}
-          className="p-2 bg-base-100 rounded-full shadow-md pointer-events-auto"
+          className="p-2 bg-gray-100 rounded-full shadow-md pointer-events-auto"
         >
           <Home className="w-6 h-6" />
         </button>
@@ -86,15 +91,15 @@ export const BentoNavSidebar: React.FC = () => {
       {/* Sidebar overlay for mobile */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-[90] lg:hidden"
+          className="fixed inset-0 bg-black/50 z-90 backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:hidden top-0 left-0 h-full z-[100] w-80 bg-gray-100 dark:bg-gray-800 text-base-content flex flex-col gap-6 p-6 transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        className={`fixed top-0 left-0 h-full z-100 w-80 p-6 bg-gray-100 dark:bg-gray-800 rounded-r-2xl text-base-content flex flex-col gap-6 transition-transform duration-300 ease-in-out ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* User Profile Dropdown */}
@@ -118,7 +123,7 @@ export const BentoNavSidebar: React.FC = () => {
 
           {/* Dropdown Menu */}
           {isDropdownOpen && (
-            <div className="absolute top-full left-0 mt-4 w-[240px] bg-base-200 rounded-2xl shadow-xl z-10 p-2 flex flex-col gap-1">
+            <div className="absolute top-full left-0 mt-4 w-60 bg-base-200 rounded-2xl shadow-xl z-10 p-2 flex flex-col gap-1">
               {auth.isAuthenticated ? (
                 <>
                   <Link
@@ -151,12 +156,12 @@ export const BentoNavSidebar: React.FC = () => {
                   )}
                   <div className="h-px bg-base-300 my-1"></div>
                   <button
-                    onClick={auth.logout}
-                    disabled={auth.loading}
+                    onClick={handleLoginout}
+                    disabled={isLoading}
                     className="flex items-center gap-2 p-2 rounded-xl text-error hover:bg-error/10 font-bold"
                   >
                     <LogOut className="h-4 w-4" />
-                    {auth.loading ? 'Signing out...' : 'Logout'}
+                    {isLoading ? 'Signing out...' : 'Logout'}
                   </button>
                 </>
               ) : (
@@ -179,15 +184,15 @@ export const BentoNavSidebar: React.FC = () => {
           )}
         </div>
 
-        <div className="px-3 text-sm font-bold tracking-wider text-base-content/50 mt-4">
+        <div className="px-3 text-sm font-bold tracking-wider text-base-content/50 mt-4 border-b pb-2">
           GENERAL
         </div>
 
         {/* Navigation List */}
-        <ul className="flex flex-col gap-2 relative flex-grow">
+        <ul className="flex flex-col gap-2 relative grow">
           {/* Active indicator */}
           <motion.div
-            className="absolute left-0 w-full h-12 bg-base-200 rounded-2xl"
+            className="absolute left-0 w-full h-12 bg-gray-500 rounded-2xl"
             animate={{ y: hoverNavIndex * 56 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             style={{ zIndex: 0 }}
@@ -208,12 +213,16 @@ export const BentoNavSidebar: React.FC = () => {
                     : 'text-base-content/70 hover:text-base-content'
                 }`}
               >
-                <item.icon className="h-5 w-5" />
+                <item.icon className="h-5 w-5 shrink-0" />
                 <span className="text-[15px]">{item.label}</span>
               </Link>
             </li>
           ))}
         </ul>
+
+        <div className="mt-auto pt-1 border-t mb-20">
+          <BasicFooter />
+        </div>
       </aside>
     </>
   );

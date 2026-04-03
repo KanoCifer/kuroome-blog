@@ -1,8 +1,10 @@
 export function BasicFooter() {
   return (
     // Footer
-    <footer className="transition-colors duration-1000">
-      <p>Copyright &copy; 2026 All Rights Reserved.</p>
+    <footer className="mt-12">
+      <p className="ext-center text-xs text-neutral-700 dark:text-neutral-400">
+        Copyright &copy; 2026 All Rights Reserved.
+      </p>
       <div className="flex items-end justify-center">
         <a
           href="https://github.com/KanoCifer/Flask-Example"
@@ -13,18 +15,11 @@ export function BasicFooter() {
           <img
             alt="Powered by Flask"
             src="https://github.githubassets.com/favicons/favicon.svg"
-            className="cover aspect-square w-6 object-cover align-bottom"
+            className="cover aspect-square size-4 object-cover align-bottom"
           />
         </a>
         <a
-          className="hover:underline"
-          href="https://github.com/KanoCifer/Flask-Example "
-          target="_blank"
-        >
-          &nbsp;Github: KanoCifer
-        </a>
-        <a
-          className="hover:underline"
+          className="hover:underline ext-center text-xs text-neutral-700 dark:text-neutral-400"
           href="https://beian.miit.gov.cn/#/Integrated/index"
           target="_blank"
         >

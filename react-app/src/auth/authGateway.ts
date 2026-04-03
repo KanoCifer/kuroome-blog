@@ -1,7 +1,10 @@
 import { fetchAndStoreCSRF } from '@/api/csrf';
 import request from '@/api/request';
 import type { UserInfo } from '@/auth/types';
+import { useNotificationStore } from '@/stores/notificationState';
 import type { PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/browser';
+
+const notification = useNotificationStore.getState();
 
 interface ApiResponse<T> {
   data: T;
@@ -96,29 +99,42 @@ export function createAuthGateway(): AuthGateway {
           remember_me: rememberMe,
         },
       );
+      if (!res.data.data) {
+        notification.error('登录失败，请检查用户名和密码');
+        return emptyLoginResult();
+      }
 
       const data = extractData(res);
-      return data
-        ? buildLoginResult(data as LoginResponseData)
-        : emptyLoginResult();
+      if (!data) {
+        notification.error('登录失败，请检查用户名和密码');
+        return emptyLoginResult();
+      }
+
+      notification.success('登录成功');
+      return buildLoginResult(data as LoginResponseData);
     },
 
     async loginWithPasskey(assertion: unknown): Promise<PasskeyLoginResult> {
       const res = await request.post<ApiResponse<LoginResponseData>>(
         '/auth/passkey/authenticate',
         {
-          response: assertion,
+          assertion: assertion,
         },
       );
 
       const data = extractData(res);
-      return data
-        ? buildLoginResult(data as LoginResponseData)
-        : emptyLoginResult();
+      if (!data) {
+        notification.error('Passkey 登录失败，请重试');
+        return emptyLoginResult();
+      }
+
+      notification.success('登录成功');
+      return buildLoginResult(data as LoginResponseData);
     },
 
     async logout(): Promise<void> {
       await request.post('/auth/logout');
+      notification.success('已退出登录');
     },
 
     async postHeartbeat(): Promise<void> {

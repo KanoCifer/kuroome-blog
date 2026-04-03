@@ -9,6 +9,7 @@ import {
   NotFound,
   ProfileSetting,
   Register,
+  Website,
 } from './lazy';
 
 // 认证守卫 loader
@@ -59,6 +60,10 @@ export const router = createBrowserRouter([
       {
         path: '/about',
         element: <About />,
+      },
+      {
+        path: '/websites',
+        element: <Website />,
       },
       {
         path: '*',

@@ -2,8 +2,8 @@ import { createAuthGateway } from '@/auth/authGateway';
 import { createHeartbeat } from '@/auth/heartbeat';
 import type { UserInfo } from '@/auth/types';
 import { userCache } from '@/auth/userCache';
-import { create } from 'zustand';
 import type { PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/browser';
+import { create } from 'zustand';
 
 const authGateway = createAuthGateway();
 const heartbeat = createHeartbeat({

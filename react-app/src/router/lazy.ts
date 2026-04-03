@@ -9,3 +9,4 @@ export const ProfileSetting = lazy(
 export const FishingMap = lazy(() => import('../views/FishingMap/FishingMap'));
 export const NotFound = lazy(() => import('../views/NotFound/NotFound'));
 export const About = lazy(() => import('../views/general/AboutView'));
+export const Website = lazy(() => import('../views/Website/WebsiteView'));

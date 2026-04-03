@@ -1,6 +1,7 @@
 import { BentoCard } from '@/components/bento/BentoCard';
 import websitesData from '@/data/websites.json';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export function BentoWeb() {
   interface Website {
@@ -12,8 +13,9 @@ export function BentoWeb() {
     category: string;
     tags: string[];
   }
+  const navigate = useNavigate();
 
-  const websites = websitesData.sites;
+  const websites = websitesData.sites as Website[];
 
   // 直接在渲染时计算随机网站，无需 Effect
   const [randomSite] = useState(
@@ -27,7 +29,7 @@ export function BentoWeb() {
   };
 
   return (
-    <BentoCard>
+    <BentoCard onClick={() => navigate('/websites')} className="cursor-pointer">
       <div className="relative z-10 flex h-full flex-col justify-between px-6 py-4 max-sm:px-2 max-sm:py-1">
         <div className="text-xs font-bold tracking-wide text-neutral-500 uppercase transition-colors duration-300 group-hover:text-neutral-600 dark:text-neutral-400 dark:group-hover:text-neutral-300">
           Daily Pick
