@@ -414,8 +414,8 @@
 </template>
 
 <script setup lang="ts">
-import request from "@/api/request";
 import IconUser from "@/components/icons/IconUser.vue";
+import { analyticsService } from "@/service/analyticsService";
 import { useAuthStore } from "@/stores/auth";
 import { useScroll } from "@vueuse/core";
 import dayjs from "dayjs";
@@ -516,9 +516,7 @@ const formatDateTime = (dateStr: string | null): string => {
 
 const fetchOverview = async () => {
   try {
-    const res = await request.get("/status/overview", {
-      params: { days: selectedDays.value },
-    });
+    const res = await analyticsService.getOverview(selectedDays.value);
     if (res.data.code === 200) {
       overviewData.value = res.data.data;
     } else {
@@ -532,12 +530,10 @@ const fetchOverview = async () => {
 
 const fetchLoginLogs = async () => {
   try {
-    const res = await request.get("/status/user-logins", {
-      params: {
-        days: selectedDays.value,
-        page: loginLogsPage.value,
-        page_size: 20,
-      },
+    const res = await analyticsService.getUserLogins({
+      days: selectedDays.value,
+      page: loginLogsPage.value,
+      page_size: 20,
     });
     if (res.data.code === 200) {
       loginLogsData.value = res.data.data;

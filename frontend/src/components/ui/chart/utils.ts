@@ -7,17 +7,23 @@ import { h, render } from "vue";
 const cache = new Map<string, string>();
 
 // Convert object to a consistent string key
-function serializeKey(key: Record<string, any>): string {
+function serializeKey(key: Record<string, unknown>): string {
   return JSON.stringify(key, Object.keys(key).sort());
 }
 
-interface Constructor<P = any> {
+interface Constructor<P = unknown> {
   __isFragment?: never;
   __isTeleport?: never;
   __isSuspense?: never;
-  new (...args: any[]): {
+  new (...args: unknown[]): {
     $props: P;
   };
+}
+
+type CrosshairData = Record<string, unknown> | { data: Record<string, unknown> };
+
+function hasDataField(data: CrosshairData): data is { data: Record<string, unknown> } {
+  return "data" in data && typeof data.data === "object" && data.data !== null;
 }
 
 export function componentToString<P>(
@@ -31,8 +37,8 @@ export function componentToString<P>(
   const id = useId();
 
   // https://unovis.dev/docs/auxiliary/Crosshair#component-props
-  return (_data: any, x: number | Date) => {
-    const data = "data" in _data ? _data.data : _data;
+  return (_data: CrosshairData, x: number | Date) => {
+    const data = hasDataField(_data) ? _data.data : _data;
     const serializedKey = `${id}-${serializeKey(data)}`;
     const cachedContent = cache.get(serializedKey);
     if (cachedContent) return cachedContent;

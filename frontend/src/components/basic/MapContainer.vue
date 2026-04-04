@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import request from "@/api/request";
+import { mapService } from "@/service/mapService";
 import type {
   AMapDriving,
   AMapMapInstance,
@@ -64,7 +64,7 @@ let clickHandler: ((e: unknown) => void) | null = null;
 
 const fetchSecurityKey = async (): Promise<string> => {
   try {
-    const response = await request.get("/amap/security-key");
+    const response = await mapService.getSecurityKey();
     const encodedKey = response.data?.data?.securityJsCode || "";
 
     // Decode base64 encoded key

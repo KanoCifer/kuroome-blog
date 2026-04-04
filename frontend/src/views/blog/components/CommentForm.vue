@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import request from "@/api/request";
+import { blogService } from "@/service/blogService";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
 import { computed, ref } from "vue";
@@ -43,19 +43,16 @@ const handleSubmit = async () => {
 
   try {
     console.log("Submitting comment:", {
-      post_id: props.postId,
+      post_id: String(props.postId),
       body: body.value,
     });
-    const res = await request.post("/comments", {
-      post_id: props.postId,
+    await blogService.postLegacyComment({
+      post_id: String(props.postId),
       body: body.value,
       author: auth.isAuthenticated && auth.user ? auth.user.username : author.value,
       reply_to: props.isReply ? props.replyTo : undefined,
       reply_to_author: props.isReply ? props.replyToAuthor : undefined,
     });
-    if (res.status !== 200) {
-      throw new Error("Failed to submit comment");
-    }
     notifier.success("评论已提交，等待审核");
 
     // Reset form

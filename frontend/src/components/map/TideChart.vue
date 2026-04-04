@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import request from "@/api/request";
+import { weatherService } from "@/service/weatherService";
 import { useNotificationStore } from "@/stores/notification";
 import dayjs from "dayjs";
 import { LineChart } from "echarts/charts";
@@ -45,7 +45,7 @@ const checkDarkMode = () => {
 const fetchTideData = async () => {
   loading.value = true;
   try {
-    const res = await request.get("/qweather/tide");
+    const res = await weatherService.getTide();
     if (res.status === 200) {
       tideData.value = res.data.data;
     }

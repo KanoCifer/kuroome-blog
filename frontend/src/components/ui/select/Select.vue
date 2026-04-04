@@ -6,6 +6,10 @@ const props = defineProps<SelectRootProps>();
 const emits = defineEmits<SelectRootEmits>();
 
 const forwarded = useForwardPropsEmits(props, emits);
+
+defineOptions({
+  name: "UiSelect",
+});
 </script>
 
 <template>

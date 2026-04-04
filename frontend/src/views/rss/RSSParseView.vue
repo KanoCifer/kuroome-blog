@@ -383,8 +383,8 @@
 </template>
 
 <script setup lang="ts">
-import request from "@/api/request";
 import { BasicDetail } from "@/components/basic";
+import { rssService } from "@/service/rssService";
 import { useNotificationStore } from "@/stores/notification";
 import { useStorage } from "@vueuse/core";
 import dayjs from "dayjs";
@@ -393,14 +393,14 @@ interface RssMetadata {
   title: string;
   description: string;
   link: string;
-  published?: string;
+  published?: string | null;
 }
 
 interface RssEntry {
   title: string;
   link: string;
   summary: string;
-  published: string;
+  published: string | null;
   content?: string;
 }
 
@@ -485,41 +485,33 @@ const parseRss = async () => {
   }
 
   try {
-    const response = await request.post("/rss/parse-rss", {
+    const parsedData = await rssService.parseRss({
       rss_url: rssForm.value.rssUrl,
       save_to_db: rssForm.value.saveToDb,
     });
 
-    if (response.status === 200) {
-      const parsedData = response.data.data;
+    // Extract RSS metadata and entries
+    const meta = parsedData.meta;
+    const entries = parsedData.entries;
 
-      // Extract RSS metadata and entries
-      const meta = parsedData.meta;
-      const entries = parsedData.entries;
+    notifier.success("RSS 解析成功");
 
-      notifier.success("RSS 解析成功");
+    // Update the UI with the parsed RSS metadata
+    rssMetadata.value = {
+      title: meta.title,
+      description: meta.description,
+      link: meta.link,
+      published: meta.published ?? null,
+    };
 
-      // Update the UI with the parsed RSS metadata
-      rssMetadata.value = {
-        title: meta.title,
-        description: meta.description,
-        link: meta.link,
-        published: meta.published,
-      };
-
-      // Update the UI with the parsed RSS entries
-      rssEntries.value = entries.map(
-        (entry: { title: string; link: string; summary: string; published: string; content?: string }) => ({
-          title: entry.title,
-          link: entry.link,
-          summary: entry.summary,
-          content: entry.content,
-          published: entry.published,
-        }),
-      );
-    } else {
-      notifier.error("解析失败，请检查 RSS 地址是否正确");
-    }
+    // Update the UI with the parsed RSS entries
+    rssEntries.value = entries.map((entry) => ({
+      title: entry.title,
+      link: entry.link,
+      summary: entry.summary,
+      content: entry.content,
+      published: entry.published ?? null,
+    }));
   } catch (error) {
     console.error("RSS parse error:", error);
     notifier.error("解析失败: " + (error instanceof Error ? error.message : "未知错误"));

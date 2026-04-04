@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import request, { type ApiResponse } from "@/api/request";
+import { analyticsService } from "@/service/analyticsService";
 import type { ChartConfig } from "@/components/ui/chart";
 import { computed, ref, watch } from "vue";
 
@@ -74,8 +74,8 @@ async function fetchData() {
   loading.value = true;
   error.value = null;
   try {
-    const response = await request.get<ApiResponse<OverviewResponse>>(`/status/overview?days=${days}`);
-    chartData.value = response.data.data.daily_trend || [];
+    const response = await analyticsService.getOverview(days);
+    chartData.value = (response.data.data as OverviewResponse).daily_trend || [];
   } catch (e) {
     error.value = e instanceof Error ? e.message : "Failed to load data";
     chartData.value = [];

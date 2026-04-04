@@ -1,3 +1,4 @@
+import { TrackEvent } from '@/utils/visitorTracker';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Outlet } from 'react-router-dom';
@@ -24,6 +25,7 @@ export function BasicLayout() {
 
   return (
     <>
+      <TrackEvent />
       <div className="relative isolate grid min-h-dvh grid-rows-[auto_1fr_auto]">
         <div
           style={{ backgroundImage: `url(${backgroundUrl})` }}
@@ -32,7 +34,7 @@ export function BasicLayout() {
         <header>
           <BasicNav />
         </header>
-        <main className="relative scroll-smooth">
+        <main className="relative scroll-smooth max-w-dvw">
           <Outlet />
         </main>
         <BackToTop className="fixed bottom-30 right-4" />

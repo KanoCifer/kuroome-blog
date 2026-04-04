@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import request from "@/api/request";
 import AddBookForm from "@/components/books/AddBookForm.vue";
 import BookActionButtons from "@/components/books/BookActionButtons.vue";
 import HomeSideBar from "@/components/layout/HomeSideBar.vue";
 import MessageBoard from "@/components/message/MessageBoard.vue";
+import { bookService } from "@/service/bookService";
 import { useNotificationStore } from "@/stores/notification";
-import type { BookItem, BookListResponse, Pagination } from "@/types";
+import type { BookItem, Pagination } from "@/types";
 import { useHead } from "@vueuse/head";
 import { computed, ref } from "vue";
 useHead({
@@ -62,9 +62,7 @@ const fetchBooks = async (page: number = 1) => {
   isLoading.value = true;
   errorMessage.value = "";
   try {
-    const res = await request.get<BookListResponse>("/book", {
-      params: { page, per_page: 20 },
-    });
+    const res = await bookService.getBooks({ page, per_page: 20 });
     books.value = res.data.data?.books ?? [];
     pagination.value = res.data.data?.pagination ?? null;
     currentPage.value = page;
@@ -85,7 +83,7 @@ fetchBooks();
 const toggleBookStatus = async (book: BookItem) => {
   pendingBookId.value = book.id;
   try {
-    await request.patch(`/books/${book.id}/status`, {
+    await bookService.patchBookStatus(book.id, {
       iscompleted: !book.iscompleted,
     });
     books.value = books.value.map((item) =>
@@ -109,7 +107,7 @@ const toggleBookStatus = async (book: BookItem) => {
 const deleteBook = async (book: BookItem) => {
   pendingBookId.value = book.id;
   try {
-    await request.delete(`/books/${book.id}`);
+    await bookService.deleteBook(book.id);
     books.value = books.value.filter((item) => item.id !== book.id);
     notifier.success("删除成功");
   } catch (err: unknown) {

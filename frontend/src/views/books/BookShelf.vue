@@ -239,9 +239,9 @@
 </template>
 
 <script setup lang="ts">
-import request from "@/api/request";
 import BookCard from "@/components/books/BookCard.vue";
-import type { BookItem, BookListResponse, Pagination } from "@/types";
+import { bookService } from "@/service/bookService";
+import type { BookItem, Pagination } from "@/types";
 import { computed, onMounted, ref } from "vue";
 import { RouterLink } from "vue-router";
 
@@ -274,9 +274,7 @@ const fetchBooks = async (page: number = 1) => {
   isLoading.value = true;
   errorMessage.value = "";
   try {
-    const res = await request.get<BookListResponse>("/book", {
-      params: { page, per_page: 12 },
-    });
+    const res = await bookService.getBooks({ page, per_page: 12 });
     if (res.data.status === "success") {
       books.value = res.data.data?.books || [];
       //

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import request from "@/api/request";
+import { messageService } from "@/service/messageService";
 import { useAuthStore } from "@/stores/auth";
 import type { Message } from "@/types";
 import { formatDate } from "@/utils/formatdate";
@@ -21,7 +21,7 @@ if (auth.isAuthenticated) {
 const fetchMessages = async () => {
   loading.value = true;
   try {
-    const response = await request.get("/messages");
+    const response = await messageService.getMessages();
     const data = response.data;
     if (data.status === "success") {
       messages.value = data.data.messages;
@@ -45,7 +45,7 @@ const handleSubmit = async () => {
       message: message.value,
     });
 
-    const response = await request.post("/messages", {
+    const response = await messageService.postMessage({
       name: name.value,
       message: message.value,
     });

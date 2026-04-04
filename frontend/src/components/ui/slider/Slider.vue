@@ -19,6 +19,10 @@ const emits = defineEmits<SliderRootEmits>();
 const delegatedProps = reactiveOmit(props, "class");
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits);
+
+defineOptions({
+  name: "UiSlider",
+});
 </script>
 
 <template>

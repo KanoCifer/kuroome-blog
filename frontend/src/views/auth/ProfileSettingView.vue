@@ -464,7 +464,6 @@
 </template>
 
 <script setup lang="ts">
-import request from "@/api/request";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -476,6 +475,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { authService } from "@/service/authService";
 import { useAuthStore } from "@/stores/auth";
 import type { ProfileForm } from "@/types";
 import { startRegistration } from "@simplewebauthn/browser";
@@ -540,11 +540,7 @@ const handlePhotoUpload = async (event: Event) => {
   formData.append("image", file);
 
   try {
-    const response = await request.put("/auth/upload-pic", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const response = await authService.uploadAvatar(formData);
 
     if (response.data) {
       await authStore.fetchUser();
@@ -583,14 +579,14 @@ const handleAddPasskey = async () => {
 
   try {
     // 获取注册选项
-    const optionsRes = await request.get("/auth/passkey/registration-options");
+    const optionsRes = await authService.getPasskeyRegistrationOptions();
     const options = optionsRes.data.data;
 
     // 调用浏览器 Passkey 注册
     const credential = await startRegistration(options);
 
     // 提交注册结果
-    await request.post("/auth/passkey/register", {
+    await authService.registerPasskey({
       response: credential,
     });
 
@@ -611,7 +607,7 @@ const handleDeletePasskey = async () => {
   passkeyMessage.value = "";
 
   try {
-    await request.delete("/auth/passkey/delete");
+    await authService.deletePasskey();
     passkeyMessage.value = "Passkey deleted successfully!";
     passkeyMessageType.value = "success";
     hasPasskey.value = false;
@@ -637,7 +633,7 @@ const handleUnbindGitHub = async () => {
   githubMessage.value = "";
 
   try {
-    await request.post("/auth/github/unbind");
+    await authService.unbindGithub();
     githubMessage.value = "GitHub account unbound successfully!";
     githubMessageType.value = "success";
     hasGitHubBound.value = false;
@@ -667,7 +663,7 @@ const handleSubmit = async () => {
       password: form.value.password || null,
     };
 
-    const response = await request.put("/auth/settings", payload);
+    const response = await authService.updateProfileSettings(payload);
 
     if (response.data.code === 200) {
       await authStore.fetchUser();

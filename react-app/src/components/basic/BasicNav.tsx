@@ -275,7 +275,7 @@ export function BasicNav() {
 
           {/* New Post Button */}
           <Link
-            to="/blog/new"
+            to="/new"
             className="-mt-10 flex h-14 w-14 items-center justify-center rounded-full border-[3px] border-white/50 bg-linear-to-br from-blue-400 to-blue-600 text-white shadow-xl shadow-blue-500/35 transition-all duration-200 hover:scale-110 hover:shadow-2xl hover:shadow-blue-500/40 active:scale-95 dark:border-slate-800/50 dark:shadow-blue-400/30"
           >
             <PlusIcon className="h-6 w-6" />

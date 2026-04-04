@@ -45,7 +45,7 @@ export const useThemeStore = defineStore("theme", () => {
   };
 
   // Cleanup listener on unmount
-  const cleanup = () => {
+  const _cleanup = () => {
     mediaQuery.removeEventListener("change", handleSystemChange);
   };
 

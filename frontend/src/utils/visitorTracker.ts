@@ -1,7 +1,8 @@
-import request from "@/api/request";
+import { analyticsService } from "@/service/analyticsService";
 import { useStorage } from "@vueuse/core";
 import { UAParser } from "ua-parser-js";
 import { v4 } from "uuid";
+
 // 生成 UUID 作为访客唯一标识
 function generateVisitorId() {
   return v4();
@@ -42,11 +43,7 @@ export async function reportVisitorData() {
   try {
     const data = collectVisitorData();
     // 发送POST请求到FastAPI后端接口
-    await request.post("/admin/track", data, {
-      timeout: 5000, // 超时时间5秒
-      // 跨域配置（如果前端和后端域名不同，需后端配合跨域）
-      withCredentials: true,
-    });
+    await analyticsService.reportVisitorData(data);
   } catch (error) {
     // 上报失败不影响主流程，仅控制台打印
     if (error instanceof Error) {

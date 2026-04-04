@@ -396,15 +396,10 @@
 </template>
 
 <script setup lang="ts">
-import request from "@/api/request";
 import { BasicDetail } from "@/components/basic";
+import { rssService } from "@/service/rssService";
 import { useNotificationStore } from "@/stores/notification";
-import type {
-  ApiResponse,
-  RssArticle,
-  RssArticleListResponse,
-  RssSubscription,
-} from "@/types";
+import type { RssArticle, RssSubscription } from "@/types";
 import { formatDate } from "@/utils/formatdate";
 import { useStorage } from "@vueuse/core";
 import { computed, onMounted, ref } from "vue";
@@ -414,14 +409,14 @@ interface RssMetadata {
   title: string;
   description: string;
   link: string;
-  published?: string;
+  published?: string | null;
 }
 
 interface RssEntry {
   title: string;
   link: string;
   summary: string;
-  published: string;
+  published: string | null;
   content?: string;
 }
 
@@ -448,7 +443,15 @@ const parseMetadata = ref<RssMetadata | null>(null);
 const parseEntries = ref<RssEntry[]>([]);
 const parseLoading = ref(false);
 
-const subscriptions = ref<RssSubscription[]>([]);
+type ViewSubscription = RssSubscription & {
+  rss_url: string;
+  feed_title: string | null;
+  entry_count: number;
+  last_fetched_at: string | null;
+  created_at: string;
+};
+
+const subscriptions = ref<ViewSubscription[]>([]);
 const subscriptionsLoading = ref(false);
 const subscriptionsError = ref("");
 const activeSubscriptionId = ref<number | null>(null);
@@ -507,6 +510,30 @@ const getSubscriptionTitle = (subscription: RssSubscription): string => {
   return getFeedHost(subscription.rss_url);
 };
 
+const mapSubscriptionForView = (subscription: unknown): ViewSubscription => {
+  const source = subscription as RssSubscription & {
+    rssUrl?: string;
+    feedTitle?: string;
+    entryCount?: number;
+    lastFetchedAt?: string | null;
+    createdAt?: string;
+    rss_url?: string;
+    feed_title?: string;
+    entry_count?: number;
+    last_fetched_at?: string | null;
+    created_at?: string;
+  };
+
+  return {
+    ...(source as RssSubscription),
+    rss_url: source.rss_url ?? source.rssUrl ?? "",
+    feed_title: source.feed_title ?? source.feedTitle ?? null,
+    entry_count: source.entry_count ?? source.entryCount ?? 0,
+    last_fetched_at: source.last_fetched_at ?? source.lastFetchedAt ?? null,
+    created_at: source.created_at ?? source.createdAt ?? "",
+  };
+};
+
 const syncRouteQuery = async (page: number): Promise<void> => {
   const query: Record<string, string> = {};
   if (page > 1) {
@@ -546,33 +573,22 @@ const parseRss = async (): Promise<void> => {
   }
 
   try {
-    const response = await request.post("/rss/parse-rss", {
+    const parsedData = await rssService.parseRss({
       rss_url: rssUrl,
       save_to_db: rssForm.value.saveToDb,
     });
-
-    const parsedData = response.data?.data as
-      | {
-          meta: RssMetadata;
-          entries: RssEntry[];
-        }
-      | undefined;
-
-    if (!parsedData) {
-      throw new Error("解析结果为空");
-    }
 
     parseMetadata.value = {
       title: parsedData.meta.title,
       description: parsedData.meta.description,
       link: parsedData.meta.link,
-      published: parsedData.meta.published,
+      published: parsedData.meta.published ?? null,
     };
     parseEntries.value = parsedData.entries.map((entry) => ({
       title: entry.title,
       link: entry.link,
       summary: entry.summary,
-      published: entry.published,
+      published: entry.published ?? null,
       content: entry.content,
     }));
 
@@ -597,16 +613,12 @@ const fetchSubscriptions = async (): Promise<void> => {
   subscriptionsError.value = "";
 
   try {
-    const response = await request.get<ApiResponse<RssSubscription[]>>(
-      "/rss/subscriptions",
-    );
-    const data = response.data.data;
-
+    const data = await rssService.getSubscriptions();
     if (!Array.isArray(data)) {
-      throw new Error(response.data.message || "订阅列表格式错误");
+      throw new Error("订阅列表格式错误");
     }
 
-    subscriptions.value = data;
+    subscriptions.value = data.map((item) => mapSubscriptionForView(item));
 
     if (selectedFeedUrl.value) {
       const active = subscriptions.value.find(
@@ -644,18 +656,10 @@ const fetchArticles = async (page = 1): Promise<void> => {
       params.search = search;
     }
 
-    const response = await request.get<ApiResponse<RssArticleListResponse>>(
-      "/rss/articles",
-      { params },
-    );
-
-    if (response.data.status !== "success" || !response.data.data) {
-      throw new Error(response.data.message || "获取文章列表失败");
-    }
-
-    articles.value = response.data.data.items;
-    totalItems.value = response.data.data.total;
-    currentPage.value = response.data.data.page;
+    const response = await rssService.getArticles(params);
+    articles.value = response.items;
+    totalItems.value = response.total;
+    currentPage.value = response.page;
   } catch (error: unknown) {
     console.error("fetch articles error:", error);
     articlesError.value = error instanceof Error ? error.message : "加载文章失败";
@@ -667,7 +671,7 @@ const fetchArticles = async (page = 1): Promise<void> => {
 
 const handleRefresh = async (subscription: RssSubscription): Promise<void> => {
   try {
-    await request.post(`/rss/subscriptions/${subscription.id}/refresh`);
+    await rssService.refreshSubscription(subscription.id);
     notifier.success(`已刷新：${getSubscriptionTitle(subscription)}`);
     await fetchSubscriptions();
 
@@ -691,7 +695,7 @@ const handleDelete = async (subscription: RssSubscription): Promise<void> => {
   }
 
   try {
-    await request.delete(`/rss/subscriptions/${subscription.id}`);
+    await rssService.deleteSubscription(subscription.id);
     notifier.success("订阅删除成功");
 
     if (selectedFeedUrl.value === subscription.rss_url) {

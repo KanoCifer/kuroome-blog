@@ -71,7 +71,6 @@ export const BentoNavSidebar: React.FC = () => {
   useEffect(() => {
     const index = navItems.findIndex((item) => location.pathname === item.path);
     if (index !== -1) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setHoverNavIndex(index);
     }
   }, [location.pathname]);
@@ -82,7 +81,7 @@ export const BentoNavSidebar: React.FC = () => {
       <div className="fixed top-0 left-0 w-full z-50 p-4 pointer-events-none">
         <button
           onClick={() => setIsOpen(true)}
-          className="p-2 bg-gray-100 rounded-full shadow-md pointer-events-auto"
+          className="p-2 bg-gray-100/80 rounded-full shadow-md pointer-events-auto dark:bg-gray-500/20 backdrop-blur-sm transition-transform active:scale-95"
         >
           <Home className="w-6 h-6" />
         </button>
@@ -111,7 +110,7 @@ export const BentoNavSidebar: React.FC = () => {
             <img
               src={avatarUrl}
               alt={currentUserName}
-              className="h-14 w-14 rounded-full object-cover shadow-sm ring-4 ring-base-300"
+              className="h-14 w-14 rounded-full object-cover shadow-sm ring-4 ring-blue-300"
             />
             <div className="flex items-baseline gap-2">
               <span className="font-serif text-2xl font-bold text-base-content">
@@ -123,7 +122,7 @@ export const BentoNavSidebar: React.FC = () => {
 
           {/* Dropdown Menu */}
           {isDropdownOpen && (
-            <div className="absolute top-full left-0 mt-4 w-60 bg-base-200 rounded-2xl shadow-xl z-10 p-2 flex flex-col gap-1">
+            <div className="absolute top-full left-0 mt-4 w-60 bg-gray-200 rounded-2xl shadow-xl z-50 p-2 flex flex-col gap-1">
               {auth.isAuthenticated ? (
                 <>
                   <Link
@@ -192,7 +191,7 @@ export const BentoNavSidebar: React.FC = () => {
         <ul className="flex flex-col gap-2 relative grow">
           {/* Active indicator */}
           <motion.div
-            className="absolute left-0 w-full h-12 bg-gray-500 rounded-2xl"
+            className="absolute left-0 w-full h-12 bg-blue-300 rounded-2xl"
             animate={{ y: hoverNavIndex * 56 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             style={{ zIndex: 0 }}

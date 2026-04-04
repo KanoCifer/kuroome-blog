@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
+import { blogService } from "@/service/blogService";
 import type { Comment } from "@/types";
 import CommentForm from "./CommentForm.vue";
 import CommentItem from "./CommentItem.vue";
@@ -43,22 +44,15 @@ const handleReply = async (commentId: string, body: string) => {
       return;
     }
 
-    const { default: request } = await import("@/api/request");
-
-    const res = await request.post("/comments", {
+    await blogService.postLegacyComment({
       post_id: props.postId,
       body: body,
       reply_to: commentId,
       reply_to_author: parentComment.author,
       author: auth.isAuthenticated && auth.user ? auth.user.username : "",
     });
-
-    if (res.data.status === "success" || res.status === 200 || res.status === 201) {
-      notifier.success("评论已提交，待审核后显示");
-      emit("refresh");
-    } else {
-      throw new Error(res.data.message || "提交评论失败");
-    }
+    notifier.success("评论已提交，待审核后显示");
+    emit("refresh");
   } catch (err) {
     console.error("提交回复失败:", err);
     const errorMsg = err instanceof Error ? err.message : "提交评论失败，请稍后重试";

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import request from "@/api/request";
 import BasicDetail from "@/components/basic/BasicDetail.vue";
 import TiptapEditor from "@/components/editor/TiptapEditor.vue";
 import IconDel from "@/components/icons/IconDel.vue";
@@ -15,8 +14,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { blogService } from "@/service/blogService";
 import { useNotificationStore } from "@/stores/notification";
-import type { ApiResponse, Category, Post } from "@/types";
+import type { Category, CategoryResponseItem } from "@/types";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -134,18 +134,16 @@ onMounted(async () => {
 
 const fetchCategories = async () => {
   try {
-    const res = await request.get<ApiResponse<{ categories: Category[] } | Category[]>>("/categories");
-    if (res.data.status === "success") {
-      // 兼容新旧两种 API 格式
-      const data = res.data.data;
-      if (Array.isArray(data)) {
-        categories.value = data;
-      } else if (data && "categories" in data) {
-        categories.value = data.categories;
-      } else {
-        categories.value = [];
-      }
-    }
+    const legacyCategories = await blogService.getLegacyCategories();
+    categories.value = legacyCategories.map(
+      (cat): CategoryResponseItem => ({
+        id: cat.id,
+        name: cat.name,
+        description: "",
+        post_count: cat.post_count,
+        posts: [],
+      }),
+    ) as unknown as Category[];
   } catch (err) {
     console.error(err);
     notification.error("加载分类失败");
@@ -155,19 +153,12 @@ const fetchCategories = async () => {
 const fetchPost = async (id: string) => {
   loading.value = true;
   try {
-    const res = await request.get<ApiResponse<Post>>("/post", {
-      params: { _id: id },
-    });
-    if (res.data.status === "success" && res.data.data) {
-      const post = res.data.data;
-      title.value = post.title || "";
-      debouncedTitle.value = post.title || "";
-      category.value = post.category_id ? String(post.category_id) : "";
-      body.value = post.body || "";
-      pin.value = Boolean(post.is_pinned);
-    } else {
-      throw new Error(res.data.message);
-    }
+    const post = await blogService.getLegacyPost(id);
+    title.value = post.title || "";
+    debouncedTitle.value = post.title || "";
+    category.value = post.category_id ? String(post.category_id) : "";
+    body.value = post.body || "";
+    pin.value = Boolean(post.is_pinned);
   } catch (err: unknown) {
     error.value = err instanceof Error ? err.message : "Failed to load post";
     notification.error(error.value);
@@ -219,19 +210,11 @@ const handleSubmit = async () => {
 
     if (isEdit.value && postId.value) {
       const updatePayload = { ...payload, _id: postId.value };
-      const res = await request.put<ApiResponse<{ _id: string }>>("/admin/post/update", updatePayload);
-      if (res.data.status === "success") {
-        notification.success("文章更新成功");
-      } else {
-        throw new Error(res.data.message);
-      }
+      await blogService.updateLegacyPost(updatePayload);
+      notification.success("文章更新成功");
     } else {
-      const res = await request.post<ApiResponse<{ _id: string }>>("/admin/post/add", payload);
-      if (res.data.status === "success") {
-        notification.success("文章创建成功");
-      } else {
-        throw new Error(res.data.message);
-      }
+      await blogService.createLegacyPost(payload);
+      notification.success("文章创建成功");
     }
 
     // Redirect to previous page

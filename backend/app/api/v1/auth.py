@@ -367,13 +367,15 @@ async def passkey_registration_options(
 
 @router.post("/passkey/register")
 async def passkey_register(
-    request: PasskeyRegistrationRequest,
+    request: Request,
+    body: PasskeyRegistrationRequest,
     user: User = Depends(manager),
     user_service: UserService = Depends(user_service_dep),
     redis: AsyncRedis = Depends(get_redis),
 ):
+    origin = str(request.base_url).rstrip("/")
     error = await user_service.complete_passkey_registration(
-        user, request.response, redis
+        user, body.response, redis, origin
     )
     if error:
         return APIResponse.error(

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import request from "@/api/request";
+import { uploadService } from "@/service/uploadService";
 import DOMPurify from "dompurify";
 import hljs from "highlight.js/lib/common";
 import "highlight.js/styles/github-dark.css";
@@ -146,7 +146,7 @@ const renderedMarkdown = computed<string>(() => {
 const uploadImageToServer = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("file", file);
-  const response = await request.post("/upload-image", formData);
+  const response = await uploadService.uploadEditorImage(formData);
   return response.data.data.url;
 };
 

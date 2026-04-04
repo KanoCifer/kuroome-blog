@@ -219,7 +219,7 @@
 </template>
 
 <script setup lang="ts">
-import request from "@/api/request";
+import { weatherService } from "@/service/weatherService";
 import { onMounted, ref } from "vue";
 
 interface LiveWeather {
@@ -293,7 +293,7 @@ const fetchWeather = async (location: [number, number]) => {
 
   try {
     // 首先进行逆地理编码获取城市adcode
-    const regeoResponse = await request.post("/geocode/regeo", {
+    const regeoResponse = await weatherService.reverseGeocode({
       location: `${location[0]},${location[1]}`,
       extensions: "base",
     });
@@ -306,7 +306,7 @@ const fetchWeather = async (location: [number, number]) => {
     const adcode = regeoData.regeocode.addressComponent.adcode;
 
     // 获取实况天气
-    const liveResponse = await request.post("/weather", {
+    const liveResponse = await weatherService.getWeather({
       city: adcode,
       extensions: "base",
     });
@@ -319,7 +319,7 @@ const fetchWeather = async (location: [number, number]) => {
     }
 
     // 获取预报天气
-    const forecastResponse = await request.post("/weather", {
+    const forecastResponse = await weatherService.getWeather({
       city: adcode,
       extensions: "all",
     });

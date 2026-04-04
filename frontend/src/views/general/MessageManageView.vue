@@ -189,9 +189,9 @@
 </template>
 
 <script setup lang="ts">
-import request from "@/api/request";
 import CommentsTab from "@/components/message/CommentsTab.vue";
 import MessagesTab from "@/components/message/MessagesTab.vue";
+import { messageService } from "@/service/messageService";
 import { useAuthStore } from "@/stores/auth";
 import type { Comment, Message } from "@/types";
 import { useScroll } from "@vueuse/core";
@@ -250,7 +250,7 @@ const fetchMessages = async () => {
   loading.value = true;
   error.value = "";
   try {
-    const response = await request.get("/admin/messages");
+    const response = await messageService.getAdminMessages();
 
     const result = response.data;
     if (response.status === 200) {
@@ -273,7 +273,7 @@ const fetchComments = async () => {
   loading.value = true;
   error.value = "";
   try {
-    const response = await request.get("/admin/comments");
+    const response = await messageService.getAdminComments();
 
     const result = response.data;
     if (response.status === 200) {
@@ -296,10 +296,10 @@ const handleApprove = async (itemId: string) => {
   actionLoading.value = itemId;
   try {
     if (activeTab.value === "messages") {
-      await request.post(`/admin/messages/${itemId}/approve`);
+      await messageService.approveAdminMessage(itemId);
       await fetchMessages();
     } else {
-      await request.post(`/admin/comments/${itemId}/approve`);
+      await messageService.approveAdminComment(itemId);
       await fetchComments();
     }
   } catch (err) {
@@ -314,10 +314,10 @@ const handleDelete = async (itemId: string) => {
   actionLoading.value = itemId;
   try {
     if (activeTab.value === "messages") {
-      await request.delete(`/admin/messages/${itemId}/delete`);
+      await messageService.deleteAdminMessage(itemId);
       await fetchMessages();
     } else {
-      await request.delete(`/admin/comments/${itemId}/delete`);
+      await messageService.deleteAdminComment(itemId);
       await fetchComments();
     }
   } catch (err) {

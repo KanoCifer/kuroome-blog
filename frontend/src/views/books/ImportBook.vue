@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import request from "@/api/request";
+import { bookService } from "@/service/bookService";
 import { useNotificationStore } from "@/stores/notification";
 import { onMounted, ref } from "vue";
 const weread_cookie = ref("");
@@ -75,7 +75,7 @@ const notifier = useNotificationStore();
 const submitImport = async () => {
   loading.value = true;
   try {
-    const response = await request.post("/import", {
+    const response = await bookService.importBooks({
       weread_cookie: weread_cookie.value,
     });
     if (response.status === 200) {

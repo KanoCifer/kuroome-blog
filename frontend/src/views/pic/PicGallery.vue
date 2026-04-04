@@ -408,8 +408,8 @@
 </template>
 
 <script setup lang="ts">
-import request from "@/api/request";
 import { Button } from "@/components/ui/button";
+import { galleryService } from "@/service/galleryService";
 import { useAuthStore } from "@/stores/auth";
 import { useDeviceStore } from "@/stores/device";
 import { useNotificationStore } from "@/stores/notification";
@@ -516,7 +516,7 @@ const editDescription = ref("");
 // 获取照片墙图片数据
 const fetchGalleryImages = async () => {
   try {
-    const response = await request.get("/pic-gallery");
+    const response = await galleryService.getGallery();
     images.value = response.data.data.images;
     generateLayoutSeeds();
     console.log(images.value);
@@ -676,9 +676,7 @@ const uploadPic = async (file: File) => {
   formData.append("file", file);
 
   try {
-    const res = await request.post("/upload-gallery-image", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const res = await galleryService.uploadGalleryImage(formData);
     useNotificationStore().success("图片上传成功");
     return res.data.data.url;
   } catch {
@@ -690,7 +688,7 @@ const uploadPic = async (file: File) => {
 // 保存照片墙数据
 const saveGallery = async () => {
   try {
-    await request.post("/set-pic-gallery", {
+    await galleryService.saveGallery({
       images: images.value.map((img) => ({
         id: img.id,
         url: img.url,

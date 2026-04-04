@@ -191,10 +191,10 @@
 </template>
 
 <script setup lang="ts">
-import request from "@/api/request";
 import BasicDetail from "@/components/basic/BasicDetail.vue";
+import { rssService } from "@/service/rssService";
 import { useNotificationStore } from "@/stores/notification";
-import type { ApiResponse, RssArticle, RssArticleListResponse } from "@/types";
+import type { RssArticle } from "@/types";
 import { formatDate } from "@/utils/formatdate";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -228,17 +228,15 @@ const fetchArticles = async (page: number) => {
       searchQuery.value = route.query.search;
     }
 
-    const res = await request.get<ApiResponse<RssArticleListResponse>>("/rss/articles", {
-      params,
+    const res = await rssService.getArticles({
+      page: Number(params.page) || 1,
+      limit: Number(params.limit) || 20,
+      feed_url: typeof params.feed_url === "string" ? params.feed_url : undefined,
+      search: typeof params.search === "string" ? params.search : undefined,
     });
-
-    if (res.data.status === "success" && res.data.data) {
-      articles.value = res.data.data.items;
-      totalItems.value = res.data.data.total;
-      currentPage.value = res.data.data.page;
-    } else {
-      throw new Error(res.data.message || "获取文章列表失败");
-    }
+    articles.value = res.items;
+    totalItems.value = res.total;
+    currentPage.value = res.page;
   } catch (err: unknown) {
     console.error(err);
     errorMessage.value = err instanceof Error ? err.message : String(err) || "加载文章列表失败，请稍后重试。";

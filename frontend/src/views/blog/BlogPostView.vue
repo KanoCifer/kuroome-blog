@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import request from "@/api/request";
 import ArticleDetailLayout from "@/components/article/ArticleDetailLayout.vue";
 import ArticleSummaryCard from "@/components/blog/ArticleSummaryCard.vue";
+import { blogService } from "@/service/blogService";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
-import type { Post, PostResponse } from "@/types";
+import type { Post } from "@/types";
 import { formatDate } from "@/utils/formatdate";
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import { useHead } from "@unhead/vue";
@@ -39,15 +39,8 @@ const fetchPost = async () => {
   errorMessage.value = "";
 
   try {
-    const res = await request.get<PostResponse>("/post", {
-      params: { _id: postId.value },
-    });
-
-    if (res.data.status === "success") {
-      post.value = res.data.data;
-    } else {
-      throw new Error(res.data.message || "获取文章失败");
-    }
+    const res = await blogService.getLegacyPost(postId.value);
+    post.value = res as unknown as Post;
   } catch (err: unknown) {
     console.error(err);
     errorMessage.value = err instanceof Error ? err.message : "加载文章失败，请稍后重试。";
@@ -179,18 +172,9 @@ const showDeleteConfirm = () => {
 
 const handleDelete = async () => {
   try {
-    const res = await request.delete<{
-      status: string;
-      message: string;
-      data?: { _id: string };
-    }>(`/admin/post/${postId.value}/delete`);
-
-    if (res.data.status === "success") {
-      useNotificationStore().success("文章删除成功");
-      router.push("/blog");
-    } else {
-      throw new Error(res.data.message || "删除文章失败");
-    }
+    await blogService.deleteLegacyPost(postId.value);
+    useNotificationStore().success("文章删除成功");
+    router.push("/blog");
   } catch (err: unknown) {
     console.error("删除文章失败:", err);
     const errorMsg = err instanceof Error ? err.message : "删除文章失败，请稍后重试";

@@ -389,19 +389,6 @@ interface OutputTypeOption {
   label: string;
   value: string;
 }
-interface ImageItem {
-  id: string; // crypto.randomUUID()
-  file: File;
-  originalUrl: string; // URL.createObjectURL
-  processedBlob: Blob | null;
-  processedUrl: string | null;
-  status: "pending" | "processing" | "done" | "error";
-  error?: string;
-  compressionRatio?: number;
-}
-
-const images = ref<ImageItem[]>([]);
-
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const dropZoneRef = useTemplateRef("dropZoneRef");
 const originalFile = ref<File | null>(null);

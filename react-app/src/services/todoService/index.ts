@@ -1,5 +1,5 @@
 import request, { extractData } from '@/api/request.ts';
-import { type Todo } from '@/stores/todoState.ts';
+import type { Todo } from '@/stores/todoState.ts';
 
 import type { BatchAction, CreateTodoPayload } from './types';
 

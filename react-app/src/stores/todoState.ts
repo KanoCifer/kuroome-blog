@@ -1,61 +1,89 @@
 import { todoService, type TodoService } from '@/services/todoService';
 import { create } from 'zustand';
+import type { CreateTodoPayload } from '@/services/todoService/types';
 
 export interface Todo {
   id: string;
   text: string;
   completed: boolean;
   createdAt: string;
-  description: string;
-  dueDate: string;
+  description?: string;
+  dueDate?: string;
   priority: 'low' | 'medium' | 'high';
-  category: string;
-  arichived: boolean;
-  archivedAt: string;
+  category?: string;
+  archived?: boolean;
+  archivedAt?: string;
 }
+
 interface TodoState {
   todos: Todo[];
-  getTodos: () => void;
-  addTodo: (todo: Todo) => void;
-  deleteTodo: (id: string) => void;
-  updateTodo: (id: string, updatedTodo: Todo) => void;
-  archiveCompleted: () => void;
-  clearCompleted: () => void;
+  hydrateTodos: () => void;
+  addTodo: (payload: CreateTodoPayload) => Promise<void>;
+  toggleTodo: (id: string) => Promise<void>;
+  updateTodo: (id: string, patch: Partial<Todo>) => Promise<void>;
+  removeTodo: (id: string) => Promise<void>;
+  archiveTodo: (id: string) => Promise<void>;
+  unarchiveTodo: (id: string) => Promise<void>;
+  archiveCompleted: () => Promise<void>;
+  clearCompleted: () => Promise<void>;
 }
 
-const service: TodoService = todoService(); // 获取 todoService 实例
+const service: TodoService = todoService();
 
-export const useTodoState = create<TodoState>((set) => ({
-  // 数据结构
+export const useTodoState = create<TodoState>((set, get) => ({
   todos: [],
 
-  getTodos: async () => {
-    const todos = await service.fetchTodos();
-    set({ todos });
+  hydrateTodos: () => {
+    service.fetchTodos(true).then((todos) => set({ todos }));
   },
 
-  // 方法
-  addTodo: async (todo) => {
-    const newTodo = await service.addTodo(todo);
+  addTodo: async (payload) => {
+    const newTodo = await service.addTodo(payload);
     if (newTodo) {
+      set((state) => ({ todos: [...state.todos, newTodo] }));
+    }
+  },
+
+  toggleTodo: async (id) => {
+    const todo = get().todos.find((t) => t.id === id);
+    if (todo) {
+      await service.updateTodo(id, { completed: !todo.completed });
       set((state) => ({
-        todos: [...state.todos, newTodo],
+        todos: state.todos.map((t) =>
+          t.id === id ? { ...t, completed: !t.completed } : t,
+        ),
       }));
     }
   },
 
-  deleteTodo: async (id) => {
+  updateTodo: async (id, patch) => {
+    const updated = await service.updateTodo(id, patch);
+    if (updated) {
+      set((state) => ({
+        todos: state.todos.map((t) => (t.id === id ? { ...t, ...updated } : t)),
+      }));
+    }
+  },
+
+  removeTodo: async (id) => {
     await service.removeTodo(id);
+    set((state) => ({ todos: state.todos.filter((t) => t.id !== id) }));
+  },
+
+  archiveTodo: async (id) => {
+    await service.updateTodo(id, { archived: true, archivedAt: new Date().toISOString() });
     set((state) => ({
-      todos: state.todos.filter((todo) => todo.id !== id),
+      todos: state.todos.map((t) =>
+        t.id === id ? { ...t, archived: true, archivedAt: new Date().toISOString() } : t,
+      ),
     }));
   },
 
-  updateTodo: async (id, updatedTodo) => {
-    const updated = await service.updateTodo(id, updatedTodo);
+  unarchiveTodo: async (id) => {
+    await service.updateTodo(id, { archived: false });
     set((state) => ({
       todos: state.todos.map((t) =>
-        t.id === id ? (updated ? { ...t, ...updated } : t) : t,
+        t.id === id ? { ...t, archived: false } : t,
       ),
     }));
   },
@@ -73,8 +101,6 @@ export const useTodoState = create<TodoState>((set) => ({
 
   clearCompleted: async () => {
     await service.batchAction('clearCompleted');
-    set((state) => ({
-      todos: state.todos.filter((t) => !t.completed),
-    }));
+    set((state) => ({ todos: state.todos.filter((t) => !t.completed) }));
   },
 }));

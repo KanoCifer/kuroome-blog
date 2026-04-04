@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, File, Query, UploadFile
+from fastapi import APIRouter, Depends, File, Path, Query, UploadFile
 from fastapi.responses import JSONResponse
 from starlette import status
 
@@ -74,6 +74,23 @@ async def get_blog_post(
     )
 
 
+### 获取单个博客文章详情（修复：增加了对 ObjectId 的验证，处理了分类信息和评论树的构建） ###
+@router.get("/blogs/{_id}")
+@redis_cache(ttl=60, exclude=["blog_service"])
+async def get_blog(
+    _id: Annotated[str | None, Path(description="Blog post ID")],
+    blog_service: BlogService = Depends(blog_service_dep),
+):
+    """Get a single blog post by ID."""
+    try:
+        post_data = await blog_service.get_blog_post(_id)
+    except BlogDomainError as exc:
+        return APIResponse.error(message=exc.message, code=exc.code)
+    return APIResponse.ok(
+        data=post_data, message="Blog post retrieved successfully"
+    )
+
+
 @router.post("/comments")
 async def post_comment(
     data: PostComment,
@@ -110,6 +127,24 @@ async def get_categories(
 @router.post("/category")
 async def get_posts_by_category(
     category_id: Annotated[int, Query(..., description="Category ID")],
+    blog_service: BlogService = Depends(blog_service_dep),
+):
+    """Get posts by category."""
+    try:
+        data = await blog_service.get_posts_by_category(category_id)
+    except BlogDomainError as exc:
+        return APIResponse.error(message=exc.message, code=exc.code)
+
+    category_name = data["category"]["name"]
+    return APIResponse.ok(
+        data=data,
+        message=f"Posts in category '{category_name}' retrieved successfully",
+    )
+
+
+@router.get("/blogs/categories/{category_id}")
+async def get_category_posts(
+    category_id: Annotated[int, Path(..., description="Category ID")],
     blog_service: BlogService = Depends(blog_service_dep),
 ):
     """Get posts by category."""

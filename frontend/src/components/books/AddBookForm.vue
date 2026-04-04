@@ -113,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import request from "@/api/request";
+import { bookService } from "@/service/bookService";
 import { useNotificationStore } from "@/stores/notification";
 import type { ADDBookForm, BookItem } from "@/types";
 import { reactive, ref } from "vue";
@@ -141,7 +141,7 @@ async function submitForm() {
   try {
     if (isEditing.value && editingBookId.value) {
       // 编辑模式：更新书籍
-      await request.put(`/books/${editingBookId.value}`, {
+      await bookService.updateBook(editingBookId.value, {
         title: form.title,
         author: form.author,
         iscompleted: form.iscompleted,
@@ -151,7 +151,7 @@ async function submitForm() {
       resetForm();
     } else {
       // 添加模式：添加书籍
-      await request.post("/books/addbook", {
+      await bookService.createBook({
         title: form.title,
         author: form.author,
         iscompleted: form.iscompleted,

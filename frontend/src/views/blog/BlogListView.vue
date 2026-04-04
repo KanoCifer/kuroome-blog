@@ -342,10 +342,10 @@
 </template>
 
 <script setup lang="ts">
-import request from "@/api/request";
 import BasicDetail from "@/components/basic/BasicDetail.vue";
+import { blogService } from "@/service/blogService";
 import { useNotificationStore } from "@/stores/notification";
-import type { BlogPagination, BlogsResponse, Category, Post } from "@/types";
+import type { BlogPagination, Category, Post } from "@/types";
 import { formatDate } from "@/utils/formatdate";
 import { useHead } from "@unhead/vue";
 import DOMPurify from "dompurify";
@@ -409,18 +409,15 @@ const fetchPosts = async (page: number = 1) => {
       searchQuery.value = route.query.search;
     }
 
-    const res = await request.get<BlogsResponse>("/blogs", {
-      params,
+    const res = await blogService.getBlogs({
+      page,
+      search: typeof params.search === "string" ? params.search : undefined,
     });
 
-    if (res.data.status === "success") {
-      posts.value = res.data.data.posts;
-      categories.value = res.data.data.categories;
-      pagination.value = res.data.data.pagination;
-      currentPage.value = page;
-    } else {
-      throw new Error(res.data.message || "获取文章列表失败");
-    }
+    posts.value = res.posts as unknown as Post[];
+    categories.value = res.categories;
+    pagination.value = res.pagination;
+    currentPage.value = page;
   } catch (err: unknown) {
     console.error(err);
     errorMessage.value = err instanceof Error ? err.message : "加载文章列表失败，请稍后重试。";

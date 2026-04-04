@@ -63,14 +63,16 @@ def generate_passkey_registration_options(
 
 
 def verify_passkey_registration_response(
-    response: dict, expected_challenge: str
+    response: dict,
+    expected_challenge: str,
+    expected_origin: str,
 ) -> VerifiedRegistration:
     """验证 Passkey 注册响应"""
     verification: VerifiedRegistration = verify_registration_response(
         credential=response,
         expected_challenge=base64url_to_bytes(expected_challenge),
         expected_rp_id=settings.WEBAUTHN_RP_ID,
-        expected_origin=settings.WEBAUTHN_ORIGIN,
+        expected_origin=expected_origin,
     )
     return verification
 
@@ -92,6 +94,7 @@ def verify_passkey_authentication_response(
     expected_challenge: str,
     credential_public_key: str,
     sign_count: int,
+    expected_origin: str,
 ) -> VerifiedAuthentication:
     """验证 Passkey 认证响应"""
     verification: VerifiedAuthentication = verify_authentication_response(
@@ -99,7 +102,7 @@ def verify_passkey_authentication_response(
         expected_challenge=base64url_to_bytes(expected_challenge),
         credential_public_key=base64url_to_bytes(credential_public_key),
         expected_rp_id=settings.WEBAUTHN_RP_ID,
-        expected_origin=settings.WEBAUTHN_ORIGIN,
+        expected_origin=expected_origin,
         credential_current_sign_count=sign_count,
     )
     return verification

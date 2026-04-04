@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import request from "@/api/request";
+import { blogService } from "@/service/blogService";
 import IconTags from "@/components/icons/IconTags.vue";
 import type { Category, CategoryResponseItem, Post } from "@/types";
 import { onMounted, ref, watch } from "vue";
@@ -103,14 +103,16 @@ watch(
 
 const fetchCategories = async () => {
   try {
-    const response = await request.get("/categories");
-    if (response.data.status === "success") {
-      categories.value = response.data.data.map((cat: CategoryResponseItem) => ({
+    const response = await blogService.getLegacyCategories();
+    categories.value = response.map(
+      (cat): CategoryResponseItem => ({
         id: cat.id,
         name: cat.name,
+        description: "",
         post_count: cat.post_count || 0,
-      }));
-    }
+        posts: [],
+      }),
+    ) as unknown as Category[];
   } catch (error) {
     console.error("Failed to fetch categories:", error);
   }
@@ -119,15 +121,22 @@ const fetchCategories = async () => {
 const fetchPostsByCategory = async (categoryId: number) => {
   isLoading.value = true;
   try {
-    // 后端 API 使用 query 参数: POST /category?category_id=xxx
-    const response = await request.post("/category", null, {
-      params: { category_id: categoryId },
-    });
-    if (response.data.status === "success") {
-      const posts: Post[] = response.data.data.posts;
-      const categoryName = response.data.data.category?.name || "";
-      emit("filterPosts", posts, categoryName);
-    }
+    const response = await blogService.getPostsByLegacyCategory(categoryId);
+    const posts: Post[] = response.posts.map((post) => ({
+      ...(post as unknown as Post),
+      category: post.category
+        ? {
+            id: post.category.id,
+            name: post.category.name,
+            description: "",
+            post_count: 0,
+            created_at: "",
+            updated_at: "",
+          }
+        : undefined,
+    }));
+    const categoryName = response.category?.name || "";
+    emit("filterPosts", posts, categoryName);
   } catch (error) {
     console.error("Failed to fetch posts by category:", error);
   } finally {

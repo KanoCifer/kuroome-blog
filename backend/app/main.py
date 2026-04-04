@@ -137,7 +137,9 @@ setup_csrf(app)
 origins: list[str] = [
     "http://localhost",
     "http://localhost:5173",
+    "http://localhost:5174",
     "https://kanocifer.chat",
+    "https://m.kanocifer.com",
 ]
 
 # 配置 CORS 中间件，允许前端访问 API，并暴露 Set-Cookie 头以支持跨域认证

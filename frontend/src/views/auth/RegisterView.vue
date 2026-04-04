@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import request from "@/api/request";
+import { authService } from "@/service/authService";
 import { useNotificationStore } from "@/stores/notification";
 import type { RegisterForm } from "@/types";
 import axios from "axios";
@@ -40,7 +40,7 @@ const sendEmailCode = async () => {
   sendCodeText.value = "Sending...";
 
   try {
-    await request.post("/auth/email/code", {
+    await authService.sendRegisterEmailCode({
       email: form.value.email,
     });
     sendCodeText.value = "Sent!";
@@ -78,12 +78,12 @@ const handleSubmit = async () => {
   isSubmitting.value = true;
 
   try {
-    const response = await request.post("/auth/register", {
+    const response = await authService.register({
       username: form.value.username,
       email: form.value.email,
       password: form.value.password,
       confirm_password: form.value.confirmPassword,
-      email_code: form.value.emailCode,
+      email_code: form.value.emailCode || "",
     });
 
     if (response.data.status === "success") {

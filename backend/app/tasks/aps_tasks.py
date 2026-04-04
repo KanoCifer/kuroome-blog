@@ -171,6 +171,7 @@ async def run_migration_job(context: Context = TaskiqDepends()):
                 track_objects: list[VisitorTrack] = []
 
                 # 字段最大长度映射 (防止 StringDataRightTruncationError)
+                # 注意：browser 字段是 Text 类型，不需要截断
                 max_lengths = {
                     "visitor_id": 100,
                     "page_url": 200,
@@ -184,7 +185,7 @@ async def run_migration_job(context: Context = TaskiqDepends()):
                     "os_name": 100,
                     "os_version": 100,
                     "cpu": 50,
-                    "device_type": 20,
+                    "device_type": 50,
                 }
 
                 for data in parsed_data_list:
@@ -201,8 +202,20 @@ async def run_migration_job(context: Context = TaskiqDepends()):
 
                     track_objects.append(VisitorTrack(**data_dict))
 
+                logger.info(
+                    f"[MigrationJob] Adding {len(track_objects)} objects to session"
+                )
                 session.add_all(track_objects)
-                await session.commit()
+
+                logger.info("[MigrationJob] Committing to database...")
+                try:
+                    await session.commit()
+                    logger.info("[MigrationJob] Commit successful")
+                except Exception as db_error:
+                    logger.exception(
+                        f"[MigrationJob] Database commit failed: {db_error!r}"
+                    )
+                    raise
 
                 processed_count = len(track_objects)
                 db_duration = time.perf_counter() - db_start

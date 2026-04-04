@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import request from "@/api/request";
+import { socialService } from "@/service/socialService";
 import { useNotificationStore } from "@/stores/notification";
 import { AxiosError } from "axios";
 import type { AnimationItem } from "lottie-web";
@@ -31,7 +31,7 @@ const isSubmitting = ref(false);
 
 const fetchLikesCount = async () => {
   try {
-    const response = await request("/likes");
+    const response = await socialService.getLikes();
     likesCounts.value = response.data.data.likes_count || 0;
   } catch (error) {
     console.error("Failed to fetch likes count:", error);
@@ -68,7 +68,7 @@ const playAnimation = async () => {
   anim.value.play();
 
   try {
-    await request.post("/like", { likescounts: 1 });
+    await socialService.likeOnce({ likescounts: 1 });
     likesCounts.value += 1;
   } catch (error) {
     let errorMsg = "点赞失败，请稍后重试";

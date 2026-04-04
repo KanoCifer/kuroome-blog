@@ -1,11 +1,11 @@
+import request from '@/api/request';
 import { useAuthStore } from '@/stores/authState';
+import type { ProfileForm } from '@/types';
 import { startRegistration } from '@simplewebauthn/browser';
 import axios from 'axios';
+import { Eye, EyeOff } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
-import request from '@/api/request';
-import type { ProfileForm } from '@/types';
 
 interface FormErrors {
   name?: string;
@@ -337,7 +337,7 @@ export default function ProfileSettingView() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="max-h-80vh overflow-y-auto py-10">
       <div
         className="squircle mx-auto max-w-2xl border border-white/70 bg-white/40 p-10 shadow-2xl dark:border-gray-700/30 dark:bg-gray-900/40"
         style={{ animation: 'fadeInUp 0.6s ease-out' }}

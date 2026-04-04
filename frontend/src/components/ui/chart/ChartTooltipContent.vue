@@ -12,7 +12,7 @@ const props = withDefaults(
     nameKey?: string;
     labelKey?: string;
     labelFormatter?: (d: number | Date) => string;
-    payload?: Record<string, any>;
+    payload?: Record<string, unknown> & { fill?: string };
     config?: ChartConfig;
     class?: HTMLAttributes["class"];
     color?: string;
@@ -35,7 +35,14 @@ const payload = computed(() => {
       const itemConfig = props.config[key];
       const indicatorColor = props.config[key]?.color ?? props.payload.fill;
 
-      return { key, value, itemConfig, indicatorColor };
+      const normalizedValue =
+        typeof value === "number" ||
+        typeof value === "string" ||
+        value instanceof Date
+          ? value
+          : String(value);
+
+      return { key, value: normalizedValue, itemConfig, indicatorColor };
     })
     .filter((i) => i.itemConfig);
 });

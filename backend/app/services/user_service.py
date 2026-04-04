@@ -297,6 +297,7 @@ class UserService:
         user: User,
         response: dict,
         expected_challenge: str,
+        expected_origin: str,
     ) -> bool:
         """Verify and store passkey registration response.
 
@@ -307,7 +308,7 @@ class UserService:
             return False
 
         verification = verify_passkey_registration_response(
-            response, expected_challenge
+            response, expected_challenge, expected_origin
         )
         if not verification:
             return False
@@ -327,6 +328,7 @@ class UserService:
         self,
         response: dict,
         expected_challenge: str,
+        expected_origin: str,
         request: Request,
     ) -> tuple[User | None, str | None]:
         """Verify passkey authentication and login user.
@@ -364,6 +366,7 @@ class UserService:
             expected_challenge=expected_challenge,
             credential_public_key=credential.public_key,
             sign_count=credential.sign_count,
+            expected_origin=expected_origin,
         )
         if not verification:
             return None, "Passkey 认证验证失败"
@@ -384,6 +387,9 @@ class UserService:
 
         Returns (user, tokens, None) on success, (None, None, error_msg) on failure.
         """
+        # Extract origin from request (e.g., https://xxx.com or https://m.xxx.com)
+        origin = str(request.base_url).rstrip("/")
+
         # Parse challenge from clientDataJSON
         try:
             client_data_json_b64 = assertion_response["response"][
@@ -406,7 +412,7 @@ class UserService:
 
         # Authenticate and create tokens
         user, error = await self.authenticate_passkey(
-            assertion_response, expected_challenge, request
+            assertion_response, expected_challenge, origin, request
         )
         if error or user is None:
             return None, None, error or "认证失败"
@@ -419,6 +425,7 @@ class UserService:
         user: User,
         response: dict,
         redis: AsyncRedis,
+        expected_origin: str,
     ) -> str | None:
         """Complete passkey registration flow: validate challenge → register credential.
 
@@ -433,7 +440,7 @@ class UserService:
         await redis.delete(f"passkey:registration:challenge:{user.id}")
 
         success = await self.register_passkey(
-            user, response, expected_challenge
+            user, response, expected_challenge, expected_origin
         )
         if not success:
             return "您的账户已经绑定了Passkey或验证失败"

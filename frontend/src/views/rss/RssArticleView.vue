@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import request from "@/api/request";
+import { rssService } from "@/service/rssService";
 import BasicDetail from "@/components/basic/BasicDetail.vue";
 import ArticleSummaryCard from "@/components/blog/ArticleSummaryCard.vue";
 import { useNotificationStore } from "@/stores/notification";
-import type { ApiResponse, RssArticle } from "@/types";
+import type { RssArticle } from "@/types";
 import { formatDate } from "@/utils/formatdate";
 import { useScroll } from "@vueuse/core";
 import DOMPurify from "dompurify";
@@ -96,12 +96,7 @@ const fetchArticle = async () => {
   isLoading.value = true;
   errorMessage.value = "";
   try {
-    const res = await request.get<ApiResponse<RssArticle>>(`/rss/articles/${articleId.value}`);
-    if (res.data.status === "success" && res.data.data) {
-      article.value = res.data.data;
-    } else {
-      throw new Error(res.data.message || "获取文章详情失败");
-    }
+    article.value = await rssService.getArticle(articleId.value);
   } catch (err: unknown) {
     console.error(err);
     errorMessage.value = err instanceof Error ? err.message : String(err) || "加载文章失败，请稍后重试。";
@@ -118,11 +113,11 @@ const toggleReadStatus = async () => {
 
   try {
     if (isCurrentlyRead) {
-      await request.delete(`/rss/articles/${articleId.value}/read`);
+      await rssService.markArticleUnread(articleId.value);
       article.value.is_read = false;
       notifier.success("已标记为未读");
     } else {
-      await request.post(`/rss/articles/${articleId.value}/read`);
+      await rssService.markArticleRead(articleId.value);
       article.value.is_read = true;
       notifier.success("已标记为已读");
     }
@@ -151,7 +146,7 @@ watch(
   async (newPercent) => {
     if (newPercent === 100 && article.value && !article.value.is_read) {
       try {
-        await request.post(`/rss/articles/${articleId.value}/read`);
+        await rssService.markArticleRead(articleId.value);
         article.value.is_read = true;
         notifier.success("已读完！");
       } catch {
