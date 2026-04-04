@@ -1,5 +1,20 @@
 [
   {
+    "version": "2.7.0",
+    "date": "2026-04-04",
+    "title": "使用React重构移动端网站",
+    "changes": [
+      {
+        "type": "refactor",
+        "content": "使用React重构移动端网站，提升性能和用户体验"
+      },
+      {
+        "type": "fix",
+        "content": "修复了重构过程中引入的一些小bug，优化了页面加载速度"
+      }
+    ]
+  },
+  {
     "version": "2.6.2",
     "date": "2026-03-30",
     "title": "修复照片画廊功能的bug",

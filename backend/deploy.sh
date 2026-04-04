@@ -50,6 +50,13 @@ pnpm i
 pnpm run build
 ok "Frontend built"
 
+step "Building React"
+cd ../react-app || exit 1
+pnpm i
+pnpm run build
+ok "React app built"
+
+
 step "Restarting services"
 sudo supervisorctl reload || true
 sudo supervisorctl update || true
