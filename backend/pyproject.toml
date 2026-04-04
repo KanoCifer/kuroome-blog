@@ -59,3 +59,9 @@ pythonpath = [".", ".."]
 
 [dependency-groups]
 dev = ["pytest>=9.0.2", "watchdog>=6.0.0"]
+
+
+[tool.uv]
+[[tool.uv.index]]
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+default = true
