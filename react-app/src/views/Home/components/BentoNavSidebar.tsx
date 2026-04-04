@@ -113,7 +113,7 @@ export const BentoNavSidebar: React.FC = () => {
               className="h-14 w-14 rounded-full object-cover shadow-sm ring-4 ring-blue-300"
             />
             <div className="flex items-baseline gap-2">
-              <span className="font-serif text-2xl font-bold text-base-content">
+              <span className="font-serif text-2xl font-bold text-base-content select-none">
                 {currentUserName}
               </span>
               <ChevronDown className="h-4 w-4 text-base-content/70" />
@@ -122,18 +122,23 @@ export const BentoNavSidebar: React.FC = () => {
 
           {/* Dropdown Menu */}
           {isDropdownOpen && (
-            <div className="absolute top-full left-0 mt-4 w-60 bg-gray-200 rounded-2xl shadow-xl z-50 p-2 flex flex-col gap-1">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="absolute top-full left-0 mt-4 w-60 bg-gray-200 rounded-2xl shadow-xl z-50 p-2 flex flex-col gap-1 selection-none"
+            >
               {auth.isAuthenticated ? (
                 <>
                   <Link
                     to="/settings"
-                    className="flex items-center gap-2 p-2 rounded-xl hover:bg-base-300"
+                    className="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-300 select-none"
                   >
                     <User className="h-4 w-4" /> Profile
                   </Link>
                   <Link
                     to="/import"
-                    className="flex items-center gap-2 p-2 rounded-xl hover:bg-base-300"
+                    className="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-300 select-none"
                   >
                     <FileUp className="h-4 w-4" /> Import
                   </Link>
@@ -141,19 +146,19 @@ export const BentoNavSidebar: React.FC = () => {
                     <>
                       <Link
                         to="/messages"
-                        className="flex items-center gap-2 p-2 rounded-xl hover:bg-base-300"
+                        className="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-300 select-none"
                       >
                         <MessageSquare className="h-4 w-4" /> Messages
                       </Link>
                       <Link
                         to="/analytics"
-                        className="flex items-center gap-2 p-2 rounded-xl hover:bg-base-300"
+                        className="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-300 select-none"
                       >
                         <BarChart className="h-4 w-4" /> Analytics
                       </Link>
                     </>
                   )}
-                  <div className="h-px bg-base-300 my-1"></div>
+                  <div className="h-px bg-gray-300 my-1"></div>
                   <button
                     onClick={handleLoginout}
                     disabled={isLoading}
@@ -167,19 +172,19 @@ export const BentoNavSidebar: React.FC = () => {
                 <>
                   <Link
                     to="/login"
-                    className="flex items-center gap-2 p-2 rounded-xl hover:bg-base-300"
+                    className="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-300 select-none"
                   >
                     <LogIn className="h-4 w-4" /> Login
                   </Link>
                   <Link
                     to="/register"
-                    className="flex items-center gap-2 p-2 rounded-xl hover:bg-base-300"
+                    className="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-300 select-none"
                   >
                     <UserPlus className="h-4 w-4" /> Register
                   </Link>
                 </>
               )}
-            </div>
+            </motion.div>
           )}
         </div>
 

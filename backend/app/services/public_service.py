@@ -181,7 +181,9 @@ Sitemap: https://readinglist.example.com/api/sitemap.xml
         cache_key = "qweather:jwt"
         cached_jwt = await redis.get(cache_key)
         if cached_jwt:
-            return cached_jwt.decode()
+            if isinstance(cached_jwt, bytes):
+                return cached_jwt.decode()
+            return str(cached_jwt)
 
         encoded_jwt = generate_qweather_jwt()
         await redis.set(cache_key, encoded_jwt, ex=24 * 3600)

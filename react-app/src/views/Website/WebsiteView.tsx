@@ -21,8 +21,10 @@ export default function WebsiteView() {
         key={t.id}
         href={t.url}
         target="_blank"
-        initial={{ opacity: 0, y: 5 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 5 }}
         transition={{
           type: 'spring',
           duration: 1,

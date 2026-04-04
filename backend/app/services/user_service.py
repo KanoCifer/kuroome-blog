@@ -387,8 +387,7 @@ class UserService:
 
         Returns (user, tokens, None) on success, (None, None, error_msg) on failure.
         """
-        # Extract origin from request (e.g., https://xxx.com or https://m.xxx.com)
-        origin = str(request.base_url).rstrip("/")
+        origin = "http://localhost:5174"  # TODO: Make this configurable in production
 
         # Parse challenge from clientDataJSON
         try:

@@ -1,8 +1,8 @@
+import { uploadService } from '@/services/uploadService';
 import DOMPurify from 'dompurify';
 import hljs from 'highlight.js/lib/common';
 import { marked } from 'marked';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { uploadService } from '@/service/uploadService';
 
 // Configure marked
 marked.setOptions({
@@ -38,9 +38,12 @@ export default function MarkdownEditor({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
 
-  // Sync external value changes
+  // Sync external value changes (controlled prop → internal state for draft/preview)
+  const valueRef = useRef(value);
   useEffect(() => {
-    if (value !== content) {
+    if (valueRef.current !== value) {
+      valueRef.current = value;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setContent(value);
     }
   }, [value]);
@@ -247,6 +250,7 @@ console.log('Hello!');
 }
 
 // Draft management utilities
+// eslint-disable-next-line react-refresh/only-export-components
 export function getAllDrafts(): Draft[] {
   const drafts: Draft[] = [];
   for (let i = 0; i < localStorage.length; i++) {
@@ -261,15 +265,16 @@ export function getAllDrafts(): Draft[] {
     }
   }
   return drafts.sort(
-    (a, b) =>
-      new Date(b.title).getTime() - new Date(a.title).getTime(),
+    (a, b) => new Date(b.title).getTime() - new Date(a.title).getTime(),
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function deleteDraft(key: string): void {
   localStorage.removeItem(key);
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function switchDraft(key: string): Draft | null {
   try {
     const draft = JSON.parse(localStorage.getItem(key) || '');

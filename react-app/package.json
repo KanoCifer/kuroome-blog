@@ -16,6 +16,7 @@
     "@simplewebauthn/browser": "^13.3.0",
     "@tailwindcss/vite": "^4.2.2",
     "axios": "^1.14.0",
+    "browser-image-compression": "^2.0.2",
     "dayjs": "^1.11.20",
     "dompurify": "^3.3.3",
     "echarts": "^6.0.0",

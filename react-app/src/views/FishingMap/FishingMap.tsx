@@ -1,12 +1,658 @@
+import { useNotificationStore } from '@/stores/notificationState';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import {
+  AMAP_SCRIPT_ID,
+  MAP_CENTER,
+  MAP_PLUGIN_LIST,
+  MAP_ZOOM,
+  fishingSpots,
+} from './constants';
+import { fishingMapService } from './service';
+import type {
+  AMapDriving,
+  AMapDrivingResult,
+  AMapMapInstance,
+  AMapMarkerInstance,
+  AMapNamespace,
+  AMapPolyline,
+  AMapSecurityConfig,
+  AnalysisPayload,
+  GeolocationResult,
+  ForecastDay,
+  LiveWeather,
+  RouteInfo,
+  TideData,
+  TideTableItem,
+} from './types';
+import { AIAnalysisWidget } from './components/AIAnalysisWidget';
+import { FishingMapHeader } from './components/FishingMapHeader';
+import { MapPanel } from './components/MapPanel';
+import { RouteStatusCard } from './components/RouteStatusCard';
+import { TideCard } from './components/TideCard';
+import { WeatherCard } from './components/WeatherCard';
+
+declare global {
+  interface Window {
+    _AMapSecurityConfig?: AMapSecurityConfig;
+    AMap?: AMapNamespace;
+  }
+}
+
+async function loadAMapScript(key: string): Promise<AMapNamespace> {
+  if (window.AMap) {
+    return window.AMap;
+  }
+
+  const script = document.getElementById(
+    AMAP_SCRIPT_ID,
+  ) as HTMLScriptElement | null;
+  if (script) {
+    await new Promise<void>((resolve, reject) => {
+      script.addEventListener('load', () => resolve(), { once: true });
+      script.addEventListener(
+        'error',
+        () => reject(new Error('高德地图脚本加载失败')),
+        { once: true },
+      );
+    });
+
+    if (!window.AMap) {
+      throw new Error('高德地图脚本已加载但 AMap 不可用');
+    }
+    return window.AMap;
+  }
+
+  const scriptElement = document.createElement('script');
+  scriptElement.id = AMAP_SCRIPT_ID;
+  scriptElement.async = true;
+  scriptElement.defer = true;
+  scriptElement.src = `https://webapi.amap.com/maps?v=2.0&key=${encodeURIComponent(key)}&plugin=${encodeURIComponent(MAP_PLUGIN_LIST.join(','))}`;
+
+  await new Promise<void>((resolve, reject) => {
+    scriptElement.onload = () => resolve();
+    scriptElement.onerror = () => reject(new Error('高德地图脚本加载失败'));
+    document.head.appendChild(scriptElement);
+  });
+
+  if (!window.AMap) {
+    throw new Error('高德地图脚本初始化失败');
+  }
+
+  return window.AMap;
+}
+
 export default function FishingMap() {
+  const navigate = useNavigate();
+  const notifyError = useNotificationStore((state) => state.error);
+  const notifyErrorRef = useRef(notifyError);
+
+  const service = useMemo(() => fishingMapService(), []);
+  const mapContainerRef = useRef<HTMLDivElement | null>(null);
+  const mapInstanceRef = useRef<AMapMapInstance | null>(null);
+  const markerInstancesRef = useRef<AMapMarkerInstance[]>([]);
+  const drivingRef = useRef<AMapDriving | null>(null);
+  const currentRouteRef = useRef<AMapPolyline | null>(null);
+  const handleMarkerClickRef = useRef<(index: number) => Promise<void>>(
+    async () => undefined,
+  );
+  const autoAnalysisAttemptRef = useRef('');
+  const analysisAbortRef = useRef<AbortController | null>(null);
+
+  const [isMapReady, setIsMapReady] = useState(false);
+  const [isPlanningRoute, setIsPlanningRoute] = useState(false);
+  const [routeInfo, setRouteInfo] = useState<RouteInfo | null>(null);
+  const [selectedSpotIndex, setSelectedSpotIndex] = useState<number | null>(
+    null,
+  );
+
+  const [analysisOpen, setAnalysisOpen] = useState(false);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
+  const [analysisError, setAnalysisError] = useState('');
+  const [analysisResult, setAnalysisResult] = useState('');
+
+  const [weatherLoading, setWeatherLoading] = useState(false);
+  const [weatherError, setWeatherError] = useState('');
+  const [liveWeather, setLiveWeather] = useState<LiveWeather | null>(null);
+  const [forecasts, setForecasts] = useState<ForecastDay[]>([]);
+  const [locationName, setLocationName] = useState('');
+
+  const [tideLoading, setTideLoading] = useState(false);
+  const [tideData, setTideData] = useState<TideData | null>(null);
+  const [tideSpotName, setTideSpotName] = useState('黄埔港');
+
+  const isDarkMode = document.documentElement.classList.contains('dark');
+
+  const analysisPayload = useMemo<AnalysisPayload | null>(() => {
+    if (!liveWeather && forecasts.length === 0 && !tideData) {
+      return null;
+    }
+
+    return {
+      liveWeather,
+      forecasts,
+      tideData,
+      locationName: locationName || liveWeather?.city || '钓鱼地点',
+      tideSpotName,
+    };
+  }, [forecasts, liveWeather, locationName, tideData, tideSpotName]);
+
+  const analysisHasData = useMemo(() => {
+    return Boolean(liveWeather) || forecasts.length > 0 || Boolean(tideData);
+  }, [forecasts.length, liveWeather, tideData]);
+
+  const highTide = useMemo<TideTableItem | null>(() => {
+    if (!tideData?.tideTable?.length) {
+      return null;
+    }
+
+    const highs = tideData.tideTable.filter((item) => item.type === 'H');
+    if (!highs.length) {
+      return null;
+    }
+
+    return highs.reduce((prev, curr) => {
+      return Number(curr.height) > Number(prev.height) ? curr : prev;
+    });
+  }, [tideData]);
+
+  const lowTide = useMemo<TideTableItem | null>(() => {
+    if (!tideData?.tideTable?.length) {
+      return null;
+    }
+
+    const lows = tideData.tideTable.filter((item) => item.type === 'L');
+    if (!lows.length) {
+      return null;
+    }
+
+    return lows.reduce((prev, curr) => {
+      return Number(curr.height) < Number(prev.height) ? curr : prev;
+    });
+  }, [tideData]);
+
+  const tideChartOption = useMemo(() => {
+    if (!tideData) {
+      return {};
+    }
+
+    const textColor = isDarkMode ? '#e5e7eb' : '#333';
+    const subTextColor = isDarkMode ? '#9ca3af' : '#666';
+
+    return {
+      tooltip: {
+        trigger: 'axis',
+        backgroundColor: isDarkMode
+          ? 'rgba(30, 41, 59, 0.95)'
+          : 'rgba(255, 255, 255, 0.95)',
+        borderColor: isDarkMode ? '#475569' : '#e5e7eb',
+        borderWidth: 1,
+        borderRadius: 8,
+      },
+      grid: {
+        left: '4%',
+        right: '4%',
+        bottom: '12%',
+        top: '10%',
+      },
+      xAxis: {
+        type: 'category',
+        data: tideData.tideHourly.map((point) => point.fxTime),
+        axisLabel: {
+          color: subTextColor,
+          fontSize: 11,
+          formatter: (value: string) => value.slice(11, 16),
+          interval: Math.max(1, Math.floor(tideData.tideHourly.length / 5)),
+        },
+        axisLine: {
+          lineStyle: {
+            color: isDarkMode ? '#334155' : '#e5e7eb',
+          },
+        },
+        axisTick: { show: false },
+      },
+      yAxis: {
+        type: 'value',
+        axisLabel: {
+          color: subTextColor,
+          fontSize: 11,
+          formatter: (value: number) => `${value}m`,
+        },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        splitLine: {
+          lineStyle: {
+            color: isDarkMode ? '#1e293b' : '#f1f5f9',
+            type: 'dashed',
+          },
+        },
+      },
+      series: [
+        {
+          data: tideData.tideHourly.map((point) => Number(point.height)),
+          type: 'line',
+          smooth: 0.4,
+          symbol: 'none',
+          lineStyle: {
+            color: '#06b6d4',
+            width: 2.5,
+          },
+          areaStyle: {
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [
+                { offset: 0, color: 'rgba(6, 182, 212, 0.25)' },
+                { offset: 0.7, color: 'rgba(6, 182, 212, 0.05)' },
+                { offset: 1, color: 'rgba(6, 182, 212, 0)' },
+              ],
+            },
+          },
+        },
+      ],
+      textStyle: {
+        color: textColor,
+      },
+    };
+  }, [isDarkMode, tideData]);
+
+  const clearRoute = useCallback(() => {
+    if (currentRouteRef.current && mapInstanceRef.current) {
+      mapInstanceRef.current.remove(currentRouteRef.current);
+      currentRouteRef.current = null;
+    }
+    setRouteInfo(null);
+    setSelectedSpotIndex(null);
+  }, []);
+
+  const getCurrentPosition = useCallback(async (): Promise<
+    [number, number]
+  > => {
+    if (!window.AMap || !mapInstanceRef.current) {
+      throw new Error('地图未初始化');
+    }
+
+    return await new Promise<[number, number]>((resolve, reject) => {
+      const geolocation = new window.AMap!.Geolocation({
+        enableHighAccuracy: true,
+        timeout: 10000,
+      });
+
+      geolocation.getCurrentPosition((status: string, result: unknown) => {
+        if (status === 'complete') {
+          const position = (result as GeolocationResult).position;
+          if (!position) {
+            reject(new Error('未获取到定位结果'));
+            return;
+          }
+          resolve([position.lng, position.lat]);
+          return;
+        }
+
+        const message =
+          (result as GeolocationResult)?.info || '定位失败，请检查定位权限';
+        reject(new Error(message));
+      });
+    });
+  }, []);
+
+  const planRoute = useCallback(
+    async (start: [number, number], end: [number, number]) => {
+      if (!window.AMap || !mapInstanceRef.current) {
+        throw new Error('地图未初始化');
+      }
+
+      if (!drivingRef.current) {
+        drivingRef.current = new window.AMap.Driving({
+          map: mapInstanceRef.current,
+          showTraffic: true,
+        });
+      }
+
+      clearRoute();
+
+      return await new Promise<RouteInfo>((resolve, reject) => {
+        drivingRef.current?.search(
+          start,
+          end,
+          (status: string, result: AMapDrivingResult | string) => {
+            if (
+              status !== 'complete' ||
+              typeof result === 'string' ||
+              !result.routes.length
+            ) {
+              reject(new Error('未找到可用路线'));
+              return;
+            }
+
+            const route = result.routes[0];
+            const path: [number, number][] = [];
+            route.steps.forEach((step) => {
+              path.push(...step.path);
+            });
+
+            const polyline = new window.AMap!.Polyline({
+              path,
+              strokeColor: '#1890ff',
+              strokeWeight: 6,
+              strokeOpacity: 0.9,
+              lineJoin: 'round',
+              lineCap: 'round',
+            });
+
+            mapInstanceRef.current!.add(polyline);
+            mapInstanceRef.current!.setFitView();
+            currentRouteRef.current = polyline;
+
+            resolve({
+              distance: route.distance,
+              time: route.time,
+            });
+          },
+        );
+      });
+    },
+    [clearRoute],
+  );
+
+  const handleMarkerClick = useCallback(
+    async (index: number) => {
+      const selectedSpot = fishingSpots[index];
+      if (!selectedSpot) {
+        notifyErrorRef.current('钓点不存在');
+        return;
+      }
+
+      setSelectedSpotIndex(index);
+      setIsPlanningRoute(true);
+
+      try {
+        const userPosition = await getCurrentPosition();
+        const route = await planRoute(userPosition, selectedSpot.position);
+        setRouteInfo(route);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : '路线规划失败';
+        notifyErrorRef.current(`路线规划失败：${message}`);
+      } finally {
+        setIsPlanningRoute(false);
+      }
+    },
+    [getCurrentPosition, planRoute],
+  );
+
+  const fetchWeather = useCallback(async () => {
+    setWeatherLoading(true);
+    setWeatherError('');
+
+    try {
+      const weatherData = await service.fetchWeatherAndLocation(MAP_CENTER);
+      setLiveWeather(weatherData.liveWeather);
+      setForecasts(weatherData.forecasts);
+      setLocationName(weatherData.locationName);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '获取天气失败';
+      setWeatherError(message);
+      notifyErrorRef.current(message);
+    } finally {
+      setWeatherLoading(false);
+    }
+  }, [service]);
+
+  const fetchTide = useCallback(async () => {
+    setTideLoading(true);
+
+    try {
+      const tideResult = await service.fetchTideData();
+      setTideData(tideResult.tideData);
+      setTideSpotName(tideResult.tideSpotName);
+    } catch {
+      notifyErrorRef.current('获取潮汐信息失败，请稍后重试');
+    } finally {
+      setTideLoading(false);
+    }
+  }, [service]);
+
+  const generateAnalysis = useCallback(async () => {
+    if (!analysisPayload || analysisLoading) {
+      return;
+    }
+
+    analysisAbortRef.current?.abort();
+    const controller = new AbortController();
+    analysisAbortRef.current = controller;
+    setAnalysisLoading(true);
+    setAnalysisError('');
+    setAnalysisResult('');
+
+    try {
+      await service.generateAnalysis(
+        analysisPayload,
+        (content) => {
+          setAnalysisResult((prev) => prev + content);
+        },
+        controller.signal,
+      );
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        return;
+      }
+      const message = error instanceof Error ? error.message : 'AI 分析失败';
+      setAnalysisError(message);
+      notifyErrorRef.current(message);
+    } finally {
+      if (analysisAbortRef.current === controller) {
+        analysisAbortRef.current = null;
+      }
+      setAnalysisLoading(false);
+    }
+  }, [analysisLoading, analysisPayload, service]);
+
+  useEffect(() => {
+    return () => {
+      analysisAbortRef.current?.abort();
+      analysisAbortRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    notifyErrorRef.current = notifyError;
+  }, [notifyError]);
+
+  useEffect(() => {
+    handleMarkerClickRef.current = handleMarkerClick;
+  }, [handleMarkerClick]);
+
+  useEffect(() => {
+    let unmounted = false;
+    let clickHandler: ((event: unknown) => void) | null = null;
+    const containerElement = mapContainerRef.current;
+
+    const initializeMap = async () => {
+      if (!containerElement || unmounted) {
+        return;
+      }
+
+      try {
+        const securityJsCode = await service.getSecurityJsCode();
+        window._AMapSecurityConfig = {
+          securityJsCode,
+        };
+
+        const mapApiKey = import.meta.env.VITE_JS_API;
+        if (!mapApiKey) {
+          throw new Error('缺少 VITE_JS_API 配置');
+        }
+
+        const AMap = await loadAMapScript(mapApiKey);
+        if (!containerElement || unmounted) {
+          return;
+        }
+
+        const map = new AMap.Map(containerElement, {
+          viewMode: '2D',
+          zoom: MAP_ZOOM,
+          center: MAP_CENTER,
+        });
+
+        mapInstanceRef.current = map;
+
+        map.addControl(new AMap.ToolBar({ position: 'RT' }));
+        map.addControl(new AMap.Scale());
+        map.addControl(
+          new AMap.Geolocation({
+            enableHighAccuracy: true,
+            timeout: 10000,
+            buttonPosition: 'RB',
+            buttonOffset: new AMap.Pixel(10, 18),
+          }),
+        );
+
+        const mapDriving = new AMap.Driving({
+          map,
+          showTraffic: true,
+        });
+        drivingRef.current = mapDriving;
+
+        markerInstancesRef.current = fishingSpots.map((markerData, index) => {
+          const marker = new AMap.Marker({
+            position: markerData.position,
+            content:
+              '<div style="width:18px;height:18px;border-radius:9999px;background:linear-gradient(135deg,#0ea5e9,#1d4ed8);box-shadow:0 4px 14px rgba(30,64,175,.45);border:2px solid rgba(255,255,255,.95);"></div>',
+            offset: new AMap.Pixel(-9, -9),
+          });
+
+          marker.on('click', () => {
+            void handleMarkerClickRef.current(index);
+          });
+
+          marker.setMap(map);
+          return marker;
+        });
+
+        clickHandler = () => undefined;
+        map.on('click', clickHandler);
+
+        setIsMapReady(true);
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : '地图初始化失败';
+        notifyErrorRef.current(message);
+      }
+    };
+
+    void initializeMap();
+
+    return () => {
+      unmounted = true;
+
+      markerInstancesRef.current.forEach((marker) => {
+        marker.setMap(null);
+      });
+      markerInstancesRef.current = [];
+
+      drivingRef.current?.clear();
+      drivingRef.current = null;
+
+      currentRouteRef.current = null;
+
+      if (mapInstanceRef.current && clickHandler) {
+        mapInstanceRef.current.off('click', clickHandler);
+      }
+
+      mapInstanceRef.current?.destroy();
+      mapInstanceRef.current = null;
+
+      if (containerElement) {
+        containerElement.innerHTML = '';
+      }
+    };
+  }, [service]);
+
+  useEffect(() => {
+    void fetchWeather();
+    void fetchTide();
+  }, [fetchTide, fetchWeather]);
+
+  useEffect(() => {
+    if (!analysisOpen) {
+      autoAnalysisAttemptRef.current = '';
+    }
+  }, [analysisOpen]);
+
+  useEffect(() => {
+    if (
+      analysisOpen &&
+      analysisHasData &&
+      !analysisResult &&
+      !analysisLoading &&
+      !analysisError
+    ) {
+      const fingerprint = JSON.stringify(analysisPayload);
+      if (autoAnalysisAttemptRef.current === fingerprint) {
+        return;
+      }
+      autoAnalysisAttemptRef.current = fingerprint;
+      void generateAnalysis();
+    }
+  }, [
+    analysisError,
+    analysisHasData,
+    analysisLoading,
+    analysisOpen,
+    analysisPayload,
+    analysisResult,
+    generateAnalysis,
+  ]);
+
   return (
-    <div className="min-h-dvh w-full p-5 pt-24">
-      <h1 className="font-serif text-2xl font-bold text-gray-800 dark:text-gray-100">
-        MyFishingMAP (Coming Soon)
-      </h1>
-      <p className="mt-2 text-gray-600 dark:text-gray-400">
-        钓鱼地图页面正在开发中...
-      </p>
+    <div className="relative min-h-dvh w-full bg-linear-to-b from-sky-50/90 to-white px-4 pt-22 pb-42 dark:from-slate-900 dark:to-slate-950">
+      <FishingMapHeader onBack={() => navigate(-1)} />
+
+      <section className="space-y-4">
+        <RouteStatusCard
+          isPlanningRoute={isPlanningRoute}
+          routeInfo={routeInfo}
+          selectedSpotIndex={selectedSpotIndex}
+          onClearRoute={clearRoute}
+        />
+
+        <MapPanel isMapReady={isMapReady} mapContainerRef={mapContainerRef} />
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <WeatherCard
+            weatherLoading={weatherLoading}
+            weatherError={weatherError}
+            liveWeather={liveWeather}
+            forecasts={forecasts}
+            locationName={locationName}
+          />
+          <TideCard
+            tideLoading={tideLoading}
+            tideData={tideData}
+            tideSpotName={tideSpotName}
+            tideChartOption={tideChartOption}
+            highTide={highTide}
+            lowTide={lowTide}
+          />
+        </div>
+      </section>
+
+      <AIAnalysisWidget
+        analysisOpen={analysisOpen}
+        analysisLoading={analysisLoading}
+        analysisError={analysisError}
+        analysisResult={analysisResult}
+        analysisHasData={analysisHasData}
+        onToggle={() => setAnalysisOpen((prev) => !prev)}
+        onClose={() => setAnalysisOpen(false)}
+        onGenerate={() => {
+          void generateAnalysis();
+        }}
+      />
     </div>
   );
 }

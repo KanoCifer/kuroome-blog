@@ -3,14 +3,20 @@ import { Suspense } from 'react';
 import { createBrowserRouter, redirect } from 'react-router-dom';
 import {
   About,
+  Changelog,
   BlogEdit,
   BlogList,
   BlogPost,
+  BookShelf,
   FishingMap,
   Home,
+  ImageToolbox,
+  ImportBook,
   Login,
   NotFound,
+  PicGallery,
   ProfileSetting,
+  ReadingList,
   Register,
   RssArticle,
   RssWorkspace,
@@ -64,6 +70,18 @@ export const router = createBrowserRouter([
         element: <FishingMap />,
       },
       {
+        path: '/gallery',
+        element: <PicGallery />,
+      },
+      {
+        path: '/toolbox/image-toolbox',
+        element: <ImageToolbox />,
+      },
+      {
+        path: '/changelog',
+        element: <Changelog />,
+      },
+      {
         path: '/about',
         element: <About />,
       },
@@ -92,6 +110,21 @@ export const router = createBrowserRouter([
       {
         path: '/rss/articles/:articleId',
         element: <RssArticle />,
+        loader: authLoader,
+      },
+      {
+        path: '/readinglist',
+        element: <ReadingList />,
+        loader: authLoader,
+      },
+      {
+        path: '/bookshelf',
+        element: <BookShelf />,
+        loader: authLoader,
+      },
+      {
+        path: '/import',
+        element: <ImportBook />,
         loader: authLoader,
       },
       {

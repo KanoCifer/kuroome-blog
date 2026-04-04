@@ -429,14 +429,6 @@ async def passkey_authenticate(
     return _build_login_response(
         user, user.profile, tokens, message="Passkey 登录成功"
     )
-    if error:
-        return APIResponse.error(
-            message=error, code=status.HTTP_400_BAD_REQUEST
-        )
-
-    return _build_login_response(
-        user, user.profile, tokens, message="Passkey 登录成功"
-    )
 
 
 # ------------------------------------------------------------------ #

@@ -75,7 +75,7 @@ export default function BasicDetail({
       <div className="relative mt-24 w-full">
         <div className="absolute left-1/2 -z-5 h-full w-full -translate-x-1/2 rounded-t-[40px] bg-blue-50 dark:bg-slate-900"></div>
         <div className="mx-auto max-w-6xl">
-          <div className="mx-8 grid grid-cols-1 gap-6 pt-24 max-sm:mx-2 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mx-8 grid grid-cols-1 gap-6 pt-24 max-sm:mx-6 sm:grid-cols-2 lg:grid-cols-3">
             {/* <!-- Content slots --> */}
             {children}
           </div>
