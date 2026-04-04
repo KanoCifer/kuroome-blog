@@ -387,7 +387,9 @@ class UserService:
 
         Returns (user, tokens, None) on success, (None, None, error_msg) on failure.
         """
-        origin = "http://localhost:5174"  # TODO: Make this configurable in production
+        origin = str(request.base_url)[
+            :-1
+        ]  # Remove trailing slash from base URL
 
         # Parse challenge from clientDataJSON
         try:
