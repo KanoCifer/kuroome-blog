@@ -146,41 +146,40 @@
       </div>
     </div>
 
-          <div
-        class="rounded-2xl border border-white/50 bg-white/80 p-2 shadow-[0_10px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-gray-900/80"
-      >
-        <div class="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            @click="toggleEditMode"
-            class="h-10 flex-1 gap-2 rounded-xl border-gray-200/70 px-3 shadow-sm dark:border-gray-700"
-            :class="isEditMode ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' : ''"
-          >
-            <component :is="isEditMode ? Check : Edit2" class="h-4 w-4" />
-            {{ isEditMode ? "完成编辑" : "编辑模式" }}
-          </Button>
+    <div
+      class="rounded-2xl border border-white/50 bg-white/80 p-2 shadow-[0_10px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-gray-900/80"
+    >
+      <div class="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          @click="toggleEditMode"
+          class="h-10 flex-1 gap-2 rounded-xl border-gray-200/70 px-3 shadow-sm dark:border-gray-700"
+          :class="isEditMode ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' : ''"
+        >
+          <component :is="isEditMode ? Check : Edit2" class="h-4 w-4" />
+          {{ isEditMode ? "完成编辑" : "编辑模式" }}
+        </Button>
 
-          <Button
-            v-if="isEditMode"
-            variant="outline"
-            size="sm"
-            @click="shuffleImages"
-            class="h-10 rounded-xl border-gray-200/70 px-3 shadow-sm dark:border-gray-700"
-          >
-            <Shuffle class="h-4 w-4" />
-          </Button>
+        <Button
+          v-if="isEditMode"
+          variant="outline"
+          size="sm"
+          @click="shuffleImages"
+          class="h-10 rounded-xl border-gray-200/70 px-3 shadow-sm dark:border-gray-700"
+        >
+          <Shuffle class="h-4 w-4" />
+        </Button>
 
-          <Button
-            v-if="isEditMode"
-            variant="default"
-            size="sm"
-            @click="openUploadModal"
-            class="h-10 rounded-xl bg-gray-900 px-3 shadow-sm hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-white"
-          >
-            <Upload class="h-4 w-4" />
-          </Button>
-        </div>
+        <Button
+          v-if="isEditMode"
+          variant="default"
+          size="sm"
+          @click="openUploadModal"
+          class="h-10 rounded-xl bg-gray-900 px-3 shadow-sm hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-white"
+        >
+          <Upload class="h-4 w-4" />
+        </Button>
       </div>
     </div>
 
