@@ -1,11 +1,15 @@
 import type { BlogListItem, CategoryItem } from '@/services/blogService';
 import { blogService } from '@/services/blogService';
-import type { BlogPagination } from '@/types';
+import type { BlogPagination as BlogPaginationType } from '@/types';
 import { formatDate } from '@/utils/formatdate';
 import DOMPurify from 'dompurify';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { BlogEmptyState } from './components/BlogEmptyState';
+import { BlogErrorState } from './components/BlogErrorState';
+import { BlogLoadingSkeleton } from './components/BlogLoadingSkeleton';
+import { BlogPagination } from './components/BlogPagination';
 import { CategorySidebar } from './components/CategorySidebar';
 
 function getPreviewHtml(html: string): string {
@@ -140,187 +144,6 @@ function PostCard({ post, index }: PostCardProps) {
   );
 }
 
-function LoadingSkeleton() {
-  return (
-    <div className="space-y-4">
-      {[1, 2, 3].map((i) => (
-        <div
-          key={i}
-          className="animate-pulse rounded-2xl bg-white p-4 dark:bg-gray-900"
-        >
-          <div className="h-6 w-3/4 rounded-lg bg-gray-200 dark:bg-gray-800" />
-          <div className="mt-3 h-4 w-1/4 rounded bg-gray-200 dark:bg-gray-800" />
-          <div className="mt-3 space-y-2">
-            <div className="h-3 w-full rounded bg-gray-200 dark:bg-gray-800" />
-            <div className="h-3 w-5/6 rounded bg-gray-200 dark:bg-gray-800" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function ErrorState({
-  message,
-  onRetry,
-}: {
-  message: string;
-  onRetry: () => void;
-}) {
-  return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-red-200 bg-red-50/50 p-8 text-center dark:border-red-800/50 dark:bg-red-900/20">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-12 w-12 text-red-400"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth="1.5"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-        />
-      </svg>
-      <p className="mt-4 text-lg font-medium text-red-600 dark:text-red-400">
-        加载失败
-      </p>
-      <p className="mt-1 text-sm text-red-500">{message}</p>
-      <button
-        onClick={onRetry}
-        className="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 active:scale-95 transition-transform"
-      >
-        重试
-      </button>
-    </div>
-  );
-}
-
-function EmptyState({ hasCategory }: { hasCategory: boolean }) {
-  return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50/50 p-8 text-center dark:border-gray-700/50 dark:bg-gray-900/30">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-12 w-12 text-gray-300 dark:text-gray-600"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth="1.5"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
-        />
-      </svg>
-      <p className="mt-4 text-base font-medium text-gray-500">暂无文章</p>
-      <p className="mt-1 text-sm text-gray-400">
-        {hasCategory ? '该分类下还没有文章' : '稍后再来看看吧'}
-      </p>
-    </div>
-  );
-}
-
-function Pagination({
-  pagination,
-  currentPage,
-  onPageChange,
-}: {
-  pagination: BlogPagination;
-  currentPage: number;
-  onPageChange: (page: number) => void;
-}) {
-  const getVisiblePages = () => {
-    const pages: (number | string)[] = [];
-    const { page, pages: totalPages } = pagination;
-
-    if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else {
-      pages.push(1);
-      if (page > 3) pages.push('...');
-      for (
-        let i = Math.max(2, page - 1);
-        i <= Math.min(totalPages - 1, page + 1);
-        i++
-      ) {
-        pages.push(i);
-      }
-      if (page < totalPages - 2) pages.push('...');
-      pages.push(totalPages);
-    }
-    return pages;
-  };
-
-  return (
-    <nav className="flex justify-center gap-1" aria-label="分页">
-      <button
-        disabled={!pagination.has_prev}
-        onClick={() => onPageChange(pagination.prev_num || 1)}
-        className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:text-gray-400"
-      >
-        <svg
-          className="h-5 w-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
-      </button>
-
-      {getVisiblePages().map((p, i) =>
-        typeof p === 'number' ? (
-          <button
-            key={i}
-            onClick={() => onPageChange(p)}
-            className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium transition-colors ${
-              p === currentPage
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
-            }`}
-          >
-            {p}
-          </button>
-        ) : (
-          <span
-            key={i}
-            className="flex h-10 w-10 items-center justify-center text-gray-400"
-          >
-            {p}
-          </span>
-        ),
-      )}
-
-      <button
-        disabled={!pagination.has_next}
-        onClick={() => onPageChange(pagination.next_num || pagination.pages)}
-        className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:text-gray-400"
-      >
-        <svg
-          className="h-5 w-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M9 5l7 7-7 7"
-          />
-        </svg>
-      </button>
-    </nav>
-  );
-}
-
 export default function BlogListView() {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -329,7 +152,7 @@ export default function BlogListView() {
   const [categoryCounts, setCategoryCounts] = useState<Record<number, number>>(
     {},
   );
-  const [pagination, setPagination] = useState<BlogPagination | null>(null);
+  const [pagination, setPagination] = useState<BlogPaginationType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -356,8 +179,13 @@ export default function BlogListView() {
           const result = await service.getPostsByCategory(categoryId);
           setPosts(
             result.posts.map((post) => ({
-              ...post,
+              _id: post._id,
+              title: post.title,
+              body: post.body,
+              category: post.category,
               is_pinned: false,
+              created_at: post.created_at,
+              updated_at: post.updated_at,
               comment_count: 0,
             })),
           );
@@ -432,7 +260,7 @@ export default function BlogListView() {
     <div className="min-h-dvh bg-gray-50 dark:bg-slate-950">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md dark:bg-gray-900/80">
-        <div className="mx-auto max-w-2xl px-4 py-4">
+        <div className="ml-12 max-w-2xl px-4 py-4">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             博客
           </h1>
@@ -514,11 +342,11 @@ export default function BlogListView() {
       <div ref={listRef} className="mx-auto max-w-2xl px-4 pb-8">
         <AnimatePresence mode="wait">
           {isLoading ? (
-            <LoadingSkeleton key="loading" />
+            <BlogLoadingSkeleton key="loading" />
           ) : error ? (
-            <ErrorState key="error" message={error} onRetry={handleRetry} />
+            <BlogErrorState key="error" message={error} onRetry={handleRetry} />
           ) : posts.length === 0 ? (
-            <EmptyState key="empty" hasCategory={activeCategoryId !== null} />
+            <BlogEmptyState key="empty" hasCategory={activeCategoryId !== null} />
           ) : (
             <motion.div
               key="posts"
@@ -537,7 +365,7 @@ export default function BlogListView() {
         {/* Pagination */}
         {!isLoading && !error && pagination && pagination.pages > 1 && (
           <div className="mt-8">
-            <Pagination
+            <BlogPagination
               pagination={pagination}
               currentPage={currentPage}
               onPageChange={handlePageChange}

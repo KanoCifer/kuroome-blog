@@ -63,7 +63,7 @@
       </div>
       <!-- Map Container -->
       <div
-        class="squircle relative overflow-hidden border border-gray-200/60 bg-white/30 shadow-md max-sm:h-80 dark:border-gray-800 dark:bg-gray-900/70"
+        class="squircle relative overflow-hidden border border-gray-200/60 bg-white/30 shadow-md dark:border-gray-800 dark:bg-gray-900/70"
       >
         <MapContainer
           ref="mapContainerRef"
@@ -89,7 +89,7 @@
     </div>
 
     <!-- Floating AI Analysis -->
-    <div class="fixed right-6 bottom-0 z-50 max-sm:bottom-45 max-sm:left-4">
+    <div class="fixed right-6 bottom-0 z-50">
       <transition
         enter-active-class="transition-all duration-300 ease-out"
         enter-from-class="opacity-0 translate-y-4 scale-95"

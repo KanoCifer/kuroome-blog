@@ -1,10 +1,11 @@
 import { BentoCard } from '@/components/bento/BentoCard';
 import { useTodoState } from '@/stores/todoState';
+import { BookCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function BentoTodo() {
   const todo = useTodoState();
-  const title = '待办事项';
+  const title = 'TODO List';
   const todos = todo.todos;
   const completedCount = todos.filter((t) => t.completed).length;
 
@@ -38,10 +39,10 @@ export function BentoTodo() {
   return (
     <BentoCard>
       {/* <!-- Inner wrapper --> */}
-      <div className="flex h-full flex-col p-6">
+      <div className="flex h-full flex-col">
         {/* <!-- Header --> */}
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-sm font-semibold tracking-wide text-gray-900 dark:text-gray-100">
+          <h3 className="text-xs font-bold tracking-wide text-neutral-500 uppercase transition-colors duration-300 group-hover:text-neutral-600 dark:text-neutral-400 dark:group-hover:text-neutral-300">
             {title}
           </h3>
           <div className="flex items-center gap-2">
@@ -67,24 +68,6 @@ export function BentoTodo() {
                 />
               </svg>
             </Link>
-            <button
-              className="cursor-pointer rounded-md p-1 text-gray-400 outline-0 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-gray-100"
-              title="隐藏待办卡片"
-            >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
           </div>
         </div>
 
@@ -96,8 +79,9 @@ export function BentoTodo() {
 
             {/* <!-- Empty state --> */}
             {todos.length === 0 && (
-              <div className="flex h-full flex-col items-center justify-center py-6 text-gray-400 dark:text-gray-600">
-                <span className="text-sm font-medium tracking-wide">
+              <div className="flex h-full flex-col items-center justify-center py-6 text-gray-100 dark:text-gray-600">
+                <span className="text-md font-medium tracking-wide flex-col items-center gap-2 flex">
+                  <BookCheck className="size-12" />
                   所有任务已完成
                 </span>
               </div>

@@ -16,7 +16,7 @@ const AboutIMG = "/images/about.webp";
       class="mx-auto mt-36 flex max-w-6xl flex-col items-center justify-center"
     >
       <div
-        class="squircle border border-gray-100 bg-white/70 p-8 shadow-sm transition-all duration-300 hover:shadow-md max-sm:mx-2 md:p-12 dark:border-gray-700 dark:bg-gray-800/80"
+        class="squircle border border-gray-100 bg-white/70 p-8 shadow-sm transition-all duration-300 hover:shadow-md md:p-12 dark:border-gray-700 dark:bg-gray-800/80"
       >
         <div
           class="flex flex-col items-center gap-8 md:flex-row md:items-center md:gap-12"
@@ -33,7 +33,7 @@ const AboutIMG = "/images/about.webp";
           </div>
           <!-- 分割线 -->
           <div
-            class="h-72 outline outline-stone-600/80 max-sm:hidden dark:outline-stone-100/80"
+            class="h-72 outline outline-stone-600/80 dark:outline-stone-100/80"
           ></div>
 
           <div class="flex-1 space-y-6 text-center md:text-left">

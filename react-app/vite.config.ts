@@ -57,6 +57,14 @@ export default defineConfig({
             id.includes('moment')
           )
             return 'date';
+
+          // ✅ ECharts（体积大，单独打包）
+          if (
+            id.includes('echarts') ||
+            id.includes('echarts-for-react')
+          ) {
+            return 'echarts';
+          }
         },
       },
       // 忽略 lottie-web 的 eval 警告

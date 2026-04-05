@@ -6,6 +6,7 @@ import MarkdownEditor, {
 import type { CategoryItem } from '@/services/blogService';
 import { blogService } from '@/services/blogService';
 import { useNotificationStore } from '@/stores/notificationState';
+import { motion } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -227,7 +228,12 @@ export default function BlogEditView() {
   };
 
   return (
-    <div className="flex h-full flex-col bg-white dark:bg-gray-900">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="flex h-full flex-col bg-white dark:bg-gray-900"
+    >
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
         <button
@@ -478,6 +484,6 @@ export default function BlogEditView() {
           </form>
         ) : null}
       </div>
-    </div>
+    </motion.div>
   );
 }

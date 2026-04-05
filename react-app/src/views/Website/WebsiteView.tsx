@@ -34,7 +34,7 @@ export default function WebsiteView() {
         rel="noopener noreferrer"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="bg-gray-50 squircle dark:bg-gray-700 p-5 shadow-lg"
+        className="bg-gray-50 squircle dark:bg-gray-700 p-5 shadow-lg mx-4"
       >
         <div className="mb-4 flex items-start gap-4">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-700">

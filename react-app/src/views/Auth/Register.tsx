@@ -1,9 +1,38 @@
 import { useNotificationStore } from '@/stores/notificationState';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, ShieldUser } from 'lucide-react';
+import { useEffect } from 'react';
 import axios from 'axios';
 import request from '@/api/request';
+
+function IconCloud({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="24"
+      height="24"
+      viewBox="0 0 48 48"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 33C8.66666 33 4 31.5 4 25.5C4 18.5 11 17 13 17C14 13.5 16 8 24 8C31 8 34 12 35 15.5C35 15.5 44 16.5 44 25C44 31 40 33 36 33"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M18 33L24 38L32 28"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 interface FormErrors {
   username?: string;
@@ -29,10 +58,17 @@ export default function Register() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSendingCode, setIsSendingCode] = useState(false);
-  const [sendCodeText, setSendCodeText] = useState('SendCode');
+  const [sendCodeText, setSendCodeText] = useState('Send Code');
   const [isSent, setIsSent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsReady(true);
+    }, 50);
+  }, []);
 
   const sendEmailCode = async () => {
     if (!form.email) {
@@ -133,176 +169,232 @@ export default function Register() {
   };
 
   return (
-    <div className="flex min-h-dvh items-center">
-      <div className="squircle mx-auto max-w-md bg-blue-50/50 px-12 py-14 shadow-2xl dark:bg-gray-800/50">
-        <p className="text-center font-serif text-2xl font-bold text-shadow-md dark:text-white">
-          Register
-        </p>
-        <p className="mb-12 text-center font-serif text-gray-500 italic dark:text-gray-400">
-          Create an account to start managing your reading list!
-        </p>
-
-        <form onSubmit={handleSubmit}>
-          {/* Username */}
-          <div className="form-group">
-            <input
-              type="text"
-              autoComplete="off"
-              placeholder="Username"
-              value={form.username}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, username: e.target.value }))
-              }
-              className="form-control my-4 w-full rounded-xl border border-gray-300 bg-gray-100/50 px-4 py-2 text-gray-900 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
-              required
-            />
-            {errors.username && (
-              <span className="mt-1 block text-sm text-red-600 dark:text-red-400">
-                {errors.username}
-              </span>
-            )}
+    <div className="font-body relative min-h-screen bg-gray-50 dark:bg-gray-800 overflow-hidden">
+      {/* Main Content */}
+      <main className="relative z-10 mt-4 flex flex-col items-center px-5 pt-8 pb-10">
+        {/* Hero Section */}
+        <div
+          className={`mb-8 flex flex-col items-center justify-center transition-all duration-700 ease-out ${
+            isReady ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+          }`}
+        >
+          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[#2563eb] text-white shadow-[0_8px_16px_rgba(37,99,235,0.25)]">
+            <IconCloud className="size-8" />
           </div>
+          <h2 className="font-headline text-center text-[28px] font-extrabold tracking-tight text-[#111827] dark:text-white">
+            Join kanocifer
+            <span className="text-[#2563eb] dark:text-blue-400">.chat</span>
+          </h2>
+          <p className="mt-1 text-center text-[15px] font-medium text-[#4b5563] dark:text-gray-400">
+            Create your account to start managing your reading list!
+          </p>
+        </div>
 
-          {/* Email */}
-          <div className="form-group">
-            <input
-              type="email"
-              autoComplete="off"
-              placeholder="Email"
-              value={form.email}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, email: e.target.value }))
-              }
-              className="form-control my-4 w-full rounded-xl border border-gray-300 bg-gray-100/50 px-4 py-2 text-gray-900 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
-              required
-            />
-            {errors.email && (
-              <span className="mt-1 block text-sm text-red-600 dark:text-red-400">
-                {errors.email}
-              </span>
-            )}
-          </div>
-
-          {/* Password */}
-          <div className="form-group relative">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              autoComplete="off"
-              placeholder="Password"
-              value={form.password}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, password: e.target.value }))
-              }
-              className="form-control my-4 w-full rounded-xl border border-gray-300 bg-gray-100/50 px-4 py-2 text-gray-900 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 transform text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-            {errors.password && (
-              <span className="mt-1 block text-sm text-red-600 dark:text-red-400">
-                {errors.password}
-              </span>
-            )}
-          </div>
-
-          {/* Confirm Password */}
-          <div className="form-group relative">
-            <input
-              type={showConfirmPassword ? 'text' : 'password'}
-              autoComplete="off"
-              placeholder="Confirm Password"
-              value={form.confirmPassword}
-              onChange={(e) =>
-                setForm((prev) => ({
-                  ...prev,
-                  confirmPassword: e.target.value,
-                }))
-              }
-              className="form-control my-4 w-full rounded-xl border border-gray-300 bg-gray-100/50 px-4 py-2 text-gray-900 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowConfirmPassword((prev) => !prev)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 transform text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-            >
-              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-            {errors.confirmPassword && (
-              <span className="mt-1 block text-sm text-red-600 dark:text-red-400">
-                {errors.confirmPassword}
-              </span>
-            )}
-          </div>
-
-          {/* Email Code */}
-          <div className="mt-4 flex items-end gap-2">
-            <div className="form-group mb-0 flex w-full items-center gap-2">
-              <input
-                type="text"
-                autoComplete="off"
-                placeholder="Email Code"
-                value={form.emailCode}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, emailCode: e.target.value }))
-                }
-                className="form-control my-4 w-full rounded-xl border border-gray-300 bg-gray-100/50 px-4 py-2 text-gray-900 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
-                required
-              />
-              <button
-                type="button"
-                id="send-code"
-                onClick={sendEmailCode}
-                disabled={isSendingCode || isSent}
-                className="h-full items-center gap-2 rounded-xl bg-blue-600 px-8 py-2.5 font-bold text-white shadow-lg shadow-blue-500/30 transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-progress disabled:bg-blue-950 dark:ring-offset-gray-800"
-              >
-                {sendCodeText}
-              </button>
+        {/* Register Card */}
+        <div
+          className={`w-full max-w-100 rounded-4xl border border-white/50 bg-white/70 p-6 shadow-xl transition-all delay-100 duration-700 ease-out dark:border-slate-700/50 dark:bg-slate-800/60 ${
+            isReady ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+          }`}
+        >
+          <form className="flex flex-col" onSubmit={handleSubmit}>
+            {/* Username Field */}
+            <div className="mb-5">
+              <label className="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">
+                Username
+              </label>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
+                  <ShieldUser className="size-6" />
+                </div>
+                <input
+                  type="text"
+                  autoComplete="off"
+                  placeholder="Enter your username"
+                  value={form.username}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, username: e.target.value }))
+                  }
+                  className="w-full rounded-2xl border-0 bg-gray-100 py-3.5 pr-4 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white"
+                />
+              </div>
+              {errors.username && (
+                <span className="mt-1 block pl-1 text-[12px] font-medium text-red-500">
+                  {errors.username}
+                </span>
+              )}
             </div>
-          </div>
-          {errors.emailCode && (
-            <span className="mt-1 block text-sm text-red-600 dark:text-red-400">
-              {errors.emailCode}
-            </span>
-          )}
 
-          {/* Submit Button */}
-          <div className="mt-6">
+            {/* Email Field */}
+            <div className="mb-5">
+              <label className="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">
+                Email
+              </label>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
+                  <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <input
+                  type="email"
+                  autoComplete="off"
+                  placeholder="Enter your email"
+                  value={form.email}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, email: e.target.value }))
+                  }
+                  className="w-full rounded-2xl border-0 bg-gray-100 py-3.5 pr-4 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white"
+                />
+              </div>
+              {errors.email && (
+                <span className="mt-1 block pl-1 text-[12px] font-medium text-red-500">
+                  {errors.email}
+                </span>
+              )}
+            </div>
+
+            {/* Password Field */}
+            <div className="mb-5">
+              <label className="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">
+                Password
+              </label>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
+                  <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="off"
+                  placeholder="••••••••"
+                  value={form.password}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, password: e.target.value }))
+                  }
+                  className="w-full rounded-2xl border-0 bg-gray-100 py-3.5 pr-12 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#9ca3af] transition-all duration-200 hover:text-[#2563eb] dark:hover:text-blue-400"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
+                </button>
+              </div>
+              {errors.password && (
+                <span className="mt-1 block pl-1 text-[12px] font-medium text-red-500">
+                  {errors.password}
+                </span>
+              )}
+            </div>
+
+            {/* Confirm Password Field */}
+            <div className="mb-5">
+              <label className="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
+                  <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  autoComplete="off"
+                  placeholder="••••••••"
+                  value={form.confirmPassword}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, confirmPassword: e.target.value }))
+                  }
+                  className="w-full rounded-2xl border-0 bg-gray-100 py-3.5 pr-12 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#9ca3af] transition-all duration-200 hover:text-[#2563eb] dark:hover:text-blue-400"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
+                </button>
+              </div>
+              {errors.confirmPassword && (
+                <span className="mt-1 block pl-1 text-[12px] font-medium text-red-500">
+                  {errors.confirmPassword}
+                </span>
+              )}
+            </div>
+
+            {/* Email Code Field */}
+            <div className="mb-5">
+              <label className="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">
+                Email Code
+              </label>
+              <div className="flex gap-3">
+                <div className="relative flex-1">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
+                    <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    autoComplete="off"
+                    placeholder="Enter code"
+                    value={form.emailCode}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, emailCode: e.target.value }))
+                    }
+                    className="w-full rounded-2xl border-0 bg-gray-100 py-3.5 pr-4 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white"
+                  />
+                </div>
+                <button
+                  type="button"
+                  id="send-code"
+                  onClick={sendEmailCode}
+                  disabled={isSendingCode || isSent}
+                  className="shrink-0 rounded-full bg-blue-500 px-6 py-3.5 text-[14px] font-bold text-white shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all hover:bg-[#1e3a8a]/90 active:scale-[0.98] disabled:opacity-70 dark:bg-blue-600 dark:hover:bg-blue-600/90"
+                >
+                  {isSendingCode ? '...' : isSent ? 'Sent!' : sendCodeText}
+                </button>
+              </div>
+              {errors.emailCode && (
+                <span className="mt-1 block pl-1 text-[12px] font-medium text-red-500">
+                  {errors.emailCode}
+                </span>
+              )}
+            </div>
+
+            {/* Register Button */}
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-blue-600 px-8 py-2.5 font-bold text-white shadow-lg shadow-blue-500/30 transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none dark:ring-offset-gray-800"
+              className="mb-4 w-full rounded-full bg-blue-500 py-4 text-[15px] font-bold text-white shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all hover:bg-[#1e3a8a]/90 active:scale-[0.98] disabled:opacity-70 dark:bg-blue-600 dark:hover:bg-blue-600/90"
             >
-              {isSubmitting ? 'Registering...' : 'Register'}
+              {isSubmitting ? 'Creating Account...' : 'Create Account'}
             </button>
+
+            {errors.submit && (
+              <div className="mt-4 text-center text-[12px] font-medium text-red-500 p-2 bg-red-100 rounded-2xl">
+                {errors.submit}
+              </div>
+            )}
+          </form>
+
+          {/* Login Link */}
+          <div className="mt-8 text-center">
+            <p className="text-[14.5px] font-medium text-[#4b5563] dark:text-gray-300">
+              Already have an account?
+              <Link
+                to="/login"
+                className="ml-1 font-bold text-[#1d4ed8] hover:underline dark:text-blue-400"
+              >
+                Login here
+              </Link>
+            </p>
           </div>
-
-          {errors.submit && (
-            <span className="mt-2 block text-center text-sm text-red-600 dark:text-red-400">
-              {errors.submit}
-            </span>
-          )}
-        </form>
-
-        <p className="mt-8 text-center font-serif text-gray-400">
-          Kuroome's Blog
-        </p>
-        <div className="mb-4 text-center text-gray-400 dark:text-gray-300">
-          Already have an account?
-          <Link
-            to="/login"
-            className="underline transition duration-100 hover:font-bold"
-          >
-            {' '}
-            Login here.{' '}
-          </Link>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

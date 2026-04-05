@@ -1,9 +1,11 @@
+import { BentoNavSidebar } from '@/components/basic/BasicSidebar';
 import { TrackEvent } from '@/utils/visitorTracker';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Outlet } from 'react-router-dom';
 import { BackToTop } from './BackToTop';
 import { BasicNav } from './BasicNav';
+import { NavVisibilityProvider } from './NavVisibilityContext';
 import { Notifier } from './NotificationContainer';
 
 export function BasicLayout() {
@@ -24,8 +26,9 @@ export function BasicLayout() {
   );
 
   return (
-    <>
+    <NavVisibilityProvider>
       <TrackEvent />
+      <BentoNavSidebar />
       <div className="relative isolate grid min-h-dvh grid-rows-[auto_1fr_auto]">
         <div
           style={{ backgroundImage: `url(${backgroundUrl})` }}
@@ -41,6 +44,6 @@ export function BasicLayout() {
       </div>
 
       {createPortal(<Notifier />, document.body)}
-    </>
+    </NavVisibilityProvider>
   );
 }

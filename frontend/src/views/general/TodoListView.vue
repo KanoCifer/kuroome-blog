@@ -239,7 +239,7 @@
 
             <!-- Actions -->
             <div
-              class="flex shrink-0 items-center gap-1 opacity-0 transition-opacity duration-300 group-hover:opacity-100 max-sm:opacity-100"
+              class="flex shrink-0 items-center gap-1 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
             >
               <button
                 v-if="!todo.archived"

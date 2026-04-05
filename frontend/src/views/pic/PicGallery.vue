@@ -11,7 +11,6 @@
 
     <!-- Header -->
     <header
-      v-if="!isMobileDevice"
       class="sticky top-0 z-30 border-b border-white/40 bg-white/70 shadow-[inset_0_-1px_0_rgba(255,255,255,0.5)] backdrop-blur-2xl dark:border-white/10 dark:bg-gray-950/70 dark:shadow-none"
     >
       <div class="mx-auto flex max-w-6xl items-center justify-end px-6 py-4">
@@ -97,7 +96,7 @@
         <!-- Polaroid Frame -->
         <div
           class="group relative flex flex-col items-center rounded-sm bg-white p-2 shadow-xl ring-1 ring-black/5 transition-shadow hover:shadow-2xl sm:p-3 dark:bg-gray-800 dark:ring-white/10"
-          :style="{ width: `${getImageSize(index) + (isMobileDevice ? 16 : 24)}px` }"
+          :style="{ width: `${getImageSize(index) + 24}px` }"
         >
           <div
             class="relative w-full overflow-hidden rounded-sm bg-gray-100 dark:bg-gray-900"
@@ -147,11 +146,7 @@
       </div>
     </div>
 
-    <div
-      v-if="canEdit && isMobileDevice"
-      class="fixed bottom-[calc(env(safe-area-inset-bottom)+5.75rem)] left-1/2 z-45 w-fit -translate-x-1/2 md:hidden"
-    >
-      <div
+          <div
         class="rounded-2xl border border-white/50 bg-white/80 p-2 shadow-[0_10px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-gray-900/80"
       >
         <div class="flex items-center gap-2">
@@ -411,7 +406,6 @@
 import { Button } from "@/components/ui/button";
 import { galleryService } from "@/service/galleryService";
 import { useAuthStore } from "@/stores/auth";
-import { useDeviceStore } from "@/stores/device";
 import { useNotificationStore } from "@/stores/notification";
 import dayjs from "dayjs";
 import {
@@ -443,9 +437,7 @@ interface Picture {
 const images = ref<Picture[]>([]);
 const galleryRef = ref<HTMLElement | null>(null);
 const authStore = useAuthStore();
-const deviceStore = useDeviceStore();
 const canEdit = computed(() => authStore.isAdmin);
-const isMobileDevice = computed(() => deviceStore.isMobile);
 
 // Random layout seeds (cached per image index)
 const layoutSeeds = ref<Map<number, { x: number; y: number; rotation: number; zIndex: number }>>(new Map());
@@ -573,9 +565,6 @@ const getImageStyle = (index: number) => {
 const getImageSize = (index: number) => {
   // Use index to consistently determine size for the same image
   const seed = (index * 137) % 100;
-  if (isMobileDevice.value) {
-    return 120 + (seed % 46);
-  }
   return 220 + seed;
 };
 

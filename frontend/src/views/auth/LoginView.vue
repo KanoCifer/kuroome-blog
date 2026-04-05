@@ -4,16 +4,13 @@ import IconKey from "@/components/icons/IconKey.vue";
 import IconLock from "@/components/icons/IconLock.vue";
 import IconUser from "@/components/icons/IconUser.vue";
 import { useAuthStore } from "@/stores/auth";
-import { useDeviceStore } from "@/stores/device";
 import type { LoginForm } from "@/types";
 import { startAuthentication } from "@simplewebauthn/browser";
 import { ref } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
-import MobileLogin from "./MobileLogin.vue";
 const router = useRouter();
 const route = useRoute();
 const auth = useAuthStore();
-const device = useDeviceStore();
 
 const form = ref<LoginForm>({
   username: "",
@@ -85,8 +82,7 @@ const handleGitHubLogin = () => {
 
 <template>
   <div>
-    <MobileLogin v-if="device.isMobile" />
-    <div v-else class="flex h-screen items-center">
+    <div class="flex h-screen items-center">
       <!-- 标题卡片 -->
       <div class="squircle mx-auto max-w-md bg-blue-50/50 px-12 py-14 shadow-2xl dark:bg-gray-800/50">
         <!-- Hero Section -->

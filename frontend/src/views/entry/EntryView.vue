@@ -1,9 +1,7 @@
 <template>
   <div>
-    <MobileDashboard v-show="useDeviceStore().isMobile" @switchBackground="switchBackground" />
     <div
-      v-show="!useDeviceStore().isMobile"
-      class="relative min-h-dvh w-full snap-start space-y-2 max-sm:flex max-sm:flex-col max-sm:gap-4 max-sm:overflow-x-hidden max-sm:p-4 max-sm:pt-14"
+      class="relative min-h-dvh w-full snap-start space-y-2"
       :style="containerStyle"
       ref="parentContainer"
     >
@@ -34,7 +32,7 @@
         :initial="{ scale: 0 }"
         :animate="{ scale: 1 }"
         :style="greetingPosition"
-        class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 cursor-pointer max-sm:static! max-sm:order-1 max-sm:w-full! max-sm:min-w-0 max-sm:translate-0!"
+        class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 cursor-pointer"
       />
       <BentoProfileCard
         v-if="show.BentoProfileCard"
@@ -42,7 +40,7 @@
         :animate="{ scale: 1, opacity: 1 }"
         ref="boxRef"
         :style="profilePosition"
-        class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:order-2 max-sm:w-full! max-sm:min-w-0 max-sm:translate-0!"
+        class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2"
       />
       <AnimatePresence>
         <BentoNavCard
@@ -56,7 +54,7 @@
             stiffness: 400,
             damping: 30,
           }"
-          class="absolute w-68 -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-3 max-sm:w-full! max-sm:translate-0!"
+          class="absolute w-68 -translate-x-1/2 -translate-y-1/2"
           :style="navCardPosition"
         />
       </AnimatePresence>
@@ -66,7 +64,7 @@
         :animate="{ scale: 1 }"
         ref="clockRef"
         :style="clockCardPosition"
-        class="absolute w-auto -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-5 max-sm:w-full! max-sm:translate-0!"
+        class="absolute w-auto -translate-x-1/2 -translate-y-1/2"
       />
       <BentoCalendar
         v-if="show.BentoCalendar"
@@ -74,30 +72,30 @@
         :animate="{ scale: 1 }"
         ref="calRef"
         :style="calendarPosition"
-        class="absolute w-2xs -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-7 max-sm:w-full! max-sm:translate-0!"
+        class="absolute w-2xs -translate-x-1/2 -translate-y-1/2"
       />
       <BentoMemo
         v-if="show.BentoMemo"
         :style="memoCardPosition"
-        class="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer max-sm:static! max-sm:left-auto! max-sm:order-6 max-sm:w-full! max-sm:translate-0!"
+        class="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer"
       />
       <BentoNewPost
         v-if="show.BentoNewPost"
         :style="newCardPosition"
-        class="absolute w-auto -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-4 max-sm:w-full! max-sm:translate-0!"
+        class="absolute w-auto -translate-x-1/2 -translate-y-1/2"
       />
       <BentoTech
         v-if="show.BentoTech"
         :initial="{ scale: 0.5 }"
         :animate="{ scale: 1 }"
-        class="h-2xs absolute w-70 -translate-x-1/2 -translate-y-1/2 p-0! max-sm:static! max-sm:left-auto! max-sm:order-11 max-sm:h-auto! max-sm:w-full! max-sm:translate-0!"
+        class="h-2xs absolute w-70 -translate-x-1/2 -translate-y-1/2 p-0!"
         :style="techPosition"
       />
       <BentoWebsites
         v-if="show.BentoWebsites"
         :initial="{ scale: 0.5 }"
         :animate="{ scale: 1 }"
-        class="absolute w-68 -translate-x-1/2 -translate-y-1/2 p-0! max-sm:static! max-sm:left-auto! max-sm:order-9 max-sm:w-full! max-sm:translate-0!"
+        class="absolute w-68 -translate-x-1/2 -translate-y-1/2 p-0!"
         :style="websitesPosition"
       />
       <BentoReadingList
@@ -105,22 +103,22 @@
         :initial="{ scale: 0 }"
         :animate="{ scale: 1 }"
         :style="listCardPosition"
-        class="absolute w-auto -translate-x-1/2 -translate-y-1/2 cursor-pointer max-sm:static! max-sm:left-auto! max-sm:order-8 max-sm:w-full! max-sm:translate-0!"
+        class="absolute w-auto -translate-x-1/2 -translate-y-1/2 cursor-pointer"
       />
       <BentoCat
         v-if="show.BentoCat"
         :style="catPosition"
-        class="absolute w-2xs -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-12 max-sm:w-full! max-sm:translate-0!"
+        class="absolute w-2xs -translate-x-1/2 -translate-y-1/2"
       />
       <div
         v-if="show.TodoCard && showTodoCard"
-        class="absolute top-1/2 -right-20 w-70 min-w-3xs -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-10 max-sm:w-full! max-sm:translate-0!"
+        class="absolute top-1/2 -right-20 w-70 min-w-3xs -translate-x-1/2 -translate-y-1/2"
       >
         <TodoCard title="MyTasks" hideable @hide="showTodoCard = false" />
       </div>
       <!-- 显示 TodoCard 的按钮，隐藏时显示 -->
       <button
-        v-if="show.TodoCard && !showTodoCard && !isMobile"
+        v-if="show.TodoCard && !showTodoCard"
         @click="showTodoCard = true"
         class="squircle fixed top-1/2 right-4 z-50 -translate-y-1/2 rounded-2xl bg-blue-50 p-3 shadow-sm ring ring-blue-50/70 transition-all hover:scale-110 dark:bg-blue-900/80 dark:ring-blue-600"
         title="显示待办卡片"
@@ -137,12 +135,12 @@
       <BentoLike
         v-if="show.BentoLike"
         :style="likePosition"
-        class="absolute w-fit -translate-x-1/2 -translate-y-1/2 max-sm:static! max-sm:left-auto! max-sm:order-13 max-sm:mx-auto max-sm:translate-0!"
+        class="absolute w-fit -translate-x-1/2 -translate-y-1/2"
       />
       <BentoMap
         v-if="show.BentoMap"
         :style="mapPosition"
-        class="absolute w-fit -translate-x-1/2 -translate-y-1/2 select-none max-sm:static! max-sm:left-auto! max-sm:order-14 max-sm:translate-0!"
+        class="absolute w-fit -translate-x-1/2 -translate-y-1/2 select-none"
       />
     </div>
   </div>
@@ -165,11 +163,9 @@ import {
   BentoWebsites,
   TodoCard,
 } from "@/components/bento";
-import MobileDashboard from "@/components/bento/mobile/MobileDashboard.vue";
 import ThemeToggle from "@/components/layout/ThemeToggle.vue";
 import carddelay from "@/data/carddelay.json";
-import { useDeviceStore } from "@/stores/device";
-import { useDebounceFn, useMediaQuery, useStorage } from "@vueuse/core";
+import { useDebounceFn, useStorage } from "@vueuse/core";
 import { AnimatePresence } from "motion-v";
 import { computed, nextTick, onMounted, onUnmounted, ref, watch, type ComponentPublicInstance } from "vue";
 
@@ -396,9 +392,6 @@ onMounted(() => {
   window.addEventListener("resize", debouncedFn);
 });
 
-// 响应式判断：是否为移动端（max-width: 640px）
-const isMobile = useMediaQuery("(max-width: 640px)");
-
 // 为每个卡片维护独立的显示状态
 const show = ref<Record<string, boolean>>({
   BentoGreeting: false,
@@ -439,17 +432,6 @@ const cardNames = [
 
 onMounted(async () => {
   await nextTick(); // 确保 DOM 已更新，能正确获取元素尺寸
-  // 移动端或非首次加载直接显示所有卡片，跳过延迟
-  if (isMobile.value) {
-    Object.keys(show.value).forEach((key) => {
-      show.value[key] = true;
-    });
-    // Update dimensions after all cards are rendered
-    nextTick(() => {
-      updateDimensions();
-    });
-    return;
-  }
   // 根据每个卡片的 order 计算延迟时间，触发显示
   cardNames.forEach((cardName) => {
     const order = carddelay?.[cardName]?.order || 0;

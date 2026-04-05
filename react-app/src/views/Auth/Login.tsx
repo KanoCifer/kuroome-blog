@@ -1,8 +1,9 @@
 import { IconGitHub } from '@/components/basic/icon/IconGitHub';
 import { useAuthStore } from '@/stores/authState';
 import { startAuthentication } from '@simplewebauthn/browser';
-import { Eye, EyeOff } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { Eye, EyeOff, ShieldUser } from 'lucide-react';
+import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 function IconCloud({ className }: { className?: string }) {
@@ -29,20 +30,6 @@ function IconCloud({ className }: { className?: string }) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-    </svg>
-  );
-}
-
-function IconUser({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 1024 1024"
-      version="1.1"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="currentColor"
-    >
-      <path d="M515.541449 7.082899c-280.359429 0-508.458551 228.120391-508.458551 508.458551s228.120391 508.458551 508.458551 508.458551 508.458551-228.120391 508.458551-508.458551S795.900879 7.082899 515.541449 7.082899zM515.541449 981.864196c-257.132626 0-466.301477-209.190121-466.301477-466.322747 0-257.132626 209.168851-466.322747 466.301477-466.322747s466.301477 209.190121 466.301477 466.322747S772.674075 981.864196 515.541449 981.864196zM614.574414 524.177056 614.574414 524.177056c47.751075-31.96876 79.230625-86.398604 79.230625-148.187857 0-98.437405-79.804915-178.24232-178.24232-178.24232-98.437405 0-178.24232 79.804915-178.24232 178.24232 0 61.810523 31.479551 116.219097 79.251895 148.187857-100.266622 39.519598-171.244501 137.170014-171.244501 251.453545 0 0.23397 0 0.446669 0.02127 0.659369 0 0.04254-0.02127 0.10635-0.02127 0.14889 0 15.612155 12.65563 28.246516 28.267786 28.246516 15.590885 0 21.886796-12.63436 21.886796-28.246516 0-0.340319-0.08508-0.659369-0.10635-1.020958 0.10635-118.005774 102.159649-219.995264 220.207964-219.995264 118.112124 0 220.207964 102.095839 220.207964 220.207964 0 0.14889-1.467628 29.054774 21.971875 29.054774 15.505806 0 28.076356-12.57055 28.076356-28.055086 0-0.06381-0.02127-0.12762-0.02127-0.2127 0-0.25524 0.02127-0.510479 0.02127-0.786989C785.797645 661.34707 714.798496 563.696654 614.574414 524.177056zM515.541449 510.734437c-74.402343 0-134.723968-60.321625-134.723968-134.723968 0-74.423613 60.321625-134.723968 134.723968-134.723968 74.423613 0 134.723968 60.321625 134.723968 134.723968S589.943792 510.734437 515.541449 510.734437z"></path>
     </svg>
   );
 }
@@ -133,13 +120,6 @@ export default function Login() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPasskeySubmitting, setIsPasskeySubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setIsReady(true);
-    }, 50);
-  }, []);
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -191,31 +171,35 @@ export default function Login() {
   };
 
   return (
-    <div className="font-body relative min-h-screen overflow-hidden">
+    <div className="font-body relative min-h-screen bg-gray-50 dark:bg-gray-800 overflow-hidden">
       {/* Main Content */}
       <main className="relative z-10 mt-4 flex flex-col items-center px-5 pt-8 pb-10">
         {/* Hero Section */}
-        <div
-          className={`mb-8 flex flex-col items-center justify-center transition-all duration-700 ease-out ${
-            isReady ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: 'easeOut', delay: 0.05 }}
+          className={`mb-8 flex flex-col items-center justify-center
+          `}
         >
           <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[#2563eb] text-white shadow-[0_8px_16px_rgba(37,99,235,0.25)]">
             <IconCloud className="size-8" />
           </div>
           <h2 className="font-headline text-center text-[28px] font-extrabold tracking-tight text-[#111827] dark:text-white">
-            Kanocifer
+            kanocifer
             <span className="text-[#2563eb] dark:text-blue-400">.chat</span>
           </h2>
           <p className="mt-1 text-center text-[15px] font-medium text-[#4b5563] dark:text-gray-400">
             Welcome back to the reading space.
           </p>
-        </div>
+        </motion.div>
 
         {/* Login Card */}
-        <div
-          className={`w-full max-w-100 rounded-[32px] border border-white/50 bg-white/70 p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] backdrop-blur-xl transition-all delay-100 duration-700 ease-out dark:border-slate-700/50 dark:bg-slate-800/60 ${
-            isReady ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
+          className={`w-full max-w-100 rounded-4xl border border-white/50 bg-white/70 p-6 shadow-xl dark:border-slate-700/50 dark:bg-slate-800/60
           }`}
         >
           <form className="flex flex-col" onSubmit={handleSubmit}>
@@ -226,7 +210,7 @@ export default function Login() {
               </label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
-                  <IconUser className="size-6 text-white" />
+                  <ShieldUser className="size-6" />
                 </div>
                 <input
                   type="text"
@@ -236,7 +220,7 @@ export default function Login() {
                   onChange={(e) =>
                     setLoginForm({ ...loginForm, username: e.target.value })
                   }
-                  className="w-full rounded-2xl border-0 bg-white py-3.5 pr-4 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white"
+                  className="w-full rounded-2xl border-0 bg-gray-100 py-3.5 pr-4 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white"
                 />
               </div>
               {errors.username && (
@@ -263,7 +247,7 @@ export default function Login() {
                   onChange={(e) =>
                     setLoginForm({ ...loginForm, password: e.target.value })
                   }
-                  className="w-full rounded-2xl border-0 bg-white py-3.5 pr-12 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white"
+                  className="w-full rounded-2xl border-0 bg-gray-100 py-3.5 pr-12 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white"
                 />
                 <button
                   type="button"
@@ -329,7 +313,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="mb-4 w-full rounded-full bg-[#1e3a8a] py-4 text-[15px] font-bold text-white shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all hover:bg-[#1e3a8a]/90 active:scale-[0.98] disabled:opacity-70 dark:bg-blue-600 dark:hover:bg-blue-600/90"
+              className="mb-4 w-full rounded-full bg-blue-500 py-4 text-[15px] font-bold text-white shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all hover:bg-[#1e3a8a]/90 active:scale-[0.98] disabled:opacity-70 dark:bg-blue-600 dark:hover:bg-blue-600/90"
             >
               {isSubmitting ? 'Logging in...' : 'Login'}
             </button>
@@ -338,7 +322,7 @@ export default function Login() {
             <button
               type="button"
               disabled={isPasskeySubmitting}
-              className="flex w-full items-center justify-center space-x-2 rounded-full bg-white py-4 text-[15px] font-bold text-[#111827] shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition-all hover:bg-gray-50 active:scale-[0.98] disabled:opacity-70 dark:bg-slate-700 dark:text-white dark:hover:bg-slate-600"
+              className="flex w-full items-center justify-center space-x-2 rounded-full bg-white py-4 text-[15px] font-bold text-[#111827] shadow-lg transition-all active:scale-[0.98] disabled:opacity-70 disabled:bg-gray-300 dark:bg-gray-700 dark:text-white"
               onClick={handlePasskeyLogin}
             >
               <IconKey className="size-5" />
@@ -370,7 +354,7 @@ export default function Login() {
 
           {/* Passkey Error */}
           {errors.passkey && (
-            <div className="mt-4 text-center text-[12px] font-medium text-red-500">
+            <div className="mt-4 text-center text-[12px] font-medium text-red-500 p-2 bg-red-100 rounded-2xl">
               {errors.passkey}
             </div>
           )}
@@ -387,7 +371,7 @@ export default function Login() {
               </Link>
             </p>
           </div>
-        </div>
+        </motion.div>
       </main>
     </div>
   );

@@ -377,7 +377,7 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <div class="mt-4 h-80 overflow-auto rounded-2xl bg-white/60 p-4 max-sm:h-40 dark:bg-gray-900/60">
+      <div class="mt-4 h-80 overflow-auto rounded-2xl bg-white/60 p-4 dark:bg-gray-900/60">
         <div class="mb-2 flex items-center gap-2 text-xs text-gray-500">
           <span class="h-1.5 w-1.5 rounded-full bg-gray-400"></span>
           AI 分析输出

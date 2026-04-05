@@ -3,7 +3,7 @@
     <!-- Title Section with Parallax -->
     <div class="relative z-10 mx-0 mt-60 flex flex-col items-center justify-center bg-transparent" :style="titleStyle">
       <div>
-        <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl">Analytics Dashboard</h1>
+        <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50">Analytics Dashboard</h1>
         <!-- Admin Badge and Description -->
         <div class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400">
           <span

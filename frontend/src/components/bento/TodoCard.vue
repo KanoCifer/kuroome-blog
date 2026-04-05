@@ -4,7 +4,7 @@
       :initial="{ scale: 0.5, opacity: 0 }"
       :animate="{ scale: 1, opacity: 1 }"
       :exit="{ scale: 0.5, opacity: 0, transition: { duration: 0.5 } }"
-      :drag="!useDeviceStore().isMobile"
+      :drag="true"
       :whileDrag="{ scale: 0.9 }"
       class="group/card relative flex h-full cursor-grab flex-col overflow-hidden p-0!"
     >
@@ -92,7 +92,6 @@
 </template>
 
 <script setup lang="ts">
-import { useDeviceStore } from "@/stores/device";
 import { useTodoStore } from "@/stores/todos";
 import { AnimatePresence } from "motion-v";
 import { storeToRefs } from "pinia";

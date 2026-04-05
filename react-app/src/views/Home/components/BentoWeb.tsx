@@ -30,7 +30,7 @@ export function BentoWeb() {
 
   return (
     <BentoCard onClick={() => navigate('/websites')} className="cursor-pointer">
-      <div className="relative z-10 flex h-full flex-col justify-between px-6 py-4 max-sm:px-2 max-sm:py-1">
+      <div className="relative z-10 flex h-full flex-col justify-between">
         <div className="text-xs font-bold tracking-wide text-neutral-500 uppercase transition-colors duration-300 group-hover:text-neutral-600 dark:text-neutral-400 dark:group-hover:text-neutral-300">
           Daily Pick
         </div>

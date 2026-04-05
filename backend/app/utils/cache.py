@@ -66,7 +66,7 @@ class AsyncCache:
             }
 
             # 生成缓存键
-            key = self._make_key(func.__name__, *params)
+            key = self._make_key(func.__name__, **params)
 
             cached_value = await self.get(key)
             if cached_value is not None:
@@ -80,7 +80,8 @@ class AsyncCache:
 
     def _make_key(self, *args, **kwargs):
         """生成唯一的缓存键"""
-        return hashkey(*args, **kwargs)
+        key = hashkey(*args, **kwargs)
+        return str(key)
 
     async def __setitem__(self, key: str, value: Any) -> None:
         """支持 cache[key] = value 方式设置缓存"""

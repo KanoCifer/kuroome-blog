@@ -3,7 +3,7 @@
     <!-- Title Section with Parallax -->
     <div class="relative -z-5 mx-0 mt-60 flex flex-col items-center justify-center bg-transparent" :style="titleStyle">
       <div>
-        <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl">
+        <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50">
           {{ activeTab === "messages" ? "留言管理" : "评论管理" }}
         </h1>
         <!-- Description -->

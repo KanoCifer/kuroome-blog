@@ -48,22 +48,14 @@ const getTypeClass = (type: string): string => {
 </script>
 
 <template>
-  <div
-    id="changelogView"
-    class="my-12 flex min-h-full w-full flex-col items-center justify-center py-12 max-sm:my-6 max-sm:py-6"
-  >
-    <div class="w-full max-w-6xl px-4 max-sm:px-3">
+  <div id="changelogView" class="my-12 flex min-h-full w-full flex-col items-center justify-center py-12">
+    <div class="w-full max-w-6xl px-4">
       <!-- Header Section -->
-      <div class="mb-16 text-center max-sm:mb-10">
+      <div class="mb-16 text-center">
         <div
-          class="mb-6 inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 max-sm:mb-4 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs dark:bg-blue-900/30 dark:text-blue-300"
+          class="mb-6 inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
         >
-          <svg
-            class="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -73,14 +65,8 @@ const getTypeClass = (type: string): string => {
           </svg>
           版本更新记录
         </div>
-        <h1
-          class="mb-4 text-5xl font-bold tracking-tight text-gray-800 max-sm:text-3xl md:text-6xl dark:text-gray-100"
-        >
-          变更日志
-        </h1>
-        <p class="mx-auto max-w-2xl text-lg text-gray-600 max-sm:text-base dark:text-gray-400">
-          记录网站的每一次成长与进步
-        </p>
+        <h1 class="mb-4 text-5xl font-bold tracking-tight text-gray-800 md:text-6xl dark:text-gray-100">变更日志</h1>
+        <p class="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-400">记录网站的每一次成长与进步</p>
       </div>
 
       <!-- Timeline -->
@@ -90,11 +76,11 @@ const getTypeClass = (type: string): string => {
           class="absolute top-0 left-1/2 hidden h-full w-0.5 -translate-x-1/2 bg-linear-to-b from-blue-400 via-purple-400 to-pink-400 md:block"
         ></div>
         <div
-          class="absolute top-0 left-3 hidden h-full w-px bg-linear-to-b from-blue-400 via-purple-400 to-pink-400 max-sm:block"
+          class="absolute top-0 left-3 hidden h-full w-px bg-linear-to-b from-blue-400 via-purple-400 to-pink-400"
         ></div>
 
         <!-- Releases -->
-        <div class="space-y-12 max-sm:space-y-8">
+        <div class="space-y-12">
           <motion.div
             :initial="{ opacity: 0, y: 40 }"
             :whileInView="{ opacity: 1, y: 0 }"
@@ -106,27 +92,19 @@ const getTypeClass = (type: string): string => {
             }"
             v-for="(r, i) in changelog"
             :key="r.version"
-            :class="[
-              'relative flex items-center max-sm:items-start max-sm:pl-8',
-              i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse',
-            ]"
+            :class="['relative flex items-center', i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse']"
           >
             <!-- Content Card -->
-            <div class="-mx-8 w-full max-sm:mx-0 md:w-1/2">
+            <div class="-mx-8 w-full md:w-1/2">
               <div
-                class="group squircle cursor-pointer border border-gray-100 bg-white/80 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl max-sm:p-4 md:p-8 dark:border-gray-700 dark:bg-gray-800/80"
+                class="group squircle cursor-pointer border border-gray-100 bg-white/80 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl md:p-8 dark:border-gray-700 dark:bg-gray-800/80"
               >
                 <!-- Version Badge & Date -->
-                <div class="mb-4 flex flex-wrap items-center gap-3 max-sm:gap-2">
+                <div class="mb-4 flex flex-wrap items-center gap-3">
                   <span
-                    class="inline-flex items-center gap-2 rounded-full bg-linear-to-r from-blue-500 to-cyan-500 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-blue-500/25 max-sm:px-3 max-sm:py-1 max-sm:text-xs"
+                    class="inline-flex items-center gap-2 rounded-full bg-linear-to-r from-blue-500 to-cyan-500 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-blue-500/25"
                   >
-                    <svg
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -136,15 +114,8 @@ const getTypeClass = (type: string): string => {
                     </svg>
                     v{{ r.version }}
                   </span>
-                  <span
-                    class="flex items-center gap-1 text-sm text-gray-500 max-sm:text-xs dark:text-gray-400"
-                  >
-                    <svg
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
+                  <span class="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -157,31 +128,23 @@ const getTypeClass = (type: string): string => {
                 </div>
 
                 <!-- Release Title -->
-                <h2
-                  class="mb-4 text-2xl font-bold text-gray-800 max-sm:text-xl dark:text-gray-100"
-                >
+                <h2 class="mb-4 text-2xl font-bold text-gray-800 dark:text-gray-100">
                   {{ r.title }}
                 </h2>
 
                 <!-- Changes List -->
-                <ul class="space-y-3 max-sm:space-y-2">
-                  <li
-                    v-for="(change, i) in r.changes"
-                    :key="i"
-                    class="flex items-start gap-3 max-sm:gap-2"
-                  >
+                <ul class="space-y-3">
+                  <li v-for="(change, i) in r.changes" :key="i" class="flex items-start gap-3">
                     <span
                       :class="[
                         'mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold tracking-wide uppercase transition-all duration-200',
                         getTypeClass(change.type),
                       ]"
                     >
-                      <span v-if="getTypeIcon(change.type)">{{
-                        getTypeIcon(change.type)
-                      }}</span>
+                      <span v-if="getTypeIcon(change.type)">{{ getTypeIcon(change.type) }}</span>
                       {{ getTypeLabel(change.type) }}
                     </span>
-                    <span class="text-gray-700 max-sm:text-sm dark:text-gray-300">
+                    <span class="text-gray-700 dark:text-gray-300">
                       {{ change.content }}
                     </span>
                   </li>
@@ -190,9 +153,7 @@ const getTypeClass = (type: string): string => {
             </div>
 
             <!-- Timeline Dot -->
-            <div
-              class="absolute top-1/2 left-1/2 z-10 hidden h-8 w-8 -translate-x-1/2 -translate-y-1/2 md:block"
-            >
+            <div class="absolute top-1/2 left-1/2 z-10 hidden h-8 w-8 -translate-x-1/2 -translate-y-1/2 md:block">
               <div
                 class="absolute inset-0 -m-2 rounded-full bg-blue-500 opacity-30 blur-md transition-all duration-300 group-hover:opacity-50 group-hover:blur-lg"
               ></div>
@@ -204,9 +165,7 @@ const getTypeClass = (type: string): string => {
             </div>
 
             <!-- Mobile Timeline Dot -->
-            <div
-              class="absolute top-6 left-0 z-10 h-6 w-6 -translate-x-1/2 md:hidden max-sm:top-5 max-sm:left-3"
-            >
+            <div class="absolute top-6 left-0 z-10 h-6 w-6 -translate-x-1/2 md:hidden">
               <div
                 class="relative flex h-full w-full items-center justify-center rounded-full bg-white ring-3 ring-blue-100 dark:bg-gray-800 dark:ring-gray-700"
               >

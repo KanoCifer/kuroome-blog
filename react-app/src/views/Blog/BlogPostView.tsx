@@ -3,9 +3,11 @@ import { blogService } from '@/services/blogService';
 import type { Comment } from '@/types';
 import { formatDate } from '@/utils/formatdate';
 import DOMPurify from 'dompurify';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import hljs from 'highlight.js/lib/common';
+import 'highlight.js/styles/github-dark.css';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 function sanitizeHtml(html: string): string {
   if (!html) return '';
@@ -29,7 +31,7 @@ function CommentItem({
     >
       <div className="py-3">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-sky-500 text-sm font-bold text-white">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-sky-500 text-sm font-bold text-white">
             {comment.author?.[0]?.toUpperCase() || 'A'}
           </div>
           <div className="flex-1">
@@ -189,6 +191,13 @@ export default function BlogPostView() {
 
   const contentRef = useRef<HTMLDivElement>(null);
 
+  // Highlight code blocks after content renders
+  useEffect(() => {
+    if (contentRef.current && post?.body) {
+      hljs.highlightAll();
+    }
+  }, [post?.body]);
+
   const fetchPost = useCallback(async () => {
     if (!postId) return;
 
@@ -332,7 +341,7 @@ export default function BlogPostView() {
 
               <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-sky-500 text-xs font-bold text-white">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-sky-500 text-xs font-bold text-white">
                     A
                   </div>
                   <span>{post.category?.name || '未分类'}</span>
@@ -389,9 +398,7 @@ export default function BlogPostView() {
                   onCancel={replyTo ? () => setReplyTo(null) : undefined}
                   isSubmitting={isSubmitting}
                   placeholder={
-                    replyTo
-                      ? `回复 @${replyTo.author}...`
-                      : '写下你的评论...'
+                    replyTo ? `回复 @${replyTo.author}...` : '写下你的评论...'
                   }
                 />
               </div>

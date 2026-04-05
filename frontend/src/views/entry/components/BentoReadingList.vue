@@ -4,7 +4,7 @@
       <div class="flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/40">
         <svg
           t="1772544505590"
-          class="icon text-orange-500 max-sm:mr-2"
+          class="icon text-orange-500"
           viewBox="0 0 1024 1024"
           version="1.1"
           xmlns="http://www.w3.org/2000/svg"

@@ -154,14 +154,23 @@ export default function RssWorkspaceView() {
 
   return (
     <div className="min-h-dvh bg-gray-50 pb-28 dark:bg-slate-950">
-      <header className="sticky top-0 z-10 bg-white/85 px-4 py-3 backdrop-blur-md dark:bg-slate-900/85">
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-          RSS 工作台
-        </h1>
+      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md dark:bg-gray-900/80">
+        <div className="ml-12 max-w-2xl px-4 py-4">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Rss工作台
+          </h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Rss相关功能
+          </p>
+        </div>
       </header>
 
       <main className="mx-auto w-full max-w-2xl space-y-5 px-4 pt-4">
-        <section className="rounded-2xl bg-white p-4 ring-1 ring-blue-100 dark:bg-slate-900 dark:ring-slate-800">
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl bg-white p-4 ring-1 ring-blue-100 dark:bg-slate-900 dark:ring-slate-800"
+        >
           <input
             value={rssUrl}
             onChange={(e) => setRssUrl(e.target.value)}
@@ -212,9 +221,14 @@ export default function RssWorkspaceView() {
               {parseMetadata.title} · {formatDate(parseMetadata.published)}
             </p>
           ) : null}
-        </section>
+        </motion.section>
 
-        <section className="rounded-2xl bg-white p-4 ring-1 ring-blue-100 dark:bg-slate-900 dark:ring-slate-800">
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="rounded-2xl bg-white p-4 ring-1 ring-blue-100 dark:bg-slate-900 dark:ring-slate-800"
+        >
           <div className="mb-2 flex items-center">
             <h2 className="text-sm font-semibold">我的订阅</h2>
             <button
@@ -254,9 +268,14 @@ export default function RssWorkspaceView() {
               ))}
             </ul>
           )}
-        </section>
+        </motion.section>
 
-        <section className="rounded-2xl bg-white p-4 ring-1 ring-blue-100 dark:bg-slate-900 dark:ring-slate-800">
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.3 }}
+          className="rounded-2xl bg-white p-4 ring-1 ring-blue-100 dark:bg-slate-900 dark:ring-slate-800"
+        >
           <div className="relative mb-2">
             <input
               value={searchQuery}
@@ -342,7 +361,7 @@ export default function RssWorkspaceView() {
               </button>
             </div>
           ) : null}
-        </section>
+        </motion.section>
       </main>
     </div>
   );

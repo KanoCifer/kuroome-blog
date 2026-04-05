@@ -14,6 +14,8 @@ const heartbeat = createHeartbeat({
   },
 });
 
+let isLoggingOut = false;
+
 interface AuthState {
   isAuthenticated: boolean;
   user: UserInfo | null;
@@ -80,12 +82,19 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: () => {
+    if (isLoggingOut) return;
+    isLoggingOut = true;
+    heartbeat.stop();
+    userCache.clear();
     authGateway.logout().then(() => {
+      isLoggingOut = false;
       // 注销成功后更新状态
       set({
         isAuthenticated: false,
         user: null,
       });
+    }).catch(() => {
+      isLoggingOut = false;
     });
   },
 

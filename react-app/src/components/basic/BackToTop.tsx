@@ -50,10 +50,10 @@ export function BackToTop({ className }: BackToTopProps) {
       <AnimatePresence>
         {isVisible && (
           <motion.button
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.3 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
             onClick={backToTop}
             aria-label="回到顶部"
             title="回到顶部"

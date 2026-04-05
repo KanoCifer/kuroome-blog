@@ -1,4 +1,3 @@
-import { BentoCard } from './BentoCard';
 import { Mail } from 'lucide-react';
 
 const socialLinks = [
@@ -16,7 +15,7 @@ const socialLinks = [
 
 export function BentoSocial() {
   return (
-    <BentoCard className="flex items-center justify-center gap-6 p-6">
+    <div className="flex items-center justify-center gap-4">
       {socialLinks.map((social) => (
         <a
           key={social.name}
@@ -24,14 +23,14 @@ export function BentoSocial() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={social.name}
-          className="group relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-white/50 bg-white/60 text-slate-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-orange-100 hover:bg-orange-50 hover:text-orange-600 hover:shadow-md dark:bg-slate-700 dark:hover:text-white"
+          className="group relative flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200/50 bg-white/80 text-slate-500 shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:bg-blue-50/80 hover:text-blue-600 hover:shadow-md dark:border-slate-700/50 dark:bg-slate-800/80 dark:text-slate-400 dark:hover:border-blue-500/50 dark:hover:bg-blue-900/30 dark:hover:text-blue-400"
         >
-          <span className="absolute -top-10 scale-0 rounded-lg bg-slate-800 px-3 py-1 text-sm font-medium text-white opacity-0 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100 dark:bg-slate-600">
+          <span className="absolute -top-11 scale-0 rounded-xl bg-slate-800 px-3 py-1.5 text-xs font-medium text-white opacity-0 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100 dark:bg-slate-600">
             {social.name}
           </span>
           {social.icon === 'github' && (
             <svg
-              className="h-7 w-7"
+              className="h-5 w-5"
               fill="currentColor"
               viewBox="0 0 24 24"
               aria-hidden="true"
@@ -43,9 +42,9 @@ export function BentoSocial() {
               />
             </svg>
           )}
-          {social.icon === 'email' && <Mail className="h-7 w-7" />}
+          {social.icon === 'email' && <Mail className="h-5 w-5" />}
         </a>
       ))}
-    </BentoCard>
+    </div>
   );
 }

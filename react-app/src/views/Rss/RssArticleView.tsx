@@ -5,7 +5,7 @@ import { formatDate } from '@/utils/formatdate';
 import DOMPurify from 'dompurify';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 function rewriteImageUrls(html: string, base: string): string {
   if (!html) return html;
@@ -29,7 +29,6 @@ function rewriteImageUrls(html: string, base: string): string {
 
 export default function RssArticleView() {
   const { articleId } = useParams<{ articleId: string }>();
-  const navigate = useNavigate();
   const notifier = useNotificationStore();
   const service = useMemo(() => rssService(), []);
 
@@ -64,15 +63,7 @@ export default function RssArticleView() {
 
   return (
     <div className="min-h-dvh bg-gray-50 pb-28 dark:bg-slate-950">
-      <header className="sticky top-0 z-10 bg-white/85 px-4 py-3 backdrop-blur-md dark:bg-slate-900/85">
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          className="rounded-full px-3 py-1 text-sm"
-        >
-          返回
-        </button>
-      </header>
+      <header className="sticky top-0 z-10 h-15 bg-white/85 px-4 py-3 backdrop-blur-md dark:bg-slate-900/85"></header>
       <main className="mx-auto w-full max-w-dvw px-4 py-4">
         <AnimatePresence mode="wait">
           {loading ? (

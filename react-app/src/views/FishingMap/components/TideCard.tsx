@@ -1,4 +1,4 @@
-import ReactECharts from 'echarts-for-react';
+import { TideChart } from './TideChart';
 
 import type { TideData, TideTableItem } from '../types';
 
@@ -41,12 +41,7 @@ export function TideCard({
         </p>
       ) : tideData ? (
         <>
-          <ReactECharts
-            option={tideChartOption}
-            style={{ width: '100%', height: 220 }}
-            notMerge
-            lazyUpdate
-          />
+          <TideChart option={tideChartOption} />
           <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
             <div className="rounded-lg bg-white/60 px-3 py-2 dark:bg-gray-800/60">
               <p className="text-gray-500 dark:text-gray-400">最高潮</p>

@@ -82,7 +82,7 @@ const formattedDate = computed(() =>
 
       <div v-else>
         <h1
-          class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl"
+          class="max-w-6xl text-center font-serif text-7xl text-gray-50"
         >
           {{ title }}
         </h1>

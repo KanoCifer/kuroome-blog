@@ -1,5 +1,5 @@
 <template>
-  <div class="col-span-1 max-sm:hidden">
+  <div class="col-span-1">
     <!-- 右侧边栏 -->
     <div class="sticky top-30 h-fit space-y-6">
       <!-- 个人简介卡片 -->

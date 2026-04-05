@@ -2,11 +2,11 @@
   <div>
     <!-- Title Section with Parallax -->
     <div
-      class="relative -z-5 mx-0 mt-60 flex flex-col items-center justify-center bg-transparent max-sm:mt-30"
+      class="relative -z-5 mx-0 mt-60 flex flex-col items-center justify-center bg-transparent"
       :style="titleStyle"
     >
       <div>
-        <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl">
+        <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50">
           {{ title }}
         </h1>
         <!-- Info -->
@@ -25,7 +25,7 @@
         class="absolute left-1/2 -z-5 h-full -translate-x-1/2 rounded-t-[40px] bg-blue-50 dark:bg-slate-900"
       ></div>
       <div class="mx-auto max-w-6xl">
-        <div class="mx-8 grid grid-cols-1 gap-6 pt-24 max-sm:mx-2 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="mx-8 grid grid-cols-1 gap-6 pt-24 sm:grid-cols-2 lg:grid-cols-3">
           <!-- Content slots -->
           <slot />
         </div>

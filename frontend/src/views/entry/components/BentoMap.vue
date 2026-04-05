@@ -2,7 +2,7 @@
   <BentoCard :initial="{ scale: 0 }" :animate="{ scale: 1 }" class="min-w-0">
     <div class="flex min-w-0 flex-col items-center justify-center gap-2 sm:flex-row sm:gap-0">
       <div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/40">
-        <IconGlobal class="size-6 text-blue-500 max-sm:mr-2" />
+        <IconGlobal class="size-6 text-blue-500" />
       </div>
       <RouterLink
         to="/fishing-map"

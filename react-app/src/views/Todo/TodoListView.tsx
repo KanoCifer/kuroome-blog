@@ -1,3 +1,4 @@
+import { useNavVisibility } from '@/components/basic/NavVisibilityContext';
 import type {
   CreateTodoPayload,
   TodoPriority,
@@ -5,7 +6,6 @@ import type {
 import { useTodoState, type Todo } from '@/stores/todoState';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 // Icons
 function CheckIcon({ completed }: { completed: boolean }) {
@@ -143,24 +143,6 @@ function CalendarIcon() {
   );
 }
 
-function BackIcon() {
-  return (
-    <svg
-      className="h-5 w-5"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M10 19l-7-7m0 0l7-7m-7 7h18"
-      />
-    </svg>
-  );
-}
-
 // Priority Badge
 function PriorityBadge({ priority }: { priority: TodoPriority }) {
   const styles = {
@@ -192,7 +174,7 @@ const filterLabels: Record<FilterType, string> = {
 type SortMode = 'createdAt' | 'priority' | 'dueDate';
 
 export default function TodoListView() {
-  const navigate = useNavigate();
+  const { hideNav, showNav } = useNavVisibility();
   const todoState = useTodoState();
   const { todos } = todoState;
 
@@ -294,7 +276,7 @@ export default function TodoListView() {
     setNewDescription('');
     setNewPriority('medium');
     setNewDueDate('');
-    setShowAddForm(false);
+    closeAddForm();
   };
 
   const startEdit = (todo: Todo) => {
@@ -341,24 +323,37 @@ export default function TodoListView() {
 
   const completedCount = completedTodos.length;
 
+  const showAddFrom = () => {
+    hideNav();
+    setShowAddForm(true);
+  };
+
+  const closeAddForm = () => {
+    showNav();
+    setShowAddForm(false);
+  };
   return (
-    <div className="relative min-h-dvh bg-linear-to-b from-blue-50 to-white pb-32 dark:from-slate-900 dark:to-slate-900">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        type: 'spring',
+        ease: 'easeOut',
+        duration: 0.5,
+        delay: 0.1,
+      }}
+      className="relative min-h-dvh bg-linear-to-b from-blue-50 to-white pb-32 dark:from-slate-900 dark:to-slate-900"
+    >
       {/* Header */}
       <div className="sticky top-0 z-10 bg-white/80 px-4 py-4 backdrop-blur-md dark:bg-slate-900/80">
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
-          >
-            <BackIcon />
-          </button>
           <div>
-            <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+            <h1 className="ml-12 text-xl flex flex-col font-semibold text-gray-900 dark:text-gray-100">
               待办事项
+              <span className="text-sm text-gray-500">
+                {getFilterCount('all')} 项待办
+              </span>
             </h1>
-            <p className="text-sm text-gray-500">
-              {getFilterCount('all')} 项待办
-            </p>
           </div>
         </div>
       </div>
@@ -579,7 +574,7 @@ export default function TodoListView() {
       </div>
 
       {/* Bottom Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/80 px-4 py-4 backdrop-blur-md dark:bg-slate-900/80">
+      <div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-white/80 px-4 py-4 w-[30vw ] dark:bg-slate-900/80">
         {completedCount > 0 && (
           <div className="mb-3 flex gap-2">
             <button
@@ -600,7 +595,7 @@ export default function TodoListView() {
         )}
 
         <button
-          onClick={() => setShowAddForm(!showAddForm)}
+          onClick={() => showAddFrom()}
           className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gray-900 px-4 py-4 font-medium text-white transition-all hover:bg-gray-800 active:scale-[0.98] dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
         >
           <PlusIcon />
@@ -616,7 +611,7 @@ export default function TodoListView() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-20 bg-black/50 backdrop-blur-sm"
-            onClick={() => setShowAddForm(false)}
+            onClick={closeAddForm}
           >
             <motion.div
               initial={{ y: '100%' }}
@@ -624,14 +619,14 @@ export default function TodoListView() {
               exit={{ y: '100%' }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               onClick={(e) => e.stopPropagation()}
-              className="absolute bottom-0 left-0 right-0 max-h-[85dvh] overflow-y-auto rounded-t-3xl bg-white p-6 dark:bg-gray-900"
+              className="absolute left-0 right-0 bottom-0 max-h-[85dvh] overflow-y-auto rounded-t-3xl bg-white p-6 dark:bg-gray-900"
             >
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                   添加待办
                 </h2>
                 <button
-                  onClick={() => setShowAddForm(false)}
+                  onClick={closeAddForm}
                   className="cursor-pointer rounded-lg p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
                   <svg
@@ -711,6 +706,6 @@ export default function TodoListView() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }
