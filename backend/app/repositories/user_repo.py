@@ -8,21 +8,31 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from werkzeug.security import generate_password_hash
 
+from app.core import logger
 from app.models.models import PasskeyCredential, Profile, User
 
 
 class UserRepo:
     """用户数据访问层，封装所有用户相关的数据库查询操作。"""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         """
         :param session: SQLAlchemy 异步会话实例
         """
-        self.session = session
+        self.session: AsyncSession = session
 
     # ------------------------------------------------------------------ #
     # User CRUD
     # ------------------------------------------------------------------ #
+
+    async def is_admin_online(self) -> int:
+        """检查是否有管理员用户在线。"""
+        stmt = select(User).where(User.id == 1, User.active)
+        result = await self.session.execute(stmt)
+        admin_user = result.scalar_one_or_none()
+        if admin_user:
+            return 1
+        return 0
 
     async def get_by_id(
         self,
@@ -165,15 +175,23 @@ class UserRepo:
         :param github_id: GitHub ID，传 None 则解除绑定
         """
         user.github_id = github_id
+        await self.session.flush()
 
-    async def set_active(self, user: User, active: bool) -> None:
+    async def set_active_by_id(self, user_id: int, active: bool) -> None:
         """
-        设置用户在线状态。
+        根据用户 ID 设置在线状态（直接执行 UPDATE 语句）。
 
-        :param user: 用户对象
+        用于处理 detached 的 user 对象场景（如 logout）。
+
+        :param user_id: 用户 ID
         :param active: 是否在线
         """
-        user.active = active
+        from sqlalchemy import update
+
+        stmt = update(User).where(User.id == user_id).values(active=active)
+        await self.session.execute(stmt)
+        await self.session.flush()
+        logger.info(f"Set user {user_id} active={active}")
 
     async def set_password(self, user: User, password: str) -> None:
         """
@@ -183,6 +201,7 @@ class UserRepo:
         :param password: 明文密码
         """
         user.password_hash = generate_password_hash(password)
+        await self.session.flush()
 
     async def set_name(self, user: User, name: str) -> None:
         """
@@ -192,6 +211,7 @@ class UserRepo:
         :param name: 新的显示名称
         """
         user.name = name
+        await self.session.flush()
 
     async def set_username(self, user: User, username: str) -> None:
         """
@@ -201,6 +221,56 @@ class UserRepo:
         :param username: 新的用户名
         """
         user.username = username
+        await self.session.flush()
+
+    async def set_username_by_id(self, user_id: int, username: str) -> None:
+        """
+        根据用户 ID 更新用户名（直接执行 UPDATE 语句）。
+
+        用于处理 detached 的 user 对象场景。
+
+        :param user_id: 用户 ID
+        :param username: 新的用户名
+        """
+        from sqlalchemy import update
+
+        stmt = update(User).where(User.id == user_id).values(username=username)
+        await self.session.execute(stmt)
+        await self.session.flush()
+
+    async def set_name_by_id(self, user_id: int, name: str) -> None:
+        """
+        根据用户 ID 更新显示名称（直接执行 UPDATE 语句）。
+
+        用于处理 detached 的 user 对象场景。
+
+        :param user_id: 用户 ID
+        :param name: 新的显示名称
+        """
+        from sqlalchemy import update
+
+        stmt = update(User).where(User.id == user_id).values(name=name)
+        await self.session.execute(stmt)
+        await self.session.flush()
+
+    async def set_password_by_id(self, user_id: int, password: str) -> None:
+        """
+        根据用户 ID 更新密码（直接执行 UPDATE 语句）。
+
+        用于处理 detached 的 user 对象场景。
+
+        :param user_id: 用户 ID
+        :param password: 明文密码（会自动哈希）
+        """
+        from sqlalchemy import update
+
+        stmt = (
+            update(User)
+            .where(User.id == user_id)
+            .values(password_hash=generate_password_hash(password))
+        )
+        await self.session.execute(stmt)
+        await self.session.flush()
 
     # ------------------------------------------------------------------ #
     # Profile CRUD

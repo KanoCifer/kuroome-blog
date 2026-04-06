@@ -1,7 +1,19 @@
+import { useEffect, useState } from 'react';
 import { BentoCard } from '@/components/bento/BentoCard';
 import { Link } from 'react-router-dom';
+import { createAuthGateway } from '@/auth/authGateway';
+
+const authGateway = createAuthGateway();
 
 export function BentoProfile() {
+  const [adminOnline, setAdminOnline] = useState<boolean>(true);
+
+  useEffect(() => {
+    authGateway.fetchAdminStatus().then((status) => {
+      setAdminOnline(status === 1);
+    });
+  }, []);
+
   return (
     <BentoCard>
       <div className="flex items-center gap-5">
@@ -36,10 +48,21 @@ export function BentoProfile() {
           <p className="font-medium text-gray-600 dark:text-gray-400">
             Developer
           </p>
+          {/* <!-- Admin Status Badge --> */}
           <div className="mt-2 flex items-center gap-2">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-green-500"></span>
-            <span className="text-xs font-semibold tracking-widest text-green-700 uppercase dark:text-green-400">
-              Active Now
+            <span
+              className={`h-2 w-2 rounded-full ${
+                adminOnline ? 'animate-pulse bg-green-500' : 'bg-red-500'
+              }`}
+            ></span>
+            <span
+              className={`text-xs font-semibold tracking-widest uppercase ${
+                adminOnline
+                  ? 'text-green-700 dark:text-green-400'
+                  : 'text-red-700 dark:text-red-400'
+              }`}
+            >
+              {adminOnline ? 'Active Now' : 'Offline'}
             </span>
           </div>
         </div>

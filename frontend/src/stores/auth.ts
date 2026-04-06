@@ -14,6 +14,7 @@ export const useAuthStore = defineStore("auth", () => {
   const user = ref<UserInfo | null>(null);
   const loading = ref(false);
   const isHydrated = ref(false); // 是否初始化过
+  const adminOnline = ref(false); // 管理员是否在线
   const authGateway = createAuthGateway();
   const sideEffects = getAuthSideEffects();
 
@@ -79,17 +80,23 @@ export const useAuthStore = defineStore("auth", () => {
         isHydrated.value = true;
         // 启动心跳上报
         startHeartbeat();
+        // 获取管理员在线状态
+        await fetchAdminOnlineStatus();
         return;
       }
 
       // 2. 缓存不存在，从后端获取
       await fetchUser({ silentOnUnauthenticated: true });
       isHydrated.value = true;
+      // 获取管理员在线状态
+      await fetchAdminOnlineStatus();
     } catch {
       sideEffects.notifyError("认证初始化失败");
       user.value = null;
       userCache.clear();
       isHydrated.value = true;
+      // 即使认证失败也尝试获取管理员在线状态
+      await fetchAdminOnlineStatus();
     }
   }
 
@@ -117,6 +124,9 @@ export const useAuthStore = defineStore("auth", () => {
 
       // 启动心跳上报
       startHeartbeat();
+
+      // 获取管理员在线状态
+      await fetchAdminOnlineStatus();
 
       sideEffects.notifySuccess("登录成功");
       return res.raw;
@@ -191,6 +201,16 @@ export const useAuthStore = defineStore("auth", () => {
     await fetchUser(); // 从后端获取最新数据并更新缓存
   }
 
+  // 7. 获取管理员在线状态（无需认证，游客也可查看）
+  async function fetchAdminOnlineStatus() {
+    try {
+      const status = await authGateway.fetchAdminStatus();
+      adminOnline.value = status === 1;
+    } catch {
+      adminOnline.value = false;
+    }
+  }
+
   // 暴露给组件使用的状态和方法
   return {
     user,
@@ -198,6 +218,7 @@ export const useAuthStore = defineStore("auth", () => {
     isAuthenticated,
     isAdmin,
     isHydrated,
+    adminOnline,
     fetchUser,
     hydrateAuth,
     getPasskeyAuthenticationOptions,
@@ -206,5 +227,6 @@ export const useAuthStore = defineStore("auth", () => {
     loginWithGitHub,
     logout,
     refreshUser,
+    fetchAdminOnlineStatus,
   };
 });

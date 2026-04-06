@@ -27,84 +27,84 @@
         >
           <div class="rounded-[23px] bg-gray-50 dark:bg-gray-800">
             <ol>
-            <template v-if="auth.isAuthenticated">
-              <li>
-                <RouterLink
-                  to="/settings"
-                  @click="closeUserMenuImmediately"
-                  class="flex items-center gap-2 rounded-t-3xl px-4 py-2 font-serif text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                >
-                  <IconUser class="h-4 w-4" />
-                  Profile
-                </RouterLink>
-              </li>
-              <li>
-                <RouterLink
-                  to="/import"
-                  class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                >
-                  <ImportIcon class="h-4 w-4" />
+              <template v-if="auth.isAuthenticated">
+                <li>
+                  <RouterLink
+                    to="/settings"
+                    @click="closeUserMenuImmediately"
+                    class="flex items-center gap-2 rounded-t-3xl px-4 py-2 font-serif text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                  >
+                    <IconUser class="h-4 w-4" />
+                    Profile
+                  </RouterLink>
+                </li>
+                <li>
+                  <RouterLink
+                    to="/import"
+                    class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                  >
+                    <ImportIcon class="h-4 w-4" />
 
-                  Import
-                </RouterLink>
-              </li>
-              <li>
-                <RouterLink
-                  v-if="auth.user?.is_admin"
-                  to="/messages"
-                  @click="closeUserMenuImmediately"
-                  class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                >
-                  <MessageIcon class="h-4 w-4" />
-                  Messages
-                </RouterLink>
-              </li>
+                    Import
+                  </RouterLink>
+                </li>
+                <li>
+                  <RouterLink
+                    v-if="auth.user?.is_admin"
+                    to="/messages"
+                    @click="closeUserMenuImmediately"
+                    class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                  >
+                    <MessageIcon class="h-4 w-4" />
+                    Messages
+                  </RouterLink>
+                </li>
 
-              <li>
-                <RouterLink
-                  v-if="auth.user?.is_admin"
-                  to="/analytics"
-                  @click="closeUserMenuImmediately"
-                  class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                >
-                  <IconAnalytics class="h-4 w-4" />
-                  Analytics
-                </RouterLink>
-              </li>
-              <li>
-                <div class="mx-4 h-px bg-gray-200 dark:bg-gray-700" />
-                <button
-                  @click.prevent="handleLogout"
-                  :disabled="auth.loading"
-                  class="flex w-full cursor-pointer items-center gap-2 rounded-xl px-4 py-2 font-serif font-bold text-blue-600 dark:text-blue-400"
-                >
-                  <LogoutIcon class="h-4 w-4" />
-                  {{ auth.loading ? "Signing out..." : "Logout" }}
-                </button>
-              </li>
-            </template>
-            <template v-else>
-              <li>
-                <RouterLink
-                  to="/login"
-                  @click="closeUserMenuImmediately"
-                  class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 dark:text-gray-300"
-                >
-                  <LoginIcon class="h-4 w-4" />
-                  Login
-                </RouterLink>
-              </li>
-              <li>
-                <RouterLink
-                  to="/register"
-                  @click="closeUserMenuImmediately"
-                  class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 dark:text-gray-300"
-                >
-                  <RegisterIcon class="h-4 w-4" />
-                  Register
-                </RouterLink>
-              </li>
-            </template>
+                <li>
+                  <RouterLink
+                    v-if="auth.user?.is_admin"
+                    to="/analytics"
+                    @click="closeUserMenuImmediately"
+                    class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                  >
+                    <IconAnalytics class="h-4 w-4" />
+                    Analytics
+                  </RouterLink>
+                </li>
+                <li>
+                  <div class="mx-4 h-px bg-gray-200 dark:bg-gray-700" />
+                  <button
+                    @click.prevent="handleLogout"
+                    :disabled="auth.loading"
+                    class="flex w-full cursor-pointer items-center gap-2 rounded-xl px-4 py-2 font-serif font-bold text-blue-600 dark:text-blue-400"
+                  >
+                    <LogoutIcon class="h-4 w-4" />
+                    {{ auth.loading ? "Signing out..." : "Logout" }}
+                  </button>
+                </li>
+              </template>
+              <template v-else>
+                <li>
+                  <RouterLink
+                    to="/login"
+                    @click="closeUserMenuImmediately"
+                    class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 dark:text-gray-300"
+                  >
+                    <LoginIcon class="h-4 w-4" />
+                    Login
+                  </RouterLink>
+                </li>
+                <li>
+                  <RouterLink
+                    to="/register"
+                    @click="closeUserMenuImmediately"
+                    class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 dark:text-gray-300"
+                  >
+                    <RegisterIcon class="h-4 w-4" />
+                    Register
+                  </RouterLink>
+                </li>
+              </template>
             </ol>
           </div>
         </div>
@@ -123,9 +123,7 @@
         class="h-14 w-14 rounded-full object-cover shadow-sm ring-4 ring-white/50 dark:ring-gray-700/50"
       />
       <div class="flex items-baseline gap-2">
-        <span
-          class="font-serif text-2xl font-bold text-gray-800 dark:text-gray-100"
-        >
+        <span class="font-serif text-2xl font-bold text-gray-800 dark:text-gray-100">
           {{ currentUserName }}
         </span>
         <ChevronDownIcon
@@ -136,11 +134,7 @@
     </div>
 
     <!-- 导航分类 -->
-    <div
-      class="mb-4 px-3 text-sm font-bold tracking-wider text-gray-400 dark:text-gray-500"
-    >
-      GENERAL
-    </div>
+    <div class="mb-4 px-3 text-sm font-bold tracking-wider text-gray-600 dark:text-gray-500">GENERAL</div>
 
     <!-- 导航项列表 -->
     <div class="relative">
@@ -153,18 +147,14 @@
       />
 
       <ol class="flex flex-col gap-2">
-        <li
-          v-for="(item, index) in navItems"
-          :key="item.path"
-          @mouseenter="hoverNavIndex = index"
-        >
+        <li v-for="(item, index) in navItems" :key="item.path" @mouseenter="hoverNavIndex = index">
           <RouterLink
             :to="item.path"
             class="relative z-10 flex items-center gap-4 rounded-2xl py-3.5 pr-5 pl-6 font-medium transition-all"
             :class="[
               hoverNavIndex === index
                 ? 'text-blue-600 dark:text-blue-400'
-                : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200',
+                : 'text-gray-700 dark:text-gray-400 dark:hover:text-gray-200',
             ]"
           >
             <component :is="item.icon" class="h-6 w-6" />
@@ -177,18 +167,15 @@
 </template>
 
 <script setup lang="ts">
-import { type MotionProps, Motion } from "motion-v";
-import { computed, onUnmounted, ref, watch } from "vue";
-import { useRoute } from "vue-router";
 import BentoCard from "@/components/bento/BentoCard.vue";
 import {
   AboutIcon,
   BlogIcon,
   BookshelfIcon,
-  ChangelogIcon,
   ChevronDownIcon,
   HomeIcon,
   IconAnalytics,
+  IconTooling,
   IconUser,
   ImportIcon,
   LoginIcon,
@@ -196,10 +183,12 @@ import {
   MessageIcon,
   RegisterIcon,
   RssIcon,
-  IconTooling,
 } from "@/components/icons";
-import { Image } from "lucide-vue-next";
 import { useAuthStore } from "@/stores/auth";
+import { Image } from "lucide-vue-next";
+import { type MotionProps, Motion } from "motion-v";
+import { computed, onUnmounted, ref, watch } from "vue";
+import { useRoute } from "vue-router";
 
 const auth = useAuthStore();
 const route = useRoute();
@@ -217,7 +206,6 @@ const navItems = [
   { path: "/blog", label: "近期文章", icon: BlogIcon },
   { path: "/bookshelf", label: "我的书架", icon: BookshelfIcon },
   { path: "/gallery", label: "图片画廊", icon: Image },
-  { path: "/changelog", label: "更新日志", icon: ChangelogIcon },
   { path: "/rss", label: "RSS 订阅", icon: RssIcon },
   { path: "/toolbox/image-toolbox", label: "图片工具", icon: IconTooling },
   { path: "/about", label: "关于网站", icon: AboutIcon },

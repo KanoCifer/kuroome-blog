@@ -234,7 +234,7 @@ export function BasicNav() {
           {hidden ? null : (
             <motion.nav
               id="mobile-nav"
-              className="fixed bottom-4 left-1/2 z-65 flex h-20 max-w-md shadow-lg -translate-x-1/2 items-center justify-around rounded-full bg-white/80 px-6 py-3 backdrop-blur-sm dark:bg-slate-900/80 dark:shadow-[0_-8px_30px_rgba(0,0,0,0.3)]"
+              className="fixed bottom-4 left-1/2 z-65 flex h-16 max-w-md shadow-lg -translate-x-1/2 items-center justify-around rounded-full bg-white/80 px-6 py-3 backdrop-blur-sm dark:bg-slate-900/80 dark:shadow-[0_-8px_30px_rgba(0,0,0,0.3)]"
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 80, opacity: 0 }}

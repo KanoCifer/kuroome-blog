@@ -1,8 +1,10 @@
 <template>
   <BentoCard>
     <!-- Tech Stack Card -->
-    <div class="squircle border border-gray-100 bg-gray-50/10 p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800/10">
-      <h3 class="mb-3 ml-2 font-serif text-xs font-bold tracking-wider text-gray-400 uppercase">TechStack</h3>
+    <div class="p-4">
+      <h3 class="mb-3 ml-2 font-serif text-xs font-bold tracking-wider text-gray-600 uppercase dark:text-gray-400">
+        TechStack
+      </h3>
       <div class="flex flex-wrap gap-2">
         <span
           class="cursor-default rounded-md bg-blue-100 px-2.5 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50"

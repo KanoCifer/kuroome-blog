@@ -6,7 +6,7 @@
     <p class="mt-2 font-mono text-6xl font-bold tracking-tight text-blue-800 dark:text-slate-300">
       {{ timeLabel }}
     </p>
-    <p class="mt-1 text-sm text-slate-400">
+    <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
       {{ weekdayLabel }}
     </p>
   </BentoCard>

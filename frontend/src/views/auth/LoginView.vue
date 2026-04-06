@@ -2,12 +2,13 @@
 import IconCloud from "@/components/icons/IconCloud.vue";
 import IconKey from "@/components/icons/IconKey.vue";
 import IconLock from "@/components/icons/IconLock.vue";
-import IconUser from "@/components/icons/IconUser.vue";
 import { useAuthStore } from "@/stores/auth";
 import type { LoginForm } from "@/types";
 import { startAuthentication } from "@simplewebauthn/browser";
+import { ShieldUser } from "lucide-vue-next";
 import { ref } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
+
 const router = useRouter();
 const route = useRoute();
 const auth = useAuthStore();
@@ -33,6 +34,17 @@ const handleSubmit = async () => {
   errors.value = {};
   isSubmitting.value = true;
 
+  if (!form.value.username) {
+    errors.value.username = "用户名不能为空";
+  }
+  if (!form.value.password) {
+    errors.value.password = "密码不能为空";
+  }
+  if (errors.value.username || errors.value.password) {
+    isSubmitting.value = false;
+    return;
+  }
+
   try {
     await auth.login(form.value.username, form.value.password, form.value.rememberMe);
     const redirect = (route.query.redirect as string) || "/";
@@ -41,7 +53,7 @@ const handleSubmit = async () => {
     // 后端返回的 APIResponse 在 request.ts 已转成 Error.message
     if (err instanceof Error) {
       // 把简单错误显示在 password 字段上（根据项目需要可更细化）
-      errors.value.password = err.message;
+      errors.value.password = "用户名或密码错误";
     }
   } finally {
     isSubmitting.value = false;
@@ -84,7 +96,7 @@ const handleGitHubLogin = () => {
   <div>
     <div class="flex h-screen items-center">
       <!-- 标题卡片 -->
-      <div class="squircle mx-auto max-w-md bg-blue-50/50 px-12 py-14 shadow-2xl dark:bg-gray-800/50">
+      <div class="squircle mx-auto w-auto max-w-md bg-blue-50/50 px-12 py-14 shadow-2xl dark:bg-gray-800/50">
         <!-- Hero Section -->
         <div class="mb-8 flex flex-col items-center justify-center">
           <div
@@ -104,9 +116,9 @@ const handleGitHubLogin = () => {
         <!-- 登录表单 -->
         <form @submit.prevent="handleSubmit">
           <!-- 用户名 -->
-          <div class="form-group relative">
-            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
-              <IconUser class="size-6 dark:text-white" />
+          <div class="relative transition-transform duration-200 focus-within:scale-[1.01]">
+            <div class="pointer-events-none absolute top-6 left-0 flex items-center pl-4 text-[#9ca3af]">
+              <ShieldUser class="size-6 dark:text-white" />
             </div>
             <input
               v-model="form.username"
@@ -183,10 +195,19 @@ const handleGitHubLogin = () => {
           <div class="mt-6 flex items-center justify-between">
             <button
               type="submit"
-              class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-8 py-2.5 font-bold text-white shadow-lg shadow-blue-500/30 transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none dark:ring-offset-gray-800"
+              class="inline-flex w-28 cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-8 py-2.5 font-bold text-white shadow-lg shadow-blue-500/30 transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none dark:ring-offset-gray-800"
               :disabled="isSubmitting"
             >
-              {{ isSubmitting ? "Logging in..." : "Login" }}
+              <!-- SVG 加载动画 -->
+              <svg v-if="isSubmitting" class="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+              {{ isSubmitting ? null : "Login" }}
             </button>
 
             <!-- Remember Me Checkbox -->
@@ -213,10 +234,16 @@ const handleGitHubLogin = () => {
               class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-green-600 px-8 py-2.5 font-bold text-white shadow-lg shadow-green-500/30 transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-800"
             >
               <IconKey />
-              <span v-if="isPasskeySubmitting" class="flex items-center justify-center gap-2">
-                <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
-                Logging in with Passkey...
-              </span>
+              <!-- SVG 加载动画 -->
+              <svg v-if="isPasskeySubmitting" class="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+              <span v-if="isPasskeySubmitting">Logging in with Passkey...</span>
               <span v-else>Login with Passkey</span>
             </button>
             <span v-if="errors.passkey" class="mt-1 block text-center text-sm text-red-600 dark:text-red-400">
@@ -240,9 +267,9 @@ const handleGitHubLogin = () => {
             </button>
           </div>
 
-          <p class="mt-8 text-center font-serif text-gray-400">Kuroome's Blog</p>
+          <p class="mt-8 text-center font-serif text-gray-600">Kuroome's Blog</p>
           <!-- 注册链接 -->
-          <div class="mb-4 text-center text-gray-400 dark:text-gray-300">
+          <div class="mb-4 text-center text-gray-600 dark:text-gray-300">
             Don't have an account?
             <RouterLink to="/register" class="underline transition duration-100 hover:text-blue-500">
               Register here.

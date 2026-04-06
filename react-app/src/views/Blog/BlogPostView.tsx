@@ -1,3 +1,4 @@
+import { ArticleSummaryCard } from '@/components/basic/ArticleSummary';
 import type { BlogDetail } from '@/services/blogService';
 import { blogService } from '@/services/blogService';
 import type { Comment } from '@/types';
@@ -359,6 +360,12 @@ export default function BlogPostView() {
 
             {/* Divider */}
             <div className="my-4 h-px bg-gray-100 dark:bg-gray-800" />
+
+            {/* Article Summary */}
+            <ArticleSummaryCard
+              title={post?.title}
+              content={post?.body || ''}
+            />
 
             {/* Content */}
             <div

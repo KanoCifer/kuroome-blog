@@ -1,10 +1,6 @@
 <template>
   <div>
-    <div
-      class="relative min-h-dvh w-full snap-start space-y-2"
-      :style="containerStyle"
-      ref="parentContainer"
-    >
+    <div class="relative min-h-dvh w-full snap-start space-y-2" :style="containerStyle" ref="parentContainer">
       <!-- Theme Toggle + Background Switch - 只在入口页面显示 -->
       <div
         class="squircle absolute top-4 right-4 z-50 flex gap-2 rounded-2xl bg-blue-50 p-2 shadow-sm ring ring-blue-50/70 dark:bg-blue-900/80 dark:ring-blue-600"
@@ -27,11 +23,10 @@
         </button>
       </div>
       <BentoGreeting
-        @click.stop="$router.push('/gallery')"
         v-if="show.BentoGreeting"
         :initial="{ scale: 0 }"
         :animate="{ scale: 1 }"
-        :style="greetingPosition"
+        :style="[greetingPosition, moveStyle]"
         class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 cursor-pointer"
       />
       <BentoProfileCard
@@ -39,7 +34,7 @@
         :initial="{ scale: 0.5, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
         ref="boxRef"
-        :style="profilePosition"
+        :style="[profilePosition, moveStyle]"
         class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2"
       />
       <AnimatePresence>
@@ -55,7 +50,7 @@
             damping: 30,
           }"
           class="absolute w-68 -translate-x-1/2 -translate-y-1/2"
-          :style="navCardPosition"
+          :style="[navCardPosition, moveStyleFast]"
         />
       </AnimatePresence>
       <BentoClock
@@ -63,7 +58,7 @@
         :initial="{ scale: 0 }"
         :animate="{ scale: 1 }"
         ref="clockRef"
-        :style="clockCardPosition"
+        :style="[clockCardPosition, moveStyleFast]"
         class="absolute w-auto -translate-x-1/2 -translate-y-1/2"
       />
       <BentoCalendar
@@ -71,17 +66,17 @@
         :initial="{ scale: 0 }"
         :animate="{ scale: 1 }"
         ref="calRef"
-        :style="calendarPosition"
+        :style="[calendarPosition, moveStyleFast]"
         class="absolute w-2xs -translate-x-1/2 -translate-y-1/2"
       />
       <BentoMemo
         v-if="show.BentoMemo"
-        :style="memoCardPosition"
+        :style="[memoCardPosition, moveStyle]"
         class="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer"
       />
       <BentoNewPost
         v-if="show.BentoNewPost"
-        :style="newCardPosition"
+        :style="[newCardPosition, moveStyle]"
         class="absolute w-auto -translate-x-1/2 -translate-y-1/2"
       />
       <BentoTech
@@ -89,25 +84,25 @@
         :initial="{ scale: 0.5 }"
         :animate="{ scale: 1 }"
         class="h-2xs absolute w-70 -translate-x-1/2 -translate-y-1/2 p-0!"
-        :style="techPosition"
+        :style="[techPosition, moveStyleFast]"
       />
       <BentoWebsites
         v-if="show.BentoWebsites"
         :initial="{ scale: 0.5 }"
         :animate="{ scale: 1 }"
         class="absolute w-68 -translate-x-1/2 -translate-y-1/2 p-0!"
-        :style="websitesPosition"
+        :style="[websitesPosition, moveStyleFast]"
       />
       <BentoReadingList
         v-if="show.BentoReadingList"
         :initial="{ scale: 0 }"
         :animate="{ scale: 1 }"
-        :style="listCardPosition"
+        :style="[listCardPosition, moveStyle]"
         class="absolute w-auto -translate-x-1/2 -translate-y-1/2 cursor-pointer"
       />
       <BentoCat
         v-if="show.BentoCat"
-        :style="catPosition"
+        :style="[catPosition, moveStyle]"
         class="absolute w-2xs -translate-x-1/2 -translate-y-1/2"
       />
       <div
@@ -134,12 +129,12 @@
       </button>
       <BentoLike
         v-if="show.BentoLike"
-        :style="likePosition"
+        :style="[likePosition, moveStyleFast]"
         class="absolute w-fit -translate-x-1/2 -translate-y-1/2"
       />
       <BentoMap
         v-if="show.BentoMap"
-        :style="mapPosition"
+        :style="[mapPosition, moveStyle]"
         class="absolute w-fit -translate-x-1/2 -translate-y-1/2 select-none"
       />
     </div>
@@ -165,10 +160,13 @@ import {
 } from "@/components/bento";
 import ThemeToggle from "@/components/layout/ThemeToggle.vue";
 import carddelay from "@/data/carddelay.json";
-import { useDebounceFn, useStorage } from "@vueuse/core";
+import { useDebounceFn, useMouse, useStorage } from "@vueuse/core";
 import { AnimatePresence } from "motion-v";
 import { computed, nextTick, onMounted, onUnmounted, ref, watch, type ComponentPublicInstance } from "vue";
 
+const { x: mouseX, y: mouseY } = useMouse({
+  touch: false,
+});
 const backgroundImages = [
   "/background/bg-1.webp",
   "/background/bg-2.webp",
@@ -196,6 +194,29 @@ onUnmounted(() => {
   // 如果防抖函数支持 cancel，则在卸载时取消
   const maybe = debouncedSwitchBackground as unknown as { cancel?: () => void };
   maybe.cancel?.();
+});
+
+const moveStyle = computed(() => {
+  const centerX = mouseX.value - window.innerWidth / 2;
+  const centerY = mouseY.value - window.innerHeight / 2;
+  const dist = Math.sqrt(centerX * centerX + centerY * centerY);
+  const maxDist = Math.sqrt((window.innerWidth / 2) ** 2 + (window.innerHeight / 2) ** 2);
+  const ratio = dist / maxDist;
+
+  return {
+    filter: `drop-shadow(0 ${ratio * 8}px ${ratio * 4}px rgba(0,0,0,0.2)) brightness(${1 + ratio * 0.15})`,
+  };
+});
+const moveStyleFast = computed(() => {
+  const centerX = mouseX.value - window.innerWidth / 2;
+  const centerY = mouseY.value - window.innerHeight / 2;
+  const dist = Math.sqrt(centerX * centerX + centerY * centerY);
+  const maxDist = Math.sqrt((window.innerWidth / 2) ** 2 + (window.innerHeight / 2) ** 2);
+  const ratio = dist / maxDist;
+
+  return {
+    filter: `drop-shadow(0 ${ratio * 12}px ${ratio * 4}px rgba(0,0,0,0.2)) brightness(${1 + ratio * 0.2})`,
+  };
 });
 
 const clockRef = ref<ComponentPublicInstance | null>(null);

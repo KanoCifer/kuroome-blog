@@ -19,14 +19,20 @@ export function BackToTop({ className }: BackToTopProps) {
     const docHeight =
       document.documentElement.scrollHeight - window.innerHeight;
     const pct = docHeight > 0 ? Math.min(1, scrollTop / docHeight) : 0;
+    // console.log(
+    //   `scrollTop: ${scrollTop}, docHeight: ${docHeight}, pct: ${pct}`,
+    // );
     setProgress(pct);
     setIsVisible(scrollTop > 300);
   };
 
-  // 使用 requestAnimationFrame 来优化滚动事件的性能
+  // 使用 requestAnimationFrame 节流，确保每帧只更新一次
   const onScroll = () => {
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(updateScroll);
+    if (rafRef.current !== null) return;
+    rafRef.current = requestAnimationFrame(() => {
+      updateScroll();
+      rafRef.current = null;
+    });
   };
 
   useEffect(() => {
@@ -36,7 +42,6 @@ export function BackToTop({ className }: BackToTopProps) {
     return () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -87,7 +92,7 @@ export function BackToTop({ className }: BackToTopProps) {
                 strokeLinecap="round"
                 strokeDasharray={circumference}
                 strokeDashoffset={offset}
-                style={{ transition: 'stroke-dashoffset 200ms linear' }}
+                style={{ transition: 'none' }}
               />
             </svg>
 

@@ -1,3 +1,4 @@
+import { ArticleSummaryCard } from '@/components/basic/ArticleSummary';
 import { rssService } from '@/services/rssService';
 import { useNotificationStore } from '@/stores/notificationState';
 import type { RssArticle } from '@/types';
@@ -7,9 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-function rewriteImageUrls(html: string, base: string): string {
-  if (!html) return html;
-  const doc = new DOMParser().parseFromString(html, 'text/html');
+function rewriteImageUrls(doc: Document, base: string): void {
   doc.querySelectorAll('img').forEach((img) => {
     const src = img.getAttribute('src');
     if (!src) return;
@@ -24,7 +23,6 @@ function rewriteImageUrls(html: string, base: string): string {
       `/api/v1/rss/image-proxy?url=${encodeURIComponent(resolved)}`,
     );
   });
-  return doc.body.innerHTML;
 }
 
 export default function RssArticleView() {
@@ -57,8 +55,18 @@ export default function RssArticleView() {
 
   const html = useMemo(() => {
     const raw = article?.content || article?.summary || '';
+    if (!raw) return '';
     const base = article?.link || article?.feed_url || window.location.origin;
-    return DOMPurify.sanitize(rewriteImageUrls(raw, base));
+    const doc = new DOMParser().parseFromString(raw, 'text/html');
+    rewriteImageUrls(doc, base);
+    return DOMPurify.sanitize(doc.body.innerHTML);
+  }, [article]);
+
+  const pureContent = useMemo(() => {
+    const raw = article?.content || article?.summary || '';
+    if (!raw) return '';
+    const doc = new DOMParser().parseFromString(raw, 'text/html');
+    return doc.body.textContent || '';
   }, [article]);
 
   return (
@@ -95,10 +103,14 @@ export default function RssArticleView() {
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                 {article.title}
               </h1>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 mb-4">
                 {article.author ? `作者：${article.author} · ` : ''}
                 {formatDate(article.published)}
               </p>
+
+              {/* AI总结卡片 */}
+              <ArticleSummaryCard title={article.title} content={pureContent} />
+
               <div
                 className="prose prose-sm mt-4 max-w-none rounded-2xl bg-white p-4 ring-1 ring-blue-100 dark:prose-invert dark:bg-slate-900 dark:ring-slate-800"
                 dangerouslySetInnerHTML={{ __html: html }}

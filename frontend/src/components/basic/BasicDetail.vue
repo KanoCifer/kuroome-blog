@@ -1,10 +1,7 @@
 <template>
   <div>
     <!-- Title Section with Parallax -->
-    <div
-      class="relative -z-5 mx-0 mt-60 flex flex-col items-center justify-center bg-transparent"
-      :style="titleStyle"
-    >
+    <div class="relative -z-5 mx-0 mt-60 flex flex-col items-center justify-center bg-transparent" :style="titleStyle">
       <div>
         <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50">
           {{ title }}
@@ -58,7 +55,7 @@ defineProps<{
 
 // 计算标题的平移效果
 const titleStyle = computed(() => ({
-  transform: `translateY(${y.value * 0.4}px)`,
+  transform: `translateY(${y.value * 0.6}px)`,
 }));
 
 // 计算内容区的缩放效果

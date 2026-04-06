@@ -42,6 +42,10 @@ class UserService:
     def __init__(self, repo: UserRepo):
         self.repo = repo
 
+    async def is_admin_online(self) -> int:
+        """Check if any admin user is currently online."""
+        return await self.repo.is_admin_online()
+
     # ------------------------------------------------------------------ #
     # Authentication
     # ------------------------------------------------------------------ #
@@ -88,7 +92,7 @@ class UserService:
 
     async def logout(self, user: User, redis: AsyncRedis) -> None:
         """Mark user offline and remove from online tracking."""
-        await self.repo.set_active(user, False)
+        await self.repo.set_active_by_id(user.id, False)
         await redis.zrem("online:users", str(user.id))
         await redis.delete(f"online:{user.id}")
 
@@ -192,12 +196,12 @@ class UserService:
                 data.username, exclude_user_id=user.id
             ):
                 raise ValueError("Username already exists")
-            await self.repo.set_username(user, data.username)
+            await self.repo.set_username_by_id(user.id, data.username)
 
-        await self.repo.set_name(user, data.name)
+        await self.repo.set_name_by_id(user.id, data.name)
 
         if data.password:
-            await self.repo.set_password(user, data.password)
+            await self.repo.set_password_by_id(user.id, data.password)
 
         profile = await self.repo.get_profile(user.id)
         if not profile:
@@ -210,14 +214,21 @@ class UserService:
             mobile=data.mobile,
         )
 
+        # Re-fetch to get actual DB values (user may be detached)
+        updated_user = await self.repo.get_by_id(user.id, with_profile=True)
+        assert updated_user is not None
         return UserProfileOut(
-            id=user.id,
-            name=user.name,
-            username=user.username,
-            gender=profile.gender,
-            email=profile.email,
-            mobile=profile.mobile,
-            photo=profile.photo,
+            id=updated_user.id,
+            name=updated_user.name,
+            username=updated_user.username,
+            gender=updated_user.profile.gender
+            if updated_user.profile
+            else None,
+            email=updated_user.profile.email if updated_user.profile else None,
+            mobile=updated_user.profile.mobile
+            if updated_user.profile
+            else None,
+            photo=updated_user.profile.photo if updated_user.profile else None,
         ).model_dump()
 
     async def upload_avatar(self, user: User, image) -> dict:
