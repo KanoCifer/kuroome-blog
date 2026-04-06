@@ -1,8 +1,4 @@
 import axios from "axios";
-import {
-  getRefreshTokenFromStorage,
-  saveRefreshTokenToStorage,
-} from "../auth/refreshToken";
 
 const refreshTokenEndpoint = "/auth/refresh-token";
 
@@ -30,22 +26,10 @@ export async function refreshAccessToken() {
 }
 
 export async function refreshToken(): Promise<void> {
-  const refreshToken = getRefreshTokenFromStorage();
-
-  // 如果没有refreshToken，直接抛出错误，不需要请求
-  if (!refreshToken) {
-    throw new Error("No refresh token available");
-  }
-
-  const res = await refreshRequest.get(refreshTokenEndpoint, {
-    headers: {
-      refresh_token: refreshToken,
-    },
+  // refresh_token 从 cookie 自动发送（带 domain），后端从 cookie 读取
+  await refreshRequest.get(refreshTokenEndpoint, {
     _isRefreshToken: true,
   });
-
-  const newRefreshToken = res.data.data.refresh_token;
-  saveRefreshTokenToStorage(newRefreshToken);
 }
 
 export function isrefreshTokenRequest(config: {

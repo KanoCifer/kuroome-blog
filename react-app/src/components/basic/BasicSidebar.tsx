@@ -142,6 +142,18 @@ export const BentoNavSidebar: React.FC = () => {
     }
   }, [location.pathname]);
 
+  // 侧边栏打开时禁止背景滚动
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   return (
     <>
       {/* 侧边栏开关键 */}

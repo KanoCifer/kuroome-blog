@@ -1,4 +1,4 @@
-# ReadingList
+# kanocifer.chat
 
 [![Python](https://img.shields.io/badge/Python-v3.14%2B-3776AB?logo=python)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-NEW-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
@@ -16,20 +16,25 @@
 
 基于 **FastAPI + Vue 3 + React** 的全栈阅读清单管理与个人博客系统，支持**桌面端/移动端自动分流**。
 
+> 在线地址: [https://kanocifer.chat](https://kanocifer.chat)
+> 项目名称 kanocifer 来源于日语「黒猫」的罗马音，寓意神秘、独立、敏捷，象征着这个项目的核心价值：为用户提供一个高效、灵活、个性化的阅读与交流平台。
+
+---
+
 ## 功能特性
 
-| 功能模块       | 描述                                  |
-| -------------- | ------------------------------------- |
+| 功能模块       | 描述                                                                    |
+| -------------- | ----------------------------------------------------------------------- |
 | **用户系统**   | 注册、登录、个人资料、JWT/Cookie 认证、Passkey (WebAuthn)、GitHub OAuth |
-| **书籍管理**   | 书籍 CRUD、书架展示、阅读进度追踪     |
-| **微信读书**   | 从微信读书导入书籍                    |
-| **博客系统**   | 文章发布、分类、标签、评论            |
-| **留言板**     | 访客留言、管理                        |
-| **RSS 阅读器** | RSS 订阅解析、文章聚合、定时刷新      |
-| **AI 助手**    | 文章总结（Redis 缓存）                |
-| **待办事项**   | 任务管理、每日提醒（飞书通知）         |
-| **后台监控**   | 系统运行数据监控、访客追踪            |
-| **图库管理**   | 图片上传、管理                        |
+| **书籍管理**   | 书籍 CRUD、书架展示、阅读进度追踪                                       |
+| **微信读书**   | 从微信读书导入书籍                                                      |
+| **博客系统**   | 文章发布、分类、标签、评论                                              |
+| **留言板**     | 访客留言、管理                                                          |
+| **RSS 阅读器** | RSS 订阅解析、文章聚合、定时刷新                                        |
+| **AI 助手**    | 文章总结（Redis 缓存）                                                  |
+| **待办事项**   | 任务管理、每日提醒（飞书通知）                                          |
+| **后台监控**   | 系统运行数据监控、访客追踪                                              |
+| **图库管理**   | 图片上传、管理                                                          |
 
 ## 技术栈
 
@@ -240,9 +245,9 @@ react-app/src/
 
 ```mermaid
 flowchart LR
-    U[User Browser] --> D{Device?\nMobile?}
-    D -->|Yes| R[React App\n:5174]
-    D -->|No| F[Vue App\n:5173]
+    U[User Browser] --> D{Mobile?}
+    D -->|Yes| R[React App\nm.kanocifer.chat]
+    D -->|No| F[Vue App\nkanocifer.chat]
     F -->|HTTP / Cookie / CSRF| B[Backend API\nFastAPI]
     R -->|HTTP / Cookie / CSRF| B
     B --> PG[(PostgreSQL)]
@@ -255,6 +260,7 @@ flowchart LR
 ### 自动分流机制
 
 访问根路径时，通过 **UA 解析** 自动识别设备类型：
+
 - **移动端** (device_type = `mobile` / `tablet`) → 重定向到 React App
 - **桌面端** (device_type = `desktop`) → 访问 Vue App
 
@@ -272,6 +278,7 @@ flowchart LR
 ### 前端模块设计
 
 #### Vue 桌面端
+
 - **Views (`views/`)**：页面级容器，按业务领域组织。
 - **Components (`components/`)**：可复用 UI 组件，减少重复实现。
 - **Stores (`stores/`)**：Pinia 全局状态（用户、主题、通知、业务状态）。
@@ -279,6 +286,7 @@ flowchart LR
 - **Router (`router/`)**：路由注册、权限拦截、页面元信息管理。
 
 #### React 移动端
+
 - **Views (`views/`)**：页面级组件，按业务领域组织（Bento 布局）。
 - **Components (`components/`)**：可复用组件，触控优化。
 - **Stores (`stores/`)**：Zustand 轻量状态管理（认证、设备、主题、通知）。
@@ -295,30 +303,30 @@ flowchart LR
 
 ## API 端点 (:5555)
 
-| 路由               | 描述                      |
-| ------------------ | ------------------------- |
+| 路由               | 描述                           |
+| ------------------ | ------------------------------ |
 | `/api/v1/auth`     | 认证 (登录/注册/Passkey/OAuth) |
-| `/api/v1/books`    | 书籍管理 (CRUD、阅读进度) |
-| `/api/v1/users`    | 用户资料 (设置、头像)     |
-| `/api/v1/blog`     | 博客系统 (文章/评论/分类) |
-| `/api/v1/messages` | 留言板                    |
-| `/api/v1/weread`   | 微信读书导入              |
-| `/api/v1/rss`      | RSS 订阅器                |
-| `/api/v1/admin`    | 管理员 (内容审核)         |
-| `/api/v1/ai`       | AI 助手 (文章摘要)        |
-| `/api/v1/todos`    | 待办事项                  |
-| `/api/v1/monitor`  | 系统监控                  |
-| `/api/v1/public`   | 公共接口                  |
-| `/api/v1/publish`  | 文章发布                  |
+| `/api/v1/books`    | 书籍管理 (CRUD、阅读进度)      |
+| `/api/v1/users`    | 用户资料 (设置、头像)          |
+| `/api/v1/blog`     | 博客系统 (文章/评论/分类)      |
+| `/api/v1/messages` | 留言板                         |
+| `/api/v1/weread`   | 微信读书导入                   |
+| `/api/v1/rss`      | RSS 订阅器                     |
+| `/api/v1/admin`    | 管理员 (内容审核)              |
+| `/api/v1/ai`       | AI 助手 (文章摘要)             |
+| `/api/v1/todos`    | 待办事项                       |
+| `/api/v1/monitor`  | 系统监控                       |
+| `/api/v1/public`   | 公共接口                       |
+| `/api/v1/publish`  | 文章发布                       |
 
 ## 定时任务
 
-| 任务 | 调度规则 | 功能 |
-|------|----------|------|
-| `refresh_rss_feeds` | 每天 10:00 (Asia/Shanghai) | 刷新所有 RSS 订阅源 |
-| `run_migration_job` | 每 30 分钟 | 迁移 Redis 访客数据到 PostgreSQL |
-| `check_user_heartbeats` | 定时 | 检查用户心跳 |
-| `send_todo` | 每天 09:00 | 发送待办提醒（飞书通知） |
+| 任务                    | 调度规则                   | 功能                             |
+| ----------------------- | -------------------------- | -------------------------------- |
+| `refresh_rss_feeds`     | 每天 10:00 (Asia/Shanghai) | 刷新所有 RSS 订阅源              |
+| `run_migration_job`     | 每 30 分钟                 | 迁移 Redis 访客数据到 PostgreSQL |
+| `check_user_heartbeats` | 定时                       | 检查用户心跳                     |
+| `send_todo`             | 每天 09:00                 | 发送待办提醒（飞书通知）         |
 
 ## 配置
 

@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { createBrowserRouter, redirect } from 'react-router-dom';
 import {
   About,
+  Analytics,
   Changelog,
   BlogEdit,
   BlogList,
@@ -36,6 +37,25 @@ async function authLoader() {
   if (!store.user) {
     return redirect('/login?redirect=' + window.location.pathname);
   }
+  return null;
+}
+
+async function adminLoader() {
+  const { useAuthStore } = await import('../stores/authState');
+  const store = useAuthStore.getState();
+
+  if (!store.isHydrated) {
+    await store.hydrateAuth();
+  }
+
+  if (!store.user) {
+    return redirect('/login?redirect=' + window.location.pathname);
+  }
+
+  if (!store.user.is_admin) {
+    return redirect('/');
+  }
+
   return null;
 }
 
@@ -130,6 +150,11 @@ export const router = createBrowserRouter([
       {
         path: '/todos',
         element: <TodoList />,
+      },
+      {
+        path: '/analytics',
+        element: <Analytics />,
+        loader: adminLoader,
       },
       {
         path: '*',

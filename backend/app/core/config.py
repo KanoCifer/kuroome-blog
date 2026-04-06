@@ -39,6 +39,8 @@ class Settings(BaseSettings):
     AMAP_SECURITY_CODE: str = ""
     AMAP_WEB_KEY: str = ""
     JWT_PRIVATE_KEY: str = ""
+    # Cookie 跨域配置
+    COOKIE_DOMAIN: str = ""
     # Redis 配置
     REDIS_URL: str = "redis://localhost:6379/0"
     REDIS_MAX_CONNECTIONS: int = 10

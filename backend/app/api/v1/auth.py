@@ -69,6 +69,7 @@ def _build_login_response(
         },
         message=message,
     )
+    cookie_domain = settings.COOKIE_DOMAIN
     manager.set_cookie(response=response, token=tokens["access_token"])
     response.set_cookie(
         key="refresh_token",
@@ -76,6 +77,7 @@ def _build_login_response(
         httponly=True,
         samesite="lax",
         secure=True,
+        domain=cookie_domain or None,
     )
     csrf_manager.set_csrf_cookie(response)
     return response
@@ -145,6 +147,7 @@ async def refresh_token(
             code=status.HTTP_200_OK,
             data={"refresh_token": new_refresh_token},
         )
+        cookie_domain = settings.COOKIE_DOMAIN
         manager.set_cookie(response=response, token=access_token)
         response.set_cookie(
             key="refresh_token",
@@ -152,6 +155,7 @@ async def refresh_token(
             httponly=True,
             samesite="lax",
             secure=True,
+            domain=cookie_domain or None,
         )
         csrf_manager.set_csrf_cookie(response)
 
@@ -200,12 +204,15 @@ async def logout(
 ):
     await user_service.logout(user, redis)
 
+    cookie_domain = settings.COOKIE_DOMAIN
     response = APIResponse.ok(
         message="已退出登录",
         code=status.HTTP_200_OK,
     )
-    response.delete_cookie(key="refresh_token")
-    response.delete_cookie(key=manager.cookie_name)
+    response.delete_cookie(key="refresh_token", domain=cookie_domain or None)
+    response.delete_cookie(
+        key=manager.cookie_name, domain=cookie_domain or None
+    )
     return response
 
 
@@ -627,6 +634,7 @@ async def github_callback(
         tokens = user_service.create_tokens(user)
 
         response = RedirectResponse(url=settings.FRONTEND_URL)
+        cookie_domain = settings.COOKIE_DOMAIN
         manager.set_cookie(response=response, token=tokens["access_token"])
         response.set_cookie(
             key="refresh_token",
@@ -634,6 +642,7 @@ async def github_callback(
             httponly=True,
             samesite="lax",
             secure=True,
+            domain=cookie_domain or None,
         )
         csrf_manager.set_csrf_cookie(response)
 

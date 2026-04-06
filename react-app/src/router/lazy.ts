@@ -26,3 +26,4 @@ export const PicGallery = lazy(() => import('../views/Pic/PicGalleryView'));
 export const ImageToolbox = lazy(
   () => import('../views/Toolbox/ImageToolboxView'),
 );
+export const Analytics = lazy(() => import('../views/Analytics/AnalyticsView'));
