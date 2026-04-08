@@ -155,8 +155,18 @@ const fetchTideData = async () => {
   loading.value = true;
   try {
     const res = await weatherService.getTide();
-    if (res.status === 200) {
-      tideData.value = res.data.data;
+    if (res.tides && res.tides.length > 0) {
+      // Transform API data to component format
+      const tideTable = res.tides.map((t, i) => ({
+        fxTime: t.time,
+        height: t.height,
+        type: i % 2 === 0 ? ("H" as const) : ("L" as const),
+      }));
+      tideData.value = {
+        updateTime: "",
+        tideTable,
+        tideHourly: res.tides.map((t) => ({ fxTime: t.time, height: t.height })),
+      };
       emit("update", { tideData: tideData.value, spotName: "黄埔港" });
     }
   } catch {

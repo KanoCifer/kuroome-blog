@@ -508,7 +508,7 @@ const editDescription = ref("");
 const fetchGalleryImages = async () => {
   try {
     const response = await galleryService.getGallery();
-    images.value = response.data.data.images;
+    images.value = response.images;
     generateLayoutSeeds();
     console.log(images.value);
   } catch {
@@ -666,7 +666,7 @@ const uploadPic = async (file: File) => {
   try {
     const res = await galleryService.uploadGalleryImage(formData);
     useNotificationStore().success("图片上传成功");
-    return res.data.data.url;
+    return res.url;
   } catch {
     useNotificationStore().error("图片上传失败");
     return null;

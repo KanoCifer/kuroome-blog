@@ -5,23 +5,49 @@ export interface TideResponse {
 }
 
 export interface GeocodeResponse {
-  address: string;
+  status: string;
+  regeocode?: {
+    addressComponent: {
+      adcode: string;
+    };
+  };
+  address?: string;
   location?: { lat: number; lng: number };
 }
 
-export interface WeatherResponse {
-  now?: {
+export interface WeatherLiveResponse {
+  status: string;
+  lives?: Array<{
+    city: string;
     temp: string;
     text: string;
     windDir: string;
     humidity: string;
-  };
+  }>;
+}
+
+export interface WeatherForecastResponse {
+  status: string;
+  forecasts?: Array<{
+    casts?: Array<{
+      date: string;
+      dayWeather: string;
+      nightWeather: string;
+      dayTemp: string;
+      nightTemp: string;
+      dayWind: string;
+      nightWind: string;
+    }>;
+  }>;
 }
 
 export interface WeatherGateway {
   getTide(): Promise<TideResponse>;
   reverseGeocode(payload: { location: string; extensions: "base" | "all" }): Promise<GeocodeResponse>;
-  getWeather(payload: { city: string; extensions: "base" | "all" }): Promise<WeatherResponse>;
+  getWeather(payload: {
+    city: string;
+    extensions: "base" | "all";
+  }): Promise<WeatherLiveResponse | WeatherForecastResponse>;
 }
 
 export const weatherGateway: WeatherGateway = {
@@ -35,8 +61,14 @@ export const weatherGateway: WeatherGateway = {
     return res.data.data;
   },
 
-  async getWeather(payload: { city: string; extensions: "base" | "all" }): Promise<WeatherResponse> {
-    const res = await request.post<{ data: WeatherResponse }>("v1/weather/weather", payload);
+  async getWeather(payload: {
+    city: string;
+    extensions: "base" | "all";
+  }): Promise<WeatherLiveResponse | WeatherForecastResponse> {
+    const res = await request.post<{ data: WeatherLiveResponse | WeatherForecastResponse }>(
+      "v1/weather/weather",
+      payload,
+    );
     return res.data.data;
   },
 };

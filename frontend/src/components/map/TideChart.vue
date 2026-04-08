@@ -46,8 +46,17 @@ const fetchTideData = async () => {
   loading.value = true;
   try {
     const res = await weatherService.getTide();
-    if (res.status === 200) {
-      tideData.value = res.data.data;
+    if (res.tides && res.tides.length > 0) {
+      const tideTable = res.tides.map((t, i) => ({
+        fxTime: t.time,
+        height: t.height,
+        type: (i % 2 === 0 ? "H" : "L") as "H" | "L",
+      }));
+      tideData.value = {
+        updateTime: "",
+        tideTable,
+        tideHourly: res.tides.map((t) => ({ fxTime: t.time, height: t.height })),
+      };
     }
   } catch {
     notifier.error("获取潮汐信息失败，请稍后再试");

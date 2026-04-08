@@ -32,7 +32,7 @@ const isSubmitting = ref(false);
 const fetchLikesCount = async () => {
   try {
     const response = await socialService.getLikes();
-    likesCounts.value = response.data.data.likes_count || 0;
+    likesCounts.value = response.likescounts || 0;
   } catch (error) {
     console.error("Failed to fetch likes count:", error);
   }

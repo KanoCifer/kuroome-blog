@@ -147,7 +147,7 @@ const uploadImageToServer = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("file", file);
   const response = await uploadService.uploadEditorImage(formData);
-  return response.data.data.url;
+  return response.url;
 };
 
 // 发布前上传所有 blob 图片并返回最终内容

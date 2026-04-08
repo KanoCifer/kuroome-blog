@@ -75,7 +75,7 @@ async function fetchData() {
   error.value = null;
   try {
     const response = await analyticsService.getOverview(days);
-    chartData.value = (response.data.data as OverviewResponse).daily_trend || [];
+    chartData.value = (response.data as OverviewResponse).daily_trend || [];
   } catch (e) {
     error.value = e instanceof Error ? e.message : "Failed to load data";
     chartData.value = [];

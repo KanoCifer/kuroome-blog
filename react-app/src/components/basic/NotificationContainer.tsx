@@ -36,16 +36,18 @@ export function Notifier() {
   }, [notifications, notificationStore]);
 
   const toast = notifications.map((n, i) => {
+    const offset = i * 88;
+
     return (
       <motion.div
         key={n.id}
-        initial={{ opacity: 0, y: -40, scale: 0.9 }}
+        initial={{ opacity: 0, y: -40 - offset, scale: 0.9 }}
         animate={{
           opacity: 1,
-          y: 0,
-          scale: 1 - notifications.length * 0.1,
+          y: offset,
+          scale: 1 - i * 0.05,
           zIndex: 9999 - i,
-          pointerEvents: notifications.length > 3 ? 'none' : 'auto', // 超过3条通知时，后续通知不可点击
+          pointerEvents: i > 2 ? 'none' : 'auto',
         }}
         exit={{ opacity: 0, y: -40, scale: 0.9 }}
         transition={{ type: 'spring', damping: 30, stiffness: 500 }}
@@ -68,10 +70,7 @@ export function Notifier() {
   });
 
   return (
-    <div
-      className="fixed top-4 left-1/2 z-9999 w-full -translate-x-1/2 sm:w-96"
-      style={{ perspective: '1000px' }}
-    >
+    <div className="fixed top-4 left-1/2 z-9999 w-full -translate-x-1/2">
       <AnimatePresence mode="popLayout">{toast}</AnimatePresence>
     </div>
   );

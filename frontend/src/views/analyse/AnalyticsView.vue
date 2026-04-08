@@ -517,10 +517,10 @@ const formatDateTime = (dateStr: string | null): string => {
 const fetchOverview = async () => {
   try {
     const res = await analyticsService.getOverview(selectedDays.value);
-    if (res.data.code === 200) {
-      overviewData.value = res.data.data;
+    if (res.code === 200) {
+      overviewData.value = res.data as unknown as OverviewData;
     } else {
-      error.value = res.data.message || "Failed to load overview data";
+      error.value = res.message || "Failed to load overview data";
     }
   } catch (err) {
     console.error("Failed to fetch overview:", err);
@@ -535,10 +535,10 @@ const fetchLoginLogs = async () => {
       page: loginLogsPage.value,
       page_size: 20,
     });
-    if (res.data.code === 200) {
-      loginLogsData.value = res.data.data;
+    if (res.code === 200) {
+      loginLogsData.value = res.data as unknown as LoginLogsResponse;
     } else {
-      error.value = res.data.message || "Failed to load login logs";
+      error.value = res.message || "Failed to load login logs";
     }
   } catch (err) {
     console.error("Failed to fetch login logs:", err);

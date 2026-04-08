@@ -298,7 +298,7 @@ const fetchWeather = async (location: [number, number]) => {
       extensions: "base",
     });
 
-    const regeoData = regeoResponse.data?.data;
+    const regeoData = regeoResponse;
     if (regeoData?.status !== "1" || !regeoData?.regeocode?.addressComponent?.adcode) {
       throw new Error("无法获取城市信息");
     }
@@ -311,9 +311,23 @@ const fetchWeather = async (location: [number, number]) => {
       extensions: "base",
     });
 
-    const liveResult = liveResponse.data?.data;
-    if (liveResult?.status === "1" && liveResult?.lives?.length > 0) {
-      liveWeather.value = liveResult.lives[0];
+    const liveResult = liveResponse as {
+      status: string;
+      lives?: Array<{ city: string; temp: string; text: string; windDir: string; humidity: string }>;
+    };
+    if (liveResult?.status === "1" && liveResult?.lives && liveResult.lives.length > 0) {
+      const live = liveResult.lives[0]!;
+      liveWeather.value = {
+        province: "",
+        city: live.city,
+        adcode,
+        weather: live.text,
+        temperature: live.temp,
+        winddirection: live.windDir,
+        windpower: "",
+        humidity: live.humidity,
+        reporttime: "",
+      };
     } else {
       throw new Error("无法获取天气信息");
     }
@@ -324,9 +338,38 @@ const fetchWeather = async (location: [number, number]) => {
       extensions: "all",
     });
 
-    const forecastResult = forecastResponse.data?.data;
-    if (forecastResult?.status === "1" && forecastResult?.forecasts?.length > 0) {
-      forecasts.value = forecastResult.forecasts[0]?.casts || [];
+    const forecastResult = forecastResponse as {
+      status: string;
+      forecasts?: Array<{
+        casts?: Array<{
+          date: string;
+          dayWeather: string;
+          nightWeather: string;
+          dayTemp: string;
+          nightTemp: string;
+          dayWind: string;
+          nightWind: string;
+        }>;
+      }>;
+    };
+    if (
+      forecastResult?.status === "1" &&
+      forecastResult?.forecasts &&
+      forecastResult.forecasts.length > 0 &&
+      forecastResult.forecasts[0]?.casts
+    ) {
+      forecasts.value = forecastResult.forecasts[0].casts.map((cast) => ({
+        date: cast.date,
+        week: "",
+        dayweather: cast.dayWeather,
+        nightweather: cast.nightWeather,
+        daytemp: cast.dayTemp,
+        nighttemp: cast.nightTemp,
+        daywind: cast.dayWind,
+        nightwind: cast.nightWind,
+        daypower: "",
+        nightpower: "",
+      }));
     }
 
     if (liveWeather.value) {

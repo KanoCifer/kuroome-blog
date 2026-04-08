@@ -65,7 +65,7 @@ let clickHandler: ((e: unknown) => void) | null = null;
 const fetchSecurityKey = async (): Promise<string> => {
   try {
     const response = await mapService.getSecurityKey();
-    const encodedKey = response.data?.data?.securityJsCode || "";
+    const encodedKey = response.key || "";
 
     // Decode base64 encoded key
     if (encodedKey) {
