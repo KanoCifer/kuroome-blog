@@ -14,6 +14,7 @@ from app.repositories import (
     MonitorRepo,
     PublicRepo,
     RssRepo,
+    SubRepo,
     TodoRepo,
     UserRepo,
     WereadRepo,
@@ -26,6 +27,7 @@ from app.services.message_service import MessageService
 from app.services.monitor_service import MonitorService
 from app.services.public_service import PublicService
 from app.services.rss_service import RssService
+from app.services.sub_service import SubService
 from app.services.todo_service import TodoService
 from app.services.user_service import UserService
 from app.services.weread_service import WereadService
@@ -110,9 +112,32 @@ async def get_weread_service():
 
 
 @asynccontextmanager
+async def get_sub_service():
+    async with get_async_session() as session:
+        sub_repo = SubRepo(session)
+        service = SubService(repo=sub_repo)
+        yield service
+
+
+@asynccontextmanager
 async def get_ai_service(
     summarizer: ArticleSummarizer = article_summarizer,
 ):
     ai_repo = AiRepo()
     service = AiService(repo=ai_repo, summarizer=summarizer)
     yield service
+
+
+@asynccontextmanager
+async def get_notification_service(dispatcher=None):
+    from app.notification.dispatcher import NotificationDispatcher
+
+    async with get_async_session() as session:
+        from app.repositories.notification_repo import NotificationRepo
+
+        repo = NotificationRepo(session)
+        from app.services.notification_service import NotificationService
+
+        _dispatcher = dispatcher or NotificationDispatcher()
+        service = NotificationService(_dispatcher, repo=repo)
+        yield service

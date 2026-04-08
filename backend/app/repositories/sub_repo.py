@@ -1,0 +1,115 @@
+from __future__ import annotations
+
+from datetime import UTC, datetime
+from typing import Any
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+
+from app.models.beanie import SubscriptionLog
+from app.models.models import Subscription
+
+
+class SubRepo:
+    def __init__(self, session: AsyncSession) -> None:
+        self.session = session
+
+    async def get_all_subscriptions(self, user_id: int) -> list[Subscription]:
+        """获取用户的所有订阅"""
+        stmt = select(Subscription).where(Subscription.user_id == user_id)
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def get_subscription_by_id(self, sub_id: int) -> Subscription | None:
+        """根据订阅ID获取订阅详情"""
+        stmt = (
+            select(Subscription)
+            .where(Subscription.id == sub_id)
+            .options(selectinload(Subscription.user))
+        )
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def create_one_subscription(
+        self,
+        user_id: int,
+        **sub_data: Any,
+    ) -> Subscription:
+        """创建新的订阅"""
+        subscription = Subscription(user_id=user_id, **sub_data)
+        self.session.add(subscription)
+        await self.session.refresh(subscription)
+        return subscription
+
+    async def update_subscription(
+        self,
+        sub_id: int,
+        **update_data: Any,
+    ) -> Subscription | None:
+        """更新订阅信息"""
+        subscription = await self.get_subscription_by_id(sub_id)
+        if subscription is None:
+            return None
+        for key, value in update_data.items():
+            if value is not None:
+                setattr(subscription, key, value)
+        await self.session.refresh(subscription)
+        return subscription
+
+    async def delete_subscription(self, sub_id: int) -> bool:
+        """删除订阅"""
+        subscription = await self.get_subscription_by_id(sub_id)
+        if subscription is None:
+            return False
+        await self.session.delete(subscription)
+        return True
+
+    async def update_status(
+        self, sub_id: int, new_status: str
+    ) -> Subscription | None:
+        """更新订阅状态"""
+        subscription = await self.get_subscription_by_id(sub_id)
+        if subscription is None:
+            return None
+        subscription.status = new_status
+        await self.session.refresh(subscription)
+        return subscription
+
+    async def update_reminder_config(
+        self, sub_id: int, new_config: dict
+    ) -> Subscription | None:
+        """更新订阅提醒配置"""
+        subscription = await self.get_subscription_by_id(sub_id)
+        if subscription is None:
+            return None
+        subscription.reminder_config = new_config
+        await self.session.refresh(subscription)
+        return subscription
+
+    async def get_due_subscriptions(self) -> list[Subscription]:
+        """获取所有需要发送通知的订阅"""
+        stmt = select(Subscription).where(
+            Subscription.status == "active",
+            Subscription.next_billing_date <= datetime.now(UTC),
+        )
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def get_active_subscriptions(self) -> list[Subscription]:
+        """获取所有活跃订阅"""
+        stmt = select(Subscription).where(Subscription.status == "active")
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def get_subscription_logs(
+        self, user_id: int | None = None, sub_id: int | None = None
+    ) -> list[SubscriptionLog]:
+        """获取订阅通知日志"""
+        if user_id is not None:
+            logs = SubscriptionLog.find(SubscriptionLog.user_id == user_id)
+        elif sub_id is not None:
+            logs = SubscriptionLog.find(SubscriptionLog.sub_id == sub_id)
+        else:
+            return []
+        return await logs.to_list()

@@ -1,24 +1,28 @@
-import request from "@/api/request";
+import { galleryGateway } from "@/api/galleryGateway";
 
-export const galleryService = {
-  async getGallery() {
-    return request.get("/pic-gallery");
-  },
-
-  async uploadGalleryImage(formData: FormData) {
-    return request.post("/upload-gallery-image", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-  },
-
-  async saveGallery(payload: {
+export interface GalleryService {
+  getGallery(): Promise<{ images: Array<{ id: string; url: string; description: string; uploadedAt?: string }> }>;
+  uploadGalleryImage(formData: FormData): Promise<{ url: string }>;
+  saveGallery(payload: {
     images: Array<{
       id: string;
       url: string;
       description: string;
       uploadedAt?: string;
     }>;
-  }) {
-    return request.post("/set-pic-gallery", payload);
+  }): Promise<void>;
+}
+
+export const galleryService: GalleryService = {
+  async getGallery() {
+    return galleryGateway.getGallery();
+  },
+
+  async uploadGalleryImage(formData: FormData) {
+    return galleryGateway.uploadGalleryImage(formData);
+  },
+
+  async saveGallery(payload) {
+    await galleryGateway.saveGallery(payload);
   },
 };

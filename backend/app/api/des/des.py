@@ -8,8 +8,10 @@ from app.core.container import (
     get_book_service,
     get_message_service,
     get_monitor_service,
+    get_notification_service,
     get_public_service,
     get_rss_service,
+    get_sub_service,
     get_todo_service,
     get_user_service,
     get_weread_service,
@@ -72,4 +74,14 @@ async def weread_service_dep():
 
 async def ai_service_dep():
     async with get_ai_service() as service:
+        yield service
+
+
+async def sub_service_dep():
+    async with get_sub_service() as service:
+        yield service
+
+
+async def notification_service_dep():
+    async with get_notification_service() as service:
         yield service

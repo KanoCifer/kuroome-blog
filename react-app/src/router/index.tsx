@@ -21,6 +21,7 @@ import {
   Register,
   RssArticle,
   RssWorkspace,
+  Subscription,
   TodoList,
   Website,
 } from './lazy';
@@ -154,6 +155,11 @@ export const router = createBrowserRouter([
       {
         path: '/analytics',
         element: <Analytics />,
+        loader: adminLoader,
+      },
+      {
+        path: '/subscription',
+        element: <Subscription />,
         loader: adminLoader,
       },
       {

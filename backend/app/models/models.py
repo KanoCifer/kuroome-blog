@@ -5,8 +5,11 @@ from datetime import UTC, datetime
 import faker
 from fastapi import Request
 from sqlalchemy import (
+    JSON,
     Boolean,
     DateTime,
+    Enum,
+    Float,
     ForeignKey,
     Index,
     Integer,
@@ -104,6 +107,10 @@ class User(Base):
     rss_info: Mapped[list[RssInfo]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
+    subscriptions: Mapped[list[Subscription]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+
     # 一对一关系与PasskeyCredential
     passkey_credential: Mapped[PasskeyCredential | None] = relationship(
         back_populates="user", uselist=False, cascade="all, delete-orphan"
@@ -181,6 +188,13 @@ class Profile(Base):
     user: Mapped[User] = relationship(back_populates="profile")
     photo: Mapped[str | None] = mapped_column(
         String(200), nullable=True, default="default.png"
+    )
+
+    bark_device_key: Mapped[str | None] = mapped_column(
+        String(100), nullable=True
+    )
+    feishu_webhook_url: Mapped[str | None] = mapped_column(
+        String(500), nullable=True
     )
 
     # 初始化方法
@@ -360,3 +374,46 @@ class PasskeyCredential(Base):
     user: Mapped[User] = relationship(
         back_populates="passkey_credential", uselist=False
     )
+
+
+class Subscription(Base):
+    __tablename__ = "subscription"
+    id = mapped_column(Integer, primary_key=True, autoincrement=True)
+
+    name = mapped_column(String(100), nullable=False)
+    provider = mapped_column(String(100), nullable=False)
+
+    price = mapped_column(Float, nullable=False)
+
+    currency = mapped_column(String(10), nullable=False)
+
+    billing_cycle = mapped_column(
+        Enum("monthly", "quarterly", "yearly", name="billing_cycle_enum"),
+        nullable=False,
+    )
+
+    next_billing_date = mapped_column(DateTime(timezone=True), nullable=False)
+
+    status = mapped_column(
+        Enum(
+            "active",
+            "canceled",
+            "paused",
+            "expired",
+            name="subscription_status_enum",
+        ),
+        nullable=False,
+    )
+    reminder_config = mapped_column(JSON, nullable=True)
+    notes = mapped_column(Text, nullable=True)
+    created_at = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), index=True
+    )
+    updated_at = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+    )
+
+    user_id = mapped_column(Integer, ForeignKey("user.id"), index=True)
+    user: Mapped[User] = relationship(back_populates="subscriptions")

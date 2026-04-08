@@ -27,3 +27,6 @@ export const ImageToolbox = lazy(
   () => import('../views/Toolbox/ImageToolboxView'),
 );
 export const Analytics = lazy(() => import('../views/Analytics/AnalyticsView'));
+export const Subscription = lazy(
+  () => import('../views/subscription/SubscriptionView'),
+);

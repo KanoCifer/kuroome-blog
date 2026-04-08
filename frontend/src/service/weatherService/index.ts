@@ -1,15 +1,27 @@
-import request from "@/api/request";
+import { weatherGateway } from "@/api/weatherGateway";
 
-export const weatherService = {
+export interface WeatherService {
+  getTide(): Promise<{ tides?: Array<{ time: string; height: number }> }>;
+  reverseGeocode(payload: {
+    location: string;
+    extensions: "base" | "all";
+  }): Promise<{ address: string; location?: { lat: number; lng: number } }>;
+  getWeather(payload: {
+    city: string;
+    extensions: "base" | "all";
+  }): Promise<{ now?: { temp: string; text: string; windDir: string; humidity: string } }>;
+}
+
+export const weatherService: WeatherService = {
   async getTide() {
-    return request.get("/qweather/tide");
+    return weatherGateway.getTide();
   },
 
-  async reverseGeocode(payload: { location: string; extensions: "base" | "all" }) {
-    return request.post("/geocode/regeo", payload);
+  async reverseGeocode(payload) {
+    return weatherGateway.reverseGeocode(payload);
   },
 
-  async getWeather(payload: { city: string; extensions: "base" | "all" }) {
-    return request.post("/weather", payload);
+  async getWeather(payload) {
+    return weatherGateway.getWeather(payload);
   },
 };

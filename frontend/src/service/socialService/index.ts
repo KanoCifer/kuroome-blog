@@ -1,11 +1,16 @@
-import request from "@/api/request";
+import { socialGateway } from "@/api/socialGateway";
 
-export const socialService = {
+export interface SocialService {
+  getLikes(): Promise<{ likescounts: number }>;
+  likeOnce(payload: { likescounts: number }): Promise<void>;
+}
+
+export const socialService: SocialService = {
   async getLikes() {
-    return request("/likes");
+    return socialGateway.getLikes();
   },
 
-  async likeOnce(payload: { likescounts: number }) {
-    return request.post("/like", payload);
+  async likeOnce(payload) {
+    await socialGateway.likeOnce(payload);
   },
 };

@@ -1,22 +1,21 @@
-import request from "@/api/request";
+import { analyticsGateway } from "@/api/analyticsGateway";
 
-export const analyticsService = {
-  async getOverview(days: number) {
-    return request.get("/status/overview", {
-      params: { days },
-    });
+export interface AnalyticsService {
+  getOverview(days: number): Promise<Record<string, unknown>>;
+  getUserLogins(params: { days: number; page: number; page_size: number }): Promise<Record<string, unknown>>;
+  reportVisitorData(data: Record<string, unknown>): Promise<void>;
+}
+
+export const analyticsService: AnalyticsService = {
+  async getOverview(days) {
+    return analyticsGateway.getOverview(days);
   },
 
-  async getUserLogins(params: { days: number; page: number; page_size: number }) {
-    return request.get("/status/user-logins", {
-      params,
-    });
+  async getUserLogins(params) {
+    return analyticsGateway.getUserLogins(params);
   },
 
-  async reportVisitorData(data: Record<string, unknown>) {
-    return request.post("/admin/track", data, {
-      timeout: 5000,
-      withCredentials: true,
-    });
+  async reportVisitorData(data) {
+    await analyticsGateway.reportVisitorData(data);
   },
 };

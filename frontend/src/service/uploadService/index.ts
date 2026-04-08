@@ -1,7 +1,11 @@
-import request from "@/api/request";
+import { uploadGateway } from "@/api/uploadGateway";
 
-export const uploadService = {
+export interface UploadService {
+  uploadEditorImage(formData: FormData): Promise<{ url: string }>;
+}
+
+export const uploadService: UploadService = {
   async uploadEditorImage(formData: FormData) {
-    return request.post("/upload-image", formData);
+    return uploadGateway.uploadEditorImage(formData);
   },
 };

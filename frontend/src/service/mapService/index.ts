@@ -1,7 +1,11 @@
-import request from "@/api/request";
+import { mapGateway } from "@/api/mapGateway";
 
-export const mapService = {
+export interface MapService {
+  getSecurityKey(): Promise<{ key: string }>;
+}
+
+export const mapService: MapService = {
   async getSecurityKey() {
-    return request.get("/amap/security-key");
+    return mapGateway.getSecurityKey();
   },
 };

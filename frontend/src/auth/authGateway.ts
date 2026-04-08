@@ -65,12 +65,12 @@ function emptyLoginResult(): LoginResult {
 export function createAuthGateway(): AuthGateway {
   return {
     async fetchAdminStatus(): Promise<1 | 0> {
-      const res = await request.get("/auth/status-of-admin");
+      const res = await request.get("v1/auth/status-of-admin");
       return res.data.data.admin_online;
     },
 
     async fetchUser(): Promise<UserInfo | null> {
-      const res = await request.get<ApiResponse<UserInfo | null>>("/auth/me");
+      const res = await request.get<ApiResponse<UserInfo | null>>("v1/auth/me");
       return res.data.data || null;
     },
 
@@ -80,13 +80,13 @@ export function createAuthGateway(): AuthGateway {
 
     async getPasskeyAuthenticationOptions(): Promise<PublicKeyCredentialRequestOptionsJSON> {
       const res = await request.get<ApiResponse<PublicKeyCredentialRequestOptionsJSON>>(
-        "/auth/passkey/authentication-options",
+        "v1/auth/passkey/authentication-options",
       );
       return res.data.data;
     },
 
     async login(username: string, password: string, rememberMe: boolean): Promise<LoginResult> {
-      const res = await request.post<ApiResponse<LoginResponseData>>("/auth/login", {
+      const res = await request.post<ApiResponse<LoginResponseData>>("v1/auth/login", {
         username: username,
         password: password,
         remember_me: rememberMe,
@@ -97,7 +97,7 @@ export function createAuthGateway(): AuthGateway {
     },
 
     async loginWithPasskey(assertion: unknown): Promise<PasskeyLoginResult> {
-      const res = await request.post<ApiResponse<LoginResponseData>>("/auth/passkey/authenticate", {
+      const res = await request.post<ApiResponse<LoginResponseData>>("v1/auth/passkey/authenticate", {
         assertion: assertion,
       });
 
@@ -106,11 +106,11 @@ export function createAuthGateway(): AuthGateway {
     },
 
     async logout(): Promise<void> {
-      await request.post("/auth/logout");
+      await request.post("v1/auth/logout");
     },
 
     async postHeartbeat(): Promise<void> {
-      await request.post("/auth/heartbeat");
+      await request.post("v1/auth/heartbeat");
     },
 
     loginWithGitHub(): void {
