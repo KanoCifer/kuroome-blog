@@ -9,6 +9,7 @@ from app.notification import NotificationPayload
 from app.schemas.response import APIResponse
 from app.schemas.sub import (
     CreateOneSubRequest,
+    SubResponse,
     TestNotificationRequest,
     UpdateSubRequest,
 )
@@ -24,12 +25,10 @@ async def get_subscriptions(
     sub_service: SubService = Depends(sub_service_dep),
 ):
     """获取当前用户的订阅列表"""
+    subscriptions = await sub_service.get_all_subscriptions(current_user.id)
+    response = [SubResponse.model_validate(sub) for sub in subscriptions]
     return APIResponse.ok(
-        data={
-            "subscriptions": await sub_service.get_all_subscriptions(
-                current_user.id
-            )
-        },
+        data={"subscriptions": response},
         message="获取订阅列表成功",
     )
 
@@ -44,8 +43,11 @@ async def get_subscription(
     subscription = await sub_service.get_subscription_by_id(sub_id)
     if subscription is None or subscription.user_id != current_user.id:
         return APIResponse.error(message="订阅不存在或无访问权限")
+    response = (
+        SubResponse.model_validate(subscription) if subscription else None
+    )
     return APIResponse.ok(
-        data={"subscription": subscription}, message="获取订阅详情成功"
+        data={"subscription": response}, message="获取订阅详情成功"
     )
 
 

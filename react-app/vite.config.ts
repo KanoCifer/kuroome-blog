@@ -59,10 +59,7 @@ export default defineConfig({
             return 'date';
 
           // ✅ ECharts（体积大，单独打包）
-          if (
-            id.includes('echarts') ||
-            id.includes('echarts-for-react')
-          ) {
+          if (id.includes('echarts') || id.includes('echarts-for-react')) {
             return 'echarts';
           }
         },
@@ -82,7 +79,7 @@ export default defineConfig({
   server: {
     port: 5174, // 避免与 Vue 项目冲突
     proxy: {
-      '/api/v1/': {
+      '/api/': {
         target: 'http://localhost:5555',
         changeOrigin: true,
       },

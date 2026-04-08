@@ -26,7 +26,7 @@ export interface AuthGateway {
 
 export const authGateway: AuthGateway = {
   async uploadAvatar(formData: FormData) {
-    return request.put("/auth/upload-pic", formData, {
+    return request.put("v1/auth/upload-pic", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -34,30 +34,30 @@ export const authGateway: AuthGateway = {
   },
 
   async getPasskeyRegistrationOptions() {
-    return request.get("/auth/passkey/registration-options");
+    return request.get("v1/auth/passkey/registration-options");
   },
 
   async registerPasskey(payload: { response: unknown }) {
-    return request.post("/auth/passkey/register", payload);
+    return request.post("v1/auth/passkey/register", payload);
   },
 
   async deletePasskey() {
-    return request.delete("/auth/passkey/delete");
+    return request.delete("v1/auth/passkey/delete");
   },
 
   async unbindGithub() {
-    return request.post("/auth/github/unbind");
+    return request.post("v1/auth/github/unbind");
   },
 
   async updateProfileSettings(payload) {
-    return request.put("/auth/settings", payload);
+    return request.put("v1/auth/settings", payload);
   },
 
   async sendRegisterEmailCode(payload: { email: string }) {
-    return request.post("/auth/email/code", payload);
+    return request.post("v1/auth/email/code", payload);
   },
 
   async register(payload) {
-    return request.post("/auth/register", payload);
+    return request.post("v1/auth/register", payload);
   },
 };

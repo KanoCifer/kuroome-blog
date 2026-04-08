@@ -44,7 +44,9 @@ export interface blogGateway {
   getCategories(): Promise<AxiosResponse<Category[]>>;
   getPostsByCategory(
     categoryId: number,
-  ): Promise<AxiosResponse<{ posts: BlogPost[]; category: { id: number; name: string } }>>;
+  ): Promise<
+    AxiosResponse<{ posts: BlogPost[]; category: { id: number; name: string } }>
+  >;
   // Legacy endpoints
   getLegacyPost(postId: string): Promise<AxiosResponse<BlogPostResponse>>;
   createLegacyPost(payload: {
@@ -66,34 +68,31 @@ export interface blogGateway {
 export const blogGateway = (): blogGateway => {
   return {
     async getBlogs(query?: BlogQuery) {
-      return request.get('/blogs', { params: query }) as Promise<
+      return request.get('v1/blogs', { params: query }) as Promise<
         AxiosResponse<BlogListResponse>
       >;
     },
 
     async getBlogPost(postId: string) {
-      return request.get(`/blogs/${postId}`) as Promise<
+      return request.get(`v1/blogs/${postId}`) as Promise<
         AxiosResponse<BlogPostResponse>
       >;
     },
 
     async postComment(payload: PostCommentPayload) {
-      return request.post(
-        '/blogs/comments',
-        payload,
-      ) as Promise<AxiosResponse<{ _id: string }>>;
+      return request.post('v1/blogs/comments', payload) as Promise<
+        AxiosResponse<{ _id: string }>
+      >;
     },
 
     async getCategories() {
-      return request.get('/blogs/categories') as Promise<
+      return request.get('v1/blogs/categories') as Promise<
         AxiosResponse<Category[]>
       >;
     },
 
     async getPostsByCategory(categoryId: number) {
-      return request.get(
-        `/blogs/categories/${categoryId}`,
-      ) as Promise<
+      return request.get(`v1/blogs/categories/${categoryId}`) as Promise<
         AxiosResponse<{
           posts: BlogPost[];
           category: { id: number; name: string };
@@ -102,27 +101,25 @@ export const blogGateway = (): blogGateway => {
     },
 
     async getLegacyPost(postId: string) {
-      return request.get('/post', { params: { _id: postId } }) as Promise<
+      return request.get('v1/post', { params: { _id: postId } }) as Promise<
         AxiosResponse<BlogPostResponse>
       >;
     },
 
     async createLegacyPost(payload) {
-      return request.post('/admin/post/add', payload) as Promise<
+      return request.post('v1/admin/post/add', payload) as Promise<
         AxiosResponse<{ _id: string }>
       >;
     },
 
     async updateLegacyPost(payload) {
-      return request.put('/admin/post/update', payload) as Promise<
+      return request.put('v1/admin/post/update', payload) as Promise<
         AxiosResponse<{ _id: string }>
       >;
     },
 
     async getLegacyCategories() {
-      return request.get('/categories') as Promise<
-        AxiosResponse<Category[]>
-      >;
+      return request.get('v1/categories') as Promise<AxiosResponse<Category[]>>;
     },
   };
 };

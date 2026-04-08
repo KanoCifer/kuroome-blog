@@ -89,19 +89,19 @@ export interface subscriptionGateway {
 export const subscriptionGateway = (): subscriptionGateway => {
   return {
     async getSubscriptions() {
-      return request.get('api/v2/subscriptions') as Promise<
+      return request.get('v2/subscriptions') as Promise<
         AxiosResponse<SubscriptionListResponse>
       >;
     },
 
     async getSubscription(subId: number) {
-      return request.get(`api/v2/subscriptions/${subId}`) as Promise<
+      return request.get(`v2/subscriptions/${subId}`) as Promise<
         AxiosResponse<SubscriptionResponse>
       >;
     },
 
     async createSubscription(payload: CreateSubscriptionPayload) {
-      return request.post('api/v2/subscriptions', payload) as Promise<
+      return request.post('v2/subscriptions', payload) as Promise<
         AxiosResponse<SubscriptionResponse>
       >;
     },
@@ -110,20 +110,20 @@ export const subscriptionGateway = (): subscriptionGateway => {
       subId: number,
       payload: UpdateSubscriptionPayload,
     ) {
-      return request.put(`api/v2/subscriptions/${subId}`, payload) as Promise<
+      return request.put(`v2/subscriptions/${subId}`, payload) as Promise<
         AxiosResponse<SubscriptionResponse>
       >;
     },
 
     async deleteSubscription(subId: number) {
-      return request.delete(`api/v2/subscriptions/${subId}`) as Promise<
+      return request.delete(`v2/subscriptions/${subId}`) as Promise<
         AxiosResponse<{ message: string }>
       >;
     },
 
     async updateStatus(subId: number, newStatus: string) {
       return request.patch(
-        `api/v2/subscriptions/${subId}/status`,
+        `v2/subscriptions/${subId}/status`,
         newStatus,
       ) as Promise<AxiosResponse<SubscriptionResponse>>;
     },
@@ -133,20 +133,20 @@ export const subscriptionGateway = (): subscriptionGateway => {
       reminderData: Record<string, unknown>,
     ) {
       return request.patch(
-        `api/v2/subscriptions/${subId}/reminders`,
+        `v2/subscriptions/${subId}/reminders`,
         reminderData,
       ) as Promise<AxiosResponse<SubscriptionResponse>>;
     },
 
     async getUpcomingSubscriptions() {
-      return request.get('api/v2/subscriptions/upcoming') as Promise<
+      return request.get('v2/subscriptions/upcoming') as Promise<
         AxiosResponse<UpcomingResponse>
       >;
     },
 
     async testNotification(subId: number, payload: TestNotificationPayload) {
       return request.post(
-        `api/v2/subscriptions/${subId}/test-notification`,
+        `v2/subscriptions/${subId}/test-notification`,
         payload,
       ) as Promise<AxiosResponse<{ results: Record<string, boolean> }>>;
     },

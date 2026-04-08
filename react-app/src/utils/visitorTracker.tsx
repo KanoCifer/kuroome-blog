@@ -54,7 +54,7 @@ const reportVisitorData = async () => {
   try {
     const data = collectVisitorData();
     // 发送POST请求到FastAPI后端接口
-    await request.post('/admin/track', data, {
+    await request.post('v1/admin/track', data, {
       timeout: 5000, // 超时时间5秒
       // 跨域配置（如果前端和后端域名不同，需后端配合跨域）
       withCredentials: true,

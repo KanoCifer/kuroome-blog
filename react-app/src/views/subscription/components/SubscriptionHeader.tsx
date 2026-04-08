@@ -17,7 +17,7 @@ export function SubscriptionHeader({
     <header className="sticky top-0 z-10 border-b border-gray-200/60 bg-white/90 px-4 py-4 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/85">
       <div className="mx-auto w-full max-w-2xl">
         <div className="flex items-start justify-between gap-3">
-          <div className="space-y-1">
+          <div className="space-y-1 ml-12">
             <p className="text-xs font-semibold tracking-wide text-indigo-500 uppercase">
               Subscription
             </p>

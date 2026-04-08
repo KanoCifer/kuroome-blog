@@ -11,27 +11,27 @@ export interface TodoGateway {
 
 export const todoGateway: TodoGateway = {
   async fetchTodos(includeArchived = false) {
-    const res = await request.get<TodoApiResponse>("/todos", {
+    const res = await request.get<TodoApiResponse>("v1/todos", {
       params: { include_archived: includeArchived },
     });
     return res.data;
   },
 
   async addTodo(payload: CreateTodoPayload) {
-    const res = await request.post<TodoApiResponse>("/todos", payload);
+    const res = await request.post<TodoApiResponse>("v1/todos", payload);
     return res.data;
   },
 
   async updateTodo(id: string, patch: Partial<Todo>) {
-    const res = await request.patch<TodoApiResponse>(`/todos/${id}`, patch);
+    const res = await request.patch<TodoApiResponse>(`v1/todos/${id}`, patch);
     return res.data;
   },
 
   async removeTodo(id: string) {
-    await request.delete(`/todos/${id}`);
+    await request.delete(`v1/todos/${id}`);
   },
 
   async batchAction(action: BatchAction) {
-    await request.post("/todos/batch", { action });
+    await request.post("v1/todos/batch", { action });
   },
 };

@@ -88,7 +88,7 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      "/api/v1/": {
+      "/api/": {
         target: "http://localhost:5555", // FastApi 后端地址
         changeOrigin: true,
       },

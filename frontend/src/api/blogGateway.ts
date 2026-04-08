@@ -1,5 +1,5 @@
 import request from "@/api/request";
-import type { BlogPost, BlogPagination, Category, Comment } from "@/types";
+import type { BlogPagination, BlogPost, Category, Comment } from "@/types";
 
 export interface BlogQuery {
   page?: number;
@@ -61,68 +61,74 @@ export interface BlogGateway {
 
 export const blogGateway: BlogGateway = {
   async getBlogs(query?: BlogQuery): Promise<BlogListResponse> {
-    const res = await request.get<{ data: BlogListResponse }>("/blogs", {
+    const res = await request.get<{ data: BlogListResponse }>("v1/blogs", {
       params: query,
     });
     return res.data.data;
   },
 
   async getBlogPost(postId: string): Promise<BlogPostResponse> {
-    const res = await request.get<{ data: BlogPostResponse }>(`/blogs/${postId}`);
+    const res = await request.get<{ data: BlogPostResponse }>(`v1/blogs/${postId}`);
     return res.data.data;
   },
 
   async postComment(payload: PostCommentPayload): Promise<{ _id: string }> {
-    const res = await request.post<{ data: { _id: string } }>("/blogs/comments", payload);
+    const res = await request.post<{ data: { _id: string } }>("v1/blogs/comments", payload);
     return res.data.data;
   },
 
   async getCategories(): Promise<Category[]> {
-    const res = await request.get<{ data: Category[] }>("/blogs/categories");
+    const res = await request.get<{ data: Category[] }>("v1/blogs/categories");
     return res.data.data;
   },
 
   async getPostsByCategory(categoryId: number): Promise<{ posts: BlogPost[]; category: { id: number; name: string } }> {
     const res = await request.get<{
       data: { posts: BlogPost[]; category: { id: number; name: string } };
-    }>(`/blogs/categories/${categoryId}`);
+    }>(`v1/blogs/categories/${categoryId}`);
     return res.data.data;
   },
 
   async getLegacyPost(postId: string): Promise<BlogPostResponse> {
-    const res = await request.get<{ data: BlogPostResponse }>("/post", {
+    const res = await request.get<{ data: BlogPostResponse }>("v1/post", {
       params: { _id: postId },
     });
     return res.data.data;
   },
 
   async createLegacyPost(payload): Promise<{ _id: string }> {
-    const res = await request.post<{ data: { _id: string } }>("/admin/post/add", payload);
+    const res = await request.post<{ data: { _id: string } }>("v1/admin/post/add", payload);
     return res.data.data;
   },
 
   async updateLegacyPost(payload): Promise<{ _id: string }> {
-    const res = await request.put<{ data: { _id: string } }>("/admin/post/update", payload);
+    const res = await request.put<{ data: { _id: string } }>("v1/admin/post/update", payload);
     return res.data.data;
   },
 
   async deleteLegacyPost(postId: string): Promise<void> {
-    await request.delete(`/admin/post/${postId}/delete`);
+    await request.delete(`v1/admin/post/${postId}/delete`);
   },
 
   async getLegacyCategories(): Promise<Category[]> {
-    const res = await request.get<{ data: Category[] }>("/categories");
+    const res = await request.get<{ data: Category[] }>("v1/categories");
     return res.data.data;
   },
 
-  async getPostsByLegacyCategory(categoryId: number): Promise<{ posts: BlogPost[]; category: { id: number; name: string } }> {
-    const res = await request.post<{ data: { posts: BlogPost[]; category: { id: number; name: string } } }>("/category", null, {
-      params: { category_id: categoryId },
-    });
+  async getPostsByLegacyCategory(
+    categoryId: number,
+  ): Promise<{ posts: BlogPost[]; category: { id: number; name: string } }> {
+    const res = await request.post<{ data: { posts: BlogPost[]; category: { id: number; name: string } } }>(
+      "v1/category",
+      null,
+      {
+        params: { category_id: categoryId },
+      },
+    );
     return res.data.data;
   },
 
   async postLegacyComment(payload: PostCommentPayload): Promise<void> {
-    await request.post("/comments", payload);
+    await request.post("v1/comments", payload);
   },
 };

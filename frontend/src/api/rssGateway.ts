@@ -50,7 +50,7 @@ export interface RssGateway {
 
 export const rssGateway: RssGateway = {
   async parseRss(payload: ParseRssPayload): Promise<ParseRssResponse> {
-    const res = await request.post<{ data: ParseRssResponse }>("/rss/parse-rss", payload);
+    const res = await request.post<{ data: ParseRssResponse }>("v1/rss/parse-rss", payload);
     return res.data.data;
   },
 
@@ -60,34 +60,34 @@ export const rssGateway: RssGateway = {
     feed_url?: string;
     search?: string;
   }): Promise<RssArticleListResponse> {
-    const res = await request.get<{ data: RssArticleListResponse }>("/rss/articles", { params });
+    const res = await request.get<{ data: RssArticleListResponse }>("v1/rss/articles", { params });
     return res.data.data;
   },
 
   async getArticle(articleId: string): Promise<RssArticle> {
-    const res = await request.get<{ data: RssArticle }>(`/rss/articles/${articleId}`);
+    const res = await request.get<{ data: RssArticle }>(`v1/rss/articles/${articleId}`);
     return res.data.data;
   },
 
   async getSubscriptions(): Promise<RssSubscription[]> {
-    const res = await request.get<{ data: RssSubscription[] }>("/rss/subscriptions");
+    const res = await request.get<{ data: RssSubscription[] }>("v1/rss/subscriptions");
     return res.data.data;
   },
 
   async refreshSubscription(subscriptionId: number): Promise<RefreshResult> {
-    const res = await request.post<{ data: RefreshResult }>(`/rss/subscriptions/${subscriptionId}/refresh`);
+    const res = await request.post<{ data: RefreshResult }>(`v1/rss/subscriptions/${subscriptionId}/refresh`);
     return res.data.data;
   },
 
   async deleteSubscription(subscriptionId: number): Promise<void> {
-    await request.delete(`/rss/subscriptions/${subscriptionId}`);
+    await request.delete(`v1/rss/subscriptions/${subscriptionId}`);
   },
 
   async markArticleRead(articleId: string): Promise<void> {
-    await request.post(`/rss/articles/${articleId}/read`);
+    await request.post(`v1/rss/articles/${articleId}/read`);
   },
 
   async markArticleUnread(articleId: string): Promise<void> {
-    await request.delete(`/rss/articles/${articleId}/read`);
+    await request.delete(`v1/rss/articles/${articleId}/read`);
   },
 };

@@ -22,6 +22,7 @@ from app.models.beanie import (
     Post,
     RssArticle,
     RssFeed,
+    SubscriptionLog,
 )
 from app.schemas import (
     EmailCodeContent,
@@ -44,7 +45,13 @@ async def startup(state: TaskiqState) -> None:
     mongo_db = state.mongo_client["readinglist"]
     await init_beanie(
         database=mongo_db,
-        document_models=[MessageBoard, Post, RssArticle, RssFeed],
+        document_models=[
+            MessageBoard,
+            Post,
+            RssArticle,
+            RssFeed,
+            SubscriptionLog,
+        ],
     )
     state.mongo = mongo_db
 
