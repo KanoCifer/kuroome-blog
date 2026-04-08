@@ -71,8 +71,8 @@ export interface SubscriptionGateway {
 
 export const subscriptionGateway: SubscriptionGateway = {
   async getSubscriptions(): Promise<Subscription[]> {
-    const res = await request.get<{ data: Subscription[] }>("/api/v2/subscriptions");
-    return res.data.data;
+    const res = await request.get("/api/v2/subscriptions");
+    return res.data.data.subscriptions;
   },
 
   async getSubscription(subId: number): Promise<Subscription> {
@@ -105,8 +105,8 @@ export const subscriptionGateway: SubscriptionGateway = {
   },
 
   async getUpcomingSubscriptions(): Promise<Subscription[]> {
-    const res = await request.get<{ data: Subscription[] }>("/api/v2/subscriptions/upcoming");
-    return res.data.data;
+    const res = await request.get("/api/v2/subscriptions/upcoming");
+    return res.data.data.subscriptions;
   },
 
   async testNotification(subId: number, payload: TestNotificationPayload): Promise<Record<string, boolean>> {
