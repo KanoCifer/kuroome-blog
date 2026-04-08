@@ -1,10 +1,13 @@
+from app.notification.dispatcher import NotificationDispatcher
 from app.repositories.notification_repo import NotificationRepo
 
 
 class NotificationService:
-    def __init__(self, dispatcher, repo: NotificationRepo):
-        self.dispatcher = dispatcher
-        self.repo = repo
+    def __init__(
+        self, dispatcher: NotificationDispatcher, repo: NotificationRepo
+    ):
+        self.dispatcher: NotificationDispatcher = dispatcher
+        self.repo: NotificationRepo = repo
 
     async def get_all_subscriptions(self):
         return await self.repo.get_all_subscriptions_orm()
@@ -18,7 +21,7 @@ class NotificationService:
 
     async def send_reminder(self, payload, config, user_id, channels):
         """发送提醒"""
-        result = await self.dispatcher.dispatch(
+        result: dict[str, bool] = await self.dispatcher.dispatch(
             payload=payload,
             reminder_config=config,
             user_id=user_id,

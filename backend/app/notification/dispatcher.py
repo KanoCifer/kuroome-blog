@@ -6,7 +6,8 @@ from . import NotificationPayload, NotifierBase  # noqa: TID252
 
 
 class NotificationDispatcher:
-    def __init__(self):
+    def __init__(self) -> None:
+        # 初始化可用的通知渠道
         self._channels: dict[str, NotifierBase] = {
             "email": EmailNotificationChannel(),
             "feishu": FeishuNotificationChannel(),
@@ -19,10 +20,21 @@ class NotificationDispatcher:
         reminder_config: dict,
         user_id: int,
         channels: list[str],
-    ) -> dict[str, bool]:  # {channel_name: success}
-        results = {}
+    ) -> dict[str, bool]:
+        """分发通知到不同渠道
+
+        Args:
+            payload: 通知内容
+            reminder_config: 提醒配置
+            user_id: 用户ID
+            channels: 需要发送的渠道列表
+
+        Returns:
+            dict[str, bool]: 每个渠道的发送结果，True表示成功，False表示失败
+        """
+        results: dict[str, bool] = {}
         for channel_name in channels:
-            channel = self._channels.get(channel_name)
+            channel: NotifierBase | None = self._channels.get(channel_name)
             if not channel:
                 results[channel_name] = False
                 continue
