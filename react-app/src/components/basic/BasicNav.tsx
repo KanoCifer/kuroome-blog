@@ -1,3 +1,4 @@
+import { IconHomeFilled } from '@tabler/icons-react';
 import { Newspaper, Rss } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Fragment, useMemo, useState } from 'react';
@@ -34,9 +35,10 @@ interface NavItemProps {
   to: string;
   isActive: boolean;
   isMore?: boolean;
+  activeIcon?: React.ReactNode;
 }
 
-function NavItem({ icon, to, isActive }: NavItemProps) {
+function NavItem({ icon, to, isActive, activeIcon }: NavItemProps) {
   return (
     <>
       <div className="flex items-center justify-center">
@@ -48,7 +50,7 @@ function NavItem({ icon, to, isActive }: NavItemProps) {
               : 'text-slate-500 hover:text-blue-500 dark:text-slate-400 dark:hover:text-blue-400'
           }`}
         >
-          {icon}
+          {isActive && activeIcon ? activeIcon : icon}
         </Link>
       </div>
     </>
@@ -242,6 +244,7 @@ export function BasicNav() {
             >
               <NavItem
                 icon={<HomeIcon className="h-5 w-5" />}
+                activeIcon={<IconHomeFilled className="h-5 w-5" />}
                 to="/"
                 isActive={location.pathname === '/'}
               />

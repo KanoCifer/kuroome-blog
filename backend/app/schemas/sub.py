@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -40,12 +42,12 @@ class SubResponse(BaseModel):
     price: float
     currency: str
     billing_cycle: str
-    next_billing_date: str
+    next_billing_date: datetime
     reminder_config: dict | None
     status: str
     notes: str | None
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
 
 
 class TestNotificationRequest(BaseModel):

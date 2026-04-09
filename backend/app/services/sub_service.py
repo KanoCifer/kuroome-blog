@@ -29,10 +29,8 @@ class SubService:
     ):
         return await self.sub_repo.get_subscription_logs(user_id, sub_id)
 
-    async def update_reminder_config(self, sub_id: int, **config_data):
-        return await self.sub_repo.update_reminder_config(
-            sub_id, **config_data
-        )
+    async def update_reminder_config(self, sub_id: int, config_data: dict):
+        return await self.sub_repo.update_reminder_config(sub_id, config_data)
 
     async def get_due_subscriptions(self):
         return await self.sub_repo.get_due_subscriptions()

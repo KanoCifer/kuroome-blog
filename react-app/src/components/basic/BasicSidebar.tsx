@@ -1,5 +1,6 @@
 import { BasicFooter } from '@/components/basic/BasicFooter';
 import { useAuthStore } from '@/stores/authState';
+import { IconCoin } from '@tabler/icons-react';
 import { motion } from 'framer-motion';
 import {
   BarChart,
@@ -29,6 +30,7 @@ const navItems = [
   { path: '/gallery', label: '图片画廊', icon: ImageIcon },
   { path: '/changelog', label: '更新日志', icon: History },
   { path: '/rss', label: 'RSS 订阅', icon: Rss },
+  { path: '/subscription', label: 'SubTracker', icon: IconCoin },
   { path: '/toolbox/image-toolbox', label: '图片工具', icon: Wrench },
   { path: '/about', label: '关于网站', icon: Info },
 ];

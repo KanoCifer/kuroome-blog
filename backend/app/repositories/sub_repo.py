@@ -37,8 +37,15 @@ class SubRepo:
         **sub_data: Any,
     ) -> Subscription:
         """创建新的订阅"""
+
+        next_billing_date = sub_data.get("next_billing_date")
+        if isinstance(next_billing_date, str):
+            sub_data["next_billing_date"] = datetime.fromisoformat(
+                next_billing_date
+            )
         subscription = Subscription(user_id=user_id, **sub_data)
         self.session.add(subscription)
+        await self.session.flush()
         await self.session.refresh(subscription)
         return subscription
 
@@ -53,7 +60,10 @@ class SubRepo:
             return None
         for key, value in update_data.items():
             if value is not None:
+                if key == "next_billing_date" and isinstance(value, str):
+                    value = datetime.fromisoformat(value)
                 setattr(subscription, key, value)
+        await self.session.flush()
         await self.session.refresh(subscription)
         return subscription
 
@@ -73,6 +83,7 @@ class SubRepo:
         if subscription is None:
             return None
         subscription.status = new_status
+        await self.session.flush()
         await self.session.refresh(subscription)
         return subscription
 
@@ -84,6 +95,7 @@ class SubRepo:
         if subscription is None:
             return None
         subscription.reminder_config = new_config
+        await self.session.flush()
         await self.session.refresh(subscription)
         return subscription
 

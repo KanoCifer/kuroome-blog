@@ -26,7 +26,10 @@ async def get_subscriptions(
 ):
     """获取当前用户的订阅列表"""
     subscriptions = await sub_service.get_all_subscriptions(current_user.id)
-    response = [SubResponse.model_validate(sub) for sub in subscriptions]
+    response = [
+        SubResponse.model_validate(sub).model_dump(mode="json")
+        for sub in subscriptions
+    ]
     return APIResponse.ok(
         data={"subscriptions": response},
         message="获取订阅列表成功",
@@ -44,7 +47,9 @@ async def get_subscription(
     if subscription is None or subscription.user_id != current_user.id:
         return APIResponse.error(message="订阅不存在或无访问权限")
     response = (
-        SubResponse.model_validate(subscription) if subscription else None
+        SubResponse.model_validate(subscription).model_dump(mode="json")
+        if subscription
+        else None
     )
     return APIResponse.ok(
         data={"subscription": response}, message="获取订阅详情成功"
@@ -61,8 +66,11 @@ async def create_subscription(
     subscription = await sub_service.create_one_subscription(
         user_id=current_user.id, **sub_data.model_dump()
     )
+    response = SubResponse.model_validate(subscription).model_dump(
+        mode="json"
+    )
     return APIResponse.ok(
-        data={"subscription": subscription}, message="创建订阅成功"
+        data={"subscription": response}, message="创建订阅成功"
     )
 
 
@@ -80,8 +88,15 @@ async def update_subscription(
     updated_subscription = await sub_service.update_subscription(
         sub_id, **update_data.model_dump(exclude_unset=True)
     )
+    response = (
+        SubResponse.model_validate(updated_subscription).model_dump(
+            mode="json"
+        )
+        if updated_subscription
+        else None
+    )
     return APIResponse.ok(
-        data={"subscription": updated_subscription}, message="更新订阅成功"
+        data={"subscription": response}, message="更新订阅成功"
     )
 
 
@@ -115,8 +130,11 @@ async def update_subscription_status(
     updated_subscription = await sub_service.update_status(sub_id, new_status)
     if updated_subscription is None:
         return APIResponse.error(message="更新订阅状态失败")
+    response = SubResponse.model_validate(updated_subscription).model_dump(
+        mode="json"
+    )
     return APIResponse.ok(
-        data={"subscription": updated_subscription}, message="更新订阅状态成功"
+        data={"subscription": response}, message="更新订阅状态成功"
     )
 
 
@@ -132,12 +150,15 @@ async def update_subscription_reminders(
     if subscription is None or subscription.user_id != current_user.id:
         return APIResponse.error(message="订阅不存在或无访问权限")
     updated_subscription = await sub_service.update_reminder_config(
-        sub_id, **reminder_data
+        sub_id, reminder_data
     )
     if updated_subscription is None:
         return APIResponse.error(message="更新订阅提醒失败")
+    response = SubResponse.model_validate(updated_subscription).model_dump(
+        mode="json"
+    )
     return APIResponse.ok(
-        data={"subscription": updated_subscription}, message="更新订阅提醒成功"
+        data={"subscription": response}, message="更新订阅提醒成功"
     )
 
 
@@ -151,8 +172,12 @@ async def get_upcoming_subscriptions(
     user_due_subs = [
         sub for sub in due_subscriptions if sub.user_id == current_user.id
     ]
+    response = [
+        SubResponse.model_validate(sub).model_dump(mode="json")
+        for sub in user_due_subs
+    ]
     return APIResponse.ok(
-        data={"subscriptions": user_due_subs},
+        data={"subscriptions": response},
         message="获取即将到期的订阅成功",
     )
 

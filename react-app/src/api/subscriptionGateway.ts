@@ -124,7 +124,10 @@ export const subscriptionGateway = (): subscriptionGateway => {
     async updateStatus(subId: number, newStatus: string) {
       return request.patch(
         `v2/subscriptions/${subId}/status`,
-        newStatus,
+        undefined,
+        {
+          params: { new_status: newStatus },
+        },
       ) as Promise<AxiosResponse<SubscriptionResponse>>;
     },
 

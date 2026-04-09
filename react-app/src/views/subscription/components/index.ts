@@ -1,3 +1,4 @@
+export { SubscriptionAddForm } from './SubscriptionAddForm';
 export { SubscriptionCard } from './SubscriptionCard';
 export { SubscriptionEmptyState } from './SubscriptionEmptyState';
 export { SubscriptionErrorState } from './SubscriptionErrorState';

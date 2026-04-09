@@ -58,8 +58,8 @@ class FeishuNotificationChannel(NotifierBase):
             return False
 
     async def validate_config(self) -> bool:
-        """验证飞书通知配置是否有效"""
-        return bool(get_settings().FEISHU_WEBHOOK_URL)
+        """飞书支持订阅级 Webhook，配置在 send 中校验"""
+        return True
 
     def _build_message(self, payload: NotificationPayload) -> str:
         """构建飞书消息文本"""
