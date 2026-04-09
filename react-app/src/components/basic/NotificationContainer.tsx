@@ -36,7 +36,7 @@ export function Notifier() {
   }, [notifications, notificationStore]);
 
   const toast = notifications.map((n, i) => {
-    const offset = i * 88;
+    const offset = i * 20; // 每条通知向下偏移20px，形成堆叠效果
 
     return (
       <motion.div

@@ -61,7 +61,7 @@
 import { BlogIcon, BookshelfIcon, ChangelogIcon, HomeIcon, IconTooling, RssIcon } from "@/components/icons";
 import { useAuthStore } from "@/stores/auth";
 import { useDebounce } from "@vueuse/core";
-import { Image } from "lucide-vue-next";
+import { CreditCard, Image } from "lucide-vue-next";
 import { AnimatePresence, motion } from "motion-v";
 import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
@@ -82,6 +82,7 @@ const navItems = [
   { to: "/", icon: HomeIcon },
   { to: "/blog", icon: BlogIcon },
   { to: "/bookshelf", icon: BookshelfIcon },
+  { to: "/subscription", icon: CreditCard },
   { to: "/gallery", icon: Image },
   { to: "/toolbox/image-toolbox", icon: IconTooling },
   { to: "/changelog", icon: ChangelogIcon },

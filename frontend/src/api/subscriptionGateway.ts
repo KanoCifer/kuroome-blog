@@ -71,23 +71,23 @@ export interface SubscriptionGateway {
 
 export const subscriptionGateway: SubscriptionGateway = {
   async getSubscriptions(): Promise<Subscription[]> {
-    const res = await request.get("/api/v2/subscriptions");
+    const res = await request.get<{ data: { subscriptions: Subscription[] } }>("/api/v2/subscriptions");
     return res.data.data.subscriptions;
   },
 
   async getSubscription(subId: number): Promise<Subscription> {
-    const res = await request.get<{ data: Subscription }>(`/api/v2/subscriptions/${subId}`);
-    return res.data.data;
+    const res = await request.get<{ data: { subscription: Subscription } }>(`/api/v2/subscriptions/${subId}`);
+    return res.data.data.subscription;
   },
 
   async createSubscription(payload: CreateSubscriptionPayload): Promise<Subscription> {
-    const res = await request.post<{ data: Subscription }>("/api/v2/subscriptions", payload);
-    return res.data.data;
+    const res = await request.post<{ data: { subscription: Subscription } }>("/api/v2/subscriptions", payload);
+    return res.data.data.subscription;
   },
 
   async updateSubscription(subId: number, payload: UpdateSubscriptionPayload): Promise<Subscription> {
-    const res = await request.put<{ data: Subscription }>(`/api/v2/subscriptions/${subId}`, payload);
-    return res.data.data;
+    const res = await request.put<{ data: { subscription: Subscription } }>(`/api/v2/subscriptions/${subId}`, payload);
+    return res.data.data.subscription;
   },
 
   async deleteSubscription(subId: number): Promise<void> {
@@ -95,17 +95,26 @@ export const subscriptionGateway: SubscriptionGateway = {
   },
 
   async updateStatus(subId: number, newStatus: string): Promise<Subscription> {
-    const res = await request.patch<{ data: Subscription }>(`/api/v2/subscriptions/${subId}/status`, newStatus);
-    return res.data.data;
+    const res = await request.patch<{ data: { subscription: Subscription } }>(
+      `/api/v2/subscriptions/${subId}/status`,
+      undefined,
+      {
+        params: { new_status: newStatus },
+      },
+    );
+    return res.data.data.subscription;
   },
 
   async updateReminders(subId: number, reminderData: Record<string, unknown>): Promise<Subscription> {
-    const res = await request.patch<{ data: Subscription }>(`/api/v2/subscriptions/${subId}/reminders`, reminderData);
-    return res.data.data;
+    const res = await request.patch<{ data: { subscription: Subscription } }>(
+      `/api/v2/subscriptions/${subId}/reminders`,
+      reminderData,
+    );
+    return res.data.data.subscription;
   },
 
   async getUpcomingSubscriptions(): Promise<Subscription[]> {
-    const res = await request.get("/api/v2/subscriptions/upcoming");
+    const res = await request.get<{ data: { subscriptions: Subscription[] } }>("/api/v2/subscriptions/upcoming");
     return res.data.data.subscriptions;
   },
 

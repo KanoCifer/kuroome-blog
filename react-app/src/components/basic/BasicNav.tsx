@@ -1,4 +1,9 @@
-import { IconHomeFilled } from '@tabler/icons-react';
+import {
+  IconArticleFilled,
+  IconCategoryFilled,
+  IconFileRssFilled,
+  IconHomeFilled,
+} from '@tabler/icons-react';
 import { Newspaper, Rss } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Fragment, useMemo, useState } from 'react';
@@ -243,15 +248,16 @@ export function BasicNav() {
               transition={{ type: 'spring', damping: 20, stiffness: 300 }}
             >
               <NavItem
-                icon={<HomeIcon className="h-5 w-5" />}
-                activeIcon={<IconHomeFilled className="h-5 w-5" />}
+                icon={<HomeIcon className="size-6" />}
+                activeIcon={<IconHomeFilled className="size-6" />}
                 to="/"
                 isActive={location.pathname === '/'}
               />
 
               {/* Blog */}
               <NavItem
-                icon={<Newspaper className="h-5 w-5" />}
+                icon={<Newspaper className="size-6" />}
+                activeIcon={<IconArticleFilled className="size-6" />}
                 to="/blog"
                 isActive={location.pathname === '/blog'}
               />
@@ -265,7 +271,8 @@ export function BasicNav() {
 
               {/* RSS */}
               <NavItem
-                icon={<Rss className="h-5 w-5" />}
+                icon={<Rss className="size-6" />}
+                activeIcon={<IconFileRssFilled className="size-6" />}
                 to="/rss"
                 isActive={location.pathname === '/rss'}
               />
@@ -280,7 +287,11 @@ export function BasicNav() {
                       : 'text-slate-500 hover:text-blue-500 dark:text-slate-400 dark:hover:text-blue-400'
                   }`}
                 >
-                  <MoreIcon className="h-5 w-5" />
+                  {showMenu || isMore ? (
+                    <IconCategoryFilled className="size-6" />
+                  ) : (
+                    <MoreIcon className="size-6" />
+                  )}
                 </button>
               </div>
             </motion.nav>

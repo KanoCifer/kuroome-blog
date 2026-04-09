@@ -219,6 +219,17 @@ const router = createRouter({
       },
     },
     {
+      path: "/subscription",
+      name: "subscription",
+      component: () => import("@/views/subscription/SubscriptionView.vue"),
+      meta: {
+        requiresAuth: true,
+        title: "订阅管理 - Kuroome's Blog",
+        description: "管理数字订阅、账单周期和通知渠道",
+        keywords: "订阅管理,账单提醒,订阅通知",
+      },
+    },
+    {
       path: "/gallery",
       name: "gallery",
       component: () => import("@/views/pic/PicGallery.vue"),

@@ -1,3 +1,4 @@
+import { ArrowRight, Currency, Loader2, Tag } from 'lucide-react';
 import { useState } from 'react';
 
 import type { CreateSubscriptionPayload } from '@/api/subscriptionGateway';
@@ -19,6 +20,14 @@ interface SubscriptionFormState {
   nextBillingDate: string;
   notes: string;
 }
+
+const quickSuggestions = [
+  { name: 'Netflix', icon: 'Netflix', color: 'bg-red-500' },
+  { name: 'Spotify', icon: 'Spotify', color: 'bg-green-500' },
+  { name: 'Apple One', icon: 'Apple', color: 'bg-gray-500' },
+  { name: 'Apple Music', icon: 'Apple', color: 'bg-gray-500' },
+  { name: 'MiniMax AI', icon: 'MiniMax', color: 'bg-rose-500' },
+];
 
 const cycleOptions = [
   { value: 'monthly', label: '月付' },
@@ -49,6 +58,17 @@ function createInitialState(): SubscriptionFormState {
   };
 }
 
+function applyQuickSuggestion(
+  suggestion: (typeof quickSuggestions)[0],
+  setForm: React.Dispatch<React.SetStateAction<SubscriptionFormState>>,
+) {
+  setForm((prev) => ({
+    ...prev,
+    name: suggestion.name,
+    provider: suggestion.name.split(' ')[0],
+  }));
+}
+
 export function SubscriptionAddForm({
   isOpen,
   onClose,
@@ -65,29 +85,29 @@ export function SubscriptionAddForm({
     const name = form.name.trim();
     const provider = form.provider.trim();
     if (!name || !provider) {
-      setFormError('请填写订阅名称和服务商。');
+      setFormError('请填写订阅名称和服务商');
       return;
     }
 
     const price = Number.parseFloat(form.price);
     if (!Number.isFinite(price) || price <= 0) {
-      setFormError('请输入大于 0 的价格。');
+      setFormError('请输入大于 0 的价格');
       return;
     }
 
     const currency = form.currency.trim();
     if (!currency) {
-      setFormError('请输入货币单位。');
+      setFormError('请输入货币单位');
       return;
     }
 
     if (currency.length > 10) {
-      setFormError('货币单位长度不能超过 10 个字符。');
+      setFormError('货币单位长度不能超过 10 个字符');
       return;
     }
 
     if (!form.nextBillingDate) {
-      setFormError('请选择下次扣费日期。');
+      setFormError('请选择下次扣费日期');
       return;
     }
 
@@ -111,32 +131,57 @@ export function SubscriptionAddForm({
   };
 
   return (
-    <SubscriptionModal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="添加新订阅"
-      description="记录价格、周期与扣费时间，自动计入月度估算。"
-    >
-      <section className="relative overflow-hidden rounded-3xl border border-indigo-200/70 bg-white p-5 shadow-sm dark:border-indigo-500/25 dark:bg-slate-900">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.18),transparent_45%),radial-gradient(circle_at_10%_20%,rgba(14,165,233,0.14),transparent_35%)] dark:bg-[radial-gradient(circle_at_top_right,rgba(129,140,248,0.2),transparent_45%),radial-gradient(circle_at_10%_20%,rgba(56,189,248,0.18),transparent_35%)]"
-        />
+    <SubscriptionModal isOpen={isOpen} onClose={onClose}>
+      <section className="relative overflow-hidden p-4 transition-all">
+        {/* Decorative background elements */}
 
         <div className="relative">
-          <div className="mb-5 flex items-start justify-between gap-3">
-            <p className="text-xs font-semibold tracking-wide text-indigo-600 uppercase dark:text-indigo-300">
-              Quick Add
-            </p>
-            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-400/20 dark:text-emerald-300">
-              默认激活
+          {/* Header */}
+          <div className="mb-6 flex items-start justify-between gap-3">
+            <div>
+              <h2 className="font-bold text-2xl font-serif text-slate-800 dark:text-slate-100">
+                Add Subscription
+              </h2>
+            </div>
+            <span className="shrink-0 rounded-full bg-blue-100 dark:bg-blue-900/40 px-3 py-1 text-xs font-semibold text-blue-700 dark:text-blue-300">
+              激活
             </span>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid gap-3 sm:grid-cols-2">
+          {/* Quick Suggestions */}
+          <div className="mb-6">
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-3">
+              快速添加
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {quickSuggestions.map((suggestion) => (
+                <button
+                  key={suggestion.name}
+                  type="button"
+                  onClick={() => applyQuickSuggestion(suggestion, setForm)}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-full border border-white/40 dark:border-slate-700/40 shadow-sm hover:scale-105 hover:bg-white/80 dark:hover:bg-slate-700/80 transition-all duration-200"
+                >
+                  <span
+                    className={`w-4 h-4 rounded-sm ${suggestion.color} flex items-center justify-center`}
+                  >
+                    <span className="text-[6px] text-white font-black">
+                      {suggestion.icon.charAt(0)}
+                    </span>
+                  </span>
+                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                    {suggestion.name}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Name & Provider */}
+            <div className="grid gap-4 sm:grid-cols-2">
               <label className="space-y-1.5">
-                <span className="text-xs font-medium text-gray-600 dark:text-slate-300">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1">
                   订阅名称
                 </span>
                 <input
@@ -145,11 +190,11 @@ export function SubscriptionAddForm({
                     setForm((prev) => ({ ...prev, name: event.target.value }))
                   }
                   placeholder="例如：Spotify Premium"
-                  className="w-full rounded-2xl border border-white/60 bg-white/90 px-4 py-3 text-sm text-gray-900 outline-none ring-2 ring-transparent transition focus:border-indigo-300 focus:ring-indigo-200 dark:border-slate-700 dark:bg-slate-950/70 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500/25"
+                  className="w-full dark:bg-gray-800 bg-gray-100 border-0 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none ring-2 ring-transparent focus:ring-blue-400/30 dark:focus:ring-blue-500/30 transition-all"
                 />
               </label>
               <label className="space-y-1.5">
-                <span className="text-xs font-medium text-gray-600 dark:text-slate-300">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1">
                   服务商
                 </span>
                 <input
@@ -161,62 +206,77 @@ export function SubscriptionAddForm({
                     }))
                   }
                   placeholder="例如：Spotify"
-                  className="w-full rounded-2xl border border-white/60 bg-white/90 px-4 py-3 text-sm text-gray-900 outline-none ring-2 ring-transparent transition focus:border-indigo-300 focus:ring-indigo-200 dark:border-slate-700 dark:bg-slate-950/70 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500/25"
+                  className="w-full bg-gray-100 dark:bg-slate-800/70 border-0 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none ring-2 ring-transparent focus:ring-blue-400/30 dark:focus:ring-blue-500/30 transition-all"
                 />
               </label>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-[1.2fr_0.8fr]">
+            {/* Currency & Price */}
+            <div className="grid gap-4 grid-cols-[0.4fr_0.6fr]">
               <label className="space-y-1.5">
-                <span className="text-xs font-medium text-gray-600 dark:text-slate-300">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1">
+                  货币
+                </span>
+                <div className="relative">
+                  <input
+                    value={form.currency}
+                    onChange={(event) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        currency: event.target.value,
+                      }))
+                    }
+                    list="subscription-currency-options"
+                    maxLength={10}
+                    placeholder="USD"
+                    className="w-full bg-gray-100  dark:bg-slate-800/70 border-0 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none ring-2 ring-transparent focus:ring-blue-400/30 dark:focus:ring-blue-500/30 transition-all pr-10"
+                  />
+                  <datalist id="subscription-currency-options">
+                    {currencySuggestions.map((currency) => (
+                      <option key={currency} value={currency} />
+                    ))}
+                  </datalist>
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                    <Currency size={16} />
+                  </span>
+                </div>
+              </label>
+
+              <label className="space-y-1.5">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1">
                   价格
                 </span>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={form.price}
-                  onChange={(event) =>
-                    setForm((prev) => ({ ...prev, price: event.target.value }))
-                  }
-                  placeholder="0.00"
-                  className="w-full rounded-2xl border border-white/60 bg-white/90 px-4 py-3 text-sm text-gray-900 outline-none ring-2 ring-transparent transition focus:border-indigo-300 focus:ring-indigo-200 dark:border-slate-700 dark:bg-slate-950/70 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500/25"
-                />
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={form.price}
+                    onChange={(event) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        price: event.target.value,
+                      }))
+                    }
+                    placeholder="0.00"
+                    className="w-full bg-gray-100  dark:bg-slate-800/70 border-0 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none ring-2 ring-transparent focus:ring-blue-400/30 dark:focus:ring-blue-500/30 transition-all"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                    <Tag size={16} />
+                  </span>
+                </div>
               </label>
-
-              <label className="space-y-1.5">
-                <span className="text-xs font-medium text-gray-600 dark:text-slate-300">
-                  币种
-                </span>
-                <input
-                  value={form.currency}
-                  onChange={(event) =>
-                    setForm((prev) => ({
-                      ...prev,
-                      currency: event.target.value,
-                    }))
-                  }
-                  list="subscription-currency-options"
-                  maxLength={10}
-                  placeholder="例如：USD / CNY / EUR"
-                  className="w-full rounded-2xl border border-white/60 bg-white/90 px-4 py-3 text-sm text-gray-900 outline-none ring-2 ring-transparent transition focus:border-indigo-300 focus:ring-indigo-200 dark:border-slate-700 dark:bg-slate-950/70 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500/25"
-                />
-                <datalist id="subscription-currency-options">
-                  {currencySuggestions.map((currency) => (
-                    <option key={currency} value={currency} />
-                  ))}
-                </datalist>
-                <p className="text-[11px] text-gray-500 dark:text-slate-400">
-                  支持自定义，例如 HK$、元、USD。
-                </p>
-              </label>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 col-span-2 -mt-2">
+                支持自定义格式，例如 HK$、元、USD
+              </p>
             </div>
 
-            <div className="space-y-1.5">
-              <span className="text-xs font-medium text-gray-600 dark:text-slate-300">
+            {/* Billing Cycle */}
+            <div className="space-y-2">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1">
                 计费周期
               </span>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="flex bg-slate-100/60 dark:bg-slate-800/60 p-1 rounded-full backdrop-blur-sm">
                 {cycleOptions.map((option) => {
                   const isActive = form.billingCycle === option.value;
                   return (
@@ -229,10 +289,10 @@ export function SubscriptionAddForm({
                           billingCycle: option.value,
                         }))
                       }
-                      className={`rounded-xl px-2 py-2 text-xs font-medium transition ${
+                      className={`flex-1 text-xs font-semibold py-2.5 px-3 rounded-full transition-all duration-200 ${
                         isActive
-                          ? 'bg-blue-400 text-white shadow-sm shadow-blue-500/25'
-                          : 'bg-white/80 text-gray-600 hover:bg-white dark:bg-slate-950/70 dark:text-slate-300 dark:hover:bg-slate-900'
+                          ? 'bg-blue-700 text-white shadow-lg shadow-blue-500/25'
+                          : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-700/60'
                       }`}
                     >
                       {option.label}
@@ -242,26 +302,29 @@ export function SubscriptionAddForm({
               </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-[1fr_1.2fr]">
+            {/* Next Billing Date & Notes */}
+            <div className="grid gap-4 sm:grid-cols-2">
               <label className="space-y-1.5">
-                <span className="text-xs font-medium text-gray-600 dark:text-slate-300">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1">
                   下次扣费日期
                 </span>
-                <input
-                  type="date"
-                  value={form.nextBillingDate}
-                  onChange={(event) =>
-                    setForm((prev) => ({
-                      ...prev,
-                      nextBillingDate: event.target.value,
-                    }))
-                  }
-                  className="w-full rounded-2xl border border-white/60 bg-white/90 px-4 py-3 text-sm text-gray-900 outline-none ring-2 ring-transparent transition focus:border-indigo-300 focus:ring-indigo-200 dark:border-slate-700 dark:bg-slate-950/70 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500/25"
-                />
+                <div className="relative">
+                  <input
+                    type="date"
+                    value={form.nextBillingDate}
+                    onChange={(event) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        nextBillingDate: event.target.value,
+                      }))
+                    }
+                    className="w-full bg-gray-100  dark:bg-slate-800/70 border-0 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 dark:text-white outline-none ring-2 ring-transparent focus:ring-blue-400/30 dark:focus:ring-blue-500/30 transition-all"
+                  />
+                </div>
               </label>
 
               <label className="space-y-1.5">
-                <span className="text-xs font-medium text-gray-600 dark:text-slate-300">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-1">
                   备注（可选）
                 </span>
                 <input
@@ -270,36 +333,39 @@ export function SubscriptionAddForm({
                     setForm((prev) => ({ ...prev, notes: event.target.value }))
                   }
                   placeholder="例如：家庭套餐、可随时取消"
-                  className="w-full rounded-2xl border border-white/60 bg-white/90 px-4 py-3 text-sm text-gray-900 outline-none ring-2 ring-transparent transition focus:border-indigo-300 focus:ring-indigo-200 dark:border-slate-700 dark:bg-slate-950/70 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500/25"
+                  className="w-full bg-gray-100  dark:bg-slate-800/70 border-0 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none ring-2 ring-transparent focus:ring-blue-400/30 dark:focus:ring-blue-500/30 transition-all"
                 />
               </label>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              {formError ? (
-                <p className="text-xs font-medium text-red-500">{formError}</p>
+            {/* Error & Submit */}
+            {formError ? (
+              <p className="text-xs font-medium text-red-500 dark:text-red-400 text-center py-2">
+                {formError}
+              </p>
+            ) : (
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center">
+                创建后可暂停或恢复订阅状态
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full py-4 rounded-full bg-blue-700 text-white font-extrabold text-sm shadow-xl shadow-blue-500/30 hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  <span>添加中...</span>
+                </>
               ) : (
-                <p className="text-xs text-gray-500 dark:text-slate-400">
-                  创建后可在列表中暂停或恢复订阅状态。
-                </p>
+                <>
+                  <span>添加订阅</span>
+                  <ArrowRight size={18} />
+                </>
               )}
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="min-h-11 rounded-2xl border border-gray-300 bg-white px-5 text-sm font-medium text-gray-700 transition hover:bg-gray-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-800"
-                >
-                  取消
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="min-h-11 rounded-2xl bg-blue-400 px-5 text-sm font-semibold text-white shadow-sm shadow-indigo-500/30 transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isSubmitting ? '添加中...' : '添加订阅'}
-                </button>
-              </div>
-            </div>
+            </button>
           </form>
         </div>
       </section>
