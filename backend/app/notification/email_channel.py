@@ -1,3 +1,5 @@
+from html import escape
+
 from fastapi_mail import FastMail, MessageSchema, MessageType
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -78,21 +80,95 @@ class EmailNotificationChannel(NotifierBase):
 
     def _build_html(self, payload: NotificationPayload) -> str:
         """构建邮件 HTML 内容"""
+        subscription_name = escape(payload.subscription_name)
+        provider = escape(payload.provider)
+        price = f"{payload.price:,.2f}"
         days_text = (
             f"还有 {payload.days_until} 天"
             if payload.days_until > 0
-            else "今天"
+            else "今天到期"
         )
+        status_bg = "#E8F8EF" if payload.days_until > 0 else "#FDECEE"
+        status_color = "#157347" if payload.days_until > 0 else "#B42318"
+
         return f"""
-        <h1>订阅续费提醒</h1>
-        <p>您的订阅 <strong>{payload.subscription_name}</strong> 即将续费。</p>
-        <ul>
-            <li>服务商: {payload.provider}</li>
-            <li>金额: {payload.currency} {payload.price}</li>
-            <li>续费日期: {payload.next_billing_date.strftime("%Y-%m-%d")}</li>
-            <li>状态: {days_text}</li>
-        </ul>
-        <p style="color: #666; font-size: 12px;">
-            此邮件由 kanocifer.chat 自动发送，请勿回复。
-        </p>
+        <div style="margin:0;padding:24px 0;background:#F5F7FB;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td align="center">
+                <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0"
+                  style="max-width:560px;width:100%;background:#FFFFFF;border-radius:16px;overflow:hidden;
+                  box-shadow:0 8px 24px rgba(15,23,42,0.08);font-family:'Segoe UI','PingFang SC',
+                  'Hiragino Sans GB','Microsoft YaHei',sans-serif;color:#111827;">
+                  <tr>
+                    <td style="padding:24px 28px;background:linear-gradient(120deg,#0F766E,#155EEF);">
+                      <p style="margin:0;font-size:12px;line-height:18px;color:#D1FAE5;letter-spacing:0.8px;">
+                        SUBSCRIPTION ALERT
+                      </p>
+                      <h1 style="margin:8px 0 0;font-size:22px;line-height:30px;color:#FFFFFF;">
+                        订阅续费提醒
+                      </h1>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:24px 28px;">
+                      <p style="margin:0 0 18px;font-size:14px;line-height:22px;color:#4B5563;">
+                        您的订阅即将续费，请留意扣款时间与金额。
+                      </p>
+                      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                        style="border:1px solid #E5E7EB;border-radius:12px;overflow:hidden;">
+                        <tr>
+                          <td style="padding:12px 16px;font-size:14px;color:#6B7280;border-bottom:1px solid #F3F4F6;">
+                            订阅名称
+                          </td>
+                          <td style="padding:12px 16px;font-size:14px;color:#111827;font-weight:600;border-bottom:1px solid #F3F4F6;">
+                            {subscription_name}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding:12px 16px;font-size:14px;color:#6B7280;border-bottom:1px solid #F3F4F6;">
+                            服务商
+                          </td>
+                          <td style="padding:12px 16px;font-size:14px;color:#111827;border-bottom:1px solid #F3F4F6;">
+                            {provider}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding:12px 16px;font-size:14px;color:#6B7280;border-bottom:1px solid #F3F4F6;">
+                            续费金额
+                          </td>
+                          <td style="padding:12px 16px;font-size:14px;color:#111827;border-bottom:1px solid #F3F4F6;">
+                            {payload.currency} {price}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding:12px 16px;font-size:14px;color:#6B7280;border-bottom:1px solid #F3F4F6;">
+                            续费日期
+                          </td>
+                          <td style="padding:12px 16px;font-size:14px;color:#111827;border-bottom:1px solid #F3F4F6;">
+                            {payload.next_billing_date.strftime("%Y-%m-%d")}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding:12px 16px;font-size:14px;color:#6B7280;">
+                            到期状态
+                          </td>
+                          <td style="padding:12px 16px;">
+                            <span style="display:inline-block;padding:4px 10px;border-radius:999px;
+                              background:{status_bg};color:{status_color};font-size:13px;font-weight:600;">
+                              {days_text}
+                            </span>
+                          </td>
+                        </tr>
+                      </table>
+                      <p style="margin:20px 0 0;font-size:12px;line-height:18px;color:#9CA3AF;">
+                        此邮件由 kanocifer.chat 自动发送，请勿直接回复。
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </div>
         """

@@ -1,9 +1,9 @@
-import { useState } from 'react';
 import type {
   TestNotificationPayload,
   UpdateSubscriptionPayload,
 } from '@/api/subscriptionGateway';
 import { formatDate } from '@/utils/formatdate';
+import { useState } from 'react';
 
 import type { Subscription, SubscriptionStatus } from '../types';
 import { SubscriptionModal } from './SubscriptionModal';
@@ -116,6 +116,7 @@ const channelOptions = [
   { value: 'feishu', label: '飞书' },
   { value: 'bark', label: 'Bark' },
 ];
+const currencySuggestions = ['USD', 'CNY', 'EUR', 'JPY', 'HKD', 'GBP'];
 
 const reminderPointOptions: Array<{
   key: keyof Pick<
@@ -238,6 +239,7 @@ export function SubscriptionCard({
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [isSavingReminder, setIsSavingReminder] = useState(false);
   const [isTestingReminder, setIsTestingReminder] = useState(false);
+  const currencyDatalistId = `subscription-currency-options-${subscription.id}`;
 
   const openModal = (tab: ModalTab) => {
     setActiveTab(tab);
@@ -250,6 +252,7 @@ export function SubscriptionCard({
     const provider = editForm.provider.trim();
     const notes = editForm.notes.trim();
     const price = Number.parseFloat(editForm.price);
+    const currency = editForm.currency.trim();
 
     if (!name || !provider) {
       setEditError('请填写订阅名称和服务商。');
@@ -257,6 +260,14 @@ export function SubscriptionCard({
     }
     if (!Number.isFinite(price) || price <= 0) {
       setEditError('请输入大于 0 的价格。');
+      return;
+    }
+    if (!currency) {
+      setEditError('请输入货币单位。');
+      return;
+    }
+    if (currency.length > 10) {
+      setEditError('货币单位长度不能超过 10 个字符。');
       return;
     }
     if (!editForm.nextBillingDate) {
@@ -269,7 +280,7 @@ export function SubscriptionCard({
       name,
       provider,
       price,
-      currency: editForm.currency,
+      currency,
       billing_cycle: editForm.billingCycle,
       next_billing_date: editForm.nextBillingDate,
       status: editForm.status,
@@ -360,7 +371,7 @@ export function SubscriptionCard({
           下次扣费
         </p>
         <p className="mt-1 text-sm font-semibold text-indigo-800 dark:text-indigo-200">
-          {formatDate(subscription.next_billing_date)}
+          {formatDate(subscription.next_billing_date, 'YYYY-MM-DD')}
         </p>
         <p className="mt-1 text-xs text-indigo-600 dark:text-indigo-300">
           {getDaysUntil(subscription.next_billing_date)} 天后
@@ -487,7 +498,7 @@ export function SubscriptionCard({
                   <span className="text-xs text-gray-500 dark:text-slate-400">
                     币种
                   </span>
-                  <select
+                  <input
                     value={editForm.currency}
                     onChange={(event) =>
                       setEditForm((prev) => ({
@@ -495,11 +506,19 @@ export function SubscriptionCard({
                         currency: event.target.value,
                       }))
                     }
+                    list={currencyDatalistId}
+                    maxLength={10}
+                    placeholder="例如：USD / CNY / EUR"
                     className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none ring-2 ring-transparent transition focus:border-indigo-300 focus:ring-indigo-200 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500/20"
-                  >
-                    <option value="USD">USD</option>
-                    <option value="CNY">CNY</option>
-                  </select>
+                  />
+                  <datalist id={currencyDatalistId}>
+                    {currencySuggestions.map((currency) => (
+                      <option key={currency} value={currency} />
+                    ))}
+                  </datalist>
+                  <p className="text-[11px] text-gray-500 dark:text-slate-400">
+                    支持自定义，例如 HK$、元、AUD。
+                  </p>
                 </label>
                 <label className="space-y-1">
                   <span className="text-xs text-gray-500 dark:text-slate-400">
