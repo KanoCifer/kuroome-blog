@@ -141,3 +141,15 @@ async def get_notification_service(dispatcher=None):
         _dispatcher = dispatcher or NotificationDispatcher()
         service = NotificationService(_dispatcher, repo=repo)
         yield service
+
+
+@asynccontextmanager
+async def get_device_service():
+    from app.repositories.device_repo import DeviceRepo
+
+    async with get_async_session() as session:
+        repo = DeviceRepo(session)
+        from app.services.device_service import DeviceService
+
+        service = DeviceService(repo=repo)
+        yield service

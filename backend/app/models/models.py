@@ -16,7 +16,7 @@ from sqlalchemy import (
     String,
     Text,
 )
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, MappedColumn, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.models import Base
@@ -378,23 +378,27 @@ class PasskeyCredential(Base):
 
 class Subscription(Base):
     __tablename__ = "subscription"
-    id = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(
+        Integer, primary_key=True, autoincrement=True
+    )
 
-    name = mapped_column(String(100), nullable=False)
-    provider = mapped_column(String(100), nullable=False)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    provider: Mapped[str] = mapped_column(String(100), nullable=False)
 
-    price = mapped_column(Float, nullable=False)
+    price: Mapped[float] = mapped_column(Float, nullable=False)
 
-    currency = mapped_column(String(10), nullable=False)
+    currency: Mapped[str] = mapped_column(String(10), nullable=False)
 
-    billing_cycle = mapped_column(
+    billing_cycle: Mapped[str] = mapped_column(
         Enum("monthly", "quarterly", "yearly", name="billing_cycle_enum"),
         nullable=False,
     )
 
-    next_billing_date = mapped_column(DateTime(timezone=True), nullable=False)
+    next_billing_date: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
 
-    status = mapped_column(
+    status: Mapped[str] = mapped_column(
         Enum(
             "active",
             "canceled",
@@ -404,16 +408,46 @@ class Subscription(Base):
         ),
         nullable=False,
     )
-    reminder_config = mapped_column(JSON, nullable=True)
-    notes = mapped_column(Text, nullable=True)
-    created_at = mapped_column(
+    reminder_config: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC), index=True
     )
-    updated_at = mapped_column(
+    updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(UTC),
         onupdate=lambda: datetime.now(UTC),
     )
 
-    user_id = mapped_column(Integer, ForeignKey("user.id"), index=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("user.id"), index=True
+    )
     user: Mapped[User] = relationship(back_populates="subscriptions")
+
+
+class DeviceTrack(Base):
+    __tablename__ = "device_track"
+    id: Mapped[int] = mapped_column(
+        Integer, primary_key=True, autoincrement=True
+    )
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("user.id"), index=True
+    )
+    name: Mapped[str] = mapped_column(String(100))
+    purchase_date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    price: Mapped[float] = mapped_column(Float)
+    currency: MappedColumn[str] = mapped_column(String(10), nullable=False)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), index=True
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+    )
+    status: Mapped[str] = mapped_column(
+        Enum("active", "retired", name="device_status_enum"),
+        nullable=False,
+    )
+    reminder_config: Mapped[dict | None] = mapped_column(JSON, nullable=True)

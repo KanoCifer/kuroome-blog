@@ -36,7 +36,7 @@ from app.api.v1 import (
     todos,
     weread,
 )
-from app.api.v2 import subscriptions
+from app.api.v2 import device, subscriptions
 from app.core import get_settings, register_exception_handlers
 from app.core import logger as app_logger
 from app.models.beanie import MessageBoard, Post, RssArticle, SubscriptionLog
@@ -112,30 +112,33 @@ app = FastAPI(
 app.state.limiter = limiter
 
 # Include routers
-app.include_router(admin.router, prefix="/api/v1")
-app.include_router(auth.router, prefix="/api/v1")
-app.include_router(blog.router, prefix="/api/v1")
-app.include_router(books.router, prefix="/api/v1")
-app.include_router(todos.router, prefix="/api/v1")
-app.include_router(messages.router, prefix="/api/v1")
-app.include_router(public.router, prefix="/api/v1")
-app.include_router(weread.router, prefix="/api/v1")
-app.include_router(rss.router, prefix="/api/v1")
-app.include_router(monitor.router, prefix="/api/v1")
-app.include_router(ai.router, prefix="/api/v1")
-app.include_router(publish.router, prefix="/api/v1")
+# v1 版本API
+app.include_router(router=admin.router, prefix="/api/v1")
+app.include_router(router=auth.router, prefix="/api/v1")
+app.include_router(router=blog.router, prefix="/api/v1")
+app.include_router(router=books.router, prefix="/api/v1")
+app.include_router(router=todos.router, prefix="/api/v1")
+app.include_router(router=messages.router, prefix="/api/v1")
+app.include_router(router=public.router, prefix="/api/v1")
+app.include_router(router=weread.router, prefix="/api/v1")
+app.include_router(router=rss.router, prefix="/api/v1")
+app.include_router(router=monitor.router, prefix="/api/v1")
+app.include_router(router=ai.router, prefix="/api/v1")
+app.include_router(router=publish.router, prefix="/api/v1")
 
-app.include_router(subscriptions.router, prefix="/api/v2")
+# v2 版本API
+app.include_router(router=subscriptions.router, prefix="/api/v2")
+app.include_router(router=device.router, prefix="/api/v2")
 
 # 统一注册全局异常处理器
-register_exception_handlers(app)
+register_exception_handlers(app=app)
 
 app.add_middleware(
     middleware_class=SessionMiddleware,
     secret_key=get_settings().SECRET_KEY,
 )
 
-setup_csrf(app)
+setup_csrf(app=app)
 # 配置允许的源（例如你的前端地址）
 origins: list[str] = [
     "http://localhost",
@@ -147,7 +150,7 @@ origins: list[str] = [
 
 # 配置 CORS 中间件，允许前端访问 API，并暴露 Set-Cookie 头以支持跨域认证
 app.add_middleware(
-    CORSMiddleware,
+    middleware_class=CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
@@ -173,10 +176,10 @@ async def add_process_time_header(request: Request, call_next):
 
 
 # 挂载 media 文件夹为静态文件目录（使用相对于本文件的绝对路径，确保指向 /media）
-media_dir = Path(__file__).resolve().parent.parent / "media"
+media_dir: Path = Path(__file__).resolve().parent.parent / "media"
 app.mount(
-    "/api/v1/media/",
-    StaticFiles(directory=str(media_dir), check_dir=True),
+    path="/api/v1/media/",
+    app=StaticFiles(directory=str(media_dir), check_dir=True),
     name="media",
 )
 

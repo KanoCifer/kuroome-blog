@@ -39,19 +39,19 @@ export interface fishingMapGateway {
 export const fishingMapGateway = (): fishingMapGateway => {
   return {
     async getSecurityKey() {
-      return request.get('/amap/security-key') as Promise<
+      return request.get('v1/amap/security-key') as Promise<
         AxiosResponse<ApiEnvelope<SecurityKeyResponse>>
       >;
     },
 
     async getRegeo(payload: RegeoRequestPayload) {
-      return request.post('/geocode/regeo', payload) as Promise<
+      return request.post('v1/geocode/regeo', payload) as Promise<
         AxiosResponse<ApiEnvelope<RegeoResponseData>>
       >;
     },
 
     async getWeather(payload: WeatherRequestPayload) {
-      return request.post('/weather', payload) as Promise<
+      return request.post('v1/weather', payload) as Promise<
         AxiosResponse<
           ApiEnvelope<WeatherLiveResponseData | WeatherForecastResponseData>
         >
@@ -59,7 +59,7 @@ export const fishingMapGateway = (): fishingMapGateway => {
     },
 
     async getTide() {
-      return request.get('/qweather/tide') as Promise<
+      return request.get('v1/qweather/tide') as Promise<
         AxiosResponse<ApiEnvelope<TideData>>
       >;
     },

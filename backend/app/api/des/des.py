@@ -6,6 +6,7 @@ from app.core.container import (
     get_ai_service,
     get_blog_service,
     get_book_service,
+    get_device_service,
     get_message_service,
     get_monitor_service,
     get_notification_service,
@@ -84,4 +85,9 @@ async def sub_service_dep():
 
 async def notification_service_dep():
     async with get_notification_service() as service:
+        yield service
+
+
+async def device_service_dep():
+    async with get_device_service() as service:
         yield service

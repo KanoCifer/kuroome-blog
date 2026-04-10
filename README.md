@@ -35,6 +35,9 @@
 | **待办事项**   | 任务管理、每日提醒（飞书通知）                                          |
 | **后台监控**   | 系统运行数据监控、访客追踪                                              |
 | **图库管理**   | 图片上传、管理                                                          |
+| **自动分流**   | 根据 User-Agent 自动将移动端路由到 React App，桌面端访问 Vue App        |
+| **安全**       | CSRF 保护、JWT、权限控制                                                |
+| **订阅管理**   | 管理你的付费订阅，邮件订阅、RSS 订阅、飞书通知订阅                      |
 
 ## 技术栈
 
@@ -228,6 +231,7 @@ react-app/src/
 │   ├── NotFound/             # 404 页面
 │   ├── Pic/                  # 图片页面
 │   ├── ReadingList/          # 阅读清单
+│   ├── Subscription/         # 订阅管理
 │   ├── Toolbox/              # 工具箱
 │   └── general/              # 通用页面
 ├── App.tsx                   # React 入口
@@ -318,6 +322,7 @@ flowchart LR
 | `/api/v1/monitor`  | 系统监控                       |
 | `/api/v1/public`   | 公共接口                       |
 | `/api/v1/publish`  | 文章发布                       |
+| `/api/v2/subscriptions` | 订阅管理 (新增/编辑/通知)  |
 
 ## 定时任务
 
@@ -355,7 +360,7 @@ RABBITMQ_URL=amqp://guest:guest@localhost:5672/
 ## 部署
 
 - **在线演示**: [Kuroome's Blog](https://kanocifer.chat)
-- **本地端口**: 后端 `:5555` / Vue 桌面端 `:5173` / React 移动端 `:5174`
+- **本地端口**: 后端 `:5555` / Vue App `:5173` / React App `:5174`
 - **生产分流**: 通过 Nginx 根据 `User-Agent` 自动将移动端用户路由到 React App
 
 ## License
