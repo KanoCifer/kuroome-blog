@@ -67,6 +67,10 @@ export interface SubscriptionGateway {
   getUpcomingSubscriptions(): Promise<Subscription[]>;
   /** 测试通知 */
   testNotification(subId: number, payload: TestNotificationPayload): Promise<Record<string, boolean>>;
+  /** 获取用户全局默认通知配置 */
+  getUserGlobalConfig(): Promise<Record<string, unknown>>;
+  /** 更新用户全局默认通知配置 */
+  updateUserGlobalConfig(configData: Record<string, unknown>): Promise<Record<string, unknown>>;
 }
 
 export const subscriptionGateway: SubscriptionGateway = {
@@ -124,5 +128,17 @@ export const subscriptionGateway: SubscriptionGateway = {
       payload,
     );
     return res.data.data.results;
+  },
+
+  async getUserGlobalConfig(): Promise<Record<string, unknown>> {
+    const res = await request.get<{ data: { config: Record<string, unknown> } }>("v2/subscriptions/global-config");
+    return res.data.data.config;
+  },
+
+  async updateUserGlobalConfig(configData: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const res = await request.put<{ data: { config: Record<string, unknown> } }>("v2/subscriptions/global-config", {
+      config_data: configData,
+    });
+    return res.data.data.config;
   },
 };
