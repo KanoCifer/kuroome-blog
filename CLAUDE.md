@@ -109,7 +109,25 @@ pnpm run lint:fix                 # eslint . --fix
   - route user-visible failures to notification flows
 ---
 
-## 5) Architecture & Boundaries
+## 4) Key Files
+
+- Backend entry: `backend/app/main.py`
+- Frontend entry: `frontend/src/main.ts`
+- React entry: `react-app/src/main.tsx`
+- Config: `config/` (environment configs)
+- Core modules: `03_Core_Modules.md` (API documentation)
+
+## 5) Environment Setup
+
+Required env vars:
+- `DATABASE_URL` — PostgreSQL connection string
+- `SECRET_KEY` — Application secret key
+
+See `.env.example` or `config/` for full list.
+
+---
+
+## 6) Architecture & Boundaries
 
 - Backend layering: `api -> service -> repository`
 - Keep business logic in services; keep data access in repositories

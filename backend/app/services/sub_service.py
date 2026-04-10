@@ -34,3 +34,13 @@ class SubService:
 
     async def get_due_subscriptions(self):
         return await self.sub_repo.get_due_subscriptions()
+
+    async def get_user_global_reminder_config(self, user_id: int):
+        return await self.sub_repo.get_global_notification_config(user_id)
+
+    async def update_user_global_reminder_config(
+        self, user_id: int, config_data: dict
+    ):
+        return await self.sub_repo.update_global_notification_config(
+            user_id, config_data
+        )

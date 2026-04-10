@@ -222,7 +222,7 @@ export const BentoNavSidebar: React.FC = () => {
         <ul className="flex flex-col gap-1 relative grow">
           {/* Active indicator */}
           <motion.div
-            className="absolute left-0 w-full h-12 bg-blue-300 rounded-2xl dark:bg-blue-600/50 shadow-md pointer-events-none"
+            className="absolute left-0 w-full h-12 bg-blue-500 rounded-2xl dark:bg-blue-600/50 shadow-md pointer-events-none"
             animate={{ y: hoverNavIndex * 52 }} // 52 = item height (48) + gap (4)
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             style={{ zIndex: 0 }}

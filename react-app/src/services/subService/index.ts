@@ -5,9 +5,8 @@
 
 import type { AxiosResponse } from 'axios';
 
-import { subscriptionGateway } from '@/api/subscriptionGateway';
-import { extractData } from '@/api/request';
 import type { ApiResponse } from '@/api/request';
+import { extractData } from '@/api/request';
 import type {
   CreateSubscriptionPayload,
   Subscription,
@@ -17,6 +16,7 @@ import type {
   UpcomingResponse,
   UpdateSubscriptionPayload,
 } from '@/api/subscriptionGateway';
+import { subscriptionGateway } from '@/api/subscriptionGateway';
 
 /**
  * 订阅服务接口
@@ -63,6 +63,14 @@ export interface SubService {
     subId: number,
     payload: TestNotificationPayload,
   ): Promise<Record<string, boolean>>;
+
+  /** 获取用户的全局默认通知配置 */
+  getUserGlobalConfig(): Promise<Record<string, unknown>>;
+
+  /** 更新用户的全局默认通知配置 */
+  updateUserGlobalConfig(
+    configData: Record<string, unknown>,
+  ): Promise<Record<string, unknown>>;
 }
 
 /**
@@ -76,18 +84,21 @@ export const subService = (): SubService => {
     async getSubscriptions(): Promise<Subscription[]> {
       const res: AxiosResponse<SubscriptionListResponse> =
         await gateway.getSubscriptions();
-      return (extractData(
-        res as unknown as { data: ApiResponse<unknown> },
-      ) as SubscriptionListResponse).subscriptions;
+      return (
+        extractData(
+          res as unknown as { data: ApiResponse<unknown> },
+        ) as SubscriptionListResponse
+      ).subscriptions;
     },
 
     async getSubscription(subId: number): Promise<Subscription> {
-      const res: AxiosResponse<SubscriptionResponse> = await gateway.getSubscription(
-        subId,
-      );
-      return (extractData(
-        res as unknown as { data: ApiResponse<unknown> },
-      ) as SubscriptionResponse).subscription;
+      const res: AxiosResponse<SubscriptionResponse> =
+        await gateway.getSubscription(subId);
+      return (
+        extractData(
+          res as unknown as { data: ApiResponse<unknown> },
+        ) as SubscriptionResponse
+      ).subscription;
     },
 
     async createSubscription(
@@ -95,9 +106,11 @@ export const subService = (): SubService => {
     ): Promise<Subscription> {
       const res: AxiosResponse<SubscriptionResponse> =
         await gateway.createSubscription(payload);
-      return (extractData(
-        res as unknown as { data: ApiResponse<unknown> },
-      ) as SubscriptionResponse).subscription;
+      return (
+        extractData(
+          res as unknown as { data: ApiResponse<unknown> },
+        ) as SubscriptionResponse
+      ).subscription;
     },
 
     async updateSubscription(
@@ -106,23 +119,28 @@ export const subService = (): SubService => {
     ): Promise<Subscription> {
       const res: AxiosResponse<SubscriptionResponse> =
         await gateway.updateSubscription(subId, payload);
-      return (extractData(
-        res as unknown as { data: ApiResponse<unknown> },
-      ) as SubscriptionResponse).subscription;
+      return (
+        extractData(
+          res as unknown as { data: ApiResponse<unknown> },
+        ) as SubscriptionResponse
+      ).subscription;
     },
 
     async deleteSubscription(subId: number): Promise<void> {
       await gateway.deleteSubscription(subId);
     },
 
-    async updateStatus(subId: number, newStatus: string): Promise<Subscription> {
-      const res: AxiosResponse<SubscriptionResponse> = await gateway.updateStatus(
-        subId,
-        newStatus,
-      );
-      return (extractData(
-        res as unknown as { data: ApiResponse<unknown> },
-      ) as SubscriptionResponse).subscription;
+    async updateStatus(
+      subId: number,
+      newStatus: string,
+    ): Promise<Subscription> {
+      const res: AxiosResponse<SubscriptionResponse> =
+        await gateway.updateStatus(subId, newStatus);
+      return (
+        extractData(
+          res as unknown as { data: ApiResponse<unknown> },
+        ) as SubscriptionResponse
+      ).subscription;
     },
 
     async updateReminders(
@@ -131,17 +149,21 @@ export const subService = (): SubService => {
     ): Promise<Subscription> {
       const res: AxiosResponse<SubscriptionResponse> =
         await gateway.updateReminders(subId, reminderData);
-      return (extractData(
-        res as unknown as { data: ApiResponse<unknown> },
-      ) as SubscriptionResponse).subscription;
+      return (
+        extractData(
+          res as unknown as { data: ApiResponse<unknown> },
+        ) as SubscriptionResponse
+      ).subscription;
     },
 
     async getUpcomingSubscriptions(): Promise<Subscription[]> {
       const res: AxiosResponse<UpcomingResponse> =
         await gateway.getUpcomingSubscriptions();
-      return (extractData(
-        res as unknown as { data: ApiResponse<unknown> },
-      ) as UpcomingResponse).subscriptions;
+      return (
+        extractData(
+          res as unknown as { data: ApiResponse<unknown> },
+        ) as UpcomingResponse
+      ).subscriptions;
     },
 
     async testNotification(
@@ -150,9 +172,33 @@ export const subService = (): SubService => {
     ): Promise<Record<string, boolean>> {
       const res: AxiosResponse<{ results: Record<string, boolean> }> =
         await gateway.testNotification(subId, payload);
-      return (extractData(
-        res as unknown as { data: ApiResponse<unknown> },
-      ) as { results: Record<string, boolean> }).results;
+      return (
+        extractData(res as unknown as { data: ApiResponse<unknown> }) as {
+          results: Record<string, boolean>;
+        }
+      ).results;
+    },
+
+    async getUserGlobalConfig(): Promise<Record<string, unknown>> {
+      const res: AxiosResponse<{ config: Record<string, unknown> }> =
+        await gateway.getUserGlobalConfig();
+      return (
+        extractData(res as unknown as { data: ApiResponse<unknown> }) as {
+          config: Record<string, unknown>;
+        }
+      ).config;
+    },
+
+    async updateUserGlobalConfig(
+      configData: Record<string, unknown>,
+    ): Promise<Record<string, unknown>> {
+      const res: AxiosResponse<{ config: Record<string, unknown> }> =
+        await gateway.updateUserGlobalConfig(configData);
+      return (
+        extractData(res as unknown as { data: ApiResponse<unknown> }) as {
+          config: Record<string, unknown>;
+        }
+      ).config;
     },
   };
 };

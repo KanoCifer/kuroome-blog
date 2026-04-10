@@ -1,7 +1,8 @@
-import { ArrowRight, Currency, Loader2, Tag } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowRight, BellRing, CheckCircle2, Currency, Loader2, Mail, Settings, Tag } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 
 import type { CreateSubscriptionPayload } from '@/api/subscriptionGateway';
+import { subService } from '@/services/subService';
 import { SubscriptionModal } from './SubscriptionModal';
 
 interface SubscriptionAddFormProps {
@@ -19,6 +20,22 @@ interface SubscriptionFormState {
   billingCycle: string;
   nextBillingDate: string;
   notes: string;
+  reminderEnabled: boolean;
+  channels: string[];
+  days_30: boolean;
+  days_7: boolean;
+  days_3: boolean;
+  days_1: boolean;
+  day_of: boolean;
+  email: string;
+  feishu_webhook_url: string;
+  bark_device_key: string;
+}
+
+interface GlobalConfig {
+  email?: string;
+  feishu_webhook_url?: string;
+  bark_device_key?: string;
 }
 
 const quickSuggestions = [
@@ -36,6 +53,23 @@ const cycleOptions = [
 ];
 
 const currencySuggestions = ['USD', 'CNY', 'EUR', 'JPY', 'HKD', 'GBP'];
+
+const channelOptions = [
+  { value: 'email', label: '邮件', icon: Mail },
+  { value: 'feishu', label: '飞书', icon: Settings },
+  { value: 'bark', label: 'Bark', icon: BellRing },
+];
+
+const reminderPointOptions: Array<{
+  key: keyof Pick<SubscriptionFormState, 'days_30' | 'days_7' | 'days_3' | 'days_1' | 'day_of'>;
+  label: string;
+}> = [
+  { key: 'days_30', label: '提前 30 天' },
+  { key: 'days_7', label: '提前 7 天' },
+  { key: 'days_3', label: '提前 3 天' },
+  { key: 'days_1', label: '提前 1 天' },
+  { key: 'day_of', label: '当天提醒' },
+];
 
 function getDefaultNextBillingDate(): string {
   const nextMonth = new Date();
@@ -55,6 +89,16 @@ function createInitialState(): SubscriptionFormState {
     billingCycle: 'monthly',
     nextBillingDate: getDefaultNextBillingDate(),
     notes: '',
+    reminderEnabled: false,
+    channels: [],
+    days_30: true,
+    days_7: true,
+    days_3: true,
+    days_1: true,
+    day_of: true,
+    email: '',
+    feishu_webhook_url: '',
+    bark_device_key: '',
   };
 }
 
@@ -69,14 +113,72 @@ function applyQuickSuggestion(
   }));
 }
 
+function toString(value: unknown): string {
+  return typeof value === 'string' ? value : '';
+}
+
+function applyGlobalConfig(
+  setForm: React.Dispatch<React.SetStateAction<SubscriptionFormState>>,
+  globalConfig: GlobalConfig,
+) {
+  setForm((prev) => ({
+    ...prev,
+    email: toString(globalConfig.email),
+    feishu_webhook_url: toString(globalConfig.feishu_webhook_url),
+    bark_device_key: toString(globalConfig.bark_device_key),
+  }));
+}
+
+function buildReminderConfig(form: SubscriptionFormState): Record<string, unknown> {
+  const config: Record<string, unknown> = {
+    channels: form.channels,
+    days_30: form.days_30,
+    days_7: form.days_7,
+    days_3: form.days_3,
+    days_1: form.days_1,
+    day_of: form.day_of,
+  };
+  const email = form.email.trim();
+  const feishu = form.feishu_webhook_url.trim();
+  const bark = form.bark_device_key.trim();
+  if (email) config.email = email;
+  if (feishu) config.feishu_webhook_url = feishu;
+  if (bark) config.bark_device_key = bark;
+  return config;
+}
+
 export function SubscriptionAddForm({
   isOpen,
   onClose,
   isSubmitting,
   onCreate,
 }: SubscriptionAddFormProps) {
+  const service = useMemo(() => subService(), []);
   const [form, setForm] = useState<SubscriptionFormState>(createInitialState);
   const [formError, setFormError] = useState<string | null>(null);
+  const [showReminder, setShowReminder] = useState(false);
+  const [isLoadingConfig, setIsLoadingConfig] = useState(false);
+
+  // Load global config when modal opens
+  useEffect(() => {
+    if (!isOpen) return;
+    setIsLoadingConfig(true);
+    service
+      .getUserGlobalConfig()
+      .then((config: GlobalConfig) => {
+        applyGlobalConfig(setForm, config);
+        // Auto-enable reminder if global config has channel credentials
+        if (config.email || config.feishu_webhook_url || config.bark_device_key) {
+          setShowReminder(true);
+        }
+      })
+      .catch(() => {
+        // Silently fail, form works without global config
+      })
+      .finally(() => {
+        setIsLoadingConfig(false);
+      });
+  }, [isOpen, service]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -122,12 +224,37 @@ export function SubscriptionAddForm({
       notes: form.notes.trim() || null,
     };
 
+    // Include reminder config if reminder is enabled and has channels
+    if (showReminder && form.channels.length > 0) {
+      payload.reminder_config = buildReminderConfig(form);
+    }
+
     const created = await onCreate(payload);
     if (!created) return;
 
     setForm(createInitialState());
     setFormError(null);
+    setShowReminder(false);
     onClose();
+  };
+
+  const toggleChannel = (channel: string) => {
+    setForm((prev) => {
+      const hasChannel = prev.channels.includes(channel);
+      return {
+        ...prev,
+        channels: hasChannel
+          ? prev.channels.filter((item) => item !== channel)
+          : [...prev.channels, channel],
+      };
+    });
+  };
+
+  const handleReminderChange = <K extends keyof SubscriptionFormState>(
+    key: K,
+    value: SubscriptionFormState[K],
+  ) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   return (
@@ -336,6 +463,161 @@ export function SubscriptionAddForm({
                   className="w-full bg-gray-100  dark:bg-slate-800/70 border-0 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none ring-2 ring-transparent focus:ring-blue-400/30 dark:focus:ring-blue-500/30 transition-all"
                 />
               </label>
+            </div>
+
+            {/* Reminder Config Toggle */}
+            <div className="rounded-2xl border border-gray-200/80 bg-gray-50 p-4 dark:border-slate-700 dark:bg-slate-900/60">
+              <label className="flex items-center justify-between cursor-pointer">
+                <div className="flex items-center gap-2">
+                  <BellRing size={16} className="text-blue-600 dark:text-blue-400" />
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                    通知提醒配置
+                  </span>
+                  {isLoadingConfig && (
+                    <Loader2 size={14} className="animate-spin text-slate-400" />
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowReminder((prev) => !prev)}
+                  className={`
+                    relative w-11 h-6 rounded-full transition-colors
+                    ${showReminder ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-600'}
+                  `}
+                >
+                  <span
+                    className={`
+                      absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm
+                      transition-transform
+                      ${showReminder ? 'translate-x-5' : 'translate-x-0'}
+                    `}
+                  />
+                </button>
+              </label>
+              {showReminder && (
+                <div className="mt-4 space-y-4">
+                  {/* Channels */}
+                  <div>
+                    <h4 className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 ml-1">
+                      通知渠道
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {channelOptions.map((option) => {
+                        const checked = form.channels.includes(option.value);
+                        return (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => toggleChannel(option.value)}
+                            className={`
+                              inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all
+                              ${
+                                checked
+                                  ? 'bg-blue-600 text-white shadow-[0_4px_12px_rgba(0,40,142,0.25)]'
+                                  : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 dark:hover:bg-slate-700'
+                              }
+                            `}
+                          >
+                            <option.icon size={16} />
+                            {option.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Reminder Points */}
+                  <div>
+                    <h4 className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 ml-1">
+                      提醒时间点
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {reminderPointOptions.map((option) => {
+                        const checked = form[option.key];
+                        return (
+                          <label
+                            key={option.key}
+                            className={`
+                              flex items-center gap-3 rounded-xl px-3 py-2.5 cursor-pointer transition-all
+                              ${
+                                checked
+                                  ? 'bg-blue-100 border border-blue-200 dark:bg-blue-900/40 dark:border-blue-700/50'
+                                  : 'bg-white border border-gray-200 hover:bg-gray-50 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-700/50'
+                              }
+                            `}
+                          >
+                            <div
+                              className={`
+                                flex h-5 w-5 items-center justify-center rounded-full transition-all
+                                ${checked ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-slate-600'}
+                              `}
+                            >
+                              {checked && <CheckCircle2 size={14} />}
+                            </div>
+                            <span
+                              className={`text-sm font-medium ${checked ? 'text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-slate-200'}`}
+                            >
+                              {option.label}
+                            </span>
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={(e) => handleReminderChange(option.key, e.target.checked)}
+                              className="sr-only"
+                            />
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Channel Configs */}
+                  {form.channels.includes('email') && (
+                    <div>
+                      <h4 className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 ml-1">
+                        邮件地址
+                      </h4>
+                      <input
+                        type="email"
+                        value={form.email}
+                        onChange={(event) => handleReminderChange('email', event.target.value)}
+                        placeholder="your@email.com"
+                        className="w-full bg-white dark:bg-gray-800 border-0 focus:ring-2 focus:ring-blue-500/20 rounded-xl px-4 py-3 text-sm text-on-surface placeholder:text-outline/50 transition-all"
+                      />
+                    </div>
+                  )}
+
+                  {form.channels.includes('feishu') && (
+                    <div>
+                      <h4 className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 ml-1">
+                        飞书 Webhook
+                      </h4>
+                      <input
+                        type="text"
+                        value={form.feishu_webhook_url}
+                        onChange={(event) => handleReminderChange('feishu_webhook_url', event.target.value)}
+                        placeholder="https://open.feishu.cn/..."
+                        className="w-full bg-white dark:bg-gray-800 border-0 focus:ring-2 focus:ring-blue-500/20 rounded-xl px-4 py-3 text-sm text-on-surface placeholder:text-outline/50 transition-all"
+                      />
+                    </div>
+                  )}
+
+                  {form.channels.includes('bark') && (
+                    <div>
+                      <h4 className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 ml-1">
+                        Bark Device Key
+                      </h4>
+                      <input
+                        type="text"
+                        value={form.bark_device_key}
+                        onChange={(event) => handleReminderChange('bark_device_key', event.target.value)}
+                        placeholder="填写 Bark 设备 Key"
+                        className="w-full bg-white dark:bg-gray-800 border-0 focus:ring-2 focus:ring-blue-500/20 rounded-xl px-4 py-3 text-sm text-on-surface placeholder:text-outline/50 transition-all"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Error & Submit */}

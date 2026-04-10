@@ -71,32 +71,32 @@ export interface SubscriptionGateway {
 
 export const subscriptionGateway: SubscriptionGateway = {
   async getSubscriptions(): Promise<Subscription[]> {
-    const res = await request.get<{ data: { subscriptions: Subscription[] } }>("/api/v2/subscriptions");
+    const res = await request.get<{ data: { subscriptions: Subscription[] } }>("v2/subscriptions");
     return res.data.data.subscriptions;
   },
 
   async getSubscription(subId: number): Promise<Subscription> {
-    const res = await request.get<{ data: { subscription: Subscription } }>(`/api/v2/subscriptions/${subId}`);
+    const res = await request.get<{ data: { subscription: Subscription } }>(`v2/subscriptions/${subId}`);
     return res.data.data.subscription;
   },
 
   async createSubscription(payload: CreateSubscriptionPayload): Promise<Subscription> {
-    const res = await request.post<{ data: { subscription: Subscription } }>("/api/v2/subscriptions", payload);
+    const res = await request.post<{ data: { subscription: Subscription } }>("v2/subscriptions", payload);
     return res.data.data.subscription;
   },
 
   async updateSubscription(subId: number, payload: UpdateSubscriptionPayload): Promise<Subscription> {
-    const res = await request.put<{ data: { subscription: Subscription } }>(`/api/v2/subscriptions/${subId}`, payload);
+    const res = await request.put<{ data: { subscription: Subscription } }>(`v2/subscriptions/${subId}`, payload);
     return res.data.data.subscription;
   },
 
   async deleteSubscription(subId: number): Promise<void> {
-    await request.delete(`/api/v2/subscriptions/${subId}`);
+    await request.delete(`v2/subscriptions/${subId}`);
   },
 
   async updateStatus(subId: number, newStatus: string): Promise<Subscription> {
     const res = await request.patch<{ data: { subscription: Subscription } }>(
-      `/api/v2/subscriptions/${subId}/status`,
+      `v2/subscriptions/${subId}/status`,
       undefined,
       {
         params: { new_status: newStatus },
@@ -107,20 +107,20 @@ export const subscriptionGateway: SubscriptionGateway = {
 
   async updateReminders(subId: number, reminderData: Record<string, unknown>): Promise<Subscription> {
     const res = await request.patch<{ data: { subscription: Subscription } }>(
-      `/api/v2/subscriptions/${subId}/reminders`,
+      `v2/subscriptions/${subId}/reminders`,
       reminderData,
     );
     return res.data.data.subscription;
   },
 
   async getUpcomingSubscriptions(): Promise<Subscription[]> {
-    const res = await request.get<{ data: { subscriptions: Subscription[] } }>("/api/v2/subscriptions/upcoming");
+    const res = await request.get<{ data: { subscriptions: Subscription[] } }>("v2/subscriptions/upcoming");
     return res.data.data.subscriptions;
   },
 
   async testNotification(subId: number, payload: TestNotificationPayload): Promise<Record<string, boolean>> {
     const res = await request.post<{ data: { results: Record<string, boolean> } }>(
-      `/api/v2/subscriptions/${subId}/test-notification`,
+      `v2/subscriptions/${subId}/test-notification`,
       payload,
     );
     return res.data.data.results;

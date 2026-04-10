@@ -15,6 +15,7 @@ import {
   SubscriptionList,
   SubscriptionLoadingSkeleton,
 } from './components';
+import ConfigManage from './components/ConfigManage';
 import type { Subscription } from './types';
 
 function getMonthlyEstimate(subscription: Subscription): number {
@@ -204,7 +205,9 @@ export default function SubscriptionView() {
           {/* Monthly Estimate (Spans 2) */}
           <div className="col-span-2 bg-white dark:bg-slate-800/70 dark:backdrop-blur-xl squircle p-6 flex items-center justify-between shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:border-white/10 dark:shadow-xl dark:shadow-slate-900/50 border border-slate-100">
             <div>
-              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">月度估算</p>
+              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
+                月度估算
+              </p>
               <p className="font-bold text-3xl text-[#00288e] dark:text-blue-400 tracking-tight mt-1">
                 ¥{monthlyEstimate.toFixed(2)}
               </p>
@@ -242,8 +245,12 @@ export default function SubscriptionView() {
                 />
               </svg>
             </div>
-            <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">进行中</p>
-            <p className="font-bold text-xl mt-1 text-slate-900 dark:text-white">{activeCount}</p>
+            <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">
+              进行中
+            </p>
+            <p className="font-bold text-xl mt-1 text-slate-900 dark:text-white">
+              {activeCount}
+            </p>
           </div>
           {/* Total */}
           <div className="bg-white dark:bg-slate-800/70 dark:backdrop-blur-xl squircle p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:border-white/10 dark:shadow-xl dark:shadow-slate-900/50 border border-slate-100">
@@ -262,13 +269,17 @@ export default function SubscriptionView() {
                 />
               </svg>
             </div>
-            <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">总订阅</p>
-            <p className="font-bold text-xl mt-1 text-slate-900 dark:text-white">{subscriptions.length}</p>
+            <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">
+              总订阅
+            </p>
+            <p className="font-bold text-xl mt-1 text-slate-900 dark:text-white">
+              {subscriptions.length}
+            </p>
           </div>
         </section>
 
         {/* Main Action Button */}
-        <section>
+        <section className="flex justify-center items-center gap-4">
           <button
             type="button"
             onClick={() => setIsAddModalOpen(true)}
@@ -289,6 +300,7 @@ export default function SubscriptionView() {
             </svg>
             新增订阅
           </button>
+          <ConfigManage />
         </section>
 
         <SubscriptionAddForm
@@ -320,6 +332,8 @@ export default function SubscriptionView() {
           />
         )}
       </main>
+
+      <section className="px-6 py-8 max-w-md mx-auto"></section>
     </div>
   );
 }

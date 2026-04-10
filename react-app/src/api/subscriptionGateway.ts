@@ -84,6 +84,12 @@ export interface subscriptionGateway {
     subId: number,
     payload: TestNotificationPayload,
   ): Promise<AxiosResponse<{ results: Record<string, boolean> }>>;
+  getUserGlobalConfig(): Promise<
+    AxiosResponse<{ config: Record<string, unknown> }>
+  >;
+  updateUserGlobalConfig(
+    configData: Record<string, unknown>,
+  ): Promise<AxiosResponse<{ config: Record<string, unknown> }>>;
 }
 
 export const subscriptionGateway = (): subscriptionGateway => {
@@ -122,13 +128,9 @@ export const subscriptionGateway = (): subscriptionGateway => {
     },
 
     async updateStatus(subId: number, newStatus: string) {
-      return request.patch(
-        `v2/subscriptions/${subId}/status`,
-        undefined,
-        {
-          params: { new_status: newStatus },
-        },
-      ) as Promise<AxiosResponse<SubscriptionResponse>>;
+      return request.patch(`v2/subscriptions/${subId}/status`, undefined, {
+        params: { new_status: newStatus },
+      }) as Promise<AxiosResponse<SubscriptionResponse>>;
     },
 
     async updateReminders(
@@ -152,6 +154,18 @@ export const subscriptionGateway = (): subscriptionGateway => {
         `v2/subscriptions/${subId}/test-notification`,
         payload,
       ) as Promise<AxiosResponse<{ results: Record<string, boolean> }>>;
+    },
+
+    async getUserGlobalConfig() {
+      return request.get('v2/subscriptions/global-config') as Promise<
+        AxiosResponse<{ config: Record<string, unknown> }>
+      >;
+    },
+
+    async updateUserGlobalConfig(configData: Record<string, unknown>) {
+      return request.put('v2/subscriptions/global-config', {
+        config_data: configData,
+      }) as Promise<AxiosResponse<{ config: Record<string, unknown> }>>;
     },
   };
 };

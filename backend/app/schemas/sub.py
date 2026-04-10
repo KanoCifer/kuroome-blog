@@ -57,3 +57,11 @@ class TestNotificationRequest(BaseModel):
         ..., description="通知渠道列表，如 ['bark', 'email']"
     )
     config: dict = Field(default_factory=dict, description="渠道配置")
+
+
+class GlobalConfigIn(BaseModel):
+    """全局配置请求体"""
+
+    email: str | None = Field(None, description="电子邮件地址")
+    feishu_webhook_url: str | None = Field(None, description="飞书Webhook URL")
+    bark_device_key: str | None = Field(None, description="Bark设备Key")

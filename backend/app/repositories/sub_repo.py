@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.models.beanie import SubscriptionLog
-from app.models.models import Subscription
+from app.models.models import Profile, Subscription
 
 
 class SubRepo:
@@ -125,3 +125,42 @@ class SubRepo:
         else:
             return []
         return await logs.to_list()
+
+    async def get_global_notification_config(self, user_id: int) -> dict:
+        """获取用户的全局通知配置"""
+        stmt = select(Profile).where(Profile.user_id == user_id)
+        result = await self.session.execute(stmt)
+        profile = result.scalar_one_or_none()
+        if profile is None:
+            return {}
+
+        config = {
+            "email": profile.email,
+            "feishu_webhook_url": profile.feishu_webhook_url,
+            "bark_device_key": profile.bark_device_key,
+        }
+        return config
+
+    async def update_global_notification_config(
+        self, user_id: int, config_data: dict
+    ) -> dict:
+        """更新用户的全局通知配置"""
+        stmt = select(Profile).where(Profile.user_id == user_id)
+        result = await self.session.execute(stmt)
+        profile = result.scalar_one_or_none()
+        if profile is None:
+            return {}
+
+        for key, value in config_data.items():
+            if value is not None and hasattr(profile, key):
+                setattr(profile, key, value)
+
+        await self.session.flush()
+        await self.session.refresh(profile)
+
+        updated_config = {
+            "email": profile.email,
+            "feishu_webhook_url": profile.feishu_webhook_url,
+            "bark_device_key": profile.bark_device_key,
+        }
+        return updated_config
