@@ -1,5 +1,67 @@
 [
   {
+    "version": "2.9.1",
+    "date": "2026-04-10",
+    "title": "订阅管理组件重构与设备跟踪功能",
+    "changes": [
+      {
+        "type": "refactor",
+        "content": "拆分订阅管理视图为模块化子组件"
+      },
+      {
+        "type": "chore",
+        "content": "重构文档结构，清理过时文档"
+      },
+      {
+        "type": "feat",
+        "content": "设备里程碑通知系统"
+      },
+      {
+        "type": "feat",
+        "content": "新增设备跟踪管理模块"
+      },
+      {
+        "type": "refactor",
+        "content": "订阅管理组件重构，提升可维护性"
+      }
+    ]
+  },
+  {
+    "version": "2.9.0",
+    "date": "2026-04-08",
+    "title": "订阅管理功能完善与性能优化",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "新增订阅管理及天气 API 响应结构统一"
+      },
+      {
+        "type": "fix",
+        "content": "修复订阅列表 API 响应解析错误"
+      },
+      {
+        "type": "perf",
+        "content": "统一前后端 API 路径，消除冗余前缀"
+      },
+      {
+        "type": "refactor",
+        "content": "优化通知模块类型提示与文档字符串"
+      },
+      {
+        "type": "feat",
+        "content": "完善订阅管理模块（新增/编辑/通知测试）"
+      },
+      {
+        "type": "perf",
+        "content": "优化邮件模板与订阅表单交互"
+      },
+      {
+        "type": "style",
+        "content": "统一订阅表单设计系统风格"
+      }
+    ]
+  },
+  {
     "version": "2.7.5",
     "date": "2026-04-5",
     "title": "修复移动端网站重构引入的bug",
