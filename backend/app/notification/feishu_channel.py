@@ -3,7 +3,11 @@ import httpx
 from app.core.config import get_settings
 from app.core.logger import logger
 
-from . import NotificationPayload, NotifierBase  # noqa: TID252
+from . import (  # noqa: TID252
+    DeviceNotificationPayload,
+    NotificationPayload,
+    NotifierBase,
+)
 
 
 class FeishuNotificationChannel(NotifierBase):
@@ -76,3 +80,58 @@ class FeishuNotificationChannel(NotifierBase):
 💰 金额: {payload.currency} {payload.price}
 📅 续费日期: {payload.next_billing_date.strftime("%Y-%m-%d")}
 ⏰ 状态: {days_text}"""
+
+    async def send_device_reminder(
+        self, user_id: int, payload: DeviceNotificationPayload, config: dict
+    ) -> bool:
+        """发送设备周年提醒"""
+        try:
+            webhook_url = (
+                config.get("feishu_webhook_url")
+                or get_settings().FEISHU_WEBHOOK_URL
+            )
+            if not webhook_url:
+                logger.warning("[Feishu] FEISHU_WEBHOOK_URL not configured")
+                return False
+
+            message = self._build_device_message(payload)
+            feishu_payload = {
+                "msg_type": "text",
+                "content": {"text": message},
+            }
+
+            async with httpx.AsyncClient(
+                timeout=httpx.Timeout(10.0)
+            ) as client:
+                response = await client.post(
+                    url=webhook_url, json=feishu_payload
+                )
+                response.raise_for_status()
+                body = response.json()
+                code = body.get("code", body.get("StatusCode"))
+                if code not in (0, "0"):
+                    logger.error(
+                        f"[Feishu] API error: code={code} body={body}"
+                    )
+                    return False
+
+            logger.info(
+                f"[Feishu] Device reminder sent for device '{payload.name}'"
+            )
+            return True
+
+        except Exception as e:
+            logger.error(f"[Feishu] Failed to send device reminder: {e!r}")
+            return False
+
+    def _build_device_message(self, payload: DeviceNotificationPayload) -> str:
+        """构建设备周年提醒飞书消息"""
+        from datetime import UTC, datetime
+
+        years = (datetime.now(UTC) - payload.purchase_date).days // 365
+        return f"""🎉 设备周年提醒
+
+📱 设备: {payload.name}
+💰 价格: {payload.currency} {payload.price}
+📅 购买日期: {payload.purchase_date.strftime("%Y-%m-%d")}
+🎉 已使用 {years} 年啦！"""

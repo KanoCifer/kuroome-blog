@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from datetime import datetime
 
 from sqlalchemy import select
 
@@ -68,3 +69,44 @@ class DeviceRepo:
             await self.session.refresh(device_track)
             return device_track
         return None
+
+    async def get_active_devices(self) -> Sequence[DeviceTrack]:
+        """获取所有活跃设备"""
+        stmt = select(DeviceTrack).where(DeviceTrack.status == "active")
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
+
+    async def get_devices_with_upcoming_milestone(
+        self, user_id: int, days_ahead: int = 30
+    ) -> Sequence[DeviceTrack]:
+        """获取即将到达里程碑的设备（未来N天内）"""
+        from datetime import UTC, timedelta
+
+        today = datetime.now(UTC).date()
+        future_date = today + timedelta(days=days_ahead)
+
+        stmt = select(DeviceTrack).where(
+            DeviceTrack.user_id == user_id,
+            DeviceTrack.status == "active",
+        )
+        result = await self.session.execute(stmt)
+        devices = result.scalars().all()
+
+        # 过滤出即将到达里程碑的设备
+        upcoming = []
+        for device in devices:
+            days_owned = (today - device.purchase_date.date()).days
+            future_days = (future_date - device.purchase_date.date()).days
+
+            # 检查是否有里程碑在 [days_owned, future_days] 范围内
+            reminder_config = device.reminder_config or {}
+            milestones = reminder_config.get(
+                "milestones", [100, 365, 730, 1000, 1825]
+            )
+
+            for milestone in milestones:
+                if days_owned <= milestone <= future_days:
+                    upcoming.append(device)
+                    break
+
+        return upcoming

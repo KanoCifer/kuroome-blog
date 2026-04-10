@@ -19,6 +19,18 @@ class NotificationPayload:
     next_billing_date: datetime
 
 
+@dataclass
+class DeviceNotificationPayload:
+    """设备通知载荷"""
+
+    title: str
+    body: str
+    name: str
+    price: float
+    currency: str
+    purchase_date: datetime
+
+
 class NotifierBase(ABC):
     """通知器基类"""
 
