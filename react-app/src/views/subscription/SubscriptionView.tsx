@@ -191,7 +191,7 @@ export default function SubscriptionView() {
     .reduce((total, item) => total + getMonthlyEstimate(item), 0);
 
   return (
-    <motion.div className="min-h-dvh bg-gray-50 pb-24 dark:bg-slate-900">
+    <motion.div className="min-h-dvh bg-gray-50/95 pb-24 dark:bg-slate-900/95">
       <SubscriptionHeader
         onClick={() => {
           navigate('/device-tracker');
@@ -208,7 +208,7 @@ export default function SubscriptionView() {
         {/* Summary Cards Section */}
         <section className="grid grid-cols-2 gap-4">
           {/* Monthly Estimate (Spans 2) */}
-          <div className="squircle col-span-2 flex items-center justify-between border border-slate-100 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl">
+          <div className="squircle col-span-2 flex items-center justify-between border border-slate-100 bg-white p-6 shadow-lg dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl">
             <div>
               <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
                 月度估算
@@ -234,7 +234,7 @@ export default function SubscriptionView() {
             </div>
           </div>
           {/* Active */}
-          <div className="squircle border border-slate-100 bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl">
+          <div className="squircle border border-slate-100 bg-white p-5 shadow-lg dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl">
             <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-emerald-500/20 dark:text-emerald-400">
               <svg
                 className="h-5 w-5"
@@ -258,7 +258,7 @@ export default function SubscriptionView() {
             </p>
           </div>
           {/* Total */}
-          <div className="squircle border border-slate-100 bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl">
+          <div className="squircle border border-slate-100 bg-white p-5 shadow-lg dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl">
             <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400">
               <svg
                 className="h-5 w-5"

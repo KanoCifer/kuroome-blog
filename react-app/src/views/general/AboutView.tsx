@@ -23,7 +23,7 @@ export default function AboutView() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="mb-20 flex h-full w-full flex-col items-center bg-gray-50 px-4 py-8 dark:bg-[#0f1117]"
+      className="mb-20 flex h-full w-full flex-col items-center bg-gray-50/95 px-4 py-8 dark:bg-gray-900/95"
     >
       {/* Hero Section */}
       <motion.div

@@ -12,7 +12,7 @@ export function BentoReadingList() {
               <ListCheck className="size-6" />
             </div>
             <div className="flex min-w-0 flex-col items-start">
-              <div className="truncate font-serif text-neutral-900 sm:text-lg dark:text-white">
+              <div className="max-w-full overflow-hidden font-serif whitespace-pre text-gray-800 dark:text-white">
                 Reading
               </div>
             </div>

@@ -9,7 +9,7 @@ export function SubscriptionHeader({ onClick }: SubscriptionHeaderProps) {
       <div className="mx-auto w-full max-w-2xl">
         <div className="flex items-start justify-between gap-3">
           <div className="ml-12 space-y-1">
-            <h1 className="font-family-dongfang mt-2 text-2xl font-bold text-gray-900 dark:text-white">
+            <h1 className="mt-2 font-serif text-2xl font-semibold text-gray-900 text-shadow-lg dark:text-white">
               SubTracker
             </h1>
           </div>

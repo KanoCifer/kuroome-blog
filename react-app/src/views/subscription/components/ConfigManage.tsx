@@ -17,7 +17,7 @@ export function ConfigManageButton({ onOpen }: { onOpen: () => void }) {
       onClick={onOpen}
     >
       <BellRing className="size-5" />
-      全局通知配置
+      全局配置
     </button>
   );
 }

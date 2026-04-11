@@ -86,7 +86,7 @@ export function SubscriptionCard({
 
   return (
     <div className="space-y-4">
-      <article className="squircle border border-slate-100 bg-white p-6 shadow-[0_12px_40px_rgb(0,0,0,0.06)] dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl">
+      <article className="squircle border border-slate-100 bg-white p-6 shadow-lg dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl">
         <div className="mb-6 flex items-start justify-between">
           <div className="flex items-center gap-4">
             {/* Logo placeholder */}

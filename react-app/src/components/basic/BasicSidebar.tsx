@@ -187,7 +187,7 @@ export const BentoNavSidebar: React.FC = () => {
           duration: 0.3,
           ease: 'easeInOut',
         }}
-        className="fixed top-0 left-0 z-100 flex h-screen w-80 flex-col gap-6 rounded-r-4xl bg-gray-100 p-6 dark:bg-gray-800"
+        className="fixed top-0 left-0 z-100 flex h-screen w-80 flex-col gap-6 rounded-r-4xl bg-gray-50/90 p-6 backdrop-blur-sm dark:bg-gray-800/80"
       >
         {/* 下拉菜单 */}
         <div className="relative">
@@ -198,7 +198,7 @@ export const BentoNavSidebar: React.FC = () => {
             <img
               src={avatarUrl}
               alt={currentUserName}
-              className="h-14 w-14 rounded-full object-cover shadow-sm ring-4 ring-blue-300"
+              className="h-14 w-14 rounded-full object-cover shadow-[0_0_14px_rgba(0,0,0,0.8)] ring-4 ring-blue-500"
             />
             <div className="flex items-baseline gap-2">
               <span className="text-base-content font-serif text-2xl font-bold select-none">

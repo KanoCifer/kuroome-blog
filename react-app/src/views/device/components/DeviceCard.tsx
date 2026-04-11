@@ -32,7 +32,7 @@ export function DeviceCard({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
-        className="squircle border border-slate-100 bg-white p-6 shadow-[0_12px_40px_rgb(0,0,0,0.06)] dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl"
+        className="squircle border border-slate-100 bg-white p-6 shadow-lg dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl"
       >
         <div className="mb-6 flex items-start justify-between">
           <div className="flex items-center gap-4">
@@ -47,24 +47,17 @@ export function DeviceCard({
                 {device.name}
               </h3>
               {isActive ? (
-                <div className="flex items-center gap-2">
-                  <p className="rounded-full bg-green-100 px-2 py-0.5 text-sm font-medium text-green-600 dark:bg-green-700/20 dark:text-emerald-400">
-                    使用中
-                  </p>
-                  <span className="text-xs text-slate-500 dark:text-slate-400">
-                    • {formatDate(device.purchase_date, 'YYYY-MM-DD')}
-                  </span>
-                </div>
+                <p className="w-fit rounded-full bg-green-100 px-2 py-0.5 text-center text-sm font-medium text-green-600 dark:bg-green-700/20 dark:text-emerald-400">
+                  使用中
+                </p>
               ) : (
-                <div className="flex items-center gap-2">
-                  <p className="rounded-full bg-red-100 px-2 py-0.5 text-sm font-medium text-red-500 dark:bg-red-700/20 dark:text-red-400">
-                    已退役
-                  </p>
-                  <span className="text-xs text-slate-500 dark:text-slate-400">
-                    • {formatDate(device.purchase_date, 'YYYY-MM-DD')}
-                  </span>
-                </div>
+                <p className="w-fit rounded-full bg-red-100 px-2 py-0.5 text-center text-sm font-medium text-red-500 dark:bg-red-700/20 dark:text-red-400">
+                  已退役
+                </p>
               )}
+              <span className="text-xs text-slate-500 dark:text-slate-400">
+                {formatDate(device.purchase_date, 'YYYY-MM-DD')}
+              </span>
             </div>
           </div>
           <div className="text-right">
