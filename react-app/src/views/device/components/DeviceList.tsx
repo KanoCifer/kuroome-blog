@@ -1,0 +1,36 @@
+import { motion } from 'framer-motion';
+import type { Device } from '@/services/deviceService';
+import { DeviceCard } from './DeviceCard';
+
+interface DeviceListProps {
+  devices: Device[];
+  onToggleStatus: (device: Device) => void;
+  onDelete: (device: Device) => void;
+  pendingId: number | null;
+}
+
+export function DeviceList({
+  devices,
+  onToggleStatus,
+  onDelete,
+  pendingId,
+}: DeviceListProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, ease: 'easeOut' }}
+      className="space-y-3"
+    >
+      {devices.map((device) => (
+        <DeviceCard
+          key={device.id}
+          device={device}
+          onToggleStatus={onToggleStatus}
+          onDelete={onDelete}
+          pendingId={pendingId}
+        />
+      ))}
+    </motion.div>
+  );
+}

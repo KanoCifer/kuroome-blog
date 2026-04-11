@@ -4,11 +4,12 @@ import { createBrowserRouter, redirect } from 'react-router-dom';
 import {
   About,
   Analytics,
-  Changelog,
   BlogEdit,
   BlogList,
   BlogPost,
   BookShelf,
+  Changelog,
+  DeviceTracker,
   FishingMap,
   Home,
   ImageToolbox,
@@ -160,7 +161,12 @@ export const router = createBrowserRouter([
       {
         path: '/subscription',
         element: <Subscription />,
-        loader: adminLoader,
+        loader: authLoader,
+      },
+      {
+        path: '/device-tracker',
+        element: <DeviceTracker />,
+        loader: authLoader,
       },
       {
         path: '*',
