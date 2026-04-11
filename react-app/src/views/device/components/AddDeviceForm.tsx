@@ -1,6 +1,6 @@
+import { motion } from 'framer-motion';
 import { ArrowRight, Loader2, Tag } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
 import { createPortal } from 'react-dom';
 
 import { deviceService, type DeviceInput } from '@/services/deviceService';
@@ -143,7 +143,7 @@ export function AddDeviceForm({ onClose, onSuccess }: AddDeviceFormProps) {
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
           transition={{ type: 'spring', duration: 0.4 }}
-          className="fixed inset-x-4 inset-y-24 z-50 flex items-center justify-center"
+          className="fixed inset-x-8 inset-y-24 z-50 flex items-center justify-center"
         >
           <div className="max-h-full w-full max-w-md overflow-y-auto rounded-2xl bg-gray-50 shadow-2xl dark:bg-gray-800">
             {/* Header */}
