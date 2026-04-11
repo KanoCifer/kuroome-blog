@@ -53,7 +53,7 @@ export const deviceGateway = (): DeviceGateway => {
     },
 
     createDevice: (data: DeviceInput) => {
-      return request.post<Device>('v2/device', { device_input: data });
+      return request.post<Device>('v2/device', data);
     },
 
     deleteDevice: (device_id: number) => {
@@ -61,7 +61,9 @@ export const deviceGateway = (): DeviceGateway => {
     },
 
     updateDevice: (device_id: number, data: Omit<DeviceInput, 'id'>) => {
-      return request.put<Device>(`v2/device/${device_id}`, { device_input: data });
+      return request.put<Device>(`v2/device/${device_id}`, {
+        device_input: data,
+      });
     },
 
     updateDeviceStatus: (device_id: number, status: 'active' | 'retired') => {

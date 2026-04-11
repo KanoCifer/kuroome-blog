@@ -60,7 +60,7 @@ async def create_device(
 ):
     """创建新设备"""
     device: DeviceTrack = await service.create_device(
-        user.id, **device_input.model_dump()
+        user_id=user.id, **device_input.model_dump()
     )
     response: DeviceResponse = DeviceResponse.model_validate(device)
     return APIResponse.ok(data={"device": response}, message="创建设备成功")

@@ -1,6 +1,10 @@
-import { deviceService, type Device } from '@/services/deviceService';
+import {
+  deviceService,
+  type Device,
+  type DeviceService,
+} from '@/services/deviceService';
 import { useNotificationStore } from '@/stores/notificationState';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { motion } from 'framer-motion';
 import {
@@ -14,7 +18,11 @@ import {
 import { AddDeviceForm } from './components/AddDeviceForm';
 
 export default function DeviceTracker() {
-  const service = useMemo(() => deviceService(), []);
+  const serviceRef = useRef<DeviceService | null>(null);
+  if (!serviceRef.current) {
+    serviceRef.current = deviceService();
+  }
+  const service = serviceRef.current;
   const notifySuccess = useNotificationStore((state) => state.success);
 
   const [devices, setDevices] = useState<Device[]>([]);
@@ -50,13 +58,11 @@ export default function DeviceTracker() {
       const nextStatus = device.status === 'active' ? 'retired' : 'active';
       setPendingId(device.id);
       try {
-        const updated = await service.updateDeviceStatus(device.id, nextStatus);
-        setDevices((prev) =>
-          prev.map((item) => (item.id === updated.id ? updated : item)),
-        );
+        await service.updateDeviceStatus(device.id, nextStatus);
         notifySuccess(
           nextStatus === 'retired' ? '设备已标记为退役' : '设备已恢复使用',
         );
+        await fetchDevices();
       } catch (updateError) {
         useNotificationStore
           .getState()
@@ -69,7 +75,7 @@ export default function DeviceTracker() {
         setPendingId(null);
       }
     },
-    [notifySuccess, service],
+    [fetchDevices, notifySuccess, service],
   );
 
   const handleDeleteDevice = useCallback(
@@ -103,7 +109,7 @@ export default function DeviceTracker() {
   const totalPrice = devices.reduce((total, device) => total + device.price, 0);
 
   return (
-    <div className="min-h-dvh bg-gray-50 dark:bg-slate-900 pb-24">
+    <div className="min-h-dvh bg-gray-50 pb-24 dark:bg-slate-900">
       <DeviceHeader
         onClick={() => {
           window.history.back();
@@ -111,7 +117,7 @@ export default function DeviceTracker() {
       />
 
       <motion.main
-        className="px-6 py-8 space-y-10 max-w-md mx-auto"
+        className="mx-auto max-w-md space-y-10 px-6 py-8"
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
@@ -120,18 +126,18 @@ export default function DeviceTracker() {
         {/* Summary Cards Section */}
         <section className="grid grid-cols-2 gap-4">
           {/* Total Price (Spans 2) */}
-          <div className="col-span-2 bg-white dark:bg-slate-800/70 dark:backdrop-blur-xl squircle p-6 flex items-center justify-between shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:border-white/10 dark:shadow-xl dark:shadow-slate-900/50 border border-slate-100">
+          <div className="squircle col-span-2 flex items-center justify-between border border-slate-100 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl">
             <div>
-              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
                 设备总价格
               </p>
-              <p className="font-bold text-3xl text-[#00288e] dark:text-blue-400 tracking-tight mt-1">
+              <p className="mt-1 text-3xl font-bold tracking-tight text-[#00288e] dark:text-blue-400">
                 ¥{totalPrice.toFixed(2)}
               </p>
             </div>
-            <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-500/20 flex items-center justify-center text-[#00288e] dark:text-blue-400">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-[#00288e] dark:bg-blue-500/20 dark:text-blue-400">
               <svg
-                className="w-6 h-6"
+                className="h-6 w-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -146,10 +152,10 @@ export default function DeviceTracker() {
             </div>
           </div>
           {/* Active */}
-          <div className="bg-white dark:bg-slate-800/70 dark:backdrop-blur-xl squircle p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:border-white/10 dark:shadow-xl dark:shadow-slate-900/50 border border-slate-100">
-            <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-emerald-500/20 flex items-center justify-center text-green-600 dark:text-emerald-400 mb-3">
+          <div className="squircle border border-slate-100 bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl">
+            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-emerald-500/20 dark:text-emerald-400">
               <svg
-                className="w-5 h-5"
+                className="h-5 w-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -162,18 +168,18 @@ export default function DeviceTracker() {
                 />
               </svg>
             </div>
-            <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">
+            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
               使用中
             </p>
-            <p className="font-bold text-xl mt-1 text-slate-900 dark:text-white">
+            <p className="mt-1 text-xl font-bold text-slate-900 dark:text-white">
               {activeCount}
             </p>
           </div>
           {/* Total */}
-          <div className="bg-white dark:bg-slate-800/70 dark:backdrop-blur-xl squircle p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:border-white/10 dark:shadow-xl dark:shadow-slate-900/50 border border-slate-100">
-            <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 mb-3">
+          <div className="squircle border border-slate-100 bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl">
+            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400">
               <svg
-                className="w-5 h-5"
+                className="h-5 w-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -186,17 +192,17 @@ export default function DeviceTracker() {
                 />
               </svg>
             </div>
-            <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">
+            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
               设备总数
             </p>
-            <p className="font-bold text-xl mt-1 text-slate-900 dark:text-white">
+            <p className="mt-1 text-xl font-bold text-slate-900 dark:text-white">
               {devices.length}
             </p>
           </div>
         </section>
 
         {/* Main Action Button */}
-        <section className="flex justify-center items-center">
+        <section className="flex items-center justify-center">
           <NewButton onClick={() => setIsAddModalOpen(true)} />
         </section>
 
@@ -223,10 +229,13 @@ export default function DeviceTracker() {
 
       {/* Add Device Modal */}
       {isAddModalOpen && (
-        <AddDeviceForm onClose={() => setIsAddModalOpen(false)} />
+        <AddDeviceForm
+          onClose={() => setIsAddModalOpen(false)}
+          onSuccess={fetchDevices}
+        />
       )}
 
-      <section className="px-6 py-8 max-w-md mx-auto"></section>
+      <section className="mx-auto max-w-md px-6 py-8"></section>
     </div>
   );
 }

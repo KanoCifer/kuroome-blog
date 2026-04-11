@@ -13,6 +13,9 @@ class DeviceRepo:
 
     async def create_device_track(self, user_id: int, **data) -> DeviceTrack:
         """创建设备跟踪记录"""
+        purchase_date = data.get("purchase_date")
+        if isinstance(purchase_date, str):
+            data["purchase_date"] = datetime.fromisoformat(purchase_date)
         device_track = DeviceTrack(user_id=user_id, **data)
         self.session.add(device_track)
         await self.session.flush()
@@ -59,6 +62,9 @@ class DeviceRepo:
         self, track_id: int, **data
     ) -> DeviceTrack | None:
         """更新设备跟踪记录"""
+        purchase_date = data.get("purchase_date")
+        if isinstance(purchase_date, str):
+            data["purchase_date"] = datetime.fromisoformat(purchase_date)
         stmt = select(DeviceTrack).where(DeviceTrack.id == track_id)
         result = await self.session.execute(stmt)
         device_track = result.scalar_one_or_none()
