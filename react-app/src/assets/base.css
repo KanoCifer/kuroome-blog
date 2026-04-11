@@ -527,4 +527,10 @@ ul[data-type='taskList'] ul[data-type='taskList'] {
   body {
     @apply bg-background text-foreground;
   }
+  /* 修复 iOS Safari 表单聚焦时自动放大 */
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
 }
