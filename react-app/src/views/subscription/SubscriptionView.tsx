@@ -7,6 +7,8 @@ import { subService } from '@/services/subService';
 import { useNotificationStore } from '@/stores/notificationState';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import {
   SubscriptionAddForm,
   SubscriptionEmptyState,
@@ -35,6 +37,7 @@ function getMonthlyEstimate(subscription: Subscription): number {
 }
 
 export default function SubscriptionView() {
+  const navigate = useNavigate();
   const service = useMemo(() => subService(), []);
   const notifyError = useNotificationStore((state) => state.error);
   const notifySuccess = useNotificationStore((state) => state.success);
@@ -188,18 +191,20 @@ export default function SubscriptionView() {
     .reduce((total, item) => total + getMonthlyEstimate(item), 0);
 
   return (
-    <div className="min-h-dvh bg-gray-50 dark:bg-slate-900 pb-24">
+    <motion.div className="min-h-dvh bg-gray-50 dark:bg-slate-900 pb-24">
       <SubscriptionHeader
-        totalCount={subscriptions.length}
-        activeCount={activeCount}
-        monthlyEstimate={monthlyEstimate}
-        isRefreshing={isLoading}
-        onRefresh={() => {
-          void fetchSubscriptions();
+        onClick={() => {
+          navigate('/device-tracker');
         }}
       />
 
-      <main className="px-6 py-8 space-y-10 max-w-md mx-auto">
+      <motion.main
+        className="px-6 py-8 space-y-10 max-w-md mx-auto"
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        transition={{ duration: 0.3 }}
+      >
         {/* Summary Cards Section */}
         <section className="grid grid-cols-2 gap-4">
           {/* Monthly Estimate (Spans 2) */}
@@ -331,9 +336,9 @@ export default function SubscriptionView() {
             onTestNotification={handleTestNotification}
           />
         )}
-      </main>
+      </motion.main>
 
       <section className="px-6 py-8 max-w-md mx-auto"></section>
-    </div>
+    </motion.div>
   );
 }

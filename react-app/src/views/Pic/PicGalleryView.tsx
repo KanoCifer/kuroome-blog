@@ -1,4 +1,8 @@
-import { galleryService, type Picture } from '@/services/galleryService';
+import {
+  galleryService,
+  type GalleryService,
+  type Picture,
+} from '@/services/galleryService';
 import { useAuthStore } from '@/stores/authState';
 import { useNotificationStore } from '@/stores/notificationState';
 import dayjs from 'dayjs';
@@ -41,7 +45,11 @@ function createPictureId(): string {
 export default function PicGalleryView() {
   const auth = useAuthStore();
   const notifier = useNotificationStore();
-  const service = useMemo(() => galleryService(), []);
+  const serviceRef = useRef<GalleryService | null>(null);
+  if (!serviceRef.current) {
+    serviceRef.current = galleryService();
+  }
+  const service = serviceRef.current;
   const canEdit = Boolean(auth.user?.is_admin);
 
   const [images, setImages] = useState<Picture[]>([]);

@@ -35,7 +35,7 @@ export interface BookService {
 
 export const bookService = (): BookService => ({
   async getBooks(params: { page?: number; per_page?: number }) {
-    const res = await request.get('/book', { params });
+    const res = await request.get('v1/book', { params });
     const data = extractData(res) as BookListData | undefined;
     return (
       data ?? {
@@ -55,15 +55,15 @@ export const bookService = (): BookService => ({
   },
 
   async createBook(payload) {
-    await request.post('/books/addbook', payload);
+    await request.post('v1/books/addbook', payload);
   },
 
   async updateBook(bookId, payload) {
-    await request.put(`/books/${bookId}`, payload);
+    await request.put(`v1/books/${bookId}`, payload);
   },
 
   async patchBookStatus(bookId, payload) {
-    const res = await request.patch(`/books/${bookId}/status`, payload);
+    const res = await request.patch(`v1/books/${bookId}/status`, payload);
     const data = extractData(res) as unknown;
     if (!data) return null;
     if (isBookItem(data)) {
@@ -77,11 +77,11 @@ export const bookService = (): BookService => ({
   },
 
   async deleteBook(bookId) {
-    await request.delete(`/books/${bookId}`);
+    await request.delete(`v1/books/${bookId}`);
   },
 
   async importBooks(payload) {
-    const res = await request.post('/import', payload);
+    const res = await request.post('v1/import', payload);
     const data = extractData(res) as { imported_count?: number } | undefined;
     return data?.imported_count ?? 0;
   },

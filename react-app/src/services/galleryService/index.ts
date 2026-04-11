@@ -28,7 +28,7 @@ export interface GalleryService {
 
 export const galleryService = (): GalleryService => ({
   async getGallery() {
-    const res = await request.get('/pic-gallery');
+    const res = await request.get('v1/pic-gallery');
     const data = extractData(res) as { images?: Picture[] } | undefined;
     return {
       images: data?.images ?? [],
@@ -36,7 +36,7 @@ export const galleryService = (): GalleryService => ({
   },
 
   async uploadGalleryImage(formData: FormData) {
-    const res = await request.post('/upload-gallery-image', formData, {
+    const res = await request.post('v1/upload-gallery-image', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     const data = extractData(res) as { url?: string } | undefined;
@@ -47,6 +47,6 @@ export const galleryService = (): GalleryService => ({
   },
 
   async saveGallery(payload) {
-    await request.post('/set-pic-gallery', payload);
+    await request.post('v1/set-pic-gallery', payload);
   },
 });

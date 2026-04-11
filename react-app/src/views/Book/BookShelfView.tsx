@@ -1,8 +1,8 @@
 import { BookCard } from '@/components/books/BookCard';
-import { bookService } from '@/services/bookService';
+import { bookService, type BookService } from '@/services/bookService';
 import { useNotificationStore } from '@/stores/notificationState';
 import type { BookItem, Pagination } from '@/types';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function BookShelfView() {
@@ -11,7 +11,11 @@ export default function BookShelfView() {
   const [errorMessage, setErrorMessage] = useState('');
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const notifier = useNotificationStore();
-  const service = useMemo(() => bookService(), []);
+  const serviceRef = useRef<BookService | null>(null);
+  if (!serviceRef.current) {
+    serviceRef.current = bookService();
+  }
+  const service = serviceRef.current;
 
   const booksCount = pagination?.total ?? books.length;
 

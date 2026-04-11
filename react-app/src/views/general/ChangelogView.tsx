@@ -118,7 +118,7 @@ export default function ChangelogView() {
                   stiffness: 100,
                   damping: 20,
                 }}
-                viewport={{ once: true, amount: 0.2 }}
+                viewport={{ once: false, amount: 0.2 }}
                 className={`relative flex items-center max-sm:items-start max-sm:pl-8 ${
                   index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
                 }`}
