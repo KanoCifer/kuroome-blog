@@ -87,7 +87,9 @@ export const blogService = (): BlogService => {
   return {
     async getBlogs(query) {
       const res = await gateway.getBlogs(query);
-      const raw = extractData(res as unknown as { data: ApiResponse<unknown> }) as {
+      const raw = extractData(
+        res as unknown as { data: ApiResponse<unknown> },
+      ) as {
         posts: BlogPost[];
         categories: Category[];
         category_counts: Record<number, number>;
@@ -99,10 +101,13 @@ export const blogService = (): BlogService => {
         title: post.title,
         body: post.body,
         category: post.category,
-        is_pinned: (post as BlogPost & { is_pinned?: boolean }).is_pinned || false,
+        is_pinned:
+          (post as BlogPost & { is_pinned?: boolean }).is_pinned || false,
         created_at: post.created_at,
         updated_at: post.updated_at,
-        comment_count: countComments((post as BlogPost & { comments?: Comment[] }).comments || []),
+        comment_count: countComments(
+          (post as BlogPost & { comments?: Comment[] }).comments || [],
+        ),
       }));
 
       return {
@@ -115,17 +120,27 @@ export const blogService = (): BlogService => {
 
     async getBlogPost(postId: string) {
       const res = await gateway.getBlogPost(postId);
-      return extractData(res as unknown as { data: ApiResponse<unknown> }) as BlogDetail;
+      return extractData(
+        res as unknown as { data: ApiResponse<unknown> },
+      ) as BlogDetail;
     },
 
     async postComment(payload) {
       const res = await gateway.postComment(payload);
-      return (extractData(res as unknown as { data: ApiResponse<unknown> }) as { _id: string })._id;
+      return (
+        extractData(res as unknown as { data: ApiResponse<unknown> }) as {
+          _id: string;
+        }
+      )._id;
     },
 
     async getCategories() {
       const res = await gateway.getCategories();
-      return (extractData(res as unknown as { data: ApiResponse<unknown> }) as Category[]).map((c) => ({
+      return (
+        extractData(
+          res as unknown as { data: ApiResponse<unknown> },
+        ) as Category[]
+      ).map((c) => ({
         id: c.id,
         name: c.name,
         post_count: c.post_count ?? c.posts_count ?? 0,
@@ -142,22 +157,32 @@ export const blogService = (): BlogService => {
 
     async getLegacyPost(postId) {
       const res = await gateway.getLegacyPost(postId);
-      return extractData(res as unknown as { data: ApiResponse<unknown> }) as BlogDetail & { category_id?: number };
+      return extractData(
+        res as unknown as { data: ApiResponse<unknown> },
+      ) as BlogDetail & { category_id?: number };
     },
 
     async createLegacyPost(payload) {
       const res = await gateway.createLegacyPost(payload);
-      return extractData(res as unknown as { data: ApiResponse<unknown> }) as { _id: string };
+      return extractData(res as unknown as { data: ApiResponse<unknown> }) as {
+        _id: string;
+      };
     },
 
     async updateLegacyPost(payload) {
       const res = await gateway.updateLegacyPost(payload);
-      return extractData(res as unknown as { data: ApiResponse<unknown> }) as { _id: string };
+      return extractData(res as unknown as { data: ApiResponse<unknown> }) as {
+        _id: string;
+      };
     },
 
     async getLegacyCategories() {
       const res = await gateway.getLegacyCategories();
-      return (extractData(res as unknown as { data: ApiResponse<unknown> }) as Category[]).map((c) => ({
+      return (
+        extractData(
+          res as unknown as { data: ApiResponse<unknown> },
+        ) as Category[]
+      ).map((c) => ({
         id: c.id,
         name: c.name,
         post_count: c.post_count ?? c.posts_count ?? 0,

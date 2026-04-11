@@ -34,7 +34,7 @@ export function SubscriptionModal({
         onClick={onClose}
       />
 
-      <div className="relative z-10 w-full max-w-176 max-h-[calc(100dvh-8rem)] overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-slate-900 flex flex-col">
+      <div className="relative z-10 flex max-h-[calc(100dvh-8rem)] w-full max-w-176 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-slate-900">
         <div className="flex-1 overflow-y-auto p-4">{children}</div>
       </div>
     </motion.div>,

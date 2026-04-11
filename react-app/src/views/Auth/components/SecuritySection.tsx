@@ -88,10 +88,10 @@ export function SecuritySection({
         )}
         {passkeyMessage && (
           <div
-            className={`mt-3 text-center text-[12px] font-medium p-2 rounded-2xl ${
+            className={`mt-3 rounded-2xl p-2 text-center text-[12px] font-medium ${
               passkeyMessageType === 'success'
-                ? 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/20'
-                : 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/20'
+                ? 'bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-400'
+                : 'bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400'
             }`}
           >
             {passkeyMessage}
@@ -142,10 +142,10 @@ export function SecuritySection({
         )}
         {githubMessage && (
           <div
-            className={`mt-3 text-center text-[12px] font-medium p-2 rounded-2xl ${
+            className={`mt-3 rounded-2xl p-2 text-center text-[12px] font-medium ${
               githubMessageType === 'success'
-                ? 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/20'
-                : 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/20'
+                ? 'bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-400'
+                : 'bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400'
             }`}
           >
             {githubMessage}

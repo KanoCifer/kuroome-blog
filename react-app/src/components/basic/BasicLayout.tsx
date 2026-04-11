@@ -37,10 +37,10 @@ export function BasicLayout() {
         <header>
           <BasicNav />
         </header>
-        <main className="relative scroll-smooth max-w-dvw">
+        <main className="relative max-w-dvw scroll-smooth">
           <Outlet />
         </main>
-        <BackToTop className="fixed bottom-30 right-4" />
+        <BackToTop className="fixed right-4 bottom-30" />
       </div>
 
       {createPortal(<Notifier />, document.body)}

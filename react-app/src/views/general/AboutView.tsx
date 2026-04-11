@@ -23,7 +23,7 @@ export default function AboutView() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="flex w-full h-full mb-20 flex-col items-center px-4 py-8 bg-gray-50 dark:bg-[#0f1117]"
+      className="mb-20 flex h-full w-full flex-col items-center bg-gray-50 px-4 py-8 dark:bg-[#0f1117]"
     >
       {/* Hero Section */}
       <motion.div
@@ -71,7 +71,7 @@ export default function AboutView() {
         transition={{ delay: 0.15, duration: 0.5, ease: 'easeOut' }}
         className="mb-6 w-full max-w-md"
       >
-        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        <h2 className="mb-3 text-xs font-semibold tracking-wider text-gray-400 uppercase">
           技术栈
         </h2>
         <div className="flex flex-wrap gap-2">
@@ -96,7 +96,7 @@ export default function AboutView() {
         transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
         className="mb-6 w-full max-w-md"
       >
-        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        <h2 className="mb-3 text-xs font-semibold tracking-wider text-gray-400 uppercase">
           技术方向
         </h2>
         <div className="flex flex-wrap gap-2">
@@ -121,7 +121,7 @@ export default function AboutView() {
         transition={{ delay: 0.25, duration: 0.5, ease: 'easeOut' }}
         className="mb-8 w-full max-w-md rounded-2xl border border-slate-200/60 bg-white/80 p-4 shadow-sm backdrop-blur-sm dark:border-slate-800/60 dark:bg-slate-800/50"
       >
-        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        <h2 className="mb-2 text-xs font-semibold tracking-wider text-gray-400 uppercase">
           兴趣爱好
         </h2>
         <p className="text-sm text-gray-600 dark:text-gray-300">
@@ -136,7 +136,7 @@ export default function AboutView() {
         transition={{ delay: 0.3, duration: 0.5, ease: 'easeOut' }}
         className="w-full max-w-md text-center"
       >
-        <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        <h2 className="mb-4 text-xs font-semibold tracking-wider text-gray-400 uppercase">
           联系我
         </h2>
         <p className="mb-6 text-sm text-gray-500 dark:text-gray-400">

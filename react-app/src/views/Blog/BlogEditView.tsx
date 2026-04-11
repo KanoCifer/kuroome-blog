@@ -238,7 +238,7 @@ export default function BlogEditView() {
       <div className="flex shrink-0 items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
         <button
           onClick={handleCancel}
-          className="p-2 -ml-2 text-slate-600 dark:text-slate-400"
+          className="-ml-2 p-2 text-slate-600 dark:text-slate-400"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -295,13 +295,13 @@ export default function BlogEditView() {
                 type="text"
                 required
                 placeholder="文章标题..."
-                className="block w-full border-0 bg-transparent px-2 py-3 text-xl font-bold text-gray-900 outline-0 placeholder:text-gray-400 focus:ring-0 dark:text-white md:text-2xl"
+                className="block w-full border-0 bg-transparent px-2 py-3 text-xl font-bold text-gray-900 outline-0 placeholder:text-gray-400 focus:ring-0 md:text-2xl dark:text-white"
               />
               <div className="h-px bg-slate-200 dark:bg-slate-700" />
             </div>
 
             {/* Controls Bar */}
-            <div className="relative flex z-10 items-center gap-2 px-4 pb-3">
+            <div className="relative z-10 flex items-center gap-2 px-4 pb-3">
               {/* Pin Button */}
               <button
                 type="button"
@@ -429,7 +429,7 @@ export default function BlogEditView() {
             </div>
 
             {/* Markdown Editor */}
-            <div className="flex-1 mx-4 mb-4 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div className="mx-4 mb-4 flex-1 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
               <MarkdownEditor
                 value={body}
                 onChange={setBody}
@@ -438,7 +438,7 @@ export default function BlogEditView() {
             </div>
 
             {/* Bottom Action Bar - Fixed on mobile */}
-            <div className="shrink-0 mb-20 border-t border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-gray-900">
+            <div className="mb-20 shrink-0 border-t border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-gray-900">
               <div className="flex items-center justify-end gap-3">
                 <button
                   type="button"

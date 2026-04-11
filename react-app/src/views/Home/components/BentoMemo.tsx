@@ -68,10 +68,10 @@ export function BentoMemo() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+              className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center"
             >
               <div
-                className="relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl bg-white p-6 shadow-2xl dark:bg-gray-800 pointer-events-auto"
+                className="pointer-events-auto relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl bg-white p-6 shadow-2xl dark:bg-gray-800"
                 onClick={(e) => e.stopPropagation()}
               >
                 <button

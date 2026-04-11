@@ -80,7 +80,7 @@ export function BentoTodo() {
             {/* <!-- Empty state --> */}
             {todos.length === 0 && (
               <div className="flex h-full flex-col items-center justify-center py-6 text-gray-100 dark:text-gray-600">
-                <span className="text-md font-medium tracking-wide flex-col items-center gap-2 flex">
+                <span className="text-md flex flex-col items-center gap-2 font-medium tracking-wide">
                   <BookCheck className="size-12" />
                   所有任务已完成
                 </span>

@@ -118,14 +118,7 @@ function PrimaryButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`
-        flex-1 rounded-full bg-blue-600
-        px-5 py-3 font-headline text-sm font-bold text-white
-        shadow-[0_8px_20px_rgba(0,40,142,0.2)]
-        transition-all hover:brightness-105 active:scale-[0.98]
-        disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100
-        ${className}
-      `}
+      className={`font-headline flex-1 rounded-full bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-[0_8px_20px_rgba(0,40,142,0.2)] transition-all hover:brightness-105 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100 ${className} `}
     >
       {children}
     </button>
@@ -148,14 +141,7 @@ function SecondaryButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`
-        flex-1 rounded-full border border-blue-600/60 bg-blue-50/50 px-4 py-2
-        font-headline text-sm font-semibold text-on-surface
-        backdrop-blur-md transition-all hover:bg-white/70 active:scale-[0.98]
-        disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100
-        dark:border-blue-600/60 dark:bg-blue-800/50 dark:text-blue-100 dark:hover:bg-blue-800/70
-        ${className}
-      `}
+      className={`font-headline text-on-surface flex-1 rounded-full border border-blue-600/60 bg-blue-50/50 px-4 py-2 text-sm font-semibold backdrop-blur-md transition-all hover:bg-white/70 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 dark:border-blue-600/60 dark:bg-blue-800/50 dark:text-blue-100 dark:hover:bg-blue-800/70 ${className} `}
     >
       {children}
     </button>
@@ -243,17 +229,17 @@ export function SubscriptionNotifyForm({
 
   return (
     <div className="relative overflow-hidden">
-      <main className="relative px-4 pt-6 max-w-lg mx-auto space-y-6">
+      <main className="relative mx-auto max-w-lg space-y-6 px-4 pt-6">
         {/* Header */}
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 dark:bg-blue-900/50">
             <BellRing size={24} className="text-blue-600 dark:text-blue-400" />
           </div>
           <div>
-            <h3 className="font-headline text-lg font-bold text-on-surface">
+            <h3 className="font-headline text-on-surface text-lg font-bold">
               通知配置
             </h3>
-            <p className="text-xs text-on-surface-variant">
+            <p className="text-on-surface-variant text-xs">
               选择渠道与提醒时间点
             </p>
           </div>
@@ -261,7 +247,7 @@ export function SubscriptionNotifyForm({
 
         {/* Channel Selection */}
         <div className="rounded-2xl border border-gray-200/80 bg-gray-50 p-5 dark:border-slate-700 dark:bg-slate-900/60">
-          <h4 className="text-xs font-semibold text-on-surface-variant mb-3 ml-1 font-label">
+          <h4 className="text-on-surface-variant font-label mb-3 ml-1 text-xs font-semibold">
             通知渠道
           </h4>
           <div className="flex flex-wrap gap-2">
@@ -272,14 +258,11 @@ export function SubscriptionNotifyForm({
                   key={option.value}
                   type="button"
                   onClick={() => toggleChannel(option.value)}
-                  className={`
-                    inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all
-                    ${
-                      checked
-                        ? 'bg-blue-600 text-white shadow-[0_4px_12px_rgba(0,40,142,0.25)]'
-                        : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 dark:hover:bg-slate-700'
-                    }
-                  `}
+                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all ${
+                    checked
+                      ? 'bg-blue-600 text-white shadow-[0_4px_12px_rgba(0,40,142,0.25)]'
+                      : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
+                  } `}
                 >
                   <option.icon size={16} />
                   {option.label}
@@ -291,7 +274,7 @@ export function SubscriptionNotifyForm({
 
         {/* Reminder Points */}
         <div className="rounded-2xl border border-gray-200/80 bg-gray-50 p-5 dark:border-slate-700 dark:bg-slate-900/60">
-          <h4 className="text-xs font-semibold text-on-surface-variant mb-3 ml-1 font-label">
+          <h4 className="text-on-surface-variant font-label mb-3 ml-1 text-xs font-semibold">
             提醒时间点
           </h4>
           <div className="grid grid-cols-2 gap-2">
@@ -300,20 +283,14 @@ export function SubscriptionNotifyForm({
               return (
                 <label
                   key={option.key}
-                  className={`
-                    flex items-center gap-3 rounded-xl px-3 py-2.5 cursor-pointer transition-all
-                    ${
-                      checked
-                        ? 'bg-blue-100 border border-blue-200 dark:bg-blue-900/40 dark:border-blue-700/50'
-                        : 'bg-white border border-gray-200 hover:bg-gray-50 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-700/50'
-                    }
-                  `}
+                  className={`flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 transition-all ${
+                    checked
+                      ? 'border border-blue-200 bg-blue-100 dark:border-blue-700/50 dark:bg-blue-900/40'
+                      : 'border border-gray-200 bg-white hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700/50'
+                  } `}
                 >
                   <div
-                    className={`
-                      flex h-5 w-5 items-center justify-center rounded-full transition-all
-                      ${checked ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-slate-600'}
-                    `}
+                    className={`flex h-5 w-5 items-center justify-center rounded-full transition-all ${checked ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-slate-600'} `}
                   >
                     {checked && <CheckCircle2 size={14} />}
                   </div>
@@ -337,7 +314,7 @@ export function SubscriptionNotifyForm({
         {/* Channel Config */}
         {form.channels.includes('email') && (
           <div className="rounded-2xl border border-gray-200/80 bg-gray-50 p-5 dark:border-slate-700 dark:bg-slate-900/60">
-            <h4 className="text-xs font-semibold text-on-surface-variant mb-3 ml-1 font-label">
+            <h4 className="text-on-surface-variant font-label mb-3 ml-1 text-xs font-semibold">
               邮件配置
             </h4>
             <input
@@ -345,14 +322,14 @@ export function SubscriptionNotifyForm({
               value={form.email}
               onChange={(event) => handleChange('email', event.target.value)}
               placeholder="your@email.com"
-              className="w-full bg-white dark:bg-gray-800 border-0 focus:ring-2 focus:ring-blue-500/20 rounded-xl px-4 py-3 text-sm text-on-surface placeholder:text-outline/50 transition-all"
+              className="text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-white px-4 py-3 text-sm transition-all focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-800"
             />
           </div>
         )}
 
         {form.channels.includes('feishu') && (
           <div className="rounded-2xl border border-gray-200/80 bg-gray-50 p-5 dark:border-slate-700 dark:bg-slate-900/60">
-            <h4 className="text-xs font-semibold text-on-surface-variant mb-3 ml-1 font-label">
+            <h4 className="text-on-surface-variant font-label mb-3 ml-1 text-xs font-semibold">
               飞书 Webhook
             </h4>
             <input
@@ -361,14 +338,14 @@ export function SubscriptionNotifyForm({
                 handleChange('feishu_webhook_url', event.target.value)
               }
               placeholder="https://open.feishu.cn/..."
-              className="w-full bg-white dark:bg-gray-800 border-0 focus:ring-2 focus:ring-blue-500/20 rounded-xl px-4 py-3 text-sm text-on-surface placeholder:text-outline/50 transition-all"
+              className="text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-white px-4 py-3 text-sm transition-all focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-800"
             />
           </div>
         )}
 
         {form.channels.includes('bark') && (
           <div className="rounded-2xl border border-gray-200/80 bg-gray-50 p-5 dark:border-slate-700 dark:bg-slate-900/60">
-            <h4 className="text-xs font-semibold text-on-surface-variant mb-3 ml-1 font-label">
+            <h4 className="text-on-surface-variant font-label mb-3 ml-1 text-xs font-semibold">
               Bark Device Key
             </h4>
             <input
@@ -377,7 +354,7 @@ export function SubscriptionNotifyForm({
                 handleChange('bark_device_key', event.target.value)
               }
               placeholder="填写 Bark 设备 Key"
-              className="w-full bg-white dark:bg-gray-800 border-0 focus:ring-2 focus:ring-blue-500/20 rounded-xl px-4 py-3 text-sm text-on-surface placeholder:text-outline/50 transition-all"
+              className="text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-white px-4 py-3 text-sm transition-all focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-800"
             />
           </div>
         )}
@@ -395,14 +372,11 @@ export function SubscriptionNotifyForm({
             {Object.entries(testResult).map(([channel, success]) => (
               <span
                 key={channel}
-                className={`
-                  inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold
-                  ${
-                    success
-                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
-                      : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
-                  }
-                `}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ${
+                  success
+                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+                    : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
+                } `}
               >
                 <CheckCircle2 size={12} />
                 {channel}: {success ? '成功' : '失败'}

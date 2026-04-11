@@ -35,7 +35,9 @@ export default function ImportBookView() {
       saveToLocalStorage(wereadCookie);
     } catch (error) {
       console.error('Error during import:', error);
-      notifier.error('Cookie过期或无效，请重新获取并输入有效的 WEREAD Cookie！');
+      notifier.error(
+        'Cookie过期或无效，请重新获取并输入有效的 WEREAD Cookie！',
+      );
     } finally {
       setLoading(false);
     }
@@ -44,7 +46,7 @@ export default function ImportBookView() {
   return (
     <div className="min-h-screen px-4 py-16">
       <motion.div
-        className="mx-auto mt-8 max-w-2xl rounded-3xl border border-white/20 bg-white/40 p-8 shadow-2xl backdrop-blur dark:border-gray-700/30 dark:bg-gray-900/40 sm:p-10"
+        className="mx-auto mt-8 max-w-2xl rounded-3xl border border-white/20 bg-white/40 p-8 shadow-2xl backdrop-blur sm:p-10 dark:border-gray-700/30 dark:bg-gray-900/40"
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
@@ -82,7 +84,7 @@ export default function ImportBookView() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-2xl bg-linear-to-r from-blue-500 to-sky-600 px-6 py-4 font-medium text-white shadow-lg shadow-blue-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-blue-500/30 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-gray-900"
+            className="w-full rounded-2xl bg-linear-to-r from-blue-500 to-sky-600 px-6 py-4 font-medium text-white shadow-lg shadow-blue-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-blue-500/30 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-gray-900"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">

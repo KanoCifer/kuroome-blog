@@ -9,18 +9,18 @@ const TOKEN_REGEX = {
   refresh_token: /refresh_token=([^;]+)/,
 };
 
-function getCookie(name: "access_token" | "refresh_token"): string {
+function getCookie(name: 'access_token' | 'refresh_token'): string {
   const match = document.cookie.match(TOKEN_REGEX[name]);
-  return match?.[1] ?? "";
+  return match?.[1] ?? '';
 }
 
 export const tokenService = {
   get(): string {
-    return getCookie("access_token");
+    return getCookie('access_token');
   },
 
   getRefreshToken(): string {
-    return getCookie("refresh_token");
+    return getCookie('refresh_token');
   },
 
   save(_token: string): void {

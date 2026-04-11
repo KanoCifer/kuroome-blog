@@ -8,7 +8,11 @@ interface TideChartProps {
 
 export function TideChart({ option }: TideChartProps) {
   return (
-    <Suspense fallback={<div className="h-[220px] animate-pulse bg-gray-100 dark:bg-gray-800" />}>
+    <Suspense
+      fallback={
+        <div className="h-[220px] animate-pulse bg-gray-100 dark:bg-gray-800" />
+      }
+    >
       <ReactECharts
         option={option}
         style={{ width: '100%', height: 220 }}

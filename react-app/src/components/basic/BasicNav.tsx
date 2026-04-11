@@ -133,15 +133,20 @@ export function BasicNav() {
 
       {/* More Menu Bottom Sheet */}
       {createPortal(
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="sync">
           {showMenu && (
             <motion.div
               key="more-menu"
-              className="grid grid-cols-2 gap-2 fixed bottom-26 w-fit scrollbar-hide right-8 z-60 max-h-[70vh] overflow-y-auto rounded-[2rem] border border-white/20 bg-white/80 p-5 shadow-xl backdrop-blur-sm dark:border-white/10 dark:bg-slate-900/80"
-              initial={{ height: 0 }}
-              animate={{ height: 'auto' }}
-              exit={{ height: 0, y: 20 }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              className="scrollbar-hide fixed right-8 bottom-22 z-60 grid h-auto w-fit grid-cols-2 gap-2 overflow-hidden rounded-[2rem] border border-white/20 bg-white/80 p-5 shadow-xl backdrop-blur-sm dark:border-white/10 dark:bg-slate-900/80"
+              initial={{ height: 0, opacity: 0.8, width: 0, y: 20 }}
+              animate={{ height: 'auto', opacity: 1, width: 'auto', y: 0 }}
+              exit={{ height: 0, opacity: 0, width: 0 }}
+              transition={{
+                type: 'spring',
+                damping: 50,
+                stiffness: 300,
+                duration: 0.5,
+              }}
             >
               <MenuItem
                 icon={<BookshelfIcon className="h-6 w-6" />}
@@ -241,7 +246,7 @@ export function BasicNav() {
           {hidden ? null : (
             <motion.nav
               id="mobile-nav"
-              className="fixed bottom-4 left-1/2 z-65 flex h-16 max-w-md shadow-lg -translate-x-1/2 items-center justify-around rounded-full bg-white/80 px-6 py-3 backdrop-blur-sm dark:bg-slate-900/80 dark:shadow-[0_-8px_30px_rgba(0,0,0,0.3)]"
+              className="fixed bottom-4 left-1/2 z-65 flex h-16 max-w-md -translate-x-1/2 items-center justify-around rounded-full bg-white/80 px-6 py-3 shadow-lg backdrop-blur-sm dark:bg-slate-900/80 dark:shadow-[0_-8px_30px_rgba(0,0,0,0.3)]"
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 80, opacity: 0 }}

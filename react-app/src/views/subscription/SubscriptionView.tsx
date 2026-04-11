@@ -191,7 +191,7 @@ export default function SubscriptionView() {
     .reduce((total, item) => total + getMonthlyEstimate(item), 0);
 
   return (
-    <motion.div className="min-h-dvh bg-gray-50 dark:bg-slate-900 pb-24">
+    <motion.div className="min-h-dvh bg-gray-50 pb-24 dark:bg-slate-900">
       <SubscriptionHeader
         onClick={() => {
           navigate('/device-tracker');
@@ -199,7 +199,7 @@ export default function SubscriptionView() {
       />
 
       <motion.main
-        className="px-6 py-8 space-y-10 max-w-md mx-auto"
+        className="mx-auto max-w-md space-y-10 px-6 py-8"
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
@@ -208,18 +208,18 @@ export default function SubscriptionView() {
         {/* Summary Cards Section */}
         <section className="grid grid-cols-2 gap-4">
           {/* Monthly Estimate (Spans 2) */}
-          <div className="col-span-2 bg-white dark:bg-slate-800/70 dark:backdrop-blur-xl squircle p-6 flex items-center justify-between shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:border-white/10 dark:shadow-xl dark:shadow-slate-900/50 border border-slate-100">
+          <div className="squircle col-span-2 flex items-center justify-between border border-slate-100 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl">
             <div>
-              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
                 月度估算
               </p>
-              <p className="font-bold text-3xl text-[#00288e] dark:text-blue-400 tracking-tight mt-1">
+              <p className="mt-1 text-3xl font-bold tracking-tight text-[#00288e] dark:text-blue-400">
                 ¥{monthlyEstimate.toFixed(2)}
               </p>
             </div>
-            <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-500/20 flex items-center justify-center text-[#00288e] dark:text-blue-400">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-[#00288e] dark:bg-blue-500/20 dark:text-blue-400">
               <svg
-                className="w-6 h-6"
+                className="h-6 w-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -234,10 +234,10 @@ export default function SubscriptionView() {
             </div>
           </div>
           {/* Active */}
-          <div className="bg-white dark:bg-slate-800/70 dark:backdrop-blur-xl squircle p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:border-white/10 dark:shadow-xl dark:shadow-slate-900/50 border border-slate-100">
-            <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-emerald-500/20 flex items-center justify-center text-green-600 dark:text-emerald-400 mb-3">
+          <div className="squircle border border-slate-100 bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl">
+            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-emerald-500/20 dark:text-emerald-400">
               <svg
-                className="w-5 h-5"
+                className="h-5 w-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -250,18 +250,18 @@ export default function SubscriptionView() {
                 />
               </svg>
             </div>
-            <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">
+            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
               进行中
             </p>
-            <p className="font-bold text-xl mt-1 text-slate-900 dark:text-white">
+            <p className="mt-1 text-xl font-bold text-slate-900 dark:text-white">
               {activeCount}
             </p>
           </div>
           {/* Total */}
-          <div className="bg-white dark:bg-slate-800/70 dark:backdrop-blur-xl squircle p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:border-white/10 dark:shadow-xl dark:shadow-slate-900/50 border border-slate-100">
-            <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 mb-3">
+          <div className="squircle border border-slate-100 bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl">
+            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400">
               <svg
-                className="w-5 h-5"
+                className="h-5 w-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -274,24 +274,24 @@ export default function SubscriptionView() {
                 />
               </svg>
             </div>
-            <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">
+            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
               总订阅
             </p>
-            <p className="font-bold text-xl mt-1 text-slate-900 dark:text-white">
+            <p className="mt-1 text-xl font-bold text-slate-900 dark:text-white">
               {subscriptions.length}
             </p>
           </div>
         </section>
 
         {/* Main Action Button */}
-        <section className="flex justify-center items-center gap-4">
+        <section className="flex items-center justify-center gap-4">
           <button
             type="button"
             onClick={() => setIsAddModalOpen(true)}
-            className="w-full py-5 px-6 rounded-full bg-[#00288e] dark:bg-blue-600 text-white font-bold flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 dark:shadow-blue-900/40 hover:opacity-90 transition-all active:scale-95"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-[#00288e] px-6 py-5 font-bold text-white shadow-lg shadow-indigo-500/20 transition-all hover:opacity-90 active:scale-95 dark:bg-blue-600 dark:shadow-blue-900/40"
           >
             <svg
-              className="w-6 h-6"
+              className="h-6 w-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -338,7 +338,7 @@ export default function SubscriptionView() {
         )}
       </motion.main>
 
-      <section className="px-6 py-8 max-w-md mx-auto"></section>
+      <section className="mx-auto max-w-md px-6 py-8"></section>
     </motion.div>
   );
 }

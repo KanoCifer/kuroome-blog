@@ -71,10 +71,15 @@ export const useTodoState = create<TodoState>((set, get) => ({
   },
 
   archiveTodo: async (id) => {
-    await service.updateTodo(id, { archived: true, archivedAt: new Date().toISOString() });
+    await service.updateTodo(id, {
+      archived: true,
+      archivedAt: new Date().toISOString(),
+    });
     set((state) => ({
       todos: state.todos.map((t) =>
-        t.id === id ? { ...t, archived: true, archivedAt: new Date().toISOString() } : t,
+        t.id === id
+          ? { ...t, archived: true, archivedAt: new Date().toISOString() }
+          : t,
       ),
     }));
   },

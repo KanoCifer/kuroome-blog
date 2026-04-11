@@ -11,7 +11,7 @@ export function BentoReadingList() {
             <div className="flex size-10 items-center justify-center rounded-2xl bg-orange-100 text-orange-500 ring-1 ring-orange-200/60 sm:size-12 dark:bg-orange-900/30 dark:text-orange-300 dark:ring-orange-500/20">
               <ListCheck className="size-6" />
             </div>
-            <div className="min-w-0 flex flex-col items-start">
+            <div className="flex min-w-0 flex-col items-start">
               <div className="truncate font-serif text-neutral-900 sm:text-lg dark:text-white">
                 Reading
               </div>

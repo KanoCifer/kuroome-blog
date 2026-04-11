@@ -220,7 +220,7 @@ export default function MarkdownEditor({
               value={content}
               onChange={handleChange}
               onKeyDown={handleKeyDown}
-              className="flex-1 resize-none bg-transparent p-4 font-mono text-sm leading-relaxed outline-none placeholder:text-slate-300 focus:ring-0 dark:placeholder:text-slate-700 md:p-6"
+              className="flex-1 resize-none bg-transparent p-4 font-mono text-sm leading-relaxed outline-none placeholder:text-slate-300 focus:ring-0 md:p-6 dark:placeholder:text-slate-700"
               placeholder="# 在此编写 Markdown 内容
 
 - 支持列表
@@ -235,7 +235,7 @@ console.log('Hello!');
         ) : (
           <div
             ref={previewRef}
-            className="prose prose-slate dark:prose-invert max-w-none h-full overflow-y-auto p-4 md:p-6"
+            className="prose prose-slate dark:prose-invert h-full max-w-none overflow-y-auto p-4 md:p-6"
           >
             {content ? (
               <div dangerouslySetInnerHTML={{ __html: renderedHtml }} />

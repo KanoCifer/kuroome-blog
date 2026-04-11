@@ -60,7 +60,7 @@ export default function Home() {
   }, [showNav]);
 
   return (
-    <div className="flex flex-col items-center justify-center relative min-h-screen">
+    <div className="relative flex min-h-screen flex-col items-center justify-center">
       {/* Bento Grid */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

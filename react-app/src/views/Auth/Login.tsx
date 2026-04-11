@@ -171,7 +171,7 @@ export default function Login() {
   };
 
   return (
-    <div className="font-body relative min-h-screen bg-gray-50 dark:bg-gray-800 overflow-hidden">
+    <div className="font-body relative min-h-screen overflow-hidden bg-gray-50 dark:bg-gray-800">
       {/* Main Content */}
       <main className="relative z-10 mt-4 flex flex-col items-center px-5 pt-8 pb-10">
         {/* Hero Section */}
@@ -179,8 +179,7 @@ export default function Login() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: 'easeOut', delay: 0.05 }}
-          className={`mb-8 flex flex-col items-center justify-center
-          `}
+          className={`mb-8 flex flex-col items-center justify-center`}
         >
           <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[#2563eb] text-white shadow-[0_8px_16px_rgba(37,99,235,0.25)]">
             <IconCloud className="size-8" />
@@ -199,8 +198,7 @@ export default function Login() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
-          className={`w-full max-w-100 rounded-4xl border border-white/50 bg-white/70 p-6 shadow-xl dark:border-slate-700/50 dark:bg-slate-800/60
-          }`}
+          className={`} w-full max-w-100 rounded-4xl border border-white/50 bg-white/70 p-6 shadow-xl dark:border-slate-700/50 dark:bg-slate-800/60`}
         >
           <form className="flex flex-col" onSubmit={handleSubmit}>
             {/* Username Field */}
@@ -237,7 +235,7 @@ export default function Login() {
               </label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
-                  <IconLock className="dark:text-white size-5" />
+                  <IconLock className="size-5 dark:text-white" />
                 </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -322,7 +320,7 @@ export default function Login() {
             <button
               type="button"
               disabled={isPasskeySubmitting}
-              className="flex w-full items-center justify-center space-x-2 rounded-full bg-white py-4 text-[15px] font-bold text-[#111827] shadow-lg transition-all active:scale-[0.98] disabled:opacity-70 disabled:bg-gray-300 dark:bg-gray-700 dark:text-white"
+              className="flex w-full items-center justify-center space-x-2 rounded-full bg-white py-4 text-[15px] font-bold text-[#111827] shadow-lg transition-all active:scale-[0.98] disabled:bg-gray-300 disabled:opacity-70 dark:bg-gray-700 dark:text-white"
               onClick={handlePasskeyLogin}
             >
               <IconKey className="size-5" />
@@ -354,7 +352,7 @@ export default function Login() {
 
           {/* Passkey Error */}
           {errors.passkey && (
-            <div className="mt-4 text-center text-[12px] font-medium text-red-500 p-2 bg-red-100 rounded-2xl">
+            <div className="mt-4 rounded-2xl bg-red-100 p-2 text-center text-[12px] font-medium text-red-500">
               {errors.passkey}
             </div>
           )}

@@ -194,7 +194,7 @@ export default function ChangelogView() {
                   </div>
                 </div>
 
-                <div className="absolute top-6 left-0 z-10 h-6 w-6 -translate-x-1/2 md:hidden max-sm:top-5 max-sm:left-3">
+                <div className="absolute top-6 left-0 z-10 h-6 w-6 -translate-x-1/2 max-sm:top-5 max-sm:left-3 md:hidden">
                   <div className="relative flex h-full w-full items-center justify-center rounded-full bg-white ring-3 ring-blue-100 dark:bg-gray-800 dark:ring-gray-700">
                     <div className="h-2 w-2 rounded-full bg-blue-400" />
                   </div>

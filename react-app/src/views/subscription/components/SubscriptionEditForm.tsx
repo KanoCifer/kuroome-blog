@@ -80,14 +80,7 @@ function PrimaryButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`
-        w-full rounded-full bg-blue-600
-        px-5 py-4 font-headline text-base font-bold text-white
-        shadow-[0_10px_25px_rgba(0,40,142,0.2)]
-        transition-all hover:brightness-105 active:scale-[0.98]
-        disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100
-        ${className}
-      `}
+      className={`font-headline w-full rounded-full bg-blue-600 px-5 py-4 text-base font-bold text-white shadow-[0_10px_25px_rgba(0,40,142,0.2)] transition-all hover:brightness-105 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100 ${className} `}
     >
       {children}
     </button>
@@ -114,13 +107,7 @@ function SecondaryButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`
-        w-full rounded-full border border-blue-600/60 bg-blue-50/50 px-5 py-4
-        font-semibold transition-all hover:bg-white/70 active:scale-[0.98]
-        disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100
-        dark:border-blue-600/60 dark:bg-blue-800/50 dark:text-blue-100 dark:hover:bg-blue-800/70
-        ${className}
-      `}
+      className={`w-full rounded-full border border-blue-600/60 bg-blue-50/50 px-5 py-4 font-semibold transition-all hover:bg-white/70 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 dark:border-blue-600/60 dark:bg-blue-800/50 dark:text-blue-100 dark:hover:bg-blue-800/70 ${className} `}
     >
       {children}
     </button>
@@ -192,39 +179,39 @@ export function SubscriptionEditForm({
   return (
     <div className="relative overflow-hidden">
       {/* Main Content */}
-      <main className="relative max-w-lg mx-auto space-y-6">
+      <main className="relative mx-auto max-w-lg space-y-6">
         {/* Form Content */}
-        <div className="p-6 space-y-6">
+        <div className="space-y-6 p-6">
           {/* Subscription Name */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-on-surface-variant ml-1 font-label">
+            <label className="text-on-surface-variant font-label ml-1 text-xs font-semibold">
               订阅名称
             </label>
             <input
               value={form.name}
               onChange={(event) => handleChange('name', event.target.value)}
               placeholder="例如：Spotify Premium"
-              className="w-full bg-gray-100 dark:bg-gray-800 border-0 focus:ring-2 focus:ring-primary/20 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder:text-outline/50 transition-all"
+              className="focus:ring-primary/20 text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-gray-100 px-4 py-3.5 text-sm transition-all focus:ring-2 dark:bg-gray-800"
             />
           </div>
 
           {/* Service Provider */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-on-surface-variant ml-1 font-label">
+            <label className="text-on-surface-variant font-label ml-1 text-xs font-semibold">
               服务商
             </label>
             <input
               value={form.provider}
               onChange={(event) => handleChange('provider', event.target.value)}
               placeholder="例如：Spotify"
-              className="w-full bg-gray-100 dark:bg-gray-800 border-0 focus:ring-2 focus:ring-primary/20 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder:text-outline/50 transition-all"
+              className="focus:ring-primary/20 text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-gray-100 px-4 py-3.5 text-sm transition-all focus:ring-2 dark:bg-gray-800"
             />
           </div>
 
           {/* Price & Currency Grid */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-on-surface-variant ml-1 font-label">
+              <label className="text-on-surface-variant font-label ml-1 text-xs font-semibold">
                 价格
               </label>
               <input
@@ -234,11 +221,11 @@ export function SubscriptionEditForm({
                 value={form.price}
                 onChange={(event) => handleChange('price', event.target.value)}
                 placeholder="0.00"
-                className="w-full bg-gray-100 dark:bg-gray-800 border-0 focus:ring-2 focus:ring-primary/20 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder:text-outline/50 transition-all"
+                className="focus:ring-primary/20 text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-gray-100 px-4 py-3.5 text-sm transition-all focus:ring-2 dark:bg-gray-800"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-on-surface-variant ml-1 font-label">
+              <label className="text-on-surface-variant font-label ml-1 text-xs font-semibold">
                 货币
               </label>
               <div className="relative">
@@ -250,7 +237,7 @@ export function SubscriptionEditForm({
                   list={datalistId}
                   maxLength={10}
                   placeholder="USD / CNY"
-                  className="w-full bg-gray-100 dark:bg-gray-800 border-0 focus:ring-2 focus:ring-primary/20 rounded-xl px-4 py-3.5 pr-10 text-sm text-on-surface placeholder:text-outline/50 transition-all appearance-none"
+                  className="focus:ring-primary/20 text-on-surface placeholder:text-outline/50 w-full appearance-none rounded-xl border-0 bg-gray-100 px-4 py-3.5 pr-10 text-sm transition-all focus:ring-2 dark:bg-gray-800"
                 />
                 <datalist id={datalistId}>
                   {currencySuggestions.map((currency) => (
@@ -263,10 +250,10 @@ export function SubscriptionEditForm({
 
           {/* Billing Cycle */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-on-surface-variant ml-1 font-label">
+            <label className="text-on-surface-variant font-label ml-1 text-xs font-semibold">
               计费周期
             </label>
-            <div className="flex p-1 bg-surface-container-low rounded-xl gap-1">
+            <div className="bg-surface-container-low flex gap-1 rounded-xl p-1">
               {cycleOptions.map((option) => {
                 const isActive = form.billingCycle === option.value;
                 return (
@@ -274,14 +261,11 @@ export function SubscriptionEditForm({
                     key={option.value}
                     type="button"
                     onClick={() => handleChange('billingCycle', option.value)}
-                    className={`
-                        flex-1 py-2.5 px-2 rounded-lg text-[11px] font-bold transition-all
-                        ${
-                          isActive
-                            ? 'bg-blue-600 text-white shadow-md'
-                            : 'text-on-surface-variant hover:bg-white/50 font-medium bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700/50'
-                        }
-                      `}
+                    className={`flex-1 rounded-lg px-2 py-2.5 text-[11px] font-bold transition-all ${
+                      isActive
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : 'text-on-surface-variant bg-gray-100 font-medium hover:bg-white/50 dark:bg-gray-800 dark:hover:bg-gray-700/50'
+                    } `}
                   >
                     {option.label}
                   </button>
@@ -293,7 +277,7 @@ export function SubscriptionEditForm({
           {/* Next Billing Date & Status */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-on-surface-variant ml-1 font-label">
+              <label className="text-on-surface-variant font-label ml-1 text-xs font-semibold">
                 下次扣费日期
               </label>
               <div className="relative flex items-center">
@@ -303,18 +287,18 @@ export function SubscriptionEditForm({
                   onChange={(event) =>
                     handleChange('nextBillingDate', event.target.value)
                   }
-                  className="w-full bg-gray-100 dark:bg-gray-800 border-0 focus:ring-2 focus:ring-primary/20 rounded-xl px-4 py-3.5 text-sm transition-all"
+                  className="focus:ring-primary/20 w-full rounded-xl border-0 bg-gray-100 px-4 py-3.5 text-sm transition-all focus:ring-2 dark:bg-gray-800"
                 />
               </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold ml-1 font-label">
+              <label className="font-label ml-1 text-xs font-semibold">
                 订阅状态
               </label>
               <select
                 value={form.status}
                 onChange={(event) => handleChange('status', event.target.value)}
-                className="w-full bg-blue-50 dark:bg-blue-700 ring-1 ring-blue-700/20 border-0 focus:ring-2 focus:ring-blue-700/20 rounded-xl px-4 py-3.5 text-sm text-on-surface transition-all appearance-none"
+                className="text-on-surface w-full appearance-none rounded-xl border-0 bg-blue-50 px-4 py-3.5 text-sm ring-1 ring-blue-700/20 transition-all focus:ring-2 focus:ring-blue-700/20 dark:bg-blue-700"
               >
                 {statusOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -327,26 +311,26 @@ export function SubscriptionEditForm({
 
           {/* Notes */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-on-surface-variant ml-1 font-label">
+            <label className="text-on-surface-variant font-label ml-1 text-xs font-semibold">
               备注
             </label>
             <input
               value={form.notes}
               onChange={(event) => handleChange('notes', event.target.value)}
               placeholder="可填写账号、套餐说明等"
-              className="w-full bg-gray-100 dark:bg-gray-800 border-0 focus:ring-2 focus:ring-primary/20 rounded-xl px-4 py-3.5 text-sm text-on-surface placeholder:text-outline/50 transition-all"
+              className="focus:ring-primary/20 text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-gray-100 px-4 py-3.5 text-sm transition-all focus:ring-2 dark:bg-gray-800"
             />
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="px-6 pb-6 space-y-3">
+        <div className="space-y-3 px-6 pb-6">
           {error ? (
-            <p className="rounded-xl bg-error-container px-4 py-3 text-sm text-on-error-container">
+            <p className="bg-error-container text-on-error-container rounded-xl px-4 py-3 text-sm">
               {error}
             </p>
           ) : (
-            <p className="px-1 text-xs text-on-surface-variant/70">
+            <p className="text-on-surface-variant/70 px-1 text-xs">
               保存后立即生效
             </p>
           )}

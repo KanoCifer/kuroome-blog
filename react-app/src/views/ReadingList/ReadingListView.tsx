@@ -103,9 +103,7 @@ export default function ReadingListView() {
           ),
         );
       } catch (err) {
-        notifier.error(
-          err instanceof Error ? err.message : '更新阅读状态失败',
-        );
+        notifier.error(err instanceof Error ? err.message : '更新阅读状态失败');
       } finally {
         setPendingBookId(null);
       }
@@ -228,13 +226,13 @@ export default function ReadingListView() {
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
                 placeholder="书名"
-                className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-orange-400 focus:bg-white dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 transition outline-none focus:border-orange-400 focus:bg-white dark:border-slate-700 dark:bg-slate-950 dark:text-white"
               />
               <input
                 value={author}
                 onChange={(event) => setAuthor(event.target.value)}
                 placeholder="作者"
-                className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-orange-400 focus:bg-white dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 transition outline-none focus:border-orange-400 focus:bg-white dark:border-slate-700 dark:bg-slate-950 dark:text-white"
               />
             </div>
             <div className="flex flex-wrap items-center gap-3 text-xs text-gray-600 dark:text-slate-300">

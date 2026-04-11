@@ -57,13 +57,13 @@ function DropDownItems() {
       <>
         <Link
           to="/settings"
-          className="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-800 select-none"
+          className="flex items-center gap-2 rounded-xl p-2 select-none hover:bg-gray-300 dark:hover:bg-gray-800"
         >
           <User className="h-4 w-4" /> Profile
         </Link>
         <Link
           to="/import"
-          className="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-800 select-none"
+          className="flex items-center gap-2 rounded-xl p-2 select-none hover:bg-gray-300 dark:hover:bg-gray-800"
         >
           <FileUp className="h-4 w-4" /> Import
         </Link>
@@ -71,23 +71,23 @@ function DropDownItems() {
           <>
             <Link
               to="/messages"
-              className="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-800 select-none"
+              className="flex items-center gap-2 rounded-xl p-2 select-none hover:bg-gray-300 dark:hover:bg-gray-800"
             >
               <MessageSquare className="h-4 w-4" /> Messages
             </Link>
             <Link
               to="/analytics"
-              className="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-800 select-none"
+              className="flex items-center gap-2 rounded-xl p-2 select-none hover:bg-gray-300 dark:hover:bg-gray-800"
             >
               <BarChart className="h-4 w-4" /> Analytics
             </Link>
           </>
         )}
-        <div className="h-px bg-gray-300 dark:bg-gray-600 my-1"></div>
+        <div className="my-1 h-px bg-gray-300 dark:bg-gray-600"></div>
         <button
           onClick={handleLoginout}
           disabled={isLoading}
-          className="flex items-center gap-2 p-2 rounded-xl text-error hover:bg-error/10 font-bold"
+          className="text-error hover:bg-error/10 flex items-center gap-2 rounded-xl p-2 font-bold"
         >
           <LogOut className="h-4 w-4" />
           {isLoading ? 'Signing out...' : 'Logout'}
@@ -99,13 +99,13 @@ function DropDownItems() {
       <>
         <Link
           to="/login"
-          className="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-800 select-none"
+          className="flex items-center gap-2 rounded-xl p-2 select-none hover:bg-gray-300 dark:hover:bg-gray-800"
         >
           <LogIn className="h-4 w-4" /> Login
         </Link>
         <Link
           to="/register"
-          className="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-800 select-none"
+          className="flex items-center gap-2 rounded-xl p-2 select-none hover:bg-gray-300 dark:hover:bg-gray-800"
         >
           <UserPlus className="h-4 w-4" /> Register
         </Link>
@@ -159,33 +159,40 @@ export const BentoNavSidebar: React.FC = () => {
   return (
     <>
       {/* 侧边栏开关键 */}
-      <div className="fixed top-0 left-0 w-full z-50 p-4 pointer-events-none">
+      <div className="pointer-events-none fixed top-0 left-0 z-50 w-full p-4">
         <button
           onClick={() => setIsOpen(true)}
-          className="p-2 bg-gray-100/50 rounded-full shadow-lg pointer-events-auto dark:bg-gray-500/20 backdrop-blur-sm transition-transform active:scale-95"
+          className="pointer-events-auto rounded-full bg-gray-100/50 p-2 shadow-lg backdrop-blur-sm transition-transform active:scale-95 dark:bg-gray-500/20"
         >
-          <TextAlignJustify className="w-6 h-6 text-gray-500 dark:text-white" />
+          <TextAlignJustify className="h-6 w-6 text-gray-500 dark:text-white" />
         </button>
       </div>
 
       {/* 背景层 */}
       {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-90 backdrop-blur-sm"
+        <motion.div
+          className="fixed inset-0 z-90 bg-black/50 backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
         />
       )}
 
       {/* 侧边栏 */}
-      <aside
-        className={`fixed top-0 left-0 h-screen z-100 w-80 p-6 bg-gray-100 dark:bg-gray-800 rounded-r-3xl flex flex-col gap-6 transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+      <motion.aside
+        initial={{ x: '-100%' }}
+        animate={{ x: isOpen ? 0 : '-100%' }}
+        transition={{
+          duration: 0.3,
+          ease: 'easeInOut',
+        }}
+        className="fixed top-0 left-0 z-100 flex h-screen w-80 flex-col gap-6 rounded-r-4xl bg-gray-100 p-6 dark:bg-gray-800"
       >
         {/* 下拉菜单 */}
         <div className="relative">
           <div
-            className="flex items-center gap-4 px-2 hover:cursor-pointer transition-transform active:scale-95"
+            className="flex items-center gap-4 px-2 transition-transform hover:cursor-pointer active:scale-95"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
             <img
@@ -194,10 +201,10 @@ export const BentoNavSidebar: React.FC = () => {
               className="h-14 w-14 rounded-full object-cover shadow-sm ring-4 ring-blue-300"
             />
             <div className="flex items-baseline gap-2">
-              <span className="font-serif text-2xl font-bold text-base-content select-none">
+              <span className="text-base-content font-serif text-2xl font-bold select-none">
                 {currentUserName}
               </span>
-              <ChevronDown className="h-4 w-4 text-base-content/70" />
+              <ChevronDown className="text-base-content/70 h-4 w-4" />
             </div>
           </div>
 
@@ -207,22 +214,22 @@ export const BentoNavSidebar: React.FC = () => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="absolute top-full left-0 mt-4 w-60 bg-gray-200 dark:bg-gray-600 rounded-2xl shadow-xl z-50 p-2 flex flex-col gap-1 selection-none"
+              className="selection-none absolute top-full left-0 z-50 mt-4 flex w-60 flex-col gap-1 rounded-2xl bg-gray-200 p-2 shadow-xl dark:bg-gray-600"
             >
               <DropDownItems />
             </motion.div>
           )}
         </div>
 
-        <div className="px-3 text-sm font-bold tracking-wider text-base-content/50 mt-4 border-b pb-2">
+        <div className="text-base-content/50 mt-4 border-b px-3 pb-2 text-sm font-bold tracking-wider">
           GENERAL
         </div>
 
         {/* Navigation List */}
-        <ul className="flex flex-col gap-1 relative grow">
+        <ul className="relative flex grow flex-col gap-1">
           {/* Active indicator */}
           <motion.div
-            className="absolute left-0 w-full h-12 bg-blue-500 rounded-2xl dark:bg-blue-600/50 shadow-md pointer-events-none"
+            className="pointer-events-none absolute left-0 h-12 w-full rounded-2xl bg-blue-500 shadow-md dark:bg-blue-600/50"
             animate={{ y: hoverNavIndex * 52 }} // 52 = item height (48) + gap (4)
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             style={{ zIndex: 0 }}
@@ -232,12 +239,12 @@ export const BentoNavSidebar: React.FC = () => {
             <li
               key={item.path}
               onMouseEnter={() => setHoverNavIndex(index)}
-              className="z-10 h-12 flex"
+              className="z-10 flex h-12"
             >
               <Link
                 to={item.path}
                 onClick={() => setIsOpen(false)}
-                className={`flex items-center gap-4 px-4 w-full rounded-2xl h-full font-medium transition-colors ${
+                className={`flex h-full w-full items-center gap-4 rounded-2xl px-4 font-medium transition-colors ${
                   hoverNavIndex === index
                     ? 'text-primary'
                     : 'text-base-content/70 hover:text-base-content'
@@ -250,10 +257,10 @@ export const BentoNavSidebar: React.FC = () => {
           ))}
         </ul>
 
-        <div className="pt-1 border-t mb-30 text-center text-sm">
+        <div className="mb-30 border-t pt-1 text-center text-sm">
           <BasicFooter />
         </div>
-      </aside>
+      </motion.aside>
     </>
   );
 };

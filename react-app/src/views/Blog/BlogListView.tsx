@@ -36,7 +36,7 @@ function PostCard({ post, index }: PostCardProps) {
     >
       {/* Pinned Badge */}
       {post.is_pinned && (
-        <div className="absolute -top-1 -right-1 flex items-center gap-1 rounded-bl-xl rounded-tr-2xl bg-linear-to-r from-blue-500 to-sky-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
+        <div className="absolute -top-1 -right-1 flex items-center gap-1 rounded-tr-2xl rounded-bl-xl bg-linear-to-r from-blue-500 to-sky-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-3.5 w-3.5"
@@ -52,7 +52,7 @@ function PostCard({ post, index }: PostCardProps) {
       <Link to={`/blog/${post._id}`} className="block p-4">
         {/* Title */}
         <h2
-          className={`text-lg font-semibold leading-snug ${
+          className={`text-lg leading-snug font-semibold ${
             post.is_pinned
               ? 'text-blue-900 dark:text-blue-100'
               : 'text-gray-900 dark:text-white'
@@ -294,7 +294,7 @@ export default function BlogListView() {
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             placeholder="搜索文章..."
-            className="block w-full rounded-xl border border-gray-200 bg-white py-3 pr-4 pl-10 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500"
+            className="block w-full rounded-xl border border-gray-200 bg-white py-3 pr-4 pl-10 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500"
           />
           {searchQuery && (
             <button
@@ -346,7 +346,10 @@ export default function BlogListView() {
           ) : error ? (
             <BlogErrorState key="error" message={error} onRetry={handleRetry} />
           ) : posts.length === 0 ? (
-            <BlogEmptyState key="empty" hasCategory={activeCategoryId !== null} />
+            <BlogEmptyState
+              key="empty"
+              hasCategory={activeCategoryId !== null}
+            />
           ) : (
             <motion.div
               key="posts"

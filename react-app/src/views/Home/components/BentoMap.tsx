@@ -6,7 +6,7 @@ export function BentoMap() {
   return (
     <Link to="/fishing-map" className="group block h-full">
       <BentoCard className="min-w-0 cursor-pointer">
-        <div className="min-w-0 flex flex-col items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-col items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/40">
               <Earth className="size-6 text-blue-500" />

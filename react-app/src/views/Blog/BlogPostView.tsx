@@ -28,7 +28,7 @@ function CommentItem({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`${depth > 0 ? 'ml-4 border-l-2 border-gray-100 dark:border-gray-800 pl-4' : ''}`}
+      className={`${depth > 0 ? 'ml-4 border-l-2 border-gray-100 pl-4 dark:border-gray-800' : ''}`}
     >
       <div className="py-3">
         <div className="flex items-center gap-2">
@@ -99,7 +99,7 @@ function CommentForm({
         onChange={(e) => setBody(e.target.value)}
         placeholder={placeholder}
         rows={3}
-        className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500"
+        className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500"
       />
       <div className="mt-3 flex justify-end gap-2">
         {onCancel && (
@@ -118,7 +118,7 @@ function CommentForm({
             }
           }}
           disabled={!body.trim() || isSubmitting}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 active:scale-95 transition-transform"
+          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-transform hover:bg-blue-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isSubmitting ? '发布中...' : '发布评论'}
         </button>
@@ -151,7 +151,7 @@ function ErrorState({
   onRetry: () => void;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-red-200 bg-red-50/50 p-8 text-center dark:border-red-800/50 dark:bg-red-900/20 mx-4">
+    <div className="mx-4 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-red-200 bg-red-50/50 p-8 text-center dark:border-red-800/50 dark:bg-red-900/20">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         className="h-12 w-12 text-red-400"
@@ -172,7 +172,7 @@ function ErrorState({
       <p className="mt-1 text-sm text-red-500">{message}</p>
       <button
         onClick={onRetry}
-        className="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 active:scale-95 transition-transform"
+        className="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-transform hover:bg-red-700 active:scale-95"
       >
         重试
       </button>
@@ -269,7 +269,7 @@ export default function BlogPostView() {
         <div className="flex items-center gap-3 px-4 py-3">
           <button
             onClick={() => navigate(-1)}
-            className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100 active:scale-95 transition-transform dark:hover:bg-gray-800"
+            className="flex h-10 w-10 items-center justify-center rounded-full transition-transform hover:bg-gray-100 active:scale-95 dark:hover:bg-gray-800"
           >
             <svg
               className="h-5 w-5 text-gray-700 dark:text-gray-300"
@@ -336,7 +336,7 @@ export default function BlogPostView() {
                 </div>
               )}
 
-              <h1 className="text-2xl font-bold leading-tight text-gray-900 dark:text-white">
+              <h1 className="text-2xl leading-tight font-bold text-gray-900 dark:text-white">
                 {post.title}
               </h1>
 
@@ -370,10 +370,10 @@ export default function BlogPostView() {
             {/* Content */}
             <div
               ref={contentRef}
-              className="px-4 prose prose-sm dark:prose-invert max-w-none"
+              className="prose prose-sm dark:prose-invert max-w-none px-4"
             >
               <div
-                className="leading-relaxed text-gray-700 dark:text-gray-300 [&_p]:mb-4 [&_h1,&_h2,&_h3,&_h4]:font-bold [&_h1]:text-xl [&_h2]:text-lg [&_h3]:text-base [&_a]:text-blue-600 [&_a]:underline"
+                className="leading-relaxed text-gray-700 dark:text-gray-300 [&_a]:text-blue-600 [&_a]:underline [&_h1]:text-xl [&_h1,&_h2,&_h3,&_h4]:font-bold [&_h2]:text-lg [&_h3]:text-base [&_p]:mb-4"
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.body) }}
               />
             </div>

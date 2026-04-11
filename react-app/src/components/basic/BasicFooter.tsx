@@ -19,7 +19,7 @@ export function BasicFooter() {
           />
         </a>
         <a
-          className="hover:underline ext-center text-xs text-neutral-700 dark:text-neutral-400"
+          className="ext-center text-xs text-neutral-700 hover:underline dark:text-neutral-400"
           href="https://beian.miit.gov.cn/#/Integrated/index"
           target="_blank"
         >

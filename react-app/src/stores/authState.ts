@@ -107,16 +107,19 @@ export const useAuthStore = create<AuthState>((set) => ({
     isLoggingOut = true;
     heartbeat.stop();
     userCache.clear();
-    authGateway.logout().then(() => {
-      isLoggingOut = false;
-      // 注销成功后更新状态
-      set({
-        isAuthenticated: false,
-        user: null,
+    authGateway
+      .logout()
+      .then(() => {
+        isLoggingOut = false;
+        // 注销成功后更新状态
+        set({
+          isAuthenticated: false,
+          user: null,
+        });
+      })
+      .catch(() => {
+        isLoggingOut = false;
       });
-    }).catch(() => {
-      isLoggingOut = false;
-    });
   },
 
   loginWithPasskey: async (assertion: unknown) => {

@@ -129,7 +129,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
     useArticleSummary();
 
   return (
-    <section className="mx-4 shadow-[0_1px_20px_rgba(105,163,255,0.253)] mb-6 overflow-hidden rounded-2xl border border-blue-100 bg-blue-50/70 p-5 transition-all dark:border-slate-700 dark:bg-slate-800/70">
+    <section className="mx-4 mb-6 overflow-hidden rounded-2xl border border-blue-100 bg-blue-50/70 p-5 shadow-[0_1px_20px_rgba(105,163,255,0.253)] transition-all dark:border-slate-700 dark:bg-slate-800/70">
       <div className="mb-3 flex items-center justify-between gap-3">
         <h3 className="font-semibold text-blue-900 dark:text-blue-100">
           AI 文章总结
@@ -148,7 +148,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
         </h3>
 
         <button
-          className="rounded-full px-2 py-1.5 text-xs cursor-pointer bg-blue-500 text-white disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          className="cursor-pointer rounded-full bg-blue-500 px-2 py-1.5 text-xs text-white transition-colors disabled:cursor-not-allowed disabled:bg-gray-400"
           disabled={!content.trim() || loading}
           onClick={() => generateSummary({ title, content })}
         >
@@ -156,7 +156,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
         </button>
       </div>
 
-      <article className="rounded-2xl whitespace-pre-line border border-blue-200 bg-blue-100/50 p-4 text-sm text-gray-800 dark:border-slate-700 dark:bg-slate-700/50 dark:text-gray-300">
+      <article className="rounded-2xl border border-blue-200 bg-blue-100/50 p-4 text-sm whitespace-pre-line text-gray-800 dark:border-slate-700 dark:bg-slate-700/50 dark:text-gray-300">
         {summary || (loading ? '正在生成总结...' : '点击按钮生成文章总结')}
       </article>
     </section>

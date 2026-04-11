@@ -36,7 +36,7 @@ export function CategorySidebar({
 
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+      <h3 className="text-sm font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
         分类
       </h3>
       <div className="flex flex-wrap gap-2">

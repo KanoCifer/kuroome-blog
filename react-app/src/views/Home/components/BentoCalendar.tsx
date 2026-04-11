@@ -13,7 +13,7 @@ export function BentoCalendar() {
       key={idx}
       className={`py-1 text-xs font-medium ${
         idx === weekday
-          ? 'text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-900/30 rounded-2xl'
+          ? 'rounded-2xl bg-blue-50 font-bold text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
           : ''
       }`}
     >
@@ -59,10 +59,10 @@ export function BentoCalendar() {
         </span>
       </div>
       {/* 表头 */}
-      <div className="mb-1 grid text-center grid-cols-7">{weekdayHeaders}</div>
+      <div className="mb-1 grid grid-cols-7 text-center">{weekdayHeaders}</div>
 
       {/* 日期部分 */}
-      <div className="grid text-center grid-cols-7">
+      <div className="grid grid-cols-7 text-center">
         {startOffset()}
         {daysInMonth}
       </div>

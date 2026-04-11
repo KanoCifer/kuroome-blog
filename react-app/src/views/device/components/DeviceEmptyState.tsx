@@ -1,9 +1,9 @@
 export function DeviceEmptyState() {
   return (
-    <div className="bg-slate-50 dark:bg-slate-800/30 rounded-xl p-8 border border-dashed border-slate-200 dark:border-slate-700 text-center">
-      <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800/50 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+    <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center dark:border-slate-700 dark:bg-slate-800/30">
+      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800/50">
         <svg
-          className="w-8 h-8 text-slate-400 dark:text-slate-500"
+          className="h-8 w-8 text-slate-400 dark:text-slate-500"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -16,12 +16,10 @@ export function DeviceEmptyState() {
           />
         </svg>
       </div>
-      <p className="font-semibold text-slate-900 dark:text-slate-200 mb-1">
+      <p className="mb-1 font-semibold text-slate-900 dark:text-slate-200">
         暂无设备
       </p>
-      <p className="text-sm text-slate-500">
-        点击上方按钮添加您的第一个设备
-      </p>
+      <p className="text-sm text-slate-500">点击上方按钮添加您的第一个设备</p>
     </div>
   );
 }

@@ -103,7 +103,7 @@ export default function RssArticleView() {
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                 {article.title}
               </h1>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 mb-4">
+              <p className="mt-1 mb-4 text-xs text-gray-500 dark:text-gray-400">
                 {article.author ? `作者：${article.author} · ` : ''}
                 {formatDate(article.published)}
               </p>
@@ -112,7 +112,7 @@ export default function RssArticleView() {
               <ArticleSummaryCard title={article.title} content={pureContent} />
 
               <div
-                className="prose prose-sm mt-4 max-w-none rounded-2xl bg-white p-4 ring-1 ring-blue-100 dark:prose-invert dark:bg-slate-900 dark:ring-slate-800"
+                className="prose prose-sm dark:prose-invert mt-4 max-w-none rounded-2xl bg-white p-4 ring-1 ring-blue-100 dark:bg-slate-900 dark:ring-slate-800"
                 dangerouslySetInnerHTML={{ __html: html }}
               />
             </motion.article>

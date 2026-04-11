@@ -62,7 +62,7 @@ export function BackToTop({ className }: BackToTopProps) {
             onClick={backToTop}
             aria-label="回到顶部"
             title="回到顶部"
-            className={`group z-50 flex h-14 w-14 transform-gpu cursor-pointer items-center justify-center overflow-hidden rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:shadow-2xl focus:outline-none ${className || 'fixed left-1/2 bottom-12 -translate-x-1/2'}`}
+            className={`group z-50 flex h-14 w-14 transform-gpu cursor-pointer items-center justify-center overflow-hidden rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:shadow-2xl focus:outline-none ${className || 'fixed bottom-12 left-1/2 -translate-x-1/2'}`}
           >
             {/* 背景进度环 */}
             <svg
@@ -114,7 +114,7 @@ export function BackToTop({ className }: BackToTopProps) {
             </svg>
 
             {/* Tooltip */}
-            <span className="absolute right-full mr-3 rounded-lg bg-gray-900 px-3 py-1 text-sm whitespace-nowrap text-white opacity-0 transition-opacity duration-200 dark:bg-gray-700 group-hover:opacity-100">
+            <span className="absolute right-full mr-3 rounded-lg bg-gray-900 px-3 py-1 text-sm whitespace-nowrap text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 dark:bg-gray-700">
               回到顶部
               <span className="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 border-4 border-transparent border-l-gray-900 dark:border-l-gray-700"></span>
             </span>

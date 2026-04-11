@@ -1,4 +1,4 @@
-declare module "pace-js" {
+declare module 'pace-js' {
   interface PaceOptions {
     theme?: string;
     minTime?: number;

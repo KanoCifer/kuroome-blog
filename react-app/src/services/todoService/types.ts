@@ -1,4 +1,4 @@
-export type TodoPriority = "low" | "medium" | "high";
+export type TodoPriority = 'low' | 'medium' | 'high';
 
 export interface Todo {
   id: string;
@@ -30,4 +30,4 @@ export interface CreateTodoPayload {
   category?: string;
 }
 
-export type BatchAction = "archiveCompleted" | "clearCompleted";
+export type BatchAction = 'archiveCompleted' | 'clearCompleted';

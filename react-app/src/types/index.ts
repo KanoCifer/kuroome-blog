@@ -179,7 +179,7 @@ export interface TocItem {
 // 徽章类型定义
 export interface Badge {
   text: string;
-  type: "default" | "success" | "error" | "warning" | "info";
+  type: 'default' | 'success' | 'error' | 'warning' | 'info';
 }
 
 // 分类响应项类型

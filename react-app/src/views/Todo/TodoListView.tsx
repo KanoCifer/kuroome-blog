@@ -14,7 +14,7 @@ function CheckIcon({ completed }: { completed: boolean }) {
       className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-300 ${
         completed
           ? 'border-blue-500 bg-blue-500'
-          : 'border-gray-300 dark:border-gray-600 hover:border-blue-400'
+          : 'border-gray-300 hover:border-blue-400 dark:border-gray-600'
       }`}
     >
       {completed && (
@@ -348,7 +348,7 @@ export default function TodoListView() {
       <div className="sticky top-0 z-10 bg-white/80 px-4 py-4 backdrop-blur-md dark:bg-slate-900/80">
         <div className="flex items-center gap-3">
           <div>
-            <h1 className="ml-12 text-xl flex flex-col font-semibold text-gray-900 dark:text-gray-100">
+            <h1 className="ml-12 flex flex-col text-xl font-semibold text-gray-900 dark:text-gray-100">
               待办事项
               <span className="text-sm text-gray-500">
                 {getFilterCount('all')} 项待办
@@ -359,7 +359,7 @@ export default function TodoListView() {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex gap-2 px-4 py-3 overflow-x-auto">
+      <div className="flex gap-2 overflow-x-auto px-4 py-3">
         {(Object.keys(filterLabels) as FilterType[]).map((f) => (
           <button
             key={f}
@@ -405,7 +405,7 @@ export default function TodoListView() {
               } ${
                 todo.completed
                   ? 'border-gray-200 dark:border-gray-800'
-                  : 'border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700'
+                  : 'border-gray-200 hover:border-gray-300 dark:border-gray-800 dark:hover:border-gray-700'
               }`}
             >
               {editingId === todo.id ? (
@@ -574,7 +574,7 @@ export default function TodoListView() {
       </div>
 
       {/* Bottom Action Bar */}
-      <div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-white/80 px-4 py-4 w-[30vw ] dark:bg-slate-900/80">
+      <div className="w-[30vw ] fixed bottom-24 left-1/2 -translate-x-1/2 transform bg-white/80 px-4 py-4 dark:bg-slate-900/80">
         {completedCount > 0 && (
           <div className="mb-3 flex gap-2">
             <button
@@ -619,7 +619,7 @@ export default function TodoListView() {
               exit={{ y: '100%' }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               onClick={(e) => e.stopPropagation()}
-              className="absolute left-0 right-0 bottom-0 max-h-[85dvh] overflow-y-auto rounded-t-3xl bg-white p-6 dark:bg-gray-900"
+              className="absolute right-0 bottom-0 left-0 max-h-[85dvh] overflow-y-auto rounded-t-3xl bg-white p-6 dark:bg-gray-900"
             >
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">

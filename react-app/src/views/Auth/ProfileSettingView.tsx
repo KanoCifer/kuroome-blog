@@ -278,7 +278,7 @@ export default function ProfileSettingView() {
   };
 
   return (
-    <div className="font-body relative h-full mb-24 bg-gray-50 dark:bg-gray-800 overflow-hidden">
+    <div className="font-body relative mb-24 h-full overflow-hidden bg-gray-50 dark:bg-gray-800">
       {/* Main Content */}
       <main className="relative z-10 mt-4 flex flex-col items-center px-5 pt-8 pb-10">
         {/* Header Section */}
@@ -360,10 +360,10 @@ export default function ProfileSettingView() {
             {/* Message */}
             {message && (
               <div
-                className={`mt-4 text-center text-[12px] font-medium p-3 rounded-2xl ${
+                className={`mt-4 rounded-2xl p-3 text-center text-[12px] font-medium ${
                   messageType === 'success'
-                    ? 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/20'
-                    : 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/20'
+                    ? 'bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-400'
+                    : 'bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400'
                 }`}
               >
                 {message}
