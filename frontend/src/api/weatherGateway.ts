@@ -1,7 +1,10 @@
 import request from "@/api/request";
 
 export interface TideResponse {
-  tides?: Array<{ time: string; height: number }>;
+  code: string;
+  updateTime: string;
+  tideTable: Array<{ fxTime: string; height: string; type: "H" | "L" }>;
+  tideHourly: Array<{ fxTime: string; height: string }>;
 }
 
 export interface GeocodeResponse {
@@ -52,12 +55,12 @@ export interface WeatherGateway {
 
 export const weatherGateway: WeatherGateway = {
   async getTide(): Promise<TideResponse> {
-    const res = await request.get<{ data: TideResponse }>("v1/weather/tide");
+    const res = await request.get<{ data: TideResponse }>("v1/qweather/tide");
     return res.data.data;
   },
 
   async reverseGeocode(payload: { location: string; extensions: "base" | "all" }): Promise<GeocodeResponse> {
-    const res = await request.post<{ data: GeocodeResponse }>("v1/weather/geocode", payload);
+    const res = await request.post<{ data: GeocodeResponse }>("v1/geocode/regeo", payload);
     return res.data.data;
   },
 
@@ -65,10 +68,7 @@ export const weatherGateway: WeatherGateway = {
     city: string;
     extensions: "base" | "all";
   }): Promise<WeatherLiveResponse | WeatherForecastResponse> {
-    const res = await request.post<{ data: WeatherLiveResponse | WeatherForecastResponse }>(
-      "v1/weather/weather",
-      payload,
-    );
+    const res = await request.post<{ data: WeatherLiveResponse | WeatherForecastResponse }>("v1/weather", payload);
     return res.data.data;
   },
 };

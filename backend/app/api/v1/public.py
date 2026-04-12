@@ -175,20 +175,53 @@ async def get_weather(
     extensions: str = Body("base", description="Weather type: base/all"),
     redis: AsyncRedis = Depends(get_redis),
 ) -> JSONResponse:
-    """Get weather information from Amap API.
+    """Get weather information from Amap API and transform to frontend format.
 
     Args:
         city: City adcode
         extensions: Weather type (base for current, all for forecast)
 
     Returns:
-        JSONResponse: Weather data from Amap API
+        JSONResponse: Weather data transformed to frontend-expected format
     """
     data, from_cache = await PublicService.get_weather(
         redis=redis,
         city=city,
         extensions=extensions,
     )
+
+    # Transform Amap response to frontend-expected WeatherLiveResponse/WeatherForecastResponse format
+    # Amap fields: temperature, weather, winddirection → frontend: temp, text, windDir
+    if extensions == "base" and "lives" in data:
+        data["lives"] = [
+            {
+                "city": item.get("city", ""),
+                "temp": item.get("temperature", ""),
+                "text": item.get("weather", ""),
+                "windDir": item.get("winddirection", ""),
+                "humidity": item.get("humidity", ""),
+            }
+            for item in data.get("lives", [])
+        ]
+    elif extensions == "all" and "forecasts" in data:
+        data["forecasts"] = [
+            {
+                "casts": [
+                    {
+                        "date": cast.get("date", ""),
+                        "dayWeather": cast.get("dayweather", ""),
+                        "nightWeather": cast.get("nightweather", ""),
+                        "dayTemp": cast.get("daytemp", ""),
+                        "nightTemp": cast.get("nighttemp", ""),
+                        "dayWind": cast.get("daywind", ""),
+                        "nightWind": cast.get("nightwind", ""),
+                    }
+                    for cast in forecast.get("casts", [])
+                ]
+            }
+            for forecast in data.get("forecasts", [])
+        ]
+
     if from_cache:
         return APIResponse.ok(
             data=data,

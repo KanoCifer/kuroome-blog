@@ -28,8 +28,8 @@ use([TitleComponent, TooltipComponent, GridComponent, MarkLineComponent, MarkPoi
 
 interface TideData {
   updateTime: string;
-  tideTable: { fxTime: string; height: number; type: "H" | "L" }[];
-  tideHourly: { fxTime: string; height: number }[];
+  tideTable: { fxTime: string; height: string; type: "H" | "L" }[];
+  tideHourly: { fxTime: string; height: string }[];
 }
 const notifier = useNotificationStore();
 const tideData = ref<TideData | null>(null);
@@ -46,16 +46,11 @@ const fetchTideData = async () => {
   loading.value = true;
   try {
     const res = await weatherService.getTide();
-    if (res.tides && res.tides.length > 0) {
-      const tideTable = res.tides.map((t, i) => ({
-        fxTime: t.time,
-        height: t.height,
-        type: (i % 2 === 0 ? "H" : "L") as "H" | "L",
-      }));
+    if (res.tideHourly && res.tideHourly.length > 0) {
       tideData.value = {
-        updateTime: "",
-        tideTable,
-        tideHourly: res.tides.map((t) => ({ fxTime: t.time, height: t.height })),
+        updateTime: res.updateTime,
+        tideTable: res.tideTable,
+        tideHourly: res.tideHourly,
       };
     }
   } catch {
