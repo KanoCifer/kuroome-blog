@@ -135,9 +135,9 @@ function openAddModal(): void {
   isAddModalOpen.value = true;
 }
 
-async function handleCreateSubscription(): Promise<void> {
+async function handleCreateSubscription(form: SubscriptionFormState): Promise<void> {
   addFormError.value = "";
-  const validationError = validateSubscriptionForm(createForm);
+  const validationError = validateSubscriptionForm(form);
   if (validationError) {
     addFormError.value = validationError;
     return;
@@ -145,7 +145,7 @@ async function handleCreateSubscription(): Promise<void> {
 
   isCreating.value = true;
   try {
-    const created = await subscriptionService.createSubscription(toCreatePayload(createForm));
+    const created = await subscriptionService.createSubscription(toCreatePayload(form));
     subscriptions.value = [created, ...subscriptions.value];
     selectedSubId.value = created.id;
     isAddModalOpen.value = false;
@@ -164,11 +164,11 @@ function openEditModal(subscription: Subscription): void {
   isEditModalOpen.value = true;
 }
 
-async function handleUpdateSubscription(): Promise<void> {
+async function handleUpdateSubscription(form: SubscriptionFormState): Promise<void> {
   if (editTargetId.value === null) return;
 
   editFormError.value = "";
-  const validationError = validateSubscriptionForm(editForm);
+  const validationError = validateSubscriptionForm(form);
   if (validationError) {
     editFormError.value = validationError;
     return;
@@ -176,7 +176,7 @@ async function handleUpdateSubscription(): Promise<void> {
 
   isUpdating.value = true;
   try {
-    const updated = await subscriptionService.updateSubscription(editTargetId.value, toUpdatePayload(editForm));
+    const updated = await subscriptionService.updateSubscription(editTargetId.value, toUpdatePayload(form));
     subscriptions.value = upsertSubscription(subscriptions.value, updated);
     isEditModalOpen.value = false;
     notifier.success("订阅信息已更新");
