@@ -230,6 +230,17 @@ const router = createRouter({
       },
     },
     {
+      path: "/device-tracker",
+      name: "device-tracker",
+      component: () => import("@/views/device/DeviceTracker.vue"),
+      meta: {
+        requiresAuth: true,
+        title: "设备管理 - Kuroome's Blog",
+        description: "管理电子设备资产与价格",
+        keywords: "设备管理,资产追踪",
+      },
+    },
+    {
       path: "/gallery",
       name: "gallery",
       component: () => import("@/views/pic/PicGallery.vue"),

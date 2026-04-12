@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { AxiosError } from "axios";
 import type { Subscription, TestNotificationPayload } from "@/api/subscriptionGateway";
 import BasicDetail from "@/components/basic/BasicDetail.vue";
 import { subscriptionService } from "@/service/subscriptionService";
@@ -34,6 +33,7 @@ import {
   validateSubscriptionForm,
 } from "@/views/subscription/subscriptionUtils";
 import type { ReminderFormState, SubscriptionFormState } from "@/views/subscription/types";
+import type { AxiosError } from "axios";
 import { computed, onMounted, reactive, ref } from "vue";
 
 const notifier = useNotificationStore();
@@ -362,48 +362,54 @@ onMounted(() => {
         />
       </div>
     </div>
+
+    <Teleport to="body">
+      <SubscriptionFormModal
+        mode="create"
+        :is-open="isAddModalOpen"
+        title="新增订阅"
+        description="创建新的订阅记录，默认状态为进行中。"
+        submit-text="确认创建"
+        loading-text="创建中..."
+        :is-submitting="isCreating"
+        :form="createForm"
+        :error-message="addFormError"
+        :currency-suggestions="currencySuggestions"
+        @close="isAddModalOpen = false"
+        @submit="handleCreateSubscription"
+      />
+    </Teleport>
+
+    <Teleport to="body">
+      <SubscriptionFormModal
+        mode="edit"
+        :is-open="isEditModalOpen"
+        title="编辑订阅"
+        description="更新订阅信息、状态和账单日期。"
+        submit-text="保存更改"
+        loading-text="保存中..."
+        :is-submitting="isUpdating"
+        :form="editForm"
+        :error-message="editFormError"
+        :currency-suggestions="currencySuggestions"
+        :include-status="true"
+        @close="isEditModalOpen = false"
+        @submit="handleUpdateSubscription"
+      />
+    </Teleport>
+
+    <Teleport to="body">
+      <ReminderConfigModal
+        :is-open="isReminderModalOpen"
+        :form="reminderForm"
+        :is-testing="isTestingReminder"
+        :is-saving="isSavingReminder"
+        :error-message="reminderFormError"
+        :test-result="reminderTestResult"
+        @close="isReminderModalOpen = false"
+        @test="handleTestNotificationFromForm"
+        @save="handleSaveReminderConfigFromForm"
+      />
+    </Teleport>
   </BasicDetail>
-
-  <SubscriptionFormModal
-    mode="create"
-    :is-open="isAddModalOpen"
-    title="新增订阅"
-    description="创建新的订阅记录，默认状态为进行中。"
-    submit-text="确认创建"
-    loading-text="创建中..."
-    :is-submitting="isCreating"
-    :form="createForm"
-    :error-message="addFormError"
-    :currency-suggestions="currencySuggestions"
-    @close="isAddModalOpen = false"
-    @submit="handleCreateSubscription"
-  />
-
-  <SubscriptionFormModal
-    mode="edit"
-    :is-open="isEditModalOpen"
-    title="编辑订阅"
-    description="更新订阅信息、状态和账单日期。"
-    submit-text="保存更改"
-    loading-text="保存中..."
-    :is-submitting="isUpdating"
-    :form="editForm"
-    :error-message="editFormError"
-    :currency-suggestions="currencySuggestions"
-    :include-status="true"
-    @close="isEditModalOpen = false"
-    @submit="handleUpdateSubscription"
-  />
-
-  <ReminderConfigModal
-    :is-open="isReminderModalOpen"
-    :form="reminderForm"
-    :is-testing="isTestingReminder"
-    :is-saving="isSavingReminder"
-    :error-message="reminderFormError"
-    :test-result="reminderTestResult"
-    @close="isReminderModalOpen = false"
-    @test="handleTestNotificationFromForm"
-    @save="handleSaveReminderConfigFromForm"
-  />
 </template>

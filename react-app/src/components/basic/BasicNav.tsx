@@ -3,6 +3,7 @@ import {
   IconCategoryFilled,
   IconFileRssFilled,
   IconHomeFilled,
+  IconDeviceDesktop,
 } from '@tabler/icons-react';
 import { Newspaper, Rss } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
@@ -83,6 +84,19 @@ function MenuItem({
       <span className="text-xs font-bold">{label}</span>
     </button>
   );
+}
+
+const DesktopIcon = IconDeviceDesktop;
+
+function setCookie(name: string, value: string, days: number = 30) {
+  const expires = new Date();
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;domain=.kanocifer.chat`;
+}
+
+function switchToVue() {
+  setCookie('device_force', 'vue', 30);
+  window.location.href = 'https://kanocifer.chat';
 }
 
 export function BasicNav() {
@@ -234,6 +248,14 @@ export function BasicNav() {
                   darkIconBg="dark:bg-red-900/40"
                 />
               )}
+              <MenuItem
+                icon={<DesktopIcon className="h-6 w-6" />}
+                label="Desktop"
+                onClick={switchToVue}
+                iconColor="text-teal-500"
+                iconBg="bg-teal-100"
+                darkIconBg="dark:bg-teal-900/40"
+              />
             </motion.div>
           )}
         </AnimatePresence>,
