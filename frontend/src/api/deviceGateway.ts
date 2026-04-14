@@ -16,6 +16,7 @@ export type Device = DeviceInput & {
 
 export interface DeviceGateway {
   getUserDevices: () => Promise<Device[]>;
+  getUserGlobalConfig: () => Promise<{ config: Record<string, unknown> }>;
   getDeviceById: (device_id: number) => Promise<Device>;
   createDevice: (data: DeviceInput) => Promise<Device>;
   deleteDevice: (device_id: number) => Promise<void>;
@@ -29,6 +30,11 @@ export const deviceGateway: DeviceGateway = {
   async getUserDevices() {
     const res = await request.get<{ data: { devices: Device[] } }>("v2/device");
     return res.data.data.devices;
+  },
+
+  async getUserGlobalConfig() {
+    const res = await request.get<{ data: { config: Record<string, unknown> } }>("v2/subscriptions/global-config");
+    return res.data.data;
   },
 
   async getDeviceById(device_id: number) {

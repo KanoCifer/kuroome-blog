@@ -90,6 +90,7 @@
         :pending-id="pendingId"
         @toggle-status="handleToggleStatus"
         @delete="handleDeleteDevice"
+        @config-success="fetchDevices"
       />
     </div>
 

@@ -8,10 +8,12 @@
     <!-- Form Container -->
     <Transition name="modal">
       <div v-if="modelValue" class="fixed inset-x-8 inset-y-24 z-50 flex items-center justify-center">
-        <div class="max-h-full w-full max-w-md overflow-y-auto rounded-2xl bg-gray-50 shadow-2xl dark:bg-gray-800">
+        <div
+          class="max-h-full w-full max-w-md overflow-y-auto rounded-2xl bg-slate-100 shadow-2xl dark:bg-[#1a2133] dark:shadow-xl dark:shadow-slate-900/60"
+        >
           <!-- Header -->
           <div
-            class="sticky top-0 z-10 border-b border-gray-100 bg-gray-50 px-6 pt-6 pb-4 dark:border-gray-700/50 dark:bg-gray-800"
+            class="sticky top-0 z-10 border-b border-gray-200 bg-slate-100 px-6 pt-6 pb-4 dark:border-white/10 dark:bg-[#1a2133]"
           >
             <div class="flex items-start justify-between gap-3">
               <div>
@@ -27,7 +29,7 @@
           </div>
 
           <!-- Form -->
-          <form @submit.prevent="handleSubmit" class="space-y-5 p-6">
+          <form @submit.prevent="handleSubmit" class="space-y-5 bg-slate-50 p-6 dark:bg-[#111827]">
             <!-- Name -->
             <label class="block space-y-1.5">
               <span class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"> 设备名称 * </span>
@@ -36,7 +38,7 @@
                 type="text"
                 placeholder="例如：iPhone 15 Pro Max"
                 maxlength="100"
-                class="w-full rounded-xl border-0 bg-white px-4 py-3 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:ring-blue-400/30 dark:bg-gray-800/70 dark:text-white dark:placeholder:text-slate-500 dark:focus:ring-blue-500/30"
+                class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:bg-[#0f172a] dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
               />
             </label>
 
@@ -46,7 +48,7 @@
               <input
                 v-model="form.purchase_date"
                 type="date"
-                class="w-full rounded-xl border-0 bg-white px-4 py-3 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none focus:ring-blue-400/30 dark:bg-gray-800/70 dark:text-white dark:focus:ring-blue-500/30"
+                class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:bg-[#0f172a] dark:text-white dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
               />
             </label>
 
@@ -56,7 +58,7 @@
                 <span class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"> 货币 </span>
                 <select
                   v-model="form.currency"
-                  class="w-full cursor-pointer appearance-none rounded-xl border-0 bg-white px-4 py-3 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none focus:ring-blue-400/30 dark:bg-gray-800/70 dark:text-white dark:focus:ring-blue-500/30"
+                  class="w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:bg-[#0f172a] dark:text-white dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
                 >
                   <option v-for="c in currencyOptions" :key="c" :value="c">
                     {{ c }}
@@ -72,7 +74,7 @@
                   min="0"
                   step="0.01"
                   placeholder="0.00"
-                  class="w-full rounded-xl border-0 bg-white px-4 py-3 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:ring-blue-400/30 dark:bg-gray-800/70 dark:text-white dark:placeholder:text-slate-500 dark:focus:ring-blue-500/30"
+                  class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:bg-[#0f172a] dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
                 />
               </label>
             </div>
@@ -84,14 +86,16 @@
                 v-model="form.notes"
                 type="text"
                 placeholder="例如：256GB 银色、国行版本"
-                class="w-full rounded-xl border-0 bg-white px-4 py-3 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:ring-blue-400/30 dark:bg-gray-800/70 dark:text-white dark:placeholder:text-slate-500 dark:focus:ring-blue-500/30"
+                class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:bg-[#0f172a] dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
               />
             </label>
 
             <!-- Status Toggle -->
             <div class="space-y-2">
               <span class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"> 设备状态 </span>
-              <div class="flex rounded-full bg-slate-100/60 p-1 backdrop-blur-sm dark:bg-slate-800/60">
+              <div
+                class="flex rounded-full bg-slate-200/80 p-1 backdrop-blur-sm dark:border dark:border-white/10 dark:bg-[#0f172a]"
+              >
                 <button
                   v-for="option in statusOptions"
                   :key="option.value"
@@ -101,7 +105,7 @@
                     'flex-1 rounded-full px-3 py-2.5 text-xs font-semibold transition-all duration-200',
                     form.status === option.value
                       ? 'bg-blue-700 text-white shadow-lg shadow-blue-500/25'
-                      : 'text-slate-500 hover:bg-slate-200/60 dark:text-slate-400 dark:hover:bg-slate-700/60',
+                      : 'text-slate-500 hover:bg-slate-200/60 dark:text-slate-400 dark:hover:bg-white/10',
                   ]"
                 >
                   {{ option.label }}

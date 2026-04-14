@@ -7,6 +7,7 @@
       :pending-id="pendingId"
       @toggle-status="(d) => emit('toggleStatus', d)"
       @delete="(d) => emit('delete', d)"
+      @config-success="(d) => emit('configSuccess', d)"
     />
   </div>
 </template>
@@ -25,5 +26,6 @@ defineProps<Props>();
 const emit = defineEmits<{
   toggleStatus: [device: Device];
   delete: [device: Device];
+  configSuccess: [device: Device];
 }>();
 </script>

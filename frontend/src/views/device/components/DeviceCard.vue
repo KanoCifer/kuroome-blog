@@ -31,6 +31,9 @@
           <span class="text-xs text-slate-500 dark:text-slate-400">
             {{ formatPurchaseDate(device.purchase_date) }}
           </span>
+          <p class="font-family-dongfang mt-2 text-xs font-bold text-slate-500 dark:text-slate-400">
+            {{ `日均 ${formatPrice(calcSpendPerDay(device), device.currency)}/天` }}
+          </p>
         </div>
       </div>
       <div class="text-right">
@@ -66,7 +69,7 @@
       </span>
     </div>
 
-    <div class="grid grid-cols-2 gap-3">
+    <div class="grid grid-cols-3 gap-3">
       <button
         type="button"
         :disabled="isPending"
@@ -77,19 +80,34 @@
       </button>
       <button
         type="button"
+        @click="isMilestoneModalOpen = true"
+        class="rounded-full bg-[#00288e] px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-blue-600"
+      >
+        编辑配置
+      </button>
+      <button
+        type="button"
         @click="handleDelete"
         class="rounded-full border border-red-200 bg-red-300/50 px-4 py-3 text-sm font-bold text-red-600 transition-all hover:bg-red-50 active:scale-95 dark:border-red-800 dark:bg-red-700/30 dark:text-red-400 dark:hover:bg-red-900/20"
       >
         删除设备
       </button>
     </div>
+
+    <!-- Milestone Config Modal -->
+    <MilestoneConfigForm
+      v-model="isMilestoneModalOpen"
+      :device="device"
+      @success="(updated) => emit('configSuccess', updated)"
+    />
   </article>
 </template>
 
 <script setup lang="ts">
 import type { Device } from "@/services/deviceService";
 import dayjs from "dayjs";
-import { computed } from "vue";
+import { computed, ref } from "vue";
+import MilestoneConfigForm from "./MilestoneConfigForm.vue";
 
 interface Props {
   device: Device;
@@ -101,10 +119,12 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
   toggleStatus: [device: Device];
   delete: [device: Device];
+  configSuccess: [device: Device];
 }>();
 
 const isPending = computed(() => props.pendingId === props.device.id);
 const isActive = computed(() => props.device.status === "active");
+const isMilestoneModalOpen = ref(false);
 
 function formatPrice(price: number, currency: string): string {
   const normalized = currency?.toUpperCase() ?? "CNY";
@@ -117,6 +137,11 @@ function formatPrice(price: number, currency: string): string {
 function formatPurchaseDate(dateStr: string): string {
   if (!dateStr) return "";
   return dayjs(dateStr).format("YYYY-MM-DD");
+}
+
+function calcSpendPerDay(device: Device): number {
+  const daysInUse = Math.max(1, dayjs().diff(dayjs(device.purchase_date), "day"));
+  return device.price / daysInUse;
 }
 
 function handleToggleStatus() {
