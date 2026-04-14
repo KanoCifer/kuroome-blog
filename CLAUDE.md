@@ -10,6 +10,7 @@
 - 添加必要的代码注释和Docstring。
 - 回复保持简洁、技术化。
 - `/init` 类任务仅更新 `CLAUDE.md`，不要创建/修改 `AGENTS.md`。
+- 编辑 CLAUDE.md 时，确保章节编号唯一，避免重复标题。
 > 需要后端接口时 访问./03_Core_Modules.md，新增接口时更新该文件。
 
 ## Approach
@@ -27,7 +28,7 @@
 
 ## 2) Project Overview
 
-- Stack: FastAPI + Vue 3(desktop) + React(mobile) + TypeScript
+- Stack: FastAPI + Vue 3 (desktop) + React (mobile, `react-app/`) + TypeScript
 
 ---
 
@@ -109,7 +110,7 @@ pnpm run lint:fix                 # eslint . --fix
   - route user-visible failures to notification flows
 ---
 
-## 4) Key Files
+## 5) Key Files
 
 - Backend entry: `backend/app/main.py`
 - Frontend entry: `frontend/src/main.ts`
@@ -128,6 +129,19 @@ See `.env.example` or `config/` for full list.
 ---
 
 ## 6) Architecture & Boundaries
+
+Backend `app/` layout:
+- `api/` — HTTP route handlers
+- `services/` — business logic
+- `repositories/` — data access
+- `schemas/` — Pydantic request/response models
+- `tasks/` — background jobs
+
+Frontend `src/` layout:
+- `components/` — Vue components
+- `stores/` — Pinia state stores
+- `views/` — page-level components
+- `api/` — API client wrappers
 
 - Backend layering: `api -> service -> repository`
 - Keep business logic in services; keep data access in repositories
