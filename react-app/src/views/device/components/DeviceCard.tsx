@@ -1,11 +1,15 @@
 import type { Device } from '@/services/deviceService';
 import { formatDate } from '@/utils/formatdate';
+import dayjs from 'dayjs';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useState } from 'react';
+import { MilestoneConfigForm } from './MilestoneConfigForm';
 
 interface DeviceCardProps {
   device: Device;
   onToggleStatus: (device: Device) => void;
   onDelete: (device: Device) => void;
+  onConfigSuccess?: (device: Device) => void;
   pendingId: number | null;
 }
 
@@ -17,14 +21,24 @@ function formatPrice(price: number, currency: string): string {
   return `$${price.toFixed(2)}`;
 }
 
+const calcSpendPerDay = (device: Device): number => {
+  const daysInUse = Math.max(
+    1,
+    dayjs().diff(dayjs(device.purchase_date), 'day'),
+  );
+  return device.price / daysInUse;
+};
+
 export function DeviceCard({
   device,
   onToggleStatus,
   onDelete,
+  onConfigSuccess,
   pendingId,
 }: DeviceCardProps) {
   const isPending = pendingId === device.id;
   const isActive = device.status === 'active';
+  const [isMilestoneModalOpen, setIsMilestoneModalOpen] = useState(false);
 
   return (
     <AnimatePresence>
@@ -67,6 +81,9 @@ export function DeviceCard({
             <p className="text-[10px] font-bold tracking-wider text-slate-400 uppercase dark:text-slate-500">
               {device.currency}
             </p>
+            <p className="font-family-dongfang mt-2 text-xs font-bold text-slate-500 dark:text-slate-400">
+              {`日均 ${formatPrice(calcSpendPerDay(device), device.currency)}/天`}
+            </p>
           </div>
         </div>
 
@@ -92,7 +109,7 @@ export function DeviceCard({
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <button
             type="button"
             disabled={isPending}
@@ -103,12 +120,31 @@ export function DeviceCard({
           </button>
           <button
             type="button"
+            onClick={() => setIsMilestoneModalOpen(true)}
+            className="rounded-full bg-[#00288e] px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-blue-600"
+          >
+            编辑配置
+          </button>
+
+          <button
+            type="button"
             onClick={() => onDelete(device)}
             className="rounded-full border border-red-200 bg-red-300/50 px-4 py-3 text-sm font-bold text-red-600 transition-all hover:bg-red-50 active:scale-95 dark:border-red-800 dark:bg-red-700/30 dark:text-red-400 dark:hover:bg-red-900/20"
           >
             删除设备
           </button>
         </div>
+        {/* Milestone Config Modal */}
+        {isMilestoneModalOpen && (
+          <MilestoneConfigForm
+            device={device}
+            onClose={() => setIsMilestoneModalOpen(false)}
+            onSuccess={(updated) => {
+              setIsMilestoneModalOpen(false);
+              onConfigSuccess?.(updated);
+            }}
+          />
+        )}
       </motion.article>
     </AnimatePresence>
   );

@@ -222,6 +222,7 @@ export default function DeviceTracker() {
             devices={devices}
             onToggleStatus={handleToggleStatus}
             onDelete={handleDeleteDevice}
+            onConfigSuccess={fetchDevices}
             pendingId={pendingId}
           />
         )}

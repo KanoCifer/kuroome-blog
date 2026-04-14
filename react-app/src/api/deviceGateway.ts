@@ -39,6 +39,10 @@ export interface DeviceGateway {
     reminder_config: unknown,
   ) => Promise<AxiosResponse<Device>>;
 
+  getUserGlobalConfig(): Promise<
+    AxiosResponse<{ config: Record<string, unknown> }>
+  >;
+
   testNotification: (device_id: number) => Promise<AxiosResponse<void>>;
 }
 
@@ -77,6 +81,12 @@ export const deviceGateway = (): DeviceGateway => {
       return request.patch<Device>(`v2/device/${device_id}/reminders`, {
         reminder_config,
       });
+    },
+
+    async getUserGlobalConfig() {
+      return request.get('v2/subscriptions/global-config') as Promise<
+        AxiosResponse<{ config: Record<string, unknown> }>
+      >;
     },
 
     testNotification: (device_id: number) => {

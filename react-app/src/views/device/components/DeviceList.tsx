@@ -7,6 +7,7 @@ interface DeviceListProps {
   devices: Device[];
   onToggleStatus: (device: Device) => void;
   onDelete: (device: Device) => void;
+  onConfigSuccess: (device: Device) => void;
   pendingId: number | null;
 }
 
@@ -14,6 +15,7 @@ export function DeviceList({
   devices,
   onToggleStatus,
   onDelete,
+  onConfigSuccess,
   pendingId,
 }: DeviceListProps) {
   return (
@@ -29,6 +31,7 @@ export function DeviceList({
           device={device}
           onToggleStatus={onToggleStatus}
           onDelete={onDelete}
+          onConfigSuccess={onConfigSuccess}
           pendingId={pendingId}
         />
       ))}
