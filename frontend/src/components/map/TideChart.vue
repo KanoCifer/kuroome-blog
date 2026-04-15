@@ -21,7 +21,7 @@ import {
 } from "echarts/components";
 import { use } from "echarts/core";
 import { SVGRenderer } from "echarts/renderers";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import VChart from "vue-echarts";
 
 use([TitleComponent, TooltipComponent, GridComponent, MarkLineComponent, MarkPointComponent, LineChart, SVGRenderer]);
@@ -31,6 +31,18 @@ interface TideData {
   tideTable: { fxTime: string; height: string; type: "H" | "L" }[];
   tideHourly: { fxTime: string; height: string }[];
 }
+
+const props = withDefaults(
+  defineProps<{
+    harbor?: string;
+    date?: string;
+  }>(),
+  {
+    harbor: "P2352",
+    date: dayjs().format("YYYYMMDD"),
+  },
+);
+
 const notifier = useNotificationStore();
 const tideData = ref<TideData | null>(null);
 const loading = ref<boolean>(false);
@@ -41,11 +53,11 @@ const checkDarkMode = () => {
   isDarkMode.value = window.matchMedia("(prefers-color-scheme: dark)").matches;
 };
 
-// 从后端获取当天的潮汐数据
-const fetchTideData = async () => {
+// 从后端获取潮汐数据
+const fetchTideData = async (harbor: string, date: string) => {
   loading.value = true;
   try {
-    const res = await weatherService.getTide();
+    const res = await weatherService.getTide({ harbor, date });
     if (res.tideHourly && res.tideHourly.length > 0) {
       tideData.value = {
         updateTime: res.updateTime,
@@ -233,10 +245,17 @@ const tideOptions = computed(() => {
   };
 });
 
+// harbor 或 date 变化时自动刷新
+watch(
+  () => [props.harbor, props.date],
+  ([harbor, date]) => {
+    void fetchTideData(harbor, date);
+  },
+  { immediate: true },
+);
+
 onMounted(() => {
   checkDarkMode();
-  fetchTideData();
-
   // 监听深色模式变化
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", checkDarkMode);
 });

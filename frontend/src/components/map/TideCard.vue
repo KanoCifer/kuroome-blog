@@ -11,13 +11,31 @@
     ></div>
 
     <!-- Header -->
-    <div class="relative z-10 mb-4 flex items-start justify-between">
+    <div class="relative z-10 mb-4 flex items-start justify-between gap-2">
       <div>
         <h3 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">潮汐预报</h3>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">黄埔港 · {{ todayStr }}</p>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ tideSpotName }} · {{ todayStr }}</p>
+      </div>
+      <div class="flex shrink-0 items-center gap-1.5">
+        <select
+          v-model="selectedHarbor"
+          class="cursor-pointer rounded-lg border border-gray-200 bg-white/80 px-1.5 py-1 text-xs text-gray-700 focus:ring-1 focus:ring-cyan-400 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
+        >
+          <option v-for="opt in HARBOR_OPTIONS" :key="opt.code" :value="opt.code">
+            {{ opt.name }}
+          </option>
+        </select>
+        <select
+          v-model="selectedDate"
+          class="cursor-pointer rounded-lg border border-gray-200 bg-white/80 px-1.5 py-1 text-xs text-gray-700 focus:ring-1 focus:ring-cyan-400 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
+        >
+          <option v-for="opt in dateOptions" :key="opt.value" :value="opt.value">
+            {{ opt.label }} {{ opt.weekday }}
+          </option>
+        </select>
       </div>
       <div
-        class="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-cyan-400 to-blue-500 shadow-lg shadow-cyan-500/25 transition-transform duration-300 group-hover:scale-110"
+        class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-cyan-400 to-blue-500 shadow-lg shadow-cyan-500/25 transition-transform duration-300 group-hover:scale-110"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -123,7 +141,7 @@ import { LineChart } from "echarts/charts";
 import { GridComponent, MarkLineComponent, MarkPointComponent, TooltipComponent } from "echarts/components";
 import { use } from "echarts/core";
 import { SVGRenderer } from "echarts/renderers";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import VChart from "vue-echarts";
 
 use([TooltipComponent, GridComponent, MarkLineComponent, MarkPointComponent, LineChart, SVGRenderer]);
@@ -134,34 +152,64 @@ interface TideData {
   tideHourly: { fxTime: string; height: number | string }[];
 }
 
+const HARBOR_OPTIONS = [
+  { code: "P2352", name: "黄埔港" },
+  { code: "P2932", name: "舢舨洲" },
+  { code: "P2299", name: "南沙港" },
+  { code: "P2474", name: "海沁" },
+  { code: "P2609", name: "东沙" },
+];
+
 const notifier = useNotificationStore();
 const tideData = ref<TideData | null>(null);
 const loading = ref<boolean>(false);
 const isDarkMode = ref<boolean>(false);
+const selectedHarbor = ref<string>("P2352");
+const selectedDate = ref<string>(dayjs().format("YYYYMMDD"));
+const tideSpotName = ref<string>("黄埔港");
 
 const emit = defineEmits<{
   (e: "update", payload: { tideData: TideData | null; spotName: string }): void;
 }>();
 
-const todayStr = dayjs().format("YYYY-MM-DD");
+// 今日 ~ +7天
+const dateOptions = computed(() =>
+  Array(8)
+    .fill(null)
+    .map((_, i) => {
+      const d = dayjs().add(i, "day");
+      return {
+        value: d.format("YYYYMMDD"),
+        label: d.format("MM-DD"),
+        weekday: d.format("dd"),
+      };
+    }),
+);
+
+const todayStr = computed(() => {
+  const opt = dateOptions.value.find((o) => o.value === selectedDate.value);
+  return opt ? `${opt.label} ${opt.weekday}` : dayjs().format("YYYY-MM-DD");
+});
 
 // 检测深色模式
 const checkDarkMode = () => {
   isDarkMode.value = window.matchMedia("(prefers-color-scheme: dark)").matches;
 };
 
-// 从后端获取当天的潮汐数据
-const fetchTideData = async () => {
+// 从后端获取潮汐数据
+const fetchTideData = async (harbor: string, date: string) => {
   loading.value = true;
   try {
-    const res = await weatherService.getTide();
+    const res = await weatherService.getTide({ harbor, date });
     if (res.tideHourly && res.tideHourly.length > 0) {
       tideData.value = {
         updateTime: res.updateTime,
         tideTable: res.tideTable,
         tideHourly: res.tideHourly,
       };
-      emit("update", { tideData: tideData.value, spotName: "黄埔港" });
+      const harborName = HARBOR_OPTIONS.find((h) => h.code === harbor)?.name ?? "黄埔港";
+      tideSpotName.value = harborName;
+      emit("update", { tideData: tideData.value, spotName: harborName });
     }
   } catch {
     notifier.error("获取潮汐信息失败，请稍后再试");
@@ -169,6 +217,11 @@ const fetchTideData = async () => {
     loading.value = false;
   }
 };
+
+// harbor 或 date 变化时自动刷新
+watch([selectedHarbor, selectedDate], ([harbor, date]) => {
+  void fetchTideData(harbor, date);
+});
 
 // 计算最高潮和最低潮
 const highTide = computed(() => {
@@ -347,7 +400,7 @@ const tideOptions = computed(() => {
 
 onMounted(() => {
   checkDarkMode();
-  fetchTideData();
+  void fetchTideData(selectedHarbor.value, selectedDate.value);
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", checkDarkMode);
 });
 </script>

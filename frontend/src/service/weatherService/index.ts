@@ -1,8 +1,8 @@
+import type { GeocodeResponse, TideResponse, WeatherForecastResponse, WeatherLiveResponse } from "@/api/weatherGateway";
 import { weatherGateway } from "@/api/weatherGateway";
-import type { TideResponse, GeocodeResponse, WeatherLiveResponse, WeatherForecastResponse } from "@/api/weatherGateway";
 
 export interface WeatherService {
-  getTide(): Promise<TideResponse>;
+  getTide(payload: { harbor: string; date: string }): Promise<TideResponse>;
   reverseGeocode(payload: { location: string; extensions: "base" | "all" }): Promise<GeocodeResponse>;
   getWeather(payload: {
     city: string;
@@ -11,8 +11,8 @@ export interface WeatherService {
 }
 
 export const weatherService: WeatherService = {
-  async getTide() {
-    return weatherGateway.getTide();
+  async getTide(payload) {
+    return weatherGateway.getTide(payload);
   },
 
   async reverseGeocode(payload) {

@@ -45,7 +45,7 @@ export interface WeatherForecastResponse {
 }
 
 export interface WeatherGateway {
-  getTide(): Promise<TideResponse>;
+  getTide(payload: { harbor: string; date: string }): Promise<TideResponse>;
   reverseGeocode(payload: { location: string; extensions: "base" | "all" }): Promise<GeocodeResponse>;
   getWeather(payload: {
     city: string;
@@ -54,8 +54,8 @@ export interface WeatherGateway {
 }
 
 export const weatherGateway: WeatherGateway = {
-  async getTide(): Promise<TideResponse> {
-    const res = await request.get<{ data: TideResponse }>("v1/qweather/tide");
+  async getTide(payload: { harbor: string; date: string }): Promise<TideResponse> {
+    const res = await request.get<{ data: TideResponse }>("v1/qweather/tide", { params: payload });
     return res.data.data;
   },
 
