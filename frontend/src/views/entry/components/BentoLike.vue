@@ -32,7 +32,7 @@ const isSubmitting = ref(false);
 const fetchLikesCount = async () => {
   try {
     const response = await socialService.getLikes();
-    likesCounts.value = response.likescounts || 0;
+    likesCounts.value = response.likes_count || 0;
   } catch (error) {
     console.error("Failed to fetch likes count:", error);
   }
@@ -68,7 +68,7 @@ const playAnimation = async () => {
   anim.value.play();
 
   try {
-    await socialService.likeOnce({ likescounts: 1 });
+    await socialService.likeOnce({ likes_count: 1 });
     likesCounts.value += 1;
   } catch (error) {
     let errorMsg = "点赞失败，请稍后重试";

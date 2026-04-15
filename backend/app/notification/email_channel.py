@@ -220,6 +220,7 @@ class EmailNotificationChannel(NotifierBase):
         """构建设备周年提醒邮件 HTML 内容"""
         device_name = escape(payload.name)
         price = f"{payload.price:,.2f}"
+        days = (datetime.now(UTC).date() - payload.purchase_date.date()).days
         years = (datetime.now(UTC) - payload.purchase_date).days // 365
         anniversary_text = f"{years}周年"
 
@@ -245,7 +246,7 @@ class EmailNotificationChannel(NotifierBase):
                   <tr>
                     <td style="padding:24px 28px;">
                       <p style="margin:0 0 18px;font-size:14px;line-height:22px;color:#4B5563;">
-                        您的设备已陪伴您 {years} 年了！
+                        您的设备已陪伴您 {days} 天了！
                       </p>
                       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
                         style="border:1px solid #E5E7EB;border-radius:12px;overflow:hidden;">

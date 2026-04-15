@@ -107,7 +107,7 @@ async def get_sitemap_xml(
 async def add_like(
     request: Request,
     redis: AsyncRedis = Depends(get_redis),
-    likescounts: int = Body(
+    likes_count: int = Body(
         ..., gt=0, embed=True, description="Number of likes to add"
     ),
 ) -> JSONResponse:
@@ -116,7 +116,7 @@ async def add_like(
     Returns:
         JSONResponse: Current total likes count
     """
-    total = await PublicService.add_like(redis, likescounts)
+    total = await PublicService.add_like(redis, likes_count)
 
     return APIResponse.ok(
         data={"likes_count": total},

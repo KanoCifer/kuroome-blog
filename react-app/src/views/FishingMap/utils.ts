@@ -1,4 +1,5 @@
 export const weatherIcon = (weather: string): string => {
+  if (!weather) return '🌤️';
   if (weather.includes('晴')) return '☀️';
   if (weather.includes('多云')) return '⛅';
   if (weather.includes('阴')) return '☁️';

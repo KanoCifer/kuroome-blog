@@ -1,7 +1,13 @@
 import { useNotificationStore } from '@/stores/notificationState';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
+import dayjs from 'dayjs';
+import { AIAnalysisWidget } from './components/AIAnalysisWidget';
+import { FishingMapHeader } from './components/FishingMapHeader';
+import { MapPanel } from './components/MapPanel';
+import { RouteStatusCard } from './components/RouteStatusCard';
+import { TideCard } from './components/TideCard';
+import { WeatherCard } from './components/WeatherCard';
 import {
   AMAP_SCRIPT_ID,
   MAP_CENTER,
@@ -19,19 +25,13 @@ import type {
   AMapPolyline,
   AMapSecurityConfig,
   AnalysisPayload,
-  GeolocationResult,
   ForecastDay,
+  GeolocationResult,
   LiveWeather,
   RouteInfo,
   TideData,
   TideTableItem,
 } from './types';
-import { AIAnalysisWidget } from './components/AIAnalysisWidget';
-import { FishingMapHeader } from './components/FishingMapHeader';
-import { MapPanel } from './components/MapPanel';
-import { RouteStatusCard } from './components/RouteStatusCard';
-import { TideCard } from './components/TideCard';
-import { WeatherCard } from './components/WeatherCard';
 
 declare global {
   interface Window {
@@ -84,7 +84,6 @@ async function loadAMapScript(key: string): Promise<AMapNamespace> {
 }
 
 export default function FishingMap() {
-  const navigate = useNavigate();
   const notifyError = useNotificationStore((state) => state.error);
   const notifyErrorRef = useRef(notifyError);
 
@@ -198,7 +197,9 @@ export default function FishingMap() {
       },
       xAxis: {
         type: 'category',
-        data: tideData.tideHourly.map((point) => point.fxTime),
+        data: tideData.tideHourly.map((point) =>
+          dayjs(point.fxTime).format('MM-DD HH:mm'),
+        ),
         axisLabel: {
           color: subTextColor,
           fontSize: 11,
@@ -609,50 +610,53 @@ export default function FishingMap() {
   ]);
 
   return (
-    <div className="relative min-h-dvh w-full bg-linear-to-b from-sky-50/90 to-white px-4 pt-22 pb-42 dark:from-slate-900 dark:to-slate-950">
-      <FishingMapHeader onBack={() => navigate(-1)} />
+    <>
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-gray-50/90 dark:bg-gray-900/90"></div>
+      <FishingMapHeader />
+      <div className="relative mx-auto mb-24 min-h-dvh w-full max-w-xl">
+        <section className="space-y-4">
+          <RouteStatusCard
+            isPlanningRoute={isPlanningRoute}
+            routeInfo={routeInfo}
+            selectedSpotIndex={selectedSpotIndex}
+            onClearRoute={clearRoute}
+          />
 
-      <section className="space-y-4">
-        <RouteStatusCard
-          isPlanningRoute={isPlanningRoute}
-          routeInfo={routeInfo}
-          selectedSpotIndex={selectedSpotIndex}
-          onClearRoute={clearRoute}
+          <MapPanel isMapReady={isMapReady} mapContainerRef={mapContainerRef} />
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <WeatherCard
+              weatherLoading={weatherLoading}
+              weatherError={weatherError}
+              liveWeather={liveWeather}
+              forecasts={forecasts}
+              locationName={locationName}
+            />
+            <TideCard
+              tideLoading={tideLoading}
+              tideData={tideData}
+              tideSpotName={tideSpotName}
+              tideChartOption={tideChartOption}
+              highTide={highTide}
+              lowTide={lowTide}
+            />
+          </div>
+        </section>
+
+        <AIAnalysisWidget
+          analysisOpen={analysisOpen}
+          analysisLoading={analysisLoading}
+          analysisError={analysisError}
+          analysisResult={analysisResult}
+          analysisHasData={analysisHasData}
+          onToggle={() => setAnalysisOpen((prev) => !prev)}
+          onClose={() => setAnalysisOpen(false)}
+          onGenerate={() => {
+            void generateAnalysis();
+          }}
         />
-
-        <MapPanel isMapReady={isMapReady} mapContainerRef={mapContainerRef} />
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <WeatherCard
-            weatherLoading={weatherLoading}
-            weatherError={weatherError}
-            liveWeather={liveWeather}
-            forecasts={forecasts}
-            locationName={locationName}
-          />
-          <TideCard
-            tideLoading={tideLoading}
-            tideData={tideData}
-            tideSpotName={tideSpotName}
-            tideChartOption={tideChartOption}
-            highTide={highTide}
-            lowTide={lowTide}
-          />
-        </div>
-      </section>
-
-      <AIAnalysisWidget
-        analysisOpen={analysisOpen}
-        analysisLoading={analysisLoading}
-        analysisError={analysisError}
-        analysisResult={analysisResult}
-        analysisHasData={analysisHasData}
-        onToggle={() => setAnalysisOpen((prev) => !prev)}
-        onClose={() => setAnalysisOpen(false)}
-        onGenerate={() => {
-          void generateAnalysis();
-        }}
-      />
-    </div>
+      </div>
+    </>
   );
 }

@@ -1,8 +1,8 @@
 import { socialGateway } from "@/api/socialGateway";
 
 export interface SocialService {
-  getLikes(): Promise<{ likescounts: number }>;
-  likeOnce(payload: { likescounts: number }): Promise<void>;
+  getLikes(): Promise<{ likes_count: number }>;
+  likeOnce(payload: { likes_count: number }): Promise<void>;
 }
 
 export const socialService: SocialService = {

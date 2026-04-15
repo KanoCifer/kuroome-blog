@@ -196,7 +196,9 @@ async def test_device_notification(
     from app.notification.dispatcher import NotificationDispatcher
 
     # 构建测试通知
-    days_owned = (datetime.now(UTC).date() - device.purchase_date.date()).days
+    days_owned: int = (
+        datetime.now(UTC).date() - device.purchase_date.date()
+    ).days
     payload = DeviceNotificationPayload(
         title=f"测试通知 - {device.name}",
         body=f"这是一条测试通知，设备已使用 {days_owned} 天",
