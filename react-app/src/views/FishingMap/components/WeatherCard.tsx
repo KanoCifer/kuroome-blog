@@ -1,27 +1,77 @@
-import { weatherIcon } from '../utils';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
+import { useNotificationStore } from '@/stores/notificationState';
+
+import { fishingMapService } from '../service';
 import type { ForecastDay, LiveWeather } from '../types';
+import { weatherIcon } from '../utils';
 
 interface WeatherCardProps {
-  weatherLoading: boolean;
-  weatherError: string;
-  liveWeather: LiveWeather | null;
-  forecasts: ForecastDay[];
-  locationName: string;
+  location?: [number, number];
+  onWeatherUpdate?: (payload: {
+    liveWeather: LiveWeather | null;
+    forecasts: ForecastDay[];
+    locationName: string;
+  }) => void;
 }
 
 export function WeatherCard({
-  weatherLoading,
-  weatherError,
-  liveWeather,
-  forecasts,
-  locationName,
+  location = [113.389549, 23.050067],
+  onWeatherUpdate,
 }: WeatherCardProps) {
+  const notifyError = useNotificationStore((state) => state.error);
+  const service = useMemo(() => fishingMapService(), []);
+
+  const [weatherLoading, setWeatherLoading] = useState(false);
+  const [weatherError, setWeatherError] = useState('');
+  const [liveWeather, setLiveWeather] = useState<LiveWeather | null>(null);
+  const [forecasts, setForecasts] = useState<ForecastDay[]>([]);
+  const [locationName, setLocationName] = useState('');
+
+  const fetchWeather = useCallback(async () => {
+    setWeatherLoading(true);
+    setWeatherError('');
+
+    try {
+      const weatherData = await service.fetchWeatherAndLocation(location);
+      setLiveWeather(weatherData.liveWeather);
+      setForecasts(weatherData.forecasts);
+      setLocationName(weatherData.locationName);
+      onWeatherUpdate?.({
+        liveWeather: weatherData.liveWeather,
+        forecasts: weatherData.forecasts,
+        locationName: weatherData.locationName,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '获取天气失败';
+      setWeatherError(message);
+      notifyError(message);
+    } finally {
+      setWeatherLoading(false);
+    }
+  }, [location, notifyError, onWeatherUpdate, service]);
+
+  useEffect(() => {
+    void fetchWeather();
+  }, [fetchWeather]);
+
+  // 打开和风天气
+  const openQWeather = () => {
+    window.open('https://www.qweather.com/', '_blank');
+  };
+
   return (
-    <article className="rounded-2xl border border-white/40 bg-linear-to-br from-white/80 to-white/40 p-4 shadow-sm backdrop-blur-sm dark:border-gray-700/60 dark:from-gray-900/80 dark:to-gray-800/60">
+    <article
+      onClick={openQWeather}
+      className="cursor-pointer rounded-2xl border border-white/40 bg-linear-to-br from-white/80 to-white/40 p-4 shadow-sm backdrop-blur-sm dark:border-gray-700/60 dark:from-gray-900/80 dark:to-gray-800/60"
+    >
       <div className="mb-3 flex items-center justify-between">
         <div>
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-            实时天气
+            实时天气{' '}
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              点击跳转和风天气，查看详细信息
+            </span>
           </h3>
           <p className="text-xs text-gray-500 dark:text-gray-400">
             {locationName || '钓鱼地点'}

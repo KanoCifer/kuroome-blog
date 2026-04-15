@@ -10,7 +10,7 @@ export function TideChart({ option }: TideChartProps) {
   return (
     <Suspense
       fallback={
-        <div className="h-[220px] animate-pulse bg-gray-100 dark:bg-gray-800" />
+        <div className="h-55 animate-pulse bg-gray-100 dark:bg-gray-800" />
       }
     >
       <ReactECharts

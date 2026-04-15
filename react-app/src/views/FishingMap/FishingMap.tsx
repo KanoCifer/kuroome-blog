@@ -108,8 +108,6 @@ export default function FishingMap() {
   const [analysisError, setAnalysisError] = useState('');
   const [analysisResult, setAnalysisResult] = useState('');
 
-  const [weatherLoading, setWeatherLoading] = useState(false);
-  const [weatherError, setWeatherError] = useState('');
   const [liveWeather, setLiveWeather] = useState<LiveWeather | null>(null);
   const [forecasts, setForecasts] = useState<ForecastDay[]>([]);
   const [locationName, setLocationName] = useState('');
@@ -256,23 +254,18 @@ export default function FishingMap() {
     [getCurrentPosition, planRoute],
   );
 
-  const fetchWeather = useCallback(async () => {
-    setWeatherLoading(true);
-    setWeatherError('');
-
-    try {
-      const weatherData = await service.fetchWeatherAndLocation(MAP_CENTER);
-      setLiveWeather(weatherData.liveWeather);
-      setForecasts(weatherData.forecasts);
-      setLocationName(weatherData.locationName);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : '获取天气失败';
-      setWeatherError(message);
-      notifyErrorRef.current(message);
-    } finally {
-      setWeatherLoading(false);
-    }
-  }, [service]);
+  const handleWeatherUpdate = useCallback(
+    (payload: {
+      liveWeather: LiveWeather | null;
+      forecasts: ForecastDay[];
+      locationName: string;
+    }) => {
+      setLiveWeather(payload.liveWeather);
+      setForecasts(payload.forecasts);
+      setLocationName(payload.locationName);
+    },
+    [],
+  );
 
   const generateAnalysis = useCallback(async () => {
     if (!analysisPayload || analysisLoading) {
@@ -431,10 +424,6 @@ export default function FishingMap() {
   }, [service]);
 
   useEffect(() => {
-    void fetchWeather();
-  }, [fetchWeather]);
-
-  useEffect(() => {
     if (!analysisOpen) {
       autoAnalysisAttemptRef.current = '';
     }
@@ -487,11 +476,8 @@ export default function FishingMap() {
 
           <div className="grid grid-cols-1 gap-4">
             <WeatherCard
-              weatherLoading={weatherLoading}
-              weatherError={weatherError}
-              liveWeather={liveWeather}
-              forecasts={forecasts}
-              locationName={locationName}
+              location={MAP_CENTER}
+              onWeatherUpdate={handleWeatherUpdate}
             />
             <TideCard />
           </div>

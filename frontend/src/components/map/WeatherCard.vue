@@ -313,20 +313,20 @@ const fetchWeather = async (location: [number, number]) => {
 
     const liveResult = liveResponse as {
       status: string;
-      lives?: Array<{ city: string; temp: string; text: string; windDir: string; humidity: string }>;
+      lives?: LiveWeather[];
     };
     if (liveResult?.status === "1" && liveResult?.lives && liveResult.lives.length > 0) {
       const live = liveResult.lives[0]!;
       liveWeather.value = {
-        province: "",
-        city: live.city,
-        adcode,
-        weather: live.text,
-        temperature: live.temp,
-        winddirection: live.windDir,
-        windpower: "",
-        humidity: live.humidity,
-        reporttime: "",
+        province: live.province ?? "",
+        city: live.city ?? "",
+        adcode: live.adcode ?? "",
+        weather: live.weather ?? "",
+        temperature: live.temperature ?? "",
+        winddirection: live.winddirection ?? "",
+        windpower: live.windpower ?? "",
+        humidity: live.humidity ?? "",
+        reporttime: live.reporttime ?? "",
       };
     } else {
       throw new Error("无法获取天气信息");
@@ -340,17 +340,7 @@ const fetchWeather = async (location: [number, number]) => {
 
     const forecastResult = forecastResponse as {
       status: string;
-      forecasts?: Array<{
-        casts?: Array<{
-          date: string;
-          dayWeather: string;
-          nightWeather: string;
-          dayTemp: string;
-          nightTemp: string;
-          dayWind: string;
-          nightWind: string;
-        }>;
-      }>;
+      forecasts?: Array<{ casts?: ForecastDay[] }>;
     };
     if (
       forecastResult?.status === "1" &&
@@ -360,15 +350,15 @@ const fetchWeather = async (location: [number, number]) => {
     ) {
       forecasts.value = forecastResult.forecasts[0].casts.map((cast) => ({
         date: cast.date,
-        week: "",
-        dayweather: cast.dayWeather,
-        nightweather: cast.nightWeather,
-        daytemp: cast.dayTemp,
-        nighttemp: cast.nightTemp,
-        daywind: cast.dayWind,
-        nightwind: cast.nightWind,
-        daypower: "",
-        nightpower: "",
+        week: cast.week ?? "",
+        dayweather: cast.dayweather ?? "",
+        nightweather: cast.nightweather ?? "",
+        daytemp: cast.daytemp ?? "",
+        nighttemp: cast.nighttemp ?? "",
+        daywind: cast.daywind ?? "",
+        nightwind: cast.nightwind ?? "",
+        daypower: cast.daypower ?? "",
+        nightpower: cast.nightpower ?? "",
       }));
     }
 

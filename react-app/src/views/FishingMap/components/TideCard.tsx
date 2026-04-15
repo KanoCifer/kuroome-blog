@@ -67,13 +67,26 @@ export function TideCard() {
 
     return {
       tooltip: {
-        trigger: 'axis' as const,
+        trigger: 'axis',
         backgroundColor: isDarkMode
           ? 'rgba(30, 41, 59, 0.95)'
           : 'rgba(255, 255, 255, 0.95)',
         borderColor: isDarkMode ? '#475569' : '#e5e7eb',
         borderWidth: 1,
         borderRadius: 8,
+        padding: [12, 16],
+        textStyle: {
+          color: textColor,
+          fontSize: 13,
+        },
+        formatter: (params: unknown[]) => {
+          const param = params[0] as { axisValue: string; data: number };
+          const timeStr = dayjs(param.axisValue).format('HH:mm');
+          return `<div style="padding: 2px 0;">
+          <div style="font-weight: 600; margin-bottom: 4px;">${timeStr}</div>
+          <div>潮高: <span style="color: #06b6d4; font-weight: bold;">${param.data.toFixed(2)} m</span></div>
+        </div>`;
+        },
       },
       grid: { left: '4%', right: '4%', bottom: '12%', top: '10%' },
       xAxis: {

@@ -192,16 +192,20 @@ async def get_weather(
         extensions=extensions,
     )
 
-    # Transform Amap response to frontend-expected WeatherLiveResponse/WeatherForecastResponse format
-    # Amap fields: temperature, weather, winddirection → frontend: temp, text, windDir
+    # Pass through Amap fields as-is; frontend LiveWeather/ForecastDay types expect
+    # the original Amap field names (temperature, weather, winddirection, dayweather, etc.)
     if extensions == "base" and "lives" in data:
         data["lives"] = [
             {
+                "province": item.get("province", ""),
                 "city": item.get("city", ""),
-                "temp": item.get("temperature", ""),
-                "text": item.get("weather", ""),
-                "windDir": item.get("winddirection", ""),
+                "adcode": item.get("adcode", ""),
+                "weather": item.get("weather", ""),
+                "temperature": item.get("temperature", ""),
+                "winddirection": item.get("winddirection", ""),
+                "windpower": item.get("windpower", ""),
                 "humidity": item.get("humidity", ""),
+                "reporttime": item.get("reporttime", ""),
             }
             for item in data.get("lives", [])
         ]
@@ -211,12 +215,15 @@ async def get_weather(
                 "casts": [
                     {
                         "date": cast.get("date", ""),
-                        "dayWeather": cast.get("dayweather", ""),
-                        "nightWeather": cast.get("nightweather", ""),
-                        "dayTemp": cast.get("daytemp", ""),
-                        "nightTemp": cast.get("nighttemp", ""),
-                        "dayWind": cast.get("daywind", ""),
-                        "nightWind": cast.get("nightwind", ""),
+                        "week": cast.get("week", ""),
+                        "dayweather": cast.get("dayweather", ""),
+                        "nightweather": cast.get("nightweather", ""),
+                        "daytemp": cast.get("daytemp", ""),
+                        "nighttemp": cast.get("nighttemp", ""),
+                        "daywind": cast.get("daywind", ""),
+                        "nightwind": cast.get("nightwind", ""),
+                        "daypower": cast.get("daypower", ""),
+                        "nightpower": cast.get("nightpower", ""),
                     }
                     for cast in forecast.get("casts", [])
                 ]
@@ -274,15 +281,6 @@ async def get_qweather(
     redis: AsyncRedis = Depends(get_redis),
 ) -> JSONResponse:
     """Get weather information from QWeather API."""
-
-    harbor_data = {
-        "P2352": "黄埔港",
-        "P2932": "舢舨洲",
-        "P2299": "南沙港",
-        "P2474": "海沁",
-        "P2609": "东沙",
-    }
-
     try:
         data, from_cache = await PublicService.get_qweather_tide(
             redis=redis, harbor=harbor, date=date
