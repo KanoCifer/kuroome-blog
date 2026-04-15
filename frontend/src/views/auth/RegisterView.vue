@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { authService } from "@/service/authService";
+import { authGateway } from "@/api/authGateway";
 import { useNotificationStore } from "@/stores/notification";
 import type { RegisterForm } from "@/types";
 import axios from "axios";
@@ -40,7 +40,7 @@ const sendEmailCode = async () => {
   sendCodeText.value = "Sending...";
 
   try {
-    await authService.sendRegisterEmailCode({
+    await authGateway.sendRegisterEmailCode({
       email: form.value.email,
     });
     sendCodeText.value = "Sent!";
@@ -78,7 +78,7 @@ const handleSubmit = async () => {
   isSubmitting.value = true;
 
   try {
-    const response = await authService.register({
+    const response = await authGateway.register({
       username: form.value.username,
       email: form.value.email,
       password: form.value.password,

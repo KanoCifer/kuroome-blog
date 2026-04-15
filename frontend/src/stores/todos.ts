@@ -1,4 +1,4 @@
-import { todoService } from "@/service/todoService";
+import { todoGateway } from "@/api/todoGateway";
 import type { Todo } from "@/service/todoService/types";
 import { type CreateTodoPayload } from "@/service/todoService/types";
 import { useAuthStore } from "@/stores/auth";
@@ -26,7 +26,7 @@ export const useTodoStore = defineStore("todos", () => {
   // 加载待办事项
   async function fetchTodos(): Promise<boolean> {
     try {
-      todos.value = await todoService.fetchTodos();
+      todos.value = await todoGateway.fetchTodos();
       return true;
     } catch (err) {
       console.error("fetchTodos error", err);
@@ -78,7 +78,7 @@ export const useTodoStore = defineStore("todos", () => {
 
   async function addTodo(payload: CreateTodoPayload) {
     try {
-      const todo = await todoService.addTodo(payload);
+      const todo = await todoGateway.addTodo(payload);
       if (todo) todos.value.unshift(todo);
     } catch (err) {
       console.error(err);
@@ -90,7 +90,7 @@ export const useTodoStore = defineStore("todos", () => {
     const t = todos.value.find((x) => x.id === id);
     if (!t) return;
     try {
-      const updated = await todoService.updateTodo(id, { completed: !t.completed });
+      const updated = await todoGateway.updateTodo(id, { completed: !t.completed });
       const idx = todos.value.findIndex((x) => x.id === id);
       if (idx !== -1 && updated) todos.value[idx] = updated;
     } catch (err) {
@@ -101,7 +101,7 @@ export const useTodoStore = defineStore("todos", () => {
 
   async function removeTodo(id: string) {
     try {
-      await todoService.removeTodo(id);
+      await todoGateway.removeTodo(id);
       todos.value = todos.value.filter((t) => t.id !== id);
     } catch (err) {
       console.error(err);
@@ -111,7 +111,7 @@ export const useTodoStore = defineStore("todos", () => {
 
   async function updateTodo(id: string, patch: Partial<Todo>) {
     try {
-      const updated = await todoService.updateTodo(id, patch);
+      const updated = await todoGateway.updateTodo(id, patch);
       const idx = todos.value.findIndex((x) => x.id === id);
       if (idx !== -1 && updated) todos.value[idx] = updated;
     } catch (err) {
@@ -122,7 +122,7 @@ export const useTodoStore = defineStore("todos", () => {
 
   async function clearCompleted() {
     try {
-      await todoService.batchAction("clearCompleted");
+      await todoGateway.batchAction("clearCompleted");
       todos.value = todos.value.filter((t) => !t.completed);
     } catch (err) {
       console.error(err);
@@ -132,7 +132,7 @@ export const useTodoStore = defineStore("todos", () => {
 
   async function archiveTodo(id: string) {
     try {
-      const updated = await todoService.updateTodo(id, { archived: true });
+      const updated = await todoGateway.updateTodo(id, { archived: true });
       const idx = todos.value.findIndex((x) => x.id === id);
       if (idx !== -1 && updated) todos.value[idx] = updated;
     } catch (err) {
@@ -143,7 +143,7 @@ export const useTodoStore = defineStore("todos", () => {
 
   async function unarchiveTodo(id: string) {
     try {
-      const updated = await todoService.updateTodo(id, { archived: false });
+      const updated = await todoGateway.updateTodo(id, { archived: false });
       const idx = todos.value.findIndex((x) => x.id === id);
       if (idx !== -1 && updated) todos.value[idx] = updated;
     } catch (err) {
@@ -154,7 +154,7 @@ export const useTodoStore = defineStore("todos", () => {
 
   async function archiveCompleted() {
     try {
-      await todoService.batchAction("archiveCompleted");
+      await todoGateway.batchAction("archiveCompleted");
       const now = new Date().toISOString();
       todos.value = todos.value.map((t) =>
         t.completed && !t.archived ? { ...t, archived: true, archivedAt: now } : t,

@@ -1,11 +1,12 @@
 import request from "@/api/request";
+import type { AxiosResponse } from "axios";
 
 export interface AuthGateway {
-  uploadAvatar(formData: FormData): Promise<unknown>;
-  getPasskeyRegistrationOptions(): Promise<unknown>;
-  registerPasskey(payload: { response: unknown }): Promise<unknown>;
-  deletePasskey(): Promise<unknown>;
-  unbindGithub(): Promise<unknown>;
+  uploadAvatar(formData: FormData): Promise<AxiosResponse<any>>;
+  getPasskeyRegistrationOptions(): Promise<AxiosResponse<any>>;
+  registerPasskey(payload: { response: unknown }): Promise<AxiosResponse<any>>;
+  deletePasskey(): Promise<AxiosResponse<any>>;
+  unbindGithub(): Promise<AxiosResponse<any>>;
   updateProfileSettings(payload: {
     name: string;
     username: string;
@@ -13,15 +14,15 @@ export interface AuthGateway {
     email: string | null;
     mobile: string | null;
     password: string | null;
-  }): Promise<unknown>;
-  sendRegisterEmailCode(payload: { email: string }): Promise<unknown>;
+  }): Promise<AxiosResponse<any>>;
+  sendRegisterEmailCode(payload: { email: string }): Promise<AxiosResponse<any>>;
   register(payload: {
     username: string;
     email: string;
     password: string;
     confirm_password: string;
     email_code: string;
-  }): Promise<unknown>;
+  }): Promise<AxiosResponse<any>>;
 }
 
 export const authGateway: AuthGateway = {

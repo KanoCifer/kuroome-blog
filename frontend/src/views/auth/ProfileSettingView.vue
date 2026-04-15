@@ -475,7 +475,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { authService } from "@/service/authService";
+import { authGateway } from "@/api/authGateway";
 import { useAuthStore } from "@/stores/auth";
 import type { ProfileForm } from "@/types";
 import { startRegistration } from "@simplewebauthn/browser";
@@ -540,7 +540,7 @@ const handlePhotoUpload = async (event: Event) => {
   formData.append("image", file);
 
   try {
-    const response = await authService.uploadAvatar(formData);
+    const response = await authGateway.uploadAvatar(formData);
 
     if (response.data) {
       await authStore.fetchUser();
@@ -579,14 +579,14 @@ const handleAddPasskey = async () => {
 
   try {
     // 获取注册选项
-    const optionsRes = await authService.getPasskeyRegistrationOptions();
+    const optionsRes = await authGateway.getPasskeyRegistrationOptions();
     const options = optionsRes.data.data;
 
     // 调用浏览器 Passkey 注册
     const credential = await startRegistration(options);
 
     // 提交注册结果
-    await authService.registerPasskey({
+    await authGateway.registerPasskey({
       response: credential,
     });
 
@@ -607,7 +607,7 @@ const handleDeletePasskey = async () => {
   passkeyMessage.value = "";
 
   try {
-    await authService.deletePasskey();
+    await authGateway.deletePasskey();
     passkeyMessage.value = "Passkey deleted successfully!";
     passkeyMessageType.value = "success";
     hasPasskey.value = false;
@@ -633,7 +633,7 @@ const handleUnbindGitHub = async () => {
   githubMessage.value = "";
 
   try {
-    await authService.unbindGithub();
+    await authGateway.unbindGithub();
     githubMessage.value = "GitHub account unbound successfully!";
     githubMessageType.value = "success";
     hasGitHubBound.value = false;
@@ -663,7 +663,7 @@ const handleSubmit = async () => {
       password: form.value.password || null,
     };
 
-    const response = await authService.updateProfileSettings(payload);
+    const response = await authGateway.updateProfileSettings(payload);
 
     if (response.data.code === 200) {
       await authStore.fetchUser();
