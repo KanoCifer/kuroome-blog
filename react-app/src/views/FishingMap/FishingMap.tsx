@@ -1,7 +1,6 @@
 import { useNotificationStore } from '@/stores/notificationState';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import dayjs from 'dayjs';
 import { AIAnalysisWidget } from './components/AIAnalysisWidget';
 import { FishingMapHeader } from './components/FishingMapHeader';
 import { MapPanel } from './components/MapPanel';
@@ -29,8 +28,6 @@ import type {
   GeolocationResult,
   LiveWeather,
   RouteInfo,
-  TideData,
-  TideTableItem,
 } from './types';
 
 declare global {
@@ -117,149 +114,23 @@ export default function FishingMap() {
   const [forecasts, setForecasts] = useState<ForecastDay[]>([]);
   const [locationName, setLocationName] = useState('');
 
-  const [tideLoading, setTideLoading] = useState(false);
-  const [tideData, setTideData] = useState<TideData | null>(null);
-  const [tideSpotName, setTideSpotName] = useState('黄埔港');
-
-  const isDarkMode = document.documentElement.classList.contains('dark');
-
   const analysisPayload = useMemo<AnalysisPayload | null>(() => {
-    if (!liveWeather && forecasts.length === 0 && !tideData) {
+    if (!liveWeather && forecasts.length === 0) {
       return null;
     }
 
     return {
       liveWeather,
       forecasts,
-      tideData,
+      tideData: null,
       locationName: locationName || liveWeather?.city || '钓鱼地点',
-      tideSpotName,
+      tideSpotName: '',
     };
-  }, [forecasts, liveWeather, locationName, tideData, tideSpotName]);
+  }, [forecasts, liveWeather, locationName]);
 
   const analysisHasData = useMemo(() => {
-    return Boolean(liveWeather) || forecasts.length > 0 || Boolean(tideData);
-  }, [forecasts.length, liveWeather, tideData]);
-
-  const highTide = useMemo<TideTableItem | null>(() => {
-    if (!tideData?.tideTable?.length) {
-      return null;
-    }
-
-    const highs = tideData.tideTable.filter((item) => item.type === 'H');
-    if (!highs.length) {
-      return null;
-    }
-
-    return highs.reduce((prev, curr) => {
-      return Number(curr.height) > Number(prev.height) ? curr : prev;
-    });
-  }, [tideData]);
-
-  const lowTide = useMemo<TideTableItem | null>(() => {
-    if (!tideData?.tideTable?.length) {
-      return null;
-    }
-
-    const lows = tideData.tideTable.filter((item) => item.type === 'L');
-    if (!lows.length) {
-      return null;
-    }
-
-    return lows.reduce((prev, curr) => {
-      return Number(curr.height) < Number(prev.height) ? curr : prev;
-    });
-  }, [tideData]);
-
-  const tideChartOption = useMemo(() => {
-    if (!tideData) {
-      return {};
-    }
-
-    const textColor = isDarkMode ? '#e5e7eb' : '#333';
-    const subTextColor = isDarkMode ? '#9ca3af' : '#666';
-
-    return {
-      tooltip: {
-        trigger: 'axis',
-        backgroundColor: isDarkMode
-          ? 'rgba(30, 41, 59, 0.95)'
-          : 'rgba(255, 255, 255, 0.95)',
-        borderColor: isDarkMode ? '#475569' : '#e5e7eb',
-        borderWidth: 1,
-        borderRadius: 8,
-      },
-      grid: {
-        left: '4%',
-        right: '4%',
-        bottom: '12%',
-        top: '10%',
-      },
-      xAxis: {
-        type: 'category',
-        data: tideData.tideHourly.map((point) =>
-          dayjs(point.fxTime).format('MM-DD HH:mm'),
-        ),
-        axisLabel: {
-          color: subTextColor,
-          fontSize: 11,
-          formatter: (value: string) => value.slice(11, 16),
-          interval: Math.max(1, Math.floor(tideData.tideHourly.length / 5)),
-        },
-        axisLine: {
-          lineStyle: {
-            color: isDarkMode ? '#334155' : '#e5e7eb',
-          },
-        },
-        axisTick: { show: false },
-      },
-      yAxis: {
-        type: 'value',
-        axisLabel: {
-          color: subTextColor,
-          fontSize: 11,
-          formatter: (value: number) => `${value}m`,
-        },
-        axisLine: { show: false },
-        axisTick: { show: false },
-        splitLine: {
-          lineStyle: {
-            color: isDarkMode ? '#1e293b' : '#f1f5f9',
-            type: 'dashed',
-          },
-        },
-      },
-      series: [
-        {
-          data: tideData.tideHourly.map((point) => Number(point.height)),
-          type: 'line',
-          smooth: 0.4,
-          symbol: 'none',
-          lineStyle: {
-            color: '#06b6d4',
-            width: 2.5,
-          },
-          areaStyle: {
-            color: {
-              type: 'linear',
-              x: 0,
-              y: 0,
-              x2: 0,
-              y2: 1,
-              colorStops: [
-                { offset: 0, color: 'rgba(6, 182, 212, 0.25)' },
-                { offset: 0.7, color: 'rgba(6, 182, 212, 0.05)' },
-                { offset: 1, color: 'rgba(6, 182, 212, 0)' },
-              ],
-            },
-          },
-        },
-      ],
-      textStyle: {
-        color: textColor,
-      },
-    };
-  }, [isDarkMode, tideData]);
+    return Boolean(liveWeather) || forecasts.length > 0;
+  }, [forecasts.length, liveWeather]);
 
   const clearRoute = useCallback(() => {
     if (currentRouteRef.current && mapInstanceRef.current) {
@@ -400,20 +271,6 @@ export default function FishingMap() {
       notifyErrorRef.current(message);
     } finally {
       setWeatherLoading(false);
-    }
-  }, [service]);
-
-  const fetchTide = useCallback(async () => {
-    setTideLoading(true);
-
-    try {
-      const tideResult = await service.fetchTideData();
-      setTideData(tideResult.tideData);
-      setTideSpotName(tideResult.tideSpotName);
-    } catch {
-      notifyErrorRef.current('获取潮汐信息失败，请稍后重试');
-    } finally {
-      setTideLoading(false);
     }
   }, [service]);
 
@@ -575,8 +432,7 @@ export default function FishingMap() {
 
   useEffect(() => {
     void fetchWeather();
-    void fetchTide();
-  }, [fetchTide, fetchWeather]);
+  }, [fetchWeather]);
 
   useEffect(() => {
     if (!analysisOpen) {
@@ -613,8 +469,12 @@ export default function FishingMap() {
     <>
       {/* Backdrop */}
       <div className="fixed inset-0 bg-gray-50/90 dark:bg-gray-900/90"></div>
+
+      {/* Header */}
       <FishingMapHeader />
-      <div className="relative mx-auto mb-24 min-h-dvh w-full max-w-xl">
+
+      {/* 主内容区域 */}
+      <div className="relative mx-auto mb-24 min-h-dvh w-full max-w-xl px-4 pt-4">
         <section className="space-y-4">
           <RouteStatusCard
             isPlanningRoute={isPlanningRoute}
@@ -625,7 +485,7 @@ export default function FishingMap() {
 
           <MapPanel isMapReady={isMapReady} mapContainerRef={mapContainerRef} />
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4">
             <WeatherCard
               weatherLoading={weatherLoading}
               weatherError={weatherError}
@@ -633,14 +493,7 @@ export default function FishingMap() {
               forecasts={forecasts}
               locationName={locationName}
             />
-            <TideCard
-              tideLoading={tideLoading}
-              tideData={tideData}
-              tideSpotName={tideSpotName}
-              tideChartOption={tideChartOption}
-              highTide={highTide}
-              lowTide={lowTide}
-            />
+            <TideCard />
           </div>
         </section>
 

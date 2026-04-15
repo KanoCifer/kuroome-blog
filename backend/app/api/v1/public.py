@@ -9,7 +9,9 @@ This module provides public endpoints that do not require authentication:
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Body, Depends, File, Request, UploadFile
+import datetime
+
+from fastapi import APIRouter, Body, Depends, File, Query, Request, UploadFile
 from fastapi.responses import JSONResponse, PlainTextResponse
 from redis.asyncio import Redis as AsyncRedis
 from starlette import status
@@ -262,12 +264,29 @@ async def reverse_geocode(
 @limiter.limit("100/hour")
 async def get_qweather(
     request: Request,
+    date: str = Query(
+        datetime.datetime.now().strftime("%Y%m%d"),
+        description="Date for tide information in YYYYMMDD format",
+    ),
+    harbor: str = Query(
+        "P2352", description="Harbor code for tide information"
+    ),
     redis: AsyncRedis = Depends(get_redis),
 ) -> JSONResponse:
     """Get weather information from QWeather API."""
 
+    harbor_data = {
+        "P2352": "黄埔港",
+        "P2932": "舢舨洲",
+        "P2299": "南沙港",
+        "P2474": "海沁",
+        "P2609": "东沙",
+    }
+
     try:
-        data, from_cache = await PublicService.get_qweather_tide(redis)
+        data, from_cache = await PublicService.get_qweather_tide(
+            redis=redis, harbor=harbor, date=date
+        )
         if from_cache:
             return APIResponse.ok(
                 data=data,

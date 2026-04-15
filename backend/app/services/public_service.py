@@ -15,6 +15,8 @@ from app.schemas.aiagent import WeatherAnalysisInput
 from app.schemas.gallery import GalleryInput
 from app.utils.qweather_jwt import generate_qweather_jwt
 
+_FRONTEND_URL = get_settings().FRONTEND_URL.rstrip("/")
+
 
 class PublicDomainError(Exception):
     def __init__(self, message: str, code: int) -> None:
@@ -33,14 +35,13 @@ class PublicService:
 
     @staticmethod
     def get_robots_txt() -> str:
-        return """User-agent: *
+        sitemap_url = f"{_FRONTEND_URL}/sitemap.xml"
+        return f"""User-agent: *
 Disallow: /api/
 Disallow: /admin/
 Allow: /
-Allow: /blog/
-Allow: /blog/*
 
-Sitemap: https://readinglist.example.com/api/sitemap.xml
+Sitemap: {sitemap_url}
 """
 
     async def build_sitemap_xml(self) -> str:
@@ -49,29 +50,45 @@ Sitemap: https://readinglist.example.com/api/sitemap.xml
         )
 
         today = datetime.now(UTC).isoformat().split("T")[0]
+
+        # Static public pages
+        self._append_static_url(urlset, _FRONTEND_URL, today, "daily", "1.0")
         self._append_static_url(
-            urlset,
-            "https://readinglist.example.com",
-            today,
-            "daily",
-            "1.0",
+            urlset, f"{_FRONTEND_URL}/blog", today, "daily", "0.9"
+        )
+        self._append_static_url(
+            urlset, f"{_FRONTEND_URL}/about", today, "monthly", "0.7"
+        )
+        self._append_static_url(
+            urlset, f"{_FRONTEND_URL}/fishing-map", today, "weekly", "0.7"
+        )
+        self._append_static_url(
+            urlset, f"{_FRONTEND_URL}/gallery", today, "weekly", "0.7"
+        )
+        self._append_static_url(
+            urlset, f"{_FRONTEND_URL}/changelog", today, "weekly", "0.6"
+        )
+        self._append_static_url(
+            urlset, f"{_FRONTEND_URL}/websites", today, "monthly", "0.6"
+        )
+        self._append_static_url(
+            urlset, f"{_FRONTEND_URL}/todos", today, "weekly", "0.5"
         )
         self._append_static_url(
             urlset,
-            "https://readinglist.example.com/blog",
+            f"{_FRONTEND_URL}/toolbox/image-toolbox",
             today,
-            "daily",
-            "0.9",
+            "monthly",
+            "0.5",
         )
 
+        # Blog posts from DB
         try:
             posts = await self.repo.list_sitemap_posts()
             for post in posts:
                 url = SubElement(urlset, "url")
                 loc = SubElement(url, "loc")
-                loc.text = (
-                    f"https://readinglist.example.com/blog/{post['_id']}"
-                )
+                loc.text = f"{_FRONTEND_URL}/blog/{post['_id']}"
                 if "updated_at" in post:
                     lastmod = SubElement(url, "lastmod")
                     lastmod_text = post["updated_at"]
@@ -85,21 +102,6 @@ Sitemap: https://readinglist.example.com/api/sitemap.xml
                 priority.text = "0.8"
         except Exception:
             pass
-
-        self._append_static_url(
-            urlset,
-            "https://readinglist.example.com/about",
-            today,
-            "monthly",
-            "0.7",
-        )
-        self._append_static_url(
-            urlset,
-            "https://readinglist.example.com/contact",
-            today,
-            "monthly",
-            "0.6",
-        )
 
         return '<?xml version="1.0" encoding="UTF-8"?>\n' + tostring(
             urlset,
@@ -190,9 +192,10 @@ Sitemap: https://readinglist.example.com/api/sitemap.xml
         return encoded_jwt
 
     @staticmethod
-    async def get_qweather_tide(redis: AsyncRedis) -> tuple[dict, bool]:
-        now = datetime.now().strftime("%Y%m%d")
-        cache_key = f"qweather:tide:P2352:{now}"
+    async def get_qweather_tide(
+        redis: AsyncRedis, harbor: str, date: str
+    ) -> tuple[dict, bool]:
+        cache_key: str = f"qweather:tide:{harbor}:{date}"
         cached_data = await redis.get(cache_key)
 
         encoded_jwt = await PublicService.get_qweather_jwt(redis)
@@ -202,8 +205,8 @@ Sitemap: https://readinglist.example.com/api/sitemap.xml
         url = "https://qk2tupqwuj.re.qweatherapi.com/v7/ocean/tide"
         headers = {"Authorization": f"Bearer {encoded_jwt}"}
         payload = {
-            "location": "P2352",
-            "date": now,
+            "location": harbor,
+            "date": date,
         }
 
         try:

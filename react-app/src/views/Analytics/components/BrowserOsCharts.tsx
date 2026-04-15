@@ -72,7 +72,7 @@ export function BrowserOsCharts({
 
   return (
     <div className="grid grid-cols-1 gap-3">
-      <article className="squircle border border-gray-200/60 bg-white/85 p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900/80">
+      <article className="rounded-3xl border border-gray-200/60 bg-white/85 p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900/80">
         <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100">
           Browser Distribution
         </h3>
@@ -91,7 +91,7 @@ export function BrowserOsCharts({
         </Suspense>
       </article>
 
-      <article className="squircle border border-gray-200/60 bg-white/85 p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900/80">
+      <article className="rounded-3xl border border-gray-200/60 bg-white/85 p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900/80">
         <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100">
           OS Distribution
         </h3>

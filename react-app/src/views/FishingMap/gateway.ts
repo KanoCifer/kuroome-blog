@@ -33,7 +33,10 @@ export interface fishingMapGateway {
       ApiEnvelope<WeatherLiveResponseData | WeatherForecastResponseData>
     >
   >;
-  getTide(): Promise<AxiosResponse<ApiEnvelope<TideData>>>;
+  getTide(payload?: {
+    harbor: string;
+    date: string;
+  }): Promise<AxiosResponse<ApiEnvelope<TideData>>>;
 }
 
 export const fishingMapGateway = (): fishingMapGateway => {
@@ -58,8 +61,8 @@ export const fishingMapGateway = (): fishingMapGateway => {
       >;
     },
 
-    async getTide() {
-      return request.get('v1/qweather/tide') as Promise<
+    async getTide(payload?: { harbor: string; date: string }) {
+      return request.get('v1/qweather/tide', { params: payload }) as Promise<
         AxiosResponse<ApiEnvelope<TideData>>
       >;
     },

@@ -39,7 +39,7 @@ export function ServerStatusCard({ status }: ServerStatusCardProps) {
   const disk = status?.diskUsagePercent ?? 0;
 
   return (
-    <article className="squircle border border-gray-200/60 bg-white/85 p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900/80">
+    <article className="rounded-3xl border border-gray-200/60 bg-white/85 p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900/80">
       <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100">
         Server Status Snapshot
       </h3>

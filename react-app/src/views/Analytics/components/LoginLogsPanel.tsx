@@ -1,6 +1,11 @@
-import { formatDate } from '@/utils/formatdate';
+import dayjs from 'dayjs';
 
 import type { UserLoginLogData, UserLoginLogItem } from '../types';
+
+const formatUtc = (dateStr: string | null | undefined): string => {
+  if (!dateStr) return '-';
+  return dayjs(dateStr).format('YYYY-MM-DD HH:mm:ss');
+};
 
 interface LoginLogsPanelProps {
   data: UserLoginLogData | null;
@@ -42,7 +47,7 @@ function StatusBadge({ active }: { active: boolean }) {
 
 function MobileLogCard({ item }: { item: UserLoginLogItem }) {
   return (
-    <article className="rounded-xl border border-gray-200/60 bg-white p-4 dark:border-gray-700 dark:bg-gray-800/70">
+    <article className="rounded-3xl border border-gray-200/60 bg-white p-4 dark:border-gray-700 dark:bg-gray-800/70">
       <div className="flex items-start justify-between gap-3">
         <UserAvatar item={item} />
         <StatusBadge active={item.active} />
@@ -52,9 +57,9 @@ function MobileLogCard({ item }: { item: UserLoginLogItem }) {
         <span>Login Count</span>
         <span className="text-right font-medium">{item.loginCount}</span>
         <span>Last Login</span>
-        <span className="text-right">{formatDate(item.lastLoginAt)}</span>
+        <span className="text-right">{formatUtc(item.lastLoginAt)}</span>
         <span>Current Login</span>
-        <span className="text-right">{formatDate(item.currentLoginAt)}</span>
+        <span className="text-right">{formatUtc(item.currentLoginAt)}</span>
         <span>Last IP</span>
         <span className="text-right font-mono">{item.lastLoginIp || '-'}</span>
         <span>Current IP</span>
@@ -72,7 +77,7 @@ export function LoginLogsPanel({
   onPageChange,
 }: LoginLogsPanelProps) {
   return (
-    <section className="squircle overflow-hidden border border-gray-200/60 bg-white/85 p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900/80">
+    <section className="overflow-hidden rounded-3xl border border-gray-200/60 bg-white/85 p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900/80">
       <h3 className="mb-3 text-base font-semibold text-gray-800 dark:text-gray-100">
         User Login Logs
       </h3>

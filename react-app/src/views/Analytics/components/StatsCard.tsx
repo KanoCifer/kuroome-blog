@@ -16,7 +16,7 @@ export function StatsCard({
   iconClassName,
 }: StatsCardProps) {
   return (
-    <article className="group squircle overflow-hidden border border-gray-200/60 bg-white/85 p-3.5 shadow-sm transition-all duration-300 dark:border-gray-800 dark:bg-gray-900/80">
+    <article className="group overflow-hidden rounded-3xl border border-gray-200/60 bg-white/85 p-3.5 shadow-sm transition-all duration-300 dark:border-gray-800 dark:bg-gray-900/80">
       <div className="mb-2 flex items-center gap-2">
         <div
           className={`flex h-8 w-8 items-center justify-center rounded-lg ${iconClassName}`}

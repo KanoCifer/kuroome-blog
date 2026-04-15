@@ -162,7 +162,7 @@ class UserRepo:
         """
         user.active = True
         user.last_login_at = user.current_login_at
-        user.current_login_at = datetime.now(UTC).replace(tzinfo=None)
+        user.current_login_at = datetime.now(UTC)
         user.last_login_ip = user.current_login_ip
         user.current_login_ip = User.get_real_ip(request)
         user.login_count += 1

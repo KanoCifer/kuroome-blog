@@ -66,12 +66,12 @@ export default function AnalyticsView() {
   }, []);
 
   const fetchLoginLogs = useCallback(async (days: number, page: number) => {
-    const payload = await service.getUserLogins({
+    const res = await service.getUserLogins({
       days,
       page,
       pageSize: 20,
     });
-    setLoginLogsData(payload);
+    setLoginLogsData(res);
   }, []);
 
   const fetchAllData = useCallback(async () => {
@@ -123,7 +123,7 @@ export default function AnalyticsView() {
           </p>
         </section>
 
-        <section className="squircle border border-gray-200/60 bg-white/80 p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900/70">
+        <section className="rounded-3xl border border-gray-200/60 bg-white/80 p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900/70">
           <DayFilter selectedDays={selectedDays} onChange={setSelectedDays} />
 
           <button

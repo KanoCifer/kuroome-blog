@@ -18,7 +18,10 @@ export interface FishingMapService {
   fetchWeatherAndLocation(
     location: [number, number],
   ): Promise<WeatherAndLocationData>;
-  fetchTideData(): Promise<{ tideData: TideData; tideSpotName: string }>;
+  fetchTideData(payload?: {
+    harbor: string;
+    date: string;
+  }): Promise<{ tideData: TideData; tideSpotName: string }>;
   generateAnalysis(
     payload: AnalysisPayload,
     onChunk: (content: string) => void,
@@ -85,11 +88,11 @@ export const fishingMapService = (): FishingMapService => {
       };
     },
 
-    async fetchTideData(): Promise<{
+    async fetchTideData(payload?: { harbor: string; date: string }): Promise<{
       tideData: TideData;
       tideSpotName: string;
     }> {
-      const response = await gateway.getTide();
+      const response = await gateway.getTide(payload);
       return {
         tideData: response.data.data,
         tideSpotName: DEFAULT_TIDE_SPOT_NAME,
