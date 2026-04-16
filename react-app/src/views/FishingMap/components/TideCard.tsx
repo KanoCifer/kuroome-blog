@@ -90,7 +90,9 @@ export function TideCard() {
         },
         formatter: (params: unknown[]) => {
           const param = params[0] as { axisValue: string; data: number };
-          const timeStr = dayjs(param.axisValue).format('HH:mm');
+          const timeStr = param.axisValue as string;
+          // console.log('tooltip params', params);
+          // console.log('timeStr', timeStr, 'value', param.data);
           return `<div style="padding: 2px 0;">
           <div style="font-weight: 600; margin-bottom: 4px;">${timeStr}</div>
           <div>潮高: <span style="color: #06b6d4; font-weight: bold;">${param.data.toFixed(2)} m</span></div>
@@ -101,7 +103,7 @@ export function TideCard() {
       xAxis: {
         type: 'category',
         data: tideData.tideHourly.map((point) =>
-          dayjs(point.fxTime).format('MM-DD HH:mm'),
+          dayjs(point.fxTime).format('HH:mm'),
         ),
         axisLabel: {
           color: subTextColor,
