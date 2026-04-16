@@ -1,12 +1,21 @@
 import { BentoNavSidebar } from '@/components/basic/BasicSidebar';
 import { TrackEvent } from '@/utils/visitorTracker';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useLocation } from 'react-router-dom';
 import { Outlet } from 'react-router-dom';
 import { BackToTop } from './BackToTop';
 import { BasicNav } from './BasicNav';
 import { NavVisibilityProvider } from './NavVisibilityContext';
 import { Notifier } from './NotificationContainer';
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
 
 export function BasicLayout() {
   const backgroundImages = [
@@ -37,6 +46,7 @@ export function BasicLayout() {
         <header>
           <BasicNav />
         </header>
+        <ScrollToTop />
         <main className="relative max-w-dvw scroll-smooth">
           <Outlet />
         </main>

@@ -18,6 +18,7 @@ import {
   SubscriptionLoadingSkeleton,
 } from './components';
 import ConfigManage from './components/ConfigManage';
+import { PriceAnalytics } from './components/PriceAnalytics';
 import type { Subscription } from './types';
 
 function getMonthlyEstimate(subscription: Subscription): number {
@@ -47,6 +48,7 @@ export default function SubscriptionView() {
   const [pendingId, setPendingId] = useState<number | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
 
   const fetchSubscriptions = useCallback(async () => {
     setIsLoading(true);
@@ -208,13 +210,19 @@ export default function SubscriptionView() {
         {/* Summary Cards Section */}
         <section className="grid grid-cols-2 gap-4">
           {/* Monthly Estimate (Spans 2) */}
-          <div className="squircle col-span-2 flex items-center justify-between border border-slate-100 bg-white p-6 shadow-lg dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl">
+          <div
+            onClick={() => setIsAnalyticsOpen(true)}
+            className="squircle col-span-2 flex items-center justify-between border border-slate-100 bg-white p-6 shadow-lg dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl"
+          >
             <div>
               <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
                 月度估算
               </p>
               <p className="mt-1 text-3xl font-bold tracking-tight text-[#00288e] dark:text-blue-400">
                 ¥{monthlyEstimate.toFixed(2)}
+              </p>
+              <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
+                点击查看分析
               </p>
             </div>
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-[#00288e] dark:bg-blue-500/20 dark:text-blue-400">
@@ -233,6 +241,13 @@ export default function SubscriptionView() {
               </svg>
             </div>
           </div>
+          {/* 分析图表 */}
+          <PriceAnalytics
+            data={subscriptions}
+            isOpen={isAnalyticsOpen}
+            onClose={() => setIsAnalyticsOpen(false)}
+          />
+
           {/* Active */}
           <div className="squircle border border-slate-100 bg-white p-5 shadow-lg dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl">
             <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-emerald-500/20 dark:text-emerald-400">

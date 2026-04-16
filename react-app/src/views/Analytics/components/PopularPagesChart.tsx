@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo } from 'react';
+import { lazy, useMemo } from 'react';
 
 import type { OverviewTopPage } from '../types';
 
@@ -23,7 +23,8 @@ export function PopularPagesChart({ pages }: PopularPagesChartProps) {
       grid: {
         left: '3%',
         right: '4%',
-        bottom: '3%',
+        bottom: '10%',
+        top: '0%',
         containLabel: true,
       },
       xAxis: {
@@ -62,26 +63,19 @@ export function PopularPagesChart({ pages }: PopularPagesChartProps) {
   }, [pages]);
 
   return (
-    <article className="rounded-3xl border border-gray-200/60 bg-white/85 p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900/80">
+    <article className="h-100 rounded-3xl border border-gray-200/60 bg-white/85 p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900/80">
       <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100">
         Popular Pages
       </h3>
       <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
         Top viewed paths
       </p>
-
-      <Suspense
-        fallback={
-          <div className="mt-4 h-55 animate-pulse rounded-3xl bg-gray-100 dark:bg-gray-800" />
-        }
-      >
-        <ReactECharts
-          option={option}
-          style={{ width: '100%', height: 220 }}
-          notMerge
-          lazyUpdate
-        />
-      </Suspense>
+      <ReactECharts
+        option={option}
+        style={{ width: '100%', height: '100%' }}
+        notMerge
+        lazyUpdate
+      />
     </article>
   );
 }

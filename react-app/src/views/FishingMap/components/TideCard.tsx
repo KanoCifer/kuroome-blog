@@ -65,6 +65,15 @@ export function TideCard() {
     const textColor = isDarkMode ? '#e5e7eb' : '#333';
     const subTextColor = isDarkMode ? '#9ca3af' : '#666';
 
+    const now = dayjs();
+    let currentTimeIndex = -1;
+    tideData.tideHourly.forEach((point, index) => {
+      const pointTime = dayjs(point.fxTime);
+      if (pointTime.isBefore(now) || pointTime.isSame(now)) {
+        currentTimeIndex = index;
+      }
+    });
+
     return {
       tooltip: {
         trigger: 'axis',
@@ -90,7 +99,7 @@ export function TideCard() {
       },
       grid: { left: '4%', right: '4%', bottom: '12%', top: '10%' },
       xAxis: {
-        type: 'category' as const,
+        type: 'category',
         data: tideData.tideHourly.map((point) =>
           dayjs(point.fxTime).format('MM-DD HH:mm'),
         ),
@@ -108,7 +117,7 @@ export function TideCard() {
         axisTick: { show: false },
       },
       yAxis: {
-        type: 'value' as const,
+        type: 'value',
         axisLabel: {
           color: subTextColor,
           fontSize: 11,
@@ -119,20 +128,20 @@ export function TideCard() {
         splitLine: {
           lineStyle: {
             color: isDarkMode ? '#1e293b' : '#f1f5f9',
-            type: 'dashed' as const,
+            type: 'dashed',
           },
         },
       },
       series: [
         {
           data: tideData.tideHourly.map((point) => Number(point.height)),
-          type: 'line' as const,
+          type: 'line',
           smooth: 0.4,
           symbol: 'none',
           lineStyle: { color: '#06b6d4', width: 2.5 },
           areaStyle: {
             color: {
-              type: 'linear' as const,
+              type: 'linear',
               x: 0,
               y: 0,
               x2: 0,
@@ -144,6 +153,25 @@ export function TideCard() {
               ],
             },
           },
+          markLine:
+            currentTimeIndex >= 0
+              ? {
+                  symbol: ['none', 'none'],
+                  lineStyle: {
+                    color: '#f59e0b',
+                    type: 'dashed',
+                    width: 1.5,
+                  },
+                  label: {
+                    show: true,
+                    formatter: '现在',
+                    color: '#f59e0b',
+                    fontWeight: '600',
+                    fontSize: 12,
+                  },
+                  data: [{ xAxis: currentTimeIndex }],
+                }
+              : undefined,
         },
       ],
       textStyle: { color: textColor },

@@ -3,6 +3,7 @@ import { formatDate } from '@/utils/formatdate';
 import dayjs from 'dayjs';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
+import { DailyCost } from './DailyCost';
 import { MilestoneConfigForm } from './MilestoneConfigForm';
 
 interface DeviceCardProps {
@@ -39,6 +40,7 @@ export function DeviceCard({
   const isPending = pendingId === device.id;
   const isActive = device.status === 'active';
   const [isMilestoneModalOpen, setIsMilestoneModalOpen] = useState(false);
+  const [isDailyCostOpen, setIsDailyCostOpen] = useState(false);
 
   return (
     <AnimatePresence>
@@ -46,8 +48,16 @@ export function DeviceCard({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
+        onClick={() => setIsDailyCostOpen(true)}
         className="squircle border border-slate-100 bg-white p-6 shadow-lg dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl"
       >
+        {/* 分析图表 */}
+        <DailyCost
+          data={device}
+          isOpen={isDailyCostOpen}
+          onClose={() => setIsDailyCostOpen(false)}
+        />
+
         <div className="mb-6 flex items-start justify-between">
           <div className="flex items-center gap-4">
             {/* Logo placeholder */}
@@ -113,14 +123,20 @@ export function DeviceCard({
           <button
             type="button"
             disabled={isPending}
-            onClick={() => onToggleStatus(device)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleStatus(device);
+            }}
             className="rounded-full bg-[#00288e] px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-blue-600"
           >
             {isPending ? '处理中...' : isActive ? '标记退役' : '恢复使用'}
           </button>
           <button
             type="button"
-            onClick={() => setIsMilestoneModalOpen(true)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsMilestoneModalOpen(true);
+            }}
             className="rounded-full bg-[#00288e] px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-blue-600"
           >
             编辑配置
@@ -128,7 +144,10 @@ export function DeviceCard({
 
           <button
             type="button"
-            onClick={() => onDelete(device)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(device);
+            }}
             className="rounded-full border border-red-200 bg-red-300/50 px-4 py-3 text-sm font-bold text-red-600 transition-all hover:bg-red-50 active:scale-95 dark:border-red-800 dark:bg-red-700/30 dark:text-red-400 dark:hover:bg-red-900/20"
           >
             删除设备

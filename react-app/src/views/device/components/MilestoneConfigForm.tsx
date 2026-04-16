@@ -7,8 +7,8 @@ import {
   Loader2,
   Mail,
   MessageSquare,
-  Radio,
   Plus,
+  Radio,
   X,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -252,7 +252,10 @@ export function MilestoneConfigForm({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
-          onClick={onClose}
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
         />,
         document.body,
       )}

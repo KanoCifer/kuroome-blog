@@ -1,6 +1,7 @@
 import { useNotificationStore } from '@/stores/notificationState';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { motion } from 'framer-motion';
 import { AIAnalysisWidget } from './components/AIAnalysisWidget';
 import { FishingMapHeader } from './components/FishingMapHeader';
 import { MapPanel } from './components/MapPanel';
@@ -463,7 +464,11 @@ export default function FishingMap() {
       <FishingMapHeader />
 
       {/* 主内容区域 */}
-      <div className="relative mx-auto mb-24 min-h-dvh w-full max-w-xl px-4 pt-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative mx-auto mb-24 min-h-dvh w-full max-w-xl px-4 pt-4"
+      >
         <section className="space-y-4">
           <RouteStatusCard
             isPlanningRoute={isPlanningRoute}
@@ -495,7 +500,7 @@ export default function FishingMap() {
             void generateAnalysis();
           }}
         />
-      </div>
+      </motion.div>
     </>
   );
 }
