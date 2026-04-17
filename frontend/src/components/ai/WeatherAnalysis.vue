@@ -1,8 +1,16 @@
 <script setup lang="ts">
 import { useNotificationStore } from "@/stores/notification";
+import { formatDate } from "@/utils/formatdate";
 import dayjs from "dayjs";
+import DOMPurify from "dompurify";
+import { marked } from "marked";
 import { AnimatePresence, motion } from "motion-v";
 import { computed, onUnmounted, ref, watch } from "vue";
+
+marked.setOptions({
+  gfm: true,
+  breaks: true,
+});
 
 interface LiveWeather {
   province: string;
@@ -59,6 +67,16 @@ const loading = ref(false);
 const summary = ref("");
 const hasGenerated = ref(false);
 const errorMessage = ref("");
+
+const renderedSummary = computed(() => {
+  if (!summary.value) return "";
+  try {
+    const rawHtml = marked.parse(summary.value, { async: false }) as string;
+    return DOMPurify.sanitize(rawHtml);
+  } catch {
+    return summary.value;
+  }
+});
 const textShimmer = ref<string[]>(["正在整理天气变化...", "正在评估体感与风况...", "正在结合潮汐节奏..."]);
 
 let shimmerTimer: ReturnType<typeof setInterval> | null = null;
@@ -90,45 +108,6 @@ const payload = computed(() => {
 });
 
 const canGenerate = computed(() => hasInputData.value && !loading.value);
-
-const highTide = computed(() => {
-  const tideData = normalizedData.value?.tideData;
-  if (!tideData?.tideTable?.length) return null;
-  const highs = tideData.tideTable.filter((t) => t.type === "H");
-  if (!highs.length) return null;
-  let maxEntry = highs[0];
-  for (const item of highs) {
-    if (Number(item.height) > Number(maxEntry.height)) {
-      maxEntry = item;
-    }
-  }
-  return {
-    height: Number(maxEntry.height),
-    time: dayjs(maxEntry.fxTime).format("HH:mm"),
-  };
-});
-
-const lowTide = computed(() => {
-  const tideData = normalizedData.value?.tideData;
-  if (!tideData?.tideTable?.length) return null;
-  const lows = tideData.tideTable.filter((t) => t.type === "L");
-  if (!lows.length) return null;
-  let minEntry = lows[0];
-  for (const item of lows) {
-    if (Number(item.height) < Number(minEntry.height)) {
-      minEntry = item;
-    }
-  }
-  return {
-    height: Number(minEntry.height),
-    time: dayjs(minEntry.fxTime).format("HH:mm"),
-  };
-});
-
-const forecastPreview = computed(() => {
-  const forecasts = normalizedData.value?.forecasts ?? [];
-  return forecasts.slice(0, 2);
-});
 
 const statusLabel = computed(() => {
   if (loading.value) return "分析中";
@@ -285,7 +264,7 @@ onUnmounted(() => {
         <h3 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">AI 天气分析</h3>
         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">结合实时天气与潮汐节奏给出出行建议</p>
       </div>
-      <div class="flex flex-col items-end gap-2">
+      <div class="mr-5 flex flex-col items-end gap-2">
         <span class="rounded-full px-2.5 py-1 text-xs font-medium" :class="statusClass">
           {{ statusLabel }}
         </span>
@@ -325,59 +304,7 @@ onUnmounted(() => {
     </div>
 
     <div v-else class="relative z-10 mt-5 flex flex-1 flex-col">
-      <div class="grid grid-cols-2 gap-3 text-xs">
-        <div class="rounded-xl bg-white/50 p-3 dark:bg-gray-800/50">
-          <p class="text-gray-500 dark:text-gray-400">当前天气</p>
-          <p class="mt-1 text-lg font-semibold text-gray-900 dark:text-white">
-            {{ normalizedData?.liveWeather?.temperature ?? "--" }}°C
-          </p>
-          <p class="text-gray-500 dark:text-gray-400">
-            {{ normalizedData?.liveWeather?.weather ?? "未知" }}
-          </p>
-        </div>
-        <div class="rounded-xl bg-white/50 p-3 dark:bg-gray-800/50">
-          <p class="text-gray-500 dark:text-gray-400">风况与湿度</p>
-          <p class="mt-1 text-sm font-semibold text-gray-900 dark:text-white">
-            {{ normalizedData?.liveWeather?.winddirection ?? "--" }}
-            {{ normalizedData?.liveWeather?.windpower ?? "--" }}级
-          </p>
-          <p class="text-gray-500 dark:text-gray-400">湿度 {{ normalizedData?.liveWeather?.humidity ?? "--" }}%</p>
-        </div>
-        <div class="rounded-xl bg-white/50 p-3 dark:bg-gray-800/50">
-          <p class="text-gray-500 dark:text-gray-400">高潮位</p>
-          <p class="mt-1 text-sm font-semibold text-gray-900 dark:text-white">
-            {{ highTide ? highTide.height.toFixed(2) : "--" }}m
-          </p>
-          <p class="text-gray-500 dark:text-gray-400">
-            {{ highTide?.time ?? "--:--" }}
-          </p>
-        </div>
-        <div class="rounded-xl bg-white/50 p-3 dark:bg-gray-800/50">
-          <p class="text-gray-500 dark:text-gray-400">低潮位</p>
-          <p class="mt-1 text-sm font-semibold text-gray-900 dark:text-white">
-            {{ lowTide ? lowTide.height.toFixed(2) : "--" }}m
-          </p>
-          <p class="text-gray-500 dark:text-gray-400">
-            {{ lowTide?.time ?? "--:--" }}
-          </p>
-        </div>
-      </div>
-
-      <div v-if="forecastPreview.length" class="mt-3 grid grid-cols-2 gap-3 text-xs">
-        <div
-          v-for="day in forecastPreview"
-          :key="day.date"
-          class="rounded-xl bg-white/40 p-3 text-gray-600 dark:bg-gray-800/40 dark:text-gray-300"
-        >
-          <p class="text-xs text-gray-500 dark:text-gray-400">
-            {{ day.date }}
-          </p>
-          <p class="mt-1 font-medium">白天 {{ day.daytemp }}° / 夜间 {{ day.nighttemp }}°</p>
-          <p class="text-gray-500 dark:text-gray-400">{{ day.dayweather }} · {{ day.daywind }}</p>
-        </div>
-      </div>
-
-      <div class="mt-4 h-80 overflow-auto rounded-2xl bg-white/60 p-4 dark:bg-gray-900/60">
+      <div class="h-[75vh] overflow-auto rounded-2xl bg-white/60 p-4 dark:bg-gray-900/60">
         <div class="mb-2 flex items-center gap-2 text-xs text-gray-500">
           <span class="h-1.5 w-1.5 rounded-full bg-gray-400"></span>
           AI 分析输出
@@ -398,16 +325,15 @@ onUnmounted(() => {
               <div class="h-3 w-2/3 animate-pulse rounded bg-gray-200/70 dark:bg-gray-700/50"></div>
             </div>
           </motion.div>
-          <motion.p
+          <motion.div
             v-else-if="summary"
             key="summary"
             :initial="{ opacity: 0, y: 8 }"
             :animate="{ opacity: 1, y: 0 }"
             :exit="{ opacity: 0, y: -8 }"
-            class="text-sm leading-7 whitespace-pre-line text-gray-700 dark:text-gray-200"
-          >
-            {{ summary }}<span v-if="loading" class="animate-breathe ml-0.5">|</span>
-          </motion.p>
+            class="prose prose-sm dark:prose-invert max-w-none text-gray-700 dark:text-gray-200"
+            v-html="renderedSummary"
+          ></motion.div>
           <motion.div
             v-else
             key="placeholder"
@@ -429,9 +355,8 @@ onUnmounted(() => {
       </div>
 
       <div class="mt-3 text-xs text-gray-400">
-        天气更新: {{ normalizedData?.liveWeather?.reporttime ?? "--" }}
-        <span class="mx-2">|</span>
-        潮汐更新: {{ normalizedData?.tideData?.updateTime ?? "--" }}
+        天气更新: {{ normalizedData?.liveWeather?.reporttime ?? "--" }}<br />
+        潮汐更新: {{ formatDate(normalizedData?.tideData?.updateTime) ?? "--" }}
       </div>
     </div>
   </motion.div>

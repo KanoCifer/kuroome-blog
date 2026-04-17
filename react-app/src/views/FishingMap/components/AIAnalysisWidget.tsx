@@ -1,4 +1,11 @@
 import { AnimatePresence, motion } from 'framer-motion';
+import DOMPurify from 'dompurify';
+import { marked } from 'marked';
+
+marked.setOptions({
+  gfm: true,
+  breaks: true,
+});
 
 interface AIAnalysisWidgetProps {
   analysisOpen: boolean;
@@ -74,9 +81,14 @@ export function AIAnalysisWidget({
               ) : analysisError ? (
                 <p className="text-red-500">{analysisError}</p>
               ) : analysisResult ? (
-                <p className="max-h-56 overflow-y-auto leading-7 whitespace-pre-line text-gray-700 dark:text-gray-200">
-                  {analysisResult}
-                </p>
+                <div
+                  className="prose prose-sm dark:prose-invert max-h-56 overflow-y-auto text-gray-700 dark:text-gray-200"
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(
+                      marked.parse(analysisResult, { async: false }) as string,
+                    ),
+                  }}
+                />
               ) : (
                 <p className="text-gray-500 dark:text-gray-400">
                   暂无分析结果，点击下方按钮生成。

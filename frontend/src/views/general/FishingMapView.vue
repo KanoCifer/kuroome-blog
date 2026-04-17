@@ -119,20 +119,19 @@
           <WeatherAnalysis :weather_data="analysisPayload" :autoAnalyze="analysisOpen" />
         </div>
       </transition>
-
-      <button
-        class="group squircle relative flex h-14 w-14 items-center justify-center border border-white/40 bg-linear-to-br from-slate-900/90 to-slate-700/80 text-white shadow-lg backdrop-blur transition-all hover:-translate-y-1 hover:shadow-xl dark:border-gray-700/60 dark:from-gray-100 dark:to-gray-300 dark:text-gray-900"
-        @click="analysisOpen = !analysisOpen"
-      >
-        <span class="absolute -top-1 -right-1 flex h-3 w-3" v-if="analysisHasData">
-          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"></span>
-          <span class="relative inline-flex h-3 w-3 rounded-full bg-emerald-500"></span>
-        </span>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
-      </button>
     </div>
+    <button
+      class="group squircle fixed right-8 bottom-40 flex h-14 w-14 items-center justify-center border border-white/40 bg-linear-to-br from-slate-900/90 to-slate-700/80 text-white shadow-lg backdrop-blur transition-all hover:-translate-y-1 hover:shadow-xl dark:border-gray-700/60 dark:from-gray-100 dark:to-gray-300 dark:text-gray-900"
+      @click="analysisOpen = !analysisOpen"
+    >
+      <span class="absolute -top-1 -right-1 flex h-3 w-3" v-if="analysisHasData">
+        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"></span>
+        <span class="relative inline-flex h-3 w-3 rounded-full bg-emerald-500"></span>
+      </span>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    </button>
   </BasicDetail>
 </template>
 

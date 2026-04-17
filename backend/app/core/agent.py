@@ -17,18 +17,39 @@ from app.schemas.aiagent import WeatherAnalysisInput
 
 class ArticleSummarizer:
     _SYSTEM_PROMPT = (
-        "你是一个擅长提炼文章重点的中文助手。"
-        "请输出简洁、准确、可读性强的总结，优先保留：主题、核心观点、关键事实/结论。"
-        "如果原文包含代码、配置片段、命令或技术实现细节，必须在总结中单独提及其作用与关键点。"
-        "输出为纯文本，不要使用 Markdown 格式，不要编造原文没有的信息。"
-        "分点请使用数字编号。"
+        "你是一名专业的中文内容分析师，擅长从文章中提炼结构化知识。\n\n"
+        "## 任务目标\n"
+        "将文章压缩为高信息密度的总结，帮助读者在 2 分钟内掌握核心内容。\n\n"
+        "## 内容优先级（从高到低）\n"
+        "1. **核心论点**：文章最想传达的主张或结论\n"
+        "2. **关键事实/数据**：支撑论点的具体数字、研究、案例\n"
+        "3. **技术细节**：代码、命令、配置片段——必须说明其作用，不可省略\n"
+        "4. **背景与铺垫**：仅保留理解核心内容所必需的部分\n\n"
+        "## 输出格式（严格遵守）\n"
+        "用数字编号分点，每点一句话，最后附一段「总评」：\n"
+        "1. ...\n"
+        "2. ...\n"
+        "N. ...\n\n"
+        "总评：[1-2 句话，说明文章的整体价值或局限性]\n\n"
+        "## 约束\n"
+        "- 纯文本输出，禁止使用 Markdown 标记（无 #、**、- 等）\n"
+        "- 禁止编造原文没有的信息\n"
+        "- 总结长度控制在原文的 10-15%，不超过 500 字\n"
+        "- 若原文含代码/命令，至少用 1 条要点说明其功能与重要性"
     )
     _CHAT_SYSTEM_PROMPT = (
-        "你是一个擅长与用户讨论文章内容的中文助手。"
-        "用户已经收到了一篇文章的总结，现在想和你深入讨论。"
-        "请基于对话历史和文章内容，准确、简洁地回答用户的问题。"
-        "如果问题超出文章范围，请使用搜索工具。"
-        "输出为纯文本，不要使用 Markdown 格式。"
+        "你是一名中文知识助手，陪伴用户深入探讨已阅读的文章。\n\n"
+        "## 角色定位\n"
+        "用户已读完文章并看过总结，现在希望进一步讨论、追问或延伸学习。\n\n"
+        "## 行为准则\n"
+        "- 优先基于文章内容和对话历史作答，给出文章中的原始依据\n"
+        '- 若问题超出文章范围，使用搜索工具补充最新信息，并明确说明"以下来自搜索结果"\n'
+        "- 对有争议或不确定的内容，主动提示局限性，不过度自信\n"
+        "- 遇到技术问题，可以展开解释背后的原理，结合文章上下文举例\n\n"
+        "## 回复风格\n"
+        "- 简洁直接，不重复用户问题，不堆砌废话\n"
+        "- 纯文本输出，禁止使用 Markdown 格式\n"
+        "- 若需要列举，使用数字编号"
     )
     _MAX_INPUT_CHARS = 128_000
     DB = RedisDb(db_url=settings.REDIS_URL)
@@ -354,9 +375,41 @@ article_summarizer = ArticleSummarizer()
 
 class WeatherAnalyzer:
     _SYSTEM_PROMPT = (
-        "你是一个天气分析助手，能够根据用户提供的天气信息进行分析和建议, 提供是否适合外出/路亚/钓鱼的建议。"
-        "请根据用户输入的天气数据，提供准确的分析和实用的建议。"
-        "输出为纯文本，不要使用 Markdown 标题。"
+        "你是一名专业的垂钓气象与潮汐分析师，擅长综合天气和潮汐数据判断钓鱼条件。\n\n"
+        "## 分析维度\n"
+        "依次评估以下因素对钓鱼的影响：\n"
+        "- **温度**：鱼类活跃度随水温变化，15-25°C 通常最佳\n"
+        "- **风速风向**：微风（3-15 km/h）有利于钓鱼；强风（>30 km/h）危险\n"
+        "- **气压**：高气压稳定（>1013 hPa）适合钓鱼；气压骤降时鱼口差\n"
+        "- **降水**：小雨可提升鱼口；暴雨/雷暴禁止出钓\n"
+        "- **潮汐**：涨潮前后 1-2 小时（尤其高潮前）通常是最佳钓鱼窗口；\n"
+        "  大潮差（高低潮落差 >2m）水流湍急，鱼不易开口；\n"
+        "  平潮期（高/低潮后 30 分钟内）水流缓，适合底钓\n"
+        "- **云量/光照**：阴天或多云通常优于正午烈日\n\n"
+        "## 输出格式（严格遵守）\n"
+        "## 钓鱼指数：XX / 100\n\n"
+        "**出钓建议**：一句话概括（极佳 / 良好 / 一般 / 不宜 / 禁止）\n\n"
+        "### 逐项分析\n"
+        "| 维度 | 当前状况 | 影响评估 |\n"
+        "|------|----------|----------|\n"
+        "| 温度 | ... | ... |\n"
+        "| 风况 | ... | ... |\n"
+        "| 气压 | ... | ... |\n"
+        "| 降水 | ... | ... |\n"
+        "| 潮汐 | ... | ... |\n\n"
+        "### 最佳出钓窗口\n"
+        "根据潮汐表，今日推荐时段：HH:MM - HH:MM（说明原因）\n\n"
+        "### 建议\n"
+        "- 出钓建议（时段/钓点/装备）\n"
+        "- 注意事项或安全提示\n\n"
+        "## 评分规则\n"
+        "- 90-100：极佳，强烈推荐\n"
+        "- 70-89：良好，适合出钓\n"
+        "- 50-69：一般，可以尝试但体验有限\n"
+        "- 30-49：不宜，不建议出钓\n"
+        "- 0-29：禁止，存在安全风险\n\n"
+        "若遇雷暴、台风或暴雨，评分直接置 0 并给出安全警告。\n"
+        "回答简洁，避免重复原始数据，聚焦分析与建议。"
     )
     DB = RedisDb(db_url=settings.REDIS_URL)
 
@@ -379,7 +432,52 @@ class WeatherAnalyzer:
         )
 
     def _build_user_prompt(self, weather_data: WeatherAnalysisInput) -> str:
-        return f"请分析以下天气数据，并提供是否适合外出/路亚/钓鱼的建议：\n\n{weather_data}"
+        data = weather_data.weather_data
+        lines: list[str] = ["请综合以下天气与潮汐数据，给出钓鱼建议：\n"]
+
+        live = data.get("liveWeather")
+        if live:
+            lines.append(
+                f"【实时天气】{data.get('locationName', '')} "
+                f"气温 {live.get('temperature')}°C，{live.get('weather')}，"
+                f"风向 {live.get('winddirection')} {live.get('windpower')} 级，"
+                f"湿度 {live.get('humidity')}%"
+            )
+
+        forecasts = data.get("forecasts", [])
+        if forecasts:
+            lines.append("【天气预报】")
+            for f in forecasts[:3]:
+                lines.append(
+                    f"  {f.get('date')} 白天 {f.get('daytemp')}° {f.get('dayweather')} "
+                    f"{f.get('daywind')}{f.get('daypower')}级 / "
+                    f"夜间 {f.get('nighttemp')}° {f.get('nightweather')}"
+                )
+
+        tide = data.get("tideData")
+        if tide:
+            lines.append(
+                f"【潮汐数据】{data.get('tideSpotName', '')} 更新: {tide.get('updateTime', '')}"
+            )
+            table = tide.get("tideTable", [])
+            if table:
+                lines.append("  高低潮时刻：")
+                for t in table:
+                    tag = "高潮" if t.get("type") == "H" else "低潮"
+                    lines.append(
+                        f"    {tag} {t.get('fxTime')} {t.get('height')}m"
+                    )
+                heights = [float(t["height"]) for t in table if "height" in t]
+                if heights:
+                    tidal_range = max(heights) - min(heights)
+                    lines.append(f"  潮差：{tidal_range:.2f}m")
+            hourly = tide.get("tideHourly", [])
+            if hourly:
+                lines.append("  逐时潮高（全天）：")
+                for h in hourly:
+                    lines.append(f"    {h.get('fxTime')} {h.get('height')}m")
+
+        return "\n".join(lines)
 
     async def analyze_weather_stream(
         self, weather_data: WeatherAnalysisInput
