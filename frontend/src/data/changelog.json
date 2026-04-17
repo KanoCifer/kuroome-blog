@@ -1,5 +1,44 @@
 [
   {
+    "version": "2.9.5",
+    "date": "2026-04-17",
+    "title": "AI 潮汐综合分析与价格图表功能",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "AI 天气分析融合潮汐数据，新增逐时潮高传入、潮差计算与最佳出钓窗口推荐"
+      },
+      {
+        "type": "feat",
+        "content": "AI 分析输出由纯文本改为 Markdown 渲染，支持表格与分级显示"
+      },
+      {
+        "type": "feat",
+        "content": "潮汐预报支持港口和日期切换"
+      },
+      {
+        "type": "feat",
+        "content": "新增设备价格分析弹层与价格走势图表交互"
+      },
+      {
+        "type": "fix",
+        "content": "修复天气数据字段不匹配导致湿度之外字段无法正常显示的问题"
+      },
+      {
+        "type": "fix",
+        "content": "修复图表图例显示异常"
+      },
+      {
+        "type": "style",
+        "content": "BentoGreeting 头像替换为日夜 SVG 图标"
+      },
+      {
+        "type": "refactor",
+        "content": "合并重复的 authService 和 todoService 至 api/ 目录"
+      }
+    ]
+  },
+  {
     "version": "2.9.4",
     "date": "2026-04-14",
     "title": "设备管理里程碑配置功能完善",

@@ -1,5 +1,28 @@
 [
   {
+    "version": "2.9.5",
+    "date": "2026-04-17",
+    "title": "AI 天气分析支持潮汐数据与 Markdown 渲染",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "AI 天气分析新增潮汐综合评估，推荐最佳出钓时段"
+      },
+      {
+        "type": "feat",
+        "content": "AI 分析结果支持 Markdown 渲染，改善表格与评分展示"
+      },
+      {
+        "type": "feat",
+        "content": "潮汐预报支持港口和日期切换"
+      },
+      {
+        "type": "refactor",
+        "content": "重构 FishingMap 组件结构"
+      }
+    ]
+  },
+  {
     "version": "2.9.4",
     "date": "2026-04-14",
     "title": "设备管理里程碑配置功能完善",
