@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { flushSync } from 'react-dom';
 
 import { useNotificationStore } from '@/stores/notificationState';
 
 import { fishingMapService } from '../service';
-import type { ForecastDay, LiveWeather } from '../types';
-import { weatherIcon } from '../utils';
+import type { WeatherDay, WeatherNow } from '../types';
 
 interface WeatherCardProps {
   location?: [number, number];
   onWeatherUpdate?: (payload: {
-    liveWeather: LiveWeather | null;
-    forecasts: ForecastDay[];
+    liveWeather: WeatherNow | null;
+    forecasts: WeatherDay[];
     locationName: string;
   }) => void;
 }
@@ -24,8 +24,8 @@ export function WeatherCard({
 
   const [weatherLoading, setWeatherLoading] = useState(false);
   const [weatherError, setWeatherError] = useState('');
-  const [liveWeather, setLiveWeather] = useState<LiveWeather | null>(null);
-  const [forecasts, setForecasts] = useState<ForecastDay[]>([]);
+  const [liveWeather, setLiveWeather] = useState<WeatherNow | null>(null);
+  const [forecasts, setForecasts] = useState<WeatherDay[]>([]);
   const [locationName, setLocationName] = useState('');
 
   const fetchWeather = useCallback(async () => {
@@ -33,14 +33,25 @@ export function WeatherCard({
     setWeatherError('');
 
     try {
-      const weatherData = await service.fetchWeatherAndLocation(location);
-      setLiveWeather(weatherData.liveWeather);
-      setForecasts(weatherData.forecasts);
-      setLocationName(weatherData.locationName);
+      const { now } = await service.fetchWeatherLive({ location });
+      const { daily } = await service.fetchWeatherForecast({
+        location,
+        days: 3,
+      });
+      const poi = await service.fetchPOI({ location });
+      const resolvedLocationName = poi?.name || '未知地点';
+      const resolvedLive = now ?? null;
+      const resolvedDaily = daily ?? [];
+
+      flushSync(() => {
+        setLiveWeather(resolvedLive);
+        setForecasts(resolvedDaily);
+        setLocationName(resolvedLocationName);
+      });
       onWeatherUpdate?.({
-        liveWeather: weatherData.liveWeather,
-        forecasts: weatherData.forecasts,
-        locationName: weatherData.locationName,
+        liveWeather: resolvedLive,
+        forecasts: resolvedDaily,
+        locationName: resolvedLocationName,
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : '获取天气失败';
@@ -81,7 +92,11 @@ export function WeatherCard({
           </p>
         </div>
         <span className="text-2xl">
-          {liveWeather ? weatherIcon(liveWeather.weather) : '🌤️'}
+          {liveWeather ? (
+            <i className={`qi-${liveWeather.icon} text-3xl`} />
+          ) : (
+            '🌤️'
+          )}
         </span>
       </div>
 
@@ -95,22 +110,20 @@ export function WeatherCard({
         <>
           <div className="mb-3 flex items-end gap-2">
             <span className="text-4xl font-bold text-gray-900 dark:text-white">
-              {liveWeather.temperature}
+              {liveWeather.temp}
             </span>
             <span className="pb-1 text-sm text-gray-500 dark:text-gray-400">
-              °C · {liveWeather.weather}
+              °C · {liveWeather.text}
             </span>
           </div>
           <div className="grid grid-cols-3 gap-2 text-center text-xs">
             <div className="rounded-lg bg-white/60 px-2 py-2 text-gray-700 dark:bg-gray-800/60 dark:text-gray-200">
               风向
-              <div className="mt-1 font-medium">
-                {liveWeather.winddirection}
-              </div>
+              <div className="mt-1 font-medium">{liveWeather.windDir}</div>
             </div>
             <div className="rounded-lg bg-white/60 px-2 py-2 text-gray-700 dark:bg-gray-800/60 dark:text-gray-200">
               风力
-              <div className="mt-1 font-medium">{liveWeather.windpower}级</div>
+              <div className="mt-1 font-medium">{liveWeather.windScale}级</div>
             </div>
             <div className="rounded-lg bg-white/60 px-2 py-2 text-gray-700 dark:bg-gray-800/60 dark:text-gray-200">
               湿度
@@ -121,16 +134,21 @@ export function WeatherCard({
             <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
               {forecasts.slice(0, 2).map((day) => (
                 <div
-                  key={day.date}
-                  className="rounded-lg bg-white/55 px-3 py-2 dark:bg-gray-800/50"
+                  key={day.fxDate}
+                  className="flex items-center gap-2 rounded-lg bg-white/55 px-3 py-2 dark:bg-gray-800/50"
                 >
-                  <p className="text-gray-500 dark:text-gray-400">{day.date}</p>
-                  <p className="mt-1 font-medium text-gray-900 dark:text-white">
-                    {day.daytemp}° / {day.nighttemp}°
-                  </p>
-                  <p className="text-gray-500 dark:text-gray-400">
-                    {day.dayweather}
-                  </p>
+                  <i className={`qi-${day.iconDay} shrink-0 text-xl`} />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-gray-500 dark:text-gray-400">
+                      {day.fxDate}
+                    </p>
+                    <p className="truncate font-medium text-gray-900 dark:text-white">
+                      {day.tempMax}° / {day.tempMin}°
+                    </p>
+                    <p className="truncate text-gray-500 dark:text-gray-400">
+                      {day.textDay}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>

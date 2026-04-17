@@ -45,6 +45,7 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/0"
     REDIS_MAX_CONNECTIONS: int = 10
     RABBITMQ_URL: str = "amqp://guest:guest@localhost:5672/"
+    QWEATHER_BASE_URL: str = ""
 
     model_config = SettingsConfigDict(
         env_file=get_env_file_path(),

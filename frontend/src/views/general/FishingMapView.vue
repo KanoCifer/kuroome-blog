@@ -157,28 +157,21 @@ interface MapContainerInstance {
 }
 
 interface LiveWeather {
-  province: string;
-  city: string;
-  adcode: string;
-  weather: string;
-  temperature: string;
-  winddirection: string;
-  windpower: string;
+  obsTime: string;
+  temp: string;
+  text: string;
+  windDir: string;
+  windScale: string;
   humidity: string;
-  reporttime: string;
+  icon: string;
 }
 
 interface ForecastDay {
-  date: string;
-  week: string;
-  dayweather: string;
-  nightweather: string;
-  daytemp: string;
-  nighttemp: string;
-  daywind: string;
-  nightwind: string;
-  daypower: string;
-  nightpower: string;
+  fxDate: string;
+  tempMax: string;
+  tempMin: string;
+  textDay: string;
+  iconDay: string;
 }
 
 interface TideData {
@@ -211,19 +204,14 @@ const analysisPayload = computed(() => {
     liveWeather: liveWeather.value,
     forecasts: forecasts.value,
     tideData: tideData.value,
-    locationName: locationName.value || liveWeather.value?.city,
+    locationName: locationName.value,
     tideSpotName: tideSpotName.value,
   };
 });
 
 const analysisHasData = computed(() => !!liveWeather.value || forecasts.value.length > 0 || !!tideData.value);
 
-const handleWeatherUpdate = (payload: {
-  liveWeather: LiveWeather;
-  forecasts: ForecastDay[];
-  locationName: string;
-  adcode: string;
-}) => {
+const handleWeatherUpdate = (payload: { liveWeather: LiveWeather; forecasts: ForecastDay[]; locationName: string }) => {
   liveWeather.value = payload.liveWeather;
   forecasts.value = payload.forecasts;
   locationName.value = payload.locationName;

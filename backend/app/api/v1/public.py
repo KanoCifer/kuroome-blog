@@ -424,3 +424,117 @@ async def get_pic_gallery(
         )
     except PublicDomainError as exc:
         return APIResponse.error(message=exc.message, code=exc.code)
+
+
+@router.get("/weather/now")
+async def get_current_weather(
+    request: Request,
+    location: str = Query(..., description="Location coordinates: lng,lat"),
+    redis: AsyncRedis = Depends(get_redis),
+    public_service: PublicService = Depends(public_service_dep),
+) -> JSONResponse:
+    """通过经纬度坐标获取当前的天气信息。"""
+    try:
+        data = await public_service.get_current_weather(
+            location=location, redis=redis
+        )
+        return APIResponse.ok(
+            data=data,
+            message="Current weather retrieved successfully",
+        )
+    except PublicDomainError as exc:
+        return APIResponse.error(message=exc.message, code=exc.code)
+    except Exception as exc:
+        return APIResponse.error(
+            message=f"Failed to retrieve current weather: {exc!s}",
+            code=500,
+        )
+
+
+@router.get("/geo/v2/poi/lookup")
+async def get_poi_lookup(
+    request: Request,
+    location: str = Query(..., description="Location coordinates: lng,lat"),
+    redis: AsyncRedis = Depends(get_redis),
+    public_service: PublicService = Depends(public_service_dep),
+) -> JSONResponse:
+    """通过经纬度坐标获取兴趣点信息。"""
+    try:
+        data = await public_service.get_poi_lookup(
+            location=location, redis=redis
+        )
+        return APIResponse.ok(
+            data=data,
+            message="POI information retrieved successfully",
+        )
+    except PublicDomainError as exc:
+        return APIResponse.error(message=exc.message, code=exc.code)
+    except Exception as exc:
+        return APIResponse.error(
+            message=f"Failed to retrieve POI information: {exc!s}",
+            code=500,
+        )
+
+
+@router.get("/weather/{days}")
+async def get_weather_by_days(
+    request: Request,
+    days: int,
+    location: str = Query(..., description="Location coordinates: lng,lat"),
+    redis: AsyncRedis = Depends(get_redis),
+    public_service: PublicService = Depends(public_service_dep),
+) -> JSONResponse:
+    """
+    通过经纬度坐标获取未来几天的天气预报信息。
+    Args:
+        location: 经纬度坐标，格式为 "lng,lat"保留两位小数
+        days: 需要获取预报的天数，必须在1到14之间
+    """
+
+    try:
+        data = await public_service.get_weather_forecast(
+            location=location, days=days, redis=redis
+        )
+        return APIResponse.ok(
+            data=data,
+            message=f"{days}-day weather forecast retrieved successfully",
+        )
+    except PublicDomainError as exc:
+        return APIResponse.error(message=exc.message, code=exc.code)
+    except Exception as exc:
+        return APIResponse.error(
+            message=f"Failed to retrieve weather forecast: {exc!s}",
+            code=500,
+        )
+
+
+@router.get("/weather/hourly/{hours}")
+async def get_hourly_weather(
+    request: Request,
+    hours: int,
+    location: str = Query(..., description="Location coordinates: lng,lat"),
+    redis: AsyncRedis = Depends(get_redis),
+    public_service: PublicService = Depends(public_service_dep),
+) -> JSONResponse:
+    """
+    通过经纬度坐标获取未来几小时的天气预报信息。
+    Args:
+        location: 经纬度坐标，格式为 "lng,lat"保留两位小数
+        hours: 需要获取预报的小时数，必须在1到24之间
+    """
+
+    try:
+        data = await public_service.get_hourly_weather(
+            location=location, hours=hours, redis=redis
+        )
+        return APIResponse.ok(
+            data=data,
+            message=f"{hours}-hour weather forecast retrieved successfully",
+        )
+    except PublicDomainError as exc:
+        return APIResponse.error(message=exc.message, code=exc.code)
+    except Exception as exc:
+        return APIResponse.error(
+            message=f"Failed to retrieve hourly weather forecast: {exc!s}",
+            code=500,
+        )

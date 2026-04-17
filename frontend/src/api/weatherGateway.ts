@@ -1,5 +1,6 @@
 import request from "@/api/request";
 
+// Tide
 export interface TideResponse {
   code: string;
   updateTime: string;
@@ -7,68 +8,135 @@ export interface TideResponse {
   tideHourly: Array<{ fxTime: string; height: string }>;
 }
 
-export interface GeocodeResponse {
-  status: string;
-  regeocode?: {
-    addressComponent: {
-      adcode: string;
-    };
-  };
-  address?: string;
-  location?: { lat: number; lng: number };
+// QWeather POI
+export interface PoiItem {
+  name: string;
+  id: string;
+  lat: string;
+  lon: string;
+  adm2: string;
+  adm1: string;
+  country: string;
+  tz: string;
+  utcOffset: string;
+  isDst: string;
+  type: string;
+  rank: string;
+  fxLink: string;
+}
+
+export interface PoiResponse {
+  poi?: PoiItem[];
+}
+
+// QWeather 实时天气
+export interface WeatherNow {
+  obsTime: string;
+  temp: string;
+  feelsLike: string;
+  icon: string;
+  text: string;
+  wind360: string;
+  windDir: string;
+  windScale: string;
+  windSpeed: string;
+  humidity: string;
+  precip: string;
+  pressure: string;
+  vis: string;
+  cloud: string;
+  dew: string;
 }
 
 export interface WeatherLiveResponse {
-  status: string;
-  lives?: Array<{
-    city: string;
-    temp: string;
-    text: string;
-    windDir: string;
-    humidity: string;
-  }>;
+  code: string;
+  updateTime: string;
+  fxLink: string;
+  now?: WeatherNow;
+  refer?: {
+    sources?: string[];
+    license?: string[];
+  };
+}
+
+// QWeather 天气预报
+export interface WeatherDay {
+  fxDate: string;
+  sunrise: string;
+  sunset: string;
+  moonrise: string;
+  moonset: string;
+  moonPhase: string;
+  moonPhaseIcon: string;
+  tempMax: string;
+  tempMin: string;
+  iconDay: string;
+  textDay: string;
+  iconNight: string;
+  textNight: string;
+  wind360Day: string;
+  windDirDay: string;
+  windScaleDay: string;
+  windSpeedDay: string;
+  wind360Night: string;
+  windDirNight: string;
+  windScaleNight: string;
+  windSpeedNight: string;
+  humidity: string;
+  precip: string;
+  pressure: string;
+  vis: string;
+  cloud: string;
+  uvIndex: string;
 }
 
 export interface WeatherForecastResponse {
-  status: string;
-  forecasts?: Array<{
-    casts?: Array<{
-      date: string;
-      dayWeather: string;
-      nightWeather: string;
-      dayTemp: string;
-      nightTemp: string;
-      dayWind: string;
-      nightWind: string;
-    }>;
-  }>;
+  code: string;
+  updateTime: string;
+  fxLink: string;
+  daily?: WeatherDay[];
+  refer?: {
+    sources?: string[];
+    license?: string[];
+  };
 }
 
 export interface WeatherGateway {
   getTide(payload: { harbor: string; date: string }): Promise<TideResponse>;
-  reverseGeocode(payload: { location: string; extensions: "base" | "all" }): Promise<GeocodeResponse>;
-  getWeather(payload: {
-    city: string;
-    extensions: "base" | "all";
-  }): Promise<WeatherLiveResponse | WeatherForecastResponse>;
+  getPOI(payload: { location: [number, number] }): Promise<PoiResponse>;
+  getWeatherLive(payload: { location: [number, number] }): Promise<WeatherLiveResponse>;
+  getWeatherForecast(payload: { location: [number, number]; days: number }): Promise<WeatherForecastResponse>;
 }
 
 export const weatherGateway: WeatherGateway = {
   async getTide(payload: { harbor: string; date: string }): Promise<TideResponse> {
-    const res = await request.get<{ data: TideResponse }>("v1/qweather/tide", { params: payload });
+    const res = await request.get<{ data: TideResponse }>("v1/qweather/tide", {
+      params: payload,
+    });
     return res.data.data;
   },
 
-  async reverseGeocode(payload: { location: string; extensions: "base" | "all" }): Promise<GeocodeResponse> {
-    const res = await request.post<{ data: GeocodeResponse }>("v1/geocode/regeo", payload);
+  async getPOI(payload: { location: [number, number] }): Promise<PoiResponse> {
+    const [lng, lat] = payload.location;
+    const res = await request.get<{ data: PoiResponse }>("v1/geo/v2/poi/lookup", {
+      params: { location: `${lng.toFixed(2)},${lat.toFixed(2)}` },
+    });
     return res.data.data;
   },
 
-  async getWeather(payload: {
-    city: string;
-    extensions: "base" | "all";
-  }): Promise<WeatherLiveResponse | WeatherForecastResponse> {
-    const res = await request.post<{ data: WeatherLiveResponse | WeatherForecastResponse }>("v1/weather", payload);
+  async getWeatherLive(payload: { location: [number, number] }): Promise<WeatherLiveResponse> {
+    const [lng, lat] = payload.location;
+    const res = await request.get<{ data: WeatherLiveResponse }>("v1/weather/now", {
+      params: { location: `${lng.toFixed(2)},${lat.toFixed(2)}` },
+    });
+    return res.data.data;
+  },
+
+  async getWeatherForecast(payload: { location: [number, number]; days: number }): Promise<WeatherForecastResponse> {
+    const [lng, lat] = payload.location;
+    const res = await request.get<{ data: WeatherForecastResponse }>(`v1/weather/${payload.days}`, {
+      params: { location: `${lng.toFixed(2)},${lat.toFixed(2)}` },
+    });
     return res.data.data;
   },
 };

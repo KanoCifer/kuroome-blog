@@ -25,10 +25,11 @@ import type {
   AMapPolyline,
   AMapSecurityConfig,
   AnalysisPayload,
-  ForecastDay,
   GeolocationResult,
-  LiveWeather,
   RouteInfo,
+  TideData,
+  WeatherDay,
+  WeatherNow,
 } from './types';
 
 declare global {
@@ -109,9 +110,11 @@ export default function FishingMap() {
   const [analysisError, setAnalysisError] = useState('');
   const [analysisResult, setAnalysisResult] = useState('');
 
-  const [liveWeather, setLiveWeather] = useState<LiveWeather | null>(null);
-  const [forecasts, setForecasts] = useState<ForecastDay[]>([]);
+  const [liveWeather, setLiveWeather] = useState<WeatherNow | null>(null);
+  const [forecasts, setForecasts] = useState<WeatherDay[]>([]);
   const [locationName, setLocationName] = useState('');
+  const [tideData, setTideData] = useState<TideData | null>(null);
+  const [tideSpotName, setTideSpotName] = useState('');
 
   const analysisPayload = useMemo<AnalysisPayload | null>(() => {
     if (!liveWeather && forecasts.length === 0) {
@@ -121,11 +124,11 @@ export default function FishingMap() {
     return {
       liveWeather,
       forecasts,
-      tideData: null,
-      locationName: locationName || liveWeather?.city || '钓鱼地点',
-      tideSpotName: '',
+      tideData: tideData,
+      locationName: locationName || '钓鱼地点',
+      tideSpotName: tideSpotName || '黄埔港',
     };
-  }, [forecasts, liveWeather, locationName]);
+  }, [forecasts, liveWeather, locationName, tideData, tideSpotName]);
 
   const analysisHasData = useMemo(() => {
     return Boolean(liveWeather) || forecasts.length > 0;
@@ -257,13 +260,21 @@ export default function FishingMap() {
 
   const handleWeatherUpdate = useCallback(
     (payload: {
-      liveWeather: LiveWeather | null;
-      forecasts: ForecastDay[];
+      liveWeather: WeatherNow | null;
+      forecasts: WeatherDay[];
       locationName: string;
     }) => {
       setLiveWeather(payload.liveWeather);
       setForecasts(payload.forecasts);
       setLocationName(payload.locationName);
+    },
+    [],
+  );
+
+  const handleTideUpdate = useCallback(
+    (payload: { tideData: TideData | null; tideSpotName: string }) => {
+      setTideData(payload.tideData);
+      setTideSpotName(payload.tideSpotName);
     },
     [],
   );
@@ -485,7 +496,7 @@ export default function FishingMap() {
               location={MAP_CENTER}
               onWeatherUpdate={handleWeatherUpdate}
             />
-            <TideCard />
+            <TideCard onTideUpdate={handleTideUpdate} />
           </div>
         </section>
 

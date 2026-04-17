@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import re
 from collections.abc import AsyncIterator
+from typing import Literal
 
 from agno.agent import Agent, RunOutputEvent
 from agno.db.base import SessionType
@@ -439,8 +440,8 @@ class WeatherAnalyzer:
         if live:
             lines.append(
                 f"【实时天气】{data.get('locationName', '')} "
-                f"气温 {live.get('temperature')}°C，{live.get('weather')}，"
-                f"风向 {live.get('winddirection')} {live.get('windpower')} 级，"
+                f"气温 {live.get('temp')}°C，{live.get('text')}，"
+                f"风向 {live.get('wind360')} {live.get('windScale')} 级，"
                 f"湿度 {live.get('humidity')}%"
             )
 
@@ -463,7 +464,9 @@ class WeatherAnalyzer:
             if table:
                 lines.append("  高低潮时刻：")
                 for t in table:
-                    tag = "高潮" if t.get("type") == "H" else "低潮"
+                    tag: Literal["高潮"] | Literal["低潮"] = (
+                        "高潮" if t.get("type") == "H" else "低潮"
+                    )
                     lines.append(
                         f"    {tag} {t.get('fxTime')} {t.get('height')}m"
                     )

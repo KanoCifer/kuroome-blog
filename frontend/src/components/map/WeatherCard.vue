@@ -14,16 +14,19 @@
     <!-- Header -->
     <div class="relative z-10 mb-4 flex items-start justify-between">
       <div>
-        <h3 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">实时天气</h3>
-        <p class="mt-1 text-gray-500 dark:text-gray-400">
-          {{ liveWeather?.city || "钓鱼地点" }}
+        <h3 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
+          实时天气
+          <span class="ml-2 text-xs text-gray-500 dark:text-gray-400">点击跳转和风天气</span>
+        </h3>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          {{ locationName || "钓鱼地点" }}
         </p>
       </div>
       <div
         class="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-sky-400 to-blue-500 shadow-lg shadow-sky-500/25 transition-transform duration-300 group-hover:scale-110"
       >
-        <span v-if="liveWeather" class="text-2xl drop-shadow-sm">
-          {{ getWeatherIcon(liveWeather.weather) }}
+        <span v-if="liveWeather" class="text-2xl">
+          <i :class="`qi-${liveWeather.icon}`" class="text-2xl" />
         </span>
         <svg
           v-else
@@ -84,14 +87,14 @@
           <span
             class="bg-linear-to-br from-gray-900 to-gray-600 bg-clip-text text-5xl font-bold tracking-tight text-transparent dark:from-white dark:to-gray-300"
           >
-            {{ liveWeather.temperature }}
+            {{ liveWeather.temp }}
           </span>
           <span class="text-2xl font-light text-gray-400">°C</span>
         </div>
         <span
           class="inline-block rounded-full bg-sky-100 px-3 py-1 font-medium text-sky-700 dark:bg-sky-900/40 dark:text-sky-300"
         >
-          {{ liveWeather.weather }}
+          {{ liveWeather.text }}
         </span>
       </div>
 
@@ -111,7 +114,7 @@
             <span class="text-xs">风向</span>
           </div>
           <p class="text-center text-xs font-semibold text-gray-900 dark:text-white">
-            {{ liveWeather.winddirection }}
+            {{ liveWeather.windDir }}
           </p>
         </div>
         <div class="rounded-xl bg-white/50 p-2.5 dark:bg-gray-800/50">
@@ -127,7 +130,7 @@
             </svg>
             <span class="text-xs">风力</span>
           </div>
-          <p class="text-center text-xs font-semibold text-gray-900 dark:text-white">{{ liveWeather.windpower }}级</p>
+          <p class="text-center text-xs font-semibold text-gray-900 dark:text-white">{{ liveWeather.windScale }}级</p>
         </div>
         <div class="rounded-xl bg-white/50 p-2.5 dark:bg-gray-800/50">
           <div class="mb-1 flex items-center justify-center gap-1 text-gray-400">
@@ -173,14 +176,16 @@
         <div class="grid grid-cols-4 gap-2">
           <div
             v-for="day in forecasts.slice(0, 4)"
-            :key="day.date"
+            :key="day.fxDate"
             class="rounded-lg bg-white/40 p-2 text-center dark:bg-gray-800/40"
           >
             <p class="mb-1 text-xs text-gray-500 dark:text-gray-400">
-              {{ day.date }}
+              {{ day.fxDate }}
             </p>
-            <p class="mb-1 text-lg">{{ getWeatherIcon(day.dayweather) }}</p>
-            <p class="text-xs font-medium text-gray-900 dark:text-white">{{ day.daytemp }}° / {{ day.nighttemp }}°</p>
+            <p class="mb-1 text-lg">
+              <i :class="`qi-${day.iconDay}`" />
+            </p>
+            <p class="text-xs font-medium text-gray-900 dark:text-white">{{ day.tempMax }}° / {{ day.tempMin }}°</p>
           </div>
         </div>
         <div>
@@ -190,7 +195,7 @@
 
       <!-- Update Time -->
       <div class="mt-3 text-center">
-        <span class="text-xs text-gray-400"> 更新于 {{ liveWeather.reporttime }} </span>
+        <span class="text-xs text-gray-400"> 更新于 {{ liveWeather.obsTime }} </span>
       </div>
     </div>
 
@@ -223,28 +228,21 @@ import { weatherService } from "@/service/weatherService";
 import { onMounted, ref } from "vue";
 
 interface LiveWeather {
-  province: string;
-  city: string;
-  adcode: string;
-  weather: string;
-  temperature: string;
-  winddirection: string;
-  windpower: string;
+  obsTime: string;
+  temp: string;
+  text: string;
+  windDir: string;
+  windScale: string;
   humidity: string;
-  reporttime: string;
+  icon: string;
 }
 
 interface ForecastDay {
-  date: string;
-  week: string;
-  dayweather: string;
-  nightweather: string;
-  daytemp: string;
-  nighttemp: string;
-  daywind: string;
-  nightwind: string;
-  daypower: string;
-  nightpower: string;
+  fxDate: string;
+  tempMax: string;
+  tempMin: string;
+  textDay: string;
+  iconDay: string;
 }
 
 const props = withDefaults(
@@ -263,28 +261,15 @@ const emit = defineEmits<{
       liveWeather: LiveWeather;
       forecasts: ForecastDay[];
       locationName: string;
-      adcode: string;
     },
   ): void;
 }>();
 
 const liveWeather = ref<LiveWeather | null>(null);
 const forecasts = ref<ForecastDay[]>([]);
+const locationName = ref("");
 const isLoading = ref(false);
 const error = ref<string | null>(null);
-
-// 天气图标映射
-const getWeatherIcon = (weather: string): string => {
-  if (weather.includes("晴")) return "☀️";
-  if (weather.includes("多云")) return "⛅";
-  if (weather.includes("阴")) return "☁️";
-  if (weather.includes("雷")) return "⛈️";
-  if (weather.includes("雨")) return "🌧️";
-  if (weather.includes("雪")) return "❄️";
-  if (weather.includes("风")) return "💨";
-  if (weather.includes("雾") || weather.includes("霾")) return "🌫️";
-  return "🌤️";
-};
 
 // 获取天气信息
 const fetchWeather = async (location: [number, number]) => {
@@ -292,73 +277,33 @@ const fetchWeather = async (location: [number, number]) => {
   error.value = null;
 
   try {
-    // 首先进行逆地理编码获取城市adcode
-    const regeoResponse = await weatherService.reverseGeocode({
-      location: `${location[0]},${location[1]}`,
-      extensions: "base",
-    });
+    const [poiData, weatherLive, weatherForecast] = await Promise.all([
+      weatherService.getPOI({ location }),
+      weatherService.getWeatherLive({ location }),
+      weatherService.getWeatherForecast({ location, days: 3 }),
+    ]);
 
-    const regeoData = regeoResponse;
-    if (regeoData?.status !== "1" || !regeoData?.regeocode?.addressComponent?.adcode) {
-      throw new Error("无法获取城市信息");
-    }
+    locationName.value = poiData?.name || "钓鱼地点";
 
-    const adcode = regeoData.regeocode.addressComponent.adcode;
-
-    // 获取实况天气
-    const liveResponse = await weatherService.getWeather({
-      city: adcode,
-      extensions: "base",
-    });
-
-    const liveResult = liveResponse as {
-      status: string;
-      lives?: LiveWeather[];
-    };
-    if (liveResult?.status === "1" && liveResult?.lives && liveResult.lives.length > 0) {
-      const live = liveResult.lives[0]!;
+    if (weatherLive.now) {
       liveWeather.value = {
-        province: live.province ?? "",
-        city: live.city ?? "",
-        adcode: live.adcode ?? "",
-        weather: live.weather ?? "",
-        temperature: live.temperature ?? "",
-        winddirection: live.winddirection ?? "",
-        windpower: live.windpower ?? "",
-        humidity: live.humidity ?? "",
-        reporttime: live.reporttime ?? "",
+        obsTime: weatherLive.now.obsTime || "",
+        temp: weatherLive.now.temp || "",
+        text: weatherLive.now.text || "",
+        windDir: weatherLive.now.windDir || "",
+        windScale: weatherLive.now.windScale || "",
+        humidity: weatherLive.now.humidity || "",
+        icon: weatherLive.now.icon || "",
       };
-    } else {
-      throw new Error("无法获取天气信息");
     }
 
-    // 获取预报天气
-    const forecastResponse = await weatherService.getWeather({
-      city: adcode,
-      extensions: "all",
-    });
-
-    const forecastResult = forecastResponse as {
-      status: string;
-      forecasts?: Array<{ casts?: ForecastDay[] }>;
-    };
-    if (
-      forecastResult?.status === "1" &&
-      forecastResult?.forecasts &&
-      forecastResult.forecasts.length > 0 &&
-      forecastResult.forecasts[0]?.casts
-    ) {
-      forecasts.value = forecastResult.forecasts[0].casts.map((cast) => ({
-        date: cast.date,
-        week: cast.week ?? "",
-        dayweather: cast.dayweather ?? "",
-        nightweather: cast.nightweather ?? "",
-        daytemp: cast.daytemp ?? "",
-        nighttemp: cast.nighttemp ?? "",
-        daywind: cast.daywind ?? "",
-        nightwind: cast.nightwind ?? "",
-        daypower: cast.daypower ?? "",
-        nightpower: cast.nightpower ?? "",
+    if (weatherForecast.daily) {
+      forecasts.value = weatherForecast.daily.slice(0, 4).map((day) => ({
+        fxDate: day.fxDate || "",
+        tempMax: day.tempMax || "",
+        tempMin: day.tempMin || "",
+        textDay: day.textDay || "",
+        iconDay: day.iconDay || "",
       }));
     }
 
@@ -366,8 +311,7 @@ const fetchWeather = async (location: [number, number]) => {
       emit("update", {
         liveWeather: liveWeather.value,
         forecasts: forecasts.value,
-        locationName: liveWeather.value.city || "钓鱼地点",
-        adcode,
+        locationName: locationName.value,
       });
     }
   } catch (err) {

@@ -16,6 +16,7 @@ from app.schemas.gallery import GalleryInput
 from app.utils.qweather_jwt import generate_qweather_jwt
 
 _FRONTEND_URL = get_settings().FRONTEND_URL.rstrip("/")
+_QWEATHER_BASE_URL = get_settings().QWEATHER_BASE_URL.rstrip("/")
 
 
 class PublicDomainError(Exception):
@@ -202,7 +203,7 @@ Sitemap: {sitemap_url}
         if cached_data:
             return orjson.loads(cached_data), True
 
-        url = "https://qk2tupqwuj.re.qweatherapi.com/v7/ocean/tide"
+        url = _QWEATHER_BASE_URL + "/v7/ocean/tide"
         headers = {"Authorization": f"Bearer {encoded_jwt}"}
         payload = {
             "location": harbor,
@@ -308,3 +309,165 @@ Sitemap: {sitemap_url}
             orjson.loads(image)
             for image in await redis.lrange("pic_gallery:images", 0, -1)  # type: ignore
         ]  # type: ignore
+
+    async def get_weather_forecast(
+        self, location: str, days: int, redis: AsyncRedis
+    ) -> dict:
+        """获取天气预报"""
+
+        # 缓存键格式：qweather:forecast:{location}:{days}d
+        cache_key = f"qweather:forecast:{location}:{days}d"
+        cached_data = await redis.get(cache_key)
+        if cached_data:
+            return orjson.loads(cached_data)
+
+        url = f"{_QWEATHER_BASE_URL}/v7/weather/{days}d"
+
+        encoded_jwt = await PublicService.get_qweather_jwt(redis)
+        headers = {"Authorization": f"Bearer {encoded_jwt}"}
+        params = {"location": location}
+
+        try:
+            async with httpx.AsyncClient() as client:
+                res = await client.get(
+                    url=url,
+                    headers=headers,
+                    params=params,
+                )
+                res.raise_for_status()
+
+                # 缓存数据，过期时间为1小时
+                await redis.set(cache_key, orjson.dumps(res.json()), ex=3600)
+                return res.json()
+        except httpx.HTTPStatusError as exc:
+            response = exc.response
+            raise PublicDomainError(
+                f"QWeather API error: {response.status_code} - {response.text}",
+                response.status_code,
+            ) from exc
+        except httpx.HTTPError as exc:
+            raise PublicDomainError(
+                f"Failed to fetch QWeather forecast: {exc!s}",
+                503,
+            ) from exc
+
+    async def get_current_weather(
+        self, location: str, redis: AsyncRedis
+    ) -> dict:
+        """获取当前天气"""
+
+        # 缓存键格式：qweather:current:{location}
+        cache_key = f"qweather:current:{location}"
+        cached_data = await redis.get(cache_key)
+        if cached_data:
+            return orjson.loads(cached_data)
+
+        url = f"{_QWEATHER_BASE_URL}/v7/weather/now"
+
+        encoded_jwt = await PublicService.get_qweather_jwt(redis)
+        headers = {"Authorization": f"Bearer {encoded_jwt}"}
+        params = {"location": location}
+
+        try:
+            async with httpx.AsyncClient() as client:
+                res = await client.get(
+                    url=url,
+                    headers=headers,
+                    params=params,
+                )
+                res.raise_for_status()
+
+                # 缓存数据，过期时间为30分钟
+                await redis.set(cache_key, orjson.dumps(res.json()), ex=600)
+                return res.json()
+        except httpx.HTTPStatusError as exc:
+            response = exc.response
+            raise PublicDomainError(
+                f"QWeather API error: {response.status_code} - {response.text}",
+                response.status_code,
+            ) from exc
+        except httpx.HTTPError as exc:
+            raise PublicDomainError(
+                f"Failed to fetch QWeather current weather: {exc!s}",
+                503,
+            ) from exc
+
+    async def get_poi_lookup(self, location: str, redis: AsyncRedis) -> dict:
+        """获取地理位置信息"""
+
+        # 缓存键格式：qweather:poi:{location}:{type}
+        cache_key = f"qweather:poi:{location}:scenic"
+        cached_data = await redis.get(cache_key)
+        if cached_data:
+            return orjson.loads(cached_data)
+
+        url = f"{_QWEATHER_BASE_URL}/geo/v2/poi/lookup"
+        encoded_jwt = await PublicService.get_qweather_jwt(redis)
+        headers = {"Authorization": f"Bearer {encoded_jwt}"}
+        params = {"location": location, "type": "scenic"}
+
+        try:
+            async with httpx.AsyncClient() as client:
+                res = await client.get(
+                    url=url,
+                    headers=headers,
+                    params=params,
+                )
+                res.raise_for_status()
+
+                # 缓存数据，过期时间为1天
+                await redis.set(
+                    cache_key, orjson.dumps(res.json()), ex=24 * 3600
+                )
+                return res.json()
+        except httpx.HTTPStatusError as exc:
+            response = exc.response
+            raise PublicDomainError(
+                f"QWeather API error: {response.status_code} - {response.text}",
+                response.status_code,
+            ) from exc
+        except httpx.HTTPError as exc:
+            raise PublicDomainError(
+                f"Failed to fetch QWeather POI lookup: {exc!s}",
+                503,
+            ) from exc
+
+    async def get_hourly_weather(
+        self, location: str, hours: int, redis: AsyncRedis
+    ) -> dict:
+        """获取逐小时天气预报"""
+
+        # 缓存键格式：qweather:hourly:{location}
+        cache_key = f"qweather:hourly:{location}"
+        cached_data = await redis.get(cache_key)
+        if cached_data:
+            return orjson.loads(cached_data)
+
+        url = f"{_QWEATHER_BASE_URL}/v7/weather/{hours}h"
+        encoded_jwt = await PublicService.get_qweather_jwt(redis)
+        headers = {"Authorization": f"Bearer {encoded_jwt}"}
+        params = {"location": location}
+
+        try:
+            async with httpx.AsyncClient() as client:
+                res = await client.get(
+                    url=url,
+                    headers=headers,
+                    params=params,
+                )
+                res.raise_for_status()
+
+                # 缓存数据，过期时间为1小时
+                await redis.set(cache_key, orjson.dumps(res.json()), ex=1800)
+                return res.json()
+        except httpx.HTTPStatusError as exc:
+            response = exc.response
+            raise PublicDomainError(
+                f"QWeather API error: {response.status_code} - {response.text}",
+                response.status_code,
+            ) from exc
+        except httpx.HTTPError as exc:
+            raise PublicDomainError(
+                f"Failed to fetch QWeather hourly weather: {exc!s}",
+                503,
+            ) from exc

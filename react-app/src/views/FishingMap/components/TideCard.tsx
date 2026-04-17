@@ -15,7 +15,14 @@ const HARBOR_OPTIONS = [
   { code: 'P2609', name: '东沙' },
 ];
 
-export function TideCard() {
+interface TideCardProps {
+  onTideUpdate?: (payload: {
+    tideData: TideData | null;
+    tideSpotName: string;
+  }) => void;
+}
+
+export function TideCard({ onTideUpdate }: TideCardProps) {
   const notifyError = useNotificationStore((state) => state.error);
   const service = useMemo(() => fishingMapService(), []);
 
@@ -187,13 +194,17 @@ export function TideCard() {
         const result = await service.fetchTideData({ harbor, date });
         setTideData(result.tideData);
         setTideSpotName(result.tideSpotName);
+        onTideUpdate?.({
+          tideData: result.tideData,
+          tideSpotName: result.tideSpotName,
+        });
       } catch {
         notifyError('获取潮汐信息失败，请稍后重试');
       } finally {
         setTideLoading(false);
       }
     },
-    [notifyError, service],
+    [notifyError, onTideUpdate, service],
   );
 
   useEffect(() => {

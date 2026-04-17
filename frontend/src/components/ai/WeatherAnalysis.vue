@@ -13,28 +13,21 @@ marked.setOptions({
 });
 
 interface LiveWeather {
-  province: string;
-  city: string;
-  adcode: string;
-  weather: string;
-  temperature: string;
-  winddirection: string;
-  windpower: string;
+  obsTime: string;
+  temp: string;
+  text: string;
+  windDir: string;
+  windScale: string;
   humidity: string;
-  reporttime: string;
+  icon: string;
 }
 
 interface ForecastDay {
-  date: string;
-  week: string;
-  dayweather: string;
-  nightweather: string;
-  daytemp: string;
-  nighttemp: string;
-  daywind: string;
-  nightwind: string;
-  daypower: string;
-  nightpower: string;
+  fxDate: string;
+  tempMax: string;
+  tempMin: string;
+  textDay: string;
+  iconDay: string;
 }
 
 interface TideData {
@@ -101,7 +94,7 @@ const payload = computed(() => {
     liveWeather: data.liveWeather ?? null,
     forecasts: data.forecasts ?? [],
     tideData: data.tideData ?? null,
-    locationName: data.locationName ?? data.liveWeather?.city ?? "钓鱼地点",
+    locationName: data.locationName ?? "钓鱼地点",
     tideSpotName: data.tideSpotName ?? "潮汐点位",
     generatedAt: dayjs().format("YYYY-MM-DD HH:mm:ss"),
   };
@@ -355,7 +348,7 @@ onUnmounted(() => {
       </div>
 
       <div class="mt-3 text-xs text-gray-400">
-        天气更新: {{ normalizedData?.liveWeather?.reporttime ?? "--" }}<br />
+        天气更新: {{ normalizedData?.liveWeather?.obsTime ?? "--" }}<br />
         潮汐更新: {{ formatDate(normalizedData?.tideData?.updateTime) ?? "--" }}
       </div>
     </div>

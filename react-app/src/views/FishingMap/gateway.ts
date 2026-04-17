@@ -4,17 +4,13 @@ import request from '@/api/request';
 
 import type {
   ApiEnvelope,
+  PoiResponse,
   RegeoResponseData,
   SecurityKeyResponse,
   TideData,
-  WeatherForecastResponseData,
-  WeatherLiveResponseData,
+  WeatherForecastResponse,
+  WeatherLiveResponse,
 } from './types';
-
-interface WeatherRequestPayload {
-  city: string;
-  extensions: 'base' | 'all';
-}
 
 interface RegeoRequestPayload {
   location: string;
@@ -26,17 +22,23 @@ export interface fishingMapGateway {
   getRegeo(
     payload: RegeoRequestPayload,
   ): Promise<AxiosResponse<ApiEnvelope<RegeoResponseData>>>;
-  getWeather(
-    payload: WeatherRequestPayload,
-  ): Promise<
-    AxiosResponse<
-      ApiEnvelope<WeatherLiveResponseData | WeatherForecastResponseData>
-    >
-  >;
   getTide(payload?: {
     harbor: string;
     date: string;
   }): Promise<AxiosResponse<ApiEnvelope<TideData>>>;
+
+  getWeatherForecast(payload: {
+    location: [number, number];
+    days: number;
+  }): Promise<AxiosResponse<ApiEnvelope<WeatherForecastResponse>>>;
+
+  getWeatherLive(payload: {
+    location: [number, number];
+  }): Promise<AxiosResponse<ApiEnvelope<WeatherLiveResponse>>>;
+
+  getPOI(payload: {
+    location: [number, number];
+  }): Promise<AxiosResponse<ApiEnvelope<PoiResponse>>>;
 }
 
 export const fishingMapGateway = (): fishingMapGateway => {
@@ -53,18 +55,36 @@ export const fishingMapGateway = (): fishingMapGateway => {
       >;
     },
 
-    async getWeather(payload: WeatherRequestPayload) {
-      return request.post('v1/weather', payload) as Promise<
-        AxiosResponse<
-          ApiEnvelope<WeatherLiveResponseData | WeatherForecastResponseData>
-        >
-      >;
-    },
-
     async getTide(payload?: { harbor: string; date: string }) {
       return request.get('v1/qweather/tide', { params: payload }) as Promise<
         AxiosResponse<ApiEnvelope<TideData>>
       >;
+    },
+
+    async getWeatherForecast(payload: {
+      location: [number, number];
+      days: number;
+    }) {
+      const [lng, lat] = payload.location;
+      const params = { location: `${lng.toFixed(2)},${lat.toFixed(2)}` };
+
+      return request.get(`v1/weather/${payload.days}`, {
+        params: params,
+      }) as Promise<AxiosResponse<ApiEnvelope<WeatherForecastResponse>>>;
+    },
+
+    async getWeatherLive(payload: { location: [number, number] }) {
+      const [lng, lat] = payload.location;
+      return request.get('v1/weather/now', {
+        params: { location: `${lng.toFixed(2)},${lat.toFixed(2)}` },
+      }) as Promise<AxiosResponse<ApiEnvelope<WeatherLiveResponse>>>;
+    },
+
+    async getPOI(payload: { location: [number, number] }) {
+      const [lng, lat] = payload.location;
+      return request.get('v1/geo/v2/poi/lookup', {
+        params: { location: `${lng.toFixed(2)},${lat.toFixed(2)}` },
+      }) as Promise<AxiosResponse<ApiEnvelope<PoiResponse>>>;
     },
   };
 };

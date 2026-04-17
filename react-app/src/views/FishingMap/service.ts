@@ -2,11 +2,14 @@ import { DEFAULT_TIDE_SPOT_NAME } from './constants';
 import { fishingMapGateway } from './gateway';
 import type {
   AnalysisPayload,
+  PoiItem,
+  PoiResponse,
   SecurityKeyResponse,
   TideData,
-  WeatherAndLocationData,
-  WeatherForecastResponseData,
-  WeatherLiveResponseData,
+  WeatherDay,
+  WeatherForecastResponse,
+  WeatherLiveResponse,
+  WeatherNow,
 } from './types';
 
 interface AnalysisChunk {
@@ -15,9 +18,6 @@ interface AnalysisChunk {
 
 export interface FishingMapService {
   getSecurityJsCode(): Promise<string>;
-  fetchWeatherAndLocation(
-    location: [number, number],
-  ): Promise<WeatherAndLocationData>;
   fetchTideData(payload?: {
     harbor: string;
     date: string;
@@ -27,9 +27,18 @@ export interface FishingMapService {
     onChunk: (content: string) => void,
     signal?: AbortSignal,
   ): Promise<void>;
-}
 
-const weatherError = (reason: string): Error => new Error(reason);
+  fetchWeatherForecast(payload: {
+    location: [number, number];
+    days: number;
+  }): Promise<{ updateTime?: string; daily?: WeatherDay[] }>;
+  fetchWeatherLive(payload: {
+    location: [number, number];
+  }): Promise<{ updateTime?: string; now?: WeatherNow }>;
+  fetchPOI(payload: {
+    location: [number, number];
+  }): Promise<PoiItem | undefined>;
+}
 
 export const fishingMapService = (): FishingMapService => {
   const gateway = fishingMapGateway();
@@ -41,51 +50,6 @@ export const fishingMapService = (): FishingMapService => {
         (securityResponse.data.data as SecurityKeyResponse | undefined)
           ?.securityJsCode ?? '';
       return encodedKey ? atob(encodedKey) : '';
-    },
-
-    async fetchWeatherAndLocation(
-      location: [number, number],
-    ): Promise<WeatherAndLocationData> {
-      const locationString = `${location[0]},${location[1]}`;
-      const regeoResponse = await gateway.getRegeo({
-        location: locationString,
-        extensions: 'base',
-      });
-
-      const regeoData = regeoResponse.data.data;
-      const adcode = regeoData?.regeocode?.addressComponent?.adcode;
-      if (regeoData?.status !== '1' || !adcode) {
-        throw weatherError('无法获取城市编码');
-      }
-
-      const liveResponse = await gateway.getWeather({
-        city: adcode,
-        extensions: 'base',
-      });
-      const liveData = liveResponse.data.data as WeatherLiveResponseData;
-      if (liveData.status !== '1' || !liveData.lives?.length) {
-        throw weatherError('无法获取实时天气');
-      }
-
-      const liveWeather = liveData.lives[0];
-      const locationName = liveWeather.city || '钓鱼地点';
-
-      const forecastResponse = await gateway.getWeather({
-        city: adcode,
-        extensions: 'all',
-      });
-      const forecastData = forecastResponse.data
-        .data as WeatherForecastResponseData;
-      const forecasts =
-        forecastData.status === '1' && forecastData.forecasts?.length
-          ? (forecastData.forecasts[0]?.casts ?? [])
-          : [];
-
-      return {
-        liveWeather,
-        forecasts,
-        locationName,
-      };
     },
 
     async fetchTideData(payload?: { harbor: string; date: string }): Promise<{
@@ -155,6 +119,38 @@ export const fishingMapService = (): FishingMapService => {
           }
         }
       }
+    },
+
+    async fetchWeatherForecast(payload: {
+      location: [number, number];
+      days: number;
+    }): Promise<{ updateTime?: string; daily?: WeatherDay[] }> {
+      const res = await gateway.getWeatherForecast(payload);
+      const data = res.data.data as WeatherForecastResponse | undefined;
+      const updateTime = data?.updateTime;
+      const daily = data?.daily;
+
+      return { updateTime, daily };
+    },
+
+    async fetchWeatherLive(payload: {
+      location: [number, number];
+    }): Promise<{ updateTime?: string; now?: WeatherNow }> {
+      const res = await gateway.getWeatherLive(payload);
+      const data = res.data.data as WeatherLiveResponse | undefined;
+      const updateTime = data?.updateTime;
+      const now = data?.now;
+
+      return { updateTime, now };
+    },
+
+    async fetchPOI(payload: {
+      location: [number, number];
+    }): Promise<PoiItem | undefined> {
+      const res = await gateway.getPOI(payload);
+      const data = res.data.data as PoiResponse | undefined;
+      const poi = data?.poi?.[0];
+      return poi;
     },
   };
 };
