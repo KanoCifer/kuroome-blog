@@ -24,6 +24,52 @@
         </button>
       </div>
 
+      <!-- Analytics Buttons -->
+      <div class="mx-auto flex w-full max-w-md items-center justify-center gap-4">
+        <button
+          type="button"
+          @click="isPriceAnalyticsOpen = true"
+          class="inline-flex items-center justify-center gap-2 rounded-full bg-purple-700 px-6 py-3 text-sm font-bold text-white shadow-xl shadow-purple-500/30 transition-all hover:scale-[1.02] hover:bg-purple-800 active:scale-[0.98]"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="h-5 w-5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            />
+          </svg>
+          价格分布
+        </button>
+        <button
+          type="button"
+          @click="openDailyCostChart"
+          class="inline-flex items-center justify-center gap-2 rounded-full bg-green-700 px-6 py-3 text-sm font-bold text-white shadow-xl shadow-green-500/30 transition-all hover:scale-[1.02] hover:bg-green-800 active:scale-[0.98]"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="h-5 w-5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
+            />
+          </svg>
+          日均成本
+        </button>
+      </div>
+
       <!-- Loading State -->
       <div v-if="isLoading" class="col-span-full grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <div
@@ -97,6 +143,22 @@
     <Teleport to="body">
       <!-- Add Device Modal -->
       <AddDeviceModal v-model="isAddModalOpen" @success="handleAddSuccess" />
+
+      <!-- Price Analytics Chart -->
+      <PriceAnalyticsChart
+        v-model="isPriceAnalyticsOpen"
+        :data="devices"
+        :is-open="isPriceAnalyticsOpen"
+        :on-close="() => (isPriceAnalyticsOpen = false)"
+      />
+
+      <!-- Daily Cost Chart -->
+      <DailyCostChart
+        v-if="selectedDevice"
+        :data="selectedDevice"
+        :is-open="!!selectedDevice"
+        :on-close="() => (selectedDevice = null)"
+      />
     </Teleport>
   </BasicDetail>
 </template>
@@ -109,8 +171,10 @@ import { ref } from "vue";
 
 import BasicDetail from "@/components/basic/BasicDetail.vue";
 import AddDeviceModal from "./components/AddDeviceModal.vue";
+import DailyCostChart from "./components/DailyCostChart.vue";
 import DeviceList from "./components/DeviceList.vue";
 import DeviceSummary from "./components/DeviceSummary.vue";
+import PriceAnalyticsChart from "./components/PriceAnalyticsChart.vue";
 
 const notificationStore = useNotificationStore();
 
@@ -119,6 +183,8 @@ const isLoading = ref(true);
 const error = ref<string | null>(null);
 const pendingId = ref<number | null>(null);
 const isAddModalOpen = ref(false);
+const isPriceAnalyticsOpen = ref(false);
+const selectedDevice = ref<Device | null>(null);
 
 async function fetchDevices() {
   isLoading.value = true;
@@ -166,6 +232,12 @@ async function handleDeleteDevice(device: Device) {
 
 function handleAddSuccess(_device: DeviceInput) {
   void fetchDevices();
+}
+
+function openDailyCostChart() {
+  if (devices.value.length > 0) {
+    selectedDevice.value = devices.value[0];
+  }
 }
 
 // Initial fetch

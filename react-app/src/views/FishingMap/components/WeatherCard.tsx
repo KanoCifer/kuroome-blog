@@ -63,8 +63,11 @@ export function WeatherCard({
   return (
     <article
       onClick={openQWeather}
-      className="cursor-pointer rounded-2xl border border-white/40 bg-linear-to-br from-white/80 to-white/40 p-4 shadow-sm backdrop-blur-sm dark:border-gray-700/60 dark:from-gray-900/80 dark:to-gray-800/60"
+      className="relative cursor-pointer rounded-2xl border border-white/40 bg-gray-50/80 p-4 shadow-sm backdrop-blur-sm dark:border-gray-700/60 dark:from-gray-900/80 dark:to-gray-800/60"
     >
+      {/* 背景 */}
+      <div className="shadow-[0_4px_18px_oklch(80.9% 0.105 251.813)] absolute top-10 right-0 overflow-hidden rounded-full bg-blue-200 p-12 blur-2xl"></div>
+
       <div className="mb-3 flex items-center justify-between">
         <div>
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">

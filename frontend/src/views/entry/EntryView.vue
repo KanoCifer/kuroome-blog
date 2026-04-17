@@ -26,7 +26,7 @@
         v-if="show.BentoGreeting"
         :initial="{ scale: 0 }"
         :animate="{ scale: 1 }"
-        :style="[greetingPosition, moveStyle]"
+        :style="[greetingPosition]"
         class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2 cursor-pointer"
       />
       <BentoProfileCard
@@ -34,7 +34,7 @@
         :initial="{ scale: 0.5, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
         ref="boxRef"
-        :style="[profilePosition, moveStyle]"
+        :style="[profilePosition]"
         class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2"
       />
       <AnimatePresence>
@@ -50,7 +50,7 @@
             damping: 30,
           }"
           class="absolute w-68 -translate-x-1/2 -translate-y-1/2"
-          :style="[navCardPosition, moveStyleFast]"
+          :style="[navCardPosition]"
         />
       </AnimatePresence>
       <BentoClock
@@ -58,7 +58,7 @@
         :initial="{ scale: 0 }"
         :animate="{ scale: 1 }"
         ref="clockRef"
-        :style="[clockCardPosition, moveStyleFast]"
+        :style="[clockCardPosition]"
         class="absolute w-auto -translate-x-1/2 -translate-y-1/2"
       />
       <BentoCalendar
@@ -66,45 +66,41 @@
         :initial="{ scale: 0 }"
         :animate="{ scale: 1 }"
         ref="calRef"
-        :style="[calendarPosition, moveStyleFast]"
+        :style="[calendarPosition]"
         class="absolute w-2xs -translate-x-1/2 -translate-y-1/2"
       />
       <BentoMemo
         v-if="show.BentoMemo"
-        :style="[memoCardPosition, moveStyle]"
+        :style="[memoCardPosition]"
         class="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer"
       />
       <BentoNewPost
         v-if="show.BentoNewPost"
-        :style="[newCardPosition, moveStyle]"
+        :style="[newCardPosition]"
         class="absolute w-auto -translate-x-1/2 -translate-y-1/2"
       />
       <BentoTech
         v-if="show.BentoTech"
         :initial="{ scale: 0.5 }"
         :animate="{ scale: 1 }"
-        class="h-2xs absolute w-70 -translate-x-1/2 -translate-y-1/2 p-0!"
-        :style="[techPosition, moveStyleFast]"
+        class="h-2xs absolute w-68 -translate-x-1/2 -translate-y-1/2 p-0!"
+        :style="[techPosition]"
       />
       <BentoWebsites
         v-if="show.BentoWebsites"
         :initial="{ scale: 0.5 }"
         :animate="{ scale: 1 }"
         class="absolute w-68 -translate-x-1/2 -translate-y-1/2 p-0!"
-        :style="[websitesPosition, moveStyleFast]"
+        :style="[websitesPosition]"
       />
       <BentoReadingList
         v-if="show.BentoReadingList"
         :initial="{ scale: 0 }"
         :animate="{ scale: 1 }"
-        :style="[listCardPosition, moveStyle]"
+        :style="[listCardPosition]"
         class="absolute w-auto -translate-x-1/2 -translate-y-1/2 cursor-pointer"
       />
-      <BentoCat
-        v-if="show.BentoCat"
-        :style="[catPosition, moveStyle]"
-        class="absolute w-2xs -translate-x-1/2 -translate-y-1/2"
-      />
+      <BentoCat v-if="show.BentoCat" :style="[catPosition]" class="absolute w-2xs -translate-x-1/2 -translate-y-1/2" />
       <div
         v-if="show.TodoCard && showTodoCard"
         class="absolute top-1/2 -right-20 w-70 min-w-3xs -translate-x-1/2 -translate-y-1/2"
@@ -129,12 +125,12 @@
       </button>
       <BentoLike
         v-if="show.BentoLike"
-        :style="[likePosition, moveStyleFast]"
+        :style="[likePosition]"
         class="absolute w-fit -translate-x-1/2 -translate-y-1/2"
       />
       <BentoMap
         v-if="show.BentoMap"
-        :style="[mapPosition, moveStyle]"
+        :style="[mapPosition]"
         class="absolute w-fit -translate-x-1/2 -translate-y-1/2 select-none"
       />
     </div>
@@ -160,13 +156,13 @@ import {
 } from "@/components/bento";
 import ThemeToggle from "@/components/layout/ThemeToggle.vue";
 import carddelay from "@/data/carddelay.json";
-import { useDebounceFn, useMouse, useStorage } from "@vueuse/core";
+import { useDebounceFn, useStorage } from "@vueuse/core";
 import { AnimatePresence } from "motion-v";
 import { computed, nextTick, onMounted, onUnmounted, ref, watch, type ComponentPublicInstance } from "vue";
 
-const { x: mouseX, y: mouseY } = useMouse({
-  touch: false,
-});
+// const { x: mouseX, y: mouseY } = useMouse({
+//   touch: false,
+// });
 const backgroundImages = [
   "/background/bg-1.webp",
   "/background/bg-2.webp",
@@ -196,28 +192,26 @@ onUnmounted(() => {
   maybe.cancel?.();
 });
 
-const moveStyle = computed(() => {
-  const centerX = mouseX.value - window.innerWidth / 2;
-  const centerY = mouseY.value - window.innerHeight / 2;
-  const dist = Math.sqrt(centerX * centerX + centerY * centerY);
-  const maxDist = Math.sqrt((window.innerWidth / 2) ** 2 + (window.innerHeight / 2) ** 2);
-  const ratio = dist / maxDist;
-
-  return {
-    filter: `drop-shadow(0 ${ratio * 8}px ${ratio * 4}px rgba(0,0,0,0.2)) brightness(${1 + ratio * 0.15})`,
-  };
-});
-const moveStyleFast = computed(() => {
-  const centerX = mouseX.value - window.innerWidth / 2;
-  const centerY = mouseY.value - window.innerHeight / 2;
-  const dist = Math.sqrt(centerX * centerX + centerY * centerY);
-  const maxDist = Math.sqrt((window.innerWidth / 2) ** 2 + (window.innerHeight / 2) ** 2);
-  const ratio = dist / maxDist;
-
-  return {
-    filter: `drop-shadow(0 ${ratio * 12}px ${ratio * 4}px rgba(0,0,0,0.2)) brightness(${1 + ratio * 0.2})`,
-  };
-});
+// const moveStyle = computed(() => {
+//   // const centerX = mouseX.value - window.innerWidth / 2;
+//   // const centerY = mouseY.value - window.innerHeight / 2;
+//   // const dist = Math.sqrt(centerX * centerX + centerY * centerY);
+//   // const maxDist = Math.sqrt((window.innerWidth / 2) ** 2 + (window.innerHeight / 2) ** 2);
+//   // const ratio = dist / maxDist;
+//   // return {
+//   //   filter: `drop-shadow(0 ${ratio * 8}px ${ratio * 4}px rgba(0,0,0,0.2)) brightness(${1 + ratio * 0.15})`,
+//   // };
+// });
+// const moveStyleFast = computed(() => {
+//   // const centerX = mouseX.value - window.innerWidth / 2;
+//   // const centerY = mouseY.value - window.innerHeight / 2;
+//   // const dist = Math.sqrt(centerX * centerX + centerY * centerY);
+//   // const maxDist = Math.sqrt((window.innerWidth / 2) ** 2 + (window.innerHeight / 2) ** 2);
+//   // const ratio = dist / maxDist;
+//   // return {
+//   //   filter: `drop-shadow(0 ${ratio * 12}px ${ratio * 4}px rgba(0,0,0,0.2)) brightness(${1 + ratio * 0.2})`,
+//   // };
+// });
 
 const clockRef = ref<ComponentPublicInstance | null>(null);
 // 卡片边距
@@ -313,7 +307,7 @@ const newCardPosition = computed(() => {
 const techPosition = computed(() => {
   return {
     left: `${leftTotal.value}px`,
-    top: `${layoutHeight.value * 0.83}px`,
+    top: `${layoutHeight.value * 0.85}px`,
   };
 });
 
