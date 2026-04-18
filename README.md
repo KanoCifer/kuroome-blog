@@ -14,7 +14,7 @@
 [![Zustand](https://img.shields.io/badge/Zustand-5.0-FFB000?logo=zustand)](https://zustand-demo.pmnd.rs/)
 [![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3.13-FF6600?logo=rabbitmq)](https://www.rabbitmq.com/)
 
-基于 **FastAPI + Vue 3 + React** 的全栈阅读清单管理与个人博客系统，支持**桌面端/移动端自动分流**。
+基于 **FastAPI + Vue 3 + React** 的全栈阅读清单管理与个人博客系统，支持**桌面端/移动端自动分流**，并提供钓点智能指数与天气融合分析能力。
 
 > 在线地址: [https://kanocifer.chat](https://kanocifer.chat)
 > 项目名称 kanocifer 来源于日语「黒猫」的罗马音，寓意神秘、独立、敏捷，象征着这个项目的核心价值：为用户提供一个高效、灵活、个性化的阅读与交流平台。
@@ -23,29 +23,31 @@
 
 ## 功能特性
 
-| 功能模块       | 描述                                                                    |
-| -------------- | ----------------------------------------------------------------------- |
-| **用户系统**   | 注册、登录、个人资料、JWT/Cookie 认证、Passkey (WebAuthn)、GitHub OAuth |
-| **书籍管理**   | 书籍 CRUD、书架展示、阅读进度追踪                                       |
-| **微信读书**   | 从微信读书导入书籍                                                      |
-| **博客系统**   | 文章发布、分类、标签、评论                                              |
-| **留言板**     | 访客留言、管理                                                          |
-| **RSS 阅读器** | RSS 订阅解析、文章聚合、定时刷新                                        |
-| **AI 助手**    | 文章总结（Redis 缓存）                                                  |
-| **待办事项**   | 任务管理、每日提醒（飞书通知）                                          |
-| **后台监控**   | 系统运行数据监控、访客追踪                                              |
-| **图库管理**   | 图片上传、管理                                                          |
-| **自动分流**   | 根据 User-Agent 自动将移动端路由到 React App，桌面端访问 Vue App        |
-| **安全**       | CSRF 保护、JWT、权限控制                                                |
-| **订阅管理**   | 管理你的付费订阅，邮件订阅、RSS 订阅、飞书通知订阅                      |
-| **设备管理**   | 设备跟踪管理、设备里程碑通知、移动端/桌面端切换                          |
+| 功能模块         | 描述                                                                    |
+| ---------------- | ----------------------------------------------------------------------- |
+| **用户系统**     | 注册、登录、个人资料、JWT/Cookie 认证、Passkey (WebAuthn)、GitHub OAuth |
+| **书籍管理**     | 书籍 CRUD、书架展示、阅读进度追踪                                       |
+| **微信读书**     | 从微信读书导入书籍                                                      |
+| **博客系统**     | 文章发布、分类、标签、评论                                              |
+| **留言板**       | 访客留言、管理                                                          |
+| **RSS 阅读器**   | RSS 订阅解析、文章聚合、定时刷新                                        |
+| **AI 助手**      | 文章总结（Redis 缓存）                                                  |
+| **钓点智能分析** | 融合天气数据与钓点特征生成智能指数，支持反馈闭环与多端一致展示          |
+| **待办事项**     | 任务管理、每日提醒（飞书通知）                                          |
+| **后台监控**     | 系统运行数据监控、访客追踪                                              |
+| **图库管理**     | 图片上传、管理                                                          |
+| **自动分流**     | 根据 User-Agent 自动将移动端路由到 React App，桌面端访问 Vue App        |
+| **安全**         | CSRF 保护、JWT、权限控制                                                |
+| **订阅管理**     | 管理你的付费订阅，邮件订阅、RSS 订阅、飞书通知订阅                      |
+| **设备管理**     | 设备跟踪管理、设备里程碑通知、移动端/桌面端切换                          |
 
 ## 技术栈
 
 - **后端**: FastAPI + SQLAlchemy 2.0 + Alembic + PostgreSQL + MongoDB (Beanie) + Redis + Taskiq (RabbitMQ)
 - **桌面端 (Vue)**: Vue 3.5 + TypeScript + Vite + Tailwind CSS v4 + Pinia + shadcn-vue + motion-v
 - **移动端 (React)**: React 19 + TypeScript + Vite + Tailwind CSS v4 + Zustand + Framer Motion
-- **AI**: Agno
+- **AI/智能能力**: Agno + 钓点指数推理模型（`fishing_scaler.joblib`、`fishing_residual_model.joblib`）
+- **数据接入**: weatherGateway + fishingGateway（Vue/React 双端对齐）
 - **安全**: JWT 认证、CSRF 保护、WebAuthn/Passkey、GitHub OAuth
 
 ## 快速开始
@@ -262,6 +264,9 @@ flowchart LR
     B --> TQ[Taskiq Worker]
 ```
 
+### Fishing Index 服务架构
+![架构设计图](./docs/Fishing-Index.png)
+
 ### 自动分流机制
 
 访问根路径时，通过 **UA 解析** 自动识别设备类型：
@@ -308,22 +313,29 @@ flowchart LR
 
 ## API 端点 (:5555)
 
-| 路由               | 描述                           |
-| ------------------ | ------------------------------ |
-| `/api/v1/auth`     | 认证 (登录/注册/Passkey/OAuth) |
-| `/api/v1/books`    | 书籍管理 (CRUD、阅读进度)      |
-| `/api/v1/users`    | 用户资料 (设置、头像)          |
-| `/api/v1/blog`     | 博客系统 (文章/评论/分类)      |
-| `/api/v1/messages` | 留言板                         |
-| `/api/v1/weread`   | 微信读书导入                   |
-| `/api/v1/rss`      | RSS 订阅器                     |
-| `/api/v1/admin`    | 管理员 (内容审核)              |
-| `/api/v1/ai`       | AI 助手 (文章摘要)             |
-| `/api/v1/todos`    | 待办事项                       |
-| `/api/v1/monitor`  | 系统监控                       |
-| `/api/v1/public`   | 公共接口                       |
-| `/api/v1/publish`  | 文章发布                       |
-| `/api/v2/subscriptions` | 订阅管理 (新增/编辑/通知)  |
+| 路由                    | 描述                                  |
+| ----------------------- | ------------------------------------- |
+| `/api/v1/auth`          | 认证 (登录/注册/Passkey/OAuth)        |
+| `/api/v1/books`         | 书籍管理 (CRUD、阅读进度)             |
+| `/api/v1/users`         | 用户资料 (设置、头像)                 |
+| `/api/v1/blog`          | 博客系统 (文章/评论/分类)             |
+| `/api/v1/messages`      | 留言板                                |
+| `/api/v1/weread`        | 微信读书导入                          |
+| `/api/v1/rss`           | RSS 订阅器                            |
+| `/api/v1/admin`         | 管理员 (内容审核)                     |
+| `/api/v1/ai`            | AI 助手 (文章摘要)                    |
+| `/api/v1/todos`         | 待办事项                              |
+| `/api/v1/monitor`       | 系统监控                              |
+| `/api/v1/public`        | 公共接口（含天气/钓点聚合能力）       |
+| `/api/v1/publish`       | 文章发布                              |
+| `/api/v2/fishing`       | 钓点智能指数与分析相关接口            |
+| `/api/v2/subscriptions` | 订阅管理 (新增/编辑/通知)             |
+
+### 最近改动（融合）
+
+- **后端契约**：`/api/v1/public` 与 `/api/v2/fishing` 输出字段已对齐钓点指数场景。
+- **前端接入**：Vue 与 React 端均新增/调整 fishing 与 weather 数据网关，消费字段保持一致。
+- **测试覆盖**：新增 `backend/test/test_fishing_expert.py`，验证钓点专家服务核心流程。
 
 ## 定时任务
 

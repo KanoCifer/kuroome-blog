@@ -3,32 +3,27 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Bot } from 'lucide-react';
 import { marked } from 'marked';
 
+import { useAnalysisContext } from '../contexts/AnalysisContext';
+
 marked.setOptions({
   gfm: true,
   breaks: true,
 });
 
 interface AIAnalysisWidgetProps {
-  analysisOpen: boolean;
-  analysisLoading: boolean;
-  analysisError: string;
-  analysisResult: string;
-  analysisHasData: boolean;
-  onToggle: () => void;
-  onClose: () => void;
   onGenerate: () => void;
 }
 
-export function AIAnalysisWidget({
-  analysisOpen,
-  analysisLoading,
-  analysisError,
-  analysisResult,
-  analysisHasData,
-  onToggle,
-  onClose,
-  onGenerate,
-}: AIAnalysisWidgetProps) {
+export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
+  const {
+    analysisOpen,
+    analysisLoading,
+    analysisError,
+    analysisResult,
+    analysisHasData,
+    toggleAnalysis,
+    closeAnalysis,
+  } = useAnalysisContext();
   return (
     <>
       <div className="fixed right-4 bottom-24 z-50 sm:right-6 sm:bottom-24">
@@ -51,7 +46,7 @@ export function AIAnalysisWidget({
                   </p>
                 </div>
                 <button
-                  onClick={onClose}
+                  onClick={closeAnalysis}
                   className="rounded-full p-1 text-gray-500 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
                   aria-label="关闭分析"
                 >
@@ -117,7 +112,7 @@ export function AIAnalysisWidget({
       </div>
 
       <button
-        onClick={onToggle}
+        onClick={toggleAnalysis}
         className="fixed right-0 bottom-45 flex h-14 w-14 items-center justify-center rounded-full border border-white/50 bg-linear-to-br from-slate-900/90 to-slate-700/85 text-white shadow-lg backdrop-blur transition-all hover:-translate-y-0.5 hover:shadow-xl dark:border-gray-700/70 dark:from-gray-100 dark:to-gray-300 dark:text-gray-900"
         aria-label="打开 AI 分析"
         title="AI分析"

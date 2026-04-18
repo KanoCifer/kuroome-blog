@@ -1,38 +1,24 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
-import { useNotificationStore } from '@/stores/notificationState';
 import dayjs from 'dayjs';
 
-import { fishingMapService } from '../service';
-import type { TideData, TideTableItem } from '../types';
+import { useTideData } from '../hooks/useTideData';
+import type { TideTableItem } from '../types';
 import { TideChart } from './TideChart';
 
-const HARBOR_OPTIONS = [
-  { code: 'P2352', name: '黄埔港' },
-  { code: 'P2932', name: '舢舨洲' },
-  { code: 'P2299', name: '南沙港' },
-  { code: 'P2474', name: '海沁' },
-  { code: 'P2609', name: '东沙' },
-];
+interface TideCardProps {}
 
-interface TideCardProps {
-  onTideUpdate?: (payload: {
-    tideData: TideData | null;
-    tideSpotName: string;
-  }) => void;
-}
-
-export function TideCard({ onTideUpdate }: TideCardProps) {
-  const notifyError = useNotificationStore((state) => state.error);
-  const service = useMemo(() => fishingMapService(), []);
-
-  const [tideLoading, setTideLoading] = useState(false);
-  const [tideData, setTideData] = useState<TideData | null>(null);
-  const [tideSpotName, setTideSpotName] = useState('黄埔港');
-  const [selectedHarbor, setSelectedHarbor] = useState('P2352');
-  const [selectedDate, setSelectedDate] = useState(() =>
-    dayjs().format('YYYYMMDD'),
-  );
+export function TideCard({}: TideCardProps) {
+  const {
+    tideData,
+    tideSpotName,
+    loading,
+    selectedHarbor,
+    selectedDate,
+    harborOptions,
+    setSelectedHarbor,
+    setSelectedDate,
+  } = useTideData();
 
   const isDarkMode = document.documentElement.classList.contains('dark');
 
@@ -187,29 +173,6 @@ export function TideCard({ onTideUpdate }: TideCardProps) {
     };
   }, [isDarkMode, tideData]);
 
-  const fetchTide = useCallback(
-    async (harbor: string, date: string): Promise<void> => {
-      setTideLoading(true);
-      try {
-        const result = await service.fetchTideData({ harbor, date });
-        setTideData(result.tideData);
-        setTideSpotName(result.tideSpotName);
-        onTideUpdate?.({
-          tideData: result.tideData,
-          tideSpotName: result.tideSpotName,
-        });
-      } catch {
-        notifyError('获取潮汐信息失败，请稍后重试');
-      } finally {
-        setTideLoading(false);
-      }
-    },
-    [notifyError, onTideUpdate, service],
-  );
-
-  useEffect(() => {
-    fetchTide(selectedHarbor, selectedDate);
-  }, [fetchTide, selectedHarbor, selectedDate]);
   return (
     <article className="rounded-2xl border border-white/40 bg-linear-to-br from-white/80 to-white/40 p-4 shadow-sm backdrop-blur-sm dark:border-gray-700/60 dark:from-gray-900/80 dark:to-gray-800/60">
       <div className="mb-3 flex items-center justify-between gap-2">
@@ -227,7 +190,7 @@ export function TideCard({ onTideUpdate }: TideCardProps) {
             onChange={(e) => setSelectedHarbor(e.target.value)}
             className="cursor-pointer rounded-lg border border-gray-200 bg-white/80 px-1.5 py-1 text-xs text-gray-700 focus:ring-1 focus:ring-cyan-400 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
           >
-            {HARBOR_OPTIONS.map((opt) => (
+            {harborOptions.map((opt) => (
               <option key={opt.code} value={opt.code}>
                 {opt.name}
               </option>
@@ -247,7 +210,7 @@ export function TideCard({ onTideUpdate }: TideCardProps) {
         </div>
       </div>
 
-      {tideLoading ? (
+      {loading ? (
         <p className="text-sm text-gray-500 dark:text-gray-400">
           获取潮汐数据中...
         </p>

@@ -13,12 +13,12 @@ from pydantic import BaseModel, Field
 from redis.asyncio import Redis as AsyncRedis
 
 from app.api.des.auth import manager
-from app.api.des.des import fishing_service_dep, public_service_dep
+from app.api.des.des import fishing_service_dep, weather_service_dep
 from app.api.des.redis import get_redis
 from app.models.models import User
 from app.schemas.response import APIResponse
 from app.services.fishing_service import FishingService, fishing_service
-from app.services.public_service import PublicService
+from app.services.weather_service import WeatherService
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +36,19 @@ class FishingIndexResponse(BaseModel):
     )
     feature_breakdown: dict[str, float] = Field(
         default_factory=dict, description="各特征评分"
+    )
+    # enriched 模式下附加的天气数据
+    current_weather: dict | None = Field(
+        default=None, description="当前天气（enriched=True 时填充）"
+    )
+    forecasts: list[dict] | None = Field(
+        default=None, description="天气预报列表（enriched=True 时填充）"
+    )
+    location_name: str | None = Field(
+        default=None, description="位置名称（enriched=True 时填充）"
+    )
+    tide_data: dict | None = Field(
+        default=None, description="潮汐数据（enriched=True 时填充）"
     )
 
 
@@ -105,17 +118,21 @@ def _build_record_from_request(req: FishingFeedbackRequest) -> dict:
 @router.get("/index")
 async def get_fishing_index(
     location: str = Query(..., description="经纬度坐标，格式为 'lng,lat'"),
+    enriched: bool = Query(False, description="是否附加天气数据"),
     redis: AsyncRedis = Depends(get_redis),
-    public_svc: PublicService = Depends(public_service_dep),
+    weather_svc: WeatherService = Depends(weather_service_dep),
 ) -> JSONResponse:
     """
     获取指定地点的钓鱼指数
 
     基于专家公式计算基础分数 + sklearn 个性化校正
+    当 enriched=True 时，响应中附加天气数据（当前天气/预报/位置名/潮汐）
     """
-    logger.info(f"[钓鱼指数] 收到请求 location={location}")
+    logger.info(
+        f"[钓鱼指数] 收到请求 location={location}, enriched={enriched}"
+    )
     try:
-        weather_data = await public_svc.get_full_weather_data(location, redis)
+        weather_data = await weather_svc.get_full_weather_data(location, redis)
         logger.info(
             f"[钓鱼指数] 获取天气数据成功: {list(weather_data.keys())}"
         )
@@ -141,17 +158,24 @@ async def get_fishing_index(
         f"[钓鱼指数] 计算完成: index={fishing_index}, expert={expert_score}, residual={residual}"
     )
 
-    return APIResponse.ok(
-        data=FishingIndexResponse(
-            fishing_index=fishing_index,
-            expert_score=expert_score,
-            residual=residual,
-            level=fishing_service.get_level(fishing_index),
-            feature_breakdown={
-                k: round(v, 2) for k, v in feature_breakdown.items()
-            },
-        ).model_dump(),
+    resp_data = FishingIndexResponse(
+        fishing_index=fishing_index,
+        expert_score=expert_score,
+        residual=residual,
+        level=fishing_service.get_level(fishing_index),
+        feature_breakdown={
+            k: round(v, 2) for k, v in feature_breakdown.items()
+        },
     )
+
+    # enriched 模式下附加天气数据
+    if enriched:
+        resp_data.current_weather = weather_data.get("current", {}).get("now")
+        resp_data.forecasts = weather_data.get("daily", {}).get("daily")
+        resp_data.location_name = weather_data.get("locationName")
+        resp_data.tide_data = weather_data.get("tide")
+
+    return APIResponse.ok(data=resp_data.model_dump())
 
 
 @router.post("/feedback", response_model=FishingFeedbackResponse)

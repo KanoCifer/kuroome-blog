@@ -94,7 +94,7 @@ export interface WeatherGateway {
 
 export const weatherGateway: WeatherGateway = {
   async getTide(payload: { harbor: string; date: string }): Promise<TideResponse> {
-    const res = await request.get<{ data: TideResponse }>("v1/qweather/tide", {
+    const res = await request.get<{ data: TideResponse }>("v2/weather/tide", {
       params: payload,
     });
     return res.data.data;
@@ -102,7 +102,7 @@ export const weatherGateway: WeatherGateway = {
 
   async getWeatherFull(payload: { location: [number, number] }): Promise<WeatherFullResponse> {
     const [lng, lat] = payload.location;
-    const res = await request.get<{ data: WeatherFullResponse }>("v1/weather/full", {
+    const res = await request.get<{ data: WeatherFullResponse }>("v2/weather/full", {
       params: { location: `${lng.toFixed(2)},${lat.toFixed(2)}` },
     });
     return res.data.data;

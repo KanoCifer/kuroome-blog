@@ -1,67 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { flushSync } from 'react-dom';
-
-import { useNotificationStore } from '@/stores/notificationState';
-
-import { fishingMapService } from '../service';
-import type { WeatherDay, WeatherNow } from '../types';
+import { useWeatherData } from '../hooks/useWeatherData';
 
 interface WeatherCardProps {
   location?: [number, number];
-  onWeatherUpdate?: (payload: {
-    liveWeather: WeatherNow | null;
-    forecasts: WeatherDay[];
-    locationName: string;
-  }) => void;
 }
 
 export function WeatherCard({
   location = [113.389549, 23.050067],
-  onWeatherUpdate,
 }: WeatherCardProps) {
-  const notifyError = useNotificationStore((state) => state.error);
-  const service = useMemo(() => fishingMapService(), []);
-
-  const [weatherLoading, setWeatherLoading] = useState(false);
-  const [weatherError, setWeatherError] = useState('');
-  const [liveWeather, setLiveWeather] = useState<WeatherNow | null>(null);
-  const [forecasts, setForecasts] = useState<WeatherDay[]>([]);
-  const [locationName, setLocationName] = useState('');
-
-  const fetchWeather = useCallback(async () => {
-    setWeatherLoading(true);
-    setWeatherError('');
-
-    try {
-      const { now, daily, locationName } = await service.fetchWeatherFull({
-        location,
-      });
-      const resolvedLocationName = locationName || '钓鱼地点';
-      const resolvedLive = now ?? null;
-      const resolvedDaily = daily ?? [];
-
-      flushSync(() => {
-        setLiveWeather(resolvedLive);
-        setForecasts(resolvedDaily);
-        setLocationName(resolvedLocationName);
-      });
-      onWeatherUpdate?.({
-        liveWeather: resolvedLive,
-        forecasts: resolvedDaily,
-        locationName: resolvedLocationName,
-      });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : '获取天气失败';
-      setWeatherError(message);
-      notifyError(message);
-    } finally {
-      setWeatherLoading(false);
-    }
-  }, [location, notifyError, onWeatherUpdate, service]);
-
-  useEffect(() => {
-    void fetchWeather();
-  }, [fetchWeather]);
+  const { liveWeather, forecasts, locationName, loading, error } =
+    useWeatherData(location);
 
   // 打开和风天气
   const openQWeather = () => {
@@ -97,12 +44,12 @@ export function WeatherCard({
         </span>
       </div>
 
-      {weatherLoading ? (
+      {loading ? (
         <p className="text-sm text-gray-500 dark:text-gray-400">
           获取天气数据中...
         </p>
-      ) : weatherError ? (
-        <p className="text-sm text-red-500">{weatherError}</p>
+      ) : error ? (
+        <p className="text-sm text-red-500">{error}</p>
       ) : liveWeather ? (
         <>
           <div className="mb-3 flex items-end gap-2">

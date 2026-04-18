@@ -16,6 +16,7 @@ from app.core.container import (
     get_sub_service,
     get_todo_service,
     get_user_service,
+    get_weather_service,
     get_weread_service,
 )
 
@@ -96,4 +97,9 @@ async def device_service_dep():
 
 async def fishing_service_dep():
     async with get_fishing_service() as service:
+        yield service
+
+
+async def weather_service_dep():
+    async with get_weather_service() as service:
         yield service

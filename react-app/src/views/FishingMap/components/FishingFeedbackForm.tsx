@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useNotificationStore } from '@/stores/notificationState';
 
 import dayjs from 'dayjs';
+import { useFishingMapStore } from '@/stores/fishingMapStore';
 import { fishingMapService } from '../service';
 import type { FishingFeedbackData, FishingLevel } from '../types';
 
@@ -31,12 +32,65 @@ export function FishingFeedbackForm({
 }: FishingFeedbackFormProps) {
   const notifyError = useNotificationStore((state) => state.error);
   const notifySuccess = useNotificationStore((state) => state.success);
+  const { liveWeather, tideData } = useFishingMapStore((s) => ({
+    liveWeather: s.liveWeather,
+    tideData: s.tideData,
+  }));
   const service = useMemo(() => fishingMapService(), []);
 
   const [loading, setLoading] = useState(false);
   const [selectedFeedback, setSelectedFeedback] = useState<FishingLevel | null>(
     null,
   );
+
+  const feedbackPayload = useMemo(() => {
+    // 优先使用 context 中的实时数据，不再依赖父组件拼装
+    let tideLevel = 1.5;
+    let tideType: '涨潮' | '退潮' = '涨潮';
+    let tideRange = 1.5;
+    let hoursToNextTide = 3.0;
+
+    if (tideData?.tideTable?.length) {
+      const currentTide = tideData.tideTable[0];
+      const nextTide = tideData.tideTable[1];
+      tideType = currentTide.type === 'H' ? '涨潮' : '退潮';
+      tideLevel = Number(currentTide.height) || 1.5;
+      if (nextTide) {
+        const nextLevel = Number(nextTide.height) || 1.5;
+        tideRange = Math.abs(nextLevel - tideLevel);
+        hoursToNextTide =
+          (new Date(nextTide.fxTime).getTime() -
+            new Date(currentTide.fxTime).getTime()) /
+          (1000 * 60 * 60);
+      }
+    }
+
+    const windLevel = 2;
+
+    return {
+      location_id: locationId,
+      location_name: locationName,
+      fishing_time: dayjs().toISOString(),
+      feedback: selectedFeedback!,
+      temperature: Number(liveWeather?.temp) || fishingData.temperature,
+      humidity: Number(liveWeather?.humidity) || fishingData.humidity,
+      pressure: Number(liveWeather?.pressure) || fishingData.pressure,
+      wind_speed: Number(liveWeather?.windSpeed) || fishingData.wind_speed,
+      precipitation: Number(liveWeather?.precip) || fishingData.precipitation,
+      indicate: windLevel,
+      tide_level: tideLevel,
+      tide_type: tideType,
+      tide_range: tideRange,
+      hours_to_next_tide: hoursToNextTide,
+    };
+  }, [
+    fishingData,
+    liveWeather,
+    locationId,
+    locationName,
+    selectedFeedback,
+    tideData,
+  ]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -50,23 +104,7 @@ export function FishingFeedbackForm({
       setLoading(true);
 
       try {
-        await service.submitFishingFeedback({
-          location_id: locationId,
-          location_name: locationName,
-          fishing_time: dayjs().toISOString(),
-          feedback: selectedFeedback,
-          temperature: fishingData.temperature,
-          humidity: fishingData.humidity,
-          pressure: fishingData.pressure,
-          wind_speed: fishingData.wind_speed,
-          precipitation: fishingData.precipitation,
-          indicate: fishingData.indicate,
-          tide_level: fishingData.tide_level,
-          tide_type: fishingData.tide_type,
-          tide_range: fishingData.tide_range,
-          hours_to_next_tide: fishingData.hours_to_next_tide,
-        });
-
+        await service.submitFishingFeedback(feedbackPayload);
         notifySuccess('反馈已提交，感谢您的分享！');
         onSuccess?.();
       } catch (err) {
@@ -77,16 +115,7 @@ export function FishingFeedbackForm({
         setLoading(false);
       }
     },
-    [
-      selectedFeedback,
-      locationId,
-      locationName,
-      fishingData,
-      notifyError,
-      notifySuccess,
-      onSuccess,
-      service,
-    ],
+    [feedbackPayload, notifyError, notifySuccess, onSuccess, service],
   );
 
   return (

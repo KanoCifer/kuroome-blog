@@ -6,8 +6,10 @@ from app.services.message_service import MessageService
 from app.services.monitor_service import MonitorService
 from app.services.public_service import PublicService
 from app.services.rss_service import RssService
+from app.services.sub_service import SubService
 from app.services.todo_service import TodoService
 from app.services.user_service import UserService
+from app.services.weather_service import WeatherService
 from app.services.weread_service import WereadService
 
 __all__ = [
@@ -19,7 +21,9 @@ __all__ = [
     "MonitorService",
     "PublicService",
     "RssService",
+    "SubService",
     "TodoService",
     "UserService",
+    "WeatherService",
     "WereadService",
 ]

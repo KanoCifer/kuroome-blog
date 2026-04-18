@@ -1,8 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback } from 'react';
 
-import { useNotificationStore } from '@/stores/notificationState';
-
-import { fishingMapService } from '../service';
+import { useFishingIndex } from '../hooks/useFishingIndex';
 import type { FishingIndexData } from '../types';
 
 interface FishingIndexCardProps {
@@ -30,32 +28,7 @@ export function FishingIndexCard({
   location = [113.389549, 23.050067],
   onFeedbackClick,
 }: FishingIndexCardProps) {
-  const notifyError = useNotificationStore((state) => state.error);
-  const service = useMemo(() => fishingMapService(), []);
-
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [indexData, setIndexData] = useState<FishingIndexData | null>(null);
-
-  const fetchIndex = useCallback(async () => {
-    setLoading(true);
-    setError('');
-
-    try {
-      const data = await service.fetchFishingIndex({ location });
-      setIndexData(data);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '获取钓鱼指数失败';
-      setError(message);
-      notifyError(message);
-    } finally {
-      setLoading(false);
-    }
-  }, [location, notifyError, service]);
-
-  useEffect(() => {
-    void fetchIndex();
-  }, [fetchIndex]);
+  const { indexData, loading, error, refetch } = useFishingIndex(location);
 
   const handleFeedback = useCallback(() => {
     if (indexData && onFeedbackClick) {
@@ -89,7 +62,7 @@ export function FishingIndexCard({
           </p>
         </div>
         <button
-          onClick={() => void fetchIndex()}
+          onClick={() => void refetch()}
           className="rounded-lg bg-white/60 px-2 py-1 text-xs text-gray-600 hover:bg-white/80 dark:bg-gray-800/60 dark:text-gray-300 dark:hover:bg-gray-800/80"
           disabled={loading}
         >
@@ -141,7 +114,7 @@ export function FishingIndexCard({
               </summary>
               <div className="mt-2 grid grid-cols-3 gap-1">
                 {Object.entries(indexData.feature_breakdown).map(
-                  ([key, value]) => (
+                  ([key, value]: [string, number]) => (
                     <div
                       key={key}
                       className="rounded bg-white/40 px-1 py-1 dark:bg-gray-800/40"

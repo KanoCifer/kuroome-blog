@@ -1,19 +1,10 @@
+import { useRouteMapStore } from '@/stores/routeMapStore';
 import { formatDistance, formatDuration } from '../utils';
-import type { RouteInfo } from '../types';
 
-interface RouteStatusCardProps {
-  isPlanningRoute: boolean;
-  routeInfo: RouteInfo | null;
-  selectedSpotIndex: number | null;
-  onClearRoute: () => void;
-}
+export function RouteStatusCard() {
+  const { isPlanningRoute, routeInfo, selectedSpotIndex } = useRouteMapStore();
+  const clearRoute = useRouteMapStore((s) => s.clearRoute);
 
-export function RouteStatusCard({
-  isPlanningRoute,
-  routeInfo,
-  selectedSpotIndex,
-  onClearRoute,
-}: RouteStatusCardProps) {
   if (isPlanningRoute) {
     return (
       <div className="flex items-center justify-center gap-2 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-700 dark:border-blue-900/40 dark:bg-blue-900/20 dark:text-blue-300">
@@ -58,7 +49,7 @@ export function RouteStatusCard({
             )}
           </div>
           <button
-            onClick={onClearRoute}
+            onClick={clearRoute}
             className="rounded-lg bg-red-500 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-red-600"
           >
             清除路线

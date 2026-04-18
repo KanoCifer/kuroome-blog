@@ -117,15 +117,12 @@ def setup_csrf(app: FastAPI) -> None:
             return await call_next(request)
 
         skip_paths = [
-            "/docs",
-            "/redoc",
-            "/openapi.json",
             "/api/v1/auth/login",
             "/api/v1/auth/register",
             "/api/v1/auth/email/code",
             "/api/v1/admin/track",
             "/api/v1/admin/deploy",
-            "/api/v1/qweather/tide",
+            "/api/v2/weather/tide",
         ]
 
         if any(request.url.path.startswith(path) for path in skip_paths):

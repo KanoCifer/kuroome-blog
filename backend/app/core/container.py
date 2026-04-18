@@ -32,6 +32,7 @@ from app.services.rss_service import RssService
 from app.services.sub_service import SubService
 from app.services.todo_service import TodoService
 from app.services.user_service import UserService
+from app.services.weather_service import WeatherService
 from app.services.weread_service import WereadService
 from app.utils import redis_cache
 
@@ -161,4 +162,10 @@ async def get_device_service():
 async def get_fishing_service():
     repo = FishingRepo()
     service = FishingService(repo=repo)
+    yield service
+
+
+@asynccontextmanager
+async def get_weather_service():
+    service = WeatherService()
     yield service
