@@ -49,9 +49,17 @@ export interface AMapMarkerInstance {
   setMap: (mapInstance: AMapMapInstance | null) => void;
 }
 
+export type GeolocationStatusEvent = {
+  position: {
+    lng: number;
+    lat: number;
+  };
+  info?: string;
+};
+
 export interface AMapGeolocationInstance {
   getCurrentPosition: (
-    callback: (status: string, result: unknown) => void,
+    callback: (status: string, result: GeolocationStatusEvent) => void,
   ) => void;
 }
 
@@ -59,8 +67,8 @@ export interface AMapNamespace {
   Geolocation: new (options?: {
     enableHighAccuracy?: boolean;
     timeout?: number;
-    buttonPosition?: string;
-    buttonOffset?: unknown;
+    offset?: [number, number];
+    position?: string;
   }) => AMapGeolocationInstance;
   Map: new (
     container: HTMLDivElement,

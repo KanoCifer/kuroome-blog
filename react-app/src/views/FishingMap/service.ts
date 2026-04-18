@@ -1,4 +1,3 @@
-import { DEFAULT_TIDE_SPOT_NAME } from './constants';
 import { fishingMapGateway } from './gateway';
 import type {
   AnalysisPayload,
@@ -9,6 +8,7 @@ import type {
   TideData,
   WeatherDay,
   WeatherFullResponse,
+  WeatherIndex,
   WeatherNow,
 } from './types';
 
@@ -18,10 +18,6 @@ interface AnalysisChunk {
 
 export interface FishingMapService {
   getSecurityJsCode(): Promise<string>;
-  fetchTideData(payload?: {
-    harbor: string;
-    date: string;
-  }): Promise<{ tideData: TideData; tideSpotName: string }>;
   generateAnalysis(
     payload: AnalysisPayload,
     onChunk: (content: string) => void,
@@ -33,6 +29,8 @@ export interface FishingMapService {
     now?: WeatherNow;
     daily?: WeatherDay[];
     locationName: string;
+    indices: WeatherIndex[];
+    tideData: TideData | null;
   }>;
 
   fetchFishingIndex(payload: {
@@ -44,23 +42,6 @@ export interface FishingMapService {
   ): Promise<FishingFeedbackResponse>;
 }
 
-const resolveLocationName = (
-  fullData: WeatherFullResponse | undefined,
-  now: WeatherNow | undefined,
-): string => {
-  const name =
-    fullData?.locationName?.trim() ||
-    (
-      fullData?.hourly as { locationName?: string } | undefined
-    )?.locationName?.trim();
-
-  if (name) {
-    return name;
-  }
-
-  return now?.text ? '当前位置' : '钓鱼地点';
-};
-
 export const fishingMapService = (): FishingMapService => {
   const gateway = fishingMapGateway();
 
@@ -71,17 +52,6 @@ export const fishingMapService = (): FishingMapService => {
         (securityResponse.data.data as SecurityKeyResponse | undefined)
           ?.securityJsCode ?? '';
       return encodedKey ? atob(encodedKey) : '';
-    },
-
-    async fetchTideData(payload?: { harbor: string; date: string }): Promise<{
-      tideData: TideData;
-      tideSpotName: string;
-    }> {
-      const response = await gateway.getTide(payload);
-      return {
-        tideData: response.data.data,
-        tideSpotName: DEFAULT_TIDE_SPOT_NAME,
-      };
     },
 
     async generateAnalysis(
@@ -147,19 +117,26 @@ export const fishingMapService = (): FishingMapService => {
       now?: WeatherNow;
       daily?: WeatherDay[];
       locationName: string;
+      indices: WeatherIndex[];
+      tideData: TideData | null;
     }> {
-      const res = await gateway.getWeatherFull(payload);
-      const data = res.data.data as WeatherFullResponse | undefined;
+      const weatherRes = await gateway.getWeatherFull(payload);
+
+      const data = weatherRes.data.data as WeatherFullResponse | undefined;
       const now = data?.current?.now;
       const daily = data?.daily?.daily;
       const updateTime = data?.current?.updateTime ?? data?.daily?.updateTime;
-      const locationName = resolveLocationName(data, now);
+      const locationName = data?.locationName ?? '未知地点';
+      const tideData = data?.tide ?? null;
+      const indices = data?.indices?.daily ?? [];
 
       return {
         updateTime,
         now,
         daily,
         locationName,
+        indices,
+        tideData,
       };
     },
 
