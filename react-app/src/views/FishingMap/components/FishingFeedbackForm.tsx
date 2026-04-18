@@ -2,15 +2,16 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { useNotificationStore } from '@/stores/notificationState';
 
-import dayjs from 'dayjs';
 import { useFishingMapStore } from '@/stores/fishingMapStore';
+import dayjs from 'dayjs';
 import { fishingMapService } from '../service';
-import type { FishingFeedbackData, FishingLevel } from '../types';
+import type { FishingFeedbackData, FishingLevel, TideData } from '../types';
 
 interface FishingFeedbackFormProps {
   fishingData: FishingFeedbackData;
   locationId: string;
   locationName: string;
+  tideData?: TideData | null;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
@@ -27,15 +28,13 @@ export function FishingFeedbackForm({
   fishingData,
   locationId,
   locationName,
+  tideData,
   onSuccess,
   onCancel,
 }: FishingFeedbackFormProps) {
   const notifyError = useNotificationStore((state) => state.error);
   const notifySuccess = useNotificationStore((state) => state.success);
-  const { liveWeather, tideData } = useFishingMapStore((s) => ({
-    liveWeather: s.liveWeather,
-    tideData: s.tideData,
-  }));
+  const liveWeather = useFishingMapStore((s) => s.liveWeather);
   const service = useMemo(() => fishingMapService(), []);
 
   const [loading, setLoading] = useState(false);
@@ -77,7 +76,7 @@ export function FishingFeedbackForm({
       pressure: Number(liveWeather?.pressure) || fishingData.pressure,
       wind_speed: Number(liveWeather?.windSpeed) || fishingData.wind_speed,
       precipitation: Number(liveWeather?.precip) || fishingData.precipitation,
-      indicate: windLevel,
+      indices: windLevel,
       tide_level: tideLevel,
       tide_type: tideType,
       tide_range: tideRange,
