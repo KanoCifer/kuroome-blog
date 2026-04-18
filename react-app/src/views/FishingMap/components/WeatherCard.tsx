@@ -1,4 +1,5 @@
 import { useWeatherData } from '../hooks/useWeatherData';
+import { SkeletonCard } from './SkeletonCard';
 
 interface WeatherCardProps {
   location?: [number, number];
@@ -45,13 +46,15 @@ export function WeatherCard({
       </div>
 
       {loading ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          获取天气数据中...
-        </p>
+        <div className="min-h-[200px]">
+          <SkeletonCard hasBottomRow />
+        </div>
       ) : error ? (
-        <p className="text-sm text-red-500">{error}</p>
+        <div className="min-h-[200px]">
+          <p className="text-sm text-red-500">{error}</p>
+        </div>
       ) : liveWeather ? (
-        <>
+        <div className="min-h-[200px]">
           <div className="mb-3 flex items-end gap-2">
             <span className="text-4xl font-bold text-gray-900 dark:text-white">
               {liveWeather.temp}
@@ -97,9 +100,13 @@ export function WeatherCard({
               ))}
             </div>
           )}
-        </>
+        </div>
       ) : (
-        <p className="text-sm text-gray-500 dark:text-gray-400">暂无天气数据</p>
+        <div className="min-h-[200px]">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            暂无天气数据
+          </p>
+        </div>
       )}
     </article>
   );

@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 
 import { useFishingIndex } from '../hooks/useFishingIndex';
 import type { FishingIndexData } from '../types';
+import { SkeletonCard } from './SkeletonCard';
 
 interface FishingIndexCardProps {
   location?: [number, number];
@@ -71,11 +72,15 @@ export function FishingIndexCard({
       </div>
 
       {loading && !indexData ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400">加载中...</p>
+        <div className="min-h-[200px]">
+          <SkeletonCard />
+        </div>
       ) : error && !indexData ? (
-        <p className="text-sm text-red-500">{error}</p>
+        <div className="min-h-[200px]">
+          <p className="text-sm text-red-500">{error}</p>
+        </div>
       ) : indexData ? (
-        <>
+        <div className="min-h-[200px]">
           <div className="mb-3 flex items-end gap-3">
             <span className={`text-5xl font-bold ${levelColor}`}>
               {indexData.fishing_index}
@@ -138,9 +143,11 @@ export function FishingIndexCard({
           >
             提交钓鱼反馈
           </button>
-        </>
+        </div>
       ) : (
-        <p className="text-sm text-gray-500 dark:text-gray-400">暂无数据</p>
+        <div className="min-h-[200px]">
+          <p className="text-sm text-gray-500 dark:text-gray-400">暂无数据</p>
+        </div>
       )}
     </article>
   );

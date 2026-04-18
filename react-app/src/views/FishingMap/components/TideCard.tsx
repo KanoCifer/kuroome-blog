@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import { useTideData } from '../hooks/useTideData';
 import type { TideTableItem } from '../types';
 import { TideChart } from './TideChart';
+import { SkeletonCard } from './SkeletonCard';
 
 interface TideCardProps {}
 
@@ -211,11 +212,11 @@ export function TideCard({}: TideCardProps) {
       </div>
 
       {loading ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          获取潮汐数据中...
-        </p>
+        <div className="min-h-[200px]">
+          <SkeletonCard hasChart hasBottomRow />
+        </div>
       ) : tideData ? (
-        <>
+        <div className="min-h-[200px]">
           <TideChart option={tideChartOption} />
           <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
             <div className="rounded-lg bg-white/60 px-3 py-2 dark:bg-gray-800/60">
@@ -231,9 +232,13 @@ export function TideCard({}: TideCardProps) {
               </p>
             </div>
           </div>
-        </>
+        </div>
       ) : (
-        <p className="text-sm text-gray-500 dark:text-gray-400">暂无潮汐数据</p>
+        <div className="min-h-[200px]">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            暂无潮汐数据
+          </p>
+        </div>
       )}
     </article>
   );

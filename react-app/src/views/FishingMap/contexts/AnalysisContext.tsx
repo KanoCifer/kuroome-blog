@@ -4,8 +4,8 @@ import {
   useContext,
   useRef,
   useState,
-  type RefObject,
   type ReactNode,
+  type RefObject,
 } from 'react';
 
 interface AnalysisContextValue {
@@ -78,6 +78,7 @@ export function AnalysisContextProvider({
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAnalysisContext(): AnalysisContextValue {
   const ctx = useContext(AnalysisContext);
   if (!ctx) {
