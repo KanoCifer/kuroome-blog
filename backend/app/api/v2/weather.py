@@ -4,24 +4,20 @@
 
 from __future__ import annotations
 
-import logging
-
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import JSONResponse
 from redis.asyncio import Redis as AsyncRedis
 
 from app.api.des.des import weather_service_dep
-from app.api.des.limiter import limiter
 from app.api.des.redis import get_redis
+from app.core.logger import logger
 from app.schemas.response import APIResponse
 from app.services.weather_service import WeatherDomainError, WeatherService
 
-logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/weather", tags=["weather"])
 
 
 @router.get("/tide")
-@limiter.limit("100/hour")
 async def get_qweather_tide(
     date: str = Query(..., description="日期，格式为 YYYYMMDD"),
     harbor: str = Query("P2352", description="港口代码"),
