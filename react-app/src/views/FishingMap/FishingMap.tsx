@@ -3,6 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { motion } from 'framer-motion';
 import { AIAnalysisWidget } from './components/AIAnalysisWidget';
+import { FishingFeedbackForm } from './components/FishingFeedbackForm';
+import { FishingIndexCard } from './components/FishingIndexCard';
 import { FishingMapHeader } from './components/FishingMapHeader';
 import { MapPanel } from './components/MapPanel';
 import { RouteStatusCard } from './components/RouteStatusCard';
@@ -25,6 +27,8 @@ import type {
   AMapPolyline,
   AMapSecurityConfig,
   AnalysisPayload,
+  FishingFeedbackData,
+  FishingIndexData,
   GeolocationResult,
   RouteInfo,
   TideData,
@@ -115,6 +119,15 @@ export default function FishingMap() {
   const [locationName, setLocationName] = useState('');
   const [tideData, setTideData] = useState<TideData | null>(null);
   const [tideSpotName, setTideSpotName] = useState('');
+  const [userPosition, setUserPosition] = useState<[number, number] | null>(
+    null,
+  );
+
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [feedbackLocationId, setFeedbackLocationId] = useState('default');
+  const [feedbackLocationName, setFeedbackLocationName] = useState('钓鱼地点');
+  const [currentFishingData, setCurrentFishingData] =
+    useState<FishingFeedbackData | null>(null);
 
   const analysisPayload = useMemo<AnalysisPayload | null>(() => {
     if (!liveWeather && forecasts.length === 0) {
@@ -279,6 +292,65 @@ export default function FishingMap() {
     [],
   );
 
+  const handleFeedbackClick = useCallback(
+    (data: FishingIndexData) => {
+      // 从天气数据提取风等级（1-3）
+      const windLevel = liveWeather
+        ? Math.min(
+            3,
+            Math.max(1, Math.ceil((Number(liveWeather.windScale) || 1) / 3)),
+          )
+        : 1;
+
+      // 从潮汐数据提取潮汐信息
+      let tideLevel = 1.5;
+      let tideType: 'H' | 'L' = 'H';
+      let tideRange = 1.5;
+      let hoursToNextTide = 3.0;
+
+      if (tideData?.tideTable?.length) {
+        const currentTide = tideData.tideTable[0];
+        const nextTide = tideData.tideTable[1];
+
+        tideType = currentTide.type || 'H';
+        tideLevel = Number(currentTide.height) || 1.5;
+
+        if (nextTide) {
+          const nextLevel = Number(nextTide.height) || 1.5;
+          tideRange = Math.abs(nextLevel - tideLevel);
+
+          // 计算距下一潮汐时间
+          const currentTime = new Date(currentTide.fxTime).getTime();
+          const nextTime = new Date(nextTide.fxTime).getTime();
+          hoursToNextTide = (nextTime - currentTime) / (1000 * 60 * 60);
+        }
+      }
+
+      const feedbackData: FishingFeedbackData = {
+        fishing_index: data.fishing_index,
+        level: data.level,
+        temperature: Number(liveWeather?.temp) || 20,
+        humidity: Number(liveWeather?.humidity) || 50,
+        pressure: Number(liveWeather?.pressure) || 1013,
+        wind_speed: Number(liveWeather?.windSpeed) || 0,
+        precipitation: Number(liveWeather?.precip) || 0,
+        wind_level: windLevel,
+        tide_level: tideLevel,
+        tide_type: tideType,
+        tide_range: tideRange,
+        hours_to_next_tide: hoursToNextTide,
+      };
+
+      setCurrentFishingData(feedbackData);
+      setFeedbackLocationId(
+        selectedSpotIndex !== null ? String(selectedSpotIndex) : 'default',
+      );
+      setFeedbackLocationName(locationName || '钓鱼地点');
+      setFeedbackOpen(true);
+    },
+    [liveWeather, locationName, selectedSpotIndex, tideData],
+  );
+
   const generateAnalysis = useCallback(async () => {
     if (!analysisPayload || analysisLoading) {
       return;
@@ -401,6 +473,15 @@ export default function FishingMap() {
         map.on('click', clickHandler);
 
         setIsMapReady(true);
+
+        // 获取用户定位
+        try {
+          const position = await getCurrentPosition();
+          setUserPosition(position);
+          setLocationName('我的位置');
+        } catch {
+          // 定位失败不影响地图使用
+        }
       } catch (error) {
         const message =
           error instanceof Error ? error.message : '地图初始化失败';
@@ -434,7 +515,7 @@ export default function FishingMap() {
         containerElement.innerHTML = '';
       }
     };
-  }, [service]);
+  }, [getCurrentPosition, service]);
 
   useEffect(() => {
     if (!analysisOpen) {
@@ -492,8 +573,12 @@ export default function FishingMap() {
           <MapPanel isMapReady={isMapReady} mapContainerRef={mapContainerRef} />
 
           <div className="grid grid-cols-1 gap-4">
+            <FishingIndexCard
+              location={userPosition ?? MAP_CENTER}
+              onFeedbackClick={handleFeedbackClick}
+            />
             <WeatherCard
-              location={MAP_CENTER}
+              location={userPosition ?? MAP_CENTER}
               onWeatherUpdate={handleWeatherUpdate}
             />
             <TideCard onTideUpdate={handleTideUpdate} />
@@ -512,6 +597,16 @@ export default function FishingMap() {
             void generateAnalysis();
           }}
         />
+
+        {feedbackOpen && currentFishingData && (
+          <FishingFeedbackForm
+            fishingData={currentFishingData}
+            locationId={feedbackLocationId}
+            locationName={feedbackLocationName}
+            onSuccess={() => setFeedbackOpen(false)}
+            onCancel={() => setFeedbackOpen(false)}
+          />
+        )}
       </motion.div>
     </>
   );

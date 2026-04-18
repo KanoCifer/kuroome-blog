@@ -10,6 +10,7 @@ from app.repositories import (
     AiRepo,
     BlogRepo,
     BookRepo,
+    FishingRepo,
     MessageRepo,
     MonitorRepo,
     PublicRepo,
@@ -23,6 +24,7 @@ from app.services.admin_service import AdminService
 from app.services.ai_service import AiService
 from app.services.blog_service import BlogService
 from app.services.book_service import BookService
+from app.services.fishing_service import FishingService
 from app.services.message_service import MessageService
 from app.services.monitor_service import MonitorService
 from app.services.public_service import PublicService
@@ -153,3 +155,10 @@ async def get_device_service():
 
         service = DeviceService(repo=repo)
         yield service
+
+
+@asynccontextmanager
+async def get_fishing_service():
+    repo = FishingRepo()
+    service = FishingService(repo=repo)
+    yield service

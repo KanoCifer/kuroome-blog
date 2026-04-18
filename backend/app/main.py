@@ -36,10 +36,11 @@ from app.api.v1 import (
     todos,
     weread,
 )
-from app.api.v2 import device, subscriptions
+from app.api.v2 import device, fishing, subscriptions
 from app.core import get_settings, register_exception_handlers
 from app.core import logger as app_logger
 from app.models.beanie import MessageBoard, Post, RssArticle, SubscriptionLog
+from app.models.fishing import FishingModelMeta, FishingRecord
 from app.tasks import broker, send_feishu_message
 from app.utils import close_cache_redis
 
@@ -67,7 +68,14 @@ async def lifespan(app: FastAPI):
     await init_mongo(app)
     await init_beanie(
         database=app.state.mongo,
-        document_models=[MessageBoard, Post, RssArticle, SubscriptionLog],
+        document_models=[
+            MessageBoard,
+            Post,
+            RssArticle,
+            SubscriptionLog,
+            FishingRecord,
+            FishingModelMeta,
+        ],
     )
     app.state.redis = await init_redis()
 
@@ -129,6 +137,8 @@ app.include_router(router=publish.router, prefix="/api/v1")
 # v2 版本API
 app.include_router(router=subscriptions.router, prefix="/api/v2")
 app.include_router(router=device.router, prefix="/api/v2")
+app.include_router(router=fishing.router, prefix="/api/v2")
+
 
 # 统一注册全局异常处理器
 register_exception_handlers(app=app)

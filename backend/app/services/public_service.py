@@ -9,6 +9,7 @@ import httpx
 import orjson
 from redis.asyncio import Redis as AsyncRedis
 
+from app.core import logger
 from app.core.config import get_settings
 from app.repositories.public_repo import PublicRepo
 from app.schemas.aiagent import WeatherAnalysisInput
@@ -238,7 +239,7 @@ Sitemap: {sitemap_url}
     async def get_qweather_location(
         location: str, type_: str, redis: AsyncRedis
     ) -> dict:
-        url = "https://qk2tupqwuj.re.qweatherapi.com/geo/v2/poi/lookup"
+        url = f"{_QWEATHER_BASE_URL}/geo/v2/poi/lookup"
         encoded_jwt = await PublicService.get_qweather_jwt(redis)
         headers = {"Authorization": f"Bearer {encoded_jwt}"}
         params = {"location": location, "type": type_}
@@ -311,12 +312,19 @@ Sitemap: {sitemap_url}
         ]  # type: ignore
 
     async def get_weather_forecast(
-        self, location: str, days: int, redis: AsyncRedis
+        self,
+        days: int,
+        redis: AsyncRedis,
+        location: str | None = None,
+        location_id: str | None = None,
     ) -> dict:
         """获取天气预报"""
 
         # 缓存键格式：qweather:forecast:{location}:{days}d
-        cache_key = f"qweather:forecast:{location}:{days}d"
+        if location_id:
+            cache_key = f"qweather:forecast:{location_id}:{days}d"
+        elif location:
+            cache_key = f"qweather:forecast:{location}:{days}d"
         cached_data = await redis.get(cache_key)
         if cached_data:
             return orjson.loads(cached_data)
@@ -325,7 +333,7 @@ Sitemap: {sitemap_url}
 
         encoded_jwt = await PublicService.get_qweather_jwt(redis)
         headers = {"Authorization": f"Bearer {encoded_jwt}"}
-        params = {"location": location}
+        params = {"location": location or location_id}
 
         try:
             async with httpx.AsyncClient() as client:
@@ -352,12 +360,26 @@ Sitemap: {sitemap_url}
             ) from exc
 
     async def get_current_weather(
-        self, location: str, redis: AsyncRedis
+        self,
+        redis: AsyncRedis,
+        location: str | None = None,
+        location_id: str | None = None,
     ) -> dict:
-        """获取当前天气"""
+        """获取当前天气
+            缓存键格式：qweather:current:{location}
+
+        返回：
+            原始的和风天气API响应数据字典
+            实时天气.get("now", {}) 中包含当前天气信息
+        """
 
         # 缓存键格式：qweather:current:{location}
-        cache_key = f"qweather:current:{location}"
+        if location_id:
+            cache_key = f"qweather:current:{location_id}"
+        elif location:
+            cache_key = f"qweather:current:{location}"
+        else:
+            raise PublicDomainError("必须提供位置信息", 400)
         cached_data = await redis.get(cache_key)
         if cached_data:
             return orjson.loads(cached_data)
@@ -366,7 +388,7 @@ Sitemap: {sitemap_url}
 
         encoded_jwt = await PublicService.get_qweather_jwt(redis)
         headers = {"Authorization": f"Bearer {encoded_jwt}"}
-        params = {"location": location}
+        params = {"location": location or location_id}
 
         try:
             async with httpx.AsyncClient() as client:
@@ -433,12 +455,19 @@ Sitemap: {sitemap_url}
             ) from exc
 
     async def get_hourly_weather(
-        self, location: str, hours: int, redis: AsyncRedis
+        self,
+        hours: int,
+        redis: AsyncRedis,
+        location_id: str | None = None,
+        location: str | None = None,
     ) -> dict:
         """获取逐小时天气预报"""
 
         # 缓存键格式：qweather:hourly:{location}
-        cache_key = f"qweather:hourly:{location}"
+        if location_id:
+            cache_key = f"qweather:hourly:{location_id}"
+        elif location:
+            cache_key = f"qweather:hourly:{location}"
         cached_data = await redis.get(cache_key)
         if cached_data:
             return orjson.loads(cached_data)
@@ -446,7 +475,7 @@ Sitemap: {sitemap_url}
         url = f"{_QWEATHER_BASE_URL}/v7/weather/{hours}h"
         encoded_jwt = await PublicService.get_qweather_jwt(redis)
         headers = {"Authorization": f"Bearer {encoded_jwt}"}
-        params = {"location": location}
+        params = {"location": location or location_id}
 
         try:
             async with httpx.AsyncClient() as client:
@@ -471,3 +500,147 @@ Sitemap: {sitemap_url}
                 f"Failed to fetch QWeather hourly weather: {exc!s}",
                 503,
             ) from exc
+
+    async def get_indicates(
+        self,
+        redis: AsyncRedis,
+        location: str | None = None,
+        location_id: str | None = None,
+    ) -> dict:
+        """获取钓鱼指数相关的天气指标数据"""
+
+        # 缓存键格式：qweather:indicates:{location} 或 qweather:indicates:{location_id}
+        if location_id:
+            cache_key = f"qweather:indicates:{location_id}"
+        elif location:
+            cache_key = f"qweather:indicates:{location}"
+        else:
+            raise PublicDomainError("必须提供位置信息", 400)
+
+        cached_data = await redis.get(cache_key)
+        if cached_data:
+            return orjson.loads(cached_data)
+
+        url = f"{_QWEATHER_BASE_URL}/v7/indices/1d"
+        encoded_jwt = await PublicService.get_qweather_jwt(redis)
+        headers = {"Authorization": f"Bearer {encoded_jwt}"}
+        params = {"location": location or location_id, "type": "4"}
+        try:
+            async with httpx.AsyncClient() as client:
+                res = await client.get(
+                    url=url,
+                    headers=headers,
+                    params=params,
+                )
+                res.raise_for_status()
+                # 缓存数据，过期时间为12小时
+                await redis.set(
+                    cache_key, orjson.dumps(res.json()), ex=12 * 3600
+                )
+                return res.json()
+        except httpx.HTTPStatusError as exc:
+            response = exc.response
+            raise PublicDomainError(
+                f"QWeather API error: {response.status_code} - {response.text}",
+                response.status_code,
+            ) from exc
+        except httpx.HTTPError as exc:
+            raise PublicDomainError(
+                f"Failed to fetch QWeather indices: {exc!s}",
+                503,
+            ) from exc
+
+    async def get_full_weather_data(
+        self, location: str, redis: AsyncRedis
+    ) -> dict:
+        """获取完整天气数据（当前 + 24小时预报 + 3天天气 + 潮汐数据）
+        params:
+            location: 地理位置坐标，格式为 "lng,lat" 保留两位小数
+            redis: Redis 连接实例
+
+
+        流程:
+            根据location获取POI
+            根据POI获取当前天气、24小时预报、7天天气和潮汐数据
+                -实时天气：/v7/weather/now
+                    - location
+                -24小时预报：/v7/weather/24h
+                    - location
+                -3天天气：/v7/weather/3d
+                    - location
+                -潮汐数据：/v7/ocean/tide
+                    - location（使用POI名称或ID）
+                    - date（使用当前日期）格式为 YYYYMMDD
+        returns:
+            包含当前天气、24小时预报、3天天气和潮汐数据的完整天气数据字典
+        """
+        # 获取POI信息
+        poi_data = await self.get_poi_lookup(location, redis)
+        # 从POI数据中提取位置名称或ID，这里假设使用位置名称
+        poi_name = (
+            poi_data.get("poi", [])[0].get("name")
+            if poi_data.get("poi")
+            else None
+        )
+        poi_id = (
+            poi_data.get("poi", [])[0].get("id")
+            if poi_data.get("poi")
+            else None
+        )
+        logger.info(
+            f"POI lookup for location {location} returned: {poi_name} (ID: {poi_id})"
+        )
+        if not poi_name and not poi_id:
+            raise PublicDomainError("无法获取位置的POI信息", 404)
+
+        try:
+            # 获取当前天气 - 使用原始坐标而非 poi_id
+            current_weather = await self.get_current_weather(
+                location=location, redis=redis
+            )
+
+            # 获取24小时预报 - 使用原始坐标
+            hourly_weather = await self.get_hourly_weather(
+                hours=24, redis=redis, location=location
+            )
+            # 获取3天天气 - 使用原始坐标
+            daily_weather = await self.get_weather_forecast(
+                location=location,
+                days=3,
+                redis=redis,
+            )
+
+            # 获取潮汐数据，使用当前日期
+            date_str = datetime.now(UTC).strftime("%Y%m%d")
+            tide_data, _ = await self.get_qweather_tide(
+                redis, harbor="P2352", date=date_str
+            )
+
+            # 获取和风指数 - 使用原始坐标
+            indicates_data = await self.get_indicates(redis, location=location)
+        except PublicDomainError as exc:
+            logger.error(
+                f"Error fetching weather data for location {location}: {exc!s}"
+            )
+            raise
+        except Exception as exc:
+            logger.error(
+                f"Unexpected error fetching weather data for location {location}: {exc!s}",
+                exc_info=True,
+            )
+            raise PublicDomainError(
+                "获取天气数据失败，请稍后再试", 503
+            ) from exc
+
+        logger.debug(
+            f"Fetched full weather data for location: {location} (POI: {poi_name or poi_id})"
+            f" - Current: {current_weather.get('now', {})}"
+        )
+
+        return {
+            "current": current_weather,
+            "hourly": hourly_weather,
+            "daily": daily_weather,
+            "tide": tide_data,
+            "indicates": indicates_data,
+        }

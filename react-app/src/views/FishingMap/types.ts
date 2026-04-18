@@ -162,3 +162,57 @@ export interface WeatherLiveResponse {
     license?: string[];
   };
 }
+
+// 钓鱼指数
+export type FishingLevel = '爆护' | '极好' | '好' | '一般' | '差' | '空军';
+
+export interface FishingIndexData {
+  fishing_index: number;
+  expert_score: number;
+  residual: number;
+  level: FishingLevel;
+  feature_breakdown: Record<string, number>;
+}
+
+// 钓鱼反馈所需数据
+export interface FishingFeedbackData {
+  // 钓鱼指数（用于显示）
+  fishing_index: number;
+  level: FishingLevel;
+  // 天气数据
+  temperature: number;
+  humidity: number;
+  pressure: number;
+  wind_speed: number;
+  precipitation: number;
+  wind_level: number;
+  // 潮汐数据
+  tide_level: number;
+  tide_type: 'H' | 'L';
+  tide_range: number;
+  hours_to_next_tide: number;
+}
+
+export interface FishingFeedbackPayload {
+  location_id: string;
+  location_name: string;
+  fishing_time: string;
+  temperature?: number;
+  humidity?: number;
+  pressure?: number;
+  wind_speed?: number;
+  precipitation?: number;
+  wind_level?: number;
+  tide_level?: number;
+  tide_type?: 'H' | 'L';
+  tide_range?: number;
+  hours_to_next_tide?: number;
+  feedback: FishingLevel;
+}
+
+export interface FishingFeedbackResponse {
+  success: boolean;
+  record_id: string;
+  expert_score: number;
+  residual: number;
+}

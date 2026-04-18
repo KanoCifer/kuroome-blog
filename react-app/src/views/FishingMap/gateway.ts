@@ -4,6 +4,9 @@ import request from '@/api/request';
 
 import type {
   ApiEnvelope,
+  FishingFeedbackPayload,
+  FishingFeedbackResponse,
+  FishingIndexData,
   PoiResponse,
   RegeoResponseData,
   SecurityKeyResponse,
@@ -39,6 +42,14 @@ export interface fishingMapGateway {
   getPOI(payload: {
     location: [number, number];
   }): Promise<AxiosResponse<ApiEnvelope<PoiResponse>>>;
+
+  getFishingIndex(payload: {
+    location: [number, number];
+  }): Promise<AxiosResponse<ApiEnvelope<FishingIndexData>>>;
+
+  postFishingFeedback(
+    payload: FishingFeedbackPayload,
+  ): Promise<AxiosResponse<ApiEnvelope<FishingFeedbackResponse>>>;
 }
 
 export const fishingMapGateway = (): fishingMapGateway => {
@@ -85,6 +96,19 @@ export const fishingMapGateway = (): fishingMapGateway => {
       return request.get('v1/geo/v2/poi/lookup', {
         params: { location: `${lng.toFixed(2)},${lat.toFixed(2)}` },
       }) as Promise<AxiosResponse<ApiEnvelope<PoiResponse>>>;
+    },
+
+    async getFishingIndex(payload: { location: [number, number] }) {
+      const [lng, lat] = payload.location;
+      return request.get('v2/fishing/index', {
+        params: { location: `${lng.toFixed(2)},${lat.toFixed(2)}` },
+      }) as Promise<AxiosResponse<ApiEnvelope<FishingIndexData>>>;
+    },
+
+    async postFishingFeedback(payload: FishingFeedbackPayload) {
+      return request.post('v2/fishing/feedback', payload) as Promise<
+        AxiosResponse<ApiEnvelope<FishingFeedbackResponse>>
+      >;
     },
   };
 };

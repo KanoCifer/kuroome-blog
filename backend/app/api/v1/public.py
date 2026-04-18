@@ -163,10 +163,7 @@ async def get_amap_security_key(request: Request) -> JSONResponse:
     """
     encoded_key = PublicService.get_amap_security_key()
 
-    return APIResponse.ok(
-        data={"securityJsCode": encoded_key},
-        message="Amap security key retrieved successfully",
-    )
+    return APIResponse.ok(data={"securityJsCode": encoded_key})
 
 
 @router.post("/weather")
@@ -177,15 +174,7 @@ async def get_weather(
     extensions: str = Body("base", description="Weather type: base/all"),
     redis: AsyncRedis = Depends(get_redis),
 ) -> JSONResponse:
-    """Get weather information from Amap API and transform to frontend format.
-
-    Args:
-        city: City adcode
-        extensions: Weather type (base for current, all for forecast)
-
-    Returns:
-        JSONResponse: Weather data transformed to frontend-expected format
-    """
+    """高德天气接口代理，获取当前天气或天气预报。（已废弃，使用 /weather/now 和 /weather/{days} 替代）"""
     data, from_cache = await PublicService.get_weather(
         redis=redis,
         city=city,
@@ -237,10 +226,7 @@ async def get_weather(
             message="Weather information retrieved from cache",
         )
 
-    return APIResponse.ok(
-        data=data,
-        message="Weather information retrieved successfully",
-    )
+    return APIResponse.ok(data=data)
 
 
 @router.post("/geocode/regeo")
@@ -250,14 +236,8 @@ async def reverse_geocode(
     location: str = Body(..., description="Location coordinates: lng,lat"),
     extensions: str = Body("base", description="Extensions type"),
 ) -> JSONResponse:
-    """Reverse geocode coordinates to address using Amap API.
-
-    Args:
-        location: Location coordinates in format "lng,lat"
-        extensions: Extensions type
-
-    Returns:
-        JSONResponse: Address information including city adcode
+    """逆地理编码接口代理，根据经纬度坐标获取地址信息和兴趣点信息。
+    已废弃，使用 /geo/v2/poi/lookup 替代。
     """
     data = await PublicService.reverse_geocode(location, extensions)
 
@@ -316,7 +296,12 @@ async def get_qweather_location(
     public_service: PublicService = Depends(public_service_dep),
     redis: AsyncRedis = Depends(get_redis),
 ) -> JSONResponse:
-    """Get location information from QWeather API."""
+    """通过经纬度坐标获取兴趣点信息。已废弃，使用 /geo/v2/poi/lookup 替代。
+
+    Args:
+        location: 经纬度坐标，格式为 "lng,lat"保留两位小数
+        type: 兴趣点类型，"scenic" "TSTA"等
+    """
     try:
         data = await public_service.get_qweather_location(
             location=location, type_=type, redis=redis
@@ -536,5 +521,30 @@ async def get_hourly_weather(
     except Exception as exc:
         return APIResponse.error(
             message=f"Failed to retrieve hourly weather forecast: {exc!s}",
+            code=500,
+        )
+
+
+@router.get("/weather/full")
+async def get_full_weather_data(
+    request: Request,
+    location: str = Query(..., description="Location coordinates: lng,lat"),
+    redis: AsyncRedis = Depends(get_redis),
+    public_service: PublicService = Depends(public_service_dep),
+) -> JSONResponse:
+    """通过经纬度坐标获取完整的天气数据。"""
+    try:
+        data = await public_service.get_full_weather_data(
+            location=location, redis=redis
+        )
+        return APIResponse.ok(
+            data=data,
+            message="Full weather data retrieved successfully",
+        )
+    except PublicDomainError as exc:
+        return APIResponse.error(message=exc.message, code=exc.code)
+    except Exception as exc:
+        return APIResponse.error(
+            message=f"Failed to retrieve full weather data: {exc!s}",
             code=500,
         )

@@ -2,6 +2,9 @@ import { DEFAULT_TIDE_SPOT_NAME } from './constants';
 import { fishingMapGateway } from './gateway';
 import type {
   AnalysisPayload,
+  FishingFeedbackPayload,
+  FishingFeedbackResponse,
+  FishingIndexData,
   PoiItem,
   PoiResponse,
   SecurityKeyResponse,
@@ -38,6 +41,14 @@ export interface FishingMapService {
   fetchPOI(payload: {
     location: [number, number];
   }): Promise<PoiItem | undefined>;
+
+  fetchFishingIndex(payload: {
+    location: [number, number];
+  }): Promise<FishingIndexData>;
+
+  submitFishingFeedback(
+    payload: FishingFeedbackPayload,
+  ): Promise<FishingFeedbackResponse>;
 }
 
 export const fishingMapService = (): FishingMapService => {
@@ -151,6 +162,20 @@ export const fishingMapService = (): FishingMapService => {
       const data = res.data.data as PoiResponse | undefined;
       const poi = data?.poi?.[0];
       return poi;
+    },
+
+    async fetchFishingIndex(payload: {
+      location: [number, number];
+    }): Promise<FishingIndexData> {
+      const res = await gateway.getFishingIndex(payload);
+      return res.data.data;
+    },
+
+    async submitFishingFeedback(
+      payload: FishingFeedbackPayload,
+    ): Promise<FishingFeedbackResponse> {
+      const res = await gateway.postFishingFeedback(payload);
+      return res.data.data;
     },
   };
 };
