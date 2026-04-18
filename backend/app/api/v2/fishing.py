@@ -65,7 +65,7 @@ class FishingFeedbackRequest(BaseModel):
     pressure: float = Field(1013.0, description="气压 hPa")
     wind_speed: float = Field(0.0, description="风速 m/s")
     precipitation: float = Field(0.0, description="降水量 mm")
-    indicate: int = Field(2, description="和风指数 1-3")
+    indices: int = Field(2, description="和风指数 1-3")
 
     # 潮汐数据
     tide_level: float = Field(1.0, description="潮位 m")
@@ -111,7 +111,7 @@ def _build_record_from_request(req: FishingFeedbackRequest) -> dict:
         "tide_type": req.tide_type,
         "hours_to_tide": req.hours_to_next_tide,
         "tide_range": req.tide_range,
-        "indicate": req.indicate,
+        "indices": req.indices,
     }
 
 
@@ -145,10 +145,10 @@ async def get_fishing_index(
     tide_info = fishing_service.parse_tide_info(tide_data)
 
     # 获取和风指数
-    indicate = int(fishing_service.get_qweather_index(weather_data))
+    indices = int(fishing_service.get_qweather_index(weather_data))
 
     # 构建钓鱼记录
-    record = fishing_service.build_record(weather_data, tide_info, indicate)
+    record = fishing_service.build_record(weather_data, tide_info, indices)
 
     # 计算钓鱼指数
     fishing_index, expert_score, residual, feature_breakdown = (

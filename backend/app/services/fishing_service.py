@@ -39,7 +39,7 @@ class FishingRecord:
     tide_type: str  # "涨潮" | "退潮"
     hours_to_next_tide: float
     tide_range: float
-    indicate: int
+    indices: int
 
 
 class FishingService:
@@ -69,8 +69,8 @@ class FishingService:
 
     def get_qweather_index(self, weather_data: dict) -> float:
         """提取天气数据中的和风指数特征"""
-        indicates = weather_data.get("indicates", {})
-        level = indicates.get("daily", [])[0].get("level", 2)  # 默认2
+        indices = weather_data.get("indices", {})
+        level = indices.get("daily", [])[0].get("level", 2)  # 默认2
         return int(level)
 
     def parse_tide_info(self, tide_data: dict) -> TideInfo:
@@ -159,7 +159,7 @@ class FishingService:
         self,
         weather_data: dict,
         tide_info: TideInfo,
-        indicate: int = 2,
+        indices: int = 2,
     ) -> FishingRecord:
         """
         从天气和潮汐数据构建钓鱼记录
@@ -167,7 +167,7 @@ class FishingService:
         Args:
             weather_data: 完整天气数据
             tide_info: 解析后的潮汐信息
-            indicate: 和风指数 1-3
+            indices: 和风指数 1-3
 
         Returns:
             钓鱼记录
@@ -180,7 +180,7 @@ class FishingService:
             pressure=float(now.get("pressure", 1013)),
             wind_speed=float(now.get("windSpeed", 0)),
             precipitation=float(now.get("precip", 0)),
-            indicate=indicate,
+            indices=indices,
             tide_type=tide_info.tide_type,
             hours_to_next_tide=tide_info.hours_to_next_tide,
             tide_range=tide_info.tide_range,
@@ -205,7 +205,7 @@ class FishingService:
             "pressure": record.pressure,
             "wind_speed": record.wind_speed,
             "precipitation": record.precipitation,
-            "indicate": record.indicate,
+            "indices": record.indices,
             "tide_type": record.tide_type,
             "hours_to_tide": record.hours_to_next_tide,
             "tide_range": record.tide_range,
@@ -267,7 +267,7 @@ class FishingService:
                         "pressure": record.pressure,
                         "wind_speed": record.wind_speed,
                         "precipitation": record.precipitation,
-                        "indicate": record.indicate,
+                        "indices": record.indices,
                         "tide_type": "涨潮"
                         if record.tide_type == "H"
                         else "退潮",

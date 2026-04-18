@@ -21,7 +21,7 @@ def test_calculate_returns_100_for_best_conditions() -> None:
         tide_type="涨潮",
         hours_to_tide=0.0,
         tide_range=2.5,
-        indicate=1,
+        indices=1,
     )
 
     assert score == 100.0
@@ -39,7 +39,7 @@ def test_calculate_stays_within_bounds_for_poor_conditions() -> None:
         tide_type="退潮",
         hours_to_tide=24.0,
         tide_range=0.0,
-        indicate=3,
+        indices=3,
     )
 
     assert 0.0 <= score <= 100.0

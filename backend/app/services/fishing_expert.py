@@ -122,12 +122,12 @@ class FishingExpertScorer:
             return 0.3 + (tide_range - 1) * 0.5
 
     @staticmethod
-    def score_indicate(indicate: int) -> float:
+    def score_indices(indices: int) -> float:
         """
         w9 和风钓鱼指数: 适宜(1)->1.0, 较适宜(2)->0.5, 不宜(3)->0.0
         """
         mapping = {1: 1.0, 2: 0.5, 3: 0.0}
-        return mapping.get(indicate, 0.5)
+        return mapping.get(indices, 0.5)
 
     def calculate(
         self,
@@ -139,7 +139,7 @@ class FishingExpertScorer:
         tide_type: str,
         hours_to_tide: float,
         tide_range: float,
-        indicate: int,
+        indices: int,
     ) -> float:
         """
         计算专家评分
@@ -153,7 +153,7 @@ class FishingExpertScorer:
             tide_type: "涨潮" | "退潮"
             hours_to_tide: 距低潮时间（小时）
             tide_range: 潮差 m
-            indicate: 和风指数 1-3
+            indices: 和风指数 1-3
 
         Returns:
             专家评分 0-100
@@ -166,7 +166,7 @@ class FishingExpertScorer:
         w6 = self.score_tide_rising(tide_type)
         w7 = self.score_hours_to_tide(hours_to_tide)
         w8 = self.score_tide_range(tide_range)
-        w9 = self.score_indicate(indicate)
+        w9 = self.score_indices(indices)
 
         score = (
             self.WEIGHTS["w1"] * w1
@@ -192,7 +192,7 @@ class FishingExpertScorer:
         tide_type: str,
         hours_to_tide: float,
         tide_range: float,
-        indicate: int,
+        indices: int,
     ) -> dict[str, float]:
         """
         获取各特征评分详情（用于调试和展示）
@@ -206,7 +206,7 @@ class FishingExpertScorer:
             "w6_tide_rising": self.score_tide_rising(tide_type),
             "w7_hours_to_tide": self.score_hours_to_tide(hours_to_tide),
             "w8_tide_range": self.score_tide_range(tide_range),
-            "w9_indicate": self.score_indicate(indicate),
+            "w9_indices": self.score_indices(indices),
         }
 
 

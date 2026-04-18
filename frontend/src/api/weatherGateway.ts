@@ -82,7 +82,7 @@ export interface WeatherFullResponse {
   daily?: WeatherForecastResponse;
   hourly?: Record<string, unknown>;
   tide?: TideResponse;
-  indicates?: Record<string, unknown>;
+  indices?: Record<string, unknown>;
   locationName?: string;
   poiId?: string;
 }

@@ -33,7 +33,7 @@ class FishingModelService:
         "w6_tide_rising",  # 是否涨潮
         "w7_hours_to_tide",  # 距离下一次潮汐的小时数
         "w8_tide_range",  # 潮差
-        "w9_indicate",  # 和风钓鱼指数参考
+        "w9_indices",  # 和风钓鱼指数参考
     ]
 
     def __init__(self, model_dir: Path | None = None) -> None:
@@ -82,7 +82,7 @@ class FishingModelService:
             1.0 if record.get("tide_type") == "涨潮" else 0.5,
             record.get("hours_to_next_tide", 3.0),
             record.get("tide_range", 1.5),
-            record.get("indicate", 2),  # 默认为较适宜
+            record.get("indices", 2),  # 默认为较适宜
         ]
         return np.array(features, dtype=np.float64)
 

@@ -28,7 +28,7 @@ class FishingRecord(Document):
     pressure: float = 1000.0  # 气压 hPa
     humidity: float = 50.0  # 湿度 %
     precipitation: float = 0.0  # 降水量 mm
-    indicate: int = 2  # 和风钓鱼指数参考 1-3
+    indices: int = 2  # 和风钓鱼指数参考 1-3
 
     # 潮汐特征
     tide_level: float = 1.0  # 潮位 m
@@ -79,7 +79,7 @@ class FishingModelMeta(Document):
         "w6_tide_rising",
         "w7_hours_to_tide",
         "w8_tide_range",
-        "w9_indicate",
+        "w9_indices",
     ]
 
     # 模型性能

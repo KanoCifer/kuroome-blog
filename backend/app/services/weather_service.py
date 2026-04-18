@@ -278,16 +278,16 @@ class WeatherService:
                 503,
             ) from exc
 
-    async def get_indicates(
+    async def get_indices(
         self,
         redis: AsyncRedis,
         location: str | None = None,
         location_id: str | None = None,
     ) -> dict:
         if location_id:
-            cache_key = f"qweather:indicates:{location_id}"
+            cache_key = f"qweather:indices:{location_id}"
         elif location:
-            cache_key = f"qweather:indicates:{location}"
+            cache_key = f"qweather:indices:{location}"
         else:
             raise WeatherDomainError("必须提供位置信息", 400)
 
@@ -362,7 +362,7 @@ class WeatherService:
                 redis, harbor="P2352", date=date_str
             )
 
-            indicates_data = await self.get_indicates(redis, location=location)
+            indices_data = await self.get_indices(redis, location=location)
         except WeatherDomainError as exc:
             logger.error(
                 f"Error fetching weather data for location {location}: {exc!s}"
@@ -387,7 +387,7 @@ class WeatherService:
             "hourly": hourly_weather,
             "daily": daily_weather,
             "tide": tide_data,
-            "indicates": indicates_data,
+            "indices": indices_data,
             "locationName": poi_name or "",
             "poiId": poi_id or "",
         }
