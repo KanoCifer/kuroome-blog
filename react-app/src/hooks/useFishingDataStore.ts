@@ -1,27 +1,23 @@
+import { useShallow } from 'zustand/react/shallow';
+
 import { useFishingMapStore } from '@/stores/fishingMapStore';
 
 export const useWeatherSelector = () =>
-  useFishingMapStore((s) => ({
-    liveWeather: s.liveWeather,
-    forecasts: s.forecasts,
-    locationName: s.locationName,
-    loading: s.weatherLoading,
-    error: s.weatherError,
-  }));
-
-export const useTideSelector = () =>
-  useFishingMapStore((s) => ({
-    tideData: s.tideData,
-    tideSpotName: s.tideSpotName,
-    loading: s.tideLoading,
-    error: s.tideError,
-    tideHarbor: s.tideHarbor,
-    tideDate: s.tideDate,
-  }));
+  useFishingMapStore(
+    useShallow((s) => ({
+      liveWeather: s.liveWeather,
+      forecasts: s.forecasts,
+      locationName: s.locationName,
+      loading: s.weatherLoading,
+      error: s.weatherError,
+    })),
+  );
 
 export const useFishingIndexSelector = () =>
-  useFishingMapStore((s) => ({
-    indexData: s.indexData,
-    loading: s.indexLoading,
-    error: s.indexError,
-  }));
+  useFishingMapStore(
+    useShallow((s) => ({
+      indexData: s.indexData,
+      loading: s.indexLoading,
+      error: s.indexError,
+    })),
+  );

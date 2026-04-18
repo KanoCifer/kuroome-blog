@@ -7,6 +7,7 @@ import type {
   FishingIndexData,
   TideData,
   WeatherDay,
+  WeatherIndex,
   WeatherNow,
 } from '@/views/FishingMap/types';
 
@@ -25,44 +26,37 @@ export interface FishingMapState {
   locationName: string;
   weatherLoading: boolean;
   weatherError: string;
+  weatherIndices: WeatherIndex[];
+
   // tide
   tideData: TideData | null;
-  tideSpotName: string;
-  tideHarbor: string;
-  tideDate: string;
-  tideLoading: boolean;
-  tideError: string;
   // fishing index
   indexData: FishingIndexData | null;
   indexLoading: boolean;
   indexError: string;
 
   fetchWeatherAndFishing: (location: [number, number]) => Promise<void>;
-  fetchTide: (harbor?: string, date?: string) => Promise<void>;
-  setTideHarbor: (harbor: string) => void;
-  setTideDate: (date: string) => void;
 }
 
 const notifyError = (msg: string) => {
   useNotificationStore.getState().error(msg);
 };
 
-export const useFishingMapStore = create<FishingMapState>((set, get) => ({
+// 创建 store
+export const useFishingMapStore = create<FishingMapState>((set) => ({
+  // 初始状态
   liveWeather: null,
   forecasts: [],
   locationName: '',
   weatherLoading: false,
   weatherError: '',
-  tideData: null,
-  tideSpotName: '黄埔港',
-  tideHarbor: 'P2352',
-  tideDate: new Date().toISOString().slice(0, 10).replace(/-/g, ''),
-  tideLoading: false,
-  tideError: '',
   indexData: null,
   indexLoading: false,
   indexError: '',
+  weatherIndices: [],
+  tideData: null,
 
+  // actions
   fetchWeatherAndFishing: async (location: [number, number]) => {
     const service = fishingMapService();
     set({
@@ -81,6 +75,8 @@ export const useFishingMapStore = create<FishingMapState>((set, get) => ({
         forecasts: weatherRes.daily ?? [],
         locationName: weatherRes.locationName,
         indexData: indexRes,
+        weatherIndices: weatherRes.indices,
+        tideData: weatherRes.tideData,
         weatherLoading: false,
         indexLoading: false,
       });
@@ -94,40 +90,5 @@ export const useFishingMapStore = create<FishingMapState>((set, get) => ({
         indexLoading: false,
       });
     }
-  },
-
-  fetchTide: async (harbor?: string, date?: string) => {
-    const { tideHarbor: h, tideDate: d } = get();
-    const harborCode = harbor ?? h;
-    const dateVal = date ?? d;
-    const service = fishingMapService();
-    set({ tideLoading: true, tideError: '' });
-    try {
-      const result = await service.fetchTideData({
-        harbor: harborCode,
-        date: dateVal,
-      });
-      const harborOption = HARBOR_OPTIONS.find((o) => o.code === harborCode);
-      set({
-        tideData: result.tideData,
-        tideSpotName: harborOption?.name ?? '黄埔港',
-        tideHarbor: harborCode,
-        tideDate: dateVal,
-        tideLoading: false,
-      });
-    } catch {
-      notifyError('获取潮汐信息失败');
-      set({ tideError: '获取潮汐信息失败', tideLoading: false });
-    }
-  },
-
-  setTideHarbor: (harbor: string) => {
-    set({ tideHarbor: harbor });
-    void get().fetchTide(harbor, undefined);
-  },
-
-  setTideDate: (date: string) => {
-    set({ tideDate: date });
-    void get().fetchTide(undefined, date);
   },
 }));

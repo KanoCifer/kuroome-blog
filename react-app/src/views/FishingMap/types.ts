@@ -1,23 +1,27 @@
 import type {
   AMapDriving,
   AMapDrivingResult,
+  AMapGeolocationInstance,
   AMapMapInstance,
   AMapMarker,
   AMapMarkerInstance,
   AMapNamespace,
   AMapPolyline,
   AMapSecurityConfig,
+  GeolocationStatusEvent,
 } from '@/types/maptype';
 
 export type {
   AMapDriving,
   AMapDrivingResult,
+  AMapGeolocationInstance,
   AMapMapInstance,
   AMapMarker,
   AMapMarkerInstance,
   AMapNamespace,
   AMapPolyline,
   AMapSecurityConfig,
+  GeolocationStatusEvent,
 };
 
 export interface ApiEnvelope<T> {
@@ -133,6 +137,27 @@ export interface WeatherForecastResponse {
   };
 }
 
+// 天气指数
+export interface WeatherIndex {
+  date: string;
+  type: string;
+  name: string;
+  level: string;
+  category: string;
+  text: string;
+}
+
+export interface WeatherIndicesResponse {
+  code: string;
+  updateTime: string;
+  fxLink: string;
+  daily?: WeatherIndex[];
+  refer?: {
+    sources?: string[];
+    license?: string[];
+  };
+}
+
 // 实时天气
 export interface WeatherNow {
   obsTime: string;
@@ -168,7 +193,7 @@ export interface WeatherFullResponse {
   daily?: WeatherForecastResponse;
   hourly?: Record<string, unknown>;
   tide?: TideData;
-  indicates?: Record<string, unknown>;
+  indices?: WeatherIndicesResponse;
   locationName?: string;
   poiId?: string;
 }
@@ -195,7 +220,7 @@ export interface FishingFeedbackData {
   pressure: number;
   wind_speed: number;
   precipitation: number;
-  indicate: number;
+  indices: number;
   // 潮汐数据
   tide_level: number;
   tide_type?: '涨潮' | '退潮';
@@ -212,7 +237,7 @@ export interface FishingFeedbackPayload {
   pressure?: number;
   wind_speed?: number;
   precipitation?: number;
-  indicate?: number;
+  indices?: number;
   tide_level?: number;
   tide_type?: '涨潮' | '退潮';
   tide_range?: number;
