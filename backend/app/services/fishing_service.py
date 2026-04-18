@@ -5,10 +5,10 @@
 
 from __future__ import annotations
 
-import logging
 from dataclasses import dataclass
 from typing import Literal
 
+from app.core.logger import logger
 from app.repositories.fishing_repo import FishingRepo
 from app.services.fishing_expert import FishingExpertScorer, fishing_expert
 from app.services.fishing_model_service import (
@@ -16,14 +16,12 @@ from app.services.fishing_model_service import (
     fishing_model_service,
 )
 
-logger = logging.getLogger(__name__)
-
 
 @dataclass
 class TideInfo:
     """潮汐信息"""
 
-    tide_type: Literal["H", "L"]  # H=高潮(涨潮), L=低潮(退潮)
+    tide_type: Literal["涨潮", "退潮"]  # 涨潮, 退潮
     tide_level: float  # 潮位 m
     tide_range: float  # 潮差 m
     hours_to_next_tide: float  # 距下一潮汐时间（小时）
@@ -38,10 +36,10 @@ class FishingRecord:
     pressure: float
     wind_speed: float
     precipitation: float
-    wind_level: int
-    tide_type: str  # "涨潮" | "退潮" | "平潮"
+    tide_type: str  # "涨潮" | "退潮"
     hours_to_next_tide: float
     tide_range: float
+    indicate: int
 
 
 class FishingService:
@@ -72,7 +70,7 @@ class FishingService:
     def get_qweather_index(self, weather_data: dict) -> float:
         """提取天气数据中的和风指数特征"""
         indicates = weather_data.get("indicates", {})
-        level = indicates.get("daily", [])[0].get("level", 1)  # 默认1
+        level = indicates.get("daily", [])[0].get("level", 2)  # 默认2
         return int(level)
 
     def parse_tide_info(self, tide_data: dict) -> TideInfo:
@@ -101,7 +99,7 @@ class FishingService:
 
         if not tide_table:
             return TideInfo(
-                tide_type="H",
+                tide_type="涨潮",
                 tide_level=1.5,
                 tide_range=1.5,
                 hours_to_next_tide=3.0,
@@ -131,7 +129,7 @@ class FishingService:
             current_tide = tide_table[0]
             next_tide = tide_table[1] if len(tide_table) > 1 else None
 
-        tide_type = current_tide.get("type", "H")
+        tide_type = "涨潮" if current_tide.get("type", "H") == "H" else "退潮"
         tide_level = float(current_tide.get("height", 1.5))
 
         # 潮差 = 相邻潮汐点的高度差
@@ -161,7 +159,7 @@ class FishingService:
         self,
         weather_data: dict,
         tide_info: TideInfo,
-        wind_level: int = 1,
+        indicate: int = 2,
     ) -> FishingRecord:
         """
         从天气和潮汐数据构建钓鱼记录
@@ -169,7 +167,7 @@ class FishingService:
         Args:
             weather_data: 完整天气数据
             tide_info: 解析后的潮汐信息
-            wind_level: 和风指数 1-3
+            indicate: 和风指数 1-3
 
         Returns:
             钓鱼记录
@@ -182,8 +180,8 @@ class FishingService:
             pressure=float(now.get("pressure", 1013)),
             wind_speed=float(now.get("windSpeed", 0)),
             precipitation=float(now.get("precip", 0)),
-            wind_level=wind_level,
-            tide_type="涨潮" if tide_info.tide_type == "H" else "退潮",
+            indicate=indicate,
+            tide_type=tide_info.tide_type,
             hours_to_next_tide=tide_info.hours_to_next_tide,
             tide_range=tide_info.tide_range,
         )
@@ -207,7 +205,7 @@ class FishingService:
             "pressure": record.pressure,
             "wind_speed": record.wind_speed,
             "precipitation": record.precipitation,
-            "wind_level": record.wind_level,
+            "indicate": record.indicate,
             "tide_type": record.tide_type,
             "hours_to_tide": record.hours_to_next_tide,
             "tide_range": record.tide_range,
@@ -269,7 +267,7 @@ class FishingService:
                         "pressure": record.pressure,
                         "wind_speed": record.wind_speed,
                         "precipitation": record.precipitation,
-                        "wind_level": record.wind_level,
+                        "indicate": record.indicate,
                         "tide_type": "涨潮"
                         if record.tide_type == "H"
                         else "退潮",
@@ -295,17 +293,15 @@ class FishingService:
 
     def get_level(
         self, index: float
-    ) -> Literal["爆护", "极好", "好", "一般", "差", "空军"]:
+    ) -> Literal["爆护", "好", "一般", "差", "空军"]:
         """根据指数获取等级"""
         if index >= 90:
             return "爆护"
-        elif index >= 75:
-            return "极好"
-        elif index >= 60:
+        elif index >= 70:
             return "好"
-        elif index >= 40:
+        elif index >= 50:
             return "一般"
-        elif index >= 20:
+        elif index >= 25:
             return "差"
         else:
             return "空军"

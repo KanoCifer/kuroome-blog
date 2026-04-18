@@ -12,8 +12,7 @@ interface FishingIndexCardProps {
 
 const LEVEL_COLORS: Record<string, string> = {
   爆护: 'text-red-500',
-  极好: 'text-orange-500',
-  好: 'text-yellow-500',
+  好: 'text-orange-500',
   一般: 'text-green-500',
   差: 'text-blue-500',
   空军: 'text-gray-500',
@@ -21,8 +20,7 @@ const LEVEL_COLORS: Record<string, string> = {
 
 const LEVEL_BG: Record<string, string> = {
   爆护: 'bg-red-50 dark:bg-red-950/30',
-  极好: 'bg-orange-50 dark:bg-orange-950/30',
-  好: 'bg-yellow-50 dark:bg-yellow-950/30',
+  好: 'bg-orange-50 dark:bg-orange-950/30',
   一般: 'bg-green-50 dark:bg-green-950/30',
   差: 'bg-blue-50 dark:bg-blue-950/30',
   空军: 'bg-gray-50 dark:bg-gray-800/30',

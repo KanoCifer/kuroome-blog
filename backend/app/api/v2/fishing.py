@@ -5,7 +5,6 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime
 from typing import Literal
 
 from fastapi import APIRouter, Depends, Query
@@ -32,7 +31,7 @@ class FishingIndexResponse(BaseModel):
     fishing_index: int = Field(..., description="钓鱼指数 0-100")
     expert_score: int = Field(..., description="专家评分")
     residual: float = Field(..., description="个性化校正量")
-    level: Literal["爆护", "极好", "好", "一般", "差", "空军"] = Field(
+    level: Literal["爆护", "好", "一般", "差", "空军"] = Field(
         ..., description="钓鱼等级"
     )
     feature_breakdown: dict[str, float] = Field(
@@ -45,7 +44,7 @@ class FishingFeedbackRequest(BaseModel):
 
     location_id: str = Field(..., description="钓点ID")
     location_name: str = Field(..., description="钓点名称")
-    fishing_time: datetime = Field(..., description="钓鱼时间")
+    fishing_time: str = Field(..., description="钓鱼时间")
 
     # 天气数据
     temperature: float = Field(20.0, description="温度 °C")
@@ -53,13 +52,11 @@ class FishingFeedbackRequest(BaseModel):
     pressure: float = Field(1013.0, description="气压 hPa")
     wind_speed: float = Field(0.0, description="风速 m/s")
     precipitation: float = Field(0.0, description="降水量 mm")
-    wind_level: int = Field(1, description="和风指数 1-3")
+    indicate: int = Field(2, description="和风指数 1-3")
 
     # 潮汐数据
     tide_level: float = Field(1.0, description="潮位 m")
-    tide_type: Literal["H", "L", "涨潮", "退潮"] = Field(
-        "H", description="高潮/低潮"
-    )
+    tide_type: Literal["涨潮", "退潮"] = Field("涨潮", description="高潮/低潮")
     tide_range: float = Field(1.5, description="潮差 m")
     hours_to_next_tide: float = Field(
         3.0, description="距下一潮汐时间（小时）"
@@ -101,7 +98,7 @@ def _build_record_from_request(req: FishingFeedbackRequest) -> dict:
         "tide_type": req.tide_type,
         "hours_to_tide": req.hours_to_next_tide,
         "tide_range": req.tide_range,
-        "wind_level": req.wind_level,
+        "indicate": req.indicate,
     }
 
 
@@ -131,10 +128,10 @@ async def get_fishing_index(
     tide_info = fishing_service.parse_tide_info(tide_data)
 
     # 获取和风指数
-    wind_level = int(fishing_service.get_qweather_index(weather_data))
+    indicate = int(fishing_service.get_qweather_index(weather_data))
 
     # 构建钓鱼记录
-    record = fishing_service.build_record(weather_data, tide_info, wind_level)
+    record = fishing_service.build_record(weather_data, tide_info, indicate)
 
     # 计算钓鱼指数
     fishing_index, expert_score, residual, feature_breakdown = (

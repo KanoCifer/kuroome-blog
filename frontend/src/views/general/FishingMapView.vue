@@ -79,14 +79,22 @@
       </div>
 
       <!-- Map Controls and Info -->
-      <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2">
-        <!-- Tide Card -->
+      <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <TideCard @update="handleTideUpdate" />
-
-        <!-- Weather Card -->
         <WeatherCard :location="[113.389549, 23.050067]" @update="handleWeatherUpdate" />
+        <FishingIndexCard :location="[113.389549, 23.050067]" @feedback-click="handleFeedbackClick" />
       </div>
     </div>
+
+    <FishingFeedbackForm
+      v-if="feedbackOpen && currentFishingData"
+      :is-open="feedbackOpen"
+      :fishing-data="currentFishingData"
+      :location-id="feedbackLocationId"
+      :location-name="feedbackLocationName"
+      @cancel="feedbackOpen = false"
+      @success="handleFeedbackSuccess"
+    />
 
     <!-- Floating AI Analysis -->
     <div class="fixed right-6 bottom-0 z-50">
@@ -128,9 +136,7 @@
         <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"></span>
         <span class="relative inline-flex h-3 w-3 rounded-full bg-emerald-500"></span>
       </span>
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-      </svg>
+      <Bot class="h-6 w-6" />
     </button>
   </BasicDetail>
 </template>
@@ -142,6 +148,10 @@ import MapContainer from "@/components/basic/MapContainer.vue";
 import TideCard from "@/components/map/TideCard.vue";
 import WeatherCard from "@/components/map/WeatherCard.vue";
 import fishingSpotsData from "@/data/fishing-spots.json";
+import FishingFeedbackForm from "@/views/general/fishing/components/FishingFeedbackForm.vue";
+import FishingIndexCard from "@/views/general/fishing/components/FishingIndexCard.vue";
+import type { FishingFeedbackData, FishingIndexData } from "@/views/general/fishing/types";
+import { Bot } from "lucide-vue-next";
 import { computed, ref, useTemplateRef } from "vue";
 
 export interface AMapMarker {
@@ -164,6 +174,9 @@ interface LiveWeather {
   windScale: string;
   humidity: string;
   icon: string;
+  pressure?: string;
+  windSpeed?: string;
+  precip?: string;
 }
 
 interface ForecastDay {
@@ -196,6 +209,11 @@ const tideData = ref<TideData | null>(null);
 const locationName = ref<string>("");
 const tideSpotName = ref<string>("黄埔港");
 
+const feedbackOpen = ref(false);
+const feedbackLocationId = ref("default");
+const feedbackLocationName = ref("钓鱼地点");
+const currentFishingData = ref<FishingFeedbackData | null>(null);
+
 const analysisPayload = computed(() => {
   if (!liveWeather.value && forecasts.value.length === 0 && !tideData.value) {
     return null;
@@ -211,7 +229,11 @@ const analysisPayload = computed(() => {
 
 const analysisHasData = computed(() => !!liveWeather.value || forecasts.value.length > 0 || !!tideData.value);
 
-const handleWeatherUpdate = (payload: { liveWeather: LiveWeather; forecasts: ForecastDay[]; locationName: string }) => {
+const handleWeatherUpdate = (payload: {
+  liveWeather: LiveWeather | null;
+  forecasts: ForecastDay[];
+  locationName: string;
+}) => {
   liveWeather.value = payload.liveWeather;
   forecasts.value = payload.forecasts;
   locationName.value = payload.locationName;
@@ -220,6 +242,56 @@ const handleWeatherUpdate = (payload: { liveWeather: LiveWeather; forecasts: For
 const handleTideUpdate = (payload: { tideData: TideData | null; spotName: string }) => {
   tideData.value = payload.tideData;
   tideSpotName.value = payload.spotName;
+};
+
+const handleFeedbackClick = (data: FishingIndexData) => {
+  const windLevel = liveWeather.value
+    ? Math.min(3, Math.max(1, Math.ceil((Number(liveWeather.value.windScale) || 1) / 3)))
+    : 1;
+
+  let tideLevel = 1.5;
+  let tideType: "H" | "L" = "H";
+  let tideRange = 1.5;
+  let hoursToNextTide = 3.0;
+
+  if (tideData.value?.tideTable?.length) {
+    const currentTide = tideData.value.tideTable[0];
+    const nextTide = tideData.value.tideTable[1];
+
+    tideType = currentTide.type || "H";
+    tideLevel = Number(currentTide.height) || 1.5;
+
+    if (nextTide) {
+      const nextLevel = Number(nextTide.height) || 1.5;
+      tideRange = Math.abs(nextLevel - tideLevel);
+      const currentTime = new Date(currentTide.fxTime).getTime();
+      const nextTime = new Date(nextTide.fxTime).getTime();
+      hoursToNextTide = (nextTime - currentTime) / (1000 * 60 * 60);
+    }
+  }
+
+  currentFishingData.value = {
+    fishing_index: data.fishing_index,
+    level: data.level,
+    temperature: Number(liveWeather.value?.temp) || 20,
+    humidity: Number(liveWeather.value?.humidity) || 50,
+    pressure: Number(liveWeather.value?.pressure) || 1013,
+    wind_speed: Number(liveWeather.value?.windSpeed) || 0,
+    precipitation: Number(liveWeather.value?.precip) || 0,
+    wind_level: windLevel,
+    tide_level: tideLevel,
+    tide_type: tideType,
+    tide_range: tideRange,
+    hours_to_next_tide: hoursToNextTide,
+  };
+
+  feedbackLocationId.value = selectedSpotIndex.value !== null ? String(selectedSpotIndex.value) : "default";
+  feedbackLocationName.value = locationName.value || "钓鱼地点";
+  feedbackOpen.value = true;
+};
+
+const handleFeedbackSuccess = () => {
+  feedbackOpen.value = false;
 };
 
 // 地图事件处理

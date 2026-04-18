@@ -12,20 +12,21 @@ class FishingExpertScorer:
     """
     专家规则钓鱼评分器
 
-    公式: Expert_score = 0.2*w1 + 0.1*w2 + 0.1*w3 + 0.1*w4 + 0.05*w5 + 0.2*w6 + 0.2*w7 + 0.1*w8 + 0.1*w9
+    公式: Expert_score = w1*f1 + w2*f2 + ... + w9*f9
     """
 
     # 权重配置
     WEIGHTS = {  # noqa: RUF012
-        "w1": 0.2,  # 温度
-        "w2": 0.1,  # 湿度
-        "w3": 0.1,  # 气压
-        "w4": 0.1,  # 风速
-        "w5": 0.05,  # 降雨
-        "w6": 0.2,  # 涨潮
-        "w7": 0.2,  # 距低潮时间
-        "w8": 0.1,  # 潮差
-        "w9": 0.1,  # 和风指数
+        # 原始权重 0.2:0.1:0.1:0.1:0.05:0.2:0.2:0.1:0.1 归一化后总和为 1
+        "w1": 4 / 23,  # 温度
+        "w2": 2 / 23,  # 湿度
+        "w3": 2 / 23,  # 气压
+        "w4": 2 / 23,  # 风速
+        "w5": 1 / 23,  # 降雨
+        "w6": 4 / 23,  # 涨潮
+        "w7": 4 / 23,  # 距低潮时间
+        "w8": 2 / 23,  # 潮差
+        "w9": 2 / 23,  # 和风天气钓鱼指数
     }
 
     @staticmethod
@@ -37,20 +38,20 @@ class FishingExpertScorer:
             return 1.0
         elif temp < 20:
             # 每降低1°C扣0.05分
-            return np.amax([0.0, 1.0 - (20 - temp) * 0.05])
+            return max(0.0, 1.0 - (20 - temp) * 0.05)
         else:
             # 每升高1°C扣0.05分
-            return np.amax([0.0, 1.0 - (temp - 28) * 0.05])
+            return max(0.0, 1.0 - (temp - 28) * 0.05)
 
     @staticmethod
     def score_humidity(humidity: float) -> float:
         """
-        w2 湿度评分: 85% = 1分, 偏离扣分
+        w2 湿度评分: 75% = 1分, 偏离扣分
         """
-        if humidity == 85:
+        if humidity == 75:
             return 1.0
-        diff = abs(humidity - 85)
-        return np.amax([0.0, 1.0 - diff * 0.02])
+        diff = abs(humidity - 75)
+        return max(0.0, 1.0 - diff * 0.02)
 
     @staticmethod
     def score_pressure(pressure: float) -> float:
@@ -59,7 +60,7 @@ class FishingExpertScorer:
         f_pressure = (pressure - 1000) / 25
         """
         f_pressure: float = (pressure - 1000) / 25
-        return np.clip(f_pressure, 0, 2)  # 限制在0-2范围
+        return min(max(f_pressure, 0.0), 2.0)  # 限制在0-2范围
 
     @staticmethod
     def score_wind(wind_speed: float) -> float:
@@ -70,7 +71,7 @@ class FishingExpertScorer:
             return 1.0
         else:
             # 每超过3m/s 1m/s扣0.33分
-            return np.amax([0.0, 1.0 - (wind_speed - 3) * 0.33])
+            return max(0.0, 1.0 - (wind_speed - 3) * 0.33)
 
     @staticmethod
     def score_rain(precipitation: float) -> float:
@@ -88,9 +89,9 @@ class FishingExpertScorer:
     @staticmethod
     def score_tide_rising(tide_type: str) -> float:
         """
-        w6 是否涨潮: 涨潮=1, 退潮=0
+        w6 是否涨潮: 涨潮=1, 退潮=0.5
         """
-        return 1.0 if tide_type == "涨潮" else 0.0
+        return 1.0 if tide_type == "涨潮" else 0.5
 
     @staticmethod
     def score_hours_to_tide(hours: float) -> float:
@@ -110,23 +111,23 @@ class FishingExpertScorer:
     def score_tide_range(tide_range: float) -> float:
         """
         w8 高低潮差: 越大越高分
-        假设最佳潮差2-3m为满分1分
+        最佳潮差2-3m为满分1分
         """
-        if tide_range >= 2.5:
+        if tide_range >= 2:
             return 1.0
-        elif tide_range < 0.5:
+        elif tide_range < 1:
             return 0.3
         else:
-            # 线性映射: 0.5m->0.3, 2.5m->1.0
-            return 0.3 + (tide_range - 0.5) * (0.7 / 2.0)
+            # 线性映射 1-2m之间
+            return 0.3 + (tide_range - 1) * 0.5
 
     @staticmethod
-    def score_wind_level(wind_level: int) -> float:
+    def score_indicate(indicate: int) -> float:
         """
         w9 和风钓鱼指数: 适宜(1)->1.0, 较适宜(2)->0.5, 不宜(3)->0.0
         """
         mapping = {1: 1.0, 2: 0.5, 3: 0.0}
-        return mapping.get(wind_level, 0.5)
+        return mapping.get(indicate, 0.5)
 
     def calculate(
         self,
@@ -138,7 +139,7 @@ class FishingExpertScorer:
         tide_type: str,
         hours_to_tide: float,
         tide_range: float,
-        wind_level: int,
+        indicate: int,
     ) -> float:
         """
         计算专家评分
@@ -149,10 +150,10 @@ class FishingExpertScorer:
             pressure: 气压 hPa
             wind_speed: 风速 m/s
             precipitation: 降水量 mm
-            tide_type: "涨潮" | "退潮" | "平潮"
+            tide_type: "涨潮" | "退潮"
             hours_to_tide: 距低潮时间（小时）
             tide_range: 潮差 m
-            wind_level: 和风指数 1-3
+            indicate: 和风指数 1-3
 
         Returns:
             专家评分 0-100
@@ -165,9 +166,9 @@ class FishingExpertScorer:
         w6 = self.score_tide_rising(tide_type)
         w7 = self.score_hours_to_tide(hours_to_tide)
         w8 = self.score_tide_range(tide_range)
-        w9 = self.score_wind_level(wind_level)
+        w9 = self.score_indicate(indicate)
 
-        raw_score = (
+        score = (
             self.WEIGHTS["w1"] * w1
             + self.WEIGHTS["w2"] * w2
             + self.WEIGHTS["w3"] * w3
@@ -179,8 +180,7 @@ class FishingExpertScorer:
             + self.WEIGHTS["w9"] * w9
         )
 
-        # 转换为0-100
-        return np.clip(raw_score * 100, 0, 100)
+        return np.clip(score * 100, 0, 100)  # 归一化到0-100并限制范围
 
     def get_feature_scores(
         self,
@@ -192,7 +192,7 @@ class FishingExpertScorer:
         tide_type: str,
         hours_to_tide: float,
         tide_range: float,
-        wind_level: int,
+        indicate: int,
     ) -> dict[str, float]:
         """
         获取各特征评分详情（用于调试和展示）
@@ -206,7 +206,7 @@ class FishingExpertScorer:
             "w6_tide_rising": self.score_tide_rising(tide_type),
             "w7_hours_to_tide": self.score_hours_to_tide(hours_to_tide),
             "w8_tide_range": self.score_tide_range(tide_range),
-            "w9_wind_level": self.score_wind_level(wind_level),
+            "w9_indicate": self.score_indicate(indicate),
         }
 
 

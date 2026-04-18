@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from beanie import SortDirection
 from bson import ObjectId
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,7 +22,7 @@ class FishingRepo:
         """获取指定地点的最新钓鱼记录"""
         records = (
             await FishingRecord.find({"location_id": location_id})
-            .sort("fishing_time", SortDirection.DESCENDING)  # type: ignore
+            .sort("-fishing_time")
             .limit(limit)
             .to_list()
         )
@@ -33,7 +32,7 @@ class FishingRepo:
         """获取所有有反馈分数的记录用于模型训练"""
         records = (
             await FishingRecord.find({"feedback_score": {"$gte": 0}})
-            .sort("fishing_time", SortDirection.DESCENDING)
+            .sort("-fishing_time")
             .to_list()
         )
         return records

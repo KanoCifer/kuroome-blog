@@ -163,8 +163,18 @@ export interface WeatherLiveResponse {
   };
 }
 
+export interface WeatherFullResponse {
+  current?: WeatherLiveResponse;
+  daily?: WeatherForecastResponse;
+  hourly?: Record<string, unknown>;
+  tide?: TideData;
+  indicates?: Record<string, unknown>;
+  locationName?: string;
+  poiId?: string;
+}
+
 // 钓鱼指数
-export type FishingLevel = '爆护' | '极好' | '好' | '一般' | '差' | '空军';
+export type FishingLevel = '爆护' | '好' | '一般' | '差' | '空军';
 
 export interface FishingIndexData {
   fishing_index: number;
@@ -185,10 +195,10 @@ export interface FishingFeedbackData {
   pressure: number;
   wind_speed: number;
   precipitation: number;
-  wind_level: number;
+  indicate: number;
   // 潮汐数据
   tide_level: number;
-  tide_type: 'H' | 'L';
+  tide_type?: '涨潮' | '退潮';
   tide_range: number;
   hours_to_next_tide: number;
 }
@@ -202,9 +212,9 @@ export interface FishingFeedbackPayload {
   pressure?: number;
   wind_speed?: number;
   precipitation?: number;
-  wind_level?: number;
+  indicate?: number;
   tide_level?: number;
-  tide_type?: 'H' | 'L';
+  tide_type?: '涨潮' | '退潮';
   tide_range?: number;
   hours_to_next_tide?: number;
   feedback: FishingLevel;

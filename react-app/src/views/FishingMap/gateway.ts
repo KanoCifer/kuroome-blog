@@ -7,12 +7,10 @@ import type {
   FishingFeedbackPayload,
   FishingFeedbackResponse,
   FishingIndexData,
-  PoiResponse,
   RegeoResponseData,
   SecurityKeyResponse,
   TideData,
-  WeatherForecastResponse,
-  WeatherLiveResponse,
+  WeatherFullResponse,
 } from './types';
 
 interface RegeoRequestPayload {
@@ -30,18 +28,9 @@ export interface fishingMapGateway {
     date: string;
   }): Promise<AxiosResponse<ApiEnvelope<TideData>>>;
 
-  getWeatherForecast(payload: {
+  getWeatherFull(payload: {
     location: [number, number];
-    days: number;
-  }): Promise<AxiosResponse<ApiEnvelope<WeatherForecastResponse>>>;
-
-  getWeatherLive(payload: {
-    location: [number, number];
-  }): Promise<AxiosResponse<ApiEnvelope<WeatherLiveResponse>>>;
-
-  getPOI(payload: {
-    location: [number, number];
-  }): Promise<AxiosResponse<ApiEnvelope<PoiResponse>>>;
+  }): Promise<AxiosResponse<ApiEnvelope<WeatherFullResponse>>>;
 
   getFishingIndex(payload: {
     location: [number, number];
@@ -72,30 +61,11 @@ export const fishingMapGateway = (): fishingMapGateway => {
       >;
     },
 
-    async getWeatherForecast(payload: {
-      location: [number, number];
-      days: number;
-    }) {
+    async getWeatherFull(payload: { location: [number, number] }) {
       const [lng, lat] = payload.location;
-      const params = { location: `${lng.toFixed(2)},${lat.toFixed(2)}` };
-
-      return request.get(`v1/weather/${payload.days}`, {
-        params: params,
-      }) as Promise<AxiosResponse<ApiEnvelope<WeatherForecastResponse>>>;
-    },
-
-    async getWeatherLive(payload: { location: [number, number] }) {
-      const [lng, lat] = payload.location;
-      return request.get('v1/weather/now', {
+      return request.get('v1/weather/full', {
         params: { location: `${lng.toFixed(2)},${lat.toFixed(2)}` },
-      }) as Promise<AxiosResponse<ApiEnvelope<WeatherLiveResponse>>>;
-    },
-
-    async getPOI(payload: { location: [number, number] }) {
-      const [lng, lat] = payload.location;
-      return request.get('v1/geo/v2/poi/lookup', {
-        params: { location: `${lng.toFixed(2)},${lat.toFixed(2)}` },
-      }) as Promise<AxiosResponse<ApiEnvelope<PoiResponse>>>;
+      }) as Promise<AxiosResponse<ApiEnvelope<WeatherFullResponse>>>;
     },
 
     async getFishingIndex(payload: { location: [number, number] }) {

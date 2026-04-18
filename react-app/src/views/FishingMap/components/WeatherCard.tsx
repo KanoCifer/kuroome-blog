@@ -33,13 +33,10 @@ export function WeatherCard({
     setWeatherError('');
 
     try {
-      const { now } = await service.fetchWeatherLive({ location });
-      const { daily } = await service.fetchWeatherForecast({
+      const { now, daily, locationName } = await service.fetchWeatherFull({
         location,
-        days: 3,
       });
-      const poi = await service.fetchPOI({ location });
-      const resolvedLocationName = poi?.name || '未知地点';
+      const resolvedLocationName = locationName || '钓鱼地点';
       const resolvedLive = now ?? null;
       const resolvedDaily = daily ?? [];
 

@@ -5,13 +5,10 @@ import type {
   FishingFeedbackPayload,
   FishingFeedbackResponse,
   FishingIndexData,
-  PoiItem,
-  PoiResponse,
   SecurityKeyResponse,
   TideData,
   WeatherDay,
-  WeatherForecastResponse,
-  WeatherLiveResponse,
+  WeatherFullResponse,
   WeatherNow,
 } from './types';
 
@@ -31,16 +28,12 @@ export interface FishingMapService {
     signal?: AbortSignal,
   ): Promise<void>;
 
-  fetchWeatherForecast(payload: {
-    location: [number, number];
-    days: number;
-  }): Promise<{ updateTime?: string; daily?: WeatherDay[] }>;
-  fetchWeatherLive(payload: {
-    location: [number, number];
-  }): Promise<{ updateTime?: string; now?: WeatherNow }>;
-  fetchPOI(payload: {
-    location: [number, number];
-  }): Promise<PoiItem | undefined>;
+  fetchWeatherFull(payload: { location: [number, number] }): Promise<{
+    updateTime?: string;
+    now?: WeatherNow;
+    daily?: WeatherDay[];
+    locationName: string;
+  }>;
 
   fetchFishingIndex(payload: {
     location: [number, number];
@@ -50,6 +43,23 @@ export interface FishingMapService {
     payload: FishingFeedbackPayload,
   ): Promise<FishingFeedbackResponse>;
 }
+
+const resolveLocationName = (
+  fullData: WeatherFullResponse | undefined,
+  now: WeatherNow | undefined,
+): string => {
+  const name =
+    fullData?.locationName?.trim() ||
+    (
+      fullData?.hourly as { locationName?: string } | undefined
+    )?.locationName?.trim();
+
+  if (name) {
+    return name;
+  }
+
+  return now?.text ? '当前位置' : '钓鱼地点';
+};
 
 export const fishingMapService = (): FishingMapService => {
   const gateway = fishingMapGateway();
@@ -132,36 +142,25 @@ export const fishingMapService = (): FishingMapService => {
       }
     },
 
-    async fetchWeatherForecast(payload: {
-      location: [number, number];
-      days: number;
-    }): Promise<{ updateTime?: string; daily?: WeatherDay[] }> {
-      const res = await gateway.getWeatherForecast(payload);
-      const data = res.data.data as WeatherForecastResponse | undefined;
-      const updateTime = data?.updateTime;
-      const daily = data?.daily;
+    async fetchWeatherFull(payload: { location: [number, number] }): Promise<{
+      updateTime?: string;
+      now?: WeatherNow;
+      daily?: WeatherDay[];
+      locationName: string;
+    }> {
+      const res = await gateway.getWeatherFull(payload);
+      const data = res.data.data as WeatherFullResponse | undefined;
+      const now = data?.current?.now;
+      const daily = data?.daily?.daily;
+      const updateTime = data?.current?.updateTime ?? data?.daily?.updateTime;
+      const locationName = resolveLocationName(data, now);
 
-      return { updateTime, daily };
-    },
-
-    async fetchWeatherLive(payload: {
-      location: [number, number];
-    }): Promise<{ updateTime?: string; now?: WeatherNow }> {
-      const res = await gateway.getWeatherLive(payload);
-      const data = res.data.data as WeatherLiveResponse | undefined;
-      const updateTime = data?.updateTime;
-      const now = data?.now;
-
-      return { updateTime, now };
-    },
-
-    async fetchPOI(payload: {
-      location: [number, number];
-    }): Promise<PoiItem | undefined> {
-      const res = await gateway.getPOI(payload);
-      const data = res.data.data as PoiResponse | undefined;
-      const poi = data?.poi?.[0];
-      return poi;
+      return {
+        updateTime,
+        now,
+        daily,
+        locationName,
+      };
     },
 
     async fetchFishingIndex(payload: {

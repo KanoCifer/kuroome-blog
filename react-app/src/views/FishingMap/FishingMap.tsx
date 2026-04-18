@@ -294,17 +294,12 @@ export default function FishingMap() {
 
   const handleFeedbackClick = useCallback(
     (data: FishingIndexData) => {
-      // 从天气数据提取风等级（1-3）
-      const windLevel = liveWeather
-        ? Math.min(
-            3,
-            Math.max(1, Math.ceil((Number(liveWeather.windScale) || 1) / 3)),
-          )
-        : 1;
+      // 从天气数据提取和风天气钓鱼指数（1-3）
+      const windLevel = 2; // 默认中等
 
       // 从潮汐数据提取潮汐信息
       let tideLevel = 1.5;
-      let tideType: 'H' | 'L' = 'H';
+      let tideType: '涨潮' | '退潮' = '涨潮';
       let tideRange = 1.5;
       let hoursToNextTide = 3.0;
 
@@ -312,7 +307,7 @@ export default function FishingMap() {
         const currentTide = tideData.tideTable[0];
         const nextTide = tideData.tideTable[1];
 
-        tideType = currentTide.type || 'H';
+        tideType = currentTide.type === 'H' ? '涨潮' : '退潮';
         tideLevel = Number(currentTide.height) || 1.5;
 
         if (nextTide) {
@@ -334,7 +329,7 @@ export default function FishingMap() {
         pressure: Number(liveWeather?.pressure) || 1013,
         wind_speed: Number(liveWeather?.windSpeed) || 0,
         precipitation: Number(liveWeather?.precip) || 0,
-        wind_level: windLevel,
+        indicate: windLevel,
         tide_level: tideLevel,
         tide_type: tideType,
         tide_range: tideRange,

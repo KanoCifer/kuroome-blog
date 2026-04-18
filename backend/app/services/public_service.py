@@ -643,4 +643,6 @@ Sitemap: {sitemap_url}
             "daily": daily_weather,
             "tide": tide_data,
             "indicates": indicates_data,
+            "locationName": poi_name or "",
+            "poiId": poi_id or "",
         }

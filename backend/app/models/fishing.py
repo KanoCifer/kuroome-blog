@@ -25,14 +25,14 @@ class FishingRecord(Document):
     # 天气特征
     temperature: float = 20.0  # 温度 °C
     wind_speed: float = 0.0  # 风速 m/s
-    pressure: float = 1013.0  # 气压 hPa
+    pressure: float = 1000.0  # 气压 hPa
     humidity: float = 50.0  # 湿度 %
     precipitation: float = 0.0  # 降水量 mm
-    wind_level: int = 1  # 和风指数 1-3
+    indicate: int = 2  # 和风钓鱼指数参考 1-3
 
     # 潮汐特征
     tide_level: float = 1.0  # 潮位 m
-    tide_type: Literal["H", "L"] = "H"  # 高潮/低潮
+    tide_type: Literal["涨潮", "退潮"] = "涨潮"  # 高潮/低潮
     tide_range: float = 1.5  # 潮差 m
     hours_to_next_tide: float = 3.0  # 距下一潮汐时间（小时）
 
@@ -79,7 +79,7 @@ class FishingModelMeta(Document):
         "w6_tide_rising",
         "w7_hours_to_tide",
         "w8_tide_range",
-        "w9_wind_level",
+        "w9_indicate",
     ]
 
     # 模型性能

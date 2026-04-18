@@ -173,7 +173,7 @@
           </svg>
           <span>未来天气</span>
         </div>
-        <div class="grid grid-cols-4 gap-2">
+        <div class="grid grid-cols-3 gap-2">
           <div
             v-for="day in forecasts.slice(0, 4)"
             :key="day.fxDate"
@@ -195,7 +195,7 @@
 
       <!-- Update Time -->
       <div class="mt-3 text-center">
-        <span class="text-xs text-gray-400"> 更新于 {{ liveWeather.obsTime }} </span>
+        <span class="text-xs text-gray-400"> 更新于 {{ formatDate(liveWeather.obsTime) }} </span>
       </div>
     </div>
 
@@ -225,6 +225,7 @@
 
 <script setup lang="ts">
 import { weatherService } from "@/service/weatherService";
+import { formatDate } from "@/utils/formatdate";
 import { onMounted, ref } from "vue";
 
 interface LiveWeather {
@@ -235,6 +236,9 @@ interface LiveWeather {
   windScale: string;
   humidity: string;
   icon: string;
+  pressure?: string;
+  windSpeed?: string;
+  precip?: string;
 }
 
 interface ForecastDay {
@@ -258,7 +262,7 @@ const emit = defineEmits<{
   (
     e: "update",
     payload: {
-      liveWeather: LiveWeather;
+      liveWeather: LiveWeather | null;
       forecasts: ForecastDay[];
       locationName: string;
     },
@@ -277,43 +281,40 @@ const fetchWeather = async (location: [number, number]) => {
   error.value = null;
 
   try {
-    const [poiData, weatherLive, weatherForecast] = await Promise.all([
-      weatherService.getPOI({ location }),
-      weatherService.getWeatherLive({ location }),
-      weatherService.getWeatherForecast({ location, days: 3 }),
-    ]);
+    const { now, daily, locationName: resolvedLocationName } = await weatherService.fetchWeatherFull({ location });
 
-    locationName.value = poiData?.name || "钓鱼地点";
+    locationName.value = resolvedLocationName || "钓鱼地点";
 
-    if (weatherLive.now) {
+    if (now) {
       liveWeather.value = {
-        obsTime: weatherLive.now.obsTime || "",
-        temp: weatherLive.now.temp || "",
-        text: weatherLive.now.text || "",
-        windDir: weatherLive.now.windDir || "",
-        windScale: weatherLive.now.windScale || "",
-        humidity: weatherLive.now.humidity || "",
-        icon: weatherLive.now.icon || "",
+        obsTime: now.obsTime || "",
+        temp: now.temp || "",
+        text: now.text || "",
+        windDir: now.windDir || "",
+        windScale: now.windScale || "",
+        humidity: now.humidity || "",
+        icon: now.icon || "",
+        pressure: now.pressure || "",
+        windSpeed: now.windSpeed || "",
+        precip: now.precip || "",
       };
+    } else {
+      liveWeather.value = null;
     }
 
-    if (weatherForecast.daily) {
-      forecasts.value = weatherForecast.daily.slice(0, 4).map((day) => ({
-        fxDate: day.fxDate || "",
-        tempMax: day.tempMax || "",
-        tempMin: day.tempMin || "",
-        textDay: day.textDay || "",
-        iconDay: day.iconDay || "",
-      }));
-    }
+    forecasts.value = (daily ?? []).slice(0, 4).map((day) => ({
+      fxDate: day.fxDate || "",
+      tempMax: day.tempMax || "",
+      tempMin: day.tempMin || "",
+      textDay: day.textDay || "",
+      iconDay: day.iconDay || "",
+    }));
 
-    if (liveWeather.value) {
-      emit("update", {
-        liveWeather: liveWeather.value,
-        forecasts: forecasts.value,
-        locationName: locationName.value,
-      });
-    }
+    emit("update", {
+      liveWeather: liveWeather.value,
+      forecasts: forecasts.value,
+      locationName: locationName.value,
+    });
   } catch (err) {
     console.error("获取天气失败:", err);
     error.value = err instanceof Error ? err.message : "获取天气失败";

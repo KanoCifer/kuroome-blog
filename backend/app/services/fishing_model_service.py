@@ -25,15 +25,15 @@ class FishingModelService:
     """
 
     FEATURE_NAMES: list[str] = [  # noqa: RUF012
-        "w1_temp",
-        "w2_humidity",
-        "w3_pressure",
-        "w4_wind",
-        "w5_rain",
-        "w6_tide_rising",
-        "w7_hours_to_tide",
-        "w8_tide_range",
-        "w9_wind_level",
+        "w1_temp",  # 温度
+        "w2_humidity",  # 湿度
+        "w3_pressure",  # 气压
+        "w4_wind",  # 风速
+        "w5_rain",  # 降水
+        "w6_tide_rising",  # 是否涨潮
+        "w7_hours_to_tide",  # 距离下一次潮汐的小时数
+        "w8_tide_range",  # 潮差
+        "w9_indicate",  # 和风钓鱼指数参考
     ]
 
     def __init__(self, model_dir: Path | None = None) -> None:
@@ -76,13 +76,13 @@ class FishingModelService:
         features = [
             record.get("temperature", 20.0),
             record.get("humidity", 50.0),
-            record.get("pressure", 1013.0),
-            record.get("wind_speed", 0.0),
+            record.get("pressure", 1000.0),
+            record.get("wind_speed", 1.0),
             record.get("precipitation", 0.0),
-            1.0 if record.get("tide_type") == "涨潮" else 0.0,
+            1.0 if record.get("tide_type") == "涨潮" else 0.5,
             record.get("hours_to_next_tide", 3.0),
             record.get("tide_range", 1.5),
-            record.get("wind_level", 1),
+            record.get("indicate", 2),  # 默认为较适宜
         ]
         return np.array(features, dtype=np.float64)
 
@@ -114,8 +114,8 @@ class FishingModelService:
             expert_scores, dtype=np.float64
         )
 
-        # 过滤异常残差（|残差| > 30）
-        valid_mask = np.abs(residuals) <= 30
+        # 过滤异常残差（|残差| > 50）
+        valid_mask = np.abs(residuals) <= 50
         X = X[valid_mask]  # noqa: N806
         residuals = residuals[valid_mask]
 
@@ -169,7 +169,7 @@ class FishingModelService:
         residual = actual_score - expert_score
 
         # 过滤异常残差
-        if abs(residual) > 30:
+        if abs(residual) > 50:
             return {"skipped": True, "reason": "残差过大"}
 
         if self.model is None or self.scaler is None:

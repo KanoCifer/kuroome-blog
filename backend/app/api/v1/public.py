@@ -461,6 +461,31 @@ async def get_poi_lookup(
         )
 
 
+@router.get("/weather/full")
+async def get_full_weather_data(
+    request: Request,
+    location: str = Query(..., description="Location coordinates: lng,lat"),
+    redis: AsyncRedis = Depends(get_redis),
+    public_service: PublicService = Depends(public_service_dep),
+) -> JSONResponse:
+    """通过经纬度坐标获取完整的天气数据。"""
+    try:
+        data = await public_service.get_full_weather_data(
+            location=location, redis=redis
+        )
+        return APIResponse.ok(
+            data=data,
+            message="Full weather data retrieved successfully",
+        )
+    except PublicDomainError as exc:
+        return APIResponse.error(message=exc.message, code=exc.code)
+    except Exception as exc:
+        return APIResponse.error(
+            message=f"Failed to retrieve full weather data: {exc!s}",
+            code=500,
+        )
+
+
 @router.get("/weather/{days}")
 async def get_weather_by_days(
     request: Request,
@@ -521,30 +546,5 @@ async def get_hourly_weather(
     except Exception as exc:
         return APIResponse.error(
             message=f"Failed to retrieve hourly weather forecast: {exc!s}",
-            code=500,
-        )
-
-
-@router.get("/weather/full")
-async def get_full_weather_data(
-    request: Request,
-    location: str = Query(..., description="Location coordinates: lng,lat"),
-    redis: AsyncRedis = Depends(get_redis),
-    public_service: PublicService = Depends(public_service_dep),
-) -> JSONResponse:
-    """通过经纬度坐标获取完整的天气数据。"""
-    try:
-        data = await public_service.get_full_weather_data(
-            location=location, redis=redis
-        )
-        return APIResponse.ok(
-            data=data,
-            message="Full weather data retrieved successfully",
-        )
-    except PublicDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
-    except Exception as exc:
-        return APIResponse.error(
-            message=f"Failed to retrieve full weather data: {exc!s}",
             code=500,
         )

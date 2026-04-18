@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { useNotificationStore } from '@/stores/notificationState';
 
+import dayjs from 'dayjs';
 import { fishingMapService } from '../service';
 import type { FishingFeedbackData, FishingLevel } from '../types';
 
@@ -15,7 +16,6 @@ interface FishingFeedbackFormProps {
 
 const FEEDBACK_OPTIONS: { value: FishingLevel; label: string }[] = [
   { value: '爆护', label: '爆护' },
-  { value: '极好', label: '极好' },
   { value: '好', label: '好' },
   { value: '一般', label: '一般' },
   { value: '差', label: '差' },
@@ -53,14 +53,14 @@ export function FishingFeedbackForm({
         await service.submitFishingFeedback({
           location_id: locationId,
           location_name: locationName,
-          fishing_time: new Date().toISOString(),
+          fishing_time: dayjs().toISOString(),
           feedback: selectedFeedback,
           temperature: fishingData.temperature,
           humidity: fishingData.humidity,
           pressure: fishingData.pressure,
           wind_speed: fishingData.wind_speed,
           precipitation: fishingData.precipitation,
-          wind_level: fishingData.wind_level,
+          indicate: fishingData.indicate,
           tide_level: fishingData.tide_level,
           tide_type: fishingData.tide_type,
           tide_range: fishingData.tide_range,

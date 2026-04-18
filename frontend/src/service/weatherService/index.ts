@@ -1,36 +1,45 @@
-import type { PoiItem, TideResponse, WeatherDay, WeatherNow } from "@/api/weatherGateway";
+import type { TideResponse, WeatherDay, WeatherFullResponse, WeatherNow } from "@/api/weatherGateway";
 import { weatherGateway } from "@/api/weatherGateway";
+
+export interface WeatherFullResult {
+  updateTime?: string;
+  now?: WeatherNow;
+  daily?: WeatherDay[];
+  locationName: string;
+}
 
 export interface WeatherService {
   getTide(payload: { harbor: string; date: string }): Promise<TideResponse>;
-  getPOI(payload: { location: [number, number] }): Promise<PoiItem | undefined>;
-  getWeatherLive(payload: { location: [number, number] }): Promise<{ updateTime?: string; now?: WeatherNow }>;
-  getWeatherForecast(payload: {
-    location: [number, number];
-    days: number;
-  }): Promise<{ updateTime?: string; daily?: WeatherDay[] }>;
+  fetchWeatherFull(payload: { location: [number, number] }): Promise<WeatherFullResult>;
 }
+
+const resolveLocationName = (fullData: WeatherFullResponse | undefined, now: WeatherNow | undefined): string => {
+  // TODO(human): 可继续优化位置名兜底优先级（例如接入更多后端字段）。
+  const directName = fullData?.locationName?.trim();
+  const hourlyName = (fullData?.hourly as { locationName?: string } | undefined)?.locationName?.trim();
+
+  if (directName) return directName;
+  if (hourlyName) return hourlyName;
+  return now?.text ? "当前位置" : "钓鱼地点";
+};
 
 export const weatherService: WeatherService = {
   async getTide(payload: { harbor: string; date: string }): Promise<TideResponse> {
     return weatherGateway.getTide(payload);
   },
 
-  async getPOI(payload: { location: [number, number] }): Promise<PoiItem | undefined> {
-    const res = await weatherGateway.getPOI(payload);
-    return res.poi?.[0];
-  },
+  async fetchWeatherFull(payload: { location: [number, number] }): Promise<WeatherFullResult> {
+    const data = await weatherGateway.getWeatherFull(payload);
+    const now = data.current?.now;
+    const daily = data.daily?.daily;
+    const updateTime = data.current?.updateTime ?? data.daily?.updateTime;
+    const locationName = resolveLocationName(data, now);
 
-  async getWeatherLive(payload: { location: [number, number] }): Promise<{ updateTime?: string; now?: WeatherNow }> {
-    const res = await weatherGateway.getWeatherLive(payload);
-    return { updateTime: res.updateTime, now: res.now };
-  },
-
-  async getWeatherForecast(payload: {
-    location: [number, number];
-    days: number;
-  }): Promise<{ updateTime?: string; daily?: WeatherDay[] }> {
-    const res = await weatherGateway.getWeatherForecast(payload);
-    return { updateTime: res.updateTime, daily: res.daily };
+    return {
+      updateTime,
+      now,
+      daily,
+      locationName,
+    };
   },
 };

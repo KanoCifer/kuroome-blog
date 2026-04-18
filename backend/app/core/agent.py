@@ -404,11 +404,15 @@ class WeatherAnalyzer:
         "- 出钓建议（时段/钓点/装备）\n"
         "- 注意事项或安全提示\n\n"
         "## 评分规则\n"
+        "- 先按专家权重计算基准分：w1=0.2,w2=0.1,w3=0.1,w4=0.1,w5=0.05,w6=0.2,w7=0.2,w8=0.1,w9=0.1\n"
+        "- 再给出 AI 自主修正分（-20~20），并说明修正依据（短时天气波动、天气现象、潮汐时序）\n"
+        "- 最终钓鱼指数 = clip(专家基准分 + AI 自主修正分, 0, 100)\n"
         "- 90-100：极佳，强烈推荐\n"
         "- 70-89：良好，适合出钓\n"
         "- 50-69：一般，可以尝试但体验有限\n"
         "- 30-49：不宜，不建议出钓\n"
         "- 0-29：禁止，存在安全风险\n\n"
+        "输出时必须显式给出：专家基准分、AI 自主修正分、最终钓鱼指数。\n"
         "若遇雷暴、台风或暴雨，评分直接置 0 并给出安全警告。\n"
         "回答简洁，避免重复原始数据，聚焦分析与建议。"
     )
@@ -434,15 +438,34 @@ class WeatherAnalyzer:
 
     def _build_user_prompt(self, weather_data: WeatherAnalysisInput) -> str:
         data = weather_data.weather_data
-        lines: list[str] = ["请综合以下天气与潮汐数据，给出钓鱼建议：\n"]
+        lines: list[str] = [
+            "请综合以下天气与潮汐数据，按专家权重先算基准分，再给出 AI 自主修正分与最终钓鱼指数：\n"
+        ]
+
+        fishing_context = data.get("fishingIndex")
+        if fishing_context:
+            expert_score = fishing_context.get("expert_score")
+            residual = fishing_context.get("residual")
+            feature_breakdown = fishing_context.get("feature_breakdown")
+            if expert_score is not None:
+                lines.append(f"【专家基准分】{expert_score}")
+            if residual is not None:
+                lines.append(f"【历史校正残差】{residual}")
+            if feature_breakdown:
+                lines.append(f"【专家特征分解】{feature_breakdown}")
+
+        lines.append(
+            "【专家权重】w1=0.2,w2=0.1,w3=0.1,w4=0.1,w5=0.05,w6=0.2,w7=0.2,w8=0.1,w9=0.1"
+        )
 
         live = data.get("liveWeather")
         if live:
             lines.append(
                 f"【实时天气】{data.get('locationName', '')} "
                 f"气温 {live.get('temp')}°C，{live.get('text')}，"
-                f"风向 {live.get('wind360')} {live.get('windScale')} 级，"
-                f"湿度 {live.get('humidity')}%"
+                f"风向 {live.get('wind360') or live.get('windDir')} {live.get('windScale')} 级，"
+                f"湿度 {live.get('humidity')}%，"
+                f"气压 {live.get('pressure')} hPa，降水 {live.get('precip')} mm"
             )
 
         forecasts = data.get("forecasts", [])
