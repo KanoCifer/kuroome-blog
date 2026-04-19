@@ -13,22 +13,12 @@
 - 编辑 CLAUDE.md 时，确保章节编号唯一，避免重复标题。
 > 需要后端接口时 访问./03_Core_Modules.md，新增接口时更新该文件。
 
-## Approach
-
-- Think before acting. Read existing files before writing code.
-- Be concise in output but thorough in reasoning.
-- Prefer editing over rewriting whole files.
-- Do not re-read files you have already read unless the file may have changed.
-- Test your code before declaring done.
-- No sycophantic openers or closing fluff.
-- Keep solutions simple and direct.
-- User instructions always override this file.
-
 ---
 
 ## 2) Project Overview
 
 - Stack: FastAPI + Vue 3 (desktop) + React (mobile, `react-app/`) + TypeScript
+- **双前端架构**: Vue (`frontend/`) + React (`react-app/`) 共享后端服务，但各自维护独立状态 Store；API 契约修改需同步两端
 
 ---
 
@@ -49,6 +39,10 @@ alembic upgrade head
 # format & lint
 ruff format .
 ruff check .
+
+# run all tests
+pytest backend/ -v
+pytest backend/test/test_fishing_expert.py  # run specific test file
 ```
 
 ### Frontend (`cd frontend`)
@@ -72,9 +66,15 @@ pnpm run build-only               # vite build only
 pnpm run type-check               # tsc -b
 pnpm run lint                     # eslint .
 pnpm run lint:fix                 # eslint . --fix
+pnpm run test:unit               # vitest
 ```
 
 ## 4) Code Style Guidelines
+
+### Zustand (React-app)
+
+- 对象 Selector 需使用 `useShallow` 防止无限渲染
+- 避免在 Selector 中返回新对象引用
 
 ### Backend (Python)
 
@@ -117,8 +117,9 @@ pnpm run lint:fix                 # eslint . --fix
 - React entry: `react-app/src/main.tsx`
 - Config: `config/` (environment configs)
 - Core modules: `03_Core_Modules.md` (API documentation)
+- **Changelog**: `react-app/src/data/changelog.json`
 
-## 5) Environment Setup
+## 6) Environment Setup
 
 Required env vars:
 - `DATABASE_URL` — PostgreSQL connection string
@@ -142,6 +143,14 @@ Frontend `src/` layout:
 - `stores/` — Pinia state stores
 - `views/` — page-level components
 - `api/` — API client wrappers
+- `service/` — business logic layer
+
+React-app `src/` layout (Zustand + hooks):
+- `stores/` — Zustand state stores
+- `hooks/` — custom hooks
+- `views/` — page components
+- `services/` — service layer
+- `components/` — shared components
 
 - Backend layering: `api -> service -> repository`
 - Keep business logic in services; keep data access in repositories

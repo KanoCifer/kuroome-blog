@@ -26,6 +26,8 @@
 | --- | --- | --- |
 | 订阅管理 | `/api/v2/subscriptions` | 订阅项 CRUD、状态管理、到期提醒、通知测试 |
 | 设备跟踪 | `/api/v2/device` | 用户设备管理（CRUD） |
+| 钓鱼指数 | `/api/v2/fishing` | 钓鱼指数计算、反馈收集、模型权重查看 |
+| 天气 | `/api/v2/weather` | 潮汐数据查询、完整天气数据获取 |
 
 ## 2. 每个模块的详细说明
 
@@ -243,6 +245,27 @@
 | DELETE | `/device/{device_id}` | 删除设备 |
 | DELETE | `/device` | 删除全部设备 |
 
+### 2.14 钓鱼指数模块 `/api/v2/fishing`
+
+**功能：** 基于专家公式和机器学习模型计算钓鱼指数，支持用户反馈收集与模型自动训练
+
+**主要端点：**
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| GET | `/fishing/index` | 获取指定地点钓鱼指数（支持 enriched 模式附加天气数据）|
+| POST | `/fishing/feedback` | 提交钓鱼体验反馈（保存至 MongoDB，触发自动训练）|
+| GET | `/fishing/weights` | 查看模型权重（专家权重 + sklearn 残差模型权重，需登录）|
+
+### 2.15 天气模块 `/api/v2/weather`
+
+**功能：** 提供潮汐数据和完整天气数据的查询，支持 Redis 缓存
+
+**主要端点：**
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| GET | `/weather/tide` | 获取潮汐数据（Query: date, harbor）|
+| GET | `/weather/full` | 获取完整天气数据（Query: location 经纬度）|
+
 ## 3. 关键业务逻辑链
 
 ### 3.1 书籍业务链
@@ -273,17 +296,15 @@
 
 ```json
 {
-  "code": 0,
+  "code": 200,
   "message": "success",
   "data": {},
-  "timestamp": 1710000000000
 }
 ```
 
 - `code`：业务状态码
 - `message`：人类可读提示
 - `data`：实际返回数据
-- `timestamp`：服务端时间戳
 
 ## 5. 权限控制原则
 
