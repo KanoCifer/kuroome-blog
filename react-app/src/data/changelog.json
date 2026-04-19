@@ -1,5 +1,56 @@
 [
   {
+    "version": "2.9.7",
+    "date": "2026-04-19",
+    "title": "钓鱼地图 AI 分析、骨架屏与状态管理优化",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "新增 SkeletonCard 骨架屏，替换所有加载态文本"
+      },
+      {
+        "type": "feat",
+        "content": "AI 智能体新增潮汐综合分析能力"
+      },
+      {
+        "type": "feat",
+        "content": "新增价格分析弹层并优化图表交互"
+      },
+      {
+        "type": "fix",
+        "content": "修复 AI 天气分析钓鱼指数与实际数据不一致"
+      },
+      {
+        "type": "fix",
+        "content": "修复天气数据字段不匹配导致唯独湿度正常显示的问题"
+      },
+      {
+        "type": "fix",
+        "content": "修复 Zustand selector 对象引用导致无限渲染循环"
+      },
+      {
+        "type": "fix",
+        "content": "修复地图规划线路 bug"
+      },
+      {
+        "type": "perf",
+        "content": "统一 Vue/React 状态管理 + 动态潮汐站点查找"
+      },
+      {
+        "type": "perf",
+        "content": "精简 useMap 定位流程与 fishingMapService 数据结构"
+      },
+      {
+        "type": "style",
+        "content": "AIAnalysisWidget 移植玻璃拟态风格与响应式布局"
+      },
+      {
+        "type": "chore",
+        "content": "更新 marked 与 eslint-plugin-react-hooks 依赖版本"
+      }
+    ]
+  },
+  {
     "version": "2.9.6",
     "date": "2026-04-18",
     "title": "钓点智能指数与天气数据链路整合",
