@@ -1,22 +1,11 @@
 <script setup lang="ts">
 import BasicDetail from "@/components/basic/BasicDetail.vue";
-import TiptapEditor from "@/components/editor/TiptapEditor.vue";
-import IconDel from "@/components/icons/IconDel.vue";
+import MarkdownEditor from "@/components/editor/MarkdownEditor.vue";
 import IconSave from "@/components/icons/IconSave.vue";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { blogService } from "@/service/blogService";
 import { useNotificationStore } from "@/stores/notification";
 import type { Category, CategoryResponseItem } from "@/types";
+import { marked } from "marked";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -33,65 +22,7 @@ const category = ref("");
 const body = ref("");
 const pin = ref(false);
 const categoryMenuOpen = ref(false);
-const draftMenuOpen = ref(false);
-const editorRef = ref<InstanceType<typeof TiptapEditor> | null>(null);
-// 用于强制更新草稿列表的响应式触发器
-const draftListRefreshTrigger = ref(0);
-// 生成安全的 storage key
-const getSafeStorageKey = (key: string): string => {
-  if (!key || key.trim() === "") {
-    return "tiptap-draft-default";
-  }
-  const safeKey = key.trim().replace(/[^\w\u4e00-\u9fa5-]/g, "_");
-  return `tiptap-draft-${safeKey}`;
-};
-
-// 获取草稿列表
-const draftList = computed(() => {
-  // 访问触发器以建立响应式依赖
-  void draftListRefreshTrigger.value;
-  return editorRef.value?.getAllDrafts() || [];
-});
-
-// 切换到指定草稿
-const handleSwitchDraft = (draftKey: string, draftTitle: string) => {
-  // 清除防抖定时器，立即更新
-  if (titleDebounceTimer) {
-    clearTimeout(titleDebounceTimer);
-    titleDebounceTimer = null;
-  }
-  // 立即更新标题和防抖标题
-  const actualTitle = draftTitle === "未命名草稿" ? "" : draftTitle;
-  title.value = actualTitle;
-  debouncedTitle.value = actualTitle;
-  // 然后切换草稿
-  editorRef.value?.switchToDraft(draftKey, draftTitle);
-  draftMenuOpen.value = false;
-  notification.success(`已切换到草稿：${draftTitle}`);
-};
-
-// 删除草稿
-const handleDeleteDraft = (draftKey: string, draftTitle: string) => {
-  editorRef.value?.deleteDraft(draftKey);
-  // 刷新草稿列表
-  draftListRefreshTrigger.value++;
-  notification.success(`已删除草稿：${draftTitle}`);
-};
-
-let draftCloseTimeout: ReturnType<typeof setTimeout> | null = null;
-const handleDraftMouseEnter = () => {
-  if (draftCloseTimeout) {
-    clearTimeout(draftCloseTimeout);
-    draftCloseTimeout = null;
-  }
-  draftMenuOpen.value = true;
-};
-
-const handleDraftMouseLeave = () => {
-  draftCloseTimeout = setTimeout(() => {
-    draftMenuOpen.value = false;
-  }, 200);
-};
+const markdownEditorRef = ref<InstanceType<typeof MarkdownEditor> | null>(null);
 
 // 计算当前选中的分类名称
 const currentCategory = computed(() => {
@@ -107,7 +38,8 @@ const error = ref("");
 
 // 保存草稿
 const handleSaveDraft = () => {
-  editorRef.value?.saveDraft();
+  const safeKey = (debouncedTitle.value || "default").trim().replace(/[^\w\u4e00-\u9fa5-]/g, "_");
+  localStorage.setItem(`markdown-draft-${safeKey}`, body.value);
   notification.success("草稿已保存");
 };
 
@@ -190,7 +122,23 @@ const handleSubmit = async () => {
   }
 
   // 获取当前内容
-  const currentContent = editorRef.value?.getContent() || "";
+  let currentContent: string;
+  if (markdownEditorRef.value) {
+    try {
+      // Upload blob images and get final markdown content
+      const markdownWithServerUrls = await markdownEditorRef.value.getContentForPublish();
+      // Convert to HTML
+      currentContent = marked.parse(markdownWithServerUrls, { async: false }) as string;
+    } catch (err) {
+      error.value = "图片上传失败";
+      notification.error(error.value);
+      console.error(err);
+      return;
+    }
+  } else {
+    currentContent = body.value;
+  }
+
   if (!currentContent.trim()) {
     error.value = "内容不能为空";
     notification.error(error.value);
@@ -409,104 +357,12 @@ const handleCategoryMouseLeave = () => {
               <IconSave />
               保存草稿
             </button>
-            <!-- 草稿下拉菜单 -->
-            <div
-              class="group relative flex w-auto items-center"
-              @mouseenter="handleDraftMouseEnter"
-              @mouseleave="handleDraftMouseLeave"
-            >
-              <button
-                type="button"
-                @click="draftMenuOpen = !draftMenuOpen"
-                class="flex items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-600 shadow-sm transition-all duration-200 hover:border-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-500 dark:hover:bg-gray-700"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
-                  <path
-                    fill-rule="evenodd"
-                    d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-                <span>草稿</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  :class="[
-                    'h-4 w-4 text-gray-400 transition-transform duration-200',
-                    draftMenuOpen ? 'rotate-180' : '',
-                  ]"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </button>
-              <transition
-                enter-active-class="transition-all transform-gpu duration-200 ease-out"
-                enter-from-class="opacity-0 scale-95 -translate-y-1"
-                enter-to-class="opacity-100 scale-100 translate-y-0"
-                leave-active-class="transition-all transform-gpu duration-150 ease-in"
-                leave-from-class="opacity-100 scale-100 translate-y-0"
-                leave-to-class="opacity-0 scale-95 -translate-y-1"
-              >
-                <div
-                  v-show="draftMenuOpen"
-                  class="absolute top-full right-0 z-50 mt-1 max-h-64 w-64 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
-                >
-                  <div v-if="draftList.length === 0" class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-                    暂无草稿
-                  </div>
-                  <div v-else class="py-1">
-                    <div
-                      v-for="draft in draftList"
-                      :key="draft.key"
-                      :class="[
-                        'flex w-full items-center justify-between px-4 py-2 text-left text-sm transition-colors',
-                        getSafeStorageKey(title) === draft.key
-                          ? 'bg-blue-100 text-blue-900 dark:bg-blue-900/20 dark:text-blue-300'
-                          : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700',
-                      ]"
-                    >
-                      <span class="flex-1 cursor-pointer truncate" @click="handleSwitchDraft(draft.key, draft.title)">
-                        {{ draft.title }}
-                        <span v-if="!draft.hasContent" class="ml-1 text-xs text-gray-400">(空)</span>
-                      </span>
-                      <AlertDialog>
-                        <AlertDialogTrigger>
-                          <button type="button" class="ml-2 p-1 text-gray-400 hover:text-red-500" title="删除草稿">
-                            <IconDel />
-                          </button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent class="rounded-3xl">
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>你确定要删除此草稿吗？</AlertDialogTitle>
-                            <AlertDialogDescription> 这将永久删除草稿，并且无法恢复。 </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>取消</AlertDialogCancel>
-                            <AlertDialogAction
-                              class="bg-red-500/70 hover:bg-red-500"
-                              @click.stop="handleDeleteDraft(draft.key, draft.title)"
-                            >
-                              确定</AlertDialogAction
-                            >
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </div>
-                </div>
-              </transition>
-            </div>
           </div>
         </div>
 
-        <!-- Tiptap Editor -->
+        <!-- Markdown Editor -->
         <div>
-          <TiptapEditor ref="editorRef" v-model="body" v-model:storageKey="debouncedTitle" />
+          <MarkdownEditor ref="markdownEditorRef" v-model="body" />
         </div>
 
         <!-- Action Buttons -->

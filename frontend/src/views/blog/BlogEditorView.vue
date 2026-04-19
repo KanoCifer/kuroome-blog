@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import BasicDetail from "@/components/basic/BasicDetail.vue";
 import MarkdownEditor from "@/components/editor/MarkdownEditor.vue";
-import TiptapEditor from "@/components/editor/TiptapEditor.vue";
 import IconSave from "@/components/icons/IconSave.vue";
 import { blogService } from "@/service/blogService";
 import { useNotificationStore } from "@/stores/notification";
@@ -14,10 +13,6 @@ const route = useRoute();
 const router = useRouter();
 const notification = useNotificationStore();
 
-// Editor mode
-type EditorMode = "tiptap" | "markdown";
-const editorMode = ref<EditorMode>("markdown");
-
 // Post state
 const isEdit = ref(false);
 const postId = ref<string | null>(null);
@@ -28,10 +23,6 @@ const pin = ref(false);
 const categories = ref<Category[]>([]);
 const loading = ref(false);
 const error = ref("");
-
-// Tiptap state
-const tiptapBody = ref("");
-const tiptapEditorRef = ref<InstanceType<typeof TiptapEditor> | null>(null);
 
 // Markdown state
 const markdownBody = ref("");
@@ -74,44 +65,17 @@ const handleCategoryMouseLeave = () => {
   }, 150);
 };
 
-// Get current content based on mode
+// Get current content - convert markdown to HTML for backend
 const getCurrentContent = (): string => {
-  if (editorMode.value === "tiptap") {
-    return tiptapEditorRef.value?.getContent() || tiptapBody.value;
-  }
-  // Convert markdown to HTML for backend
   return marked.parse(markdownBody.value, { async: false }) as string;
 };
 
 // Save draft
 const handleSaveDraft = () => {
-  if (editorMode.value === "tiptap") {
-    tiptapEditorRef.value?.saveDraft();
-  } else {
-    // Save markdown draft to localStorage
-    const safeKey = (debouncedTitle.value || "default").trim().replace(/[^\w\u4e00-\u9fa5-]/g, "_");
-    localStorage.setItem(`markdown-draft-${safeKey}`, markdownBody.value);
-  }
+  // Save markdown draft to localStorage
+  const safeKey = (debouncedTitle.value || "default").trim().replace(/[^\w\u4e00-\u9fa5-]/g, "_");
+  localStorage.setItem(`markdown-draft-${safeKey}`, markdownBody.value);
   notification.success("草稿已保存");
-};
-
-// Switch editor mode with content conversion
-const handleModeSwitch = (newMode: EditorMode) => {
-  if (newMode === editorMode.value) return;
-
-  if (newMode === "markdown") {
-    // Convert Tiptap HTML to Markdown (simplified - tiptap-markdown handles this better)
-    // For now, just set the raw HTML as markdown source
-    const html = tiptapEditorRef.value?.getContent() || tiptapBody.value;
-    // Strip HTML tags for basic markdown view (you could use turndown for better conversion)
-    markdownBody.value = html;
-  } else {
-    // Convert Markdown to HTML for Tiptap
-    const html = marked.parse(markdownBody.value, { async: false }) as string;
-    tiptapBody.value = html;
-  }
-
-  editorMode.value = newMode;
 };
 
 // Fetch categories
@@ -143,8 +107,7 @@ const fetchPost = async (id: string) => {
     category.value = post.category_id ? String(post.category_id) : "";
     pin.value = Boolean(post.is_pinned);
 
-    // Load content into both editors
-    tiptapBody.value = post.body || "";
+    // Load content - convert HTML to markdown for editor
     markdownBody.value = post.body || "";
   } catch (err: unknown) {
     error.value = err instanceof Error ? err.message : "加载文章失败";
@@ -177,13 +140,13 @@ const handleSubmit = async () => {
     return;
   }
 
-  // 获取内容，markdown 模式下先上传图片
+  // Get content and upload images
   let currentContent: string;
-  if (editorMode.value === "markdown" && markdownEditorRef.value) {
+  if (markdownEditorRef.value) {
     try {
-      // 上传所有 blob 图片，获取替换后的 markdown 内容
+      // Upload all blob images and get markdown content with server URLs
       const markdownWithServerUrls = await markdownEditorRef.value.getContentForPublish();
-      // 转换为 HTML
+      // Convert to HTML
       currentContent = marked.parse(markdownWithServerUrls, { async: false }) as string;
     } catch (err) {
       error.value = "图片上传失败";
@@ -290,36 +253,6 @@ onMounted(async () => {
 
             <!-- Controls -->
             <div class="flex flex-wrap items-center gap-3">
-              <!-- Mode Toggle -->
-              <div
-                class="flex items-center rounded-full border border-slate-200 bg-slate-50 p-1 dark:border-slate-700 dark:bg-slate-800"
-              >
-                <button
-                  type="button"
-                  @click="handleModeSwitch('tiptap')"
-                  :class="[
-                    'rounded-full px-4 py-1.5 text-xs font-semibold transition-all',
-                    editorMode === 'tiptap'
-                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white',
-                  ]"
-                >
-                  富文本
-                </button>
-                <button
-                  type="button"
-                  @click="handleModeSwitch('markdown')"
-                  :class="[
-                    'rounded-full px-4 py-1.5 text-xs font-semibold transition-all',
-                    editorMode === 'markdown'
-                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white',
-                  ]"
-                >
-                  Markdown
-                </button>
-              </div>
-
               <!-- Pin Button -->
               <button
                 type="button"
@@ -415,13 +348,8 @@ onMounted(async () => {
         <div
           class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900"
         >
-          <!-- Tiptap Editor -->
-          <div v-show="editorMode === 'tiptap'" class="h-[calc(100vh-320px)] min-h-[500px]">
-            <TiptapEditor ref="tiptapEditorRef" v-model="tiptapBody" v-model:storageKey="debouncedTitle" />
-          </div>
-
           <!-- Markdown Editor -->
-          <div v-show="editorMode === 'markdown'" class="h-[calc(100vh-320px)] min-h-[500px]">
+          <div class="h-[calc(100vh-320px)] min-h-[500px]">
             <MarkdownEditor ref="markdownEditorRef" v-model="markdownBody" />
           </div>
         </div>
