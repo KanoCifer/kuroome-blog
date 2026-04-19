@@ -13,7 +13,7 @@ export function BentoReadingList() {
             </div>
             <div className="flex min-w-0 flex-col items-start">
               <div className="max-w-full overflow-hidden font-serif whitespace-pre text-gray-800 dark:text-white">
-                Reading
+                书单
               </div>
             </div>
           </div>

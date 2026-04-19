@@ -1,5 +1,5 @@
 import { BentoCard } from '@/components/bento/BentoCard';
-import { Earth } from 'lucide-react';
+import { FishingRod } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function BentoMap() {
@@ -9,11 +9,11 @@ export function BentoMap() {
         <div className="flex h-full flex-col justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-2xl bg-blue-100 text-blue-500 ring-1 ring-blue-200/60 sm:size-12 dark:bg-blue-900/30 dark:text-blue-300 dark:ring-blue-500/20">
-              <Earth className="size-6" />
+              <FishingRod className="size-6" />
             </div>
             <div className="flex min-w-0 flex-col items-start">
               <div className="max-w-full overflow-hidden font-serif whitespace-pre text-gray-800 dark:text-white">
-                Fishing Map
+                我的钓点
               </div>
             </div>
           </div>

@@ -3,12 +3,9 @@ import { BentoCard } from '@/components/bento/BentoCard';
 export function BentoTech() {
   const techStack = [
     { name: 'Python', color: 'blue' },
-    { name: 'TS', color: 'yellow' },
     { name: 'TaskIQ', color: 'green' },
-    { name: 'Vue3', color: 'rose' },
-    { name: 'Motion', color: 'teal' },
-    { name: 'TailwindCSS', color: 'purple' },
-    { name: 'PostgreSQL', color: 'indigo' },
+    { name: 'Vue', color: 'rose' },
+    { name: 'Postgre', color: 'indigo' },
     { name: 'SQLAlchemy', color: 'cyan' },
     { name: 'FastAPI', color: 'indigo' },
     { name: 'Redis', color: 'teal' },
