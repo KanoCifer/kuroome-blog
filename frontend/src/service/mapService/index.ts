@@ -1,7 +1,7 @@
 import { mapGateway } from "@/api/mapGateway";
 
 export interface MapService {
-  getSecurityKey(): Promise<{ key: string }>;
+  getSecurityKey(): Promise<{ securityJsCode: string }>;
 }
 
 export const mapService: MapService = {

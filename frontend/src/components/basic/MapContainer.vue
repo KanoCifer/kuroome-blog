@@ -1,5 +1,5 @@
 <template>
-  <div ref="containerRef" class="map-container shadow-md"></div>
+  <div ref="containerRef" class="map-container shadow-lg"></div>
 </template>
 
 <script setup lang="ts">
@@ -65,21 +65,25 @@ let clickHandler: ((e: unknown) => void) | null = null;
 const fetchSecurityKey = async (): Promise<string> => {
   try {
     const response = await mapService.getSecurityKey();
-    const encodedKey = response.key || "";
+    const encodedKey = response.securityJsCode || "";
 
-    // Decode base64 encoded key
     if (encodedKey) {
       try {
-        return atob(encodedKey);
+        const decoded = atob(encodedKey);
+        // console.debug("[AMap] Security key fetched & decoded:", decoded);
+        return decoded;
       } catch {
+        // console.warn("[AMap] Failed to decode security key, using as-is");
         return encodedKey;
       }
     }
 
-    return "";
-  } catch (error) {
-    console.error("Failed to fetch Amap security key:", error);
-    return "";
+    // Fallback to env var if API returns empty
+    // console.warn("[AMap] API returned empty security key, using env var fallback");
+    return import.meta.env.VITE_AMAP_SECURITY_CODE || "";
+  } catch {
+    // console.error("[AMap] Failed to fetch security key:", error);
+    return import.meta.env.VITE_AMAP_SECURITY_CODE || "";
   }
 };
 
@@ -239,36 +243,44 @@ const planRoute = (start: [number, number], end: [number, number]): Promise<{ di
     clearRoute();
 
     driving.search(start, end, (status: string, result: unknown) => {
+      // 调试日志
+      console.debug("路线规划回调:", { status, result });
+
       if (status === "complete" && result && typeof result === "object") {
         const drivingResult = result as {
-          routes: Array<{
+          routes?: Array<{
             distance: number;
             time: number;
-            steps: Array<{ path: [number, number][] }>;
+            steps?: Array<{ path?: [number, number][] }>;
           }>;
+          info?: string;
         };
 
         if (drivingResult.routes && drivingResult.routes.length > 0) {
           const route = drivingResult.routes[0];
+
+          if (!route.steps || route.steps.length === 0) {
+            console.error("路线步骤为空:", result);
+            reject(new Error("路线数据不完整"));
+            return;
+          }
+
           const path: [number, number][] = [];
 
           // 提取路径点
           route.steps.forEach((step) => {
-            path.push(...step.path);
+            if (step.path) {
+              path.push(...step.path);
+            }
           });
 
-          // 绘制路线
-          const AMap = (window as unknown as { AMap: AMapNamespace }).AMap;
-          currentRoute = new AMap.Polyline({
-            path: path,
-            strokeColor: "#1890ff",
-            strokeWeight: 6,
-            strokeOpacity: 0.9,
-            lineJoin: "round",
-            lineCap: "round",
-          });
+          if (path.length === 0) {
+            console.error("路线坐标为空:", result);
+            reject(new Error("路线坐标数据为空"));
+            return;
+          }
 
-          map!.add(currentRoute);
+          // map!.add(currentRoute);
           map!.setFitView();
 
           resolve({
@@ -276,10 +288,15 @@ const planRoute = (start: [number, number], end: [number, number]): Promise<{ di
             time: route.time,
           });
         } else {
-          reject(new Error("未找到路线"));
+          console.warn("未找到路线:", drivingResult.info);
+          reject(new Error("未找到可行路线，请检查起终点位置是否可通行"));
         }
+      } else if (status === "no_data") {
+        console.warn("无路线数据:", result);
+        reject(new Error("起终点之间无法通行，请尝试其他目的地"));
       } else {
-        reject(new Error("路线规划失败"));
+        console.error("路线规划失败:", { status, result });
+        reject(new Error("路线规划失败，请检查网络连接或稍后重试"));
       }
     });
   });

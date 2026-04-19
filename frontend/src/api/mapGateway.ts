@@ -1,12 +1,12 @@
 import request from "@/api/request";
 
 export interface MapGateway {
-  getSecurityKey(): Promise<{ key: string }>;
+  getSecurityKey(): Promise<{ securityJsCode: string }>;
 }
 
 export const mapGateway: MapGateway = {
-  async getSecurityKey(): Promise<{ key: string }> {
-    const res = await request.get<{ data: { key: string } }>("v1/amap/security-key");
+  async getSecurityKey(): Promise<{ securityJsCode: string }> {
+    const res = await request.get<{ data: { securityJsCode: string } }>("v1/amap/security-key");
     return res.data.data;
   },
 };

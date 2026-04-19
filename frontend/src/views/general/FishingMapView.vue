@@ -257,7 +257,7 @@ const handleFeedbackSuccess = () => {
 
 // 地图事件处理
 const handleMarkerClick = async (index: number) => {
-  console.log("点击了钓点:", fishingSpots.value?.[index]);
+  // console.log("点击了钓点:", fishingSpots.value?.[index]);
   selectedSpotIndex.value = index;
 
   if (!mapContainerRef.value) {
