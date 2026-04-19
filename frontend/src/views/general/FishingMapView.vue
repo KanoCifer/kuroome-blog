@@ -172,7 +172,7 @@ interface MapContainerInstance {
 const fishingSpots = ref<AMapMarker[]>(fishingSpotsData as AMapMarker[]);
 const mapContainerRef = useTemplateRef<MapContainerInstance>("mapContainerRef");
 const fishingMapStore = useFishingMapStore();
-const { liveWeather, forecasts, tideData, weatherIndices, locationName } = storeToRefs(fishingMapStore);
+const { liveWeather, forecasts, tideData, weatherIndices, locationName, indexData } = storeToRefs(fishingMapStore);
 const userPosition = ref<[number, number] | null>(null);
 const activeLocation = computed<[number, number]>(() => userPosition.value ?? DEFAULT_MAP_CENTER);
 const tideSpotName = ref("黄埔港");
@@ -198,6 +198,7 @@ const analysisPayload = computed(() => {
     forecasts: forecasts.value,
     tideData: tideData.value,
     weatherIndices: weatherIndices.value,
+    fishingIndex: indexData.value ?? undefined,
     locationName: locationName.value,
     tideSpotName: tideSpotName.value,
   };

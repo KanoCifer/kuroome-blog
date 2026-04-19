@@ -35,13 +35,14 @@ export function AnalysisContent({
   const analysisResultRef = useRef('');
   const analysisAbortRef = useRef<AbortController | null>(null);
 
-  const { liveWeather, forecasts, locationName, weatherIndices } =
+  const { liveWeather, forecasts, locationName, weatherIndices, indexData } =
     useFishingMapStore(
       useShallow((s) => ({
         liveWeather: s.liveWeather,
         forecasts: s.forecasts,
         locationName: s.locationName,
         weatherIndices: s.weatherIndices,
+        indexData: s.indexData,
       })),
     );
 
@@ -71,6 +72,7 @@ export function AnalysisContent({
       forecasts,
       tideData,
       weatherIndices,
+      fishingIndex: indexData ?? undefined,
       locationName: locationName || '未知地点',
       tideSpotName: tideSpotName || '黄埔港',
     }),
@@ -81,6 +83,7 @@ export function AnalysisContent({
       tideData,
       tideSpotName,
       weatherIndices,
+      indexData,
     ],
   );
 

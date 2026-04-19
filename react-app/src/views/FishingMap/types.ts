@@ -70,6 +70,8 @@ export interface AnalysisPayload {
   liveWeather: WeatherNow | null;
   forecasts: WeatherDay[];
   tideData: TideData | null;
+  weatherIndices: WeatherIndex[];
+  fishingIndex?: FishingIndexData;
   locationName: string;
   tideSpotName: string;
 }

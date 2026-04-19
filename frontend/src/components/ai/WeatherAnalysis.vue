@@ -36,11 +36,20 @@ interface TideData {
   tideHourly: { fxTime: string; height: number | string }[];
 }
 
+interface FishingIndexData {
+  fishing_index: number;
+  expert_score: number;
+  residual: number;
+  level: string;
+  feature_breakdown: Record<string, number>;
+}
+
 interface WeatherAnalysisPayload {
   liveWeather?: LiveWeather | null;
   forecasts?: ForecastDay[];
   tideData?: TideData | null;
   weatherIndices?: Array<Record<string, unknown>>;
+  fishingIndex?: FishingIndexData;
   locationName?: string;
   tideSpotName?: string;
 }
@@ -95,6 +104,8 @@ const payload = computed(() => {
     liveWeather: data.liveWeather ?? null,
     forecasts: data.forecasts ?? [],
     tideData: data.tideData ?? null,
+    weatherIndices: data.weatherIndices ?? [],
+    fishingIndex: data.fishingIndex ?? undefined,
     locationName: data.locationName ?? "钓鱼地点",
     tideSpotName: data.tideSpotName ?? "潮汐点位",
     generatedAt: dayjs().format("YYYY-MM-DD HH:mm:ss"),
