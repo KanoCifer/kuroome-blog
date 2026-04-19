@@ -1,3 +1,4 @@
+import { CloudSun, Droplets, MapPin, Navigation, Wind } from 'lucide-react';
 import { useWeatherData } from '../hooks/useWeatherData';
 import { SkeletonCard } from './SkeletonCard';
 
@@ -32,17 +33,18 @@ export function WeatherCard({
               点击跳转和风天气，查看详细信息
             </span>
           </h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="mt-1 flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+            <MapPin className="h-3 w-3" />
             {locationName || '钓鱼地点'}
           </p>
         </div>
-        <span className="text-2xl">
-          {liveWeather ? (
-            <i className={`qi-${liveWeather.icon} text-3xl`} />
-          ) : (
-            '🌤️'
-          )}
-        </span>
+        {liveWeather ? (
+          <div className="flex items-center">
+            <i className={`qi-${liveWeather.icon} text-4xl`} />
+          </div>
+        ) : (
+          <CloudSun className="text-3xl text-yellow-500" />
+        )}
       </div>
 
       {loading ? (
@@ -64,17 +66,28 @@ export function WeatherCard({
             </span>
           </div>
           <div className="grid grid-cols-3 gap-2 text-center text-xs">
-            <div className="rounded-lg bg-white/60 px-2 py-2 text-gray-700 dark:bg-gray-800/60 dark:text-gray-200">
-              风向
-              <div className="mt-1 font-medium">{liveWeather.windDir}</div>
+            <div className="flex flex-col items-center rounded-lg bg-white/60 px-2 py-2 text-gray-700 dark:bg-gray-800/60 dark:text-gray-200">
+              <Navigation className="h-4 w-4 text-blue-500" />
+              <span className="mt-1 text-gray-500 dark:text-gray-400">
+                风向
+              </span>
+              <div className="mt-0.5 font-medium">{liveWeather.windDir}</div>
             </div>
-            <div className="rounded-lg bg-white/60 px-2 py-2 text-gray-700 dark:bg-gray-800/60 dark:text-gray-200">
-              风力
-              <div className="mt-1 font-medium">{liveWeather.windScale}级</div>
+            <div className="flex flex-col items-center rounded-lg bg-white/60 px-2 py-2 text-gray-700 dark:bg-gray-800/60 dark:text-gray-200">
+              <Wind className="h-4 w-4 text-green-500" />
+              <span className="mt-1 text-gray-500 dark:text-gray-400">
+                风力
+              </span>
+              <div className="mt-0.5 font-medium">
+                {liveWeather.windScale}级
+              </div>
             </div>
-            <div className="rounded-lg bg-white/60 px-2 py-2 text-gray-700 dark:bg-gray-800/60 dark:text-gray-200">
-              湿度
-              <div className="mt-1 font-medium">{liveWeather.humidity}%</div>
+            <div className="flex flex-col items-center rounded-lg bg-white/60 px-2 py-2 text-gray-700 dark:bg-gray-800/60 dark:text-gray-200">
+              <Droplets className="h-4 w-4 text-cyan-500" />
+              <span className="mt-1 text-gray-500 dark:text-gray-400">
+                湿度
+              </span>
+              <div className="mt-0.5 font-medium">{liveWeather.humidity}%</div>
             </div>
           </div>
           {!!forecasts.length && (

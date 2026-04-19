@@ -1,27 +1,29 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import dayjs from 'dayjs';
 
-import { useTideData } from '../hooks/useTideData';
+import { HARBOR_OPTIONS, useFishingMapStore } from '@/stores/fishingMapStore';
 import type { TideTableItem } from '../types';
-import { TideChart } from './TideChart';
 import { SkeletonCard } from './SkeletonCard';
+import { TideChart } from './TideChart';
 
-interface TideCardProps {}
-
-export function TideCard({}: TideCardProps) {
+export function TideCard() {
   const {
-    tideData,
-    tideSpotName,
-    loading,
+    panelTideData: tideData,
+    panelTideSpotName: tideSpotName,
+    tideLoading: loading,
     selectedHarbor,
     selectedDate,
-    harborOptions,
     setSelectedHarbor,
     setSelectedDate,
-  } = useTideData();
+    fetchPanelTide,
+  } = useFishingMapStore();
 
   const isDarkMode = document.documentElement.classList.contains('dark');
+
+  useEffect(() => {
+    fetchPanelTide();
+  }, [selectedHarbor, selectedDate, fetchPanelTide]);
 
   // 今日 ~ +7天
   const dateOptions = Array(8)
@@ -175,7 +177,10 @@ export function TideCard({}: TideCardProps) {
   }, [isDarkMode, tideData]);
 
   return (
-    <article className="rounded-2xl border border-white/40 bg-linear-to-br from-white/80 to-white/40 p-4 shadow-sm backdrop-blur-sm dark:border-gray-700/60 dark:from-gray-900/80 dark:to-gray-800/60">
+    <article className="relative rounded-2xl border border-white/40 bg-linear-to-br from-white/80 to-white/40 p-4 shadow-sm backdrop-blur-sm dark:border-gray-700/60 dark:from-gray-900/80 dark:to-gray-800/60">
+      {/* Decorative gradient orbs */}
+      <div className="pointer-events-none absolute bottom-16 left-16 h-32 w-32 overflow-hidden rounded-full bg-linear-to-tr from-teal-300/20 to-emerald-400/10 blur-3xl transition-transform duration-700 group-hover:scale-110"></div>
+
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="min-w-0">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -191,7 +196,7 @@ export function TideCard({}: TideCardProps) {
             onChange={(e) => setSelectedHarbor(e.target.value)}
             className="cursor-pointer rounded-lg border border-gray-200 bg-white/80 px-1.5 py-1 text-xs text-gray-700 focus:ring-1 focus:ring-cyan-400 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
           >
-            {harborOptions.map((opt) => (
+            {HARBOR_OPTIONS.map((opt) => (
               <option key={opt.code} value={opt.code}>
                 {opt.name}
               </option>
@@ -220,13 +225,19 @@ export function TideCard({}: TideCardProps) {
           <TideChart option={tideChartOption} />
           <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
             <div className="rounded-lg bg-white/60 px-3 py-2 dark:bg-gray-800/60">
-              <p className="text-gray-500 dark:text-gray-400">最高潮</p>
+              <p className="text-gray-500 dark:text-gray-400">
+                最高潮:{dayjs(highTide?.fxTime).format('HH:mm')}
+                <span className="text-cyan-500">↗</span>
+              </p>
               <p className="mt-1 font-medium text-gray-900 dark:text-white">
                 {highTide ? Number(highTide.height).toFixed(2) : '--'}m
               </p>
             </div>
             <div className="rounded-lg bg-white/60 px-3 py-2 dark:bg-gray-800/60">
-              <p className="text-gray-500 dark:text-gray-400">最低潮</p>
+              <p className="text-gray-500 dark:text-gray-400">
+                最低潮:{dayjs(lowTide?.fxTime).format('HH:mm')}
+                <span className="text-cyan-500">↘</span>
+              </p>
               <p className="mt-1 font-medium text-gray-900 dark:text-white">
                 {lowTide ? Number(lowTide.height).toFixed(2) : '--'}m
               </p>

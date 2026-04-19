@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 
+import dayjs from 'dayjs';
+
 import { useNotificationStore } from '@/stores/notificationState';
 
 import { fishingMapService } from '@/views/FishingMap/service';
@@ -28,14 +30,25 @@ export interface FishingMapState {
   weatherError: string;
   weatherIndices: WeatherIndex[];
 
-  // tide
+  // tide (from weather full)
   tideData: TideData | null;
+
+  // panel tide (selectable harbor / date)
+  panelTideData: TideData | null;
+  panelTideSpotName: string;
+  tideLoading: boolean;
+  selectedHarbor: string;
+  selectedDate: string;
+
   // fishing index
   indexData: FishingIndexData | null;
   indexLoading: boolean;
   indexError: string;
 
   fetchWeatherAndFishing: (location: [number, number]) => Promise<void>;
+  fetchPanelTide: (harbor?: string, date?: string) => Promise<void>;
+  setSelectedHarbor: (harbor: string) => void;
+  setSelectedDate: (date: string) => void;
 }
 
 const notifyError = (msg: string) => {
@@ -43,7 +56,7 @@ const notifyError = (msg: string) => {
 };
 
 // 创建 store
-export const useFishingMapStore = create<FishingMapState>((set) => ({
+export const useFishingMapStore = create<FishingMapState>((set, get) => ({
   // 初始状态
   liveWeather: null,
   forecasts: [],
@@ -55,6 +68,13 @@ export const useFishingMapStore = create<FishingMapState>((set) => ({
   indexError: '',
   weatherIndices: [],
   tideData: null,
+
+  // panel tide 初始状态
+  panelTideData: null,
+  panelTideSpotName: '黄埔港',
+  tideLoading: false,
+  selectedHarbor: 'P2352',
+  selectedDate: dayjs().format('YYYYMMDD'),
 
   // actions
   fetchWeatherAndFishing: async (location: [number, number]) => {
@@ -90,5 +110,39 @@ export const useFishingMapStore = create<FishingMapState>((set) => ({
         indexLoading: false,
       });
     }
+  },
+
+  fetchPanelTide: async (harbor?: string, date?: string) => {
+    const { selectedHarbor: currentHarbor, selectedDate: currentDate } = get();
+    const harborToUse = harbor ?? currentHarbor;
+    const dateToUse = date ?? currentDate;
+    set({ tideLoading: true });
+    try {
+      const service = fishingMapService();
+      const res = await service.getTide({
+        harbor: harborToUse,
+        date: dateToUse,
+      });
+      const harborOption = HARBOR_OPTIONS.find((o) => o.code === harborToUse);
+      set({
+        panelTideData: res,
+        panelTideSpotName: harborOption?.name ?? '黄埔港',
+        tideLoading: false,
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '获取潮汐信息失败';
+      notifyError(msg);
+      set({ tideLoading: false });
+    }
+  },
+
+  setSelectedHarbor: (harbor: string) => {
+    set({ selectedHarbor: harbor });
+    void get().fetchPanelTide(harbor, get().selectedDate);
+  },
+
+  setSelectedDate: (date: string) => {
+    set({ selectedDate: date });
+    void get().fetchPanelTide(get().selectedHarbor, date);
   },
 }));

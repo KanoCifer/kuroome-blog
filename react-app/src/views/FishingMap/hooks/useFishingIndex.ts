@@ -1,10 +1,16 @@
 import { useCallback } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 import { useFishingMapStore } from '@/stores/fishingMapStore';
-import { useFishingIndexSelector } from '@/hooks/useFishingDataStore';
 
 export function useFishingIndex(location: [number, number]) {
-  const { indexData, loading, error } = useFishingIndexSelector();
+  const { indexData, loading, error } = useFishingMapStore(
+    useShallow((s) => ({
+      indexData: s.indexData,
+      loading: s.indexLoading,
+      error: s.indexError,
+    })),
+  );
 
   const refetch = useCallback(() => {
     void useFishingMapStore.getState().fetchWeatherAndFishing(location);

@@ -98,6 +98,7 @@ declare module 'vue' {
     EyeOn: typeof import('./src/components/icons/EyeOn.vue')['default']
     HomeIcon: typeof import('./src/components/icons/HomeIcon.vue')['default']
     HomeSideBar: typeof import('./src/components/layout/HomeSideBar.vue')['default']
+    HourlyCard: typeof import('./src/components/map/HourlyCard.vue')['default']
     IconAbout: typeof import('./src/components/basic/icon/IconAbout.vue')['default']
     IconAnalytics: typeof import('./src/components/basic/icon/IconAnalytics.vue')['default']
     IconBookshelf: typeof import('./src/components/basic/icon/IconBookshelf.vue')['default']

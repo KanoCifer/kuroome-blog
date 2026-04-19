@@ -134,43 +134,35 @@
 </template>
 
 <script setup lang="ts">
-import { weatherService } from "@/service/weatherService";
-import { useNotificationStore } from "@/stores/notification";
+import { HARBOR_OPTIONS, useFishingMapStore } from "@/stores/fishingMap";
 import dayjs from "dayjs";
 import { LineChart } from "echarts/charts";
 import { GridComponent, MarkLineComponent, MarkPointComponent, TooltipComponent } from "echarts/components";
 import { use } from "echarts/core";
 import { SVGRenderer } from "echarts/renderers";
-import { computed, onMounted, ref, watch } from "vue";
+import { storeToRefs } from "pinia";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import VChart from "vue-echarts";
 
 use([TooltipComponent, GridComponent, MarkLineComponent, MarkPointComponent, LineChart, SVGRenderer]);
 
-interface TideData {
-  updateTime: string;
-  tideTable: { fxTime: string; height: number | string; type: "H" | "L" }[];
-  tideHourly: { fxTime: string; height: number | string }[];
-}
+const fishingMapStore = useFishingMapStore();
+const { panelTideData, tideLoading, selectedHarbor: selectedHarborState, selectedDate: selectedDateState, panelTideSpotName } =
+  storeToRefs(fishingMapStore);
 
-const HARBOR_OPTIONS = [
-  { code: "P2352", name: "黄埔港" },
-  { code: "P2932", name: "舢舨洲" },
-  { code: "P2299", name: "南沙港" },
-  { code: "P2474", name: "海沁" },
-  { code: "P2609", name: "东沙" },
-];
-
-const notifier = useNotificationStore();
-const tideData = ref<TideData | null>(null);
-const loading = ref<boolean>(false);
+const tideData = computed(() => panelTideData.value);
+const loading = computed(() => tideLoading.value);
 const isDarkMode = ref<boolean>(false);
-const selectedHarbor = ref<string>("P2352");
-const selectedDate = ref<string>(dayjs().format("YYYYMMDD"));
-const tideSpotName = ref<string>("黄埔港");
-
-const emit = defineEmits<{
-  (e: "update", payload: { tideData: TideData | null; spotName: string }): void;
-}>();
+let darkModeMediaQuery: MediaQueryList | null = null;
+const tideSpotName = computed(() => panelTideSpotName.value);
+const selectedHarbor = computed({
+  get: () => selectedHarborState.value,
+  set: (value: string) => fishingMapStore.setSelectedHarbor(value),
+});
+const selectedDate = computed({
+  get: () => selectedDateState.value,
+  set: (value: string) => fishingMapStore.setSelectedDate(value),
+});
 
 // 今日 ~ +7天
 const dateOptions = computed(() =>
@@ -193,35 +185,8 @@ const todayStr = computed(() => {
 
 // 检测深色模式
 const checkDarkMode = () => {
-  isDarkMode.value = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  isDarkMode.value = darkModeMediaQuery?.matches ?? false;
 };
-
-// 从后端获取潮汐数据
-const fetchTideData = async (harbor: string, date: string) => {
-  loading.value = true;
-  try {
-    const res = await weatherService.getTide({ harbor, date });
-    if (res.tideHourly && res.tideHourly.length > 0) {
-      tideData.value = {
-        updateTime: res.updateTime,
-        tideTable: res.tideTable,
-        tideHourly: res.tideHourly,
-      };
-      const harborName = HARBOR_OPTIONS.find((h) => h.code === harbor)?.name ?? "黄埔港";
-      tideSpotName.value = harborName;
-      emit("update", { tideData: tideData.value, spotName: harborName });
-    }
-  } catch {
-    notifier.error("获取潮汐信息失败，请稍后再试");
-  } finally {
-    loading.value = false;
-  }
-};
-
-// harbor 或 date 变化时自动刷新
-watch([selectedHarbor, selectedDate], ([harbor, date]) => {
-  void fetchTideData(harbor, date);
-});
 
 // 计算最高潮和最低潮
 const highTide = computed(() => {
@@ -309,7 +274,7 @@ const tideOptions = computed(() => {
         formatter: (value: string) => dayjs(value).format("HH:mm"),
         color: subTextColor,
         fontSize: 11,
-        interval: Math.floor(tideData.value!.tideHourly.length / 5),
+        interval: Math.max(1, Math.floor(tideData.value.tideHourly.length / 5)),
       },
       axisLine: {
         lineStyle: { color: isDarkMode.value ? "#334155" : "#e5e7eb" },
@@ -399,8 +364,16 @@ const tideOptions = computed(() => {
 });
 
 onMounted(() => {
+  darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
   checkDarkMode();
-  void fetchTideData(selectedHarbor.value, selectedDate.value);
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", checkDarkMode);
+  if (!panelTideData.value) {
+    void fishingMapStore.fetchPanelTide(selectedHarborState.value, selectedDateState.value);
+  }
+  darkModeMediaQuery.addEventListener("change", checkDarkMode);
+});
+
+onUnmounted(() => {
+  darkModeMediaQuery?.removeEventListener("change", checkDarkMode);
+  darkModeMediaQuery = null;
 });
 </script>

@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { fishingService } from "@/service/fishingService";
-import { useNotificationStore } from "@/stores/notification";
+import { useFishingMapStore } from "@/stores/fishingMap";
 import type { FishingIndexData } from "@/views/general/fishing/types";
-import { onMounted, ref } from "vue";
+import { FishingRod, Loader } from "lucide-vue-next";
+import { motion } from "motion-v";
+import { storeToRefs } from "pinia";
 
 interface Props {
   location?: [number, number];
@@ -16,44 +17,60 @@ const emit = defineEmits<{
   (e: "feedback-click", data: FishingIndexData): void;
 }>();
 
-const notifier = useNotificationStore();
-const loading = ref(false);
-const error = ref("");
-const indexData = ref<FishingIndexData | null>(null);
-
+const fishingMapStore = useFishingMapStore();
+const { indexData, indexLoading: loading, indexError: error } = storeToRefs(fishingMapStore);
+// console.log("钓鱼指数数据：", indexData.value);
 const levelColors: Record<string, string> = {
-  爆护: "text-red-500",
-  极好: "text-orange-500",
-  好: "text-yellow-500",
-  一般: "text-green-500",
-  差: "text-blue-500",
+  爆护: "text-green-500",
+  好: "text-blue-500",
+  一般: "text-orange-500",
+  差: "text-red-500",
   空军: "text-gray-500",
 };
 
 const levelBg: Record<string, string> = {
-  爆护: "bg-red-50 dark:bg-red-950/30",
-  极好: "bg-orange-50 dark:bg-orange-950/30",
-  好: "bg-yellow-50 dark:bg-yellow-950/30",
-  一般: "bg-green-50 dark:bg-green-950/30",
-  差: "bg-blue-50 dark:bg-blue-950/30",
+  爆护: "bg-green-50 dark:bg-green-950/30",
+  好: "bg-blue-50 dark:bg-blue-950/30",
+  一般: "bg-orange-50 dark:bg-orange-950/30",
+  差: "bg-red-50 dark:bg-red-950/30",
   空军: "bg-gray-50 dark:bg-gray-800/30",
 };
 
-const fetchIndex = async () => {
-  loading.value = true;
-  error.value = "";
+const getGaugeColor = (percentage: number): string => {
+  if (percentage >= 85) return "#22c55e";
+  if (percentage >= 70) return "#06b6d4";
+  if (percentage >= 50) return "#f97316";
+  if (percentage <= 30) return "#ef4444";
+  return "#3b82f6"; // blue-500
+};
 
-  try {
-    indexData.value = await fishingService.fetchFishingIndex({
-      location: props.location,
-    });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "获取钓鱼指数失败";
-    error.value = message;
-    notifier.error(message);
-  } finally {
-    loading.value = false;
-  }
+const getGaugeStyle = (value: number) => {
+  if (!value) return {};
+  const percentage = Math.round(value * 100);
+  return {
+    width: `${percentage}%`,
+    background: `linear-gradient(90deg, ${getGaugeColor(percentage)}cc, ${getGaugeColor(percentage)})`,
+  };
+};
+
+const formatFeatureName = (name: string): string => {
+  const mapping: Record<string, string> = {
+    w1_temp: "气温",
+    w2_humidity: "湿度",
+    w3_pressure: "气压",
+    w4_wind: "风速",
+    w5_rain: "降水",
+    w6_tide_rising: "涨潮",
+    w7_hours_to_tide: "距潮",
+    w8_tide_range: "潮差",
+    w9_indices: "指数",
+  };
+  return mapping[name] || name;
+};
+
+const fetchIndex = async () => {
+  console.log("刷新钓鱼指数，位置：", props.location);
+  await fishingMapStore.fetchWeatherAndFishing(props.location);
 };
 
 const handleFeedback = () => {
@@ -61,33 +78,37 @@ const handleFeedback = () => {
     emit("feedback-click", indexData.value);
   }
 };
-
-onMounted(() => {
-  void fetchIndex();
-});
 </script>
 
 <template>
   <article
-    class="squircle relative border border-white/40 p-6 shadow-sm backdrop-blur-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-xl dark:border-gray-700/60"
-    :class="indexData ? levelBg[indexData.level] || 'bg-gray-50' : 'bg-gray-50'"
+    class="group squircle relative flex h-full cursor-pointer flex-col overflow-hidden border border-white/20 p-6 shadow-lg transition-all duration-500 hover:-translate-y-2 hover:shadow-xl dark:border-gray-700/50"
+    :class="indexData ? levelBg[indexData.level] || 'bg-gray-50 dark:bg-gray-800/60' : 'bg-gray-50 dark:bg-gray-800/60'"
   >
-    <div class="absolute top-0 right-0 overflow-hidden rounded-full p-8 blur-2xl">
+    <div class="pointer-events-none absolute top-0 right-0 overflow-hidden rounded-full p-8 blur-3xl">
       <div class="h-24 w-24 rounded-full bg-linear-to-br from-blue-200/60 to-green-200/60" />
     </div>
 
+    <!-- 钓鱼指数标题和说明 -->
     <div class="mb-3 flex items-center justify-between">
       <div>
         <h3 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">钓鱼指数</h3>
         <p class="text-sm text-gray-500 dark:text-gray-400">基于实时天气、潮汐综合计算</p>
       </div>
+
       <button
-        class="rounded-lg bg-white/60 px-2 py-1 text-xs text-gray-600 hover:bg-white/80 dark:bg-gray-800/60 dark:text-gray-300 dark:hover:bg-gray-800/80"
+        class="flex cursor-pointer items-center gap-1 rounded-lg bg-white/60 px-2 py-1 text-sm text-gray-600 hover:bg-white/80 disabled:cursor-not-allowed dark:bg-gray-800/60 dark:text-gray-300 dark:hover:bg-gray-800/80"
         :disabled="loading"
         @click="fetchIndex"
       >
+        <Loader v-if="loading" class="h-3 w-3 animate-spin" />
         {{ loading ? "刷新中..." : "刷新" }}
       </button>
+      <div
+        class="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-sky-400 to-blue-500 shadow-lg shadow-sky-500/25 transition-transform duration-300 group-hover:scale-110"
+      >
+        <FishingRod class="text-white" />
+      </div>
     </div>
 
     <p v-if="loading && !indexData" class="text-sm text-gray-500 dark:text-gray-400">加载中...</p>
@@ -103,33 +124,47 @@ onMounted(() => {
       </div>
 
       <div class="mb-3 grid grid-cols-3 gap-2 text-center text-xs">
-        <div class="rounded-lg bg-white/60 px-2 py-2 dark:bg-gray-800/60">
+        <div
+          class="rounded-lg bg-white/60 px-2 py-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:bg-gray-800/60"
+        >
           默认权重
           <div class="mt-1 font-medium text-gray-900 dark:text-white">{{ indexData.expert_score }}</div>
         </div>
-        <div class="rounded-lg bg-white/60 px-2 py-2 dark:bg-gray-800/60">
+        <div
+          class="rounded-lg bg-white/60 px-2 py-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:bg-gray-800/60"
+        >
           权重调整
           <div class="mt-1 font-medium text-gray-900 dark:text-white">
             {{ indexData.residual > 0 ? "+" : "" }}{{ indexData.residual }}
           </div>
         </div>
-        <div class="rounded-lg bg-white/60 px-2 py-2 dark:bg-gray-800/60">
+        <div
+          class="rounded-lg bg-white/60 px-2 py-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:bg-gray-800/60"
+        >
           综合指数
           <div class="mt-1 font-medium text-gray-900 dark:text-white">{{ indexData.fishing_index }}</div>
         </div>
       </div>
 
-      <details v-if="Object.keys(indexData.feature_breakdown).length > 0" class="mt-2 cursor-pointer text-xs">
+      <details v-if="Object.keys(indexData.feature_breakdown).length > 0" open class="mt-4 cursor-pointer text-xs">
         <summary class="text-gray-500 dark:text-gray-400">特征详情</summary>
-        <div class="mt-2 grid grid-cols-3 gap-1">
-          <div
-            v-for="(value, key) in indexData.feature_breakdown"
-            :key="key"
-            class="rounded bg-white/40 px-1 py-1 dark:bg-gray-800/40"
+        <div class="mt-2 grid grid-cols-3 gap-2">
+          <motion.div
+            v-for="(value, keyName) in indexData.feature_breakdown"
+            :key="keyName"
+            class="rounded-xl border border-gray-200/60 bg-white/60 p-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-gray-700/60 dark:bg-gray-800/60"
           >
-            <span class="text-gray-500 dark:text-gray-400">{{ key.replace("_", " ") }}:</span>
-            <span class="font-medium text-gray-900 dark:text-white"> {{ value }} </span>
-          </div>
+            <div class="text-xs text-gray-800 dark:text-gray-400">
+              {{ formatFeatureName(keyName) }}
+            </div>
+
+            <div class="relative mt-1 h-1.5 w-full overflow-hidden rounded-full bg-gray-200/60 dark:bg-gray-700/60">
+              <div
+                class="absolute inset-y-0 left-0 rounded-full transition-all duration-700 ease-out"
+                :style="getGaugeStyle(value)"
+              />
+            </div>
+          </motion.div>
         </div>
       </details>
 

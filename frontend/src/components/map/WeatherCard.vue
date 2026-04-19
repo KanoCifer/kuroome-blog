@@ -26,7 +26,7 @@
         class="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-sky-400 to-blue-500 shadow-lg shadow-sky-500/25 transition-transform duration-300 group-hover:scale-110"
       >
         <span v-if="liveWeather" class="text-2xl">
-          <i :class="`qi-${liveWeather.icon}`" class="text-2xl" />
+          <i :class="`qi-${liveWeather.icon}`" class="text-2xl text-white" />
         </span>
         <svg
           v-else
@@ -224,111 +224,23 @@
 </template>
 
 <script setup lang="ts">
-import { weatherService } from "@/service/weatherService";
+import { useFishingMapStore } from "@/stores/fishingMap";
 import { formatDate } from "@/utils/formatdate";
-import { onMounted, ref } from "vue";
+import { storeToRefs } from "pinia";
+import { computed } from "vue";
 
-interface LiveWeather {
-  obsTime: string;
-  temp: string;
-  text: string;
-  windDir: string;
-  windScale: string;
-  humidity: string;
-  icon: string;
-  pressure?: string;
-  windSpeed?: string;
-  precip?: string;
-}
-
-interface ForecastDay {
-  fxDate: string;
-  tempMax: string;
-  tempMin: string;
-  textDay: string;
-  iconDay: string;
-}
-
-const props = withDefaults(
-  defineProps<{
-    location?: [number, number];
-  }>(),
-  {
-    location: () => [113.389549, 23.050067],
-  },
-);
-
-const emit = defineEmits<{
-  (
-    e: "update",
-    payload: {
-      liveWeather: LiveWeather | null;
-      forecasts: ForecastDay[];
-      locationName: string;
-    },
-  ): void;
+defineProps<{
+  location?: [number, number];
 }>();
 
-const liveWeather = ref<LiveWeather | null>(null);
-const forecasts = ref<ForecastDay[]>([]);
-const locationName = ref("");
-const isLoading = ref(false);
-const error = ref<string | null>(null);
+const fishingMapStore = useFishingMapStore();
+const { liveWeather, forecasts, locationName, weatherLoading, weatherError } = storeToRefs(fishingMapStore);
 
-// 获取天气信息
-const fetchWeather = async (location: [number, number]) => {
-  isLoading.value = true;
-  error.value = null;
-
-  try {
-    const { now, daily, locationName: resolvedLocationName } = await weatherService.fetchWeatherFull({ location });
-
-    locationName.value = resolvedLocationName || "钓鱼地点";
-
-    if (now) {
-      liveWeather.value = {
-        obsTime: now.obsTime || "",
-        temp: now.temp || "",
-        text: now.text || "",
-        windDir: now.windDir || "",
-        windScale: now.windScale || "",
-        humidity: now.humidity || "",
-        icon: now.icon || "",
-        pressure: now.pressure || "",
-        windSpeed: now.windSpeed || "",
-        precip: now.precip || "",
-      };
-    } else {
-      liveWeather.value = null;
-    }
-
-    forecasts.value = (daily ?? []).slice(0, 4).map((day) => ({
-      fxDate: day.fxDate || "",
-      tempMax: day.tempMax || "",
-      tempMin: day.tempMin || "",
-      textDay: day.textDay || "",
-      iconDay: day.iconDay || "",
-    }));
-
-    emit("update", {
-      liveWeather: liveWeather.value,
-      forecasts: forecasts.value,
-      locationName: locationName.value,
-    });
-  } catch (err) {
-    console.error("获取天气失败:", err);
-    error.value = err instanceof Error ? err.message : "获取天气失败";
-  } finally {
-    isLoading.value = false;
-  }
-};
+const isLoading = computed(() => weatherLoading.value);
+const error = computed(() => weatherError.value || null);
 
 // 打开和风天气
 const openQWeather = () => {
   window.open("https://www.qweather.com/", "_blank");
 };
-
-onMounted(() => {
-  fetchWeather(props.location);
-});
 </script>

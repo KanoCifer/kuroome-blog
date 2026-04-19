@@ -30,7 +30,7 @@ class WeatherService:
                 return cached_jwt.decode()
             return str(cached_jwt)
 
-        encoded_jwt = generate_qweather_jwt()
+        encoded_jwt: str = generate_qweather_jwt()
         await redis.set(cache_key, encoded_jwt, ex=24 * 3600)
         return encoded_jwt
 
@@ -323,6 +323,39 @@ class WeatherService:
                 503,
             ) from exc
 
+    async def get_nearby_tsta(self, location: str, redis: AsyncRedis) -> dict:
+        """获取指定经纬度附近的潮汐站点（TSTA）信息。
+
+        Returns
+            dict: 包含站点名称和ID的字典，例如 {"name": "站点名称", "id": "站点ID"}。
+        """
+        url = f"{_QWEATHER_BASE_URL}/geo/v2/poi/lookup"
+        encoded_jwt = await self.get_qweather_jwt(redis)
+        headers = {"Authorization": f"Bearer {encoded_jwt}"}
+        params = {"location": location, "type": "TSTA"}
+        try:
+            async with httpx.AsyncClient() as client:
+                res = await client.get(
+                    url=url,
+                    headers=headers,
+                    params=params,
+                )
+                res.raise_for_status()
+                res = res.json()
+                data = res.get("poi", [])[0] if res.get("poi") else {}
+                return {"id": data.get("id")}
+        except httpx.HTTPStatusError as exc:
+            response = exc.response
+            raise WeatherDomainError(
+                f"QWeather API error: {response.status_code} - {response.text}",
+                response.status_code,
+            ) from exc
+        except httpx.HTTPError as exc:
+            raise WeatherDomainError(
+                f"Failed to fetch QWeather nearby TSTA: {exc!s}",
+                503,
+            ) from exc
+
     async def get_full_weather_data(
         self, location: str, redis: AsyncRedis
     ) -> dict:
@@ -340,6 +373,24 @@ class WeatherService:
         logger.info(
             f"POI lookup for location {location} returned: {poi_name} (ID: {poi_id})"
         )
+
+        try:
+            tsta_info = await self.get_nearby_tsta(location, redis)
+            if tsta_info.get("id"):
+                tsta_id = tsta_info["id"]
+                logger.info(
+                    f"Found nearby TSTA station for ID: {tsta_info['id']})"
+                )
+            else:
+                logger.warning(
+                    f"No nearby TSTA station found for location {location}"
+                )
+        except WeatherDomainError as exc:
+            logger.error(
+                f"Error fetching nearby TSTA station for location {location}: {exc!s}"
+            )
+            tsta_id = None
+
         if not poi_name and not poi_id:
             raise WeatherDomainError("无法获取位置的POI信息", 404)
 
@@ -359,7 +410,7 @@ class WeatherService:
 
             date_str = datetime.now(UTC).strftime("%Y%m%d")
             tide_data, _ = await self.get_qweather_tide(
-                redis, harbor="P2352", date=date_str
+                redis, harbor=tsta_id or "P2352", date=date_str
             )
 
             indices_data = await self.get_indices(redis, location=location)

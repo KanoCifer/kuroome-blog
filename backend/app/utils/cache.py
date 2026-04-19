@@ -13,12 +13,12 @@ from redis.asyncio import ConnectionPool
 from redis.asyncio import Redis as AsyncRedis
 
 from app.core import logger
-from app.core.config import settings
+from app.core.config import get_settings
 
 CONNECTION_POOL = ConnectionPool.from_url(
-    settings.REDIS_URL,
+    get_settings().REDIS_URL,
     decode_responses=True,
-    max_connections=settings.REDIS_MAX_CONNECTIONS,
+    max_connections=get_settings().REDIS_MAX_CONNECTIONS,
 )
 
 
@@ -128,7 +128,7 @@ def _orjson_dumps(obj: Any) -> bytes:
         return json.dumps(obj, default=str).encode("utf-8")
 
 
-def _orjson_loads(data: str | bytes):
+def _orjson_loads(data: str | bytes) -> bytes:
     if isinstance(data, str):
         data = data.encode("utf-8")
     return orjson.loads(data)
@@ -234,9 +234,6 @@ def init_redis_cache() -> AsyncRedis:
 redis_cache = AsyncRedisCache(redis_client=init_redis_cache())
 
 
-# 依赖注入函数
-# async def get_cache() -> AsyncCache:
-#     return cache
 async def get_redis_cache() -> AsyncRedisCache:
     return redis_cache
 

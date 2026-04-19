@@ -1,91 +1,11 @@
 import request from "@/api/request";
+import type { TideData, WeatherDay, WeatherFullResponse, WeatherNow } from "@/views/general/fishing/types";
 
-export interface TideResponse {
+export interface TideResponse extends TideData {
   code: string;
-  updateTime: string;
-  tideTable: Array<{ fxTime: string; height: string; type: "H" | "L" }>;
-  tideHourly: Array<{ fxTime: string; height: string }>;
 }
 
-export interface WeatherNow {
-  obsTime: string;
-  temp: string;
-  feelsLike: string;
-  icon: string;
-  text: string;
-  wind360: string;
-  windDir: string;
-  windScale: string;
-  windSpeed: string;
-  humidity: string;
-  precip: string;
-  pressure: string;
-  vis: string;
-  cloud: string;
-  dew: string;
-}
-
-export interface WeatherLiveResponse {
-  code: string;
-  updateTime: string;
-  fxLink: string;
-  now?: WeatherNow;
-  refer?: {
-    sources?: string[];
-    license?: string[];
-  };
-}
-
-export interface WeatherDay {
-  fxDate: string;
-  sunrise: string;
-  sunset: string;
-  moonrise: string;
-  moonset: string;
-  moonPhase: string;
-  moonPhaseIcon: string;
-  tempMax: string;
-  tempMin: string;
-  iconDay: string;
-  textDay: string;
-  iconNight: string;
-  textNight: string;
-  wind360Day: string;
-  windDirDay: string;
-  windScaleDay: string;
-  windSpeedDay: string;
-  wind360Night: string;
-  windDirNight: string;
-  windScaleNight: string;
-  windSpeedNight: string;
-  humidity: string;
-  precip: string;
-  pressure: string;
-  vis: string;
-  cloud: string;
-  uvIndex: string;
-}
-
-export interface WeatherForecastResponse {
-  code: string;
-  updateTime: string;
-  fxLink: string;
-  daily?: WeatherDay[];
-  refer?: {
-    sources?: string[];
-    license?: string[];
-  };
-}
-
-export interface WeatherFullResponse {
-  current?: WeatherLiveResponse;
-  daily?: WeatherForecastResponse;
-  hourly?: Record<string, unknown>;
-  tide?: TideResponse;
-  indices?: Record<string, unknown>;
-  locationName?: string;
-  poiId?: string;
-}
+export type { WeatherDay, WeatherFullResponse, WeatherNow };
 
 export interface WeatherGateway {
   getTide(payload: { harbor: string; date: string }): Promise<TideResponse>;

@@ -1,5 +1,14 @@
 @import 'tailwindcss';
 
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
 @font-face {
   font-family: '阿里妈妈方圆体 VF Regular';
   src:

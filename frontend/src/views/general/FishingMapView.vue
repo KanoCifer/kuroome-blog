@@ -67,7 +67,7 @@
       >
         <MapContainer
           ref="mapContainerRef"
-          :center="[113.389549, 23.050067]"
+          :center="DEFAULT_MAP_CENTER"
           :zoom="13"
           :markers="fishingSpots"
           :show-tool-bar="true"
@@ -80,9 +80,9 @@
 
       <!-- Map Controls and Info -->
       <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <TideCard @update="handleTideUpdate" />
-        <WeatherCard :location="[113.389549, 23.050067]" @update="handleWeatherUpdate" />
-        <FishingIndexCard :location="[113.389549, 23.050067]" @feedback-click="handleFeedbackClick" />
+        <TideCard />
+        <WeatherCard :location="activeLocation" />
+        <FishingIndexCard :location="activeLocation" @feedback-click="handleFeedbackClick" />
       </div>
     </div>
 
@@ -148,11 +148,13 @@ import MapContainer from "@/components/basic/MapContainer.vue";
 import TideCard from "@/components/map/TideCard.vue";
 import WeatherCard from "@/components/map/WeatherCard.vue";
 import fishingSpotsData from "@/data/fishing-spots.json";
+import { DEFAULT_MAP_CENTER, useFishingMapStore } from "@/stores/fishingMap";
 import FishingFeedbackForm from "@/views/general/fishing/components/FishingFeedbackForm.vue";
 import FishingIndexCard from "@/views/general/fishing/components/FishingIndexCard.vue";
 import type { FishingFeedbackData, FishingIndexData } from "@/views/general/fishing/types";
 import { Bot } from "lucide-vue-next";
-import { computed, ref, useTemplateRef } from "vue";
+import { storeToRefs } from "pinia";
+import { computed, onMounted, ref, useTemplateRef } from "vue";
 
 export interface AMapMarker {
   position: [number, number];
@@ -166,36 +168,14 @@ interface MapContainerInstance {
   getCurrentPosition: () => Promise<[number, number]>;
 }
 
-interface LiveWeather {
-  obsTime: string;
-  temp: string;
-  text: string;
-  windDir: string;
-  windScale: string;
-  humidity: string;
-  icon: string;
-  pressure?: string;
-  windSpeed?: string;
-  precip?: string;
-}
-
-interface ForecastDay {
-  fxDate: string;
-  tempMax: string;
-  tempMin: string;
-  textDay: string;
-  iconDay: string;
-}
-
-interface TideData {
-  updateTime: string;
-  tideTable: { fxTime: string; height: number | string; type: "H" | "L" }[];
-  tideHourly: { fxTime: string; height: number | string }[];
-}
-
 // 钓点数据
 const fishingSpots = ref<AMapMarker[]>(fishingSpotsData as AMapMarker[]);
 const mapContainerRef = useTemplateRef<MapContainerInstance>("mapContainerRef");
+const fishingMapStore = useFishingMapStore();
+const { liveWeather, forecasts, tideData, weatherIndices, locationName } = storeToRefs(fishingMapStore);
+const userPosition = ref<[number, number] | null>(null);
+const activeLocation = computed<[number, number]>(() => userPosition.value ?? DEFAULT_MAP_CENTER);
+const tideSpotName = ref("黄埔港");
 
 // 路线规划状态
 const isPlanningRoute = ref(false);
@@ -203,11 +183,6 @@ const routeInfo = ref<{ distance: number; time: number } | null>(null);
 const selectedSpotIndex = ref<number | null>(null);
 
 const analysisOpen = ref(false);
-const liveWeather = ref<LiveWeather | null>(null);
-const forecasts = ref<ForecastDay[]>([]);
-const tideData = ref<TideData | null>(null);
-const locationName = ref<string>("");
-const tideSpotName = ref<string>("黄埔港");
 
 const feedbackOpen = ref(false);
 const feedbackLocationId = ref("default");
@@ -222,27 +197,13 @@ const analysisPayload = computed(() => {
     liveWeather: liveWeather.value,
     forecasts: forecasts.value,
     tideData: tideData.value,
+    weatherIndices: weatherIndices.value,
     locationName: locationName.value,
     tideSpotName: tideSpotName.value,
   };
 });
 
-const analysisHasData = computed(() => !!liveWeather.value || forecasts.value.length > 0 || !!tideData.value);
-
-const handleWeatherUpdate = (payload: {
-  liveWeather: LiveWeather | null;
-  forecasts: ForecastDay[];
-  locationName: string;
-}) => {
-  liveWeather.value = payload.liveWeather;
-  forecasts.value = payload.forecasts;
-  locationName.value = payload.locationName;
-};
-
-const handleTideUpdate = (payload: { tideData: TideData | null; spotName: string }) => {
-  tideData.value = payload.tideData;
-  tideSpotName.value = payload.spotName;
-};
+const analysisHasData = computed(() => liveWeather.value !== null && tideData.value !== null);
 
 const handleFeedbackClick = (data: FishingIndexData) => {
   const windLevel = liveWeather.value
@@ -250,7 +211,7 @@ const handleFeedbackClick = (data: FishingIndexData) => {
     : 1;
 
   let tideLevel = 1.5;
-  let tideType: "H" | "L" = "H";
+  let tideType: "涨潮" | "退潮" | undefined = undefined;
   let tideRange = 1.5;
   let hoursToNextTide = 3.0;
 
@@ -258,7 +219,7 @@ const handleFeedbackClick = (data: FishingIndexData) => {
     const currentTide = tideData.value.tideTable[0];
     const nextTide = tideData.value.tideTable[1];
 
-    tideType = currentTide.type || "H";
+    tideType = currentTide.type === "H" ? "涨潮" : "退潮";
     tideLevel = Number(currentTide.height) || 1.5;
 
     if (nextTide) {
@@ -278,7 +239,7 @@ const handleFeedbackClick = (data: FishingIndexData) => {
     pressure: Number(liveWeather.value?.pressure) || 1013,
     wind_speed: Number(liveWeather.value?.windSpeed) || 0,
     precipitation: Number(liveWeather.value?.precip) || 0,
-    wind_level: windLevel,
+    indices: windLevel,
     tide_level: tideLevel,
     tide_type: tideType,
     tide_range: tideRange,
@@ -308,7 +269,13 @@ const handleMarkerClick = async (index: number) => {
     isPlanningRoute.value = true;
 
     // 获取用户当前位置
-    const userPosition = await mapContainerRef.value.getCurrentPosition();
+    const currentPosition = await mapContainerRef.value.getCurrentPosition();
+    const previousPosition = activeLocation.value;
+    const hasChangedPosition = previousPosition[0] !== currentPosition[0] || previousPosition[1] !== currentPosition[1];
+    if (hasChangedPosition) {
+      await fishingMapStore.fetchWeatherAndFishing(currentPosition);
+    }
+    userPosition.value = currentPosition;
 
     // 获取被点击的钓点位置
     const spot = fishingSpots.value?.[index];
@@ -317,7 +284,7 @@ const handleMarkerClick = async (index: number) => {
     }
 
     // 规划路线
-    const result = await mapContainerRef.value.planRoute(userPosition, spot.position);
+    const result = await mapContainerRef.value.planRoute(currentPosition, spot.position);
 
     routeInfo.value = result;
   } catch (error) {
@@ -339,6 +306,19 @@ const handleClearRoute = () => {
 
 // 地图初始化完成
 const handleMapReady = () => {
-  // 地图初始化完成，天气由 WeatherCard 组件自行获取
+  void (async () => {
+    if (!mapContainerRef.value) return;
+    try {
+      const position = await mapContainerRef.value.getCurrentPosition();
+      userPosition.value = position;
+      await fishingMapStore.fetchWeatherAndFishing(position);
+    } catch {
+      // 如果定位失败，保留默认中心点数据
+    }
+  })();
 };
+
+onMounted(() => {
+  void fishingMapStore.fetchWeatherAndFishing(DEFAULT_MAP_CENTER);
+});
 </script>

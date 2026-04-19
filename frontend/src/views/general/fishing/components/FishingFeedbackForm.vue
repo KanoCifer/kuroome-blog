@@ -2,6 +2,7 @@
 import { fishingService } from "@/service/fishingService";
 import { useNotificationStore } from "@/stores/notification";
 import type { FishingFeedbackData, FishingFeedbackLevel, FishingFeedbackPayload } from "@/views/general/fishing/types";
+import dayjs from "dayjs";
 import { ref } from "vue";
 
 interface Props {
@@ -42,16 +43,16 @@ const handleSubmit = async () => {
     const payload: FishingFeedbackPayload = {
       location_id: props.locationId,
       location_name: props.locationName,
-      fishing_time: new Date().toISOString(),
+      fishing_time: dayjs().toISOString(),
       feedback: selectedFeedback.value,
       temperature: props.fishingData.temperature,
       humidity: props.fishingData.humidity,
       pressure: props.fishingData.pressure,
       wind_speed: props.fishingData.wind_speed,
       precipitation: props.fishingData.precipitation,
-      wind_level: props.fishingData.wind_level,
+      indices: props.fishingData.indices,
       tide_level: props.fishingData.tide_level,
-      tide_type: props.fishingData.tide_type === "H" ? "涨潮" : "退潮",
+      tide_type: props.fishingData.tide_type,
       tide_range: props.fishingData.tide_range,
       hours_to_next_tide: props.fishingData.hours_to_next_tide,
     };

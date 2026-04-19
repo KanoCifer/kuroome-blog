@@ -24,6 +24,8 @@ export interface FishingMapService {
     signal?: AbortSignal,
   ): Promise<void>;
 
+  getTide(payload: { harbor: string; date: string }): Promise<TideData>;
+
   fetchWeatherFull(payload: { location: [number, number] }): Promise<{
     updateTime?: string;
     now?: WeatherNow;
@@ -46,6 +48,14 @@ export const fishingMapService = (): FishingMapService => {
   const gateway = fishingMapGateway();
 
   return {
+    async getTide(payload: {
+      harbor: string;
+      date: string;
+    }): Promise<TideData> {
+      const res = await gateway.getTide(payload);
+      return res.data.data;
+    },
+
     async getSecurityJsCode(): Promise<string> {
       const securityResponse = await gateway.getSecurityKey();
       const encodedKey =

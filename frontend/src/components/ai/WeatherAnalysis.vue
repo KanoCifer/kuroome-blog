@@ -40,6 +40,7 @@ interface WeatherAnalysisPayload {
   liveWeather?: LiveWeather | null;
   forecasts?: ForecastDay[];
   tideData?: TideData | null;
+  weatherIndices?: Array<Record<string, unknown>>;
   locationName?: string;
   tideSpotName?: string;
 }

@@ -1,11 +1,15 @@
-import type { TideResponse, WeatherDay, WeatherFullResponse, WeatherNow } from "@/api/weatherGateway";
+import type { TideResponse } from "@/api/weatherGateway";
 import { weatherGateway } from "@/api/weatherGateway";
+import type { TideData, WeatherDay, WeatherFullResponse, WeatherIndex, WeatherNow } from "@/views/general/fishing/types";
 
 export interface WeatherFullResult {
   updateTime?: string;
   now?: WeatherNow;
   daily?: WeatherDay[];
   locationName: string;
+  indices: WeatherIndex[];
+  tideData: TideData | null;
+  fullWeatherData: WeatherFullResponse;
 }
 
 export interface WeatherService {
@@ -34,12 +38,17 @@ export const weatherService: WeatherService = {
     const daily = data.daily?.daily;
     const updateTime = data.current?.updateTime ?? data.daily?.updateTime;
     const locationName = resolveLocationName(data, now);
+    const indices = data.indices?.daily ?? [];
+    const tideData = data.tide ?? null;
 
     return {
       updateTime,
       now,
       daily,
       locationName,
+      indices,
+      tideData,
+      fullWeatherData: data,
     };
   },
 };

@@ -4,10 +4,10 @@ import { useShallow } from 'zustand/react/shallow';
 import { useNotificationStore } from '@/stores/notificationState';
 
 import { useFishingMapStore } from '@/stores/fishingMapStore';
-import { AIAnalysisWidget } from './AIAnalysisWidget';
-import { FishingFeedbackForm } from './FishingFeedbackForm';
 import { useAnalysisContext } from '../contexts/AnalysisContext';
 import type { FishingFeedbackData } from '../types';
+import { AIAnalysisWidget } from './AIAnalysisWidget';
+import { FishingFeedbackForm } from './FishingFeedbackForm';
 
 interface AnalysisContentProps {
   service: ReturnType<typeof import('../service').fishingMapService>;
@@ -45,7 +45,8 @@ export function AnalysisContent({
       })),
     );
 
-  const { setAnalysisError, setAnalysisResult } = useAnalysisContext();
+  const { setAnalysisError, setAnalysisResult, setAnalysisLoading } =
+    useAnalysisContext();
 
   useEffect(() => {
     notifyErrorRef.current = notifyError;
@@ -111,8 +112,9 @@ export function AnalysisContent({
       if (analysisAbortRef.current === controller) {
         analysisAbortRef.current = null;
       }
+      setAnalysisLoading(false);
     }
-  }, [analysisPayload, service]);
+  }, [analysisPayload, service, setAnalysisLoading]);
 
   return (
     <>

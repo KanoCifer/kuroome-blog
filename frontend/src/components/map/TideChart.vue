@@ -28,8 +28,8 @@ use([TitleComponent, TooltipComponent, GridComponent, MarkLineComponent, MarkPoi
 
 interface TideData {
   updateTime: string;
-  tideTable: { fxTime: string; height: string; type: "H" | "L" }[];
-  tideHourly: { fxTime: string; height: string }[];
+  tideTable: { fxTime: string; height: number | string; type: "H" | "L" }[];
+  tideHourly: { fxTime: string; height: number | string }[];
 }
 
 const props = withDefaults(
