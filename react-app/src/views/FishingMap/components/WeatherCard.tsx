@@ -20,10 +20,10 @@ export function WeatherCard({
   return (
     <article
       onClick={openQWeather}
-      className="relative cursor-pointer rounded-2xl border border-white/40 bg-gray-50/80 p-4 shadow-sm backdrop-blur-sm dark:border-gray-700/60 dark:from-gray-900/80 dark:to-gray-800/60"
+      className="relative cursor-pointer rounded-2xl border border-white/40 bg-gray-50/80 p-4 shadow-sm backdrop-blur-sm dark:border-gray-700/60 dark:bg-gray-900/30"
     >
       {/* 背景 */}
-      <div className="shadow-[0_4px_18px_oklch(80.9% 0.105 251.813)] absolute top-10 right-0 overflow-hidden rounded-full bg-blue-200 p-12 blur-2xl"></div>
+      <div className="shadow-[0_4px_18px_oklch(80.9% 0.105 251.813)] absolute top-10 right-0 overflow-hidden rounded-full bg-blue-200 p-12 blur-2xl dark:bg-gray-600 dark:opacity-40 dark:blur-3xl"></div>
 
       <div className="mb-3 flex items-center justify-between">
         <div>
@@ -66,14 +66,14 @@ export function WeatherCard({
             </span>
           </div>
           <div className="grid grid-cols-3 gap-2 text-center text-xs">
-            <div className="flex flex-col items-center rounded-lg bg-white/60 px-2 py-2 text-gray-700 dark:bg-gray-800/60 dark:text-gray-200">
+            <div className="flex flex-col items-center rounded-lg bg-white/60 px-2 py-2 text-gray-700 dark:bg-gray-700/60 dark:text-gray-200">
               <Navigation className="h-4 w-4 text-blue-500" />
               <span className="mt-1 text-gray-500 dark:text-gray-400">
                 风向
               </span>
               <div className="mt-0.5 font-medium">{liveWeather.windDir}</div>
             </div>
-            <div className="flex flex-col items-center rounded-lg bg-white/60 px-2 py-2 text-gray-700 dark:bg-gray-800/60 dark:text-gray-200">
+            <div className="flex flex-col items-center rounded-lg bg-white/60 px-2 py-2 text-gray-700 dark:bg-gray-700/60 dark:text-gray-200">
               <Wind className="h-4 w-4 text-green-500" />
               <span className="mt-1 text-gray-500 dark:text-gray-400">
                 风力
@@ -82,7 +82,7 @@ export function WeatherCard({
                 {liveWeather.windScale}级
               </div>
             </div>
-            <div className="flex flex-col items-center rounded-lg bg-white/60 px-2 py-2 text-gray-700 dark:bg-gray-800/60 dark:text-gray-200">
+            <div className="flex flex-col items-center rounded-lg bg-white/60 px-2 py-2 text-gray-700 dark:bg-gray-700/60 dark:text-gray-200">
               <Droplets className="h-4 w-4 text-cyan-500" />
               <span className="mt-1 text-gray-500 dark:text-gray-400">
                 湿度
@@ -95,7 +95,7 @@ export function WeatherCard({
               {forecasts.slice(0, 2).map((day) => (
                 <div
                   key={day.fxDate}
-                  className="flex items-center gap-2 rounded-lg bg-white/55 px-3 py-2 dark:bg-gray-800/50"
+                  className="flex items-center gap-2 rounded-lg bg-white/55 px-3 py-2 dark:bg-gray-700/50"
                 >
                   <i className={`qi-${day.iconDay} shrink-0 text-xl`} />
                   <div className="min-w-0 flex-1">
