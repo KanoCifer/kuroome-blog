@@ -1,5 +1,24 @@
 [
   {
+    "version": "2.9.8",
+    "date": "2026-04-21",
+    "title": "小时天气预报组件移植与天气数据链路完善",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "新增小时天气预报组件，集成降水量与温度双轴图表"
+      },
+      {
+        "type": "feat",
+        "content": "weatherHourly 数据层接入钓鱼地图，支持逐时天气展示"
+      },
+      {
+        "type": "style",
+        "content": "WeatherCard 深色模式适配，优化灰阶层次"
+      }
+    ]
+  },
+  {
     "version": "2.9.7",
     "date": "2026-04-19",
     "title": "钓鱼地图 AI 分析、骨架屏与状态管理优化",

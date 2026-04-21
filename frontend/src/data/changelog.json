@@ -1,5 +1,28 @@
 [
   {
+    "version": "2.9.7",
+    "date": "2026-04-21",
+    "title": "小时天气预报组件与钓鱼指数页面布局优化",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "新增小时天气预报组件，集成降水量与温度双轴图表"
+      },
+      {
+        "type": "feat",
+        "content": "新增 weatherHourly 数据层，从和风天气 API 提取逐时数据"
+      },
+      {
+        "type": "style",
+        "content": "WeatherCard 深色模式适配，优化灰阶层次"
+      },
+      {
+        "type": "style",
+        "content": "FishingIndexCard 头部布局重构，按钮与图标组合对齐"
+      }
+    ]
+  },
+  {
     "version": "2.9.6",
     "date": "2026-04-18",
     "title": "钓点智能指数与天气数据链路整合",
