@@ -79,10 +79,11 @@
       </div>
 
       <!-- Map Controls and Info -->
-      <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
         <TideCard />
         <WeatherCard :location="activeLocation" />
         <FishingIndexCard :location="activeLocation" @feedback-click="handleFeedbackClick" />
+        <HourlyWeather />
       </div>
     </div>
 
@@ -155,6 +156,7 @@ import type { FishingFeedbackData, FishingIndexData } from "@/views/general/fish
 import { Bot } from "lucide-vue-next";
 import { storeToRefs } from "pinia";
 import { computed, onMounted, ref, useTemplateRef } from "vue";
+import HourlyWeather from "./fishing/components/HourlyWeather.vue";
 
 export interface AMapMarker {
   position: [number, number];

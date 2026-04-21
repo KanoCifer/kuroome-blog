@@ -95,19 +95,20 @@ const handleFeedback = () => {
         <h3 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">钓鱼指数</h3>
         <p class="text-sm text-gray-500 dark:text-gray-400">基于实时天气、潮汐综合计算</p>
       </div>
-
-      <button
-        class="flex cursor-pointer items-center gap-1 rounded-lg bg-white/60 px-2 py-1 text-sm text-gray-600 hover:bg-white/80 disabled:cursor-not-allowed dark:bg-gray-800/60 dark:text-gray-300 dark:hover:bg-gray-800/80"
-        :disabled="loading"
-        @click="fetchIndex"
-      >
-        <Loader v-if="loading" class="h-3 w-3 animate-spin" />
-        {{ loading ? "刷新中..." : "刷新" }}
-      </button>
-      <div
-        class="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-sky-400 to-blue-500 shadow-lg shadow-sky-500/25 transition-transform duration-300 group-hover:scale-110"
-      >
-        <FishingRod class="text-white" />
+      <div class="flex items-center gap-3">
+        <button
+          class="flex h-fit cursor-pointer items-center gap-1 rounded-lg bg-white/60 px-2 py-1 text-sm text-gray-600 hover:bg-white/80 disabled:cursor-not-allowed dark:bg-gray-800/60 dark:text-gray-300 dark:hover:bg-gray-800/80"
+          :disabled="loading"
+          @click="fetchIndex"
+        >
+          <Loader v-if="loading" class="h-3 w-3 animate-spin" />
+          {{ loading ? "刷新中..." : "刷新" }}
+        </button>
+        <div
+          class="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-sky-400 to-blue-500 shadow-lg shadow-sky-500/25 transition-transform duration-300 group-hover:scale-110"
+        >
+          <FishingRod class="text-white" />
+        </div>
       </div>
     </div>
 
