@@ -8,6 +8,7 @@ import type {
   TideData,
   WeatherDay,
   WeatherFullResponse,
+  WeatherHourly,
   WeatherIndex,
   WeatherNow,
 } from './types';
@@ -30,6 +31,7 @@ export interface FishingMapService {
     updateTime?: string;
     now?: WeatherNow;
     daily?: WeatherDay[];
+    hourly?: WeatherHourly[];
     locationName: string;
     indices: WeatherIndex[];
     tideData: TideData | null;
@@ -126,6 +128,7 @@ export const fishingMapService = (): FishingMapService => {
       updateTime?: string;
       now?: WeatherNow;
       daily?: WeatherDay[];
+      hourly?: WeatherHourly[];
       locationName: string;
       indices: WeatherIndex[];
       tideData: TideData | null;
@@ -135,6 +138,7 @@ export const fishingMapService = (): FishingMapService => {
       const data = weatherRes.data.data as WeatherFullResponse | undefined;
       const now = data?.current?.now;
       const daily = data?.daily?.daily;
+      const hourly = data?.hourly?.hourly as WeatherHourly[] | undefined;
       const updateTime = data?.current?.updateTime ?? data?.daily?.updateTime;
       const locationName = data?.locationName ?? '未知地点';
       const tideData = data?.tide ?? null;
@@ -144,6 +148,7 @@ export const fishingMapService = (): FishingMapService => {
         updateTime,
         now,
         daily,
+        hourly,
         locationName,
         indices,
         tideData,

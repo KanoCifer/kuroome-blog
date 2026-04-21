@@ -7,6 +7,7 @@ import { useFishingMapStore } from '@/stores/fishingMapStore';
 import { AnalysisContent } from './components/AnalysisContent';
 import { FishingIndexCard } from './components/FishingIndexCard';
 import { FishingMapHeader } from './components/FishingMapHeader';
+import { HourlyWeather } from './components/HourlyWeather';
 import { MapPanel } from './components/MapPanel';
 import { RouteStatusCard } from './components/RouteStatusCard';
 import { TideCard } from './components/TideCard';
@@ -107,6 +108,7 @@ export default function FishingMap() {
             />
             <WeatherCard location={userPosition ?? MAP_CENTER} />
             <TideCard />
+            <HourlyWeather />
           </div>
         </section>
 

@@ -200,6 +200,30 @@ export interface WeatherFullResponse {
   poiId?: string;
 }
 
+export interface WeatherHourlyResponse {
+  code: string;
+  updateTime: string;
+  fxLink: string;
+  hourly?: WeatherHourly[];
+}
+
+export interface WeatherHourly {
+  fxTime: string;
+  temp: string;
+  icon: string;
+  text: string;
+  wind360: string;
+  windDir: string;
+  windScale: string;
+  windSpeed: string;
+  humidity: string;
+  precip: string;
+  pressure: string;
+  pop: string;
+  cloud: string;
+  dew: string;
+}
+
 // 钓鱼指数
 export type FishingLevel = '爆护' | '好' | '一般' | '差' | '空军';
 

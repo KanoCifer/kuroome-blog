@@ -8,9 +8,11 @@ import { LineChart } from 'echarts/charts';
 import {
   // GridSimpleComponent,
   GridComponent,
+  MarkAreaComponent,
   // AxisPointerComponent,
   // BrushComponent,
   TitleComponent,
+  // MarkAreaComponent
   // PolarComponent,
   // RadarComponent,
   // GeoComponent,
@@ -31,12 +33,13 @@ echarts.use([
   GridComponent,
   LineChart,
   SVGRenderer,
+  MarkAreaComponent,
 ]);
 
-interface TideChartProps {
+interface HourlyWeatherChartProps {
   option: Record<string, unknown>;
 }
 
-export function TideChart({ option }: TideChartProps) {
+export function HourlyWeatherChart({ option }: HourlyWeatherChartProps) {
   return <ReactEChartsCore option={option} notMerge lazyUpdate />;
 }

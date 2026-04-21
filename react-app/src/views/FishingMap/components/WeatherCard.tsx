@@ -23,7 +23,7 @@ export function WeatherCard({
       className="relative cursor-pointer rounded-2xl border border-white/40 bg-gray-50/80 p-4 shadow-sm backdrop-blur-sm dark:border-gray-700/60 dark:bg-gray-900/30"
     >
       {/* 背景 */}
-      <div className="shadow-[0_4px_18px_oklch(80.9% 0.105 251.813)] absolute top-10 right-0 overflow-hidden rounded-full bg-blue-200 p-12 blur-2xl dark:bg-gray-600 dark:opacity-40 dark:blur-3xl"></div>
+      <div className="blur-4xl absolute top-10 right-0 overflow-hidden rounded-full bg-blue-500/40 p-12 blur-3xl dark:bg-gray-600/10 dark:opacity-40"></div>
 
       <div className="mb-3 flex items-center justify-between">
         <div>

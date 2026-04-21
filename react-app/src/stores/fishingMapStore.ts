@@ -9,6 +9,7 @@ import type {
   FishingIndexData,
   TideData,
   WeatherDay,
+  WeatherHourly,
   WeatherIndex,
   WeatherNow,
 } from '@/views/FishingMap/types';
@@ -29,6 +30,9 @@ export interface FishingMapState {
   weatherLoading: boolean;
   weatherError: string;
   weatherIndices: WeatherIndex[];
+
+  // 小时天气预报
+  weatherHourly: WeatherHourly[];
 
   // tide (from weather full)
   tideData: TideData | null;
@@ -69,6 +73,9 @@ export const useFishingMapStore = create<FishingMapState>((set, get) => ({
   weatherIndices: [],
   tideData: null,
 
+  // 小时天气预报初始状态
+  weatherHourly: [],
+
   // panel tide 初始状态
   panelTideData: null,
   panelTideSpotName: '黄埔港',
@@ -97,6 +104,7 @@ export const useFishingMapStore = create<FishingMapState>((set, get) => ({
         indexData: indexRes,
         weatherIndices: weatherRes.indices,
         tideData: weatherRes.tideData,
+        weatherHourly: weatherRes.hourly ?? [],
         weatherLoading: false,
         indexLoading: false,
       });
