@@ -34,3 +34,5 @@ html5-cheatsheet.html
 backend/app.log
 backend/app/logs/app.log
 CLAUDE.local.md
+# ML models
+backend/models/*.joblib
