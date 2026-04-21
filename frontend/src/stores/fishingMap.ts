@@ -1,7 +1,15 @@
 import { fishingService } from "@/service/fishingService";
 import { weatherService } from "@/service/weatherService";
 import { useNotificationStore } from "@/stores/notification";
-import type { FishingIndexData, TideData, WeatherDay, WeatherFullResponse, WeatherIndex, WeatherNow } from "@/views/general/fishing/types";
+import type {
+  FishingIndexData,
+  TideData,
+  WeatherDay,
+  WeatherFullResponse,
+  WeatherHourly,
+  WeatherIndex,
+  WeatherNow,
+} from "@/views/general/fishing/types";
 import dayjs from "dayjs";
 import { defineStore } from "pinia";
 import { ref } from "vue";
@@ -22,6 +30,7 @@ export const useFishingMapStore = defineStore("fishingMap", () => {
   const fullWeatherData = ref<WeatherFullResponse | null>(null);
   const liveWeather = ref<WeatherNow | null>(null);
   const forecasts = ref<WeatherDay[]>([]);
+  const weatherHourly = ref<WeatherHourly[]>([]);
   const locationName = ref("");
   const weatherIndices = ref<WeatherIndex[]>([]);
   const tideData = ref<TideData | null>(null);
@@ -54,6 +63,7 @@ export const useFishingMapStore = defineStore("fishingMap", () => {
       fullWeatherData.value = weatherRes.fullWeatherData;
       liveWeather.value = weatherRes.now ?? null;
       forecasts.value = weatherRes.daily ?? [];
+      weatherHourly.value = weatherRes.hourly ?? [];
       locationName.value = weatherRes.locationName;
       weatherIndices.value = weatherRes.indices;
       tideData.value = weatherRes.tideData;
@@ -101,6 +111,7 @@ export const useFishingMapStore = defineStore("fishingMap", () => {
     fullWeatherData,
     liveWeather,
     forecasts,
+    weatherHourly,
     locationName,
     weatherIndices,
     tideData,

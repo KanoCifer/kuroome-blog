@@ -1,11 +1,19 @@
 import type { TideResponse } from "@/api/weatherGateway";
 import { weatherGateway } from "@/api/weatherGateway";
-import type { TideData, WeatherDay, WeatherFullResponse, WeatherIndex, WeatherNow } from "@/views/general/fishing/types";
+import type {
+  TideData,
+  WeatherDay,
+  WeatherFullResponse,
+  WeatherHourly,
+  WeatherIndex,
+  WeatherNow,
+} from "@/views/general/fishing/types";
 
 export interface WeatherFullResult {
   updateTime?: string;
   now?: WeatherNow;
   daily?: WeatherDay[];
+  hourly?: WeatherHourly[];
   locationName: string;
   indices: WeatherIndex[];
   tideData: TideData | null;
@@ -36,6 +44,9 @@ export const weatherService: WeatherService = {
     const data = await weatherGateway.getWeatherFull(payload);
     const now = data.current?.now;
     const daily = data.daily?.daily;
+    // hourly 是 QWeather HourlyWeather 对象，需要取其中的 hourly 数组
+    const hourlyWrapper = data.hourly as { hourly?: WeatherHourly[] } | undefined;
+    const hourly = hourlyWrapper?.hourly ?? [];
     const updateTime = data.current?.updateTime ?? data.daily?.updateTime;
     const locationName = resolveLocationName(data, now);
     const indices = data.indices?.daily ?? [];
@@ -45,6 +56,7 @@ export const weatherService: WeatherService = {
       updateTime,
       now,
       daily,
+      hourly,
       locationName,
       indices,
       tideData,

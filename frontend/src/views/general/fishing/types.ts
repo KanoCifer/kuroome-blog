@@ -10,6 +10,19 @@ export interface TideData {
   tideHourly: Array<{ fxTime: string; height: number | string }>;
 }
 
+export interface WeatherHourly {
+  fxTime: string;
+  temp?: number;
+  precip?: number;
+  humidity?: number;
+  pressure?: number;
+  windDir?: string;
+  windScale?: string;
+  windSpeed?: number;
+  text?: string;
+  icon?: string;
+}
+
 export interface WeatherDay {
   fxDate: string;
   sunrise: string;
