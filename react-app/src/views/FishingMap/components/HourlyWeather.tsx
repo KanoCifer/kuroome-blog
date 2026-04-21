@@ -227,7 +227,16 @@ export function HourlyWeather() {
         </div>
       </div>
 
-      <HourlyWeatherChart option={option} />
+      {weatherHourly ? (
+        <HourlyWeatherChart option={option} />
+      ) : (
+        <div className="full flex items-center justify-center">
+          <div className="text-center">
+            <div className="mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-blue-500" />
+            <p className="text-sm text-slate-400">正在加载天气数据...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
