@@ -196,9 +196,11 @@ async def analyze_weather(
 ) -> StreamingResponse:
     """根据天气数据进行分析并生成报告。
     param weather_data: 需要分析的天气数据。
+    param model_id: AI 模型 ID，默认使用配置中的模型。
     """
-    # logger.info(weather_data)
-    event_generator = public_service.analyze_weather(weather_data)
+    event_generator = public_service.analyze_weather(
+        weather_data, model_id=weather_data.model_id
+    )
     return StreamingResponse(
         event_generator,
         media_type="text/event-stream",

@@ -74,6 +74,7 @@ export interface AnalysisPayload {
   fishingIndex?: FishingIndexData;
   locationName: string;
   tideSpotName: string;
+  modelId?: string;
 }
 
 // POI 数据

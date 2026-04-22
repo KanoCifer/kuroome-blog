@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import AsyncIterator
 from typing import Literal
 
@@ -10,8 +11,10 @@ from agno.db.redis import RedisDb
 from pydantic import BaseModel, Field
 
 from app.core.config import settings
+from app.core.container import get_fishing_service
 from app.core.logger import logger
 from app.schemas.aiagent import WeatherAnalysisInput
+from app.services.fishing_service import fishing_service
 
 
 class FishingContextInput(BaseModel):
@@ -99,51 +102,73 @@ class WeatherAnalysisInputSchema(BaseModel):
 
 
 class WeatherAnalyzer:
-    _SYSTEM_PROMPT = (
-        "你是一名专业的垂钓气象与潮汐分析师，擅长综合天气和潮汐数据判断钓鱼条件。\n\n"
-        "## 分析维度\n"
-        "依次评估以下因素对钓鱼的影响：\n"
-        "- **温度**：鱼类活跃度随水温变化，15-25°C 通常最佳\n"
-        "- **风速风向**：微风（3-15 km/h）有利于钓鱼；强风（>30 km/h）危险\n"
-        "- **气压**：高气压稳定（>1013 hPa）适合钓鱼；气压骤降时鱼口差\n"
-        "- **降水**：小雨可提升鱼口；暴雨/雷暴禁止出钓\n"
-        "- **潮汐**：涨潮前后 1-2 小时（尤其高潮前）通常是最佳钓鱼窗口；\n"
-        "  大潮差（高低潮落差 >2m）水流湍急，鱼不易开口；\n"
-        "  平潮期（高/低潮后 30 分钟内）水流缓，适合底钓\n"
-        "- **云量/光照**：阴天或多云通常优于正午烈日\n\n"
-        "## 输出格式（严格遵守）\n"
-        "## 钓鱼指数：XX / 100\n\n"
-        "**出钓建议**：一句话概括（极佳 / 良好 / 一般 / 不宜 / 禁止）\n\n"
-        "### 逐项分析\n"
-        "| 维度 | 当前状况 | 影响评估 |\n"
-        "|------|----------|----------|\n"
-        "| 温度 | ... | ... |\n"
-        "| 风况 | ... | ... |\n"
-        "| 气压 | ... | ... |\n"
-        "| 降水 | ... | ... |\n"
-        "| 潮汐 | ... | ... |\n\n"
-        "### 最佳出钓窗口\n"
-        "根据潮汐表，今日推荐时段：HH:MM - HH:MM（说明原因）\n\n"
-        "### 建议\n"
-        "- 出钓建议（时段/钓点/装备）\n"
-        "- 注意事项或安全提示\n\n"
-        "## 评分规则\n"
-        "- 先按专家权重计算基准分（归一化权重，总和=1）：\n"
-        "  w1_temp=4/23, w2_humidity=2/23, w3_pressure=2/23, w4_wind=2/23,\n"
-        "  w5_rain=1/23, w6_tide_rising=4/23, w7_hours_to_tide=4/23,\n"
-        "  w8_tide_range=2/23, w9_indices=2/23\n"
-        "- Expert_score = Σ(weight_i * feature_score_i) * 100，feature_score_i 范围 [0,1]，但 pressure 特征可达 [0,2]\n"
-        "- 再给出 AI 自主修正分（-20~20），并说明修正依据（短时天气波动、天气现象、潮汐时序）\n"
-        "- 最终钓鱼指数 = clip(专家基准分 + AI 自主修正分, 0, 100)\n"
-        "- 90-100：极佳，强烈推荐\n"
-        "- 70-89：良好，适合出钓\n"
-        "- 50-69：一般，可以尝试但体验有限\n"
-        "- 30-49：不宜，不建议出钓\n"
-        "- 0-29：禁止，存在安全风险\n\n"
-        "输出时必须显式给出：专家基准分、AI 自主修正分、最终钓鱼指数。\n"
-        "若遇雷暴、台风或暴雨，评分直接置 0 并给出安全警告。\n"
-        "回答简洁，避免重复原始数据，聚焦分析与建议。"
-    )
+    # 可用模型列表
+    AVAILABLE_MODELS = {  # noqa: RUF012
+        "Ling-2.6-1T": {
+            "id": "Ling-2.6-1T",
+            "base_url": "https://api.tbox.cn/api/llm/v1",
+        },
+        "Ling-2.6-flash": {
+            "id": "Ling-2.6-flash",
+            "base_url": "https://api.tbox.cn/api/llm/v1",
+        },
+        "Ring-2.5-1T": {
+            "id": "Ring-2.5-1T",
+            "base_url": "https://api.tbox.cn/api/llm/v1",
+        },
+    }
+    DEFAULT_MODEL = "Ling-2.6-1T"
+
+    _SYSTEM_PROMPT = """
+        你是一名专业的垂钓气象与潮汐分析师，擅长综合天气和潮汐数据判断钓鱼条件。
+        ## 分析维度
+        依次评估以下因素对钓鱼的影响：
+        - **温度**：鱼类活跃度随水温变化，15-25°C 通常最佳
+        - **风速风向**：微风（3-15 km/h）有利于钓鱼；强风（>30 km/h）危险
+        - **气压**：高气压稳定（>1013 hPa）适合钓鱼；气压骤降时鱼口差
+        - **降水**：小雨可提升鱼口；暴雨/雷暴禁止出钓
+        - **潮汐**：涨潮前后 1-2 小时（尤其高潮前）通常是最佳钓鱼窗口；
+          大潮差（高低潮落差 >2m）水流湍急，鱼不易开口；
+          平潮期（高/低潮后 30 分钟内）水流缓，适合底钓
+        - **云量/光照**：阴天或多云通常优于正午烈日
+
+
+
+        ## 输出Markdown格式（严格遵守）
+        ## 钓鱼指数：XX / 100
+        **出钓建议**：一句话概括（极佳 / 良好 / 一般 / 不宜 / 禁止）
+        ### 逐项分析
+        | 维度 | 当前状况 | 影响评估 |
+        |------|----------|----------|
+        | 温度 | ... | ... |
+        | 风况 | ... | ... |
+        | 气压 | ... | ... |
+        | 降水 | ... | ... |
+        | 潮汐 | ... | ... |
+        ### 最佳出钓窗口
+        根据潮汐表，今日推荐时段：HH:MM - HH:MM（说明原因）
+        ### 建议
+        - 出钓建议（时段/钓点/装备）
+        - 注意事项或安全提示
+
+
+        ## 评分规则
+        - 先按专家权重计算基准分（归一化权重，总和=1）：
+          w1_temp=4/23, w2_humidity=2/23, w3_pressure=2/23, w4_wind=2/23,
+          w5_rain=1/23, w6_tide_rising=4/23, w7_hours_to_tide=4/23,
+          w8_tide_range=2/23, w9_indices=2/23
+        - Expert_score = Σ(weight_i * feature_score_i) * 100，feature_score_i 范围 [0,1]，但 pressure 特征可达 [0,2]
+        - 再给出 AI 自主修正分（-20~20），并说明修正依据（短时天气波动、天气现象、潮汐时序）
+        - 最终钓鱼指数 = clip(专家基准分 + AI 自主修正分, 0, 100)
+        - 90-100：极佳，强烈推荐
+        - 70-89：良好，适合出钓
+        - 50-69：一般，可以尝试但体验有限
+        - 30-49：不宜，不建议出钓
+        - 0-29：禁止，存在安全风险
+        输出时必须显式给出：专家基准分、AI 自主修正分、最终钓鱼指数。
+        若遇雷暴、台风或暴雨，评分直接置 0 并给出安全警告。
+        回答简洁清晰，避免重复原始数据，聚焦分析与建议
+    """
     DB = RedisDb(db_url=settings.REDIS_URL)
 
     def __init__(self) -> None:
@@ -164,8 +189,9 @@ class WeatherAnalyzer:
             db=WeatherAnalyzer.DB,
             tools=[WebSearchTools(backend="bing")],
             add_history_to_context=True,
-            num_history_runs=5,
+            num_history_runs=3,
             input_schema=WeatherAnalysisInputSchema,
+            markdown=True,
         )
 
     def _build_input_schema(
@@ -245,7 +271,7 @@ class WeatherAnalyzer:
         )
 
     async def analyze_weather_stream(
-        self, weather_data: WeatherAnalysisInput
+        self, weather_data: WeatherAnalysisInput, model_id: str | None = None
     ) -> AsyncIterator[str]:
         """流式分析天气数据，返回结构化 JSON 字符串片段"""
         if not settings.API_KEY:
@@ -254,30 +280,148 @@ class WeatherAnalyzer:
 
         try:
             input_schema = self._build_input_schema(weather_data)
-            # logger.info(f"Constructed input schema: {input_schema}")
         except Exception:
             logger.exception("构建 input_schema 失败")
             raise
 
+        # 根据 model_id 选择模型配置
+        model_key = model_id or self.DEFAULT_MODEL
+        model_config = self.AVAILABLE_MODELS.get(
+            model_key,
+            {
+                "id": "Ling-2.6-1T",
+                "base_url": "https://api.tbox.cn/api/llm/v1",
+            },
+        )
+
+        from agno.models.openai.like import OpenAILike
+
+        dynamic_model = OpenAILike(
+            id=model_config["id"],
+            api_key=settings.API_KEY,
+            base_url=model_config["base_url"],
+            temperature=1,
+            timeout=30,
+        )
+
+        # 使用动态模型创建临时 agent
+        from agno.tools.websearch import WebSearchTools
+
+        dynamic_agent = Agent(
+            model=dynamic_model,
+            instructions=self._SYSTEM_PROMPT,
+            db=WeatherAnalyzer.DB,
+            tools=[WebSearchTools(backend="bing")],
+            input_schema=WeatherAnalysisInputSchema,
+            markdown=True,
+        )
+
         try:
-            response = self._agent.arun(input_schema, stream=True)
+            response = dynamic_agent.arun(input_schema, stream=True)
         except Exception:
             logger.exception("Agent 运行失败")
             raise
 
-        # json_buffer = ""
+        buffer: str = ""
         async for event in response:
             if isinstance(event, RunOutputEvent) and event.content:
-                # json_buffer += str(event.content)
-                # logger.info(f"Received chunk: {event!r}")
+                buffer += event.content
                 yield str(event.content)
 
-        # 流结束后校验并解析为 Pydantic
-        # try:
-        #     result = WeatherAnalysisResult.model_validate_json(json_buffer)
-        #     logger.info(f"结构化验证成功: final_score={result.final_score}")
-        # except Exception:
-        #     logger.exception("JSON 解析失败，将返回原始文本")
+        # 提取最终钓鱼指数
+        index = None
+        buffer = buffer.strip()
+        logger.debug(f"Final agent output: {buffer!r}")
+        try:
+            match = re.search(
+                r"(?:\*\*)?最终钓鱼指数(?:\*\*)?[：:]\s*(\d+)", string=buffer
+            )
+            if match:
+                index = int(match.group(1))
+                logger.debug(f"Extracted fishing index: {index}")
+            else:
+                logger.warning("未能提取到钓鱼指数")
+        except Exception:
+            logger.exception("提取钓鱼指数失败")
+
+        # 提取后用 weather_data 和指数训练模型
+        if index is not None:
+            try:
+                import asyncio
+
+                # 在 analyze_weather_stream 末尾
+                asyncio.create_task(self._train_model(weather_data, index))  # noqa: RUF006
+
+            except Exception:
+                logger.exception("模型训练失败")
+
+    async def _train_model(
+        self, weather_data: WeatherAnalysisInput, ai_score: int
+    ) -> None:
+        """用 AI 评分和天气数据训练钓鱼模型（保存为 feedback_score）"""
+        data = weather_data.weather_data
+
+        now = data.get("liveWeather") or {}
+        tide = data.get("tideData") or {}
+        fishing_index = data.get("fishingIndex") or {}
+
+        expert_score = (
+            fishing_index.get("expert_score") if fishing_index else None
+        )
+
+        # 构建天气特征
+        temperature = float(now.get("temp") or 20.0)
+        humidity = float(now.get("humidity") or 50.0)
+        pressure = float(now.get("pressure") or 1000.0)
+        wind_speed = float(now.get("windSpeed") or 0.0)
+        precipitation = float(now.get("precip") or 0.0)
+
+        # 钓鱼相关指数
+        indices_raw = data.get("weatherIndices")
+        level = 2
+        if (
+            indices_raw
+            and isinstance(indices_raw, list)
+            and len(indices_raw) > 0
+        ):
+            level = int(indices_raw[0].get("level", 2))
+
+        # 解析潮汐
+        tide_info = fishing_service.parse_tide_info(tide)
+        tide_type_str: Literal["涨潮", "退潮"] = (
+            "涨潮" if tide_info.tide_type == "涨潮" else "退潮"
+        )
+
+        # 必填字段：location, fishing_time, feedback
+        location_name = (
+            data.get("locationName") or data.get("tideSpotName") or "未知"
+        )
+        now_iso = now.get("obsTime") if now else None
+
+        doc_data = {
+            "location_id": location_name,
+            "location_name": location_name,
+            "fishing_time": now_iso,
+            "temperature": temperature,
+            "humidity": humidity,
+            "pressure": pressure,
+            "wind_speed": wind_speed,
+            "precipitation": precipitation,
+            "indices": level,
+            "tide_level": tide_info.tide_level,
+            "tide_type": tide_type_str,
+            "tide_range": tide_info.tide_range,
+            "hours_to_next_tide": tide_info.hours_to_next_tide,
+            "expert_score": expert_score or 0.0,
+            "feedback_score": ai_score,
+            "feedback": "好" if ai_score >= 70 else "一般",
+            "source": "ai",
+        }
+
+        async with get_fishing_service() as svc:
+            await svc.save_feedback(doc_data)
+            logger.info(f"[天气分析] AI 评分 {ai_score} 已保存，开始自动训练")
+            await svc.auto_train_if_needed(source="all")
 
 
 weather_analyzer = WeatherAnalyzer()

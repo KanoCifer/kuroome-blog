@@ -7,13 +7,19 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useAnalysisContext } from '../contexts/AnalysisContext';
 
+const AI_MODELS = [
+  { id: 'Ling-2.6-1T', name: 'Ling-2.6-1T' },
+  { id: 'Ling-2.6-flash', name: 'Ling-2.6-flash' },
+  { id: 'Ring-2.5-1T', name: 'Ring-2.5-1T' },
+];
+
 marked.setOptions({
   gfm: true,
   breaks: true,
 });
 
 interface AIAnalysisWidgetProps {
-  onGenerate: () => void;
+  onGenerate: (modelId: string) => void;
 }
 
 const SHIMMER_TEXTS = [
@@ -67,6 +73,8 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
     };
   }, [analysisLoading]);
 
+  const [selectedModel, setSelectedModel] = useState(AI_MODELS[0].id);
+
   const statusLabel = (() => {
     if (analysisLoading) return '分析中';
     if (analysisError) return '分析失败';
@@ -87,7 +95,7 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
   return (
     <>
       {createPortal(
-        <div className="fixed right-4 bottom-24 z-50">
+        <div className="fixed right-1/2 bottom-24 z-50 flex translate-x-1/2 flex-col items-center gap-4">
           <AnimatePresence mode="wait">
             {analysisOpen && (
               <motion.div
@@ -146,9 +154,26 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
                       <PlaceholderState />
                     )}
 
+                    {/* 模型选择器 */}
+                    {!analysisLoading && (
+                      <div className="flex items-center gap-2">
+                        <select
+                          value={selectedModel}
+                          onChange={(e) => setSelectedModel(e.target.value)}
+                          className="flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                        >
+                          {AI_MODELS.map((model) => (
+                            <option key={model.id} value={model.id}>
+                              {model.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
                     <button
                       onClick={() => {
-                        onGenerate();
+                        onGenerate(selectedModel);
                         setAnalysisLoading(true);
                       }}
                       disabled={!analysisHasData || analysisLoading}

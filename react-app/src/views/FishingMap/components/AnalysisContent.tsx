@@ -18,6 +18,7 @@ interface AnalysisContentProps {
   tideData: import('../types').TideData | null;
   tideSpotName: string;
   onFeedbackClose: () => void;
+  selectedModel?: string;
 }
 
 export function AnalysisContent({
@@ -29,6 +30,7 @@ export function AnalysisContent({
   tideData,
   tideSpotName,
   onFeedbackClose,
+  selectedModel,
 }: AnalysisContentProps) {
   const notifyError = useNotificationStore((state) => state.error);
   const notifyErrorRef = useRef(notifyError);
@@ -75,6 +77,7 @@ export function AnalysisContent({
       fishingIndex: indexData ?? undefined,
       locationName: locationName || '未知地点',
       tideSpotName: tideSpotName || '黄埔港',
+      modelId: selectedModel,
     }),
     [
       forecasts,
@@ -84,45 +87,50 @@ export function AnalysisContent({
       tideSpotName,
       weatherIndices,
       indexData,
+      selectedModel,
     ],
   );
 
-  const generateAnalysis = useCallback(async () => {
-    if (analysisResultRef.current) return;
-    if (analysisAbortRef.current) return;
+  const generateAnalysis = useCallback(
+    async (modelId: string) => {
+      if (analysisAbortRef.current) return;
 
-    const controller = new AbortController();
-    analysisAbortRef.current = controller;
-    analysisResultRef.current = '';
-    setAnalysisResultRef.current('');
-    setAnalysisErrorRef.current('');
+      const controller = new AbortController();
+      analysisAbortRef.current = controller;
+      analysisResultRef.current = '';
+      setAnalysisResultRef.current('');
+      setAnalysisErrorRef.current('');
 
-    try {
-      await service.generateAnalysis(
-        analysisPayload,
-        (content) => {
-          analysisResultRef.current += content;
-          setAnalysisResultRef.current(analysisResultRef.current);
-          // console.log('Received chunk:', content);
-        },
-        controller.signal,
-      );
-    } catch (error) {
-      if (error instanceof DOMException && error.name === 'AbortError') return;
-      const message = error instanceof Error ? error.message : 'AI 分析失败';
-      setAnalysisErrorRef.current(message);
-      notifyErrorRef.current(message);
-    } finally {
-      if (analysisAbortRef.current === controller) {
-        analysisAbortRef.current = null;
+      try {
+        await service.generateAnalysis(
+          { ...analysisPayload, modelId },
+          (content) => {
+            analysisResultRef.current += content;
+            setAnalysisResultRef.current(analysisResultRef.current);
+          },
+          controller.signal,
+        );
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError')
+          return;
+        const message = error instanceof Error ? error.message : 'AI 分析失败';
+        setAnalysisErrorRef.current(message);
+        notifyErrorRef.current(message);
+      } finally {
+        if (analysisAbortRef.current === controller) {
+          analysisAbortRef.current = null;
+        }
+        setAnalysisLoading(false);
       }
-      setAnalysisLoading(false);
-    }
-  }, [analysisPayload, service, setAnalysisLoading]);
+    },
+    [analysisPayload, service, setAnalysisLoading],
+  );
 
   return (
     <>
-      <AIAnalysisWidget onGenerate={() => void generateAnalysis()} />
+      <AIAnalysisWidget
+        onGenerate={(modelId) => void generateAnalysis(modelId)}
+      />
       {feedbackOpen && currentFishingData && (
         <FishingFeedbackForm
           fishingData={currentFishingData}

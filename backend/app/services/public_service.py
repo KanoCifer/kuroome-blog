@@ -174,13 +174,15 @@ Sitemap: {sitemap_url}
         data = {"content": content, "is_end": is_end}
         return f"data:{orjson.dumps(data).decode()}\n\n"
 
-    async def analyze_weather(self, weather_data: WeatherAnalysisInput):
-        """根据天气数据进行分析并生成报告（支持结构化评分）。"""
+    async def analyze_weather(
+        self, weather_data: WeatherAnalysisInput, model_id: str | None = None
+    ):
+        """根据天气数据进行分析并生成报告"""
         from app.core.weather_analyzer import weather_analyzer
 
         try:
             async for chunk in weather_analyzer.analyze_weather_stream(
-                weather_data=weather_data
+                weather_data=weather_data, model_id=model_id
             ):
                 yield self._to_sse_event(chunk, False)
             yield self._to_sse_event("", True)

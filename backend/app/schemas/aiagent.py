@@ -39,3 +39,6 @@ class WeatherAnalysisInput(BaseModel):
     """天气分析输入模型"""
 
     weather_data: dict = Field(..., description="需要分析的天气数据")
+    model_id: str | None = Field(
+        default=None, description="AI 模型 ID，默认使用配置中的模型"
+    )
