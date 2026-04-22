@@ -8,9 +8,9 @@ import { createPortal } from 'react-dom';
 import { useAnalysisContext } from '../contexts/AnalysisContext';
 
 const AI_MODELS = [
-  { id: 'Ling-2.6-1T', name: 'Ling-2.6-1T' },
-  { id: 'Ling-2.6-flash', name: 'Ling-2.6-flash' },
-  { id: 'Ring-2.5-1T', name: 'Ring-2.5-1T' },
+  { id: 'Ling-2.6-1T', name: 'Ling 2.6' },
+  { id: 'Ling-2.6-flash', name: 'Ling 2.6 Flash' },
+  { id: 'Ring-2.5-1T', name: 'Ring 2.5' },
 ];
 
 marked.setOptions({
@@ -50,6 +50,7 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
     toggleAnalysis,
     closeAnalysis,
     setAnalysisLoading,
+    abortAnalysis,
   } = useAnalysisContext();
 
   const [shimmerIndex, setShimmerIndex] = useState(0);
@@ -171,41 +172,41 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
                       </div>
                     )}
 
-                    <button
-                      onClick={() => {
-                        onGenerate(selectedModel);
-                        setAnalysisLoading(true);
-                      }}
-                      disabled={!analysisHasData || analysisLoading}
-                      className="relative flex w-full items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-xs font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
-                    >
-                      {analysisLoading && (
+                    {analysisLoading ? (
+                      <button
+                        onClick={() => {
+                          abortAnalysis();
+                        }}
+                        className="relative flex w-full items-center justify-center gap-2 rounded-xl bg-red-500 px-4 py-2.5 text-xs font-medium text-white transition hover:bg-red-600"
+                      >
                         <svg
-                          className="h-3.5 w-3.5 animate-spin"
+                          className="h-3.5 w-3.5"
                           viewBox="0 0 24 24"
                           fill="none"
                         >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          />
-                          <path
-                            className="opacity-75"
+                          <rect
+                            x="6"
+                            y="6"
+                            width="12"
+                            height="12"
+                            rx="1"
                             fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                           />
                         </svg>
-                      )}
-                      {analysisLoading
-                        ? '分析中...'
-                        : analysisResult
-                          ? '重新分析'
-                          : '生成分析'}
-                    </button>
+                        取消分析
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          onGenerate(selectedModel);
+                          setAnalysisLoading(true);
+                        }}
+                        disabled={!analysisHasData}
+                        className="relative flex w-full items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-xs font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
+                      >
+                        {analysisResult ? '重新分析' : '生成分析'}
+                      </button>
+                    )}
                   </div>
                 </div>
               </motion.div>

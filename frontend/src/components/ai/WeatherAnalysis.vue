@@ -54,6 +54,19 @@ interface WeatherAnalysisPayload {
   tideSpotName?: string;
 }
 
+const AI_MODELS = [
+  { id: "Ling-2.6-1T", name: "Ling 2.6" },
+  { id: "Ling-2.6-flash", name: "Ling 2.6 Flash" },
+  { id: "Ring-2.5-1T", name: "Ring 2.5" },
+];
+
+const textShimmer = ref<string[]>(["正在整理天气变化...", "正在评估体感与风况...", "正在结合潮汐节奏..."]);
+
+const selectedModel = ref(AI_MODELS[0].id);
+
+let shimmerTimer: ReturnType<typeof setInterval> | null = null;
+let abortController: AbortController | null = null;
+
 const props = withDefaults(
   defineProps<{
     weather_data?: WeatherAnalysisPayload | null;
@@ -80,10 +93,6 @@ const renderedSummary = computed(() => {
     return summary.value;
   }
 });
-const textShimmer = ref<string[]>(["正在整理天气变化...", "正在评估体感与风况...", "正在结合潮汐节奏..."]);
-
-let shimmerTimer: ReturnType<typeof setInterval> | null = null;
-const abortController = ref<AbortController | null>(null);
 const lastAutoFingerprint = ref<string>("");
 
 const normalizedData = computed<WeatherAnalysisPayload | null>(() => {
@@ -134,17 +143,18 @@ const resetState = () => {
   errorMessage.value = "";
 };
 
-const fetchWeatherAnalysis = async () => {
+const fetchWeatherAnalysis = () => {
   if (!payload.value) {
     errorMessage.value = "缺少天气数据，无法分析";
     return;
   }
+  void _doFetch();
+};
 
-  if (abortController.value) {
-    abortController.value.abort();
-  }
+const _doFetch = async () => {
+  if (abortController) abortController.abort();
 
-  abortController.value = new AbortController();
+  abortController = new AbortController();
   loading.value = true;
   errorMessage.value = "";
   summary.value = "";
@@ -153,21 +163,18 @@ const fetchWeatherAnalysis = async () => {
   try {
     const response = await fetch("/api/v1/llm/weather-analysis", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ weather_data: payload.value }),
-      signal: abortController.value.signal,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        weather_data: payload.value,
+        model_id: selectedModel.value,
+      }),
+      signal: abortController.signal,
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
+    if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
 
     const reader = response.body?.getReader();
-    if (!reader) {
-      throw new Error("无法获取响应体");
-    }
+    if (!reader) throw new Error("无法获取响应体");
 
     const decoder = new TextDecoder("utf-8");
     let buffer = "";
@@ -196,18 +203,18 @@ const fetchWeatherAnalysis = async () => {
         }
       }
     }
-    if (summary.value && !hasGenerated.value) {
-      hasGenerated.value = true;
-    }
+    if (summary.value && !hasGenerated.value) hasGenerated.value = true;
   } catch (error: unknown) {
-    if (error instanceof DOMException && error.name === "AbortError") {
-      return;
-    }
+    if (error instanceof DOMException && error.name === "AbortError") return;
     errorMessage.value = error instanceof Error ? error.message : "AI 分析失败，请稍后重试";
     notifier.error(errorMessage.value);
   } finally {
     loading.value = false;
   }
+};
+
+const cancelAnalysis = () => {
+  abortController?.abort();
 };
 
 watch(
@@ -245,7 +252,7 @@ watch(
 );
 
 onUnmounted(() => {
-  if (abortController.value) abortController.value.abort();
+  if (abortController) abortController.abort();
   if (shimmerTimer) clearInterval(shimmerTimer);
 });
 </script>
@@ -273,16 +280,34 @@ onUnmounted(() => {
         <span class="rounded-full px-2.5 py-1 text-xs font-medium" :class="statusClass">
           {{ statusLabel }}
         </span>
+        <!-- 模型选择器 -->
+        <select
+          v-if="!loading"
+          v-model="selectedModel"
+          class="rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-xs text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+        >
+          <option v-for="model in AI_MODELS" :key="model.id" :value="model.id">
+            {{ model.name }}
+          </option>
+        </select>
+
         <button
+          v-if="loading"
+          class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-red-500 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-600"
+          @click="cancelAnalysis"
+        >
+          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
+            <rect x="6" y="6" width="12" height="12" rx="1" fill="currentColor" />
+          </svg>
+          取消分析
+        </button>
+        <button
+          v-else
           class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
           :disabled="!canGenerate"
           @click="fetchWeatherAnalysis"
         >
-          <svg v-if="loading" class="h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
-          {{ loading ? "分析中..." : hasGenerated ? "重新分析" : "生成分析" }}
+          {{ hasGenerated ? "重新分析" : "生成分析" }}
         </button>
       </div>
     </div>
