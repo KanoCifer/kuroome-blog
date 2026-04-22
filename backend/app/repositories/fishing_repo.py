@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from bson import ObjectId
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -32,6 +34,19 @@ class FishingRepo:
         """获取所有有反馈分数的记录用于模型训练"""
         records = (
             await FishingRecord.find({"feedback_score": {"$gte": 0}})
+            .sort("-fishing_time")
+            .to_list()
+        )
+        return records
+
+    async def get_records_for_training_by_source(
+        self, source: Literal["user", "ai"]
+    ) -> list[FishingRecord]:
+        """获取指定来源的训练记录"""
+        records = (
+            await FishingRecord.find(
+                {"feedback_score": {"$gte": 0}, "source": source}
+            )
             .sort("-fishing_time")
             .to_list()
         )

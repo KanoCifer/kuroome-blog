@@ -163,7 +163,7 @@ export function FishingIndexCard({
                     return (
                       <div
                         key={key}
-                        className="group relative overflow-hidden rounded-xl border border-white/30 bg-white/50 p-3 backdrop-blur-sm transition-all hover:border-blue-300/50 hover:bg-white/70 dark:border-gray-600/30 dark:bg-gray-800/40 dark:hover:border-blue-400/50 dark:hover:bg-gray-800/60"
+                        className="group relative overflow-hidden rounded-xl border border-white/30 bg-white/50 p-3 shadow-md backdrop-blur-sm transition-all hover:border-blue-300/50 hover:bg-white/70 dark:border-gray-600/30 dark:bg-gray-800/40 dark:hover:border-blue-400/50 dark:hover:bg-gray-800/60"
                         style={{ animationDelay: `${idx * 60}ms` }}
                       >
                         {/* Background shimmer effect */}
@@ -173,12 +173,6 @@ export function FishingIndexCard({
                         <div className="mb-2 flex items-center justify-between">
                           <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
                             {label}
-                          </span>
-                          <span
-                            className="text-sm font-bold tabular-nums"
-                            style={{ color: gaugeColor }}
-                          >
-                            {value.toFixed(1)}
                           </span>
                         </div>
 
@@ -202,13 +196,6 @@ export function FishingIndexCard({
                               boxShadow: `0 0 6px ${gaugeColor}`,
                             }}
                           />
-                        </div>
-
-                        {/* Percentage label */}
-                        <div className="mt-1 text-right">
-                          <span className="text-[10px] text-gray-400 dark:text-gray-500">
-                            {percentage.toFixed(0)}%
-                          </span>
                         </div>
                       </div>
                     );

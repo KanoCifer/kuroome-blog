@@ -19,6 +19,7 @@ from app.api.des.auth import manager
 from app.api.des.des import public_service_dep
 from app.api.des.limiter import limiter
 from app.api.des.redis import get_redis
+from app.core.config import get_settings
 from app.models.models import User
 from app.schemas.aiagent import WeatherAnalysisInput
 from app.schemas.gallery import GalleryInput
@@ -143,7 +144,24 @@ async def get_likes(
 
 @router.get("/amap/security-key")
 async def get_amap_security_key(request: Request) -> JSONResponse:
-    """获取高德地图安全密钥，用于前端调用高德地图相关接口时的安全验证。"""
+    """获取高德地图安全密钥，用于前端调用高德地图相关接口时的安全验证。
+
+    该接口暴露给客户端是安全的，因为：
+    1. 高德 JS API 的 securityJsCode 是绑定域名的标识符，不是私密密钥
+    2. 真正的密钥是 Web Key（后端持有），用于服务端 API 调用
+    3. 已配置来源验证，限制只有合法前端才能获取
+    """
+    # 验证请求来源
+    origin = request.headers.get("origin") or request.headers.get(
+        "referer", ""
+    )
+    allowed_origins = get_settings().AMAP_KEY_ALLOWED_ORIGINS.split(",")
+    if origin and not any(o in origin for o in allowed_origins):
+        return APIResponse.error(
+            message="Forbidden: invalid origin",
+            code=403,
+        )
+
     encoded_key = PublicService.get_amap_security_key()
 
     return APIResponse.ok(data={"securityJsCode": encoded_key})

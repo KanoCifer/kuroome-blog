@@ -44,7 +44,7 @@ export default function FishingMap() {
     [],
   );
 
-  const { isMapReady, userPosition, planRoute } = useMap(
+  const { userPosition, planRoute } = useMap(
     mapContainerRef,
     getSecurityJsCode,
     handleMarkerClick,
@@ -100,7 +100,7 @@ export default function FishingMap() {
       >
         <section className="space-y-4">
           <RouteStatusCard />
-          <MapPanel isMapReady={isMapReady} mapContainerRef={mapContainerRef} />
+          <MapPanel mapContainerRef={mapContainerRef} />
           <div className="grid grid-cols-1 gap-4">
             <FishingIndexCard
               location={userPosition ?? MAP_CENTER}

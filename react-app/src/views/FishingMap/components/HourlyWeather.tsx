@@ -75,7 +75,7 @@ export function HourlyWeather() {
         },
         {
           type: 'value',
-          max: (value: { max: number }) => value.max * 1.2,
+          max: (value: { max: number }) => Math.round(value.max + 5),
           min: 0,
           position: 'right',
           nameTextStyle: { color: '#9ca3af', fontSize: 11 },
@@ -186,7 +186,7 @@ export function HourlyWeather() {
             silent: true,
             data: [
               [
-                { yAxis: 20, itemStyle: { color: 'rgba(255, 188, 120, 0.1)' } },
+                { yAxis: 20, itemStyle: { color: 'rgba(250, 204, 21, 0.1)' } },
                 { yAxis: 28 },
               ],
             ],
@@ -207,9 +207,12 @@ export function HourlyWeather() {
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
             小时天气预报{' '}
             <span className="text-xs text-gray-500 dark:text-gray-400">
-              未来24小时天气变化趋势
+              未来24小时
             </span>
           </h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            天气变化趋势
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5 rounded-full bg-white/60 px-3 py-1.5 shadow-sm dark:bg-slate-800/60">

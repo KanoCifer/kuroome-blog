@@ -77,7 +77,7 @@ class FishingModelService:
             record.get("temperature", 20.0),
             record.get("humidity", 50.0),
             record.get("pressure", 1000.0),
-            record.get("wind_speed", 1.0),
+            record.get("wind_speed", 1.0) / 3.6,  # 转换为 m/s
             record.get("precipitation", 0.0),
             1.0 if record.get("tide_type") == "涨潮" else 0.5,
             record.get("hours_to_next_tide", 3.0),

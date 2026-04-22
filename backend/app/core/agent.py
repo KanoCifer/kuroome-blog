@@ -3,7 +3,6 @@ from __future__ import annotations
 import hashlib
 import re
 from collections.abc import AsyncIterator
-from typing import Literal
 
 from agno.agent import Agent, RunOutputEvent
 from agno.db.base import SessionType
@@ -13,7 +12,8 @@ from agno.tools.websearch import WebSearchTools
 
 from app.core.config import settings
 from app.core.logger import logger
-from app.schemas.aiagent import WeatherAnalysisInput
+
+# WeatherAnalyzer 已在 weather_analyzer.py 中定义
 
 
 class ArticleSummarizer:
@@ -372,164 +372,3 @@ class ArticleSummarizer:
 
 
 article_summarizer = ArticleSummarizer()
-
-
-class WeatherAnalyzer:
-    _SYSTEM_PROMPT = (
-        "你是一名专业的垂钓气象与潮汐分析师，擅长综合天气和潮汐数据判断钓鱼条件。\n\n"
-        "## 分析维度\n"
-        "依次评估以下因素对钓鱼的影响：\n"
-        "- **温度**：鱼类活跃度随水温变化，15-25°C 通常最佳\n"
-        "- **风速风向**：微风（3-15 km/h）有利于钓鱼；强风（>30 km/h）危险\n"
-        "- **气压**：高气压稳定（>1013 hPa）适合钓鱼；气压骤降时鱼口差\n"
-        "- **降水**：小雨可提升鱼口；暴雨/雷暴禁止出钓\n"
-        "- **潮汐**：涨潮前后 1-2 小时（尤其高潮前）通常是最佳钓鱼窗口；\n"
-        "  大潮差（高低潮落差 >2m）水流湍急，鱼不易开口；\n"
-        "  平潮期（高/低潮后 30 分钟内）水流缓，适合底钓\n"
-        "- **云量/光照**：阴天或多云通常优于正午烈日\n\n"
-        "## 输出格式（严格遵守）\n"
-        "## 钓鱼指数：XX / 100\n\n"
-        "**出钓建议**：一句话概括（极佳 / 良好 / 一般 / 不宜 / 禁止）\n\n"
-        "### 逐项分析\n"
-        "| 维度 | 当前状况 | 影响评估 |\n"
-        "|------|----------|----------|\n"
-        "| 温度 | ... | ... |\n"
-        "| 风况 | ... | ... |\n"
-        "| 气压 | ... | ... |\n"
-        "| 降水 | ... | ... |\n"
-        "| 潮汐 | ... | ... |\n\n"
-        "### 最佳出钓窗口\n"
-        "根据潮汐表，今日推荐时段：HH:MM - HH:MM（说明原因）\n\n"
-        "### 建议\n"
-        "- 出钓建议（时段/钓点/装备）\n"
-        "- 注意事项或安全提示\n\n"
-        "## 评分规则\n"
-        "- 先按专家权重计算基准分（归一化权重，总和=1）：\n"
-        "  w1_temp=4/23, w2_humidity=2/23, w3_pressure=2/23, w4_wind=2/23,\n"
-        "  w5_rain=1/23, w6_tide_rising=4/23, w7_hours_to_tide=4/23,\n"
-        "  w8_tide_range=2/23, w9_indices=2/23\n"
-        "- Expert_score = Σ(weight_i * feature_score_i) * 100，feature_score_i 范围 [0,1]，但 pressure 特征可达 [0,2]\n"
-        "- 再给出 AI 自主修正分（-20~20），并说明修正依据（短时天气波动、天气现象、潮汐时序）\n"
-        "- 最终钓鱼指数 = clip(专家基准分 + AI 自主修正分, 0, 100)\n"
-        "- 90-100：极佳，强烈推荐\n"
-        "- 70-89：良好，适合出钓\n"
-        "- 50-69：一般，可以尝试但体验有限\n"
-        "- 30-49：不宜，不建议出钓\n"
-        "- 0-29：禁止，存在安全风险\n\n"
-        "输出时必须显式给出：专家基准分、AI 自主修正分、最终钓鱼指数。\n"
-        "若遇雷暴、台风或暴雨，评分直接置 0 并给出安全警告。\n"
-        "回答简洁，避免重复原始数据，聚焦分析与建议。"
-    )
-    DB = RedisDb(db_url=settings.REDIS_URL)
-
-    def __init__(self) -> None:
-        self._model = OpenAILike(
-            id="Ling-2.5-1T",
-            api_key=settings.API_KEY,
-            base_url="https://api.tbox.cn/api/llm/v1",
-            temperature=0.8,
-            timeout=30,
-        )
-
-        self._agent = Agent(
-            model=self._model,
-            instructions=self._SYSTEM_PROMPT,
-            db=WeatherAnalyzer.DB,
-            tools=[WebSearchTools(backend="bing")],
-            add_history_to_context=True,
-            num_history_runs=5,
-        )
-
-    def _build_user_prompt(self, weather_data: WeatherAnalysisInput) -> str:
-        data = weather_data.weather_data
-        lines: list[str] = [
-            "请综合以下天气与潮汐数据，按专家权重先算基准分，再给出 AI 自主修正分与最终钓鱼指数：\n"
-        ]
-
-        fishing_context = data.get("fishingIndex")
-        if fishing_context:
-            expert_score = fishing_context.get("expert_score")
-            residual = fishing_context.get("residual")
-            feature_breakdown = fishing_context.get("feature_breakdown")
-            if expert_score is not None:
-                lines.append(f"【专家基准分】{expert_score}")
-            if residual is not None:
-                lines.append(f"【历史校正残差】{residual}")
-            if feature_breakdown:
-                lines.append(f"【专家特征分解】{feature_breakdown}")
-
-        lines.append(
-            "【专家权重】w1=0.2,w2=0.1,w3=0.1,w4=0.1,w5=0.05,w6=0.2,w7=0.2,w8=0.1,w9=0.1"
-        )
-
-        live = data.get("liveWeather")
-        if live:
-            lines.append(
-                f"【实时天气】{data.get('locationName', '')} "
-                f"气温 {live.get('temp')}°C，{live.get('text')}，"
-                f"风向 {live.get('wind360') or live.get('windDir')} {live.get('windScale')} 级，"
-                f"湿度 {live.get('humidity')}%，"
-                f"气压 {live.get('pressure')} hPa，降水 {live.get('precip')} mm"
-            )
-
-        forecasts = data.get("forecasts", [])
-        if forecasts:
-            lines.append("【天气预报】")
-            for f in forecasts[:3]:
-                lines.append(
-                    f"  {f.get('date')} 白天 {f.get('daytemp')}° {f.get('dayweather')} "
-                    f"{f.get('daywind')}{f.get('daypower')}级 / "
-                    f"夜间 {f.get('nighttemp')}° {f.get('nightweather')}"
-                )
-
-        tide = data.get("tideData")
-        if tide:
-            lines.append(
-                f"【潮汐数据】{data.get('tideSpotName', '')} 更新: {tide.get('updateTime', '')}"
-            )
-            table = tide.get("tideTable", [])
-            if table:
-                lines.append("  高低潮时刻：")
-                for t in table:
-                    tag: Literal["高潮"] | Literal["低潮"] = (
-                        "高潮" if t.get("type") == "H" else "低潮"
-                    )
-                    lines.append(
-                        f"    {tag} {t.get('fxTime')} {t.get('height')}m"
-                    )
-                heights = [float(t["height"]) for t in table if "height" in t]
-                if heights:
-                    tidal_range = max(heights) - min(heights)
-                    lines.append(f"  潮差：{tidal_range:.2f}m")
-            hourly = tide.get("tideHourly", [])
-            if hourly:
-                lines.append("  逐时潮高（全天）：")
-                for h in hourly:
-                    lines.append(f"    {h.get('fxTime')} {h.get('height')}m")
-
-        return "\n".join(lines)
-
-    async def analyze_weather_stream(
-        self, weather_data: WeatherAnalysisInput
-    ) -> AsyncIterator[str]:
-        if not settings.API_KEY:
-            logger.error("AI 服务未配置 API_KEY")
-            raise RuntimeError("AI 服务未配置 API_KEY")
-
-        data = (
-            str(weather_data)
-            if isinstance(weather_data, WeatherAnalysisInput)
-            else weather_data
-        )
-
-        if not data.strip():
-            raise ValueError("天气数据不能为空")
-
-        user_prompt = self._build_user_prompt(weather_data)
-
-        async for event in self._agent.arun(user_prompt, stream=True):
-            if isinstance(event, RunOutputEvent) and event.content:
-                yield str(event.content)
-
-
-weather_analyzer = WeatherAnalyzer()

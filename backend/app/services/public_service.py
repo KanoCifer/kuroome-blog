@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import base64
-import json
 from datetime import UTC, datetime
 from xml.etree.ElementTree import Element, SubElement, tostring
 
@@ -173,11 +172,11 @@ Sitemap: {sitemap_url}
     @staticmethod
     def _to_sse_event(content: str, is_end: bool) -> str:
         data = {"content": content, "is_end": is_end}
-        return f"data:{json.dumps(data, ensure_ascii=False)}\n\n"
+        return f"data:{orjson.dumps(data)}\n\n"
 
     async def analyze_weather(self, weather_data: WeatherAnalysisInput):
-        """根据天气数据进行分析并生成报告。"""
-        from app.core.agent import weather_analyzer
+        """根据天气数据进行分析并生成报告（支持结构化评分）。"""
+        from app.core.weather_analyzer import weather_analyzer
 
         try:
             async for chunk in weather_analyzer.analyze_weather_stream(

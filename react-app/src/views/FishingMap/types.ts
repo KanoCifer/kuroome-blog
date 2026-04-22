@@ -277,3 +277,16 @@ export interface FishingFeedbackResponse {
   expert_score: number;
   residual: number;
 }
+
+// AI 天气分析评分
+export interface FishingScores {
+  expert_score: number;
+  ai_final_score: number;
+  final_score: number;
+}
+
+export interface AnalysisChunk {
+  content?: string;
+  is_end?: boolean;
+  scores?: FishingScores;
+}

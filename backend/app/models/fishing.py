@@ -45,6 +45,9 @@ class FishingRecord(Document):
 
     # 元数据
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    source: Literal["user", "ai"] = Field(
+        default="user", description="记录来源"
+    )
 
     class Settings:
         name = "fishing_records"

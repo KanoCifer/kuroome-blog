@@ -38,6 +38,8 @@ class Settings(BaseSettings):
     VITE_JS_API_TOKEN: str = ""
     AMAP_SECURITY_CODE: str = ""
     AMAP_WEB_KEY: str = ""
+    # 允许获取高德安全密钥的前端来源
+    AMAP_KEY_ALLOWED_ORIGINS: str = "http://localhost:5173,http://localhost:5174,https://kanocifer.chat,https://m.kanocifer.chat"
     JWT_PRIVATE_KEY: str = ""
     # Cookie 跨域配置
     COOKIE_DOMAIN: str = ""

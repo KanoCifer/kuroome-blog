@@ -172,7 +172,7 @@ class FishingService:
         Returns:
             钓鱼记录
         """
-        now = weather_data.get("now", weather_data.get("current", {}))
+        now = weather_data.get("current", {}).get("now", {})
 
         return FishingRecord(
             temperature=float(now.get("temp", 20)),
@@ -210,6 +210,9 @@ class FishingService:
             "hours_to_tide": record.hours_to_next_tide,
             "tide_range": record.tide_range,
         }
+        logger.info(
+            f"[钓鱼指数] 输入记录: wind_speed={record.wind_speed} km/h, temp={record.temperature}°C, pressure={record.pressure}hPa"
+        )
 
         # 专家评分
         expert_score = self.expert.calculate(**record_dict)
@@ -229,9 +232,12 @@ class FishingService:
             feature_breakdown,
         )
 
-    async def auto_train_if_needed(self) -> dict | None:
+    async def auto_train_if_needed(self, source: str = "all") -> dict | None:
         """
         检查记录数并自动训练模型
+
+        Args:
+            source: "user" | "ai" | "all" - 训练数据来源筛选
 
         当记录数 > 3 时自动触发全量训练
 
@@ -243,11 +249,17 @@ class FishingService:
             return None
 
         try:
-            records = await self.repo.get_all_records_for_training()
+            if source == "all":
+                records = await self.repo.get_all_records_for_training()
+            else:
+                records = await self.repo.get_records_for_training_by_source(
+                    source
+                )
+
             record_count = len(records)
 
             logger.info(
-                f"[钓鱼模型] 当前有 {record_count} 条记录，开始检查是否需要训练"
+                f"[钓鱼模型] 当前有 {record_count} 条 {source} 记录，开始检查是否需要训练"
             )
 
             if record_count <= 3:

@@ -7,6 +7,8 @@ from __future__ import annotations
 
 import numpy as np
 
+from app.core.logger import logger
+
 
 class FishingExpertScorer:
     """
@@ -65,13 +67,24 @@ class FishingExpertScorer:
     @staticmethod
     def score_wind(wind_speed: float) -> float:
         """
-        w4 风速评分: 过大扣分，>3m/s扣1分
+        w4 风速评分: 过大扣分，>3m/s(约10.8km/h)开始扣分
+        注意: wind_speed 输入是 km/h (来自和风 API now.windSpeed)
         """
-        if wind_speed <= 3:
-            return 1.0
+        # 转换 km/h -> m/s
+        wind_speed_ms = wind_speed / 3.6 if wind_speed >= 0 else 0
+        logger.info(
+            f"[钓鱼指数] 风速评分: 输入={wind_speed} km/h, 转换={wind_speed_ms:.2f} m/s, 阈值=3 m/s"
+        )
+        if wind_speed_ms <= 3:
+            result = 1.0
+            logger.info(f"[钓鱼指数] 风速评分: {result} (<=3 m/s)")
         else:
             # 每超过3m/s 1m/s扣0.33分
-            return max(0.0, 1.0 - (wind_speed - 3) * 0.33)
+            result = max(0.0, 1.0 - (wind_speed_ms - 3) * 0.33)
+            logger.info(
+                f"[钓鱼指数] 风速评分: {result:.3f} (>3 m/s, 扣分: {(wind_speed_ms - 3) * 0.33:.2f})"
+            )
+        return result
 
     @staticmethod
     def score_rain(precipitation: float) -> float:
@@ -180,7 +193,17 @@ class FishingExpertScorer:
             + self.WEIGHTS["w9"] * w9
         )
 
-        return np.clip(score * 100, 0, 100)  # 归一化到0-100并限制范围
+        logger.info(
+            f"[钓鱼指数] 各特征评分: temp={w1:.3f}, humidity={w2:.3f}, "
+            f"pressure={w3:.3f}, wind={w4:.3f}, rain={w5:.3f}, "
+            f"tide_rising={w6:.3f}, hours_to_tide={w7:.3f}, "
+            f"tide_range={w8:.3f}, indices={w9:.3f}"
+        )
+        logger.info(
+            f"[钓鱼指数] 加权求和: score={score:.4f}, 最终={np.clip(score * 100, 0, 100):.1f}"
+        )
+
+        return np.clip(score * 100, 0, 100)
 
     def get_feature_scores(
         self,
