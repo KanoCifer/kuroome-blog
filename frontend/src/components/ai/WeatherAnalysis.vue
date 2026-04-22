@@ -334,7 +334,7 @@ onUnmounted(() => {
     </div>
 
     <div v-else class="relative z-10 mt-5 flex flex-1 flex-col">
-      <div class="h-[75vh] overflow-auto rounded-2xl bg-white/60 p-4 dark:bg-gray-900/60">
+      <div class="h-[60vh] max-h-[60vh] overflow-auto rounded-2xl bg-white/60 p-4 dark:bg-gray-900/60">
         <div class="mb-2 flex items-center gap-2 text-xs text-gray-500">
           <span class="h-1.5 w-1.5 rounded-full bg-gray-400"></span>
           AI 分析输出
