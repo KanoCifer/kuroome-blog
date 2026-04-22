@@ -91,7 +91,7 @@ export default function FishingMap() {
 
   return (
     <AnalysisContextProvider analysisHasData={analysisHasData}>
-      <div className="fixed inset-0 bg-gray-50/90 dark:bg-gray-900/90" />
+      <div className="fixed inset-0 w-screen bg-gray-50/90 dark:bg-gray-900/90" />
       <FishingMapHeader />
       <motion.div
         initial={{ opacity: 0, y: 20 }}

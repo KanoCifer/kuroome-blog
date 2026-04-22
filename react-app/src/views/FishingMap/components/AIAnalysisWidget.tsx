@@ -104,7 +104,7 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.92, y: 12 }}
                 transition={{ duration: 0.35, ease: 'easeOut' }}
-                className="group relative mb-3 w-[calc(100vw-1.5rem)] max-w-sm overflow-hidden rounded-3xl border border-white/20 bg-linear-to-br from-white/80 to-white/40 shadow-2xl backdrop-blur-sm sm:w-[calc(100vw-3rem)] dark:border-gray-700/50 dark:from-gray-900/80 dark:to-gray-800/40"
+                className="group relative mb-3 w-[90vw] max-w-sm overflow-hidden rounded-3xl border border-white/20 bg-linear-to-br from-white/80 to-white/40 shadow-2xl backdrop-blur-sm dark:border-gray-700/50 dark:from-gray-900/80 dark:to-gray-800/40"
               >
                 {/* Decorative blobs */}
                 <div className="pointer-events-none absolute -top-16 -right-16 h-32 w-32 rounded-full bg-linear-to-br from-indigo-300/30 to-sky-500/20 blur-2xl transition-transform duration-700 group-hover:scale-110" />
