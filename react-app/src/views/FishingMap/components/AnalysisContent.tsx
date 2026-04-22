@@ -103,6 +103,7 @@ export function AnalysisContent({
         (content) => {
           analysisResultRef.current += content;
           setAnalysisResultRef.current(analysisResultRef.current);
+          // console.log('Received chunk:', content);
         },
         controller.signal,
       );

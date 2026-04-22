@@ -24,9 +24,12 @@ const SHIMMER_TEXTS = [
 
 function renderMarkdown(content: string): string {
   try {
+    // console.log('Rendering markdown content:', content);
     const rawHtml = marked.parse(content, { async: false }) as string;
     return DOMPurify.sanitize(rawHtml);
   } catch {
+    console.error('Error rendering markdown content:', content);
+
     return content;
   }
 }

@@ -172,7 +172,7 @@ Sitemap: {sitemap_url}
     @staticmethod
     def _to_sse_event(content: str, is_end: bool) -> str:
         data = {"content": content, "is_end": is_end}
-        return f"data:{orjson.dumps(data)}\n\n"
+        return f"data:{orjson.dumps(data).decode()}\n\n"
 
     async def analyze_weather(self, weather_data: WeatherAnalysisInput):
         """根据天气数据进行分析并生成报告（支持结构化评分）。"""

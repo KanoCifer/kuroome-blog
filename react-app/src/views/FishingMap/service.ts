@@ -116,6 +116,7 @@ export const fishingMapService = (): FishingMapService => {
             const parsed = JSON.parse(payloadText) as AnalysisChunk;
             if (parsed.content) {
               onChunk(parsed.content);
+              // console.log('Received chunk:', parsed.content);
             }
           } catch {
             continue;

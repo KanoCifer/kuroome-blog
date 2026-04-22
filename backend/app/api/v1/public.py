@@ -197,6 +197,7 @@ async def analyze_weather(
     """根据天气数据进行分析并生成报告。
     param weather_data: 需要分析的天气数据。
     """
+    # logger.info(weather_data)
     event_generator = public_service.analyze_weather(weather_data)
     return StreamingResponse(
         event_generator,
