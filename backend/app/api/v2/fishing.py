@@ -7,7 +7,7 @@ from __future__ import annotations
 import logging
 from typing import Literal
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from redis.asyncio import Redis as AsyncRedis
@@ -181,6 +181,7 @@ async def get_fishing_index(
 @router.post("/feedback", response_model=FishingFeedbackResponse)
 async def submit_feedback(
     payload: FishingFeedbackRequest,
+    background_tasks: BackgroundTasks,
     _: AsyncRedis = Depends(get_redis),
     service: FishingService = Depends(fishing_service_dep),
 ) -> JSONResponse:
@@ -215,7 +216,7 @@ async def submit_feedback(
     logger.info(f"[钓鱼反馈] 已保存记录: {record_id}")
 
     # 自动训练检查（异步，不阻塞响应）
-    await service.auto_train_if_needed()
+    background_tasks.add_task(service.auto_train_if_needed, source="all")
 
     return APIResponse.ok(
         data=FishingFeedbackResponse(
@@ -225,116 +226,6 @@ async def submit_feedback(
             residual=int(residual),
         ).model_dump(),
         message=f"反馈已记录：{payload.feedback}",
-    )
-
-
-class AITrainingRequest(BaseModel):
-    """AI训练数据请求"""
-
-    location_id: str = Field(..., description="钓点ID")
-    location_name: str = Field(..., description="钓点名称")
-    fishing_time: str = Field(..., description="钓鱼时间")
-
-    # 天气特征
-    temperature: float = Field(20.0, description="温度 °C")
-    humidity: float = Field(50.0, description="湿度 %")
-    pressure: float = Field(1013.0, description="气压 hPa")
-    wind_speed: float = Field(0.0, description="风速 m/s")
-    precipitation: float = Field(0.0, description="降水量 mm")
-    indices: int = Field(2, description="和风指数 1-3")
-
-    # 潮汐特征
-    tide_level: float = Field(1.0, description="潮位 m")
-    tide_type: Literal["涨潮", "退潮"] = Field("涨潮", description="高潮/低潮")
-    tide_range: float = Field(1.5, description="潮差 m")
-    hours_to_next_tide: float = Field(
-        3.0, description="距下一潮汐时间（小时）"
-    )
-
-    # AI 评分
-    ai_expert_score: int = Field(..., description="AI 给的专家基准分")
-    ai_final_score: int = Field(..., description="AI 给的最终钓鱼指数")
-
-
-class AITrainingResponse(BaseModel):
-    """AI训练响应"""
-
-    success: bool
-    record_id: str
-    expert_score: int
-    ai_score: int
-    residual: float
-    training_triggered: bool
-    training_result: dict | None
-
-
-def _build_ai_record_from_request(req: AITrainingRequest) -> dict:
-    """从 AI 请求构建钓鱼记录"""
-    return {
-        "temperature": req.temperature,
-        "humidity": req.humidity,
-        "pressure": req.pressure,
-        "wind_speed": req.wind_speed,
-        "precipitation": req.precipitation,
-        "tide_type": req.tide_type,
-        "hours_to_next_tide": req.hours_to_next_tide,
-        "tide_range": req.tide_range,
-        "indices": req.indices,
-    }
-
-
-@router.post("/train-from-ai", response_model=AITrainingResponse)
-async def train_from_ai_scores(
-    payload: AITrainingRequest,
-    _: AsyncRedis = Depends(get_redis),
-    service: FishingService = Depends(fishing_service_dep),
-) -> JSONResponse:
-    """
-    使用 AI 评分自动训练模型
-
-    无需用户反馈，直接用 AI 天气分析返回的评分作为训练数据
-    """
-    # 构建记录
-    record = _build_ai_record_from_request(payload)
-
-    # 计算本地专家评分（用于对比）
-    local_expert_score = fishing_service.expert.calculate(**record)
-
-    # AI 评分作为 actual_score
-    ai_score = payload.ai_final_score
-
-    # 计算残差
-    residual = ai_score - local_expert_score
-
-    # 保存到 MongoDB
-    doc_data = {
-        "location_id": payload.location_id,
-        "location_name": payload.location_name,
-        "fishing_time": payload.fishing_time,
-        **record,
-        "tide_level": payload.tide_level,
-        "feedback": service.get_level(ai_score),
-        "feedback_score": ai_score,
-        "expert_score": local_expert_score,
-        "source": "ai",
-    }
-    record_id = await service.save_feedback(doc_data)
-    logger.info(f"[AI训练] 已保存记录: {record_id}, ai_score={ai_score}")
-
-    # 自动训练检查
-    training_result = await service.auto_train_if_needed()
-
-    return APIResponse.ok(
-        data=AITrainingResponse(
-            success=True,
-            record_id=str(record_id),
-            expert_score=int(local_expert_score),
-            ai_score=ai_score,
-            residual=round(residual, 1),
-            training_triggered=training_result is not None,
-            training_result=training_result,
-        ).model_dump(),
-        message="AI训练数据已记录",
     )
 
 

@@ -210,7 +210,7 @@ class FishingService:
             "hours_to_tide": record.hours_to_next_tide,
             "tide_range": record.tide_range,
         }
-        logger.info(
+        logger.debug(
             f"[钓鱼指数] 输入记录: wind_speed={record.wind_speed} km/h, temp={record.temperature}°C, pressure={record.pressure}hPa"
         )
 
