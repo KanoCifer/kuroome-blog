@@ -1,6 +1,6 @@
 import { useNavVisibility } from '@/components/basic/NavVisibilityContext';
 import { motion } from 'framer-motion';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { BentoCalendar } from './components/BentoCalendar';
 import { BentoClock } from './components/BentoClock';
 import { BentoGreeting } from './components/BentoGreeting';
@@ -12,51 +12,12 @@ import { BentoTech } from './components/BentoTech';
 import { BentoTodo } from './components/BentoTodo';
 import { BentoWeb } from './components/BentoWeb';
 
-const SCROLL_THRESHOLD = 10;
-
 export default function Home() {
-  const { hideNav, showNav } = useNavVisibility();
-  const lastScrollY = useRef(window.scrollY);
-  const ticking = useRef(false);
+  const { showNav } = useNavVisibility();
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (!ticking.current) {
-        window.requestAnimationFrame(() => {
-          const currentScrollY = window.scrollY;
-          const diff = currentScrollY - lastScrollY.current;
-
-          // 往上滚动（手指向上滑动，页面向上走）-> 显示
-          if (currentScrollY < lastScrollY.current) {
-            showNav();
-          }
-          // 往下滚动超过阈值 -> 隐藏
-          else if (diff > SCROLL_THRESHOLD) {
-            hideNav();
-          }
-
-          lastScrollY.current = currentScrollY;
-          ticking.current = false;
-        });
-        ticking.current = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [hideNav, showNav]);
-
-  useEffect(() => {
-    // 页面加载时显示导航栏
     showNav();
-
-    return () => {
-      // 页面卸载时显示导航栏，确保其他页面正常显示
-      showNav();
-    };
+    return () => showNav();
   }, [showNav]);
 
   return (
