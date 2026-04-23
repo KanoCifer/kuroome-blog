@@ -17,6 +17,7 @@ export function HourlyWeather() {
     const tempData = weatherHourly.map((item) => item.temp ?? 0);
 
     return {
+      backgroundColor: 'transparent',
       textStyle: {
         color: '#333',
         fontSize: 13,
@@ -65,7 +66,7 @@ export function HourlyWeather() {
         {
           type: 'value',
           position: 'left',
-          max: 60,
+          max: 18,
           min: 0,
           nameTextStyle: { color: '#9ca3af', fontSize: 11 },
           axisLine: { show: false },
@@ -101,35 +102,21 @@ export function HourlyWeather() {
       series: [
         {
           name: '降水量 (mm)',
-          type: 'line',
+          type: 'bar',
           data: rainData,
           yAxisIndex: 0,
-          lineStyle: { width: 2.5, color: '#3b82f6' },
-          areaStyle: {
-            color: {
-              type: 'linear',
-              x: 0,
-              y: 0,
-              x2: 0,
-              y2: 1,
-              colorStops: [
-                { offset: 0, color: 'rgba(59, 130, 246, 0.1)' },
-                { offset: 0.7, color: 'rgba(59, 130, 246, 0.05)' },
-                { offset: 1, color: 'rgba(59, 130, 246, 0)' },
-              ],
-            },
+          barMaxWidth: 12,
+          itemStyle: {
+            color: '#3b82f6',
+            borderRadius: [4, 4, 0, 0],
           },
-          smooth: 0.2,
-          symbol: 'none',
-          symbolSize: 6,
-          itemStyle: { color: '#3b82f6', borderWidth: 2, borderColor: '#fff' },
           markLine: {
             silent: true,
             symbol: 'none',
             lineStyle: { type: 'dashed', width: 1 },
             data: [
               {
-                yAxis: 10,
+                yAxis: 0.5,
                 lineStyle: { color: '#94a3b8' },
                 label: {
                   formatter: '小雨',
@@ -138,20 +125,20 @@ export function HourlyWeather() {
                 },
               },
               {
-                yAxis: 25,
-                lineStyle: { color: '#f97316' },
+                yAxis: 8,
+                lineStyle: { color: '#3b82f6' },
                 label: {
                   formatter: '中雨',
-                  color: '#f97316',
+                  color: '#3b82f6',
                   position: 'start',
                 },
               },
               {
-                yAxis: 50,
-                lineStyle: { color: '#ef4444' },
+                yAxis: 16,
+                lineStyle: { color: '#f97316' },
                 label: {
                   formatter: '大雨',
-                  color: '#ef4444',
+                  color: '#f97316',
                   position: 'start',
                 },
               },
