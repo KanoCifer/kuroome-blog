@@ -47,10 +47,6 @@ const chartOption = computed(() => {
     return {};
   }
 
-  const textColor = isDarkMode.value ? "#e5e7eb" : "#1e293b";
-  const subTextColor = isDarkMode.value ? "#94a3b8" : "#64748b";
-  const gridLineColor = isDarkMode.value ? "#334155" : "#e2e8f0";
-
   const xData = weatherHourly.value.map((item) => dayjs(item.fxTime).format("HH:mm"));
   const rainData = weatherHourly.value.map((item) => item.precip ?? 0);
   const tempData = weatherHourly.value.map((item) => item.temp ?? 0);
@@ -58,54 +54,56 @@ const chartOption = computed(() => {
   return {
     backgroundColor: "transparent",
     textStyle: {
-      color: textColor,
+      color: "#333",
       fontSize: 13,
-      fontWeight: 500,
     },
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: [12, 16],
     tooltip: {
       trigger: "axis",
-      backgroundColor: isDarkMode.value ? "rgba(15, 23, 42, 0.9)" : "rgba(255, 255, 255, 0.98)",
-      borderColor: isDarkMode.value ? "#475569" : "#e2e8f0",
+      backgroundColor: "rgba(255, 255, 255, 0.95)",
+      borderColor: "rgba(0, 0, 0, 0.05)",
       borderWidth: 1,
-      borderRadius: 16,
+      borderRadius: 12,
       padding: [12, 16],
-      textStyle: { color: textColor, fontSize: 13 },
+      textStyle: { color: "#1f2937", fontSize: 14 },
       axisPointer: {
         type: "line",
-        lineStyle: { color: "rgba(100, 116, 139, 0.3)", type: "dashed", width: 1.5 },
+        lineStyle: { color: "rgba(0,0,0,0.1)", type: "dashed" },
       },
     },
     legend: {
       data: ["降水量 (mm)", "温度 (°C)"],
       top: 0,
-      right: 16,
-      itemWidth: 20,
-      itemHeight: 8,
-      itemGap: 24,
-      textStyle: { color: subTextColor, fontSize: 12 },
+      right: 10,
+      itemWidth: 16,
+      itemHeight: 6,
+      itemGap: 20,
+      textStyle: { color: "#6b7280", fontSize: 13 },
     },
     grid: {
       left: "6%",
-      right: "2%",
-      top: 10,
-      bottom: "20%",
-      containLabel: false,
+      right: "4%",
+      top: 40,
+      bottom: 30,
+      containLabel: true,
     },
     xAxis: {
       type: "category",
       boundaryGap: false,
       data: xData,
-      axisLine: { lineStyle: { color: gridLineColor, width: 1 } },
+      axisLine: { lineStyle: { color: "#e5e7eb", width: 1 } },
       axisTick: { show: false },
-      axisLabel: { color: subTextColor, fontSize: 11, margin: 8 },
+      axisLabel: { color: "#9ca3af", fontSize: 11 },
     },
     yAxis: [
       {
         type: "value",
         position: "left",
-        max: 60,
+        max: 18,
         min: 0,
-        nameTextStyle: { color: subTextColor, fontSize: 11 },
+        nameTextStyle: { color: "#9ca3af", fontSize: 11 },
         axisLine: { show: false },
         axisTick: { show: false },
         splitLine: { show: false },
@@ -116,45 +114,36 @@ const chartOption = computed(() => {
         max: (value: { max: number }) => Math.round(value.max + 5),
         min: 0,
         position: "right",
-        nameTextStyle: { color: subTextColor, fontSize: 11 },
+        nameTextStyle: { color: "#9ca3af", fontSize: 11 },
         axisLine: { show: false },
         axisTick: { show: false },
         splitLine: { show: false },
-        axisLabel: { color: subTextColor, fontSize: 11 },
+        axisLabel: { color: "#9ca3af", fontSize: 11 },
       },
     ],
+    visualMap: {
+      type: "piecewise",
+      show: false,
+      dimension: 0,
+      seriesIndex: 2,
+      pieces: [
+        {
+          gt: 20,
+          lt: 28,
+          color: "rgba(255, 112, 0, 0.86)",
+        },
+      ],
+    },
     series: [
       {
         name: "降水量 (mm)",
-        type: "line",
+        type: "bar",
         data: rainData,
         yAxisIndex: 0,
-        lineStyle: { width: 2.5, color: "#3b82f6" },
-        areaStyle: {
-          color: {
-            type: "linear",
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: "rgba(59, 130, 246, 0.25)" },
-              { offset: 0.5, color: "rgba(59, 130, 246, 0.1)" },
-              { offset: 1, color: "rgba(59, 130, 246, 0)" },
-            ],
-          },
-        },
-        smooth: 0.3,
-        symbol: "circle",
-        symbolSize: 0,
-        emphasis: {
-          itemStyle: {
-            color: "#3b82f6",
-            borderWidth: 3,
-            borderColor: "#fff",
-            shadowBlur: 12,
-            shadowColor: "rgba(59, 130, 246, 0.5)",
-          },
+        barMaxWidth: 12,
+        itemStyle: {
+          color: "#3b82f6",
+          borderRadius: [4, 4, 0, 0],
         },
         markLine: {
           silent: true,
@@ -162,19 +151,31 @@ const chartOption = computed(() => {
           lineStyle: { type: "dashed", width: 1 },
           data: [
             {
-              yAxis: 10,
+              yAxis: 0.5,
               lineStyle: { color: "#94a3b8" },
-              label: { formatter: "小雨", color: "#94a3b8", fontSize: 12, position: "start" },
+              label: {
+                formatter: "小雨",
+                color: "#94a3b8",
+                position: "start",
+              },
             },
             {
-              yAxis: 25,
+              yAxis: 8,
+              lineStyle: { color: "#3b82f6" },
+              label: {
+                formatter: "中雨",
+                color: "#3b82f6",
+                position: "start",
+              },
+            },
+            {
+              yAxis: 16,
               lineStyle: { color: "#f97316" },
-              label: { formatter: "中雨", color: "#f97316", fontSize: 12, position: "start" },
-            },
-            {
-              yAxis: 50,
-              lineStyle: { color: "#ef4444" },
-              label: { formatter: "大雨", color: "#ef4444", fontSize: 12, position: "start" },
+              label: {
+                formatter: "大雨",
+                color: "#f97316",
+                position: "start",
+              },
             },
           ],
         },
@@ -184,7 +185,6 @@ const chartOption = computed(() => {
         type: "line",
         data: tempData,
         yAxisIndex: 1,
-        itemStyle: { color: "#f97316" },
         lineStyle: { width: 2.5, color: "#f97316" },
         areaStyle: {
           color: {
@@ -194,24 +194,16 @@ const chartOption = computed(() => {
             x2: 0,
             y2: 1,
             colorStops: [
-              { offset: 0, color: "rgba(249, 115, 22, 0.2)" },
-              { offset: 0.5, color: "rgba(249, 115, 22, 0.08)" },
+              { offset: 0, color: "rgba(249, 115, 22, 0.1)" },
+              { offset: 0.7, color: "rgba(249, 115, 22, 0.05)" },
               { offset: 1, color: "rgba(249, 115, 22, 0)" },
             ],
           },
         },
-        smooth: 0.3,
-        symbol: "circle",
-        symbolSize: 0,
-        emphasis: {
-          itemStyle: {
-            color: "#f97316",
-            borderWidth: 3,
-            borderColor: "#fff",
-            shadowBlur: 12,
-            shadowColor: "rgba(249, 115, 22, 0.4)",
-          },
-        },
+        smooth: 0.2,
+        symbol: "none",
+        symbolSize: 6,
+        itemStyle: { color: "#f97316", borderWidth: 2, borderColor: "#fff" },
         markArea: {
           silent: true,
           data: [[{ yAxis: 20, itemStyle: { color: "rgba(250, 204, 21, 0.1)" } }, { yAxis: 28 }]],
