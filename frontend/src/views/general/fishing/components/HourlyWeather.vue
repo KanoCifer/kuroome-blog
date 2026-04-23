@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useFishingMapStore } from "@/stores/fishingMap";
 import dayjs from "dayjs";
-import { LineChart } from "echarts/charts";
+import { BarChart, LineChart } from "echarts/charts";
 import {
   GridComponent,
   LegendComponent,
@@ -23,8 +23,9 @@ use([
   LegendComponent,
   MarkLineComponent,
   MarkAreaComponent,
-  LineChart,
+  BarChart,
   SVGRenderer,
+  LineChart,
 ]);
 
 const fishingMapStore = useFishingMapStore();
@@ -121,19 +122,6 @@ const chartOption = computed(() => {
         axisLabel: { color: "#9ca3af", fontSize: 11 },
       },
     ],
-    visualMap: {
-      type: "piecewise",
-      show: false,
-      dimension: 0,
-      seriesIndex: 2,
-      pieces: [
-        {
-          gt: 20,
-          lt: 28,
-          color: "rgba(255, 112, 0, 0.86)",
-        },
-      ],
-    },
     series: [
       {
         name: "降水量 (mm)",
