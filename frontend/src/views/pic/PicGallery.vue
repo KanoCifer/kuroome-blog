@@ -4,7 +4,11 @@
     <div
       class="pointer-events-none absolute inset-0 z-0 opacity-40 dark:opacity-20"
       style="
-        background-image: radial-gradient(circle at 1px 1px, #9ca3af 1px, transparent 0);
+        background-image: radial-gradient(
+          circle at 1px 1px,
+          #9ca3af 1px,
+          transparent 0
+        );
         background-size: 32px 32px;
       "
     ></div>
@@ -21,7 +25,11 @@
             size="sm"
             @click="toggleEditMode"
             class="h-9 gap-2 rounded-full border-gray-200/60 px-4 shadow-sm transition-colors dark:border-gray-800"
-            :class="isEditMode ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' : ''"
+            :class="
+              isEditMode
+                ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                : ''
+            "
           >
             <component :is="isEditMode ? Check : Edit2" class="h-4 w-4" />
             {{ isEditMode ? "完成编辑" : "编辑模式" }}
@@ -55,15 +63,27 @@
     </header>
 
     <!-- Gallery Container -->
-    <div ref="galleryRef" class="relative z-10 mx-auto h-full w-full max-w-7xl px-4 pt-24 pb-40 sm:px-6 sm:pb-12">
+    <div
+      ref="galleryRef"
+      class="relative z-10 mx-auto h-full w-full max-w-7xl px-4 pt-24 pb-40 sm:px-6 sm:pb-12"
+    >
       <!-- Polaroid Cards -->
       <motion.div
         v-for="(image, index) in images"
         :key="image.id"
         class="absolute origin-center"
-        :class="isEditMode && canEdit ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'"
+        :class="
+          isEditMode && canEdit
+            ? 'cursor-grab active:cursor-grabbing'
+            : 'cursor-pointer'
+        "
         :style="getImageStyle(index)"
-        :initial="{ opacity: 0, scale: 0.8, rotate: getRandomRotation() - 10, y: 50 }"
+        :initial="{
+          opacity: 0,
+          scale: 0.8,
+          rotate: getRandomRotation() - 10,
+          y: 50,
+        }"
         :animate="{ opacity: 1, scale: 1, rotate: getRandomRotation(), y: 0 }"
         :transition="{
           duration: 0.8,
@@ -72,7 +92,11 @@
           stiffness: 260,
           damping: 20,
         }"
-        :whileHover="{ scale: 1.05, zIndex: 100, transition: { duration: 0.2 } }"
+        :whileHover="{
+          scale: 1.05,
+          zIndex: 100,
+          transition: { duration: 0.2 },
+        }"
         :whileDrag="
           isEditMode && canEdit
             ? {
@@ -84,7 +108,10 @@
               }
             : undefined
         "
-        :whileTap="{ scale: 1.05, cursor: isEditMode && canEdit ? 'grabbing' : 'pointer' }"
+        :whileTap="{
+          scale: 1.05,
+          cursor: isEditMode && canEdit ? 'grabbing' : 'pointer',
+        }"
         drag
         :drag-constraints="galleryRef!"
         :drag-elastic="0.2"
@@ -100,7 +127,9 @@
         >
           <div
             class="relative w-full overflow-hidden rounded-sm bg-gray-100 dark:bg-gray-900"
-            :style="{ height: `${getImageSize(index) * getAspectRation(index)}px` }"
+            :style="{
+              height: `${getImageSize(index) * getAspectRation(index)}px`,
+            }"
           >
             <img
               :src="image.url"
@@ -125,7 +154,10 @@
       </motion.div>
 
       <!-- Empty State -->
-      <div v-if="images.length === 0" class="flex h-[60vh] flex-col items-center justify-center">
+      <div
+        v-if="images.length === 0"
+        class="flex h-[60vh] flex-col items-center justify-center"
+      >
         <motion.div
           initial="{ opacity: 0, y: 20 }"
           animate="{ opacity: 1, y: 0 }"
@@ -137,11 +169,21 @@
           >
             <ImageOff class="h-10 w-10" stroke-width="1.5" />
           </div>
-          <h3 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">还没有图片</h3>
+          <h3
+            class="text-xl font-bold tracking-tight text-gray-900 dark:text-white"
+          >
+            还没有图片
+          </h3>
           <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
             你的图片墙就像一张白纸，点击上方按钮上传第一张照片吧
           </p>
-          <Button v-if="canEdit" class="mt-6 rounded-full px-8 shadow-sm" @click="openUploadModal"> 开始上传 </Button>
+          <Button
+            v-if="canEdit"
+            class="mt-6 rounded-full px-8 shadow-sm"
+            @click="openUploadModal"
+          >
+            开始上传
+          </Button>
         </motion.div>
       </div>
     </div>
@@ -155,7 +197,11 @@
           size="sm"
           @click="toggleEditMode"
           class="h-10 flex-1 gap-2 rounded-xl border-gray-200/70 px-3 shadow-sm dark:border-gray-700"
-          :class="isEditMode ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' : ''"
+          :class="
+            isEditMode
+              ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+              : ''
+          "
         >
           <component :is="isEditMode ? Check : Edit2" class="h-4 w-4" />
           {{ isEditMode ? "完成编辑" : "编辑模式" }}
@@ -229,7 +275,9 @@
             </div>
 
             <!-- Details Area -->
-            <div class="flex w-full flex-col bg-white/50 p-6 md:w-1/3 md:p-10 dark:bg-gray-900/50">
+            <div
+              class="flex w-full flex-col bg-white/50 p-6 md:w-1/3 md:p-10 dark:bg-gray-900/50"
+            >
               <div class="flex-1">
                 <div class="mb-8 hidden justify-end md:flex">
                   <button
@@ -240,14 +288,18 @@
                   </button>
                 </div>
 
-                <div class="mb-8 flex items-center text-sm font-medium text-gray-500 dark:text-gray-400">
+                <div
+                  class="mb-8 flex items-center text-sm font-medium text-gray-500 dark:text-gray-400"
+                >
                   <Calendar class="mr-1.5 h-4 w-4" />
                   {{ formatDate(selectedImage.uploadedAt) }}
                 </div>
 
                 <!-- Edit Description -->
                 <div v-if="canEdit && isEditMode" class="space-y-3">
-                  <label class="text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                  <label
+                    class="text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400"
+                  >
                     修改描述
                   </label>
                   <textarea
@@ -265,7 +317,11 @@
                       <Trash2 class="h-4 w-4" />
                       删除图片
                     </Button>
-                    <Button variant="secondary" class="rounded-full px-5 shadow-sm" @click="updateDescription">
+                    <Button
+                      variant="secondary"
+                      class="rounded-full px-5 shadow-sm"
+                      @click="updateDescription"
+                    >
                       保存修改
                     </Button>
                   </div>
@@ -325,8 +381,14 @@
               >
                 <UploadCloud class="h-6 w-6" />
               </div>
-              <h3 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">上传新图片</h3>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">添加到你的照片墙</p>
+              <h3
+                class="text-xl font-bold tracking-tight text-gray-900 dark:text-white"
+              >
+                上传新图片
+              </h3>
+              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                添加到你的照片墙
+              </p>
             </div>
 
             <!-- Upload Area -->
@@ -336,17 +398,31 @@
               @dragover.prevent="isDragging = true"
               @dragleave.prevent="isDragging = false"
               @drop.prevent="handleDrop"
-              :class="{ 'scale-[0.98] border-gray-900 bg-gray-50 dark:border-gray-100 dark:bg-white/5': isDragging }"
+              :class="{
+                'scale-[0.98] border-gray-900 bg-gray-50 dark:border-gray-100 dark:bg-white/5':
+                  isDragging,
+              }"
             >
-              <input ref="fileInputRef" type="file" accept="image/*" class="hidden" @change="handleFileSelect" />
+              <input
+                ref="fileInputRef"
+                type="file"
+                accept="image/*"
+                class="hidden"
+                @change="handleFileSelect"
+              />
 
               <!-- Preview -->
               <div v-if="previewUrl" class="relative w-full">
-                <img :src="previewUrl" alt="Preview" class="mx-auto max-h-48 rounded-xl object-contain shadow-md" />
+                <img
+                  :src="previewUrl"
+                  alt="Preview"
+                  class="mx-auto max-h-48 rounded-xl object-contain shadow-md"
+                />
                 <div
                   class="absolute inset-0 flex items-center justify-center rounded-xl bg-black/40 opacity-0 transition-opacity group-hover:opacity-100"
                 >
-                  <span class="rounded-full bg-black/40 px-3 py-1.5 text-sm font-medium text-white backdrop-blur-md"
+                  <span
+                    class="rounded-full bg-black/40 px-3 py-1.5 text-sm font-medium text-white backdrop-blur-md"
                     >更换图片</span
                   >
                 </div>
@@ -362,14 +438,20 @@
                     stroke-width="1.5"
                   />
                 </div>
-                <p class="text-sm font-medium text-gray-700 dark:text-gray-300">点击或拖拽图片到此处</p>
-                <p class="mt-2 text-xs text-gray-400 dark:text-gray-500">支持 JPG、PNG、GIF、WebP (最大 5MB)</p>
+                <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  点击或拖拽图片到此处
+                </p>
+                <p class="mt-2 text-xs text-gray-400 dark:text-gray-500">
+                  支持 JPG、PNG、GIF、WebP (最大 5MB)
+                </p>
               </div>
             </div>
 
             <!-- Description Input -->
             <div class="mt-6">
-              <label class="text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
+              <label
+                class="text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400"
+              >
                 照片描述（可选）
               </label>
               <input
@@ -382,7 +464,11 @@
 
             <!-- Actions -->
             <div class="mt-8 flex gap-3">
-              <Button variant="outline" class="flex-1 rounded-xl shadow-sm" @click="showUploadModal = false">
+              <Button
+                variant="outline"
+                class="flex-1 rounded-xl shadow-sm"
+                @click="showUploadModal = false"
+              >
                 取消
               </Button>
               <Button
@@ -439,7 +525,9 @@ const authStore = useAuthStore();
 const canEdit = computed(() => authStore.isAdmin);
 
 // Random layout seeds (cached per image index)
-const layoutSeeds = ref<Map<number, { x: number; y: number; rotation: number; zIndex: number }>>(new Map());
+const layoutSeeds = ref<
+  Map<number, { x: number; y: number; rotation: number; zIndex: number }>
+>(new Map());
 
 // Max z-index to bring dragging items to front
 const maxZIndex = ref(10);
@@ -708,7 +796,9 @@ const updateDescription = async () => {
   if (!ensureAdminPermission()) return;
   if (!selectedImage.value) return;
 
-  const index = images.value.findIndex((img) => img.id === selectedImage.value!.id);
+  const index = images.value.findIndex(
+    (img) => img.id === selectedImage.value!.id,
+  );
   if (index !== -1) {
     images.value[index].description = editDescription.value;
     selectedImage.value.description = editDescription.value;

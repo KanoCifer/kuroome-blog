@@ -1,5 +1,8 @@
 <template>
-  <BasicDetail title="RSS 工作台" subtitle="在一个页面里完成解析、订阅管理与文章阅读">
+  <BasicDetail
+    title="RSS 工作台"
+    subtitle="在一个页面里完成解析、订阅管理与文章阅读"
+  >
     <div class="col-span-full mx-auto w-full max-w-6xl space-y-8">
       <div class="flex flex-wrap items-center gap-3">
         <a
@@ -22,17 +25,30 @@
         </a>
       </div>
 
-      <section id="rss-parse" class="rounded-2xl border border-blue-100 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
+      <section
+        id="rss-parse"
+        class="rounded-2xl border border-blue-100 bg-white p-6 dark:border-slate-700 dark:bg-slate-800"
+      >
         <div class="mb-5 flex items-center justify-between gap-3">
           <div>
-            <h2 class="text-xl font-bold text-blue-900 dark:text-white">解析订阅地址</h2>
-            <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">支持 RSS/Atom，解析后可直接保存到我的订阅</p>
+            <h2 class="text-xl font-bold text-blue-900 dark:text-white">
+              解析订阅地址
+            </h2>
+            <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">
+              支持 RSS/Atom，解析后可直接保存到我的订阅
+            </p>
           </div>
         </div>
 
-        <form class="flex flex-col gap-4 lg:flex-row lg:items-end" @submit.prevent="parseRss">
+        <form
+          class="flex flex-col gap-4 lg:flex-row lg:items-end"
+          @submit.prevent="parseRss"
+        >
           <div class="flex-1">
-            <label for="rss-url" class="mb-2 block text-sm font-medium text-blue-800 dark:text-blue-200">
+            <label
+              for="rss-url"
+              class="mb-2 block text-sm font-medium text-blue-800 dark:text-blue-200"
+            >
               RSS/Atom 地址
             </label>
             <input
@@ -62,7 +78,9 @@
         </form>
 
         <div class="mt-4 flex flex-wrap items-center gap-2">
-          <span class="text-sm text-blue-600 dark:text-blue-400">快捷尝试:</span>
+          <span class="text-sm text-blue-600 dark:text-blue-400"
+            >快捷尝试:</span
+          >
           <button
             v-for="example in exampleFeeds"
             :key="example.url"
@@ -74,8 +92,13 @@
           </button>
         </div>
 
-        <div v-if="rssHistory.length > 0" class="mt-3 flex flex-wrap items-center gap-2">
-          <span class="text-sm text-blue-600 dark:text-blue-400">历史记录:</span>
+        <div
+          v-if="rssHistory.length > 0"
+          class="mt-3 flex flex-wrap items-center gap-2"
+        >
+          <span class="text-sm text-blue-600 dark:text-blue-400"
+            >历史记录:</span
+          >
           <button
             v-for="historyUrl in rssHistory.slice(0, 3)"
             :key="historyUrl"
@@ -87,13 +110,25 @@
           </button>
         </div>
 
-        <div v-if="parseMetadata" class="mt-6 rounded-xl border border-blue-100 bg-blue-50/40 p-5 dark:border-slate-700 dark:bg-slate-700/20">
-          <h3 class="text-lg font-bold text-blue-900 dark:text-white">{{ parseMetadata.title }}</h3>
-          <p v-if="parseMetadata.description" class="mt-2 text-sm text-blue-600 dark:text-blue-400">
+        <div
+          v-if="parseMetadata"
+          class="mt-6 rounded-xl border border-blue-100 bg-blue-50/40 p-5 dark:border-slate-700 dark:bg-slate-700/20"
+        >
+          <h3 class="text-lg font-bold text-blue-900 dark:text-white">
+            {{ parseMetadata.title }}
+          </h3>
+          <p
+            v-if="parseMetadata.description"
+            class="mt-2 text-sm text-blue-600 dark:text-blue-400"
+          >
             {{ parseMetadata.description }}
           </p>
-          <div class="mt-3 flex flex-wrap items-center gap-3 text-xs text-blue-500 dark:text-blue-400">
-            <span v-if="parseMetadata.published">更新时间: {{ formatDate(parseMetadata.published) }}</span>
+          <div
+            class="mt-3 flex flex-wrap items-center gap-3 text-xs text-blue-500 dark:text-blue-400"
+          >
+            <span v-if="parseMetadata.published"
+              >更新时间: {{ formatDate(parseMetadata.published) }}</span
+            >
             <a
               :href="parseMetadata.link"
               target="_blank"
@@ -106,7 +141,9 @@
         </div>
 
         <div v-if="parseEntries.length > 0" class="mt-5 space-y-3">
-          <div class="text-sm font-semibold text-blue-700 dark:text-blue-300">最新解析文章（{{ parseEntries.length }}）</div>
+          <div class="text-sm font-semibold text-blue-700 dark:text-blue-300">
+            最新解析文章（{{ parseEntries.length }}）
+          </div>
           <ul class="space-y-2">
             <li
               v-for="(entry, index) in parseEntries"
@@ -121,7 +158,10 @@
               >
                 {{ entry.title }}
               </a>
-              <p v-if="entry.summary" class="mt-2 line-clamp-2 text-sm text-blue-600 dark:text-blue-400">
+              <p
+                v-if="entry.summary"
+                class="mt-2 line-clamp-2 text-sm text-blue-600 dark:text-blue-400"
+              >
                 {{ truncateSummary(entry.summary) }}
               </p>
               <div class="mt-2 text-xs text-blue-500 dark:text-blue-400">
@@ -138,8 +178,12 @@
       >
         <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 class="text-xl font-bold text-blue-900 dark:text-white">我的订阅</h2>
-            <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">共 {{ subscriptions.length }} 个订阅源</p>
+            <h2 class="text-xl font-bold text-blue-900 dark:text-white">
+              我的订阅
+            </h2>
+            <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">
+              共 {{ subscriptions.length }} 个订阅源
+            </p>
           </div>
           <button
             type="button"
@@ -184,10 +228,14 @@
                 : 'border-blue-100 bg-white hover:border-blue-200 dark:bg-slate-800'
             "
           >
-            <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div
+              class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"
+            >
               <div class="min-w-0">
                 <div class="flex flex-wrap items-center gap-2">
-                  <h3 class="truncate text-base font-semibold text-blue-900 dark:text-white">
+                  <h3
+                    class="truncate text-base font-semibold text-blue-900 dark:text-white"
+                  >
                     {{ getSubscriptionTitle(subscription) }}
                   </h3>
                   <span
@@ -196,11 +244,22 @@
                     {{ getFeedProtocol(subscription.rss_url) }}
                   </span>
                 </div>
-                <p class="mt-1 break-all text-xs text-blue-500 dark:text-blue-400">{{ subscription.rss_url }}</p>
-                <div class="mt-2 flex flex-wrap items-center gap-3 text-xs text-blue-500 dark:text-blue-400">
+                <p
+                  class="mt-1 text-xs break-all text-blue-500 dark:text-blue-400"
+                >
+                  {{ subscription.rss_url }}
+                </p>
+                <div
+                  class="mt-2 flex flex-wrap items-center gap-3 text-xs text-blue-500 dark:text-blue-400"
+                >
                   <span>文章数: {{ subscription.entry_count ?? 0 }}</span>
-                  <span>最近抓取: {{ formatDate(subscription.last_fetched_at) }}</span>
-                  <span>创建时间: {{ formatDate(subscription.created_at) }}</span>
+                  <span
+                    >最近抓取:
+                    {{ formatDate(subscription.last_fetched_at) }}</span
+                  >
+                  <span
+                    >创建时间: {{ formatDate(subscription.created_at) }}</span
+                  >
                 </div>
               </div>
 
@@ -232,11 +291,18 @@
         </ul>
       </section>
 
-      <section id="rss-articles" class="rounded-2xl border border-blue-100 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
+      <section
+        id="rss-articles"
+        class="rounded-2xl border border-blue-100 bg-white p-6 dark:border-slate-700 dark:bg-slate-800"
+      >
         <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 class="text-xl font-bold text-blue-900 dark:text-white">文章列表</h2>
-            <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">搜索与分页阅读已保存文章</p>
+            <h2 class="text-xl font-bold text-blue-900 dark:text-white">
+              文章列表
+            </h2>
+            <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">
+              搜索与分页阅读已保存文章
+            </p>
           </div>
           <button
             type="button"
@@ -278,7 +344,9 @@
         </div>
 
         <div v-if="selectedFeedUrl" class="mb-4 flex items-center gap-2">
-          <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+          <span
+            class="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+          >
             当前来源: {{ selectedFeedUrl }}
           </span>
           <button
@@ -338,10 +406,15 @@
                     {{ article.is_read ? "已读" : "未读" }}
                   </span>
                 </div>
-                <p v-if="article.summary" class="line-clamp-2 text-sm text-blue-600 dark:text-blue-400">
+                <p
+                  v-if="article.summary"
+                  class="line-clamp-2 text-sm text-blue-600 dark:text-blue-400"
+                >
                   {{ article.summary }}
                 </p>
-                <div class="flex flex-wrap items-center gap-3 text-xs text-blue-500 dark:text-blue-400">
+                <div
+                  class="flex flex-wrap items-center gap-3 text-xs text-blue-500 dark:text-blue-400"
+                >
                   <span v-if="article.author">作者: {{ article.author }}</span>
                   <span>发布时间: {{ formatDate(article.published) }}</span>
                   <span class="truncate">来源: {{ article.feed_url }}</span>
@@ -358,7 +431,10 @@
             </li>
           </ul>
 
-          <nav v-if="totalPages > 1" class="mt-6 flex items-center justify-center gap-3">
+          <nav
+            v-if="totalPages > 1"
+            class="mt-6 flex items-center justify-center gap-3"
+          >
             <button
               type="button"
               :disabled="currentPage <= 1"
@@ -662,7 +738,8 @@ const fetchArticles = async (page = 1): Promise<void> => {
     currentPage.value = response.page;
   } catch (error: unknown) {
     console.error("fetch articles error:", error);
-    articlesError.value = error instanceof Error ? error.message : "加载文章失败";
+    articlesError.value =
+      error instanceof Error ? error.message : "加载文章失败";
     notifier.error(articlesError.value);
   } finally {
     articlesLoading.value = false;
@@ -759,9 +836,8 @@ onMounted(async () => {
     typeof route.query.page === "string"
       ? Number.parseInt(route.query.page, 10)
       : 1;
-  const initialPage = Number.isNaN(pageFromQuery) || pageFromQuery < 1
-    ? 1
-    : pageFromQuery;
+  const initialPage =
+    Number.isNaN(pageFromQuery) || pageFromQuery < 1 ? 1 : pageFromQuery;
 
   await Promise.all([fetchSubscriptions(), fetchArticles(initialPage)]);
 });

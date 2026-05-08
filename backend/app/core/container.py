@@ -11,6 +11,7 @@ from app.repositories import (
     BlogRepo,
     BookRepo,
     FishingRepo,
+    GalleryRepo,
     MessageRepo,
     MonitorRepo,
     PublicRepo,
@@ -86,9 +87,11 @@ async def get_monitor_service(redis: AsyncRedis):
 
 @asynccontextmanager
 async def get_public_service(mongodb: AsyncDatabase):
-    public_repo = PublicRepo(mongodb=mongodb)
-    service = PublicService(repo=public_repo)
-    yield service
+    async with get_async_session() as session:
+        public_repo = PublicRepo(mongodb=mongodb)
+        gallery_repo = GalleryRepo(session)
+        service = PublicService(repo=public_repo, gallery_repo=gallery_repo)
+        yield service
 
 
 @asynccontextmanager

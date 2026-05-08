@@ -88,7 +88,10 @@ const openImageEditor = (payload: {
 };
 
 const closeImageEditor = () => {
-  if (editingImageFile.value && editingImageUrl.value !== editingOriginalUrl.value) {
+  if (
+    editingImageFile.value &&
+    editingImageUrl.value !== editingOriginalUrl.value
+  ) {
     revokeObjectUrl(editingImageUrl.value);
   }
   isImageEditorOpen.value = false;
@@ -115,7 +118,10 @@ const handlePreviewClick = (event: MouseEvent) => {
     : img.classList.contains("md-img-right")
       ? "right"
       : "center";
-  const align = alignAttr === "left" || alignAttr === "center" || alignAttr === "right" ? alignAttr : alignFromClass;
+  const align =
+    alignAttr === "left" || alignAttr === "center" || alignAttr === "right"
+      ? alignAttr
+      : alignFromClass;
 
   openImageEditor({
     id,
@@ -169,16 +175,26 @@ onBeforeUnmount(() => {
 
 <template>
   <BasicDetail title="Markdown 编辑器" subtitle="实时预览">
-    <div class="col-span-full h-175 overflow-hidden rounded-2xl bg-white shadow-lg dark:bg-slate-900">
-      <div class="col-span-full h-175 overflow-hidden rounded-2xl bg-white shadow-lg dark:bg-slate-900">
+    <div
+      class="col-span-full h-175 overflow-hidden rounded-2xl bg-white shadow-lg dark:bg-slate-900"
+    >
+      <div
+        class="col-span-full h-175 overflow-hidden rounded-2xl bg-white shadow-lg dark:bg-slate-900"
+      >
         <div class="flex h-full w-full flex-col md:flex-row">
           <!-- Left Column: Editor -->
           <div
             class="flex h-1/2 w-full flex-col border-b border-slate-200 md:h-full md:w-1/2 md:border-r md:border-b-0 dark:border-slate-800"
           >
-            <div class="flex h-12 shrink-0 items-center border-b border-slate-200 px-4 dark:border-slate-800">
+            <div
+              class="flex h-12 shrink-0 items-center border-b border-slate-200 px-4 dark:border-slate-800"
+            >
               <div class="flex w-full items-center justify-between">
-                <h1 class="text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400">MARKDOWN</h1>
+                <h1
+                  class="text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400"
+                >
+                  MARKDOWN
+                </h1>
                 <div class="flex items-center gap-2">
                   <input
                     ref="fileInputRef"
@@ -207,11 +223,19 @@ onBeforeUnmount(() => {
 
           <!-- Right Column: Preview -->
           <div class="flex h-1/2 w-full flex-col md:h-full md:w-1/2">
-            <div class="flex h-12 shrink-0 items-center border-b border-slate-200 px-4 dark:border-slate-800">
-              <h2 class="text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400">PREVIEW</h2>
+            <div
+              class="flex h-12 shrink-0 items-center border-b border-slate-200 px-4 dark:border-slate-800"
+            >
+              <h2
+                class="text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400"
+              >
+                PREVIEW
+              </h2>
             </div>
             <!-- Use Tailwind Typography plugin (prose) for styling the markdown output -->
-            <div class="prose prose-slate dark:prose-invert max-w-none flex-1 overflow-y-auto p-6">
+            <div
+              class="prose prose-slate dark:prose-invert max-w-none flex-1 overflow-y-auto p-6"
+            >
               <div v-html="renderedMarkdown" @click="handlePreviewClick"></div>
             </div>
           </div>
@@ -233,9 +257,17 @@ onBeforeUnmount(() => {
           class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
           @click.self="closeImageEditor"
         >
-          <div class="w-full max-w-3xl rounded-3xl bg-white shadow-2xl dark:bg-slate-900">
-            <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4 dark:border-slate-800">
-              <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100">编辑图片</h3>
+          <div
+            class="w-full max-w-3xl rounded-3xl bg-white shadow-2xl dark:bg-slate-900"
+          >
+            <div
+              class="flex items-center justify-between border-b border-slate-200 px-6 py-4 dark:border-slate-800"
+            >
+              <h3
+                class="text-base font-semibold text-slate-800 dark:text-slate-100"
+              >
+                编辑图片
+              </h3>
               <button
                 type="button"
                 class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
@@ -247,7 +279,9 @@ onBeforeUnmount(() => {
 
             <div class="grid gap-6 p-6 md:grid-cols-2">
               <div class="flex h-full flex-col gap-3">
-                <div class="flex-1 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
+                <div
+                  class="flex-1 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800"
+                >
                   <img
                     :src="editingImageUrl"
                     :alt="editingImageAlt"
@@ -280,7 +314,10 @@ onBeforeUnmount(() => {
               </div>
 
               <div class="flex flex-col gap-4">
-                <label class="text-xs font-semibold text-slate-500 dark:text-slate-400">Alt 文本</label>
+                <label
+                  class="text-xs font-semibold text-slate-500 dark:text-slate-400"
+                  >Alt 文本</label
+                >
                 <input
                   v-model="editingImageAlt"
                   type="text"
@@ -288,7 +325,10 @@ onBeforeUnmount(() => {
                   placeholder="图片说明"
                 />
 
-                <label class="text-xs font-semibold text-slate-500 dark:text-slate-400">标题</label>
+                <label
+                  class="text-xs font-semibold text-slate-500 dark:text-slate-400"
+                  >标题</label
+                >
                 <input
                   v-model="editingImageTitle"
                   type="text"
@@ -298,7 +338,10 @@ onBeforeUnmount(() => {
 
                 <div class="grid grid-cols-2 gap-3">
                   <div class="flex flex-col gap-2">
-                    <label class="text-xs font-semibold text-slate-500 dark:text-slate-400">宽度</label>
+                    <label
+                      class="text-xs font-semibold text-slate-500 dark:text-slate-400"
+                      >宽度</label
+                    >
                     <input
                       v-model="editingImageWidth"
                       type="number"
@@ -308,7 +351,10 @@ onBeforeUnmount(() => {
                     />
                   </div>
                   <div class="flex flex-col gap-2">
-                    <label class="text-xs font-semibold text-slate-500 dark:text-slate-400">高度</label>
+                    <label
+                      class="text-xs font-semibold text-slate-500 dark:text-slate-400"
+                      >高度</label
+                    >
                     <input
                       v-model="editingImageHeight"
                       type="number"
@@ -320,7 +366,10 @@ onBeforeUnmount(() => {
                 </div>
 
                 <div class="flex flex-col gap-2">
-                  <label class="text-xs font-semibold text-slate-500 dark:text-slate-400">对齐</label>
+                  <label
+                    class="text-xs font-semibold text-slate-500 dark:text-slate-400"
+                    >对齐</label
+                  >
                   <div class="flex items-center gap-2">
                     <button
                       type="button"
@@ -363,7 +412,9 @@ onBeforeUnmount(() => {
               </div>
             </div>
 
-            <div class="flex items-center justify-end gap-2 border-t border-slate-200 px-6 py-4 dark:border-slate-800">
+            <div
+              class="flex items-center justify-end gap-2 border-t border-slate-200 px-6 py-4 dark:border-slate-800"
+            >
               <button
                 type="button"
                 class="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"

@@ -15,7 +15,11 @@
             stroke="currentColor"
             class="h-4 w-4"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+            />
           </svg>
           返回Rss解析
         </button>
@@ -30,7 +34,9 @@
       <!-- 搜索框 -->
       <div class="mb-6">
         <div class="relative">
-          <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+          <div
+            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -66,7 +72,11 @@
               stroke="currentColor"
               class="h-5 w-5"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -90,7 +100,9 @@
         v-else-if="errorMessage"
         class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-red-200 bg-red-50 py-16 text-center dark:border-red-800 dark:bg-red-900/20"
       >
-        <p class="text-lg font-medium text-red-600 dark:text-red-400">加载失败</p>
+        <p class="text-lg font-medium text-red-600 dark:text-red-400">
+          加载失败
+        </p>
         <p class="mt-1 text-sm text-red-500">{{ errorMessage }}</p>
         <button
           class="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none"
@@ -131,18 +143,28 @@
                 </span>
               </div>
 
-              <div class="mt-1 flex flex-wrap items-center gap-3 text-xs text-blue-500 dark:text-blue-400">
-                <span v-if="article.author" class="font-medium">{{ article.author }}</span>
+              <div
+                class="mt-1 flex flex-wrap items-center gap-3 text-xs text-blue-500 dark:text-blue-400"
+              >
+                <span v-if="article.author" class="font-medium">{{
+                  article.author
+                }}</span>
                 <span v-if="article.published" class="flex items-center gap-1">
                   {{ formatDate(article.published) }}
                 </span>
-                <span class="max-w-50 truncate opacity-75 sm:max-w-xs" :title="article.feed_url">
+                <span
+                  class="max-w-50 truncate opacity-75 sm:max-w-xs"
+                  :title="article.feed_url"
+                >
                   来源: {{ article.feed_url }}
                 </span>
               </div>
 
               <!-- 摘要 -->
-              <p v-if="article.summary" class="mt-3 line-clamp-2 text-sm text-blue-600 dark:text-blue-400">
+              <p
+                v-if="article.summary"
+                class="mt-3 line-clamp-2 text-sm text-blue-600 dark:text-blue-400"
+              >
                 {{ article.summary }}
               </p>
             </div>
@@ -166,7 +188,9 @@
                 上一页
               </button>
             </li>
-            <li class="px-2 text-sm font-medium text-blue-700 dark:text-blue-300">
+            <li
+              class="px-2 text-sm font-medium text-blue-700 dark:text-blue-300"
+            >
               第 {{ currentPage }} 页 / 共 {{ totalPages }} 页
             </li>
             <li>
@@ -231,7 +255,8 @@ const fetchArticles = async (page: number) => {
     const res = await rssService.getArticles({
       page: Number(params.page) || 1,
       limit: Number(params.limit) || 20,
-      feed_url: typeof params.feed_url === "string" ? params.feed_url : undefined,
+      feed_url:
+        typeof params.feed_url === "string" ? params.feed_url : undefined,
       search: typeof params.search === "string" ? params.search : undefined,
     });
     articles.value = res.items;
@@ -239,7 +264,10 @@ const fetchArticles = async (page: number) => {
     currentPage.value = res.page;
   } catch (err: unknown) {
     console.error(err);
-    errorMessage.value = err instanceof Error ? err.message : String(err) || "加载文章列表失败，请稍后重试。";
+    errorMessage.value =
+      err instanceof Error
+        ? err.message
+        : String(err) || "加载文章列表失败，请稍后重试。";
     notifier.error(errorMessage.value);
   } finally {
     isLoading.value = false;

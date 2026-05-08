@@ -48,14 +48,22 @@ const getTypeClass = (type: string): string => {
 </script>
 
 <template>
-  <div id="changelogView" class="my-12 flex min-h-full w-full flex-col items-center justify-center py-12">
+  <div
+    id="changelogView"
+    class="my-12 flex min-h-full w-full flex-col items-center justify-center py-12"
+  >
     <div class="w-full max-w-6xl px-4">
       <!-- Header Section -->
       <div class="mb-16 text-center">
         <div
           class="mb-6 inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
         >
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -65,8 +73,14 @@ const getTypeClass = (type: string): string => {
           </svg>
           版本更新记录
         </div>
-        <h1 class="mb-4 text-5xl font-bold tracking-tight text-gray-800 md:text-6xl dark:text-gray-100">变更日志</h1>
-        <p class="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-400">记录网站的每一次成长与进步</p>
+        <h1
+          class="mb-4 text-5xl font-bold tracking-tight text-gray-800 md:text-6xl dark:text-gray-100"
+        >
+          变更日志
+        </h1>
+        <p class="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-400">
+          记录网站的每一次成长与进步
+        </p>
       </div>
 
       <!-- Timeline -->
@@ -92,7 +106,10 @@ const getTypeClass = (type: string): string => {
             }"
             v-for="(r, i) in changelog"
             :key="r.version"
-            :class="['relative flex items-center', i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse']"
+            :class="[
+              'relative flex items-center',
+              i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse',
+            ]"
           >
             <!-- Content Card -->
             <div class="-mx-8 w-full md:w-1/2">
@@ -104,7 +121,12 @@ const getTypeClass = (type: string): string => {
                   <span
                     class="inline-flex items-center gap-2 rounded-full bg-linear-to-r from-blue-500 to-cyan-500 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-blue-500/25"
                   >
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -114,8 +136,15 @@ const getTypeClass = (type: string): string => {
                     </svg>
                     v{{ r.version }}
                   </span>
-                  <span class="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <span
+                    class="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400"
+                  >
+                    <svg
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -128,20 +157,28 @@ const getTypeClass = (type: string): string => {
                 </div>
 
                 <!-- Release Title -->
-                <h2 class="mb-4 text-2xl font-bold text-gray-800 dark:text-gray-100">
+                <h2
+                  class="mb-4 text-2xl font-bold text-gray-800 dark:text-gray-100"
+                >
                   {{ r.title }}
                 </h2>
 
                 <!-- Changes List -->
                 <ul class="space-y-3">
-                  <li v-for="(change, i) in r.changes" :key="i" class="flex items-start gap-3">
+                  <li
+                    v-for="(change, i) in r.changes"
+                    :key="i"
+                    class="flex items-start gap-3"
+                  >
                     <span
                       :class="[
                         'mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold tracking-wide uppercase transition-all duration-200',
                         getTypeClass(change.type),
                       ]"
                     >
-                      <span v-if="getTypeIcon(change.type)">{{ getTypeIcon(change.type) }}</span>
+                      <span v-if="getTypeIcon(change.type)">{{
+                        getTypeIcon(change.type)
+                      }}</span>
                       {{ getTypeLabel(change.type) }}
                     </span>
                     <span class="text-gray-700 dark:text-gray-300">
@@ -153,7 +190,9 @@ const getTypeClass = (type: string): string => {
             </div>
 
             <!-- Timeline Dot -->
-            <div class="absolute top-1/2 left-1/2 z-10 hidden h-8 w-8 -translate-x-1/2 -translate-y-1/2 md:block">
+            <div
+              class="absolute top-1/2 left-1/2 z-10 hidden h-8 w-8 -translate-x-1/2 -translate-y-1/2 md:block"
+            >
               <div
                 class="absolute inset-0 -m-2 rounded-full bg-blue-500 opacity-30 blur-md transition-all duration-300 group-hover:opacity-50 group-hover:blur-lg"
               ></div>
@@ -165,7 +204,9 @@ const getTypeClass = (type: string): string => {
             </div>
 
             <!-- Mobile Timeline Dot -->
-            <div class="absolute top-6 left-0 z-10 h-6 w-6 -translate-x-1/2 md:hidden">
+            <div
+              class="absolute top-6 left-0 z-10 h-6 w-6 -translate-x-1/2 md:hidden"
+            >
               <div
                 class="relative flex h-full w-full items-center justify-center rounded-full bg-white ring-3 ring-blue-100 dark:bg-gray-800 dark:ring-gray-700"
               >

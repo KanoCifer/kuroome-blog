@@ -3,7 +3,9 @@
     <div
       class="rounded-3xl bg-white/80 p-6 shadow-md dark:border dark:border-gray-700/50 dark:bg-gray-900/80 dark:shadow-none"
     >
-      <h3 class="mb-4 flex items-center gap-2 font-serif text-lg font-semibold text-gray-800 italic dark:text-white">
+      <h3
+        class="mb-4 flex items-center gap-2 font-serif text-lg font-semibold text-gray-800 italic dark:text-white"
+      >
         <IconTags class="size-5!"></IconTags>
         Tags
       </h3>

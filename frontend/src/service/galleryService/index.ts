@@ -1,7 +1,14 @@
 import { galleryGateway } from "@/api/galleryGateway";
 
 export interface GalleryService {
-  getGallery(): Promise<{ images: Array<{ id: string; url: string; description: string; uploadedAt?: string }> }>;
+  getGallery(): Promise<{
+    images: Array<{
+      id: string;
+      url: string;
+      description: string;
+      uploadedAt?: string;
+    }>;
+  }>;
   uploadGalleryImage(formData: FormData): Promise<{ url: string }>;
   saveGallery(payload: {
     images: Array<{

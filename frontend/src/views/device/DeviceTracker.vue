@@ -1,6 +1,9 @@
 <template>
   <BasicDetail title="设备管理" subtitle="追踪你的电子设备资产与价格">
-    <div id="device-tracker-content" class="col-span-full mx-auto w-full max-w-6xl space-y-8">
+    <div
+      id="device-tracker-content"
+      class="col-span-full mx-auto w-full max-w-6xl space-y-8"
+    >
       <!-- Summary Cards Section -->
       <DeviceSummary :devices="devices" />
 
@@ -18,14 +21,20 @@
             stroke="currentColor"
             class="h-5 w-5"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 4.5v15m7.5-7.5h-15"
+            />
           </svg>
           添加设备
         </button>
       </div>
 
       <!-- Analytics Buttons -->
-      <div class="mx-auto flex w-full max-w-md items-center justify-center gap-4">
+      <div
+        class="mx-auto flex w-full max-w-md items-center justify-center gap-4"
+      >
         <button
           type="button"
           @click="isPriceAnalyticsOpen = true"
@@ -71,7 +80,10 @@
       </div>
 
       <!-- Loading State -->
-      <div v-if="isLoading" class="col-span-full grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div
+        v-if="isLoading"
+        class="col-span-full grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+      >
         <div
           v-for="i in 3"
           :key="i"
@@ -92,7 +104,12 @@
         v-else-if="error"
         class="col-span-full flex flex-col items-center justify-center rounded-xl border border-red-200 bg-red-50 p-8 text-center dark:border-red-800 dark:bg-red-900/20"
       >
-        <svg class="h-12 w-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg
+          class="h-12 w-12 text-red-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -117,7 +134,12 @@
         v-else-if="devices.length === 0"
         class="col-span-full flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-white p-12 text-center shadow-lg dark:border-white/10 dark:bg-slate-800/70"
       >
-        <svg class="h-16 w-16 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg
+          class="h-16 w-16 text-slate-300 dark:text-slate-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -125,8 +147,12 @@
             d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
           />
         </svg>
-        <p class="mt-4 text-lg font-medium text-slate-500 dark:text-slate-400">暂无设备</p>
-        <p class="mt-1 text-sm text-slate-400 dark:text-slate-500">点击上方按钮添加你的第一个设备</p>
+        <p class="mt-4 text-lg font-medium text-slate-500 dark:text-slate-400">
+          暂无设备
+        </p>
+        <p class="mt-1 text-sm text-slate-400 dark:text-slate-500">
+          点击上方按钮添加你的第一个设备
+        </p>
       </div>
 
       <!-- Device List -->
@@ -193,7 +219,10 @@ async function fetchDevices() {
     const data = await deviceService.getUserDevices();
     devices.value = data;
   } catch (fetchError) {
-    error.value = fetchError instanceof Error ? fetchError.message : "设备列表加载失败，请稍后重试。";
+    error.value =
+      fetchError instanceof Error
+        ? fetchError.message
+        : "设备列表加载失败，请稍后重试。";
     notificationStore.error(error.value);
   } finally {
     isLoading.value = false;
@@ -205,10 +234,16 @@ async function handleToggleStatus(device: Device) {
   pendingId.value = device.id;
   try {
     await deviceService.updateDeviceStatus(device.id, nextStatus);
-    notificationStore.success(nextStatus === "retired" ? "设备已标记为退役" : "设备已恢复使用");
+    notificationStore.success(
+      nextStatus === "retired" ? "设备已标记为退役" : "设备已恢复使用",
+    );
     await fetchDevices();
   } catch (updateError) {
-    notificationStore.error(updateError instanceof Error ? updateError.message : "状态更新失败，请重试。");
+    notificationStore.error(
+      updateError instanceof Error
+        ? updateError.message
+        : "状态更新失败，请重试。",
+    );
   } finally {
     pendingId.value = null;
   }
@@ -224,7 +259,9 @@ async function handleDeleteDevice(device: Device) {
     devices.value = devices.value.filter((item) => item.id !== device.id);
     notificationStore.success("设备已删除");
   } catch (deleteError) {
-    notificationStore.error(deleteError instanceof Error ? deleteError.message : "删除失败，请重试。");
+    notificationStore.error(
+      deleteError instanceof Error ? deleteError.message : "删除失败，请重试。",
+    );
   } finally {
     pendingId.value = null;
   }

@@ -34,11 +34,18 @@ const chatInput = ref<string>("");
 const sessionId = ref<string>("");
 const messagesContainer = ref<HTMLElement | null>(null);
 
-const pureContent = computed(() => props.content.replaceAll(/<[^>]+>/g, "").trim());
+const pureContent = computed(() =>
+  props.content.replaceAll(/<[^>]+>/g, "").trim(),
+);
 
-const canSummarize = computed(() => pureContent.value.length > 0 && !loading.value);
+const canSummarize = computed(
+  () => pureContent.value.length > 0 && !loading.value,
+);
 
-const canChat = computed(() => hasGenerated.value && chatInput.value.trim().length > 0 && !loading.value);
+const canChat = computed(
+  () =>
+    hasGenerated.value && chatInput.value.trim().length > 0 && !loading.value,
+);
 
 /** 生成对话会话 ID（新对话或清空时使用） */
 function generateSessionId() {
@@ -180,7 +187,8 @@ async function generateSummaryStream() {
       }
     }
   } catch (error: unknown) {
-    errorMessage.value = error instanceof Error ? error.message : "AI总结失败，请稍后重试";
+    errorMessage.value =
+      error instanceof Error ? error.message : "AI总结失败，请稍后重试";
     notifier.error(errorMessage.value);
   } finally {
     loading.value = false;
@@ -205,7 +213,8 @@ async function sendChatMessage() {
   errorMessage.value = "";
 
   const assistantIdx = messages.value.length - 1;
-  const isFirstMessage = messages.value.filter((m) => m.role === "user").length === 1;
+  const isFirstMessage =
+    messages.value.filter((m) => m.role === "user").length === 1;
 
   try {
     const body: Record<string, string> = {
@@ -308,7 +317,11 @@ function clearChat() {
   sessionId.value = generateSessionId();
 }
 
-const textShimmer = ref<string[]>(["正在分析文章结构...", "正在提取关键信息...", "正在生成总结内容..."]);
+const textShimmer = ref<string[]>([
+  "正在分析文章结构...",
+  "正在提取关键信息...",
+  "正在生成总结内容...",
+]);
 let textShimmerInterval: ReturnType<typeof setInterval> | null = null;
 
 watch(
@@ -385,9 +398,25 @@ onUnmounted(() => {
           :disabled="!canSummarize"
           @click="onGenerate"
         >
-          <svg v-if="loading" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          <svg
+            v-if="loading"
+            class="h-4 w-4 animate-spin"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            />
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+            />
           </svg>
           {{ loading ? "总结中..." : hasGenerated ? "重新总结" : "生成总结" }}
         </button>
@@ -408,19 +437,36 @@ onUnmounted(() => {
 
     <template v-if="cardMode === CardMode.SUMMARY">
       <Transition name="summary-fade" mode="out-in">
-        <p v-if="summary" key="result" class="text-sm leading-7 whitespace-pre-line text-slate-700 dark:text-slate-200">
-          {{ summary }}<span v-if="loading" class="animate-breathe ml-0.5">|</span>
+        <p
+          v-if="summary"
+          key="result"
+          class="text-sm leading-7 whitespace-pre-line text-slate-700 dark:text-slate-200"
+        >
+          {{ summary
+          }}<span v-if="loading" class="animate-breathe ml-0.5">|</span>
         </p>
-        <p v-else key="placeholder" class="text-sm text-slate-500 dark:text-slate-400">
+        <p
+          v-else
+          key="placeholder"
+          class="text-sm text-slate-500 dark:text-slate-400"
+        >
           点击"生成总结"，快速提炼当前文章重点。
         </p>
       </Transition>
     </template>
 
     <template v-else>
-      <div v-if="!hasGenerated" class="text-sm text-slate-500 dark:text-slate-400">请先生成文章总结，再开始对话。</div>
+      <div
+        v-if="!hasGenerated"
+        class="text-sm text-slate-500 dark:text-slate-400"
+      >
+        请先生成文章总结，再开始对话。
+      </div>
       <template v-else>
-        <div ref="messagesContainer" class="mb-1 max-h-80 space-y-3 overflow-y-auto pr-1">
+        <div
+          ref="messagesContainer"
+          class="mb-1 max-h-80 space-y-3 overflow-y-auto pr-1"
+        >
           <div
             v-for="(msg, idx) in messages"
             :key="idx"
@@ -438,7 +484,11 @@ onUnmounted(() => {
               <template v-if="msg.content">
                 {{ msg.content
                 }}<span
-                  v-if="loading && idx === messages.length - 1 && msg.role === 'assistant'"
+                  v-if="
+                    loading &&
+                    idx === messages.length - 1 &&
+                    msg.role === 'assistant'
+                  "
                   class="animate-breathe ml-0.5"
                   >|</span
                 >
@@ -464,12 +514,39 @@ onUnmounted(() => {
             :disabled="!canChat"
             @click="onSendChat"
           >
-            <svg v-if="loading" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            <svg
+              v-if="loading"
+              class="h-4 w-4 animate-spin"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              />
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+              />
             </svg>
-            <svg v-else class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+            <svg
+              v-else
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M5 12h14M12 5l7 7-7 7"
+              />
             </svg>
           </button>
         </div>

@@ -60,7 +60,11 @@ const AI_MODELS = [
   { id: "Ring-2.5-1T", name: "Ring 2.5" },
 ];
 
-const textShimmer = ref<string[]>(["正在整理天气变化...", "正在评估体感与风况...", "正在结合潮汐节奏..."]);
+const textShimmer = ref<string[]>([
+  "正在整理天气变化...",
+  "正在评估体感与风况...",
+  "正在结合潮汐节奏...",
+]);
 
 const selectedModel = ref(AI_MODELS[0].id);
 
@@ -96,14 +100,19 @@ const renderedSummary = computed(() => {
 const lastAutoFingerprint = ref<string>("");
 
 const normalizedData = computed<WeatherAnalysisPayload | null>(() => {
-  if (!props.weather_data || typeof props.weather_data !== "object") return null;
+  if (!props.weather_data || typeof props.weather_data !== "object")
+    return null;
   return props.weather_data;
 });
 
 const hasInputData = computed(() => {
   const data = normalizedData.value;
   if (!data) return false;
-  return Boolean(data.liveWeather || (data.forecasts && data.forecasts.length > 0) || data.tideData);
+  return Boolean(
+    data.liveWeather ||
+    (data.forecasts && data.forecasts.length > 0) ||
+    data.tideData,
+  );
 });
 
 const payload = computed(() => {
@@ -133,7 +142,8 @@ const statusLabel = computed(() => {
 const statusClass = computed(() => {
   if (loading.value) return "bg-blue-500/15 text-blue-700 dark:text-blue-200";
   if (errorMessage.value) return "bg-red-500/15 text-red-600 dark:text-red-300";
-  if (hasGenerated.value) return "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300";
+  if (hasGenerated.value)
+    return "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300";
   return "bg-gray-500/10 text-gray-600 dark:text-gray-300";
 });
 
@@ -171,7 +181,8 @@ const _doFetch = async () => {
       signal: abortController.signal,
     });
 
-    if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    if (!response.ok)
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
 
     const reader = response.body?.getReader();
     if (!reader) throw new Error("无法获取响应体");
@@ -206,7 +217,8 @@ const _doFetch = async () => {
     if (summary.value && !hasGenerated.value) hasGenerated.value = true;
   } catch (error: unknown) {
     if (error instanceof DOMException && error.name === "AbortError") return;
-    errorMessage.value = error instanceof Error ? error.message : "AI 分析失败，请稍后重试";
+    errorMessage.value =
+      error instanceof Error ? error.message : "AI 分析失败，请稍后重试";
     notifier.error(errorMessage.value);
   } finally {
     loading.value = false;
@@ -273,11 +285,20 @@ onUnmounted(() => {
 
     <div class="relative z-10 flex items-start justify-between gap-4">
       <div>
-        <h3 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">AI 天气分析</h3>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">结合实时天气与潮汐节奏给出出行建议</p>
+        <h3
+          class="text-lg font-bold tracking-tight text-gray-900 dark:text-white"
+        >
+          AI 天气分析
+        </h3>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          结合实时天气与潮汐节奏给出出行建议
+        </p>
       </div>
       <div class="mr-5 flex flex-col items-end gap-2">
-        <span class="rounded-full px-2.5 py-1 text-xs font-medium" :class="statusClass">
+        <span
+          class="rounded-full px-2.5 py-1 text-xs font-medium"
+          :class="statusClass"
+        >
           {{ statusLabel }}
         </span>
         <!-- 模型选择器 -->
@@ -297,7 +318,14 @@ onUnmounted(() => {
           @click="cancelAnalysis"
         >
           <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
-            <rect x="6" y="6" width="12" height="12" rx="1" fill="currentColor" />
+            <rect
+              x="6"
+              y="6"
+              width="12"
+              height="12"
+              rx="1"
+              fill="currentColor"
+            />
           </svg>
           取消分析
         </button>
@@ -312,8 +340,13 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div v-if="!hasInputData" class="relative z-10 mt-6 flex flex-1 flex-col items-center justify-center text-center">
-      <div class="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800">
+    <div
+      v-if="!hasInputData"
+      class="relative z-10 mt-6 flex flex-1 flex-col items-center justify-center text-center"
+    >
+      <div
+        class="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="h-7 w-7 text-gray-400"
@@ -329,12 +362,16 @@ onUnmounted(() => {
           />
         </svg>
       </div>
-      <p class="text-sm text-gray-600 dark:text-gray-400">等待天气与潮汐数据加载</p>
+      <p class="text-sm text-gray-600 dark:text-gray-400">
+        等待天气与潮汐数据加载
+      </p>
       <p class="mt-1 text-xs text-gray-400">数据到位后即可生成分析</p>
     </div>
 
     <div v-else class="relative z-10 mt-5 flex flex-1 flex-col">
-      <div class="h-[60vh] max-h-[60vh] overflow-auto rounded-2xl bg-white/60 p-4 dark:bg-gray-900/60">
+      <div
+        class="h-[60vh] max-h-[60vh] overflow-auto rounded-2xl bg-white/60 p-4 dark:bg-gray-900/60"
+      >
         <div class="mb-2 flex items-center gap-2 text-xs text-gray-500">
           <span class="h-1.5 w-1.5 rounded-full bg-gray-400"></span>
           AI 分析输出
@@ -350,9 +387,15 @@ onUnmounted(() => {
           >
             <p>{{ textShimmer[0] }}</p>
             <div class="mt-3 space-y-2">
-              <div class="h-3 w-full animate-pulse rounded bg-gray-200/70 dark:bg-gray-700/50"></div>
-              <div class="h-3 w-5/6 animate-pulse rounded bg-gray-200/70 dark:bg-gray-700/50"></div>
-              <div class="h-3 w-2/3 animate-pulse rounded bg-gray-200/70 dark:bg-gray-700/50"></div>
+              <div
+                class="h-3 w-full animate-pulse rounded bg-gray-200/70 dark:bg-gray-700/50"
+              ></div>
+              <div
+                class="h-3 w-5/6 animate-pulse rounded bg-gray-200/70 dark:bg-gray-700/50"
+              ></div>
+              <div
+                class="h-3 w-2/3 animate-pulse rounded bg-gray-200/70 dark:bg-gray-700/50"
+              ></div>
             </div>
           </motion.div>
           <motion.div
@@ -385,7 +428,8 @@ onUnmounted(() => {
       </div>
 
       <div class="mt-3 text-xs text-gray-400">
-        天气更新: {{ formatDate(normalizedData?.liveWeather?.obsTime) ?? "--" }}<br />
+        天气更新: {{ formatDate(normalizedData?.liveWeather?.obsTime) ?? "--"
+        }}<br />
         潮汐更新: {{ formatDate(normalizedData?.tideData?.updateTime) ?? "--" }}
       </div>
     </div>

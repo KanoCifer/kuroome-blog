@@ -18,7 +18,11 @@ const emit = defineEmits<{
 }>();
 
 const fishingMapStore = useFishingMapStore();
-const { indexData, indexLoading: loading, indexError: error } = storeToRefs(fishingMapStore);
+const {
+  indexData,
+  indexLoading: loading,
+  indexError: error,
+} = storeToRefs(fishingMapStore);
 // console.log("钓鱼指数数据：", indexData.value);
 const levelColors: Record<string, string> = {
   爆护: "text-green-500",
@@ -83,17 +87,31 @@ const handleFeedback = () => {
 <template>
   <article
     class="group squircle relative flex h-full cursor-pointer flex-col overflow-hidden border border-white/20 p-6 shadow-lg transition-all duration-500 hover:-translate-y-2 hover:shadow-xl dark:border-gray-700/50"
-    :class="indexData ? levelBg[indexData.level] || 'bg-gray-50 dark:bg-gray-800/60' : 'bg-gray-50 dark:bg-gray-800/60'"
+    :class="
+      indexData
+        ? levelBg[indexData.level] || 'bg-gray-50 dark:bg-gray-800/60'
+        : 'bg-gray-50 dark:bg-gray-800/60'
+    "
   >
-    <div class="pointer-events-none absolute top-0 right-0 overflow-hidden rounded-full p-8 blur-3xl">
-      <div class="h-24 w-24 rounded-full bg-linear-to-br from-blue-200/60 to-green-200/60" />
+    <div
+      class="pointer-events-none absolute top-0 right-0 overflow-hidden rounded-full p-8 blur-3xl"
+    >
+      <div
+        class="h-24 w-24 rounded-full bg-linear-to-br from-blue-200/60 to-green-200/60"
+      />
     </div>
 
     <!-- 钓鱼指数标题和说明 -->
     <div class="mb-3 flex items-center justify-between">
       <div>
-        <h3 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">钓鱼指数</h3>
-        <p class="text-sm text-gray-500 dark:text-gray-400">基于实时天气、潮汐综合计算</p>
+        <h3
+          class="text-lg font-bold tracking-tight text-gray-900 dark:text-white"
+        >
+          钓鱼指数
+        </h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          基于实时天气、潮汐综合计算
+        </p>
       </div>
       <div class="flex items-center gap-3">
         <button
@@ -112,14 +130,27 @@ const handleFeedback = () => {
       </div>
     </div>
 
-    <p v-if="loading && !indexData" class="text-sm text-gray-500 dark:text-gray-400">加载中...</p>
-    <p v-else-if="error && !indexData" class="text-sm text-red-500">{{ error }}</p>
+    <p
+      v-if="loading && !indexData"
+      class="text-sm text-gray-500 dark:text-gray-400"
+    >
+      加载中...
+    </p>
+    <p v-else-if="error && !indexData" class="text-sm text-red-500">
+      {{ error }}
+    </p>
     <template v-else-if="indexData">
       <div class="mb-3 flex items-end gap-3">
-        <span class="text-5xl font-bold" :class="levelColors[indexData.level] || 'text-gray-500'">
+        <span
+          class="text-5xl font-bold"
+          :class="levelColors[indexData.level] || 'text-gray-500'"
+        >
           {{ indexData.fishing_index }}
         </span>
-        <span class="mb-1 text-lg font-medium" :class="levelColors[indexData.level] || 'text-gray-500'">
+        <span
+          class="mb-1 text-lg font-medium"
+          :class="levelColors[indexData.level] || 'text-gray-500'"
+        >
           {{ indexData.level }}
         </span>
       </div>
@@ -129,7 +160,9 @@ const handleFeedback = () => {
           class="rounded-lg bg-white/60 px-2 py-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:bg-gray-800/60"
         >
           默认权重
-          <div class="mt-1 font-medium text-gray-900 dark:text-white">{{ indexData.expert_score }}</div>
+          <div class="mt-1 font-medium text-gray-900 dark:text-white">
+            {{ indexData.expert_score }}
+          </div>
         </div>
         <div
           class="rounded-lg bg-white/60 px-2 py-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:bg-gray-800/60"
@@ -143,11 +176,17 @@ const handleFeedback = () => {
           class="rounded-lg bg-white/60 px-2 py-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:bg-gray-800/60"
         >
           综合指数
-          <div class="mt-1 font-medium text-gray-900 dark:text-white">{{ indexData.fishing_index }}</div>
+          <div class="mt-1 font-medium text-gray-900 dark:text-white">
+            {{ indexData.fishing_index }}
+          </div>
         </div>
       </div>
 
-      <details v-if="Object.keys(indexData.feature_breakdown).length > 0" open class="mt-4 cursor-pointer text-xs">
+      <details
+        v-if="Object.keys(indexData.feature_breakdown).length > 0"
+        open
+        class="mt-4 cursor-pointer text-xs"
+      >
         <summary class="text-gray-500 dark:text-gray-400">特征详情</summary>
         <div class="mt-2 grid grid-cols-3 gap-2">
           <motion.div
@@ -159,7 +198,9 @@ const handleFeedback = () => {
               {{ formatFeatureName(keyName) }}
             </div>
 
-            <div class="relative mt-1 h-1.5 w-full overflow-hidden rounded-full bg-gray-200/60 dark:bg-gray-700/60">
+            <div
+              class="relative mt-1 h-1.5 w-full overflow-hidden rounded-full bg-gray-200/60 dark:bg-gray-700/60"
+            >
               <div
                 class="absolute inset-y-0 left-0 rounded-full transition-all duration-700 ease-out"
                 :style="getGaugeStyle(value)"

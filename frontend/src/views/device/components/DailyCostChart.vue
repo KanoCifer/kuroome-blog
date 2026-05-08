@@ -14,8 +14,18 @@
             class="absolute top-4 right-4 z-50 rounded-full bg-red-500 px-1.5 py-1.5 text-white hover:bg-red-600"
             @click="onClose"
           >
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            <svg
+              class="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
           <v-chart :option="chartOption" autoresize class="h-full w-full" />
@@ -29,13 +39,25 @@
 import type { Device } from "@/services/deviceService";
 import dayjs from "dayjs";
 import { LineChart } from "echarts/charts";
-import { GridComponent, LegendComponent, TitleComponent, TooltipComponent } from "echarts/components";
+import {
+  GridComponent,
+  LegendComponent,
+  TitleComponent,
+  TooltipComponent,
+} from "echarts/components";
 import { use } from "echarts/core";
 import { SVGRenderer } from "echarts/renderers";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import VChart from "vue-echarts";
 
-use([TitleComponent, TooltipComponent, GridComponent, LegendComponent, LineChart, SVGRenderer]);
+use([
+  TitleComponent,
+  TooltipComponent,
+  GridComponent,
+  LegendComponent,
+  LineChart,
+  SVGRenderer,
+]);
 
 const props = defineProps<{
   data: Device;
@@ -62,7 +84,8 @@ const chartOption = computed(() => {
   const now = dayjs();
 
   const usedDays = now.diff(purchaseDate, "day");
-  const currentDailyCost = usedDays > 0 ? props.data.price / usedDays : props.data.price;
+  const currentDailyCost =
+    usedDays > 0 ? props.data.price / usedDays : props.data.price;
 
   const predictDays = 180;
   const currentTimeIndex = usedDays;

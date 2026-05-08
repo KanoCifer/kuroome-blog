@@ -58,7 +58,14 @@
 </template>
 
 <script setup lang="ts">
-import { BlogIcon, BookshelfIcon, ChangelogIcon, HomeIcon, IconTooling, RssIcon } from "@/components/icons";
+import {
+  BlogIcon,
+  BookshelfIcon,
+  ChangelogIcon,
+  HomeIcon,
+  IconTooling,
+  RssIcon,
+} from "@/components/icons";
 import { useAuthStore } from "@/stores/auth";
 import { useDebounce } from "@vueuse/core";
 import { CreditCard, Image } from "lucide-vue-next";
@@ -75,7 +82,9 @@ const props = defineProps<{
   isVisible?: boolean;
 }>();
 
-const isVisible = computed(() => (props.isVisible !== undefined ? props.isVisible : !props.isEntryView));
+const isVisible = computed(() =>
+  props.isVisible !== undefined ? props.isVisible : !props.isEntryView,
+);
 
 // Navigation items config
 const navItems = [

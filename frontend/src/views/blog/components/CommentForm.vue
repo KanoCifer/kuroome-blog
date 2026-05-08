@@ -33,7 +33,11 @@ const isValid = computed(() => {
   if (auth.isAuthenticated) {
     return body.value.trim().length > 0 && body.value.length <= maxChars;
   }
-  return author.value.trim().length > 0 && body.value.trim().length > 0 && body.value.length <= maxChars;
+  return (
+    author.value.trim().length > 0 &&
+    body.value.trim().length > 0 &&
+    body.value.length <= maxChars
+  );
 });
 
 const handleSubmit = async () => {
@@ -49,7 +53,8 @@ const handleSubmit = async () => {
     await blogService.postLegacyComment({
       post_id: String(props.postId),
       body: body.value,
-      author: auth.isAuthenticated && auth.user ? auth.user.username : author.value,
+      author:
+        auth.isAuthenticated && auth.user ? auth.user.username : author.value,
       reply_to: props.isReply ? props.replyTo : undefined,
       reply_to_author: props.isReply ? props.replyToAuthor : undefined,
     });
@@ -86,14 +91,19 @@ const addEmoji = (emoji: string) => {
   >
     <!-- Header -->
     <div class="mb-4 flex items-center justify-between">
-      <h4 v-if="!isReply" class="gap-2 text-lg font-semibold text-gray-900 dark:text-white">
+      <h4
+        v-if="!isReply"
+        class="gap-2 text-lg font-semibold text-gray-900 dark:text-white"
+      >
         发表评论
         <span
           class="ml-2 rounded-full border border-blue-200 bg-blue-200/30 px-4 py-2 text-xs font-medium text-blue-400"
           >*评论发布后请等待管理员审核</span
         >
       </h4>
-      <h4 v-else class="text-sm font-medium text-gray-600 dark:text-gray-400">回复 @{{ replyToAuthor }}</h4>
+      <h4 v-else class="text-sm font-medium text-gray-600 dark:text-gray-400">
+        回复 @{{ replyToAuthor }}
+      </h4>
 
       <!-- Cancel reply button -->
       <button
@@ -109,7 +119,11 @@ const addEmoji = (emoji: string) => {
     <template v-if="!auth.isAuthenticated">
       <div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div class="relative">
-          <label class="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400"> 昵称 * </label>
+          <label
+            class="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400"
+          >
+            昵称 *
+          </label>
           <input
             v-model="author"
             type="text"
@@ -118,7 +132,11 @@ const addEmoji = (emoji: string) => {
           />
         </div>
         <div class="relative">
-          <label class="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400"> 邮箱 * </label>
+          <label
+            class="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400"
+          >
+            邮箱 *
+          </label>
           <input
             v-model="email"
             type="email"
@@ -128,7 +146,11 @@ const addEmoji = (emoji: string) => {
         </div>
       </div>
       <div class="mb-4">
-        <label class="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400"> 网站 </label>
+        <label
+          class="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400"
+        >
+          网站
+        </label>
         <input
           v-model="site"
           type="url"
@@ -158,7 +180,9 @@ const addEmoji = (emoji: string) => {
       ></textarea>
 
       <!-- Toolbar -->
-      <div class="flex items-center justify-between border-t border-gray-100 px-3 py-2 dark:border-gray-700">
+      <div
+        class="flex items-center justify-between border-t border-gray-100 px-3 py-2 dark:border-gray-700"
+      >
         <!-- Quick emojis -->
         <div class="flex items-center gap-1">
           <button
@@ -191,7 +215,10 @@ const addEmoji = (emoji: string) => {
 
     <!-- Submit button -->
     <div class="mt-4 flex items-center justify-end gap-3">
-      <p v-if="!auth.isAuthenticated" class="mr-auto text-xs text-gray-500 dark:text-gray-400">
+      <p
+        v-if="!auth.isAuthenticated"
+        class="mr-auto text-xs text-gray-500 dark:text-gray-400"
+      >
         * 为必填项，邮箱不会被公开显示
       </p>
 
@@ -207,8 +234,20 @@ const addEmoji = (emoji: string) => {
         @click="handleSubmit"
       >
         <!-- Loading spinner -->
-        <svg v-if="isSubmitting" class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <svg
+          v-if="isSubmitting"
+          class="h-4 w-4 animate-spin"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="4"
+          ></circle>
           <path
             class="opacity-75"
             fill="currentColor"
@@ -217,8 +256,19 @@ const addEmoji = (emoji: string) => {
         </svg>
 
         <!-- Send icon -->
-        <svg v-else class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+        <svg
+          v-else
+          class="h-4 w-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+          />
         </svg>
 
         {{ isSubmitting ? "提交中..." : "发表评论" }}

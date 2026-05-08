@@ -7,7 +7,9 @@ export interface SocialGateway {
 
 export const socialGateway: SocialGateway = {
   async getLikes(): Promise<{ likes_count: number }> {
-    const res = await request.get<{ data: { likes_count: number } }>("v1/likes");
+    const res = await request.get<{ data: { likes_count: number } }>(
+      "v1/likes",
+    );
     return res.data.data;
   },
 

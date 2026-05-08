@@ -1,5 +1,13 @@
-import type { CreateSubscriptionPayload, Subscription, UpdateSubscriptionPayload } from "@/api/subscriptionGateway";
-import type { ReminderFormState, SubscriptionFormState, SubscriptionStatusMeta } from "@/views/subscription/types";
+import type {
+  CreateSubscriptionPayload,
+  Subscription,
+  UpdateSubscriptionPayload,
+} from "@/api/subscriptionGateway";
+import type {
+  ReminderFormState,
+  SubscriptionFormState,
+  SubscriptionStatusMeta,
+} from "@/views/subscription/types";
 
 /**
  * 默认周期选项
@@ -117,7 +125,9 @@ export function toStringArray(value: unknown): string[] {
 /**
  * 把 reminder_config 映射为表单状态
  */
-export function createReminderFormState(config: Record<string, unknown> | null): ReminderFormState {
+export function createReminderFormState(
+  config: Record<string, unknown> | null,
+): ReminderFormState {
   const reminderConfig = config ?? {};
   return {
     channels: toStringArray(reminderConfig.channels),
@@ -125,10 +135,19 @@ export function createReminderFormState(config: Record<string, unknown> | null):
     days_7: Boolean(reminderConfig.days_7),
     days_3: Boolean(reminderConfig.days_3),
     days_1: Boolean(reminderConfig.days_1),
-    day_of: reminderConfig.day_of === undefined ? true : Boolean(reminderConfig.day_of),
+    day_of:
+      reminderConfig.day_of === undefined
+        ? true
+        : Boolean(reminderConfig.day_of),
     email: typeof reminderConfig.email === "string" ? reminderConfig.email : "",
-    feishu_webhook_url: typeof reminderConfig.feishu_webhook_url === "string" ? reminderConfig.feishu_webhook_url : "",
-    bark_device_key: typeof reminderConfig.bark_device_key === "string" ? reminderConfig.bark_device_key : "",
+    feishu_webhook_url:
+      typeof reminderConfig.feishu_webhook_url === "string"
+        ? reminderConfig.feishu_webhook_url
+        : "",
+    bark_device_key:
+      typeof reminderConfig.bark_device_key === "string"
+        ? reminderConfig.bark_device_key
+        : "",
   };
 }
 
@@ -179,25 +198,29 @@ export function getStatusMeta(status: string): SubscriptionStatusMeta {
       return {
         label: "已暂停",
         dotClass: "bg-amber-500",
-        badgeClass: "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300",
+        badgeClass:
+          "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300",
       };
     case "canceled":
       return {
         label: "已取消",
         dotClass: "bg-red-500",
-        badgeClass: "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300",
+        badgeClass:
+          "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300",
       };
     case "expired":
       return {
         label: "已过期",
         dotClass: "bg-slate-500",
-        badgeClass: "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200",
+        badgeClass:
+          "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200",
       };
     default:
       return {
         label: "进行中",
         dotClass: "bg-emerald-500",
-        badgeClass: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300",
+        badgeClass:
+          "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300",
       };
   }
 }
@@ -222,7 +245,9 @@ export function formatPrice(price: number, currency: string): string {
 /**
  * 校验订阅表单
  */
-export function validateSubscriptionForm(form: SubscriptionFormState): string | null {
+export function validateSubscriptionForm(
+  form: SubscriptionFormState,
+): string | null {
   const name = form.name.trim();
   const provider = form.provider.trim();
   if (!name || !provider) {
@@ -250,7 +275,9 @@ export function validateSubscriptionForm(form: SubscriptionFormState): string | 
 /**
  * 创建请求体映射
  */
-export function toCreatePayload(form: SubscriptionFormState): CreateSubscriptionPayload {
+export function toCreatePayload(
+  form: SubscriptionFormState,
+): CreateSubscriptionPayload {
   return {
     name: form.name.trim(),
     provider: form.provider.trim(),
@@ -266,7 +293,9 @@ export function toCreatePayload(form: SubscriptionFormState): CreateSubscription
 /**
  * 更新请求体映射
  */
-export function toUpdatePayload(form: SubscriptionFormState): UpdateSubscriptionPayload {
+export function toUpdatePayload(
+  form: SubscriptionFormState,
+): UpdateSubscriptionPayload {
   return {
     name: form.name.trim(),
     provider: form.provider.trim(),
@@ -282,7 +311,9 @@ export function toUpdatePayload(form: SubscriptionFormState): UpdateSubscription
 /**
  * 生成提醒配置 payload
  */
-export function createReminderPayload(form: ReminderFormState): Record<string, unknown> {
+export function createReminderPayload(
+  form: ReminderFormState,
+): Record<string, unknown> {
   const payload: Record<string, unknown> = {
     channels: form.channels,
     days_30: form.days_30,
@@ -306,13 +337,17 @@ export function createReminderPayload(form: ReminderFormState): Record<string, u
  * 是否开启任意提醒时间点
  */
 export function hasEnabledReminderPoint(form: ReminderFormState): boolean {
-  return form.days_30 || form.days_7 || form.days_3 || form.days_1 || form.day_of;
+  return (
+    form.days_30 || form.days_7 || form.days_3 || form.days_1 || form.day_of
+  );
 }
 
 /**
  * 提醒渠道文本
  */
-export function getReminderChannelsText(config: Record<string, unknown> | null): string {
+export function getReminderChannelsText(
+  config: Record<string, unknown> | null,
+): string {
   const channels = toStringArray(config?.channels);
   if (channels.length === 0) return "未配置";
   return channels.join("、");
@@ -321,21 +356,27 @@ export function getReminderChannelsText(config: Record<string, unknown> | null):
 /**
  * 提醒时间点文本
  */
-export function getReminderPointsText(config: Record<string, unknown> | null): string {
+export function getReminderPointsText(
+  config: Record<string, unknown> | null,
+): string {
   if (!config) return "未配置";
   const points: string[] = [];
   if (config.days_30) points.push("提前 30 天");
   if (config.days_7) points.push("提前 7 天");
   if (config.days_3) points.push("提前 3 天");
   if (config.days_1) points.push("提前 1 天");
-  if (config.day_of === undefined || Boolean(config.day_of)) points.push("当天");
+  if (config.day_of === undefined || Boolean(config.day_of))
+    points.push("当天");
   return points.length > 0 ? points.join("、") : "未配置";
 }
 
 /**
  * 同步表单数据
  */
-export function applyFormValues(target: SubscriptionFormState, source: SubscriptionFormState): void {
+export function applyFormValues(
+  target: SubscriptionFormState,
+  source: SubscriptionFormState,
+): void {
   target.name = source.name;
   target.provider = source.provider;
   target.price = source.price;
@@ -349,7 +390,10 @@ export function applyFormValues(target: SubscriptionFormState, source: Subscript
 /**
  * 同步提醒表单数据
  */
-export function applyReminderFormValues(target: ReminderFormState, source: ReminderFormState): void {
+export function applyReminderFormValues(
+  target: ReminderFormState,
+  source: ReminderFormState,
+): void {
   target.channels = [...source.channels];
   target.days_30 = source.days_30;
   target.days_7 = source.days_7;
@@ -364,7 +408,9 @@ export function applyReminderFormValues(target: ReminderFormState, source: Remin
 /**
  * 订阅实体映射为编辑表单
  */
-export function mapSubscriptionToForm(subscription: Subscription): SubscriptionFormState {
+export function mapSubscriptionToForm(
+  subscription: Subscription,
+): SubscriptionFormState {
   return {
     name: subscription.name,
     provider: subscription.provider,
@@ -380,6 +426,9 @@ export function mapSubscriptionToForm(subscription: Subscription): SubscriptionF
 /**
  * 更新数组中的订阅项
  */
-export function upsertSubscription(items: Subscription[], updated: Subscription): Subscription[] {
+export function upsertSubscription(
+  items: Subscription[],
+  updated: Subscription,
+): Subscription[] {
   return items.map((item) => (item.id === updated.id ? updated : item));
 }

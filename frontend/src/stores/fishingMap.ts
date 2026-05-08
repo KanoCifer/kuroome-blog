@@ -48,7 +48,9 @@ export const useFishingMapStore = defineStore("fishingMap", () => {
   const selectedHarbor = ref("P2352");
   const selectedDate = ref(dayjs().format("YYYYMMDD"));
 
-  async function fetchWeatherAndFishing(location: [number, number]): Promise<void> {
+  async function fetchWeatherAndFishing(
+    location: [number, number],
+  ): Promise<void> {
     weatherLoading.value = true;
     indexLoading.value = true;
     weatherError.value = "";
@@ -69,7 +71,8 @@ export const useFishingMapStore = defineStore("fishingMap", () => {
       tideData.value = weatherRes.tideData;
       indexData.value = fishingIndex;
     } catch (err) {
-      const message = err instanceof Error ? err.message : "获取钓鱼地图数据失败";
+      const message =
+        err instanceof Error ? err.message : "获取钓鱼地图数据失败";
       weatherError.value = message;
       indexError.value = message;
       notifier.error(message);
@@ -79,7 +82,10 @@ export const useFishingMapStore = defineStore("fishingMap", () => {
     }
   }
 
-  async function fetchPanelTide(harbor = selectedHarbor.value, date = selectedDate.value): Promise<void> {
+  async function fetchPanelTide(
+    harbor = selectedHarbor.value,
+    date = selectedDate.value,
+  ): Promise<void> {
     tideLoading.value = true;
     try {
       const res = await weatherService.getTide({ harbor, date });
@@ -88,9 +94,12 @@ export const useFishingMapStore = defineStore("fishingMap", () => {
         tideTable: res.tideTable,
         tideHourly: res.tideHourly,
       };
-      panelTideSpotName.value = HARBOR_OPTIONS.find((option) => option.code === harbor)?.name ?? "黄埔港";
+      panelTideSpotName.value =
+        HARBOR_OPTIONS.find((option) => option.code === harbor)?.name ??
+        "黄埔港";
     } catch (err) {
-      const message = err instanceof Error ? err.message : "获取潮汐信息失败，请稍后再试";
+      const message =
+        err instanceof Error ? err.message : "获取潮汐信息失败，请稍后再试";
       notifier.error(message);
     } finally {
       tideLoading.value = false;

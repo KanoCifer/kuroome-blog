@@ -22,8 +22,12 @@
           </svg>
         </div>
         <div>
-          <h2 class="text-2xl font-bold text-blue-900 dark:text-white">解析订阅</h2>
-          <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">输入 RSS/Atom 地址开始阅读</p>
+          <h2 class="text-2xl font-bold text-blue-900 dark:text-white">
+            解析订阅
+          </h2>
+          <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">
+            输入 RSS/Atom 地址开始阅读
+          </p>
         </div>
         <RouterLink
           to="/rss"
@@ -33,14 +37,24 @@
       </div>
 
       <!-- 输入区域 -->
-      <div class="mb-8 rounded-2xl border border-blue-100 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
-        <form @submit.prevent="parseRss" class="flex flex-col gap-4 sm:flex-row sm:items-end">
+      <div
+        class="mb-8 rounded-2xl border border-blue-100 bg-white p-6 dark:border-slate-700 dark:bg-slate-800"
+      >
+        <form
+          @submit.prevent="parseRss"
+          class="flex flex-col gap-4 sm:flex-row sm:items-end"
+        >
           <div class="flex-1">
-            <label for="rss-url" class="mb-2 block text-sm font-medium text-blue-800 dark:text-blue-200">
+            <label
+              for="rss-url"
+              class="mb-2 block text-sm font-medium text-blue-800 dark:text-blue-200"
+            >
               RSS/Atom 订阅地址
             </label>
             <div class="relative">
-              <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+              <div
+                class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -100,7 +114,14 @@
               viewBox="0 0 24 24"
               class="h-5 w-5 animate-spin"
             >
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
               <path
                 class="opacity-75"
                 fill="currentColor"
@@ -128,7 +149,9 @@
 
         <!-- 快捷链接 -->
         <div class="mt-4 flex flex-wrap gap-2">
-          <span class="text-sm text-blue-600 dark:text-blue-400">快捷尝试:</span>
+          <span class="text-sm text-blue-600 dark:text-blue-400"
+            >快捷尝试:</span
+          >
           <button
             v-for="example in exampleFeeds"
             :key="example.url"
@@ -139,7 +162,9 @@
             {{ example.name }}
           </button>
 
-          <span class="text-sm text-blue-600 dark:text-blue-400">历史记录:</span>
+          <span class="text-sm text-blue-600 dark:text-blue-400"
+            >历史记录:</span
+          >
           <button
             v-for="history in rssHistory.slice(0, 3)"
             :key="history"
@@ -176,7 +201,10 @@
               <h2 class="mb-2 text-xl font-bold text-blue-900 dark:text-white">
                 {{ rssMetadata.title }}
               </h2>
-              <p v-if="rssMetadata.description" class="mb-3 text-sm text-blue-600 dark:text-blue-400">
+              <p
+                v-if="rssMetadata.description"
+                class="mb-3 text-sm text-blue-600 dark:text-blue-400"
+              >
                 {{ rssMetadata.description }}
               </p>
               <a
@@ -221,7 +249,10 @@
               </svg>
             </div>
           </div>
-          <div v-if="rssMetadata.published" class="mt-3 flex items-center gap-2 text-xs text-blue-500">
+          <div
+            v-if="rssMetadata.published"
+            class="mt-3 flex items-center gap-2 text-xs text-blue-500"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -259,14 +290,18 @@
                 d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"
               />
             </svg>
-            <span class="text-sm font-medium text-blue-700 dark:text-blue-300">共 {{ rssEntries.length }} 篇文章</span>
+            <span class="text-sm font-medium text-blue-700 dark:text-blue-300"
+              >共 {{ rssEntries.length }} 篇文章</span
+            >
           </div>
         </div>
       </div>
 
       <!-- RSS 条目列表 -->
       <div v-if="rssEntries.length > 0" class="space-y-4">
-        <h3 class="mb-4 flex items-center gap-2 text-lg font-bold text-blue-900 dark:text-white">
+        <h3
+          class="mb-4 flex items-center gap-2 text-lg font-bold text-blue-900 dark:text-white"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -290,7 +325,9 @@
             class="group relative overflow-hidden rounded-xl border border-blue-100 bg-white p-5 transition-all hover:border-blue-300 hover:bg-blue-50/30 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600 dark:hover:bg-slate-700/50"
             :style="{ '--index': index }"
           >
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div
+              class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+            >
               <div class="min-w-0 flex-1">
                 <a
                   :href="entry.link"
@@ -300,10 +337,15 @@
                 >
                   {{ entry.title }}
                 </a>
-                <p v-if="entry.summary" class="mt-2 line-clamp-2 text-sm text-blue-600 dark:text-blue-400">
+                <p
+                  v-if="entry.summary"
+                  class="mt-2 line-clamp-2 text-sm text-blue-600 dark:text-blue-400"
+                >
                   {{ truncateSummary(entry.summary) }}
                 </p>
-                <div class="mt-3 flex flex-wrap items-center gap-3 text-xs text-blue-500">
+                <div
+                  class="mt-3 flex flex-wrap items-center gap-3 text-xs text-blue-500"
+                >
                   <span v-if="entry.published" class="flex items-center gap-1">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -373,7 +415,9 @@
             />
           </svg>
         </div>
-        <h3 class="mb-2 text-xl font-bold text-blue-900 dark:text-white">输入 RSS/Atom 订阅地址</h3>
+        <h3 class="mb-2 text-xl font-bold text-blue-900 dark:text-white">
+          输入 RSS/Atom 订阅地址
+        </h3>
         <p class="mb-6 text-center text-blue-600 dark:text-blue-400">
           在上方输入框中粘贴 RSS 或 Atom 订阅链接，即可解析阅读
         </p>
@@ -514,7 +558,9 @@ const parseRss = async () => {
     }));
   } catch (error) {
     console.error("RSS parse error:", error);
-    notifier.error("解析失败: " + (error instanceof Error ? error.message : "未知错误"));
+    notifier.error(
+      "解析失败: " + (error instanceof Error ? error.message : "未知错误"),
+    );
   } finally {
     isLoading.value = false;
   }

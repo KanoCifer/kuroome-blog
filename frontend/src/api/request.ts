@@ -50,7 +50,11 @@ request.interceptors.response.use(
       _isRefreshToken?: boolean;
       _retry?: boolean;
     };
-    if (error.response?.status === 401 && !isrefreshTokenRequest(_cfg) && !_cfg._retry) {
+    if (
+      error.response?.status === 401 &&
+      !isrefreshTokenRequest(_cfg) &&
+      !_cfg._retry
+    ) {
       // 标记已重试，防止无限循环
       _cfg._retry = true;
 

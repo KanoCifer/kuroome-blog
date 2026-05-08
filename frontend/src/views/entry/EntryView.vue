@@ -1,6 +1,10 @@
 <template>
   <div>
-    <div class="relative min-h-dvh w-full snap-start space-y-2" :style="containerStyle" ref="parentContainer">
+    <div
+      class="relative min-h-dvh w-full snap-start space-y-2"
+      :style="containerStyle"
+      ref="parentContainer"
+    >
       <!-- Theme Toggle + Background Switch - 只在入口页面显示 -->
       <div
         class="squircle absolute top-4 right-4 z-50 flex gap-2 rounded-2xl bg-blue-50 p-2 shadow-sm ring ring-blue-50/70 dark:bg-blue-900/80 dark:ring-blue-600"
@@ -12,7 +16,12 @@
           class="squircle rounded-xl p-2 transition-all hover:scale-110 hover:bg-blue-100 dark:hover:bg-blue-800"
           title="切换背景图"
         >
-          <svg class="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg
+            class="h-5 w-5 text-blue-600 dark:text-blue-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -100,7 +109,11 @@
         :style="[listCardPosition]"
         class="absolute w-auto -translate-x-1/2 -translate-y-1/2 cursor-pointer"
       />
-      <BentoCat v-if="show.BentoCat" :style="[catPosition]" class="absolute w-2xs -translate-x-1/2 -translate-y-1/2" />
+      <BentoCat
+        v-if="show.BentoCat"
+        :style="[catPosition]"
+        class="absolute w-2xs -translate-x-1/2 -translate-y-1/2"
+      />
       <div
         v-if="show.TodoCard && showTodoCard"
         class="absolute top-1/2 -right-20 w-70 min-w-3xs -translate-x-1/2 -translate-y-1/2"
@@ -114,7 +127,12 @@
         class="squircle fixed top-1/2 right-4 z-50 -translate-y-1/2 rounded-2xl bg-blue-50 p-3 shadow-sm ring ring-blue-50/70 transition-all hover:scale-110 dark:bg-blue-900/80 dark:ring-blue-600"
         title="显示待办卡片"
       >
-        <svg class="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg
+          class="h-5 w-5 text-blue-600 dark:text-blue-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -158,7 +176,15 @@ import ThemeToggle from "@/components/layout/ThemeToggle.vue";
 import carddelay from "@/data/carddelay.json";
 import { useDebounceFn, useStorage } from "@vueuse/core";
 import { AnimatePresence } from "motion-v";
-import { computed, nextTick, onMounted, onUnmounted, ref, watch, type ComponentPublicInstance } from "vue";
+import {
+  computed,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  ref,
+  watch,
+  type ComponentPublicInstance,
+} from "vue";
 
 // const { x: mouseX, y: mouseY } = useMouse({
 //   touch: false,
@@ -230,7 +256,9 @@ const viewportHeight = ref<number>(0);
 const showTodoCard = useStorage<boolean>("readinglist_show_todo_card", true);
 
 // 布局设计基准高度：使用视口高度，但不低于 820px，保证卡片间距不被压缩
-const layoutHeight = computed<number>(() => Math.max(viewportHeight.value, 820));
+const layoutHeight = computed<number>(() =>
+  Math.max(viewportHeight.value, 820),
+);
 
 // 容器高度：至少撑满布局高度（让绝对定位的卡片不被裁剪）
 const containerStyle = computed(() => ({
@@ -243,10 +271,14 @@ const halfWidth = computed<number>(() => {
 });
 
 // 左侧卡片公共偏移量（导航、备忘录、技术栈用，从屏幕中线向左偏移）
-const leftTotal = computed<number>(() => halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224);
+const leftTotal = computed<number>(
+  () => halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224,
+);
 
 // 右侧卡片公共偏移量（时钟、日历、网站、阅读列表用，从屏幕中线向右偏移）
-const rightTotal = computed<number>(() => halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224);
+const rightTotal = computed<number>(
+  () => halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224,
+);
 
 // 计算所有卡片的动态位置，包含 left 和 top，以 layoutHeight 为基准
 // layoutHeight = max(视口高度, 820px)，保证小屏时卡片不重叠
@@ -457,7 +489,9 @@ onMounted(async () => {
   });
 
   // Update dimensions after all cards have been rendered
-  const maxOrder = Math.max(...Object.values(carddelay).map((item) => item.order));
+  const maxOrder = Math.max(
+    ...Object.values(carddelay).map((item) => item.order),
+  );
   setTimeout(
     () => {
       updateDimensions();

@@ -2,17 +2,32 @@ import request from "@/api/request";
 import type { BookListResponse } from "@/types";
 
 export interface BookGateway {
-  getBooks(params: { page?: number; per_page?: number }): Promise<BookListResponse>;
-  createBook(payload: { title: string; author: string; iscompleted: boolean }): Promise<void>;
-  updateBook(bookId: number, payload: { title: string; author: string; iscompleted: boolean }): Promise<void>;
-  patchBookStatus(bookId: number, payload: { iscompleted: boolean }): Promise<void>;
+  getBooks(params: {
+    page?: number;
+    per_page?: number;
+  }): Promise<BookListResponse>;
+  createBook(payload: {
+    title: string;
+    author: string;
+    iscompleted: boolean;
+  }): Promise<void>;
+  updateBook(
+    bookId: number,
+    payload: { title: string; author: string; iscompleted: boolean },
+  ): Promise<void>;
+  patchBookStatus(
+    bookId: number,
+    payload: { iscompleted: boolean },
+  ): Promise<void>;
   deleteBook(bookId: number): Promise<void>;
   importBooks(payload: { weread_cookie: string }): Promise<void>;
 }
 
 export const bookGateway: BookGateway = {
   async getBooks(params) {
-    const res = await request.get<{ data: BookListResponse }>("v1/books", { params });
+    const res = await request.get<{ data: BookListResponse }>("v1/books", {
+      params,
+    });
     return res.data.data;
   },
 

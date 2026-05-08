@@ -15,10 +15,18 @@ export const useTodoStore = defineStore("todos", () => {
   const auth = useAuthStore();
   let hydrationPromise: Promise<void> | null = null;
 
-  const nonArchivedTodos = computed(() => todos.value.filter((t) => !t.archived));
-  const completedCount = computed(() => nonArchivedTodos.value.filter((t) => t.completed).length);
-  const activeTodos = computed(() => nonArchivedTodos.value.filter((t) => !t.completed));
-  const completedTodos = computed(() => nonArchivedTodos.value.filter((t) => t.completed));
+  const nonArchivedTodos = computed(() =>
+    todos.value.filter((t) => !t.archived),
+  );
+  const completedCount = computed(
+    () => nonArchivedTodos.value.filter((t) => t.completed).length,
+  );
+  const activeTodos = computed(() =>
+    nonArchivedTodos.value.filter((t) => !t.completed),
+  );
+  const completedTodos = computed(() =>
+    nonArchivedTodos.value.filter((t) => t.completed),
+  );
   const archivedTodos = computed(() => todos.value.filter((t) => t.archived));
 
   const notifier = useNotificationStore();
@@ -90,7 +98,9 @@ export const useTodoStore = defineStore("todos", () => {
     const t = todos.value.find((x) => x.id === id);
     if (!t) return;
     try {
-      const updated = await todoGateway.updateTodo(id, { completed: !t.completed });
+      const updated = await todoGateway.updateTodo(id, {
+        completed: !t.completed,
+      });
       const idx = todos.value.findIndex((x) => x.id === id);
       if (idx !== -1 && updated) todos.value[idx] = updated;
     } catch (err) {
@@ -157,7 +167,9 @@ export const useTodoStore = defineStore("todos", () => {
       await todoGateway.batchAction("archiveCompleted");
       const now = new Date().toISOString();
       todos.value = todos.value.map((t) =>
-        t.completed && !t.archived ? { ...t, archived: true, archivedAt: now } : t,
+        t.completed && !t.archived
+          ? { ...t, archived: true, archivedAt: now }
+          : t,
       );
     } catch (err) {
       console.error(err);

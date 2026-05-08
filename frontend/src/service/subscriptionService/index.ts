@@ -23,13 +23,19 @@ export interface SubscriptionService {
   /** 创建新订阅 */
   createSubscription(payload: CreateSubscriptionPayload): Promise<Subscription>;
   /** 更新订阅信息（部分更新） */
-  updateSubscription(subId: number, payload: UpdateSubscriptionPayload): Promise<Subscription>;
+  updateSubscription(
+    subId: number,
+    payload: UpdateSubscriptionPayload,
+  ): Promise<Subscription>;
   /** 删除订阅 */
   deleteSubscription(subId: number): Promise<void>;
   /** 更新订阅状态（active/canceled/paused/expired） */
   updateStatus(subId: number, newStatus: string): Promise<Subscription>;
   /** 更新订阅提醒配置（渠道、提前天数等） */
-  updateReminders(subId: number, reminderData: Record<string, unknown>): Promise<Subscription>;
+  updateReminders(
+    subId: number,
+    reminderData: Record<string, unknown>,
+  ): Promise<Subscription>;
   /** 获取即将到期的订阅（下次账单日期在一定范围内） */
   getUpcomingSubscriptions(): Promise<Subscription[]>;
   /**
@@ -38,7 +44,10 @@ export interface SubscriptionService {
    * @param payload 测试配置，包含通知渠道和渠道配置
    * @returns 各渠道发送结果 {channelName: success}
    */
-  testNotification(subId: number, payload: TestNotificationPayload): Promise<Record<string, boolean>>;
+  testNotification(
+    subId: number,
+    payload: TestNotificationPayload,
+  ): Promise<Record<string, boolean>>;
 }
 
 /**
@@ -54,11 +63,16 @@ export const subscriptionService: SubscriptionService = {
     return subscriptionGateway.getSubscription(subId);
   },
 
-  async createSubscription(payload: CreateSubscriptionPayload): Promise<Subscription> {
+  async createSubscription(
+    payload: CreateSubscriptionPayload,
+  ): Promise<Subscription> {
     return subscriptionGateway.createSubscription(payload);
   },
 
-  async updateSubscription(subId: number, payload: UpdateSubscriptionPayload): Promise<Subscription> {
+  async updateSubscription(
+    subId: number,
+    payload: UpdateSubscriptionPayload,
+  ): Promise<Subscription> {
     return subscriptionGateway.updateSubscription(subId, payload);
   },
 
@@ -70,7 +84,10 @@ export const subscriptionService: SubscriptionService = {
     return subscriptionGateway.updateStatus(subId, newStatus);
   },
 
-  async updateReminders(subId: number, reminderData: Record<string, unknown>): Promise<Subscription> {
+  async updateReminders(
+    subId: number,
+    reminderData: Record<string, unknown>,
+  ): Promise<Subscription> {
     return subscriptionGateway.updateReminders(subId, reminderData);
   },
 
@@ -78,7 +95,10 @@ export const subscriptionService: SubscriptionService = {
     return subscriptionGateway.getUpcomingSubscriptions();
   },
 
-  async testNotification(subId: number, payload: TestNotificationPayload): Promise<Record<string, boolean>> {
+  async testNotification(
+    subId: number,
+    payload: TestNotificationPayload,
+  ): Promise<Record<string, boolean>> {
     return subscriptionGateway.testNotification(subId, payload);
   },
 };

@@ -20,9 +20,13 @@ interface Constructor<P = unknown> {
   };
 }
 
-type CrosshairData = Record<string, unknown> | { data: Record<string, unknown> };
+type CrosshairData =
+  | Record<string, unknown>
+  | { data: Record<string, unknown> };
 
-function hasDataField(data: CrosshairData): data is { data: Record<string, unknown> } {
+function hasDataField(
+  data: CrosshairData,
+): data is { data: Record<string, unknown> } {
   return "data" in data && typeof data.data === "object" && data.data !== null;
 }
 

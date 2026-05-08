@@ -31,8 +31,12 @@
           <span class="text-xs text-slate-500 dark:text-slate-400">
             {{ formatPurchaseDate(device.purchase_date) }}
           </span>
-          <p class="font-family-dongfang mt-2 text-xs font-bold text-slate-500 dark:text-slate-400">
-            {{ `日均 ${formatPrice(calcSpendPerDay(device), device.currency)}/天` }}
+          <p
+            class="font-family-dongfang mt-2 text-xs font-bold text-slate-500 dark:text-slate-400"
+          >
+            {{
+              `日均 ${formatPrice(calcSpendPerDay(device), device.currency)}/天`
+            }}
           </p>
         </div>
       </div>
@@ -40,7 +44,9 @@
         <p class="text-xl font-bold text-[#00288e] dark:text-blue-400">
           {{ formatPrice(device.price, device.currency) }}
         </p>
-        <p class="text-[10px] font-bold tracking-wider text-slate-400 uppercase dark:text-slate-500">
+        <p
+          class="text-[10px] font-bold tracking-wider text-slate-400 uppercase dark:text-slate-500"
+        >
           {{ device.currency }}
         </p>
       </div>
@@ -64,7 +70,9 @@
           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
         />
       </svg>
-      <span class="truncate text-sm font-medium text-slate-500 dark:text-slate-400">
+      <span
+        class="truncate text-sm font-medium text-slate-500 dark:text-slate-400"
+      >
         {{ device.notes }}
       </span>
     </div>
@@ -140,7 +148,10 @@ function formatPurchaseDate(dateStr: string): string {
 }
 
 function calcSpendPerDay(device: Device): number {
-  const daysInUse = Math.max(1, dayjs().diff(dayjs(device.purchase_date), "day"));
+  const daysInUse = Math.max(
+    1,
+    dayjs().diff(dayjs(device.purchase_date), "day"),
+  );
   return device.price / daysInUse;
 }
 

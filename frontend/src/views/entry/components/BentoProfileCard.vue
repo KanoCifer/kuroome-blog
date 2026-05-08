@@ -5,7 +5,9 @@
       <!-- Avatar with Glow + Active Badge -->
       <div class="group relative mb-4">
         <!-- 青/蓝色渐变 -->
-        <div class="absolute -inset-1 rounded-full bg-linear-to-br from-cyan-300 to-blue-400 opacity-50 blur"></div>
+        <div
+          class="absolute -inset-1 rounded-full bg-linear-to-br from-cyan-300 to-blue-400 opacity-50 blur"
+        ></div>
         <img
           src="/images/about.webp"
           alt="Kuroome"
@@ -15,15 +17,28 @@
         <div
           class="absolute right-0 bottom-0 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-green-100 dark:border-gray-700 dark:bg-green-900"
         >
-          <svg class="h-3 w-3 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+          <svg
+            class="h-3 w-3 text-green-600 dark:text-green-400"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
+            />
           </svg>
         </div>
-        <RouterLink to="/about" class="absolute inset-0 rounded-full"></RouterLink>
+        <RouterLink
+          to="/about"
+          class="absolute inset-0 rounded-full"
+        ></RouterLink>
       </div>
 
       <!-- Name -->
-      <h2 class="mb-2 font-serif text-2xl font-bold text-gray-800 dark:text-gray-100">Kuroome</h2>
+      <h2
+        class="mb-2 font-serif text-2xl font-bold text-gray-800 dark:text-gray-100"
+      >
+        Kuroome
+      </h2>
 
       <!-- Role/Title Badge -->
       <div class="mb-4">
@@ -38,11 +53,17 @@
       <div class="mt-2 flex items-center gap-2">
         <span
           class="h-2 w-2 rounded-full"
-          :class="auth.adminOnline ? 'animate-pulse bg-green-500' : 'bg-red-500'"
+          :class="
+            auth.adminOnline ? 'animate-pulse bg-green-500' : 'bg-red-500'
+          "
         ></span>
         <span
           class="text-xs font-semibold tracking-widest uppercase"
-          :class="auth.adminOnline ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'"
+          :class="
+            auth.adminOnline
+              ? 'text-green-700 dark:text-green-400'
+              : 'text-red-700 dark:text-red-400'
+          "
         >
           {{ auth.adminOnline ? "Admin Online" : "Offline" }}
         </span>

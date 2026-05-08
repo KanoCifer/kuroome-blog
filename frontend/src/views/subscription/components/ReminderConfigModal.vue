@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { reactive, watch } from "vue";
 import type { ReminderFormState } from "@/views/subscription/types";
-import { channelOptions, reminderPointOptions } from "@/views/subscription/subscriptionUtils";
+import {
+  channelOptions,
+  reminderPointOptions,
+} from "@/views/subscription/subscriptionUtils";
 
 interface Props {
   isOpen: boolean;
@@ -93,7 +96,10 @@ watch(
 <template>
   <teleport to="body">
     <transition name="modal-fade">
-      <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+      <div
+        v-if="isOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+      >
         <button
           type="button"
           aria-label="关闭弹窗"
@@ -105,7 +111,9 @@ watch(
         >
           <header class="mb-4 flex items-start justify-between gap-4">
             <div>
-              <h3 class="text-lg font-semibold text-slate-900 dark:text-white">通知渠道配置</h3>
+              <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+                通知渠道配置
+              </h3>
               <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
                 选择通知渠道和提醒触发时间点，可先发送测试通知。
               </p>
@@ -121,7 +129,9 @@ watch(
 
           <div class="space-y-4">
             <section>
-              <p class="mb-2 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <p
+                class="mb-2 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400"
+              >
                 通知渠道
               </p>
               <div class="grid gap-2 sm:grid-cols-3">
@@ -143,7 +153,9 @@ watch(
             </section>
 
             <section>
-              <p class="mb-2 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <p
+                class="mb-2 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400"
+              >
                 提醒时间点
               </p>
               <div class="grid gap-2 sm:grid-cols-3">
@@ -163,8 +175,14 @@ watch(
             </section>
 
             <section class="grid gap-3">
-              <label v-if="localForm.channels.includes('email')" class="space-y-1">
-                <span class="text-xs font-medium text-slate-600 dark:text-slate-300">邮箱地址（Email）</span>
+              <label
+                v-if="localForm.channels.includes('email')"
+                class="space-y-1"
+              >
+                <span
+                  class="text-xs font-medium text-slate-600 dark:text-slate-300"
+                  >邮箱地址（Email）</span
+                >
                 <input
                   v-model="localForm.email"
                   type="email"
@@ -172,8 +190,14 @@ watch(
                   class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-white"
                 />
               </label>
-              <label v-if="localForm.channels.includes('feishu')" class="space-y-1">
-                <span class="text-xs font-medium text-slate-600 dark:text-slate-300">飞书 Webhook URL</span>
+              <label
+                v-if="localForm.channels.includes('feishu')"
+                class="space-y-1"
+              >
+                <span
+                  class="text-xs font-medium text-slate-600 dark:text-slate-300"
+                  >飞书 Webhook URL</span
+                >
                 <input
                   v-model="localForm.feishu_webhook_url"
                   type="text"
@@ -181,8 +205,14 @@ watch(
                   class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-white"
                 />
               </label>
-              <label v-if="localForm.channels.includes('bark')" class="space-y-1">
-                <span class="text-xs font-medium text-slate-600 dark:text-slate-300">Bark Device Key</span>
+              <label
+                v-if="localForm.channels.includes('bark')"
+                class="space-y-1"
+              >
+                <span
+                  class="text-xs font-medium text-slate-600 dark:text-slate-300"
+                  >Bark Device Key</span
+                >
                 <input
                   v-model="localForm.bark_device_key"
                   type="text"

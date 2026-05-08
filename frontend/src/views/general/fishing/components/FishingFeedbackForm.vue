@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { fishingService } from "@/service/fishingService";
 import { useNotificationStore } from "@/stores/notification";
-import type { FishingFeedbackData, FishingFeedbackLevel, FishingFeedbackPayload } from "@/views/general/fishing/types";
+import type {
+  FishingFeedbackData,
+  FishingFeedbackLevel,
+  FishingFeedbackPayload,
+} from "@/views/general/fishing/types";
 import dayjs from "dayjs";
 import { ref } from "vue";
 
@@ -73,23 +77,38 @@ const handleSubmit = async () => {
 <template>
   <teleport to="body">
     <transition name="modal-fade">
-      <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-        <div class="mx-4 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900">
+      <div
+        v-if="isOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      >
+        <div
+          class="mx-4 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900"
+        >
           <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
             钓鱼反馈
-            <span class="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400">你的反馈会帮助我们改进</span>
+            <span
+              class="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400"
+              >你的反馈会帮助我们改进</span
+            >
           </h3>
 
           <div class="mb-4 rounded-lg bg-gray-50 p-3 text-sm dark:bg-gray-800">
-            <p class="text-gray-600 dark:text-gray-400">地点: {{ locationName }}</p>
             <p class="text-gray-600 dark:text-gray-400">
-              当前指数: {{ fishingData.fishing_index }} ({{ fishingData.level }})
+              地点: {{ locationName }}
+            </p>
+            <p class="text-gray-600 dark:text-gray-400">
+              当前指数: {{ fishingData.fishing_index }} ({{
+                fishingData.level
+              }})
             </p>
           </div>
 
           <div class="space-y-4">
             <div>
-              <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">您的钓鱼体验</label>
+              <label
+                class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >您的钓鱼体验</label
+              >
               <div class="grid grid-cols-3 gap-2">
                 <button
                   v-for="option in FEEDBACK_OPTIONS"

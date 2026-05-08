@@ -8,7 +8,9 @@
         <!-- 搜索框 -->
         <div class="flex w-full items-center justify-between gap-4">
           <div class="relative w-fit">
-            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <div
+              class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -44,7 +46,11 @@
                 stroke="currentColor"
                 class="h-5 w-5"
               >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -53,7 +59,12 @@
             to="/blog/new"
             class="inline-flex w-fit items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="mr-2 h-4 w-4"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
               <path
                 fill-rule="evenodd"
                 d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
@@ -73,7 +84,9 @@
               v-if="isLoading"
               class="flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white px-6 py-16 text-center dark:border-gray-700"
             >
-              <div class="mb-4 h-10 w-10 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"></div>
+              <div
+                class="mb-4 h-10 w-10 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"
+              ></div>
               <p class="text-gray-600 dark:text-gray-400">加载中...</p>
             </div>
 
@@ -96,7 +109,9 @@
                   d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
                 />
               </svg>
-              <p class="text-lg font-medium text-red-600 dark:text-red-400">加载失败</p>
+              <p class="text-lg font-medium text-red-600 dark:text-red-400">
+                加载失败
+              </p>
               <p class="mt-1 text-sm text-red-500">{{ errorMessage }}</p>
               <button
                 class="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
@@ -125,9 +140,15 @@
                   d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
                 />
               </svg>
-              <p class="text-lg font-medium text-gray-500">No blog posts available.</p>
+              <p class="text-lg font-medium text-gray-500">
+                No blog posts available.
+              </p>
               <p class="mt-1 text-sm text-gray-400">
-                {{ activeCategory ? "There are no posts in this category yet." : "Check back later for new content." }}
+                {{
+                  activeCategory
+                    ? "There are no posts in this category yet."
+                    : "Check back later for new content."
+                }}
               </p>
             </div>
 
@@ -147,7 +168,12 @@
                 v-if="post.is_pinned"
                 class="absolute -top-3 right-4 flex items-center gap-1.5 rounded-full bg-linear-to-r from-blue-500 to-sky-500 px-3 py-1 text-xs font-bold text-white shadow-md dark:from-blue-600 dark:to-sky-600"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-3.5 w-3.5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
                   <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
                 </svg>
                 置顶
@@ -167,7 +193,9 @@
               <p
                 :class="[
                   'my-4 text-sm',
-                  post.is_pinned ? 'text-blue-700/80 dark:text-blue-300/80' : 'text-gray-600 dark:text-gray-400',
+                  post.is_pinned
+                    ? 'text-blue-700/80 dark:text-blue-300/80'
+                    : 'text-gray-600 dark:text-gray-400',
                 ]"
               >
                 发布于 {{ formatDate(post.created_at) }}
@@ -194,7 +222,9 @@
                 <div
                   :class="[
                     'flex items-center gap-4 text-sm',
-                    post.is_pinned ? 'text-blue-700/70 dark:text-blue-300/70' : 'text-gray-500 dark:text-gray-400',
+                    post.is_pinned
+                      ? 'text-blue-700/70 dark:text-blue-300/70'
+                      : 'text-gray-500 dark:text-gray-400',
                   ]"
                 >
                   <router-link
@@ -209,7 +239,12 @@
                     title="Category"
                   >
                     <!-- tags icon -->
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg
+                      class="h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -230,7 +265,12 @@
                   ]"
                 >
                   阅读更多
-                  <svg class="ml-1 h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    class="ml-1 h-3 w-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -244,7 +284,11 @@
           </div>
 
           <!-- Pagination -->
-          <nav v-if="pagination && pagination.pages > 1" class="mt-10" aria-label="博客分页">
+          <nav
+            v-if="pagination && pagination.pages > 1"
+            class="mt-10"
+            aria-label="博客分页"
+          >
             <ul
               class="mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border border-gray-200/80 bg-white/90 p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2 dark:border-gray-700/70 dark:bg-gray-900/80"
             >
@@ -278,7 +322,9 @@
 
               <!-- 省略号 -->
               <li v-if="pagination && pagination.page > 4">
-                <span class="px-1 text-sm text-gray-400 dark:text-gray-500">...</span>
+                <span class="px-1 text-sm text-gray-400 dark:text-gray-500"
+                  >...</span
+                >
               </li>
 
               <!-- 显示当前页附近的页码 -->
@@ -298,7 +344,9 @@
 
               <!-- 省略号 -->
               <li v-if="pagination && pagination.page < pagination.pages - 3">
-                <span class="px-1 text-sm text-gray-400 dark:text-gray-500">...</span>
+                <span class="px-1 text-sm text-gray-400 dark:text-gray-500"
+                  >...</span
+                >
               </li>
 
               <!-- 显示最后一页 -->
@@ -333,7 +381,10 @@
         <!-- Category Sidebar -->
         <div class="w-full shrink-0 lg:w-72">
           <div class="sticky top-24">
-            <CategorySidebar @filterPosts="handleFilterPosts" @resetFilter="handleResetFilter" />
+            <CategorySidebar
+              @filterPosts="handleFilterPosts"
+              @resetFilter="handleResetFilter"
+            />
           </div>
         </div>
       </div>
@@ -391,7 +442,11 @@ const getVisiblePages = computed(() => {
   const visiblePages = [];
 
   // 显示当前页附近的页码
-  for (let i = Math.max(2, current - 2); i <= Math.min(totalPages - 1, current + 2); i++) {
+  for (
+    let i = Math.max(2, current - 2);
+    i <= Math.min(totalPages - 1, current + 2);
+    i++
+  ) {
     visiblePages.push(i);
   }
 
@@ -420,7 +475,8 @@ const fetchPosts = async (page: number = 1) => {
     currentPage.value = page;
   } catch (err: unknown) {
     console.error(err);
-    errorMessage.value = err instanceof Error ? err.message : "加载文章列表失败，请稍后重试。";
+    errorMessage.value =
+      err instanceof Error ? err.message : "加载文章列表失败，请稍后重试。";
     useNotificationStore().error(errorMessage.value);
   } finally {
     isLoading.value = false;
@@ -463,12 +519,19 @@ const clearSearch = () => {
 };
 
 watch(
-  () => [route.query.page, route.query.search, route.query.category, route.params.categoryId],
+  () => [
+    route.query.page,
+    route.query.search,
+    route.query.category,
+    route.params.categoryId,
+  ],
   ([pageQuery, searchParam, categoryQuery, categoryParam]) => {
     searchQuery.value = typeof searchParam === "string" ? searchParam : "";
 
-    const hasCategoryQuery = typeof categoryQuery === "string" && categoryQuery.length > 0;
-    const hasCategoryParam = typeof categoryParam === "string" && categoryParam.length > 0;
+    const hasCategoryQuery =
+      typeof categoryQuery === "string" && categoryQuery.length > 0;
+    const hasCategoryParam =
+      typeof categoryParam === "string" && categoryParam.length > 0;
 
     if (hasCategoryQuery || hasCategoryParam) {
       return;
@@ -505,7 +568,9 @@ useHead(() => ({
     },
     {
       property: "og:title",
-      content: activeCategory.value ? `${activeCategory.value} 分类文章 - ReadingList` : "ReadingList Blog",
+      content: activeCategory.value
+        ? `${activeCategory.value} 分类文章 - ReadingList`
+        : "ReadingList Blog",
     },
     {
       property: "og:description",
@@ -525,7 +590,9 @@ useHead(() => ({
     },
     {
       name: "twitter:title",
-      content: activeCategory.value ? `${activeCategory.value} 分类文章 - ReadingList` : "ReadingList Blog",
+      content: activeCategory.value
+        ? `${activeCategory.value} 分类文章 - ReadingList`
+        : "ReadingList Blog",
     },
     {
       name: "twitter:description",

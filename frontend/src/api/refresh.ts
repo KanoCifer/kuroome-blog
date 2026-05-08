@@ -32,6 +32,8 @@ export async function refreshToken(): Promise<void> {
   });
 }
 
-export function isrefreshTokenRequest(config: { _isRefreshToken?: boolean }): boolean {
+export function isrefreshTokenRequest(config: {
+  _isRefreshToken?: boolean;
+}): boolean {
   return !!config._isRefreshToken;
 }

@@ -2,12 +2,19 @@
   <Teleport to="body">
     <!-- Backdrop -->
     <Transition name="fade">
-      <div v-if="modelValue" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" @click="handleClose" />
+      <div
+        v-if="modelValue"
+        class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+        @click="handleClose"
+      />
     </Transition>
 
     <!-- Form Container -->
     <Transition name="modal">
-      <div v-if="modelValue" class="fixed inset-x-8 inset-y-24 z-50 flex items-center justify-center">
+      <div
+        v-if="modelValue"
+        class="fixed inset-x-8 inset-y-24 z-50 flex items-center justify-center"
+      >
         <div
           class="max-h-full w-full max-w-md overflow-y-auto rounded-2xl bg-slate-100 shadow-2xl dark:bg-[#1a2133] dark:shadow-xl dark:shadow-slate-900/60"
         >
@@ -17,8 +24,14 @@
           >
             <div class="flex items-start justify-between gap-3">
               <div>
-                <h2 class="font-serif text-2xl font-bold text-slate-800 dark:text-slate-100">添加设备</h2>
-                <p class="mt-1 text-xs text-slate-400 dark:text-slate-500">记录你的电子设备资产</p>
+                <h2
+                  class="font-serif text-2xl font-bold text-slate-800 dark:text-slate-100"
+                >
+                  添加设备
+                </h2>
+                <p class="mt-1 text-xs text-slate-400 dark:text-slate-500">
+                  记录你的电子设备资产
+                </p>
               </div>
               <span
                 class="shrink-0 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
@@ -29,10 +42,17 @@
           </div>
 
           <!-- Form -->
-          <form @submit.prevent="handleSubmit" class="space-y-5 bg-slate-50 p-6 dark:bg-[#111827]">
+          <form
+            @submit.prevent="handleSubmit"
+            class="space-y-5 bg-slate-50 p-6 dark:bg-[#111827]"
+          >
             <!-- Name -->
             <label class="block space-y-1.5">
-              <span class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"> 设备名称 * </span>
+              <span
+                class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"
+              >
+                设备名称 *
+              </span>
               <input
                 v-model="form.name"
                 type="text"
@@ -44,7 +64,11 @@
 
             <!-- Purchase Date -->
             <label class="block space-y-1.5">
-              <span class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"> 购买日期 * </span>
+              <span
+                class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"
+              >
+                购买日期 *
+              </span>
               <input
                 v-model="form.purchase_date"
                 type="date"
@@ -55,7 +79,11 @@
             <!-- Currency & Price -->
             <div class="grid grid-cols-[0.4fr_0.6fr] gap-4">
               <label class="block space-y-1.5">
-                <span class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"> 货币 </span>
+                <span
+                  class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"
+                >
+                  货币
+                </span>
                 <select
                   v-model="form.currency"
                   class="w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:bg-[#0f172a] dark:text-white dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
@@ -67,7 +95,11 @@
               </label>
 
               <label class="block space-y-1.5">
-                <span class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"> 价格 </span>
+                <span
+                  class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"
+                >
+                  价格
+                </span>
                 <input
                   v-model.number="form.price"
                   type="number"
@@ -81,7 +113,11 @@
 
             <!-- Notes -->
             <label class="block space-y-1.5">
-              <span class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"> 备注（可选） </span>
+              <span
+                class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"
+              >
+                备注（可选）
+              </span>
               <input
                 v-model="form.notes"
                 type="text"
@@ -92,7 +128,11 @@
 
             <!-- Status Toggle -->
             <div class="space-y-2">
-              <span class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"> 设备状态 </span>
+              <span
+                class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"
+              >
+                设备状态
+              </span>
               <div
                 class="flex rounded-full bg-slate-200/80 p-1 backdrop-blur-sm dark:border dark:border-white/10 dark:bg-[#0f172a]"
               >
@@ -114,10 +154,18 @@
             </div>
 
             <!-- Error -->
-            <p v-if="formError" class="py-2 text-center text-xs font-medium text-red-500 dark:text-red-400">
+            <p
+              v-if="formError"
+              class="py-2 text-center text-xs font-medium text-red-500 dark:text-red-400"
+            >
               {{ formError }}
             </p>
-            <p v-else class="text-center text-[10px] text-slate-400 dark:text-slate-500">* 为必填项</p>
+            <p
+              v-else
+              class="text-center text-[10px] text-slate-400 dark:text-slate-500"
+            >
+              * 为必填项
+            </p>
 
             <!-- Submit Button -->
             <button

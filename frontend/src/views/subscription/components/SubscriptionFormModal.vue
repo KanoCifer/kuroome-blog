@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { reactive, watch } from "vue";
 import type { SubscriptionFormState } from "@/views/subscription/types";
-import { cycleOptions, statusOptions } from "@/views/subscription/subscriptionUtils";
+import {
+  cycleOptions,
+  statusOptions,
+} from "@/views/subscription/subscriptionUtils";
 
 interface Props {
   isOpen: boolean;
@@ -75,7 +78,10 @@ watch(
 <template>
   <teleport to="body">
     <transition name="modal-fade">
-      <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+      <div
+        v-if="isOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+      >
         <button
           type="button"
           aria-label="关闭弹窗"
@@ -87,8 +93,12 @@ watch(
         >
           <header class="mb-4 flex items-start justify-between gap-4">
             <div>
-              <h3 class="text-lg font-semibold text-slate-900 dark:text-white">{{ title }}</h3>
-              <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ description }}</p>
+              <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+                {{ title }}
+              </h3>
+              <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                {{ description }}
+              </p>
             </div>
             <button
               type="button"
@@ -102,7 +112,10 @@ watch(
           <form class="space-y-4" @submit.prevent="emitSubmit">
             <div class="grid gap-3 sm:grid-cols-2">
               <label class="space-y-1">
-                <span class="text-xs font-medium text-slate-600 dark:text-slate-300">订阅名称</span>
+                <span
+                  class="text-xs font-medium text-slate-600 dark:text-slate-300"
+                  >订阅名称</span
+                >
                 <input
                   v-model="localForm.name"
                   type="text"
@@ -111,7 +124,10 @@ watch(
                 />
               </label>
               <label class="space-y-1">
-                <span class="text-xs font-medium text-slate-600 dark:text-slate-300">服务商</span>
+                <span
+                  class="text-xs font-medium text-slate-600 dark:text-slate-300"
+                  >服务商</span
+                >
                 <input
                   v-model="localForm.provider"
                   type="text"
@@ -123,7 +139,10 @@ watch(
 
             <div class="grid gap-3 sm:grid-cols-[1fr_1fr_1fr]">
               <label class="space-y-1">
-                <span class="text-xs font-medium text-slate-600 dark:text-slate-300">价格</span>
+                <span
+                  class="text-xs font-medium text-slate-600 dark:text-slate-300"
+                  >价格</span
+                >
                 <input
                   v-model="localForm.price"
                   type="number"
@@ -134,7 +153,10 @@ watch(
                 />
               </label>
               <label class="space-y-1">
-                <span class="text-xs font-medium text-slate-600 dark:text-slate-300">币种</span>
+                <span
+                  class="text-xs font-medium text-slate-600 dark:text-slate-300"
+                  >币种</span
+                >
                 <input
                   v-model="localForm.currency"
                   type="text"
@@ -144,25 +166,42 @@ watch(
                   class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-white"
                 />
                 <datalist :id="`subscription-currency-options-${mode}`">
-                  <option v-for="currency in currencySuggestions" :key="currency" :value="currency" />
+                  <option
+                    v-for="currency in currencySuggestions"
+                    :key="currency"
+                    :value="currency"
+                  />
                 </datalist>
               </label>
               <label class="space-y-1">
-                <span class="text-xs font-medium text-slate-600 dark:text-slate-300">计费周期</span>
+                <span
+                  class="text-xs font-medium text-slate-600 dark:text-slate-300"
+                  >计费周期</span
+                >
                 <select
                   v-model="localForm.billing_cycle"
                   class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-white"
                 >
-                  <option v-for="cycle in cycleOptions" :key="cycle.value" :value="cycle.value">
+                  <option
+                    v-for="cycle in cycleOptions"
+                    :key="cycle.value"
+                    :value="cycle.value"
+                  >
                     {{ cycle.label }}
                   </option>
                 </select>
               </label>
             </div>
 
-            <div class="grid gap-3" :class="includeStatus ? 'sm:grid-cols-2' : ''">
+            <div
+              class="grid gap-3"
+              :class="includeStatus ? 'sm:grid-cols-2' : ''"
+            >
               <label class="space-y-1">
-                <span class="text-xs font-medium text-slate-600 dark:text-slate-300">下次扣费日期</span>
+                <span
+                  class="text-xs font-medium text-slate-600 dark:text-slate-300"
+                  >下次扣费日期</span
+                >
                 <input
                   v-model="localForm.next_billing_date"
                   type="date"
@@ -170,12 +209,19 @@ watch(
                 />
               </label>
               <label v-if="includeStatus" class="space-y-1">
-                <span class="text-xs font-medium text-slate-600 dark:text-slate-300">状态</span>
+                <span
+                  class="text-xs font-medium text-slate-600 dark:text-slate-300"
+                  >状态</span
+                >
                 <select
                   v-model="localForm.status"
                   class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-white"
                 >
-                  <option v-for="status in statusOptions" :key="status.value" :value="status.value">
+                  <option
+                    v-for="status in statusOptions"
+                    :key="status.value"
+                    :value="status.value"
+                  >
                     {{ status.label }}
                   </option>
                 </select>
@@ -183,7 +229,10 @@ watch(
             </div>
 
             <label class="space-y-1">
-              <span class="text-xs font-medium text-slate-600 dark:text-slate-300">备注</span>
+              <span
+                class="text-xs font-medium text-slate-600 dark:text-slate-300"
+                >备注</span
+              >
               <textarea
                 v-model="localForm.notes"
                 rows="3"

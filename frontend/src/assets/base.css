@@ -3,8 +3,10 @@
 @font-face {
   font-family: "阿里妈妈方圆体 VF Regular";
   src:
-    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/JzWMyKA8U06c.woff2") format("woff2"),
-    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/qFzBtDuQpN4i.woff") format("woff");
+    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/JzWMyKA8U06c.woff2")
+      format("woff2"),
+    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/qFzBtDuQpN4i.woff")
+      format("woff");
   font-variation-settings:
     "BEVL" 80,
     "wght" 500;
@@ -15,8 +17,10 @@
   font-family: "阿里妈妈东方大楷 Regular";
   font-weight: 400;
   src:
-    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/bs5CgKu7Hdck.woff2") format("woff2"),
-    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/FS1e5LRmIZGQ.woff") format("woff");
+    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/bs5CgKu7Hdck.woff2")
+      format("woff2"),
+    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/FS1e5LRmIZGQ.woff")
+      format("woff");
   font-variation-settings: normal;
   font-display: swap;
 }
@@ -43,9 +47,11 @@ body {
   }
 }
 @theme {
-  --font-family-alibaba: "阿里妈妈方圆体 VF Regular", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-family-alibaba:
+    "阿里妈妈方圆体 VF Regular", "PingFang SC", "Microsoft YaHei", sans-serif;
 
-  --font-family-dongfang: "阿里妈妈东方大楷 Regular", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-family-dongfang:
+    "阿里妈妈东方大楷 Regular", "PingFang SC", "Microsoft YaHei", sans-serif;
 
   --animate-bounce-up: bounce-up 2s infinite;
 

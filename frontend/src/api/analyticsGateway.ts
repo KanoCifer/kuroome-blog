@@ -9,22 +9,36 @@ export interface AnalyticsOverviewData {
 
 export interface AnalyticsGateway {
   getOverview(days: number): Promise<AnalyticsOverviewData>;
-  getUserLogins(params: { days: number; page: number; page_size: number }): Promise<AnalyticsOverviewData>;
+  getUserLogins(params: {
+    days: number;
+    page: number;
+    page_size: number;
+  }): Promise<AnalyticsOverviewData>;
   reportVisitorData(data: Record<string, unknown>): Promise<void>;
 }
 
 export const analyticsGateway: AnalyticsGateway = {
   async getOverview(days: number): Promise<AnalyticsOverviewData> {
-    const res = await request.get<ApiResponse<Record<string, unknown>>>("v1/status/overview", {
-      params: { days },
-    });
+    const res = await request.get<ApiResponse<Record<string, unknown>>>(
+      "v1/status/overview",
+      {
+        params: { days },
+      },
+    );
     return res.data;
   },
 
-  async getUserLogins(params: { days: number; page: number; page_size: number }): Promise<AnalyticsOverviewData> {
-    const res = await request.get<ApiResponse<Record<string, unknown>>>("v1/status/user-logins", {
-      params,
-    });
+  async getUserLogins(params: {
+    days: number;
+    page: number;
+    page_size: number;
+  }): Promise<AnalyticsOverviewData> {
+    const res = await request.get<ApiResponse<Record<string, unknown>>>(
+      "v1/status/user-logins",
+      {
+        params,
+      },
+    );
     return res.data;
   },
 

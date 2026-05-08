@@ -116,6 +116,11 @@ class User(Base):
         back_populates="user", uselist=False, cascade="all, delete-orphan"
     )
 
+    # 一对多关系与画廊图片
+    gallery_images: Mapped[list[GalleryImage]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+
     def __init__(self, *args, **kwargs):
         """允许在初始化时直接传入 password 参数并自动生成哈希值"""
         password = kwargs.get("password")
@@ -451,3 +456,34 @@ class DeviceTrack(Base):
         nullable=False,
     )
     reminder_config: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+
+
+class GalleryImage(Base):
+    """持久化的画廊图片记录"""
+
+    __tablename__ = "gallery_image"
+
+    id: Mapped[int] = mapped_column(
+        Integer, primary_key=True, autoincrement=True
+    )
+    url: Mapped[str] = mapped_column(String(500), nullable=False)
+    description: Mapped[str] = mapped_column(String(500), default="")
+    file_size: Mapped[int] = mapped_column(Integer, default=0)
+    mime_type: Mapped[str] = mapped_column(String(50), default="image/jpeg")
+    sort_order: Mapped[int] = mapped_column(Integer, default=0, index=True)
+    uploaded_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC)
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), index=True
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+    )
+
+    user_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("user.id"), nullable=True, index=True
+    )
+    user: Mapped[User | None] = relationship(back_populates="gallery_images")

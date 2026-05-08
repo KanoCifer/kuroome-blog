@@ -36,7 +36,10 @@ export interface SubscriptionItem {
 }
 
 export interface RssService {
-  parseRss(payload: { rss_url: string; save_to_db: boolean }): Promise<ParsedRssFeed>;
+  parseRss(payload: {
+    rss_url: string;
+    save_to_db: boolean;
+  }): Promise<ParsedRssFeed>;
   getArticles(params: {
     page?: number;
     limit?: number;
@@ -52,7 +55,10 @@ export interface RssService {
 }
 
 export const rssService: RssService = {
-  async parseRss(payload: { rss_url: string; save_to_db: boolean }): Promise<ParsedRssFeed> {
+  async parseRss(payload: {
+    rss_url: string;
+    save_to_db: boolean;
+  }): Promise<ParsedRssFeed> {
     return rssGateway.parseRss(payload);
   },
 

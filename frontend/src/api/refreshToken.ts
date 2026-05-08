@@ -4,8 +4,7 @@ let inMemoryRefreshToken = "";
 
 function isBrowserStorageAvailable(): boolean {
   return (
-    typeof window !== "undefined" &&
-    typeof window.localStorage !== "undefined"
+    typeof window !== "undefined" && typeof window.localStorage !== "undefined"
   );
 }
 

@@ -56,41 +56,67 @@ export interface SubscriptionGateway {
   /** 创建订阅 */
   createSubscription(payload: CreateSubscriptionPayload): Promise<Subscription>;
   /** 更新订阅 */
-  updateSubscription(subId: number, payload: UpdateSubscriptionPayload): Promise<Subscription>;
+  updateSubscription(
+    subId: number,
+    payload: UpdateSubscriptionPayload,
+  ): Promise<Subscription>;
   /** 删除订阅 */
   deleteSubscription(subId: number): Promise<void>;
   /** 更新订阅状态 */
   updateStatus(subId: number, newStatus: string): Promise<Subscription>;
   /** 更新订阅提醒配置 */
-  updateReminders(subId: number, reminderData: Record<string, unknown>): Promise<Subscription>;
+  updateReminders(
+    subId: number,
+    reminderData: Record<string, unknown>,
+  ): Promise<Subscription>;
   /** 获取即将到期的订阅 */
   getUpcomingSubscriptions(): Promise<Subscription[]>;
   /** 测试通知 */
-  testNotification(subId: number, payload: TestNotificationPayload): Promise<Record<string, boolean>>;
+  testNotification(
+    subId: number,
+    payload: TestNotificationPayload,
+  ): Promise<Record<string, boolean>>;
   /** 获取用户全局默认通知配置 */
   getUserGlobalConfig(): Promise<Record<string, unknown>>;
   /** 更新用户全局默认通知配置 */
-  updateUserGlobalConfig(configData: Record<string, unknown>): Promise<Record<string, unknown>>;
+  updateUserGlobalConfig(
+    configData: Record<string, unknown>,
+  ): Promise<Record<string, unknown>>;
 }
 
 export const subscriptionGateway: SubscriptionGateway = {
   async getSubscriptions(): Promise<Subscription[]> {
-    const res = await request.get<{ data: { subscriptions: Subscription[] } }>("v2/subscriptions");
+    const res = await request.get<{ data: { subscriptions: Subscription[] } }>(
+      "v2/subscriptions",
+    );
     return res.data.data.subscriptions;
   },
 
   async getSubscription(subId: number): Promise<Subscription> {
-    const res = await request.get<{ data: { subscription: Subscription } }>(`v2/subscriptions/${subId}`);
+    const res = await request.get<{ data: { subscription: Subscription } }>(
+      `v2/subscriptions/${subId}`,
+    );
     return res.data.data.subscription;
   },
 
-  async createSubscription(payload: CreateSubscriptionPayload): Promise<Subscription> {
-    const res = await request.post<{ data: { subscription: Subscription } }>("v2/subscriptions", payload);
+  async createSubscription(
+    payload: CreateSubscriptionPayload,
+  ): Promise<Subscription> {
+    const res = await request.post<{ data: { subscription: Subscription } }>(
+      "v2/subscriptions",
+      payload,
+    );
     return res.data.data.subscription;
   },
 
-  async updateSubscription(subId: number, payload: UpdateSubscriptionPayload): Promise<Subscription> {
-    const res = await request.put<{ data: { subscription: Subscription } }>(`v2/subscriptions/${subId}`, payload);
+  async updateSubscription(
+    subId: number,
+    payload: UpdateSubscriptionPayload,
+  ): Promise<Subscription> {
+    const res = await request.put<{ data: { subscription: Subscription } }>(
+      `v2/subscriptions/${subId}`,
+      payload,
+    );
     return res.data.data.subscription;
   },
 
@@ -109,7 +135,10 @@ export const subscriptionGateway: SubscriptionGateway = {
     return res.data.data.subscription;
   },
 
-  async updateReminders(subId: number, reminderData: Record<string, unknown>): Promise<Subscription> {
+  async updateReminders(
+    subId: number,
+    reminderData: Record<string, unknown>,
+  ): Promise<Subscription> {
     const res = await request.patch<{ data: { subscription: Subscription } }>(
       `v2/subscriptions/${subId}/reminders`,
       reminderData,
@@ -118,25 +147,35 @@ export const subscriptionGateway: SubscriptionGateway = {
   },
 
   async getUpcomingSubscriptions(): Promise<Subscription[]> {
-    const res = await request.get<{ data: { subscriptions: Subscription[] } }>("v2/subscriptions/upcoming");
+    const res = await request.get<{ data: { subscriptions: Subscription[] } }>(
+      "v2/subscriptions/upcoming",
+    );
     return res.data.data.subscriptions;
   },
 
-  async testNotification(subId: number, payload: TestNotificationPayload): Promise<Record<string, boolean>> {
-    const res = await request.post<{ data: { results: Record<string, boolean> } }>(
-      `v2/subscriptions/${subId}/test-notification`,
-      payload,
-    );
+  async testNotification(
+    subId: number,
+    payload: TestNotificationPayload,
+  ): Promise<Record<string, boolean>> {
+    const res = await request.post<{
+      data: { results: Record<string, boolean> };
+    }>(`v2/subscriptions/${subId}/test-notification`, payload);
     return res.data.data.results;
   },
 
   async getUserGlobalConfig(): Promise<Record<string, unknown>> {
-    const res = await request.get<{ data: { config: Record<string, unknown> } }>("v2/subscriptions/global-config");
+    const res = await request.get<{
+      data: { config: Record<string, unknown> };
+    }>("v2/subscriptions/global-config");
     return res.data.data.config;
   },
 
-  async updateUserGlobalConfig(configData: Record<string, unknown>): Promise<Record<string, unknown>> {
-    const res = await request.put<{ data: { config: Record<string, unknown> } }>("v2/subscriptions/global-config", {
+  async updateUserGlobalConfig(
+    configData: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
+    const res = await request.put<{
+      data: { config: Record<string, unknown> };
+    }>("v2/subscriptions/global-config", {
       config_data: configData,
     });
     return res.data.data.config;

@@ -27,7 +27,9 @@ const markdownEditorRef = ref<InstanceType<typeof MarkdownEditor> | null>(null);
 // 计算当前选中的分类名称
 const currentCategory = computed(() => {
   if (!category.value) return "";
-  const selectedCategory = categories.value.find((cat) => String(cat.id) === category.value);
+  const selectedCategory = categories.value.find(
+    (cat) => String(cat.id) === category.value,
+  );
   return selectedCategory ? selectedCategory.name : "";
 });
 
@@ -38,7 +40,9 @@ const error = ref("");
 
 // 保存草稿
 const handleSaveDraft = () => {
-  const safeKey = (debouncedTitle.value || "default").trim().replace(/[^\w\u4e00-\u9fa5-]/g, "_");
+  const safeKey = (debouncedTitle.value || "default")
+    .trim()
+    .replace(/[^\w\u4e00-\u9fa5-]/g, "_");
   localStorage.setItem(`markdown-draft-${safeKey}`, body.value);
   notification.success("草稿已保存");
 };
@@ -126,9 +130,12 @@ const handleSubmit = async () => {
   if (markdownEditorRef.value) {
     try {
       // Upload blob images and get final markdown content
-      const markdownWithServerUrls = await markdownEditorRef.value.getContentForPublish();
+      const markdownWithServerUrls =
+        await markdownEditorRef.value.getContentForPublish();
       // Convert to HTML
-      currentContent = marked.parse(markdownWithServerUrls, { async: false }) as string;
+      currentContent = marked.parse(markdownWithServerUrls, {
+        async: false,
+      }) as string;
     } catch (err) {
       error.value = "图片上传失败";
       notification.error(error.value);
@@ -204,7 +211,10 @@ const handleCategoryMouseLeave = () => {
   >
     <div class="col-span-full mx-auto w-full max-w-4xl">
       <!-- Error Message -->
-      <div v-if="error" class="mb-6 rounded-lg bg-red-50 p-4 text-red-800 dark:bg-red-900/20 dark:text-red-200">
+      <div
+        v-if="error"
+        class="mb-6 rounded-lg bg-red-50 p-4 text-red-800 dark:bg-red-900/20 dark:text-red-200"
+      >
         <div class="flex items-center">
           <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
             <path
@@ -219,12 +229,19 @@ const handleCategoryMouseLeave = () => {
 
       <!-- Loading State -->
       <div v-if="loading && isEdit" class="py-12 text-center">
-        <div class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"></div>
+        <div
+          class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"
+        ></div>
         <p class="mt-2 text-gray-600 dark:text-gray-400">Loading post...</p>
       </div>
 
       <!-- Form -->
-      <form v-else @submit.prevent="handleSubmit" ref="formRef" class="space-y-6">
+      <form
+        v-else
+        @submit.prevent="handleSubmit"
+        ref="formRef"
+        class="space-y-6"
+      >
         <!-- Title, Category, and Pin -->
         <div class="space-y-4">
           <!-- Title -->
@@ -259,7 +276,10 @@ const handleCategoryMouseLeave = () => {
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
                 fill="currentColor"
-                :class="['h-4 w-4 transition-transform duration-200', pin ? 'rotate-0' : 'rotate-45']"
+                :class="[
+                  'h-4 w-4 transition-transform duration-200',
+                  pin ? 'rotate-0' : 'rotate-45',
+                ]"
               >
                 <path
                   d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 4.5a.75.75 0 001.09 0l4.25-4.5a.75.75 0 00-1.09-1.03l-2.955 3.129V2.75z"
@@ -293,7 +313,10 @@ const handleCategoryMouseLeave = () => {
                       clip-rule="evenodd"
                     />
                   </svg>
-                  <span class="mr-2 text-sm font-medium text-gray-500 dark:text-gray-400">分类</span>
+                  <span
+                    class="mr-2 text-sm font-medium text-gray-500 dark:text-gray-400"
+                    >分类</span
+                  >
                   <span class="text-sm font-medium">
                     {{ currentCategory || "请选择分类..." }}
                   </span>
@@ -386,14 +409,27 @@ const handleCategoryMouseLeave = () => {
               fill="none"
               viewBox="0 0 24 24"
             >
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
               <path
                 class="opacity-75"
                 fill="currentColor"
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               ></path>
             </svg>
-            <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="mr-2 h-4 w-4">
+            <svg
+              v-else
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              class="mr-2 h-4 w-4"
+            >
               <path
                 fill-rule="evenodd"
                 d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"

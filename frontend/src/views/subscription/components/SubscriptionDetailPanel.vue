@@ -9,7 +9,11 @@ interface Props {
   getCycleLabel: (cycle: string) => string;
   formatPrice: (price: number, currency: string) => string;
   formatDate: (value: string) => string;
-  getStatusMeta: (status: string) => { label: string; dotClass: string; badgeClass: string };
+  getStatusMeta: (status: string) => {
+    label: string;
+    dotClass: string;
+    badgeClass: string;
+  };
   getReminderChannelsText: (config: Record<string, unknown> | null) => string;
   getReminderPointsText: (config: Record<string, unknown> | null) => string;
 }
@@ -29,43 +33,67 @@ const emit = defineEmits<{
     <section
       class="rounded-3xl border border-slate-200/80 bg-white/95 p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/85"
     >
-      <h3 class="text-sm font-semibold tracking-wide text-slate-700 uppercase dark:text-slate-300">详情面板</h3>
+      <h3
+        class="text-sm font-semibold tracking-wide text-slate-700 uppercase dark:text-slate-300"
+      >
+        详情面板
+      </h3>
 
       <div v-if="selectedSubscription" class="mt-4 space-y-4">
         <div class="flex items-start justify-between gap-3">
           <div>
-            <h4 class="text-xl font-semibold text-slate-900 dark:text-white">{{ selectedSubscription.name }}</h4>
-            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ selectedSubscription.provider }}</p>
+            <h4 class="text-xl font-semibold text-slate-900 dark:text-white">
+              {{ selectedSubscription.name }}
+            </h4>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              {{ selectedSubscription.provider }}
+            </p>
           </div>
           <span
             class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium"
             :class="getStatusMeta(selectedSubscription.status).badgeClass"
           >
-            <span class="mr-1 h-1.5 w-1.5 rounded-full" :class="getStatusMeta(selectedSubscription.status).dotClass" />
+            <span
+              class="mr-1 h-1.5 w-1.5 rounded-full"
+              :class="getStatusMeta(selectedSubscription.status).dotClass"
+            />
             {{ getStatusMeta(selectedSubscription.status).label }}
           </span>
         </div>
 
         <div class="grid grid-cols-2 gap-3 text-sm">
-          <div class="rounded-xl bg-slate-100/80 px-3 py-2 dark:bg-slate-800/80">
+          <div
+            class="rounded-xl bg-slate-100/80 px-3 py-2 dark:bg-slate-800/80"
+          >
             <p class="text-xs text-slate-500 dark:text-slate-400">价格</p>
             <p class="mt-1 font-medium text-slate-900 dark:text-slate-100">
-              {{ formatPrice(selectedSubscription.price, selectedSubscription.currency) }}
+              {{
+                formatPrice(
+                  selectedSubscription.price,
+                  selectedSubscription.currency,
+                )
+              }}
             </p>
           </div>
-          <div class="rounded-xl bg-slate-100/80 px-3 py-2 dark:bg-slate-800/80">
+          <div
+            class="rounded-xl bg-slate-100/80 px-3 py-2 dark:bg-slate-800/80"
+          >
             <p class="text-xs text-slate-500 dark:text-slate-400">周期</p>
             <p class="mt-1 font-medium text-slate-900 dark:text-slate-100">
               {{ getCycleLabel(selectedSubscription.billing_cycle) }}
             </p>
           </div>
-          <div class="rounded-xl bg-slate-100/80 px-3 py-2 dark:bg-slate-800/80">
+          <div
+            class="rounded-xl bg-slate-100/80 px-3 py-2 dark:bg-slate-800/80"
+          >
             <p class="text-xs text-slate-500 dark:text-slate-400">下次扣费</p>
             <p class="mt-1 font-medium text-slate-900 dark:text-slate-100">
               {{ toDateInputValue(selectedSubscription.next_billing_date) }}
             </p>
           </div>
-          <div class="rounded-xl bg-slate-100/80 px-3 py-2 dark:bg-slate-800/80">
+          <div
+            class="rounded-xl bg-slate-100/80 px-3 py-2 dark:bg-slate-800/80"
+          >
             <p class="text-xs text-slate-500 dark:text-slate-400">更新时间</p>
             <p class="mt-1 font-medium text-slate-900 dark:text-slate-100">
               {{ formatDate(selectedSubscription.updated_at) }}
@@ -73,13 +101,19 @@ const emit = defineEmits<{
           </div>
         </div>
 
-        <div class="rounded-xl border border-slate-200 px-3 py-2 dark:border-slate-700">
+        <div
+          class="rounded-xl border border-slate-200 px-3 py-2 dark:border-slate-700"
+        >
           <p class="text-xs text-slate-500 dark:text-slate-400">提醒配置</p>
           <p class="mt-1 text-sm text-slate-700 dark:text-slate-300">
-            渠道：{{ getReminderChannelsText(selectedSubscription.reminder_config) }}
+            渠道：{{
+              getReminderChannelsText(selectedSubscription.reminder_config)
+            }}
           </p>
           <p class="mt-1 text-sm text-slate-700 dark:text-slate-300">
-            节点：{{ getReminderPointsText(selectedSubscription.reminder_config) }}
+            节点：{{
+              getReminderPointsText(selectedSubscription.reminder_config)
+            }}
           </p>
         </div>
 
@@ -110,7 +144,9 @@ const emit = defineEmits<{
             :disabled="pendingStatusId === selectedSubscription.id"
             @click="emit('toggleStatus', selectedSubscription)"
           >
-            {{ selectedSubscription.status === "active" ? "暂停订阅" : "恢复订阅" }}
+            {{
+              selectedSubscription.status === "active" ? "暂停订阅" : "恢复订阅"
+            }}
           </button>
           <button
             type="button"

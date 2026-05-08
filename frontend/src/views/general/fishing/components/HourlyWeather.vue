@@ -40,7 +40,9 @@ const checkDarkMode = () => {
 
 onMounted(() => {
   checkDarkMode();
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", checkDarkMode);
+  window
+    .matchMedia("(prefers-color-scheme: dark)")
+    .addEventListener("change", checkDarkMode);
 });
 
 const chartOption = computed(() => {
@@ -48,7 +50,9 @@ const chartOption = computed(() => {
     return {};
   }
 
-  const xData = weatherHourly.value.map((item) => dayjs(item.fxTime).format("HH:mm"));
+  const xData = weatherHourly.value.map((item) =>
+    dayjs(item.fxTime).format("HH:mm"),
+  );
   const rainData = weatherHourly.value.map((item) => item.precip ?? 0);
   const tempData = weatherHourly.value.map((item) => item.temp ?? 0);
 
@@ -194,7 +198,12 @@ const chartOption = computed(() => {
         itemStyle: { color: "#f97316", borderWidth: 2, borderColor: "#fff" },
         markArea: {
           silent: true,
-          data: [[{ yAxis: 20, itemStyle: { color: "rgba(250, 204, 21, 0.1)" } }, { yAxis: 28 }]],
+          data: [
+            [
+              { yAxis: 20, itemStyle: { color: "rgba(250, 204, 21, 0.1)" } },
+              { yAxis: 28 },
+            ],
+          ],
         },
       },
     ],
@@ -219,17 +228,26 @@ const chartOption = computed(() => {
       <div>
         <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100">
           小时天气预报
-          <span class="ml-2 text-sm font-normal text-slate-500 dark:text-slate-400">未来24小时</span>
+          <span
+            class="ml-2 text-sm font-normal text-slate-500 dark:text-slate-400"
+            >未来24小时</span
+          >
         </h3>
-        <p class="mt-0.5 text-sm text-slate-400 dark:text-slate-500">天气变化趋势</p>
+        <p class="mt-0.5 text-sm text-slate-400 dark:text-slate-500">
+          天气变化趋势
+        </p>
       </div>
       <!-- Legend pills -->
       <div class="flex items-center gap-3">
-        <div class="flex items-center gap-1.5 rounded-full bg-white/60 px-3 py-1.5 shadow-sm dark:bg-slate-800/60">
+        <div
+          class="flex items-center gap-1.5 rounded-full bg-white/60 px-3 py-1.5 shadow-sm dark:bg-slate-800/60"
+        >
           <span class="h-2.5 w-2.5 rounded-full bg-blue-500" />
           <span class="text-xs text-slate-600 dark:text-slate-300">降水量</span>
         </div>
-        <div class="flex items-center gap-1.5 rounded-full bg-white/60 px-3 py-1.5 shadow-sm dark:bg-slate-800/60">
+        <div
+          class="flex items-center gap-1.5 rounded-full bg-white/60 px-3 py-1.5 shadow-sm dark:bg-slate-800/60"
+        >
           <span class="h-2.5 w-2.5 rounded-full bg-orange-500" />
           <span class="text-xs text-slate-600 dark:text-slate-300">温度</span>
         </div>
@@ -237,12 +255,17 @@ const chartOption = computed(() => {
     </div>
 
     <!-- Chart -->
-    <div v-if="weatherHourly && weatherHourly.length > 0" class="relative h-full">
+    <div
+      v-if="weatherHourly && weatherHourly.length > 0"
+      class="relative h-full"
+    >
       <v-chart :option="chartOption" autoresize />
     </div>
     <div v-else class="flex h-64 items-center justify-center">
       <div class="text-center">
-        <div class="mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-blue-500" />
+        <div
+          class="mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-blue-500"
+        />
         <p class="text-sm text-slate-400">正在加载天气数据...</p>
       </div>
     </div>

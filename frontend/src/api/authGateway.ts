@@ -15,7 +15,9 @@ export interface AuthGateway {
     mobile: string | null;
     password: string | null;
   }): Promise<AxiosResponse<any>>;
-  sendRegisterEmailCode(payload: { email: string }): Promise<AxiosResponse<any>>;
+  sendRegisterEmailCode(payload: {
+    email: string;
+  }): Promise<AxiosResponse<any>>;
   register(payload: {
     username: string;
     email: string;

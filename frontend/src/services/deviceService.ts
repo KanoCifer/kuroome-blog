@@ -8,10 +8,19 @@ export interface DeviceService {
   getUserDevices: () => Promise<Device[]>;
   getDeviceById: (device_id: number) => Promise<Device>;
   createDevice: (data: DeviceInput) => Promise<Device>;
-  updateDevice: (device_id: number, data: Omit<DeviceInput, "id">) => Promise<Device>;
+  updateDevice: (
+    device_id: number,
+    data: Omit<DeviceInput, "id">,
+  ) => Promise<Device>;
   deleteDevice: (device_id: number) => Promise<void>;
-  updateDeviceStatus: (device_id: number, status: "active" | "retired") => Promise<Device>;
-  updateDeviceReminderConfig: (device_id: number, reminder_config: unknown) => Promise<Device>;
+  updateDeviceStatus: (
+    device_id: number,
+    status: "active" | "retired",
+  ) => Promise<Device>;
+  updateDeviceReminderConfig: (
+    device_id: number,
+    reminder_config: unknown,
+  ) => Promise<Device>;
   testNotification: (device_id: number) => Promise<void>;
 }
 
@@ -69,7 +78,10 @@ export const deviceService: DeviceService = {
     return gateway.updateDeviceStatus(device_id, status);
   },
 
-  async updateDeviceReminderConfig(device_id: number, reminder_config: unknown): Promise<Device> {
+  async updateDeviceReminderConfig(
+    device_id: number,
+    reminder_config: unknown,
+  ): Promise<Device> {
     if (!device_id || device_id <= 0) {
       return Promise.reject(new Error("无效的设备ID"));
     }

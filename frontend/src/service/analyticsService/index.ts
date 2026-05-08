@@ -1,8 +1,15 @@
-import { analyticsGateway, type AnalyticsOverviewData } from "@/api/analyticsGateway";
+import {
+  analyticsGateway,
+  type AnalyticsOverviewData,
+} from "@/api/analyticsGateway";
 
 export interface AnalyticsService {
   getOverview(days: number): Promise<AnalyticsOverviewData>;
-  getUserLogins(params: { days: number; page: number; page_size: number }): Promise<AnalyticsOverviewData>;
+  getUserLogins(params: {
+    days: number;
+    page: number;
+    page_size: number;
+  }): Promise<AnalyticsOverviewData>;
   reportVisitorData(data: Record<string, unknown>): Promise<void>;
 }
 

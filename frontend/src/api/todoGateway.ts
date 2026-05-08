@@ -1,5 +1,9 @@
 import request from "@/api/request";
-import type { BatchAction, CreateTodoPayload, Todo } from "@/service/todoService/types";
+import type {
+  BatchAction,
+  CreateTodoPayload,
+  Todo,
+} from "@/service/todoService/types";
 
 export interface TodoGateway {
   fetchTodos(includeArchived?: boolean): Promise<Todo[]>;
@@ -18,12 +22,18 @@ export const todoGateway: TodoGateway = {
   },
 
   async addTodo(payload: CreateTodoPayload): Promise<Todo | null> {
-    const res = await request.post<{ data?: { todo?: Todo } }>("v1/todos", payload);
+    const res = await request.post<{ data?: { todo?: Todo } }>(
+      "v1/todos",
+      payload,
+    );
     return res.data.data?.todo ?? null;
   },
 
   async updateTodo(id: string, patch: Partial<Todo>): Promise<Todo | null> {
-    const res = await request.patch<{ data?: { todo?: Todo } }>(`v1/todos/${id}`, patch);
+    const res = await request.patch<{ data?: { todo?: Todo } }>(
+      `v1/todos/${id}`,
+      patch,
+    );
     return res.data.data?.todo ?? null;
   },
 

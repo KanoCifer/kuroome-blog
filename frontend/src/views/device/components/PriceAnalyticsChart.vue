@@ -20,7 +20,11 @@
 <script setup lang="ts">
 import type { Device } from "@/services/deviceService";
 import { PieChart } from "echarts/charts";
-import { GridComponent, TitleComponent, TooltipComponent } from "echarts/components";
+import {
+  GridComponent,
+  TitleComponent,
+  TooltipComponent,
+} from "echarts/components";
 import { use } from "echarts/core";
 import { SVGRenderer } from "echarts/renderers";
 import { computed, onMounted, onUnmounted, ref } from "vue";
@@ -80,7 +84,14 @@ const chartOption = computed(() => {
     },
     series: [
       {
-        color: ["#ee6666", "#73c0de", "#3ba272", "#fc8452", "#9a60b4", "#ea7ccc"],
+        color: [
+          "#ee6666",
+          "#73c0de",
+          "#3ba272",
+          "#fc8452",
+          "#9a60b4",
+          "#ea7ccc",
+        ],
         type: "pie",
         data: props.data.map((device) => ({
           name: device.name,

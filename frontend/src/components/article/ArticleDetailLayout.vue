@@ -81,9 +81,7 @@ const formattedDate = computed(() =>
       </div>
 
       <div v-else>
-        <h1
-          class="max-w-6xl text-center font-serif text-7xl text-gray-50"
-        >
+        <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50">
           {{ title }}
         </h1>
         <!-- Author and Date Info -->

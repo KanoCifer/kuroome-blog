@@ -38,7 +38,11 @@ export interface AuthGateway {
   fetchUser: () => Promise<UserInfo | null>;
   initCSRF: () => Promise<void>;
   getPasskeyAuthenticationOptions: () => Promise<PublicKeyCredentialRequestOptionsJSON>;
-  login: (username: string, password: string, rememberMe: boolean) => Promise<LoginResult>;
+  login: (
+    username: string,
+    password: string,
+    rememberMe: boolean,
+  ) => Promise<LoginResult>;
   loginWithPasskey: (assertion: unknown) => Promise<PasskeyLoginResult>;
   logout: () => Promise<void>;
   postHeartbeat: () => Promise<void>;
@@ -79,27 +83,37 @@ export function createAuthGateway(): AuthGateway {
     },
 
     async getPasskeyAuthenticationOptions(): Promise<PublicKeyCredentialRequestOptionsJSON> {
-      const res = await request.get<ApiResponse<PublicKeyCredentialRequestOptionsJSON>>(
-        "v1/auth/passkey/authentication-options",
-      );
+      const res = await request.get<
+        ApiResponse<PublicKeyCredentialRequestOptionsJSON>
+      >("v1/auth/passkey/authentication-options");
       return res.data.data;
     },
 
-    async login(username: string, password: string, rememberMe: boolean): Promise<LoginResult> {
-      const res = await request.post<ApiResponse<LoginResponseData>>("v1/auth/login", {
-        username: username,
-        password: password,
-        remember_me: rememberMe,
-      });
+    async login(
+      username: string,
+      password: string,
+      rememberMe: boolean,
+    ): Promise<LoginResult> {
+      const res = await request.post<ApiResponse<LoginResponseData>>(
+        "v1/auth/login",
+        {
+          username: username,
+          password: password,
+          remember_me: rememberMe,
+        },
+      );
 
       const data = unwrapEnvelope(res);
       return data ? buildLoginResult(data) : emptyLoginResult();
     },
 
     async loginWithPasskey(assertion: unknown): Promise<PasskeyLoginResult> {
-      const res = await request.post<ApiResponse<LoginResponseData>>("v1/auth/passkey/authenticate", {
-        assertion: assertion,
-      });
+      const res = await request.post<ApiResponse<LoginResponseData>>(
+        "v1/auth/passkey/authenticate",
+        {
+          assertion: assertion,
+        },
+      );
 
       const data = unwrapEnvelope(res);
       return data ? buildLoginResult(data) : emptyLoginResult();

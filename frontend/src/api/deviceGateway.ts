@@ -20,9 +20,18 @@ export interface DeviceGateway {
   getDeviceById: (device_id: number) => Promise<Device>;
   createDevice: (data: DeviceInput) => Promise<Device>;
   deleteDevice: (device_id: number) => Promise<void>;
-  updateDevice: (device_id: number, data: Omit<DeviceInput, "id">) => Promise<Device>;
-  updateDeviceStatus: (device_id: number, status: "active" | "retired") => Promise<Device>;
-  updateDeviceReminderConfig: (device_id: number, reminder_config: unknown) => Promise<Device>;
+  updateDevice: (
+    device_id: number,
+    data: Omit<DeviceInput, "id">,
+  ) => Promise<Device>;
+  updateDeviceStatus: (
+    device_id: number,
+    status: "active" | "retired",
+  ) => Promise<Device>;
+  updateDeviceReminderConfig: (
+    device_id: number,
+    reminder_config: unknown,
+  ) => Promise<Device>;
   testNotification: (device_id: number) => Promise<void>;
 }
 
@@ -33,7 +42,9 @@ export const deviceGateway: DeviceGateway = {
   },
 
   async getUserGlobalConfig() {
-    const res = await request.get<{ data: { config: Record<string, unknown> } }>("v2/subscriptions/global-config");
+    const res = await request.get<{
+      data: { config: Record<string, unknown> };
+    }>("v2/subscriptions/global-config");
     return res.data.data;
   },
 
@@ -59,14 +70,23 @@ export const deviceGateway: DeviceGateway = {
   },
 
   async updateDeviceStatus(device_id: number, status: "active" | "retired") {
-    const res = await request.patch<{ data: Device }>(`v2/device/${device_id}/status`, { status });
+    const res = await request.patch<{ data: Device }>(
+      `v2/device/${device_id}/status`,
+      { status },
+    );
     return res.data.data;
   },
 
-  async updateDeviceReminderConfig(device_id: number, reminder_config: unknown) {
-    const res = await request.patch<{ data: Device }>(`v2/device/${device_id}/reminders`, {
-      reminder_config,
-    });
+  async updateDeviceReminderConfig(
+    device_id: number,
+    reminder_config: unknown,
+  ) {
+    const res = await request.patch<{ data: Device }>(
+      `v2/device/${device_id}/reminders`,
+      {
+        reminder_config,
+      },
+    );
     return res.data.data;
   },
 

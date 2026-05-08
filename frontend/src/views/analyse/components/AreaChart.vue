@@ -4,7 +4,13 @@ import type { ChartConfig } from "@/components/ui/chart";
 import { computed, ref, watch } from "vue";
 
 // import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   ChartContainer,
   ChartCrosshair,
@@ -13,7 +19,13 @@ import {
   ChartTooltipContent,
   componentToString,
 } from "@/components/ui/chart";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { VisArea, VisAxis, VisLine, VisXYContainer } from "@unovis/vue";
 
 type DailyTrend = {
@@ -111,17 +123,26 @@ const yDomain = computed<[number, number]>(() => {
 
 <template>
   <Card class="pt-0">
-    <CardHeader class="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+    <CardHeader
+      class="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row"
+    >
       <div class="grid flex-1 gap-1">
         <CardTitle>Area Chart - Interactive</CardTitle>
-        <CardDescription> Showing total visitors for the last 3 months </CardDescription>
+        <CardDescription>
+          Showing total visitors for the last 3 months
+        </CardDescription>
       </div>
       <Select v-model="timeRange">
-        <SelectTrigger class="hidden w-40 rounded-lg sm:ml-auto sm:flex" aria-label="Select a value">
+        <SelectTrigger
+          class="hidden w-40 rounded-lg sm:ml-auto sm:flex"
+          aria-label="Select a value"
+        >
           <SelectValue placeholder="Last 3 months" />
         </SelectTrigger>
         <SelectContent class="rounded-xl">
-          <SelectItem value="90d" class="rounded-lg"> Last 3 months </SelectItem>
+          <SelectItem value="90d" class="rounded-lg">
+            Last 3 months
+          </SelectItem>
           <SelectItem value="30d" class="rounded-lg"> Last 30 days </SelectItem>
           <SelectItem value="7d" class="rounded-lg"> Last 7 days </SelectItem>
         </SelectContent>
@@ -134,8 +155,18 @@ const yDomain = computed<[number, number]>(() => {
       <div v-else-if="error" class="flex h-62.5 items-center justify-center">
         <div class="text-red-500">{{ error }}</div>
       </div>
-      <ChartContainer v-else :config="chartConfig" class="aspect-auto h-62.5 w-full" :cursor="false">
-        <VisXYContainer :data="filterRange" :svg-defs="svgDefs" :margin="{ left: -40 }" :y-domain="yDomain">
+      <ChartContainer
+        v-else
+        :config="chartConfig"
+        class="aspect-auto h-62.5 w-full"
+        :cursor="false"
+      >
+        <VisXYContainer
+          :data="filterRange"
+          :svg-defs="svgDefs"
+          :margin="{ left: -40 }"
+          :y-domain="yDomain"
+        >
           <VisArea
             :x="(d: ChartPoint) => d.date"
             :y="(d: ChartPoint) => d.visits"
@@ -165,7 +196,12 @@ const yDomain = computed<[number, number]>(() => {
               }
             "
           />
-          <VisAxis type="y" :num-ticks="3" :tick-line="false" :domain-line="false" />
+          <VisAxis
+            type="y"
+            :num-ticks="3"
+            :tick-line="false"
+            :domain-line="false"
+          />
           <ChartTooltip />
           <ChartCrosshair
             :template="

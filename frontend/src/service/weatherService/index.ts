@@ -22,13 +22,20 @@ export interface WeatherFullResult {
 
 export interface WeatherService {
   getTide(payload: { harbor: string; date: string }): Promise<TideResponse>;
-  fetchWeatherFull(payload: { location: [number, number] }): Promise<WeatherFullResult>;
+  fetchWeatherFull(payload: {
+    location: [number, number];
+  }): Promise<WeatherFullResult>;
 }
 
-const resolveLocationName = (fullData: WeatherFullResponse | undefined, now: WeatherNow | undefined): string => {
+const resolveLocationName = (
+  fullData: WeatherFullResponse | undefined,
+  now: WeatherNow | undefined,
+): string => {
   // TODO(human): 可继续优化位置名兜底优先级（例如接入更多后端字段）。
   const directName = fullData?.locationName?.trim();
-  const hourlyName = (fullData?.hourly as { locationName?: string } | undefined)?.locationName?.trim();
+  const hourlyName = (
+    fullData?.hourly as { locationName?: string } | undefined
+  )?.locationName?.trim();
 
   if (directName) return directName;
   if (hourlyName) return hourlyName;
@@ -36,16 +43,23 @@ const resolveLocationName = (fullData: WeatherFullResponse | undefined, now: Wea
 };
 
 export const weatherService: WeatherService = {
-  async getTide(payload: { harbor: string; date: string }): Promise<TideResponse> {
+  async getTide(payload: {
+    harbor: string;
+    date: string;
+  }): Promise<TideResponse> {
     return weatherGateway.getTide(payload);
   },
 
-  async fetchWeatherFull(payload: { location: [number, number] }): Promise<WeatherFullResult> {
+  async fetchWeatherFull(payload: {
+    location: [number, number];
+  }): Promise<WeatherFullResult> {
     const data = await weatherGateway.getWeatherFull(payload);
     const now = data.current?.now;
     const daily = data.daily?.daily;
     // hourly 是 QWeather HourlyWeather 对象，需要取其中的 hourly 数组
-    const hourlyWrapper = data.hourly as { hourly?: WeatherHourly[] } | undefined;
+    const hourlyWrapper = data.hourly as
+      | { hourly?: WeatherHourly[] }
+      | undefined;
     const hourly = hourlyWrapper?.hourly ?? [];
     const updateTime = data.current?.updateTime ?? data.daily?.updateTime;
     const locationName = resolveLocationName(data, now);

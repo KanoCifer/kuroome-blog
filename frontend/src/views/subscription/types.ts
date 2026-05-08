@@ -47,7 +47,10 @@ export interface ChannelOption {
 
 /** 提醒时间点选项 */
 export interface ReminderPointOption {
-  key: keyof Pick<ReminderFormState, "days_30" | "days_7" | "days_3" | "days_1" | "day_of">;
+  key: keyof Pick<
+    ReminderFormState,
+    "days_30" | "days_7" | "days_3" | "days_1" | "day_of"
+  >;
   label: string;
 }
 

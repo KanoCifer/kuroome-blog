@@ -5,7 +5,9 @@
     <div class="mx-auto w-full max-w-6xl">
       <div class="flex items-start justify-between gap-3">
         <div class="ml-12 space-y-1">
-          <h1 class="mt-2 font-serif text-2xl font-semibold text-gray-900 text-shadow-lg dark:text-white">
+          <h1
+            class="mt-2 font-serif text-2xl font-semibold text-gray-900 text-shadow-lg dark:text-white"
+          >
             DeviceTracker
           </h1>
         </div>

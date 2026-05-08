@@ -34,7 +34,9 @@ const categoryMenuOpen = ref(false);
 // Computed current category name
 const currentCategory = computed(() => {
   if (!category.value) return "";
-  const selectedCategory = categories.value.find((cat) => String(cat.id) === category.value);
+  const selectedCategory = categories.value.find(
+    (cat) => String(cat.id) === category.value,
+  );
   return selectedCategory ? selectedCategory.name : "";
 });
 
@@ -73,7 +75,9 @@ const getCurrentContent = (): string => {
 // Save draft
 const handleSaveDraft = () => {
   // Save markdown draft to localStorage
-  const safeKey = (debouncedTitle.value || "default").trim().replace(/[^\w\u4e00-\u9fa5-]/g, "_");
+  const safeKey = (debouncedTitle.value || "default")
+    .trim()
+    .replace(/[^\w\u4e00-\u9fa5-]/g, "_");
   localStorage.setItem(`markdown-draft-${safeKey}`, markdownBody.value);
   notification.success("草稿已保存");
 };
@@ -145,9 +149,12 @@ const handleSubmit = async () => {
   if (markdownEditorRef.value) {
     try {
       // Upload all blob images and get markdown content with server URLs
-      const markdownWithServerUrls = await markdownEditorRef.value.getContentForPublish();
+      const markdownWithServerUrls =
+        await markdownEditorRef.value.getContentForPublish();
       // Convert to HTML
-      currentContent = marked.parse(markdownWithServerUrls, { async: false }) as string;
+      currentContent = marked.parse(markdownWithServerUrls, {
+        async: false,
+      }) as string;
     } catch (err) {
       error.value = "图片上传失败";
       notification.error(error.value);
@@ -216,7 +223,10 @@ onMounted(async () => {
   >
     <div class="col-span-full mx-auto w-full">
       <!-- Error Message -->
-      <div v-if="error" class="mb-6 rounded-lg bg-red-50 p-4 text-red-800 dark:bg-red-900/20 dark:text-red-200">
+      <div
+        v-if="error"
+        class="mb-6 rounded-lg bg-red-50 p-4 text-red-800 dark:bg-red-900/20 dark:text-red-200"
+      >
         <div class="flex items-center">
           <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
             <path
@@ -231,15 +241,26 @@ onMounted(async () => {
 
       <!-- Loading State -->
       <div v-if="loading && isEdit" class="py-12 text-center">
-        <div class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"></div>
+        <div
+          class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"
+        ></div>
         <p class="mt-2 text-gray-600 dark:text-gray-400">加载文章中...</p>
       </div>
 
       <!-- Form -->
-      <form v-else @submit.prevent="handleSubmit" ref="formRef" class="space-y-4">
+      <form
+        v-else
+        @submit.prevent="handleSubmit"
+        ref="formRef"
+        class="space-y-4"
+      >
         <!-- Title and Controls Bar -->
-        <div class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div
+          class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+        >
+          <div
+            class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
+          >
             <!-- Title Input -->
             <div class="flex-1">
               <input
@@ -264,7 +285,12 @@ onMounted(async () => {
                     : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400',
                 ]"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3.5 w-3.5">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  class="h-3.5 w-3.5"
+                >
                   <path
                     d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 4.5a.75.75 0 001.09 0l4.25-4.5a.75.75 0 00-1.09-1.03l-2.955 3.129V2.75z"
                   />
@@ -276,7 +302,11 @@ onMounted(async () => {
               </button>
 
               <!-- Category Selector -->
-              <div class="group relative" @mouseenter="handleCategoryMouseEnter" @mouseleave="handleCategoryMouseLeave">
+              <div
+                class="group relative"
+                @mouseenter="handleCategoryMouseEnter"
+                @mouseleave="handleCategoryMouseLeave"
+              >
                 <button
                   type="button"
                   @click="categoryMenuOpen = !categoryMenuOpen"
@@ -375,7 +405,14 @@ onMounted(async () => {
               fill="none"
               viewBox="0 0 24 24"
             >
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
               <path
                 class="opacity-75"
                 fill="currentColor"

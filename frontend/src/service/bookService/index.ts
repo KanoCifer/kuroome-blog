@@ -6,11 +6,18 @@ export const bookService = {
     return request.get<BookListResponse>("/book", { params });
   },
 
-  async createBook(payload: { title: string; author: string; iscompleted: boolean }) {
+  async createBook(payload: {
+    title: string;
+    author: string;
+    iscompleted: boolean;
+  }) {
     return request.post("/books/addbook", payload);
   },
 
-  async updateBook(bookId: number, payload: { title: string; author: string; iscompleted: boolean }) {
+  async updateBook(
+    bookId: number,
+    payload: { title: string; author: string; iscompleted: boolean },
+  ) {
     return request.put(`/books/${bookId}`, payload);
   },
 

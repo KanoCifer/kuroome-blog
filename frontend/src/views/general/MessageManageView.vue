@@ -1,13 +1,18 @@
 <template>
   <div>
     <!-- Title Section with Parallax -->
-    <div class="relative -z-5 mx-0 mt-60 flex flex-col items-center justify-center bg-transparent" :style="titleStyle">
+    <div
+      class="relative -z-5 mx-0 mt-60 flex flex-col items-center justify-center bg-transparent"
+      :style="titleStyle"
+    >
       <div>
         <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50">
           {{ activeTab === "messages" ? "留言管理" : "评论管理" }}
         </h1>
         <!-- Description -->
-        <div class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400">
+        <div
+          class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400"
+        >
           <span
             class="inline-block rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400"
           >
@@ -41,7 +46,12 @@
                   : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800',
               ]"
             >
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                class="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -61,7 +71,12 @@
                   : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800',
               ]"
             >
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                class="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -81,7 +96,10 @@
               class="group flex cursor-pointer items-center gap-2 rounded-xl bg-gray-900 px-5 py-2.5 font-medium text-white shadow-md transition-all select-none hover:bg-gray-800 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
             >
               <svg
-                :class="[loading ? 'animate-spin' : 'group-hover:rotate-180', 'h-4 w-4 transition-transform']"
+                :class="[
+                  loading ? 'animate-spin' : 'group-hover:rotate-180',
+                  'h-4 w-4 transition-transform',
+                ]"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -105,7 +123,12 @@
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
               </svg>
               返回
             </button>
@@ -136,7 +159,11 @@
         >
           <div class="py-8">
             <div class="space-y-4">
-              <div v-for="i in 5" :key="i" class="h-16 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-700/40"></div>
+              <div
+                v-for="i in 5"
+                :key="i"
+                class="h-16 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-700/40"
+              ></div>
             </div>
           </div>
         </div>
@@ -178,7 +205,12 @@
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
             </svg>
             返回首页
           </RouterLink>
@@ -260,7 +292,10 @@ const fetchMessages = async () => {
       pendingMessages.value = pending as Message[];
       approvedMessages.value = approved as Message[];
     } else {
-      error.value = result.error?.message || result.description || "Failed to load messages";
+      error.value =
+        result.error?.message ||
+        result.description ||
+        "Failed to load messages";
     }
   } catch {
     error.value = "Network error occurred";
@@ -283,7 +318,10 @@ const fetchComments = async () => {
       pendingComments.value = pending as Comment[];
       approvedComments.value = approved as Comment[];
     } else {
-      error.value = result.error?.message || result.description || "Failed to load comments";
+      error.value =
+        result.error?.message ||
+        result.description ||
+        "Failed to load comments";
     }
   } catch {
     error.value = "Network error occurred";
@@ -303,7 +341,8 @@ const handleApprove = async (itemId: string) => {
       await fetchComments();
     }
   } catch (err) {
-    if (err instanceof Error) error.value = err.message || "Network error occurred";
+    if (err instanceof Error)
+      error.value = err.message || "Network error occurred";
     else error.value = "Network error occurred";
   } finally {
     actionLoading.value = null;
@@ -321,7 +360,8 @@ const handleDelete = async (itemId: string) => {
       await fetchComments();
     }
   } catch (err) {
-    if (err instanceof Error) error.value = err.message || "Network error occurred";
+    if (err instanceof Error)
+      error.value = err.message || "Network error occurred";
     else error.value = "Network error occurred";
   } finally {
     actionLoading.value = null;

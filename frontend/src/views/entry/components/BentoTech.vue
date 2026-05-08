@@ -1,7 +1,11 @@
 <template>
   <BentoCard>
     <div class="p-4">
-      <h3 class="mb-2 ml-2 text-xs font-bold tracking-wider text-gray-600 uppercase dark:text-gray-400">TechStack</h3>
+      <h3
+        class="mb-2 ml-2 text-xs font-bold tracking-wider text-gray-600 uppercase dark:text-gray-400"
+      >
+        TechStack
+      </h3>
       <div class="flex flex-wrap gap-2">
         <span
           v-for="tech in techStack"
