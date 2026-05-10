@@ -24,6 +24,8 @@ echo "  🚀 Deployment Started"
 echo "  📅 $(date)"
 echo "========================================"
 
+export CI=true
+
 step "Setting up Node.js environment"
 source ~/.nvm/nvm.sh
 nvm use 24
