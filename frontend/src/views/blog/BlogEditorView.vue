@@ -77,7 +77,7 @@ const handleSaveDraft = () => {
   // Save markdown draft to localStorage
   const safeKey = (debouncedTitle.value || "default")
     .trim()
-    .replace(/[^\w\u4e00-\u9fa5-]/g, "_");
+    .replace(/[^\w一-龥-]/g, "_");
   localStorage.setItem(`markdown-draft-${safeKey}`, markdownBody.value);
   notification.success("草稿已保存");
 };
@@ -225,7 +225,7 @@ onMounted(async () => {
       <!-- Error Message -->
       <div
         v-if="error"
-        class="mb-6 rounded-lg bg-red-50 p-4 text-red-800 dark:bg-red-900/20 dark:text-red-200"
+        class="bg-destructive/10 text-destructive mb-6 rounded-lg p-4"
       >
         <div class="flex items-center">
           <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -242,9 +242,9 @@ onMounted(async () => {
       <!-- Loading State -->
       <div v-if="loading && isEdit" class="py-12 text-center">
         <div
-          class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"
+          class="border-border/50 border-t-primary mx-auto h-8 w-8 animate-spin rounded-full border-2"
         ></div>
-        <p class="mt-2 text-gray-600 dark:text-gray-400">加载文章中...</p>
+        <p class="text-muted-foreground mt-2">加载文章中...</p>
       </div>
 
       <!-- Form -->
@@ -255,9 +255,7 @@ onMounted(async () => {
         class="space-y-4"
       >
         <!-- Title and Controls Bar -->
-        <div
-          class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900"
-        >
+        <div class="border-border bg-card rounded-3xl border p-4 shadow-sm">
           <div
             class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
           >
@@ -268,7 +266,7 @@ onMounted(async () => {
                 type="text"
                 required
                 placeholder="输入文章标题..."
-                class="w-full border-0 bg-transparent text-2xl font-bold text-slate-900 outline-none placeholder:text-slate-300 dark:text-white dark:placeholder:text-slate-600"
+                class="text-foreground placeholder:text-muted-foreground w-full border-0 bg-transparent text-2xl font-bold outline-none"
               />
             </div>
 
@@ -281,8 +279,8 @@ onMounted(async () => {
                 :class="[
                   'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all',
                   pin
-                    ? 'border-amber-500 bg-amber-50 text-amber-700 dark:border-amber-400 dark:bg-amber-900/20 dark:text-amber-300'
-                    : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400',
+                    ? 'border-warning bg-warning/10 text-warning'
+                    : 'border-border bg-card text-muted-foreground hover:border-border/80',
                 ]"
               >
                 <svg
@@ -310,14 +308,14 @@ onMounted(async () => {
                 <button
                   type="button"
                   @click="categoryMenuOpen = !categoryMenuOpen"
-                  class="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs font-semibold text-slate-700 transition-all hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                  class="border-border bg-card text-muted-foreground hover:border-border/80 flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-semibold transition-all"
                 >
                   <span>{{ currentCategory || "选择分类" }}</span>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
-                    class="h-3.5 w-3.5 text-slate-400"
+                    class="text-muted-foreground h-3.5 w-3.5"
                   >
                     <path
                       fill-rule="evenodd"
@@ -336,7 +334,7 @@ onMounted(async () => {
                 >
                   <div
                     v-if="categoryMenuOpen"
-                    class="absolute top-full right-0 z-50 mt-1 w-48 rounded-xl border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-800"
+                    class="border-border bg-card absolute top-full right-0 z-50 mt-1 w-48 rounded-xl border shadow-lg"
                   >
                     <div class="p-1">
                       <button
@@ -350,8 +348,8 @@ onMounted(async () => {
                         :class="[
                           'w-full rounded-lg px-3 py-2 text-left text-sm transition-colors',
                           category === String(cat.id)
-                            ? 'bg-slate-100 text-slate-900 dark:bg-slate-700 dark:text-white'
-                            : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-700/50',
+                            ? 'bg-accent text-foreground'
+                            : 'text-muted-foreground hover:bg-accent/50',
                         ]"
                       >
                         {{ cat.name }}
@@ -365,7 +363,7 @@ onMounted(async () => {
               <button
                 type="button"
                 @click="handleSaveDraft"
-                class="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition-all hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400"
+                class="border-border bg-card text-muted-foreground hover:border-border/80 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all"
               >
                 <IconSave />
                 保存草稿
@@ -376,7 +374,7 @@ onMounted(async () => {
 
         <!-- Editor Area -->
         <div
-          class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900"
+          class="border-border bg-card overflow-hidden rounded-3xl border shadow-sm"
         >
           <!-- Markdown Editor -->
           <div class="h-[calc(100vh-320px)] min-h-[500px]">
@@ -389,14 +387,14 @@ onMounted(async () => {
           <button
             type="button"
             @click="handleCancel"
-            class="rounded-full border border-slate-200 bg-white px-6 py-2 text-sm font-medium text-slate-700 transition-all hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+            class="border-border bg-card text-muted-foreground hover:bg-accent rounded-full border px-6 py-2 text-sm font-medium transition-all"
           >
             取消
           </button>
           <button
             type="submit"
             :disabled="loading"
-            class="inline-flex items-center justify-center rounded-full bg-slate-900 px-6 py-2 text-sm font-semibold text-white transition-all hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100"
+            class="bg-foreground text-background hover:bg-foreground/90 inline-flex items-center justify-center rounded-full px-6 py-2 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50"
           >
             <svg
               v-if="loading"

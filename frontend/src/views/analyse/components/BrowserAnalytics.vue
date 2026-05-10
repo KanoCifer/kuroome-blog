@@ -1,11 +1,11 @@
 <template>
-  <div class="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800/80">
-    <h2 class="mb-4 text-lg font-bold text-gray-800 dark:text-gray-100">
+  <div class="bg-card rounded-2xl p-6 shadow-lg">
+    <h2 class="text-foreground mb-4 text-lg font-bold">
       <icon-analytics class="inline-block size-6" /> Browser Distribution
     </h2>
     <div
       v-if="loading && !browserStats"
-      class="h-72 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-700/40"
+      class="bg-muted h-72 animate-pulse rounded-xl"
     ></div>
     <div v-else class="h-72 w-full overflow-hidden">
       <v-chart :option="browserChartOption" autoresize class="h-full w-full" />

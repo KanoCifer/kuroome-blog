@@ -1,12 +1,12 @@
 <template>
   <BentoCard class="group relative h-full overflow-hidden">
     <div
-      class="absolute inset-0 bg-linear-to-br from-green-500 to-teal-400 opacity-10 transition-opacity group-hover:opacity-20"
+      class="from-gradient-decorative-from to-gradient-decorative-to absolute inset-0 bg-linear-to-br opacity-10 transition-opacity group-hover:opacity-20"
     ></div>
     <div class="relative z-10 flex h-full flex-col justify-between p-2">
       <!-- Icon / Logo -->
       <div
-        class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-teal-100 text-teal-600"
+        class="bg-accent text-accent-foreground mb-4 flex h-12 w-12 items-center justify-center rounded-full"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -25,16 +25,16 @@
       </div>
       <div>
         <div
-          class="mb-1 text-xs font-bold tracking-wide text-teal-600 uppercase"
+          class="text-accent-foreground mb-1 text-xs font-bold tracking-wide uppercase"
         >
           Recommended Read
         </div>
         <h3
-          class="mb-2 text-lg leading-tight font-bold text-gray-800 transition-colors group-hover:text-teal-700"
+          class="text-foreground group-hover:text-accent-foreground mb-2 text-lg leading-tight font-bold transition-colors"
         >
           {{ item.title }}
         </h3>
-        <p class="line-clamp-3 text-sm text-gray-600">
+        <p class="text-muted-foreground line-clamp-3 text-sm">
           {{ item.description }}
         </p>
       </div>

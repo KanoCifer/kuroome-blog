@@ -2,7 +2,11 @@
   <Teleport to="body">
     <!-- Backdrop -->
     <Transition name="fade">
-      <div v-if="modelValue" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" @click="handleClose" />
+      <div
+        v-if="modelValue"
+        class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+        @click="handleClose"
+      />
     </Transition>
 
     <!-- Modal -->
@@ -12,16 +16,16 @@
         class="fixed inset-x-4 inset-y-24 z-50 flex items-center justify-center sm:inset-x-auto sm:inset-y-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2"
       >
         <div
-          class="dark:bg-card max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-slate-100 shadow-2xl dark:shadow-xl dark:shadow-slate-900/60"
+          class="bg-card max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl shadow-2xl dark:shadow-xl dark:shadow-slate-900/60"
         >
           <!-- Header -->
           <div
-            class="dark:bg-card sticky top-0 z-10 border-b border-gray-200 bg-slate-100 px-6 pt-6 pb-4 dark:border-white/10"
+            class="bg-card border-border sticky top-0 z-10 border-b px-6 pt-6 pb-4"
           >
             <div class="flex items-start justify-between gap-3">
               <div class="flex items-center gap-3">
                 <div
-                  class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-700 shadow-lg shadow-blue-500/30 dark:shadow-blue-900/50"
+                  class="bg-primary shadow-primary/30 flex h-10 w-10 items-center justify-center rounded-xl shadow-lg"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -29,7 +33,7 @@
                     viewBox="0 0 24 24"
                     stroke-width="2"
                     stroke="currentColor"
-                    class="h-5 w-5 text-white"
+                    class="text-primary-foreground h-5 w-5"
                   >
                     <path
                       stroke-linecap="round"
@@ -39,29 +43,34 @@
                   </svg>
                 </div>
                 <div>
-                  <h2 class="font-serif text-2xl font-bold text-slate-800 dark:text-slate-100">里程碑提醒</h2>
-                  <p class="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
+                  <h2 class="text-foreground font-serif text-2xl font-bold">
+                    里程碑提醒
+                  </h2>
+                  <p class="text-muted-foreground mt-0.5 text-xs">
                     {{ device.name }}
                   </p>
                 </div>
               </div>
               <span
-                class="shrink-0 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                class="bg-warning/20 text-warning shrink-0 rounded-full px-3 py-1 text-xs font-semibold"
               >
                 提醒配置
               </span>
             </div>
           </div>
 
-          <form @submit.prevent="handleSubmit" class="dark:bg-background space-y-6 bg-slate-50 p-6">
+          <form
+            @submit.prevent="handleSubmit"
+            class="bg-background space-y-6 p-6"
+          >
             <!-- Enable Toggle -->
             <div
-              class="dark:bg-muted flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-white/10"
+              class="border-border bg-card flex items-center justify-between rounded-2xl border px-5 py-4 shadow-sm"
             >
               <div class="flex items-center gap-3">
                 <div
                   v-if="form.enabled"
-                  class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-700 shadow-md"
+                  class="bg-primary flex h-9 w-9 items-center justify-center rounded-xl shadow-md"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -69,7 +78,7 @@
                     viewBox="0 0 24 24"
                     stroke-width="2"
                     stroke="currentColor"
-                    class="h-4 w-4 text-white"
+                    class="text-primary-foreground h-4 w-4"
                   >
                     <path
                       stroke-linecap="round"
@@ -78,21 +87,32 @@
                     />
                   </svg>
                 </div>
-                <div v-else class="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-200 dark:bg-slate-700">
+                <div
+                  v-else
+                  class="bg-muted flex h-9 w-9 items-center justify-center rounded-xl"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke-width="2"
                     stroke="currentColor"
-                    class="h-4 w-4 text-slate-500"
+                    class="text-muted-foreground h-4 w-4"
                   >
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9" />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"
+                    />
                   </svg>
                 </div>
                 <div>
-                  <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">启用里程碑提醒</p>
-                  <p class="text-xs text-slate-400 dark:text-slate-500">在设备到达里程碑天数时发送通知</p>
+                  <p class="text-foreground text-sm font-semibold">
+                    启用里程碑提醒
+                  </p>
+                  <p class="text-muted-foreground text-xs">
+                    在设备到达里程碑天数时发送通知
+                  </p>
                 </div>
               </div>
               <button
@@ -102,7 +122,7 @@
                 @click="form.enabled = !form.enabled"
                 :class="[
                   'relative flex h-6 w-11 shrink-0 rounded-full transition-colors duration-300',
-                  form.enabled ? 'bg-blue-700' : 'bg-slate-300 dark:bg-slate-600',
+                  form.enabled ? 'bg-primary' : 'bg-muted-foreground/30',
                 ]"
               >
                 <span
@@ -118,14 +138,14 @@
             <div class="space-y-3">
               <div class="flex items-center gap-2">
                 <div
-                  class="h-px flex-1 bg-gradient-to-r from-transparent via-slate-200 to-transparent dark:via-slate-700"
+                  class="via-border h-px flex-1 bg-linear-to-r from-transparent to-transparent"
                 />
                 <span
-                  class="shrink-0 text-xs font-semibold tracking-widest text-slate-400 uppercase dark:text-slate-500"
+                  class="text-muted-foreground shrink-0 text-xs font-semibold tracking-widest uppercase"
                   >里程碑节点</span
                 >
                 <div
-                  class="h-px flex-1 bg-gradient-to-r from-transparent via-slate-200 to-transparent dark:via-slate-700"
+                  class="via-border h-px flex-1 bg-linear-to-r from-transparent to-transparent"
                 />
               </div>
 
@@ -138,15 +158,19 @@
                   :class="[
                     'relative flex flex-col items-center gap-1 rounded-xl px-3 py-3 text-xs font-semibold transition-all duration-200',
                     form.milestones.includes(preset.days)
-                      ? 'bg-blue-700 text-white shadow-lg shadow-blue-500/25 dark:shadow-blue-900/40'
-                      : 'dark:bg-muted bg-white text-slate-500 shadow-sm hover:bg-slate-50 dark:border dark:dark:border-white/10 dark:text-slate-400 dark:hover:bg-white/5',
+                      ? 'bg-primary text-primary-foreground shadow-primary/25 shadow-lg'
+                      : 'bg-card text-muted-foreground hover:bg-accent border-border border shadow-sm',
                   ]"
                 >
-                  <span class="text-base">{{ formatMilestone(preset.days) }}</span>
+                  <span class="text-base">{{
+                    formatMilestone(preset.days)
+                  }}</span>
                   <span
                     :class="[
                       'text-[10px] font-medium',
-                      form.milestones.includes(preset.days) ? 'text-blue-100' : 'text-slate-400 dark:text-slate-600',
+                      form.milestones.includes(preset.days)
+                        ? 'text-primary-foreground/70'
+                        : 'text-muted-foreground/60',
                     ]"
                     >Day {{ preset.days }}</span
                   >
@@ -160,9 +184,13 @@
                       viewBox="0 0 24 24"
                       stroke-width="3"
                       stroke="currentColor"
-                      class="h-2 w-2 text-blue-700"
+                      class="text-primary h-2 w-2"
                     >
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                      />
                     </svg>
                   </span>
                 </button>
@@ -176,16 +204,17 @@
                     type="number"
                     min="1"
                     placeholder="自定义天数..."
-                    class="dark:bg-muted w-full rounded-xl border border-slate-200 bg-white py-2.5 pr-12 pl-4 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                    class="text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 border-border bg-card w-full rounded-xl border py-2.5 pr-12 pl-4 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                   />
-                  <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-xs text-slate-400"
+                  <span
+                    class="text-muted-foreground pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-xs"
                     >天</span
                   >
                 </div>
                 <button
                   type="button"
                   @click="addCustomMilestone"
-                  class="dark:bg-muted flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 active:scale-95 dark:border-white/10 dark:text-slate-400 dark:hover:border-blue-500/30 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
+                  class="border-border bg-card text-muted-foreground hover:border-primary/30 hover:bg-primary/10 hover:text-primary flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-all active:scale-95"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -195,7 +224,11 @@
                     stroke="currentColor"
                     class="h-[18px] w-[18px]"
                   >
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 4.5v15m7.5-7.5h-15"
+                    />
                   </svg>
                 </button>
               </div>
@@ -203,18 +236,18 @@
               <!-- Selected milestones tags -->
               <div
                 v-if="form.milestones.length > 0"
-                class="flex min-w-0 flex-wrap gap-1.5 rounded-xl border border-dashed border-blue-200 bg-blue-50/60 p-3 dark:border-blue-500/30 dark:bg-blue-900/20"
+                class="border-primary/30 bg-primary/10 flex min-w-0 flex-wrap gap-1.5 rounded-xl border border-dashed p-3"
               >
                 <span
                   v-for="d in form.milestones"
                   :key="d"
-                  class="inline-flex items-center gap-1 rounded-full bg-blue-100 py-0.5 pr-1.5 pl-2.5 text-xs font-semibold text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"
+                  class="bg-primary/15 text-primary inline-flex items-center gap-1 rounded-full py-0.5 pr-1.5 pl-2.5 text-xs font-semibold"
                 >
                   {{ formatMilestone(d) }}
                   <button
                     type="button"
                     @click="toggleMilestone(d)"
-                    class="flex h-4 w-4 items-center justify-center rounded-full hover:bg-blue-200 dark:hover:bg-blue-800"
+                    class="hover:bg-primary/20 flex h-4 w-4 items-center justify-center rounded-full"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -224,7 +257,11 @@
                       stroke="currentColor"
                       class="h-2 w-2"
                     >
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 </span>
@@ -235,17 +272,17 @@
             <div class="space-y-3">
               <div class="flex items-center gap-2">
                 <div
-                  class="h-px flex-1 bg-gradient-to-r from-transparent via-slate-200 to-transparent dark:via-slate-700"
+                  class="via-border h-px flex-1 bg-linear-to-r from-transparent to-transparent"
                 />
                 <span
-                  class="shrink-0 text-xs font-semibold tracking-widest text-slate-400 uppercase dark:text-slate-500"
+                  class="text-muted-foreground shrink-0 text-xs font-semibold tracking-widest uppercase"
                   >通知渠道</span
                 >
                 <button
                   type="button"
                   :disabled="testLoading"
                   @click="handleTestNotification"
-                  class="ml-auto flex shrink-0 items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600 transition-all hover:bg-blue-100 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50"
+                  class="border-primary/20 bg-primary/10 text-primary hover:bg-primary/20 ml-auto flex shrink-0 items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <svg
                     v-if="testLoading"
@@ -280,7 +317,7 @@
                   测试通知
                 </button>
                 <div
-                  class="h-px flex-1 bg-gradient-to-r from-transparent via-slate-200 to-transparent dark:via-slate-700"
+                  class="via-border h-px flex-1 bg-linear-to-r from-transparent to-transparent"
                 />
               </div>
 
@@ -293,8 +330,8 @@
                   :class="[
                     'flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold transition-all duration-200',
                     form.channels.includes(opt.value)
-                      ? 'bg-blue-700 text-white shadow-lg shadow-blue-500/25 dark:shadow-blue-900/40'
-                      : 'dark:bg-muted bg-white text-slate-500 shadow-sm hover:bg-slate-50 dark:border dark:border-white/10 dark:text-slate-400 dark:hover:bg-white/5',
+                      ? 'bg-primary text-primary-foreground shadow-primary/25 shadow-lg'
+                      : 'bg-card text-muted-foreground hover:bg-accent border-border border shadow-sm',
                   ]"
                 >
                   <span v-html="opt.icon" />
@@ -303,39 +340,57 @@
               </div>
 
               <!-- Channel-specific fields -->
-              <label v-if="form.channels.includes('email')" class="block space-y-1">
-                <span class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400">邮件地址</span>
+              <label
+                v-if="form.channels.includes('email')"
+                class="block space-y-1"
+              >
+                <span class="text-muted-foreground ml-1 text-xs font-semibold"
+                  >邮件地址</span
+                >
                 <input
                   v-model="form.email"
                   type="email"
                   placeholder="example@domain.com"
-                  class="dark:bg-muted w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                  class="text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 border-border bg-card w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
 
-              <label v-if="form.channels.includes('feishu')" class="block space-y-1">
-                <span class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400">飞书 Webhook URL</span>
+              <label
+                v-if="form.channels.includes('feishu')"
+                class="block space-y-1"
+              >
+                <span class="text-muted-foreground ml-1 text-xs font-semibold"
+                  >飞书 Webhook URL</span
+                >
                 <input
                   v-model="form.feishu_webhook_url"
                   type="url"
                   placeholder="https://open.feishu.cn/open-apis/bot/v2/hook/..."
-                  class="dark:bg-muted w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                  class="text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 border-border bg-card w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
 
-              <label v-if="form.channels.includes('bark')" class="block space-y-1">
-                <span class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400">Bark Device Key</span>
+              <label
+                v-if="form.channels.includes('bark')"
+                class="block space-y-1"
+              >
+                <span class="text-muted-foreground ml-1 text-xs font-semibold"
+                  >Bark Device Key</span
+                >
                 <input
                   v-model="form.bark_device_key"
                   type="text"
                   placeholder="设备Key或完整推送URL"
-                  class="dark:bg-muted w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                  class="text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 border-border bg-card w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
             </div>
 
             <!-- Error -->
-            <p v-if="formError" class="py-2 text-center text-xs font-medium text-red-500 dark:text-red-400">
+            <p
+              v-if="formError"
+              class="text-destructive py-2 text-center text-xs font-medium"
+            >
               {{ formError }}
             </p>
 
@@ -343,7 +398,7 @@
             <button
               type="submit"
               :disabled="isSubmitting"
-              class="flex w-full items-center justify-center gap-2 rounded-full bg-blue-700 py-4 text-sm font-extrabold text-white shadow-xl shadow-blue-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-blue-500/40 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+              class="bg-primary text-primary-foreground hover:shadow-primary/40 shadow-primary/30 flex w-full items-center justify-center gap-2 rounded-full py-4 text-sm font-extrabold shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
             >
               <svg
                 v-if="isSubmitting"
@@ -371,7 +426,11 @@
                   stroke="currentColor"
                   class="h-[18px] w-[18px]"
                 >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                  />
                 </svg>
               </template>
             </button>
@@ -446,15 +505,26 @@ const emit = defineEmits<Emits>();
 
 const notificationStore = useNotificationStore();
 
-function createInitialState(device: Device, globalConfig?: GlobalConfig | null): MilestoneFormState {
+function createInitialState(
+  device: Device,
+  globalConfig?: GlobalConfig | null,
+): MilestoneFormState {
   const cfg = device.reminder_config as Record<string, unknown> | undefined;
   return {
     enabled: (cfg?.enabled as boolean) ?? true,
-    milestones: Array.isArray(cfg?.milestones) ? (cfg.milestones as number[]) : [100, 365, 730],
-    channels: Array.isArray(cfg?.channels) ? (cfg.channels as Channel[]) : ["email"],
+    milestones: Array.isArray(cfg?.milestones)
+      ? (cfg.milestones as number[])
+      : [100, 365, 730],
+    channels: Array.isArray(cfg?.channels)
+      ? (cfg.channels as Channel[])
+      : ["email"],
     email: (cfg?.email as string) || globalConfig?.email || "",
-    feishu_webhook_url: (cfg?.feishu_webhook_url as string) || globalConfig?.feishu_webhook_url || "",
-    bark_device_key: (cfg?.bark_device_key as string) || globalConfig?.bark_device_key || "",
+    feishu_webhook_url:
+      (cfg?.feishu_webhook_url as string) ||
+      globalConfig?.feishu_webhook_url ||
+      "",
+    bark_device_key:
+      (cfg?.bark_device_key as string) || globalConfig?.bark_device_key || "",
   };
 }
 
@@ -467,7 +537,9 @@ function formatMilestone(days: number): string {
   return `${years}年${remaining}天`;
 }
 
-const form = reactive<MilestoneFormState>(createInitialState(props.device, null));
+const form = reactive<MilestoneFormState>(
+  createInitialState(props.device, null),
+);
 const formError = ref<string | null>(null);
 const isSubmitting = ref(false);
 const testLoading = ref(false);
@@ -478,7 +550,8 @@ async function fetchGlobalConfig() {
     const res = await deviceGateway.getUserGlobalConfig();
     const cfg = res.config as GlobalConfig;
     form.email = form.email || cfg?.email || "";
-    form.feishu_webhook_url = form.feishu_webhook_url || cfg?.feishu_webhook_url || "";
+    form.feishu_webhook_url =
+      form.feishu_webhook_url || cfg?.feishu_webhook_url || "";
     form.bark_device_key = form.bark_device_key || cfg?.bark_device_key || "";
   } catch {
     notificationStore.error("获取全局配置失败");
@@ -523,7 +596,8 @@ async function handleTestNotification() {
     await deviceService.testNotification(props.device.id);
     notificationStore.success("测试通知已发送，请检查您的通知渠道");
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "测试通知发送失败，请检查配置";
+    const msg =
+      err instanceof Error ? err.message : "测试通知发送失败，请检查配置";
     notificationStore.error(msg);
   } finally {
     testLoading.value = false;
@@ -570,7 +644,10 @@ async function handleSubmit() {
   };
 
   try {
-    const updated = await deviceService.updateDeviceReminderConfig(props.device.id, payload);
+    const updated = await deviceService.updateDeviceReminderConfig(
+      props.device.id,
+      payload,
+    );
     notificationStore.success("里程碑配置已保存");
     emit("success", updated);
     handleClose();

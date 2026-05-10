@@ -78,6 +78,7 @@ declare module 'vue' {
     CommentForm: typeof import('./src/components/blog/CommentForm.vue')['default']
     CommentItem: typeof import('./src/components/blog/CommentItem.vue')['default']
     CommentsTab: typeof import('./src/components/message/CommentsTab.vue')['default']
+    CookieConsent: typeof import('./src/components/layout/CookieConsent.vue')['default']
     DelIcon: typeof import('./src/components/icons/DelIcon.vue')['default']
     DropdownMenu: typeof import('./src/components/ui/dropdown-menu/DropdownMenu.vue')['default']
     DropdownMenuCheckboxItem: typeof import('./src/components/ui/dropdown-menu/DropdownMenuCheckboxItem.vue')['default']

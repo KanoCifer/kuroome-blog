@@ -1,25 +1,25 @@
 <template>
   <BentoCard class="group relative h-full overflow-hidden">
     <div
-      class="absolute inset-0 bg-linear-to-br from-indigo-500 to-purple-600 opacity-10 transition-opacity group-hover:opacity-20"
+      class="from-gradient-decorative-from to-gradient-decorative-to absolute inset-0 bg-linear-to-br opacity-10 transition-opacity group-hover:opacity-20"
     ></div>
     <div class="relative z-10 flex h-full flex-col justify-between">
-      <div class="mb-4 h-32 w-full overflow-hidden rounded-xl bg-gray-200">
+      <div class="bg-muted mb-4 h-32 w-full overflow-hidden rounded-xl">
         <!-- Mock Thumbnail -->
         <div
-          class="h-full w-full bg-linear-to-r from-blue-400 to-indigo-500"
+          class="from-gradient-primary-from to-gradient-primary-to h-full w-full bg-linear-to-r"
         ></div>
       </div>
       <div>
-        <div class="mb-1 text-xs font-semibold text-indigo-600">
+        <div class="text-primary mb-1 text-xs font-semibold">
           {{ post.date }}
         </div>
         <h3
-          class="mb-2 text-lg leading-tight font-bold text-gray-800 transition-colors group-hover:text-indigo-700"
+          class="text-foreground group-hover:text-primary mb-2 text-lg leading-tight font-bold transition-colors"
         >
           {{ post.title }}
         </h3>
-        <p class="line-clamp-2 text-sm text-gray-600">
+        <p class="text-muted-foreground line-clamp-2 text-sm">
           {{ post.excerpt }}
         </p>
       </div>

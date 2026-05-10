@@ -28,36 +28,36 @@ function CommentItem({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`${depth > 0 ? 'ml-4 border-l-2 border-gray-100 pl-4 dark:border-gray-800' : ''}`}
+      className={`${depth > 0 ? 'border-border ml-4 border-l-2 pl-4' : ''}`}
     >
       <div className="py-3">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-sky-500 text-sm font-bold text-white">
+          <div className="from-primary to-primary/80 text-primary-foreground flex h-8 w-8 items-center justify-center rounded-full bg-linear-to-br text-sm font-bold">
             {comment.author?.[0]?.toUpperCase() || 'A'}
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <span className="font-medium text-gray-900 dark:text-white">
+              <span className="text-foreground font-medium">
                 {comment.author}
               </span>
               {comment.from_admin && (
-                <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                <span className="bg-primary/15 text-primary rounded-full px-2 py-0.5 text-xs font-medium">
                   博主
                 </span>
               )}
-              <span className="text-xs text-gray-400">
+              <span className="text-muted-foreground text-xs">
                 {formatDate(comment.created_at)}
               </span>
             </div>
           </div>
           <button
             onClick={() => onReply(comment)}
-            className="rounded-lg px-2 py-1 text-xs text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+            className="text-muted-foreground hover:bg-accent rounded-lg px-2 py-1 text-xs"
           >
             回复
           </button>
         </div>
-        <p className="mt-2 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        <p className="text-foreground mt-2 text-sm leading-relaxed">
           {comment.body}
         </p>
         {comment.comments && comment.comments.length > 0 && (
@@ -93,19 +93,19 @@ function CommentForm({
   const [body, setBody] = useState(initialValue);
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
+    <div className="border-border bg-card rounded-2xl border p-4">
       <textarea
         value={body}
         onChange={(e) => setBody(e.target.value)}
         placeholder={placeholder}
         rows={3}
-        className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500"
+        className="border-border bg-muted text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 w-full resize-none rounded-xl border p-3 text-sm focus:ring-2 focus:outline-none"
       />
       <div className="mt-3 flex justify-end gap-2">
         {onCancel && (
           <button
             onClick={onCancel}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+            className="text-foreground hover:bg-accent rounded-lg px-4 py-2 text-sm font-medium"
           >
             取消
           </button>
@@ -118,7 +118,7 @@ function CommentForm({
             }
           }}
           disabled={!body.trim() || isSubmitting}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-transform hover:bg-blue-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 text-sm font-medium transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isSubmitting ? '发布中...' : '发布评论'}
         </button>
@@ -131,13 +131,13 @@ function LoadingSkeleton() {
   return (
     <div className="animate-pulse space-y-6 px-4">
       <div className="space-y-4">
-        <div className="h-8 w-3/4 rounded-lg bg-gray-200 dark:bg-gray-800" />
-        <div className="h-4 w-1/4 rounded bg-gray-200 dark:bg-gray-800" />
+        <div className="bg-muted h-8 w-3/4 rounded-lg" />
+        <div className="bg-muted h-4 w-1/4 rounded" />
       </div>
       <div className="space-y-3">
-        <div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-800" />
-        <div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-800" />
-        <div className="h-4 w-2/3 rounded bg-gray-200 dark:bg-gray-800" />
+        <div className="bg-muted h-4 w-full rounded" />
+        <div className="bg-muted h-4 w-full rounded" />
+        <div className="bg-muted h-4 w-2/3 rounded" />
       </div>
     </div>
   );
@@ -151,10 +151,10 @@ function ErrorState({
   onRetry: () => void;
 }) {
   return (
-    <div className="mx-4 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-red-200 bg-red-50/50 p-8 text-center dark:border-red-800/50 dark:bg-red-900/20">
+    <div className="border-destructive/30 bg-destructive/10 mx-4 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center">
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className="h-12 w-12 text-red-400"
+        className="text-destructive/80 h-12 w-12"
         fill="none"
         viewBox="0 0 24 24"
         strokeWidth="1.5"
@@ -166,13 +166,11 @@ function ErrorState({
           d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
         />
       </svg>
-      <p className="mt-4 text-lg font-medium text-red-600 dark:text-red-400">
-        加载失败
-      </p>
-      <p className="mt-1 text-sm text-red-500">{message}</p>
+      <p className="text-destructive mt-4 text-lg font-medium">加载失败</p>
+      <p className="text-destructive/80 mt-1 text-sm">{message}</p>
       <button
         onClick={onRetry}
-        className="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-transform hover:bg-red-700 active:scale-95"
+        className="bg-destructive hover:bg-destructive/90 mt-4 rounded-lg px-4 py-2 text-sm font-medium text-white transition-transform active:scale-95"
       >
         重试
       </button>
@@ -263,16 +261,16 @@ export default function BlogPostView() {
   };
 
   return (
-    <div className="min-h-dvh bg-gray-50 dark:bg-slate-950">
+    <div className="bg-background min-h-dvh">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md dark:bg-gray-900/80">
+      <div className="bg-surface sticky top-0 z-10 backdrop-blur-md">
         <div className="flex items-center gap-3 px-4 py-3">
           <button
             onClick={() => navigate(-1)}
-            className="flex h-10 w-10 items-center justify-center rounded-full transition-transform hover:bg-gray-100 active:scale-95 dark:hover:bg-gray-800"
+            className="hover:bg-accent flex h-10 w-10 items-center justify-center rounded-full transition-transform active:scale-95"
           >
             <svg
-              className="h-5 w-5 text-gray-700 dark:text-gray-300"
+              className="text-foreground h-5 w-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -285,7 +283,7 @@ export default function BlogPostView() {
               />
             </svg>
           </button>
-          <h1 className="flex-1 truncate text-lg font-semibold text-gray-900 dark:text-white">
+          <h1 className="text-foreground flex-1 truncate text-lg font-semibold">
             {post?.title || '文章'}
           </h1>
         </div>
@@ -323,7 +321,7 @@ export default function BlogPostView() {
             {/* Hero */}
             <div className="px-4 pt-4">
               {post.is_pinned && (
-                <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                <div className="bg-primary/15 text-primary mb-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-3.5 w-3.5"
@@ -336,22 +334,22 @@ export default function BlogPostView() {
                 </div>
               )}
 
-              <h1 className="text-2xl leading-tight font-bold text-gray-900 dark:text-white">
+              <h1 className="text-foreground text-2xl leading-tight font-bold">
                 {post.title}
               </h1>
 
-              <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+              <div className="text-muted-foreground mt-3 flex flex-wrap items-center gap-3 text-sm">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-sky-500 text-xs font-bold text-white">
+                  <div className="from-primary to-primary/80 text-primary-foreground flex h-6 w-6 items-center justify-center rounded-full bg-linear-to-br text-xs font-bold">
                     A
                   </div>
                   <span>{post.category?.name || '未分类'}</span>
                 </div>
-                <span className="text-gray-300 dark:text-gray-600">|</span>
+                <span className="text-muted-foreground/50">|</span>
                 <span>{formatDate(post.created_at)}</span>
                 {post.updated_at !== post.created_at && (
                   <>
-                    <span className="text-gray-300 dark:text-gray-600">|</span>
+                    <span className="text-muted-foreground/50">|</span>
                     <span>更新于 {formatDate(post.updated_at)}</span>
                   </>
                 )}
@@ -359,7 +357,7 @@ export default function BlogPostView() {
             </div>
 
             {/* Divider */}
-            <div className="my-4 h-px bg-gray-100 dark:bg-gray-800" />
+            <div className="bg-muted my-4 h-px" />
 
             {/* Article Summary */}
             <ArticleSummaryCard
@@ -373,28 +371,28 @@ export default function BlogPostView() {
               className="prose prose-sm dark:prose-invert max-w-none px-4"
             >
               <div
-                className="leading-relaxed text-gray-700 dark:text-gray-300 [&_a]:text-blue-600 [&_a]:underline [&_h1]:text-xl [&_h1,&_h2,&_h3,&_h4]:font-bold [&_h2]:text-lg [&_h3]:text-base [&_p]:mb-4"
+                className="text-foreground [&_a]:text-primary leading-relaxed [&_a]:underline [&_h1]:text-xl [&_h1,&_h2,&_h3,&_h4]:font-bold [&_h2]:text-lg [&_h3]:text-base [&_p]:mb-4"
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.body) }}
               />
             </div>
 
             {/* Comments Section */}
-            <div className="mx-4 mt-8 rounded-2xl bg-white p-4 dark:bg-gray-900">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <div className="bg-card mx-4 mt-8 rounded-2xl p-4">
+              <h2 className="text-foreground text-lg font-semibold">
                 评论 ({flatComments(post.comments || []).length})
               </h2>
 
               {/* Comment Form */}
               <div className="mt-4">
                 {replyTo ? (
-                  <div className="mb-3 flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                  <div className="text-muted-foreground mb-3 flex items-center gap-2 text-sm">
                     <span>回复 @</span>
-                    <span className="font-medium text-gray-700 dark:text-gray-300">
+                    <span className="text-foreground font-medium">
                       {replyTo.author}
                     </span>
                     <button
                       onClick={() => setReplyTo(null)}
-                      className="ml-auto rounded-lg px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      className="hover:bg-accent ml-auto rounded-lg px-2 py-1"
                     >
                       取消
                     </button>
@@ -412,7 +410,7 @@ export default function BlogPostView() {
 
               {/* Comments List */}
               {post.comments && post.comments.length > 0 ? (
-                <div className="mt-4 divide-y divide-gray-100 dark:divide-gray-800">
+                <div className="divide-border mt-4 divide-y">
                   {post.comments.map((comment) => (
                     <CommentItem
                       key={comment._id}
@@ -422,7 +420,7 @@ export default function BlogPostView() {
                   ))}
                 </div>
               ) : (
-                <div className="mt-6 text-center text-sm text-gray-400">
+                <div className="text-muted-foreground mt-6 text-center text-sm">
                   暂无评论，来发表第一条评论吧
                 </div>
               )}

@@ -16,7 +16,7 @@ const AboutIMG = "/images/about.webp";
       class="mx-auto mt-36 flex max-w-6xl flex-col items-center justify-center"
     >
       <div
-        class="squircle border border-gray-100 bg-white/70 p-8 shadow-sm transition-all duration-300 hover:shadow-md md:p-12 dark:border-gray-700 dark:bg-gray-800/80"
+        class="squircle border-border bg-card/70 border p-8 shadow-sm transition-all duration-300 hover:shadow-md md:p-12"
       >
         <div
           class="flex flex-col items-center gap-8 md:flex-row md:items-center md:gap-12"
@@ -28,7 +28,7 @@ const AboutIMG = "/images/about.webp";
             <img
               :src="AboutIMG"
               alt="Kuroome"
-              class="relative h-40 w-40 transform rounded-full border-4 border-white object-cover shadow-xl transition duration-500 group-hover:scale-105 md:h-48 md:w-48 dark:border-gray-800"
+              class="relative h-40 w-40 transform rounded-full border-4 border-white object-cover shadow-xl transition duration-500 group-hover:scale-105 md:h-48 md:w-48"
             />
           </div>
           <!-- 分割线 -->
@@ -38,7 +38,7 @@ const AboutIMG = "/images/about.webp";
 
           <div class="flex-1 space-y-6 text-center md:text-left">
             <div
-              class="space-y-4 text-lg leading-relaxed text-gray-600 dark:text-gray-300"
+              class="text-muted-foreground space-y-4 text-lg leading-relaxed"
             >
               <p>
                 <span class="text-2xl font-bold">我是 Kuroome。</span>
@@ -46,41 +46,41 @@ const AboutIMG = "/images/about.webp";
               <p>
                 技术栈
                 <span
-                  class="cursor-default font-medium text-gray-800 underline decoration-blue-400/60 decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400 dark:text-gray-100"
+                  class="text-foreground decoration-primary/60 cursor-default font-medium underline decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400"
                   >Python</span
                 >
                 、<span
-                  class="cursor-default font-medium text-gray-800 underline decoration-blue-400/60 decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400 dark:text-gray-100"
+                  class="text-foreground decoration-primary/60 cursor-default font-medium underline decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400"
                   >React</span
                 >
                 、
                 <span
-                  class="cursor-default font-medium text-gray-800 underline decoration-blue-400/60 decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400 dark:text-gray-100"
+                  class="text-foreground decoration-primary/60 cursor-default font-medium underline decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400"
                   >TaskIQ</span
                 >
                 、
                 <span
-                  class="cursor-default font-medium text-gray-800 underline decoration-blue-400/60 decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400 dark:text-gray-100"
+                  class="text-foreground decoration-primary/60 cursor-default font-medium underline decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400"
                   >FastApi</span
                 >
                 、
                 <span
-                  class="cursor-default font-medium text-gray-800 underline decoration-blue-400/60 decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400 dark:text-gray-100"
+                  class="text-foreground decoration-primary/60 cursor-default font-medium underline decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400"
                   >PostgreSQL</span
                 >
                 、
                 <span
-                  class="cursor-default font-medium text-gray-800 underline decoration-blue-400/60 decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400 dark:text-gray-100"
+                  class="text-foreground decoration-primary/60 cursor-default font-medium underline decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400"
                   >Vue3</span
                 >
                 、
                 <span
-                  class="cursor-default font-medium text-gray-800 underline decoration-blue-400/60 decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400 dark:text-gray-100"
+                  class="text-foreground decoration-primary/60 cursor-default font-medium underline decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400"
                   >Redis</span
                 >
                 、
                 <span
-                  class="cursor-default font-medium text-gray-800 underline decoration-blue-400/60 decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400 dark:text-gray-100"
+                  class="text-foreground decoration-primary/60 cursor-default font-medium underline decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400"
                   >MongoDB</span
                 >
                 等。
@@ -88,23 +88,23 @@ const AboutIMG = "/images/about.webp";
               </p>
               <p>
                 技术方向包含<span
-                  class="cursor-default font-medium text-gray-800 underline decoration-blue-400/60 decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400 dark:text-gray-100"
+                  class="text-foreground decoration-primary/60 cursor-default font-medium underline decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400"
                   >Web 开发</span
                 >
                 、
                 <span
-                  class="cursor-default font-medium text-gray-800 underline decoration-blue-400/60 decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400 dark:text-gray-100"
+                  class="text-foreground decoration-primary/60 cursor-default font-medium underline decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400"
                   >前后端</span
                 >
                 、
                 <span
-                  class="cursor-default font-medium text-gray-800 underline decoration-blue-400/60 decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400 dark:text-gray-100"
+                  class="text-foreground decoration-primary/60 cursor-default font-medium underline decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400"
                   >Python数据分析</span
                 >等。
               </p>
               <p>
                 我的兴趣爱好广泛，涵盖<span
-                  class="cursor-default font-medium text-gray-800 underline decoration-blue-400/60 decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400 dark:text-gray-100"
+                  class="text-foreground decoration-primary/60 cursor-default font-medium underline decoration-4 underline-offset-2 transition-colors hover:decoration-pink-400"
                   >编程、阅读、钓鱼</span
                 >等多个领域。
               </p>
@@ -116,12 +116,12 @@ const AboutIMG = "/images/about.webp";
             <div
               class="flex items-center justify-center gap-6 pt-4 md:justify-start"
             >
-              <span class="font-medium text-gray-400">联系方式：</span>
+              <span class="text-muted-foreground font-medium">联系方式：</span>
 
               <a
                 href="https://github.com/KanoCifer"
                 target="_blank"
-                class="transform text-gray-400 transition-colors hover:scale-110 hover:text-gray-800 dark:hover:text-white"
+                class="text-muted-foreground hover:text-foreground transform transition-colors hover:scale-110"
                 title="GitHub"
               >
                 <svg
@@ -140,7 +140,7 @@ const AboutIMG = "/images/about.webp";
 
               <a
                 href="mailto:kano3255@outlook.com"
-                class="transform text-gray-400 transition-colors hover:scale-110 hover:text-gray-800 dark:hover:text-white"
+                class="text-muted-foreground hover:text-foreground transform transition-colors hover:scale-110"
                 title="Email"
               >
                 <svg

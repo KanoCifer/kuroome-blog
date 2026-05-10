@@ -11,14 +11,14 @@
         <img
           src="/images/about.webp"
           alt="Kuroome"
-          class="relative h-32 w-32 transform transform-gpu rounded-full border-4 border-white object-cover shadow-xl transition duration-500 group-hover:scale-105 dark:border-gray-700"
+          class="relative h-32 w-32 transform transform-gpu rounded-full border-4 border-white object-cover shadow-xl transition duration-500 group-hover:scale-105"
         />
         <!-- Green Active Badge -->
         <div
-          class="absolute right-0 bottom-0 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-green-100 dark:border-gray-700 dark:bg-green-900"
+          class="border-card bg-success/25 absolute right-0 bottom-0 flex h-6 w-6 items-center justify-center rounded-full border-2"
         >
           <svg
-            class="h-3 w-3 text-green-600 dark:text-green-400"
+            class="text-success h-3 w-3"
             fill="currentColor"
             viewBox="0 0 24 24"
           >
@@ -34,16 +34,14 @@
       </div>
 
       <!-- Name -->
-      <h2
-        class="mb-2 font-serif text-2xl font-bold text-gray-800 dark:text-gray-100"
-      >
+      <h2 class="text-foreground mb-2 font-serif text-2xl font-bold">
         Kuroome
       </h2>
 
       <!-- Role/Title Badge -->
       <div class="mb-4">
         <span
-          class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+          class="bg-muted text-muted-foreground inline-flex items-center rounded-full px-3 py-1 text-xs font-medium"
         >
           Developer
         </span>
@@ -54,19 +52,38 @@
         <span
           class="h-2 w-2 rounded-full"
           :class="
-            auth.adminOnline ? 'animate-pulse bg-green-500' : 'bg-red-500'
+            auth.adminOnline ? 'bg-success animate-pulse' : 'bg-destructive'
           "
         ></span>
         <span
           class="text-xs font-semibold tracking-widest uppercase"
-          :class="
-            auth.adminOnline
-              ? 'text-green-700 dark:text-green-400'
-              : 'text-red-700 dark:text-red-400'
-          "
+          :class="auth.adminOnline ? 'text-success' : 'text-destructive'"
         >
           {{ auth.adminOnline ? "Admin Online" : "Offline" }}
         </span>
+      </div>
+
+      <!-- Visitor Count -->
+      <div class="text-muted-foreground mt-3 flex items-center gap-1.5 text-xs">
+        <svg
+          class="h-3.5 w-3.5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+          />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+          />
+        </svg>
+        <span>{{ visitorCount.count }} 人在线</span>
       </div>
 
       <!-- Bio/Bullet Points -->
@@ -99,6 +116,8 @@
 <script setup lang="ts">
 import BentoCard from "@/components/bento/BentoCard.vue";
 import { useAuthStore } from "@/stores/auth";
+import { useVisitorCountStore } from "@/stores/visitorCount";
 
 const auth = useAuthStore();
+const visitorCount = useVisitorCountStore();
 </script>

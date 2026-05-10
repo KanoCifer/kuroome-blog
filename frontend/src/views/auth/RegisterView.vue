@@ -121,17 +121,11 @@ const handleSubmit = async () => {
 <template>
   <div class="flex min-h-dvh items-center">
     <!-- 标题卡片和注册表单 -->
-    <div
-      class="squircle mx-auto max-w-md bg-blue-50/50 px-12 py-14 shadow-2xl dark:bg-gray-800/50"
-    >
-      <p
-        class="text-center font-serif text-2xl font-bold text-shadow-md dark:text-white"
-      >
+    <div class="squircle bg-card mx-auto max-w-md px-12 py-14 shadow-2xl">
+      <p class="text-center font-serif text-2xl font-bold text-shadow-md">
         Register
       </p>
-      <p
-        class="mb-12 text-center font-serif text-gray-500 italic dark:text-gray-400"
-      >
+      <p class="text-muted-foreground mb-12 text-center font-serif italic">
         Create an account to start managing your reading list!
       </p>
 
@@ -143,12 +137,12 @@ const handleSubmit = async () => {
             type="text"
             autocomplete="off"
             placeholder="Username"
-            class="form-control my-4 w-full rounded-xl border border-gray-300 bg-gray-100/50 px-4 py-2 text-gray-900 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
+            class="form-control border-border bg-muted text-foreground focus:border-primary focus:ring-primary/30 my-4 w-full rounded-xl px-4 py-2 transition-transform focus:scale-[1.01] focus:ring-2 focus:outline-none"
             required
           />
           <span
             v-if="errors.username"
-            class="mt-1 block text-sm text-red-600 dark:text-red-400"
+            class="text-destructive mt-1 block text-sm"
             >{{ errors.username }}</span
           >
         </div>
@@ -160,12 +154,12 @@ const handleSubmit = async () => {
             type="email"
             autocomplete="off"
             placeholder="Email"
-            class="form-control my-4 w-full rounded-xl border border-gray-300 bg-gray-100/50 px-4 py-2 text-gray-900 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
+            class="form-control border-border bg-muted text-foreground focus:border-primary focus:ring-primary/30 my-4 w-full rounded-xl px-4 py-2 transition-transform focus:scale-[1.01] focus:ring-2 focus:outline-none"
             required
           />
           <span
             v-if="errors.email"
-            class="mt-1 block text-sm text-red-600 dark:text-red-400"
+            class="text-destructive mt-1 block text-sm"
             >{{ errors.email }}</span
           >
         </div>
@@ -177,12 +171,12 @@ const handleSubmit = async () => {
             type="password"
             autocomplete="off"
             placeholder="Password"
-            class="form-control my-4 w-full rounded-xl border border-gray-300 bg-gray-100/50 px-4 py-2 text-gray-900 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
+            class="form-control border-border bg-muted text-foreground focus:border-primary focus:ring-primary/30 my-4 w-full rounded-xl px-4 py-2 transition-transform focus:scale-[1.01] focus:ring-2 focus:outline-none"
             required
           />
           <span
             v-if="errors.password"
-            class="mt-1 block text-sm text-red-600 dark:text-red-400"
+            class="text-destructive mt-1 block text-sm"
             >{{ errors.password }}</span
           >
         </div>
@@ -194,12 +188,12 @@ const handleSubmit = async () => {
             type="password"
             autocomplete="off"
             placeholder="Confirm Password"
-            class="form-control my-4 w-full rounded-xl border border-gray-300 bg-gray-100/50 px-4 py-2 text-gray-900 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
+            class="form-control border-border bg-muted text-foreground focus:border-primary focus:ring-primary/30 my-4 w-full rounded-xl px-4 py-2 transition-transform focus:scale-[1.01] focus:ring-2 focus:outline-none"
             required
           />
           <span
             v-if="errors.confirmPassword"
-            class="mt-1 block text-sm text-red-600 dark:text-red-400"
+            class="text-destructive mt-1 block text-sm"
             >{{ errors.confirmPassword }}</span
           >
         </div>
@@ -212,19 +206,19 @@ const handleSubmit = async () => {
               type="text"
               autocomplete="off"
               placeholder="Email Code"
-              class="form-control my-4 w-full rounded-xl border border-gray-300 bg-gray-100/50 px-4 py-2 text-gray-900 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
+              class="form-control border-border bg-muted text-foreground focus:border-primary focus:ring-primary/30 my-4 w-full rounded-xl px-4 py-2 transition-transform focus:scale-[1.01] focus:ring-2 focus:outline-none"
               required
             />
             <span
               v-if="errors.emailCode"
-              class="mt-1 block text-sm text-red-600 dark:text-red-400"
+              class="text-destructive mt-1 block text-sm"
               >{{ errors.emailCode }}</span
             >
 
             <button
               type="button"
               id="send-code"
-              class="h-full items-center gap-2 rounded-xl bg-blue-600 px-8 py-2.5 font-bold text-white shadow-lg shadow-blue-500/30 transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-progress disabled:bg-blue-950 dark:ring-offset-gray-800"
+              class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-primary/30 disabled:bg-primary/50 h-full items-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-progress"
               :disabled="isSendingCode || isSent"
               @click="sendEmailCode"
             >
@@ -237,7 +231,7 @@ const handleSubmit = async () => {
         <div class="mt-6">
           <button
             type="submit"
-            class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-blue-600 px-8 py-2.5 font-bold text-white shadow-lg shadow-blue-500/30 transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none dark:ring-offset-gray-800"
+            class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-primary/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
             :disabled="isSubmitting"
           >
             {{ isSubmitting ? "Registering..." : "Register" }}
@@ -246,14 +240,16 @@ const handleSubmit = async () => {
 
         <span
           v-if="errors.submit"
-          class="mt-2 block text-center text-sm text-red-600 dark:text-red-400"
+          class="text-destructive mt-2 block text-center text-sm"
           >{{ errors.submit }}</span
         >
       </form>
 
-      <p class="mt-8 text-center font-serif text-gray-400">Kuroome's Blog</p>
+      <p class="text-muted-foreground mt-8 text-center font-serif">
+        Kuroome's Blog
+      </p>
       <!-- 登录链接 -->
-      <div class="mb-4 text-center text-gray-400 dark:text-gray-300">
+      <div class="text-muted-foreground mb-4 text-center">
         Already have an account?
         <RouterLink
           to="/login"

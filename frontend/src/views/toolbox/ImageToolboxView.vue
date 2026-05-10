@@ -2,18 +2,16 @@
   <BasicDetail title="图片工具箱" subtitle="本地压缩与格式转换">
     <div class="col-span-full">
       <div
-        class="squircle overflow-hidden border border-gray-200/60 bg-white/50 shadow-sm dark:border-gray-700/60 dark:bg-gray-900/70"
+        class="squircle border-border/60 bg-card/50 overflow-hidden border shadow-sm"
       >
         <div class="flex flex-col lg:flex-row lg:items-stretch">
           <!-- 左侧配置面板 -->
           <aside
-            class="w-full shrink-0 border-b border-gray-200/60 p-6 lg:w-80 lg:border-r lg:border-b-0 dark:border-gray-700/60"
+            class="border-border/60 w-full shrink-0 border-b p-6 lg:w-80 lg:border-r lg:border-b-0"
           >
             <header class="mb-8">
-              <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">
-                参数配置
-              </h2>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <h2 class="text-foreground text-xl font-bold">参数配置</h2>
+              <p class="text-muted-foreground mt-1 text-xs">
                 本地处理，保护隐私安全
               </p>
             </header>
@@ -24,14 +22,14 @@
                 <div class="flex items-center justify-between">
                   <label
                     for="max-width"
-                    class="text-sm font-semibold text-gray-700 dark:text-gray-300"
+                    class="text-foreground text-sm font-semibold"
                   >
                     最大宽度限制
                   </label>
                   <input
                     v-model="enableMaxWidth"
                     type="checkbox"
-                    class="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900 dark:border-gray-600 dark:bg-gray-800"
+                    class="text-foreground focus:ring-foreground border-border bg-card h-4 w-4 rounded"
                   />
                 </div>
                 <div class="relative">
@@ -41,13 +39,12 @@
                     type="number"
                     min="1"
                     :disabled="!enableMaxWidth"
-                    class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm transition-all focus:border-gray-900 focus:ring-0 focus:outline-none disabled:bg-gray-50 disabled:text-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:focus:border-gray-100"
+                    class="text-foreground placeholder:text-muted-foreground focus:border-foreground border-border bg-card disabled:bg-muted disabled:text-muted-foreground w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
                   />
                   <span
-                    class="absolute top-1/2 right-4 -translate-y-1/2 text-xs text-gray-400"
+                    class="text-muted-foreground absolute top-1/2 right-4 -translate-y-1/2 text-xs"
+                    >px</span
                   >
-                    px
-                  </span>
                 </div>
               </div>
 
@@ -56,11 +53,13 @@
                 <div class="flex items-center justify-between">
                   <label
                     for="quality"
-                    class="text-sm font-semibold text-gray-700 dark:text-gray-300"
+                    class="text-foreground text-sm font-semibold"
                   >
                     压缩质量
                   </label>
-                  <span class="font-mono text-xs font-medium text-gray-500">
+                  <span
+                    class="text-muted-foreground font-mono text-xs font-medium"
+                  >
                     {{ Math.round(quality * 100) }}%
                   </span>
                 </div>
@@ -72,7 +71,7 @@
                   v-model="qualityArray"
                 />
                 <div
-                  class="flex justify-between text-[10px] text-gray-400 uppercase"
+                  class="text-muted-foreground flex justify-between text-[10px] uppercase"
                 >
                   <span>高压缩</span>
                   <span>原画</span>
@@ -81,11 +80,9 @@
 
               <!-- 输出格式 -->
               <div class="space-y-3">
-                <span
-                  class="text-sm font-semibold text-gray-700 dark:text-gray-300"
+                <span class="text-foreground text-sm font-semibold"
+                  >输出格式</span
                 >
-                  输出格式
-                </span>
                 <div class="grid grid-cols-3 gap-2">
                   <button
                     v-for="option in outputTypes"
@@ -94,8 +91,8 @@
                     class="rounded-xl border py-2 text-xs font-medium transition-all"
                     :class="
                       outputType === option.value
-                        ? 'border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900'
-                        : 'border-gray-200 bg-white text-gray-600 hover:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400'
+                        ? 'border-foreground bg-foreground text-background'
+                        : 'border-border bg-card text-muted-foreground hover:border-muted-foreground'
                     "
                     @click="outputType = option.value"
                   >
@@ -109,7 +106,7 @@
                 <button
                   type="button"
                   :disabled="!originalFile || processing"
-                  class="group relative overflow-hidden rounded-xl bg-gray-900 py-3 text-sm font-bold text-white transition-all hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+                  class="bg-foreground text-background hover:bg-foreground/90 group relative overflow-hidden rounded-xl py-3 text-sm font-bold transition-all"
                   @click="handleProcess"
                 >
                   <span
@@ -140,7 +137,7 @@
                 <button
                   type="button"
                   :disabled="!processedBlob"
-                  class="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white py-3 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                  class="text-foreground hover:bg-accent border-border bg-card flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium transition-all disabled:opacity-50"
                   @click="downloadProcessedImage"
                 >
                   <svg
@@ -161,7 +158,7 @@
 
                 <button
                   type="button"
-                  class="py-2 text-xs font-medium text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                  class="text-muted-foreground hover:text-foreground py-2 text-xs font-medium"
                   @click="resetAll"
                 >
                   清空并重置
@@ -171,7 +168,7 @@
           </aside>
 
           <!-- 右侧工作区 -->
-          <main class="flex-1 bg-gray-50/50 p-6 dark:bg-black/20">
+          <main class="bg-muted/50 flex-1 p-6 dark:bg-black/20">
             <div class="mx-auto max-w-5xl space-y-6">
               <!-- 拖放上传区 -->
               <div
@@ -179,23 +176,23 @@
                 class="group relative flex min-h-50 cursor-pointer items-center justify-center overflow-hidden rounded-3xl border-2 border-dashed transition-all duration-500"
                 :class="
                   isOverDropZone
-                    ? 'border-gray-900 bg-gray-900/5 dark:border-gray-100 dark:bg-gray-100/5'
+                    ? 'border-foreground bg-foreground/5'
                     : originalFile
-                      ? 'border-transparent bg-white shadow-sm dark:bg-gray-800'
-                      : 'border-gray-200 bg-white hover:border-gray-400 dark:border-gray-800 dark:bg-gray-900/50 dark:hover:border-gray-600'
+                      ? 'bg-card border-transparent shadow-sm'
+                      : 'border-border bg-card hover:border-muted-foreground'
                 "
                 @click="openFilePicker"
               >
                 <!-- 动态背景装饰 -->
                 <div
                   v-if="isOverDropZone"
-                  class="absolute inset-0 animate-pulse bg-gray-900/5 dark:bg-gray-100/5"
+                  class="bg-foreground/5 absolute inset-0 animate-pulse"
                 ></div>
 
                 <div class="relative z-10 p-8 text-center">
                   <div v-if="!originalFile" class="space-y-4">
                     <div
-                      class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-50 text-gray-400 transition-transform group-hover:scale-110 dark:bg-gray-800"
+                      class="bg-muted text-muted-foreground mx-auto flex h-16 w-16 items-center justify-center rounded-2xl transition-transform group-hover:scale-110"
                     >
                       <svg
                         class="h-8 w-8"
@@ -212,12 +209,10 @@
                       </svg>
                     </div>
                     <div>
-                      <p
-                        class="text-base font-bold text-gray-900 dark:text-gray-100"
-                      >
+                      <p class="text-foreground text-base font-bold">
                         {{ isOverDropZone ? "即刻上传" : "点击或拖拽图片" }}
                       </p>
-                      <p class="mt-1 text-xs text-gray-500">
+                      <p class="text-muted-foreground mt-1 text-xs">
                         支持 JPG, PNG, WebP, GIF, AVIF (最大 20MB)
                       </p>
                     </div>
@@ -229,7 +224,7 @@
                   >
                     <div class="flex items-center gap-4">
                       <div
-                        class="h-12 w-12 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700"
+                        class="bg-muted h-12 w-12 overflow-hidden rounded-lg"
                       >
                         <img
                           :src="originalPreviewUrl"
@@ -238,18 +233,18 @@
                       </div>
                       <div class="text-left">
                         <p
-                          class="max-w-50 truncate text-sm font-bold text-gray-900 dark:text-gray-100"
+                          class="text-foreground max-w-50 truncate text-sm font-bold"
                         >
                           {{ originalFile.name }}
                         </p>
-                        <p class="text-xs text-gray-500">
+                        <p class="text-muted-foreground text-xs">
                           {{ formatBytes(originalFile.size) }}
                         </p>
                       </div>
                     </div>
                     <button
                       type="button"
-                      class="rounded-full bg-white px-4 py-1.5 text-xs font-bold text-gray-900 shadow-sm ring-1 ring-gray-200 transition-all hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700"
+                      class="text-foreground bg-card ring-border hover:bg-accent rounded-full px-4 py-1.5 text-xs font-bold shadow-sm ring-1 transition-all"
                       @click.stop="openFilePicker"
                     >
                       更换图片
@@ -273,30 +268,30 @@
               >
                 <!-- 原图预览 -->
                 <div
-                  class="group relative flex flex-col overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-gray-800"
+                  class="group bg-card relative flex flex-col overflow-hidden rounded-3xl shadow-sm"
                 >
                   <div
-                    class="flex items-center justify-between border-b border-gray-50 p-4 dark:border-gray-700/50"
+                    class="border-border/50 flex items-center justify-between border-b p-4"
                   >
                     <span
-                      class="text-xs font-bold tracking-wider text-gray-400 uppercase"
+                      class="text-muted-foreground text-xs font-bold tracking-wider uppercase"
                       >原始图像</span
                     >
                     <div class="flex items-center gap-2">
-                      <span class="text-[10px] text-gray-500"
+                      <span class="text-muted-foreground text-[10px]"
                         >缩放:
                         {{ Math.round(originalPreviewZoom * 100) }}%</span
                       >
                       <button
                         @click="originalPreviewZoom = 1"
-                        class="text-[10px] text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                        class="text-muted-foreground hover:text-foreground text-[10px]"
                       >
                         重置
                       </button>
                     </div>
                   </div>
                   <div
-                    class="relative flex min-h-[320px] items-center justify-center overflow-auto bg-gray-50/50 p-8 dark:bg-gray-900/50"
+                    class="bg-muted/50 relative flex min-h-[320px] items-center justify-center overflow-auto p-8"
                   >
                     <button
                       type="button"
@@ -323,56 +318,58 @@
                       min="1"
                       max="4"
                       step="0.1"
-                      class="h-1 w-full accent-gray-900"
+                      class="accent-foreground h-1 w-full"
                     />
                   </div>
                 </div>
 
                 <!-- 处理后预览 -->
                 <div
-                  class="group relative flex flex-col overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-gray-800"
+                  class="group bg-card relative flex flex-col overflow-hidden rounded-3xl shadow-sm"
                 >
                   <div
-                    class="flex items-center justify-between border-b border-gray-50 p-4 dark:border-gray-700/50"
+                    class="border-border/50 flex items-center justify-between border-b p-4"
                   >
                     <div class="flex items-center gap-2">
                       <span
-                        class="text-xs font-bold tracking-wider text-gray-400 uppercase"
+                        class="text-muted-foreground text-xs font-bold tracking-wider uppercase"
                         >处理后:{{
                           formatBytes(processedBlob?.size ?? 0) || "0 KB"
                         }}</span
                       >
                       <span
                         v-if="processedBlob"
-                        class="rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-bold text-green-600 dark:bg-green-500/10"
+                        class="bg-success/10 text-success rounded-full px-2 py-0.5 text-[10px] font-bold"
                       >
                         {{ compressionRatio }} 节省
                       </span>
                     </div>
                     <div class="flex items-center gap-2">
-                      <span class="text-[10px] text-gray-500"
+                      <span class="text-muted-foreground text-[10px]"
                         >缩放:
                         {{ Math.round(processedPreviewZoom * 100) }}%</span
                       >
                       <button
                         @click="processedPreviewZoom = 1"
-                        class="text-[10px] text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                        class="text-muted-foreground hover:text-foreground text-[10px]"
                       >
                         重置
                       </button>
                     </div>
                   </div>
                   <div
-                    class="relative flex min-h-[320px] items-center justify-center overflow-auto bg-gray-50/50 p-8 dark:bg-gray-900/50"
+                    class="bg-muted/50 relative flex min-h-[320px] items-center justify-center overflow-auto p-8"
                   >
                     <div
                       v-if="processing"
                       class="flex flex-col items-center gap-3"
                     >
                       <div
-                        class="h-8 w-8 animate-spin rounded-full border-2 border-gray-900 border-t-transparent dark:border-gray-100"
+                        class="border-foreground h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
                       ></div>
-                      <span class="text-xs text-gray-500">正在渲染...</span>
+                      <span class="text-muted-foreground text-xs"
+                        >正在渲染...</span
+                      >
                     </div>
                     <button
                       v-else-if="processedPreviewUrl"
@@ -404,7 +401,7 @@
                           d="M13 10V3L4 14h7v7l9-11h-7z"
                         />
                       </svg>
-                      <p class="mt-2 text-xs">调整参数后点击“开始处理”</p>
+                      <p class="mt-2 text-xs">调整参数后点击"开始处理"</p>
                     </div>
                   </div>
                   <div
@@ -417,7 +414,7 @@
                       min="1"
                       max="4"
                       step="0.1"
-                      class="h-1 w-full accent-gray-900"
+                      class="accent-foreground h-1 w-full"
                     />
                   </div>
                 </div>
@@ -426,7 +423,7 @@
 
             <p
               v-if="errorMessage"
-              class="mx-auto mt-6 max-w-md rounded-xl bg-red-50 p-3 text-center text-xs font-medium text-red-500 dark:bg-red-500/10"
+              class="bg-destructive/10 text-destructive mx-auto mt-6 max-w-md rounded-xl p-3 text-center text-xs font-medium"
             >
               {{ errorMessage }}
             </p>

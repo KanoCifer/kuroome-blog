@@ -24,11 +24,17 @@ const props = defineProps({
 // 检测字符串是否像 HTML（简单检测）
 const isHtmlLike = (str: string): boolean => {
   if (!str) return false;
-  return /<\/?[a-z][\s\S]*>/i.test(str) || str.includes("&lt;") || str.includes("&gt;");
+  return (
+    /<\/?[a-z][\s\S]*>/i.test(str) ||
+    str.includes("&lt;") ||
+    str.includes("&gt;")
+  );
 };
 
 // 初始化时如果是 HTML 则转换为 Markdown
-const initialContent = isHtmlLike(props.modelValue) ? turndownService.turndown(props.modelValue) : props.modelValue;
+const initialContent = isHtmlLike(props.modelValue)
+  ? turndownService.turndown(props.modelValue)
+  : props.modelValue;
 
 const markdownText = ref<string>(initialContent);
 const fileInputRef = ref<HTMLInputElement | null>(null);
@@ -203,7 +209,7 @@ onBeforeUnmount(() => {
   <div class="flex h-full flex-col md:flex-row">
     <!-- Editor -->
     <div
-      class="relative flex h-1/2 w-full flex-col border-b border-slate-200 md:h-full md:w-1/2 md:border-r md:border-b-0 dark:border-slate-800"
+      class="border-border relative flex h-1/2 w-full flex-col border-b md:h-full md:w-1/2 md:border-r md:border-b-0"
       @dragover.prevent="dragCounter++"
       @dragleave.prevent="
         dragCounter--;
@@ -217,19 +223,27 @@ onBeforeUnmount(() => {
       <!-- Drag overlay -->
       <div
         v-if="isDraggingOver"
-        class="pointer-events-none absolute inset-0 z-10 flex items-center justify-center border-2 border-dashed border-blue-400 bg-blue-50/60 dark:bg-blue-900/20"
+        class="border-primary/50 bg-primary/10 pointer-events-none absolute inset-0 z-10 flex items-center justify-center border-2 border-dashed"
       >
-        <span class="text-sm font-semibold text-blue-600 dark:text-blue-400">释放以添加图片</span>
+        <span class="text-primary text-sm font-semibold">释放以添加图片</span>
       </div>
 
-      <div class="flex h-12 shrink-0 items-center border-b border-slate-200 px-4 dark:border-slate-800">
+      <div class="border-border flex h-12 shrink-0 items-center border-b px-4">
         <div class="flex w-full items-center justify-between">
-          <h1 class="text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400">MARKDOWN</h1>
+          <h1 class="text-muted-foreground text-xs font-bold tracking-wider">
+            MARKDOWN
+          </h1>
           <div class="flex items-center gap-2">
-            <input ref="fileInputRef" type="file" accept="image/*" class="hidden" @change="handleImageUpload" />
+            <input
+              ref="fileInputRef"
+              type="file"
+              accept="image/*"
+              class="hidden"
+              @change="handleImageUpload"
+            />
             <button
               type="button"
-              class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              class="text-muted-foreground hover:bg-accent border-border rounded-full border px-3 py-1 text-xs font-semibold transition"
               @click="fileInputRef?.click()"
             >
               插入图片
@@ -239,17 +253,21 @@ onBeforeUnmount(() => {
       </div>
       <textarea
         v-model="markdownText"
-        class="flex-1 resize-none bg-transparent p-6 font-mono text-sm leading-relaxed outline-none placeholder:text-slate-300 focus:ring-0 dark:placeholder:text-slate-700"
+        class="placeholder:text-muted-foreground flex-1 resize-none bg-transparent p-6 font-mono text-sm leading-relaxed outline-none focus:ring-0"
         placeholder="# 在此编写 Markdown 内容&#10;&#10;- 支持列表&#10;- **粗体**&#10;- *斜体*&#10;&#10;```js&#10;console.log('Hello!');&#10;```"
       ></textarea>
     </div>
 
     <!-- Preview -->
     <div class="flex h-1/2 w-full flex-col md:h-full md:w-1/2">
-      <div class="flex h-12 shrink-0 items-center border-b border-slate-200 px-4 dark:border-slate-800">
-        <h2 class="text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400">PREVIEW</h2>
+      <div class="border-border flex h-12 shrink-0 items-center border-b px-4">
+        <h2 class="text-muted-foreground text-xs font-bold tracking-wider">
+          PREVIEW
+        </h2>
       </div>
-      <div class="prose prose-slate dark:prose-invert max-w-none flex-1 overflow-y-auto p-6">
+      <div
+        class="prose prose-slate dark:prose-invert max-w-none flex-1 overflow-y-auto p-6"
+      >
         <div v-html="renderedMarkdown" @click="handlePreviewClick"></div>
       </div>
     </div>
@@ -269,12 +287,14 @@ onBeforeUnmount(() => {
           class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
           @click.self="closeImageEditor"
         >
-          <div class="w-full max-w-md rounded-3xl bg-white shadow-2xl dark:bg-slate-900">
-            <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4 dark:border-slate-800">
-              <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100">编辑图片</h3>
+          <div class="bg-card w-full max-w-md rounded-3xl shadow-2xl">
+            <div
+              class="border-border flex items-center justify-between border-b px-6 py-4"
+            >
+              <h3 class="text-foreground text-base font-semibold">编辑图片</h3>
               <button
                 type="button"
-                class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                class="text-muted-foreground hover:bg-accent bg-muted rounded-full px-3 py-1 text-xs font-semibold transition"
                 @click="closeImageEditor"
               >
                 关闭
@@ -282,7 +302,9 @@ onBeforeUnmount(() => {
             </div>
 
             <div class="p-6">
-              <div class="mb-4 flex items-center justify-center rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
+              <div
+                class="bg-muted mb-4 flex items-center justify-center rounded-2xl p-4"
+              >
                 <img
                   :src="editingImageUrl"
                   :alt="editingImageAlt"
@@ -296,7 +318,7 @@ onBeforeUnmount(() => {
                   v-model="editingImageAlt"
                   type="text"
                   placeholder="图片说明 (Alt)"
-                  class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                  class="text-foreground placeholder:text-muted-foreground focus:border-ring border-border bg-card w-full rounded-xl border px-3 py-2 text-sm outline-none"
                 />
 
                 <div class="grid grid-cols-2 gap-3">
@@ -305,20 +327,22 @@ onBeforeUnmount(() => {
                     type="number"
                     min="0"
                     placeholder="宽度"
-                    class="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                    class="text-foreground placeholder:text-muted-foreground focus:border-ring border-border bg-card w-full rounded-xl border px-3 py-2 text-sm outline-none"
                   />
                   <input
                     v-model="editingImageHeight"
                     type="number"
                     min="0"
                     placeholder="高度"
-                    class="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                    class="text-foreground placeholder:text-muted-foreground focus:border-ring border-border bg-card w-full rounded-xl border px-3 py-2 text-sm outline-none"
                   />
                 </div>
               </div>
             </div>
 
-            <div class="flex items-center justify-between border-t border-slate-200 px-6 py-4 dark:border-slate-800">
+            <div
+              class="border-border flex items-center justify-between border-t px-6 py-4"
+            >
               <div>
                 <input
                   ref="replaceInputRef"
@@ -329,7 +353,7 @@ onBeforeUnmount(() => {
                 />
                 <button
                   type="button"
-                  class="rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                  class="text-muted-foreground hover:bg-accent border-border rounded-xl border px-3 py-2 text-xs font-semibold transition"
                   @click="replaceInputRef?.click()"
                 >
                   替换图片
@@ -337,7 +361,7 @@ onBeforeUnmount(() => {
               </div>
               <button
                 type="button"
-                class="rounded-xl bg-slate-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"
+                class="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-4 py-2 text-xs font-semibold transition"
                 @click="closeImageEditor"
               >
                 完成

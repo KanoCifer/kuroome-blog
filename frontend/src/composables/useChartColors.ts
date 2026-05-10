@@ -7,7 +7,9 @@ import { computed } from "vue";
 export function useChartColors() {
   const getCSSVar = (name: string): string => {
     if (typeof document === "undefined") return "";
-    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(name)
+      .trim();
   };
 
   const textColor = computed(() => getCSSVar("--foreground"));

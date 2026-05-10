@@ -1,7 +1,7 @@
 <template>
   <div
     @click="openQWeather"
-    class="group squircle relative flex h-full cursor-pointer flex-col overflow-hidden border border-white/20 bg-linear-to-br from-white/80 to-white/40 p-6 shadow-lg backdrop-blur-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-xl dark:border-gray-700/50 dark:from-gray-900/80 dark:to-gray-800/40"
+    class="group squircle from-card/80 to-card/40 relative flex h-full cursor-pointer flex-col overflow-hidden border border-white/20 bg-linear-to-br p-6 shadow-lg backdrop-blur-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-xl dark:border-gray-700/50 dark:from-gray-900/80 dark:to-gray-800/40"
   >
     <!-- Decorative gradient orbs -->
     <div
@@ -15,14 +15,17 @@
     <div class="relative z-10 mb-4 flex items-start justify-between">
       <div>
         <h3
-          class="text-lg font-bold tracking-tight text-gray-900 dark:text-white"
+          class="text-foreground text-lg font-bold tracking-tight dark:text-white"
         >
           实时天气
-          <span class="ml-2 text-xs text-gray-500 dark:text-gray-400"
+          <span
+            class="text-muted-foreground dark:text-muted-foreground ml-2 text-xs"
             >点击跳转和风天气</span
           >
         </h3>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        <p
+          class="text-muted-foreground dark:text-muted-foreground mt-1 text-sm"
+        >
           {{ locationName || "钓鱼地点" }}
         </p>
       </div>
@@ -60,7 +63,7 @@
           class="h-12 w-12 animate-spin rounded-full border-4 border-sky-100 border-t-sky-500 dark:border-gray-700 dark:border-t-sky-400"
         ></div>
       </div>
-      <span class="mt-4 text-gray-500 dark:text-gray-400">
+      <span class="text-muted-foreground dark:text-muted-foreground mt-4">
         获取天气数据...
       </span>
     </div>
@@ -68,13 +71,13 @@
     <!-- Error State -->
     <div
       v-else-if="error"
-      class="relative z-10 rounded-xl bg-red-50 p-4 dark:bg-red-900/20"
+      class="bg-destructive/10 relative z-10 rounded-xl p-4 dark:bg-red-900/20"
     >
       <div class="flex items-center gap-3">
-        <div class="rounded-full bg-red-100 p-2 dark:bg-red-900/40">
+        <div class="bg-destructive/20 rounded-full p-2 dark:bg-red-900/40">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5 text-red-500"
+            class="text-destructive h-5 w-5"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -87,7 +90,7 @@
             />
           </svg>
         </div>
-        <p class="text-red-600 dark:text-red-400">{{ error }}</p>
+        <p class="text-destructive dark:text-red-400">{{ error }}</p>
       </div>
     </div>
 
@@ -101,10 +104,10 @@
           >
             {{ liveWeather.temp }}
           </span>
-          <span class="text-2xl font-light text-gray-400">°C</span>
+          <span class="text-muted-foreground text-2xl font-light">°C</span>
         </div>
         <span
-          class="inline-block rounded-full bg-sky-100 px-3 py-1 font-medium text-sky-700 dark:bg-sky-900/40 dark:text-sky-300"
+          class="bg-primary/10 text-primary dark:text-primary inline-block rounded-full px-3 py-1 font-medium dark:bg-sky-900/40"
         >
           {{ liveWeather.text }}
         </span>
@@ -112,9 +115,9 @@
 
       <!-- Current Details -->
       <div class="mb-4 grid grid-cols-3 gap-3">
-        <div class="rounded-xl bg-white/50 p-2.5 dark:bg-gray-800/50">
+        <div class="bg-card/50 dark:bg-muted/50 rounded-xl p-2.5">
           <div
-            class="mb-1 flex items-center justify-center gap-1 text-gray-400"
+            class="text-muted-foreground mb-1 flex items-center justify-center gap-1"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -133,14 +136,14 @@
             <span class="text-xs">风向</span>
           </div>
           <p
-            class="text-center text-xs font-semibold text-gray-900 dark:text-white"
+            class="text-foreground text-center text-xs font-semibold dark:text-white"
           >
             {{ liveWeather.windDir }}
           </p>
         </div>
-        <div class="rounded-xl bg-white/50 p-2.5 dark:bg-gray-800/50">
+        <div class="bg-card/50 dark:bg-muted/50 rounded-xl p-2.5">
           <div
-            class="mb-1 flex items-center justify-center gap-1 text-gray-400"
+            class="text-muted-foreground mb-1 flex items-center justify-center gap-1"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -159,14 +162,14 @@
             <span class="text-xs">风力</span>
           </div>
           <p
-            class="text-center text-xs font-semibold text-gray-900 dark:text-white"
+            class="text-foreground text-center text-xs font-semibold dark:text-white"
           >
             {{ liveWeather.windScale }}级
           </p>
         </div>
-        <div class="rounded-xl bg-white/50 p-2.5 dark:bg-gray-800/50">
+        <div class="bg-card/50 dark:bg-muted/50 rounded-xl p-2.5">
           <div
-            class="mb-1 flex items-center justify-center gap-1 text-gray-400"
+            class="text-muted-foreground mb-1 flex items-center justify-center gap-1"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -185,7 +188,7 @@
             <span class="text-xs">湿度</span>
           </div>
           <p
-            class="text-center text-xs font-semibold text-gray-900 dark:text-white"
+            class="text-foreground text-center text-xs font-semibold dark:text-white"
           >
             {{ liveWeather.humidity }}%
           </p>
@@ -195,7 +198,7 @@
       <!-- Forecast -->
       <div v-if="forecasts.length > 0" class="flex-1">
         <div
-          class="mb-2 ml-6 flex w-full items-center gap-2 text-xs text-gray-500 dark:text-gray-400"
+          class="text-muted-foreground dark:text-muted-foreground mb-2 ml-6 flex w-full items-center gap-2 text-xs"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -217,21 +220,25 @@
           <div
             v-for="day in forecasts.slice(0, 4)"
             :key="day.fxDate"
-            class="rounded-lg bg-white/40 p-2 text-center dark:bg-gray-800/40"
+            class="bg-card/40 dark:bg-muted/40 rounded-lg p-2 text-center"
           >
-            <p class="mb-1 text-xs text-gray-500 dark:text-gray-400">
+            <p
+              class="text-muted-foreground dark:text-muted-foreground mb-1 text-xs"
+            >
               {{ day.fxDate }}
             </p>
             <p class="mb-1 text-lg">
               <i :class="`qi-${day.iconDay}`" />
             </p>
-            <p class="text-xs font-medium text-gray-900 dark:text-white">
+            <p class="text-foreground text-xs font-medium dark:text-white">
               {{ day.tempMax }}° / {{ day.tempMin }}°
             </p>
           </div>
         </div>
         <div>
-          <p class="mt-3 text-center text-sm text-gray-500 dark:text-gray-400">
+          <p
+            class="text-muted-foreground dark:text-muted-foreground mt-3 text-center text-sm"
+          >
             更多预报请访问和风天气官网
           </p>
         </div>
@@ -239,7 +246,7 @@
 
       <!-- Update Time -->
       <div class="mt-3 text-center">
-        <span class="text-xs text-gray-400">
+        <span class="text-muted-foreground text-xs">
           更新于 {{ formatDate(liveWeather.obsTime) }}
         </span>
       </div>
@@ -251,11 +258,11 @@
       class="relative z-10 flex flex-1 flex-col items-center justify-center py-4"
     >
       <div
-        class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800"
+        class="bg-muted dark:bg-muted mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="h-8 w-8 text-gray-400"
+          class="text-muted-foreground h-8 w-8"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -268,8 +275,10 @@
           />
         </svg>
       </div>
-      <p class="text-gray-600 dark:text-gray-400">查看钓鱼地点的实时天气情况</p>
-      <p class="mt-1 text-xs text-gray-400">选择最佳钓鱼时间</p>
+      <p class="dark:text-muted-foreground text-secondary-foreground">
+        查看钓鱼地点的实时天气情况
+      </p>
+      <p class="text-muted-foreground mt-1 text-xs">选择最佳钓鱼时间</p>
     </div>
   </div>
 </template>

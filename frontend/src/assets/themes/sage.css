@@ -1,0 +1,61 @@
+/* Sage — 鼠尾草绿 */
+[data-color-scheme="sage"] {
+  --radius: 0.625rem;
+  --ink: #172018;
+  --paper: #eef2eb;
+  --warm-gray: #dbe3d7;
+  --muted: #7f8c81;
+  --accent-amber: #8b7146;
+  --accent-sage: #4d6f57;
+  --accent-slate: #5e7072;
+  --accent-rose: #9a6860;
+  --workspace-accent: #4f7657;
+  --workspace-accent-soft: #deebe1;
+  --workspace-accent-border: #9ebda6;
+  --workspace-accent-contrast: #f6fbf7;
+  --status-active: #446953;
+  --status-cooling: #907548;
+  --status-abandoned: #996760;
+  --card-bg: #fafcf8;
+  --surface: #eef2ebbf;
+  --surface-foreground: #172018;
+  --chart-1: #4d6f57;
+  --chart-2: #8b7146;
+  --chart-3: #5e7072;
+  --chart-4: #9a6860;
+  --chart-5: #907548;
+  --gradient-primary-from: #4f7657;
+  --gradient-primary-to: #5e7072;
+  --gradient-decorative-from: #deebe1;
+  --gradient-decorative-to: #9ebda6;
+}
+
+[data-color-scheme="sage"].dark {
+  --ink: #d8e3d7;
+  --paper: #172018;
+  --warm-gray: #252d25;
+  --muted: #6a7a6a;
+  --accent-amber: #9a8a5a;
+  --accent-sage: #6a9a7a;
+  --accent-slate: #6a7a8a;
+  --accent-rose: #9a7a7a;
+  --workspace-accent: #5a8a6a;
+  --workspace-accent-soft: #252d25;
+  --workspace-accent-border: #3a4a3a;
+  --workspace-accent-contrast: #eef2eb;
+  --status-active: #5a9a7a;
+  --status-cooling: #b89a4a;
+  --status-abandoned: #c36a6a;
+  --card-bg: #1e261e;
+  --surface: #1e261ecc;
+  --surface-foreground: #d8e3d7;
+  --chart-1: #6a9a7a;
+  --chart-2: #9a8a5a;
+  --chart-3: #6a7a8a;
+  --chart-4: #9a7a7a;
+  --chart-5: #b89a4a;
+  --gradient-primary-from: #5a8a6a;
+  --gradient-primary-to: #6a7a8a;
+  --gradient-decorative-from: #252d25;
+  --gradient-decorative-to: #3a4a3a;
+}

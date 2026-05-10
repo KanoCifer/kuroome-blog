@@ -31,17 +31,14 @@ const getTypeIcon = (type: string): string => {
 
 const getTypeClass = (type: string): string => {
   const classes: Record<string, string> = {
-    feat: "bg-linear-to-r from-green-100 to-emerald-100 text-emerald-700 ring-1 ring-emerald-200/60 dark:from-green-900/30 dark:to-emerald-900/30 dark:text-emerald-300 dark:ring-emerald-800/60",
-    fix: "bg-linear-to-r from-red-100 to-rose-100 text-rose-700 ring-1 ring-rose-200/60 dark:from-red-900/30 dark:to-rose-900/30 dark:text-rose-300 dark:ring-rose-800/60",
-    refactor:
-      "bg-linear-to-r from-purple-100 to-violet-100 text-violet-700 ring-1 ring-violet-200/60 dark:from-purple-900/30 dark:to-violet-900/30 dark:text-violet-300 dark:ring-violet-800/60",
-    style:
-      "bg-linear-to-r from-pink-100 to-fuchsia-100 text-fuchsia-700 ring-1 ring-fuchsia-200/60 dark:from-pink-900/30 dark:to-fuchsia-900/30 dark:text-fuchsia-300 dark:ring-fuchsia-800/60",
-    docs: "bg-linear-to-r from-blue-100 to-sky-100 text-sky-700 ring-1 ring-sky-200/60 dark:from-blue-900/30 dark:to-sky-900/30 dark:text-sky-300 dark:ring-sky-800/60",
-    perf: "bg-linear-to-r from-amber-100 to-orange-100 text-orange-700 ring-1 ring-orange-200/60 dark:from-amber-900/30 dark:to-orange-900/30 dark:text-orange-300 dark:ring-orange-800/60",
-    test: "bg-linear-to-r from-cyan-100 to-teal-100 text-teal-700 ring-1 ring-teal-200/60 dark:from-cyan-900/30 dark:to-teal-900/30 dark:text-teal-300 dark:ring-teal-800/60",
-    chore:
-      "bg-linear-to-r from-gray-100 to-slate-100 text-slate-700 ring-1 ring-slate-200/60 dark:from-gray-900/30 dark:to-slate-900/30 dark:text-slate-300 dark:ring-slate-800/60",
+    feat: "bg-success/15 text-success ring-1 ring-success/30",
+    fix: "bg-destructive/15 text-destructive ring-1 ring-destructive/30",
+    refactor: "bg-chart-2/15 text-chart-2 ring-1 ring-chart-2/30",
+    style: "bg-chart-4/15 text-chart-4 ring-1 ring-chart-4/30",
+    docs: "bg-primary/15 text-primary ring-1 ring-primary/30",
+    perf: "bg-warning/15 text-warning ring-1 ring-warning/30",
+    test: "bg-chart-1/15 text-chart-1 ring-1 ring-chart-1/30",
+    chore: "bg-muted text-muted-foreground ring-1 ring-border/30",
   };
   return classes[type] ?? classes.chore ?? "";
 };
@@ -56,7 +53,7 @@ const getTypeClass = (type: string): string => {
       <!-- Header Section -->
       <div class="mb-16 text-center">
         <div
-          class="mb-6 inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+          class="bg-primary/15 text-primary mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium"
         >
           <svg
             class="h-4 w-4"
@@ -74,11 +71,11 @@ const getTypeClass = (type: string): string => {
           版本更新记录
         </div>
         <h1
-          class="mb-4 text-5xl font-bold tracking-tight text-gray-800 md:text-6xl dark:text-gray-100"
+          class="text-foreground mb-4 text-5xl font-bold tracking-tight md:text-6xl"
         >
           变更日志
         </h1>
-        <p class="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-400">
+        <p class="text-muted-foreground mx-auto max-w-2xl text-lg">
           记录网站的每一次成长与进步
         </p>
       </div>
@@ -114,12 +111,12 @@ const getTypeClass = (type: string): string => {
             <!-- Content Card -->
             <div class="-mx-8 w-full md:w-1/2">
               <div
-                class="group squircle cursor-pointer border border-gray-100 bg-white/80 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl md:p-8 dark:border-gray-700 dark:bg-gray-800/80"
+                class="group squircle border-border bg-card/80 cursor-pointer border p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl md:p-8"
               >
                 <!-- Version Badge & Date -->
                 <div class="mb-4 flex flex-wrap items-center gap-3">
                   <span
-                    class="inline-flex items-center gap-2 rounded-full bg-linear-to-r from-blue-500 to-cyan-500 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-blue-500/25"
+                    class="from-gradient-primary-from to-gradient-primary-to text-primary-foreground shadow-primary/25 inline-flex items-center gap-2 rounded-full bg-linear-to-r px-4 py-2 text-sm font-bold shadow-lg"
                   >
                     <svg
                       class="h-4 w-4"
@@ -137,7 +134,7 @@ const getTypeClass = (type: string): string => {
                     v{{ r.version }}
                   </span>
                   <span
-                    class="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400"
+                    class="text-muted-foreground flex items-center gap-1 text-sm"
                   >
                     <svg
                       class="h-4 w-4"
@@ -157,9 +154,7 @@ const getTypeClass = (type: string): string => {
                 </div>
 
                 <!-- Release Title -->
-                <h2
-                  class="mb-4 text-2xl font-bold text-gray-800 dark:text-gray-100"
-                >
+                <h2 class="text-foreground mb-4 text-2xl font-bold">
                   {{ r.title }}
                 </h2>
 
@@ -181,7 +176,7 @@ const getTypeClass = (type: string): string => {
                       }}</span>
                       {{ getTypeLabel(change.type) }}
                     </span>
-                    <span class="text-gray-700 dark:text-gray-300">
+                    <span class="text-foreground">
                       {{ change.content }}
                     </span>
                   </li>
@@ -194,12 +189,12 @@ const getTypeClass = (type: string): string => {
               class="absolute top-1/2 left-1/2 z-10 hidden h-8 w-8 -translate-x-1/2 -translate-y-1/2 md:block"
             >
               <div
-                class="absolute inset-0 -m-2 rounded-full bg-blue-500 opacity-30 blur-md transition-all duration-300 group-hover:opacity-50 group-hover:blur-lg"
+                class="bg-primary absolute inset-0 -m-2 rounded-full opacity-30 blur-md transition-all duration-300 group-hover:opacity-50 group-hover:blur-lg"
               ></div>
               <div
-                class="relative flex h-full w-full items-center justify-center rounded-full bg-white ring-4 ring-blue-100 dark:bg-gray-800 dark:ring-gray-700"
+                class="bg-card ring-primary/20 relative flex h-full w-full items-center justify-center rounded-full ring-4"
               >
-                <div class="h-3 w-3 rounded-full bg-blue-400"></div>
+                <div class="bg-primary h-3 w-3 rounded-full"></div>
               </div>
             </div>
 
@@ -208,9 +203,9 @@ const getTypeClass = (type: string): string => {
               class="absolute top-6 left-0 z-10 h-6 w-6 -translate-x-1/2 md:hidden"
             >
               <div
-                class="relative flex h-full w-full items-center justify-center rounded-full bg-white ring-3 ring-blue-100 dark:bg-gray-800 dark:ring-gray-700"
+                class="bg-card ring-primary/20 relative flex h-full w-full items-center justify-center rounded-full ring-3"
               >
-                <div class="h-2 w-2 rounded-full bg-blue-400"></div>
+                <div class="bg-primary h-2 w-2 rounded-full"></div>
               </div>
             </div>
 

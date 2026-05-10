@@ -18,5 +18,12 @@ export const useVisitorCountStore = defineStore("visitorCount", () => {
     visitorId.value = id;
   };
 
-  return { count, isConnected, visitorId, setCount, setConnected, setVisitorId };
+  return {
+    count,
+    isConnected,
+    visitorId,
+    setCount,
+    setConnected,
+    setVisitorId,
+  };
 });

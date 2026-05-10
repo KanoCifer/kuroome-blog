@@ -1,12 +1,12 @@
 <template>
   <div
-    class="mx-auto my-24 min-h-screen max-w-5xl rounded-4xl bg-gray-50/70 px-4 py-8 sm:px-6 lg:px-8 dark:bg-gray-900/50"
+    class="bg-muted/70 mx-auto my-24 min-h-screen max-w-5xl rounded-4xl px-4 py-8 sm:px-6 lg:px-8"
   >
     <div class="mx-auto">
       <!-- 页面标题 -->
       <div class="mb-8 flex items-center gap-3">
         <div
-          class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
+          class="bg-primary/15 text-primary flex h-12 w-12 items-center justify-center rounded-xl"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -25,19 +25,15 @@
         </div>
         <div>
           <div class="flex items-center gap-6">
-            <h1
-              class="font-serif text-3xl font-bold text-gray-900 dark:text-white"
-            >
+            <h1 class="text-foreground font-serif text-3xl font-bold">
               我的书架
             </h1>
             <span
-              class="self-center rounded-full border border-blue-300 bg-blue-200/60 px-4 py-2 text-xs text-blue-500 dark:bg-blue-200 dark:text-blue-900"
+              class="border-primary/30 bg-primary/20 text-primary self-center rounded-full border px-4 py-2 text-xs"
               >{{ books_count }}</span
             >
           </div>
-          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            管理您的阅读收藏
-          </p>
+          <p class="text-muted-foreground mt-1 text-sm">管理您的阅读收藏</p>
         </div>
       </div>
 
@@ -49,12 +45,12 @@
         <div
           v-for="i in 6"
           :key="i"
-          class="animate-pulse overflow-hidden rounded-xl bg-white shadow-sm dark:bg-gray-800"
+          class="bg-card animate-pulse overflow-hidden rounded-xl shadow-sm"
         >
-          <div class="aspect-2/3 bg-gray-200 dark:bg-gray-700" />
+          <div class="bg-muted aspect-2/3" />
           <div class="p-4">
-            <div class="mb-2 h-5 w-3/4 rounded bg-gray-200 dark:bg-gray-700" />
-            <div class="h-4 w-1/2 rounded bg-gray-200 dark:bg-gray-700" />
+            <div class="bg-muted mb-2 h-5 w-3/4 rounded" />
+            <div class="bg-muted h-4 w-1/2 rounded" />
           </div>
         </div>
       </div>
@@ -62,10 +58,10 @@
       <!-- 错误状态 -->
       <div
         v-else-if="errorMessage"
-        class="flex flex-col items-center justify-center rounded-2xl bg-white py-16 shadow-sm dark:bg-gray-800"
+        class="bg-card flex flex-col items-center justify-center rounded-2xl py-16 shadow-sm"
       >
         <div
-          class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400"
+          class="bg-destructive/15 text-destructive mb-4 flex h-16 w-16 items-center justify-center rounded-full"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -82,12 +78,12 @@
             />
           </svg>
         </div>
-        <p class="mb-4 text-center text-red-600 dark:text-red-400">
+        <p class="text-destructive mb-4 text-center">
           {{ errorMessage }}
         </p>
         <button
           type="button"
-          class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-6 py-2.5 font-semibold text-white shadow-lg shadow-red-500/30 transition-colors hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none dark:ring-offset-gray-800"
+          class="bg-destructive text-primary-foreground shadow-destructive/30 hover:bg-destructive/90 focus:ring-destructive inline-flex items-center gap-2 rounded-xl px-6 py-2.5 font-semibold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
           @click="() => fetchBooks()"
         >
           <svg
@@ -111,10 +107,10 @@
       <!-- 空状态 -->
       <div
         v-else-if="books.length === 0"
-        class="flex flex-col items-center justify-center rounded-2xl bg-white py-16 shadow-sm dark:bg-gray-800"
+        class="bg-card flex flex-col items-center justify-center rounded-2xl py-16 shadow-sm"
       >
         <div
-          class="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500"
+          class="bg-muted text-muted-foreground mb-4 flex h-20 w-20 items-center justify-center rounded-full"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -131,17 +127,15 @@
             />
           </svg>
         </div>
-        <h3
-          class="mb-2 font-serif text-xl font-semibold text-gray-900 dark:text-white"
-        >
+        <h3 class="text-foreground mb-2 font-serif text-xl font-semibold">
           暂无书籍
         </h3>
-        <p class="mb-6 text-center text-gray-500 dark:text-gray-400">
+        <p class="text-muted-foreground mb-6 text-center">
           您的书架还是空的，快去导入一些书籍吧
         </p>
         <router-link
           to="/import"
-          class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 font-semibold text-white shadow-lg shadow-blue-500/30 transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none dark:ring-offset-gray-800"
+          class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-primary inline-flex items-center gap-2 rounded-xl px-6 py-2.5 font-semibold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -183,11 +177,9 @@
           <!-- 上一页 -->
           <button
             :disabled="!pagination.has_prev"
-            class="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-800"
+            class="hover:bg-accent rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
             :class="
-              pagination?.has_prev
-                ? 'text-gray-700 dark:text-gray-300'
-                : 'text-gray-400'
+              pagination?.has_prev ? 'text-foreground' : 'text-muted-foreground'
             "
             @click="goToPage(pagination!.prev_num!)"
             type="button"
@@ -200,7 +192,7 @@
             <!-- 显示第一页 -->
             <button
               v-if="pagination && pagination.page > 3"
-              class="min-w-32px rounded-lg px-2 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+              class="min-w-32px text-foreground hover:bg-accent rounded-lg px-2 py-2 text-sm font-medium"
               @click="goToPage(1)"
               type="button"
             >
@@ -210,7 +202,7 @@
             <!-- 省略号 -->
             <span
               v-if="pagination && pagination.page > 4"
-              class="px-1 text-gray-500 dark:text-gray-400"
+              class="text-muted-foreground px-1"
               >...</span
             >
 
@@ -221,8 +213,8 @@
               class="min-w-32px rounded-lg px-2 py-2 text-sm font-medium transition-colors"
               :class="
                 pageNum === pagination?.page
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-foreground hover:bg-accent'
               "
               @click="goToPage(pageNum)"
               type="button"
@@ -233,14 +225,14 @@
             <!-- 省略号 -->
             <span
               v-if="pagination && pagination.page < pagination.pages - 3"
-              class="px-1 text-gray-500 dark:text-gray-400"
+              class="text-muted-foreground px-1"
               >...</span
             >
 
             <!-- 显示最后一页 -->
             <button
               v-if="pagination && pagination.page < pagination.pages - 2"
-              class="min-w-32px rounded-lg px-2 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+              class="min-w-32px text-foreground hover:bg-accent rounded-lg px-2 py-2 text-sm font-medium"
               @click="goToPage(pagination.pages)"
               type="button"
             >
@@ -251,11 +243,9 @@
           <!-- 下一页 -->
           <button
             :disabled="!pagination?.has_next"
-            class="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-800"
+            class="hover:bg-accent rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
             :class="
-              pagination?.has_next
-                ? 'text-gray-700 dark:text-gray-300'
-                : 'text-gray-400'
+              pagination?.has_next ? 'text-foreground' : 'text-muted-foreground'
             "
             @click="goToPage(pagination!.next_num!)"
             type="button"

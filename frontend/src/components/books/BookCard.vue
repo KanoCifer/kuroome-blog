@@ -1,11 +1,9 @@
 <template>
   <div
-    class="book-card group m-2 overflow-hidden rounded-xl bg-white shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg dark:bg-gray-800"
+    class="book-card group bg-card dark:bg-card m-2 overflow-hidden rounded-xl shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
   >
     <!-- 封面区域 -->
-    <div
-      class="relative aspect-2/3 overflow-hidden bg-gray-100 dark:bg-gray-700"
-    >
+    <div class="bg-muted relative aspect-2/3 overflow-hidden dark:bg-gray-700">
       <img
         v-if="book.cover && !coverError"
         :src="coverSrc"
@@ -21,7 +19,7 @@
           viewBox="0 0 24 24"
           stroke-width="1.5"
           stroke="currentColor"
-          class="h-16 w-16 text-gray-300 dark:text-gray-600"
+          class="text-muted-foreground dark:text-muted-foreground h-16 w-16"
         >
           <path
             stroke-linecap="round"
@@ -45,13 +43,13 @@
     <!-- 书籍信息 -->
     <div class="p-4">
       <h3
-        class="truncate text-base font-semibold text-gray-900 dark:text-white"
+        class="text-foreground dark:text-foreground truncate text-base font-semibold"
         :title="book.title"
       >
         {{ book.title }}
       </h3>
       <p
-        class="mt-1 truncate text-sm text-gray-500 opacity-70 dark:text-gray-400"
+        class="text-muted-foreground dark:text-muted-foreground mt-1 truncate text-sm opacity-70"
       >
         {{ book.author }}
       </p>
@@ -79,12 +77,12 @@ const badge = computed<Badge>(() => {
     return {
       text: "已读",
       class:
-        "bg-green-100 text-green-700 dark:bg-green-400/10 dark:text-green-400",
+        "bg-success/20 text-success dark:bg-green-400/10 dark:text-green-400",
     };
   }
   return {
     text: "在读",
-    class: "bg-blue-100 text-blue-700 dark:bg-blue-400/10 dark:text-blue-400",
+    class: "bg-primary/20 text-primary dark:bg-blue-400/10 dark:text-blue-400",
   };
 });
 

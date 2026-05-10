@@ -7,11 +7,11 @@
         @click="onClose"
       >
         <div
-          class="fixed top-1/2 left-1/2 z-60 h-[60vh] w-[90vw] max-w-md min-w-0 -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-gray-50 p-4 dark:bg-gray-900"
+          class="bg-card fixed top-1/2 left-1/2 z-60 h-[60vh] w-[90vw] max-w-md min-w-0 -translate-x-1/2 -translate-y-1/2 rounded-2xl p-4"
           @click.stop
         >
           <button
-            class="absolute top-4 right-4 z-50 rounded-full bg-red-500 px-1.5 py-1.5 text-white hover:bg-red-600"
+            class="bg-destructive text-destructive-foreground hover:bg-destructive/90 absolute top-4 right-4 z-50 rounded-full px-1.5 py-1.5"
             @click="onClose"
           >
             <svg

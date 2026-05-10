@@ -171,20 +171,20 @@ watch(
       <!-- Loading State -->
       <div v-if="isLoading" class="py-12 text-center">
         <div
-          class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"
+          class="border-border border-t-primary mx-auto h-8 w-8 animate-spin rounded-full border-2"
         ></div>
-        <p class="mt-2 text-gray-600 dark:text-gray-400">Loading...</p>
+        <p class="text-muted-foreground mt-2">Loading...</p>
       </div>
 
       <!-- Error State -->
       <div
         v-else-if="errorMessage"
-        class="rounded-2xl border border-red-200 bg-red-50 p-8 text-center dark:border-red-800 dark:bg-red-900/20"
+        class="border-destructive/30 bg-destructive/10 rounded-2xl border p-8 text-center"
       >
-        <p class="text-red-600 dark:text-red-400">{{ errorMessage }}</p>
+        <p class="text-destructive">{{ errorMessage }}</p>
         <button
           @click="handleRetry"
-          class="mt-4 rounded-full bg-gray-900 px-6 py-2 text-sm font-medium text-white hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+          class="bg-primary text-primary-foreground hover:bg-primary/90 mt-4 rounded-full px-6 py-2 text-sm font-medium"
         >
           Retry
         </button>
@@ -200,8 +200,8 @@ watch(
             class="inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors"
             :class="
               article.is_read
-                ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-slate-700 dark:text-gray-300'
-                : 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
+                ? 'bg-muted text-foreground hover:bg-accent'
+                : 'bg-primary text-primary-foreground hover:bg-primary/90'
             "
           >
             <svg
@@ -252,18 +252,14 @@ watch(
 
         <!-- Article Body -->
         <div
-          class="overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
+          class="border-border bg-card overflow-hidden rounded-2xl border shadow-sm"
         >
-          <div class="border-b border-blue-100 p-8 dark:border-slate-700">
-            <h1
-              class="mb-4 text-3xl leading-tight font-bold text-blue-900 dark:text-white"
-            >
+          <div class="border-border border-border border-b p-8">
+            <h1 class="text-primary mb-4 text-3xl leading-tight font-bold">
               {{ article.title }}
             </h1>
 
-            <div
-              class="flex flex-wrap gap-x-6 gap-y-3 text-sm text-blue-600 dark:text-blue-400"
-            >
+            <div class="text-primary flex flex-wrap gap-x-6 gap-y-3 text-sm">
               <div
                 v-if="article.author"
                 class="flex items-center gap-1.5 font-medium"
@@ -328,7 +324,7 @@ watch(
                 :href="article.link"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="flex items-center gap-1.5 text-blue-700 hover:text-blue-800 hover:underline dark:text-blue-300 dark:hover:text-blue-200"
+                class="text-primary hover:text-primary flex items-center gap-1.5 hover:underline"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -355,7 +351,7 @@ watch(
               :content="article.content || article.summary || ''"
             />
             <div
-              class="prose prose-lg prose-blue prose-a:text-blue-600 prose-img:rounded-xl dark:prose-invert dark:prose-a:text-blue-400 max-w-none"
+              class="prose prose-lg prose-a:text-primary prose-img:rounded-xl dark:prose-invert max-w-none"
               v-html="safeContent"
             ></div>
           </div>
@@ -369,7 +365,7 @@ watch(
       :initial="{ opacity: 0, y: 20 }"
       :animate="{ opacity: 1, y: 0 }"
       :transition="{ type: 'spring' }"
-      class="fixed right-4 bottom-4 w-2xs rounded-lg bg-blue-200 px-4 py-2 text-sm text-gray-600 opacity-90 shadow-lg dark:bg-gray-700 dark:text-white"
+      class="bg-primary/15 text-foreground fixed right-4 bottom-4 w-2xs rounded-lg px-4 py-2 text-sm opacity-90 shadow-lg"
     >
       {{ percent }}% 阅读进度
       <a-flex vertical gap="small">

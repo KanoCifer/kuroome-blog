@@ -19,14 +19,12 @@ export function CategorySidebar({
   if (isLoading) {
     return (
       <div className="space-y-3">
-        <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-          分类
-        </h3>
+        <h3 className="text-muted-foreground text-sm font-semibold">分类</h3>
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-10 w-full animate-pulse rounded-lg bg-gray-200 dark:bg-gray-800"
+              className="bg-muted h-10 w-full animate-pulse rounded-lg"
             />
           ))}
         </div>
@@ -36,7 +34,7 @@ export function CategorySidebar({
 
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+      <h3 className="text-muted-foreground text-sm font-semibold tracking-wide uppercase">
         分类
       </h3>
       <div className="flex flex-wrap gap-2">
@@ -45,16 +43,16 @@ export function CategorySidebar({
           onClick={() => onSelectCategory(null)}
           className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
             activeCategoryId === null
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-muted text-foreground hover:bg-accent'
           }`}
         >
           <span>全部</span>
           <span
             className={`rounded-full px-1.5 py-0.5 text-xs ${
               activeCategoryId === null
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 dark:bg-gray-700'
+                ? 'bg-primary/80 text-primary-foreground'
+                : 'bg-muted-foreground/20'
             }`}
           >
             {Object.values(categoryCounts).reduce((a, b) => a + b, 0)}
@@ -69,16 +67,16 @@ export function CategorySidebar({
               onClick={() => onSelectCategory(category.id)}
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
                 activeCategoryId === category.id
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-foreground hover:bg-accent'
               }`}
             >
               <span>{category.name}</span>
               <span
                 className={`rounded-full px-1.5 py-0.5 text-xs ${
                   activeCategoryId === category.id
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700'
+                    ? 'bg-primary/80 text-primary-foreground'
+                    : 'bg-muted-foreground/20'
                 }`}
               >
                 {count}

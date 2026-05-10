@@ -30,13 +30,13 @@ function PostCard({ post, index }: PostCardProps) {
       transition={{ delay: index * 0.05, duration: 0.3 }}
       className={`relative overflow-hidden rounded-2xl ${
         post.is_pinned
-          ? 'bg-linear-to-br from-blue-50 to-sky-50 ring-2 ring-blue-400/30 dark:from-slate-800/80 dark:to-slate-800/60 dark:ring-blue-500/30'
-          : 'bg-white dark:bg-gray-900'
+          ? 'from-primary/5 to-primary/10 ring-primary/30 bg-linear-to-br ring-2'
+          : 'bg-card'
       }`}
     >
       {/* Pinned Badge */}
       {post.is_pinned && (
-        <div className="absolute -top-1 -right-1 flex items-center gap-1 rounded-tr-2xl rounded-bl-xl bg-linear-to-r from-blue-500 to-sky-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
+        <div className="from-primary to-primary/80 text-primary-foreground absolute -top-1 -right-1 flex items-center gap-1 rounded-tr-2xl rounded-bl-xl bg-linear-to-r px-3 py-1.5 text-xs font-bold shadow-lg">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-3.5 w-3.5"
@@ -53,9 +53,7 @@ function PostCard({ post, index }: PostCardProps) {
         {/* Title */}
         <h2
           className={`text-lg leading-snug font-semibold ${
-            post.is_pinned
-              ? 'text-blue-900 dark:text-blue-100'
-              : 'text-gray-900 dark:text-white'
+            post.is_pinned ? 'text-primary' : 'text-foreground'
           }`}
         >
           {post.title}
@@ -64,9 +62,7 @@ function PostCard({ post, index }: PostCardProps) {
         {/* Meta */}
         <p
           className={`mt-2 text-xs ${
-            post.is_pinned
-              ? 'text-blue-700/70 dark:text-blue-300/70'
-              : 'text-gray-500 dark:text-gray-400'
+            post.is_pinned ? 'text-primary/70' : 'text-muted-foreground'
           }`}
         >
           {formatDate(post.created_at)}
@@ -109,21 +105,13 @@ function PostCard({ post, index }: PostCardProps) {
         {/* Preview */}
         <div
           className={`mt-3 line-clamp-3 text-sm leading-relaxed ${
-            post.is_pinned
-              ? 'text-blue-800/80 dark:text-blue-200/80'
-              : 'text-gray-600 dark:text-gray-400'
+            post.is_pinned ? 'text-primary/80' : 'text-foreground/80'
           }`}
           dangerouslySetInnerHTML={{ __html: getPreviewHtml(post.body) }}
         />
 
         {/* Read More */}
-        <div
-          className={`mt-3 inline-flex items-center text-sm font-medium ${
-            post.is_pinned
-              ? 'text-blue-600 dark:text-blue-400'
-              : 'text-blue-600 dark:text-blue-400'
-          }`}
-        >
+        <div className="text-primary mt-3 inline-flex items-center text-sm font-medium">
           阅读全文
           <svg
             className="ml-1 h-4 w-4"
@@ -257,14 +245,12 @@ export default function BlogListView() {
   };
 
   return (
-    <div className="min-h-dvh bg-gray-50 dark:bg-slate-950">
+    <div className="bg-background min-h-dvh">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md dark:bg-gray-900/80">
+      <div className="bg-surface sticky top-0 z-10 backdrop-blur-md">
         <div className="ml-12 max-w-2xl px-4 py-4">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            博客
-          </h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <h1 className="text-foreground text-2xl font-bold">博客</h1>
+          <p className="text-muted-foreground mt-1 text-sm">
             分享阅读心得、技术思考
           </p>
         </div>
@@ -275,7 +261,7 @@ export default function BlogListView() {
         <div className="relative">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
             <svg
-              className="h-5 w-5 text-gray-400"
+              className="text-muted-foreground h-5 w-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -294,12 +280,12 @@ export default function BlogListView() {
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             placeholder="搜索文章..."
-            className="block w-full rounded-xl border border-gray-200 bg-white py-3 pr-4 pl-10 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500"
+            className="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 block w-full rounded-xl border py-3 pr-4 pl-10 text-sm focus:ring-2 focus:outline-none"
           />
           {searchQuery && (
             <button
               onClick={handleClearSearch}
-              className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+              className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center pr-3"
             >
               <svg
                 className="h-5 w-5"

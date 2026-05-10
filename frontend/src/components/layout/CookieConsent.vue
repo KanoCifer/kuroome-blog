@@ -106,7 +106,9 @@ const saveSettings = () => {
         <div class="relative px-5 py-4">
           <!-- 标题行 -->
           <div class="mb-2 flex items-center gap-2.5">
-            <span class="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500/15 text-[11px]">
+            <span
+              class="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500/15 text-[11px]"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="14"
@@ -124,7 +126,9 @@ const saveSettings = () => {
                 <path d="M17.33 2.93A10 10 0 0 1 22 12H12Z" />
               </svg>
             </span>
-            <span class="text-[13px] font-medium tracking-wide text-white/90">Cookie 设置</span>
+            <span class="text-[13px] font-medium tracking-wide text-white/90"
+              >Cookie 设置</span
+            >
           </div>
 
           <!-- 说明文字 -->
@@ -176,8 +180,12 @@ const saveSettings = () => {
         ></div>
 
         <AlertDialogHeader class="relative">
-          <AlertDialogTitle class="text-[15px] font-medium text-white/90"> Cookie 偏好设置 </AlertDialogTitle>
-          <AlertDialogDescription class="mt-1 text-[12.5px] leading-relaxed text-white/45">
+          <AlertDialogTitle class="text-[15px] font-medium text-white/90">
+            Cookie 偏好设置
+          </AlertDialogTitle>
+          <AlertDialogDescription
+            class="mt-1 text-[12.5px] leading-relaxed text-white/45"
+          >
             选择允许的 Cookie 类别。您可随时通过清除浏览器数据撤回同意。
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -200,8 +208,12 @@ const saveSettings = () => {
               />
             </div>
             <label :for="`cookie-${cat.id}`" class="flex-1 cursor-pointer">
-              <span class="text-[13px] font-medium text-white/80">{{ cat.label }}</span>
-              <p class="mt-0.5 text-[11.5px] text-white/40">{{ cat.description }}</p>
+              <span class="text-[13px] font-medium text-white/80">{{
+                cat.label
+              }}</span>
+              <p class="mt-0.5 text-[11.5px] text-white/40">
+                {{ cat.description }}
+              </p>
             </label>
             <span
               v-if="cat.required"

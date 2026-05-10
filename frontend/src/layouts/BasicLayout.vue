@@ -26,7 +26,9 @@ const backgroundImages = [
 const currentBgIndex = useStorage<number>("readinglist_bg_index", 0);
 
 // 动态背景图 URL
-const backgroundUrl = computed(() => backgroundImages[currentBgIndex.value] || backgroundImages[0]);
+const backgroundUrl = computed(
+  () => backgroundImages[currentBgIndex.value] || backgroundImages[0],
+);
 const route = useRoute();
 const isEntryView = ref<boolean>(false);
 const isAboutView = ref<boolean>(false);

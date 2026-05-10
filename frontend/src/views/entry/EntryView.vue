@@ -7,17 +7,17 @@
     >
       <!-- Theme Toggle + Background Switch - 只在入口页面显示 -->
       <div
-        class="squircle absolute top-4 right-4 z-50 flex gap-2 rounded-2xl bg-blue-50 p-2 shadow-sm ring ring-blue-50/70 dark:bg-blue-900/80 dark:ring-blue-600"
+        class="squircle bg-secondary ring-border/30 absolute top-4 right-4 z-50 flex gap-2 rounded-2xl p-2 shadow-sm ring"
       >
         <ThemeToggle />
         <!-- 背景图切换按钮 -->
         <button
           @click="debouncedSwitchBackground()"
-          class="squircle rounded-xl p-2 transition-all hover:scale-110 hover:bg-blue-100 dark:hover:bg-blue-800"
+          class="squircle hover:bg-accent rounded-xl p-2 transition-all hover:scale-110"
           title="切换背景图"
         >
           <svg
-            class="h-5 w-5 text-blue-600 dark:text-blue-400"
+            class="text-primary h-5 w-5"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -124,11 +124,11 @@
       <button
         v-if="show.TodoCard && !showTodoCard"
         @click="showTodoCard = true"
-        class="squircle fixed top-1/2 right-4 z-50 -translate-y-1/2 rounded-2xl bg-blue-50 p-3 shadow-sm ring ring-blue-50/70 transition-all hover:scale-110 dark:bg-blue-900/80 dark:ring-blue-600"
+        class="squircle bg-secondary ring-border/30 fixed top-1/2 right-4 z-50 -translate-y-1/2 rounded-2xl p-3 shadow-sm ring transition-all hover:scale-110"
         title="显示待办卡片"
       >
         <svg
-          class="h-5 w-5 text-blue-600 dark:text-blue-400"
+          class="text-primary h-5 w-5"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"

@@ -7,7 +7,7 @@
     class="w-auto"
   >
     <button
-      class="squircle flex cursor-pointer items-center bg-blue-600/80 px-4 py-2 text-2xl font-semibold text-gray-50 ring ring-gray-50/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:ring-gray-600"
+      class="squircle bg-primary/80 text-primary-foreground ring-border/30 focus-visible:outline-primary flex cursor-pointer items-center px-4 py-2 text-2xl font-semibold ring focus-visible:outline-2 focus-visible:outline-offset-2"
       @click="handleClick"
     >
       <svg

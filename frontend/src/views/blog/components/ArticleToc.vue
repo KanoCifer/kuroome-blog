@@ -2,7 +2,7 @@
   <aside class="w-full lg:w-64 lg:shrink-0">
     <div v-if="toc.length > 0" class="sticky top-24 rounded-3xl p-5 shadow-md">
       <h3
-        class="mb-4 flex items-center gap-2 font-serif text-base font-semibold text-gray-800 dark:text-white"
+        class="text-foreground mb-4 flex items-center gap-2 font-serif text-base font-semibold"
       >
         <svg
           class="h-5 w-5"
@@ -27,8 +27,8 @@
           :class="[
             'group flex w-full items-start rounded-lg px-3 py-2 text-left text-sm transition-all',
             activeId === item.id
-              ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-              : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white',
+              ? 'bg-primary/15 text-primary'
+              : 'text-muted-foreground hover:bg-accent hover:text-foreground',
           ]"
           :style="{ paddingLeft: `${(item.level - 1) * 12 + 12}px` }"
         >

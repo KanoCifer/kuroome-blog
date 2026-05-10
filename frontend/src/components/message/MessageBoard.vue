@@ -82,27 +82,27 @@ onMounted(() => {
 
 <template>
   <div
-    class="mx-auto mt-12 mb-4 rounded-3xl bg-white/80 p-4 py-8 shadow-lg ring-1 ring-gray-900/5 hover:shadow-xl motion-safe:transition-shadow motion-safe:duration-300 dark:bg-gray-800/80"
+    class="bg-card/80 ring-border mx-auto mt-12 mb-4 rounded-3xl p-4 py-8 shadow-lg ring-1 hover:shadow-xl motion-safe:transition-shadow motion-safe:duration-300 dark:bg-gray-800/80"
   >
     <div class="mx-4 my-2">
       <h2
-        class="flex items-center gap-3 font-serif text-2xl font-bold text-gray-800 dark:text-gray-100"
+        class="text-foreground dark:text-foreground flex items-center gap-3 font-serif text-2xl font-bold"
       >
         Message Board
         <span
-          class="items-baseline text-sm text-gray-500 italic dark:text-gray-400"
+          class="text-muted-foreground dark:text-muted-foreground items-baseline text-sm italic"
         >
           Say hello now!
         </span>
         <span
-          class="ml-2 rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+          class="bg-muted text-muted-foreground dark:text-muted-foreground ml-2 rounded-full px-3 py-1 text-sm font-medium dark:bg-gray-800"
         >
           {{ messages.length }}
         </span>
       </h2>
       <p class="my-4">
         <span
-          class="rounded-full border border-blue-200 bg-blue-200/30 px-4 py-2 text-xs font-medium text-blue-400"
+          class="border-primary/30 bg-primary/20 text-primary rounded-full border px-4 py-2 text-xs font-medium"
           >*评论发布后请等待管理员审核</span
         >
       </p>
@@ -112,7 +112,7 @@ onMounted(() => {
           <div class="form-group">
             <label
               for="username-input"
-              class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              class="text-foreground dark:text-foreground mb-2 block text-sm font-semibold"
             >
               Username
             </label>
@@ -120,14 +120,14 @@ onMounted(() => {
               id="username-input"
               v-model="name"
               type="text"
-              class="w-full rounded-3xl border border-gray-300 bg-gray-50 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none motion-safe:transition-all motion-safe:duration-300 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
+              class="border-border bg-muted focus:border-ring focus:ring-ring w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
               :disabled="submitting"
               placeholder="Your name"
             />
             <div
               v-if="errors.name"
               aria-live="assertive"
-              class="mt-1 flex items-center text-sm text-red-500"
+              class="text-destructive mt-1 flex items-center text-sm"
             >
               {{ errors.name[0] }}
             </div>
@@ -136,7 +136,7 @@ onMounted(() => {
           <div class="form-group">
             <label
               for="message-input"
-              class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300"
+              class="text-foreground dark:text-foreground mb-2 block text-sm font-semibold"
             >
               Message
             </label>
@@ -144,14 +144,14 @@ onMounted(() => {
               id="message-input"
               v-model="message"
               rows="3"
-              class="w-full rounded-3xl border border-gray-300 bg-gray-50 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none motion-safe:transition-all motion-safe:duration-300 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
+              class="border-border bg-muted focus:border-ring focus:ring-ring w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
               :disabled="submitting"
               placeholder="发布后请等待审核"
             ></textarea>
             <div
               v-if="errors.message"
               aria-live="assertive"
-              class="mt-1 flex items-center text-sm text-red-500"
+              class="text-destructive mt-1 flex items-center text-sm"
             >
               {{ errors.message[0] }}
             </div>
@@ -160,7 +160,7 @@ onMounted(() => {
           <div>
             <button
               type="submit"
-              class="flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-8 py-2.5 font-bold text-white shadow-lg shadow-blue-500/30 ring-offset-2 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-800"
+              class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-ring flex cursor-pointer items-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg ring-offset-2 focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-800"
               :disabled="submitting"
             >
               {{ submitting ? "Submitting..." : "Submit" }}
@@ -171,7 +171,7 @@ onMounted(() => {
         <div
           v-if="successMessage"
           aria-live="polite"
-          class="mt-4 rounded-lg bg-green-50 p-4 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+          class="bg-success/10 text-success mt-4 rounded-lg p-4 dark:bg-green-900/20 dark:text-green-400"
         >
           {{ successMessage }}
         </div>
@@ -180,7 +180,7 @@ onMounted(() => {
       <div
         v-if="loading"
         role="status"
-        class="mt-6 text-center text-gray-500 dark:text-gray-400"
+        class="text-muted-foreground dark:text-muted-foreground mt-6 text-center"
       >
         Loading messages...
       </div>
@@ -193,7 +193,7 @@ onMounted(() => {
             'mt-6 rounded-3xl p-4 shadow-sm hover:shadow-md motion-safe:transition-all motion-safe:duration-300',
             msg.from_admin
               ? 'bg-violet-50 ring-2 ring-violet-400/50 dark:bg-violet-950/30 dark:ring-violet-500/40'
-              : 'bg-gray-50 dark:bg-gray-700/30',
+              : 'bg-muted dark:bg-gray-700/30',
           ]"
         >
           <div class="flex items-center justify-between">
@@ -202,8 +202,8 @@ onMounted(() => {
                 :class="[
                   'flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold',
                   msg.from_admin
-                    ? 'bg-violet-600 text-white'
-                    : 'bg-linear-to-br from-blue-50 to-blue-100 text-blue-600 dark:from-sky-900 dark:to-blue-900 dark:text-blue-300',
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-primary bg-linear-to-br from-blue-50 to-blue-100 dark:from-sky-900 dark:to-blue-900 dark:text-blue-300',
                 ]"
               >
                 {{ msg.name.charAt(0).toUpperCase() }}
@@ -214,14 +214,14 @@ onMounted(() => {
                     'text-lg font-semibold',
                     msg.from_admin
                       ? 'text-violet-900 dark:text-violet-100'
-                      : 'text-gray-900 dark:text-gray-100',
+                      : 'text-foreground dark:text-foreground',
                   ]"
                 >
                   {{ msg.name }}
                 </h3>
                 <span
                   v-if="msg.from_admin"
-                  class="inline-flex items-center gap-1 rounded-md bg-violet-600 px-2 py-0.5 text-xs font-bold text-white shadow-sm"
+                  class="bg-primary text-primary-foreground inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-bold shadow-sm"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -244,7 +244,7 @@ onMounted(() => {
                 'text-sm',
                 msg.from_admin
                   ? 'text-violet-600/70 dark:text-violet-300/70'
-                  : 'text-gray-500 dark:text-gray-400',
+                  : 'text-muted-foreground dark:text-muted-foreground',
               ]"
             >
               {{ formatDate(msg.created_at) }}
@@ -255,7 +255,7 @@ onMounted(() => {
               'mt-3',
               msg.from_admin
                 ? 'text-violet-800 dark:text-violet-200'
-                : 'text-gray-700 dark:text-gray-300',
+                : 'text-foreground dark:text-foreground',
             ]"
           >
             {{ msg.message }}
@@ -264,7 +264,7 @@ onMounted(() => {
 
         <div
           v-if="messages.length === 0 && !loading"
-          class="mt-6 text-center text-gray-500 dark:text-gray-400"
+          class="text-muted-foreground dark:text-muted-foreground mt-6 text-center"
         >
           No messages yet. Be the first to say hello!
         </div>

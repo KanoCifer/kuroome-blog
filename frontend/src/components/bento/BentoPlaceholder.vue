@@ -10,11 +10,11 @@
     ></div>
 
     <div
-      class="relative flex h-full min-h-30 w-full items-center justify-center rounded-2xl border-2 border-dashed border-white/50 bg-white/20 transition-colors hover:bg-white/30"
+      class="bg-card/20 hover:bg-card/30 relative flex h-full min-h-30 w-full items-center justify-center rounded-2xl border-2 border-dashed border-white/50 transition-colors"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        class="h-8 w-8 text-slate-400"
+        class="text-muted-foreground h-8 w-8"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"

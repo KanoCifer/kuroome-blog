@@ -103,24 +103,24 @@ watch(
         <button
           type="button"
           aria-label="关闭弹窗"
-          class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
+          class="bg-background/60 absolute inset-0 backdrop-blur-sm"
           @click="emit('close')"
         />
         <section
-          class="relative z-10 w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl dark:border-slate-700 dark:bg-slate-900"
+          class="border-border bg-card relative z-10 w-full max-w-2xl rounded-2xl border p-5 shadow-2xl"
         >
           <header class="mb-4 flex items-start justify-between gap-4">
             <div>
-              <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+              <h3 class="text-foreground text-lg font-semibold">
                 通知渠道配置
               </h3>
-              <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              <p class="text-muted-foreground mt-1 text-sm">
                 选择通知渠道和提醒触发时间点，可先发送测试通知。
               </p>
             </div>
             <button
               type="button"
-              class="rounded-lg border border-slate-300 px-3 py-1 text-xs text-slate-600 transition hover:bg-slate-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+              class="border-border text-muted-foreground hover:bg-accent rounded-lg border px-3 py-1 text-xs transition"
               @click="emit('close')"
             >
               关闭
@@ -130,7 +130,7 @@ watch(
           <div class="space-y-4">
             <section>
               <p
-                class="mb-2 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400"
+                class="text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase"
               >
                 通知渠道
               </p>
@@ -142,8 +142,8 @@ watch(
                   class="rounded-xl border px-3 py-2 text-sm transition"
                   :class="
                     localForm.channels.includes(channel.value)
-                      ? 'border-indigo-400 bg-indigo-50 text-indigo-700 dark:border-indigo-400 dark:bg-indigo-500/20 dark:text-indigo-300'
-                      : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+                      ? 'border-primary/30 bg-primary/15 text-primary'
+                      : 'border-border bg-card text-card-foreground hover:bg-accent'
                   "
                   @click="toggleChannel(channel.value)"
                 >
@@ -154,7 +154,7 @@ watch(
 
             <section>
               <p
-                class="mb-2 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400"
+                class="text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase"
               >
                 提醒时间点
               </p>
@@ -162,12 +162,12 @@ watch(
                 <label
                   v-for="point in reminderPointOptions"
                   :key="point.key"
-                  class="flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                  class="border-border bg-card text-card-foreground flex items-center gap-2 rounded-xl border px-3 py-2 text-sm"
                 >
                   <input
                     v-model="localForm[point.key]"
                     type="checkbox"
-                    class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/30 dark:border-slate-500"
+                    class="text-primary focus:ring-primary/30 border-border h-4 w-4 rounded"
                   />
                   {{ point.label }}
                 </label>
@@ -179,52 +179,49 @@ watch(
                 v-if="localForm.channels.includes('email')"
                 class="space-y-1"
               >
-                <span
-                  class="text-xs font-medium text-slate-600 dark:text-slate-300"
+                <span class="text-muted-foreground text-xs font-medium"
                   >邮箱地址（Email）</span
                 >
                 <input
                   v-model="localForm.email"
                   type="email"
                   placeholder="name@example.com"
-                  class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                  class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
               <label
                 v-if="localForm.channels.includes('feishu')"
                 class="space-y-1"
               >
-                <span
-                  class="text-xs font-medium text-slate-600 dark:text-slate-300"
+                <span class="text-muted-foreground text-xs font-medium"
                   >飞书 Webhook URL</span
                 >
                 <input
                   v-model="localForm.feishu_webhook_url"
                   type="text"
                   placeholder="https://open.feishu.cn/open-apis/bot/v2/hook/..."
-                  class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                  class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
               <label
                 v-if="localForm.channels.includes('bark')"
                 class="space-y-1"
               >
-                <span
-                  class="text-xs font-medium text-slate-600 dark:text-slate-300"
+                <span class="text-muted-foreground text-xs font-medium"
                   >Bark Device Key</span
                 >
                 <input
                   v-model="localForm.bark_device_key"
                   type="text"
                   placeholder="请输入 Bark 设备 Key"
-                  class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                  class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
             </section>
 
             <div
               v-if="testResult"
-              class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+              class="border-border bg-muted/50 text-card-foreground rounded-xl border px-3 py-2 text-xs"
             >
               <p class="mb-2 font-medium">测试结果</p>
               <div class="flex flex-wrap gap-2">
@@ -234,8 +231,8 @@ watch(
                   class="rounded-full px-2.5 py-1"
                   :class="
                     success
-                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
-                      : 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300'
+                      ? 'bg-success/20 text-success'
+                      : 'bg-destructive/20 text-destructive'
                   "
                 >
                   {{ channel }}: {{ success ? "成功" : "失败" }}
@@ -245,7 +242,7 @@ watch(
 
             <p
               v-if="errorMessage"
-              class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300"
+              class="border-destructive/30 bg-destructive/10 text-destructive rounded-lg border px-3 py-2 text-sm"
             >
               {{ errorMessage }}
             </p>
@@ -253,7 +250,7 @@ watch(
             <footer class="flex flex-wrap justify-end gap-2">
               <button
                 type="button"
-                class="rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+                class="border-border text-muted-foreground hover:bg-accent rounded-xl border px-3 py-2 text-sm transition"
                 @click="emit('close')"
               >
                 取消
@@ -261,7 +258,7 @@ watch(
               <button
                 type="button"
                 :disabled="isTesting"
-                class="rounded-xl border border-indigo-300 bg-indigo-50 px-3 py-2 text-sm font-medium text-indigo-700 transition hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-indigo-500/40 dark:bg-indigo-500/10 dark:text-indigo-300 dark:hover:bg-indigo-500/20"
+                class="border-primary/30 bg-primary/15 text-primary hover:bg-accent rounded-xl border px-3 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60"
                 @click="emitTest"
               >
                 {{ isTesting ? "测试中..." : "发送测试通知" }}
@@ -269,7 +266,7 @@ watch(
               <button
                 type="button"
                 :disabled="isSaving"
-                class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
+                class="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60"
                 @click="emitSave"
               >
                 {{ isSaving ? "保存中..." : "保存配置" }}

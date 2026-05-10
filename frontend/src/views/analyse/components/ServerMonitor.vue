@@ -2,9 +2,7 @@
   <!-- Server Monitoring Section -->
   <div class="space-y-6">
     <div class="flex items-center justify-between">
-      <h2
-        class="flex items-center gap-2 text-xl font-bold text-gray-800 dark:text-gray-100"
-      >
+      <h2 class="text-foreground flex items-center gap-2 text-xl font-bold">
         <svg
           class="h-6 w-6"
           fill="none"
@@ -22,13 +20,13 @@
       </h2>
       <div class="flex items-center gap-3">
         <div
-          class="flex items-center gap-2 rounded-xl bg-gray-50 px-4 py-2 text-sm text-gray-600 dark:bg-gray-700 dark:text-gray-400"
+          class="bg-muted text-muted-foreground flex items-center gap-2 rounded-xl px-4 py-2 text-sm"
         >
           <div
             :class="[
               isSSEConnected
-                ? 'h-2 w-2 animate-pulse rounded-full bg-green-500'
-                : 'h-2 w-2 rounded-full bg-gray-400',
+                ? 'bg-success h-2 w-2 animate-pulse rounded-full'
+                : 'bg-border h-2 w-2 rounded-full',
             ]"
           ></div>
           {{ isSSEConnected ? "Auto-refresh active" : "Auto-refresh paused" }}
@@ -36,7 +34,7 @@
         <button
           type="button"
           @click="toggleAutoRefresh"
-          class="rounded-xl bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+          class="text-foreground hover:bg-accent bg-muted rounded-xl px-4 py-2 text-sm font-medium transition-colors"
         >
           {{ isSSEConnected ? "Pause" : "Start" }} Auto-refresh
         </button>
@@ -46,11 +44,9 @@
     <!-- Server Status Cards -->
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
       <!-- CPU Gauge -->
-      <div
-        :class="`rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800/80 ${customClass || ''}`"
-      >
+      <div :class="`bg-card rounded-2xl p-6 shadow-lg ${customClass || ''}`">
         <div class="mb-4 flex items-center justify-between">
-          <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100">
+          <h3 class="text-foreground text-lg font-bold">
             <div class="flex items-center gap-2">
               <svg
                 class="h-5 w-5 text-amber-500"
@@ -81,11 +77,9 @@
       </div>
 
       <!-- Memory Gauge -->
-      <div
-        :class="`rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800/80 ${customClass || ''}`"
-      >
+      <div :class="`bg-card rounded-2xl p-6 shadow-lg ${customClass || ''}`">
         <div class="mb-4 flex items-center justify-between">
-          <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100">
+          <h3 class="text-foreground text-lg font-bold">
             <div class="flex items-center gap-2">
               <svg
                 class="h-5 w-5 text-purple-500"
@@ -103,7 +97,7 @@
               Memory Usage
             </div>
           </h3>
-          <span class="text-sm font-semibold text-gray-600 dark:text-gray-400">
+          <span class="text-muted-foreground text-sm font-semibold">
             {{ serverStatus?.mem_used ?? 0 }} MB /
             {{ serverStatus?.mem_total ?? 0 }} MB
           </span>
@@ -118,11 +112,9 @@
       </div>
 
       <!-- Disk Usage Card -->
-      <div
-        :class="`rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800/80 ${customClass || ''}`"
-      >
+      <div :class="`bg-card rounded-2xl p-6 shadow-lg ${customClass || ''}`">
         <div class="mb-4 flex items-center justify-between">
-          <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100">
+          <h3 class="text-foreground text-lg font-bold">
             <div class="flex items-center gap-2">
               <svg
                 class="h-5 w-5 text-blue-500"
@@ -150,21 +142,19 @@
         <div class="space-y-4">
           <div class="space-y-2">
             <div class="flex justify-between text-sm">
-              <span class="text-gray-600 dark:text-gray-400">Used</span>
-              <span class="font-medium text-gray-800 dark:text-gray-100">
+              <span class="text-muted-foreground">Used</span>
+              <span class="text-foreground font-medium">
                 {{ serverStatus?.disk_used ?? 0 }} GB
               </span>
             </div>
             <div class="flex justify-between text-sm">
-              <span class="text-gray-600 dark:text-gray-400">Total</span>
-              <span class="font-medium text-gray-800 dark:text-gray-100">
+              <span class="text-muted-foreground">Total</span>
+              <span class="text-foreground font-medium">
                 {{ serverStatus?.disk_total ?? 0 }} GB
               </span>
             </div>
           </div>
-          <div
-            class="h-4 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700"
-          >
+          <div class="bg-border h-4 w-full overflow-hidden rounded-full">
             <div
               :style="{
                 width: `${serverStatus?.disk_usage ?? 0}%`,
@@ -178,11 +168,9 @@
     </div>
 
     <!-- Server History Chart -->
-    <div
-      :class="`rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800/80 ${customClass || ''}`"
-    >
+    <div :class="`bg-card rounded-2xl p-6 shadow-lg ${customClass || ''}`">
       <h3
-        class="mb-4 flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100"
+        class="text-foreground mb-4 flex items-center gap-2 text-lg font-bold"
       >
         <svg
           class="h-5 w-5"
@@ -201,7 +189,7 @@
       </h3>
       <div
         v-if="loading && !serverStatus"
-        class="h-72 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-700/40"
+        class="bg-muted h-72 animate-pulse rounded-xl"
       ></div>
       <div v-else class="h-72 w-full overflow-hidden">
         <v-chart
@@ -482,31 +470,6 @@ const historyChartOption = computed(() => ({
     },
   ],
 }));
-
-// Fetch server status
-// const fetchStatus = async () => {
-//   try {
-//     const res = await request.get("/monitor/status/server/status");
-//     if (res.data.code === 200) {
-//       serverStatus.value = res.data.data;
-//       emit("status-update", res.data.data);
-
-//       // Add to history
-//       history.value.push({
-//         timestamp: new Date().toISOString(),
-//         cpu: res.data.data.cpu_percent,
-//         memory: res.data.data.mem_usage,
-//       });
-
-//       // Keep only last 100 records (~8 minutes of data at 5s intervals)
-//       if (history.value.length > 100) {
-//         history.value = history.value.slice(-100);
-//       }
-//     }
-//   } catch (err) {
-//     console.error("Failed to fetch server status:", err);
-//   }
-// };
 
 const fetchStatusSSE = async () => {
   // Close existing connection if any

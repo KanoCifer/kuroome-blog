@@ -1,6 +1,6 @@
 <template>
   <div
-    class="group squircle relative overflow-hidden border border-white/20 bg-linear-to-br from-white/80 to-white/40 p-6 shadow-lg backdrop-blur-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-xl dark:border-gray-700/50 dark:from-gray-900/80 dark:to-gray-800/40"
+    class="group squircle from-card/80 to-card/40 relative overflow-hidden border border-white/20 bg-linear-to-br p-6 shadow-lg backdrop-blur-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-xl dark:border-gray-700/50 dark:from-gray-900/80 dark:to-gray-800/40"
   >
     <!-- Decorative gradient orbs -->
     <div
@@ -14,18 +14,20 @@
     <div class="relative z-10 mb-4 flex items-start justify-between gap-2">
       <div>
         <h3
-          class="text-lg font-bold tracking-tight text-gray-900 dark:text-white"
+          class="text-foreground text-lg font-bold tracking-tight dark:text-white"
         >
           潮汐预报
         </h3>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        <p
+          class="text-muted-foreground dark:text-muted-foreground mt-1 text-sm"
+        >
           {{ tideSpotName }} · {{ todayStr }}
         </p>
       </div>
       <div class="flex shrink-0 items-center gap-1.5">
         <select
           v-model="selectedHarbor"
-          class="cursor-pointer rounded-lg border border-gray-200 bg-white/80 px-1.5 py-1 text-xs text-gray-700 focus:ring-1 focus:ring-cyan-400 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
+          class="text-secondary-foreground border-border bg-card/80 dark:bg-muted dark:text-secondary-foreground cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:ring-cyan-400 focus:outline-none dark:border-gray-600"
         >
           <option
             v-for="opt in HARBOR_OPTIONS"
@@ -37,7 +39,7 @@
         </select>
         <select
           v-model="selectedDate"
-          class="cursor-pointer rounded-lg border border-gray-200 bg-white/80 px-1.5 py-1 text-xs text-gray-700 focus:ring-1 focus:ring-cyan-400 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
+          class="text-secondary-foreground border-border bg-card/80 dark:bg-muted dark:text-secondary-foreground cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:ring-cyan-400 focus:outline-none dark:border-gray-600"
         >
           <option
             v-for="opt in dateOptions"
@@ -78,7 +80,9 @@
           class="h-12 w-12 animate-spin rounded-full border-4 border-cyan-100 border-t-cyan-500 dark:border-gray-700 dark:border-t-cyan-400"
         ></div>
       </div>
-      <span class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+      <span
+        class="text-muted-foreground dark:text-muted-foreground mt-4 text-sm"
+      >
         获取潮汐数据...
       </span>
     </div>
@@ -93,8 +97,8 @@
 
       <!-- Tide Summary -->
       <div class="mt-4 grid grid-cols-2 gap-3">
-        <div class="rounded-xl bg-white/50 p-3 dark:bg-gray-800/50">
-          <div class="mb-1 flex items-center gap-1.5 text-gray-400">
+        <div class="bg-card/50 dark:bg-muted/50 rounded-xl p-3">
+          <div class="text-muted-foreground mb-1 flex items-center gap-1.5">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="h-4 w-4"
@@ -111,14 +115,16 @@
             </svg>
             <span class="text-xs">最高潮</span>
           </div>
-          <p class="text-sm font-semibold text-gray-900 dark:text-white">
+          <p class="text-foreground text-sm font-semibold dark:text-white">
             {{ highTide ? highTide.height.toFixed(2) : "--" }}m
           </p>
-          <p class="text-xs text-gray-500">{{ highTide?.time ?? "--:--" }}</p>
+          <p class="text-muted-foreground text-xs">
+            {{ highTide?.time ?? "--:--" }}
+          </p>
         </div>
 
-        <div class="rounded-xl bg-white/50 p-3 dark:bg-gray-800/50">
-          <div class="mb-1 flex items-center gap-1.5 text-gray-400">
+        <div class="bg-card/50 dark:bg-muted/50 rounded-xl p-3">
+          <div class="text-muted-foreground mb-1 flex items-center gap-1.5">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="h-4 w-4"
@@ -135,10 +141,12 @@
             </svg>
             <span class="text-xs">最低潮</span>
           </div>
-          <p class="text-sm font-semibold text-gray-900 dark:text-white">
+          <p class="text-foreground text-sm font-semibold dark:text-white">
             {{ lowTide ? lowTide.height.toFixed(2) : "--" }}m
           </p>
-          <p class="text-xs text-gray-500">{{ lowTide?.time ?? "--:--" }}</p>
+          <p class="text-muted-foreground text-xs">
+            {{ lowTide?.time ?? "--:--" }}
+          </p>
         </div>
       </div>
     </div>
@@ -146,11 +154,11 @@
     <!-- No Data -->
     <div v-else class="relative z-10 py-4 text-center">
       <div
-        class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800"
+        class="bg-muted dark:bg-muted mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="h-8 w-8 text-gray-400"
+          class="text-muted-foreground h-8 w-8"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -163,7 +171,9 @@
           />
         </svg>
       </div>
-      <p class="text-sm text-gray-600 dark:text-gray-400">暂无潮汐数据</p>
+      <p class="dark:text-muted-foreground text-secondary-foreground text-sm">
+        暂无潮汐数据
+      </p>
     </div>
   </div>
 </template>

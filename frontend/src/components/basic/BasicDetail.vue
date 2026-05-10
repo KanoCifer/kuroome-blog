@@ -6,15 +6,15 @@
       :style="titleStyle"
     >
       <div>
-        <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50">
+        <h1 class="text-background max-w-6xl text-center font-serif text-7xl">
           {{ title }}
         </h1>
         <!-- Info -->
         <div
-          class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400"
+          class="text-muted-foreground mt-4 flex flex-wrap items-center justify-center gap-4 text-sm"
         >
           <span
-            class="inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+            class="bg-muted text-secondary-foreground dark:bg-muted dark:text-muted-foreground inline-block rounded-full px-2 py-0.5 text-xs font-medium"
           >
             {{ subtitle }}
           </span>
@@ -24,7 +24,7 @@
     <div class="relative mt-36 w-full">
       <div
         :style="sectionStyle"
-        class="absolute left-1/2 -z-5 h-full -translate-x-1/2 rounded-t-[40px] bg-blue-50 dark:bg-slate-900"
+        class="bg-background absolute left-1/2 -z-5 h-full -translate-x-1/2 rounded-t-[40px] dark:bg-slate-900"
       ></div>
       <div class="mx-auto max-w-6xl">
         <div
@@ -38,7 +38,7 @@
       <div class="mt-12 text-center">
         <button
           @click="$router.back()"
-          class="mb-12 inline-flex cursor-pointer items-center gap-2 rounded-full bg-gray-900 px-6 py-3 font-medium text-white transition-all duration-300 hover:bg-gray-800 hover:shadow-lg dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+          class="bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90 mb-12 inline-flex cursor-pointer items-center gap-2 rounded-full px-6 py-3 font-medium transition-all duration-300 hover:shadow-lg"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

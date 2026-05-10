@@ -25,19 +25,19 @@ const {
 } = storeToRefs(fishingMapStore);
 // console.log("钓鱼指数数据：", indexData.value);
 const levelColors: Record<string, string> = {
-  爆护: "text-green-500",
-  好: "text-blue-500",
-  一般: "text-orange-500",
-  差: "text-red-500",
-  空军: "text-gray-500",
+  爆护: "text-success",
+  好: "text-primary",
+  一般: "text-warning",
+  差: "text-destructive",
+  空军: "text-muted-foreground",
 };
 
 const levelBg: Record<string, string> = {
-  爆护: "bg-green-50 dark:bg-green-950/30",
-  好: "bg-blue-50 dark:bg-blue-950/30",
-  一般: "bg-orange-50 dark:bg-orange-950/30",
-  差: "bg-red-50 dark:bg-red-950/30",
-  空军: "bg-gray-50 dark:bg-gray-800/30",
+  爆护: "bg-success/10",
+  好: "bg-primary/10",
+  一般: "bg-warning/10",
+  差: "bg-destructive/10",
+  空军: "bg-muted",
 };
 
 const getGaugeColor = (percentage: number): string => {
@@ -86,12 +86,8 @@ const handleFeedback = () => {
 
 <template>
   <article
-    class="group squircle relative flex h-full cursor-pointer flex-col overflow-hidden border border-white/20 p-6 shadow-lg transition-all duration-500 hover:-translate-y-2 hover:shadow-xl dark:border-gray-700/50"
-    :class="
-      indexData
-        ? levelBg[indexData.level] || 'bg-gray-50 dark:bg-gray-800/60'
-        : 'bg-gray-50 dark:bg-gray-800/60'
-    "
+    class="group squircle border-border/20 relative flex h-full cursor-pointer flex-col overflow-hidden border p-6 shadow-lg transition-all duration-500 hover:-translate-y-2 hover:shadow-xl"
+    :class="indexData ? levelBg[indexData.level] || 'bg-muted' : 'bg-muted'"
   >
     <div
       class="pointer-events-none absolute top-0 right-0 overflow-hidden rounded-full p-8 blur-3xl"
@@ -104,18 +100,14 @@ const handleFeedback = () => {
     <!-- 钓鱼指数标题和说明 -->
     <div class="mb-3 flex items-center justify-between">
       <div>
-        <h3
-          class="text-lg font-bold tracking-tight text-gray-900 dark:text-white"
-        >
+        <h3 class="text-foreground text-lg font-bold tracking-tight">
           钓鱼指数
         </h3>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          基于实时天气、潮汐综合计算
-        </p>
+        <p class="text-muted-foreground text-sm">基于实时天气、潮汐综合计算</p>
       </div>
       <div class="flex items-center gap-3">
         <button
-          class="flex h-fit cursor-pointer items-center gap-1 rounded-lg bg-white/60 px-2 py-1 text-sm text-gray-600 hover:bg-white/80 disabled:cursor-not-allowed dark:bg-gray-800/60 dark:text-gray-300 dark:hover:bg-gray-800/80"
+          class="bg-card/60 text-muted-foreground hover:bg-card/80 flex h-fit cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-sm disabled:cursor-not-allowed"
           :disabled="loading"
           @click="fetchIndex"
         >
@@ -125,31 +117,28 @@ const handleFeedback = () => {
         <div
           class="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-sky-400 to-blue-500 shadow-lg shadow-sky-500/25 transition-transform duration-300 group-hover:scale-110"
         >
-          <FishingRod class="text-white" />
+          <FishingRod class="text-primary-foreground" />
         </div>
       </div>
     </div>
 
-    <p
-      v-if="loading && !indexData"
-      class="text-sm text-gray-500 dark:text-gray-400"
-    >
+    <p v-if="loading && !indexData" class="text-muted-foreground text-sm">
       加载中...
     </p>
-    <p v-else-if="error && !indexData" class="text-sm text-red-500">
+    <p v-else-if="error && !indexData" class="text-destructive text-sm">
       {{ error }}
     </p>
     <template v-else-if="indexData">
       <div class="mb-3 flex items-end gap-3">
         <span
           class="text-5xl font-bold"
-          :class="levelColors[indexData.level] || 'text-gray-500'"
+          :class="levelColors[indexData.level] || 'text-muted-foreground'"
         >
           {{ indexData.fishing_index }}
         </span>
         <span
           class="mb-1 text-lg font-medium"
-          :class="levelColors[indexData.level] || 'text-gray-500'"
+          :class="levelColors[indexData.level] || 'text-muted-foreground'"
         >
           {{ indexData.level }}
         </span>
@@ -157,26 +146,26 @@ const handleFeedback = () => {
 
       <div class="mb-3 grid grid-cols-3 gap-2 text-center text-xs">
         <div
-          class="rounded-lg bg-white/60 px-2 py-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:bg-gray-800/60"
+          class="bg-card/60 rounded-lg px-2 py-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
         >
           默认权重
-          <div class="mt-1 font-medium text-gray-900 dark:text-white">
+          <div class="text-foreground mt-1 font-medium">
             {{ indexData.expert_score }}
           </div>
         </div>
         <div
-          class="rounded-lg bg-white/60 px-2 py-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:bg-gray-800/60"
+          class="bg-card/60 rounded-lg px-2 py-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
         >
           权重调整
-          <div class="mt-1 font-medium text-gray-900 dark:text-white">
+          <div class="text-foreground mt-1 font-medium">
             {{ indexData.residual > 0 ? "+" : "" }}{{ indexData.residual }}
           </div>
         </div>
         <div
-          class="rounded-lg bg-white/60 px-2 py-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:bg-gray-800/60"
+          class="bg-card/60 rounded-lg px-2 py-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
         >
           综合指数
-          <div class="mt-1 font-medium text-gray-900 dark:text-white">
+          <div class="text-foreground mt-1 font-medium">
             {{ indexData.fishing_index }}
           </div>
         </div>
@@ -187,19 +176,19 @@ const handleFeedback = () => {
         open
         class="mt-4 cursor-pointer text-xs"
       >
-        <summary class="text-gray-500 dark:text-gray-400">特征详情</summary>
+        <summary class="text-muted-foreground">特征详情</summary>
         <div class="mt-2 grid grid-cols-3 gap-2">
           <motion.div
             v-for="(value, keyName) in indexData.feature_breakdown"
             :key="keyName"
-            class="rounded-xl border border-gray-200/60 bg-white/60 p-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-gray-700/60 dark:bg-gray-800/60"
+            class="border-border/60 bg-card/60 rounded-xl border p-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
           >
-            <div class="text-xs text-gray-800 dark:text-gray-400">
+            <div class="text-foreground text-xs">
               {{ formatFeatureName(keyName) }}
             </div>
 
             <div
-              class="relative mt-1 h-1.5 w-full overflow-hidden rounded-full bg-gray-200/60 dark:bg-gray-700/60"
+              class="bg-muted relative mt-1 h-1.5 w-full overflow-hidden rounded-full"
             >
               <div
                 class="absolute inset-y-0 left-0 rounded-full transition-all duration-700 ease-out"
@@ -211,12 +200,12 @@ const handleFeedback = () => {
       </details>
 
       <button
-        class="mt-3 w-full rounded-lg bg-blue-500 px-3 py-2 text-sm font-medium text-white hover:bg-blue-600"
+        class="bg-primary text-primary-foreground hover:bg-primary/90 mt-3 w-full rounded-lg px-3 py-2 text-sm font-medium"
         @click="handleFeedback"
       >
         提交钓鱼反馈
       </button>
     </template>
-    <p v-else class="text-sm text-gray-500 dark:text-gray-400">暂无数据</p>
+    <p v-else class="text-muted-foreground text-sm">暂无数据</p>
   </article>
 </template>

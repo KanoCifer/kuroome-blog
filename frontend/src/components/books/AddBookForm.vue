@@ -1,14 +1,14 @@
 <template>
   <!-- 添加书籍表单 -->
   <div
-    class="mb-8 rounded-3xl bg-white/80 p-6 shadow-xl ring-1 ring-gray-900/5 transition-shadow hover:shadow-2xl dark:bg-gray-800/80 dark:ring-white/10"
+    class="bg-card/80 ring-border dark:ring-border mb-8 rounded-3xl p-6 shadow-xl ring-1 transition-shadow hover:shadow-2xl dark:bg-gray-800/80"
   >
     <div
-      class="mb-6 flex cursor-pointer items-center gap-3 border-b border-gray-100 pb-4 dark:border-gray-700"
+      class="border-border mb-6 flex cursor-pointer items-center gap-3 border-b pb-4 dark:border-gray-700"
       @click="isCollapsed = !isCollapsed"
     >
       <div
-        class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
+        class="bg-primary/20 text-primary flex h-10 w-10 items-center justify-center rounded-full dark:bg-blue-900/30 dark:text-blue-400"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -26,20 +26,20 @@
         </svg>
       </div>
       <p
-        class="mb-0 items-center font-serif text-xl font-bold text-gray-900 dark:text-white"
+        class="text-foreground mb-0 items-center font-serif text-xl font-bold dark:text-white"
       >
         {{ isEditing ? "Edit Book" : "Add to ReadingList" }}
       </p>
       <button
         v-if="isEditing"
         @click.stop="resetForm"
-        class="rounded-4xl border bg-rose-100 px-4 py-2 text-sm text-rose-500 transition-colors hover:bg-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:hover:bg-rose-900/50"
+        class="bg-destructive/20 text-destructive hover:bg-destructive/30 rounded-4xl border px-4 py-2 text-sm transition-colors dark:bg-rose-900/30 dark:text-rose-400 dark:hover:bg-rose-900/50"
       >
         取消
       </button>
       <button
         @click.stop="isCollapsed = !isCollapsed"
-        class="ml-auto text-sm text-gray-500 transition-transform hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+        class="text-muted-foreground hover:text-foreground ml-auto text-sm transition-transform dark:text-gray-400 dark:hover:text-gray-200"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -70,7 +70,7 @@
               type="text"
               autocomplete="off"
               placeholder="Book Title"
-              class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
+              class="border-border bg-card text-foreground focus:border-ring focus:ring-ring w-full rounded-lg border px-4 py-2 transition-transform focus:scale-[1.01] focus:ring-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
             />
           </div>
           <div class="group">
@@ -79,13 +79,13 @@
               type="text"
               autocomplete="off"
               placeholder="Author"
-              class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
+              class="border-border bg-card text-foreground focus:border-ring focus:ring-ring w-full rounded-lg border px-4 py-2 transition-transform focus:scale-[1.01] focus:ring-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
             />
           </div>
         </div>
 
         <label
-          class="group relative flex cursor-pointer items-center rounded-xl border border-gray-100 bg-gray-50 p-4 transition-all hover:bg-gray-50/50 dark:border-gray-700 dark:bg-gray-700/30 dark:hover:bg-gray-700/30"
+          class="group border-border bg-muted hover:bg-muted/50 relative flex cursor-pointer items-center rounded-xl border p-4 transition-all dark:border-gray-700 dark:bg-gray-700/30 dark:hover:bg-gray-700/30"
         >
           <input
             v-model="form.iscompleted"
@@ -93,11 +93,11 @@
             class="peer sr-only"
           />
           <div
-            class="mr-4 flex h-6 w-6 items-center justify-center rounded-md border-2 border-gray-300 bg-white transition-all peer-checked:border-blue-500 peer-checked:bg-blue-500 dark:border-gray-500 dark:bg-gray-700"
+            class="border-border bg-card peer-checked:border-primary peer-checked:bg-primary mr-4 flex h-6 w-6 items-center justify-center rounded-md border-2 transition-all dark:border-gray-500 dark:bg-gray-700"
           >
             <svg
               :class="[
-                'z-50 h-4 w-4 text-white transition-opacity peer-checked:opacity-100',
+                'text-primary-foreground z-50 h-4 w-4 transition-opacity peer-checked:opacity-100',
                 form.iscompleted ? 'opacity-100' : 'opacity-0',
               ]"
               fill="none"
@@ -112,7 +112,7 @@
               />
             </svg>
           </div>
-          <span class="font-medium text-gray-700 dark:text-gray-300"
+          <span class="text-foreground font-medium dark:text-gray-300"
             >Mark as completed</span
           >
         </label>
@@ -125,7 +125,7 @@
               'inline-flex items-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:outline-none',
               submitting
                 ? 'cursor-not-allowed opacity-50'
-                : 'bg-blue-600 text-white shadow-blue-500/30 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:ring-offset-gray-800',
+                : 'bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-ring focus:ring-2 focus:ring-offset-2 dark:ring-offset-gray-800',
             ]"
           >
             {{ isEditing ? "Update Book" : "Add Book" }}

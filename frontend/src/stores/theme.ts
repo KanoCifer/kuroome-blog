@@ -2,17 +2,29 @@ import { defineStore } from "pinia";
 import { ref, watch } from "vue";
 
 export type Theme = "light" | "dark" | "system";
-export type ColorScheme = "sky-blue" | "forest-green";
+export type ColorScheme =
+  | "sky-blue"
+  | "forest-green"
+  | "paper"
+  | "sage"
+  | "mist"
+  | "blush";
 
 export const useThemeStore = defineStore("theme", () => {
-  const theme = ref<Theme>((localStorage.getItem("theme") as Theme) || "system");
+  const theme = ref<Theme>(
+    (localStorage.getItem("theme") as Theme) || "system",
+  );
 
-  const scheme = ref<ColorScheme>((localStorage.getItem("color-scheme") as ColorScheme) || "sky-blue");
+  const scheme = ref<ColorScheme>(
+    (localStorage.getItem("color-scheme") as ColorScheme) || "sky-blue",
+  );
 
   const applyTheme = (newTheme: Theme) => {
     const root = document.documentElement;
     const isDark =
-      newTheme === "dark" || (newTheme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+      newTheme === "dark" ||
+      (newTheme === "system" &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches);
 
     if (isDark) {
       root.classList.add("dark");
@@ -70,7 +82,9 @@ export const useThemeStore = defineStore("theme", () => {
       setTheme("light");
     } else {
       // If system, toggle based on current system preference
-      const isCurrentlyDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const isCurrentlyDark = window.matchMedia(
+        "(prefers-color-scheme: dark)",
+      ).matches;
       setTheme(isCurrentlyDark ? "light" : "dark");
     }
   };

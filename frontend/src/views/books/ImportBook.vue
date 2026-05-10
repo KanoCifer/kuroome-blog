@@ -1,17 +1,17 @@
 <template>
   <div class="min-h-screen px-4 py-16">
     <div
-      class="mx-auto mt-8 max-w-2xl rounded-3xl border border-white/20 bg-white/40 p-10 shadow-2xl dark:border-gray-700/30 dark:bg-gray-900/40"
+      class="border-border/20 bg-card/40 mx-auto mt-8 max-w-2xl rounded-3xl border p-10 shadow-2xl"
       style="animation: fadeInUp 0.6s ease-out"
     >
       <!-- Header -->
       <div class="mb-12 text-center">
         <h1
-          class="bg-linear-to-r from-blue-600 to-sky-600 bg-clip-text text-[clamp(1.8rem,4vw,2.5rem)] font-bold text-transparent dark:from-blue-400 dark:to-sky-400"
+          class="from-gradient-primary-from to-gradient-primary-to bg-linear-to-r bg-clip-text text-[clamp(1.8rem,4vw,2.5rem)] font-bold text-transparent"
         >
           Import Your Bookshelf
         </h1>
-        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+        <p class="text-muted-foreground mt-2 text-sm">
           Import your books from WeRead by providing your account cookie
         </p>
       </div>
@@ -22,7 +22,7 @@
         <div class="space-y-2">
           <label
             for="weread_cookie"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            class="text-foreground block text-sm font-medium"
           >
             WeRead Cookie
           </label>
@@ -30,12 +30,12 @@
             <textarea
               id="weread_cookie"
               v-model="weread_cookie"
-              class="w-full rounded-2xl border border-gray-200 bg-white/70 px-4 py-3 text-sm transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800/50 dark:text-white"
+              class="border-border bg-card/70 focus:border-primary focus:ring-primary/20 w-full rounded-2xl border px-4 py-3 text-sm transition-all duration-200 focus:ring-2 focus:outline-none"
               rows="8"
               placeholder="Paste your WeRead cookie here..."
             />
           </div>
-          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          <p class="text-muted-foreground mt-1 text-xs">
             Your cookie will be saved locally in your browser for future use
           </p>
         </div>
@@ -44,7 +44,7 @@
         <button
           type="submit"
           :disabled="loading"
-          class="w-full rounded-2xl bg-linear-to-r from-blue-500 to-sky-600 px-6 py-4 font-medium text-white shadow-lg shadow-blue-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-blue-500/30 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-gray-900"
+          class="bg-primary text-primary-foreground shadow-primary/20 hover:shadow-primary/30 focus:ring-primary w-full rounded-2xl px-6 py-4 font-medium shadow-lg transition-all duration-300 hover:scale-[1.02] focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span v-if="loading" class="flex items-center justify-center gap-2">
             <span

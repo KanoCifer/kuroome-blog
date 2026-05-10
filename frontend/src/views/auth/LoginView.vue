@@ -96,7 +96,7 @@ const handleGitHubLogin = () => {
   <div>
     <div class="flex h-screen items-center">
       <!-- 标题卡片 -->
-      <div class="squircle mx-auto w-auto max-w-md bg-blue-50/50 px-12 py-14 shadow-2xl dark:bg-gray-800/50">
+      <div class="squircle bg-card mx-auto w-auto max-w-md px-12 py-14 shadow-2xl">
         <!-- Hero Section -->
         <div class="mb-8 flex flex-col items-center justify-center">
           <div
@@ -104,12 +104,10 @@ const handleGitHubLogin = () => {
           >
             <IconCloud class="size-8" />
           </div>
-          <h2
-            class="font-headline text-foreground text-center text-[28px] font-extrabold tracking-tight dark:text-white"
-          >
-            Kanocifer<span class="text-primary dark:text-primary">.chat</span>
+          <h2 class="font-headline text-foreground text-center text-[28px] font-extrabold tracking-tight">
+            Kanocifer<span class="text-primary">.chat</span>
           </h2>
-          <p class="text-muted-foreground mt-1 text-center text-[15px] font-medium dark:text-gray-400">
+          <p class="text-muted-foreground mt-1 text-center text-[15px] font-medium">
             Welcome back to the reading space.
           </p>
         </div>
@@ -118,31 +116,29 @@ const handleGitHubLogin = () => {
           <!-- 用户名 -->
           <div class="relative transition-transform duration-200 focus-within:scale-[1.01]">
             <div class="text-muted-foreground/60 pointer-events-none absolute top-6 left-0 flex items-center pl-4">
-              <ShieldUser class="size-6 dark:text-white" />
+              <ShieldUser class="size-6" />
             </div>
             <input
               v-model="form.username"
               type="text"
               autocomplete="off"
               placeholder="用户名"
-              class="form-control my-4 w-full rounded-xl border border-gray-300 bg-gray-100/50 py-2 pr-4 pl-11 text-gray-900 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
+              class="form-control border-border bg-muted text-foreground focus:border-primary focus:ring-primary/30 my-4 w-full rounded-xl py-2 pr-4 pl-11 transition-transform focus:scale-[1.01] focus:ring-2 focus:outline-none"
             />
-            <span v-if="errors.username" class="mt-1 block text-sm text-red-600 dark:text-red-400">{{
-              errors.username
-            }}</span>
+            <span v-if="errors.username" class="text-destructive mt-1 block text-sm">{{ errors.username }}</span>
           </div>
 
           <!-- 密码 -->
           <div class="relative mt-4 transition-transform duration-200 focus-within:scale-[1.01]">
             <div class="text-muted-foreground/60 pointer-events-none absolute top-2.5 left-0 flex items-center pl-4">
-              <IconLock class="size-6 dark:text-white" />
+              <IconLock class="size-6" />
             </div>
             <input
               v-model="form.password"
               :type="showPassword ? 'text' : 'password'"
               autocomplete="off"
               placeholder="密码"
-              class="form-control mb-6 w-full rounded-xl border border-gray-300 bg-gray-100/50 py-2 pr-12 pl-11 text-gray-900 transition-transform focus:scale-[1.01] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-800"
+              class="form-control border-border bg-muted text-foreground focus:border-primary focus:ring-primary/30 mb-6 w-full rounded-xl py-2 pr-12 pl-11 transition-transform focus:scale-[1.01] focus:ring-2 focus:outline-none"
             />
 
             <!-- 显示/隐藏密码按钮 -->
@@ -150,7 +146,7 @@ const handleGitHubLogin = () => {
               type="button"
               @click="showPassword = !showPassword"
               :aria-label="showPassword ? '隐藏密码' : '显示密码'"
-              class="absolute top-5.5 right-4 flex h-4 w-4 -translate-y-1/2 items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:scale-[1.01] dark:text-gray-300 dark:hover:text-white"
+              class="text-muted-foreground hover:text-foreground absolute top-5.5 right-4 flex h-4 w-4 -translate-y-1/2 items-center justify-center rounded-md focus:scale-[1.01]"
             >
               <!-- eye (显示) -->
               <svg
@@ -186,16 +182,14 @@ const handleGitHubLogin = () => {
               </svg>
             </button>
 
-            <span v-if="errors.password" class="mt-1 block text-sm text-red-600 dark:text-red-400">{{
-              errors.password
-            }}</span>
+            <span v-if="errors.password" class="text-destructive mt-1 block text-sm">{{ errors.password }}</span>
           </div>
 
           <!-- 提交按钮和记住我 -->
           <div class="mt-6 flex items-center justify-between">
             <button
               type="submit"
-              class="inline-flex w-28 cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-8 py-2.5 font-bold text-white shadow-lg shadow-blue-500/30 transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none dark:ring-offset-gray-800"
+              class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-primary/30 inline-flex w-28 cursor-pointer items-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
               :disabled="isSubmitting"
             >
               <!-- SVG 加载动画 -->
@@ -214,11 +208,9 @@ const handleGitHubLogin = () => {
             <label class="group relative flex cursor-pointer">
               <input v-model="form.rememberMe" type="checkbox" class="peer sr-only" />
               <div
-                class="rounded-xl border-2 border-gray-100 bg-white px-3 py-2 shadow-sm transition-all duration-200 select-none group-active:scale-95 peer-checked:border-blue-500 peer-checked:bg-blue-50/50 peer-checked:shadow-blue-100/50 hover:border-blue-200 dark:border-gray-600 dark:bg-gray-700 dark:peer-checked:border-blue-500 dark:peer-checked:bg-blue-500/10 dark:peer-checked:shadow-none dark:hover:border-blue-500/50"
+                class="border-border bg-card peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-primary/10 hover:border-primary/30 rounded-xl border-2 px-3 py-2 shadow-sm transition-all duration-200 select-none group-active:scale-95"
               >
-                <span
-                  class="text-sm font-medium text-gray-600 transition-colors peer-checked:text-blue-600 dark:text-gray-300 dark:peer-checked:text-blue-400"
-                >
+                <span class="text-muted-foreground peer-checked:text-primary text-sm font-medium transition-colors">
                   Remember Me
                 </span>
               </div>
@@ -231,7 +223,7 @@ const handleGitHubLogin = () => {
               type="button"
               @click="handlePasskeyLogin"
               :disabled="isPasskeySubmitting"
-              class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-green-600 px-8 py-2.5 font-bold text-white shadow-lg shadow-green-500/30 transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-800"
+              class="bg-success text-primary-foreground shadow-success/30 hover:bg-success/90 focus:ring-success/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             >
               <IconKey />
               <!-- SVG 加载动画 -->
@@ -246,7 +238,7 @@ const handleGitHubLogin = () => {
               <span v-if="isPasskeySubmitting">Logging in with Passkey...</span>
               <span v-else>Login with Passkey</span>
             </button>
-            <span v-if="errors.passkey" class="mt-1 block text-center text-sm text-red-600 dark:text-red-400">
+            <span v-if="errors.passkey" class="text-destructive mt-1 block text-center text-sm">
               {{ errors.passkey }}
             </span>
           </div>
@@ -256,7 +248,7 @@ const handleGitHubLogin = () => {
             <button
               type="button"
               @click="handleGitHubLogin"
-              class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-gray-900 px-8 py-2.5 font-bold text-white shadow-lg shadow-gray-500/30 transition-colors hover:bg-gray-900 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none dark:bg-gray-700 dark:ring-offset-gray-800 dark:hover:bg-gray-600"
+              class="text-primary-foreground shadow-primary/30 hover:bg-accent focus:ring-primary inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-black px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
             >
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                 <path
@@ -267,11 +259,11 @@ const handleGitHubLogin = () => {
             </button>
           </div>
 
-          <p class="mt-8 text-center font-serif text-gray-600">Kuroome's Blog</p>
+          <p class="text-muted-foreground mt-8 text-center font-serif">Kuroome's Blog</p>
           <!-- 注册链接 -->
-          <div class="mb-4 text-center text-gray-600 dark:text-gray-300">
+          <div class="text-muted-foreground mb-4 text-center">
             Don't have an account?
-            <RouterLink to="/register" class="underline transition duration-100 hover:text-blue-500">
+            <RouterLink to="/register" class="hover:text-primary underline transition duration-100">
               Register here.
             </RouterLink>
           </div>

@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 z-40 overflow-hidden bg-gray-50 dark:bg-gray-900">
+  <div class="bg-background fixed inset-0 z-40 overflow-hidden">
     <!-- Subtle Dot Pattern Background -->
     <div
       class="pointer-events-none absolute inset-0 z-0 opacity-40 dark:opacity-20"
@@ -15,7 +15,7 @@
 
     <!-- Header -->
     <header
-      class="sticky top-0 z-30 border-b border-white/40 bg-white/70 shadow-[inset_0_-1px_0_rgba(255,255,255,0.5)] backdrop-blur-2xl dark:border-white/10 dark:bg-gray-950/70 dark:shadow-none"
+      class="bg-card/70 sticky top-0 z-30 border-b border-white/40 shadow-[inset_0_-1px_0_rgba(255,255,255,0.5)] backdrop-blur-2xl dark:border-white/10 dark:shadow-none"
     >
       <div class="mx-auto flex max-w-6xl items-center justify-end px-6 py-4">
         <div class="flex items-center gap-3">
@@ -24,11 +24,9 @@
             variant="outline"
             size="sm"
             @click="toggleEditMode"
-            class="h-9 gap-2 rounded-full border-gray-200/60 px-4 shadow-sm transition-colors dark:border-gray-800"
+            class="border-border/60 h-9 gap-2 rounded-full px-4 shadow-sm transition-colors"
             :class="
-              isEditMode
-                ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-                : ''
+              isEditMode ? 'bg-primary text-primary dark:bg-primary/30' : ''
             "
           >
             <component :is="isEditMode ? Check : Edit2" class="h-4 w-4" />
@@ -41,7 +39,7 @@
               variant="outline"
               size="sm"
               @click="shuffleImages"
-              class="h-9 gap-2 rounded-full border-gray-200/60 px-4 shadow-sm dark:border-gray-800"
+              class="border-border/60 h-9 gap-2 rounded-full px-4 shadow-sm"
             >
               <Shuffle class="h-4 w-4" />
               重排
@@ -52,7 +50,7 @@
               variant="default"
               size="sm"
               @click="openUploadModal"
-              class="h-9 gap-2 rounded-full bg-gray-900 px-4 shadow-md hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-white"
+              class="bg-primary text-primary-foreground hover:bg-primary/90 h-9 gap-2 rounded-full px-4 shadow-md"
             >
               <Upload class="h-4 w-4" />
               上传图片
@@ -122,11 +120,11 @@
       >
         <!-- Polaroid Frame -->
         <div
-          class="group relative flex flex-col items-center rounded-sm bg-white p-2 shadow-xl ring-1 ring-black/5 transition-shadow hover:shadow-2xl sm:p-3 dark:bg-gray-800 dark:ring-white/10"
+          class="group bg-card ring-border/5 relative flex flex-col items-center rounded-sm p-2 shadow-xl ring-1 transition-shadow hover:shadow-2xl sm:p-3"
           :style="{ width: `${getImageSize(index) + 24}px` }"
         >
           <div
-            class="relative w-full overflow-hidden rounded-sm bg-gray-100 dark:bg-gray-900"
+            class="bg-muted relative w-full overflow-hidden rounded-sm"
             :style="{
               height: `${getImageSize(index) * getAspectRation(index)}px`,
             }"
@@ -162,19 +160,17 @@
           initial="{ opacity: 0, y: 20 }"
           animate="{ opacity: 1, y: 0 }"
           :transition="{ duration: 0.8, type: 'spring' }"
-          class="relative max-w-md rounded-[2rem] border border-white/80 bg-white/60 p-10 text-center shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] backdrop-blur-xl dark:border-gray-800/80 dark:bg-gray-900/60"
+          class="bg-card/60 relative max-w-md rounded-[2rem] border border-white/80 p-10 text-center shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] backdrop-blur-xl dark:border-gray-800/80"
         >
           <div
             class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-linear-to-tr from-blue-50 to-indigo-50 text-blue-500 shadow-inner dark:from-blue-900/30 dark:to-indigo-900/30 dark:text-blue-400"
           >
             <ImageOff class="h-10 w-10" stroke-width="1.5" />
           </div>
-          <h3
-            class="text-xl font-bold tracking-tight text-gray-900 dark:text-white"
-          >
+          <h3 class="text-foreground text-xl font-bold tracking-tight">
             还没有图片
           </h3>
-          <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <p class="text-muted-foreground mt-2 text-sm">
             你的图片墙就像一张白纸，点击上方按钮上传第一张照片吧
           </p>
           <Button
@@ -189,19 +185,15 @@
     </div>
 
     <div
-      class="rounded-2xl border border-white/50 bg-white/80 p-2 shadow-[0_10px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-gray-900/80"
+      class="bg-card/80 rounded-2xl border border-white/50 p-2 shadow-[0_10px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl dark:border-white/10"
     >
       <div class="flex items-center gap-2">
         <Button
           variant="outline"
           size="sm"
           @click="toggleEditMode"
-          class="h-10 flex-1 gap-2 rounded-xl border-gray-200/70 px-3 shadow-sm dark:border-gray-700"
-          :class="
-            isEditMode
-              ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-              : ''
-          "
+          class="border-border/70 h-10 flex-1 gap-2 rounded-xl px-3 shadow-sm"
+          :class="isEditMode ? 'bg-primary/15 text-primary' : ''"
         >
           <component :is="isEditMode ? Check : Edit2" class="h-4 w-4" />
           {{ isEditMode ? "完成编辑" : "编辑模式" }}
@@ -212,7 +204,7 @@
           variant="outline"
           size="sm"
           @click="shuffleImages"
-          class="h-10 rounded-xl border-gray-200/70 px-3 shadow-sm dark:border-gray-700"
+          class="border-border/70 h-10 rounded-xl px-3 shadow-sm"
         >
           <Shuffle class="h-4 w-4" />
         </Button>
@@ -222,7 +214,7 @@
           variant="default"
           size="sm"
           @click="openUploadModal"
-          class="h-10 rounded-xl bg-gray-900 px-3 shadow-sm hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-white"
+          class="bg-primary text-primary-foreground hover:bg-primary/90 h-10 rounded-xl px-3 shadow-sm"
         >
           <Upload class="h-4 w-4" />
         </Button>
@@ -253,19 +245,19 @@
             :animate="{ opacity: 1, scale: 1, y: 0 }"
             :exit="{ opacity: 0, scale: 0.95, y: 10 }"
             :transition="{ type: 'spring', damping: 25, stiffness: 300 }"
-            class="relative z-10 flex max-h-full w-full max-w-5xl flex-col overflow-hidden rounded-[2rem] bg-white/95 shadow-2xl ring-1 ring-white/20 backdrop-blur-2xl md:flex-row dark:bg-gray-900/95 dark:ring-white/10"
+            class="bg-card/95 relative z-10 flex max-h-full w-full max-w-5xl flex-col overflow-hidden rounded-[2rem] shadow-2xl ring-1 ring-white/20 backdrop-blur-2xl md:flex-row dark:ring-white/10"
           >
             <!-- Close Button -->
             <button
               @click="closeImageDetail"
-              class="absolute top-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-black/10 text-gray-600 backdrop-blur-md transition-all hover:scale-105 hover:bg-black/20 active:scale-95 md:hidden dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/20"
+              class="text-muted-foreground absolute top-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-black/10 backdrop-blur-md transition-all hover:scale-105 hover:bg-black/20 active:scale-95 md:hidden dark:bg-white/10 dark:hover:bg-white/20"
             >
               <X class="h-5 w-5" />
             </button>
 
             <!-- Image Area -->
             <div
-              class="relative flex max-h-[70vh] w-full items-center justify-center bg-gray-100/50 p-4 md:max-h-[85vh] md:w-2/3 md:p-8 dark:bg-black/50"
+              class="bg-muted/50 relative flex max-h-[70vh] w-full items-center justify-center p-4 md:max-h-[85vh] md:w-2/3 md:p-8"
             >
               <img
                 :src="selectedImage.url"
@@ -275,21 +267,19 @@
             </div>
 
             <!-- Details Area -->
-            <div
-              class="flex w-full flex-col bg-white/50 p-6 md:w-1/3 md:p-10 dark:bg-gray-900/50"
-            >
+            <div class="bg-card/50 flex w-full flex-col p-6 md:w-1/3 md:p-10">
               <div class="flex-1">
                 <div class="mb-8 hidden justify-end md:flex">
                   <button
                     @click="closeImageDetail"
-                    class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100/80 text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-800/80 dark:text-gray-400 dark:hover:bg-gray-700"
+                    class="text-muted-foreground hover:bg-accent bg-muted/80 flex h-10 w-10 items-center justify-center rounded-full transition-colors"
                   >
                     <X class="h-5 w-5" />
                   </button>
                 </div>
 
                 <div
-                  class="mb-8 flex items-center text-sm font-medium text-gray-500 dark:text-gray-400"
+                  class="text-muted-foreground mb-8 flex items-center text-sm font-medium"
                 >
                   <Calendar class="mr-1.5 h-4 w-4" />
                   {{ formatDate(selectedImage.uploadedAt) }}
@@ -298,7 +288,7 @@
                 <!-- Edit Description -->
                 <div v-if="canEdit && isEditMode" class="space-y-3">
                   <label
-                    class="text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400"
+                    class="text-muted-foreground text-xs font-semibold tracking-wider uppercase"
                   >
                     修改描述
                   </label>
@@ -306,12 +296,12 @@
                     v-model="editDescription"
                     rows="3"
                     placeholder="输入新的描述..."
-                    class="w-full resize-none rounded-xl border border-gray-200/80 bg-white px-4 py-3 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition-all focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-gray-300 dark:focus:ring-gray-300"
+                    class="text-foreground placeholder:text-muted-foreground focus:border-foreground focus:ring-foreground border-border/80 bg-card w-full resize-none rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
                   ></textarea>
                   <div class="flex justify-end gap-4 pt-2">
                     <Button
                       variant="ghost"
-                      class="rounded-full px-5 text-red-500 shadow-sm hover:bg-red-50 hover:text-red-600 dark:text-red-400 dark:hover:bg-red-950/30"
+                      class="text-destructive hover:bg-destructive/10 rounded-full px-5 shadow-sm"
                       @click="deleteImage(selectedImage.id)"
                     >
                       <Trash2 class="h-4 w-4" />
@@ -329,7 +319,7 @@
 
                 <div
                   v-else
-                  class="rounded-md bg-gray-100/80 p-4 text-base whitespace-pre-wrap text-gray-700 dark:bg-gray-800/80 dark:text-gray-300"
+                  class="text-foreground bg-muted/80 rounded-md p-4 text-base whitespace-pre-wrap"
                 >
                   {{ selectedImage.description || "暂无描述" }}
                 </div>
@@ -364,12 +354,12 @@
             :animate="{ opacity: 1, scale: 1, y: 0 }"
             :exit="{ opacity: 0, scale: 0.95, y: 10 }"
             :transition="{ type: 'spring', damping: 25, stiffness: 300 }"
-            class="relative z-10 w-full max-w-md rounded-[2rem] bg-white/95 p-6 shadow-2xl ring-1 ring-white/20 backdrop-blur-2xl md:p-8 dark:bg-gray-900/95 dark:ring-white/10"
+            class="bg-card/95 relative z-10 w-full max-w-md rounded-[2rem] p-6 shadow-2xl ring-1 ring-white/20 backdrop-blur-2xl md:p-8 dark:ring-white/10"
           >
             <!-- Close Button -->
             <button
               @click="showUploadModal = false"
-              class="absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+              class="text-muted-foreground hover:bg-accent hover:text-foreground absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
             >
               <X class="h-5 w-5" />
             </button>
@@ -377,30 +367,25 @@
             <!-- Header -->
             <div class="mb-6 text-center">
               <div
-                class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-blue-500 dark:bg-blue-500/10 dark:text-blue-400"
+                class="bg-primary/10 text-primary mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full"
               >
                 <UploadCloud class="h-6 w-6" />
               </div>
-              <h3
-                class="text-xl font-bold tracking-tight text-gray-900 dark:text-white"
-              >
+              <h3 class="text-foreground text-xl font-bold tracking-tight">
                 上传新图片
               </h3>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                添加到你的照片墙
-              </p>
+              <p class="text-muted-foreground mt-1 text-sm">添加到你的照片墙</p>
             </div>
 
             <!-- Upload Area -->
             <div
-              class="group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-300/80 bg-gray-50/50 p-8 text-center transition-all hover:border-gray-400 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800/30 dark:hover:border-gray-500"
+              class="group border-border/80 bg-muted/50 hover:border-muted-foreground hover:bg-muted relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-all"
               @click="triggerFileInput"
               @dragover.prevent="isDragging = true"
               @dragleave.prevent="isDragging = false"
               @drop.prevent="handleDrop"
               :class="{
-                'scale-[0.98] border-gray-900 bg-gray-50 dark:border-gray-100 dark:bg-white/5':
-                  isDragging,
+                'border-foreground bg-muted scale-[0.98]': isDragging,
               }"
             >
               <input
@@ -431,17 +416,17 @@
               <!-- Placeholder -->
               <div v-else class="flex flex-col items-center">
                 <div
-                  class="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-black/5 transition-transform group-hover:scale-110 dark:bg-gray-800 dark:ring-white/10"
+                  class="bg-card ring-border/5 mb-4 flex h-14 w-14 items-center justify-center rounded-full shadow-sm ring-1 transition-transform group-hover:scale-110"
                 >
                   <ImagePlus
-                    class="h-6 w-6 text-gray-400 transition-colors group-hover:text-blue-500"
+                    class="text-muted-foreground group-hover:text-primary h-6 w-6 transition-colors"
                     stroke-width="1.5"
                   />
                 </div>
-                <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <p class="text-foreground text-sm font-medium">
                   点击或拖拽图片到此处
                 </p>
-                <p class="mt-2 text-xs text-gray-400 dark:text-gray-500">
+                <p class="text-muted-foreground mt-2 text-xs">
                   支持 JPG、PNG、GIF、WebP (最大 5MB)
                 </p>
               </div>
@@ -450,7 +435,7 @@
             <!-- Description Input -->
             <div class="mt-6">
               <label
-                class="text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400"
+                class="text-muted-foreground text-xs font-semibold tracking-wider uppercase"
               >
                 照片描述（可选）
               </label>
@@ -458,7 +443,7 @@
                 v-model="uploadDescription"
                 type="text"
                 placeholder="为这张图片添加描述..."
-                class="mt-2 w-full rounded-xl border border-gray-200/80 bg-white px-4 py-3 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition-all focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-gray-300 dark:focus:ring-gray-300"
+                class="text-foreground placeholder:text-muted-foreground focus:border-foreground focus:ring-foreground border-border/80 bg-card mt-2 w-full rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
               />
             </div>
 
@@ -472,7 +457,7 @@
                 取消
               </Button>
               <Button
-                class="flex-1 rounded-xl bg-gray-900 text-white shadow-md hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-white"
+                class="bg-primary text-primary-foreground hover:bg-primary/90 flex-1 rounded-xl shadow-md"
                 :disabled="!selectedFile || isUploading"
                 @click="uploadImage"
               >

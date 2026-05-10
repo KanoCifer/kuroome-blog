@@ -1,15 +1,15 @@
 <template>
   <!-- Footer -->
   <footer
-    class="text-gray-700 transition-colors duration-1000"
-    :class="!props.isAboutView && !props.isEntryView ? 'bg-blue-50 dark:bg-gray-900' : 'bg-transparent'"
+    class="text-foreground transition-colors duration-1000"
+    :class="!props.isAboutView && !props.isEntryView ? 'bg-background' : 'bg-transparent'"
   >
-    <p class="text-gray-700">
+    <p class="text-foreground">
       Copyright &copy; 2026 All Rights Reserved.
-      <span class="ml-3 inline-flex items-center gap-1.5 text-xs text-gray-400">
+      <span class="text-muted-foreground ml-3 inline-flex items-center gap-1.5 text-xs">
         <span class="relative flex h-2 w-2">
-          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
-          <span class="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+          <span class="bg-success absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"></span>
+          <span class="bg-success relative inline-flex h-2 w-2 rounded-full"></span>
         </span>
         {{ visitorCount.count }} 人在线
       </span>
@@ -27,15 +27,11 @@
           class="cover aspect-square w-6 object-cover align-bottom"
         />
       </a>
-      <a class="text-gray-700 hover:underline" href="https://github.com/KanoCifer/Flask-Example " target="_blank"
-        >Github: KanoCifer</a
-      >
-      <a class="text-gray-700 hover:underline" href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank"
-        >粤ICP备2026018113号</a
-      >
+      <a class="text-foreground hover:underline" target="_blank">Github: KanoCifer</a>
+      <a class="text-foreground hover:underline" target="_blank">粤ICP备2026018113号</a>
       <button
         @click="switchToReact"
-        class="rounded-lg border border-gray-300 px-3 py-1 text-sm transition-colors hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800"
+        class="border-border hover:bg-accent dark:border-border dark:hover:bg-accent rounded-lg border px-3 py-1 text-sm transition-colors"
       >
         切换到移动版
       </button>

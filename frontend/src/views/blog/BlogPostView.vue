@@ -276,14 +276,14 @@ onUnmounted(() => {
       <div v-if="showEditButton && post" class="flex items-center gap-2">
         <router-link
           :to="`/blog/edit/${post._id}`"
-          class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-slate-700 dark:text-gray-300 dark:hover:bg-slate-600"
+          class="bg-accent text-foreground hover:bg-accent/80 inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors"
         >
           <EditIcon />
           编辑
         </router-link>
         <button
           @click="showDeleteConfirm"
-          class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-red-100 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50"
+          class="bg-destructive/10 text-destructive hover:bg-destructive/15 inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors"
         >
           <DelIcon />
           删除
@@ -294,18 +294,14 @@ onUnmounted(() => {
     <!-- Article Content -->
     <div
       v-if="post"
-      class="overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
+      class="border-border bg-card overflow-hidden rounded-2xl border shadow-sm"
     >
-      <div class="border-b border-blue-100 p-8 dark:border-slate-700">
-        <h1
-          class="mb-4 text-3xl leading-tight font-bold text-blue-900 dark:text-white"
-        >
+      <div class="border-border border-b p-8">
+        <h1 class="text-foreground mb-4 text-3xl leading-tight font-bold">
           {{ post.title }}
         </h1>
 
-        <div
-          class="flex flex-wrap gap-x-6 gap-y-3 text-sm text-blue-600 dark:text-blue-400"
-        >
+        <div class="text-primary flex flex-wrap gap-x-6 gap-y-3 text-sm">
           <div v-if="post.author" class="flex items-center gap-1.5 font-medium">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -335,7 +331,7 @@ onUnmounted(() => {
         <ArticleSummaryCard :title="post.title" :content="post.body || ''" />
         <div class="prose prose-base dark:prose-invert max-w-none">
           <div v-if="post.body" v-html="post.body" />
-          <div v-else class="text-gray-400 italic">暂无内容</div>
+          <div v-else class="text-muted-foreground italic">暂无内容</div>
         </div>
       </div>
 

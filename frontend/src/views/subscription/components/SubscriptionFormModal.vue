@@ -85,24 +85,24 @@ watch(
         <button
           type="button"
           aria-label="关闭弹窗"
-          class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
+          class="bg-background/60 absolute inset-0 backdrop-blur-sm"
           @click="emit('close')"
         />
         <section
-          class="relative z-10 w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl dark:border-slate-700 dark:bg-slate-900"
+          class="border-border bg-card relative z-10 w-full max-w-2xl rounded-2xl border p-5 shadow-2xl"
         >
           <header class="mb-4 flex items-start justify-between gap-4">
             <div>
-              <h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+              <h3 class="text-foreground text-lg font-semibold">
                 {{ title }}
               </h3>
-              <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              <p class="text-muted-foreground mt-1 text-sm">
                 {{ description }}
               </p>
             </div>
             <button
               type="button"
-              class="rounded-lg border border-slate-300 px-3 py-1 text-xs text-slate-600 transition hover:bg-slate-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+              class="border-border text-muted-foreground hover:bg-accent rounded-lg border px-3 py-1 text-xs transition"
               @click="emit('close')"
             >
               关闭
@@ -112,35 +112,32 @@ watch(
           <form class="space-y-4" @submit.prevent="emitSubmit">
             <div class="grid gap-3 sm:grid-cols-2">
               <label class="space-y-1">
-                <span
-                  class="text-xs font-medium text-slate-600 dark:text-slate-300"
+                <span class="text-muted-foreground text-xs font-medium"
                   >订阅名称</span
                 >
                 <input
                   v-model="localForm.name"
                   type="text"
                   placeholder="例如：Spotify Premium"
-                  class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                  class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
               <label class="space-y-1">
-                <span
-                  class="text-xs font-medium text-slate-600 dark:text-slate-300"
+                <span class="text-muted-foreground text-xs font-medium"
                   >服务商</span
                 >
                 <input
                   v-model="localForm.provider"
                   type="text"
                   placeholder="例如：Spotify"
-                  class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                  class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
             </div>
 
             <div class="grid gap-3 sm:grid-cols-[1fr_1fr_1fr]">
               <label class="space-y-1">
-                <span
-                  class="text-xs font-medium text-slate-600 dark:text-slate-300"
+                <span class="text-muted-foreground text-xs font-medium"
                   >价格</span
                 >
                 <input
@@ -149,12 +146,11 @@ watch(
                   min="0"
                   step="0.01"
                   placeholder="0.00"
-                  class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                  class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
               <label class="space-y-1">
-                <span
-                  class="text-xs font-medium text-slate-600 dark:text-slate-300"
+                <span class="text-muted-foreground text-xs font-medium"
                   >币种</span
                 >
                 <input
@@ -163,7 +159,7 @@ watch(
                   :list="`subscription-currency-options-${mode}`"
                   maxlength="10"
                   placeholder="例如：USD / CNY / 元"
-                  class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                  class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
                 <datalist :id="`subscription-currency-options-${mode}`">
                   <option
@@ -174,13 +170,12 @@ watch(
                 </datalist>
               </label>
               <label class="space-y-1">
-                <span
-                  class="text-xs font-medium text-slate-600 dark:text-slate-300"
+                <span class="text-muted-foreground text-xs font-medium"
                   >计费周期</span
                 >
                 <select
                   v-model="localForm.billing_cycle"
-                  class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                  class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 >
                   <option
                     v-for="cycle in cycleOptions"
@@ -198,24 +193,22 @@ watch(
               :class="includeStatus ? 'sm:grid-cols-2' : ''"
             >
               <label class="space-y-1">
-                <span
-                  class="text-xs font-medium text-slate-600 dark:text-slate-300"
+                <span class="text-muted-foreground text-xs font-medium"
                   >下次扣费日期</span
                 >
                 <input
                   v-model="localForm.next_billing_date"
                   type="date"
-                  class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                  class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
               <label v-if="includeStatus" class="space-y-1">
-                <span
-                  class="text-xs font-medium text-slate-600 dark:text-slate-300"
+                <span class="text-muted-foreground text-xs font-medium"
                   >状态</span
                 >
                 <select
                   v-model="localForm.status"
-                  class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                  class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 >
                   <option
                     v-for="status in statusOptions"
@@ -229,21 +222,20 @@ watch(
             </div>
 
             <label class="space-y-1">
-              <span
-                class="text-xs font-medium text-slate-600 dark:text-slate-300"
+              <span class="text-muted-foreground text-xs font-medium"
                 >备注</span
               >
               <textarea
                 v-model="localForm.notes"
                 rows="3"
                 placeholder="可选备注，例如套餐人数、自动续费规则等。"
-                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
               />
             </label>
 
             <p
               v-if="errorMessage"
-              class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300"
+              class="border-destructive/30 bg-destructive/10 text-destructive rounded-lg border px-3 py-2 text-sm"
             >
               {{ errorMessage }}
             </p>
@@ -251,7 +243,7 @@ watch(
             <footer class="flex justify-end gap-2">
               <button
                 type="button"
-                class="rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+                class="border-border text-muted-foreground hover:bg-accent rounded-xl border px-3 py-2 text-sm transition"
                 @click="emit('close')"
               >
                 取消
@@ -259,7 +251,7 @@ watch(
               <button
                 type="submit"
                 :disabled="isSubmitting"
-                class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
+                class="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {{ isSubmitting ? loadingText : submitText }}
               </button>

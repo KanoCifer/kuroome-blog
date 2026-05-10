@@ -23,16 +23,16 @@
       >
         <div
           v-if="isUserMenuOpen"
-          class="absolute top-16 right-0 z-9999 mt-2 w-auto rounded-3xl bg-gray-200/60 p-px shadow-lg dark:bg-gray-700 dark:shadow-gray-50/5"
+          class="bg-muted/60 dark:bg-accent absolute top-16 right-0 z-9999 mt-2 w-auto rounded-3xl p-px shadow-lg dark:shadow-gray-50/5"
         >
-          <div class="rounded-[23px] bg-gray-50 dark:bg-gray-800">
+          <div class="bg-muted dark:bg-card rounded-[23px]">
             <ol>
               <template v-if="auth.isAuthenticated">
                 <li>
                   <RouterLink
                     to="/settings"
                     @click="closeUserMenuImmediately"
-                    class="flex items-center gap-2 rounded-t-3xl px-4 py-2 font-serif text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                    class="text-foreground hover:bg-accent dark:text-foreground dark:hover:bg-accent flex items-center gap-2 rounded-t-3xl px-4 py-2 font-serif"
                   >
                     <IconUser class="h-4 w-4" />
                     Profile
@@ -41,7 +41,7 @@
                 <li>
                   <RouterLink
                     to="/import"
-                    class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                    class="text-foreground hover:bg-accent dark:text-foreground dark:hover:bg-accent flex items-center gap-2 px-4 py-2 font-serif"
                   >
                     <ImportIcon class="h-4 w-4" />
 
@@ -53,7 +53,7 @@
                     v-if="auth.user?.is_admin"
                     to="/messages"
                     @click="closeUserMenuImmediately"
-                    class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                    class="text-foreground hover:bg-accent dark:text-foreground dark:hover:bg-accent flex items-center gap-2 px-4 py-2 font-serif"
                   >
                     <MessageIcon class="h-4 w-4" />
                     Messages
@@ -65,18 +65,18 @@
                     v-if="auth.user?.is_admin"
                     to="/analytics"
                     @click="closeUserMenuImmediately"
-                    class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                    class="text-foreground hover:bg-accent dark:text-foreground dark:hover:bg-accent flex items-center gap-2 px-4 py-2 font-serif"
                   >
                     <IconAnalytics class="h-4 w-4" />
                     Analytics
                   </RouterLink>
                 </li>
                 <li>
-                  <div class="mx-4 h-px bg-gray-200 dark:bg-gray-700" />
+                  <div class="bg-border dark:bg-border mx-4 h-px" />
                   <button
                     @click.prevent="handleLogout"
                     :disabled="auth.loading"
-                    class="flex w-full cursor-pointer items-center gap-2 rounded-xl px-4 py-2 font-serif font-bold text-blue-600 dark:text-blue-400"
+                    class="text-primary dark:text-primary flex w-full cursor-pointer items-center gap-2 rounded-xl px-4 py-2 font-serif font-bold"
                   >
                     <LogoutIcon class="h-4 w-4" />
                     {{ auth.loading ? "Signing out..." : "Logout" }}
@@ -88,7 +88,7 @@
                   <RouterLink
                     to="/login"
                     @click="closeUserMenuImmediately"
-                    class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 dark:text-gray-300"
+                    class="text-foreground dark:text-foreground flex items-center gap-2 px-4 py-2 font-serif"
                   >
                     <LoginIcon class="h-4 w-4" />
                     Login
@@ -98,7 +98,7 @@
                   <RouterLink
                     to="/register"
                     @click="closeUserMenuImmediately"
-                    class="flex items-center gap-2 px-4 py-2 font-serif text-gray-700 dark:text-gray-300"
+                    class="text-foreground dark:text-foreground flex items-center gap-2 px-4 py-2 font-serif"
                   >
                     <RegisterIcon class="h-4 w-4" />
                     Register
@@ -124,12 +124,12 @@
       />
       <div class="flex items-baseline gap-2">
         <span
-          class="font-serif text-2xl font-bold text-gray-800 dark:text-gray-100"
+          class="text-foreground dark:text-foreground font-serif text-2xl font-bold"
         >
           {{ currentUserName }}
         </span>
         <ChevronDownIcon
-          class="h-3 w-3 transform-gpu text-gray-700 transition-transform"
+          class="text-foreground h-3 w-3 transform-gpu transition-transform"
           :class="{ 'rotate-180': isUserMenuOpen }"
         />
       </div>
@@ -137,7 +137,7 @@
 
     <!-- 导航分类 -->
     <div
-      class="mb-4 px-3 text-sm font-bold tracking-wider text-gray-600 dark:text-gray-500"
+      class="text-secondary-foreground dark:text-muted-foreground mb-4 px-3 text-sm font-bold tracking-wider"
     >
       GENERAL
     </div>
@@ -146,7 +146,7 @@
     <div class="relative">
       <!-- 导航指示器 -->
       <Motion
-        class="absolute top-0 left-0 h-14 w-full rounded-2xl bg-white shadow-sm dark:bg-gray-700"
+        class="bg-card dark:bg-accent absolute top-0 left-0 h-14 w-full rounded-2xl shadow-sm"
         :animate="{ y: `${hoverNavIndex * (52 + 8)}px` }"
         :transition="{ type: 'spring', stiffness: 300, damping: 30 }"
         style="z-index: -1"
@@ -163,8 +163,8 @@
             class="relative z-10 flex items-center gap-4 rounded-2xl py-3.5 pr-5 pl-6 font-medium transition-all"
             :class="[
               hoverNavIndex === index
-                ? 'text-blue-600 dark:text-blue-400'
-                : 'text-gray-700 dark:text-gray-400 dark:hover:text-gray-200',
+                ? 'text-primary dark:text-primary'
+                : 'text-foreground dark:text-muted-foreground dark:hover:text-foreground',
             ]"
           >
             <component :is="item.icon" class="h-6 w-6" />

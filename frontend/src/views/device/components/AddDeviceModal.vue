@@ -2,26 +2,37 @@
   <Teleport to="body">
     <!-- Backdrop -->
     <Transition name="fade">
-      <div v-if="modelValue" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" @click="handleClose" />
+      <div
+        v-if="modelValue"
+        class="bg-background/50 fixed inset-0 z-50 backdrop-blur-sm"
+        @click="handleClose"
+      />
     </Transition>
 
     <!-- Form Container -->
     <Transition name="modal">
-      <div v-if="modelValue" class="fixed inset-x-8 inset-y-24 z-50 flex items-center justify-center">
+      <div
+        v-if="modelValue"
+        class="fixed inset-x-8 inset-y-24 z-50 flex items-center justify-center"
+      >
         <div
-          class="dark:bg-card max-h-full w-full max-w-md overflow-y-auto rounded-2xl bg-slate-100 shadow-2xl dark:shadow-xl dark:shadow-slate-900/60"
+          class="bg-card max-h-full w-full max-w-md overflow-y-auto rounded-2xl shadow-2xl"
         >
           <!-- Header -->
           <div
-            class="dark:bg-card sticky top-0 z-10 border-b border-gray-200 bg-slate-100 px-6 pt-6 pb-4 dark:border-white/10"
+            class="bg-card border-border sticky top-0 z-10 border-b px-6 pt-6 pb-4"
           >
             <div class="flex items-start justify-between gap-3">
               <div>
-                <h2 class="font-serif text-2xl font-bold text-slate-800 dark:text-slate-100">添加设备</h2>
-                <p class="mt-1 text-xs text-slate-400 dark:text-slate-500">记录你的电子设备资产</p>
+                <h2 class="text-foreground font-serif text-2xl font-bold">
+                  添加设备
+                </h2>
+                <p class="text-muted-foreground mt-1 text-xs">
+                  记录你的电子设备资产
+                </p>
               </div>
               <span
-                class="shrink-0 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+                class="bg-primary/15 text-primary shrink-0 rounded-full px-3 py-1 text-xs font-semibold"
               >
                 新建设备
               </span>
@@ -29,36 +40,45 @@
           </div>
 
           <!-- Form -->
-          <form @submit.prevent="handleSubmit" class="dark:bg-background space-y-5 bg-slate-50 p-6">
+          <form
+            @submit.prevent="handleSubmit"
+            class="bg-background space-y-5 p-6"
+          >
             <!-- Name -->
             <label class="block space-y-1.5">
-              <span class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"> 设备名称 * </span>
+              <span class="text-muted-foreground ml-1 text-xs font-semibold">
+                设备名称 *
+              </span>
               <input
                 v-model="form.name"
                 type="text"
                 placeholder="例如：iPhone 15 Pro Max"
                 maxlength="100"
-                class="dark:bg-muted w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                class="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
               />
             </label>
 
             <!-- Purchase Date -->
             <label class="block space-y-1.5">
-              <span class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"> 购买日期 * </span>
+              <span class="text-muted-foreground ml-1 text-xs font-semibold">
+                购买日期 *
+              </span>
               <input
                 v-model="form.purchase_date"
                 type="date"
-                class="dark:bg-muted w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:text-white dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
               />
             </label>
 
             <!-- Currency & Price -->
             <div class="grid grid-cols-[0.4fr_0.6fr] gap-4">
               <label class="block space-y-1.5">
-                <span class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"> 货币 </span>
+                <span class="text-muted-foreground ml-1 text-xs font-semibold">
+                  货币
+                </span>
                 <select
                   v-model="form.currency"
-                  class="dark:bg-muted w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:text-white dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                  class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/30 w-full cursor-pointer appearance-none rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 >
                   <option v-for="c in currencyOptions" :key="c" :value="c">
                     {{ c }}
@@ -67,35 +87,39 @@
               </label>
 
               <label class="block space-y-1.5">
-                <span class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"> 价格 </span>
+                <span class="text-muted-foreground ml-1 text-xs font-semibold">
+                  价格
+                </span>
                 <input
                   v-model.number="form.price"
                   type="number"
                   min="0"
                   step="0.01"
                   placeholder="0.00"
-                  class="dark:bg-muted w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                  class="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
             </div>
 
             <!-- Notes -->
             <label class="block space-y-1.5">
-              <span class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"> 备注（可选） </span>
+              <span class="text-muted-foreground ml-1 text-xs font-semibold">
+                备注（可选）
+              </span>
               <input
                 v-model="form.notes"
                 type="text"
                 placeholder="例如：256GB 银色、国行版本"
-                class="dark:bg-muted w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                class="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
               />
             </label>
 
             <!-- Status Toggle -->
             <div class="space-y-2">
-              <span class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"> 设备状态 </span>
-              <div
-                class="dark:bg-muted flex rounded-full bg-slate-200/80 p-1 backdrop-blur-sm dark:border dark:border-white/10"
-              >
+              <span class="text-muted-foreground ml-1 text-xs font-semibold">
+                设备状态
+              </span>
+              <div class="bg-muted flex rounded-full p-1 backdrop-blur-sm">
                 <button
                   v-for="option in statusOptions"
                   :key="option.value"
@@ -104,8 +128,8 @@
                   :class="[
                     'flex-1 rounded-full px-3 py-2.5 text-xs font-semibold transition-all duration-200',
                     form.status === option.value
-                      ? 'bg-blue-700 text-white shadow-lg shadow-blue-500/25'
-                      : 'text-slate-500 hover:bg-slate-200/60 dark:text-slate-400 dark:hover:bg-white/10',
+                      ? 'bg-primary text-primary-foreground shadow-primary/25 shadow-lg'
+                      : 'text-muted-foreground hover:bg-accent',
                   ]"
                 >
                   {{ option.label }}
@@ -114,16 +138,21 @@
             </div>
 
             <!-- Error -->
-            <p v-if="formError" class="py-2 text-center text-xs font-medium text-red-500 dark:text-red-400">
+            <p
+              v-if="formError"
+              class="text-destructive py-2 text-center text-xs font-medium"
+            >
               {{ formError }}
             </p>
-            <p v-else class="text-center text-[10px] text-slate-400 dark:text-slate-500">* 为必填项</p>
+            <p v-else class="text-muted-foreground text-center text-[10px]">
+              * 为必填项
+            </p>
 
             <!-- Submit Button -->
             <button
               type="submit"
               :disabled="isSubmitting"
-              class="flex w-full items-center justify-center gap-2 rounded-full bg-blue-700 py-4 text-sm font-extrabold text-white shadow-xl shadow-blue-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-blue-500/40 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+              class="bg-primary text-primary-foreground shadow-primary/30 hover:shadow-primary/40 flex w-full items-center justify-center gap-2 rounded-full py-4 text-sm font-extrabold shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
             >
               <span v-if="isSubmitting">添加中...</span>
               <span v-else>添加设备</span>

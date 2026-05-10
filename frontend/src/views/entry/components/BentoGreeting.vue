@@ -4,7 +4,7 @@
       <div class="flex shrink-0 items-center justify-center">
         <svg
           v-if="isDay"
-          class="size-12 text-amber-400"
+          class="text-warning size-12"
           viewBox="0 0 24 24"
           fill="currentColor"
         >
@@ -22,7 +22,7 @@
         </svg>
         <svg
           v-else
-          class="size-12 text-slate-300"
+          class="text-muted size-12"
           viewBox="0 0 24 24"
           fill="currentColor"
         >
@@ -31,20 +31,18 @@
       </div>
       <div class="flex flex-col justify-center">
         <h2
-          class="font-serif text-2xl font-bold tracking-tight text-slate-800 dark:text-slate-100"
+          class="text-foreground font-serif text-2xl font-bold tracking-tight"
         >
           {{ greeting }}
         </h2>
-        <p
-          class="mt-1 font-serif text-sm font-medium text-slate-600 dark:text-slate-400"
-        >
+        <p class="text-muted-foreground mt-1 font-serif text-sm font-medium">
           {{ changelogHint }}
         </p>
       </div>
       <!-- 更新日志按钮 -->
       <button
         @click.stop="$router.push('/changelog')"
-        class="squircle ml-4 shrink-0 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-600 ring ring-blue-100 transition-all hover:scale-105 hover:bg-blue-100 dark:bg-blue-900/60 dark:text-blue-400 dark:ring-blue-800"
+        class="squircle bg-primary/10 text-primary ring-primary/20 hover:bg-primary/20 ml-4 shrink-0 px-3 py-2 text-xs font-bold ring transition-all hover:scale-105"
       >
         Changelog
       </button>

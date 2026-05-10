@@ -7,19 +7,19 @@
       <div class="flex flex-wrap items-center gap-3">
         <a
           href="#rss-parse"
-          class="rounded-lg bg-blue-100 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:bg-slate-800 dark:text-blue-300 dark:hover:bg-slate-700"
+          class="bg-primary/15 text-primary hover:bg-accent rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
         >
           解析订阅
         </a>
         <a
           href="#rss-subscriptions"
-          class="rounded-lg bg-blue-100 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:bg-slate-800 dark:text-blue-300 dark:hover:bg-slate-700"
+          class="bg-primary/15 text-primary hover:bg-accent rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
         >
           我的订阅
         </a>
         <a
           href="#rss-articles"
-          class="rounded-lg bg-blue-100 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:bg-slate-800 dark:text-blue-300 dark:hover:bg-slate-700"
+          class="bg-primary/15 text-primary hover:bg-accent rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
         >
           文章列表
         </a>
@@ -27,14 +27,12 @@
 
       <section
         id="rss-parse"
-        class="rounded-2xl border border-blue-100 bg-white p-6 dark:border-slate-700 dark:bg-slate-800"
+        class="border-border bg-card rounded-2xl border p-6"
       >
         <div class="mb-5 flex items-center justify-between gap-3">
           <div>
-            <h2 class="text-xl font-bold text-blue-900 dark:text-white">
-              解析订阅地址
-            </h2>
-            <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">
+            <h2 class="text-primary text-xl font-bold">解析订阅地址</h2>
+            <p class="text-muted-foreground mt-1 text-sm">
               支持 RSS/Atom，解析后可直接保存到我的订阅
             </p>
           </div>
@@ -47,7 +45,7 @@
           <div class="flex-1">
             <label
               for="rss-url"
-              class="mb-2 block text-sm font-medium text-blue-800 dark:text-blue-200"
+              class="text-primary mb-2 block text-sm font-medium"
             >
               RSS/Atom 地址
             </label>
@@ -56,13 +54,13 @@
               v-model="rssForm.rssUrl"
               type="text"
               placeholder="https://example.com/feed.xml"
-              class="w-full rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-blue-900 transition-all placeholder:text-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-slate-600 dark:bg-slate-700/50 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-blue-400"
+              class="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border px-4 py-3 transition-all focus:ring-2 focus:outline-none"
             />
           </div>
 
           <button
             type="button"
-            class="rounded-xl border border-blue-300 bg-blue-100 px-5 py-3 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:border-slate-700 dark:bg-slate-700/50 dark:text-blue-300 dark:hover:bg-slate-600/50"
+            class="border-primary/30 bg-primary/15 text-primary hover:bg-accent rounded-xl border px-5 py-3 text-sm font-medium transition-colors"
             @click="rssForm.saveToDb = !rssForm.saveToDb"
           >
             {{ rssForm.saveToDb ? "已启用保存" : "保存到订阅" }}
@@ -71,21 +69,19 @@
           <button
             type="submit"
             :disabled="parseLoading"
-            class="rounded-xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-orange-600 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-orange-500 dark:ring-offset-slate-800"
+            class="bg-warning text-warning-foreground hover:bg-warning/90 focus:ring-warning disabled:hover:bg-warning rounded-xl px-6 py-3 text-sm font-semibold transition-all focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70"
           >
             {{ parseLoading ? "解析中..." : "开始解析" }}
           </button>
         </form>
 
         <div class="mt-4 flex flex-wrap items-center gap-2">
-          <span class="text-sm text-blue-600 dark:text-blue-400"
-            >快捷尝试:</span
-          >
+          <span class="text-muted-foreground text-sm">快捷尝试:</span>
           <button
             v-for="example in exampleFeeds"
             :key="example.url"
             type="button"
-            class="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:bg-slate-700 dark:text-blue-300 dark:hover:bg-slate-600"
+            class="bg-primary/15 text-primary hover:bg-accent rounded-full px-3 py-1 text-xs font-medium transition-colors"
             @click="rssForm.rssUrl = example.url"
           >
             {{ example.name }}
@@ -96,14 +92,12 @@
           v-if="rssHistory.length > 0"
           class="mt-3 flex flex-wrap items-center gap-2"
         >
-          <span class="text-sm text-blue-600 dark:text-blue-400"
-            >历史记录:</span
-          >
+          <span class="text-muted-foreground text-sm">历史记录:</span>
           <button
             v-for="historyUrl in rssHistory.slice(0, 3)"
             :key="historyUrl"
             type="button"
-            class="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:bg-slate-700 dark:text-blue-300 dark:hover:bg-slate-600"
+            class="bg-primary/15 text-primary hover:bg-accent rounded-full px-3 py-1 text-xs font-medium transition-colors"
             @click="rssForm.rssUrl = historyUrl"
           >
             {{ historyUrl }}
@@ -112,19 +106,19 @@
 
         <div
           v-if="parseMetadata"
-          class="mt-6 rounded-xl border border-blue-100 bg-blue-50/40 p-5 dark:border-slate-700 dark:bg-slate-700/20"
+          class="border-border bg-muted/40 mt-6 rounded-xl border p-5"
         >
-          <h3 class="text-lg font-bold text-blue-900 dark:text-white">
+          <h3 class="text-primary text-lg font-bold">
             {{ parseMetadata.title }}
           </h3>
           <p
             v-if="parseMetadata.description"
-            class="mt-2 text-sm text-blue-600 dark:text-blue-400"
+            class="text-muted-foreground mt-2 text-sm"
           >
             {{ parseMetadata.description }}
           </p>
           <div
-            class="mt-3 flex flex-wrap items-center gap-3 text-xs text-blue-500 dark:text-blue-400"
+            class="text-muted-foreground mt-3 flex flex-wrap items-center gap-3 text-xs"
           >
             <span v-if="parseMetadata.published"
               >更新时间: {{ formatDate(parseMetadata.published) }}</span
@@ -133,7 +127,7 @@
               :href="parseMetadata.link"
               target="_blank"
               rel="noopener noreferrer"
-              class="font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+              class="text-primary hover:text-primary font-medium"
             >
               访问原站
             </a>
@@ -141,30 +135,30 @@
         </div>
 
         <div v-if="parseEntries.length > 0" class="mt-5 space-y-3">
-          <div class="text-sm font-semibold text-blue-700 dark:text-blue-300">
+          <div class="text-foreground text-sm font-semibold">
             最新解析文章（{{ parseEntries.length }}）
           </div>
           <ul class="space-y-2">
             <li
               v-for="(entry, index) in parseEntries"
               :key="`${entry.link}-${index}`"
-              class="rounded-xl border border-blue-100 bg-white p-4 dark:border-slate-700 dark:bg-slate-800"
+              class="border-border bg-card rounded-xl border p-4"
             >
               <a
                 :href="entry.link"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="font-medium text-blue-900 hover:text-blue-600 dark:text-white dark:hover:text-blue-400"
+                class="text-primary hover:text-primary font-medium transition-colors"
               >
                 {{ entry.title }}
               </a>
               <p
                 v-if="entry.summary"
-                class="mt-2 line-clamp-2 text-sm text-blue-600 dark:text-blue-400"
+                class="text-muted-foreground mt-2 line-clamp-2 text-sm"
               >
                 {{ truncateSummary(entry.summary) }}
               </p>
-              <div class="mt-2 text-xs text-blue-500 dark:text-blue-400">
+              <div class="text-muted-foreground mt-2 text-xs">
                 {{ formatDate(entry.published) }}
               </div>
             </li>
@@ -174,20 +168,18 @@
 
       <section
         id="rss-subscriptions"
-        class="rounded-2xl border border-blue-100 bg-white p-6 dark:border-slate-700 dark:bg-slate-800"
+        class="border-border bg-card rounded-2xl border p-6"
       >
         <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 class="text-xl font-bold text-blue-900 dark:text-white">
-              我的订阅
-            </h2>
-            <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">
+            <h2 class="text-primary text-xl font-bold">我的订阅</h2>
+            <p class="text-muted-foreground mt-1 text-sm">
               共 {{ subscriptions.length }} 个订阅源
             </p>
           </div>
           <button
             type="button"
-            class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+            class="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
             :disabled="subscriptionsLoading"
             @click="fetchSubscriptions"
           >
@@ -197,7 +189,7 @@
 
         <div
           v-if="subscriptionsError"
-          class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400"
+          class="border-destructive/30 bg-destructive/10 text-destructive rounded-xl border p-4 text-sm"
         >
           {{ subscriptionsError }}
         </div>
@@ -206,13 +198,13 @@
           <div
             v-for="skeleton in 3"
             :key="skeleton"
-            class="h-24 animate-pulse rounded-xl border border-blue-100 bg-blue-50 dark:border-slate-700 dark:bg-slate-700/40"
+            class="border-border bg-muted/40 h-24 animate-pulse rounded-xl border"
           />
         </div>
 
         <div
           v-else-if="subscriptions.length === 0"
-          class="rounded-xl border border-dashed border-blue-200 bg-blue-50/60 p-8 text-center text-sm text-blue-600 dark:border-slate-700 dark:bg-slate-700/20 dark:text-blue-400"
+          class="border-border bg-muted/40 text-muted-foreground rounded-xl border border-dashed p-8 text-center text-sm"
         >
           暂无订阅，先在上方解析并保存一个 RSS 地址吧。
         </div>
@@ -221,11 +213,11 @@
           <li
             v-for="subscription in subscriptions"
             :key="subscription.id"
-            class="rounded-xl border p-4 transition-all dark:border-slate-700"
+            class="rounded-xl border p-4 transition-all"
             :class="
               activeSubscriptionId === subscription.id
-                ? 'border-blue-300 bg-blue-50/60 dark:border-blue-700 dark:bg-blue-900/10'
-                : 'border-blue-100 bg-white hover:border-blue-200 dark:bg-slate-800'
+                ? 'border-primary/30 bg-primary/5'
+                : 'border-border bg-card hover:border-border/70'
             "
           >
             <div
@@ -233,24 +225,20 @@
             >
               <div class="min-w-0">
                 <div class="flex flex-wrap items-center gap-2">
-                  <h3
-                    class="truncate text-base font-semibold text-blue-900 dark:text-white"
-                  >
+                  <h3 class="text-primary truncate text-base font-semibold">
                     {{ getSubscriptionTitle(subscription) }}
                   </h3>
                   <span
-                    class="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-slate-700 dark:text-blue-300"
+                    class="bg-primary/15 text-primary rounded-full px-2 py-0.5 text-xs font-medium"
                   >
                     {{ getFeedProtocol(subscription.rss_url) }}
                   </span>
                 </div>
-                <p
-                  class="mt-1 text-xs break-all text-blue-500 dark:text-blue-400"
-                >
+                <p class="text-muted-foreground mt-1 text-xs break-all">
                   {{ subscription.rss_url }}
                 </p>
                 <div
-                  class="mt-2 flex flex-wrap items-center gap-3 text-xs text-blue-500 dark:text-blue-400"
+                  class="text-muted-foreground mt-2 flex flex-wrap items-center gap-3 text-xs"
                 >
                   <span>文章数: {{ subscription.entry_count ?? 0 }}</span>
                   <span
@@ -266,21 +254,21 @@
               <div class="flex shrink-0 flex-wrap items-center gap-2">
                 <button
                   type="button"
-                  class="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                  class="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
                   @click="filterByFeed(subscription)"
                 >
                   查看文章
                 </button>
                 <button
                   type="button"
-                  class="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-emerald-700"
+                  class="bg-success text-success-foreground hover:bg-success/90 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
                   @click="handleRefresh(subscription)"
                 >
                   刷新文章
                 </button>
                 <button
                   type="button"
-                  class="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-red-700"
+                  class="bg-destructive text-primary-foreground hover:bg-destructive/90 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
                   @click="handleDelete(subscription)"
                 >
                   删除订阅
@@ -293,20 +281,18 @@
 
       <section
         id="rss-articles"
-        class="rounded-2xl border border-blue-100 bg-white p-6 dark:border-slate-700 dark:bg-slate-800"
+        class="border-border bg-card rounded-2xl border p-6"
       >
         <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 class="text-xl font-bold text-blue-900 dark:text-white">
-              文章列表
-            </h2>
-            <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">
+            <h2 class="text-primary text-xl font-bold">文章列表</h2>
+            <p class="text-muted-foreground mt-1 text-sm">
               搜索与分页阅读已保存文章
             </p>
           </div>
           <button
             type="button"
-            class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+            class="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
             :disabled="articlesLoading"
             @click="fetchArticles(currentPage)"
           >
@@ -320,13 +306,13 @@
               v-model="searchQuery"
               type="search"
               placeholder="搜索文章标题和内容..."
-              class="w-full rounded-xl border border-blue-200 bg-white py-3 pr-24 pl-4 text-sm text-blue-900 placeholder:text-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400"
+              class="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border py-3 pr-24 pl-4 text-sm focus:ring-2 focus:outline-none"
               @keyup.enter="handleSearch"
             />
             <div class="absolute inset-y-0 right-2 flex items-center gap-1">
               <button
                 type="button"
-                class="rounded-md px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-100 hover:text-blue-800 dark:text-blue-400 dark:hover:bg-slate-700 dark:hover:text-blue-300"
+                class="text-primary hover:bg-accent rounded-md px-2 py-1 text-xs font-medium transition-colors"
                 @click="handleSearch"
               >
                 搜索
@@ -334,7 +320,7 @@
               <button
                 v-if="searchQuery"
                 type="button"
-                class="rounded-md px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-100 hover:text-blue-800 dark:text-blue-400 dark:hover:bg-slate-700 dark:hover:text-blue-300"
+                class="text-primary hover:bg-accent rounded-md px-2 py-1 text-xs font-medium transition-colors"
                 @click="clearSearch"
               >
                 清空
@@ -345,13 +331,13 @@
 
         <div v-if="selectedFeedUrl" class="mb-4 flex items-center gap-2">
           <span
-            class="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+            class="bg-primary/15 text-primary rounded-full px-3 py-1 text-xs font-medium"
           >
             当前来源: {{ selectedFeedUrl }}
           </span>
           <button
             type="button"
-            class="rounded-lg border border-blue-300 px-2.5 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 dark:border-slate-600 dark:text-blue-300 dark:hover:bg-slate-700"
+            class="border-primary/30 text-primary hover:bg-accent rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors"
             @click="clearFeedFilter"
           >
             清除筛选
@@ -360,7 +346,7 @@
 
         <div
           v-if="articlesError"
-          class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400"
+          class="border-destructive/30 bg-destructive/10 text-destructive rounded-xl border p-4 text-sm"
         >
           {{ articlesError }}
         </div>
@@ -369,13 +355,13 @@
           <div
             v-for="skeleton in 5"
             :key="skeleton"
-            class="h-24 animate-pulse rounded-xl border border-blue-100 bg-blue-50 dark:border-slate-700 dark:bg-slate-700/40"
+            class="border-border bg-muted/40 h-24 animate-pulse rounded-xl border"
           />
         </div>
 
         <div
           v-else-if="articles.length === 0"
-          class="rounded-xl border border-dashed border-blue-200 bg-blue-50/60 p-8 text-center text-sm text-blue-600 dark:border-slate-700 dark:bg-slate-700/20 dark:text-blue-400"
+          class="border-border bg-muted/40 text-muted-foreground rounded-xl border border-dashed p-8 text-center text-sm"
         >
           暂无文章，尝试刷新订阅或更换搜索条件。
         </div>
@@ -385,13 +371,13 @@
             <li
               v-for="article in articles"
               :key="article.id"
-              class="rounded-xl border border-blue-100 bg-white p-4 transition-all hover:border-blue-300 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600"
+              class="border-border bg-card hover:border-primary/30 rounded-xl border p-4 transition-all"
             >
               <div class="flex flex-col gap-3">
                 <div class="flex flex-wrap items-start justify-between gap-2">
                   <router-link
                     :to="`/rss/articles/${article.id}`"
-                    class="text-base font-semibold text-blue-900 hover:text-blue-600 dark:text-white dark:hover:text-blue-400"
+                    class="text-primary hover:text-primary text-base font-semibold transition-colors"
                   >
                     {{ article.title || "无标题" }}
                   </router-link>
@@ -399,8 +385,8 @@
                     class="rounded-full px-2 py-0.5 text-xs font-medium"
                     :class="
                       article.is_read
-                        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
-                        : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                        ? 'bg-success/20 text-success'
+                        : 'bg-primary/15 text-primary'
                     "
                   >
                     {{ article.is_read ? "已读" : "未读" }}
@@ -408,12 +394,12 @@
                 </div>
                 <p
                   v-if="article.summary"
-                  class="line-clamp-2 text-sm text-blue-600 dark:text-blue-400"
+                  class="text-muted-foreground line-clamp-2 text-sm"
                 >
                   {{ article.summary }}
                 </p>
                 <div
-                  class="flex flex-wrap items-center gap-3 text-xs text-blue-500 dark:text-blue-400"
+                  class="text-muted-foreground flex flex-wrap items-center gap-3 text-xs"
                 >
                   <span v-if="article.author">作者: {{ article.author }}</span>
                   <span>发布时间: {{ formatDate(article.published) }}</span>
@@ -422,7 +408,7 @@
                     :href="article.link"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                    class="text-primary hover:text-primary font-medium"
                   >
                     阅读原文
                   </a>
@@ -441,14 +427,14 @@
               class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
               :class="
                 currentPage > 1
-                  ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
-                  : 'cursor-not-allowed bg-blue-100 text-blue-400 dark:bg-slate-800 dark:text-slate-600'
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                  : 'bg-muted text-muted-foreground cursor-not-allowed'
               "
               @click="goToPage(currentPage - 1)"
             >
               上一页
             </button>
-            <span class="text-sm font-medium text-blue-700 dark:text-blue-300">
+            <span class="text-foreground text-sm font-medium">
               第 {{ currentPage }} 页 / 共 {{ totalPages }} 页
             </span>
             <button
@@ -457,8 +443,8 @@
               class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
               :class="
                 currentPage < totalPages
-                  ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
-                  : 'cursor-not-allowed bg-blue-100 text-blue-400 dark:bg-slate-800 dark:text-slate-600'
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                  : 'bg-muted text-muted-foreground cursor-not-allowed'
               "
               @click="goToPage(currentPage + 1)"
             >

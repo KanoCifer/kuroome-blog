@@ -4,13 +4,13 @@
       class="flex min-w-0 flex-col items-center justify-center gap-2 sm:flex-row sm:gap-0"
     >
       <div
-        class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/40"
+        class="bg-primary/15 flex h-12 w-12 items-center justify-center rounded-full"
       >
-        <FishingRod class="size-6 text-blue-500" />
+        <FishingRod class="text-primary size-6" />
       </div>
       <RouterLink
         to="/fishing-map"
-        class="max-w-full truncate font-serif text-sm text-gray-800 sm:text-xl dark:text-white"
+        class="text-foreground max-w-full truncate font-serif text-sm sm:text-xl"
         >我的钓点</RouterLink
       >
     </div>

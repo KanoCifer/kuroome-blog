@@ -232,14 +232,11 @@ export default function BlogEditView() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="flex h-full flex-col bg-white dark:bg-gray-900"
+      className="bg-card flex h-full flex-col"
     >
       {/* Header */}
-      <div className="flex shrink-0 items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
-        <button
-          onClick={handleCancel}
-          className="-ml-2 p-2 text-slate-600 dark:text-slate-400"
-        >
+      <div className="border-border flex shrink-0 items-center justify-between border-b px-4 py-3">
+        <button onClick={handleCancel} className="text-foreground -ml-2 p-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-5"
@@ -255,7 +252,7 @@ export default function BlogEditView() {
             />
           </svg>
         </button>
-        <h1 className="text-base font-semibold text-slate-900 dark:text-white">
+        <h1 className="text-foreground text-base font-semibold">
           {isEdit ? '编辑文章' : '发布文章'}
         </h1>
         <div className="w-9" />
@@ -264,7 +261,7 @@ export default function BlogEditView() {
       <div className="flex flex-1 flex-col">
         {/* Error Message */}
         {error && (
-          <div className="mx-4 mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-800 dark:bg-red-900/20 dark:text-red-200">
+          <div className="bg-destructive/10 text-destructive mx-4 mb-4 rounded-lg p-3 text-sm">
             {error}
           </div>
         )}
@@ -272,7 +269,7 @@ export default function BlogEditView() {
         {/* Loading State */}
         {loading && isEdit && (
           <div className="flex h-64 items-center justify-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"></div>
+            <div className="border-border border-t-primary h-8 w-8 animate-spin rounded-full border-2"></div>
           </div>
         )}
 
@@ -295,9 +292,9 @@ export default function BlogEditView() {
                 type="text"
                 required
                 placeholder="文章标题..."
-                className="block w-full border-0 bg-transparent px-2 py-3 text-xl font-bold text-gray-900 outline-0 placeholder:text-gray-400 focus:ring-0 md:text-2xl dark:text-white"
+                className="text-foreground placeholder:text-muted-foreground block w-full border-0 bg-transparent px-2 py-3 text-xl font-bold outline-0 focus:ring-0 md:text-2xl"
               />
-              <div className="h-px bg-slate-200 dark:bg-slate-700" />
+              <div className="bg-border h-px" />
             </div>
 
             {/* Controls Bar */}
@@ -308,8 +305,8 @@ export default function BlogEditView() {
                 onClick={() => setPin(!pin)}
                 className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                   pin
-                    ? 'border-amber-500 bg-amber-50 text-amber-700 dark:border-amber-400 dark:bg-amber-900/20 dark:text-amber-300'
-                    : 'border-slate-200 text-slate-600 dark:border-slate-700 dark:text-slate-400'
+                    ? 'border-warning bg-warning/15 text-warning'
+                    : 'border-border text-foreground'
                 }`}
               >
                 {pin ? '已置顶' : '置顶'}
@@ -320,7 +317,7 @@ export default function BlogEditView() {
                 <button
                   type="button"
                   onClick={() => setCategoryMenuOpen(!categoryMenuOpen)}
-                  className="flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 dark:border-slate-700 dark:text-slate-400"
+                  className="border-border text-foreground flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium"
                 >
                   <span>{currentCategory || '分类'}</span>
                   <svg
@@ -338,7 +335,7 @@ export default function BlogEditView() {
                 </button>
 
                 {categoryMenuOpen && (
-                  <div className="absolute top-full left-0 z-50 mt-1 w-36 rounded-lg border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-gray-800">
+                  <div className="border-border bg-card absolute top-full left-0 z-50 mt-1 w-36 rounded-lg border py-1 shadow-lg">
                     {categories.map((cat) => (
                       <button
                         type="button"
@@ -349,8 +346,8 @@ export default function BlogEditView() {
                         }}
                         className={`w-full px-3 py-2 text-left text-xs transition-colors ${
                           category === String(cat.id)
-                            ? 'bg-blue-100 text-blue-900 dark:bg-blue-900/20 dark:text-blue-300'
-                            : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700'
+                            ? 'bg-primary/15 text-primary'
+                            : 'text-foreground hover:bg-accent'
                         }`}
                       >
                         {cat.name}
@@ -365,7 +362,7 @@ export default function BlogEditView() {
                 <button
                   type="button"
                   onClick={() => setDraftMenuOpen(!draftMenuOpen)}
-                  className="flex items-center gap-1 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 dark:border-slate-700 dark:text-slate-400"
+                  className="border-border text-foreground flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-medium"
                 >
                   草稿
                   <svg
@@ -383,9 +380,9 @@ export default function BlogEditView() {
                 </button>
 
                 {draftMenuOpen && (
-                  <div className="absolute top-full right-0 z-50 mt-1 max-h-48 w-56 overflow-y-auto rounded-lg border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-gray-800">
+                  <div className="border-border bg-card absolute top-full right-0 z-50 mt-1 max-h-48 w-56 overflow-y-auto rounded-lg border py-1 shadow-lg">
                     {draftList.length === 0 ? (
-                      <div className="px-3 py-2 text-xs text-slate-500">
+                      <div className="text-muted-foreground px-3 py-2 text-xs">
                         暂无草稿
                       </div>
                     ) : (
@@ -395,7 +392,7 @@ export default function BlogEditView() {
                           className="flex items-center justify-between px-3 py-2"
                         >
                           <span
-                            className="flex-1 cursor-pointer truncate text-xs text-slate-700 dark:text-slate-300"
+                            className="text-foreground flex-1 cursor-pointer truncate text-xs"
                             onClick={() =>
                               handleSwitchDraft(draft.key, draft.title)
                             }
@@ -404,7 +401,7 @@ export default function BlogEditView() {
                           </span>
                           <button
                             type="button"
-                            className="ml-2 p-1 text-slate-400 hover:text-red-500"
+                            className="text-muted-foreground hover:text-destructive ml-2 p-1"
                             onClick={() =>
                               handleDeleteDraft(draft.key, draft.title)
                             }
@@ -422,14 +419,14 @@ export default function BlogEditView() {
               <button
                 type="button"
                 onClick={handleSaveDraft}
-                className="shrink-0 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 dark:border-slate-700 dark:text-slate-400"
+                className="border-border text-foreground shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium"
               >
                 保存
               </button>
             </div>
 
             {/* Markdown Editor */}
-            <div className="mx-4 mb-4 flex-1 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
+            <div className="border-border mx-4 mb-4 flex-1 overflow-hidden rounded-lg border">
               <MarkdownEditor
                 value={body}
                 onChange={setBody}
@@ -438,19 +435,19 @@ export default function BlogEditView() {
             </div>
 
             {/* Bottom Action Bar - Fixed on mobile */}
-            <div className="mb-20 shrink-0 border-t border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-gray-900">
+            <div className="border-border bg-card mb-20 shrink-0 border-t px-4 py-3">
               <div className="flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 dark:border-slate-700 dark:text-slate-400"
+                  className="border-border text-foreground rounded-full border px-4 py-2 text-sm font-medium"
                 >
                   取消
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="inline-flex cursor-pointer items-center justify-center rounded-full bg-blue-600 px-6 py-2 text-sm font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50 dark:bg-blue-500"
+                  className="bg-primary text-primary-foreground inline-flex cursor-pointer items-center justify-center rounded-full px-6 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {loading ? (
                     <svg

@@ -36,7 +36,7 @@ export function BlogPagination({
       <button
         disabled={!pagination.has_prev}
         onClick={() => onPageChange(pagination.prev_num || 1)}
-        className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:text-gray-400"
+        className="disabled:text-muted-foreground/50 flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium transition-colors disabled:cursor-not-allowed"
       >
         <svg
           className="h-5 w-5"
@@ -60,8 +60,8 @@ export function BlogPagination({
             onClick={() => onPageChange(p)}
             className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium transition-colors ${
               p === currentPage
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                ? 'bg-primary text-primary-foreground'
+                : 'text-foreground hover:bg-accent'
             }`}
           >
             {p}
@@ -69,7 +69,7 @@ export function BlogPagination({
         ) : (
           <span
             key={i}
-            className="flex h-10 w-10 items-center justify-center text-gray-400"
+            className="text-muted-foreground flex h-10 w-10 items-center justify-center"
           >
             {p}
           </span>
@@ -79,7 +79,7 @@ export function BlogPagination({
       <button
         disabled={!pagination.has_next}
         onClick={() => onPageChange(pagination.next_num || pagination.pages)}
-        className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:text-gray-400"
+        className="disabled:text-muted-foreground/50 flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium transition-colors disabled:cursor-not-allowed"
       >
         <svg
           className="h-5 w-5"

@@ -73,8 +73,8 @@ const scrollToTop = () => {
       class="fixed z-50 flex h-14 w-14 -translate-x-1/2 transform-gpu cursor-pointer items-center justify-center overflow-hidden rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:shadow-2xl focus:outline-none"
       :class="[
         isHovered
-          ? 'bg-blue-600/30 text-white dark:bg-blue-500/10'
-          : 'bg-gray-50/30 text-gray-700 dark:bg-gray-800/10 dark:text-gray-200',
+          ? 'bg-primary/30 dark:bg-primary/10 text-white'
+          : 'bg-background/30 text-foreground dark:bg-background/10 dark:text-foreground',
         'right-0 bottom-16',
       ]"
       aria-label="回到顶部"
@@ -92,7 +92,7 @@ const scrollToTop = () => {
           fill="none"
           stroke="currentColor"
           stroke-width="2"
-          class="text-gray-200 dark:text-gray-700"
+          class="text-muted-foreground dark:text-muted-foreground"
           opacity="0.3"
         />
         <!-- 进度圆环 -->
@@ -107,14 +107,14 @@ const scrollToTop = () => {
           :stroke-dasharray="163.36"
           :stroke-dashoffset="163.36 - (scrollProgress / 100) * 163.36"
           class="transition-all duration-100"
-          :class="isHovered ? 'text-white' : 'text-blue-600 dark:text-blue-400'"
+          :class="isHovered ? 'text-white' : 'text-primary dark:text-primary'"
         />
       </svg>
 
       <!-- 箭头图标 -->
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        class="h-6 w-6 transform-gpu text-gray-600 transition-transform duration-300 dark:text-gray-300"
+        class="text-secondary-foreground dark:text-foreground h-6 w-6 transform-gpu transition-transform duration-300"
         :class="{ '-translate-y-1': isHovered }"
         fill="none"
         viewBox="0 0 24 24"
@@ -130,13 +130,13 @@ const scrollToTop = () => {
 
       <!-- Tooltip -->
       <span
-        class="absolute right-full mr-3 rounded-lg bg-gray-900 px-3 py-1 text-sm whitespace-nowrap text-white opacity-0 transition-opacity duration-200 dark:bg-gray-700"
+        class="bg-primary text-primary-foreground dark:bg-primary absolute right-full mr-3 rounded-lg px-3 py-1 text-sm whitespace-nowrap opacity-0 transition-opacity duration-200"
         :class="{ 'opacity-100': isHovered }"
       >
         回到顶部
         <!-- 小箭头 -->
         <span
-          class="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 border-4 border-transparent border-l-gray-900 dark:border-l-gray-700"
+          class="border-l-primary dark:border-l-primary absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 border-4 border-transparent"
         ></span>
       </span>
     </button>

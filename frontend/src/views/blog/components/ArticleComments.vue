@@ -66,14 +66,12 @@ const handleReply = async (commentId: string, body: string) => {
 </script>
 
 <template>
-  <div id="comments" class="border-t border-blue-100 p-8 dark:border-slate-700">
-    <div
-      class="mb-8 flex items-center gap-4 border-b border-gray-100 pb-6 dark:border-gray-700"
-    >
-      <h3 class="text-2xl font-bold text-gray-900 dark:text-white">评论</h3>
+  <div id="comments" class="border-border border-t p-8">
+    <div class="border-border mb-8 flex items-center gap-4 border-b pb-6">
+      <h3 class="text-foreground text-2xl font-bold">评论</h3>
       <span
         v-if="comments && comments.length > 0"
-        class="rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"
+        class="bg-primary/15 text-primary rounded-full px-3 py-1 text-sm font-semibold"
       >
         {{ comments.length }}
       </span>
@@ -91,13 +89,13 @@ const handleReply = async (commentId: string, body: string) => {
 
     <div
       v-else
-      class="mb-8 flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gray-50/50 py-12 text-center dark:border-gray-700 dark:bg-gray-800/30"
+      class="border-border bg-muted mb-8 flex flex-col items-center justify-center rounded-2xl border border-dashed py-12 text-center"
     >
       <div
-        class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-gray-100 dark:bg-gray-800 dark:ring-gray-700"
+        class="bg-card ring-border mb-4 flex h-16 w-16 items-center justify-center rounded-full shadow-sm ring-1"
       >
         <svg
-          class="h-8 w-8 text-gray-400 dark:text-gray-500"
+          class="text-muted-foreground h-8 w-8"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -110,10 +108,8 @@ const handleReply = async (commentId: string, body: string) => {
           />
         </svg>
       </div>
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-        暂无评论
-      </h3>
-      <p class="mx-auto mt-2 max-w-sm text-sm text-gray-500 dark:text-gray-400">
+      <h3 class="text-foreground text-lg font-semibold">暂无评论</h3>
+      <p class="text-muted-foreground mx-auto mt-2 max-w-sm text-sm">
         成为第一个评论的人吧！
       </p>
     </div>

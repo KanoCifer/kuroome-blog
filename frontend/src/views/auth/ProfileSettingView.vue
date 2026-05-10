@@ -1,17 +1,17 @@
 <template>
   <div class="min-h-screen">
     <div
-      class="squircle mx-auto max-w-2xl border border-white/70 bg-white/40 p-10 shadow-2xl dark:border-gray-700/30 dark:bg-gray-900/40"
+      class="squircle border-border/30 bg-card/40 mx-auto max-w-2xl border p-10 shadow-2xl"
       style="animation: fadeInUp 0.6s ease-out"
     >
       <!-- Header -->
       <div class="mb-12 text-center">
         <h1
-          class="bg-linear-to-r from-blue-600 to-sky-600 bg-clip-text text-[clamp(1.8rem,4vw,2.5rem)] font-bold text-transparent dark:from-blue-400 dark:to-sky-400"
+          class="from-gradient-primary-from to-gradient-primary-to bg-linear-to-r bg-clip-text text-[clamp(1.8rem,4vw,2.5rem)] font-bold text-transparent"
         >
           Profile Settings
         </h1>
-        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+        <p class="text-muted-foreground mt-2 text-sm">
           Manage your profile and preferences here
         </p>
       </div>
@@ -20,7 +20,7 @@
       <div class="mb-12 flex justify-center">
         <div class="group relative">
           <div
-            class="h-32 w-32 overflow-hidden rounded-full border-[6px] border-white shadow-2xl transition-all duration-300 group-hover:shadow-blue-500/20 dark:border-gray-800"
+            class="border-border group-hover:shadow-primary/20 h-32 w-32 overflow-hidden rounded-full border-[6px] shadow-2xl transition-all duration-300"
           >
             <img
               :src="avatarUrl"
@@ -38,7 +38,7 @@
             />
             <label
               for="photo-upload"
-              class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-linear-to-r from-blue-500 to-sky-600 text-white shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-blue-500/50 active:scale-95"
+              class="bg-primary text-primary-foreground hover:shadow-primary/50 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full shadow-lg transition-all duration-300 hover:scale-110 active:scale-95"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -70,9 +70,7 @@
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
           <!-- Name -->
           <div class="space-y-2">
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
+            <label class="text-foreground block text-sm font-medium">
               Display Name
             </label>
             <div class="relative">
@@ -80,33 +78,31 @@
                 v-model="form.name"
                 type="text"
                 autocomplete="off"
-                class="w-full rounded-2xl border border-gray-200 bg-white/70 px-4 py-3 text-sm transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800/50 dark:text-white"
+                class="border-border bg-card/70 text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-2xl px-4 py-3 text-sm transition-all duration-200 focus:ring-2 focus:outline-none"
                 placeholder="Your name"
               />
             </div>
-            <p v-if="errors.name" class="mt-1 text-xs text-red-500">
+            <p v-if="errors.name" class="text-destructive mt-1 text-xs">
               {{ errors.name }}
             </p>
           </div>
 
           <!-- Username -->
           <div class="space-y-2">
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
+            <label class="text-foreground block text-sm font-medium">
               Username
-              <span class="ml-1 text-xs text-red-400">*</span>
+              <span class="text-destructive ml-1 text-xs">*</span>
             </label>
             <div class="relative">
               <input
                 v-model="form.username"
                 type="text"
                 autocomplete="off"
-                class="w-full rounded-2xl border border-gray-200 bg-white/70 px-4 py-3 text-sm transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800/50 dark:text-white"
+                class="border-border bg-card/70 text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-2xl px-4 py-3 text-sm transition-all duration-200 focus:ring-2 focus:outline-none"
                 placeholder="Login username"
               />
             </div>
-            <p v-if="errors.username" class="mt-1 text-xs text-red-500">
+            <p v-if="errors.username" class="text-destructive mt-1 text-xs">
               {{ errors.username }}
             </p>
           </div>
@@ -114,9 +110,7 @@
 
         <!-- Gender -->
         <div class="space-y-2">
-          <label
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
+          <label class="text-foreground block text-sm font-medium">
             Gender
           </label>
           <div class="grid grid-cols-2 gap-4">
@@ -129,10 +123,10 @@
                 @click="toggleGender('male')"
               />
               <div
-                class="flex items-center justify-center rounded-2xl border-2 border-gray-200 bg-white/70 px-4 py-4 transition-all duration-300 group-active:scale-95 peer-checked:border-blue-500 peer-checked:bg-linear-to-r peer-checked:from-blue-50 peer-checked:to-sky-50 peer-checked:shadow-lg peer-checked:shadow-blue-500/10 hover:border-blue-200 dark:border-gray-600 dark:bg-gray-800/50 dark:peer-checked:border-blue-500 dark:peer-checked:bg-linear-to-r dark:peer-checked:from-blue-900/20 dark:peer-checked:to-sky-900/20"
+                class="border-border bg-card/70 peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-primary/10 hover:border-primary/30 flex items-center justify-center rounded-2xl border-2 px-4 py-4 transition-all duration-300 group-active:scale-95 peer-checked:shadow-lg"
               >
                 <span
-                  class="text-sm font-medium text-gray-600 transition-colors peer-checked:text-blue-700 dark:text-gray-300 dark:peer-checked:text-blue-400"
+                  class="text-muted-foreground peer-checked:text-primary text-sm font-medium transition-colors"
                   >Male</span
                 >
               </div>
@@ -146,10 +140,10 @@
                 @click="toggleGender('female')"
               />
               <div
-                class="flex items-center justify-center rounded-2xl border-2 border-gray-200 bg-white/70 px-4 py-4 transition-all duration-300 group-active:scale-95 peer-checked:border-sky-500 peer-checked:bg-linear-to-r peer-checked:from-sky-50 peer-checked:to-cyan-50 peer-checked:shadow-lg peer-checked:shadow-sky-500/10 hover:border-sky-200 dark:border-gray-600 dark:bg-gray-800/50 dark:peer-checked:border-sky-500 dark:peer-checked:bg-linear-to-r dark:peer-checked:from-sky-900/20 dark:peer-checked:to-cyan-900/20"
+                class="border-border bg-card/70 peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-primary/10 hover:border-primary/30 flex items-center justify-center rounded-2xl border-2 px-4 py-4 transition-all duration-300 group-active:scale-95 peer-checked:shadow-lg"
               >
                 <span
-                  class="text-sm font-medium text-gray-600 transition-colors peer-checked:text-sky-700 dark:text-gray-300 dark:peer-checked:text-sky-400"
+                  class="text-muted-foreground peer-checked:text-primary text-sm font-medium transition-colors"
                   >Female</span
                 >
               </div>
@@ -161,9 +155,7 @@
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
           <!-- Email -->
           <div class="space-y-2">
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
+            <label class="text-foreground block text-sm font-medium">
               Email
             </label>
             <div class="relative">
@@ -171,20 +163,18 @@
                 v-model="form.email"
                 type="email"
                 autocomplete="off"
-                class="w-full rounded-2xl border border-gray-200 bg-white/70 px-4 py-3 text-sm transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800/50 dark:text-white"
+                class="border-border bg-card/70 text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-2xl px-4 py-3 text-sm transition-all duration-200 focus:ring-2 focus:outline-none"
                 placeholder="your@email.com"
               />
             </div>
-            <p v-if="errors.email" class="mt-1 text-xs text-red-500">
+            <p v-if="errors.email" class="text-destructive mt-1 text-xs">
               {{ errors.email }}
             </p>
           </div>
 
           <!-- Mobile -->
           <div class="space-y-2">
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
+            <label class="text-foreground block text-sm font-medium">
               Mobile
             </label>
             <div class="relative">
@@ -192,11 +182,11 @@
                 v-model="form.mobile"
                 type="tel"
                 autocomplete="off"
-                class="w-full rounded-2xl border border-gray-200 bg-white/70 px-4 py-3 text-sm transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800/50 dark:text-white"
+                class="border-border bg-card/70 text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-2xl px-4 py-3 text-sm transition-all duration-200 focus:ring-2 focus:outline-none"
                 placeholder="Phone number"
               />
             </div>
-            <p v-if="errors.mobile" class="mt-1 text-xs text-red-500">
+            <p v-if="errors.mobile" class="text-destructive mt-1 text-xs">
               {{ errors.mobile }}
             </p>
           </div>
@@ -204,20 +194,18 @@
 
         <!-- Password -->
         <div class="space-y-2">
-          <label
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
+          <label class="text-foreground block text-sm font-medium">
             Password
           </label>
           <div class="relative">
             <input
               v-model="form.password"
               type="password"
-              class="w-full rounded-2xl border border-gray-200 bg-white/70 px-4 py-3 text-sm transition-all duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800/50 dark:text-white"
+              class="border-border bg-card/70 text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-2xl px-4 py-3 text-sm transition-all duration-200 focus:ring-2 focus:outline-none"
               placeholder="Leave empty to keep current"
             />
           </div>
-          <p v-if="errors.password" class="mt-1 text-xs text-red-500">
+          <p v-if="errors.password" class="text-destructive mt-1 text-xs">
             {{ errors.password }}
           </p>
         </div>
@@ -225,13 +213,11 @@
         <!-- Divider -->
         <div class="relative">
           <div class="absolute inset-0 flex items-center">
-            <div
-              class="w-full border-t border-gray-200 dark:border-gray-700"
-            ></div>
+            <div class="border-border w-full border-t"></div>
           </div>
           <div class="relative flex justify-center">
             <span
-              class="rounded-full bg-white px-4 text-sm text-gray-500 dark:bg-gray-900/40 dark:text-gray-400"
+              class="bg-card text-muted-foreground rounded-full px-4 text-sm"
             >
               Security
             </span>
@@ -240,15 +226,13 @@
 
         <!-- Passkey Section -->
         <div class="space-y-3">
-          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Passkeys
-          </h3>
+          <h3 class="text-foreground text-sm font-medium">Passkeys</h3>
           <button
             v-if="!hasPasskey"
             type="button"
             @click="handleAddPasskey"
             :disabled="addingPasskey"
-            class="w-full rounded-2xl bg-linear-to-r from-emerald-500 to-green-600 px-6 py-3.5 font-medium text-white shadow-lg shadow-emerald-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-emerald-500/30 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:outline-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-gray-900"
+            class="bg-success text-primary-foreground shadow-success/20 hover:shadow-success/30 focus:ring-success/30 w-full rounded-2xl px-6 py-3.5 font-medium shadow-lg transition-all duration-300 hover:scale-[1.02] focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span
               v-if="addingPasskey"
@@ -281,7 +265,7 @@
               <button
                 type="button"
                 :disabled="deletingPasskey"
-                class="w-full rounded-2xl bg-linear-to-r from-red-500 to-rose-600 px-6 py-3.5 font-medium text-white shadow-lg shadow-red-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-red-500/30 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-gray-900"
+                class="bg-destructive text-primary-foreground shadow-destructive/20 hover:shadow-destructive/30 focus:ring-destructive/30 w-full rounded-2xl px-6 py-3.5 font-medium shadow-lg transition-all duration-300 hover:scale-[1.02] focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <span
                   v-if="deletingPasskey"
@@ -315,22 +299,20 @@
                 <AlertDialogTitle class="text-xl font-bold"
                   >Are you absolutely sure?</AlertDialogTitle
                 >
-                <AlertDialogDescription
-                  class="text-gray-600 dark:text-gray-400"
-                >
+                <AlertDialogDescription class="text-muted-foreground">
                   This action cannot be undone. You will need to use your
                   password to log in after deleting your passkey.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter class="gap-3">
                 <AlertDialogCancel
-                  class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                  class="border-border bg-card text-foreground hover:bg-accent rounded-xl border px-4 py-2 text-sm font-medium"
                 >
                   Cancel
                 </AlertDialogCancel>
                 <AlertDialogAction
                   @click="handleDeletePasskey"
-                  class="rounded-xl bg-linear-to-r from-red-500 to-rose-600 px-4 py-2 text-sm font-medium text-white hover:from-red-600 hover:to-rose-700"
+                  class="bg-destructive text-primary-foreground hover:bg-destructive/90 rounded-xl px-4 py-2 text-sm font-medium"
                 >
                   Confirm
                 </AlertDialogAction>
@@ -342,8 +324,8 @@
             v-if="passkeyMessage"
             :class="[
               passkeyMessageType === 'success'
-                ? 'text-green-600 dark:text-green-400'
-                : 'text-red-600 dark:text-red-400',
+                ? 'text-success'
+                : 'text-destructive',
               'text-center text-sm',
             ]"
           >
@@ -353,15 +335,13 @@
 
         <!-- GitHub Section -->
         <div class="space-y-3">
-          <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-            GitHub Account
-          </h3>
+          <h3 class="text-foreground text-sm font-medium">GitHub Account</h3>
           <button
             v-if="!hasGitHubBound"
             type="button"
             @click="handleBindGitHub"
             :disabled="bindingGitHub"
-            class="w-full rounded-2xl bg-gray-900 px-6 py-3.5 font-medium text-white shadow-lg shadow-gray-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-gray-500/30 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-gray-900"
+            class="bg-card text-primary-foreground shadow-primary/20 hover:shadow-primary/30 focus:ring-primary w-full rounded-2xl px-6 py-3.5 font-medium shadow-lg transition-all duration-300 hover:scale-[1.02] focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span
               v-if="bindingGitHub"
@@ -388,7 +368,7 @@
             type="button"
             @click="handleBindGitHub"
             :disabled="bindingGitHub"
-            class="w-full rounded-2xl bg-gray-900 px-6 py-3.5 font-medium text-white shadow-lg shadow-gray-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-gray-500/30 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-gray-900"
+            class="w-full rounded-2xl bg-card px-6 py-3.5 font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-primary/30 focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span v-if="bindingGitHub" class="flex items-center justify-center gap-2">
               <span
@@ -413,7 +393,7 @@
                 v-if="hasGitHubBound"
                 type="button"
                 :disabled="unbindingGitHub"
-                class="w-full rounded-2xl bg-gray-900 px-6 py-3.5 font-medium text-white shadow-lg shadow-gray-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-gray-500/30 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-gray-900"
+                class="bg-card text-primary-foreground shadow-primary/20 hover:shadow-primary/30 focus:ring-primary w-full rounded-2xl px-6 py-3.5 font-medium shadow-lg transition-all duration-300 hover:scale-[1.02] focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <span
                   v-if="unbindingGitHub"
@@ -447,22 +427,20 @@
                 <AlertDialogTitle class="text-xl font-bold"
                   >Are you absolutely sure?</AlertDialogTitle
                 >
-                <AlertDialogDescription
-                  class="text-gray-600 dark:text-gray-400"
-                >
+                <AlertDialogDescription class="text-muted-foreground">
                   This action will unbind your GitHub account from your profile.
                   You will no longer be able to log in with GitHub after this.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter class="gap-3">
                 <AlertDialogCancel
-                  class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                  class="border-border bg-card text-foreground hover:bg-accent rounded-xl border px-4 py-2 text-sm font-medium"
                 >
                   Cancel
                 </AlertDialogCancel>
                 <AlertDialogAction
                   @click="handleUnbindGitHub"
-                  class="rounded-xl bg-linear-to-r from-red-500 to-rose-600 px-4 py-2 text-sm font-medium text-white hover:from-red-600 hover:to-rose-700"
+                  class="bg-destructive text-primary-foreground hover:bg-destructive/90 rounded-xl px-4 py-2 text-sm font-medium"
                 >
                   Confirm
                 </AlertDialogAction>
@@ -474,8 +452,8 @@
             v-if="githubMessage"
             :class="[
               githubMessageType === 'success'
-                ? 'text-green-600 dark:text-green-400'
-                : 'text-red-600 dark:text-red-400',
+                ? 'text-success'
+                : 'text-destructive',
               'text-center text-sm',
             ]"
           >
@@ -487,7 +465,7 @@
         <button
           type="submit"
           :disabled="saving"
-          class="mt-4 w-full rounded-2xl bg-linear-to-r from-blue-500 to-sky-600 px-6 py-4 font-medium text-white shadow-lg shadow-blue-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-blue-500/30 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-gray-900"
+          class="bg-primary text-primary-foreground shadow-primary/20 hover:shadow-primary/30 focus:ring-primary/30 mt-4 w-full rounded-2xl px-6 py-4 font-medium shadow-lg transition-all duration-300 hover:scale-[1.02] focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span v-if="saving" class="flex items-center justify-center gap-2">
             <span
@@ -519,8 +497,8 @@
             <div
               :class="[
                 messageType === 'success'
-                  ? 'border-green-200 bg-linear-to-r from-green-50 to-emerald-50 text-green-700 dark:border-green-800/30 dark:from-green-900/20 dark:to-emerald-900/20 dark:text-green-400'
-                  : 'border-red-200 bg-linear-to-r from-red-50 to-rose-50 text-red-700 dark:border-red-800/30 dark:from-red-900/20 dark:to-rose-900/20 dark:text-red-400',
+                  ? 'border-success/30 bg-success/10 text-success'
+                  : 'border-destructive/30 bg-destructive/10 text-destructive',
                 'rounded-2xl border p-4 text-center text-sm',
               ]"
             >

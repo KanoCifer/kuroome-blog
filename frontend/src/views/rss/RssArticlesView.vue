@@ -5,7 +5,7 @@
       <div class="mb-6 flex items-center gap-3">
         <button
           @click="router.push('/rss')"
-          class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:bg-slate-800 dark:text-blue-300 dark:hover:bg-slate-700"
+          class="bg-primary/15 text-primary hover:bg-accent inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -25,7 +25,7 @@
         </button>
         <router-link
           to="/rss"
-          class="ml-auto text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+          class="text-primary hover:text-primary ml-auto text-sm"
         >
           管理订阅
         </router-link>
@@ -43,7 +43,7 @@
               viewBox="0 0 24 24"
               stroke-width="2"
               stroke="currentColor"
-              class="h-5 w-5 text-blue-500 dark:text-blue-400"
+              class="text-primary h-5 w-5"
             >
               <path
                 stroke-linecap="round"
@@ -56,13 +56,13 @@
             v-model="searchQuery"
             type="search"
             placeholder="搜索文章标题和内容..."
-            class="block w-full rounded-xl border border-blue-200 bg-white py-3 pr-4 pl-10 text-sm text-blue-900 placeholder:text-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-blue-500"
+            class="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 block w-full rounded-xl border py-3 pr-4 pl-10 text-sm focus:ring-2 focus:outline-none"
             @keyup.enter="handleSearch"
           />
           <button
             v-if="searchQuery"
             @click="clearSearch"
-            class="absolute inset-y-0 right-0 flex items-center pr-3 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+            class="text-primary hover:text-primary absolute inset-y-0 right-0 flex items-center pr-3"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -87,25 +87,23 @@
         <div
           v-for="i in 5"
           :key="i"
-          class="animate-pulse overflow-hidden rounded-xl border border-blue-100 bg-white p-5 dark:border-slate-700 dark:bg-slate-800"
+          class="border-border bg-card animate-pulse overflow-hidden rounded-xl border p-5"
         >
-          <div class="mb-3 h-6 w-3/4 rounded bg-blue-200 dark:bg-slate-700" />
-          <div class="mb-4 h-4 w-full rounded bg-blue-100 dark:bg-slate-700" />
-          <div class="h-4 w-1/3 rounded bg-blue-100 dark:bg-slate-700" />
+          <div class="bg-muted mb-3 h-6 w-3/4 rounded" />
+          <div class="bg-muted mb-4 h-4 w-full rounded" />
+          <div class="bg-muted h-4 w-1/3 rounded" />
         </div>
       </div>
 
       <!-- 错误状态 -->
       <div
         v-else-if="errorMessage"
-        class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-red-200 bg-red-50 py-16 text-center dark:border-red-800 dark:bg-red-900/20"
+        class="border-destructive/30 bg-destructive/10 flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 text-center"
       >
-        <p class="text-lg font-medium text-red-600 dark:text-red-400">
-          加载失败
-        </p>
-        <p class="mt-1 text-sm text-red-500">{{ errorMessage }}</p>
+        <p class="text-destructive text-lg font-medium">加载失败</p>
+        <p class="text-destructive mt-1 text-sm">{{ errorMessage }}</p>
         <button
-          class="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none"
+          class="bg-destructive text-primary-foreground hover:bg-destructive/90 mt-4 rounded-lg px-4 py-2 text-sm font-medium focus:outline-none"
           @click="fetchArticles(currentPage)"
         >
           重试
@@ -115,9 +113,9 @@
       <!-- 空状态 -->
       <div
         v-else-if="articles.length === 0"
-        class="flex flex-col items-center justify-center rounded-2xl border border-blue-100 bg-white py-16 text-center dark:border-slate-700 dark:bg-slate-800"
+        class="border-border bg-card flex flex-col items-center justify-center rounded-2xl border py-16 text-center"
       >
-        <p class="text-lg font-medium text-blue-500">暂无文章</p>
+        <p class="text-primary text-lg font-medium">暂无文章</p>
       </div>
 
       <!-- 文章列表 -->
@@ -126,25 +124,25 @@
           <li
             v-for="article in articles"
             :key="article.id"
-            class="group relative overflow-hidden rounded-xl border border-blue-100 bg-white p-6 shadow-sm transition-all hover:border-blue-300 hover:bg-blue-50/30 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600 dark:hover:bg-slate-700/50"
+            class="group border-border bg-card hover:border-primary/30 hover:bg-primary/5 relative overflow-hidden rounded-xl border p-6 shadow-sm transition-all"
           >
             <div class="flex flex-col gap-3">
               <div class="flex items-start justify-between gap-4">
                 <router-link
                   :to="`/rss/articles/${article.id}`"
-                  class="block text-lg font-bold text-blue-900 transition-colors hover:text-blue-600 dark:text-white dark:hover:text-blue-400"
+                  class="text-primary hover:text-primary block text-lg font-bold transition-colors"
                 >
                   {{ article.title || "无标题" }}
                 </router-link>
                 <span
-                  class="inline-flex shrink-0 items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/50 dark:text-blue-300"
+                  class="bg-primary/15 text-primary inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium"
                 >
                   {{ article.is_read ? "已读" : "未读" }}
                 </span>
               </div>
 
               <div
-                class="mt-1 flex flex-wrap items-center gap-3 text-xs text-blue-500 dark:text-blue-400"
+                class="text-primary mt-1 flex flex-wrap items-center gap-3 text-xs"
               >
                 <span v-if="article.author" class="font-medium">{{
                   article.author
@@ -163,7 +161,7 @@
               <!-- 摘要 -->
               <p
                 v-if="article.summary"
-                class="mt-3 line-clamp-2 text-sm text-blue-600 dark:text-blue-400"
+                class="text-primary mt-3 line-clamp-2 text-sm"
               >
                 {{ article.summary }}
               </p>
@@ -180,17 +178,15 @@
                 class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
                 :class="
                   currentPage > 1
-                    ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
-                    : 'cursor-not-allowed bg-blue-100 text-blue-400 dark:bg-slate-800 dark:text-slate-600'
+                    ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                    : 'bg-muted text-muted-foreground cursor-not-allowed'
                 "
                 @click="goToPage(currentPage - 1)"
               >
                 上一页
               </button>
             </li>
-            <li
-              class="px-2 text-sm font-medium text-blue-700 dark:text-blue-300"
-            >
+            <li class="text-primary px-2 text-sm font-medium">
               第 {{ currentPage }} 页 / 共 {{ totalPages }} 页
             </li>
             <li>
@@ -199,8 +195,8 @@
                 class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
                 :class="
                   currentPage < totalPages
-                    ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
-                    : 'cursor-not-allowed bg-blue-100 text-blue-400 dark:bg-slate-800 dark:text-slate-600'
+                    ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                    : 'bg-muted text-muted-foreground cursor-not-allowed'
                 "
                 @click="goToPage(currentPage + 1)"
               >

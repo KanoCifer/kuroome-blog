@@ -48,49 +48,43 @@ const submitReply = () => {
   >
     <div
       :class="[
-        'mb-2',
+        'relative rounded-2xl border p-5 shadow-sm transition-shadow hover:shadow-md',
         !comment.reviewed
-          ? 'gap-y-4 border-yellow-300 bg-yellow-50 ring-4 ring-yellow-50/50 dark:border-yellow-700/50 dark:bg-yellow-900/20 dark:ring-yellow-900/30'
-          : 'bg-white dark:bg-gray-800',
+          ? 'border-warning/30 bg-warning/10 ring-warning/5 gap-y-4 ring-4'
+          : 'border-border bg-card',
       ]"
-      class="relative rounded-2xl border border-gray-100 p-5 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700"
     >
       <div class="mb-3 flex items-start justify-between">
         <div class="flex items-center gap-3">
           <div
             :class="[
               'flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold',
-              'bg-linear-to-br from-blue-50 to-blue-100 text-blue-600 dark:from-sky-900 dark:to-blue-900 dark:text-blue-300',
+              'bg-primary/10 text-primary',
             ]"
           >
             {{ comment.author?.charAt(0).toUpperCase() || "?" }}
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <span class="font-semibold text-gray-900 dark:text-gray-100">{{
+              <span class="text-foreground font-semibold">{{
                 comment.author
               }}</span>
               <span
                 v-if="!comment.reviewed"
-                class="inline-flex items-center rounded-md bg-yellow-50 px-2 py-0.5 text-xs font-medium text-yellow-800 ring-1 ring-yellow-600/20 ring-inset dark:bg-yellow-900/40 dark:text-yellow-300 dark:ring-yellow-300/20"
+                class="bg-warning/10 text-warning ring-warning/20 inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-inset"
               >
                 Pending
               </span>
             </div>
-            <div class="text-xs text-gray-500 dark:text-gray-400">
+            <div class="text-muted-foreground text-xs">
               {{ comment.created_at ? formatDate(comment.created_at) : "N/A" }}
             </div>
           </div>
         </div>
       </div>
 
-      <div
-        class="prose prose-sm dark:prose-invert max-w-none text-gray-700 dark:text-gray-300"
-      >
-        <span
-          v-if="comment.reply_to_author"
-          class="font-medium text-blue-600 dark:text-blue-400"
-        >
+      <div class="prose prose-sm dark:prose-invert text-foreground max-w-none">
+        <span v-if="comment.reply_to_author" class="text-primary font-medium">
           @{{ comment.reply_to_author }}
         </span>
         <span v-if="comment.reply_to_author">&nbsp;</span>
@@ -105,11 +99,11 @@ const submitReply = () => {
               v-model="replyBody"
               :placeholder="`Reply to @${comment.author}...`"
               rows="3"
-              class="w-full resize-none rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-900/30"
+              class="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/10 w-full resize-none rounded-lg border px-4 py-2.5 text-sm transition-all duration-200 focus:ring-2 focus:outline-none"
               @keydown.ctrl.enter="submitReply"
             ></textarea>
             <div
-              class="absolute right-2 bottom-2 text-xs text-gray-400 dark:text-gray-500"
+              class="text-muted-foreground absolute right-2 bottom-2 text-xs"
             >
               Ctrl+Enter to submit
             </div>
@@ -118,7 +112,7 @@ const submitReply = () => {
         <div class="flex items-center justify-end gap-2">
           <button
             type="button"
-            class="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+            class="text-muted-foreground hover:bg-accent hover:text-foreground rounded-lg px-4 py-2 text-sm font-medium transition-colors"
             @click="cancelReply"
           >
             Cancel
@@ -129,8 +123,8 @@ const submitReply = () => {
             :class="[
               'rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200',
               replyBody.trim()
-                ? 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md dark:bg-blue-500 dark:hover:bg-blue-600'
-                : 'cursor-not-allowed bg-gray-300 text-gray-500 dark:bg-gray-600 dark:text-gray-400',
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                : 'bg-muted text-muted-foreground cursor-not-allowed',
             ]"
             @click="submitReply"
           >
@@ -140,13 +134,13 @@ const submitReply = () => {
       </div>
 
       <div
-        class="mt-4 flex items-center justify-between border-t border-gray-50 pt-3 dark:border-gray-700"
+        class="border-border mt-4 flex items-center justify-between border-t pt-3"
       >
         <div>
           <button
             v-if="!isReplying"
             type="button"
-            class="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
+            class="text-muted-foreground hover:text-primary inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
             @click="startReply"
           >
             <svg
@@ -169,13 +163,13 @@ const submitReply = () => {
         <div v-if="!comment.reviewed" class="flex gap-2">
           <button
             type="button"
-            class="rounded-md bg-green-50 px-2.5 py-1.5 text-xs font-medium text-green-700 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50"
+            class="bg-success/10 text-success hover:bg-success/15 rounded-md px-2.5 py-1.5 text-xs font-medium"
           >
             Approve
           </button>
           <button
             type="button"
-            class="rounded-md bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
+            class="bg-destructive/10 text-destructive hover:bg-destructive/15 rounded-md px-2.5 py-1.5 text-xs font-medium"
           >
             Delete
           </button>

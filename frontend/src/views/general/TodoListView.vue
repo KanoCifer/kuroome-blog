@@ -3,13 +3,13 @@
     <div class="col-span-full mx-auto max-w-3xl px-4">
       <!-- Add Todo Form -->
       <div
-        class="mb-8 overflow-hidden rounded-3xl border border-gray-200/60 bg-white/60 p-6 shadow-sm backdrop-blur-xl transition-all dark:border-gray-800 dark:bg-gray-900/60"
+        class="border-border/60 bg-card/60 mb-8 overflow-hidden rounded-3xl border p-6 shadow-sm backdrop-blur-xl transition-all"
       >
         <input
           v-model="newTodoForm.text"
           type="text"
           placeholder="添加新待办..."
-          class="w-full rounded-xl border-none bg-transparent px-2 py-2 text-lg font-medium outline-none placeholder:text-gray-400 focus:ring-0 dark:text-gray-100 dark:placeholder:text-gray-500"
+          class="placeholder:text-muted-foreground text-foreground w-full rounded-xl border-none bg-transparent px-2 py-2 text-lg font-medium outline-none focus:ring-0"
           @keyup.enter="submitAddTodo"
         />
 
@@ -18,18 +18,17 @@
             v-model="newTodoForm.description"
             placeholder="添加描述... (可选)"
             rows="2"
-            class="w-full resize-none rounded-xl border border-gray-100 bg-white/80 p-3 text-sm transition-all outline-none focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-100 dark:border-gray-800 dark:bg-gray-950/50 dark:text-gray-300 dark:focus:border-blue-700 dark:focus:ring-blue-900/30"
+            class="border-border bg-card/80 focus:border-primary focus:bg-card focus:ring-primary/15 w-full resize-none rounded-xl border p-3 text-sm transition-all outline-none focus:ring-4"
           ></textarea>
 
           <div class="flex flex-wrap items-center gap-4">
             <div class="flex items-center gap-2">
-              <label
-                class="text-sm font-medium text-gray-500 dark:text-gray-400"
+              <label class="text-muted-foreground text-sm font-medium"
                 >优先级</label
               >
               <select
                 v-model="newTodoForm.priority"
-                class="cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                class="border-border bg-card text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
               >
                 <option value="low">低</option>
                 <option value="medium">中</option>
@@ -38,14 +37,13 @@
             </div>
 
             <div class="flex items-center gap-2">
-              <label
-                class="text-sm font-medium text-gray-500 dark:text-gray-400"
+              <label class="text-muted-foreground text-sm font-medium"
                 >截止日期</label
               >
               <input
                 v-model="newTodoForm.dueDate"
                 type="date"
-                class="cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                class="border-border bg-card text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
               />
             </div>
 
@@ -53,7 +51,7 @@
               <button
                 @click="submitAddTodo"
                 :disabled="!newTodoForm.text.trim()"
-                class="flex cursor-pointer items-center gap-2 rounded-xl bg-gray-900 px-5 py-2 font-medium text-white transition-all hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+                class="bg-primary text-primary-foreground hover:bg-primary/90 flex cursor-pointer items-center gap-2 rounded-xl px-5 py-2 font-medium transition-all disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -85,8 +83,8 @@
             class="cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-300"
             :class="[
               filter === f
-                ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900'
-                : 'text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-800',
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:bg-accent',
             ]"
             @click="filter = f"
           >
@@ -95,12 +93,10 @@
         </div>
 
         <div class="flex items-center gap-2">
-          <span class="text-sm font-medium text-gray-500 dark:text-gray-400"
-            >排序:</span
-          >
+          <span class="text-muted-foreground text-sm font-medium">排序:</span>
           <select
             v-model="sortMode"
-            class="cursor-pointer rounded-lg border border-gray-200 bg-white/50 px-3 py-1.5 text-sm font-medium backdrop-blur-sm outline-none dark:border-gray-700 dark:bg-gray-900/50 dark:text-gray-200"
+            class="border-border bg-card/50 text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm font-medium backdrop-blur-sm outline-none"
           >
             <option value="createdAt">创建时间</option>
             <option value="priority">优先级</option>
@@ -124,24 +120,24 @@
         <li
           v-for="todo in displayTodos"
           :key="todo.id"
-          class="group relative flex flex-col gap-4 rounded-2xl border border-gray-200/60 bg-white/50 p-5 shadow-sm transition-all duration-300 hover:border-gray-300 hover:shadow-md dark:border-gray-800 dark:bg-gray-900/60"
+          class="group bg-card/50 border-border/60 hover:border-border relative flex flex-col gap-4 rounded-2xl border p-5 shadow-sm transition-all duration-300 hover:shadow-md"
           :class="[todo.archived ? 'opacity-70' : '']"
         >
           <div v-if="editingId === todo.id" class="w-full space-y-4">
             <!-- Edit Mode -->
             <input
               v-model="editingForm.text"
-              class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-lg font-medium outline-none focus:border-blue-400 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+              class="border-border bg-card focus:border-primary text-foreground w-full rounded-xl border px-4 py-2 text-lg font-medium outline-none"
             />
             <textarea
               v-model="editingForm.description"
               rows="2"
-              class="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:border-blue-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+              class="focus:border-primary border-border bg-card text-foreground w-full resize-none rounded-xl border px-4 py-2 text-sm outline-none"
             ></textarea>
             <div class="flex flex-wrap items-center gap-4">
               <select
                 v-model="editingForm.priority"
-                class="cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                class="border-border bg-card text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
               >
                 <option value="low">低</option>
                 <option value="medium">中</option>
@@ -150,18 +146,18 @@
               <input
                 type="date"
                 v-model="editingForm.dueDate"
-                class="cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                class="border-border bg-card text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
               />
               <div class="ml-auto flex gap-2">
                 <button
                   @click="cancelEdit"
-                  class="cursor-pointer rounded-xl bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                  class="bg-muted text-foreground hover:bg-accent cursor-pointer rounded-xl px-4 py-2 text-sm font-medium transition-colors"
                 >
                   取消
                 </button>
                 <button
                   @click="saveEdit"
-                  class="cursor-pointer rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                  class="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer rounded-xl px-4 py-2 text-sm font-medium transition-colors"
                 >
                   保存
                 </button>
@@ -175,15 +171,15 @@
               class="mt-1 flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-lg border-2 transition-all duration-300"
               :class="[
                 todo.completed
-                  ? 'border-blue-500 bg-blue-500'
-                  : 'border-gray-300 hover:border-blue-400 dark:border-gray-600',
+                  ? 'border-primary bg-primary'
+                  : 'hover:border-primary border-gray-300 dark:border-gray-600',
               ]"
               @click="todoStore.toggleTodo(todo.id)"
             >
               <svg
                 v-if="todo.completed"
                 xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4 text-white"
+                class="text-primary-foreground h-4 w-4"
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -201,8 +197,8 @@
                   class="text-lg font-medium wrap-break-word transition-all duration-300"
                   :class="[
                     todo.completed
-                      ? 'text-gray-400 line-through'
-                      : 'text-gray-900 dark:text-gray-100',
+                      ? 'text-muted-foreground line-through'
+                      : 'text-foreground',
                   ]"
                 >
                   {{ todo.text }}
@@ -212,11 +208,11 @@
                 <span
                   class="rounded-full border px-2 py-0.5 text-xs font-medium"
                   :class="{
-                    'border-blue-200 bg-blue-50 text-blue-600 dark:border-blue-900/50 dark:bg-blue-900/20 dark:text-blue-400':
+                    'border-primary/20 bg-primary/10 text-primary':
                       todo.priority === 'low',
-                    'border-yellow-200 bg-yellow-50 text-yellow-600 dark:border-yellow-900/50 dark:bg-yellow-900/20 dark:text-yellow-400':
+                    'border-warning/20 bg-warning/10 text-warning':
                       todo.priority === 'medium',
-                    'border-red-200 bg-red-50 text-red-600 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400':
+                    'border-destructive/20 bg-destructive/10 text-destructive':
                       todo.priority === 'high',
                   }"
                 >
@@ -228,8 +224,8 @@
                   class="flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium"
                   :class="
                     isOverdue(todo.dueDate) && !todo.completed
-                      ? 'border-red-200 bg-red-50 text-red-600 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400'
-                      : 'border-gray-200 bg-gray-50 text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400'
+                      ? 'border-destructive/20 bg-destructive/10 text-destructive'
+                      : 'border-border bg-muted text-muted-foreground'
                   "
                 >
                   <svg
@@ -250,13 +246,13 @@
 
               <p
                 v-if="todo.description"
-                class="mt-2 line-clamp-2 text-sm text-gray-600 dark:text-gray-400"
+                class="text-muted-foreground mt-2 line-clamp-2 text-sm"
                 :class="[todo.completed ? 'opacity-60' : '']"
               >
                 {{ todo.description }}
               </p>
 
-              <div class="mt-3 text-xs text-gray-400 dark:text-gray-500">
+              <div class="text-muted-foreground mt-3 text-xs">
                 创建于 {{ formatDate(todo.createdAt) }}
               </div>
             </div>
@@ -268,7 +264,7 @@
               <button
                 v-if="!todo.archived"
                 @click="todoStore.archiveTodo(todo.id)"
-                class="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-amber-50 hover:text-amber-600 dark:hover:bg-amber-900/20 dark:hover:text-amber-400"
+                class="text-muted-foreground hover:bg-warning/10 hover:text-warning cursor-pointer rounded-lg p-2 transition-colors"
                 title="归档"
               >
                 <svg
@@ -289,7 +285,7 @@
               <button
                 v-if="todo.archived"
                 @click="todoStore.unarchiveTodo(todo.id)"
-                class="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-900/20 dark:hover:text-green-400"
+                class="text-muted-foreground hover:bg-success/10 hover:text-success cursor-pointer rounded-lg p-2 transition-colors"
                 title="取消归档"
               >
                 <svg
@@ -309,7 +305,7 @@
               </button>
               <button
                 @click="startEdit(todo)"
-                class="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-blue-600 dark:hover:bg-gray-800 dark:hover:text-blue-400"
+                class="text-muted-foreground hover:bg-accent hover:text-primary cursor-pointer rounded-lg p-2 transition-colors"
                 title="编辑"
               >
                 <svg
@@ -329,7 +325,7 @@
               </button>
               <button
                 @click="todoStore.removeTodo(todo.id)"
-                class="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
+                class="text-muted-foreground hover:bg-destructive/10 hover:text-destructive cursor-pointer rounded-lg p-2 transition-colors"
                 title="删除"
               >
                 <svg
@@ -355,11 +351,11 @@
       <!-- Empty State -->
       <div v-if="displayTodos.length === 0" class="mt-20 text-center">
         <div
-          class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-3xl bg-gray-100 dark:bg-gray-800"
+          class="bg-muted mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-3xl"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="h-10 w-10 text-gray-400"
+            class="text-muted-foreground h-10 w-10"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -372,10 +368,10 @@
             />
           </svg>
         </div>
-        <h3 class="text-xl font-medium text-gray-900 dark:text-gray-100">
+        <h3 class="text-foreground text-xl font-medium">
           {{ filter === "archived" ? "暂无归档" : "暂无事项" }}
         </h3>
-        <p class="mt-2 text-gray-500">
+        <p class="text-muted-foreground mt-2">
           {{
             filter === "archived"
               ? "归档的任务会显示在这里"
@@ -391,7 +387,7 @@
       >
         <button
           @click="todoStore.archiveCompleted()"
-          class="flex cursor-pointer items-center gap-2 rounded-xl bg-gray-100 px-6 py-2.5 text-sm font-medium text-gray-600 transition-all hover:bg-amber-50 hover:text-amber-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-amber-900/20 dark:hover:text-amber-400"
+          class="bg-muted text-muted-foreground hover:bg-warning/10 hover:text-warning flex cursor-pointer items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-medium transition-all"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -411,7 +407,7 @@
         </button>
         <button
           @click="todoStore.clearCompleted()"
-          class="flex cursor-pointer items-center gap-2 rounded-xl bg-gray-100 px-6 py-2.5 text-sm font-medium text-gray-600 transition-all hover:bg-red-50 hover:text-red-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+          class="bg-muted text-muted-foreground hover:bg-destructive/10 hover:text-destructive flex cursor-pointer items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-medium transition-all"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

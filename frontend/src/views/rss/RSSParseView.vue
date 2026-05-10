@@ -4,7 +4,7 @@
       <!-- 页面标题 -->
       <div class="mb-8 flex items-center gap-3">
         <div
-          class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400"
+          class="bg-primary/15 text-primary flex h-12 w-12 items-center justify-center rounded-2xl"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -22,24 +22,18 @@
           </svg>
         </div>
         <div>
-          <h2 class="text-2xl font-bold text-blue-900 dark:text-white">
-            解析订阅
-          </h2>
-          <p class="mt-1 text-sm text-blue-600 dark:text-blue-400">
-            输入 RSS/Atom 地址开始阅读
-          </p>
+          <h2 class="text-primary text-2xl font-bold">解析订阅</h2>
+          <p class="text-primary mt-1 text-sm">输入 RSS/Atom 地址开始阅读</p>
         </div>
         <RouterLink
           to="/rss"
-          class="ml-auto text-sm font-medium text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+          class="text-primary hover:text-primary ml-auto text-sm font-medium transition-colors"
           >管理订阅</RouterLink
         >
       </div>
 
       <!-- 输入区域 -->
-      <div
-        class="mb-8 rounded-2xl border border-blue-100 bg-white p-6 dark:border-slate-700 dark:bg-slate-800"
-      >
+      <div class="border-border bg-card mb-8 rounded-2xl border p-6">
         <form
           @submit.prevent="parseRss"
           class="flex flex-col gap-4 sm:flex-row sm:items-end"
@@ -47,7 +41,7 @@
           <div class="flex-1">
             <label
               for="rss-url"
-              class="mb-2 block text-sm font-medium text-blue-800 dark:text-blue-200"
+              class="text-primary mb-2 block text-sm font-medium"
             >
               RSS/Atom 订阅地址
             </label>
@@ -61,7 +55,7 @@
                   viewBox="0 0 24 24"
                   stroke-width="1.5"
                   stroke="currentColor"
-                  class="h-5 w-5 text-blue-400"
+                  class="text-muted-foreground h-5 w-5"
                 >
                   <path
                     stroke-linecap="round"
@@ -75,7 +69,7 @@
                 v-model="rssForm.rssUrl"
                 type="text"
                 placeholder="https://example.com/feed.xml"
-                class="w-full rounded-xl border border-blue-200 bg-blue-50 py-3 pr-4 pl-12 text-blue-900 transition-all placeholder:text-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-slate-600 dark:bg-slate-700/50 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-blue-400"
+                class="placeholder:text-muted-foreground border-border bg-card text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border py-3 pr-4 pl-12 transition-all focus:ring-2 focus:outline-none"
               />
             </div>
           </div>
@@ -84,7 +78,7 @@
           <button
             type="button"
             @click="rssForm.saveToDb = !rssForm.saveToDb"
-            class="flex items-center justify-center gap-2 rounded-xl border border-blue-300 bg-blue-100 px-8 py-3 font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:border-slate-700 dark:bg-slate-700/50 dark:text-blue-300 dark:hover:bg-slate-600/50"
+            class="border-primary/30 bg-primary/15 text-primary hover:bg-accent flex items-center justify-center gap-2 rounded-xl border px-8 py-3 font-medium transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -105,7 +99,7 @@
           <button
             type="submit"
             :disabled="isLoading"
-            class="flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-8 py-3 font-semibold text-white transition-all hover:bg-orange-600 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-orange-500 dark:ring-offset-slate-800"
+            class="bg-warning text-warning-foreground hover:bg-warning/90 focus:ring-warning disabled:hover:bg-warning flex items-center justify-center gap-2 rounded-xl px-8 py-3 font-semibold transition-all focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70"
           >
             <svg
               v-if="isLoading"
@@ -149,27 +143,23 @@
 
         <!-- 快捷链接 -->
         <div class="mt-4 flex flex-wrap gap-2">
-          <span class="text-sm text-blue-600 dark:text-blue-400"
-            >快捷尝试:</span
-          >
+          <span class="text-primary text-sm">快捷尝试:</span>
           <button
             v-for="example in exampleFeeds"
             :key="example.url"
             type="button"
-            class="cursor-pointer rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:bg-slate-700 dark:text-blue-300 dark:hover:bg-slate-600"
+            class="bg-primary/15 text-primary hover:bg-accent cursor-pointer rounded-full px-3 py-1 text-xs font-medium transition-colors"
             @click="rssForm.rssUrl = example.url"
           >
             {{ example.name }}
           </button>
 
-          <span class="text-sm text-blue-600 dark:text-blue-400"
-            >历史记录:</span
-          >
+          <span class="text-primary text-sm">历史记录:</span>
           <button
             v-for="history in rssHistory.slice(0, 3)"
             :key="history"
             type="button"
-            class="cursor-pointer rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-200 dark:bg-slate-700 dark:text-blue-300 dark:hover:bg-slate-600"
+            class="bg-primary/15 text-primary hover:bg-accent cursor-pointer rounded-full px-3 py-1 text-xs font-medium transition-colors"
             @click="rssForm.rssUrl = history"
           >
             {{ history }}
@@ -182,28 +172,28 @@
         <div
           v-for="i in 3"
           :key="i"
-          class="animate-pulse overflow-hidden rounded-xl border border-blue-100 bg-white p-5 dark:border-slate-700 dark:bg-slate-800"
+          class="border-border bg-card animate-pulse overflow-hidden rounded-xl border p-5"
         >
-          <div class="mb-3 h-6 w-3/4 rounded bg-blue-200 dark:bg-slate-700" />
-          <div class="mb-4 h-4 w-full rounded bg-blue-100 dark:bg-slate-700" />
-          <div class="h-4 w-1/3 rounded bg-blue-100 dark:bg-slate-700" />
+          <div class="bg-muted mb-3 h-6 w-3/4 rounded" />
+          <div class="bg-muted mb-4 h-4 w-full rounded" />
+          <div class="bg-muted h-4 w-1/3 rounded" />
         </div>
       </div>
 
       <!-- RSS 元数据 -->
       <div
         v-else-if="rssMetadata"
-        class="mb-6 overflow-hidden rounded-2xl border border-blue-100 bg-white dark:border-slate-700 dark:bg-slate-800"
+        class="border-border bg-card mb-6 overflow-hidden rounded-2xl border"
       >
-        <div class="border-b border-blue-100 p-6 dark:border-slate-700">
+        <div class="border-border border-b p-6">
           <div class="flex items-start justify-between">
             <div class="min-w-0 flex-1">
-              <h2 class="mb-2 text-xl font-bold text-blue-900 dark:text-white">
+              <h2 class="text-primary mb-2 text-xl font-bold">
                 {{ rssMetadata.title }}
               </h2>
               <p
                 v-if="rssMetadata.description"
-                class="mb-3 text-sm text-blue-600 dark:text-blue-400"
+                class="text-primary mb-3 text-sm"
               >
                 {{ rssMetadata.description }}
               </p>
@@ -211,7 +201,7 @@
                 :href="rssMetadata.link"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                class="text-primary hover:text-primary inline-flex cursor-pointer items-center gap-1 text-sm font-medium transition-colors"
               >
                 访问原站
                 <svg
@@ -231,7 +221,7 @@
               </a>
             </div>
             <div
-              class="ml-4 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400"
+              class="bg-primary/15 text-primary ml-4 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -251,7 +241,7 @@
           </div>
           <div
             v-if="rssMetadata.published"
-            class="mt-3 flex items-center gap-2 text-xs text-blue-500"
+            class="text-muted-foreground mt-3 flex items-center gap-2 text-xs"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -273,7 +263,7 @@
 
         <!-- 统计信息 -->
         <div
-          class="flex items-center gap-6 border-t border-blue-100 bg-blue-50/50 px-6 py-4 dark:border-slate-700 dark:bg-slate-700/20"
+          class="border-border bg-muted/50 flex items-center gap-6 border-t px-6 py-4"
         >
           <div class="flex items-center gap-2">
             <svg
@@ -282,7 +272,7 @@
               viewBox="0 0 24 24"
               stroke-width="1.5"
               stroke="currentColor"
-              class="h-5 w-5 text-blue-500"
+              class="text-muted-foreground h-5 w-5"
             >
               <path
                 stroke-linecap="round"
@@ -290,7 +280,7 @@
                 d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"
               />
             </svg>
-            <span class="text-sm font-medium text-blue-700 dark:text-blue-300"
+            <span class="text-foreground text-sm font-medium"
               >共 {{ rssEntries.length }} 篇文章</span
             >
           </div>
@@ -299,16 +289,14 @@
 
       <!-- RSS 条目列表 -->
       <div v-if="rssEntries.length > 0" class="space-y-4">
-        <h3
-          class="mb-4 flex items-center gap-2 text-lg font-bold text-blue-900 dark:text-white"
-        >
+        <h3 class="text-primary mb-4 flex items-center gap-2 text-lg font-bold">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="h-5 w-5 text-blue-500"
+            class="text-primary h-5 w-5"
           >
             <path
               stroke-linecap="round"
@@ -322,7 +310,7 @@
           <li
             v-for="(entry, index) in rssEntries"
             :key="entry.link"
-            class="group relative overflow-hidden rounded-xl border border-blue-100 bg-white p-5 transition-all hover:border-blue-300 hover:bg-blue-50/30 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-600 dark:hover:bg-slate-700/50"
+            class="group border-border bg-card hover:border-primary/30 hover:bg-primary/5 relative overflow-hidden rounded-xl border p-5 transition-all"
             :style="{ '--index': index }"
           >
             <div
@@ -333,18 +321,18 @@
                   :href="entry.link"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="block cursor-pointer font-semibold text-blue-900 transition-colors hover:text-blue-600 dark:text-white dark:hover:text-blue-400"
+                  class="text-foreground hover:text-primary block cursor-pointer font-semibold transition-colors"
                 >
                   {{ entry.title }}
                 </a>
                 <p
                   v-if="entry.summary"
-                  class="mt-2 line-clamp-2 text-sm text-blue-600 dark:text-blue-400"
+                  class="text-primary mt-2 line-clamp-2 text-sm"
                 >
                   {{ truncateSummary(entry.summary) }}
                 </p>
                 <div
-                  class="mt-3 flex flex-wrap items-center gap-3 text-xs text-blue-500"
+                  class="text-muted-foreground mt-3 flex flex-wrap items-center gap-3 text-xs"
                 >
                   <span v-if="entry.published" class="flex items-center gap-1">
                     <svg
@@ -367,7 +355,7 @@
                     :href="entry.link"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="flex cursor-pointer items-center gap-1 text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                    class="text-primary hover:text-primary flex cursor-pointer items-center gap-1 transition-colors"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -395,10 +383,10 @@
       <!-- 空状态 -->
       <div
         v-else-if="!isLoading && !rssMetadata"
-        class="flex flex-col items-center justify-center rounded-2xl border border-blue-100 bg-white py-16 dark:border-slate-700 dark:bg-slate-800"
+        class="border-border bg-card flex flex-col items-center justify-center rounded-2xl border py-16"
       >
         <div
-          class="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-blue-100 text-blue-400 dark:bg-slate-700 dark:text-blue-500"
+          class="text-muted-foreground bg-muted mb-4 flex h-20 w-20 items-center justify-center rounded-full"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -415,10 +403,10 @@
             />
           </svg>
         </div>
-        <h3 class="mb-2 text-xl font-bold text-blue-900 dark:text-white">
+        <h3 class="text-primary mb-2 text-xl font-bold">
           输入 RSS/Atom 订阅地址
         </h3>
-        <p class="mb-6 text-center text-blue-600 dark:text-blue-400">
+        <p class="text-primary mb-6 text-center">
           在上方输入框中粘贴 RSS 或 Atom 订阅链接，即可解析阅读
         </p>
       </div>

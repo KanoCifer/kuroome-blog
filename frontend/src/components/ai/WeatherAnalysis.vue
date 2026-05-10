@@ -140,11 +140,11 @@ const statusLabel = computed(() => {
 });
 
 const statusClass = computed(() => {
-  if (loading.value) return "bg-blue-500/15 text-blue-700 dark:text-blue-200";
-  if (errorMessage.value) return "bg-red-500/15 text-red-600 dark:text-red-300";
+  if (loading.value) return "bg-primary/15 text-primary";
+  if (errorMessage.value) return "bg-destructive/15 text-destructive";
   if (hasGenerated.value)
     return "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300";
-  return "bg-gray-500/10 text-gray-600 dark:text-gray-300";
+  return "bg-muted text-muted-foreground";
 });
 
 const resetState = () => {
@@ -274,7 +274,7 @@ onUnmounted(() => {
     :initial="{ opacity: 0, y: 12 }"
     :animate="{ opacity: 1, y: 0 }"
     :transition="{ duration: 0.4 }"
-    class="group squircle relative flex h-full flex-col overflow-hidden border border-white/20 bg-linear-to-br from-white/80 to-white/40 p-6 shadow-lg backdrop-blur-sm transition-all duration-500 dark:border-gray-700/50 dark:from-gray-900/80 dark:to-gray-800/40"
+    class="group squircle from-card/80 to-card/40 relative flex h-full flex-col overflow-hidden border border-white/20 bg-linear-to-br p-6 shadow-lg backdrop-blur-sm transition-all duration-500 dark:border-gray-700/50 dark:from-gray-900/80 dark:to-gray-800/40"
   >
     <div
       class="pointer-events-none absolute -top-20 -right-20 h-40 w-40 rounded-full bg-linear-to-br from-indigo-300/30 to-sky-500/20 blur-3xl transition-transform duration-700 group-hover:scale-110"
@@ -286,11 +286,13 @@ onUnmounted(() => {
     <div class="relative z-10 flex items-start justify-between gap-4">
       <div>
         <h3
-          class="text-lg font-bold tracking-tight text-gray-900 dark:text-white"
+          class="text-foreground dark:text-foreground text-lg font-bold tracking-tight"
         >
           AI 天气分析
         </h3>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        <p
+          class="text-muted-foreground dark:text-muted-foreground mt-1 text-sm"
+        >
           结合实时天气与潮汐节奏给出出行建议
         </p>
       </div>
@@ -305,7 +307,7 @@ onUnmounted(() => {
         <select
           v-if="!loading"
           v-model="selectedModel"
-          class="rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-xs text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+          class="border-border bg-muted text-foreground dark:border-border dark:bg-card dark:text-foreground rounded-lg border px-2 py-1 text-xs"
         >
           <option v-for="model in AI_MODELS" :key="model.id" :value="model.id">
             {{ model.name }}
@@ -314,7 +316,7 @@ onUnmounted(() => {
 
         <button
           v-if="loading"
-          class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-red-500 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-600"
+          class="bg-destructive text-primary-foreground hover:bg-destructive/90 inline-flex cursor-pointer items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition"
           @click="cancelAnalysis"
         >
           <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
@@ -331,7 +333,7 @@ onUnmounted(() => {
         </button>
         <button
           v-else
-          class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
+          class="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted inline-flex cursor-pointer items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition disabled:cursor-not-allowed dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
           :disabled="!canGenerate"
           @click="fetchWeatherAnalysis"
         >
@@ -345,11 +347,11 @@ onUnmounted(() => {
       class="relative z-10 mt-6 flex flex-1 flex-col items-center justify-center text-center"
     >
       <div
-        class="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800"
+        class="bg-muted dark:bg-card mb-3 flex h-14 w-14 items-center justify-center rounded-2xl"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="h-7 w-7 text-gray-400"
+          class="text-muted-foreground h-7 w-7"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -362,18 +364,18 @@ onUnmounted(() => {
           />
         </svg>
       </div>
-      <p class="text-sm text-gray-600 dark:text-gray-400">
+      <p class="text-secondary-foreground dark:text-muted-foreground text-sm">
         等待天气与潮汐数据加载
       </p>
-      <p class="mt-1 text-xs text-gray-400">数据到位后即可生成分析</p>
+      <p class="text-muted-foreground mt-1 text-xs">数据到位后即可生成分析</p>
     </div>
 
     <div v-else class="relative z-10 mt-5 flex flex-1 flex-col">
       <div
-        class="h-[60vh] max-h-[60vh] overflow-auto rounded-2xl bg-white/60 p-4 dark:bg-gray-900/60"
+        class="bg-card/60 dark:bg-card/60 h-[60vh] max-h-[60vh] overflow-auto rounded-2xl p-4"
       >
-        <div class="mb-2 flex items-center gap-2 text-xs text-gray-500">
-          <span class="h-1.5 w-1.5 rounded-full bg-gray-400"></span>
+        <div class="text-muted-foreground mb-2 flex items-center gap-2 text-xs">
+          <span class="bg-muted-foreground/40 h-1.5 w-1.5 rounded-full"></span>
           AI 分析输出
         </div>
         <AnimatePresence mode="wait">
@@ -383,18 +385,18 @@ onUnmounted(() => {
             :initial="{ opacity: 0, y: 8 }"
             :animate="{ opacity: 1, y: 0 }"
             :exit="{ opacity: 0, y: -8 }"
-            class="text-sm text-gray-500 dark:text-gray-400"
+            class="text-muted-foreground dark:text-muted-foreground text-sm"
           >
             <p>{{ textShimmer[0] }}</p>
             <div class="mt-3 space-y-2">
               <div
-                class="h-3 w-full animate-pulse rounded bg-gray-200/70 dark:bg-gray-700/50"
+                class="bg-muted/70 dark:bg-muted/50 h-3 w-full animate-pulse rounded"
               ></div>
               <div
-                class="h-3 w-5/6 animate-pulse rounded bg-gray-200/70 dark:bg-gray-700/50"
+                class="bg-muted/70 dark:bg-muted/50 h-3 w-5/6 animate-pulse rounded"
               ></div>
               <div
-                class="h-3 w-2/3 animate-pulse rounded bg-gray-200/70 dark:bg-gray-700/50"
+                class="bg-muted/70 dark:bg-muted/50 h-3 w-2/3 animate-pulse rounded"
               ></div>
             </div>
           </motion.div>
@@ -404,7 +406,7 @@ onUnmounted(() => {
             :initial="{ opacity: 0, y: 8 }"
             :animate="{ opacity: 1, y: 0 }"
             :exit="{ opacity: 0, y: -8 }"
-            class="prose prose-sm dark:prose-invert max-w-none text-gray-700 dark:text-gray-200"
+            class="prose prose-sm dark:prose-invert text-foreground dark:text-foreground max-w-none"
             v-html="renderedSummary"
           ></motion.div>
           <motion.div
@@ -413,7 +415,7 @@ onUnmounted(() => {
             :initial="{ opacity: 0, y: 8 }"
             :animate="{ opacity: 1, y: 0 }"
             :exit="{ opacity: 0, y: -8 }"
-            class="text-sm text-gray-500 dark:text-gray-400"
+            class="text-muted-foreground dark:text-muted-foreground text-sm"
           >
             点击“生成分析”，获取适合外出与钓鱼的天气建议。
           </motion.div>
@@ -422,12 +424,12 @@ onUnmounted(() => {
 
       <div
         v-if="errorMessage"
-        class="mt-3 rounded-xl bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-300"
+        class="bg-destructive/10 text-destructive dark:bg-destructive/10 dark:text-destructive mt-3 rounded-xl p-3 text-sm"
       >
         {{ errorMessage }}
       </div>
 
-      <div class="mt-3 text-xs text-gray-400">
+      <div class="text-muted-foreground mt-3 text-xs">
         天气更新: {{ formatDate(normalizedData?.liveWeather?.obsTime) ?? "--"
         }}<br />
         潮汐更新: {{ formatDate(normalizedData?.tideData?.updateTime) ?? "--" }}

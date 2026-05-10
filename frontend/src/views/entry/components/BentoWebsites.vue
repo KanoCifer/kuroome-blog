@@ -5,13 +5,13 @@
   >
     <div class="relative z-10 flex h-full flex-col justify-between px-6 py-4">
       <div
-        class="text-xs font-bold tracking-wide text-neutral-500 uppercase transition-colors duration-300 group-hover:text-neutral-600 dark:text-neutral-400 dark:group-hover:text-neutral-300"
+        class="text-muted-foreground group-hover:text-foreground text-xs font-bold tracking-wide uppercase transition-colors duration-300"
       >
         Daily Pick
       </div>
       <div class="my-1 flex items-center">
         <div
-          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-neutral-100 text-neutral-700 transition-colors duration-300 group-hover:bg-neutral-200 dark:bg-neutral-700 dark:text-neutral-300 dark:group-hover:bg-neutral-600"
+          class="bg-muted text-muted-foreground group-hover:bg-secondary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors duration-300"
         >
           <img
             v-if="randomSite?.icon"
@@ -37,14 +37,14 @@
           </svg>
         </div>
         <h3
-          class="ml-2 text-lg leading-tight font-bold text-neutral-800 transition-colors duration-300 group-hover:text-neutral-950 dark:text-neutral-100 dark:group-hover:text-white"
+          class="text-foreground group-hover:text-foreground ml-2 text-lg leading-tight font-bold transition-colors duration-300"
         >
           {{ randomSite?.name || "加载中..." }}
         </h3>
       </div>
       <div>
         <p
-          class="line-clamp-2 text-sm text-neutral-500 transition-colors duration-300 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-300"
+          class="text-muted-foreground group-hover:text-foreground line-clamp-2 text-sm transition-colors duration-300"
         >
           {{ randomSite?.description || "正在获取推荐网站..." }}
         </p>

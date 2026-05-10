@@ -13,20 +13,20 @@
         <!-- Header -->
         <div class="mb-4 flex items-center justify-between">
           <h3
-            class="text-sm font-semibold tracking-wide text-gray-900 dark:text-gray-100"
+            class="text-foreground dark:text-foreground text-sm font-semibold tracking-wide"
           >
             {{ title }}
           </h3>
           <div class="flex items-center gap-2">
             <span
               v-if="!isCollapsed && todos.length > 0"
-              class="text-xs font-medium text-gray-500 dark:text-gray-400"
+              class="text-muted-foreground dark:text-muted-foreground text-xs font-medium"
             >
               {{ completedCount }} / {{ todos.length }}
             </span>
             <RouterLink
               to="/todos"
-              class="cursor-pointer rounded-md p-1 text-gray-400 outline-0 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+              class="text-muted-foreground hover:bg-accent hover:text-foreground dark:hover:bg-accent dark:hover:text-foreground cursor-pointer rounded-md p-1 outline-0 transition-colors"
               title="查看详情"
             >
               <svg
@@ -46,7 +46,7 @@
             <button
               v-if="hideable"
               @click="emit('hide')"
-              class="cursor-pointer rounded-md p-1 text-gray-400 outline-0 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+              class="text-muted-foreground hover:bg-accent hover:text-foreground dark:hover:bg-accent dark:hover:text-foreground cursor-pointer rounded-md p-1 outline-0 transition-colors"
               title="隐藏待办卡片"
             >
               <svg
@@ -80,13 +80,13 @@
                 class="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors duration-200"
                 :class="
                   todo.completed
-                    ? 'border-gray-900 bg-gray-900 dark:border-gray-100 dark:bg-gray-100'
-                    : 'border-gray-300 group-hover:border-gray-400 dark:border-gray-700 dark:group-hover:border-gray-500'
+                    ? 'border-primary bg-primary dark:border-primary dark:bg-primary'
+                    : 'border-border group-hover:border-foreground/30 dark:border-border dark:group-hover:border-foreground/30'
                 "
               >
                 <svg
                   v-if="todo.completed"
-                  class="h-3 w-3 text-white dark:text-gray-900"
+                  class="text-primary-foreground dark:text-primary-foreground h-3 w-3"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -105,8 +105,8 @@
                 class="text-sm leading-tight transition-colors duration-200 select-none"
                 :class="
                   todo.completed
-                    ? 'text-gray-400 line-through dark:text-gray-600'
-                    : 'text-gray-700 dark:text-gray-300'
+                    ? 'text-muted-foreground dark:text-muted-foreground line-through'
+                    : 'text-foreground dark:text-foreground'
                 "
               >
                 {{ todo.text }}
@@ -116,7 +116,7 @@
             <!-- Empty state -->
             <div
               v-if="todos.length === 0"
-              class="flex h-full flex-col items-center justify-center py-6 text-gray-400 dark:text-gray-600"
+              class="text-muted-foreground dark:text-muted-foreground flex h-full flex-col items-center justify-center py-6"
             >
               <span class="text-sm font-medium tracking-wide"
                 >所有任务已完成</span

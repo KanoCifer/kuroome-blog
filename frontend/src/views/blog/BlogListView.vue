@@ -17,7 +17,7 @@
                 viewBox="0 0 24 24"
                 stroke-width="2"
                 stroke="currentColor"
-                class="h-5 w-5 text-gray-500 dark:text-gray-400"
+                class="text-muted-foreground h-5 w-5"
               >
                 <path
                   stroke-linecap="round"
@@ -30,13 +30,13 @@
               v-model="searchQuery"
               type="search"
               placeholder="搜索文章标题和内容..."
-              class="block w-full rounded-xl border border-gray-300 bg-white py-3 pr-4 pl-10 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-blue-500"
+              class="text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 border-border bg-card block w-full rounded-xl border py-3 pr-4 pl-10 text-sm focus:ring-2 focus:outline-none"
               @keyup.enter="handleSearch"
             />
             <button
               v-if="searchQuery"
               @click="clearSearch"
-              class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+              class="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center pr-3"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -57,7 +57,7 @@
           <router-link
             v-if="user.isAuthenticated"
             to="/blog/new"
-            class="inline-flex w-fit items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+            class="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:outline-primary inline-flex w-fit items-center rounded-lg px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -82,22 +82,22 @@
             <!-- Loading State -->
             <div
               v-if="isLoading"
-              class="flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white px-6 py-16 text-center dark:border-gray-700"
+              class="border-border bg-card flex flex-col items-center justify-center rounded-xl border px-6 py-16 text-center"
             >
               <div
-                class="mb-4 h-10 w-10 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"
+                class="border-primary/20 border-t-primary mb-4 h-10 w-10 animate-spin rounded-full border-4"
               ></div>
-              <p class="text-gray-600 dark:text-gray-400">加载中...</p>
+              <p class="text-muted-foreground">加载中...</p>
             </div>
 
             <!-- Error State -->
             <div
               v-else-if="errorMessage"
-              class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-red-200 bg-red-50 px-6 py-16 text-center dark:border-rose-800 dark:bg-rose-300/30"
+              class="border-destructive/30 bg-destructive/10 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-16 text-center"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="mb-4 h-12 w-12 text-red-400"
+                class="text-destructive/60 mb-4 h-12 w-12"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke-width="1.5"
@@ -109,12 +109,10 @@
                   d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
                 />
               </svg>
-              <p class="text-lg font-medium text-red-600 dark:text-red-400">
-                加载失败
-              </p>
-              <p class="mt-1 text-sm text-red-500">{{ errorMessage }}</p>
+              <p class="text-destructive text-lg font-medium">加载失败</p>
+              <p class="text-destructive/80 mt-1 text-sm">{{ errorMessage }}</p>
               <button
-                class="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
+                class="bg-destructive hover:bg-destructive/90 focus:ring-ring mt-4 rounded-lg px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-offset-2 focus:outline-none"
                 @click="fetchPosts(1)"
               >
                 重试
@@ -124,11 +122,11 @@
             <!-- Empty State -->
             <div
               v-else-if="posts.length === 0"
-              class="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 px-6 py-16 text-center dark:border-gray-700 dark:bg-gray-800/30"
+              class="border-border bg-muted flex flex-col items-center justify-center rounded-xl border border-dashed px-6 py-16 text-center"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="mb-4 h-12 w-12 text-gray-300 dark:text-gray-600"
+                class="text-muted-foreground/40 mb-4 h-12 w-12"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke-width="1.5"
@@ -140,10 +138,10 @@
                   d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
                 />
               </svg>
-              <p class="text-lg font-medium text-gray-500">
+              <p class="text-muted-foreground text-lg font-medium">
                 No blog posts available.
               </p>
-              <p class="mt-1 text-sm text-gray-400">
+              <p class="text-muted-foreground/70 mt-1 text-sm">
                 {{
                   activeCategory
                     ? "There are no posts in this category yet."
@@ -159,14 +157,14 @@
               :class="[
                 'relative mb-8 rounded-3xl p-6 shadow-md transition-all duration-300 hover:shadow-lg dark:shadow-none',
                 post.is_pinned
-                  ? 'bg-blue-50/80 ring-3 ring-blue-400/60 dark:bg-slate-800/80 dark:ring-blue-500/40'
-                  : 'bg-white dark:border dark:border-gray-700/50 dark:bg-gray-900',
+                  ? 'bg-primary/10 ring-primary/40 ring-3'
+                  : 'bg-card',
               ]"
             >
               <!-- Pinned Badge -->
               <div
                 v-if="post.is_pinned"
-                class="absolute -top-3 right-4 flex items-center gap-1.5 rounded-full bg-linear-to-r from-blue-500 to-sky-500 px-3 py-1 text-xs font-bold text-white shadow-md dark:from-blue-600 dark:to-sky-600"
+                class="bg-primary text-primary-foreground absolute -top-3 right-4 flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold shadow-md"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -184,8 +182,8 @@
                 :class="[
                   'mb-2 block text-3xl font-semibold transition-colors',
                   post.is_pinned
-                    ? 'text-blue-900 hover:text-blue-700 dark:text-blue-100 dark:hover:text-blue-300'
-                    : 'hover:text-blue-600 dark:text-white dark:hover:text-blue-400',
+                    ? 'text-primary hover:text-primary/80'
+                    : 'hover:text-primary text-foreground',
                 ]"
               >
                 {{ post.title }}
@@ -193,9 +191,7 @@
               <p
                 :class="[
                   'my-4 text-sm',
-                  post.is_pinned
-                    ? 'text-blue-700/80 dark:text-blue-300/80'
-                    : 'text-gray-600 dark:text-gray-400',
+                  post.is_pinned ? 'text-primary/80' : 'text-muted-foreground',
                 ]"
               >
                 发布于 {{ formatDate(post.created_at) }}
@@ -206,25 +202,23 @@
                 :class="[
                   'post-preview prose prose-base dark:prose-invert max-h-72 max-w-none overflow-y-hidden rounded-xl p-4 leading-relaxed',
                   post.is_pinned
-                    ? 'dark:prose-invert bg-white/70 ring-1 ring-blue-200/50 dark:bg-black/20 dark:ring-blue-800/30'
-                    : 'dark:prose-invert bg-gray-50/80 ring-1 ring-gray-200/50 dark:bg-gray-800/50 dark:ring-gray-700/30',
+                    ? 'bg-card ring-primary/20 ring-1'
+                    : 'bg-muted ring-border/50 ring-1',
                 ]"
                 v-html="getPreviewHtml(post.body)"
               ></div>
               <div
                 :class="[
                   'mt-4 flex items-center justify-between border-t pt-4',
-                  post.is_pinned
-                    ? 'border-blue-200/60 dark:border-blue-800/40'
-                    : 'border-gray-100 dark:border-gray-700',
+                  post.is_pinned ? 'border-primary/20' : 'border-border',
                 ]"
               >
                 <div
                   :class="[
                     'flex items-center gap-4 text-sm',
                     post.is_pinned
-                      ? 'text-blue-700/70 dark:text-blue-300/70'
-                      : 'text-gray-500 dark:text-gray-400',
+                      ? 'text-primary/70'
+                      : 'text-muted-foreground',
                   ]"
                 >
                   <router-link
@@ -232,9 +226,7 @@
                     :to="`/blog/category/${post.category.id}`"
                     :class="[
                       'flex items-center gap-1.5 transition-colors',
-                      post.is_pinned
-                        ? 'hover:text-blue-800 dark:hover:text-blue-400'
-                        : 'hover:text-blue-600 dark:hover:text-blue-400',
+                      'hover:text-primary',
                     ]"
                     title="Category"
                   >
@@ -260,8 +252,8 @@
                   :class="[
                     'inline-flex items-center text-sm font-medium transition-colors',
                     post.is_pinned
-                      ? 'text-blue-700 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300'
-                      : 'text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300',
+                      ? 'text-primary hover:text-primary/80'
+                      : 'text-primary hover:text-primary/80',
                   ]"
                 >
                   阅读更多
@@ -290,17 +282,17 @@
             aria-label="博客分页"
           >
             <ul
-              class="mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border border-gray-200/80 bg-white/90 p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2 dark:border-gray-700/70 dark:bg-gray-900/80"
+              class="border-border/80 bg-card/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2"
             >
               <!-- Previous Button -->
               <li>
                 <button
                   :disabled="!pagination?.has_prev"
-                  class="inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 focus-visible:outline-none dark:focus-visible:ring-offset-gray-900"
+                  class="focus-visible:ring-ring inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                   :class="
                     pagination?.has_prev
-                      ? 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-white'
-                      : 'cursor-not-allowed text-gray-400 dark:text-gray-600'
+                      ? 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                      : 'text-muted-foreground/50 cursor-not-allowed'
                   "
                   @click="goToPage(pagination!.prev_num!)"
                 >
@@ -313,7 +305,7 @@
               <!-- 显示第一页 -->
               <li v-if="pagination && pagination.page > 3">
                 <button
-                  class="inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 focus-visible:outline-none dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white dark:focus-visible:ring-offset-gray-900"
+                  class="focus-visible:ring-ring text-muted-foreground hover:bg-accent hover:text-foreground inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                   @click="goToPage(1)"
                 >
                   1
@@ -322,19 +314,17 @@
 
               <!-- 省略号 -->
               <li v-if="pagination && pagination.page > 4">
-                <span class="px-1 text-sm text-gray-400 dark:text-gray-500"
-                  >...</span
-                >
+                <span class="text-muted-foreground/60 px-1 text-sm">...</span>
               </li>
 
               <!-- 显示当前页附近的页码 -->
               <li v-for="pageNum in getVisiblePages" :key="pageNum">
                 <button
-                  class="inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 focus-visible:outline-none dark:focus-visible:ring-offset-gray-900"
+                  class="focus-visible:ring-ring inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                   :class="
                     pageNum === pagination?.page
-                      ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25 dark:bg-blue-500 dark:shadow-blue-500/20'
-                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                   "
                   @click="goToPage(pageNum)"
                 >
@@ -344,15 +334,13 @@
 
               <!-- 省略号 -->
               <li v-if="pagination && pagination.page < pagination.pages - 3">
-                <span class="px-1 text-sm text-gray-400 dark:text-gray-500"
-                  >...</span
-                >
+                <span class="text-muted-foreground/60 px-1 text-sm">...</span>
               </li>
 
               <!-- 显示最后一页 -->
               <li v-if="pagination && pagination.page < pagination.pages - 2">
                 <button
-                  class="inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 focus-visible:outline-none dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white dark:focus-visible:ring-offset-gray-900"
+                  class="focus-visible:ring-ring text-muted-foreground hover:bg-accent hover:text-foreground inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                   @click="goToPage(pagination.pages)"
                 >
                   {{ pagination.pages }}
@@ -363,11 +351,11 @@
               <li>
                 <button
                   :disabled="!pagination?.has_next"
-                  class="inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 focus-visible:outline-none dark:focus-visible:ring-offset-gray-900"
+                  class="focus-visible:ring-ring inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                   :class="
                     pagination?.has_next
-                      ? 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-white'
-                      : 'cursor-not-allowed text-gray-400 dark:text-gray-600'
+                      ? 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                      : 'text-muted-foreground/50 cursor-not-allowed'
                   "
                   @click="goToPage(pagination!.next_num!)"
                 >
@@ -705,54 +693,5 @@ const handleResetFilter = () => {
   height: auto;
   border-radius: 0.375rem;
   margin: 0.5rem 0;
-}
-
-/* Light mode specific styles */
-:global(.light) .post-preview :deep(code) {
-  background-color: #f3f4f6;
-  color: #1f2937;
-}
-
-:global(.light) .post-preview :deep(pre) {
-  background-color: #f3f4f6;
-}
-
-:global(.light) .post-preview :deep(blockquote) {
-  border-left-color: #d1d5db;
-  color: #4b5563;
-}
-
-/* Dark mode specific styles */
-:global(.dark) .post-preview :deep(code) {
-  background-color: #374151;
-  color: #f9fafb;
-}
-
-:global(.dark) .post-preview :deep(pre) {
-  background-color: #1f2937;
-}
-
-:global(.dark) .post-preview :deep(blockquote) {
-  border-left-color: #4b5563;
-  color: #9ca3af;
-}
-
-/* Pinned post specific preview styles */
-:global(.dark) .post-preview.pinned :deep(code) {
-  background-color: #1e3a5f;
-  color: #bfdbfe;
-}
-
-:global(.dark) .post-preview.pinned :deep(pre) {
-  background-color: #1e3a5f;
-}
-
-:global(.light) .post-preview.pinned :deep(code) {
-  background-color: #dbeafe;
-  color: #1e40af;
-}
-
-:global(.light) .post-preview.pinned :deep(pre) {
-  background-color: #dbeafe;
 }
 </style>

@@ -17,12 +17,12 @@
 
         <!-- 弹窗内容 -->
         <div
-          class="relative z-10 w-11/12 max-w-md transform-gpu rounded-2xl bg-white p-8 shadow-2xl dark:bg-gray-800"
+          class="bg-card dark:bg-card relative z-10 w-11/12 max-w-md transform-gpu rounded-2xl p-8 shadow-2xl"
         >
           <!-- 警告图标 -->
           <div class="mb-6 flex justify-center">
             <div
-              class="flex h-20 w-20 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400"
+              class="bg-warning/20 text-warning dark:bg-warning/20 dark:text-warning flex h-20 w-20 items-center justify-center rounded-full"
             >
               <svg
                 class="h-10 w-10"
@@ -42,13 +42,15 @@
 
           <!-- 标题 -->
           <h2
-            class="mb-4 text-center font-serif text-2xl font-bold text-gray-800 dark:text-gray-200"
+            class="text-foreground dark:text-foreground mb-4 text-center font-serif text-2xl font-bold"
           >
             暂未适配移动端
           </h2>
 
           <!-- 说明文字 -->
-          <p class="mb-8 text-center text-gray-600 dark:text-gray-400">
+          <p
+            class="text-muted-foreground dark:text-muted-foreground mb-8 text-center"
+          >
             为了获得最佳体验，请使用桌面设备访问本网站。
             移动端功能正在开发中，敬请期待！
           </p>
@@ -56,7 +58,7 @@
           <!-- 确认按钮 -->
           <button
             @click="closeMobileWarning"
-            class="w-full transform-gpu rounded-xl bg-blue-600 py-4 font-serif text-lg font-bold text-white transition-all hover:scale-[1.02] hover:bg-blue-700 active:scale-[0.98] dark:bg-blue-500 dark:hover:bg-blue-600"
+            class="bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:hover:bg-primary/90 w-full transform-gpu rounded-xl py-4 font-serif text-lg font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             知道了
           </button>

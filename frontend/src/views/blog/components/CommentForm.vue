@@ -85,30 +85,27 @@ const addEmoji = (emoji: string) => {
   <div
     :class="[
       isReply
-        ? 'mt-4 rounded-xl bg-gray-50 p-4 ring-1 ring-gray-200 dark:bg-gray-800/50 dark:ring-gray-700'
-        : 'mt-8 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700/50 dark:bg-gray-800/30 dark:shadow-none',
+        ? 'bg-muted ring-border mt-4 rounded-xl p-4 ring-1'
+        : 'border-border bg-card mt-8 rounded-2xl border p-5 shadow-sm',
     ]"
   >
     <!-- Header -->
     <div class="mb-4 flex items-center justify-between">
-      <h4
-        v-if="!isReply"
-        class="gap-2 text-lg font-semibold text-gray-900 dark:text-white"
-      >
+      <h4 v-if="!isReply" class="text-foreground gap-2 text-lg font-semibold">
         发表评论
         <span
-          class="ml-2 rounded-full border border-blue-200 bg-blue-200/30 px-4 py-2 text-xs font-medium text-blue-400"
+          class="border-primary/20 bg-primary/10 text-primary/70 ml-2 rounded-full border px-4 py-2 text-xs font-medium"
           >*评论发布后请等待管理员审核</span
         >
       </h4>
-      <h4 v-else class="text-sm font-medium text-gray-600 dark:text-gray-400">
+      <h4 v-else class="text-muted-foreground text-sm font-medium">
         回复 @{{ replyToAuthor }}
       </h4>
 
       <!-- Cancel reply button -->
       <button
         v-if="isReply && replyTo"
-        class="text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+        class="text-muted-foreground hover:text-foreground text-sm transition-colors"
         @click="$emit('cancelReply')"
       >
         取消
@@ -119,43 +116,37 @@ const addEmoji = (emoji: string) => {
     <template v-if="!auth.isAuthenticated">
       <div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div class="relative">
-          <label
-            class="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400"
-          >
+          <label class="text-muted-foreground mb-1.5 block text-xs font-medium">
             昵称 *
           </label>
           <input
             v-model="author"
             type="text"
             placeholder="你的名字"
-            class="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-700 dark:bg-gray-800/50 dark:text-white dark:placeholder-gray-500 dark:focus:border-blue-400"
+            class="border-border bg-muted focus:border-primary focus:bg-card focus:ring-primary/20 w-full rounded-lg border px-4 py-2.5 text-sm transition-all focus:ring-2 focus:outline-none"
           />
         </div>
         <div class="relative">
-          <label
-            class="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400"
-          >
+          <label class="text-muted-foreground mb-1.5 block text-xs font-medium">
             邮箱 *
           </label>
           <input
             v-model="email"
             type="email"
             placeholder="your@email.com"
-            class="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-700 dark:bg-gray-800/50 dark:text-white dark:placeholder-gray-500 dark:focus:border-blue-400"
+            class="border-border bg-muted focus:border-primary focus:bg-card focus:ring-primary/20 w-full rounded-lg border px-4 py-2.5 text-sm transition-all focus:ring-2 focus:outline-none"
           />
         </div>
       </div>
       <div class="mb-4">
-        <label
-          class="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-400"
-        >
+        <label class="text-muted-foreground mb-1.5 block text-xs font-medium">
           网站
         </label>
         <input
           v-model="site"
           type="url"
           placeholder="https://yourwebsite.com"
-          class="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-700 dark:bg-gray-800/50 dark:text-white dark:placeholder-gray-500 dark:focus:border-blue-400"
+          class="border-border bg-muted focus:border-primary focus:bg-card focus:ring-primary/20 w-full rounded-lg border px-4 py-2.5 text-sm transition-all focus:ring-2 focus:outline-none"
         />
       </div>
     </template>
@@ -165,8 +156,8 @@ const addEmoji = (emoji: string) => {
       :class="[
         'relative rounded-xl border transition-all duration-200',
         isFocused
-          ? 'border-blue-500 bg-white ring-2 ring-blue-500/20 dark:border-blue-400 dark:bg-gray-800/50'
-          : 'border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800/30',
+          ? 'border-primary bg-card ring-primary/20 ring-2'
+          : 'border-border bg-muted',
       ]"
     >
       <textarea
@@ -174,14 +165,14 @@ const addEmoji = (emoji: string) => {
         rows="4"
         :placeholder="isReply ? '写下你的回复...' : '写下你的评论...'"
         :maxlength="maxChars"
-        class="w-full resize-none rounded-xl border-0 bg-transparent px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-500"
+        class="text-foreground placeholder:text-muted-foreground w-full resize-none rounded-xl border-0 bg-transparent px-4 py-3 text-sm focus:ring-0 focus:outline-none"
         @focus="isFocused = true"
         @blur="isFocused = false"
       ></textarea>
 
       <!-- Toolbar -->
       <div
-        class="flex items-center justify-between border-t border-gray-100 px-3 py-2 dark:border-gray-700"
+        class="border-border flex items-center justify-between border-t px-3 py-2"
       >
         <!-- Quick emojis -->
         <div class="flex items-center gap-1">
@@ -189,7 +180,7 @@ const addEmoji = (emoji: string) => {
             v-for="emoji in emojis"
             :key="emoji"
             type="button"
-            class="rounded-lg p-1.5 text-lg transition-all hover:scale-110 hover:bg-gray-100 dark:hover:bg-gray-700"
+            class="hover:bg-accent rounded-lg p-1.5 text-lg transition-all hover:scale-110"
             :title="emoji"
             @click="addEmoji(emoji)"
           >
@@ -202,10 +193,10 @@ const addEmoji = (emoji: string) => {
           :class="[
             'text-xs',
             charCount > maxChars
-              ? 'text-red-500'
+              ? 'text-destructive'
               : charCount > maxChars * 0.9
                 ? 'text-orange-500'
-                : 'text-gray-400 dark:text-gray-500',
+                : 'text-muted-foreground',
           ]"
         >
           {{ charCount }} / {{ maxChars }}
@@ -217,7 +208,7 @@ const addEmoji = (emoji: string) => {
     <div class="mt-4 flex items-center justify-end gap-3">
       <p
         v-if="!auth.isAuthenticated"
-        class="mr-auto text-xs text-gray-500 dark:text-gray-400"
+        class="text-muted-foreground mr-auto text-xs"
       >
         * 为必填项，邮箱不会被公开显示
       </p>
@@ -228,8 +219,8 @@ const addEmoji = (emoji: string) => {
         :class="[
           'inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200',
           isValid && !isSubmitting
-            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30 hover:bg-blue-700 hover:shadow-blue-500/40 dark:bg-blue-500 dark:hover:bg-blue-600'
-            : 'cursor-not-allowed bg-gray-200 text-gray-400 dark:bg-gray-700 dark:text-gray-500',
+            ? 'bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 shadow-lg'
+            : 'bg-muted text-muted-foreground cursor-not-allowed',
         ]"
         @click="handleSubmit"
       >

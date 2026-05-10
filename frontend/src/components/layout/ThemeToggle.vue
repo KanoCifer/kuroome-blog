@@ -36,12 +36,18 @@ const schemes: { value: ColorScheme; label: string; colors: string[] }[] = [
     label: "Forest Green",
     colors: ["#16a34a", "#0d9488", "#65a30d"],
   },
+  { value: "paper", label: "Paper", colors: ["#c8713a", "#5a7a62", "#8a653f"] },
+  { value: "sage", label: "Sage", colors: ["#4d6f57", "#8b7146", "#5e7072"] },
+  { value: "mist", label: "Mist", colors: ["#4f687a", "#5d7569", "#927255"] },
+  { value: "blush", label: "Blush", colors: ["#a5656f", "#6a7866", "#a06d4f"] },
 ];
 
-const currentTheme = computed((): { value: Theme; label: string; icon: string } => {
-  const found = themes.find((t) => t.value === themeStore.theme);
-  return found || themes[0]!;
-});
+const currentTheme = computed(
+  (): { value: Theme; label: string; icon: string } => {
+    const found = themes.find((t) => t.value === themeStore.theme);
+    return found || themes[0]!;
+  },
+);
 
 let closeTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -96,13 +102,15 @@ onUnmounted(() => {
     <div class="relative">
       <button
         @click.stop="isSchemeOpen = !isSchemeOpen"
-        class="flex cursor-pointer items-center gap-1 rounded-lg px-2 py-2 text-sm font-medium text-gray-600 transition-all hover:bg-gray-200 focus:ring-2 focus:ring-blue-300 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-600"
+        class="text-secondary-foreground hover:bg-accent focus:ring-ring dark:text-foreground dark:hover:bg-accent flex cursor-pointer items-center gap-1 rounded-lg px-2 py-2 text-sm font-medium transition-all focus:ring-2 focus:outline-none"
         aria-label="Select color scheme"
         title="Color Scheme"
       >
         <div class="flex gap-0.5">
           <span
-            v-for="(color, i) in schemes.find((s) => s.value === themeStore.scheme)?.colors || []"
+            v-for="(color, i) in schemes.find(
+              (s) => s.value === themeStore.scheme,
+            )?.colors || []"
             :key="i"
             class="h-3 w-3 rounded-full"
             :style="{ backgroundColor: color }"
@@ -135,16 +143,17 @@ onUnmounted(() => {
       >
         <div
           v-if="isSchemeOpen"
-          class="absolute top-full right-0 z-9999 mt-2 w-40 rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+          class="border-border bg-card dark:border-border dark:bg-card absolute top-full right-0 z-9999 mt-2 w-40 rounded-lg shadow-lg"
           @click.stop
         >
           <button
             v-for="(schemeItem, index) in schemes"
             :key="schemeItem.value"
             @click="selectScheme(schemeItem.value)"
-            class="flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+            class="text-foreground hover:bg-accent dark:text-foreground dark:hover:bg-accent flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm transition-colors"
             :class="{
-              'bg-gray-100 dark:bg-gray-700': themeStore.scheme === schemeItem.value,
+              'bg-accent dark:bg-accent':
+                themeStore.scheme === schemeItem.value,
               'rounded-t-lg': index === 0,
               'rounded-b-lg': index === schemes.length - 1,
             }"
@@ -169,7 +178,7 @@ onUnmounted(() => {
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="ml-auto text-blue-500"
+              class="text-primary ml-auto"
             >
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
@@ -179,10 +188,14 @@ onUnmounted(() => {
     </div>
 
     <!-- Light/Dark Mode Toggle -->
-    <div class="relative" @mouseenter="openDropdown" @mouseleave="closeDropdown">
+    <div
+      class="relative"
+      @mouseenter="openDropdown"
+      @mouseleave="closeDropdown"
+    >
       <button
         @click.stop="toggleDropdown"
-        class="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-all hover:bg-gray-200 focus:ring-2 focus:ring-blue-300 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-600"
+        class="text-secondary-foreground hover:bg-accent focus:ring-ring dark:text-foreground dark:hover:bg-accent flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all focus:ring-2 focus:outline-none"
         aria-label="Toggle theme"
       >
         <span v-html="currentTheme.icon"></span>
@@ -214,16 +227,16 @@ onUnmounted(() => {
       >
         <div
           v-if="isOpen"
-          class="absolute top-full right-0 z-9999 mt-2 w-36 rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+          class="border-border bg-card dark:border-border dark:bg-card absolute top-full right-0 z-9999 mt-2 w-36 rounded-lg shadow-lg"
           @click.stop
         >
           <button
             v-for="(theme, index) in themes"
             :key="theme.value"
             @click="selectTheme(theme.value)"
-            class="flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+            class="text-foreground hover:bg-accent dark:text-foreground dark:hover:bg-accent flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm transition-colors"
             :class="{
-              'bg-gray-100 dark:bg-gray-700': themeStore.theme === theme.value,
+              'bg-accent dark:bg-accent': themeStore.theme === theme.value,
               'rounded-t-lg': index === 0,
               'rounded-b-lg': index === themes.length - 1,
             }"
@@ -241,7 +254,7 @@ onUnmounted(() => {
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="ml-auto text-blue-500"
+              class="text-primary ml-auto"
             >
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>

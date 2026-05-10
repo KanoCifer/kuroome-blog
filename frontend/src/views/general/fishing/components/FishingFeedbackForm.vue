@@ -81,22 +81,17 @@ const handleSubmit = async () => {
         v-if="isOpen"
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
       >
-        <div
-          class="mx-4 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900"
-        >
-          <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+        <div class="bg-card mx-4 w-full max-w-md rounded-2xl p-6 shadow-xl">
+          <h3 class="text-foreground mb-4 text-lg font-semibold">
             钓鱼反馈
-            <span
-              class="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400"
+            <span class="text-muted-foreground ml-2 text-sm font-normal"
               >你的反馈会帮助我们改进</span
             >
           </h3>
 
-          <div class="mb-4 rounded-lg bg-gray-50 p-3 text-sm dark:bg-gray-800">
-            <p class="text-gray-600 dark:text-gray-400">
-              地点: {{ locationName }}
-            </p>
-            <p class="text-gray-600 dark:text-gray-400">
+          <div class="bg-muted mb-4 rounded-lg p-3 text-sm">
+            <p class="text-muted-foreground">地点: {{ locationName }}</p>
+            <p class="text-muted-foreground">
               当前指数: {{ fishingData.fishing_index }} ({{
                 fishingData.level
               }})
@@ -105,8 +100,7 @@ const handleSubmit = async () => {
 
           <div class="space-y-4">
             <div>
-              <label
-                class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+              <label class="text-foreground mb-2 block text-sm font-medium"
                 >您的钓鱼体验</label
               >
               <div class="grid grid-cols-3 gap-2">
@@ -117,8 +111,8 @@ const handleSubmit = async () => {
                   class="rounded-lg px-3 py-2 text-sm font-medium transition-colors"
                   :class="
                     selectedFeedback === option.value
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-foreground hover:bg-accent'
                   "
                   @click="selectedFeedback = option.value"
                 >
@@ -130,7 +124,7 @@ const handleSubmit = async () => {
             <div class="flex gap-3 pt-2">
               <button
                 type="button"
-                class="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                class="border-border text-foreground hover:bg-accent flex-1 rounded-lg border px-4 py-2 text-sm font-medium"
                 :disabled="loading"
                 @click="$emit('cancel')"
               >
@@ -138,7 +132,7 @@ const handleSubmit = async () => {
               </button>
               <button
                 type="button"
-                class="flex-1 rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+                class="bg-primary text-primary-foreground hover:bg-primary/90 flex-1 rounded-lg px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
                 :disabled="!selectedFeedback || loading"
                 @click="handleSubmit"
               >

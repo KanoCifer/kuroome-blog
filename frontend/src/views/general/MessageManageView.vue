@@ -6,19 +6,19 @@
       :style="titleStyle"
     >
       <div>
-        <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50">
+        <h1 class="text-foreground max-w-6xl text-center font-serif text-7xl">
           {{ activeTab === "messages" ? "留言管理" : "评论管理" }}
         </h1>
         <!-- Description -->
         <div
-          class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400"
+          class="text-muted-foreground mt-4 flex flex-wrap items-center justify-center gap-4 text-sm"
         >
           <span
-            class="inline-block rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+            class="bg-muted text-muted-foreground inline-block rounded-full px-3 py-1 text-xs font-medium"
           >
             Admin Only
           </span>
-          <span class="text-gray-500">审核和管理用户内容</span>
+          <span class="text-muted-foreground">审核和管理用户内容</span>
         </div>
       </div>
     </div>
@@ -26,13 +26,13 @@
     <div class="relative mt-36">
       <div
         :style="sectionStyle"
-        class="absolute left-1/2 -z-5 h-full -translate-x-1/2 rounded-t-[40px] bg-blue-50 dark:bg-slate-900"
+        class="bg-muted absolute left-1/2 -z-5 h-full -translate-x-1/2 rounded-t-[40px]"
       ></div>
 
       <div class="mx-auto max-w-5xl space-y-6 pt-24 pb-12">
         <!-- Action Bar -->
         <div
-          class="relative z-10 flex flex-col items-center justify-between gap-4 rounded-2xl border border-gray-200/60 bg-white/80 p-4 shadow-sm sm:flex-row dark:border-gray-800 dark:bg-gray-900/70"
+          class="border-border/60 bg-card/80 relative z-10 flex flex-col items-center justify-between gap-4 rounded-2xl border p-4 shadow-sm sm:flex-row"
         >
           <!-- Tab Navigation -->
           <div class="flex gap-2">
@@ -42,8 +42,8 @@
               :class="[
                 'flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all',
                 activeTab === 'messages'
-                  ? 'bg-gray-900 text-white shadow-md dark:bg-gray-100 dark:text-gray-900'
-                  : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800',
+                  ? 'bg-primary text-primary-foreground shadow-md'
+                  : 'text-muted-foreground hover:bg-accent',
               ]"
             >
               <svg
@@ -67,8 +67,8 @@
               :class="[
                 'flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all',
                 activeTab === 'comments'
-                  ? 'bg-gray-900 text-white shadow-md dark:bg-gray-100 dark:text-gray-900'
-                  : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800',
+                  ? 'bg-primary text-primary-foreground shadow-md'
+                  : 'text-muted-foreground hover:bg-accent',
               ]"
             >
               <svg
@@ -93,7 +93,7 @@
             <button
               @click="handleRefresh"
               :disabled="loading"
-              class="group flex cursor-pointer items-center gap-2 rounded-xl bg-gray-900 px-5 py-2.5 font-medium text-white shadow-md transition-all select-none hover:bg-gray-800 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+              class="group bg-primary text-primary-foreground hover:bg-primary/90 flex cursor-pointer items-center gap-2 rounded-xl px-5 py-2.5 font-medium shadow-md transition-all select-none hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
             >
               <svg
                 :class="[
@@ -115,7 +115,7 @@
             </button>
             <button
               @click="goBack"
-              class="group flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 font-medium text-gray-700 shadow-sm transition-all select-none hover:bg-gray-50 hover:shadow-md dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+              class="group border-border bg-card text-foreground hover:bg-accent flex cursor-pointer items-center gap-2 rounded-xl border px-5 py-2.5 font-medium shadow-sm transition-all select-none hover:shadow-md"
             >
               <svg
                 class="h-4 w-4 transition-transform group-hover:-translate-x-1"
@@ -138,7 +138,7 @@
         <!-- Error Message -->
         <div
           v-if="error"
-          class="rounded-xl border border-red-200 bg-red-50/80 p-4 text-red-800 dark:border-red-800 dark:bg-red-900/30 dark:text-red-200"
+          class="border-destructive/30 bg-destructive/10 text-destructive rounded-xl border p-4"
         >
           <div class="flex items-center gap-2">
             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -155,14 +155,14 @@
         <!-- Loading State -->
         <div
           v-if="loading"
-          class="squircle overflow-hidden rounded-2xl border border-gray-200/60 bg-white/30 p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900/70"
+          class="squircle border-border/60 bg-card/30 overflow-hidden rounded-2xl border p-6 shadow-sm"
         >
           <div class="py-8">
             <div class="space-y-4">
               <div
                 v-for="i in 5"
                 :key="i"
-                class="h-16 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-700/40"
+                class="bg-muted h-16 animate-pulse rounded-xl"
               ></div>
             </div>
           </div>
@@ -196,7 +196,7 @@
         <div class="mt-12 text-center">
           <RouterLink
             to="/"
-            class="inline-flex cursor-pointer items-center gap-2 rounded-full bg-gray-900 px-6 py-3 font-medium text-white transition-all duration-300 hover:bg-gray-800 hover:shadow-lg dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+            class="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex cursor-pointer items-center gap-2 rounded-full px-6 py-3 font-medium transition-all duration-300 hover:shadow-lg"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

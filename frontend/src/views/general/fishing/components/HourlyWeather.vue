@@ -213,7 +213,7 @@ const chartOption = computed(() => {
 
 <template>
   <div
-    class="hourly-weather squircle relative overflow-hidden border border-white/30 bg-linear-to-br from-slate-50/90 to-white/80 p-5 shadow-xl backdrop-blur-md dark:border-slate-700/40 dark:from-slate-900/90 dark:to-slate-800/80"
+    class="hourly-weather squircle border-border/30 bg-card relative overflow-hidden border p-5 shadow-xl backdrop-blur-md"
   >
     <!-- Decorative background elements -->
     <div
@@ -226,30 +226,27 @@ const chartOption = computed(() => {
     <!-- Header -->
     <div class="relative mb-4 flex items-center justify-between">
       <div>
-        <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100">
+        <h3 class="text-foreground text-lg font-semibold">
           小时天气预报
-          <span
-            class="ml-2 text-sm font-normal text-slate-500 dark:text-slate-400"
+          <span class="text-muted-foreground ml-2 text-sm font-normal"
             >未来24小时</span
           >
         </h3>
-        <p class="mt-0.5 text-sm text-slate-400 dark:text-slate-500">
-          天气变化趋势
-        </p>
+        <p class="text-muted-foreground mt-0.5 text-sm">天气变化趋势</p>
       </div>
       <!-- Legend pills -->
       <div class="flex items-center gap-3">
         <div
-          class="flex items-center gap-1.5 rounded-full bg-white/60 px-3 py-1.5 shadow-sm dark:bg-slate-800/60"
+          class="bg-card/60 flex items-center gap-1.5 rounded-full px-3 py-1.5 shadow-sm"
         >
-          <span class="h-2.5 w-2.5 rounded-full bg-blue-500" />
-          <span class="text-xs text-slate-600 dark:text-slate-300">降水量</span>
+          <span class="bg-primary h-2.5 w-2.5 rounded-full" />
+          <span class="text-foreground text-xs">降水量</span>
         </div>
         <div
-          class="flex items-center gap-1.5 rounded-full bg-white/60 px-3 py-1.5 shadow-sm dark:bg-slate-800/60"
+          class="bg-card/60 flex items-center gap-1.5 rounded-full px-3 py-1.5 shadow-sm"
         >
-          <span class="h-2.5 w-2.5 rounded-full bg-orange-500" />
-          <span class="text-xs text-slate-600 dark:text-slate-300">温度</span>
+          <span class="bg-warning h-2.5 w-2.5 rounded-full" />
+          <span class="text-foreground text-xs">温度</span>
         </div>
       </div>
     </div>
@@ -264,9 +261,9 @@ const chartOption = computed(() => {
     <div v-else class="flex h-64 items-center justify-center">
       <div class="text-center">
         <div
-          class="mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-blue-500"
+          class="border-border border-t-primary mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-2"
         />
-        <p class="text-sm text-slate-400">正在加载天气数据...</p>
+        <p class="text-muted-foreground text-sm">正在加载天气数据...</p>
       </div>
     </div>
   </div>

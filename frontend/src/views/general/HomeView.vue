@@ -154,7 +154,7 @@ const goToPage = (page: number) => {
       <!-- 书籍列表 -->
       <div class="min-h-fit space-y-4">
         <h2
-          class="mb-4 flex items-baseline font-serif text-2xl font-bold dark:text-gray-800"
+          class="text-foreground mb-4 flex items-baseline font-serif text-2xl font-bold"
         >
           Reading List
         </h2>
@@ -162,24 +162,18 @@ const goToPage = (page: number) => {
         <div v-if="isLoading" aria-hidden="true">
           <!-- Skeleton placeholders (fixed height) to reserve space and prevent layout shift -->
           <ul class="space-y-3">
-            <li
-              class="h-20 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-700/40"
-            ></li>
-            <li
-              class="h-20 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-700/40"
-            ></li>
-            <li
-              class="h-20 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-700/40"
-            ></li>
+            <li class="bg-muted h-20 animate-pulse rounded-xl"></li>
+            <li class="bg-muted h-20 animate-pulse rounded-xl"></li>
+            <li class="bg-muted h-20 animate-pulse rounded-xl"></li>
           </ul>
         </div>
         <div
           v-else-if="errorMessage"
-          class="flex min-h-20 w-full flex-col items-center justify-center rounded-2xl border border-dotted bg-red-50/80 object-center py-4 text-center text-xl text-red-600 dark:bg-red-900/30 dark:text-red-400"
+          class="bg-destructive/10 text-destructive flex min-h-20 w-full flex-col items-center justify-center rounded-2xl border border-dotted object-center py-4 text-center text-xl"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="mb-4 h-12 w-12 text-red-400"
+            class="text-destructive mb-4 h-12 w-12"
             fill="none"
             viewBox="0 0 24 24"
             stroke-width="1.5"
@@ -195,10 +189,7 @@ const goToPage = (page: number) => {
             {{ errorMessage }}
           </p>
         </div>
-        <p
-          v-else-if="books.length === 0"
-          class="text-sm text-gray-500 dark:text-gray-400"
-        >
+        <p v-else-if="books.length === 0" class="text-muted-foreground text-sm">
           暂无书籍，先添加一本吧。
         </p>
 
@@ -206,28 +197,28 @@ const goToPage = (page: number) => {
           <li
             v-for="book in books"
             :key="book.id"
-            class="group relative flex min-h-20 flex-col gap-4 rounded-3xl bg-white/80 p-5 shadow-sm transition-all hover:bg-gray-50 hover:shadow-md sm:flex-row sm:items-center sm:justify-between dark:bg-gray-800/80 dark:hover:bg-gray-700/50"
+            class="group bg-card/80 hover:bg-accent relative flex min-h-20 flex-col gap-4 rounded-3xl p-5 shadow-sm transition-all hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
           >
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2">
                 <p
-                  class="truncate text-lg font-semibold text-gray-900 dark:text-gray-100"
+                  class="text-foreground truncate text-lg font-semibold"
                   :title="book.title"
                 >
                   {{ book.title }}
                 </p>
                 <span
                   v-if="book.iscompleted"
-                  class="inline-flex shrink-0 items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-green-600/20 ring-inset dark:bg-green-400/10 dark:text-green-400"
+                  class="bg-success/10 text-success ring-success/30 inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset"
                   >Done</span
                 >
                 <span
                   v-else
-                  class="inline-flex shrink-0 items-center rounded-full bg-orange-50 px-2.5 py-0.5 text-xs font-medium text-orange-700 ring-1 ring-orange-600/20 ring-inset dark:bg-orange-400/10 dark:text-orange-400"
+                  class="bg-warning/10 text-warning ring-warning/30 inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset"
                   >Reading</span
                 >
               </div>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p class="text-muted-foreground mt-1 text-sm">
                 @ {{ book.author }}
               </p>
             </div>
@@ -245,17 +236,17 @@ const goToPage = (page: number) => {
         <!-- 分页 -->
         <div
           v-if="pagination && pagination.pages > 1"
-          class="mx-auto mt-8 flex w-fit justify-center rounded-2xl bg-gray-50 px-4 py-2 dark:bg-gray-900"
+          class="bg-muted mx-auto mt-8 flex w-fit justify-center rounded-2xl px-4 py-2"
         >
           <nav class="flex items-center gap-2">
             <!-- 上一页 -->
             <button
               :disabled="!pagination.has_prev"
-              class="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-800"
+              class="hover:bg-accent rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
               :class="
                 pagination?.has_prev
-                  ? 'text-gray-700 dark:text-gray-300'
-                  : 'text-gray-400'
+                  ? 'text-foreground'
+                  : 'text-muted-foreground'
               "
               @click="goToPage(pagination!.prev_num!)"
               type="button"
@@ -268,7 +259,7 @@ const goToPage = (page: number) => {
               <!-- 显示第一页 -->
               <button
                 v-if="pagination && pagination.page > 3"
-                class="rounded-lg px-2 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                class="text-foreground hover:bg-accent rounded-lg px-2 py-2 text-sm font-medium"
                 @click="goToPage(1)"
                 type="button"
               >
@@ -278,7 +269,7 @@ const goToPage = (page: number) => {
               <!-- 省略号 -->
               <span
                 v-if="pagination && pagination.page > 4"
-                class="px-1 text-gray-500 dark:text-gray-400"
+                class="text-muted-foreground px-1"
                 >...</span
               >
 
@@ -289,8 +280,8 @@ const goToPage = (page: number) => {
                 class="min-w-32px rounded-lg px-2 py-2 text-sm font-medium transition-colors"
                 :class="
                   pageNum === pagination?.page
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-foreground hover:bg-accent'
                 "
                 @click="goToPage(pageNum)"
                 type="button"
@@ -301,14 +292,14 @@ const goToPage = (page: number) => {
               <!-- 省略号 -->
               <span
                 v-if="pagination && pagination.page < pagination.pages - 3"
-                class="px-1 text-gray-500 dark:text-gray-400"
+                class="text-muted-foreground px-1"
                 >...</span
               >
 
               <!-- 显示最后一页 -->
               <button
                 v-if="pagination && pagination.page < pagination.pages - 2"
-                class="rounded-lg px-2 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                class="text-foreground hover:bg-accent rounded-lg px-2 py-2 text-sm font-medium"
                 @click="goToPage(pagination.pages)"
                 type="button"
               >
@@ -319,11 +310,11 @@ const goToPage = (page: number) => {
             <!-- 下一页 -->
             <button
               :disabled="!pagination?.has_next"
-              class="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-800"
+              class="hover:bg-accent rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
               :class="
                 pagination?.has_next
-                  ? 'text-gray-700 dark:text-gray-300'
-                  : 'text-gray-400'
+                  ? 'text-foreground'
+                  : 'text-muted-foreground'
               "
               @click="goToPage(pagination!.next_num!)"
               type="button"

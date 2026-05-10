@@ -27,7 +27,7 @@ const clearMemo = () => {
 <template>
   <button
     @click="toggleMemo"
-    class="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100/50 text-gray-700 transition-colors hover:bg-gray-200/70 dark:bg-gray-800/50 dark:text-gray-300 dark:hover:bg-gray-700/70"
+    class="bg-muted/50 text-foreground hover:bg-accent/70 dark:bg-card/50 dark:text-foreground dark:hover:bg-accent/70 flex h-9 w-9 items-center justify-center rounded-full transition-colors"
     title="备忘录"
   >
     <IconMemo class="h-4 w-4" />
@@ -53,12 +53,12 @@ const clearMemo = () => {
 
         <!-- Modal content -->
         <div
-          class="relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl bg-white p-6 shadow-2xl dark:bg-gray-800"
+          class="bg-card dark:bg-card relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl p-6 shadow-2xl"
         >
           <!-- Close button -->
           <button
             @click="closeMemo"
-            class="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+            class="text-muted-foreground hover:bg-accent hover:text-secondary-foreground dark:hover:bg-accent dark:hover:text-foreground absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full"
           >
             <svg
               class="h-5 w-5"
@@ -77,7 +77,7 @@ const clearMemo = () => {
 
           <!-- Header -->
           <h3
-            class="mb-4 flex items-center gap-2 font-serif text-xl font-bold text-gray-800 dark:text-white"
+            class="text-foreground dark:text-foreground mb-4 flex items-center gap-2 font-serif text-xl font-bold"
           >
             <IconMemo class="h-5 w-5" />
             备忘录
@@ -87,19 +87,21 @@ const clearMemo = () => {
           <textarea
             v-model="memoText"
             placeholder="在这里写下你的想法..."
-            class="mb-4 w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:placeholder-gray-500"
+            class="border-border bg-muted text-foreground placeholder-muted-foreground focus:border-ring focus:ring-ring dark:border-border dark:bg-card dark:text-foreground dark:placeholder-muted-foreground mb-4 w-full resize-none rounded-xl border px-4 py-3 text-sm focus:ring-2 focus:outline-none"
             rows="10"
           ></textarea>
 
           <!-- Footer -->
           <div class="flex items-center justify-between">
-            <span class="text-xs text-gray-500 dark:text-gray-400">
+            <span
+              class="text-muted-foreground dark:text-muted-foreground text-xs"
+            >
               自动保存
               <span v-if="memoText" class="ml-2">{{ memoText.length }} 字</span>
             </span>
             <button
               @click="clearMemo"
-              class="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-800 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+              class="border-border bg-muted text-secondary-foreground hover:bg-accent hover:text-foreground dark:border-border dark:bg-card dark:text-muted-foreground dark:hover:bg-accent dark:hover:text-foreground flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

@@ -6,19 +6,23 @@
       :style="titleStyle"
     >
       <div>
-        <h1 class="max-w-6xl text-center font-serif text-7xl text-gray-50">
+        <h1
+          class="text-foreground/80 max-w-6xl text-center font-serif text-7xl"
+        >
           Analytics Dashboard
         </h1>
         <!-- Admin Badge and Description -->
         <div
-          class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400"
+          class="text-muted-foreground mt-4 flex flex-wrap items-center justify-center gap-4 text-sm"
         >
           <span
-            class="inline-block rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+            class="bg-muted text-muted-foreground inline-block rounded-full px-3 py-1 text-xs font-medium"
           >
             Admin Only
           </span>
-          <span class="text-gray-200">Monitor your website performance</span>
+          <span class="text-muted-foreground/60"
+            >Monitor your website performance</span
+          >
         </div>
       </div>
     </div>
@@ -26,24 +30,24 @@
     <div class="relative mt-36">
       <div
         :style="sectionStyle"
-        class="absolute left-1/2 -z-5 h-full -translate-x-1/2 rounded-t-[40px] bg-blue-50 dark:bg-slate-900"
+        class="bg-primary/5 absolute left-1/2 -z-5 h-full -translate-x-1/2 rounded-t-[40px]"
       ></div>
 
       <div class="mx-auto max-w-6xl space-y-6 pt-24 pb-12">
         <!-- Action Bar -->
         <div
-          class="squircle relative z-10 flex flex-col items-center justify-between gap-4 border border-gray-200/60 bg-white/80 p-4 shadow-sm sm:flex-row dark:border-gray-800 dark:bg-gray-900/70"
+          class="squircle border-border/60 bg-card/80 relative z-10 flex flex-col items-center justify-between gap-4 border p-4 shadow-sm sm:flex-row"
         >
           <!-- Days Filter -->
           <div class="relative">
             <button
-              class="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-all hover:border-gray-300 hover:bg-gray-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+              class="border-border bg-card text-foreground hover:border-border/70 hover:bg-muted focus:border-primary focus:ring-primary/20 flex items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-medium shadow-sm transition-all focus:ring-2"
               @click="showDropdown = !showDropdown"
               @mouseenter="handleMouseIn"
               @mouseleave="handleMouseOut"
             >
               <svg
-                class="h-4 w-4 text-gray-500"
+                class="text-muted-foreground h-4 w-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -57,7 +61,7 @@
               </svg>
               Last {{ selectedDays }} Days
               <svg
-                class="h-3 w-3 transform-gpu text-gray-500 transition-transform"
+                class="text-muted-foreground h-3 w-3 transition-transform"
                 :class="{ 'rotate-180': showDropdown }"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -83,7 +87,7 @@
             >
               <div
                 v-if="showDropdown"
-                class="absolute top-full left-0 z-50 mt-2 w-fit rounded-xl border border-gray-200/60 bg-white whitespace-nowrap shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-50/5"
+                class="border-border bg-card absolute top-full left-0 z-50 mt-2 w-fit rounded-xl border whitespace-nowrap shadow-lg"
                 @mouseenter="handleMouseIn"
                 @mouseleave="handleMouseOut"
               >
@@ -94,7 +98,7 @@
                     selectedDays = option;
                     showDropdown = false;
                   "
-                  class="block w-full rounded-xl px-4 py-2.5 text-left text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50"
+                  class="text-foreground hover:bg-accent block w-full rounded-xl px-4 py-2.5 text-left text-sm transition-colors"
                 >
                   Last {{ option }} days
                 </button>
@@ -107,7 +111,7 @@
             type="button"
             :disabled="loading"
             @click="fetchAllData"
-            class="group flex cursor-pointer items-center gap-2 rounded-xl bg-gray-900 px-5 py-2.5 font-medium text-white shadow-md transition-all select-none hover:bg-gray-800 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+            class="group bg-primary text-primary-foreground hover:bg-primary/90 flex cursor-pointer items-center gap-2 rounded-xl px-5 py-2.5 font-medium shadow-md transition-all select-none hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
           >
             <svg
               :class="[
@@ -132,7 +136,7 @@
         <!-- Error Message -->
         <div
           v-if="error"
-          class="rounded-xl border border-red-200 bg-red-50/80 p-4 text-red-800 dark:border-red-800 dark:bg-red-900/30 dark:text-red-200"
+          class="border-destructive/30 bg-destructive/10 text-destructive rounded-xl border p-4"
         >
           <div class="flex items-center gap-2">
             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -153,7 +157,7 @@
             <div
               v-for="i in 4"
               :key="i"
-              class="squircle h-32 animate-pulse bg-white/60 dark:bg-gray-800/60"
+              class="bg-card/60 squircle h-32 animate-pulse"
             ></div>
           </template>
 
@@ -161,11 +165,11 @@
           <template v-else>
             <!-- Total Visits (PV) -->
             <div
-              class="group squircle squircle cursor-pointer overflow-hidden border border-gray-200/60 bg-white/30 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900/70"
+              class="group squircle border-border/60 bg-card/30 squircle cursor-pointer overflow-hidden border p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
               <div class="mb-3 flex items-center gap-2">
                 <div
-                  class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
+                  class="bg-primary/15 text-primary flex h-10 w-10 items-center justify-center rounded-xl"
                 >
                   <svg
                     class="h-5 w-5"
@@ -187,26 +191,23 @@
                     />
                   </svg>
                 </div>
-                <span
-                  class="text-sm font-medium text-gray-500 dark:text-gray-400"
+                <span class="text-muted-foreground text-sm font-medium"
                   >Total Visits</span
                 >
               </div>
-              <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">
+              <p class="text-foreground text-3xl font-bold">
                 {{ formatNumber(overviewData?.total_visits ?? 0) }}
               </p>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                Page Views
-              </p>
+              <p class="text-muted-foreground mt-1 text-xs">Page Views</p>
             </div>
 
             <!-- Unique Visitors (UV) -->
             <div
-              class="group squircle squircle cursor-pointer overflow-hidden border border-gray-200/60 bg-white/30 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900/70"
+              class="group squircle border-border/60 bg-card/30 squircle cursor-pointer overflow-hidden border p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
               <div class="mb-3 flex items-center gap-2">
                 <div
-                  class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
+                  class="bg-success/20 text-success flex h-10 w-10 items-center justify-center rounded-xl"
                 >
                   <svg
                     class="h-5 w-5"
@@ -222,26 +223,23 @@
                     />
                   </svg>
                 </div>
-                <span
-                  class="text-sm font-medium text-gray-500 dark:text-gray-400"
+                <span class="text-muted-foreground text-sm font-medium"
                   >Unique Visitors</span
                 >
               </div>
-              <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">
+              <p class="text-foreground text-3xl font-bold">
                 {{ formatNumber(overviewData?.unique_visitors ?? 0) }}
               </p>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                By IP address
-              </p>
+              <p class="text-muted-foreground mt-1 text-xs">By IP address</p>
             </div>
 
             <!-- Unique Visitor IDs -->
             <div
-              class="group squircle squircle cursor-pointer overflow-hidden border border-gray-200/60 bg-white/30 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900/70"
+              class="group squircle border-border/60 bg-card/30 squircle cursor-pointer overflow-hidden border p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
               <div class="mb-3 flex items-center gap-2">
                 <div
-                  class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
+                  class="bg-accent text-accent-foreground flex h-10 w-10 items-center justify-center rounded-xl"
                 >
                   <svg
                     class="h-5 w-5"
@@ -257,26 +255,23 @@
                     />
                   </svg>
                 </div>
-                <span
-                  class="text-sm font-medium text-gray-500 dark:text-gray-400"
+                <span class="text-muted-foreground text-sm font-medium"
                   >Visitor IDs</span
                 >
               </div>
-              <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">
+              <p class="text-foreground text-3xl font-bold">
                 {{ formatNumber(overviewData?.unique_visitor_ids ?? 0) }}
               </p>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                By visitor ID
-              </p>
+              <p class="text-muted-foreground mt-1 text-xs">By visitor ID</p>
             </div>
 
             <!-- Avg Visits Per Day -->
             <div
-              class="group squircle squircle cursor-pointer overflow-hidden border border-gray-200/60 bg-white/30 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900/70"
+              class="group squircle border-border/60 bg-card/30 squircle cursor-pointer overflow-hidden border p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
               <div class="mb-3 flex items-center gap-2">
                 <div
-                  class="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400"
+                  class="bg-warning/20 text-warning flex h-10 w-10 items-center justify-center rounded-xl"
                 >
                   <svg
                     class="h-5 w-5"
@@ -292,15 +287,14 @@
                     />
                   </svg>
                 </div>
-                <span
-                  class="text-sm font-medium text-gray-500 dark:text-gray-400"
+                <span class="text-muted-foreground text-sm font-medium"
                   >Avg/Day</span
                 >
               </div>
-              <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">
+              <p class="text-foreground text-3xl font-bold">
                 {{ avgVisitsPerDay }}
               </p>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p class="text-muted-foreground mt-1 text-xs">
                 Last {{ selectedDays }} days
               </p>
             </div>
@@ -309,7 +303,7 @@
 
         <!-- Charts Section -->
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <AreaChart class="squircle dark:bg-gray-900/80" />
+          <AreaChart class="squircle" />
           <PopularPagesChartCard
             :loading="loading"
             :overview-data="overviewData"
@@ -340,10 +334,10 @@
 
         <!-- User Login Logs Table -->
         <div
-          class="squircle squircle overflow-hidden border border-gray-200/60 bg-white/30 p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900/70"
+          class="squircle border-border/60 bg-card/30 squircle overflow-hidden border p-6 shadow-sm"
         >
           <h2
-            class="mb-4 flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100"
+            class="text-foreground mb-4 flex items-center gap-2 text-lg font-bold"
           >
             <icon-user class="inline-block size-4" />
             User Login Logs
@@ -355,7 +349,7 @@
               <div
                 v-for="i in 5"
                 :key="i"
-                class="h-12 animate-pulse rounded-lg bg-gray-100 dark:bg-gray-700/40"
+                class="bg-muted h-12 animate-pulse rounded-lg"
               ></div>
             </div>
           </div>
@@ -363,10 +357,10 @@
           <!-- Empty State -->
           <div
             v-else-if="loginLogsData?.list.length === 0"
-            class="py-12 text-center text-gray-500 dark:text-gray-400"
+            class="text-muted-foreground py-12 text-center"
           >
             <svg
-              class="mx-auto mb-4 h-12 w-12 text-gray-300 dark:text-gray-600"
+              class="text-muted-foreground/40 mx-auto mb-4 h-12 w-12"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -386,7 +380,7 @@
             <table class="w-full">
               <thead>
                 <tr
-                  class="border-b border-gray-200 text-left text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400"
+                  class="border-border text-muted-foreground border-b text-left text-sm"
                 >
                   <th class="pb-3 font-medium">User</th>
                   <th class="pb-3 font-medium">Login Count</th>
@@ -397,24 +391,24 @@
                   <th class="pb-3 font-medium">Active</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+              <tbody class="divide-border divide-y">
                 <tr
                   v-for="log in loginLogsData?.list"
                   :key="log.user_id"
-                  class="text-sm transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/30"
+                  class="hover:bg-accent/30 text-sm transition-colors"
                 >
                   <td class="py-4">
                     <div class="flex items-center gap-3">
                       <div
-                        class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
+                        class="bg-primary/15 text-primary flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold"
                       >
                         {{ log.username?.charAt(0).toUpperCase() }}
                       </div>
                       <div>
-                        <p class="font-medium text-gray-900 dark:text-gray-100">
+                        <p class="text-foreground font-medium">
                           {{ log.name || log.username }}
                         </p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                        <p class="text-muted-foreground text-xs">
                           @{{ log.username }}
                         </p>
                       </div>
@@ -422,30 +416,26 @@
                   </td>
                   <td class="py-4">
                     <span
-                      class="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                      class="bg-success/20 text-success inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
                     >
                       {{ log.login_count }} times
                     </span>
                   </td>
-                  <td class="py-4 text-gray-600 dark:text-gray-300">
+                  <td class="text-foreground/80 py-4">
                     {{ formatDateTime(log.last_login_at) }}
                   </td>
-                  <td class="py-4 text-gray-600 dark:text-gray-300">
+                  <td class="text-foreground/80 py-4">
                     {{ formatDateTime(log.current_login_at) }}
                   </td>
-                  <td
-                    class="py-4 font-mono text-xs text-gray-500 dark:text-gray-400"
-                  >
+                  <td class="text-muted-foreground py-4 font-mono text-xs">
                     {{ log.last_login_ip || "-" }}
                   </td>
-                  <td
-                    class="py-4 font-mono text-xs text-gray-500 dark:text-gray-400"
-                  >
+                  <td class="text-muted-foreground py-4 font-mono text-xs">
                     {{ log.current_login_ip || "-" }}
                   </td>
                   <td>
                     <span
-                      class="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                      class="bg-success/20 text-success inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
                     >
                       {{ log.active ? "Online" : "Offline" }}
                     </span>
@@ -458,9 +448,9 @@
           <!-- Pagination -->
           <div
             v-if="loginLogsData && loginLogsData.total_pages > 1"
-            class="mt-4 flex items-center justify-between border-t border-gray-100 pt-4 dark:border-gray-700"
+            class="border-border mt-4 flex items-center justify-between border-t pt-4"
           >
-            <p class="text-sm text-gray-500 dark:text-gray-400">
+            <p class="text-muted-foreground text-sm">
               Showing
               {{ (loginLogsData.page - 1) * loginLogsData.page_size + 1 }} to
               {{
@@ -475,14 +465,14 @@
               <button
                 :disabled="loginLogsData.page <= 1"
                 @click="changePage(loginLogsData.page - 1)"
-                class="rounded-lg px-3 py-1.5 text-sm font-medium transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700"
+                class="hover:bg-accent text-foreground rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Previous
               </button>
               <button
                 :disabled="loginLogsData.page >= loginLogsData.total_pages"
                 @click="changePage(loginLogsData.page + 1)"
-                class="rounded-lg px-3 py-1.5 text-sm font-medium transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-700"
+                class="hover:bg-accent text-foreground rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Next
               </button>
@@ -494,7 +484,7 @@
         <div class="mt-12 text-center">
           <RouterLink
             to="/"
-            class="inline-flex cursor-pointer items-center gap-2 rounded-full bg-gray-900 px-6 py-3 font-medium text-white transition-all duration-300 hover:bg-gray-800 hover:shadow-lg dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+            class="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex cursor-pointer items-center gap-2 rounded-full px-6 py-3 font-medium transition-all duration-300 hover:shadow-lg"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

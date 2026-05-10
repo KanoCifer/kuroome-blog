@@ -346,11 +346,11 @@ onUnmounted(() => {
 
 <template>
   <section
-    class="summary-card shadow-glow mb-6 overflow-hidden rounded-2xl border border-blue-100 bg-blue-50/70 p-5 transition-all dark:border-slate-700 dark:bg-slate-800/70"
+    class="summary-card shadow-glow border-primary/20 bg-primary/10 dark:border-border dark:bg-card/70 mb-6 overflow-hidden rounded-2xl border p-5 transition-all"
     :class="{ 'is-loading': loading }"
   >
     <div class="mb-3 flex items-center justify-between gap-3">
-      <h3 class="text-base font-semibold text-blue-900 dark:text-blue-100">
+      <h3 class="text-primary dark:text-primary text-base font-semibold">
         <template v-if="cardMode === CardMode.SUMMARY"> AI 文章总结 </template>
         <template v-else> AI 对话 </template>
         <AnimatePresence mode="wait">
@@ -372,8 +372,8 @@ onUnmounted(() => {
           class="cursor-pointer rounded-md px-2 py-1 text-xs"
           :class="
             cardMode === CardMode.SUMMARY
-              ? 'bg-blue-600 text-white'
-              : 'bg-blue-100 text-blue-700 dark:bg-slate-700 dark:text-slate-200'
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-primary/20 text-primary dark:bg-card dark:text-foreground'
           "
           :disabled="loading"
           @click="cardMode = CardMode.SUMMARY"
@@ -384,8 +384,8 @@ onUnmounted(() => {
           class="cursor-pointer rounded-md px-2 py-1 text-xs"
           :class="
             cardMode === CardMode.CHAT
-              ? 'bg-blue-600 text-white'
-              : 'bg-blue-100 text-blue-700 dark:bg-slate-700 dark:text-slate-200'
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-primary/20 text-primary dark:bg-card dark:text-foreground'
           "
           :disabled="loading"
           @click="switchToChat"
@@ -394,7 +394,7 @@ onUnmounted(() => {
         </button>
         <button
           v-if="cardMode === CardMode.SUMMARY"
-          class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 dark:disabled:bg-slate-600"
+          class="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-primary/30 dark:disabled:bg-primary/30 inline-flex cursor-pointer items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition disabled:cursor-not-allowed"
           :disabled="!canSummarize"
           @click="onGenerate"
         >
@@ -422,7 +422,7 @@ onUnmounted(() => {
         </button>
         <button
           v-if="cardMode === CardMode.CHAT && messages.length > 0"
-          class="cursor-pointer rounded-md px-2 py-1 text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+          class="text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-foreground cursor-pointer rounded-md px-2 py-1 text-xs"
           :disabled="loading"
           @click="clearChat"
         >
@@ -431,7 +431,10 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <p v-if="errorMessage" class="text-sm text-red-500 dark:text-red-400">
+    <p
+      v-if="errorMessage"
+      class="text-destructive dark:text-destructive text-sm"
+    >
       {{ errorMessage }}
     </p>
 
@@ -440,7 +443,7 @@ onUnmounted(() => {
         <p
           v-if="summary"
           key="result"
-          class="text-sm leading-7 whitespace-pre-line text-slate-700 dark:text-slate-200"
+          class="text-foreground dark:text-foreground text-sm leading-7 whitespace-pre-line"
         >
           {{ summary
           }}<span v-if="loading" class="animate-breathe ml-0.5">|</span>
@@ -448,7 +451,7 @@ onUnmounted(() => {
         <p
           v-else
           key="placeholder"
-          class="text-sm text-slate-500 dark:text-slate-400"
+          class="text-muted-foreground dark:text-muted-foreground text-sm"
         >
           点击"生成总结"，快速提炼当前文章重点。
         </p>
@@ -458,10 +461,8 @@ onUnmounted(() => {
     <template v-else>
       <div
         v-if="!hasGenerated"
-        class="text-sm text-slate-500 dark:text-slate-400"
-      >
-        请先生成文章总结，再开始对话。
-      </div>
+        class="text-muted-foreground dark:text-muted-foreground text-sm"
+      ></div>
       <template v-else>
         <div
           ref="messagesContainer"
@@ -477,8 +478,8 @@ onUnmounted(() => {
               class="max-w-[85%] rounded-xl px-3 py-2 text-sm leading-6 whitespace-pre-line"
               :class="
                 msg.role === 'user'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-slate-700 shadow-sm dark:bg-slate-700 dark:text-slate-200'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-card text-foreground dark:bg-card dark:text-foreground shadow-sm'
               "
             >
               <template v-if="msg.content">
@@ -494,7 +495,9 @@ onUnmounted(() => {
                 >
               </template>
               <template v-else-if="loading && idx === messages.length - 1">
-                <span class="animate-pulse text-slate-400">思考中...</span>
+                <span class="text-muted-foreground animate-pulse"
+                  >思考中...</span
+                >
               </template>
             </div>
           </div>
@@ -505,12 +508,12 @@ onUnmounted(() => {
             v-model="chatInput"
             type="text"
             placeholder="继续提问..."
-            class="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:placeholder-slate-400 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+            class="border-border bg-card text-foreground placeholder-muted-foreground focus:border-ring focus:ring-ring dark:border-border dark:bg-card dark:text-foreground dark:placeholder-muted-foreground dark:focus:border-ring dark:focus:ring-ring flex-1 rounded-lg border px-3 py-2 text-sm focus:ring-1 focus:outline-none"
             :disabled="loading"
             @keydown="onChatKeydown"
           />
           <button
-            class="inline-flex cursor-pointer items-center justify-center rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 dark:disabled:bg-slate-600"
+            class="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-primary/30 dark:disabled:bg-primary/30 inline-flex cursor-pointer items-center justify-center rounded-lg px-3 py-2 text-sm font-medium transition disabled:cursor-not-allowed"
             :disabled="!canChat"
             @click="onSendChat"
           >

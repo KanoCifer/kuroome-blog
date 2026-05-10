@@ -8,7 +8,7 @@
       class="group fixed top-4 left-4 z-50 hidden md:block"
     >
       <nav
-        class="squircle z-9999 flex items-center gap-2 bg-white/80 px-1 py-2 shadow-lg backdrop-blur-sm dark:bg-gray-800/80"
+        class="squircle bg-card/80 dark:bg-card/80 z-9999 flex items-center gap-2 px-1 py-2 shadow-lg backdrop-blur-sm"
       >
         <ul class="flex items-center gap-2 font-medium">
           <!-- Avatar -->
@@ -32,7 +32,7 @@
           <li class="relative flex items-center gap-4 px-2">
             <!-- Indicator -->
             <motion.div
-              class="pointer-events-none absolute top-0 left-0 z-1 h-12 w-12 rounded-full bg-gray-100 shadow-sm dark:bg-gray-700"
+              class="bg-muted dark:bg-accent pointer-events-none absolute top-0 left-0 z-1 h-12 w-12 rounded-full shadow-sm"
               :animate="{ x: indicatorX }"
               :transition="{ type: 'spring', stiffness: 320, damping: 30 }"
             />
@@ -41,9 +41,9 @@
               v-for="(item, index) in navItems"
               :key="item.to"
               :to="item.to"
-              class="relative z-10 flex h-12 w-12 items-center justify-center rounded-full text-gray-500 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+              class="text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-foreground relative z-10 flex h-12 w-12 items-center justify-center rounded-full transition-colors"
               :class="{
-                'text-blue-600 dark:text-blue-400': isActive(item.to),
+                'text-primary dark:text-primary': isActive(item.to),
               }"
               @mouseenter="hoveredIndex = index"
               @mouseleave="hoveredIndex = activeIndex"

@@ -1,0 +1,61 @@
+/* Paper — 纸色暖调 */
+[data-color-scheme="paper"] {
+  --radius: 0.625rem;
+  --ink: #1a1613;
+  --paper: #f8f5f0;
+  --warm-gray: #e8e2da;
+  --muted: #9a918a;
+  --accent-amber: #c8713a;
+  --accent-sage: #5a7a62;
+  --accent-slate: #5a6b7a;
+  --accent-rose: #b35a5a;
+  --workspace-accent: #8a653f;
+  --workspace-accent-soft: #f2e7db;
+  --workspace-accent-border: #d4b396;
+  --workspace-accent-contrast: #fffaf5;
+  --status-active: #3d7a4a;
+  --status-cooling: #b8892e;
+  --status-abandoned: #b35a5a;
+  --card-bg: #fffdf9;
+  --surface: #f8f5f0bf;
+  --surface-foreground: #1a1613;
+  --chart-1: #c8713a;
+  --chart-2: #5a7a62;
+  --chart-3: #5a6b7a;
+  --chart-4: #b35a5a;
+  --chart-5: #b8892e;
+  --gradient-primary-from: #8a653f;
+  --gradient-primary-to: #c8713a;
+  --gradient-decorative-from: #f2e7db;
+  --gradient-decorative-to: #d4b396;
+}
+
+[data-color-scheme="paper"].dark {
+  --ink: #e8e2da;
+  --paper: #1a1613;
+  --warm-gray: #2d2722;
+  --muted: #7a726a;
+  --accent-amber: #d4854a;
+  --accent-sage: #6a8a72;
+  --accent-slate: #6a7b8a;
+  --accent-rose: #b37a7a;
+  --workspace-accent: #a0754f;
+  --workspace-accent-soft: #2d2722;
+  --workspace-accent-border: #5a4a3a;
+  --workspace-accent-contrast: #f8f5f0;
+  --status-active: #5a9a6a;
+  --status-cooling: #c89a3a;
+  --status-abandoned: #c36a6a;
+  --card-bg: #231f1a;
+  --surface: #231f1acc;
+  --surface-foreground: #e8e2da;
+  --chart-1: #d4854a;
+  --chart-2: #6a8a72;
+  --chart-3: #6a7b8a;
+  --chart-4: #b37a7a;
+  --chart-5: #c89a3a;
+  --gradient-primary-from: #a0754f;
+  --gradient-primary-to: #d4854a;
+  --gradient-decorative-from: #2d2722;
+  --gradient-decorative-to: #5a4a3a;
+}

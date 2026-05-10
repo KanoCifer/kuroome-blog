@@ -27,11 +27,15 @@ onMounted(() => {
 
 <template>
   <div
-    class="rounded-3xl border border-gray-100 bg-white/80 p-5 shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-md dark:border-gray-700 dark:bg-gray-800/80"
+    class="border-border bg-card/80 dark:border-border dark:bg-card/80 rounded-3xl border p-5 shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-md"
   >
     <div class="mb-3 flex items-center gap-2">
-      <IconMemo class="h-4 w-4 text-gray-600 dark:text-gray-300" />
-      <h3 class="text-xs font-bold tracking-wider text-gray-400 uppercase">
+      <IconMemo
+        class="text-secondary-foreground dark:text-foreground h-4 w-4"
+      />
+      <h3
+        class="text-muted-foreground text-xs font-bold tracking-wider uppercase"
+      >
         备忘录
       </h3>
     </div>
@@ -39,17 +43,19 @@ onMounted(() => {
       v-model="memoText"
       @input="saveMemo"
       placeholder="在这里写下你的想法..."
-      class="mb-3 w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-700 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:placeholder-gray-500"
+      class="border-border bg-muted text-foreground placeholder-muted-foreground focus:border-ring focus:ring-ring dark:border-border dark:bg-card dark:text-foreground dark:placeholder-muted-foreground mb-3 w-full resize-none rounded-xl border px-3 py-2 text-xs focus:ring-2 focus:outline-none"
       rows="6"
     ></textarea>
     <div class="flex items-center justify-between">
-      <span class="text-[10px] text-gray-500 dark:text-gray-400">
+      <span
+        class="text-muted-foreground dark:text-muted-foreground text-[10px]"
+      >
         自动保存
         <span v-if="memoText" class="ml-1">{{ memoText.length }} 字</span>
       </span>
       <button
         @click="clearMemo"
-        class="flex items-center gap-1 rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-[10px] font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-800 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+        class="border-border bg-muted text-secondary-foreground hover:bg-accent hover:text-foreground dark:border-border dark:bg-card dark:text-muted-foreground dark:hover:bg-accent dark:hover:text-foreground flex items-center gap-1 rounded-lg border px-2 py-1 text-[10px] font-medium transition-colors"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

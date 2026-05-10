@@ -2,18 +2,23 @@
   <section class="grid grid-cols-2 gap-4">
     <!-- Total Price (Spans 2 columns on large screens) -->
     <div
-      class="squircle col-span-2 flex items-center justify-between border border-slate-100 bg-white p-10 shadow-lg dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl"
+      class="squircle border-border/10 bg-card col-span-2 flex items-center justify-between border p-10 shadow-lg"
     >
       <div>
-        <p class="text-sm font-medium text-slate-500 dark:text-slate-400">设备总价格</p>
-        <p class="text-brand-devices dark:text-brand-devices mt-1 text-3xl font-bold tracking-tight">
+        <p class="text-muted-foreground text-sm font-medium">设备总价格</p>
+        <p class="text-brand-devices mt-1 text-3xl font-bold tracking-tight">
           ¥{{ totalPrice.toFixed(2) }}
         </p>
       </div>
       <div
-        class="text-brand-devices dark:text-brand-devices flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-500/20"
+        class="text-brand-devices bg-brand-devices/10 flex h-12 w-12 items-center justify-center rounded-full"
       >
-        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg
+          class="h-6 w-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -26,12 +31,17 @@
 
     <!-- Active -->
     <div
-      class="squircle flex items-center gap-4 border border-slate-100 bg-white p-8 shadow-lg dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl"
+      class="squircle border-border/10 bg-card flex items-center gap-4 border p-8 shadow-lg"
     >
       <div
-        class="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-emerald-500/20 dark:text-emerald-400"
+        class="bg-success/20 text-success flex h-10 w-10 items-center justify-center rounded-full"
       >
-        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg
+          class="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -41,8 +51,8 @@
         </svg>
       </div>
       <div>
-        <p class="text-xs font-medium text-slate-500 dark:text-slate-400">使用中</p>
-        <p class="mt-1 text-xl font-bold text-slate-900 dark:text-white">
+        <p class="text-muted-foreground text-xs font-medium">使用中</p>
+        <p class="text-foreground mt-1 text-xl font-bold">
           {{ activeCount }}
         </p>
       </div>
@@ -50,12 +60,17 @@
 
     <!-- Total -->
     <div
-      class="squircle flex items-center gap-4 border border-slate-100 bg-white p-8 shadow-lg dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl"
+      class="squircle border-border/10 bg-card flex items-center gap-4 border p-8 shadow-lg"
     >
       <div
-        class="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400"
+        class="bg-warning/20 text-warning flex h-10 w-10 items-center justify-center rounded-full"
       >
-        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg
+          class="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -65,8 +80,8 @@
         </svg>
       </div>
       <div>
-        <p class="text-xs font-medium text-slate-500 dark:text-slate-400">设备总数</p>
-        <p class="mt-1 text-xl font-bold text-slate-900 dark:text-white">
+        <p class="text-muted-foreground text-xs font-medium">设备总数</p>
+        <p class="text-foreground mt-1 text-xl font-bold">
           {{ totalCount }}
         </p>
       </div>
@@ -84,7 +99,11 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const activeCount = computed(() => props.devices.filter((d) => d.status === "active").length);
-const totalPrice = computed(() => props.devices.reduce((total, device) => total + device.price, 0));
+const activeCount = computed(
+  () => props.devices.filter((d) => d.status === "active").length,
+);
+const totalPrice = computed(() =>
+  props.devices.reduce((total, device) => total + device.price, 0),
+);
 const totalCount = computed(() => props.devices.length);
 </script>

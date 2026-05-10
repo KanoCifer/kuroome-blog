@@ -2,7 +2,7 @@
   <motion.div
     :whileHover="{ scale: 1.05 }"
     :whilePress="{ scale: 0.95 }"
-    class="card squircle rounded-[40px] border border-white/60 bg-gray-50/50 p-6 shadow-sm ring ring-gray-50/70 dark:border-gray-700 dark:bg-gray-800/80 dark:ring-gray-600"
+    class="card squircle border-border/50 bg-card/55 ring-border/30 rounded-[40px] border p-6 shadow-sm ring"
   >
     <slot></slot>
   </motion.div>

@@ -42,7 +42,7 @@ const error = ref("");
 const handleSaveDraft = () => {
   const safeKey = (debouncedTitle.value || "default")
     .trim()
-    .replace(/[^\w\u4e00-\u9fa5-]/g, "_");
+    .replace(/[^\w一-龥-]/g, "_");
   localStorage.setItem(`markdown-draft-${safeKey}`, body.value);
   notification.success("草稿已保存");
 };
@@ -213,7 +213,7 @@ const handleCategoryMouseLeave = () => {
       <!-- Error Message -->
       <div
         v-if="error"
-        class="mb-6 rounded-lg bg-red-50 p-4 text-red-800 dark:bg-red-900/20 dark:text-red-200"
+        class="bg-destructive/10 text-destructive mb-6 rounded-lg p-4"
       >
         <div class="flex items-center">
           <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -230,9 +230,9 @@ const handleCategoryMouseLeave = () => {
       <!-- Loading State -->
       <div v-if="loading && isEdit" class="py-12 text-center">
         <div
-          class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"
+          class="border-border/50 border-t-primary mx-auto h-8 w-8 animate-spin rounded-full border-2"
         ></div>
-        <p class="mt-2 text-gray-600 dark:text-gray-400">Loading post...</p>
+        <p class="text-muted-foreground mt-2">Loading post...</p>
       </div>
 
       <!-- Form -->
@@ -246,7 +246,7 @@ const handleCategoryMouseLeave = () => {
         <div class="space-y-4">
           <!-- Title -->
           <div
-            class="group relative rounded-3xl border border-gray-200 bg-white p-2 shadow-sm transition-all focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600"
+            class="group border-border bg-card focus-within:border-primary focus-within:ring-primary hover:border-border/80 relative rounded-3xl border p-2 shadow-sm transition-all focus-within:ring-2"
           >
             <label for="title" class="sr-only">Post Title</label>
             <input
@@ -255,7 +255,7 @@ const handleCategoryMouseLeave = () => {
               type="text"
               required
               placeholder="Enter post title..."
-              class="block w-full border-0 bg-transparent px-4 py-3 text-3xl font-bold text-gray-900 outline-0 placeholder:text-gray-400 focus:ring-0 sm:text-2xl dark:text-white"
+              class="text-foreground placeholder:text-muted-foreground block w-full border-0 bg-transparent px-4 py-3 text-3xl font-bold outline-0 focus:ring-0 sm:text-2xl"
             />
           </div>
 
@@ -268,8 +268,8 @@ const handleCategoryMouseLeave = () => {
               :class="[
                 'inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-medium transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:outline-none',
                 pin
-                  ? 'border-amber-500 bg-amber-50 text-amber-700 ring-amber-500 hover:bg-amber-100 dark:border-amber-400 dark:bg-amber-900/20 dark:text-amber-300 dark:hover:bg-amber-900/30'
-                  : 'border-gray-300 bg-white text-gray-600 ring-blue-500 hover:border-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-500 dark:hover:bg-gray-700',
+                  ? 'border-warning bg-warning/10 text-warning hover:bg-warning/15'
+                  : 'border-border bg-card text-muted-foreground hover:border-border/80 hover:bg-accent',
               ]"
             >
               <svg
@@ -298,14 +298,14 @@ const handleCategoryMouseLeave = () => {
               <button
                 type="button"
                 @click="categoryMenuOpen = !categoryMenuOpen"
-                class="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 shadow-sm transition-all duration-200 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 hover:border-gray-300 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                class="border-border bg-card text-foreground focus-within:border-primary focus-within:ring-primary/20 hover:border-border/80 flex w-full items-center justify-between rounded-xl border px-4 py-2 text-sm font-medium shadow-sm transition-all duration-200 focus-within:ring-2 hover:shadow-md"
               >
                 <div class="flex items-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
-                    class="mr-2 h-4 w-4 shrink-0 text-gray-400 transition-colors group-focus-within:text-blue-500 dark:text-gray-500"
+                    class="text-muted-foreground group-focus-within:text-primary mr-2 h-4 w-4 shrink-0 transition-colors"
                   >
                     <path
                       fill-rule="evenodd"
@@ -313,8 +313,7 @@ const handleCategoryMouseLeave = () => {
                       clip-rule="evenodd"
                     />
                   </svg>
-                  <span
-                    class="mr-2 text-sm font-medium text-gray-500 dark:text-gray-400"
+                  <span class="text-muted-foreground mr-2 text-sm font-medium"
                     >分类</span
                   >
                   <span class="text-sm font-medium">
@@ -326,7 +325,7 @@ const handleCategoryMouseLeave = () => {
                   viewBox="0 0 20 20"
                   fill="currentColor"
                   :class="[
-                    'h-4 w-4 text-gray-400 transition-transform duration-200',
+                    'text-muted-foreground h-4 w-4 transition-transform duration-200',
                     categoryMenuOpen ? 'rotate-180' : '',
                   ]"
                 >
@@ -347,7 +346,7 @@ const handleCategoryMouseLeave = () => {
               >
                 <div
                   v-if="categoryMenuOpen"
-                  class="absolute top-full left-0 z-50 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                  class="border-border bg-card absolute top-full left-0 z-50 mt-1 w-full rounded-lg border shadow-lg"
                 >
                   <div class="py-1">
                     <button
@@ -361,8 +360,8 @@ const handleCategoryMouseLeave = () => {
                       :class="[
                         'w-full px-4 py-2 text-left text-sm transition-colors',
                         category === String(cat.id)
-                          ? 'bg-blue-100 text-blue-900 dark:bg-blue-900/20 dark:text-blue-300'
-                          : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700',
+                          ? 'bg-primary/15 text-primary'
+                          : 'text-muted-foreground hover:bg-accent',
                       ]"
                     >
                       {{ cat.name }}
@@ -375,7 +374,7 @@ const handleCategoryMouseLeave = () => {
             <button
               type="button"
               @click="handleSaveDraft"
-              class="inline-flex items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-600 shadow-sm transition-all duration-200 hover:border-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-500 dark:hover:bg-gray-700"
+              class="border-border bg-card text-muted-foreground hover:border-border/80 hover:bg-accent inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-medium shadow-sm transition-all duration-200"
             >
               <IconSave />
               保存草稿
@@ -393,14 +392,14 @@ const handleCategoryMouseLeave = () => {
           <button
             type="button"
             @click="handleCancel"
-            class="rounded-full border border-gray-300 bg-white px-6 py-2 text-sm font-medium text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-50 hover:shadow-md focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+            class="border-border bg-card text-muted-foreground hover:bg-accent focus:ring-ring rounded-full border px-6 py-2 text-sm font-medium shadow-sm transition-all duration-200 hover:shadow-md focus:ring-2 focus:ring-offset-2 focus:outline-none"
           >
             取消
           </button>
           <button
             type="submit"
             :disabled="loading"
-            class="inline-flex cursor-pointer items-center justify-center rounded-full bg-gray-900 px-6 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-gray-800 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+            class="bg-foreground text-background hover:bg-foreground/90 focus-visible:outline-foreground inline-flex cursor-pointer items-center justify-center rounded-full px-6 py-2 text-sm font-semibold shadow-sm transition-all duration-200 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <svg
               v-if="loading"

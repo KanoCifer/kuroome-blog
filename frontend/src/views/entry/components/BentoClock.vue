@@ -1,14 +1,12 @@
 <template>
   <BentoCard class="flex flex-col items-center justify-center">
-    <p class="text-sm font-medium tracking-wider text-slate-500">
+    <p class="text-muted-foreground text-sm font-medium tracking-wider">
       {{ dateLabel }}
     </p>
-    <p
-      class="mt-2 font-mono text-6xl font-bold tracking-tight text-blue-800 dark:text-slate-300"
-    >
+    <p class="text-primary mt-2 font-mono text-6xl font-bold tracking-tight">
       {{ timeLabel }}
     </p>
-    <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
+    <p class="text-muted-foreground mt-1 text-sm">
       {{ weekdayLabel }}
     </p>
   </BentoCard>
