@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { BasicFooter } from "@/components/basic";
 import BackToTop from "@/components/layout/BackToTop.vue";
+import CookieConsent from "@/components/layout/CookieConsent.vue";
 import ToastContainer from "@/components/layout/ToastContainer.vue";
 import BasicNav from "@/components/nav/BasicNav.vue";
 import { useDebounceFn, useScroll, useStorage } from "@vueuse/core";
@@ -179,6 +180,7 @@ onUnmounted(() => {
         <Teleport to="body">
           <ToastContainer />
         </Teleport>
+        <CookieConsent />
         <BasicNav :isEntryView="isEntryView" :isVisible="showBasicNav" />
       </div>
     </header>
