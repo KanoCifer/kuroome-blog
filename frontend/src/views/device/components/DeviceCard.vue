@@ -31,22 +31,16 @@
           <span class="text-xs text-slate-500 dark:text-slate-400">
             {{ formatPurchaseDate(device.purchase_date) }}
           </span>
-          <p
-            class="font-family-dongfang mt-2 text-xs font-bold text-slate-500 dark:text-slate-400"
-          >
-            {{
-              `日均 ${formatPrice(calcSpendPerDay(device), device.currency)}/天`
-            }}
+          <p class="font-family-dongfang mt-2 text-xs font-bold text-slate-500 dark:text-slate-400">
+            {{ `日均 ${formatPrice(calcSpendPerDay(device), device.currency)}/天` }}
           </p>
         </div>
       </div>
       <div class="text-right">
-        <p class="text-xl font-bold text-[#00288e] dark:text-blue-400">
+        <p class="text-brand-devices dark:text-brand-devices text-xl font-bold">
           {{ formatPrice(device.price, device.currency) }}
         </p>
-        <p
-          class="text-[10px] font-bold tracking-wider text-slate-400 uppercase dark:text-slate-500"
-        >
+        <p class="text-[10px] font-bold tracking-wider text-slate-400 uppercase dark:text-slate-500">
           {{ device.currency }}
         </p>
       </div>
@@ -58,7 +52,7 @@
       class="mb-6 flex items-center gap-2 rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-700/50"
     >
       <svg
-        class="h-4 w-4 scale-75 text-[#00288e] dark:text-blue-400"
+        class="text-brand-devices dark:text-brand-devices h-4 w-4 scale-75"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -70,9 +64,7 @@
           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
         />
       </svg>
-      <span
-        class="truncate text-sm font-medium text-slate-500 dark:text-slate-400"
-      >
+      <span class="truncate text-sm font-medium text-slate-500 dark:text-slate-400">
         {{ device.notes }}
       </span>
     </div>
@@ -82,14 +74,14 @@
         type="button"
         :disabled="isPending"
         @click="handleToggleStatus"
-        class="rounded-full bg-[#00288e] px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-blue-600"
+        class="bg-brand-devices dark:bg-brand-devices rounded-full px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {{ isPending ? "处理中..." : isActive ? "标记退役" : "恢复使用" }}
       </button>
       <button
         type="button"
         @click="isMilestoneModalOpen = true"
-        class="rounded-full bg-[#00288e] px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-blue-600"
+        class="bg-brand-devices dark:bg-brand-devices rounded-full px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
       >
         编辑配置
       </button>
@@ -148,10 +140,7 @@ function formatPurchaseDate(dateStr: string): string {
 }
 
 function calcSpendPerDay(device: Device): number {
-  const daysInUse = Math.max(
-    1,
-    dayjs().diff(dayjs(device.purchase_date), "day"),
-  );
+  const daysInUse = Math.max(1, dayjs().diff(dayjs(device.purchase_date), "day"));
   return device.price / daysInUse;
 }
 

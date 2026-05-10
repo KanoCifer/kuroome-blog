@@ -13,6 +13,12 @@ import "./assets/squircle.css";
 import { initVisitorWebSocket } from "./plugins/visitorWs";
 import router from "./router";
 
+// Apply persisted color scheme before mount to avoid flash of wrong colors
+if (typeof document !== "undefined") {
+  const savedScheme = localStorage.getItem("color-scheme") || "sky-blue";
+  document.documentElement.setAttribute("data-color-scheme", savedScheme);
+}
+
 dayjs.extend(relativeTime);
 dayjs.locale("zh-cn");
 const app = createApp(App);

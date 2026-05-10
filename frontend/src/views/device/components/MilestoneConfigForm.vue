@@ -2,11 +2,7 @@
   <Teleport to="body">
     <!-- Backdrop -->
     <Transition name="fade">
-      <div
-        v-if="modelValue"
-        class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
-        @click="handleClose"
-      />
+      <div v-if="modelValue" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" @click="handleClose" />
     </Transition>
 
     <!-- Modal -->
@@ -16,11 +12,11 @@
         class="fixed inset-x-4 inset-y-24 z-50 flex items-center justify-center sm:inset-x-auto sm:inset-y-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2"
       >
         <div
-          class="max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-slate-100 shadow-2xl dark:bg-[#1a2133] dark:shadow-xl dark:shadow-slate-900/60"
+          class="dark:bg-card max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-slate-100 shadow-2xl dark:shadow-xl dark:shadow-slate-900/60"
         >
           <!-- Header -->
           <div
-            class="sticky top-0 z-10 border-b border-gray-200 bg-slate-100 px-6 pt-6 pb-4 dark:border-white/10 dark:bg-[#1a2133]"
+            class="dark:bg-card sticky top-0 z-10 border-b border-gray-200 bg-slate-100 px-6 pt-6 pb-4 dark:border-white/10"
           >
             <div class="flex items-start justify-between gap-3">
               <div class="flex items-center gap-3">
@@ -43,11 +39,7 @@
                   </svg>
                 </div>
                 <div>
-                  <h2
-                    class="font-serif text-2xl font-bold text-slate-800 dark:text-slate-100"
-                  >
-                    里程碑提醒
-                  </h2>
+                  <h2 class="font-serif text-2xl font-bold text-slate-800 dark:text-slate-100">里程碑提醒</h2>
                   <p class="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
                     {{ device.name }}
                   </p>
@@ -61,13 +53,10 @@
             </div>
           </div>
 
-          <form
-            @submit.prevent="handleSubmit"
-            class="space-y-6 bg-slate-50 p-6 dark:bg-[#111827]"
-          >
+          <form @submit.prevent="handleSubmit" class="dark:bg-background space-y-6 bg-slate-50 p-6">
             <!-- Enable Toggle -->
             <div
-              class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-white/10 dark:bg-[#0f172a]"
+              class="dark:bg-muted flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-white/10"
             >
               <div class="flex items-center gap-3">
                 <div
@@ -89,10 +78,7 @@
                     />
                   </svg>
                 </div>
-                <div
-                  v-else
-                  class="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-200 dark:bg-slate-700"
-                >
+                <div v-else class="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-200 dark:bg-slate-700">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -101,22 +87,12 @@
                     stroke="currentColor"
                     class="h-4 w-4 text-slate-500"
                   >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"
-                    />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9" />
                   </svg>
                 </div>
                 <div>
-                  <p
-                    class="text-sm font-semibold text-slate-700 dark:text-slate-200"
-                  >
-                    启用里程碑提醒
-                  </p>
-                  <p class="text-xs text-slate-400 dark:text-slate-500">
-                    在设备到达里程碑天数时发送通知
-                  </p>
+                  <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">启用里程碑提醒</p>
+                  <p class="text-xs text-slate-400 dark:text-slate-500">在设备到达里程碑天数时发送通知</p>
                 </div>
               </div>
               <button
@@ -126,9 +102,7 @@
                 @click="form.enabled = !form.enabled"
                 :class="[
                   'relative flex h-6 w-11 shrink-0 rounded-full transition-colors duration-300',
-                  form.enabled
-                    ? 'bg-blue-700'
-                    : 'bg-slate-300 dark:bg-slate-600',
+                  form.enabled ? 'bg-blue-700' : 'bg-slate-300 dark:bg-slate-600',
                 ]"
               >
                 <span
@@ -165,18 +139,14 @@
                     'relative flex flex-col items-center gap-1 rounded-xl px-3 py-3 text-xs font-semibold transition-all duration-200',
                     form.milestones.includes(preset.days)
                       ? 'bg-blue-700 text-white shadow-lg shadow-blue-500/25 dark:shadow-blue-900/40'
-                      : 'bg-white text-slate-500 shadow-sm hover:bg-slate-50 dark:border dark:dark:border-white/10 dark:bg-[#0f172a] dark:text-slate-400 dark:hover:bg-white/5',
+                      : 'dark:bg-muted bg-white text-slate-500 shadow-sm hover:bg-slate-50 dark:border dark:dark:border-white/10 dark:text-slate-400 dark:hover:bg-white/5',
                   ]"
                 >
-                  <span class="text-base">{{
-                    formatMilestone(preset.days)
-                  }}</span>
+                  <span class="text-base">{{ formatMilestone(preset.days) }}</span>
                   <span
                     :class="[
                       'text-[10px] font-medium',
-                      form.milestones.includes(preset.days)
-                        ? 'text-blue-100'
-                        : 'text-slate-400 dark:text-slate-600',
+                      form.milestones.includes(preset.days) ? 'text-blue-100' : 'text-slate-400 dark:text-slate-600',
                     ]"
                     >Day {{ preset.days }}</span
                   >
@@ -192,11 +162,7 @@
                       stroke="currentColor"
                       class="h-2 w-2 text-blue-700"
                     >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-                      />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                     </svg>
                   </span>
                 </button>
@@ -210,17 +176,16 @@
                     type="number"
                     min="1"
                     placeholder="自定义天数..."
-                    class="w-full rounded-xl border border-slate-200 bg-white py-2.5 pr-12 pl-4 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:bg-[#0f172a] dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                    class="dark:bg-muted w-full rounded-xl border border-slate-200 bg-white py-2.5 pr-12 pl-4 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
                   />
-                  <span
-                    class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-xs text-slate-400"
+                  <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-xs text-slate-400"
                     >天</span
                   >
                 </div>
                 <button
                   type="button"
                   @click="addCustomMilestone"
-                  class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 active:scale-95 dark:border-white/10 dark:bg-[#0f172a] dark:text-slate-400 dark:hover:border-blue-500/30 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
+                  class="dark:bg-muted flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 active:scale-95 dark:border-white/10 dark:text-slate-400 dark:hover:border-blue-500/30 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -230,11 +195,7 @@
                     stroke="currentColor"
                     class="h-[18px] w-[18px]"
                   >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M12 4.5v15m7.5-7.5h-15"
-                    />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                   </svg>
                 </button>
               </div>
@@ -263,11 +224,7 @@
                       stroke="currentColor"
                       class="h-2 w-2"
                     >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
                 </span>
@@ -337,7 +294,7 @@
                     'flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold transition-all duration-200',
                     form.channels.includes(opt.value)
                       ? 'bg-blue-700 text-white shadow-lg shadow-blue-500/25 dark:shadow-blue-900/40'
-                      : 'bg-white text-slate-500 shadow-sm hover:bg-slate-50 dark:border dark:border-white/10 dark:bg-[#0f172a] dark:text-slate-400 dark:hover:bg-white/5',
+                      : 'dark:bg-muted bg-white text-slate-500 shadow-sm hover:bg-slate-50 dark:border dark:border-white/10 dark:text-slate-400 dark:hover:bg-white/5',
                   ]"
                 >
                   <span v-html="opt.icon" />
@@ -346,60 +303,39 @@
               </div>
 
               <!-- Channel-specific fields -->
-              <label
-                v-if="form.channels.includes('email')"
-                class="block space-y-1"
-              >
-                <span
-                  class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"
-                  >邮件地址</span
-                >
+              <label v-if="form.channels.includes('email')" class="block space-y-1">
+                <span class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400">邮件地址</span>
                 <input
                   v-model="form.email"
                   type="email"
                   placeholder="example@domain.com"
-                  class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:bg-[#0f172a] dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                  class="dark:bg-muted w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
                 />
               </label>
 
-              <label
-                v-if="form.channels.includes('feishu')"
-                class="block space-y-1"
-              >
-                <span
-                  class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"
-                  >飞书 Webhook URL</span
-                >
+              <label v-if="form.channels.includes('feishu')" class="block space-y-1">
+                <span class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400">飞书 Webhook URL</span>
                 <input
                   v-model="form.feishu_webhook_url"
                   type="url"
                   placeholder="https://open.feishu.cn/open-apis/bot/v2/hook/..."
-                  class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:bg-[#0f172a] dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                  class="dark:bg-muted w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
                 />
               </label>
 
-              <label
-                v-if="form.channels.includes('bark')"
-                class="block space-y-1"
-              >
-                <span
-                  class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400"
-                  >Bark Device Key</span
-                >
+              <label v-if="form.channels.includes('bark')" class="block space-y-1">
+                <span class="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400">Bark Device Key</span>
                 <input
                   v-model="form.bark_device_key"
                   type="text"
                   placeholder="设备Key或完整推送URL"
-                  class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:bg-[#0f172a] dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                  class="dark:bg-muted w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
                 />
               </label>
             </div>
 
             <!-- Error -->
-            <p
-              v-if="formError"
-              class="py-2 text-center text-xs font-medium text-red-500 dark:text-red-400"
-            >
+            <p v-if="formError" class="py-2 text-center text-xs font-medium text-red-500 dark:text-red-400">
               {{ formError }}
             </p>
 
@@ -435,11 +371,7 @@
                   stroke="currentColor"
                   class="h-[18px] w-[18px]"
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-                  />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                 </svg>
               </template>
             </button>
@@ -514,26 +446,15 @@ const emit = defineEmits<Emits>();
 
 const notificationStore = useNotificationStore();
 
-function createInitialState(
-  device: Device,
-  globalConfig?: GlobalConfig | null,
-): MilestoneFormState {
+function createInitialState(device: Device, globalConfig?: GlobalConfig | null): MilestoneFormState {
   const cfg = device.reminder_config as Record<string, unknown> | undefined;
   return {
     enabled: (cfg?.enabled as boolean) ?? true,
-    milestones: Array.isArray(cfg?.milestones)
-      ? (cfg.milestones as number[])
-      : [100, 365, 730],
-    channels: Array.isArray(cfg?.channels)
-      ? (cfg.channels as Channel[])
-      : ["email"],
+    milestones: Array.isArray(cfg?.milestones) ? (cfg.milestones as number[]) : [100, 365, 730],
+    channels: Array.isArray(cfg?.channels) ? (cfg.channels as Channel[]) : ["email"],
     email: (cfg?.email as string) || globalConfig?.email || "",
-    feishu_webhook_url:
-      (cfg?.feishu_webhook_url as string) ||
-      globalConfig?.feishu_webhook_url ||
-      "",
-    bark_device_key:
-      (cfg?.bark_device_key as string) || globalConfig?.bark_device_key || "",
+    feishu_webhook_url: (cfg?.feishu_webhook_url as string) || globalConfig?.feishu_webhook_url || "",
+    bark_device_key: (cfg?.bark_device_key as string) || globalConfig?.bark_device_key || "",
   };
 }
 
@@ -546,9 +467,7 @@ function formatMilestone(days: number): string {
   return `${years}年${remaining}天`;
 }
 
-const form = reactive<MilestoneFormState>(
-  createInitialState(props.device, null),
-);
+const form = reactive<MilestoneFormState>(createInitialState(props.device, null));
 const formError = ref<string | null>(null);
 const isSubmitting = ref(false);
 const testLoading = ref(false);
@@ -559,8 +478,7 @@ async function fetchGlobalConfig() {
     const res = await deviceGateway.getUserGlobalConfig();
     const cfg = res.config as GlobalConfig;
     form.email = form.email || cfg?.email || "";
-    form.feishu_webhook_url =
-      form.feishu_webhook_url || cfg?.feishu_webhook_url || "";
+    form.feishu_webhook_url = form.feishu_webhook_url || cfg?.feishu_webhook_url || "";
     form.bark_device_key = form.bark_device_key || cfg?.bark_device_key || "";
   } catch {
     notificationStore.error("获取全局配置失败");
@@ -605,8 +523,7 @@ async function handleTestNotification() {
     await deviceService.testNotification(props.device.id);
     notificationStore.success("测试通知已发送，请检查您的通知渠道");
   } catch (err) {
-    const msg =
-      err instanceof Error ? err.message : "测试通知发送失败，请检查配置";
+    const msg = err instanceof Error ? err.message : "测试通知发送失败，请检查配置";
     notificationStore.error(msg);
   } finally {
     testLoading.value = false;
@@ -653,10 +570,7 @@ async function handleSubmit() {
   };
 
   try {
-    const updated = await deviceService.updateDeviceReminderConfig(
-      props.device.id,
-      payload,
-    );
+    const updated = await deviceService.updateDeviceReminderConfig(props.device.id, payload);
     notificationStore.success("里程碑配置已保存");
     emit("success", updated);
     handleClose();

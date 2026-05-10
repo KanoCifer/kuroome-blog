@@ -2,18 +2,17 @@ import { defineStore } from "pinia";
 import { ref, watch } from "vue";
 
 export type Theme = "light" | "dark" | "system";
+export type ColorScheme = "sky-blue" | "forest-green";
 
 export const useThemeStore = defineStore("theme", () => {
-  const theme = ref<Theme>(
-    (localStorage.getItem("theme") as Theme) || "system",
-  );
+  const theme = ref<Theme>((localStorage.getItem("theme") as Theme) || "system");
+
+  const scheme = ref<ColorScheme>((localStorage.getItem("color-scheme") as ColorScheme) || "sky-blue");
 
   const applyTheme = (newTheme: Theme) => {
     const root = document.documentElement;
     const isDark =
-      newTheme === "dark" ||
-      (newTheme === "system" &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches);
+      newTheme === "dark" || (newTheme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
     if (isDark) {
       root.classList.add("dark");
@@ -28,6 +27,11 @@ export const useThemeStore = defineStore("theme", () => {
     }
   };
 
+  const applyScheme = (newScheme: ColorScheme) => {
+    document.documentElement.setAttribute("data-color-scheme", newScheme);
+    localStorage.setItem("color-scheme", newScheme);
+  };
+
   // Watch for theme changes
   watch(theme, (newTheme) => {
     applyTheme(newTheme);
@@ -40,12 +44,18 @@ export const useThemeStore = defineStore("theme", () => {
     }
   };
 
-  // Apply theme immediately
+  // Apply theme and scheme immediately
   applyTheme(theme.value);
+  applyScheme(scheme.value);
   mediaQuery.addEventListener("change", handleSystemChange);
 
   const setTheme = (newTheme: Theme) => {
     theme.value = newTheme;
+  };
+
+  const setScheme = (newScheme: ColorScheme) => {
+    scheme.value = newScheme;
+    applyScheme(newScheme);
   };
 
   // Cleanup listener on unmount
@@ -60,16 +70,16 @@ export const useThemeStore = defineStore("theme", () => {
       setTheme("light");
     } else {
       // If system, toggle based on current system preference
-      const isCurrentlyDark = window.matchMedia(
-        "(prefers-color-scheme: dark)",
-      ).matches;
+      const isCurrentlyDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       setTheme(isCurrentlyDark ? "light" : "dark");
     }
   };
 
   return {
     theme,
+    scheme,
     setTheme,
+    setScheme,
     toggleTheme,
   };
 });

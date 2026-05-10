@@ -38,14 +38,8 @@ const emit = defineEmits<{
     class="rounded-3xl border border-slate-200/80 bg-white/95 p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/85"
   >
     <header class="mb-4 flex items-center justify-between gap-3">
-      <h3
-        class="text-sm font-semibold tracking-wide text-slate-700 uppercase dark:text-slate-300"
-      >
-        订阅列表
-      </h3>
-      <p class="text-xs text-slate-500 dark:text-slate-400">
-        {{ subscriptions.length }} 项
-      </p>
+      <h3 class="text-sm font-semibold tracking-wide text-slate-700 uppercase dark:text-slate-300">订阅列表</h3>
+      <p class="text-xs text-slate-500 dark:text-slate-400">{{ subscriptions.length }} 项</p>
     </header>
 
     <div
@@ -70,9 +64,7 @@ const emit = defineEmits<{
         :key="idx"
         class="animate-pulse rounded-2xl border border-slate-200/70 bg-slate-100/80 p-6 dark:border-slate-700/70 dark:bg-slate-800/80"
       >
-        <div
-          class="mb-4 h-5 w-36 rounded-full bg-slate-200 dark:bg-slate-700"
-        />
+        <div class="mb-4 h-5 w-36 rounded-full bg-slate-200 dark:bg-slate-700" />
         <div class="h-10 rounded-2xl bg-slate-200 dark:bg-slate-700" />
       </div>
     </div>
@@ -104,9 +96,7 @@ const emit = defineEmits<{
               {{ subscription.name.charAt(0).toUpperCase() }}
             </div>
             <div class="min-w-0">
-              <h4
-                class="truncate text-lg font-bold text-slate-900 dark:text-white"
-              >
+              <h4 class="truncate text-lg font-bold text-slate-900 dark:text-white">
                 {{ subscription.name }}
               </h4>
               <p class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
@@ -117,23 +107,17 @@ const emit = defineEmits<{
           </div>
 
           <div class="text-right">
-            <p class="text-xl font-bold text-[#00288e] dark:text-blue-400">
+            <p class="text-brand-devices dark:text-brand-devices text-xl font-bold">
               {{ formatPrice(subscription.price, subscription.currency) }}
             </p>
-            <p
-              class="text-[10px] tracking-wider text-slate-400 uppercase dark:text-slate-500"
-            >
+            <p class="text-[10px] tracking-wider text-slate-400 uppercase dark:text-slate-500">
               {{ subscription.currency }}
             </p>
           </div>
         </div>
 
-        <div
-          class="mt-4 flex items-center gap-2 rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-700/50"
-        >
-          <span class="text-sm text-slate-500 dark:text-slate-400"
-            >下次扣费:</span
-          >
+        <div class="mt-4 flex items-center gap-2 rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-700/50">
+          <span class="text-sm text-slate-500 dark:text-slate-400">下次扣费:</span>
           <span class="text-sm font-bold text-slate-900 dark:text-slate-200">
             {{ toDateInputValue(subscription.next_billing_date) }}
           </span>
@@ -144,10 +128,7 @@ const emit = defineEmits<{
             class="ml-auto inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium"
             :class="getStatusMeta(subscription.status).badgeClass"
           >
-            <span
-              class="mr-1 h-1.5 w-1.5 rounded-full"
-              :class="getStatusMeta(subscription.status).dotClass"
-            />
+            <span class="mr-1 h-1.5 w-1.5 rounded-full" :class="getStatusMeta(subscription.status).dotClass" />
             {{ getStatusMeta(subscription.status).label }}
           </span>
         </div>

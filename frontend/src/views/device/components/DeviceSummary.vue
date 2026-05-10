@@ -5,24 +5,15 @@
       class="squircle col-span-2 flex items-center justify-between border border-slate-100 bg-white p-10 shadow-lg dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl"
     >
       <div>
-        <p class="text-sm font-medium text-slate-500 dark:text-slate-400">
-          设备总价格
-        </p>
-        <p
-          class="mt-1 text-3xl font-bold tracking-tight text-[#00288e] dark:text-blue-400"
-        >
+        <p class="text-sm font-medium text-slate-500 dark:text-slate-400">设备总价格</p>
+        <p class="text-brand-devices dark:text-brand-devices mt-1 text-3xl font-bold tracking-tight">
           ¥{{ totalPrice.toFixed(2) }}
         </p>
       </div>
       <div
-        class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-[#00288e] dark:bg-blue-500/20 dark:text-blue-400"
+        class="text-brand-devices dark:text-brand-devices flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-500/20"
       >
-        <svg
-          class="h-6 w-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -40,12 +31,7 @@
       <div
         class="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-emerald-500/20 dark:text-emerald-400"
       >
-        <svg
-          class="h-5 w-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -55,9 +41,7 @@
         </svg>
       </div>
       <div>
-        <p class="text-xs font-medium text-slate-500 dark:text-slate-400">
-          使用中
-        </p>
+        <p class="text-xs font-medium text-slate-500 dark:text-slate-400">使用中</p>
         <p class="mt-1 text-xl font-bold text-slate-900 dark:text-white">
           {{ activeCount }}
         </p>
@@ -71,12 +55,7 @@
       <div
         class="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400"
       >
-        <svg
-          class="h-5 w-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -86,9 +65,7 @@
         </svg>
       </div>
       <div>
-        <p class="text-xs font-medium text-slate-500 dark:text-slate-400">
-          设备总数
-        </p>
+        <p class="text-xs font-medium text-slate-500 dark:text-slate-400">设备总数</p>
         <p class="mt-1 text-xl font-bold text-slate-900 dark:text-white">
           {{ totalCount }}
         </p>
@@ -107,11 +84,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const activeCount = computed(
-  () => props.devices.filter((d) => d.status === "active").length,
-);
-const totalPrice = computed(() =>
-  props.devices.reduce((total, device) => total + device.price, 0),
-);
+const activeCount = computed(() => props.devices.filter((d) => d.status === "active").length);
+const totalPrice = computed(() => props.devices.reduce((total, device) => total + device.price, 0));
 const totalCount = computed(() => props.devices.length);
 </script>

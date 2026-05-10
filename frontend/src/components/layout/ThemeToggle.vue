@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { useThemeStore, type Theme } from "@/stores/theme";
+import { useThemeStore, type Theme, type ColorScheme } from "@/stores/theme";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 
 const themeStore = useThemeStore();
 const isOpen = ref(false);
+const isSchemeOpen = ref(false);
 const dropdownRef = ref<HTMLElement | null>(null);
 
 const themes: { value: Theme; label: string; icon: string }[] = [
@@ -24,12 +25,23 @@ const themes: { value: Theme; label: string; icon: string }[] = [
   },
 ];
 
-const currentTheme = computed(
-  (): { value: Theme; label: string; icon: string } => {
-    const found = themes.find((t) => t.value === themeStore.theme);
-    return found || themes[0]!;
+const schemes: { value: ColorScheme; label: string; colors: string[] }[] = [
+  {
+    value: "sky-blue",
+    label: "Sky Blue",
+    colors: ["#3b82f6", "#0ea5e9", "#6366f1"],
   },
-);
+  {
+    value: "forest-green",
+    label: "Forest Green",
+    colors: ["#16a34a", "#0d9488", "#65a30d"],
+  },
+];
+
+const currentTheme = computed((): { value: Theme; label: string; icon: string } => {
+  const found = themes.find((t) => t.value === themeStore.theme);
+  return found || themes[0]!;
+});
 
 let closeTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -38,7 +50,6 @@ const toggleDropdown = () => {
 };
 
 const openDropdown = () => {
-  // 清除关闭延迟，避免快速移动时闪烁
   if (closeTimeout) {
     clearTimeout(closeTimeout);
     closeTimeout = null;
@@ -47,7 +58,6 @@ const openDropdown = () => {
 };
 
 const closeDropdown = () => {
-  // 延迟关闭，给用户时间移动到菜单上
   closeTimeout = setTimeout(() => {
     isOpen.value = false;
   }, 150);
@@ -58,11 +68,17 @@ const selectTheme = (theme: Theme) => {
   isOpen.value = false;
 };
 
+const selectScheme = (newScheme: ColorScheme) => {
+  themeStore.setScheme(newScheme);
+  isSchemeOpen.value = false;
+};
+
 const handleClickOutside = (event: MouseEvent) => {
   if (dropdownRef.value && dropdownRef.value.contains(event.target as Node)) {
     return;
   }
   isOpen.value = false;
+  isSchemeOpen.value = false;
 };
 
 onMounted(() => {
@@ -75,79 +91,163 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div
-    ref="dropdownRef"
-    class="relative"
-    @mouseenter="openDropdown"
-    @mouseleave="closeDropdown"
-  >
-    <button
-      @click.stop="toggleDropdown"
-      class="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-all hover:bg-gray-200 focus:ring-2 focus:ring-blue-300 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-600"
-      aria-label="Toggle theme"
-    >
-      <span v-html="currentTheme.icon"></span>
-      <span class="hidden sm:inline">{{ currentTheme.label }}</span>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        class="transition-transform duration-200"
-        :class="{ 'rotate-180': isOpen }"
+  <div ref="dropdownRef" class="flex items-center gap-1">
+    <!-- Color Scheme Selector -->
+    <div class="relative">
+      <button
+        @click.stop="isSchemeOpen = !isSchemeOpen"
+        class="flex cursor-pointer items-center gap-1 rounded-lg px-2 py-2 text-sm font-medium text-gray-600 transition-all hover:bg-gray-200 focus:ring-2 focus:ring-blue-300 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-600"
+        aria-label="Select color scheme"
+        title="Color Scheme"
       >
-        <polyline points="6 9 12 15 18 9"></polyline>
-      </svg>
-    </button>
-
-    <transition
-      enter-active-class="transition-all duration-200 ease-out"
-      enter-from-class="opacity-0 scale-95 -translate-y-1"
-      enter-to-class="opacity-100 scale-100 translate-y-0"
-      leave-active-class="transition-all duration-150 ease-in"
-      leave-from-class="opacity-100 scale-100 translate-y-0"
-      leave-to-class="opacity-0 scale-95 -translate-y-1"
-    >
-      <div
-        v-if="isOpen"
-        class="absolute top-full right-0 z-9999 mt-2 w-36 rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
-        @click.stop
-      >
-        <button
-          v-for="(theme, index) in themes"
-          :key="theme.value"
-          @click="selectTheme(theme.value)"
-          class="flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-          :class="{
-            'bg-gray-100 dark:bg-gray-700': themeStore.theme === theme.value,
-            'rounded-t-lg': index === 0,
-            'rounded-b-lg': index === themes.length - 1,
-          }"
+        <div class="flex gap-0.5">
+          <span
+            v-for="(color, i) in schemes.find((s) => s.value === themeStore.scheme)?.colors || []"
+            :key="i"
+            class="h-3 w-3 rounded-full"
+            :style="{ backgroundColor: color }"
+          ></span>
+        </div>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="10"
+          height="10"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="transition-transform duration-200"
+          :class="{ 'rotate-180': isSchemeOpen }"
         >
-          <span v-html="theme.icon"></span>
-          <span>{{ theme.label }}</span>
-          <svg
-            v-if="themeStore.theme === theme.value"
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="ml-auto text-blue-500"
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+
+      <transition
+        enter-active-class="transition-all duration-200 ease-out"
+        enter-from-class="opacity-0 scale-95 -translate-y-1"
+        enter-to-class="opacity-100 scale-100 translate-y-0"
+        leave-active-class="transition-all duration-150 ease-in"
+        leave-from-class="opacity-100 scale-100 translate-y-0"
+        leave-to-class="opacity-0 scale-95 -translate-y-1"
+      >
+        <div
+          v-if="isSchemeOpen"
+          class="absolute top-full right-0 z-9999 mt-2 w-40 rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+          @click.stop
+        >
+          <button
+            v-for="(schemeItem, index) in schemes"
+            :key="schemeItem.value"
+            @click="selectScheme(schemeItem.value)"
+            class="flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+            :class="{
+              'bg-gray-100 dark:bg-gray-700': themeStore.scheme === schemeItem.value,
+              'rounded-t-lg': index === 0,
+              'rounded-b-lg': index === schemes.length - 1,
+            }"
           >
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-        </button>
-      </div>
-    </transition>
+            <div class="flex gap-0.5">
+              <span
+                v-for="(color, i) in schemeItem.colors"
+                :key="i"
+                class="h-3.5 w-3.5 rounded-full"
+                :style="{ backgroundColor: color }"
+              ></span>
+            </div>
+            <span>{{ schemeItem.label }}</span>
+            <svg
+              v-if="themeStore.scheme === schemeItem.value"
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="ml-auto text-blue-500"
+            >
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </button>
+        </div>
+      </transition>
+    </div>
+
+    <!-- Light/Dark Mode Toggle -->
+    <div class="relative" @mouseenter="openDropdown" @mouseleave="closeDropdown">
+      <button
+        @click.stop="toggleDropdown"
+        class="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-all hover:bg-gray-200 focus:ring-2 focus:ring-blue-300 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-600"
+        aria-label="Toggle theme"
+      >
+        <span v-html="currentTheme.icon"></span>
+        <span class="hidden sm:inline">{{ currentTheme.label }}</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="transition-transform duration-200"
+          :class="{ 'rotate-180': isOpen }"
+        >
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+
+      <transition
+        enter-active-class="transition-all duration-200 ease-out"
+        enter-from-class="opacity-0 scale-95 -translate-y-1"
+        enter-to-class="opacity-100 scale-100 translate-y-0"
+        leave-active-class="transition-all duration-150 ease-in"
+        leave-from-class="opacity-100 scale-100 translate-y-0"
+        leave-to-class="opacity-0 scale-95 -translate-y-1"
+      >
+        <div
+          v-if="isOpen"
+          class="absolute top-full right-0 z-9999 mt-2 w-36 rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+          @click.stop
+        >
+          <button
+            v-for="(theme, index) in themes"
+            :key="theme.value"
+            @click="selectTheme(theme.value)"
+            class="flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+            :class="{
+              'bg-gray-100 dark:bg-gray-700': themeStore.theme === theme.value,
+              'rounded-t-lg': index === 0,
+              'rounded-b-lg': index === themes.length - 1,
+            }"
+          >
+            <span v-html="theme.icon"></span>
+            <span>{{ theme.label }}</span>
+            <svg
+              v-if="themeStore.theme === theme.value"
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="ml-auto text-blue-500"
+            >
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </button>
+        </div>
+      </transition>
+    </div>
   </div>
 </template>
