@@ -1,5 +1,36 @@
 [
   {
+    "version": "3.0.0",
+    "date": "2026-05-10",
+    "title": "多主题系统适配",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "引入多主题配色系统，Vue/React 双端各提供 7 套配色方案（森林绿、天空蓝、玫瑰红、薄雾、羊皮纸、鼠尾草、默认）"
+      },
+      {
+        "type": "feat",
+        "content": "钓鱼功能新增 AI 天气分析、模型切换、后台训练任务及移动端体验优化"
+      },
+      {
+        "type": "feat",
+        "content": "新增 Cookie 同意弹窗与访客数 WebSocket 实时统计"
+      },
+      {
+        "type": "feat",
+        "content": "相册模块：图片存储迁移至 PostgreSQL 持久化"
+      },
+      {
+        "type": "fix",
+        "content": "修复钓鱼专家评分默认值计算、AI 内容溢出、导航滚动监听、移动端横向滑动等 bug"
+      },
+      {
+        "type": "refactor",
+        "content": "降水图表改为柱状图，AI 分析切换为 Markdown 输出"
+      }
+    ]
+  },
+  {
     "version": "2.9.8",
     "date": "2026-04-21",
     "title": "小时天气预报组件与钓鱼指数页面布局优化",
