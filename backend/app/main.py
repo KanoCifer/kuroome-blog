@@ -37,6 +37,7 @@ from app.api.v1 import (
     weread,
 )
 from app.api.v2 import device, fishing, subscriptions, weather
+from app.api.v2 import public as public_v2
 from app.core import get_settings, register_exception_handlers
 from app.core import logger as app_logger
 from app.models.beanie import MessageBoard, Post, RssArticle, SubscriptionLog
@@ -139,6 +140,7 @@ app.include_router(router=subscriptions.router, prefix="/api/v2")
 app.include_router(router=device.router, prefix="/api/v2")
 app.include_router(router=fishing.router, prefix="/api/v2")
 app.include_router(router=weather.router, prefix="/api/v2")
+app.include_router(router=public_v2.router, prefix="/api/v2")
 
 
 # 统一注册全局异常处理器

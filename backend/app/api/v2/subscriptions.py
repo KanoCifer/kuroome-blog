@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.des.auth import manager
 from app.api.des.des import notification_service_dep, sub_service_dep
+from app.core.exceptions import NotFoundError
 from app.models.models import User
 from app.notification import NotificationPayload
 from app.schemas.response import APIResponse
@@ -96,14 +97,10 @@ async def get_subscription(
     sub_service: SubService = Depends(sub_service_dep),
 ):
     """获取订阅详情"""
-    subscription = await sub_service.get_subscription_by_id(sub_id)
-    if subscription is None or subscription.user_id != current_user.id:
-        return APIResponse.error(message="订阅不存在或无访问权限")
-    response = (
-        SubResponse.model_validate(subscription).model_dump(mode="json")
-        if subscription
-        else None
+    subscription = await sub_service.get_owned_subscription(
+        sub_id, current_user.id
     )
+    response = SubResponse.model_validate(subscription).model_dump(mode="json")
     return APIResponse.ok(
         data={"subscription": response}, message="获取订阅详情成功"
     )
@@ -133,9 +130,7 @@ async def update_subscription(
     sub_service: SubService = Depends(sub_service_dep),
 ):
     """更新订阅信息"""
-    subscription = await sub_service.get_subscription_by_id(sub_id)
-    if subscription is None or subscription.user_id != current_user.id:
-        return APIResponse.error(message="订阅不存在或无访问权限")
+    await sub_service.get_owned_subscription(sub_id, current_user.id)
     updated_subscription = await sub_service.update_subscription(
         sub_id, **update_data.model_dump(exclude_unset=True)
     )
@@ -158,12 +153,9 @@ async def delete_subscription(
     sub_service: SubService = Depends(sub_service_dep),
 ):
     """删除订阅"""
-    subscription = await sub_service.get_subscription_by_id(sub_id)
-    if subscription is None or subscription.user_id != current_user.id:
-        return APIResponse.error(message="订阅不存在或无访问权限")
-    success = await sub_service.delete_subscription(sub_id)
-    if not success:
-        return APIResponse.error(message="删除订阅失败")
+    await sub_service.get_owned_subscription(sub_id, current_user.id)
+    if not await sub_service.delete_subscription(sub_id):
+        raise NotFoundError("删除订阅失败")
     return APIResponse.ok(message="删除订阅成功")
 
 
@@ -175,12 +167,10 @@ async def update_subscription_status(
     sub_service: SubService = Depends(sub_service_dep),
 ):
     """更新订阅状态"""
-    subscription = await sub_service.get_subscription_by_id(sub_id)
-    if subscription is None or subscription.user_id != current_user.id:
-        return APIResponse.error(message="订阅不存在或无访问权限")
+    await sub_service.get_owned_subscription(sub_id, current_user.id)
     updated_subscription = await sub_service.update_status(sub_id, new_status)
     if updated_subscription is None:
-        return APIResponse.error(message="更新订阅状态失败")
+        raise NotFoundError("更新订阅状态失败")
     response = SubResponse.model_validate(updated_subscription).model_dump(
         mode="json"
     )
@@ -197,14 +187,12 @@ async def update_subscription_reminders(
     sub_service: SubService = Depends(sub_service_dep),
 ):
     """更新订阅提醒"""
-    subscription = await sub_service.get_subscription_by_id(sub_id)
-    if subscription is None or subscription.user_id != current_user.id:
-        return APIResponse.error(message="订阅不存在或无访问权限")
+    await sub_service.get_owned_subscription(sub_id, current_user.id)
     updated_subscription = await sub_service.update_reminder_config(
         sub_id, reminder_data
     )
     if updated_subscription is None:
-        return APIResponse.error(message="更新订阅提醒失败")
+        raise NotFoundError("更新订阅提醒失败")
     response = SubResponse.model_validate(updated_subscription).model_dump(
         mode="json"
     )
@@ -224,9 +212,9 @@ async def test_subscription_notification(
     ),
 ):
     """测试订阅通知"""
-    subscription = await sub_service.get_subscription_by_id(sub_id)
-    if subscription is None or subscription.user_id != current_user.id:
-        return APIResponse.error(message="订阅不存在或无访问权限")
+    subscription = await sub_service.get_owned_subscription(
+        sub_id, current_user.id
+    )
 
     payload = NotificationPayload(
         title="测试通知",

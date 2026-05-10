@@ -1,9 +1,11 @@
 from collections.abc import Sequence
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends
 
 from app.api.des.auth import manager
 from app.api.des.des import device_service_dep
+from app.core.exceptions import NotFoundError
 from app.models.models import DeviceTrack, User
 from app.schemas.device import (
     DeviceInput,
@@ -15,10 +17,7 @@ from app.schemas.device import (
 from app.schemas.response import APIResponse
 from app.services.device_service import DeviceService
 
-router = APIRouter(
-    prefix="/device",
-    tags=["device"],
-)
+router = APIRouter(prefix="/device", tags=["device"])
 
 
 @router.get("")
@@ -43,9 +42,7 @@ async def get_device_by_id(
     service: DeviceService = Depends(device_service_dep),
 ):
     """根据设备ID获取设备信息"""
-    device: DeviceTrack | None = await service.get_device_by_id(device_id)
-    if not device or device.user_id != user.id:
-        return APIResponse.error(message="设备不存在或无权限访问")
+    device = await service.get_owned_device(device_id, user.id)
     response: DeviceResponse = DeviceResponse.model_validate(device)
     return APIResponse.ok(
         data={"device": response}, message="获取设备信息成功"
@@ -74,13 +71,10 @@ async def update_device(
     service: DeviceService = Depends(device_service_dep),
 ):
     """更新设备信息"""
-    device: DeviceTrack | None = await service.get_device_by_id(device_id)
-    if not device or device.user_id != user.id:
-        return APIResponse.error(message="设备不存在或无权限访问")
+    await service.get_owned_device(device_id, user.id)
     updated_device: DeviceTrack | None = await service.update_device(
         device_id, **device_input.model_dump(exclude_unset=True)
     )
-
     if not updated_device:
         return APIResponse.error(message="设备信息不存在或更新失败")
     response: DeviceResponse = DeviceResponse.model_validate(updated_device)
@@ -96,12 +90,9 @@ async def delete_device(
     service: DeviceService = Depends(device_service_dep),
 ):
     """删除设备"""
-    device: DeviceTrack | None = await service.get_device_by_id(device_id)
-    if not device or device.user_id != user.id:
-        return APIResponse.error(message="设备不存在或无权限访问")
-    deleted: bool = await service.delete_device(device_id)
-    if not deleted:
-        return APIResponse.error(message="设备信息不存在或删除失败")
+    await service.get_owned_device(device_id, user.id)
+    if not await service.delete_device(device_id):
+        raise NotFoundError("设备删除失败")
     return APIResponse.ok(message="删除设备成功")
 
 
@@ -123,14 +114,12 @@ async def update_device_status(
     service: DeviceService = Depends(device_service_dep),
 ):
     """更新设备状态（active/retired）"""
-    device: DeviceTrack | None = await service.get_device_by_id(device_id)
-    if not device or device.user_id != user.id:
-        return APIResponse.error(message="设备不存在或无权限访问")
+    await service.get_owned_device(device_id, user.id)
     updated_device: DeviceTrack | None = await service.update_device_status(
         device_id, status=status_update.status
     )
     if not updated_device:
-        return APIResponse.error(message="设备状态更新失败")
+        raise NotFoundError("设备状态更新失败")
     response: DeviceResponse = DeviceResponse.model_validate(updated_device)
     return APIResponse.ok(
         data={"device": response}, message="更新设备状态成功"
@@ -145,16 +134,14 @@ async def update_device_reminders(
     service: DeviceService = Depends(device_service_dep),
 ):
     """更新设备提醒配置"""
-    device: DeviceTrack | None = await service.get_device_by_id(device_id)
-    if not device or device.user_id != user.id:
-        return APIResponse.error(message="设备不存在或无权限访问")
+    await service.get_owned_device(device_id, user.id)
     updated_device: (
         DeviceTrack | None
     ) = await service.update_device_reminder_config(
         device_id, reminder_config=reminder_update.reminder_config
     )
     if not updated_device:
-        return APIResponse.error(message="提醒配置更新失败")
+        raise NotFoundError("提醒配置更新失败")
     response: DeviceResponse = DeviceResponse.model_validate(updated_device)
     return APIResponse.ok(
         data={"device": response}, message="更新提醒配置成功"
@@ -186,11 +173,7 @@ async def test_device_notification(
     service: DeviceService = Depends(device_service_dep),
 ):
     """测试通知发送"""
-    device: DeviceTrack | None = await service.get_device_by_id(device_id)
-    if not device or device.user_id != user.id:
-        return APIResponse.error(message="设备不存在或无权限访问")
-
-    from datetime import UTC, datetime
+    device = await service.get_owned_device(device_id, user.id)
 
     from app.notification import DeviceNotificationPayload
     from app.notification.dispatcher import NotificationDispatcher

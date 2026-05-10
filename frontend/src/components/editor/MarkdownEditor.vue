@@ -24,17 +24,11 @@ const props = defineProps({
 // 检测字符串是否像 HTML（简单检测）
 const isHtmlLike = (str: string): boolean => {
   if (!str) return false;
-  return (
-    /<\/?[a-z][\s\S]*>/i.test(str) ||
-    str.includes("&lt;") ||
-    str.includes("&gt;")
-  );
+  return /<\/?[a-z][\s\S]*>/i.test(str) || str.includes("&lt;") || str.includes("&gt;");
 };
 
 // 初始化时如果是 HTML 则转换为 Markdown
-const initialContent = isHtmlLike(props.modelValue)
-  ? turndownService.turndown(props.modelValue)
-  : props.modelValue;
+const initialContent = isHtmlLike(props.modelValue) ? turndownService.turndown(props.modelValue) : props.modelValue;
 
 const markdownText = ref<string>(initialContent);
 const fileInputRef = ref<HTMLInputElement | null>(null);
@@ -42,6 +36,10 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
 
 // blob URL → File 映射，用于发布时批量上传
 const blobFileMap = ref<Map<string, File>>(new Map());
+
+// 拖拽状态（计数法避免子元素触发 dragleave 闪烁）
+const dragCounter = ref(0);
+const isDraggingOver = ref(false);
 
 // Image editor state
 const isImageEditorOpen = ref<boolean>(false);
@@ -72,6 +70,20 @@ watch(markdownText, (newValue) => {
 const handleInsertImage = (url: string) => {
   const md = `![image](${url})`;
   markdownText.value += `${md}\n\n`;
+};
+
+const handleDrop = (event: DragEvent) => {
+  isDraggingOver.value = false;
+  dragCounter.value = 0;
+  const files = event.dataTransfer?.files;
+  if (!files || files.length === 0) return;
+
+  for (const file of files) {
+    if (!file.type.startsWith("image/")) continue;
+    const blobUrl = URL.createObjectURL(file);
+    blobFileMap.value.set(blobUrl, file);
+    handleInsertImage(blobUrl);
+  }
 };
 
 const handleImageUpload = (event: Event) => {
@@ -191,25 +203,30 @@ onBeforeUnmount(() => {
   <div class="flex h-full flex-col md:flex-row">
     <!-- Editor -->
     <div
-      class="flex h-1/2 w-full flex-col border-b border-slate-200 md:h-full md:w-1/2 md:border-r md:border-b-0 dark:border-slate-800"
+      class="relative flex h-1/2 w-full flex-col border-b border-slate-200 md:h-full md:w-1/2 md:border-r md:border-b-0 dark:border-slate-800"
+      @dragover.prevent="dragCounter++"
+      @dragleave.prevent="
+        dragCounter--;
+        isDraggingOver = dragCounter > 0;
+      "
+      @drop.prevent="
+        dragCounter = 0;
+        handleDrop($event);
+      "
     >
+      <!-- Drag overlay -->
       <div
-        class="flex h-12 shrink-0 items-center border-b border-slate-200 px-4 dark:border-slate-800"
+        v-if="isDraggingOver"
+        class="pointer-events-none absolute inset-0 z-10 flex items-center justify-center border-2 border-dashed border-blue-400 bg-blue-50/60 dark:bg-blue-900/20"
       >
+        <span class="text-sm font-semibold text-blue-600 dark:text-blue-400">释放以添加图片</span>
+      </div>
+
+      <div class="flex h-12 shrink-0 items-center border-b border-slate-200 px-4 dark:border-slate-800">
         <div class="flex w-full items-center justify-between">
-          <h1
-            class="text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400"
-          >
-            MARKDOWN
-          </h1>
+          <h1 class="text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400">MARKDOWN</h1>
           <div class="flex items-center gap-2">
-            <input
-              ref="fileInputRef"
-              type="file"
-              accept="image/*"
-              class="hidden"
-              @change="handleImageUpload"
-            />
+            <input ref="fileInputRef" type="file" accept="image/*" class="hidden" @change="handleImageUpload" />
             <button
               type="button"
               class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
@@ -229,18 +246,10 @@ onBeforeUnmount(() => {
 
     <!-- Preview -->
     <div class="flex h-1/2 w-full flex-col md:h-full md:w-1/2">
-      <div
-        class="flex h-12 shrink-0 items-center border-b border-slate-200 px-4 dark:border-slate-800"
-      >
-        <h2
-          class="text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400"
-        >
-          PREVIEW
-        </h2>
+      <div class="flex h-12 shrink-0 items-center border-b border-slate-200 px-4 dark:border-slate-800">
+        <h2 class="text-xs font-bold tracking-wider text-slate-500 dark:text-slate-400">PREVIEW</h2>
       </div>
-      <div
-        class="prose prose-slate dark:prose-invert max-w-none flex-1 overflow-y-auto p-6"
-      >
+      <div class="prose prose-slate dark:prose-invert max-w-none flex-1 overflow-y-auto p-6">
         <div v-html="renderedMarkdown" @click="handlePreviewClick"></div>
       </div>
     </div>
@@ -260,17 +269,9 @@ onBeforeUnmount(() => {
           class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
           @click.self="closeImageEditor"
         >
-          <div
-            class="w-full max-w-md rounded-3xl bg-white shadow-2xl dark:bg-slate-900"
-          >
-            <div
-              class="flex items-center justify-between border-b border-slate-200 px-6 py-4 dark:border-slate-800"
-            >
-              <h3
-                class="text-base font-semibold text-slate-800 dark:text-slate-100"
-              >
-                编辑图片
-              </h3>
+          <div class="w-full max-w-md rounded-3xl bg-white shadow-2xl dark:bg-slate-900">
+            <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4 dark:border-slate-800">
+              <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100">编辑图片</h3>
               <button
                 type="button"
                 class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
@@ -281,9 +282,7 @@ onBeforeUnmount(() => {
             </div>
 
             <div class="p-6">
-              <div
-                class="mb-4 flex items-center justify-center rounded-2xl bg-slate-100 p-4 dark:bg-slate-800"
-              >
+              <div class="mb-4 flex items-center justify-center rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
                 <img
                   :src="editingImageUrl"
                   :alt="editingImageAlt"
@@ -319,9 +318,7 @@ onBeforeUnmount(() => {
               </div>
             </div>
 
-            <div
-              class="flex items-center justify-between border-t border-slate-200 px-6 py-4 dark:border-slate-800"
-            >
+            <div class="flex items-center justify-between border-t border-slate-200 px-6 py-4 dark:border-slate-800">
               <div>
                 <input
                   ref="replaceInputRef"

@@ -91,6 +91,7 @@ export default defineConfig({
       "/api/": {
         target: "http://localhost:5555", // FastApi 后端地址
         changeOrigin: true,
+        ws: true,
       },
     },
   },

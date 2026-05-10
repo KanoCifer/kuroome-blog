@@ -1802,6 +1802,7 @@ dependencies = [
     { name = "uvicorn", extra = ["standard"] },
     { name = "uvloop" },
     { name = "webauthn" },
+    { name = "websockets" },
     { name = "werkzeug" },
 ]
 
@@ -1858,6 +1859,7 @@ requires-dist = [
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.41.0" },
     { name = "uvloop", specifier = ">=0.22.1" },
     { name = "webauthn", specifier = ">=2.7.1" },
+    { name = "websockets", specifier = ">=16.0" },
     { name = "werkzeug", specifier = ">=3.1.6" },
 ]
 

@@ -29,20 +29,24 @@
 ### Backend
 
 ```bash
+# sync dependencies & activate venv
+uv sync
+source .venv/bin/activate
+
 # run dev server
-python3 dev.py
+uv run python3 dev.py
 
 # migrations
-alembic revision --autogenerate -m "desc"
-alembic upgrade head
+uv run alembic revision --autogenerate -m "desc"
+uv run alembic upgrade head
 
 # format & lint
 ruff format .
 ruff check .
 
 # run all tests
-pytest backend/ -v
-pytest backend/test/test_fishing_expert.py  # run specific test file
+uv run pytest backend/ -v
+uv run pytest backend/test/test_fishing_expert.py  # run specific test file
 ```
 
 ### Frontend (`cd frontend`)
@@ -66,7 +70,6 @@ pnpm run build-only               # vite build only
 pnpm run type-check               # tsc -b
 pnpm run lint                     # eslint .
 pnpm run lint:fix                 # eslint . --fix
-pnpm run test:unit               # vitest
 ```
 
 ## 4) Code Style Guidelines
@@ -115,7 +118,8 @@ pnpm run test:unit               # vitest
 - Backend entry: `backend/app/main.py`
 - Frontend entry: `frontend/src/main.ts`
 - React entry: `react-app/src/main.tsx`
-- Config: `config/` (environment configs)
+- Config: `config/` (migration config: `mcporter.json`)
+- Env files: `backend/.env`, `frontend/.env`, `react-app/.env`
 - Core modules: `03_Core_Modules.md` (API documentation)
 - **Changelog**: `react-app/src/data/changelog.json`
 
@@ -129,7 +133,7 @@ See `.env.example` or `config/` for full list.
 
 ---
 
-## 6) Architecture & Boundaries
+## 7) Architecture & Boundaries
 
 Backend `app/` layout:
 - `api/` — HTTP route handlers

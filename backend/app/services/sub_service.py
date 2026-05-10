@@ -1,10 +1,18 @@
 from app.models.models import Subscription
 from app.repositories.sub_repo import SubRepo
+from app.services.base import BaseService
 
 
-class SubService:
+class SubService(BaseService):
     def __init__(self, repo: SubRepo) -> None:
         self.sub_repo = repo
+
+    async def get_owned_subscription(
+        self, sub_id: int, user_id: int
+    ) -> Subscription:
+        """Return subscription if found and owned, otherwise raise."""
+        sub = await self.sub_repo.get_subscription_by_id(sub_id)
+        return self.get_owned(sub, user_id, "订阅不存在", "无权访问此订阅")
 
     async def get_all_subscriptions(self, user_id: int):
         return await self.sub_repo.get_all_subscriptions(user_id)

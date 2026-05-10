@@ -2,11 +2,19 @@ from collections.abc import Sequence
 
 from app.models.models import DeviceTrack
 from app.repositories.device_repo import DeviceRepo
+from app.services.base import BaseService
 
 
-class DeviceService:
+class DeviceService(BaseService):
     def __init__(self, repo: DeviceRepo):
         self.repo = repo
+
+    async def get_owned_device(
+        self, device_id: int, user_id: int
+    ) -> DeviceTrack:
+        """Return device if found and owned, otherwise raise."""
+        device = await self.repo.get_device_track_by_id(device_id)
+        return self.get_owned(device, user_id, "设备不存在", "无权访问此设备")
 
     async def get_device_by_id(self, device_id: int) -> DeviceTrack | None:
         return await self.repo.get_device_track_by_id(device_id)

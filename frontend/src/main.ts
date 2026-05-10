@@ -10,6 +10,7 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import "./assets/base.css";
 import "./assets/squircle.css";
+import { initVisitorWebSocket } from "./plugins/visitorWs";
 import router from "./router";
 
 dayjs.extend(relativeTime);
@@ -33,5 +34,9 @@ configureAuthSideEffects({
 app.use(pinia);
 app.use(router);
 app.use(head);
+
+if (typeof window !== "undefined") {
+  initVisitorWebSocket(pinia);
+}
 
 app.mount("#app");

@@ -2,13 +2,18 @@
   <!-- Footer -->
   <footer
     class="text-gray-700 transition-colors duration-1000"
-    :class="
-      !props.isAboutView && !props.isEntryView
-        ? 'bg-blue-50 dark:bg-gray-900'
-        : 'bg-transparent'
-    "
+    :class="!props.isAboutView && !props.isEntryView ? 'bg-blue-50 dark:bg-gray-900' : 'bg-transparent'"
   >
-    <p class="text-gray-700">Copyright &copy; 2026 All Rights Reserved.</p>
+    <p class="text-gray-700">
+      Copyright &copy; 2026 All Rights Reserved.
+      <span class="ml-3 inline-flex items-center gap-1.5 text-xs text-gray-400">
+        <span class="relative flex h-2 w-2">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+          <span class="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+        </span>
+        {{ visitorCount.count }} 人在线
+      </span>
+    </p>
     <div class="flex items-end justify-center gap-4">
       <a
         href="https://github.com/KanoCifer/Flask-Example"
@@ -22,16 +27,10 @@
           class="cover aspect-square w-6 object-cover align-bottom"
         />
       </a>
-      <a
-        class="text-gray-700 hover:underline"
-        href="https://github.com/KanoCifer/Flask-Example "
-        target="_blank"
+      <a class="text-gray-700 hover:underline" href="https://github.com/KanoCifer/Flask-Example " target="_blank"
         >Github: KanoCifer</a
       >
-      <a
-        class="text-gray-700 hover:underline"
-        href="https://beian.miit.gov.cn/#/Integrated/index"
-        target="_blank"
+      <a class="text-gray-700 hover:underline" href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank"
         >粤ICP备2026018113号</a
       >
       <button
@@ -45,6 +44,10 @@
 </template>
 
 <script setup lang="ts">
+import { useVisitorCountStore } from "@/stores/visitorCount";
+
+const visitorCount = useVisitorCountStore();
+
 const props = defineProps<{
   isEntryView: boolean;
   isAboutView: boolean;
