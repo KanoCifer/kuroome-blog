@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { BasicFooter } from "@/components/basic";
-import BasicNav from "@/components/nav/BasicNav.vue";
 import BackToTop from "@/components/layout/BackToTop.vue";
 import ToastContainer from "@/components/layout/ToastContainer.vue";
-import { useScroll, useStorage, useDebounceFn } from "@vueuse/core";
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import BasicNav from "@/components/nav/BasicNav.vue";
+import { useDebounceFn, useScroll, useStorage } from "@vueuse/core";
 import { useHead } from "@vueuse/head";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { RouterView, useRoute } from "vue-router";
 // 背景图列表
 const backgroundImages = [
@@ -25,9 +25,7 @@ const backgroundImages = [
 const currentBgIndex = useStorage<number>("readinglist_bg_index", 0);
 
 // 动态背景图 URL
-const backgroundUrl = computed(
-  () => backgroundImages[currentBgIndex.value] || backgroundImages[0],
-);
+const backgroundUrl = computed(() => backgroundImages[currentBgIndex.value] || backgroundImages[0]);
 const route = useRoute();
 const isEntryView = ref<boolean>(false);
 const isAboutView = ref<boolean>(false);
@@ -74,7 +72,7 @@ onMounted(() => {
   lastScrollY.value = y.value;
 });
 
-// 自动回顶逻辑（仅在桌面端首页生效）
+// 自动回顶
 const isAutoScrolling = ref(false);
 let returnTopTimer: number | null = null;
 const scheduleReturnTop = () => {
@@ -84,15 +82,15 @@ const scheduleReturnTop = () => {
   if (returnTopTimer) {
     clearTimeout(returnTopTimer);
   }
-  // 在滚动停止后 500ms 执行回顶
+  // 在滚动停止后 2000ms 执行回顶
   returnTopTimer = window.setTimeout(() => {
     isAutoScrolling.value = true;
     window.scrollTo({ top: 0, behavior: "smooth" });
-    // 1000ms 后解除自动滚动锁，允许后续用户操作
+    // 3000ms 后解除自动滚动锁，允许后续用户操作
     setTimeout(() => {
       isAutoScrolling.value = false;
-    }, 1000);
-  }, 500);
+    }, 3000);
+  }, 2000);
 };
 
 onMounted(() => {
