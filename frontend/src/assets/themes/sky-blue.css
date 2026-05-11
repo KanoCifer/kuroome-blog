@@ -3,7 +3,7 @@
   --radius: 0.625rem;
   --ink: oklch(0.13 0.028 261.692);
   --paper: var(--color-blue-50);
-  --warm-gray: oklch(0.967 0.003 264.542);
+  --warm-gray: oklch(0.95 0.018 260);
   --muted: oklch(0.551 0.027 264.364);
   --accent-amber: oklch(0.769 0.188 70.08);
   --accent-sage: oklch(0.627 0.194 149.214);
@@ -12,7 +12,7 @@
   --workspace-accent: var(--color-blue-600);
   --workspace-accent-contrast: oklch(0.985 0.002 247.839);
   --card-bg: var(--color-blue-50);
-  --surface: oklch(1 0 0 / 0.8);
+  --surface: oklch(0.97 0.013 260 / 0.75);
   --surface-foreground: oklch(0.13 0.028 261.692);
   --chart-1: oklch(62.631% 0.20155 260.563);
   --chart-2: oklch(0.6 0.118 184.704);

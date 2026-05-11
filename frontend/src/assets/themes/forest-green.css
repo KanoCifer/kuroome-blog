@@ -2,8 +2,8 @@
 [data-color-scheme="forest-green"] {
   --radius: 0.625rem;
   --ink: oklch(0.13 0.028 145);
-  --paper: oklch(98.6% 0.031 120.757);
-  --warm-gray: oklch(0.967 0.015 145);
+  --paper: oklch(0.97 0.013 131);
+  --warm-gray: oklch(0.95 0.018 131);
   --muted: oklch(0.551 0.027 145);
   --accent-amber: oklch(0.7 0.16 70);
   --accent-sage: oklch(0.55 0.16 148);
@@ -11,8 +11,8 @@
   --accent-rose: oklch(0.577 0.245 27.325);
   --workspace-accent: oklch(40.5% 0.101 131.063);
   --workspace-accent-contrast: oklch(0.985 0.002 145);
-  --card-bg: oklch(1 0 0);
-  --surface: oklch(1 0 0 / 0.8);
+  --card-bg: oklch(0.99 0.008 131);
+  --surface: oklch(0.97 0.013 131 / 0.75);
   --surface-foreground: oklch(0.13 0.028 145);
   --chart-1: oklch(0.55 0.18 145);
   --chart-2: oklch(0.6 0.12 190);

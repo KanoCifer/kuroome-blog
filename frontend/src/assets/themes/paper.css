@@ -2,8 +2,8 @@
 [data-color-scheme="paper"] {
   --radius: 0.625rem;
   --ink: #1a1613;
-  --paper: #f8f5f0;
-  --warm-gray: #e8e2da;
+  --paper: oklch(0.97 0.013 50);
+  --warm-gray: oklch(0.95 0.018 50);
   --muted: #9a918a;
   --accent-amber: #c8713a;
   --accent-sage: #5a7a62;
@@ -16,8 +16,8 @@
   --status-active: #3d7a4a;
   --status-cooling: #b8892e;
   --status-abandoned: #b35a5a;
-  --card-bg: #fffdf9;
-  --surface: #f8f5f0bf;
+  --card-bg: oklch(0.99 0.008 50);
+  --surface: oklch(0.97 0.013 50 / 0.75);
   --surface-foreground: #1a1613;
   --chart-1: #c8713a;
   --chart-2: #5a7a62;

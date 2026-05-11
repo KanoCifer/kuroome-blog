@@ -3,10 +3,8 @@
 @font-face {
   font-family: "阿里妈妈方圆体 VF Regular";
   src:
-    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/JzWMyKA8U06c.woff2")
-      format("woff2"),
-    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/qFzBtDuQpN4i.woff")
-      format("woff");
+    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/JzWMyKA8U06c.woff2") format("woff2"),
+    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/qFzBtDuQpN4i.woff") format("woff");
   font-variation-settings:
     "BEVL" 80,
     "wght" 500;
@@ -17,10 +15,8 @@
   font-family: "阿里妈妈东方大楷 Regular";
   font-weight: 400;
   src:
-    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/bs5CgKu7Hdck.woff2")
-      format("woff2"),
-    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/FS1e5LRmIZGQ.woff")
-      format("woff");
+    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/bs5CgKu7Hdck.woff2") format("woff2"),
+    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/FS1e5LRmIZGQ.woff") format("woff");
   font-variation-settings: normal;
   font-display: swap;
 }
@@ -48,11 +44,9 @@ body {
   }
 }
 @theme {
-  --font-family-alibaba:
-    "阿里妈妈方圆体 VF Regular", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-family-alibaba: "阿里妈妈方圆体 VF Regular", "PingFang SC", "Microsoft YaHei", sans-serif;
 
-  --font-family-dongfang:
-    "阿里妈妈东方大楷 Regular", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-family-dongfang: "阿里妈妈东方大楷 Regular", "PingFang SC", "Microsoft YaHei", sans-serif;
 
   --animate-bounce-up: bounce-up 2s infinite;
 
@@ -305,8 +299,8 @@ ul[data-type="taskList"] ul[data-type="taskList"] {
 :root:not([data-color-scheme]) {
   --radius: 0.625rem;
   --ink: oklch(0.13 0.028 261.692);
-  --paper: oklch(1 0 0);
-  --warm-gray: oklch(0.967 0.003 264.542);
+  --paper: oklch(0.97 0.013 260);
+  --warm-gray: oklch(0.95 0.018 260);
   --muted: oklch(0.551 0.027 264.364);
   --accent-amber: oklch(0.769 0.188 70.08);
   --accent-sage: oklch(0.627 0.194 149.214);
@@ -314,8 +308,8 @@ ul[data-type="taskList"] ul[data-type="taskList"] {
   --accent-rose: oklch(0.577 0.245 27.325);
   --workspace-accent: oklch(0.21 0.034 264.665);
   --workspace-accent-contrast: oklch(0.985 0.002 247.839);
-  --card-bg: oklch(1 0 0);
-  --surface: oklch(1 0 0 / 0.8);
+  --card-bg: oklch(0.99 0.008 260);
+  --surface: oklch(0.97 0.013 260 / 0.75);
   --surface-foreground: oklch(0.13 0.028 261.692);
   --chart-1: oklch(62.631% 0.20155 260.563);
   --chart-2: oklch(0.6 0.118 184.704);

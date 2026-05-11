@@ -2,8 +2,8 @@
 [data-color-scheme="blush"] {
   --radius: 0.625rem;
   --ink: #201716;
-  --paper: #f6efec;
-  --warm-gray: #e5d8d2;
+  --paper: oklch(0.97 0.013 355);
+  --warm-gray: oklch(0.95 0.018 355);
   --muted: #97827c;
   --accent-amber: #a06d4f;
   --accent-sage: #6a7866;
@@ -16,8 +16,8 @@
   --status-active: #5a7162;
   --status-cooling: #9c7448;
   --status-abandoned: #a96262;
-  --card-bg: #fffaf7;
-  --surface: #f6efecbf;
+  --card-bg: oklch(0.99 0.008 355);
+  --surface: oklch(0.97 0.013 355 / 0.75);
   --surface-foreground: #201716;
   --chart-1: #a5656f;
   --chart-2: #6a7866;

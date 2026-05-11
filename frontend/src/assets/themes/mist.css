@@ -2,8 +2,8 @@
 [data-color-scheme="mist"] {
   --radius: 0.625rem;
   --ink: #161c21;
-  --paper: #eef2f5;
-  --warm-gray: #d8dee5;
+  --paper: oklch(0.97 0.01 225);
+  --warm-gray: oklch(0.95 0.015 225);
   --muted: #7d8791;
   --accent-amber: #927255;
   --accent-sage: #5d7569;
@@ -16,8 +16,8 @@
   --status-active: #4e6c61;
   --status-cooling: #94724a;
   --status-abandoned: #93636c;
-  --card-bg: #fafcfd;
-  --surface: #eef2f5bf;
+  --card-bg: oklch(0.99 0.008 225);
+  --surface: oklch(0.97 0.01 225 / 0.75);
   --surface-foreground: #161c21;
   --chart-1: #4f687a;
   --chart-2: #5d7569;
