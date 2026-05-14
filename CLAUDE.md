@@ -129,7 +129,7 @@ Required env vars:
 - `DATABASE_URL` — PostgreSQL connection string
 - `SECRET_KEY` — Application secret key
 
-See `.env.example` or `config/` for full list.
+See `backend/.env`, `frontend/.env`, `react-app/.env` or `config/` for full list.
 
 ---
 
@@ -137,6 +137,8 @@ See `.env.example` or `config/` for full list.
 
 Backend `app/` layout:
 - `api/` — HTTP route handlers
+  - `api/v1/` — stable API routes
+  - `api/v2/` — next-version API routes
 - `services/` — business logic
 - `repositories/` — data access
 - `schemas/` — Pydantic request/response models
@@ -159,3 +161,11 @@ React-app `src/` layout (Zustand + hooks):
 - Backend layering: `api -> service -> repository`
 - Keep business logic in services; keep data access in repositories
 - Keep request/response contracts in schemas
+
+### API 契约变更流程
+
+修改 `backend/app/schemas/` 后，需同步更新：
+- `frontend/src/api/` — Vue 端 API client
+- `react-app/src/services/` — React 端 service 层
+
+双前端不共享 API client，契约变更需手动同步两端。
