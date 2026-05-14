@@ -1,7 +1,7 @@
 import { createAuthGateway } from "@/auth/authGateway";
-import { createHeartbeat } from "@/auth/heartbeat";
 import { getAuthSideEffects } from "@/auth/sideEffects";
 import { tokenService } from "@/auth/tokenService";
+import { reconnectWs } from "@/plugins/visitorWs";
 import type { UserInfo } from "@/auth/types";
 import { userCache } from "@/auth/userCache";
 import { isAxiosError } from "axios";
@@ -21,43 +21,21 @@ export const useAuthStore = defineStore("auth", () => {
   const isAuthenticated = computed(() => !!user.value);
   const isAdmin = computed(() => !!user.value?.is_admin);
 
-  const heartbeat = createHeartbeat({
-    isAuthenticated: () => !!user.value,
-    postHeartbeat: () => authGateway.postHeartbeat(),
-    onError: (error: unknown) => {
-      console.error("心跳上报失败:", error);
-    },
-  });
-
-  // ---------------------- 辅助方法 ----------------------
-
   const saveRefreshToken = (token: string) => {
     tokenService.save(token);
   };
 
-  // 启动心跳上报
-  function startHeartbeat() {
-    heartbeat.start();
-  }
-
-  // 停止心跳上报
-  function stopHeartbeat() {
-    heartbeat.stop();
-  }
-
   // ---------------------- 方法（Actions） ----------------------
 
   // 2. 获取当前登录用户信息
-  async function fetchUser(
-    options: { silentOnUnauthenticated?: boolean } = {},
-  ) {
+  async function fetchUser(options: { silentOnUnauthenticated?: boolean } = {}) {
     loading.value = true;
     try {
       const userData = await authGateway.fetchUser();
       user.value = userData;
       userCache.set(userData); // 缓存到 sessionStorage
       // 启动心跳上报
-      startHeartbeat();
+      reconnectWs();
     } catch (err) {
       const status = isAxiosError(err) ? err.response?.status : undefined;
       const isUnauthenticated = status === 401;
@@ -81,7 +59,7 @@ export const useAuthStore = defineStore("auth", () => {
         user.value = cachedUser;
         isHydrated.value = true;
         // 启动心跳上报
-        startHeartbeat();
+        reconnectWs();
         // 获取管理员在线状态
         await fetchAdminOnlineStatus();
         return;
@@ -125,7 +103,7 @@ export const useAuthStore = defineStore("auth", () => {
       saveRefreshToken(res.refreshToken);
 
       // 启动心跳上报
-      startHeartbeat();
+      reconnectWs();
 
       // 获取管理员在线状态
       await fetchAdminOnlineStatus();
@@ -153,7 +131,7 @@ export const useAuthStore = defineStore("auth", () => {
       user.value = userData;
       userCache.set(userData);
 
-      startHeartbeat();
+      reconnectWs();
 
       sideEffects.notifySuccess("Passkey 登录成功！欢迎回来！");
       return res.raw;
@@ -182,7 +160,7 @@ export const useAuthStore = defineStore("auth", () => {
       userCache.clear();
 
       // 停止心跳上报
-      stopHeartbeat();
+      reconnectWs();
 
       // 清除刷新令牌
       saveRefreshToken("");

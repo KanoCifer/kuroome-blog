@@ -4,6 +4,8 @@ import { getVisitorId } from "@/utils/visitorTracker";
 import type { Pinia } from "pinia";
 
 let initialized = false;
+let wsDisconnect: (() => void) | null = null;
+let wsConnect: (() => void) | null = null;
 
 function buildWsUrl(): string {
   const apiBase = import.meta.env.VITE_API_BASE || "/api";
@@ -12,10 +14,7 @@ function buildWsUrl(): string {
   }
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
   const host = window.location.host;
-  console.log(
-    "WebSocket URL:",
-    `${protocol}//${host}${apiBase}/v2/publicv2/ws`,
-  );
+  console.log("WebSocket URL:", `${protocol}//${host}${apiBase}/v2/publicv2/ws`);
   return `${protocol}//${host}${apiBase}/v2/publicv2/ws`;
 }
 
@@ -25,7 +24,7 @@ export function initVisitorWebSocket(pinia: Pinia) {
 
   const store = useVisitorCountStore(pinia);
 
-  useWebSocket({
+  const ws = useWebSocket({
     url: buildWsUrl(),
     visitorId: getVisitorId(),
     onCount: (count: number) => {
@@ -33,4 +32,15 @@ export function initVisitorWebSocket(pinia: Pinia) {
     },
     immediate: true,
   });
+
+  wsDisconnect = ws.disconnect;
+  wsConnect = ws.connect;
+}
+
+/** 断开并重新连接 WS，用于登录/登出后携带更新后的 cookie */
+export function reconnectWs() {
+  if (wsDisconnect && wsConnect) {
+    wsDisconnect();
+    wsConnect();
+  }
 }

@@ -1,18 +1,22 @@
 """WebSocket visitor count service.
 
 Encapsulates connection tracking, Redis pub/sub lifecycle, and count broadcasting
-so the API layer is a thin handler.
+so the API layer is a thin handler. Also handles authenticated user online tracking
+via JWT cookie on connection.
 """
 
 from __future__ import annotations
 
 import asyncio
 import json
+import time
 from contextlib import asynccontextmanager, suppress
 
 from fastapi import WebSocket, WebSocketDisconnect
 from redis.asyncio import Redis as AsyncRedis
 
+import jwt
+from app.api.des.auth import manager
 from app.core import logger
 
 VISITOR_COUNT_KEY = "ws:visitor_count"
@@ -24,6 +28,10 @@ class WsVisitorService:
 
     Tracks active connections and manages a single Redis pub/sub listener
     that broadcasts count changes to all connected clients.
+
+    When the client's cookie includes a valid JWT access-token, the connection
+    is also registered in the ``online:users`` sorted set for authenticated
+    user presence.
     """
 
     _active_connections: dict[WebSocket, dict] = {}  # noqa: RUF012
@@ -85,6 +93,42 @@ class WsVisitorService:
         )
 
     @classmethod
+    async def _try_authenticate(cls, websocket: WebSocket):
+        """Try to authenticate user from the WebSocket handshake cookie.
+
+        Reads the ``access-token`` cookie (set by fastapi-login), decodes the
+        JWT, and loads the corresponding user.  Returns ``None`` when no valid
+        token is present.
+        """
+        cookie_header = websocket.headers.get("cookie", "")
+        token: str | None = None
+        for part in cookie_header.split("; "):
+            if "=" not in part:
+                continue
+            key, val = part.split("=", 1)
+            if key.strip() == "access-token":
+                token = val.strip()
+                break
+
+        if not token:
+            return None
+
+        try:
+            payload = jwt.decode(
+                token,
+                manager.secret.secret_for_decode,
+                algorithms=[manager.algorithm or "HS256"],
+            )
+        except jwt.PyJWTError:
+            return None
+
+        user_id = payload.get("sub")
+        if user_id is None:
+            return None
+
+        return await manager._load_user(user_id)
+
+    @classmethod
     async def _handle_message(cls, websocket: WebSocket, raw: str) -> None:
         """Parse and dispatch an incoming JSON message."""
         try:
@@ -99,7 +143,9 @@ class WsVisitorService:
         elif msg_type == "visitor_id":
             visitor_id = msg.get("visitor_id")
             if visitor_id is not None:
-                cls._active_connections[websocket] = {"visitor_id": visitor_id}
+                cls._active_connections[websocket].update(
+                    {"visitor_id": visitor_id}
+                )
 
     @classmethod
     async def handle_connection(
@@ -109,9 +155,18 @@ class WsVisitorService:
         async with cls.ensure_listener(redis):
             cls._active_connections[websocket] = {}
 
+            # ---- try JWT authentication from cookie ----
+            user = await cls._try_authenticate(websocket)
+            if user is not None:
+                now = int(time.time())
+                cls._active_connections[websocket].update(
+                    {"visitor_id": None, "user_id": user.id}
+                )
+                await redis.zadd("online:users", {str(user.id): now})
+                await redis.set(f"online:{user.id}", str(now), ex=600)
+
             try:
                 await redis.incr(VISITOR_COUNT_KEY)
-                # 给当前连接直接推送初始 count，避免 pub/sub listener 未就绪的竞态
                 count = await redis.get(VISITOR_COUNT_KEY)
                 current = int(count) if count else 0
                 await websocket.send_text(
@@ -133,7 +188,16 @@ class WsVisitorService:
             except Exception:
                 logger.exception("WebSocket error")
             finally:
-                cls._active_connections.pop(websocket, None)
+                conn = cls._active_connections.pop(websocket, None) or {}
+                user_id = conn.get("user_id")
+                if user_id is not None:
+                    try:
+                        await redis.zrem("online:users", str(user_id))
+                        await redis.delete(f"online:{user_id}")
+                    except Exception:
+                        logger.warning(
+                            "Failed to clean up online tracking on disconnect"
+                        )
                 try:
                     await redis.decr(VISITOR_COUNT_KEY)
                     await cls.publish_count(redis)
