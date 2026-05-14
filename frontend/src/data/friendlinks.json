@@ -1,0 +1,12 @@
+{
+  "links": [
+    {
+      "id": "1",
+      "name": "Kuroome's Blog",
+      "description": "本站的另一个入口，基于 React 技术栈构建的个人博客。",
+      "url": "https://m.kanocifer.chat",
+      "icon": "https://m.kanocifer.chat/favicon.ico",
+      "tags": ["个人博客", "React"]
+    }
+  ]
+}

@@ -98,6 +98,7 @@ declare module 'vue' {
     EditIcon: typeof import('./src/components/icons/EditIcon.vue')['default']
     EyeOff: typeof import('./src/components/icons/EyeOff.vue')['default']
     EyeOn: typeof import('./src/components/icons/EyeOn.vue')['default']
+    FriendLinkApplicationForm: typeof import('./src/components/friendlink/FriendLinkApplicationForm.vue')['default']
     HomeIcon: typeof import('./src/components/icons/HomeIcon.vue')['default']
     HomeSideBar: typeof import('./src/components/layout/HomeSideBar.vue')['default']
     HourlyCard: typeof import('./src/components/map/HourlyCard.vue')['default']

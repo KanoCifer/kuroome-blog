@@ -35,9 +35,13 @@
 | **钓点智能分析** | 融合天气数据与钓点特征生成智能指数，支持反馈闭环与多端一致展示          |
 | **待办事项**     | 任务管理、每日提醒（飞书通知）                                          |
 | **后台监控**     | 系统运行数据监控、访客追踪                                              |
-| **图库管理**     | 图片上传、管理                                                          |
+| **图库管理**     | 图片上传、管理、PostgreSQL 持久化存储                                    |
+| **多主题系统**   | Vue/React 双端 7 套配色方案（森林绿、天空蓝、玫瑰红、薄雾等），一键切换 |
+| **背景图切换**   | 固定/随机背景图选择器，10 张高质量背景                                  |
+| **Cookie 同意**  | GDPR 合规 Cookie 同意弹窗                                              |
+| **实时访客统计** | WebSocket 实时在线人数统计                                              |
 | **自动分流**     | 根据 User-Agent 自动将移动端路由到 React App，桌面端访问 Vue App        |
-| **安全**         | CSRF 保护、JWT、权限控制                                                |
+| **安全**         | CSRF 保护、JWT、权限控制、WebAuthn/Passkey                              |
 | **订阅管理**     | 管理你的付费订阅，邮件订阅、RSS 订阅、飞书通知订阅                      |
 | **设备管理**     | 设备跟踪管理、设备里程碑通知、移动端/桌面端切换                          |
 
@@ -55,17 +59,17 @@
 ```bash
 # 1. 后端环境
 cd backend
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+uv sync
+source .venv/bin/activate
 
 # 2. 配置环境变量
 cp .env.example .env  # 编辑 .env 配置数据库等
 
 # 3. 数据库迁移
-alembic upgrade head
+uv run alembic upgrade head
 
 # 4. 启动开发服务器
-python dev.py           # 后端 :5555
+uv run python3 dev.py      # 后端 :5555
 cd ../frontend && pnpm install && pnpm run dev  # 桌面端 :5173
 cd ../react-app && pnpm install && pnpm run dev # 移动端 :5174
 ```
@@ -79,18 +83,18 @@ cd ../react-app && pnpm install && pnpm run dev # 移动端 :5174
 
 ```bash
 cd backend
-python dev.py                           # 启动 (:5555)
-ruff format . && ruff check .           # 格式化 + 检查
-ruff check . --fix                      # 自动修复
-alembic revision --autogenerate -m "x"  # 生成迁移
-alembic upgrade head                    # 执行迁移
+uv run python3 dev.py                    # 启动 (:5555)
+ruff format . && ruff check .            # 格式化 + 检查
+ruff check . --fix                        # 自动修复
+uv run alembic revision --autogenerate -m "x"  # 生成迁移
+uv run alembic upgrade head              # 执行迁移
 
 # 测试
-python -m pytest                                  # 运行所有测试
-python -m pytest test/test_main.py -v             # 单个测试文件
-python -m pytest test/core/test_config.py::test_config_loading -v # 单个测试函数
-python -m pytest -k "config" -v                   # 按关键字过滤
-python -m pytest --tb=short                        # 简短 traceback
+uv run pytest                                      # 运行所有测试
+uv run pytest test/test_main.py -v                 # 单个测试文件
+uv run pytest test/core/test_config.py::test_config_loading -v  # 单个测试函数
+uv run pytest -k "config" -v                       # 按关键字过滤
+uv run pytest --tb=short                            # 简短 traceback
 ```
 
 ### 前端
@@ -123,6 +127,7 @@ pnpm run dev                            # 启动 (:5174)
 pnpm run lint                           # ESLint 检查
 pnpm run lint:fix                       # ESLint 自动修复
 pnpm run type-check                     # TypeScript 类型检查
+pnpm run format                         # Prettier 格式化
 pnpm run build                          # 完整构建 (type-check + compile)
 pnpm run build-only                     # 仅构建 (跳过 type-check)
 ```
@@ -331,11 +336,13 @@ flowchart LR
 | `/api/v2/fishing`       | 钓点智能指数与分析相关接口            |
 | `/api/v2/subscriptions` | 订阅管理 (新增/编辑/通知)             |
 
-### 最近改动（融合）
+### 最近改动（v3.0.0）
 
-- **后端契约**：`/api/v1/public` 与 `/api/v2/fishing` 输出字段已对齐钓点指数场景。
-- **前端接入**：Vue 与 React 端均新增/调整 fishing 与 weather 数据网关，消费字段保持一致。
-- **测试覆盖**：新增 `backend/test/test_fishing_expert.py`，验证钓点专家服务核心流程。
+- **多主题系统**：Vue/React 双端 7 套配色方案，基于 CSS 自定义属性实现一键切换。
+- **钓鱼升级**：AI 天气分析（支持模型切换）、后台训练任务、柱状图降水显示、移动端横向滑动修复。
+- **基础设施**：背景图固定/随机选择器、Averia 装饰字体、Cookie 同意弹窗、访客 WebSocket 实时统计。
+- **相册重构**：图片存储从文件系统迁移至 PostgreSQL 持久化。
+- **架构清理**：废弃 `frontend-architecture-analysis.md`，移除无用静态资源。
 
 ## 定时任务
 
@@ -366,7 +373,7 @@ RABBITMQ_URL=amqp://guest:guest@localhost:5672/
 
 1. 后端提交前: `cd backend && ruff format . && ruff check .`
 2. Vue 前端提交前: `cd frontend && pnpm format && pnpm lint && pnpm type-check`
-3. React 移动端提交前: `cd react-app && pnpm lint && pnpm type-check`
+3. React 移动端提交前: `cd react-app && pnpm format && pnpm lint && pnpm type-check`
 4. 提交信息: Conventional Commits (`feat:`, `fix:`, `docs:`, `style:`, `refactor:`, `perf:`, `test:`, `chore:`)
 5. 分支命名: `feature/xxx`, `fix/xxx`, `refactor/xxx`
 

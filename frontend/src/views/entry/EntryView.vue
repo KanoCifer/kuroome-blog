@@ -1,13 +1,44 @@
 <template>
   <div>
     <div class="relative min-h-dvh w-full snap-start space-y-2" :style="containerStyle" ref="parentContainer">
-      <!-- Theme Toggle + Background Switch - 只在入口页面显示 -->
-      <div
-        class="squircle bg-secondary ring-border/30 absolute top-4 right-4 z-50 flex gap-2 rounded-2xl p-2 shadow-sm ring"
+      <button
+        @click="openSettings"
+        class="group bg-secondary hover:bg-primary absolute top-4 right-4 z-50 flex h-10 cursor-pointer items-center overflow-hidden rounded-full px-2.5 shadow-md transition-all duration-500 ease-out"
+        title="偏好设置"
       >
-        <ThemeToggle />
-        <BackgroundSwitcher />
-      </div>
+        <SettingIcon class="text-primary h-5 w-5 shrink-0 transition-colors duration-500 group-hover:text-white" />
+        <span
+          class="max-w-0 min-w-0 text-sm font-medium whitespace-nowrap text-white opacity-0 transition-all duration-500 ease-out group-hover:max-w-20 group-hover:opacity-100"
+        >
+          偏好设置
+        </span>
+      </button>
+      <button
+        @click="goToFriendLinks"
+        class="group bg-secondary hover:bg-primary absolute top-16 right-4 z-50 flex h-10 cursor-pointer items-center overflow-hidden rounded-full px-2.5 shadow-md transition-all duration-500 ease-out"
+        title="友情链接"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="text-primary h-5 w-5 shrink-0 transition-colors duration-500 group-hover:text-white"
+        >
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+        </svg>
+        <span
+          class="max-w-0 min-w-0 text-sm font-medium whitespace-nowrap text-white opacity-0 transition-all duration-500 ease-out group-hover:max-w-20 group-hover:opacity-100"
+        >
+          友链
+        </span>
+      </button>
       <BentoGreeting
         v-if="show.BentoGreeting"
         :initial="{ scale: 0 }"
@@ -119,6 +150,79 @@
         :style="[mapPosition]"
         class="absolute w-fit -translate-x-1/2 -translate-y-1/2 select-none"
       />
+
+      <!-- Settings Modal -->
+      <Teleport to="body">
+        <transition
+          enter-active-class="transition-all duration-300 ease-out"
+          enter-from-class="opacity-0"
+          enter-to-class="opacity-100"
+          leave-active-class="transition-all duration-200 ease-in"
+          leave-from-class="opacity-100"
+          leave-to-class="opacity-0"
+        >
+          <div
+            v-if="isSettingsOpen"
+            class="fixed inset-0 z-9999 flex items-center justify-center"
+            @click.self="closeSettings"
+          >
+            <!-- Background overlay -->
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+
+            <!-- Modal content -->
+            <div class="bg-card dark:bg-card relative z-10 w-11/12 max-w-sm transform-gpu rounded-3xl p-6 shadow-2xl">
+              <!-- Close button -->
+              <button
+                @click="closeSettings"
+                class="text-muted-foreground hover:bg-accent hover:text-secondary-foreground dark:hover:bg-accent dark:hover:text-foreground absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+              >
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              <!-- Header -->
+              <h3
+                class="text-foreground dark:text-foreground mb-6 flex items-center gap-2 font-serif text-xl font-bold"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="3" />
+                  <path
+                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                  />
+                </svg>
+                偏好设置
+              </h3>
+
+              <!-- Theme Toggle -->
+              <div class="mb-5">
+                <label class="text-muted-foreground dark:text-muted-foreground mb-2 block text-sm font-medium">
+                  主题与配色
+                </label>
+                <ThemeToggle />
+              </div>
+
+              <!-- Background Switcher -->
+              <div>
+                <label class="text-muted-foreground dark:text-muted-foreground mb-2 block text-sm font-medium">
+                  背景图片
+                </label>
+                <BackgroundSwitcher />
+              </div>
+            </div>
+          </div>
+        </transition>
+      </Teleport>
     </div>
   </div>
 </template>
@@ -140,12 +244,21 @@ import {
   BentoWebsites,
   TodoCard,
 } from "@/components/bento";
+import BackgroundSwitcher from "@/components/layout/BackgroundSwitcher.vue";
 import ThemeToggle from "@/components/layout/ThemeToggle.vue";
 import carddelay from "@/data/carddelay.json";
 import { useDebounceFn, useStorage } from "@vueuse/core";
-import BackgroundSwitcher from "@/components/layout/BackgroundSwitcher.vue";
 import { AnimatePresence } from "motion-v";
 import { computed, nextTick, onMounted, onUnmounted, ref, watch, type ComponentPublicInstance } from "vue";
+import { useRouter } from "vue-router";
+import SettingIcon from "./icon/SettingIcon.vue";
+
+const router = useRouter();
+
+const goToFriendLinks = () => {
+  closeSettings();
+  router.push({ name: "friend-links" });
+};
 
 // const { x: mouseX, y: mouseY } = useMouse({
 //   touch: false,
@@ -366,6 +479,14 @@ onMounted(() => {
 });
 
 // 为每个卡片维护独立的显示状态
+const isSettingsOpen = ref(false);
+const openSettings = () => {
+  isSettingsOpen.value = true;
+};
+const closeSettings = () => {
+  isSettingsOpen.value = false;
+};
+
 const show = ref<Record<string, boolean>>({
   BentoGreeting: false,
   BentoProfileCard: false,

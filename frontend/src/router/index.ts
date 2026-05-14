@@ -1,10 +1,6 @@
 import { useAuthStore } from "@/stores/auth";
 import { reportVisitorData } from "@/utils/visitorTracker";
-import {
-  createMemoryHistory,
-  createRouter,
-  createWebHistory,
-} from "vue-router";
+import { createMemoryHistory, createRouter, createWebHistory } from "vue-router";
 
 declare global {
   interface Window {
@@ -88,6 +84,16 @@ const router = createRouter({
         title: "推荐网站 - Kuroome's Blog",
         description: "发现有趣的网站和工具",
         keywords: "网站推荐,工具,资源",
+      },
+    },
+    {
+      path: "/friend-links",
+      name: "friend-links",
+      component: () => import("@/views/general/FriendLinksView.vue"),
+      meta: {
+        title: "友情链接 - Kuroome's Blog",
+        description: "与志同道合的朋友交换链接",
+        keywords: "友情链接,友链,博客链接",
       },
     },
     {
@@ -333,9 +339,7 @@ router.beforeEach(async (to) => {
     await auth.hydrateAuth();
   }
 
-  const needsAuth = to.matched.some(
-    (route) => route.meta?.requiresAuth === true,
-  );
+  const needsAuth = to.matched.some((route) => route.meta?.requiresAuth === true);
 
   if (needsAuth && !auth.isAuthenticated) {
     return { name: "login", query: { redirect: to.fullPath } };
