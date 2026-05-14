@@ -12,6 +12,14 @@
 }
 
 @font-face {
+  font-family: "Averia Gruesa Libre";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/AveriaGruesaLibre-Regular.ttf") format("truetype");
+}
+
+@font-face {
   font-family: "阿里妈妈东方大楷 Regular";
   font-weight: 400;
   src:
@@ -47,6 +55,8 @@ body {
   --font-family-alibaba: "阿里妈妈方圆体 VF Regular", "PingFang SC", "Microsoft YaHei", sans-serif;
 
   --font-family-dongfang: "阿里妈妈东方大楷 Regular", "PingFang SC", "Microsoft YaHei", sans-serif;
+
+  --font-family-averia: "Averia Gruesa Libre", system-ui;
 
   --animate-bounce-up: bounce-up 2s infinite;
 

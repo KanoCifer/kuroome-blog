@@ -31,7 +31,7 @@
       <a class="text-foreground hover:underline" target="_blank">粤ICP备2026018113号</a>
       <button
         @click="switchToReact"
-        class="border-border hover:bg-accent dark:border-border dark:hover:bg-accent rounded-lg border px-3 py-1 text-sm transition-colors"
+        class="border-primary text-primary hover:bg-primary hover:text-foreground rounded-lg border px-3 py-1 text-sm transition-colors"
       >
         切换到移动版
       </button>

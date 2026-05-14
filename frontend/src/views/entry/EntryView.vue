@@ -1,35 +1,12 @@
 <template>
   <div>
-    <div
-      class="relative min-h-dvh w-full snap-start space-y-2"
-      :style="containerStyle"
-      ref="parentContainer"
-    >
+    <div class="relative min-h-dvh w-full snap-start space-y-2" :style="containerStyle" ref="parentContainer">
       <!-- Theme Toggle + Background Switch - 只在入口页面显示 -->
       <div
         class="squircle bg-secondary ring-border/30 absolute top-4 right-4 z-50 flex gap-2 rounded-2xl p-2 shadow-sm ring"
       >
         <ThemeToggle />
-        <!-- 背景图切换按钮 -->
-        <button
-          @click="debouncedSwitchBackground()"
-          class="squircle hover:bg-accent rounded-xl p-2 transition-all hover:scale-110"
-          title="切换背景图"
-        >
-          <svg
-            class="text-primary h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
-        </button>
+        <BackgroundSwitcher />
       </div>
       <BentoGreeting
         v-if="show.BentoGreeting"
@@ -76,7 +53,7 @@
         :animate="{ scale: 1 }"
         ref="calRef"
         :style="[calendarPosition]"
-        class="absolute w-2xs -translate-x-1/2 -translate-y-1/2"
+        class="absolute w-auto -translate-x-1/2 -translate-y-1/2"
       />
       <BentoMemo
         v-if="show.BentoMemo"
@@ -109,11 +86,7 @@
         :style="[listCardPosition]"
         class="absolute w-auto -translate-x-1/2 -translate-y-1/2 cursor-pointer"
       />
-      <BentoCat
-        v-if="show.BentoCat"
-        :style="[catPosition]"
-        class="absolute w-2xs -translate-x-1/2 -translate-y-1/2"
-      />
+      <BentoCat v-if="show.BentoCat" :style="[catPosition]" class="absolute w-2xs -translate-x-1/2 -translate-y-1/2" />
       <div
         v-if="show.TodoCard && showTodoCard"
         class="absolute top-1/2 -right-20 w-70 min-w-3xs -translate-x-1/2 -translate-y-1/2"
@@ -127,12 +100,7 @@
         class="squircle bg-secondary ring-border/30 fixed top-1/2 right-4 z-50 -translate-y-1/2 rounded-2xl p-3 shadow-sm ring transition-all hover:scale-110"
         title="显示待办卡片"
       >
-        <svg
-          class="text-primary h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
+        <svg class="text-primary h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -175,49 +143,13 @@ import {
 import ThemeToggle from "@/components/layout/ThemeToggle.vue";
 import carddelay from "@/data/carddelay.json";
 import { useDebounceFn, useStorage } from "@vueuse/core";
+import BackgroundSwitcher from "@/components/layout/BackgroundSwitcher.vue";
 import { AnimatePresence } from "motion-v";
-import {
-  computed,
-  nextTick,
-  onMounted,
-  onUnmounted,
-  ref,
-  watch,
-  type ComponentPublicInstance,
-} from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref, watch, type ComponentPublicInstance } from "vue";
 
 // const { x: mouseX, y: mouseY } = useMouse({
 //   touch: false,
 // });
-const backgroundImages = [
-  "/background/bg-1.webp",
-  "/background/bg-2.webp",
-  "/background/bg-3.webp",
-  "/background/bg-4.webp",
-  "/background/bg-5.webp",
-  "/background/bg-6.webp",
-  "/background/bg-7.webp",
-  "/background/bg-8.webp",
-  "/background/bg-9.webp",
-  "/background/bg-10.webp",
-];
-
-// 当前背景图索引
-const currentBgIndex = useStorage<number>("readinglist_bg_index", 0);
-
-// 切换背景（带防抖）
-const switchBackground = () => {
-  currentBgIndex.value = (currentBgIndex.value + 1) % backgroundImages.length;
-};
-
-const debouncedSwitchBackground = useDebounceFn(switchBackground, 400);
-
-onUnmounted(() => {
-  // 如果防抖函数支持 cancel，则在卸载时取消
-  const maybe = debouncedSwitchBackground as unknown as { cancel?: () => void };
-  maybe.cancel?.();
-});
-
 // const moveStyle = computed(() => {
 //   // const centerX = mouseX.value - window.innerWidth / 2;
 //   // const centerY = mouseY.value - window.innerHeight / 2;
@@ -256,9 +188,7 @@ const viewportHeight = ref<number>(0);
 const showTodoCard = useStorage<boolean>("readinglist_show_todo_card", true);
 
 // 布局设计基准高度：使用视口高度，但不低于 820px，保证卡片间距不被压缩
-const layoutHeight = computed<number>(() =>
-  Math.max(viewportHeight.value, 820),
-);
+const layoutHeight = computed<number>(() => Math.max(viewportHeight.value, 820));
 
 // 容器高度：至少撑满布局高度（让绝对定位的卡片不被裁剪）
 const containerStyle = computed(() => ({
@@ -271,14 +201,10 @@ const halfWidth = computed<number>(() => {
 });
 
 // 左侧卡片公共偏移量（导航、备忘录、技术栈用，从屏幕中线向左偏移）
-const leftTotal = computed<number>(
-  () => halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224,
-);
+const leftTotal = computed<number>(() => halfWidth.value - navoffsetWidth.value / 2 - cardMargin.value - 224);
 
 // 右侧卡片公共偏移量（时钟、日历、网站、阅读列表用，从屏幕中线向右偏移）
-const rightTotal = computed<number>(
-  () => halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224,
-);
+const rightTotal = computed<number>(() => halfWidth.value + clockoffsetWidth.value / 2 + cardMargin.value + 224);
 
 // 计算所有卡片的动态位置，包含 left 和 top，以 layoutHeight 为基准
 // layoutHeight = max(视口高度, 820px)，保证小屏时卡片不重叠
@@ -489,9 +415,7 @@ onMounted(async () => {
   });
 
   // Update dimensions after all cards have been rendered
-  const maxOrder = Math.max(
-    ...Object.values(carddelay).map((item) => item.order),
-  );
+  const maxOrder = Math.max(...Object.values(carddelay).map((item) => item.order));
   setTimeout(
     () => {
       updateDimensions();

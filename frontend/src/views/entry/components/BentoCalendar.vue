@@ -8,10 +8,7 @@
     </div>
 
     <!-- Weekday headers -->
-    <div
-      class="mb-1 grid text-center"
-      style="grid-template-columns: repeat(7, 1fr)"
-    >
+    <div class="mb-1 grid gap-x-3 text-center" style="grid-template-columns: repeat(7, 1fr)">
       <span
         v-for="(label, idx) in weekdays"
         :key="idx"
@@ -23,7 +20,7 @@
     </div>
 
     <!-- Days grid -->
-    <div class="grid text-center" style="grid-template-columns: repeat(7, 1fr)">
+    <div class="grid gap-x-3 text-center" style="grid-template-columns: repeat(7, 1fr)">
       <!-- Leading blank cells for alignment -->
       <span v-for="n in startOffset" :key="'blank-' + n" />
 
@@ -31,11 +28,9 @@
       <span
         v-for="day in daysInMonth"
         :key="day"
-        class="mx-auto flex aspect-square w-full max-w-8 items-center justify-center rounded-full text-sm transition-colors"
+        class="mx-auto flex aspect-square w-full max-w-8 items-center justify-center rounded-lg text-sm transition-colors"
         :class="
-          day === today
-            ? 'bg-primary text-primary-foreground font-bold'
-            : 'text-foreground hover:bg-primary/10'
+          day === today ? 'bg-primary text-primary-foreground font-bold' : 'text-muted-foreground hover:bg-primary/10'
         "
       >
         {{ day }}

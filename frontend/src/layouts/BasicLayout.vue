@@ -4,31 +4,13 @@ import BackToTop from "@/components/layout/BackToTop.vue";
 import CookieConsent from "@/components/layout/CookieConsent.vue";
 import ToastContainer from "@/components/layout/ToastContainer.vue";
 import BasicNav from "@/components/nav/BasicNav.vue";
-import { useDebounceFn, useScroll, useStorage } from "@vueuse/core";
+import { useScroll } from "@vueuse/core";
 import { useHead } from "@vueuse/head";
+import { useBackgroundStore } from "@/stores/background";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { RouterView, useRoute } from "vue-router";
-// 背景图列表
-const backgroundImages = [
-  "/background/bg-1.webp",
-  "/background/bg-2.webp",
-  "/background/bg-3.webp",
-  "/background/bg-4.webp",
-  "/background/bg-5.webp",
-  "/background/bg-6.webp",
-  "/background/bg-7.webp",
-  "/background/bg-8.webp",
-  "/background/bg-9.webp",
-  "/background/bg-10.webp",
-];
 
-// 使用 localStorage 持久化当前背景图索引
-const currentBgIndex = useStorage<number>("readinglist_bg_index", 0);
-
-// 动态背景图 URL
-const backgroundUrl = computed(
-  () => backgroundImages[currentBgIndex.value] || backgroundImages[0],
-);
+const bgStore = useBackgroundStore();
 const route = useRoute();
 const isEntryView = ref<boolean>(false);
 const isAboutView = ref<boolean>(false);
@@ -40,6 +22,7 @@ watch(
   (newPath) => {
     isEntryView.value = newPath === "/";
     isAboutView.value = newPath === "/about";
+    bgStore.reroll();
 
     if (newPath === "/") {
       showBasicNav.value = false;
@@ -113,69 +96,28 @@ onUnmounted(() => {
   window.removeEventListener("scroll", handleScroll);
 });
 
-// 切换背景（带防抖）
-const switchBackground = () => {
-  currentBgIndex.value = (currentBgIndex.value + 1) % backgroundImages.length;
-};
-
-const debouncedSwitchBackground = useDebounceFn(switchBackground, 400);
-
-onUnmounted(() => {
-  // 如果防抖函数支持 cancel，则在卸载时取消
-  const maybe = debouncedSwitchBackground as unknown as { cancel?: () => void };
-  maybe.cancel?.();
-});
-
 // 使用 useHead 在 head 中预加载当前与下一张背景图
 const headPreload = computed(() => {
   const links: Array<Record<string, string>> = [];
-  const len = backgroundImages.length;
+  const len = bgStore.backgroundImages.length;
   if (len === 0) return { link: [] };
-  const cur = backgroundImages[currentBgIndex.value] || backgroundImages[0];
+  const cur = bgStore.backgroundUrl;
   links.push({ rel: "preload", as: "image", href: cur });
   if (len > 1) {
-    const next = backgroundImages[(currentBgIndex.value + 1) % len];
+    const next = bgStore.backgroundImages[(bgStore.effectiveIndex + 1) % len];
     links.push({ rel: "preload", as: "image", href: next });
   }
   return { link: links };
 });
 useHead(headPreload);
-
-// 自动轮播背景图（仅桌面端）
-const BACKGROUND_ROTATE_INTERVAL = 60000; // 毫秒，60s
-let bgRotateTimer: number | null = null;
-
-const stopBackgroundRotation = () => {
-  if (bgRotateTimer) {
-    clearInterval(bgRotateTimer);
-    bgRotateTimer = null;
-  }
-};
-
-const startBackgroundRotation = () => {
-  // 如果只有一张图则不启动
-  if (backgroundImages.length <= 1) return;
-  stopBackgroundRotation();
-  bgRotateTimer = window.setInterval(() => {
-    currentBgIndex.value = (currentBgIndex.value + 1) % backgroundImages.length;
-  }, BACKGROUND_ROTATE_INTERVAL);
-};
-
-onMounted(() => {
-  startBackgroundRotation();
-});
-
-onUnmounted(() => {
-  stopBackgroundRotation();
-});
 </script>
 
 <template>
   <div class="relative isolate grid min-h-dvh grid-rows-[auto_1fr_auto]">
     <!-- 背景图 -->
     <div
-      class="pointer-events-none fixed inset-0 -z-10 transform-gpu bg-cover bg-fixed blur-md transition-all duration-800"
-      :style="{ backgroundImage: `url('${backgroundUrl}')` }"
+      class="pointer-events-none fixed inset-0 -z-10 transform-gpu bg-cover bg-fixed blur-3xl transition-all duration-800"
+      :style="{ backgroundImage: `url('${bgStore.backgroundUrl}')` }"
     ></div>
     <header>
       <div class="mx-auto mt-6">

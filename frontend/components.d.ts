@@ -30,6 +30,7 @@ declare module 'vue' {
     ArticleDetailLayout: typeof import('./src/components/article/ArticleDetailLayout.vue')['default']
     ArticleSummaryCard: typeof import('./src/components/blog/ArticleSummaryCard.vue')['default']
     ArticleToc: typeof import('./src/components/blog/ArticleToc.vue')['default']
+    BackgroundSwitcher: typeof import('./src/components/layout/BackgroundSwitcher.vue')['default']
     BackToTop: typeof import('./src/components/layout/BackToTop.vue')['default']
     BasicDetail: typeof import('./src/components/basic/BasicDetail.vue')['default']
     BasicFooter: typeof import('./src/components/basic/BasicFooter.vue')['default']
