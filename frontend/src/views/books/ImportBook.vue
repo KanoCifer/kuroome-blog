@@ -11,21 +11,14 @@
         >
           Import Your Bookshelf
         </h1>
-        <p class="text-muted-foreground mt-2 text-sm">
-          Import your books from WeRead by providing your account cookie
-        </p>
+        <p class="text-muted-foreground mt-2 text-sm">Import your books from WeRead by providing your account cookie</p>
       </div>
 
       <!-- Form Section -->
       <form @submit.prevent="submitImport" class="space-y-6">
         <!-- Cookie Input -->
         <div class="space-y-2">
-          <label
-            for="weread_cookie"
-            class="text-foreground block text-sm font-medium"
-          >
-            WeRead Cookie
-          </label>
+          <label for="weread_cookie" class="text-foreground block text-sm font-medium"> WeRead Cookie </label>
           <div class="relative">
             <textarea
               id="weread_cookie"
@@ -47,18 +40,11 @@
           class="bg-primary text-primary-foreground shadow-primary/20 hover:shadow-primary/30 focus:ring-primary w-full rounded-2xl px-6 py-4 font-medium shadow-lg transition-all duration-300 hover:scale-[1.02] focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span v-if="loading" class="flex items-center justify-center gap-2">
-            <span
-              class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
-            ></span>
+            <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
             Importing Books...
           </span>
           <span v-else class="flex items-center justify-center gap-2">
-            <svg
-              class="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -88,8 +74,8 @@ const submitImport = async () => {
     const response = await bookService.importBooks({
       weread_cookie: weread_cookie.value,
     });
-    if (response.status === 200) {
-      const imported_count = response.data.data.imported_count;
+    if (response.status === "success") {
+      const imported_count = response.data?.imported_count ?? 0;
       notifier.success(`Successfully imported ${imported_count} books!`);
 
       // 保存cookie

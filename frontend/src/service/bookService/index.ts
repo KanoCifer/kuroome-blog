@@ -1,35 +1,27 @@
-import request from "@/api/request";
-import type { BookListResponse } from "@/types";
+import { bookGateway } from "@/api/bookGateway";
 
 export const bookService = {
   async getBooks(params: { page?: number; per_page?: number }) {
-    return request.get<BookListResponse>("/book", { params });
+    return bookGateway.getBooks(params);
   },
 
-  async createBook(payload: {
-    title: string;
-    author: string;
-    iscompleted: boolean;
-  }) {
-    return request.post("/books/addbook", payload);
+  async createBook(payload: { title: string; author: string; iscompleted: boolean }) {
+    return bookGateway.createBook(payload);
   },
 
-  async updateBook(
-    bookId: number,
-    payload: { title: string; author: string; iscompleted: boolean },
-  ) {
-    return request.put(`/books/${bookId}`, payload);
+  async updateBook(bookId: number, payload: { title: string; author: string; iscompleted: boolean }) {
+    return bookGateway.updateBook(bookId, payload);
   },
 
   async patchBookStatus(bookId: number, payload: { iscompleted: boolean }) {
-    return request.patch(`/books/${bookId}/status`, payload);
+    return bookGateway.patchBookStatus(bookId, payload);
   },
 
   async deleteBook(bookId: number) {
-    return request.delete(`/books/${bookId}`);
+    return bookGateway.deleteBook(bookId);
   },
 
   async importBooks(payload: { weread_cookie: string }) {
-    return request.post("/import", payload);
+    return bookGateway.importBooks(payload);
   },
 };

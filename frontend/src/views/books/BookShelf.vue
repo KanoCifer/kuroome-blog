@@ -1,13 +1,9 @@
 <template>
-  <div
-    class="bg-muted/70 mx-auto my-24 min-h-screen max-w-5xl rounded-4xl px-4 py-8 sm:px-6 lg:px-8"
-  >
+  <div class="bg-muted/70 mx-auto my-24 min-h-screen max-w-5xl rounded-4xl px-4 py-8 sm:px-6 lg:px-8">
     <div class="mx-auto">
       <!-- 页面标题 -->
       <div class="mb-8 flex items-center gap-3">
-        <div
-          class="bg-primary/15 text-primary flex h-12 w-12 items-center justify-center rounded-xl"
-        >
+        <div class="bg-primary/15 text-primary flex h-12 w-12 items-center justify-center rounded-xl">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -25,9 +21,7 @@
         </div>
         <div>
           <div class="flex items-center gap-6">
-            <h1 class="text-foreground font-serif text-3xl font-bold">
-              我的书架
-            </h1>
+            <h1 class="text-foreground font-serif text-3xl font-bold">我的书架</h1>
             <span
               class="border-primary/30 bg-primary/20 text-primary self-center rounded-full border px-4 py-2 text-xs"
               >{{ books_count }}</span
@@ -38,15 +32,8 @@
       </div>
 
       <!-- 加载状态 - 骨架屏 -->
-      <div
-        v-if="isLoading"
-        class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-      >
-        <div
-          v-for="i in 6"
-          :key="i"
-          class="bg-card animate-pulse overflow-hidden rounded-xl shadow-sm"
-        >
+      <div v-if="isLoading" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div v-for="i in 6" :key="i" class="bg-card animate-pulse overflow-hidden rounded-xl shadow-sm">
           <div class="bg-muted aspect-2/3" />
           <div class="p-4">
             <div class="bg-muted mb-2 h-5 w-3/4 rounded" />
@@ -60,9 +47,7 @@
         v-else-if="errorMessage"
         class="bg-card flex flex-col items-center justify-center rounded-2xl py-16 shadow-sm"
       >
-        <div
-          class="bg-destructive/15 text-destructive mb-4 flex h-16 w-16 items-center justify-center rounded-full"
-        >
+        <div class="bg-destructive/15 text-destructive mb-4 flex h-16 w-16 items-center justify-center rounded-full">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -109,9 +94,7 @@
         v-else-if="books.length === 0"
         class="bg-card flex flex-col items-center justify-center rounded-2xl py-16 shadow-sm"
       >
-        <div
-          class="bg-muted text-muted-foreground mb-4 flex h-20 w-20 items-center justify-center rounded-full"
-        >
+        <div class="bg-muted text-muted-foreground mb-4 flex h-20 w-20 items-center justify-center rounded-full">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -127,12 +110,8 @@
             />
           </svg>
         </div>
-        <h3 class="text-foreground mb-2 font-serif text-xl font-semibold">
-          暂无书籍
-        </h3>
-        <p class="text-muted-foreground mb-6 text-center">
-          您的书架还是空的，快去导入一些书籍吧
-        </p>
+        <h3 class="text-foreground mb-2 font-serif text-xl font-semibold">暂无书籍</h3>
+        <p class="text-muted-foreground mb-6 text-center">您的书架还是空的，快去导入一些书籍吧</p>
         <router-link
           to="/import"
           class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-primary inline-flex items-center gap-2 rounded-xl px-6 py-2.5 font-semibold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
@@ -169,18 +148,13 @@
         </div>
       </transition>
       <!-- 分页 -->
-      <div
-        v-if="pagination && pagination.pages > 1"
-        class="mt-8 flex justify-center"
-      >
+      <div v-if="pagination && pagination.pages > 1" class="mt-8 flex justify-center">
         <nav class="flex items-center gap-2">
           <!-- 上一页 -->
           <button
             :disabled="!pagination.has_prev"
             class="hover:bg-accent rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-            :class="
-              pagination?.has_prev ? 'text-foreground' : 'text-muted-foreground'
-            "
+            :class="pagination?.has_prev ? 'text-foreground' : 'text-muted-foreground'"
             @click="goToPage(pagination!.prev_num!)"
             type="button"
           >
@@ -200,11 +174,7 @@
             </button>
 
             <!-- 省略号 -->
-            <span
-              v-if="pagination && pagination.page > 4"
-              class="text-muted-foreground px-1"
-              >...</span
-            >
+            <span v-if="pagination && pagination.page > 4" class="text-muted-foreground px-1">...</span>
 
             <!-- 显示当前页附近的页码 -->
             <button
@@ -212,9 +182,7 @@
               :key="pageNum"
               class="min-w-32px rounded-lg px-2 py-2 text-sm font-medium transition-colors"
               :class="
-                pageNum === pagination?.page
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-foreground hover:bg-accent'
+                pageNum === pagination?.page ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-accent'
               "
               @click="goToPage(pageNum)"
               type="button"
@@ -223,9 +191,7 @@
             </button>
 
             <!-- 省略号 -->
-            <span
-              v-if="pagination && pagination.page < pagination.pages - 3"
-              class="text-muted-foreground px-1"
+            <span v-if="pagination && pagination.page < pagination.pages - 3" class="text-muted-foreground px-1"
               >...</span
             >
 
@@ -244,9 +210,7 @@
           <button
             :disabled="!pagination?.has_next"
             class="hover:bg-accent rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-            :class="
-              pagination?.has_next ? 'text-foreground' : 'text-muted-foreground'
-            "
+            :class="pagination?.has_next ? 'text-foreground' : 'text-muted-foreground'"
             @click="goToPage(pagination!.next_num!)"
             type="button"
           >
@@ -282,11 +246,7 @@ const getVisiblePages = computed(() => {
   const visiblePages = [];
 
   // 显示当前页附近的页码
-  for (
-    let i = Math.max(2, current - 2);
-    i <= Math.min(totalPages - 1, current + 2);
-    i++
-  ) {
+  for (let i = Math.max(2, current - 2); i <= Math.min(totalPages - 1, current + 2); i++) {
     visiblePages.push(i);
   }
 
@@ -299,22 +259,21 @@ const fetchBooks = async (page: number = 1) => {
   errorMessage.value = "";
   try {
     const res = await bookService.getBooks({ page, per_page: 12 });
-    if (res.data.status === "success") {
-      books.value = res.data.data?.books || [];
+    if (res.status === "success") {
+      books.value = res.data?.books || [];
       //
-      books_count.value = res.data.data?.pagination?.total || 0;
-      pagination.value = res.data.data?.pagination || null;
+      books_count.value = res.data?.pagination?.total || 0;
+      pagination.value = res.data?.pagination || null;
       currentPage.value = page;
     } else {
-      throw new Error(res.data.message || "获取书籍列表失败");
+      throw new Error(res.message || "获取书籍列表失败");
     }
   } catch (err: unknown) {
     const error = err as {
       response?: { data?: { message?: string } };
       message?: string;
     };
-    errorMessage.value =
-      error?.response?.data?.message || error?.message || "获取书籍列表失败";
+    errorMessage.value = error?.response?.data?.message || error?.message || "获取书籍列表失败";
   } finally {
     isLoading.value = false;
   }

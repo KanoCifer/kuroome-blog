@@ -51,11 +51,7 @@ const getVisiblePages = computed(() => {
   const visiblePages: number[] = [];
 
   // 显示当前页附近的页码
-  for (
-    let i = Math.max(2, current - 2);
-    i <= Math.min(totalPages - 1, current + 2);
-    i++
-  ) {
+  for (let i = Math.max(2, current - 2); i <= Math.min(totalPages - 1, current + 2); i++) {
     visiblePages.push(i);
   }
 
@@ -67,8 +63,8 @@ const fetchBooks = async (page: number = 1) => {
   errorMessage.value = "";
   try {
     const res = await bookService.getBooks({ page, per_page: 20 });
-    books.value = res.data.data?.books ?? [];
-    pagination.value = res.data.data?.pagination ?? null;
+    books.value = res.data?.books ?? [];
+    pagination.value = res.data?.pagination ?? null;
     currentPage.value = page;
   } catch (err: unknown) {
     console.error(err);
@@ -144,20 +140,12 @@ const goToPage = (page: number) => {
     <!-- 左侧：书籍列表和添加表单 -->
     <div class="lg:col-span-2">
       <!-- 使用组件：AddBookForm（子组件通过 emit("book-added") 通知父组件） -->
-      <AddBookForm
-        ref="addBookFormRef"
-        @book-added="fetchBooks"
-        @book-updated="fetchBooks"
-      />
+      <AddBookForm ref="addBookFormRef" @book-added="fetchBooks" @book-updated="fetchBooks" />
 
       <!-- 主视图 -->
       <!-- 书籍列表 -->
       <div class="min-h-fit space-y-4">
-        <h2
-          class="text-foreground mb-4 flex items-baseline font-serif text-2xl font-bold"
-        >
-          Reading List
-        </h2>
+        <h2 class="text-foreground mb-4 flex items-baseline font-serif text-2xl font-bold">Reading List</h2>
 
         <div v-if="isLoading" aria-hidden="true">
           <!-- Skeleton placeholders (fixed height) to reserve space and prevent layout shift -->
@@ -189,9 +177,7 @@ const goToPage = (page: number) => {
             {{ errorMessage }}
           </p>
         </div>
-        <p v-else-if="books.length === 0" class="text-muted-foreground text-sm">
-          暂无书籍，先添加一本吧。
-        </p>
+        <p v-else-if="books.length === 0" class="text-muted-foreground text-sm">暂无书籍，先添加一本吧。</p>
 
         <ul class="space-y-3" style="contain: layout">
           <li
@@ -201,10 +187,7 @@ const goToPage = (page: number) => {
           >
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2">
-                <p
-                  class="text-foreground truncate text-lg font-semibold"
-                  :title="book.title"
-                >
+                <p class="text-foreground truncate text-lg font-semibold" :title="book.title">
                   {{ book.title }}
                 </p>
                 <span
@@ -218,9 +201,7 @@ const goToPage = (page: number) => {
                   >Reading</span
                 >
               </div>
-              <p class="text-muted-foreground mt-1 text-sm">
-                @ {{ book.author }}
-              </p>
+              <p class="text-muted-foreground mt-1 text-sm">@ {{ book.author }}</p>
             </div>
 
             <BookActionButtons
@@ -243,11 +224,7 @@ const goToPage = (page: number) => {
             <button
               :disabled="!pagination.has_prev"
               class="hover:bg-accent rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-              :class="
-                pagination?.has_prev
-                  ? 'text-foreground'
-                  : 'text-muted-foreground'
-              "
+              :class="pagination?.has_prev ? 'text-foreground' : 'text-muted-foreground'"
               @click="goToPage(pagination!.prev_num!)"
               type="button"
             >
@@ -267,11 +244,7 @@ const goToPage = (page: number) => {
               </button>
 
               <!-- 省略号 -->
-              <span
-                v-if="pagination && pagination.page > 4"
-                class="text-muted-foreground px-1"
-                >...</span
-              >
+              <span v-if="pagination && pagination.page > 4" class="text-muted-foreground px-1">...</span>
 
               <!-- 显示当前页附近的页码 -->
               <button
@@ -290,9 +263,7 @@ const goToPage = (page: number) => {
               </button>
 
               <!-- 省略号 -->
-              <span
-                v-if="pagination && pagination.page < pagination.pages - 3"
-                class="text-muted-foreground px-1"
+              <span v-if="pagination && pagination.page < pagination.pages - 3" class="text-muted-foreground px-1"
                 >...</span
               >
 
@@ -311,11 +282,7 @@ const goToPage = (page: number) => {
             <button
               :disabled="!pagination?.has_next"
               class="hover:bg-accent rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-              :class="
-                pagination?.has_next
-                  ? 'text-foreground'
-                  : 'text-muted-foreground'
-              "
+              :class="pagination?.has_next ? 'text-foreground' : 'text-muted-foreground'"
               @click="goToPage(pagination!.next_num!)"
               type="button"
             >
