@@ -35,7 +35,7 @@ export interface BookService {
 
 export const bookService = (): BookService => ({
   async getBooks(params: { page?: number; per_page?: number }) {
-    const res = await request.get('v1/book', { params });
+    const res = await request.get('v1/books', { params });
     const data = extractData(res) as BookListData | undefined;
     return (
       data ?? {

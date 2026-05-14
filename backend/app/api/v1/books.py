@@ -19,7 +19,7 @@ router = APIRouter(
 
 
 @router.get(
-    "/book",
+    "/books",
 )
 async def get_books(
     page: int = Query(default=1, ge=1),
