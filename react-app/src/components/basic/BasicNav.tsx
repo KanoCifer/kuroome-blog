@@ -30,7 +30,7 @@ import { useNavVisibility } from './NavVisibilityContext';
 interface MenuItemProps {
   icon: React.ReactNode;
   label: string;
-  onClick: () => void;
+  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   iconColor: string;
   iconBg: string;
   darkIconBg: string;
@@ -74,7 +74,7 @@ function MenuItem({
   return (
     <button
       className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white/40 p-4 transition-transform active:scale-95 dark:bg-white/5"
-      onClick={onClick}
+      onClick={(e) => onClick(e)}
     >
       <div
         className={`flex h-12 w-12 items-center justify-center rounded-full ${iconBg} ${darkIconBg}`}
@@ -104,8 +104,8 @@ export function BasicNav() {
   const themeStore = useThemeState();
   const navigate = useNavigate();
   const { hidden } = useNavVisibility();
-  const toggleTheme = () => {
-    themeStore.toggleTheme();
+  const toggleTheme = (e: React.MouseEvent) => {
+    themeStore.toggleThemeWithAnimation(e);
   };
 
   const handleLogout = () => {
@@ -205,7 +205,7 @@ export function BasicNav() {
               <MenuItem
                 icon={<ThemeIcon className="h-6 w-6" />}
                 label="Theme"
-                onClick={toggleTheme}
+                onClick={(e) => toggleTheme(e)}
                 iconColor="text-purple-500"
                 iconBg="bg-purple-100"
                 darkIconBg="dark:bg-purple-900/40"

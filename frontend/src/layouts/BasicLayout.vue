@@ -4,13 +4,15 @@ import BackToTop from "@/components/layout/BackToTop.vue";
 import CookieConsent from "@/components/layout/CookieConsent.vue";
 import ToastContainer from "@/components/layout/ToastContainer.vue";
 import BasicNav from "@/components/nav/BasicNav.vue";
+import { useBackgroundStore } from "@/stores/background";
+import { useThemeStore } from "@/stores/theme";
 import { useScroll } from "@vueuse/core";
 import { useHead } from "@vueuse/head";
-import { useBackgroundStore } from "@/stores/background";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { RouterView, useRoute } from "vue-router";
 
 const bgStore = useBackgroundStore();
+const themeStore = useThemeStore();
 const route = useRoute();
 const isEntryView = ref<boolean>(false);
 const isAboutView = ref<boolean>(false);
@@ -120,7 +122,7 @@ useHead(headPreload);
       :style="{ backgroundImage: `url('${bgStore.backgroundUrl}')` }"
     ></div>
     <header>
-      <div class="mx-auto mt-6">
+      <div class="mx-auto">
         <Teleport to="body">
           <ToastContainer />
         </Teleport>
@@ -148,7 +150,7 @@ useHead(headPreload);
     </main>
 
     <!-- Footer -->
-    <BasicFooter :isEntryView="isEntryView" :isAboutView="isAboutView" />
+    <BasicFooter v-if="themeStore.showFooter === 'true'" :isEntryView="isEntryView" :isAboutView="isAboutView" />
 
     <!-- Back to Top Button -->
     <BackToTop />

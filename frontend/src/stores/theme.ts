@@ -1,30 +1,26 @@
+import { playThemeTransition } from "@/utils/themeTransition";
 import { defineStore } from "pinia";
 import { ref, watch } from "vue";
 
 export type Theme = "light" | "dark" | "system";
-export type ColorScheme =
-  | "sky-blue"
-  | "forest-green"
-  | "paper"
-  | "sage"
-  | "mist"
-  | "blush";
+export type ColorScheme = "sky-blue" | "forest-green" | "paper" | "sage" | "mist" | "blush";
 
 export const useThemeStore = defineStore("theme", () => {
-  const theme = ref<Theme>(
-    (localStorage.getItem("theme") as Theme) || "system",
-  );
+  const theme = ref<Theme>((localStorage.getItem("theme") as Theme) || "system");
 
-  const scheme = ref<ColorScheme>(
-    (localStorage.getItem("color-scheme") as ColorScheme) || "sky-blue",
-  );
+  const scheme = ref<ColorScheme>((localStorage.getItem("color-scheme") as ColorScheme) || "sky-blue");
+
+  const showFooter = ref<string>(localStorage.getItem("show-footer") || "true");
+
+  const toggleFooter = () => {
+    showFooter.value = showFooter.value === "true" ? "false" : "true";
+    localStorage.setItem("show-footer", showFooter.value);
+  };
 
   const applyTheme = (newTheme: Theme) => {
     const root = document.documentElement;
     const isDark =
-      newTheme === "dark" ||
-      (newTheme === "system" &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches);
+      newTheme === "dark" || (newTheme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
     if (isDark) {
       root.classList.add("dark");
@@ -65,6 +61,12 @@ export const useThemeStore = defineStore("theme", () => {
     theme.value = newTheme;
   };
 
+  const setThemeWithAnimation = (event: MouseEvent, newTheme: Theme) => {
+    playThemeTransition(event, newTheme, scheme.value, () => {
+      setTheme(newTheme);
+    });
+  };
+
   const setScheme = (newScheme: ColorScheme) => {
     scheme.value = newScheme;
     applyScheme(newScheme);
@@ -82,9 +84,7 @@ export const useThemeStore = defineStore("theme", () => {
       setTheme("light");
     } else {
       // If system, toggle based on current system preference
-      const isCurrentlyDark = window.matchMedia(
-        "(prefers-color-scheme: dark)",
-      ).matches;
+      const isCurrentlyDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       setTheme(isCurrentlyDark ? "light" : "dark");
     }
   };
@@ -92,8 +92,11 @@ export const useThemeStore = defineStore("theme", () => {
   return {
     theme,
     scheme,
+    showFooter,
     setTheme,
     setScheme,
     toggleTheme,
+    toggleFooter,
+    setThemeWithAnimation,
   };
 });

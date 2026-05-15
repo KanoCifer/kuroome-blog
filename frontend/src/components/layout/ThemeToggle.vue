@@ -42,12 +42,10 @@ const schemes: { value: ColorScheme; label: string; colors: string[] }[] = [
   { value: "blush", label: "Blush", colors: ["#a5656f", "#6a7866", "#a06d4f"] },
 ];
 
-const currentTheme = computed(
-  (): { value: Theme; label: string; icon: string } => {
-    const found = themes.find((t) => t.value === themeStore.theme);
-    return found || themes[0]!;
-  },
-);
+const currentTheme = computed((): { value: Theme; label: string; icon: string } => {
+  const found = themes.find((t) => t.value === themeStore.theme);
+  return found || themes[0]!;
+});
 
 let closeTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -69,8 +67,8 @@ const closeDropdown = () => {
   }, 150);
 };
 
-const selectTheme = (theme: Theme) => {
-  themeStore.theme = theme;
+const selectTheme = (theme: Theme, event: MouseEvent) => {
+  themeStore.setThemeWithAnimation(event, theme);
   isOpen.value = false;
 };
 
@@ -108,9 +106,7 @@ onUnmounted(() => {
       >
         <div class="flex gap-0.5">
           <span
-            v-for="(color, i) in schemes.find(
-              (s) => s.value === themeStore.scheme,
-            )?.colors || []"
+            v-for="(color, i) in schemes.find((s) => s.value === themeStore.scheme)?.colors || []"
             :key="i"
             class="h-3 w-3 rounded-full"
             :style="{ backgroundColor: color }"
@@ -152,8 +148,7 @@ onUnmounted(() => {
             @click="selectScheme(schemeItem.value)"
             class="text-foreground hover:bg-accent dark:text-foreground dark:hover:bg-accent flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm transition-colors"
             :class="{
-              'bg-accent dark:bg-accent':
-                themeStore.scheme === schemeItem.value,
+              'bg-accent dark:bg-accent': themeStore.scheme === schemeItem.value,
               'rounded-t-lg': index === 0,
               'rounded-b-lg': index === schemes.length - 1,
             }"
@@ -188,11 +183,7 @@ onUnmounted(() => {
     </div>
 
     <!-- Light/Dark Mode Toggle -->
-    <div
-      class="relative"
-      @mouseenter="openDropdown"
-      @mouseleave="closeDropdown"
-    >
+    <div class="relative" @mouseenter="openDropdown" @mouseleave="closeDropdown">
       <button
         @click.stop="toggleDropdown"
         class="text-secondary-foreground hover:bg-accent focus:ring-ring dark:text-foreground dark:hover:bg-accent flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all focus:ring-2 focus:outline-none"
@@ -233,7 +224,7 @@ onUnmounted(() => {
           <button
             v-for="(theme, index) in themes"
             :key="theme.value"
-            @click="selectTheme(theme.value)"
+            @click="selectTheme(theme.value, $event)"
             class="text-foreground hover:bg-accent dark:text-foreground dark:hover:bg-accent flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm transition-colors"
             :class="{
               'bg-accent dark:bg-accent': themeStore.theme === theme.value,

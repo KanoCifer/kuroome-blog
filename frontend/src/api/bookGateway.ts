@@ -12,10 +12,10 @@ export interface BookGateway {
 
 export const bookGateway: BookGateway = {
   async getBooks(params) {
-    const res = await request.get<{ data: BookListResponse }>("v1/books", {
+    const res = await request.get<BookListResponse>("v1/books", {
       params,
     });
-    return res.data.data;
+    return res.data;
   },
 
   async createBook(payload) {

@@ -1,11 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { playThemeTransition } from '../utils/themeTransition';
 
 type Theme = 'light' | 'dark' | 'system';
 interface ThemeState {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
+  toggleThemeWithAnimation: (event: React.MouseEvent | MouseEvent) => void;
 }
 
 const applyTheme = (newTheme: Theme) => {
@@ -35,6 +37,15 @@ export const useThemeState = create<ThemeState>()(
         const currentTheme = get().theme;
         // 复用 setTheme
         get().setTheme(currentTheme === 'light' ? 'dark' : 'light');
+      },
+
+      toggleThemeWithAnimation: (event: React.MouseEvent | MouseEvent) => {
+        const currentTheme = get().theme;
+        const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+        playThemeTransition(event, nextTheme, () => {
+          get().setTheme(nextTheme);
+        });
       },
     }),
     {

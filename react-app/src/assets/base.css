@@ -66,6 +66,17 @@ html::-webkit-scrollbar {
   --font-family-alibaba:
     '阿里妈妈方圆体 VF Regular', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 
+  --animate-tt-spin: tt-spin 0.8s ease-in-out forwards;
+
+  @keyframes tt-spin {
+    0% {
+      rotate: 0deg;
+    }
+    100% {
+      rotate: 60deg;
+    }
+  }
+
   --animate-bounce-up: bounce-up 2s infinite;
 
   --font-family-dongfang:

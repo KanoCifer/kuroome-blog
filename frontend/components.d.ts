@@ -98,6 +98,7 @@ declare module 'vue' {
     EditIcon: typeof import('./src/components/icons/EditIcon.vue')['default']
     EyeOff: typeof import('./src/components/icons/EyeOff.vue')['default']
     EyeOn: typeof import('./src/components/icons/EyeOn.vue')['default']
+    FloatingActionButtons: typeof import('./src/components/layout/FloatingActionButtons.vue')['default']
     FriendLinkApplicationForm: typeof import('./src/components/friendlink/FriendLinkApplicationForm.vue')['default']
     HomeIcon: typeof import('./src/components/icons/HomeIcon.vue')['default']
     HomeSideBar: typeof import('./src/components/layout/HomeSideBar.vue')['default']
@@ -175,6 +176,7 @@ declare module 'vue' {
     SelectTrigger: typeof import('./src/components/ui/select/SelectTrigger.vue')['default']
     SelectValue: typeof import('./src/components/ui/select/SelectValue.vue')['default']
     ServerMonitor: typeof import('./src/components/analytics/ServerMonitor.vue')['default']
+    SettingsModal: typeof import('./src/components/layout/SettingsModal.vue')['default']
     Slider: typeof import('./src/components/ui/slider/Slider.vue')['default']
     ThemeToggle: typeof import('./src/components/layout/ThemeToggle.vue')['default']
     TideCard: typeof import('./src/components/map/TideCard.vue')['default']
@@ -184,6 +186,7 @@ declare module 'vue' {
     ToastContainer: typeof import('./src/components/layout/ToastContainer.vue')['default']
     TodoCard: typeof import('./src/components/bento/TodoCard.vue')['default']
     TrendChartCard: typeof import('./src/components/analytics/TrendChartCard.vue')['default']
+    UserDropdown: typeof import('./src/components/nav/components/UserDropdown.vue')['default']
     WeatherAnalysis: typeof import('./src/components/ai/WeatherAnalysis.vue')['default']
     WeatherCard: typeof import('./src/components/map/WeatherCard.vue')['default']
   }
