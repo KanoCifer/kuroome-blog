@@ -7,7 +7,10 @@ interface ThemeState {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
-  toggleThemeWithAnimation: (event: React.MouseEvent | MouseEvent) => void;
+  toggleThemeWithAnimation: (event: {
+    clientX: number;
+    clientY: number;
+  }) => void;
 }
 
 const applyTheme = (newTheme: Theme) => {
@@ -39,11 +42,12 @@ export const useThemeState = create<ThemeState>()(
         get().setTheme(currentTheme === 'light' ? 'dark' : 'light');
       },
 
-      toggleThemeWithAnimation: (event: React.MouseEvent | MouseEvent) => {
+      toggleThemeWithAnimation: (event) => {
         const currentTheme = get().theme;
         const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
 
-        playThemeTransition(event, nextTheme, () => {
+        // playThemeTransition 签名: (event, targetTheme, scheme?, onComplete?)
+        playThemeTransition(event, nextTheme, undefined, () => {
           get().setTheme(nextTheme);
         });
       },

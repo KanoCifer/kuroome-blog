@@ -40,7 +40,7 @@ function createTransitionIcon(
 }
 
 export function playThemeTransition(
-  event: MouseEvent,
+  event: { clientX: number; clientY: number },
   targetTheme: 'light' | 'dark' | 'system',
   scheme?: string,
   onComplete?: () => void,
