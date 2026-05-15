@@ -23,8 +23,8 @@
       </div>
 
       <!-- Name -->
-      <h2 class="text-foreground font-family-averia mb-2 text-2xl">
-        I'm <span class="text-primary font-bold">Kuroome</span>. Nice to meet you!
+      <h2 class="text-foreground font-family-averia white- mb-2 text-2xl">
+        I'm <span class="text-primary text-3xl font-bold">Kuroome</span>. Welcome to my site!
       </h2>
 
       <!-- Admin Status Badge -->

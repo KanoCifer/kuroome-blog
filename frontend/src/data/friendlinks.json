@@ -1,4 +1,11 @@
 {
+  "self": {
+    "name": "Kuroome's Blog",
+    "description": "阅读、编码、思考 — 一个全栈开发者的数字花园",
+    "url": "https://kanocifer.chat",
+    "icon": "https://kanocifer.chat/favicon.ico",
+    "tags": ["个人博客", "全栈开发", "数字花园"]
+  },
   "links": [
     {
       "id": "1",

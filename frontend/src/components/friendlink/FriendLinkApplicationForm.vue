@@ -82,14 +82,79 @@ const handleSubmit = () => {
 
 <template>
   <div
-    class="bg-card/80 ring-border mx-auto mt-12 mb-4 rounded-3xl p-4 py-8 shadow-lg ring-1 hover:shadow-xl motion-safe:transition-shadow motion-safe:duration-300 dark:bg-gray-800/80"
+    class="bg-card/80 ring-border mx-auto mt-12 mb-4 rounded-3xl p-4 py-8 shadow-lg ring-1 hover:shadow-xl motion-safe:transition-shadow motion-safe:duration-300"
   >
     <div class="mx-4 my-2">
-      <h2 class="text-foreground dark:text-foreground flex items-center gap-3 font-serif text-2xl font-bold">
+      <!-- 申请须知 -->
+      <div class="border-primary/15 bg-primary/5 mb-6 rounded-2xl border p-5">
+        <h3 class="text-foreground mb-3 flex items-center gap-2 text-sm font-bold">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="text-primary h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          友链申请须知
+        </h3>
+        <ul class="text-muted-foreground space-y-2 text-sm">
+          <li class="flex items-start gap-2">
+            <span class="text-primary mt-0.5 shrink-0 text-xs">●</span>
+            <span>网站需符合中国大陆相关法律法规</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-primary mt-0.5 shrink-0 text-xs">●</span>
+            <span>网站内容原创、非商业推广</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-primary mt-0.5 shrink-0 text-xs">●</span>
+            <span
+              >已在您的网站添加本站友链（<a href="https://kanocifer.chat" target="_blank" class="text-primary underline"
+                >kanocifer.chat</a
+              >）</span
+            >
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-primary mt-0.5 shrink-0 text-xs">●</span>
+            <span>网站可正常访问</span>
+          </li>
+        </ul>
+
+        <h3 class="text-foreground mt-4 mb-3 flex items-center gap-2 text-sm font-bold">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="text-primary h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+          申请时请提供
+        </h3>
+        <ul class="text-muted-foreground space-y-2 text-sm">
+          <li class="flex items-start gap-2">
+            <span class="text-primary mt-0.5 shrink-0 text-xs">●</span>
+            <span>网站名称、描述、地址、Favicon 地址</span>
+          </li>
+        </ul>
+      </div>
+
+      <h2 class="text-foreground flex items-center gap-3 font-serif text-2xl font-bold">
         申请友链
-        <span class="text-muted-foreground dark:text-muted-foreground items-baseline text-sm italic">
-          交换链接，互相访问
-        </span>
+        <span class="text-muted-foreground items-baseline text-sm italic"> 交换链接，互相访问 </span>
       </h2>
       <p class="my-4">
         <span class="border-primary/30 bg-primary/20 text-primary rounded-full border px-4 py-2 text-xs font-medium">
@@ -100,14 +165,14 @@ const handleSubmit = () => {
       <form @submit.prevent="handleSubmit" class="mt-4">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div class="form-group">
-            <label for="fl-name" class="text-foreground dark:text-foreground mb-2 block text-sm font-semibold">
+            <label for="fl-name" class="text-foreground mb-2 block text-sm font-semibold">
               您的昵称 <span class="text-destructive">*</span>
             </label>
             <input
               id="fl-name"
               v-model="name"
               type="text"
-              class="border-border bg-muted focus:border-ring focus:ring-ring w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
+              class="border-border bg-muted focus:border-ring focus:ring-ring text-foreground placeholder:text-muted-foreground w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
               :disabled="submitting"
               placeholder="怎么称呼您"
             />
@@ -117,14 +182,14 @@ const handleSubmit = () => {
           </div>
 
           <div class="form-group">
-            <label for="fl-email" class="text-foreground dark:text-foreground mb-2 block text-sm font-semibold">
+            <label for="fl-email" class="text-foreground mb-2 block text-sm font-semibold">
               联系邮箱 <span class="text-destructive">*</span>
             </label>
             <input
               id="fl-email"
               v-model="email"
               type="email"
-              class="border-border bg-muted focus:border-ring focus:ring-ring w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
+              class="border-border bg-muted focus:border-ring focus:ring-ring text-foreground placeholder:text-muted-foreground w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
               :disabled="submitting"
               placeholder="your@email.com"
             />
@@ -134,14 +199,14 @@ const handleSubmit = () => {
           </div>
 
           <div class="form-group">
-            <label for="fl-site-name" class="text-foreground dark:text-foreground mb-2 block text-sm font-semibold">
+            <label for="fl-site-name" class="text-foreground mb-2 block text-sm font-semibold">
               网站名称 <span class="text-destructive">*</span>
             </label>
             <input
               id="fl-site-name"
               v-model="siteName"
               type="text"
-              class="border-border bg-muted focus:border-ring focus:ring-ring w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
+              class="border-border bg-muted focus:border-ring focus:ring-ring text-foreground placeholder:text-muted-foreground w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
               :disabled="submitting"
               placeholder="您的网站名称"
             />
@@ -151,14 +216,14 @@ const handleSubmit = () => {
           </div>
 
           <div class="form-group">
-            <label for="fl-site-url" class="text-foreground dark:text-foreground mb-2 block text-sm font-semibold">
+            <label for="fl-site-url" class="text-foreground mb-2 block text-sm font-semibold">
               网站地址 <span class="text-destructive">*</span>
             </label>
             <input
               id="fl-site-url"
               v-model="siteUrl"
               type="text"
-              class="border-border bg-muted focus:border-ring focus:ring-ring w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
+              class="border-border bg-muted focus:border-ring focus:ring-ring text-foreground placeholder:text-muted-foreground w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
               :disabled="submitting"
               placeholder="https://example.com"
             />
@@ -168,7 +233,7 @@ const handleSubmit = () => {
           </div>
 
           <div class="form-group md:col-span-2">
-            <label for="fl-description" class="text-foreground dark:text-foreground mb-2 block text-sm font-semibold">
+            <label for="fl-description" class="text-foreground mb-2 block text-sm font-semibold">
               网站描述 <span class="text-destructive">*</span>
             </label>
             <textarea
@@ -176,7 +241,7 @@ const handleSubmit = () => {
               v-model="description"
               rows="3"
               maxlength="200"
-              class="border-border bg-muted focus:border-ring focus:ring-ring w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
+              class="border-border bg-muted focus:border-ring focus:ring-ring text-foreground placeholder:text-muted-foreground w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
               :disabled="submitting"
               placeholder="用简短的一段话介绍您的网站（不超过 200 字）"
             ></textarea>
@@ -184,16 +249,14 @@ const handleSubmit = () => {
               <div v-if="errors.description" aria-live="assertive" class="text-destructive flex items-center text-sm">
                 {{ errors.description[0] }}
               </div>
-              <div v-else class="text-muted-foreground dark:text-muted-foreground text-xs">
-                {{ description.length }}/200
-              </div>
+              <div v-else class="text-muted-foreground text-xs">{{ description.length }}/200</div>
             </div>
           </div>
 
           <div class="md:col-span-2">
             <button
               type="submit"
-              class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-ring flex cursor-pointer items-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg ring-offset-2 focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-800"
+              class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-ring dark:ring-offset-background flex cursor-pointer items-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg ring-offset-2 focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
               :disabled="submitting"
             >
               {{ submitting ? "正在打开邮件客户端..." : "提交申请" }}
@@ -201,11 +264,7 @@ const handleSubmit = () => {
           </div>
         </div>
 
-        <div
-          v-if="successMessage"
-          aria-live="polite"
-          class="bg-success/10 text-success mt-4 rounded-lg p-4 dark:bg-green-900/20 dark:text-green-400"
-        >
+        <div v-if="successMessage" aria-live="polite" class="bg-success/10 text-success mt-4 rounded-lg p-4">
           {{ successMessage }}
         </div>
       </form>

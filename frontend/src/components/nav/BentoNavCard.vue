@@ -17,22 +17,22 @@
     <div class="relative">
       <!-- 导航指示器 -->
       <Motion
-        class="bg-card dark:bg-accent absolute top-0 left-0 h-14 w-full rounded-2xl shadow-sm"
-        :animate="{ y: `${hoverNavIndex * (52 + 8)}px` }"
-        :transition="{ type: 'spring', stiffness: 300, damping: 30 }"
+        class="bg-primary absolute top-0 left-0 h-14 w-full transform-gpu rounded-3xl shadow-sm will-change-transform"
+        :animate="{ y: hoverNavIndex * (52 + 4) }"
+        :transition="{ visualDuration: 0.3, bounce: 0.15, type: 'spring' }"
         style="z-index: -1"
       />
 
-      <ol class="flex flex-col gap-2">
+      <ol class="flex flex-col gap-1">
         <li v-for="(item, index) in navItems" :key="item.path" @mouseenter="hoverNavIndex = index">
           <RouterLink
             :to="item.path"
-            class="relative z-10 flex items-center gap-4 rounded-2xl py-3.5 pr-5 pl-6 font-medium transition-all"
-            :class="[
+            class="relative z-10 flex items-center gap-4 rounded-3xl py-3.5 pr-5 pl-6 font-medium transition-colors duration-150"
+            :class="
               hoverNavIndex === index
-                ? 'text-primary dark:text-primary'
-                : 'text-foreground dark:text-muted-foreground dark:hover:text-foreground',
-            ]"
+                ? 'text-white'
+                : 'text-foreground dark:text-muted-foreground dark:hover:text-foreground'
+            "
           >
             <component :is="item.icon" class="h-6 w-6" />
             <span class="text-[15px]">{{ item.label }}</span>
@@ -62,7 +62,7 @@ import {
 } from "@/components/icons";
 import { useAuthStore } from "@/stores/auth";
 import { CreditCard, Image } from "lucide-vue-next";
-import { type MotionProps, Motion } from "motion-v";
+import { Motion, type MotionProps } from "motion-v";
 import { onUnmounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import type { DropdownItem } from "./components/UserDropdown.vue";
