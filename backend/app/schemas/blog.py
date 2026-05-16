@@ -16,6 +16,7 @@ class BlogPostIn(BaseModel):
 
     title: str
     body: str
+    summary: str | None = None
     category_id: int
     is_pinned: int = 0
 
@@ -26,6 +27,7 @@ class BlogPostUpdate(BaseModel):
     id: str = Field(alias="_id")  # MongoDB _id field
     title: str
     body: str
+    summary: str | None = None
     category_id: int
     is_pinned: int = 0
 

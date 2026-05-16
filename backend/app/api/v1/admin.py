@@ -44,6 +44,7 @@ async def add_post(
         new_id = await admin_service.add_post(
             title=data.title,
             body=data.body,
+            summary=data.summary,
             category_id=data.category_id,
             is_pinned=data.is_pinned,
         )
@@ -67,6 +68,7 @@ async def update_post(
             post_id=data.id,
             title=data.title,
             body=data.body,
+            summary=data.summary,
             category_id=data.category_id,
             is_pinned=data.is_pinned,
         )

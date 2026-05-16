@@ -6,6 +6,7 @@ export interface BlogListItem {
   _id: string;
   title: string;
   body: string;
+  summary?: string | null;
   category: { id: number; name: string } | null;
   is_pinned: boolean;
   created_at: string;
@@ -26,6 +27,7 @@ export interface BlogDetail {
   _id: string;
   title: string;
   body: string;
+  summary?: string | null;
   category: { id: number; name: string } | null;
   is_pinned: boolean;
   created_at: string;
@@ -51,14 +53,13 @@ export interface BlogService {
     reply_to_author?: string;
   }): Promise<string>;
   getCategories(): Promise<CategoryItem[]>;
-  getPostsByCategory(
-    categoryId: number,
-  ): Promise<{ posts: BlogPost[]; category: { id: number; name: string } }>;
+  getPostsByCategory(categoryId: number): Promise<{ posts: BlogPost[]; category: { id: number; name: string } }>;
   getLegacyPost(postId: string): Promise<BlogDetail & { category_id?: number }>;
   createLegacyPost(payload: {
     title: string;
     category_id: number;
     body: string;
+    summary?: string | null;
     is_pinned: number;
   }): Promise<{ _id: string }>;
   updateLegacyPost(payload: {
@@ -66,13 +67,12 @@ export interface BlogService {
     title: string;
     category_id: number;
     body: string;
+    summary?: string | null;
     is_pinned: number;
   }): Promise<{ _id: string }>;
   deleteLegacyPost(postId: string): Promise<void>;
   getLegacyCategories(): Promise<CategoryItem[]>;
-  getPostsByLegacyCategory(
-    categoryId: number,
-  ): Promise<{ posts: BlogPost[]; category: { id: number; name: string } }>;
+  getPostsByLegacyCategory(categoryId: number): Promise<{ posts: BlogPost[]; category: { id: number; name: string } }>;
   postLegacyComment(payload: {
     post_id: string;
     body: string;
@@ -97,14 +97,12 @@ export const blogService: BlogService = {
       _id: post._id,
       title: post.title,
       body: post.body,
+      summary: post.summary ?? null,
       category: post.category,
-      is_pinned:
-        (post as BlogPost & { is_pinned?: boolean }).is_pinned || false,
+      is_pinned: (post as BlogPost & { is_pinned?: boolean }).is_pinned || false,
       created_at: post.created_at,
       updated_at: post.updated_at,
-      comment_count: countComments(
-        (post as BlogPost & { comments?: Comment[] }).comments || [],
-      ),
+      comment_count: countComments((post as BlogPost & { comments?: Comment[] }).comments || []),
     }));
 
     return {

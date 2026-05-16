@@ -33,6 +33,7 @@ class BlogService:
             "_id": str(post.id),
             "title": post.title,
             "body": post.body,
+            "summary": post.summary,
             "category_id": post.category_id,
             "is_pinned": post.is_pinned,
             "created_at": BlogService._serialize_datetime(post.created_at),

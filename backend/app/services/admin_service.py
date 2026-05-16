@@ -33,6 +33,7 @@ class AdminService:
         *,
         title: str,
         body: str,
+        summary: str | None = None,
         category_id: int,
         is_pinned: int,
     ) -> str:
@@ -44,6 +45,7 @@ class AdminService:
         post = Post(
             title=title,
             body=body,
+            summary=summary,
             category_id=category_id,
             is_pinned=is_pinned,
             created_at=now,
@@ -62,6 +64,7 @@ class AdminService:
         post_id: str,
         title: str,
         body: str,
+        summary: str | None = None,
         category_id: int,
         is_pinned: int,
     ) -> None:
@@ -79,6 +82,7 @@ class AdminService:
             {
                 "title": title,
                 "body": body,
+                "summary": summary,
                 "category_id": category_id,
                 "is_pinned": is_pinned,
                 "updated_at": datetime.now(UTC),

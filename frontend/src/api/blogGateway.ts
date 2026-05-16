@@ -17,6 +17,7 @@ export interface BlogPostResponse {
   _id: string;
   title: string;
   body: string;
+  summary?: string | null;
   category_id: number;
   is_pinned: boolean;
   created_at: string;
@@ -38,14 +39,13 @@ export interface BlogGateway {
   getBlogPost(postId: string): Promise<BlogPostResponse>;
   postComment(payload: PostCommentPayload): Promise<{ _id: string }>;
   getCategories(): Promise<Category[]>;
-  getPostsByCategory(
-    categoryId: number,
-  ): Promise<{ posts: BlogPost[]; category: { id: number; name: string } }>;
+  getPostsByCategory(categoryId: number): Promise<{ posts: BlogPost[]; category: { id: number; name: string } }>;
   getLegacyPost(postId: string): Promise<BlogPostResponse>;
   createLegacyPost(payload: {
     title: string;
     category_id: number;
     body: string;
+    summary?: string | null;
     is_pinned: number;
   }): Promise<{ _id: string }>;
   updateLegacyPost(payload: {
@@ -53,13 +53,12 @@ export interface BlogGateway {
     title: string;
     category_id: number;
     body: string;
+    summary?: string | null;
     is_pinned: number;
   }): Promise<{ _id: string }>;
   deleteLegacyPost(postId: string): Promise<void>;
   getLegacyCategories(): Promise<Category[]>;
-  getPostsByLegacyCategory(
-    categoryId: number,
-  ): Promise<{ posts: BlogPost[]; category: { id: number; name: string } }>;
+  getPostsByLegacyCategory(categoryId: number): Promise<{ posts: BlogPost[]; category: { id: number; name: string } }>;
   postLegacyComment(payload: PostCommentPayload): Promise<void>;
 }
 
@@ -72,17 +71,12 @@ export const blogGateway: BlogGateway = {
   },
 
   async getBlogPost(postId: string): Promise<BlogPostResponse> {
-    const res = await request.get<{ data: BlogPostResponse }>(
-      `v1/blogs/${postId}`,
-    );
+    const res = await request.get<{ data: BlogPostResponse }>(`v1/blogs/${postId}`);
     return res.data.data;
   },
 
   async postComment(payload: PostCommentPayload): Promise<{ _id: string }> {
-    const res = await request.post<{ data: { _id: string } }>(
-      "v1/blogs/comments",
-      payload,
-    );
+    const res = await request.post<{ data: { _id: string } }>("v1/blogs/comments", payload);
     return res.data.data;
   },
 
@@ -91,9 +85,7 @@ export const blogGateway: BlogGateway = {
     return res.data.data;
   },
 
-  async getPostsByCategory(
-    categoryId: number,
-  ): Promise<{ posts: BlogPost[]; category: { id: number; name: string } }> {
+  async getPostsByCategory(categoryId: number): Promise<{ posts: BlogPost[]; category: { id: number; name: string } }> {
     const res = await request.get<{
       data: { posts: BlogPost[]; category: { id: number; name: string } };
     }>(`v1/blogs/categories/${categoryId}`);
@@ -108,18 +100,12 @@ export const blogGateway: BlogGateway = {
   },
 
   async createLegacyPost(payload): Promise<{ _id: string }> {
-    const res = await request.post<{ data: { _id: string } }>(
-      "v1/admin/post/add",
-      payload,
-    );
+    const res = await request.post<{ data: { _id: string } }>("v1/admin/post/add", payload);
     return res.data.data;
   },
 
   async updateLegacyPost(payload): Promise<{ _id: string }> {
-    const res = await request.put<{ data: { _id: string } }>(
-      "v1/admin/post/update",
-      payload,
-    );
+    const res = await request.put<{ data: { _id: string } }>("v1/admin/post/update", payload);
     return res.data.data;
   },
 

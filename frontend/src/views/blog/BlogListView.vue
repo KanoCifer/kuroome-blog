@@ -8,9 +8,7 @@
         <!-- 搜索框 -->
         <div class="flex w-full items-center justify-between gap-4">
           <div class="relative w-fit">
-            <div
-              class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
-            >
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -46,11 +44,7 @@
                 stroke="currentColor"
                 class="h-5 w-5"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
@@ -59,12 +53,7 @@
             to="/blog/new"
             class="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:outline-primary inline-flex w-fit items-center rounded-lg px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="mr-2 h-4 w-4"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
+            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
               <path
                 fill-rule="evenodd"
                 d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
@@ -84,9 +73,7 @@
               v-if="isLoading"
               class="border-border bg-card flex flex-col items-center justify-center rounded-xl border px-6 py-16 text-center"
             >
-              <div
-                class="border-primary/20 border-t-primary mb-4 h-10 w-10 animate-spin rounded-full border-4"
-              ></div>
+              <div class="border-primary/20 border-t-primary mb-4 h-10 w-10 animate-spin rounded-full border-4"></div>
               <p class="text-muted-foreground">加载中...</p>
             </div>
 
@@ -138,149 +125,18 @@
                   d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
                 />
               </svg>
-              <p class="text-muted-foreground text-lg font-medium">
-                No blog posts available.
-              </p>
+              <p class="text-muted-foreground text-lg font-medium">No blog posts available.</p>
               <p class="text-muted-foreground/70 mt-1 text-sm">
-                {{
-                  activeCategory
-                    ? "There are no posts in this category yet."
-                    : "Check back later for new content."
-                }}
+                {{ activeCategory ? "There are no posts in this category yet." : "Check back later for new content." }}
               </p>
             </div>
 
             <!-- Blog Post Item -->
-            <div
-              v-for="post in posts"
-              :key="post._id"
-              :class="[
-                'relative mb-8 rounded-3xl p-6 shadow-md transition-all duration-300 hover:shadow-lg dark:shadow-none',
-                post.is_pinned
-                  ? 'bg-primary/10 ring-primary/40 ring-3'
-                  : 'bg-card',
-              ]"
-            >
-              <!-- Pinned Badge -->
-              <div
-                v-if="post.is_pinned"
-                class="bg-primary text-primary-foreground absolute -top-3 right-4 flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold shadow-md"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-3.5 w-3.5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
-                </svg>
-                置顶
-              </div>
-
-              <router-link
-                :to="`/blog/${post._id}`"
-                :class="[
-                  'mb-2 block text-3xl font-semibold transition-colors',
-                  post.is_pinned
-                    ? 'text-primary hover:text-primary/80'
-                    : 'hover:text-primary text-foreground',
-                ]"
-              >
-                {{ post.title }}
-              </router-link>
-              <p
-                :class="[
-                  'my-4 text-sm',
-                  post.is_pinned ? 'text-primary/80' : 'text-muted-foreground',
-                ]"
-              >
-                发布于 {{ formatDate(post.created_at) }}
-                <span v-if="post.category" class="ml-2"> </span>
-              </p>
-              <!-- HTML Content Preview -->
-              <div
-                :class="[
-                  'post-preview prose prose-base dark:prose-invert max-h-72 max-w-none overflow-y-hidden rounded-xl p-4 leading-relaxed',
-                  post.is_pinned
-                    ? 'bg-card ring-primary/20 ring-1'
-                    : 'bg-muted ring-border/50 ring-1',
-                ]"
-                v-html="getPreviewHtml(post.body)"
-              ></div>
-              <div
-                :class="[
-                  'mt-4 flex items-center justify-between border-t pt-4',
-                  post.is_pinned ? 'border-primary/20' : 'border-border',
-                ]"
-              >
-                <div
-                  :class="[
-                    'flex items-center gap-4 text-sm',
-                    post.is_pinned
-                      ? 'text-primary/70'
-                      : 'text-muted-foreground',
-                  ]"
-                >
-                  <router-link
-                    v-if="post.category"
-                    :to="`/blog/category/${post.category.id}`"
-                    :class="[
-                      'flex items-center gap-1.5 transition-colors',
-                      'hover:text-primary',
-                    ]"
-                    title="Category"
-                  >
-                    <!-- tags icon -->
-                    <svg
-                      class="h-4 w-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-                      ></path>
-                    </svg>
-                    <span>{{ post.category.name }}</span>
-                  </router-link>
-                </div>
-                <router-link
-                  :to="`/blog/${post._id}`"
-                  :class="[
-                    'inline-flex items-center text-sm font-medium transition-colors',
-                    post.is_pinned
-                      ? 'text-primary hover:text-primary/80'
-                      : 'text-primary hover:text-primary/80',
-                  ]"
-                >
-                  阅读更多
-                  <svg
-                    class="ml-1 h-3 w-3"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M14 5l7 7m0 0l-7 7m7-7H3"
-                    ></path>
-                  </svg>
-                </router-link>
-              </div>
-            </div>
+            <BlogListItem v-for="post in posts" :key="post._id" :post="post" />
           </div>
 
           <!-- Pagination -->
-          <nav
-            v-if="pagination && pagination.pages > 1"
-            class="mt-10"
-            aria-label="博客分页"
-          >
+          <nav v-if="pagination && pagination.pages > 1" class="mt-10" aria-label="博客分页">
             <ul
               class="border-border/80 bg-card/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2"
             >
@@ -369,10 +225,7 @@
         <!-- Category Sidebar -->
         <div class="w-full shrink-0 lg:w-72">
           <div class="sticky top-24">
-            <CategorySidebar
-              @filterPosts="handleFilterPosts"
-              @resetFilter="handleResetFilter"
-            />
+            <CategorySidebar @filterPosts="handleFilterPosts" @resetFilter="handleResetFilter" />
           </div>
         </div>
       </div>
@@ -385,12 +238,10 @@ import BasicDetail from "@/components/basic/BasicDetail.vue";
 import { blogService } from "@/service/blogService";
 import { useNotificationStore } from "@/stores/notification";
 import type { BlogPagination, Category, Post } from "@/types";
-import { formatDate } from "@/utils/formatdate";
 import { useHead } from "@unhead/vue";
-import DOMPurify from "dompurify";
-import hljs from "highlight.js/lib/common";
-import { computed, nextTick, ref, watch, watchEffect } from "vue";
+import { computed, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import BlogListItem from "./components/BlogListItem.vue";
 import CategorySidebar from "./components/CategorySidebar.vue";
 
 const route = useRoute();
@@ -430,11 +281,7 @@ const getVisiblePages = computed(() => {
   const visiblePages = [];
 
   // 显示当前页附近的页码
-  for (
-    let i = Math.max(2, current - 2);
-    i <= Math.min(totalPages - 1, current + 2);
-    i++
-  ) {
+  for (let i = Math.max(2, current - 2); i <= Math.min(totalPages - 1, current + 2); i++) {
     visiblePages.push(i);
   }
 
@@ -463,8 +310,7 @@ const fetchPosts = async (page: number = 1) => {
     currentPage.value = page;
   } catch (err: unknown) {
     console.error(err);
-    errorMessage.value =
-      err instanceof Error ? err.message : "加载文章列表失败，请稍后重试。";
+    errorMessage.value = err instanceof Error ? err.message : "加载文章列表失败，请稍后重试。";
     useNotificationStore().error(errorMessage.value);
   } finally {
     isLoading.value = false;
@@ -507,19 +353,12 @@ const clearSearch = () => {
 };
 
 watch(
-  () => [
-    route.query.page,
-    route.query.search,
-    route.query.category,
-    route.params.categoryId,
-  ],
+  () => [route.query.page, route.query.search, route.query.category, route.params.categoryId],
   ([pageQuery, searchParam, categoryQuery, categoryParam]) => {
     searchQuery.value = typeof searchParam === "string" ? searchParam : "";
 
-    const hasCategoryQuery =
-      typeof categoryQuery === "string" && categoryQuery.length > 0;
-    const hasCategoryParam =
-      typeof categoryParam === "string" && categoryParam.length > 0;
+    const hasCategoryQuery = typeof categoryQuery === "string" && categoryQuery.length > 0;
+    const hasCategoryParam = typeof categoryParam === "string" && categoryParam.length > 0;
 
     if (hasCategoryQuery || hasCategoryParam) {
       return;
@@ -531,12 +370,6 @@ watch(
   { immediate: true },
 );
 
-watchEffect(async () => {
-  await nextTick();
-  hljs.highlightAll();
-});
-
-// 设置页面 meta 标签
 useHead(() => ({
   title: activeCategory.value
     ? `Category: ${activeCategory.value} - ReadingList Blog`
@@ -556,9 +389,7 @@ useHead(() => ({
     },
     {
       property: "og:title",
-      content: activeCategory.value
-        ? `${activeCategory.value} 分类文章 - ReadingList`
-        : "ReadingList Blog",
+      content: activeCategory.value ? `${activeCategory.value} 分类文章 - ReadingList` : "ReadingList Blog",
     },
     {
       property: "og:description",
@@ -578,9 +409,7 @@ useHead(() => ({
     },
     {
       name: "twitter:title",
-      content: activeCategory.value
-        ? `${activeCategory.value} 分类文章 - ReadingList`
-        : "ReadingList Blog",
+      content: activeCategory.value ? `${activeCategory.value} 分类文章 - ReadingList` : "ReadingList Blog",
     },
     {
       name: "twitter:description",
@@ -591,15 +420,6 @@ useHead(() => ({
   ],
 }));
 
-const getPreviewHtml = (html: string) => {
-  if (!html) return "";
-  const sanitizedHtml = DOMPurify.sanitize(html, {
-    USE_PROFILES: { html: true },
-  });
-  return sanitizedHtml;
-};
-
-// 处理分类过滤
 const handleFilterPosts = (filteredPosts: Post[], categoryName: string) => {
   posts.value = filteredPosts;
   activeCategory.value = categoryName;
@@ -622,76 +442,3 @@ const handleResetFilter = () => {
   router.push({ query });
 };
 </script>
-<style scoped>
-/* Post preview styles */
-.post-preview {
-  font-size: 0.875rem;
-  line-height: 1.6;
-}
-
-.post-preview :deep(p) {
-  margin-bottom: 0.75rem;
-}
-
-.post-preview :deep(p):last-child {
-  margin-bottom: 0;
-}
-
-.post-preview :deep(h1),
-.post-preview :deep(h2),
-.post-preview :deep(h3),
-.post-preview :deep(h4) {
-  font-weight: 600;
-  margin-top: 1rem;
-  margin-bottom: 0.5rem;
-}
-
-.post-preview :deep(ul),
-.post-preview :deep(ol) {
-  margin-left: 1.25rem;
-  margin-bottom: 0.75rem;
-}
-
-.post-preview :deep(li) {
-  margin-bottom: 0.25rem;
-}
-
-.post-preview :deep(code) {
-  padding: 0.125rem 0.375rem;
-  border-radius: 0.25rem;
-  font-size: 0.8125rem;
-  font-family: ui-monospace, SFMono-Regular, monospace;
-}
-
-.post-preview :deep(pre) {
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  overflow-x: auto;
-  margin-bottom: 0.75rem;
-}
-
-.post-preview :deep(pre code) {
-  padding: 0;
-  background: transparent;
-}
-
-/* 预览卡片里统一覆盖语法高亮内联色，避免深色背景下文字不可见 */
-.post-preview :deep(pre code *) {
-  color: inherit !important;
-  background: transparent !important;
-}
-
-.post-preview :deep(blockquote) {
-  padding-left: 0.75rem;
-  border-left-width: 3px;
-  margin-bottom: 0.75rem;
-  font-style: italic;
-}
-
-.post-preview :deep(img) {
-  max-width: 100%;
-  height: auto;
-  border-radius: 0.375rem;
-  margin: 0.5rem 0;
-}
-</style>

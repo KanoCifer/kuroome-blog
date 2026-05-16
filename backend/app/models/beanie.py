@@ -39,6 +39,7 @@ class Post(Document):
 
     title: str
     body: str
+    summary: str | None = None
     category_id: int | None = None
     is_pinned: int = 0
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
