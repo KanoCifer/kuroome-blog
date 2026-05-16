@@ -151,3 +151,17 @@ class SubscriptionLog(Document):
             IndexModel([("sub_id", ASCENDING), ("sent_at", DESCENDING)]),
             IndexModel([("user_id", ASCENDING), ("sent_at", DESCENDING)]),
         ]
+
+
+class FriendLinks(Document):
+    """友情链接文档模型"""
+
+    name: str
+    url: str
+    favicon: str | None = None
+    description: str | None = None
+    email: str | None = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+
+    class Settings:
+        name = "friend_links"
