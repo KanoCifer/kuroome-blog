@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ArticleDetailLayout from "@/components/article/ArticleDetailLayout.vue";
+import { BasicDetail } from "@/components/basic";
 import ArticleSummaryCard from "@/components/blog/ArticleSummaryCard.vue";
 import { blogService } from "@/service/blogService";
 import { useAuthStore } from "@/stores/auth";
@@ -11,15 +11,7 @@ import { useHead } from "@unhead/vue";
 import { Modal } from "ant-design-vue";
 import hljs from "highlight.js/lib/common";
 import "highlight.js/styles/github-dark.css";
-import {
-  computed,
-  createVNode,
-  nextTick,
-  onMounted,
-  onUnmounted,
-  ref,
-  watch,
-} from "vue";
+import { computed, createVNode, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import CalendarIcon from "../../components/icons/CalendarIcon.vue";
 import DelIcon from "../../components/icons/DelIcon.vue";
@@ -51,8 +43,7 @@ const fetchPost = async () => {
     post.value = res as unknown as Post;
   } catch (err: unknown) {
     console.error(err);
-    errorMessage.value =
-      err instanceof Error ? err.message : "加载文章失败，请稍后重试。";
+    errorMessage.value = err instanceof Error ? err.message : "加载文章失败，请稍后重试。";
     useNotificationStore().error(errorMessage.value);
   } finally {
     isLoading.value = false;
@@ -87,10 +78,23 @@ watch(
   },
 );
 
+const subtitle = computed(() => {
+  if (!post.value) return "";
+  const parts: string[] = [];
+  if (post.value.author) {
+    parts.push(post.value.author);
+  }
+  if (post.value.created_at) {
+    parts.push(formatDate(post.value.created_at));
+  }
+  if (post.value.category?.name) {
+    parts.push(post.value.category.name);
+  }
+  return parts.join(" · ");
+});
+
 useHead(() => ({
-  title: post.value
-    ? `${post.value.title} - ReadingList`
-    : "文章未找到 - ReadingList",
+  title: post.value ? `${post.value.title} - ReadingList` : "文章未找到 - ReadingList",
   meta: [
     {
       name: "description",
@@ -188,8 +192,7 @@ const handleDelete = async () => {
     router.push("/blog");
   } catch (err: unknown) {
     console.error("删除文章失败:", err);
-    const errorMsg =
-      err instanceof Error ? err.message : "删除文章失败，请稍后重试";
+    const errorMsg = err instanceof Error ? err.message : "删除文章失败，请稍后重试";
     useNotificationStore().error(errorMsg);
   }
 };
@@ -259,21 +262,59 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <ArticleDetailLayout
-    :title="post?.title || ''"
-    :author="post?.author"
-    :published-date="post?.created_at"
-    :updated-date="post?.updated_at"
-    :category="post?.category"
-    :is-loading="isLoading"
-    :error-message="errorMessage"
-    back-link="/blog"
-    back-text="返回博客列表"
-    :show-category="true"
-    @retry="handleRetry"
-  >
-    <template #actions>
-      <div v-if="showEditButton && post" class="flex items-center gap-2">
+  <BasicDetail :title="post?.title || ''" :subtitle="subtitle">
+    <!-- Loading -->
+    <div v-if="isLoading" class="sm:col-span-2 lg:col-span-3">
+      <div class="border-border bg-card animate-pulse space-y-6 rounded-2xl border p-8 shadow-sm">
+        <div class="bg-muted mb-6 h-8 w-3/4 rounded" />
+        <div class="mb-8 flex gap-4">
+          <div class="bg-muted h-4 w-24 rounded" />
+          <div class="bg-muted h-4 w-32 rounded" />
+        </div>
+        <div class="space-y-4">
+          <div class="bg-muted h-4 w-full rounded" />
+          <div class="bg-muted h-4 w-full rounded" />
+          <div class="bg-muted h-4 w-5/6 rounded" />
+          <div class="bg-muted h-4 w-full rounded" />
+          <div class="bg-muted h-4 w-4/5 rounded" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div v-else-if="errorMessage" class="sm:col-span-2 lg:col-span-3">
+      <!-- TODO(human): Implement error retry UX -->
+      <div
+        class="border-destructive/30 bg-destructive/5 flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 text-center"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="text-destructive mb-4 h-12 w-12"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+          />
+        </svg>
+        <p class="text-destructive text-lg font-medium">加载失败</p>
+        <p class="text-muted-foreground mt-1 text-sm">{{ errorMessage }}</p>
+        <button
+          @click="handleRetry"
+          class="bg-destructive/90 hover:bg-destructive mt-4 cursor-pointer rounded-lg px-4 py-2 text-sm font-medium text-white"
+        >
+          重试
+        </button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <template v-else>
+      <div v-if="showEditButton && post" class="flex items-center justify-end gap-2 sm:col-span-2 lg:col-span-3">
         <router-link
           :to="`/blog/edit/${post._id}`"
           class="bg-accent text-foreground hover:bg-accent/80 inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors"
@@ -289,57 +330,54 @@ onUnmounted(() => {
           删除
         </button>
       </div>
+
+      <div
+        v-if="post"
+        class="border-border bg-card overflow-hidden rounded-2xl border shadow-sm sm:col-span-2 lg:col-span-3"
+      >
+        <div class="border-border border-b p-8">
+          <h1 class="text-foreground mb-4 text-3xl leading-tight font-bold">
+            {{ post.title }}
+          </h1>
+
+          <div class="text-primary flex flex-wrap gap-x-6 gap-y-3 text-sm">
+            <div v-if="post.author" class="flex items-center gap-1.5 font-medium">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="h-4 w-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                />
+              </svg>
+              {{ post.author }}
+            </div>
+
+            <div v-if="post.created_at" class="flex items-center gap-1.5">
+              <CalendarIcon />
+              {{ formatDate(post.created_at) }}
+            </div>
+          </div>
+        </div>
+
+        <div class="p-8">
+          <ArticleSummaryCard :title="post.title" :content="post.body || ''" />
+          <div class="prose prose-base dark:prose-invert max-w-none">
+            <div v-if="post.body" v-html="post.body" />
+            <div v-else class="text-muted-foreground italic">暂无内容</div>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="post" class="sm:col-span-2 lg:col-span-3">
+        <ArticleComments :post-id="postId" :comments="comments" @refresh="fetchPost" />
+      </div>
     </template>
-
-    <!-- Article Content -->
-    <div
-      v-if="post"
-      class="border-border bg-card overflow-hidden rounded-2xl border shadow-sm"
-    >
-      <div class="border-border border-b p-8">
-        <h1 class="text-foreground mb-4 text-3xl leading-tight font-bold">
-          {{ post.title }}
-        </h1>
-
-        <div class="text-primary flex flex-wrap gap-x-6 gap-y-3 text-sm">
-          <div v-if="post.author" class="flex items-center gap-1.5 font-medium">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="h-4 w-4"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-              />
-            </svg>
-            {{ post.author }}
-          </div>
-
-          <div v-if="post.created_at" class="flex items-center gap-1.5">
-            <CalendarIcon />
-            {{ formatDate(post.created_at) }}
-          </div>
-        </div>
-      </div>
-
-      <div class="p-8">
-        <ArticleSummaryCard :title="post.title" :content="post.body || ''" />
-        <div class="prose prose-base dark:prose-invert max-w-none">
-          <div v-if="post.body" v-html="post.body" />
-          <div v-else class="text-muted-foreground italic">暂无内容</div>
-        </div>
-      </div>
-
-      <ArticleComments
-        :post-id="postId"
-        :comments="comments"
-        @refresh="fetchPost"
-      />
-    </div>
-  </ArticleDetailLayout>
+  </BasicDetail>
 </template>

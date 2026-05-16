@@ -1,7 +1,7 @@
 <template>
   <!-- Profile Card -->
-  <BentoCard>
-    <div class="flex flex-col items-center text-center">
+  <BentoCard class="flex items-center">
+    <div class="flex flex-col items-center justify-center text-center">
       <!-- Avatar with Glow + Active Badge -->
       <div class="group relative mb-4">
         <!-- 青/蓝色渐变 -->
@@ -69,9 +69,6 @@
 
 <script setup lang="ts">
 import BentoCard from "@/components/bento/BentoCard.vue";
-import { useAuthStore } from "@/stores/auth";
 import { useVisitorCountStore } from "@/stores/visitorCount";
-
-const auth = useAuthStore();
 const visitorCount = useVisitorCountStore();
 </script>

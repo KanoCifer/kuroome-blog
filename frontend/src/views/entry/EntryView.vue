@@ -19,19 +19,19 @@
         :animate="{ scale: 1, opacity: 1 }"
         ref="boxRef"
         :style="[profilePosition]"
-        class="absolute w-md min-w-fit -translate-x-1/2 -translate-y-1/2"
+        class="absolute h-80 w-md min-w-fit -translate-x-1/2 -translate-y-1/2"
       />
       <AnimatePresence>
         <BentoNavCard
           v-if="show.BentoNavCard"
           layoutId="nav-card"
-          :initial="{ scale: 0.5, opacity: 0.8 }"
+          :initial="{ scale: 0.95, opacity: 0 }"
           :animate="{ scale: 1, opacity: 1 }"
-          :exit="{ scale: 0.5, opacity: 0, transition: { duration: 0.2 } }"
           :transition="{
             type: 'spring',
-            stiffness: 400,
-            damping: 30,
+            stiffness: 500,
+            damping: 35,
+            mass: 1,
           }"
           class="absolute w-68 -translate-x-1/2 -translate-y-1/2"
           :style="[navCardPosition]"
@@ -189,7 +189,7 @@ const switchToMobile = () => {
 
 const clockRef = ref<ComponentPublicInstance | null>(null);
 // 卡片边距
-const cardMargin = ref<number>(24);
+const cardMargin = ref<number>(12);
 // 父容器引用
 const parentContainer = ref<HTMLElement | null>(null);
 // 元素宽度
@@ -264,7 +264,7 @@ const clockCardPosition = computed(() => {
 // 对应 BentoCalendar (top-5/8)
 const calendarPosition = computed(() => {
   return {
-    left: `${rightTotal.value + 24}px`,
+    left: `${rightTotal.value + 28}px`,
     top: `${layoutHeight.value * 0.625 + 48}px`,
   };
 });
@@ -281,7 +281,7 @@ const newCardPosition = computed(() => {
 const techPosition = computed(() => {
   return {
     left: `${leftTotal.value}px`,
-    top: `${layoutHeight.value * 0.85}px`,
+    top: `${layoutHeight.value * 0.84 - 20}px`,
   };
 });
 
@@ -297,7 +297,7 @@ const websitesPosition = computed(() => {
 const listCardPosition = computed(() => {
   return {
     left: `${rightTotal.value - 240}px`,
-    top: `${(layoutHeight.value * 6) / 8}px`,
+    top: `${layoutHeight.value * 0.74}px`,
   };
 });
 
@@ -309,20 +309,19 @@ const likePosition = computed(() => {
   };
 });
 
-// 对应 BentoCalendar (top-5/8)
-// 对应 BentoCat (top-10/12 left-[45%])
+// 对应 BentoCat
 const catPosition = computed(() => {
   return {
-    left: `${parentWidth.value * 0.43}px`,
-    top: `${(layoutHeight.value * 10) / 12}px`,
+    left: `${parentWidth.value * 0.43 + 20}px`,
+    top: `${layoutHeight.value * 0.79}px`,
   };
 });
 
 // 对应 BentoMap (top-11/12)
 const mapPosition = computed(() => {
   return {
-    left: `${parentWidth.value / 2 + 120}px`,
-    top: `${layoutHeight.value * 0.89}px`,
+    left: `${rightTotal.value - 240}px`,
+    top: `${layoutHeight.value * 0.86}px`,
   };
 });
 

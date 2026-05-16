@@ -1,75 +1,68 @@
 <template>
-  <AnimatePresence>
-    <motion.div
-      v-if="isVisible"
-      :exit="{ width: 0, opacity: 0, transition: { duration: 0.2 } }"
-      :transition="{ type: 'spring', stiffness: 500, damping: 30 }"
-      layoutId="nav-card"
-      class="group fixed top-4 left-4 z-50 hidden md:block"
+  <motion.div
+    v-if="isVisible"
+    :initial="{ opacity: 0, scale: 0.95 }"
+    :animate="{ opacity: 1, scale: 1 }"
+    :exit="{ opacity: 0, scale: 0.95, width: 0, transition: { duration: 0.3 } }"
+    :transition="{ type: 'spring', stiffness: 500, damping: 35, mass: 1 }"
+    layoutId="nav-card"
+    class="group fixed top-4 left-4 z-50"
+  >
+    <nav
+      class="squircle bg-card/80 dark:bg-card/80 z-9999 flex items-center gap-2 px-1 py-2 shadow-lg backdrop-blur-sm"
     >
-      <nav
-        class="squircle bg-card/80 dark:bg-card/80 z-9999 flex items-center gap-2 px-1 py-2 shadow-lg backdrop-blur-sm"
-      >
-        <ul class="flex items-center gap-2 font-medium">
-          <!-- Avatar -->
-          <li class="ml-2 shrink-0">
-            <RouterLink to="/">
-              <img
-                v-if="auth.isAuthenticated && auth.user?.photo"
-                :src="avatarUrl"
-                :alt="currentUserName"
-                class="h-10 w-10 rounded-full object-cover ring-2 ring-white/50 transition-transform hover:scale-105 dark:ring-gray-700/50"
-              />
-              <img
-                v-else
-                src="/images/about.webp"
-                alt="Default Avatar"
-                class="h-10 w-10 rounded-full object-cover ring-2 ring-white/50 transition-transform hover:scale-105 dark:ring-gray-700/50"
-              />
-            </RouterLink>
-          </li>
-          <!-- Navigation Icons -->
-          <li class="relative flex items-center gap-4 px-2">
-            <!-- Indicator -->
-            <motion.div
-              class="bg-muted dark:bg-accent pointer-events-none absolute top-0 left-0 z-1 h-12 w-12 rounded-full shadow-sm"
-              :animate="{ x: indicatorX }"
-              :transition="{ type: 'spring', stiffness: 320, damping: 30 }"
+      <ul class="flex items-center gap-2 font-medium">
+        <!-- Avatar -->
+        <li class="ml-2 shrink-0">
+          <RouterLink to="/">
+            <img
+              v-if="auth.isAuthenticated && auth.user?.photo"
+              :src="avatarUrl"
+              :alt="currentUserName"
+              class="h-10 w-10 rounded-full object-cover ring-2 ring-white/50 transition-transform hover:scale-105 dark:ring-gray-700/50"
             />
-            <!-- Nav Items -->
-            <RouterLink
-              v-for="(item, index) in navItems"
-              :key="item.to"
-              :to="item.to"
-              class="text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-foreground relative z-10 flex h-12 w-12 items-center justify-center rounded-full transition-colors"
-              :class="{
-                'text-primary dark:text-primary': isActive(item.to),
-              }"
-              @mouseenter="hoveredIndex = index"
-              @mouseleave="hoveredIndex = activeIndex"
-            >
-              <component :is="item.icon" class="h-6 w-6" />
-            </RouterLink>
-          </li>
-        </ul>
-      </nav>
-    </motion.div>
-  </AnimatePresence>
+            <img
+              v-else
+              src="/images/about.webp"
+              alt="Default Avatar"
+              class="h-10 w-10 rounded-full object-cover ring-2 ring-white/50 transition-transform hover:scale-105 dark:ring-gray-700/50"
+            />
+          </RouterLink>
+        </li>
+        <!-- Navigation Icons -->
+        <li class="relative flex items-center gap-4 px-2">
+          <!-- Indicator -->
+          <motion.div
+            class="bg-muted dark:bg-accent pointer-events-none absolute top-0 left-0 z-1 h-12 w-12 rounded-full shadow-sm"
+            :animate="{ x: indicatorX }"
+            :transition="{ type: 'spring', stiffness: 320, damping: 30 }"
+          />
+          <!-- Nav Items -->
+          <RouterLink
+            v-for="(item, index) in navItems"
+            :key="item.to"
+            :to="item.to"
+            class="text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-foreground relative z-10 flex h-12 w-12 items-center justify-center rounded-full transition-colors"
+            :class="{
+              'text-primary dark:text-primary': isActive(item.to),
+            }"
+            @mouseenter="hoveredIndex = index"
+            @mouseleave="hoveredIndex = activeIndex"
+          >
+            <component :is="item.icon" class="h-6 w-6" />
+          </RouterLink>
+        </li>
+      </ul>
+    </nav>
+  </motion.div>
 </template>
 
 <script setup lang="ts">
-import {
-  BlogIcon,
-  BookshelfIcon,
-  ChangelogIcon,
-  HomeIcon,
-  IconTooling,
-  RssIcon,
-} from "@/components/icons";
+import { BlogIcon, BookshelfIcon, ChangelogIcon, HomeIcon, IconTooling, RssIcon } from "@/components/icons";
 import { useAuthStore } from "@/stores/auth";
 import { useDebounce } from "@vueuse/core";
 import { CreditCard, Image } from "lucide-vue-next";
-import { AnimatePresence, motion } from "motion-v";
+import { motion } from "motion-v";
 import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
@@ -82,9 +75,7 @@ const props = defineProps<{
   isVisible?: boolean;
 }>();
 
-const isVisible = computed(() =>
-  props.isVisible !== undefined ? props.isVisible : !props.isEntryView,
-);
+const isVisible = computed(() => (props.isVisible !== undefined ? props.isVisible : !props.isEntryView));
 
 // Navigation items config
 const navItems = [

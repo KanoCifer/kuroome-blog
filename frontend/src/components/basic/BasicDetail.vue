@@ -1,7 +1,10 @@
 <template>
   <div>
     <!-- Title Section with Parallax -->
-    <div class="relative -z-5 mx-0 mt-60 flex flex-col items-center justify-center bg-transparent" :style="titleStyle">
+    <div
+      class="relative -z-5 mx-0 mt-[40vh] flex flex-col items-center justify-center bg-transparent"
+      :style="titleStyle"
+    >
       <div>
         <h1 class="text-background max-w-6xl text-center font-serif text-7xl">
           {{ title }}
@@ -9,25 +12,37 @@
         <!-- Info -->
         <div class="text-muted-foreground mt-4 flex flex-wrap items-center justify-center gap-4 text-sm">
           <span
-            class="bg-muted text-secondary-foreground dark:bg-muted dark:text-muted-foreground inline-block rounded-full px-2 py-0.5 text-xs font-medium"
+            class="bg-muted text-secondary-foreground dark:bg-muted dark:text-muted-foreground inline-block rounded-full px-3 py-1 text-xs font-medium"
           >
             {{ subtitle }}
           </span>
         </div>
       </div>
     </div>
-    <div class="relative mt-36 w-full">
+    <div class="relative mt-[40vh] w-full">
+      <!-- Scroll Indicator -->
+      <div class="absolute -top-10 left-1/2 -translate-x-1/2 animate-bounce cursor-pointer text-white">
+        <a href="#main-content">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="text-background/60 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+        </a>
+      </div>
       <div
         :style="sectionStyle"
         class="bg-background/80 absolute left-1/2 -z-5 h-full -translate-x-1/2 rounded-t-[40px] shadow-[0_-8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl dark:bg-slate-900/80 dark:shadow-[0_-8px_30px_rgb(0,0,0,0.2)]"
       ></div>
       <div class="mx-auto max-w-6xl">
         <div
+          id="main-content"
           ref="gridRef"
-          :class="[
-            'staggered-grid mx-8 grid grid-cols-1 gap-6 pt-24 sm:grid-cols-2 lg:grid-cols-3',
-            { 'is-visible': isVisible },
-          ]"
+          :class="['staggered-grid mx-8 grid grid-cols-1 gap-6 pt-24 sm:grid-cols-2 lg:grid-cols-3']"
         >
           <!-- Content slots -->
           <slot />
@@ -50,8 +65,8 @@
 </template>
 
 <script setup lang="ts">
-import { useIntersectionObserver, useMediaQuery, useScroll } from "@vueuse/core";
-import { computed, onMounted, ref } from "vue";
+import { useMediaQuery, useScroll } from "@vueuse/core";
+import { computed } from "vue";
 const { y } = useScroll(window);
 
 defineProps<{
@@ -70,7 +85,7 @@ const sectionStyle = computed(() => {
   if (isSmallScreen.value) {
     return { width: "100%" };
   }
-  const scale = Math.min(1, 0.95 + y.value * 0.0005);
+  const scale = Math.min(1, 0.85 + y.value * 0.0005);
   return {
     transform: `scaleX(${scale})`,
     transformOrigin: "top center",
@@ -78,59 +93,18 @@ const sectionStyle = computed(() => {
   };
 });
 
-const gridRef = ref(null);
-const isVisible = ref(false);
+// const gridRef = ref<HTMLElement | null>(null);
+// const isVisible = ref(false);
 
-// TODO(human): 使用 useIntersectionObserver 监听 gridRef
-// 在这里实现你的代码，当内容进入视口时，将 isVisible.value 设为 true
-// 思考：阈值(threshold)应该设置多少？动画是否应该只触发一次？
+// const onIntersectionObserver = (entries: IntersectionObserverEntry[]) => {
+//   const entry = entries[0];
+//   if (entry.isIntersecting) {
+//     isVisible.value = true;
+//     stop(); // 只触发一次，停止观察
+//   }
+// };
 
-const onIntersectionObserver = (entries: IntersectionObserverEntry[]) => {
-  const entry = entries[0];
-  if (entry.isIntersecting) {
-    isVisible.value = true;
-    stop(); // 只触发一次，停止观察
-  }
-};
-
-const { stop } = useIntersectionObserver(gridRef, onIntersectionObserver, {
-  threshold: 0.3, // 当内容至少有10%进入视口时触发
-});
-
-onMounted(() => {
-  window.scrollTo(0, 0);
-});
+// const { stop } = useIntersectionObserver(gridRef, onIntersectionObserver, {
+//   threshold: 0, // 当内容至少有10%进入视口时触发
+// });
 </script>
-
-<style scoped>
-/* 交错入场动画 */
-.staggered-grid > :deep(*) {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.staggered-grid.is-visible > :deep(*) {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.staggered-grid.is-visible > :deep(*:nth-child(1)) {
-  transition-delay: 50ms;
-}
-.staggered-grid.is-visible > :deep(*:nth-child(2)) {
-  transition-delay: 100ms;
-}
-.staggered-grid.is-visible > :deep(*:nth-child(3)) {
-  transition-delay: 150ms;
-}
-.staggered-grid.is-visible > :deep(*:nth-child(4)) {
-  transition-delay: 200ms;
-}
-.staggered-grid.is-visible > :deep(*:nth-child(5)) {
-  transition-delay: 250ms;
-}
-.staggered-grid.is-visible > :deep(*:nth-child(6)) {
-  transition-delay: 300ms;
-}
-</style>

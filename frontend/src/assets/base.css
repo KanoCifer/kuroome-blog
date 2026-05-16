@@ -1,4 +1,9 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "./themes/index.css";
+@plugin "@tailwindcss/typography";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @font-face {
   font-family: "HarmonyOS Sans";
@@ -52,16 +57,15 @@
   font-variation-settings: normal;
   font-display: swap;
 }
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-@import "./themes/index.css";
-@plugin "@tailwindcss/typography";
-@custom-variant dark (&:where(.dark, .dark *));
 
 html,
 body {
   -webkit-font-smoothing: antialiased;
   -webkit-overflow-scrolling: touch;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 @layer base {
   body {
@@ -269,19 +273,9 @@ ul[data-type="taskList"] ul[data-type="taskList"] {
   @apply text-gray-400;
 }
 
-/* ────────────── Bridge Layer ────────────── */
-/* Maps compact scheme vars → shadcn Tailwind token names.
-   Each theme file only defines ~20 compact vars;
-   this block derives the full shadcn palette from them. */
-
-/* Font switcher — overrides Tailwind's default-font-family and font-sans */
-:root {
-}
-
 :root[data-font="harmonyos"] {
   --default-font-family: "HarmonyOS Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
   --font-sans: "HarmonyOS Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
-  --font-serif: "Times New Roman" "HarmonyOS Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 
 @theme inline {

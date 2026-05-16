@@ -8,6 +8,7 @@ import { useBackgroundStore } from "@/stores/background";
 import { useThemeStore } from "@/stores/theme";
 import { useScroll } from "@vueuse/core";
 import { useHead } from "@vueuse/head";
+import { AnimatePresence } from "motion-v";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { RouterView, useRoute } from "vue-router";
 
@@ -127,7 +128,9 @@ useHead(headPreload);
           <ToastContainer />
         </Teleport>
         <CookieConsent />
-        <BasicNav :isEntryView="isEntryView" :isVisible="showBasicNav" />
+        <AnimatePresence>
+          <BasicNav :isEntryView="isEntryView" :isVisible="showBasicNav" />
+        </AnimatePresence>
       </div>
     </header>
 
@@ -136,12 +139,12 @@ useHead(headPreload);
       <RouterView v-slot="{ Component }">
         <transition
           mode="out-in"
-          enter-active-class="transition-all transform-gpu duration-300 ease-out"
-          enter-from-class="scale-95 opacity-0"
-          enter-to-class="scale-100 opacity-100"
-          leave-active-class="transition-all transform-gpu duration-300 ease-out"
-          leave-from-class="scale-100 opacity-100"
-          leave-to-class="scale-95 opacity-0"
+          enter-active-class="transition-all transform-gpu duration-500 ease-out"
+          enter-from-class="translate-y-20 opacity-0"
+          enter-to-class="translate-y-0 opacity-100"
+          leave-active-class="transition-all transform-gpu duration-200 ease-out"
+          leave-from-class="translate-y-0 opacity-100"
+          leave-to-class="translate-y-20 opacity-0"
         >
           <component :is="Component" :key="$route.path" />
         </transition>
