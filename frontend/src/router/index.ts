@@ -97,6 +97,16 @@ const router = createRouter({
       },
     },
     {
+      path: "/privacy",
+      name: "privacy",
+      component: () => import("@/views/general/PrivacyPolicyView.vue"),
+      meta: {
+        title: "隐私政策 - Kuroome's Blog",
+        description: "了解本站如何收集、使用和保护您的个人信息",
+        keywords: "隐私政策,个人信息保护,数据安全",
+      },
+    },
+    {
       path: "/fishing-map",
       name: "fishing-map",
       component: () => import("@/views/general/FishingMapView.vue"),

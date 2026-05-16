@@ -10,6 +10,30 @@
 }
 
 @font-face {
+  font-family: 'HarmonyOS Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/HarmonyOS_Sans_Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'HarmonyOS Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/HarmonyOS_Sans_Medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'HarmonyOS Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/HarmonyOS_Sans_Bold.ttf') format('truetype');
+}
+
+@font-face {
   font-family: '阿里妈妈方圆体 VF Regular';
   src:
     url('//at.alicdn.com/wf/webfont/IycYNJ7qsIni/JzWMyKA8U06c.woff2')
@@ -482,6 +506,8 @@ ul[data-type='taskList'] ul[data-type='taskList'] {
 
 :root {
   --radius: 0.625rem;
+  --default-font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-sans: 'PingFang SC', 'Microsoft YaHei', sans-serif;
   --background: oklch(1 0 0);
   --foreground: oklch(0.13 0.028 261.692);
   --card: oklch(1 0 0);
@@ -549,12 +575,19 @@ ul[data-type='taskList'] ul[data-type='taskList'] {
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
+:root[data-font='harmonyos'] {
+  --default-font-family:
+    'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-sans: 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-body);
   }
   /* 修复 iOS Safari 表单聚焦时自动放大 */
   input,

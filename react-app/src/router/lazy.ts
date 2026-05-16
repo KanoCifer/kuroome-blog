@@ -30,6 +30,9 @@ export const Analytics = lazy(() => import('../views/Analytics/AnalyticsView'));
 export const Subscription = lazy(
   () => import('../views/subscription/SubscriptionView'),
 );
+export const PrivacyPolicy = lazy(
+  () => import('../views/general/PrivacyPolicyView'),
+);
 export const DeviceTracker = lazy(
   () => import('../views/device/DeviceTracker'),
 );

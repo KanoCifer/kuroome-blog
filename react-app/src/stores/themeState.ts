@@ -3,9 +3,12 @@ import { persist } from 'zustand/middleware';
 import { playThemeTransition } from '../utils/themeTransition';
 
 type Theme = 'light' | 'dark' | 'system';
+type FontFamily = 'default' | 'harmonyos';
 interface ThemeState {
   theme: Theme;
+  font: FontFamily;
   setTheme: (theme: Theme) => void;
+  setFont: (font: FontFamily) => void;
   toggleTheme: () => void;
   toggleThemeWithAnimation: (event: {
     clientX: number;
@@ -26,14 +29,29 @@ const applyTheme = (newTheme: Theme) => {
   }
 };
 
+const applyFont = (newFont: FontFamily) => {
+  const root = document.documentElement;
+  if (newFont === 'harmonyos') {
+    root.setAttribute('data-font', 'harmonyos');
+  } else {
+    root.removeAttribute('data-font');
+  }
+};
+
 export const useThemeState = create<ThemeState>()(
   persist(
     (set, get) => ({
       theme: 'system',
+      font: 'default',
 
       setTheme: (theme) => {
         applyTheme(theme);
         set({ theme });
+      },
+
+      setFont: (font) => {
+        applyFont(font);
+        set({ font });
       },
 
       toggleTheme: () => {
@@ -60,9 +78,15 @@ export const useThemeState = create<ThemeState>()(
         if (state?.theme) {
           applyTheme(state.theme);
         }
+        if (state?.font) {
+          applyFont(state.font);
+        }
       },
 
-      partialize: (state) => ({ theme: state.theme }),
+      partialize: (state) => ({
+        theme: state.theme,
+        font: state.font,
+      }),
     },
   ),
 );

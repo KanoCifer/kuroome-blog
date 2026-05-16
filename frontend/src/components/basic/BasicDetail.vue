@@ -19,10 +19,16 @@
     <div class="relative mt-36 w-full">
       <div
         :style="sectionStyle"
-        class="bg-background absolute left-1/2 -z-5 h-full -translate-x-1/2 rounded-t-[40px] dark:bg-slate-900"
+        class="bg-background/80 absolute left-1/2 -z-5 h-full -translate-x-1/2 rounded-t-[40px] shadow-[0_-8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl dark:bg-slate-900/80 dark:shadow-[0_-8px_30px_rgb(0,0,0,0.2)]"
       ></div>
       <div class="mx-auto max-w-6xl">
-        <div class="mx-8 grid grid-cols-1 gap-6 pt-24 sm:grid-cols-2 lg:grid-cols-3">
+        <div
+          ref="gridRef"
+          :class="[
+            'staggered-grid mx-8 grid grid-cols-1 gap-6 pt-24 sm:grid-cols-2 lg:grid-cols-3',
+            { 'is-visible': isVisible },
+          ]"
+        >
           <!-- Content slots -->
           <slot />
         </div>
@@ -44,8 +50,8 @@
 </template>
 
 <script setup lang="ts">
-import { useMediaQuery, useScroll } from "@vueuse/core";
-import { computed, onMounted } from "vue";
+import { useIntersectionObserver, useMediaQuery, useScroll } from "@vueuse/core";
+import { computed, onMounted, ref } from "vue";
 const { y } = useScroll(window);
 
 defineProps<{
@@ -58,21 +64,73 @@ const titleStyle = computed(() => ({
   transform: `translateY(${y.value * 0.6}px)`,
 }));
 
-// 计算内容区的缩放效果
+// 计算内容区的缩放效果 (使用 scaleX 替代 width 优化性能)
 const sectionStyle = computed(() => {
   const isSmallScreen = useMediaQuery("(max-width: 768px)");
   if (isSmallScreen.value) {
-    return {
-      width: "100%",
-    };
+    return { width: "100%" };
   }
   const scale = Math.min(1, 0.95 + y.value * 0.0005);
   return {
-    width: `${100 * scale}%`,
+    transform: `scaleX(${scale})`,
+    transformOrigin: "top center",
+    width: "100%",
   };
+});
+
+const gridRef = ref(null);
+const isVisible = ref(false);
+
+// TODO(human): 使用 useIntersectionObserver 监听 gridRef
+// 在这里实现你的代码，当内容进入视口时，将 isVisible.value 设为 true
+// 思考：阈值(threshold)应该设置多少？动画是否应该只触发一次？
+
+const onIntersectionObserver = (entries: IntersectionObserverEntry[]) => {
+  const entry = entries[0];
+  if (entry.isIntersecting) {
+    isVisible.value = true;
+    stop(); // 只触发一次，停止观察
+  }
+};
+
+const { stop } = useIntersectionObserver(gridRef, onIntersectionObserver, {
+  threshold: 0.3, // 当内容至少有10%进入视口时触发
 });
 
 onMounted(() => {
   window.scrollTo(0, 0);
 });
 </script>
+
+<style scoped>
+/* 交错入场动画 */
+.staggered-grid > :deep(*) {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.staggered-grid.is-visible > :deep(*) {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.staggered-grid.is-visible > :deep(*:nth-child(1)) {
+  transition-delay: 50ms;
+}
+.staggered-grid.is-visible > :deep(*:nth-child(2)) {
+  transition-delay: 100ms;
+}
+.staggered-grid.is-visible > :deep(*:nth-child(3)) {
+  transition-delay: 150ms;
+}
+.staggered-grid.is-visible > :deep(*:nth-child(4)) {
+  transition-delay: 200ms;
+}
+.staggered-grid.is-visible > :deep(*:nth-child(5)) {
+  transition-delay: 250ms;
+}
+.staggered-grid.is-visible > :deep(*:nth-child(6)) {
+  transition-delay: 300ms;
+}
+</style>

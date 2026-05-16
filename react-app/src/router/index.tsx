@@ -18,6 +18,7 @@ import {
   NotFound,
   PicGallery,
   ProfileSetting,
+  PrivacyPolicy,
   ReadingList,
   Register,
   RssArticle,
@@ -106,6 +107,10 @@ export const router = createBrowserRouter([
       {
         path: '/about',
         element: <About />,
+      },
+      {
+        path: '/privacy',
+        element: <PrivacyPolicy />,
       },
       {
         path: '/websites',

@@ -200,6 +200,9 @@ async def track_visitor(
     redis: AsyncRedis = Depends(get_redis),
 ):
     """Track visitor data sent from the frontend."""
+    if not get_settings().ENABLE_TRACKING:
+        return Response(status_code=204)
+
     ip_address = get_remote_address(request)
     visitor_data = VisitorData(
         **data.model_dump(exclude={"ip_address"}),

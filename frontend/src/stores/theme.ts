@@ -4,6 +4,7 @@ import { ref, watch } from "vue";
 
 export type Theme = "light" | "dark" | "system";
 export type ColorScheme = "sky-blue" | "forest-green" | "paper" | "sage" | "mist" | "blush";
+export type FontFamily = "default" | "harmonyos";
 
 export const useThemeStore = defineStore("theme", () => {
   const theme = ref<Theme>((localStorage.getItem("theme") as Theme) || "system");
@@ -12,9 +13,22 @@ export const useThemeStore = defineStore("theme", () => {
 
   const showFooter = ref<string>(localStorage.getItem("show-footer") || "true");
 
+  const font = ref<FontFamily>((localStorage.getItem("font") as FontFamily) || "default");
+
   const toggleFooter = () => {
     showFooter.value = showFooter.value === "true" ? "false" : "true";
     localStorage.setItem("show-footer", showFooter.value);
+  };
+
+  const applyFont = (newFont: FontFamily) => {
+    font.value = newFont;
+    const root = document.documentElement;
+    if (newFont === "harmonyos") {
+      root.setAttribute("data-font", "harmonyos");
+    } else {
+      root.removeAttribute("data-font");
+    }
+    localStorage.setItem("font", newFont);
   };
 
   const applyTheme = (newTheme: Theme) => {
@@ -52,9 +66,10 @@ export const useThemeStore = defineStore("theme", () => {
     }
   };
 
-  // Apply theme and scheme immediately
+  // Apply theme, scheme, and font immediately
   applyTheme(theme.value);
   applyScheme(scheme.value);
+  applyFont(font.value);
   mediaQuery.addEventListener("change", handleSystemChange);
 
   const setTheme = (newTheme: Theme) => {
@@ -92,11 +107,13 @@ export const useThemeStore = defineStore("theme", () => {
   return {
     theme,
     scheme,
+    font,
     showFooter,
     setTheme,
     setScheme,
     toggleTheme,
     toggleFooter,
     setThemeWithAnimation,
+    applyFont,
   };
 });

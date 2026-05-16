@@ -25,6 +25,12 @@ export function BasicFooter() {
         >
           &nbsp;粤ICP备2026018113号
         </a>
+        <a
+          className="ext-center text-xs text-neutral-700 hover:underline dark:text-neutral-400"
+          href="/privacy"
+        >
+          &nbsp;隐私政策
+        </a>
       </div>
     </footer>
   );

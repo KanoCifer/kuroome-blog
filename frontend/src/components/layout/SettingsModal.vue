@@ -92,6 +92,31 @@
                 </div>
               </div>
 
+              <!-- Font Switcher -->
+              <div>
+                <label class="text-muted-foreground mb-3 block text-sm font-medium"> 字体 </label>
+                <div class="grid grid-cols-2 gap-3">
+                  <button
+                    @click="themeStore.applyFont('default')"
+                    class="border-border hover:border-primary dark:border-border flex flex-col items-center gap-1 rounded-xl border-2 p-3 transition-all"
+                    :class="{ 'border-primary bg-muted': themeStore.font === 'default' }"
+                  >
+                    <span class="font-sans text-sm font-medium">默认字体</span>
+                    <span class="text-muted-foreground font-sans text-xs">PingFang SC</span>
+                  </button>
+                  <button
+                    @click="themeStore.applyFont('harmonyos')"
+                    class="border-border hover:border-primary dark:border-border flex flex-col items-center gap-1 rounded-xl border-2 p-3 transition-all"
+                    :class="{ 'border-primary bg-muted': themeStore.font === 'harmonyos' }"
+                  >
+                    <span class="font-family-harmonyos text-sm font-medium" style="font-weight: 500"
+                      >HarmonyOS Sans</span
+                    >
+                    <span class="text-muted-foreground font-family-harmonyos text-xs">鸿蒙字体</span>
+                  </button>
+                </div>
+              </div>
+
               <div>
                 <label class="text-muted-foreground mb-3 block text-sm font-medium"> 配色方案 </label>
                 <div class="space-y-2">

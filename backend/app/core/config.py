@@ -48,6 +48,7 @@ class Settings(BaseSettings):
     REDIS_MAX_CONNECTIONS: int = 30
     RABBITMQ_URL: str = "amqp://guest:guest@localhost:5672/"
     QWEATHER_BASE_URL: str = ""
+    ENABLE_TRACKING: bool = True
 
     model_config = SettingsConfigDict(
         env_file=get_env_file_path(),
