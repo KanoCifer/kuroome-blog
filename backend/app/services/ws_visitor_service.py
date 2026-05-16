@@ -1,86 +1,42 @@
 """WebSocket visitor count service.
 
-Encapsulates connection tracking, Redis pub/sub lifecycle, and count broadcasting
-so the API layer is a thin handler. Also handles authenticated user online tracking
-via JWT cookie on connection.
+Encapsulates connection lifecycle, per-connection Redis pub/sub, and
+count broadcasting so the API layer is a thin handler.
+
+Each connection independently subscribes to a shared Redis pub/sub
+channel — no process-bound state, so the design scales across multiple
+uvicorn workers.
 """
 
 from __future__ import annotations
 
 import asyncio
 import json
-import time
-from contextlib import asynccontextmanager, suppress
+from contextlib import suppress
+from typing import TYPE_CHECKING
 
 from fastapi import WebSocket, WebSocketDisconnect
-from redis.asyncio import Redis as AsyncRedis
 
-import jwt
-from app.api.des.auth import manager
 from app.core import logger
+
+if TYPE_CHECKING:
+    from redis.asyncio import Redis as AsyncRedis
 
 VISITOR_COUNT_KEY = "ws:visitor_count"
 VISITOR_COUNT_CHANNEL = "ws:visitor_count_changed"
 
 
 class WsVisitorService:
-    """Process-wide WebSocket visitor count manager.
+    """Per-connection WebSocket visitor count manager.
 
-    Tracks active connections and manages a single Redis pub/sub listener
-    that broadcasts count changes to all connected clients.
+    Each call to ``handle_connection`` spawns two concurrent tasks:
 
-    When the client's cookie includes a valid JWT access-token, the connection
-    is also registered in the ``online:users`` sorted set for authenticated
-    user presence.
+    * a Redis pub/sub listener that broadcasts count changes to the client
+    * a WebSocket receiver that answers pings
+
+    Visitor count is tracked via Redis INCR / DECR so it stays atomic
+    across workers.
     """
-
-    _active_connections: dict[WebSocket, dict] = {}  # noqa: RUF012
-    _listener_started = False
-    _listener_lock = asyncio.Lock()
-
-    @classmethod
-    async def _broadcast(cls, message: str) -> None:
-        stale: list[WebSocket] = []
-        for ws in cls._active_connections:
-            try:
-                await ws.send_text(message)
-            except Exception:
-                stale.append(ws)
-        for ws in stale:
-            cls._active_connections.pop(ws, None)
-
-    @classmethod
-    async def _subscriber(cls, redis: AsyncRedis) -> None:
-        pubsub = redis.pubsub()
-        await pubsub.subscribe(VISITOR_COUNT_CHANNEL)
-        try:
-            async for msg in pubsub.listen():
-                if msg["type"] == "message":
-                    data = msg["data"]
-                    if isinstance(data, bytes):
-                        data = data.decode()
-                    await cls._broadcast(data)
-        except asyncio.CancelledError:
-            await pubsub.unsubscribe(VISITOR_COUNT_CHANNEL)
-            raise
-
-    @classmethod
-    @asynccontextmanager
-    async def ensure_listener(cls, redis: AsyncRedis):
-        """Ensure exactly one pub/sub listener runs process-wide."""
-        task = None
-        async with cls._listener_lock:
-            if not cls._listener_started:
-                cls._listener_started = True
-                task = asyncio.create_task(cls._subscriber(redis))
-        try:
-            yield
-        finally:
-            if task:
-                task.cancel()
-                with suppress(asyncio.CancelledError):
-                    await task
-                cls._listener_started = False
 
     @classmethod
     async def publish_count(cls, redis: AsyncRedis) -> None:
@@ -93,115 +49,77 @@ class WsVisitorService:
         )
 
     @classmethod
-    async def _try_authenticate(cls, websocket: WebSocket):
-        """Try to authenticate user from the WebSocket handshake cookie.
-
-        Reads the ``access-token`` cookie (set by fastapi-login), decodes the
-        JWT, and loads the corresponding user.  Returns ``None`` when no valid
-        token is present.
-        """
-        cookie_header = websocket.headers.get("cookie", "")
-        token: str | None = None
-        for part in cookie_header.split("; "):
-            if "=" not in part:
-                continue
-            key, val = part.split("=", 1)
-            if key.strip() == "access-token":
-                token = val.strip()
-                break
-
-        if not token:
-            return None
-
+    async def _redis_listener(
+        cls, redis: AsyncRedis, websocket: WebSocket
+    ) -> None:
+        """Subscribe to the visitor-count pub/sub channel and forward every
+        message to the WebSocket client."""
+        pubsub = redis.pubsub()
+        await pubsub.subscribe(VISITOR_COUNT_CHANNEL)
         try:
-            payload = jwt.decode(
-                token,
-                manager.secret.secret_for_decode,
-                algorithms=[manager.algorithm or "HS256"],
-            )
-        except jwt.PyJWTError:
-            return None
-
-        user_id = payload.get("sub")
-        if user_id is None:
-            return None
-
-        return await manager._load_user(user_id)
+            async for msg in pubsub.listen():
+                if msg["type"] != "message":
+                    continue
+                data = msg["data"]
+                if isinstance(data, bytes):
+                    data = data.decode()
+                try:
+                    await websocket.send_text(data)
+                except Exception:
+                    break
+        except asyncio.CancelledError:
+            pass
+        finally:
+            with suppress(Exception):
+                await pubsub.unsubscribe(VISITOR_COUNT_CHANNEL)
 
     @classmethod
-    async def _handle_message(cls, websocket: WebSocket, raw: str) -> None:
-        """Parse and dispatch an incoming JSON message."""
-        try:
-            msg = json.loads(raw)
-        except json.JSONDecodeError:
-            return
-
-        msg_type = msg.get("type")
-
-        if msg_type == "ping":
-            await websocket.send_text('{"type":"pong"}')
-        elif msg_type == "visitor_id":
-            visitor_id = msg.get("visitor_id")
-            if visitor_id is not None:
-                cls._active_connections[websocket].update(
-                    {"visitor_id": visitor_id}
+    async def _ws_receiver(cls, websocket: WebSocket) -> None:
+        """Receive and handle WebSocket text messages (currently only ping)."""
+        while True:
+            try:
+                raw = await asyncio.wait_for(
+                    websocket.receive_text(), timeout=90
                 )
+            except TimeoutError:
+                break
+
+            try:
+                msg = json.loads(raw)
+            except json.JSONDecodeError:
+                continue
+
+            if msg.get("type") == "ping":
+                try:
+                    await websocket.send_text('{"type":"pong"}')
+                except Exception:
+                    break
 
     @classmethod
     async def handle_connection(
         cls, websocket: WebSocket, redis: AsyncRedis
     ) -> None:
         """Run the full WebSocket lifecycle for one connection."""
-        async with cls.ensure_listener(redis):
-            cls._active_connections[websocket] = {}
+        try:
+            await redis.incr(VISITOR_COUNT_KEY)
+            count = await redis.get(VISITOR_COUNT_KEY)
+            current = int(count) if count else 0
+            await websocket.send_text(
+                json.dumps({"type": "count", "count": current})
+            )
+            await cls.publish_count(redis)
 
-            # ---- try JWT authentication from cookie ----
-            user = await cls._try_authenticate(websocket)
-            if user is not None:
-                now = int(time.time())
-                cls._active_connections[websocket].update(
-                    {"visitor_id": None, "user_id": user.id}
-                )
-                await redis.zadd("online:users", {str(user.id): now})
-                await redis.set(f"online:{user.id}", str(now), ex=600)
-
+            # Run the two listeners concurrently; either exiting tears down
+            # the whole connection.
+            await asyncio.gather(
+                cls._redis_listener(redis, websocket),
+                cls._ws_receiver(websocket),
+            )
+        except WebSocketDisconnect, Exception:
+            logger.debug("WebSocket connection closed")
+        finally:
             try:
-                await redis.incr(VISITOR_COUNT_KEY)
-                count = await redis.get(VISITOR_COUNT_KEY)
-                current = int(count) if count else 0
-                await websocket.send_text(
-                    json.dumps({"type": "count", "count": current})
-                )
+                await redis.decr(VISITOR_COUNT_KEY)
                 await cls.publish_count(redis)
-
-                while True:
-                    try:
-                        raw = await asyncio.wait_for(
-                            websocket.receive_text(), timeout=90
-                        )
-                    except TimeoutError:
-                        break
-
-                    await cls._handle_message(websocket, raw)
-            except WebSocketDisconnect:
-                pass
             except Exception:
-                logger.exception("WebSocket error")
-            finally:
-                conn = cls._active_connections.pop(websocket, None) or {}
-                user_id = conn.get("user_id")
-                if user_id is not None:
-                    try:
-                        await redis.zrem("online:users", str(user_id))
-                        await redis.delete(f"online:{user_id}")
-                    except Exception:
-                        logger.warning(
-                            "Failed to clean up online tracking on disconnect"
-                        )
-                try:
-                    await redis.decr(VISITOR_COUNT_KEY)
-                    await cls.publish_count(redis)
-                except Exception:
-                    logger.warning(
-                        "Failed to update visitor count on disconnect"
-                    )
+                logger.warning("Failed to update visitor count on disconnect")

@@ -88,20 +88,6 @@ def _build_login_response(
 # ------------------------------------------------------------------ #
 
 
-@router.get("/status-of-admin")
-async def status_of_admin(
-    user_service: UserService = Depends(user_service_dep),
-) -> JSONResponse:
-    """检查管理员在线状态
-
-    online:1, offline:0
-    """
-    return APIResponse.ok(
-        data={"admin_online": await user_service.is_admin_online()},
-        message="管理员在线状态获取成功",
-    )
-
-
 @router.get("/csrf-token", response_model=APIResponse)
 async def csrf_token(response: Response) -> JSONResponse:
     """生成 CSRF token 并设置 cookie，前端可以调用此接口获取 token 以支持后续的认证请求。"""
@@ -199,10 +185,9 @@ async def login(
 @router.post("/logout", response_model=APIResponse)
 async def logout(
     user: User = Depends(manager),
-    redis: AsyncRedis = Depends(get_redis),
     user_service: UserService = Depends(user_service_dep),
 ):
-    await user_service.logout(user, redis)
+    await user_service.logout(user)
 
     cookie_domain = settings.COOKIE_DOMAIN
     response = APIResponse.ok(
@@ -214,21 +199,6 @@ async def logout(
         key=manager.cookie_name, domain=cookie_domain or None
     )
     return response
-
-
-@router.post("/heartbeat", response_model=APIResponse)
-@limiter.limit(limit_value="60/minute")
-async def heartbeat(
-    request: Request,
-    user: User = Depends(manager),
-    redis: AsyncRedis = Depends(get_redis),
-    user_service: UserService = Depends(user_service_dep),
-):
-    await user_service.record_heartbeat(user, redis)
-    return APIResponse.ok(
-        message="心跳上报成功",
-        code=status.HTTP_200_OK,
-    )
 
 
 @router.put("/settings")

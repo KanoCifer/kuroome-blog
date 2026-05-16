@@ -1,6 +1,5 @@
 import { socialGateway } from '@/api/socialGateway';
 import animationData from '@/assets/Success Micro Interaction.json';
-import { createAuthGateway } from '@/auth/authGateway';
 import { BentoCard } from '@/components/bento/BentoCard';
 import { useNotificationStore } from '@/stores/notificationState';
 import { motion } from 'framer-motion';
@@ -8,7 +7,6 @@ import { useLottie } from 'lottie-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const authGateway = createAuthGateway();
 
 const VUE_SITE_URL = 'https://kanocifer.chat';
 
@@ -57,7 +55,6 @@ function LikeAnimation() {
 }
 
 export function BentoProfile() {
-  const [adminOnline, setAdminOnline] = useState<boolean>(true);
   const [likesCount, setLikesCount] = useState<number>(0);
   const notifySuccess = useNotificationStore((state) => state.success);
   const notifyError = useNotificationStore((state) => state.error);
@@ -77,12 +74,6 @@ export function BentoProfile() {
     return () => {
       isMounted = false;
     };
-  }, []);
-
-  useEffect(() => {
-    authGateway.fetchAdminStatus().then((status) => {
-      setAdminOnline(status === 1);
-    });
   }, []);
 
   const handleLike = async () => {
@@ -137,23 +128,7 @@ export function BentoProfile() {
           <p className="font-medium text-gray-600 dark:text-gray-400">
             Developer
           </p>
-          {/* <!-- Admin Status Badge --> */}
-          <div className="mt-2 flex items-center gap-2">
-            <span
-              className={`h-2 w-2 rounded-full ${
-                adminOnline ? 'animate-pulse bg-green-500' : 'bg-red-500'
-              }`}
-            ></span>
-            <span
-              className={`text-xs font-semibold tracking-widest uppercase ${
-                adminOnline
-                  ? 'text-green-700 dark:text-green-400'
-                  : 'text-red-700 dark:text-red-400'
-              }`}
-            >
-              {adminOnline ? 'Active Now' : 'Offline'}
-            </span>
-          </div>
+
         </div>
 
         {/* 点赞按钮 */}

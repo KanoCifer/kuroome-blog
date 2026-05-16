@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import random
 import secrets
-import time
 from datetime import timedelta
 from urllib.parse import urlencode
 
@@ -41,10 +40,6 @@ class UserService:
 
     def __init__(self, repo: UserRepo):
         self.repo = repo
-
-    async def is_admin_online(self) -> int:
-        """Check if any admin user is currently online."""
-        return await self.repo.is_admin_online()
 
     # ------------------------------------------------------------------ #
     # Authentication
@@ -90,22 +85,9 @@ class UserService:
             "refresh_token": refresh_token,
         }
 
-    async def logout(self, user: User, redis: AsyncRedis) -> None:
-        """Mark user offline and remove from online tracking."""
+    async def logout(self, user: User) -> None:
+        """Mark user offline."""
         await self.repo.set_active_by_id(user.id, False)
-        await redis.zrem("online:users", str(user.id))
-        await redis.delete(f"online:{user.id}")
-
-    async def record_heartbeat(self, user: User, redis: AsyncRedis) -> None:
-        """Update user's last-seen timestamp in Redis sorted set.
-
-        Uses sorted set for efficient online user queries.
-        TTL of 600s auto-cleans stale entries.
-        """
-
-        now = int(time.time())
-        await redis.zadd("online:users", {str(user.id): now})
-        await redis.set(f"online:{user.id}", str(now), ex=600)
 
     # ------------------------------------------------------------------ #
     # User info

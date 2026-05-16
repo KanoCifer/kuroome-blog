@@ -6,9 +6,7 @@ from collections.abc import AsyncIterator
 from datetime import UTC, datetime, timedelta
 
 import psutil
-from redis.asyncio import Redis as AsyncRedis
 
-from app.models.models import User
 from app.repositories.monitor_repo import MonitorRepo
 
 
@@ -23,10 +21,8 @@ class MonitorService:
     def __init__(
         self,
         repo: MonitorRepo,
-        redis: AsyncRedis,
     ) -> None:
         self.repo = repo
-        self.redis = redis
 
     @staticmethod
     def _get_server_status_payload() -> dict[str, float | int | None]:
@@ -184,41 +180,6 @@ class MonitorService:
     async def get_server_status(self) -> dict[str, float | int | None]:
         return self._get_server_status_payload()
 
-    async def get_online_users(self, include_user_details: bool) -> dict:
-        redis = self.redis
-
-        online_count_raw = await redis.get("stats:online_count")
-        online_count = int(online_count_raw) if online_count_raw else 0
-
-        online_user_ids_raw = await redis.zrange("online:users", 0, -1)
-        online_user_ids = [
-            int(uid.decode() if isinstance(uid, bytes) else str(uid))
-            for uid in online_user_ids_raw
-        ]
-
-        user_details: list[dict] = []
-        if include_user_details and online_user_ids:
-            repo = self.repo
-            users: list[User] = await repo.list_users_by_ids(online_user_ids)
-            user_details = [
-                {
-                    "id": user.id,
-                    "username": user.username,
-                    "name": user.name,
-                    "email": user.profile.email if user.profile else None,
-                    "avatar": user.profile.photo if user.profile else None,
-                    "is_admin": user.is_admin,
-                    "active": user.active,
-                }
-                for user in users
-            ]
-
-        return {
-            "online_count": online_count,
-            "online_user_ids": online_user_ids,
-            "user_details": user_details,
-        }
-
     async def stream_server_status(self) -> AsyncIterator[str]:
         while True:
             payload = self._get_server_status_payload()
@@ -272,25 +233,13 @@ class MonitorService:
         from sqlalchemy import update
 
         from app.api.des.db import AsyncSessionFactory
-        from app.models.models import User
 
-        redis = self.redis
+        removed_count = await self._tracker.cleanup_expired(cutoff_seconds)
+        online_count = await self._tracker.count_online()
 
-        now = int(datetime.now(UTC).timestamp())
-        cutoff_time = now - cutoff_seconds
+        await self.redis.set("stats:online_count", str(online_count), ex=120)
 
-        removed_count = await redis.zremrangebyscore(
-            "online:users", 0, cutoff_time
-        )
-        online_count = await redis.zcard("online:users")
-
-        await redis.set("stats:online_count", str(online_count), ex=120)
-
-        online_user_ids = await redis.zrange("online:users", 0, -1)
-        online_user_ids = [
-            int(uid.decode() if isinstance(uid, bytes) else str(uid))
-            for uid in online_user_ids
-        ]
+        online_user_ids = await self._tracker.get_online_users()
 
         if online_user_ids:
             async with AsyncSessionFactory() as session:

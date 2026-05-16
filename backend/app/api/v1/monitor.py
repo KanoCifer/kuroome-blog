@@ -86,26 +86,6 @@ async def get_server_status(
     )
 
 
-@router.get("/online-users")
-async def get_online_users(
-    include_user_details: bool = Query(
-        False,
-        description="是否包含用户详细信息",
-    ),
-    current_user: User = Depends(get_admin_user),
-    monitor_service: MonitorService = Depends(monitor_service_dep),
-):
-    try:
-        payload = await monitor_service.get_online_users(include_user_details)
-    except MonitorDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
-
-    return APIResponse.ok(
-        data=payload,
-        message="在线用户数据获取成功",
-    )
-
-
 @router.get("/server/status/stream")
 async def get_server_status_stream(
     current_user: User = Depends(get_admin_user),

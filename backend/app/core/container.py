@@ -78,10 +78,10 @@ async def get_message_service():
 
 
 @asynccontextmanager
-async def get_monitor_service(redis: AsyncRedis):
+async def get_monitor_service():
     async with get_async_session() as session:
         monitor_repo = MonitorRepo(session)
-        service = MonitorService(repo=monitor_repo, redis=redis)
+        service = MonitorService(repo=monitor_repo)
         yield service
 
 

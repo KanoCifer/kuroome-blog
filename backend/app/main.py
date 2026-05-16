@@ -42,6 +42,7 @@ from app.core import get_settings, register_exception_handlers
 from app.core import logger as app_logger
 from app.models.beanie import MessageBoard, Post, RssArticle, SubscriptionLog
 from app.models.fishing import FishingModelMeta, FishingRecord
+from app.models.friendlinks import FriendLinks
 from app.tasks import broker, send_feishu_message
 from app.utils import close_cache_redis
 
@@ -76,6 +77,7 @@ async def lifespan(app: FastAPI):
             SubscriptionLog,
             FishingRecord,
             FishingModelMeta,
+            FriendLinks,
         ],
     )
     app.state.redis = await init_redis()

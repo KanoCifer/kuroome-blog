@@ -27,20 +27,6 @@
         I'm <span class="text-primary text-3xl font-bold">Kuroome</span>. Welcome to my site!
       </h2>
 
-      <!-- Admin Status Badge -->
-      <div class="mt-2 flex items-center gap-2">
-        <span
-          class="h-2 w-2 rounded-full"
-          :class="auth.adminOnline ? 'bg-success animate-pulse' : 'bg-destructive'"
-        ></span>
-        <span
-          class="text-xs font-semibold tracking-widest uppercase"
-          :class="auth.adminOnline ? 'text-success' : 'text-destructive'"
-        >
-          {{ auth.adminOnline ? "Admin Online" : "Offline" }}
-        </span>
-      </div>
-
       <!-- Visitor Count -->
       <div class="text-muted-foreground mt-3 flex items-center gap-1.5 text-xs">
         <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

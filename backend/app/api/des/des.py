@@ -46,9 +46,8 @@ async def message_service_dep():
         yield service
 
 
-async def monitor_service_dep(request: Request):
-    redis: AsyncRedis = request.app.state.redis
-    async with get_monitor_service(redis=redis) as service:
+async def monitor_service_dep():
+    async with get_monitor_service() as service:
         yield service
 
 

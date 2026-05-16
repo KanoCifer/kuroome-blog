@@ -2,8 +2,13 @@
 
 ## Overview
 
-- Stack: FastAPI + Vue 3 (desktop) + React (mobile, `react-app/`) + TypeScript
-- Dual-frontend: Vue (`frontend/`) and React (`react-app/`) share backend services but maintain independent state stores. API contract changes must sync both ends.
+- Stack: FastAPI + SQLAlchemy 2.0 async (PostgreSQL) + Beanie ODM (MongoDB) + Redis
+- Desktop: Vue 3 (`frontend/`), Mobile: React 19 (`react-app/`)
+- Domain terms: see [domain.md](domain.md)
+
+## Dual-Frontend
+
+Vue (`frontend/`) and React (`react-app/`) share backend services but maintain independent state stores. API contract changes must sync both ends.
 
 ## Backend Layering
 
@@ -15,6 +20,14 @@
 - `schemas/` — Pydantic request/response models
 - `core/` — config, security, exceptions, logging
 - `tasks/` — background jobs (Taskiq + APScheduler)
+
+## API Conventions
+
+- **Base path**: `/api/v1/` (core), `/api/v2/` (extensions: subscription, device, fishing, weather)
+- **Response format**: unified `{status, message, data, code}` envelope
+- **Auth**: JWT access token (12h) + refresh token HTTP-only cookie (30d), optional Passkey / GitHub OAuth
+- **Concurrency**: Todo writes use Redis lock; conflict returns HTTP 423
+- **Task queue**: Taskiq + RabbitMQ for async background jobs
 
 ## Frontend `src/` Layout
 
@@ -41,3 +54,10 @@
 After modifying `backend/app/schemas/`, sync both frontends:
 - `frontend/src/api/` — Vue API client
 - `react-app/src/services/` — React service layer
+
+## Key Constraints
+
+- 同一本 Book（title + author 相同）在全局库中唯一，用户重复添加会报错
+- Fishing index 计算分两步：专家规则公式 → Ridge 回归残差校准
+- 双前端（Vue + React）维护独立状态 Store，API 契约修改必须在两端同步
+- 管理员功能硬编码（`user.id in (1, 2)`），非 RBAC 系统

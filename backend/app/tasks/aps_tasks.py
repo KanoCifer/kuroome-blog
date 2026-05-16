@@ -372,7 +372,7 @@ async def send_daily_summary(
             logger.warning("Taskiq Redis 未初始化，跳过发送每日统计飞书消息")
             return
 
-        async with get_monitor_service(redis) as monitor_service:
+        async with get_monitor_service() as monitor_service:
             stats = await monitor_service.get_daily_summary(target_day_utc)
 
         total_visits = stats["total_visits"]

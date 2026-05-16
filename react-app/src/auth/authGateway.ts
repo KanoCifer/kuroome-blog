@@ -38,7 +38,6 @@ export interface PasskeyLoginResult {
 
 export interface AuthGateway {
   fetchUser: () => Promise<UserInfo | null>;
-  fetchAdminStatus: () => Promise<1 | 0>;
   initCSRF: () => Promise<void>;
   getPasskeyAuthenticationOptions: () => Promise<PublicKeyCredentialRequestOptionsJSON>;
   login: (
@@ -49,7 +48,6 @@ export interface AuthGateway {
   loginWithPasskey: (assertion: unknown) => Promise<PasskeyLoginResult>;
   loginWithGitHub: () => void;
   logout: () => Promise<void>;
-  postHeartbeat: () => Promise<void>;
 }
 
 // 辅助方法
@@ -74,13 +72,6 @@ export function createAuthGateway(): AuthGateway {
     async fetchUser(): Promise<UserInfo | null> {
       const res = await request.get<ApiResponse<UserInfo | null>>('v1/auth/me');
       return res.data.data || null;
-    },
-
-    async fetchAdminStatus(): Promise<1 | 0> {
-      const res = await request.get<ApiResponse<{ admin_online: 1 | 0 }>>(
-        'v1/auth/status-of-admin',
-      );
-      return res.data.data.admin_online;
     },
 
     async initCSRF(): Promise<void> {
@@ -143,10 +134,6 @@ export function createAuthGateway(): AuthGateway {
     async logout(): Promise<void> {
       await request.post('/v1/auth/logout');
       notification.success('已退出登录');
-    },
-
-    async postHeartbeat(): Promise<void> {
-      await request.post('v1/auth/heartbeat');
     },
 
     loginWithGitHub(): void {

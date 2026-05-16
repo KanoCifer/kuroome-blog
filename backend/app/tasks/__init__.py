@@ -82,7 +82,6 @@ __all__ = [
 """
 
 from app.tasks.aps_tasks import refresh_rss_feeds, run_migration_job
-from app.tasks.maintain_task import check_user_heartbeats
 from app.tasks.scheduler import scheduler
 from app.tasks.task import (
     save_cache_to_redis,
@@ -93,7 +92,6 @@ from app.tasks.weread_task import import_books_from_weread
 
 __all__ = [
     "broker",
-    "check_user_heartbeats",
     "import_books_from_weread",
     "refresh_rss_feeds",
     "run_migration_job",

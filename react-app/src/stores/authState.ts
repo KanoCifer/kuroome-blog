@@ -1,5 +1,4 @@
 import { createAuthGateway } from '@/auth/authGateway';
-import { createHeartbeat } from '@/auth/heartbeat';
 import type { UserInfo } from '@/auth/types';
 import { userCache } from '@/auth/userCache';
 import { saveRefreshTokenToStorage } from '@/auth/refreshToken';
@@ -7,14 +6,6 @@ import type { PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/brow
 import { create } from 'zustand';
 
 const authGateway = createAuthGateway();
-const heartbeat = createHeartbeat({
-  isAuthenticated: () => !!userCache.get(),
-  postHeartbeat: () => authGateway.postHeartbeat(),
-  onError: (error: unknown) => {
-    console.error('心跳上报失败:', error);
-  },
-});
-
 let isLoggingOut = false;
 let hydrationPromise: Promise<void> | null = null;
 
@@ -54,7 +45,6 @@ export const useAuthStore = create<AuthState>((set) => ({
           user: userCache.get(),
           isHydrated: true,
         });
-        heartbeat.start();
         return;
       }
 
@@ -70,7 +60,6 @@ export const useAuthStore = create<AuthState>((set) => ({
             isHydrated: true,
           });
           if (userData) {
-            heartbeat.start();
           }
         } catch (err) {
           console.error('获取用户信息失败:', err);
@@ -94,7 +83,6 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
     if (result.user) {
       userCache.set(result.user);
-      heartbeat.start();
     }
     set({
       isAuthenticated: true,
@@ -105,7 +93,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: () => {
     if (isLoggingOut) return;
     isLoggingOut = true;
-    heartbeat.stop();
     userCache.clear();
     authGateway
       .logout()
@@ -130,7 +117,6 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
     if (result.user) {
       userCache.set(result.user);
-      heartbeat.start();
     }
     set({
       isAuthenticated: true,

@@ -34,7 +34,6 @@ export interface PasskeyLoginResult {
 }
 
 export interface AuthGateway {
-  fetchAdminStatus: () => Promise<1 | 0>;
   fetchUser: () => Promise<UserInfo | null>;
   initCSRF: () => Promise<void>;
   getPasskeyAuthenticationOptions: () => Promise<PublicKeyCredentialRequestOptionsJSON>;
@@ -63,11 +62,6 @@ function emptyLoginResult(): LoginResult {
 
 export function createAuthGateway(): AuthGateway {
   return {
-    async fetchAdminStatus(): Promise<1 | 0> {
-      const res = await request.get("v1/auth/status-of-admin");
-      return res.data.data.admin_online;
-    },
-
     async fetchUser(): Promise<UserInfo | null> {
       const res = await request.get<ApiResponse<UserInfo | null>>("v1/auth/me");
       return res.data.data || null;

@@ -25,15 +25,6 @@ class UserRepo:
     # User CRUD
     # ------------------------------------------------------------------ #
 
-    async def is_admin_online(self) -> int:
-        """检查是否有管理员用户在线。"""
-        stmt = select(User).where(User.id == 1, User.active)
-        result = await self.session.execute(stmt)
-        admin_user = result.scalar_one_or_none()
-        if admin_user:
-            return 1
-        return 0
-
     async def get_by_id(
         self,
         user_id: int,
