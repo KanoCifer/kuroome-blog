@@ -2,7 +2,7 @@
   <div class="relative min-h-dvh w-full" :style="containerStyle" ref="parentContainer">
     <FloatingActionButtons
       @openSettings="openSettings"
-      @goToFriendLinks="goToFriendLinks"
+      @goToFriendLinks="$router.push({ name: 'friend-links' })"
       @switchToMobile="switchToMobile"
     />
     <!-- Greeting 弹窗 -->
@@ -10,8 +10,8 @@
     <!-- 钓点卡片 -->
     <BentoMap
       v-if="show.BentoMap"
-      :initial="{ scale: 0 }"
-      :animate="{ scale: 1 }"
+      :initial="{ scale: 0, opacity: 0 }"
+      :animate="{ scale: 1, opacity: 1 }"
       :style="[greetingPosition]"
       class="absolute h-auto w-2xs min-w-fit -translate-x-1/2 -translate-y-1/2"
     />
@@ -50,32 +50,32 @@
     /> -->
     <BentoClock
       v-if="show.BentoClock"
-      :initial="{ scale: 0 }"
-      :animate="{ scale: 1 }"
+      :initial="{ scale: 0, opacity: 0 }"
+      :animate="{ scale: 1, opacity: 1 }"
       ref="clockRef"
       :style="[clockCardPosition]"
       class="absolute w-auto -translate-x-1/2 -translate-y-1/2"
     />
     <BentoCalendar
       v-if="show.BentoCalendar"
-      :initial="{ scale: 0 }"
-      :animate="{ scale: 1 }"
+      :initial="{ scale: 0, opacity: 0 }"
+      :animate="{ scale: 1, opacity: 1 }"
       ref="calRef"
       :style="[calendarPosition]"
       class="absolute w-auto -translate-x-1/2 -translate-y-1/2"
     />
     <BentoTech
       v-if="show.BentoTech"
-      :initial="{ scale: 0.5 }"
-      :animate="{ scale: 1 }"
+      :initial="{ scale: 0.5, opacity: 0 }"
+      :animate="{ scale: 1, opacity: 1 }"
       class="h-2xs absolute w-68 -translate-x-1/2 -translate-y-1/2 p-0!"
       :style="[techPosition]"
     />
 
     <BentoReadingList
       v-if="show.BentoReadingList"
-      :initial="{ scale: 0 }"
-      :animate="{ scale: 1 }"
+      :initial="{ scale: 0, opacity: 0 }"
+      :animate="{ scale: 1, opacity: 1 }"
       :style="[listCardPosition]"
       class="absolute w-90 -translate-x-1/2 -translate-y-1/2 cursor-pointer"
     />
@@ -108,14 +108,7 @@ import SettingsModal from "@/components/layout/SettingsModal.vue";
 import { useCardLayout } from "@/composables/useCardLayout";
 import { AnimatePresence } from "motion-v";
 import { nextTick, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
 import GreetingToast from "./components/GreetingToast.vue";
-
-const router = useRouter();
-
-const goToFriendLinks = () => {
-  router.push({ name: "friend-links" });
-};
 
 const switchToMobile = () => {
   const expires = new Date();
@@ -148,18 +141,12 @@ const openSettings = () => {
 };
 
 const show = ref<Record<string, boolean>>({
-  BentoGreeting: false,
   BentoProfileCard: false,
   BentoNavCard: false,
   BentoClock: false,
   BentoCalendar: false,
-  BentoMemo: false,
-  BentoNewPost: false,
   BentoTech: false,
-  BentoWebsites: false,
   BentoReadingList: false,
-  BentoCat: false,
-  BentoLike: false,
   TodoCard: false,
   BentoMap: false,
 });

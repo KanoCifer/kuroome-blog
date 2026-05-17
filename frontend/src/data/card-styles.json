@@ -1,16 +1,10 @@
 {
   "BentoProfileCard": { "width": 448, "height": 320, "order": 1 },
   "BentoNavCard": { "width": 272, "height": 0, "order": 2 },
-  "BentoGreeting": { "width": 0, "height": 0, "order": 3 },
-  "BentoMemo": { "width": 0, "height": 0, "order": 3 },
-  "BentoWebsites": { "width": 256, "height": 0, "order": 3 },
-  "BentoClock": { "width": 256, "height": 0, "order": 4 },
-  "BentoLike": { "width": 0, "height": 0, "order": 4 },
-  "BentoNewPost": { "width": 0, "height": 0, "order": 4 },
-  "BentoCalendar": { "width": 0, "height": 0, "order": 5 },
-  "BentoMap": { "width": 272, "height": 112, "order": 6 },
-  "BentoReadingList": { "width": 272, "height": 0, "order": 6 },
-  "BentoCat": { "width": 192, "height": 192, "order": 7 },
-  "TodoCard": { "width": 280, "height": 0, "order": 8 },
-  "BentoTech": { "width": 272, "height": 0, "order": 9 }
+  "BentoReadingList": { "width": 272, "height": 0, "order": 4 },
+  "BentoMap": { "width": 272, "height": 112, "order": 4 },
+  "BentoClock": { "width": 256, "height": 0, "order": 5 },
+  "BentoCalendar": { "width": 0, "height": 0, "order": 6 },
+  "TodoCard": { "width": 280, "height": 0, "order": 7 },
+  "BentoTech": { "width": 272, "height": 0, "order": 8 }
 }
