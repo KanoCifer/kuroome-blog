@@ -1,6 +1,6 @@
 <template>
   <!-- Profile Card -->
-  <BentoCard class="flex items-center">
+  <BentoCard class="flex items-center justify-center">
     <div class="flex flex-col items-center justify-center text-center">
       <!-- Avatar with Glow + Active Badge -->
       <div class="group relative mb-4">
@@ -24,8 +24,9 @@
 
       <!-- Name -->
       <h2 class="text-foreground font-family-averia white- mb-2 text-2xl">
-        I'm <span class="text-primary text-3xl font-bold">Kuroome</span>. Welcome to my site!
+        I'm <span class="text-primary text-3xl font-bold">Kuroome</span>.
       </h2>
+      <p class="font-family-averia white- mb-2 text-2xl">Welcome to my site!</p>
 
       <!-- Visitor Count -->
       <div class="text-muted-foreground mt-3 flex items-center gap-1.5 text-xs">

@@ -51,17 +51,15 @@ import {
   BookshelfIcon,
   HomeIcon,
   IconAnalytics,
-  IconTooling,
   IconUser,
   ImportIcon,
   LoginIcon,
   LogoutIcon,
   MessageIcon,
   RegisterIcon,
-  RssIcon,
 } from "@/components/icons";
 import { useAuthStore } from "@/stores/auth";
-import { CreditCard, Image } from "lucide-vue-next";
+import { Image } from "lucide-vue-next";
 import { Motion, type MotionProps } from "motion-v";
 import { onUnmounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
@@ -115,10 +113,7 @@ const navItems = [
   { path: "/", label: "首页", icon: HomeIcon },
   { path: "/blog", label: "近期文章", icon: BlogIcon },
   { path: "/bookshelf", label: "我的书架", icon: BookshelfIcon },
-  { path: "/subscription", label: "订阅管理", icon: CreditCard },
   { path: "/gallery", label: "图片画廊", icon: Image },
-  { path: "/rss", label: "RSS 订阅", icon: RssIcon },
-  { path: "/toolbox/image-toolbox", label: "图片工具", icon: IconTooling },
   { path: "/about", label: "关于网站", icon: AboutIcon },
 ];
 

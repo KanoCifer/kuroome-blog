@@ -1,8 +1,8 @@
 <template>
   <motion.div
-    :whileHover="{ scale: 1.05 }"
-    :whilePress="{ scale: 0.95 }"
-    class="card squircle border-border bg-card/55 rounded-[40px] border p-6 shadow-sm"
+    :whileHover="{ scale: 1.02 }"
+    :whilePress="{ scale: 0.98 }"
+    class="card squircle rounded-[64px] border border-white p-6"
   >
     <slot></slot>
   </motion.div>
@@ -16,6 +16,10 @@ import { motion } from "motion-v";
 @reference "../../assets/base.css";
 
 .card {
-  box-shadow: 0 40px 50px -32px rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(4px);
+  box-shadow:
+    rgba(0, 0, 0, 0.05) 0px 40px 50px -32px,
+    rgba(255, 255, 255, 0.25) 0px 0px 20px 0px inset;
 }
 </style>

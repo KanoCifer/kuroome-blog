@@ -222,10 +222,12 @@
             </ul>
           </nav>
         </div>
-        <!-- Category Sidebar -->
-        <div class="w-full shrink-0 lg:w-72">
-          <div class="sticky top-24">
-            <CategorySidebar @filterPosts="handleFilterPosts" @resetFilter="handleResetFilter" />
+        <!-- HomeSideBar Style Sidebar -->
+        <div class="col-span-1 w-full shrink-0 lg:w-72">
+          <div class="sticky top-24 h-fit space-y-6">
+            <BentoProfileCard />
+            <BentoCalendar />
+            <BentoCategory @filterPosts="handleFilterPosts" @resetFilter="handleResetFilter" />
           </div>
         </div>
       </div>
@@ -242,7 +244,9 @@ import { useHead } from "@unhead/vue";
 import { computed, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import BlogListItem from "./components/BlogListItem.vue";
-import CategorySidebar from "./components/CategorySidebar.vue";
+import BentoCategory from "./components/BentoCategory.vue";
+import BentoProfileCard from "@/views/entry/components/BentoProfileCard.vue";
+import BentoCalendar from "@/views/entry/components/BentoCalendar.vue";
 
 const route = useRoute();
 const router = useRouter();

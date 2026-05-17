@@ -1,9 +1,8 @@
 <template>
   <motion.div
     v-if="isVisible"
-    :initial="{ opacity: 0, scale: 0.95 }"
-    :animate="{ opacity: 1, scale: 1 }"
-    :exit="{ opacity: 0, scale: 0.95, width: 0, transition: { duration: 0.3 } }"
+    :initial="{ opacity: 0 }"
+    :animate="{ opacity: 1 }"
     :transition="{ type: 'spring', stiffness: 500, damping: 35, mass: 1 }"
     layoutId="nav-card"
     class="group fixed top-4 left-4 z-50"
@@ -58,10 +57,10 @@
 </template>
 
 <script setup lang="ts">
-import { BlogIcon, BookshelfIcon, ChangelogIcon, HomeIcon, IconTooling, RssIcon } from "@/components/icons";
+import { BlogIcon, BookshelfIcon, ChangelogIcon, HomeIcon } from "@/components/icons";
 import { useAuthStore } from "@/stores/auth";
 import { useDebounce } from "@vueuse/core";
-import { CreditCard, Image } from "lucide-vue-next";
+import { Image } from "lucide-vue-next";
 import { motion } from "motion-v";
 import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
@@ -82,11 +81,8 @@ const navItems = [
   { to: "/", icon: HomeIcon },
   { to: "/blog", icon: BlogIcon },
   { to: "/bookshelf", icon: BookshelfIcon },
-  { to: "/subscription", icon: CreditCard },
   { to: "/gallery", icon: Image },
-  { to: "/toolbox/image-toolbox", icon: IconTooling },
   { to: "/changelog", icon: ChangelogIcon },
-  { to: "/rss", icon: RssIcon },
 ];
 
 // State

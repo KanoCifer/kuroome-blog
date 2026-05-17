@@ -136,10 +136,16 @@ useHead(headPreload);
 
     <!-- Main Content -->
     <main class="relative scroll-smooth">
+      <!-- 路由出口 -->
+
       <RouterView v-slot="{ Component }">
+        <template v-if="isEntryView">
+          <component :is="Component" :key="$route.path" />
+        </template>
         <transition
+          v-else
           mode="out-in"
-          enter-active-class="transition-all transform-gpu duration-500 ease-out"
+          enter-active-class="transition-all transform-gpu duration-300 ease-out"
           enter-from-class="translate-y-20 opacity-0"
           enter-to-class="translate-y-0 opacity-100"
           leave-active-class="transition-all transform-gpu duration-200 ease-out"
@@ -148,7 +154,6 @@ useHead(headPreload);
         >
           <component :is="Component" :key="$route.path" />
         </transition>
-        <!-- 路由出口 -->
       </RouterView>
     </main>
 
@@ -157,7 +162,5 @@ useHead(headPreload);
 
     <!-- Back to Top Button -->
     <BackToTop />
-
-    <!-- 移动端适配警告弹窗 -->
   </div>
 </template>

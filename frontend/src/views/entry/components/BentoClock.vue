@@ -1,5 +1,5 @@
 <template>
-  <BentoCard class="flex flex-col items-center justify-center">
+  <BentoCard class="flex w-64 flex-col items-center justify-center">
     <p class="text-muted-foreground text-sm font-medium tracking-wider">
       {{ dateLabel }}
     </p>
