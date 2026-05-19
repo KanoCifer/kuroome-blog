@@ -9,7 +9,9 @@ import { computed, defineAsyncComponent, onUnmounted, ref } from "vue";
 import errorAnimationData from "@/assets/error.json";
 import successAnimationData from "@/assets/success.json";
 
-const Vue3Lottie = defineAsyncComponent(() => import("vue3-lottie").then((m) => m.Vue3Lottie));
+const Vue3Lottie = defineAsyncComponent(() =>
+  import("vue3-lottie").then((m) => m.Vue3Lottie),
+);
 const lottieContainer = ref<typeof Vue3Lottie | null>(null);
 const store = useNotificationStore();
 const toasts = computed(() => store.toasts);
@@ -59,14 +61,18 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="fixed top-4 left-1/2 z-9999 w-full -translate-x-1/2 sm:w-96" style="perspective: 1000px">
+  <div
+    class="fixed top-4 left-1/2 z-9999 w-full -translate-x-1/2 sm:w-96"
+    style="perspective: 1000px"
+  >
     <AnimatePresence mode="popLayout">
       <motion.div
         v-for="(t, i) in toasts"
         :key="t.id"
         :initial="{ opacity: 0, y: -40, scale: 0.9 }"
         :animate="{
-          opacity: toasts.length - 1 - i >= 3 ? 0 : 1 - (toasts.length - 1 - i) * 0.15,
+          opacity:
+            toasts.length - 1 - i >= 3 ? 0 : 1 - (toasts.length - 1 - i) * 0.15,
           y: (toasts.length - 1 - i) * 16,
           scale: 1 - (toasts.length - 1 - i) * 0.05,
           zIndex: i,
@@ -79,12 +85,17 @@ onUnmounted(() => {
         ]"
       >
         <component
-          v-if="getIconForType(t.type) !== 'success-lottie' && getIconForType(t.type) !== 'error-lottie'"
+          v-if="
+            getIconForType(t.type) !== 'success-lottie' &&
+            getIconForType(t.type) !== 'error-lottie'
+          "
           :is="getIconForType(t.type)"
           :class="['shrink-0', iconColorForType(t.type)]"
         />
         <Vue3Lottie
-          v-else-if="getIconForType(t.type) === 'success-lottie' && successAnimationData"
+          v-else-if="
+            getIconForType(t.type) === 'success-lottie' && successAnimationData
+          "
           :animationData="successAnimationData"
           :height="96"
           :width="96"
@@ -96,7 +107,9 @@ onUnmounted(() => {
           ref="lottieContainer"
         />
         <Vue3Lottie
-          v-else-if="getIconForType(t.type) === 'error-lottie' && errorAnimationData"
+          v-else-if="
+            getIconForType(t.type) === 'error-lottie' && errorAnimationData
+          "
           :animationData="errorAnimationData"
           :loop="false"
           :autoPlay="true"
@@ -108,7 +121,9 @@ onUnmounted(() => {
           ref="lottieContainer"
         />
 
-        <div class="text-muted-foreground dark:text-foreground flex-1 text-sm leading-snug font-semibold">
+        <div
+          class="text-muted-foreground dark:text-foreground flex-1 text-sm leading-snug font-semibold"
+        >
           {{ t.message }}
         </div>
         <button

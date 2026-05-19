@@ -1,6 +1,10 @@
 import { useAuthStore } from "@/stores/auth";
 import { reportVisitorData } from "@/utils/visitorTracker";
-import { createMemoryHistory, createRouter, createWebHistory } from "vue-router";
+import {
+  createMemoryHistory,
+  createRouter,
+  createWebHistory,
+} from "vue-router";
 
 declare global {
   interface Window {
@@ -349,7 +353,9 @@ router.beforeEach(async (to) => {
     await auth.hydrateAuth();
   }
 
-  const needsAuth = to.matched.some((route) => route.meta?.requiresAuth === true);
+  const needsAuth = to.matched.some(
+    (route) => route.meta?.requiresAuth === true,
+  );
 
   if (needsAuth && !auth.isAuthenticated) {
     return { name: "login", query: { redirect: to.fullPath } };

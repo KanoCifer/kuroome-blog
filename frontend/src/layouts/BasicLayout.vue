@@ -158,7 +158,11 @@ useHead(headPreload);
     </main>
 
     <!-- Footer -->
-    <BasicFooter v-if="themeStore.showFooter === 'true'" :isEntryView="isEntryView" :isAboutView="isAboutView" />
+    <BasicFooter
+      v-if="themeStore.showFooter === 'true'"
+      :isEntryView="isEntryView"
+      :isAboutView="isAboutView"
+    />
 
     <!-- Back to Top Button -->
     <BackToTop />

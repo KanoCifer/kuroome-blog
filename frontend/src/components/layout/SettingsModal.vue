@@ -16,12 +16,22 @@
       leave-from-class="opacity-100 translate-x-0"
       leave-to-class="opacity-0 translate-x-full"
     >
-      <div v-if="modelValue" class="fixed inset-0 z-9999 flex justify-end" @click.self="close">
+      <div
+        v-if="modelValue"
+        class="fixed inset-0 z-9999 flex justify-end"
+        @click.self="close"
+      >
         <!-- Drawer content -->
-        <div class="bg-card dark:bg-card relative z-10 h-full w-full max-w-md rounded-l-2xl">
+        <div
+          class="bg-card dark:bg-card relative z-10 h-full w-full max-w-md rounded-l-2xl"
+        >
           <!-- Header -->
-          <div class="border-border flex items-center justify-between border-b px-6 py-4">
-            <h3 class="text-foreground flex items-center gap-2 font-serif text-lg font-bold">
+          <div
+            class="border-border flex items-center justify-between border-b px-6 py-4"
+          >
+            <h3
+              class="text-foreground flex items-center gap-2 font-serif text-lg font-bold"
+            >
               <SettingIcon class="text-primary h-5 w-5" />
               偏好设置
             </h3>
@@ -29,8 +39,18 @@
               @click="close"
               class="text-muted-foreground hover:bg-accent hover:text-secondary-foreground dark:hover:bg-accent dark:hover:text-foreground flex h-8 w-8 items-center justify-center rounded-full transition-colors"
             >
-              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              <svg
+                class="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -42,7 +62,11 @@
               :key="tab.key"
               @click="activeTab = tab.key"
               class="relative px-4 py-3 text-sm font-medium transition-colors"
-              :class="activeTab === tab.key ? 'text-primary' : 'text-muted-foreground hover:text-foreground'"
+              :class="
+                activeTab === tab.key
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              "
             >
               {{ tab.label }}
               <span
@@ -58,7 +82,11 @@
             <div v-if="activeTab === 'appearance'" class="space-y-6">
               <!-- Footer Toggle -->
               <div>
-                <label class="text-muted-foreground mb-3 block text-sm font-medium"> 页面元素 </label>
+                <label
+                  class="text-muted-foreground mb-3 block text-sm font-medium"
+                >
+                  页面元素
+                </label>
                 <div
                   @click="themeStore.toggleFooter()"
                   class="border-border hover:border-primary dark:border-border flex cursor-pointer items-center justify-between rounded-xl border-2 p-4 transition-all"
@@ -66,25 +94,40 @@
                   <span class="text-sm font-medium">显示页脚</span>
                   <div
                     class="h-6 w-11 rounded-full p-0.5 transition-colors"
-                    :class="themeStore.showFooter === 'true' ? 'bg-primary' : 'bg-muted-foreground/30'"
+                    :class="
+                      themeStore.showFooter === 'true'
+                        ? 'bg-primary'
+                        : 'bg-muted-foreground/30'
+                    "
                   >
                     <div
                       class="h-5 w-5 rounded-full bg-white shadow-md transition-transform"
-                      :class="themeStore.showFooter === 'true' ? 'translate-x-5' : 'translate-x-0'"
+                      :class="
+                        themeStore.showFooter === 'true'
+                          ? 'translate-x-5'
+                          : 'translate-x-0'
+                      "
                     />
                   </div>
                 </div>
               </div>
 
               <div>
-                <label class="text-muted-foreground mb-3 block text-sm font-medium"> 主题模式 </label>
+                <label
+                  class="text-muted-foreground mb-3 block text-sm font-medium"
+                >
+                  主题模式
+                </label>
                 <div class="grid grid-cols-3 gap-3">
                   <button
                     v-for="theme in themes"
                     :key="theme.value"
                     @click="selectTheme(theme.value as Theme, $event)"
                     class="border-border hover:border-primary dark:border-border flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-all"
-                    :class="{ 'border-primary bg-primary/5': themeStore.theme === theme.value }"
+                    :class="{
+                      'border-primary bg-primary/5':
+                        themeStore.theme === theme.value,
+                    }"
                   >
                     <span v-html="theme.icon"></span>
                     <span class="text-xs font-medium">{{ theme.label }}</span>
@@ -94,38 +137,61 @@
 
               <!-- Font Switcher -->
               <div>
-                <label class="text-muted-foreground mb-3 block text-sm font-medium"> 字体 </label>
+                <label
+                  class="text-muted-foreground mb-3 block text-sm font-medium"
+                >
+                  字体
+                </label>
                 <div class="grid grid-cols-2 gap-3">
                   <button
                     @click="themeStore.applyFont('default')"
                     class="border-border hover:border-primary dark:border-border flex flex-col items-center gap-1 rounded-xl border-2 p-3 transition-all"
-                    :class="{ 'border-primary bg-muted': themeStore.font === 'default' }"
+                    :class="{
+                      'border-primary bg-muted': themeStore.font === 'default',
+                    }"
                   >
                     <span class="font-sans text-sm font-medium">默认字体</span>
-                    <span class="text-muted-foreground font-sans text-xs">PingFang SC</span>
+                    <span class="text-muted-foreground font-sans text-xs"
+                      >PingFang SC</span
+                    >
                   </button>
                   <button
                     @click="themeStore.applyFont('harmonyos')"
                     class="border-border hover:border-primary dark:border-border flex flex-col items-center gap-1 rounded-xl border-2 p-3 transition-all"
-                    :class="{ 'border-primary bg-muted': themeStore.font === 'harmonyos' }"
+                    :class="{
+                      'border-primary bg-muted':
+                        themeStore.font === 'harmonyos',
+                    }"
                   >
-                    <span class="font-family-harmonyos text-sm font-medium" style="font-weight: 500"
+                    <span
+                      class="font-family-harmonyos text-sm font-medium"
+                      style="font-weight: 500"
                       >HarmonyOS Sans</span
                     >
-                    <span class="text-muted-foreground font-family-harmonyos text-xs">鸿蒙字体</span>
+                    <span
+                      class="text-muted-foreground font-family-harmonyos text-xs"
+                      >鸿蒙字体</span
+                    >
                   </button>
                 </div>
               </div>
 
               <div>
-                <label class="text-muted-foreground mb-3 block text-sm font-medium"> 配色方案 </label>
+                <label
+                  class="text-muted-foreground mb-3 block text-sm font-medium"
+                >
+                  配色方案
+                </label>
                 <div class="space-y-2">
                   <button
                     v-for="scheme in schemes"
                     :key="scheme.value"
                     @click="themeStore.setScheme(scheme.value)"
                     class="border-border hover:border-primary dark:border-border flex w-full items-center gap-3 rounded-xl border-2 p-3 transition-all"
-                    :class="{ 'border-primary bg-primary/5': themeStore.scheme === scheme.value }"
+                    :class="{
+                      'border-primary bg-primary/5':
+                        themeStore.scheme === scheme.value,
+                    }"
                   >
                     <div class="flex gap-1">
                       <span
@@ -159,12 +225,19 @@
             <!-- Background Tab -->
             <div v-if="activeTab === 'background'" class="space-y-6">
               <div>
-                <label class="text-muted-foreground mb-3 block text-sm font-medium"> 背景模式 </label>
+                <label
+                  class="text-muted-foreground mb-3 block text-sm font-medium"
+                >
+                  背景模式
+                </label>
                 <div class="grid grid-cols-2 gap-3">
                   <button
                     @click="backgroundStore.randomize()"
                     class="border-border hover:border-primary dark:border-border flex items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all"
-                    :class="{ 'border-primary bg-primary/5': backgroundStore.mode === 'random' }"
+                    :class="{
+                      'border-primary bg-primary/5':
+                        backgroundStore.mode === 'random',
+                    }"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -188,7 +261,10 @@
                   <button
                     @click="backgroundStore.mode = 'fixed'"
                     class="border-border hover:border-primary dark:border-border flex items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all"
-                    :class="{ 'border-primary bg-primary/5': backgroundStore.mode === 'fixed' }"
+                    :class="{
+                      'border-primary bg-primary/5':
+                        backgroundStore.mode === 'fixed',
+                    }"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -211,16 +287,25 @@
               </div>
 
               <div v-if="backgroundStore.mode === 'fixed'">
-                <label class="text-muted-foreground mb-3 block text-sm font-medium"> 选择背景 </label>
+                <label
+                  class="text-muted-foreground mb-3 block text-sm font-medium"
+                >
+                  选择背景
+                </label>
                 <div class="grid grid-cols-2 gap-3">
                   <button
                     v-for="(img, index) in backgroundStore.backgroundImages"
                     :key="index"
                     @click="backgroundStore.selectFixed(index)"
                     class="border-border hover:border-primary dark:border-border relative overflow-hidden rounded-xl border-2 transition-all"
-                    :class="{ 'border-primary': backgroundStore.fixedIndex === index }"
+                    :class="{
+                      'border-primary': backgroundStore.fixedIndex === index,
+                    }"
                   >
-                    <div class="h-24 w-full bg-cover bg-center" :style="{ backgroundImage: `url('${img}')` }" />
+                    <div
+                      class="h-24 w-full bg-cover bg-center"
+                      :style="{ backgroundImage: `url('${img}')` }"
+                    />
                     <div
                       v-if="backgroundStore.fixedIndex === index"
                       class="absolute inset-0 flex items-center justify-center bg-black/30"
@@ -239,7 +324,9 @@
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
                     </div>
-                    <div class="bg-card/80 absolute right-2 bottom-2 rounded-md px-2 py-0.5 text-xs backdrop-blur-sm">
+                    <div
+                      class="bg-card/80 absolute right-2 bottom-2 rounded-md px-2 py-0.5 text-xs backdrop-blur-sm"
+                    >
                       {{ index + 1 }}
                     </div>
                   </button>
@@ -301,8 +388,16 @@ const themes: { value: Theme; label: string; icon: string }[] = [
 ];
 
 const schemes: { value: ColorScheme; label: string; colors: string[] }[] = [
-  { value: "sky-blue", label: "Sky Blue", colors: ["#3b82f6", "#0ea5e9", "#6366f1"] },
-  { value: "forest-green", label: "Forest Green", colors: ["#16a34a", "#0d9488", "#65a30d"] },
+  {
+    value: "sky-blue",
+    label: "Sky Blue",
+    colors: ["#3b82f6", "#0ea5e9", "#6366f1"],
+  },
+  {
+    value: "forest-green",
+    label: "Forest Green",
+    colors: ["#16a34a", "#0d9488", "#65a30d"],
+  },
   { value: "paper", label: "Paper", colors: ["#c8713a", "#5a7a62", "#8a653f"] },
   { value: "sage", label: "Sage", colors: ["#4d6f57", "#8b7146", "#5e7072"] },
   { value: "mist", label: "Mist", colors: ["#4f687a", "#5d7569", "#927255"] },

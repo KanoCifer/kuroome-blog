@@ -2,12 +2,27 @@ import request, { type ApiResponse } from "@/api/request";
 import type { BookListResponse } from "@/types";
 
 export interface BookGateway {
-  getBooks(params: { page?: number; per_page?: number }): Promise<BookListResponse>;
-  createBook(payload: { title: string; author: string; iscompleted: boolean }): Promise<void>;
-  updateBook(bookId: number, payload: { title: string; author: string; iscompleted: boolean }): Promise<void>;
-  patchBookStatus(bookId: number, payload: { iscompleted: boolean }): Promise<void>;
+  getBooks(params: {
+    page?: number;
+    per_page?: number;
+  }): Promise<BookListResponse>;
+  createBook(payload: {
+    title: string;
+    author: string;
+    iscompleted: boolean;
+  }): Promise<void>;
+  updateBook(
+    bookId: number,
+    payload: { title: string; author: string; iscompleted: boolean },
+  ): Promise<void>;
+  patchBookStatus(
+    bookId: number,
+    payload: { iscompleted: boolean },
+  ): Promise<void>;
   deleteBook(bookId: number): Promise<void>;
-  importBooks(payload: { weread_cookie: string }): Promise<ApiResponse<{ imported_count: number }>>;
+  importBooks(payload: {
+    weread_cookie: string;
+  }): Promise<ApiResponse<{ imported_count: number }>>;
 }
 
 export const bookGateway: BookGateway = {
@@ -35,7 +50,10 @@ export const bookGateway: BookGateway = {
   },
 
   async importBooks(payload) {
-    const res = await request.post<ApiResponse<{ imported_count: number }>>("v1/import", payload);
+    const res = await request.post<ApiResponse<{ imported_count: number }>>(
+      "v1/import",
+      payload,
+    );
     return res.data;
   },
 };

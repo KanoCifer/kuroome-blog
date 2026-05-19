@@ -3,19 +3,24 @@ import { motion } from "motion-v";
 </script>
 
 <template>
-  <div class="mx-auto my-auto flex max-w-6xl flex-col items-center justify-center">
+  <div
+    class="mx-auto my-auto flex max-w-6xl flex-col items-center justify-center"
+  >
     <motion.div
       :initial="{ opacity: 0, y: 20 }"
       :animate="{ opacity: 1, y: 0 }"
       class="mx-auto mt-36 mb-20 flex max-w-3xl flex-col"
     >
-      <div class="squircle border-border bg-card/70 border p-8 shadow-sm md:p-12">
+      <div
+        class="squircle border-border bg-card/70 border p-8 shadow-sm md:p-12"
+      >
         <article class="text-foreground space-y-8 text-base leading-relaxed">
           <!-- 标题 -->
           <header class="space-y-3">
             <h1 class="text-3xl font-bold">隐私政策</h1>
             <p class="text-muted-foreground text-sm">
-              更新日期：2026 年 5 月 16 日 &nbsp;·&nbsp; 生效日期：2026 年 05 月 16 日
+              更新日期：2026 年 5 月 16 日 &nbsp;·&nbsp; 生效日期：2026 年 05 月
+              16 日
             </p>
           </header>
 
@@ -32,35 +37,56 @@ import { motion } from "motion-v";
 
             <div class="space-y-3">
               <h3 class="text-lg font-medium">在您访问时</h3>
-              <blockquote class="border-primary/30 bg-muted/30 text-muted-foreground border-l-3 py-2 pl-4 italic">
+              <blockquote
+                class="border-primary/30 bg-muted/30 text-muted-foreground border-l-3 py-2 pl-4 italic"
+              >
                 <p>在访问时，收集访问信息的服务会收集不限于以下信息：</p>
               </blockquote>
               <ul class="text-muted-foreground list-disc space-y-1.5 pl-6">
-                <li><strong class="text-foreground">网络身份标识信息</strong>（浏览器 UA、IP 地址等）</li>
-                <li><strong class="text-foreground">设备信息</strong>（设备型号、设备操作系统等）</li>
                 <li>
-                  <strong class="text-foreground">浏览过程</strong>（操作方式、浏览方式与时长、性能与网络加载情况等）
+                  <strong class="text-foreground">网络身份标识信息</strong
+                  >（浏览器 UA、IP 地址等）
+                </li>
+                <li>
+                  <strong class="text-foreground">设备信息</strong
+                  >（设备型号、设备操作系统等）
+                </li>
+                <li>
+                  <strong class="text-foreground">浏览过程</strong
+                  >（操作方式、浏览方式与时长、性能与网络加载情况等）
                 </li>
               </ul>
             </div>
 
             <div class="space-y-3">
               <h3 class="text-lg font-medium">在您注册 / 评论时</h3>
-              <blockquote class="border-primary/30 bg-muted/30 text-muted-foreground border-l-3 py-2 pl-4 italic">
-                <p>在您注册账户或发表评论时，本站会通过以下途径获取您的相关信息：</p>
+              <blockquote
+                class="border-primary/30 bg-muted/30 text-muted-foreground border-l-3 py-2 pl-4 italic"
+              >
+                <p>
+                  在您注册账户或发表评论时，本站会通过以下途径获取您的相关信息：
+                </p>
               </blockquote>
               <ul class="text-muted-foreground list-disc space-y-1.5 pl-6">
                 <li>
-                  <strong class="text-foreground">您的邮箱</strong> — 用于账户注册、密码重置和回复通知（不会公开）
+                  <strong class="text-foreground">您的邮箱</strong> —
+                  用于账户注册、密码重置和回复通知（不会公开）
                 </li>
-                <li><strong class="text-foreground">您的用户名</strong> — 用于公开显示的用户身份标识</li>
                 <li>
-                  <strong class="text-foreground">您的头像</strong> — 通过 Gravatar 服务获取，基于您注册时使用的邮箱
+                  <strong class="text-foreground">您的用户名</strong> —
+                  用于公开显示的用户身份标识
                 </li>
-                <li><strong class="text-foreground">您的网址</strong> — 如果您选择填写，将用于头像点击跳转</li>
                 <li>
-                  <strong class="text-foreground">您的 IP 地址</strong> — 用于反垃圾评论和恶意用户识别（不会公开 IP
-                  地址）
+                  <strong class="text-foreground">您的头像</strong> — 通过
+                  Gravatar 服务获取，基于您注册时使用的邮箱
+                </li>
+                <li>
+                  <strong class="text-foreground">您的网址</strong> —
+                  如果您选择填写，将用于头像点击跳转
+                </li>
+                <li>
+                  <strong class="text-foreground">您的 IP 地址</strong> —
+                  用于反垃圾评论和恶意用户识别（不会公开 IP 地址）
                 </li>
                 <li>
                   <strong class="text-foreground">您的浏览器代理</strong> —
@@ -72,8 +98,9 @@ import { motion } from "motion-v";
             <div class="space-y-3">
               <h3 class="text-lg font-medium">如何使用 Cookies 和本地存储</h3>
               <p class="text-muted-foreground">
-                本站为实现用户认证、深色模式切换、偏好设置等功能，会在您的浏览器中进行本地存储（包括 Cookies 和
-                LocalStorage）。您可以随时清除浏览器中保存的所有 Cookies 以及
+                本站为实现用户认证、深色模式切换、偏好设置等功能，会在您的浏览器中进行本地存储（包括
+                Cookies 和 LocalStorage）。您可以随时清除浏览器中保存的所有
+                Cookies 以及
                 LocalStorage，不会影响您的正常使用（但需要重新登录）。
               </p>
               <p class="text-muted-foreground text-sm">
@@ -99,10 +126,18 @@ import { motion } from "motion-v";
           <!-- 第三方服务 -->
           <section class="space-y-3">
             <h2 class="text-xl font-semibold">第三方服务</h2>
-            <p class="text-muted-foreground">本站使用以下第三方服务，它们可能收集您的相关信息：</p>
+            <p class="text-muted-foreground">
+              本站使用以下第三方服务，它们可能收集您的相关信息：
+            </p>
             <ul class="text-muted-foreground list-disc space-y-1.5 pl-6">
-              <li><strong class="text-foreground">Gravatar</strong> — 用于获取您的头像</li>
-              <li><strong class="text-foreground">GitHub OAuth</strong> — 用于第三方登录（仅在您选择使用时）</li>
+              <li>
+                <strong class="text-foreground">Gravatar</strong> —
+                用于获取您的头像
+              </li>
+              <li>
+                <strong class="text-foreground">GitHub OAuth</strong> —
+                用于第三方登录（仅在您选择使用时）
+              </li>
             </ul>
           </section>
 
@@ -127,11 +162,12 @@ import { motion } from "motion-v";
           <section class="space-y-3">
             <h2 class="text-xl font-semibold">附属协议</h2>
             <p class="text-muted-foreground">
-              当本站监测到存在恶意访问、恶意请求、恶意攻击、恶意评论的行为时，为了防止增大受害范围，可能会临时将您的 IP
-              地址及访问信息短期内添加到黑名单，短期内禁止访问。
+              当本站监测到存在恶意访问、恶意请求、恶意攻击、恶意评论的行为时，为了防止增大受害范围，可能会临时将您的
+              IP 地址及访问信息短期内添加到黑名单，短期内禁止访问。
             </p>
             <p class="text-muted-foreground">
-              此黑名单可能会被公开，并可能共享给其他站点使用，包括但不限于：IP 地址、设备信息、地理位置等。
+              此黑名单可能会被公开，并可能共享给其他站点使用，包括但不限于：IP
+              地址、设备信息、地理位置等。
             </p>
           </section>
 
@@ -146,17 +182,26 @@ import { motion } from "motion-v";
           <!-- 联系本站 -->
           <section class="space-y-3">
             <h2 class="text-xl font-semibold">联系本站</h2>
-            <p class="text-muted-foreground">如果您对本隐私政策有任何疑问，请通过以下方式与本站取得联系：</p>
+            <p class="text-muted-foreground">
+              如果您对本隐私政策有任何疑问，请通过以下方式与本站取得联系：
+            </p>
             <ul class="text-muted-foreground list-disc space-y-1.5 pl-6">
               <li>
                 GitHub：
-                <a href="https://github.com/KanoCifer" target="_blank" class="text-primary hover:underline"
+                <a
+                  href="https://github.com/KanoCifer"
+                  target="_blank"
+                  class="text-primary hover:underline"
                   >KanoCifer</a
                 >
               </li>
               <li>
                 邮箱：
-                <a href="mailto:kano3255@outlook.com" class="text-primary hover:underline">kano3255@outlook.com</a>
+                <a
+                  href="mailto:kano3255@outlook.com"
+                  class="text-primary hover:underline"
+                  >kano3255@outlook.com</a
+                >
               </li>
             </ul>
           </section>

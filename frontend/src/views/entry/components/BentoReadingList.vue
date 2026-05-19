@@ -5,7 +5,10 @@
       class="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-transparent to-orange-500/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
     />
 
-    <RouterLink to="/home" class="relative flex h-full flex-col justify-between p-1">
+    <RouterLink
+      to="/home"
+      class="relative flex h-full flex-col justify-between p-1"
+    >
       <!-- 顶部：图标和标题 -->
       <div class="flex items-start justify-between">
         <div
@@ -17,7 +20,10 @@
           <div
             v-for="(color, i) in bookCovers"
             :key="i"
-            :class="['h-8 w-6 rounded shadow-sm transition-transform duration-300', color]"
+            :class="[
+              'h-8 w-6 rounded shadow-sm transition-transform duration-300',
+              color,
+            ]"
             :style="{ transitionDelay: `${i * 50}ms` }"
           />
         </div>
@@ -26,7 +32,9 @@
       <!-- 中部：统计信息 -->
       <div class="mt-3 space-y-2">
         <div class="flex items-baseline gap-1">
-          <span class="text-foreground text-2xl font-bold tracking-tight">{{ displayCount }}</span>
+          <span class="text-foreground text-2xl font-bold tracking-tight">{{
+            displayCount
+          }}</span>
           <span class="text-muted-foreground text-xs">本在读</span>
         </div>
 
@@ -34,7 +42,9 @@
         <div class="space-y-1">
           <div class="flex items-center justify-between text-[10px]">
             <span class="text-muted-foreground">本月进度</span>
-            <span class="font-medium text-amber-600">{{ progressPercent }}%</span>
+            <span class="font-medium text-amber-600"
+              >{{ progressPercent }}%</span
+            >
           </div>
           <div class="bg-muted h-1.5 overflow-hidden rounded-full">
             <div

@@ -27,7 +27,9 @@ export const useAuthStore = defineStore("auth", () => {
   // ---------------------- 方法（Actions） ----------------------
 
   // 2. 获取当前登录用户信息
-  async function fetchUser(options: { silentOnUnauthenticated?: boolean } = {}) {
+  async function fetchUser(
+    options: { silentOnUnauthenticated?: boolean } = {},
+  ) {
     loading.value = true;
     try {
       const userData = await authGateway.fetchUser();

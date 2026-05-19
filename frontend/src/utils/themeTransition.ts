@@ -1,6 +1,11 @@
 import type { Theme } from "@/stores/theme";
 
-function getCssVar(isDark: boolean, scheme: string | undefined, varName: string, fallback: string): string {
+function getCssVar(
+  isDark: boolean,
+  scheme: string | undefined,
+  varName: string,
+  fallback: string,
+): string {
   const temp = document.createElement("div");
   temp.style.cssText = "position:absolute;visibility:hidden;";
   if (isDark) temp.classList.add("dark");
@@ -11,7 +16,10 @@ function getCssVar(isDark: boolean, scheme: string | undefined, varName: string,
   return value || fallback;
 }
 
-function createTransitionIcon(targetTheme: Theme, _inkColor: string): HTMLElement {
+function createTransitionIcon(
+  targetTheme: Theme,
+  _inkColor: string,
+): HTMLElement {
   const container = document.createElement("div");
   container.style.cssText = `
     position: absolute;
@@ -33,12 +41,29 @@ function createTransitionIcon(targetTheme: Theme, _inkColor: string): HTMLElemen
   return container;
 }
 
-export function playThemeTransition(event: MouseEvent, targetTheme: Theme, scheme?: string, onComplete?: () => void) {
+export function playThemeTransition(
+  event: MouseEvent,
+  targetTheme: Theme,
+  scheme?: string,
+  onComplete?: () => void,
+) {
   const isDark =
-    targetTheme === "dark" || (targetTheme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    targetTheme === "dark" ||
+    (targetTheme === "system" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
 
-  const targetColor = getCssVar(isDark, scheme, "--paper", isDark ? "#0f172a" : "#ffffff");
-  const inkColor = getCssVar(isDark, scheme, "--ink", isDark ? "#f8fafc" : "#0f172a");
+  const targetColor = getCssVar(
+    isDark,
+    scheme,
+    "--paper",
+    isDark ? "#0f172a" : "#ffffff",
+  );
+  const inkColor = getCssVar(
+    isDark,
+    scheme,
+    "--ink",
+    isDark ? "#f8fafc" : "#0f172a",
+  );
 
   const cx = event.clientX;
   const cy = event.clientY;

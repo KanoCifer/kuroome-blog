@@ -3,7 +3,9 @@
     <p class="text-muted-foreground text-sm font-medium tracking-wider">
       {{ dateLabel }}
     </p>
-    <p class="text-primary/80 font-family-harmonyos mt-2 text-6xl font-bold tracking-tight">
+    <p
+      class="text-primary/80 font-family-harmonyos mt-2 text-6xl font-bold tracking-tight"
+    >
       {{ timeLabel }}
     </p>
     <p class="text-muted-foreground mt-1 text-sm">

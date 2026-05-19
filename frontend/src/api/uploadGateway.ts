@@ -6,7 +6,10 @@ export interface UploadGateway {
 
 export const uploadGateway: UploadGateway = {
   async uploadEditorImage(formData: FormData): Promise<{ url: string }> {
-    const res = await request.post<{ data: { url: string } }>("v1/upload-image", formData);
+    const res = await request.post<{ data: { url: string } }>(
+      "v1/upload-image",
+      formData,
+    );
     return res.data.data;
   },
 };

@@ -11,7 +11,15 @@ import { useHead } from "@unhead/vue";
 import { Modal } from "ant-design-vue";
 import hljs from "highlight.js/lib/common";
 import "highlight.js/styles/github-dark.css";
-import { computed, createVNode, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import {
+  computed,
+  createVNode,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  ref,
+  watch,
+} from "vue";
 import { useRoute, useRouter } from "vue-router";
 import CalendarIcon from "../../components/icons/CalendarIcon.vue";
 import DelIcon from "../../components/icons/DelIcon.vue";
@@ -43,7 +51,8 @@ const fetchPost = async () => {
     post.value = res as unknown as Post;
   } catch (err: unknown) {
     console.error(err);
-    errorMessage.value = err instanceof Error ? err.message : "加载文章失败，请稍后重试。";
+    errorMessage.value =
+      err instanceof Error ? err.message : "加载文章失败，请稍后重试。";
     useNotificationStore().error(errorMessage.value);
   } finally {
     isLoading.value = false;
@@ -94,7 +103,9 @@ const subtitle = computed(() => {
 });
 
 useHead(() => ({
-  title: post.value ? `${post.value.title} - ReadingList` : "文章未找到 - ReadingList",
+  title: post.value
+    ? `${post.value.title} - ReadingList`
+    : "文章未找到 - ReadingList",
   meta: [
     {
       name: "description",
@@ -192,7 +203,8 @@ const handleDelete = async () => {
     router.push("/blog");
   } catch (err: unknown) {
     console.error("删除文章失败:", err);
-    const errorMsg = err instanceof Error ? err.message : "删除文章失败，请稍后重试";
+    const errorMsg =
+      err instanceof Error ? err.message : "删除文章失败，请稍后重试";
     useNotificationStore().error(errorMsg);
   }
 };
@@ -265,7 +277,9 @@ onUnmounted(() => {
   <BasicDetail :title="post?.title || ''" :subtitle="subtitle">
     <!-- Loading -->
     <div v-if="isLoading" class="sm:col-span-2 lg:col-span-3">
-      <div class="border-border bg-card animate-pulse space-y-6 rounded-2xl border p-8 shadow-sm">
+      <div
+        class="border-border bg-card animate-pulse space-y-6 rounded-2xl border p-8 shadow-sm"
+      >
         <div class="bg-muted mb-6 h-8 w-3/4 rounded" />
         <div class="mb-8 flex gap-4">
           <div class="bg-muted h-4 w-24 rounded" />
@@ -314,7 +328,10 @@ onUnmounted(() => {
 
     <!-- Content -->
     <template v-else>
-      <div v-if="showEditButton && post" class="flex items-center justify-end gap-2 sm:col-span-2 lg:col-span-3">
+      <div
+        v-if="showEditButton && post"
+        class="flex items-center justify-end gap-2 sm:col-span-2 lg:col-span-3"
+      >
         <router-link
           :to="`/blog/edit/${post._id}`"
           class="bg-accent text-foreground hover:bg-accent/80 inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors"
@@ -341,7 +358,10 @@ onUnmounted(() => {
           </h1>
 
           <div class="text-primary flex flex-wrap gap-x-6 gap-y-3 text-sm">
-            <div v-if="post.author" class="flex items-center gap-1.5 font-medium">
+            <div
+              v-if="post.author"
+              class="flex items-center gap-1.5 font-medium"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -376,7 +396,11 @@ onUnmounted(() => {
       </div>
 
       <div v-if="post" class="sm:col-span-2 lg:col-span-3">
-        <ArticleComments :post-id="postId" :comments="comments" @refresh="fetchPost" />
+        <ArticleComments
+          :post-id="postId"
+          :comments="comments"
+          @refresh="fetchPost"
+        />
       </div>
     </template>
   </BasicDetail>

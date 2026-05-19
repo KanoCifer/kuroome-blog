@@ -3,7 +3,9 @@ import { computed } from "vue";
 export function useGreeting() {
   const currentHour = computed(() => new Date().getHours());
 
-  const isDay = computed(() => currentHour.value >= 6 && currentHour.value < 18);
+  const isDay = computed(
+    () => currentHour.value >= 6 && currentHour.value < 18,
+  );
 
   const greeting = computed(() => {
     if (currentHour.value < 12) return "Good Morning";

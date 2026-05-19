@@ -5,7 +5,12 @@
       class="squircle hover:bg-accent rounded-xl p-2 transition-all hover:scale-110"
       title="选择背景图"
     >
-      <svg class="text-primary h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg
+        class="text-primary h-5 w-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -84,7 +89,11 @@
           >
             <div
               class="flex-shrink-0 overflow-hidden rounded-md bg-cover bg-center"
-              :style="{ backgroundImage: `url('${img}')`, width: '40px', height: '24px' }"
+              :style="{
+                backgroundImage: `url('${img}')`,
+                width: '40px',
+                height: '24px',
+              }"
             />
             <span class="flex-1 text-left">背景 {{ index + 1 }}</span>
             <svg

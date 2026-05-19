@@ -1,5 +1,9 @@
 <template>
-  <BentoCard :initial="{ scale: 0 }" :animate="{ scale: 1 }" class="group relative h-28 w-60 min-w-0 overflow-hidden">
+  <BentoCard
+    :initial="{ scale: 0 }"
+    :animate="{ scale: 1 }"
+    class="group relative h-28 w-60 min-w-0 overflow-hidden"
+  >
     <!-- 背景水波纹效果 -->
     <div
       class="absolute inset-0 bg-linear-to-br from-teal-500/10 via-cyan-500/5 to-blue-500/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
@@ -16,7 +20,10 @@
       <circle cx="50" cy="50" r="20" opacity="0.7" />
     </svg>
 
-    <RouterLink to="/fishing-map" class="relative flex h-full flex-col justify-between p-1">
+    <RouterLink
+      to="/fishing-map"
+      class="relative flex h-full flex-col justify-between p-1"
+    >
       <!-- 顶部：图标和状态 -->
       <div class="flex items-start justify-between">
         <div
@@ -24,16 +31,23 @@
         >
           <FishingRod class="size-5 text-teal-600" />
         </div>
-        <div v-if="weatherStatus" class="flex items-center gap-1 rounded-full bg-teal-500/10 px-2 py-0.5">
+        <div
+          v-if="weatherStatus"
+          class="flex items-center gap-1 rounded-full bg-teal-500/10 px-2 py-0.5"
+        >
           <component :is="weatherStatus.icon" class="size-3 text-teal-600" />
-          <span class="text-[10px] font-medium text-teal-700">{{ weatherStatus.text }}</span>
+          <span class="text-[10px] font-medium text-teal-700">{{
+            weatherStatus.text
+          }}</span>
         </div>
       </div>
 
       <!-- 中部：统计和地图预览 -->
       <div class="mt-3 space-y-2">
         <div class="flex items-baseline gap-1">
-          <span class="text-foreground text-2xl font-bold tracking-tight">{{ displaySpots }}</span>
+          <span class="text-foreground text-2xl font-bold tracking-tight">{{
+            displaySpots
+          }}</span>
           <span class="text-muted-foreground text-xs">个钓点</span>
         </div>
       </div>
@@ -42,9 +56,13 @@
       <div class="mt-2 flex items-center justify-between">
         <div class="flex items-center gap-1.5">
           <Waves class="size-3 text-teal-500/60" />
-          <span class="text-muted-foreground text-[10px]">{{ tideStatus }}</span>
+          <span class="text-muted-foreground text-[10px]">{{
+            tideStatus
+          }}</span>
         </div>
-        <span class="text-[10px] font-medium text-teal-600">{{ lastRecord }}</span>
+        <span class="text-[10px] font-medium text-teal-600">{{
+          lastRecord
+        }}</span>
       </div>
     </RouterLink>
   </BentoCard>
@@ -53,7 +71,14 @@
 <script setup lang="ts">
 import BentoCard from "@/components/bento/BentoCard.vue";
 import { useAnimateNumber } from "@/composables/useAnimateNumber";
-import { Cloud, CloudRain, FishingRod, Sun, Waves, Wind } from "lucide-vue-next";
+import {
+  Cloud,
+  CloudRain,
+  FishingRod,
+  Sun,
+  Waves,
+  Wind,
+} from "lucide-vue-next";
 import { computed, onMounted, ref, type Component } from "vue";
 
 const { displayValue: displaySpots, animateTo } = useAnimateNumber();

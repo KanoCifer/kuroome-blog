@@ -1,5 +1,9 @@
 <template>
-  <div class="relative min-h-dvh w-full" :style="containerStyle" ref="parentContainer">
+  <div
+    class="relative min-h-dvh w-full"
+    :style="containerStyle"
+    ref="parentContainer"
+  >
     <FloatingActionButtons
       @openSettings="openSettings"
       @goToFriendLinks="$router.push({ name: 'friend-links' })"
@@ -76,6 +80,10 @@
       v-if="show.BentoReadingList"
       :initial="{ scale: 0, opacity: 0 }"
       :animate="{ scale: 1, opacity: 1 }"
+      :transition="{
+        type: 'spring',
+        duration: 0.3,
+      }"
       :style="[listCardPosition]"
       class="absolute w-90 -translate-x-1/2 -translate-y-1/2 cursor-pointer"
     />
@@ -159,14 +167,16 @@ onMounted(async () => {
 
   cardNamesByOrder.forEach((cardName) => {
     const order = cardStyles[cardName]?.order || 0;
-    const delay = order * ANIMATION_DELAY * 1000;
+    const delay = order * ANIMATION_DELAY * 1500;
     setTimeout(() => {
-      show.value[cardName] = true;
+      requestAnimationFrame(() => {
+        show.value[cardName] = true;
+      });
     }, delay);
   });
 
   // Refresh dimensions after all cards have rendered
-  const maxDelay = maxOrder * ANIMATION_DELAY * 1000;
+  const maxDelay = maxOrder * ANIMATION_DELAY * 1500;
   setTimeout(() => {
     window.dispatchEvent(new Event("resize"));
   }, maxDelay);

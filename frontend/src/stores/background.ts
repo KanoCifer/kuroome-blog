@@ -3,22 +3,33 @@ import { defineStore } from "pinia";
 
 export type BackgroundMode = "fixed" | "random";
 
-const BACKGROUND_IMAGES = Array.from({ length: 10 }, (_, i) => `/background/bg-${i + 1}.webp`);
+const BACKGROUND_IMAGES = Array.from(
+  { length: 10 },
+  (_, i) => `/background/bg-${i + 1}.webp`,
+);
 
 export const useBackgroundStore = defineStore("background", () => {
-  const mode = ref<BackgroundMode>((localStorage.getItem("readinglist_bg_mode") as BackgroundMode) || "fixed");
+  const mode = ref<BackgroundMode>(
+    (localStorage.getItem("readinglist_bg_mode") as BackgroundMode) || "fixed",
+  );
 
   const fixedIndex = ref<number>(
     (() => {
       const stored = localStorage.getItem("readinglist_bg_index");
       const n = stored ? Number.parseInt(stored, 10) : NaN;
-      return Number.isFinite(n) && n >= 0 && n < BACKGROUND_IMAGES.length ? n : 0;
+      return Number.isFinite(n) && n >= 0 && n < BACKGROUND_IMAGES.length
+        ? n
+        : 0;
     })(),
   );
 
-  const randomIndex = ref<number>(Math.floor(Math.random() * BACKGROUND_IMAGES.length));
+  const randomIndex = ref<number>(
+    Math.floor(Math.random() * BACKGROUND_IMAGES.length),
+  );
 
-  const effectiveIndex = computed(() => (mode.value === "random" ? randomIndex.value : fixedIndex.value));
+  const effectiveIndex = computed(() =>
+    mode.value === "random" ? randomIndex.value : fixedIndex.value,
+  );
 
   const backgroundUrl = computed(() => BACKGROUND_IMAGES[effectiveIndex.value]);
 

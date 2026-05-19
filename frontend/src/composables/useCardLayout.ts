@@ -62,23 +62,38 @@ function position(top: number, left: number) {
  * receive centered positions here — no offset needed.
  */
 export function useCardLayout(containerRef: Ref<HTMLElement | null>) {
-  const { centerX, layoutHeight, containerStyle } = useLayoutCenter(containerRef);
+  const { centerX, layoutHeight, containerStyle } =
+    useLayoutCenter(containerRef);
 
   // leftTotal / rightTotal anchor the left and right column clusters.
   // These use card-style widths so positions auto-adjust if config changes.
   const leftAnchor = computed(
-    () => centerX.value - STYLES.BentoNavCard.width / 2 - LAYOUT.CARD_SPACING - LAYOUT.SIDE_COLUMN_GAP,
+    () =>
+      centerX.value -
+      STYLES.BentoNavCard.width / 2 -
+      LAYOUT.CARD_SPACING -
+      LAYOUT.SIDE_COLUMN_GAP,
   );
   const rightAnchor = computed(
-    () => centerX.value + STYLES.BentoClock.width / 2 + LAYOUT.CARD_SPACING + LAYOUT.SIDE_COLUMN_GAP,
+    () =>
+      centerX.value +
+      STYLES.BentoClock.width / 2 +
+      LAYOUT.CARD_SPACING +
+      LAYOUT.SIDE_COLUMN_GAP,
   );
 
   // Center column (greeting map + profile card)
-  const listCardPosition = computed(() => position(layoutHeight.value * 0.05 - 20, centerX.value));
-  const profilePosition = computed(() => position(layoutHeight.value * 0.5, centerX.value));
+  const listCardPosition = computed(() =>
+    position(layoutHeight.value * 0.05 - 20, centerX.value),
+  );
+  const profilePosition = computed(() =>
+    position(layoutHeight.value * 0.5, centerX.value),
+  );
 
   // Left column
-  const navCardPosition = computed(() => position(layoutHeight.value * LAYOUT.NAV_TOP_RATIO, leftAnchor.value + 20));
+  const navCardPosition = computed(() =>
+    position(layoutHeight.value * LAYOUT.NAV_TOP_RATIO, leftAnchor.value + 20),
+  );
 
   const techPosition = computed(() =>
     position(
@@ -88,10 +103,15 @@ export function useCardLayout(containerRef: Ref<HTMLElement | null>) {
   );
 
   // Right column
-  const websitesPosition = computed(() => position(layoutHeight.value * 0.1, rightAnchor.value + LAYOUT.RIGHT_COL_X));
+  const websitesPosition = computed(() =>
+    position(layoutHeight.value * 0.1, rightAnchor.value + LAYOUT.RIGHT_COL_X),
+  );
 
   const clockCardPosition = computed(() =>
-    position(layoutHeight.value * 0.45 - 50, rightAnchor.value + LAYOUT.RIGHT_COL_X - 70),
+    position(
+      layoutHeight.value * 0.45 - 50,
+      rightAnchor.value + LAYOUT.RIGHT_COL_X - 70,
+    ),
   );
   const calendarPosition = computed(() =>
     position(
@@ -100,15 +120,23 @@ export function useCardLayout(containerRef: Ref<HTMLElement | null>) {
     ),
   );
   const greetingPosition = computed(() =>
-    position(layoutHeight.value * 0.2, rightAnchor.value + LAYOUT.READING_LIST_X),
+    position(
+      layoutHeight.value * 0.2,
+      rightAnchor.value + LAYOUT.READING_LIST_X,
+    ),
   );
 
   // Cat (positioned relative to center with ratio + offset)
   const catPosition = computed(() =>
-    position(layoutHeight.value * LAYOUT.CAT_TOP_RATIO, centerX.value * LAYOUT.CAT_LEFT_RATIO + LAYOUT.CAT_X_ADJUST),
+    position(
+      layoutHeight.value * LAYOUT.CAT_TOP_RATIO,
+      centerX.value * LAYOUT.CAT_LEFT_RATIO + LAYOUT.CAT_X_ADJUST,
+    ),
   );
 
-  const todoPosition = computed(() => position(layoutHeight.value * 0.8 - 20, centerX.value + 40));
+  const todoPosition = computed(() =>
+    position(layoutHeight.value * 0.8 - 20, centerX.value + 40),
+  );
 
   // Card names sorted by order for animation sequencing
   const cardNamesByOrder = Object.entries(STYLES)

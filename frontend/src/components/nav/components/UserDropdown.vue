@@ -22,7 +22,10 @@
           <ol>
             <li v-for="(item, idx) in visibleItems" :key="idx">
               <!-- 分隔线 -->
-              <div v-if="item.divider" class="bg-border dark:bg-border mx-4 h-px" />
+              <div
+                v-if="item.divider"
+                class="bg-border dark:bg-border mx-4 h-px"
+              />
               <!-- 路由链接 -->
               <RouterLink
                 v-else-if="item.to"
@@ -67,7 +70,9 @@
 
     <!-- 用户名 -->
     <div class="flex items-baseline gap-2">
-      <span class="text-foreground dark:text-foreground font-serif text-2xl font-bold">
+      <span
+        class="text-foreground dark:text-foreground font-serif text-2xl font-bold"
+      >
         {{ currentUserName }}
       </span>
       <ChevronDownIcon

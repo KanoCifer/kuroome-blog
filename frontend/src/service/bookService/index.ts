@@ -5,11 +5,18 @@ export const bookService = {
     return bookGateway.getBooks(params);
   },
 
-  async createBook(payload: { title: string; author: string; iscompleted: boolean }) {
+  async createBook(payload: {
+    title: string;
+    author: string;
+    iscompleted: boolean;
+  }) {
     return bookGateway.createBook(payload);
   },
 
-  async updateBook(bookId: number, payload: { title: string; author: string; iscompleted: boolean }) {
+  async updateBook(
+    bookId: number,
+    payload: { title: string; author: string; iscompleted: boolean },
+  ) {
     return bookGateway.updateBook(bookId, payload);
   },
 

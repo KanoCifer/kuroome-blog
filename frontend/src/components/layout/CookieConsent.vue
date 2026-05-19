@@ -94,17 +94,16 @@ const openPrivacy = () => {
 const navigateToFullPolicy = () => {
   showPrivacyPreview.value = false;
   showBanner.value = false;
-  router.push('/privacy');
+  router.push("/privacy");
 };
 
 // TODO(human): Implement privacy policy scroll tracking logic
 // Track if the user has scrolled to the bottom of the privacy policy preview
 // to enable the "Accept" button, ensuring they actually skimmed it.
-const hasReadPrivacy = ref(true); 
+const hasReadPrivacy = ref(true);
 const handlePrivacyScroll = (e: Event) => {
   // Your logic here
 };
-
 </script>
 
 <template>
@@ -120,7 +119,7 @@ const handlePrivacyScroll = (e: Event) => {
     >
       <div
         v-if="showBanner && !consentGiven"
-        class="group fixed right-4 bottom-6 z-50 w-[340px] sm:w-[380px] overflow-hidden rounded-2xl border border-white/[0.06] bg-black/75 shadow-2xl shadow-amber-500/5 backdrop-blur-2xl transition-all duration-300 hover:border-white/[0.10] hover:shadow-amber-500/10 sm:right-8 sm:bottom-8"
+        class="group fixed right-4 bottom-6 z-50 w-[340px] overflow-hidden rounded-2xl border border-white/[0.06] bg-black/75 shadow-2xl shadow-amber-500/5 backdrop-blur-2xl transition-all duration-300 hover:border-white/[0.10] hover:shadow-amber-500/10 sm:right-8 sm:bottom-8 sm:w-[380px]"
       >
         <!-- 顶部装饰光晕 -->
         <div
@@ -131,7 +130,9 @@ const handlePrivacyScroll = (e: Event) => {
           <!-- 标题行 -->
           <div class="mb-3 flex items-center justify-between">
             <div class="flex items-center gap-2.5">
-              <span class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-500/15">
+              <span
+                class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-500/15"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="14"
@@ -149,20 +150,36 @@ const handlePrivacyScroll = (e: Event) => {
                   <path d="M17.33 2.93A10 10 0 0 1 22 12H12Z" />
                 </svg>
               </span>
-              <span class="text-[14px] font-semibold tracking-wide text-white/90">Cookie 与隐私设置</span>
+              <span
+                class="text-[14px] font-semibold tracking-wide text-white/90"
+                >Cookie 与隐私设置</span
+              >
             </div>
-            <button 
+            <button
               @click="openPrivacy"
-              class="text-[12px] text-amber-400/80 hover:text-amber-400 transition-colors flex items-center gap-1"
+              class="flex items-center gap-1 text-[12px] text-amber-400/80 transition-colors hover:text-amber-400"
             >
               隐私协议预览
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="m9 18 6-6-6-6" />
+              </svg>
             </button>
           </div>
 
           <!-- 说明文字 -->
           <p class="mb-4 text-[13px] leading-relaxed text-white/60">
-            本站使用 Cookie 提升浏览体验。继续使用即表示您同意我们的 Cookie 政策与隐私协议。
+            本站使用 Cookie 提升浏览体验。继续使用即表示您同意我们的 Cookie
+            政策与隐私协议。
           </p>
 
           <!-- 操作按钮 -->
@@ -196,61 +213,101 @@ const handlePrivacyScroll = (e: Event) => {
     </Transition>
 
     <!-- 隐私协议预览弹窗 -->
-    <AlertDialog :open="showPrivacyPreview" @update:open="showPrivacyPreview = $event">
+    <AlertDialog
+      :open="showPrivacyPreview"
+      @update:open="showPrivacyPreview = $event"
+    >
       <AlertDialogContent
         class="border-white/[0.06] bg-black/80 text-white shadow-2xl shadow-amber-500/5 backdrop-blur-2xl sm:max-w-[500px]"
       >
-        <div class="pointer-events-none absolute -top-20 -right-20 h-40 w-40 rounded-full bg-amber-500/8 blur-3xl"></div>
-        
+        <div
+          class="pointer-events-none absolute -top-20 -right-20 h-40 w-40 rounded-full bg-amber-500/8 blur-3xl"
+        ></div>
+
         <AlertDialogHeader>
-          <AlertDialogTitle class="text-[16px] font-medium text-white/90">隐私协议核心摘要</AlertDialogTitle>
-          <AlertDialogDescription class="sr-only">隐私协议预览</AlertDialogDescription>
+          <AlertDialogTitle class="text-[16px] font-medium text-white/90"
+            >隐私协议核心摘要</AlertDialogTitle
+          >
+          <AlertDialogDescription class="sr-only"
+            >隐私协议预览</AlertDialogDescription
+          >
         </AlertDialogHeader>
 
-        <div 
-          class="relative flex flex-col gap-3 py-2 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar"
+        <div
+          class="custom-scrollbar relative flex max-h-[40vh] flex-col gap-3 overflow-y-auto py-2 pr-2"
           @scroll="handlePrivacyScroll"
         >
           <div class="space-y-4 text-[13px] leading-relaxed text-white/70">
             <div>
-              <h4 class="text-white/90 font-medium mb-1 flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+              <h4
+                class="mb-1 flex items-center gap-1.5 font-medium text-white/90"
+              >
+                <span class="h-1.5 w-1.5 rounded-full bg-amber-400"></span>
                 信息收集
               </h4>
-              <p class="text-white/50">我们收集必要的网络身份标识(IP/UA)及浏览过程数据以保障服务运行。</p>
+              <p class="text-white/50">
+                我们收集必要的网络身份标识(IP/UA)及浏览过程数据以保障服务运行。
+              </p>
             </div>
             <div>
-              <h4 class="text-white/90 font-medium mb-1 flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+              <h4
+                class="mb-1 flex items-center gap-1.5 font-medium text-white/90"
+              >
+                <span class="h-1.5 w-1.5 rounded-full bg-amber-400"></span>
                 本地存储
               </h4>
-              <p class="text-white/50">使用 Cookie 和 LocalStorage 保存您的登录状态及界面偏好设置。</p>
+              <p class="text-white/50">
+                使用 Cookie 和 LocalStorage 保存您的登录状态及界面偏好设置。
+              </p>
             </div>
             <div>
-              <h4 class="text-white/90 font-medium mb-1 flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+              <h4
+                class="mb-1 flex items-center gap-1.5 font-medium text-white/90"
+              >
+                <span class="h-1.5 w-1.5 rounded-full bg-amber-400"></span>
                 第三方服务
               </h4>
-              <p class="text-white/50">接入 Gravatar (头像) 及 GitHub OAuth (快捷登录)，仅在您使用时生效。</p>
+              <p class="text-white/50">
+                接入 Gravatar (头像) 及 GitHub OAuth
+                (快捷登录)，仅在您使用时生效。
+              </p>
             </div>
-            <div class="pt-2 border-t border-white/[0.06]">
-              <button 
+            <div class="border-t border-white/[0.06] pt-2">
+              <button
                 @click="navigateToFullPolicy"
-                class="text-amber-400/80 hover:text-amber-400 transition-colors text-[12px] inline-flex items-center gap-1"
+                class="inline-flex items-center gap-1 text-[12px] text-amber-400/80 transition-colors hover:text-amber-400"
               >
                 阅读完整《隐私政策》
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                  />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" x2="21" y1="14" y2="3" />
+                </svg>
               </button>
             </div>
           </div>
         </div>
 
         <AlertDialogFooter class="mt-4">
-          <AlertDialogCancel class="h-9 rounded-xl border border-white/[0.08] px-4 text-[12px] font-medium text-white/60 hover:bg-white/[0.04] hover:text-white/80">
+          <AlertDialogCancel
+            class="h-9 rounded-xl border border-white/[0.08] px-4 text-[12px] font-medium text-white/60 hover:bg-white/[0.04] hover:text-white/80"
+          >
             返回
           </AlertDialogCancel>
-          <AlertDialogAction 
-            class="h-9 rounded-xl bg-amber-400/90 px-4 text-[12px] font-medium text-black/90 shadow-lg shadow-amber-500/15 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed"
+          <AlertDialogAction
+            class="h-9 rounded-xl bg-amber-400/90 px-4 text-[12px] font-medium text-black/90 shadow-lg shadow-amber-500/15 hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-50"
             @click="acceptAll"
             :disabled="!hasReadPrivacy"
           >
@@ -265,12 +322,20 @@ const handlePrivacyScroll = (e: Event) => {
       <AlertDialogContent
         class="border-white/[0.06] bg-black/80 text-white shadow-2xl shadow-amber-500/5 backdrop-blur-2xl sm:max-w-[400px]"
       >
-        <div class="pointer-events-none absolute -top-20 -right-20 h-40 w-40 rounded-full bg-amber-500/8 blur-3xl"></div>
-        <div class="pointer-events-none absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-amber-500/5 blur-3xl"></div>
+        <div
+          class="pointer-events-none absolute -top-20 -right-20 h-40 w-40 rounded-full bg-amber-500/8 blur-3xl"
+        ></div>
+        <div
+          class="pointer-events-none absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-amber-500/5 blur-3xl"
+        ></div>
 
         <AlertDialogHeader class="relative">
-          <AlertDialogTitle class="text-[15px] font-medium text-white/90"> Cookie 偏好设置 </AlertDialogTitle>
-          <AlertDialogDescription class="mt-1 text-[12.5px] leading-relaxed text-white/45">
+          <AlertDialogTitle class="text-[15px] font-medium text-white/90">
+            Cookie 偏好设置
+          </AlertDialogTitle>
+          <AlertDialogDescription
+            class="mt-1 text-[12.5px] leading-relaxed text-white/45"
+          >
             选择允许的 Cookie 类别。您可随时通过清除浏览器数据撤回同意。
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -293,7 +358,9 @@ const handlePrivacyScroll = (e: Event) => {
               />
             </div>
             <label :for="`cookie-${cat.id}`" class="flex-1 cursor-pointer">
-              <span class="text-[13px] font-medium text-white/80">{{ cat.label }}</span>
+              <span class="text-[13px] font-medium text-white/80">{{
+                cat.label
+              }}</span>
               <p class="mt-0.5 text-[11.5px] text-white/40">
                 {{ cat.description }}
               </p>

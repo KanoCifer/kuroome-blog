@@ -1,5 +1,8 @@
 <template>
-  <div class="relative flex h-full w-3xs flex-col justify-between px-6 py-4" @click="$router.push('/websites')">
+  <div
+    class="relative flex h-full w-3xs flex-col justify-between px-6 py-4"
+    @click="$router.push('/websites')"
+  >
     <div
       class="text-muted-foreground group-hover:text-foreground text-xs font-bold tracking-wide uppercase transition-colors duration-300"
     >
@@ -39,7 +42,9 @@
       </h3>
     </div>
     <div>
-      <p class="text-muted-foreground group-hover:text-foreground line-clamp-2 text-sm transition-colors duration-300">
+      <p
+        class="text-muted-foreground group-hover:text-foreground line-clamp-2 text-sm transition-colors duration-300"
+      >
         {{ randomSite?.description || "正在获取推荐网站..." }}
       </p>
     </div>
@@ -60,7 +65,9 @@ interface Website {
 }
 
 const randomSite: Website | null =
-  websitesData.sites.length > 0 ? websitesData.sites[Math.floor(Math.random() * websitesData.sites.length)] : null;
+  websitesData.sites.length > 0
+    ? websitesData.sites[Math.floor(Math.random() * websitesData.sites.length)]
+    : null;
 
 const handleImageError = (event: Event) => {
   const img = event.target as HTMLImageElement;

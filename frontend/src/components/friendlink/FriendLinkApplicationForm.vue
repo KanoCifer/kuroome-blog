@@ -87,7 +87,9 @@ const handleSubmit = () => {
     <div class="mx-4 my-2">
       <!-- 申请须知 -->
       <div class="border-primary/15 bg-primary/5 mb-6 rounded-2xl border p-5">
-        <h3 class="text-foreground mb-3 flex items-center gap-2 text-sm font-bold">
+        <h3
+          class="text-foreground mb-3 flex items-center gap-2 text-sm font-bold"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="text-primary h-4 w-4"
@@ -116,7 +118,10 @@ const handleSubmit = () => {
           <li class="flex items-start gap-2">
             <span class="text-primary mt-0.5 shrink-0 text-xs">●</span>
             <span
-              >已在您的网站添加本站友链（<a href="https://kanocifer.chat" target="_blank" class="text-primary underline"
+              >已在您的网站添加本站友链（<a
+                href="https://kanocifer.chat"
+                target="_blank"
+                class="text-primary underline"
                 >kanocifer.chat</a
               >）</span
             >
@@ -127,7 +132,9 @@ const handleSubmit = () => {
           </li>
         </ul>
 
-        <h3 class="text-foreground mt-4 mb-3 flex items-center gap-2 text-sm font-bold">
+        <h3
+          class="text-foreground mt-4 mb-3 flex items-center gap-2 text-sm font-bold"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="text-primary h-4 w-4"
@@ -152,12 +159,18 @@ const handleSubmit = () => {
         </ul>
       </div>
 
-      <h2 class="text-foreground flex items-center gap-3 font-serif text-2xl font-bold">
+      <h2
+        class="text-foreground flex items-center gap-3 font-serif text-2xl font-bold"
+      >
         申请友链
-        <span class="text-muted-foreground items-baseline text-sm italic"> 交换链接，互相访问 </span>
+        <span class="text-muted-foreground items-baseline text-sm italic">
+          交换链接，互相访问
+        </span>
       </h2>
       <p class="my-4">
-        <span class="border-primary/30 bg-primary/20 text-primary rounded-full border px-4 py-2 text-xs font-medium">
+        <span
+          class="border-primary/30 bg-primary/20 text-primary rounded-full border px-4 py-2 text-xs font-medium"
+        >
           填写以下信息，通过邮件提交友链申请
         </span>
       </p>
@@ -165,7 +178,10 @@ const handleSubmit = () => {
       <form @submit.prevent="handleSubmit" class="mt-4">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div class="form-group">
-            <label for="fl-name" class="text-foreground mb-2 block text-sm font-semibold">
+            <label
+              for="fl-name"
+              class="text-foreground mb-2 block text-sm font-semibold"
+            >
               您的昵称 <span class="text-destructive">*</span>
             </label>
             <input
@@ -176,13 +192,20 @@ const handleSubmit = () => {
               :disabled="submitting"
               placeholder="怎么称呼您"
             />
-            <div v-if="errors.name" aria-live="assertive" class="text-destructive mt-1 flex items-center text-sm">
+            <div
+              v-if="errors.name"
+              aria-live="assertive"
+              class="text-destructive mt-1 flex items-center text-sm"
+            >
               {{ errors.name[0] }}
             </div>
           </div>
 
           <div class="form-group">
-            <label for="fl-email" class="text-foreground mb-2 block text-sm font-semibold">
+            <label
+              for="fl-email"
+              class="text-foreground mb-2 block text-sm font-semibold"
+            >
               联系邮箱 <span class="text-destructive">*</span>
             </label>
             <input
@@ -193,13 +216,20 @@ const handleSubmit = () => {
               :disabled="submitting"
               placeholder="your@email.com"
             />
-            <div v-if="errors.email" aria-live="assertive" class="text-destructive mt-1 flex items-center text-sm">
+            <div
+              v-if="errors.email"
+              aria-live="assertive"
+              class="text-destructive mt-1 flex items-center text-sm"
+            >
               {{ errors.email[0] }}
             </div>
           </div>
 
           <div class="form-group">
-            <label for="fl-site-name" class="text-foreground mb-2 block text-sm font-semibold">
+            <label
+              for="fl-site-name"
+              class="text-foreground mb-2 block text-sm font-semibold"
+            >
               网站名称 <span class="text-destructive">*</span>
             </label>
             <input
@@ -210,13 +240,20 @@ const handleSubmit = () => {
               :disabled="submitting"
               placeholder="您的网站名称"
             />
-            <div v-if="errors.siteName" aria-live="assertive" class="text-destructive mt-1 flex items-center text-sm">
+            <div
+              v-if="errors.siteName"
+              aria-live="assertive"
+              class="text-destructive mt-1 flex items-center text-sm"
+            >
               {{ errors.siteName[0] }}
             </div>
           </div>
 
           <div class="form-group">
-            <label for="fl-site-url" class="text-foreground mb-2 block text-sm font-semibold">
+            <label
+              for="fl-site-url"
+              class="text-foreground mb-2 block text-sm font-semibold"
+            >
               网站地址 <span class="text-destructive">*</span>
             </label>
             <input
@@ -227,13 +264,20 @@ const handleSubmit = () => {
               :disabled="submitting"
               placeholder="https://example.com"
             />
-            <div v-if="errors.siteUrl" aria-live="assertive" class="text-destructive mt-1 flex items-center text-sm">
+            <div
+              v-if="errors.siteUrl"
+              aria-live="assertive"
+              class="text-destructive mt-1 flex items-center text-sm"
+            >
               {{ errors.siteUrl[0] }}
             </div>
           </div>
 
           <div class="form-group md:col-span-2">
-            <label for="fl-description" class="text-foreground mb-2 block text-sm font-semibold">
+            <label
+              for="fl-description"
+              class="text-foreground mb-2 block text-sm font-semibold"
+            >
               网站描述 <span class="text-destructive">*</span>
             </label>
             <textarea
@@ -246,10 +290,16 @@ const handleSubmit = () => {
               placeholder="用简短的一段话介绍您的网站（不超过 200 字）"
             ></textarea>
             <div class="mt-1 flex items-center justify-between">
-              <div v-if="errors.description" aria-live="assertive" class="text-destructive flex items-center text-sm">
+              <div
+                v-if="errors.description"
+                aria-live="assertive"
+                class="text-destructive flex items-center text-sm"
+              >
                 {{ errors.description[0] }}
               </div>
-              <div v-else class="text-muted-foreground text-xs">{{ description.length }}/200</div>
+              <div v-else class="text-muted-foreground text-xs">
+                {{ description.length }}/200
+              </div>
             </div>
           </div>
 
@@ -264,7 +314,11 @@ const handleSubmit = () => {
           </div>
         </div>
 
-        <div v-if="successMessage" aria-live="polite" class="bg-success/10 text-success mt-4 rounded-lg p-4">
+        <div
+          v-if="successMessage"
+          aria-live="polite"
+          class="bg-success/10 text-success mt-4 rounded-lg p-4"
+        >
           {{ successMessage }}
         </div>
       </form>

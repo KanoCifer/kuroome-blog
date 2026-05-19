@@ -6,9 +6,13 @@
         <!-- ======== 左列：本站信息 + 友链大卡片 ======== -->
         <div class="space-y-6 lg:col-span-2">
           <!-- 本站信息面板 -->
-          <div class="border-primary/20 bg-primary/5 ring-primary/10 overflow-hidden rounded-4xl border p-8 ring-1">
+          <div
+            class="border-primary/20 bg-primary/5 ring-primary/10 overflow-hidden rounded-4xl border p-8 ring-1"
+          >
             <div class="mb-6 flex items-start gap-5">
-              <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full">
+              <div
+                class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full"
+              >
                 <img
                   :src="selfInfo.icon"
                   :alt="selfInfo.name"
@@ -61,12 +65,18 @@
             <!-- 信息行 -->
             <div class="bg-card/60 space-y-2 rounded-xl p-4">
               <div class="flex items-center gap-3 text-sm">
-                <span class="text-muted-foreground w-16 shrink-0 font-medium">URL</span>
+                <span class="text-muted-foreground w-16 shrink-0 font-medium"
+                  >URL</span
+                >
                 <code class="text-foreground truncate">{{ selfInfo.url }}</code>
               </div>
               <div class="flex items-center gap-3 text-sm">
-                <span class="text-muted-foreground w-16 shrink-0 font-medium">Favicon</span>
-                <code class="text-foreground truncate">{{ selfInfo.icon }}</code>
+                <span class="text-muted-foreground w-16 shrink-0 font-medium"
+                  >Favicon</span
+                >
+                <code class="text-foreground truncate">{{
+                  selfInfo.icon
+                }}</code>
               </div>
               <div class="flex flex-wrap gap-2 pt-1">
                 <span
@@ -149,7 +159,9 @@
             </div>
 
             <!-- 外链箭头 -->
-            <div class="absolute top-6 right-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <div
+              class="absolute top-6 right-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="text-muted-foreground h-5 w-5"
@@ -187,7 +199,9 @@
               />
             </svg>
             <p class="text-muted-foreground text-lg">暂无友链</p>
-            <p class="text-muted-foreground mt-2 text-sm">欢迎提交申请，成为第一位友链伙伴</p>
+            <p class="text-muted-foreground mt-2 text-sm">
+              欢迎提交申请，成为第一位友链伙伴
+            </p>
           </div>
         </div>
 

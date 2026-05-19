@@ -12,11 +12,15 @@ export interface LayoutCenter {
  * Reactive center point and layout height for card positioning.
  * Observes the parent container's width and window's inner height.
  */
-export function useLayoutCenter(containerRef: Ref<HTMLElement | null>): LayoutCenter {
+export function useLayoutCenter(
+  containerRef: Ref<HTMLElement | null>,
+): LayoutCenter {
   const viewportHeight = ref<number>(window.innerHeight);
   const parentWidth = ref<number>(0);
 
-  const layoutHeight = computed<number>(() => Math.max(viewportHeight.value, 820));
+  const layoutHeight = computed<number>(() =>
+    Math.max(viewportHeight.value, 820),
+  );
 
   const centerX = computed<number>(() => parentWidth.value / 2);
   const centerY = computed<number>(() => layoutHeight.value / 2);
