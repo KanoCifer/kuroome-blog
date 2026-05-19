@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { BasicFooter } from "@/components/basic";
+import { BentoNavCard } from "@/components/bento";
 import BackToTop from "@/components/layout/BackToTop.vue";
 import CookieConsent from "@/components/layout/CookieConsent.vue";
 import ToastContainer from "@/components/layout/ToastContainer.vue";
 import BasicNav from "@/components/nav/BasicNav.vue";
+import { useCardLayout } from "@/composables/useCardLayout";
 import { useBackgroundStore } from "@/stores/background";
 import { useThemeStore } from "@/stores/theme";
 import { useScroll } from "@vueuse/core";
@@ -15,9 +17,13 @@ import { RouterView, useRoute } from "vue-router";
 const bgStore = useBackgroundStore();
 const themeStore = useThemeStore();
 const route = useRoute();
+const layoutContainer = ref<HTMLElement | null>(null);
 const isEntryView = ref<boolean>(false);
 const isAboutView = ref<boolean>(false);
 const showBasicNav = ref<boolean>(route.path !== "/");
+
+// Card layout for BentoNavCard positioning on entry view
+const { navCardPosition } = useCardLayout(layoutContainer);
 
 // 监听路由变化
 watch(
@@ -116,7 +122,11 @@ useHead(headPreload);
 </script>
 
 <template>
-  <div class="relative isolate grid min-h-dvh grid-rows-[auto_1fr_auto]">
+  <div
+    ref="layoutContainer"
+    class="relative isolate"
+    :class="isEntryView ? 'flex h-dvh flex-col overflow-hidden' : 'grid min-h-dvh grid-rows-[auto_1fr_auto]'"
+  >
     <!-- 背景图 -->
     <div
       class="pointer-events-none fixed inset-0 -z-10 transform-gpu bg-cover bg-fixed blur-3xl transition-all duration-800"
@@ -128,14 +138,11 @@ useHead(headPreload);
           <ToastContainer />
         </Teleport>
         <CookieConsent />
-        <AnimatePresence>
-          <BasicNav :isEntryView="isEntryView" :isVisible="showBasicNav" />
-        </AnimatePresence>
       </div>
     </header>
 
     <!-- Main Content -->
-    <main class="relative scroll-smooth">
+    <main class="relative flex-1 scroll-smooth">
       <!-- 路由出口 -->
 
       <RouterView v-slot="{ Component }">
@@ -159,12 +166,43 @@ useHead(headPreload);
 
     <!-- Footer -->
     <BasicFooter
-      v-if="themeStore.showFooter === 'true'"
+      v-if="themeStore.showFooter === 'true' && !isEntryView"
       :isEntryView="isEntryView"
       :isAboutView="isAboutView"
     />
 
     <!-- Back to Top Button -->
     <BackToTop />
+
+    <!-- Navigation: cross-route layoutId morph -->
+    <AnimatePresence mode="sync">
+      <BasicNav
+        v-if="showBasicNav"
+        key="basic-nav"
+        layoutId="nav-card"
+        :isEntryView="isEntryView"
+        :isVisible="showBasicNav"
+        :initial="{ opacity: 0 }"
+        :animate="{ opacity: 1 }"
+        :transition="{ type: 'spring', bounce: 0.3, duration: 0.5 }"
+        :exit="{ transition: { duration: 0.5 } }"
+        class="group fixed top-4 left-4 z-50"
+      />
+      <BentoNavCard
+        v-else
+        key="bento-nav"
+        layoutId="nav-card"
+        class="fixed z-50 w-68 -translate-x-1/2 -translate-y-1/2"
+        :style="[navCardPosition]"
+        :initial="{ scale: 0.5, opacity: 0 }"
+        :animate="{ scale: 1, opacity: 1 }"
+        :exit="{ transition: { duration: 0.5 } }"
+        :transition="{
+          type: 'spring',
+          bounce: 0.3,
+          duration: 0.5,
+        }"
+      />
+    </AnimatePresence>
   </div>
 </template>

@@ -1,12 +1,5 @@
 <template>
-  <motion.div
-    v-if="isVisible"
-    :initial="{ opacity: 0 }"
-    :animate="{ opacity: 1 }"
-    :transition="{ type: 'spring', stiffness: 500, damping: 35, mass: 1 }"
-    layoutId="nav-card"
-    class="group fixed top-4 left-4 z-50"
-  >
+  <motion.div>
     <nav
       class="squircle bg-card/80 dark:bg-card/80 z-9999 flex items-center gap-2 px-1 py-2 shadow-lg backdrop-blur-sm"
     >
@@ -57,12 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  BlogIcon,
-  BookshelfIcon,
-  ChangelogIcon,
-  HomeIcon,
-} from "@/components/icons";
+import { BlogIcon, BookshelfIcon, ChangelogIcon, HomeIcon } from "@/components/icons";
 import { useAuthStore } from "@/stores/auth";
 import { useDebounce } from "@vueuse/core";
 import { Image } from "lucide-vue-next";
@@ -73,15 +61,11 @@ import { useRoute } from "vue-router";
 const auth = useAuthStore();
 const route = useRoute();
 
-const props = defineProps<{
+defineProps<{
   isHeaderVisible?: boolean;
   isEntryView?: boolean;
   isVisible?: boolean;
 }>();
-
-const isVisible = computed(() =>
-  props.isVisible !== undefined ? props.isVisible : !props.isEntryView,
-);
 
 // Navigation items config
 const navItems = [

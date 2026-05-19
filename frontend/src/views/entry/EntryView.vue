@@ -1,9 +1,5 @@
 <template>
-  <div
-    class="relative min-h-dvh w-full"
-    :style="containerStyle"
-    ref="parentContainer"
-  >
+  <div class="relative h-dvh w-full" :style="containerStyle" ref="parentContainer">
     <FloatingActionButtons
       @openSettings="openSettings"
       @goToFriendLinks="$router.push({ name: 'friend-links' })"
@@ -27,23 +23,6 @@
       :style="[profilePosition]"
       class="absolute h-70 w-90 min-w-fit -translate-x-1/2 -translate-y-1/2"
     />
-    <AnimatePresence>
-      <BentoNavCard
-        v-if="show.BentoNavCard"
-        layoutId="nav-card"
-        :exit="{ opacity: 0, width: 0, transition: { duration: 0.5 } }"
-        :initial="{ scale: 0.5, opacity: 0 }"
-        :animate="{ scale: 1, opacity: 1 }"
-        :transition="{
-          type: 'spring',
-          stiffness: 500,
-          damping: 35,
-          mass: 1,
-        }"
-        class="absolute w-68 -translate-x-1/2 -translate-y-1/2"
-        :style="[navCardPosition]"
-      />
-    </AnimatePresence>
     <!-- <BentoWebsites
       v-if="show.BentoWebsites"
       :initial="{ scale: 0 }"
@@ -97,15 +76,22 @@
     </div>
     <!-- Settings Modal -->
     <SettingsModal v-model="isSettingsOpen" />
+    <!-- Footer -->
+    <BasicFooter
+      class="absolute right-0 bottom-0 left-0"
+      v-if="themeStore.showFooter === 'true'"
+      :isEntryView="isEntryView"
+      :isAboutView="isAboutView"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import { BasicFooter } from "@/components/basic";
 import {
   BentoCalendar,
   BentoClock,
   BentoMap,
-  BentoNavCard,
   BentoProfileCard,
   BentoReadingList,
   BentoTech,
@@ -114,9 +100,13 @@ import {
 import FloatingActionButtons from "@/components/layout/FloatingActionButtons.vue";
 import SettingsModal from "@/components/layout/SettingsModal.vue";
 import { useCardLayout } from "@/composables/useCardLayout";
-import { AnimatePresence } from "motion-v";
+import { useThemeStore } from "@/stores/theme";
 import { nextTick, onMounted, ref } from "vue";
 import GreetingToast from "./components/GreetingToast.vue";
+
+const themeStore = useThemeStore();
+const isEntryView = ref<boolean>(true);
+const isAboutView = ref<boolean>(false);
 
 const switchToMobile = () => {
   const expires = new Date();
@@ -133,7 +123,6 @@ const {
   greetingPosition,
   todoPosition,
   profilePosition,
-  navCardPosition,
   clockCardPosition,
   calendarPosition,
   techPosition,
@@ -150,7 +139,6 @@ const openSettings = () => {
 
 const show = ref<Record<string, boolean>>({
   BentoProfileCard: false,
-  BentoNavCard: false,
   BentoClock: false,
   BentoCalendar: false,
   BentoTech: false,
@@ -167,7 +155,7 @@ onMounted(async () => {
 
   cardNamesByOrder.forEach((cardName) => {
     const order = cardStyles[cardName]?.order || 0;
-    const delay = order * ANIMATION_DELAY * 1500;
+    const delay = order * ANIMATION_DELAY * 1000;
     setTimeout(() => {
       requestAnimationFrame(() => {
         show.value[cardName] = true;
@@ -176,7 +164,7 @@ onMounted(async () => {
   });
 
   // Refresh dimensions after all cards have rendered
-  const maxDelay = maxOrder * ANIMATION_DELAY * 1500;
+  const maxDelay = maxOrder * ANIMATION_DELAY * 1000;
   setTimeout(() => {
     window.dispatchEvent(new Event("resize"));
   }, maxDelay);
