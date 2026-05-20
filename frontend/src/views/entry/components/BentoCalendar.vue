@@ -1,5 +1,5 @@
 <template>
-  <BentoCard class="flex flex-col">
+  <BentoCard class="flex flex-col select-none">
     <div class="mb-3 flex items-center justify-between">
       <h3 class="text-foreground text-lg font-semibold">
         {{ monthLabel }}
@@ -8,10 +8,7 @@
     </div>
 
     <!-- Weekday headers -->
-    <div
-      class="mb-1 grid gap-x-3 text-center"
-      style="grid-template-columns: repeat(7, 1fr)"
-    >
+    <div class="mb-1 grid gap-x-3 text-center" style="grid-template-columns: repeat(7, 1fr)">
       <span
         v-for="(label, idx) in weekdays"
         :key="idx"
@@ -23,10 +20,7 @@
     </div>
 
     <!-- Days grid -->
-    <div
-      class="grid gap-x-3 text-center"
-      style="grid-template-columns: repeat(7, 1fr)"
-    >
+    <div class="grid gap-x-3 text-center" style="grid-template-columns: repeat(7, 1fr)">
       <!-- Leading blank cells for alignment -->
       <span v-for="n in startOffset" :key="'blank-' + n" />
 
@@ -36,9 +30,7 @@
         :key="day"
         class="mx-auto flex aspect-square w-full max-w-8 items-center justify-center rounded-lg text-sm transition-colors"
         :class="
-          day === today
-            ? 'bg-primary text-primary-foreground font-bold'
-            : 'text-muted-foreground hover:bg-primary/10'
+          day === today ? 'bg-primary text-primary-foreground font-bold' : 'text-muted-foreground hover:bg-primary/10'
         "
       >
         {{ day }}

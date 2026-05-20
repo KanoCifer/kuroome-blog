@@ -1,0 +1,51 @@
+/* 秋实 (Autumn) */
+[data-color-scheme="autumn"] {
+  --radius: 0.625rem;
+  --ink: oklch(0.2 0.05 40);
+  --paper: var(--color-orange-50);
+  --warm-gray: oklch(0.95 0.02 40);
+  --muted: oklch(0.55 0.03 40);
+  --accent-amber: oklch(0.75 0.18 70);
+  --accent-sage: oklch(0.6 0.12 140);
+  --accent-slate: oklch(0.7 0.03 260);
+  --accent-rose: oklch(0.6 0.2 25);
+  --workspace-accent: #de4331;
+  --workspace-accent-contrast: oklch(0.98 0.01 40);
+  --card-bg: var(--color-orange-50);
+  --surface: oklch(0.98 0.01 40 / 0.75);
+  --surface-foreground: oklch(0.2 0.05 40);
+  --chart-1: oklch(0.55 0.2 30);
+  --chart-2: oklch(0.65 0.15 70);
+  --chart-3: oklch(0.45 0.1 240);
+  --chart-4: oklch(0.75 0.18 70);
+  --chart-5: oklch(0.6 0.12 140);
+  --gradient-primary-from: #de4331;
+  --gradient-primary-to: var(--color-orange-500);
+  --gradient-decorative-from: var(--color-red-300);
+  --gradient-decorative-to: var(--color-orange-300);
+}
+
+[data-color-scheme="autumn"].dark {
+  --ink: oklch(0.98 0.01 40);
+  --paper: oklch(0.18 0.03 40);
+  --warm-gray: oklch(0.25 0.03 40);
+  --muted: oklch(0.7 0.02 40);
+  --accent-amber: oklch(0.65 0.12 70);
+  --accent-sage: oklch(0.55 0.1 140);
+  --accent-slate: oklch(0.6 0.03 260);
+  --accent-rose: oklch(0.7 0.18 25);
+  --workspace-accent: #de4331;
+  --workspace-accent-contrast: oklch(0.2 0.05 40);
+  --card-bg: oklch(0.2 0.03 40);
+  --surface: oklch(0.2 0.03 40 / 0.8);
+  --surface-foreground: oklch(0.98 0.01 40);
+  --chart-1: oklch(0.5 0.18 30);
+  --chart-2: oklch(0.6 0.12 70);
+  --chart-3: oklch(0.5 0.1 240);
+  --chart-4: oklch(0.7 0.18 25);
+  --chart-5: oklch(0.65 0.12 70);
+  --gradient-primary-from: #de4331;
+  --gradient-primary-to: var(--color-orange-600);
+  --gradient-decorative-from: var(--color-red-800);
+  --gradient-decorative-to: var(--color-orange-800);
+}

@@ -8,21 +8,23 @@
     <!-- Greeting 弹窗 -->
     <GreetingToast />
     <!-- 钓点卡片 -->
-    <BentoMap
-      v-if="show.BentoMap"
-      :initial="{ scale: 0, opacity: 0 }"
-      :animate="{ scale: 1, opacity: 1 }"
-      :style="[greetingPosition]"
-      class="absolute h-auto w-2xs min-w-fit -translate-x-1/2 -translate-y-1/2"
-    />
-    <BentoProfileCard
-      v-if="show.BentoProfileCard"
-      :initial="{ scale: 0.5, opacity: 0 }"
-      :animate="{ scale: 1, opacity: 1 }"
-      ref="boxRef"
-      :style="[profilePosition]"
-      class="absolute h-70 w-90 min-w-fit -translate-x-1/2 -translate-y-1/2"
-    />
+    <DragWrapper :position="greetingPosition" card-name="BentoMap">
+      <BentoMap
+        v-if="show.BentoMap"
+        :initial="{ scale: 0, opacity: 0 }"
+        :animate="{ scale: 1, opacity: 1 }"
+        class="h-auto w-2xs min-w-fit"
+      />
+    </DragWrapper>
+    <DragWrapper :position="profilePosition" card-name="BentoProfileCard">
+      <BentoProfileCard
+        v-if="show.BentoProfileCard"
+        :initial="{ scale: 0.5, opacity: 0 }"
+        :animate="{ scale: 1, opacity: 1 }"
+        ref="boxRef"
+        class="h-70 w-90 min-w-fit"
+      />
+    </DragWrapper>
     <!-- <BentoWebsites
       v-if="show.BentoWebsites"
       :initial="{ scale: 0 }"
@@ -31,49 +33,49 @@
       class="absolute w-auto -translate-x-1/2 -translate-y-1/2 p-0!"
       :style="[websitesPosition]"
     /> -->
-    <BentoClock
-      v-if="show.BentoClock"
-      :initial="{ scale: 0, opacity: 0 }"
-      :animate="{ scale: 1, opacity: 1 }"
-      ref="clockRef"
-      :style="[clockCardPosition]"
-      class="absolute w-auto -translate-x-1/2 -translate-y-1/2"
-    />
-    <BentoCalendar
-      v-if="show.BentoCalendar"
-      :initial="{ scale: 0, opacity: 0 }"
-      :animate="{ scale: 1, opacity: 1 }"
-      ref="calRef"
-      :style="[calendarPosition]"
-      class="absolute w-auto -translate-x-1/2 -translate-y-1/2"
-    />
-    <BentoTech
-      v-if="show.BentoTech"
-      :initial="{ scale: 0.5, opacity: 0 }"
-      :animate="{ scale: 1, opacity: 1 }"
-      class="h-2xs absolute w-68 -translate-x-1/2 -translate-y-1/2 p-0!"
-      :style="[techPosition]"
-    />
+    <DragWrapper :position="clockCardPosition" card-name="BentoClock">
+      <BentoClock
+        v-if="show.BentoClock"
+        :initial="{ scale: 0, opacity: 0 }"
+        :animate="{ scale: 1, opacity: 1 }"
+        ref="clockRef"
+        class="w-auto"
+      />
+    </DragWrapper>
+    <DragWrapper :position="calendarPosition" card-name="BentoCalendar">
+      <BentoCalendar
+        v-if="show.BentoCalendar"
+        :initial="{ scale: 0, opacity: 0 }"
+        :animate="{ scale: 1, opacity: 1 }"
+        ref="calRef"
+        class="w-auto"
+      />
+    </DragWrapper>
+    <DragWrapper :position="techPosition" card-name="BentoTech">
+      <BentoTech
+        v-if="show.BentoTech"
+        :initial="{ scale: 0.5, opacity: 0 }"
+        :animate="{ scale: 1, opacity: 1 }"
+        class="h-2xs w-68 p-0!"
+      />
+    </DragWrapper>
 
-    <BentoReadingList
-      v-if="show.BentoReadingList"
-      :initial="{ scale: 0, opacity: 0 }"
-      :animate="{ scale: 1, opacity: 1 }"
-      :transition="{
-        type: 'spring',
-        duration: 0.3,
-      }"
-      :style="[listCardPosition]"
-      class="absolute w-90 -translate-x-1/2 -translate-y-1/2 cursor-pointer"
-    />
+    <DragWrapper :position="listCardPosition" card-name="BentoReadingList">
+      <BentoReadingList
+        v-if="show.BentoReadingList"
+        :initial="{ scale: 0, opacity: 0 }"
+        :animate="{ scale: 1, opacity: 1 }"
+        :transition="{
+          type: 'spring',
+          duration: 0.3,
+        }"
+        class="w-90 cursor-pointer"
+      />
+    </DragWrapper>
     <!-- <BentoCat v-if="show.BentoCat" :style="[catPosition]" class="absolute w-2xs -translate-x-1/2 -translate-y-1/2" /> -->
-    <div
-      v-if="show.TodoCard"
-      :style="[todoPosition]"
-      class="absolute top-1/2 -right-20 w-70 min-w-3xs -translate-x-1/2 -translate-y-1/2"
-    >
+    <DragWrapper :position="todoPosition" card-name="TodoCard">
       <TodoCard title="MyTasks" />
-    </div>
+    </DragWrapper>
     <!-- Settings Modal -->
     <SettingsModal v-model="isSettingsOpen" />
     <!-- Footer -->
@@ -83,25 +85,57 @@
       :isEntryView="isEntryView"
       :isAboutView="isAboutView"
     />
+
+    <!-- Edit Layout Toolbar -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition-all duration-300 ease-out"
+        enter-from-class="opacity-0 translate-y-4"
+        enter-to-class="opacity-100 translate-y-0"
+        leave-active-class="transition-all duration-200 ease-in"
+        leave-from-class="opacity-100 translate-y-0"
+        leave-to-class="opacity-0 translate-y-4"
+      >
+        <div
+          v-if="layoutStore.isEditing"
+          class="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 rounded-2xl bg-white/90 px-5 py-3 shadow-lg backdrop-blur-md dark:bg-neutral-800/90"
+        >
+          <span class="text-sm font-medium text-neutral-500">编辑布局</span>
+          <button
+            @click="layoutStore.cancelEditing()"
+            class="cursor-pointer rounded-xl border border-neutral-300 px-4 py-1.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700"
+          >
+            取消
+          </button>
+          <button
+            @click="layoutStore.saveEditing()"
+            class="cursor-pointer rounded-xl bg-blue-500 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-600"
+          >
+            保存
+          </button>
+          <button
+            @click="layoutStore.resetAllOffsets()"
+            class="cursor-pointer rounded-xl border border-red-300 px-4 py-1.5 text-sm font-medium text-red-500 transition-colors hover:bg-red-50 dark:border-red-700 dark:hover:bg-red-900/30"
+          >
+            重置
+          </button>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
 import { BasicFooter } from "@/components/basic";
-import {
-  BentoCalendar,
-  BentoClock,
-  BentoMap,
-  BentoProfileCard,
-  BentoReadingList,
-  BentoTech,
-  TodoCard,
-} from "@/components/bento";
+import { BentoCalendar, BentoClock, BentoProfileCard, BentoReadingList, BentoTech, TodoCard } from "@/components/bento";
+import DragWrapper from "@/components/layout/DragWrapper.vue";
 import FloatingActionButtons from "@/components/layout/FloatingActionButtons.vue";
 import SettingsModal from "@/components/layout/SettingsModal.vue";
 import { useCardLayout } from "@/composables/useCardLayout";
+import { useCardLayoutStore } from "@/stores/cardLayout";
 import { useThemeStore } from "@/stores/theme";
-import { nextTick, onMounted, ref } from "vue";
+import { nextTick, onMounted, onUnmounted, ref } from "vue";
+import BentoMap from "./components/BentoMap.vue";
 import GreetingToast from "./components/GreetingToast.vue";
 
 const themeStore = useThemeStore();
@@ -131,6 +165,22 @@ const {
   cardNamesByOrder,
   maxOrder,
 } = useCardLayout(parentContainer);
+
+const layoutStore = useCardLayoutStore();
+
+function onKeyDown(e: KeyboardEvent) {
+  if (e.key === "Escape" && layoutStore.isEditing) {
+    layoutStore.cancelEditing();
+  }
+}
+
+onMounted(() => {
+  window.addEventListener("keydown", onKeyDown);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", onKeyDown);
+});
 
 const isSettingsOpen = ref(false);
 const openSettings = () => {

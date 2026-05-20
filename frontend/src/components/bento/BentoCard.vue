@@ -16,10 +16,9 @@ import { motion } from "motion-v";
 @reference "../../assets/base.css";
 
 .card {
-  background-color: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(4px);
+  background-color: rgba(255, 255, 255, 0.75);
   box-shadow:
     rgba(0, 0, 0, 0.05) 0px 40px 50px -32px,
-    rgba(255, 255, 255, 0.25) 0px 0px 20px 0px inset;
+    rgba(255, 255, 255, 0.35) 0px 0px 20px 0px inset;
 }
 </style>

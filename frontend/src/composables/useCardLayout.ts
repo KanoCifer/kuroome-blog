@@ -1,4 +1,5 @@
 import cardStyles from "@/data/card-styles.json";
+import { useCardLayoutStore } from "@/stores/cardLayout";
 import { computed, type Ref } from "vue";
 import { useLayoutCenter } from "./useLayoutCenter";
 
@@ -62,81 +63,77 @@ function position(top: number, left: number) {
  * receive centered positions here — no offset needed.
  */
 export function useCardLayout(containerRef: Ref<HTMLElement | null>) {
-  const { centerX, layoutHeight, containerStyle } =
-    useLayoutCenter(containerRef);
+  const { centerX, layoutHeight, containerStyle } = useLayoutCenter(containerRef);
+  const layoutStore = useCardLayoutStore();
 
   // leftTotal / rightTotal anchor the left and right column clusters.
   // These use card-style widths so positions auto-adjust if config changes.
   const leftAnchor = computed(
-    () =>
-      centerX.value -
-      STYLES.BentoNavCard.width / 2 -
-      LAYOUT.CARD_SPACING -
-      LAYOUT.SIDE_COLUMN_GAP,
+    () => centerX.value - STYLES.BentoNavCard.width / 2 - LAYOUT.CARD_SPACING - LAYOUT.SIDE_COLUMN_GAP,
   );
   const rightAnchor = computed(
-    () =>
-      centerX.value +
-      STYLES.BentoClock.width / 2 +
-      LAYOUT.CARD_SPACING +
-      LAYOUT.SIDE_COLUMN_GAP,
+    () => centerX.value + STYLES.BentoClock.width / 2 + LAYOUT.CARD_SPACING + LAYOUT.SIDE_COLUMN_GAP,
   );
 
   // Center column (greeting map + profile card)
-  const listCardPosition = computed(() =>
-    position(layoutHeight.value * 0.05 - 20, centerX.value),
-  );
-  const profilePosition = computed(() =>
-    position(layoutHeight.value * 0.5, centerX.value),
-  );
+  const listCardPosition = computed(() => {
+    const o = layoutStore.getOffset("BentoReadingList");
+    return position(layoutHeight.value * 0.23 - 20 + o.y, centerX.value + o.x);
+  });
+  const profilePosition = computed(() => {
+    const o = layoutStore.getOffset("BentoProfileCard");
+    return position(layoutHeight.value * 0.5 + o.y, centerX.value + o.x);
+  });
 
   // Left column
-  const navCardPosition = computed(() =>
-    position(layoutHeight.value * LAYOUT.NAV_TOP_RATIO, leftAnchor.value + 20),
-  );
+  const navCardPosition = computed(() => {
+    const o = layoutStore.getOffset("BentoNavCard");
+    return position(layoutHeight.value * LAYOUT.NAV_TOP_RATIO + o.y, leftAnchor.value + 20 + o.x);
+  });
 
-  const techPosition = computed(() =>
-    position(
-      layoutHeight.value * LAYOUT.TECH_TOP_RATIO + LAYOUT.TECH_Y_ADJUST,
-      leftAnchor.value + LAYOUT.CARD_SPACING + 90,
-    ),
-  );
+  const techPosition = computed(() => {
+    const o = layoutStore.getOffset("BentoTech");
+    return position(
+      layoutHeight.value * LAYOUT.TECH_TOP_RATIO + LAYOUT.TECH_Y_ADJUST + o.y,
+      leftAnchor.value + LAYOUT.CARD_SPACING + 90 + o.x,
+    );
+  });
 
   // Right column
-  const websitesPosition = computed(() =>
-    position(layoutHeight.value * 0.1, rightAnchor.value + LAYOUT.RIGHT_COL_X),
-  );
+  const websitesPosition = computed(() => {
+    const o = layoutStore.getOffset("BentoWebsites");
+    return position(layoutHeight.value * 0.1 + o.y, rightAnchor.value + LAYOUT.RIGHT_COL_X + o.x);
+  });
 
-  const clockCardPosition = computed(() =>
-    position(
-      layoutHeight.value * 0.45 - 50,
-      rightAnchor.value + LAYOUT.RIGHT_COL_X - 70,
-    ),
-  );
-  const calendarPosition = computed(() =>
-    position(
-      layoutHeight.value * LAYOUT.CAL_TOP_RATIO + LAYOUT.CAL_Y_ADJUST,
-      rightAnchor.value + LAYOUT.RIGHT_COL_X + LAYOUT.CAL_X_DELTA,
-    ),
-  );
-  const greetingPosition = computed(() =>
-    position(
-      layoutHeight.value * 0.2,
-      rightAnchor.value + LAYOUT.READING_LIST_X,
-    ),
-  );
+  const clockCardPosition = computed(() => {
+    const o = layoutStore.getOffset("BentoClock");
+    return position(layoutHeight.value * 0.45 - 50 + o.y, rightAnchor.value + LAYOUT.RIGHT_COL_X - 70 + o.x);
+  });
+  const calendarPosition = computed(() => {
+    const o = layoutStore.getOffset("BentoCalendar");
+    return position(
+      layoutHeight.value * LAYOUT.CAL_TOP_RATIO + LAYOUT.CAL_Y_ADJUST + o.y,
+      rightAnchor.value + LAYOUT.RIGHT_COL_X + LAYOUT.CAL_X_DELTA + o.x,
+    );
+  });
+  const greetingPosition = computed(() => {
+    const o = layoutStore.getOffset("BentoMap");
+    return position(layoutHeight.value * 0.2 + o.y, rightAnchor.value + LAYOUT.READING_LIST_X + o.x);
+  });
 
   // Cat (positioned relative to center with ratio + offset)
-  const catPosition = computed(() =>
-    position(
-      layoutHeight.value * LAYOUT.CAT_TOP_RATIO,
-      centerX.value * LAYOUT.CAT_LEFT_RATIO + LAYOUT.CAT_X_ADJUST,
-    ),
-  );
+  const catPosition = computed(() => {
+    const o = layoutStore.getOffset("BentoCat");
+    return position(
+      layoutHeight.value * LAYOUT.CAT_TOP_RATIO + o.y,
+      centerX.value * LAYOUT.CAT_LEFT_RATIO + LAYOUT.CAT_X_ADJUST + o.x,
+    );
+  });
 
-  const todoPosition = computed(() =>
-    position(layoutHeight.value * 0.8 - 20, centerX.value + 40),
-  );
+  const todoPosition = computed(() => {
+    const o = layoutStore.getOffset("TodoCard");
+    return position(layoutHeight.value * 0.8 - 20 + o.y, centerX.value + 40 + o.x);
+  });
 
   // Card names sorted by order for animation sequencing
   const cardNamesByOrder = Object.entries(STYLES)

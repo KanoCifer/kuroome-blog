@@ -45,7 +45,7 @@
       </div>
       <div
         :style="sectionStyle"
-        class="bg-background/80 absolute left-1/2 -z-5 h-full -translate-x-1/2 rounded-t-[40px] shadow-[0_-8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl dark:bg-slate-900/80 dark:shadow-[0_-8px_30px_rgb(0,0,0,0.2)]"
+        class="bg-background/80 absolute left-1/2 -z-5 h-full -translate-x-1/2 rounded-t-[40px] shadow-[0_-8px_30px_rgb(0,0,0,0.04)] dark:bg-slate-900/80 dark:shadow-[0_-8px_30px_rgb(0,0,0,0.2)]"
       ></div>
       <div class="mx-auto max-w-6xl">
         <div
@@ -89,21 +89,20 @@
 <script setup lang="ts">
 import { useMediaQuery, useScroll } from "@vueuse/core";
 import { computed } from "vue";
+
 const { y } = useScroll(window);
+const isSmallScreen = useMediaQuery("(max-width: 768px)");
 
 defineProps<{
   title: string;
   subtitle: string;
 }>();
 
-// 计算标题的平移效果
 const titleStyle = computed(() => ({
   transform: `translateY(${y.value * 0.6}px)`,
 }));
 
-// 计算内容区的缩放效果 (使用 scaleX 替代 width 优化性能)
 const sectionStyle = computed(() => {
-  const isSmallScreen = useMediaQuery("(max-width: 768px)");
   if (isSmallScreen.value) {
     return { width: "100%" };
   }

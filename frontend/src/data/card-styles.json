@@ -1,7 +1,7 @@
 {
   "BentoProfileCard": { "width": 448, "height": 320, "order": 1 },
   "BentoNavCard": { "width": 272, "height": 0, "order": 2 },
-  "BentoReadingList": { "width": 272, "height": 0, "order": 4 },
+  "BentoReadingList": { "width": 272, "height": 0, "order": 3 },
   "BentoMap": { "width": 272, "height": 112, "order": 4 },
   "BentoClock": { "width": 256, "height": 0, "order": 5 },
   "BentoCalendar": { "width": 0, "height": 0, "order": 6 },
