@@ -6,7 +6,7 @@ const CARD_KEY = "readinglist_card_imgae_index";
 
 const getImageIndex = (): number => {
   const stored = localStorage.getItem(CARD_KEY);
-  const n = stored ? parseInt(stored, 1) : NaN;
+  const n = stored ? parseInt(stored, 10) : NaN;
   return Number.isFinite(n) && n >= 0 && n < CARD_IMAGES.length ? n : 0;
 };
 
