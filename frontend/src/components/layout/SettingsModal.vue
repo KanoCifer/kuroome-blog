@@ -226,6 +226,38 @@
                 />
               </div>
 
+              <!-- Brightness Slider -->
+              <div>
+                <label class="text-muted-foreground mb-3 block text-sm font-medium">
+                  背景亮度：{{ Math.round(themeStore.bgBrightness * 100) }}%
+                </label>
+                <input
+                  type="range"
+                  min="30"
+                  max="100"
+                  step="5"
+                  :value="Math.round(themeStore.bgBrightness * 100)"
+                  @input="themeStore.saveBgBrightness(Number(($event.target as HTMLInputElement).value) / 100)"
+                  class="hocus:border-primary accent-primary w-full cursor-pointer appearance-none rounded-full bg-gray-200/70 py-0.5 dark:bg-gray-700/70"
+                />
+              </div>
+
+              <!-- Scale Slider -->
+              <div>
+                <label class="text-muted-foreground mb-3 block text-sm font-medium">
+                  背景缩放：{{ Math.round(themeStore.bgScale * 100) }}%
+                </label>
+                <input
+                  type="range"
+                  min="100"
+                  max="130"
+                  step="1"
+                  :value="Math.round(themeStore.bgScale * 100)"
+                  @input="themeStore.saveBgScale(Number(($event.target as HTMLInputElement).value) / 100)"
+                  class="hocus:border-primary accent-primary w-full cursor-pointer appearance-none rounded-full bg-gray-200/70 py-0.5 dark:bg-gray-700/70"
+                />
+              </div>
+
               <div>
                 <label class="text-muted-foreground mb-3 block text-sm font-medium"> 背景模式 </label>
                 <div class="grid grid-cols-2 gap-3">
@@ -278,6 +310,24 @@
                       <polyline points="21 15 16 10 5 21" />
                     </svg>
                     <span class="text-sm font-medium">固定背景</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Auto-switch Interval (random mode only) -->
+              <div v-if="backgroundStore.mode === 'random'">
+                <label class="text-muted-foreground mb-3 block text-sm font-medium"> 自动切换 </label>
+                <div class="flex flex-wrap gap-2">
+                  <button
+                    v-for="opt in autoSwitchOptions"
+                    :key="opt.value"
+                    @click="backgroundStore.saveAutoSwitch(opt.value)"
+                    class="border-border hover:border-primary dark:border-border rounded-lg border-2 px-3 py-1.5 text-sm transition-all"
+                    :class="{
+                      'border-primary bg-primary/5': backgroundStore.autoSwitchInterval === opt.value,
+                    }"
+                  >
+                    {{ opt.label }}
                   </button>
                 </div>
               </div>
@@ -351,6 +401,14 @@ const backgroundStore = useBackgroundStore();
 const { cardIndex, cardImages, setCardIndex } = useCardImage();
 
 const activeTab = ref("appearance");
+
+const autoSwitchOptions = [
+  { label: "关闭", value: 0 },
+  { label: "10s", value: 10 },
+  { label: "30s", value: 30 },
+  { label: "60s", value: 60 },
+  { label: "120s", value: 120 },
+];
 
 const tabs = [
   { key: "appearance", label: "外观" },

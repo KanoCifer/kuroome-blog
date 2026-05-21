@@ -1,4 +1,4 @@
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { defineStore } from "pinia";
 
 export type BackgroundMode = "fixed" | "random";
@@ -52,6 +52,33 @@ export const useBackgroundStore = defineStore("background", () => {
     }
   };
 
+  const autoSwitchInterval = ref<number>(
+    Number(localStorage.getItem("bg-auto-switch") || 0),
+  );
+
+  let autoSwitchTimer: ReturnType<typeof setInterval> | null = null;
+
+  const saveAutoSwitch = (seconds: number) => {
+    autoSwitchInterval.value = seconds;
+    localStorage.setItem("bg-auto-switch", String(seconds));
+  };
+
+  watch(
+    [mode, autoSwitchInterval],
+    ([m, interval]) => {
+      if (autoSwitchTimer) {
+        clearInterval(autoSwitchTimer);
+        autoSwitchTimer = null;
+      }
+      if (m === "random" && interval > 0) {
+        autoSwitchTimer = setInterval(() => {
+          randomIndex.value = Math.floor(Math.random() * BACKGROUND_IMAGES.length);
+        }, interval * 1000);
+      }
+    },
+    { immediate: true },
+  );
+
   return {
     backgroundImages: BACKGROUND_IMAGES,
     mode,
@@ -62,5 +89,7 @@ export const useBackgroundStore = defineStore("background", () => {
     selectFixed,
     randomize,
     reroll,
+    autoSwitchInterval,
+    saveAutoSwitch,
   };
 });

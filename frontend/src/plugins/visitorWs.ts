@@ -6,6 +6,8 @@ import type { Pinia } from "pinia";
 let initialized = false;
 let wsDisconnect: (() => void) | null = null;
 let wsConnect: (() => void) | null = null;
+/** 全局单例的 connectionDelay ref，供 Footer 等组件只读订阅 */
+export let connectionDelay: ReturnType<typeof useWebSocket>["connectionDelay"] | null = null;
 
 function buildWsUrl(): string {
   const apiBase = import.meta.env.VITE_API_BASE || "/api";
@@ -38,6 +40,7 @@ export function initVisitorWebSocket(pinia: Pinia) {
 
   wsDisconnect = ws.disconnect;
   wsConnect = ws.connect;
+  connectionDelay = ws.connectionDelay;
 }
 
 /** 断开并重新连接 WS，用于登录/登出后携带更新后的 cookie */

@@ -25,15 +25,19 @@ export function useWebSocket(options: UseWebSocketOptions) {
 
   const isConnected = ref(false);
   const reconnectAttempt = ref(0);
+  const connectionDelay = ref<number>(0);
   let ws: WebSocket | null = null;
   let pingTimer: ReturnType<typeof setInterval> | null = null;
   let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  let pingStartTime = 0;
+
+  function calculateConnectionDelay(stratTime: number) {
+    const ping = performance.now() - stratTime;
+    connectionDelay.value = ping;
+  }
 
   function scheduleReconnect() {
-    const delay = Math.min(
-      reconnectBaseMs * Math.pow(2, reconnectAttempt.value),
-      reconnectMaxMs,
-    );
+    const delay = Math.min(reconnectBaseMs * Math.pow(2, reconnectAttempt.value), reconnectMaxMs);
     reconnectTimer = setTimeout(connect, delay);
     reconnectAttempt.value++;
   }
@@ -42,6 +46,7 @@ export function useWebSocket(options: UseWebSocketOptions) {
     stopPing();
     pingTimer = setInterval(() => {
       if (ws?.readyState === WebSocket.OPEN) {
+        pingStartTime = performance.now();
         ws.send(JSON.stringify({ type: "ping" }));
       }
     }, pingIntervalMs);
@@ -73,7 +78,10 @@ export function useWebSocket(options: UseWebSocketOptions) {
       ws.close();
     }
 
+    let startTime: number;
+
     try {
+      startTime = performance.now();
       ws = new WebSocket(url);
     } catch {
       scheduleReconnect();
@@ -83,6 +91,7 @@ export function useWebSocket(options: UseWebSocketOptions) {
     ws.onopen = () => {
       isConnected.value = true;
       reconnectAttempt.value = 0;
+      calculateConnectionDelay(startTime);
       sendVisitorId(visitorId || null);
       startPing();
     };
@@ -90,12 +99,10 @@ export function useWebSocket(options: UseWebSocketOptions) {
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        if (
-          data.type === "count" &&
-          onCount &&
-          typeof data.count === "number"
-        ) {
+        if (data.type === "count" && onCount && typeof data.count === "number") {
           onCount(data.count);
+        } else if (data.type === "pong") {
+          calculateConnectionDelay(pingStartTime);
         }
       } catch {
         // ignore non-JSON or malformed messages
@@ -165,5 +172,5 @@ export function useWebSocket(options: UseWebSocketOptions) {
     });
   }
 
-  return { isConnected, send, disconnect, connect };
+  return { isConnected, connectionDelay, send, disconnect, connect };
 }

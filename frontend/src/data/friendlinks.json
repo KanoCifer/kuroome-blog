@@ -1,18 +1,18 @@
 {
   "self": {
     "name": "Kuroome's Blog",
-    "description": "阅读、编码、思考 — 一个全栈开发者的数字花园",
+    "description": "阅读、Coding、Fishing、生活记录",
     "url": "https://kanocifer.chat",
     "icon": "https://kanocifer.chat/favicon.ico",
-    "tags": ["个人博客", "全栈开发", "数字花园"]
+    "tags": ["个人博客", "全栈开发"]
   },
   "links": [
     {
       "id": "1",
       "name": "Kuroome's Blog",
-      "description": "本站的另一个入口，基于 React 技术栈构建的个人博客。",
+      "description": "本站的另一个入口，基于 React 技术栈构建的个人博客，移动端友好。",
       "url": "https://m.kanocifer.chat",
-      "icon": "https://m.kanocifer.chat/favicon.ico",
+      "icon": "https://kanocifer.chat/favicon.ico",
       "tags": ["个人博客", "React"]
     }
   ]

@@ -140,8 +140,12 @@ watch(
       <img
         :key="bgStore.backgroundUrl"
         :src="bgStore.backgroundUrl"
-        class="pointer-events-none fixed inset-0 -z-10 h-full w-full scale-105 transform-gpu object-cover"
-        :style="{ filter: `blur(${themeStore.bgBlur}px)`, willChange: themeStore.bgBlur > 0 ? 'filter' : 'auto' }"
+        class="pointer-events-none fixed inset-0 -z-10 h-full w-full transform-gpu object-cover"
+        :style="{
+          filter: `blur(${themeStore.bgBlur}px) brightness(${themeStore.bgBrightness})`,
+          transform: `scale(${themeStore.bgScale})`,
+          willChange: themeStore.bgBlur > 0 ? 'filter' : 'auto',
+        }"
       />
     </Transition>
     <header>

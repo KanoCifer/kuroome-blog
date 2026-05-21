@@ -25,6 +25,24 @@ export const useThemeStore = defineStore("theme", () => {
     localStorage.setItem("bg-blur", String(newBlur));
   };
 
+  const bgBrightness = ref<number>(
+    Number(localStorage.getItem("bg-brightness") || 1.0),
+  );
+
+  const saveBgBrightness = (val: number) => {
+    bgBrightness.value = val;
+    localStorage.setItem("bg-brightness", String(val));
+  };
+
+  const bgScale = ref<number>(
+    Number(localStorage.getItem("bg-scale") || 1.05),
+  );
+
+  const saveBgScale = (val: number) => {
+    bgScale.value = val;
+    localStorage.setItem("bg-scale", String(val));
+  };
+
   const toggleFooter = () => {
     showFooter.value = showFooter.value === "true" ? "false" : "true";
     localStorage.setItem("show-footer", showFooter.value);
@@ -121,6 +139,10 @@ export const useThemeStore = defineStore("theme", () => {
     showFooter,
     bgBlur,
     saveBgBlur,
+    bgBrightness,
+    saveBgBrightness,
+    bgScale,
+    saveBgScale,
     setTheme,
     setScheme,
     toggleTheme,

@@ -6,13 +6,9 @@
         <!-- ======== 左列：本站信息 + 友链大卡片 ======== -->
         <div class="space-y-6 lg:col-span-2">
           <!-- 本站信息面板 -->
-          <div
-            class="border-primary/20 bg-primary/5 ring-primary/10 overflow-hidden rounded-4xl border p-8 ring-1"
-          >
+          <div class="border-primary/20 bg-primary/5 ring-primary/10 overflow-hidden rounded-4xl border p-8 ring-1">
             <div class="mb-6 flex items-start gap-5">
-              <div
-                class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full"
-              >
+              <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full">
                 <img
                   :src="selfInfo.icon"
                   :alt="selfInfo.name"
@@ -65,18 +61,12 @@
             <!-- 信息行 -->
             <div class="bg-card/60 space-y-2 rounded-xl p-4">
               <div class="flex items-center gap-3 text-sm">
-                <span class="text-muted-foreground w-16 shrink-0 font-medium"
-                  >URL</span
-                >
+                <span class="text-muted-foreground w-16 shrink-0 font-medium">URL</span>
                 <code class="text-foreground truncate">{{ selfInfo.url }}</code>
               </div>
               <div class="flex items-center gap-3 text-sm">
-                <span class="text-muted-foreground w-16 shrink-0 font-medium"
-                  >Favicon</span
-                >
-                <code class="text-foreground truncate">{{
-                  selfInfo.icon
-                }}</code>
+                <span class="text-muted-foreground w-16 shrink-0 font-medium">Favicon</span>
+                <code class="text-foreground truncate">{{ selfInfo.icon }}</code>
               </div>
               <div class="flex flex-wrap gap-2 pt-1">
                 <span
@@ -159,9 +149,7 @@
             </div>
 
             <!-- 外链箭头 -->
-            <div
-              class="absolute top-6 right-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-            >
+            <div class="absolute top-6 right-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="text-muted-foreground h-5 w-5"
@@ -199,15 +187,135 @@
               />
             </svg>
             <p class="text-muted-foreground text-lg">暂无友链</p>
-            <p class="text-muted-foreground mt-2 text-sm">
-              欢迎提交申请，成为第一位友链伙伴
-            </p>
+            <p class="text-muted-foreground mt-2 text-sm">欢迎提交申请，成为第一位友链伙伴</p>
           </div>
         </div>
 
-        <!-- ======== 右列：申请须知 + 申请表单 ======== -->
+        <!-- ======== 右列：申请须知 + GitHub Issue ======== -->
         <div class="space-y-6 lg:col-span-1">
-          <FriendLinkApplicationForm />
+          <div class="border-border bg-card/30 overflow-hidden rounded-4xl border p-8 shadow-sm">
+            <!-- Header -->
+            <div class="mb-6">
+              <h3 class="text-foreground flex items-center gap-2 font-serif text-xl font-bold">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="text-primary h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                  />
+                </svg>
+                申请友链
+              </h3>
+              <p class="text-muted-foreground mt-1.5 text-sm">
+                通过 GitHub Issue 提交友链申请，审核通过后将在 48 小时内上线
+              </p>
+            </div>
+
+            <!-- 接入须知 -->
+            <div class="border-primary/15 bg-primary/5 mb-6 rounded-2xl border p-5">
+              <h4 class="text-foreground mb-3 flex items-center gap-2 text-sm font-bold">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="text-primary h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                接入须知
+              </h4>
+              <ul class="text-muted-foreground space-y-2 text-sm">
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-0.5 shrink-0 text-xs">●</span>
+                  <span>网站需符合中国大陆相关法律法规</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-0.5 shrink-0 text-xs">●</span>
+                  <span>网站内容原创、非商业推广</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-0.5 shrink-0 text-xs">●</span>
+                  <span
+                    >已在您的网站添加本站友链（<a
+                      href="https://kanocifer.chat"
+                      target="_blank"
+                      class="text-primary underline"
+                      >kanocifer.chat</a
+                    >）</span
+                  >
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-0.5 shrink-0 text-xs">●</span>
+                  <span>网站可正常访问</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- 申请格式 -->
+            <div class="mb-6">
+              <h4 class="text-foreground mb-3 flex items-center gap-2 text-sm font-bold">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="text-primary h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+                申请格式
+              </h4>
+              <pre class="bg-muted text-muted-foreground overflow-x-auto rounded-xl p-4 text-xs leading-relaxed">
+- **站点名称**：
+- **描述**：
+- **URL**：
+- **头像**：
+- **标签**：</pre
+              >
+            </div>
+
+            <!-- CTA -->
+            <a
+              href="https://github.com/KanoCifer/kuroome-blog/issues/1"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="bg-primary text-primary-foreground hover:bg-primary/90 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold shadow-sm transition-all duration-200 hover:shadow-md active:scale-95"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                />
+              </svg>
+              前往 GitHub Issue 提交申请
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -216,7 +324,6 @@
 
 <script setup lang="ts">
 import { BasicDetail } from "@/components/basic";
-import FriendLinkApplicationForm from "@/components/friendlink/FriendLinkApplicationForm.vue";
 import friendLinksData from "@/data/friendlinks.json";
 import { useNotificationStore } from "@/stores/notification";
 import { motion } from "motion-v";
