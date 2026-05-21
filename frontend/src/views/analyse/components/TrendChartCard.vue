@@ -1,14 +1,14 @@
 <template>
-  <div class="bg-card rounded-2xl p-6 shadow-lg">
-    <h2 class="text-foreground mb-4 text-lg font-bold">
-      <icon-trend class="inline-block size-6" /> Trend (Last
+  <div class="squircle border-border/60 bg-card h-full border p-6 shadow-sm">
+    <h2 class="text-foreground mb-4 flex items-center gap-2 text-lg font-bold">
+      <icon-trend class="size-6" /> Visits Trend (Last
       {{ selectedDays }} days)
     </h2>
     <div
       v-if="loading && !overviewData"
-      class="bg-muted h-72 animate-pulse rounded-xl"
+      class="bg-muted h-80 animate-pulse rounded-xl"
     ></div>
-    <div v-else class="h-72 w-full overflow-hidden">
+    <div v-else class="h-80 w-full overflow-hidden">
       <v-chart :option="trendChartOption" autoresize class="h-full w-full" />
     </div>
   </div>
@@ -17,45 +17,13 @@
 <script setup lang="ts">
 import IconTrend from "@/components/icons/IconTrend.vue";
 import dayjs from "dayjs";
-import { LineChart } from "echarts/charts";
-import {
-  GridComponent,
-  LegendComponent,
-  TitleComponent,
-  TooltipComponent,
-} from "echarts/components";
-import { use } from "echarts/core";
-import { CanvasRenderer } from "echarts/renderers";
 import { computed } from "vue";
 import VChart from "vue-echarts";
 
-use([
-  CanvasRenderer,
-  LineChart,
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent,
-  GridComponent,
-]);
-
-interface DailyTrend {
-  date: string;
-  count: number;
-}
-
-interface TopPage {
-  page_path: string;
-  count: number;
-}
-
 interface OverviewData {
-  total_visits: number;
-  unique_visitors: number;
-  unique_visitor_ids: number;
-  top_pages: TopPage[];
-  browser_stats: { browser: string; count: number }[];
-  daily_trend: DailyTrend[];
+  daily_trend: { date: string; count: number }[];
   period_days: number;
+  [key: string]: unknown;
 }
 
 const props = defineProps<{

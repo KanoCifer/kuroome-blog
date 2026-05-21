@@ -10,6 +10,7 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import "./assets/base.css";
 import "./assets/squircle.css";
+import "./lib/echarts";
 import { initVisitorWebSocket } from "./plugins/visitorWs";
 import router from "./router";
 

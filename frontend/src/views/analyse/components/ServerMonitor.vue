@@ -205,28 +205,8 @@
 <script setup lang="ts">
 import { useThemeStore } from "@/stores/theme";
 import dayjs from "dayjs";
-import { GaugeChart, LineChart } from "echarts/charts";
-import {
-  GridComponent,
-  LegendComponent,
-  TitleComponent,
-  TooltipComponent,
-} from "echarts/components";
-import { use } from "echarts/core";
-import { CanvasRenderer } from "echarts/renderers";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import VChart from "vue-echarts";
-
-// Register ECharts components
-use([
-  CanvasRenderer,
-  GaugeChart,
-  LineChart,
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent,
-  GridComponent,
-]);
 
 // Types
 interface ServerStatus {

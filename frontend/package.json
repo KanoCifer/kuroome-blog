@@ -26,8 +26,6 @@
     "@tailwindcss/cli": "^4.3.0",
     "@types/markdown-it": "^14.1.2",
     "@unhead/vue": "^3.1.0",
-    "@unovis/ts": "^1.6.5",
-    "@unovis/vue": "^1.6.5",
     "@vueuse/core": "^14.3.0",
     "@vueuse/head": "^2.0.0",
     "animate.css": "^4.1.1",

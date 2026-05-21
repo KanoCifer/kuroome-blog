@@ -181,27 +181,9 @@
 <script setup lang="ts">
 import { HARBOR_OPTIONS, useFishingMapStore } from "@/stores/fishingMap";
 import dayjs from "dayjs";
-import { LineChart } from "echarts/charts";
-import {
-  GridComponent,
-  MarkLineComponent,
-  MarkPointComponent,
-  TooltipComponent,
-} from "echarts/components";
-import { use } from "echarts/core";
-import { SVGRenderer } from "echarts/renderers";
 import { storeToRefs } from "pinia";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import VChart from "vue-echarts";
-
-use([
-  TooltipComponent,
-  GridComponent,
-  MarkLineComponent,
-  MarkPointComponent,
-  LineChart,
-  SVGRenderer,
-]);
 
 const fishingMapStore = useFishingMapStore();
 const {

@@ -38,26 +38,8 @@
 <script setup lang="ts">
 import type { Device } from "@/services/deviceService";
 import dayjs from "dayjs";
-import { LineChart } from "echarts/charts";
-import {
-  GridComponent,
-  LegendComponent,
-  TitleComponent,
-  TooltipComponent,
-} from "echarts/components";
-import { use } from "echarts/core";
-import { SVGRenderer } from "echarts/renderers";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import VChart from "vue-echarts";
-
-use([
-  TitleComponent,
-  TooltipComponent,
-  GridComponent,
-  LegendComponent,
-  LineChart,
-  SVGRenderer,
-]);
 
 const props = defineProps<{
   data: Device;

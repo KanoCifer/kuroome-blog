@@ -19,18 +19,8 @@
 
 <script setup lang="ts">
 import type { Device } from "@/services/deviceService";
-import { PieChart } from "echarts/charts";
-import {
-  GridComponent,
-  TitleComponent,
-  TooltipComponent,
-} from "echarts/components";
-import { use } from "echarts/core";
-import { SVGRenderer } from "echarts/renderers";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import VChart from "vue-echarts";
-
-use([TitleComponent, TooltipComponent, GridComponent, PieChart, SVGRenderer]);
 
 const props = defineProps<{
   data: Device[];

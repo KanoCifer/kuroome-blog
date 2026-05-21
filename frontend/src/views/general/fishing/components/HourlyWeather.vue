@@ -1,32 +1,9 @@
 <script setup lang="ts">
 import { useFishingMapStore } from "@/stores/fishingMap";
 import dayjs from "dayjs";
-import { BarChart, LineChart } from "echarts/charts";
-import {
-  GridComponent,
-  LegendComponent,
-  MarkAreaComponent,
-  MarkLineComponent,
-  TitleComponent,
-  TooltipComponent,
-} from "echarts/components";
-import { use } from "echarts/core";
-import { SVGRenderer } from "echarts/renderers";
 import { storeToRefs } from "pinia";
 import { computed, onMounted, ref } from "vue";
 import VChart from "vue-echarts";
-
-use([
-  TitleComponent,
-  TooltipComponent,
-  GridComponent,
-  LegendComponent,
-  MarkLineComponent,
-  MarkAreaComponent,
-  BarChart,
-  SVGRenderer,
-  LineChart,
-]);
 
 const fishingMapStore = useFishingMapStore();
 const { weatherHourly } = storeToRefs(fishingMapStore);

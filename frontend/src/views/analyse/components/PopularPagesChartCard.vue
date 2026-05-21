@@ -1,12 +1,9 @@
 <template>
-  <div class="bg-card rounded-2xl p-6 shadow-lg">
-    <h2 class="text-foreground mb-4 text-lg font-bold">
-      <icon-popular class="inline-block size-6" /> Popular Pages
+  <div class="squircle border-border/60 bg-card h-full border p-6 shadow-sm">
+    <h2 class="text-foreground flex items-center gap-2 text-lg font-bold">
+      <icon-popular class="size-6" /> Popular Pages
     </h2>
-    <div
-      v-if="loading && !overviewData"
-      class="bg-muted h-72 animate-pulse rounded-xl"
-    ></div>
+    <div v-if="loading && !overviewData" class="bg-muted h-full animate-pulse rounded-xl"></div>
     <div v-else class="h-full w-full overflow-hidden">
       <v-chart :option="popularPagesChartOption" autoresize />
     </div>
@@ -15,26 +12,8 @@
 
 <script setup lang="ts">
 import IconPopular from "@/components/icons/IconPopular.vue";
-import { BarChart } from "echarts/charts";
-import {
-  GridComponent,
-  LegendComponent,
-  TitleComponent,
-  TooltipComponent,
-} from "echarts/components";
-import { use } from "echarts/core";
-import { CanvasRenderer } from "echarts/renderers";
 import { computed } from "vue";
 import VChart from "vue-echarts";
-
-use([
-  CanvasRenderer,
-  BarChart,
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent,
-  GridComponent,
-]);
 
 interface OverviewData {
   total_visits: number;
@@ -73,9 +52,9 @@ const popularPagesChartOption = computed(() => {
       },
     },
     grid: {
-      left: "3%",
-      right: "4%",
-      bottom: "3%",
+      left: 0,
+      right: 0,
+      bottom: 0,
       containLabel: true,
     },
     xAxis: {
@@ -103,7 +82,7 @@ const popularPagesChartOption = computed(() => {
       axisLabel: {
         color: "#6b7280",
         fontSize: 11,
-        width: 120,
+        width: 40,
         overflow: "truncate",
       },
     },

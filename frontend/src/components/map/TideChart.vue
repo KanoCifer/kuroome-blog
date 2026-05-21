@@ -16,28 +16,8 @@
 import { weatherService } from "@/service/weatherService";
 import { useNotificationStore } from "@/stores/notification";
 import dayjs from "dayjs";
-import { LineChart } from "echarts/charts";
-import {
-  GridComponent,
-  MarkLineComponent,
-  MarkPointComponent,
-  TitleComponent,
-  TooltipComponent,
-} from "echarts/components";
-import { use } from "echarts/core";
-import { SVGRenderer } from "echarts/renderers";
 import { computed, onMounted, ref, watch } from "vue";
 import VChart from "vue-echarts";
-
-use([
-  TitleComponent,
-  TooltipComponent,
-  GridComponent,
-  MarkLineComponent,
-  MarkPointComponent,
-  LineChart,
-  SVGRenderer,
-]);
 
 interface TideData {
   updateTime: string;

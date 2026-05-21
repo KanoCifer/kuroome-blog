@@ -14,6 +14,14 @@
       "url": "https://m.kanocifer.chat",
       "icon": "https://kanocifer.chat/favicon.ico",
       "tags": ["个人博客", "React"]
+    },
+    {
+      "id": "2",
+      "name": "23朵毒蘑菇",
+      "url": "https://blog.dumogu.top/",
+      "icon": "https://blog.dumogu.top/web-assets/v-last/public/user.jpg",
+      "description": "一个简单的前端开发者。",
+      "tags": ["个人博客", "前端开发"]
     }
   ]
 }

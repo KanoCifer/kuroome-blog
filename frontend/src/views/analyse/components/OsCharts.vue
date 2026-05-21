@@ -1,14 +1,13 @@
 <template>
-  <div class="bg-card rounded-2xl p-6 shadow-lg">
-    <h2 class="text-foreground mb-4 text-lg font-bold">
-      <icon-analytics class="inline-block size-6" /> Operating System
-      Distribution
+  <div class="squircle border-border/60 bg-card h-full border p-6 shadow-sm">
+    <h2 class="text-foreground mb-4 flex items-center gap-2 text-lg font-bold">
+      <icon-analytics class="size-6" /> OS Distribution
     </h2>
     <div
       v-if="loading && !osStats"
-      class="bg-muted h-72 animate-pulse rounded-xl"
+      class="bg-muted h-64 animate-pulse rounded-xl"
     ></div>
-    <div v-else class="h-72 w-full overflow-hidden">
+    <div v-else class="h-64 w-full overflow-hidden">
       <v-chart :option="osChartOption" autoresize class="h-full w-full" />
     </div>
   </div>
@@ -16,24 +15,8 @@
 
 <script setup lang="ts">
 import IconAnalytics from "@/components/icons/IconAnalytics.vue";
-import { PieChart } from "echarts/charts";
-import {
-  LegendComponent,
-  TitleComponent,
-  TooltipComponent,
-} from "echarts/components";
-import { use } from "echarts/core";
-import { CanvasRenderer } from "echarts/renderers";
 import { computed } from "vue";
 import VChart from "vue-echarts";
-
-use([
-  CanvasRenderer,
-  PieChart,
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent,
-]);
 
 interface OsStat {
   os_name: string;
