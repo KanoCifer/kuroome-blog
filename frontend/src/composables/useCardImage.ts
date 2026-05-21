@@ -20,6 +20,8 @@ export function useCardImage() {
   };
 
   return {
+    cardIndex,
+    cardImages: CARD_IMAGES,
     setCardIndex,
     imageSrc,
   };

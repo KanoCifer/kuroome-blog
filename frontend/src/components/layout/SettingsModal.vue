@@ -164,6 +164,50 @@
               </div>
             </div>
 
+            <!-- Card Tab -->
+            <div v-if="activeTab === 'card'" class="space-y-6">
+              <div>
+                <label class="text-muted-foreground mb-3 block text-sm font-medium"> 选择卡片配图 </label>
+                <div class="grid grid-cols-2 gap-3">
+                  <button
+                    v-for="(img, index) in cardImages"
+                    :key="index"
+                    @click="setCardIndex(index)"
+                    class="border-border hover:border-primary dark:border-border relative overflow-hidden rounded-xl border-2 transition-all"
+                    :class="{
+                      'border-primary': cardIndex === index,
+                    }"
+                  >
+                    <div
+                      class="h-24 w-full bg-cover bg-center"
+                      :style="{ backgroundImage: `url('${img}')` }"
+                    />
+                    <div
+                      v-if="cardIndex === index"
+                      class="absolute inset-0 flex items-center justify-center bg-black/30"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="white"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </div>
+                    <div class="bg-card/80 absolute right-2 bottom-2 rounded-md px-2 py-0.5 text-xs backdrop-blur-sm">
+                      {{ index + 1 }}
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+
             <!-- Background Tab -->
             <div v-if="activeTab === 'background'" class="space-y-6">
               <!-- Blur Slider -->
@@ -286,6 +330,7 @@
 <script setup lang="ts">
 import { useBackgroundStore } from "@/stores/background";
 import { useThemeStore, type ColorScheme, type Theme } from "@/stores/theme";
+import { useCardImage } from "@/composables/useCardImage";
 import SettingIcon from "@/views/entry/icon/SettingIcon.vue";
 import { ref } from "vue";
 
@@ -303,12 +348,14 @@ const close = () => {
 
 const themeStore = useThemeStore();
 const backgroundStore = useBackgroundStore();
+const { cardIndex, cardImages, setCardIndex } = useCardImage();
 
 const activeTab = ref("appearance");
 
 const tabs = [
   { key: "appearance", label: "外观" },
   { key: "background", label: "背景" },
+  { key: "card", label: "卡片" },
 ];
 
 const themes: { value: Theme; label: string; icon: string }[] = [
