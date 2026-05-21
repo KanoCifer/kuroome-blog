@@ -1,5 +1,40 @@
 [
   {
+    "version": "3.0.1",
+    "date": "2026-05-21",
+    "title": "首页布局重构与Bento卡片系统升级",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "重构Bento卡片布局系统，支持拖拽排序和季节主题切换"
+      },
+      {
+        "type": "feat",
+        "content": "Todo 待办事项改造为全局侧边栏抽屉，新增偏好设置面板、卡片配图切换、字体切换、隐私协议、背景图固定/随机选择器"
+      },
+      {
+        "type": "feat",
+        "content": "友链页面重构，新增延迟指示器与背景控件"
+      },
+      {
+        "type": "fix",
+        "content": "修复卡片配图切换不生效、首页导航过渡动画、主题过渡事件类型、API 端点路径、BasicDetail 滚动位置等 bug"
+      },
+      {
+        "type": "refactor",
+        "content": "统计分析图表统一迁移至 ECharts，博客卡片重设计（编辑式排版+交错动画），TodoCard 替换为 BentoPic"
+      },
+      {
+        "type": "refactor",
+        "content": "RssSubscriptionsView 拆分为 composable + 子组件架构，WebSocket 在线追踪替换 HTTP 心跳"
+      },
+      {
+        "type": "style",
+        "content": "调整首页与 Blog 页 UI 细节，更新主题配色"
+      }
+    ]
+  },
+  {
     "version": "3.0.0",
     "date": "2026-05-10",
     "title": "多主题系统适配",
