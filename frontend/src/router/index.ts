@@ -123,7 +123,7 @@ const router = createRouter({
     {
       path: "/todos",
       name: "todo-list",
-      component: () => import("@/views/general/TodoListView.vue"),
+      redirect: { path: "/" },
       meta: {
         title: "待办事项 - Kuroome's Blog",
         description: "管理个人待办事项和任务清单",
