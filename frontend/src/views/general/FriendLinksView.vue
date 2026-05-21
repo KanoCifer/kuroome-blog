@@ -1,6 +1,103 @@
 <template>
   <BasicDetail title="友情链接" subtitle="与志同道合的朋友交换链接">
     <div class="col-span-full mx-auto w-full max-w-6xl">
+      <!-- 每日推荐横幅 -->
+      <div
+        class="border-border bg-card/30 group mb-6 cursor-pointer overflow-hidden rounded-4xl border p-6 shadow-sm transition-all duration-300 hover:shadow-lg sm:p-8"
+        @click="$router.push('/websites')"
+      >
+        <Transition name="pick-switch" mode="out-in">
+          <div
+            :key="dailyPick?.id"
+            class="flex flex-col gap-4 sm:flex-row sm:items-center"
+          >
+            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-muted">
+              <img
+                v-if="dailyPick?.icon"
+                :src="dailyPick.icon"
+                :alt="dailyPick?.name"
+                class="h-8 w-8 object-contain"
+                @error="handleImageError"
+              />
+              <svg
+                v-else
+                xmlns="http://www.w3.org/2000/svg"
+                class="text-muted-foreground h-7 w-7"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
+                />
+              </svg>
+            </div>
+
+            <div class="min-w-0 flex-1">
+              <div class="mb-1 flex items-center gap-2">
+                <span class="text-muted-foreground text-xs font-bold tracking-wide uppercase">每日推荐</span>
+                <span
+                  class="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                >
+                  {{ dailyPick?.category }}
+                </span>
+              </div>
+              <h3 class="text-foreground text-lg font-bold">{{ dailyPick?.name }}</h3>
+              <p class="text-muted-foreground mt-1 line-clamp-2 text-sm">{{ dailyPick?.description }}</p>
+              <div v-if="dailyPick?.tags?.length" class="mt-3 flex flex-wrap gap-2">
+                <TagPill
+                  v-for="tag in dailyPick.tags.slice(0, 4)"
+                  :key="tag"
+                  compact
+                >
+                  {{ tag }}
+                </TagPill>
+              </div>
+            </div>
+
+            <div class="flex shrink-0 items-center gap-3 sm:flex-col sm:gap-4">
+              <button
+                class="bg-muted hover:bg-secondary text-muted-foreground hover:text-foreground flex cursor-pointer items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all duration-200 active:scale-95"
+                @click.stop="refreshDailyPick"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-3.5 w-3.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                <span class="hidden sm:inline">换一个</span>
+              </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="text-muted-foreground h-5 w-5 shrink-0 opacity-40 transition-opacity duration-300 group-hover:opacity-100"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                />
+              </svg>
+            </div>
+          </div>
+        </Transition>
+      </div>
+
       <!-- 非对称布局：左 2/3 + 右 1/3 -->
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <!-- ======== 左列：本站信息 + 友链大卡片 ======== -->
@@ -69,13 +166,13 @@
                 <code class="text-foreground truncate">{{ selfInfo.icon }}</code>
               </div>
               <div class="flex flex-wrap gap-2 pt-1">
-                <span
+                <TagPill
                   v-for="tag in selfInfo.tags"
                   :key="tag"
-                  class="bg-muted text-muted-foreground rounded-full px-2.5 py-0.5 text-xs"
+                  compact
                 >
                   {{ tag }}
-                </span>
+                </TagPill>
               </div>
             </div>
           </div>
@@ -137,13 +234,12 @@
                   {{ link.description }}
                 </p>
                 <div class="mt-4 flex flex-wrap gap-2">
-                  <span
+                  <TagPill
                     v-for="tag in link.tags"
                     :key="tag"
-                    class="bg-muted text-muted-foreground rounded-full px-2.5 py-1 text-xs"
                   >
                     {{ tag }}
-                  </span>
+                  </TagPill>
                 </div>
               </div>
             </div>
@@ -325,7 +421,11 @@
 <script setup lang="ts">
 import { BasicDetail } from "@/components/basic";
 import friendLinksData from "@/data/friendlinks.json";
+import websitesData from "@/data/websites.json";
 import { useNotificationStore } from "@/stores/notification";
+import type { Website } from "@/types";
+import { TagPill } from "@/components/ui/tag-pill";
+import { useImageError } from "@/composables/useImageError";
 import { motion } from "motion-v";
 import { onMounted, ref } from "vue";
 
@@ -346,6 +446,7 @@ interface SelfInfo {
   tags: string[];
 }
 
+const dailyPick = ref<Website | null>(null);
 const links = ref<FriendLink[]>([]);
 const selfInfo = ref<SelfInfo>({
   name: "",
@@ -355,15 +456,26 @@ const selfInfo = ref<SelfInfo>({
   tags: [],
 });
 
+const refreshDailyPick = () => {
+  if (websitesData.sites.length === 0) return;
+  if (websitesData.sites.length === 1) {
+    dailyPick.value = websitesData.sites[0] as Website;
+    return;
+  }
+  let idx: number;
+  do {
+    idx = Math.floor(Math.random() * websitesData.sites.length);
+  } while (websitesData.sites[idx].id === dailyPick.value?.id);
+  dailyPick.value = websitesData.sites[idx] as Website;
+};
+
 onMounted(() => {
   links.value = friendLinksData.links;
   selfInfo.value = friendLinksData.self as SelfInfo;
+  refreshDailyPick();
 });
 
-const handleImageError = (event: Event) => {
-  const img = event.target as HTMLImageElement;
-  img.style.display = "none";
-};
+const { handleImageError } = useImageError();
 
 const copySelfInfo = async () => {
   const md = [
@@ -373,13 +485,27 @@ const copySelfInfo = async () => {
     `- **头像**：${selfInfo.value.icon}`,
   ].join("\n");
 
+  const notice = useNotificationStore();
   try {
     await navigator.clipboard.writeText(md);
-    const notice = useNotificationStore();
     notice.success("友链信息已复制到剪贴板");
   } catch {
-    const notice = useNotificationStore();
     notice.error("复制失败，请手动复制");
   }
 };
 </script>
+
+<style scoped>
+.pick-switch-enter-active,
+.pick-switch-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.pick-switch-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.pick-switch-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+</style>

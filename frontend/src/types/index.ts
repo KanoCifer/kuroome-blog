@@ -220,6 +220,17 @@ export interface RssSubscription {
   created_at: string | null;
 }
 
+// 推荐网站
+export interface Website {
+  id: string;
+  name: string;
+  description: string;
+  url: string;
+  icon: string;
+  category: string;
+  tags: string[];
+}
+
 // RSS 文章分页响应类型
 export interface RssArticleListResponse {
   items: RssArticle[];

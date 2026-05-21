@@ -53,24 +53,13 @@
 
 <script setup lang="ts">
 import websitesData from "@/data/websites.json";
+import type { Website } from "@/types";
+import { useImageError } from "@/composables/useImageError";
 
-interface Website {
-  id: string;
-  name: string;
-  description: string;
-  url: string;
-  icon: string;
-  category: string;
-  tags: string[];
-}
+const { handleImageError } = useImageError();
 
 const randomSite: Website | null =
   websitesData.sites.length > 0
     ? websitesData.sites[Math.floor(Math.random() * websitesData.sites.length)]
     : null;
-
-const handleImageError = (event: Event) => {
-  const img = event.target as HTMLImageElement;
-  img.style.display = "none";
-};
 </script>

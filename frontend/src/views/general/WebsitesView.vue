@@ -99,18 +99,10 @@
 <script setup lang="ts">
 import { BasicDetail } from "@/components/basic";
 import websitesData from "@/data/websites.json";
+import type { Website } from "@/types";
+import { useImageError } from "@/composables/useImageError";
 import { onMounted, ref } from "vue";
 import { motion } from "motion-v";
-
-interface Website {
-  id: string;
-  name: string;
-  description: string;
-  url: string;
-  icon: string;
-  category: string;
-  tags: string[];
-}
 
 const sites = ref<Website[]>([]);
 
@@ -118,8 +110,5 @@ onMounted(() => {
   sites.value = websitesData.sites;
 });
 
-const handleImageError = (event: Event) => {
-  const img = event.target as HTMLImageElement;
-  img.style.display = "none";
-};
+const { handleImageError } = useImageError();
 </script>

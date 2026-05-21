@@ -181,6 +181,7 @@ declare module 'vue' {
     ServerMonitor: typeof import('./src/components/analytics/ServerMonitor.vue')['default']
     SettingsModal: typeof import('./src/components/layout/SettingsModal.vue')['default']
     Slider: typeof import('./src/components/ui/slider/Slider.vue')['default']
+    TagPill: typeof import('./src/components/ui/tag-pill/TagPill.vue')['default']
     ThemeToggle: typeof import('./src/components/layout/ThemeToggle.vue')['default']
     TideCard: typeof import('./src/components/map/TideCard.vue')['default']
     TideChart: typeof import('./src/components/map/TideChart.vue')['default']
