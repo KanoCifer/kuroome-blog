@@ -1,11 +1,7 @@
 <template>
   <BentoCard>
     <div class="p-4">
-      <h3
-        class="text-muted-foreground mb-3 text-xs font-bold tracking-wider uppercase"
-      >
-        分类
-      </h3>
+      <h3 class="text-muted-foreground mb-3 text-xs font-bold tracking-wider uppercase">Tags</h3>
       <ul class="space-y-1">
         <!-- 全部文章 -->
         <li>
@@ -22,10 +18,7 @@
               <IconTags class="size-4" />
               全部文章
             </span>
-            <span
-              v-if="totalPosts !== null"
-              class="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs"
-            >
+            <span v-if="totalPosts !== null" class="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs">
               {{ totalPosts }}
             </span>
           </button>
@@ -45,9 +38,7 @@
               <IconTags class="size-4" />
               {{ category.name }}
             </span>
-            <span
-              class="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs"
-            >
+            <span class="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs">
               {{ category.post_count || 0 }}
             </span>
           </button>
@@ -111,10 +102,7 @@ const fetchCategories = async () => {
         posts: [],
       }),
     ) as unknown as Category[];
-    totalPosts.value = response.reduce(
-      (sum, cat) => sum + (cat.post_count || 0),
-      0,
-    );
+    totalPosts.value = response.reduce((sum, cat) => sum + (cat.post_count || 0), 0);
   } catch (error) {
     console.error("Failed to fetch categories:", error);
   }

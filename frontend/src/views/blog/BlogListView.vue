@@ -8,9 +8,7 @@
         <!-- 搜索框 -->
         <div class="flex w-full items-center justify-between gap-4">
           <div class="relative w-fit">
-            <div
-              class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
-            >
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -46,11 +44,7 @@
                 stroke="currentColor"
                 class="h-5 w-5"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
@@ -59,12 +53,7 @@
             to="/blog/new"
             class="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:outline-primary inline-flex w-fit items-center rounded-lg px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="mr-2 h-4 w-4"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
+            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
               <path
                 fill-rule="evenodd"
                 d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
@@ -84,9 +73,7 @@
               v-if="isLoading"
               class="border-border bg-card flex flex-col items-center justify-center rounded-xl border px-6 py-16 text-center"
             >
-              <div
-                class="border-primary/20 border-t-primary mb-4 h-10 w-10 animate-spin rounded-full border-4"
-              ></div>
+              <div class="border-primary/20 border-t-primary mb-4 h-10 w-10 animate-spin rounded-full border-4"></div>
               <p class="text-muted-foreground">加载中...</p>
             </div>
 
@@ -138,28 +125,18 @@
                   d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
                 />
               </svg>
-              <p class="text-muted-foreground text-lg font-medium">
-                No blog posts available.
-              </p>
+              <p class="text-muted-foreground text-lg font-medium">No blog posts available.</p>
               <p class="text-muted-foreground/70 mt-1 text-sm">
-                {{
-                  activeCategory
-                    ? "There are no posts in this category yet."
-                    : "Check back later for new content."
-                }}
+                {{ activeCategory ? "There are no posts in this category yet." : "Check back later for new content." }}
               </p>
             </div>
 
             <!-- Blog Post Item -->
-            <BlogListItem v-for="post in posts" :key="post._id" :post="post" />
+            <BlogListItem v-for="(post, index) in posts" :key="post._id" :post="post" :index="index" />
           </div>
 
           <!-- Pagination -->
-          <nav
-            v-if="pagination && pagination.pages > 1"
-            class="mt-10"
-            aria-label="博客分页"
-          >
+          <nav v-if="pagination && pagination.pages > 1" class="mt-10" aria-label="博客分页">
             <ul
               class="border-border/80 bg-card/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2"
             >
@@ -253,6 +230,7 @@
             <BentoCategory
               @filterPosts="handleFilterPosts"
               @resetFilter="handleResetFilter"
+              class="hidden p-2! lg:block"
             />
           </div>
         </div>
@@ -266,13 +244,13 @@ import BasicDetail from "@/components/basic/BasicDetail.vue";
 import { blogService } from "@/service/blogService";
 import { useNotificationStore } from "@/stores/notification";
 import type { BlogPagination, Category, Post } from "@/types";
+import BentoCalendar from "@/views/entry/components/BentoCalendar.vue";
+import BentoProfileCard from "@/views/entry/components/BentoProfileCard.vue";
 import { useHead } from "@unhead/vue";
 import { computed, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import BlogListItem from "./components/BlogListItem.vue";
 import BentoCategory from "./components/BentoCategory.vue";
-import BentoProfileCard from "@/views/entry/components/BentoProfileCard.vue";
-import BentoCalendar from "@/views/entry/components/BentoCalendar.vue";
+import BlogListItem from "./components/BlogListItem.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -311,11 +289,7 @@ const getVisiblePages = computed(() => {
   const visiblePages = [];
 
   // 显示当前页附近的页码
-  for (
-    let i = Math.max(2, current - 2);
-    i <= Math.min(totalPages - 1, current + 2);
-    i++
-  ) {
+  for (let i = Math.max(2, current - 2); i <= Math.min(totalPages - 1, current + 2); i++) {
     visiblePages.push(i);
   }
 
@@ -344,8 +318,7 @@ const fetchPosts = async (page: number = 1) => {
     currentPage.value = page;
   } catch (err: unknown) {
     console.error(err);
-    errorMessage.value =
-      err instanceof Error ? err.message : "加载文章列表失败，请稍后重试。";
+    errorMessage.value = err instanceof Error ? err.message : "加载文章列表失败，请稍后重试。";
     useNotificationStore().error(errorMessage.value);
   } finally {
     isLoading.value = false;
@@ -388,19 +361,12 @@ const clearSearch = () => {
 };
 
 watch(
-  () => [
-    route.query.page,
-    route.query.search,
-    route.query.category,
-    route.params.categoryId,
-  ],
+  () => [route.query.page, route.query.search, route.query.category, route.params.categoryId],
   ([pageQuery, searchParam, categoryQuery, categoryParam]) => {
     searchQuery.value = typeof searchParam === "string" ? searchParam : "";
 
-    const hasCategoryQuery =
-      typeof categoryQuery === "string" && categoryQuery.length > 0;
-    const hasCategoryParam =
-      typeof categoryParam === "string" && categoryParam.length > 0;
+    const hasCategoryQuery = typeof categoryQuery === "string" && categoryQuery.length > 0;
+    const hasCategoryParam = typeof categoryParam === "string" && categoryParam.length > 0;
 
     if (hasCategoryQuery || hasCategoryParam) {
       return;
@@ -431,9 +397,7 @@ useHead(() => ({
     },
     {
       property: "og:title",
-      content: activeCategory.value
-        ? `${activeCategory.value} 分类文章 - ReadingList`
-        : "ReadingList Blog",
+      content: activeCategory.value ? `${activeCategory.value} 分类文章 - ReadingList` : "ReadingList Blog",
     },
     {
       property: "og:description",
@@ -453,9 +417,7 @@ useHead(() => ({
     },
     {
       name: "twitter:title",
-      content: activeCategory.value
-        ? `${activeCategory.value} 分类文章 - ReadingList`
-        : "ReadingList Blog",
+      content: activeCategory.value ? `${activeCategory.value} 分类文章 - ReadingList` : "ReadingList Blog",
     },
     {
       name: "twitter:description",

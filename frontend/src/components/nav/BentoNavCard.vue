@@ -30,7 +30,7 @@
             class="relative z-10 flex items-center gap-4 rounded-3xl py-3.5 pr-5 pl-6 font-medium transition-colors duration-150"
             :class="
               hoverNavIndex === index
-                ? 'text-(--ink)'
+                ? 'text-white/80'
                 : 'text-foreground dark:text-muted-foreground dark:hover:text-foreground'
             "
           >
