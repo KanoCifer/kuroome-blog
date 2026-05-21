@@ -139,6 +139,7 @@ declare module 'vue' {
     IconTrend: typeof import('./src/components/icons/IconTrend.vue')['default']
     IconUser: typeof import('./src/components/icons/IconUser.vue')['default']
     IconWarning: typeof import('./src/components/icons/IconWarning.vue')['default']
+    ImageEditorModal: typeof import('./src/components/editor/ImageEditorModal.vue')['default']
     ImgCat: typeof import('./src/components/icons/ImgCat.vue')['default']
     ImportIcon: typeof import('./src/components/icons/ImportIcon.vue')['default']
     LoginIcon: typeof import('./src/components/icons/LoginIcon.vue')['default']

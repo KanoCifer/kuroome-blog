@@ -2,9 +2,8 @@
 
 ## 1) Rules (Highest Priority)
 
-- 用户使用中文提问时，使用中文回复。
 - 修改前端代码后，必须运行：`pnpm run type-check`。
-- **不要自动运行 `pnpm run build`**，除非用户明确要求。
+- **不要运行 `build`**，除非用户明确要求。
 - 提交前执行对应语言的格式化与 lint。
 
 ## 2) Project Overview

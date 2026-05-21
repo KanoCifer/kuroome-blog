@@ -3,7 +3,7 @@
     :style="[position]"
     class="drag-wrapper absolute -translate-x-1/2 -translate-y-1/2 transition-[border] duration-200"
     :class="{
-      'outline-primary/60 rounded-3xl outline-2 outline-offset-[12px] outline-dashed': layoutStore.isEditing,
+      'outline-primary/60 rounded-3xl outline-2 outline-offset-8 outline-dashed': layoutStore.isEditing,
       'cursor-grab': layoutStore.isEditing,
     }"
     @pointerdown="onPointerDown"

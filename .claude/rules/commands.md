@@ -46,7 +46,3 @@ pnpm run lint                     # eslint .
 pnpm run lint:fix                 # eslint . --fix
 pnpm run format                   # prettier --write src/
 ```
-
-## Verification
-
-Run `/verify` to execute all format/lint/type-check at once.
