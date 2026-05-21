@@ -56,7 +56,7 @@
         v-if="show.BentoTech"
         :initial="{ scale: 0.5, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
-        class="h-2xs w-68 p-0!"
+        class="h-2xs w-68 p-2!"
       />
     </DragWrapper>
 
@@ -69,13 +69,26 @@
           type: 'spring',
           duration: 0.3,
         }"
-        class="w-90 cursor-pointer"
+        class="w-60 cursor-pointer"
       />
     </DragWrapper>
     <!-- <BentoCat v-if="show.BentoCat" :style="[catPosition]" class="absolute w-2xs -translate-x-1/2 -translate-y-1/2" /> -->
-    <DragWrapper :position="todoPosition" card-name="TodoCard">
-      <TodoCard title="MyTasks" />
+
+    <DragWrapper :position="picPosition" card-name="BentoPic">
+      <!-- 新增照片卡片的拖拽容器 -->
+      <BentoPic
+        v-if="show.BentoPic"
+        :initial="{ scale: 0, opacity: 0 }"
+        :animate="{ scale: 1, opacity: 1 }"
+        :transition="{
+          type: 'spring',
+          duration: 0.3,
+        }"
+        class="w-80 cursor-pointer p-2!"
+      />
+      <!-- 中间的照片卡片 -->
     </DragWrapper>
+
     <!-- Settings Modal -->
     <SettingsModal v-model="isSettingsOpen" />
     <!-- Footer -->
@@ -127,7 +140,7 @@
 
 <script setup lang="ts">
 import { BasicFooter } from "@/components/basic";
-import { BentoCalendar, BentoClock, BentoProfileCard, BentoReadingList, BentoTech, TodoCard } from "@/components/bento";
+import { BentoCalendar, BentoClock, BentoProfileCard, BentoReadingList, BentoTech } from "@/components/bento";
 import DragWrapper from "@/components/layout/DragWrapper.vue";
 import FloatingActionButtons from "@/components/layout/FloatingActionButtons.vue";
 import SettingsModal from "@/components/layout/SettingsModal.vue";
@@ -136,6 +149,7 @@ import { useCardLayoutStore } from "@/stores/cardLayout";
 import { useThemeStore } from "@/stores/theme";
 import { nextTick, onMounted, onUnmounted, ref } from "vue";
 import BentoMap from "./components/BentoMap.vue";
+import BentoPic from "./components/BentoPic.vue";
 import GreetingToast from "./components/GreetingToast.vue";
 
 const themeStore = useThemeStore();
@@ -155,7 +169,7 @@ const parentContainer = ref<HTMLElement | null>(null);
 const {
   containerStyle,
   greetingPosition,
-  todoPosition,
+  picPosition,
   profilePosition,
   clockCardPosition,
   calendarPosition,

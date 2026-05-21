@@ -5,8 +5,8 @@ import { useLayoutCenter } from "./useLayoutCenter";
 
 /** Card style entry from card-styles.json */
 interface CardStyle {
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
   order: number;
 }
 
@@ -67,15 +67,15 @@ export function useCardLayout(containerRef: Ref<HTMLElement | null>) {
   const layoutStore = useCardLayoutStore();
 
   const leftAnchor = computed(
-    () => centerX.value - STYLES.BentoNavCard.width / 2 - LAYOUT.CARD_SPACING - LAYOUT.SIDE_COLUMN_GAP,
+    () => centerX.value - STYLES.BentoNavCard.width! / 2 - LAYOUT.CARD_SPACING - LAYOUT.SIDE_COLUMN_GAP,
   );
   const rightAnchor = computed(
-    () => centerX.value + STYLES.BentoClock.width / 2 + LAYOUT.CARD_SPACING + LAYOUT.SIDE_COLUMN_GAP,
+    () => centerX.value + STYLES.BentoClock.width! / 2 + LAYOUT.CARD_SPACING + LAYOUT.SIDE_COLUMN_GAP,
   );
 
   // Center column (greeting map + profile card)
-  const listCardPosition = computed(() => {
-    const o = layoutStore.getOffset("BentoReadingList");
+  const picPosition = computed(() => {
+    const o = layoutStore.getOffset("BentoPic");
     return position(layoutHeight.value * LAYOUT.LIST_TOP_RATIO + LAYOUT.LIST_Y_ADJUST + o.y, centerX.value + o.x);
   });
   const profilePosition = computed(() => {
@@ -120,8 +120,8 @@ export function useCardLayout(containerRef: Ref<HTMLElement | null>) {
     );
   });
 
-  const todoPosition = computed(() => {
-    const o = layoutStore.getOffset("TodoCard");
+  const listCardPosition = computed(() => {
+    const o = layoutStore.getOffset("BentoReadingList");
     return position(
       layoutHeight.value * LAYOUT.TODO_TOP_RATIO + LAYOUT.TODO_Y_ADJUST + o.y,
       centerX.value + LAYOUT.TODO_X_ADJUST + o.x,
@@ -130,7 +130,7 @@ export function useCardLayout(containerRef: Ref<HTMLElement | null>) {
 
   return {
     containerStyle,
-    todoPosition,
+    picPosition,
     greetingPosition,
     profilePosition,
     navCardPosition,
