@@ -20,8 +20,8 @@
           >
             {{ completedCount }} / {{ todos.length }}
           </span>
-          <RouterLink
-            to="/todos"
+          <button
+            @click="todoDrawer.open()"
             class="text-muted-foreground hover:bg-accent hover:text-foreground dark:hover:bg-accent dark:hover:text-foreground cursor-pointer rounded-md p-1 outline-0 transition-colors"
             title="查看详情"
           >
@@ -38,7 +38,7 @@
                 d="M4 6h16M4 12h16M4 18h16"
               />
             </svg>
-          </RouterLink>
+          </button>
         </div>
       </div>
 
@@ -108,7 +108,7 @@
 import { useTodoStore } from "@/stores/todos";
 import { storeToRefs } from "pinia";
 import { onMounted } from "vue";
-import { RouterLink } from "vue-router";
+import { useTodoDrawer } from "@/composables/useTodoDrawer";
 import BentoCard from "./BentoCard.vue";
 
 interface Props {
@@ -125,6 +125,8 @@ const {
   completedCount,
   isCollapsed,
 } = storeToRefs(todoStore);
+
+const todoDrawer = useTodoDrawer();
 
 onMounted(() => {
   todoStore.hydrateTodos();
