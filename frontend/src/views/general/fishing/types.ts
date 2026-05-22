@@ -173,3 +173,8 @@ export interface FishingFeedbackResponse {
   expert_score: number;
   residual: number;
 }
+
+export interface FishingStats {
+  total_records: number;
+  latest_record_time: string | null;
+}

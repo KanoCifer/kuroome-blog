@@ -4,6 +4,7 @@ import type {
   FishingFeedbackPayload,
   FishingFeedbackResponse,
   FishingIndexData,
+  FishingStats,
 } from "@/views/general/fishing/types";
 
 export interface FishingService {
@@ -13,6 +14,7 @@ export interface FishingService {
   submitFishingFeedback(
     payload: FishingFeedbackPayload,
   ): Promise<FishingFeedbackResponse>;
+  fetchFishingStats(): Promise<FishingStats>;
 }
 
 export const fishingService: FishingService = {
@@ -26,5 +28,9 @@ export const fishingService: FishingService = {
     payload: FishingFeedbackPayload,
   ): Promise<FishingFeedbackResponse> {
     return fishingGateway.postFishingFeedback(payload);
+  },
+
+  async fetchFishingStats(): Promise<FishingStats> {
+    return fishingGateway.getFishingStats();
   },
 };

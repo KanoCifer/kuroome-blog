@@ -5,3 +5,5 @@ allowBuilds:
   maplibre-gl: true
   msw: true
   vue-demi: true
+overrides:
+  lottie-web: 5.13.0

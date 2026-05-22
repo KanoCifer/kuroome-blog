@@ -44,17 +44,6 @@
           </div>
         </div>
       </div>
-
-      <!-- 底部：标签 -->
-      <div class="mt-2 flex items-center gap-1.5">
-        <span
-          v-for="tag in tags"
-          :key="tag"
-          class="text-muted-foreground border-border/50 rounded-full border px-2 py-0.5 text-[10px]"
-        >
-          {{ tag }}
-        </span>
-      </div>
     </RouterLink>
   </BentoCard>
 </template>
@@ -69,7 +58,6 @@ import { onMounted, ref } from "vue";
 
 const { displayValue: displayCount, animateTo } = useAnimateNumber();
 const progressPercent = ref(68);
-const tags = ref(["小说", "技术", "传记"]);
 const bookCovers = ["bg-red-400", "bg-blue-400", "bg-green-400"];
 
 onMounted(async () => {

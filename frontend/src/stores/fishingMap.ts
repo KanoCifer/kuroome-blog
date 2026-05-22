@@ -27,6 +27,8 @@ export const HARBOR_OPTIONS = [
 export const useFishingMapStore = defineStore("fishingMap", () => {
   const notifier = useNotificationStore();
 
+  let fetchSeq = 0;
+
   const fullWeatherData = ref<WeatherFullResponse | null>(null);
   const liveWeather = ref<WeatherNow | null>(null);
   const forecasts = ref<WeatherDay[]>([]);
@@ -51,6 +53,7 @@ export const useFishingMapStore = defineStore("fishingMap", () => {
   async function fetchWeatherAndFishing(
     location: [number, number],
   ): Promise<void> {
+    const seq = ++fetchSeq;
     weatherLoading.value = true;
     indexLoading.value = true;
     weatherError.value = "";
@@ -62,6 +65,8 @@ export const useFishingMapStore = defineStore("fishingMap", () => {
         fishingService.fetchFishingIndex({ location }),
       ]);
 
+      if (seq !== fetchSeq) return;
+
       fullWeatherData.value = weatherRes.fullWeatherData;
       liveWeather.value = weatherRes.now ?? null;
       forecasts.value = weatherRes.daily ?? [];
@@ -71,14 +76,17 @@ export const useFishingMapStore = defineStore("fishingMap", () => {
       tideData.value = weatherRes.tideData;
       indexData.value = fishingIndex;
     } catch (err) {
+      if (seq !== fetchSeq) return;
       const message =
         err instanceof Error ? err.message : "获取钓鱼地图数据失败";
       weatherError.value = message;
       indexError.value = message;
       notifier.error(message);
     } finally {
-      weatherLoading.value = false;
-      indexLoading.value = false;
+      if (seq === fetchSeq) {
+        weatherLoading.value = false;
+        indexLoading.value = false;
+      }
     }
   }
 

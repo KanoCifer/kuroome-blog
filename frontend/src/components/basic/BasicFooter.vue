@@ -69,8 +69,8 @@ const delayStatus = computed(() => {
   const ms = connectionDelay?.value ?? 0;
   if (!ms) return { label: "-- ms", dotClass: "bg-muted-foreground/40" };
   const label = `${Math.round(ms)} ms`;
-  if (ms < 50) return { label, dotClass: "bg-emerald-500" };
-  if (ms < 150) return { label, dotClass: "bg-yellow-500" };
+  if (ms < 200) return { label, dotClass: "bg-emerald-500" };
+  if (ms < 2000) return { label, dotClass: "bg-yellow-500" };
   return { label, dotClass: "bg-red-500" };
 });
 

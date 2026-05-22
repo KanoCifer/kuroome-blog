@@ -4,6 +4,7 @@ import type {
   FishingFeedbackPayload,
   FishingFeedbackResponse,
   FishingIndexData,
+  FishingStats,
 } from "@/views/general/fishing/types";
 
 export interface FishingGateway {
@@ -13,6 +14,7 @@ export interface FishingGateway {
   postFishingFeedback(
     payload: FishingFeedbackPayload,
   ): Promise<FishingFeedbackResponse>;
+  getFishingStats(): Promise<FishingStats>;
 }
 
 export const fishingGateway: FishingGateway = {
@@ -36,6 +38,11 @@ export const fishingGateway: FishingGateway = {
       "v2/fishing/feedback",
       payload,
     );
+    return res.data.data;
+  },
+
+  async getFishingStats(): Promise<FishingStats> {
+    const res = await request.get<{ data: FishingStats }>("v2/fishing/stats");
     return res.data.data;
   },
 };

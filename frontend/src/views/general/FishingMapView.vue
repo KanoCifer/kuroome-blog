@@ -256,7 +256,10 @@ const analysisPayload = computed(() => {
 });
 
 const analysisHasData = computed(
-  () => liveWeather.value !== null && tideData.value !== null,
+  () =>
+    liveWeather.value !== null ||
+    forecasts.value.length > 0 ||
+    tideData.value !== null,
 );
 
 const handleFeedbackClick = (data: FishingIndexData) => {
@@ -276,23 +279,26 @@ const handleFeedbackClick = (data: FishingIndexData) => {
     const currentTide = tideData.value.tideTable[0];
     const nextTide = tideData.value.tideTable[1];
 
-    tideType = currentTide.type === "H" ? "涨潮" : "退潮";
-    tideLevel = Number(currentTide.height) || 1.5;
+    tideType = currentTide.type === "H" ? "退潮" : "涨潮";
+    tideLevel = Number(currentTide.height ?? 1.5);
 
     if (nextTide) {
-      const nextLevel = Number(nextTide.height) || 1.5;
+      const nextLevel = Number(nextTide.height ?? 1.5);
       tideRange = Math.abs(nextLevel - tideLevel);
       const currentTime = new Date(currentTide.fxTime).getTime();
       const nextTime = new Date(nextTide.fxTime).getTime();
-      hoursToNextTide = (nextTime - currentTime) / (1000 * 60 * 60);
+      hoursToNextTide =
+        Number.isFinite(currentTime) && Number.isFinite(nextTime)
+          ? (nextTime - currentTime) / (1000 * 60 * 60)
+          : 3.0;
     }
   }
 
   currentFishingData.value = {
     fishing_index: data.fishing_index,
     level: data.level,
-    temperature: Number(liveWeather.value?.temp) || 20,
-    humidity: Number(liveWeather.value?.humidity) || 50,
+    temperature: Number(liveWeather.value?.temp ?? 20),
+    humidity: Number(liveWeather.value?.humidity ?? 50),
     pressure: Number(liveWeather.value?.pressure) || 1013,
     wind_speed: Number(liveWeather.value?.windSpeed) || 0,
     precipitation: Number(liveWeather.value?.precip) || 0,
@@ -355,6 +361,8 @@ const handleMarkerClick = async (index: number) => {
   } catch (error) {
     console.error("路线规划失败:", error);
     alert("路线规划失败，请检查网络连接或定位权限");
+    routeInfo.value = null;
+    selectedSpotIndex.value = null;
   } finally {
     isPlanningRoute.value = false;
   }
@@ -378,7 +386,7 @@ const handleMapReady = () => {
       userPosition.value = position;
       await fishingMapStore.fetchWeatherAndFishing(position);
     } catch {
-      // 如果定位失败，保留默认中心点数据
+      console.error("handleMapReady 定位失败");
     }
   })();
 };

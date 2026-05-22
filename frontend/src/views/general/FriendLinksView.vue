@@ -3,15 +3,12 @@
     <div class="col-span-full mx-auto w-full max-w-6xl">
       <!-- 每日推荐横幅 -->
       <div
-        class="border-border bg-card/30 group mb-6 cursor-pointer overflow-hidden rounded-4xl border p-6 shadow-sm transition-all duration-300 hover:shadow-lg sm:p-8"
+        class="border-border bg-card/30 group relative mb-6 cursor-pointer overflow-hidden rounded-4xl border p-6 shadow-sm transition-all duration-300 hover:shadow-lg sm:p-8"
         @click="$router.push('/websites')"
       >
         <Transition name="pick-switch" mode="out-in">
-          <div
-            :key="dailyPick?.id"
-            class="flex flex-col gap-4 sm:flex-row sm:items-center"
-          >
-            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-muted">
+          <div :key="dailyPick?.id" class="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <div class="bg-muted flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl">
               <img
                 v-if="dailyPick?.icon"
                 :src="dailyPick.icon"
@@ -19,40 +16,20 @@
                 class="h-8 w-8 object-contain"
                 @error="handleImageError"
               />
-              <svg
-                v-else
-                xmlns="http://www.w3.org/2000/svg"
-                class="text-muted-foreground h-7 w-7"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
-                />
-              </svg>
+              <IconGlobeOutline v-else class="text-muted-foreground h-7 w-7" />
             </div>
 
             <div class="min-w-0 flex-1">
               <div class="mb-1 flex items-center gap-2">
                 <span class="text-muted-foreground text-xs font-bold tracking-wide uppercase">每日推荐</span>
-                <span
-                  class="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px] font-semibold"
-                >
+                <span class="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px] font-semibold">
                   {{ dailyPick?.category }}
                 </span>
               </div>
               <h3 class="text-foreground text-lg font-bold">{{ dailyPick?.name }}</h3>
               <p class="text-muted-foreground mt-1 line-clamp-2 text-sm">{{ dailyPick?.description }}</p>
               <div v-if="dailyPick?.tags?.length" class="mt-3 flex flex-wrap gap-2">
-                <TagPill
-                  v-for="tag in dailyPick.tags.slice(0, 4)"
-                  :key="tag"
-                  compact
-                >
+                <TagPill v-for="tag in dailyPick.tags.slice(0, 4)" :key="tag" compact>
                   {{ tag }}
                 </TagPill>
               </div>
@@ -60,42 +37,25 @@
 
             <div class="flex shrink-0 items-center gap-3 sm:flex-col sm:gap-4">
               <button
+                class="bg-primary text-primary-foreground hover:bg-primary/90 flex cursor-pointer items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold shadow-sm transition-all duration-200 hover:shadow-md active:scale-95"
+                @click.stop="$router.push('/websites')"
+              >
+                <IconExternalLink class="h-3.5 w-3.5" />
+                <span class="hidden sm:inline">看更多</span>
+              </button>
+              <button
                 class="bg-muted hover:bg-secondary text-muted-foreground hover:text-foreground flex cursor-pointer items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all duration-200 active:scale-95"
                 @click.stop="refreshDailyPick"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-3.5 w-3.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                  />
-                </svg>
+                <IconRefresh class="h-3.5 w-3.5" />
                 <span class="hidden sm:inline">换一个</span>
               </button>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="text-muted-foreground h-5 w-5 shrink-0 opacity-40 transition-opacity duration-300 group-hover:opacity-100"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                />
-              </svg>
             </div>
           </div>
         </Transition>
+        <IconExternalLink
+          class="text-muted-foreground absolute top-4 right-4 h-5 w-5 shrink-0 opacity-40 transition-opacity duration-300 group-hover:opacity-100"
+        />
       </div>
 
       <!-- 非对称布局：左 2/3 + 右 1/3 -->
@@ -134,20 +94,7 @@
                 class="group bg-primary text-primary-foreground hover:bg-primary/90 flex shrink-0 cursor-pointer items-center rounded-xl px-4 py-2 text-sm font-semibold shadow-sm transition-all duration-200 hover:shadow-md active:scale-95"
                 @click="copySelfInfo"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
-                  />
-                </svg>
+                <IconCopy class="h-4 w-4" />
                 <span
                   class="max-w-0 min-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-all duration-500 ease-out group-hover:max-w-50 group-hover:opacity-100"
                   >复制</span
@@ -166,11 +113,7 @@
                 <code class="text-foreground truncate">{{ selfInfo.icon }}</code>
               </div>
               <div class="flex flex-wrap gap-2 pt-1">
-                <TagPill
-                  v-for="tag in selfInfo.tags"
-                  :key="tag"
-                  compact
-                >
+                <TagPill v-for="tag in selfInfo.tags" :key="tag" compact>
                   {{ tag }}
                 </TagPill>
               </div>
@@ -206,21 +149,7 @@
                   class="h-16 w-16 rounded-full object-cover"
                   @error="handleImageError"
                 />
-                <svg
-                  v-else
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="text-muted-foreground h-10 w-10"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
-                  />
-                </svg>
+                <IconGlobeOutline v-else class="text-muted-foreground h-10 w-10" />
               </div>
               <div class="min-w-0 flex-1">
                 <h3
@@ -234,10 +163,7 @@
                   {{ link.description }}
                 </p>
                 <div class="mt-4 flex flex-wrap gap-2">
-                  <TagPill
-                    v-for="tag in link.tags"
-                    :key="tag"
-                  >
+                  <TagPill v-for="tag in link.tags" :key="tag">
                     {{ tag }}
                   </TagPill>
                 </div>
@@ -246,20 +172,7 @@
 
             <!-- 外链箭头 -->
             <div class="absolute top-6 right-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="text-muted-foreground h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                />
-              </svg>
+              <IconExternalLink class="text-muted-foreground h-5 w-5" />
             </div>
           </motion.a>
 
@@ -268,20 +181,7 @@
             v-if="links.length === 0"
             class="border-border bg-card/30 flex flex-col items-center justify-center rounded-4xl border py-16"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="text-muted-foreground mb-4 h-16 w-16"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="1.5"
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
+            <IconUsersGroup class="text-muted-foreground mb-4 h-16 w-16" />
             <p class="text-muted-foreground text-lg">暂无友链</p>
             <p class="text-muted-foreground mt-2 text-sm">欢迎提交申请，成为第一位友链伙伴</p>
           </div>
@@ -293,20 +193,7 @@
             <!-- Header -->
             <div class="mb-6">
               <h3 class="text-foreground flex items-center gap-2 font-serif text-xl font-bold">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="text-primary h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                  />
-                </svg>
+                <IconLinkChain class="text-primary h-5 w-5" />
                 申请友链
               </h3>
               <p class="text-muted-foreground mt-1.5 text-sm">
@@ -317,20 +204,7 @@
             <!-- 接入须知 -->
             <div class="border-primary/15 bg-primary/5 mb-6 rounded-2xl border p-5">
               <h4 class="text-foreground mb-3 flex items-center gap-2 text-sm font-bold">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="text-primary h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+                <IconInfoCircle class="text-primary h-4 w-4" />
                 接入须知
               </h4>
               <ul class="text-muted-foreground space-y-2 text-sm">
@@ -363,20 +237,7 @@
             <!-- 申请格式 -->
             <div class="mb-6">
               <h4 class="text-foreground mb-3 flex items-center gap-2 text-sm font-bold">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="text-primary h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
+                <IconDocumentText class="text-primary h-4 w-4" />
                 申请格式
               </h4>
               <pre class="bg-muted text-muted-foreground overflow-x-auto rounded-xl p-4 text-xs leading-relaxed">
@@ -395,20 +256,7 @@
               rel="noopener noreferrer"
               class="bg-primary text-primary-foreground hover:bg-primary/90 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold shadow-sm transition-all duration-200 hover:shadow-md active:scale-95"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                />
-              </svg>
+              <IconExternalLink class="h-4 w-4" />
               前往 GitHub Issue 提交申请
             </a>
           </div>
@@ -420,14 +268,22 @@
 
 <script setup lang="ts">
 import { BasicDetail } from "@/components/basic";
+import { TagPill } from "@/components/ui/tag-pill";
+import { useImageError } from "@/composables/useImageError";
 import friendLinksData from "@/data/friendlinks.json";
 import websitesData from "@/data/websites.json";
 import { useNotificationStore } from "@/stores/notification";
 import type { Website } from "@/types";
-import { TagPill } from "@/components/ui/tag-pill";
-import { useImageError } from "@/composables/useImageError";
 import { motion } from "motion-v";
 import { onMounted, ref } from "vue";
+import IconCopy from "./icon/IconCopy.vue";
+import IconDocumentText from "./icon/IconDocumentText.vue";
+import IconExternalLink from "./icon/IconExternalLink.vue";
+import IconGlobeOutline from "./icon/IconGlobeOutline.vue";
+import IconInfoCircle from "./icon/IconInfoCircle.vue";
+import IconLinkChain from "./icon/IconLinkChain.vue";
+import IconRefresh from "./icon/IconRefresh.vue";
+import IconUsersGroup from "./icon/IconUsersGroup.vue";
 
 interface FriendLink {
   id: string;
@@ -498,7 +354,9 @@ const copySelfInfo = async () => {
 <style scoped>
 .pick-switch-enter-active,
 .pick-switch-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 .pick-switch-enter-from {
   opacity: 0;
