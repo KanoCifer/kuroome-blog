@@ -229,6 +229,15 @@ async def submit_feedback(
     )
 
 
+@router.get("/stats")
+async def get_fishing_stats(
+    service: FishingService = Depends(fishing_service_dep),
+) -> JSONResponse:
+    """获取钓鱼统计数据（总记录数 + 最近记录时间）"""
+    stats = await service.get_stats()
+    return APIResponse.ok(data=stats)
+
+
 @router.get("/weights")
 async def get_weights(
     _: User = Depends(manager),

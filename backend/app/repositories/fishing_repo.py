@@ -55,3 +55,10 @@ class FishingRepo:
     async def count_records(self) -> int:
         """统计总记录数"""
         return await FishingRecord.count()
+
+    async def get_latest_record(self) -> FishingRecord | None:
+        """获取最新的钓鱼记录（按 fishing_time 降序）"""
+        record = await FishingRecord.find_one(
+            {}, sort=[("fishing_time", -1)]
+        )
+        return record

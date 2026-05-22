@@ -333,6 +333,20 @@ class FishingService:
             logger.error(f"[钓鱼服务] 保存反馈记录失败: {e}", exc_info=True)
             return "save_failed"
 
+    async def get_stats(self) -> dict:
+        """获取钓鱼统计数据（总记录数 + 最近记录时间）"""
+        if self.repo is None:
+            return {"total_records": 0, "latest_record_time": None}
+
+        total = await self.repo.count_records()
+        latest = await self.repo.get_latest_record()
+        return {
+            "total_records": total,
+            "latest_record_time": (
+                latest.fishing_time.isoformat() if latest else None
+            ),
+        }
+
 
 # 全局实例
 fishing_service = FishingService()
