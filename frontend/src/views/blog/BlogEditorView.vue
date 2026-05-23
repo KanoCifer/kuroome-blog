@@ -5,7 +5,6 @@ import IconSave from "@/components/icons/IconSave.vue";
 import { blogService } from "@/service/blogService";
 import { useNotificationStore } from "@/stores/notification";
 import type { Category, CategoryResponseItem } from "@/types";
-import { marked } from "marked";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -128,9 +127,9 @@ const handleCategoryMouseLeave = () => {
   }, 150);
 };
 
-// Get current content - convert markdown to HTML for backend
+// Get current markdown content (stored as-is, no HTML conversion)
 const getCurrentContent = (): string => {
-  return marked.parse(markdownBody.value, { async: false }) as string;
+  return markdownBody.value;
 };
 
 // Manual save draft (Cmd+S)
@@ -215,12 +214,9 @@ const handleSubmit = async () => {
   if (markdownEditorRef.value) {
     try {
       // Upload all blob images and get markdown content with server URLs
-      const markdownWithServerUrls =
+      // Store raw markdown — conversion to HTML happens at display time
+      currentContent =
         await markdownEditorRef.value.getContentForPublish();
-      // Convert to HTML
-      currentContent = marked.parse(markdownWithServerUrls, {
-        async: false,
-      }) as string;
     } catch (err) {
       error.value = "图片上传失败";
       notification.error(error.value);

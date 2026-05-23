@@ -263,6 +263,18 @@
         </div>
       </div>
     </div>
+
+    <!-- 评论区 -->
+    <div class="col-span-full mx-auto w-full max-w-6xl">
+      <div class="border-border bg-card overflow-hidden rounded-4xl border shadow-sm">
+        <div class="border-border border-b px-8 py-5">
+          <h3 class="text-foreground text-lg font-semibold">评论</h3>
+        </div>
+        <div class="p-8">
+          <div id="tcomment" />
+        </div>
+      </div>
+    </div>
   </BasicDetail>
 </template>
 
@@ -275,7 +287,8 @@ import websitesData from "@/data/websites.json";
 import { useNotificationStore } from "@/stores/notification";
 import type { Website } from "@/types";
 import { motion } from "motion-v";
-import { onMounted, ref } from "vue";
+import { nextTick, onMounted, ref } from "vue";
+import twikoo from "twikoo";
 import IconCopy from "./icon/IconCopy.vue";
 import IconDocumentText from "./icon/IconDocumentText.vue";
 import IconExternalLink from "./icon/IconExternalLink.vue";
@@ -325,10 +338,18 @@ const refreshDailyPick = () => {
   dailyPick.value = websitesData.sites[idx] as Website;
 };
 
-onMounted(() => {
+onMounted(async () => {
   links.value = friendLinksData.links;
   selfInfo.value = friendLinksData.self as SelfInfo;
   refreshDailyPick();
+
+  await nextTick();
+  twikoo.init({
+    envId: "https://kanocifer.chat/twikoo",
+    el: "#tcomment",
+    path: "/friend-links",
+    lang: "zh-CN",
+  });
 });
 
 const { handleImageError } = useImageError();
@@ -365,5 +386,131 @@ const copySelfInfo = async () => {
 .pick-switch-leave-to {
   opacity: 0;
   transform: translateY(-6px);
+}
+</style>
+
+<style>
+@import "twikoo/dist/twikoo.css";
+
+#tcomment {
+  font-size: 0.9375rem;
+}
+
+#tcomment .el-input__inner,
+#tcomment .el-textarea__inner {
+  background: var(--card-bg);
+  border-color: var(--warm-gray);
+  border-radius: 0.75rem;
+  color: var(--ink);
+  font-size: 0.9375rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+#tcomment .el-input__inner:focus,
+#tcomment .el-textarea__inner:focus {
+  border-color: var(--workspace-accent);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--workspace-accent) 15%, transparent);
+}
+#tcomment .el-textarea__inner {
+  line-height: 1.7;
+  padding: 0.75rem 1rem;
+}
+
+#tcomment .el-button {
+  border-radius: 0.75rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  padding: 0.5rem 1.25rem;
+}
+
+#tcomment .el-button--primary {
+  background: var(--workspace-accent);
+  border-color: var(--workspace-accent);
+  color: var(--workspace-accent-contrast);
+}
+#tcomment .el-button--primary:hover {
+  opacity: 0.88;
+  background: var(--workspace-accent);
+  border-color: var(--workspace-accent);
+}
+#tcomment .el-button--primary:active {
+  opacity: 0.78;
+}
+
+#tcomment .el-button--default,
+#tcomment .el-button:not(.el-button--primary):not(.el-button--danger):not(.el-button--text) {
+  background: var(--card-bg);
+  border-color: var(--warm-gray);
+  color: var(--ink);
+}
+#tcomment .el-button--default:hover,
+#tcomment .el-button:not(.el-button--primary):not(.el-button--danger):not(.el-button--text):hover {
+  border-color: var(--workspace-accent);
+  color: var(--workspace-accent);
+  background: color-mix(in oklch, var(--workspace-accent) 8%, var(--card-bg));
+}
+
+#tcomment .el-button--text {
+  color: var(--muted);
+  padding: 0.25rem 0.5rem;
+}
+#tcomment .el-button--text:hover {
+  color: var(--workspace-accent);
+  background: transparent;
+}
+
+#tcomment .tk-comment {
+  border-bottom: 1px solid var(--warm-gray);
+  padding: 1.25rem 0;
+}
+#tcomment .tk-comment:last-child {
+  border-bottom: none;
+}
+
+#tcomment .tk-avatar {
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+#tcomment .tk-nick {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+#tcomment .tk-time {
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+#tcomment .tk-content {
+  color: var(--ink);
+  line-height: 1.75;
+}
+
+#tcomment .tk-replies {
+  border-left: 2px solid var(--warm-gray);
+  margin-left: 1.5rem;
+  padding-left: 1rem;
+}
+
+#tcomment .el-pager li {
+  border-radius: 0.5rem;
+  font-weight: 500;
+}
+#tcomment .el-pager li.active {
+  background: var(--workspace-accent);
+  color: var(--workspace-accent-contrast);
+}
+
+#tcomment .OwO {
+  color: var(--ink);
+}
+#tcomment .OwO .OwO-logo {
+  border-radius: 0.5rem;
+}
+
+.dark #tcomment .el-input__inner,
+.dark #tcomment .el-textarea__inner {
+  background: color-mix(in oklch, var(--card-bg) 60%, var(--paper));
 }
 </style>

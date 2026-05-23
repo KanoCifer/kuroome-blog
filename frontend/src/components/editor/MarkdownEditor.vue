@@ -8,7 +8,11 @@ import { marked } from "marked";
 import TurndownService from "turndown";
 import { computed, nextTick, ref, watch } from "vue";
 
-const turndownService = new TurndownService();
+const turndownService = new TurndownService({
+  headingStyle: "atx",
+  codeBlockStyle: "fenced",
+  bulletListMarker: "-",
+});
 
 const emit = defineEmits<{
   "update:modelValue": [value: string];
