@@ -212,12 +212,20 @@ class AsyncRedisCache(AsyncCache):
         await self.redis.delete(redis_key)
 
     async def clear(self) -> None:
-        keys = await self.redis.keys(pattern=self._cache_prefix + "*")
-        if keys:
-            logger.info(f"Clearing {len(keys)} cache keys: {keys}")
-            await self.redis.delete(*keys)
-        else:
-            logger.info("No cache keys to clear")
+        try:
+            keys: list[str] = []
+            async for key in self.redis.scan_iter(
+                match=self._cache_prefix + "*", count=100
+            ):
+                keys.append(key)
+            if keys:
+                logger.info(f"Clearing {len(keys)} cache keys")
+                await self.redis.delete(*keys)
+                logger.info("Cache cleared successfully")
+            else:
+                logger.info("No cache keys to clear")
+        except Exception as exc:
+            logger.error(f"Failed to clear cache: {exc}")
 
     async def aclose(self) -> None:
         await self.redis.aclose()
