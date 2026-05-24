@@ -32,8 +32,10 @@
 @font-face {
   font-family: "阿里妈妈方圆体 VF Regular";
   src:
-    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/JzWMyKA8U06c.woff2") format("woff2"),
-    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/qFzBtDuQpN4i.woff") format("woff");
+    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/JzWMyKA8U06c.woff2")
+      format("woff2"),
+    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/qFzBtDuQpN4i.woff")
+      format("woff");
   font-variation-settings:
     "BEVL" 80,
     "wght" 500;
@@ -52,8 +54,10 @@
   font-family: "阿里妈妈东方大楷 Regular";
   font-weight: 400;
   src:
-    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/bs5CgKu7Hdck.woff2") format("woff2"),
-    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/FS1e5LRmIZGQ.woff") format("woff");
+    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/bs5CgKu7Hdck.woff2")
+      format("woff2"),
+    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/FS1e5LRmIZGQ.woff")
+      format("woff");
   font-variation-settings: normal;
   font-display: swap;
 }
@@ -81,13 +85,16 @@ html {
   }
 }
 @theme {
-  --font-family-alibaba: "阿里妈妈方圆体 VF Regular", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-family-alibaba:
+    "阿里妈妈方圆体 VF Regular", "PingFang SC", "Microsoft YaHei", sans-serif;
 
-  --font-family-dongfang: "阿里妈妈东方大楷 Regular", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-family-dongfang:
+    "阿里妈妈东方大楷 Regular", "PingFang SC", "Microsoft YaHei", sans-serif;
 
   --font-family-averia: "Averia Gruesa Libre", system-ui;
 
-  --font-family-harmonyos: "HarmonyOS Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-family-harmonyos:
+    "HarmonyOS Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
 
   --animate-tt-spin: tt-spin 0.8s ease-in-out forwards;
 
@@ -213,12 +220,12 @@ a {
 
 /* 代码块 - macOS 风格（文章展示） */
 .prose pre {
-  @apply relative my-4 overflow-hidden rounded-xl border border-gray-200 bg-gray-900 pt-10 shadow-lg dark:border-gray-700;
+  @apply relative my-4 overflow-hidden rounded-3xl border border-gray-200 bg-gray-800 pt-10 shadow-md dark:border-gray-700;
 }
 
 .prose pre::before {
   content: "";
-  @apply absolute inset-x-0 top-0 mb-1 flex h-10 items-center border-b border-gray-700 bg-gray-800 py-2;
+  @apply absolute inset-x-0 top-0 mb-1 flex h-10 items-center border-b border-gray-600 bg-gray-700 py-2;
 }
 
 .prose pre::after {
@@ -285,7 +292,8 @@ ul[data-type="taskList"] ul[data-type="taskList"] {
 }
 
 :root[data-font="harmonyos"] {
-  --default-font-family: "HarmonyOS Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --default-font-family:
+    "HarmonyOS Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
   --font-sans: "HarmonyOS Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 

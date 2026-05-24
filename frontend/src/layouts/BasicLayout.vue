@@ -126,7 +126,11 @@ watch(
   <div
     ref="layoutContainer"
     class="relative isolate"
-    :class="isEntryView ? 'flex h-dvh flex-col overflow-hidden' : 'grid min-h-dvh grid-rows-[auto_1fr_auto]'"
+    :class="
+      isEntryView
+        ? 'flex h-dvh flex-col overflow-hidden'
+        : 'grid min-h-dvh grid-rows-[auto_1fr_auto]'
+    "
   >
     <!-- 背景图：img + filter:blur + will-change -->
     <Transition

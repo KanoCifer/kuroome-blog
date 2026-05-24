@@ -7,8 +7,13 @@
         @click="$router.push('/websites')"
       >
         <Transition name="pick-switch" mode="out-in">
-          <div :key="dailyPick?.id" class="flex flex-col gap-4 sm:flex-row sm:items-center">
-            <div class="bg-muted flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl">
+          <div
+            :key="dailyPick?.id"
+            class="flex flex-col gap-4 sm:flex-row sm:items-center"
+          >
+            <div
+              class="bg-muted flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl"
+            >
               <img
                 v-if="dailyPick?.icon"
                 :src="dailyPick.icon"
@@ -21,15 +26,31 @@
 
             <div class="min-w-0 flex-1">
               <div class="mb-1 flex items-center gap-2">
-                <span class="text-muted-foreground text-xs font-bold tracking-wide uppercase">每日推荐</span>
-                <span class="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px] font-semibold">
+                <span
+                  class="text-muted-foreground text-xs font-bold tracking-wide uppercase"
+                  >每日推荐</span
+                >
+                <span
+                  class="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                >
                   {{ dailyPick?.category }}
                 </span>
               </div>
-              <h3 class="text-foreground text-lg font-bold">{{ dailyPick?.name }}</h3>
-              <p class="text-muted-foreground mt-1 line-clamp-2 text-sm">{{ dailyPick?.description }}</p>
-              <div v-if="dailyPick?.tags?.length" class="mt-3 flex flex-wrap gap-2">
-                <TagPill v-for="tag in dailyPick.tags.slice(0, 4)" :key="tag" compact>
+              <h3 class="text-foreground text-lg font-bold">
+                {{ dailyPick?.name }}
+              </h3>
+              <p class="text-muted-foreground mt-1 line-clamp-2 text-sm">
+                {{ dailyPick?.description }}
+              </p>
+              <div
+                v-if="dailyPick?.tags?.length"
+                class="mt-3 flex flex-wrap gap-2"
+              >
+                <TagPill
+                  v-for="tag in dailyPick.tags.slice(0, 4)"
+                  :key="tag"
+                  compact
+                >
                   {{ tag }}
                 </TagPill>
               </div>
@@ -63,9 +84,13 @@
         <!-- ======== 左列：本站信息 + 友链大卡片 ======== -->
         <div class="space-y-6 lg:col-span-2">
           <!-- 本站信息面板 -->
-          <div class="border-primary/20 bg-primary/5 ring-primary/10 overflow-hidden rounded-4xl border p-8 ring-1">
+          <div
+            class="border-primary/20 bg-primary/5 ring-primary/10 overflow-hidden rounded-4xl border p-8 ring-1"
+          >
             <div class="mb-6 flex items-start gap-5">
-              <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full">
+              <div
+                class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full"
+              >
                 <img
                   :src="selfInfo.icon"
                   :alt="selfInfo.name"
@@ -105,12 +130,18 @@
             <!-- 信息行 -->
             <div class="bg-card/60 space-y-2 rounded-xl p-4">
               <div class="flex items-center gap-3 text-sm">
-                <span class="text-muted-foreground w-16 shrink-0 font-medium">URL</span>
+                <span class="text-muted-foreground w-16 shrink-0 font-medium"
+                  >URL</span
+                >
                 <code class="text-foreground truncate">{{ selfInfo.url }}</code>
               </div>
               <div class="flex items-center gap-3 text-sm">
-                <span class="text-muted-foreground w-16 shrink-0 font-medium">Favicon</span>
-                <code class="text-foreground truncate">{{ selfInfo.icon }}</code>
+                <span class="text-muted-foreground w-16 shrink-0 font-medium"
+                  >Favicon</span
+                >
+                <code class="text-foreground truncate">{{
+                  selfInfo.icon
+                }}</code>
               </div>
               <div class="flex flex-wrap gap-2 pt-1">
                 <TagPill v-for="tag in selfInfo.tags" :key="tag" compact>
@@ -149,7 +180,10 @@
                   class="h-16 w-16 rounded-full object-cover"
                   @error="handleImageError"
                 />
-                <IconGlobeOutline v-else class="text-muted-foreground h-10 w-10" />
+                <IconGlobeOutline
+                  v-else
+                  class="text-muted-foreground h-10 w-10"
+                />
               </div>
               <div class="min-w-0 flex-1">
                 <h3
@@ -171,7 +205,9 @@
             </div>
 
             <!-- 外链箭头 -->
-            <div class="absolute top-6 right-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <div
+              class="absolute top-6 right-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            >
               <IconExternalLink class="text-muted-foreground h-5 w-5" />
             </div>
           </motion.a>
@@ -183,16 +219,22 @@
           >
             <IconUsersGroup class="text-muted-foreground mb-4 h-16 w-16" />
             <p class="text-muted-foreground text-lg">暂无友链</p>
-            <p class="text-muted-foreground mt-2 text-sm">欢迎提交申请，成为第一位友链伙伴</p>
+            <p class="text-muted-foreground mt-2 text-sm">
+              欢迎提交申请，成为第一位友链伙伴
+            </p>
           </div>
         </div>
 
         <!-- ======== 右列：申请须知 + GitHub Issue ======== -->
         <div class="space-y-6 lg:col-span-1">
-          <div class="border-border bg-card/30 overflow-hidden rounded-4xl border p-8 shadow-sm">
+          <div
+            class="border-border bg-card/30 overflow-hidden rounded-4xl border p-8 shadow-sm"
+          >
             <!-- Header -->
             <div class="mb-6">
-              <h3 class="text-foreground flex items-center gap-2 font-serif text-xl font-bold">
+              <h3
+                class="text-foreground flex items-center gap-2 font-serif text-xl font-bold"
+              >
                 <IconLinkChain class="text-primary h-5 w-5" />
                 申请友链
               </h3>
@@ -202,8 +244,12 @@
             </div>
 
             <!-- 接入须知 -->
-            <div class="border-primary/15 bg-primary/5 mb-6 rounded-2xl border p-5">
-              <h4 class="text-foreground mb-3 flex items-center gap-2 text-sm font-bold">
+            <div
+              class="border-primary/15 bg-primary/5 mb-6 rounded-2xl border p-5"
+            >
+              <h4
+                class="text-foreground mb-3 flex items-center gap-2 text-sm font-bold"
+              >
                 <IconInfoCircle class="text-primary h-4 w-4" />
                 接入须知
               </h4>
@@ -236,11 +282,15 @@
 
             <!-- 申请格式 -->
             <div class="mb-6">
-              <h4 class="text-foreground mb-3 flex items-center gap-2 text-sm font-bold">
+              <h4
+                class="text-foreground mb-3 flex items-center gap-2 text-sm font-bold"
+              >
                 <IconDocumentText class="text-primary h-4 w-4" />
                 申请格式
               </h4>
-              <pre class="bg-muted text-muted-foreground overflow-x-auto rounded-xl p-4 text-xs leading-relaxed">
+              <pre
+                class="bg-muted text-muted-foreground overflow-x-auto rounded-xl p-4 text-xs leading-relaxed"
+              >
 - **站点名称**：
 - **描述**：
 - **URL**：
@@ -266,7 +316,9 @@
 
     <!-- 评论区 -->
     <div class="col-span-full mx-auto w-full max-w-6xl">
-      <div class="border-border bg-card overflow-hidden rounded-4xl border shadow-sm">
+      <div
+        class="border-border bg-card overflow-hidden rounded-4xl border shadow-sm"
+      >
         <div class="border-border border-b px-8 py-5">
           <h3 class="text-foreground text-lg font-semibold">评论</h3>
         </div>
@@ -403,12 +455,15 @@ const copySelfInfo = async () => {
   border-radius: 0.75rem;
   color: var(--ink);
   font-size: 0.9375rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 #tcomment .el-input__inner:focus,
 #tcomment .el-textarea__inner:focus {
   border-color: var(--workspace-accent);
-  box-shadow: 0 0 0 3px color-mix(in oklch, var(--workspace-accent) 15%, transparent);
+  box-shadow: 0 0 0 3px
+    color-mix(in oklch, var(--workspace-accent) 15%, transparent);
 }
 #tcomment .el-textarea__inner {
   line-height: 1.7;
@@ -438,13 +493,19 @@ const copySelfInfo = async () => {
 }
 
 #tcomment .el-button--default,
-#tcomment .el-button:not(.el-button--primary):not(.el-button--danger):not(.el-button--text) {
+#tcomment
+  .el-button:not(.el-button--primary):not(.el-button--danger):not(
+    .el-button--text
+  ) {
   background: var(--card-bg);
   border-color: var(--warm-gray);
   color: var(--ink);
 }
 #tcomment .el-button--default:hover,
-#tcomment .el-button:not(.el-button--primary):not(.el-button--danger):not(.el-button--text):hover {
+#tcomment
+  .el-button:not(.el-button--primary):not(.el-button--danger):not(
+    .el-button--text
+  ):hover {
   border-color: var(--workspace-accent);
   color: var(--workspace-accent);
   background: color-mix(in oklch, var(--workspace-accent) 8%, var(--card-bg));

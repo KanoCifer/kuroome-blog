@@ -40,11 +40,21 @@
       leave-from-class="opacity-100 translate-x-0"
       leave-to-class="opacity-0 translate-x-full"
     >
-      <div v-if="isOpen" class="fixed inset-0 z-9999 flex justify-end" @click.self="close">
-        <div class="bg-card dark:bg-card relative z-10 flex h-full w-full max-w-md flex-col rounded-l-2xl shadow-2xl">
+      <div
+        v-if="isOpen"
+        class="fixed inset-0 z-9999 flex justify-end"
+        @click.self="close"
+      >
+        <div
+          class="bg-card dark:bg-card relative z-10 flex h-full w-full max-w-md flex-col rounded-l-2xl shadow-2xl"
+        >
           <!-- Header -->
-          <div class="border-border flex shrink-0 items-center justify-between border-b px-6 py-4">
-            <h3 class="text-foreground flex items-center gap-2 font-serif text-lg font-bold">
+          <div
+            class="border-border flex shrink-0 items-center justify-between border-b px-6 py-4"
+          >
+            <h3
+              class="text-foreground flex items-center gap-2 font-serif text-lg font-bold"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="text-primary h-5 w-5"
@@ -65,8 +75,18 @@
               @click="close"
               class="text-muted-foreground hover:bg-accent hover:text-secondary-foreground dark:hover:bg-accent dark:hover:text-foreground flex h-8 w-8 items-center justify-center rounded-full transition-colors"
             >
-              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              <svg
+                class="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -78,7 +98,11 @@
               :key="f"
               @click="filter = f"
               class="relative px-4 py-3 text-sm font-medium transition-colors"
-              :class="filter === f ? 'text-primary' : 'text-muted-foreground hover:text-foreground'"
+              :class="
+                filter === f
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              "
             >
               {{ filterLabels[f] }}
               <span
@@ -98,7 +122,9 @@
           <!-- Scrollable body -->
           <div class="flex-1 overflow-y-auto px-6 py-4">
             <!-- Add form -->
-            <div class="border-border/60 bg-card/60 mb-6 overflow-hidden rounded-2xl border p-4 shadow-sm">
+            <div
+              class="border-border/60 bg-card/60 mb-6 overflow-hidden rounded-2xl border p-4 shadow-sm"
+            >
               <input
                 v-model="newTodoForm.text"
                 type="text"
@@ -139,7 +165,12 @@
                       viewBox="0 0 24 24"
                       stroke="currentColor"
                     >
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 4v16m8-8H4"
+                      />
                     </svg>
                     添加
                   </button>
@@ -149,7 +180,9 @@
 
             <!-- Sort -->
             <div class="mb-4 flex items-center gap-2">
-              <span class="text-muted-foreground text-sm font-medium">排序:</span>
+              <span class="text-muted-foreground text-sm font-medium"
+                >排序:</span
+              >
               <select
                 v-model="sortMode"
                 class="border-border bg-card/50 text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm font-medium backdrop-blur-sm outline-none"
@@ -261,9 +294,12 @@
                       <span
                         class="rounded-full border px-2 py-0.5 text-xs font-medium"
                         :class="{
-                          'border-primary/20 bg-primary/10 text-primary': todo.priority === 'low',
-                          'border-warning/20 bg-warning/10 text-warning': todo.priority === 'medium',
-                          'border-destructive/20 bg-destructive/10 text-destructive': todo.priority === 'high',
+                          'border-primary/20 bg-primary/10 text-primary':
+                            todo.priority === 'low',
+                          'border-warning/20 bg-warning/10 text-warning':
+                            todo.priority === 'medium',
+                          'border-destructive/20 bg-destructive/10 text-destructive':
+                            todo.priority === 'high',
                         }"
                       >
                         {{ priorityLabels[todo.priority] }}
@@ -314,8 +350,19 @@
                       class="text-muted-foreground hover:bg-warning/10 hover:text-warning cursor-pointer rounded-lg p-1.5 transition-colors"
                       title="归档"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+                        />
                       </svg>
                     </button>
                     <button
@@ -324,8 +371,19 @@
                       class="text-muted-foreground hover:bg-success/10 hover:text-success cursor-pointer rounded-lg p-1.5 transition-colors"
                       title="取消归档"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+                        />
                       </svg>
                     </button>
                     <button
@@ -333,8 +391,19 @@
                       class="text-muted-foreground hover:bg-accent hover:text-primary cursor-pointer rounded-lg p-1.5 transition-colors"
                       title="编辑"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
                       </svg>
                     </button>
                     <button
@@ -342,8 +411,19 @@
                       class="text-muted-foreground hover:bg-destructive/10 hover:text-destructive cursor-pointer rounded-lg p-1.5 transition-colors"
                       title="删除"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
                       </svg>
                     </button>
                   </div>
@@ -353,7 +433,9 @@
 
             <!-- Empty state -->
             <div v-if="displayTodos.length === 0" class="mt-16 text-center">
-              <div class="bg-muted mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-3xl">
+              <div
+                class="bg-muted mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-3xl"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="text-muted-foreground h-8 w-8"
@@ -373,18 +455,36 @@
                 {{ filter === "archived" ? "暂无归档" : "暂无事项" }}
               </h3>
               <p class="text-muted-foreground mt-1 text-sm">
-                {{ filter === "archived" ? "归档的任务会显示在这里" : "记录下你接下来的计划吧！" }}
+                {{
+                  filter === "archived"
+                    ? "归档的任务会显示在这里"
+                    : "记录下你接下来的计划吧！"
+                }}
               </p>
             </div>
 
             <!-- Bulk actions -->
-            <div v-if="todoStore.completedCount > 0" class="mt-6 flex justify-center gap-3">
+            <div
+              v-if="todoStore.completedCount > 0"
+              class="mt-6 flex justify-center gap-3"
+            >
               <button
                 @click="todoStore.archiveCompleted()"
                 class="bg-muted text-muted-foreground hover:bg-warning/10 hover:text-warning flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+                  />
                 </svg>
                 归档已完成 ({{ todoStore.completedCount }})
               </button>
@@ -392,8 +492,19 @@
                 @click="todoStore.clearCompleted()"
                 class="bg-muted text-muted-foreground hover:bg-destructive/10 hover:text-destructive flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
                 </svg>
                 清除已完成 ({{ todoStore.completedCount }})
               </button>
@@ -439,7 +550,12 @@ const submitAddTodo = () => {
     dueDate: newTodoForm.value.dueDate || undefined,
     priority: newTodoForm.value.priority,
   });
-  newTodoForm.value = { text: "", description: "", dueDate: "", priority: "medium" };
+  newTodoForm.value = {
+    text: "",
+    description: "",
+    dueDate: "",
+    priority: "medium",
+  };
 };
 
 // Filter & sort
@@ -475,7 +591,11 @@ const displayTodos = computed(() => {
   else if (filter.value === "completed") list = completedTodos.value;
   else if (filter.value === "archived") list = archivedTodos.value;
 
-  const priorityWeight: Record<TodoPriority, number> = { high: 3, medium: 2, low: 1 };
+  const priorityWeight: Record<TodoPriority, number> = {
+    high: 3,
+    medium: 2,
+    low: 1,
+  };
 
   return [...list].sort((a, b) => {
     if (sortMode.value === "priority") {
@@ -486,7 +606,9 @@ const displayTodos = computed(() => {
     }
     if (sortMode.value === "dueDate") {
       if (!a.dueDate && !b.dueDate)
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
       if (!a.dueDate) return 1;
       if (!b.dueDate) return -1;
       return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();

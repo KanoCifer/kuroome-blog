@@ -2,7 +2,7 @@
   <motion.div
     :whileHover="{ scale: 1.02 }"
     :whilePress="{ scale: 0.98 }"
-    class="card squircle rounded-[64px] border border-white p-6"
+    class="card squircle border-border bg-card/75 rounded-[64px] border p-6"
   >
     <slot></slot>
   </motion.div>
@@ -13,12 +13,14 @@ import { motion } from "motion-v";
 </script>
 
 <style scoped>
-@reference "../../assets/base.css";
+@reference "@/assets/base.css";
 
 .card {
-  background-color: rgba(255, 255, 255, 0.75);
   box-shadow:
-    rgba(0, 0, 0, 0.05) 0px 40px 50px -32px,
+    color-mix(in srgb, var(--color-foreground) 12%, transparent) 0px 40px
+      50px -32px,
+    color-mix(in srgb, var(--color-foreground) 8%, transparent) 0px 60px
+      80px -48px,
     rgba(255, 255, 255, 0.35) 0px 0px 20px 0px inset;
 }
 </style>

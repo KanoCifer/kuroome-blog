@@ -3,16 +3,32 @@ import { defineStore } from "pinia";
 import { ref, watch } from "vue";
 
 export type Theme = "light" | "dark" | "system";
-export type ColorScheme = "sky-blue" | "forest-green" | "paper" | "sage" | "mist" | "blush" | "spring" | "autumn" | "clear-sky" | "midnight";
+export type ColorScheme =
+  | "sky-blue"
+  | "forest-green"
+  | "paper"
+  | "sage"
+  | "mist"
+  | "blush"
+  | "spring"
+  | "autumn"
+  | "clear-sky"
+  | "midnight";
 export type FontFamily = "default" | "harmonyos";
 export const useThemeStore = defineStore("theme", () => {
-  const theme = ref<Theme>((localStorage.getItem("theme") as Theme) || "system");
+  const theme = ref<Theme>(
+    (localStorage.getItem("theme") as Theme) || "system",
+  );
 
-  const scheme = ref<ColorScheme>((localStorage.getItem("color-scheme") as ColorScheme) || "sky-blue");
+  const scheme = ref<ColorScheme>(
+    (localStorage.getItem("color-scheme") as ColorScheme) || "sky-blue",
+  );
 
   const showFooter = ref<string>(localStorage.getItem("show-footer") || "true");
 
-  const font = ref<FontFamily>((localStorage.getItem("font") as FontFamily) || "default");
+  const font = ref<FontFamily>(
+    (localStorage.getItem("font") as FontFamily) || "default",
+  );
 
   // 背景模糊值（px），兼容旧版 blur-* 字符串存储
   const storedBlur = localStorage.getItem("bg-blur");
@@ -34,9 +50,7 @@ export const useThemeStore = defineStore("theme", () => {
     localStorage.setItem("bg-brightness", String(val));
   };
 
-  const bgScale = ref<number>(
-    Number(localStorage.getItem("bg-scale") || 1.05),
-  );
+  const bgScale = ref<number>(Number(localStorage.getItem("bg-scale") || 1.05));
 
   const saveBgScale = (val: number) => {
     bgScale.value = val;
@@ -62,7 +76,9 @@ export const useThemeStore = defineStore("theme", () => {
   const applyTheme = (newTheme: Theme) => {
     const root = document.documentElement;
     const isDark =
-      newTheme === "dark" || (newTheme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+      newTheme === "dark" ||
+      (newTheme === "system" &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches);
 
     if (isDark) {
       root.classList.add("dark");
@@ -127,7 +143,9 @@ export const useThemeStore = defineStore("theme", () => {
       setTheme("light");
     } else {
       // If system, toggle based on current system preference
-      const isCurrentlyDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const isCurrentlyDark = window.matchMedia(
+        "(prefers-color-scheme: dark)",
+      ).matches;
       setTheme(isCurrentlyDark ? "light" : "dark");
     }
   };

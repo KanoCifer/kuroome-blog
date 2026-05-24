@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { BasicDetail } from "@/components/basic";
 import ArticleSummaryCard from "@/components/blog/ArticleSummaryCard.vue";
+import TwikooComments from "@/components/blog/TwikooComments.vue";
 import { blogService } from "@/service/blogService";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
@@ -10,14 +11,21 @@ import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import { useHead } from "@unhead/vue";
 import { Modal } from "ant-design-vue";
 import hljs from "highlight.js/lib/common";
-import "highlight.js/styles/github-dark.css";
+import "highlight.js/scss/rainbow.scss";
 import { marked } from "marked";
-import twikoo from "twikoo";
-import { computed, createVNode, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import {
+  computed,
+  createVNode,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  ref,
+  watch,
+} from "vue";
 import { useRoute, useRouter } from "vue-router";
-import CalendarIcon from "../../components/icons/CalendarIcon.vue";
-import DelIcon from "../../components/icons/DelIcon.vue";
-import EditIcon from "../../components/icons/EditIcon.vue";
+import CalendarIcon from "@/components/icons/CalendarIcon.vue";
+import DelIcon from "@/components/icons/DelIcon.vue";
+import EditIcon from "@/components/icons/EditIcon.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -44,7 +52,8 @@ const fetchPost = async () => {
     post.value = res as unknown as Post;
   } catch (err: unknown) {
     console.error(err);
-    errorMessage.value = err instanceof Error ? err.message : "加载文章失败，请稍后重试。";
+    errorMessage.value =
+      err instanceof Error ? err.message : "加载文章失败，请稍后重试。";
     useNotificationStore().error(errorMessage.value);
   } finally {
     isLoading.value = false;
@@ -59,22 +68,6 @@ onMounted(() => {
   fetchPost();
 });
 
-// Twikoo 评论初始化
-watch(
-  () => post.value,
-  async (p) => {
-    if (p) {
-      await nextTick();
-      twikoo.init({
-        envId: "https://kanocifer.chat/twikoo",
-        el: "#tcomment",
-        path: `/blog/${postId.value}`,
-        lang: "zh-CN",
-      });
-    }
-  },
-);
-
 watch(
   () => route.params.id,
   (newId) => {
@@ -88,103 +81,79 @@ watch(
 watch(
   () => post.value?.body,
   async (html) => {
-    if (html) {
-      await nextTick();
-      hljs.highlightAll();
-    }
+    if (!html) return;
+    await nextTick();
+    hljs.highlightAll();
+    setupCodeCopy();
   },
 );
 
 const renderedBody = computed(() => {
   if (!post.value?.body) return "";
-  return marked.parse(post.value.body, { async: false, breaks: false }) as string;
+  return marked.parse(post.value.body, {
+    async: false,
+    breaks: false,
+  }) as string;
 });
 
 const subtitle = computed(() => {
   if (!post.value) return "";
-  const parts: string[] = [];
-  if (post.value.author) {
-    parts.push(post.value.author);
-  }
-  if (post.value.created_at) {
-    parts.push(formatDate(post.value.created_at));
-  }
-  if (post.value.category?.name) {
-    parts.push(post.value.category.name);
-  }
-  return parts.join(" · ");
+  const { author, created_at, category } = post.value;
+  return [author, created_at && formatDate(created_at), category?.name]
+    .filter(Boolean)
+    .join(" · ");
 });
 
-useHead(() => ({
-  title: post.value ? `${post.value.title} - ReadingList` : "文章未找到 - ReadingList",
-  meta: [
-    {
-      name: "description",
-      content: post.value
-        ? post.value.summary || `阅读 ${post.value.title} 的完整内容`
-        : "抱歉，您请求的文章不存在或已被删除",
-    },
-    {
-      name: "keywords",
-      content: post.value
-        ? [
-            post.value.title,
-            post.value.author || "Kurroome",
-            post.value.category?.name || "博客",
-            "阅读",
-            "读书笔记",
-            "个人博客",
-          ]
-            .filter(Boolean)
-            .join(", ")
-        : "文章未找到, 阅读清单, ReadingList",
-    },
-    {
-      property: "og:title",
-      content: post.value ? post.value.title : "文章未找到",
-    },
-    {
-      property: "og:description",
-      content: post.value
-        ? post.value.summary || `阅读 ${post.value.title} 的完整内容`
-        : "抱歉，您请求的文章不存在或已被删除",
-    },
-    {
-      property: "og:type",
-      content: "article",
-    },
-    {
-      property: "og:url",
-      content: `https://readinglist.example.com/blog/${postId.value}`,
-    },
-    {
-      property: "og:article:author",
-      content: post.value?.author || "Kurroome",
-    },
-    {
-      property: "og:article:published_time",
-      content: post.value?.created_at,
-    },
-    {
-      property: "og:article:modified_time",
-      content: post.value?.updated_at,
-    },
-    {
-      property: "og:article:section",
-      content: post.value?.category?.name || "博客",
-    },
-    {
-      name: "twitter:title",
-      content: post.value ? post.value.title : "文章未找到",
-    },
-    {
-      name: "twitter:description",
-      content: post.value
-        ? post.value.summary || `阅读 ${post.value.title} 的完整内容`
-        : "抱歉，您请求的文章不存在或已被删除",
-    },
-  ],
-}));
+useHead(() => {
+  const title = post.value
+    ? `${post.value.title} - ReadingList`
+    : "文章未找到 - ReadingList";
+  const desc = post.value
+    ? post.value.summary || `阅读 ${post.value.title} 的完整内容`
+    : "抱歉，您请求的文章不存在或已被删除";
+  const keywords = post.value
+    ? [
+        post.value.title,
+        post.value.author || "Kurroome",
+        post.value.category?.name || "博客",
+        "阅读",
+        "读书笔记",
+        "个人博客",
+      ]
+        .filter(Boolean)
+        .join(", ")
+    : "文章未找到, 阅读清单, ReadingList";
+
+  return {
+    title,
+    meta: [
+      { name: "description", content: desc },
+      { name: "keywords", content: keywords },
+      { property: "og:title", content: post.value?.title ?? "文章未找到" },
+      { property: "og:description", content: desc },
+      { property: "og:type", content: "article" },
+      {
+        property: "og:url",
+        content: `https://readinglist.example.com/blog/${postId.value}`,
+      },
+      {
+        property: "og:article:author",
+        content: post.value?.author || "Kurroome",
+      },
+      {
+        property: "og:article:published_time",
+        content: post.value?.created_at,
+      },
+      { property: "og:article:modified_time", content: post.value?.updated_at },
+      {
+        property: "og:article:section",
+        content: post.value?.category?.name || "博客",
+      },
+      { name: "twitter:title", content: post.value?.title ?? "文章未找到" },
+      { name: "twitter:description", content: desc },
+    ],
+  };
+});
 
 const showDeleteConfirm = () => {
   Modal.confirm({
@@ -210,12 +179,13 @@ const handleDelete = async () => {
     router.push("/blog");
   } catch (err: unknown) {
     console.error("删除文章失败:", err);
-    const errorMsg = err instanceof Error ? err.message : "删除文章失败，请稍后重试";
+    const errorMsg =
+      err instanceof Error ? err.message : "删除文章失败，请稍后重试";
     useNotificationStore().error(errorMsg);
   }
 };
 
-let clickHandler: (event: Event) => void;
+let clickHandler: ((event: Event) => void) | undefined;
 const setupCodeCopy = () => {
   const contentContainer = document.querySelector(".prose");
   if (!contentContainer) return;
@@ -231,9 +201,8 @@ const setupCodeCopy = () => {
       if (codeBlock) {
         const codeElement = codeBlock.querySelector("code");
         if (codeElement) {
-          const codeText = codeElement.innerText;
           navigator.clipboard
-            .writeText(codeText)
+            .writeText(codeElement.textContent ?? "")
             .then(() => {
               useNotificationStore().success("代码已复制到剪贴板");
             })
@@ -251,25 +220,15 @@ const setupCodeCopy = () => {
 
   const codeBlocks = contentContainer.querySelectorAll("pre");
   codeBlocks.forEach((block) => {
+    block.classList.add("w-[80%]", "whitespace-pre-wrap");
     const button = document.createElement("button");
-    button.innerText = "复制";
+    button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2z"/></svg>`;
     button.className =
-      "copy-btn absolute top-2 right-2 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white rounded bg-gray-200 px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-300 focus:outline-none";
+      "copy-btn absolute top-2 right-3 rounded-lg bg-card px-2 py-1 hover:bg-gray-300";
     block.style.position = "relative";
     block.appendChild(button);
   });
 };
-
-onMounted(() => {
-  watch(
-    () => post.value?.body,
-    async () => {
-      await nextTick();
-      setupCodeCopy();
-    },
-    { immediate: true },
-  );
-});
 
 onUnmounted(() => {
   const contentContainer = document.querySelector(".prose");
@@ -283,7 +242,9 @@ onUnmounted(() => {
   <BasicDetail :title="post?.title || ''" :subtitle="subtitle">
     <!-- Loading -->
     <div v-if="isLoading" class="sm:col-span-2 lg:col-span-3">
-      <div class="border-border bg-card animate-pulse space-y-6 rounded-2xl border p-8 shadow-sm">
+      <div
+        class="border-border bg-card animate-pulse space-y-6 rounded-2xl border p-8 shadow-sm"
+      >
         <div class="bg-muted mb-6 h-8 w-3/4 rounded" />
         <div class="mb-8 flex gap-4">
           <div class="bg-muted h-4 w-24 rounded" />
@@ -301,7 +262,6 @@ onUnmounted(() => {
 
     <!-- Error -->
     <div v-else-if="errorMessage" class="sm:col-span-2 lg:col-span-3">
-      <!-- TODO(human): Implement error retry UX -->
       <div
         class="border-destructive/30 bg-destructive/5 flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 text-center"
       >
@@ -332,7 +292,10 @@ onUnmounted(() => {
 
     <!-- Content -->
     <template v-else>
-      <div v-if="showEditButton && post" class="flex items-center justify-end gap-2 sm:col-span-2 lg:col-span-3">
+      <div
+        v-if="showEditButton && post"
+        class="flex items-center justify-end gap-2 sm:col-span-2 lg:col-span-3"
+      >
         <router-link
           :to="`/blog/edit/${post._id}`"
           class="bg-accent text-foreground hover:bg-accent/80 inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors"
@@ -359,7 +322,10 @@ onUnmounted(() => {
           </h1>
 
           <div class="text-primary flex flex-wrap gap-x-6 gap-y-3 text-sm">
-            <div v-if="post.author" class="flex items-center gap-1.5 font-medium">
+            <div
+              v-if="post.author"
+              class="flex items-center gap-1.5 font-medium"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -386,41 +352,20 @@ onUnmounted(() => {
 
         <div class="p-8">
           <ArticleSummaryCard :title="post.title" :content="post.body || ''" />
-          <!-- TODO(human): 配置阅读体验优化参数 -->
-          <div class="prose prose-lg dark:prose-invert article-content max-w-none">
+          <div
+            class="prose prose-lg dark:prose-invert article-content max-w-none"
+          >
             <div v-if="post.body" v-html="renderedBody" />
             <div v-else class="text-muted-foreground italic">暂无内容</div>
           </div>
         </div>
       </div>
 
-      <div v-if="post" class="sm:col-span-2 lg:col-span-3">
-        <div class="border-border bg-card overflow-hidden rounded-2xl border shadow-sm">
-          <div class="border-border flex gap-2 border-b px-8 py-5">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="lucide lucide-message-circle-check-icon lucide-message-circle-check"
-            >
-              <path
-                d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"
-              />
-              <path d="m9 12 2 2 4-4" />
-            </svg>
-            <h3 class="text-foreground text-lg font-semibold">评论</h3>
-          </div>
-          <div class="p-8">
-            <div id="tcomment" />
-          </div>
-        </div>
-      </div>
+      <TwikooComments
+        v-if="post"
+        :path="`/blog/${postId}`"
+        class="sm:col-span-2 lg:col-span-3"
+      />
     </template>
   </BasicDetail>
 </template>
@@ -428,148 +373,33 @@ onUnmounted(() => {
 <style>
 @import "twikoo/dist/twikoo.css";
 
-/* ── Twikoo 评论区美化 ── */
-#tcomment {
-  font-size: 0.9375rem;
-}
-
-/* 输入框 / 文本域 */
-#tcomment .el-input__inner,
-#tcomment .el-textarea__inner {
-  background: var(--card-bg);
-  border-color: var(--warm-gray);
-  border-radius: 0.75rem;
-  color: var(--ink);
-  font-size: 0.9375rem;
+.copy-btn::before {
+  content: "复制";
+  position: absolute;
+  bottom: -150%;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  opacity: 0;
   transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
-}
-#tcomment .el-input__inner:focus,
-#tcomment .el-textarea__inner:focus {
-  border-color: var(--workspace-accent);
-  box-shadow: 0 0 0 3px color-mix(in oklch, var(--workspace-accent) 15%, transparent);
-}
-#tcomment .el-textarea__inner {
-  line-height: 1.7;
-  padding: 0.75rem 1rem;
-}
-
-/* 按钮通用 */
-#tcomment .el-button {
-  border-radius: 0.75rem;
-  font-weight: 500;
+    opacity 0.2s ease-out,
+    transform 0.2s ease-out;
+  padding: 4px 8px;
+  background: var(--muted);
+  color: white;
+  border-radius: 4px;
+  pointer-events: none;
   font-size: 0.875rem;
-  transition: all 0.2s;
-  padding: 0.5rem 1.25rem;
+  white-space: nowrap;
 }
 
-/* 主按钮 */
-#tcomment .el-button--primary {
-  background: var(--workspace-accent);
-  border-color: var(--workspace-accent);
-  color: var(--workspace-accent-contrast);
+.copy-btn:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
-#tcomment .el-button--primary:hover {
-  opacity: 0.88;
-  background: var(--workspace-accent);
-  border-color: var(--workspace-accent);
-}
-#tcomment .el-button--primary:active {
-  opacity: 0.78;
-}
-
-/* 默认按钮 */
-#tcomment .el-button--default,
-#tcomment .el-button:not(.el-button--primary):not(.el-button--danger):not(.el-button--text) {
-  background: var(--card-bg);
-  border-color: var(--warm-gray);
-  color: var(--ink);
-}
-#tcomment .el-button--default:hover,
-#tcomment .el-button:not(.el-button--primary):not(.el-button--danger):not(.el-button--text):hover {
-  border-color: var(--workspace-accent);
-  color: var(--workspace-accent);
-  background: color-mix(in oklch, var(--workspace-accent) 8%, var(--card-bg));
-}
-
-/* 文字按钮（回复/点赞等） */
-#tcomment .el-button--text {
-  color: var(--muted);
-  padding: 0.25rem 0.5rem;
-}
-#tcomment .el-button--text:hover {
-  color: var(--workspace-accent);
-  background: transparent;
-}
-
-/* 评论卡片 */
-#tcomment .tk-comment {
-  border-bottom: 1px solid var(--warm-gray);
-  padding: 1.25rem 0;
-}
-#tcomment .tk-comment:last-child {
-  border-bottom: none;
-}
-
-/* 头像 */
-#tcomment .tk-avatar {
-  border-radius: 9999px;
-  overflow: hidden;
-}
-
-/* 评论者昵称 */
-#tcomment .tk-nick {
-  color: var(--ink);
-  font-weight: 600;
-}
-
-/* 时间戳 */
-#tcomment .tk-time {
-  color: var(--muted);
-  font-size: 0.8125rem;
-}
-
-/* 评论内容 */
-#tcomment .tk-content {
-  color: var(--ink);
-  line-height: 1.75;
-}
-
-/* 子回复缩进线 */
-#tcomment .tk-replies {
-  border-left: 2px solid var(--warm-gray);
-  margin-left: 1.5rem;
-  padding-left: 1rem;
-}
-
-/* 分页器 */
-#tcomment .el-pager li {
-  border-radius: 0.5rem;
-  font-weight: 500;
-}
-#tcomment .el-pager li.active {
-  background: var(--workspace-accent);
-  color: var(--workspace-accent-contrast);
-}
-
-/* OwO 表情面板 */
-#tcomment .OwO {
-  color: var(--ink);
-}
-#tcomment .OwO .OwO-logo {
-  border-radius: 0.5rem;
-}
-
-/* 暗色模式补充 */
-.dark #tcomment .el-input__inner,
-.dark #tcomment .el-textarea__inner {
-  background: color-mix(in oklch, var(--card-bg) 60%, var(--paper));
-}
-
 /* ── 文章阅读体验优化 ── */
 .article-content {
   /* 行高与阅读节奏 */
+  --warm: var(--warm-gray);
   --tw-prose-body: var(--foreground);
   --tw-prose-headings: var(--foreground);
   --tw-prose-links: var(--primary);
@@ -586,7 +416,6 @@ onUnmounted(() => {
   --tw-prose-th-borders: var(--border);
   --tw-prose-td-borders: var(--border);
 
-  /* 增大正文字体到 18px，行高 1.8 */
   font-size: 1.1rem;
   line-height: 2;
   font-weight: 500;
@@ -629,7 +458,7 @@ onUnmounted(() => {
 .article-content :where(blockquote):not(:where([class~="not-prose"] *)) {
   border-left-width: 4px;
   border-left-color: var(--primary);
-  background: color-mix(in oklch, var(--primary) 5%, var(--card));
+  background: var(--warm);
   padding: 1rem 1.25rem;
   border-radius: 0 0.5rem 0.5rem 0;
   font-style: italic;
@@ -650,17 +479,23 @@ onUnmounted(() => {
 }
 
 .article-content :where(code):not(:where([class~="not-prose"] *)) {
-  font-size: 0.9375em;
-  padding: 0.2em 0.4em;
-  border-radius: 0.375rem;
-  background: color-mix(in oklch, var(--muted) 80%, var(--card));
+  font-size: 0.875em;
+  padding: 0.15em 0.35em;
+  border-radius: 0.25rem;
+  background: var(--warm);
+  border: 1px solid color-mix(in oklch, var(--primary) 15%, transparent);
+  font-family:
+    ui-monospace, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", monospace;
+  vertical-align: 0.05em;
 }
 
 .article-content :where(pre code):not(:where([class~="not-prose"] *)) {
   background: transparent;
   padding: 0;
-  font-size: 0.875rem;
+  font-size: 1rem;
   line-height: 1.7;
+  font-family:
+    ui-monospace, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", monospace;
 }
 
 /* 列表优化 */
@@ -728,7 +563,7 @@ onUnmounted(() => {
 }
 
 /* 暗色模式变量覆盖 */
-.dark .article-content {
+/*.dark .article-content {
   --tw-prose-invert-body: var(--foreground);
   --tw-prose-invert-headings: var(--foreground);
   --tw-prose-invert-links: var(--primary);
@@ -744,5 +579,5 @@ onUnmounted(() => {
   --tw-prose-invert-pre-bg: var(--muted);
   --tw-prose-invert-th-borders: var(--border);
   --tw-prose-invert-td-borders: var(--border);
-}
+}*/
 </style>

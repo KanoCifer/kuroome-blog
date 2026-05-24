@@ -46,7 +46,11 @@ const handleSubmit = async () => {
   }
 
   try {
-    await auth.login(form.value.username, form.value.password, form.value.rememberMe);
+    await auth.login(
+      form.value.username,
+      form.value.password,
+      form.value.rememberMe,
+    );
     const redirect = (route.query.redirect as string) || "/";
     router.push(redirect);
   } catch (err: unknown) {
@@ -96,7 +100,9 @@ const handleGitHubLogin = () => {
   <div>
     <div class="flex h-screen items-center">
       <!-- 标题卡片 -->
-      <div class="squircle bg-card mx-auto w-auto max-w-md px-12 py-14 shadow-2xl">
+      <div
+        class="squircle bg-card mx-auto w-auto max-w-md px-12 py-14 shadow-2xl"
+      >
         <!-- Hero Section -->
         <div class="mb-8 flex flex-col items-center justify-center">
           <div
@@ -104,18 +110,26 @@ const handleGitHubLogin = () => {
           >
             <IconCloud class="size-8" />
           </div>
-          <h2 class="font-headline text-foreground text-center text-[28px] font-extrabold tracking-tight">
+          <h2
+            class="font-headline text-foreground text-center text-[28px] font-extrabold tracking-tight"
+          >
             Kanocifer<span class="text-primary">.chat</span>
           </h2>
-          <p class="text-muted-foreground mt-1 text-center text-[15px] font-medium">
+          <p
+            class="text-muted-foreground mt-1 text-center text-[15px] font-medium"
+          >
             Welcome back to the reading space.
           </p>
         </div>
         <!-- 登录表单 -->
         <form @submit.prevent="handleSubmit">
           <!-- 用户名 -->
-          <div class="relative transition-transform duration-200 focus-within:scale-[1.01]">
-            <div class="text-muted-foreground/60 pointer-events-none absolute top-6 left-0 flex items-center pl-4">
+          <div
+            class="relative transition-transform duration-200 focus-within:scale-[1.01]"
+          >
+            <div
+              class="text-muted-foreground/60 pointer-events-none absolute top-6 left-0 flex items-center pl-4"
+            >
               <ShieldUser class="size-6 focus-within:scale-101" />
             </div>
             <input
@@ -125,12 +139,20 @@ const handleGitHubLogin = () => {
               placeholder="用户名"
               class="form-control border-border bg-muted text-foreground focus:border-primary focus:ring-primary/30 my-4 w-full rounded-xl py-2 pr-4 pl-11 transition-transform focus:scale-[1.01] focus:ring-2 focus:outline-none"
             />
-            <span v-if="errors.username" class="text-destructive mt-1 block text-sm">{{ errors.username }}</span>
+            <span
+              v-if="errors.username"
+              class="text-destructive mt-1 block text-sm"
+              >{{ errors.username }}</span
+            >
           </div>
 
           <!-- 密码 -->
-          <div class="relative mt-4 transition-transform duration-200 focus-within:scale-[1.01]">
-            <div class="text-muted-foreground/60 pointer-events-none absolute top-2.5 left-0 flex items-center pl-4">
+          <div
+            class="relative mt-4 transition-transform duration-200 focus-within:scale-[1.01]"
+          >
+            <div
+              class="text-muted-foreground/60 pointer-events-none absolute top-2.5 left-0 flex items-center pl-4"
+            >
               <IconLock class="size-6" />
             </div>
             <input
@@ -182,7 +204,11 @@ const handleGitHubLogin = () => {
               </svg>
             </button>
 
-            <span v-if="errors.password" class="text-destructive mt-1 block text-sm">{{ errors.password }}</span>
+            <span
+              v-if="errors.password"
+              class="text-destructive mt-1 block text-sm"
+              >{{ errors.password }}</span
+            >
           </div>
 
           <!-- 提交按钮和记住我 -->
@@ -193,8 +219,20 @@ const handleGitHubLogin = () => {
               :disabled="isSubmitting"
             >
               <!-- SVG 加载动画 -->
-              <svg v-if="isSubmitting" class="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <svg
+                v-if="isSubmitting"
+                class="h-5 w-5 animate-spin"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                />
                 <path
                   class="opacity-75"
                   fill="currentColor"
@@ -206,11 +244,17 @@ const handleGitHubLogin = () => {
 
             <!-- Remember Me Checkbox -->
             <label class="group relative flex cursor-pointer">
-              <input v-model="form.rememberMe" type="checkbox" class="peer sr-only" />
+              <input
+                v-model="form.rememberMe"
+                type="checkbox"
+                class="peer sr-only"
+              />
               <div
                 class="border-border bg-card peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-primary/10 hover:border-primary/30 rounded-xl border-2 px-3 py-2 shadow-sm transition-all duration-200 select-none group-active:scale-95"
               >
-                <span class="text-muted-foreground peer-checked:text-primary text-sm font-medium transition-colors">
+                <span
+                  class="text-muted-foreground peer-checked:text-primary text-sm font-medium transition-colors"
+                >
                   Remember Me
                 </span>
               </div>
@@ -227,8 +271,20 @@ const handleGitHubLogin = () => {
             >
               <IconKey />
               <!-- SVG 加载动画 -->
-              <svg v-if="isPasskeySubmitting" class="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <svg
+                v-if="isPasskeySubmitting"
+                class="h-5 w-5 animate-spin"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                />
                 <path
                   class="opacity-75"
                   fill="currentColor"
@@ -238,7 +294,10 @@ const handleGitHubLogin = () => {
               <span v-if="isPasskeySubmitting">Logging in with Passkey...</span>
               <span v-else>Login with Passkey</span>
             </button>
-            <span v-if="errors.passkey" class="text-destructive mt-1 block text-center text-sm">
+            <span
+              v-if="errors.passkey"
+              class="text-destructive mt-1 block text-center text-sm"
+            >
               {{ errors.passkey }}
             </span>
           </div>
@@ -259,11 +318,16 @@ const handleGitHubLogin = () => {
             </button>
           </div>
 
-          <p class="text-muted-foreground mt-8 text-center font-serif">Kuroome's Blog</p>
+          <p class="text-muted-foreground mt-8 text-center font-serif">
+            Kuroome's Blog
+          </p>
           <!-- 注册链接 -->
           <div class="text-muted-foreground mb-4 text-center">
             Don't have an account?
-            <RouterLink to="/register" class="hover:text-primary underline transition duration-100">
+            <RouterLink
+              to="/register"
+              class="hover:text-primary underline transition duration-100"
+            >
               Register here.
             </RouterLink>
           </div>

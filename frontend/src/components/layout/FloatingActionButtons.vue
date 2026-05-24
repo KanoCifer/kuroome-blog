@@ -6,7 +6,9 @@
       class="group bg-secondary hover:bg-primary flex h-10 cursor-pointer items-center overflow-hidden rounded-full px-2.5 shadow-md transition-all duration-300 ease-out"
       title="偏好设置"
     >
-      <SettingIcon class="text-primary h-5 w-5 shrink-0 transition-colors duration-300 group-hover:text-white" />
+      <SettingIcon
+        class="text-primary h-5 w-5 shrink-0 transition-colors duration-300 group-hover:text-white"
+      />
       <span
         class="max-w-0 min-w-0 text-sm font-medium whitespace-nowrap text-white opacity-0 transition-all duration-300 ease-out group-hover:ml-1.5 group-hover:max-w-20 group-hover:opacity-100"
       >
@@ -35,7 +37,9 @@
         class="text-primary h-5 w-5 shrink-0 transition-colors duration-300 group-hover:text-white"
       >
         <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+        <path
+          d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+        />
       </svg>
       <span
         class="max-w-0 min-w-0 text-sm font-medium whitespace-nowrap text-white opacity-0 transition-all duration-300 ease-out group-hover:ml-1.5 group-hover:max-w-20 group-hover:opacity-100"
@@ -126,7 +130,9 @@
         stroke-linejoin="round"
         :class="[
           'h-5 w-5 shrink-0 transition-colors duration-300',
-          liked ? 'fill-rose-500 text-rose-500' : 'text-primary group-hover:text-white',
+          liked
+            ? 'fill-rose-500 text-rose-500'
+            : 'text-primary group-hover:text-white',
         ]"
       >
         <path
@@ -214,7 +220,9 @@
       class="group bg-secondary hover:bg-primary flex h-10 cursor-pointer items-center overflow-hidden rounded-full px-2.5 shadow-md transition-all duration-300 ease-out"
       title="RSS"
     >
-      <RssIcon class="text-primary h-5 w-5 shrink-0 transition-colors duration-300 group-hover:text-white" />
+      <RssIcon
+        class="text-primary h-5 w-5 shrink-0 transition-colors duration-300 group-hover:text-white"
+      />
       <span
         class="max-w-0 min-w-0 text-sm font-medium whitespace-nowrap text-white opacity-0 transition-all duration-300 ease-out group-hover:ml-1.5 group-hover:max-w-20 group-hover:opacity-100"
       >
@@ -230,7 +238,9 @@
       class="group bg-secondary hover:bg-primary flex h-10 cursor-pointer items-center overflow-hidden rounded-full px-2.5 shadow-md transition-all duration-300 ease-out"
       title="订阅管理"
     >
-      <CreditCard class="text-primary h-5 w-5 shrink-0 transition-colors duration-300 group-hover:text-white" />
+      <CreditCard
+        class="text-primary h-5 w-5 shrink-0 transition-colors duration-300 group-hover:text-white"
+      />
       <span
         class="max-w-0 min-w-0 text-sm font-medium whitespace-nowrap text-white opacity-0 transition-all duration-300 ease-out group-hover:ml-1.5 group-hover:max-w-20 group-hover:opacity-100"
       >
@@ -246,7 +256,9 @@
       class="group bg-secondary hover:bg-primary flex h-10 cursor-pointer items-center overflow-hidden rounded-full px-2.5 shadow-md transition-all duration-300 ease-out"
       title="图片工具"
     >
-      <IconTooling class="text-primary h-5 w-5 shrink-0 transition-colors duration-300 group-hover:text-white" />
+      <IconTooling
+        class="text-primary h-5 w-5 shrink-0 transition-colors duration-300 group-hover:text-white"
+      />
       <span
         class="max-w-0 min-w-0 text-sm font-medium whitespace-nowrap text-white opacity-0 transition-all duration-300 ease-out group-hover:ml-1.5 group-hover:max-w-20 group-hover:opacity-100"
       >
@@ -265,7 +277,11 @@
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div v-if="isMemoOpen" class="fixed inset-0 z-9998 bg-black/60 backdrop-blur-sm" @click="closeMemo"></div>
+      <div
+        v-if="isMemoOpen"
+        class="fixed inset-0 z-9998 bg-black/60 backdrop-blur-sm"
+        @click="closeMemo"
+      ></div>
     </transition>
   </Teleport>
   <Teleport to="body">
@@ -277,17 +293,35 @@
       leave-from-class="opacity-100 scale-100"
       leave-to-class="opacity-0 scale-95"
     >
-      <div v-if="isMemoOpen" class="fixed inset-0 z-9999 flex items-center justify-center" @click.self="closeMemo">
-        <div class="bg-card relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl p-6 shadow-2xl">
+      <div
+        v-if="isMemoOpen"
+        class="fixed inset-0 z-9999 flex items-center justify-center"
+        @click.self="closeMemo"
+      >
+        <div
+          class="bg-card relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl p-6 shadow-2xl"
+        >
           <button
             @click="closeMemo"
             class="text-muted-foreground hover:bg-muted hover:text-foreground absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full"
           >
-            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            <svg
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
-          <h3 class="text-foreground mb-4 flex items-center gap-2 font-serif text-xl font-bold">
+          <h3
+            class="text-foreground mb-4 flex items-center gap-2 font-serif text-xl font-bold"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
@@ -299,7 +333,9 @@
               stroke-linecap="round"
               stroke-linejoin="round"
             >
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <path
+                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+              />
               <polyline points="14 2 14 8 20 8" />
               <line x1="16" y1="13" x2="8" y2="13" />
               <line x1="16" y1="17" x2="8" y2="17" />

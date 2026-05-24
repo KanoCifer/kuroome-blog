@@ -63,30 +63,48 @@ function position(top: number, left: number) {
 // ── Composable ──────────────────────────────────────────
 
 export function useCardLayout(containerRef: Ref<HTMLElement | null>) {
-  const { centerX, layoutHeight, containerStyle } = useLayoutCenter(containerRef);
+  const { centerX, layoutHeight, containerStyle } =
+    useLayoutCenter(containerRef);
   const layoutStore = useCardLayoutStore();
 
   const leftAnchor = computed(
-    () => centerX.value - STYLES.BentoNavCard.width! / 2 - LAYOUT.CARD_SPACING - LAYOUT.SIDE_COLUMN_GAP,
+    () =>
+      centerX.value -
+      STYLES.BentoNavCard.width! / 2 -
+      LAYOUT.CARD_SPACING -
+      LAYOUT.SIDE_COLUMN_GAP,
   );
   const rightAnchor = computed(
-    () => centerX.value + STYLES.BentoClock.width! / 2 + LAYOUT.CARD_SPACING + LAYOUT.SIDE_COLUMN_GAP,
+    () =>
+      centerX.value +
+      STYLES.BentoClock.width! / 2 +
+      LAYOUT.CARD_SPACING +
+      LAYOUT.SIDE_COLUMN_GAP,
   );
 
   // Center column (greeting map + profile card)
   const picPosition = computed(() => {
     const o = layoutStore.getOffset("BentoPic");
-    return position(layoutHeight.value * LAYOUT.LIST_TOP_RATIO + LAYOUT.LIST_Y_ADJUST + o.y, centerX.value + o.x);
+    return position(
+      layoutHeight.value * LAYOUT.LIST_TOP_RATIO + LAYOUT.LIST_Y_ADJUST + o.y,
+      centerX.value + o.x,
+    );
   });
   const profilePosition = computed(() => {
     const o = layoutStore.getOffset("BentoProfileCard");
-    return position(layoutHeight.value * LAYOUT.PROFILE_TOP_RATIO + o.y, centerX.value + o.x);
+    return position(
+      layoutHeight.value * LAYOUT.PROFILE_TOP_RATIO + o.y,
+      centerX.value + o.x,
+    );
   });
 
   // Left column
   const navCardPosition = computed(() => {
     const o = layoutStore.getOffset("BentoNavCard");
-    return position(layoutHeight.value * LAYOUT.NAV_TOP_RATIO + o.y, leftAnchor.value + LAYOUT.NAV_X_ADJUST + o.x);
+    return position(
+      layoutHeight.value * LAYOUT.NAV_TOP_RATIO + o.y,
+      leftAnchor.value + LAYOUT.NAV_X_ADJUST + o.x,
+    );
   });
 
   const techPosition = computed(() => {

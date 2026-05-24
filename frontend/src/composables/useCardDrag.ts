@@ -14,7 +14,11 @@ export function useCardDrag() {
   const draggingCard = ref<DragState | null>(null);
   const activeElement = ref<HTMLElement | null>(null);
 
-  function onCardPointerDown(e: PointerEvent, cardName: string, element: HTMLElement) {
+  function onCardPointerDown(
+    e: PointerEvent,
+    cardName: string,
+    element: HTMLElement,
+  ) {
     if (!layoutStore.isEditing) return;
     e.preventDefault();
     element.setPointerCapture(e.pointerId);

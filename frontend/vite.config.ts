@@ -12,9 +12,8 @@ export default defineConfig({
   plugins: [
     vue(),
     vueDevTools({
-      // 移除 appendTo 以使用插件默认的脚本注入方式，便于排查显示问题
       componentInspector: true,
-      launchEditor: "code",
+      launchEditor: "zed",
     }),
     tailwindcss(),
     Components({
@@ -75,7 +74,10 @@ export default defineConfig({
           },
           // 忽略lottie-web的eval警告（第三方库问题，无法修复）
           onwarn(warning, warn) {
-            if (warning.code === "EVAL" && warning.id?.includes("node_modules/lottie-web")) {
+            if (
+              warning.code === "EVAL" &&
+              warning.id?.includes("node_modules/lottie-web")
+            ) {
               return;
             }
             warn(warning);

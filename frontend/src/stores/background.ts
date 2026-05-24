@@ -72,7 +72,9 @@ export const useBackgroundStore = defineStore("background", () => {
       }
       if (m === "random" && interval > 0) {
         autoSwitchTimer = setInterval(() => {
-          randomIndex.value = Math.floor(Math.random() * BACKGROUND_IMAGES.length);
+          randomIndex.value = Math.floor(
+            Math.random() * BACKGROUND_IMAGES.length,
+          );
         }, interval * 1000);
       }
     },

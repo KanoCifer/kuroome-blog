@@ -9,7 +9,9 @@
     <UserDropdown :items="userMenuItems" :guest-items="guestMenuItems" />
 
     <!-- 导航分类 -->
-    <div class="text-secondary-foreground dark:text-muted-foreground mb-4 px-3 text-sm font-bold tracking-wider">
+    <div
+      class="text-secondary-foreground dark:text-muted-foreground mb-4 px-3 text-sm font-bold tracking-wider"
+    >
       GENERAL
     </div>
 
@@ -24,7 +26,11 @@
       />
 
       <ol class="flex flex-col gap-1">
-        <li v-for="(item, index) in navItems" :key="item.path" @mouseenter="hoverNavIndex = index">
+        <li
+          v-for="(item, index) in navItems"
+          :key="item.path"
+          @mouseenter="hoverNavIndex = index"
+        >
           <RouterLink
             :to="item.path"
             class="relative z-10 flex items-center gap-4 rounded-3xl py-3.5 pr-5 pl-6 font-medium transition-colors duration-150"
@@ -102,13 +108,15 @@ const guestMenuItems: DropdownItem[] = [
   {
     icon: LoginIcon,
     label: "Login",
-    class: "hover:bg-primary rounded-full transition-colors duration-300 hover:text-white",
+    class:
+      "hover:bg-primary rounded-full transition-colors duration-300 hover:text-white",
     to: "/login",
   },
   {
     icon: RegisterIcon,
     label: "Register",
-    class: "hover:bg-primary rounded-full transition-colors duration-300 hover:text-white",
+    class:
+      "hover:bg-primary rounded-full transition-colors duration-300 hover:text-white",
     to: "/register",
   },
 ];

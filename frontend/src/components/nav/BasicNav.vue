@@ -50,7 +50,12 @@
 </template>
 
 <script setup lang="ts">
-import { BlogIcon, BookshelfIcon, ChangelogIcon, HomeIcon } from "@/components/icons";
+import {
+  BlogIcon,
+  BookshelfIcon,
+  ChangelogIcon,
+  HomeIcon,
+} from "@/components/icons";
 import { useAuthStore } from "@/stores/auth";
 import { useDebounce } from "@vueuse/core";
 import { Image } from "lucide-vue-next";

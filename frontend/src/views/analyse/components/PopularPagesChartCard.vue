@@ -3,7 +3,10 @@
     <h2 class="text-foreground flex items-center gap-2 text-lg font-bold">
       <icon-popular class="size-6" /> Popular Pages
     </h2>
-    <div v-if="loading && !overviewData" class="bg-muted h-full animate-pulse rounded-xl"></div>
+    <div
+      v-if="loading && !overviewData"
+      class="bg-muted h-full animate-pulse rounded-xl"
+    ></div>
     <div v-else class="h-full w-full overflow-hidden">
       <v-chart :option="popularPagesChartOption" autoresize />
     </div>

@@ -41,7 +41,9 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
         @click.self="emit('close')"
       >
         <div class="bg-card w-full max-w-md rounded-3xl shadow-2xl">
-          <div class="border-border flex items-center justify-between border-b px-6 py-4">
+          <div
+            class="border-border flex items-center justify-between border-b px-6 py-4"
+          >
             <h3 class="text-foreground text-base font-semibold">编辑图片</h3>
             <button
               type="button"
@@ -53,7 +55,9 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
           </div>
 
           <div class="p-6">
-            <div class="bg-muted mb-4 flex items-center justify-center rounded-2xl p-4">
+            <div
+              class="bg-muted mb-4 flex items-center justify-center rounded-2xl p-4"
+            >
               <img
                 :src="imageUrl"
                 :alt="alt"
@@ -68,7 +72,9 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
                 type="text"
                 placeholder="图片说明 (Alt)"
                 class="text-foreground placeholder:text-muted-foreground focus:border-ring border-border bg-card w-full rounded-xl border px-3 py-2 text-sm outline-none"
-                @input="emit('update:alt', ($event.target as HTMLInputElement).value)"
+                @input="
+                  emit('update:alt', ($event.target as HTMLInputElement).value)
+                "
               />
 
               <div class="grid grid-cols-2 gap-3">
@@ -78,7 +84,12 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
                   min="0"
                   placeholder="宽度"
                   class="text-foreground placeholder:text-muted-foreground focus:border-ring border-border bg-card w-full rounded-xl border px-3 py-2 text-sm outline-none"
-                  @input="emit('update:width', ($event.target as HTMLInputElement).value)"
+                  @input="
+                    emit(
+                      'update:width',
+                      ($event.target as HTMLInputElement).value,
+                    )
+                  "
                 />
                 <input
                   :value="height"
@@ -86,13 +97,20 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
                   min="0"
                   placeholder="高度"
                   class="text-foreground placeholder:text-muted-foreground focus:border-ring border-border bg-card w-full rounded-xl border px-3 py-2 text-sm outline-none"
-                  @input="emit('update:height', ($event.target as HTMLInputElement).value)"
+                  @input="
+                    emit(
+                      'update:height',
+                      ($event.target as HTMLInputElement).value,
+                    )
+                  "
                 />
               </div>
             </div>
           </div>
 
-          <div class="border-border flex items-center justify-between border-t px-6 py-4">
+          <div
+            class="border-border flex items-center justify-between border-t px-6 py-4"
+          >
             <div>
               <input
                 ref="replaceInputRef"

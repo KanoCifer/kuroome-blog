@@ -40,9 +40,21 @@ const schemes: { value: ColorScheme; label: string; colors: string[] }[] = [
   { value: "sage", label: "Sage", colors: ["#4d6f57", "#8b7146", "#5e7072"] },
   { value: "mist", label: "Mist", colors: ["#4f687a", "#5d7569", "#927255"] },
   { value: "blush", label: "Blush", colors: ["#a5656f", "#6a7866", "#a06d4f"] },
-  { value: "spring", label: "春暖 (Spring)", colors: ["#35bfab", "#f59e0b", "#10b981"] },
-  { value: "autumn", label: "秋实 (Autumn)", colors: ["#de4331", "#eab308", "#3b82f6"] },
-  { value: "clear-sky", label: "晴空 (Clear Sky)", colors: ["#2fcbe7", "#eab308", "#ffffff"] },
+  {
+    value: "spring",
+    label: "春暖 (Spring)",
+    colors: ["#35bfab", "#f59e0b", "#10b981"],
+  },
+  {
+    value: "autumn",
+    label: "秋实 (Autumn)",
+    colors: ["#de4331", "#eab308", "#3b82f6"],
+  },
+  {
+    value: "clear-sky",
+    label: "晴空 (Clear Sky)",
+    colors: ["#2fcbe7", "#eab308", "#ffffff"],
+  },
   { value: "midnight", label: "深夜 (Midnight)", colors: ["#2a48f3"] },
 ];
 

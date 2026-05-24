@@ -1,5 +1,9 @@
 <template>
-  <div class="relative h-dvh w-full" :style="containerStyle" ref="parentContainer">
+  <div
+    class="relative h-dvh w-full"
+    :style="containerStyle"
+    ref="parentContainer"
+  >
     <FloatingActionButtons
       @openSettings="openSettings"
       @goToFriendLinks="$router.push({ name: 'friend-links' })"
@@ -140,7 +144,13 @@
 
 <script setup lang="ts">
 import { BasicFooter } from "@/components/basic";
-import { BentoCalendar, BentoClock, BentoProfileCard, BentoReadingList, BentoTech } from "@/components/bento";
+import {
+  BentoCalendar,
+  BentoClock,
+  BentoProfileCard,
+  BentoReadingList,
+  BentoTech,
+} from "@/components/bento";
 import DragWrapper from "@/components/layout/DragWrapper.vue";
 import FloatingActionButtons from "@/components/layout/FloatingActionButtons.vue";
 import SettingsModal from "@/components/layout/SettingsModal.vue";

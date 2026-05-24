@@ -37,7 +37,10 @@ export function useWebSocket(options: UseWebSocketOptions) {
   }
 
   function scheduleReconnect() {
-    const delay = Math.min(reconnectBaseMs * Math.pow(2, reconnectAttempt.value), reconnectMaxMs);
+    const delay = Math.min(
+      reconnectBaseMs * Math.pow(2, reconnectAttempt.value),
+      reconnectMaxMs,
+    );
     reconnectTimer = setTimeout(connect, delay);
     reconnectAttempt.value++;
   }
@@ -99,7 +102,11 @@ export function useWebSocket(options: UseWebSocketOptions) {
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        if (data.type === "count" && onCount && typeof data.count === "number") {
+        if (
+          data.type === "count" &&
+          onCount &&
+          typeof data.count === "number"
+        ) {
           onCount(data.count);
         } else if (data.type === "pong") {
           calculateConnectionDelay(pingStartTime);
@@ -154,10 +161,15 @@ export function useWebSocket(options: UseWebSocketOptions) {
     connect();
   };
 
+  const handleBeforeUnload = () => {
+    disconnect();
+  };
+
   if (immediate) {
     connect();
     document.addEventListener("visibilitychange", handleVisibility);
     window.addEventListener("online", handleOnline);
+    window.addEventListener("beforeunload", handleBeforeUnload);
   } else {
     onMounted(() => {
       connect();

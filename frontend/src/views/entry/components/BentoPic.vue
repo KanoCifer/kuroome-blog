@@ -1,5 +1,8 @@
 <template>
-  <BentoCard class="group relative min-w-0 overflow-hidden" @click.stop="$router.push('/gallery')">
+  <BentoCard
+    class="group relative min-w-0 overflow-hidden"
+    @click.stop="$router.push('/gallery')"
+  >
     <!-- 背景渐变 -->
     <img :src="imageSrc" class="squircle w-full p-0" />
   </BentoCard>

@@ -6,7 +6,11 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 const showToast = ref(false);
-const hasClosed = useStorage<boolean>("greeting_toast_closed", false, sessionStorage);
+const hasClosed = useStorage<boolean>(
+  "greeting_toast_closed",
+  false,
+  sessionStorage,
+);
 
 const { isDay, greeting, changelogHint } = useGreeting();
 
@@ -30,7 +34,10 @@ const goToChangelog = () => {
 
 <template>
   <Teleport to="body">
-    <Transition enter-active-class="animate-toast-in" leave-active-class="animate-toast-out">
+    <Transition
+      enter-active-class="animate-toast-in"
+      leave-active-class="animate-toast-out"
+    >
       <div
         v-if="showToast"
         class="group fixed bottom-6 left-4 z-50 w-[300px] overflow-hidden rounded-2xl border border-white/[0.08] bg-black/50 shadow-2xl shadow-black/20 backdrop-blur-2xl transition-all duration-500 ease-out hover:-translate-y-1 hover:border-white/[0.14] hover:bg-black/60 hover:shadow-2xl hover:shadow-amber-500/5 sm:bottom-8 sm:left-8"
@@ -76,9 +83,18 @@ const goToChangelog = () => {
             <div
               class="animate-icon-glow relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 ring-1 ring-amber-400/20"
             >
-              <svg v-if="isDay" class="size-5 text-amber-400" viewBox="0 0 24 24" fill="currentColor">
+              <svg
+                v-if="isDay"
+                class="size-5 text-amber-400"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
                 <circle cx="12" cy="12" r="5" />
-                <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <g
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                >
                   <line x1="12" y1="1" x2="12" y2="3" />
                   <line x1="12" y1="21" x2="12" y2="23" />
                   <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
@@ -89,14 +105,21 @@ const goToChangelog = () => {
                   <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
                 </g>
               </svg>
-              <svg v-else class="size-5 text-amber-200" viewBox="0 0 24 24" fill="currentColor">
+              <svg
+                v-else
+                class="size-5 text-amber-200"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
               </svg>
             </div>
 
             <!-- 文字 -->
             <div class="min-w-0 flex-1">
-              <h3 class="font-serif text-sm font-semibold tracking-wide text-white/90">
+              <h3
+                class="font-serif text-sm font-semibold tracking-wide text-white/90"
+              >
                 {{ greeting }}
               </h3>
               <p class="mt-0.5 truncate text-xs text-white/50">

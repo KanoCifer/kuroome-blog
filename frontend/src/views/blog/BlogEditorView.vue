@@ -41,7 +41,7 @@ const currentCategory = computed(() => {
 });
 
 // Draft management
-const draftKey = computed(() => `blog-draft-${postId.value || 'new'}`);
+const draftKey = computed(() => `blog-draft-${postId.value || "new"}`);
 const lastSavedAt = ref<Date | null>(null);
 const hasUnsavedChanges = ref(false);
 const autoSaveEnabled = ref(true);
@@ -72,7 +72,7 @@ watch(
       autoSaveTimer = setTimeout(saveDraft, 3000);
     }
   },
-  { deep: true }
+  { deep: true },
 );
 
 // Restore draft from localStorage
@@ -81,10 +81,10 @@ const restoreDraft = (): boolean => {
   if (!saved) return false;
   try {
     const draft = JSON.parse(saved);
-    title.value = draft.title || '';
-    summary.value = draft.summary || '';
-    markdownBody.value = draft.markdownBody || '';
-    category.value = draft.category || '';
+    title.value = draft.title || "";
+    summary.value = draft.summary || "";
+    markdownBody.value = draft.markdownBody || "";
+    category.value = draft.category || "";
     pin.value = draft.pin || false;
     if (draft.savedAt) lastSavedAt.value = new Date(draft.savedAt);
     return true;
@@ -107,7 +107,7 @@ const showDraftRestore = ref(false);
 const handleBeforeUnload = (e: BeforeUnloadEvent) => {
   if (hasUnsavedChanges.value) {
     e.preventDefault();
-    e.returnValue = '';
+    e.returnValue = "";
   }
 };
 
@@ -140,7 +140,7 @@ const handleSaveDraft = () => {
 
 // Keyboard shortcut for save
 const handleKeydown = (e: KeyboardEvent) => {
-  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
     e.preventDefault();
     handleSaveDraft();
   }
@@ -215,8 +215,7 @@ const handleSubmit = async () => {
     try {
       // Upload all blob images and get markdown content with server URLs
       // Store raw markdown — conversion to HTML happens at display time
-      currentContent =
-        await markdownEditorRef.value.getContentForPublish();
+      currentContent = await markdownEditorRef.value.getContentForPublish();
     } catch (err) {
       error.value = "图片上传失败";
       notification.error(error.value);
@@ -270,8 +269,8 @@ const handleCancel = () => {
 };
 
 onMounted(async () => {
-  window.addEventListener('keydown', handleKeydown);
-  window.addEventListener('beforeunload', handleBeforeUnload);
+  window.addEventListener("keydown", handleKeydown);
+  window.addEventListener("beforeunload", handleBeforeUnload);
 
   await fetchCategories();
   const id = route.params.id;
@@ -296,8 +295,8 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('keydown', handleKeydown);
-  window.removeEventListener('beforeunload', handleBeforeUnload);
+  window.removeEventListener("keydown", handleKeydown);
+  window.removeEventListener("beforeunload", handleBeforeUnload);
   if (autoSaveTimer) clearTimeout(autoSaveTimer);
 });
 </script>
@@ -316,26 +315,47 @@ onBeforeUnmount(() => {
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div class="bg-primary/10 text-primary rounded-full p-2">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
-                <path fill-rule="evenodd" d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0V5.36l-.31-.31A7 7 0 003.239 8.188a.75.75 0 101.448.389A5.5 5.5 0 0113.89 6.11l.311.31h-2.432a.75.75 0 000 1.5h4.243a.75.75 0 00.53-.219z" clip-rule="evenodd" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                class="h-5 w-5"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0V5.36l-.31-.31A7 7 0 003.239 8.188a.75.75 0 101.448.389A5.5 5.5 0 0113.89 6.11l.311.31h-2.432a.75.75 0 000 1.5h4.243a.75.75 0 00.53-.219z"
+                  clip-rule="evenodd"
+                />
               </svg>
             </div>
             <div>
-              <p class="text-foreground text-sm font-medium">检测到未保存的草稿</p>
-              <p class="text-muted-foreground text-xs">上次保存于 {{ lastSavedAt ? lastSavedAt.toLocaleString() : '未知' }}</p>
+              <p class="text-foreground text-sm font-medium">
+                检测到未保存的草稿
+              </p>
+              <p class="text-muted-foreground text-xs">
+                上次保存于
+                {{ lastSavedAt ? lastSavedAt.toLocaleString() : "未知" }}
+              </p>
             </div>
           </div>
           <div class="flex items-center gap-2">
             <button
               type="button"
-              @click="showDraftRestore = false; if (postId) fetchPost(postId)"
+              @click="
+                showDraftRestore = false;
+                if (postId) fetchPost(postId);
+              "
               class="text-muted-foreground hover:text-foreground text-sm transition"
             >
               放弃
             </button>
             <button
               type="button"
-              @click="restoreDraft(); showDraftRestore = false; notification.success('已恢复草稿')"
+              @click="
+                restoreDraft();
+                showDraftRestore = false;
+                notification.success('已恢复草稿');
+              "
               class="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-4 py-1.5 text-sm font-medium transition"
             >
               恢复草稿
@@ -379,7 +399,9 @@ onBeforeUnmount(() => {
         <!-- Title and Summary -->
         <div class="border-border bg-card rounded-3xl border p-2 shadow-sm">
           <!-- Title -->
-          <div class="group focus-within:bg-accent/30 rounded-2xl transition-colors">
+          <div
+            class="group focus-within:bg-accent/30 rounded-2xl transition-colors"
+          >
             <input
               v-model="title"
               type="text"
@@ -393,8 +415,12 @@ onBeforeUnmount(() => {
           <div class="bg-border mx-4 h-px"></div>
 
           <!-- Summary -->
-          <div class="group focus-within:bg-accent/30 flex items-center gap-3 rounded-2xl px-4 py-3 transition-colors">
-            <span class="text-muted-foreground shrink-0 text-sm font-medium">摘要</span>
+          <div
+            class="group focus-within:bg-accent/30 flex items-center gap-3 rounded-2xl px-4 py-3 transition-colors"
+          >
+            <span class="text-muted-foreground shrink-0 text-sm font-medium"
+              >摘要</span
+            >
             <input
               v-model="summary"
               type="text"
@@ -411,11 +437,13 @@ onBeforeUnmount(() => {
             <span
               :class="[
                 'h-2 w-2 rounded-full transition-colors',
-                hasUnsavedChanges ? 'bg-warning animate-pulse' : 'bg-success'
+                hasUnsavedChanges ? 'bg-warning animate-pulse' : 'bg-success',
               ]"
             ></span>
             <span v-if="hasUnsavedChanges">未保存更改</span>
-            <span v-else-if="lastSavedAt">已保存 {{ lastSavedAt.toLocaleTimeString() }}</span>
+            <span v-else-if="lastSavedAt"
+              >已保存 {{ lastSavedAt.toLocaleTimeString() }}</span
+            >
             <span v-else>准备就绪</span>
           </div>
 
@@ -460,7 +488,7 @@ onBeforeUnmount(() => {
                   'flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-semibold transition-all',
                   category
                     ? 'border-primary/30 bg-primary/5 text-primary'
-                    : 'border-border bg-card text-muted-foreground hover:border-border/80'
+                    : 'border-border bg-card text-muted-foreground hover:border-border/80',
                 ]"
               >
                 <span>{{ currentCategory || "选择分类" }}</span>
@@ -520,14 +548,28 @@ onBeforeUnmount(() => {
                 'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all',
                 autoSaveEnabled
                   ? 'border-success/30 bg-success/10 text-success'
-                  : 'border-border bg-card text-muted-foreground'
+                  : 'border-border bg-card text-muted-foreground',
               ]"
-              :title="autoSaveEnabled ? '自动保存已开启 (Cmd+S 手动触发)' : '自动保存已关闭'"
+              :title="
+                autoSaveEnabled
+                  ? '自动保存已开启 (Cmd+S 手动触发)'
+                  : '自动保存已关闭'
+              "
             >
-              <svg v-if="autoSaveEnabled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3.5 w-3.5">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+              <svg
+                v-if="autoSaveEnabled"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                class="h-3.5 w-3.5"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                  clip-rule="evenodd"
+                />
               </svg>
-              <span>{{ autoSaveEnabled ? '自动' : '手动' }}</span>
+              <span>{{ autoSaveEnabled ? "自动" : "手动" }}</span>
             </button>
 
             <!-- Save Draft Button -->

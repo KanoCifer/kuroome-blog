@@ -72,6 +72,7 @@ class WsVisitorService:
         finally:
             with suppress(Exception):
                 await pubsub.unsubscribe(VISITOR_COUNT_CHANNEL)
+                await pubsub.reset()
 
     @classmethod
     async def _ws_receiver(cls, websocket: WebSocket) -> None:
@@ -109,14 +110,23 @@ class WsVisitorService:
             )
             await cls.publish_count(redis)
 
-            # Run the two listeners concurrently; either exiting tears down
-            # the whole connection.
-            await asyncio.gather(
-                cls._redis_listener(redis, websocket),
-                cls._ws_receiver(websocket),
+            # Run the two listeners concurrently; when one exits, cancel the other.
+            listener_task = asyncio.create_task(
+                cls._redis_listener(redis, websocket)
             )
-        except WebSocketDisconnect, Exception:
-            logger.debug("WebSocket connection closed")
+            receiver_task = asyncio.create_task(cls._ws_receiver(websocket))
+            done, pending = await asyncio.wait(
+                [listener_task, receiver_task],
+                return_when=asyncio.FIRST_COMPLETED,
+            )
+            for task in pending:
+                task.cancel()
+                with suppress(asyncio.CancelledError):
+                    await task
+        except WebSocketDisconnect:
+            logger.debug("WebSocket disconnected by client")
+        except Exception:
+            logger.warning("Unexpected WebSocket error")
         finally:
             try:
                 await redis.decr(VISITOR_COUNT_KEY)

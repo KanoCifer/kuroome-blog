@@ -25,11 +25,17 @@ const props = defineProps<{
 // 检测字符串是否像 HTML
 const isHtmlLike = (str: string): boolean => {
   if (!str) return false;
-  return /<\/?[a-z][\s\S]*>/i.test(str) || str.includes("&lt;") || str.includes("&gt;");
+  return (
+    /<\/?[a-z][\s\S]*>/i.test(str) ||
+    str.includes("&lt;") ||
+    str.includes("&gt;")
+  );
 };
 
 const markdownText = ref<string>(
-  isHtmlLike(props.modelValue || "") ? turndownService.turndown(props.modelValue || "") : props.modelValue || "",
+  isHtmlLike(props.modelValue || "")
+    ? turndownService.turndown(props.modelValue || "")
+    : props.modelValue || "",
 );
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
 
@@ -72,7 +78,12 @@ const insertAtCursor = (before: string, after: string = "") => {
   const end = textarea.selectionEnd;
   const selectedText = markdownText.value.slice(start, end);
 
-  const newText = markdownText.value.slice(0, start) + before + selectedText + after + markdownText.value.slice(end);
+  const newText =
+    markdownText.value.slice(0, start) +
+    before +
+    selectedText +
+    after +
+    markdownText.value.slice(end);
   markdownText.value = newText;
 
   nextTick(() => {
@@ -131,7 +142,9 @@ const handleKeydown = (e: KeyboardEvent) => {
 watch(
   () => props.modelValue,
   (newValue) => {
-    const converted = isHtmlLike(newValue || "") ? turndownService.turndown(newValue || "") : newValue || "";
+    const converted = isHtmlLike(newValue || "")
+      ? turndownService.turndown(newValue || "")
+      : newValue || "";
     if (converted !== markdownText.value) {
       markdownText.value = converted;
     }
@@ -225,7 +238,9 @@ defineExpose({
       </div>
 
       <!-- Toolbar -->
-      <div class="border-border/50 flex h-10 shrink-0 items-center justify-between border-b px-4">
+      <div
+        class="border-border/50 flex h-10 shrink-0 items-center justify-between border-b px-4"
+      >
         <div class="flex items-center gap-1">
           <button
             type="button"
@@ -285,7 +300,13 @@ defineExpose({
             <span class="opacity-70">🔗</span>
           </button>
           <div class="bg-border mx-1 h-4 w-px"></div>
-          <input ref="fileInputRef" type="file" accept="image/*" class="hidden" @change="handleImageUpload" />
+          <input
+            ref="fileInputRef"
+            type="file"
+            accept="image/*"
+            class="hidden"
+            @change="handleImageUpload"
+          />
           <button
             type="button"
             class="text-muted-foreground hover:bg-accent/50 hover:text-foreground rounded-lg px-2 py-1.5 text-sm font-medium transition"
@@ -360,7 +381,10 @@ defineExpose({
       leave-from-class="opacity-100"
       leave-to-class="opacity-0 w-0"
     >
-      <div v-if="showPreview" class="border-border/50 bg-card/50 border-l md:w-1/2 md:pl-4">
+      <div
+        v-if="showPreview"
+        class="border-border/50 bg-card/50 border-l md:w-1/2 md:pl-4"
+      >
         <div class="flex h-full flex-col">
           <div class="flex h-10 shrink-0 items-center justify-between px-4">
             <h2 class="text-muted-foreground text-xs font-medium">预览</h2>
@@ -372,7 +396,9 @@ defineExpose({
               关闭
             </button>
           </div>
-          <div class="prose prose-slate dark:prose-invert max-w-none flex-1 overflow-y-auto px-6 py-4">
+          <div
+            class="prose prose-slate dark:prose-invert max-w-none flex-1 overflow-y-auto px-6 py-4"
+          >
             <div v-html="renderedMarkdown" @click="handlePreviewClick"></div>
           </div>
         </div>
