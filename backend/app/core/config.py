@@ -45,7 +45,7 @@ class Settings(BaseSettings):
     COOKIE_DOMAIN: str = ""
     # Redis 配置
     REDIS_URL: str = "redis://localhost:6379/0"
-    REDIS_MAX_CONNECTIONS: int = 30
+    REDIS_MAX_CONNECTIONS: int = 50
     RABBITMQ_URL: str = "amqp://guest:guest@localhost:5672/"
     QWEATHER_BASE_URL: str = ""
     ENABLE_TRACKING: bool = True

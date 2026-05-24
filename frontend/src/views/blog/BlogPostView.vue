@@ -70,7 +70,7 @@ onMounted(() => {
 
 watch(
   () => route.params.id,
-  (newId) => {
+  (newId): void => {
     if (newId && newId !== postId.value) {
       postId.value = newId as string;
       fetchPost();
@@ -80,7 +80,7 @@ watch(
 
 watch(
   () => post.value?.body,
-  async (html) => {
+  async (html): Promise<void> => {
     if (!html) return;
     await nextTick();
     hljs.highlightAll();

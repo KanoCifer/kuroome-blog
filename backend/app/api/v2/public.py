@@ -12,4 +12,5 @@ router = APIRouter(prefix="/publicv2", tags=["publicv2"])
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     redis: Redis = websocket.app.state.redis
+
     await WsVisitorService.handle_connection(websocket, redis)
