@@ -65,7 +65,8 @@ body {
 }
 
 html {
-  scroll-behavior: smooth;
+  /* scroll-behavior: smooth; */
+  box-sizing: border-box;
 }
 @layer base {
   body {

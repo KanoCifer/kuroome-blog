@@ -396,7 +396,24 @@ onUnmounted(() => {
 
       <div v-if="post" class="sm:col-span-2 lg:col-span-3">
         <div class="border-border bg-card overflow-hidden rounded-2xl border shadow-sm">
-          <div class="border-border border-b px-8 py-5">
+          <div class="border-border flex gap-2 border-b px-8 py-5">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-message-circle-check-icon lucide-message-circle-check"
+            >
+              <path
+                d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"
+              />
+              <path d="m9 12 2 2 4-4" />
+            </svg>
             <h3 class="text-foreground text-lg font-semibold">评论</h3>
           </div>
           <div class="p-8">

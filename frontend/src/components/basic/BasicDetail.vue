@@ -10,9 +10,7 @@
           {{ title }}
         </h1>
         <!-- Info -->
-        <div
-          class="text-muted-foreground mt-4 flex flex-wrap items-center justify-center gap-4 text-sm"
-        >
+        <div class="text-muted-foreground mt-4 flex flex-wrap items-center justify-center gap-4 text-sm">
           <span
             class="bg-muted text-secondary-foreground dark:bg-muted dark:text-muted-foreground inline-block rounded-full px-3 py-1 text-xs font-medium"
           >
@@ -23,9 +21,7 @@
     </div>
     <div class="relative mt-[40vh] w-full">
       <!-- Scroll Indicator -->
-      <div
-        class="absolute -top-10 left-1/2 -translate-x-1/2 animate-bounce cursor-pointer text-white"
-      >
+      <div class="absolute -top-10 left-1/2 -translate-x-1/2 animate-bounce cursor-pointer text-white">
         <a href="#main-content">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -34,12 +30,7 @@
             viewBox="0 0 24 24"
             stroke="currentColor"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="3"
-              d="M19 14l-7 7m0 0l-7-7m7 7V3"
-            />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
           </svg>
         </a>
       </div>
@@ -51,9 +42,7 @@
         <div
           id="main-content"
           ref="gridRef"
-          :class="[
-            'staggered-grid mx-8 grid grid-cols-1 gap-6 pt-24 sm:grid-cols-2 lg:grid-cols-3',
-          ]"
+          :class="['staggered-grid mx-8 grid grid-cols-1 gap-6 pt-24 sm:grid-cols-2 lg:grid-cols-3']"
         >
           <!-- Content slots -->
           <slot />
@@ -65,19 +54,8 @@
           @click="$router.back()"
           class="bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90 mb-12 inline-flex cursor-pointer items-center gap-2 rounded-full px-6 py-3 font-medium transition-all duration-300 hover:shadow-lg"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           返回上一页
         </button>

@@ -37,3 +37,4 @@ CLAUDE.local.md
 .claude/settings.local.json
 # ML models
 backend/models/*.joblib
+.zed/debug.json
