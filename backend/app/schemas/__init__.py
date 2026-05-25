@@ -46,6 +46,7 @@ from app.schemas.comment import (
     GetComment,
     PostComment,
 )
+from app.schemas.devtask import DevTaskCreate, DevTaskOut, DevTaskUpdate
 from app.schemas.email import BootstrapEmailContent, EmailCodeContent
 from app.schemas.feishu import FeishuMessageContent, FeishuRichTextContent
 from app.schemas.message import (
@@ -63,7 +64,6 @@ from app.schemas.rss import (
     RssRequest,
     RssSubscriptionResponse,
 )
-from app.schemas.todo import TodoIn, TodoOut, TodoUpdate
 from app.schemas.track import VisitorData
 from app.schemas.user import (
     ImageUploadOut,
@@ -135,7 +135,7 @@ __all__ = [
     "MessagesOut",
     "NowWeather",
     "PaginationSchema",
-    "PasskeyAuthenticationRequest",
+    "PasskeyAuthRequest",
     "PasskeyRegistrationRequest",
     "PostComment",
     "RegisterIn",
@@ -149,9 +149,9 @@ __all__ = [
     "TideData",
     "TideHourly",
     "TideItem",
-    "TodoIn",
-    "TodoOut",
-    "TodoUpdate",
+    "DevTaskCreate",
+    "DevTaskOut",
+    "DevTaskUpdate",
     "UpdateBookIn",
     "UserOut",
     "UserProfileOut",

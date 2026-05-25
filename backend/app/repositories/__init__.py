@@ -9,7 +9,7 @@ from app.repositories.monitor_repo import MonitorRepo
 from app.repositories.public_repo import PublicRepo
 from app.repositories.rss_repo import RssRepo
 from app.repositories.sub_repo import SubRepo
-from app.repositories.todo_repo import TodoRepo
+from app.repositories.devtask_repo import DevTaskRepo
 from app.repositories.user_repo import UserRepo
 from app.repositories.weread_repo import WereadRepo
 
@@ -25,7 +25,7 @@ __all__ = [
     "PublicRepo",
     "RssRepo",
     "SubRepo",
-    "TodoRepo",
+    "DevTaskRepo",
     "UserRepo",
     "WereadRepo",
 ]

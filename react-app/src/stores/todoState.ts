@@ -1,111 +1,67 @@
-import { todoService, type TodoService } from '@/services/todoService';
+import { devTaskService, type DevTaskService } from '@/services/todoService';
 import { create } from 'zustand';
-import type { CreateTodoPayload } from '@/services/todoService/types';
+import type { CreateDevTaskPayload, DevTask, DevTaskStatus } from '@/services/todoService/types';
 
-export interface Todo {
-  id: string;
-  text: string;
-  completed: boolean;
-  createdAt: string;
-  description?: string;
-  dueDate?: string;
-  priority: 'low' | 'medium' | 'high';
-  category?: string;
-  archived?: boolean;
-  archivedAt?: string;
+export const STATUS_LABELS: Record<DevTaskStatus, string> = {
+  todo: '待开发',
+  'in-progress': '开发中',
+  done: '已完成',
+};
+
+const STATUS_CYCLE: Record<DevTaskStatus, DevTaskStatus> = {
+  todo: 'in-progress',
+  'in-progress': 'done',
+  done: 'todo',
+};
+
+interface DevTaskState {
+  tasks: DevTask[];
+  hydrateTasks: () => void;
+  createTask: (payload: CreateDevTaskPayload) => Promise<void>;
+  cycleStatus: (id: string) => Promise<void>;
+  updateTask: (id: string, patch: Partial<DevTask>) => Promise<void>;
+  deleteTask: (id: string) => Promise<void>;
 }
 
-interface TodoState {
-  todos: Todo[];
-  hydrateTodos: () => void;
-  addTodo: (payload: CreateTodoPayload) => Promise<void>;
-  toggleTodo: (id: string) => Promise<void>;
-  updateTodo: (id: string, patch: Partial<Todo>) => Promise<void>;
-  removeTodo: (id: string) => Promise<void>;
-  archiveTodo: (id: string) => Promise<void>;
-  unarchiveTodo: (id: string) => Promise<void>;
-  archiveCompleted: () => Promise<void>;
-  clearCompleted: () => Promise<void>;
-}
+const service: DevTaskService = devTaskService();
 
-const service: TodoService = todoService();
+export const useTodoState = create<DevTaskState>((set, get) => ({
+  tasks: [],
 
-export const useTodoState = create<TodoState>((set, get) => ({
-  todos: [],
-
-  hydrateTodos: () => {
-    service.fetchTodos(true).then((todos) => set({ todos }));
+  hydrateTasks: () => {
+    service.fetchTasks().then((tasks) => set({ tasks }));
   },
 
-  addTodo: async (payload) => {
-    const newTodo = await service.addTodo(payload);
-    if (newTodo) {
-      set((state) => ({ todos: [...state.todos, newTodo] }));
+  createTask: async (payload) => {
+    const newTask = await service.createTask(payload);
+    if (newTask) {
+      set((state) => ({ tasks: [newTask, ...state.tasks] }));
     }
   },
 
-  toggleTodo: async (id) => {
-    const todo = get().todos.find((t) => t.id === id);
-    if (todo) {
-      await service.updateTodo(id, { completed: !todo.completed });
-      set((state) => ({
-        todos: state.todos.map((t) =>
-          t.id === id ? { ...t, completed: !t.completed } : t,
-        ),
-      }));
-    }
-  },
-
-  updateTodo: async (id, patch) => {
-    const updated = await service.updateTodo(id, patch);
+  cycleStatus: async (id) => {
+    const task = get().tasks.find((t) => t.id === id);
+    if (!task) return;
+    const nextStatus = STATUS_CYCLE[task.status];
+    const updated = await service.updateTask(id, { status: nextStatus });
     if (updated) {
       set((state) => ({
-        todos: state.todos.map((t) => (t.id === id ? { ...t, ...updated } : t)),
+        tasks: state.tasks.map((t) => (t.id === id ? { ...t, ...updated } : t)),
       }));
     }
   },
 
-  removeTodo: async (id) => {
-    await service.removeTodo(id);
-    set((state) => ({ todos: state.todos.filter((t) => t.id !== id) }));
+  updateTask: async (id, patch) => {
+    const updated = await service.updateTask(id, patch);
+    if (updated) {
+      set((state) => ({
+        tasks: state.tasks.map((t) => (t.id === id ? { ...t, ...updated } : t)),
+      }));
+    }
   },
 
-  archiveTodo: async (id) => {
-    await service.updateTodo(id, {
-      archived: true,
-      archivedAt: new Date().toISOString(),
-    });
-    set((state) => ({
-      todos: state.todos.map((t) =>
-        t.id === id
-          ? { ...t, archived: true, archivedAt: new Date().toISOString() }
-          : t,
-      ),
-    }));
-  },
-
-  unarchiveTodo: async (id) => {
-    await service.updateTodo(id, { archived: false });
-    set((state) => ({
-      todos: state.todos.map((t) =>
-        t.id === id ? { ...t, archived: false } : t,
-      ),
-    }));
-  },
-
-  archiveCompleted: async () => {
-    await service.batchAction('archiveCompleted');
-    set((state) => ({
-      todos: state.todos.map((t) =>
-        t.completed
-          ? { ...t, archived: true, archivedAt: new Date().toISOString() }
-          : t,
-      ),
-    }));
-  },
-
-  clearCompleted: async () => {
-    await service.batchAction('clearCompleted');
-    set((state) => ({ todos: state.todos.filter((t) => !t.completed) }));
+  deleteTask: async (id) => {
+    await service.deleteTask(id);
+    set((state) => ({ tasks: state.tasks.filter((t) => t.id !== id) }));
   },
 }));

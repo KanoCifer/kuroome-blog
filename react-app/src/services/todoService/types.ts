@@ -1,33 +1,21 @@
-export type TodoPriority = 'low' | 'medium' | 'high';
+export type DevTaskPriority = 'low' | 'medium' | 'high';
+export type DevTaskStatus = 'todo' | 'in-progress' | 'done';
 
-export interface Todo {
+export interface DevTask {
   id: string;
-  text: string;
-  completed: boolean;
+  title: string;
+  status: DevTaskStatus;
   createdAt: string;
+  updatedAt: string;
   description?: string;
   dueDate?: string;
-  priority: TodoPriority;
-  category?: string;
-  archived?: boolean;
-  archivedAt?: string;
+  priority: DevTaskPriority;
 }
 
-export interface TodoApiPayload {
-  todo?: Todo;
-  todos?: Todo[];
-}
-
-export interface TodoApiResponse {
-  data?: TodoApiPayload;
-}
-
-export interface CreateTodoPayload {
-  text: string;
+export interface CreateDevTaskPayload {
+  title: string;
   description?: string;
   dueDate?: string;
-  priority?: TodoPriority;
-  category?: string;
+  priority?: DevTaskPriority;
+  status?: DevTaskStatus;
 }
-
-export type BatchAction = 'archiveCompleted' | 'clearCompleted';

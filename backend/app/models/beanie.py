@@ -152,6 +152,8 @@ class SubscriptionLog(Document):
             IndexModel([("sub_id", ASCENDING), ("sent_at", DESCENDING)]),
             IndexModel([("user_id", ASCENDING), ("sent_at", DESCENDING)]),
         ]
+        use_cache = True
+        cache_expiration_time = timedelta(seconds=600)
 
 
 class FriendLinks(Document):
@@ -166,3 +168,23 @@ class FriendLinks(Document):
 
     class Settings:
         name = "friend_links"
+        use_cache = True
+        cache_expiration_time = timedelta(seconds=600)
+
+
+class DevTask(Document):
+    """DevTask document model."""
+
+    user_id: int
+    title: str
+    description: str | None = None
+    priority: str = "medium"
+    status: str = "todo"
+    due_date: datetime | None = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+
+    class Settings:
+        name = "dev_tasks"
+        use_cache = True
+        cache_expiration_time = timedelta(seconds=10)

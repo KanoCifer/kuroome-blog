@@ -17,7 +17,7 @@ function App() {
 
   // 初始化 Todo 数据（仅调用一次）
   useEffect(() => {
-    todoState.hydrateTodos();
+    todoState.hydrateTasks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

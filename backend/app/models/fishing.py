@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Annotated, Literal
 
 from beanie import Document, Indexed
@@ -54,6 +54,8 @@ class FishingRecord(Document):
         indexes = [  # noqa: RUF012
             [("location_id", 1), ("fishing_time", -1)],
         ]
+        use_cache = True
+        cache_expiration_time = timedelta(seconds=10)
 
 
 class FishingModelMeta(Document):
@@ -95,3 +97,5 @@ class FishingModelMeta(Document):
 
     class Settings:
         name = "fishing_model_meta"
+        use_cache = True
+        cache_expiration_time = timedelta(seconds=10)

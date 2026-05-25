@@ -1,296 +1,257 @@
 import { useNavVisibility } from '@/components/basic/NavVisibilityContext';
 import type {
-  CreateTodoPayload,
-  TodoPriority,
+  CreateDevTaskPayload,
+  DevTaskPriority,
+  DevTaskStatus,
 } from '@/services/todoService/types';
-import { useTodoState, type Todo } from '@/stores/todoState';
+import { useTodoState, STATUS_LABELS } from '@/stores/todoState';
+import type { DevTask } from '@/services/todoService/types';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
-// Icons
-function CheckIcon({ completed }: { completed: boolean }) {
-  return (
-    <div
-      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-300 ${
-        completed
-          ? 'border-blue-500 bg-blue-500'
-          : 'border-gray-300 hover:border-blue-400 dark:border-gray-600'
-      }`}
-    >
-      {completed && (
-        <svg
-          className="h-4 w-4 text-white"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2.5}
-            d="M5 13l4 4L19 7"
-          />
-        </svg>
-      )}
-    </div>
-  );
+// Column definitions
+interface ColumnDef {
+  status: DevTaskStatus;
+  title: string;
+  dotClass: string;
+  bgClass: string;
+  emptyText: string;
 }
 
-function ArchiveIcon({ archived }: { archived?: boolean }) {
-  if (archived) {
-    return (
-      <svg
-        className="h-5 w-5"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
-        />
-      </svg>
-    );
-  }
-  return (
-    <svg
-      className="h-5 w-5"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
-      />
-    </svg>
-  );
-}
+const COLUMNS: ColumnDef[] = [
+  {
+    status: 'todo',
+    title: '待办',
+    dotClass: 'bg-blue-500',
+    bgClass: 'bg-blue-50/40 dark:bg-blue-950/15',
+    emptyText: '没有待开发任务',
+  },
+  {
+    status: 'in-progress',
+    title: '开发中',
+    dotClass: 'bg-amber-500',
+    bgClass: 'bg-amber-50/40 dark:bg-amber-950/15',
+    emptyText: '没有开发中任务',
+  },
+  {
+    status: 'done',
+    title: '已完成',
+    dotClass: 'bg-emerald-500',
+    bgClass: 'bg-emerald-50/40 dark:bg-emerald-950/15',
+    emptyText: '没有已完成任务',
+  },
+];
 
-function TrashIcon() {
-  return (
-    <svg
-      className="h-5 w-5"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-      />
-    </svg>
-  );
-}
-
-function EditIcon() {
-  return (
-    <svg
-      className="h-5 w-5"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-      />
-    </svg>
-  );
-}
-
-function PlusIcon() {
-  return (
-    <svg
-      className="h-5 w-5"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M12 4v16m8-8H4"
-      />
-    </svg>
-  );
-}
-
-function CalendarIcon() {
-  return (
-    <svg
-      className="h-3.5 w-3.5"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-      />
-    </svg>
-  );
-}
-
-// Priority Badge
-function PriorityBadge({ priority }: { priority: TodoPriority }) {
-  const styles = {
-    low: 'border-blue-200 bg-blue-50 text-blue-600 dark:border-blue-900/50 dark:bg-blue-900/20 dark:text-blue-400',
-    medium:
-      'border-yellow-200 bg-yellow-50 text-yellow-600 dark:border-yellow-900/50 dark:bg-yellow-900/20 dark:text-yellow-400',
-    high: 'border-red-200 bg-red-50 text-red-600 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400',
+function statusBadgeStyle(status: DevTaskStatus): React.CSSProperties {
+  const colors: Record<DevTaskStatus, { bg: string; border: string; text: string }> = {
+    todo: { bg: '#eff6ff', border: '#bfdbfe', text: '#1d4ed8' },
+    'in-progress': { bg: '#fffbeb', border: '#fde68a', text: '#b45309' },
+    done: { bg: '#ecfdf5', border: '#a7f3d0', text: '#047857' },
   };
-  const labels = { low: '低', medium: '中', high: '高' };
+  const c = colors[status];
+  return {
+    backgroundColor: c.bg,
+    borderColor: c.border,
+    color: c.text,
+  };
+}
+
+function priorityLabel(p: DevTaskPriority): string {
+  return { low: '低', medium: '中', high: '高' }[p];
+}
+
+function priorityBadgeClass(p: DevTaskPriority): string {
+  const map: Record<DevTaskPriority, string> = {
+    low: 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+    medium:
+      'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
+    high: 'border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400',
+  };
+  return map[p];
+}
+
+// ----- Task Card -----
+function TaskCard({
+  task,
+  onCycle,
+  onEdit,
+  onDelete,
+}: {
+  task: DevTask;
+  onCycle: (id: string) => void;
+  onEdit: (task: DevTask) => void;
+  onDelete: (id: string) => void;
+}) {
+  const isDone = task.status === 'done';
+  const isOverdue =
+    task.dueDate && new Date(task.dueDate) < new Date(new Date().setHours(0, 0, 0, 0));
+
   return (
-    <span
-      className={`rounded-full border px-2 py-0.5 text-xs font-medium ${styles[priority]}`}
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.2 }}
+      className="group rounded-xl border border-gray-200/60 bg-white p-3.5 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700/60 dark:bg-gray-900"
     >
-      {labels[priority]}
-    </span>
+      <div className="flex items-start gap-2.5">
+        {/* Status badge */}
+        <button
+          onClick={() => onCycle(task.id)}
+          className="mt-0.5 shrink-0 cursor-pointer rounded-md border px-2 py-0.5 text-[11px] font-medium transition-all duration-300 ease-out"
+          style={statusBadgeStyle(task.status)}
+        >
+          {STATUS_LABELS[task.status]}
+        </button>
+
+        <div className="min-w-0 flex-1">
+          <p
+            className={`text-sm font-medium leading-snug ${
+              isDone
+                ? 'text-gray-400 line-through dark:text-gray-500'
+                : 'text-gray-900 dark:text-gray-100'
+            }`}
+          >
+            {task.title}
+          </p>
+
+          {task.description && (
+            <p
+              className={`mt-1 line-clamp-2 text-xs text-gray-500 dark:text-gray-400 ${
+                isDone ? 'opacity-60' : ''
+              }`}
+            >
+              {task.description}
+            </p>
+          )}
+
+          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+            <span
+              className={`rounded-full border px-1.5 py-px text-[10px] font-medium ${priorityBadgeClass(task.priority || 'medium')}`}
+            >
+              {priorityLabel(task.priority || 'medium')}
+            </span>
+            {task.dueDate && (
+              <span
+                className={`flex items-center gap-1 text-[10px] ${
+                  isOverdue && !isDone
+                    ? 'text-red-600 dark:text-red-400'
+                    : 'text-gray-500 dark:text-gray-400'
+                }`}
+              >
+                <svg
+                  className="h-2.5 w-2.5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                {task.dueDate}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100 max-sm:opacity-100">
+          <button
+            onClick={() => onEdit(task)}
+            className="cursor-pointer rounded-md p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-blue-600 dark:hover:bg-gray-800 dark:hover:text-blue-400"
+            title="编辑"
+          >
+            <svg
+              className="h-3.5 w-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
+            </svg>
+          </button>
+          <button
+            onClick={() => onDelete(task.id)}
+            className="cursor-pointer rounded-md p-1 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
+            title="删除"
+          >
+            <svg
+              className="h-3.5 w-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </motion.div>
   );
 }
 
-// Filter tabs
-type FilterType = 'all' | 'active' | 'completed' | 'archived';
-const filterLabels: Record<FilterType, string> = {
-  all: '全部',
-  active: '进行中',
-  completed: '已完成',
-  archived: '归档',
-};
-
-// Sort options
-type SortMode = 'createdAt' | 'priority' | 'dueDate';
-
+// ----- Main Page -----
 export default function TodoListView() {
   const { hideNav, showNav } = useNavVisibility();
   const todoState = useTodoState();
-  const { todos } = todoState;
+  const { tasks } = todoState;
 
-  const [filter, setFilter] = useState<FilterType>('all');
-  const [sortMode, setSortMode] = useState<SortMode>('createdAt');
-  const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-
-  // Add form state
-  const [newText, setNewText] = useState('');
-  const [newDescription, setNewDescription] = useState('');
-  const [newPriority, setNewPriority] = useState<TodoPriority>('medium');
-  const [newDueDate, setNewDueDate] = useState('');
-
-  // Edit form state
-  const [editText, setEditText] = useState('');
+  const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
-  const [editPriority, setEditPriority] = useState<TodoPriority>('medium');
+  const [editPriority, setEditPriority] = useState<DevTaskPriority>('medium');
   const [editDueDate, setEditDueDate] = useState('');
 
-  // Computed lists
-  const nonArchivedTodos = useMemo(
-    () => todos.filter((t) => !t.archived),
-    [todos],
-  );
-  const activeTodos = useMemo(
-    () => nonArchivedTodos.filter((t) => !t.completed),
-    [nonArchivedTodos],
-  );
-  const completedTodos = useMemo(
-    () => nonArchivedTodos.filter((t) => t.completed),
-    [nonArchivedTodos],
-  );
-  const archivedTodos = useMemo(() => todos.filter((t) => t.archived), [todos]);
+  // Quick-add state: which column has the active quick-add input
+  const [addingStatus, setAddingStatus] = useState<DevTaskStatus | null>(null);
+  const [quickTitle, setQuickTitle] = useState('');
+  const quickInputRef = useRef<HTMLInputElement>(null);
 
-  const getFilterCount = (f: FilterType) => {
-    if (f === 'all') return nonArchivedTodos.length;
-    if (f === 'active') return activeTodos.length;
-    if (f === 'completed') return completedTodos.length;
-    if (f === 'archived') return archivedTodos.length;
-    return 0;
-  };
+  useEffect(() => {
+    if (addingStatus && quickInputRef.current) {
+      quickInputRef.current.focus();
+    }
+  }, [addingStatus]);
 
-  const displayTodos = useMemo(() => {
-    const list =
-      filter === 'all'
-        ? nonArchivedTodos
-        : filter === 'active'
-          ? activeTodos
-          : filter === 'completed'
-            ? completedTodos
-            : archivedTodos;
-
-    const priorityWeight: Record<TodoPriority, number> = {
-      high: 3,
-      medium: 2,
-      low: 1,
+  // Group tasks by status
+  const grouped = useMemo(() => {
+    const g: Record<DevTaskStatus, DevTask[]> = {
+      todo: [],
+      'in-progress': [],
+      done: [],
     };
+    for (const t of tasks) {
+      g[t.status]?.push(t);
+    }
+    return g;
+  }, [tasks]);
 
-    return [...list].sort((a, b) => {
-      if (sortMode === 'priority') {
-        const wA = priorityWeight[a.priority || 'medium'];
-        const wB = priorityWeight[b.priority || 'medium'];
-        if (wA !== wB) return wB - wA;
-        return (
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-      }
-      if (sortMode === 'dueDate') {
-        if (!a.dueDate && !b.dueDate)
-          return (
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          );
-        if (!a.dueDate) return 1;
-        if (!b.dueDate) return -1;
-        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
-      }
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
-  }, [
-    activeTodos,
-    archivedTodos,
-    completedTodos,
-    filter,
-    nonArchivedTodos,
-    sortMode,
-  ]);
-
-  const handleAddTodo = async () => {
-    if (!newText.trim()) return;
-    const payload: CreateTodoPayload = {
-      text: newText.trim(),
-      description: newDescription.trim() || undefined,
-      dueDate: newDueDate || undefined,
-      priority: newPriority,
-    };
-    await todoState.addTodo(payload);
-    setNewText('');
-    setNewDescription('');
-    setNewPriority('medium');
-    setNewDueDate('');
-    closeAddForm();
-  };
-
-  const startEdit = (todo: Todo) => {
-    setEditingId(todo.id);
-    setEditText(todo.text);
-    setEditDescription(todo.description || '');
-    setEditPriority(todo.priority || 'medium');
-    setEditDueDate(todo.dueDate || '');
+  // Edit
+  const startEdit = (task: DevTask) => {
+    setEditingId(task.id);
+    setEditTitle(task.title);
+    setEditDescription(task.description || '');
+    setEditPriority(task.priority || 'medium');
+    setEditDueDate(task.dueDate || '');
   };
 
   const saveEdit = async () => {
-    if (editingId && editText.trim()) {
-      await todoState.updateTodo(editingId, {
-        text: editText.trim(),
+    if (editingId && editTitle.trim()) {
+      await todoState.updateTask(editingId, {
+        title: editTitle.trim(),
         description: editDescription.trim() || undefined,
         dueDate: editDueDate || undefined,
         priority: editPriority,
@@ -299,29 +260,44 @@ export default function TodoListView() {
     setEditingId(null);
   };
 
-  const cancelEdit = () => {
-    setEditingId(null);
+  // Quick add
+  const startQuickAdd = (status: DevTaskStatus) => {
+    setAddingStatus(status);
+    setQuickTitle('');
   };
 
-  const isOverdue = (dateStr?: string) => {
-    if (!dateStr) return false;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return new Date(dateStr) < today;
+  const submitQuickAdd = async () => {
+    const title = quickTitle.trim();
+    if (!title || !addingStatus) return;
+    const payload: CreateDevTaskPayload = { title, status: addingStatus };
+    await todoState.createTask(payload);
+    setAddingStatus(null);
   };
 
-  const formatDate = (isoString: string) => {
-    try {
-      const d = new Date(isoString);
-      if (isNaN(d.getTime())) return isoString;
-      const pad = (n: number) => String(n).padStart(2, '0');
-      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    } catch {
-      return isoString;
-    }
-  };
+  // Full add modal (mobile bottom sheet)
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newDescription, setNewDescription] = useState('');
+  const [newPriority, setNewPriority] = useState<DevTaskPriority>('medium');
+  const [newDueDate, setNewDueDate] = useState('');
+  const [newStatus, setNewStatus] = useState<DevTaskStatus>('todo');
 
-  const completedCount = completedTodos.length;
+  const handleCreateTask = async () => {
+    if (!newTitle.trim()) return;
+    const payload: CreateDevTaskPayload = {
+      title: newTitle.trim(),
+      description: newDescription.trim() || undefined,
+      dueDate: newDueDate || undefined,
+      priority: newPriority,
+      status: newStatus,
+    };
+    await todoState.createTask(payload);
+    setNewTitle('');
+    setNewDescription('');
+    setNewPriority('medium');
+    setNewDueDate('');
+    closeAddForm();
+  };
 
   const showAddFrom = () => {
     hideNav();
@@ -332,278 +308,209 @@ export default function TodoListView() {
     showNav();
     setShowAddForm(false);
   };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{
-        type: 'spring',
-        ease: 'easeOut',
-        duration: 0.5,
-        delay: 0.1,
-      }}
-      className="relative min-h-dvh bg-linear-to-b from-blue-50 to-white pb-32 dark:from-slate-900 dark:to-slate-900"
+      transition={{ type: 'spring', ease: 'easeOut', duration: 0.5, delay: 0.1 }}
+      className="relative min-h-dvh bg-linear-to-b from-blue-50 to-white pb-28 dark:from-slate-900 dark:to-slate-900"
     >
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/80 px-4 py-4 backdrop-blur-md dark:bg-slate-900/80">
-        <div className="flex items-center gap-3">
-          <div>
-            <h1 className="ml-12 flex flex-col text-xl font-semibold text-gray-900 dark:text-gray-100">
-              待办事项
-              <span className="text-sm text-gray-500">
-                {getFilterCount('all')} 项待办
-              </span>
-            </h1>
-          </div>
+      <div className="sticky top-0 z-10 flex items-center justify-between bg-white/80 px-4 py-4 backdrop-blur-md dark:bg-slate-900/80">
+        <div>
+          <h1 className="ml-12 text-xl font-semibold text-gray-900 dark:text-gray-100">
+            开发任务
+          </h1>
+          <p className="text-sm text-gray-500">{tasks.length} 项任务</p>
         </div>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex gap-2 overflow-x-auto px-4 py-3">
-        {(Object.keys(filterLabels) as FilterType[]).map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`shrink-0 cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
-              filter === f
-                ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900'
-                : 'bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
-            }`}
-          >
-            {filterLabels[f]} ({getFilterCount(f)})
-          </button>
-        ))}
-      </div>
+      {/* Horizontal scroll board */}
+      <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 pt-2">
+        {COLUMNS.map((col) => {
+          const colTasks = grouped[col.status];
 
-      {/* Sort */}
-      <div className="flex items-center gap-2 px-4 pb-3">
-        <span className="text-sm text-gray-500">排序:</span>
-        <select
-          value={sortMode}
-          onChange={(e) => setSortMode(e.target.value as SortMode)}
-          className="cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
-        >
-          <option value="createdAt">创建时间</option>
-          <option value="priority">优先级</option>
-          <option value="dueDate">截止日期</option>
-        </select>
-      </div>
-
-      {/* Todo List */}
-      <div className="space-y-3 px-4">
-        <AnimatePresence mode="popLayout">
-          {displayTodos.map((todo) => (
-            <motion.div
-              key={todo.id}
-              layout
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-              className={`group relative rounded-2xl border bg-white p-4 shadow-sm transition-all dark:bg-gray-900 ${
-                todo.archived ? 'opacity-60' : ''
-              } ${
-                todo.completed
-                  ? 'border-gray-200 dark:border-gray-800'
-                  : 'border-gray-200 hover:border-gray-300 dark:border-gray-800 dark:hover:border-gray-700'
-              }`}
+          return (
+            <div
+              key={col.status}
+              className={`flex w-[85vw] shrink-0 snap-center flex-col rounded-2xl p-4 sm:w-[320px] ${col.bgClass}`}
+              style={{ minHeight: '60vh' }}
             >
-              {editingId === todo.id ? (
-                /* Edit Mode */
-                <div className="space-y-3">
-                  <input
-                    value={editText}
-                    onChange={(e) => setEditText(e.target.value)}
-                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-lg font-medium outline-none focus:border-blue-400 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                    autoFocus
-                  />
-                  <textarea
-                    value={editDescription}
-                    onChange={(e) => setEditDescription(e.target.value)}
-                    rows={2}
-                    className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm outline-none focus:border-blue-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
-                    placeholder="描述..."
-                  />
-                  <div className="flex flex-wrap items-center gap-3">
-                    <select
-                      value={editPriority}
-                      onChange={(e) =>
-                        setEditPriority(e.target.value as TodoPriority)
-                      }
-                      className="cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                    >
-                      <option value="low">低</option>
-                      <option value="medium">中</option>
-                      <option value="high">高</option>
-                    </select>
+              {/* Column header */}
+              <div className="mb-4 flex shrink-0 items-center gap-2">
+                <span
+                  className={`h-2.5 w-2.5 shrink-0 rounded-full ${col.dotClass}`}
+                />
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                  {col.title}
+                </h3>
+                <span className="rounded-full bg-black/5 px-2 py-0.5 text-xs font-medium tabular-nums text-gray-500 dark:bg-white/10 dark:text-gray-400">
+                  {colTasks.length}
+                </span>
+              </div>
+
+              {/* Cards */}
+              <div className="flex-1 space-y-3 overflow-y-auto">
+                {/* Edit overlay */}
+                {editingId && (
+                  <div className="space-y-2.5 rounded-xl border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-900">
                     <input
-                      type="date"
-                      value={editDueDate}
-                      onChange={(e) => setEditDueDate(e.target.value)}
-                      className="cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      className="w-full rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-sm font-medium outline-none focus:border-blue-400 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                      autoFocus
                     />
-                    <div className="ml-auto flex gap-2">
+                    <textarea
+                      value={editDescription}
+                      onChange={(e) => setEditDescription(e.target.value)}
+                      rows={2}
+                      className="w-full resize-none rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs outline-none focus:border-blue-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                      placeholder="描述..."
+                    />
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={editPriority}
+                        onChange={(e) =>
+                          setEditPriority(e.target.value as DevTaskPriority)
+                        }
+                        className="cursor-pointer rounded-md border border-gray-200 bg-white px-2 py-1 text-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                      >
+                        <option value="low">低</option>
+                        <option value="medium">中</option>
+                        <option value="high">高</option>
+                      </select>
+                      <input
+                        type="date"
+                        value={editDueDate}
+                        onChange={(e) => setEditDueDate(e.target.value)}
+                        className="cursor-pointer rounded-md border border-gray-200 bg-white px-2 py-1 text-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                      />
+                      <div className="ml-auto flex gap-1.5">
+                        <button
+                          onClick={() => setEditingId(null)}
+                          className="cursor-pointer rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300"
+                        >
+                          取消
+                        </button>
+                        <button
+                          onClick={saveEdit}
+                          className="cursor-pointer rounded-lg bg-blue-600 px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-blue-700"
+                        >
+                          保存
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <AnimatePresence mode="popLayout">
+                  {colTasks.map((task) =>
+                    editingId === task.id ? null : (
+                      <TaskCard
+                        key={task.id}
+                        task={task}
+                        onCycle={todoState.cycleStatus}
+                        onEdit={startEdit}
+                        onDelete={todoState.deleteTask}
+                      />
+                    ),
+                  )}
+                </AnimatePresence>
+
+                {/* Empty state */}
+                {colTasks.length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <p className="text-sm text-gray-400 dark:text-gray-500">
+                      {col.emptyText}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Quick add */}
+              <div className="mt-3 shrink-0 border-t border-gray-200/50 pt-3 dark:border-gray-700/50">
+                {addingStatus !== col.status ? (
+                  <button
+                    onClick={() => startQuickAdd(col.status)}
+                    className="flex w-full cursor-pointer items-center gap-1.5 rounded-lg px-2 py-2 text-xs text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+                  >
+                    <svg
+                      className="h-3.5 w-3.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 4v16m8-8H4"
+                      />
+                    </svg>
+                    添加
+                  </button>
+                ) : (
+                  <div className="space-y-2">
+                    <input
+                      ref={quickInputRef}
+                      value={quickTitle}
+                      onChange={(e) => setQuickTitle(e.target.value)}
+                      type="text"
+                      placeholder={`添加${col.title}任务...`}
+                      className="w-full rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-blue-400 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') submitQuickAdd();
+                        if (e.key === 'Escape') setAddingStatus(null);
+                      }}
+                    />
+                    <div className="flex items-center gap-1.5">
                       <button
-                        onClick={cancelEdit}
-                        className="cursor-pointer rounded-xl bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                        onClick={() => setAddingStatus(null)}
+                        className="cursor-pointer rounded-md px-2 py-1 text-xs text-gray-500 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
                       >
                         取消
                       </button>
                       <button
-                        onClick={saveEdit}
-                        className="cursor-pointer rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                        onClick={submitQuickAdd}
+                        disabled={!quickTitle.trim()}
+                        className="cursor-pointer rounded-md bg-gray-900 px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
                       >
-                        保存
+                        确定
                       </button>
                     </div>
                   </div>
-                </div>
-              ) : (
-                /* View Mode */
-                <div className="flex items-start gap-3">
-                  <button
-                    onClick={() => todoState.toggleTodo(todo.id)}
-                    className="mt-0.5 cursor-pointer"
-                  >
-                    <CheckIcon completed={todo.completed} />
-                  </button>
-
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3
-                        className={`text-base font-medium transition-all ${
-                          todo.completed
-                            ? 'text-gray-400 line-through'
-                            : 'text-gray-900 dark:text-gray-100'
-                        }`}
-                      >
-                        {todo.text}
-                      </h3>
-                      <PriorityBadge priority={todo.priority || 'medium'} />
-                      {todo.dueDate && (
-                        <span
-                          className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${
-                            isOverdue(todo.dueDate) && !todo.completed
-                              ? 'border-red-200 bg-red-50 text-red-600 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400'
-                              : 'border-gray-200 bg-gray-50 text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400'
-                          }`}
-                        >
-                          <CalendarIcon />
-                          {todo.dueDate}
-                        </span>
-                      )}
-                    </div>
-
-                    {todo.description && (
-                      <p
-                        className={`mt-1.5 text-sm text-gray-600 dark:text-gray-400 ${
-                          todo.completed ? 'opacity-60' : ''
-                        }`}
-                      >
-                        {todo.description}
-                      </p>
-                    )}
-
-                    <p className="mt-2 text-xs text-gray-400">
-                      创建于 {formatDate(todo.createdAt)}
-                    </p>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex shrink-0 items-center gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100 max-sm:opacity-100">
-                    <button
-                      onClick={() =>
-                        todo.archived
-                          ? todoState.unarchiveTodo(todo.id)
-                          : todoState.archiveTodo(todo.id)
-                      }
-                      className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-amber-50 hover:text-amber-600 dark:hover:bg-amber-900/20 dark:hover:text-amber-400"
-                      title={todo.archived ? '取消归档' : '归档'}
-                    >
-                      <ArchiveIcon archived={todo.archived} />
-                    </button>
-                    <button
-                      onClick={() => startEdit(todo)}
-                      className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-blue-600 dark:hover:bg-gray-800 dark:hover:text-blue-400"
-                      title="编辑"
-                    >
-                      <EditIcon />
-                    </button>
-                    <button
-                      onClick={() => todoState.removeTodo(todo.id)}
-                      className="cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
-                      title="删除"
-                    >
-                      <TrashIcon />
-                    </button>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          ))}
-        </AnimatePresence>
-
-        {/* Empty State */}
-        {displayTodos.length === 0 && (
-          <div className="mt-16 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800">
-              <svg
-                className="h-8 w-8 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-                />
-              </svg>
+                )}
+              </div>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-              {filter === 'archived' ? '暂无归档' : '暂无事项'}
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              {filter === 'archived'
-                ? '归档的任务会显示在这里'
-                : '记录下你接下来的计划吧！'}
-            </p>
-          </div>
-        )}
+          );
+        })}
       </div>
 
-      {/* Bottom Action Bar */}
-      <div className="w-[30vw ] fixed bottom-24 left-1/2 -translate-x-1/2 transform bg-white/80 px-4 py-4 dark:bg-slate-900/80">
-        {completedCount > 0 && (
-          <div className="mb-3 flex gap-2">
-            <button
-              onClick={() => todoState.archiveCompleted()}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gray-100 px-4 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-amber-50 hover:text-amber-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-amber-900/20 dark:hover:text-amber-400"
-            >
-              <ArchiveIcon />
-              归档已完成 ({completedCount})
-            </button>
-            <button
-              onClick={() => todoState.clearCompleted()}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gray-100 px-4 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-red-50 hover:text-red-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-red-900/20 dark:hover:text-red-400"
-            >
-              <TrashIcon />
-              清除 ({completedCount})
-            </button>
-          </div>
-        )}
-
+      {/* Bottom FAB */}
+      <div className="fixed right-4 bottom-24 z-10">
         <button
-          onClick={() => showAddFrom()}
-          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gray-900 px-4 py-4 font-medium text-white transition-all hover:bg-gray-800 active:scale-[0.98] dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+          onClick={showAddFrom}
+          className="flex cursor-pointer items-center gap-2 rounded-2xl bg-gray-900 px-5 py-3 font-medium text-white shadow-lg transition-all hover:bg-gray-800 active:scale-[0.97] dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
         >
-          <PlusIcon />
-          添加待办
+          <svg
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 4v16m8-8H4"
+            />
+          </svg>
+          添加任务
         </button>
       </div>
 
-      {/* Add Form Modal */}
+      {/* Full add modal (bottom sheet) */}
       <AnimatePresence>
         {showAddForm && (
           <motion.div
@@ -623,7 +530,7 @@ export default function TodoListView() {
             >
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  添加待办
+                  添加任务
                 </h2>
                 <button
                   onClick={closeAddForm}
@@ -647,10 +554,10 @@ export default function TodoListView() {
 
               <div className="space-y-4">
                 <input
-                  value={newText}
-                  onChange={(e) => setNewText(e.target.value)}
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
                   type="text"
-                  placeholder="待办内容..."
+                  placeholder="任务内容..."
                   className="w-full rounded-xl border border-gray-200 bg-white/80 px-4 py-3 text-base outline-none focus:border-blue-400 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                   autoFocus
                 />
@@ -666,12 +573,29 @@ export default function TodoListView() {
                 <div className="flex flex-wrap items-center gap-4">
                   <div className="flex items-center gap-2">
                     <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      状态
+                    </label>
+                    <select
+                      value={newStatus}
+                      onChange={(e) =>
+                        setNewStatus(e.target.value as DevTaskStatus)
+                      }
+                      className="cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                    >
+                      <option value="todo">待办</option>
+                      <option value="in-progress">开发中</option>
+                      <option value="done">已完成</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
                       优先级
                     </label>
                     <select
                       value={newPriority}
                       onChange={(e) =>
-                        setNewPriority(e.target.value as TodoPriority)
+                        setNewPriority(e.target.value as DevTaskPriority)
                       }
                       className="cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
                     >
@@ -695,8 +619,8 @@ export default function TodoListView() {
                 </div>
 
                 <button
-                  onClick={handleAddTodo}
-                  disabled={!newText.trim()}
+                  onClick={handleCreateTask}
+                  disabled={!newTitle.trim()}
                   className="w-full cursor-pointer rounded-xl bg-gray-900 py-4 font-medium text-white transition-all hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
                 >
                   添加

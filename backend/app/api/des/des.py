@@ -7,6 +7,7 @@ from app.core.container import (
     get_blog_service,
     get_book_service,
     get_device_service,
+    get_devtask_service,
     get_fishing_service,
     get_message_service,
     get_monitor_service,
@@ -14,7 +15,6 @@ from app.core.container import (
     get_public_service,
     get_rss_service,
     get_sub_service,
-    get_todo_service,
     get_user_service,
     get_weather_service,
     get_weread_service,
@@ -63,9 +63,8 @@ async def rss_service_dep(request: Request):
         yield service
 
 
-async def todo_service_dep(request: Request):
-    redis: AsyncRedis = request.app.state.redis
-    async with get_todo_service(redis=redis) as service:
+async def devtask_service_dep():
+    async with get_devtask_service() as service:
         yield service
 
 

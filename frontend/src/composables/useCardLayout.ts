@@ -1,12 +1,12 @@
-import cardStyles from "@/data/card-styles.json";
-import { useCardLayoutStore } from "@/stores/cardLayout";
-import { computed, type Ref } from "vue";
-import { useLayoutCenter } from "./useLayoutCenter";
+import cardStyles from '@/data/card-styles.json';
+import { useCardLayoutStore } from '@/stores/cardLayout';
+import { computed, type Ref } from 'vue';
+import { useLayoutCenter } from './useLayoutCenter';
 
 /** Card style entry from card-styles.json */
 interface CardStyle {
   width?: number;
-  height?: number;
+  height: number;
   order: number;
 }
 
@@ -20,27 +20,23 @@ const maxOrder = Math.max(...Object.values(STYLES).map((s) => s.order));
 
 const LAYOUT = {
   CARD_SPACING: 12,
+  VERTICAL_GAP: 16,
   SIDE_COLUMN_GAP: 224,
   RIGHT_COL_X: 24,
   CAL_X_DELTA: -20,
   READING_LIST_X: -30,
 
-  // Vertical position ratios
-  LIST_TOP_RATIO: 0.23,
-  PROFILE_TOP_RATIO: 0.5,
+  // First-card vertical ratios (subsequent cards cascade)
+  GREETING_TOP_RATIO: 0.16,
+  LIST_TOP_RATIO: 0.19,
   NAV_TOP_RATIO: 0.4,
-  TECH_TOP_RATIO: 0.75,
-  CLOCK_TOP_RATIO: 0.45,
-  CAL_TOP_RATIO: 0.625,
-  GREETING_TOP_RATIO: 0.2,
-  TODO_TOP_RATIO: 0.8,
 
-  // Vertical fine-tuning (px)
+  // Vertical fine-tuning (px) for first cards only
   LIST_Y_ADJUST: -20,
-  TECH_Y_ADJUST: 10,
-  CLOCK_Y_ADJUST: -50,
-  CAL_Y_ADJUST: 40,
-  TODO_Y_ADJUST: -20,
+
+  // Cascade vertical offsets (after cascade top, before drag offset)
+  PROFILE_CASCADE_ADJUST: -20,
+  TECH_CASCADE_ADJUST: 90,
 
   // Horizontal fine-tuning (px)
   NAV_X_ADJUST: 20,
@@ -58,6 +54,16 @@ function px(value: number): string {
 /** Build {top, left} style object for absolute-positioned cards */
 function position(top: number, left: number) {
   return { top: px(top), left: px(left) };
+}
+
+/** Cascade: return the center-top of a card placed below `prevCenterY` */
+function cascadeTop(
+  prevCenterY: number,
+  prevHeight: number,
+  thisHeight: number,
+  gap: number,
+): number {
+  return prevCenterY + prevHeight / 2 + gap + thisHeight / 2;
 }
 
 // ── Composable ──────────────────────────────────────────
@@ -82,67 +88,147 @@ export function useCardLayout(containerRef: Ref<HTMLElement | null>) {
       LAYOUT.SIDE_COLUMN_GAP,
   );
 
-  // Center column (greeting map + profile card)
+  // ── First-card center Y (ratio + offset) ──
+
+  const _greetingCenterY = computed(
+    () =>
+      layoutHeight.value * LAYOUT.GREETING_TOP_RATIO +
+      layoutStore.getOffset('BentoMap').y,
+  );
+  const _picCenterY = computed(
+    () =>
+      layoutHeight.value * LAYOUT.LIST_TOP_RATIO +
+      LAYOUT.LIST_Y_ADJUST +
+      layoutStore.getOffset('BentoPic').y,
+  );
+  const _navCenterY = computed(
+    () =>
+      layoutHeight.value * LAYOUT.NAV_TOP_RATIO +
+      layoutStore.getOffset('BentoNavCard').y,
+  );
+
+  // ── Right column cascade: Map → Clock → Calendar ──
+
+  const _clockBaseY = computed(() =>
+    cascadeTop(
+      _greetingCenterY.value,
+      STYLES.BentoMap.height,
+      STYLES.BentoClock.height,
+      LAYOUT.VERTICAL_GAP,
+    ),
+  );
+  const _clockCenterY = computed(
+    () => _clockBaseY.value + layoutStore.getOffset('BentoClock').y,
+  );
+
+  const _calBaseY = computed(() =>
+    cascadeTop(
+      _clockCenterY.value,
+      STYLES.BentoClock.height,
+      STYLES.BentoCalendar.height,
+      LAYOUT.VERTICAL_GAP,
+    ),
+  );
+  const _calCenterY = computed(
+    () => _calBaseY.value + layoutStore.getOffset('BentoCalendar').y,
+  );
+
+  // ── Center column cascade: Pic → ProfileCard → ReadingList ──
+
+  const _profileBaseY = computed(() =>
+    cascadeTop(
+      _picCenterY.value,
+      STYLES.BentoPic.height,
+      STYLES.BentoProfileCard.height,
+      LAYOUT.VERTICAL_GAP,
+    ) + LAYOUT.PROFILE_CASCADE_ADJUST,
+  );
+  const _profileCenterY = computed(
+    () => _profileBaseY.value + layoutStore.getOffset('BentoProfileCard').y,
+  );
+
+  const _listBaseY = computed(() =>
+    cascadeTop(
+      _profileCenterY.value,
+      STYLES.BentoProfileCard.height,
+      STYLES.BentoReadingList.height,
+      LAYOUT.VERTICAL_GAP,
+    ),
+  );
+  const _listCenterY = computed(
+    () => _listBaseY.value + layoutStore.getOffset('BentoReadingList').y,
+  );
+
+  // ── Left column cascade: NavCard → Tech ──
+
+  const _techBaseY = computed(
+    () =>
+      cascadeTop(
+        _navCenterY.value,
+        STYLES.BentoNavCard.height,
+        STYLES.BentoTech.height,
+        LAYOUT.VERTICAL_GAP,
+      ) + LAYOUT.TECH_CASCADE_ADJUST,
+  );
+  const _techCenterY = computed(
+    () => _techBaseY.value + layoutStore.getOffset('BentoTech').y,
+  );
+
+  // ── Position objects ──
+
+  // Center column
   const picPosition = computed(() => {
-    const o = layoutStore.getOffset("BentoPic");
-    return position(
-      layoutHeight.value * LAYOUT.LIST_TOP_RATIO + LAYOUT.LIST_Y_ADJUST + o.y,
-      centerX.value + o.x,
-    );
+    const o = layoutStore.getOffset('BentoPic');
+    return position(_picCenterY.value, centerX.value + o.x);
   });
   const profilePosition = computed(() => {
-    const o = layoutStore.getOffset("BentoProfileCard");
+    const o = layoutStore.getOffset('BentoProfileCard');
+    return position(_profileCenterY.value, centerX.value + o.x);
+  });
+  const listCardPosition = computed(() => {
+    const o = layoutStore.getOffset('BentoReadingList');
     return position(
-      layoutHeight.value * LAYOUT.PROFILE_TOP_RATIO + o.y,
-      centerX.value + o.x,
+      _listCenterY.value,
+      centerX.value + LAYOUT.TODO_X_ADJUST + o.x,
     );
   });
 
   // Left column
   const navCardPosition = computed(() => {
-    const o = layoutStore.getOffset("BentoNavCard");
+    const o = layoutStore.getOffset('BentoNavCard');
     return position(
-      layoutHeight.value * LAYOUT.NAV_TOP_RATIO + o.y,
+      _navCenterY.value,
       leftAnchor.value + LAYOUT.NAV_X_ADJUST + o.x,
     );
   });
-
   const techPosition = computed(() => {
-    const o = layoutStore.getOffset("BentoTech");
+    const o = layoutStore.getOffset('BentoTech');
     return position(
-      layoutHeight.value * LAYOUT.TECH_TOP_RATIO + LAYOUT.TECH_Y_ADJUST + o.y,
+      _techCenterY.value,
       leftAnchor.value + LAYOUT.CARD_SPACING + LAYOUT.TECH_X_ADJUST + o.x,
     );
   });
 
   // Right column
   const clockCardPosition = computed(() => {
-    const o = layoutStore.getOffset("BentoClock");
+    const o = layoutStore.getOffset('BentoClock');
     return position(
-      layoutHeight.value * LAYOUT.CLOCK_TOP_RATIO + LAYOUT.CLOCK_Y_ADJUST + o.y,
+      _clockCenterY.value,
       rightAnchor.value + LAYOUT.RIGHT_COL_X + LAYOUT.CLOCK_X_ADJUST + o.x,
     );
   });
   const calendarPosition = computed(() => {
-    const o = layoutStore.getOffset("BentoCalendar");
+    const o = layoutStore.getOffset('BentoCalendar');
     return position(
-      layoutHeight.value * LAYOUT.CAL_TOP_RATIO + LAYOUT.CAL_Y_ADJUST + o.y,
+      _calCenterY.value,
       rightAnchor.value + LAYOUT.RIGHT_COL_X + LAYOUT.CAL_X_DELTA + o.x,
     );
   });
   const greetingPosition = computed(() => {
-    const o = layoutStore.getOffset("BentoMap");
+    const o = layoutStore.getOffset('BentoMap');
     return position(
-      layoutHeight.value * LAYOUT.GREETING_TOP_RATIO + o.y,
+      _greetingCenterY.value,
       rightAnchor.value + LAYOUT.READING_LIST_X + o.x,
-    );
-  });
-
-  const listCardPosition = computed(() => {
-    const o = layoutStore.getOffset("BentoReadingList");
-    return position(
-      layoutHeight.value * LAYOUT.TODO_TOP_RATIO + LAYOUT.TODO_Y_ADJUST + o.y,
-      centerX.value + LAYOUT.TODO_X_ADJUST + o.x,
     );
   });
 

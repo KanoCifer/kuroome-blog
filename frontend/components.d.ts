@@ -81,6 +81,7 @@ declare module 'vue' {
     CommentsTab: typeof import('./src/components/message/CommentsTab.vue')['default']
     CookieConsent: typeof import('./src/components/layout/CookieConsent.vue')['default']
     DelIcon: typeof import('./src/components/icons/DelIcon.vue')['default']
+    DevTaskCard: typeof import('./src/components/DevTaskCard.vue')['default']
     DraggableCard: typeof import('./src/components/bento/DraggableCard.vue')['default']
     DragWrapper: typeof import('./src/components/layout/DragWrapper.vue')['default']
     DropdownMenu: typeof import('./src/components/ui/dropdown-menu/DropdownMenu.vue')['default']

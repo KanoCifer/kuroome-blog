@@ -28,12 +28,12 @@ from app.api.v1 import (
     auth,
     blog,
     books,
+    devtasks,
     messages,
     monitor,
     public,
     publish,
     rss,
-    todos,
     weread,
 )
 from app.api.v2 import device, fishing, subscriptions, weather
@@ -41,6 +41,7 @@ from app.api.v2 import public as public_v2
 from app.core import get_settings, register_exception_handlers
 from app.core import logger as app_logger
 from app.models.beanie import (
+    DevTask,
     FriendLinks,
     MessageBoard,
     Post,
@@ -83,6 +84,7 @@ async def lifespan(app: FastAPI):
             FishingRecord,
             FishingModelMeta,
             FriendLinks,
+            DevTask,
         ],
     )
     app.state.redis = await init_redis()
@@ -133,7 +135,7 @@ app.include_router(router=admin.router, prefix="/api/v1")
 app.include_router(router=auth.router, prefix="/api/v1")
 app.include_router(router=blog.router, prefix="/api/v1")
 app.include_router(router=books.router, prefix="/api/v1")
-app.include_router(router=todos.router, prefix="/api/v1")
+app.include_router(router=devtasks.router, prefix="/api/v1")
 app.include_router(router=messages.router, prefix="/api/v1")
 app.include_router(router=public.router, prefix="/api/v1")
 app.include_router(router=weread.router, prefix="/api/v1")

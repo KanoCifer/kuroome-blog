@@ -10,6 +10,7 @@ from app.repositories import (
     AiRepo,
     BlogRepo,
     BookRepo,
+    DevTaskRepo,
     FishingRepo,
     GalleryRepo,
     MessageRepo,
@@ -17,7 +18,6 @@ from app.repositories import (
     PublicRepo,
     RssRepo,
     SubRepo,
-    TodoRepo,
     UserRepo,
     WereadRepo,
 )
@@ -25,13 +25,13 @@ from app.services.admin_service import AdminService
 from app.services.ai_service import AiService
 from app.services.blog_service import BlogService
 from app.services.book_service import BookService
+from app.services.devtask_service import DevTaskService
 from app.services.fishing_service import FishingService
 from app.services.message_service import MessageService
 from app.services.monitor_service import MonitorService
 from app.services.public_service import PublicService
 from app.services.rss_service import RssService
 from app.services.sub_service import SubService
-from app.services.todo_service import TodoService
 from app.services.user_service import UserService
 from app.services.weather_service import WeatherService
 from app.services.weread_service import WereadService
@@ -103,9 +103,9 @@ async def get_rss_service(redis: AsyncRedis):
 
 
 @asynccontextmanager
-async def get_todo_service(redis: AsyncRedis):
-    todo_repo = TodoRepo(redis=redis)
-    service = TodoService(repo=todo_repo)
+async def get_devtask_service():
+    repo = DevTaskRepo()
+    service = DevTaskService(repo=repo)
     yield service
 
 

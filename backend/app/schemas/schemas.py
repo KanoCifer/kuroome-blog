@@ -63,7 +63,7 @@ from app.schemas.rss import (
     RssRequest,
     RssSubscriptionResponse,
 )
-from app.schemas.todo import BatchAction, TodoCreate, TodoOut, TodoUpdate
+from app.schemas.devtask import DevTaskCreate, DevTaskOut, DevTaskUpdate
 from app.schemas.user import (
     ImageUploadOut,
     UserOut,
@@ -79,7 +79,6 @@ __all__ = [
     "AdminMessageOut",
     "AdminMessagesOut",
     "ArticleSummaryRequest",
-    "BatchAction",
     "BlogIn",
     "BlogPostDelete",
     "BlogPostGet",
@@ -111,7 +110,6 @@ __all__ = [
     "MessageOut",
     "MessagesOut",
     "PaginationSchema",
-    "PasskeyAuthenticationRequest",
     "PasskeyRegistrationRequest",
     "PostComment",
     "RegisterIn",
@@ -122,9 +120,9 @@ __all__ = [
     "RssRequest",
     "RssSubscriptionResponse",
     "SummaryInput",
-    "TodoCreate",
-    "TodoOut",
-    "TodoUpdate",
+    "DevTaskCreate",
+    "DevTaskOut",
+    "DevTaskUpdate",
     "UpdateBookIn",
     "UserOut",
     "UserProfileOut",

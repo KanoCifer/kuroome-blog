@@ -1,47 +1,44 @@
 import request from "@/api/request";
-import type {
-  BatchAction,
-  CreateTodoPayload,
-  Todo,
-} from "@/service/todoService/types";
+import type { CreateDevTaskPayload, DevTask } from "@/service/todoService/types";
 
-export interface TodoGateway {
-  fetchTodos(includeArchived?: boolean): Promise<Todo[]>;
-  addTodo(payload: CreateTodoPayload): Promise<Todo | null>;
-  updateTodo(id: string, patch: Partial<Todo>): Promise<Todo | null>;
-  removeTodo(id: string): Promise<void>;
-  batchAction(action: BatchAction): Promise<void>;
+export interface DevTaskGateway {
+  fetchTasks(): Promise<DevTask[]>;
+  createTask(payload: CreateDevTaskPayload): Promise<DevTask | null>;
+  updateTask(
+    id: string,
+    patch: Partial<DevTask>,
+  ): Promise<DevTask | null>;
+  deleteTask(id: string): Promise<void>;
 }
 
-export const todoGateway: TodoGateway = {
-  async fetchTodos(includeArchived = false): Promise<Todo[]> {
-    const res = await request.get<{ data?: { todos?: Todo[] } }>("v1/todos", {
-      params: { include_archived: includeArchived },
-    });
-    return res.data.data?.todos ?? [];
+export const devTaskGateway: DevTaskGateway = {
+  async fetchTasks(): Promise<DevTask[]> {
+    const res = await request.get<{ data?: { tasks?: DevTask[] } }>(
+      "v1/devtasks",
+    );
+    return res.data.data?.tasks ?? [];
   },
 
-  async addTodo(payload: CreateTodoPayload): Promise<Todo | null> {
-    const res = await request.post<{ data?: { todo?: Todo } }>(
-      "v1/todos",
+  async createTask(payload: CreateDevTaskPayload): Promise<DevTask | null> {
+    const res = await request.post<{ data?: { task?: DevTask } }>(
+      "v1/devtasks",
       payload,
     );
-    return res.data.data?.todo ?? null;
+    return res.data.data?.task ?? null;
   },
 
-  async updateTodo(id: string, patch: Partial<Todo>): Promise<Todo | null> {
-    const res = await request.patch<{ data?: { todo?: Todo } }>(
-      `v1/todos/${id}`,
+  async updateTask(
+    id: string,
+    patch: Partial<DevTask>,
+  ): Promise<DevTask | null> {
+    const res = await request.patch<{ data?: { task?: DevTask } }>(
+      `v1/devtasks/${id}`,
       patch,
     );
-    return res.data.data?.todo ?? null;
+    return res.data.data?.task ?? null;
   },
 
-  async removeTodo(id: string): Promise<void> {
-    await request.delete(`v1/todos/${id}`);
-  },
-
-  async batchAction(action: BatchAction): Promise<void> {
-    await request.post("v1/todos/batch", { action });
+  async deleteTask(id: string): Promise<void> {
+    await request.delete(`v1/devtasks/${id}`);
   },
 };
