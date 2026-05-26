@@ -135,13 +135,14 @@ export function useCardLayout(containerRef: Ref<HTMLElement | null>) {
 
   // ── Center column cascade: Pic → ProfileCard → ReadingList ──
 
-  const _profileBaseY = computed(() =>
-    cascadeTop(
-      _picCenterY.value,
-      STYLES.BentoPic.height,
-      STYLES.BentoProfileCard.height,
-      LAYOUT.VERTICAL_GAP,
-    ) + LAYOUT.PROFILE_CASCADE_ADJUST,
+  const _profileBaseY = computed(
+    () =>
+      cascadeTop(
+        _picCenterY.value,
+        STYLES.BentoPic.height,
+        STYLES.BentoProfileCard.height,
+        LAYOUT.VERTICAL_GAP,
+      ) + LAYOUT.PROFILE_CASCADE_ADJUST,
   );
   const _profileCenterY = computed(
     () => _profileBaseY.value + layoutStore.getOffset('BentoProfileCard').y,
@@ -157,6 +158,18 @@ export function useCardLayout(containerRef: Ref<HTMLElement | null>) {
   );
   const _listCenterY = computed(
     () => _listBaseY.value + layoutStore.getOffset('BentoReadingList').y,
+  );
+
+  const _todoBaseY = computed(() =>
+    cascadeTop(
+      _calCenterY.value,
+      STYLES.BentoReadingList.height,
+      STYLES.TodoCard.height,
+      LAYOUT.VERTICAL_GAP,
+    ),
+  );
+  const _todoCenterY = computed(
+    () => _todoBaseY.value + layoutStore.getOffset('TodoCard').y,
   );
 
   // ── Left column cascade: NavCard → Tech ──
@@ -191,6 +204,11 @@ export function useCardLayout(containerRef: Ref<HTMLElement | null>) {
       _listCenterY.value,
       centerX.value + LAYOUT.TODO_X_ADJUST + o.x,
     );
+  });
+
+  const todoCardPosition = computed(() => {
+    const o = layoutStore.getOffset('TodoCard');
+    return position(_todoCenterY.value + 50, centerX.value + o.x + 300);
   });
 
   // Left column
@@ -242,6 +260,7 @@ export function useCardLayout(containerRef: Ref<HTMLElement | null>) {
     calendarPosition,
     techPosition,
     listCardPosition,
+    todoCardPosition,
     cardStyles: STYLES,
     cardNamesByOrder,
     maxOrder,

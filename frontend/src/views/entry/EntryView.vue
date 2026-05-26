@@ -76,6 +76,15 @@
         class="w-60 cursor-pointer"
       />
     </DragWrapper>
+
+    <DragWrapper :position="todoCardPosition" card-name="TodoCard">
+      <TodoCard
+        v-if="show.TodoCard"
+        :initial="{ scale: 0.5, opacity: 0 }"
+        :animate="{ scale: 1, opacity: 1 }"
+        class="w-52"
+      />
+    </DragWrapper>
     <!-- <BentoCat v-if="show.BentoCat" :style="[catPosition]" class="absolute w-2xs -translate-x-1/2 -translate-y-1/2" /> -->
 
     <DragWrapper :position="picPosition" card-name="BentoPic">
@@ -150,6 +159,7 @@ import {
   BentoProfileCard,
   BentoReadingList,
   BentoTech,
+  TodoCard,
 } from "@/components/bento";
 import DragWrapper from "@/components/layout/DragWrapper.vue";
 import FloatingActionButtons from "@/components/layout/FloatingActionButtons.vue";
@@ -185,6 +195,7 @@ const {
   calendarPosition,
   techPosition,
   listCardPosition,
+  todoCardPosition,
   cardStyles,
   cardNamesByOrder,
   maxOrder,
