@@ -1,29 +1,33 @@
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 from app.api.des.auth import manager
 from app.api.des.des import devtask_service_dep
 from app.models.models import User
+from app.schemas.devtask import DevTaskCreate, DevTaskUpdate
 from app.schemas.response import APIResponse
-from app.schemas.schemas import DevTaskCreate, DevTaskUpdate
 from app.services.devtask_service import DevTaskService
 
 router = APIRouter(prefix="/devtasks", tags=["devtasks"])
 
 
+class DevTaskReorder(BaseModel):
+    status: str
+    ordered_ids: list[str]
+
+
 @router.get("")
 async def get_tasks(
-    user: User = Depends(manager),
     service: DevTaskService = Depends(devtask_service_dep),
 ) -> JSONResponse:
-    tasks = await service.get_tasks(user.id)
-    # Serialize tasks to match response schema
-    task_dicts = []
+    tasks = await service.get_all_tasks()
+    grouped: dict[str, list[dict]] = {"todo": [], "in-progress": [], "done": []}
     for t in tasks:
         td = t.model_dump()
         td["id"] = str(t.id)
-        task_dicts.append(td)
-    return APIResponse.ok(data={"tasks": task_dicts})
+        grouped[t.status].append(td)
+    return APIResponse.ok(data={"tasks": grouped})
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)
@@ -75,3 +79,21 @@ async def delete_task(
         return APIResponse.ok(message="DevTask deleted")
     except ValueError as e:
         return APIResponse.error(message=str(e), code=404)
+
+
+@router.put("/reorder")
+async def reorder_tasks(
+    data: DevTaskReorder,
+    user: User = Depends(manager),
+    service: DevTaskService = Depends(devtask_service_dep),
+) -> JSONResponse:
+    tasks = await service.reorder_tasks(user.id, data.status, data.ordered_ids)
+    task_dicts = []
+    for t in tasks:
+        td = t.model_dump()
+        td["id"] = str(t.id)
+        task_dicts.append(td)
+    return APIResponse.ok(
+        data={"tasks": task_dicts},
+        message="DevTasks reordered",
+    )

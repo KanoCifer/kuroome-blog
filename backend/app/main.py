@@ -28,7 +28,6 @@ from app.api.v1 import (
     auth,
     blog,
     books,
-    devtasks,
     messages,
     monitor,
     public,
@@ -36,7 +35,16 @@ from app.api.v1 import (
     rss,
     weread,
 )
-from app.api.v2 import device, fishing, subscriptions, weather
+from app.api.v2 import (
+    device,
+    fishing,
+    friendlinks,
+    subscriptions,
+    weather,
+)
+from app.api.v2 import (
+    devtasks as devtasks_v2,
+)
 from app.api.v2 import public as public_v2
 from app.core import get_settings, register_exception_handlers
 from app.core import logger as app_logger
@@ -135,7 +143,6 @@ app.include_router(router=admin.router, prefix="/api/v1")
 app.include_router(router=auth.router, prefix="/api/v1")
 app.include_router(router=blog.router, prefix="/api/v1")
 app.include_router(router=books.router, prefix="/api/v1")
-app.include_router(router=devtasks.router, prefix="/api/v1")
 app.include_router(router=messages.router, prefix="/api/v1")
 app.include_router(router=public.router, prefix="/api/v1")
 app.include_router(router=weread.router, prefix="/api/v1")
@@ -150,6 +157,8 @@ app.include_router(router=device.router, prefix="/api/v2")
 app.include_router(router=fishing.router, prefix="/api/v2")
 app.include_router(router=weather.router, prefix="/api/v2")
 app.include_router(router=public_v2.router, prefix="/api/v2")
+app.include_router(router=friendlinks.router, prefix="/api/v2")
+app.include_router(router=devtasks_v2.router, prefix="/api/v2")
 
 
 # 统一注册全局异常处理器

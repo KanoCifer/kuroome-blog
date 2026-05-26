@@ -1,57 +1,69 @@
-import { devTaskGateway } from "@/api/todoGateway";
-import type { DevTask, DevTaskStatus } from "@/service/todoService/types";
-import { type CreateDevTaskPayload } from "@/service/todoService/types";
-import { useAuthStore } from "@/stores/auth";
-import { useNotificationStore } from "@/stores/notification";
-import { useStorage } from "@vueuse/core";
-import { defineStore } from "pinia";
-import { computed, ref, watch } from "vue";
+import { devTaskGateway } from '@/api/todoGateway';
+import type { DevTask, DevTaskStatus } from '@/service/todoService/types';
+import { type CreateDevTaskPayload } from '@/service/todoService/types';
+import { useAuthStore } from '@/stores/auth';
+import { useNotificationStore } from '@/stores/notification';
+import { useStorage } from '@vueuse/core';
+import { defineStore } from 'pinia';
+import { computed, ref, watch } from 'vue';
 
 export const STATUS_LABELS: Record<DevTaskStatus, string> = {
-  todo: "待开发",
-  "in-progress": "开发中",
-  done: "已完成",
+  todo: '待开发',
+  'in-progress': '开发中',
+  done: '已完成',
 };
 
 const STATUS_CYCLE: Record<DevTaskStatus, DevTaskStatus> = {
-  todo: "in-progress",
-  "in-progress": "done",
-  done: "todo",
+  todo: 'in-progress',
+  'in-progress': 'done',
+  done: 'todo',
 };
 
-export const useTodoStore = defineStore("todos", () => {
+export const useTodoStore = defineStore('todos', () => {
   const tasks = ref<DevTask[]>([]);
-  const isCollapsed = useStorage("todos-collapsed", false);
+  const isCollapsed = useStorage('todos-collapsed', false);
   const isHydrated = ref(false);
-  const hydrationScope = ref<"guest" | "auth" | null>(null);
+  const hydrationScope = ref<'guest' | 'auth' | null>(null);
   const auth = useAuthStore();
   let hydrationPromise: Promise<void> | null = null;
 
   const activeTasks = computed(() =>
-    tasks.value.filter((t) => t.status !== "done"),
+    tasks.value.filter((t) => t.status !== 'done'),
   );
   const doneCount = computed(
-    () => tasks.value.filter((t) => t.status === "done").length,
+    () => tasks.value.filter((t) => t.status === 'done').length,
   );
   const todoItems = computed(() =>
-    tasks.value.filter((t) => t.status === "todo"),
+    tasks.value
+      .filter((t) => t.status === 'todo')
+      .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
   );
   const inProgressItems = computed(() =>
-    tasks.value.filter((t) => t.status === "in-progress"),
+    tasks.value
+      .filter((t) => t.status === 'in-progress')
+      .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
   );
   const doneItems = computed(() =>
-    tasks.value.filter((t) => t.status === "done"),
+    tasks.value
+      .filter((t) => t.status === 'done')
+      .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
   );
 
   const notifier = useNotificationStore();
 
   async function fetchTasks(): Promise<boolean> {
     try {
-      tasks.value = await devTaskGateway.fetchTasks();
+      const grouped = await devTaskGateway.fetchTasks();
+      tasks.value = [
+        ...grouped.todo,
+        ...grouped['in-progress'],
+        ...grouped.done,
+      ];
+      isHydrated.value = true;
       return true;
     } catch (err) {
-      console.error("fetchTasks error", err);
-      notifier.error("加载开发任务失败");
+      console.error('fetchTasks error', err);
+      notifier.error('加载开发任务失败');
       return false;
     }
   }
@@ -61,16 +73,16 @@ export const useTodoStore = defineStore("todos", () => {
 
     hydrationPromise = (async () => {
       if (!auth.isAuthenticated) {
-        hydrationScope.value = "guest";
+        hydrationScope.value = 'guest';
         isHydrated.value = true;
         tasks.value = [];
         return;
       }
 
-      if (hydrationScope.value === "auth" && isHydrated.value) return;
+      if (hydrationScope.value === 'auth' && isHydrated.value) return;
 
       await fetchTasks();
-      hydrationScope.value = "auth";
+      hydrationScope.value = 'auth';
       isHydrated.value = true;
     })().finally(() => {
       hydrationPromise = null;
@@ -83,13 +95,13 @@ export const useTodoStore = defineStore("todos", () => {
     () => auth.isAuthenticated,
     (authenticated) => {
       if (!authenticated) {
-        hydrationScope.value = "guest";
+        hydrationScope.value = 'guest';
         isHydrated.value = true;
         tasks.value = [];
         return;
       }
 
-      if (hydrationScope.value !== "auth") {
+      if (hydrationScope.value !== 'auth') {
         void hydrateTasks();
       }
     },
@@ -102,7 +114,7 @@ export const useTodoStore = defineStore("todos", () => {
       if (task) tasks.value.unshift(task);
     } catch (err) {
       console.error(err);
-      notifier.error("添加任务失败");
+      notifier.error('添加任务失败');
     }
   }
 
@@ -118,7 +130,7 @@ export const useTodoStore = defineStore("todos", () => {
       if (idx !== -1 && updated) tasks.value[idx] = updated;
     } catch (err) {
       console.error(err);
-      notifier.error("更新任务状态失败");
+      notifier.error('更新任务状态失败');
     }
   }
 
@@ -128,7 +140,7 @@ export const useTodoStore = defineStore("todos", () => {
       tasks.value = tasks.value.filter((t) => t.id !== id);
     } catch (err) {
       console.error(err);
-      notifier.error("删除任务失败");
+      notifier.error('删除任务失败');
     }
   }
 
@@ -139,7 +151,25 @@ export const useTodoStore = defineStore("todos", () => {
       if (idx !== -1 && updated) tasks.value[idx] = updated;
     } catch (err) {
       console.error(err);
-      notifier.error("更新任务失败");
+      notifier.error('更新任务失败');
+    }
+  }
+
+  async function sortTasks({
+    status,
+    ordered_ids,
+  }: {
+    status: string;
+    ordered_ids: string[];
+  }) {
+    try {
+      await devTaskGateway.patchTasksOrder({
+        status: status,
+        ordered_ids: ordered_ids,
+      });
+    } catch (err) {
+      console.error(err);
+      notifier.error('排序同步失败');
     }
   }
 
@@ -156,5 +186,6 @@ export const useTodoStore = defineStore("todos", () => {
     deleteTask,
     updateTask,
     hydrateTasks,
+    sortTasks,
   };
 });

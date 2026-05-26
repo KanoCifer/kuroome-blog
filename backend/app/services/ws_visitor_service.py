@@ -196,4 +196,6 @@ class WsVisitorService:
                 try:
                     await cls.publish_count(redis)
                 except Exception:
-                    logger.warning("Failed to broadcast count after disconnect")
+                    logger.warning(
+                        "Failed to broadcast count after disconnect"
+                    )

@@ -3,181 +3,216 @@
     <div class="col-span-full mx-auto w-full max-w-7xl px-4">
       <!-- Board -->
       <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
-        <div
-          v-for="col in columns"
-          :key="col.status"
-          class="flex min-h-[60vh] flex-col rounded-2xl p-4"
-          :class="col.bgClass"
+        <!-- 待办 -->
+        <TodoColumn
+          status="todo"
+          title="待办"
+          :tasks-count="todoList.length"
+          bg="bg-blue-50 dark:bg-blue-950"
+          dot="bg-blue-500"
+          :adding-to-status="addingToStatus"
+          @start-add="addingToStatus = $event"
+          @submit-quick-add="handleQuickAdd('todo', $event)"
+          @cancel-quick-add="addingToStatus = null"
         >
-          <!-- Column header -->
-          <div class="mb-4 flex shrink-0 items-center gap-2">
-            <span
-              class="h-2.5 w-2.5 shrink-0 rounded-full"
-              :class="col.dotClass"
-            ></span>
-            <h3 class="text-foreground text-sm font-semibold">
-              {{ col.title }}
-            </h3>
-            <span
-              class="text-muted-foreground rounded-full bg-black/5 px-2 py-0.5 text-xs font-medium tabular-nums dark:bg-white/10"
+          <TransitionGroup
+            v-draggable="[todoList, dragTodo]"
+            tag="ul"
+            class="space-y-3"
+            type="transition"
+            :name="!dragging ? 'todo-card' : undefined"
+          >
+            <DevTaskCard
+              v-for="task in todoList"
+              :key="task.id"
+              :task="task"
+              @cycle-status="todoStore.cycleStatus"
+              @delete-task="todoStore.deleteTask"
+              @update-task="(id, patch) => todoStore.updateTask(id, patch)"
+            />
+            <li
+              v-if="todoList.length === 0"
+              key="empty"
+              class="flex items-center justify-center py-16 text-sm text-gray-400"
             >
-              {{ col.tasks.length }}
-            </span>
-          </div>
+              拖拽任务到此处
+            </li>
+          </TransitionGroup>
+        </TodoColumn>
 
-          <!-- Task cards -->
-          <div class="flex-1 space-y-3 overflow-y-auto">
-            <TransitionGroup
-              tag="div"
-              class="space-y-3"
-              enter-active-class="transition-all duration-300 ease-out"
-              enter-from-class="opacity-0 translate-y-2"
-              enter-to-class="opacity-100 translate-y-0"
-              leave-active-class="transition-all duration-200 ease-in"
-              leave-from-class="opacity-100 scale-100"
-              leave-to-class="opacity-0 scale-95"
-              move-class="transition-transform duration-300"
+        <!-- 开发中 -->
+        <TodoColumn
+          status="in-progress"
+          title="开发中"
+          :tasks-count="inProgressList.length"
+          bg="bg-amber-50 dark:bg-amber-950"
+          dot="bg-amber-500"
+          :adding-to-status="addingToStatus"
+          @start-add="addingToStatus = $event"
+          @submit-quick-add="handleQuickAdd('in-progress', $event)"
+          @cancel-quick-add="addingToStatus = null"
+        >
+          <TransitionGroup
+            v-draggable="[inProgressList, dragInProgress]"
+            tag="ul"
+            class="space-y-3"
+            type="transition"
+            :name="!dragging ? 'todo-card' : undefined"
+          >
+            <DevTaskCard
+              v-for="task in inProgressList"
+              :key="task.id"
+              :task="task"
+              @cycle-status="todoStore.cycleStatus"
+              @delete-task="todoStore.deleteTask"
+              @update-task="(id, patch) => todoStore.updateTask(id, patch)"
+            />
+            <li
+              v-if="inProgressList.length === 0"
+              key="empty"
+              class="flex items-center justify-center py-16 text-sm text-gray-400"
             >
-              <DevTaskCard
-                v-for="task in col.tasks"
-                :key="task.id"
-                :task="task"
-                @cycle-status="todoStore.cycleStatus"
-                @delete-task="todoStore.deleteTask"
-                @update-task="(id, patch) => todoStore.updateTask(id, patch)"
-              />
-            </TransitionGroup>
+              拖拽任务到此处
+            </li>
+          </TransitionGroup>
+        </TodoColumn>
 
-            <!-- Empty state -->
-            <div
-              v-if="col.tasks.length === 0"
-              class="flex flex-col items-center justify-center py-12 text-center"
+        <!-- 已完成 -->
+        <TodoColumn
+          status="done"
+          title="已完成"
+          :tasks-count="doneList.length"
+          bg="bg-emerald-50 dark:bg-emerald-950"
+          dot="bg-emerald-500"
+          :adding-to-status="addingToStatus"
+          @start-add="addingToStatus = $event"
+          @submit-quick-add="handleQuickAdd('done', $event)"
+          @cancel-quick-add="addingToStatus = null"
+        >
+          <TransitionGroup
+            v-draggable="[doneList, dragDone]"
+            tag="ul"
+            class="space-y-3"
+            type="transition"
+            :name="!dragging ? 'todo-card' : undefined"
+          >
+            <DevTaskCard
+              v-for="task in doneList"
+              :key="task.id"
+              :task="task"
+              @cycle-status="todoStore.cycleStatus"
+              @delete-task="todoStore.deleteTask"
+              @update-task="(id, patch) => todoStore.updateTask(id, patch)"
+            />
+            <li
+              v-if="doneList.length === 0"
+              key="empty"
+              class="flex items-center justify-center py-16 text-sm text-gray-400"
             >
-              <p class="text-muted-foreground text-sm">
-                {{ col.emptyText }}
-              </p>
-            </div>
-          </div>
-
-          <!-- Quick add -->
-          <div class="border-border/50 mt-3 shrink-0 border-t pt-3">
-            <button
-              v-if="addingToStatus !== col.status"
-              @click="startAdd(col.status)"
-              class="text-muted-foreground hover:text-foreground hover:bg-accent flex w-full cursor-pointer items-center gap-1.5 rounded-lg px-2 py-2 text-xs transition-colors"
-            >
-              <svg
-                class="h-3.5 w-3.5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              添加
-            </button>
-            <div v-else class="space-y-2">
-              <input
-                v-model="quickAddForm.title"
-                ref="quickAddInput"
-                type="text"
-                :placeholder="`添加${col.title}任务...`"
-                class="border-border bg-card focus:border-primary text-foreground w-full rounded-lg border px-2.5 py-1.5 text-sm outline-none"
-                @keyup.enter="submitQuickAdd"
-                @keyup.escape="cancelQuickAdd"
-              />
-              <div class="flex items-center gap-1.5">
-                <button
-                  @click="cancelQuickAdd"
-                  class="text-muted-foreground hover:bg-accent cursor-pointer rounded-md px-2 py-1 text-xs transition-colors"
-                >
-                  取消
-                </button>
-                <button
-                  @click="submitQuickAdd"
-                  :disabled="!quickAddForm.title.trim()"
-                  class="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer rounded-md px-3 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  确定
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+              拖拽任务到此处
+            </li>
+          </TransitionGroup>
+        </TodoColumn>
       </div>
     </div>
   </BasicDetail>
 </template>
 
 <script setup lang="ts">
-import BasicDetail from "@/components/basic/BasicDetail.vue";
-import DevTaskCard from "@/components/DevTaskCard.vue";
-import type { DevTaskStatus } from "@/service/todoService/types";
-import { useTodoStore } from "@/stores/todos";
-import { storeToRefs } from "pinia";
-import { computed, nextTick, onMounted, ref } from "vue";
+import BasicDetail from '@/components/basic/BasicDetail.vue';
+import DevTaskCard from '@/components/DevTaskCard.vue';
+import TodoColumn from '@/components/TodoColumn.vue';
+import type { DevTask, DevTaskStatus } from '@/service/todoService/types';
+import { useTodoStore } from '@/stores/todos';
+import { vDraggable } from 'vue-draggable-plus';
+import { nextTick, onMounted, ref, watch } from 'vue';
 
 const todoStore = useTodoStore();
-const { todoItems, inProgressItems, doneItems } = storeToRefs(todoStore);
 
-const quickAddInput = ref<HTMLInputElement | null>(null);
+const dragging = ref(false);
+
+function createDragOptions(status: string) {
+  const listRef = (): typeof todoList.value => {
+    const m: Record<string, typeof todoList.value> = {
+      todo: todoList.value,
+      'in-progress': inProgressList.value,
+      done: doneList.value,
+    };
+    return m[status];
+  };
+
+  const reorder = () => {
+    const ids = listRef().map((t: DevTask) => t.id);
+    todoStore.sortTasks({ status, ordered_ids: ids });
+  };
+
+  return {
+    animation: 300,
+    ghostClass: 'opacity-50',
+    group: 'devtasks',
+    onStart: () => { dragging.value = true; },
+    onUpdate: reorder,
+    onAdd: (evt: any) => {
+      const item = listRef()[evt.newIndex];
+      if (item && item.status !== status) {
+        item.status = status as DevTaskStatus;
+        todoStore.updateTask(item.id, { status: status as DevTaskStatus });
+      }
+      reorder();
+    },
+    onEnd: () => { nextTick(() => { dragging.value = false; }); },
+  };
+}
+
+const dragTodo = createDragOptions('todo');
+const dragInProgress = createDragOptions('in-progress');
+const dragDone = createDragOptions('done');
+
+// Writable local copies for drag-and-drop, synced from store via watcher
+const todoList = ref<DevTask[]>([]);
+const inProgressList = ref<DevTask[]>([]);
+const doneList = ref<DevTask[]>([]);
 
 onMounted(() => {
   todoStore.hydrateTasks();
 });
 
-// Column definitions
-const columns = computed(() => [
-  {
-    status: "todo" as const,
-    title: "待办",
-    tasks: todoItems.value,
-    bgClass: "bg-blue-50 dark:bg-blue-950",
-    dotClass: "bg-blue-500",
-    emptyText: "没有待开发任务",
+// Sync local drag refs from store — fires on initial load and after every create/delete/update
+watch(
+  [
+    () => todoStore.todoItems,
+    () => todoStore.inProgressItems,
+    () => todoStore.doneItems,
+  ],
+  ([t, ip, d]) => {
+    todoList.value = t;
+    inProgressList.value = ip;
+    doneList.value = d;
   },
-  {
-    status: "in-progress" as const,
-    title: "开发中",
-    tasks: inProgressItems.value,
-    bgClass: "bg-amber-50 dark:bg-amber-950",
-    dotClass: "bg-amber-500",
-    emptyText: "没有开发中任务",
-  },
-  {
-    status: "done" as const,
-    title: "已完成",
-    tasks: doneItems.value,
-    bgClass: "bg-emerald-50 dark:bg-emerald-950",
-    dotClass: "bg-emerald-500",
-    emptyText: "没有已完成任务",
-  },
-]);
+  { immediate: true },
+);
 
 // Quick add
-const addingToStatus = ref<DevTaskStatus | null>(null);
-const quickAddForm = ref({ title: "" });
+const addingToStatus = ref<string | null>(null);
 
-const startAdd = async (status: DevTaskStatus) => {
-  addingToStatus.value = status;
-  quickAddForm.value.title = "";
-  await nextTick();
-  quickAddInput.value?.focus();
-};
-
-const submitQuickAdd = () => {
-  const title = quickAddForm.value.title.trim();
-  if (!title || !addingToStatus.value) return;
-  todoStore.createTask({ title, status: addingToStatus.value });
-  addingToStatus.value = null;
-};
-
-const cancelQuickAdd = () => {
+const handleQuickAdd = (status: DevTaskStatus, title: string) => {
+  todoStore.createTask({ title, status });
   addingToStatus.value = null;
 };
 </script>
+
+<style>
+.todo-card-move,
+.todo-card-enter-active,
+.todo-card-leave-active {
+  transition: all 0.3s ease-out;
+}
+.todo-card-enter-from,
+.todo-card-leave-to {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.todo-card-leave-active {
+  position: absolute;
+}
+</style>

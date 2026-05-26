@@ -9,6 +9,9 @@ class DevTaskService:
     async def get_tasks(self, user_id: int) -> list[DevTask]:
         return await self.repo.get_tasks(user_id)
 
+    async def get_all_tasks(self) -> list[DevTask]:
+        return await self.repo.get_all_tasks()
+
     async def create_task(self, user_id: int, task_data: dict) -> DevTask:
         return await self.repo.create_task(user_id, task_data)
 
@@ -25,3 +28,8 @@ class DevTaskService:
         if not success:
             raise ValueError("Task not found")
         return success
+
+    async def reorder_tasks(
+        self, user_id: int, status: str, ordered_ids: list[str]
+    ) -> list[DevTask]:
+        return await self.repo.reorder_tasks(user_id, status, ordered_ids)

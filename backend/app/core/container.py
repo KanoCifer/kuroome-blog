@@ -27,6 +27,7 @@ from app.services.blog_service import BlogService
 from app.services.book_service import BookService
 from app.services.devtask_service import DevTaskService
 from app.services.fishing_service import FishingService
+from app.services.friendlink_service import FriendLinkService
 from app.services.message_service import MessageService
 from app.services.monitor_service import MonitorService
 from app.services.public_service import PublicService
@@ -171,4 +172,10 @@ async def get_fishing_service():
 @asynccontextmanager
 async def get_weather_service():
     service = WeatherService()
+    yield service
+
+
+@asynccontextmanager
+async def get_friendlink_service():
+    service = FriendLinkService()
     yield service

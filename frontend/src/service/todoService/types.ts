@@ -1,5 +1,5 @@
-export type DevTaskPriority = "low" | "medium" | "high";
-export type DevTaskStatus = "todo" | "in-progress" | "done";
+export type DevTaskPriority = 'low' | 'high' | 'default';
+export type DevTaskStatus = 'todo' | 'in-progress' | 'done';
 
 export interface DevTask {
   id: string;
@@ -10,6 +10,15 @@ export interface DevTask {
   description?: string;
   dueDate?: string;
   priority: DevTaskPriority;
+  sortOrder?: number;
+}
+
+export interface DevTaskResponse {
+  tasks: {
+    todo: DevTask[];
+    'in-progress': DevTask[];
+    done: DevTask[];
+  };
 }
 
 export interface CreateDevTaskPayload {
@@ -18,4 +27,5 @@ export interface CreateDevTaskPayload {
   dueDate?: string;
   priority?: DevTaskPriority;
   status?: DevTaskStatus;
+  sortOrder?: number;
 }

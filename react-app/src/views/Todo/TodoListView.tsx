@@ -57,15 +57,15 @@ function statusBadgeStyle(status: DevTaskStatus): React.CSSProperties {
 }
 
 function priorityLabel(p: DevTaskPriority): string {
-  return { low: '低', medium: '中', high: '高' }[p];
+  return { low: '低', high: '高', default: '默认' }[p];
 }
 
 function priorityBadgeClass(p: DevTaskPriority): string {
   const map: Record<DevTaskPriority, string> = {
     low: 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-    medium:
-      'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
     high: 'border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400',
+    default:
+      'border-gray-200 bg-gray-50 text-gray-700 dark:border-gray-700 dark:bg-gray-800/30 dark:text-gray-400',
   };
   return map[p];
 }
@@ -128,9 +128,9 @@ function TaskCard({
 
           <div className="mt-2 flex flex-wrap items-center gap-1.5">
             <span
-              className={`rounded-full border px-1.5 py-px text-[10px] font-medium ${priorityBadgeClass(task.priority || 'medium')}`}
+              className={`rounded-full border px-1.5 py-px text-[10px] font-medium ${priorityBadgeClass(task.priority || 'default')}`}
             >
-              {priorityLabel(task.priority || 'medium')}
+              {priorityLabel(task.priority || 'default')}
             </span>
             {task.dueDate && (
               <span
@@ -212,7 +212,7 @@ export default function TodoListView() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
-  const [editPriority, setEditPriority] = useState<DevTaskPriority>('medium');
+  const [editPriority, setEditPriority] = useState<DevTaskPriority>('default');
   const [editDueDate, setEditDueDate] = useState('');
 
   // Quick-add state: which column has the active quick-add input
@@ -244,7 +244,7 @@ export default function TodoListView() {
     setEditingId(task.id);
     setEditTitle(task.title);
     setEditDescription(task.description || '');
-    setEditPriority(task.priority || 'medium');
+    setEditPriority(task.priority || 'default');
     setEditDueDate(task.dueDate || '');
   };
 
@@ -278,7 +278,7 @@ export default function TodoListView() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newDescription, setNewDescription] = useState('');
-  const [newPriority, setNewPriority] = useState<DevTaskPriority>('medium');
+  const [newPriority, setNewPriority] = useState<DevTaskPriority>('default');
   const [newDueDate, setNewDueDate] = useState('');
   const [newStatus, setNewStatus] = useState<DevTaskStatus>('todo');
 
@@ -294,7 +294,7 @@ export default function TodoListView() {
     await todoState.createTask(payload);
     setNewTitle('');
     setNewDescription('');
-    setNewPriority('medium');
+    setNewPriority('default');
     setNewDueDate('');
     closeAddForm();
   };
@@ -376,8 +376,8 @@ export default function TodoListView() {
                         }
                         className="cursor-pointer rounded-md border border-gray-200 bg-white px-2 py-1 text-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                       >
+                        <option value="default">默认</option>
                         <option value="low">低</option>
-                        <option value="medium">中</option>
                         <option value="high">高</option>
                       </select>
                       <input
@@ -599,8 +599,8 @@ export default function TodoListView() {
                       }
                       className="cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
                     >
+                      <option value="default">默认</option>
                       <option value="low">低</option>
-                      <option value="medium">中</option>
                       <option value="high">高</option>
                     </select>
                   </div>

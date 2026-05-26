@@ -161,6 +161,7 @@ class FriendLinks(Document):
 
     name: str
     url: str
+    sort_order: Annotated[int, Indexed()] = 0
     favicon: str | None = None
     description: str | None = None
     email: str | None = None
@@ -178,8 +179,9 @@ class DevTask(Document):
     user_id: int
     title: str
     description: str | None = None
-    priority: str = "medium"
+    priority: str = "default"
     status: str = "todo"
+    sort_order: Annotated[int, Indexed()] = 0
     due_date: datetime | None = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))

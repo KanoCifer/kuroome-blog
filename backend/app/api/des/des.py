@@ -9,6 +9,7 @@ from app.core.container import (
     get_device_service,
     get_devtask_service,
     get_fishing_service,
+    get_friendlink_service,
     get_message_service,
     get_monitor_service,
     get_notification_service,
@@ -100,4 +101,9 @@ async def fishing_service_dep():
 
 async def weather_service_dep():
     async with get_weather_service() as service:
+        yield service
+
+
+async def friendlink_service_dep():
+    async with get_friendlink_service() as service:
         yield service

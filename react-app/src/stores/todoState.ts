@@ -29,7 +29,15 @@ export const useTodoState = create<DevTaskState>((set, get) => ({
   tasks: [],
 
   hydrateTasks: () => {
-    service.fetchTasks().then((tasks) => set({ tasks }));
+    service.fetchTasks().then((grouped) =>
+      set({
+        tasks: [
+          ...grouped.todo,
+          ...grouped['in-progress'],
+          ...grouped.done,
+        ],
+      }),
+    );
   },
 
   createTask: async (payload) => {

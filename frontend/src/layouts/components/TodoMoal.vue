@@ -128,7 +128,8 @@
                     class="border-border bg-card text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
                   >
                     <option value="low">低</option>
-                    <option value="medium">中</option>
+                    <option value="default">默认</option>
+                    <option value="low">低</option>
                     <option value="high">高</option>
                   </select>
                   <input
@@ -266,7 +267,7 @@ const newTaskForm = ref({
   title: "",
   description: "",
   dueDate: "",
-  priority: "medium" as DevTaskPriority,
+  priority: "default" as DevTaskPriority,
 });
 
 const submitCreateTask = () => {
@@ -277,12 +278,12 @@ const submitCreateTask = () => {
     dueDate: newTaskForm.value.dueDate || undefined,
     priority: newTaskForm.value.priority,
   });
-  newTaskForm.value = { title: "", description: "", dueDate: "", priority: "medium" };
+  newTaskForm.value = { title: "", description: "", dueDate: "", priority: "default" };
   showAddForm.value = false;
 };
 
 const cancelAdd = () => {
-  newTaskForm.value = { title: "", description: "", dueDate: "", priority: "medium" };
+  newTaskForm.value = { title: "", description: "", dueDate: "", priority: "default" };
   showAddForm.value = false;
 };
 </script>

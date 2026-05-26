@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 class DevTaskCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=500)
     description: str | None = None
-    priority: str = Field(default="medium", pattern="^(low|medium|high)$")
+    priority: str = Field(default="default", pattern="^(low|high|default)$")
     status: str = Field(default="todo", pattern="^(todo|in-progress|done)$")
     due_date: datetime | None = None
 
@@ -15,7 +15,7 @@ class DevTaskCreate(BaseModel):
 class DevTaskUpdate(BaseModel):
     title: str | None = None
     description: str | None = None
-    priority: str | None = Field(None, pattern="^(low|medium|high)$")
+    priority: str | None = Field(None, pattern="^(low|high|default)$")
     status: str | None = Field(None, pattern="^(todo|in-progress|done)$")
     due_date: datetime | None = None
 
