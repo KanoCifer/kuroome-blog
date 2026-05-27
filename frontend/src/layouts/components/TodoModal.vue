@@ -196,7 +196,7 @@
                   :task="task"
                   @cycle-status="todoStore.cycleStatus"
                   @delete-task="todoStore.deleteTask"
-                  @update-task="(id, patch) => todoStore.updateTask(id, patch)"
+                  @update-task="(id: string, patch: Partial<DevTask>) => todoStore.updateTask(id, patch)"
                 />
               </TransitionGroup>
 
@@ -216,9 +216,9 @@
 </template>
 
 <script setup lang="ts">
-import DevTaskCard from "@/components/DevTaskCard.vue";
+import DevTaskCard from "@/views/todos/components/DevTaskCard.vue";
 import { useTodoDrawer } from "@/composables/useTodoDrawer";
-import type { DevTaskPriority } from "@/service/todoService/types";
+import type { DevTask, DevTaskPriority } from "@/service/todoService/types";
 import { useTodoStore } from "@/stores/todos";
 import { storeToRefs } from "pinia";
 import { computed, onMounted, ref } from "vue";
