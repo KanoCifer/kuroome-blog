@@ -1,4 +1,4 @@
-import { onMounted, onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from 'vue';
 
 interface UseWebSocketOptions {
   url: string;
@@ -7,8 +7,6 @@ interface UseWebSocketOptions {
   reconnectBaseMs?: number;
   reconnectMaxMs?: number;
   pingIntervalMs?: number;
-  /** When true, connect immediately instead of deferring to onMounted.
-   *  Use for module-level singleton WebSockets called outside Vue setup. */
   immediate?: boolean;
 }
 
@@ -50,7 +48,7 @@ export function useWebSocket(options: UseWebSocketOptions) {
     pingTimer = setInterval(() => {
       if (ws?.readyState === WebSocket.OPEN) {
         pingStartTime = performance.now();
-        ws.send(JSON.stringify({ type: "ping" }));
+        ws.send(JSON.stringify({ type: 'ping' }));
       }
     }, pingIntervalMs);
   }
@@ -64,7 +62,7 @@ export function useWebSocket(options: UseWebSocketOptions) {
 
   function sendVisitorId(visitorId: string | null) {
     if (ws?.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ type: "visitor_id", visitor_id: visitorId }));
+      ws.send(JSON.stringify({ type: 'visitor_id', visitor_id: visitorId }));
     }
   }
 
@@ -103,12 +101,12 @@ export function useWebSocket(options: UseWebSocketOptions) {
       try {
         const data = JSON.parse(event.data);
         if (
-          data.type === "count" &&
+          data.type === 'count' &&
           onCount &&
-          typeof data.count === "number"
+          typeof data.count === 'number'
         ) {
           onCount(data.count);
-        } else if (data.type === "pong") {
+        } else if (data.type === 'pong') {
           calculateConnectionDelay(pingStartTime);
         }
       } catch {
@@ -150,7 +148,7 @@ export function useWebSocket(options: UseWebSocketOptions) {
   }
 
   const handleVisibility = () => {
-    if (document.visibilityState === "visible" && !isConnected.value) {
+    if (document.visibilityState === 'visible' && !isConnected.value) {
       reconnectAttempt.value = 0;
       connect();
     }
@@ -167,20 +165,20 @@ export function useWebSocket(options: UseWebSocketOptions) {
 
   if (immediate) {
     connect();
-    document.addEventListener("visibilitychange", handleVisibility);
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("beforeunload", handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('beforeunload', handleBeforeUnload);
   } else {
     onMounted(() => {
       connect();
-      document.addEventListener("visibilitychange", handleVisibility);
-      window.addEventListener("online", handleOnline);
+      document.addEventListener('visibilitychange', handleVisibility);
+      window.addEventListener('online', handleOnline);
     });
 
     onUnmounted(() => {
       disconnect();
-      document.removeEventListener("visibilitychange", handleVisibility);
-      window.removeEventListener("online", handleOnline);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('online', handleOnline);
     });
   }
 

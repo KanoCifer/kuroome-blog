@@ -31,7 +31,7 @@
                 v-else-if="item.to"
                 :to="item.to"
                 @click="closeUserMenuImmediately"
-                class="text-foreground hover:bg-accent dark:text-foreground dark:hover:bg-accent hover:bg-primary flex items-center gap-2 rounded-full px-4 py-2 font-serif transition-colors duration-300 hover:text-white"
+                class="text-foreground dark:text-foreground dark:hover:bg-accent hover:bg-primary flex items-center gap-2 rounded-full px-4 py-2 font-serif transition-colors duration-300 hover:text-white"
                 :class="item.class"
               >
                 <component :is="item.icon" class="h-4 w-4" />
@@ -84,10 +84,10 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronDownIcon } from "@/components/icons";
-import { useAuthStore } from "@/stores/auth";
-import type { Component } from "vue";
-import { computed, onUnmounted, ref } from "vue";
+import { ChevronDownIcon } from '@/components/icons';
+import { useAuthStore } from '@/stores/auth';
+import type { Component } from 'vue';
+import { computed, onUnmounted, ref } from 'vue';
 
 export interface DropdownItem {
   icon?: Component;
@@ -113,7 +113,7 @@ const isUserMenuOpen = ref(false);
 let userMenuCloseTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const currentUserName = computed(() => {
-  return auth.isAuthenticated ? auth.user?.name || "用户" : "游客";
+  return auth.isAuthenticated ? auth.user?.name || '用户' : '游客';
 });
 
 const visibleItems = computed(() => {
@@ -149,13 +149,13 @@ const handleItemClick = (item: DropdownItem) => {
 };
 
 const avatarUrl = computed(() => {
-  if (auth.user?.photo?.startsWith("http")) {
+  if (auth.user?.photo?.startsWith('http')) {
     return auth.user.photo;
   }
   if (auth.user?.photo) {
     return `/api/v1/media/${auth.user.photo}`;
   }
-  return "/api/v1/media/default.png";
+  return '/api/v1/media/default.png';
 });
 
 onUnmounted(() => {

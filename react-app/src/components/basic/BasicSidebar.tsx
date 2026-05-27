@@ -1,5 +1,6 @@
 import { BasicFooter } from '@/components/basic/BasicFooter';
 import { useAuthStore } from '@/stores/authState';
+import { useVisitorCountStore } from '@/stores/visitorCountStore';
 import { IconCoin } from '@tabler/icons-react';
 import { motion } from 'framer-motion';
 import {
@@ -114,8 +115,44 @@ function DropDownItems() {
   }
 }
 
+function DelayStatus({ ms }: { ms: number }) {
+  if (!ms) {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-xs text-gray-400">
+        <span className="relative flex h-2 w-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gray-400 opacity-75" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-gray-400" />
+        </span>
+        延迟 -- ms
+      </span>
+    );
+  }
+  const label = `${Math.round(ms)} ms`;
+  const dotClass =
+    ms < 200
+      ? 'bg-emerald-500'
+      : ms < 2000
+        ? 'bg-yellow-500'
+        : 'bg-red-500';
+  return (
+    <span className="inline-flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+      <span className="relative flex h-2 w-2">
+        <span
+          className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${dotClass}`}
+        />
+        <span
+          className={`relative inline-flex h-2 w-2 rounded-full ${dotClass}`}
+        />
+      </span>
+      延迟 {label}
+    </span>
+  );
+}
+
 export const BentoNavSidebar: React.FC = () => {
   const auth = useAuthStore();
+  const visitorCount = useVisitorCountStore((s) => s.count);
+  const connectionDelay = useVisitorCountStore((s) => s.connectionDelay);
   const location = useLocation();
   const activeIndex = navItems.findIndex(
     (item) => location.pathname === item.path,
@@ -256,6 +293,18 @@ export const BentoNavSidebar: React.FC = () => {
             </li>
           ))}
         </ul>
+
+        {/* 状态栏：在线人数 + 延迟 */}
+        <div className="flex items-center justify-between px-3 text-xs text-gray-500 dark:text-gray-400">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+            </span>
+            {visitorCount} 人在线
+          </span>
+          <DelayStatus ms={connectionDelay} />
+        </div>
 
         <div className="mb-30 border-t pt-1 text-center text-sm">
           <BasicFooter />

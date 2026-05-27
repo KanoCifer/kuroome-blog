@@ -38,3 +38,4 @@ CLAUDE.local.md
 # ML models
 backend/models/*.joblib
 .zed/
+.scratch/

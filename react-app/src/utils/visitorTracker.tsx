@@ -17,14 +17,14 @@ const getStoredVisitorId = (): string | null => {
 };
 
 // 初始化访客ID
-const getVisitorId = () => {
+export function getVisitorId() {
   let visitorId = getStoredVisitorId();
   if (!visitorId) {
     visitorId = generateVisitorId();
     setVisitorId(visitorId);
   }
   return visitorId;
-};
+}
 
 // 收集前端可获取的追踪信息
 const collectVisitorData = () => {
