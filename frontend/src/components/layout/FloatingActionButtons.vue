@@ -386,7 +386,7 @@ import { IconTooling, RssIcon } from "@/components/icons";
 import { socialService } from "@/service/socialService";
 import { useCardLayoutStore } from "@/stores/cardLayout";
 import { useNotificationStore } from "@/stores/notification";
-import SettingIcon from "@/views/entry/icon/SettingIcon.vue";
+import SettingIcon from "@/components/icons/SettingIcon.vue";
 import { useStorage } from "@vueuse/core";
 import { AxiosError } from "axios";
 import { CreditCard } from "lucide-vue-next";

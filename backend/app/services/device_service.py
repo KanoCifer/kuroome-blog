@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from datetime import UTC, datetime, timedelta
 
 from app.models.models import DeviceTrack
 from app.repositories.device_repo import DeviceRepo
@@ -50,7 +51,29 @@ class DeviceService(BaseService):
     async def get_upcoming_milestone_devices(
         self, user_id: int, days_ahead: int = 30
     ) -> Sequence[DeviceTrack]:
-        """获取即将到达里程碑的设备"""
-        return await self.repo.get_devices_with_upcoming_milestone(
-            user_id=user_id, days_ahead=days_ahead
-        )
+        """获取即将到达里程碑的设备（未来N天内）。
+
+        里程碑计算逻辑属于业务规则，放在服务层而非仓库层。
+        """
+        devices = await self.repo.get_device_tracks_by_user_id(user_id)
+        active_devices = [d for d in devices if d.status == "active"]
+
+        today = datetime.now(UTC).date()
+        future_date = today + timedelta(days=days_ahead)
+
+        upcoming = []
+        for device in active_devices:
+            days_owned = (today - device.purchase_date.date()).days
+            future_days = (future_date - device.purchase_date.date()).days
+
+            reminder_config = device.reminder_config or {}
+            milestones = reminder_config.get(
+                "milestones", [100, 365, 730, 1000, 1825]
+            )
+
+            for milestone in milestones:
+                if days_owned <= milestone <= future_days:
+                    upcoming.append(device)
+                    break
+
+        return upcoming

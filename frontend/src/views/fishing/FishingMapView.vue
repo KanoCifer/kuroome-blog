@@ -184,16 +184,16 @@ import TideCard from "@/components/map/TideCard.vue";
 import WeatherCard from "@/components/map/WeatherCard.vue";
 import fishingSpotsData from "@/data/fishing-spots.json";
 import { DEFAULT_MAP_CENTER, useFishingMapStore } from "@/stores/fishingMap";
-import FishingFeedbackForm from "@/views/general/fishing/components/FishingFeedbackForm.vue";
-import FishingIndexCard from "@/views/general/fishing/components/FishingIndexCard.vue";
+import FishingFeedbackForm from "@/views/fishing/components/FishingFeedbackForm.vue";
+import FishingIndexCard from "@/views/fishing/components/FishingIndexCard.vue";
 import type {
   FishingFeedbackData,
   FishingIndexData,
-} from "@/views/general/fishing/types";
+} from "@/views/fishing/types";
 import { Bot } from "lucide-vue-next";
 import { storeToRefs } from "pinia";
 import { computed, onMounted, ref, useTemplateRef } from "vue";
-import HourlyWeather from "./fishing/components/HourlyWeather.vue";
+import HourlyWeather from "./components/HourlyWeather.vue";
 
 export interface AMapMarker {
   position: [number, number];

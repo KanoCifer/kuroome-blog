@@ -75,9 +75,9 @@ import { useRssParse } from "@/composables/useRssParse";
 import { useRssSubscriptions } from "@/composables/useRssSubscriptions";
 import { useRssArticles } from "@/composables/useRssArticles";
 import { BasicDetail } from "@/components/basic";
-import RssParseSection from "./RssParseSection.vue";
-import RssSubscriptionsSection from "./RssSubscriptionsSection.vue";
-import RssArticlesSection from "./RssArticlesSection.vue";
+import RssParseSection from "./components/RssParseSection.vue";
+import RssSubscriptionsSection from "./components/RssSubscriptionsSection.vue";
+import RssArticlesSection from "./components/RssArticlesSection.vue";
 import type { SubscriptionItem } from "@/service/rssService";
 
 const route = useRoute();

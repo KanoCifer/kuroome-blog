@@ -3,14 +3,13 @@ from __future__ import annotations
 from typing import Literal
 
 from bson import ObjectId
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.fishing import FishingRecord
 
 
 class FishingRepo:
-    def __init__(self, session: AsyncSession | None = None) -> None:
-        self.session = session
+    def __init__(self) -> None:
+        pass
 
     async def save_fishing_record(self, record: dict) -> ObjectId:
         """保存钓鱼记录到 MongoDB"""

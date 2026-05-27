@@ -69,8 +69,8 @@ import { Image } from "lucide-vue-next";
 import { Motion, type MotionProps } from "motion-v";
 import { onUnmounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import type { DropdownItem } from "./components/UserDropdown.vue";
-import UserDropdown from "./components/UserDropdown.vue";
+import type { DropdownItem } from "./UserDropdown.vue";
+import UserDropdown from "./UserDropdown.vue";
 
 const auth = useAuthStore();
 const route = useRoute();

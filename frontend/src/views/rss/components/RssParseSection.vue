@@ -142,9 +142,9 @@
 </template>
 
 <script setup lang="ts">
-import { truncateSummary } from "./rssUtils";
+import { truncateSummary } from "../rssUtils";
 import { formatDate } from "@/utils/formatdate";
-import type { ExampleFeed } from "./rssUtils";
+import type { ExampleFeed } from "../rssUtils";
 
 export interface RssMetadata {
   title: string;

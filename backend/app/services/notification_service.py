@@ -28,3 +28,13 @@ class NotificationService:
             channels=channels,
         )
         return result
+
+    async def send_device_reminder(self, payload, config, user_id, channels):
+        """发送设备提醒"""
+        result: dict[str, bool] = await self.dispatcher.dispatch_device_reminder(
+            payload=payload,
+            reminder_config=config,
+            user_id=user_id,
+            channels=channels,
+        )
+        return result

@@ -51,3 +51,10 @@ class NotifierBase(ABC):
     async def validate_config(self) -> bool:
         """验证通知配置"""
         raise NotImplementedError("validate_config方法需要在子类中实现")
+
+    @abstractmethod
+    async def send_device_reminder(
+        self, user_id: int, payload: DeviceNotificationPayload, config: dict
+    ) -> bool:
+        """发送设备提醒"""
+        raise NotImplementedError("send_device_reminder方法需要在子类中实现")

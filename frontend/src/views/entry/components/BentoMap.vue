@@ -74,7 +74,7 @@ import { useAnimateNumber } from "@/composables/useAnimateNumber";
 import fishingSpots from "@/data/fishing-spots.json";
 import { fishingService } from "@/service/fishingService";
 import { DEFAULT_MAP_CENTER, useFishingMapStore } from "@/stores/fishingMap";
-import type { TideData } from "@/views/general/fishing/types";
+import type { TideData } from "@/views/fishing/types";
 import dayjs from "dayjs";
 import {
   Cloud,

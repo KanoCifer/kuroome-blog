@@ -9,7 +9,7 @@ import type {
   WeatherHourly,
   WeatherIndex,
   WeatherNow,
-} from "@/views/general/fishing/types";
+} from "@/views/fishing/types";
 import dayjs from "dayjs";
 import { defineStore } from "pinia";
 import { ref } from "vue";

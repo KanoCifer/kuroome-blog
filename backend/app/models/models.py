@@ -160,8 +160,10 @@ class User(Base):
 
     @property
     def is_admin(self) -> bool:
-        """检查用户是否为管理员(id=1或id=2的用户为管理员)"""
-        return self.id == 1 or self.id == 2
+        """检查用户是否在管理员白名单中，由 settings.ADMIN_USER_IDS 配置。"""
+        from app.core.config import settings
+
+        return self.id in settings.ADMIN_USER_IDS
 
     @property
     def raw_password(self):

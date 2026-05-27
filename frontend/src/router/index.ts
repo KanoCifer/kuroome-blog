@@ -43,7 +43,7 @@ const router = createRouter({
     {
       path: '/home',
       name: 'home',
-      component: () => import('@/views/general/HomeView.vue'),
+      component: () => import('@/views/pages/HomeView.vue'),
       meta: {
         title: "Kuroome's Blog - 个人阅读清单与博客",
         description: '个人阅读清单管理项目，包含博客系统、书籍管理和阅读记录',
@@ -63,7 +63,7 @@ const router = createRouter({
     {
       path: '/about',
       name: 'about',
-      component: () => import('@/views/general/AboutView.vue'),
+      component: () => import('@/views/pages/AboutView.vue'),
       meta: {
         title: "关于我 - Kuroome's Blog",
         description: "关于 Kuroome's Blog 项目和作者的介绍",
@@ -73,7 +73,7 @@ const router = createRouter({
     {
       path: '/changelog',
       name: 'changelog',
-      component: () => import('@/views/general/ChangelogView.vue'),
+      component: () => import('@/views/pages/ChangelogView.vue'),
       meta: {
         title: "变更日志 - Kuroome's Blog",
         description: '网站更新历史与变更记录',
@@ -83,7 +83,7 @@ const router = createRouter({
     {
       path: '/websites',
       name: 'websites',
-      component: () => import('@/views/general/WebsitesView.vue'),
+      component: () => import('@/views/pages/WebsitesView.vue'),
       meta: {
         title: "推荐网站 - Kuroome's Blog",
         description: '发现有趣的网站和工具',
@@ -93,7 +93,7 @@ const router = createRouter({
     {
       path: '/friend-links',
       name: 'friend-links',
-      component: () => import('@/views/general/FriendLinksView.vue'),
+      component: () => import('@/views/pages/FriendLinksView.vue'),
       meta: {
         title: "友情链接 - Kuroome's Blog",
         description: '与志同道合的朋友交换链接',
@@ -103,7 +103,7 @@ const router = createRouter({
     {
       path: '/privacy',
       name: 'privacy',
-      component: () => import('@/views/general/PrivacyPolicyView.vue'),
+      component: () => import('@/views/pages/PrivacyPolicyView.vue'),
       meta: {
         title: "隐私政策 - Kuroome's Blog",
         description: '了解本站如何收集、使用和保护您的个人信息',
@@ -113,7 +113,7 @@ const router = createRouter({
     {
       path: '/fishing-map',
       name: 'fishing-map',
-      component: () => import('@/views/general/FishingMapView.vue'),
+      component: () => import('@/views/fishing/FishingMapView.vue'),
       meta: {
         title: "钓鱼地图 - Kuroome's Blog",
         description: '探索钓鱼地点和钓点信息',
@@ -124,7 +124,7 @@ const router = createRouter({
       path: '/todos',
       name: 'todo-list',
       // redirect: { path: "/" },
-      component: () => import('@/views/general/TodoListView.vue'),
+      component: () => import('@/views/todos/TodoListView.vue'),
       meta: {
         title: "开发任务 - Kuroome's Blog",
         description: '网站开发需求和实现清单',
@@ -196,7 +196,7 @@ const router = createRouter({
     {
       path: '/messages',
       name: 'message-manage',
-      component: () => import('@/views/general/MessageManageView.vue'),
+      component: () => import('@/views/messages/MessageManageView.vue'),
       meta: { requiresAuth: true },
     },
     {
@@ -235,7 +235,7 @@ const router = createRouter({
     {
       path: '/analytics',
       name: 'analytics',
-      component: () => import('@/views/analyse/AnalyticsView.vue'),
+      component: () => import('@/views/analytics/AnalyticsView.vue'),
       meta: {
         requiresAuth: true,
         title: '网站数据分析',
@@ -341,7 +341,7 @@ const router = createRouter({
       // 通配符匹配所有未定义的路径
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
-      component: () => import('@/views/general/NotFound.vue'),
+      component: () => import('@/views/pages/NotFound.vue'),
     },
   ],
 });

@@ -79,6 +79,14 @@ class ForbiddenError(APIError):
         super().__init__(message=message, code=403, **kwargs)
 
 
+class GitHubAuthError(Exception):
+    """GitHub OAuth flow error — carries an error_code for the frontend redirect."""
+
+    def __init__(self, error_code: str) -> None:
+        self.error_code = error_code
+        super().__init__(error_code)
+
+
 # ============================================================================
 # Error Response Format
 # ============================================================================

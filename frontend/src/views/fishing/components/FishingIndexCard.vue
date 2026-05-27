@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useFishingMapStore } from "@/stores/fishingMap";
-import type { FishingIndexData } from "@/views/general/fishing/types";
+import type { FishingIndexData } from "@/views/fishing/types";
 import { FishingRod, Loader } from "lucide-vue-next";
 import { motion } from "motion-v";
 import { storeToRefs } from "pinia";

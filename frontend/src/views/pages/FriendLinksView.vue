@@ -341,14 +341,14 @@ import type { Website } from "@/types";
 import { motion } from "motion-v";
 import { nextTick, onMounted, ref } from "vue";
 import twikoo from "twikoo";
-import IconCopy from "./icon/IconCopy.vue";
-import IconDocumentText from "./icon/IconDocumentText.vue";
-import IconExternalLink from "./icon/IconExternalLink.vue";
-import IconGlobeOutline from "./icon/IconGlobeOutline.vue";
-import IconInfoCircle from "./icon/IconInfoCircle.vue";
-import IconLinkChain from "./icon/IconLinkChain.vue";
-import IconRefresh from "./icon/IconRefresh.vue";
-import IconUsersGroup from "./icon/IconUsersGroup.vue";
+import IconCopy from "@/components/icons/IconCopy.vue";
+import IconDocumentText from "@/components/icons/IconDocumentText.vue";
+import IconExternalLink from "@/components/icons/IconExternalLink.vue";
+import IconGlobeOutline from "@/components/icons/IconGlobeOutline.vue";
+import IconInfoCircle from "@/components/icons/IconInfoCircle.vue";
+import IconLinkChain from "@/components/icons/IconLinkChain.vue";
+import IconRefresh from "@/components/icons/IconRefresh.vue";
+import IconUsersGroup from "@/components/icons/IconUsersGroup.vue";
 
 interface FriendLink {
   id: string;

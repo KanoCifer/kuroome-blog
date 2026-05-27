@@ -483,7 +483,7 @@
 import { useBackgroundStore } from "@/stores/background";
 import { useThemeStore, type ColorScheme, type Theme } from "@/stores/theme";
 import { useCardImage } from "@/composables/useCardImage";
-import SettingIcon from "@/views/entry/icon/SettingIcon.vue";
+import SettingIcon from "@/components/icons/SettingIcon.vue";
 import { ref } from "vue";
 
 defineProps<{

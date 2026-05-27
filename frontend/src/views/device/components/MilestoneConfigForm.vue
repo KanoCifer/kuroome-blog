@@ -442,9 +442,9 @@
 </template>
 
 <script setup lang="ts">
-import type { Device } from "@/services/deviceService";
+import type { Device } from "@/service/deviceService";
 import { deviceGateway } from "@/api/deviceGateway";
-import { deviceService } from "@/services/deviceService";
+import { deviceService } from "@/service/deviceService";
 import { useNotificationStore } from "@/stores/notification";
 import { reactive, ref, watch, onMounted } from "vue";
 import dayjs from "dayjs";

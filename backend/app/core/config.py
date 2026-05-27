@@ -49,6 +49,7 @@ class Settings(BaseSettings):
     RABBITMQ_URL: str = "amqp://guest:guest@localhost:5672/"
     QWEATHER_BASE_URL: str = ""
     ENABLE_TRACKING: bool = True
+    ADMIN_USER_IDS: list[int] = [1, 2]
 
     model_config = SettingsConfigDict(
         env_file=get_env_file_path(),

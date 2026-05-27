@@ -17,7 +17,15 @@ from app.api.des.des import fishing_service_dep, weather_service_dep
 from app.api.des.redis import get_redis
 from app.models.models import User
 from app.schemas.response import APIResponse
-from app.services.fishing_service import FishingService, fishing_service
+from app.services.fishing_index import (
+    FEEDBACK_SCORES,
+    FishingRecord,
+    build_record,
+    get_level,
+    get_qweather_index,
+    parse_tide_info,
+)
+from app.services.fishing_service import FishingService
 from app.services.weather_service import WeatherService
 
 logger = logging.getLogger(__name__)
@@ -90,18 +98,8 @@ class FishingFeedbackResponse(BaseModel):
     residual: int
 
 
-# 反馈分数映射
-FEEDBACK_SCORES = {
-    "爆护": 100,
-    "好": 75,
-    "一般": 50,
-    "差": 25,
-    "空军": 0,
-}
-
-
 def _build_record_from_request(req: FishingFeedbackRequest) -> dict:
-    """从请求构建钓鱼记录"""
+    """从请求构建钓鱼记录 dict"""
     return {
         "temperature": req.temperature,
         "humidity": req.humidity,
@@ -121,6 +119,7 @@ async def get_fishing_index(
     enriched: bool = Query(False, description="是否附加天气数据"),
     redis: AsyncRedis = Depends(get_redis),
     weather_svc: WeatherService = Depends(weather_service_dep),
+    service: FishingService = Depends(fishing_service_dep),
 ) -> JSONResponse:
     """
     获取指定地点的钓鱼指数
@@ -142,17 +141,17 @@ async def get_fishing_index(
 
     # 解析潮汐数据
     tide_data = weather_data.get("tide", {})
-    tide_info = fishing_service.parse_tide_info(tide_data)
+    tide_info = parse_tide_info(tide_data)
 
     # 获取和风指数
-    indices = int(fishing_service.get_qweather_index(weather_data))
+    indices = get_qweather_index(weather_data)
 
     # 构建钓鱼记录
-    record = fishing_service.build_record(weather_data, tide_info, indices)
+    record = build_record(weather_data, tide_info, indices)
 
     # 计算钓鱼指数
     fishing_index, expert_score, residual, feature_breakdown = (
-        fishing_service.calculate_fishing_index(record)
+        service.calculate_fishing_index(record)
     )
     logger.info(
         f"[钓鱼指数] 计算完成: index={fishing_index}, expert={expert_score}, residual={residual}"
@@ -162,7 +161,7 @@ async def get_fishing_index(
         fishing_index=fishing_index,
         expert_score=expert_score,
         residual=residual,
-        level=fishing_service.get_level(fishing_index),
+        level=get_level(fishing_index),
         feature_breakdown={
             k: round(v, 2) for k, v in feature_breakdown.items()
         },
@@ -190,17 +189,29 @@ async def submit_feedback(
 
     用户提交反馈后，系统计算残差并保存到 MongoDB
     """
-    # 构建记录
     record = _build_record_from_request(payload)
 
-    # 计算专家评分
-    expert_score = fishing_service.expert.calculate(**record)
+    # 通过服务的 calculate_fishing_index 统一计算（专家 + 模型残差）
+    fishing_record = FishingRecord(
+        temperature=payload.temperature,
+        humidity=payload.humidity,
+        pressure=payload.pressure,
+        wind_speed=payload.wind_speed,
+        precipitation=payload.precipitation,
+        tide_type=payload.tide_type,
+        hours_to_next_tide=payload.hours_to_next_tide,
+        tide_range=payload.tide_range,
+        indices=payload.indices,
+    )
+    _fishing_idx, expert_score_from_svc, _residual, _features = (
+        service.calculate_fishing_index(fishing_record)
+    )
 
     # 用户实际评分
     actual_score = FEEDBACK_SCORES[payload.feedback]
 
-    # 计算残差
-    residual = actual_score - expert_score
+    # 残差 = 实际 - 专家
+    residual = actual_score - expert_score_from_svc
 
     # 保存到 MongoDB
     doc_data = {
@@ -210,7 +221,7 @@ async def submit_feedback(
         **record,
         "feedback": payload.feedback,
         "feedback_score": actual_score,
-        "expert_score": expert_score,
+        "expert_score": expert_score_from_svc,
     }
     record_id = await service.save_feedback(doc_data)
     logger.info(f"[钓鱼反馈] 已保存记录: {record_id}")
@@ -222,7 +233,7 @@ async def submit_feedback(
         data=FishingFeedbackResponse(
             success=True,
             record_id=str(record_id),
-            expert_score=int(expert_score),
+            expert_score=int(expert_score_from_svc),
             residual=int(residual),
         ).model_dump(),
         message=f"反馈已记录：{payload.feedback}",
@@ -241,14 +252,15 @@ async def get_fishing_stats(
 @router.get("/weights")
 async def get_weights(
     _: User = Depends(manager),
+    service: FishingService = Depends(fishing_service_dep),
 ) -> APIResponse:
     """
     查看模型权重
 
     返回专家权重和 sklearn 残差模型权重
     """
-    expert_weights = fishing_service.expert.WEIGHTS
-    residual_weights = fishing_service.model_svc.get_weights()
+    expert_weights = service.expert.WEIGHTS
+    residual_weights = service.model_svc.get_weights()
 
     return APIResponse(
         status="success",

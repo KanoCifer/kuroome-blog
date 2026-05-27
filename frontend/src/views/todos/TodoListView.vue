@@ -120,8 +120,8 @@
 
 <script setup lang="ts">
 import BasicDetail from '@/components/basic/BasicDetail.vue';
-import DevTaskCard from '@/components/DevTaskCard.vue';
-import TodoColumn from '@/components/TodoColumn.vue';
+import DevTaskCard from './components/DevTaskCard.vue';
+import TodoColumn from './components/TodoColumn.vue';
 import type { DevTask, DevTaskStatus } from '@/service/todoService/types';
 import { useTodoStore } from '@/stores/todos';
 import { vDraggable } from 'vue-draggable-plus';
@@ -150,7 +150,9 @@ function createDragOptions(status: string) {
     animation: 300,
     ghostClass: 'opacity-50',
     group: 'devtasks',
-    onStart: () => { dragging.value = true; },
+    onStart: () => {
+      dragging.value = true;
+    },
     onUpdate: reorder,
     onAdd: (evt: any) => {
       const item = listRef()[evt.newIndex];
@@ -160,7 +162,11 @@ function createDragOptions(status: string) {
       }
       reorder();
     },
-    onEnd: () => { nextTick(() => { dragging.value = false; }); },
+    onEnd: () => {
+      nextTick(() => {
+        dragging.value = false;
+      });
+    },
   };
 }
 

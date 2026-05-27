@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 
 from sqlalchemy import select
@@ -98,15 +98,6 @@ class SubRepo:
         await self.session.flush()
         await self.session.refresh(subscription)
         return subscription
-
-    async def get_due_subscriptions(self) -> list[Subscription]:
-        """获取所有需要发送通知的订阅"""
-        stmt = select(Subscription).where(
-            Subscription.status == "active",
-            Subscription.next_billing_date <= datetime.now(UTC),
-        )
-        result = await self.session.execute(stmt)
-        return list(result.scalars().all())
 
     async def get_active_subscriptions(self) -> list[Subscription]:
         """获取所有活跃订阅"""

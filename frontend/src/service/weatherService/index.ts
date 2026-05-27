@@ -7,7 +7,7 @@ import type {
   WeatherHourly,
   WeatherIndex,
   WeatherNow,
-} from "@/views/general/fishing/types";
+} from "@/views/fishing/types";
 
 export interface WeatherFullResult {
   updateTime?: string;

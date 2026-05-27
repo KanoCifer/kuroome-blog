@@ -5,6 +5,7 @@ import secrets
 from datetime import timedelta
 from urllib.parse import urlencode
 
+import httpx
 import orjson
 from fastapi import Request
 from redis.asyncio import Redis as AsyncRedis
@@ -15,6 +16,8 @@ from webauthn.helpers.structs import (
 
 from app.api.des.auth import manager
 from app.core.config import settings
+from app.core.exceptions import GitHubAuthError
+from app.core.logger import logger
 from app.core.security import (
     generate_passkey_authentication_options,
     generate_passkey_registration_options,
@@ -559,3 +562,108 @@ class UserService:
 
         await self.record_login(user, request)
         return user
+
+    async def exchange_github_code(self, code: str, code_verifier: str) -> str:
+        """Exchange GitHub OAuth code for an access token.
+
+        Raises GitHubAuthError on any failure (timeout, HTTP error, network error).
+        """
+        try:
+            async with httpx.AsyncClient() as client:
+                token_resp = await client.post(
+                    "https://github.com/login/oauth/access_token",
+                    json={
+                        "client_id": settings.GITHUB_CLIENT_ID,
+                        "client_secret": settings.GITHUB_CLIENT_SECRET,
+                        "code": code,
+                        "redirect_uri": settings.GITHUB_REDIRECT_URI,
+                        "code_verifier": code_verifier,
+                    },
+                    headers={"Accept": "application/json"},
+                    timeout=httpx.Timeout(
+                        connect=10.0, read=30.0, write=10.0, pool=5.0
+                    ),
+                    follow_redirects=True,
+                )
+                token_resp.raise_for_status()
+                token_data = token_resp.json()
+        except (
+            httpx.ReadTimeout,
+            httpx.ConnectTimeout,
+            httpx.PoolTimeout,
+        ) as e:
+            raise GitHubAuthError("github_timeout") from e
+        except httpx.HTTPStatusError as e:
+            logger.error(f"GitHub token exchange failed: {e.response.text}")
+            raise GitHubAuthError("github_auth_failed") from e
+        except httpx.NetworkError as e:
+            logger.error(f"GitHub network error: {e!s}")
+            raise GitHubAuthError("github_network_error") from e
+        except ValueError as e:
+            logger.error(f"GitHub token JSON parse failed: {e!s}")
+            raise GitHubAuthError("github_invalid_response") from e
+
+        if "error" in token_data:
+            error_msg = token_data.get(
+                "error_description", "github_auth_failed"
+            )
+            raise GitHubAuthError(error_msg)
+
+        return token_data["access_token"]
+
+    async def fetch_github_user_info(self, access_token: str) -> dict:
+        """Fetch GitHub user profile with the given access token.
+
+        Raises GitHubAuthError on any failure.
+        """
+        try:
+            async with httpx.AsyncClient() as client:
+                user_resp = await client.get(
+                    "https://api.github.com/user",
+                    headers={"Authorization": f"Bearer {access_token}"},
+                    timeout=httpx.Timeout(
+                        connect=10.0, read=30.0, write=10.0, pool=5.0
+                    ),
+                    follow_redirects=True,
+                )
+                user_resp.raise_for_status()
+                return user_resp.json()
+        except (
+            httpx.ReadTimeout,
+            httpx.ConnectTimeout,
+            httpx.PoolTimeout,
+        ) as e:
+            raise GitHubAuthError("github_timeout") from e
+        except httpx.HTTPStatusError as e:
+            logger.error(f"GitHub user info failed: {e.response.text}")
+            raise GitHubAuthError("github_user_info_failed") from e
+        except httpx.NetworkError as e:
+            logger.error(f"GitHub network error: {e!s}")
+            raise GitHubAuthError("github_network_error") from e
+        except ValueError as e:
+            logger.error(f"GitHub user info JSON parse failed: {e!s}")
+            raise GitHubAuthError("github_invalid_response") from e
+
+    def build_login_data(self, user: User, refresh_token: str) -> dict:
+        """Assemble the login response data dict (user info + refresh token)."""
+        data = self.user_to_dict(user, user.profile)
+        data["refresh_token"] = refresh_token
+        return data
+
+    async def refresh_user_token(
+        self, token: str
+    ) -> tuple[User, dict[str, str]] | None:
+        """Validate a refresh token and issue a new token pair.
+
+        Returns (user, tokens_dict) on success, None if the token is invalid
+        or expired. Follows the same None-on-failure convention as
+        authenticate_user().
+        """
+        try:
+            user = await manager.get_current_user(token)
+        except Exception:
+            return None
+        if user is None:
+            return None
+        tokens = self.create_tokens(user)
+        return user, tokens

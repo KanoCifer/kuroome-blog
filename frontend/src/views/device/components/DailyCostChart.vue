@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Device } from "@/services/deviceService";
+import type { Device } from "@/service/deviceService";
 import dayjs from "dayjs";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import VChart from "vue-echarts";

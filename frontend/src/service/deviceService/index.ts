@@ -1,6 +1,5 @@
 import { deviceGateway } from "@/api/deviceGateway";
 import type { Device, DeviceInput } from "@/api/deviceGateway";
-import { useNotificationStore } from "@/stores/notification";
 
 export type { Device, DeviceInput };
 

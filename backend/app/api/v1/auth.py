@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from datetime import timedelta
 from typing import Annotated
 
-import httpx
 from email_validator import EmailNotValidError, ValidatedEmail, validate_email
 from fastapi import (
     APIRouter,
@@ -24,6 +22,7 @@ from app.api.des.des import user_service_dep
 from app.api.des.limiter import limiter
 from app.api.des.redis import AsyncRedis, get_redis
 from app.core.config import settings
+from app.core.exceptions import GitHubAuthError
 from app.core.logger import logger
 from app.models.models import User
 from app.schemas.auth import (
@@ -48,32 +47,22 @@ router = APIRouter(
 
 
 def _build_login_response(
-    user: User,
-    profile,
-    tokens: dict[str, str],
+    data: dict,
+    access_token: str,
+    refresh_token: str,
     message: str = "登录成功",
 ) -> JSONResponse:
-    response: JSONResponse = APIResponse.ok(
-        data={
-            "id": user.id,
-            "username": user.username,
-            "is_admin": user.is_admin,
-            "name": user.name,
-            "email": profile.email if profile else None,
-            "gender": profile.gender if profile else None,
-            "mobile": profile.mobile if profile else None,
-            "photo": profile.photo if profile else None,
-            "refresh_token": tokens["refresh_token"],
-            "has_passkey": bool(user.passkey_credential),
-            "github_bound": bool(user.github_id),
-        },
-        message=message,
-    )
+    """Build a login JSONResponse with auth cookies set.
+
+    data is assembled by UserService.build_login_data() — this function
+    only handles HTTP presentation concerns (cookies, response envelope).
+    """
+    response: JSONResponse = APIResponse.ok(data=data, message=message)
     cookie_domain = settings.COOKIE_DOMAIN
-    manager.set_cookie(response=response, token=tokens["access_token"])
+    manager.set_cookie(response=response, token=access_token)
     response.set_cookie(
         key="refresh_token",
-        value=tokens["refresh_token"],
+        value=refresh_token,
         httponly=True,
         samesite="lax",
         secure=True,
@@ -100,6 +89,7 @@ async def csrf_token(response: Response) -> JSONResponse:
 async def refresh_token(
     request: Request,
     refresh_token: str = Cookie(None),
+    user_service: UserService = Depends(user_service_dep),
 ) -> JSONResponse:
     """使用刷新令牌获取新的访问令牌。刷新令牌可以来自 Cookie 或请求头。
 
@@ -113,45 +103,31 @@ async def refresh_token(
             code=status.HTTP_401_UNAUTHORIZED,
         )
 
-    try:
-        user = await manager.get_current_user(token)
-        if user is None:
-            return APIResponse.error(
-                message="用户不存在",
-                code=status.HTTP_401_UNAUTHORIZED,
-            )
-
-        access_token = manager.create_access_token(
-            data={"sub": str(user.id)}, expires=timedelta(hours=12)
-        )
-        new_refresh_token = manager.create_access_token(
-            data={"sub": str(user.id)}, expires=timedelta(days=30)
-        )
-
-        response: JSONResponse = APIResponse.ok(
-            message="访问令牌已刷新",
-            code=status.HTTP_200_OK,
-            data={"refresh_token": new_refresh_token},
-        )
-        cookie_domain = settings.COOKIE_DOMAIN
-        manager.set_cookie(response=response, token=access_token)
-        response.set_cookie(
-            key="refresh_token",
-            value=new_refresh_token,
-            httponly=True,
-            samesite="lax",
-            secure=True,
-            domain=cookie_domain or None,
-        )
-        csrf_manager.set_csrf_cookie(response)
-
-        return response
-    except Exception as e:
-        logger.error(f"刷新令牌验证失败: {e!s}")
+    result = await user_service.refresh_user_token(token)
+    if result is None:
         return APIResponse.error(
             message="无效的刷新令牌或已过期",
             code=status.HTTP_401_UNAUTHORIZED,
         )
+    _, tokens = result
+
+    response: JSONResponse = APIResponse.ok(
+        message="访问令牌已刷新",
+        code=status.HTTP_200_OK,
+        data={"refresh_token": tokens["refresh_token"]},
+    )
+    cookie_domain = settings.COOKIE_DOMAIN
+    manager.set_cookie(response=response, token=tokens["access_token"])
+    response.set_cookie(
+        key="refresh_token",
+        value=tokens["refresh_token"],
+        httponly=True,
+        samesite="lax",
+        secure=True,
+        domain=cookie_domain or None,
+    )
+    csrf_manager.set_csrf_cookie(response)
+    return response
 
 
 @router.post("/login", response_model=APIResponse)
@@ -179,7 +155,10 @@ async def login(
 
     await user_service.record_login(user, request)
     tokens = user_service.create_tokens(user, remember_me=data.remember_me)
-    return _build_login_response(user, user.profile, tokens)
+    login_data = user_service.build_login_data(user, tokens["refresh_token"])
+    return _build_login_response(
+        login_data, tokens["access_token"], tokens["refresh_token"]
+    )
 
 
 @router.post("/logout", response_model=APIResponse)
@@ -417,8 +396,12 @@ async def passkey_authenticate(
             message=error or "认证失败", code=status.HTTP_400_BAD_REQUEST
         )
 
+    login_data = user_service.build_login_data(user, tokens["refresh_token"])
     return _build_login_response(
-        user, user.profile, tokens, message="Passkey 登录成功"
+        login_data,
+        tokens["access_token"],
+        tokens["refresh_token"],
+        message="Passkey 登录成功",
     )
 
 
@@ -489,85 +472,15 @@ async def github_callback(
             url=settings.FRONTEND_URL + "/login?error=missing_pkce_info"
         )
 
-    # Exchange access_token
+    # Exchange code for access token
     try:
-        async with httpx.AsyncClient() as client:
-            token_resp = await client.post(
-                "https://github.com/login/oauth/access_token",
-                json={
-                    "client_id": settings.GITHUB_CLIENT_ID,
-                    "client_secret": settings.GITHUB_CLIENT_SECRET,
-                    "code": code,
-                    "redirect_uri": settings.GITHUB_REDIRECT_URI,
-                    "code_verifier": code_verifier,
-                },
-                headers={"Accept": "application/json"},
-                timeout=httpx.Timeout(
-                    connect=10.0, read=30.0, write=10.0, pool=5.0
-                ),
-                follow_redirects=True,
-            )
-            token_resp.raise_for_status()
-            token_data = token_resp.json()
-    except httpx.ReadTimeout, httpx.ConnectTimeout, httpx.PoolTimeout:
-        return RedirectResponse(
-            url=f"{settings.FRONTEND_URL}/login?error=github_timeout"
+        access_token = await user_service.exchange_github_code(
+            code, code_verifier
         )
-    except httpx.HTTPStatusError as e:
-        logger.error(f"GitHub token exchange failed: {e.response.text}")
+        github_user = await user_service.fetch_github_user_info(access_token)
+    except GitHubAuthError as e:
         return RedirectResponse(
-            url=f"{settings.FRONTEND_URL}/login?error=github_auth_failed"
-        )
-    except httpx.NetworkError as e:
-        logger.error(f"GitHub network error: {e!s}")
-        return RedirectResponse(
-            url=f"{settings.FRONTEND_URL}/login?error=github_network_error"
-        )
-    except ValueError as e:
-        logger.error(f"GitHub token JSON parse failed: {e!s}")
-        return RedirectResponse(
-            url=f"{settings.FRONTEND_URL}/login?error=github_invalid_response"
-        )
-
-    if "error" in token_data:
-        error_msg = token_data.get("error_description", "github_auth_failed")
-        return RedirectResponse(
-            url=f"{settings.FRONTEND_URL}/login?error={error_msg}"
-        )
-
-    access_token = token_data["access_token"]
-
-    # Get user info
-    try:
-        async with httpx.AsyncClient() as client:
-            user_resp = await client.get(
-                "https://api.github.com/user",
-                headers={"Authorization": f"Bearer {access_token}"},
-                timeout=httpx.Timeout(
-                    connect=10.0, read=30.0, write=10.0, pool=5.0
-                ),
-                follow_redirects=True,
-            )
-            user_resp.raise_for_status()
-            github_user = user_resp.json()
-    except httpx.ReadTimeout, httpx.ConnectTimeout, httpx.PoolTimeout:
-        return RedirectResponse(
-            url=f"{settings.FRONTEND_URL}/login?error=github_timeout"
-        )
-    except httpx.HTTPStatusError as e:
-        logger.error(f"GitHub user info failed: {e.response.text}")
-        return RedirectResponse(
-            url=f"{settings.FRONTEND_URL}/login?error=github_user_info_failed"
-        )
-    except httpx.NetworkError as e:
-        logger.error(f"GitHub network error: {e!s}")
-        return RedirectResponse(
-            url=f"{settings.FRONTEND_URL}/login?error=github_network_error"
-        )
-    except ValueError as e:
-        logger.error(f"GitHub user info JSON parse failed: {e!s}")
-        return RedirectResponse(
-            url=f"{settings.FRONTEND_URL}/login?error=github_invalid_response"
+            url=f"{settings.FRONTEND_URL}/login?error={e.error_code}"
         )
 
     github_id = github_user["id"]

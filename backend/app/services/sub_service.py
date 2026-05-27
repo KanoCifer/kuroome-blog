@@ -1,3 +1,5 @@
+from datetime import UTC, datetime
+
 from app.models.models import Subscription
 from app.repositories.sub_repo import SubRepo
 from app.services.base import BaseService
@@ -41,7 +43,14 @@ class SubService(BaseService):
         return await self.sub_repo.update_reminder_config(sub_id, config_data)
 
     async def get_due_subscriptions(self):
-        return await self.sub_repo.get_due_subscriptions()
+        """Return active subscriptions past their billing date.
+
+        The "due" rule — active AND next_billing_date <= now — lives here
+        in the service layer, not in the repo.
+        """
+        active_subs = await self.sub_repo.get_active_subscriptions()
+        now = datetime.now(UTC)
+        return [s for s in active_subs if s.next_billing_date <= now]
 
     async def get_user_global_reminder_config(self, user_id: int):
         return await self.sub_repo.get_global_notification_config(user_id)

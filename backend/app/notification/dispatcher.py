@@ -1,4 +1,3 @@
-from app.core.logger import logger
 from app.notification.bark_channel import BarkNotificationChannel
 from app.notification.email_channel import EmailNotificationChannel
 from app.notification.feishu_channel import FeishuNotificationChannel
@@ -78,16 +77,7 @@ class NotificationDispatcher:
             if not await channel.validate_config():
                 results[channel_name] = False
                 continue
-            # 尝试调用 send_device_reminder 方法
-            send_method = getattr(channel, "send_device_reminder", None)
-            if send_method:
-                results[channel_name] = await send_method(
-                    user_id=user_id, payload=payload, config=reminder_config
-                )
-            else:
-                results[channel_name] = False
-                logger.warning(
-                    f"[Dispatcher] Channel {channel_name} does not support "
-                    f"device reminders"
-                )
+            results[channel_name] = await channel.send_device_reminder(
+                user_id=user_id, payload=payload, config=reminder_config
+            )
         return results

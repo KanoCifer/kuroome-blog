@@ -2,7 +2,7 @@
 import { BasicFooter } from "@/components/basic";
 import { BentoNavCard } from "@/components/bento";
 import BackToTop from "@/components/layout/BackToTop.vue";
-import TodoMoal from "@/layouts/components/TodoMoal.vue";
+import TodoModal from "@/layouts/components/TodoModal.vue";
 import CookieConsent from "@/components/layout/CookieConsent.vue";
 import ToastContainer from "@/components/layout/ToastContainer.vue";
 import BasicNav from "@/components/nav/BasicNav.vue";
@@ -195,7 +195,7 @@ watch(
     <BackToTop />
 
     <!-- Todo Drawer: global floating button + right slide-in drawer -->
-    <TodoMoal />
+    <TodoModal />
 
     <!-- Navigation: cross-route layoutId morph -->
     <AnimatePresence mode="sync">

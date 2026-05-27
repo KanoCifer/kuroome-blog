@@ -165,9 +165,9 @@
 </template>
 
 <script setup lang="ts">
-import { deviceService } from "@/services/deviceService";
+import { deviceService } from "@/service/deviceService";
 import { useNotificationStore } from "@/stores/notification";
-import type { DeviceInput } from "@/services/deviceService";
+import type { DeviceInput } from "@/service/deviceService";
 import { reactive, ref, watch } from "vue";
 import dayjs from "dayjs";
 

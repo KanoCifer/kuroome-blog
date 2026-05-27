@@ -184,10 +184,20 @@ Sitemap: {sitemap_url}
     ):
         """根据天气数据进行分析并生成报告"""
         from app.core.weather_analyzer import weather_analyzer
+        from app.services.fishing_index import parse_tide_info
+
+        async def _on_index_calculated(data: dict, ai_score: int) -> None:
+            """训练回调：AI 分析完成后保存反馈并触发自动训练"""
+            from app.core.container import get_fishing_service
+
+            async with get_fishing_service() as svc:
+                await svc.save_ai_analysis_feedback(data, ai_score, parse_tide_info)
 
         try:
             async for chunk in weather_analyzer.analyze_weather_stream(
-                weather_data=weather_data, model_id=model_id
+                weather_data=weather_data,
+                model_id=model_id,
+                on_index_calculated=_on_index_calculated,
             ):
                 yield self._to_sse_event(chunk, False)
             yield self._to_sse_event("", True)

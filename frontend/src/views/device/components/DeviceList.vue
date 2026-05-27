@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import DeviceCard from "./DeviceCard.vue";
-import type { Device } from "@/services/deviceService";
+import type { Device } from "@/service/deviceService";
 
 interface Props {
   devices: Device[];

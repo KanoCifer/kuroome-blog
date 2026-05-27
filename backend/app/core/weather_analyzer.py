@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Callable
 from typing import Literal
 
 from agno.agent import Agent, RunOutputEvent
@@ -11,10 +11,8 @@ from agno.db.redis import RedisDb
 from pydantic import BaseModel, Field
 
 from app.core.config import settings
-from app.core.container import get_fishing_service
 from app.core.logger import logger
 from app.schemas.aiagent import WeatherAnalysisInput
-from app.services.fishing_service import fishing_service
 
 
 class FishingContextInput(BaseModel):
@@ -119,7 +117,7 @@ class WeatherAnalyzer:
     }
     DEFAULT_MODEL = "Ling-2.6-1T"
 
-    _SYSTEM_PROMPT = """
+    _PROMPT_TEMPLATE = """
         你是一名专业的垂钓气象与潮汐分析师，擅长综合天气和潮汐数据判断钓鱼条件。
         ## 分析维度
         依次评估以下因素对钓鱼的影响：
@@ -154,9 +152,7 @@ class WeatherAnalyzer:
 
         ## 评分规则
         - 先按专家权重计算基准分（归一化权重，总和=1）：
-          w1_temp=4/23, w2_humidity=2/23, w3_pressure=2/23, w4_wind=2/23,
-          w5_rain=1/23, w6_tide_rising=4/23, w7_hours_to_tide=4/23,
-          w8_tide_range=2/23, w9_indices=2/23
+          {weights_line}
         - Expert_score = Σ(weight_i * feature_score_i) * 100，feature_score_i 范围 [0,1]，但 pressure 特征可达 [0,2]
         - 再给出 AI 自主修正分（-20~20），并说明修正依据（短时天气波动、天气现象、潮汐时序）
         - 最终钓鱼指数 = clip(专家基准分 + AI 自主修正分, 0, 100)
@@ -171,9 +167,45 @@ class WeatherAnalyzer:
     """
     DB = RedisDb(db_url=settings.REDIS_URL)
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        expert_weights: dict[str, float] | None = None,
+        parse_tide_info_fn: Callable | None = None,
+    ) -> None:
         from agno.models.openai.like import OpenAILike
         from agno.tools.websearch import WebSearchTools
+
+        self._parse_tide_info = parse_tide_info_fn
+
+        # 权重名称映射，与 FishingExpertScorer.WEIGHTS 对齐
+        weight_names = {
+            "w1": "w1_temp",
+            "w2": "w2_humidity",
+            "w3": "w3_pressure",
+            "w4": "w4_wind",
+            "w5": "w5_rain",
+            "w6": "w6_tide_rising",
+            "w7": "w7_hours_to_tide",
+            "w8": "w8_tide_range",
+            "w9": "w9_indices",
+        }
+        weights = expert_weights or {
+            "w1": 4 / 23,
+            "w2": 2 / 23,
+            "w3": 2 / 23,
+            "w4": 2 / 23,
+            "w5": 1 / 23,
+            "w6": 4 / 23,
+            "w7": 4 / 23,
+            "w8": 2 / 23,
+            "w9": 2 / 23,
+        }
+        weights_line = ", ".join(
+            f"{weight_names.get(k, k)}={v:.4f}" for k, v in weights.items()
+        )
+        self._system_prompt = self._PROMPT_TEMPLATE.format(
+            weights_line=weights_line
+        )
 
         self._model = OpenAILike(
             id="Ling-2.6-1T",
@@ -185,7 +217,7 @@ class WeatherAnalyzer:
 
         self._agent = Agent(
             model=self._model,
-            instructions=self._SYSTEM_PROMPT,
+            instructions=self._system_prompt,
             db=WeatherAnalyzer.DB,
             tools=[WebSearchTools(backend="bing")],
             add_history_to_context=True,
@@ -271,9 +303,18 @@ class WeatherAnalyzer:
         )
 
     async def analyze_weather_stream(
-        self, weather_data: WeatherAnalysisInput, model_id: str | None = None
+        self,
+        weather_data: WeatherAnalysisInput,
+        model_id: str | None = None,
+        on_index_calculated: Callable | None = None,
     ) -> AsyncIterator[str]:
-        """流式分析天气数据，返回结构化 JSON 字符串片段"""
+        """流式分析天气数据，返回结构化 JSON 字符串片段
+
+        Args:
+            on_index_calculated: 可选回调（sync 或 async），当提取到 AI 评分时调用。
+                由调用方决定是否触发训练等副作用。
+                签名: (weather_data_dict: dict, ai_score: int) -> None
+        """
         if not settings.API_KEY:
             logger.error("AI 服务未配置 API_KEY")
             raise RuntimeError("AI 服务未配置 API_KEY")
@@ -309,7 +350,7 @@ class WeatherAnalyzer:
 
         dynamic_agent = Agent(
             model=dynamic_model,
-            instructions=self._SYSTEM_PROMPT,
+            instructions=self._system_prompt,
             db=WeatherAnalyzer.DB,
             tools=[WebSearchTools(backend="bing")],
             input_schema=WeatherAnalysisInputSchema,
@@ -344,84 +385,27 @@ class WeatherAnalyzer:
         except Exception:
             logger.exception("提取钓鱼指数失败")
 
-        # 提取后用 weather_data 和指数训练模型
-        if index is not None:
+        # 通过回调通知调用方，由调用方决定训练等副作用
+        if index is not None and on_index_calculated is not None:
             try:
                 import asyncio
 
-                # 在 analyze_weather_stream 末尾
-                asyncio.create_task(self._train_model(weather_data, index))  # noqa: RUF006
-
+                result = on_index_calculated(weather_data.weather_data, index)
+                if asyncio.iscoroutine(result):
+                    await result
             except Exception:
-                logger.exception("模型训练失败")
-
-    async def _train_model(
-        self, weather_data: WeatherAnalysisInput, ai_score: int
-    ) -> None:
-        """用 AI 评分和天气数据训练钓鱼模型（保存为 feedback_score）"""
-        data = weather_data.weather_data
-
-        now = data.get("liveWeather") or {}
-        tide = data.get("tideData") or {}
-        fishing_index = data.get("fishingIndex") or {}
-
-        expert_score = (
-            fishing_index.get("expert_score") if fishing_index else None
-        )
-
-        # 构建天气特征
-        temperature = float(now.get("temp") or 20.0)
-        humidity = float(now.get("humidity") or 50.0)
-        pressure = float(now.get("pressure") or 1000.0)
-        wind_speed = float(now.get("windSpeed") or 0.0)
-        precipitation = float(now.get("precip") or 0.0)
-
-        # 钓鱼相关指数
-        indices_raw = data.get("weatherIndices")
-        level = 2
-        if (
-            indices_raw
-            and isinstance(indices_raw, list)
-            and len(indices_raw) > 0
-        ):
-            level = int(indices_raw[0].get("level", 2))
-
-        # 解析潮汐
-        tide_info = fishing_service.parse_tide_info(tide)
-        tide_type_str: Literal["涨潮", "退潮"] = (
-            "涨潮" if tide_info.tide_type == "涨潮" else "退潮"
-        )
-
-        # 必填字段：location, fishing_time, feedback
-        location_name = (
-            data.get("locationName") or data.get("tideSpotName") or "未知"
-        )
-        now_iso = now.get("obsTime") if now else None
-
-        doc_data = {
-            "location_id": location_name,
-            "location_name": location_name,
-            "fishing_time": now_iso,
-            "temperature": temperature,
-            "humidity": humidity,
-            "pressure": pressure,
-            "wind_speed": wind_speed,
-            "precipitation": precipitation,
-            "indices": level,
-            "tide_level": tide_info.tide_level,
-            "tide_type": tide_type_str,
-            "tide_range": tide_info.tide_range,
-            "hours_to_next_tide": tide_info.hours_to_next_tide,
-            "expert_score": expert_score or 0.0,
-            "feedback_score": ai_score,
-            "feedback": "好" if ai_score >= 70 else "一般",
-            "source": "ai",
-        }
-
-        async with get_fishing_service() as svc:
-            await svc.save_feedback(doc_data)
-            logger.info(f"[天气分析] AI 评分 {ai_score} 已保存，开始自动训练")
-            await svc.auto_train_if_needed(source="all")
+                logger.exception("on_index_calculated 回调失败")
 
 
-weather_analyzer = WeatherAnalyzer()
+def _create_weather_analyzer() -> WeatherAnalyzer:
+    """创建全局 WeatherAnalyzer 实例，从 FishingExpertScorer 注入权重"""
+    from app.services.fishing_expert import FishingExpertScorer
+    from app.services.fishing_index import parse_tide_info
+
+    return WeatherAnalyzer(
+        expert_weights=FishingExpertScorer.WEIGHTS,
+        parse_tide_info_fn=parse_tide_info,
+    )
+
+
+weather_analyzer = _create_weather_analyzer()

@@ -190,8 +190,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Device, DeviceInput } from "@/services/deviceService";
-import { deviceService } from "@/services/deviceService";
+import type { Device, DeviceInput } from "@/service/deviceService";
+import { deviceService } from "@/service/deviceService";
 import { useNotificationStore } from "@/stores/notification";
 import { ref } from "vue";
 
