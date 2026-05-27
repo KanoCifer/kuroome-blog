@@ -1,7 +1,7 @@
 import { ArticleSummaryCard } from '@/components/basic/ArticleSummary';
 import type { BlogDetail } from '@/services/blogService';
 import { blogService } from '@/services/blogService';
-import type { Comment } from '@/types';
+import { TwikooComments } from '@/components/blog/TwikooComments';
 import { formatDate } from '@/utils/formatdate';
 import DOMPurify from 'dompurify';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -13,118 +13,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 function sanitizeHtml(html: string): string {
   if (!html) return '';
   return DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
-}
-
-function CommentItem({
-  comment,
-  depth = 0,
-  onReply,
-}: {
-  comment: Comment;
-  depth?: number;
-  onReply: (comment: Comment) => void;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={`${depth > 0 ? 'border-border ml-4 border-l-2 pl-4' : ''}`}
-    >
-      <div className="py-3">
-        <div className="flex items-center gap-2">
-          <div className="from-primary to-primary/80 text-primary-foreground flex h-8 w-8 items-center justify-center rounded-full bg-linear-to-br text-sm font-bold">
-            {comment.author?.[0]?.toUpperCase() || 'A'}
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <span className="text-foreground font-medium">
-                {comment.author}
-              </span>
-              {comment.from_admin && (
-                <span className="bg-primary/15 text-primary rounded-full px-2 py-0.5 text-xs font-medium">
-                  博主
-                </span>
-              )}
-              <span className="text-muted-foreground text-xs">
-                {formatDate(comment.created_at)}
-              </span>
-            </div>
-          </div>
-          <button
-            onClick={() => onReply(comment)}
-            className="text-muted-foreground hover:bg-accent rounded-lg px-2 py-1 text-xs"
-          >
-            回复
-          </button>
-        </div>
-        <p className="text-foreground mt-2 text-sm leading-relaxed">
-          {comment.body}
-        </p>
-        {comment.comments && comment.comments.length > 0 && (
-          <div className="mt-2">
-            {comment.comments.map((reply: Comment) => (
-              <CommentItem
-                key={reply._id}
-                comment={reply}
-                depth={depth + 1}
-                onReply={onReply}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    </motion.div>
-  );
-}
-
-function CommentForm({
-  onSubmit,
-  onCancel,
-  isSubmitting,
-  placeholder = '写下你的评论...',
-  initialValue = '',
-}: {
-  onSubmit: (body: string) => void;
-  onCancel?: () => void;
-  isSubmitting?: boolean;
-  placeholder?: string;
-  initialValue?: string;
-}) {
-  const [body, setBody] = useState(initialValue);
-
-  return (
-    <div className="border-border bg-card rounded-2xl border p-4">
-      <textarea
-        value={body}
-        onChange={(e) => setBody(e.target.value)}
-        placeholder={placeholder}
-        rows={3}
-        className="border-border bg-muted text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 w-full resize-none rounded-xl border p-3 text-sm focus:ring-2 focus:outline-none"
-      />
-      <div className="mt-3 flex justify-end gap-2">
-        {onCancel && (
-          <button
-            onClick={onCancel}
-            className="text-foreground hover:bg-accent rounded-lg px-4 py-2 text-sm font-medium"
-          >
-            取消
-          </button>
-        )}
-        <button
-          onClick={() => {
-            if (body.trim()) {
-              onSubmit(body);
-              setBody('');
-            }
-          }}
-          disabled={!body.trim() || isSubmitting}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 text-sm font-medium transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {isSubmitting ? '发布中...' : '发布评论'}
-        </button>
-      </div>
-    </div>
-  );
 }
 
 function LoadingSkeleton() {
@@ -185,9 +73,6 @@ export default function BlogPostView() {
   const [post, setPost] = useState<BlogDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [replyTo, setReplyTo] = useState<Comment | null>(null);
-
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Highlight code blocks after content renders
@@ -217,48 +102,6 @@ export default function BlogPostView() {
   useEffect(() => {
     fetchPost();
   }, [fetchPost]);
-
-  const handleSubmitComment = async (body: string) => {
-    if (!postId || !body.trim()) return;
-
-    setIsSubmitting(true);
-
-    try {
-      const service = blogService();
-      await service.postComment({
-        post_id: postId,
-        body: body.trim(),
-        author: '匿名用户',
-        reply_to: replyTo?._id,
-        reply_to_author: replyTo?.author,
-      });
-      setReplyTo(null);
-      await fetchPost();
-    } catch (err) {
-      alert(err instanceof Error ? err.message : '评论失败');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleReply = (comment: Comment) => {
-    setReplyTo(comment);
-    contentRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const flatComments = (comments: Comment[]): Comment[] => {
-    const flat: Comment[] = [];
-    const flatten = (list: Comment[]) => {
-      list.forEach((c) => {
-        flat.push(c);
-        if (c.comments && c.comments.length > 0) {
-          flatten(c.comments);
-        }
-      });
-    };
-    flatten(comments);
-    return flat;
-  };
 
   return (
     <div className="bg-background min-h-dvh">
@@ -377,54 +220,7 @@ export default function BlogPostView() {
             </div>
 
             {/* Comments Section */}
-            <div className="bg-card mx-4 mt-8 rounded-2xl p-4">
-              <h2 className="text-foreground text-lg font-semibold">
-                评论 ({flatComments(post.comments || []).length})
-              </h2>
-
-              {/* Comment Form */}
-              <div className="mt-4">
-                {replyTo ? (
-                  <div className="text-muted-foreground mb-3 flex items-center gap-2 text-sm">
-                    <span>回复 @</span>
-                    <span className="text-foreground font-medium">
-                      {replyTo.author}
-                    </span>
-                    <button
-                      onClick={() => setReplyTo(null)}
-                      className="hover:bg-accent ml-auto rounded-lg px-2 py-1"
-                    >
-                      取消
-                    </button>
-                  </div>
-                ) : null}
-                <CommentForm
-                  onSubmit={handleSubmitComment}
-                  onCancel={replyTo ? () => setReplyTo(null) : undefined}
-                  isSubmitting={isSubmitting}
-                  placeholder={
-                    replyTo ? `回复 @${replyTo.author}...` : '写下你的评论...'
-                  }
-                />
-              </div>
-
-              {/* Comments List */}
-              {post.comments && post.comments.length > 0 ? (
-                <div className="divide-border mt-4 divide-y">
-                  {post.comments.map((comment) => (
-                    <CommentItem
-                      key={comment._id}
-                      comment={comment}
-                      onReply={handleReply}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-muted-foreground mt-6 text-center text-sm">
-                  暂无评论，来发表第一条评论吧
-                </div>
-              )}
-            </div>
+            <TwikooComments path={postId} />
           </motion.article>
         ) : null}
       </AnimatePresence>

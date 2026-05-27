@@ -1,7 +1,7 @@
 import { blogGateway } from '@/api/blogGateway';
 import { extractData } from '@/api/request';
 import type { ApiResponse } from '@/api/request';
-import type { BlogPost, Category, BlogPagination, Comment } from '@/types';
+import type { BlogPost, Category, BlogPagination, Comment } from '@/types'; // Comment used by countComments
 
 // 博客列表项（处理后的）
 export interface BlogListItem {
@@ -45,13 +45,6 @@ export interface CategoryItem {
 export interface BlogService {
   getBlogs(query?: { page?: number; search?: string }): Promise<BlogList>;
   getBlogPost(postId: string): Promise<BlogDetail>;
-  postComment(payload: {
-    post_id: string;
-    body: string;
-    author: string;
-    reply_to?: string;
-    reply_to_author?: string;
-  }): Promise<string>;
   getCategories(): Promise<CategoryItem[]>;
   getPostsByCategory(
     categoryId: number,
@@ -123,15 +116,6 @@ export const blogService = (): BlogService => {
       return extractData(
         res as unknown as { data: ApiResponse<unknown> },
       ) as BlogDetail;
-    },
-
-    async postComment(payload) {
-      const res = await gateway.postComment(payload);
-      return (
-        extractData(res as unknown as { data: ApiResponse<unknown> }) as {
-          _id: string;
-        }
-      )._id;
     },
 
     async getCategories() {

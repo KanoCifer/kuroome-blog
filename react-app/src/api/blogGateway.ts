@@ -27,20 +27,9 @@ interface BlogPostResponse {
   comments: Comment[];
 }
 
-interface PostCommentPayload {
-  post_id: string;
-  body: string;
-  author: string;
-  reply_to?: string;
-  reply_to_author?: string;
-}
-
 export interface blogGateway {
   getBlogs(query?: BlogQuery): Promise<AxiosResponse<BlogListResponse>>;
   getBlogPost(postId: string): Promise<AxiosResponse<BlogPostResponse>>;
-  postComment(
-    payload: PostCommentPayload,
-  ): Promise<AxiosResponse<{ _id: string }>>;
   getCategories(): Promise<AxiosResponse<Category[]>>;
   getPostsByCategory(
     categoryId: number,
@@ -76,12 +65,6 @@ export const blogGateway = (): blogGateway => {
     async getBlogPost(postId: string) {
       return request.get(`v1/blogs/${postId}`) as Promise<
         AxiosResponse<BlogPostResponse>
-      >;
-    },
-
-    async postComment(payload: PostCommentPayload) {
-      return request.post('v1/blogs/comments', payload) as Promise<
-        AxiosResponse<{ _id: string }>
       >;
     },
 
