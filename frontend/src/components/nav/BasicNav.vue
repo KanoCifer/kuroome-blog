@@ -1,9 +1,13 @@
 <template>
   <motion.div>
     <nav
-      class="squircle bg-card/80 dark:bg-card/80 z-9999 flex items-center gap-2 px-1 py-2 shadow-lg backdrop-blur-sm"
+      class="squircle bg-card/80 dark:bg-card/80 z-9999 flex items-center gap-2 px-1 py-2 shadow-lg backdrop-blur-sm transition-all duration-300 ease-out"
+      :class="isCompact ? '' : 'w-full'"
     >
-      <ul class="flex items-center gap-2 font-medium">
+      <ul
+        class="flex items-center gap-2 font-medium transition-all duration-300 ease-out"
+        :class="isCompact ? '' : 'mx-auto'"
+      >
         <!-- Avatar -->
         <li class="ml-2 shrink-0">
           <RouterLink to="/">
@@ -66,10 +70,11 @@ import { useRoute } from "vue-router";
 const auth = useAuthStore();
 const route = useRoute();
 
-defineProps<{
+const props = defineProps<{
   isHeaderVisible?: boolean;
   isEntryView?: boolean;
   isVisible?: boolean;
+  isCompact?: boolean;
 }>();
 
 // Navigation items config

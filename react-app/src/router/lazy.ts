@@ -16,7 +16,6 @@ export const BlogPost = lazy(() => import('../views/Blog/BlogPostView'));
 export const RssWorkspace = lazy(() => import('../views/Rss/RssWorkspaceView'));
 export const RssArticle = lazy(() => import('../views/Rss/RssArticleView'));
 export const TodoList = lazy(() => import('../views/Todo/TodoListView'));
-export const BlogEdit = lazy(() => import('../views/Blog/BlogEditView'));
 export const ReadingList = lazy(
   () => import('../views/ReadingList/ReadingListView'),
 );
@@ -35,4 +34,7 @@ export const PrivacyPolicy = lazy(
 );
 export const DeviceTracker = lazy(
   () => import('../views/device/DeviceTracker'),
+);
+export const FriendLinks = lazy(
+  () => import('../views/pages/FriendLinksView'),
 );

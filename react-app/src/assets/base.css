@@ -596,3 +596,126 @@ ul[data-type='taskList'] ul[data-type='taskList'] {
     font-size: 16px;
   }
 }
+
+/* Article content typography — aligned with Vue BlogPostView */
+.article-content {
+  line-height: 2;
+  font-weight: 500;
+  font-family: 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.article-content h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.article-content h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.article-content h3 {
+  font-size: 1.375rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.article-content h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.article-content p {
+  margin-bottom: 1rem;
+}
+
+.article-content blockquote {
+  border-left: 4px solid var(--primary);
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+  border-radius: 0 0.5rem 0.5rem 0;
+  background: color-mix(in srgb, var(--primary) 5%, transparent);
+  font-style: italic;
+}
+
+.article-content code {
+  font-size: 0.875em;
+  background: color-mix(in srgb, var(--muted) 60%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.15em 0.35em;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.article-content pre {
+  width: 80%;
+  white-space: pre-wrap;
+}
+
+.article-content table {
+  width: 100%;
+  border-collapse: separate;
+  margin: 1rem 0;
+  overflow-x: auto;
+  display: block;
+}
+
+.article-content table th,
+.article-content table td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.article-content table th {
+  background: var(--muted);
+  font-weight: 600;
+}
+
+.article-content table tr:hover td {
+  background: color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+.article-content img {
+  display: block;
+  margin: 1rem auto;
+  border-radius: 0.75rem;
+  max-width: 100%;
+  height: auto;
+}
+
+.article-content a {
+  color: var(--primary);
+  text-decoration: underline;
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+
+.article-content a:hover {
+  opacity: 1;
+}
+
+.article-content ul,
+.article-content ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.article-content li {
+  margin-bottom: 0.25rem;
+}
+
+.article-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}

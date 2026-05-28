@@ -4,13 +4,13 @@ import { createBrowserRouter, redirect } from 'react-router-dom';
 import {
   About,
   Analytics,
-  BlogEdit,
   BlogList,
   BlogPost,
   BookShelf,
   Changelog,
   DeviceTracker,
   FishingMap,
+  FriendLinks,
   Home,
   ImageToolbox,
   ImportBook,
@@ -117,17 +117,16 @@ export const router = createBrowserRouter([
         element: <Website />,
       },
       {
+        path: '/friend-links',
+        element: <FriendLinks />,
+      },
+      {
         path: '/blog',
         element: <BlogList />,
       },
       {
         path: '/blog/:postId',
         element: <BlogPost />,
-      },
-      {
-        path: '/new',
-        element: <BlogEdit />,
-        loader: authLoader,
       },
       {
         path: '/rss',

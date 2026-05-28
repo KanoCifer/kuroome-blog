@@ -1,63 +1,63 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-@import "./themes/index.css";
-@plugin "@tailwindcss/typography";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import './themes/index.css';
+@plugin '@tailwindcss/typography';
 @custom-variant dark (&:where(.dark, .dark *));
 
 @font-face {
-  font-family: "HarmonyOS Sans";
+  font-family: 'HarmonyOS Sans';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("/fonts/HarmonyOS_Sans_Regular.ttf") format("truetype");
+  src: url('/fonts/HarmonyOS_Sans_Regular.ttf') format('truetype');
 }
 
 @font-face {
-  font-family: "HarmonyOS Sans";
+  font-family: 'HarmonyOS Sans';
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url("/fonts/HarmonyOS_Sans_Medium.ttf") format("truetype");
+  src: url('/fonts/HarmonyOS_Sans_Medium.ttf') format('truetype');
 }
 
 @font-face {
-  font-family: "HarmonyOS Sans";
+  font-family: 'HarmonyOS Sans';
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("/fonts/HarmonyOS_Sans_Bold.ttf") format("truetype");
+  src: url('/fonts/HarmonyOS_Sans_Bold.ttf') format('truetype');
 }
 
 @font-face {
-  font-family: "阿里妈妈方圆体 VF Regular";
+  font-family: '阿里妈妈方圆体 VF Regular';
   src:
-    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/JzWMyKA8U06c.woff2")
-      format("woff2"),
-    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/qFzBtDuQpN4i.woff")
-      format("woff");
+    url('//at.alicdn.com/wf/webfont/IycYNJ7qsIni/JzWMyKA8U06c.woff2')
+      format('woff2'),
+    url('//at.alicdn.com/wf/webfont/IycYNJ7qsIni/qFzBtDuQpN4i.woff')
+      format('woff');
   font-variation-settings:
-    "BEVL" 80,
-    "wght" 500;
+    'BEVL' 80,
+    'wght' 500;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Averia Gruesa Libre";
+  font-family: 'Averia Gruesa Libre';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("/fonts/AveriaGruesaLibre-Regular.ttf") format("truetype");
+  src: url('/fonts/AveriaGruesaLibre-Regular.ttf') format('truetype');
 }
 
 @font-face {
-  font-family: "阿里妈妈东方大楷 Regular";
+  font-family: '阿里妈妈东方大楷 Regular';
   font-weight: 400;
   src:
-    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/bs5CgKu7Hdck.woff2")
-      format("woff2"),
-    url("//at.alicdn.com/wf/webfont/IycYNJ7qsIni/FS1e5LRmIZGQ.woff")
-      format("woff");
+    url('//at.alicdn.com/wf/webfont/IycYNJ7qsIni/bs5CgKu7Hdck.woff2')
+      format('woff2'),
+    url('//at.alicdn.com/wf/webfont/IycYNJ7qsIni/FS1e5LRmIZGQ.woff')
+      format('woff');
   font-variation-settings: normal;
   font-display: swap;
 }
@@ -86,15 +86,15 @@ html {
 }
 @theme {
   --font-family-alibaba:
-    "阿里妈妈方圆体 VF Regular", "PingFang SC", "Microsoft YaHei", sans-serif;
+    '阿里妈妈方圆体 VF Regular', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 
   --font-family-dongfang:
-    "阿里妈妈东方大楷 Regular", "PingFang SC", "Microsoft YaHei", sans-serif;
+    '阿里妈妈东方大楷 Regular', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 
-  --font-family-averia: "Averia Gruesa Libre", system-ui;
+  --font-family-averia: 'Averia Gruesa Libre', system-ui;
 
   --font-family-harmonyos:
-    "HarmonyOS Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+    'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 
   --animate-tt-spin: tt-spin 0.8s ease-in-out forwards;
 
@@ -118,6 +118,21 @@ html {
     50% {
       transform: none;
       animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+  }
+
+  --animate-message-pop: messagePop 0.5s ease-out;
+
+  @keyframes messagePop {
+    0% {
+      opacity: 0;
+      transform: translateY(-10px) rotateX(-16deg) scale(0.92);
+      filter: blur(32px) brightness(0.1);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) rotateX(0deg) scale(1);
+      filter: blur(0px) brightness(1);
     }
   }
 }
@@ -224,12 +239,12 @@ a {
 }
 
 .prose pre::before {
-  content: "";
+  content: '';
   @apply absolute inset-x-0 top-0 mb-1 flex h-10 items-center border-b border-gray-600 bg-gray-700 py-2;
 }
 
 .prose pre::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 14px;
   left: 24px;
@@ -250,51 +265,51 @@ a {
 }
 
 /* Task list (Tailwind) */
-ul[data-type="taskList"] {
+ul[data-type='taskList'] {
   @apply ml-0 list-none p-0;
 }
 
-ul[data-type="taskList"] > li {
+ul[data-type='taskList'] > li {
   @apply flex flex-nowrap items-center gap-2 py-1;
 }
 
-ul[data-type="taskList"] > li > label {
+ul[data-type='taskList'] > li > label {
   @apply mr-0 inline-flex flex-none items-center select-none;
 }
 
-ul[data-type="taskList"] > li > label input[type="checkbox"] {
+ul[data-type='taskList'] > li > label input[type='checkbox'] {
   @apply m-0 h-4 w-4 align-middle;
 }
 
-ul[data-type="taskList"] > li > div {
+ul[data-type='taskList'] > li > div {
   @apply min-w-0 flex-1;
 }
 
-ul[data-type="taskList"] > li > div p {
+ul[data-type='taskList'] > li > div p {
   @apply m-0;
 }
 
 /* checked state -> strike-through */
-ul[data-type="taskList"] > li[data-checked="true"] > div,
-ul[data-type="taskList"] > li[data-checked="true"] > div p {
+ul[data-type='taskList'] > li[data-checked='true'] > div,
+ul[data-type='taskList'] > li[data-checked='true'] > div p {
   @apply text-gray-500 line-through opacity-60;
 }
 
 /* nested taskList reset */
-ul[data-type="taskList"] ul[data-type="taskList"] {
+ul[data-type='taskList'] ul[data-type='taskList'] {
   @apply m-0;
 }
 
 /* dark mode adjustments */
-.dark ul[data-type="taskList"] > li[data-checked="true"] > div,
-.dark ul[data-type="taskList"] > li[data-checked="true"] > div p {
+.dark ul[data-type='taskList'] > li[data-checked='true'] > div,
+.dark ul[data-type='taskList'] > li[data-checked='true'] > div p {
   @apply text-gray-400;
 }
 
-:root[data-font="harmonyos"] {
+:root[data-font='harmonyos'] {
   --default-font-family:
-    "HarmonyOS Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
-  --font-sans: "HarmonyOS Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+    'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-sans: 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
 @theme inline {

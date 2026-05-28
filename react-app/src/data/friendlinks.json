@@ -1,0 +1,27 @@
+{
+  "self": {
+    "name": "Kuroome's Blog",
+    "description": "阅读、Coding、Fishing、生活记录",
+    "url": "https://kanocifer.chat",
+    "icon": "https://kanocifer.chat/favicon.ico",
+    "tags": ["个人博客", "全栈开发"]
+  },
+  "links": [
+    {
+      "id": "1",
+      "name": "Kuroome's Blog",
+      "description": "本站的另一个入口，基于 React 技术栈构建的个人博客，移动端友好。",
+      "url": "https://m.kanocifer.chat",
+      "icon": "https://kanocifer.chat/favicon.ico",
+      "tags": ["个人博客", "React"]
+    },
+    {
+      "id": "2",
+      "name": "23朵毒蘑菇",
+      "url": "https://blog.dumogu.top/",
+      "icon": "https://blog.dumogu.top/web-assets/v-last/public/user.jpg",
+      "description": "一个简单的前端开发者。",
+      "tags": ["个人博客", "前端开发"]
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import { ArticleSummaryCard } from '@/components/basic/ArticleSummary';
 import type { BlogDetail } from '@/services/blogService';
 import { blogService } from '@/services/blogService';
 import { TwikooComments } from '@/components/blog/TwikooComments';
+import { useNotificationStore } from '@/stores/notificationState';
 import { formatDate } from '@/utils/formatdate';
 import DOMPurify from 'dompurify';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -66,21 +67,67 @@ function ErrorState({
   );
 }
 
+const COPY_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>`;
+
+function setupCodeCopy(
+  container: HTMLElement,
+  onCopy: (msg: string) => void,
+): () => void {
+  const preElements = container.querySelectorAll('pre');
+  const cleanups: (() => void)[] = [];
+
+  preElements.forEach((pre) => {
+    pre.style.position = 'relative';
+    pre.classList.add('group');
+
+    const btn = document.createElement('button');
+    btn.innerHTML = COPY_ICON_SVG;
+    btn.title = '复制';
+    btn.className =
+      'absolute top-2 right-2 p-1.5 rounded-md bg-muted/80 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-accent cursor-pointer';
+    btn.setAttribute('aria-label', '复制代码');
+
+    const handleClick = () => {
+      const code = pre.querySelector('code');
+      if (code) {
+        navigator.clipboard
+          .writeText(code.textContent || '')
+          .then(() => onCopy('代码已复制'))
+          .catch(() => onCopy('复制失败'));
+      }
+    };
+
+    btn.addEventListener('click', handleClick);
+    pre.appendChild(btn);
+    cleanups.push(() => {
+      btn.removeEventListener('click', handleClick);
+      btn.remove();
+    });
+  });
+
+  return () => cleanups.forEach((fn) => fn());
+}
+
 export default function BlogPostView() {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
+  const notification = useNotificationStore();
 
   const [post, setPost] = useState<BlogDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  // Highlight code blocks after content renders
+  // Highlight code blocks + setup copy buttons after content renders
   useEffect(() => {
     if (contentRef.current && post?.body) {
       hljs.highlightAll();
+      const cleanup = setupCodeCopy(contentRef.current, (msg) =>
+        notification.success(msg),
+      );
+      return cleanup;
     }
-  }, [post?.body]);
+  }, [post?.body, notification]);
 
   const fetchPost = useCallback(async () => {
     if (!postId) return;
@@ -211,10 +258,9 @@ export default function BlogPostView() {
             {/* Content */}
             <div
               ref={contentRef}
-              className="prose prose-sm dark:prose-invert max-w-none px-4"
+              className="article-content max-w-none px-4"
             >
               <div
-                className="text-foreground [&_a]:text-primary leading-relaxed [&_a]:underline [&_h1]:text-xl [&_h1,&_h2,&_h3,&_h4]:font-bold [&_h2]:text-lg [&_h3]:text-base [&_p]:mb-4"
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.body) }}
               />
             </div>

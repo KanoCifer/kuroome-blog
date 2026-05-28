@@ -21,7 +21,6 @@ import { LoginIcon } from './icon/LoginIcon';
 import { LogoutIcon } from './icon/LogoutIcon';
 import { MessagesIcon } from './icon/MessagesIcon';
 import { MoreIcon } from './icon/MoreIcon';
-import { PlusIcon } from './icon/PlusIcon';
 import { RegisterIcon } from './icon/RegisterIcon';
 import { Settings } from './icon/Settings';
 import { ThemeIcon } from './icon/ThemeIcon';
@@ -287,13 +286,6 @@ export function BasicNav() {
                 activeIcon={<IconArticleFilled className="size-6" />}
                 to="/blog"
                 isActive={location.pathname === '/blog'}
-              />
-
-              {/* New Post Button */}
-              <NavItem
-                icon={<PlusIcon className="size-8" />}
-                to="/new"
-                isActive={location.pathname === '/new'}
               />
 
               {/* RSS */}

@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { BasicFooter } from "@/components/basic";
-import { BentoNavCard } from "@/components/bento";
-import BackToTop from "@/components/layout/BackToTop.vue";
-import TodoModal from "@/layouts/components/TodoModal.vue";
-import CookieConsent from "@/components/layout/CookieConsent.vue";
-import ToastContainer from "@/components/layout/ToastContainer.vue";
-import BasicNav from "@/components/nav/BasicNav.vue";
-import { useCardLayout } from "@/composables/useCardLayout";
-import { useBackgroundStore } from "@/stores/background";
-import { useThemeStore } from "@/stores/theme";
-import { AnimatePresence } from "motion-v";
-import { ref, watch } from "vue";
-import { RouterView, useRoute } from "vue-router";
+import { BasicFooter } from '@/components/basic';
+import { BentoNavCard } from '@/components/bento';
+import BackToTop from '@/components/layout/BackToTop.vue';
+import TodoModal from '@/layouts/components/TodoModal.vue';
+import CookieConsent from '@/components/layout/CookieConsent.vue';
+import ToastContainer from '@/components/layout/ToastContainer.vue';
+import BasicNav from '@/components/nav/BasicNav.vue';
+import { useCardLayout } from '@/composables/useCardLayout';
+import { useBackgroundStore } from '@/stores/background';
+import { useThemeStore } from '@/stores/theme';
+import { AnimatePresence } from 'motion-v';
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { RouterView, useRoute } from 'vue-router';
 
 const bgStore = useBackgroundStore();
 const themeStore = useThemeStore();
@@ -20,7 +20,8 @@ const route = useRoute();
 const layoutContainer = ref<HTMLElement | null>(null);
 const isEntryView = ref<boolean>(false);
 const isAboutView = ref<boolean>(false);
-const showBasicNav = ref<boolean>(route.path !== "/");
+const showBasicNav = ref<boolean>(route.path !== '/');
+const isNavCompact = ref<boolean>(false);
 
 // Card layout for BentoNavCard positioning on entry view
 const { navCardPosition } = useCardLayout(layoutContainer);
@@ -29,11 +30,11 @@ const { navCardPosition } = useCardLayout(layoutContainer);
 watch(
   () => route.path,
   (newPath) => {
-    isEntryView.value = newPath === "/";
-    isAboutView.value = newPath === "/about";
+    isEntryView.value = newPath === '/';
+    isAboutView.value = newPath === '/about';
     bgStore.reroll();
 
-    if (newPath === "/") {
+    if (newPath === '/') {
       showBasicNav.value = false;
       return;
     }
@@ -42,6 +43,28 @@ watch(
   },
   { immediate: true },
 );
+
+// IntersectionObserver: 检测页面是否已滚动，触发导航栏收窄
+let scrollObserver: IntersectionObserver | null = null;
+const sentinelRef = ref<HTMLElement | null>(null);
+
+const initObserver = () => {
+  scrollObserver?.disconnect();
+  if (!sentinelRef.value) return;
+  scrollObserver = new IntersectionObserver(
+    ([entry]) => {
+      isNavCompact.value = !entry.isIntersecting;
+    },
+    { threshold: 0 },
+  );
+  scrollObserver.observe(sentinelRef.value);
+};
+
+onMounted(() => initObserver());
+onBeforeUnmount(() => scrollObserver?.disconnect());
+
+watch(sentinelRef, () => initObserver());
+
 // 导航栏滚动隐藏逻辑
 // const isHeaderVisible = ref(true);
 // const lastScrollY = ref(0);
@@ -161,6 +184,13 @@ watch(
       </div>
     </header>
 
+    <!-- 滚动检测哨兵（页面顶部不可见 fixed div） -->
+    <div
+      ref="sentinelRef"
+      class="pointer-events-none fixed top-0 left-0 z-0 h-px w-px opacity-0"
+      aria-hidden="true"
+    />
+
     <!-- Main Content -->
     <main class="relative flex-1 scroll-smooth">
       <!-- 路由出口 -->
@@ -205,11 +235,13 @@ watch(
         layoutId="nav-card"
         :isEntryView="isEntryView"
         :isVisible="showBasicNav"
+        :isCompact="isNavCompact"
         :initial="{ opacity: 0 }"
         :animate="{ opacity: 1 }"
         :transition="{ type: 'spring', bounce: 0.3, duration: 0.5 }"
         :exit="{ transition: { duration: 0.5 } }"
-        class="group fixed top-4 left-4 z-50"
+        class="group fixed top-4 z-50 transition-all duration-300 ease-out"
+        :class="isNavCompact ? 'left-4' : 'left-0 right-0 mx-auto max-w-screen-xl'"
       />
       <BentoNavCard
         v-else

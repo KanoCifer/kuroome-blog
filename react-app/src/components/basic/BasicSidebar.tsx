@@ -12,6 +12,7 @@ import {
   Home,
   Image as ImageIcon,
   Info,
+  Link2,
   LogIn,
   LogOut,
   MessageSquare,
@@ -33,6 +34,7 @@ const navItems = [
   { path: '/rss', label: 'RSS 订阅', icon: Rss },
   { path: '/subscription', label: 'SubTracker', icon: IconCoin },
   { path: '/toolbox/image-toolbox', label: '图片工具', icon: Wrench },
+  { path: '/friend-links', label: '友情链接', icon: Link2 },
   { path: '/about', label: '关于网站', icon: Info },
 ];
 
