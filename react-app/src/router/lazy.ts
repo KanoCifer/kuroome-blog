@@ -35,6 +35,4 @@ export const PrivacyPolicy = lazy(
 export const DeviceTracker = lazy(
   () => import('../views/device/DeviceTracker'),
 );
-export const FriendLinks = lazy(
-  () => import('../views/pages/FriendLinksView'),
-);
+export const FriendLinks = lazy(() => import('../views/pages/FriendLinksView'));

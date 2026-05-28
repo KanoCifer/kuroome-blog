@@ -1,6 +1,10 @@
 import { devTaskService, type DevTaskService } from '@/services/todoService';
 import { create } from 'zustand';
-import type { CreateDevTaskPayload, DevTask, DevTaskStatus } from '@/services/todoService/types';
+import type {
+  CreateDevTaskPayload,
+  DevTask,
+  DevTaskStatus,
+} from '@/services/todoService/types';
 
 export const STATUS_LABELS: Record<DevTaskStatus, string> = {
   todo: '待开发',
@@ -31,11 +35,7 @@ export const useTodoState = create<DevTaskState>((set, get) => ({
   hydrateTasks: () => {
     service.fetchTasks().then((grouped) =>
       set({
-        tasks: [
-          ...grouped.todo,
-          ...grouped['in-progress'],
-          ...grouped.done,
-        ],
+        tasks: [...grouped.todo, ...grouped['in-progress'], ...grouped.done],
       }),
     );
   },

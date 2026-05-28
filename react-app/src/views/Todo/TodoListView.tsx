@@ -43,7 +43,10 @@ const COLUMNS: ColumnDef[] = [
 ];
 
 function statusBadgeStyle(status: DevTaskStatus): React.CSSProperties {
-  const colors: Record<DevTaskStatus, { bg: string; border: string; text: string }> = {
+  const colors: Record<
+    DevTaskStatus,
+    { bg: string; border: string; text: string }
+  > = {
     todo: { bg: '#eff6ff', border: '#bfdbfe', text: '#1d4ed8' },
     'in-progress': { bg: '#fffbeb', border: '#fde68a', text: '#b45309' },
     done: { bg: '#ecfdf5', border: '#a7f3d0', text: '#047857' },
@@ -84,7 +87,8 @@ function TaskCard({
 }) {
   const isDone = task.status === 'done';
   const isOverdue =
-    task.dueDate && new Date(task.dueDate) < new Date(new Date().setHours(0, 0, 0, 0));
+    task.dueDate &&
+    new Date(task.dueDate) < new Date(new Date().setHours(0, 0, 0, 0));
 
   return (
     <motion.div
@@ -107,7 +111,7 @@ function TaskCard({
 
         <div className="min-w-0 flex-1">
           <p
-            className={`text-sm font-medium leading-snug ${
+            className={`text-sm leading-snug font-medium ${
               isDone
                 ? 'text-gray-400 line-through dark:text-gray-500'
                 : 'text-gray-900 dark:text-gray-100'
@@ -313,7 +317,12 @@ export default function TodoListView() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ type: 'spring', ease: 'easeOut', duration: 0.5, delay: 0.1 }}
+      transition={{
+        type: 'spring',
+        ease: 'easeOut',
+        duration: 0.5,
+        delay: 0.1,
+      }}
       className="relative min-h-dvh bg-linear-to-b from-blue-50 to-white pb-28 dark:from-slate-900 dark:to-slate-900"
     >
       {/* Header */}
@@ -327,7 +336,7 @@ export default function TodoListView() {
       </div>
 
       {/* Horizontal scroll board */}
-      <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 pt-2">
+      <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pt-2 pb-4">
         {COLUMNS.map((col) => {
           const colTasks = grouped[col.status];
 
@@ -345,7 +354,7 @@ export default function TodoListView() {
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                   {col.title}
                 </h3>
-                <span className="rounded-full bg-black/5 px-2 py-0.5 text-xs font-medium tabular-nums text-gray-500 dark:bg-white/10 dark:text-gray-400">
+                <span className="rounded-full bg-black/5 px-2 py-0.5 text-xs font-medium text-gray-500 tabular-nums dark:bg-white/10 dark:text-gray-400">
                   {colTasks.length}
                 </span>
               </div>

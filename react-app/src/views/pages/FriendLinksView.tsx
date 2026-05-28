@@ -114,7 +114,7 @@ function DailyPickBanner() {
                 {pick?.category}
               </span>
             </div>
-            <h3 className="text-foreground text-base font-bold leading-tight">
+            <h3 className="text-foreground text-base leading-tight font-bold">
               {pick?.name}
             </h3>
             <p className="text-muted-foreground mt-1 line-clamp-2 text-xs leading-relaxed">
@@ -234,13 +234,7 @@ function SelfInfoCard() {
   );
 }
 
-function FriendLinkCard({
-  link,
-  index,
-}: {
-  link: FriendLink;
-  index: number;
-}) {
+function FriendLinkCard({ link, index }: { link: FriendLink; index: number }) {
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     e.currentTarget.style.display = 'none';
   };
@@ -261,7 +255,7 @@ function FriendLinkCard({
         damping: 20,
         delay: index * 0.06,
       }}
-      className="border-border bg-card group block overflow-hidden rounded-2xl border p-4 shadow-sm transition-all duration-300 hover:border-primary/25 hover:shadow-md"
+      className="border-border bg-card group hover:border-primary/25 block overflow-hidden rounded-2xl border p-4 shadow-sm transition-all duration-300 hover:shadow-md"
     >
       <div className="flex items-start gap-3.5">
         <div className="bg-muted flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full">

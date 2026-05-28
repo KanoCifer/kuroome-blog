@@ -1,5 +1,5 @@
 /* Blush — 薄红陶色 */
-[data-color-scheme="blush"] {
+[data-color-scheme='blush'] {
   --radius: 0.625rem;
   --ink: #201716;
   --paper: #f6efec;
@@ -30,7 +30,7 @@
   --gradient-decorative-to: #d2a1a7;
 }
 
-[data-color-scheme="blush"].dark {
+[data-color-scheme='blush'].dark {
   --ink: #e8e2da;
   --paper: #201716;
   --warm-gray: #332a2a;

@@ -23,7 +23,7 @@ export function BentoTodo() {
   const taskList = tasks.slice(0, 3).map((t) => (
     <div key={t.id} className="group flex items-start gap-3 py-2.5">
       <button
-        className={`mt-0.5 shrink-0 cursor-pointer rounded px-1.5 py-0.5 text-xs font-medium border ${statusClass(t.status)}`}
+        className={`mt-0.5 shrink-0 cursor-pointer rounded border px-1.5 py-0.5 text-xs font-medium ${statusClass(t.status)}`}
         onClick={() => todo.cycleStatus(t.id)}
       >
         {STATUS_LABELS[t.status]}

@@ -133,9 +133,7 @@ describe('useWebsocket', () => {
     // Simulate pong
     act(() => {
       const ws = MockWebSocket.instances[0];
-      ws.onmessage?.(
-        new MessageEvent('message', { data: '{"type":"pong"}' }),
-      );
+      ws.onmessage?.(new MessageEvent('message', { data: '{"type":"pong"}' }));
     });
 
     expect(onConnectionDelay).toHaveBeenCalled();
@@ -157,9 +155,7 @@ describe('useWebsocket', () => {
     // Simulate abnormal close (code 1006)
     act(() => {
       const ws = MockWebSocket.instances[0];
-      ws.onclose?.(
-        new CloseEvent('close', { code: 1006, wasClean: false }),
-      );
+      ws.onclose?.(new CloseEvent('close', { code: 1006, wasClean: false }));
     });
 
     // Should schedule reconnect after 1s (base * 2^0)
@@ -209,9 +205,7 @@ describe('useWebsocket', () => {
   });
 
   it('reconnects on visibilitychange to visible while disconnected', () => {
-    renderHook(() =>
-      useWebsocket({ url: 'ws://localhost/ws' }),
-    );
+    renderHook(() => useWebsocket({ url: 'ws://localhost/ws' }));
 
     flushWsOpen();
     expect(MockWebSocket.instances.length).toBe(1);
@@ -234,9 +228,7 @@ describe('useWebsocket', () => {
   });
 
   it('disconnects on beforeunload', () => {
-    renderHook(() =>
-      useWebsocket({ url: 'ws://localhost/ws' }),
-    );
+    renderHook(() => useWebsocket({ url: 'ws://localhost/ws' }));
 
     flushWsOpen();
     const ws = MockWebSocket.instances[0];

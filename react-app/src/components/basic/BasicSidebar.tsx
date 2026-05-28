@@ -131,11 +131,7 @@ function DelayStatus({ ms }: { ms: number }) {
   }
   const label = `${Math.round(ms)} ms`;
   const dotClass =
-    ms < 200
-      ? 'bg-emerald-500'
-      : ms < 2000
-        ? 'bg-yellow-500'
-        : 'bg-red-500';
+    ms < 200 ? 'bg-emerald-500' : ms < 2000 ? 'bg-yellow-500' : 'bg-red-500';
   return (
     <span className="inline-flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
       <span className="relative flex h-2 w-2">

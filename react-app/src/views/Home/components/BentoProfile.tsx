@@ -7,7 +7,6 @@ import { useLottie } from 'lottie-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-
 const VUE_SITE_URL = 'https://kanocifer.chat';
 
 function setCookie(name: string, value: string, days: number) {
@@ -128,7 +127,6 @@ export function BentoProfile() {
           <p className="font-medium text-gray-600 dark:text-gray-400">
             Developer
           </p>
-
         </div>
 
         {/* 点赞按钮 */}

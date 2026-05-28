@@ -88,7 +88,9 @@ function ExternalLinkIcon() {
 
 export function CookieConsent() {
   const navigate = useNavigate();
-  const [consentGiven, setConsentGiven] = useState(() => localStorage.getItem(STORAGE_KEY) === 'true');
+  const [consentGiven, setConsentGiven] = useState(
+    () => localStorage.getItem(STORAGE_KEY) === 'true',
+  );
   const [showBanner, setShowBanner] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showPrivacyPreview, setShowPrivacyPreview] = useState(false);
@@ -152,9 +154,12 @@ export function CookieConsent() {
   // TODO(human): Implement privacy policy scroll tracking logic
   // Track if the user has scrolled to the bottom of the privacy policy preview
   // to enable the "Accept" button, ensuring they actually skimmed it.
-  const handlePrivacyScroll = useCallback((_e: React.UIEvent<HTMLDivElement>) => {
-    // Your logic here
-  }, []);
+  const handlePrivacyScroll = useCallback(
+    (_e: React.UIEvent<HTMLDivElement>) => {
+      // Your logic here
+    },
+    [],
+  );
 
   const toggleSetting = useCallback((id: string) => {
     setSettings((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -193,7 +198,8 @@ export function CookieConsent() {
                 </button>
               </div>
               <p className="mb-4 text-[13px] leading-relaxed text-white/60">
-                本站使用 Cookie 提升浏览体验。继续使用即表示您同意我们的 Cookie 政策与隐私协议。
+                本站使用 Cookie 提升浏览体验。继续使用即表示您同意我们的 Cookie
+                政策与隐私协议。
               </p>
               <div className="flex items-center gap-2">
                 <button
@@ -233,7 +239,9 @@ export function CookieConsent() {
               className="relative w-full max-w-[500px] overflow-hidden rounded-2xl border border-white/[0.06] bg-black/80 p-6 shadow-2xl shadow-amber-500/5 backdrop-blur-2xl"
             >
               <div className="pointer-events-none absolute -top-20 -right-20 h-40 w-40 rounded-full bg-amber-500/[0.08] blur-3xl" />
-              <h2 className="relative text-[16px] font-medium text-white/90">隐私协议核心摘要</h2>
+              <h2 className="relative text-[16px] font-medium text-white/90">
+                隐私协议核心摘要
+              </h2>
               <div
                 ref={privacyScrollRef}
                 className="custom-scrollbar relative flex max-h-[40vh] flex-col gap-3 overflow-y-auto py-2 pr-2"
@@ -255,7 +263,8 @@ export function CookieConsent() {
                       本地存储
                     </h4>
                     <p className="text-white/50">
-                      使用 Cookie 和 LocalStorage 保存您的登录状态及界面偏好设置。
+                      使用 Cookie 和 LocalStorage
+                      保存您的登录状态及界面偏好设置。
                     </p>
                   </div>
                   <div>
@@ -264,7 +273,8 @@ export function CookieConsent() {
                       第三方服务
                     </h4>
                     <p className="text-white/50">
-                      接入 Gravatar (头像) 及 GitHub OAuth (快捷登录)，仅在您使用时生效。
+                      接入 Gravatar (头像) 及 GitHub OAuth
+                      (快捷登录)，仅在您使用时生效。
                     </p>
                   </div>
                   <div className="border-t border-white/[0.06] pt-2">
@@ -311,7 +321,9 @@ export function CookieConsent() {
             >
               <div className="pointer-events-none absolute -top-20 -right-20 h-40 w-40 rounded-full bg-amber-500/[0.08] blur-3xl" />
               <div className="pointer-events-none absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-amber-500/[0.05] blur-3xl" />
-              <h2 className="relative text-[15px] font-medium text-white/90">Cookie 偏好设置</h2>
+              <h2 className="relative text-[15px] font-medium text-white/90">
+                Cookie 偏好设置
+              </h2>
               <p className="relative mt-1 text-[12.5px] leading-relaxed text-white/45">
                 选择允许的 Cookie 类别。您可随时通过清除浏览器数据撤回同意。
               </p>
@@ -331,9 +343,16 @@ export function CookieConsent() {
                         className="h-3.5 w-3.5 appearance-none rounded-[3px] border border-white/20 bg-white/5 transition-all duration-150 checked:border-amber-400 checked:bg-amber-400/90 focus:ring-1 focus:ring-amber-400/30 focus:ring-offset-0 disabled:opacity-60"
                       />
                     </div>
-                    <label htmlFor={`cookie-${cat.id}`} className="flex-1 cursor-pointer">
-                      <span className="text-[13px] font-medium text-white/80">{cat.label}</span>
-                      <p className="mt-0.5 text-[11.5px] text-white/40">{cat.description}</p>
+                    <label
+                      htmlFor={`cookie-${cat.id}`}
+                      className="flex-1 cursor-pointer"
+                    >
+                      <span className="text-[13px] font-medium text-white/80">
+                        {cat.label}
+                      </span>
+                      <p className="mt-0.5 text-[11.5px] text-white/40">
+                        {cat.description}
+                      </p>
                     </label>
                     {cat.required && (
                       <span className="mt-0.5 shrink-0 rounded-md border border-white/[0.06] px-2 py-0.5 text-[10px] text-white/30">

@@ -256,10 +256,7 @@ export default function BlogPostView() {
             />
 
             {/* Content */}
-            <div
-              ref={contentRef}
-              className="article-content max-w-none px-4"
-            >
+            <div ref={contentRef} className="article-content max-w-none px-4">
               <div
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.body) }}
               />

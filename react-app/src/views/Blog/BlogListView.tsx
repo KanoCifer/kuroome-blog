@@ -33,7 +33,7 @@ function PostCard({ post, index }: PostCardProps) {
       transition={{ type: 'spring', duration: 0.5, delay: index * 0.06 }}
     >
       <Link to={`/blog/${post._id}`} className="group block">
-        <article className="border-border/40 bg-card relative overflow-hidden rounded-2xl border p-5 shadow-sm transition-all duration-500 ease-out group-hover:-translate-y-1 group-hover:border-primary/25 group-hover:shadow-md">
+        <article className="border-border/40 bg-card group-hover:border-primary/25 relative overflow-hidden rounded-2xl border p-5 shadow-sm transition-all duration-500 ease-out group-hover:-translate-y-1 group-hover:shadow-md">
           {/* Left spine accent */}
           <div
             className="bg-primary absolute top-0 left-0 h-full w-1 origin-top scale-y-0 rounded-r-full transition-transform duration-500 ease-out group-hover:scale-y-100"
@@ -60,7 +60,7 @@ function PostCard({ post, index }: PostCardProps) {
 
           {/* Title */}
           <h2
-            className="text-primary w-fit font-serif text-xl leading-snug transition-all duration-300 ease-out group-hover:bg-primary/10 group-hover:-translate-y-0.5 group-hover:rounded-lg group-hover:px-2 group-hover:shadow-sm"
+            className="text-primary group-hover:bg-primary/10 w-fit font-serif text-xl leading-snug transition-all duration-300 ease-out group-hover:-translate-y-0.5 group-hover:rounded-lg group-hover:px-2 group-hover:shadow-sm"
             style={{ textWrap: 'balance' }}
           >
             {post.title}
@@ -68,27 +68,31 @@ function PostCard({ post, index }: PostCardProps) {
 
           {/* Decorative divider */}
           <div
-            className="bg-border my-3 h-1 w-16 transition-all duration-500 ease-out group-hover:w-full group-hover:bg-primary/15"
+            className="bg-border group-hover:bg-primary/15 my-3 h-1 w-16 transition-all duration-500 ease-out group-hover:w-full"
             aria-hidden="true"
           />
 
           {/* Summary */}
           <div
-            className="line-clamp-3 text-sm leading-relaxed text-foreground/60 dark:text-white/60"
+            className="text-foreground/60 line-clamp-3 text-sm leading-relaxed dark:text-white/60"
             dangerouslySetInnerHTML={{ __html: getPreviewHtml(post.body) }}
           />
 
           {/* Footer meta */}
-          <footer className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
+          <footer className="text-muted-foreground mt-4 flex items-center gap-2 text-xs">
             <time>{formatDate(post.created_at)}</time>
             {post.category && (
               <span className="flex items-center gap-2">
-                <span aria-hidden="true" className="text-border/60">·</span>
+                <span aria-hidden="true" className="text-border/60">
+                  ·
+                </span>
                 # {post.category.name}
               </span>
             )}
             <span className="flex items-center gap-1">
-              <span aria-hidden="true" className="text-border/60">·</span>
+              <span aria-hidden="true" className="text-border/60">
+                ·
+              </span>
               <svg
                 className="h-3 w-3"
                 fill="none"
