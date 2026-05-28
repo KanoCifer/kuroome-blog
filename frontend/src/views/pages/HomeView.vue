@@ -1,42 +1,42 @@
 <script setup lang="ts">
-import AddBookForm from "@/components/books/AddBookForm.vue";
-import BookActionButtons from "@/components/books/BookActionButtons.vue";
-import HomeSideBar from "@/components/layout/HomeSideBar.vue";
-import MessageBoard from "@/components/message/MessageBoard.vue";
-import { bookService } from "@/service/bookService";
-import { useNotificationStore } from "@/stores/notification";
-import type { BookItem, Pagination } from "@/types";
-import { useHead } from "@vueuse/head";
-import { computed, ref } from "vue";
+import AddBookForm from '@/components/books/AddBookForm.vue';
+import BookActionButtons from '@/components/books/BookActionButtons.vue';
+import HomeSideBar from '@/components/layout/HomeSideBar.vue';
+import MessageBoard from '@/components/message/MessageBoard.vue';
+import { bookService } from '@/service/bookService';
+import { useNotificationStore } from '@/stores/notification';
+import type { BookItem, Pagination } from '@/types';
+import { useHead } from '@vueuse/head';
+import { computed, ref } from 'vue';
 useHead({
   title: "Kuroome's Blog - 个人阅读清单与博客",
   meta: [
     {
-      name: "description",
-      content: "个人阅读清单管理项目，包含博客系统、书籍管理和阅读记录",
+      name: 'description',
+      content: '个人阅读清单管理项目，包含博客系统、书籍管理和阅读记录',
     },
-    { name: "keywords", content: "阅读清单,博客,书籍管理,个人知识库" },
-    { property: "og:title", content: "Kuroome's Blog - 个人阅读清单与博客" },
+    { name: 'keywords', content: '阅读清单,博客,书籍管理,个人知识库' },
+    { property: 'og:title', content: "Kuroome's Blog - 个人阅读清单与博客" },
     {
-      property: "og:description",
-      content: "个人阅读清单管理项目，包含博客系统、书籍管理和阅读记录",
+      property: 'og:description',
+      content: '个人阅读清单管理项目，包含博客系统、书籍管理和阅读记录',
     },
-    { property: "og:type", content: "website" },
-    { property: "twitter:card", content: "summary" },
+    { property: 'og:type', content: 'website' },
+    { property: 'twitter:card', content: 'summary' },
     {
-      property: "twitter:title",
+      property: 'twitter:title',
       content: "Kuroome's Blog - 个人阅读清单与博客",
     },
     {
-      property: "twitter:description",
-      content: "个人阅读清单管理项目，包含博客系统、书籍管理和阅读记录",
+      property: 'twitter:description',
+      content: '个人阅读清单管理项目，包含博客系统、书籍管理和阅读记录',
     },
   ],
 });
 
 const books = ref<BookItem[]>([]);
 const isLoading = ref<boolean>(false);
-const errorMessage = ref<string>("");
+const errorMessage = ref<string>('');
 const pendingBookId = ref<number | null>(null);
 const pagination = ref<Pagination | null>(null);
 const currentPage = ref<number>(1);
@@ -64,7 +64,7 @@ const getVisiblePages = computed(() => {
 
 const fetchBooks = async (page: number = 1) => {
   isLoading.value = true;
-  errorMessage.value = "";
+  errorMessage.value = '';
   try {
     const res = await bookService.getBooks({ page, per_page: 20 });
     books.value = res.data?.books ?? [];
@@ -72,7 +72,7 @@ const fetchBooks = async (page: number = 1) => {
     currentPage.value = page;
   } catch (err: unknown) {
     console.error(err);
-    errorMessage.value = "加载书籍失败，请稍后重试。";
+    errorMessage.value = '加载书籍失败，请稍后重试。';
     notifier.error(errorMessage.value);
     books.value = [];
     pagination.value = null;
@@ -98,10 +98,10 @@ const toggleBookStatus = async (book: BookItem) => {
           }
         : item,
     );
-    notifier.success("更新状态成功");
+    notifier.success('更新状态成功');
   } catch (err: unknown) {
     console.error(err);
-    errorMessage.value = "更新阅读状态失败，请稍后重试。";
+    errorMessage.value = '更新阅读状态失败，请稍后重试。';
     notifier.error(errorMessage.value);
   } finally {
     pendingBookId.value = null;
@@ -113,10 +113,10 @@ const deleteBook = async (book: BookItem) => {
   try {
     await bookService.deleteBook(book.id);
     books.value = books.value.filter((item) => item.id !== book.id);
-    notifier.success("删除成功");
+    notifier.success('删除成功');
   } catch (err: unknown) {
     console.error(err);
-    errorMessage.value = "删除书籍失败，请稍后重试。";
+    errorMessage.value = '删除书籍失败，请稍后重试。';
     notifier.error(errorMessage.value);
   } finally {
     pendingBookId.value = null;
@@ -127,7 +127,7 @@ const editBook = (book: BookItem) => {
   if (addBookFormRef.value) {
     addBookFormRef.value.startEditing(book);
     // 滚动到表单
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 };
 

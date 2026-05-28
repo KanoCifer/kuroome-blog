@@ -1,4 +1,4 @@
-import request from "@/api/request";
+import request from '@/api/request';
 
 export interface Message {
   id: string;
@@ -28,17 +28,17 @@ export interface MessageGateway {
 
 export const messageGateway: MessageGateway = {
   async getMessages() {
-    const res = await request.get<{ data: Message[] }>("v1/messages");
+    const res = await request.get<{ data: Message[] }>('v1/messages');
     return res.data.data;
   },
 
   async postMessage(payload) {
-    const res = await request.post<{ data: Message }>("v1/messages", payload);
+    const res = await request.post<{ data: Message }>('v1/messages', payload);
     return res.data.data;
   },
 
   async getAdminMessages() {
-    const res = await request.get<{ data: Message[] }>("v1/admin/messages");
+    const res = await request.get<{ data: Message[] }>('v1/admin/messages');
     return res.data.data;
   },
 
@@ -51,7 +51,7 @@ export const messageGateway: MessageGateway = {
   },
 
   async getAdminComments() {
-    const res = await request.get<{ data: Comment[] }>("v1/admin/comments");
+    const res = await request.get<{ data: Comment[] }>('v1/admin/comments');
     return res.data.data;
   },
 

@@ -1,5 +1,5 @@
 /* 春暖 (Spring) */
-[data-color-scheme="spring"] {
+[data-color-scheme='spring'] {
   --radius: 0.625rem;
   --ink: oklch(0.2 0.05 160);
   --paper: var(--color-teal-50);
@@ -25,7 +25,7 @@
   --gradient-decorative-to: var(--color-emerald-300);
 }
 
-[data-color-scheme="spring"].dark {
+[data-color-scheme='spring'].dark {
   --ink: oklch(0.98 0.01 160);
   --paper: oklch(0.15 0.03 160);
   --warm-gray: oklch(0.25 0.03 160);

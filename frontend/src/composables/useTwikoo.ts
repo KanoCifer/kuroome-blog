@@ -1,4 +1,4 @@
-import twikoo from "twikoo";
+import twikoo from 'twikoo';
 
 interface TwikooOptions {
   el: string | HTMLElement;
@@ -7,7 +7,7 @@ interface TwikooOptions {
 }
 
 export function useTwikoo(options: TwikooOptions) {
-  twikoo.init({ ...options, envId: "https://kanocifer.chat/twikoo" });
+  twikoo.init({ ...options, envId: 'https://kanocifer.chat/twikoo' });
 
   return twikoo;
 }

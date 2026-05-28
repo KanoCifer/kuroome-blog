@@ -1,5 +1,5 @@
-import { onBeforeUnmount, ref } from "vue";
-import { uploadService } from "@/service/uploadService";
+import { onBeforeUnmount, ref } from 'vue';
+import { uploadService } from '@/service/uploadService';
 
 export function useMarkdownImage() {
   const blobFileMap = ref<Map<string, File>>(new Map());
@@ -7,12 +7,12 @@ export function useMarkdownImage() {
 
   // Image editor state
   const isImageEditorOpen = ref(false);
-  const editingImageUrl = ref("");
-  const editingImageAlt = ref("");
-  const editingImageTitle = ref("");
-  const editingImageWidth = ref("");
-  const editingImageHeight = ref("");
-  const editingImageAlign = ref<"left" | "center" | "right">("center");
+  const editingImageUrl = ref('');
+  const editingImageAlt = ref('');
+  const editingImageTitle = ref('');
+  const editingImageWidth = ref('');
+  const editingImageHeight = ref('');
+  const editingImageAlign = ref<'left' | 'center' | 'right'>('center');
   const editingImageFile = ref<File | null>(null);
 
   // Create blob URL from file, store in map, return Markdown
@@ -28,7 +28,7 @@ export function useMarkdownImage() {
     if (!target.files || target.files.length === 0) return null;
     const file = target.files[0];
     const md = addImageFile(file);
-    target.value = "";
+    target.value = '';
     return md;
   }
 
@@ -38,7 +38,7 @@ export function useMarkdownImage() {
     const files = event.dataTransfer?.files;
     if (!files || files.length === 0) return results;
     for (const file of files) {
-      if (!file.type.startsWith("image/")) continue;
+      if (!file.type.startsWith('image/')) continue;
       results.push(addImageFile(file));
     }
     return results;
@@ -50,7 +50,7 @@ export function useMarkdownImage() {
     const items = event.clipboardData?.items;
     if (!items) return results;
     for (const item of items) {
-      if (item.type.startsWith("image/")) {
+      if (item.type.startsWith('image/')) {
         const file = item.getAsFile();
         if (file) {
           results.push(addImageFile(file));
@@ -62,23 +62,23 @@ export function useMarkdownImage() {
 
   function openImageEditor(img: HTMLImageElement) {
     editingImageUrl.value = img.currentSrc || img.src;
-    editingImageAlt.value = img.alt || "";
-    editingImageTitle.value = img.getAttribute("title") || "";
-    editingImageWidth.value = img.getAttribute("width") || "";
-    editingImageHeight.value = img.getAttribute("height") || "";
-    editingImageAlign.value = "center";
+    editingImageAlt.value = img.alt || '';
+    editingImageTitle.value = img.getAttribute('title') || '';
+    editingImageWidth.value = img.getAttribute('width') || '';
+    editingImageHeight.value = img.getAttribute('height') || '';
+    editingImageAlign.value = 'center';
     editingImageFile.value = null;
     isImageEditorOpen.value = true;
   }
 
   function closeImageEditor() {
     isImageEditorOpen.value = false;
-    editingImageUrl.value = "";
-    editingImageAlt.value = "";
-    editingImageTitle.value = "";
-    editingImageWidth.value = "";
-    editingImageHeight.value = "";
-    editingImageAlign.value = "center";
+    editingImageUrl.value = '';
+    editingImageAlt.value = '';
+    editingImageTitle.value = '';
+    editingImageWidth.value = '';
+    editingImageHeight.value = '';
+    editingImageAlign.value = 'center';
     editingImageFile.value = null;
   }
 
@@ -93,7 +93,7 @@ export function useMarkdownImage() {
     if (!editingImageAlt.value) {
       editingImageAlt.value = file.name;
     }
-    target.value = "";
+    target.value = '';
   }
 
   function openImageInNewTab(url: string) {
@@ -106,7 +106,7 @@ export function useMarkdownImage() {
     const results = await Promise.all(
       entries.map(async ([blobUrl, file]) => {
         const formData = new FormData();
-        formData.append("file", file);
+        formData.append('file', file);
         const response = await uploadService.uploadEditorImage(formData);
         URL.revokeObjectURL(blobUrl);
         return { blobUrl, serverUrl: response.url };

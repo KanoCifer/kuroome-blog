@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from "@/components/bento/BentoCard.vue";
+import BentoCard from '@/components/bento/BentoCard.vue';
 import {
   AboutIcon,
   BlogIcon,
@@ -63,42 +63,42 @@ import {
   LogoutIcon,
   MessageIcon,
   RegisterIcon,
-} from "@/components/icons";
-import { useAuthStore } from "@/stores/auth";
-import { Image } from "lucide-vue-next";
-import { Motion, type MotionProps } from "motion-v";
-import { onUnmounted, ref, watch } from "vue";
-import { useRoute } from "vue-router";
-import type { DropdownItem } from "./UserDropdown.vue";
-import UserDropdown from "./UserDropdown.vue";
+} from '@/components/icons';
+import { useAuthStore } from '@/stores/auth';
+import { Image } from 'lucide-vue-next';
+import { Motion, type MotionProps } from 'motion-v';
+import { onUnmounted, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
+import type { DropdownItem } from './UserDropdown.vue';
+import UserDropdown from './UserDropdown.vue';
 
 const auth = useAuthStore();
 const route = useRoute();
 
 const props = defineProps<{
   layoutId?: string;
-  initial?: MotionProps["initial"];
-  animate?: MotionProps["animate"];
-  transition?: MotionProps["transition"];
+  initial?: MotionProps['initial'];
+  animate?: MotionProps['animate'];
+  transition?: MotionProps['transition'];
 }>();
 
 // 用户菜单项配置（登录态）
 const userMenuItems: DropdownItem[] = [
-  { icon: IconUser, label: "Profile", to: "/settings" },
-  { icon: ImportIcon, label: "Import", to: "/import" },
-  { icon: MessageIcon, label: "Messages", to: "/messages", adminOnly: true },
+  { icon: IconUser, label: 'Profile', to: '/settings' },
+  { icon: ImportIcon, label: 'Import', to: '/import' },
+  { icon: MessageIcon, label: 'Messages', to: '/messages', adminOnly: true },
   {
     icon: IconAnalytics,
-    label: "Analytics",
-    to: "/analytics",
+    label: 'Analytics',
+    to: '/analytics',
     adminOnly: true,
   },
   { divider: true },
   {
     icon: LogoutIcon,
-    label: "Logout",
+    label: 'Logout',
     class:
-      "text-primary dark:text-primary rounded-xl font-bold hover:bg-primary rounded-full transition-colors duration-300 hover:text-white",
+      'text-primary dark:text-primary rounded-xl font-bold hover:bg-primary rounded-full transition-colors duration-300 hover:text-white',
     onClick: () => auth.logout(),
   },
 ];
@@ -107,27 +107,27 @@ const userMenuItems: DropdownItem[] = [
 const guestMenuItems: DropdownItem[] = [
   {
     icon: LoginIcon,
-    label: "Login",
+    label: 'Login',
     class:
-      "hover:bg-primary rounded-full transition-colors duration-300 hover:text-white",
-    to: "/login",
+      'hover:bg-primary rounded-full transition-colors duration-300 hover:text-white',
+    to: '/login',
   },
   {
     icon: RegisterIcon,
-    label: "Register",
+    label: 'Register',
     class:
-      "hover:bg-primary rounded-full transition-colors duration-300 hover:text-white",
-    to: "/register",
+      'hover:bg-primary rounded-full transition-colors duration-300 hover:text-white',
+    to: '/register',
   },
 ];
 
 // 导航项配置
 const navItems = [
-  { path: "/", label: "首页", icon: HomeIcon },
-  { path: "/blog", label: "近期文章", icon: BlogIcon },
-  { path: "/bookshelf", label: "我的书架", icon: BookshelfIcon },
-  { path: "/gallery", label: "图片画廊", icon: Image },
-  { path: "/about", label: "关于网站", icon: AboutIcon },
+  { path: '/', label: '首页', icon: HomeIcon },
+  { path: '/blog', label: '近期文章', icon: BlogIcon },
+  { path: '/bookshelf', label: '我的书架', icon: BookshelfIcon },
+  { path: '/gallery', label: '图片画廊', icon: Image },
+  { path: '/about', label: '关于网站', icon: AboutIcon },
 ];
 
 const hoverNavIndex = ref(0);

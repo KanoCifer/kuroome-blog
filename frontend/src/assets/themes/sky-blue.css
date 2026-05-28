@@ -1,5 +1,5 @@
 /* Sky Blue — 天空蓝（默认） */
-[data-color-scheme="sky-blue"] {
+[data-color-scheme='sky-blue'] {
   --radius: 0.625rem;
   --ink: oklch(0.13 0.028 261.692);
   --paper: var(--color-blue-50);
@@ -25,7 +25,7 @@
   --gradient-decorative-to: var(--color-sky-500);
 }
 
-[data-color-scheme="sky-blue"].dark {
+[data-color-scheme='sky-blue'].dark {
   --ink: oklch(0.985 0.002 247.839);
   --paper: oklch(0.13 0.028 261.692);
   --warm-gray: oklch(0.278 0.033 256.848);

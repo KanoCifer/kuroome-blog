@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { reactive, watch } from "vue";
-import type { ReminderFormState } from "@/views/subscription/types";
+import { reactive, watch } from 'vue';
+import type { ReminderFormState } from '@/views/subscription/types';
 import {
   channelOptions,
   reminderPointOptions,
-} from "@/views/subscription/subscriptionUtils";
+} from '@/views/subscription/subscriptionUtils';
 
 interface Props {
   isOpen: boolean;
@@ -30,9 +30,9 @@ const localForm = reactive<ReminderFormState>({
   days_3: false,
   days_1: true,
   day_of: true,
-  email: "",
-  feishu_webhook_url: "",
-  bark_device_key: "",
+  email: '',
+  feishu_webhook_url: '',
+  bark_device_key: '',
 });
 
 function syncLocalForm(source: ReminderFormState): void {
@@ -48,7 +48,7 @@ function syncLocalForm(source: ReminderFormState): void {
 }
 
 function emitSave(): void {
-  emit("save", {
+  emit('save', {
     channels: [...localForm.channels],
     days_30: localForm.days_30,
     days_7: localForm.days_7,
@@ -62,7 +62,7 @@ function emitSave(): void {
 }
 
 function emitTest(): void {
-  emit("test", {
+  emit('test', {
     channels: [...localForm.channels],
     days_30: localForm.days_30,
     days_7: localForm.days_7,
@@ -235,7 +235,7 @@ watch(
                       : 'bg-destructive/20 text-destructive'
                   "
                 >
-                  {{ channel }}: {{ success ? "成功" : "失败" }}
+                  {{ channel }}: {{ success ? '成功' : '失败' }}
                 </span>
               </div>
             </div>
@@ -261,7 +261,7 @@ watch(
                 class="border-primary/30 bg-primary/15 text-primary hover:bg-accent rounded-xl border px-3 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60"
                 @click="emitTest"
               >
-                {{ isTesting ? "测试中..." : "发送测试通知" }}
+                {{ isTesting ? '测试中...' : '发送测试通知' }}
               </button>
               <button
                 type="button"
@@ -269,7 +269,7 @@ watch(
                 class="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60"
                 @click="emitSave"
               >
-                {{ isSaving ? "保存中..." : "保存配置" }}
+                {{ isSaving ? '保存中...' : '保存配置' }}
               </button>
             </footer>
           </div>

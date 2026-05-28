@@ -1,5 +1,5 @@
-import request from "@/api/request";
-import type { AxiosResponse } from "axios";
+import request from '@/api/request';
+import type { AxiosResponse } from 'axios';
 
 export interface AuthGateway {
   uploadAvatar(formData: FormData): Promise<AxiosResponse<any>>;
@@ -29,38 +29,38 @@ export interface AuthGateway {
 
 export const authGateway: AuthGateway = {
   async uploadAvatar(formData: FormData) {
-    return request.put("v1/auth/upload-pic", formData, {
+    return request.put('v1/auth/upload-pic', formData, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
       },
     });
   },
 
   async getPasskeyRegistrationOptions() {
-    return request.get("v1/auth/passkey/registration-options");
+    return request.get('v1/auth/passkey/registration-options');
   },
 
   async registerPasskey(payload: { response: unknown }) {
-    return request.post("v1/auth/passkey/register", payload);
+    return request.post('v1/auth/passkey/register', payload);
   },
 
   async deletePasskey() {
-    return request.delete("v1/auth/passkey/delete");
+    return request.delete('v1/auth/passkey/delete');
   },
 
   async unbindGithub() {
-    return request.post("v1/auth/github/unbind");
+    return request.post('v1/auth/github/unbind');
   },
 
   async updateProfileSettings(payload) {
-    return request.put("v1/auth/settings", payload);
+    return request.put('v1/auth/settings', payload);
   },
 
   async sendRegisterEmailCode(payload: { email: string }) {
-    return request.post("v1/auth/email/code", payload);
+    return request.post('v1/auth/email/code', payload);
   },
 
   async register(payload) {
-    return request.post("v1/auth/register", payload);
+    return request.post('v1/auth/register', payload);
   },
 };

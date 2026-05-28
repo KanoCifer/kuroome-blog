@@ -1,7 +1,7 @@
 import {
   analyticsGateway,
   type AnalyticsOverviewData,
-} from "@/api/analyticsGateway";
+} from '@/api/analyticsGateway';
 
 export interface AnalyticsService {
   getOverview(days: number): Promise<AnalyticsOverviewData>;

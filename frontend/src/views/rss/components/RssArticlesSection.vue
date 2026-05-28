@@ -16,7 +16,7 @@
         :disabled="articlesLoading"
         @click="$emit('refresh')"
       >
-        {{ articlesLoading ? "加载中..." : "刷新文章" }}
+        {{ articlesLoading ? '加载中...' : '刷新文章' }}
       </button>
     </div>
 
@@ -105,7 +105,7 @@
                 :to="`/rss/articles/${article.id}`"
                 class="text-primary hover:text-primary text-base font-semibold transition-colors"
               >
-                {{ article.title || "无标题" }}
+                {{ article.title || '无标题' }}
               </router-link>
               <span
                 class="rounded-full px-2 py-0.5 text-xs font-medium"
@@ -115,7 +115,7 @@
                     : 'bg-primary/15 text-primary'
                 "
               >
-                {{ article.is_read ? "已读" : "未读" }}
+                {{ article.is_read ? '已读' : '未读' }}
               </span>
             </div>
             <p
@@ -182,8 +182,8 @@
 </template>
 
 <script setup lang="ts">
-import { formatDate } from "@/utils/formatdate";
-import type { RssArticle } from "@/types";
+import { formatDate } from '@/utils/formatdate';
+import type { RssArticle } from '@/types';
 
 defineProps<{
   articles: RssArticle[];
@@ -196,7 +196,7 @@ defineProps<{
 }>();
 
 defineEmits<{
-  "update:searchQuery": [value: string];
+  'update:searchQuery': [value: string];
   search: [];
   clearSearch: [];
   goToPage: [page: number];

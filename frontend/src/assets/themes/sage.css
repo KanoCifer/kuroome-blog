@@ -1,5 +1,5 @@
 /* Sage — 鼠尾草绿 */
-[data-color-scheme="sage"] {
+[data-color-scheme='sage'] {
   --radius: 0.625rem;
   --ink: #172018;
   --paper: oklch(0.97 0.013 145);
@@ -30,7 +30,7 @@
   --gradient-decorative-to: #9ebda6;
 }
 
-[data-color-scheme="sage"].dark {
+[data-color-scheme='sage'].dark {
   --ink: #d8e3d7;
   --paper: #172018;
   --warm-gray: #252d25;

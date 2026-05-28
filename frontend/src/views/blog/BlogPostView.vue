@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { BasicDetail } from "@/components/basic";
-import ArticleSummaryCard from "@/components/blog/ArticleSummaryCard.vue";
-import TwikooComments from "@/components/blog/TwikooComments.vue";
-import { blogService } from "@/service/blogService";
-import { useAuthStore } from "@/stores/auth";
-import { useNotificationStore } from "@/stores/notification";
-import type { Post } from "@/types";
-import { formatDate } from "@/utils/formatdate";
-import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
-import { useHead } from "@unhead/vue";
-import { Modal } from "ant-design-vue";
-import hljs from "highlight.js/lib/common";
-import "highlight.js/scss/rainbow.scss";
-import { marked } from "marked";
+import { BasicDetail } from '@/components/basic';
+import ArticleSummaryCard from '@/components/blog/ArticleSummaryCard.vue';
+import TwikooComments from '@/components/blog/TwikooComments.vue';
+import { blogService } from '@/service/blogService';
+import { useAuthStore } from '@/stores/auth';
+import { useNotificationStore } from '@/stores/notification';
+import type { Post } from '@/types';
+import { formatDate } from '@/utils/formatdate';
+import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
+import { useHead } from '@unhead/vue';
+import { Modal } from 'ant-design-vue';
+import hljs from 'highlight.js/lib/common';
+import 'highlight.js/scss/rainbow.scss';
+import { marked } from 'marked';
 import {
   computed,
   createVNode,
@@ -21,11 +21,11 @@ import {
   onUnmounted,
   ref,
   watch,
-} from "vue";
-import { useRoute, useRouter } from "vue-router";
-import CalendarIcon from "@/components/icons/CalendarIcon.vue";
-import DelIcon from "@/components/icons/DelIcon.vue";
-import EditIcon from "@/components/icons/EditIcon.vue";
+} from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import CalendarIcon from '@/components/icons/CalendarIcon.vue';
+import DelIcon from '@/components/icons/DelIcon.vue';
+import EditIcon from '@/components/icons/EditIcon.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -33,19 +33,19 @@ const postId = ref<string>(route.params.id as string);
 
 const post = ref<Post | null>(null);
 const isLoading = ref(false);
-const errorMessage = ref("");
+const errorMessage = ref('');
 
 const auth = useAuthStore();
 const showEditButton = computed(() => !!auth.user?.is_admin);
 
 const fetchPost = async () => {
   if (!postId.value) {
-    errorMessage.value = "无效的文章 ID";
+    errorMessage.value = '无效的文章 ID';
     return;
   }
 
   isLoading.value = true;
-  errorMessage.value = "";
+  errorMessage.value = '';
 
   try {
     const res = await blogService.getLegacyPost(postId.value);
@@ -53,7 +53,7 @@ const fetchPost = async () => {
   } catch (err: unknown) {
     console.error(err);
     errorMessage.value =
-      err instanceof Error ? err.message : "加载文章失败，请稍后重试。";
+      err instanceof Error ? err.message : '加载文章失败，请稍后重试。';
     useNotificationStore().error(errorMessage.value);
   } finally {
     isLoading.value = false;
@@ -89,7 +89,7 @@ watch(
 );
 
 const renderedBody = computed(() => {
-  if (!post.value?.body) return "";
+  if (!post.value?.body) return '';
   return marked.parse(post.value.body, {
     async: false,
     breaks: false,
@@ -97,74 +97,74 @@ const renderedBody = computed(() => {
 });
 
 const subtitle = computed(() => {
-  if (!post.value) return "";
+  if (!post.value) return '';
   const { author, created_at, category } = post.value;
   return [author, created_at && formatDate(created_at), category?.name]
     .filter(Boolean)
-    .join(" · ");
+    .join(' · ');
 });
 
 useHead(() => {
   const title = post.value
     ? `${post.value.title} - ReadingList`
-    : "文章未找到 - ReadingList";
+    : '文章未找到 - ReadingList';
   const desc = post.value
     ? post.value.summary || `阅读 ${post.value.title} 的完整内容`
-    : "抱歉，您请求的文章不存在或已被删除";
+    : '抱歉，您请求的文章不存在或已被删除';
   const keywords = post.value
     ? [
         post.value.title,
-        post.value.author || "Kurroome",
-        post.value.category?.name || "博客",
-        "阅读",
-        "读书笔记",
-        "个人博客",
+        post.value.author || 'Kurroome',
+        post.value.category?.name || '博客',
+        '阅读',
+        '读书笔记',
+        '个人博客',
       ]
         .filter(Boolean)
-        .join(", ")
-    : "文章未找到, 阅读清单, ReadingList";
+        .join(', ')
+    : '文章未找到, 阅读清单, ReadingList';
 
   return {
     title,
     meta: [
-      { name: "description", content: desc },
-      { name: "keywords", content: keywords },
-      { property: "og:title", content: post.value?.title ?? "文章未找到" },
-      { property: "og:description", content: desc },
-      { property: "og:type", content: "article" },
+      { name: 'description', content: desc },
+      { name: 'keywords', content: keywords },
+      { property: 'og:title', content: post.value?.title ?? '文章未找到' },
+      { property: 'og:description', content: desc },
+      { property: 'og:type', content: 'article' },
       {
-        property: "og:url",
+        property: 'og:url',
         content: `https://readinglist.example.com/blog/${postId.value}`,
       },
       {
-        property: "og:article:author",
-        content: post.value?.author || "Kurroome",
+        property: 'og:article:author',
+        content: post.value?.author || 'Kurroome',
       },
       {
-        property: "og:article:published_time",
+        property: 'og:article:published_time',
         content: post.value?.created_at,
       },
-      { property: "og:article:modified_time", content: post.value?.updated_at },
+      { property: 'og:article:modified_time', content: post.value?.updated_at },
       {
-        property: "og:article:section",
-        content: post.value?.category?.name || "博客",
+        property: 'og:article:section',
+        content: post.value?.category?.name || '博客',
       },
-      { name: "twitter:title", content: post.value?.title ?? "文章未找到" },
-      { name: "twitter:description", content: desc },
+      { name: 'twitter:title', content: post.value?.title ?? '文章未找到' },
+      { name: 'twitter:description', content: desc },
     ],
   };
 });
 
 const showDeleteConfirm = () => {
   Modal.confirm({
-    title: "Are you sure delete this Post?",
+    title: 'Are you sure delete this Post?',
     icon: createVNode(ExclamationCircleOutlined),
-    content: "The action cannot be undone.",
-    okText: "Yes",
-    okType: "danger",
-    cancelText: "No",
+    content: 'The action cannot be undone.',
+    okText: 'Yes',
+    okType: 'danger',
+    cancelText: 'No',
     centered: true,
-    wrapClassName: "modal",
+    wrapClassName: 'modal',
     onOk() {
       handleDelete();
     },
@@ -175,65 +175,65 @@ const showDeleteConfirm = () => {
 const handleDelete = async () => {
   try {
     await blogService.deleteLegacyPost(postId.value);
-    useNotificationStore().success("文章删除成功");
-    router.push("/blog");
+    useNotificationStore().success('文章删除成功');
+    router.push('/blog');
   } catch (err: unknown) {
-    console.error("删除文章失败:", err);
+    console.error('删除文章失败:', err);
     const errorMsg =
-      err instanceof Error ? err.message : "删除文章失败，请稍后重试";
+      err instanceof Error ? err.message : '删除文章失败，请稍后重试';
     useNotificationStore().error(errorMsg);
   }
 };
 
 let clickHandler: ((event: Event) => void) | undefined;
 const setupCodeCopy = () => {
-  const contentContainer = document.querySelector(".prose");
+  const contentContainer = document.querySelector('.prose');
   if (!contentContainer) return;
 
   if (clickHandler) {
-    contentContainer.removeEventListener("click", clickHandler);
+    contentContainer.removeEventListener('click', clickHandler);
   }
 
   clickHandler = (event: Event) => {
     const target = event.target as HTMLElement;
-    if (target.classList.contains("copy-btn")) {
-      const codeBlock = target.closest("pre");
+    if (target.classList.contains('copy-btn')) {
+      const codeBlock = target.closest('pre');
       if (codeBlock) {
-        const codeElement = codeBlock.querySelector("code");
+        const codeElement = codeBlock.querySelector('code');
         if (codeElement) {
           navigator.clipboard
-            .writeText(codeElement.textContent ?? "")
+            .writeText(codeElement.textContent ?? '')
             .then(() => {
-              useNotificationStore().success("代码已复制到剪贴板");
+              useNotificationStore().success('代码已复制到剪贴板');
             })
             .catch(() => {
-              useNotificationStore().error("复制失败，请手动复制");
+              useNotificationStore().error('复制失败，请手动复制');
             });
         }
       }
     }
   };
 
-  contentContainer.addEventListener("click", clickHandler);
+  contentContainer.addEventListener('click', clickHandler);
 
-  contentContainer.querySelectorAll(".copy-btn").forEach((btn) => btn.remove());
+  contentContainer.querySelectorAll('.copy-btn').forEach((btn) => btn.remove());
 
-  const codeBlocks = contentContainer.querySelectorAll("pre");
+  const codeBlocks = contentContainer.querySelectorAll('pre');
   codeBlocks.forEach((block) => {
-    block.classList.add("w-[80%]", "whitespace-pre-wrap");
-    const button = document.createElement("button");
+    block.classList.add('w-[80%]', 'whitespace-pre-wrap');
+    const button = document.createElement('button');
     button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2z"/></svg>`;
     button.className =
-      "copy-btn absolute top-2 right-3 rounded-lg bg-card px-2 py-1 hover:bg-gray-300";
-    block.style.position = "relative";
+      'copy-btn absolute top-2 right-3 rounded-lg bg-card px-2 py-1 hover:bg-gray-300';
+    block.style.position = 'relative';
     block.appendChild(button);
   });
 };
 
 onUnmounted(() => {
-  const contentContainer = document.querySelector(".prose");
+  const contentContainer = document.querySelector('.prose');
   if (contentContainer && clickHandler) {
-    contentContainer.removeEventListener("click", clickHandler);
+    contentContainer.removeEventListener('click', clickHandler);
   }
 });
 </script>
@@ -371,10 +371,10 @@ onUnmounted(() => {
 </template>
 
 <style>
-@import "twikoo/dist/twikoo.css";
+@import 'twikoo/dist/twikoo.css';
 
 .copy-btn::before {
-  content: "复制";
+  content: '复制';
   position: absolute;
   bottom: -150%;
   left: 50%;
@@ -419,11 +419,11 @@ onUnmounted(() => {
   font-size: 1.1rem;
   line-height: 2;
   font-weight: 500;
-  font-family: "HarmonyOS Sans";
+  font-family: 'HarmonyOS Sans';
 }
 
 /* 标题层级优化 */
-.article-content :where(h1):not(:where([class~="not-prose"] *)) {
+.article-content :where(h1):not(:where([class~='not-prose'] *)) {
   font-size: 2.25rem;
   font-weight: 700;
   margin-top: 2.5rem;
@@ -431,7 +431,7 @@ onUnmounted(() => {
   line-height: 1.2;
 }
 
-.article-content :where(h2):not(:where([class~="not-prose"] *)) {
+.article-content :where(h2):not(:where([class~='not-prose'] *)) {
   font-size: 1.75rem;
   font-weight: 600;
   margin-top: 2rem;
@@ -441,7 +441,7 @@ onUnmounted(() => {
   border-bottom: 1px solid var(--border);
 }
 
-.article-content :where(h3):not(:where([class~="not-prose"] *)) {
+.article-content :where(h3):not(:where([class~='not-prose'] *)) {
   font-size: 1.375rem;
   font-weight: 600;
   margin-top: 1.75rem;
@@ -450,12 +450,12 @@ onUnmounted(() => {
 }
 
 /* 段落间距 */
-.article-content :where(p):not(:where([class~="not-prose"] *)) {
+.article-content :where(p):not(:where([class~='not-prose'] *)) {
   margin-bottom: 1.25rem;
 }
 
 /* 引用块美化 */
-.article-content :where(blockquote):not(:where([class~="not-prose"] *)) {
+.article-content :where(blockquote):not(:where([class~='not-prose'] *)) {
   border-left-width: 4px;
   border-left-color: var(--primary);
   background: var(--warm);
@@ -465,12 +465,12 @@ onUnmounted(() => {
   margin: 1.5rem 0;
 }
 
-.article-content :where(blockquote p):not(:where([class~="not-prose"] *)) {
+.article-content :where(blockquote p):not(:where([class~='not-prose'] *)) {
   margin-bottom: 0;
 }
 
 /* 代码块优化 */
-.article-content :where(pre):not(:where([class~="not-prose"] *)) {
+.article-content :where(pre):not(:where([class~='not-prose'] *)) {
   border-radius: 0.75rem;
   padding: 1.25rem;
   margin: 1.5rem 0;
@@ -478,38 +478,38 @@ onUnmounted(() => {
   background: var(--muted);
 }
 
-.article-content :where(code):not(:where([class~="not-prose"] *)) {
+.article-content :where(code):not(:where([class~='not-prose'] *)) {
   font-size: 0.875em;
   padding: 0.15em 0.35em;
   border-radius: 0.25rem;
   background: var(--warm);
   border: 1px solid color-mix(in oklch, var(--primary) 15%, transparent);
   font-family:
-    ui-monospace, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", monospace;
+    ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', 'Roboto Mono', monospace;
   vertical-align: 0.05em;
 }
 
-.article-content :where(pre code):not(:where([class~="not-prose"] *)) {
+.article-content :where(pre code):not(:where([class~='not-prose'] *)) {
   background: transparent;
   padding: 0;
   font-size: 1rem;
   line-height: 1.7;
   font-family:
-    ui-monospace, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", monospace;
+    ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', 'Roboto Mono', monospace;
 }
 
 /* 列表优化 */
-.article-content :where(ul, ol):not(:where([class~="not-prose"] *)) {
+.article-content :where(ul, ol):not(:where([class~='not-prose'] *)) {
   margin: 1.25rem 0;
   padding-left: 1.75rem;
 }
 
-.article-content :where(li):not(:where([class~="not-prose"] *)) {
+.article-content :where(li):not(:where([class~='not-prose'] *)) {
   margin-bottom: 0.5rem;
 }
 
 /* 图片居中 + 圆角 */
-.article-content :where(img):not(:where([class~="not-prose"] *)) {
+.article-content :where(img):not(:where([class~='not-prose'] *)) {
   border-radius: 0.75rem;
   margin: 1.5rem auto;
   display: block;
@@ -518,7 +518,7 @@ onUnmounted(() => {
 }
 
 /* 表格横向滚动 */
-.article-content :where(table):not(:where([class~="not-prose"] *)) {
+.article-content :where(table):not(:where([class~='not-prose'] *)) {
   display: block;
   overflow-x: auto;
   white-space: nowrap;
@@ -528,29 +528,29 @@ onUnmounted(() => {
   font-size: 0.9375rem;
 }
 
-.article-content :where(th, td):not(:where([class~="not-prose"] *)) {
+.article-content :where(th, td):not(:where([class~='not-prose'] *)) {
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--border);
 }
 
-.article-content :where(th):not(:where([class~="not-prose"] *)) {
+.article-content :where(th):not(:where([class~='not-prose'] *)) {
   font-weight: 600;
   background: var(--muted);
   text-align: left;
 }
 
-.article-content :where(tr:hover):not(:where([class~="not-prose"] *)) {
+.article-content :where(tr:hover):not(:where([class~='not-prose'] *)) {
   background: color-mix(in oklch, var(--muted) 30%, var(--card));
 }
 
 /* 分隔线 */
-.article-content :where(hr):not(:where([class~="not-prose"] *)) {
+.article-content :where(hr):not(:where([class~='not-prose'] *)) {
   margin: 2.5rem 0;
   border-color: var(--border);
 }
 
 /* 链接样式 */
-.article-content :where(a):not(:where([class~="not-prose"] *)) {
+.article-content :where(a):not(:where([class~='not-prose'] *)) {
   color: var(--primary);
   text-decoration: underline;
   text-underline-offset: 0.2em;
@@ -558,7 +558,7 @@ onUnmounted(() => {
   transition: opacity 0.2s;
 }
 
-.article-content :where(a:hover):not(:where([class~="not-prose"] *)) {
+.article-content :where(a:hover):not(:where([class~='not-prose'] *)) {
   opacity: 0.8;
 }
 

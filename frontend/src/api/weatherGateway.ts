@@ -1,10 +1,10 @@
-import request from "@/api/request";
+import request from '@/api/request';
 import type {
   TideData,
   WeatherDay,
   WeatherFullResponse,
   WeatherNow,
-} from "@/views/fishing/types";
+} from '@/views/fishing/types';
 
 export interface TideResponse extends TideData {
   code: string;
@@ -24,7 +24,7 @@ export const weatherGateway: WeatherGateway = {
     harbor: string;
     date: string;
   }): Promise<TideResponse> {
-    const res = await request.get<{ data: TideResponse }>("v2/weather/tide", {
+    const res = await request.get<{ data: TideResponse }>('v2/weather/tide', {
       params: payload,
     });
     return res.data.data;
@@ -35,7 +35,7 @@ export const weatherGateway: WeatherGateway = {
   }): Promise<WeatherFullResponse> {
     const [lng, lat] = payload.location;
     const res = await request.get<{ data: WeatherFullResponse }>(
-      "v2/weather/full",
+      'v2/weather/full',
       {
         params: { location: `${lng.toFixed(2)},${lat.toFixed(2)}` },
       },

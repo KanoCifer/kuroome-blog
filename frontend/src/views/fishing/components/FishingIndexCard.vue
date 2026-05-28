@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useFishingMapStore } from "@/stores/fishingMap";
-import type { FishingIndexData } from "@/views/fishing/types";
-import { FishingRod, Loader } from "lucide-vue-next";
-import { motion } from "motion-v";
-import { storeToRefs } from "pinia";
+import { useFishingMapStore } from '@/stores/fishingMap';
+import type { FishingIndexData } from '@/views/fishing/types';
+import { FishingRod, Loader } from 'lucide-vue-next';
+import { motion } from 'motion-v';
+import { storeToRefs } from 'pinia';
 
 interface Props {
   location?: [number, number];
@@ -14,7 +14,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  (e: "feedback-click", data: FishingIndexData): void;
+  (e: 'feedback-click', data: FishingIndexData): void;
 }>();
 
 const fishingMapStore = useFishingMapStore();
@@ -25,27 +25,27 @@ const {
 } = storeToRefs(fishingMapStore);
 // console.log("钓鱼指数数据：", indexData.value);
 const levelColors: Record<string, string> = {
-  爆护: "text-success",
-  好: "text-primary",
-  一般: "text-warning",
-  差: "text-destructive",
-  空军: "text-muted-foreground",
+  爆护: 'text-success',
+  好: 'text-primary',
+  一般: 'text-warning',
+  差: 'text-destructive',
+  空军: 'text-muted-foreground',
 };
 
 const levelBg: Record<string, string> = {
-  爆护: "bg-success/10",
-  好: "bg-primary/10",
-  一般: "bg-warning/10",
-  差: "bg-destructive/10",
-  空军: "bg-muted",
+  爆护: 'bg-success/10',
+  好: 'bg-primary/10',
+  一般: 'bg-warning/10',
+  差: 'bg-destructive/10',
+  空军: 'bg-muted',
 };
 
 const getGaugeColor = (percentage: number): string => {
-  if (percentage >= 85) return "#22c55e";
-  if (percentage >= 70) return "#06b6d4";
-  if (percentage >= 50) return "#f97316";
-  if (percentage <= 30) return "#ef4444";
-  return "#3b82f6"; // blue-500
+  if (percentage >= 85) return '#22c55e';
+  if (percentage >= 70) return '#06b6d4';
+  if (percentage >= 50) return '#f97316';
+  if (percentage <= 30) return '#ef4444';
+  return '#3b82f6'; // blue-500
 };
 
 const getGaugeStyle = (value: number) => {
@@ -59,27 +59,27 @@ const getGaugeStyle = (value: number) => {
 
 const formatFeatureName = (name: string): string => {
   const mapping: Record<string, string> = {
-    w1_temp: "气温",
-    w2_humidity: "湿度",
-    w3_pressure: "气压",
-    w4_wind: "风速",
-    w5_rain: "降水",
-    w6_tide_rising: "涨潮",
-    w7_hours_to_tide: "距潮",
-    w8_tide_range: "潮差",
-    w9_indices: "指数",
+    w1_temp: '气温',
+    w2_humidity: '湿度',
+    w3_pressure: '气压',
+    w4_wind: '风速',
+    w5_rain: '降水',
+    w6_tide_rising: '涨潮',
+    w7_hours_to_tide: '距潮',
+    w8_tide_range: '潮差',
+    w9_indices: '指数',
   };
   return mapping[name] || name;
 };
 
 const fetchIndex = async () => {
-  console.log("刷新钓鱼指数，位置：", props.location);
+  console.log('刷新钓鱼指数，位置：', props.location);
   await fishingMapStore.fetchWeatherAndFishing(props.location);
 };
 
 const handleFeedback = () => {
   if (indexData.value) {
-    emit("feedback-click", indexData.value);
+    emit('feedback-click', indexData.value);
   }
 };
 </script>
@@ -112,7 +112,7 @@ const handleFeedback = () => {
           @click="fetchIndex"
         >
           <Loader v-if="loading" class="h-3 w-3 animate-spin" />
-          {{ loading ? "刷新中..." : "刷新" }}
+          {{ loading ? '刷新中...' : '刷新' }}
         </button>
         <div
           class="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-sky-400 to-blue-500 shadow-lg shadow-sky-500/25 transition-transform duration-300 group-hover:scale-110"
@@ -158,7 +158,7 @@ const handleFeedback = () => {
         >
           权重调整
           <div class="text-foreground mt-1 font-medium">
-            {{ indexData.residual > 0 ? "+" : "" }}{{ indexData.residual }}
+            {{ indexData.residual > 0 ? '+' : '' }}{{ indexData.residual }}
           </div>
         </div>
         <div

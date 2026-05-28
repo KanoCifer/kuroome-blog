@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import IconCloud from "@/components/icons/IconCloud.vue";
-import IconKey from "@/components/icons/IconKey.vue";
-import IconLock from "@/components/icons/IconLock.vue";
-import { useAuthStore } from "@/stores/auth";
-import type { LoginForm } from "@/types";
-import { startAuthentication } from "@simplewebauthn/browser";
-import { ShieldUser } from "lucide-vue-next";
-import { ref } from "vue";
-import { RouterLink, useRoute, useRouter } from "vue-router";
+import IconCloud from '@/components/icons/IconCloud.vue';
+import IconKey from '@/components/icons/IconKey.vue';
+import IconLock from '@/components/icons/IconLock.vue';
+import { useAuthStore } from '@/stores/auth';
+import type { LoginForm } from '@/types';
+import { startAuthentication } from '@simplewebauthn/browser';
+import { ShieldUser } from 'lucide-vue-next';
+import { ref } from 'vue';
+import { RouterLink, useRoute, useRouter } from 'vue-router';
 
 const router = useRouter();
 const route = useRoute();
 const auth = useAuthStore();
 
 const form = ref<LoginForm>({
-  username: "",
-  password: "",
+  username: '',
+  password: '',
   rememberMe: false,
 });
 
@@ -35,10 +35,10 @@ const handleSubmit = async () => {
   isSubmitting.value = true;
 
   if (!form.value.username) {
-    errors.value.username = "用户名不能为空";
+    errors.value.username = '用户名不能为空';
   }
   if (!form.value.password) {
-    errors.value.password = "密码不能为空";
+    errors.value.password = '密码不能为空';
   }
   if (errors.value.username || errors.value.password) {
     isSubmitting.value = false;
@@ -51,13 +51,13 @@ const handleSubmit = async () => {
       form.value.password,
       form.value.rememberMe,
     );
-    const redirect = (route.query.redirect as string) || "/";
+    const redirect = (route.query.redirect as string) || '/';
     router.push(redirect);
   } catch (err: unknown) {
     // 后端返回的 APIResponse 在 request.ts 已转成 Error.message
     if (err instanceof Error) {
       // 把简单错误显示在 password 字段上（根据项目需要可更细化）
-      errors.value.password = "用户名或密码错误";
+      errors.value.password = '用户名或密码错误';
     }
   } finally {
     isSubmitting.value = false;
@@ -78,7 +78,7 @@ const handlePasskeyLogin = async () => {
       optionsJSON: options,
     });
     await auth.loginWithPasskey(assertion);
-    const redirect = (route.query.redirect as string) || "/";
+    const redirect = (route.query.redirect as string) || '/';
     router.push(redirect);
   } catch (err: unknown) {
     if (err instanceof Error) {
@@ -239,7 +239,7 @@ const handleGitHubLogin = () => {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 />
               </svg>
-              {{ isSubmitting ? null : "Login" }}
+              {{ isSubmitting ? null : 'Login' }}
             </button>
 
             <!-- Remember Me Checkbox -->

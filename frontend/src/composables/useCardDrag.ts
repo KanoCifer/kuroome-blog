@@ -1,5 +1,5 @@
-import { useCardLayoutStore } from "@/stores/cardLayout";
-import { onUnmounted, ref } from "vue";
+import { useCardLayoutStore } from '@/stores/cardLayout';
+import { onUnmounted, ref } from 'vue';
 
 interface DragState {
   cardName: string;
@@ -33,8 +33,8 @@ export function useCardDrag() {
     };
     activeElement.value = element;
 
-    element.style.zIndex = "100";
-    element.style.cursor = "grabbing";
+    element.style.zIndex = '100';
+    element.style.cursor = 'grabbing';
   }
 
   function onCardPointerMove(e: PointerEvent) {
@@ -61,9 +61,9 @@ export function useCardDrag() {
 
     // Reset DOM; Vue reactivity will restore translate to -50% -50%
     // because top/left now include the offset baked in.
-    activeElement.value.style.zIndex = "";
-    activeElement.value.style.cursor = "";
-    activeElement.value.style.translate = "";
+    activeElement.value.style.zIndex = '';
+    activeElement.value.style.cursor = '';
+    activeElement.value.style.translate = '';
 
     draggingCard.value = null;
     activeElement.value = null;

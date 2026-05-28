@@ -29,14 +29,14 @@
                 : 'bg-border h-2 w-2 rounded-full',
             ]"
           ></div>
-          {{ isSSEConnected ? "Auto-refresh active" : "Auto-refresh paused" }}
+          {{ isSSEConnected ? 'Auto-refresh active' : 'Auto-refresh paused' }}
         </div>
         <button
           type="button"
           @click="toggleAutoRefresh"
           class="text-foreground hover:bg-accent bg-muted rounded-xl px-4 py-2 text-sm font-medium transition-colors"
         >
-          {{ isSSEConnected ? "Pause" : "Start" }} Auto-refresh
+          {{ isSSEConnected ? 'Pause' : 'Start' }} Auto-refresh
         </button>
       </div>
     </div>
@@ -203,10 +203,10 @@
 </template>
 
 <script setup lang="ts">
-import { useThemeStore } from "@/stores/theme";
-import dayjs from "dayjs";
-import { computed, onMounted, onUnmounted, ref } from "vue";
-import VChart from "vue-echarts";
+import { useThemeStore } from '@/stores/theme';
+import dayjs from 'dayjs';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import VChart from 'vue-echarts';
 
 // Types
 interface ServerStatus {
@@ -227,7 +227,7 @@ interface HistoryItem {
 }
 
 defineOptions({
-  name: "ServerMonitor",
+  name: 'ServerMonitor',
 });
 
 const props = defineProps<{
@@ -236,7 +236,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "status-update", status: ServerStatus): void;
+  (e: 'status-update', status: ServerStatus): void;
 }>();
 
 const loading = ref(false);
@@ -248,31 +248,31 @@ const isSSEConnected = ref(false);
 // theme store for dark/light detection
 const themeStore = useThemeStore();
 const isDark = computed(() => {
-  if (themeStore.theme === "dark") return true;
-  if (themeStore.theme === "light") return false;
+  if (themeStore.theme === 'dark') return true;
+  if (themeStore.theme === 'light') return false;
   // system setting
-  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
 });
 
 // colors that adapt to mode
-const textColor = computed(() => (isDark.value ? "#f3f4f6" : "#1f2937"));
-const axisLineColor = computed(() => (isDark.value ? "#374151" : "#e5e7eb"));
+const textColor = computed(() => (isDark.value ? '#f3f4f6' : '#1f2937'));
+const axisLineColor = computed(() => (isDark.value ? '#374151' : '#e5e7eb'));
 const tooltipBgColor = computed(() =>
-  isDark.value ? "rgba(0,0,0,0.75)" : "rgba(255,255,255,0.95)",
+  isDark.value ? 'rgba(0,0,0,0.75)' : 'rgba(255,255,255,0.95)',
 );
 
 // Get status color based on percentage
 const getStatusColor = (percent: number): string => {
-  if (percent < 50) return "#10b981";
-  if (percent < 80) return "#f59e0b";
-  return "#ef4444";
+  if (percent < 50) return '#10b981';
+  if (percent < 80) return '#f59e0b';
+  return '#ef4444';
 };
 
 // CPU Gauge Chart Option
 const cpuGaugeOption = computed(() => ({
   series: [
     {
-      type: "gauge",
+      type: 'gauge',
       startAngle: 180,
       endAngle: 0,
       min: 0,
@@ -280,15 +280,15 @@ const cpuGaugeOption = computed(() => ({
       splitNumber: 5,
       itemStyle: {
         color: {
-          type: "linear",
+          type: 'linear',
           x: 0,
           y: 0,
           x2: 1,
           y2: 0,
           colorStops: [
-            { offset: 0, color: "#10b981" },
-            { offset: 0.5, color: "#f59e0b" },
-            { offset: 1, color: "#ef4444" },
+            { offset: 0, color: '#10b981' },
+            { offset: 0.5, color: '#f59e0b' },
+            { offset: 1, color: '#ef4444' },
           ],
         },
       },
@@ -297,7 +297,7 @@ const cpuGaugeOption = computed(() => ({
       axisLine: {
         lineStyle: {
           width: 18,
-          color: [[1, "#e5e7eb"]],
+          color: [[1, '#e5e7eb']],
         },
       },
       axisTick: { show: false },
@@ -306,10 +306,10 @@ const cpuGaugeOption = computed(() => ({
       title: { show: false },
       detail: {
         valueAnimation: true,
-        offsetCenter: [0, "0%"],
+        offsetCenter: [0, '0%'],
         fontSize: 32,
-        fontWeight: "bold",
-        formatter: "{value}%",
+        fontWeight: 'bold',
+        formatter: '{value}%',
         color: textColor.value,
       },
       data: [{ value: serverStatus.value?.cpu_percent ?? 0 }],
@@ -321,7 +321,7 @@ const cpuGaugeOption = computed(() => ({
 const memoryGaugeOption = computed(() => ({
   series: [
     {
-      type: "gauge",
+      type: 'gauge',
       startAngle: 180,
       endAngle: 0,
       min: 0,
@@ -329,15 +329,15 @@ const memoryGaugeOption = computed(() => ({
       splitNumber: 5,
       itemStyle: {
         color: {
-          type: "linear",
+          type: 'linear',
           x: 0,
           y: 0,
           x2: 1,
           y2: 0,
           colorStops: [
-            { offset: 0, color: "#3b82f6" },
-            { offset: 0.5, color: "#8b5cf6" },
-            { offset: 1, color: "#ef4444" },
+            { offset: 0, color: '#3b82f6' },
+            { offset: 0.5, color: '#8b5cf6' },
+            { offset: 1, color: '#ef4444' },
           ],
         },
       },
@@ -355,10 +355,10 @@ const memoryGaugeOption = computed(() => ({
       title: { show: false },
       detail: {
         valueAnimation: true,
-        offsetCenter: [0, "0%"],
+        offsetCenter: [0, '0%'],
         fontSize: 32,
-        fontWeight: "bold",
-        formatter: "{value}%",
+        fontWeight: 'bold',
+        formatter: '{value}%',
         color: textColor.value,
       },
       data: [{ value: serverStatus.value?.mem_usage ?? 0 }],
@@ -369,80 +369,80 @@ const memoryGaugeOption = computed(() => ({
 // History Chart Option
 const historyChartOption = computed(() => ({
   tooltip: {
-    trigger: "axis",
+    trigger: 'axis',
     backgroundColor: tooltipBgColor.value,
     borderColor: axisLineColor.value,
     textStyle: { color: textColor.value },
   },
   legend: {
-    data: ["CPU", "Memory"],
+    data: ['CPU', 'Memory'],
     top: 0,
     textStyle: { color: textColor.value },
   },
   grid: {
-    left: "3%",
-    right: "4%",
-    bottom: "3%",
-    top: "15%",
+    left: '3%',
+    right: '4%',
+    bottom: '3%',
+    top: '15%',
     containLabel: true,
   },
   xAxis: {
-    type: "category",
+    type: 'category',
     boundaryGap: false,
-    data: history.value.map((d) => dayjs(d.timestamp).format("HH:mm:ss")),
+    data: history.value.map((d) => dayjs(d.timestamp).format('HH:mm:ss')),
     axisLine: { lineStyle: { color: axisLineColor.value } },
     axisLabel: { color: textColor.value, fontSize: 10 },
   },
   yAxis: {
-    type: "value",
+    type: 'value',
     min: 0,
     max: 100,
     axisLine: { show: false },
-    axisLabel: { color: textColor.value, formatter: "{value}%" },
-    splitLine: { lineStyle: { color: isDark.value ? "#4b5563" : "#f3f4f6" } },
+    axisLabel: { color: textColor.value, formatter: '{value}%' },
+    splitLine: { lineStyle: { color: isDark.value ? '#4b5563' : '#f3f4f6' } },
   },
   series: [
     {
-      name: "CPU",
-      type: "line",
+      name: 'CPU',
+      type: 'line',
       smooth: true,
-      symbol: "circle",
+      symbol: 'circle',
       symbolSize: 4,
-      lineStyle: { width: 2, color: "#f59e0b" },
-      itemStyle: { color: "#f59e0b" },
+      lineStyle: { width: 2, color: '#f59e0b' },
+      itemStyle: { color: '#f59e0b' },
       areaStyle: {
         color: {
-          type: "linear",
+          type: 'linear',
           x: 0,
           y: 0,
           x2: 0,
           y2: 1,
           colorStops: [
-            { offset: 0, color: "rgba(245, 158, 11, 0.2)" },
-            { offset: 1, color: "rgba(245, 158, 11, 0.02)" },
+            { offset: 0, color: 'rgba(245, 158, 11, 0.2)' },
+            { offset: 1, color: 'rgba(245, 158, 11, 0.02)' },
           ],
         },
       },
       data: history.value.map((d) => d.cpu),
     },
     {
-      name: "Memory",
-      type: "line",
+      name: 'Memory',
+      type: 'line',
       smooth: true,
-      symbol: "circle",
+      symbol: 'circle',
       symbolSize: 4,
-      lineStyle: { width: 2, color: "#8b5cf6" },
-      itemStyle: { color: "#8b5cf6" },
+      lineStyle: { width: 2, color: '#8b5cf6' },
+      itemStyle: { color: '#8b5cf6' },
       areaStyle: {
         color: {
-          type: "linear",
+          type: 'linear',
           x: 0,
           y: 0,
           x2: 0,
           y2: 1,
           colorStops: [
-            { offset: 0, color: "rgba(139, 92, 246, 0.2)" },
-            { offset: 1, color: "rgba(139, 92, 246, 0.02)" },
+            { offset: 0, color: 'rgba(139, 92, 246, 0.2)' },
+            { offset: 1, color: 'rgba(139, 92, 246, 0.02)' },
           ],
         },
       },
@@ -458,21 +458,21 @@ const fetchStatusSSE = async () => {
     eventSource.value = null;
   }
 
-  console.log("Establishing SSE connection for server status...");
+  console.log('Establishing SSE connection for server status...');
   try {
-    const es = new EventSource("/api/v1/status/server/status/stream", {
+    const es = new EventSource('/api/v1/status/server/status/stream', {
       withCredentials: true,
     });
 
     es.onopen = () => {
-      console.log("SSE connection established");
+      console.log('SSE connection established');
       isSSEConnected.value = true;
     };
 
     es.onmessage = (event) => {
       const data = JSON.parse(event.data);
       serverStatus.value = data;
-      emit("status-update", data);
+      emit('status-update', data);
 
       // Add to history
       history.value.push({
@@ -488,7 +488,7 @@ const fetchStatusSSE = async () => {
     };
 
     es.onerror = (err) => {
-      console.error("SSE error:", err);
+      console.error('SSE error:', err);
       es.close();
       eventSource.value = null;
       isSSEConnected.value = false;
@@ -496,7 +496,7 @@ const fetchStatusSSE = async () => {
 
     eventSource.value = es;
   } catch (err) {
-    console.error("Failed to establish SSE connection:", err);
+    console.error('Failed to establish SSE connection:', err);
     isSSEConnected.value = false;
   }
 };
@@ -508,7 +508,7 @@ const toggleAutoRefresh = () => {
     eventSource.value.close();
     eventSource.value = null;
     isSSEConnected.value = false;
-    console.log("SSE connection closed");
+    console.log('SSE connection closed');
   } else {
     // Start: establish new connection
     fetchStatusSSE();

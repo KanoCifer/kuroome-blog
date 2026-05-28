@@ -1,5 +1,5 @@
-import { blogGateway } from "@/api/blogGateway";
-import type { BlogPost, Category, BlogPagination, Comment } from "@/types";
+import { blogGateway } from '@/api/blogGateway';
+import type { BlogPost, Category, BlogPagination, Comment } from '@/types';
 
 // 博客列表项（处理后的）
 export interface BlogListItem {

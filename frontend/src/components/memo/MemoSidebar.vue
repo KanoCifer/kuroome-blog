@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref } from 'vue';
 
-import IconMemo from "@/components/icons/IconMemo.vue";
+import IconMemo from '@/components/icons/IconMemo.vue';
 
-const memoText = ref("");
-const STORAGE_KEY = "readinglist_memo_sidebar";
+const memoText = ref('');
+const STORAGE_KEY = 'readinglist_memo_sidebar';
 
 const saveMemo = () => {
   localStorage.setItem(STORAGE_KEY, memoText.value);
 };
 
 const clearMemo = () => {
-  if (memoText.value && confirm("确定要清空备忘录吗？")) {
-    memoText.value = "";
+  if (memoText.value && confirm('确定要清空备忘录吗？')) {
+    memoText.value = '';
     localStorage.removeItem(STORAGE_KEY);
   }
 };

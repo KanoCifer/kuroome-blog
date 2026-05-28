@@ -43,12 +43,12 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from "./BentoCard.vue";
+import BentoCard from './BentoCard.vue';
 
 const item = {
-  title: "Refactoring UI",
+  title: 'Refactoring UI',
   description:
     "Learn how to design beautiful user interfaces by yourself using specific tactics explained from a developer's point-of-view.",
-  type: "Book",
+  type: 'Book',
 };
 </script>

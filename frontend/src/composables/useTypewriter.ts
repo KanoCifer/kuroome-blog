@@ -1,14 +1,14 @@
-import { ref, onUnmounted } from "vue";
+import { ref, onUnmounted } from 'vue';
 
 export function useTypewriter() {
-  const displayed = ref("");
+  const displayed = ref('');
   const isTyping = ref(false);
   const isDone = ref(false);
   let timer: ReturnType<typeof setInterval> | null = null;
 
   function start(text: string, speed = 50, onComplete?: () => void) {
     stop();
-    displayed.value = "";
+    displayed.value = '';
     isTyping.value = true;
     isDone.value = false;
     let i = 0;

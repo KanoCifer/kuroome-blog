@@ -7,7 +7,7 @@
     >
       <div>
         <h1 class="text-foreground max-w-6xl text-center font-serif text-7xl">
-          {{ activeTab === "messages" ? "留言管理" : "评论管理" }}
+          {{ activeTab === 'messages' ? '留言管理' : '评论管理' }}
         </h1>
         <!-- Description -->
         <div
@@ -111,7 +111,7 @@
                   d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                 />
               </svg>
-              {{ loading ? "刷新中..." : "刷新" }}
+              {{ loading ? '刷新中...' : '刷新' }}
             </button>
             <button
               @click="goBack"
@@ -221,20 +221,20 @@
 </template>
 
 <script setup lang="ts">
-import CommentsTab from "@/components/message/CommentsTab.vue";
-import MessagesTab from "@/components/message/MessagesTab.vue";
-import { messageService } from "@/service/messageService";
-import { useAuthStore } from "@/stores/auth";
-import type { Comment, Message } from "@/types";
-import { useScroll } from "@vueuse/core";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import { computed, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import CommentsTab from '@/components/message/CommentsTab.vue';
+import MessagesTab from '@/components/message/MessagesTab.vue';
+import { messageService } from '@/service/messageService';
+import { useAuthStore } from '@/stores/auth';
+import type { Comment, Message } from '@/types';
+import { useScroll } from '@vueuse/core';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 // 组件名称，用于 KeepAlive 缓存
 defineOptions({
-  name: "MessageManageView",
+  name: 'MessageManageView',
 });
 
 dayjs.extend(relativeTime);
@@ -243,13 +243,13 @@ const auth = useAuthStore();
 const router = useRouter();
 const { y } = useScroll(window);
 
-const activeTab = ref<"messages" | "comments">("messages");
+const activeTab = ref<'messages' | 'comments'>('messages');
 const pendingMessages = ref<Message[]>([]);
 const approvedMessages = ref<Message[]>([]);
 const pendingComments = ref<Comment[]>([]);
 const approvedComments = ref<Comment[]>([]);
 const loading = ref(false);
-const error = ref("");
+const error = ref('');
 const actionLoading = ref<string | null>(null);
 
 // Parallax computed styles
@@ -270,7 +270,7 @@ onMounted(async () => {
   }
 
   if (!auth.isAuthenticated || auth.user?.id !== 1) {
-    router.push("/");
+    router.push('/');
     return;
   }
 
@@ -280,7 +280,7 @@ onMounted(async () => {
 
 const fetchMessages = async () => {
   loading.value = true;
-  error.value = "";
+  error.value = '';
   try {
     const response = await messageService.getAdminMessages();
 
@@ -295,10 +295,10 @@ const fetchMessages = async () => {
       error.value =
         result.error?.message ||
         result.description ||
-        "Failed to load messages";
+        'Failed to load messages';
     }
   } catch {
-    error.value = "Network error occurred";
+    error.value = 'Network error occurred';
   } finally {
     loading.value = false;
   }
@@ -306,7 +306,7 @@ const fetchMessages = async () => {
 
 const fetchComments = async () => {
   loading.value = true;
-  error.value = "";
+  error.value = '';
   try {
     const response = await messageService.getAdminComments();
 
@@ -321,10 +321,10 @@ const fetchComments = async () => {
       error.value =
         result.error?.message ||
         result.description ||
-        "Failed to load comments";
+        'Failed to load comments';
     }
   } catch {
-    error.value = "Network error occurred";
+    error.value = 'Network error occurred';
   } finally {
     loading.value = false;
   }
@@ -333,7 +333,7 @@ const fetchComments = async () => {
 const handleApprove = async (itemId: string) => {
   actionLoading.value = itemId;
   try {
-    if (activeTab.value === "messages") {
+    if (activeTab.value === 'messages') {
       await messageService.approveAdminMessage(itemId);
       await fetchMessages();
     } else {
@@ -342,8 +342,8 @@ const handleApprove = async (itemId: string) => {
     }
   } catch (err) {
     if (err instanceof Error)
-      error.value = err.message || "Network error occurred";
-    else error.value = "Network error occurred";
+      error.value = err.message || 'Network error occurred';
+    else error.value = 'Network error occurred';
   } finally {
     actionLoading.value = null;
   }
@@ -352,7 +352,7 @@ const handleApprove = async (itemId: string) => {
 const handleDelete = async (itemId: string) => {
   actionLoading.value = itemId;
   try {
-    if (activeTab.value === "messages") {
+    if (activeTab.value === 'messages') {
       await messageService.deleteAdminMessage(itemId);
       await fetchMessages();
     } else {
@@ -361,15 +361,15 @@ const handleDelete = async (itemId: string) => {
     }
   } catch (err) {
     if (err instanceof Error)
-      error.value = err.message || "Network error occurred";
-    else error.value = "Network error occurred";
+      error.value = err.message || 'Network error occurred';
+    else error.value = 'Network error occurred';
   } finally {
     actionLoading.value = null;
   }
 };
 
 const handleRefresh = async () => {
-  if (activeTab.value === "messages") {
+  if (activeTab.value === 'messages') {
     await fetchMessages();
   } else {
     await fetchComments();
@@ -388,11 +388,11 @@ const goBack = () => {
   width: 100%;
 }
 
-.tab-content[v-show="false"] {
+.tab-content[v-show='false'] {
   display: none;
 }
 
-.tab-content[v-show="true"] {
+.tab-content[v-show='true'] {
   display: block;
 }
 </style>

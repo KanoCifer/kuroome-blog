@@ -1,7 +1,7 @@
-import { analyticsService } from "@/service/analyticsService";
-import { useStorage } from "@vueuse/core";
-import { UAParser } from "ua-parser-js";
-import { v4 } from "uuid";
+import { analyticsService } from '@/service/analyticsService';
+import { useStorage } from '@vueuse/core';
+import { UAParser } from 'ua-parser-js';
+import { v4 } from 'uuid';
 
 // 生成 UUID 作为访客唯一标识
 function generateVisitorId() {
@@ -9,7 +9,7 @@ function generateVisitorId() {
 }
 
 // 使用 VueUse 的 useStorage 来持久化访客 ID
-const visitorId = useStorage("visitorId", generateVisitorId());
+const visitorId = useStorage('visitorId', generateVisitorId());
 
 export function getVisitorId() {
   return visitorId.value;
@@ -25,16 +25,16 @@ export function collectVisitorData() {
     visitor_id: getVisitorId(), // 访客唯一标识
     page_url: location.href, // 当前访问的完整URL
     page_path: location.pathname, // 页面路径
-    referrer: document.referrer || "", // 访问来源
+    referrer: document.referrer || '', // 访问来源
     browser: uaResult.ua, // 浏览器/设备信息
     screen_resolution: `${screen.width}x${screen.height}`, // 屏幕分辨率
-    language: navigator.language || "", // 浏览器语言
-    browser_name: uaResult.browser.name || "", // 浏览器名称
-    browser_version: uaResult.browser.version || "", // 浏览器版本
-    os_name: uaResult.os.name || "", // 操作系统名称
-    os_version: uaResult.os.version || "", // 操作系统版本
-    device_type: uaResult.device.type || "desktop", // 设备类型（mobile/tablet/desktop）
-    cpu: uaResult.cpu.architecture || "", // CPU 架构
+    language: navigator.language || '', // 浏览器语言
+    browser_name: uaResult.browser.name || '', // 浏览器名称
+    browser_version: uaResult.browser.version || '', // 浏览器版本
+    os_name: uaResult.os.name || '', // 操作系统名称
+    os_version: uaResult.os.version || '', // 操作系统版本
+    device_type: uaResult.device.type || 'desktop', // 设备类型（mobile/tablet/desktop）
+    cpu: uaResult.cpu.architecture || '', // CPU 架构
   };
 }
 
@@ -47,7 +47,7 @@ export async function reportVisitorData() {
   } catch (error) {
     // 上报失败不影响主流程，仅控制台打印
     if (error instanceof Error) {
-      console.warn("访客追踪数据上报失败:", error.message);
+      console.warn('访客追踪数据上报失败:', error.message);
     }
   }
 }

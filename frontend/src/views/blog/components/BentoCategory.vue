@@ -58,12 +58,12 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from "@/components/bento/BentoCard.vue";
-import IconTags from "@/components/icons/IconTags.vue";
-import { blogService } from "@/service/blogService";
-import type { Category, CategoryResponseItem, Post } from "@/types";
-import { onMounted, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import BentoCard from '@/components/bento/BentoCard.vue';
+import IconTags from '@/components/icons/IconTags.vue';
+import { blogService } from '@/service/blogService';
+import type { Category, CategoryResponseItem, Post } from '@/types';
+import { onMounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
 const router = useRouter();
@@ -94,7 +94,7 @@ watch(
       fetchPostsByCategory(activeCategoryId.value);
     } else {
       activeCategoryId.value = null;
-      emit("resetFilter");
+      emit('resetFilter');
     }
   },
 );
@@ -106,7 +106,7 @@ const fetchCategories = async () => {
       (cat): CategoryResponseItem => ({
         id: cat.id,
         name: cat.name,
-        description: "",
+        description: '',
         post_count: cat.post_count || 0,
         posts: [],
       }),
@@ -116,7 +116,7 @@ const fetchCategories = async () => {
       0,
     );
   } catch (error) {
-    console.error("Failed to fetch categories:", error);
+    console.error('Failed to fetch categories:', error);
   }
 };
 
@@ -129,17 +129,17 @@ const fetchPostsByCategory = async (categoryId: number) => {
         ? {
             id: post.category.id,
             name: post.category.name,
-            description: "",
+            description: '',
             post_count: 0,
-            created_at: "",
-            updated_at: "",
+            created_at: '',
+            updated_at: '',
           }
         : undefined,
     }));
-    const categoryName = response.category?.name || "";
-    emit("filterPosts", posts, categoryName);
+    const categoryName = response.category?.name || '';
+    emit('filterPosts', posts, categoryName);
   } catch (error) {
-    console.error("Failed to fetch posts by category:", error);
+    console.error('Failed to fetch posts by category:', error);
   }
 };
 
@@ -153,7 +153,7 @@ const selectCategory = (categoryId: number | null) => {
     const query = { ...route.query };
     delete query.category;
     router.replace({ query });
-    emit("resetFilter");
+    emit('resetFilter');
   }
 };
 </script>

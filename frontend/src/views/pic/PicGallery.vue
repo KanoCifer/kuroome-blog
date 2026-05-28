@@ -30,7 +30,7 @@
             "
           >
             <component :is="isEditMode ? Check : Edit2" class="h-4 w-4" />
-            {{ isEditMode ? "完成编辑" : "编辑模式" }}
+            {{ isEditMode ? '完成编辑' : '编辑模式' }}
           </Button>
           <TransitionGroup name="fade">
             <Button
@@ -196,7 +196,7 @@
           :class="isEditMode ? 'bg-primary/15 text-primary' : ''"
         >
           <component :is="isEditMode ? Check : Edit2" class="h-4 w-4" />
-          {{ isEditMode ? "完成编辑" : "编辑模式" }}
+          {{ isEditMode ? '完成编辑' : '编辑模式' }}
         </Button>
 
         <Button
@@ -321,7 +321,7 @@
                   v-else
                   class="text-foreground bg-muted/80 rounded-md p-4 text-base whitespace-pre-wrap"
                 >
-                  {{ selectedImage.description || "暂无描述" }}
+                  {{ selectedImage.description || '暂无描述' }}
                 </div>
               </div>
             </div>
@@ -462,7 +462,7 @@
                 @click="uploadImage"
               >
                 <Loader2 v-if="isUploading" class="mr-2 h-4 w-4 animate-spin" />
-                {{ isUploading ? "上传中..." : "确认上传" }}
+                {{ isUploading ? '上传中...' : '确认上传' }}
               </Button>
             </div>
           </motion.div>
@@ -473,11 +473,11 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from "@/components/ui/button";
-import { galleryService } from "@/service/galleryService";
-import { useAuthStore } from "@/stores/auth";
-import { useNotificationStore } from "@/stores/notification";
-import dayjs from "dayjs";
+import { Button } from '@/components/ui/button';
+import { galleryService } from '@/service/galleryService';
+import { useAuthStore } from '@/stores/auth';
+import { useNotificationStore } from '@/stores/notification';
+import dayjs from 'dayjs';
 import {
   Calendar,
   Check,
@@ -491,10 +491,10 @@ import {
   Upload,
   UploadCloud,
   X,
-} from "lucide-vue-next";
-import { motion } from "motion-v";
-import { v4 } from "uuid";
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+} from 'lucide-vue-next';
+import { motion } from 'motion-v';
+import { v4 } from 'uuid';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
 // 照片墙图片接口
 interface Picture {
@@ -522,7 +522,7 @@ const showUploadModal = ref(false);
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const selectedFile = ref<File | null>(null);
 const previewUrl = ref<string | null>(null);
-const uploadDescription = ref("");
+const uploadDescription = ref('');
 const isUploading = ref(false);
 const isDragging = ref(false);
 
@@ -532,7 +532,7 @@ const dragStartPos = ref({ x: 0, y: 0 });
 
 const ensureAdminPermission = () => {
   if (!canEdit.value) {
-    useNotificationStore().error("仅管理员可编辑图片");
+    useNotificationStore().error('仅管理员可编辑图片');
     return false;
   }
   return true;
@@ -575,7 +575,7 @@ const handlePhotoClick = (image: Picture, index: number, e: MouseEvent) => {
 // Image detail modal state
 const selectedImage = ref<Picture | null>(null);
 const selectedIndex = ref(-1);
-const editDescription = ref("");
+const editDescription = ref('');
 
 // 获取照片墙图片数据
 const fetchGalleryImages = async () => {
@@ -585,7 +585,7 @@ const fetchGalleryImages = async () => {
     generateLayoutSeeds();
     console.log(images.value);
   } catch {
-    useNotificationStore().error("获取照片墙数据失败");
+    useNotificationStore().error('获取照片墙数据失败');
   }
 };
 
@@ -611,7 +611,7 @@ const generateLayoutSeeds = () => {
 const shuffleImages = () => {
   if (!ensureAdminPermission()) return;
   generateLayoutSeeds();
-  useNotificationStore().success("照片已重新洗牌");
+  useNotificationStore().success('照片已重新洗牌');
 };
 
 const bringToFront = (index: number) => {
@@ -653,8 +653,8 @@ const getRandomRotation = () => {
 
 // Format date
 const formatDate = (dateStr: string | undefined) => {
-  if (!dateStr) return "";
-  return dayjs(dateStr).format("YYYY年MM月DD日 HH:mm");
+  if (!dateStr) return '';
+  return dayjs(dateStr).format('YYYY年MM月DD日 HH:mm');
 };
 
 // File input trigger
@@ -684,13 +684,13 @@ const handleDrop = (event: DragEvent) => {
 // Process selected file
 const processFile = (file: File) => {
   if (!canEdit.value) return;
-  if (!file.type.startsWith("image/")) {
-    useNotificationStore().error("请选择图片文件");
+  if (!file.type.startsWith('image/')) {
+    useNotificationStore().error('请选择图片文件');
     return;
   }
 
   if (file.size > 5 * 1024 * 1024) {
-    useNotificationStore().error("图片大小不能超过 5MB");
+    useNotificationStore().error('图片大小不能超过 5MB');
     return;
   }
 
@@ -712,7 +712,7 @@ const uploadImage = async () => {
       id: v4().slice(0, 8),
       uploadedAt: dayjs().toISOString(),
       url: url,
-      description: uploadDescription.value || "",
+      description: uploadDescription.value || '',
     };
 
     images.value.push(newImage);
@@ -721,7 +721,7 @@ const uploadImage = async () => {
     // Reset upload state
     selectedFile.value = null;
     previewUrl.value = null;
-    uploadDescription.value = "";
+    uploadDescription.value = '';
     showUploadModal.value = false;
 
     // Generate new layout seed for the new image
@@ -734,14 +734,14 @@ const uploadImage = async () => {
 // 上传图片到照片墙
 const uploadPic = async (file: File) => {
   const formData = new FormData();
-  formData.append("file", file);
+  formData.append('file', file);
 
   try {
     const res = await galleryService.uploadGalleryImage(formData);
-    useNotificationStore().success("图片上传成功");
+    useNotificationStore().success('图片上传成功');
     return res.url;
   } catch {
-    useNotificationStore().error("图片上传失败");
+    useNotificationStore().error('图片上传失败');
     return null;
   }
 };
@@ -758,7 +758,7 @@ const saveGallery = async () => {
       })),
     });
   } catch {
-    useNotificationStore().error("保存失败");
+    useNotificationStore().error('保存失败');
   }
 };
 
@@ -773,7 +773,7 @@ const openImageDetail = (image: Picture, index: number) => {
 const closeImageDetail = () => {
   selectedImage.value = null;
   selectedIndex.value = -1;
-  editDescription.value = "";
+  editDescription.value = '';
 };
 
 // Update description
@@ -788,7 +788,7 @@ const updateDescription = async () => {
     images.value[index].description = editDescription.value;
     selectedImage.value.description = editDescription.value;
     await saveGallery();
-    useNotificationStore().success("描述已更新");
+    useNotificationStore().success('描述已更新');
   }
 };
 
@@ -801,7 +801,7 @@ const deleteImage = async (id: string) => {
     generateLayoutSeeds();
     await saveGallery();
     closeImageDetail();
-    useNotificationStore().success("图片已删除");
+    useNotificationStore().success('图片已删除');
   }
 };
 
@@ -820,5 +820,5 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Kalam:wght@400;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Kalam:wght@400;700&display=swap');
 </style>

@@ -34,18 +34,18 @@ export interface AMapDriving {
 
 export interface AMapMapInstance {
   addControl: (control: unknown) => void;
-  on: (event: "click", handler: (e: unknown) => void) => void;
+  on: (event: 'click', handler: (e: unknown) => void) => void;
   setCenter: (center: [number, number]) => void;
   setZoom: (zoom: number) => void;
   add: (overlay: unknown) => void;
   remove: (overlay: unknown) => void;
   setFitView: () => void;
   destroy: () => void;
-  off: (event: "click", handler: (e: unknown) => void) => void;
+  off: (event: 'click', handler: (e: unknown) => void) => void;
 }
 
 export interface AMapMarkerInstance {
-  on: (event: "click", handler: () => void) => void;
+  on: (event: 'click', handler: () => void) => void;
   setMap: (mapInstance: AMapMapInstance | null) => void;
 }
 
@@ -65,7 +65,7 @@ export interface AMapNamespace {
   Map: new (
     container: HTMLDivElement,
     options: {
-      viewMode: "2D" | "3D";
+      viewMode: '2D' | '3D';
       zoom: number;
       center: [number, number];
     },

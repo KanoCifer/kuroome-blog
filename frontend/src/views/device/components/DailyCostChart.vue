@@ -36,10 +36,10 @@
 </template>
 
 <script setup lang="ts">
-import type { Device } from "@/service/deviceService";
-import dayjs from "dayjs";
-import { computed, onMounted, onUnmounted, ref } from "vue";
-import VChart from "vue-echarts";
+import type { Device } from '@/service/deviceService';
+import dayjs from 'dayjs';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import VChart from 'vue-echarts';
 
 const props = defineProps<{
   data: Device;
@@ -48,15 +48,15 @@ const props = defineProps<{
 }>();
 
 // Detect dark mode
-const isDark = ref(document.documentElement.classList.contains("dark"));
+const isDark = ref(document.documentElement.classList.contains('dark'));
 
 onMounted(() => {
   const observer = new MutationObserver(() => {
-    isDark.value = document.documentElement.classList.contains("dark");
+    isDark.value = document.documentElement.classList.contains('dark');
   });
   observer.observe(document.documentElement, {
     attributes: true,
-    attributeFilter: ["class"],
+    attributeFilter: ['class'],
   });
   onUnmounted(() => observer.disconnect());
 });
@@ -65,7 +65,7 @@ const chartOption = computed(() => {
   const purchaseDate = dayjs(props.data.purchase_date);
   const now = dayjs();
 
-  const usedDays = now.diff(purchaseDate, "day");
+  const usedDays = now.diff(purchaseDate, 'day');
   const currentDailyCost =
     usedDays > 0 ? props.data.price / usedDays : props.data.price;
 
@@ -75,30 +75,30 @@ const chartOption = computed(() => {
   const xAxisData: string[] = [];
   const seriesData: number[] = [];
   for (let i = 0; i <= usedDays + predictDays; i++) {
-    const date = purchaseDate.add(i, "day");
-    xAxisData.push(date.format("YYYY-MM-DD"));
+    const date = purchaseDate.add(i, 'day');
+    xAxisData.push(date.format('YYYY-MM-DD'));
     const dailyCost = i > 0 ? props.data.price / i : props.data.price;
     seriesData.push(dailyCost);
   }
 
-  const textColor = isDark.value ? "#e5e7eb" : "#1f2937";
-  const subtextColor = isDark.value ? "#9ca3af" : "#6b7280";
-  const axisColor = isDark.value ? "#4b5563" : "#d1d5db";
-  const splitLineColor = isDark.value ? "#374151" : "#f3f4f6";
+  const textColor = isDark.value ? '#e5e7eb' : '#1f2937';
+  const subtextColor = isDark.value ? '#9ca3af' : '#6b7280';
+  const axisColor = isDark.value ? '#4b5563' : '#d1d5db';
+  const splitLineColor = isDark.value ? '#374151' : '#f3f4f6';
 
   return {
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
     title: {
       text: `Daily Cost Trend: ${props.data.name}`,
       subtext: `Current: ¥${currentDailyCost.toFixed(2)}/day | Total: ¥${props.data.price}`,
       left: 0,
       top: 8,
-      textStyle: { fontSize: 16, fontWeight: "bold", color: textColor },
+      textStyle: { fontSize: 16, fontWeight: 'bold', color: textColor },
       subtextStyle: { fontSize: 12, color: subtextColor },
     },
     tooltip: {
-      trigger: "axis",
-      backgroundColor: isDark.value ? "#1f2937" : "#fff",
+      trigger: 'axis',
+      backgroundColor: isDark.value ? '#1f2937' : '#fff',
       textStyle: { color: textColor },
       formatter: (params: { name: string; value: number }[]) => {
         const p = params[0];
@@ -106,11 +106,11 @@ const chartOption = computed(() => {
       },
     },
     grid: {
-      top: "22%",
+      top: '22%',
       containLabel: false,
     },
     xAxis: {
-      type: "category",
+      type: 'category',
       data: xAxisData,
       axisLine: { lineStyle: { color: axisColor } },
       axisLabel: {
@@ -122,8 +122,8 @@ const chartOption = computed(() => {
       axisTick: { show: false },
     },
     yAxis: {
-      type: "log",
-      name: "¥/day",
+      type: 'log',
+      name: '¥/day',
       max: Math.ceil(props.data.price * 1.1),
       nameTextStyle: { color: textColor, fontSize: 11 },
       axisLine: { show: false },
@@ -132,38 +132,38 @@ const chartOption = computed(() => {
     },
     series: [
       {
-        type: "line",
+        type: 'line',
         smooth: true,
         data: seriesData,
-        lineStyle: { color: "#3b82f6", width: 2 },
-        itemStyle: { color: "#3b82f6" },
+        lineStyle: { color: '#3b82f6', width: 2 },
+        itemStyle: { color: '#3b82f6' },
         areaStyle: {
           color: {
-            type: "linear",
+            type: 'linear',
             x: 0,
             y: 0,
             x2: 0,
             y2: 1,
             colorStops: [
-              { offset: 0, color: "rgba(59,130,246,0.35)" },
-              { offset: 1, color: "rgba(59,130,246,0.02)" },
+              { offset: 0, color: 'rgba(59,130,246,0.35)' },
+              { offset: 1, color: 'rgba(59,130,246,0.02)' },
             ],
           },
         },
         markLine:
           currentTimeIndex > 0
             ? {
-                symbol: ["none", "none"],
+                symbol: ['none', 'none'],
                 lineStyle: {
-                  color: "#f59e0b",
-                  type: "dashed",
+                  color: '#f59e0b',
+                  type: 'dashed',
                   width: 1.5,
                 },
                 label: {
                   show: true,
-                  formatter: "现在",
-                  color: "#f59e0b",
-                  fontWeight: "600",
+                  formatter: '现在',
+                  color: '#f59e0b',
+                  fontWeight: '600',
                   fontSize: 12,
                 },
                 data: [{ xAxis: currentTimeIndex }],

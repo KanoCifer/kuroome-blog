@@ -382,16 +382,16 @@
 </template>
 
 <script setup lang="ts">
-import { IconTooling, RssIcon } from "@/components/icons";
-import { socialService } from "@/service/socialService";
-import { useCardLayoutStore } from "@/stores/cardLayout";
-import { useNotificationStore } from "@/stores/notification";
-import SettingIcon from "@/components/icons/SettingIcon.vue";
-import { useStorage } from "@vueuse/core";
-import { AxiosError } from "axios";
-import { CreditCard } from "lucide-vue-next";
-import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import { IconTooling, RssIcon } from '@/components/icons';
+import { socialService } from '@/service/socialService';
+import { useCardLayoutStore } from '@/stores/cardLayout';
+import { useNotificationStore } from '@/stores/notification';
+import SettingIcon from '@/components/icons/SettingIcon.vue';
+import { useStorage } from '@vueuse/core';
+import { AxiosError } from 'axios';
+import { CreditCard } from 'lucide-vue-next';
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const notifier = useNotificationStore();
@@ -405,8 +405,8 @@ function toggleEditLayout() {
   }
 }
 
-const STORAGE_KEY = "readinglist_memo";
-const memoText = useStorage<string>(STORAGE_KEY, "");
+const STORAGE_KEY = 'readinglist_memo';
+const memoText = useStorage<string>(STORAGE_KEY, '');
 const isMemoOpen = ref(false);
 const liked = ref(false);
 const likesCount = ref(0);
@@ -420,13 +420,13 @@ const closeMemo = () => {
 };
 
 const clearMemo = () => {
-  if (memoText.value && confirm("确定要清空备忘录吗？")) {
-    memoText.value = "";
+  if (memoText.value && confirm('确定要清空备忘录吗？')) {
+    memoText.value = '';
   }
 };
 
 const goToNewPost = () => {
-  router.push("/blog/new");
+  router.push('/blog/new');
 };
 
 const handleLike = async () => {
@@ -435,14 +435,14 @@ const handleLike = async () => {
     liked.value = true;
     likesCount.value += 1;
   } catch (error) {
-    let errorMsg = "点赞失败，请稍后重试";
+    let errorMsg = '点赞失败，请稍后重试';
     if (error instanceof AxiosError) {
       if (error.response?.status === 429) {
-        errorMsg = "🥳今天已经点赞很多次啦，明天再试试吧！";
+        errorMsg = '🥳今天已经点赞很多次啦，明天再试试吧！';
       }
     }
     notifier.error(errorMsg);
-    console.error("Failed to update likes count:", error);
+    console.error('Failed to update likes count:', error);
   }
 };
 
@@ -451,25 +451,25 @@ onMounted(async () => {
     const response = await socialService.getLikes();
     likesCount.value = response.likes_count || 0;
   } catch (error) {
-    console.error("Failed to fetch likes count:", error);
+    console.error('Failed to fetch likes count:', error);
   }
 });
 
 const goToRss = () => {
-  router.push("/rss");
+  router.push('/rss');
 };
 
 const goToSubscription = () => {
-  router.push("/subscription");
+  router.push('/subscription');
 };
 
 const goToImageToolbox = () => {
-  router.push("/toolbox/image-toolbox");
+  router.push('/toolbox/image-toolbox');
 };
 
 defineEmits<{
-  (e: "openSettings"): void;
-  (e: "goToFriendLinks"): void;
-  (e: "switchToMobile"): void;
+  (e: 'openSettings'): void;
+  (e: 'goToFriendLinks'): void;
+  (e: 'switchToMobile'): void;
 }>();
 </script>

@@ -1,4 +1,4 @@
-import request from "@/api/request";
+import request from '@/api/request';
 
 /** 订阅数据类型 */
 export interface Subscription {
@@ -87,7 +87,7 @@ export interface SubscriptionGateway {
 export const subscriptionGateway: SubscriptionGateway = {
   async getSubscriptions(): Promise<Subscription[]> {
     const res = await request.get<{ data: { subscriptions: Subscription[] } }>(
-      "v2/subscriptions",
+      'v2/subscriptions',
     );
     return res.data.data.subscriptions;
   },
@@ -103,7 +103,7 @@ export const subscriptionGateway: SubscriptionGateway = {
     payload: CreateSubscriptionPayload,
   ): Promise<Subscription> {
     const res = await request.post<{ data: { subscription: Subscription } }>(
-      "v2/subscriptions",
+      'v2/subscriptions',
       payload,
     );
     return res.data.data.subscription;
@@ -148,7 +148,7 @@ export const subscriptionGateway: SubscriptionGateway = {
 
   async getUpcomingSubscriptions(): Promise<Subscription[]> {
     const res = await request.get<{ data: { subscriptions: Subscription[] } }>(
-      "v2/subscriptions/upcoming",
+      'v2/subscriptions/upcoming',
     );
     return res.data.data.subscriptions;
   },
@@ -166,7 +166,7 @@ export const subscriptionGateway: SubscriptionGateway = {
   async getUserGlobalConfig(): Promise<Record<string, unknown>> {
     const res = await request.get<{
       data: { config: Record<string, unknown> };
-    }>("v2/subscriptions/global-config");
+    }>('v2/subscriptions/global-config');
     return res.data.data.config;
   },
 
@@ -175,7 +175,7 @@ export const subscriptionGateway: SubscriptionGateway = {
   ): Promise<Record<string, unknown>> {
     const res = await request.put<{
       data: { config: Record<string, unknown> };
-    }>("v2/subscriptions/global-config", {
+    }>('v2/subscriptions/global-config', {
       config_data: configData,
     });
     return res.data.data.config;

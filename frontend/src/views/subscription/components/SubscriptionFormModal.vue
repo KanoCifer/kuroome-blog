@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { reactive, watch } from "vue";
-import type { SubscriptionFormState } from "@/views/subscription/types";
+import { reactive, watch } from 'vue';
+import type { SubscriptionFormState } from '@/views/subscription/types';
 import {
   cycleOptions,
   statusOptions,
-} from "@/views/subscription/subscriptionUtils";
+} from '@/views/subscription/subscriptionUtils';
 
 interface Props {
   isOpen: boolean;
@@ -17,7 +17,7 @@ interface Props {
   errorMessage: string;
   currencySuggestions: string[];
   includeStatus?: boolean;
-  mode: "create" | "edit";
+  mode: 'create' | 'edit';
 }
 
 const emit = defineEmits<{
@@ -30,14 +30,14 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const localForm = reactive<SubscriptionFormState>({
-  name: "",
-  provider: "",
-  price: "",
-  currency: "USD",
-  billing_cycle: "monthly",
-  next_billing_date: "",
-  status: "active",
-  notes: "",
+  name: '',
+  provider: '',
+  price: '',
+  currency: 'USD',
+  billing_cycle: 'monthly',
+  next_billing_date: '',
+  status: 'active',
+  notes: '',
 });
 
 function syncLocalForm(source: SubscriptionFormState): void {
@@ -52,7 +52,7 @@ function syncLocalForm(source: SubscriptionFormState): void {
 }
 
 function emitSubmit(): void {
-  emit("submit", {
+  emit('submit', {
     name: localForm.name,
     provider: localForm.provider,
     price: localForm.price,

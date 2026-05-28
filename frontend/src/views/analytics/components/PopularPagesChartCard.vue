@@ -14,9 +14,9 @@
 </template>
 
 <script setup lang="ts">
-import IconPopular from "@/components/icons/IconPopular.vue";
-import { computed } from "vue";
-import VChart from "vue-echarts";
+import IconPopular from '@/components/icons/IconPopular.vue';
+import { computed } from 'vue';
+import VChart from 'vue-echarts';
 
 interface OverviewData {
   total_visits: number;
@@ -44,14 +44,14 @@ const popularPagesChartOption = computed(() => {
 
   return {
     tooltip: {
-      trigger: "axis",
+      trigger: 'axis',
       axisPointer: {
-        type: "shadow",
+        type: 'shadow',
       },
-      backgroundColor: "rgba(255, 255, 255, 0.95)",
-      borderColor: "#e5e7eb",
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#e5e7eb',
       textStyle: {
-        color: "#374151",
+        color: '#374151',
       },
     },
     grid: {
@@ -61,50 +61,50 @@ const popularPagesChartOption = computed(() => {
       containLabel: true,
     },
     xAxis: {
-      type: "value",
+      type: 'value',
       axisLine: {
         show: false,
       },
       axisLabel: {
-        color: "#6b7280",
+        color: '#6b7280',
       },
       splitLine: {
         lineStyle: {
-          color: "#f3f4f6",
+          color: '#f3f4f6',
         },
       },
     },
     yAxis: {
-      type: "category",
-      data: sortedPages.map((p) => p.page_path || "/"),
+      type: 'category',
+      data: sortedPages.map((p) => p.page_path || '/'),
       axisLine: {
         lineStyle: {
-          color: "#e5e7eb",
+          color: '#e5e7eb',
         },
       },
       axisLabel: {
-        color: "#6b7280",
+        color: '#6b7280',
         fontSize: 11,
         width: 40,
-        overflow: "truncate",
+        overflow: 'truncate',
       },
     },
     series: [
       {
-        name: "Views",
-        type: "bar",
-        barWidth: "60%",
+        name: 'Views',
+        type: 'bar',
+        barWidth: '60%',
         itemStyle: {
           borderRadius: [0, 4, 4, 0],
           color: {
-            type: "linear",
+            type: 'linear',
             x: 0,
             y: 0,
             x2: 1,
             y2: 0,
             colorStops: [
-              { offset: 0, color: "rgba(255, 101, 0, 0.8)" },
-              { offset: 1, color: "rgba(255, 190, 147, 0.8)" },
+              { offset: 0, color: 'rgba(255, 101, 0, 0.8)' },
+              { offset: 1, color: 'rgba(255, 190, 147, 0.8)' },
             ],
           },
         },

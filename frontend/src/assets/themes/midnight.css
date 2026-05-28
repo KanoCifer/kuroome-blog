@@ -1,5 +1,5 @@
 /* 深夜 (Midnight) */
-[data-color-scheme="midnight"] {
+[data-color-scheme='midnight'] {
   --radius: 0.625rem;
   --ink: oklch(0.2 0.05 280);
   --paper: var(--color-indigo-50);
@@ -25,7 +25,7 @@
   --gradient-decorative-to: var(--color-indigo-300);
 }
 
-[data-color-scheme="midnight"].dark {
+[data-color-scheme='midnight'].dark {
   --ink: oklch(0.98 0.01 280);
   --paper: oklch(0.12 0.03 280);
   --warm-gray: oklch(0.2 0.03 280);

@@ -4,17 +4,17 @@ export interface ExampleFeed {
 }
 
 export const exampleFeeds: ExampleFeed[] = [
-  { name: "少数派", url: "https://sspai.com/feed" },
-  { name: "GitHub", url: "https://github.com/blog.atom" },
-  { name: "TechCrunch", url: "https://techcrunch.com/feed/" },
+  { name: '少数派', url: 'https://sspai.com/feed' },
+  { name: 'GitHub', url: 'https://github.com/blog.atom' },
+  { name: 'TechCrunch', url: 'https://techcrunch.com/feed/' },
 ];
 
 export const truncateSummary = (summary: string, maxLength = 160): string => {
   if (!summary) {
-    return "";
+    return '';
   }
 
-  const plainText = summary.replace(/<[^>]*>/g, "").trim();
+  const plainText = summary.replace(/<[^>]*>/g, '').trim();
   if (plainText.length <= maxLength) {
     return plainText;
   }
@@ -32,9 +32,9 @@ export const getFeedHost = (url: string): string => {
 
 export const getFeedProtocol = (url: string): string => {
   try {
-    return new URL(url).protocol.replace(":", "").toUpperCase();
+    return new URL(url).protocol.replace(':', '').toUpperCase();
   } catch {
-    return "URL";
+    return 'URL';
   }
 };
 

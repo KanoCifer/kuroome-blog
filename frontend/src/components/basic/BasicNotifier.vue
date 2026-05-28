@@ -69,14 +69,14 @@
 </template>
 
 <script setup lang="ts">
-import { AnimatePresence, motion } from "motion-v";
-const emit = defineEmits(["close", "update:isMobileWarningVisible"]);
+import { AnimatePresence, motion } from 'motion-v';
+const emit = defineEmits(['close', 'update:isMobileWarningVisible']);
 const props = defineProps<{
   isMobileWarningVisible: boolean;
 }>();
 
 const closeMobileWarning = () => {
   // 触发父组件事件，关闭警告
-  emit("update:isMobileWarningVisible", false);
+  emit('update:isMobileWarningVisible', false);
 };
 </script>

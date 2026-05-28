@@ -1,10 +1,10 @@
-const REFRESH_TOKEN_KEY = "refresh_token";
+const REFRESH_TOKEN_KEY = 'refresh_token';
 
-let inMemoryRefreshToken = "";
+let inMemoryRefreshToken = '';
 
 function isBrowserStorageAvailable(): boolean {
   return (
-    typeof window !== "undefined" && typeof window.localStorage !== "undefined"
+    typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
   );
 }
 
@@ -13,7 +13,7 @@ export function getRefreshTokenFromStorage(): string {
     return inMemoryRefreshToken;
   }
 
-  return window.localStorage.getItem(REFRESH_TOKEN_KEY) ?? "";
+  return window.localStorage.getItem(REFRESH_TOKEN_KEY) ?? '';
 }
 
 export function saveRefreshTokenToStorage(token: string): void {

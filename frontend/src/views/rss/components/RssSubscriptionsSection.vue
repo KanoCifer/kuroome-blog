@@ -16,7 +16,7 @@
         :disabled="subscriptionsLoading"
         @click="$emit('refreshList')"
       >
-        {{ subscriptionsLoading ? "刷新中..." : "刷新订阅列表" }}
+        {{ subscriptionsLoading ? '刷新中...' : '刷新订阅列表' }}
       </button>
     </div>
 
@@ -111,9 +111,9 @@
 </template>
 
 <script setup lang="ts">
-import { getSubscriptionTitle, getFeedProtocol } from "../rssUtils";
-import { formatDate } from "@/utils/formatdate";
-import type { SubscriptionItem } from "@/service/rssService";
+import { getSubscriptionTitle, getFeedProtocol } from '../rssUtils';
+import { formatDate } from '@/utils/formatdate';
+import type { SubscriptionItem } from '@/service/rssService';
 
 defineProps<{
   subscriptions: SubscriptionItem[];

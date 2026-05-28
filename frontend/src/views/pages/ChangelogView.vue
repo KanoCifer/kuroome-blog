@@ -1,46 +1,46 @@
 <script setup lang="ts">
-import changelog from "@/data/changelog.json";
-import { motion } from "motion-v";
+import changelog from '@/data/changelog.json';
+import { motion } from 'motion-v';
 const getTypeLabel = (type: string): string => {
   const labels: Record<string, string> = {
-    feat: "新功能",
-    fix: "修复",
-    refactor: "重构",
-    style: "样式",
-    docs: "文档",
-    perf: "性能",
-    test: "测试",
-    chore: "构建",
+    feat: '新功能',
+    fix: '修复',
+    refactor: '重构',
+    style: '样式',
+    docs: '文档',
+    perf: '性能',
+    test: '测试',
+    chore: '构建',
   };
   return labels[type] || type;
 };
 
 const getTypeIcon = (type: string): string => {
   const icons: Record<string, string> = {
-    feat: "✨",
-    fix: "🐛",
-    refactor: "♻️",
-    style: "🎨",
-    docs: "📝",
-    perf: "⚡",
-    test: "🧪",
-    chore: "🔧",
+    feat: '✨',
+    fix: '🐛',
+    refactor: '♻️',
+    style: '🎨',
+    docs: '📝',
+    perf: '⚡',
+    test: '🧪',
+    chore: '🔧',
   };
-  return icons[type] || "";
+  return icons[type] || '';
 };
 
 const getTypeClass = (type: string): string => {
   const classes: Record<string, string> = {
-    feat: "bg-success/15 text-success ring-1 ring-success/30",
-    fix: "bg-destructive/15 text-destructive ring-1 ring-destructive/30",
-    refactor: "bg-chart-2/15 text-chart-2 ring-1 ring-chart-2/30",
-    style: "bg-chart-4/15 text-chart-4 ring-1 ring-chart-4/30",
-    docs: "bg-primary/15 text-primary ring-1 ring-primary/30",
-    perf: "bg-warning/15 text-warning ring-1 ring-warning/30",
-    test: "bg-chart-1/15 text-chart-1 ring-1 ring-chart-1/30",
-    chore: "bg-muted text-muted-foreground ring-1 ring-border/30",
+    feat: 'bg-success/15 text-success ring-1 ring-success/30',
+    fix: 'bg-destructive/15 text-destructive ring-1 ring-destructive/30',
+    refactor: 'bg-chart-2/15 text-chart-2 ring-1 ring-chart-2/30',
+    style: 'bg-chart-4/15 text-chart-4 ring-1 ring-chart-4/30',
+    docs: 'bg-primary/15 text-primary ring-1 ring-primary/30',
+    perf: 'bg-warning/15 text-warning ring-1 ring-warning/30',
+    test: 'bg-chart-1/15 text-chart-1 ring-1 ring-chart-1/30',
+    chore: 'bg-muted text-muted-foreground ring-1 ring-border/30',
   };
-  return classes[type] ?? classes.chore ?? "";
+  return classes[type] ?? classes.chore ?? '';
 };
 </script>
 

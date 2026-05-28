@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { messageService } from "@/service/messageService";
-import { useAuthStore } from "@/stores/auth";
-import type { Message } from "@/types";
-import { formatDate } from "@/utils/formatdate";
-import { onMounted, ref } from "vue";
+import { messageService } from '@/service/messageService';
+import { useAuthStore } from '@/stores/auth';
+import type { Message } from '@/types';
+import { formatDate } from '@/utils/formatdate';
+import { onMounted, ref } from 'vue';
 
-const name = ref<string>("Anonymous");
-const message = ref<string>("");
+const name = ref<string>('Anonymous');
+const message = ref<string>('');
 const messages = ref<Message[]>([]);
 const loading = ref<boolean>(false);
 const submitting = ref<boolean>(false);
-const successMessage = ref<string>("");
+const successMessage = ref<string>('');
 const errors = ref<{ name?: string[]; message?: string[] }>({});
 const auth = useAuthStore();
 //填充留言用户名称
 if (auth.isAuthenticated) {
-  name.value = auth.user?.username || "Anonymous";
+  name.value = auth.user?.username || 'Anonymous';
 }
 
 const fetchMessages = async () => {
@@ -23,12 +23,12 @@ const fetchMessages = async () => {
   try {
     const response = await messageService.getMessages();
     const data = response.data;
-    if (data.status === "success") {
+    if (data.status === 'success') {
       messages.value = data.data.messages;
-      console.log("Fetched messages:", messages.value);
+      console.log('Fetched messages:', messages.value);
     }
   } catch (error) {
-    console.error("Failed to fetch messages:", error);
+    console.error('Failed to fetch messages:', error);
   } finally {
     loading.value = false;
   }
@@ -36,11 +36,11 @@ const fetchMessages = async () => {
 
 const handleSubmit = async () => {
   errors.value = {};
-  successMessage.value = "";
+  successMessage.value = '';
   submitting.value = true;
 
   try {
-    console.log("Submitting message...", {
+    console.log('Submitting message...', {
       name: name.value,
       message: message.value,
     });
@@ -50,25 +50,25 @@ const handleSubmit = async () => {
       message: message.value,
     });
 
-    console.log("Response status:", response.status);
+    console.log('Response status:', response.status);
 
     const data = response.data;
-    console.log("Response data:", data);
+    console.log('Response data:', data);
 
-    if (data.status === "success") {
+    if (data.status === 'success') {
       successMessage.value = data.message;
-      name.value = "";
-      message.value = "";
+      name.value = '';
+      message.value = '';
       await fetchMessages();
-    } else if (data.status === "error" && data.errors) {
+    } else if (data.status === 'error' && data.errors) {
       errors.value = data.errors;
     } else {
-      console.warn("Unexpected response:", data);
+      console.warn('Unexpected response:', data);
     }
   } catch (error) {
-    console.error("Failed to submit message:", error);
+    console.error('Failed to submit message:', error);
     errors.value = {
-      name: ["Network error. Please check console for details."],
+      name: ['Network error. Please check console for details.'],
     };
   } finally {
     submitting.value = false;
@@ -163,7 +163,7 @@ onMounted(() => {
               class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-ring flex cursor-pointer items-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg ring-offset-2 focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-800"
               :disabled="submitting"
             >
-              {{ submitting ? "Submitting..." : "Submit" }}
+              {{ submitting ? 'Submitting...' : 'Submit' }}
             </button>
           </div>
         </div>

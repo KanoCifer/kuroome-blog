@@ -51,8 +51,8 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from "@/components/bento/BentoCard.vue";
-import { useGreeting } from "@/composables/useGreeting";
+import BentoCard from '@/components/bento/BentoCard.vue';
+import { useGreeting } from '@/composables/useGreeting';
 
 const { isDay, greeting, changelogHint } = useGreeting();
 </script>

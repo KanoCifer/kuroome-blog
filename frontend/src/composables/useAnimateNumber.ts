@@ -1,4 +1,4 @@
-import { onUnmounted, ref } from "vue";
+import { onUnmounted, ref } from 'vue';
 
 export function useAnimateNumber(duration = 800, steps = 20) {
   const displayValue = ref(0);

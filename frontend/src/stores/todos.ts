@@ -72,17 +72,10 @@ export const useTodoStore = defineStore('todos', () => {
     if (hydrationPromise) return hydrationPromise;
 
     hydrationPromise = (async () => {
-      if (!auth.isAuthenticated) {
-        hydrationScope.value = 'guest';
-        isHydrated.value = true;
-        tasks.value = [];
-        return;
-      }
-
       if (hydrationScope.value === 'auth' && isHydrated.value) return;
 
       await fetchTasks();
-      hydrationScope.value = 'auth';
+      hydrationScope.value = auth.isAuthenticated ? 'auth' : 'guest';
       isHydrated.value = true;
     })().finally(() => {
       hydrationPromise = null;
@@ -187,5 +180,6 @@ export const useTodoStore = defineStore('todos', () => {
     updateTask,
     hydrateTasks,
     sortTasks,
+    hydrationScope,
   };
 });

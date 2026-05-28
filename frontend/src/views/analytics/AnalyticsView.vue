@@ -117,7 +117,7 @@
               d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
             />
           </svg>
-          {{ loading ? "Loading..." : "Refresh" }}
+          {{ loading ? 'Loading...' : 'Refresh' }}
         </button>
       </div>
     </div>
@@ -403,10 +403,10 @@
                   {{ formatDateTime(log.current_login_at) }}
                 </td>
                 <td class="text-muted-foreground py-4 font-mono text-xs">
-                  {{ log.last_login_ip || "-" }}
+                  {{ log.last_login_ip || '-' }}
                 </td>
                 <td class="text-muted-foreground py-4 font-mono text-xs">
-                  {{ log.current_login_ip || "-" }}
+                  {{ log.current_login_ip || '-' }}
                 </td>
               </tr>
             </tbody>
@@ -452,18 +452,18 @@
 </template>
 
 <script setup lang="ts">
-import BasicDetail from "@/components/basic/BasicDetail.vue";
-import IconUser from "@/components/icons/IconUser.vue";
-import { analyticsService } from "@/service/analyticsService";
-import { useAuthStore } from "@/stores/auth";
-import dayjs from "dayjs";
-import { computed, onMounted, ref, watch } from "vue";
-import { useRouter } from "vue-router";
-import TrendChartCard from "./components/TrendChartCard.vue";
-import BrowserAnalytics from "./components/BrowserAnalytics.vue";
-import OsCharts from "./components/OsCharts.vue";
-import PopularPagesChartCard from "./components/PopularPagesChartCard.vue";
-import ServerMonitor from "./components/ServerMonitor.vue";
+import BasicDetail from '@/components/basic/BasicDetail.vue';
+import IconUser from '@/components/icons/IconUser.vue';
+import { analyticsService } from '@/service/analyticsService';
+import { useAuthStore } from '@/stores/auth';
+import dayjs from 'dayjs';
+import { computed, onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import TrendChartCard from './components/TrendChartCard.vue';
+import BrowserAnalytics from './components/BrowserAnalytics.vue';
+import OsCharts from './components/OsCharts.vue';
+import PopularPagesChartCard from './components/PopularPagesChartCard.vue';
+import ServerMonitor from './components/ServerMonitor.vue';
 
 // Types
 interface OverviewData {
@@ -502,7 +502,7 @@ interface LoginLogsResponse {
 }
 
 defineOptions({
-  name: "AnalyticsView",
+  name: 'AnalyticsView',
 });
 
 const auth = useAuthStore();
@@ -519,7 +519,7 @@ const showDropdown = ref<boolean>(false);
 
 // Computed
 const avgVisitsPerDay = computed(() => {
-  if (!overviewData.value?.total_visits || !selectedDays.value) return "0";
+  if (!overviewData.value?.total_visits || !selectedDays.value) return '0';
   const avg = overviewData.value.total_visits / selectedDays.value;
   return avg.toFixed(1);
 });
@@ -527,17 +527,17 @@ const avgVisitsPerDay = computed(() => {
 // Methods
 const formatNumber = (num: number): string => {
   if (num >= 1000000) {
-    return (num / 1000000).toFixed(1) + "M";
+    return (num / 1000000).toFixed(1) + 'M';
   }
   if (num >= 1000) {
-    return (num / 1000).toFixed(1) + "K";
+    return (num / 1000).toFixed(1) + 'K';
   }
   return num.toString();
 };
 
 const formatDateTime = (dateStr: string | null): string => {
-  if (!dateStr) return "-";
-  return dayjs(dateStr).format("YYYY-MM-DD HH:mm");
+  if (!dateStr) return '-';
+  return dayjs(dateStr).format('YYYY-MM-DD HH:mm');
 };
 
 const fetchOverview = async () => {
@@ -546,11 +546,11 @@ const fetchOverview = async () => {
     if (res.code === 200) {
       overviewData.value = res.data as unknown as OverviewData;
     } else {
-      error.value = res.message || "Failed to load overview data";
+      error.value = res.message || 'Failed to load overview data';
     }
   } catch (err) {
-    console.error("Failed to fetch overview:", err);
-    error.value = "Failed to load overview data. Please try again.";
+    console.error('Failed to fetch overview:', err);
+    error.value = 'Failed to load overview data. Please try again.';
   }
 };
 
@@ -564,17 +564,17 @@ const fetchLoginLogs = async () => {
     if (res.code === 200) {
       loginLogsData.value = res.data as unknown as LoginLogsResponse;
     } else {
-      error.value = res.message || "Failed to load login logs";
+      error.value = res.message || 'Failed to load login logs';
     }
   } catch (err) {
-    console.error("Failed to fetch login logs:", err);
-    error.value = "Failed to load login logs. Please try again.";
+    console.error('Failed to fetch login logs:', err);
+    error.value = 'Failed to load login logs. Please try again.';
   }
 };
 
 const fetchAllData = async () => {
   loading.value = true;
-  error.value = "";
+  error.value = '';
   try {
     await Promise.all([fetchOverview(), fetchLoginLogs()]);
   } finally {
@@ -596,7 +596,7 @@ watch(
     loginLogsPage.value = 1;
     fetchAllData();
   },
-  { flush: "pre" },
+  { flush: 'pre' },
 );
 
 // Lifecycle
@@ -607,7 +607,7 @@ onMounted(async () => {
   }
 
   if (!auth.isAuthenticated || auth.user?.id !== 1) {
-    router.push("/");
+    router.push('/');
     return;
   }
 

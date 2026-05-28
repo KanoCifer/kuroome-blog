@@ -1,4 +1,4 @@
-import { mapGateway } from "@/api/mapGateway";
+import { mapGateway } from '@/api/mapGateway';
 
 export interface MapService {
   getSecurityKey(): Promise<{ securityJsCode: string }>;

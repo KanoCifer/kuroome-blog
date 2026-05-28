@@ -1,5 +1,5 @@
-import request, { type ApiResponse } from "@/api/request";
-import type { BookListResponse } from "@/types";
+import request, { type ApiResponse } from '@/api/request';
+import type { BookListResponse } from '@/types';
 
 export interface BookGateway {
   getBooks(params: {
@@ -27,14 +27,14 @@ export interface BookGateway {
 
 export const bookGateway: BookGateway = {
   async getBooks(params) {
-    const res = await request.get<BookListResponse>("v1/books", {
+    const res = await request.get<BookListResponse>('v1/books', {
       params,
     });
     return res.data;
   },
 
   async createBook(payload) {
-    await request.post("v1/books/addbook", payload);
+    await request.post('v1/books/addbook', payload);
   },
 
   async updateBook(bookId, payload) {
@@ -51,7 +51,7 @@ export const bookGateway: BookGateway = {
 
   async importBooks(payload) {
     const res = await request.post<ApiResponse<{ imported_count: number }>>(
-      "v1/import",
+      'v1/import',
       payload,
     );
     return res.data;

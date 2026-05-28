@@ -107,12 +107,12 @@
 </template>
 
 <script setup lang="ts">
-import animationJson from "@/assets/404.json";
-import { defineAsyncComponent, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import animationJson from '@/assets/404.json';
+import { defineAsyncComponent, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const Vue3Lottie = defineAsyncComponent(() =>
-  import("vue3-lottie").then((m) => m.Vue3Lottie),
+  import('vue3-lottie').then((m) => m.Vue3Lottie),
 );
 const animationData = ref<Record<string, unknown> | null>(null);
 onMounted(() => {
@@ -124,7 +124,7 @@ const goBack = () => {
   if (window.history.length > 1) {
     router.back();
   } else {
-    router.push("/");
+    router.push('/');
   }
 };
 </script>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref } from 'vue';
 
 defineProps<{
   isOpen: boolean;
@@ -8,18 +8,18 @@ defineProps<{
   title: string;
   width: string;
   height: string;
-  align: "left" | "center" | "right";
+  align: 'left' | 'center' | 'right';
 }>();
 
 const emit = defineEmits<{
   close: [];
-  "update:alt": [value: string];
-  "update:title": [value: string];
-  "update:width": [value: string];
-  "update:height": [value: string];
-  "update:align": [value: "left" | "center" | "right"];
-  "replace-image": [event: Event];
-  "open-new-tab": [url: string];
+  'update:alt': [value: string];
+  'update:title': [value: string];
+  'update:width': [value: string];
+  'update:height': [value: string];
+  'update:align': [value: 'left' | 'center' | 'right'];
+  'replace-image': [event: Event];
+  'open-new-tab': [url: string];
 }>();
 
 const replaceInputRef = ref<HTMLInputElement | null>(null);

@@ -1,5 +1,5 @@
-import type { TideResponse } from "@/api/weatherGateway";
-import { weatherGateway } from "@/api/weatherGateway";
+import type { TideResponse } from '@/api/weatherGateway';
+import { weatherGateway } from '@/api/weatherGateway';
 import type {
   TideData,
   WeatherDay,
@@ -7,7 +7,7 @@ import type {
   WeatherHourly,
   WeatherIndex,
   WeatherNow,
-} from "@/views/fishing/types";
+} from '@/views/fishing/types';
 
 export interface WeatherFullResult {
   updateTime?: string;
@@ -39,7 +39,7 @@ const resolveLocationName = (
 
   if (directName) return directName;
   if (hourlyName) return hourlyName;
-  return now?.text ? "当前位置" : "钓鱼地点";
+  return now?.text ? '当前位置' : '钓鱼地点';
 };
 
 export const weatherService: WeatherService = {

@@ -259,16 +259,16 @@
 </template>
 
 <script setup lang="ts">
-import BookCard from "@/components/books/BookCard.vue";
-import { bookService } from "@/service/bookService";
-import type { BookItem, Pagination } from "@/types";
-import { computed, onMounted, ref } from "vue";
-import { RouterLink } from "vue-router";
+import BookCard from '@/components/books/BookCard.vue';
+import { bookService } from '@/service/bookService';
+import type { BookItem, Pagination } from '@/types';
+import { computed, onMounted, ref } from 'vue';
+import { RouterLink } from 'vue-router';
 
 // 响应式状态
 const books = ref<BookItem[]>([]);
 const isLoading = ref<boolean>(false);
-const errorMessage = ref<string>("");
+const errorMessage = ref<string>('');
 const pagination = ref<Pagination | null>(null);
 const currentPage = ref<number>(1);
 const books_count = ref<number>(0);
@@ -296,17 +296,17 @@ const getVisiblePages = computed(() => {
 // 数据获取
 const fetchBooks = async (page: number = 1) => {
   isLoading.value = true;
-  errorMessage.value = "";
+  errorMessage.value = '';
   try {
     const res = await bookService.getBooks({ page, per_page: 12 });
-    if (res.status === "success") {
+    if (res.status === 'success') {
       books.value = res.data?.books || [];
       //
       books_count.value = res.data?.pagination?.total || 0;
       pagination.value = res.data?.pagination || null;
       currentPage.value = page;
     } else {
-      throw new Error(res.message || "获取书籍列表失败");
+      throw new Error(res.message || '获取书籍列表失败');
     }
   } catch (err: unknown) {
     const error = err as {
@@ -314,7 +314,7 @@ const fetchBooks = async (page: number = 1) => {
       message?: string;
     };
     errorMessage.value =
-      error?.response?.data?.message || error?.message || "获取书籍列表失败";
+      error?.response?.data?.message || error?.message || '获取书籍列表失败';
   } finally {
     isLoading.value = false;
   }

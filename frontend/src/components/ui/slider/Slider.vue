@@ -1,27 +1,27 @@
 <script setup lang="ts">
-import type { SliderRootEmits, SliderRootProps } from "reka-ui";
-import type { HTMLAttributes } from "vue";
-import { reactiveOmit } from "@vueuse/core";
+import type { SliderRootEmits, SliderRootProps } from 'reka-ui';
+import type { HTMLAttributes } from 'vue';
+import { reactiveOmit } from '@vueuse/core';
 import {
   SliderRange,
   SliderRoot,
   SliderThumb,
   SliderTrack,
   useForwardPropsEmits,
-} from "reka-ui";
-import { cn } from "@/lib/utils";
+} from 'reka-ui';
+import { cn } from '@/lib/utils';
 
 const props = defineProps<
-  SliderRootProps & { class?: HTMLAttributes["class"] }
+  SliderRootProps & { class?: HTMLAttributes['class'] }
 >();
 const emits = defineEmits<SliderRootEmits>();
 
-const delegatedProps = reactiveOmit(props, "class");
+const delegatedProps = reactiveOmit(props, 'class');
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits);
 
 defineOptions({
-  name: "UiSlider",
+  name: 'UiSlider',
 });
 </script>
 

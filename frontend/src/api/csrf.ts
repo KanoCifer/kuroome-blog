@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios';
 
 interface CSRFTokenResponse {
   data?: {
@@ -7,7 +7,7 @@ interface CSRFTokenResponse {
 }
 
 const csrfRequest = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE || "/api/v1/",
+  baseURL: import.meta.env.VITE_API_BASE || '/api/v1/',
   timeout: 10000,
   withCredentials: true,
 });
@@ -21,9 +21,9 @@ export async function fetchAndStoreCSRF(): Promise<void> {
 
   csrfFetchPromise = (async () => {
     try {
-      await csrfRequest.get<CSRFTokenResponse>("/auth/csrf-token");
+      await csrfRequest.get<CSRFTokenResponse>('/auth/csrf-token');
     } catch (error) {
-      console.error("获取 CSRF Token 失败:", error);
+      console.error('获取 CSRF Token 失败:', error);
       throw error;
     } finally {
       csrfFetchPromise = null;

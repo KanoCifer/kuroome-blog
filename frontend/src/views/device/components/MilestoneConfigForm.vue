@@ -442,14 +442,14 @@
 </template>
 
 <script setup lang="ts">
-import type { Device } from "@/service/deviceService";
-import { deviceGateway } from "@/api/deviceGateway";
-import { deviceService } from "@/service/deviceService";
-import { useNotificationStore } from "@/stores/notification";
-import { reactive, ref, watch, onMounted } from "vue";
-import dayjs from "dayjs";
+import type { Device } from '@/service/deviceService';
+import { deviceGateway } from '@/api/deviceGateway';
+import { deviceService } from '@/service/deviceService';
+import { useNotificationStore } from '@/stores/notification';
+import { reactive, ref, watch, onMounted } from 'vue';
+import dayjs from 'dayjs';
 
-type Channel = "email" | "feishu" | "bark";
+type Channel = 'email' | 'feishu' | 'bark';
 
 interface MilestoneFormState {
   enabled: boolean;
@@ -467,25 +467,25 @@ interface GlobalConfig {
 }
 
 const milestonePresets = [
-  { label: "100天", days: 100 },
-  { label: "1年", days: 365 },
-  { label: "2年", days: 730 },
+  { label: '100天', days: 100 },
+  { label: '1年', days: 365 },
+  { label: '2年', days: 730 },
 ];
 
 const channelOptions = [
   {
-    value: "email" as Channel,
-    label: "邮件",
+    value: 'email' as Channel,
+    label: '邮件',
     icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-[14px] w-[14px]"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>`,
   },
   {
-    value: "feishu" as Channel,
-    label: "飞书",
+    value: 'feishu' as Channel,
+    label: '飞书',
     icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-[14px] w-[14px]"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" /></svg>`,
   },
   {
-    value: "bark" as Channel,
-    label: "Bark",
+    value: 'bark' as Channel,
+    label: 'Bark',
     icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-[14px] w-[14px]"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>`,
   },
 ];
@@ -496,8 +496,8 @@ interface Props {
 }
 
 interface Emits {
-  (e: "update:modelValue", value: boolean): void;
-  (e: "success", device: Device): void;
+  (e: 'update:modelValue', value: boolean): void;
+  (e: 'success', device: Device): void;
 }
 
 const props = defineProps<Props>();
@@ -517,14 +517,14 @@ function createInitialState(
       : [100, 365, 730],
     channels: Array.isArray(cfg?.channels)
       ? (cfg.channels as Channel[])
-      : ["email"],
-    email: (cfg?.email as string) || globalConfig?.email || "",
+      : ['email'],
+    email: (cfg?.email as string) || globalConfig?.email || '',
     feishu_webhook_url:
       (cfg?.feishu_webhook_url as string) ||
       globalConfig?.feishu_webhook_url ||
-      "",
+      '',
     bark_device_key:
-      (cfg?.bark_device_key as string) || globalConfig?.bark_device_key || "",
+      (cfg?.bark_device_key as string) || globalConfig?.bark_device_key || '',
   };
 }
 
@@ -543,18 +543,18 @@ const form = reactive<MilestoneFormState>(
 const formError = ref<string | null>(null);
 const isSubmitting = ref(false);
 const testLoading = ref(false);
-const customMilestone = ref<number | "">("");
+const customMilestone = ref<number | ''>('');
 
 async function fetchGlobalConfig() {
   try {
     const res = await deviceGateway.getUserGlobalConfig();
     const cfg = res.config as GlobalConfig;
-    form.email = form.email || cfg?.email || "";
+    form.email = form.email || cfg?.email || '';
     form.feishu_webhook_url =
-      form.feishu_webhook_url || cfg?.feishu_webhook_url || "";
-    form.bark_device_key = form.bark_device_key || cfg?.bark_device_key || "";
+      form.feishu_webhook_url || cfg?.feishu_webhook_url || '';
+    form.bark_device_key = form.bark_device_key || cfg?.bark_device_key || '';
   } catch {
-    notificationStore.error("获取全局配置失败");
+    notificationStore.error('获取全局配置失败');
   }
 }
 
@@ -574,11 +574,11 @@ function addCustomMilestone() {
   const val = customMilestone.value;
   if (!val || val <= 0) return;
   if (form.milestones.includes(val)) {
-    customMilestone.value = "";
+    customMilestone.value = '';
     return;
   }
   form.milestones = [...form.milestones, val].sort((a, b) => a - b);
-  customMilestone.value = "";
+  customMilestone.value = '';
 }
 
 function toggleChannel(ch: Channel) {
@@ -594,10 +594,10 @@ async function handleTestNotification() {
   testLoading.value = true;
   try {
     await deviceService.testNotification(props.device.id);
-    notificationStore.success("测试通知已发送，请检查您的通知渠道");
+    notificationStore.success('测试通知已发送，请检查您的通知渠道');
   } catch (err) {
     const msg =
-      err instanceof Error ? err.message : "测试通知发送失败，请检查配置";
+      err instanceof Error ? err.message : '测试通知发送失败，请检查配置';
     notificationStore.error(msg);
   } finally {
     testLoading.value = false;
@@ -608,23 +608,23 @@ async function handleSubmit() {
   formError.value = null;
 
   if (form.channels.length === 0 && form.enabled) {
-    formError.value = "请至少选择一个通知渠道";
+    formError.value = '请至少选择一个通知渠道';
     return;
   }
   if (form.milestones.length === 0 && form.enabled) {
-    formError.value = "请至少选择一个里程碑";
+    formError.value = '请至少选择一个里程碑';
     return;
   }
-  if (form.channels.includes("email") && !form.email.trim()) {
-    formError.value = "请填写邮件地址";
+  if (form.channels.includes('email') && !form.email.trim()) {
+    formError.value = '请填写邮件地址';
     return;
   }
-  if (form.channels.includes("feishu") && !form.feishu_webhook_url.trim()) {
-    formError.value = "请填写飞书 Webhook 地址";
+  if (form.channels.includes('feishu') && !form.feishu_webhook_url.trim()) {
+    formError.value = '请填写飞书 Webhook 地址';
     return;
   }
-  if (form.channels.includes("bark") && !form.bark_device_key.trim()) {
-    formError.value = "请填写 Bark Device Key";
+  if (form.channels.includes('bark') && !form.bark_device_key.trim()) {
+    formError.value = '请填写 Bark Device Key';
     return;
   }
 
@@ -648,11 +648,11 @@ async function handleSubmit() {
       props.device.id,
       payload,
     );
-    notificationStore.success("里程碑配置已保存");
-    emit("success", updated);
+    notificationStore.success('里程碑配置已保存');
+    emit('success', updated);
     handleClose();
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "保存失败，请稍后重试";
+    const msg = err instanceof Error ? err.message : '保存失败，请稍后重试';
     formError.value = msg;
     notificationStore.error(msg);
   } finally {
@@ -661,7 +661,7 @@ async function handleSubmit() {
 }
 
 function handleClose() {
-  emit("update:modelValue", false);
+  emit('update:modelValue', false);
 }
 
 watch(

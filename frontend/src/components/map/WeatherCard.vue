@@ -26,7 +26,7 @@
         <p
           class="text-muted-foreground dark:text-muted-foreground mt-1 text-sm"
         >
-          {{ locationName || "钓鱼地点" }}
+          {{ locationName || '钓鱼地点' }}
         </p>
       </div>
       <div
@@ -284,10 +284,10 @@
 </template>
 
 <script setup lang="ts">
-import { useFishingMapStore } from "@/stores/fishingMap";
-import { formatDate } from "@/utils/formatdate";
-import { storeToRefs } from "pinia";
-import { computed } from "vue";
+import { useFishingMapStore } from '@/stores/fishingMap';
+import { formatDate } from '@/utils/formatdate';
+import { storeToRefs } from 'pinia';
+import { computed } from 'vue';
 
 defineProps<{
   location?: [number, number];
@@ -302,6 +302,6 @@ const error = computed(() => weatherError.value || null);
 
 // 打开和风天气
 const openQWeather = () => {
-  window.open("https://www.qweather.com/", "_blank");
+  window.open('https://www.qweather.com/', '_blank');
 };
 </script>

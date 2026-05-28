@@ -22,17 +22,17 @@
   </BentoCard>
 </template>
 <script setup lang="ts">
-import BentoCard from "@/components/bento/BentoCard.vue";
+import BentoCard from '@/components/bento/BentoCard.vue';
 
 const techStack = [
-  { name: "TaskIQ", color: "green" },
-  { name: "Vue", color: "rose" },
-  { name: "React", color: "teal" },
-  { name: "Postgre", color: "indigo" },
-  { name: "SQLAlchemy", color: "cyan" },
-  { name: "FastAPI", color: "indigo" },
-  { name: "Redis", color: "teal" },
-  { name: "MongoDB", color: "fuchsia" },
+  { name: 'TaskIQ', color: 'green' },
+  { name: 'Vue', color: 'rose' },
+  { name: 'React', color: 'teal' },
+  { name: 'Postgre', color: 'indigo' },
+  { name: 'SQLAlchemy', color: 'cyan' },
+  { name: 'FastAPI', color: 'indigo' },
+  { name: 'Redis', color: 'teal' },
+  { name: 'MongoDB', color: 'fuchsia' },
 ];
 
 // TODO(human): Replace hardcoded color classes with theme-aware semantic tokens.
@@ -43,13 +43,13 @@ const techStack = [
 // 3. Derive colors from CSS custom properties with hue rotation
 const colorClasses: Record<string, string> = {
   green:
-    "bg-success/15 text-success hover:bg-success/25 dark:bg-success/10 dark:text-success dark:hover:bg-success/20",
-  rose: "bg-destructive/15 text-destructive hover:bg-destructive/25 dark:bg-destructive/10 dark:text-destructive dark:hover:bg-destructive/20",
-  teal: "bg-chart-2/15 text-chart-2 hover:bg-chart-2/25 dark:bg-chart-2/10 dark:text-chart-2 dark:hover:bg-chart-2/20",
+    'bg-success/15 text-success hover:bg-success/25 dark:bg-success/10 dark:text-success dark:hover:bg-success/20',
+  rose: 'bg-destructive/15 text-destructive hover:bg-destructive/25 dark:bg-destructive/10 dark:text-destructive dark:hover:bg-destructive/20',
+  teal: 'bg-chart-2/15 text-chart-2 hover:bg-chart-2/25 dark:bg-chart-2/10 dark:text-chart-2 dark:hover:bg-chart-2/20',
   indigo:
-    "bg-chart-3/15 text-chart-3 hover:bg-chart-3/25 dark:bg-chart-3/10 dark:text-chart-3 dark:hover:bg-chart-3/20",
-  cyan: "bg-chart-1/15 text-chart-1 hover:bg-chart-1/25 dark:bg-chart-1/10 dark:text-chart-1 dark:hover:bg-chart-1/20",
+    'bg-chart-3/15 text-chart-3 hover:bg-chart-3/25 dark:bg-chart-3/10 dark:text-chart-3 dark:hover:bg-chart-3/20',
+  cyan: 'bg-chart-1/15 text-chart-1 hover:bg-chart-1/25 dark:bg-chart-1/10 dark:text-chart-1 dark:hover:bg-chart-1/20',
   fuchsia:
-    "bg-chart-5/15 text-chart-5 hover:bg-chart-5/25 dark:bg-chart-5/10 dark:text-chart-5 dark:hover:bg-chart-5/20",
+    'bg-chart-5/15 text-chart-5 hover:bg-chart-5/25 dark:bg-chart-5/10 dark:text-chart-5 dark:hover:bg-chart-5/20',
 };
 </script>

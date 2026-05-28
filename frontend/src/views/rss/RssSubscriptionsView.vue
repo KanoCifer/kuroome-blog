@@ -69,16 +69,16 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
-import { useRoute } from "vue-router";
-import { useRssParse } from "@/composables/useRssParse";
-import { useRssSubscriptions } from "@/composables/useRssSubscriptions";
-import { useRssArticles } from "@/composables/useRssArticles";
-import { BasicDetail } from "@/components/basic";
-import RssParseSection from "./components/RssParseSection.vue";
-import RssSubscriptionsSection from "./components/RssSubscriptionsSection.vue";
-import RssArticlesSection from "./components/RssArticlesSection.vue";
-import type { SubscriptionItem } from "@/service/rssService";
+import { onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { useRssParse } from '@/composables/useRssParse';
+import { useRssSubscriptions } from '@/composables/useRssSubscriptions';
+import { useRssArticles } from '@/composables/useRssArticles';
+import { BasicDetail } from '@/components/basic';
+import RssParseSection from './components/RssParseSection.vue';
+import RssSubscriptionsSection from './components/RssSubscriptionsSection.vue';
+import RssArticlesSection from './components/RssArticlesSection.vue';
+import type { SubscriptionItem } from '@/service/rssService';
 
 const route = useRoute();
 
@@ -146,7 +146,7 @@ const handleDeleteFeed = async (subscription: SubscriptionItem) => {
   const wasSelected = selectedFeedUrl.value === subscription.rssUrl;
   const deleted = await handleDelete(subscription);
   if (deleted && wasSelected) {
-    setSelectedFeed("");
+    setSelectedFeed('');
     activeSubscriptionId.value = null;
     await syncRouteQuery(1);
     await fetchArticles(1);
@@ -154,13 +154,13 @@ const handleDeleteFeed = async (subscription: SubscriptionItem) => {
 };
 
 const handleClearSearch = async () => {
-  searchQuery.value = "";
+  searchQuery.value = '';
   await syncRouteQuery(1);
   await fetchArticles(1);
 };
 
 const handleClearFeedFilter = async () => {
-  setSelectedFeed("");
+  setSelectedFeed('');
   activeSubscriptionId.value = null;
   await syncRouteQuery(1);
   await fetchArticles(1);
@@ -172,7 +172,7 @@ onMounted(async () => {
   initFromRoute(route.query as Record<string, string | undefined>);
 
   const pageFromQuery =
-    typeof route.query.page === "string"
+    typeof route.query.page === 'string'
       ? Number.parseInt(route.query.page, 10)
       : 1;
   const initialPage =

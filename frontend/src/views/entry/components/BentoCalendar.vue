@@ -48,19 +48,19 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from "@/components/bento/BentoCard.vue";
-import dayjs from "dayjs";
-import { computed } from "vue";
+import BentoCard from '@/components/bento/BentoCard.vue';
+import dayjs from 'dayjs';
+import { computed } from 'vue';
 
 const now = dayjs();
 
-const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const weekdayToday = computed(() => dayjs().day());
-const monthLabel = computed(() => now.format("MMMM"));
-const yearLabel = computed(() => now.format("YYYY"));
+const monthLabel = computed(() => now.format('MMMM'));
+const yearLabel = computed(() => now.format('YYYY'));
 
 // Day of week for the 1st of the month (0 = Sunday)
-const startOffset = computed(() => now.startOf("month").day());
+const startOffset = computed(() => now.startOf('month').day());
 
 // Total days in current month
 const daysInMonth = computed(() => now.daysInMonth());

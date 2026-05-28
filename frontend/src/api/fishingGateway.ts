@@ -1,11 +1,11 @@
-import request from "@/api/request";
+import request from '@/api/request';
 
 import type {
   FishingFeedbackPayload,
   FishingFeedbackResponse,
   FishingIndexData,
   FishingStats,
-} from "@/views/fishing/types";
+} from '@/views/fishing/types';
 
 export interface FishingGateway {
   getFishingIndex(payload: {
@@ -23,7 +23,7 @@ export const fishingGateway: FishingGateway = {
   }): Promise<FishingIndexData> {
     const [lng, lat] = payload.location;
     const res = await request.get<{ data: FishingIndexData }>(
-      "v2/fishing/index",
+      'v2/fishing/index',
       {
         params: { location: `${lng.toFixed(2)},${lat.toFixed(2)}` },
       },
@@ -35,14 +35,14 @@ export const fishingGateway: FishingGateway = {
     payload: FishingFeedbackPayload,
   ): Promise<FishingFeedbackResponse> {
     const res = await request.post<{ data: FishingFeedbackResponse }>(
-      "v2/fishing/feedback",
+      'v2/fishing/feedback',
       payload,
     );
     return res.data.data;
   },
 
   async getFishingStats(): Promise<FishingStats> {
-    const res = await request.get<{ data: FishingStats }>("v2/fishing/stats");
+    const res = await request.get<{ data: FishingStats }>('v2/fishing/stats');
     return res.data.data;
   },
 };

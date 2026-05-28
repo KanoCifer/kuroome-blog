@@ -9,8 +9,8 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from "@/components/bento/BentoCard.vue";
-import { useCardImage } from "@/composables/useCardImage";
+import BentoCard from '@/components/bento/BentoCard.vue';
+import { useCardImage } from '@/composables/useCardImage';
 
 const { imageSrc } = useCardImage();
 </script>

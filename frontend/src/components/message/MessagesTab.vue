@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { Message } from "@/types";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
+import type { Message } from '@/types';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime);
 
@@ -22,14 +22,14 @@ const formatTime = (dateStr: string) => {
 };
 
 const handleApproveMessage = (messageId: string) => {
-  emit("approve", messageId);
+  emit('approve', messageId);
 };
 
 const handleDeleteMessage = (messageId: string) => {
-  if (!confirm("Are you sure you want to delete this message?")) {
+  if (!confirm('Are you sure you want to delete this message?')) {
     return;
   }
-  emit("delete", messageId);
+  emit('delete', messageId);
 };
 </script>
 
@@ -59,7 +59,7 @@ const handleDeleteMessage = (messageId: string) => {
           <div class="mb-3 flex items-start justify-between">
             <div>
               <h3 class="text-foreground dark:text-foreground font-semibold">
-                {{ message.name || "Anonymous" }}
+                {{ message.name || 'Anonymous' }}
               </h3>
               <p
                 class="text-muted-foreground dark:text-muted-foreground text-sm"
@@ -203,7 +203,7 @@ const handleDeleteMessage = (messageId: string) => {
           <div class="mb-3 flex items-start justify-between">
             <div>
               <h3 class="text-foreground dark:text-foreground font-semibold">
-                {{ message.name || "Anonymous" }}
+                {{ message.name || 'Anonymous' }}
               </h3>
               <p
                 class="text-muted-foreground dark:text-muted-foreground text-sm"

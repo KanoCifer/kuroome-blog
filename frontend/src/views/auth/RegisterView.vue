@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { authGateway } from "@/api/authGateway";
-import { useNotificationStore } from "@/stores/notification";
-import type { RegisterForm } from "@/types";
-import axios from "axios";
-import { ref } from "vue";
-import { RouterLink, useRouter } from "vue-router";
+import { authGateway } from '@/api/authGateway';
+import { useNotificationStore } from '@/stores/notification';
+import type { RegisterForm } from '@/types';
+import axios from 'axios';
+import { ref } from 'vue';
+import { RouterLink, useRouter } from 'vue-router';
 const router = useRouter();
 
 const notifier = useNotificationStore();
 const form = ref<RegisterForm>({
-  username: "",
-  email: "",
-  password: "",
-  confirmPassword: "",
-  emailCode: "",
+  username: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+  emailCode: '',
 });
 
 const errors = ref<{
@@ -27,24 +27,24 @@ const errors = ref<{
 
 const isSubmitting = ref<boolean>(false);
 const isSendingCode = ref<boolean>(false);
-const sendCodeText = ref<string>("SendCode");
+const sendCodeText = ref<string>('SendCode');
 const isSent = ref<boolean>(false);
 
 const sendEmailCode = async () => {
   if (!form.value.email) {
-    errors.value.email = "Please enter your email first";
+    errors.value.email = 'Please enter your email first';
     return;
   }
 
   isSendingCode.value = true;
-  sendCodeText.value = "Sending...";
+  sendCodeText.value = 'Sending...';
 
   try {
     await authGateway.sendRegisterEmailCode({
       email: form.value.email,
     });
-    sendCodeText.value = "Sent!";
-    notifier.success("验证码已发送到您的邮箱，请注意查收");
+    sendCodeText.value = 'Sent!';
+    notifier.success('验证码已发送到您的邮箱，请注意查收');
     // 倒计时 60 秒
     isSent.value = true;
     let countdown = 60;
@@ -52,7 +52,7 @@ const sendEmailCode = async () => {
       countdown--;
       if (countdown <= 0) {
         clearInterval(timer);
-        sendCodeText.value = "SendCode";
+        sendCodeText.value = 'SendCode';
         isSent.value = false;
       } else {
         sendCodeText.value = `${countdown}s`;
@@ -71,7 +71,7 @@ const handleSubmit = async () => {
   errors.value = {};
 
   if (form.value.password !== form.value.confirmPassword) {
-    errors.value.confirmPassword = "Passwords do not match";
+    errors.value.confirmPassword = 'Passwords do not match';
     return;
   }
 
@@ -83,12 +83,12 @@ const handleSubmit = async () => {
       email: form.value.email,
       password: form.value.password,
       confirm_password: form.value.confirmPassword,
-      email_code: form.value.emailCode || "",
+      email_code: form.value.emailCode || '',
     });
 
-    if (response.data.status === "success") {
-      router.push("/login");
-      notifier.success("注册成功！请使用您的账号登录");
+    if (response.data.status === 'success') {
+      router.push('/login');
+      notifier.success('注册成功！请使用您的账号登录');
     }
   } catch (err: unknown) {
     if (axios.isAxiosError(err) && err.response?.data) {
@@ -234,7 +234,7 @@ const handleSubmit = async () => {
             class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-primary/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
             :disabled="isSubmitting"
           >
-            {{ isSubmitting ? "Registering..." : "Register" }}
+            {{ isSubmitting ? 'Registering...' : 'Register' }}
           </button>
         </div>
 

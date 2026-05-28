@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import BasicDetail from "@/components/basic/BasicDetail.vue";
-import MarkdownEditor from "@/components/editor/MarkdownEditor.vue";
-import IconSave from "@/components/icons/IconSave.vue";
-import { blogService } from "@/service/blogService";
-import { useNotificationStore } from "@/stores/notification";
-import type { Category, CategoryResponseItem } from "@/types";
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import BasicDetail from '@/components/basic/BasicDetail.vue';
+import MarkdownEditor from '@/components/editor/MarkdownEditor.vue';
+import IconSave from '@/components/icons/IconSave.vue';
+import { blogService } from '@/service/blogService';
+import { useNotificationStore } from '@/stores/notification';
+import type { Category, CategoryResponseItem } from '@/types';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
 const router = useRouter();
@@ -15,17 +15,17 @@ const notification = useNotificationStore();
 // Post state
 const isEdit = ref(false);
 const postId = ref<string | null>(null);
-const title = ref("");
-const summary = ref("");
-const debouncedTitle = ref("");
-const category = ref("");
+const title = ref('');
+const summary = ref('');
+const debouncedTitle = ref('');
+const category = ref('');
 const pin = ref(false);
 const categories = ref<Category[]>([]);
 const loading = ref(false);
-const error = ref("");
+const error = ref('');
 
 // Markdown state
-const markdownBody = ref("");
+const markdownBody = ref('');
 const markdownEditorRef = ref<InstanceType<typeof MarkdownEditor> | null>(null);
 
 // Category dropdown
@@ -33,15 +33,15 @@ const categoryMenuOpen = ref(false);
 
 // Computed current category name
 const currentCategory = computed(() => {
-  if (!category.value) return "";
+  if (!category.value) return '';
   const selectedCategory = categories.value.find(
     (cat) => String(cat.id) === category.value,
   );
-  return selectedCategory ? selectedCategory.name : "";
+  return selectedCategory ? selectedCategory.name : '';
 });
 
 // Draft management
-const draftKey = computed(() => `blog-draft-${postId.value || "new"}`);
+const draftKey = computed(() => `blog-draft-${postId.value || 'new'}`);
 const lastSavedAt = ref<Date | null>(null);
 const hasUnsavedChanges = ref(false);
 const autoSaveEnabled = ref(true);
@@ -81,10 +81,10 @@ const restoreDraft = (): boolean => {
   if (!saved) return false;
   try {
     const draft = JSON.parse(saved);
-    title.value = draft.title || "";
-    summary.value = draft.summary || "";
-    markdownBody.value = draft.markdownBody || "";
-    category.value = draft.category || "";
+    title.value = draft.title || '';
+    summary.value = draft.summary || '';
+    markdownBody.value = draft.markdownBody || '';
+    category.value = draft.category || '';
     pin.value = draft.pin || false;
     if (draft.savedAt) lastSavedAt.value = new Date(draft.savedAt);
     return true;
@@ -107,7 +107,7 @@ const showDraftRestore = ref(false);
 const handleBeforeUnload = (e: BeforeUnloadEvent) => {
   if (hasUnsavedChanges.value) {
     e.preventDefault();
-    e.returnValue = "";
+    e.returnValue = '';
   }
 };
 
@@ -135,12 +135,12 @@ const getCurrentContent = (): string => {
 // Manual save draft (Cmd+S)
 const handleSaveDraft = () => {
   saveDraft();
-  notification.success("草稿已保存");
+  notification.success('草稿已保存');
 };
 
 // Keyboard shortcut for save
 const handleKeydown = (e: KeyboardEvent) => {
-  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
     e.preventDefault();
     handleSaveDraft();
   }
@@ -154,14 +154,14 @@ const fetchCategories = async () => {
       (cat): CategoryResponseItem => ({
         id: cat.id,
         name: cat.name,
-        description: "",
+        description: '',
         post_count: cat.post_count,
         posts: [],
       }),
     ) as unknown as Category[];
   } catch (err) {
     console.error(err);
-    notification.error("加载分类失败");
+    notification.error('加载分类失败');
   }
 };
 
@@ -170,16 +170,16 @@ const fetchPost = async (id: string) => {
   loading.value = true;
   try {
     const post = await blogService.getLegacyPost(id);
-    title.value = post.title || "";
-    summary.value = post.summary || "";
-    debouncedTitle.value = post.title || "";
-    category.value = post.category_id ? String(post.category_id) : "";
+    title.value = post.title || '';
+    summary.value = post.summary || '';
+    debouncedTitle.value = post.title || '';
+    category.value = post.category_id ? String(post.category_id) : '';
     pin.value = Boolean(post.is_pinned);
 
     // Load content - convert HTML to markdown for editor
-    markdownBody.value = post.body || "";
+    markdownBody.value = post.body || '';
   } catch (err: unknown) {
-    error.value = err instanceof Error ? err.message : "加载文章失败";
+    error.value = err instanceof Error ? err.message : '加载文章失败';
     notification.error(error.value);
     console.error(err);
   } finally {
@@ -193,18 +193,18 @@ const formRef = ref<HTMLElement | null>(null);
 // Submit handler
 const handleSubmit = async () => {
   if (!formRef.value || !document.body.contains(formRef.value)) {
-    console.warn("Form submission canceled because the form is not connected");
+    console.warn('Form submission canceled because the form is not connected');
     return;
   }
 
   if (!title.value.trim()) {
-    error.value = "标题不能为空";
+    error.value = '标题不能为空';
     notification.error(error.value);
     return;
   }
 
   if (!category.value) {
-    error.value = "请选择分类";
+    error.value = '请选择分类';
     notification.error(error.value);
     return;
   }
@@ -217,7 +217,7 @@ const handleSubmit = async () => {
       // Store raw markdown — conversion to HTML happens at display time
       currentContent = await markdownEditorRef.value.getContentForPublish();
     } catch (err) {
-      error.value = "图片上传失败";
+      error.value = '图片上传失败';
       notification.error(error.value);
       console.error(err);
       return;
@@ -227,13 +227,13 @@ const handleSubmit = async () => {
   }
 
   if (!currentContent.trim()) {
-    error.value = "内容不能为空";
+    error.value = '内容不能为空';
     notification.error(error.value);
     return;
   }
 
   loading.value = true;
-  error.value = "";
+  error.value = '';
 
   try {
     const payload = {
@@ -247,16 +247,16 @@ const handleSubmit = async () => {
     if (isEdit.value && postId.value) {
       const updatePayload = { ...payload, _id: postId.value };
       await blogService.updateLegacyPost(updatePayload);
-      notification.success("文章更新成功");
+      notification.success('文章更新成功');
     } else {
       await blogService.createLegacyPost(payload);
-      notification.success("文章发布成功");
+      notification.success('文章发布成功');
     }
 
     clearDraft();
     router.back();
   } catch (err: unknown) {
-    error.value = err instanceof Error ? err.message : "保存文章失败";
+    error.value = err instanceof Error ? err.message : '保存文章失败';
     notification.error(error.value);
     console.error(err);
   } finally {
@@ -269,13 +269,13 @@ const handleCancel = () => {
 };
 
 onMounted(async () => {
-  window.addEventListener("keydown", handleKeydown);
-  window.addEventListener("beforeunload", handleBeforeUnload);
+  window.addEventListener('keydown', handleKeydown);
+  window.addEventListener('beforeunload', handleBeforeUnload);
 
   await fetchCategories();
   const id = route.params.id;
 
-  if (id && id !== "new") {
+  if (id && id !== 'new') {
     isEdit.value = true;
     postId.value = String(id);
 
@@ -289,14 +289,14 @@ onMounted(async () => {
     // New post - try restore draft
     if (hasDraft.value && restoreDraft()) {
       showDraftRestore.value = false;
-      notification.success("已恢复上次草稿");
+      notification.success('已恢复上次草稿');
     }
   }
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener("keydown", handleKeydown);
-  window.removeEventListener("beforeunload", handleBeforeUnload);
+  window.removeEventListener('keydown', handleKeydown);
+  window.removeEventListener('beforeunload', handleBeforeUnload);
   if (autoSaveTimer) clearTimeout(autoSaveTimer);
 });
 </script>
@@ -334,7 +334,7 @@ onBeforeUnmount(() => {
               </p>
               <p class="text-muted-foreground text-xs">
                 上次保存于
-                {{ lastSavedAt ? lastSavedAt.toLocaleString() : "未知" }}
+                {{ lastSavedAt ? lastSavedAt.toLocaleString() : '未知' }}
               </p>
             </div>
           </div>
@@ -472,7 +472,7 @@ onBeforeUnmount(() => {
                   d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z"
                 />
               </svg>
-              {{ pin ? "已置顶" : "置顶" }}
+              {{ pin ? '已置顶' : '置顶' }}
             </button>
 
             <!-- Category Selector -->
@@ -491,7 +491,7 @@ onBeforeUnmount(() => {
                     : 'border-border bg-card text-muted-foreground hover:border-border/80',
                 ]"
               >
-                <span>{{ currentCategory || "选择分类" }}</span>
+                <span>{{ currentCategory || '选择分类' }}</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
@@ -569,7 +569,7 @@ onBeforeUnmount(() => {
                   clip-rule="evenodd"
                 />
               </svg>
-              <span>{{ autoSaveEnabled ? "自动" : "手动" }}</span>
+              <span>{{ autoSaveEnabled ? '自动' : '手动' }}</span>
             </button>
 
             <!-- Save Draft Button -->
@@ -629,7 +629,7 @@ onBeforeUnmount(() => {
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               ></path>
             </svg>
-            {{ isEdit ? "保存修改" : "发布文章" }}
+            {{ isEdit ? '保存修改' : '发布文章' }}
           </button>
         </div>
       </form>

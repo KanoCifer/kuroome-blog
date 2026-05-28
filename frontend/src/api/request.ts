@@ -1,11 +1,11 @@
-import axios, { AxiosError } from "axios";
-import { fetchAndStoreCSRF } from "./csrf";
-import { isrefreshTokenRequest, refreshAccessToken } from "./refresh";
-import { getRefreshTokenFromStorage } from "./refreshToken";
+import axios, { AxiosError } from 'axios';
+import { fetchAndStoreCSRF } from './csrf';
+import { isrefreshTokenRequest, refreshAccessToken } from './refresh';
+import { getRefreshTokenFromStorage } from './refreshToken';
 // keep latest CSRF token so it can be sent in headers
 
 export interface ApiResponse<T = unknown> {
-  status: "success" | "error";
+  status: 'success' | 'error';
   message: string;
   data: T;
   code?: number;
@@ -13,7 +13,7 @@ export interface ApiResponse<T = unknown> {
 }
 
 const request = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE || "/api",
+  baseURL: import.meta.env.VITE_API_BASE || '/api',
   timeout: 10000,
   withCredentials: true,
 });
@@ -24,7 +24,7 @@ request.interceptors.response.use(
   async (error: AxiosError<ApiResponse>) => {
     const config = error.config;
     const errorMessage = error.response?.data?.message;
-    if (errorMessage && errorMessage.includes("CSRF") && config) {
+    if (errorMessage && errorMessage.includes('CSRF') && config) {
       const _config = config as typeof config & { _retryCount?: number };
       _config._retryCount = (_config._retryCount || 0) + 1;
 

@@ -2,58 +2,58 @@ import type {
   CreateSubscriptionPayload,
   Subscription,
   UpdateSubscriptionPayload,
-} from "@/api/subscriptionGateway";
+} from '@/api/subscriptionGateway';
 import type {
   ReminderFormState,
   SubscriptionFormState,
   SubscriptionStatusMeta,
-} from "@/views/subscription/types";
+} from '@/views/subscription/types';
 
 /**
  * 默认周期选项
  */
 export const cycleOptions = [
-  { value: "monthly", label: "月付" },
-  { value: "quarterly", label: "季付" },
-  { value: "yearly", label: "年付" },
-  { value: "weekly", label: "周付" },
-  { value: "daily", label: "日付" },
+  { value: 'monthly', label: '月付' },
+  { value: 'quarterly', label: '季付' },
+  { value: 'yearly', label: '年付' },
+  { value: 'weekly', label: '周付' },
+  { value: 'daily', label: '日付' },
 ];
 
 /**
  * 默认状态选项
  */
 export const statusOptions = [
-  { value: "active", label: "进行中" },
-  { value: "paused", label: "已暂停" },
-  { value: "canceled", label: "已取消" },
-  { value: "expired", label: "已过期" },
+  { value: 'active', label: '进行中' },
+  { value: 'paused', label: '已暂停' },
+  { value: 'canceled', label: '已取消' },
+  { value: 'expired', label: '已过期' },
 ];
 
 /**
  * 默认通知渠道选项
  */
 export const channelOptions = [
-  { value: "email", label: "邮件" },
-  { value: "feishu", label: "飞书" },
-  { value: "bark", label: "Bark" },
+  { value: 'email', label: '邮件' },
+  { value: 'feishu', label: '飞书' },
+  { value: 'bark', label: 'Bark' },
 ];
 
 /**
  * 默认提醒时间点选项
  */
 export const reminderPointOptions = [
-  { key: "days_30", label: "提前 30 天" },
-  { key: "days_7", label: "提前 7 天" },
-  { key: "days_3", label: "提前 3 天" },
-  { key: "days_1", label: "提前 1 天" },
-  { key: "day_of", label: "当天提醒" },
+  { key: 'days_30', label: '提前 30 天' },
+  { key: 'days_7', label: '提前 7 天' },
+  { key: 'days_3', label: '提前 3 天' },
+  { key: 'days_1', label: '提前 1 天' },
+  { key: 'day_of', label: '当天提醒' },
 ] as const;
 
 /**
  * 默认币种建议
  */
-export const currencySuggestions = ["USD", "CNY", "EUR", "JPY", "HKD", "GBP"];
+export const currencySuggestions = ['USD', 'CNY', 'EUR', 'JPY', 'HKD', 'GBP'];
 
 /**
  * 获取默认下次扣费日期（30天后）
@@ -62,8 +62,8 @@ export function getDefaultNextBillingDate(): string {
   const nextMonth = new Date();
   nextMonth.setDate(nextMonth.getDate() + 30);
   const year = nextMonth.getFullYear();
-  const month = String(nextMonth.getMonth() + 1).padStart(2, "0");
-  const day = String(nextMonth.getDate()).padStart(2, "0");
+  const month = String(nextMonth.getMonth() + 1).padStart(2, '0');
+  const day = String(nextMonth.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
 
@@ -74,10 +74,10 @@ export function toDateInputValue(value: string): string {
   const match = /^\d{4}-\d{2}-\d{2}/.exec(value);
   if (match) return match[0];
   const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return "";
+  if (Number.isNaN(parsed.getTime())) return '';
   const year = parsed.getFullYear();
-  const month = String(parsed.getMonth() + 1).padStart(2, "0");
-  const day = String(parsed.getDate()).padStart(2, "0");
+  const month = String(parsed.getMonth() + 1).padStart(2, '0');
+  const day = String(parsed.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
 
@@ -86,14 +86,14 @@ export function toDateInputValue(value: string): string {
  */
 export function createDefaultSubscriptionForm(): SubscriptionFormState {
   return {
-    name: "",
-    provider: "",
-    price: "",
-    currency: "USD",
-    billing_cycle: "monthly",
+    name: '',
+    provider: '',
+    price: '',
+    currency: 'USD',
+    billing_cycle: 'monthly',
     next_billing_date: getDefaultNextBillingDate(),
-    status: "active",
-    notes: "",
+    status: 'active',
+    notes: '',
   };
 }
 
@@ -108,9 +108,9 @@ export function createDefaultReminderForm(): ReminderFormState {
     days_3: false,
     days_1: true,
     day_of: true,
-    email: "",
-    feishu_webhook_url: "",
-    bark_device_key: "",
+    email: '',
+    feishu_webhook_url: '',
+    bark_device_key: '',
   };
 }
 
@@ -119,7 +119,7 @@ export function createDefaultReminderForm(): ReminderFormState {
  */
 export function toStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
-  return value.filter((item): item is string => typeof item === "string");
+  return value.filter((item): item is string => typeof item === 'string');
 }
 
 /**
@@ -139,15 +139,15 @@ export function createReminderFormState(
       reminderConfig.day_of === undefined
         ? true
         : Boolean(reminderConfig.day_of),
-    email: typeof reminderConfig.email === "string" ? reminderConfig.email : "",
+    email: typeof reminderConfig.email === 'string' ? reminderConfig.email : '',
     feishu_webhook_url:
-      typeof reminderConfig.feishu_webhook_url === "string"
+      typeof reminderConfig.feishu_webhook_url === 'string'
         ? reminderConfig.feishu_webhook_url
-        : "",
+        : '',
     bark_device_key:
-      typeof reminderConfig.bark_device_key === "string"
+      typeof reminderConfig.bark_device_key === 'string'
         ? reminderConfig.bark_device_key
-        : "",
+        : '',
   };
 }
 
@@ -157,13 +157,13 @@ export function createReminderFormState(
 export function getMonthlyEstimate(subscription: Subscription): number {
   const price = Number(subscription.price) || 0;
   switch (subscription.billing_cycle) {
-    case "yearly":
+    case 'yearly':
       return price / 12;
-    case "quarterly":
+    case 'quarterly':
       return price / 3;
-    case "weekly":
+    case 'weekly':
       return (price * 52) / 12;
-    case "daily":
+    case 'daily':
       return price * 30;
     default:
       return price;
@@ -194,33 +194,33 @@ export function getCycleLabel(cycle: string): string {
  */
 export function getStatusMeta(status: string): SubscriptionStatusMeta {
   switch (status) {
-    case "paused":
+    case 'paused':
       return {
-        label: "已暂停",
-        dotClass: "bg-amber-500",
+        label: '已暂停',
+        dotClass: 'bg-amber-500',
         badgeClass:
-          "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300",
+          'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300',
       };
-    case "canceled":
+    case 'canceled':
       return {
-        label: "已取消",
-        dotClass: "bg-red-500",
+        label: '已取消',
+        dotClass: 'bg-red-500',
         badgeClass:
-          "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300",
+          'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300',
       };
-    case "expired":
+    case 'expired':
       return {
-        label: "已过期",
-        dotClass: "bg-slate-500",
+        label: '已过期',
+        dotClass: 'bg-slate-500',
         badgeClass:
-          "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200",
+          'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200',
       };
     default:
       return {
-        label: "进行中",
-        dotClass: "bg-emerald-500",
+        label: '进行中',
+        dotClass: 'bg-emerald-500',
         badgeClass:
-          "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300",
+          'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300',
       };
   }
 }
@@ -230,13 +230,13 @@ export function getStatusMeta(status: string): SubscriptionStatusMeta {
  */
 export function formatPrice(price: number, currency: string): string {
   const upperCurrency = currency.toUpperCase();
-  if (upperCurrency === "CNY" || upperCurrency === "RMB") {
+  if (upperCurrency === 'CNY' || upperCurrency === 'RMB') {
     return `¥${price.toFixed(2)}`;
   }
-  if (upperCurrency === "USD") {
+  if (upperCurrency === 'USD') {
     return `$${price.toFixed(2)}`;
   }
-  if (upperCurrency === "EUR") {
+  if (upperCurrency === 'EUR') {
     return `€${price.toFixed(2)}`;
   }
   return `${currency} ${price.toFixed(2)}`;
@@ -251,23 +251,23 @@ export function validateSubscriptionForm(
   const name = form.name.trim();
   const provider = form.provider.trim();
   if (!name || !provider) {
-    return "请填写订阅名称和服务商。";
+    return '请填写订阅名称和服务商。';
   }
 
   const price = Number.parseFloat(form.price);
   if (!Number.isFinite(price) || price <= 0) {
-    return "请输入大于 0 的价格。";
+    return '请输入大于 0 的价格。';
   }
 
   const currency = form.currency.trim();
   if (!currency) {
-    return "请输入货币单位。";
+    return '请输入货币单位。';
   }
   if (currency.length > 10) {
-    return "货币单位长度不能超过 10 个字符。";
+    return '货币单位长度不能超过 10 个字符。';
   }
   if (!form.next_billing_date) {
-    return "请选择下次扣费日期。";
+    return '请选择下次扣费日期。';
   }
   return null;
 }
@@ -285,7 +285,7 @@ export function toCreatePayload(
     currency: form.currency.trim(),
     billing_cycle: form.billing_cycle,
     next_billing_date: form.next_billing_date,
-    status: "active",
+    status: 'active',
     notes: form.notes.trim() || null,
   };
 }
@@ -349,8 +349,8 @@ export function getReminderChannelsText(
   config: Record<string, unknown> | null,
 ): string {
   const channels = toStringArray(config?.channels);
-  if (channels.length === 0) return "未配置";
-  return channels.join("、");
+  if (channels.length === 0) return '未配置';
+  return channels.join('、');
 }
 
 /**
@@ -359,15 +359,15 @@ export function getReminderChannelsText(
 export function getReminderPointsText(
   config: Record<string, unknown> | null,
 ): string {
-  if (!config) return "未配置";
+  if (!config) return '未配置';
   const points: string[] = [];
-  if (config.days_30) points.push("提前 30 天");
-  if (config.days_7) points.push("提前 7 天");
-  if (config.days_3) points.push("提前 3 天");
-  if (config.days_1) points.push("提前 1 天");
+  if (config.days_30) points.push('提前 30 天');
+  if (config.days_7) points.push('提前 7 天');
+  if (config.days_3) points.push('提前 3 天');
+  if (config.days_1) points.push('提前 1 天');
   if (config.day_of === undefined || Boolean(config.day_of))
-    points.push("当天");
-  return points.length > 0 ? points.join("、") : "未配置";
+    points.push('当天');
+  return points.length > 0 ? points.join('、') : '未配置';
 }
 
 /**
@@ -419,7 +419,7 @@ export function mapSubscriptionToForm(
     billing_cycle: subscription.billing_cycle,
     next_billing_date: toDateInputValue(subscription.next_billing_date),
     status: subscription.status,
-    notes: subscription.notes ?? "",
+    notes: subscription.notes ?? '',
   };
 }
 

@@ -152,7 +152,7 @@
 </template>
 
 <script setup lang="ts">
-import { BasicFooter } from "@/components/basic";
+import { BasicFooter } from '@/components/basic';
 import {
   BentoCalendar,
   BentoClock,
@@ -160,17 +160,17 @@ import {
   BentoReadingList,
   BentoTech,
   TodoCard,
-} from "@/components/bento";
-import DragWrapper from "@/components/layout/DragWrapper.vue";
-import FloatingActionButtons from "@/components/layout/FloatingActionButtons.vue";
-import SettingsModal from "@/components/layout/SettingsModal.vue";
-import { useCardLayout } from "@/composables/useCardLayout";
-import { useCardLayoutStore } from "@/stores/cardLayout";
-import { useThemeStore } from "@/stores/theme";
-import { nextTick, onMounted, onUnmounted, ref } from "vue";
-import BentoMap from "./components/BentoMap.vue";
-import BentoPic from "./components/BentoPic.vue";
-import GreetingToast from "./components/GreetingToast.vue";
+} from '@/components/bento';
+import DragWrapper from '@/components/layout/DragWrapper.vue';
+import FloatingActionButtons from '@/components/layout/FloatingActionButtons.vue';
+import SettingsModal from '@/components/layout/SettingsModal.vue';
+import { useCardLayout } from '@/composables/useCardLayout';
+import { useCardLayoutStore } from '@/stores/cardLayout';
+import { useThemeStore } from '@/stores/theme';
+import { nextTick, onMounted, onUnmounted, ref } from 'vue';
+import BentoMap from './components/BentoMap.vue';
+import BentoPic from './components/BentoPic.vue';
+import GreetingToast from './components/GreetingToast.vue';
 
 const themeStore = useThemeStore();
 const isEntryView = ref<boolean>(true);
@@ -180,7 +180,7 @@ const switchToMobile = () => {
   const expires = new Date();
   expires.setTime(expires.getTime() + 30 * 24 * 60 * 60 * 1000);
   document.cookie = `device_force=react;expires=${expires.toUTCString()};path=/;domain=.kanocifer.chat`;
-  window.location.href = "https://m.kanocifer.chat";
+  window.location.href = 'https://m.kanocifer.chat';
 };
 
 const parentContainer = ref<HTMLElement | null>(null);
@@ -204,17 +204,17 @@ const {
 const layoutStore = useCardLayoutStore();
 
 function onKeyDown(e: KeyboardEvent) {
-  if (e.key === "Escape" && layoutStore.isEditing) {
+  if (e.key === 'Escape' && layoutStore.isEditing) {
     layoutStore.cancelEditing();
   }
 }
 
 onMounted(() => {
-  window.addEventListener("keydown", onKeyDown);
+  window.addEventListener('keydown', onKeyDown);
 });
 
 onUnmounted(() => {
-  window.removeEventListener("keydown", onKeyDown);
+  window.removeEventListener('keydown', onKeyDown);
 });
 
 const isSettingsOpen = ref(false);
@@ -251,7 +251,7 @@ onMounted(async () => {
   // Refresh dimensions after all cards have rendered
   const maxDelay = maxOrder * ANIMATION_DELAY * 1000;
   setTimeout(() => {
-    window.dispatchEvent(new Event("resize"));
+    window.dispatchEvent(new Event('resize'));
   }, maxDelay);
 });
 </script>

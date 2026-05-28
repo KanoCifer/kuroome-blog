@@ -28,11 +28,11 @@
 </template>
 
 <script setup lang="ts">
-import { motion } from "motion-v";
-import { useRouter } from "vue-router";
+import { motion } from 'motion-v';
+import { useRouter } from 'vue-router';
 const router = useRouter();
 
 const handleClick = () => {
-  router.push("/blog/new");
+  router.push('/blog/new');
 };
 </script>

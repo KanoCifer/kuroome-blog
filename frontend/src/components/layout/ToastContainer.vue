@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import IconClose from "@/components/icons/IconClose.vue";
-import IconInfo from "@/components/icons/IconInfo.vue";
-import IconWarning from "@/components/icons/IconWarning.vue";
-import { useNotificationStore } from "@/stores/notification";
-import { AnimatePresence, motion } from "motion-v";
-import { computed, defineAsyncComponent, onUnmounted, ref } from "vue";
+import IconClose from '@/components/icons/IconClose.vue';
+import IconInfo from '@/components/icons/IconInfo.vue';
+import IconWarning from '@/components/icons/IconWarning.vue';
+import { useNotificationStore } from '@/stores/notification';
+import { AnimatePresence, motion } from 'motion-v';
+import { computed, defineAsyncComponent, onUnmounted, ref } from 'vue';
 
-import errorAnimationData from "@/assets/error.json";
-import successAnimationData from "@/assets/success.json";
+import errorAnimationData from '@/assets/error.json';
+import successAnimationData from '@/assets/success.json';
 
 const Vue3Lottie = defineAsyncComponent(() =>
-  import("vue3-lottie").then((m) => m.Vue3Lottie),
+  import('vue3-lottie').then((m) => m.Vue3Lottie),
 );
 const lottieContainer = ref<typeof Vue3Lottie | null>(null);
 const store = useNotificationStore();
@@ -18,11 +18,11 @@ const toasts = computed(() => store.toasts);
 
 function getIconForType(type: string) {
   switch (type) {
-    case "success":
-      return "success-lottie";
-    case "error":
-      return "error-lottie";
-    case "warning":
+    case 'success':
+      return 'success-lottie';
+    case 'error':
+      return 'error-lottie';
+    case 'warning':
       return IconWarning;
     default:
       return IconInfo;
@@ -44,14 +44,14 @@ function getIconForType(type: string) {
 
 function iconColorForType(type: string) {
   switch (type) {
-    case "success":
-      return "text-success";
-    case "error":
-      return "text-destructive";
-    case "warning":
-      return "text-warning";
+    case 'success':
+      return 'text-success';
+    case 'error':
+      return 'text-destructive';
+    case 'warning':
+      return 'text-warning';
     default:
-      return "text-primary";
+      return 'text-primary';
   }
 }
 

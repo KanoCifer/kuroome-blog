@@ -40,13 +40,13 @@ const goToChangelog = () => {
     >
       <div
         v-if="showToast"
-        class="group fixed bottom-6 left-4 z-50 w-[300px] overflow-hidden rounded-2xl border border-border bg-card/95 shadow-lg backdrop-blur-sm transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-xl sm:bottom-8 sm:left-8"
+        class="group border-border bg-card/95 fixed bottom-6 left-4 z-50 w-[300px] overflow-hidden rounded-2xl border shadow-lg backdrop-blur-sm transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-xl sm:bottom-8 sm:left-8"
       >
         <div class="relative px-4 py-4">
           <!-- 关闭按钮 -->
           <button
             @click="closeToast"
-            class="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground/60 transition-all duration-200 hover:scale-110 hover:bg-accent hover:text-foreground"
+            class="text-muted-foreground/60 hover:bg-accent hover:text-foreground absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full transition-all duration-200 hover:scale-110"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -68,11 +68,11 @@ const goToChangelog = () => {
           <div class="flex items-center gap-3">
             <!-- 图标：呼吸发光 -->
             <div
-              class="animate-icon-glow relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-warning/15 ring-1 ring-warning/20"
+              class="animate-icon-glow bg-warning/15 ring-warning/20 relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ring-1"
             >
               <svg
                 v-if="isDay"
-                class="size-5 text-warning"
+                class="text-warning size-5"
                 viewBox="0 0 24 24"
                 fill="currentColor"
               >
@@ -94,7 +94,7 @@ const goToChangelog = () => {
               </svg>
               <svg
                 v-else
-                class="size-5 text-warning/70"
+                class="text-warning/70 size-5"
                 viewBox="0 0 24 24"
                 fill="currentColor"
               >
@@ -105,11 +105,11 @@ const goToChangelog = () => {
             <!-- 文字 -->
             <div class="min-w-0 flex-1">
               <h3
-                class="font-serif text-sm font-semibold tracking-wide text-foreground"
+                class="text-foreground font-serif text-sm font-semibold tracking-wide"
               >
                 {{ greeting }}
               </h3>
-              <p class="mt-0.5 truncate text-xs text-muted-foreground">
+              <p class="text-muted-foreground mt-0.5 truncate text-xs">
                 {{ changelogHint }}
               </p>
             </div>
@@ -118,7 +118,7 @@ const goToChangelog = () => {
           <!-- CTA 按钮：hover 流光 -->
           <button
             @click="goToChangelog"
-            class="group/btn relative mt-3 flex w-full items-center justify-center gap-1.5 overflow-hidden rounded-xl bg-primary py-2 text-xs font-medium text-primary-foreground shadow-sm transition-all duration-300 hover:bg-primary/90 hover:shadow-md active:scale-[0.97]"
+            class="group/btn bg-primary text-primary-foreground hover:bg-primary/90 relative mt-3 flex w-full items-center justify-center gap-1.5 overflow-hidden rounded-xl py-2 text-xs font-medium shadow-sm transition-all duration-300 hover:shadow-md active:scale-[0.97]"
           >
             <span class="relative z-10">查看更新日志</span>
             <svg
@@ -137,7 +137,7 @@ const goToChangelog = () => {
             </svg>
             <!-- 流光条纹 -->
             <div
-              class="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-primary-foreground/25 to-transparent transition-transform duration-500 group-hover/btn:translate-x-full"
+              class="via-primary-foreground/25 absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent to-transparent transition-transform duration-500 group-hover/btn:translate-x-full"
             />
           </button>
         </div>
@@ -176,10 +176,12 @@ const goToChangelog = () => {
 @keyframes icon-glow {
   0%,
   100% {
-    box-shadow: 0 0 6px color-mix(in srgb, var(--color-warning) 15%, transparent);
+    box-shadow: 0 0 6px
+      color-mix(in srgb, var(--color-warning) 15%, transparent);
   }
   50% {
-    box-shadow: 0 0 18px color-mix(in srgb, var(--color-warning) 35%, transparent);
+    box-shadow: 0 0 18px
+      color-mix(in srgb, var(--color-warning) 35%, transparent);
   }
 }
 

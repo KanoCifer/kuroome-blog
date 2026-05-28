@@ -119,8 +119,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
-import { useBackgroundStore } from "@/stores/background";
+import { onMounted, onUnmounted, ref } from 'vue';
+import { useBackgroundStore } from '@/stores/background';
 
 const store = useBackgroundStore();
 
@@ -140,10 +140,10 @@ const handleClickOutside = (event: MouseEvent) => {
 };
 
 onMounted(() => {
-  document.addEventListener("click", handleClickOutside);
+  document.addEventListener('click', handleClickOutside);
 });
 
 onUnmounted(() => {
-  document.removeEventListener("click", handleClickOutside);
+  document.removeEventListener('click', handleClickOutside);
 });
 </script>

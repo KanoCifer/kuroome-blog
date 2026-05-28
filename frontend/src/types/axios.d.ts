@@ -1,6 +1,6 @@
-import "axios";
+import 'axios';
 
-declare module "axios" {
+declare module 'axios' {
   interface AxiosRequestConfig {
     _isRefreshToken?: boolean;
   }

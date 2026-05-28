@@ -165,37 +165,37 @@
 </template>
 
 <script setup lang="ts">
-import { deviceService } from "@/service/deviceService";
-import { useNotificationStore } from "@/stores/notification";
-import type { DeviceInput } from "@/service/deviceService";
-import { reactive, ref, watch } from "vue";
-import dayjs from "dayjs";
+import { deviceService } from '@/service/deviceService';
+import { useNotificationStore } from '@/stores/notification';
+import type { DeviceInput } from '@/service/deviceService';
+import { reactive, ref, watch } from 'vue';
+import dayjs from 'dayjs';
 
 interface Props {
   modelValue: boolean;
 }
 
 interface Emits {
-  (e: "update:modelValue", value: boolean): void;
-  (e: "success", device: DeviceInput): void;
+  (e: 'update:modelValue', value: boolean): void;
+  (e: 'success', device: DeviceInput): void;
 }
 
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
-const currencyOptions = ["CNY", "USD", "EUR", "JPY", "HKD", "GBP"];
-const statusOptions: Array<{ value: "active" | "retired"; label: string }> = [
-  { value: "active", label: "使用中" },
-  { value: "retired", label: "已退役" },
+const currencyOptions = ['CNY', 'USD', 'EUR', 'JPY', 'HKD', 'GBP'];
+const statusOptions: Array<{ value: 'active' | 'retired'; label: string }> = [
+  { value: 'active', label: '使用中' },
+  { value: 'retired', label: '已退役' },
 ];
 
 const form = reactive({
-  name: "",
-  purchase_date: "",
+  name: '',
+  purchase_date: '',
   price: 0,
-  currency: "CNY",
-  notes: "",
-  status: "active" as "active" | "retired",
+  currency: 'CNY',
+  notes: '',
+  status: 'active' as 'active' | 'retired',
 });
 
 const formError = ref<string | null>(null);
@@ -212,18 +212,18 @@ watch(
 
 function resetForm() {
   const today = dayjs();
-  form.name = "";
-  form.purchase_date = today.format("YYYY-MM-DD");
+  form.name = '';
+  form.purchase_date = today.format('YYYY-MM-DD');
   form.price = 0;
-  form.currency = "CNY";
-  form.notes = "";
-  form.status = "active";
+  form.currency = 'CNY';
+  form.notes = '';
+  form.status = 'active';
   formError.value = null;
   isSubmitting.value = false;
 }
 
 function handleClose() {
-  emit("update:modelValue", false);
+  emit('update:modelValue', false);
 }
 
 async function handleSubmit() {
@@ -231,22 +231,22 @@ async function handleSubmit() {
 
   const name = form.name.trim();
   if (!name) {
-    formError.value = "请填写设备名称";
+    formError.value = '请填写设备名称';
     return;
   }
 
   if (name.length > 100) {
-    formError.value = "设备名称不能超过 100 个字符";
+    formError.value = '设备名称不能超过 100 个字符';
     return;
   }
 
   if (!form.purchase_date) {
-    formError.value = "请选择购买日期";
+    formError.value = '请选择购买日期';
     return;
   }
 
   if (!Number.isFinite(form.price) || form.price < 0) {
-    formError.value = "请输入有效的价格";
+    formError.value = '请输入有效的价格';
     return;
   }
 
@@ -264,11 +264,11 @@ async function handleSubmit() {
 
   try {
     await deviceService.createDevice(payload);
-    useNotificationStore().success("设备添加成功");
-    emit("success", payload);
+    useNotificationStore().success('设备添加成功');
+    emit('success', payload);
     handleClose();
   } catch (err) {
-    const message = err instanceof Error ? err.message : "添加失败，请稍后重试";
+    const message = err instanceof Error ? err.message : '添加失败，请稍后重试';
     formError.value = message;
     useNotificationStore().error(message);
   } finally {

@@ -1,16 +1,16 @@
-import request from "@/api/request";
+import request from '@/api/request';
 
 export const messageService = {
   async getMessages() {
-    return request.get("/messages");
+    return request.get('/messages');
   },
 
   async postMessage(payload: { name: string; message: string }) {
-    return request.post("/messages", payload);
+    return request.post('/messages', payload);
   },
 
   async getAdminMessages() {
-    return request.get("/admin/messages");
+    return request.get('/admin/messages');
   },
 
   async approveAdminMessage(messageId: string) {
@@ -22,7 +22,7 @@ export const messageService = {
   },
 
   async getAdminComments() {
-    return request.get("/admin/comments");
+    return request.get('/admin/comments');
   },
 
   async approveAdminComment(commentId: string) {

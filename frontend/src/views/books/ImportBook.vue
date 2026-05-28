@@ -75,10 +75,10 @@
 </template>
 
 <script setup lang="ts">
-import { bookService } from "@/service/bookService";
-import { useNotificationStore } from "@/stores/notification";
-import { onMounted, ref } from "vue";
-const weread_cookie = ref("");
+import { bookService } from '@/service/bookService';
+import { useNotificationStore } from '@/stores/notification';
+import { onMounted, ref } from 'vue';
+const weread_cookie = ref('');
 const loading = ref(false);
 
 const notifier = useNotificationStore();
@@ -88,7 +88,7 @@ const submitImport = async () => {
     const response = await bookService.importBooks({
       weread_cookie: weread_cookie.value,
     });
-    if (response.status === "success") {
+    if (response.status === 'success') {
       const imported_count = response.data?.imported_count ?? 0;
       notifier.success(`Successfully imported ${imported_count} books!`);
 
@@ -96,8 +96,8 @@ const submitImport = async () => {
       saveToLocalStorage();
     }
   } catch (error) {
-    console.log("Error during import:", error);
-    notifier.error("Cookie过期或无效，请重新获取并输入有效的 WEREAD Cookie！");
+    console.log('Error during import:', error);
+    notifier.error('Cookie过期或无效，请重新获取并输入有效的 WEREAD Cookie！');
   } finally {
     loading.value = false;
   }
@@ -105,12 +105,12 @@ const submitImport = async () => {
 
 //保存数据到localStorage
 const saveToLocalStorage = () => {
-  localStorage.setItem("weread_cookie", weread_cookie.value);
+  localStorage.setItem('weread_cookie', weread_cookie.value);
 };
 
 //页面加载时从localStorage读取数据
 const loadFromLocalStorage = () => {
-  const savedCookie = localStorage.getItem("weread_cookie");
+  const savedCookie = localStorage.getItem('weread_cookie');
   if (savedCookie) {
     weread_cookie.value = savedCookie;
   }

@@ -1,5 +1,5 @@
 /* Mist — 雾蓝冷调 */
-[data-color-scheme="mist"] {
+[data-color-scheme='mist'] {
   --radius: 0.625rem;
   --ink: #161c21;
   --paper: oklch(0.97 0.01 225);
@@ -30,7 +30,7 @@
   --gradient-decorative-to: #9fb2c5;
 }
 
-[data-color-scheme="mist"].dark {
+[data-color-scheme='mist'].dark {
   --ink: #d8dee5;
   --paper: #161c21;
   --warm-gray: #252d35;

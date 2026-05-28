@@ -190,17 +190,17 @@
 </template>
 
 <script setup lang="ts">
-import type { Device, DeviceInput } from "@/service/deviceService";
-import { deviceService } from "@/service/deviceService";
-import { useNotificationStore } from "@/stores/notification";
-import { ref } from "vue";
+import type { Device, DeviceInput } from '@/service/deviceService';
+import { deviceService } from '@/service/deviceService';
+import { useNotificationStore } from '@/stores/notification';
+import { ref } from 'vue';
 
-import BasicDetail from "@/components/basic/BasicDetail.vue";
-import AddDeviceModal from "./components/AddDeviceModal.vue";
-import DailyCostChart from "./components/DailyCostChart.vue";
-import DeviceList from "./components/DeviceList.vue";
-import DeviceSummary from "./components/DeviceSummary.vue";
-import PriceAnalyticsChart from "./components/PriceAnalyticsChart.vue";
+import BasicDetail from '@/components/basic/BasicDetail.vue';
+import AddDeviceModal from './components/AddDeviceModal.vue';
+import DailyCostChart from './components/DailyCostChart.vue';
+import DeviceList from './components/DeviceList.vue';
+import DeviceSummary from './components/DeviceSummary.vue';
+import PriceAnalyticsChart from './components/PriceAnalyticsChart.vue';
 
 const notificationStore = useNotificationStore();
 
@@ -222,7 +222,7 @@ async function fetchDevices() {
     error.value =
       fetchError instanceof Error
         ? fetchError.message
-        : "设备列表加载失败，请稍后重试。";
+        : '设备列表加载失败，请稍后重试。';
     notificationStore.error(error.value);
   } finally {
     isLoading.value = false;
@@ -230,19 +230,19 @@ async function fetchDevices() {
 }
 
 async function handleToggleStatus(device: Device) {
-  const nextStatus = device.status === "active" ? "retired" : "active";
+  const nextStatus = device.status === 'active' ? 'retired' : 'active';
   pendingId.value = device.id;
   try {
     await deviceService.updateDeviceStatus(device.id, nextStatus);
     notificationStore.success(
-      nextStatus === "retired" ? "设备已标记为退役" : "设备已恢复使用",
+      nextStatus === 'retired' ? '设备已标记为退役' : '设备已恢复使用',
     );
     await fetchDevices();
   } catch (updateError) {
     notificationStore.error(
       updateError instanceof Error
         ? updateError.message
-        : "状态更新失败，请重试。",
+        : '状态更新失败，请重试。',
     );
   } finally {
     pendingId.value = null;
@@ -257,10 +257,10 @@ async function handleDeleteDevice(device: Device) {
   try {
     await deviceService.deleteDevice(device.id);
     devices.value = devices.value.filter((item) => item.id !== device.id);
-    notificationStore.success("设备已删除");
+    notificationStore.success('设备已删除');
   } catch (deleteError) {
     notificationStore.error(
-      deleteError instanceof Error ? deleteError.message : "删除失败，请重试。",
+      deleteError instanceof Error ? deleteError.message : '删除失败，请重试。',
     );
   } finally {
     pendingId.value = null;

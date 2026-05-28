@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { rssService } from "@/service/rssService";
-import BasicDetail from "@/components/basic/BasicDetail.vue";
-import ArticleSummaryCard from "@/components/blog/ArticleSummaryCard.vue";
-import { useNotificationStore } from "@/stores/notification";
-import type { RssArticle } from "@/types";
-import { formatDate } from "@/utils/formatdate";
-import { useScroll } from "@vueuse/core";
-import DOMPurify from "dompurify";
-import { motion } from "motion-v";
-import { computed, onMounted, ref, watch } from "vue";
-import { useRoute } from "vue-router";
+import { rssService } from '@/service/rssService';
+import BasicDetail from '@/components/basic/BasicDetail.vue';
+import ArticleSummaryCard from '@/components/blog/ArticleSummaryCard.vue';
+import { useNotificationStore } from '@/stores/notification';
+import type { RssArticle } from '@/types';
+import { formatDate } from '@/utils/formatdate';
+import { useScroll } from '@vueuse/core';
+import DOMPurify from 'dompurify';
+import { motion } from 'motion-v';
+import { computed, onMounted, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 
 const route = useRoute();
 const article = ref<RssArticle | null>(null);
 const isLoading = ref<boolean>(true);
 const isToggling = ref<boolean>(false);
-const errorMessage = ref<string>("");
+const errorMessage = ref<string>('');
 const notifier = useNotificationStore();
 
 const { y } = useScroll(window);
@@ -31,16 +31,16 @@ const percent = computed(() => {
 const articleId = computed(() => route.params.id as string);
 
 const subtitle = computed(() => {
-  if (!article.value) return "";
+  if (!article.value) return '';
   const parts: string[] = [];
   if (article.value.author) parts.push(article.value.author);
   if (article.value.published) parts.push(formatDate(article.value.published));
-  return parts.join(" · ");
+  return parts.join(' · ');
 });
 
 const buildProxyImageUrl = (rawUrl: string): string => {
   const trimmed = rawUrl.trim();
-  if (!trimmed || trimmed.startsWith("data:")) return trimmed;
+  if (!trimmed || trimmed.startsWith('data:')) return trimmed;
 
   let resolved = trimmed;
   try {
@@ -57,23 +57,23 @@ const buildProxyImageUrl = (rawUrl: string): string => {
 const rewriteHtmlImageUrls = (html: string): string => {
   if (!html) return html;
   const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
+  const doc = parser.parseFromString(html, 'text/html');
 
-  doc.querySelectorAll("img").forEach((img) => {
-    const src = img.getAttribute("src");
+  doc.querySelectorAll('img').forEach((img) => {
+    const src = img.getAttribute('src');
     if (src) {
-      img.setAttribute("src", buildProxyImageUrl(src));
+      img.setAttribute('src', buildProxyImageUrl(src));
     }
 
-    const dataSrc = img.getAttribute("data-src");
+    const dataSrc = img.getAttribute('data-src');
     if (dataSrc) {
-      img.setAttribute("data-src", buildProxyImageUrl(dataSrc));
+      img.setAttribute('data-src', buildProxyImageUrl(dataSrc));
     }
 
-    const srcset = img.getAttribute("srcset");
+    const srcset = img.getAttribute('srcset');
     if (srcset) {
       const rewritten = srcset
-        .split(",")
+        .split(',')
         .map((part) => {
           const segment = part.trim();
           if (!segment) return segment;
@@ -81,8 +81,8 @@ const rewriteHtmlImageUrls = (html: string): string => {
           const proxied = buildProxyImageUrl(url);
           return descriptor ? `${proxied} ${descriptor}` : proxied;
         })
-        .join(", ");
-      img.setAttribute("srcset", rewritten);
+        .join(', ');
+      img.setAttribute('srcset', rewritten);
     }
   });
 
@@ -90,7 +90,7 @@ const rewriteHtmlImageUrls = (html: string): string => {
 };
 
 const safeContent = computed(() => {
-  const rawHtml = article.value?.content || article.value?.summary || "";
+  const rawHtml = article.value?.content || article.value?.summary || '';
   const proxiedHtml = rewriteHtmlImageUrls(rawHtml);
   return DOMPurify.sanitize(proxiedHtml);
 });
@@ -98,7 +98,7 @@ const safeContent = computed(() => {
 const fetchArticle = async () => {
   if (!articleId.value) return;
   isLoading.value = true;
-  errorMessage.value = "";
+  errorMessage.value = '';
   try {
     article.value = await rssService.getArticle(articleId.value);
   } catch (err: unknown) {
@@ -106,7 +106,7 @@ const fetchArticle = async () => {
     errorMessage.value =
       err instanceof Error
         ? err.message
-        : String(err) || "加载文章失败，请稍后重试。";
+        : String(err) || '加载文章失败，请稍后重试。';
     notifier.error(errorMessage.value);
   } finally {
     isLoading.value = false;
@@ -122,15 +122,15 @@ const toggleReadStatus = async () => {
     if (isCurrentlyRead) {
       await rssService.markArticleUnread(articleId.value);
       article.value.is_read = false;
-      notifier.success("已标记为未读");
+      notifier.success('已标记为未读');
     } else {
       await rssService.markArticleRead(articleId.value);
       article.value.is_read = true;
-      notifier.success("已标记为已读");
+      notifier.success('已标记为已读');
     }
   } catch (err: unknown) {
-    console.error("Toggle read status error:", err);
-    notifier.error("操作失败，请重试");
+    console.error('Toggle read status error:', err);
+    notifier.error('操作失败，请重试');
   } finally {
     isToggling.value = false;
   }
@@ -155,9 +155,9 @@ watch(
       try {
         await rssService.markArticleRead(articleId.value);
         article.value.is_read = true;
-        notifier.success("已读完！");
+        notifier.success('已读完！');
       } catch {
-        notifier.error("自动标记已读失败，请手动点击标记");
+        notifier.error('自动标记已读失败，请手动点击标记');
       }
     }
   },
@@ -246,7 +246,7 @@ watch(
                 d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            {{ article.is_read ? "标记为未读" : "标记为已读" }}
+            {{ article.is_read ? '标记为未读' : '标记为已读' }}
           </button>
         </div>
 

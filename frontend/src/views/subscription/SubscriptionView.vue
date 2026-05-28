@@ -2,16 +2,16 @@
 import type {
   Subscription,
   TestNotificationPayload,
-} from "@/api/subscriptionGateway";
-import BasicDetail from "@/components/basic/BasicDetail.vue";
-import { subscriptionService } from "@/service/subscriptionService";
-import { useNotificationStore } from "@/stores/notification";
-import { formatDate } from "@/utils/formatdate";
-import ReminderConfigModal from "@/views/subscription/components/ReminderConfigModal.vue";
-import SubscriptionCardList from "@/views/subscription/components/SubscriptionCardList.vue";
-import SubscriptionDetailPanel from "@/views/subscription/components/SubscriptionDetailPanel.vue";
-import SubscriptionFormModal from "@/views/subscription/components/SubscriptionFormModal.vue";
-import SubscriptionStatsPanel from "@/views/subscription/components/SubscriptionStatsPanel.vue";
+} from '@/api/subscriptionGateway';
+import BasicDetail from '@/components/basic/BasicDetail.vue';
+import { subscriptionService } from '@/service/subscriptionService';
+import { useNotificationStore } from '@/stores/notification';
+import { formatDate } from '@/utils/formatdate';
+import ReminderConfigModal from '@/views/subscription/components/ReminderConfigModal.vue';
+import SubscriptionCardList from '@/views/subscription/components/SubscriptionCardList.vue';
+import SubscriptionDetailPanel from '@/views/subscription/components/SubscriptionDetailPanel.vue';
+import SubscriptionFormModal from '@/views/subscription/components/SubscriptionFormModal.vue';
+import SubscriptionStatsPanel from '@/views/subscription/components/SubscriptionStatsPanel.vue';
 import {
   applyFormValues,
   applyReminderFormValues,
@@ -34,20 +34,20 @@ import {
   toUpdatePayload,
   upsertSubscription,
   validateSubscriptionForm,
-} from "@/views/subscription/subscriptionUtils";
+} from '@/views/subscription/subscriptionUtils';
 import type {
   ReminderFormState,
   SubscriptionFormState,
-} from "@/views/subscription/types";
-import type { AxiosError } from "axios";
-import { computed, onMounted, reactive, ref } from "vue";
+} from '@/views/subscription/types';
+import type { AxiosError } from 'axios';
+import { computed, onMounted, reactive, ref } from 'vue';
 
 const notifier = useNotificationStore();
 
 const subscriptions = ref<Subscription[]>([]);
 const isLoading = ref<boolean>(false);
 const isRefreshing = ref<boolean>(false);
-const errorMessage = ref<string>("");
+const errorMessage = ref<string>('');
 const selectedSubId = ref<number | null>(null);
 
 const isAddModalOpen = ref<boolean>(false);
@@ -65,9 +65,9 @@ const reminderForm = reactive<ReminderFormState>(createDefaultReminderForm());
 const editTargetId = ref<number | null>(null);
 const reminderTargetId = ref<number | null>(null);
 
-const addFormError = ref<string>("");
-const editFormError = ref<string>("");
-const reminderFormError = ref<string>("");
+const addFormError = ref<string>('');
+const editFormError = ref<string>('');
+const reminderFormError = ref<string>('');
 
 const isCreating = ref<boolean>(false);
 const isUpdating = ref<boolean>(false);
@@ -94,12 +94,12 @@ const selectedSubscription = computed<Subscription | null>(() => {
 });
 
 const activeCount = computed<number>(
-  () => subscriptions.value.filter((item) => item.status === "active").length,
+  () => subscriptions.value.filter((item) => item.status === 'active').length,
 );
 
 const monthlyEstimate = computed<number>(() =>
   subscriptions.value
-    .filter((item) => item.status === "active")
+    .filter((item) => item.status === 'active')
     .reduce((total, item) => total + getMonthlyEstimate(item), 0),
 );
 
@@ -107,7 +107,7 @@ const dueSoonCount = computed<number>(
   () =>
     subscriptions.value.filter(
       (item) =>
-        item.status === "active" && getDaysUntil(item.next_billing_date) <= 7,
+        item.status === 'active' && getDaysUntil(item.next_billing_date) <= 7,
     ).length,
 );
 
@@ -120,7 +120,7 @@ function extractErrorMessage(error: unknown, fallbackMessage: string): string {
 }
 
 async function fetchSubscriptions(): Promise<void> {
-  errorMessage.value = "";
+  errorMessage.value = '';
   const showSkeleton = subscriptions.value.length === 0;
   if (showSkeleton) {
     isLoading.value = true;
@@ -144,7 +144,7 @@ async function fetchSubscriptions(): Promise<void> {
   } catch (error) {
     const message = extractErrorMessage(
       error,
-      "加载订阅列表失败，请稍后重试。",
+      '加载订阅列表失败，请稍后重试。',
     );
     errorMessage.value = message;
     notifier.error(message);
@@ -155,7 +155,7 @@ async function fetchSubscriptions(): Promise<void> {
 }
 
 function openAddModal(): void {
-  addFormError.value = "";
+  addFormError.value = '';
   applyFormValues(createForm, createDefaultSubscriptionForm());
   isAddModalOpen.value = true;
 }
@@ -163,7 +163,7 @@ function openAddModal(): void {
 async function handleCreateSubscription(
   form: SubscriptionFormState,
 ): Promise<void> {
-  addFormError.value = "";
+  addFormError.value = '';
   const validationError = validateSubscriptionForm(form);
   if (validationError) {
     addFormError.value = validationError;
@@ -178,11 +178,11 @@ async function handleCreateSubscription(
     subscriptions.value = [created, ...subscriptions.value];
     selectedSubId.value = created.id;
     isAddModalOpen.value = false;
-    notifier.success("订阅创建成功");
+    notifier.success('订阅创建成功');
   } catch (error) {
     addFormError.value = extractErrorMessage(
       error,
-      "创建订阅失败，请稍后重试。",
+      '创建订阅失败，请稍后重试。',
     );
   } finally {
     isCreating.value = false;
@@ -191,7 +191,7 @@ async function handleCreateSubscription(
 
 function openEditModal(subscription: Subscription): void {
   editTargetId.value = subscription.id;
-  editFormError.value = "";
+  editFormError.value = '';
   applyFormValues(editForm, mapSubscriptionToForm(subscription));
   isEditModalOpen.value = true;
 }
@@ -201,7 +201,7 @@ async function handleUpdateSubscription(
 ): Promise<void> {
   if (editTargetId.value === null) return;
 
-  editFormError.value = "";
+  editFormError.value = '';
   const validationError = validateSubscriptionForm(form);
   if (validationError) {
     editFormError.value = validationError;
@@ -216,11 +216,11 @@ async function handleUpdateSubscription(
     );
     subscriptions.value = upsertSubscription(subscriptions.value, updated);
     isEditModalOpen.value = false;
-    notifier.success("订阅信息已更新");
+    notifier.success('订阅信息已更新');
   } catch (error) {
     editFormError.value = extractErrorMessage(
       error,
-      "更新订阅失败，请稍后重试。",
+      '更新订阅失败，请稍后重试。',
     );
   } finally {
     isUpdating.value = false;
@@ -229,7 +229,7 @@ async function handleUpdateSubscription(
 
 function openReminderModal(subscription: Subscription): void {
   reminderTargetId.value = subscription.id;
-  reminderFormError.value = "";
+  reminderFormError.value = '';
   reminderTestResult.value = null;
   applyReminderFormValues(
     reminderForm,
@@ -245,13 +245,13 @@ function syncReminderForm(source: ReminderFormState): void {
 async function handleSaveReminderConfig(): Promise<void> {
   if (reminderTargetId.value === null) return;
 
-  reminderFormError.value = "";
+  reminderFormError.value = '';
   if (reminderForm.channels.length === 0) {
-    reminderFormError.value = "请至少选择一个通知渠道。";
+    reminderFormError.value = '请至少选择一个通知渠道。';
     return;
   }
   if (!hasEnabledReminderPoint(reminderForm)) {
-    reminderFormError.value = "请至少选择一个提醒时间点。";
+    reminderFormError.value = '请至少选择一个提醒时间点。';
     return;
   }
 
@@ -263,11 +263,11 @@ async function handleSaveReminderConfig(): Promise<void> {
     );
     subscriptions.value = upsertSubscription(subscriptions.value, updated);
     isReminderModalOpen.value = false;
-    notifier.success("通知配置已保存");
+    notifier.success('通知配置已保存');
   } catch (error) {
     reminderFormError.value = extractErrorMessage(
       error,
-      "保存通知配置失败，请稍后重试。",
+      '保存通知配置失败，请稍后重试。',
     );
   } finally {
     isSavingReminder.value = false;
@@ -284,10 +284,10 @@ async function handleSaveReminderConfigFromForm(
 async function handleTestNotification(): Promise<void> {
   if (reminderTargetId.value === null) return;
 
-  reminderFormError.value = "";
+  reminderFormError.value = '';
   reminderTestResult.value = null;
   if (reminderForm.channels.length === 0) {
-    reminderFormError.value = "测试前请先选择至少一个通知渠道。";
+    reminderFormError.value = '测试前请先选择至少一个通知渠道。';
     return;
   }
 
@@ -308,12 +308,12 @@ async function handleTestNotification(): Promise<void> {
         `测试通知发送成功（${successCount}/${payload.channels.length}）`,
       );
     } else {
-      notifier.error("测试通知发送失败，请检查渠道配置。");
+      notifier.error('测试通知发送失败，请检查渠道配置。');
     }
   } catch (error) {
     reminderFormError.value = extractErrorMessage(
       error,
-      "测试通知失败，请稍后重试。",
+      '测试通知失败，请稍后重试。',
     );
   } finally {
     isTestingReminder.value = false;
@@ -328,7 +328,7 @@ async function handleTestNotificationFromForm(
 }
 
 async function handleToggleStatus(subscription: Subscription): Promise<void> {
-  const nextStatus = subscription.status === "active" ? "paused" : "active";
+  const nextStatus = subscription.status === 'active' ? 'paused' : 'active';
   pendingStatusId.value = subscription.id;
   try {
     const updated = await subscriptionService.updateStatus(
@@ -336,9 +336,9 @@ async function handleToggleStatus(subscription: Subscription): Promise<void> {
       nextStatus,
     );
     subscriptions.value = upsertSubscription(subscriptions.value, updated);
-    notifier.success(nextStatus === "paused" ? "订阅已暂停" : "订阅已恢复");
+    notifier.success(nextStatus === 'paused' ? '订阅已暂停' : '订阅已恢复');
   } catch (error) {
-    notifier.error(extractErrorMessage(error, "更新状态失败，请稍后重试。"));
+    notifier.error(extractErrorMessage(error, '更新状态失败，请稍后重试。'));
   } finally {
     pendingStatusId.value = null;
   }
@@ -362,9 +362,9 @@ async function handleDeleteSubscription(
       selectedSubId.value =
         subscriptions.value.length > 0 ? subscriptions.value[0].id : null;
     }
-    notifier.success("订阅已删除");
+    notifier.success('订阅已删除');
   } catch (error) {
-    notifier.error(extractErrorMessage(error, "删除订阅失败，请稍后重试。"));
+    notifier.error(extractErrorMessage(error, '删除订阅失败，请稍后重试。'));
   } finally {
     deletePendingId.value = null;
   }

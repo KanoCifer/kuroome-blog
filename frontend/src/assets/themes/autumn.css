@@ -1,5 +1,5 @@
 /* 秋实 (Autumn) */
-[data-color-scheme="autumn"] {
+[data-color-scheme='autumn'] {
   --radius: 0.625rem;
   --ink: oklch(0.2 0.05 40);
   --paper: var(--color-orange-50);
@@ -25,7 +25,7 @@
   --gradient-decorative-to: var(--color-orange-300);
 }
 
-[data-color-scheme="autumn"].dark {
+[data-color-scheme='autumn'].dark {
   --ink: oklch(0.98 0.01 40);
   --paper: oklch(0.18 0.03 40);
   --warm-gray: oklch(0.25 0.03 40);

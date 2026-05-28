@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Subscription } from "@/api/subscriptionGateway";
+import type { Subscription } from '@/api/subscriptionGateway';
 
 interface Props {
   subscriptions: Subscription[];
@@ -158,7 +158,7 @@ const emit = defineEmits<{
         <p
           class="border-border bg-muted/70 text-foreground mt-3 line-clamp-2 rounded-xl border px-3 py-2 text-sm"
         >
-          {{ subscription.notes?.trim() || "暂无备注" }}
+          {{ subscription.notes?.trim() || '暂无备注' }}
         </p>
 
         <div class="mt-4 grid grid-cols-4 gap-2">
@@ -182,7 +182,7 @@ const emit = defineEmits<{
             :disabled="pendingStatusId === subscription.id"
             @click.stop="emit('toggleStatus', subscription)"
           >
-            {{ subscription.status === "active" ? "暂停" : "恢复" }}
+            {{ subscription.status === 'active' ? '暂停' : '恢复' }}
           </button>
           <button
             type="button"

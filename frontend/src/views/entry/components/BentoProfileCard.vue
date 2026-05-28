@@ -90,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from "@/components/bento/BentoCard.vue";
-import { useVisitorCountStore } from "@/stores/visitorCount";
+import BentoCard from '@/components/bento/BentoCard.vue';
+import { useVisitorCountStore } from '@/stores/visitorCount';
 const visitorCount = useVisitorCountStore();
 </script>

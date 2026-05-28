@@ -90,8 +90,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Device } from "@/service/deviceService";
-import { computed } from "vue";
+import type { Device } from '@/service/deviceService';
+import { computed } from 'vue';
 
 interface Props {
   devices: Device[];
@@ -100,7 +100,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const activeCount = computed(
-  () => props.devices.filter((d) => d.status === "active").length,
+  () => props.devices.filter((d) => d.status === 'active').length,
 );
 const totalPrice = computed(() =>
   props.devices.reduce((total, device) => total + device.price, 0),

@@ -18,9 +18,9 @@
 </template>
 
 <script setup lang="ts">
-import type { Device } from "@/service/deviceService";
-import { computed, onMounted, onUnmounted, ref } from "vue";
-import VChart from "vue-echarts";
+import type { Device } from '@/service/deviceService';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import VChart from 'vue-echarts';
 
 const props = defineProps<{
   data: Device[];
@@ -28,37 +28,37 @@ const props = defineProps<{
   onClose: () => void;
 }>();
 
-const isDark = ref(document.documentElement.classList.contains("dark"));
+const isDark = ref(document.documentElement.classList.contains('dark'));
 
 onMounted(() => {
   const observer = new MutationObserver(() => {
-    isDark.value = document.documentElement.classList.contains("dark");
+    isDark.value = document.documentElement.classList.contains('dark');
   });
   observer.observe(document.documentElement, {
     attributes: true,
-    attributeFilter: ["class"],
+    attributeFilter: ['class'],
   });
   onUnmounted(() => observer.disconnect());
 });
 
 const chartOption = computed(() => {
-  const isDarkMode = document.documentElement.classList.contains("dark");
+  const isDarkMode = document.documentElement.classList.contains('dark');
   return {
     title: {
-      text: "Device Price Distribution",
+      text: 'Device Price Distribution',
       left: 0,
       top: 15,
       textStyle: {
         fontSize: 18,
-        fontWeight: "bold",
-        color: isDarkMode ? "#ccc" : "rgb(50, 50, 50)",
+        fontWeight: 'bold',
+        color: isDarkMode ? '#ccc' : 'rgb(50, 50, 50)',
       },
     },
     tooltip: {
-      trigger: "item",
+      trigger: 'item',
     },
     legend: {
-      top: "bottom",
+      top: 'bottom',
     },
     toolbox: {
       show: true,
@@ -75,20 +75,20 @@ const chartOption = computed(() => {
     series: [
       {
         color: [
-          "#ee6666",
-          "#73c0de",
-          "#3ba272",
-          "#fc8452",
-          "#9a60b4",
-          "#ea7ccc",
+          '#ee6666',
+          '#73c0de',
+          '#3ba272',
+          '#fc8452',
+          '#9a60b4',
+          '#ea7ccc',
         ],
-        type: "pie",
+        type: 'pie',
         data: props.data.map((device) => ({
           name: device.name,
           value: device.price,
         })),
-        roseType: "area",
-        colorBy: "data",
+        roseType: 'area',
+        colorBy: 'data',
         legendHoverLink: true,
       },
     ],

@@ -210,7 +210,7 @@
                     </div>
                     <div>
                       <p class="text-foreground text-base font-bold">
-                        {{ isOverDropZone ? "即刻上传" : "点击或拖拽图片" }}
+                        {{ isOverDropZone ? '即刻上传' : '点击或拖拽图片' }}
                       </p>
                       <p class="text-muted-foreground mt-1 text-xs">
                         支持 JPG, PNG, WebP, GIF, AVIF (最大 20MB)
@@ -334,7 +334,7 @@
                       <span
                         class="text-muted-foreground text-xs font-bold tracking-wider uppercase"
                         >处理后:{{
-                          formatBytes(processedBlob?.size ?? 0) || "0 KB"
+                          formatBytes(processedBlob?.size ?? 0) || '0 KB'
                         }}</span
                       >
                       <span
@@ -466,39 +466,39 @@
 </template>
 
 <script setup lang="ts">
-import { BasicDetail } from "@/components/basic";
-import { Slider } from "@/components/ui/slider";
-import { formatBytes, getFileExtension, processImage } from "@/utils/handlePic";
-import { useDropZone } from "@vueuse/core";
-import { computed, onMounted, onUnmounted, ref, useTemplateRef } from "vue";
+import { BasicDetail } from '@/components/basic';
+import { Slider } from '@/components/ui/slider';
+import { formatBytes, getFileExtension, processImage } from '@/utils/handlePic';
+import { useDropZone } from '@vueuse/core';
+import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 
 interface OutputTypeOption {
   label: string;
   value: string;
 }
 const fileInputRef = ref<HTMLInputElement | null>(null);
-const dropZoneRef = useTemplateRef("dropZoneRef");
+const dropZoneRef = useTemplateRef('dropZoneRef');
 const originalFile = ref<File | null>(null);
 const processedBlob = ref<Blob | null>(null);
-const originalPreviewUrl = ref<string>("");
-const processedPreviewUrl = ref<string>("");
+const originalPreviewUrl = ref<string>('');
+const processedPreviewUrl = ref<string>('');
 const originalPreviewZoom = ref<number>(1);
 const processedPreviewZoom = ref<number>(1);
 const isPreviewDialogOpen = ref<boolean>(false);
-const previewDialogUrl = ref<string>("");
-const previewDialogAlt = ref<string>("");
+const previewDialogUrl = ref<string>('');
+const previewDialogAlt = ref<string>('');
 const processing = ref<boolean>(false);
-const errorMessage = ref<string>("");
+const errorMessage = ref<string>('');
 
 const maxWidth = ref<number>(1600);
 const enableMaxWidth = ref<boolean>(true);
 const quality = ref<number>(0.8);
-const outputType = ref<string>("image/webp");
+const outputType = ref<string>('image/webp');
 
 const outputTypes: OutputTypeOption[] = [
-  { label: "WebP", value: "image/webp" },
-  { label: "JPEG", value: "image/jpeg" },
-  { label: "PNG", value: "image/png" },
+  { label: 'WebP', value: 'image/webp' },
+  { label: 'JPEG', value: 'image/jpeg' },
+  { label: 'PNG', value: 'image/png' },
 ];
 
 // Slider 组件 v-model 需要数组格式，这里做个转换
@@ -516,24 +516,24 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
       return;
     }
 
-    const firstImage = files.find((file) => file.type.startsWith("image/"));
+    const firstImage = files.find((file) => file.type.startsWith('image/'));
     if (firstImage) {
       handleSelectedFile(firstImage);
     }
   },
   multiple: false,
   dataTypes: [
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-    "image/gif",
-    "image/avif",
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+    'image/gif',
+    'image/avif',
   ],
 });
 
 const compressionRatio = computed(() => {
   if (!originalFile.value || !processedBlob.value) {
-    return "-";
+    return '-';
   }
 
   const ratio =
@@ -552,7 +552,7 @@ function revokePreviewUrl(url: string) {
 
 function resetProcessedState() {
   revokePreviewUrl(processedPreviewUrl.value);
-  processedPreviewUrl.value = "";
+  processedPreviewUrl.value = '';
   processedBlob.value = null;
   processedPreviewZoom.value = 1;
 }
@@ -574,22 +574,22 @@ function openPreview(url: string, alt: string) {
 
 function closePreviewDialog() {
   isPreviewDialogOpen.value = false;
-  previewDialogUrl.value = "";
-  previewDialogAlt.value = "";
+  previewDialogUrl.value = '';
+  previewDialogAlt.value = '';
 }
 
 function handlePreviewKeydown(event: KeyboardEvent) {
-  if (event.key === "Escape") {
+  if (event.key === 'Escape') {
     closePreviewDialog();
   }
 }
 
 // 统一处理点击选择和拖放上传
 function handleSelectedFile(selectedFile: File) {
-  errorMessage.value = "";
+  errorMessage.value = '';
 
-  if (!selectedFile.type.startsWith("image/")) {
-    errorMessage.value = "请选择有效的图片文件。";
+  if (!selectedFile.type.startsWith('image/')) {
+    errorMessage.value = '请选择有效的图片文件。';
     return;
   }
 
@@ -615,11 +615,11 @@ function handleFileChange(event: Event) {
 
 async function handleProcess() {
   if (!originalFile.value) {
-    errorMessage.value = "请先选择图片文件。";
+    errorMessage.value = '请先选择图片文件。';
     return;
   }
 
-  errorMessage.value = "";
+  errorMessage.value = '';
   processing.value = true;
 
   try {
@@ -637,7 +637,7 @@ async function handleProcess() {
     if (error instanceof Error) {
       errorMessage.value = error.message;
     } else {
-      errorMessage.value = "图片处理失败，请稍后重试。";
+      errorMessage.value = '图片处理失败，请稍后重试。';
     }
   } finally {
     processing.value = false;
@@ -646,14 +646,14 @@ async function handleProcess() {
 
 function getOutputExtension(mimeType: string) {
   switch (mimeType) {
-    case "image/jpeg":
-      return ".jpg";
-    case "image/png":
-      return ".png";
-    case "image/webp":
-      return ".webp";
+    case 'image/jpeg':
+      return '.jpg';
+    case 'image/png':
+      return '.png';
+    case 'image/webp':
+      return '.webp';
     default:
-      return ".img";
+      return '.img';
   }
 }
 
@@ -664,11 +664,11 @@ function downloadProcessedImage() {
 
   const originalExtension = getFileExtension(originalFile.value.name);
   const outputExtension = getOutputExtension(outputType.value);
-  const baseName = originalFile.value.name.replace(originalExtension, "");
+  const baseName = originalFile.value.name.replace(originalExtension, '');
   const downloadName = `${baseName}-processed${outputExtension}`;
   const url = URL.createObjectURL(processedBlob.value);
 
-  const link = document.createElement("a");
+  const link = document.createElement('a');
   link.href = url;
   link.download = downloadName;
   document.body.appendChild(link);
@@ -681,23 +681,23 @@ function downloadProcessedImage() {
 }
 
 function resetAll() {
-  errorMessage.value = "";
+  errorMessage.value = '';
   processing.value = false;
 
   originalFile.value = null;
   resetProcessedState();
 
   revokePreviewUrl(originalPreviewUrl.value);
-  originalPreviewUrl.value = "";
+  originalPreviewUrl.value = '';
   originalPreviewZoom.value = 1;
 
   maxWidth.value = 1600;
   enableMaxWidth.value = true;
   quality.value = 0.8;
-  outputType.value = "image/webp";
+  outputType.value = 'image/webp';
 
   if (fileInputRef.value) {
-    fileInputRef.value.value = "";
+    fileInputRef.value.value = '';
   }
 }
 
@@ -706,11 +706,11 @@ onUnmounted(() => {
   revokePreviewUrl(originalPreviewUrl.value);
   revokePreviewUrl(processedPreviewUrl.value);
   closePreviewDialog();
-  window.removeEventListener("keydown", handlePreviewKeydown);
+  window.removeEventListener('keydown', handlePreviewKeydown);
 });
 
 onMounted(() => {
   // 支持 Esc 关闭大图弹层
-  window.addEventListener("keydown", handlePreviewKeydown);
+  window.addEventListener('keydown', handlePreviewKeydown);
 });
 </script>

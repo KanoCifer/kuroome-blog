@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { fetchAndStoreCSRF } from "@/api/csrf";
-import { useAuthStore } from "@/stores/auth";
-import { useNotificationStore } from "@/stores/notification";
-import { AnimatePresence, motion } from "motion-v";
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { fetchAndStoreCSRF } from '@/api/csrf';
+import { useAuthStore } from '@/stores/auth';
+import { useNotificationStore } from '@/stores/notification';
+import { AnimatePresence, motion } from 'motion-v';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 
 interface ChatMessage {
-  role: "user" | "assistant";
+  role: 'user' | 'assistant';
   content: string;
 }
 
 enum CardMode {
-  SUMMARY = "summary",
-  CHAT = "chat",
+  SUMMARY = 'summary',
+  CHAT = 'chat',
 }
 
 const props = defineProps<{
@@ -25,17 +25,17 @@ const notifier = useNotificationStore();
 
 const cardMode = ref<CardMode>(CardMode.SUMMARY);
 const loading = ref<boolean>(false);
-const summary = ref<string>("");
+const summary = ref<string>('');
 const hasGenerated = ref<boolean>(false);
-const errorMessage = ref<string>("");
+const errorMessage = ref<string>('');
 
 const messages = ref<ChatMessage[]>([]);
-const chatInput = ref<string>("");
-const sessionId = ref<string>("");
+const chatInput = ref<string>('');
+const sessionId = ref<string>('');
 const messagesContainer = ref<HTMLElement | null>(null);
 
 const pureContent = computed(() =>
-  props.content.replaceAll(/<[^>]+>/g, "").trim(),
+  props.content.replaceAll(/<[^>]+>/g, '').trim(),
 );
 
 const canSummarize = computed(
@@ -60,10 +60,10 @@ function generateSessionId() {
 async function checkCachedSummary() {
   if (!auth.isAuthenticated || !pureContent.value) return;
   try {
-    const res = await fetch("/api/v1/agent/history/summary", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
+    const res = await fetch('/api/v1/agent/history/summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({
         article_content: pureContent.value,
         article_title: props.title || undefined,
@@ -88,10 +88,10 @@ async function checkCachedSummary() {
 async function loadChatHistory() {
   if (!auth.isAuthenticated || !pureContent.value) return;
   try {
-    const res = await fetch("/api/v1/agent/history/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
+    const res = await fetch('/api/v1/agent/history/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({
         article_content: pureContent.value,
         article_title: props.title || undefined,
@@ -133,21 +133,21 @@ async function scrollToBottom() {
 
 async function generateSummaryStream() {
   if (!canSummarize.value) {
-    notifier.error("文章内容为空，无法总结");
+    notifier.error('文章内容为空，无法总结');
     return;
   }
 
   loading.value = true;
-  errorMessage.value = "";
-  summary.value = "";
+  errorMessage.value = '';
+  summary.value = '';
 
   try {
-    const response = await fetch("/api/v1/agent/summary/stream", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
+    const response = await fetch('/api/v1/agent/summary/stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({
-        title: props.title || "",
+        title: props.title || '',
         content: pureContent.value,
       }),
     });
@@ -157,23 +157,23 @@ async function generateSummaryStream() {
     }
 
     const reader = response.body?.getReader();
-    if (!reader) throw new Error("无法读取响应流");
+    if (!reader) throw new Error('无法读取响应流');
 
-    const decoder = new TextDecoder("utf-8");
-    let buffer = "";
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
 
       buffer += decoder.decode(value, { stream: true });
-      const parts = buffer.split("\n\n");
-      buffer = parts.pop() || "";
+      const parts = buffer.split('\n\n');
+      buffer = parts.pop() || '';
 
       for (const part of parts) {
-        if (!part.trim() || !part.startsWith("data:")) continue;
-        const jsonStr = part.replace(/^data:\s*/, "").trim();
-        if (jsonStr === "[DONE]") {
+        if (!part.trim() || !part.startsWith('data:')) continue;
+        const jsonStr = part.replace(/^data:\s*/, '').trim();
+        if (jsonStr === '[DONE]') {
           hasGenerated.value = true;
           break;
         }
@@ -188,7 +188,7 @@ async function generateSummaryStream() {
     }
   } catch (error: unknown) {
     errorMessage.value =
-      error instanceof Error ? error.message : "AI总结失败，请稍后重试";
+      error instanceof Error ? error.message : 'AI总结失败，请稍后重试';
     notifier.error(errorMessage.value);
   } finally {
     loading.value = false;
@@ -199,22 +199,22 @@ async function sendChatMessage() {
   if (!canChat.value) return;
 
   const userMessage = chatInput.value.trim();
-  chatInput.value = "";
+  chatInput.value = '';
 
   if (!sessionId.value) {
     sessionId.value = generateSessionId();
   }
 
-  messages.value.push({ role: "user", content: userMessage });
-  messages.value.push({ role: "assistant", content: "" });
+  messages.value.push({ role: 'user', content: userMessage });
+  messages.value.push({ role: 'assistant', content: '' });
   await scrollToBottom();
 
   loading.value = true;
-  errorMessage.value = "";
+  errorMessage.value = '';
 
   const assistantIdx = messages.value.length - 1;
   const isFirstMessage =
-    messages.value.filter((m) => m.role === "user").length === 1;
+    messages.value.filter((m) => m.role === 'user').length === 1;
 
   try {
     const body: Record<string, string> = {
@@ -223,13 +223,13 @@ async function sendChatMessage() {
     };
     if (isFirstMessage) {
       body.article_content = pureContent.value;
-      body.article_title = props.title || "";
+      body.article_title = props.title || '';
     }
 
-    const response = await fetch("/api/v1/agent/chat/stream", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
+    const response = await fetch('/api/v1/agent/chat/stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(body),
     });
 
@@ -238,23 +238,23 @@ async function sendChatMessage() {
     }
 
     const reader = response.body?.getReader();
-    if (!reader) throw new Error("无法读取响应流");
+    if (!reader) throw new Error('无法读取响应流');
 
-    const decoder = new TextDecoder("utf-8");
-    let buffer = "";
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
 
       buffer += decoder.decode(value, { stream: true });
-      const parts = buffer.split("\n\n");
-      buffer = parts.pop() || "";
+      const parts = buffer.split('\n\n');
+      buffer = parts.pop() || '';
 
       for (const part of parts) {
-        if (!part.trim() || !part.startsWith("data:")) continue;
-        const jsonStr = part.replace(/^data:\s*/, "").trim();
-        if (jsonStr === "[DONE]") break;
+        if (!part.trim() || !part.startsWith('data:')) continue;
+        const jsonStr = part.replace(/^data:\s*/, '').trim();
+        if (jsonStr === '[DONE]') break;
         try {
           const data = JSON.parse(jsonStr);
           if (data.content) {
@@ -268,7 +268,7 @@ async function sendChatMessage() {
       }
     }
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : "对话失败，请稍后重试";
+    const msg = error instanceof Error ? error.message : '对话失败，请稍后重试';
     messages.value[assistantIdx].content = `[ERROR] ${msg}`;
     notifier.error(msg);
   } finally {
@@ -278,7 +278,7 @@ async function sendChatMessage() {
 
 async function onGenerate() {
   if (!auth.isAuthenticated) {
-    notifier.error("请先登录以使用AI功能");
+    notifier.error('请先登录以使用AI功能');
     return;
   }
   await fetchAndStoreCSRF();
@@ -287,7 +287,7 @@ async function onGenerate() {
 
 async function onSendChat() {
   if (!auth.isAuthenticated) {
-    notifier.error("请先登录以使用AI功能");
+    notifier.error('请先登录以使用AI功能');
     return;
   }
   await fetchAndStoreCSRF();
@@ -295,7 +295,7 @@ async function onSendChat() {
 }
 
 function onChatKeydown(e: KeyboardEvent) {
-  if (e.key === "Enter" && !e.shiftKey) {
+  if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
     onSendChat();
   }
@@ -318,9 +318,9 @@ function clearChat() {
 }
 
 const textShimmer = ref<string[]>([
-  "正在分析文章结构...",
-  "正在提取关键信息...",
-  "正在生成总结内容...",
+  '正在分析文章结构...',
+  '正在提取关键信息...',
+  '正在生成总结内容...',
 ]);
 let textShimmerInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -439,7 +439,7 @@ onUnmounted(() => {
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
             />
           </svg>
-          {{ loading ? "总结中..." : hasGenerated ? "重新总结" : "生成总结" }}
+          {{ loading ? '总结中...' : hasGenerated ? '重新总结' : '生成总结' }}
         </button>
         <button
           v-if="cardMode === CardMode.CHAT && messages.length > 0"

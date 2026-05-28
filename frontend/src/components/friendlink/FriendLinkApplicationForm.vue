@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref } from 'vue';
 
 interface FormErrors {
   name?: string[];
@@ -9,13 +9,13 @@ interface FormErrors {
   description?: string[];
 }
 
-const name = ref("");
-const email = ref("");
-const siteName = ref("");
-const siteUrl = ref("");
-const description = ref("");
+const name = ref('');
+const email = ref('');
+const siteName = ref('');
+const siteUrl = ref('');
+const description = ref('');
 const submitting = ref(false);
-const successMessage = ref("");
+const successMessage = ref('');
 const errors = ref<FormErrors>({});
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -26,29 +26,29 @@ const validate = (): boolean => {
   const newErrors: FormErrors = {};
 
   if (!name.value.trim()) {
-    newErrors.name = ["请输入您的昵称"];
+    newErrors.name = ['请输入您的昵称'];
   }
 
   if (!email.value.trim()) {
-    newErrors.email = ["请输入联系邮箱"];
+    newErrors.email = ['请输入联系邮箱'];
   } else if (!emailRegex.test(email.value)) {
-    newErrors.email = ["邮箱格式不正确"];
+    newErrors.email = ['邮箱格式不正确'];
   }
 
   if (!siteName.value.trim()) {
-    newErrors.siteName = ["请输入网站名称"];
+    newErrors.siteName = ['请输入网站名称'];
   }
 
   if (!siteUrl.value.trim()) {
-    newErrors.siteUrl = ["请输入网站地址"];
+    newErrors.siteUrl = ['请输入网站地址'];
   } else if (!urlRegex.test(siteUrl.value)) {
-    newErrors.siteUrl = ["URL 格式不正确，需包含域名"];
+    newErrors.siteUrl = ['URL 格式不正确，需包含域名'];
   }
 
   if (!description.value.trim()) {
-    newErrors.description = ["请输入网站描述"];
+    newErrors.description = ['请输入网站描述'];
   } else if (description.value.trim().length > 200) {
-    newErrors.description = ["描述不能超过 200 字"];
+    newErrors.description = ['描述不能超过 200 字'];
   }
 
   errors.value = newErrors;
@@ -56,7 +56,7 @@ const validate = (): boolean => {
 };
 
 const handleSubmit = () => {
-  successMessage.value = "";
+  successMessage.value = '';
 
   if (!validate()) {
     return;
@@ -75,7 +75,7 @@ const handleSubmit = () => {
 
   window.location.href = `mailto:kano3255@outlook.com?subject=${subject}&body=${body}`;
 
-  successMessage.value = "已打开邮件客户端，请发送邮件完成申请。";
+  successMessage.value = '已打开邮件客户端，请发送邮件完成申请。';
   submitting.value = false;
 };
 </script>
@@ -309,7 +309,7 @@ const handleSubmit = () => {
               class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-ring dark:ring-offset-background flex cursor-pointer items-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg ring-offset-2 focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
               :disabled="submitting"
             >
-              {{ submitting ? "正在打开邮件客户端..." : "提交申请" }}
+              {{ submitting ? '正在打开邮件客户端...' : '提交申请' }}
             </button>
           </div>
         </div>

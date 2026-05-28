@@ -37,7 +37,7 @@
         class="border-primary/30 bg-primary/15 text-primary hover:bg-accent rounded-xl border px-5 py-3 text-sm font-medium transition-colors"
         @click="$emit('update:saveToDb', !saveToDb)"
       >
-        {{ saveToDb ? "已启用保存" : "保存到订阅" }}
+        {{ saveToDb ? '已启用保存' : '保存到订阅' }}
       </button>
 
       <button
@@ -45,7 +45,7 @@
         :disabled="parseLoading"
         class="bg-warning text-warning-foreground hover:bg-warning/90 focus:ring-warning disabled:hover:bg-warning rounded-xl px-6 py-3 text-sm font-semibold transition-all focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70"
       >
-        {{ parseLoading ? "解析中..." : "开始解析" }}
+        {{ parseLoading ? '解析中...' : '开始解析' }}
       </button>
     </form>
 
@@ -142,9 +142,9 @@
 </template>
 
 <script setup lang="ts">
-import { truncateSummary } from "../rssUtils";
-import { formatDate } from "@/utils/formatdate";
-import type { ExampleFeed } from "../rssUtils";
+import { truncateSummary } from '../rssUtils';
+import { formatDate } from '@/utils/formatdate';
+import type { ExampleFeed } from '../rssUtils';
 
 export interface RssMetadata {
   title: string;
@@ -172,8 +172,8 @@ defineProps<{
 }>();
 
 defineEmits<{
-  "update:rssUrl": [value: string];
-  "update:saveToDb": [value: boolean];
+  'update:rssUrl': [value: string];
+  'update:saveToDb': [value: boolean];
   parse: [];
 }>();
 </script>

@@ -1,1 +1,1 @@
-export { default as TagPill } from "./TagPill.vue";
+export { default as TagPill } from './TagPill.vue';

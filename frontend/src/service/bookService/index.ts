@@ -1,4 +1,4 @@
-import { bookGateway } from "@/api/bookGateway";
+import { bookGateway } from '@/api/bookGateway';
 
 export const bookService = {
   async getBooks(params: { page?: number; per_page?: number }) {

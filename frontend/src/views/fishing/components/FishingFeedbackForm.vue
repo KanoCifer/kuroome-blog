@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { fishingService } from "@/service/fishingService";
-import { useNotificationStore } from "@/stores/notification";
+import { fishingService } from '@/service/fishingService';
+import { useNotificationStore } from '@/stores/notification';
 import type {
   FishingFeedbackData,
   FishingFeedbackLevel,
   FishingFeedbackPayload,
-} from "@/views/fishing/types";
-import dayjs from "dayjs";
-import { ref } from "vue";
+} from '@/views/fishing/types';
+import dayjs from 'dayjs';
+import { ref } from 'vue';
 
 interface Props {
   isOpen: boolean;
@@ -19,16 +19,16 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  (e: "success"): void;
-  (e: "cancel"): void;
+  (e: 'success'): void;
+  (e: 'cancel'): void;
 }>();
 
 const FEEDBACK_OPTIONS: { value: FishingFeedbackLevel; label: string }[] = [
-  { value: "爆护", label: "爆护" },
-  { value: "好", label: "好" },
-  { value: "一般", label: "一般" },
-  { value: "差", label: "差" },
-  { value: "空军", label: "空军" },
+  { value: '爆护', label: '爆护' },
+  { value: '好', label: '好' },
+  { value: '一般', label: '一般' },
+  { value: '差', label: '差' },
+  { value: '空军', label: '空军' },
 ];
 
 const notifier = useNotificationStore();
@@ -37,7 +37,7 @@ const selectedFeedback = ref<FishingFeedbackLevel | null>(null);
 
 const handleSubmit = async () => {
   if (!selectedFeedback.value) {
-    notifier.error("请选择钓鱼体验");
+    notifier.error('请选择钓鱼体验');
     return;
   }
 
@@ -62,11 +62,11 @@ const handleSubmit = async () => {
     };
     await fishingService.submitFishingFeedback(payload);
 
-    notifier.success("反馈已提交，感谢您的分享！");
+    notifier.success('反馈已提交，感谢您的分享！');
     selectedFeedback.value = null;
-    emit("success");
+    emit('success');
   } catch (err) {
-    const message = err instanceof Error ? err.message : "提交反馈失败，请重试";
+    const message = err instanceof Error ? err.message : '提交反馈失败，请重试';
     notifier.error(message);
   } finally {
     loading.value = false;
@@ -136,7 +136,7 @@ const handleSubmit = async () => {
                 :disabled="!selectedFeedback || loading"
                 @click="handleSubmit"
               >
-                {{ loading ? "提交中..." : "确认提交" }}
+                {{ loading ? '提交中...' : '确认提交' }}
               </button>
             </div>
           </div>

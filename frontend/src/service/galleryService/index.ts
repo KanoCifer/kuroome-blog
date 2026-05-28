@@ -1,4 +1,4 @@
-import { galleryGateway } from "@/api/galleryGateway";
+import { galleryGateway } from '@/api/galleryGateway';
 
 export interface GalleryService {
   getGallery(): Promise<{

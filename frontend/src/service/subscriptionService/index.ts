@@ -9,7 +9,7 @@ import {
   type Subscription,
   type TestNotificationPayload,
   type UpdateSubscriptionPayload,
-} from "@/api/subscriptionGateway";
+} from '@/api/subscriptionGateway';
 
 /**
  * 订阅服务接口

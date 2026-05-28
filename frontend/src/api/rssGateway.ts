@@ -1,9 +1,9 @@
-import request from "@/api/request";
+import request from '@/api/request';
 import type {
   RssArticle,
   RssArticleListResponse,
   RssSubscription,
-} from "@/types";
+} from '@/types';
 
 export interface ParseRssPayload {
   rss_url: string;
@@ -55,7 +55,7 @@ export interface RssGateway {
 export const rssGateway: RssGateway = {
   async parseRss(payload: ParseRssPayload): Promise<ParseRssResponse> {
     const res = await request.post<{ data: ParseRssResponse }>(
-      "v1/rss/parse-rss",
+      'v1/rss/parse-rss',
       payload,
     );
     return res.data.data;
@@ -68,7 +68,7 @@ export const rssGateway: RssGateway = {
     search?: string;
   }): Promise<RssArticleListResponse> {
     const res = await request.get<{ data: RssArticleListResponse }>(
-      "v1/rss/articles",
+      'v1/rss/articles',
       { params },
     );
     return res.data.data;
@@ -83,7 +83,7 @@ export const rssGateway: RssGateway = {
 
   async getSubscriptions(): Promise<RssSubscription[]> {
     const res = await request.get<{ data: RssSubscription[] }>(
-      "v1/rss/subscriptions",
+      'v1/rss/subscriptions',
     );
     return res.data.data;
   },

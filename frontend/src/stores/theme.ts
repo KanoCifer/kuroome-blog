@@ -1,101 +1,101 @@
-import { playThemeTransition } from "@/utils/themeTransition";
-import { defineStore } from "pinia";
-import { ref, watch } from "vue";
+import { playThemeTransition } from '@/utils/themeTransition';
+import { defineStore } from 'pinia';
+import { ref, watch } from 'vue';
 
-export type Theme = "light" | "dark" | "system";
+export type Theme = 'light' | 'dark' | 'system';
 export type ColorScheme =
-  | "sky-blue"
-  | "forest-green"
-  | "paper"
-  | "sage"
-  | "mist"
-  | "blush"
-  | "spring"
-  | "autumn"
-  | "clear-sky"
-  | "midnight";
-export type FontFamily = "default" | "harmonyos";
-export const useThemeStore = defineStore("theme", () => {
+  | 'sky-blue'
+  | 'forest-green'
+  | 'paper'
+  | 'sage'
+  | 'mist'
+  | 'blush'
+  | 'spring'
+  | 'autumn'
+  | 'clear-sky'
+  | 'midnight';
+export type FontFamily = 'default' | 'harmonyos';
+export const useThemeStore = defineStore('theme', () => {
   const theme = ref<Theme>(
-    (localStorage.getItem("theme") as Theme) || "system",
+    (localStorage.getItem('theme') as Theme) || 'system',
   );
 
   const scheme = ref<ColorScheme>(
-    (localStorage.getItem("color-scheme") as ColorScheme) || "sky-blue",
+    (localStorage.getItem('color-scheme') as ColorScheme) || 'sky-blue',
   );
 
-  const showFooter = ref<string>(localStorage.getItem("show-footer") || "true");
+  const showFooter = ref<string>(localStorage.getItem('show-footer') || 'true');
 
   const font = ref<FontFamily>(
-    (localStorage.getItem("font") as FontFamily) || "default",
+    (localStorage.getItem('font') as FontFamily) || 'default',
   );
 
   // 背景模糊值（px），兼容旧版 blur-* 字符串存储
-  const storedBlur = localStorage.getItem("bg-blur");
+  const storedBlur = localStorage.getItem('bg-blur');
   const bgBlur = ref<number>(
-    storedBlur && !storedBlur.startsWith("blur-") ? Number(storedBlur) : 8,
+    storedBlur && !storedBlur.startsWith('blur-') ? Number(storedBlur) : 8,
   );
 
   const saveBgBlur = (newBlur: number) => {
     bgBlur.value = newBlur;
-    localStorage.setItem("bg-blur", String(newBlur));
+    localStorage.setItem('bg-blur', String(newBlur));
   };
 
   const bgBrightness = ref<number>(
-    Number(localStorage.getItem("bg-brightness") || 1.0),
+    Number(localStorage.getItem('bg-brightness') || 1.0),
   );
 
   const saveBgBrightness = (val: number) => {
     bgBrightness.value = val;
-    localStorage.setItem("bg-brightness", String(val));
+    localStorage.setItem('bg-brightness', String(val));
   };
 
-  const bgScale = ref<number>(Number(localStorage.getItem("bg-scale") || 1.05));
+  const bgScale = ref<number>(Number(localStorage.getItem('bg-scale') || 1.05));
 
   const saveBgScale = (val: number) => {
     bgScale.value = val;
-    localStorage.setItem("bg-scale", String(val));
+    localStorage.setItem('bg-scale', String(val));
   };
 
   const toggleFooter = () => {
-    showFooter.value = showFooter.value === "true" ? "false" : "true";
-    localStorage.setItem("show-footer", showFooter.value);
+    showFooter.value = showFooter.value === 'true' ? 'false' : 'true';
+    localStorage.setItem('show-footer', showFooter.value);
   };
 
   const applyFont = (newFont: FontFamily) => {
     font.value = newFont;
     const root = document.documentElement;
-    if (newFont === "harmonyos") {
-      root.setAttribute("data-font", "harmonyos");
+    if (newFont === 'harmonyos') {
+      root.setAttribute('data-font', 'harmonyos');
     } else {
-      root.removeAttribute("data-font");
+      root.removeAttribute('data-font');
     }
-    localStorage.setItem("font", newFont);
+    localStorage.setItem('font', newFont);
   };
 
   const applyTheme = (newTheme: Theme) => {
     const root = document.documentElement;
     const isDark =
-      newTheme === "dark" ||
-      (newTheme === "system" &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches);
+      newTheme === 'dark' ||
+      (newTheme === 'system' &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches);
 
     if (isDark) {
-      root.classList.add("dark");
+      root.classList.add('dark');
     } else {
-      root.classList.remove("dark");
+      root.classList.remove('dark');
     }
 
-    if (newTheme === "system") {
-      localStorage.removeItem("theme");
+    if (newTheme === 'system') {
+      localStorage.removeItem('theme');
     } else {
-      localStorage.setItem("theme", newTheme);
+      localStorage.setItem('theme', newTheme);
     }
   };
 
   const applyScheme = (newScheme: ColorScheme) => {
-    document.documentElement.setAttribute("data-color-scheme", newScheme);
-    localStorage.setItem("color-scheme", newScheme);
+    document.documentElement.setAttribute('data-color-scheme', newScheme);
+    localStorage.setItem('color-scheme', newScheme);
   };
 
   // Watch for theme changes
@@ -103,10 +103,10 @@ export const useThemeStore = defineStore("theme", () => {
     applyTheme(newTheme);
   });
 
-  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
   const handleSystemChange = () => {
-    if (theme.value === "system") {
-      applyTheme("system");
+    if (theme.value === 'system') {
+      applyTheme('system');
     }
   };
 
@@ -114,7 +114,7 @@ export const useThemeStore = defineStore("theme", () => {
   applyTheme(theme.value);
   applyScheme(scheme.value);
   applyFont(font.value);
-  mediaQuery.addEventListener("change", handleSystemChange);
+  mediaQuery.addEventListener('change', handleSystemChange);
 
   const setTheme = (newTheme: Theme) => {
     theme.value = newTheme;
@@ -133,20 +133,20 @@ export const useThemeStore = defineStore("theme", () => {
 
   // Cleanup listener on unmount
   const _cleanup = () => {
-    mediaQuery.removeEventListener("change", handleSystemChange);
+    mediaQuery.removeEventListener('change', handleSystemChange);
   };
 
   const toggleTheme = () => {
-    if (theme.value === "light") {
-      setTheme("dark");
-    } else if (theme.value === "dark") {
-      setTheme("light");
+    if (theme.value === 'light') {
+      setTheme('dark');
+    } else if (theme.value === 'dark') {
+      setTheme('light');
     } else {
       // If system, toggle based on current system preference
       const isCurrentlyDark = window.matchMedia(
-        "(prefers-color-scheme: dark)",
+        '(prefers-color-scheme: dark)',
       ).matches;
-      setTheme(isCurrentlyDark ? "light" : "dark");
+      setTheme(isCurrentlyDark ? 'light' : 'dark');
     }
   };
 

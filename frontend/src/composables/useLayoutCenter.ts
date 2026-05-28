@@ -1,5 +1,5 @@
-import { useDebounceFn } from "@vueuse/core";
-import { computed, onMounted, onUnmounted, ref, type Ref } from "vue";
+import { useDebounceFn } from '@vueuse/core';
+import { computed, onMounted, onUnmounted, ref, type Ref } from 'vue';
 
 export interface LayoutCenter {
   centerX: Ref<number>;
@@ -48,7 +48,7 @@ export function useLayoutCenter(
       });
       resizeObserver.observe(containerRef.value);
     }
-    window.addEventListener("resize", debouncedUpdate);
+    window.addEventListener('resize', debouncedUpdate);
   });
 
   onUnmounted(() => {
@@ -56,7 +56,7 @@ export function useLayoutCenter(
       resizeObserver.disconnect();
       resizeObserver = null;
     }
-    window.removeEventListener("resize", debouncedUpdate);
+    window.removeEventListener('resize', debouncedUpdate);
   });
 
   return { centerX, centerY, layoutHeight, containerStyle };

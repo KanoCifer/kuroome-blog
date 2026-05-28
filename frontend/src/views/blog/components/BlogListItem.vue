@@ -79,9 +79,9 @@
 </template>
 
 <script setup lang="ts">
-import type { Post } from "@/types";
-import { formatDate } from "@/utils/formatdate";
-import { motion } from "motion-v";
+import type { Post } from '@/types';
+import { formatDate } from '@/utils/formatdate';
+import { motion } from 'motion-v';
 
 defineProps<{
   post: Post;

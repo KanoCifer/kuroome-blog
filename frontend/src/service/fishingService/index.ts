@@ -1,11 +1,11 @@
-import { fishingGateway } from "@/api/fishingGateway";
+import { fishingGateway } from '@/api/fishingGateway';
 
 import type {
   FishingFeedbackPayload,
   FishingFeedbackResponse,
   FishingIndexData,
   FishingStats,
-} from "@/views/fishing/types";
+} from '@/views/fishing/types';
 
 export interface FishingService {
   fetchFishingIndex(payload: {

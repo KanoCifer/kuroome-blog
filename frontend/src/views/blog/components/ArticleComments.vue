@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useAuthStore } from "@/stores/auth";
-import { useNotificationStore } from "@/stores/notification";
-import { blogService } from "@/service/blogService";
-import type { Comment } from "@/types";
-import CommentForm from "./CommentForm.vue";
-import CommentItem from "./CommentItem.vue";
+import { useAuthStore } from '@/stores/auth';
+import { useNotificationStore } from '@/stores/notification';
+import { blogService } from '@/service/blogService';
+import type { Comment } from '@/types';
+import CommentForm from './CommentForm.vue';
+import CommentItem from './CommentItem.vue';
 
 interface Props {
   postId: string;
@@ -14,7 +14,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  (e: "refresh"): void;
+  (e: 'refresh'): void;
 }>();
 
 const auth = useAuthStore();
@@ -43,7 +43,7 @@ const handleReply = async (commentId: string, body: string) => {
     const parentComment = findComment(props.comments, commentId);
 
     if (!parentComment) {
-      notifier.error("找不到要回复的评论");
+      notifier.error('找不到要回复的评论');
       return;
     }
 
@@ -52,14 +52,14 @@ const handleReply = async (commentId: string, body: string) => {
       body: body,
       reply_to: commentId,
       reply_to_author: parentComment.author,
-      author: auth.isAuthenticated && auth.user ? auth.user.username : "",
+      author: auth.isAuthenticated && auth.user ? auth.user.username : '',
     });
-    notifier.success("评论已提交，待审核后显示");
-    emit("refresh");
+    notifier.success('评论已提交，待审核后显示');
+    emit('refresh');
   } catch (err) {
-    console.error("提交回复失败:", err);
+    console.error('提交回复失败:', err);
     const errorMsg =
-      err instanceof Error ? err.message : "提交评论失败，请稍后重试";
+      err instanceof Error ? err.message : '提交评论失败，请稍后重试';
     notifier.error(errorMsg);
   }
 };

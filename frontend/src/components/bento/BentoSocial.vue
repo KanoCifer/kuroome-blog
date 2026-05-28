@@ -51,18 +51,18 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from "./BentoCard.vue";
+import BentoCard from './BentoCard.vue';
 
 const socialLinks = [
   {
-    name: "GitHub",
-    href: "https://github.com/KanoCifer/Flask-Example",
-    icon: "github",
+    name: 'GitHub',
+    href: 'https://github.com/KanoCifer/Flask-Example',
+    icon: 'github',
   },
   {
-    name: "Email",
-    href: "mailto:kano3255@outlook.com",
-    icon: "email",
+    name: 'Email',
+    href: 'mailto:kano3255@outlook.com',
+    icon: 'email',
   },
 ];
 </script>

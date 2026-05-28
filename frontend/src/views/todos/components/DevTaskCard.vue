@@ -1,7 +1,10 @@
 <template>
   <li
-    class="border-border/60 group bg-card/80 relative rounded-xl border p-3.5 shadow-sm transition-[box-shadow,border-color] duration-200 hover:shadow-md"
-    :class="isEditing ? '' : 'hover:border-border'"
+    class="group relative rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)]"
+    :class="[
+      isEditing ? '' : 'hover:bg-white/80 dark:hover:bg-white/5',
+      'border border-white/40 bg-white/60 backdrop-blur-xl dark:border-white/5 dark:bg-black/20',
+    ]"
   >
     <!-- ── Edit mode (shared) ── -->
     <div v-if="isEditing" class="space-y-2.5">
@@ -18,7 +21,7 @@
       <div class="flex items-center gap-2">
         <select
           v-model="editForm.priority"
-          class="border-border bg-card text-foreground cursor-pointer rounded-md border px-2 py-1 text-xs outline-none"
+          class="border-border bg-card text-foreground cursor-pointer rounded-full border px-2 py-1 text-xs outline-none"
         >
           <option value="default">默认</option>
           <option value="low">低</option>
@@ -27,7 +30,7 @@
         <input
           type="date"
           v-model="editForm.dueDate"
-          class="border-border bg-card text-foreground cursor-pointer rounded-md border px-2 py-1 text-xs outline-none"
+          class="border-border bg-card text-foreground cursor-pointer rounded-full border px-2 py-1 text-xs outline-none"
         />
         <div class="ml-auto flex gap-1.5">
           <button
@@ -49,8 +52,8 @@
     <!-- ── Todo 卡片 ── -->
     <div v-else-if="task.status === 'todo'" class="flex items-start gap-2.5">
       <button
-        class="mt-0.5 shrink-0 cursor-pointer rounded-md border px-2 py-0.5 text-[11px] font-medium"
-        style="background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8"
+        class="mt-0.5 shrink-0 cursor-pointer rounded-full border px-2 py-0.5 text-[11px] font-medium"
+        style="background: #eff6ff; color: #1d4ed8"
         @click="$emit('cycleStatus', task.id)"
       >
         {{ STATUS_LABELS.todo }}
@@ -102,8 +105,8 @@
       class="flex items-start gap-2.5"
     >
       <button
-        class="mt-0.5 shrink-0 cursor-pointer rounded-md border px-2 py-0.5 text-[11px] font-medium"
-        style="background: #fffbeb; border-color: #fde68a; color: #b45309"
+        class="mt-0.5 shrink-0 cursor-pointer rounded-full border px-2 py-0.5 text-[11px] font-medium"
+        style="background: #fffbeb; color: #b45309"
         @click="$emit('cycleStatus', task.id)"
       >
         {{ STATUS_LABELS['in-progress'] }}
@@ -152,8 +155,8 @@
     <!-- ── Done 卡片 ── -->
     <div v-else class="flex items-start gap-2.5">
       <button
-        class="mt-0.5 shrink-0 cursor-pointer rounded-md border px-2 py-0.5 text-[11px] font-medium"
-        style="background: #ecfdf5; border-color: #a7f3d0; color: #047857"
+        class="mt-0.5 shrink-0 cursor-pointer rounded-full border px-2 py-0.5 text-[11px] font-medium"
+        style="background: #ecfdf5; color: #047857"
         @click="$emit('cycleStatus', task.id)"
       >
         {{ STATUS_LABELS.done }}

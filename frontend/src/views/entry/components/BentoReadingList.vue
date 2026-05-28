@@ -59,16 +59,16 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from "@/components/bento/BentoCard.vue";
-import { useAnimateNumber } from "@/composables/useAnimateNumber";
-import { bookService } from "@/service/bookService";
-import type { BookItem } from "@/types";
-import { BookOpen } from "lucide-vue-next";
-import { onMounted, ref } from "vue";
+import BentoCard from '@/components/bento/BentoCard.vue';
+import { useAnimateNumber } from '@/composables/useAnimateNumber';
+import { bookService } from '@/service/bookService';
+import type { BookItem } from '@/types';
+import { BookOpen } from 'lucide-vue-next';
+import { onMounted, ref } from 'vue';
 
 const { displayValue: displayCount, animateTo } = useAnimateNumber();
 const progressPercent = ref(68);
-const bookCovers = ["bg-red-400", "bg-blue-400", "bg-green-400"];
+const bookCovers = ['bg-red-400', 'bg-blue-400', 'bg-green-400'];
 
 onMounted(async () => {
   try {
@@ -77,7 +77,7 @@ onMounted(async () => {
     const readingBooks = books.filter((b: BookItem) => !b.iscompleted);
     animateTo(readingBooks.length || 5);
   } catch {
-    console.warn("Failed to fetch reading books, using default count");
+    console.warn('Failed to fetch reading books, using default count');
     animateTo(5);
   }
 });

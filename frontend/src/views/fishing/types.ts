@@ -1,7 +1,7 @@
 export interface TideTableItem {
   fxTime: string;
   height: number | string;
-  type: "H" | "L";
+  type: 'H' | 'L';
 }
 
 export interface TideData {
@@ -123,8 +123,8 @@ export interface WeatherFullResponse {
   poiId?: string;
 }
 
-export type FishingLevel = "爆护" | "好" | "一般" | "差" | "空军";
-export type FishingIndexLevel = FishingLevel | "极好";
+export type FishingLevel = '爆护' | '好' | '一般' | '差' | '空军';
+export type FishingIndexLevel = FishingLevel | '极好';
 export type FishingFeedbackLevel = FishingLevel;
 
 export interface FishingIndexData {
@@ -145,7 +145,7 @@ export interface FishingFeedbackData {
   precipitation: number;
   indices: number;
   tide_level: number;
-  tide_type?: "涨潮" | "退潮";
+  tide_type?: '涨潮' | '退潮';
   tide_range: number;
   hours_to_next_tide: number;
 }
@@ -161,7 +161,7 @@ export interface FishingFeedbackPayload {
   precipitation?: number;
   indices?: number;
   tide_level?: number;
-  tide_type?: "涨潮" | "退潮";
+  tide_type?: '涨潮' | '退潮';
   tide_range?: number;
   hours_to_next_tide?: number;
   feedback: FishingFeedbackLevel;

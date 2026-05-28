@@ -1,4 +1,4 @@
-import { BarChart, GaugeChart, LineChart, PieChart } from "echarts/charts";
+import { BarChart, GaugeChart, LineChart, PieChart } from 'echarts/charts';
 import {
   GridComponent,
   LegendComponent,
@@ -7,9 +7,9 @@ import {
   MarkPointComponent,
   TitleComponent,
   TooltipComponent,
-} from "echarts/components";
-import { use } from "echarts/core";
-import { CanvasRenderer, SVGRenderer } from "echarts/renderers";
+} from 'echarts/components';
+import { use } from 'echarts/core';
+import { CanvasRenderer, SVGRenderer } from 'echarts/renderers';
 
 use([
   CanvasRenderer,

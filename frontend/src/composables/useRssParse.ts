@@ -1,8 +1,8 @@
-import { rssService } from "@/service/rssService";
-import { useNotificationStore } from "@/stores/notification";
-import { useStorage } from "@vueuse/core";
-import { ref } from "vue";
-import { exampleFeeds } from "@/views/rss/rssUtils";
+import { rssService } from '@/service/rssService';
+import { useNotificationStore } from '@/stores/notification';
+import { useStorage } from '@vueuse/core';
+import { ref } from 'vue';
+import { exampleFeeds } from '@/views/rss/rssUtils';
 
 export interface RssMetadata {
   title: string;
@@ -28,10 +28,10 @@ export const useRssParse = () => {
   const notifier = useNotificationStore();
 
   const rssForm = ref<ParseForm>({
-    rssUrl: "",
+    rssUrl: '',
     saveToDb: false,
   });
-  const rssHistory = useStorage<string[]>("rssHistory", []);
+  const rssHistory = useStorage<string[]>('rssHistory', []);
   const parseMetadata = ref<RssMetadata | null>(null);
   const parseEntries = ref<RssEntry[]>([]);
   const parseLoading = ref(false);
@@ -39,7 +39,7 @@ export const useRssParse = () => {
   const parseRss = async (): Promise<boolean> => {
     const rssUrl = rssForm.value.rssUrl.trim();
     if (!rssUrl) {
-      notifier.error("请输入 RSS 订阅地址");
+      notifier.error('请输入 RSS 订阅地址');
       return false;
     }
 
@@ -72,12 +72,12 @@ export const useRssParse = () => {
         content: entry.content,
       }));
 
-      notifier.success("RSS 解析成功");
+      notifier.success('RSS 解析成功');
       return rssForm.value.saveToDb;
     } catch (error: unknown) {
-      console.error("RSS parse error:", error);
+      console.error('RSS parse error:', error);
       notifier.error(
-        `解析失败: ${error instanceof Error ? error.message : "未知错误"}`,
+        `解析失败: ${error instanceof Error ? error.message : '未知错误'}`,
       );
       return false;
     } finally {

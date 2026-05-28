@@ -58,8 +58,8 @@
 </template>
 
 <script setup lang="ts">
-import type { BookItem } from "@/types";
-import { computed, ref } from "vue";
+import type { BookItem } from '@/types';
+import { computed, ref } from 'vue';
 
 interface Badge {
   text: string;
@@ -75,14 +75,14 @@ const coverError = ref(false);
 const badge = computed<Badge>(() => {
   if (props.book.iscompleted) {
     return {
-      text: "已读",
+      text: '已读',
       class:
-        "bg-success/20 text-success dark:bg-green-400/10 dark:text-green-400",
+        'bg-success/20 text-success dark:bg-green-400/10 dark:text-green-400',
     };
   }
   return {
-    text: "在读",
-    class: "bg-primary/20 text-primary dark:bg-blue-400/10 dark:text-blue-400",
+    text: '在读',
+    class: 'bg-primary/20 text-primary dark:bg-blue-400/10 dark:text-blue-400',
   };
 });
 
@@ -91,15 +91,15 @@ const handleImageError = () => {
 };
 
 const coverSrc = computed(() => {
-  const raw = props.book.cover?.trim() || "";
-  if (!raw) return "";
+  const raw = props.book.cover?.trim() || '';
+  if (!raw) return '';
 
-  if (raw.startsWith("/api/v1/rss/image-proxy?")) {
+  if (raw.startsWith('/api/v1/rss/image-proxy?')) {
     return raw;
   }
 
   // data URL 与同源相对路径无需代理
-  if (raw.startsWith("data:") || raw.startsWith("/")) {
+  if (raw.startsWith('data:') || raw.startsWith('/')) {
     return raw;
   }
 

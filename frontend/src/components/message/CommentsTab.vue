@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { Comment } from "@/types";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
+import type { Comment } from '@/types';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime);
 
@@ -22,14 +22,14 @@ const formatTime = (dateStr: string) => {
 };
 
 const handleApproveComment = (commentId: string) => {
-  emit("approve", commentId);
+  emit('approve', commentId);
 };
 
 const handleDeleteComment = (commentId: string) => {
-  if (!confirm("Are you sure you want to delete this comment?")) {
+  if (!confirm('Are you sure you want to delete this comment?')) {
     return;
   }
-  emit("delete", commentId);
+  emit('delete', commentId);
 };
 </script>
 
@@ -59,7 +59,7 @@ const handleDeleteComment = (commentId: string) => {
           <div class="mb-3 flex items-start justify-between">
             <div>
               <h3 class="text-foreground dark:text-foreground font-semibold">
-                {{ comment.author || "Anonymous" }}
+                {{ comment.author || 'Anonymous' }}
               </h3>
               <p
                 class="text-muted-foreground dark:text-muted-foreground text-xs"
@@ -208,7 +208,7 @@ const handleDeleteComment = (commentId: string) => {
           <div class="mb-3 flex items-start justify-between">
             <div>
               <h3 class="text-foreground dark:text-foreground font-semibold">
-                {{ comment.author || "Anonymous" }}
+                {{ comment.author || 'Anonymous' }}
               </h3>
               <p
                 class="text-muted-foreground dark:text-muted-foreground text-xs"

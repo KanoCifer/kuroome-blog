@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref } from 'vue';
 
-import IconMemo from "@/components/icons/IconMemo.vue";
-import { useStorage } from "@vueuse/core";
+import IconMemo from '@/components/icons/IconMemo.vue';
+import { useStorage } from '@vueuse/core';
 
 const isMemoOpen = ref(false);
 
-const STORAGE_KEY = "readinglist_memo";
+const STORAGE_KEY = 'readinglist_memo';
 
-const memoText = useStorage(STORAGE_KEY, "");
+const memoText = useStorage(STORAGE_KEY, '');
 const toggleMemo = () => {
   isMemoOpen.value = !isMemoOpen.value;
 };
@@ -18,7 +18,7 @@ const closeMemo = () => {
 };
 
 const clearMemo = () => {
-  if (memoText.value && confirm("确定要清空备忘录吗？")) {
+  if (memoText.value && confirm('确定要清空备忘录吗？')) {
     memoText.value = null;
   }
 };

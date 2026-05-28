@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import ImageEditorModal from "@/components/editor/ImageEditorModal.vue";
-import { useMarkdownImage } from "@/composables/useMarkdownImage";
-import DOMPurify from "dompurify";
-import hljs from "highlight.js/lib/common";
-import "highlight.js/styles/github-dark.css";
-import { marked } from "marked";
-import TurndownService from "turndown";
-import { computed, nextTick, ref, watch } from "vue";
+import ImageEditorModal from '@/components/editor/ImageEditorModal.vue';
+import { useMarkdownImage } from '@/composables/useMarkdownImage';
+import DOMPurify from 'dompurify';
+import hljs from 'highlight.js/lib/common';
+import 'highlight.js/styles/github-dark.css';
+import { marked } from 'marked';
+import TurndownService from 'turndown';
+import { computed, nextTick, ref, watch } from 'vue';
 
 const turndownService = new TurndownService({
-  headingStyle: "atx",
-  codeBlockStyle: "fenced",
-  bulletListMarker: "-",
+  headingStyle: 'atx',
+  codeBlockStyle: 'fenced',
+  bulletListMarker: '-',
 });
 
 const emit = defineEmits<{
-  "update:modelValue": [value: string];
+  'update:modelValue': [value: string];
 }>();
 
 const props = defineProps<{
@@ -27,15 +27,15 @@ const isHtmlLike = (str: string): boolean => {
   if (!str) return false;
   return (
     /<\/?[a-z][\s\S]*>/i.test(str) ||
-    str.includes("&lt;") ||
-    str.includes("&gt;")
+    str.includes('&lt;') ||
+    str.includes('&gt;')
   );
 };
 
 const markdownText = ref<string>(
-  isHtmlLike(props.modelValue || "")
-    ? turndownService.turndown(props.modelValue || "")
-    : props.modelValue || "",
+  isHtmlLike(props.modelValue || '')
+    ? turndownService.turndown(props.modelValue || '')
+    : props.modelValue || '',
 );
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
 
@@ -70,7 +70,7 @@ const togglePreview = () => {
 };
 
 // 在光标处插入文本
-const insertAtCursor = (before: string, after: string = "") => {
+const insertAtCursor = (before: string, after: string = '') => {
   const textarea = textareaRef.value;
   if (!textarea) return;
 
@@ -94,45 +94,45 @@ const insertAtCursor = (before: string, after: string = "") => {
 };
 
 // Markdown 快捷工具
-const wrapBold = () => insertAtCursor("**", "**");
-const wrapItalic = () => insertAtCursor("*", "*");
-const wrapCode = () => insertAtCursor("`", "`");
-const insertLink = () => insertAtCursor("[", "](url)");
-const insertHeading = () => insertAtCursor("## ", "");
-const insertList = () => insertAtCursor("- ", "");
-const insertQuote = () => insertAtCursor("> ", "");
+const wrapBold = () => insertAtCursor('**', '**');
+const wrapItalic = () => insertAtCursor('*', '*');
+const wrapCode = () => insertAtCursor('`', '`');
+const insertLink = () => insertAtCursor('[', '](url)');
+const insertHeading = () => insertAtCursor('## ', '');
+const insertList = () => insertAtCursor('- ', '');
+const insertQuote = () => insertAtCursor('> ', '');
 
 // 键盘快捷键
 const handleKeydown = (e: KeyboardEvent) => {
   if (e.metaKey || e.ctrlKey) {
     switch (e.key.toLowerCase()) {
-      case "b":
+      case 'b':
         e.preventDefault();
         wrapBold();
         break;
-      case "i":
+      case 'i':
         e.preventDefault();
         wrapItalic();
         break;
-      case "k":
+      case 'k':
         e.preventDefault();
         insertLink();
         break;
-      case "p":
+      case 'p':
         if (e.shiftKey) {
           e.preventDefault();
           togglePreview();
         }
         break;
-      case "f":
+      case 'f':
         if (e.shiftKey) {
           e.preventDefault();
           toggleFocusMode();
         }
         break;
-      case "s":
+      case 's':
         e.preventDefault();
-        emit("update:modelValue", markdownText.value);
+        emit('update:modelValue', markdownText.value);
         break;
     }
   }
@@ -142,9 +142,9 @@ const handleKeydown = (e: KeyboardEvent) => {
 watch(
   () => props.modelValue,
   (newValue) => {
-    const converted = isHtmlLike(newValue || "")
-      ? turndownService.turndown(newValue || "")
-      : newValue || "";
+    const converted = isHtmlLike(newValue || '')
+      ? turndownService.turndown(newValue || '')
+      : newValue || '';
     if (converted !== markdownText.value) {
       markdownText.value = converted;
     }
@@ -153,13 +153,13 @@ watch(
 
 // Update parent when content changes
 watch(markdownText, (newValue) => {
-  emit("update:modelValue", newValue);
+  emit('update:modelValue', newValue);
 });
 
 // Bridge functions: composable returns Markdown, editor inserts at cursor
 const handleImageUpload = (event: Event) => {
   const md = image.handleImageUpload(event);
-  if (md) insertAtCursor(md, "\n\n");
+  if (md) insertAtCursor(md, '\n\n');
 };
 
 const handleDrop = (event: DragEvent) => {
@@ -167,20 +167,20 @@ const handleDrop = (event: DragEvent) => {
   dragCounter.value = 0;
   const results = image.handleDrop(event);
   for (const md of results) {
-    insertAtCursor(md, "\n\n");
+    insertAtCursor(md, '\n\n');
   }
 };
 
 const handlePaste = (event: ClipboardEvent) => {
   const results = image.handlePaste(event);
   for (const md of results) {
-    insertAtCursor(md, "\n\n");
+    insertAtCursor(md, '\n\n');
   }
 };
 
 const handlePreviewClick = (event: MouseEvent) => {
   const target = event.target as HTMLElement | null;
-  if (!target || target.tagName !== "IMG") return;
+  if (!target || target.tagName !== 'IMG') return;
   image.openImageEditor(target as HTMLImageElement);
 };
 
@@ -191,10 +191,10 @@ marked.setOptions({
 });
 
 const renderedMarkdown = computed<string>(() => {
-  if (!markdownText.value) return "";
+  if (!markdownText.value) return '';
   const rawHtml = marked.parse(markdownText.value, { async: false }) as string;
   return DOMPurify.sanitize(rawHtml, {
-    ADD_ATTR: ["data-md-id", "data-align"],
+    ADD_ATTR: ['data-md-id', 'data-align'],
     ALLOWED_URI_REGEXP: /^(?:(?:https?|blob):|[^a-z]*|[a-z0-9.+-]*$)/i,
   });
 });
@@ -202,7 +202,7 @@ const renderedMarkdown = computed<string>(() => {
 // Apply syntax highlighting after Vue renders the preview HTML
 watch(renderedMarkdown, () => {
   nextTick(() => {
-    document.querySelectorAll(".prose pre code").forEach((block) => {
+    document.querySelectorAll('.prose pre code').forEach((block) => {
       hljs.highlightElement(block as HTMLElement);
     });
   });
@@ -329,7 +329,7 @@ defineExpose({
             @click="toggleFocusMode"
             title="聚焦模式 (Cmd+Shift+F)"
           >
-            {{ isFocusMode ? "聚焦中" : "聚焦" }}
+            {{ isFocusMode ? '聚焦中' : '聚焦' }}
           </button>
           <button
             type="button"

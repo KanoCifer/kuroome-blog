@@ -38,23 +38,23 @@
       <h3
         class="text-foreground group-hover:text-foreground ml-2 text-lg leading-tight font-bold transition-colors duration-300"
       >
-        {{ randomSite?.name || "加载中..." }}
+        {{ randomSite?.name || '加载中...' }}
       </h3>
     </div>
     <div>
       <p
         class="text-muted-foreground group-hover:text-foreground line-clamp-2 text-sm transition-colors duration-300"
       >
-        {{ randomSite?.description || "正在获取推荐网站..." }}
+        {{ randomSite?.description || '正在获取推荐网站...' }}
       </p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import websitesData from "@/data/websites.json";
-import type { Website } from "@/types";
-import { useImageError } from "@/composables/useImageError";
+import websitesData from '@/data/websites.json';
+import type { Website } from '@/types';
+import { useImageError } from '@/composables/useImageError';
 
 const { handleImageError } = useImageError();
 

@@ -97,12 +97,12 @@
 </template>
 
 <script setup lang="ts">
-import { BasicDetail } from "@/components/basic";
-import websitesData from "@/data/websites.json";
-import type { Website } from "@/types";
-import { useImageError } from "@/composables/useImageError";
-import { onMounted, ref } from "vue";
-import { motion } from "motion-v";
+import { BasicDetail } from '@/components/basic';
+import websitesData from '@/data/websites.json';
+import type { Website } from '@/types';
+import { useImageError } from '@/composables/useImageError';
+import { onMounted, ref } from 'vue';
+import { motion } from 'motion-v';
 
 const sites = ref<Website[]>([]);
 

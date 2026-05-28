@@ -14,5 +14,5 @@
 </template>
 
 <script setup lang="ts">
-import { motion } from "motion-v";
+import { motion } from 'motion-v';
 </script>

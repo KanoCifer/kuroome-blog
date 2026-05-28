@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useNotificationStore } from "@/stores/notification";
-import { formatDate } from "@/utils/formatdate";
-import dayjs from "dayjs";
-import DOMPurify from "dompurify";
-import { marked } from "marked";
-import { AnimatePresence, motion } from "motion-v";
-import { computed, onUnmounted, ref, watch } from "vue";
+import { useNotificationStore } from '@/stores/notification';
+import { formatDate } from '@/utils/formatdate';
+import dayjs from 'dayjs';
+import DOMPurify from 'dompurify';
+import { marked } from 'marked';
+import { AnimatePresence, motion } from 'motion-v';
+import { computed, onUnmounted, ref, watch } from 'vue';
 
 marked.setOptions({
   gfm: true,
@@ -32,7 +32,7 @@ interface ForecastDay {
 
 interface TideData {
   updateTime: string;
-  tideTable: { fxTime: string; height: number | string; type: "H" | "L" }[];
+  tideTable: { fxTime: string; height: number | string; type: 'H' | 'L' }[];
   tideHourly: { fxTime: string; height: number | string }[];
 }
 
@@ -55,15 +55,15 @@ interface WeatherAnalysisPayload {
 }
 
 const AI_MODELS = [
-  { id: "Ling-2.6-1T", name: "Ling 2.6" },
-  { id: "Ling-2.6-flash", name: "Ling 2.6 Flash" },
-  { id: "Ring-2.5-1T", name: "Ring 2.5" },
+  { id: 'Ling-2.6-1T', name: 'Ling 2.6' },
+  { id: 'Ling-2.6-flash', name: 'Ling 2.6 Flash' },
+  { id: 'Ring-2.5-1T', name: 'Ring 2.5' },
 ];
 
 const textShimmer = ref<string[]>([
-  "正在整理天气变化...",
-  "正在评估体感与风况...",
-  "正在结合潮汐节奏...",
+  '正在整理天气变化...',
+  '正在评估体感与风况...',
+  '正在结合潮汐节奏...',
 ]);
 
 const selectedModel = ref(AI_MODELS[0].id);
@@ -84,12 +84,12 @@ const props = withDefaults(
 
 const notifier = useNotificationStore();
 const loading = ref(false);
-const summary = ref("");
+const summary = ref('');
 const hasGenerated = ref(false);
-const errorMessage = ref("");
+const errorMessage = ref('');
 
 const renderedSummary = computed(() => {
-  if (!summary.value) return "";
+  if (!summary.value) return '';
   try {
     const rawHtml = marked.parse(summary.value, { async: false }) as string;
     return DOMPurify.sanitize(rawHtml);
@@ -97,10 +97,10 @@ const renderedSummary = computed(() => {
     return summary.value;
   }
 });
-const lastAutoFingerprint = ref<string>("");
+const lastAutoFingerprint = ref<string>('');
 
 const normalizedData = computed<WeatherAnalysisPayload | null>(() => {
-  if (!props.weather_data || typeof props.weather_data !== "object")
+  if (!props.weather_data || typeof props.weather_data !== 'object')
     return null;
   return props.weather_data;
 });
@@ -124,38 +124,38 @@ const payload = computed(() => {
     tideData: data.tideData ?? null,
     weatherIndices: data.weatherIndices ?? [],
     fishingIndex: data.fishingIndex ?? undefined,
-    locationName: data.locationName ?? "钓鱼地点",
-    tideSpotName: data.tideSpotName ?? "潮汐点位",
-    generatedAt: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+    locationName: data.locationName ?? '钓鱼地点',
+    tideSpotName: data.tideSpotName ?? '潮汐点位',
+    generatedAt: dayjs().format('YYYY-MM-DD HH:mm:ss'),
   };
 });
 
 const canGenerate = computed(() => hasInputData.value && !loading.value);
 
 const statusLabel = computed(() => {
-  if (loading.value) return "分析中";
-  if (errorMessage.value) return "分析失败";
-  if (hasGenerated.value) return "已生成";
-  return "待生成";
+  if (loading.value) return '分析中';
+  if (errorMessage.value) return '分析失败';
+  if (hasGenerated.value) return '已生成';
+  return '待生成';
 });
 
 const statusClass = computed(() => {
-  if (loading.value) return "bg-primary/15 text-primary";
-  if (errorMessage.value) return "bg-destructive/15 text-destructive";
+  if (loading.value) return 'bg-primary/15 text-primary';
+  if (errorMessage.value) return 'bg-destructive/15 text-destructive';
   if (hasGenerated.value)
-    return "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300";
-  return "bg-muted text-muted-foreground";
+    return 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300';
+  return 'bg-muted text-muted-foreground';
 });
 
 const resetState = () => {
-  summary.value = "";
+  summary.value = '';
   hasGenerated.value = false;
-  errorMessage.value = "";
+  errorMessage.value = '';
 };
 
 const fetchWeatherAnalysis = () => {
   if (!payload.value) {
-    errorMessage.value = "缺少天气数据，无法分析";
+    errorMessage.value = '缺少天气数据，无法分析';
     return;
   }
   void _doFetch();
@@ -166,14 +166,14 @@ const _doFetch = async () => {
 
   abortController = new AbortController();
   loading.value = true;
-  errorMessage.value = "";
-  summary.value = "";
+  errorMessage.value = '';
+  summary.value = '';
   hasGenerated.value = false;
 
   try {
-    const response = await fetch("/api/v1/llm/weather-analysis", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const response = await fetch('/api/v1/llm/weather-analysis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         weather_data: payload.value,
         model_id: selectedModel.value,
@@ -185,23 +185,23 @@ const _doFetch = async () => {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
 
     const reader = response.body?.getReader();
-    if (!reader) throw new Error("无法获取响应体");
+    if (!reader) throw new Error('无法获取响应体');
 
-    const decoder = new TextDecoder("utf-8");
-    let buffer = "";
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
 
       buffer += decoder.decode(value, { stream: true });
-      const parts = buffer.split("\n\n");
-      buffer = parts.pop() || "";
+      const parts = buffer.split('\n\n');
+      buffer = parts.pop() || '';
 
       for (const part of parts) {
-        if (!part.trim() || !part.startsWith("data:")) continue;
-        const jsonStr = part.replace(/^data:\s*/, "").trim();
-        if (jsonStr === "[DONE]") {
+        if (!part.trim() || !part.startsWith('data:')) continue;
+        const jsonStr = part.replace(/^data:\s*/, '').trim();
+        if (jsonStr === '[DONE]') {
           hasGenerated.value = true;
           break;
         }
@@ -216,9 +216,9 @@ const _doFetch = async () => {
     }
     if (summary.value && !hasGenerated.value) hasGenerated.value = true;
   } catch (error: unknown) {
-    if (error instanceof DOMException && error.name === "AbortError") return;
+    if (error instanceof DOMException && error.name === 'AbortError') return;
     errorMessage.value =
-      error instanceof Error ? error.message : "AI 分析失败，请稍后重试";
+      error instanceof Error ? error.message : 'AI 分析失败，请稍后重试';
     notifier.error(errorMessage.value);
   } finally {
     loading.value = false;
@@ -337,7 +337,7 @@ onUnmounted(() => {
           :disabled="!canGenerate"
           @click="fetchWeatherAnalysis"
         >
-          {{ hasGenerated ? "重新分析" : "生成分析" }}
+          {{ hasGenerated ? '重新分析' : '生成分析' }}
         </button>
       </div>
     </div>
@@ -430,9 +430,9 @@ onUnmounted(() => {
       </div>
 
       <div class="text-muted-foreground mt-3 text-xs">
-        天气更新: {{ formatDate(normalizedData?.liveWeather?.obsTime) ?? "--"
+        天气更新: {{ formatDate(normalizedData?.liveWeather?.obsTime) ?? '--'
         }}<br />
-        潮汐更新: {{ formatDate(normalizedData?.tideData?.updateTime) ?? "--" }}
+        潮汐更新: {{ formatDate(normalizedData?.tideData?.updateTime) ?? '--' }}
       </div>
     </div>
   </motion.div>

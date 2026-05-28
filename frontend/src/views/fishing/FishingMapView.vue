@@ -177,23 +177,23 @@
 </template>
 
 <script setup lang="ts">
-import WeatherAnalysis from "@/components/ai/WeatherAnalysis.vue";
-import BasicDetail from "@/components/basic/BasicDetail.vue";
-import MapContainer from "@/components/basic/MapContainer.vue";
-import TideCard from "@/components/map/TideCard.vue";
-import WeatherCard from "@/components/map/WeatherCard.vue";
-import fishingSpotsData from "@/data/fishing-spots.json";
-import { DEFAULT_MAP_CENTER, useFishingMapStore } from "@/stores/fishingMap";
-import FishingFeedbackForm from "@/views/fishing/components/FishingFeedbackForm.vue";
-import FishingIndexCard from "@/views/fishing/components/FishingIndexCard.vue";
+import WeatherAnalysis from '@/components/ai/WeatherAnalysis.vue';
+import BasicDetail from '@/components/basic/BasicDetail.vue';
+import MapContainer from '@/components/basic/MapContainer.vue';
+import TideCard from '@/components/map/TideCard.vue';
+import WeatherCard from '@/components/map/WeatherCard.vue';
+import fishingSpotsData from '@/data/fishing-spots.json';
+import { DEFAULT_MAP_CENTER, useFishingMapStore } from '@/stores/fishingMap';
+import FishingFeedbackForm from '@/views/fishing/components/FishingFeedbackForm.vue';
+import FishingIndexCard from '@/views/fishing/components/FishingIndexCard.vue';
 import type {
   FishingFeedbackData,
   FishingIndexData,
-} from "@/views/fishing/types";
-import { Bot } from "lucide-vue-next";
-import { storeToRefs } from "pinia";
-import { computed, onMounted, ref, useTemplateRef } from "vue";
-import HourlyWeather from "./components/HourlyWeather.vue";
+} from '@/views/fishing/types';
+import { Bot } from 'lucide-vue-next';
+import { storeToRefs } from 'pinia';
+import { computed, onMounted, ref, useTemplateRef } from 'vue';
+import HourlyWeather from './components/HourlyWeather.vue';
 
 export interface AMapMarker {
   position: [number, number];
@@ -212,7 +212,7 @@ interface MapContainerInstance {
 
 // 钓点数据
 const fishingSpots = ref<AMapMarker[]>(fishingSpotsData as AMapMarker[]);
-const mapContainerRef = useTemplateRef<MapContainerInstance>("mapContainerRef");
+const mapContainerRef = useTemplateRef<MapContainerInstance>('mapContainerRef');
 const fishingMapStore = useFishingMapStore();
 const {
   liveWeather,
@@ -226,7 +226,7 @@ const userPosition = ref<[number, number] | null>(null);
 const activeLocation = computed<[number, number]>(
   () => userPosition.value ?? DEFAULT_MAP_CENTER,
 );
-const tideSpotName = ref("黄埔港");
+const tideSpotName = ref('黄埔港');
 
 // 路线规划状态
 const isPlanningRoute = ref(false);
@@ -236,8 +236,8 @@ const selectedSpotIndex = ref<number | null>(null);
 const analysisOpen = ref(false);
 
 const feedbackOpen = ref(false);
-const feedbackLocationId = ref("default");
-const feedbackLocationName = ref("钓鱼地点");
+const feedbackLocationId = ref('default');
+const feedbackLocationName = ref('钓鱼地点');
 const currentFishingData = ref<FishingFeedbackData | null>(null);
 
 const analysisPayload = computed(() => {
@@ -271,7 +271,7 @@ const handleFeedbackClick = (data: FishingIndexData) => {
     : 1;
 
   let tideLevel = 1.5;
-  let tideType: "涨潮" | "退潮" | undefined = undefined;
+  let tideType: '涨潮' | '退潮' | undefined = undefined;
   let tideRange = 1.5;
   let hoursToNextTide = 3.0;
 
@@ -279,7 +279,7 @@ const handleFeedbackClick = (data: FishingIndexData) => {
     const currentTide = tideData.value.tideTable[0];
     const nextTide = tideData.value.tideTable[1];
 
-    tideType = currentTide.type === "H" ? "退潮" : "涨潮";
+    tideType = currentTide.type === 'H' ? '退潮' : '涨潮';
     tideLevel = Number(currentTide.height ?? 1.5);
 
     if (nextTide) {
@@ -312,8 +312,8 @@ const handleFeedbackClick = (data: FishingIndexData) => {
   feedbackLocationId.value =
     selectedSpotIndex.value !== null
       ? String(selectedSpotIndex.value)
-      : "default";
-  feedbackLocationName.value = locationName.value || "钓鱼地点";
+      : 'default';
+  feedbackLocationName.value = locationName.value || '钓鱼地点';
   feedbackOpen.value = true;
 };
 
@@ -327,7 +327,7 @@ const handleMarkerClick = async (index: number) => {
   selectedSpotIndex.value = index;
 
   if (!mapContainerRef.value) {
-    console.error("地图组件未初始化");
+    console.error('地图组件未初始化');
     return;
   }
 
@@ -348,7 +348,7 @@ const handleMarkerClick = async (index: number) => {
     // 获取被点击的钓点位置
     const spot = fishingSpots.value?.[index];
     if (!spot) {
-      throw new Error("钓点不存在");
+      throw new Error('钓点不存在');
     }
 
     // 规划路线
@@ -359,8 +359,8 @@ const handleMarkerClick = async (index: number) => {
 
     routeInfo.value = result;
   } catch (error) {
-    console.error("路线规划失败:", error);
-    alert("路线规划失败，请检查网络连接或定位权限");
+    console.error('路线规划失败:', error);
+    alert('路线规划失败，请检查网络连接或定位权限');
     routeInfo.value = null;
     selectedSpotIndex.value = null;
   } finally {
@@ -386,7 +386,7 @@ const handleMapReady = () => {
       userPosition.value = position;
       await fishingMapStore.fetchWeatherAndFishing(position);
     } catch {
-      console.error("handleMapReady 定位失败");
+      console.error('handleMapReady 定位失败');
     }
   })();
 };

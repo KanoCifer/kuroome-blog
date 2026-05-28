@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { blogService } from "@/service/blogService";
-import { useAuthStore } from "@/stores/auth";
-import { useNotificationStore } from "@/stores/notification";
-import { computed, ref } from "vue";
+import { blogService } from '@/service/blogService';
+import { useAuthStore } from '@/stores/auth';
+import { useNotificationStore } from '@/stores/notification';
+import { computed, ref } from 'vue';
 
 interface Props {
   postId: string | number;
@@ -20,10 +20,10 @@ const props = withDefaults(defineProps<Props>(), {
 const auth = useAuthStore();
 const notifier = useNotificationStore();
 
-const author = ref("");
-const email = ref("");
-const site = ref("");
-const body = ref("");
+const author = ref('');
+const email = ref('');
+const site = ref('');
+const body = ref('');
 const isSubmitting = ref(false);
 const isFocused = ref(false);
 const charCount = computed(() => body.value.length);
@@ -46,7 +46,7 @@ const handleSubmit = async () => {
   isSubmitting.value = true;
 
   try {
-    console.log("Submitting comment:", {
+    console.log('Submitting comment:', {
       post_id: String(props.postId),
       body: body.value,
     });
@@ -58,23 +58,23 @@ const handleSubmit = async () => {
       reply_to: props.isReply ? props.replyTo : undefined,
       reply_to_author: props.isReply ? props.replyToAuthor : undefined,
     });
-    notifier.success("评论已提交，等待审核");
+    notifier.success('评论已提交，等待审核');
 
     // Reset form
-    body.value = "";
-    author.value = "";
-    email.value = "";
-    site.value = "";
+    body.value = '';
+    author.value = '';
+    email.value = '';
+    site.value = '';
   } catch (error) {
-    console.error("Error submitting comment:", error);
-    notifier.error("评论提交失败，请稍后重试");
+    console.error('Error submitting comment:', error);
+    notifier.error('评论提交失败，请稍后重试');
   } finally {
     isSubmitting.value = false;
   }
 };
 
 // Quick emoji reactions
-const emojis = ["👍", "❤️", "😊", "🎉", "🤔", "👀"];
+const emojis = ['👍', '❤️', '😊', '🎉', '🤔', '👀'];
 
 const addEmoji = (emoji: string) => {
   body.value += emoji;
@@ -262,7 +262,7 @@ const addEmoji = (emoji: string) => {
           />
         </svg>
 
-        {{ isSubmitting ? "提交中..." : "发表评论" }}
+        {{ isSubmitting ? '提交中...' : '发表评论' }}
       </button>
     </div>
   </div>

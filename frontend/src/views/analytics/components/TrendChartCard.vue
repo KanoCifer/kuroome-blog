@@ -14,10 +14,10 @@
 </template>
 
 <script setup lang="ts">
-import IconTrend from "@/components/icons/IconTrend.vue";
-import dayjs from "dayjs";
-import { computed } from "vue";
-import VChart from "vue-echarts";
+import IconTrend from '@/components/icons/IconTrend.vue';
+import dayjs from 'dayjs';
+import { computed } from 'vue';
+import VChart from 'vue-echarts';
 
 interface OverviewData {
   daily_trend: { date: string; count: number }[];
@@ -39,71 +39,71 @@ const trendChartOption = computed(() => {
 
   return {
     tooltip: {
-      trigger: "axis",
-      backgroundColor: "rgba(255, 255, 255, 0.95)",
-      borderColor: "#e5e7eb",
+      trigger: 'axis',
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#e5e7eb',
       textStyle: {
-        color: "#374151",
+        color: '#374151',
       },
     },
     grid: {
-      left: "3%",
-      right: "4%",
-      bottom: "3%",
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
       containLabel: true,
     },
     xAxis: {
-      type: "category",
+      type: 'category',
       boundaryGap: false,
       data: sortedData.map((d) => d.date),
       axisLine: {
         lineStyle: {
-          color: "#e5e7eb",
+          color: '#e5e7eb',
         },
       },
       axisLabel: {
-        color: "#6b7280",
-        formatter: (value: string) => dayjs(value).format("MM/DD"),
+        color: '#6b7280',
+        formatter: (value: string) => dayjs(value).format('MM/DD'),
       },
     },
     yAxis: {
-      type: "value",
+      type: 'value',
       axisLine: {
         show: false,
       },
       axisLabel: {
-        color: "#6b7280",
+        color: '#6b7280',
       },
       splitLine: {
         lineStyle: {
-          color: "#f3f4f6",
+          color: '#f3f4f6',
         },
       },
     },
     series: [
       {
-        name: "Visits",
-        type: "line",
+        name: 'Visits',
+        type: 'line',
         smooth: true,
-        symbol: "circle",
+        symbol: 'circle',
         symbolSize: 6,
         lineStyle: {
           width: 3,
-          color: "#3b82f6",
+          color: '#3b82f6',
         },
         itemStyle: {
-          color: "#3b82f6",
+          color: '#3b82f6',
         },
         areaStyle: {
           color: {
-            type: "linear",
+            type: 'linear',
             x: 0,
             y: 0,
             x2: 0,
             y2: 1,
             colorStops: [
-              { offset: 0, color: "rgba(59, 130, 246, 0.3)" },
-              { offset: 1, color: "rgba(59, 130, 246, 0.05)" },
+              { offset: 0, color: 'rgba(59, 130, 246, 0.3)' },
+              { offset: 1, color: 'rgba(59, 130, 246, 0.05)' },
             ],
           },
         },

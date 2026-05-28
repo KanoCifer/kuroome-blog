@@ -28,12 +28,12 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from "./BentoCard.vue";
+import BentoCard from './BentoCard.vue';
 
 const post = {
-  title: "The Future of Web Development with Vue 3",
-  date: "Oct 24, 2023",
+  title: 'The Future of Web Development with Vue 3',
+  date: 'Oct 24, 2023',
   excerpt:
-    "Discover how the Composition API and new features in Vue 3 are revolutionizing the way we build modern web applications.",
+    'Discover how the Composition API and new features in Vue 3 are revolutionizing the way we build modern web applications.',
 };
 </script>

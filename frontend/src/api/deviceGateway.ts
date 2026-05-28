@@ -1,4 +1,4 @@
-import request from "@/api/request";
+import request from '@/api/request';
 
 export type DeviceInput = {
   name: string;
@@ -6,7 +6,7 @@ export type DeviceInput = {
   price: number;
   currency: string;
   notes?: string;
-  status: "active" | "retired";
+  status: 'active' | 'retired';
   reminder_config: unknown;
 };
 
@@ -22,11 +22,11 @@ export interface DeviceGateway {
   deleteDevice: (device_id: number) => Promise<void>;
   updateDevice: (
     device_id: number,
-    data: Omit<DeviceInput, "id">,
+    data: Omit<DeviceInput, 'id'>,
   ) => Promise<Device>;
   updateDeviceStatus: (
     device_id: number,
-    status: "active" | "retired",
+    status: 'active' | 'retired',
   ) => Promise<Device>;
   updateDeviceReminderConfig: (
     device_id: number,
@@ -37,14 +37,14 @@ export interface DeviceGateway {
 
 export const deviceGateway: DeviceGateway = {
   async getUserDevices() {
-    const res = await request.get<{ data: { devices: Device[] } }>("v2/device");
+    const res = await request.get<{ data: { devices: Device[] } }>('v2/device');
     return res.data.data.devices;
   },
 
   async getUserGlobalConfig() {
     const res = await request.get<{
       data: { config: Record<string, unknown> };
-    }>("v2/subscriptions/global-config");
+    }>('v2/subscriptions/global-config');
     return res.data.data;
   },
 
@@ -54,7 +54,7 @@ export const deviceGateway: DeviceGateway = {
   },
 
   async createDevice(data: DeviceInput) {
-    const res = await request.post<{ data: Device }>("v2/device", data);
+    const res = await request.post<{ data: Device }>('v2/device', data);
     return res.data.data;
   },
 
@@ -69,7 +69,7 @@ export const deviceGateway: DeviceGateway = {
     return res.data.data;
   },
 
-  async updateDeviceStatus(device_id: number, status: "active" | "retired") {
+  async updateDeviceStatus(device_id: number, status: 'active' | 'retired') {
     const res = await request.patch<{ data: Device }>(
       `v2/device/${device_id}/status`,
       { status },

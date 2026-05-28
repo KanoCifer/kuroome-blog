@@ -44,8 +44,8 @@
 // 该组件接收渲染后的文章 HTML 内容，通过解析出 h1/h2/h3 标题构建目录，
 // 并为文章中的标题添加 id 以支持点击跳转和滚动高亮。
 
-import type { TocItem } from "@/types";
-import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import type { TocItem } from '@/types';
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 
 // 定义组件 props，content 为传入的文章 HTML 字符串
 const props = defineProps<{
@@ -54,7 +54,7 @@ const props = defineProps<{
 
 // toc 存放解析出的目录条目列表，activeId 保存当前滚动位置对应的标题 id
 const toc = ref<TocItem[]>([]);
-const activeId = ref<string>("");
+const activeId = ref<string>('');
 
 // 辅助函数
 //---------
@@ -62,19 +62,19 @@ const activeId = ref<string>("");
 // index 是标题在文档中的顺序，text 为标题文本的一部分
 const generateId = (index: number, text: string): string => {
   // 只取前 20 个字符，去除空白并用 '-' 连接，确保 id 合法
-  return `heading-${index}-${text.slice(0, 20).replace(/\s+/g, "-").toLowerCase()}`;
+  return `heading-${index}-${text.slice(0, 20).replace(/\s+/g, '-').toLowerCase()}`;
 };
 
 // 根据传入的 HTML 字符串，提取出所有 h1/h2/h3 标题，返回目录条目数组
 const extractHeadings = (html: string): TocItem[] => {
   const headings: TocItem[] = [];
   const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
+  const doc = parser.parseFromString(html, 'text/html');
 
   // querySelectorAll 返回 NodeList，我们遍历并构造 TocItem
-  const elements = doc.querySelectorAll("h1, h2, h3");
+  const elements = doc.querySelectorAll('h1, h2, h3');
   elements.forEach((el, index) => {
-    const text = el.textContent?.trim() || "";
+    const text = el.textContent?.trim() || '';
     if (text) {
       const level = parseInt(el.tagName.charAt(1)); // 'H2' -> 2
       const id = generateId(index, text);
@@ -88,12 +88,12 @@ const extractHeadings = (html: string): TocItem[] => {
 // 给页面中实际渲染的 heading 元素添加对应的 id，方便跳转和定位
 const addIdsToHeadings = () => {
   // 文章容器在样式中使用了 .prose 类
-  const contentContainer = document.querySelector(".prose");
+  const contentContainer = document.querySelector('.prose');
   if (!contentContainer) return;
 
-  const headingElements = contentContainer.querySelectorAll("h1, h2, h3");
+  const headingElements = contentContainer.querySelectorAll('h1, h2, h3');
   headingElements.forEach((el, index) => {
-    const text = el.textContent?.trim() || "";
+    const text = el.textContent?.trim() || '';
     // 若已有 id 则跳过，防止重复赋值
     if (text && !el.id) {
       el.id = generateId(index, text);
@@ -124,7 +124,7 @@ watch(
     } else {
       // 如果 content 为空，则清空目录和激活状态
       toc.value = [];
-      activeId.value = "";
+      activeId.value = '';
     }
   },
   { immediate: true }, // 组件挂载时立即触发一次
@@ -138,14 +138,14 @@ watch(
 const scrollToHeading = (id: string) => {
   const element = document.getElementById(id);
   if (element) {
-    element.scrollIntoView({ behavior: "smooth", block: "center" });
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
     activeId.value = id;
-    window.history.pushState(null, "", `#${id}`); // 更新 URL 中的 hash，便于分享链接
+    window.history.pushState(null, '', `#${id}`); // 更新 URL 中的 hash，便于分享链接
   }
 };
 
 // 监听hash变化（例如用户使用浏览器的前进/后退按钮），更新 activeId 以保持目录高亮同步
-window.addEventListener("hashchange", () => {
+window.addEventListener('hashchange', () => {
   const hash = window.location.hash.slice(1); // 去掉 '#' 前缀
   if (hash) {
     scrollToHeading(hash);
@@ -156,7 +156,7 @@ window.addEventListener("hashchange", () => {
 const handleScroll = () => {
   if (toc.value.length === 0) return;
 
-  const contentContainer = document.querySelector(".prose");
+  const contentContainer = document.querySelector('.prose');
   if (!contentContainer) return;
 
   const headingElements: HTMLElement[] = [];
@@ -202,7 +202,7 @@ const handleScroll = () => {
 // -----------------------------------------------------------------------------
 
 onMounted(() => {
-  window.addEventListener("scroll", handleScroll, { passive: true });
+  window.addEventListener('scroll', handleScroll, { passive: true });
   // 挂载后短暂延迟再尝试标记标题，避免异步渲染延迟
   setTimeout(() => {
     addIdsToHeadings();
@@ -211,7 +211,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  window.removeEventListener("scroll", handleScroll);
+  window.removeEventListener('scroll', handleScroll);
 });
 </script>
 

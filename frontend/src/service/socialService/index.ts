@@ -1,4 +1,4 @@
-import { socialGateway } from "@/api/socialGateway";
+import { socialGateway } from '@/api/socialGateway';
 
 export interface SocialService {
   getLikes(): Promise<{ likes_count: number }>;

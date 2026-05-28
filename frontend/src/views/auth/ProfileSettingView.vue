@@ -552,46 +552,46 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { authGateway } from "@/api/authGateway";
-import { useAuthStore } from "@/stores/auth";
-import type { ProfileForm } from "@/types";
-import { startRegistration } from "@simplewebauthn/browser";
-import { computed, onMounted, ref } from "vue";
+} from '@/components/ui/alert-dialog';
+import { authGateway } from '@/api/authGateway';
+import { useAuthStore } from '@/stores/auth';
+import type { ProfileForm } from '@/types';
+import { startRegistration } from '@simplewebauthn/browser';
+import { computed, onMounted, ref } from 'vue';
 const authStore = useAuthStore();
 
 const form = ref<ProfileForm>({
-  name: "",
-  username: "",
-  gender: "",
-  email: "",
-  mobile: "",
-  password: "",
+  name: '',
+  username: '',
+  gender: '',
+  email: '',
+  mobile: '',
+  password: '',
 });
 
 const errors = ref<Record<string, string>>({});
 const saving = ref(false);
-const message = ref("");
-const messageType = ref<"success" | "error">("success");
+const message = ref('');
+const messageType = ref<'success' | 'error'>('success');
 
 const avatarUrl = computed(() => {
-  if (authStore.user?.photo?.startsWith("http")) {
+  if (authStore.user?.photo?.startsWith('http')) {
     return authStore.user.photo;
   }
   if (authStore.user?.photo) {
     return `/api/v1/media/${authStore.user.photo}`;
   }
-  return "/api/v1/media/default.png";
+  return '/api/v1/media/default.png';
 });
 
 const loadUserData = () => {
   if (authStore.user) {
-    form.value.name = authStore.user.name || "";
-    form.value.username = authStore.user.username || "";
-    form.value.gender = authStore.user.gender || "";
-    form.value.email = authStore.user.email || "";
+    form.value.name = authStore.user.name || '';
+    form.value.username = authStore.user.username || '';
+    form.value.gender = authStore.user.gender || '';
+    form.value.email = authStore.user.email || '';
     const userWithMobile = authStore.user as { mobile?: string } | null;
-    form.value.mobile = userWithMobile?.mobile || "";
+    form.value.mobile = userWithMobile?.mobile || '';
     const userWithPasskey = authStore.user as { has_passkey?: boolean } | null;
     hasPasskey.value = !!userWithPasskey?.has_passkey;
     const userWithGitHub = authStore.user as { github_bound?: boolean } | null;
@@ -601,7 +601,7 @@ const loadUserData = () => {
 
 const toggleGender = (value: string) => {
   if (form.value.gender === value) {
-    form.value.gender = "";
+    form.value.gender = '';
   } else {
     form.value.gender = value;
   }
@@ -609,51 +609,51 @@ const toggleGender = (value: string) => {
 
 const handlePhotoUpload = async (event: Event) => {
   const input = event.target as HTMLInputElement;
-  console.log("Selected file:", input.files?.[0]);
+  console.log('Selected file:', input.files?.[0]);
   const file = input.files?.[0];
 
   if (!file) return;
 
   const formData = new FormData();
-  formData.append("image", file);
+  formData.append('image', file);
 
   try {
     const response = await authGateway.uploadAvatar(formData);
 
     if (response.data) {
       await authStore.fetchUser();
-      message.value = "Avatar updated successfully!";
-      messageType.value = "success";
+      message.value = 'Avatar updated successfully!';
+      messageType.value = 'success';
     } else {
-      message.value = response.data?.message || "Failed to upload avatar";
-      messageType.value = "error";
+      message.value = response.data?.message || 'Failed to upload avatar';
+      messageType.value = 'error';
     }
   } catch (error) {
-    console.error("Avatar upload error:", error);
-    message.value = "Network error, please try again";
-    messageType.value = "error";
+    console.error('Avatar upload error:', error);
+    message.value = 'Network error, please try again';
+    messageType.value = 'error';
   }
 
-  input.value = "";
+  input.value = '';
 };
 
 // Passkey 相关
 const addingPasskey = ref(false);
 const deletingPasskey = ref(false);
-const passkeyMessage = ref("");
-const passkeyMessageType = ref<"success" | "error">("success");
+const passkeyMessage = ref('');
+const passkeyMessageType = ref<'success' | 'error'>('success');
 const hasPasskey = ref(false);
 
 // GitHub 相关
 const bindingGitHub = ref(false);
 const unbindingGitHub = ref(false);
-const githubMessage = ref("");
-const githubMessageType = ref<"success" | "error">("success");
+const githubMessage = ref('');
+const githubMessageType = ref<'success' | 'error'>('success');
 const hasGitHubBound = ref<boolean>(false);
 
 const handleAddPasskey = async () => {
   addingPasskey.value = true;
-  passkeyMessage.value = "";
+  passkeyMessage.value = '';
 
   try {
     // 获取注册选项
@@ -668,13 +668,13 @@ const handleAddPasskey = async () => {
       response: credential,
     });
 
-    passkeyMessage.value = "Passkey added successfully!";
-    passkeyMessageType.value = "success";
+    passkeyMessage.value = 'Passkey added successfully!';
+    passkeyMessageType.value = 'success';
     hasPasskey.value = true;
   } catch (error) {
-    console.error("Add passkey error:", error);
-    passkeyMessage.value = "Failed to add passkey";
-    passkeyMessageType.value = "error";
+    console.error('Add passkey error:', error);
+    passkeyMessage.value = 'Failed to add passkey';
+    passkeyMessageType.value = 'error';
   } finally {
     addingPasskey.value = false;
   }
@@ -682,17 +682,17 @@ const handleAddPasskey = async () => {
 
 const handleDeletePasskey = async () => {
   deletingPasskey.value = true;
-  passkeyMessage.value = "";
+  passkeyMessage.value = '';
 
   try {
     await authGateway.deletePasskey();
-    passkeyMessage.value = "Passkey deleted successfully!";
-    passkeyMessageType.value = "success";
+    passkeyMessage.value = 'Passkey deleted successfully!';
+    passkeyMessageType.value = 'success';
     hasPasskey.value = false;
   } catch (error) {
-    console.error("Delete passkey error:", error);
-    passkeyMessage.value = "Failed to delete passkey";
-    passkeyMessageType.value = "error";
+    console.error('Delete passkey error:', error);
+    passkeyMessage.value = 'Failed to delete passkey';
+    passkeyMessageType.value = 'error';
   } finally {
     deletingPasskey.value = false;
   }
@@ -701,26 +701,26 @@ const handleDeletePasskey = async () => {
 // GitHub 绑定相关
 const handleBindGitHub = () => {
   bindingGitHub.value = true;
-  githubMessage.value = "";
+  githubMessage.value = '';
   // 跳转到后端 GitHub 绑定接口
-  window.location.href = "/api/v1/auth/github/bind";
+  window.location.href = '/api/v1/auth/github/bind';
 };
 
 const handleUnbindGitHub = async () => {
   unbindingGitHub.value = true;
-  githubMessage.value = "";
+  githubMessage.value = '';
 
   try {
     await authGateway.unbindGithub();
-    githubMessage.value = "GitHub account unbound successfully!";
-    githubMessageType.value = "success";
+    githubMessage.value = 'GitHub account unbound successfully!';
+    githubMessageType.value = 'success';
     hasGitHubBound.value = false;
     // 刷新用户信息
     await authStore.fetchUser();
   } catch (error) {
-    console.error("Unbind GitHub error:", error);
-    githubMessage.value = "Failed to unbind GitHub account";
-    githubMessageType.value = "error";
+    console.error('Unbind GitHub error:', error);
+    githubMessage.value = 'Failed to unbind GitHub account';
+    githubMessageType.value = 'error';
   } finally {
     unbindingGitHub.value = false;
   }
@@ -729,12 +729,12 @@ const handleUnbindGitHub = async () => {
 const handleSubmit = async () => {
   saving.value = true;
   errors.value = {};
-  message.value = "";
+  message.value = '';
 
   try {
     const payload = {
-      name: form.value.name || "",
-      username: form.value.username || "",
+      name: form.value.name || '',
+      username: form.value.username || '',
       gender: form.value.gender || null,
       email: form.value.email || null,
       mobile: form.value.mobile || null,
@@ -745,17 +745,17 @@ const handleSubmit = async () => {
 
     if (response.data.code === 200) {
       await authStore.fetchUser();
-      form.value.password = "";
-      message.value = "Profile updated successfully!";
-      messageType.value = "success";
+      form.value.password = '';
+      message.value = 'Profile updated successfully!';
+      messageType.value = 'success';
     } else {
-      message.value = response.data.message || "Failed to update profile";
-      messageType.value = "error";
+      message.value = response.data.message || 'Failed to update profile';
+      messageType.value = 'error';
     }
   } catch (error) {
-    console.error("Settings update error:", error);
-    message.value = "Network error, please try again";
-    messageType.value = "error";
+    console.error('Settings update error:', error);
+    message.value = 'Network error, please try again';
+    messageType.value = 'error';
   } finally {
     saving.value = false;
   }
@@ -766,32 +766,32 @@ onMounted(() => {
 
   // 处理 URL 中的 GitHub 绑定结果参数
   const urlParams = new URLSearchParams(window.location.search);
-  const error = urlParams.get("error");
-  const success = urlParams.get("success");
+  const error = urlParams.get('error');
+  const success = urlParams.get('success');
 
   if (error) {
     const errorMessages: Record<string, string> = {
-      not_logged_in: "Please log in first to bind GitHub account",
+      not_logged_in: 'Please log in first to bind GitHub account',
       github_already_bound:
-        "This GitHub account is already bound to another user",
-      github_not_bound: "Your account is not bound to GitHub",
-      invalid_oauth_state: "Invalid OAuth state, please try again",
-      missing_pkce_info: "Missing PKCE information, please try again",
-      github_auth_failed: "GitHub authentication failed, please try again",
+        'This GitHub account is already bound to another user',
+      github_not_bound: 'Your account is not bound to GitHub',
+      invalid_oauth_state: 'Invalid OAuth state, please try again',
+      missing_pkce_info: 'Missing PKCE information, please try again',
+      github_auth_failed: 'GitHub authentication failed, please try again',
     };
-    githubMessage.value = errorMessages[error] || "GitHub binding failed";
-    githubMessageType.value = "error";
+    githubMessage.value = errorMessages[error] || 'GitHub binding failed';
+    githubMessageType.value = 'error';
     // 清除 URL 参数
     window.history.replaceState({}, document.title, window.location.pathname);
   }
 
   if (success) {
     const successMessages: Record<string, string> = {
-      github_bound: "GitHub account bound successfully!",
-      github_unbound: "GitHub account unbound successfully!",
+      github_bound: 'GitHub account bound successfully!',
+      github_unbound: 'GitHub account unbound successfully!',
     };
-    githubMessage.value = successMessages[success] || "Operation successful";
-    githubMessageType.value = "success";
+    githubMessage.value = successMessages[success] || 'Operation successful';
+    githubMessageType.value = 'success';
     // 刷新用户信息
     authStore.fetchUser();
     // 清除 URL 参数

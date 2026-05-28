@@ -1,12 +1,12 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
 interface CardOffset {
   x: number;
   y: number;
 }
 
-const STORAGE_KEY = "readinglist_card_offsets";
+const STORAGE_KEY = 'readinglist_card_offsets';
 
 function loadOffsets(): Record<string, CardOffset> {
   try {
@@ -17,7 +17,7 @@ function loadOffsets(): Record<string, CardOffset> {
   }
 }
 
-export const useCardLayoutStore = defineStore("cardLayout", () => {
+export const useCardLayoutStore = defineStore('cardLayout', () => {
   // -- Editing state machine --
   const isEditing = ref(false);
   const snapshot = ref<Record<string, CardOffset> | null>(null);

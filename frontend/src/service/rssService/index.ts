@@ -1,5 +1,5 @@
-import { rssGateway, type RefreshResult } from "@/api/rssGateway";
-import type { RssArticle, RssArticleListResponse } from "@/types";
+import { rssGateway, type RefreshResult } from '@/api/rssGateway';
+import type { RssArticle, RssArticleListResponse } from '@/types';
 
 // 解析 RSS 响应
 export interface ParsedRssFeed {

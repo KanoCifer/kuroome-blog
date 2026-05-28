@@ -1,7 +1,7 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
-export const useVisitorCountStore = defineStore("visitorCount", () => {
+export const useVisitorCountStore = defineStore('visitorCount', () => {
   const count = ref(0);
   const isConnected = ref(false);
   const visitorId = ref<string | null>(null);

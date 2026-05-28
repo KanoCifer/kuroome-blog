@@ -44,7 +44,7 @@ const emit = defineEmits<{
           class="border-border bg-card text-card-foreground hover:bg-accent inline-flex items-center rounded-xl border px-4 py-2.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60"
           @click="emit('refresh')"
         >
-          {{ isRefreshing ? "刷新中..." : "刷新列表" }}
+          {{ isRefreshing ? '刷新中...' : '刷新列表' }}
         </button>
         <button
           type="button"

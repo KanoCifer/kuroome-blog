@@ -45,7 +45,7 @@
       </div>
       <div
         :style="sectionStyle"
-        class="bg-background/80 absolute left-1/2 -z-5 h-full -translate-x-1/2 rounded-t-[40px] shadow-[0_-8px_30px_rgb(0,0,0,0.04)] dark:bg-slate-900/80 dark:shadow-[0_-8px_30px_rgb(0,0,0,0.2)]"
+        class="bg-background/95 absolute left-1/2 -z-5 h-full -translate-x-1/2 rounded-t-[40px] backdrop-blur-xs"
       ></div>
       <div class="mx-auto max-w-6xl">
         <div

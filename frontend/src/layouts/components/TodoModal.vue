@@ -56,7 +56,9 @@
               class="text-foreground flex items-center gap-2 font-serif text-lg font-bold"
             >
               开发任务
-              <span class="text-muted-foreground text-sm font-normal">{{ tasks.length }}</span>
+              <span class="text-muted-foreground text-sm font-normal">{{
+                tasks.length
+              }}</span>
             </h3>
             <button
               @click="close"
@@ -157,11 +159,7 @@
             </div>
 
             <!-- Three status sections -->
-            <div
-              v-for="section in sections"
-              :key="section.status"
-              class="mb-5"
-            >
+            <div v-for="section in sections" :key="section.status" class="mb-5">
               <!-- Section header -->
               <div class="mb-2 flex items-center gap-2 px-1">
                 <span
@@ -196,7 +194,10 @@
                   :task="task"
                   @cycle-status="todoStore.cycleStatus"
                   @delete-task="todoStore.deleteTask"
-                  @update-task="(id: string, patch: Partial<DevTask>) => todoStore.updateTask(id, patch)"
+                  @update-task="
+                    (id: string, patch: Partial<DevTask>) =>
+                      todoStore.updateTask(id, patch)
+                  "
                 />
               </TransitionGroup>
 
@@ -216,12 +217,12 @@
 </template>
 
 <script setup lang="ts">
-import DevTaskCard from "@/views/todos/components/DevTaskCard.vue";
-import { useTodoDrawer } from "@/composables/useTodoDrawer";
-import type { DevTask, DevTaskPriority } from "@/service/todoService/types";
-import { useTodoStore } from "@/stores/todos";
-import { storeToRefs } from "pinia";
-import { computed, onMounted, ref } from "vue";
+import DevTaskCard from '@/views/todos/components/DevTaskCard.vue';
+import { useTodoDrawer } from '@/composables/useTodoDrawer';
+import type { DevTask, DevTaskPriority } from '@/service/todoService/types';
+import { useTodoStore } from '@/stores/todos';
+import { storeToRefs } from 'pinia';
+import { computed, onMounted, ref } from 'vue';
 
 const todoStore = useTodoStore();
 const { tasks, todoItems, inProgressItems, doneItems } = storeToRefs(todoStore);
@@ -238,25 +239,25 @@ onMounted(() => {
 // Three sections (vertically stacked in drawer)
 const sections = computed(() => [
   {
-    status: "in-progress" as const,
-    title: "开发中",
+    status: 'in-progress' as const,
+    title: '开发中',
     tasks: inProgressItems.value,
-    dotClass: "bg-amber-500",
-    emptyText: "没有开发中任务",
+    dotClass: 'bg-amber-500',
+    emptyText: '没有开发中任务',
   },
   {
-    status: "todo" as const,
-    title: "待办",
+    status: 'todo' as const,
+    title: '待办',
     tasks: todoItems.value,
-    dotClass: "bg-blue-500",
-    emptyText: "没有待开发任务",
+    dotClass: 'bg-blue-500',
+    emptyText: '没有待开发任务',
   },
   {
-    status: "done" as const,
-    title: "已完成",
+    status: 'done' as const,
+    title: '已完成',
     tasks: doneItems.value.slice(0, 8),
-    dotClass: "bg-emerald-500",
-    emptyText: "没有已完成任务",
+    dotClass: 'bg-emerald-500',
+    emptyText: '没有已完成任务',
   },
 ]);
 
@@ -264,10 +265,10 @@ const sections = computed(() => [
 const showAddForm = ref(false);
 
 const newTaskForm = ref({
-  title: "",
-  description: "",
-  dueDate: "",
-  priority: "default" as DevTaskPriority,
+  title: '',
+  description: '',
+  dueDate: '',
+  priority: 'default' as DevTaskPriority,
 });
 
 const submitCreateTask = () => {
@@ -278,12 +279,22 @@ const submitCreateTask = () => {
     dueDate: newTaskForm.value.dueDate || undefined,
     priority: newTaskForm.value.priority,
   });
-  newTaskForm.value = { title: "", description: "", dueDate: "", priority: "default" };
+  newTaskForm.value = {
+    title: '',
+    description: '',
+    dueDate: '',
+    priority: 'default',
+  };
   showAddForm.value = false;
 };
 
 const cancelAdd = () => {
-  newTaskForm.value = { title: "", description: "", dueDate: "", priority: "default" };
+  newTaskForm.value = {
+    title: '',
+    description: '',
+    dueDate: '',
+    priority: 'default',
+  };
   showAddForm.value = false;
 };
 </script>

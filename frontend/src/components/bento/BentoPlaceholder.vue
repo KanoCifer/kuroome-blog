@@ -31,5 +31,5 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from "./BentoCard.vue";
+import BentoCard from './BentoCard.vue';
 </script>

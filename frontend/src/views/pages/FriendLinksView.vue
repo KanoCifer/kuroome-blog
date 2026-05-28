@@ -331,24 +331,24 @@
 </template>
 
 <script setup lang="ts">
-import { BasicDetail } from "@/components/basic";
-import { TagPill } from "@/components/ui/tag-pill";
-import { useImageError } from "@/composables/useImageError";
-import friendLinksData from "@/data/friendlinks.json";
-import websitesData from "@/data/websites.json";
-import { useNotificationStore } from "@/stores/notification";
-import type { Website } from "@/types";
-import { motion } from "motion-v";
-import { nextTick, onMounted, ref } from "vue";
-import twikoo from "twikoo";
-import IconCopy from "@/components/icons/IconCopy.vue";
-import IconDocumentText from "@/components/icons/IconDocumentText.vue";
-import IconExternalLink from "@/components/icons/IconExternalLink.vue";
-import IconGlobeOutline from "@/components/icons/IconGlobeOutline.vue";
-import IconInfoCircle from "@/components/icons/IconInfoCircle.vue";
-import IconLinkChain from "@/components/icons/IconLinkChain.vue";
-import IconRefresh from "@/components/icons/IconRefresh.vue";
-import IconUsersGroup from "@/components/icons/IconUsersGroup.vue";
+import { BasicDetail } from '@/components/basic';
+import { TagPill } from '@/components/ui/tag-pill';
+import { useImageError } from '@/composables/useImageError';
+import friendLinksData from '@/data/friendlinks.json';
+import websitesData from '@/data/websites.json';
+import { useNotificationStore } from '@/stores/notification';
+import type { Website } from '@/types';
+import { motion } from 'motion-v';
+import { nextTick, onMounted, ref } from 'vue';
+import twikoo from 'twikoo';
+import IconCopy from '@/components/icons/IconCopy.vue';
+import IconDocumentText from '@/components/icons/IconDocumentText.vue';
+import IconExternalLink from '@/components/icons/IconExternalLink.vue';
+import IconGlobeOutline from '@/components/icons/IconGlobeOutline.vue';
+import IconInfoCircle from '@/components/icons/IconInfoCircle.vue';
+import IconLinkChain from '@/components/icons/IconLinkChain.vue';
+import IconRefresh from '@/components/icons/IconRefresh.vue';
+import IconUsersGroup from '@/components/icons/IconUsersGroup.vue';
 
 interface FriendLink {
   id: string;
@@ -370,10 +370,10 @@ interface SelfInfo {
 const dailyPick = ref<Website | null>(null);
 const links = ref<FriendLink[]>([]);
 const selfInfo = ref<SelfInfo>({
-  name: "",
-  description: "",
-  url: "",
-  icon: "",
+  name: '',
+  description: '',
+  url: '',
+  icon: '',
   tags: [],
 });
 
@@ -397,10 +397,10 @@ onMounted(async () => {
 
   await nextTick();
   twikoo.init({
-    envId: "https://kanocifer.chat/twikoo",
-    el: "#tcomment",
-    path: "/friend-links",
-    lang: "zh-CN",
+    envId: 'https://kanocifer.chat/twikoo',
+    el: '#tcomment',
+    path: '/friend-links',
+    lang: 'zh-CN',
   });
 });
 
@@ -412,14 +412,14 @@ const copySelfInfo = async () => {
     `- **描述**：${selfInfo.value.description}`,
     `- **URL**：${selfInfo.value.url}`,
     `- **头像**：${selfInfo.value.icon}`,
-  ].join("\n");
+  ].join('\n');
 
   const notice = useNotificationStore();
   try {
     await navigator.clipboard.writeText(md);
-    notice.success("友链信息已复制到剪贴板");
+    notice.success('友链信息已复制到剪贴板');
   } catch {
-    notice.error("复制失败，请手动复制");
+    notice.error('复制失败，请手动复制');
   }
 };
 </script>
@@ -442,7 +442,7 @@ const copySelfInfo = async () => {
 </style>
 
 <style>
-@import "twikoo/dist/twikoo.css";
+@import 'twikoo/dist/twikoo.css';
 
 #tcomment {
   font-size: 0.9375rem;

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { formatDate } from "@/utils/formatdate";
-import { useScroll } from "@vueuse/core";
-import { computed } from "vue";
-import { useRouter } from "vue-router";
+import { formatDate } from '@/utils/formatdate';
+import { useScroll } from '@vueuse/core';
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 
 interface Category {
   id: number;
@@ -54,11 +54,11 @@ const displayDate = computed(() => {
   ) {
     return formatDate(props.updatedDate);
   }
-  return props.publishedDate ? formatDate(props.publishedDate) : "";
+  return props.publishedDate ? formatDate(props.publishedDate) : '';
 });
 
 const formattedDate = computed(() =>
-  props.publishedDate ? formatDate(props.publishedDate) : "",
+  props.publishedDate ? formatDate(props.publishedDate) : '',
 );
 </script>
 
@@ -95,11 +95,11 @@ const formattedDate = computed(() =>
               {{
                 author?.charAt(0).toUpperCase() ||
                 authorInitial?.charAt(0).toUpperCase() ||
-                "K"
+                'K'
               }}
             </div>
             <span class="font-medium text-gray-200"
-              >@{{ author || "Kurroome" }}</span
+              >@{{ author || 'Kurroome' }}</span
             >
           </div>
           <span class="text-gray-50">·</span>
@@ -118,7 +118,7 @@ const formattedDate = computed(() =>
               />
             </svg>
             <span class="text-gray-50">
-              {{ displayDate || formattedDate || "未知时间" }}
+              {{ displayDate || formattedDate || '未知时间' }}
             </span>
           </div>
           <span v-if="showCategory && category" class="flex items-center gap-1">
@@ -175,7 +175,7 @@ const formattedDate = computed(() =>
                 d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
               />
             </svg>
-            {{ backText || "返回" }}
+            {{ backText || '返回' }}
           </button>
 
           <!-- Actions Slot -->

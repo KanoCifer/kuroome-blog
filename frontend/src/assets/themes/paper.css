@@ -1,5 +1,5 @@
 /* Paper — 纸色暖调 */
-[data-color-scheme="paper"] {
+[data-color-scheme='paper'] {
   --radius: 0.625rem;
   --ink: #1a1613;
   --paper: oklch(0.97 0.013 50);
@@ -30,7 +30,7 @@
   --gradient-decorative-to: #d4b396;
 }
 
-[data-color-scheme="paper"].dark {
+[data-color-scheme='paper'].dark {
   --ink: #e8e2da;
   --paper: #1a1613;
   --warm-gray: #2d2722;

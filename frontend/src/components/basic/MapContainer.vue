@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { mapService } from "@/service/mapService";
+import { mapService } from '@/service/mapService';
 import type {
   AMapDriving,
   AMapMapInstance,
@@ -12,14 +12,14 @@ import type {
   AMapNamespace,
   AMapPolyline,
   AMapSecurityConfig,
-} from "@/types/maptype";
-import AMapLoader from "@amap/amap-jsapi-loader";
-import { onMounted, onUnmounted, ref, watch } from "vue";
+} from '@/types/maptype';
+import AMapLoader from '@amap/amap-jsapi-loader';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 
 export interface Props {
   center?: [number, number];
   zoom?: number;
-  viewMode?: "2D" | "3D";
+  viewMode?: '2D' | '3D';
   plugins?: string[];
   markers?: AMapMarker[];
   showToolBar?: boolean;
@@ -30,12 +30,12 @@ export interface Props {
 const props = withDefaults(defineProps<Props>(), {
   center: () => [113.389549, 23.050067],
   zoom: 11,
-  viewMode: "2D",
+  viewMode: '2D',
   plugins: () => [
-    "AMap.Scale",
-    "AMap.ToolBar",
-    "AMap.Geolocation",
-    "AMap.Driving",
+    'AMap.Scale',
+    'AMap.ToolBar',
+    'AMap.Geolocation',
+    'AMap.Driving',
   ],
   markers: () => [],
   showToolBar: true,
@@ -44,9 +44,9 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  (e: "click", event: unknown): void;
-  (e: "markerClick", index: number): void;
-  (e: "mapReady", map: unknown): void;
+  (e: 'click', event: unknown): void;
+  (e: 'markerClick', index: number): void;
+  (e: 'mapReady', map: unknown): void;
 }>();
 
 declare global {
@@ -70,7 +70,7 @@ let clickHandler: ((e: unknown) => void) | null = null;
 const fetchSecurityKey = async (): Promise<string> => {
   try {
     const response = await mapService.getSecurityKey();
-    const encodedKey = response.securityJsCode || "";
+    const encodedKey = response.securityJsCode || '';
 
     if (encodedKey) {
       try {
@@ -85,10 +85,10 @@ const fetchSecurityKey = async (): Promise<string> => {
 
     // Fallback to env var if API returns empty
     // console.warn("[AMap] API returned empty security key, using env var fallback");
-    return import.meta.env.VITE_AMAP_SECURITY_CODE || "";
+    return import.meta.env.VITE_AMAP_SECURITY_CODE || '';
   } catch {
     // console.error("[AMap] Failed to fetch security key:", error);
-    return import.meta.env.VITE_AMAP_SECURITY_CODE || "";
+    return import.meta.env.VITE_AMAP_SECURITY_CODE || '';
   }
 };
 
@@ -99,19 +99,19 @@ onMounted(async () => {
   };
 
   const plugins = [...props.plugins];
-  if (props.showToolBar && !plugins.includes("AMap.ToolBar")) {
-    plugins.push("AMap.ToolBar");
+  if (props.showToolBar && !plugins.includes('AMap.ToolBar')) {
+    plugins.push('AMap.ToolBar');
   }
-  if (props.showScale && !plugins.includes("AMap.Scale")) {
-    plugins.push("AMap.Scale");
+  if (props.showScale && !plugins.includes('AMap.Scale')) {
+    plugins.push('AMap.Scale');
   }
-  if (props.showGeolocation && !plugins.includes("AMap.Geolocation")) {
-    plugins.push("AMap.Geolocation");
+  if (props.showGeolocation && !plugins.includes('AMap.Geolocation')) {
+    plugins.push('AMap.Geolocation');
   }
 
   AMapLoader.load({
     key: import.meta.env.VITE_JS_API,
-    version: "2.0",
+    version: '2.0',
     plugins,
   })
     .then((loadedAMap) => {
@@ -126,7 +126,7 @@ onMounted(async () => {
 
       // 添加控件
       if (props.showToolBar) {
-        const toolbar = new AMap.ToolBar({ position: "RT" });
+        const toolbar = new AMap.ToolBar({ position: 'RT' });
         map.addControl(toolbar);
       }
 
@@ -139,7 +139,7 @@ onMounted(async () => {
         const geolocation = new AMap.Geolocation({
           enableHighAccuracy: true,
           timeout: 10000,
-          buttonPosition: "RB",
+          buttonPosition: 'RB',
           buttonOffset: new AMap.Pixel(10, 20),
         });
         map.addControl(geolocation);
@@ -155,17 +155,17 @@ onMounted(async () => {
           showTraffic: true,
         });
       } catch (error) {
-        console.error("路线规划初始化失败:", error);
+        console.error('路线规划初始化失败:', error);
       }
 
       // 添加点击事件
-      clickHandler = (e: unknown) => emit("click", e);
-      map.on("click", clickHandler);
+      clickHandler = (e: unknown) => emit('click', e);
+      map.on('click', clickHandler);
 
-      emit("mapReady", map);
+      emit('mapReady', map);
     })
     .catch((e: unknown) => {
-      console.error("AMap loading error:", e);
+      console.error('AMap loading error:', e);
     });
 });
 
@@ -180,7 +180,7 @@ const addMarkers = (AMap: AMapNamespace) => {
       offset: new AMap.Pixel(-13, -30),
     });
 
-    marker.on("click", () => emit("markerClick", index));
+    marker.on('click', () => emit('markerClick', index));
     marker.setMap(map);
     markerInstances.push(marker);
   });
@@ -193,7 +193,7 @@ watch(
     if (map) {
       AMapLoader.load({
         key: import.meta.env.VITE_JS_API,
-        version: "2.0",
+        version: '2.0',
       }).then((loadedAMap) => {
         addMarkers(loadedAMap as AMapNamespace);
       });
@@ -229,7 +229,7 @@ const planRoute = (
 ): Promise<{ distance: number; time: number }> => {
   return new Promise((resolve, reject) => {
     if (!map) {
-      reject(new Error("地图未初始化"));
+      reject(new Error('地图未初始化'));
       return;
     }
 
@@ -241,8 +241,8 @@ const planRoute = (
           showTraffic: true,
         });
       } catch (error) {
-        console.error("driving 初始化失败:", error);
-        reject(new Error("路线规划服务初始化失败"));
+        console.error('driving 初始化失败:', error);
+        reject(new Error('路线规划服务初始化失败'));
         return;
       }
     }
@@ -252,9 +252,9 @@ const planRoute = (
 
     driving.search(start, end, (status: string, result: unknown) => {
       // 调试日志
-      console.debug("路线规划回调:", { status, result });
+      console.debug('路线规划回调:', { status, result });
 
-      if (status === "complete" && result && typeof result === "object") {
+      if (status === 'complete' && result && typeof result === 'object') {
         const drivingResult = result as {
           routes?: Array<{
             distance: number;
@@ -268,8 +268,8 @@ const planRoute = (
           const route = drivingResult.routes[0];
 
           if (!route.steps || route.steps.length === 0) {
-            console.error("路线步骤为空:", result);
-            reject(new Error("路线数据不完整"));
+            console.error('路线步骤为空:', result);
+            reject(new Error('路线数据不完整'));
             return;
           }
 
@@ -283,8 +283,8 @@ const planRoute = (
           });
 
           if (path.length === 0) {
-            console.error("路线坐标为空:", result);
-            reject(new Error("路线坐标数据为空"));
+            console.error('路线坐标为空:', result);
+            reject(new Error('路线坐标数据为空'));
             return;
           }
 
@@ -296,15 +296,15 @@ const planRoute = (
             time: route.time,
           });
         } else {
-          console.warn("未找到路线:", drivingResult.info);
-          reject(new Error("未找到可行路线，请检查起终点位置是否可通行"));
+          console.warn('未找到路线:', drivingResult.info);
+          reject(new Error('未找到可行路线，请检查起终点位置是否可通行'));
         }
-      } else if (status === "no_data") {
-        console.warn("无路线数据:", result);
-        reject(new Error("起终点之间无法通行，请尝试其他目的地"));
+      } else if (status === 'no_data') {
+        console.warn('无路线数据:', result);
+        reject(new Error('起终点之间无法通行，请尝试其他目的地'));
       } else {
-        console.error("路线规划失败:", { status, result });
-        reject(new Error("路线规划失败，请检查网络连接或稍后重试"));
+        console.error('路线规划失败:', { status, result });
+        reject(new Error('路线规划失败，请检查网络连接或稍后重试'));
       }
     });
   });
@@ -322,7 +322,7 @@ const clearRoute = () => {
 const getCurrentPosition = (): Promise<[number, number]> => {
   return new Promise((resolve, reject) => {
     if (!map) {
-      reject(new Error("地图未初始化"));
+      reject(new Error('地图未初始化'));
       return;
     }
 
@@ -333,11 +333,11 @@ const getCurrentPosition = (): Promise<[number, number]> => {
     });
 
     geolocation.getCurrentPosition((status: string, result: unknown) => {
-      if (status === "complete") {
+      if (status === 'complete') {
         const geoResult = result as { position: { lng: number; lat: number } };
         resolve([geoResult.position.lng, geoResult.position.lat]);
       } else {
-        reject(new Error("获取位置失败"));
+        reject(new Error('获取位置失败'));
       }
     });
   });
@@ -362,7 +362,7 @@ onUnmounted(() => {
 
   // 解绑地图的点击事件
   if (map && clickHandler) {
-    map.off("click", clickHandler);
+    map.off('click', clickHandler);
     clickHandler = null;
   }
 
@@ -374,7 +374,7 @@ onUnmounted(() => {
 
   // 清除地图容器的 DOM 元素（可选，Vue 会自动清理）
   if (containerRef.value) {
-    containerRef.value.innerHTML = "";
+    containerRef.value.innerHTML = '';
   }
 });
 </script>

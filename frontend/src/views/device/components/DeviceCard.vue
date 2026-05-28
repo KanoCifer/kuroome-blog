@@ -82,7 +82,7 @@
         @click="handleToggleStatus"
         class="bg-brand-devices text-primary-foreground rounded-full px-4 py-3 text-sm font-bold shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {{ isPending ? "处理中..." : isActive ? "标记退役" : "恢复使用" }}
+        {{ isPending ? '处理中...' : isActive ? '标记退役' : '恢复使用' }}
       </button>
       <button
         type="button"
@@ -110,10 +110,10 @@
 </template>
 
 <script setup lang="ts">
-import type { Device } from "@/service/deviceService";
-import dayjs from "dayjs";
-import { computed, ref } from "vue";
-import MilestoneConfigForm from "./MilestoneConfigForm.vue";
+import type { Device } from '@/service/deviceService';
+import dayjs from 'dayjs';
+import { computed, ref } from 'vue';
+import MilestoneConfigForm from './MilestoneConfigForm.vue';
 
 interface Props {
   device: Device;
@@ -129,35 +129,35 @@ const emit = defineEmits<{
 }>();
 
 const isPending = computed(() => props.pendingId === props.device.id);
-const isActive = computed(() => props.device.status === "active");
+const isActive = computed(() => props.device.status === 'active');
 const isMilestoneModalOpen = ref(false);
 
 function formatPrice(price: number, currency: string): string {
-  const normalized = currency?.toUpperCase() ?? "CNY";
-  if (normalized === "CNY") {
+  const normalized = currency?.toUpperCase() ?? 'CNY';
+  if (normalized === 'CNY') {
     return `¥${price.toFixed(2)}`;
   }
   return `$${price.toFixed(2)}`;
 }
 
 function formatPurchaseDate(dateStr: string): string {
-  if (!dateStr) return "";
-  return dayjs(dateStr).format("YYYY-MM-DD");
+  if (!dateStr) return '';
+  return dayjs(dateStr).format('YYYY-MM-DD');
 }
 
 function calcSpendPerDay(device: Device): number {
   const daysInUse = Math.max(
     1,
-    dayjs().diff(dayjs(device.purchase_date), "day"),
+    dayjs().diff(dayjs(device.purchase_date), 'day'),
   );
   return device.price / daysInUse;
 }
 
 function handleToggleStatus() {
-  emit("toggleStatus", props.device);
+  emit('toggleStatus', props.device);
 }
 
 function handleDelete() {
-  emit("delete", props.device);
+  emit('delete', props.device);
 }
 </script>

@@ -16,12 +16,12 @@
 </template>
 
 <script setup lang="ts">
-import { socialService } from "@/service/socialService";
-import { useNotificationStore } from "@/stores/notification";
-import { AxiosError } from "axios";
-import type { AnimationItem } from "lottie-web";
-import { motion } from "motion-v";
-import { onMounted, onUnmounted, ref } from "vue";
+import { socialService } from '@/service/socialService';
+import { useNotificationStore } from '@/stores/notification';
+import { AxiosError } from 'axios';
+import type { AnimationItem } from 'lottie-web';
+import { motion } from 'motion-v';
+import { onMounted, onUnmounted, ref } from 'vue';
 
 const notifier = useNotificationStore();
 const likesCounts = ref<number>(0);
@@ -34,17 +34,17 @@ const fetchLikesCount = async () => {
     const response = await socialService.getLikes();
     likesCounts.value = response.likes_count || 0;
   } catch (error) {
-    console.error("Failed to fetch likes count:", error);
+    console.error('Failed to fetch likes count:', error);
   }
 };
 
 onMounted(async () => {
   // 动态导入lottie-web，实现代码拆分
-  const lottie = await import("lottie-web");
-  const animationData = await import("@/assets/Success Micro Interaction.json");
+  const lottie = await import('lottie-web');
+  const animationData = await import('@/assets/Success Micro Interaction.json');
   anim.value = lottie.default.loadAnimation({
     container: containerRef.value as Element,
-    renderer: "svg",
+    renderer: 'svg',
     loop: false,
     autoplay: false,
     animationData: animationData.default,
@@ -52,7 +52,7 @@ onMounted(async () => {
 
   anim.value.goToAndStop(anim.value.totalFrames - 1, true);
 
-  anim.value.addEventListener("complete", () => {
+  anim.value.addEventListener('complete', () => {
     if (anim.value) {
       anim.value.goToAndStop(anim.value.totalFrames - 1, true);
     }
@@ -71,14 +71,14 @@ const playAnimation = async () => {
     await socialService.likeOnce({ likes_count: 1 });
     likesCounts.value += 1;
   } catch (error) {
-    let errorMsg = "点赞失败，请稍后重试";
+    let errorMsg = '点赞失败，请稍后重试';
     if (error instanceof AxiosError) {
       if (error.response?.status === 429) {
-        errorMsg = "🥳今天已经点赞很多次啦，明天再试试吧！";
+        errorMsg = '🥳今天已经点赞很多次啦，明天再试试吧！';
       }
     }
     notifier.error(errorMsg);
-    console.error("Failed to update likes count:", error);
+    console.error('Failed to update likes count:', error);
   } finally {
     isSubmitting.value = false;
   }

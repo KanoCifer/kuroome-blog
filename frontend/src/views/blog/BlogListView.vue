@@ -381,7 +381,9 @@ const goToPage = (page: number) => {
       delete query.search;
     }
     router.push({ query });
-    document.getElementById('main-content')?.scrollIntoView({ behavior: 'smooth' });
+    document
+      .getElementById('main-content')
+      ?.scrollIntoView({ behavior: 'smooth' });
   }
 };
 

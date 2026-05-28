@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex max-h-[80vh] min-h-[60vh] flex-col rounded-2xl p-4"
+    class="flex max-h-[80vh] min-h-[60vh] flex-col rounded-[2rem] p-5 shadow-md backdrop-blur-md transition-all duration-300 hover:shadow-lg"
     :class="bg"
   >
     <!-- Column header -->

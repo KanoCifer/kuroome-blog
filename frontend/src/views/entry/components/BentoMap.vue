@@ -69,13 +69,13 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from "@/components/bento/BentoCard.vue";
-import { useAnimateNumber } from "@/composables/useAnimateNumber";
-import fishingSpots from "@/data/fishing-spots.json";
-import { fishingService } from "@/service/fishingService";
-import { DEFAULT_MAP_CENTER, useFishingMapStore } from "@/stores/fishingMap";
-import type { TideData } from "@/views/fishing/types";
-import dayjs from "dayjs";
+import BentoCard from '@/components/bento/BentoCard.vue';
+import { useAnimateNumber } from '@/composables/useAnimateNumber';
+import fishingSpots from '@/data/fishing-spots.json';
+import { fishingService } from '@/service/fishingService';
+import { DEFAULT_MAP_CENTER, useFishingMapStore } from '@/stores/fishingMap';
+import type { TideData } from '@/views/fishing/types';
+import dayjs from 'dayjs';
 import {
   Cloud,
   CloudRain,
@@ -83,12 +83,12 @@ import {
   Sun,
   Waves,
   Wind,
-} from "lucide-vue-next";
-import { computed, onMounted, ref, type Component } from "vue";
+} from 'lucide-vue-next';
+import { computed, onMounted, ref, type Component } from 'vue';
 
 const { displayValue: displaySpots, animateTo } = useAnimateNumber();
 const store = useFishingMapStore();
-const lastRecord = ref("--");
+const lastRecord = ref('--');
 const totalRecords = ref(0);
 
 const WEATHER_ICON_MAP: Record<string, Component> = {
@@ -106,7 +106,7 @@ const WEATHER_ICON_MAP: Record<string, Component> = {
 };
 
 const weatherStatus = computed(() => {
-  const text = store.liveWeather?.text || "晴";
+  const text = store.liveWeather?.text || '晴';
   return { icon: WEATHER_ICON_MAP[text] || Sun, text };
 });
 
@@ -115,7 +115,7 @@ const tideStatus = computed(() => {
 });
 
 function deriveTideStatus(tideData: TideData | null): string {
-  if (!tideData?.tideTable?.length) return "未知潮汐";
+  if (!tideData?.tideTable?.length) return '未知潮汐';
 
   const now = dayjs();
   const table = tideData.tideTable;
@@ -123,25 +123,25 @@ function deriveTideStatus(tideData: TideData | null): string {
   for (let i = 0; i < table.length; i++) {
     const tideTime = dayjs(table[i].fxTime);
     if (tideTime.isAfter(now)) {
-      return table[i].type === "H" ? "退潮中" : "涨潮中";
+      return table[i].type === 'H' ? '退潮中' : '涨潮中';
     }
   }
 
-  return "未知潮汐";
+  return '未知潮汐';
 }
 
 function formatRelativeTime(isoString: string): string {
   const now = dayjs();
   const then = dayjs(isoString);
-  const diffMinutes = now.diff(then, "minute");
+  const diffMinutes = now.diff(then, 'minute');
 
-  if (diffMinutes < 1) return "刚刚";
+  if (diffMinutes < 1) return '刚刚';
   if (diffMinutes < 60) return `${diffMinutes}分钟前`;
-  const diffHours = now.diff(then, "hour");
+  const diffHours = now.diff(then, 'hour');
   if (diffHours < 24) return `${diffHours}小时前`;
-  const diffDays = now.diff(then, "day");
+  const diffDays = now.diff(then, 'day');
   if (diffDays < 30) return `${diffDays}天前`;
-  const diffMonths = now.diff(then, "month");
+  const diffMonths = now.diff(then, 'month');
   return `${diffMonths}个月前`;
 }
 

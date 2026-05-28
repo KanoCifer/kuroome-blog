@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { formatDate } from "@/utils/formatdate";
-import { ref } from "vue";
-import type { Comment } from "@/types";
+import { formatDate } from '@/utils/formatdate';
+import { ref } from 'vue';
+import type { Comment } from '@/types';
 
 interface Props {
   comment: Comment;
@@ -17,10 +17,10 @@ const { comment, depth } = props;
 
 // 回复功能状态
 const isReplying = ref(false);
-const replyBody = ref("");
+const replyBody = ref('');
 
 const emit = defineEmits<{
-  (e: "reply", commentId: string, body: string): void;
+  (e: 'reply', commentId: string, body: string): void;
 }>();
 
 const startReply = () => {
@@ -29,14 +29,14 @@ const startReply = () => {
 
 const cancelReply = () => {
   isReplying.value = false;
-  replyBody.value = "";
+  replyBody.value = '';
 };
 
 const submitReply = () => {
   if (!replyBody.value.trim()) return;
-  emit("reply", comment._id || "", replyBody.value.trim());
+  emit('reply', comment._id || '', replyBody.value.trim());
   isReplying.value = false;
-  replyBody.value = "";
+  replyBody.value = '';
 };
 </script>
 
@@ -62,7 +62,7 @@ const submitReply = () => {
               'bg-primary/10 text-primary',
             ]"
           >
-            {{ comment.author?.charAt(0).toUpperCase() || "?" }}
+            {{ comment.author?.charAt(0).toUpperCase() || '?' }}
           </div>
           <div>
             <div class="flex items-center gap-2">
@@ -77,7 +77,7 @@ const submitReply = () => {
               </span>
             </div>
             <div class="text-muted-foreground text-xs">
-              {{ comment.created_at ? formatDate(comment.created_at) : "N/A" }}
+              {{ comment.created_at ? formatDate(comment.created_at) : 'N/A' }}
             </div>
           </div>
         </div>

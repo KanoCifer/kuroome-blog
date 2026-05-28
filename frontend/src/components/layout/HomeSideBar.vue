@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import BentoCalendar from "@/views/entry/components/BentoCalendar.vue";
-import BentoProfileCard from "@/views/entry/components/BentoProfileCard.vue";
-import BentoTech from "@/views/entry/components/BentoTech.vue";
+import BentoCalendar from '@/views/entry/components/BentoCalendar.vue';
+import BentoProfileCard from '@/views/entry/components/BentoProfileCard.vue';
+import BentoTech from '@/views/entry/components/BentoTech.vue';
 </script>

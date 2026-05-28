@@ -116,10 +116,10 @@
             <span class="text-xs">最高潮</span>
           </div>
           <p class="text-foreground text-sm font-semibold dark:text-white">
-            {{ highTide ? highTide.height.toFixed(2) : "--" }}m
+            {{ highTide ? highTide.height.toFixed(2) : '--' }}m
           </p>
           <p class="text-muted-foreground text-xs">
-            {{ highTide?.time ?? "--:--" }}
+            {{ highTide?.time ?? '--:--' }}
           </p>
         </div>
 
@@ -142,10 +142,10 @@
             <span class="text-xs">最低潮</span>
           </div>
           <p class="text-foreground text-sm font-semibold dark:text-white">
-            {{ lowTide ? lowTide.height.toFixed(2) : "--" }}m
+            {{ lowTide ? lowTide.height.toFixed(2) : '--' }}m
           </p>
           <p class="text-muted-foreground text-xs">
-            {{ lowTide?.time ?? "--:--" }}
+            {{ lowTide?.time ?? '--:--' }}
           </p>
         </div>
       </div>
@@ -179,11 +179,11 @@
 </template>
 
 <script setup lang="ts">
-import { HARBOR_OPTIONS, useFishingMapStore } from "@/stores/fishingMap";
-import dayjs from "dayjs";
-import { storeToRefs } from "pinia";
-import { computed, onMounted, onUnmounted, ref } from "vue";
-import VChart from "vue-echarts";
+import { HARBOR_OPTIONS, useFishingMapStore } from '@/stores/fishingMap';
+import dayjs from 'dayjs';
+import { storeToRefs } from 'pinia';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import VChart from 'vue-echarts';
 
 const fishingMapStore = useFishingMapStore();
 const {
@@ -213,18 +213,18 @@ const dateOptions = computed(() =>
   Array(8)
     .fill(null)
     .map((_, i) => {
-      const d = dayjs().add(i, "day");
+      const d = dayjs().add(i, 'day');
       return {
-        value: d.format("YYYYMMDD"),
-        label: d.format("MM-DD"),
-        weekday: d.format("dd"),
+        value: d.format('YYYYMMDD'),
+        label: d.format('MM-DD'),
+        weekday: d.format('dd'),
       };
     }),
 );
 
 const todayStr = computed(() => {
   const opt = dateOptions.value.find((o) => o.value === selectedDate.value);
-  return opt ? `${opt.label} ${opt.weekday}` : dayjs().format("YYYY-MM-DD");
+  return opt ? `${opt.label} ${opt.weekday}` : dayjs().format('YYYY-MM-DD');
 });
 
 // 检测深色模式
@@ -236,7 +236,7 @@ const checkDarkMode = () => {
 const highTide = computed(() => {
   if (!tideData.value) return null;
   const highs: { height: number | string; fxTime: string }[] =
-    tideData.value.tideTable.filter((t) => t.type === "H");
+    tideData.value.tideTable.filter((t) => t.type === 'H');
   if (highs.length === 0) return null;
   let maxEntry = highs[0];
   for (const h of highs) {
@@ -246,7 +246,7 @@ const highTide = computed(() => {
   }
   return {
     height: Number(maxEntry.height),
-    time: dayjs(maxEntry.fxTime).format("HH:mm"),
+    time: dayjs(maxEntry.fxTime).format('HH:mm'),
   };
 });
 
@@ -254,7 +254,7 @@ const highTide = computed(() => {
 const lowTide = computed(() => {
   if (!tideData.value) return null;
   const lows: { height: number | string; fxTime: string }[] =
-    tideData.value.tideTable.filter((t) => t.type === "L");
+    tideData.value.tideTable.filter((t) => t.type === 'L');
   if (lows.length === 0) return null;
   let minEntry = lows[0];
   for (const l of lows) {
@@ -264,16 +264,16 @@ const lowTide = computed(() => {
   }
   return {
     height: Number(minEntry.height),
-    time: dayjs(minEntry.fxTime).format("HH:mm"),
+    time: dayjs(minEntry.fxTime).format('HH:mm'),
   };
 });
 
 const tideOptions = computed(() => {
   if (!tideData.value) return {};
 
-  const textColor = isDarkMode.value ? "#e5e7eb" : "#333";
-  const subTextColor = isDarkMode.value ? "#9ca3af" : "#666";
-  const lineColor = "#06b6d4";
+  const textColor = isDarkMode.value ? '#e5e7eb' : '#333';
+  const subTextColor = isDarkMode.value ? '#9ca3af' : '#666';
+  const lineColor = '#06b6d4';
 
   // 获取当前时间索引
   const now = dayjs();
@@ -287,11 +287,11 @@ const tideOptions = computed(() => {
 
   return {
     tooltip: {
-      trigger: "axis",
+      trigger: 'axis',
       backgroundColor: isDarkMode.value
-        ? "rgba(30, 41, 59, 0.95)"
-        : "rgba(255, 255, 255, 0.95)",
-      borderColor: isDarkMode.value ? "#475569" : "#e5e7eb",
+        ? 'rgba(30, 41, 59, 0.95)'
+        : 'rgba(255, 255, 255, 0.95)',
+      borderColor: isDarkMode.value ? '#475569' : '#e5e7eb',
       borderWidth: 1,
       borderRadius: 8,
       padding: [12, 16],
@@ -301,7 +301,7 @@ const tideOptions = computed(() => {
       },
       formatter: (params: unknown[]) => {
         const param = params[0] as { axisValue: string; data: number };
-        const timeStr = dayjs(param.axisValue).format("HH:mm");
+        const timeStr = dayjs(param.axisValue).format('HH:mm');
         return `<div style="padding: 2px 0;">
           <div style="font-weight: 600; margin-bottom: 4px;">${timeStr}</div>
           <div>潮高: <span style="color: ${lineColor}; font-weight: bold;">${param.data.toFixed(2)} m</span></div>
@@ -309,29 +309,29 @@ const tideOptions = computed(() => {
       },
     },
     grid: {
-      left: "4%",
-      right: "4%",
-      bottom: "12%",
-      top: "10%",
+      left: '4%',
+      right: '4%',
+      bottom: '12%',
+      top: '10%',
       containLabel: false,
     },
     xAxis: {
-      type: "category",
+      type: 'category',
       data: tideData.value.tideHourly.map((point) => point.fxTime),
       axisLabel: {
-        formatter: (value: string) => dayjs(value).format("HH:mm"),
+        formatter: (value: string) => dayjs(value).format('HH:mm'),
         color: subTextColor,
         fontSize: 11,
         interval: Math.max(1, Math.floor(tideData.value.tideHourly.length / 5)),
       },
       axisLine: {
-        lineStyle: { color: isDarkMode.value ? "#334155" : "#e5e7eb" },
+        lineStyle: { color: isDarkMode.value ? '#334155' : '#e5e7eb' },
       },
       axisTick: { show: false },
       splitLine: { show: false },
     },
     yAxis: {
-      type: "value",
+      type: 'value',
       axisLabel: {
         color: subTextColor,
         fontSize: 11,
@@ -341,18 +341,18 @@ const tideOptions = computed(() => {
       axisTick: { show: false },
       splitLine: {
         lineStyle: {
-          color: isDarkMode.value ? "#1e293b" : "#f1f5f9",
-          type: "dashed",
+          color: isDarkMode.value ? '#1e293b' : '#f1f5f9',
+          type: 'dashed',
         },
       },
     },
     series: [
       {
-        name: "潮高",
+        name: '潮高',
         data: tideData.value.tideHourly.map((point) => Number(point.height)),
-        type: "line",
+        type: 'line',
         smooth: 0.4,
-        symbol: "none",
+        symbol: 'none',
         lineStyle: {
           color: lineColor,
           width: 2.5,
@@ -362,46 +362,46 @@ const tideOptions = computed(() => {
         },
         areaStyle: {
           color: {
-            type: "linear",
+            type: 'linear',
             x: 0,
             y: 0,
             x2: 0,
             y2: 1,
             colorStops: [
-              { offset: 0, color: "rgba(6, 182, 212, 0.25)" },
-              { offset: 0.7, color: "rgba(6, 182, 212, 0.05)" },
-              { offset: 1, color: "rgba(6, 182, 212, 0)" },
+              { offset: 0, color: 'rgba(6, 182, 212, 0.25)' },
+              { offset: 0.7, color: 'rgba(6, 182, 212, 0.05)' },
+              { offset: 1, color: 'rgba(6, 182, 212, 0)' },
             ],
           },
         },
         markLine:
           currentTimeIndex >= 0
             ? {
-                symbol: ["none", "none"],
+                symbol: ['none', 'none'],
                 lineStyle: {
-                  color: "#f59e0b",
-                  type: "dashed",
+                  color: '#f59e0b',
+                  type: 'dashed',
                   width: 1.5,
                 },
                 label: {
                   show: true,
-                  formatter: "现在",
-                  color: "#f59e0b",
-                  fontWeight: "600",
+                  formatter: '现在',
+                  color: '#f59e0b',
+                  fontWeight: '600',
                   fontSize: 12,
                 },
                 data: [{ xAxis: currentTimeIndex }],
               }
             : undefined,
         markPoint: {
-          symbol: "circle",
+          symbol: 'circle',
           symbolSize: 6,
           label: {
             show: true,
-            position: "top",
+            position: 'top',
             color: textColor,
             fontSize: 10,
-            fontWeight: "600",
+            fontWeight: '600',
             formatter: (p: { name: string; value: string }) =>
               `${p.name}\n${p.value}`,
             lineHeight: 14,
@@ -413,7 +413,7 @@ const tideOptions = computed(() => {
 });
 
 onMounted(() => {
-  darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+  darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
   checkDarkMode();
   if (!panelTideData.value) {
     void fishingMapStore.fetchPanelTide(
@@ -421,11 +421,11 @@ onMounted(() => {
       selectedDateState.value,
     );
   }
-  darkModeMediaQuery.addEventListener("change", checkDarkMode);
+  darkModeMediaQuery.addEventListener('change', checkDarkMode);
 });
 
 onUnmounted(() => {
-  darkModeMediaQuery?.removeEventListener("change", checkDarkMode);
+  darkModeMediaQuery?.removeEventListener('change', checkDarkMode);
   darkModeMediaQuery = null;
 });
 </script>

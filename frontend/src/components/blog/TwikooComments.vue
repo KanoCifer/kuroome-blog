@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useTwikoo } from "@/composables/useTwikoo";
-import { nextTick, watch } from "vue";
+import { useTwikoo } from '@/composables/useTwikoo';
+import { nextTick, watch } from 'vue';
 
 const props = defineProps<{
   path?: string;
@@ -12,7 +12,7 @@ watch(
     if (path) {
       await nextTick();
       useTwikoo({
-        el: "#tcomment",
+        el: '#tcomment',
         path,
       });
     }
@@ -22,7 +22,9 @@ watch(
 </script>
 
 <template>
-  <div class="border-border bg-card overflow-hidden rounded-2xl border shadow-sm">
+  <div
+    class="border-border bg-card overflow-hidden rounded-2xl border shadow-sm"
+  >
     <div class="border-border flex gap-2 border-b px-8 py-5">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -50,5 +52,5 @@ watch(
 </template>
 
 <style>
-@import "twikoo/dist/twikoo.css";
+@import 'twikoo/dist/twikoo.css';
 </style>

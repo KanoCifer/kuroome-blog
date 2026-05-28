@@ -14,9 +14,9 @@
 </template>
 
 <script setup lang="ts">
-import IconAnalytics from "@/components/icons/IconAnalytics.vue";
-import { computed } from "vue";
-import VChart from "vue-echarts";
+import IconAnalytics from '@/components/icons/IconAnalytics.vue';
+import { computed } from 'vue';
+import VChart from 'vue-echarts';
 
 interface BrowserStat {
   browser_name: string;
@@ -48,63 +48,63 @@ const browserChartOption = computed(() => {
     processedData = [
       ...top9,
       {
-        browser_name: "Others",
-        browser_version: "",
+        browser_name: 'Others',
+        browser_version: '',
         count: othersCount,
       },
     ];
   }
 
   const colorPalette = [
-    "#3b82f6", // Chrome 蓝
-    "#ea4335", // Edge/Google 红
-    "#4285f4", // Firefox 蓝
-    "#fbbd00", // Safari 黄
-    "#00bfa5", // Opera 青
-    "#7b1fa2", // IE 紫
-    "#f06292", // 其他浏览器 粉
-    "#ff9800", // 橙
+    '#3b82f6', // Chrome 蓝
+    '#ea4335', // Edge/Google 红
+    '#4285f4', // Firefox 蓝
+    '#fbbd00', // Safari 黄
+    '#00bfa5', // Opera 青
+    '#7b1fa2', // IE 紫
+    '#f06292', // 其他浏览器 粉
+    '#ff9800', // 橙
   ];
 
   return {
     tooltip: {
-      trigger: "item",
-      backgroundColor: "rgba(255, 255, 255, 0.95)",
-      borderColor: "#e5e7eb",
+      trigger: 'item',
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#e5e7eb',
       textStyle: {
-        color: "#374151",
+        color: '#374151',
       },
-      formatter: "{b}: {c} ({d}%)",
+      formatter: '{b}: {c} ({d}%)',
     },
     legend: {
-      orient: "vertical",
-      left: "left",
-      top: "center",
+      orient: 'vertical',
+      left: 'left',
+      top: 'center',
       textStyle: {
-        color: "#6b7280",
+        color: '#6b7280',
       },
     },
     series: [
       {
-        name: "Browser",
-        type: "pie",
-        radius: ["40%", "70%"],
-        center: ["65%", "50%"],
+        name: 'Browser',
+        type: 'pie',
+        radius: ['40%', '70%'],
+        center: ['65%', '50%'],
         avoidLabelOverlap: false,
         itemStyle: {
           borderRadius: 8,
-          borderColor: "#fff",
+          borderColor: '#fff',
           borderWidth: 2,
         },
         label: {
           show: false,
-          position: "center",
+          position: 'center',
         },
         emphasis: {
           label: {
             show: true,
             fontSize: 20,
-            fontWeight: "bold",
+            fontWeight: 'bold',
           },
         },
         labelLine: {
@@ -113,8 +113,8 @@ const browserChartOption = computed(() => {
         data: processedData.map((item, index) => ({
           value: item.count,
           name: item.browser_name
-            ? `${item.browser_name} ${item.browser_version || ""}`.trim()
-            : "Unknown",
+            ? `${item.browser_name} ${item.browser_version || ''}`.trim()
+            : 'Unknown',
           itemStyle: {
             color: colorPalette[index % colorPalette.length],
           },

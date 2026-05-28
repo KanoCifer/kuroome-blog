@@ -1,8 +1,8 @@
-import { rssService } from "@/service/rssService";
-import type { RssArticle } from "@/types";
-import { useNotificationStore } from "@/stores/notification";
-import { computed, ref } from "vue";
-import { useRouter } from "vue-router";
+import { rssService } from '@/service/rssService';
+import type { RssArticle } from '@/types';
+import { useNotificationStore } from '@/stores/notification';
+import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 export const useRssArticles = () => {
   const router = useRouter();
@@ -10,12 +10,12 @@ export const useRssArticles = () => {
 
   const articles = ref<RssArticle[]>([]);
   const articlesLoading = ref(false);
-  const articlesError = ref("");
+  const articlesError = ref('');
   const currentPage = ref(1);
   const totalItems = ref(0);
   const limit = 20;
-  const searchQuery = ref("");
-  const selectedFeedUrl = ref("");
+  const searchQuery = ref('');
+  const selectedFeedUrl = ref('');
 
   const totalPages = computed(() => Math.ceil(totalItems.value / limit));
 
@@ -33,7 +33,7 @@ export const useRssArticles = () => {
 
     try {
       await router.replace({
-        path: "/rss",
+        path: '/rss',
         query,
       });
     } catch {
@@ -43,7 +43,7 @@ export const useRssArticles = () => {
 
   const fetchArticles = async (page = 1): Promise<void> => {
     articlesLoading.value = true;
-    articlesError.value = "";
+    articlesError.value = '';
 
     try {
       const params: Record<string, number | string> = {
@@ -66,9 +66,9 @@ export const useRssArticles = () => {
       totalItems.value = response.total;
       currentPage.value = response.page;
     } catch (error: unknown) {
-      console.error("fetch articles error:", error);
+      console.error('fetch articles error:', error);
       articlesError.value =
-        error instanceof Error ? error.message : "加载文章失败";
+        error instanceof Error ? error.message : '加载文章失败';
       notifier.error(articlesError.value);
     } finally {
       articlesLoading.value = false;
@@ -81,7 +81,7 @@ export const useRssArticles = () => {
   };
 
   const clearSearch = async (): Promise<void> => {
-    searchQuery.value = "";
+    searchQuery.value = '';
     await handleSearch();
   };
 
@@ -99,7 +99,7 @@ export const useRssArticles = () => {
   };
 
   const clearFeedFilter = async (): Promise<void> => {
-    selectedFeedUrl.value = "";
+    selectedFeedUrl.value = '';
     await syncRouteQuery(1);
     await fetchArticles(1);
   };
@@ -107,10 +107,10 @@ export const useRssArticles = () => {
   const initFromRoute = (
     routeQuery: Record<string, string | undefined>,
   ): void => {
-    if (typeof routeQuery.feed_url === "string") {
+    if (typeof routeQuery.feed_url === 'string') {
       selectedFeedUrl.value = routeQuery.feed_url;
     }
-    if (typeof routeQuery.search === "string") {
+    if (typeof routeQuery.search === 'string') {
       searchQuery.value = routeQuery.search;
     }
   };

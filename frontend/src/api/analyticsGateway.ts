@@ -1,5 +1,5 @@
-import request from "@/api/request";
-import type { ApiResponse } from "@/api/request";
+import request from '@/api/request';
+import type { ApiResponse } from '@/api/request';
 
 export interface AnalyticsOverviewData {
   code?: number;
@@ -20,7 +20,7 @@ export interface AnalyticsGateway {
 export const analyticsGateway: AnalyticsGateway = {
   async getOverview(days: number): Promise<AnalyticsOverviewData> {
     const res = await request.get<ApiResponse<Record<string, unknown>>>(
-      "v1/status/overview",
+      'v1/status/overview',
       {
         params: { days },
       },
@@ -34,7 +34,7 @@ export const analyticsGateway: AnalyticsGateway = {
     page_size: number;
   }): Promise<AnalyticsOverviewData> {
     const res = await request.get<ApiResponse<Record<string, unknown>>>(
-      "v1/status/user-logins",
+      'v1/status/user-logins',
       {
         params,
       },
@@ -43,7 +43,7 @@ export const analyticsGateway: AnalyticsGateway = {
   },
 
   async reportVisitorData(data: Record<string, unknown>): Promise<void> {
-    await request.post("/v1/admin/track", data, {
+    await request.post('/v1/admin/track', data, {
       timeout: 5000,
       withCredentials: true,
     });

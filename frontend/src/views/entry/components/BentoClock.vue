@@ -16,16 +16,16 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from "@/components/bento/BentoCard.vue";
-import { useNow } from "@vueuse/core";
-import dayjs from "dayjs";
-import { computed } from "vue";
+import BentoCard from '@/components/bento/BentoCard.vue';
+import { useNow } from '@vueuse/core';
+import dayjs from 'dayjs';
+import { computed } from 'vue';
 
 // Updates every 1000ms (1 second)
 const now = useNow({ interval: 1000 });
 
-const hourLabel = computed(() => dayjs(now.value).format("HH"));
-const minuteLabel = computed(() => dayjs(now.value).format("mm"));
-const dateLabel = computed(() => dayjs(now.value).format("YYYY-MM-DD"));
-const weekdayLabel = computed(() => dayjs(now.value).format("dddd"));
+const hourLabel = computed(() => dayjs(now.value).format('HH'));
+const minuteLabel = computed(() => dayjs(now.value).format('mm'));
+const dateLabel = computed(() => dayjs(now.value).format('YYYY-MM-DD'));
+const weekdayLabel = computed(() => dayjs(now.value).format('dddd'));
 </script>

@@ -1,5 +1,5 @@
 /* Forest Green — 森林绿 */
-[data-color-scheme="forest-green"] {
+[data-color-scheme='forest-green'] {
   --radius: 0.625rem;
   --ink: oklch(0.13 0.028 145);
   --paper: oklch(0.97 0.013 131);
@@ -25,7 +25,7 @@
   --gradient-decorative-to: oklch(0.45 0.1 180 / 0.2);
 }
 
-[data-color-scheme="forest-green"].dark {
+[data-color-scheme='forest-green'].dark {
   --ink: oklch(0.985 0.005 145);
   --paper: oklch(0.15 0.02 145);
   --warm-gray: oklch(0.28 0.03 145);

@@ -1,7 +1,7 @@
-import { fetchAndStoreCSRF } from "@/api/csrf";
-import request from "@/api/request";
-import type { UserInfo } from "@/auth/types";
-import type { PublicKeyCredentialRequestOptionsJSON } from "@simplewebauthn/browser";
+import { fetchAndStoreCSRF } from '@/api/csrf';
+import request from '@/api/request';
+import type { UserInfo } from '@/auth/types';
+import type { PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/browser';
 
 interface ApiResponse<T> {
   data: T;
@@ -61,13 +61,13 @@ function buildLoginResult(data: LoginResponseData): LoginResult {
 }
 
 function emptyLoginResult(): LoginResult {
-  return { user: null, refreshToken: "", raw: undefined };
+  return { user: null, refreshToken: '', raw: undefined };
 }
 
 export function createAuthGateway(): AuthGateway {
   return {
     async fetchUser(): Promise<UserInfo | null> {
-      const res = await request.get<ApiResponse<UserInfo | null>>("v1/auth/me");
+      const res = await request.get<ApiResponse<UserInfo | null>>('v1/auth/me');
       return res.data.data || null;
     },
 
@@ -78,7 +78,7 @@ export function createAuthGateway(): AuthGateway {
     async getPasskeyAuthenticationOptions(): Promise<PublicKeyCredentialRequestOptionsJSON> {
       const res = await request.get<
         ApiResponse<PublicKeyCredentialRequestOptionsJSON>
-      >("v1/auth/passkey/authentication-options");
+      >('v1/auth/passkey/authentication-options');
       return res.data.data;
     },
 
@@ -88,7 +88,7 @@ export function createAuthGateway(): AuthGateway {
       rememberMe: boolean,
     ): Promise<LoginResult> {
       const res = await request.post<ApiResponse<LoginResponseData>>(
-        "v1/auth/login",
+        'v1/auth/login',
         {
           username: username,
           password: password,
@@ -102,7 +102,7 @@ export function createAuthGateway(): AuthGateway {
 
     async loginWithPasskey(assertion: unknown): Promise<PasskeyLoginResult> {
       const res = await request.post<ApiResponse<LoginResponseData>>(
-        "v1/auth/passkey/authenticate",
+        'v1/auth/passkey/authenticate',
         {
           assertion: assertion,
         },
@@ -113,11 +113,11 @@ export function createAuthGateway(): AuthGateway {
     },
 
     async logout(): Promise<void> {
-      await request.post("v1/auth/logout");
+      await request.post('v1/auth/logout');
     },
 
     loginWithGitHub(): void {
-      window.location.href = "/api/v1/auth/github";
+      window.location.href = '/api/v1/auth/github';
     },
   };
 }

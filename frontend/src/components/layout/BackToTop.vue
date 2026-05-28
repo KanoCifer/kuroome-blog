@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useScroll, useWindowSize } from "@vueuse/core";
-import { computed, onBeforeUnmount, onMounted, ref, watchEffect } from "vue";
+import { useScroll, useWindowSize } from '@vueuse/core';
+import { computed, onBeforeUnmount, onMounted, ref, watchEffect } from 'vue';
 const isHovered = ref(false);
 
 // useScroll 会自动监听滚动事件并暴露 x/y 值
@@ -51,7 +51,7 @@ const scrollProgress = computed(() =>
 const scrollToTop = () => {
   window.scrollTo({
     top: 0,
-    behavior: "smooth",
+    behavior: 'smooth',
   });
 };
 </script>

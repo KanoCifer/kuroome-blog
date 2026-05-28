@@ -28,7 +28,7 @@
       <p
         class="text-foreground mb-0 items-center font-serif text-xl font-bold dark:text-white"
       >
-        {{ isEditing ? "Edit Book" : "Add to ReadingList" }}
+        {{ isEditing ? 'Edit Book' : 'Add to ReadingList' }}
       </p>
       <button
         v-if="isEditing"
@@ -128,7 +128,7 @@
                 : 'bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-ring focus:ring-2 focus:ring-offset-2 dark:ring-offset-gray-800',
             ]"
           >
-            {{ isEditing ? "Update Book" : "Add Book" }}
+            {{ isEditing ? 'Update Book' : 'Add Book' }}
           </button>
         </div>
       </form>
@@ -137,26 +137,26 @@
 </template>
 
 <script setup lang="ts">
-import { bookService } from "@/service/bookService";
-import { useNotificationStore } from "@/stores/notification";
-import type { ADDBookForm, BookItem } from "@/types";
-import { reactive, ref } from "vue";
-const emit = defineEmits(["book-added", "book-updated"]);
+import { bookService } from '@/service/bookService';
+import { useNotificationStore } from '@/stores/notification';
+import type { ADDBookForm, BookItem } from '@/types';
+import { reactive, ref } from 'vue';
+const emit = defineEmits(['book-added', 'book-updated']);
 
 const submitting = ref<boolean>(false);
 const isEditing = ref<boolean>(false);
 const isCollapsed = ref<boolean>(true);
 const editingBookId = ref<number | null>(null);
 const form = reactive<ADDBookForm>({
-  title: "",
-  author: "",
+  title: '',
+  author: '',
   iscompleted: false,
 });
 
 async function submitForm() {
   // 防止重复提交 & 简单校验
   if (!form.title.trim() || !form.author.trim()) {
-    useNotificationStore().error("标题和作者不能为空");
+    useNotificationStore().error('标题和作者不能为空');
     return;
   }
   if (submitting.value) return;
@@ -170,8 +170,8 @@ async function submitForm() {
         author: form.author,
         iscompleted: form.iscompleted,
       });
-      useNotificationStore().success("书籍更新成功");
-      emit("book-updated"); // 通知父组件刷新书籍列表
+      useNotificationStore().success('书籍更新成功');
+      emit('book-updated'); // 通知父组件刷新书籍列表
       resetForm();
     } else {
       // 添加模式：添加书籍
@@ -180,15 +180,15 @@ async function submitForm() {
         author: form.author,
         iscompleted: form.iscompleted,
       });
-      useNotificationStore().success("书籍添加成功");
-      emit("book-added"); // 通知父组件刷新书籍列表
+      useNotificationStore().success('书籍添加成功');
+      emit('book-added'); // 通知父组件刷新书籍列表
       resetForm();
     }
   } catch {
     useNotificationStore().error(
       isEditing.value
-        ? "更新书籍失败，请稍后重试。"
-        : "添加书籍失败，请稍后重试。",
+        ? '更新书籍失败，请稍后重试。'
+        : '添加书籍失败，请稍后重试。',
     );
   } finally {
     submitting.value = false;
@@ -197,8 +197,8 @@ async function submitForm() {
 
 // 重置表单
 function resetForm() {
-  form.title = "";
-  form.author = "";
+  form.title = '';
+  form.author = '';
   form.iscompleted = false;
   isEditing.value = false;
   editingBookId.value = null;

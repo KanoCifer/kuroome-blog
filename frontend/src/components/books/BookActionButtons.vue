@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { BookItem } from "@/types";
-import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
-import { Modal } from "ant-design-vue";
-import { computed, createVNode } from "vue";
+import type { BookItem } from '@/types';
+import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
+import { Modal } from 'ant-design-vue';
+import { computed, createVNode } from 'vue';
 
 const props = withDefaults(
   defineProps<{
@@ -19,22 +19,22 @@ const bookDoubanUrl = computed(() => {
 });
 
 const emit = defineEmits<{
-  "toggle-status": [book: BookItem];
-  "delete-book": [book: BookItem];
-  "edit-book": [book: BookItem];
+  'toggle-status': [book: BookItem];
+  'delete-book': [book: BookItem];
+  'edit-book': [book: BookItem];
 }>();
 
 const showDeleteConfirm = () => {
   Modal.confirm({
-    title: "Are you sure delete this Book?",
+    title: 'Are you sure delete this Book?',
     icon: createVNode(ExclamationCircleOutlined),
-    content: "The action cannot be undone.",
-    okText: "Yes",
-    okType: "danger",
-    cancelText: "No",
+    content: 'The action cannot be undone.',
+    okText: 'Yes',
+    okType: 'danger',
+    cancelText: 'No',
     centered: true,
     onOk() {
-      emit("delete-book", props.book);
+      emit('delete-book', props.book);
     },
     onCancel() {},
   });
@@ -78,7 +78,7 @@ const showDeleteConfirm = () => {
           d="M5 13l4 4L19 7"
         />
       </svg>
-      {{ book.iscompleted ? "Undo" : "Finish" }}
+      {{ book.iscompleted ? 'Undo' : 'Finish' }}
     </button>
 
     <button
