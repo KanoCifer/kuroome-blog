@@ -20,6 +20,7 @@
 - [commands.md](.claude/rules/commands.md) — 所有构建/测试/格式化命令
 - [code-style.md](.claude/rules/code-style.md) — 代码风格规范
 - [architecture.md](.claude/rules/architecture.md) — 架构分层、API 约定、关键约束
+- [design-system.md](.claude/rules/design-system.md) — 语义化 token、组件样式规则、禁止事项
 - [domain.md](.claude/rules/domain.md) — 领域词汇表
 - [environment.md](.claude/rules/environment.md) — 环境变量、关键文件
 

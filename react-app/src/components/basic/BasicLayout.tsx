@@ -6,6 +6,7 @@ import { useLocation } from 'react-router-dom';
 import { Outlet } from 'react-router-dom';
 import { BackToTop } from './BackToTop';
 import { BasicNav } from './BasicNav';
+import { CookieConsent } from './CookieConsent';
 import { NavVisibilityProvider } from './NavVisibilityContext';
 import { Notifier } from './NotificationContainer';
 
@@ -53,6 +54,7 @@ export function BasicLayout() {
         <BackToTop className="fixed right-4 bottom-30" />
       </div>
 
+      <CookieConsent />
       {createPortal(<Notifier />, document.body)}
     </NavVisibilityProvider>
   );
