@@ -2,6 +2,7 @@
   <BasicDetail
     :title="activeCategory ? `Category: ${activeCategory}` : 'Blog'"
     subtitle="分享阅读心得、技术思考与读书笔记"
+    :onBack="() => $router.push('/')"
   >
     <div class="col-span-full container mx-auto min-h-dvh max-w-6xl px-4 py-8">
       <div class="mb-6 flex flex-col gap-4">
@@ -78,86 +79,95 @@
       <div class="flex flex-col gap-8 lg:flex-row">
         <!-- Main Content -->
         <div class="min-w-0 flex-1">
-          <div class="space-y-6">
-            <!-- Loading State -->
+          <!-- Loading State -->
+          <div
+            v-if="isLoading"
+            class="border-border bg-card flex flex-col items-center justify-center rounded-xl border px-6 py-16 text-center"
+          >
             <div
-              v-if="isLoading"
-              class="border-border bg-card flex flex-col items-center justify-center rounded-xl border px-6 py-16 text-center"
-            >
-              <div
-                class="border-primary/20 border-t-primary mb-4 h-10 w-10 animate-spin rounded-full border-4"
-              ></div>
-              <p class="text-muted-foreground">加载中...</p>
-            </div>
-
-            <!-- Error State -->
-            <div
-              v-else-if="errorMessage"
-              class="border-destructive/30 bg-destructive/10 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-16 text-center"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="text-destructive/60 mb-4 h-12 w-12"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-                />
-              </svg>
-              <p class="text-destructive text-lg font-medium">加载失败</p>
-              <p class="text-destructive/80 mt-1 text-sm">{{ errorMessage }}</p>
-              <button
-                class="bg-destructive hover:bg-destructive/90 focus:ring-ring mt-4 rounded-lg px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-offset-2 focus:outline-none"
-                @click="fetchPosts(1)"
-              >
-                重试
-              </button>
-            </div>
-
-            <!-- Empty State -->
-            <div
-              v-else-if="posts.length === 0"
-              class="border-border bg-muted flex flex-col items-center justify-center rounded-xl border border-dashed px-6 py-16 text-center"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="text-muted-foreground/40 mb-4 h-12 w-12"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
-                />
-              </svg>
-              <p class="text-muted-foreground text-lg font-medium">
-                No blog posts available.
-              </p>
-              <p class="text-muted-foreground/70 mt-1 text-sm">
-                {{
-                  activeCategory
-                    ? "There are no posts in this category yet."
-                    : "Check back later for new content."
-                }}
-              </p>
-            </div>
-
-            <!-- Blog Post Item -->
-            <BlogListItem
-              v-for="(post, index) in posts"
-              :key="post._id"
-              :post="post"
-              :index="index"
-            />
+              class="border-primary/20 border-t-primary mb-4 h-10 w-10 animate-spin rounded-full border-4"
+            ></div>
+            <p class="text-muted-foreground">加载中...</p>
           </div>
+
+          <!-- Error State -->
+          <div
+            v-else-if="errorMessage"
+            class="border-destructive/30 bg-destructive/10 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-16 text-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="text-destructive/60 mb-4 h-12 w-12"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+              />
+            </svg>
+            <p class="text-destructive text-lg font-medium">加载失败</p>
+            <p class="text-destructive/80 mt-1 text-sm">{{ errorMessage }}</p>
+            <button
+              class="bg-destructive hover:bg-destructive/90 focus:ring-ring mt-4 rounded-lg px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-offset-2 focus:outline-none"
+              @click="fetchPosts(1)"
+            >
+              重试
+            </button>
+          </div>
+
+          <!-- Empty State -->
+          <div
+            v-else-if="posts.length === 0"
+            class="border-border bg-muted flex flex-col items-center justify-center rounded-xl border border-dashed px-6 py-16 text-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="text-muted-foreground/40 mb-4 h-12 w-12"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
+              />
+            </svg>
+            <p class="text-muted-foreground text-lg font-medium">
+              No blog posts available.
+            </p>
+            <p class="text-muted-foreground/70 mt-1 text-sm">
+              {{
+                activeCategory
+                  ? 'There are no posts in this category yet.'
+                  : 'Check back later for new content.'
+              }}
+            </p>
+          </div>
+
+          <!-- Blog Post List with page transition -->
+          <AnimatePresence v-else mode="wait">
+            <motion.div
+              :key="currentPage"
+              :initial="{ opacity: 0, y: 12 }"
+              :animate="{ opacity: 1, y: 0 }"
+              :exit="{ opacity: 0, y: -12 }"
+              :transition="{ duration: 0.25, ease: 'easeInOut' }"
+              class="space-y-6"
+            >
+              <BlogListItem
+                v-for="(post, index) in posts"
+                :key="post._id"
+                :post="post"
+                :index="index"
+              />
+            </motion.div>
+          </AnimatePresence>
 
           <!-- Pagination -->
           <nav
@@ -268,17 +278,18 @@
 </template>
 
 <script setup lang="ts">
-import BasicDetail from "@/components/basic/BasicDetail.vue";
-import { blogService } from "@/service/blogService";
-import { useNotificationStore } from "@/stores/notification";
-import type { BlogPagination, Category, Post } from "@/types";
-import BentoCalendar from "@/views/entry/components/BentoCalendar.vue";
-import BentoProfileCard from "@/views/entry/components/BentoProfileCard.vue";
-import { useHead } from "@unhead/vue";
-import { computed, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import BentoCategory from "./components/BentoCategory.vue";
-import BlogListItem from "./components/BlogListItem.vue";
+import BasicDetail from '@/components/basic/BasicDetail.vue';
+import { blogService } from '@/service/blogService';
+import { useNotificationStore } from '@/stores/notification';
+import type { BlogPagination, Category, Post } from '@/types';
+import BentoCalendar from '@/views/entry/components/BentoCalendar.vue';
+import BentoProfileCard from '@/views/entry/components/BentoProfileCard.vue';
+import { useHead } from '@unhead/vue';
+import { AnimatePresence, motion } from 'motion-v';
+import { computed, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import BentoCategory from './components/BentoCategory.vue';
+import BlogListItem from './components/BlogListItem.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -286,8 +297,8 @@ const posts = ref<Post[]>([]);
 const categories = ref<Category[]>([]);
 const pagination = ref<BlogPagination | null>(null);
 const isLoading = ref(false);
-const errorMessage = ref("");
-const searchQuery = ref<string>("");
+const errorMessage = ref('');
+const searchQuery = ref<string>('');
 
 const user = ref({
   isAuthenticated: true,
@@ -300,7 +311,7 @@ const activeCategory = ref<string | null>(null);
 const currentPage = ref(1);
 
 const parsePageFromQuery = (pageQuery: unknown): number => {
-  if (typeof pageQuery !== "string") {
+  if (typeof pageQuery !== 'string') {
     return 1;
   }
 
@@ -330,18 +341,18 @@ const getVisiblePages = computed(() => {
 
 const fetchPosts = async (page: number = 1) => {
   isLoading.value = true;
-  errorMessage.value = "";
+  errorMessage.value = '';
 
   try {
     const params: Record<string, string | number> = { page };
-    if (route.query.search && typeof route.query.search === "string") {
+    if (route.query.search && typeof route.query.search === 'string') {
       params.search = route.query.search;
       searchQuery.value = route.query.search;
     }
 
     const res = await blogService.getBlogs({
       page,
-      search: typeof params.search === "string" ? params.search : undefined,
+      search: typeof params.search === 'string' ? params.search : undefined,
     });
 
     posts.value = res.posts as unknown as Post[];
@@ -351,7 +362,7 @@ const fetchPosts = async (page: number = 1) => {
   } catch (err: unknown) {
     console.error(err);
     errorMessage.value =
-      err instanceof Error ? err.message : "加载文章列表失败，请稍后重试。";
+      err instanceof Error ? err.message : '加载文章列表失败，请稍后重试。';
     useNotificationStore().error(errorMessage.value);
   } finally {
     isLoading.value = false;
@@ -370,6 +381,7 @@ const goToPage = (page: number) => {
       delete query.search;
     }
     router.push({ query });
+    document.getElementById('main-content')?.scrollIntoView({ behavior: 'smooth' });
   }
 };
 
@@ -377,7 +389,7 @@ const handleSearch = () => {
   // 搜索时回到第一页
   const query = {
     ...route.query,
-    page: "1",
+    page: '1',
     search: searchQuery.value || undefined,
   };
   if (searchQuery.value) {
@@ -389,7 +401,7 @@ const handleSearch = () => {
 };
 
 const clearSearch = () => {
-  searchQuery.value = "";
+  searchQuery.value = '';
   handleSearch();
 };
 
@@ -401,12 +413,12 @@ watch(
     route.params.categoryId,
   ],
   ([pageQuery, searchParam, categoryQuery, categoryParam]) => {
-    searchQuery.value = typeof searchParam === "string" ? searchParam : "";
+    searchQuery.value = typeof searchParam === 'string' ? searchParam : '';
 
     const hasCategoryQuery =
-      typeof categoryQuery === "string" && categoryQuery.length > 0;
+      typeof categoryQuery === 'string' && categoryQuery.length > 0;
     const hasCategoryParam =
-      typeof categoryParam === "string" && categoryParam.length > 0;
+      typeof categoryParam === 'string' && categoryParam.length > 0;
 
     if (hasCategoryQuery || hasCategoryParam) {
       return;
@@ -421,53 +433,53 @@ watch(
 useHead(() => ({
   title: activeCategory.value
     ? `Category: ${activeCategory.value} - ReadingList Blog`
-    : "ReadingList Blog - 阅读与分享",
+    : 'ReadingList Blog - 阅读与分享',
   meta: [
     {
-      name: "description",
+      name: 'description',
       content: activeCategory.value
         ? `探索 ${activeCategory.value} 分类下的所有文章 - 个人阅读心得、技术分享、读书笔记`
-        : "ReadingList 博客 - 分享个人阅读心得、技术文章、读书笔记，记录阅读的美好时光",
+        : 'ReadingList 博客 - 分享个人阅读心得、技术文章、读书笔记，记录阅读的美好时光',
     },
     {
-      name: "keywords",
+      name: 'keywords',
       content: activeCategory.value
         ? `${activeCategory.value}, 博客, 阅读, 技术分享, 读书笔记, ReadingList`
-        : "博客, 阅读, 技术分享, 读书笔记, ReadingList, 个人博客, 阅读心得",
+        : '博客, 阅读, 技术分享, 读书笔记, ReadingList, 个人博客, 阅读心得',
     },
     {
-      property: "og:title",
+      property: 'og:title',
       content: activeCategory.value
         ? `${activeCategory.value} 分类文章 - ReadingList`
-        : "ReadingList Blog",
+        : 'ReadingList Blog',
     },
     {
-      property: "og:description",
+      property: 'og:description',
       content: activeCategory.value
         ? `探索 ${activeCategory.value} 分类下的所有文章`
-        : "ReadingList 博客 - 分享个人阅读心得、技术文章、读书笔记",
+        : 'ReadingList 博客 - 分享个人阅读心得、技术文章、读书笔记',
     },
     {
-      property: "og:type",
-      content: "website",
+      property: 'og:type',
+      content: 'website',
     },
     {
-      property: "og:url",
+      property: 'og:url',
       content: activeCategory.value
         ? `https://readinglist.example.com/blog/category/${activeCategory.value}`
-        : "https://readinglist.example.com/blog",
+        : 'https://readinglist.example.com/blog',
     },
     {
-      name: "twitter:title",
+      name: 'twitter:title',
       content: activeCategory.value
         ? `${activeCategory.value} 分类文章 - ReadingList`
-        : "ReadingList Blog",
+        : 'ReadingList Blog',
     },
     {
-      name: "twitter:description",
+      name: 'twitter:description',
       content: activeCategory.value
         ? `探索 ${activeCategory.value} 分类下的所有文章`
-        : "ReadingList 博客 - 分享个人阅读心得、技术文章、读书笔记",
+        : 'ReadingList 博客 - 分享个人阅读心得、技术文章、读书笔记',
     },
   ],
 }));
@@ -475,7 +487,7 @@ useHead(() => ({
 const handleFilterPosts = (filteredPosts: Post[], categoryName: string) => {
   posts.value = filteredPosts;
   activeCategory.value = categoryName;
-  searchQuery.value = "";
+  searchQuery.value = '';
   pagination.value = null; // 分类过滤结果不分页
   // 清除URL中的search参数
   const query = { ...route.query };
@@ -486,7 +498,7 @@ const handleFilterPosts = (filteredPosts: Post[], categoryName: string) => {
 // 重置过滤
 const handleResetFilter = () => {
   activeCategory.value = null;
-  searchQuery.value = "";
+  searchQuery.value = '';
   // 清除URL中的search和category参数
   const query = { ...route.query };
   delete query.category;

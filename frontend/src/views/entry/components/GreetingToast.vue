@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { useGreeting } from "@/composables/useGreeting";
-import { useStorage } from "@vueuse/core";
-import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import { useGreeting } from '@/composables/useGreeting';
+import { useStorage } from '@vueuse/core';
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const showToast = ref(false);
 const hasClosed = useStorage<boolean>(
-  "greeting_toast_closed",
+  'greeting_toast_closed',
   false,
   sessionStorage,
 );
@@ -27,7 +27,7 @@ const closeToast = () => {
 };
 
 const goToChangelog = () => {
-  router.push("/changelog");
+  router.push('/changelog');
   closeToast();
 };
 </script>
@@ -35,7 +35,7 @@ const goToChangelog = () => {
 <template>
   <Teleport to="body">
     <Transition
-      enter-active-class="animate-toast-in"
+      enter-active-class="animate-message-pop"
       leave-active-class="animate-toast-out"
     >
       <div

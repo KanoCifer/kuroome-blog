@@ -1,13 +1,9 @@
 <template>
   <motion.div>
     <nav
-      class="squircle bg-card/80 dark:bg-card/80 z-9999 flex items-center gap-2 px-1 py-2 shadow-lg backdrop-blur-sm transition-all duration-300 ease-out"
-      :class="isCompact ? '' : 'w-full'"
+      class="squircle bg-card/65 z-9999 flex items-center gap-2 px-1 py-2 shadow-lg backdrop-blur-sm"
     >
-      <ul
-        class="flex items-center gap-2 font-medium transition-all duration-300 ease-out"
-        :class="isCompact ? '' : 'mx-auto'"
-      >
+      <ul class="flex items-center gap-2 font-medium">
         <!-- Avatar -->
         <li class="ml-2 shrink-0">
           <RouterLink to="/">
@@ -59,31 +55,24 @@ import {
   BookshelfIcon,
   ChangelogIcon,
   HomeIcon,
-} from "@/components/icons";
-import { useAuthStore } from "@/stores/auth";
-import { useDebounce } from "@vueuse/core";
-import { Image } from "lucide-vue-next";
-import { motion } from "motion-v";
-import { computed, ref, watch } from "vue";
-import { useRoute } from "vue-router";
+} from '@/components/icons';
+import { useAuthStore } from '@/stores/auth';
+import { useDebounce } from '@vueuse/core';
+import { Image } from 'lucide-vue-next';
+import { motion } from 'motion-v';
+import { computed, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 
 const auth = useAuthStore();
 const route = useRoute();
 
-const props = defineProps<{
-  isHeaderVisible?: boolean;
-  isEntryView?: boolean;
-  isVisible?: boolean;
-  isCompact?: boolean;
-}>();
-
 // Navigation items config
 const navItems = [
-  { to: "/", icon: HomeIcon },
-  { to: "/blog", icon: BlogIcon },
-  { to: "/bookshelf", icon: BookshelfIcon },
-  { to: "/gallery", icon: Image },
-  { to: "/changelog", icon: ChangelogIcon },
+  { to: '/', icon: HomeIcon },
+  { to: '/blog', icon: BlogIcon },
+  { to: '/bookshelf', icon: BookshelfIcon },
+  { to: '/gallery', icon: Image },
+  { to: '/changelog', icon: ChangelogIcon },
 ];
 
 // State
@@ -94,8 +83,8 @@ const indicatorX = computed(() => debouncedHoveredIndex.value * 64 + 8);
 
 // Check if route is active
 const isActive = (path: string) => {
-  if (path === "/") {
-    return route.path === "/";
+  if (path === '/') {
+    return route.path === '/';
   }
 
   return route.path === path || route.path.startsWith(`${path}/`);
@@ -115,14 +104,14 @@ watch(
 );
 
 // Computed
-const currentUserName = computed(() => auth.user?.name || "未登录");
+const currentUserName = computed(() => auth.user?.name || '未登录');
 const avatarUrl = computed(() => {
-  if (auth.user?.photo?.startsWith("http")) {
+  if (auth.user?.photo?.startsWith('http')) {
     return auth.user.photo;
   }
   if (auth.user?.photo) {
     return `/api/v1/media/${auth.user.photo}`;
   }
-  return "/images/about.webp";
+  return '/images/about.webp';
 });
 </script>

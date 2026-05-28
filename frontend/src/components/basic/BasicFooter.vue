@@ -3,7 +3,7 @@
   <footer
     class="transition-colors duration-1000"
     :class="
-      !props.isAboutView && !props.isEntryView
+      !isEntryView
         ? 'border-border border-t bg-white dark:bg-black'
         : 'border-0 bg-transparent'
     "
@@ -72,23 +72,22 @@
 </template>
 
 <script setup lang="ts">
-import { connectionDelay } from "@/plugins/visitorWs";
-import { useVisitorCountStore } from "@/stores/visitorCount";
-import { computed } from "vue";
+import { connectionDelay } from '@/plugins/visitorWs';
+import { useVisitorCountStore } from '@/stores/visitorCount';
+import { computed } from 'vue';
 
 const visitorCount = useVisitorCountStore();
 
 const delayStatus = computed(() => {
   const ms = connectionDelay?.value ?? 0;
-  if (!ms) return { label: "-- ms", dotClass: "bg-muted-foreground/40" };
+  if (!ms) return { label: '-- ms', dotClass: 'bg-muted-foreground/40' };
   const label = `${Math.round(ms)} ms`;
-  if (ms < 200) return { label, dotClass: "bg-emerald-500" };
-  if (ms < 2000) return { label, dotClass: "bg-yellow-500" };
-  return { label, dotClass: "bg-red-500" };
+  if (ms < 200) return { label, dotClass: 'bg-emerald-500' };
+  if (ms < 2000) return { label, dotClass: 'bg-yellow-500' };
+  return { label, dotClass: 'bg-red-500' };
 });
 
-const props = defineProps<{
+defineProps<{
   isEntryView: boolean;
-  isAboutView: boolean;
 }>();
 </script>

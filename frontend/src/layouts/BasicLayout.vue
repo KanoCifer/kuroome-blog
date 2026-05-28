@@ -44,7 +44,6 @@ watch(
   { immediate: true },
 );
 
-// IntersectionObserver: 检测页面是否已滚动，触发导航栏收窄
 let scrollObserver: IntersectionObserver | null = null;
 const sentinelRef = ref<HTMLElement | null>(null);
 
@@ -187,7 +186,7 @@ watch(sentinelRef, () => initObserver());
     <!-- 滚动检测哨兵（页面顶部不可见 fixed div） -->
     <div
       ref="sentinelRef"
-      class="pointer-events-none fixed top-0 left-0 z-0 h-px w-px opacity-0"
+      class="pointer-events-none absolute top-0 left-0 z-0 h-px w-px opacity-0"
       aria-hidden="true"
     />
 
@@ -218,7 +217,6 @@ watch(sentinelRef, () => initObserver());
     <BasicFooter
       v-if="themeStore.showFooter === 'true' && !isEntryView"
       :isEntryView="isEntryView"
-      :isAboutView="isAboutView"
     />
 
     <!-- Back to Top Button -->
@@ -228,20 +226,19 @@ watch(sentinelRef, () => initObserver());
     <TodoModal />
 
     <!-- Navigation: cross-route layoutId morph -->
-    <AnimatePresence mode="sync">
+    <AnimatePresence>
       <BasicNav
         v-if="showBasicNav"
         key="basic-nav"
         layoutId="nav-card"
-        :isEntryView="isEntryView"
-        :isVisible="showBasicNav"
-        :isCompact="isNavCompact"
-        :initial="{ opacity: 0 }"
-        :animate="{ opacity: 1 }"
-        :transition="{ type: 'spring', bounce: 0.3, duration: 0.5 }"
-        :exit="{ transition: { duration: 0.5 } }"
-        class="group fixed top-4 z-50 transition-all duration-300 ease-out"
-        :class="isNavCompact ? 'left-4' : 'left-0 right-0 mx-auto max-w-screen-xl'"
+        :initial="{ opacity: 1 }"
+        :animate="{
+          opacity: 1,
+          ...(isNavCompact ? { left: 200, x: 0 } : {}),
+        }"
+        :exit="{ opacity: 0 }"
+        :transition="{ type: 'spring', bounce: 0.4, duration: 0.7 }"
+        class="group fixed top-4 left-1/2 z-50 -translate-x-1/2"
       />
       <BentoNavCard
         v-else

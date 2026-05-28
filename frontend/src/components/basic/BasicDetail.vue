@@ -62,7 +62,7 @@
 
       <div class="mt-12 text-center">
         <button
-          @click="$router.back()"
+          @click="onBack === undefined ? $router.back() : onBack()"
           class="bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90 mb-12 inline-flex cursor-pointer items-center gap-2 rounded-full px-6 py-3 font-medium transition-all duration-300 hover:shadow-lg"
         >
           <svg
@@ -87,15 +87,16 @@
 </template>
 
 <script setup lang="ts">
-import { useMediaQuery, useScroll } from "@vueuse/core";
-import { computed } from "vue";
+import { useMediaQuery, useScroll } from '@vueuse/core';
+import { computed } from 'vue';
 
 const { y } = useScroll(window);
-const isSmallScreen = useMediaQuery("(max-width: 768px)");
+const isSmallScreen = useMediaQuery('(max-width: 768px)');
 
 defineProps<{
   title: string;
   subtitle: string;
+  onBack?: () => void;
 }>();
 
 const titleStyle = computed(() => ({
@@ -104,13 +105,13 @@ const titleStyle = computed(() => ({
 
 const sectionStyle = computed(() => {
   if (isSmallScreen.value) {
-    return { width: "100%" };
+    return { width: '100%' };
   }
   const scale = Math.min(1, 0.85 + y.value * 0.0005);
   return {
     transform: `scaleX(${scale})`,
-    transformOrigin: "top center",
-    width: "100%",
+    transformOrigin: 'top center',
+    width: '100%',
   };
 });
 
