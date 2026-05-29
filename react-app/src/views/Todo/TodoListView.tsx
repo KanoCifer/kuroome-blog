@@ -7,7 +7,7 @@ import type {
 import { useTodoState, STATUS_LABELS } from '@/stores/todoState';
 import type { DevTask } from '@/services/todoService/types';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 // Column definitions
 interface ColumnDef {
@@ -343,26 +343,12 @@ function ColumnContent({
   onCycle,
   onCardClick,
   onDelete,
-  onQuickAdd,
-  addingStatus,
-  quickTitle,
-  onQuickTitleChange,
-  onSubmitQuickAdd,
-  onCancelQuickAdd,
-  quickInputRef,
 }: {
   col: ColumnDef;
   tasks: DevTask[];
   onCycle: (id: string) => void;
   onCardClick: (task: DevTask) => void;
   onDelete: (id: string) => void;
-  onQuickAdd: (status: DevTaskStatus) => void;
-  addingStatus: DevTaskStatus | null;
-  quickTitle: string;
-  onQuickTitleChange: (v: string) => void;
-  onSubmitQuickAdd: () => void;
-  onCancelQuickAdd: () => void;
-  quickInputRef: React.RefObject<HTMLInputElement | null>;
 }) {
   return (
     <>
@@ -400,17 +386,6 @@ export default function TodoListView() {
   const [editingTask, setEditingTask] = useState<DevTask | null>(null);
   const [activeTab, setActiveTab] = useState<DevTaskStatus>('todo');
 
-  // Quick-add state: which column has the active quick-add input
-  const [addingStatus, setAddingStatus] = useState<DevTaskStatus | null>(null);
-  const [quickTitle, setQuickTitle] = useState('');
-  const quickInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (addingStatus && quickInputRef.current) {
-      quickInputRef.current.focus();
-    }
-  }, [addingStatus]);
-
   // Group tasks by status
   const grouped = useMemo(() => {
     const g: Record<DevTaskStatus, DevTask[]> = {
@@ -439,20 +414,6 @@ export default function TodoListView() {
   const handleCloseEdit = () => {
     showNav();
     setEditingTask(null);
-  };
-
-  // Quick add
-  const startQuickAdd = (status: DevTaskStatus) => {
-    setAddingStatus(status);
-    setQuickTitle('');
-  };
-
-  const submitQuickAdd = async () => {
-    const title = quickTitle.trim();
-    if (!title || !addingStatus) return;
-    const payload: CreateDevTaskPayload = { title, status: addingStatus };
-    await todoState.createTask(payload);
-    setAddingStatus(null);
   };
 
   // Full add modal (mobile bottom sheet)
@@ -558,13 +519,6 @@ export default function TodoListView() {
               onCycle={todoState.cycleStatus}
               onCardClick={handleCardClick}
               onDelete={todoState.deleteTask}
-              onQuickAdd={startQuickAdd}
-              addingStatus={addingStatus}
-              quickTitle={quickTitle}
-              onQuickTitleChange={setQuickTitle}
-              onSubmitQuickAdd={submitQuickAdd}
-              onCancelQuickAdd={() => setAddingStatus(null)}
-              quickInputRef={quickInputRef}
             />
           ))}
         </div>
