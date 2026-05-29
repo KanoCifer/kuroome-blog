@@ -245,14 +245,14 @@ export default function ImageToolboxView() {
   return (
     <BasicDetail title="图片工具箱" subtitle="本地压缩与格式转换">
       <div className="col-span-full">
-        <div className="squircle overflow-hidden border border-gray-200/60 bg-white/50 shadow-sm dark:border-gray-700/60 dark:bg-gray-900/70">
+        <div className="squircle overflow-hidden border border-border/60 bg-card/50 shadow-sm">
           <div className="flex flex-col lg:flex-row lg:items-stretch">
-            <aside className="w-full shrink-0 border-b border-gray-200/60 p-6 lg:w-80 lg:border-r lg:border-b-0 dark:border-gray-700/60">
+            <aside className="w-full shrink-0 border-b border-border/60 p-6 lg:w-80 lg:border-r lg:border-b-0">
               <header className="mb-8">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                <h2 className="text-xl font-bold text-foreground">
                   参数配置
                 </h2>
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-xs text-muted-foreground">
                   本地处理，保护隐私安全
                 </p>
               </header>
@@ -262,7 +262,7 @@ export default function ImageToolboxView() {
                   <div className="flex items-center justify-between">
                     <label
                       htmlFor="max-width"
-                      className="text-sm font-semibold text-gray-700 dark:text-gray-300"
+                      className="text-sm font-semibold text-card-foreground"
                     >
                       最大宽度限制
                     </label>
@@ -272,7 +272,7 @@ export default function ImageToolboxView() {
                         setEnableMaxWidth(event.target.checked)
                       }
                       type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900 dark:border-gray-600 dark:bg-gray-800"
+                      className="h-4 w-4 rounded border-border text-foreground focus:ring-ring"
                     />
                   </div>
                   <div className="relative">
@@ -285,9 +285,9 @@ export default function ImageToolboxView() {
                       type="number"
                       min={1}
                       disabled={!enableMaxWidth}
-                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm transition-all focus:border-gray-900 focus:ring-0 focus:outline-none disabled:bg-gray-50 disabled:text-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:focus:border-gray-100"
+                      className="w-full rounded-xl border border-border bg-card px-4 py-2.5 text-sm transition-all focus:border-ring focus:ring-0 focus:outline-none disabled:bg-secondary disabled:text-muted-foreground"
                     />
-                    <span className="absolute top-1/2 right-4 -translate-y-1/2 text-xs text-gray-400">
+                    <span className="absolute top-1/2 right-4 -translate-y-1/2 text-xs text-muted-foreground">
                       px
                     </span>
                   </div>
@@ -297,11 +297,11 @@ export default function ImageToolboxView() {
                   <div className="flex items-center justify-between">
                     <label
                       htmlFor="quality"
-                      className="text-sm font-semibold text-gray-700 dark:text-gray-300"
+                      className="text-sm font-semibold text-card-foreground"
                     >
                       压缩质量
                     </label>
-                    <span className="font-mono text-xs font-medium text-gray-500">
+                    <span className="font-mono text-xs font-medium text-muted-foreground">
                       {Math.round(quality * 100)}%
                     </span>
                   </div>
@@ -313,16 +313,16 @@ export default function ImageToolboxView() {
                     min={0.3}
                     max={1}
                     step={0.1}
-                    className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-gray-200 accent-gray-900 dark:bg-gray-700 dark:accent-gray-100"
+                    className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-border accent-foreground"
                   />
-                  <div className="flex justify-between text-[10px] text-gray-400 uppercase">
+                  <div className="flex justify-between text-[10px] text-muted-foreground uppercase">
                     <span>高压缩</span>
                     <span>原画</span>
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  <span className="text-sm font-semibold text-card-foreground">
                     输出格式
                   </span>
                   <div className="grid grid-cols-3 gap-2">
@@ -332,8 +332,8 @@ export default function ImageToolboxView() {
                         type="button"
                         className={`rounded-xl border py-2 text-xs font-medium transition-all ${
                           outputType === option.value
-                            ? 'border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900'
-                            : 'border-gray-200 bg-white text-gray-600 hover:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400'
+                            ? 'border-foreground bg-foreground text-background'
+                            : 'border-border bg-card text-muted-foreground hover:border-border'
                         }`}
                         onClick={() => setOutputType(option.value)}
                       >
@@ -347,7 +347,7 @@ export default function ImageToolboxView() {
                   <button
                     type="button"
                     disabled={!originalFile || processing}
-                    className="group relative overflow-hidden rounded-xl bg-gray-900 py-3 text-sm font-bold text-white transition-all hover:bg-gray-800 disabled:opacity-60 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+                    className="group relative overflow-hidden rounded-xl bg-foreground py-3 text-sm font-bold text-background transition-all hover:bg-foreground/90 disabled:opacity-60"
                     onClick={handleProcess}
                   >
                     {processing ? (
@@ -381,7 +381,7 @@ export default function ImageToolboxView() {
                   <button
                     type="button"
                     disabled={!processedBlob}
-                    className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white py-3 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                    className="flex items-center justify-center gap-2 rounded-xl border border-border bg-card py-3 text-sm font-medium text-card-foreground transition-all hover:bg-accent disabled:opacity-50"
                     onClick={downloadProcessedImage}
                   >
                     <svg
@@ -402,7 +402,7 @@ export default function ImageToolboxView() {
 
                   <button
                     type="button"
-                    className="py-2 text-xs font-medium text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                    className="py-2 text-xs font-medium text-muted-foreground hover:text-foreground"
                     onClick={resetAll}
                   >
                     清空并重置
@@ -411,16 +411,16 @@ export default function ImageToolboxView() {
               </div>
             </aside>
 
-            <main className="flex-1 bg-gray-50/50 p-6 dark:bg-black/20">
+            <main className="flex-1 bg-secondary/50 p-6">
               <div className="mx-auto max-w-5xl space-y-6">
                 <div
                   ref={dropZoneRef}
                   className={`group relative flex min-h-50 cursor-pointer items-center justify-center overflow-hidden rounded-3xl border-2 border-dashed transition-all duration-500 ${
                     isDraggingOver
-                      ? 'border-gray-900 bg-gray-900/5 dark:border-gray-100 dark:bg-gray-100/5'
+                      ? 'border-foreground bg-foreground/5'
                       : originalFile
-                        ? 'border-transparent bg-white shadow-sm dark:bg-gray-800'
-                        : 'border-gray-200 bg-white hover:border-gray-400 dark:border-gray-800 dark:bg-gray-900/50 dark:hover:border-gray-600'
+                        ? 'border-transparent bg-card shadow-sm'
+                        : 'border-border bg-card hover:border-border'
                   }`}
                   onClick={openFilePicker}
                   onDragOver={handleDragOver}
@@ -428,13 +428,13 @@ export default function ImageToolboxView() {
                   onDrop={handleDrop}
                 >
                   {isDraggingOver && (
-                    <div className="absolute inset-0 animate-pulse bg-gray-900/5 dark:bg-gray-100/5" />
+                    <div className="absolute inset-0 animate-pulse bg-foreground/5" />
                   )}
 
                   <div className="relative z-10 p-8 text-center">
                     {!originalFile ? (
                       <div className="space-y-4">
-                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-50 text-gray-400 transition-transform group-hover:scale-110 dark:bg-gray-800">
+                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary text-muted-foreground transition-transform group-hover:scale-110">
                           <svg
                             className="h-8 w-8"
                             fill="none"
@@ -450,10 +450,10 @@ export default function ImageToolboxView() {
                           </svg>
                         </div>
                         <div>
-                          <p className="text-base font-bold text-gray-900 dark:text-gray-100">
+                          <p className="text-base font-bold text-foreground">
                             {isDraggingOver ? '即刻上传' : '点击或拖拽图片'}
                           </p>
-                          <p className="mt-1 text-xs text-gray-500">
+                          <p className="mt-1 text-xs text-muted-foreground">
                             支持 JPG, PNG, WebP, GIF, AVIF (最大 20MB)
                           </p>
                         </div>
@@ -461,7 +461,7 @@ export default function ImageToolboxView() {
                     ) : (
                       <div className="flex flex-wrap items-center justify-center gap-6">
                         <div className="flex items-center gap-4">
-                          <div className="h-12 w-12 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700">
+                          <div className="h-12 w-12 overflow-hidden rounded-lg bg-muted">
                             <img
                               src={originalPreviewUrl}
                               className="h-full w-full object-cover"
@@ -469,17 +469,17 @@ export default function ImageToolboxView() {
                             />
                           </div>
                           <div className="text-left">
-                            <p className="max-w-50 truncate text-sm font-bold text-gray-900 dark:text-gray-100">
+                            <p className="max-w-50 truncate text-sm font-bold text-foreground">
                               {originalFile.name}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-muted-foreground">
                               {formatBytes(originalFile.size)}
                             </p>
                           </div>
                         </div>
                         <button
                           type="button"
-                          className="rounded-full bg-white px-4 py-1.5 text-xs font-bold text-gray-900 shadow-sm ring-1 ring-gray-200 transition-all hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700"
+                          className="rounded-full bg-card px-4 py-1.5 text-xs font-bold text-card-foreground shadow-sm ring-1 ring-border transition-all hover:bg-accent"
                           onClick={(event) => {
                             event.stopPropagation();
                             openFilePicker();
@@ -502,24 +502,24 @@ export default function ImageToolboxView() {
 
                 {originalFile && (
                   <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <div className="group relative flex flex-col overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-gray-800">
-                      <div className="flex items-center justify-between border-b border-gray-50 p-4 dark:border-gray-700/50">
-                        <span className="text-xs font-bold tracking-wider text-gray-400 uppercase">
+                    <div className="group relative flex flex-col overflow-hidden rounded-3xl bg-card shadow-sm">
+                      <div className="flex items-center justify-between border-b border-border p-4">
+                        <span className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
                           原始图像
                         </span>
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] text-gray-500">
+                          <span className="text-[10px] text-muted-foreground">
                             缩放: {Math.round(originalPreviewZoom * 100)}%
                           </span>
                           <button
                             onClick={() => setOriginalPreviewZoom(1)}
-                            className="text-[10px] text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                            className="text-[10px] text-muted-foreground hover:text-foreground"
                           >
                             重置
                           </button>
                         </div>
                       </div>
-                      <div className="relative flex min-h-[320px] items-center justify-center overflow-auto bg-gray-50/50 p-8 dark:bg-gray-900/50">
+                      <div className="relative flex min-h-[320px] items-center justify-center overflow-auto bg-secondary/50 p-8">
                         <button
                           type="button"
                           className="cursor-zoom-in transition-transform duration-300 group-hover:scale-[1.02]"
@@ -548,40 +548,40 @@ export default function ImageToolboxView() {
                           min={1}
                           max={4}
                           step={0.1}
-                          className="h-1 w-full accent-gray-900"
+                          className="h-1 w-full accent-foreground"
                         />
                       </div>
                     </div>
 
-                    <div className="group relative flex flex-col overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-gray-800">
-                      <div className="flex items-center justify-between border-b border-gray-50 p-4 dark:border-gray-700/50">
+                    <div className="group relative flex flex-col overflow-hidden rounded-3xl bg-card shadow-sm">
+                      <div className="flex items-center justify-between border-b border-border p-4">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold tracking-wider text-gray-400 uppercase">
+                          <span className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
                             处理后:{formatBytes(processedBlob?.size ?? 0)}
                           </span>
                           {processedBlob && (
-                            <span className="rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-bold text-green-600 dark:bg-green-500/10">
+                            <span className="rounded-full bg-success/10 px-2 py-0.5 text-[10px] font-bold text-success">
                               {compressionRatio} 节省
                             </span>
                           )}
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] text-gray-500">
+                          <span className="text-[10px] text-muted-foreground">
                             缩放: {Math.round(processedPreviewZoom * 100)}%
                           </span>
                           <button
                             onClick={() => setProcessedPreviewZoom(1)}
-                            className="text-[10px] text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                            className="text-[10px] text-muted-foreground hover:text-foreground"
                           >
                             重置
                           </button>
                         </div>
                       </div>
-                      <div className="relative flex min-h-[320px] items-center justify-center overflow-auto bg-gray-50/50 p-8 dark:bg-gray-900/50">
+                      <div className="relative flex min-h-[320px] items-center justify-center overflow-auto bg-secondary/50 p-8">
                         {processing ? (
                           <div className="flex flex-col items-center gap-3">
-                            <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-900 border-t-transparent dark:border-gray-100" />
-                            <span className="text-xs text-gray-500">
+                            <div className="h-8 w-8 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
+                            <span className="text-xs text-muted-foreground">
                               正在渲染...
                             </span>
                           </div>
@@ -604,7 +604,7 @@ export default function ImageToolboxView() {
                             />
                           </button>
                         ) : (
-                          <div className="text-center text-gray-300">
+                          <div className="text-center text-muted-foreground">
                             <svg
                               className="mx-auto h-12 w-12 opacity-20"
                               fill="none"
@@ -637,7 +637,7 @@ export default function ImageToolboxView() {
                             min={1}
                             max={4}
                             step={0.1}
-                            className="h-1 w-full accent-gray-900"
+                            className="h-1 w-full accent-foreground"
                           />
                         </div>
                       )}
@@ -647,7 +647,7 @@ export default function ImageToolboxView() {
               </div>
 
               {errorMessage && (
-                <p className="mx-auto mt-6 max-w-md rounded-xl bg-red-50 p-3 text-center text-xs font-medium text-red-500 dark:bg-red-500/10">
+                <p className="mx-auto mt-6 max-w-md rounded-xl bg-destructive/10 p-3 text-center text-xs font-medium text-destructive">
                   {errorMessage}
                 </p>
               )}
@@ -661,7 +661,7 @@ export default function ImageToolboxView() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 backdrop-blur-md"
+              className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 p-4 backdrop-blur-md"
               onClick={(event) => {
                 if (event.target === event.currentTarget) {
                   closePreviewDialog();
@@ -670,7 +670,7 @@ export default function ImageToolboxView() {
             >
               <button
                 type="button"
-                className="absolute top-6 right-6 h-10 w-10 rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+                className="absolute top-6 right-6 h-10 w-10 rounded-full bg-card/10 text-foreground transition-colors hover:bg-card/20"
                 onClick={closePreviewDialog}
               >
                 ✕

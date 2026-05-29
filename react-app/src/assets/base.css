@@ -182,7 +182,7 @@ html::-webkit-scrollbar {
 }
 
 .animate-shimmer {
-  @apply bg-linear-to-r from-gray-300 via-gray-400 to-gray-500 bg-size-[200%] bg-clip-text text-transparent;
+  @apply bg-linear-to-r from-muted via-muted-foreground/60 to-muted-foreground bg-size-[200%] bg-clip-text text-transparent;
 }
 
 button {
@@ -190,7 +190,7 @@ button {
 }
 
 footer {
-  @apply mx-auto w-full min-w-0 p-4 text-center text-sm text-gray-300;
+  @apply mx-auto w-full min-w-0 p-4 text-center text-sm text-muted-foreground;
 }
 
 a {
@@ -202,12 +202,12 @@ a {
 }
 
 .modal-body {
-  @apply text-lg text-gray-700;
+  @apply text-lg text-card-foreground;
 }
 
 /* // tiptap编辑器样式 */
 .tiptap p.is-editor-empty:first-child::before {
-  @apply text-gray-400;
+  @apply text-muted-foreground;
   float: left;
   height: 0;
   pointer-events: none;
@@ -215,10 +215,10 @@ a {
 
 /* 链接 */
 .tiptap-link {
-  @apply cursor-pointer text-blue-500 underline;
+  @apply cursor-pointer text-primary underline;
 }
 .tiptap-link:hover {
-  @apply text-blue-600;
+  @apply text-primary;
 }
 
 /* 图片 */
@@ -232,11 +232,11 @@ a {
 }
 
 .tiptap [data-resize-state='true'] [data-resize-wrapper] {
-  @apply outline outline-blue-300;
+  @apply outline outline-primary/50;
 }
 
 .tiptap [data-resize-handle] {
-  @apply absolute z-10 h-2 w-2 rounded-full border border-white bg-blue-500 opacity-0 transition-opacity;
+  @apply absolute z-10 h-2 w-2 rounded-full border border-background bg-primary opacity-0 transition-opacity;
 }
 
 .tiptap [data-resize-wrapper]:hover [data-resize-handle] {
@@ -271,18 +271,14 @@ a {
   cursor: ew-resize;
 }
 
-.dark .tiptap [data-resize-handle] {
-  @apply border-slate-900 bg-blue-400;
-}
-
 /* 拖拽手柄（Tiptap DragHandle 官方示例结构） */
 .drag-handle,
 .custom-drag-handle {
   width: 18px;
   height: 18px;
   border-radius: 6px;
-  border: 1px solid #e5e7eb;
-  background-color: #ffffff;
+  border: 1px solid var(--border);
+  background-color: var(--card-bg);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
   cursor: grab;
   position: relative;
@@ -294,8 +290,8 @@ a {
   position: absolute;
   inset: 4px;
   background:
-    radial-gradient(#9ca3af 2px, transparent 2px) 0 0 / 6px 6px,
-    radial-gradient(#9ca3af 2px, transparent 2px) 3px 3px / 6px 6px;
+    radial-gradient(var(--muted-text) 2px, transparent 2px) 0 0 / 6px 6px,
+    radial-gradient(var(--muted-text) 2px, transparent 2px) 3px 3px / 6px 6px;
 }
 
 .drag-handle:active,
@@ -303,24 +299,10 @@ a {
   cursor: grabbing;
 }
 
-.dark .drag-handle,
-.dark .custom-drag-handle {
-  border-color: #334155;
-  background-color: #0f172a;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-}
-
-.dark .drag-handle::before,
-.dark .custom-drag-handle::before {
-  background:
-    radial-gradient(#94a3b8 2px, transparent 2px) 0 0 / 6px 6px,
-    radial-gradient(#94a3b8 2px, transparent 2px) 3px 3px / 6px 6px;
-}
-
 /* 代码块 - macOS 风格（同时支持编辑器和文章展示） */
 .tiptap pre,
 .prose pre {
-  @apply relative my-4 overflow-hidden rounded-xl border border-gray-200 bg-gray-900 pt-10 shadow-lg dark:border-gray-700;
+  @apply relative my-4 overflow-hidden rounded-xl border border-border bg-gray-900 pt-10 shadow-lg;
 }
 
 .tiptap pre::before,
@@ -353,10 +335,10 @@ a {
 }
 /* 激活按钮 */
 .tiptap-btn.is-active {
-  @apply bg-blue-500 text-white;
+  @apply bg-primary text-primary-foreground;
 }
 .tiptap-btn.is-active:hover {
-  @apply bg-blue-600;
+  @apply bg-primary/90;
 }
 
 /* 表格 */
@@ -365,17 +347,17 @@ a {
 }
 .tiptap table th,
 .tiptap table td {
-  @apply border border-gray-200 px-3 py-2 text-left;
+  @apply border border-border px-3 py-2 text-left;
   min-width: 3rem;
 }
 .tiptap table th {
-  @apply bg-gray-50 font-semibold;
+  @apply bg-muted font-semibold;
 }
 .tiptap table td {
-  @apply bg-white;
+  @apply bg-card;
 }
 .tiptap table tr:hover td {
-  @apply bg-gray-100;
+  @apply bg-accent;
 }
 .tiptap table .selectedCell:after {
   content: '';
@@ -383,7 +365,7 @@ a {
   inset: 0;
   pointer-events: none;
   z-index: 2;
-  background: rgba(59, 130, 246, 0.15);
+  background: color-mix(in srgb, var(--color-primary) 15%, transparent);
 }
 .tiptap table .column-resize-handle {
   position: absolute;
@@ -391,34 +373,13 @@ a {
   top: 0;
   bottom: -2px;
   width: 4px;
-  @apply pointer-events-none bg-blue-500;
+  @apply pointer-events-none bg-primary;
 }
 .tiptap table p {
   @apply m-0;
 }
 .tiptap .tableWrapper {
   @apply my-4 overflow-x-auto;
-}
-
-/* 暗色模式 */
-.dark .tiptap table th,
-.dark .tiptap table td {
-  @apply border-gray-700;
-}
-.dark .tiptap table th {
-  @apply bg-slate-800 text-gray-50;
-}
-.dark .tiptap table td {
-  @apply bg-slate-900 text-gray-300;
-}
-.dark .tiptap table tr:hover td {
-  @apply bg-slate-800;
-}
-.dark .tiptap table .selectedCell:after {
-  background: rgba(96, 165, 250, 0.25);
-}
-.dark .tiptap table .column-resize-handle {
-  background: #60a5fa;
 }
 
 /* Task list (Tailwind) */
@@ -449,18 +410,12 @@ ul[data-type='taskList'] > li > div p {
 /* checked state -> strike-through */
 ul[data-type='taskList'] > li[data-checked='true'] > div,
 ul[data-type='taskList'] > li[data-checked='true'] > div p {
-  @apply text-gray-500 line-through opacity-60;
+  @apply text-muted-foreground line-through opacity-60;
 }
 
 /* nested taskList reset */
 ul[data-type='taskList'] ul[data-type='taskList'] {
   @apply m-0;
-}
-
-/* dark mode adjustments */
-.dark ul[data-type='taskList'] > li[data-checked='true'] > div,
-.dark ul[data-type='taskList'] > li[data-checked='true'] > div p {
-  @apply text-gray-400;
 }
 
 @theme inline {

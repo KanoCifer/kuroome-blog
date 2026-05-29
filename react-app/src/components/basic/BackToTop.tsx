@@ -66,7 +66,7 @@ export function BackToTop({ className }: BackToTopProps) {
           >
             {/* 背景进度环 */}
             <svg
-              className="absolute inset-0 h-full w-full -rotate-90 text-blue-400"
+              className="absolute inset-0 h-full w-full -rotate-90 text-primary"
               viewBox="0 0 56 56"
               aria-hidden
             >
@@ -78,7 +78,7 @@ export function BackToTop({ className }: BackToTopProps) {
                 fill="none"
                 stroke="currentColor"
                 strokeWidth={2}
-                className="text-gray-200 dark:text-gray-700"
+                className="text-muted-foreground"
                 opacity={0.3}
               />
               {/* 进度圆环 */}
@@ -99,7 +99,7 @@ export function BackToTop({ className }: BackToTopProps) {
             {/* 箭头图标 */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 transform-gpu text-gray-600 transition-transform duration-300 dark:text-gray-300"
+              className="text-foreground h-6 w-6 transform-gpu transition-transform duration-300"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -114,9 +114,9 @@ export function BackToTop({ className }: BackToTopProps) {
             </svg>
 
             {/* Tooltip */}
-            <span className="absolute right-full mr-3 rounded-lg bg-gray-900 px-3 py-1 text-sm whitespace-nowrap text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 dark:bg-gray-700">
+            <span className="bg-card text-card-foreground absolute right-full mr-3 rounded-lg px-3 py-1 text-sm whitespace-nowrap opacity-0 transition-opacity duration-200 group-hover:opacity-100">
               回到顶部
-              <span className="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 border-4 border-transparent border-l-gray-900 dark:border-l-gray-700"></span>
+              <span className="border-l-card absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 border-4 border-transparent"></span>
             </span>
           </motion.button>
         )}

@@ -13,7 +13,7 @@ export function BentoCalendar() {
       key={idx}
       className={`py-1 text-xs font-medium ${
         idx === weekday
-          ? 'rounded-2xl bg-blue-50 font-bold text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+          ? 'bg-primary/10 text-primary rounded-2xl font-bold'
           : ''
       }`}
     >
@@ -39,8 +39,8 @@ export function BentoCalendar() {
         key={idx}
         className={`mx-auto flex aspect-square w-full max-w-8 items-center justify-center rounded-full text-sm transition-colors ${
           isToday
-            ? 'bg-blue-500 font-bold text-white'
-            : 'text-slate-700 hover:bg-blue-100 dark:text-slate-300 dark:hover:bg-blue-900/30'
+            ? 'bg-primary text-primary-foreground font-bold'
+            : 'text-card-foreground hover:bg-primary/10'
         }`}
       >
         {dayNum}
@@ -51,12 +51,8 @@ export function BentoCalendar() {
   return (
     <BentoCard className="flex flex-col">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">
-          {monthLabel}
-        </h3>
-        <span className="text-sm text-slate-600 dark:text-slate-400">
-          {yearLabel}
-        </span>
+        <h3 className="text-foreground text-lg font-semibold">{monthLabel}</h3>
+        <span className="text-muted-foreground text-sm">{yearLabel}</span>
       </div>
       {/* 表头 */}
       <div className="mb-1 grid grid-cols-7 text-center">{weekdayHeaders}</div>

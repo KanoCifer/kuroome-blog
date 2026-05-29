@@ -27,7 +27,7 @@ export function AvatarUpload({ avatarUrl, onPhotoUpload }: AvatarUploadProps) {
   return (
     <div className="mb-8 flex flex-col items-center">
       <div className="group relative">
-        <div className="h-28 w-28 overflow-hidden rounded-full border-[4px] border-white shadow-xl transition-all duration-300 dark:border-slate-700">
+        <div className="border-card h-28 w-28 overflow-hidden rounded-full border-[4px] shadow-xl transition-all duration-300">
           <img
             src={avatarUrl}
             alt="Avatar"
@@ -44,7 +44,7 @@ export function AvatarUpload({ avatarUrl, onPhotoUpload }: AvatarUploadProps) {
           />
           <label
             htmlFor="photo-upload"
-            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[#2563eb] text-white shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-blue-500/50 active:scale-95"
+            className="bg-primary text-primary-foreground hover:shadow-primary/50 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full shadow-lg transition-all duration-300 hover:scale-110 active:scale-95"
           >
             <IconCamera className="size-5" />
           </label>

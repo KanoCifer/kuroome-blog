@@ -16,22 +16,22 @@ export function StatsCard({
   iconClassName,
 }: StatsCardProps) {
   return (
-    <article className="group overflow-hidden rounded-3xl border border-gray-200/60 bg-white/85 p-3.5 shadow-sm transition-all duration-300 dark:border-gray-800 dark:bg-gray-900/80">
+    <article className="group border-border/60 bg-card/85 overflow-hidden rounded-3xl border p-3.5 shadow-sm transition-all duration-300">
       <div className="mb-2 flex items-center gap-2">
         <div
           className={`flex h-8 w-8 items-center justify-center rounded-lg ${iconClassName}`}
         >
           {icon}
         </div>
-        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+        <span className="text-xs font-medium text-muted-foreground">
           {title}
         </span>
       </div>
 
-      <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
+      <p className="text-xl font-bold text-foreground">
         {value}
       </p>
-      <p className="mt-0.5 text-[11px] text-gray-500 dark:text-gray-400">
+      <p className="mt-0.5 text-[11px] text-muted-foreground">
         {subtitle}
       </p>
     </article>

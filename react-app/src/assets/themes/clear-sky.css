@@ -2,16 +2,16 @@
 [data-color-scheme='clear-sky'] {
   --radius: 0.625rem;
   --ink: oklch(0.2 0.03 240);
-  --paper: #ffffff;
+  --paper: oklch(1.0000 0 0);
   --warm-gray: oklch(0.96 0.01 240);
   --muted-text: oklch(0.6 0.02 240);
   --accent-amber: oklch(0.8 0.15 80);
   --accent-sage: oklch(0.7 0.1 160);
   --accent-slate: oklch(0.7 0.03 260);
   --accent-rose: oklch(0.65 0.15 20);
-  --workspace-accent: #2fcbe7;
+  --workspace-accent: oklch(0.7771 0.1272 213.3);
   --workspace-accent-contrast: oklch(0.98 0.01 240);
-  --card-bg: #ffffff;
+  --card-bg: oklch(1.0000 0 0);
   --surface: oklch(0.98 0.01 240 / 0.75);
   --surface-foreground: oklch(0.2 0.03 240);
   --chart-1: oklch(0.7 0.15 220);
@@ -19,7 +19,7 @@
   --chart-3: oklch(0.6 0.1 260);
   --chart-4: oklch(0.65 0.15 20);
   --chart-5: oklch(0.7 0.1 160);
-  --gradient-primary-from: #2fcbe7;
+  --gradient-primary-from: oklch(0.7771 0.1272 213.3);
   --gradient-primary-to: var(--color-cyan-400);
   --gradient-decorative-from: var(--color-sky-200);
   --gradient-decorative-to: var(--color-cyan-200);
@@ -53,7 +53,7 @@
   --accent-sage: oklch(0.6 0.1 160);
   --accent-slate: oklch(0.6 0.03 260);
   --accent-rose: oklch(0.7 0.15 20);
-  --workspace-accent: #2fcbe7;
+  --workspace-accent: oklch(0.7771 0.1272 213.3);
   --workspace-accent-contrast: oklch(0.2 0.03 240);
   --card-bg: oklch(0.2 0.03 240);
   --surface: oklch(0.2 0.03 240 / 0.8);
@@ -63,7 +63,7 @@
   --chart-3: oklch(0.5 0.1 260);
   --chart-4: oklch(0.7 0.15 20);
   --chart-5: oklch(0.6 0.1 160);
-  --gradient-primary-from: #2fcbe7;
+  --gradient-primary-from: oklch(0.7771 0.1272 213.3);
   --gradient-primary-to: var(--color-cyan-500);
   --gradient-decorative-from: var(--color-sky-800);
   --gradient-decorative-to: var(--color-cyan-800);

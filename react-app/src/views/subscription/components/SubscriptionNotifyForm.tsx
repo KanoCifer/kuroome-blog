@@ -118,7 +118,7 @@ function PrimaryButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`font-headline flex-1 rounded-full bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-[0_8px_20px_rgba(0,40,142,0.2)] transition-all hover:brightness-105 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100 ${className} `}
+      className={`font-headline flex-1 rounded-full bg-primary px-5 py-3 text-sm font-bold text-primary-foreground shadow-[0_8px_20px_rgba(0,40,142,0.2)] transition-all hover:brightness-105 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100 ${className} `}
     >
       {children}
     </button>
@@ -141,7 +141,7 @@ function SecondaryButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`font-headline text-on-surface flex-1 rounded-full border border-blue-600/60 bg-blue-50/50 px-4 py-2 text-sm font-semibold backdrop-blur-md transition-all hover:bg-white/70 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 dark:border-blue-600/60 dark:bg-blue-800/50 dark:text-blue-100 dark:hover:bg-blue-800/70 ${className} `}
+      className={`font-headline text-on-surface flex-1 rounded-full border border-primary/60 bg-primary/5 px-4 py-2 text-sm font-semibold backdrop-blur-md transition-all hover:bg-card/70 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 ${className} `}
     >
       {children}
     </button>
@@ -232,8 +232,8 @@ export function SubscriptionNotifyForm({
       <main className="relative mx-auto max-w-lg space-y-6 px-4 pt-6">
         {/* Header */}
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 dark:bg-blue-900/50">
-            <BellRing size={24} className="text-blue-600 dark:text-blue-400" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
+            <BellRing size={24} className="text-primary" />
           </div>
           <div>
             <h3 className="font-headline text-on-surface text-lg font-bold">
@@ -246,7 +246,7 @@ export function SubscriptionNotifyForm({
         </div>
 
         {/* Channel Selection */}
-        <div className="rounded-2xl border border-gray-200/80 bg-gray-50 p-5 dark:border-slate-700 dark:bg-slate-900/60">
+        <div className="rounded-2xl border border-border bg-secondary p-5">
           <h4 className="text-on-surface-variant font-label mb-3 ml-1 text-xs font-semibold">
             通知渠道
           </h4>
@@ -260,8 +260,8 @@ export function SubscriptionNotifyForm({
                   onClick={() => toggleChannel(option.value)}
                   className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all ${
                     checked
-                      ? 'bg-blue-600 text-white shadow-[0_4px_12px_rgba(0,40,142,0.25)]'
-                      : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
+                      ? 'bg-primary text-primary-foreground shadow-[0_4px_12px_rgba(0,40,142,0.25)]'
+                      : 'border border-border bg-card text-card-foreground hover:bg-accent'
                   } `}
                 >
                   <option.icon size={16} />
@@ -273,7 +273,7 @@ export function SubscriptionNotifyForm({
         </div>
 
         {/* Reminder Points */}
-        <div className="rounded-2xl border border-gray-200/80 bg-gray-50 p-5 dark:border-slate-700 dark:bg-slate-900/60">
+        <div className="rounded-2xl border border-border bg-secondary p-5">
           <h4 className="text-on-surface-variant font-label mb-3 ml-1 text-xs font-semibold">
             提醒时间点
           </h4>
@@ -285,17 +285,17 @@ export function SubscriptionNotifyForm({
                   key={option.key}
                   className={`flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 transition-all ${
                     checked
-                      ? 'border border-blue-200 bg-blue-100 dark:border-blue-700/50 dark:bg-blue-900/40'
-                      : 'border border-gray-200 bg-white hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700/50'
+                      ? 'border border-primary/20 bg-primary/10'
+                      : 'border border-border bg-card hover:bg-accent'
                   } `}
                 >
                   <div
-                    className={`flex h-5 w-5 items-center justify-center rounded-full transition-all ${checked ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-slate-600'} `}
+                    className={`flex h-5 w-5 items-center justify-center rounded-full transition-all ${checked ? 'bg-primary text-primary-foreground' : 'bg-muted'} `}
                   >
                     {checked && <CheckCircle2 size={14} />}
                   </div>
                   <span
-                    className={`text-sm font-medium ${checked ? 'text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-slate-200'}`}
+                    className={`text-sm font-medium ${checked ? 'text-primary' : 'text-card-foreground'}`}
                   >
                     {option.label}
                   </span>
@@ -313,7 +313,7 @@ export function SubscriptionNotifyForm({
 
         {/* Channel Config */}
         {form.channels.includes('email') && (
-          <div className="rounded-2xl border border-gray-200/80 bg-gray-50 p-5 dark:border-slate-700 dark:bg-slate-900/60">
+          <div className="rounded-2xl border border-border bg-secondary p-5">
             <h4 className="text-on-surface-variant font-label mb-3 ml-1 text-xs font-semibold">
               邮件配置
             </h4>
@@ -322,13 +322,13 @@ export function SubscriptionNotifyForm({
               value={form.email}
               onChange={(event) => handleChange('email', event.target.value)}
               placeholder="your@email.com"
-              className="text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-white px-4 py-3 text-sm transition-all focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-800"
+              className="text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-card px-4 py-3 text-sm transition-all focus:ring-2 focus:ring-ring/20"
             />
           </div>
         )}
 
         {form.channels.includes('feishu') && (
-          <div className="rounded-2xl border border-gray-200/80 bg-gray-50 p-5 dark:border-slate-700 dark:bg-slate-900/60">
+          <div className="rounded-2xl border border-border bg-secondary p-5">
             <h4 className="text-on-surface-variant font-label mb-3 ml-1 text-xs font-semibold">
               飞书 Webhook
             </h4>
@@ -338,13 +338,13 @@ export function SubscriptionNotifyForm({
                 handleChange('feishu_webhook_url', event.target.value)
               }
               placeholder="https://open.feishu.cn/..."
-              className="text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-white px-4 py-3 text-sm transition-all focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-800"
+              className="text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-card px-4 py-3 text-sm transition-all focus:ring-2 focus:ring-ring/20"
             />
           </div>
         )}
 
         {form.channels.includes('bark') && (
-          <div className="rounded-2xl border border-gray-200/80 bg-gray-50 p-5 dark:border-slate-700 dark:bg-slate-900/60">
+          <div className="rounded-2xl border border-border bg-secondary p-5">
             <h4 className="text-on-surface-variant font-label mb-3 ml-1 text-xs font-semibold">
               Bark Device Key
             </h4>
@@ -354,14 +354,14 @@ export function SubscriptionNotifyForm({
                 handleChange('bark_device_key', event.target.value)
               }
               placeholder="填写 Bark 设备 Key"
-              className="text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-white px-4 py-3 text-sm transition-all focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-800"
+              className="text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-card px-4 py-3 text-sm transition-all focus:ring-2 focus:ring-ring/20"
             />
           </div>
         )}
 
         {/* Error Message */}
         {error && (
-          <div className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600 dark:bg-red-900/30 dark:text-red-300">
+          <div className="rounded-2xl bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {error}
           </div>
         )}
@@ -374,8 +374,8 @@ export function SubscriptionNotifyForm({
                 key={channel}
                 className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ${
                   success
-                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
-                    : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
+                    ? 'bg-success/10 text-success'
+                    : 'bg-destructive/10 text-destructive'
                 } `}
               >
                 <CheckCircle2 size={12} />

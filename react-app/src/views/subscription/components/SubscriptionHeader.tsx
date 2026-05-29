@@ -5,18 +5,18 @@ interface SubscriptionHeaderProps {
 
 export function SubscriptionHeader({ onClick }: SubscriptionHeaderProps) {
   return (
-    <header className="sticky top-0 z-10 border-b border-gray-200/60 bg-white/90 px-4 py-4 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/85">
+    <header className="sticky top-0 z-10 border-b border-border bg-card/90 px-4 py-4 backdrop-blur-md">
       <div className="mx-auto w-full max-w-2xl">
         <div className="flex items-start justify-between gap-3">
           <div className="ml-12 space-y-1">
-            <h1 className="mt-2 font-serif text-2xl font-semibold text-gray-900 text-shadow-lg dark:text-white">
+            <h1 className="mt-2 font-serif text-2xl font-semibold text-foreground text-shadow-lg">
               SubTracker
             </h1>
           </div>
           <motion.button
             type="button"
             onClick={onClick}
-            className="font-family-dongfang min-h-11 rounded-2xl bg-blue-900 px-6 text-sm font-medium text-white shadow-md shadow-blue-500/50 transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-blue-700"
+            className="font-family-dongfang min-h-11 rounded-2xl bg-primary px-6 text-sm font-medium text-primary-foreground shadow-md shadow-primary/50 transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             前往Device
           </motion.button>

@@ -32,7 +32,6 @@ interface MenuItemProps {
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   iconColor: string;
   iconBg: string;
-  darkIconBg: string;
 }
 
 interface NavItemProps {
@@ -51,8 +50,8 @@ function NavItem({ icon, to, isActive, activeIcon }: NavItemProps) {
           to={to}
           className={`flex h-14 w-16 items-center justify-center rounded-full transition-all duration-300 hover:scale-110 active:scale-95 ${
             isActive
-              ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
-              : 'text-slate-500 hover:text-blue-500 dark:text-slate-400 dark:hover:text-blue-400'
+              ? 'bg-primary/10 text-primary'
+              : 'text-muted-foreground hover:text-primary'
           }`}
         >
           {isActive && activeIcon ? activeIcon : icon}
@@ -62,21 +61,14 @@ function NavItem({ icon, to, isActive, activeIcon }: NavItemProps) {
   );
 }
 
-function MenuItem({
-  icon,
-  label,
-  onClick,
-  iconColor,
-  iconBg,
-  darkIconBg,
-}: MenuItemProps) {
+function MenuItem({ icon, label, onClick, iconColor, iconBg }: MenuItemProps) {
   return (
     <button
-      className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white/40 p-4 transition-transform active:scale-95 dark:bg-white/5"
+      className="border-border/20 bg-card/40 flex items-center gap-2 rounded-2xl border p-4 transition-transform active:scale-95"
       onClick={(e) => onClick(e)}
     >
       <div
-        className={`flex h-12 w-12 items-center justify-center rounded-full ${iconBg} ${darkIconBg}`}
+        className={`flex h-12 w-12 items-center justify-center rounded-full ${iconBg}`}
       >
         <span className={iconColor}>{icon}</span>
       </div>
@@ -132,7 +124,7 @@ export function BasicNav() {
         <AnimatePresence>
           {showMenu && (
             <motion.div
-              className="fixed inset-0 z-59 bg-black/20 backdrop-blur-[2px]"
+              className="bg-background/20 fixed inset-0 z-59 backdrop-blur-[2px]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -150,7 +142,7 @@ export function BasicNav() {
           {showMenu && (
             <motion.div
               key="more-menu"
-              className="scrollbar-hide fixed right-8 bottom-22 z-60 grid h-auto w-fit grid-cols-2 gap-2 overflow-hidden rounded-[2rem] border border-white/20 bg-white/80 p-5 shadow-xl backdrop-blur-sm dark:border-white/10 dark:bg-slate-900/80"
+              className="scrollbar-hide border-border/20 bg-card/80 fixed right-8 bottom-22 z-60 grid h-auto w-fit grid-cols-2 gap-2 overflow-hidden rounded-[2rem] border p-5 shadow-xl backdrop-blur-sm"
               initial={{ height: 0, opacity: 0.8, width: 0, y: 20 }}
               animate={{ height: 'auto', opacity: 1, width: 'auto', y: 0 }}
               exit={{ height: 0, opacity: 0, width: 0 }}
@@ -167,7 +159,6 @@ export function BasicNav() {
                 onClick={() => handleNav('/bookshelf')}
                 iconColor="text-orange-500"
                 iconBg="bg-orange-100"
-                darkIconBg="dark:bg-orange-900/40"
               />
               <MenuItem
                 icon={<MessagesIcon className="h-6 w-6" />}
@@ -175,7 +166,6 @@ export function BasicNav() {
                 onClick={() => handleNav('/messages')}
                 iconColor="text-emerald-500"
                 iconBg="bg-emerald-100"
-                darkIconBg="dark:bg-emerald-900/40"
               />
               <MenuItem
                 icon={<AnalyticsIcon className="h-6 w-6" />}
@@ -183,7 +173,6 @@ export function BasicNav() {
                 onClick={() => handleNav('/analytics')}
                 iconColor="text-cyan-500"
                 iconBg="bg-cyan-100"
-                darkIconBg="dark:bg-cyan-900/40"
               />
               <MenuItem
                 icon={<ImportIcon className="h-6 w-6" />}
@@ -191,31 +180,27 @@ export function BasicNav() {
                 onClick={() => handleNav('/import')}
                 iconColor="text-indigo-500"
                 iconBg="bg-indigo-100"
-                darkIconBg="dark:bg-indigo-900/40"
               />
               <MenuItem
                 icon={<Settings className="h-6 w-6" />}
                 label="Settings"
                 onClick={() => handleNav('/settings')}
-                iconColor="text-blue-500"
-                iconBg="bg-blue-100"
-                darkIconBg="dark:bg-blue-900/40"
+                iconColor="text-primary"
+                iconBg="bg-primary/10"
               />
               <MenuItem
                 icon={<ThemeIcon className="h-6 w-6" />}
                 label="Theme"
                 onClick={(e) => toggleTheme(e)}
-                iconColor="text-purple-500"
-                iconBg="bg-purple-100"
-                darkIconBg="dark:bg-purple-900/40"
+                iconColor="text-primary"
+                iconBg="bg-accent"
               />
               <MenuItem
                 icon={<AboutIcon className="h-6 w-6" />}
                 label="About"
                 onClick={() => handleNav('/about')}
-                iconColor="text-amber-500"
-                iconBg="bg-amber-100"
-                darkIconBg="dark:bg-amber-900/40"
+                iconColor="text-warning"
+                iconBg="bg-warning/10"
               />
               {/* Auth section */}
               {!auth.isAuthenticated ? (
@@ -224,17 +209,15 @@ export function BasicNav() {
                     icon={<LoginIcon className="h-6 w-6" />}
                     label="Login"
                     onClick={() => handleNav('/login')}
-                    iconColor="text-green-500"
-                    iconBg="bg-green-100"
-                    darkIconBg="dark:bg-green-900/40"
+                    iconColor="text-success"
+                    iconBg="bg-success/10"
                   />
                   <MenuItem
                     icon={<RegisterIcon className="h-6 w-6" />}
                     label="Register"
                     onClick={() => handleNav('/register')}
-                    iconColor="text-blue-500"
-                    iconBg="bg-blue-100"
-                    darkIconBg="dark:bg-blue-900/40"
+                    iconColor="text-primary"
+                    iconBg="bg-primary/10"
                   />
                 </>
               ) : (
@@ -242,9 +225,8 @@ export function BasicNav() {
                   icon={<LogoutIcon className="h-6 w-6" />}
                   label="Logout"
                   onClick={handleLogout}
-                  iconColor="text-red-500"
-                  iconBg="bg-red-100"
-                  darkIconBg="dark:bg-red-900/40"
+                  iconColor="text-destructive"
+                  iconBg="bg-destructive/10"
                 />
               )}
               <MenuItem
@@ -253,7 +235,6 @@ export function BasicNav() {
                 onClick={switchToVue}
                 iconColor="text-teal-500"
                 iconBg="bg-teal-100"
-                darkIconBg="dark:bg-teal-900/40"
               />
             </motion.div>
           )}
@@ -267,7 +248,7 @@ export function BasicNav() {
           {hidden ? null : (
             <motion.nav
               id="mobile-nav"
-              className="fixed bottom-4 left-1/2 z-65 flex h-16 max-w-md -translate-x-1/2 items-center justify-around rounded-full bg-white/80 px-6 py-3 shadow-lg backdrop-blur-sm dark:bg-slate-900/80 dark:shadow-[0_-8px_30px_rgba(0,0,0,0.3)]"
+              className="bg-card/80 fixed bottom-4 left-1/2 z-65 flex h-16 max-w-md -translate-x-1/2 items-center justify-around rounded-full px-6 py-3 shadow-lg backdrop-blur-sm"
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 80, opacity: 0 }}
@@ -302,8 +283,8 @@ export function BasicNav() {
                   onClick={() => setShowMenu((v) => !v)}
                   className={`flex h-14 w-16 items-center justify-center rounded-full transition-all duration-200 ${
                     showMenu || isMore
-                      ? 'bg-blue-100/80 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
-                      : 'text-slate-500 hover:text-blue-500 dark:text-slate-400 dark:hover:text-blue-400'
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-muted-foreground hover:text-primary'
                   }`}
                 >
                   {showMenu || isMore ? (

@@ -74,7 +74,7 @@ function PostCard({ post, index }: PostCardProps) {
 
           {/* Summary */}
           <div
-            className="text-foreground/60 line-clamp-3 text-sm leading-relaxed dark:text-white/60"
+            className="text-foreground/60 line-clamp-3 text-sm leading-relaxed"
             dangerouslySetInnerHTML={{ __html: getPreviewHtml(post.body) }}
           />
 

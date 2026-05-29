@@ -2,7 +2,7 @@ export function BasicFooter() {
   return (
     // Footer
     <footer className="mt-12">
-      <p className="ext-center text-xs text-neutral-700 dark:text-neutral-400">
+      <p className="ext-center text-muted-foreground text-xs">
         Copyright &copy; 2026 All Rights Reserved.
       </p>
       <div className="flex items-end justify-center">
@@ -19,14 +19,14 @@ export function BasicFooter() {
           />
         </a>
         <a
-          className="ext-center text-xs text-neutral-700 hover:underline dark:text-neutral-400"
+          className="ext-center text-muted-foreground text-xs hover:underline"
           href="https://beian.miit.gov.cn/#/Integrated/index"
           target="_blank"
         >
           &nbsp;粤ICP备2026018113号
         </a>
         <a
-          className="ext-center text-xs text-neutral-700 hover:underline dark:text-neutral-400"
+          className="ext-center text-muted-foreground text-xs hover:underline"
           href="/privacy"
         >
           &nbsp;隐私政策

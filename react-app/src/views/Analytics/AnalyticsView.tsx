@@ -109,25 +109,25 @@ export default function AnalyticsView() {
   }, [fetchAllData]);
 
   return (
-    <div className="min-h-dvh w-full bg-linear-to-b from-sky-50/90 to-white px-3 pt-20 pb-28 dark:from-slate-900 dark:to-slate-950">
+    <div className="from-background/90 to-background min-h-dvh w-full bg-linear-to-b px-3 pt-20 pb-28">
       <div className="mx-auto w-full max-w-xl space-y-4">
         <section className="space-y-2">
-          <span className="inline-flex rounded-full bg-gray-900 px-2.5 py-1 text-[11px] font-medium tracking-wide text-white dark:bg-gray-100 dark:text-gray-900">
+          <span className="bg-foreground text-background inline-flex rounded-full px-2.5 py-1 text-[11px] font-medium tracking-wide">
             Admin Only
           </span>
-          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          <h1 className="text-foreground text-2xl font-semibold">
             Analytics Dashboard
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-muted-foreground text-sm">
             Mobile-first monitoring for key traffic and system metrics.
           </p>
         </section>
 
-        <section className="rounded-3xl border border-gray-200/60 bg-white/80 p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900/70">
+        <section className="border-border/60 bg-card/80 rounded-3xl border p-3.5 shadow-sm">
           <DayFilter selectedDays={selectedDays} onChange={setSelectedDays} />
 
           <button
-            className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-50"
             disabled={loading}
             onClick={() => {
               void fetchAllData();
@@ -142,7 +142,7 @@ export default function AnalyticsView() {
         </section>
 
         {error ? (
-          <section className="rounded-xl border border-red-200 bg-red-50/80 p-4 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/30 dark:text-red-200">
+          <section className="border-destructive bg-destructive/10 text-destructive rounded-xl border p-4 text-sm">
             {error}
           </section>
         ) : null}
@@ -153,28 +153,28 @@ export default function AnalyticsView() {
             value={formatNumber(overviewData?.totalVisits ?? 0)}
             subtitle="Page Views"
             icon={<Waypoints className="h-4 w-4" />}
-            iconClassName="bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
+            iconClassName="bg-primary/10 text-primary"
           />
           <StatsCard
             title="Unique Visitors"
             value={formatNumber(overviewData?.uniqueVisitors ?? 0)}
             subtitle="By IP"
             icon={<Users className="h-4 w-4" />}
-            iconClassName="bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
+            iconClassName="bg-success/10 text-success"
           />
           <StatsCard
             title="Visitor IDs"
             value={formatNumber(overviewData?.uniqueVisitorIds ?? 0)}
             subtitle="By ID"
             icon={<UserRound className="h-4 w-4" />}
-            iconClassName="bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
+            iconClassName="bg-accent text-accent-foreground"
           />
           <StatsCard
             title="Avg/Day"
             value={avgVisitsPerDay}
             subtitle={`${selectedDays} days`}
             icon={<BarChart3 className="h-4 w-4" />}
-            iconClassName="bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400"
+            iconClassName="bg-warning/10 text-warning"
           />
         </section>
 
@@ -197,13 +197,13 @@ export default function AnalyticsView() {
 
         <section className="pt-2 text-center">
           <button
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gray-900 px-6 py-3 text-sm font-medium text-white transition-all duration-300 hover:bg-gray-800 hover:shadow-lg dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all duration-300 hover:shadow-lg"
             onClick={() => navigate('/')}
             type="button"
           >
             返回首页
           </button>
-          <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">
+          <p className="text-muted-foreground mt-2 text-xs">
             Updated at {formatDate(new Date().toISOString())}
           </p>
         </section>

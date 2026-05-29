@@ -15,12 +15,10 @@ function MeterRow({ label, percent, details, color }: MeterRowProps) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between text-sm">
-        <span className="font-medium text-gray-700 dark:text-gray-200">
-          {label}
-        </span>
-        <span className="text-gray-500 dark:text-gray-400">{details}</span>
+        <span className="text-card-foreground font-medium">{label}</span>
+        <span className="text-muted-foreground">{details}</span>
       </div>
-      <div className="h-3 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+      <div className="bg-secondary h-3 w-full rounded-full">
         <div
           className="h-full rounded-full transition-all duration-500"
           style={{
@@ -39,11 +37,11 @@ export function ServerStatusCard({ status }: ServerStatusCardProps) {
   const disk = status?.diskUsagePercent ?? 0;
 
   return (
-    <article className="rounded-3xl border border-gray-200/60 bg-white/85 p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900/80">
-      <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100">
+    <article className="border-border/60 bg-card/85 rounded-3xl border p-3.5 shadow-sm">
+      <h3 className="text-foreground text-base font-semibold">
         Server Status Snapshot
       </h3>
-      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+      <p className="text-muted-foreground mt-1 text-xs">
         Resource overview with one-click refresh
       </p>
 

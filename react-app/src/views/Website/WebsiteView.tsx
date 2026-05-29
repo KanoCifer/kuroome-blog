@@ -34,10 +34,10 @@ export default function WebsiteView() {
         rel="noopener noreferrer"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="squircle mx-4 bg-gray-50 p-5 shadow-lg dark:bg-gray-700"
+        className="squircle mx-4 bg-secondary p-5 shadow-lg"
       >
         <div className="mb-4 flex items-start gap-4">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-700">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-muted">
             <img
               src={t.icon}
               alt={t.name}
@@ -49,23 +49,23 @@ export default function WebsiteView() {
             />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="truncate text-lg font-bold text-gray-900 transition-colors duration-300 group-hover:text-gray-700 dark:text-gray-100 dark:group-hover:text-gray-300">
+            <h3 className="truncate text-lg font-bold text-foreground transition-colors duration-300 group-hover:text-card-foreground">
               {t.name}
             </h3>
-            <span className="inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+            <span className="inline-block rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground">
               {t.category}
             </span>
           </div>
         </div>
 
-        <p className="line-clamp-3 text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+        <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">
           {t.description}
         </p>
 
         <div className="mt-4 flex flex-wrap gap-2">
           <span
             key={t.id}
-            className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+            className="rounded-full bg-secondary px-2 py-1 text-xs text-muted-foreground"
           >
             {t.tags.map((tag) => (
               <span key={tag}>{tag}</span>
@@ -76,7 +76,7 @@ export default function WebsiteView() {
         <div className="absolute top-4 right-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 text-gray-500"
+            className="h-5 w-5 text-muted-foreground"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

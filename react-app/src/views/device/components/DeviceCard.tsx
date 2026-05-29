@@ -49,7 +49,7 @@ export function DeviceCard({
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         onClick={() => setIsDailyCostOpen(true)}
-        className="squircle border border-slate-100 bg-white p-6 shadow-lg dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl"
+        className="squircle border-border bg-card border p-6 shadow-lg"
       >
         {/* 分析图表 */}
         <DailyCost
@@ -61,37 +61,37 @@ export function DeviceCard({
         <div className="mb-6 flex items-start justify-between">
           <div className="flex items-center gap-4">
             {/* Logo placeholder */}
-            <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-inner dark:border-slate-600/50 dark:bg-slate-700/80">
-              <span className="text-2xl font-bold text-slate-400 dark:text-blue-400">
+            <div className="border-border bg-card flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border shadow-inner">
+              <span className="text-primary text-2xl font-bold">
                 {device.name.charAt(0).toUpperCase()}
               </span>
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              <h3 className="text-foreground text-lg font-bold">
                 {device.name}
               </h3>
               {isActive ? (
-                <p className="w-fit rounded-full bg-green-100 px-2 py-0.5 text-center text-sm font-medium text-green-600 dark:bg-green-700/20 dark:text-emerald-400">
+                <p className="bg-success/10 text-success w-fit rounded-full px-2 py-0.5 text-center text-sm font-medium">
                   使用中
                 </p>
               ) : (
-                <p className="w-fit rounded-full bg-red-100 px-2 py-0.5 text-center text-sm font-medium text-red-500 dark:bg-red-700/20 dark:text-red-400">
+                <p className="bg-destructive/10 text-destructive w-fit rounded-full px-2 py-0.5 text-center text-sm font-medium">
                   已退役
                 </p>
               )}
-              <span className="text-xs text-slate-500 dark:text-slate-400">
+              <span className="text-muted-foreground text-xs">
                 {formatDate(device.purchase_date, 'YYYY-MM-DD')}
               </span>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-xl font-bold text-[#00288e] dark:text-blue-400">
+            <p className="text-primary text-xl font-bold">
               {formatPrice(device.price, device.currency)}
             </p>
-            <p className="text-[10px] font-bold tracking-wider text-slate-400 uppercase dark:text-slate-500">
+            <p className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
               {device.currency}
             </p>
-            <p className="font-family-dongfang mt-2 text-xs font-bold text-slate-500 dark:text-slate-400">
+            <p className="font-family-dongfang mt-2 text-xs font-bold text-muted-foreground">
               {`日均 ${formatPrice(calcSpendPerDay(device), device.currency)}/天`}
             </p>
           </div>
@@ -99,9 +99,9 @@ export function DeviceCard({
 
         {/* Notes Banner */}
         {device.notes && (
-          <div className="mb-6 flex items-center gap-2 rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-700/50">
+          <div className="mb-6 flex items-center gap-2 rounded-2xl bg-secondary px-4 py-3">
             <svg
-              className="h-4 w-4 scale-75 text-[#00288e] dark:text-blue-400"
+              className="h-4 w-4 scale-75 text-primary"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -113,7 +113,7 @@ export function DeviceCard({
                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
               />
             </svg>
-            <span className="truncate text-sm font-medium text-slate-500 dark:text-slate-400">
+            <span className="truncate text-sm font-medium text-muted-foreground">
               {device.notes}
             </span>
           </div>
@@ -127,7 +127,7 @@ export function DeviceCard({
               e.stopPropagation();
               onToggleStatus(device);
             }}
-            className="rounded-full bg-[#00288e] px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-blue-600"
+            className="rounded-full bg-primary px-4 py-3 text-sm font-bold text-primary-foreground shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isPending ? '处理中...' : isActive ? '标记退役' : '恢复使用'}
           </button>
@@ -137,7 +137,7 @@ export function DeviceCard({
               e.stopPropagation();
               setIsMilestoneModalOpen(true);
             }}
-            className="rounded-full bg-[#00288e] px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-blue-600"
+            className="rounded-full bg-primary px-4 py-3 text-sm font-bold text-primary-foreground shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
           >
             编辑配置
           </button>
@@ -148,7 +148,7 @@ export function DeviceCard({
               e.stopPropagation();
               onDelete(device);
             }}
-            className="rounded-full border border-red-200 bg-red-300/50 px-4 py-3 text-sm font-bold text-red-600 transition-all hover:bg-red-50 active:scale-95 dark:border-red-800 dark:bg-red-700/30 dark:text-red-400 dark:hover:bg-red-900/20"
+            className="rounded-full border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-bold text-destructive transition-all hover:bg-destructive/20 active:scale-95"
           >
             删除设备
           </button>

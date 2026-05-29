@@ -33,12 +33,12 @@ export function BookCard({ book, index = 0 }: BookCardProps) {
     ? {
         text: '已读',
         className:
-          'bg-green-100 text-green-700 dark:bg-green-400/10 dark:text-green-300',
+          'bg-success/10 text-success',
       }
     : {
         text: '在读',
         className:
-          'bg-blue-100 text-blue-700 dark:bg-blue-400/10 dark:text-blue-300',
+          'bg-primary/10 text-primary',
       };
 
   return (
@@ -48,8 +48,8 @@ export function BookCard({ book, index = 0 }: BookCardProps) {
       transition={{ duration: 0.4, delay: Math.min(index * 0.04, 0.4) }}
       className="book-card-wrapper"
     >
-      <div className="group overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:bg-gray-800">
-        <div className="relative aspect-[2/3] overflow-hidden bg-gray-100 dark:bg-gray-700">
+      <div className="group overflow-hidden rounded-2xl bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+        <div className="relative aspect-[2/3] overflow-hidden bg-muted">
           {book.cover && !coverError ? (
             <img
               src={coverSrc}
@@ -65,7 +65,7 @@ export function BookCard({ book, index = 0 }: BookCardProps) {
                 viewBox="0 0 24 24"
                 strokeWidth="1.5"
                 stroke="currentColor"
-                className="h-14 w-14 text-gray-300 dark:text-gray-600"
+                className="h-14 w-14 text-muted-foreground"
               >
                 <path
                   strokeLinecap="round"
@@ -85,12 +85,12 @@ export function BookCard({ book, index = 0 }: BookCardProps) {
         </div>
         <div className="p-4">
           <h3
-            className="truncate text-base font-semibold text-gray-900 dark:text-white"
+            className="truncate text-base font-semibold text-foreground"
             title={book.title}
           >
             {book.title}
           </h3>
-          <p className="mt-1 truncate text-sm text-gray-500 opacity-70 dark:text-gray-400">
+          <p className="mt-1 truncate text-sm text-muted-foreground opacity-70">
             {book.author}
           </p>
         </div>

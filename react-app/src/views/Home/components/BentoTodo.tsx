@@ -6,10 +6,9 @@ import { Link } from 'react-router-dom';
 
 function statusClass(status: DevTaskStatus): string {
   const map: Record<DevTaskStatus, string> = {
-    todo: 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-    'in-progress':
-      'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
-    done: 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
+    todo: 'border-primary/20 bg-primary/5 text-primary',
+    'in-progress': 'border-warning/20 bg-warning/5 text-warning',
+    done: 'border-success/20 bg-success/5 text-success',
   };
   return map[status];
 }
@@ -31,8 +30,8 @@ export function BentoTodo() {
       <span
         className={`text-sm leading-tight transition-colors duration-200 select-none ${
           t.status === 'done'
-            ? 'text-gray-400 line-through dark:text-gray-500'
-            : 'text-gray-900 dark:text-gray-100'
+            ? 'text-muted-foreground line-through'
+            : 'text-foreground'
         }`}
       >
         {t.title}
@@ -44,16 +43,16 @@ export function BentoTodo() {
     <BentoCard>
       <div className="flex h-full flex-col">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-xs font-bold tracking-wide text-neutral-500 uppercase transition-colors duration-300 group-hover:text-neutral-600 dark:text-neutral-400 dark:group-hover:text-neutral-300">
+          <h3 className="text-xs font-bold tracking-wide text-muted-foreground uppercase transition-colors duration-300 group-hover:text-foreground">
             {title}
           </h3>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+            <span className="text-xs font-medium text-muted-foreground">
               {doneCount} / {tasks.length}
             </span>
             <Link
               to="/todos"
-              className="cursor-pointer rounded-md p-1 text-gray-400 outline-0 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+              className="cursor-pointer rounded-md p-1 text-muted-foreground outline-0 transition-colors hover:bg-accent hover:text-foreground"
               title="查看详情"
             >
               <svg
@@ -79,7 +78,7 @@ export function BentoTodo() {
 
             {tasks.length === 0 && (
               <div className="flex h-full flex-col items-center justify-center py-6">
-                <p className="text-md flex flex-col items-center gap-2 font-medium tracking-wide text-gray-400 dark:text-gray-200">
+                <p className="text-md flex flex-col items-center gap-2 font-medium tracking-wide text-muted-foreground">
                   <BookCheck className="size-12" />
                   暂无开发任务
                 </p>

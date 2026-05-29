@@ -70,8 +70,8 @@ export default function RssArticleView() {
   }, [article]);
 
   return (
-    <div className="min-h-dvh bg-gray-50 pb-28 dark:bg-slate-950">
-      <header className="sticky top-0 z-10 h-15 bg-white/85 px-4 py-3 backdrop-blur-md dark:bg-slate-900/85"></header>
+    <div className="min-h-dvh bg-background pb-28">
+      <header className="sticky top-0 z-10 h-15 bg-card/85 px-4 py-3 backdrop-blur-md"></header>
       <main className="mx-auto w-full max-w-dvw px-4 py-4">
         <AnimatePresence mode="wait">
           {loading ? (
@@ -89,7 +89,7 @@ export default function RssArticleView() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-red-600"
+              className="text-destructive"
             >
               {error}
             </motion.p>
@@ -100,10 +100,10 @@ export default function RssArticleView() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
             >
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-2xl font-bold text-foreground">
                 {article.title}
               </h1>
-              <p className="mt-1 mb-4 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 mb-4 text-xs text-muted-foreground">
                 {article.author ? `作者：${article.author} · ` : ''}
                 {formatDate(article.published)}
               </p>
@@ -112,7 +112,7 @@ export default function RssArticleView() {
               <ArticleSummaryCard title={article.title} content={pureContent} />
 
               <div
-                className="prose prose-sm dark:prose-invert mt-4 max-w-none rounded-2xl bg-white p-4 ring-1 ring-blue-100 dark:bg-slate-900 dark:ring-slate-800"
+                className="prose prose-sm dark:prose-invert mt-4 max-w-none rounded-2xl bg-card p-4 ring-1 ring-border"
                 dangerouslySetInnerHTML={{ __html: html }}
               />
             </motion.article>

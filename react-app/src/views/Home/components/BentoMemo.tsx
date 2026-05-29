@@ -40,14 +40,12 @@ export function BentoMemo() {
     <>
       <div onClick={toggleMemo} className="cursor-pointer">
         <BentoCard>
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/20">
-            <MemoIcon className="size-6 text-amber-600 dark:text-amber-400" />
+          <div className="bg-warning/20 flex h-10 w-10 items-center justify-center rounded-lg">
+            <MemoIcon className="text-warning size-6" />
           </div>
           <div>
-            <h5 className="text-sm font-bold text-slate-800 dark:text-slate-100">
-              Quick Memo
-            </h5>
-            <p className="mt-1 line-clamp-2 text-[11px] leading-tight text-slate-600 dark:text-slate-400">
+            <h5 className="text-foreground text-sm font-bold">Quick Memo</h5>
+            <p className="text-muted-foreground mt-1 line-clamp-2 text-[11px] leading-tight">
               {memoText ? memoText : 'Tap to write down your thoughts...'}
             </p>
           </div>
@@ -62,7 +60,7 @@ export function BentoMemo() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={closeMemo}
-              className="fixed inset-0 z-50 bg-black/20 backdrop-blur-[2px]"
+              className="bg-background/20 fixed inset-0 z-50 backdrop-blur-[2px]"
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
@@ -71,12 +69,12 @@ export function BentoMemo() {
               className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center"
             >
               <div
-                className="pointer-events-auto relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl bg-white p-6 shadow-2xl dark:bg-gray-800"
+                className="bg-card pointer-events-auto relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl p-6 shadow-2xl"
                 onClick={(e) => e.stopPropagation()}
               >
                 <button
                   onClick={closeMemo}
-                  className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+                  className="text-muted-foreground hover:bg-accent hover:text-accent-foreground absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full"
                 >
                   <svg
                     className="h-5 w-5"
@@ -93,7 +91,7 @@ export function BentoMemo() {
                   </svg>
                 </button>
 
-                <h3 className="mb-4 flex items-center gap-2 font-serif text-xl font-bold text-gray-800 dark:text-white">
+                <h3 className="text-foreground mb-4 flex items-center gap-2 font-serif text-xl font-bold">
                   <MemoIcon className="size-5" />
                   Quick Memo
                 </h3>
@@ -102,13 +100,13 @@ export function BentoMemo() {
                   value={memoText}
                   onChange={(e) => setMemoText(e.target.value)}
                   placeholder="在这里写下你的想法..."
-                  className="mb-4 w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-500"
+                  className="border-border bg-muted text-card-foreground placeholder-muted-foreground focus:border-primary focus:ring-primary/20 mb-4 w-full resize-none rounded-xl border px-4 py-3 text-sm focus:ring-2 focus:outline-none"
                   rows={10}
                   autoFocus
                 />
 
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                  <span className="text-muted-foreground text-xs">
                     自动保存
                     {memoText && (
                       <span className="ml-2">{memoText.length} 字</span>
@@ -116,7 +114,7 @@ export function BentoMemo() {
                   </span>
                   <button
                     onClick={clearMemo}
-                    className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-800 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+                    className="border-border bg-muted text-muted-foreground hover:bg-accent hover:text-foreground flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

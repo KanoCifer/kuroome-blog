@@ -31,11 +31,11 @@ export function BentoWeb() {
   return (
     <BentoCard onClick={() => navigate('/websites')} className="cursor-pointer">
       <div className="relative z-10 flex h-full flex-col justify-between">
-        <div className="text-xs font-bold tracking-wide text-neutral-500 uppercase transition-colors duration-300 group-hover:text-neutral-600 dark:text-neutral-400 dark:group-hover:text-neutral-300">
+        <div className="text-xs font-bold tracking-wide text-muted-foreground uppercase transition-colors duration-300 group-hover:text-foreground">
           Daily Pick
         </div>
         <div className="my-1 flex items-center">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-neutral-100 text-neutral-700 transition-colors duration-300 group-hover:bg-neutral-200 dark:bg-neutral-700 dark:text-neutral-300 dark:group-hover:bg-neutral-600">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted text-card-foreground transition-colors duration-300 group-hover:bg-secondary">
             {randomSite.icon && (
               <img
                 src={randomSite.icon}
@@ -61,12 +61,12 @@ export function BentoWeb() {
               </svg>
             )}
           </div>
-          <h3 className="ml-2 text-lg leading-tight font-bold text-neutral-800 transition-colors duration-300 group-hover:text-neutral-950 dark:text-neutral-100 dark:group-hover:text-white">
+          <h3 className="ml-2 text-lg leading-tight font-bold text-foreground transition-colors duration-300">
             {randomSite.name}
           </h3>
         </div>
         <div>
-          <p className="line-clamp-2 text-sm text-neutral-500 transition-colors duration-300 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-300">
+          <p className="line-clamp-2 text-sm text-muted-foreground transition-colors duration-300 group-hover:text-card-foreground">
             {randomSite.description}
           </p>
         </div>

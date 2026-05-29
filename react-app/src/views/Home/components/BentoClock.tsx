@@ -23,7 +23,7 @@ export function BentoClock() {
     <BentoCard>
       <div>
         <svg
-          className="h-6 w-6 text-blue-600 dark:text-blue-400"
+          className="text-primary h-6 w-6"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -37,10 +37,10 @@ export function BentoClock() {
         </svg>
       </div>
       <div>
-        <div className="font-serif text-4xl font-extrabold tracking-tighter text-slate-800 dark:text-slate-100">
+        <div className="text-foreground font-serif text-4xl font-extrabold tracking-tighter">
           {timeLabel}
         </div>
-        <div className="mt-1 text-sm font-medium text-slate-600 dark:text-slate-400">
+        <div className="text-muted-foreground mt-1 text-sm font-medium">
           {dateLabel}
         </div>
       </div>

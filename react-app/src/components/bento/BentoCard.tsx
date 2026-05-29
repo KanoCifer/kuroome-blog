@@ -18,7 +18,7 @@ export function BentoCard({ children, className, onClick }: BentoCardProps) {
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       style={style}
-      className={`card squircle rounded-[40px] border border-white/60 bg-gray-50/50 p-6 shadow-sm ring ring-gray-50/70 dark:border-gray-700 dark:bg-gray-800/80 dark:ring-gray-600 ${className || ''}`}
+      className={`card squircle rounded-[40px] border border-border/60 bg-card/50 p-6 shadow-sm ring ring-border/70 ${className || ''}`}
       onClick={onClick}
     >
       {children}

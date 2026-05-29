@@ -13,7 +13,7 @@ interface GlobalConfig {
 export function ConfigManageButton({ onOpen }: { onOpen: () => void }) {
   return (
     <button
-      className="flex w-full items-center justify-center gap-2 rounded-full bg-[#00288e] px-6 py-5 font-bold text-white shadow-lg shadow-indigo-500/20 transition-all hover:opacity-90 active:scale-95 dark:bg-blue-600 dark:shadow-blue-900/40"
+      className="bg-primary text-primary-foreground shadow-primary/20 flex w-full items-center justify-center gap-2 rounded-full px-6 py-5 font-bold shadow-lg transition-all hover:opacity-90 active:scale-95"
       onClick={onOpen}
     >
       <BellRing className="size-5" />
@@ -115,11 +115,8 @@ export default function ConfigManage() {
         <div className="relative mx-auto max-w-lg space-y-6 px-4 pt-6">
           {/* Header */}
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 dark:bg-blue-900/50">
-              <BellRing
-                size={24}
-                className="text-blue-600 dark:text-blue-400"
-              />
+            <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-2xl">
+              <BellRing size={24} className="text-primary" />
             </div>
             <div>
               <h3 className="font-headline text-on-surface text-lg font-bold">
@@ -133,12 +130,12 @@ export default function ConfigManage() {
 
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+              <div className="border-primary h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
             </div>
           ) : (
             <>
               {/* Email Config */}
-              <div className="rounded-2xl border border-gray-200/80 bg-gray-50 p-5 dark:border-slate-700 dark:bg-slate-900/60">
+              <div className="border-border bg-secondary rounded-2xl border p-5">
                 <h4 className="text-on-surface-variant font-label mb-3 ml-1 flex items-center gap-2 text-xs font-semibold">
                   <Mail size={14} />
                   邮件通知
@@ -150,12 +147,12 @@ export default function ConfigManage() {
                     handleChange('email', event.target.value)
                   }
                   placeholder="your@email.com"
-                  className="text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-white px-4 py-3 text-sm transition-all focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-800"
+                  className="text-on-surface placeholder:text-outline/50 bg-card focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
                 />
               </div>
 
               {/* Feishu Config */}
-              <div className="rounded-2xl border border-gray-200/80 bg-gray-50 p-5 dark:border-slate-700 dark:bg-slate-900/60">
+              <div className="border-border bg-secondary rounded-2xl border p-5">
                 <h4 className="text-on-surface-variant font-label mb-3 ml-1 flex items-center gap-2 text-xs font-semibold">
                   <Settings size={14} />
                   飞书 Webhook
@@ -167,12 +164,12 @@ export default function ConfigManage() {
                     handleChange('feishu_webhook_url', event.target.value)
                   }
                   placeholder="https://open.feishu.cn/..."
-                  className="text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-white px-4 py-3 text-sm transition-all focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-800"
+                  className="text-on-surface placeholder:text-outline/50 bg-card focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
                 />
               </div>
 
               {/* Bark Config */}
-              <div className="rounded-2xl border border-gray-200/80 bg-gray-50 p-5 dark:border-slate-700 dark:bg-slate-900/60">
+              <div className="border-border bg-secondary rounded-2xl border p-5">
                 <h4 className="text-on-surface-variant font-label mb-3 ml-1 flex items-center gap-2 text-xs font-semibold">
                   <BellRing size={14} />
                   Bark 通知
@@ -184,20 +181,20 @@ export default function ConfigManage() {
                     handleChange('bark_device_key', event.target.value)
                   }
                   placeholder="填写 Bark 设备 Key"
-                  className="text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-white px-4 py-3 text-sm transition-all focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-800"
+                  className="text-on-surface placeholder:text-outline/50 bg-card focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
                 />
               </div>
 
               {/* Error Message */}
               {error && (
-                <div className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600 dark:bg-red-900/30 dark:text-red-300">
+                <div className="bg-destructive/10 text-destructive rounded-2xl px-4 py-3 text-sm">
                   {error}
                 </div>
               )}
 
               {/* Success Message */}
               {success && (
-                <div className="flex items-center gap-2 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300">
+                <div className="bg-success/10 text-success flex items-center gap-2 rounded-2xl px-4 py-3 text-sm">
                   <CheckCircle2 size={16} />
                   配置保存成功
                 </div>
@@ -208,7 +205,7 @@ export default function ConfigManage() {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="font-headline text-on-surface flex-1 rounded-full border border-gray-300 px-4 py-3 text-sm font-semibold transition-all hover:bg-gray-100 active:scale-[0.98] dark:border-slate-600 dark:hover:bg-slate-800"
+                  className="font-headline text-on-surface border-border hover:bg-accent flex-1 rounded-full border px-4 py-3 text-sm font-semibold transition-all active:scale-[0.98]"
                 >
                   取消
                 </button>
@@ -216,7 +213,7 @@ export default function ConfigManage() {
                   type="button"
                   onClick={handleSave}
                   disabled={isSaving}
-                  className="font-headline flex-1 rounded-full bg-blue-600 px-4 py-3 text-sm font-bold text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:brightness-105 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
+                  className="font-headline bg-primary text-primary-foreground flex-1 rounded-full px-4 py-3 text-sm font-bold shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:brightness-105 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
                 >
                   {isSaving ? '保存中...' : '保存配置'}
                 </button>

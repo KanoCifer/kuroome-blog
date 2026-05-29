@@ -46,16 +46,16 @@ export default function ImportBookView() {
   return (
     <div className="min-h-screen px-4 py-16">
       <motion.div
-        className="mx-auto mt-8 max-w-2xl rounded-3xl border border-white/20 bg-white/40 p-8 shadow-2xl backdrop-blur sm:p-10 dark:border-gray-700/30 dark:bg-gray-900/40"
+        className="border-border/20 bg-card/40 mx-auto mt-8 max-w-2xl rounded-3xl border p-8 shadow-2xl backdrop-blur sm:p-10"
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
       >
         <div className="mb-10 text-center sm:mb-12">
-          <h1 className="bg-linear-to-r from-blue-600 to-sky-600 bg-clip-text text-[clamp(1.8rem,4vw,2.5rem)] font-bold text-transparent dark:from-blue-400 dark:to-sky-400">
+          <h1 className="from-primary to-primary bg-linear-to-r bg-clip-text text-[clamp(1.8rem,4vw,2.5rem)] font-bold text-transparent">
             Import Your Bookshelf
           </h1>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-muted-foreground mt-2 text-sm">
             Import your books from WeRead by providing your account cookie
           </p>
         </div>
@@ -64,7 +64,7 @@ export default function ImportBookView() {
           <div className="space-y-2">
             <label
               htmlFor="weread_cookie"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="text-card-foreground block text-sm font-medium"
             >
               WeRead Cookie
             </label>
@@ -72,11 +72,11 @@ export default function ImportBookView() {
               id="weread_cookie"
               value={wereadCookie}
               onChange={(event) => setWereadCookie(event.target.value)}
-              className="w-full rounded-2xl border border-gray-200 bg-white/70 px-4 py-3 text-sm transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800/50 dark:text-white"
+              className="border-input bg-card/70 text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-2xl border px-4 py-3 text-sm transition-all duration-200 focus:ring-2 focus:outline-none"
               rows={8}
               placeholder="Paste your WeRead cookie here..."
             />
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-muted-foreground mt-1 text-xs">
               Your cookie will be saved locally in your browser for future use
             </p>
           </div>
@@ -84,11 +84,11 @@ export default function ImportBookView() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-2xl bg-linear-to-r from-blue-500 to-sky-600 px-6 py-4 font-medium text-white shadow-lg shadow-blue-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-blue-500/30 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-gray-900"
+            className="from-primary to-primary text-primary-foreground shadow-primary/20 hover:shadow-primary/30 focus:ring-ring focus:ring-offset-background w-full rounded-2xl bg-linear-to-r px-6 py-4 font-medium shadow-lg transition-all duration-300 hover:scale-[1.02] focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                <span className="border-primary-foreground h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
                 Importing Books...
               </span>
             ) : (

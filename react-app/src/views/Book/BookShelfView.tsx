@@ -64,10 +64,10 @@ export default function BookShelfView() {
   };
 
   return (
-    <div className="mx-auto my-8 mb-20 min-h-screen w-full max-w-5xl rounded-[32px] bg-gray-50/70 px-4 py-6 sm:my-16 sm:px-6 lg:px-8 dark:bg-gray-900/50">
+    <div className="bg-muted/70 mx-auto my-8 mb-20 min-h-screen w-full max-w-5xl rounded-[32px] px-4 py-6 sm:my-16 sm:px-6 lg:px-8">
       <div className="mx-auto">
         <div className="mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+          <div className="bg-primary/10 text-primary flex h-12 w-12 items-center justify-center rounded-xl">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -85,14 +85,14 @@ export default function BookShelfView() {
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="font-serif text-2xl font-bold text-gray-900 sm:text-3xl dark:text-white">
+              <h1 className="text-foreground font-serif text-2xl font-bold sm:text-3xl">
                 我的书架
               </h1>
-              <span className="rounded-full border border-blue-300 bg-blue-200/60 px-3 py-1 text-xs font-semibold text-blue-600 dark:bg-blue-200 dark:text-blue-900">
+              <span className="border-primary bg-primary/20 text-primary rounded-full border px-3 py-1 text-xs font-semibold">
                 {booksCount}
               </span>
             </div>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-muted-foreground mt-1 text-sm">
               管理您的阅读收藏
             </p>
           </div>
@@ -103,12 +103,12 @@ export default function BookShelfView() {
             {Array.from({ length: 6 }).map((_, index) => (
               <div
                 key={index}
-                className="animate-pulse overflow-hidden rounded-2xl bg-white shadow-sm dark:bg-gray-800"
+                className="bg-card animate-pulse overflow-hidden rounded-2xl shadow-sm"
               >
-                <div className="aspect-[2/3] bg-gray-200 dark:bg-gray-700" />
+                <div className="bg-muted aspect-[2/3]" />
                 <div className="p-4">
-                  <div className="mb-2 h-5 w-3/4 rounded bg-gray-200 dark:bg-gray-700" />
-                  <div className="h-4 w-1/2 rounded bg-gray-200 dark:bg-gray-700" />
+                  <div className="bg-muted mb-2 h-5 w-3/4 rounded" />
+                  <div className="bg-muted h-4 w-1/2 rounded" />
                 </div>
               </div>
             ))}
@@ -116,8 +116,8 @@ export default function BookShelfView() {
         )}
 
         {!isLoading && errorMessage && (
-          <div className="flex flex-col items-center justify-center rounded-2xl bg-white py-12 shadow-sm dark:bg-gray-800">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400">
+          <div className="bg-card flex flex-col items-center justify-center rounded-2xl py-12 shadow-sm">
+            <div className="bg-destructive/10 text-destructive mb-4 flex h-16 w-16 items-center justify-center rounded-full">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -133,12 +133,10 @@ export default function BookShelfView() {
                 />
               </svg>
             </div>
-            <p className="mb-4 text-center text-red-600 dark:text-red-400">
-              {errorMessage}
-            </p>
+            <p className="text-destructive mb-4 text-center">{errorMessage}</p>
             <button
               type="button"
-              className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-6 py-2.5 font-semibold text-white shadow-lg shadow-red-500/30 transition-colors hover:bg-red-700 focus:outline-none"
+              className="bg-destructive shadow-destructive/30 hover:bg-destructive/90 inline-flex items-center gap-2 rounded-xl px-6 py-2.5 font-semibold text-white shadow-lg transition-colors focus:outline-none"
               onClick={() => fetchBooks(pagination?.page ?? 1)}
             >
               <svg
@@ -161,8 +159,8 @@ export default function BookShelfView() {
         )}
 
         {!isLoading && !errorMessage && books.length === 0 && (
-          <div className="flex flex-col items-center justify-center rounded-2xl bg-white py-12 text-center shadow-sm dark:bg-gray-800">
-            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500">
+          <div className="bg-card flex flex-col items-center justify-center rounded-2xl py-12 text-center shadow-sm">
+            <div className="bg-muted text-muted-foreground mb-4 flex h-20 w-20 items-center justify-center rounded-full">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -178,15 +176,15 @@ export default function BookShelfView() {
                 />
               </svg>
             </div>
-            <h3 className="mb-2 font-serif text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-foreground mb-2 font-serif text-lg font-semibold">
               暂无书籍
             </h3>
-            <p className="mb-5 text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-muted-foreground mb-5 text-sm">
               您的书架还是空的，快去导入一些书籍吧
             </p>
             <Link
               to="/import"
-              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition-colors hover:bg-blue-700 focus:outline-none"
+              className="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 inline-flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-semibold shadow-lg transition-colors focus:outline-none"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -221,7 +219,7 @@ export default function BookShelfView() {
               <button
                 type="button"
                 disabled={!pagination.has_prev}
-                className="rounded-lg px-3 py-2 font-medium transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-800"
+                className="hover:bg-accent rounded-lg px-3 py-2 font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={() => goToPage(pagination.prev_num ?? 1)}
               >
                 上一页
@@ -230,16 +228,14 @@ export default function BookShelfView() {
                 {pagination.page > 2 && (
                   <button
                     type="button"
-                    className="min-w-[32px] rounded-lg px-2 py-2 font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                    className="text-card-foreground hover:bg-accent min-w-[32px] rounded-lg px-2 py-2 font-medium"
                     onClick={() => goToPage(1)}
                   >
                     1
                   </button>
                 )}
                 {pagination.page > 3 && (
-                  <span className="px-1 text-gray-500 dark:text-gray-400">
-                    ...
-                  </span>
+                  <span className="text-muted-foreground px-1">...</span>
                 )}
                 {visiblePages.map((page) => (
                   <button
@@ -247,8 +243,8 @@ export default function BookShelfView() {
                     type="button"
                     className={`min-w-[32px] rounded-lg px-2 py-2 font-medium transition-colors ${
                       page === pagination.page
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-card-foreground hover:bg-accent'
                     }`}
                     onClick={() => goToPage(page)}
                   >
@@ -256,14 +252,12 @@ export default function BookShelfView() {
                   </button>
                 ))}
                 {pagination.page < pagination.pages - 2 && (
-                  <span className="px-1 text-gray-500 dark:text-gray-400">
-                    ...
-                  </span>
+                  <span className="text-muted-foreground px-1">...</span>
                 )}
                 {pagination.page < pagination.pages - 1 && (
                   <button
                     type="button"
-                    className="min-w-[32px] rounded-lg px-2 py-2 font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                    className="text-card-foreground hover:bg-accent min-w-[32px] rounded-lg px-2 py-2 font-medium"
                     onClick={() => goToPage(pagination.pages)}
                   >
                     {pagination.pages}
@@ -273,7 +267,7 @@ export default function BookShelfView() {
               <button
                 type="button"
                 disabled={!pagination.has_next}
-                className="rounded-lg px-3 py-2 font-medium transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-800"
+                className="hover:bg-accent rounded-lg px-3 py-2 font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={() =>
                   goToPage(pagination.next_num ?? pagination.pages)
                 }

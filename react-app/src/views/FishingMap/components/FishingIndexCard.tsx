@@ -11,19 +11,19 @@ interface FishingIndexCardProps {
 }
 
 const LEVEL_COLORS: Record<string, string> = {
-  爆护: 'text-green-500',
-  好: 'text-blue-500',
-  一般: 'text-orange-500',
-  差: 'text-red-500',
-  空军: 'text-gray-500',
+  爆护: 'text-success',
+  好: 'text-primary',
+  一般: 'text-warning',
+  差: 'text-destructive',
+  空军: 'text-muted-foreground',
 };
 
 const LEVEL_BG: Record<string, string> = {
-  爆护: 'bg-green-50 dark:bg-green-950/30',
-  好: 'bg-blue-50 dark:bg-blue-950/30',
-  一般: 'bg-orange-50 dark:bg-orange-950/30',
-  差: 'bg-red-50 dark:bg-red-950/30',
-  空军: 'bg-gray-50 dark:bg-gray-800/30',
+  爆护: 'bg-success/10',
+  好: 'bg-primary/10',
+  一般: 'bg-warning/10',
+  差: 'bg-destructive/10',
+  空军: 'bg-muted/30',
 };
 
 const getGaugeColor = (percentage: number): string => {
@@ -63,15 +63,15 @@ export function FishingIndexCard({
   }, [indexData, onFeedbackClick]);
 
   const levelColor = indexData
-    ? (LEVEL_COLORS[indexData.level] ?? 'text-gray-500')
+    ? (LEVEL_COLORS[indexData.level] ?? 'text-muted-foreground')
     : '';
   const levelBg = indexData
-    ? (LEVEL_BG[indexData.level] ?? 'bg-gray-50')
-    : 'bg-gray-50';
+    ? (LEVEL_BG[indexData.level] ?? 'bg-muted/30')
+    : 'bg-muted/30';
 
   return (
     <article
-      className={`relative rounded-2xl border border-white/40 p-4 shadow-sm backdrop-blur-sm ${levelBg} dark:border-gray-700/60`}
+      className={`relative rounded-2xl border border-border/40 p-4 shadow-sm backdrop-blur-sm ${levelBg}`}
     >
       {/* 背景装饰 */}
       <div className="pointer-events-none absolute top-0 right-0 overflow-hidden rounded-full p-8 blur-3xl">
@@ -80,16 +80,16 @@ export function FishingIndexCard({
 
       <div className="mb-3 flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+          <h3 className="text-sm font-semibold text-foreground">
             钓鱼指数
           </h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-muted-foreground">
             基于实时天气、潮汐综合计算
           </p>
         </div>
         <button
           onClick={() => void refetch()}
-          className="flex cursor-pointer items-center gap-1 rounded-lg bg-white/60 px-2 py-1 text-sm text-gray-600 hover:bg-white/80 disabled:cursor-not-allowed dark:bg-gray-800/60 dark:text-gray-300 dark:hover:bg-gray-800/80"
+          className="flex cursor-pointer items-center gap-1 rounded-lg bg-card/60 px-2 py-1 text-sm text-muted-foreground hover:bg-card/80 disabled:cursor-not-allowed"
           disabled={loading}
         >
           <Loader
@@ -105,7 +105,7 @@ export function FishingIndexCard({
         </div>
       ) : error && !indexData ? (
         <div className="min-h-[200px]">
-          <p className="text-sm text-red-500">{error}</p>
+          <p className="text-sm text-destructive">{error}</p>
         </div>
       ) : indexData ? (
         <div className="min-h-[200px]">
@@ -119,22 +119,22 @@ export function FishingIndexCard({
           </div>
 
           <div className="mb-3 grid grid-cols-3 gap-2 text-center text-xs">
-            <div className="rounded-lg bg-white/60 px-2 py-2 dark:bg-gray-800/60">
+            <div className="rounded-lg bg-card/60 px-2 py-2">
               默认权重
-              <div className="mt-1 font-medium text-gray-900 dark:text-white">
+              <div className="mt-1 font-medium text-foreground">
                 {indexData.expert_score}
               </div>
             </div>
-            <div className="rounded-lg bg-white/60 px-2 py-2 dark:bg-gray-800/60">
+            <div className="rounded-lg bg-card/60 px-2 py-2">
               权重调整
-              <div className="mt-1 font-medium text-gray-900 dark:text-white">
+              <div className="mt-1 font-medium text-foreground">
                 {indexData.residual > 0 ? '+' : ''}
                 {indexData.residual}
               </div>
             </div>
-            <div className="rounded-lg bg-white/60 px-2 py-2 dark:bg-gray-800/60">
+            <div className="rounded-lg bg-card/60 px-2 py-2">
               综合指数
-              <div className="mt-1 font-medium text-gray-900 dark:text-white">
+              <div className="mt-1 font-medium text-foreground">
                 {indexData.fishing_index}
               </div>
             </div>
@@ -142,7 +142,7 @@ export function FishingIndexCard({
 
           {Object.keys(indexData.feature_breakdown).length > 0 && (
             <details className="mt-2">
-              <summary className="mb-2 cursor-pointer text-xs font-medium text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+              <summary className="mb-2 cursor-pointer text-xs font-medium text-muted-foreground transition-colors hover:text-card-foreground">
                 特征详情
               </summary>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -163,7 +163,7 @@ export function FishingIndexCard({
                     return (
                       <div
                         key={key}
-                        className="group relative overflow-hidden rounded-xl border border-white/30 bg-white/50 p-3 shadow-md backdrop-blur-sm transition-all hover:border-blue-300/50 hover:bg-white/70 dark:border-gray-600/30 dark:bg-gray-800/40 dark:hover:border-blue-400/50 dark:hover:bg-gray-800/60"
+                        className="group relative overflow-hidden rounded-xl border border-border/30 bg-card/50 p-3 shadow-md backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-card/70"
                         style={{ animationDelay: `${idx * 60}ms` }}
                       >
                         {/* Background shimmer effect */}
@@ -171,13 +171,13 @@ export function FishingIndexCard({
 
                         {/* Label */}
                         <div className="mb-2 flex items-center justify-between">
-                          <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+                          <span className="text-xs font-medium text-muted-foreground">
                             {label}
                           </span>
                         </div>
 
                         {/* Gauge bar */}
-                        <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-gray-200/60 dark:bg-gray-700/60">
+                        <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-secondary/60">
                           {/* Water fill effect */}
                           <div
                             className="absolute inset-y-0 left-0 rounded-full transition-all duration-700 ease-out"
@@ -207,14 +207,14 @@ export function FishingIndexCard({
 
           <button
             onClick={handleFeedback}
-            className="mt-3 w-full rounded-lg bg-blue-500 px-3 py-2 text-sm font-medium text-white hover:bg-blue-600"
+            className="mt-3 w-full rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
           >
             提交钓鱼反馈
           </button>
         </div>
       ) : (
         <div className="min-h-[200px]">
-          <p className="text-sm text-gray-500 dark:text-gray-400">暂无数据</p>
+          <p className="text-sm text-muted-foreground">暂无数据</p>
         </div>
       )}
     </article>

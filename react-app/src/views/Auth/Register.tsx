@@ -169,7 +169,7 @@ export default function Register() {
   };
 
   return (
-    <div className="font-body relative min-h-screen overflow-hidden bg-gray-50 dark:bg-gray-800">
+    <div className="font-body bg-background relative min-h-screen overflow-hidden">
       {/* Main Content */}
       <main className="relative z-10 mt-4 flex flex-col items-center px-5 pt-8 pb-10">
         {/* Hero Section */}
@@ -178,32 +178,32 @@ export default function Register() {
             isReady ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}
         >
-          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[#2563eb] text-white shadow-[0_8px_16px_rgba(37,99,235,0.25)]">
+          <div className="bg-primary text-primary-foreground mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)]">
             <IconCloud className="size-8" />
           </div>
-          <h2 className="font-headline text-center text-[28px] font-extrabold tracking-tight text-[#111827] dark:text-white">
+          <h2 className="font-headline text-foreground text-center text-[28px] font-extrabold tracking-tight">
             Join kanocifer
-            <span className="text-[#2563eb] dark:text-blue-400">.chat</span>
+            <span className="text-primary">.chat</span>
           </h2>
-          <p className="mt-1 text-center text-[15px] font-medium text-[#4b5563] dark:text-gray-400">
+          <p className="text-muted-foreground mt-1 text-center text-[15px] font-medium">
             Create your account to start managing your reading list!
           </p>
         </div>
 
         {/* Register Card */}
         <div
-          className={`w-full max-w-100 rounded-4xl border border-white/50 bg-white/70 p-6 shadow-xl transition-all delay-100 duration-700 ease-out dark:border-slate-700/50 dark:bg-slate-800/60 ${
+          className={`border-border/50 bg-card/70 w-full max-w-100 rounded-4xl border p-6 shadow-xl transition-all delay-100 duration-700 ease-out ${
             isReady ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}
         >
           <form className="flex flex-col" onSubmit={handleSubmit}>
             {/* Username Field */}
             <div className="mb-5">
-              <label className="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">
+              <label className="text-muted-foreground mb-2 block pl-1 text-[13px] font-bold">
                 Username
               </label>
               <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
+                <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                   <ShieldUser className="size-6" />
                 </div>
                 <input
@@ -214,11 +214,11 @@ export default function Register() {
                   onChange={(e) =>
                     setForm((prev) => ({ ...prev, username: e.target.value }))
                   }
-                  className="w-full rounded-2xl border-0 bg-gray-100 py-3.5 pr-4 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white"
+                  className="bg-secondary text-foreground placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
                 />
               </div>
               {errors.username && (
-                <span className="mt-1 block pl-1 text-[12px] font-medium text-red-500">
+                <span className="text-destructive mt-1 block pl-1 text-[12px] font-medium">
                   {errors.username}
                 </span>
               )}
@@ -226,11 +226,11 @@ export default function Register() {
 
             {/* Email Field */}
             <div className="mb-5">
-              <label className="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">
+              <label className="text-muted-foreground mb-2 block pl-1 text-[13px] font-bold">
                 Email
               </label>
               <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
+                <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                   <svg
                     className="size-5"
                     fill="none"
@@ -253,11 +253,11 @@ export default function Register() {
                   onChange={(e) =>
                     setForm((prev) => ({ ...prev, email: e.target.value }))
                   }
-                  className="w-full rounded-2xl border-0 bg-gray-100 py-3.5 pr-4 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white"
+                  className="bg-secondary text-foreground placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
                 />
               </div>
               {errors.email && (
-                <span className="mt-1 block pl-1 text-[12px] font-medium text-red-500">
+                <span className="text-destructive mt-1 block pl-1 text-[12px] font-medium">
                   {errors.email}
                 </span>
               )}
@@ -265,11 +265,11 @@ export default function Register() {
 
             {/* Password Field */}
             <div className="mb-5">
-              <label className="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">
+              <label className="text-muted-foreground mb-2 block pl-1 text-[13px] font-bold">
                 Password
               </label>
               <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
+                <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                   <svg
                     className="size-5"
                     fill="none"
@@ -292,11 +292,11 @@ export default function Register() {
                   onChange={(e) =>
                     setForm((prev) => ({ ...prev, password: e.target.value }))
                   }
-                  className="w-full rounded-2xl border-0 bg-gray-100 py-3.5 pr-12 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white"
+                  className="bg-secondary text-foreground placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-12 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#9ca3af] transition-all duration-200 hover:text-[#2563eb] dark:hover:text-blue-400"
+                  className="text-muted-foreground hover:text-primary absolute inset-y-0 right-0 flex items-center pr-4 transition-all duration-200"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -307,7 +307,7 @@ export default function Register() {
                 </button>
               </div>
               {errors.password && (
-                <span className="mt-1 block pl-1 text-[12px] font-medium text-red-500">
+                <span className="text-destructive mt-1 block pl-1 text-[12px] font-medium">
                   {errors.password}
                 </span>
               )}
@@ -315,11 +315,11 @@ export default function Register() {
 
             {/* Confirm Password Field */}
             <div className="mb-5">
-              <label className="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">
+              <label className="text-muted-foreground mb-2 block pl-1 text-[13px] font-bold">
                 Confirm Password
               </label>
               <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
+                <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                   <svg
                     className="size-5"
                     fill="none"
@@ -345,11 +345,11 @@ export default function Register() {
                       confirmPassword: e.target.value,
                     }))
                   }
-                  className="w-full rounded-2xl border-0 bg-gray-100 py-3.5 pr-12 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white"
+                  className="bg-secondary text-foreground placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-12 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#9ca3af] transition-all duration-200 hover:text-[#2563eb] dark:hover:text-blue-400"
+                  className="text-muted-foreground hover:text-primary absolute inset-y-0 right-0 flex items-center pr-4 transition-all duration-200"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? (
@@ -360,7 +360,7 @@ export default function Register() {
                 </button>
               </div>
               {errors.confirmPassword && (
-                <span className="mt-1 block pl-1 text-[12px] font-medium text-red-500">
+                <span className="text-destructive mt-1 block pl-1 text-[12px] font-medium">
                   {errors.confirmPassword}
                 </span>
               )}
@@ -368,12 +368,12 @@ export default function Register() {
 
             {/* Email Code Field */}
             <div className="mb-5">
-              <label className="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">
+              <label className="text-muted-foreground mb-2 block pl-1 text-[13px] font-bold">
                 Email Code
               </label>
               <div className="flex gap-3">
                 <div className="relative flex-1">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
+                  <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                     <svg
                       className="size-5"
                       fill="none"
@@ -399,7 +399,7 @@ export default function Register() {
                         emailCode: e.target.value,
                       }))
                     }
-                    className="w-full rounded-2xl border-0 bg-gray-100 py-3.5 pr-4 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white"
+                    className="bg-secondary text-foreground placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
                   />
                 </div>
                 <button
@@ -407,13 +407,13 @@ export default function Register() {
                   id="send-code"
                   onClick={sendEmailCode}
                   disabled={isSendingCode || isSent}
-                  className="shrink-0 rounded-full bg-blue-500 px-6 py-3.5 text-[14px] font-bold text-white shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all hover:bg-[#1e3a8a]/90 active:scale-[0.98] disabled:opacity-70 dark:bg-blue-600 dark:hover:bg-blue-600/90"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 shrink-0 rounded-full px-6 py-3.5 text-[14px] font-bold shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all active:scale-[0.98] disabled:opacity-70"
                 >
                   {isSendingCode ? '...' : isSent ? 'Sent!' : sendCodeText}
                 </button>
               </div>
               {errors.emailCode && (
-                <span className="mt-1 block pl-1 text-[12px] font-medium text-red-500">
+                <span className="text-destructive mt-1 block pl-1 text-[12px] font-medium">
                   {errors.emailCode}
                 </span>
               )}
@@ -423,13 +423,13 @@ export default function Register() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="mb-4 w-full rounded-full bg-blue-500 py-4 text-[15px] font-bold text-white shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all hover:bg-[#1e3a8a]/90 active:scale-[0.98] disabled:opacity-70 dark:bg-blue-600 dark:hover:bg-blue-600/90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 mb-4 w-full rounded-full py-4 text-[15px] font-bold shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all active:scale-[0.98] disabled:opacity-70"
             >
               {isSubmitting ? 'Creating Account...' : 'Create Account'}
             </button>
 
             {errors.submit && (
-              <div className="mt-4 rounded-2xl bg-red-100 p-2 text-center text-[12px] font-medium text-red-500">
+              <div className="bg-destructive/10 text-destructive mt-4 rounded-2xl p-2 text-center text-[12px] font-medium">
                 {errors.submit}
               </div>
             )}
@@ -437,11 +437,11 @@ export default function Register() {
 
           {/* Login Link */}
           <div className="mt-8 text-center">
-            <p className="text-[14.5px] font-medium text-[#4b5563] dark:text-gray-300">
+            <p className="text-muted-foreground text-[14.5px] font-medium">
               Already have an account?
               <Link
                 to="/login"
-                className="ml-1 font-bold text-[#1d4ed8] hover:underline dark:text-blue-400"
+                className="text-primary ml-1 font-bold hover:underline"
               >
                 Login here
               </Link>

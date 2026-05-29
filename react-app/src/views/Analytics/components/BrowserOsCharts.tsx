@@ -72,14 +72,14 @@ export function BrowserOsCharts({
 
   return (
     <div className="grid grid-cols-1 gap-3">
-      <article className="rounded-3xl border border-gray-200/60 bg-white/85 p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900/80">
-        <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100">
+      <article className="border-border/60 bg-card/85 rounded-3xl border p-3.5 shadow-sm">
+        <h3 className="text-foreground text-base font-semibold">
           Browser Distribution
         </h3>
 
         <Suspense
           fallback={
-            <div className="mt-4 h-[260px] animate-pulse rounded-xl bg-gray-100 dark:bg-gray-800" />
+            <div className="bg-muted mt-4 h-[260px] animate-pulse rounded-xl" />
           }
         >
           <ReactECharts
@@ -91,14 +91,14 @@ export function BrowserOsCharts({
         </Suspense>
       </article>
 
-      <article className="rounded-3xl border border-gray-200/60 bg-white/85 p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900/80">
-        <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100">
+      <article className="border-border/60 bg-card/85 rounded-3xl border p-3.5 shadow-sm">
+        <h3 className="text-foreground text-base font-semibold">
           OS Distribution
         </h3>
 
         <Suspense
           fallback={
-            <div className="mt-4 h-[260px] animate-pulse rounded-xl bg-gray-100 dark:bg-gray-800" />
+            <div className="bg-muted mt-4 h-[260px] animate-pulse rounded-xl" />
           }
         >
           <ReactECharts

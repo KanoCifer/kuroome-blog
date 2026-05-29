@@ -8,17 +8,17 @@ export function BentoReadingList() {
       <BentoCard className="min-w-0 cursor-pointer p-5">
         <div className="flex h-full flex-col justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-2xl bg-orange-100 text-orange-500 ring-1 ring-orange-200/60 sm:size-12 dark:bg-orange-900/30 dark:text-orange-300 dark:ring-orange-500/20">
+            <div className="bg-warning/10 text-warning ring-warning/20 flex size-10 items-center justify-center rounded-2xl ring-1 sm:size-12">
               <ListCheck className="size-6" />
             </div>
             <div className="flex min-w-0 flex-col items-start">
-              <div className="max-w-full overflow-hidden font-serif whitespace-pre text-gray-800 dark:text-white">
+              <div className="text-foreground max-w-full overflow-hidden font-serif whitespace-pre">
                 书单
               </div>
             </div>
           </div>
-          <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
-            <span className="inline-flex items-center gap-1 font-semibold text-orange-600 transition-colors group-hover:text-orange-700 dark:text-orange-300 dark:group-hover:text-orange-200">
+          <div className="text-muted-foreground flex items-center justify-between text-xs">
+            <span className="text-warning group-hover:text-warning/80 inline-flex items-center gap-1 font-semibold transition-colors">
               Open <span aria-hidden="true">→</span>
             </span>
           </div>

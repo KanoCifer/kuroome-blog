@@ -171,7 +171,7 @@ export default function Login() {
   };
 
   return (
-    <div className="font-body relative min-h-screen overflow-hidden bg-gray-50 dark:bg-gray-800">
+    <div className="font-body bg-background relative min-h-screen overflow-hidden">
       {/* Main Content */}
       <main className="relative z-10 mt-4 flex flex-col items-center px-5 pt-8 pb-10">
         {/* Hero Section */}
@@ -181,14 +181,14 @@ export default function Login() {
           transition={{ duration: 0.7, ease: 'easeOut', delay: 0.05 }}
           className={`mb-8 flex flex-col items-center justify-center`}
         >
-          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[#2563eb] text-white shadow-[0_8px_16px_rgba(37,99,235,0.25)]">
+          <div className="bg-primary text-primary-foreground mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)]">
             <IconCloud className="size-8" />
           </div>
-          <h2 className="font-headline text-center text-[28px] font-extrabold tracking-tight text-[#111827] dark:text-white">
+          <h2 className="font-headline text-foreground text-center text-[28px] font-extrabold tracking-tight">
             kanocifer
-            <span className="text-[#2563eb] dark:text-blue-400">.chat</span>
+            <span className="text-primary">.chat</span>
           </h2>
-          <p className="mt-1 text-center text-[15px] font-medium text-[#4b5563] dark:text-gray-400">
+          <p className="text-muted-foreground mt-1 text-center text-[15px] font-medium">
             Welcome back to the reading space.
           </p>
         </motion.div>
@@ -198,16 +198,16 @@ export default function Login() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
-          className={`} w-full max-w-100 rounded-4xl border border-white/50 bg-white/70 p-6 shadow-xl dark:border-slate-700/50 dark:bg-slate-800/60`}
+          className={`} border-border/50 bg-card/70 w-full max-w-100 rounded-4xl border p-6 shadow-xl`}
         >
           <form className="flex flex-col" onSubmit={handleSubmit}>
             {/* Username Field */}
             <div className="mb-5">
-              <label className="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">
+              <label className="text-muted-foreground mb-2 block pl-1 text-[13px] font-bold">
                 Username
               </label>
               <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
+                <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                   <ShieldUser className="size-6" />
                 </div>
                 <input
@@ -218,11 +218,11 @@ export default function Login() {
                   onChange={(e) =>
                     setLoginForm({ ...loginForm, username: e.target.value })
                   }
-                  className="w-full rounded-2xl border-0 bg-gray-100 py-3.5 pr-4 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white"
+                  className="bg-secondary text-foreground placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
                 />
               </div>
               {errors.username && (
-                <span className="mt-1 block pl-1 text-[12px] font-medium text-red-500">
+                <span className="text-destructive mt-1 block pl-1 text-[12px] font-medium">
                   {errors.username}
                 </span>
               )}
@@ -230,12 +230,12 @@ export default function Login() {
 
             {/* Password Field */}
             <div className="mb-5">
-              <label className="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">
+              <label className="text-muted-foreground mb-2 block pl-1 text-[13px] font-bold">
                 Password
               </label>
               <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
-                  <IconLock className="size-5 dark:text-white" />
+                <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                  <IconLock className="size-5" />
                 </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -245,11 +245,11 @@ export default function Login() {
                   onChange={(e) =>
                     setLoginForm({ ...loginForm, password: e.target.value })
                   }
-                  className="w-full rounded-2xl border-0 bg-gray-100 py-3.5 pr-12 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white"
+                  className="bg-secondary text-foreground placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-12 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#9ca3af] transition-all duration-200 hover:text-[#2563eb] dark:hover:text-blue-400"
+                  className="text-muted-foreground hover:text-primary absolute inset-y-0 right-0 flex items-center pr-4 transition-all duration-200"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -260,7 +260,7 @@ export default function Login() {
                 </button>
               </div>
               {errors.password && (
-                <span className="mt-1 block pl-1 text-[12px] font-medium text-red-500">
+                <span className="text-destructive mt-1 block pl-1 text-[12px] font-medium">
                   {errors.password}
                 </span>
               )}
@@ -280,9 +280,9 @@ export default function Login() {
                   }
                   className="peer sr-only"
                 />
-                <div className="z-5 flex h-5.5 w-5.5 items-center justify-center rounded-lg border-2 border-gray-300 bg-white transition-all duration-200 peer-checked:border-[#2563eb] peer-checked:bg-[#2563eb] peer-focus:ring-2 peer-focus:ring-[#2563eb]/20 dark:border-slate-600 dark:bg-slate-700 dark:peer-checked:border-blue-500 dark:peer-checked:bg-blue-500">
+                <div className="border-border bg-card peer-checked:border-primary peer-checked:bg-primary peer-focus:ring-ring/20 z-5 flex h-5.5 w-5.5 items-center justify-center rounded-lg border-2 transition-all duration-200 peer-focus:ring-2">
                   <svg
-                    className="z-5 h-3 w-3 text-white opacity-0 transition-all duration-200 peer-checked:opacity-100"
+                    className="text-primary-foreground z-5 h-3 w-3 opacity-0 transition-all duration-200 peer-checked:opacity-100"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -293,14 +293,14 @@ export default function Login() {
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                 </div>
-                <span className="text-[14px] font-medium text-[#4b5563] dark:text-gray-300">
+                <span className="text-muted-foreground text-[14px] font-medium">
                   {' '}
                   Remember Me{' '}
                 </span>
               </label>
               <a
                 href="#"
-                className="text-[14px] font-bold text-[#1d4ed8] hover:underline dark:text-blue-400"
+                className="text-primary text-[14px] font-bold hover:underline"
               >
                 {' '}
                 Forgot?{' '}
@@ -311,7 +311,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="mb-4 w-full rounded-full bg-blue-500 py-4 text-[15px] font-bold text-white shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all hover:bg-[#1e3a8a]/90 active:scale-[0.98] disabled:opacity-70 dark:bg-blue-600 dark:hover:bg-blue-600/90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 mb-4 w-full rounded-full py-4 text-[15px] font-bold shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all active:scale-[0.98] disabled:opacity-70"
             >
               {isSubmitting ? 'Logging in...' : 'Login'}
             </button>
@@ -320,12 +320,12 @@ export default function Login() {
             <button
               type="button"
               disabled={isPasskeySubmitting}
-              className="flex w-full items-center justify-center space-x-2 rounded-full bg-white py-4 text-[15px] font-bold text-[#111827] shadow-lg transition-all active:scale-[0.98] disabled:bg-gray-300 disabled:opacity-70 dark:bg-gray-700 dark:text-white"
+              className="bg-card text-foreground disabled:bg-muted flex w-full items-center justify-center space-x-2 rounded-full py-4 text-[15px] font-bold shadow-lg transition-all active:scale-[0.98] disabled:opacity-70"
               onClick={handlePasskeyLogin}
             >
               <IconKey className="size-5" />
               {isPasskeySubmitting ? (
-                <span className="h-4.5 w-4.5 animate-spin rounded-full border-2 border-[#111827] border-t-transparent dark:border-white"></span>
+                <span className="border-foreground h-4.5 w-4.5 animate-spin rounded-full border-2 border-t-transparent"></span>
               ) : (
                 <span>Login with Passkey</span>
               )}
@@ -334,16 +334,16 @@ export default function Login() {
 
           {/* Divider */}
           <div className="my-6 flex items-center justify-center text-center">
-            <div className="h-px flex-1 bg-gray-200 dark:bg-slate-700"></div>
-            <span className="px-3 text-[11px] font-bold tracking-wider text-[#6b7280] uppercase dark:text-gray-400">
+            <div className="bg-border h-px flex-1"></div>
+            <span className="text-muted-foreground px-3 text-[11px] font-bold tracking-wider uppercase">
               OR CONTINUE WITH
             </span>
-            <div className="h-px flex-1 bg-gray-200 dark:bg-slate-700"></div>
+            <div className="bg-border h-px flex-1"></div>
           </div>
 
           {/* GitHub Button */}
           <button
-            className="flex w-full items-center justify-center space-x-2.5 rounded-full bg-[#0f172a] py-4 text-[15px] font-bold text-white shadow-md transition-all hover:bg-black active:scale-[0.98] dark:border dark:border-white/10 dark:bg-black/50"
+            className="bg-foreground text-background hover:bg-foreground/90 flex w-full items-center justify-center space-x-2.5 rounded-full py-4 text-[15px] font-bold shadow-md transition-all active:scale-[0.98]"
             onClick={handleGitHubLogin}
           >
             <IconGitHub />
@@ -352,18 +352,18 @@ export default function Login() {
 
           {/* Passkey Error */}
           {errors.passkey && (
-            <div className="mt-4 rounded-2xl bg-red-100 p-2 text-center text-[12px] font-medium text-red-500">
+            <div className="bg-destructive/10 text-destructive mt-4 rounded-2xl p-2 text-center text-[12px] font-medium">
               {errors.passkey}
             </div>
           )}
 
           {/* Register Link */}
           <div className="mt-8 text-center">
-            <p className="text-[14.5px] font-medium text-[#4b5563] dark:text-gray-300">
+            <p className="text-muted-foreground text-[14.5px] font-medium">
               Don't have an account?
               <Link
                 to="/register"
-                className="ml-1 font-bold text-[#1d4ed8] hover:underline dark:text-blue-400"
+                className="text-primary ml-1 font-bold hover:underline"
               >
                 Register here
               </Link>

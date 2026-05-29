@@ -130,7 +130,7 @@ export function AddDeviceForm({ onClose, onSuccess }: AddDeviceFormProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+          className="bg-background/50 fixed inset-0 z-50 backdrop-blur-sm"
           onClick={onClose}
         />,
         document.body,
@@ -145,19 +145,19 @@ export function AddDeviceForm({ onClose, onSuccess }: AddDeviceFormProps) {
           transition={{ type: 'spring', duration: 0.4 }}
           className="fixed inset-x-8 inset-y-24 z-50 flex items-center justify-center"
         >
-          <div className="max-h-full w-full max-w-md overflow-y-auto rounded-2xl bg-slate-100 shadow-2xl dark:bg-[#1a2133] dark:shadow-xl dark:shadow-slate-900/60">
+          <div className="bg-card max-h-full w-full max-w-md overflow-y-auto rounded-2xl shadow-2xl">
             {/* Header */}
-            <div className="sticky top-0 z-10 border-b border-gray-200 bg-slate-100 px-6 pt-6 pb-4 dark:border-white/10 dark:bg-[#1a2133]">
+            <div className="border-border bg-card sticky top-0 z-10 border-b px-6 pt-6 pb-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="font-serif text-2xl font-bold text-slate-800 dark:text-slate-100">
+                  <h2 className="text-foreground font-serif text-2xl font-bold">
                     添加设备
                   </h2>
-                  <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
+                  <p className="text-muted-foreground mt-1 text-xs">
                     记录你的电子设备资产
                   </p>
                 </div>
-                <span className="shrink-0 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+                <span className="bg-primary/10 text-primary shrink-0 rounded-full px-3 py-1 text-xs font-semibold">
                   新建设备
                 </span>
               </div>
@@ -166,11 +166,11 @@ export function AddDeviceForm({ onClose, onSuccess }: AddDeviceFormProps) {
             {/* Form */}
             <form
               onSubmit={handleSubmit}
-              className="space-y-5 bg-slate-50 p-6 dark:bg-[#111827]"
+              className="bg-background space-y-5 p-6"
             >
               {/* Name */}
               <label className="block space-y-1.5">
-                <span className="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                <span className="text-muted-foreground ml-1 text-xs font-semibold">
                   设备名称 *
                 </span>
                 <input
@@ -178,13 +178,13 @@ export function AddDeviceForm({ onClose, onSuccess }: AddDeviceFormProps) {
                   onChange={(event) => handleChange('name', event.target.value)}
                   placeholder="例如：iPhone 15 Pro Max"
                   maxLength={100}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:bg-[#0f172a] dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                  className="border-input bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-ring w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
 
               {/* Purchase Date */}
               <label className="block space-y-1.5">
-                <span className="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                <span className="text-muted-foreground ml-1 text-xs font-semibold">
                   购买日期 *
                 </span>
                 <input
@@ -193,14 +193,14 @@ export function AddDeviceForm({ onClose, onSuccess }: AddDeviceFormProps) {
                   onChange={(event) =>
                     handleChange('purchase_date', event.target.value)
                   }
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:bg-[#0f172a] dark:text-white dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                  className="border-input bg-card text-foreground focus:border-primary focus:ring-ring w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
 
               {/* Currency & Price */}
               <div className="grid grid-cols-[0.4fr_0.6fr] gap-4">
                 <label className="block space-y-1.5">
-                  <span className="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                  <span className="text-muted-foreground ml-1 text-xs font-semibold">
                     货币
                   </span>
                   <div className="relative">
@@ -209,7 +209,7 @@ export function AddDeviceForm({ onClose, onSuccess }: AddDeviceFormProps) {
                       onChange={(event) =>
                         handleChange('currency', event.target.value)
                       }
-                      className="w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:bg-[#0f172a] dark:text-white dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                      className="border-input bg-card text-foreground focus:border-primary focus:ring-ring w-full cursor-pointer appearance-none rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                     >
                       {currencyOptions.map((c) => (
                         <option key={c} value={c}>
@@ -217,14 +217,14 @@ export function AddDeviceForm({ onClose, onSuccess }: AddDeviceFormProps) {
                         </option>
                       ))}
                     </select>
-                    <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-slate-400">
+                    <span className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 -translate-y-1/2">
                       <Tag size={16} />
                     </span>
                   </div>
                 </label>
 
                 <label className="block space-y-1.5">
-                  <span className="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                  <span className="text-muted-foreground ml-1 text-xs font-semibold">
                     价格
                   </span>
                   <div className="relative">
@@ -237,7 +237,7 @@ export function AddDeviceForm({ onClose, onSuccess }: AddDeviceFormProps) {
                         handleChange('price', event.target.value)
                       }
                       placeholder="0.00"
-                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:bg-[#0f172a] dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                      className="border-input bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-ring w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                     />
                   </div>
                 </label>
@@ -245,7 +245,7 @@ export function AddDeviceForm({ onClose, onSuccess }: AddDeviceFormProps) {
 
               {/* Notes */}
               <label className="block space-y-1.5">
-                <span className="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                <span className="text-muted-foreground ml-1 text-xs font-semibold">
                   备注（可选）
                 </span>
                 <input
@@ -254,16 +254,16 @@ export function AddDeviceForm({ onClose, onSuccess }: AddDeviceFormProps) {
                     handleChange('notes', event.target.value)
                   }
                   placeholder="例如：256GB 银色、国行版本"
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:bg-[#0f172a] dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                  className="border-input bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-ring w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
 
               {/* Status Toggle */}
               <div className="space-y-2">
-                <span className="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                <span className="text-muted-foreground ml-1 text-xs font-semibold">
                   设备状态
                 </span>
-                <div className="flex rounded-full bg-slate-200/80 p-1 backdrop-blur-sm dark:border dark:border-white/10 dark:bg-[#0f172a]">
+                <div className="bg-secondary/80 flex rounded-full p-1 backdrop-blur-sm">
                   {statusOptions.map((option) => {
                     const isActive = form.status === option.value;
                     return (
@@ -273,8 +273,8 @@ export function AddDeviceForm({ onClose, onSuccess }: AddDeviceFormProps) {
                         onClick={() => handleChange('status', option.value)}
                         className={`flex-1 rounded-full px-3 py-2.5 text-xs font-semibold transition-all duration-200 ${
                           isActive
-                            ? 'bg-blue-700 text-white shadow-lg shadow-blue-500/25'
-                            : 'text-slate-500 hover:bg-slate-200/60 dark:text-slate-400 dark:hover:bg-white/10'
+                            ? 'bg-primary text-primary-foreground shadow-primary/25 shadow-lg'
+                            : 'text-muted-foreground hover:bg-secondary/60'
                         } `}
                       >
                         {option.label}
@@ -286,11 +286,11 @@ export function AddDeviceForm({ onClose, onSuccess }: AddDeviceFormProps) {
 
               {/* Error */}
               {formError ? (
-                <p className="py-2 text-center text-xs font-medium text-red-500 dark:text-red-400">
+                <p className="text-destructive py-2 text-center text-xs font-medium">
                   {formError}
                 </p>
               ) : (
-                <p className="text-center text-[10px] text-slate-400 dark:text-slate-500">
+                <p className="text-muted-foreground text-center text-[10px]">
                   * 为必填项
                 </p>
               )}
@@ -299,7 +299,7 @@ export function AddDeviceForm({ onClose, onSuccess }: AddDeviceFormProps) {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-blue-700 py-4 text-sm font-extrabold text-white shadow-xl shadow-blue-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-blue-500/40 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+                className="bg-primary text-primary-foreground shadow-primary/30 hover:shadow-primary/40 flex w-full items-center justify-center gap-2 rounded-full py-4 text-sm font-extrabold shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
               >
                 {isSubmitting ? (
                   <>

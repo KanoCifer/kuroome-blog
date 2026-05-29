@@ -28,11 +28,11 @@ export function ProfileFormFields({
     <>
       {/* Display Name */}
       <div className="mb-5">
-        <label className="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">
+        <label className="text-muted-foreground mb-2 block pl-1 text-[13px] font-bold">
           Display Name
         </label>
         <div className="relative">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
+          <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
             <User className="size-5" />
           </div>
           <input
@@ -42,12 +42,12 @@ export function ProfileFormFields({
             onChange={(e) =>
               setForm((prev) => ({ ...prev, name: e.target.value }))
             }
-            className="w-full rounded-2xl border-0 bg-gray-100 py-3.5 pr-4 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white dark:placeholder:text-slate-400"
+            className="bg-secondary text-foreground placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
             placeholder="Your name"
           />
         </div>
         {errors.name && (
-          <span className="mt-1 block pl-1 text-[12px] font-medium text-red-500">
+          <span className="text-destructive mt-1 block pl-1 text-[12px] font-medium">
             {errors.name}
           </span>
         )}
@@ -55,11 +55,11 @@ export function ProfileFormFields({
 
       {/* Username */}
       <div className="mb-5">
-        <label className="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">
-          Username <span className="text-red-400">*</span>
+        <label className="text-muted-foreground mb-2 block pl-1 text-[13px] font-bold">
+          Username <span className="text-destructive">*</span>
         </label>
         <div className="relative">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
+          <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
             <ShieldUser className="size-5" />
           </div>
           <input
@@ -69,13 +69,13 @@ export function ProfileFormFields({
             onChange={(e) =>
               setForm((prev) => ({ ...prev, username: e.target.value }))
             }
-            className="w-full rounded-2xl border-0 bg-gray-100 py-3.5 pr-4 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white dark:placeholder:text-slate-400"
+            className="bg-secondary text-foreground placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
             placeholder="Login username"
             required
           />
         </div>
         {errors.username && (
-          <span className="mt-1 block pl-1 text-[12px] font-medium text-red-500">
+          <span className="text-destructive mt-1 block pl-1 text-[12px] font-medium">
             {errors.username}
           </span>
         )}
@@ -83,7 +83,7 @@ export function ProfileFormFields({
 
       {/* Gender */}
       <div className="mb-5">
-        <label className="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">
+        <label className="text-muted-foreground mb-2 block pl-1 text-[13px] font-bold">
           Gender
         </label>
         <div className="grid grid-cols-2 gap-3">
@@ -95,8 +95,8 @@ export function ProfileFormFields({
               onChange={() => toggleGender('male')}
               className="peer sr-only"
             />
-            <div className="flex items-center justify-center rounded-2xl border-2 border-gray-200 bg-white/70 py-3.5 transition-all duration-300 group-active:scale-95 peer-checked:border-[#2563eb] peer-checked:bg-[#2563eb]/10 peer-checked:shadow-lg peer-checked:shadow-blue-500/10 hover:border-blue-200 dark:border-slate-600 dark:bg-slate-700/50 dark:peer-checked:border-blue-500 dark:peer-checked:bg-blue-500/20">
-              <span className="text-sm font-medium text-gray-600 transition-colors peer-checked:text-[#2563eb] dark:text-gray-300 dark:peer-checked:text-blue-400">
+            <div className="border-border bg-card/70 peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-primary/10 hover:border-primary/30 flex items-center justify-center rounded-2xl border-2 py-3.5 transition-all duration-300 group-active:scale-95 peer-checked:shadow-lg">
+              <span className="text-muted-foreground peer-checked:text-primary text-sm font-medium transition-colors">
                 Male
               </span>
             </div>
@@ -109,8 +109,8 @@ export function ProfileFormFields({
               onChange={() => toggleGender('female')}
               className="peer sr-only"
             />
-            <div className="flex items-center justify-center rounded-2xl border-2 border-gray-200 bg-white/70 py-3.5 transition-all duration-300 group-active:scale-95 peer-checked:border-[#2563eb] peer-checked:bg-[#2563eb]/10 peer-checked:shadow-lg peer-checked:shadow-blue-500/10 hover:border-blue-200 dark:border-slate-600 dark:bg-slate-700/50 dark:peer-checked:border-blue-500 dark:peer-checked:bg-blue-500/20">
-              <span className="text-sm font-medium text-gray-600 transition-colors peer-checked:text-[#2563eb] dark:text-gray-300 dark:peer-checked:text-blue-400">
+            <div className="border-border bg-card/70 peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-primary/10 hover:border-primary/30 flex items-center justify-center rounded-2xl border-2 py-3.5 transition-all duration-300 group-active:scale-95 peer-checked:shadow-lg">
+              <span className="text-muted-foreground peer-checked:text-primary text-sm font-medium transition-colors">
                 Female
               </span>
             </div>
@@ -120,11 +120,11 @@ export function ProfileFormFields({
 
       {/* Email */}
       <div className="mb-5">
-        <label className="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">
+        <label className="text-muted-foreground mb-2 block pl-1 text-[13px] font-bold">
           Email
         </label>
         <div className="relative">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
+          <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
             <Mail className="size-5" />
           </div>
           <input
@@ -134,12 +134,12 @@ export function ProfileFormFields({
             onChange={(e) =>
               setForm((prev) => ({ ...prev, email: e.target.value }))
             }
-            className="w-full rounded-2xl border-0 bg-gray-100 py-3.5 pr-4 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white dark:placeholder:text-slate-400"
+            className="bg-secondary text-foreground placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
             placeholder="your@email.com"
           />
         </div>
         {errors.email && (
-          <span className="mt-1 block pl-1 text-[12px] font-medium text-red-500">
+          <span className="text-destructive mt-1 block pl-1 text-[12px] font-medium">
             {errors.email}
           </span>
         )}
@@ -147,11 +147,11 @@ export function ProfileFormFields({
 
       {/* Mobile */}
       <div className="mb-5">
-        <label className="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">
+        <label className="text-muted-foreground mb-2 block pl-1 text-[13px] font-bold">
           Mobile
         </label>
         <div className="relative">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
+          <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
             <Phone className="size-5" />
           </div>
           <input
@@ -161,12 +161,12 @@ export function ProfileFormFields({
             onChange={(e) =>
               setForm((prev) => ({ ...prev, mobile: e.target.value }))
             }
-            className="w-full rounded-2xl border-0 bg-gray-100 py-3.5 pr-4 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white dark:placeholder:text-slate-400"
+            className="bg-secondary text-foreground placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
             placeholder="Phone number"
           />
         </div>
         {errors.mobile && (
-          <span className="mt-1 block pl-1 text-[12px] font-medium text-red-500">
+          <span className="text-destructive mt-1 block pl-1 text-[12px] font-medium">
             {errors.mobile}
           </span>
         )}
@@ -174,11 +174,11 @@ export function ProfileFormFields({
 
       {/* Password */}
       <div className="mb-6">
-        <label className="mb-2 block pl-1 text-[13px] font-bold text-[#4b5563] dark:text-gray-300">
+        <label className="text-muted-foreground mb-2 block pl-1 text-[13px] font-bold">
           Password
         </label>
         <div className="relative">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#9ca3af]">
+          <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
             <Lock className="size-5" />
           </div>
           <input
@@ -187,13 +187,13 @@ export function ProfileFormFields({
             onChange={(e) =>
               setForm((prev) => ({ ...prev, password: e.target.value }))
             }
-            className="w-full rounded-2xl border-0 bg-gray-100 py-3.5 pr-12 pl-11 text-[15px] font-medium text-[#111827] transition-all outline-none placeholder:text-[#9ca3af] focus:ring-2 focus:ring-[#2563eb]/20 dark:bg-slate-700 dark:text-white dark:placeholder:text-slate-400"
+            className="bg-secondary text-foreground placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-12 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
             placeholder="Leave empty to keep current"
           />
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#9ca3af] transition-all duration-200 hover:text-[#2563eb] dark:hover:text-blue-400"
+            className="text-muted-foreground hover:text-primary absolute inset-y-0 right-0 flex items-center pr-4 transition-all duration-200"
           >
             {showPassword ? (
               <EyeOff className="size-5" />
@@ -203,7 +203,7 @@ export function ProfileFormFields({
           </button>
         </div>
         {errors.password && (
-          <span className="mt-1 block pl-1 text-[12px] font-medium text-red-500">
+          <span className="text-destructive mt-1 block pl-1 text-[12px] font-medium">
             {errors.password}
           </span>
         )}

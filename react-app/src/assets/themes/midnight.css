@@ -9,7 +9,7 @@
   --accent-sage: oklch(0.65 0.1 160);
   --accent-slate: oklch(0.7 0.05 280);
   --accent-rose: oklch(0.6 0.18 20);
-  --workspace-accent: #2a48f3;
+  --workspace-accent: oklch(0.5082 0.2535 267.3);
   --workspace-accent-contrast: oklch(0.98 0.01 280);
   --card-bg: var(--color-indigo-50);
   --surface: oklch(0.98 0.01 280 / 0.75);
@@ -19,7 +19,7 @@
   --chart-3: oklch(0.6 0.15 240);
   --chart-4: oklch(0.7 0.15 220);
   --chart-5: oklch(0.8 0.15 200);
-  --gradient-primary-from: #2a48f3;
+  --gradient-primary-from: oklch(0.5082 0.2535 267.3);
   --gradient-primary-to: var(--color-indigo-600);
   --gradient-decorative-from: var(--color-blue-300);
   --gradient-decorative-to: var(--color-indigo-300);
@@ -53,7 +53,7 @@
   --accent-sage: oklch(0.55 0.1 160);
   --accent-slate: oklch(0.6 0.05 280);
   --accent-rose: oklch(0.65 0.15 20);
-  --workspace-accent: #2a48f3;
+  --workspace-accent: oklch(0.5082 0.2535 267.3);
   --workspace-accent-contrast: oklch(0.98 0.01 280);
   --card-bg: oklch(0.15 0.03 280);
   --surface: oklch(0.15 0.03 280 / 0.8);
@@ -63,7 +63,7 @@
   --chart-3: oklch(0.65 0.15 240);
   --chart-4: oklch(0.75 0.15 220);
   --chart-5: oklch(0.85 0.15 200);
-  --gradient-primary-from: #2a48f3;
+  --gradient-primary-from: oklch(0.5082 0.2535 267.3);
   --gradient-primary-to: var(--color-indigo-500);
   --gradient-decorative-from: var(--color-blue-900);
   --gradient-decorative-to: var(--color-indigo-900);

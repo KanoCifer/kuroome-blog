@@ -251,7 +251,7 @@ export function MilestoneConfigForm({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-50 bg-background/50 backdrop-blur-sm"
           onClick={(e) => {
             e.stopPropagation();
             onClose();
@@ -268,24 +268,24 @@ export function MilestoneConfigForm({
           transition={{ type: 'spring', duration: 0.4 }}
           className="fixed inset-x-4 inset-y-24 z-50 flex items-center justify-center sm:inset-x-auto sm:inset-y-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2"
         >
-          <div className="max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-slate-100 shadow-2xl dark:bg-[#1a2133] dark:shadow-xl dark:shadow-slate-900/60">
+          <div className="max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-card shadow-2xl">
             {/* Header */}
-            <div className="sticky top-0 z-10 border-b border-gray-200 bg-slate-100 px-6 pt-6 pb-4 dark:border-white/10 dark:bg-[#1a2133]">
+            <div className="sticky top-0 z-10 border-b border-border bg-card px-6 pt-6 pb-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-700 shadow-lg shadow-blue-500/30 dark:shadow-blue-900/50">
-                    <Calendar size={20} className="text-white" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/30">
+                    <Calendar size={20} className="text-primary-foreground" />
                   </div>
                   <div>
-                    <h2 className="font-serif text-2xl font-bold text-slate-800 dark:text-slate-100">
+                    <h2 className="font-serif text-2xl font-bold text-foreground">
                       里程碑提醒
                     </h2>
-                    <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
+                    <p className="mt-0.5 text-xs text-muted-foreground">
                       {device.name}
                     </p>
                   </div>
                 </div>
-                <span className="shrink-0 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                <span className="shrink-0 rounded-full bg-warning/10 px-3 py-1 text-xs font-semibold text-warning">
                   提醒配置
                 </span>
               </div>
@@ -293,25 +293,25 @@ export function MilestoneConfigForm({
 
             <form
               onSubmit={handleSubmit}
-              className="space-y-6 bg-slate-50 p-6 dark:bg-[#111827]"
+              className="space-y-6 bg-background p-6"
             >
               {/* Enable Toggle */}
-              <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-white/10 dark:bg-[#0f172a]">
+              <div className="flex items-center justify-between rounded-2xl border border-border bg-card px-5 py-4 shadow-sm">
                 <div className="flex items-center gap-3">
                   {form.enabled ? (
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-700 shadow-md">
-                      <Bell size={16} className="text-white" />
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary shadow-md">
+                      <Bell size={16} className="text-primary-foreground" />
                     </div>
                   ) : (
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-200 dark:bg-slate-700">
-                      <BellOff size={16} className="text-slate-500" />
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary">
+                      <BellOff size={16} className="text-muted-foreground" />
                     </div>
                   )}
                   <div>
-                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                    <p className="text-sm font-semibold text-foreground">
                       启用里程碑提醒
                     </p>
-                    <p className="text-xs text-slate-400 dark:text-slate-500">
+                    <p className="text-xs text-muted-foreground">
                       在设备到达里程碑天数时发送通知
                     </p>
                   </div>
@@ -323,12 +323,12 @@ export function MilestoneConfigForm({
                   onClick={() => set('enabled', !form.enabled)}
                   className={`relative flex h-6 w-11 shrink-0 rounded-full transition-colors duration-300 ${
                     form.enabled
-                      ? 'bg-blue-700'
-                      : 'bg-slate-300 dark:bg-slate-600'
+                      ? 'bg-primary'
+                      : 'bg-secondary'
                   }`}
                 >
                   <span
-                    className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-300 ${
+                    className={`absolute top-0.5 h-5 w-5 rounded-full bg-card shadow-md transition-transform duration-300 ${
                       form.enabled ? 'translate-x-5.5' : 'translate-x-0.5'
                     }`}
                   />
@@ -338,11 +338,11 @@ export function MilestoneConfigForm({
               {/* Milestones */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <div className="h-px flex-1 bg-linear-to-r from-transparent via-slate-200 to-transparent dark:via-slate-700" />
-                  <span className="shrink-0 text-xs font-semibold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+                  <div className="h-px flex-1 bg-linear-to-r from-transparent via-border to-transparent" />
+                  <span className="shrink-0 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
                     里程碑节点
                   </span>
-                  <div className="h-px flex-1 bg-linear-to-r from-transparent via-slate-200 to-transparent dark:via-slate-700" />
+                  <div className="h-px flex-1 bg-linear-to-r from-transparent via-border to-transparent" />
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
@@ -355,8 +355,8 @@ export function MilestoneConfigForm({
                         onClick={() => toggleMilestone(preset.days)}
                         className={`relative flex flex-col items-center gap-1 rounded-xl px-3 py-3 text-xs font-semibold transition-all duration-200 ${
                           active
-                            ? 'bg-blue-700 text-white shadow-lg shadow-blue-500/25 dark:shadow-blue-900/40'
-                            : 'bg-white text-slate-500 shadow-sm hover:bg-slate-50 dark:border-white/10 dark:bg-[#0f172a] dark:text-slate-400 dark:hover:bg-white/5'
+                            ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
+                            : 'bg-card text-muted-foreground shadow-sm hover:bg-accent'
                         }`}
                       >
                         <span className="text-base">
@@ -365,15 +365,15 @@ export function MilestoneConfigForm({
                         <span
                           className={`text-[10px] font-medium ${
                             active
-                              ? 'text-blue-100'
-                              : 'text-slate-400 dark:text-slate-600'
+                              ? 'text-primary-foreground/70'
+                              : 'text-muted-foreground'
                           }`}
                         >
                           Day {preset.days}
                         </span>
                         {active && (
-                          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-white shadow">
-                            <ChevronRight size={8} className="text-blue-700" />
+                          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-card shadow">
+                            <ChevronRight size={8} className="text-primary" />
                           </span>
                         )}
                       </button>
@@ -390,16 +390,16 @@ export function MilestoneConfigForm({
                       value={customMilestone}
                       onChange={(e) => setCustomMilestone(e.target.value)}
                       placeholder="自定义天数..."
-                      className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pr-16 pl-4 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:bg-[#0f172a] dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                      className="w-full rounded-xl border border-input bg-card py-2.5 pr-16 pl-4 text-sm font-medium text-foreground ring-2 ring-transparent transition-all outline-none placeholder:text-muted-foreground focus:border-primary focus:ring-ring"
                     />
-                    <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-xs text-slate-400">
+                    <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-xs text-muted-foreground">
                       天
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={addCustomMilestone}
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 active:scale-95 dark:border-white/10 dark:bg-[#0f172a] dark:text-slate-400 dark:hover:border-blue-500/30 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-input bg-card text-muted-foreground transition-all hover:border-primary/30 hover:bg-primary/10 hover:text-primary active:scale-95"
                   >
                     <Plus size={18} />
                   </button>
@@ -407,17 +407,17 @@ export function MilestoneConfigForm({
 
                 {/* Selected milestones tags */}
                 {form.milestones.length > 0 && (
-                  <div className="flex min-w-0 flex-wrap gap-1.5 rounded-xl border border-dashed border-blue-200 bg-blue-50/60 p-3 dark:border-blue-500/30 dark:bg-blue-900/20">
+                  <div className="flex min-w-0 flex-wrap gap-1.5 rounded-xl border border-dashed border-primary/30 bg-primary/10 p-3">
                     {form.milestones.map((d) => (
                       <span
                         key={d}
-                        className="inline-flex items-center gap-1 rounded-full bg-blue-100 py-0.5 pr-1.5 pl-2.5 text-xs font-semibold text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"
+                        className="inline-flex items-center gap-1 rounded-full bg-primary/10 py-0.5 pr-1.5 pl-2.5 text-xs font-semibold text-primary"
                       >
                         {formatMilestone(d)}
                         <button
                           type="button"
                           onClick={() => toggleMilestone(d)}
-                          className="flex h-4 w-4 items-center justify-center rounded-full hover:bg-blue-200 dark:hover:bg-blue-800"
+                          className="flex h-4 w-4 items-center justify-center rounded-full hover:bg-primary/20"
                         >
                           <X size={10} />
                         </button>
@@ -430,8 +430,8 @@ export function MilestoneConfigForm({
               {/* Channels */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <div className="h-px flex-1 bg-linear-to-r from-transparent via-slate-200 to-transparent dark:via-slate-700" />
-                  <span className="shrink-0 text-xs font-semibold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+                  <div className="h-px flex-1 bg-linear-to-r from-transparent via-border to-transparent" />
+                  <span className="shrink-0 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
                     通知渠道
                   </span>
                   <button
@@ -440,7 +440,7 @@ export function MilestoneConfigForm({
                     onClick={() => {
                       void handleTestNotification();
                     }}
-                    className="ml-auto flex shrink-0 items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600 transition-all hover:bg-blue-100 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50"
+                    className="ml-auto flex shrink-0 items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary transition-all hover:bg-primary/20 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {testLoading ? (
                       <Loader2 size={12} className="animate-spin" />
@@ -449,7 +449,7 @@ export function MilestoneConfigForm({
                     )}
                     测试通知
                   </button>
-                  <div className="h-px flex-1 bg-linear-to-r from-transparent via-slate-200 to-transparent dark:via-slate-700" />
+                  <div className="h-px flex-1 bg-linear-to-r from-transparent via-border to-transparent" />
                 </div>
 
                 <div className="flex gap-2">
@@ -462,8 +462,8 @@ export function MilestoneConfigForm({
                         onClick={() => toggleChannel(opt.value)}
                         className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold transition-all duration-200 ${
                           active
-                            ? 'bg-blue-700 text-white shadow-lg shadow-blue-500/25 dark:shadow-blue-900/40'
-                            : 'bg-white text-slate-500 shadow-sm hover:bg-slate-50 dark:border-white/10 dark:bg-[#0f172a] dark:text-slate-400 dark:hover:bg-white/5'
+                            ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
+                            : 'bg-card text-muted-foreground shadow-sm hover:bg-accent'
                         }`}
                       >
                         {opt.icon}
@@ -476,7 +476,7 @@ export function MilestoneConfigForm({
                 {/* Channel-specific fields */}
                 {form.channels.includes('email') && (
                   <label className="block space-y-1">
-                    <span className="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                    <span className="ml-1 text-xs font-semibold text-muted-foreground">
                       邮件地址
                     </span>
                     <input
@@ -484,14 +484,14 @@ export function MilestoneConfigForm({
                       value={form.email}
                       onChange={(e) => set('email', e.target.value)}
                       placeholder="example@domain.com"
-                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:bg-[#0f172a] dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                      className="w-full rounded-xl border border-input bg-card px-4 py-2.5 text-sm font-medium text-foreground ring-2 ring-transparent transition-all outline-none placeholder:text-muted-foreground focus:border-primary focus:ring-ring"
                     />
                   </label>
                 )}
 
                 {form.channels.includes('feishu') && (
                   <label className="block space-y-1">
-                    <span className="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                    <span className="ml-1 text-xs font-semibold text-muted-foreground">
                       飞书 Webhook URL
                     </span>
                     <input
@@ -501,14 +501,14 @@ export function MilestoneConfigForm({
                         set('feishu_webhook_url', e.target.value)
                       }
                       placeholder="https://open.feishu.cn/open-apis/bot/v2/hook/..."
-                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:bg-[#0f172a] dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                      className="w-full rounded-xl border border-input bg-card px-4 py-2.5 text-sm font-medium text-foreground ring-2 ring-transparent transition-all outline-none placeholder:text-muted-foreground focus:border-primary focus:ring-ring"
                     />
                   </label>
                 )}
 
                 {form.channels.includes('bark') && (
                   <label className="block space-y-1">
-                    <span className="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                    <span className="ml-1 text-xs font-semibold text-muted-foreground">
                       Bark Device Key
                     </span>
                     <input
@@ -516,7 +516,7 @@ export function MilestoneConfigForm({
                       value={form.bark_device_key}
                       onChange={(e) => set('bark_device_key', e.target.value)}
                       placeholder="设备Key或完整推送URL"
-                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 ring-2 ring-transparent transition-all outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400/30 dark:border-white/10 dark:bg-[#0f172a] dark:text-white dark:placeholder:text-slate-600 dark:focus:border-blue-500 dark:focus:ring-blue-500/30"
+                      className="w-full rounded-xl border border-input bg-card px-4 py-2.5 text-sm font-medium text-foreground ring-2 ring-transparent transition-all outline-none placeholder:text-muted-foreground focus:border-primary focus:ring-ring"
                     />
                   </label>
                 )}
@@ -524,7 +524,7 @@ export function MilestoneConfigForm({
 
               {/* Error */}
               {formError ? (
-                <p className="py-2 text-center text-xs font-medium text-red-500 dark:text-red-400">
+                <p className="py-2 text-center text-xs font-medium text-destructive">
                   {formError}
                 </p>
               ) : null}
@@ -533,7 +533,7 @@ export function MilestoneConfigForm({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-blue-700 py-4 text-sm font-extrabold text-white shadow-xl shadow-blue-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-blue-500/40 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 text-sm font-extrabold text-primary-foreground shadow-xl shadow-primary/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-primary/40 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
               >
                 {isSubmitting ? (
                   <>

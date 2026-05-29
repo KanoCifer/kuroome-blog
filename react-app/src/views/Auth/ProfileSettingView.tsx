@@ -278,7 +278,7 @@ export default function ProfileSettingView() {
   };
 
   return (
-    <div className="font-body relative mb-24 h-full overflow-hidden bg-gray-50 dark:bg-gray-800">
+    <div className="font-body bg-background relative mb-24 h-full overflow-hidden">
       {/* Main Content */}
       <main className="relative z-10 mt-4 flex flex-col items-center px-5 pt-8 pb-10">
         {/* Header Section */}
@@ -288,13 +288,13 @@ export default function ProfileSettingView() {
           transition={{ duration: 0.7, ease: 'easeOut', delay: 0.05 }}
           className="mb-8 flex flex-col items-center justify-center"
         >
-          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[#2563eb] text-white shadow-[0_8px_16px_rgba(37,99,235,0.25)]">
+          <div className="bg-primary text-primary-foreground mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)]">
             <User className="size-8" />
           </div>
-          <h2 className="font-headline text-center text-[28px] font-extrabold tracking-tight text-[#111827] dark:text-white">
+          <h2 className="font-headline text-foreground text-center text-[28px] font-extrabold tracking-tight">
             Profile Settings
           </h2>
-          <p className="mt-1 text-center text-[15px] font-medium text-[#4b5563] dark:text-gray-400">
+          <p className="text-muted-foreground mt-1 text-center text-[15px] font-medium">
             Manage your profile and preferences
           </p>
         </motion.div>
@@ -304,7 +304,7 @@ export default function ProfileSettingView() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
-          className="w-full max-w-100 rounded-4xl border border-white/50 bg-white/70 p-6 shadow-xl dark:border-slate-700/50 dark:bg-slate-800/60"
+          className="border-border/50 bg-card/70 w-full max-w-100 rounded-4xl border p-6 shadow-xl"
         >
           <form className="flex flex-col" onSubmit={handleSubmit}>
             {/* Avatar Upload */}
@@ -345,11 +345,11 @@ export default function ProfileSettingView() {
             <button
               type="submit"
               disabled={saving}
-              className="w-full rounded-full bg-blue-500 py-4 text-[15px] font-bold text-white shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all hover:bg-[#1e3a8a]/90 active:scale-[0.98] disabled:opacity-70 dark:bg-blue-600 dark:hover:bg-blue-600/90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 w-full rounded-full py-4 text-[15px] font-bold shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all active:scale-[0.98] disabled:opacity-70"
             >
               {saving ? (
                 <span className="flex items-center justify-center gap-2">
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                  <span className="border-primary-foreground h-4 w-4 animate-spin rounded-full border-2 border-t-transparent"></span>
                   Saving...
                 </span>
               ) : (
@@ -362,8 +362,8 @@ export default function ProfileSettingView() {
               <div
                 className={`mt-4 rounded-2xl p-3 text-center text-[12px] font-medium ${
                   messageType === 'success'
-                    ? 'bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-400'
-                    : 'bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400'
+                    ? 'bg-success/10 text-success'
+                    : 'bg-destructive/10 text-destructive'
                 }`}
               >
                 {message}

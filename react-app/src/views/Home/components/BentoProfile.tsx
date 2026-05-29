@@ -100,16 +100,16 @@ export function BentoProfile() {
         <div className="relative shrink-0">
           {/* 青/蓝色渐变 */}
           <div className="absolute -inset-1 rounded-full bg-linear-to-br from-cyan-300 to-blue-400 opacity-50 blur"></div>
-          <div className="relative h-20 w-20 overflow-hidden rounded-full ring-4 ring-white/50 dark:ring-slate-700/50">
+          <div className="ring-card/50 relative h-20 w-20 overflow-hidden rounded-full ring-4">
             <img
               src="/images/about.webp"
               alt="Kuroome"
               className="h-full w-full object-cover transition duration-500 hover:scale-105"
             />
           </div>
-          <div className="absolute right-0 bottom-0 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-green-100 dark:border-slate-800 dark:bg-green-900">
+          <div className="border-card bg-success/20 absolute right-0 bottom-0 flex h-6 w-6 items-center justify-center rounded-full border-2">
             <svg
-              className="h-3 w-3 text-green-600 dark:text-green-400"
+              className="text-success h-3 w-3"
               fill="currentColor"
               viewBox="0 0 24 24"
             >
@@ -121,12 +121,10 @@ export function BentoProfile() {
 
         {/* <!-- Content --> */}
         <div className="flex flex-col items-start text-left">
-          <h2 className="font-serif text-2xl font-extrabold tracking-tight text-gray-800 dark:text-gray-100">
+          <h2 className="text-foreground font-serif text-2xl font-extrabold tracking-tight">
             Kuroome
           </h2>
-          <p className="font-medium text-gray-600 dark:text-gray-400">
-            Developer
-          </p>
+          <p className="text-muted-foreground font-medium">Developer</p>
         </div>
 
         {/* 点赞按钮 */}
@@ -135,7 +133,7 @@ export function BentoProfile() {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           title="切换到 Vue 版本"
-          className="absolute top-1/2 right-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-gray-50/80 ring-1 ring-gray-300 dark:bg-slate-800/40 dark:ring-gray-700"
+          className="bg-card/80 ring-border absolute top-1/2 right-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full ring-1"
           onClick={switchToVue}
         >
           <svg viewBox="0 0 256 221" className="h-4 w-4" fill="currentColor">
@@ -147,11 +145,11 @@ export function BentoProfile() {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           title="喜欢这个网站吗？点个赞吧！"
-          className="absolute top-1/2 right-4 -translate-y-1/2 rounded-full bg-gray-50/80 p-1 ring-1 ring-gray-300 dark:bg-blue-900/40 dark:ring-gray-700"
+          className="bg-card/80 ring-border absolute top-1/2 right-4 -translate-y-1/2 rounded-full p-1 ring-1"
           onClick={handleLike}
         >
           <LikeAnimation />
-          <span className="absolute -top-1 -right-1 rounded-full bg-red-500 px-1.5 py-0.5 text-xs font-bold text-white dark:bg-red-400 dark:text-gray-200">
+          <span className="bg-destructive absolute -top-1 -right-1 rounded-full px-1.5 py-0.5 text-xs font-bold text-white">
             {likesCount}
           </span>
         </motion.button>

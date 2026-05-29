@@ -10,7 +10,7 @@ const OPTIONS = [7, 30, 90] as const;
 export function DayFilter({ selectedDays, onChange }: DayFilterProps) {
   return (
     <div className="w-full">
-      <p className="inline-flex items-center gap-2 text-xs font-medium tracking-wide text-gray-500 uppercase dark:text-gray-400">
+      <p className="text-muted-foreground inline-flex items-center gap-2 text-xs font-medium tracking-wide uppercase">
         <CalendarDays className="h-3.5 w-3.5" />
         Time Window
       </p>
@@ -23,8 +23,8 @@ export function DayFilter({ selectedDays, onChange }: DayFilterProps) {
               key={option}
               className={`rounded-xl border px-3 py-2 text-sm font-medium transition-colors ${
                 active
-                  ? 'border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900'
-                  : 'border-gray-200 bg-white text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300'
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border bg-card text-card-foreground'
               }`}
               onClick={() => onChange(option)}
               type="button"

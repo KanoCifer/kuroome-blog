@@ -107,7 +107,7 @@ export function PriceAnalytics({
       {isOpen &&
         createPortal(
           <motion.div
-            className="fixed inset-0 z-10 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            className="bg-background/50 fixed inset-0 z-10 flex items-center justify-center backdrop-blur-sm"
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -119,7 +119,7 @@ export function PriceAnalytics({
 
       {isOpen &&
         createPortal(
-          <motion.div className="fixed top-1/2 left-1/2 z-50 h-[60vh] w-[90vw] max-w-md min-w-0 -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-gray-50 p-4 dark:bg-gray-900">
+          <motion.div className="bg-card fixed top-1/2 left-1/2 z-50 h-[60vh] w-[90vw] max-w-md min-w-0 -translate-x-1/2 -translate-y-1/2 rounded-2xl p-4">
             <ReactEChartsCore
               option={option}
               style={{ width: '100%', height: '100%' }}

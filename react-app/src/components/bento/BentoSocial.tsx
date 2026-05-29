@@ -23,9 +23,9 @@ export function BentoSocial() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={social.name}
-          className="group relative flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200/50 bg-white/80 text-slate-500 shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:bg-blue-50/80 hover:text-blue-600 hover:shadow-md dark:border-slate-700/50 dark:bg-slate-800/80 dark:text-slate-400 dark:hover:border-blue-500/50 dark:hover:bg-blue-900/30 dark:hover:text-blue-400"
+          className="group relative flex h-12 w-12 items-center justify-center rounded-2xl border border-border/50 bg-card/80 text-muted-foreground shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:bg-primary/10 hover:text-primary hover:shadow-md"
         >
-          <span className="absolute -top-11 scale-0 rounded-xl bg-slate-800 px-3 py-1.5 text-xs font-medium text-white opacity-0 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100 dark:bg-slate-600">
+          <span className="absolute -top-11 scale-0 rounded-xl bg-card px-3 py-1.5 text-xs font-medium text-card-foreground opacity-0 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100">
             {social.name}
           </span>
           {social.icon === 'github' && (

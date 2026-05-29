@@ -7,7 +7,7 @@ export function RouteStatusCard() {
 
   if (isPlanningRoute) {
     return (
-      <div className="flex items-center justify-center gap-2 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-700 dark:border-blue-900/40 dark:bg-blue-900/20 dark:text-blue-300">
+      <div className="flex items-center justify-center gap-2 rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm text-primary">
         <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
           <circle
             className="opacity-25"
@@ -30,27 +30,27 @@ export function RouteStatusCard() {
 
   if (routeInfo) {
     return (
-      <div className="rounded-2xl border border-gray-200/70 bg-white/80 p-4 shadow-sm backdrop-blur-sm dark:border-gray-800 dark:bg-slate-900/70">
+      <div className="rounded-2xl border border-border/70 bg-card/80 p-4 shadow-sm backdrop-blur-sm">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-sm font-semibold text-foreground">
               路线信息
             </h2>
-            <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+            <p className="mt-1 text-xs text-muted-foreground">
               距离 {formatDistance(routeInfo.distance)}
             </p>
-            <p className="text-xs text-gray-600 dark:text-gray-400">
+            <p className="text-xs text-muted-foreground">
               耗时 {formatDuration(routeInfo.time)}
             </p>
             {selectedSpotIndex !== null && (
-              <p className="mt-1 text-xs text-blue-600 dark:text-blue-300">
+              <p className="mt-1 text-xs text-primary">
                 已选择钓点 #{selectedSpotIndex + 1}
               </p>
             )}
           </div>
           <button
             onClick={clearRoute}
-            className="rounded-lg bg-red-500 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-red-600"
+            className="rounded-lg bg-destructive px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-destructive/90"
           >
             清除路线
           </button>
@@ -60,7 +60,7 @@ export function RouteStatusCard() {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200/70 bg-white/80 p-4 text-sm text-gray-600 shadow-sm backdrop-blur-sm dark:border-gray-800 dark:bg-slate-900/70 dark:text-gray-300">
+    <div className="rounded-2xl border border-border/70 bg-card/80 p-4 text-sm text-muted-foreground shadow-sm backdrop-blur-sm">
       点击地图上的钓点标记，自动规划从当前位置到钓点的路线。
     </div>
   );

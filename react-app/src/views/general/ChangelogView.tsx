@@ -53,17 +53,17 @@ const getTypeIcon = (type: string): string => {
 
 const getTypeClass = (type: string): string => {
   const classes: Record<string, string> = {
-    feat: 'bg-linear-to-r from-green-100 to-emerald-100 text-emerald-700 ring-1 ring-emerald-200/60 dark:from-green-900/30 dark:to-emerald-900/30 dark:text-emerald-300 dark:ring-emerald-800/60',
-    fix: 'bg-linear-to-r from-red-100 to-rose-100 text-rose-700 ring-1 ring-rose-200/60 dark:from-red-900/30 dark:to-rose-900/30 dark:text-rose-300 dark:ring-rose-800/60',
+    feat: 'bg-linear-to-r from-success/10 to-success/10 text-success ring-1 ring-success/20',
+    fix: 'bg-linear-to-r from-destructive/10 to-destructive/10 text-destructive ring-1 ring-destructive/20',
     refactor:
       'bg-linear-to-r from-purple-100 to-violet-100 text-violet-700 ring-1 ring-violet-200/60 dark:from-purple-900/30 dark:to-violet-900/30 dark:text-violet-300 dark:ring-violet-800/60',
     style:
       'bg-linear-to-r from-pink-100 to-fuchsia-100 text-fuchsia-700 ring-1 ring-fuchsia-200/60 dark:from-pink-900/30 dark:to-fuchsia-900/30 dark:text-fuchsia-300 dark:ring-fuchsia-800/60',
-    docs: 'bg-linear-to-r from-blue-100 to-sky-100 text-sky-700 ring-1 ring-sky-200/60 dark:from-blue-900/30 dark:to-sky-900/30 dark:text-sky-300 dark:ring-sky-800/60',
-    perf: 'bg-linear-to-r from-amber-100 to-orange-100 text-orange-700 ring-1 ring-orange-200/60 dark:from-amber-900/30 dark:to-orange-900/30 dark:text-orange-300 dark:ring-orange-800/60',
+    docs: 'bg-linear-to-r from-primary/10 to-primary/10 text-primary ring-1 ring-primary/20',
+    perf: 'bg-linear-to-r from-warning/10 to-warning/10 text-warning ring-1 ring-warning/20',
     test: 'bg-linear-to-r from-cyan-100 to-teal-100 text-teal-700 ring-1 ring-teal-200/60 dark:from-cyan-900/30 dark:to-teal-900/30 dark:text-teal-300 dark:ring-teal-800/60',
     chore:
-      'bg-linear-to-r from-gray-100 to-slate-100 text-slate-700 ring-1 ring-slate-200/60 dark:from-gray-900/30 dark:to-slate-900/30 dark:text-slate-300 dark:ring-slate-800/60',
+      'bg-linear-to-r from-secondary to-secondary text-muted-foreground ring-1 ring-border',
   };
   return classes[type] ?? classes.chore;
 };
@@ -78,7 +78,7 @@ export default function ChangelogView() {
     >
       <div className="w-full max-w-6xl px-4 max-sm:px-3">
         <div className="mb-16 text-center max-sm:mb-10">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 max-sm:mb-4 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs dark:bg-blue-900/30 dark:text-blue-300">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary max-sm:mb-4 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
             <svg
               className="h-4 w-4"
               fill="none"
@@ -94,10 +94,10 @@ export default function ChangelogView() {
             </svg>
             版本更新记录
           </div>
-          <h1 className="mb-4 text-5xl font-bold tracking-tight text-gray-800 max-sm:text-3xl md:text-6xl dark:text-gray-100">
+          <h1 className="mb-4 text-5xl font-bold tracking-tight text-foreground max-sm:text-3xl md:text-6xl">
             变更日志
           </h1>
-          <p className="mx-auto max-w-2xl text-lg text-gray-600 max-sm:text-base dark:text-gray-400">
+          <p className="mx-auto max-w-2xl text-lg text-muted-foreground max-sm:text-base">
             记录网站的每一次成长与进步
           </p>
         </div>
@@ -124,7 +124,7 @@ export default function ChangelogView() {
                 }`}
               >
                 <div className="-mx-8 w-full max-sm:mx-0 md:w-1/2">
-                  <div className="group squircle cursor-pointer border border-gray-100 bg-white/80 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl max-sm:p-4 md:p-8 dark:border-gray-700 dark:bg-gray-800/80">
+                  <div className="group squircle cursor-pointer border border-border bg-card/80 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl max-sm:p-4 md:p-8">
                     <div className="mb-4 flex flex-wrap items-center gap-3 max-sm:gap-2">
                       <span className="inline-flex items-center gap-2 rounded-full bg-linear-to-r from-blue-500 to-cyan-500 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-blue-500/25 max-sm:px-3 max-sm:py-1 max-sm:text-xs">
                         <svg
@@ -142,7 +142,7 @@ export default function ChangelogView() {
                         </svg>
                         v{release.version}
                       </span>
-                      <span className="flex items-center gap-1 text-sm text-gray-500 max-sm:text-xs dark:text-gray-400">
+                      <span className="flex items-center gap-1 text-sm text-muted-foreground max-sm:text-xs">
                         <svg
                           className="h-4 w-4"
                           fill="none"
@@ -160,7 +160,7 @@ export default function ChangelogView() {
                       </span>
                     </div>
 
-                    <h2 className="mb-4 text-2xl font-bold text-gray-800 max-sm:text-xl dark:text-gray-100">
+                    <h2 className="mb-4 text-2xl font-bold text-foreground max-sm:text-xl">
                       {release.title}
                     </h2>
 
@@ -178,7 +178,7 @@ export default function ChangelogView() {
                             )}
                             {getTypeLabel(change.type)}
                           </span>
-                          <span className="text-gray-700 max-sm:text-sm dark:text-gray-300">
+                          <span className="text-card-foreground max-sm:text-sm">
                             {change.content}
                           </span>
                         </li>
@@ -189,13 +189,13 @@ export default function ChangelogView() {
 
                 <div className="absolute top-1/2 left-1/2 z-10 hidden h-8 w-8 -translate-x-1/2 -translate-y-1/2 md:block">
                   <div className="absolute inset-0 -m-2 rounded-full bg-blue-500 opacity-30 blur-md transition-all duration-300 group-hover:opacity-50 group-hover:blur-lg" />
-                  <div className="relative flex h-full w-full items-center justify-center rounded-full bg-white ring-4 ring-blue-100 dark:bg-gray-800 dark:ring-gray-700">
+                  <div className="relative flex h-full w-full items-center justify-center rounded-full bg-card ring-4 ring-border">
                     <div className="h-3 w-3 rounded-full bg-blue-400" />
                   </div>
                 </div>
 
                 <div className="absolute top-6 left-0 z-10 h-6 w-6 -translate-x-1/2 max-sm:top-5 max-sm:left-3 md:hidden">
-                  <div className="relative flex h-full w-full items-center justify-center rounded-full bg-white ring-3 ring-blue-100 dark:bg-gray-800 dark:ring-gray-700">
+                  <div className="relative flex h-full w-full items-center justify-center rounded-full bg-card ring-3 ring-border">
                     <div className="h-2 w-2 rounded-full bg-blue-400" />
                   </div>
                 </div>

@@ -193,7 +193,7 @@ export default function SubscriptionView() {
     .reduce((total, item) => total + getMonthlyEstimate(item), 0);
 
   return (
-    <motion.div className="min-h-dvh bg-gray-50/95 pb-24 dark:bg-slate-900/95">
+    <motion.div className="bg-secondary/95 min-h-dvh pb-24">
       <SubscriptionHeader
         onClick={() => {
           navigate('/device-tracker');
@@ -212,20 +212,18 @@ export default function SubscriptionView() {
           {/* Monthly Estimate (Spans 2) */}
           <div
             onClick={() => setIsAnalyticsOpen(true)}
-            className="squircle col-span-2 flex items-center justify-between border border-slate-100 bg-white p-6 shadow-lg dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl"
+            className="squircle border-border bg-card col-span-2 flex items-center justify-between border p-6 shadow-lg"
           >
             <div>
-              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+              <p className="text-muted-foreground text-sm font-medium">
                 月度估算
               </p>
-              <p className="mt-1 text-3xl font-bold tracking-tight text-[#00288e] dark:text-blue-400">
+              <p className="text-primary mt-1 text-3xl font-bold tracking-tight">
                 ¥{monthlyEstimate.toFixed(2)}
               </p>
-              <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
-                点击查看分析
-              </p>
+              <p className="text-muted-foreground mt-1 text-xs">点击查看分析</p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-[#00288e] dark:bg-blue-500/20 dark:text-blue-400">
+            <div className="bg-primary/10 text-primary flex h-12 w-12 items-center justify-center rounded-full">
               <svg
                 className="h-6 w-6"
                 fill="none"
@@ -249,8 +247,8 @@ export default function SubscriptionView() {
           />
 
           {/* Active */}
-          <div className="squircle border border-slate-100 bg-white p-5 shadow-lg dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl">
-            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-emerald-500/20 dark:text-emerald-400">
+          <div className="squircle border-border bg-card border p-5 shadow-lg">
+            <div className="bg-success/10 text-success mb-3 flex h-10 w-10 items-center justify-center rounded-full">
               <svg
                 className="h-5 w-5"
                 fill="none"
@@ -265,16 +263,14 @@ export default function SubscriptionView() {
                 />
               </svg>
             </div>
-            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-              进行中
-            </p>
-            <p className="mt-1 text-xl font-bold text-slate-900 dark:text-white">
+            <p className="text-muted-foreground text-xs font-medium">进行中</p>
+            <p className="text-foreground mt-1 text-xl font-bold">
               {activeCount}
             </p>
           </div>
           {/* Total */}
-          <div className="squircle border border-slate-100 bg-white p-5 shadow-lg dark:border-white/10 dark:bg-slate-800/70 dark:shadow-xl dark:shadow-slate-900/50 dark:backdrop-blur-xl">
-            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400">
+          <div className="squircle border-border bg-card border p-5 shadow-lg">
+            <div className="bg-warning/10 text-warning mb-3 flex h-10 w-10 items-center justify-center rounded-full">
               <svg
                 className="h-5 w-5"
                 fill="none"
@@ -289,10 +285,8 @@ export default function SubscriptionView() {
                 />
               </svg>
             </div>
-            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-              总订阅
-            </p>
-            <p className="mt-1 text-xl font-bold text-slate-900 dark:text-white">
+            <p className="text-muted-foreground text-xs font-medium">总订阅</p>
+            <p className="text-foreground mt-1 text-xl font-bold">
               {subscriptions.length}
             </p>
           </div>
@@ -303,7 +297,7 @@ export default function SubscriptionView() {
           <button
             type="button"
             onClick={() => setIsAddModalOpen(true)}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-[#00288e] px-6 py-5 font-bold text-white shadow-lg shadow-indigo-500/20 transition-all hover:opacity-90 active:scale-95 dark:bg-blue-600 dark:shadow-blue-900/40"
+            className="bg-primary text-primary-foreground shadow-primary/20 flex w-full items-center justify-center gap-2 rounded-full px-6 py-5 font-bold shadow-lg transition-all hover:opacity-90 active:scale-95"
           >
             <svg
               className="h-6 w-6"

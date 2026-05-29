@@ -60,13 +60,13 @@ function DropDownItems() {
       <>
         <Link
           to="/settings"
-          className="flex items-center gap-2 rounded-xl p-2 select-none hover:bg-gray-300 dark:hover:bg-gray-800"
+          className="hover:bg-accent flex items-center gap-2 rounded-xl p-2 select-none"
         >
           <User className="h-4 w-4" /> Profile
         </Link>
         <Link
           to="/import"
-          className="flex items-center gap-2 rounded-xl p-2 select-none hover:bg-gray-300 dark:hover:bg-gray-800"
+          className="hover:bg-accent flex items-center gap-2 rounded-xl p-2 select-none"
         >
           <FileUp className="h-4 w-4" /> Import
         </Link>
@@ -74,19 +74,19 @@ function DropDownItems() {
           <>
             <Link
               to="/messages"
-              className="flex items-center gap-2 rounded-xl p-2 select-none hover:bg-gray-300 dark:hover:bg-gray-800"
+              className="hover:bg-accent flex items-center gap-2 rounded-xl p-2 select-none"
             >
               <MessageSquare className="h-4 w-4" /> Messages
             </Link>
             <Link
               to="/analytics"
-              className="flex items-center gap-2 rounded-xl p-2 select-none hover:bg-gray-300 dark:hover:bg-gray-800"
+              className="hover:bg-accent flex items-center gap-2 rounded-xl p-2 select-none"
             >
               <BarChart className="h-4 w-4" /> Analytics
             </Link>
           </>
         )}
-        <div className="my-1 h-px bg-gray-300 dark:bg-gray-600"></div>
+        <div className="bg-border my-1 h-px"></div>
         <button
           onClick={handleLoginout}
           disabled={isLoading}
@@ -102,13 +102,13 @@ function DropDownItems() {
       <>
         <Link
           to="/login"
-          className="flex items-center gap-2 rounded-xl p-2 select-none hover:bg-gray-300 dark:hover:bg-gray-800"
+          className="hover:bg-accent flex items-center gap-2 rounded-xl p-2 select-none"
         >
           <LogIn className="h-4 w-4" /> Login
         </Link>
         <Link
           to="/register"
-          className="flex items-center gap-2 rounded-xl p-2 select-none hover:bg-gray-300 dark:hover:bg-gray-800"
+          className="hover:bg-accent flex items-center gap-2 rounded-xl p-2 select-none"
         >
           <UserPlus className="h-4 w-4" /> Register
         </Link>
@@ -120,10 +120,10 @@ function DropDownItems() {
 function DelayStatus({ ms }: { ms: number }) {
   if (!ms) {
     return (
-      <span className="inline-flex items-center gap-1.5 text-xs text-gray-400">
+      <span className="text-muted-foreground inline-flex items-center gap-1.5 text-xs">
         <span className="relative flex h-2 w-2">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gray-400 opacity-75" />
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-gray-400" />
+          <span className="bg-muted-foreground absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
+          <span className="bg-muted-foreground relative inline-flex h-2 w-2 rounded-full" />
         </span>
         延迟 -- ms
       </span>
@@ -131,9 +131,9 @@ function DelayStatus({ ms }: { ms: number }) {
   }
   const label = `${Math.round(ms)} ms`;
   const dotClass =
-    ms < 200 ? 'bg-emerald-500' : ms < 2000 ? 'bg-yellow-500' : 'bg-red-500';
+    ms < 200 ? 'bg-success' : ms < 2000 ? 'bg-warning' : 'bg-destructive';
   return (
-    <span className="inline-flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+    <span className="text-muted-foreground inline-flex items-center gap-1.5 text-xs">
       <span className="relative flex h-2 w-2">
         <span
           className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${dotClass}`}
@@ -197,16 +197,16 @@ export const BentoNavSidebar: React.FC = () => {
       <div className="pointer-events-none fixed top-0 left-0 z-50 w-full p-4">
         <button
           onClick={() => setIsOpen(true)}
-          className="pointer-events-auto rounded-full bg-gray-100/50 p-2 shadow-lg backdrop-blur-sm transition-transform active:scale-95 dark:bg-gray-500/20"
+          className="bg-secondary/50 pointer-events-auto rounded-full p-2 shadow-lg backdrop-blur-sm transition-transform active:scale-95"
         >
-          <TextAlignJustify className="h-6 w-6 text-gray-500 dark:text-white" />
+          <TextAlignJustify className="text-foreground h-6 w-6" />
         </button>
       </div>
 
       {/* 背景层 */}
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-90 bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-90 bg-background/50 backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -222,7 +222,7 @@ export const BentoNavSidebar: React.FC = () => {
           duration: 0.3,
           ease: 'easeInOut',
         }}
-        className="fixed top-0 left-0 z-100 flex h-screen w-80 flex-col gap-6 rounded-r-4xl bg-gray-50/90 p-6 backdrop-blur-sm dark:bg-gray-800/80"
+        className="fixed top-0 left-0 z-100 flex h-screen w-80 flex-col gap-6 rounded-r-4xl bg-card/90 p-6 backdrop-blur-sm"
       >
         {/* 下拉菜单 */}
         <div className="relative">
@@ -233,7 +233,7 @@ export const BentoNavSidebar: React.FC = () => {
             <img
               src={avatarUrl}
               alt={currentUserName}
-              className="h-14 w-14 rounded-full object-cover shadow-[0_0_14px_rgba(0,0,0,0.8)] ring-4 ring-blue-500"
+              className="h-14 w-14 rounded-full object-cover shadow-[0_0_14px_rgba(0,0,0,0.8)] ring-4 ring-primary"
             />
             <div className="flex items-baseline gap-2">
               <span className="text-base-content font-serif text-2xl font-bold select-none">
@@ -249,7 +249,7 @@ export const BentoNavSidebar: React.FC = () => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="selection-none absolute top-full left-0 z-50 mt-4 flex w-60 flex-col gap-1 rounded-2xl bg-gray-200 p-2 shadow-xl dark:bg-gray-600"
+              className="selection-none absolute top-full left-0 z-50 mt-4 flex w-60 flex-col gap-1 rounded-2xl bg-card p-2 shadow-xl"
             >
               <DropDownItems />
             </motion.div>
@@ -264,7 +264,7 @@ export const BentoNavSidebar: React.FC = () => {
         <ul className="relative flex grow flex-col gap-1">
           {/* Active indicator */}
           <motion.div
-            className="pointer-events-none absolute left-0 h-12 w-full rounded-2xl bg-blue-500 shadow-md dark:bg-blue-600/50"
+            className="pointer-events-none absolute left-0 h-12 w-full rounded-2xl bg-primary/30 shadow-md"
             animate={{ y: hoverNavIndex * 52 }} // 52 = item height (48) + gap (4)
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             style={{ zIndex: 0 }}
@@ -293,11 +293,11 @@ export const BentoNavSidebar: React.FC = () => {
         </ul>
 
         {/* 状态栏：在线人数 + 延迟 */}
-        <div className="flex items-center justify-between px-3 text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex items-center justify-between px-3 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
             </span>
             {visitorCount} 人在线
           </span>

@@ -177,16 +177,16 @@ export function TideCard() {
   }, [isDarkMode, tideData]);
 
   return (
-    <article className="relative rounded-2xl border border-white/40 bg-linear-to-br from-white/80 to-white/40 p-4 shadow-sm backdrop-blur-sm dark:border-gray-700/60 dark:from-gray-900/80 dark:to-gray-800/60">
+    <article className="relative rounded-2xl border border-border/40 bg-linear-to-br from-card/80 to-card/40 p-4 shadow-sm backdrop-blur-sm">
       {/* Decorative gradient orbs */}
-      <div className="pointer-events-none absolute bottom-16 left-16 h-32 w-32 overflow-hidden rounded-full bg-linear-to-tr from-teal-300/20 to-emerald-400/10 blur-3xl transition-transform duration-700 group-hover:scale-110"></div>
+      <div className="pointer-events-none absolute bottom-16 left-16 h-32 w-32 overflow-hidden rounded-full bg-linear-to-tr from-success/20 to-success/10 blur-3xl transition-transform duration-700 group-hover:scale-110"></div>
 
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="min-w-0">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+          <h3 className="text-sm font-semibold text-foreground">
             潮汐预报
           </h3>
-          <p className="truncate text-xs text-gray-500 dark:text-gray-400">
+          <p className="truncate text-xs text-muted-foreground">
             {tideSpotName}
           </p>
         </div>
@@ -194,7 +194,7 @@ export function TideCard() {
           <select
             value={selectedHarbor}
             onChange={(e) => setSelectedHarbor(e.target.value)}
-            className="cursor-pointer rounded-lg border border-gray-200 bg-white/80 px-1.5 py-1 text-xs text-gray-700 focus:ring-1 focus:ring-cyan-400 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
+            className="cursor-pointer rounded-lg border border-border bg-card/80 px-1.5 py-1 text-xs text-card-foreground focus:ring-1 focus:ring-ring focus:outline-none"
           >
             {HARBOR_OPTIONS.map((opt) => (
               <option key={opt.code} value={opt.code}>
@@ -205,7 +205,7 @@ export function TideCard() {
           <select
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            className="cursor-pointer rounded-lg border border-gray-200 bg-white/80 px-1.5 py-1 text-xs text-gray-700 focus:ring-1 focus:ring-cyan-400 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
+            className="cursor-pointer rounded-lg border border-border bg-card/80 px-1.5 py-1 text-xs text-card-foreground focus:ring-1 focus:ring-ring focus:outline-none"
           >
             {dateOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -224,21 +224,21 @@ export function TideCard() {
         <div className="min-h-[200px]">
           <TideChart option={tideChartOption} />
           <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-            <div className="rounded-lg bg-white/60 px-3 py-2 dark:bg-gray-800/60">
-              <p className="text-gray-500 dark:text-gray-400">
+            <div className="rounded-lg bg-card/60 px-3 py-2">
+              <p className="text-muted-foreground">
                 最高潮:{dayjs(highTide?.fxTime).format('HH:mm')}
-                <span className="text-cyan-500">↗</span>
+                <span className="text-primary">↗</span>
               </p>
-              <p className="mt-1 font-medium text-gray-900 dark:text-white">
+              <p className="mt-1 font-medium text-foreground">
                 {highTide ? Number(highTide.height).toFixed(2) : '--'}m
               </p>
             </div>
-            <div className="rounded-lg bg-white/60 px-3 py-2 dark:bg-gray-800/60">
-              <p className="text-gray-500 dark:text-gray-400">
+            <div className="rounded-lg bg-card/60 px-3 py-2">
+              <p className="text-muted-foreground">
                 最低潮:{dayjs(lowTide?.fxTime).format('HH:mm')}
-                <span className="text-cyan-500">↘</span>
+                <span className="text-primary">↘</span>
               </p>
-              <p className="mt-1 font-medium text-gray-900 dark:text-white">
+              <p className="mt-1 font-medium text-foreground">
                 {lowTide ? Number(lowTide.height).toFixed(2) : '--'}m
               </p>
             </div>
@@ -246,7 +246,7 @@ export function TideCard() {
         </div>
       ) : (
         <div className="min-h-[200px]">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-muted-foreground">
             暂无潮汐数据
           </p>
         </div>

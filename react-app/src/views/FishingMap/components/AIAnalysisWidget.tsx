@@ -84,13 +84,10 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
   })();
 
   const statusClass = (() => {
-    if (analysisLoading)
-      return 'bg-blue-500/15 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300';
-    if (analysisError)
-      return 'bg-red-500/15 text-red-600 dark:bg-red-500/20 dark:text-red-300';
-    if (analysisResult)
-      return 'bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300';
-    return 'bg-gray-500/10 text-gray-600 dark:bg-gray-500/20 dark:text-gray-400';
+    if (analysisLoading) return 'bg-primary/15 text-primary';
+    if (analysisError) return 'bg-destructive/15 text-destructive';
+    if (analysisResult) return 'bg-success/15 text-success';
+    return 'bg-muted/10 text-muted-foreground';
   })();
 
   return (
@@ -104,7 +101,7 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.92, y: 12 }}
                 transition={{ duration: 0.35, ease: 'easeOut' }}
-                className="group relative mb-3 w-[90vw] max-w-sm overflow-hidden rounded-3xl border border-white/20 bg-linear-to-br from-white/80 to-white/40 shadow-2xl backdrop-blur-sm dark:border-gray-700/50 dark:from-gray-900/80 dark:to-gray-800/40"
+                className="group border-border/50 from-card/80 to-card/40 relative mb-3 w-[90vw] max-w-sm overflow-hidden rounded-3xl border bg-linear-to-br shadow-2xl backdrop-blur-sm"
               >
                 {/* Decorative blobs */}
                 <div className="pointer-events-none absolute -top-16 -right-16 h-32 w-32 rounded-full bg-linear-to-br from-indigo-300/30 to-sky-500/20 blur-2xl transition-transform duration-700 group-hover:scale-110" />
@@ -112,12 +109,12 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
 
                 <div className="relative z-10">
                   {/* Header */}
-                  <div className="flex items-start justify-between gap-3 border-b border-gray-200/70 px-4 py-3 dark:border-gray-700/70">
+                  <div className="border-border/70 flex items-start justify-between gap-3 border-b px-4 py-3">
                     <div>
-                      <h3 className="text-sm font-bold tracking-tight text-gray-900 dark:text-white">
+                      <h3 className="text-foreground text-sm font-bold tracking-tight">
                         AI 天气分析
                       </h3>
-                      <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-muted-foreground mt-0.5 text-xs">
                         结合实时天气与潮汐节奏给出出行建议
                       </p>
                     </div>
@@ -129,7 +126,7 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
                       </span>
                       <button
                         onClick={closeAnalysis}
-                        className="rounded-full p-1 text-gray-500 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                        className="text-muted-foreground hover:bg-accent rounded-full p-1"
                         aria-label="关闭分析"
                       >
                         <X className="h-3.5 w-3.5" />
@@ -161,7 +158,7 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
                         <select
                           value={selectedModel}
                           onChange={(e) => setSelectedModel(e.target.value)}
-                          className="flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                          className="border-border bg-secondary text-card-foreground flex-1 rounded-lg border px-3 py-1.5 text-xs"
                         >
                           {AI_MODELS.map((model) => (
                             <option key={model.id} value={model.id}>
@@ -177,7 +174,7 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
                         onClick={() => {
                           abortAnalysis();
                         }}
-                        className="relative flex w-full items-center justify-center gap-2 rounded-xl bg-red-500 px-4 py-2.5 text-xs font-medium text-white transition hover:bg-red-600"
+                        className="bg-destructive hover:bg-destructive/90 relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium text-white transition"
                       >
                         <svg
                           className="h-3.5 w-3.5"
@@ -202,7 +199,7 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
                           setAnalysisLoading(true);
                         }}
                         disabled={!analysisHasData}
-                        className="relative flex w-full items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-xs font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
+                        className="relative flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-medium text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-muted"
                       >
                         {analysisResult ? '重新分析' : '生成分析'}
                       </button>
@@ -220,14 +217,14 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
       {!analysisOpen && (
         <button
           onClick={toggleAnalysis}
-          className="fixed right-4 bottom-50 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-white/50 bg-linear-to-br from-slate-900/90 to-slate-700/85 text-white shadow-lg backdrop-blur transition-all hover:-translate-y-0.5 hover:shadow-xl sm:right-6 sm:bottom-24 sm:h-14 sm:w-14 dark:border-gray-700/70 dark:from-gray-100 dark:to-gray-300 dark:text-gray-900"
+          className="fixed right-4 bottom-50 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-primary-foreground/50 bg-linear-to-br from-primary/90 to-primary/85 text-primary-foreground shadow-lg backdrop-blur transition-all hover:-translate-y-0.5 hover:shadow-xl sm:right-6 sm:bottom-24 sm:h-14 sm:w-14"
           aria-label="打开 AI 分析"
           title="AI分析"
         >
           {analysisHasData && (
             <span className="absolute top-0.5 right-0.5 flex h-2.5 w-2.5 sm:top-0 sm:right-0">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500 sm:h-3 sm:w-3" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-70" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-success sm:h-3 sm:w-3" />
             </span>
           )}
           <Bot className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -248,11 +245,11 @@ function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center justify-center py-4 text-center">
-      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800">
+      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-muted">
         {icon}
       </div>
-      <p className="text-sm text-gray-600 dark:text-gray-400">{title}</p>
-      <p className="mt-1 text-xs text-gray-400">{subtitle}</p>
+      <p className="text-sm text-muted-foreground">{title}</p>
+      <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>
     </div>
   );
 }
@@ -260,11 +257,11 @@ function EmptyState({
 function LoadingState({ shimmerText }: { shimmerText: string }) {
   return (
     <div className="space-y-3">
-      <p className="text-sm text-gray-500 dark:text-gray-400">{shimmerText}</p>
+      <p className="text-sm text-muted-foreground">{shimmerText}</p>
       <div className="space-y-2">
-        <div className="h-3 w-full animate-pulse rounded bg-gray-200/70 dark:bg-gray-700/50" />
-        <div className="h-3 w-5/6 animate-pulse rounded bg-gray-200/70 dark:bg-gray-700/50" />
-        <div className="h-3 w-2/3 animate-pulse rounded bg-gray-200/70 dark:bg-gray-700/50" />
+        <div className="h-3 w-full animate-pulse rounded bg-secondary/70" />
+        <div className="h-3 w-5/6 animate-pulse rounded bg-secondary/70" />
+        <div className="h-3 w-2/3 animate-pulse rounded bg-secondary/70" />
       </div>
     </div>
   );
@@ -272,7 +269,7 @@ function LoadingState({ shimmerText }: { shimmerText: string }) {
 
 function ErrorState({ message }: { message: string }) {
   return (
-    <div className="rounded-xl bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-300">
+    <div className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive">
       {message}
     </div>
   );
@@ -281,7 +278,7 @@ function ErrorState({ message }: { message: string }) {
 function ResultState({ html }: { html: string }) {
   return (
     <div
-      className="prose prose-sm dark:prose-invert max-h-[50vh] min-h-16 overflow-y-auto text-gray-700 sm:max-h-[60vh] dark:text-gray-200"
+      className="prose prose-sm dark:prose-invert max-h-[50vh] min-h-16 overflow-y-auto text-card-foreground sm:max-h-[60vh]"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
@@ -289,7 +286,7 @@ function ResultState({ html }: { html: string }) {
 
 function PlaceholderState() {
   return (
-    <p className="text-sm text-gray-500 dark:text-gray-400">
+    <p className="text-sm text-muted-foreground">
       点击「生成分析」，获取适合外出与钓鱼的天气建议。
     </p>
   );

@@ -22,22 +22,22 @@ const COLUMNS: ColumnDef[] = [
   {
     status: 'todo',
     title: '待办',
-    dotClass: 'bg-blue-500',
-    bgClass: 'bg-blue-50/40 dark:bg-blue-950/15',
+    dotClass: 'bg-primary',
+    bgClass: 'bg-primary/10',
     emptyText: '没有待开发任务',
   },
   {
     status: 'in-progress',
     title: '开发中',
-    dotClass: 'bg-amber-500',
-    bgClass: 'bg-amber-50/40 dark:bg-amber-950/15',
+    dotClass: 'bg-warning',
+    bgClass: 'bg-warning/10',
     emptyText: '没有开发中任务',
   },
   {
     status: 'done',
     title: '已完成',
-    dotClass: 'bg-emerald-500',
-    bgClass: 'bg-emerald-50/40 dark:bg-emerald-950/15',
+    dotClass: 'bg-success',
+    bgClass: 'bg-success/10',
     emptyText: '没有已完成任务',
   },
 ];
@@ -65,10 +65,10 @@ function priorityLabel(p: DevTaskPriority): string {
 
 function priorityBadgeClass(p: DevTaskPriority): string {
   const map: Record<DevTaskPriority, string> = {
-    low: 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-    high: 'border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400',
+    low: 'border-primary/20 bg-primary/10 text-primary',
+    high: 'border-destructive/20 bg-destructive/10 text-destructive',
     default:
-      'border-gray-200 bg-gray-50 text-gray-700 dark:border-gray-700 dark:bg-gray-800/30 dark:text-gray-400',
+      'border-border bg-secondary text-card-foreground',
   };
   return map[p];
 }
@@ -97,7 +97,7 @@ function TaskCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.2 }}
-      className="group rounded-xl border border-gray-200/60 bg-white p-3.5 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700/60 dark:bg-gray-900"
+      className="group rounded-xl border border-border/60 bg-card p-3.5 shadow-sm transition-shadow hover:shadow-md"
     >
       <div className="flex items-start gap-2.5">
         {/* Status badge */}
@@ -113,8 +113,8 @@ function TaskCard({
           <p
             className={`text-sm leading-snug font-medium ${
               isDone
-                ? 'text-gray-400 line-through dark:text-gray-500'
-                : 'text-gray-900 dark:text-gray-100'
+                ? 'text-muted-foreground line-through'
+                : 'text-foreground'
             }`}
           >
             {task.title}
@@ -122,7 +122,7 @@ function TaskCard({
 
           {task.description && (
             <p
-              className={`mt-1 line-clamp-2 text-xs text-gray-500 dark:text-gray-400 ${
+              className={`mt-1 line-clamp-2 text-xs text-muted-foreground ${
                 isDone ? 'opacity-60' : ''
               }`}
             >
@@ -140,8 +140,8 @@ function TaskCard({
               <span
                 className={`flex items-center gap-1 text-[10px] ${
                   isOverdue && !isDone
-                    ? 'text-red-600 dark:text-red-400'
-                    : 'text-gray-500 dark:text-gray-400'
+                    ? 'text-destructive'
+                    : 'text-muted-foreground'
                 }`}
               >
                 <svg
@@ -165,7 +165,7 @@ function TaskCard({
         <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100 max-sm:opacity-100">
           <button
             onClick={() => onEdit(task)}
-            className="cursor-pointer rounded-md p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-blue-600 dark:hover:bg-gray-800 dark:hover:text-blue-400"
+            className="cursor-pointer rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
             title="编辑"
           >
             <svg
@@ -184,7 +184,7 @@ function TaskCard({
           </button>
           <button
             onClick={() => onDelete(task.id)}
-            className="cursor-pointer rounded-md p-1 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
+            className="cursor-pointer rounded-md p-1 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
             title="删除"
           >
             <svg
@@ -323,15 +323,15 @@ export default function TodoListView() {
         duration: 0.5,
         delay: 0.1,
       }}
-      className="relative min-h-dvh bg-linear-to-b from-blue-50 to-white pb-28 dark:from-slate-900 dark:to-slate-900"
+      className="relative min-h-dvh bg-linear-to-b from-primary/10 to-background pb-28"
     >
       {/* Header */}
-      <div className="sticky top-0 z-10 flex items-center justify-between bg-white/80 px-4 py-4 backdrop-blur-md dark:bg-slate-900/80">
+      <div className="sticky top-0 z-10 flex items-center justify-between bg-card/80 px-4 py-4 backdrop-blur-md">
         <div>
-          <h1 className="ml-12 text-xl font-semibold text-gray-900 dark:text-gray-100">
+          <h1 className="ml-12 text-xl font-semibold text-foreground">
             开发任务
           </h1>
-          <p className="text-sm text-gray-500">{tasks.length} 项任务</p>
+          <p className="text-sm text-muted-foreground">{tasks.length} 项任务</p>
         </div>
       </div>
 
@@ -351,10 +351,10 @@ export default function TodoListView() {
                 <span
                   className={`h-2.5 w-2.5 shrink-0 rounded-full ${col.dotClass}`}
                 />
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                <h3 className="text-sm font-semibold text-foreground">
                   {col.title}
                 </h3>
-                <span className="rounded-full bg-black/5 px-2 py-0.5 text-xs font-medium text-gray-500 tabular-nums dark:bg-white/10 dark:text-gray-400">
+                <span className="rounded-full bg-background/5 px-2 py-0.5 text-xs font-medium text-muted-foreground tabular-nums">
                   {colTasks.length}
                 </span>
               </div>
@@ -363,18 +363,18 @@ export default function TodoListView() {
               <div className="flex-1 space-y-3 overflow-y-auto">
                 {/* Edit overlay */}
                 {editingId && (
-                  <div className="space-y-2.5 rounded-xl border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+                  <div className="space-y-2.5 rounded-xl border border-border bg-card p-3 shadow-sm">
                     <input
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
-                      className="w-full rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-sm font-medium outline-none focus:border-blue-400 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                      className="w-full rounded-lg border border-border bg-card px-2.5 py-1.5 text-sm font-medium outline-none focus:border-primary"
                       autoFocus
                     />
                     <textarea
                       value={editDescription}
                       onChange={(e) => setEditDescription(e.target.value)}
                       rows={2}
-                      className="w-full resize-none rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs outline-none focus:border-blue-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                      className="w-full resize-none rounded-lg border border-border bg-card px-2.5 py-1.5 text-xs outline-none focus:border-primary"
                       placeholder="描述..."
                     />
                     <div className="flex items-center gap-2">
@@ -383,7 +383,7 @@ export default function TodoListView() {
                         onChange={(e) =>
                           setEditPriority(e.target.value as DevTaskPriority)
                         }
-                        className="cursor-pointer rounded-md border border-gray-200 bg-white px-2 py-1 text-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                        className="cursor-pointer rounded-md border border-border bg-card px-2 py-1 text-xs"
                       >
                         <option value="default">默认</option>
                         <option value="low">低</option>
@@ -393,18 +393,18 @@ export default function TodoListView() {
                         type="date"
                         value={editDueDate}
                         onChange={(e) => setEditDueDate(e.target.value)}
-                        className="cursor-pointer rounded-md border border-gray-200 bg-white px-2 py-1 text-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                        className="cursor-pointer rounded-md border border-border bg-card px-2 py-1 text-xs"
                       />
                       <div className="ml-auto flex gap-1.5">
                         <button
                           onClick={() => setEditingId(null)}
-                          className="cursor-pointer rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300"
+                          className="cursor-pointer rounded-lg bg-secondary px-2.5 py-1 text-xs font-medium text-card-foreground transition-colors hover:bg-secondary/80"
                         >
                           取消
                         </button>
                         <button
                           onClick={saveEdit}
-                          className="cursor-pointer rounded-lg bg-blue-600 px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-blue-700"
+                          className="cursor-pointer rounded-lg bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                         >
                           保存
                         </button>
@@ -430,7 +430,7 @@ export default function TodoListView() {
                 {/* Empty state */}
                 {colTasks.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <p className="text-sm text-gray-400 dark:text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       {col.emptyText}
                     </p>
                   </div>
@@ -438,11 +438,11 @@ export default function TodoListView() {
               </div>
 
               {/* Quick add */}
-              <div className="mt-3 shrink-0 border-t border-gray-200/50 pt-3 dark:border-gray-700/50">
+              <div className="mt-3 shrink-0 border-t border-border/50 pt-3">
                 {addingStatus !== col.status ? (
                   <button
                     onClick={() => startQuickAdd(col.status)}
-                    className="flex w-full cursor-pointer items-center gap-1.5 rounded-lg px-2 py-2 text-xs text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+                    className="flex w-full cursor-pointer items-center gap-1.5 rounded-lg px-2 py-2 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                   >
                     <svg
                       className="h-3.5 w-3.5"
@@ -467,7 +467,7 @@ export default function TodoListView() {
                       onChange={(e) => setQuickTitle(e.target.value)}
                       type="text"
                       placeholder={`添加${col.title}任务...`}
-                      className="w-full rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-blue-400 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                      className="w-full rounded-lg border border-border bg-card px-2.5 py-1.5 text-sm outline-none focus:border-primary"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') submitQuickAdd();
                         if (e.key === 'Escape') setAddingStatus(null);
@@ -476,14 +476,14 @@ export default function TodoListView() {
                     <div className="flex items-center gap-1.5">
                       <button
                         onClick={() => setAddingStatus(null)}
-                        className="cursor-pointer rounded-md px-2 py-1 text-xs text-gray-500 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+                        className="cursor-pointer rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent"
                       >
                         取消
                       </button>
                       <button
                         onClick={submitQuickAdd}
                         disabled={!quickTitle.trim()}
-                        className="cursor-pointer rounded-md bg-gray-900 px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+                        className="cursor-pointer rounded-md bg-foreground px-3 py-1 text-xs font-medium text-background transition-colors hover:bg-foreground/90 disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         确定
                       </button>
@@ -500,7 +500,7 @@ export default function TodoListView() {
       <div className="fixed right-4 bottom-24 z-10">
         <button
           onClick={showAddFrom}
-          className="flex cursor-pointer items-center gap-2 rounded-2xl bg-gray-900 px-5 py-3 font-medium text-white shadow-lg transition-all hover:bg-gray-800 active:scale-[0.97] dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+          className="flex cursor-pointer items-center gap-2 rounded-2xl bg-foreground px-5 py-3 font-medium text-background shadow-lg transition-all hover:bg-foreground/90 active:scale-[0.97]"
         >
           <svg
             className="h-5 w-5"
@@ -526,7 +526,7 @@ export default function TodoListView() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-20 bg-black/50 backdrop-blur-sm"
+            className="fixed inset-0 z-20 bg-background/50 backdrop-blur-sm"
             onClick={closeAddForm}
           >
             <motion.div
@@ -535,15 +535,15 @@ export default function TodoListView() {
               exit={{ y: '100%' }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               onClick={(e) => e.stopPropagation()}
-              className="absolute right-0 bottom-0 left-0 max-h-[85dvh] overflow-y-auto rounded-t-3xl bg-white p-6 dark:bg-gray-900"
+              className="absolute right-0 bottom-0 left-0 max-h-[85dvh] overflow-y-auto rounded-t-3xl bg-card p-6"
             >
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <h2 className="text-lg font-semibold text-foreground">
                   添加任务
                 </h2>
                 <button
                   onClick={closeAddForm}
-                  className="cursor-pointer rounded-lg p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  className="cursor-pointer rounded-lg p-1 text-muted-foreground hover:bg-accent"
                 >
                   <svg
                     className="h-6 w-6"
@@ -567,7 +567,7 @@ export default function TodoListView() {
                   onChange={(e) => setNewTitle(e.target.value)}
                   type="text"
                   placeholder="任务内容..."
-                  className="w-full rounded-xl border border-gray-200 bg-white/80 px-4 py-3 text-base outline-none focus:border-blue-400 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  className="w-full rounded-xl border border-border bg-card/80 px-4 py-3 text-base outline-none focus:border-primary"
                   autoFocus
                 />
 
@@ -576,12 +576,12 @@ export default function TodoListView() {
                   onChange={(e) => setNewDescription(e.target.value)}
                   rows={2}
                   placeholder="添加描述... (可选)"
-                  className="w-full resize-none rounded-xl border border-gray-200 bg-white/80 px-4 py-3 text-sm outline-none focus:border-blue-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                  className="w-full resize-none rounded-xl border border-border bg-card/80 px-4 py-3 text-sm outline-none focus:border-primary"
                 />
 
                 <div className="flex flex-wrap items-center gap-4">
                   <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    <label className="text-sm font-medium text-muted-foreground">
                       状态
                     </label>
                     <select
@@ -589,7 +589,7 @@ export default function TodoListView() {
                       onChange={(e) =>
                         setNewStatus(e.target.value as DevTaskStatus)
                       }
-                      className="cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                      className="cursor-pointer rounded-lg border border-border bg-card px-3 py-2 text-sm"
                     >
                       <option value="todo">待办</option>
                       <option value="in-progress">开发中</option>
@@ -598,7 +598,7 @@ export default function TodoListView() {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    <label className="text-sm font-medium text-muted-foreground">
                       优先级
                     </label>
                     <select
@@ -606,7 +606,7 @@ export default function TodoListView() {
                       onChange={(e) =>
                         setNewPriority(e.target.value as DevTaskPriority)
                       }
-                      className="cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                      className="cursor-pointer rounded-lg border border-border bg-card px-3 py-2 text-sm"
                     >
                       <option value="default">默认</option>
                       <option value="low">低</option>
@@ -615,14 +615,14 @@ export default function TodoListView() {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    <label className="text-sm font-medium text-muted-foreground">
                       截止日期
                     </label>
                     <input
                       type="date"
                       value={newDueDate}
                       onChange={(e) => setNewDueDate(e.target.value)}
-                      className="cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                      className="cursor-pointer rounded-lg border border-border bg-card px-3 py-2 text-sm"
                     />
                   </div>
                 </div>
@@ -630,7 +630,7 @@ export default function TodoListView() {
                 <button
                   onClick={handleCreateTask}
                   disabled={!newTitle.trim()}
-                  className="w-full cursor-pointer rounded-xl bg-gray-900 py-4 font-medium text-white transition-all hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+                  className="w-full cursor-pointer rounded-xl bg-foreground py-4 font-medium text-background transition-all hover:bg-foreground/90 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   添加
                 </button>

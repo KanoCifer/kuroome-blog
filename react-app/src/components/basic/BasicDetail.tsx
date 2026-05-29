@@ -60,12 +60,12 @@ export default function BasicDetail({
         className="relative -z-5 mx-0 mt-60 flex flex-col items-center justify-center bg-transparent max-sm:mt-30"
       >
         <div>
-          <h1 className="max-w-6xl text-center font-serif text-7xl text-gray-50 max-sm:text-3xl">
+          <h1 className="text-foreground max-w-6xl text-center font-serif text-7xl max-sm:text-3xl">
             {title}
           </h1>
           {/* <!-- Info --> */}
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400">
-            <span className="inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+          <div className="text-muted-foreground mt-4 flex flex-wrap items-center justify-center gap-4 text-sm">
+            <span className="bg-secondary text-muted-foreground inline-block rounded-full px-2 py-0.5 text-xs font-medium">
               {subtitle}
             </span>
           </div>
@@ -73,7 +73,7 @@ export default function BasicDetail({
       </div>
 
       <div className="relative mt-24 w-full">
-        <div className="absolute left-1/2 -z-5 h-full w-full -translate-x-1/2 rounded-t-[40px] bg-blue-50 dark:bg-slate-900"></div>
+        <div className="bg-secondary absolute left-1/2 -z-5 h-full w-full -translate-x-1/2 rounded-t-[40px]"></div>
         <div className="mx-auto max-w-6xl">
           <div className="mx-8 grid grid-cols-1 gap-6 pt-24 max-sm:mx-6 sm:grid-cols-2 lg:grid-cols-3">
             {/* <!-- Content slots --> */}
@@ -84,7 +84,7 @@ export default function BasicDetail({
         <div className="mt-12 text-center">
           <button
             onClick={() => navigate(-1)}
-            className="mb-30 inline-flex cursor-pointer items-center gap-2 rounded-full bg-gray-900 px-6 py-3 font-medium text-white transition-all duration-300 hover:bg-gray-800 hover:shadow-lg dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 mb-30 inline-flex cursor-pointer items-center gap-2 rounded-full px-6 py-3 font-medium transition-all duration-300 hover:shadow-lg"
           >
             <BackButton />
             返回上一页
