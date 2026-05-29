@@ -405,9 +405,6 @@ export default function FriendLinksView() {
 
         {/* Comments */}
         <div className="border-border bg-card overflow-hidden rounded-2xl border">
-          <div className="border-border border-b px-4 py-3">
-            <h3 className="text-foreground text-sm font-semibold">评论</h3>
-          </div>
           <div className="p-4">
             <TwikooComments path="/friend-links" />
           </div>
