@@ -176,7 +176,7 @@ export function CookieConsent() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.95 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="group fixed right-4 bottom-6 z-50 w-[340px] overflow-hidden rounded-2xl border border-border bg-card/95 shadow-2xl backdrop-blur-sm transition-all duration-300 sm:right-8 sm:bottom-8 sm:w-[380px]"
+            className="group fixed bottom-6 left-1/2 z-50 w-[340px] -translate-x-1/2 overflow-hidden rounded-2xl border border-border bg-card/95 shadow-2xl backdrop-blur-sm transition-all duration-300 sm:bottom-8 sm:w-[380px]"
           >
             <div className="relative px-5 py-5">
               <div className="mb-3 flex items-center justify-between">
