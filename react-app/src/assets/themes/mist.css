@@ -4,7 +4,7 @@
   --ink: #161c21;
   --paper: #eef2f5;
   --warm-gray: #d8dee5;
-  --muted: #7d8791;
+  --muted-text: #7d8791;
   --accent-amber: #927255;
   --accent-sage: #5d7569;
   --accent-slate: #4f687a;
@@ -28,13 +28,32 @@
   --gradient-primary-to: #4f687a;
   --gradient-decorative-from: #dde7f0;
   --gradient-decorative-to: #9fb2c5;
+  /* shadcn token bridge */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--card-bg);
+  --card-foreground: var(--ink);
+  --popover: var(--card-bg);
+  --popover-foreground: var(--ink);
+  --primary: var(--workspace-accent);
+  --primary-foreground: var(--workspace-accent-contrast);
+  --secondary: var(--warm-gray);
+  --secondary-foreground: var(--ink);
+  --muted: var(--warm-gray);
+  --muted-foreground: var(--muted-text);
+  --accent: var(--warm-gray);
+  --accent-foreground: var(--ink);
+  --destructive: var(--accent-rose);
+  --border: var(--warm-gray);
+  --input: var(--warm-gray);
+  --ring: var(--accent-slate);
 }
 
 [data-color-scheme='mist'].dark {
   --ink: #d8dee5;
   --paper: #161c21;
   --warm-gray: #252d35;
-  --muted: #5d6771;
+  --muted-text: #5d6771;
   --accent-amber: #a08a6a;
   --accent-sage: #6a8a7a;
   --accent-slate: #6a8a9a;
@@ -58,4 +77,23 @@
   --gradient-primary-to: #6a8a7a;
   --gradient-decorative-from: #252d35;
   --gradient-decorative-to: #3a4a5a;
+  /* shadcn token bridge */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--card-bg);
+  --card-foreground: var(--ink);
+  --popover: var(--card-bg);
+  --popover-foreground: var(--ink);
+  --primary: var(--workspace-accent);
+  --primary-foreground: var(--workspace-accent-contrast);
+  --secondary: var(--warm-gray);
+  --secondary-foreground: var(--ink);
+  --muted: var(--warm-gray);
+  --muted-foreground: var(--muted-text);
+  --accent: var(--warm-gray);
+  --accent-foreground: var(--ink);
+  --destructive: var(--accent-rose);
+  --border: var(--warm-gray);
+  --input: var(--warm-gray);
+  --ring: var(--accent-slate);
 }

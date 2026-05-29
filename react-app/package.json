@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "preview": "vite preview",
-    "format": "prettier --write --experimental-cli src/",
+    "format": "pnpm exec prettier src --write",
     "test:unit": "vitest run",
     "preinstall": "npx only-allow pnpm"
   },

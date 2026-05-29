@@ -1,8 +1,16 @@
 <script setup lang="ts">
 import type { BookItem } from '@/types';
-import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
-import { Modal } from 'ant-design-vue';
-import { computed, createVNode } from 'vue';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { computed, ref } from 'vue';
 
 const props = withDefaults(
   defineProps<{
@@ -24,20 +32,11 @@ const emit = defineEmits<{
   'edit-book': [book: BookItem];
 }>();
 
-const showDeleteConfirm = () => {
-  Modal.confirm({
-    title: 'Are you sure delete this Book?',
-    icon: createVNode(ExclamationCircleOutlined),
-    content: 'The action cannot be undone.',
-    okText: 'Yes',
-    okType: 'danger',
-    cancelText: 'No',
-    centered: true,
-    onOk() {
-      emit('delete-book', props.book);
-    },
-    onCancel() {},
-  });
+const showDeleteDialog = ref(false);
+
+const confirmDelete = () => {
+  showDeleteDialog.value = false;
+  emit('delete-book', props.book);
 };
 </script>
 
@@ -105,7 +104,7 @@ const showDeleteConfirm = () => {
     <button
       :disabled="pending"
       class="bg-muted/50 text-destructive hover:bg-destructive/10 inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium backdrop-blur-sm transition-colors hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-60 dark:text-red-400 dark:hover:bg-red-900/30"
-      @click="showDeleteConfirm()"
+      @click="showDeleteDialog = true"
     >
       <svg
         class="h-4 w-4"
@@ -132,4 +131,27 @@ const showDeleteConfirm = () => {
       Douban
     </a>
   </div>
+
+  <AlertDialog
+    :open="showDeleteDialog"
+    @update:open="showDeleteDialog = $event"
+  >
+    <AlertDialogContent class="sm:max-w-[425px]">
+      <AlertDialogHeader>
+        <AlertDialogTitle>Are you sure delete this Book?</AlertDialogTitle>
+        <AlertDialogDescription>
+          The action cannot be undone.
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <AlertDialogCancel>Cancel</AlertDialogCancel>
+        <AlertDialogAction
+          class="bg-destructive hover:bg-destructive/90 text-white"
+          @click="confirmDelete"
+        >
+          Delete
+        </AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
 </template>

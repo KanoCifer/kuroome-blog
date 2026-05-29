@@ -2,9 +2,14 @@
 
 ## 1) Rules (Highest Priority)
 
-- 修改前端代码后，必须运行：`pnpm run type-check`。
+- 修改前端代码后，必须运行类型检查：
+  - Vue: `cd frontend && pnpm run type-check`
+  - React: `cd react-app && pnpm run type-check`
 - **不要运行 `build`**，除非用户明确要求。
 - 提交前执行对应语言的格式化与 lint。
+- `.claude/settings.local.json` auto-formats via Prettier (frontend, react-app) / Ruff (backend) — do not double-format。
+- 样式必须使用语义化 Tailwind class（`bg-background`, `text-foreground` 等），禁止硬编码颜色（`bg-black/75`, `text-white/90`）。详见 design-system.md。
+- 后端使用 `uv` 管理依赖（非 pip），运行命令前先 `cd backend && uv sync`。
 
 ## 2) Project Overview
 
@@ -12,6 +17,7 @@
 - Stack: FastAPI + SQLAlchemy 2.0 async (PostgreSQL) + Beanie (MongoDB) + Redis
 - Desktop: Vue 3.5 (`frontend/`), Mobile: React 19 (`react-app/`)
 - **双前端架构**: Vue + React 共享后端服务，各自维护独立状态 Store；API 契约修改需同步两端
+- 修改 `backend/app/schemas/` 后，必须同步 `frontend/src/api/` 和 `react-app/src/services/`。
 
 ## 3) Documentation Index
 

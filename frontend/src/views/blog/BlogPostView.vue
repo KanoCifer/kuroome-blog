@@ -2,30 +2,30 @@
 import { BasicDetail } from '@/components/basic';
 import ArticleSummaryCard from '@/components/blog/ArticleSummaryCard.vue';
 import TwikooComments from '@/components/blog/TwikooComments.vue';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import CalendarIcon from '@/components/icons/CalendarIcon.vue';
+import DelIcon from '@/components/icons/DelIcon.vue';
+import EditIcon from '@/components/icons/EditIcon.vue';
 import { blogService } from '@/service/blogService';
 import { useAuthStore } from '@/stores/auth';
 import { useNotificationStore } from '@/stores/notification';
 import type { Post } from '@/types';
 import { formatDate } from '@/utils/formatdate';
-import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import { useHead } from '@unhead/vue';
-import { Modal } from 'ant-design-vue';
 import hljs from 'highlight.js/lib/common';
 import 'highlight.js/scss/rainbow.scss';
 import { marked } from 'marked';
-import {
-  computed,
-  createVNode,
-  nextTick,
-  onMounted,
-  onUnmounted,
-  ref,
-  watch,
-} from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import CalendarIcon from '@/components/icons/CalendarIcon.vue';
-import DelIcon from '@/components/icons/DelIcon.vue';
-import EditIcon from '@/components/icons/EditIcon.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -155,21 +155,11 @@ useHead(() => {
   };
 });
 
-const showDeleteConfirm = () => {
-  Modal.confirm({
-    title: 'Are you sure delete this Post?',
-    icon: createVNode(ExclamationCircleOutlined),
-    content: 'The action cannot be undone.',
-    okText: 'Yes',
-    okType: 'danger',
-    cancelText: 'No',
-    centered: true,
-    wrapClassName: 'modal',
-    onOk() {
-      handleDelete();
-    },
-    onCancel() {},
-  });
+const showDeleteDialog = ref(false);
+
+const confirmDelete = async () => {
+  showDeleteDialog.value = false;
+  await handleDelete();
 };
 
 const handleDelete = async () => {
@@ -304,7 +294,7 @@ onUnmounted(() => {
           编辑
         </router-link>
         <button
-          @click="showDeleteConfirm"
+          @click="showDeleteDialog = true"
           class="bg-destructive/10 text-destructive hover:bg-destructive/15 inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors"
         >
           <DelIcon />
@@ -368,6 +358,29 @@ onUnmounted(() => {
       />
     </template>
   </BasicDetail>
+
+  <AlertDialog
+    :open="showDeleteDialog"
+    @update:open="showDeleteDialog = $event"
+  >
+    <AlertDialogContent class="sm:max-w-[425px]">
+      <AlertDialogHeader>
+        <AlertDialogTitle>Are you sure delete this Post?</AlertDialogTitle>
+        <AlertDialogDescription>
+          The action cannot be undone.
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <AlertDialogCancel>Cancel</AlertDialogCancel>
+        <AlertDialogAction
+          class="bg-destructive hover:bg-destructive/90 text-white"
+          @click="confirmDelete"
+        >
+          Delete
+        </AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
 </template>
 
 <style>
