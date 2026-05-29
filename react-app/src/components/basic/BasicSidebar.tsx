@@ -1,4 +1,5 @@
 import { BasicFooter } from '@/components/basic/BasicFooter';
+import { SettingModal } from '@/components/basic/SettingMoal';
 import { useAuthStore } from '@/stores/authState';
 import { useVisitorCountStore } from '@/stores/visitorCountStore';
 import { IconCoin } from '@tabler/icons-react';
@@ -7,6 +8,7 @@ import {
   BarChart,
   BookOpen,
   ChevronDown,
+  Cog,
   FileUp,
   History,
   Home,
@@ -160,6 +162,7 @@ export const BentoNavSidebar: React.FC = () => {
   );
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isSettingOpen, setIsSettingOpen] = useState(false);
 
   const currentUserName = auth.isAuthenticated
     ? auth.user?.name || '用户'
@@ -182,11 +185,23 @@ export const BentoNavSidebar: React.FC = () => {
   // 侧边栏打开时禁止背景滚动
   useEffect(() => {
     if (isOpen) {
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
       document.body.style.overflow = 'hidden';
     } else {
+      const scrollY = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
       document.body.style.overflow = '';
+      window.scrollTo(0, parseInt(scrollY || '0') * -1);
     }
     return () => {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
       document.body.style.overflow = '';
     };
   }, [isOpen]);
@@ -206,7 +221,7 @@ export const BentoNavSidebar: React.FC = () => {
       {/* 背景层 */}
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-90 bg-background/50 backdrop-blur-sm"
+          className="bg-background/50 fixed inset-0 z-90 backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -222,25 +237,33 @@ export const BentoNavSidebar: React.FC = () => {
           duration: 0.3,
           ease: 'easeInOut',
         }}
-        className="fixed top-0 left-0 z-100 flex h-screen w-80 flex-col gap-6 rounded-r-4xl bg-card/90 p-6 backdrop-blur-sm"
+        className="bg-card/90 fixed top-0 left-0 z-100 flex h-screen w-80 flex-col gap-6 rounded-r-4xl p-6 backdrop-blur-sm"
       >
         {/* 下拉菜单 */}
         <div className="relative">
-          <div
-            className="flex items-center gap-4 px-2 transition-transform hover:cursor-pointer active:scale-95"
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          >
-            <img
-              src={avatarUrl}
-              alt={currentUserName}
-              className="h-14 w-14 rounded-full object-cover shadow-[0_0_14px_rgba(0,0,0,0.8)] ring-4 ring-primary"
-            />
-            <div className="flex items-baseline gap-2">
-              <span className="text-base-content font-serif text-2xl font-bold select-none">
-                {currentUserName}
-              </span>
-              <ChevronDown className="text-base-content/70 h-4 w-4" />
+          <div className="flex items-center justify-between gap-4 px-2 transition-transform hover:cursor-pointer active:scale-95">
+            <div
+              className="flex items-center justify-center gap-3"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            >
+              <img
+                src={avatarUrl}
+                alt={currentUserName}
+                className="ring-primary h-14 w-14 rounded-full object-cover shadow-[0_0_14px_rgba(0,0,0,0.8)] ring-4"
+              />
+              <div className="ml-4 flex items-baseline gap-2">
+                <span className="text-base-content font-serif text-2xl font-bold select-none">
+                  {currentUserName}
+                </span>
+                <ChevronDown className="text-base-content/70 h-4 w-4" />
+              </div>
             </div>
+            <button
+              onClick={() => setIsSettingOpen(true)}
+              className="text-base-content/70 hover:text-base-content transition-colors"
+            >
+              <Cog className="size-6" />
+            </button>
           </div>
 
           {/* Dropdown Menu */}
@@ -249,7 +272,7 @@ export const BentoNavSidebar: React.FC = () => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="selection-none absolute top-full left-0 z-50 mt-4 flex w-60 flex-col gap-1 rounded-2xl bg-card p-2 shadow-xl"
+              className="selection-none bg-card absolute top-full left-0 z-50 mt-4 flex w-60 flex-col gap-1 rounded-2xl p-2 shadow-xl"
             >
               <DropDownItems />
             </motion.div>
@@ -264,7 +287,7 @@ export const BentoNavSidebar: React.FC = () => {
         <ul className="relative flex grow flex-col gap-1">
           {/* Active indicator */}
           <motion.div
-            className="pointer-events-none absolute left-0 h-12 w-full rounded-2xl bg-primary/30 shadow-md"
+            className="bg-primary/30 pointer-events-none absolute left-0 h-12 w-full rounded-2xl shadow-md"
             animate={{ y: hoverNavIndex * 52 }} // 52 = item height (48) + gap (4)
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             style={{ zIndex: 0 }}
@@ -293,11 +316,11 @@ export const BentoNavSidebar: React.FC = () => {
         </ul>
 
         {/* 状态栏：在线人数 + 延迟 */}
-        <div className="flex items-center justify-between px-3 text-xs text-muted-foreground">
+        <div className="text-muted-foreground flex items-center justify-between px-3 text-xs">
           <span className="inline-flex items-center gap-1.5">
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+              <span className="bg-success absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
+              <span className="bg-success relative inline-flex h-2 w-2 rounded-full" />
             </span>
             {visitorCount} 人在线
           </span>
@@ -308,6 +331,11 @@ export const BentoNavSidebar: React.FC = () => {
           <BasicFooter />
         </div>
       </motion.aside>
+
+      <SettingModal
+        isOpen={isSettingOpen}
+        onClose={() => setIsSettingOpen(false)}
+      />
     </>
   );
 };

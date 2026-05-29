@@ -4,17 +4,32 @@ import { playThemeTransition } from '../utils/themeTransition';
 
 type Theme = 'light' | 'dark' | 'system';
 type FontFamily = 'default' | 'harmonyos';
+type ColorScheme =
+  | 'sky-blue'
+  | 'forest-green'
+  | 'paper'
+  | 'sage'
+  | 'mist'
+  | 'blush'
+  | 'spring'
+  | 'autumn'
+  | 'clear-sky'
+  | 'midnight';
 interface ThemeState {
   theme: Theme;
   font: FontFamily;
+  scheme: ColorScheme;
   setTheme: (theme: Theme) => void;
   setFont: (font: FontFamily) => void;
+  setScheme: (scheme: ColorScheme) => void;
   toggleTheme: () => void;
   toggleThemeWithAnimation: (event: {
     clientX: number;
     clientY: number;
   }) => void;
 }
+
+export type { Theme, FontFamily, ColorScheme };
 
 const applyTheme = (newTheme: Theme) => {
   const root = document.documentElement;
@@ -38,11 +53,16 @@ const applyFont = (newFont: FontFamily) => {
   }
 };
 
+const applyScheme = (newScheme: ColorScheme) => {
+  document.documentElement.setAttribute('data-color-scheme', newScheme);
+};
+
 export const useThemeState = create<ThemeState>()(
   persist(
     (set, get) => ({
       theme: 'system',
       font: 'default',
+      scheme: 'sky-blue',
 
       setTheme: (theme) => {
         applyTheme(theme);
@@ -52,6 +72,11 @@ export const useThemeState = create<ThemeState>()(
       setFont: (font) => {
         applyFont(font);
         set({ font });
+      },
+
+      setScheme: (scheme) => {
+        applyScheme(scheme);
+        set({ scheme });
       },
 
       toggleTheme: () => {
@@ -74,18 +99,19 @@ export const useThemeState = create<ThemeState>()(
       name: 'theme-storage',
 
       onRehydrateStorage: () => (state) => {
-        // 当从本地存储恢复 theme 后，需要重新应用到 DOM 上（比如修改 html 的 class）
         if (state?.theme) {
           applyTheme(state.theme);
         }
         if (state?.font) {
           applyFont(state.font);
         }
+        applyScheme(state?.scheme ?? 'sky-blue');
       },
 
       partialize: (state) => ({
         theme: state.theme,
         font: state.font,
+        scheme: state.scheme,
       }),
     },
   ),
