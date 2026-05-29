@@ -50,6 +50,7 @@ class Settings(BaseSettings):
     QWEATHER_BASE_URL: str = ""
     ENABLE_TRACKING: bool = True
     ADMIN_USER_IDS: list[int] = [1, 2]
+    SAVE_LOGS: bool = True
 
     model_config = SettingsConfigDict(
         env_file=get_env_file_path(),

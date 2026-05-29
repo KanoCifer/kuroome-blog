@@ -404,11 +404,7 @@ export default function FriendLinksView() {
         <ApplyCard />
 
         {/* Comments */}
-        <div className="border-border bg-card overflow-hidden rounded-2xl border">
-          <div className="p-4">
-            <TwikooComments path="/friend-links" />
-          </div>
-        </div>
+        <TwikooComments path="/friend-links" />
       </div>
     </div>
   );

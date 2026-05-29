@@ -7,7 +7,7 @@ import {
 } from '@tabler/icons-react';
 import { Newspaper, Rss } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useMemo, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authState';
@@ -25,6 +25,7 @@ import { RegisterIcon } from './icon/RegisterIcon';
 import { Settings } from './icon/Settings';
 import { ThemeIcon } from './icon/ThemeIcon';
 import { useNavVisibility } from './NavVisibilityContext';
+import { useClickOutside } from '@/hooks/useClickOutside';
 
 interface MenuItemProps {
   icon: React.ReactNode;
@@ -63,7 +64,11 @@ function NavItem({ icon, to, isActive, activeIcon }: NavItemProps) {
 
 function MenuItem({ icon, label, onClick, iconColor, iconBg }: MenuItemProps) {
   return (
-    <button
+    <motion.button
+      variants={{
+        hidden: { opacity: 0, scale: 0.5, y: 20 },
+        visible: { opacity: 1, scale: 1, y: 0 },
+      }}
       className="border-border/20 bg-card/40 flex items-center gap-2 rounded-2xl border p-4 transition-transform active:scale-95"
       onClick={(e) => onClick(e)}
     >
@@ -73,7 +78,7 @@ function MenuItem({ icon, label, onClick, iconColor, iconBg }: MenuItemProps) {
         <span className={iconColor}>{icon}</span>
       </div>
       <span className="text-xs font-bold">{label}</span>
-    </button>
+    </motion.button>
   );
 }
 
@@ -117,6 +122,11 @@ export function BasicNav() {
     return !['/', '/blog', '/rss'].includes(location.pathname);
   }, [location.pathname]);
 
+  const ref = useRef<HTMLDivElement>(null);
+  useClickOutside(ref, () => {
+    setShowMenu(false);
+  });
+
   return (
     <Fragment>
       {/* Backdrop Overlay */}
@@ -138,19 +148,23 @@ export function BasicNav() {
 
       {/* More Menu Bottom Sheet */}
       {createPortal(
-        <AnimatePresence mode="sync">
+        <AnimatePresence>
           {showMenu && (
             <motion.div
               key="more-menu"
-              className="scrollbar-hide border-border/20 bg-card/80 fixed right-8 bottom-22 z-60 grid h-auto w-fit grid-cols-2 gap-2 overflow-hidden rounded-[2rem] border p-5 shadow-xl backdrop-blur-sm"
-              initial={{ height: 0, opacity: 0.8, width: 0, y: 20 }}
-              animate={{ height: 'auto', opacity: 1, width: 'auto', y: 0 }}
-              exit={{ height: 0, opacity: 0, width: 0 }}
-              transition={{
-                type: 'spring',
-                damping: 50,
-                stiffness: 300,
-                duration: 0.5,
+              className="scrollbar-hide border-border/20 bg-card/80 fixed bottom-22 left-1/2 z-60 grid w-full max-w-[calc(100vw-4rem)] -translate-x-1/2 grid-cols-2 gap-2 overflow-hidden rounded-[2rem] border p-5 shadow-xl backdrop-blur-sm"
+              initial="hidden"
+              animate="visible"
+              ref={ref}
+              exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.3 } }}
+              variants={{
+                hidden: { opacity: 0, scale: 0.9, y: 30 },
+                visible: {
+                  opacity: 1,
+                  scale: 1,
+                  y: 0,
+                  transition: { staggerChildren: 0.04, delayChildren: 0.05 },
+                },
               }}
             >
               <MenuItem

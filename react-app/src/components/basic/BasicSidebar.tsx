@@ -24,8 +24,9 @@ import {
   UserPlus,
   Wrench,
 } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useClickOutside } from '@/hooks/useClickOutside';
 
 const navItems = [
   { path: '/', label: '首页', icon: Home },
@@ -163,6 +164,7 @@ export const BentoNavSidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSettingOpen, setIsSettingOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const currentUserName = auth.isAuthenticated
     ? auth.user?.name || '用户'
@@ -181,6 +183,9 @@ export const BentoNavSidebar: React.FC = () => {
       setHoverNavIndex(index);
     }
   }, [location.pathname]);
+
+  // 点击 dropdown 外部时关闭
+  useClickOutside(dropdownRef, () => setIsDropdownOpen(false));
 
   // 侧边栏打开时禁止背景滚动
   useEffect(() => {
@@ -240,7 +245,7 @@ export const BentoNavSidebar: React.FC = () => {
         className="bg-card/90 fixed top-0 left-0 z-100 flex h-screen w-80 flex-col gap-6 rounded-r-4xl p-6 backdrop-blur-sm"
       >
         {/* 下拉菜单 */}
-        <div className="relative">
+        <div ref={dropdownRef} className="relative">
           <div className="flex items-center justify-between gap-4 px-2 transition-transform hover:cursor-pointer active:scale-95">
             <div
               className="flex items-center justify-center gap-3"
@@ -249,7 +254,7 @@ export const BentoNavSidebar: React.FC = () => {
               <img
                 src={avatarUrl}
                 alt={currentUserName}
-                className="ring-primary h-14 w-14 rounded-full object-cover shadow-[0_0_14px_rgba(0,0,0,0.8)] ring-4"
+                className="h-14 w-14 rounded-full object-cover shadow-[0_0_14px_rgba(0,0,0,0.8)] ring-4 ring-(--warm-gray)"
               />
               <div className="ml-4 flex items-baseline gap-2">
                 <span className="text-base-content font-serif text-2xl font-bold select-none">
@@ -259,7 +264,10 @@ export const BentoNavSidebar: React.FC = () => {
               </div>
             </div>
             <button
-              onClick={() => setIsSettingOpen(true)}
+              onClick={() => {
+                setIsDropdownOpen(false);
+                setIsSettingOpen(true);
+              }}
               className="text-base-content/70 hover:text-base-content transition-colors"
             >
               <Cog className="size-6" />
@@ -301,7 +309,10 @@ export const BentoNavSidebar: React.FC = () => {
             >
               <Link
                 to={item.path}
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsDropdownOpen(false);
+                  setIsOpen(false);
+                }}
                 className={`flex h-full w-full items-center gap-4 rounded-2xl px-4 font-medium transition-colors ${
                   hoverNavIndex === index
                     ? 'text-primary'

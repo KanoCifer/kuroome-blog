@@ -6,6 +6,7 @@ import {
   type Theme,
 } from '@/stores/themeState';
 import { useShallow } from 'zustand/shallow';
+import { playThemeTransition } from '@/utils/themeTransition';
 
 const COLOR_SCHEMES: {
   value: ColorScheme;
@@ -83,14 +84,14 @@ export function SettingModal({
 
           {/* 抽屉 */}
           <motion.div
-            className="bg-card fixed top-0 left-0 z-9999 h-full w-full max-w-md rounded-l-2xl"
+            className="bg-card fixed top-0 left-0 z-9999 h-full w-full max-w-md rounded-l-2xl transition-colors duration-300"
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'tween' }}
           >
             {/* 头部 */}
-            <div className="border-border flex items-center justify-between border-b px-6 py-4">
+            <div className="border-border flex items-center justify-between border-b px-6 py-4 transition-colors duration-300">
               <h3 className="text-foreground flex items-center gap-2 font-serif text-lg font-bold">
                 <Settings className="text-primary h-5 w-5" />
                 偏好设置
@@ -118,8 +119,11 @@ export function SettingModal({
                     {THEMES.map(({ value, label, Icon }) => (
                       <button
                         key={value}
-                        onClick={() => setTheme(value)}
-                        className={`border-border hover:border-primary flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-all ${
+                        onClick={(e) => {
+                          setTheme(value);
+                          playThemeTransition(e, value);
+                        }}
+                        className={`border-border hover:border-primary flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-all duration-300 ${
                           theme === value ? 'border-primary bg-primary/5' : ''
                         }`}
                       >
@@ -138,7 +142,7 @@ export function SettingModal({
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       onClick={() => setFont('default')}
-                      className={`border-border hover:border-primary flex flex-col items-center gap-1 rounded-xl border-2 p-3 transition-all ${
+                      className={`border-border hover:border-primary flex flex-col items-center gap-1 rounded-xl border-2 p-3 transition-all duration-300 ${
                         font === 'default' ? 'border-primary bg-muted' : ''
                       }`}
                     >
@@ -154,7 +158,7 @@ export function SettingModal({
                     </button>
                     <button
                       onClick={() => setFont('harmonyos')}
-                      className={`border-border hover:border-primary flex flex-col items-center gap-1 rounded-xl border-2 p-3 transition-all ${
+                      className={`border-border hover:border-primary flex flex-col items-center gap-1 rounded-xl border-2 p-3 transition-all duration-300 ${
                         font === 'harmonyos' ? 'border-primary bg-muted' : ''
                       }`}
                     >
@@ -187,7 +191,7 @@ export function SettingModal({
                       <button
                         key={s.value}
                         onClick={() => setScheme(s.value)}
-                        className={`border-border hover:border-primary flex w-full items-center gap-3 rounded-xl border-2 p-3 transition-all ${
+                        className={`border-border hover:border-primary flex w-full items-center gap-3 rounded-xl border-2 p-3 transition-all duration-300 ${
                           scheme === s.value
                             ? 'border-primary bg-primary/5'
                             : ''

@@ -1,5 +1,4 @@
 import { BentoCard } from '@/components/bento/BentoCard';
-import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { MemoIcon } from './icon/MemoIcon';
 
@@ -52,22 +51,17 @@ export function BentoMemo() {
         </BentoCard>
       </div>
 
-      <AnimatePresence>
-        {isMemoOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={closeMemo}
-              className="bg-background/20 fixed inset-0 z-50 backdrop-blur-[2px]"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center"
-            >
+      {isMemoOpen && (
+        <>
+          <div
+            onClick={closeMemo}
+            className="bg-background/20 fixed inset-0 z-50 backdrop-blur-[2px]"
+            style={{ animation: 'memo-fade-in 0.2s ease-out' }}
+          />
+          <div
+            className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center"
+            style={{ animation: 'memo-pop-in 0.2s ease-out' }}
+          >
               <div
                 className="bg-card pointer-events-auto relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl p-6 shadow-2xl"
                 onClick={(e) => e.stopPropagation()}
@@ -134,10 +128,9 @@ export function BentoMemo() {
                   </button>
                 </div>
               </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+          </div>
+        </>
+      )}
     </>
   );
 }

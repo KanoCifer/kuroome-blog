@@ -8,3 +8,47 @@
     border-radius: 90px;
   }
 }
+
+/* Bento card: GPU-accelerated entrance + hover (replaces framer-motion) */
+.bento-card {
+  animation: bento-enter 0.4s ease-out both;
+  will-change: transform, opacity;
+  transition: transform 0.2s ease-out;
+}
+
+.bento-card:active {
+  transform: scale(0.98);
+}
+
+@keyframes bento-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Stagger delay classes for sequential entrance */
+.bento-delay-1 { animation-delay: 0.05s; }
+.bento-delay-2 { animation-delay: 0.1s; }
+.bento-delay-3 { animation-delay: 0.15s; }
+.bento-delay-4 { animation-delay: 0.2s; }
+.bento-delay-5 { animation-delay: 0.25s; }
+.bento-delay-6 { animation-delay: 0.3s; }
+.bento-delay-7 { animation-delay: 0.35s; }
+.bento-delay-8 { animation-delay: 0.4s; }
+.bento-delay-9 { animation-delay: 0.45s; }
+
+/* Memo modal animations (replaces framer-motion AnimatePresence) */
+@keyframes memo-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes memo-pop-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}

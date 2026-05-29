@@ -7,6 +7,8 @@ from pathlib import Path
 
 from loguru import logger
 
+from app.core.config import get_settings
+
 LOG_FORMAT = "{time:YYYY-MM-DD HH:mm:ss} - {name} - {level} - {message}"
 MAX_LOG_SIZE = "1 MB"
 BACKUP_COUNT = 5
@@ -35,24 +37,26 @@ info_log_path: Path = log_path.with_stem(f"{log_path.stem}_info")
 error_log_path: Path = log_path.with_stem(f"{log_path.stem}_error")
 
 # INFO <= 级别 < ERROR 写入 app_info.log
-logger.add(
-    sink=info_log_path,
-    level="INFO",
-    format=LOG_FORMAT,
-    rotation=MAX_LOG_SIZE,
-    retention=BACKUP_COUNT,
-    encoding="utf-8",
-    filter=lambda record: record["level"].no < logger.level("ERROR").no,
-)
+if get_settings().SAVE_LOGS:
+    logger.add(
+        sink=info_log_path,
+        level="INFO",
+        format=LOG_FORMAT,
+        rotation=MAX_LOG_SIZE,
+        retention=BACKUP_COUNT,
+        encoding="utf-8",
+        filter=lambda record: record["level"].no < logger.level("ERROR").no,
+    )
 
 # 级别 >= ERROR 写入 app_error.log
-logger.add(
-    sink=error_log_path,
-    level="ERROR",
-    format=LOG_FORMAT,
-    rotation=MAX_LOG_SIZE,
-    retention=BACKUP_COUNT,
-    encoding="utf-8",
-)
+if get_settings().SAVE_LOGS:
+    logger.add(
+        sink=error_log_path,
+        level="ERROR",
+        format=LOG_FORMAT,
+        rotation=MAX_LOG_SIZE,
+        retention=BACKUP_COUNT,
+        encoding="utf-8",
+    )
 
 __all__ = ["logger"]

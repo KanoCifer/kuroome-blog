@@ -42,21 +42,31 @@ const COLUMNS: ColumnDef[] = [
   },
 ];
 
-function statusBadgeStyle(status: DevTaskStatus): React.CSSProperties {
-  const colors: Record<
-    DevTaskStatus,
-    { bg: string; border: string; text: string }
-  > = {
-    todo: { bg: '#eff6ff', border: '#bfdbfe', text: '#1d4ed8' },
-    'in-progress': { bg: '#fffbeb', border: '#fde68a', text: '#b45309' },
-    done: { bg: '#ecfdf5', border: '#a7f3d0', text: '#047857' },
-  };
-  const c = colors[status];
-  return {
-    backgroundColor: c.bg,
-    borderColor: c.border,
-    color: c.text,
-  };
+// Semantic status badge styles (replaces hardcoded hex values)
+const STATUS_STYLES: Record<
+  DevTaskStatus,
+  { bg: string; border: string; text: string }
+> = {
+  todo: {
+    bg: 'bg-primary/10',
+    border: 'border-primary/30',
+    text: 'text-primary',
+  },
+  'in-progress': {
+    bg: 'bg-warning/10',
+    border: 'border-warning/30',
+    text: 'text-warning',
+  },
+  done: {
+    bg: 'bg-success/10',
+    border: 'border-success/30',
+    text: 'text-success',
+  },
+};
+
+function statusBadgeClasses(status: DevTaskStatus): string {
+  const s = STATUS_STYLES[status];
+  return `${s.bg} ${s.border} ${s.text}`;
 }
 
 function priorityLabel(p: DevTaskPriority): string {
@@ -67,8 +77,7 @@ function priorityBadgeClass(p: DevTaskPriority): string {
   const map: Record<DevTaskPriority, string> = {
     low: 'border-primary/20 bg-primary/10 text-primary',
     high: 'border-destructive/20 bg-destructive/10 text-destructive',
-    default:
-      'border-border bg-secondary text-card-foreground',
+    default: 'border-border bg-secondary text-card-foreground',
   };
   return map[p];
 }
@@ -77,12 +86,12 @@ function priorityBadgeClass(p: DevTaskPriority): string {
 function TaskCard({
   task,
   onCycle,
-  onEdit,
+  onCardClick,
   onDelete,
 }: {
   task: DevTask;
   onCycle: (id: string) => void;
-  onEdit: (task: DevTask) => void;
+  onCardClick: (task: DevTask) => void;
   onDelete: (id: string) => void;
 }) {
   const isDone = task.status === 'done';
@@ -97,14 +106,17 @@ function TaskCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.2 }}
-      className="group rounded-xl border border-border/60 bg-card p-3.5 shadow-sm transition-shadow hover:shadow-md"
+      onClick={() => onCardClick(task)}
+      className="group border-border/60 bg-card cursor-pointer rounded-xl border p-3.5 shadow-sm transition-shadow active:shadow-md"
     >
       <div className="flex items-start gap-2.5">
         {/* Status badge */}
         <button
-          onClick={() => onCycle(task.id)}
-          className="mt-0.5 shrink-0 cursor-pointer rounded-md border px-2 py-0.5 text-[11px] font-medium transition-all duration-300 ease-out"
-          style={statusBadgeStyle(task.status)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onCycle(task.id);
+          }}
+          className={`mt-0.5 shrink-0 cursor-pointer rounded-md border px-2 py-0.5 text-[11px] font-medium transition-all duration-300 ease-out ${statusBadgeClasses(task.status)}`}
         >
           {STATUS_LABELS[task.status]}
         </button>
@@ -112,9 +124,7 @@ function TaskCard({
         <div className="min-w-0 flex-1">
           <p
             className={`text-sm leading-snug font-medium ${
-              isDone
-                ? 'text-muted-foreground line-through'
-                : 'text-foreground'
+              isDone ? 'text-muted-foreground line-through' : 'text-foreground'
             }`}
           >
             {task.title}
@@ -122,7 +132,7 @@ function TaskCard({
 
           {task.description && (
             <p
-              className={`mt-1 line-clamp-2 text-xs text-muted-foreground ${
+              className={`text-muted-foreground mt-1 line-clamp-2 text-xs ${
                 isDone ? 'opacity-60' : ''
               }`}
             >
@@ -161,30 +171,14 @@ function TaskCard({
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100 max-sm:opacity-100">
+        {/* Actions — always visible on mobile, hover on desktop */}
+        <div className="flex shrink-0 items-center gap-0.5 sm:opacity-0 sm:transition-opacity sm:duration-200 sm:group-hover:opacity-100">
           <button
-            onClick={() => onEdit(task)}
-            className="cursor-pointer rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
-            title="编辑"
-          >
-            <svg
-              className="h-3.5 w-3.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-              />
-            </svg>
-          </button>
-          <button
-            onClick={() => onDelete(task.id)}
-            className="cursor-pointer rounded-md p-1 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(task.id);
+            }}
+            className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive flex h-8 w-8 cursor-pointer items-center justify-center rounded-md transition-colors"
             title="删除"
           >
             <svg
@@ -207,17 +201,204 @@ function TaskCard({
   );
 }
 
+// ----- Edit Bottom Sheet -----
+function EditBottomSheet({
+  task,
+  onClose,
+  onSave,
+}: {
+  task: DevTask;
+  onClose: () => void;
+  onSave: (id: string, data: Partial<DevTask>) => void;
+}) {
+  const [title, setTitle] = useState(task.title);
+  const [description, setDescription] = useState(task.description || '');
+  const [priority, setPriority] = useState<DevTaskPriority>(
+    task.priority || 'default',
+  );
+  const [dueDate, setDueDate] = useState(task.dueDate || '');
+
+  const handleSave = () => {
+    if (title.trim()) {
+      onSave(task.id, {
+        title: title.trim(),
+        description: description.trim() || undefined,
+        dueDate: dueDate || undefined,
+        priority,
+      });
+    }
+    onClose();
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="bg-background/50 fixed inset-0 z-20 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        onClick={(e) => e.stopPropagation()}
+        className="bg-card absolute right-0 bottom-0 left-0 max-h-[85dvh] overflow-y-auto rounded-t-3xl p-6"
+      >
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-foreground text-lg font-semibold">编辑任务</h2>
+          <button
+            onClick={onClose}
+            className="text-muted-foreground hover:bg-accent cursor-pointer rounded-lg p-1"
+          >
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            type="text"
+            placeholder="任务内容..."
+            className="border-border bg-card focus:border-primary w-full rounded-xl border px-4 py-3 text-base outline-none"
+            autoFocus
+          />
+
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={2}
+            placeholder="添加描述... (可选)"
+            className="border-border bg-card focus:border-primary w-full resize-none rounded-xl border px-4 py-3 text-sm outline-none"
+          />
+
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2">
+              <label className="text-muted-foreground text-sm font-medium">
+                优先级
+              </label>
+              <select
+                value={priority}
+                onChange={(e) => setPriority(e.target.value as DevTaskPriority)}
+                className="border-border bg-card cursor-pointer rounded-lg border px-3 py-2 text-sm"
+              >
+                <option value="default">默认</option>
+                <option value="low">低</option>
+                <option value="high">高</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <label className="text-muted-foreground text-sm font-medium">
+                截止日期
+              </label>
+              <input
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                className="border-border bg-card cursor-pointer rounded-lg border px-3 py-2 text-sm"
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-3 pt-2">
+            <button
+              onClick={onClose}
+              className="bg-secondary text-card-foreground hover:bg-secondary/80 flex-1 cursor-pointer rounded-xl py-3.5 font-medium transition-colors"
+            >
+              取消
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={!title.trim()}
+              className="bg-foreground text-background hover:bg-foreground/90 flex-1 cursor-pointer rounded-xl py-3.5 font-medium transition-all disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              保存
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// ----- Column content (shared between mobile tab and desktop grid) -----
+function ColumnContent({
+  col,
+  tasks,
+  onCycle,
+  onCardClick,
+  onDelete,
+  onQuickAdd,
+  addingStatus,
+  quickTitle,
+  onQuickTitleChange,
+  onSubmitQuickAdd,
+  onCancelQuickAdd,
+  quickInputRef,
+}: {
+  col: ColumnDef;
+  tasks: DevTask[];
+  onCycle: (id: string) => void;
+  onCardClick: (task: DevTask) => void;
+  onDelete: (id: string) => void;
+  onQuickAdd: (status: DevTaskStatus) => void;
+  addingStatus: DevTaskStatus | null;
+  quickTitle: string;
+  onQuickTitleChange: (v: string) => void;
+  onSubmitQuickAdd: () => void;
+  onCancelQuickAdd: () => void;
+  quickInputRef: React.RefObject<HTMLInputElement | null>;
+}) {
+  return (
+    <>
+      {/* Cards */}
+      <div className="flex-1 space-y-3 overflow-y-auto">
+        <AnimatePresence mode="popLayout">
+          {tasks.map((task) => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              onCycle={onCycle}
+              onCardClick={onCardClick}
+              onDelete={onDelete}
+            />
+          ))}
+        </AnimatePresence>
+
+        {/* Empty state */}
+        {tasks.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <p className="text-muted-foreground text-sm">{col.emptyText}</p>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
 // ----- Main Page -----
 export default function TodoListView() {
   const { hideNav, showNav } = useNavVisibility();
   const todoState = useTodoState();
   const { tasks } = todoState;
 
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editTitle, setEditTitle] = useState('');
-  const [editDescription, setEditDescription] = useState('');
-  const [editPriority, setEditPriority] = useState<DevTaskPriority>('default');
-  const [editDueDate, setEditDueDate] = useState('');
+  const [editingTask, setEditingTask] = useState<DevTask | null>(null);
+  const [activeTab, setActiveTab] = useState<DevTaskStatus>('todo');
 
   // Quick-add state: which column has the active quick-add input
   const [addingStatus, setAddingStatus] = useState<DevTaskStatus | null>(null);
@@ -244,24 +425,20 @@ export default function TodoListView() {
   }, [tasks]);
 
   // Edit
-  const startEdit = (task: DevTask) => {
-    setEditingId(task.id);
-    setEditTitle(task.title);
-    setEditDescription(task.description || '');
-    setEditPriority(task.priority || 'default');
-    setEditDueDate(task.dueDate || '');
+  const handleCardClick = (task: DevTask) => {
+    hideNav();
+    setEditingTask(task);
   };
 
-  const saveEdit = async () => {
-    if (editingId && editTitle.trim()) {
-      await todoState.updateTask(editingId, {
-        title: editTitle.trim(),
-        description: editDescription.trim() || undefined,
-        dueDate: editDueDate || undefined,
-        priority: editPriority,
-      });
-    }
-    setEditingId(null);
+  const handleSaveEdit = async (id: string, data: Partial<DevTask>) => {
+    await todoState.updateTask(id, data);
+    showNav();
+    setEditingTask(null);
+  };
+
+  const handleCloseEdit = () => {
+    showNav();
+    setEditingTask(null);
   };
 
   // Quick add
@@ -323,184 +500,81 @@ export default function TodoListView() {
         duration: 0.5,
         delay: 0.1,
       }}
-      className="relative min-h-dvh bg-linear-to-b from-primary/10 to-background pb-28"
+      className="bg-background relative min-h-dvh pb-24"
     >
       {/* Header */}
-      <div className="sticky top-0 z-10 flex items-center justify-between bg-card/80 px-4 py-4 backdrop-blur-md">
+      <div className="bg-card sticky top-0 z-10 ml-12 flex items-center justify-between px-4 py-4">
         <div>
-          <h1 className="ml-12 text-xl font-semibold text-foreground">
-            开发任务
-          </h1>
-          <p className="text-sm text-muted-foreground">{tasks.length} 项任务</p>
+          <h1 className="text-foreground text-xl font-semibold">开发任务</h1>
+          <p className="text-muted-foreground text-sm">{tasks.length} 项任务</p>
         </div>
       </div>
 
-      {/* Horizontal scroll board */}
-      <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pt-2 pb-4">
-        {COLUMNS.map((col) => {
-          const colTasks = grouped[col.status];
+      {/* Edit bottom sheet */}
+      <AnimatePresence>
+        {editingTask && (
+          <EditBottomSheet
+            task={editingTask}
+            onClose={handleCloseEdit}
+            onSave={handleSaveEdit}
+          />
+        )}
+      </AnimatePresence>
 
-          return (
-            <div
-              key={col.status}
-              className={`flex w-[85vw] shrink-0 snap-center flex-col rounded-2xl p-4 sm:w-[320px] ${col.bgClass}`}
-              style={{ minHeight: '60vh' }}
-            >
-              {/* Column header */}
-              <div className="mb-4 flex shrink-0 items-center gap-2">
-                <span
-                  className={`h-2.5 w-2.5 shrink-0 rounded-full ${col.dotClass}`}
-                />
-                <h3 className="text-sm font-semibold text-foreground">
-                  {col.title}
-                </h3>
-                <span className="rounded-full bg-background/5 px-2 py-0.5 text-xs font-medium text-muted-foreground tabular-nums">
-                  {colTasks.length}
+      {/* Tab layout */}
+      <div className="flex flex-col">
+        {/* Tab bar */}
+        <div className="border-border/50 bg-card flex items-center gap-1 border-b px-4">
+          {COLUMNS.map((col) => {
+            const isActive = activeTab === col.status;
+            const count = grouped[col.status].length;
+            return (
+              <button
+                key={col.status}
+                onClick={() => setActiveTab(col.status)}
+                className={`relative flex cursor-pointer items-center gap-1.5 border-b-2 px-3 py-3 text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'border-foreground text-foreground'
+                    : 'text-muted-foreground border-transparent'
+                }`}
+              >
+                <span className={`h-2 w-2 rounded-full ${col.dotClass}`} />
+                {col.title}
+                <span className="bg-background/5 rounded-full px-1.5 py-px text-[10px] tabular-nums">
+                  {count}
                 </span>
-              </div>
+              </button>
+            );
+          })}
+        </div>
 
-              {/* Cards */}
-              <div className="flex-1 space-y-3 overflow-y-auto">
-                {/* Edit overlay */}
-                {editingId && (
-                  <div className="space-y-2.5 rounded-xl border border-border bg-card p-3 shadow-sm">
-                    <input
-                      value={editTitle}
-                      onChange={(e) => setEditTitle(e.target.value)}
-                      className="w-full rounded-lg border border-border bg-card px-2.5 py-1.5 text-sm font-medium outline-none focus:border-primary"
-                      autoFocus
-                    />
-                    <textarea
-                      value={editDescription}
-                      onChange={(e) => setEditDescription(e.target.value)}
-                      rows={2}
-                      className="w-full resize-none rounded-lg border border-border bg-card px-2.5 py-1.5 text-xs outline-none focus:border-primary"
-                      placeholder="描述..."
-                    />
-                    <div className="flex items-center gap-2">
-                      <select
-                        value={editPriority}
-                        onChange={(e) =>
-                          setEditPriority(e.target.value as DevTaskPriority)
-                        }
-                        className="cursor-pointer rounded-md border border-border bg-card px-2 py-1 text-xs"
-                      >
-                        <option value="default">默认</option>
-                        <option value="low">低</option>
-                        <option value="high">高</option>
-                      </select>
-                      <input
-                        type="date"
-                        value={editDueDate}
-                        onChange={(e) => setEditDueDate(e.target.value)}
-                        className="cursor-pointer rounded-md border border-border bg-card px-2 py-1 text-xs"
-                      />
-                      <div className="ml-auto flex gap-1.5">
-                        <button
-                          onClick={() => setEditingId(null)}
-                          className="cursor-pointer rounded-lg bg-secondary px-2.5 py-1 text-xs font-medium text-card-foreground transition-colors hover:bg-secondary/80"
-                        >
-                          取消
-                        </button>
-                        <button
-                          onClick={saveEdit}
-                          className="cursor-pointer rounded-lg bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-                        >
-                          保存
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <AnimatePresence mode="popLayout">
-                  {colTasks.map((task) =>
-                    editingId === task.id ? null : (
-                      <TaskCard
-                        key={task.id}
-                        task={task}
-                        onCycle={todoState.cycleStatus}
-                        onEdit={startEdit}
-                        onDelete={todoState.deleteTask}
-                      />
-                    ),
-                  )}
-                </AnimatePresence>
-
-                {/* Empty state */}
-                {colTasks.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <p className="text-sm text-muted-foreground">
-                      {col.emptyText}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Quick add */}
-              <div className="mt-3 shrink-0 border-t border-border/50 pt-3">
-                {addingStatus !== col.status ? (
-                  <button
-                    onClick={() => startQuickAdd(col.status)}
-                    className="flex w-full cursor-pointer items-center gap-1.5 rounded-lg px-2 py-2 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                  >
-                    <svg
-                      className="h-3.5 w-3.5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 4v16m8-8H4"
-                      />
-                    </svg>
-                    添加
-                  </button>
-                ) : (
-                  <div className="space-y-2">
-                    <input
-                      ref={quickInputRef}
-                      value={quickTitle}
-                      onChange={(e) => setQuickTitle(e.target.value)}
-                      type="text"
-                      placeholder={`添加${col.title}任务...`}
-                      className="w-full rounded-lg border border-border bg-card px-2.5 py-1.5 text-sm outline-none focus:border-primary"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') submitQuickAdd();
-                        if (e.key === 'Escape') setAddingStatus(null);
-                      }}
-                    />
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={() => setAddingStatus(null)}
-                        className="cursor-pointer rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent"
-                      >
-                        取消
-                      </button>
-                      <button
-                        onClick={submitQuickAdd}
-                        disabled={!quickTitle.trim()}
-                        className="cursor-pointer rounded-md bg-foreground px-3 py-1 text-xs font-medium text-background transition-colors hover:bg-foreground/90 disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        确定
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })}
+        {/* Active column */}
+        <div className="flex min-h-[60vh] flex-col px-4 pt-4 pb-2">
+          {COLUMNS.filter((col) => col.status === activeTab).map((col) => (
+            <ColumnContent
+              key={col.status}
+              col={col}
+              tasks={grouped[col.status]}
+              onCycle={todoState.cycleStatus}
+              onCardClick={handleCardClick}
+              onDelete={todoState.deleteTask}
+              onQuickAdd={startQuickAdd}
+              addingStatus={addingStatus}
+              quickTitle={quickTitle}
+              onQuickTitleChange={setQuickTitle}
+              onSubmitQuickAdd={submitQuickAdd}
+              onCancelQuickAdd={() => setAddingStatus(null)}
+              quickInputRef={quickInputRef}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Bottom FAB */}
       <div className="fixed right-4 bottom-24 z-10">
         <button
           onClick={showAddFrom}
-          className="flex cursor-pointer items-center gap-2 rounded-2xl bg-foreground px-5 py-3 font-medium text-background shadow-lg transition-all hover:bg-foreground/90 active:scale-[0.97]"
+          className="bg-foreground text-background hover:bg-foreground/90 flex cursor-pointer items-center gap-2 rounded-2xl px-5 py-3 font-medium shadow-lg transition-all active:scale-[0.97]"
         >
           <svg
             className="h-5 w-5"
@@ -526,7 +600,7 @@ export default function TodoListView() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-20 bg-background/50 backdrop-blur-sm"
+            className="bg-background/50 fixed inset-0 z-20 backdrop-blur-sm"
             onClick={closeAddForm}
           >
             <motion.div
@@ -535,15 +609,15 @@ export default function TodoListView() {
               exit={{ y: '100%' }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               onClick={(e) => e.stopPropagation()}
-              className="absolute right-0 bottom-0 left-0 max-h-[85dvh] overflow-y-auto rounded-t-3xl bg-card p-6"
+              className="bg-card absolute right-0 bottom-0 left-0 max-h-[85dvh] overflow-y-auto rounded-t-3xl p-6"
             >
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-foreground">
+                <h2 className="text-foreground text-lg font-semibold">
                   添加任务
                 </h2>
                 <button
                   onClick={closeAddForm}
-                  className="cursor-pointer rounded-lg p-1 text-muted-foreground hover:bg-accent"
+                  className="text-muted-foreground hover:bg-accent cursor-pointer rounded-lg p-1"
                 >
                   <svg
                     className="h-6 w-6"
@@ -567,7 +641,7 @@ export default function TodoListView() {
                   onChange={(e) => setNewTitle(e.target.value)}
                   type="text"
                   placeholder="任务内容..."
-                  className="w-full rounded-xl border border-border bg-card/80 px-4 py-3 text-base outline-none focus:border-primary"
+                  className="border-border bg-card focus:border-primary w-full rounded-xl border px-4 py-3 text-base outline-none"
                   autoFocus
                 />
 
@@ -576,12 +650,12 @@ export default function TodoListView() {
                   onChange={(e) => setNewDescription(e.target.value)}
                   rows={2}
                   placeholder="添加描述... (可选)"
-                  className="w-full resize-none rounded-xl border border-border bg-card/80 px-4 py-3 text-sm outline-none focus:border-primary"
+                  className="border-border bg-card focus:border-primary w-full resize-none rounded-xl border px-4 py-3 text-sm outline-none"
                 />
 
                 <div className="flex flex-wrap items-center gap-4">
                   <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium text-muted-foreground">
+                    <label className="text-muted-foreground text-sm font-medium">
                       状态
                     </label>
                     <select
@@ -589,7 +663,7 @@ export default function TodoListView() {
                       onChange={(e) =>
                         setNewStatus(e.target.value as DevTaskStatus)
                       }
-                      className="cursor-pointer rounded-lg border border-border bg-card px-3 py-2 text-sm"
+                      className="border-border bg-card cursor-pointer rounded-lg border px-3 py-2 text-sm"
                     >
                       <option value="todo">待办</option>
                       <option value="in-progress">开发中</option>
@@ -598,7 +672,7 @@ export default function TodoListView() {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium text-muted-foreground">
+                    <label className="text-muted-foreground text-sm font-medium">
                       优先级
                     </label>
                     <select
@@ -606,7 +680,7 @@ export default function TodoListView() {
                       onChange={(e) =>
                         setNewPriority(e.target.value as DevTaskPriority)
                       }
-                      className="cursor-pointer rounded-lg border border-border bg-card px-3 py-2 text-sm"
+                      className="border-border bg-card cursor-pointer rounded-lg border px-3 py-2 text-sm"
                     >
                       <option value="default">默认</option>
                       <option value="low">低</option>
@@ -615,14 +689,14 @@ export default function TodoListView() {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium text-muted-foreground">
+                    <label className="text-muted-foreground text-sm font-medium">
                       截止日期
                     </label>
                     <input
                       type="date"
                       value={newDueDate}
                       onChange={(e) => setNewDueDate(e.target.value)}
-                      className="cursor-pointer rounded-lg border border-border bg-card px-3 py-2 text-sm"
+                      className="border-border bg-card cursor-pointer rounded-lg border px-3 py-2 text-sm"
                     />
                   </div>
                 </div>
@@ -630,7 +704,7 @@ export default function TodoListView() {
                 <button
                   onClick={handleCreateTask}
                   disabled={!newTitle.trim()}
-                  className="w-full cursor-pointer rounded-xl bg-foreground py-4 font-medium text-background transition-all hover:bg-foreground/90 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="bg-foreground text-background hover:bg-foreground/90 w-full cursor-pointer rounded-xl py-4 font-medium transition-all disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   添加
                 </button>

@@ -2,7 +2,6 @@ import { socialGateway } from '@/api/socialGateway';
 import animationData from '@/assets/Success Micro Interaction.json';
 import { BentoCard } from '@/components/bento/BentoCard';
 import { useNotificationStore } from '@/stores/notificationState';
-import { motion } from 'framer-motion';
 import { useLottie } from 'lottie-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -129,30 +128,26 @@ export function BentoProfile() {
 
         {/* 点赞按钮 */}
 
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
+        <button
           title="切换到 Vue 版本"
-          className="bg-card/80 ring-border absolute top-1/2 right-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full ring-1"
+          className="bg-card/80 ring-border absolute top-1/2 right-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full ring-1 transition-transform duration-150 hover:scale-110 active:scale-90"
           onClick={switchToVue}
         >
           <svg viewBox="0 0 256 221" className="h-4 w-4" fill="currentColor">
             <path d="M204.8 0H256L128 220.8 0 0h97.92L128 51.2 157.44 0h47.36Z" />
           </svg>
-        </motion.button>
+        </button>
 
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
+        <button
           title="喜欢这个网站吗？点个赞吧！"
-          className="bg-card/80 ring-border absolute top-1/2 right-4 -translate-y-1/2 rounded-full p-1 ring-1"
+          className="bg-card/80 ring-border absolute top-1/2 right-4 -translate-y-1/2 rounded-full p-1 ring-1 transition-transform duration-150 hover:scale-110 active:scale-90"
           onClick={handleLike}
         >
           <LikeAnimation />
           <span className="bg-destructive absolute -top-1 -right-1 rounded-full px-1.5 py-0.5 text-xs font-bold text-white">
             {likesCount}
           </span>
-        </motion.button>
+        </button>
       </div>
     </BentoCard>
   );

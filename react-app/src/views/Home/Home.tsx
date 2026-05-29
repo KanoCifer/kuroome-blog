@@ -1,5 +1,4 @@
 import { useNavVisibility } from '@/components/basic/NavVisibilityContext';
-import { motion } from 'framer-motion';
 import { useEffect } from 'react';
 import { BentoCalendar } from './components/BentoCalendar';
 import { BentoClock } from './components/BentoClock';
@@ -22,13 +21,8 @@ export default function Home() {
 
   return (
     <div className="bg-background/70 relative flex min-h-screen flex-col items-center justify-center">
-      {/* Bento Grid */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="relative mx-auto flex min-h-dvh w-full max-w-md flex-wrap content-start gap-4 overflow-x-hidden px-6 pt-12 pb-32"
-      >
+      {/* Bento Grid — pure CSS animation, no framer-motion */}
+      <div className="relative mx-auto flex min-h-dvh w-full max-w-md flex-wrap content-start gap-4 overflow-x-hidden px-6 pt-12 pb-32">
         <div className="order-1 w-full min-w-0">
           <BentoProfile />
         </div>
@@ -61,7 +55,7 @@ export default function Home() {
         <div className="order-10 w-full min-w-0">
           <BentoWeb />
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
