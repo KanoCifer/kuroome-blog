@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { connectionDelay } from "@/plugins/visitorWs";
-import { useVisitorCountStore } from "@/stores/visitorCount";
-import { useWebSocket } from "@/composables/useWebSocket";
-import { fetchStatusDetail, type StatusDetailData } from "@/api/statusGateway";
-import { computed, onMounted, onUnmounted, ref, watchEffect } from "vue";
-import { motion } from "motion-v";
+import { connectionDelay } from '@/plugins/visitorWs';
+import { useVisitorCountStore } from '@/stores/visitorCount';
+import { useWebSocket } from '@/composables/useWebSocket';
+import { fetchStatusDetail, type StatusDetailData } from '@/api/statusGateway';
+import { computed, onMounted, onUnmounted, ref, watchEffect } from 'vue';
+import { motion } from 'motion-v';
 
 /* ── Stores ── */
 const visitorCount = useVisitorCountStore();
@@ -23,9 +23,10 @@ async function loadStatus() {
 
 /* ── WebSocket (1 s ping) ── */
 function buildWsUrl(): string {
-  const apiBase = import.meta.env.VITE_API_BASE || "/api";
-  if (apiBase.startsWith("http")) return apiBase.replace(/^http/, "ws") + "/v2/publicv2/ws";
-  const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
+  const apiBase = import.meta.env.VITE_API_BASE || '/api';
+  if (apiBase.startsWith('http'))
+    return apiBase.replace(/^http/, 'ws') + '/v2/publicv2/ws';
+  const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   return `${proto}//${window.location.host}${apiBase}/v2/publicv2/ws`;
 }
 
@@ -42,7 +43,10 @@ const MAX_HISTORY = 60;
 watchEffect(() => {
   const ms = ws.connectionDelay.value;
   if (ms > 0) {
-    latencyHistory.value = [...latencyHistory.value.slice(-(MAX_HISTORY - 1)), ms];
+    latencyHistory.value = [
+      ...latencyHistory.value.slice(-(MAX_HISTORY - 1)),
+      ms,
+    ];
   }
 });
 
@@ -51,12 +55,12 @@ const apiLatency = ref(0);
 const apiHealthy = ref(true);
 
 async function pingApi() {
-  const base = import.meta.env.VITE_API_BASE || "/api";
+  const base = import.meta.env.VITE_API_BASE || '/api';
   const start = performance.now();
   try {
     const res = await fetch(`${base}/v1/status`, {
-      method: "GET",
-      cache: "no-store",
+      method: 'GET',
+      cache: 'no-store',
       signal: AbortSignal.timeout(5000),
     });
     if (!res.ok) throw new Error();
@@ -73,7 +77,8 @@ let apiTimer: ReturnType<typeof setInterval> | null = null;
 function formatUptime(s: number): string {
   if (s < 60) return `${s} 秒`;
   if (s < 3600) return `${Math.floor(s / 60)} 分 ${s % 60} 秒`;
-  if (s < 86400) return `${Math.floor(s / 3600)} 时 ${Math.floor((s % 3600) / 60)} 分`;
+  if (s < 86400)
+    return `${Math.floor(s / 3600)} 时 ${Math.floor((s % 3600) / 60)} 分`;
   return `${Math.floor(s / 86400)} 天 ${Math.floor((s % 86400) / 3600)} 时`;
 }
 
@@ -88,38 +93,38 @@ interface StatusInfo {
 const overallStatus = computed<StatusInfo>(() => {
   if (!apiHealthy.value)
     return {
-      label: "服务中断",
-      dotClass: "bg-red-500",
-      bgClass: "bg-destructive/10",
-      textClass: "text-destructive",
+      label: '服务中断',
+      dotClass: 'bg-red-500',
+      bgClass: 'bg-destructive/10',
+      textClass: 'text-destructive',
     };
   const delay = connectionDelay?.value ?? 0;
   if (!ws.isConnected.value || delay > 2000)
     return {
-      label: "性能降级",
-      dotClass: "bg-yellow-500",
-      bgClass: "bg-warning/10",
-      textClass: "text-warning",
+      label: '性能降级',
+      dotClass: 'bg-yellow-500',
+      bgClass: 'bg-warning/10',
+      textClass: 'text-warning',
     };
   return {
-    label: "运行正常",
-    dotClass: "bg-emerald-500",
-    bgClass: "bg-success/10",
-    textClass: "text-success",
+    label: '运行正常',
+    dotClass: 'bg-emerald-500',
+    bgClass: 'bg-success/10',
+    textClass: 'text-success',
   };
 });
 
 const wsLatency = computed(() => {
   const ms = connectionDelay?.value ?? 0;
-  return ms ? `${Math.round(ms)} ms` : "-- ms";
+  return ms ? `${Math.round(ms)} ms` : '-- ms';
 });
 
 const wsDotClass = computed(() => {
   const ms = connectionDelay?.value ?? 0;
-  if (!ms) return "bg-muted-foreground/40";
-  if (ms < 200) return "bg-emerald-500";
-  if (ms < 2000) return "bg-yellow-500";
-  return "bg-red-500";
+  if (!ms) return 'bg-muted-foreground/40';
+  if (ms < 200) return 'bg-emerald-500';
+  if (ms < 2000) return 'bg-yellow-500';
+  return 'bg-red-500';
 });
 
 /* ── Latency chart (canvas) ── */
@@ -140,7 +145,7 @@ function drawChart() {
   canvas.style.width = `${w}px`;
   canvas.style.height = `${h}px`;
 
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext('2d');
   if (!ctx) return;
   ctx.scale(dpr, dpr);
 
@@ -155,24 +160,27 @@ function drawChart() {
 
   const data = latencyHistory.value;
   if (data.length < 2) {
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--muted").trim();
-    ctx.font = "14px sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("等待数据…", w / 2, h / 2);
+    ctx.fillStyle = getComputedStyle(document.documentElement)
+      .getPropertyValue('--muted')
+      .trim();
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('等待数据…', w / 2, h / 2);
     return;
   }
 
   const maxMs = 800;
-  const yOf = (v: number) => PAD_TOP + chartH - (Math.min(v, maxMs) / maxMs) * chartH;
+  const yOf = (v: number) =>
+    PAD_TOP + chartH - (Math.min(v, maxMs) / maxMs) * chartH;
 
   // Grid
   const gridValues = [0, 200, 400, 600, 800];
-  ctx.strokeStyle = "rgba(128,128,128,0.12)";
+  ctx.strokeStyle = 'rgba(128,128,128,0.12)';
   ctx.lineWidth = 1;
-  ctx.font = "11px sans-serif";
-  ctx.fillStyle = "rgba(128,128,128,0.45)";
-  ctx.textAlign = "right";
-  ctx.textBaseline = "middle";
+  ctx.font = '11px sans-serif';
+  ctx.fillStyle = 'rgba(128,128,128,0.45)';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
 
   for (let i = 0; i < gridValues.length; i++) {
     const y = yOf(gridValues[i]);
@@ -184,8 +192,8 @@ function drawChart() {
   }
 
   // X labels
-  ctx.textAlign = "center";
-  ctx.textBaseline = "top";
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
   const step = Math.max(1, Math.floor(data.length / 6));
   for (let i = 0; i < data.length; i += step) {
     const x = PAD_LEFT + (i / (data.length - 1)) * chartW;
@@ -197,9 +205,9 @@ function drawChart() {
 
   // Gradient area
   const grad = ctx.createLinearGradient(0, PAD_TOP, 0, PAD_TOP + chartH);
-  grad.addColorStop(0, "rgba(239,68,68,0.15)");
-  grad.addColorStop(0.25, "rgba(234,179,8,0.10)");
-  grad.addColorStop(1, "rgba(16,185,129,0.20)");
+  grad.addColorStop(0, 'rgba(239,68,68,0.15)');
+  grad.addColorStop(0.25, 'rgba(234,179,8,0.10)');
+  grad.addColorStop(1, 'rgba(16,185,129,0.20)');
 
   ctx.beginPath();
   ctx.moveTo(PAD_LEFT, PAD_TOP + chartH);
@@ -222,7 +230,7 @@ function drawChart() {
     if (i === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
   }
-  ctx.strokeStyle = "rgba(16,185,129,0.7)";
+  ctx.strokeStyle = 'rgba(16,185,129,0.7)';
   ctx.lineWidth = 2;
   ctx.stroke();
 
@@ -231,7 +239,7 @@ function drawChart() {
   const lastY = yOf(data[data.length - 1]);
   ctx.beginPath();
   ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
-  ctx.fillStyle = "rgba(16,185,129,0.9)";
+  ctx.fillStyle = 'rgba(16,185,129,0.9)';
   ctx.fill();
 }
 
@@ -274,11 +282,17 @@ onUnmounted(() => {
 
 <template>
   <div class="bg-background flex min-h-screen justify-center px-4 py-16">
-    <motion.div :initial="{ opacity: 0, y: 20 }" :animate="{ opacity: 1, y: 0 }" class="w-full max-w-3xl space-y-8">
+    <motion.div
+      :initial="{ opacity: 0, y: 20 }"
+      :animate="{ opacity: 1, y: 0 }"
+      class="mt-8 w-full max-w-3xl space-y-8"
+    >
       <!-- Header -->
       <header class="space-y-2 text-center">
         <h1 class="text-foreground text-3xl font-bold">服务状态</h1>
-        <p class="text-muted-foreground text-sm">Kuroome Blog 各项服务的实时运行状况</p>
+        <p class="text-muted-foreground text-sm">
+          Kuroome Blog 各项服务的实时运行状况
+        </p>
       </header>
 
       <!-- Overall status banner -->
@@ -289,19 +303,24 @@ onUnmounted(() => {
               class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
               :class="overallStatus.dotClass"
             />
-            <span class="relative inline-flex h-3 w-3 rounded-full" :class="overallStatus.dotClass" />
+            <span
+              class="relative inline-flex h-3 w-3 rounded-full"
+              :class="overallStatus.dotClass"
+            />
           </span>
           <span :class="overallStatus.textClass" class="text-lg font-semibold">
             {{ overallStatus.label }}
           </span>
         </div>
-        <p class="text-muted-foreground text-sm">所有系统运行中 · 上次检测刚刚</p>
+        <p class="text-muted-foreground text-sm">
+          所有系统运行中 · 上次检测刚刚
+        </p>
       </div>
 
       <!-- Service cards -->
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <!-- API -->
-        <div class="border-border bg-card rounded-xl border p-5">
+        <div class="border-border bg-card rounded-xl border p-5 shadow-md">
           <div class="mb-3 flex items-center gap-2">
             <span class="relative flex h-2 w-2">
               <span
@@ -316,63 +335,78 @@ onUnmounted(() => {
             <span class="text-foreground font-medium">API 服务</span>
           </div>
           <p class="text-muted-foreground mb-1 text-sm">
-            {{ apiHealthy ? "正常运行" : "无法连接" }}
+            {{ apiHealthy ? '正常运行' : '无法连接' }}
           </p>
           <p class="text-foreground text-2xl font-bold">
-            {{ apiHealthy ? `${apiLatency} ms` : "--" }}
+            {{ apiHealthy ? `${apiLatency} ms` : '--' }}
           </p>
         </div>
 
         <!-- WebSocket -->
-        <div class="border-border bg-card rounded-xl border p-5">
+        <div class="border-border bg-card rounded-xl border p-5 shadow-md">
           <div class="mb-3 flex items-center gap-2">
             <span class="relative flex h-2 w-2">
               <span
                 class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
                 :class="wsDotClass"
               />
-              <span class="relative inline-flex h-2 w-2 rounded-full" :class="wsDotClass" />
+              <span
+                class="relative inline-flex h-2 w-2 rounded-full"
+                :class="wsDotClass"
+              />
             </span>
             <span class="text-foreground font-medium">WebSocket</span>
           </div>
           <p class="text-muted-foreground mb-1 text-sm">
-            {{ ws.isConnected.value ? "已连接" : "未连接" }}
+            {{ ws.isConnected.value ? '已连接' : '未连接' }}
           </p>
           <p class="text-foreground text-2xl font-bold">{{ wsLatency }}</p>
         </div>
 
         <!-- Database -->
-        <div class="border-border bg-card rounded-xl border p-5">
+        <div class="border-border bg-card rounded-xl border p-5 shadow-md">
           <div class="mb-3 flex items-center gap-2">
             <span class="relative flex h-2 w-2">
               <span
                 class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
-                :class="serverStatus?.db_ok ? 'bg-emerald-500' : 'bg-muted-foreground/40'"
+                :class="
+                  serverStatus?.db_ok
+                    ? 'bg-emerald-500'
+                    : 'bg-muted-foreground/40'
+                "
               />
               <span
                 class="relative inline-flex h-2 w-2 rounded-full"
-                :class="serverStatus?.db_ok ? 'bg-emerald-500' : 'bg-muted-foreground/40'"
+                :class="
+                  serverStatus?.db_ok
+                    ? 'bg-emerald-500'
+                    : 'bg-muted-foreground/40'
+                "
               />
             </span>
             <span class="text-foreground font-medium">数据库</span>
           </div>
           <p class="text-muted-foreground mb-1 text-sm">
-            {{ serverStatus?.db_ok ? "连接正常" : "检测中…" }}
+            {{ serverStatus?.db_ok ? '连接正常' : '检测中…' }}
           </p>
           <p class="text-foreground text-2xl font-bold">
-            {{ serverStatus?.db_ok ? "OK" : "--" }}
+            {{ serverStatus?.db_ok ? 'OK' : '--' }}
           </p>
         </div>
       </div>
 
       <!-- Latency chart -->
-      <div class="border-border bg-card rounded-xl border p-5">
+      <div class="border-border bg-card rounded-xl border p-5 shadow-md">
         <div class="mb-4 flex items-center justify-between">
           <h2 class="text-foreground font-medium">延迟趋势</h2>
           <div class="flex items-center gap-1.5">
             <span class="relative flex h-2 w-2">
-              <span class="bg-success absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
-              <span class="bg-success relative inline-flex h-2 w-2 rounded-full" />
+              <span
+                class="bg-success absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
+              />
+              <span
+                class="bg-success relative inline-flex h-2 w-2 rounded-full"
+              />
             </span>
             <span class="text-muted-foreground text-sm">实时</span>
           </div>
@@ -387,16 +421,27 @@ onUnmounted(() => {
       </div>
 
       <!-- Footer meta -->
-      <div class="text-muted-foreground flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
+      <div
+        class="text-muted-foreground flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm"
+      >
         <span class="inline-flex items-center gap-1.5">
           <span class="relative flex h-2 w-2">
-            <span class="bg-success absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
-            <span class="bg-success relative inline-flex h-2 w-2 rounded-full" />
+            <span
+              class="bg-success absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
+            />
+            <span
+              class="bg-success relative inline-flex h-2 w-2 rounded-full"
+            />
           </span>
           {{ visitorCount.count }} 人在线
         </span>
-        <span v-if="serverStatus"> CPU {{ serverStatus.cpu_percent }}% · 内存 {{ serverStatus.mem_usage }}% </span>
-        <span v-if="serverStatus"> 运行 {{ formatUptime(serverStatus.uptime) }} </span>
+        <span v-if="serverStatus">
+          CPU {{ serverStatus.cpu_percent }}% · 内存
+          {{ serverStatus.mem_usage }}%
+        </span>
+        <span v-if="serverStatus">
+          运行 {{ formatUptime(serverStatus.uptime) }}
+        </span>
       </div>
     </motion.div>
   </div>
