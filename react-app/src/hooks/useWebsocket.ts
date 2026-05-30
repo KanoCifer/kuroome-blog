@@ -5,6 +5,7 @@ interface UseWebSocketOptions {
   visitorId?: string | null;
   onCount?: (count: number) => void;
   onConnectionDelay?: (ms: number) => void;
+  onConnectedChange?: (connected: boolean) => void;
   reconnectBaseMs?: number;
   reconnectMaxMs?: number;
   pingIntervalMs?: number;
@@ -16,6 +17,7 @@ export function useWebsocket(options: UseWebSocketOptions) {
     visitorId,
     onCount,
     onConnectionDelay,
+    onConnectedChange,
     reconnectBaseMs = 1000,
     reconnectMaxMs = 30000,
     pingIntervalMs = 30000,
@@ -31,7 +33,15 @@ export function useWebsocket(options: UseWebSocketOptions) {
   // Stable callbacks — refs for values that change but shouldn't trigger reconnect
   const onCountRef = useRef(onCount);
   const onConnectionDelayRef = useRef(onConnectionDelay);
+  const onConnectedChangeRef = useRef(onConnectedChange);
   const visitorIdRef = useRef(visitorId);
+
+  useEffect(() => {
+    onCountRef.current = onCount;
+    onConnectionDelayRef.current = onConnectionDelay;
+    onConnectedChangeRef.current = onConnectedChange;
+    visitorIdRef.current = visitorId;
+  });
 
   const stopPing = useCallback(() => {
     if (pingTimerRef.current) {
@@ -73,6 +83,7 @@ export function useWebsocket(options: UseWebSocketOptions) {
 
     ws.onopen = () => {
       isConnectedRef.current = true;
+      onConnectedChangeRef.current?.(true);
       reconnectAttemptRef.current = 0;
       onConnectionDelayRef.current?.(performance.now() - startTime);
 
@@ -116,6 +127,7 @@ export function useWebsocket(options: UseWebSocketOptions) {
 
     ws.onclose = (event) => {
       isConnectedRef.current = false;
+      onConnectedChangeRef.current?.(false);
       stopPing();
       if (event.code !== 1000) {
         const delay = Math.min(
@@ -144,7 +156,16 @@ export function useWebsocket(options: UseWebSocketOptions) {
       wsRef.current = null;
     }
     isConnectedRef.current = false;
+    onConnectedChangeRef.current?.(false);
   }, [stopPing]);
+
+  /** Send a ping and record start time for latency calculation */
+  const sendPing = useCallback(() => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      pingStartTimeRef.current = performance.now();
+      wsRef.current.send(JSON.stringify({ type: 'ping' }));
+    }
+  }, []);
 
   useEffect(() => {
     connect();
@@ -177,5 +198,5 @@ export function useWebsocket(options: UseWebSocketOptions) {
     };
   }, [connect, disconnect]);
 
-  return { isConnected: isConnectedRef.current };
+  return { sendPing };
 }

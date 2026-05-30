@@ -9,6 +9,7 @@ import {
   BookOpen,
   ChevronDown,
   Cog,
+  ExternalLink,
   FileUp,
   History,
   Home,
@@ -25,7 +26,7 @@ import {
   Wrench,
 } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useClickOutside } from '@/hooks/useClickOutside';
 
 const navItems = [
@@ -120,23 +121,32 @@ function DropDownItems() {
   }
 }
 
-function DelayStatus({ ms }: { ms: number }) {
+function DelayStatus({ ms, onClick }: { ms: number; onClick?: () => void }) {
   if (!ms) {
     return (
-      <span className="text-muted-foreground inline-flex items-center gap-1.5 text-xs">
+      <button
+        type="button"
+        onClick={onClick}
+        className="text-muted-foreground inline-flex items-center gap-1.5 text-xs"
+      >
         <span className="relative flex h-2 w-2">
           <span className="bg-muted-foreground absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
           <span className="bg-muted-foreground relative inline-flex h-2 w-2 rounded-full" />
         </span>
         延迟 -- ms
-      </span>
+        <ExternalLink className="h-3 w-3 opacity-60" />
+      </button>
     );
   }
   const label = `${Math.round(ms)} ms`;
   const dotClass =
     ms < 200 ? 'bg-success' : ms < 2000 ? 'bg-warning' : 'bg-destructive';
   return (
-    <span className="text-muted-foreground inline-flex items-center gap-1.5 text-xs">
+    <button
+      type="button"
+      onClick={onClick}
+      className="text-muted-foreground inline-flex items-center gap-1.5 text-xs"
+    >
       <span className="relative flex h-2 w-2">
         <span
           className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${dotClass}`}
@@ -146,7 +156,7 @@ function DelayStatus({ ms }: { ms: number }) {
         />
       </span>
       延迟 {label}
-    </span>
+    </button>
   );
 }
 
@@ -155,6 +165,7 @@ export const BentoNavSidebar: React.FC = () => {
   const visitorCount = useVisitorCountStore((s) => s.count);
   const connectionDelay = useVisitorCountStore((s) => s.connectionDelay);
   const location = useLocation();
+  const navigate = useNavigate();
   const activeIndex = navItems.findIndex(
     (item) => location.pathname === item.path,
   );
@@ -335,7 +346,13 @@ export const BentoNavSidebar: React.FC = () => {
             </span>
             {visitorCount} 人在线
           </span>
-          <DelayStatus ms={connectionDelay} />
+          <DelayStatus
+            ms={connectionDelay}
+            onClick={() => {
+              navigate('/status');
+              setIsOpen(false);
+            }}
+          />
         </div>
 
         <div className="mb-30 border-t pt-1 text-center text-sm">

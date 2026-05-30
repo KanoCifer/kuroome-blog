@@ -36,3 +36,4 @@ export const DeviceTracker = lazy(
   () => import('../views/device/DeviceTracker'),
 );
 export const FriendLinks = lazy(() => import('../views/pages/FriendLinksView'));
+export const Status = lazy(() => import('../views/pages/StatusView'));

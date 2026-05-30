@@ -23,6 +23,7 @@ import {
   Register,
   RssArticle,
   RssWorkspace,
+  Status,
   Subscription,
   TodoList,
   Website,
@@ -119,6 +120,10 @@ export const router = createBrowserRouter([
       {
         path: '/friend-links',
         element: <FriendLinks />,
+      },
+      {
+        path: '/status',
+        element: <Status />,
       },
       {
         path: '/blog',

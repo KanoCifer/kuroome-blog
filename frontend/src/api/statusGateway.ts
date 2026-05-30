@@ -6,7 +6,7 @@ export interface StatusDetailData {
   db_ok: boolean;
   cpu_percent: number;
   mem_usage: number;
-  uptime: number;
+  startuptime: number;
 }
 
 export async function fetchStatusDetail(): Promise<StatusDetailData> {

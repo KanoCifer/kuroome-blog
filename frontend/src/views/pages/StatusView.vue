@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { connectionDelay } from "@/plugins/visitorWs";
+import { connectionDelay, isConnected, sendPing } from "@/plugins/visitorWs";
 import { useVisitorCountStore } from "@/stores/visitorCount";
-import { useWebSocket } from "@/composables/useWebSocket";
 import { fetchStatusDetail, type StatusDetailData } from "@/api/statusGateway";
 import { computed, onMounted, onUnmounted, ref, watchEffect } from "vue";
 import { motion } from "motion-v";
@@ -13,40 +12,36 @@ const visitorCount = useVisitorCountStore();
 /* ── Server metrics ── */
 const serverStatus = ref<StatusDetailData | null>(null);
 let statusTimer: ReturnType<typeof setInterval> | null = null;
+let nowTimer: ReturnType<typeof setInterval> | null = null;
+const startTime = ref<number | null>(null);
+const now = ref(Date.now());
+const uptime = computed(() => {
+  if (startTime.value === null) return 0;
+  return Math.floor((now.value - startTime.value * 1000) / 1000);
+});
 
 async function loadStatus() {
   try {
     serverStatus.value = await fetchStatusDetail();
+    if (serverStatus.value && startTime.value === null) {
+      startTime.value = serverStatus.value.startuptime;
+    }
   } catch {
     /* silent */
   }
 }
 
-/* ── WebSocket (1 s ping) ── */
-function buildWsUrl(): string {
-  const apiBase = import.meta.env.VITE_API_BASE || '/api';
-  if (apiBase.startsWith('http'))
-    return apiBase.replace(/^http/, 'ws') + '/v2/publicv2/ws';
-  const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  return `${proto}//${window.location.host}${apiBase}/v2/publicv2/ws`;
-}
-
-const ws = useWebSocket({
-  url: buildWsUrl(),
-  pingIntervalMs: 1000,
-  immediate: true,
-});
-
-/* ── Latency history (from status-page WS) ── */
+/* ── Latency history (reuses global visitor WS) ── */
 const latencyHistory = ref<number[]>([]);
 const MAX_HISTORY = 60;
+let pingTimer: ReturnType<typeof setInterval> | null = null;
 
 watchEffect(() => {
-  const ms = ws.connectionDelay.value;
-  if (ms > 0) {
+  const ms = connectionDelay?.value;
+  if (ms && ms > 0) {
     latencyHistory.value = [
       ...latencyHistory.value.slice(-(MAX_HISTORY - 1)),
-      ms,
+      Math.round(ms * 10) / 10,
     ];
   }
 });
@@ -76,10 +71,10 @@ let apiTimer: ReturnType<typeof setInterval> | null = null;
 
 /* ── Uptime formatter ── */
 function formatUptime(s: number): string {
-  if (s < 60) return `${s} 秒`;
-  if (s < 3600) return `${Math.floor(s / 60)} 分 ${s % 60} 秒`;
+  if (s < 60) return `00 天 00 时 00 分 ${s} 秒`;
+  if (s < 3600) return `00 天 00 时 ${Math.floor(s / 60)} 分 ${s % 60} 秒`;
   if (s < 86400)
-    return `${Math.floor(s / 3600)} 时 ${Math.floor((s % 3600) / 60)} 分`;
+    return `00 天 ${Math.floor(s / 3600)} 时 ${Math.floor((s % 3600) / 60)} 分`;
   return `${Math.floor(s / 86400)} 天 ${Math.floor((s % 86400) / 3600)} 时`;
 }
 
@@ -100,7 +95,7 @@ const overallStatus = computed<StatusInfo>(() => {
       textClass: 'text-destructive',
     };
   const delay = connectionDelay?.value ?? 0;
-  if (!ws.isConnected.value || delay > 2000)
+  if (!isConnected?.value || delay > 2000)
     return {
       label: '性能降级',
       dotClass: 'bg-yellow-500',
@@ -216,13 +211,17 @@ const chartOption = computed(() => {
 onMounted(() => {
   loadStatus();
   statusTimer = setInterval(loadStatus, 30_000);
+  nowTimer = setInterval(() => { now.value = Date.now(); }, 1000);
   pingApi();
   apiTimer = setInterval(pingApi, 10_000);
+  pingTimer = setInterval(sendPing, 1000);
 });
 
 onUnmounted(() => {
   if (statusTimer) clearInterval(statusTimer);
+  if (nowTimer) clearInterval(nowTimer);
   if (apiTimer) clearInterval(apiTimer);
+  if (pingTimer) clearInterval(pingTimer);
 });
 </script>
 
@@ -259,7 +258,7 @@ onUnmounted(() => {
           </span>
         </div>
         <p class="text-muted-foreground text-sm">
-          所有系统运行中 · 上次检测刚刚
+          所有系统运行中 · 上次检测 · 刚刚
         </p>
       </div>
 
@@ -304,7 +303,7 @@ onUnmounted(() => {
             <span class="text-foreground font-medium">WebSocket</span>
           </div>
           <p class="text-muted-foreground mb-1 text-sm">
-            {{ ws.isConnected.value ? '已连接' : '未连接' }}
+            {{ isConnected ? '已连接' : '未连接' }}
           </p>
           <p class="text-foreground text-2xl font-bold">{{ wsLatency }}</p>
         </div>
@@ -385,7 +384,7 @@ onUnmounted(() => {
           {{ serverStatus.mem_usage }}%
         </span>
         <span v-if="serverStatus">
-          运行 {{ formatUptime(serverStatus.uptime) }}
+          运行 {{ formatUptime(uptime) }}
         </span>
       </div>
     </motion.div>

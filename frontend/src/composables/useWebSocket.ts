@@ -147,6 +147,14 @@ export function useWebSocket(options: UseWebSocketOptions) {
     }
   }
 
+  /** Send a ping and record start time for latency calculation */
+  function sendPing() {
+    if (ws?.readyState === WebSocket.OPEN) {
+      pingStartTime = performance.now();
+      ws.send(JSON.stringify({ type: 'ping' }));
+    }
+  }
+
   const handleVisibility = () => {
     if (document.visibilityState === 'visible' && !isConnected.value) {
       reconnectAttempt.value = 0;
@@ -182,5 +190,5 @@ export function useWebSocket(options: UseWebSocketOptions) {
     });
   }
 
-  return { isConnected, connectionDelay, send, disconnect, connect };
+  return { isConnected, connectionDelay, send, sendPing, disconnect, connect };
 }

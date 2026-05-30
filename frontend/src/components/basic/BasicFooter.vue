@@ -20,6 +20,7 @@
             <span class="relative inline-flex h-2 w-2 rounded-full" :class="delayStatus.dotClass"></span>
           </span>
           延迟 {{ delayStatus.label }}
+          <ExternalLink class="h-3 w-3 opacity-60" />
         </router-link>
       </div>
 
@@ -58,6 +59,7 @@
 import { connectionDelay } from "@/plugins/visitorWs";
 import { useVisitorCountStore } from "@/stores/visitorCount";
 import { computed } from "vue";
+import { ExternalLink } from '@lucide/vue';
 
 const visitorCount = useVisitorCountStore();
 

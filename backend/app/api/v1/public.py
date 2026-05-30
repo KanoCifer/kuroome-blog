@@ -90,15 +90,13 @@ async def get_status_detail() -> JSONResponse:
     # Lightweight server metrics (non-blocking)
     mem = psutil.virtual_memory()
 
-    uptime = int(time.time() - SERVER_START_TIME)
-
     return APIResponse.ok(
         data={
             "api_ok": api_ok,
             "db_ok": db_ok,
             "cpu_percent": psutil.cpu_percent(interval=None),
             "mem_usage": round(mem.percent, 1),
-            "uptime": uptime,
+            "startuptime": round(SERVER_START_TIME, 0),
         },
         message="Status detail retrieved successfully",
     )

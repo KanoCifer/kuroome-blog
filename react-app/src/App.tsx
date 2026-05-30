@@ -13,15 +13,23 @@ function App() {
   const todoState = useTodoState();
   const setCount = useVisitorCountStore((s) => s.setCount);
   const setConnectionDelay = useVisitorCountStore((s) => s.setConnectionDelay);
+  const setConnected = useVisitorCountStore((s) => s.setConnected);
+  const setSendPing = useVisitorCountStore((s) => s.setSendPing);
   const [isReady, setIsReady] = useState(false);
 
   // WebSocket — anonymous visitor connection
-  useWebsocket({
+  const { sendPing } = useWebsocket({
     url: buildWsUrl(),
     visitorId: getVisitorId(),
     onCount: setCount,
     onConnectionDelay: setConnectionDelay,
+    onConnectedChange: setConnected,
   });
+
+  useEffect(() => {
+    setSendPing(sendPing ?? null);
+    return () => setSendPing(null);
+  }, [sendPing, setSendPing]);
 
   // 在应用启动时尝试从缓存加载用户信息
   // 这可以防止在页面刷新时用户状态丢失
