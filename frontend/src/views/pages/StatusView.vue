@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { connectionDelay } from '@/plugins/visitorWs';
-import { useVisitorCountStore } from '@/stores/visitorCount';
-import { useWebSocket } from '@/composables/useWebSocket';
-import { fetchStatusDetail, type StatusDetailData } from '@/api/statusGateway';
-import { computed, onMounted, onUnmounted, ref, watchEffect } from 'vue';
-import { motion } from 'motion-v';
+import { connectionDelay } from "@/plugins/visitorWs";
+import { useVisitorCountStore } from "@/stores/visitorCount";
+import { useWebSocket } from "@/composables/useWebSocket";
+import { fetchStatusDetail, type StatusDetailData } from "@/api/statusGateway";
+import { computed, onMounted, onUnmounted, ref, watchEffect } from "vue";
+import { motion } from "motion-v";
+import VChart from "vue-echarts";
 
 /* ── Stores ── */
 const visitorCount = useVisitorCountStore();
@@ -127,156 +128,101 @@ const wsDotClass = computed(() => {
   return 'bg-red-500';
 });
 
-/* ── Latency chart (canvas) ── */
-const chartCanvas = ref<HTMLCanvasElement | null>(null);
-
-function drawChart() {
-  const canvas = chartCanvas.value;
-  if (!canvas) return;
-
-  const parent = canvas.parentElement;
-  if (!parent) return;
-
-  const dpr = window.devicePixelRatio || 1;
-  const w = parent.clientWidth;
-  const h = 220;
-  canvas.width = w * dpr;
-  canvas.height = h * dpr;
-  canvas.style.width = `${w}px`;
-  canvas.style.height = `${h}px`;
-
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-  ctx.scale(dpr, dpr);
-
-  const PAD_TOP = 20;
-  const PAD_BOTTOM = 36;
-  const PAD_LEFT = 48;
-  const PAD_RIGHT = 12;
-  const chartW = w - PAD_LEFT - PAD_RIGHT;
-  const chartH = h - PAD_TOP - PAD_BOTTOM;
-
-  ctx.clearRect(0, 0, w, h);
-
+/* ── Latency chart (echarts) ── */
+const chartOption = computed(() => {
   const data = latencyHistory.value;
-  if (data.length < 2) {
-    ctx.fillStyle = getComputedStyle(document.documentElement)
-      .getPropertyValue('--muted')
-      .trim();
-    ctx.font = '14px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('等待数据…', w / 2, h / 2);
-    return;
-  }
+  const xData = data.map((_, i) => `${i}s`);
 
-  const maxMs = 800;
-  const yOf = (v: number) =>
-    PAD_TOP + chartH - (Math.min(v, maxMs) / maxMs) * chartH;
-
-  // Grid
-  const gridValues = [0, 200, 400, 600, 800];
-  ctx.strokeStyle = 'rgba(128,128,128,0.12)';
-  ctx.lineWidth = 1;
-  ctx.font = '11px sans-serif';
-  ctx.fillStyle = 'rgba(128,128,128,0.45)';
-  ctx.textAlign = 'right';
-  ctx.textBaseline = 'middle';
-
-  for (let i = 0; i < gridValues.length; i++) {
-    const y = yOf(gridValues[i]);
-    ctx.beginPath();
-    ctx.moveTo(PAD_LEFT, y);
-    ctx.lineTo(w - PAD_RIGHT, y);
-    ctx.stroke();
-    ctx.fillText(`${gridValues[i]}`, PAD_LEFT - 8, y);
-  }
-
-  // X labels
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'top';
-  const step = Math.max(1, Math.floor(data.length / 6));
-  for (let i = 0; i < data.length; i += step) {
-    const x = PAD_LEFT + (i / (data.length - 1)) * chartW;
-    ctx.fillText(`${i}s`, x, h - PAD_BOTTOM + 14);
-  }
-  if (data.length > 1) {
-    ctx.fillText(`${data.length - 1}s`, PAD_LEFT + chartW, h - PAD_BOTTOM + 14);
-  }
-
-  // Gradient area
-  const grad = ctx.createLinearGradient(0, PAD_TOP, 0, PAD_TOP + chartH);
-  grad.addColorStop(0, 'rgba(239,68,68,0.15)');
-  grad.addColorStop(0.25, 'rgba(234,179,8,0.10)');
-  grad.addColorStop(1, 'rgba(16,185,129,0.20)');
-
-  ctx.beginPath();
-  ctx.moveTo(PAD_LEFT, PAD_TOP + chartH);
-  for (let i = 0; i < data.length; i++) {
-    const x = PAD_LEFT + (i / (data.length - 1)) * chartW;
-    const y = yOf(data[i]);
-    if (i === 0) ctx.lineTo(x, y);
-    else ctx.lineTo(x, y);
-  }
-  ctx.lineTo(PAD_LEFT + chartW, PAD_TOP + chartH);
-  ctx.closePath();
-  ctx.fillStyle = grad;
-  ctx.fill();
-
-  // Line
-  ctx.beginPath();
-  for (let i = 0; i < data.length; i++) {
-    const x = PAD_LEFT + (i / (data.length - 1)) * chartW;
-    const y = yOf(data[i]);
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  }
-  ctx.strokeStyle = 'rgba(16,185,129,0.7)';
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  // Endpoint dot
-  const lastX = PAD_LEFT + chartW;
-  const lastY = yOf(data[data.length - 1]);
-  ctx.beginPath();
-  ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(16,185,129,0.9)';
-  ctx.fill();
-}
-
-/* ── Lifecycle ── */
-let drawRaf = 0;
-let resizeObs: ResizeObserver | null = null;
-
-watchEffect(() => {
-  void latencyHistory.value.length;
-  const canvas = chartCanvas.value;
-  if (canvas) {
-    cancelAnimationFrame(drawRaf);
-    drawRaf = requestAnimationFrame(drawChart);
-  }
+  return {
+    backgroundColor: "transparent",
+    textStyle: { color: "#6b7280", fontSize: 12 },
+    grid: {
+      left: "6%",
+      right: "4%",
+      top: 20,
+      bottom: 30,
+      containLabel: true,
+    },
+    tooltip: {
+      trigger: "axis",
+      backgroundColor: "rgba(255, 255, 255, 0.95)",
+      borderColor: "rgba(0, 0, 0, 0.05)",
+      borderWidth: 1,
+      borderRadius: 12,
+      padding: [12, 16],
+      textStyle: { color: "#1f2937", fontSize: 14 },
+      axisPointer: {
+        type: "line",
+        lineStyle: { color: "rgba(0,0,0,0.1)", type: "dashed" },
+      },
+      formatter: (params: { seriesName: string; value: number; axisValue: string }[]) => {
+        const p = params[0];
+        return `<div style="font-size:13px;color:#6b7280">${p.axisValue}</div><div style="font-size:16px;font-weight:600;margin-top:4px">${p.value} ms</div>`;
+      },
+    },
+    xAxis: {
+      type: "category",
+      boundaryGap: false,
+      data: xData,
+      axisLine: { lineStyle: { color: "#e5e7eb", width: 1 } },
+      axisTick: { show: false },
+      axisLabel: { color: "#9ca3af", fontSize: 11 },
+    },
+    yAxis: {
+      type: "value",
+      max: 800,
+      min: 0,
+      interval: 200,
+      axisLine: { show: false },
+      axisTick: { show: false },
+      splitLine: { lineStyle: { color: "rgba(128,128,128,0.12)", type: "dashed" } },
+      axisLabel: { color: "#9ca3af", fontSize: 11, formatter: "{value}" },
+    },
+    series: [
+      {
+        name: "延迟",
+        type: "line",
+        data,
+        smooth: 0.2,
+        symbol: "circle",
+        symbolSize: (value: number, params: { dataIndex: number }) => (params.dataIndex === data.length - 1 ? 8 : 0),
+        showSymbol: data.length > 0,
+        lineStyle: { width: 2, color: "rgba(16,185,129,0.7)" },
+        itemStyle: {
+          color: "rgba(16,185,129,0.9)",
+          borderColor: "#fff",
+          borderWidth: 2,
+        },
+        areaStyle: {
+          color: {
+            type: "linear",
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: "rgba(239,68,68,0.15)" },
+              { offset: 0.25, color: "rgba(234,179,8,0.10)" },
+              { offset: 1, color: "rgba(16,185,129,0.20)" },
+            ],
+          },
+        },
+      },
+    ],
+  };
 });
 
+/* ── Lifecycle ── */
 onMounted(() => {
   loadStatus();
   statusTimer = setInterval(loadStatus, 30_000);
   pingApi();
   apiTimer = setInterval(pingApi, 10_000);
-
-  const el = chartCanvas.value;
-  if (el?.parentElement) {
-    resizeObs = new ResizeObserver(() => {
-      cancelAnimationFrame(drawRaf);
-      drawRaf = requestAnimationFrame(drawChart);
-    });
-    resizeObs.observe(el.parentElement);
-  }
 });
 
 onUnmounted(() => {
-  cancelAnimationFrame(drawRaf);
   if (statusTimer) clearInterval(statusTimer);
   if (apiTimer) clearInterval(apiTimer);
-  resizeObs?.disconnect();
 });
 </script>
 
@@ -411,12 +357,11 @@ onUnmounted(() => {
             <span class="text-muted-foreground text-sm">实时</span>
           </div>
         </div>
-        <div>
-          <canvas ref="chartCanvas" />
+        <div v-if="latencyHistory.length > 1" class="h-[220px]">
+          <v-chart :option="chartOption" autoresize />
         </div>
-        <div class="text-muted-foreground mt-3 flex justify-between text-xs">
-          <span>60 s 前</span>
-          <span>现在</span>
+        <div v-else class="flex h-[220px] items-center justify-center">
+          <p class="text-muted-foreground text-sm">等待数据…</p>
         </div>
       </div>
 
