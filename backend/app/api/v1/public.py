@@ -9,17 +9,23 @@ This module provides public endpoints that do not require authentication:
 
 from __future__ import annotations
 
+import time
+
+import psutil
 from fastapi import APIRouter, Body, Depends, File, Request, UploadFile
 from fastapi.responses import JSONResponse, PlainTextResponse
 from redis.asyncio import Redis as AsyncRedis
+from sqlalchemy import text
 from starlette import status
 from starlette.responses import StreamingResponse
 
 from app.api.des.auth import manager
+from app.api.des.db import get_async_session
 from app.api.des.des import public_service_dep
 from app.api.des.limiter import limiter
 from app.api.des.redis import get_redis
 from app.core.config import get_settings
+from app.core.startup import SERVER_START_TIME
 from app.models.models import User
 from app.schemas.aiagent import WeatherAnalysisInput
 from app.schemas.gallery import GalleryInput
@@ -56,6 +62,46 @@ async def get_api_status(
     # Cache for 60 seconds
 
     return response
+
+
+@router.get("/status-detail")
+async def get_status_detail() -> JSONResponse:
+    """Public status detail endpoint for the status page.
+
+    Returns API health, database connectivity, and server metrics.
+    No authentication required.
+    """
+    import asyncio
+
+    # API is healthy if we reach here
+    api_ok = True
+
+    # Database health check
+    db_ok = True
+    try:
+        async with get_async_session() as session:
+            await asyncio.wait_for(
+                session.execute(text("SELECT 1")),
+                timeout=3.0,
+            )
+    except Exception:
+        db_ok = False
+
+    # Lightweight server metrics (non-blocking)
+    mem = psutil.virtual_memory()
+
+    uptime = int(time.time() - SERVER_START_TIME)
+
+    return APIResponse.ok(
+        data={
+            "api_ok": api_ok,
+            "db_ok": db_ok,
+            "cpu_percent": psutil.cpu_percent(interval=None),
+            "mem_usage": round(mem.percent, 1),
+            "uptime": uptime,
+        },
+        message="Status detail retrieved successfully",
+    )
 
 
 @router.get("/robots.txt", response_class=PlainTextResponse)
