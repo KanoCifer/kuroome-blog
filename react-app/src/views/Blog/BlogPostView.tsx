@@ -7,7 +7,7 @@ import { useNotificationStore } from '@/stores/notificationState';
 import { formatDate } from '@/utils/formatdate';
 import { AnimatePresence, motion } from 'framer-motion';
 import hljs from 'highlight.js/lib/common';
-import 'highlight.js/styles/github-dark.css';
+import 'highlight.js/styles/github.css';
 import { marked } from 'marked';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';

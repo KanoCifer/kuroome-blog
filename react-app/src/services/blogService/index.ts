@@ -8,6 +8,7 @@ export interface BlogListItem {
   _id: string;
   title: string;
   body: string;
+  summary: string;
   category: { id: number; name: string } | null;
   is_pinned: boolean;
   created_at: string;
@@ -94,6 +95,7 @@ export const blogService = (): BlogService => {
         _id: post._id,
         title: post.title,
         body: post.body,
+        summary: (post as BlogPost & { summary?: string }).summary || '',
         category: post.category,
         is_pinned:
           (post as BlogPost & { is_pinned?: boolean }).is_pinned || false,

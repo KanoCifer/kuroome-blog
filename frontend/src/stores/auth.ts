@@ -1,4 +1,4 @@
-import { createAuthGateway } from '@/auth/authGateway';
+import { createAuthGateway } from '@/api/authGateway';
 import { getAuthSideEffects } from '@/auth/sideEffects';
 import { tokenService } from '@/auth/tokenService';
 import { reconnectWs } from '@/plugins/visitorWs';

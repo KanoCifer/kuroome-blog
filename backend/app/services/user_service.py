@@ -383,9 +383,9 @@ class UserService:
 
         Returns (user, tokens, None) on success, (None, None, error_msg) on failure.
         """
-        origin = str(request.base_url)[
-            :-1
-        ]  # Remove trailing slash from base URL
+        # Use configured origin (the frontend domain), not request.base_url
+        # because the browser sends the page origin, not the API host
+        origin = settings.WEBAUTHN_ORIGIN
 
         # Parse challenge from clientDataJSON
         try:

@@ -67,9 +67,9 @@ function PostCard({ post, index }: PostCardProps) {
           />
 
           {/* Summary */}
-          {post.body && (
+          {post.summary && (
             <p className="text-foreground/60 line-clamp-3 text-sm leading-relaxed">
-              {post.body}
+              {post.summary}
             </p>
           )}
 
@@ -129,6 +129,7 @@ export default function BlogListView() {
               _id: post._id,
               title: post.title,
               body: post.body,
+              summary: post.summary || '',
               category: post.category,
               is_pinned: false,
               created_at: post.created_at,
@@ -207,7 +208,7 @@ export default function BlogListView() {
     <div className="bg-background min-h-dvh">
       {/* Header */}
       <div className="bg-surface sticky top-0 z-10 backdrop-blur-md">
-        <div className="px-5 pt-5 pb-2">
+        <div className="ml-12 px-5 pt-5 pb-2">
           <h1 className="text-foreground text-2xl font-bold">博客</h1>
           <p className="text-muted-foreground mt-1 text-sm">
             分享阅读心得、技术思考

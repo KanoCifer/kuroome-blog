@@ -343,7 +343,9 @@ async def passkey_register(
     user_service: UserService = Depends(user_service_dep),
     redis: AsyncRedis = Depends(get_redis),
 ):
-    origin = str(request.base_url).rstrip("/")
+    # Use configured origin (the frontend domain), not request.base_url
+    # because the browser sends the page origin, not the API host
+    origin = settings.WEBAUTHN_ORIGIN
     error = await user_service.complete_passkey_registration(
         user, body.response, redis, origin
     )
