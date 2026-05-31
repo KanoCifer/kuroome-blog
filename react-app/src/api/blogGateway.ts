@@ -51,6 +51,7 @@ export interface blogGateway {
     body: string;
     is_pinned: number;
   }): Promise<AxiosResponse<{ _id: string }>>;
+  deleteLegacyPost(postId: string): Promise<AxiosResponse<void>>;
   getLegacyCategories(): Promise<AxiosResponse<Category[]>>;
 }
 
@@ -98,6 +99,12 @@ export const blogGateway = (): blogGateway => {
     async updateLegacyPost(payload) {
       return request.put('v1/admin/post/update', payload) as Promise<
         AxiosResponse<{ _id: string }>
+      >;
+    },
+
+    async deleteLegacyPost(postId: string) {
+      return request.delete(`v1/admin/post/${postId}/delete`) as Promise<
+        AxiosResponse<void>
       >;
     },
 

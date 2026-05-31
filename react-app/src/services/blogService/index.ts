@@ -64,6 +64,7 @@ export interface BlogService {
     body: string;
     is_pinned: number;
   }): Promise<{ _id: string }>;
+  deleteLegacyPost(postId: string): Promise<void>;
   getLegacyCategories(): Promise<CategoryItem[]>;
 }
 
@@ -158,6 +159,10 @@ export const blogService = (): BlogService => {
       return extractData(res as unknown as { data: ApiResponse<unknown> }) as {
         _id: string;
       };
+    },
+
+    async deleteLegacyPost(postId) {
+      await gateway.deleteLegacyPost(postId);
     },
 
     async getLegacyCategories() {

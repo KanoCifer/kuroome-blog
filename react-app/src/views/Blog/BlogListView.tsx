@@ -2,7 +2,6 @@ import type { BlogListItem, CategoryItem } from '@/services/blogService';
 import { blogService } from '@/services/blogService';
 import type { BlogPagination as BlogPaginationType } from '@/types';
 import { formatDate } from '@/utils/formatdate';
-import DOMPurify from 'dompurify';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -11,11 +10,6 @@ import { BlogErrorState } from './components/BlogErrorState';
 import { BlogLoadingSkeleton } from './components/BlogLoadingSkeleton';
 import { BlogPagination } from './components/BlogPagination';
 import { CategorySidebar } from './components/CategorySidebar';
-
-function getPreviewHtml(html: string): string {
-  if (!html) return '';
-  return DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
-}
 
 interface PostCardProps {
   post: BlogListItem;
@@ -27,13 +21,13 @@ function PostCard({ post, index }: PostCardProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      whileHover={{ scale: 1.01 }}
-      whileTap={{ scale: 0.99 }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ type: 'spring', duration: 0.5, delay: index * 0.06 }}
     >
       <Link to={`/blog/${post._id}`} className="group block">
-        <article className="border-border/40 bg-card group-hover:border-primary/25 relative overflow-hidden rounded-2xl border p-5 shadow-sm transition-all duration-500 ease-out group-hover:-translate-y-1 group-hover:shadow-md">
+        <article className="border-border/40 bg-card group-hover:border-primary/25 relative overflow-hidden rounded-3xl border p-6 shadow-sm transition-all duration-500 ease-out group-hover:-translate-y-1.5 group-hover:shadow-md">
           {/* Left spine accent */}
           <div
             className="bg-primary absolute top-0 left-0 h-full w-1 origin-top scale-y-0 rounded-r-full transition-transform duration-500 ease-out group-hover:scale-y-100"
@@ -42,7 +36,7 @@ function PostCard({ post, index }: PostCardProps) {
 
           {/* Pinned badge */}
           {post.is_pinned && (
-            <div className="mb-3">
+            <div className="mb-4">
               <span className="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -51,7 +45,7 @@ function PostCard({ post, index }: PostCardProps) {
                   fill="currentColor"
                   aria-hidden="true"
                 >
-                  <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                  <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                 </svg>
                 置顶
               </span>
@@ -60,7 +54,7 @@ function PostCard({ post, index }: PostCardProps) {
 
           {/* Title */}
           <h2
-            className="text-primary group-hover:bg-primary/10 w-fit font-serif text-xl leading-snug transition-all duration-300 ease-out group-hover:-translate-y-0.5 group-hover:rounded-lg group-hover:px-2 group-hover:shadow-sm"
+            className="text-primary group-hover:text-primary group-hover:bg-primary/30 w-fit rounded-full px-3 py-2 font-serif text-2xl leading-snug transition-all duration-300 ease-out group-hover:-translate-y-1 group-hover:shadow-sm"
             style={{ textWrap: 'balance' }}
           >
             {post.title}
@@ -68,18 +62,19 @@ function PostCard({ post, index }: PostCardProps) {
 
           {/* Decorative divider */}
           <div
-            className="bg-border group-hover:bg-primary/15 my-3 h-1 w-16 transition-all duration-500 ease-out group-hover:w-full"
+            className="bg-border group-hover:bg-primary/15 my-4 h-1 w-16 transition-all duration-500 ease-out group-hover:w-full"
             aria-hidden="true"
           />
 
           {/* Summary */}
-          <div
-            className="text-foreground/60 line-clamp-3 text-sm leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: getPreviewHtml(post.body) }}
-          />
+          {post.body && (
+            <p className="text-foreground/60 line-clamp-3 text-sm leading-relaxed">
+              {post.body}
+            </p>
+          )}
 
           {/* Footer meta */}
-          <footer className="text-muted-foreground mt-4 flex items-center gap-2 text-xs">
+          <footer className="text-muted-foreground mt-5 flex items-center gap-2 text-xs">
             <time>{formatDate(post.created_at)}</time>
             {post.category && (
               <span className="flex items-center gap-2">
@@ -89,25 +84,6 @@ function PostCard({ post, index }: PostCardProps) {
                 # {post.category.name}
               </span>
             )}
-            <span className="flex items-center gap-1">
-              <span aria-hidden="true" className="text-border/60">
-                ·
-              </span>
-              <svg
-                className="h-3 w-3"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                />
-              </svg>
-              {post.comment_count}
-            </span>
           </footer>
         </article>
       </Link>
@@ -231,7 +207,7 @@ export default function BlogListView() {
     <div className="bg-background min-h-dvh">
       {/* Header */}
       <div className="bg-surface sticky top-0 z-10 backdrop-blur-md">
-        <div className="ml-12 max-w-2xl px-4 py-4">
+        <div className="px-5 pt-5 pb-2">
           <h1 className="text-foreground text-2xl font-bold">博客</h1>
           <p className="text-muted-foreground mt-1 text-sm">
             分享阅读心得、技术思考
@@ -240,7 +216,7 @@ export default function BlogListView() {
       </div>
 
       {/* Search */}
-      <div className="mx-auto max-w-2xl px-4 py-3">
+      <div className="px-5 pt-4 pb-2">
         <div className="relative">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
             <svg
@@ -262,7 +238,7 @@ export default function BlogListView() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            placeholder="搜索文章..."
+            placeholder="搜索文章标题和内容..."
             className="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 block w-full rounded-xl border py-3 pr-4 pl-10 text-sm focus:ring-2 focus:outline-none"
           />
           {searchQuery && (
@@ -289,7 +265,7 @@ export default function BlogListView() {
       </div>
 
       {/* Categories */}
-      <div className="mx-auto max-w-2xl px-4 pb-3">
+      <div className="px-5 pb-4">
         <CategorySidebar
           categories={categories.map((c) => ({
             id: c.id,
@@ -308,7 +284,7 @@ export default function BlogListView() {
       </div>
 
       {/* Content */}
-      <div ref={listRef} className="mx-auto max-w-2xl px-4 pb-8">
+      <div ref={listRef} className="px-5 pb-10">
         <AnimatePresence mode="wait">
           {isLoading ? (
             <BlogLoadingSkeleton key="loading" />
