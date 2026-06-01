@@ -450,8 +450,8 @@ onMounted(async () => {
   try {
     const response = await socialService.getLikes();
     likesCount.value = response.likes_count || 0;
-  } catch (error) {
-    console.error('Failed to fetch likes count:', error);
+  } catch {
+    notifier.error('获取点赞数失败，请稍后重试');
   }
 });
 

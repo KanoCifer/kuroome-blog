@@ -63,7 +63,7 @@
       <div class="mt-12 text-center">
         <button
           @click="onBack === undefined ? $router.back() : onBack()"
-          class="bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90 mb-12 inline-flex cursor-pointer items-center gap-2 rounded-full px-6 py-3 font-medium transition-all duration-300 hover:shadow-lg"
+          class="bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90 mb-12 inline-flex cursor-pointer items-center gap-2 rounded-full px-6 py-3 font-medium shadow-md transition-all duration-300 hover:scale-105 hover:shadow-lg"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

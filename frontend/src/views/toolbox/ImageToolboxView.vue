@@ -26,11 +26,29 @@
                   >
                     最大宽度限制
                   </label>
-                  <input
-                    v-model="enableMaxWidth"
-                    type="checkbox"
-                    class="text-foreground focus:ring-foreground border-border bg-card h-4 w-4 rounded"
-                  />
+                  <button
+                    id="max-width-toggle"
+                    type="button"
+                    role="switch"
+                    :aria-checked="enableMaxWidth"
+                    :aria-label="'最大宽度限制'"
+                    :class="['switch', enableMaxWidth ? 'switch--on' : 'switch--off']"
+                    @click="enableMaxWidth = !enableMaxWidth"
+                  >
+                    <svg
+                      v-if="enableMaxWidth"
+                      aria-hidden="true"
+                      class="switch__icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </button>
                 </div>
                 <div class="relative">
                   <input
@@ -101,13 +119,38 @@
                 </div>
               </div>
 
+              <!-- 导出文件名 -->
+              <div v-if="originalFile" class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <label
+                    for="file-name"
+                    class="text-foreground text-sm font-semibold"
+                  >
+                    导出文件名
+                  </label>
+                  <span
+                    class="text-muted-foreground font-mono text-[10px] font-medium tracking-wider uppercase"
+                  >
+                    扩展名: {{ outputTypeLabel }}
+                  </span>
+                </div>
+                <input
+                  id="file-name"
+                  v-model="customFileName"
+                  type="text"
+                  spellcheck="false"
+                  placeholder="留空则使用原文件名"
+                  class="text-foreground placeholder:text-muted-foreground focus:border-foreground border-border bg-card w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
+                />
+              </div>
+
               <!-- 操作按钮 -->
               <div class="grid grid-cols-1 gap-3 pt-4">
                 <button
                   type="button"
                   :disabled="!originalFile || processing"
                   class="bg-foreground text-background hover:bg-foreground/90 group relative overflow-hidden rounded-xl py-3 text-sm font-bold transition-all"
-                  @click="handleProcess"
+                  @click="process"
                 >
                   <span
                     v-if="processing"
@@ -137,8 +180,8 @@
                 <button
                   type="button"
                   :disabled="!processedBlob"
-                  class="text-foreground hover:bg-accent border-border bg-card flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium transition-all disabled:opacity-50"
-                  @click="downloadProcessedImage"
+                  class="text-foreground hover:bg-accent border-border bg-card flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium shadow-md transition-all hover:scale-105 hover:shadow-lg disabled:opacity-50"
+                  @click="download"
                 >
                   <svg
                     class="h-4 w-4"
@@ -181,7 +224,7 @@
                       ? 'bg-card border-transparent shadow-sm'
                       : 'border-border bg-card hover:border-muted-foreground'
                 "
-                @click="openFilePicker"
+                @click="triggerFilePicker"
               >
                 <!-- 动态背景装饰 -->
                 <div
@@ -245,7 +288,7 @@
                     <button
                       type="button"
                       class="text-foreground bg-card ring-border hover:bg-accent rounded-full px-4 py-1.5 text-xs font-bold shadow-sm ring-1 transition-all"
-                      @click.stop="openFilePicker"
+                      @click.stop="triggerFilePicker"
                     >
                       更换图片
                     </button>
@@ -468,46 +511,53 @@
 <script setup lang="ts">
 import { BasicDetail } from '@/components/basic';
 import { Slider } from '@/components/ui/slider';
-import { formatBytes, getFileExtension, processImage } from '@/utils/handlePic';
+import { useImageProcessor } from '@/composables/useImageProcessor';
+import { usePreviewDialog } from '@/composables/usePreviewDialog';
+import { formatBytes } from '@/utils/handlePic';
 import { useDropZone } from '@vueuse/core';
-import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
+import { computed, useTemplateRef } from 'vue';
 
-interface OutputTypeOption {
-  label: string;
-  value: string;
-}
-const fileInputRef = ref<HTMLInputElement | null>(null);
 const dropZoneRef = useTemplateRef('dropZoneRef');
-const originalFile = ref<File | null>(null);
-const processedBlob = ref<Blob | null>(null);
-const originalPreviewUrl = ref<string>('');
-const processedPreviewUrl = ref<string>('');
-const originalPreviewZoom = ref<number>(1);
-const processedPreviewZoom = ref<number>(1);
-const isPreviewDialogOpen = ref<boolean>(false);
-const previewDialogUrl = ref<string>('');
-const previewDialogAlt = ref<string>('');
-const processing = ref<boolean>(false);
-const errorMessage = ref<string>('');
 
-const maxWidth = ref<number>(1600);
-const enableMaxWidth = ref<boolean>(true);
-const quality = ref<number>(0.8);
-const outputType = ref<string>('image/webp');
+const {
+  fileInputRef,
+  originalFile,
+  processedBlob,
+  originalPreviewUrl,
+  processedPreviewUrl,
+  originalPreviewZoom,
+  processedPreviewZoom,
+  processing,
+  errorMessage,
+  customFileName,
+  maxWidth,
+  enableMaxWidth,
+  quality,
+  qualityArray,
+  outputType,
+  outputTypes,
+  compressionRatio,
+  handleFileChange,
+  selectFile,
+  process,
+  download,
+  triggerFilePicker,
+  resetAll,
+} = useImageProcessor();
 
-const outputTypes: OutputTypeOption[] = [
-  { label: 'WebP', value: 'image/webp' },
-  { label: 'JPEG', value: 'image/jpeg' },
-  { label: 'PNG', value: 'image/png' },
-];
+const outputTypeLabel = computed(
+  () =>
+    outputTypes.find((option) => option.value === outputType.value)?.label ??
+    '',
+);
 
-// Slider 组件 v-model 需要数组格式，这里做个转换
-const qualityArray = computed({
-  get: () => [quality.value],
-  set: (val: number[]) => {
-    quality.value = val[0];
-  },
-});
+const {
+  isOpen: isPreviewDialogOpen,
+  url: previewDialogUrl,
+  alt: previewDialogAlt,
+  open: openPreview,
+  close: closePreviewDialog,
+} = usePreviewDialog();
 
 // 拖放上传：把 drop zone 结果统一交给文件处理函数，避免逻辑分叉
 const { isOverDropZone } = useDropZone(dropZoneRef, {
@@ -515,10 +565,9 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
     if (!files?.length) {
       return;
     }
-
     const firstImage = files.find((file) => file.type.startsWith('image/'));
     if (firstImage) {
-      handleSelectedFile(firstImage);
+      selectFile(firstImage);
     }
   },
   multiple: false,
@@ -530,187 +579,69 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
     'image/avif',
   ],
 });
-
-const compressionRatio = computed(() => {
-  if (!originalFile.value || !processedBlob.value) {
-    return '-';
-  }
-
-  const ratio =
-    ((originalFile.value.size - processedBlob.value.size) /
-      originalFile.value.size) *
-    100;
-  return `${ratio.toFixed(1)}%`;
-});
-
-function revokePreviewUrl(url: string) {
-  if (!url) {
-    return;
-  }
-  URL.revokeObjectURL(url);
-}
-
-function resetProcessedState() {
-  revokePreviewUrl(processedPreviewUrl.value);
-  processedPreviewUrl.value = '';
-  processedBlob.value = null;
-  processedPreviewZoom.value = 1;
-}
-
-function openFilePicker() {
-  fileInputRef.value?.click();
-}
-
-// 弹层预览控制：只负责显示/关闭，不直接改动图片数据
-function openPreview(url: string, alt: string) {
-  if (!url) {
-    return;
-  }
-
-  previewDialogUrl.value = url;
-  previewDialogAlt.value = alt;
-  isPreviewDialogOpen.value = true;
-}
-
-function closePreviewDialog() {
-  isPreviewDialogOpen.value = false;
-  previewDialogUrl.value = '';
-  previewDialogAlt.value = '';
-}
-
-function handlePreviewKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape') {
-    closePreviewDialog();
-  }
-}
-
-// 统一处理点击选择和拖放上传
-function handleSelectedFile(selectedFile: File) {
-  errorMessage.value = '';
-
-  if (!selectedFile.type.startsWith('image/')) {
-    errorMessage.value = '请选择有效的图片文件。';
-    return;
-  }
-
-  originalFile.value = selectedFile;
-  resetProcessedState();
-  originalPreviewZoom.value = 1;
-
-  // 释放之前的预览 URL，避免内存泄漏
-  revokePreviewUrl(originalPreviewUrl.value);
-  originalPreviewUrl.value = URL.createObjectURL(selectedFile);
-}
-
-function handleFileChange(event: Event) {
-  const input = event.target as HTMLInputElement;
-  const selectedFile = input.files?.[0];
-
-  if (!selectedFile) {
-    return;
-  }
-
-  handleSelectedFile(selectedFile);
-}
-
-async function handleProcess() {
-  if (!originalFile.value) {
-    errorMessage.value = '请先选择图片文件。';
-    return;
-  }
-
-  errorMessage.value = '';
-  processing.value = true;
-
-  try {
-    const normalizedQuality = Math.min(Math.max(quality.value, 0.3), 1);
-    const resultBlob = await processImage(originalFile.value, {
-      maxWidth: enableMaxWidth.value ? maxWidth.value : undefined,
-      quality: normalizedQuality,
-      type: outputType.value,
-    });
-
-    resetProcessedState();
-    processedBlob.value = resultBlob;
-    processedPreviewUrl.value = URL.createObjectURL(resultBlob);
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      errorMessage.value = error.message;
-    } else {
-      errorMessage.value = '图片处理失败，请稍后重试。';
-    }
-  } finally {
-    processing.value = false;
-  }
-}
-
-function getOutputExtension(mimeType: string) {
-  switch (mimeType) {
-    case 'image/jpeg':
-      return '.jpg';
-    case 'image/png':
-      return '.png';
-    case 'image/webp':
-      return '.webp';
-    default:
-      return '.img';
-  }
-}
-
-function downloadProcessedImage() {
-  if (!processedBlob.value || !originalFile.value) {
-    return;
-  }
-
-  const originalExtension = getFileExtension(originalFile.value.name);
-  const outputExtension = getOutputExtension(outputType.value);
-  const baseName = originalFile.value.name.replace(originalExtension, '');
-  const downloadName = `${baseName}-processed${outputExtension}`;
-  const url = URL.createObjectURL(processedBlob.value);
-
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = downloadName;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-  }, 0);
-}
-
-function resetAll() {
-  errorMessage.value = '';
-  processing.value = false;
-
-  originalFile.value = null;
-  resetProcessedState();
-
-  revokePreviewUrl(originalPreviewUrl.value);
-  originalPreviewUrl.value = '';
-  originalPreviewZoom.value = 1;
-
-  maxWidth.value = 1600;
-  enableMaxWidth.value = true;
-  quality.value = 0.8;
-  outputType.value = 'image/webp';
-
-  if (fileInputRef.value) {
-    fileInputRef.value.value = '';
-  }
-}
-
-onUnmounted(() => {
-  // 组件卸载前清理对象 URL 和全局键盘监听，避免内存泄漏
-  revokePreviewUrl(originalPreviewUrl.value);
-  revokePreviewUrl(processedPreviewUrl.value);
-  closePreviewDialog();
-  window.removeEventListener('keydown', handlePreviewKeydown);
-});
-
-onMounted(() => {
-  // 支持 Esc 关闭大图弹层
-  window.addEventListener('keydown', handlePreviewKeydown);
-});
 </script>
+
+<style scoped>
+.switch {
+  position: relative;
+  display: inline-flex;
+  height: 1.5rem; /* 24px (h-6) */
+  width: 2.75rem; /* 44px (w-11) */
+  flex-shrink: 0;
+  cursor: pointer;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1px solid;
+  transition:
+    background-color 200ms ease-out,
+    border-color 200ms ease-out;
+}
+
+.switch--off {
+  background-color: var(--color-input);
+  border-color: var(--color-input);
+}
+
+.switch--on {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* 拇指用 ::after 伪元素实现，left 在 0.25rem / 1.5rem 之间切换 */
+.switch::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0.25rem; /* off: left-1 */
+  width: 1rem; /* 16px (w-4) */
+  height: 1rem;
+  border-radius: 9999px;
+  background-color: var(--color-background);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
+  transform: translateY(-50%);
+  transition: left 200ms ease-out;
+}
+
+.switch--on::after {
+  left: 1.5rem; /* on: left-6 */
+}
+
+.switch__icon {
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  right: 0.625rem; /* 对齐 on 状态拇指中心 (32px from left = 12px from right) */
+  width: 0.625rem; /* 10px (h-2.5) */
+  height: 0.625rem;
+  color: var(--color-primary-foreground);
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.switch:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--color-card),
+    0 0 0 4px var(--color-ring);
+}
+</style>

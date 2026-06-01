@@ -154,26 +154,38 @@ watch(sentinelRef, () => initObserver());
         : 'grid min-h-dvh grid-rows-[auto_1fr_auto]'
     "
   >
-    <!-- 背景图：img + filter:blur + will-change -->
-    <Transition
-      enter-active-class="transition-opacity duration-500 ease-in-out"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="transition-opacity duration-500 ease-in-out"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
+    <!-- 背景层：img 只做位图，模糊/亮度通过独立蒙版层处理，避免 filter 翻倍占用 -->
+    <div
+      class="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+      aria-hidden="true"
     >
-      <img
-        :key="bgStore.backgroundUrl"
-        :src="bgStore.backgroundUrl"
-        class="pointer-events-none fixed inset-0 -z-10 h-full w-full transform-gpu object-cover"
+      <Transition
+        enter-active-class="transition-opacity duration-500 ease-in-out"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-opacity duration-500 ease-in-out"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <img
+          :key="bgStore.backgroundUrl"
+          :src="bgStore.backgroundUrl"
+          decoding="async"
+          class="absolute inset-0 h-full w-full transform-gpu object-cover"
+          :style="{ transform: `scale(${themeStore.bgScale})` }"
+        />
+      </Transition>
+
+      <!-- 模糊 + 亮度蒙版层：用 backdrop-filter 作用在下方 img 上，避免 filter 在 img 自身上翻倍占用 GPU 纹理 -->
+      <div
+        v-if="themeStore.bgBlur > 0 || themeStore.bgBrightness !== 1"
+        class="pointer-events-none absolute inset-0"
         :style="{
-          filter: `blur(${themeStore.bgBlur}px) brightness(${themeStore.bgBrightness})`,
-          transform: `scale(${themeStore.bgScale})`,
-          willChange: themeStore.bgBlur > 0 ? 'filter' : 'auto',
+          backdropFilter: `blur(${themeStore.bgBlur}px) brightness(${themeStore.bgBrightness})`,
+          WebkitBackdropFilter: `blur(${themeStore.bgBlur}px) brightness(${themeStore.bgBrightness})`,
         }"
-      />
-    </Transition>
+      ></div>
+    </div>
     <header>
       <div class="mx-auto">
         <Teleport to="body">
