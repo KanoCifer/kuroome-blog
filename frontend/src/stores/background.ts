@@ -4,7 +4,7 @@ import { defineStore } from 'pinia';
 export type BackgroundMode = 'fixed' | 'random';
 
 const BACKGROUND_IMAGES = Array.from(
-  { length: 10 },
+  { length: 15 },
   (_, i) => `/background/bg-${i + 1}.webp`,
 );
 
