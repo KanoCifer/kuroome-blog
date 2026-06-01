@@ -1,7 +1,7 @@
 <template>
   <motion.div>
     <nav
-      class="squircle bg-card/65 z-9999 flex items-center gap-2 px-1 py-2 shadow-lg backdrop-blur-sm"
+      class="squircle bg-card/65 dark:shadow-primary/20 z-9999 flex items-center gap-2 px-1 py-2 shadow-md backdrop-blur-sm"
     >
       <ul class="flex items-center gap-2 font-medium">
         <!-- Avatar -->

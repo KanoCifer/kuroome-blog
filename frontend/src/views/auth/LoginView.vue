@@ -2,16 +2,20 @@
 import IconCloud from '@/components/icons/IconCloud.vue';
 import IconKey from '@/components/icons/IconKey.vue';
 import IconLock from '@/components/icons/IconLock.vue';
-import { useAuthStore } from '@/stores/auth';
 import type { LoginForm } from '@/types';
-import { startAuthentication } from '@simplewebauthn/browser';
 import { ShieldUser } from 'lucide-vue-next';
 import { ref } from 'vue';
-import { RouterLink, useRoute, useRouter } from 'vue-router';
+import { RouterLink } from 'vue-router';
+import { useAuthenticate } from '@/composables/useAuthenticate';
 
-const router = useRouter();
-const route = useRoute();
-const auth = useAuthStore();
+const {
+  errors,
+  isSubmitting,
+  isPasskeySubmitting,
+  handleSubmit,
+  handlePasskeyLogin,
+  handleGitHubLogin,
+} = useAuthenticate();
 
 const form = ref<LoginForm>({
   username: '',
@@ -19,203 +23,182 @@ const form = ref<LoginForm>({
   rememberMe: false,
 });
 
-const errors = ref<{
-  username?: string;
-  password?: string;
-  passkey?: string;
-}>({});
-
-const isSubmitting = ref(false);
-const isPasskeySubmitting = ref(false);
-const showPassword = ref(false);
-
-// 处理登录表单提交
-const handleSubmit = async () => {
-  errors.value = {};
-  isSubmitting.value = true;
-
-  if (!form.value.username) {
-    errors.value.username = '用户名不能为空';
-  }
-  if (!form.value.password) {
-    errors.value.password = '密码不能为空';
-  }
-  if (errors.value.username || errors.value.password) {
-    isSubmitting.value = false;
-    return;
-  }
-
-  try {
-    await auth.login(
-      form.value.username,
-      form.value.password,
-      form.value.rememberMe,
-    );
-    const redirect = (route.query.redirect as string) || '/';
-    router.push(redirect);
-  } catch (err: unknown) {
-    // 后端返回的 APIResponse 在 request.ts 已转成 Error.message
-    if (err instanceof Error) {
-      // 把简单错误显示在 password 字段上（根据项目需要可更细化）
-      errors.value.password = '用户名或密码错误';
-    }
-  } finally {
-    isSubmitting.value = false;
-  }
-};
-
-// Passkey 登录
-const handlePasskeyLogin = async () => {
-  errors.value = {};
-  isPasskeySubmitting.value = true;
-
-  try {
-    // 获取认证选项
-    const options = await auth.getPasskeyAuthenticationOptions();
-
-    // 调用浏览器 Passkey 认证
-    const assertion = await startAuthentication({
-      optionsJSON: options,
-    });
-    await auth.loginWithPasskey(assertion);
-    const redirect = (route.query.redirect as string) || '/';
-    router.push(redirect);
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      errors.value.passkey = err.message;
-    }
-  } finally {
-    isPasskeySubmitting.value = false;
-  }
-};
-
-// GitHub 登录
-const handleGitHubLogin = () => {
-  // 直接跳转到后端 GitHub 授权接口，后端会处理后续流程
-  auth.loginWithGitHub();
-};
+const showPassword = ref<boolean>(false);
 </script>
 
 <template>
-  <div>
-    <div class="flex h-screen items-center">
-      <!-- 标题卡片 -->
-      <div
-        class="squircle bg-card mx-auto w-auto max-w-md px-12 py-14 shadow-2xl"
-      >
-        <!-- Hero Section -->
-        <div class="mb-8 flex flex-col items-center justify-center">
+  <div class="bg-background flex min-h-screen">
+    <!-- 左侧 Branding (仅在大屏幕显示) -->
+    <div
+      class="relative hidden w-1/2 flex-col justify-between bg-zinc-950 p-10 text-white lg:flex"
+    >
+      <div class="flex items-center gap-2 text-xl font-bold tracking-tight">
+        <IconCloud class="text-primary size-8" />
+        <span>Kanocifer<span class="text-primary">.chat</span></span>
+      </div>
+      <div class="z-10 my-auto">
+        <div class="flex flex-col">
+          <h1 class="text-5xl font-extrabold tracking-tight xl:text-6xl">
+            Welcome back to <br />
+            the reading space.
+          </h1>
+          <p class="mt-6 max-w-md text-lg text-zinc-400">
+            Discover, organize, and immerse yourself in all the great books you
+            plan to read.
+          </p>
+        </div>
+      </div>
+      <div class="z-10 font-serif text-sm text-zinc-500">Kuroome's Blog</div>
+    </div>
+
+    <!-- 右侧 Login Form -->
+    <div class="bg-card flex w-full items-center justify-center p-8 lg:w-1/2">
+      <div class="w-full max-w-sm xl:max-w-md">
+        <!-- 表头 -->
+        <div class="mb-8 flex flex-col items-center lg:items-start">
           <div
-            class="bg-primary text-primary-foreground mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)]"
+            class="bg-primary text-primary-foreground mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)] lg:hidden"
           >
             <IconCloud class="size-8" />
           </div>
           <h2
-            class="font-headline text-foreground text-center text-[28px] font-extrabold tracking-tight"
+            class="font-headline text-foreground text-center text-3xl text-[28px] font-extrabold tracking-tight lg:text-left"
           >
-            Kanocifer<span class="text-primary">.chat</span>
+            Log in to your account
           </h2>
           <p
-            class="text-muted-foreground mt-1 text-center text-[15px] font-medium"
+            class="text-muted-foreground mt-2 text-center text-[15px] font-medium lg:text-left"
           >
-            Welcome back to the reading space.
+            Welcome back! Please enter your details.
           </p>
         </div>
+
         <!-- 登录表单 -->
-        <form @submit.prevent="handleSubmit">
+        <form @submit.prevent="handleSubmit(form)" class="w-full">
           <!-- 用户名 -->
-          <div
-            class="relative transition-transform duration-200 focus-within:scale-[1.01]"
-          >
-            <div
-              class="text-muted-foreground/60 pointer-events-none absolute top-6 left-0 flex items-center pl-4"
-            >
-              <ShieldUser class="size-6 focus-within:scale-101" />
+          <div>
+            <div class="relative my-4">
+              <div
+                class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
+              >
+                <ShieldUser class="size-6" />
+              </div>
+              <input
+                v-model="form.username"
+                type="text"
+                autocomplete="off"
+                placeholder="username"
+                class="form-control border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+                :class="{
+                  'border-destructive focus:border-destructive focus:ring-destructive/30':
+                    errors.username,
+                }"
+              />
             </div>
-            <input
-              v-model="form.username"
-              type="text"
-              autocomplete="off"
-              placeholder="用户名"
-              class="form-control border-border bg-muted text-foreground focus:border-primary focus:ring-primary/30 my-4 w-full rounded-xl py-2 pr-4 pl-11 transition-transform focus:scale-[1.01] focus:ring-2 focus:outline-none"
-            />
             <span
               v-if="errors.username"
-              class="text-destructive mt-1 block text-sm"
-              >{{ errors.username }}</span
+              class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
             >
-          </div>
-
-          <!-- 密码 -->
-          <div
-            class="relative mt-4 transition-transform duration-200 focus-within:scale-[1.01]"
-          >
-            <div
-              class="text-muted-foreground/60 pointer-events-none absolute top-2.5 left-0 flex items-center pl-4"
-            >
-              <IconLock class="size-6" />
-            </div>
-            <input
-              v-model="form.password"
-              :type="showPassword ? 'text' : 'password'"
-              autocomplete="off"
-              placeholder="密码"
-              class="form-control border-border bg-muted text-foreground focus:border-primary focus:ring-primary/30 mb-6 w-full rounded-xl py-2 pr-12 pl-11 transition-transform focus:scale-[1.01] focus:ring-2 focus:outline-none"
-            />
-
-            <!-- 显示/隐藏密码按钮 -->
-            <button
-              type="button"
-              @click="showPassword = !showPassword"
-              :aria-label="showPassword ? '隐藏密码' : '显示密码'"
-              class="text-muted-foreground hover:text-foreground absolute top-5.5 right-4 flex h-4 w-4 -translate-y-1/2 items-center justify-center rounded-md focus:scale-[1.01]"
-            >
-              <!-- eye (显示) -->
               <svg
-                v-if="showPassword"
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5"
+                class="size-4 shrink-0"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
               >
-                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
-                <circle cx="12" cy="12" r="3" />
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
               </svg>
+              {{ errors.username }}
+            </span>
+          </div>
 
-              <!-- eye-off (隐藏) -->
-              <svg
-                v-else
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="size-6"
+          <!-- 密码 -->
+          <div>
+            <div class="relative my-4">
+              <div
+                class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
               >
-                <path
+                <IconLock class="size-6" />
+              </div>
+              <input
+                v-model="form.password"
+                :type="showPassword ? 'text' : 'password'"
+                autocomplete="off"
+                placeholder="password"
+                class="form-control border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-12 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+                :class="{
+                  'border-destructive focus:border-destructive focus:ring-destructive/30':
+                    errors.password,
+                }"
+              />
+
+              <!-- 显示/隐藏密码按钮 -->
+              <button
+                type="button"
+                @click="showPassword = !showPassword"
+                :aria-label="showPassword ? '隐藏密码' : '显示密码'"
+                class="text-muted-foreground hover:text-foreground absolute top-1/2 right-4 z-10 flex -translate-y-1/2 items-center justify-center rounded-md"
+              >
+                <!-- eye (显示) -->
+                <svg
+                  v-if="showPassword"
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"
-                />
-              </svg>
-            </button>
+                >
+                  <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
 
+                <!-- eye-off (隐藏) -->
+                <svg
+                  v-else
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="size-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"
+                  />
+                </svg>
+              </button>
+            </div>
             <span
               v-if="errors.password"
-              class="text-destructive mt-1 block text-sm"
-              >{{ errors.password }}</span
+              class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
             >
+              <svg
+                class="size-4 shrink-0"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              {{ errors.password }}
+            </span>
           </div>
 
           <!-- 提交按钮和记住我 -->
           <div class="mt-6 flex items-center justify-between">
             <button
               type="submit"
-              class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-primary/30 inline-flex w-28 cursor-pointer items-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
+              class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-primary/30 inline-flex w-32 cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
               :disabled="isSubmitting"
             >
               <!-- SVG 加载动画 -->
@@ -261,8 +244,19 @@ const handleGitHubLogin = () => {
             </label>
           </div>
 
+          <div class="relative mt-8">
+            <div class="absolute inset-0 flex items-center">
+              <span class="border-border w-full border-t"></span>
+            </div>
+            <div class="relative flex justify-center text-xs uppercase">
+              <span class="bg-card text-muted-foreground px-2">
+                Or continue with
+              </span>
+            </div>
+          </div>
+
           <!-- Passkey 登录按钮 -->
-          <div class="mt-6">
+          <div class="mt-8">
             <button
               type="button"
               @click="handlePasskeyLogin"
@@ -296,18 +290,29 @@ const handleGitHubLogin = () => {
             </button>
             <span
               v-if="errors.passkey"
-              class="text-destructive mt-1 block text-center text-sm"
+              class="text-destructive mt-2 flex items-center justify-center gap-1.5 text-center text-sm"
             >
+              <svg
+                class="size-4 shrink-0"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
               {{ errors.passkey }}
             </span>
           </div>
 
           <!-- GitHub 登录按钮 -->
-          <div class="mt-4">
+          <div class="mt-4 flex flex-col items-center">
             <button
               type="button"
               @click="handleGitHubLogin"
-              class="text-primary-foreground shadow-primary/30 hover:bg-accent focus:ring-primary inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-black px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
+              class="text-primary-foreground focus:ring-primary inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-black px-8 py-2.5 font-bold shadow-lg transition-colors hover:bg-black/90 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:text-white"
             >
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                 <path
@@ -318,17 +323,14 @@ const handleGitHubLogin = () => {
             </button>
           </div>
 
-          <p class="text-muted-foreground mt-8 text-center font-serif">
-            Kuroome's Blog
-          </p>
           <!-- 注册链接 -->
-          <div class="text-muted-foreground mb-4 text-center">
+          <div class="text-muted-foreground mt-8 text-center text-sm">
             Don't have an account?
             <RouterLink
               to="/register"
-              class="hover:text-primary underline transition duration-100"
+              class="hover:text-primary font-semibold underline transition duration-100"
             >
-              Register here.
+              Register here
             </RouterLink>
           </div>
         </form>

@@ -67,7 +67,7 @@ import { BookOpen } from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
 
 const { displayValue: displayCount, animateTo } = useAnimateNumber();
-const progressPercent = ref(68);
+const progressPercent = ref(1);
 const bookCovers = ['bg-red-400', 'bg-blue-400', 'bg-green-400'];
 
 onMounted(async () => {
@@ -75,7 +75,7 @@ onMounted(async () => {
     const response = await bookService.getBooks({ per_page: 100 });
     const books = response.data?.books || [];
     const readingBooks = books.filter((b: BookItem) => !b.iscompleted);
-    animateTo(readingBooks.length || 5);
+    animateTo(readingBooks.length || 10);
   } catch {
     console.warn('Failed to fetch reading books, using default count');
     animateTo(5);

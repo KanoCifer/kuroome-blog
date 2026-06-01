@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { connectionDelay, isConnected, sendPing } from "@/plugins/visitorWs";
-import { useVisitorCountStore } from "@/stores/visitorCount";
-import { fetchStatusDetail, type StatusDetailData } from "@/api/statusGateway";
-import { computed, onMounted, onUnmounted, ref, watchEffect } from "vue";
-import { motion } from "motion-v";
-import VChart from "vue-echarts";
+import { connectionDelay, isConnected, sendPing } from '@/plugins/visitorWs';
+import { useVisitorCountStore } from '@/stores/visitorCount';
+import { fetchStatusDetail, type StatusDetailData } from '@/api/statusGateway';
+import { computed, onMounted, onUnmounted, ref, watchEffect } from 'vue';
+import { motion } from 'motion-v';
+import VChart from 'vue-echarts';
 
 /* ── Stores ── */
 const visitorCount = useVisitorCountStore();
@@ -105,7 +105,7 @@ const overallStatus = computed<StatusInfo>(() => {
   return {
     label: '运行正常',
     dotClass: 'bg-emerald-500',
-    bgClass: 'bg-success/10',
+    bgClass: 'bg-success/20',
     textClass: 'text-success',
   };
 });
@@ -129,76 +129,81 @@ const chartOption = computed(() => {
   const xData = data.map((_, i) => `${i}s`);
 
   return {
-    backgroundColor: "transparent",
-    textStyle: { color: "#6b7280", fontSize: 12 },
+    backgroundColor: 'transparent',
+    textStyle: { color: '#6b7280', fontSize: 12 },
     grid: {
-      left: "6%",
-      right: "4%",
+      left: '6%',
+      right: '4%',
       top: 20,
       bottom: 30,
       containLabel: true,
     },
     tooltip: {
-      trigger: "axis",
-      backgroundColor: "rgba(255, 255, 255, 0.95)",
-      borderColor: "rgba(0, 0, 0, 0.05)",
+      trigger: 'axis',
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: 'rgba(0, 0, 0, 0.05)',
       borderWidth: 1,
       borderRadius: 12,
       padding: [12, 16],
-      textStyle: { color: "#1f2937", fontSize: 14 },
+      textStyle: { color: '#1f2937', fontSize: 14 },
       axisPointer: {
-        type: "line",
-        lineStyle: { color: "rgba(0,0,0,0.1)", type: "dashed" },
+        type: 'line',
+        lineStyle: { color: 'rgba(0,0,0,0.1)', type: 'dashed' },
       },
-      formatter: (params: { seriesName: string; value: number; axisValue: string }[]) => {
+      formatter: (
+        params: { seriesName: string; value: number; axisValue: string }[],
+      ) => {
         const p = params[0];
         return `<div style="font-size:13px;color:#6b7280">${p.axisValue}</div><div style="font-size:16px;font-weight:600;margin-top:4px">${p.value} ms</div>`;
       },
     },
     xAxis: {
-      type: "category",
+      type: 'category',
       boundaryGap: false,
       data: xData,
-      axisLine: { lineStyle: { color: "#e5e7eb", width: 1 } },
+      axisLine: { lineStyle: { color: '#e5e7eb', width: 1 } },
       axisTick: { show: false },
-      axisLabel: { color: "#9ca3af", fontSize: 11 },
+      axisLabel: { color: '#9ca3af', fontSize: 11 },
     },
     yAxis: {
-      type: "value",
+      type: 'value',
       max: 800,
       min: 0,
       interval: 200,
       axisLine: { show: false },
       axisTick: { show: false },
-      splitLine: { lineStyle: { color: "rgba(128,128,128,0.12)", type: "dashed" } },
-      axisLabel: { color: "#9ca3af", fontSize: 11, formatter: "{value}" },
+      splitLine: {
+        lineStyle: { color: 'rgba(128,128,128,0.12)', type: 'dashed' },
+      },
+      axisLabel: { color: '#9ca3af', fontSize: 11, formatter: '{value}' },
     },
     series: [
       {
-        name: "延迟",
-        type: "line",
+        name: '延迟',
+        type: 'line',
         data,
         smooth: 0.2,
-        symbol: "circle",
-        symbolSize: (value: number, params: { dataIndex: number }) => (params.dataIndex === data.length - 1 ? 8 : 0),
+        symbol: 'circle',
+        symbolSize: (value: number, params: { dataIndex: number }) =>
+          params.dataIndex === data.length - 1 ? 8 : 0,
         showSymbol: data.length > 0,
-        lineStyle: { width: 2, color: "rgba(16,185,129,0.7)" },
+        lineStyle: { width: 2, color: 'rgba(16,185,129,0.7)' },
         itemStyle: {
-          color: "rgba(16,185,129,0.9)",
-          borderColor: "#fff",
+          color: 'rgba(16,185,129,0.9)',
+          borderColor: '#fff',
           borderWidth: 2,
         },
         areaStyle: {
           color: {
-            type: "linear",
+            type: 'linear',
             x: 0,
             y: 0,
             x2: 0,
             y2: 1,
             colorStops: [
-              { offset: 0, color: "rgba(239,68,68,0.15)" },
-              { offset: 0.25, color: "rgba(234,179,8,0.10)" },
-              { offset: 1, color: "rgba(16,185,129,0.20)" },
+              { offset: 0, color: 'rgba(239,68,68,0.15)' },
+              { offset: 0.25, color: 'rgba(234,179,8,0.10)' },
+              { offset: 1, color: 'rgba(16,185,129,0.20)' },
             ],
           },
         },
@@ -211,7 +216,9 @@ const chartOption = computed(() => {
 onMounted(() => {
   loadStatus();
   statusTimer = setInterval(loadStatus, 30_000);
-  nowTimer = setInterval(() => { now.value = Date.now(); }, 1000);
+  nowTimer = setInterval(() => {
+    now.value = Date.now();
+  }, 1000);
   pingApi();
   apiTimer = setInterval(pingApi, 10_000);
   pingTimer = setInterval(sendPing, 1000);
@@ -265,7 +272,9 @@ onUnmounted(() => {
       <!-- Service cards -->
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <!-- API -->
-        <div class="border-border bg-card rounded-xl border p-5 shadow-md">
+        <div
+          class="border-border bg-card rounded-xl border p-5 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+        >
           <div class="mb-3 flex items-center gap-2">
             <span class="relative flex h-2 w-2">
               <span
@@ -288,7 +297,9 @@ onUnmounted(() => {
         </div>
 
         <!-- WebSocket -->
-        <div class="border-border bg-card rounded-xl border p-5 shadow-md">
+        <div
+          class="border-border bg-card rounded-xl border p-5 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+        >
           <div class="mb-3 flex items-center gap-2">
             <span class="relative flex h-2 w-2">
               <span
@@ -309,7 +320,9 @@ onUnmounted(() => {
         </div>
 
         <!-- Database -->
-        <div class="border-border bg-card rounded-xl border p-5 shadow-md">
+        <div
+          class="border-border bg-card rounded-xl border p-5 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+        >
           <div class="mb-3 flex items-center gap-2">
             <span class="relative flex h-2 w-2">
               <span
@@ -383,9 +396,7 @@ onUnmounted(() => {
           CPU {{ serverStatus.cpu_percent }}% · 内存
           {{ serverStatus.mem_usage }}%
         </span>
-        <span v-if="serverStatus">
-          运行 {{ formatUptime(uptime) }}
-        </span>
+        <span v-if="serverStatus"> 运行 {{ formatUptime(uptime) }} </span>
       </div>
     </motion.div>
   </div>
