@@ -316,16 +316,7 @@
 
     <!-- 评论区 -->
     <div class="col-span-full mx-auto w-full max-w-6xl">
-      <div
-        class="border-border bg-card overflow-hidden rounded-4xl border shadow-sm"
-      >
-        <div class="border-border border-b px-8 py-5">
-          <h3 class="text-foreground text-lg font-semibold">评论</h3>
-        </div>
-        <div class="p-8">
-          <div id="tcomment" />
-        </div>
-      </div>
+      <TwikooComments path="/friend-links" />
     </div>
   </BasicDetail>
 </template>
@@ -339,8 +330,7 @@ import websitesData from '@/data/websites.json';
 import { useNotificationStore } from '@/stores/notification';
 import type { Website } from '@/types';
 import { motion } from 'motion-v';
-import { nextTick, onMounted, ref } from 'vue';
-import twikoo from 'twikoo';
+import { onMounted, ref } from 'vue';
 import IconCopy from '@/components/icons/IconCopy.vue';
 import IconDocumentText from '@/components/icons/IconDocumentText.vue';
 import IconExternalLink from '@/components/icons/IconExternalLink.vue';
@@ -349,6 +339,7 @@ import IconInfoCircle from '@/components/icons/IconInfoCircle.vue';
 import IconLinkChain from '@/components/icons/IconLinkChain.vue';
 import IconRefresh from '@/components/icons/IconRefresh.vue';
 import IconUsersGroup from '@/components/icons/IconUsersGroup.vue';
+import TwikooComments from '@/components/blog/TwikooComments.vue';
 
 interface FriendLink {
   id: string;
@@ -394,14 +385,6 @@ onMounted(async () => {
   links.value = friendLinksData.links;
   selfInfo.value = friendLinksData.self as SelfInfo;
   refreshDailyPick();
-
-  await nextTick();
-  twikoo.init({
-    envId: 'https://kanocifer.chat/twikoo',
-    el: '#tcomment',
-    path: '/friend-links',
-    lang: 'zh-CN',
-  });
 });
 
 const { handleImageError } = useImageError();

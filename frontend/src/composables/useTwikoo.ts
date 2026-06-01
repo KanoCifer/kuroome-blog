@@ -7,7 +7,7 @@ interface TwikooOptions {
 }
 
 export function useTwikoo(options: TwikooOptions) {
-  twikoo.init({ ...options, envId: 'https://kanocifer.chat/twikoo' });
+  twikoo.init({ ...options, envId: 'https://api.kanocifer.chat/twikoo' });
 
   return twikoo;
 }
