@@ -74,4 +74,29 @@ request.interceptors.response.use(
   },
 );
 
+// 友好错误消息转换 — 在所有其他拦截器之后注册（错误链中优先执行），
+// 优先取后端返回的 message，无后端响应时按状态码映射友好文案
+request.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError<ApiResponse>) => {
+    if (error.response?.data?.message) {
+      error.message = error.response.data.message;
+    } else if (error.code === 'ERR_NETWORK') {
+      error.message = '网络连接失败，请检查网络设置';
+    } else {
+      const status = error.response?.status;
+      if (status === 429) {
+        error.message = '请求过于频繁，请稍后再试';
+      } else if (status === 502 || status === 503) {
+        error.message = '服务暂时不可用，请稍后重试';
+      } else if (status === 500) {
+        error.message = '服务器内部错误，请稍后重试';
+      } else if (status && status >= 400) {
+        error.message = `请求出错 (${status})，请稍后重试`;
+      }
+    }
+    return Promise.reject(error);
+  },
+);
+
 export default request;
