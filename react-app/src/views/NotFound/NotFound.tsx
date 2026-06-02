@@ -29,25 +29,25 @@ export default function NotFound() {
 
   return (
     <div className="flex flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-md rounded-4xl bg-secondary/70 p-8 text-center backdrop-blur-sm">
+      <div className="bg-secondary/70 mx-auto max-w-md rounded-4xl p-8 text-center backdrop-blur-sm">
         <div className="relative mx-auto h-32 w-32">
-          <div className="absolute inset-0 animate-pulse rounded-full bg-primary/10"></div>
+          <div className="bg-primary/10 absolute inset-0 animate-pulse rounded-full"></div>
           <div className="relative flex h-full items-center justify-center">
-            <span className="text-6xl font-extrabold tracking-tight text-foreground">
+            <span className="text-foreground text-6xl font-extrabold tracking-tight">
               404
             </span>
           </div>
         </div>
 
-        <h1 className="mt-8 font-serif text-3xl font-bold text-foreground sm:text-4xl">
+        <h1 className="text-foreground mt-8 font-serif text-3xl font-bold sm:text-4xl">
           页面未找到
         </h1>
 
-        <p className="mt-4 text-lg text-muted-foreground">
+        <p className="text-muted-foreground mt-4 text-lg">
           抱歉，您访问的页面不存在或已被移动。
         </p>
 
-        <div className="mt-6 space-y-2 text-sm text-muted-foreground">
+        <div className="text-muted-foreground mt-6 space-y-2 text-sm">
           <p>• 网址可能拼写错误</p>
           <p>• 页面可能已被删除</p>
           <p>• 链接可能已过期</p>
@@ -57,7 +57,7 @@ export default function NotFound() {
           <button
             type="button"
             onClick={() => navigate('/')}
-            className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-lg focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-ring inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium transition-all hover:shadow-lg focus:ring-2 focus:ring-offset-2 focus:outline-none"
           >
             <svg
               className="mr-2 h-5 w-5"
@@ -78,7 +78,7 @@ export default function NotFound() {
           <button
             type="button"
             onClick={goBack}
-            className="inline-flex items-center justify-center rounded-lg bg-card px-6 py-3 text-sm font-medium text-card-foreground ring-1 ring-border transition-all ring-inset hover:bg-accent focus:ring-2 focus:ring-ring focus:outline-none"
+            className="bg-card text-card-foreground ring-border hover:bg-accent focus:ring-ring inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium ring-1 transition-all ring-inset focus:ring-2 focus:outline-none"
           >
             <svg
               className="mr-2 h-5 w-5"
@@ -98,7 +98,7 @@ export default function NotFound() {
         </div>
       </div>
 
-      <div className="mt-16 flex gap-2 text-muted-foreground">
+      <div className="text-muted-foreground mt-16 flex gap-2">
         <div className="h-1 w-1 animate-bounce rounded-full bg-current"></div>
         <div
           className="h-1 w-1 animate-bounce rounded-full bg-current"

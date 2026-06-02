@@ -2,7 +2,7 @@
 [data-color-scheme='clear-sky'] {
   --radius: 0.625rem;
   --ink: oklch(0.2 0.03 240);
-  --paper: oklch(1.0000 0 0);
+  --paper: oklch(1 0 0);
   --warm-gray: oklch(0.96 0.01 240);
   --muted-text: oklch(0.6 0.02 240);
   --accent-amber: oklch(0.8 0.15 80);
@@ -11,7 +11,7 @@
   --accent-rose: oklch(0.65 0.15 20);
   --workspace-accent: oklch(0.7771 0.1272 213.3);
   --workspace-accent-contrast: oklch(0.98 0.01 240);
-  --card-bg: oklch(1.0000 0 0);
+  --card-bg: oklch(1 0 0);
   --surface: oklch(0.98 0.01 240 / 0.75);
   --surface-foreground: oklch(0.2 0.03 240);
   --chart-1: oklch(0.7 0.15 220);

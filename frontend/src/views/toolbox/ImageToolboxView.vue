@@ -32,7 +32,10 @@
                     role="switch"
                     :aria-checked="enableMaxWidth"
                     :aria-label="'最大宽度限制'"
-                    :class="['switch', enableMaxWidth ? 'switch--on' : 'switch--off']"
+                    :class="[
+                      'switch',
+                      enableMaxWidth ? 'switch--on' : 'switch--off',
+                    ]"
                     @click="enableMaxWidth = !enableMaxWidth"
                   >
                     <svg

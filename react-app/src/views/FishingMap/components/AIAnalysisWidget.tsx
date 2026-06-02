@@ -199,7 +199,7 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
                           setAnalysisLoading(true);
                         }}
                         disabled={!analysisHasData}
-                        className="relative flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-medium text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-muted"
+                        className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition disabled:cursor-not-allowed"
                       >
                         {analysisResult ? '重新分析' : '生成分析'}
                       </button>
@@ -217,14 +217,14 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
       {!analysisOpen && (
         <button
           onClick={toggleAnalysis}
-          className="fixed right-4 bottom-50 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-primary-foreground/50 bg-linear-to-br from-primary/90 to-primary/85 text-primary-foreground shadow-lg backdrop-blur transition-all hover:-translate-y-0.5 hover:shadow-xl sm:right-6 sm:bottom-24 sm:h-14 sm:w-14"
+          className="border-primary-foreground/50 from-primary/90 to-primary/85 text-primary-foreground fixed right-4 bottom-50 z-50 flex h-12 w-12 items-center justify-center rounded-full border bg-linear-to-br shadow-lg backdrop-blur transition-all hover:-translate-y-0.5 hover:shadow-xl sm:right-6 sm:bottom-24 sm:h-14 sm:w-14"
           aria-label="打开 AI 分析"
           title="AI分析"
         >
           {analysisHasData && (
             <span className="absolute top-0.5 right-0.5 flex h-2.5 w-2.5 sm:top-0 sm:right-0">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-70" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-success sm:h-3 sm:w-3" />
+              <span className="bg-success absolute inline-flex h-full w-full animate-ping rounded-full opacity-70" />
+              <span className="bg-success relative inline-flex h-2.5 w-2.5 rounded-full sm:h-3 sm:w-3" />
             </span>
           )}
           <Bot className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -245,11 +245,11 @@ function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center justify-center py-4 text-center">
-      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-muted">
+      <div className="bg-muted mb-3 flex h-12 w-12 items-center justify-center rounded-2xl">
         {icon}
       </div>
-      <p className="text-sm text-muted-foreground">{title}</p>
-      <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>
+      <p className="text-muted-foreground text-sm">{title}</p>
+      <p className="text-muted-foreground mt-1 text-xs">{subtitle}</p>
     </div>
   );
 }
@@ -257,11 +257,11 @@ function EmptyState({
 function LoadingState({ shimmerText }: { shimmerText: string }) {
   return (
     <div className="space-y-3">
-      <p className="text-sm text-muted-foreground">{shimmerText}</p>
+      <p className="text-muted-foreground text-sm">{shimmerText}</p>
       <div className="space-y-2">
-        <div className="h-3 w-full animate-pulse rounded bg-secondary/70" />
-        <div className="h-3 w-5/6 animate-pulse rounded bg-secondary/70" />
-        <div className="h-3 w-2/3 animate-pulse rounded bg-secondary/70" />
+        <div className="bg-secondary/70 h-3 w-full animate-pulse rounded" />
+        <div className="bg-secondary/70 h-3 w-5/6 animate-pulse rounded" />
+        <div className="bg-secondary/70 h-3 w-2/3 animate-pulse rounded" />
       </div>
     </div>
   );
@@ -269,7 +269,7 @@ function LoadingState({ shimmerText }: { shimmerText: string }) {
 
 function ErrorState({ message }: { message: string }) {
   return (
-    <div className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive">
+    <div className="bg-destructive/10 text-destructive rounded-xl p-3 text-sm">
       {message}
     </div>
   );
@@ -278,7 +278,7 @@ function ErrorState({ message }: { message: string }) {
 function ResultState({ html }: { html: string }) {
   return (
     <div
-      className="prose prose-sm dark:prose-invert max-h-[50vh] min-h-16 overflow-y-auto text-card-foreground sm:max-h-[60vh]"
+      className="prose prose-sm dark:prose-invert text-card-foreground max-h-[50vh] min-h-16 overflow-y-auto sm:max-h-[60vh]"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
@@ -286,7 +286,7 @@ function ResultState({ html }: { html: string }) {
 
 function PlaceholderState() {
   return (
-    <p className="text-sm text-muted-foreground">
+    <p className="text-muted-foreground text-sm">
       点击「生成分析」，获取适合外出与钓鱼的天气建议。
     </p>
   );

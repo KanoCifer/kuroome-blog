@@ -3,7 +3,7 @@ import IconCloud from '@/components/icons/IconCloud.vue';
 import IconKey from '@/components/icons/IconKey.vue';
 import IconLock from '@/components/icons/IconLock.vue';
 import type { LoginForm } from '@/types';
-import { ShieldUser } from 'lucide-vue-next';
+import { ShieldUser } from '@lucide/vue';
 import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
 import { useAuthenticate } from '@/composables/useAuthenticate';

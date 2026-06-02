@@ -62,16 +62,57 @@ export function BentoMemo() {
             className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center"
             style={{ animation: 'memo-pop-in 0.2s ease-out' }}
           >
-              <div
-                className="bg-card pointer-events-auto relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl p-6 shadow-2xl"
-                onClick={(e) => e.stopPropagation()}
+            <div
+              className="bg-card pointer-events-auto relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl p-6 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={closeMemo}
+                className="text-muted-foreground hover:bg-accent hover:text-accent-foreground absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full"
               >
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+
+              <h3 className="text-foreground mb-4 flex items-center gap-2 font-serif text-xl font-bold">
+                <MemoIcon className="size-5" />
+                Quick Memo
+              </h3>
+
+              <textarea
+                value={memoText}
+                onChange={(e) => setMemoText(e.target.value)}
+                placeholder="在这里写下你的想法..."
+                className="border-border bg-muted text-card-foreground placeholder-muted-foreground focus:border-primary focus:ring-primary/20 mb-4 w-full resize-none rounded-xl border px-4 py-3 text-sm focus:ring-2 focus:outline-none"
+                rows={10}
+                autoFocus
+              />
+
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground text-xs">
+                  自动保存
+                  {memoText && (
+                    <span className="ml-2">{memoText.length} 字</span>
+                  )}
+                </span>
                 <button
-                  onClick={closeMemo}
-                  className="text-muted-foreground hover:bg-accent hover:text-accent-foreground absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full"
+                  onClick={clearMemo}
+                  className="border-border bg-muted text-muted-foreground hover:bg-accent hover:text-foreground flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors"
                 >
                   <svg
-                    className="h-5 w-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="size-4"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -80,54 +121,13 @@ export function BentoMemo() {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                     />
                   </svg>
+                  清空
                 </button>
-
-                <h3 className="text-foreground mb-4 flex items-center gap-2 font-serif text-xl font-bold">
-                  <MemoIcon className="size-5" />
-                  Quick Memo
-                </h3>
-
-                <textarea
-                  value={memoText}
-                  onChange={(e) => setMemoText(e.target.value)}
-                  placeholder="在这里写下你的想法..."
-                  className="border-border bg-muted text-card-foreground placeholder-muted-foreground focus:border-primary focus:ring-primary/20 mb-4 w-full resize-none rounded-xl border px-4 py-3 text-sm focus:ring-2 focus:outline-none"
-                  rows={10}
-                  autoFocus
-                />
-
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground text-xs">
-                    自动保存
-                    {memoText && (
-                      <span className="ml-2">{memoText.length} 字</span>
-                    )}
-                  </span>
-                  <button
-                    onClick={clearMemo}
-                    className="border-border bg-muted text-muted-foreground hover:bg-accent hover:text-foreground flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="size-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
-                    </svg>
-                    清空
-                  </button>
-                </div>
               </div>
+            </div>
           </div>
         </>
       )}

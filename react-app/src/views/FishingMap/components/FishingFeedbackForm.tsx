@@ -118,19 +118,17 @@ export function FishingFeedbackForm({
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/50">
-      <div className="mx-4 w-full max-w-md rounded-2xl bg-card p-6 shadow-xl">
-        <h3 className="mb-4 text-lg font-semibold text-foreground">
+    <div className="bg-background/50 fixed inset-0 z-50 flex items-center justify-center">
+      <div className="bg-card mx-4 w-full max-w-md rounded-2xl p-6 shadow-xl">
+        <h3 className="text-foreground mb-4 text-lg font-semibold">
           钓鱼反馈
-          <span className="ml-2 text-sm font-normal text-muted-foreground">
+          <span className="text-muted-foreground ml-2 text-sm font-normal">
             你的反馈会帮助我们改进
           </span>
         </h3>
 
-        <div className="mb-4 rounded-lg bg-secondary p-3 text-sm">
-          <p className="text-muted-foreground">
-            地点: {locationName}
-          </p>
+        <div className="bg-secondary mb-4 rounded-lg p-3 text-sm">
+          <p className="text-muted-foreground">地点: {locationName}</p>
           <p className="text-muted-foreground">
             当前指数: {fishingData.fishing_index} ({fishingData.level})
           </p>
@@ -138,7 +136,7 @@ export function FishingFeedbackForm({
 
         <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
           <div>
-            <label className="mb-2 block text-sm font-medium text-card-foreground">
+            <label className="text-card-foreground mb-2 block text-sm font-medium">
               您的钓鱼体验
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -163,7 +161,7 @@ export function FishingFeedbackForm({
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 rounded-lg border border-border px-4 py-2 text-sm font-medium text-card-foreground hover:bg-accent"
+              className="border-border text-card-foreground hover:bg-accent flex-1 rounded-lg border px-4 py-2 text-sm font-medium"
               disabled={loading}
             >
               取消
@@ -171,7 +169,7 @@ export function FishingFeedbackForm({
             <button
               type="submit"
               disabled={!selectedFeedback || loading}
-              className="flex-1 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 flex-1 rounded-lg px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? '提交中...' : '确认提交'}
             </button>

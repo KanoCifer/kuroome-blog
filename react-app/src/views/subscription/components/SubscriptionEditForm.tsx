@@ -80,7 +80,7 @@ function PrimaryButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`font-headline w-full rounded-full bg-primary px-5 py-4 text-base font-bold text-primary-foreground shadow-[0_10px_25px_rgba(0,40,142,0.2)] transition-all hover:brightness-105 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100 ${className} `}
+      className={`font-headline bg-primary text-primary-foreground w-full rounded-full px-5 py-4 text-base font-bold shadow-[0_10px_25px_rgba(0,40,142,0.2)] transition-all hover:brightness-105 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100 ${className} `}
     >
       {children}
     </button>
@@ -107,7 +107,7 @@ function SecondaryButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`w-full rounded-full border border-primary/60 bg-primary/5 px-5 py-4 font-semibold transition-all hover:bg-card/70 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 ${className} `}
+      className={`border-primary/60 bg-primary/5 hover:bg-card/70 w-full rounded-full border px-5 py-4 font-semibold transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 ${className} `}
     >
       {children}
     </button>
@@ -191,7 +191,7 @@ export function SubscriptionEditForm({
               value={form.name}
               onChange={(event) => handleChange('name', event.target.value)}
               placeholder="例如：Spotify Premium"
-              className="focus:ring-ring/20 text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-muted px-4 py-3.5 text-sm transition-all focus:ring-2"
+              className="focus:ring-ring/20 text-on-surface placeholder:text-outline/50 bg-muted w-full rounded-xl border-0 px-4 py-3.5 text-sm transition-all focus:ring-2"
             />
           </div>
 
@@ -204,7 +204,7 @@ export function SubscriptionEditForm({
               value={form.provider}
               onChange={(event) => handleChange('provider', event.target.value)}
               placeholder="例如：Spotify"
-              className="focus:ring-ring/20 text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-muted px-4 py-3.5 text-sm transition-all focus:ring-2"
+              className="focus:ring-ring/20 text-on-surface placeholder:text-outline/50 bg-muted w-full rounded-xl border-0 px-4 py-3.5 text-sm transition-all focus:ring-2"
             />
           </div>
 
@@ -221,7 +221,7 @@ export function SubscriptionEditForm({
                 value={form.price}
                 onChange={(event) => handleChange('price', event.target.value)}
                 placeholder="0.00"
-                className="focus:ring-ring/20 text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-muted px-4 py-3.5 text-sm transition-all focus:ring-2"
+                className="focus:ring-ring/20 text-on-surface placeholder:text-outline/50 bg-muted w-full rounded-xl border-0 px-4 py-3.5 text-sm transition-all focus:ring-2"
               />
             </div>
             <div className="space-y-1.5">
@@ -237,7 +237,7 @@ export function SubscriptionEditForm({
                   list={datalistId}
                   maxLength={10}
                   placeholder="USD / CNY"
-                  className="focus:ring-ring/20 text-on-surface placeholder:text-outline/50 w-full appearance-none rounded-xl border-0 bg-muted px-4 py-3.5 pr-10 text-sm transition-all focus:ring-2"
+                  className="focus:ring-ring/20 text-on-surface placeholder:text-outline/50 bg-muted w-full appearance-none rounded-xl border-0 px-4 py-3.5 pr-10 text-sm transition-all focus:ring-2"
                 />
                 <datalist id={datalistId}>
                   {currencySuggestions.map((currency) => (
@@ -264,7 +264,7 @@ export function SubscriptionEditForm({
                     className={`flex-1 rounded-lg px-2 py-2.5 text-[11px] font-bold transition-all ${
                       isActive
                         ? 'bg-primary text-primary-foreground shadow-md'
-                        : 'text-on-surface-variant bg-muted font-medium hover:bg-card/50'
+                        : 'text-on-surface-variant bg-muted hover:bg-card/50 font-medium'
                     } `}
                   >
                     {option.label}
@@ -287,7 +287,7 @@ export function SubscriptionEditForm({
                   onChange={(event) =>
                     handleChange('nextBillingDate', event.target.value)
                   }
-                  className="focus:ring-ring/20 w-full rounded-xl border-0 bg-muted px-4 py-3.5 text-sm transition-all focus:ring-2"
+                  className="focus:ring-ring/20 bg-muted w-full rounded-xl border-0 px-4 py-3.5 text-sm transition-all focus:ring-2"
                 />
               </div>
             </div>
@@ -298,7 +298,7 @@ export function SubscriptionEditForm({
               <select
                 value={form.status}
                 onChange={(event) => handleChange('status', event.target.value)}
-                className="text-on-surface w-full appearance-none rounded-xl border-0 bg-primary/10 px-4 py-3.5 text-sm ring-1 ring-primary/20 transition-all focus:ring-2 focus:ring-primary/20"
+                className="text-on-surface bg-primary/10 ring-primary/20 focus:ring-primary/20 w-full appearance-none rounded-xl border-0 px-4 py-3.5 text-sm ring-1 transition-all focus:ring-2"
               >
                 {statusOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -318,7 +318,7 @@ export function SubscriptionEditForm({
               value={form.notes}
               onChange={(event) => handleChange('notes', event.target.value)}
               placeholder="可填写账号、套餐说明等"
-              className="focus:ring-ring/20 text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-muted px-4 py-3.5 text-sm transition-all focus:ring-2"
+              className="focus:ring-ring/20 text-on-surface placeholder:text-outline/50 bg-muted w-full rounded-xl border-0 px-4 py-3.5 text-sm transition-all focus:ring-2"
             />
           </div>
         </div>

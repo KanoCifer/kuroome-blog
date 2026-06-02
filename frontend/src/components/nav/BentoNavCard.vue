@@ -65,7 +65,7 @@ import {
   RegisterIcon,
 } from '@/components/icons';
 import { useAuthStore } from '@/stores/auth';
-import { Image } from 'lucide-vue-next';
+import { Image } from '@lucide/vue';
 import { Motion, type MotionProps } from 'motion-v';
 import { onUnmounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';

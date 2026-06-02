@@ -491,7 +491,7 @@ import {
   Upload,
   UploadCloud,
   X,
-} from 'lucide-vue-next';
+} from '@lucide/vue';
 import { motion } from 'motion-v';
 import { v4 } from 'uuid';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';

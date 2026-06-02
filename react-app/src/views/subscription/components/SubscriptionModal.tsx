@@ -30,11 +30,11 @@ export function SubscriptionModal({
         transition={{ duration: 0.2 }}
         type="button"
         aria-label="关闭弹窗"
-        className="fixed inset-0 bg-background/55 backdrop-blur-sm"
+        className="bg-background/55 fixed inset-0 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      <div className="relative z-10 flex max-h-[calc(100dvh-8rem)] w-full max-w-176 flex-col overflow-hidden rounded-2xl bg-card shadow-2xl">
+      <div className="bg-card relative z-10 flex max-h-[calc(100dvh-8rem)] w-full max-w-176 flex-col overflow-hidden rounded-2xl shadow-2xl">
         <div className="flex-1 overflow-y-auto p-4">{children}</div>
       </div>
     </motion.div>,

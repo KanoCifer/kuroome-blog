@@ -184,35 +184,27 @@ export function HourlyWeather() {
   }, [weatherHourly]);
 
   return (
-    <div className="relative rounded-2xl border border-border/40 bg-secondary/80 p-4 shadow-sm backdrop-blur-sm">
+    <div className="border-border/40 bg-secondary/80 relative rounded-2xl border p-4 shadow-sm backdrop-blur-sm">
       {/* 背景 */}
-      <div className="pointer-events-none absolute -top-8 -right-8 h-40 w-40 rounded-full bg-linear-to-br from-primary/10 to-primary/5 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-6 -left-6 h-32 w-32 rounded-full bg-linear-to-tr from-warning/15 to-warning/5 blur-2xl" />
+      <div className="from-primary/10 to-primary/5 pointer-events-none absolute -top-8 -right-8 h-40 w-40 rounded-full bg-linear-to-br blur-3xl" />
+      <div className="from-warning/15 to-warning/5 pointer-events-none absolute -bottom-6 -left-6 h-32 w-32 rounded-full bg-linear-to-tr blur-2xl" />
       {/* 内容区 */}
       <div className="mb-3 flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-foreground">
+          <h3 className="text-foreground text-sm font-semibold">
             小时天气预报{' '}
-            <span className="text-xs text-muted-foreground">
-              未来24小时
-            </span>
+            <span className="text-muted-foreground text-xs">未来24小时</span>
           </h3>
-          <p className="text-xs text-muted-foreground">
-            天气变化趋势
-          </p>
+          <p className="text-muted-foreground text-xs">天气变化趋势</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 rounded-full bg-card/60 px-3 py-1.5 shadow-sm">
-            <span className="h-2.5 w-2.5 rounded-full bg-primary" />
-            <span className="text-xs text-muted-foreground">
-              降水量
-            </span>
+          <div className="bg-card/60 flex items-center gap-1.5 rounded-full px-3 py-1.5 shadow-sm">
+            <span className="bg-primary h-2.5 w-2.5 rounded-full" />
+            <span className="text-muted-foreground text-xs">降水量</span>
           </div>
-          <div className="flex items-center gap-1.5 rounded-full bg-card/60 px-3 py-1.5 shadow-sm">
-            <span className="h-2.5 w-2.5 rounded-full bg-warning" />
-            <span className="text-xs text-muted-foreground">
-              温度
-            </span>
+          <div className="bg-card/60 flex items-center gap-1.5 rounded-full px-3 py-1.5 shadow-sm">
+            <span className="bg-warning h-2.5 w-2.5 rounded-full" />
+            <span className="text-muted-foreground text-xs">温度</span>
           </div>
         </div>
       </div>
@@ -222,8 +214,8 @@ export function HourlyWeather() {
       ) : (
         <div className="full flex items-center justify-center">
           <div className="text-center">
-            <div className="mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-2 border-border border-t-primary" />
-            <p className="text-sm text-muted-foreground">正在加载天气数据...</p>
+            <div className="border-border border-t-primary mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-2" />
+            <p className="text-muted-foreground text-sm">正在加载天气数据...</p>
           </div>
         </div>
       )}

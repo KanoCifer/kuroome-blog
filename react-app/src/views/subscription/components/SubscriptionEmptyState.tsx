@@ -1,9 +1,9 @@
 export function SubscriptionEmptyState() {
   return (
-    <div className="rounded-xl border border-dashed border-border bg-secondary p-8 text-center">
-      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-muted">
+    <div className="border-border bg-secondary rounded-xl border border-dashed p-8 text-center">
+      <div className="bg-muted mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl">
         <svg
-          className="h-8 w-8 text-muted-foreground"
+          className="text-muted-foreground h-8 w-8"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -16,10 +16,10 @@ export function SubscriptionEmptyState() {
           />
         </svg>
       </div>
-      <p className="mb-1 font-semibold text-foreground">
-        暂无订阅
+      <p className="text-foreground mb-1 font-semibold">暂无订阅</p>
+      <p className="text-muted-foreground text-sm">
+        点击上方按钮添加您的第一个订阅
       </p>
-      <p className="text-sm text-muted-foreground">点击上方按钮添加您的第一个订阅</p>
     </div>
   );
 }

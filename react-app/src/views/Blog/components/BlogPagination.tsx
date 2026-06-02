@@ -67,9 +67,7 @@ export function BlogPagination({
             </li>
           ) : (
             <li key={i}>
-              <span className="text-muted-foreground/60 px-1 text-sm">
-                {p}
-              </span>
+              <span className="text-muted-foreground/60 px-1 text-sm">{p}</span>
             </li>
           ),
         )}

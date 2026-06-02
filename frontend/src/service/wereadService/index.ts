@@ -8,7 +8,9 @@ export interface WereadService {
 }
 
 export const wereadService: WereadService = {
-  async saveUserInfo(apiKey: string): Promise<ApiResponse<WereadUserInfo | null>> {
+  async saveUserInfo(
+    apiKey: string,
+  ): Promise<ApiResponse<WereadUserInfo | null>> {
     return wereadGateway.saveUserInfo(apiKey);
   },
 };

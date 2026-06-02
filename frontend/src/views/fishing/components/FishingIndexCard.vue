@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useFishingMapStore } from '@/stores/fishingMap';
 import type { FishingIndexData } from '@/views/fishing/types';
-import { FishingRod, Loader } from 'lucide-vue-next';
+import { FishingRod, Loader } from '@lucide/vue';
 import { motion } from 'motion-v';
 import { storeToRefs } from 'pinia';
 

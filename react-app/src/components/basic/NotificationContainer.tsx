@@ -51,15 +51,15 @@ export function Notifier() {
         }}
         exit={{ opacity: 0, y: -40, scale: 0.9 }}
         transition={{ type: 'spring', damping: 30, stiffness: 500 }}
-        className="squircle absolute top-0 left-1/2 flex h-18 w-60 -translate-x-1/2 items-center justify-between gap-3 border border-border bg-card/80 text-foreground shadow-xl backdrop-blur-sm transition-colors duration-200"
+        className="squircle border-border bg-card/80 text-foreground absolute top-0 left-1/2 flex h-18 w-60 -translate-x-1/2 items-center justify-between gap-3 border shadow-xl backdrop-blur-sm transition-colors duration-200"
       >
         <AnimationLayer type={n.type} />
 
-        <div className="flex-1 text-sm leading-snug font-semibold text-card-foreground">
+        <div className="text-card-foreground flex-1 text-sm leading-snug font-semibold">
           {n.message}
         </div>
         <button
-          className="mr-2 shrink-0 cursor-pointer rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-card-foreground"
+          className="text-muted-foreground hover:bg-accent hover:text-card-foreground mr-2 shrink-0 cursor-pointer rounded-md p-1 transition-colors"
           onClick={() => notificationStore.dismiss(n.id)}
           aria-label="dismiss"
         >

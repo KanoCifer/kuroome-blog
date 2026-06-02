@@ -1,6 +1,6 @@
 export const MemoIcon = ({ className }: { className?: string }) => (
   <svg
-    className={`size-4 text-muted-foreground ${className || ''}`}
+    className={`text-muted-foreground size-4 ${className || ''}`}
     aria-hidden="true"
     fill="none"
     stroke="currentColor"

@@ -12,9 +12,8 @@ export let connectionDelay:
   | ReturnType<typeof useWebSocket>['connectionDelay']
   | null = null;
 /** 全局单例的连接状态 ref */
-export let isConnected:
-  | ReturnType<typeof useWebSocket>['isConnected']
-  | null = null;
+export let isConnected: ReturnType<typeof useWebSocket>['isConnected'] | null =
+  null;
 
 function buildWsUrl(): string {
   const apiBase = import.meta.env.VITE_API_BASE || '/api';

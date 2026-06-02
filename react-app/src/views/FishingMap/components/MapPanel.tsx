@@ -6,7 +6,7 @@ interface MapPanelProps {
 
 export function MapPanel({ mapContainerRef }: MapPanelProps) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-md">
+    <div className="border-border/70 bg-card overflow-hidden rounded-2xl border shadow-md">
       <div ref={mapContainerRef} className="h-[46dvh] w-full rounded-2xl" />
     </div>
   );

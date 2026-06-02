@@ -63,7 +63,7 @@ import BentoCard from '@/components/bento/BentoCard.vue';
 import { useAnimateNumber } from '@/composables/useAnimateNumber';
 import { bookService } from '@/service/bookService';
 import type { BookItem } from '@/types';
-import { BookOpen } from 'lucide-vue-next';
+import { BookOpen } from '@lucide/vue';
 import { onMounted, ref } from 'vue';
 
 const { displayValue: displayCount, animateTo } = useAnimateNumber();

@@ -46,7 +46,7 @@ export function AlertDialog({
             }}
             className={`rounded-full px-5 py-2.5 text-sm font-medium transition-all ${
               destructive
-                ? 'bg-destructive text-white hover:bg-destructive/90'
+                ? 'bg-destructive hover:bg-destructive/90 text-white'
                 : 'bg-primary text-primary-foreground hover:bg-primary/90'
             }`}
           >

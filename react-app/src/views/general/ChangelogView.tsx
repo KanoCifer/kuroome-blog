@@ -78,7 +78,7 @@ export default function ChangelogView() {
     >
       <div className="w-full max-w-6xl px-4 max-sm:px-3">
         <div className="mb-16 text-center max-sm:mb-10">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary max-sm:mb-4 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
+          <div className="bg-primary/10 text-primary mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium max-sm:mb-4 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
             <svg
               className="h-4 w-4"
               fill="none"
@@ -94,10 +94,10 @@ export default function ChangelogView() {
             </svg>
             版本更新记录
           </div>
-          <h1 className="mb-4 text-5xl font-bold tracking-tight text-foreground max-sm:text-3xl md:text-6xl">
+          <h1 className="text-foreground mb-4 text-5xl font-bold tracking-tight max-sm:text-3xl md:text-6xl">
             变更日志
           </h1>
-          <p className="mx-auto max-w-2xl text-lg text-muted-foreground max-sm:text-base">
+          <p className="text-muted-foreground mx-auto max-w-2xl text-lg max-sm:text-base">
             记录网站的每一次成长与进步
           </p>
         </div>
@@ -124,7 +124,7 @@ export default function ChangelogView() {
                 }`}
               >
                 <div className="-mx-8 w-full max-sm:mx-0 md:w-1/2">
-                  <div className="group squircle cursor-pointer border border-border bg-card/80 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl max-sm:p-4 md:p-8">
+                  <div className="group squircle border-border bg-card/80 cursor-pointer border p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl max-sm:p-4 md:p-8">
                     <div className="mb-4 flex flex-wrap items-center gap-3 max-sm:gap-2">
                       <span className="inline-flex items-center gap-2 rounded-full bg-linear-to-r from-blue-500 to-cyan-500 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-blue-500/25 max-sm:px-3 max-sm:py-1 max-sm:text-xs">
                         <svg
@@ -142,7 +142,7 @@ export default function ChangelogView() {
                         </svg>
                         v{release.version}
                       </span>
-                      <span className="flex items-center gap-1 text-sm text-muted-foreground max-sm:text-xs">
+                      <span className="text-muted-foreground flex items-center gap-1 text-sm max-sm:text-xs">
                         <svg
                           className="h-4 w-4"
                           fill="none"
@@ -160,7 +160,7 @@ export default function ChangelogView() {
                       </span>
                     </div>
 
-                    <h2 className="mb-4 text-2xl font-bold text-foreground max-sm:text-xl">
+                    <h2 className="text-foreground mb-4 text-2xl font-bold max-sm:text-xl">
                       {release.title}
                     </h2>
 
@@ -189,13 +189,13 @@ export default function ChangelogView() {
 
                 <div className="absolute top-1/2 left-1/2 z-10 hidden h-8 w-8 -translate-x-1/2 -translate-y-1/2 md:block">
                   <div className="absolute inset-0 -m-2 rounded-full bg-blue-500 opacity-30 blur-md transition-all duration-300 group-hover:opacity-50 group-hover:blur-lg" />
-                  <div className="relative flex h-full w-full items-center justify-center rounded-full bg-card ring-4 ring-border">
+                  <div className="bg-card ring-border relative flex h-full w-full items-center justify-center rounded-full ring-4">
                     <div className="h-3 w-3 rounded-full bg-blue-400" />
                   </div>
                 </div>
 
                 <div className="absolute top-6 left-0 z-10 h-6 w-6 -translate-x-1/2 max-sm:top-5 max-sm:left-3 md:hidden">
-                  <div className="relative flex h-full w-full items-center justify-center rounded-full bg-card ring-3 ring-border">
+                  <div className="bg-card ring-border relative flex h-full w-full items-center justify-center rounded-full ring-3">
                     <div className="h-2 w-2 rounded-full bg-blue-400" />
                   </div>
                 </div>

@@ -190,7 +190,7 @@ import type {
   FishingFeedbackData,
   FishingIndexData,
 } from '@/views/fishing/types';
-import { Bot } from 'lucide-vue-next';
+import { Bot } from '@lucide/vue';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref, useTemplateRef } from 'vue';
 import HourlyWeather from './components/HourlyWeather.vue';

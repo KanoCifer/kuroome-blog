@@ -364,9 +364,7 @@ export default function BlogPostView() {
                   className="article-content prose prose-lg dark:prose-invert max-w-none"
                 >
                   {renderedBody ? (
-                    <div
-                      dangerouslySetInnerHTML={{ __html: renderedBody }}
-                    />
+                    <div dangerouslySetInnerHTML={{ __html: renderedBody }} />
                   ) : (
                     <p className="text-muted-foreground italic">暂无内容</p>
                   )}
@@ -390,9 +388,7 @@ export default function BlogPostView() {
             onClick={() => setShowDeleteDialog(false)}
           />
           <div className="bg-card border-border relative w-full max-w-sm rounded-2xl border p-6 shadow-lg">
-            <h3 className="text-foreground text-lg font-semibold">
-              确认删除
-            </h3>
+            <h3 className="text-foreground text-lg font-semibold">确认删除</h3>
             <p className="text-muted-foreground mt-2 text-sm">
               确定要删除这篇文章吗？此操作无法撤销。
             </p>

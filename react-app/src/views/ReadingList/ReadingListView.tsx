@@ -163,22 +163,22 @@ export default function ReadingListView() {
   };
 
   return (
-    <div className="min-h-dvh bg-background pb-24">
-      <header className="sticky top-0 z-10 border-b border-border/60 bg-card/90 px-4 py-4 backdrop-blur-md">
+    <div className="bg-background min-h-dvh pb-24">
+      <header className="border-border/60 bg-card/90 sticky top-0 z-10 border-b px-4 py-4 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-2xl items-center justify-between">
           <div>
             <p className="text-xs font-semibold tracking-wide text-orange-500 uppercase">
               Reading List
             </p>
-            <h1 className="text-xl font-semibold text-foreground">
+            <h1 className="text-foreground text-xl font-semibold">
               我的阅读清单
             </h1>
           </div>
           <div className="flex items-center gap-2 text-xs">
-            <span className="rounded-full bg-secondary px-2.5 py-1 text-secondary-foreground">
+            <span className="bg-secondary text-secondary-foreground rounded-full px-2.5 py-1">
               {stats.reading} Reading
             </span>
-            <span className="rounded-full bg-success/10 px-2.5 py-1 text-success">
+            <span className="bg-success/10 text-success rounded-full px-2.5 py-1">
               {stats.done} Done
             </span>
           </div>
@@ -186,9 +186,9 @@ export default function ReadingListView() {
       </header>
 
       <main className="mx-auto w-full max-w-2xl space-y-6 px-4 pt-6">
-        <section className="rounded-3xl border border-warning/20 bg-card p-5 shadow-sm">
+        <section className="border-warning/20 bg-card rounded-3xl border p-5 shadow-sm">
           <div className="flex items-start gap-4">
-            <div className="flex size-12 items-center justify-center rounded-2xl bg-warning/10 text-warning">
+            <div className="bg-warning/10 text-warning flex size-12 items-center justify-center rounded-2xl">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -209,33 +209,33 @@ export default function ReadingListView() {
               </svg>
             </div>
             <div className="space-y-1">
-              <h2 className="text-base font-semibold text-foreground">
+              <h2 className="text-foreground text-base font-semibold">
                 轻量记录你的阅读节奏
               </h2>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 新增书籍、更新状态，全部在手机端也能快速完成。
               </p>
             </div>
           </div>
         </section>
 
-        <section className="rounded-3xl border border-border/80 bg-card p-5">
+        <section className="border-border/80 bg-card rounded-3xl border p-5">
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="flex flex-col gap-3 sm:flex-row">
               <input
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
                 placeholder="书名"
-                className="w-full rounded-2xl border border-border bg-secondary px-4 py-3 text-sm text-foreground transition outline-none focus:border-warning focus:bg-card"
+                className="border-border bg-secondary text-foreground focus:border-warning focus:bg-card w-full rounded-2xl border px-4 py-3 text-sm transition outline-none"
               />
               <input
                 value={author}
                 onChange={(event) => setAuthor(event.target.value)}
                 placeholder="作者"
-                className="w-full rounded-2xl border border-border bg-secondary px-4 py-3 text-sm text-foreground transition outline-none focus:border-warning focus:bg-card"
+                className="border-border bg-secondary text-foreground focus:border-warning focus:bg-card w-full rounded-2xl border px-4 py-3 text-sm transition outline-none"
               />
             </div>
-            <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+            <div className="text-muted-foreground flex flex-wrap items-center gap-3 text-xs">
               <button
                 type="button"
                 onClick={() => setIsCompleted((prev) => !prev)}
@@ -248,7 +248,7 @@ export default function ReadingListView() {
                 {isCompleted ? '标记为已读' : '标记为在读'}
               </button>
               {editingId && (
-                <span className="rounded-full bg-primary/10 px-3 py-1 text-primary">
+                <span className="bg-primary/10 text-primary rounded-full px-3 py-1">
                   正在编辑
                 </span>
               )}
@@ -258,14 +258,14 @@ export default function ReadingListView() {
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="rounded-full border border-border px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:bg-accent"
+                    className="border-border text-muted-foreground hover:bg-accent rounded-full border px-4 py-2 text-xs font-semibold transition"
                   >
                     取消
                   </button>
                 )}
                 <button
                   type="submit"
-                  className="w-full rounded-full bg-primary px-5 py-2 text-xs font-semibold text-primary-foreground transition hover:bg-primary/90 sm:w-auto"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 w-full rounded-full px-5 py-2 text-xs font-semibold transition sm:w-auto"
                 >
                   {editingId ? '保存修改' : '添加到清单'}
                 </button>
@@ -275,17 +275,15 @@ export default function ReadingListView() {
         </section>
 
         <section className="space-y-3">
-          <h3 className="text-sm font-semibold text-foreground">
-            书籍列表
-          </h3>
+          <h3 className="text-foreground text-sm font-semibold">书籍列表</h3>
           {isLoading ? (
             <div className="space-y-3">
-              <div className="h-20 animate-pulse rounded-3xl bg-card shadow-sm" />
-              <div className="h-20 animate-pulse rounded-3xl bg-card shadow-sm" />
-              <div className="h-20 animate-pulse rounded-3xl bg-card shadow-sm" />
+              <div className="bg-card h-20 animate-pulse rounded-3xl shadow-sm" />
+              <div className="bg-card h-20 animate-pulse rounded-3xl shadow-sm" />
+              <div className="bg-card h-20 animate-pulse rounded-3xl shadow-sm" />
             </div>
           ) : books.length === 0 ? (
-            <div className="rounded-3xl border border-dashed border-border bg-card p-6 text-center text-sm text-muted-foreground">
+            <div className="border-border bg-card text-muted-foreground rounded-3xl border border-dashed p-6 text-center text-sm">
               暂无书籍，先添加一本吧。
             </div>
           ) : (
@@ -293,14 +291,14 @@ export default function ReadingListView() {
               {books.map((book) => (
                 <li
                   key={book.id}
-                  className="flex flex-col gap-3 rounded-3xl border border-border/80 bg-card p-4 shadow-sm transition hover:border-warning/30"
+                  className="border-border/80 bg-card hover:border-warning/30 flex flex-col gap-3 rounded-3xl border p-4 shadow-sm transition"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="truncate text-base font-semibold text-foreground">
+                      <p className="text-foreground truncate text-base font-semibold">
                         {book.title}
                       </p>
-                      <p className="mt-1 text-sm text-muted-foreground">
+                      <p className="text-muted-foreground mt-1 text-sm">
                         {book.author}
                       </p>
                     </div>
@@ -318,21 +316,21 @@ export default function ReadingListView() {
                     <button
                       onClick={() => toggleStatus(book)}
                       disabled={pendingBookId === book.id}
-                      className="rounded-full border border-border px-3 py-1 text-muted-foreground transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
+                      className="border-border text-muted-foreground hover:bg-accent rounded-full border px-3 py-1 transition disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       切换状态
                     </button>
                     <button
                       onClick={() => startEdit(book)}
                       disabled={pendingBookId === book.id}
-                      className="rounded-full border border-border px-3 py-1 text-muted-foreground transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
+                      className="border-border text-muted-foreground hover:bg-accent rounded-full border px-3 py-1 transition disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       编辑
                     </button>
                     <button
                       onClick={() => removeBook(book)}
                       disabled={pendingBookId === book.id}
-                      className="rounded-full border border-transparent bg-destructive/10 px-3 py-1 text-destructive transition hover:bg-destructive/20 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="bg-destructive/10 text-destructive hover:bg-destructive/20 rounded-full border border-transparent px-3 py-1 transition disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       删除
                     </button>
@@ -344,12 +342,12 @@ export default function ReadingListView() {
         </section>
 
         {pagination && pagination.pages > 1 && (
-          <section className="flex items-center justify-center gap-2 pb-4 text-xs text-muted-foreground">
+          <section className="text-muted-foreground flex items-center justify-center gap-2 pb-4 text-xs">
             <button
               type="button"
               disabled={!pagination.has_prev}
               onClick={() => goToPage(pagination.prev_num ?? 1)}
-              className="rounded-full border border-border px-3 py-1 transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
+              className="border-border hover:bg-accent rounded-full border px-3 py-1 transition disabled:cursor-not-allowed disabled:opacity-50"
             >
               上一页
             </button>
@@ -357,7 +355,7 @@ export default function ReadingListView() {
               <button
                 type="button"
                 onClick={() => goToPage(1)}
-                className="rounded-full border border-transparent px-3 py-1 hover:bg-accent"
+                className="hover:bg-accent rounded-full border border-transparent px-3 py-1"
               >
                 1
               </button>
@@ -371,7 +369,7 @@ export default function ReadingListView() {
                 className={`rounded-full px-3 py-1 ${
                   page === pagination.page
                     ? 'bg-primary text-primary-foreground'
-                    : 'border border-transparent hover:bg-accent'
+                    : 'hover:bg-accent border border-transparent'
                 }`}
               >
                 {page}
@@ -384,7 +382,7 @@ export default function ReadingListView() {
               <button
                 type="button"
                 onClick={() => goToPage(pagination.pages)}
-                className="rounded-full border border-transparent px-3 py-1 hover:bg-accent"
+                className="hover:bg-accent rounded-full border border-transparent px-3 py-1"
               >
                 {pagination.pages}
               </button>
@@ -393,7 +391,7 @@ export default function ReadingListView() {
               type="button"
               disabled={!pagination.has_next}
               onClick={() => goToPage(pagination.next_num ?? pagination.pages)}
-              className="rounded-full border border-border px-3 py-1 transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
+              className="border-border hover:bg-accent rounded-full border px-3 py-1 transition disabled:cursor-not-allowed disabled:opacity-50"
             >
               下一页
             </button>

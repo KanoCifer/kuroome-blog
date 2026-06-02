@@ -76,14 +76,7 @@ import { fishingService } from '@/service/fishingService';
 import { DEFAULT_MAP_CENTER, useFishingMapStore } from '@/stores/fishingMap';
 import type { TideData } from '@/views/fishing/types';
 import dayjs from 'dayjs';
-import {
-  Cloud,
-  CloudRain,
-  FishingRod,
-  Sun,
-  Waves,
-  Wind,
-} from 'lucide-vue-next';
+import { Cloud, CloudRain, FishingRod, Sun, Waves, Wind } from '@lucide/vue';
 import { computed, onMounted, ref, type Component } from 'vue';
 
 const { displayValue: displaySpots, animateTo } = useAnimateNumber();

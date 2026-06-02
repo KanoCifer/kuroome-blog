@@ -499,8 +499,15 @@ onUnmounted(() => {
                   >启动时间 / 运行时间</span
                 >
                 <span class="text-foreground text-sm">
-                  {{ formatStartTime(serverStatus.service.start_time) }} (GMT+8) |
-                  {{ formatUptime(Math.floor((now - serverStatus.service.start_time * 1000) / 1000)) }}
+                  {{ formatStartTime(serverStatus.service.start_time) }} (GMT+8)
+                  |
+                  {{
+                    formatUptime(
+                      Math.floor(
+                        (now - serverStatus.service.start_time * 1000) / 1000,
+                      ),
+                    )
+                  }}
                 </span>
               </div>
               <div class="flex items-center justify-between">
@@ -623,7 +630,14 @@ onUnmounted(() => {
           CPU {{ serverStatus.system.cpu_percent }}% · 内存
           {{ serverStatus.system.memory_usage_percent }}%
         </span>
-        <span v-if="serverStatus"> 运行 {{ formatUptime(Math.floor((now - serverStatus.service.start_time * 1000) / 1000)) }} </span>
+        <span v-if="serverStatus">
+          运行
+          {{
+            formatUptime(
+              Math.floor((now - serverStatus.service.start_time * 1000) / 1000),
+            )
+          }}
+        </span>
       </div>
     </motion.div>
   </div>

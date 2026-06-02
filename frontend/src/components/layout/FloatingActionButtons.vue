@@ -389,7 +389,7 @@ import { useNotificationStore } from '@/stores/notification';
 import SettingIcon from '@/components/icons/SettingIcon.vue';
 import { useStorage } from '@vueuse/core';
 import { AxiosError } from 'axios';
-import { CreditCard } from 'lucide-vue-next';
+import { CreditCard } from '@lucide/vue';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 

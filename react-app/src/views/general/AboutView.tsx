@@ -23,7 +23,7 @@ export default function AboutView() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="mb-20 flex h-full w-full flex-col items-center bg-background/95 px-4 py-8"
+      className="bg-background/95 mb-20 flex h-full w-full flex-col items-center px-4 py-8"
     >
       {/* Hero Section */}
       <motion.div
@@ -38,17 +38,13 @@ export default function AboutView() {
           <img
             src={AboutIMG}
             alt="Kuroome"
-            className="relative h-28 w-28 rounded-full border-2 border-border object-cover shadow-2xl transition duration-500 group-hover:scale-105"
+            className="border-border relative h-28 w-28 rounded-full border-2 object-cover shadow-2xl transition duration-500 group-hover:scale-105"
           />
         </div>
 
         {/* Name & Tagline */}
-        <h1 className="mb-2 text-2xl font-bold text-foreground">
-          Kuroome
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          全栈开发者 · 读书爱好者
-        </p>
+        <h1 className="text-foreground mb-2 text-2xl font-bold">Kuroome</h1>
+        <p className="text-muted-foreground text-sm">全栈开发者 · 读书爱好者</p>
       </motion.div>
 
       {/* Bio Card */}
@@ -56,9 +52,9 @@ export default function AboutView() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.5, ease: 'easeOut' }}
-        className="mb-6 w-full max-w-md rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm backdrop-blur-sm"
+        className="border-border/60 bg-card/80 mb-6 w-full max-w-md rounded-2xl border p-5 shadow-sm backdrop-blur-sm"
       >
-        <p className="text-sm leading-relaxed text-card-foreground">
+        <p className="text-card-foreground text-sm leading-relaxed">
           你好！欢迎来到我的博客。这个网站是我的第一个 Web
           项目，正在持续迭代完善中。
         </p>
@@ -71,7 +67,7 @@ export default function AboutView() {
         transition={{ delay: 0.15, duration: 0.5, ease: 'easeOut' }}
         className="mb-6 w-full max-w-md"
       >
-        <h2 className="mb-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+        <h2 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
           技术栈
         </h2>
         <div className="flex flex-wrap gap-2">
@@ -81,7 +77,7 @@ export default function AboutView() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.15 + i * 0.03, duration: 0.3 }}
-              className="cursor-default rounded-full bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+              className="bg-primary/10 text-primary hover:bg-primary/20 cursor-default rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
             >
               {tech}
             </motion.span>
@@ -96,7 +92,7 @@ export default function AboutView() {
         transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
         className="mb-6 w-full max-w-md"
       >
-        <h2 className="mb-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+        <h2 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
           技术方向
         </h2>
         <div className="flex flex-wrap gap-2">
@@ -106,7 +102,7 @@ export default function AboutView() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 + i * 0.05, duration: 0.3 }}
-              className="cursor-default rounded-full bg-success/10 px-3 py-1.5 text-xs font-medium text-success"
+              className="bg-success/10 text-success cursor-default rounded-full px-3 py-1.5 text-xs font-medium"
             >
               {dir}
             </motion.span>
@@ -119,14 +115,12 @@ export default function AboutView() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.25, duration: 0.5, ease: 'easeOut' }}
-        className="mb-8 w-full max-w-md rounded-2xl border border-border/60 bg-card/80 p-4 shadow-sm backdrop-blur-sm"
+        className="border-border/60 bg-card/80 mb-8 w-full max-w-md rounded-2xl border p-4 shadow-sm backdrop-blur-sm"
       >
-        <h2 className="mb-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+        <h2 className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">
           兴趣爱好
         </h2>
-        <p className="text-sm text-card-foreground">
-          编程、阅读、钓鱼
-        </p>
+        <p className="text-card-foreground text-sm">编程、阅读、钓鱼</p>
       </motion.div>
 
       {/* Connect Section */}
@@ -136,10 +130,10 @@ export default function AboutView() {
         transition={{ delay: 0.3, duration: 0.5, ease: 'easeOut' }}
         className="w-full max-w-md text-center"
       >
-        <h2 className="mb-4 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+        <h2 className="text-muted-foreground mb-4 text-xs font-semibold tracking-wider uppercase">
           联系我
         </h2>
-        <p className="mb-6 text-sm text-muted-foreground">
+        <p className="text-muted-foreground mb-6 text-sm">
           如果你有任何建议或想法，欢迎与我交流
         </p>
         <BentoSocial />

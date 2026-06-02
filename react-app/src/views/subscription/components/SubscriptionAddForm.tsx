@@ -418,10 +418,10 @@ export function SubscriptionAddForm({
 
             {/* Billing Cycle */}
             <div className="space-y-2">
-              <span className="ml-1 text-xs font-semibold text-muted-foreground">
+              <span className="text-muted-foreground ml-1 text-xs font-semibold">
                 计费周期
               </span>
-              <div className="flex rounded-full bg-muted/60 p-1 backdrop-blur-sm">
+              <div className="bg-muted/60 flex rounded-full p-1 backdrop-blur-sm">
                 {cycleOptions.map((option) => {
                   const isActive = form.billingCycle === option.value;
                   return (
@@ -436,7 +436,7 @@ export function SubscriptionAddForm({
                       }
                       className={`flex-1 rounded-full px-3 py-2.5 text-xs font-semibold transition-all duration-200 ${
                         isActive
-                          ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
+                          ? 'bg-primary text-primary-foreground shadow-primary/25 shadow-lg'
                           : 'text-muted-foreground hover:bg-muted/60'
                       }`}
                     >
@@ -463,7 +463,7 @@ export function SubscriptionAddForm({
                         nextBillingDate: event.target.value,
                       }))
                     }
-                    className="w-full rounded-xl border-0 bg-muted px-4 py-3 text-sm font-medium text-foreground ring-2 ring-transparent transition-all outline-none focus:ring-ring/30"
+                    className="bg-muted text-foreground focus:ring-ring/30 w-full rounded-xl border-0 px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                   />
                 </div>
               </label>
@@ -478,26 +478,23 @@ export function SubscriptionAddForm({
                     setForm((prev) => ({ ...prev, notes: event.target.value }))
                   }
                   placeholder="例如：家庭套餐、可随时取消"
-                  className="w-full rounded-xl border-0 bg-muted px-4 py-3 text-sm font-medium text-foreground ring-2 ring-transparent transition-all outline-none placeholder:text-muted-foreground focus:ring-ring/30"
+                  className="bg-muted text-foreground placeholder:text-muted-foreground focus:ring-ring/30 w-full rounded-xl border-0 px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
             </div>
 
             {/* Reminder Config Toggle */}
-            <div className="rounded-2xl border border-border bg-secondary p-4">
+            <div className="border-border bg-secondary rounded-2xl border p-4">
               <label className="flex cursor-pointer items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <BellRing
-                    size={16}
-                    className="text-primary"
-                  />
-                  <span className="text-sm font-semibold text-card-foreground">
+                  <BellRing size={16} className="text-primary" />
+                  <span className="text-card-foreground text-sm font-semibold">
                     通知提醒配置
                   </span>
                   {isLoadingConfig && (
                     <Loader2
                       size={14}
-                      className="animate-spin text-muted-foreground"
+                      className="text-muted-foreground animate-spin"
                     />
                   )}
                 </div>
@@ -507,7 +504,7 @@ export function SubscriptionAddForm({
                   className={`relative h-6 w-11 rounded-full transition-colors ${showReminder ? 'bg-primary' : 'bg-muted'} `}
                 >
                   <span
-                    className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-card shadow-sm transition-transform ${showReminder ? 'translate-x-5' : 'translate-x-0'} `}
+                    className={`bg-card absolute top-0.5 left-0.5 h-5 w-5 rounded-full shadow-sm transition-transform ${showReminder ? 'translate-x-5' : 'translate-x-0'} `}
                   />
                 </button>
               </label>
@@ -515,7 +512,7 @@ export function SubscriptionAddForm({
                 <div className="mt-4 space-y-4">
                   {/* Channels */}
                   <div>
-                    <h4 className="mb-2 ml-1 text-xs font-semibold text-muted-foreground">
+                    <h4 className="text-muted-foreground mb-2 ml-1 text-xs font-semibold">
                       通知渠道
                     </h4>
                     <div className="flex flex-wrap gap-2">
@@ -529,7 +526,7 @@ export function SubscriptionAddForm({
                             className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all ${
                               checked
                                 ? 'bg-primary text-primary-foreground shadow-[0_4px_12px_rgba(0,40,142,0.25)]'
-                                : 'border border-border bg-card text-card-foreground hover:bg-accent'
+                                : 'border-border bg-card text-card-foreground hover:bg-accent border'
                             } `}
                           >
                             <option.icon size={16} />
@@ -542,7 +539,7 @@ export function SubscriptionAddForm({
 
                   {/* Reminder Points */}
                   <div>
-                    <h4 className="mb-2 ml-1 text-xs font-semibold text-muted-foreground">
+                    <h4 className="text-muted-foreground mb-2 ml-1 text-xs font-semibold">
                       提醒时间点
                     </h4>
                     <div className="grid grid-cols-2 gap-2">
@@ -553,8 +550,8 @@ export function SubscriptionAddForm({
                             key={option.key}
                             className={`flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 transition-all ${
                               checked
-                                ? 'border border-primary/20 bg-primary/10'
-                                : 'border border-border bg-card hover:bg-accent'
+                                ? 'border-primary/20 bg-primary/10 border'
+                                : 'border-border bg-card hover:bg-accent border'
                             } `}
                           >
                             <div
@@ -587,7 +584,7 @@ export function SubscriptionAddForm({
                   {/* Channel Configs */}
                   {form.channels.includes('email') && (
                     <div>
-                      <h4 className="mb-2 ml-1 text-xs font-semibold text-muted-foreground">
+                      <h4 className="text-muted-foreground mb-2 ml-1 text-xs font-semibold">
                         邮件地址
                       </h4>
                       <input
@@ -597,14 +594,14 @@ export function SubscriptionAddForm({
                           handleReminderChange('email', event.target.value)
                         }
                         placeholder="your@email.com"
-                        className="text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-card px-4 py-3 text-sm transition-all focus:ring-2 focus:ring-ring/20"
+                        className="text-on-surface placeholder:text-outline/50 bg-card focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
                       />
                     </div>
                   )}
 
                   {form.channels.includes('feishu') && (
                     <div>
-                      <h4 className="mb-2 ml-1 text-xs font-semibold text-muted-foreground">
+                      <h4 className="text-muted-foreground mb-2 ml-1 text-xs font-semibold">
                         飞书 Webhook
                       </h4>
                       <input
@@ -617,14 +614,14 @@ export function SubscriptionAddForm({
                           )
                         }
                         placeholder="https://open.feishu.cn/..."
-                        className="text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-card px-4 py-3 text-sm transition-all focus:ring-2 focus:ring-ring/20"
+                        className="text-on-surface placeholder:text-outline/50 bg-card focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
                       />
                     </div>
                   )}
 
                   {form.channels.includes('bark') && (
                     <div>
-                      <h4 className="mb-2 ml-1 text-xs font-semibold text-muted-foreground">
+                      <h4 className="text-muted-foreground mb-2 ml-1 text-xs font-semibold">
                         Bark Device Key
                       </h4>
                       <input
@@ -637,7 +634,7 @@ export function SubscriptionAddForm({
                           )
                         }
                         placeholder="填写 Bark 设备 Key"
-                        className="text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-card px-4 py-3 text-sm transition-all focus:ring-2 focus:ring-ring/20"
+                        className="text-on-surface placeholder:text-outline/50 bg-card focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
                       />
                     </div>
                   )}
@@ -647,11 +644,11 @@ export function SubscriptionAddForm({
 
             {/* Error & Submit */}
             {formError ? (
-              <p className="py-2 text-center text-xs font-medium text-destructive">
+              <p className="text-destructive py-2 text-center text-xs font-medium">
                 {formError}
               </p>
             ) : (
-              <p className="text-center text-[10px] text-muted-foreground">
+              <p className="text-muted-foreground text-center text-[10px]">
                 创建后可暂停或恢复订阅状态
               </p>
             )}
@@ -659,7 +656,7 @@ export function SubscriptionAddForm({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 text-sm font-extrabold text-primary-foreground shadow-xl shadow-primary/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-primary/40 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+              className="bg-primary text-primary-foreground shadow-primary/30 hover:shadow-primary/40 flex w-full items-center justify-center gap-2 rounded-full py-4 text-sm font-extrabold shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
             >
               {isSubmitting ? (
                 <>

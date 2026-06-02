@@ -153,15 +153,11 @@ export default function RssWorkspaceView() {
   };
 
   return (
-    <div className="min-h-dvh bg-background pb-28">
-      <header className="sticky top-0 z-10 bg-card/80 backdrop-blur-md">
+    <div className="bg-background min-h-dvh pb-28">
+      <header className="bg-card/80 sticky top-0 z-10 backdrop-blur-md">
         <div className="ml-12 max-w-2xl px-4 py-4">
-          <h1 className="text-2xl font-bold text-foreground">
-            Rss工作台
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Rss相关功能
-          </p>
+          <h1 className="text-foreground text-2xl font-bold">Rss工作台</h1>
+          <p className="text-muted-foreground mt-1 text-sm">Rss相关功能</p>
         </div>
       </header>
 
@@ -169,19 +165,19 @@ export default function RssWorkspaceView() {
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl bg-card p-4 ring-1 ring-border"
+          className="bg-card ring-border rounded-2xl p-4 ring-1"
         >
           <input
             value={rssUrl}
             onChange={(e) => setRssUrl(e.target.value)}
             placeholder="https://example.com/feed.xml"
-            className="w-full rounded-xl border border-border px-3 py-2 text-sm"
+            className="border-border w-full rounded-xl border px-3 py-2 text-sm"
           />
           <div className="mt-3 flex items-center gap-2">
             <button
               type="button"
               onClick={() => setSaveToDb((v) => !v)}
-              className="rounded-full border border-primary px-3 py-1 text-xs"
+              className="border-primary rounded-full border px-3 py-1 text-xs"
             >
               {saveToDb ? '已启用保存' : '保存到订阅'}
             </button>
@@ -189,7 +185,7 @@ export default function RssWorkspaceView() {
               type="button"
               onClick={handleParse}
               disabled={parseLoading}
-              className="ml-auto rounded-full bg-primary px-3 py-1 text-xs text-primary-foreground"
+              className="bg-primary text-primary-foreground ml-auto rounded-full px-3 py-1 text-xs"
             >
               {parseLoading ? '解析中...' : '开始解析'}
             </button>
@@ -200,7 +196,7 @@ export default function RssWorkspaceView() {
                 key={feed.url}
                 type="button"
                 onClick={() => setRssUrl(feed.url)}
-                className="rounded-full bg-primary/10 px-3 py-1 text-xs text-primary"
+                className="bg-primary/10 text-primary rounded-full px-3 py-1 text-xs"
               >
                 {feed.name}
               </button>
@@ -210,14 +206,14 @@ export default function RssWorkspaceView() {
                 key={item}
                 type="button"
                 onClick={() => setRssUrl(item)}
-                className="max-w-56 truncate rounded-full bg-secondary px-3 py-1 text-xs"
+                className="bg-secondary max-w-56 truncate rounded-full px-3 py-1 text-xs"
               >
                 {item}
               </button>
             ))}
           </div>
           {parseMetadata ? (
-            <p className="mt-3 text-xs text-muted-foreground">
+            <p className="text-muted-foreground mt-3 text-xs">
               {parseMetadata.title} · {formatDate(parseMetadata.published)}
             </p>
           ) : null}
@@ -227,7 +223,7 @@ export default function RssWorkspaceView() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="rounded-2xl bg-card p-4 ring-1 ring-border"
+          className="bg-card ring-border rounded-2xl p-4 ring-1"
         >
           <div className="mb-2 flex items-center">
             <h2 className="text-sm font-semibold">我的订阅</h2>
@@ -240,14 +236,11 @@ export default function RssWorkspaceView() {
             </button>
           </div>
           {loadingSubs ? (
-            <p className="text-xs text-muted-foreground">加载中...</p>
+            <p className="text-muted-foreground text-xs">加载中...</p>
           ) : (
             <ul className="space-y-2">
               {subscriptions.map((sub) => (
-                <li
-                  key={sub.id}
-                  className="rounded-xl bg-secondary p-3"
-                >
+                <li key={sub.id} className="bg-secondary rounded-xl p-3">
                   <p className="truncate text-sm font-medium">
                     {sub.feedTitle || getFeedHost(sub.rssUrl)}
                   </p>
@@ -259,7 +252,7 @@ export default function RssWorkspaceView() {
                         syncRouteQuery(1, sub.rssUrl, searchQuery);
                         void fetchArticles(1, sub.rssUrl, searchQuery);
                       }}
-                      className="rounded-full bg-primary px-3 py-1 text-xs text-primary-foreground"
+                      className="bg-primary text-primary-foreground rounded-full px-3 py-1 text-xs"
                     >
                       查看文章
                     </button>
@@ -274,21 +267,21 @@ export default function RssWorkspaceView() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.3 }}
-          className="rounded-2xl bg-card p-4 ring-1 ring-border"
+          className="bg-card ring-border rounded-2xl p-4 ring-1"
         >
           <div className="relative mb-2">
             <input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="搜索文章..."
-              className="w-full rounded-xl border border-border px-3 py-2 text-sm"
+              className="border-border w-full rounded-xl border px-3 py-2 text-sm"
             />
             <button
               type="button"
               onClick={() =>
                 void fetchArticles(1, selectedFeedUrl, searchQuery)
               }
-              className="absolute top-1 right-1 rounded-md px-2 py-1 text-xs text-primary"
+              className="text-primary absolute top-1 right-1 rounded-md px-2 py-1 text-xs"
             >
               搜索
             </button>
@@ -300,7 +293,7 @@ export default function RssWorkspaceView() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="text-xs text-muted-foreground"
+                className="text-muted-foreground text-xs"
               >
                 加载中...
               </motion.p>
@@ -313,13 +306,10 @@ export default function RssWorkspaceView() {
                 className="space-y-2"
               >
                 {articles.map((article) => (
-                  <li
-                    key={article.id}
-                    className="rounded-xl bg-secondary p-3"
-                  >
+                  <li key={article.id} className="bg-secondary rounded-xl p-3">
                     <Link
                       to={`/rss/articles/${article.id}`}
-                      className="text-sm font-semibold text-foreground"
+                      className="text-foreground text-sm font-semibold"
                     >
                       {article.title || '无标题'}
                     </Link>

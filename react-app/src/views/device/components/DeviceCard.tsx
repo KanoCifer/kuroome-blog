@@ -91,7 +91,7 @@ export function DeviceCard({
             <p className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
               {device.currency}
             </p>
-            <p className="font-family-dongfang mt-2 text-xs font-bold text-muted-foreground">
+            <p className="font-family-dongfang text-muted-foreground mt-2 text-xs font-bold">
               {`日均 ${formatPrice(calcSpendPerDay(device), device.currency)}/天`}
             </p>
           </div>
@@ -99,9 +99,9 @@ export function DeviceCard({
 
         {/* Notes Banner */}
         {device.notes && (
-          <div className="mb-6 flex items-center gap-2 rounded-2xl bg-secondary px-4 py-3">
+          <div className="bg-secondary mb-6 flex items-center gap-2 rounded-2xl px-4 py-3">
             <svg
-              className="h-4 w-4 scale-75 text-primary"
+              className="text-primary h-4 w-4 scale-75"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -113,7 +113,7 @@ export function DeviceCard({
                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
               />
             </svg>
-            <span className="truncate text-sm font-medium text-muted-foreground">
+            <span className="text-muted-foreground truncate text-sm font-medium">
               {device.notes}
             </span>
           </div>
@@ -127,7 +127,7 @@ export function DeviceCard({
               e.stopPropagation();
               onToggleStatus(device);
             }}
-            className="rounded-full bg-primary px-4 py-3 text-sm font-bold text-primary-foreground shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            className="bg-primary text-primary-foreground rounded-full px-4 py-3 text-sm font-bold shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isPending ? '处理中...' : isActive ? '标记退役' : '恢复使用'}
           </button>
@@ -137,7 +137,7 @@ export function DeviceCard({
               e.stopPropagation();
               setIsMilestoneModalOpen(true);
             }}
-            className="rounded-full bg-primary px-4 py-3 text-sm font-bold text-primary-foreground shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            className="bg-primary text-primary-foreground rounded-full px-4 py-3 text-sm font-bold shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
           >
             编辑配置
           </button>
@@ -148,7 +148,7 @@ export function DeviceCard({
               e.stopPropagation();
               onDelete(device);
             }}
-            className="rounded-full border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-bold text-destructive transition-all hover:bg-destructive/20 active:scale-95"
+            className="border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20 rounded-full border px-4 py-3 text-sm font-bold transition-all active:scale-95"
           >
             删除设备
           </button>

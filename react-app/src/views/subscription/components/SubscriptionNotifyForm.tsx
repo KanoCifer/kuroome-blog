@@ -118,7 +118,7 @@ function PrimaryButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`font-headline flex-1 rounded-full bg-primary px-5 py-3 text-sm font-bold text-primary-foreground shadow-[0_8px_20px_rgba(0,40,142,0.2)] transition-all hover:brightness-105 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100 ${className} `}
+      className={`font-headline bg-primary text-primary-foreground flex-1 rounded-full px-5 py-3 text-sm font-bold shadow-[0_8px_20px_rgba(0,40,142,0.2)] transition-all hover:brightness-105 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100 ${className} `}
     >
       {children}
     </button>
@@ -141,7 +141,7 @@ function SecondaryButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`font-headline text-on-surface flex-1 rounded-full border border-primary/60 bg-primary/5 px-4 py-2 text-sm font-semibold backdrop-blur-md transition-all hover:bg-card/70 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 ${className} `}
+      className={`font-headline text-on-surface border-primary/60 bg-primary/5 hover:bg-card/70 flex-1 rounded-full border px-4 py-2 text-sm font-semibold backdrop-blur-md transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 ${className} `}
     >
       {children}
     </button>
@@ -232,7 +232,7 @@ export function SubscriptionNotifyForm({
       <main className="relative mx-auto max-w-lg space-y-6 px-4 pt-6">
         {/* Header */}
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
+          <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-2xl">
             <BellRing size={24} className="text-primary" />
           </div>
           <div>
@@ -246,7 +246,7 @@ export function SubscriptionNotifyForm({
         </div>
 
         {/* Channel Selection */}
-        <div className="rounded-2xl border border-border bg-secondary p-5">
+        <div className="border-border bg-secondary rounded-2xl border p-5">
           <h4 className="text-on-surface-variant font-label mb-3 ml-1 text-xs font-semibold">
             通知渠道
           </h4>
@@ -261,7 +261,7 @@ export function SubscriptionNotifyForm({
                   className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all ${
                     checked
                       ? 'bg-primary text-primary-foreground shadow-[0_4px_12px_rgba(0,40,142,0.25)]'
-                      : 'border border-border bg-card text-card-foreground hover:bg-accent'
+                      : 'border-border bg-card text-card-foreground hover:bg-accent border'
                   } `}
                 >
                   <option.icon size={16} />
@@ -273,7 +273,7 @@ export function SubscriptionNotifyForm({
         </div>
 
         {/* Reminder Points */}
-        <div className="rounded-2xl border border-border bg-secondary p-5">
+        <div className="border-border bg-secondary rounded-2xl border p-5">
           <h4 className="text-on-surface-variant font-label mb-3 ml-1 text-xs font-semibold">
             提醒时间点
           </h4>
@@ -285,8 +285,8 @@ export function SubscriptionNotifyForm({
                   key={option.key}
                   className={`flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 transition-all ${
                     checked
-                      ? 'border border-primary/20 bg-primary/10'
-                      : 'border border-border bg-card hover:bg-accent'
+                      ? 'border-primary/20 bg-primary/10 border'
+                      : 'border-border bg-card hover:bg-accent border'
                   } `}
                 >
                   <div
@@ -313,7 +313,7 @@ export function SubscriptionNotifyForm({
 
         {/* Channel Config */}
         {form.channels.includes('email') && (
-          <div className="rounded-2xl border border-border bg-secondary p-5">
+          <div className="border-border bg-secondary rounded-2xl border p-5">
             <h4 className="text-on-surface-variant font-label mb-3 ml-1 text-xs font-semibold">
               邮件配置
             </h4>
@@ -322,13 +322,13 @@ export function SubscriptionNotifyForm({
               value={form.email}
               onChange={(event) => handleChange('email', event.target.value)}
               placeholder="your@email.com"
-              className="text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-card px-4 py-3 text-sm transition-all focus:ring-2 focus:ring-ring/20"
+              className="text-on-surface placeholder:text-outline/50 bg-card focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
             />
           </div>
         )}
 
         {form.channels.includes('feishu') && (
-          <div className="rounded-2xl border border-border bg-secondary p-5">
+          <div className="border-border bg-secondary rounded-2xl border p-5">
             <h4 className="text-on-surface-variant font-label mb-3 ml-1 text-xs font-semibold">
               飞书 Webhook
             </h4>
@@ -338,13 +338,13 @@ export function SubscriptionNotifyForm({
                 handleChange('feishu_webhook_url', event.target.value)
               }
               placeholder="https://open.feishu.cn/..."
-              className="text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-card px-4 py-3 text-sm transition-all focus:ring-2 focus:ring-ring/20"
+              className="text-on-surface placeholder:text-outline/50 bg-card focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
             />
           </div>
         )}
 
         {form.channels.includes('bark') && (
-          <div className="rounded-2xl border border-border bg-secondary p-5">
+          <div className="border-border bg-secondary rounded-2xl border p-5">
             <h4 className="text-on-surface-variant font-label mb-3 ml-1 text-xs font-semibold">
               Bark Device Key
             </h4>
@@ -354,14 +354,14 @@ export function SubscriptionNotifyForm({
                 handleChange('bark_device_key', event.target.value)
               }
               placeholder="填写 Bark 设备 Key"
-              className="text-on-surface placeholder:text-outline/50 w-full rounded-xl border-0 bg-card px-4 py-3 text-sm transition-all focus:ring-2 focus:ring-ring/20"
+              className="text-on-surface placeholder:text-outline/50 bg-card focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
             />
           </div>
         )}
 
         {/* Error Message */}
         {error && (
-          <div className="rounded-2xl bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          <div className="bg-destructive/10 text-destructive rounded-2xl px-4 py-3 text-sm">
             {error}
           </div>
         )}

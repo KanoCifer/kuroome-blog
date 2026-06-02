@@ -32,13 +32,11 @@ export function BookCard({ book, index = 0 }: BookCardProps) {
   const badge = book.iscompleted
     ? {
         text: '已读',
-        className:
-          'bg-success/10 text-success',
+        className: 'bg-success/10 text-success',
       }
     : {
         text: '在读',
-        className:
-          'bg-primary/10 text-primary',
+        className: 'bg-primary/10 text-primary',
       };
 
   return (
@@ -48,8 +46,8 @@ export function BookCard({ book, index = 0 }: BookCardProps) {
       transition={{ duration: 0.4, delay: Math.min(index * 0.04, 0.4) }}
       className="book-card-wrapper"
     >
-      <div className="group overflow-hidden rounded-2xl bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-        <div className="relative aspect-[2/3] overflow-hidden bg-muted">
+      <div className="group bg-card overflow-hidden rounded-2xl shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+        <div className="bg-muted relative aspect-[2/3] overflow-hidden">
           {book.cover && !coverError ? (
             <img
               src={coverSrc}
@@ -65,7 +63,7 @@ export function BookCard({ book, index = 0 }: BookCardProps) {
                 viewBox="0 0 24 24"
                 strokeWidth="1.5"
                 stroke="currentColor"
-                className="h-14 w-14 text-muted-foreground"
+                className="text-muted-foreground h-14 w-14"
               >
                 <path
                   strokeLinecap="round"
@@ -85,12 +83,12 @@ export function BookCard({ book, index = 0 }: BookCardProps) {
         </div>
         <div className="p-4">
           <h3
-            className="truncate text-base font-semibold text-foreground"
+            className="text-foreground truncate text-base font-semibold"
             title={book.title}
           >
             {book.title}
           </h3>
-          <p className="mt-1 truncate text-sm text-muted-foreground opacity-70">
+          <p className="text-muted-foreground mt-1 truncate text-sm opacity-70">
             {book.author}
           </p>
         </div>

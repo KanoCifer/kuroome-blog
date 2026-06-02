@@ -5,7 +5,7 @@ import IconLock from '@/components/icons/IconLock.vue';
 import { useNotificationStore } from '@/stores/notification';
 import type { RegisterForm } from '@/types';
 import axios from 'axios';
-import { Mail, ShieldUser } from 'lucide-vue-next';
+import { Mail, ShieldUser } from '@lucide/vue';
 import { ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 

@@ -66,7 +66,7 @@ export function BackToTop({ className }: BackToTopProps) {
           >
             {/* 背景进度环 */}
             <svg
-              className="absolute inset-0 h-full w-full -rotate-90 text-primary"
+              className="text-primary absolute inset-0 h-full w-full -rotate-90"
               viewBox="0 0 56 56"
               aria-hidden
             >

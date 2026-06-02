@@ -71,7 +71,7 @@ export function FishingIndexCard({
 
   return (
     <article
-      className={`relative rounded-2xl border border-border/40 p-4 shadow-sm backdrop-blur-sm ${levelBg}`}
+      className={`border-border/40 relative rounded-2xl border p-4 shadow-sm backdrop-blur-sm ${levelBg}`}
     >
       {/* 背景装饰 */}
       <div className="pointer-events-none absolute top-0 right-0 overflow-hidden rounded-full p-8 blur-3xl">
@@ -80,16 +80,14 @@ export function FishingIndexCard({
 
       <div className="mb-3 flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-foreground">
-            钓鱼指数
-          </h3>
-          <p className="text-xs text-muted-foreground">
+          <h3 className="text-foreground text-sm font-semibold">钓鱼指数</h3>
+          <p className="text-muted-foreground text-xs">
             基于实时天气、潮汐综合计算
           </p>
         </div>
         <button
           onClick={() => void refetch()}
-          className="flex cursor-pointer items-center gap-1 rounded-lg bg-card/60 px-2 py-1 text-sm text-muted-foreground hover:bg-card/80 disabled:cursor-not-allowed"
+          className="bg-card/60 text-muted-foreground hover:bg-card/80 flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-sm disabled:cursor-not-allowed"
           disabled={loading}
         >
           <Loader
@@ -105,7 +103,7 @@ export function FishingIndexCard({
         </div>
       ) : error && !indexData ? (
         <div className="min-h-[200px]">
-          <p className="text-sm text-destructive">{error}</p>
+          <p className="text-destructive text-sm">{error}</p>
         </div>
       ) : indexData ? (
         <div className="min-h-[200px]">
@@ -119,22 +117,22 @@ export function FishingIndexCard({
           </div>
 
           <div className="mb-3 grid grid-cols-3 gap-2 text-center text-xs">
-            <div className="rounded-lg bg-card/60 px-2 py-2">
+            <div className="bg-card/60 rounded-lg px-2 py-2">
               默认权重
-              <div className="mt-1 font-medium text-foreground">
+              <div className="text-foreground mt-1 font-medium">
                 {indexData.expert_score}
               </div>
             </div>
-            <div className="rounded-lg bg-card/60 px-2 py-2">
+            <div className="bg-card/60 rounded-lg px-2 py-2">
               权重调整
-              <div className="mt-1 font-medium text-foreground">
+              <div className="text-foreground mt-1 font-medium">
                 {indexData.residual > 0 ? '+' : ''}
                 {indexData.residual}
               </div>
             </div>
-            <div className="rounded-lg bg-card/60 px-2 py-2">
+            <div className="bg-card/60 rounded-lg px-2 py-2">
               综合指数
-              <div className="mt-1 font-medium text-foreground">
+              <div className="text-foreground mt-1 font-medium">
                 {indexData.fishing_index}
               </div>
             </div>
@@ -142,7 +140,7 @@ export function FishingIndexCard({
 
           {Object.keys(indexData.feature_breakdown).length > 0 && (
             <details className="mt-2">
-              <summary className="mb-2 cursor-pointer text-xs font-medium text-muted-foreground transition-colors hover:text-card-foreground">
+              <summary className="text-muted-foreground hover:text-card-foreground mb-2 cursor-pointer text-xs font-medium transition-colors">
                 特征详情
               </summary>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -163,7 +161,7 @@ export function FishingIndexCard({
                     return (
                       <div
                         key={key}
-                        className="group relative overflow-hidden rounded-xl border border-border/30 bg-card/50 p-3 shadow-md backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-card/70"
+                        className="group border-border/30 bg-card/50 hover:border-primary/50 hover:bg-card/70 relative overflow-hidden rounded-xl border p-3 shadow-md backdrop-blur-sm transition-all"
                         style={{ animationDelay: `${idx * 60}ms` }}
                       >
                         {/* Background shimmer effect */}
@@ -171,13 +169,13 @@ export function FishingIndexCard({
 
                         {/* Label */}
                         <div className="mb-2 flex items-center justify-between">
-                          <span className="text-xs font-medium text-muted-foreground">
+                          <span className="text-muted-foreground text-xs font-medium">
                             {label}
                           </span>
                         </div>
 
                         {/* Gauge bar */}
-                        <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-secondary/60">
+                        <div className="bg-secondary/60 relative h-1.5 w-full overflow-hidden rounded-full">
                           {/* Water fill effect */}
                           <div
                             className="absolute inset-y-0 left-0 rounded-full transition-all duration-700 ease-out"
@@ -207,14 +205,14 @@ export function FishingIndexCard({
 
           <button
             onClick={handleFeedback}
-            className="mt-3 w-full rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 mt-3 w-full rounded-lg px-3 py-2 text-sm font-medium"
           >
             提交钓鱼反馈
           </button>
         </div>
       ) : (
         <div className="min-h-[200px]">
-          <p className="text-sm text-muted-foreground">暂无数据</p>
+          <p className="text-muted-foreground text-sm">暂无数据</p>
         </div>
       )}
     </article>

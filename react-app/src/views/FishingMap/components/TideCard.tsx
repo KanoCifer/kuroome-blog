@@ -177,16 +177,14 @@ export function TideCard() {
   }, [isDarkMode, tideData]);
 
   return (
-    <article className="relative rounded-2xl border border-border/40 bg-linear-to-br from-card/80 to-card/40 p-4 shadow-sm backdrop-blur-sm">
+    <article className="border-border/40 from-card/80 to-card/40 relative rounded-2xl border bg-linear-to-br p-4 shadow-sm backdrop-blur-sm">
       {/* Decorative gradient orbs */}
-      <div className="pointer-events-none absolute bottom-16 left-16 h-32 w-32 overflow-hidden rounded-full bg-linear-to-tr from-success/20 to-success/10 blur-3xl transition-transform duration-700 group-hover:scale-110"></div>
+      <div className="from-success/20 to-success/10 pointer-events-none absolute bottom-16 left-16 h-32 w-32 overflow-hidden rounded-full bg-linear-to-tr blur-3xl transition-transform duration-700 group-hover:scale-110"></div>
 
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="min-w-0">
-          <h3 className="text-sm font-semibold text-foreground">
-            潮汐预报
-          </h3>
-          <p className="truncate text-xs text-muted-foreground">
+          <h3 className="text-foreground text-sm font-semibold">潮汐预报</h3>
+          <p className="text-muted-foreground truncate text-xs">
             {tideSpotName}
           </p>
         </div>
@@ -194,7 +192,7 @@ export function TideCard() {
           <select
             value={selectedHarbor}
             onChange={(e) => setSelectedHarbor(e.target.value)}
-            className="cursor-pointer rounded-lg border border-border bg-card/80 px-1.5 py-1 text-xs text-card-foreground focus:ring-1 focus:ring-ring focus:outline-none"
+            className="border-border bg-card/80 text-card-foreground focus:ring-ring cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
           >
             {HARBOR_OPTIONS.map((opt) => (
               <option key={opt.code} value={opt.code}>
@@ -205,7 +203,7 @@ export function TideCard() {
           <select
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            className="cursor-pointer rounded-lg border border-border bg-card/80 px-1.5 py-1 text-xs text-card-foreground focus:ring-1 focus:ring-ring focus:outline-none"
+            className="border-border bg-card/80 text-card-foreground focus:ring-ring cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
           >
             {dateOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -224,21 +222,21 @@ export function TideCard() {
         <div className="min-h-[200px]">
           <TideChart option={tideChartOption} />
           <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-            <div className="rounded-lg bg-card/60 px-3 py-2">
+            <div className="bg-card/60 rounded-lg px-3 py-2">
               <p className="text-muted-foreground">
                 最高潮:{dayjs(highTide?.fxTime).format('HH:mm')}
                 <span className="text-primary">↗</span>
               </p>
-              <p className="mt-1 font-medium text-foreground">
+              <p className="text-foreground mt-1 font-medium">
                 {highTide ? Number(highTide.height).toFixed(2) : '--'}m
               </p>
             </div>
-            <div className="rounded-lg bg-card/60 px-3 py-2">
+            <div className="bg-card/60 rounded-lg px-3 py-2">
               <p className="text-muted-foreground">
                 最低潮:{dayjs(lowTide?.fxTime).format('HH:mm')}
                 <span className="text-primary">↘</span>
               </p>
-              <p className="mt-1 font-medium text-foreground">
+              <p className="text-foreground mt-1 font-medium">
                 {lowTide ? Number(lowTide.height).toFixed(2) : '--'}m
               </p>
             </div>
@@ -246,9 +244,7 @@ export function TideCard() {
         </div>
       ) : (
         <div className="min-h-[200px]">
-          <p className="text-sm text-muted-foreground">
-            暂无潮汐数据
-          </p>
+          <p className="text-muted-foreground text-sm">暂无潮汐数据</p>
         </div>
       )}
     </article>

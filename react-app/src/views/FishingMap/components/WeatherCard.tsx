@@ -51,13 +51,13 @@ export function WeatherCard({
   return (
     <article
       onClick={openQWeather}
-      className="cursor-pointer overflow-hidden rounded-2xl border border-border bg-card p-3 shadow-sm transition-all hover:shadow-md active:scale-[0.98]"
+      className="border-border bg-card cursor-pointer overflow-hidden rounded-2xl border p-3 shadow-sm transition-all hover:shadow-md active:scale-[0.98]"
     >
       {/* Header */}
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <MapPin className="h-3 w-3 text-muted-foreground" />
-          <span className="text-xs font-medium text-muted-foreground">
+          <MapPin className="text-muted-foreground h-3 w-3" />
+          <span className="text-muted-foreground text-xs font-medium">
             {locationName || '钓鱼地点'}
           </span>
         </div>
@@ -65,54 +65,50 @@ export function WeatherCard({
           <div
             className={`flex items-center gap-1.5 rounded-xl bg-linear-to-r ${getLiveWeatherBg(Number(liveWeather.temp))} px-3 py-1.5`}
           >
-            <span className="text-lg font-bold text-foreground">
+            <span className="text-foreground text-lg font-bold">
               {liveWeather.temp}°
             </span>
             <div className="flex items-center gap-1 rounded-lg px-2 py-1">
               <i className={`qi-${liveWeather.icon} text-xl`} />
-              <span className="text-xs text-muted-foreground">
+              <span className="text-muted-foreground text-xs">
                 {liveWeather.text}
               </span>
             </div>
           </div>
         ) : (
-          <CloudSun className="h-5 w-5 text-warning" />
+          <CloudSun className="text-warning h-5 w-5" />
         )}
       </div>
 
       {loading ? (
         <SkeletonCard hasBottomRow />
       ) : error ? (
-        <p className="text-xs text-destructive">{error}</p>
+        <p className="text-destructive text-xs">{error}</p>
       ) : liveWeather ? (
         <div>
           {/* 主数据行 */}
           <div className="mb-3 grid grid-cols-2 gap-2">
             {/* 体感温度 */}
-            <div className="flex items-center gap-2 rounded-xl bg-secondary p-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-warning/20">
-                <Thermometer className="h-4 w-4 text-warning" />
+            <div className="bg-secondary flex items-center gap-2 rounded-xl p-2.5">
+              <div className="bg-warning/20 flex h-9 w-9 items-center justify-center rounded-lg">
+                <Thermometer className="text-warning h-4 w-4" />
               </div>
               <div>
-                <p className="text-[10px] text-muted-foreground">
-                  体感温度
-                </p>
-                <p className="text-sm font-bold text-foreground">
+                <p className="text-muted-foreground text-[10px]">体感温度</p>
+                <p className="text-foreground text-sm font-bold">
                   {liveWeather.feelsLike}°C
                 </p>
               </div>
             </div>
 
             {/* 能见度 */}
-            <div className="flex items-center gap-2 rounded-xl bg-secondary p-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-success/20">
-                <Eye className="h-4 w-4 text-success" />
+            <div className="bg-secondary flex items-center gap-2 rounded-xl p-2.5">
+              <div className="bg-success/20 flex h-9 w-9 items-center justify-center rounded-lg">
+                <Eye className="text-success h-4 w-4" />
               </div>
               <div>
-                <p className="text-[10px] text-muted-foreground">
-                  能见度
-                </p>
-                <p className="text-sm font-bold text-foreground">
+                <p className="text-muted-foreground text-[10px]">能见度</p>
+                <p className="text-foreground text-sm font-bold">
                   {liveWeather.vis} km
                 </p>
               </div>
@@ -120,7 +116,7 @@ export function WeatherCard({
           </div>
 
           {/* 气象指标条 */}
-          <div className="mb-3 flex gap-1.5 overflow-hidden rounded-xl bg-secondary p-2">
+          <div className="bg-secondary mb-3 flex gap-1.5 overflow-hidden rounded-xl p-2">
             <div className="flex flex-1 flex-col items-center">
               <Navigation
                 className="h-4 w-4"
@@ -128,28 +124,28 @@ export function WeatherCard({
                   transform: `rotate(${Number(liveWeather.wind360)}deg)`,
                 }}
               />
-              <span className="mt-1 text-[10px] text-muted-foreground">
+              <span className="text-muted-foreground mt-1 text-[10px]">
                 {liveWeather.windDir}
               </span>
-              <span className="text-[11px] font-bold text-foreground">
+              <span className="text-foreground text-[11px] font-bold">
                 {(Number(liveWeather.windSpeed) / 3.6).toFixed(1)}m/s
               </span>
             </div>
-            <div className="flex flex-1 flex-col items-center border-x border-border">
+            <div className="border-border flex flex-1 flex-col items-center border-x">
               <Droplets className="h-4 w-4" />
-              <span className="mt-1 text-[10px] text-muted-foreground">
+              <span className="text-muted-foreground mt-1 text-[10px]">
                 湿度
               </span>
-              <span className="text-[11px] font-bold text-foreground">
+              <span className="text-foreground text-[11px] font-bold">
                 {liveWeather.humidity}%
               </span>
             </div>
-            <div className="flex flex-1 flex-col items-center border-r border-border">
+            <div className="border-border flex flex-1 flex-col items-center border-r">
               <Gauge className="h-4 w-4" />
-              <span className="mt-1 text-[10px] text-muted-foreground">
+              <span className="text-muted-foreground mt-1 text-[10px]">
                 气压
               </span>
-              <span className="text-[11px] font-bold text-foreground">
+              <span className="text-foreground text-[11px] font-bold">
                 {liveWeather.pressure}
               </span>
             </div>
@@ -169,7 +165,7 @@ export function WeatherCard({
                   }`}
                 />
               </div>
-              <span className="mt-1 text-[10px] text-muted-foreground">
+              <span className="text-muted-foreground mt-1 text-[10px]">
                 状态
               </span>
               <span
@@ -186,15 +182,15 @@ export function WeatherCard({
               {forecasts.slice(0, 3).map((day, i) => (
                 <div
                   key={day.fxDate}
-                  className="flex-1 rounded-xl bg-secondary p-2"
+                  className="bg-secondary flex-1 rounded-xl p-2"
                 >
-                  <p className="text-center text-[10px] text-muted-foreground">
+                  <p className="text-muted-foreground text-center text-[10px]">
                     {i === 0 ? '今天' : dayjs(day.fxDate).format('MM/DD')}
                   </p>
                   <div className="mt-1 flex justify-center">
                     <i className={`qi-${day.iconDay} text-2xl`} />
                   </div>
-                  <p className="text-center text-[11px] font-bold text-foreground">
+                  <p className="text-foreground text-center text-[11px] font-bold">
                     {day.tempMax}°/{day.tempMin}°
                   </p>
                 </div>
@@ -203,7 +199,7 @@ export function WeatherCard({
           )}
         </div>
       ) : (
-        <p className="text-xs text-muted-foreground">暂无天气数据</p>
+        <p className="text-muted-foreground text-xs">暂无天气数据</p>
       )}
     </article>
   );

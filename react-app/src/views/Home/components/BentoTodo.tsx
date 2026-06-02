@@ -43,16 +43,16 @@ export function BentoTodo() {
     <BentoCard>
       <div className="flex h-full flex-col">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-xs font-bold tracking-wide text-muted-foreground uppercase transition-colors duration-300 group-hover:text-foreground">
+          <h3 className="text-muted-foreground group-hover:text-foreground text-xs font-bold tracking-wide uppercase transition-colors duration-300">
             {title}
           </h3>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-muted-foreground">
+            <span className="text-muted-foreground text-xs font-medium">
               {doneCount} / {tasks.length}
             </span>
             <Link
               to="/todos"
-              className="cursor-pointer rounded-md p-1 text-muted-foreground outline-0 transition-colors hover:bg-accent hover:text-foreground"
+              className="text-muted-foreground hover:bg-accent hover:text-foreground cursor-pointer rounded-md p-1 outline-0 transition-colors"
               title="查看详情"
             >
               <svg
@@ -78,7 +78,7 @@ export function BentoTodo() {
 
             {tasks.length === 0 && (
               <div className="flex h-full flex-col items-center justify-center py-6">
-                <p className="text-md flex flex-col items-center gap-2 font-medium tracking-wide text-muted-foreground">
+                <p className="text-md text-muted-foreground flex flex-col items-center gap-2 font-medium tracking-wide">
                   <BookCheck className="size-12" />
                   暂无开发任务
                 </p>

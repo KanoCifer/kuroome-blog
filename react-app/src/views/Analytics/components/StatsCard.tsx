@@ -23,17 +23,13 @@ export function StatsCard({
         >
           {icon}
         </div>
-        <span className="text-xs font-medium text-muted-foreground">
+        <span className="text-muted-foreground text-xs font-medium">
           {title}
         </span>
       </div>
 
-      <p className="text-xl font-bold text-foreground">
-        {value}
-      </p>
-      <p className="mt-0.5 text-[11px] text-muted-foreground">
-        {subtitle}
-      </p>
+      <p className="text-foreground text-xl font-bold">{value}</p>
+      <p className="text-muted-foreground mt-0.5 text-[11px]">{subtitle}</p>
     </article>
   );
 }

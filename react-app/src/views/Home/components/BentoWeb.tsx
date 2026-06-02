@@ -31,11 +31,11 @@ export function BentoWeb() {
   return (
     <BentoCard onClick={() => navigate('/websites')} className="cursor-pointer">
       <div className="relative z-10 flex h-full flex-col justify-between">
-        <div className="text-xs font-bold tracking-wide text-muted-foreground uppercase transition-colors duration-300 group-hover:text-foreground">
+        <div className="text-muted-foreground group-hover:text-foreground text-xs font-bold tracking-wide uppercase transition-colors duration-300">
           Daily Pick
         </div>
         <div className="my-1 flex items-center">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted text-card-foreground transition-colors duration-300 group-hover:bg-secondary">
+          <div className="bg-muted text-card-foreground group-hover:bg-secondary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors duration-300">
             {randomSite.icon && (
               <img
                 src={randomSite.icon}
@@ -61,12 +61,12 @@ export function BentoWeb() {
               </svg>
             )}
           </div>
-          <h3 className="ml-2 text-lg leading-tight font-bold text-foreground transition-colors duration-300">
+          <h3 className="text-foreground ml-2 text-lg leading-tight font-bold transition-colors duration-300">
             {randomSite.name}
           </h3>
         </div>
         <div>
-          <p className="line-clamp-2 text-sm text-muted-foreground transition-colors duration-300 group-hover:text-card-foreground">
+          <p className="text-muted-foreground group-hover:text-card-foreground line-clamp-2 text-sm transition-colors duration-300">
             {randomSite.description}
           </p>
         </div>

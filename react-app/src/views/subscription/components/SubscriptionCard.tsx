@@ -86,30 +86,30 @@ export function SubscriptionCard({
 
   return (
     <div className="space-y-4">
-      <article className="squircle border border-border bg-card p-6 shadow-lg">
+      <article className="squircle border-border bg-card border p-6 shadow-lg">
         <div className="mb-6 flex items-start justify-between">
           <div className="flex items-center gap-4">
             {/* Logo placeholder */}
-            <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-border bg-card shadow-inner">
-              <span className="text-2xl font-bold text-muted-foreground">
+            <div className="border-border bg-card flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border shadow-inner">
+              <span className="text-muted-foreground text-2xl font-bold">
                 {subscription.name.charAt(0).toUpperCase()}
               </span>
             </div>
             <div>
-              <h3 className="text-lg font-bold text-foreground">
+              <h3 className="text-foreground text-lg font-bold">
                 {subscription.name}
               </h3>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 {subscription.provider} •{' '}
                 {getCycleLabel(subscription.billing_cycle)}
               </p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-xl font-bold text-primary">
+            <p className="text-primary text-xl font-bold">
               {formatPrice(subscription.price, subscription.currency)}
             </p>
-            <p className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
+            <p className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
               Per{' '}
               {subscription.billing_cycle === 'monthly'
                 ? 'Month'
@@ -123,9 +123,9 @@ export function SubscriptionCard({
         </div>
 
         {/* Next Billing Banner */}
-        <div className="mb-6 flex items-center gap-2 rounded-2xl bg-secondary px-4 py-3">
+        <div className="bg-secondary mb-6 flex items-center gap-2 rounded-2xl px-4 py-3">
           <svg
-            className="h-4 w-4 scale-75 text-primary"
+            className="text-primary h-4 w-4 scale-75"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -137,13 +137,13 @@ export function SubscriptionCard({
               d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
             />
           </svg>
-          <span className="text-sm font-medium text-muted-foreground">
+          <span className="text-muted-foreground text-sm font-medium">
             下次扣费:{' '}
           </span>
-          <span className="text-sm font-bold text-foreground">
+          <span className="text-foreground text-sm font-bold">
             {formatDate(subscription.next_billing_date, 'YYYY-MM-DD')}
           </span>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-muted-foreground text-xs">
             ({getDaysUntil(subscription.next_billing_date)} 天后)
           </span>
         </div>
@@ -153,14 +153,14 @@ export function SubscriptionCard({
             type="button"
             disabled={isPending}
             onClick={() => onToggleStatus(subscription)}
-            className="rounded-full bg-primary px-4 py-3 text-sm font-bold text-primary-foreground shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            className="bg-primary text-primary-foreground rounded-full px-4 py-3 text-sm font-bold shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isPending ? '处理中...' : isActive ? '暂停订阅' : '恢复订阅'}
           </button>
           <button
             type="button"
             onClick={() => openModal('edit')}
-            className="rounded-full border border-border bg-card px-4 py-3 text-sm font-bold text-foreground transition-all hover:bg-accent active:scale-95"
+            className="border-border bg-card text-foreground hover:bg-accent rounded-full border px-4 py-3 text-sm font-bold transition-all active:scale-95"
           >
             编辑与通知
           </button>
@@ -172,7 +172,7 @@ export function SubscriptionCard({
           onClose={() => setIsModalOpen(false)}
         >
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-2 rounded-2xl border border-border bg-muted p-1">
+            <div className="border-border bg-muted grid grid-cols-2 gap-2 rounded-2xl border p-1">
               <button
                 type="button"
                 onClick={() => setActiveTab('edit')}

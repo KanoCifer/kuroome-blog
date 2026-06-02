@@ -34,10 +34,10 @@ export default function WebsiteView() {
         rel="noopener noreferrer"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="squircle mx-4 bg-secondary p-5 shadow-lg"
+        className="squircle bg-secondary mx-4 p-5 shadow-lg"
       >
         <div className="mb-4 flex items-start gap-4">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-muted">
+          <div className="bg-muted flex h-14 w-14 shrink-0 items-center justify-center rounded-xl">
             <img
               src={t.icon}
               alt={t.name}
@@ -49,23 +49,23 @@ export default function WebsiteView() {
             />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="truncate text-lg font-bold text-foreground transition-colors duration-300 group-hover:text-card-foreground">
+            <h3 className="text-foreground group-hover:text-card-foreground truncate text-lg font-bold transition-colors duration-300">
               {t.name}
             </h3>
-            <span className="inline-block rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground">
+            <span className="bg-secondary text-muted-foreground inline-block rounded-full px-2 py-0.5 text-xs font-medium">
               {t.category}
             </span>
           </div>
         </div>
 
-        <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+        <p className="text-muted-foreground line-clamp-3 text-sm leading-relaxed">
           {t.description}
         </p>
 
         <div className="mt-4 flex flex-wrap gap-2">
           <span
             key={t.id}
-            className="rounded-full bg-secondary px-2 py-1 text-xs text-muted-foreground"
+            className="bg-secondary text-muted-foreground rounded-full px-2 py-1 text-xs"
           >
             {t.tags.map((tag) => (
               <span key={tag}>{tag}</span>
@@ -76,7 +76,7 @@ export default function WebsiteView() {
         <div className="absolute top-4 right-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 text-muted-foreground"
+            className="text-muted-foreground h-5 w-5"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

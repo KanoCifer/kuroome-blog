@@ -97,7 +97,9 @@ export const authGateway = {
     return request.put('v1/auth/settings', payload);
   },
 
-  sendRegisterEmailCode(payload: { email: string }): Promise<AxiosResponse<any>> {
+  sendRegisterEmailCode(payload: {
+    email: string;
+  }): Promise<AxiosResponse<any>> {
     return request.post('v1/auth/email/code', payload);
   },
 
