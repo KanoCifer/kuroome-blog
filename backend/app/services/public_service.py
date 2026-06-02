@@ -7,6 +7,7 @@ from xml.etree.ElementTree import Element, SubElement, tostring
 import httpx
 import orjson
 from redis.asyncio import Redis as AsyncRedis
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
 from app.models.models import GalleryImage
@@ -28,6 +29,83 @@ class PublicService:
     @staticmethod
     def get_api_status() -> dict[str, str]:
         return {"status": "ok"}
+
+    async def get_status_detail(self, session: AsyncSession) -> dict:
+        """Collect version, service, and system health metrics."""
+        import asyncio
+        import gc
+        import platform
+        import sys
+        import time
+
+        import psutil
+        from sqlalchemy import text
+
+        from app.core.startup import SERVER_START_TIME
+
+        # Database health check
+        db_ok = True
+        try:
+            await asyncio.wait_for(
+                session.execute(text("SELECT 1")),
+                timeout=3.0,
+            )
+        except Exception:
+            db_ok = False
+
+        # --- Version Info ---
+        version_info = {
+            "repo_url": "https://github.com/KanoCifer/kuroome-blog",
+            "current_version": get_settings().API_VERSION,
+        }
+
+        # --- Service Info ---
+        mem = psutil.virtual_memory()
+        process = psutil.Process()
+        heap_memory = process.memory_info().rss
+
+        service_info = {
+            "runtime": f"{sys.platform}/{platform.machine()}",
+            "python_version": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+            "coroutines": len(asyncio.all_tasks()),
+            "gc_count": gc.get_count(),
+            "start_time": round(SERVER_START_TIME, 0),
+            "heap_memory_bytes": heap_memory,
+            "total_memory_bytes": mem.total,
+            "db_ok": db_ok,
+            "api_ok": True,
+        }
+
+        # --- System Info ---
+        load_avg = [round(x, 2) for x in psutil.getloadavg()]
+
+        system_info = {
+            "system_time": time.strftime(
+                "%Y/%m/%d %H:%M:%S", time.localtime()
+            ),
+            "system_timezone": "GMT+8",
+            "os_name": f"{platform.system()} {platform.release()}",
+            "os_version": platform.version(),
+            "kernel_version": platform.release(),
+            "cpu_model": platform.processor() or "Unknown",
+            "cpu_count_physical": psutil.cpu_count(logical=False),
+            "cpu_count_logical": psutil.cpu_count(logical=True),
+            "load_average": {
+                "1m": load_avg[0],
+                "5m": load_avg[1],
+                "15m": load_avg[2],
+            },
+            "cpu_percent": psutil.cpu_percent(interval=None),
+            "memory_usage_percent": round(mem.percent, 1),
+            "memory_used_bytes": mem.used,
+            "memory_total_bytes": mem.total,
+        }
+
+        return {
+            "version": version_info,
+            "service": service_info,
+            "system": system_info,
+        }
 
     @staticmethod
     def get_robots_txt() -> str:
@@ -191,7 +269,9 @@ Sitemap: {sitemap_url}
             from app.core.container import get_fishing_service
 
             async with get_fishing_service() as svc:
-                await svc.save_ai_analysis_feedback(data, ai_score, parse_tide_info)
+                await svc.save_ai_analysis_feedback(
+                    data, ai_score, parse_tide_info
+                )
 
         try:
             async for chunk in weather_analyzer.analyze_weather_stream(
