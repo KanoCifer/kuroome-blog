@@ -1,3 +1,5 @@
+import re
+
 import httpx
 
 from app.tasks.weread_task import import_books_from_weread
@@ -43,3 +45,18 @@ class WereadService:
             result.get("imported_count", 0) if isinstance(result, dict) else 0
         )
         return count
+
+    async def get_user_info(self, user_id: int):
+        """获取用户信息"""
+        user = await self.repo.get_user_info(user_id)
+        if not user:
+            raise ValueError("用户信息不存在")
+        return user
+
+    async def save_user_info(self, user_id: int, api_key: str):
+        """保存用户信息"""
+        pattern = r"^wrk\-"
+        if not api_key or not re.match(pattern=pattern, string=api_key):
+            raise ValueError("无效的API Key格式")
+        user = await self.repo.save_user_info(user_id, api_key)
+        return user

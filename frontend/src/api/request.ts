@@ -89,6 +89,8 @@ request.interceptors.response.use(
         error.message = '请求过于频繁，请稍后再试';
       } else if (status === 502 || status === 503) {
         error.message = '服务暂时不可用，请稍后重试';
+      } else if (status === 422) {
+        error.message = '请求参数错误，请检查后重试';
       } else if (status === 500) {
         error.message = '服务器内部错误，请稍后重试';
       } else if (status && status >= 400) {

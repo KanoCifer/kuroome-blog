@@ -46,6 +46,9 @@ from app.api.v2 import (
     devtasks as devtasks_v2,
 )
 from app.api.v2 import public as public_v2
+from app.api.v2 import (
+    weread as weread_v2,
+)
 from app.core import get_settings, register_exception_handlers
 from app.core import logger as app_logger
 from app.models.beanie import (
@@ -57,6 +60,7 @@ from app.models.beanie import (
     SubscriptionLog,
 )
 from app.models.fishing import FishingModelMeta, FishingRecord
+from app.models.weread import User
 from app.tasks import broker, send_feishu_message
 from app.utils import close_cache_redis
 
@@ -93,6 +97,7 @@ async def lifespan(app: FastAPI):
             FishingModelMeta,
             FriendLinks,
             DevTask,
+            User,
         ],
     )
     app.state.redis = await init_redis()
@@ -159,6 +164,7 @@ app.include_router(router=weather.router, prefix="/api/v2")
 app.include_router(router=public_v2.router, prefix="/api/v2")
 app.include_router(router=friendlinks.router, prefix="/api/v2")
 app.include_router(router=devtasks_v2.router, prefix="/api/v2")
+app.include_router(router=weread_v2.router, prefix="/api/v2")
 
 
 # 统一注册全局异常处理器
