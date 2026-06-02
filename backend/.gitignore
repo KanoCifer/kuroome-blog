@@ -34,5 +34,5 @@ babel.cfg
 legacy/
 jwt
 response_data
-media/
-models/
+/media
+*.joblib

@@ -22,6 +22,7 @@ const props = defineProps<{
 
 const auth = useAuthStore();
 const notifier = useNotificationStore();
+const apiBase = import.meta.env.VITE_API_BASE || '/api';
 
 const cardMode = ref<CardMode>(CardMode.SUMMARY);
 const loading = ref<boolean>(false);
@@ -60,7 +61,7 @@ function generateSessionId() {
 async function checkCachedSummary() {
   if (!auth.isAuthenticated || !pureContent.value) return;
   try {
-    const res = await fetch('/api/v1/agent/history/summary', {
+    const res = await fetch(`${apiBase}/v1/agent/history/summary`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -88,7 +89,7 @@ async function checkCachedSummary() {
 async function loadChatHistory() {
   if (!auth.isAuthenticated || !pureContent.value) return;
   try {
-    const res = await fetch('/api/v1/agent/history/chat', {
+    const res = await fetch(`${apiBase}/v1/agent/history/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -142,7 +143,7 @@ async function generateSummaryStream() {
   summary.value = '';
 
   try {
-    const response = await fetch('/api/v1/agent/summary/stream', {
+    const response = await fetch(`${apiBase}/v1/agent/summary/stream`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -226,7 +227,7 @@ async function sendChatMessage() {
       body.article_title = props.title || '';
     }
 
-    const response = await fetch('/api/v1/agent/chat/stream', {
+    const response = await fetch(`${apiBase}/v1/agent/chat/stream`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',

@@ -46,6 +46,8 @@ export interface FishingMapService {
   ): Promise<FishingFeedbackResponse>;
 }
 
+const apiBase = import.meta.env.VITE_API_BASE || '/api';
+
 export const fishingMapService = (): FishingMapService => {
   const gateway = fishingMapGateway();
 
@@ -71,7 +73,7 @@ export const fishingMapService = (): FishingMapService => {
       onChunk: (content: string) => void,
       signal?: AbortSignal,
     ): Promise<void> {
-      const response = await fetch('/api/v1/llm/weather-analysis', {
+      const response = await fetch(`${apiBase}/v1/llm/weather-analysis`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

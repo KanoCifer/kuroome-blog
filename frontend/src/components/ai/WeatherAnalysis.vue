@@ -2,6 +2,7 @@
 import { useNotificationStore } from '@/stores/notification';
 import { formatDate } from '@/utils/formatdate';
 import dayjs from 'dayjs';
+const apiBase = import.meta.env.VITE_API_BASE || '/api';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import { AnimatePresence, motion } from 'motion-v';
@@ -171,7 +172,7 @@ const _doFetch = async () => {
   hasGenerated.value = false;
 
   try {
-    const response = await fetch('/api/v1/llm/weather-analysis', {
+    const response = await fetch(`${apiBase}/v1/llm/weather-analysis`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

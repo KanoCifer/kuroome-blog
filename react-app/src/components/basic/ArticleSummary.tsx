@@ -33,6 +33,8 @@ function useArticleSummary() {
   );
   const [textShimmer, setTextShimmer] = useState(texts[0]);
 
+  const apiBase = import.meta.env.VITE_API_BASE || '/api';
+
   const generateSummary = useCallback(
     async ({ title, content }: ArticleSummaryProps) => {
       const pureContent = content.trim();
@@ -57,7 +59,7 @@ function useArticleSummary() {
       }, 2000);
 
       try {
-        const response = await fetch('/api/v1/agent/summary/stream', {
+        const response = await fetch(`${apiBase}/v1/agent/summary/stream`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
