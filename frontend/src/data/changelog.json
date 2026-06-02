@@ -1,5 +1,96 @@
 [
   {
+    "version": "3.1.0",
+    "date": "2026-06-02",
+    "title": "状态监控、微信读书集成与双端评论系统升级",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "新增 Service Status 页面（React/Vue 双端），含服务/系统信息卡片与 ECharts 图表"
+      },
+      {
+        "type": "feat",
+        "content": "微信读书集成 API Key 模式，支持接口鉴权"
+      },
+      {
+        "type": "feat",
+        "content": "登录/注册页面重设计，采用分栏布局"
+      },
+      {
+        "type": "feat",
+        "content": "Twikoo 评论系统集成（Vue/React 双端），支持前端 Markdown 渲染"
+      },
+      {
+        "type": "feat",
+        "content": "新增多张背景图与网站 Logo 更新"
+      },
+      {
+        "type": "feat",
+        "content": "React 端新增设置弹窗、Sass 支持、WebSocket 访客追踪"
+      },
+      {
+        "type": "feat",
+        "content": "博客文章改进排版，新增删除功能"
+      },
+      {
+        "type": "feat",
+        "content": "新增 Todo 卡片、首页天气数据接口、友链每日推荐横幅、钓鱼统计与图标组件"
+      },
+      {
+        "type": "fix",
+        "content": "新增 axios 友好错误拦截器，优化 API 错误提示"
+      },
+      {
+        "type": "fix",
+        "content": "修复评论区 UI、React 端类型错误、favicon 同步、Cookie 弹窗居中"
+      },
+      {
+        "type": "fix",
+        "content": "修复卡片配图刷新后重置、DevTaskCard 导入与模板事件类型"
+      },
+      {
+        "type": "fix",
+        "content": "后端 Redis 缓存清理改用 SCAN 替代 KEYS"
+      },
+      {
+        "type": "refactor",
+        "content": "后端分层重构（Service/Repository），前端目录结构重组"
+      },
+      {
+        "type": "refactor",
+        "content": "合并 AuthGateway，修复 Passkey 报错；统一 Twikoo 后端 API Host"
+      },
+      {
+        "type": "refactor",
+        "content": "前端 Canvas 图表统一迁移至 ECharts"
+      },
+      {
+        "type": "refactor",
+        "content": "提取图片 composables、优化背景层；问候 Toast 动画重设计"
+      },
+      {
+        "type": "refactor",
+        "content": "DevTasks 引入看板拖拽与 v2 API；Redis 连接池优化"
+      },
+      {
+        "type": "refactor",
+        "content": "React 端移除博客编辑器，重构博客路由与评论区"
+      },
+      {
+        "type": "perf",
+        "content": "React 端首页性能优化，修复 Dropdown 异常行为"
+      },
+      {
+        "type": "style",
+        "content": "React-app 组件迁移至语义设计 token（Layer 3）"
+      },
+      {
+        "type": "style",
+        "content": "前端双引号转单引号，Cookie 同意弹窗与问候 Toast 同步迁移"
+      }
+    ]
+  },
+  {
     "version": "3.0.1",
     "date": "2026-05-21",
     "title": "首页布局重构与Bento卡片系统升级",
