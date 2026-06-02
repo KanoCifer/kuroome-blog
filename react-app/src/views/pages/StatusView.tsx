@@ -31,6 +31,20 @@ function formatUptime(s: number): string {
   return `${Math.floor(s / 86400)} 天 ${Math.floor((s % 86400) / 3600)} 时`;
 }
 
+/* ── Memory formatters ── */
+function bytesToMB(bytes: number): string {
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
+
+function bytesToGB(bytes: number): string {
+  return `${(bytes / 1024 / 1024 / 1024).toFixed(2)} GB`;
+}
+
+function formatStartTime(ts: number): string {
+  const d = new Date(ts * 1000);
+  return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+}
+
 function StatusDot({ className }: { className: string }) {
   return (
     <span className="relative flex h-2 w-2">
@@ -67,16 +81,12 @@ export default function StatusView() {
   const [serverStatus, setServerStatus] = useState<StatusDetailData | null>(
     null,
   );
-  const startTimeRef = useRef<number | null>(null);
-  const [uptime, setUptime] = useState(0);
+  const [now, setNow] = useState(() => Date.now());
 
   const loadStatus = useCallback(async () => {
     try {
       const data = await service.getStatusDetail();
       setServerStatus(data);
-      if (startTimeRef.current === null) {
-        startTimeRef.current = data.startuptime;
-      }
     } catch {
       /* silent */
     }
@@ -131,11 +141,7 @@ export default function StatusView() {
 
     const statusTimer = setInterval(loadStatus, 30_000);
     const nowTimer = setInterval(() => {
-      if (startTimeRef.current !== null) {
-        setUptime(
-          Math.floor((Date.now() - startTimeRef.current * 1000) / 1000),
-        );
-      }
+      setNow(Date.now());
     }, 1000);
     const apiTimer = setInterval(pingApi, 10_000);
 
@@ -166,7 +172,7 @@ export default function StatusView() {
     return {
       label: '运行正常',
       dotClass: 'bg-emerald-500',
-      bgClass: 'bg-success/10',
+      bgClass: 'bg-success/20',
       textClass: 'text-success',
     };
   }, [apiHealthy, wsConnected, connectionDelay]);
@@ -298,7 +304,7 @@ export default function StatusView() {
         {/* Service cards */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {/* API */}
-          <div className="border-border bg-card rounded-xl border p-5 shadow-md">
+          <div className="border-border bg-card rounded-xl border p-5 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
             <div className="mb-3 flex items-center gap-2">
               <StatusDot
                 className={apiHealthy ? 'bg-emerald-500' : 'bg-red-500'}
@@ -314,7 +320,7 @@ export default function StatusView() {
           </div>
 
           {/* WebSocket */}
-          <div className="border-border bg-card rounded-xl border p-5 shadow-md">
+          <div className="border-border bg-card rounded-xl border p-5 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
             <div className="mb-3 flex items-center gap-2">
               <StatusDot className={wsDotClass} />
               <span className="text-foreground font-medium">WebSocket</span>
@@ -326,11 +332,11 @@ export default function StatusView() {
           </div>
 
           {/* Database */}
-          <div className="border-border bg-card rounded-xl border p-5 shadow-md">
+          <div className="border-border bg-card rounded-xl border p-5 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
             <div className="mb-3 flex items-center gap-2">
               <StatusDot
                 className={
-                  serverStatus?.dbOk
+                  serverStatus?.service.dbOk
                     ? 'bg-emerald-500'
                     : 'bg-muted-foreground/40'
                 }
@@ -338,10 +344,10 @@ export default function StatusView() {
               <span className="text-foreground font-medium">数据库</span>
             </div>
             <p className="text-muted-foreground mb-1 text-sm">
-              {serverStatus?.dbOk ? '连接正常' : '检测中…'}
+              {serverStatus?.service.dbOk ? '连接正常' : '检测中…'}
             </p>
             <p className="text-foreground text-2xl font-bold">
-              {serverStatus?.dbOk ? 'OK' : '--'}
+              {serverStatus?.service.dbOk ? 'OK' : '--'}
             </p>
           </div>
         </div>
@@ -372,6 +378,243 @@ export default function StatusView() {
           )}
         </div>
 
+        {/* Version Info */}
+        <div className="border-border bg-card rounded-xl border p-6 shadow-md">
+          <div className="mb-4 flex items-center gap-2">
+            <svg
+              className="text-muted-foreground h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <h2 className="text-foreground text-lg font-semibold">版本信息</h2>
+          </div>
+
+          {serverStatus && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground text-sm">项目仓库</span>
+                <a
+                  href={serverStatus.version.repoUrl}
+                  target="_blank"
+                  className="text-primary text-sm hover:underline"
+                  rel="noreferrer"
+                >
+                  GitHub 仓库
+                </a>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground text-sm">
+                  后端运行版本
+                </span>
+                <span className="text-foreground font-mono text-sm">
+                  v{serverStatus.version.currentVersion}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Service Info + System Info */}
+        <div className="border-border bg-card rounded-xl border p-6 shadow-md">
+          <div className="mb-5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <svg
+                className="text-muted-foreground h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2"
+                />
+              </svg>
+              <h2 className="text-foreground text-lg font-semibold">
+                服务信息
+              </h2>
+            </div>
+            <button
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              title="刷新"
+              onClick={loadStatus}
+            >
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+            </button>
+          </div>
+
+          {serverStatus ? (
+            <div className="space-y-6">
+              {/* Service info */}
+              <div>
+                <div className="mb-3 flex items-center gap-1.5">
+                  <svg
+                    className="text-muted-foreground h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
+                  </svg>
+                  <span className="text-foreground text-sm font-medium">
+                    服务信息
+                  </span>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground text-sm">
+                      运行时版本 / 协程数量 / GC 次数
+                    </span>
+                    <span className="text-foreground text-sm">
+                      {serverStatus.service.runtime} |{' '}
+                      {serverStatus.service.coroutines} |{' '}
+                      {serverStatus.service.gcCount[0]}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground text-sm">
+                      启动时间 / 运行时间
+                    </span>
+                    <span className="text-foreground text-sm">
+                      {formatStartTime(serverStatus.service.startTime)} (GMT+8) |{' '}
+                      {formatUptime(
+                        Math.floor(
+                          (now - serverStatus.service.startTime * 1000) / 1000,
+                        ),
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground text-sm">
+                      堆内存 / 总占用
+                    </span>
+                    <span className="text-foreground text-sm">
+                      {bytesToMB(serverStatus.service.heapMemoryBytes)} /{' '}
+                      {bytesToMB(serverStatus.service.totalMemoryBytes)}
+                    </span>
+                  </div>
+                  <div className="bg-secondary h-1 w-full rounded-full">
+                    <div
+                      className="bg-primary h-1 rounded-full transition-all duration-500"
+                      style={{
+                        width: `${(serverStatus.service.heapMemoryBytes / serverStatus.service.totalMemoryBytes) * 100}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* System info */}
+              <div>
+                <div className="mb-3 flex items-center gap-1.5">
+                  <svg
+                    className="text-muted-foreground h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+                    />
+                  </svg>
+                  <span className="text-foreground text-sm font-medium">
+                    系统信息
+                  </span>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground text-sm">
+                      系统时间
+                    </span>
+                    <span className="text-foreground text-sm">
+                      {serverStatus.system.systemTime} (
+                      {serverStatus.system.systemTimezone})
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground text-sm">
+                      操作系统 / 内核版本 / 处理器型号
+                    </span>
+                    <span className="text-foreground text-right text-sm">
+                      {serverStatus.system.osName} |{' '}
+                      {serverStatus.system.kernelVersion} |{' '}
+                      {serverStatus.system.cpuModel}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground text-sm">
+                      核心 (逻辑/物理) / 平均负载 (1/5/15)
+                    </span>
+                    <span className="text-foreground text-sm">
+                      {serverStatus.system.cpuCountLogical}/
+                      {serverStatus.system.cpuCountPhysical} |{' '}
+                      {serverStatus.system.loadAverage['1m']}{' '}
+                      {serverStatus.system.loadAverage['5m']}{' '}
+                      {serverStatus.system.loadAverage['15m']}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground text-sm">
+                      内存使用率 / 已用内存 / 总内存
+                    </span>
+                    <span className="text-foreground text-sm">
+                      {serverStatus.system.memoryUsagePercent}% |{' '}
+                      {bytesToMB(serverStatus.system.memoryUsedBytes)} /{' '}
+                      {bytesToGB(serverStatus.system.memoryTotalBytes)}
+                    </span>
+                  </div>
+                  <div className="bg-secondary h-1 w-full rounded-full">
+                    <div
+                      className="bg-primary h-1 rounded-full transition-all duration-500"
+                      style={{
+                        width: `${serverStatus.system.memoryUsagePercent}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Loading skeleton */
+            <div className="space-y-4">
+              <div className="bg-secondary h-4 w-3/4 animate-pulse rounded" />
+              <div className="bg-secondary h-4 w-1/2 animate-pulse rounded" />
+              <div className="bg-secondary h-4 w-2/3 animate-pulse rounded" />
+            </div>
+          )}
+        </div>
+
         {/* Footer meta */}
         <div className="text-muted-foreground flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
           <span className="inline-flex items-center gap-1.5">
@@ -380,10 +623,20 @@ export default function StatusView() {
           </span>
           {serverStatus && (
             <span>
-              CPU {serverStatus.cpuPercent}% · 内存 {serverStatus.memUsage}%
+              CPU {serverStatus.system.cpuPercent}% · 内存{' '}
+              {serverStatus.system.memoryUsagePercent}%
             </span>
           )}
-          {serverStatus && <span>运行 {formatUptime(uptime)}</span>}
+          {serverStatus && (
+            <span>
+              运行{' '}
+              {formatUptime(
+                Math.floor(
+                  (now - serverStatus.service.startTime * 1000) / 1000,
+                ),
+              )}
+            </span>
+          )}
         </div>
       </motion.div>
     </div>

@@ -157,15 +157,6 @@ export function BasicNav() {
               animate="visible"
               ref={ref}
               exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.3 } }}
-              variants={{
-                hidden: { opacity: 0, scale: 0.9, y: 30 },
-                visible: {
-                  opacity: 1,
-                  scale: 1,
-                  y: 0,
-                  transition: { staggerChildren: 0.04, delayChildren: 0.05 },
-                },
-              }}
             >
               <MenuItem
                 icon={<BookshelfIcon className="h-6 w-6" />}
