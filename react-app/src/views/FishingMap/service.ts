@@ -1,3 +1,4 @@
+import { fetchAndStoreCSRF } from '@/api/csrf';
 import { fishingMapGateway } from './gateway';
 import type {
   AnalysisPayload,
@@ -73,8 +74,11 @@ export const fishingMapService = (): FishingMapService => {
       onChunk: (content: string) => void,
       signal?: AbortSignal,
     ): Promise<void> {
+      await fetchAndStoreCSRF();
+
       const response = await fetch(`${apiBase}/v1/llm/weather-analysis`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },

@@ -2,6 +2,7 @@
 import { useNotificationStore } from '@/stores/notification';
 import { formatDate } from '@/utils/formatdate';
 import dayjs from 'dayjs';
+import { fetchAndStoreCSRF } from '@/api/csrf';
 const apiBase = import.meta.env.VITE_API_BASE || '/api';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
@@ -172,8 +173,12 @@ const _doFetch = async () => {
   hasGenerated.value = false;
 
   try {
+    // ensure CSRF token cookie is set before making the POST request
+    await fetchAndStoreCSRF();
+
     const response = await fetch(`${apiBase}/v1/llm/weather-analysis`, {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         weather_data: payload.value,
