@@ -60,7 +60,7 @@ from app.models.beanie import (
     SubscriptionLog,
 )
 from app.models.fishing import FishingModelMeta, FishingRecord
-from app.models.weread import User
+from app.models.weread import Archive, User, UserBook, WereadBook
 from app.tasks import broker, send_feishu_message
 from app.utils import close_cache_redis
 
@@ -98,6 +98,9 @@ async def lifespan(app: FastAPI):
             FriendLinks,
             DevTask,
             User,
+            WereadBook,
+            UserBook,
+            Archive,
         ],
     )
     app.state.redis = await init_redis()

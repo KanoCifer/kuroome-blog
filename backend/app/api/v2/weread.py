@@ -20,3 +20,56 @@ async def save_user_info(
     except ValueError as exc:
         return APIResponse.error(message=str(exc))
     return APIResponse.ok(message="User information saved successfully")
+
+
+@router.get("/bookshelf")
+async def get_user_shelf(
+    current_user=Depends(manager),
+    weread_service=Depends(weread_service_dep),
+):
+    """获取用户书架信息"""
+    try:
+        user_books, archives = await weread_service.get_user_shelf(
+            current_user.id
+        )
+    except ValueError as exc:
+        return APIResponse.error(message=str(exc))
+    return APIResponse.ok(
+        data={
+            "user_books": [b.model_dump(mode="json") for b in user_books],
+            "archives": [a.model_dump(mode="json") for a in archives],
+        },
+        message="User bookshelf information retrieved successfully",
+    )
+
+
+@router.get("/book/{bookId}")
+async def get_book_info(
+    bookId: str,  # noqa: N803
+    weread_service=Depends(weread_service_dep),
+):
+    """获取书籍信息"""
+    try:
+        book = await weread_service.get_book_info(bookId)
+    except ValueError as exc:
+        return APIResponse.error(message=str(exc))
+    return APIResponse.ok(
+        data=book.model_dump(mode="json"),
+        message="Book information retrieved successfully",
+    )
+
+
+@router.get("/sync-my-books")
+async def sync_my_books(
+    current_user=Depends(manager),
+    weread_service=Depends(weread_service_dep),
+):
+    """从远端同步我的书籍"""
+    try:
+        count = await weread_service.sync_my_books(current_user.id)
+    except ValueError as exc:
+        return APIResponse.error(message=str(exc))
+    return APIResponse.ok(
+        data={"imported_count": count},
+        message=f"Successfully imported {count} books from WeRead",
+    )

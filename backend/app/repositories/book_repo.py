@@ -101,3 +101,56 @@ class BookRepo:
         self.session.add(book)
         await self.session.flush()
         return book
+
+    async def save_books_bulk(self, books: list[dict]) -> list[Book]:
+        """批量保存书籍，按 bookid 去重，返回全部 Book 对象"""
+        bookids = [b["bookId"] for b in books if b.get("bookId")]
+        existing = await self.session.execute(
+            select(Book).where(Book.bookid.in_(bookids))
+        )
+        existing_map = {b.bookid: b for b in existing.scalars().all()}
+
+        result = []
+        for item in books:
+            bookid = item.get("bookId")
+            if bookid in existing_map:
+                result.append(existing_map[bookid])
+            else:
+                new_book = Book(
+                    title=item["title"],
+                    author=item["author"],
+                    bookid=bookid,
+                    cover=item.get("cover"),
+                )
+                self.session.add(new_book)
+                await self.session.flush()
+                result.append(new_book)
+        return result
+
+    async def save_user_books_bulk(
+        self, user_id: int, books: list[dict], book_map: dict[str, Book]
+    ) -> int:
+        """批量保存用户书籍关联，返回新增数量"""
+        book_ids = [book_map[b["bookId"]].id for b in books]
+        existing = await self.session.execute(
+            select(UserBook).where(
+                UserBook.user_id == user_id,
+                UserBook.book_id.in_(book_ids),
+            )
+        )
+        existing_book_ids = {ub.book_id for ub in existing.scalars().all()}
+
+        new_count = 0
+        for item in books:
+            book = book_map[item["bookId"]]
+            if book.id not in existing_book_ids:
+                iscompleted = bool(item.get("finishReading", False))
+                self.session.add(
+                    UserBook(
+                        user_id=user_id,
+                        book_id=book.id,
+                        iscompleted=iscompleted,
+                    )
+                )
+                new_count += 1
+        return new_count
