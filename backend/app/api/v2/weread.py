@@ -34,9 +34,20 @@ async def get_user_shelf(
         )
     except ValueError as exc:
         return APIResponse.error(message=str(exc))
+    user_books_data = []
+    for b in user_books:
+        d = b.model_dump(mode="json")
+        if b.book:
+            d["title"] = b.book.title
+            d["author"] = b.book.author
+        else:
+            d["title"] = ""
+            d["author"] = ""
+        user_books_data.append(d)
+
     return APIResponse.ok(
         data={
-            "user_books": [b.model_dump(mode="json") for b in user_books],
+            "user_books": user_books_data,
             "archives": [a.model_dump(mode="json") for a in archives],
         },
         message="User bookshelf information retrieved successfully",

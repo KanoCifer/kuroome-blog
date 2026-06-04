@@ -30,8 +30,8 @@ class LiveWeatherInput(BaseModel):
     temp: float | None = Field(default=None, description="气温（°C）")
     text: str | None = Field(default=None, description="天气文字描述")
     wind360: str | None = Field(default=None, description="风向角度")
-    windDir: str | None = Field(default=None, description="风向文字")  # noqa: N815
-    windSpeed: str | None = Field(default=None, description="风速（km/h）")  # noqa: N815
+    windDir: str | None = Field(default=None, description="风向文字")
+    windSpeed: str | None = Field(default=None, description="风速（km/h）")
     humidity: int | None = Field(default=None, description="湿度（%）")
     pressure: float | None = Field(default=None, description="气压（hPa）")
     precip: float | None = Field(default=None, description="降水量（mm）")
@@ -41,25 +41,25 @@ class TideEventInput(BaseModel):
     """潮汐事件（高低潮）"""
 
     type: Literal["H", "L"] = Field(..., description="H=高潮，L=低潮")
-    fxTime: str = Field(..., description="发生时间")  # noqa: N815
+    fxTime: str = Field(..., description="发生时间")
     height: float = Field(..., description="潮高（m）")
 
 
 class TideHourlyInput(BaseModel):
     """逐时潮高"""
 
-    fxTime: str = Field(..., description="时间")  # noqa: N815
+    fxTime: str = Field(..., description="时间")
     height: str = Field(..., description="潮高（m）")
 
 
 class TideDataInput(BaseModel):
     """潮汐数据"""
 
-    updateTime: str | None = Field(default=None, description="更新时间")  # noqa: N815
-    tideTable: list[TideEventInput] = Field(  # noqa: N815
+    updateTime: str | None = Field(default=None, description="更新时间")
+    tideTable: list[TideEventInput] = Field(
         default_factory=list, description="高低潮时刻表"
     )
-    tideHourly: list[TideHourlyInput] = Field(  # noqa: N815
+    tideHourly: list[TideHourlyInput] = Field(
         default_factory=list, description="逐时潮高"
     )
 

@@ -68,3 +68,6 @@ dev = ["pytest>=9.0.2", "watchdog>=6.0.0"]
 [[tool.uv.index]]
 url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 default = true
+
+[tool.ruff.lint]
+ignore = ["N815"]

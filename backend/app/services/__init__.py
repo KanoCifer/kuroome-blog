@@ -7,9 +7,9 @@ from app.services.monitor_service import MonitorService
 from app.services.public_service import PublicService
 from app.services.rss_service import RssService
 from app.services.sub_service import SubService
-from app.services.user_service import UserService
+from app.services.user import UserService
 from app.services.weather_service import WeatherService
-from app.services.weread_service import WereadService
+from app.services.weread import WereadService
 
 __all__ = [
     "AdminService",

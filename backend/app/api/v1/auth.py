@@ -18,10 +18,11 @@ from webauthn.helpers import options_to_json_dict
 
 from app.api.des.auth import manager
 from app.api.des.csrf import csrf_manager
-from app.api.des.des import user_service_dep
+from app.api.des.des import user_service_dep, user_services_dep
 from app.api.des.limiter import limiter
 from app.api.des.redis import AsyncRedis, get_redis
 from app.core.config import settings
+from app.core.container import UserServices
 from app.core.exceptions import GitHubAuthError
 from app.core.logger import logger
 from app.models.models import User
@@ -32,7 +33,7 @@ from app.schemas.auth import (
 )
 from app.schemas.response import APIResponse
 from app.schemas.schemas import LoginIn, RegisterIn, UserSettingsIn
-from app.services.user_service import UserService
+from app.services.user import UserService
 from app.tasks import send_code
 
 router = APIRouter(
@@ -319,11 +320,13 @@ async def send_email_code(
 @router.get("/passkey/registration-options")
 async def passkey_registration_options(
     user: User = Depends(manager),
-    user_service: UserService = Depends(user_service_dep),
+    user_services: UserServices = Depends(user_services_dep),
     redis: AsyncRedis = Depends(get_redis),
 ):
     try:
-        options = await user_service.create_registration_options(redis, user)
+        options = await user_services.passkey.create_registration_options(
+            redis, user
+        )
         return APIResponse.ok(
             data=options_to_json_dict(options),
             message="Passkey 注册选项生成成功",
@@ -340,13 +343,13 @@ async def passkey_register(
     request: Request,
     body: PasskeyRegistrationRequest,
     user: User = Depends(manager),
-    user_service: UserService = Depends(user_service_dep),
+    user_services: UserServices = Depends(user_services_dep),
     redis: AsyncRedis = Depends(get_redis),
 ):
     # Use configured origin (the frontend domain), not request.base_url
     # because the browser sends the page origin, not the API host
     origin = settings.WEBAUTHN_ORIGIN
-    error = await user_service.complete_passkey_registration(
+    error = await user_services.passkey.complete_passkey_registration(
         user, body.response, redis, origin
     )
     if error:
@@ -360,9 +363,9 @@ async def passkey_register(
 @router.get("/passkey/authentication-options")
 async def passkey_authentication_options(
     redis: AsyncRedis = Depends(get_redis),
-    user_service: UserService = Depends(user_service_dep),
+    user_services: UserServices = Depends(user_services_dep),
 ):
-    options = await user_service.create_options(redis)
+    options = await user_services.passkey.create_options(redis)
     return APIResponse.ok(
         data=options_to_json_dict(options),
         message="Passkey 认证选项生成成功",
@@ -372,9 +375,9 @@ async def passkey_authentication_options(
 @router.delete("/passkey/delete")
 async def passkey_delete(
     user: User = Depends(manager),
-    user_service: UserService = Depends(user_service_dep),
+    user_services: UserServices = Depends(user_services_dep),
 ):
-    success = await user_service.delete_passkey(user)
+    success = await user_services.passkey.delete_passkey(user)
     if not success:
         return APIResponse.error(
             message="您的账户尚未绑定Passkey",
@@ -387,10 +390,10 @@ async def passkey_delete(
 async def passkey_authenticate(
     request: Request,
     assertion: PasskeyAuthRequest,
-    user_service: UserService = Depends(user_service_dep),
+    user_services: UserServices = Depends(user_services_dep),
     redis: AsyncRedis = Depends(get_redis),
 ):
-    user, tokens, error = await user_service.complete_passkey_login(
+    user, tokens, error = await user_services.passkey.complete_passkey_login(
         assertion.assertion, redis, request
     )
     if error or user is None or tokens is None:
@@ -398,7 +401,9 @@ async def passkey_authenticate(
             message=error or "认证失败", code=status.HTTP_400_BAD_REQUEST
         )
 
-    login_data = user_service.build_login_data(user, tokens["refresh_token"])
+    login_data = user_services.user.build_login_data(
+        user, tokens["refresh_token"]
+    )
     return _build_login_response(
         login_data,
         tokens["access_token"],
@@ -415,10 +420,10 @@ async def passkey_authenticate(
 @router.get("/github")
 async def github_login(
     request: Request,
-    user_service: UserService = Depends(user_service_dep),
+    user_services: UserServices = Depends(user_services_dep),
 ):
-    auth_url, state, code_verifier, mode = user_service.generate_oauth_url(
-        mode="login"
+    auth_url, state, code_verifier, mode = (
+        user_services.github.generate_oauth_url(mode="login")
     )
     request.session["oauth_state"] = state
     request.session["code_verifier"] = code_verifier
@@ -430,10 +435,10 @@ async def github_login(
 async def github_bind(
     request: Request,
     current_user: User = Depends(manager),
-    user_service: UserService = Depends(user_service_dep),
+    user_services: UserServices = Depends(user_services_dep),
 ):
-    auth_url, state, code_verifier, mode = user_service.generate_oauth_url(
-        mode="bind"
+    auth_url, state, code_verifier, mode = (
+        user_services.github.generate_oauth_url(mode="bind")
     )
     request.session["oauth_state"] = state
     request.session["code_verifier"] = code_verifier
@@ -444,13 +449,13 @@ async def github_bind(
 @router.post("/github/unbind")
 async def github_unbind(
     current_user: User = Depends(manager),
-    user_service: UserService = Depends(user_service_dep),
+    user_services: UserServices = Depends(user_services_dep),
 ):
     url = settings.FRONTEND_URL + "/settings?error=github_not_bound"
     if not current_user.github_id:
         return RedirectResponse(url=url)
 
-    await user_service.unbind_github(current_user)
+    await user_services.github.unbind_github(current_user)
     return RedirectResponse(
         url=settings.FRONTEND_URL + "/settings?success=github_unbound"
     )
@@ -461,7 +466,7 @@ async def github_callback(
     request: Request,
     code: str,
     state: str,
-    user_service: UserService = Depends(user_service_dep),
+    user_services: UserServices = Depends(user_services_dep),
 ):
     if state != request.session.get("oauth_state"):
         return RedirectResponse(
@@ -476,10 +481,12 @@ async def github_callback(
 
     # Exchange code for access token
     try:
-        access_token = await user_service.exchange_github_code(
+        access_token = await user_services.github.exchange_github_code(
             code, code_verifier
         )
-        github_user = await user_service.fetch_github_user_info(access_token)
+        github_user = await user_services.github.fetch_github_user_info(
+            access_token
+        )
     except GitHubAuthError as e:
         return RedirectResponse(
             url=f"{settings.FRONTEND_URL}/login?error={e.error_code}"
@@ -500,7 +507,7 @@ async def github_callback(
                 url=settings.FRONTEND_URL + "/settings?error=not_logged_in"
             )
 
-        result = await user_service.bind_github(
+        result = await user_services.github.bind_github(
             current_user, github_id, avatar_url
         )
         if result == "github_already_bound":
@@ -513,10 +520,10 @@ async def github_callback(
             url=settings.FRONTEND_URL + "/settings?success=github_bound"
         )
     else:
-        user = await user_service.handle_github_login_callback(
+        user = await user_services.github.handle_github_login_callback(
             github_id, username, email, avatar_url, request
         )
-        tokens = user_service.create_tokens(user)
+        tokens = user_services.user.create_tokens(user)
 
         response = RedirectResponse(url=settings.FRONTEND_URL)
         cookie_domain = settings.COOKIE_DOMAIN

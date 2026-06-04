@@ -1,5 +1,13 @@
+from beanie import Link
+
 from app.core.logger import logger
-from app.models.weread import Archive, User, UserBook, WereadBook
+from app.models.weread import (
+    Archive,
+    ReadDetailSnapshot,
+    User,
+    UserBook,
+    WereadBook,
+)
 
 
 class WereadRepo:
@@ -11,7 +19,7 @@ class WereadRepo:
     async def save_books_bulk(
         self, books: list[WereadBook]
     ) -> list[WereadBook]:
-        """批量保存书籍，按 bookId 去重"""
+        """批量保存书籍，按 bookId 去重，并返回 bookId → WereadBook 映射"""
         book_ids = [b.bookId for b in books]
         existing = await WereadBook.find(
             {"bookId": {"$in": book_ids}}
@@ -32,10 +40,28 @@ class WereadRepo:
                 result.append(book)
         return result
 
+    async def get_book_map_by_ids(
+        self, book_ids: list[str]
+    ) -> dict[str, WereadBook]:
+        """根据 bookId 列表批量查询，返回 bookId → WereadBook 映射"""
+        if not book_ids:
+            return {}
+        existing = await WereadBook.find(
+            {"bookId": {"$in": book_ids}}
+        ).to_list()
+        return {b.bookId: b for b in existing}
+
     async def save_user_books_bulk(
-        self, user_books: list[UserBook]
+        self,
+        user_books: list[UserBook],
+        book_map: dict[str, WereadBook] | None = None,
     ) -> list[UserBook]:
-        """批量保存用户书籍，按 (user_id, bookId) 去重"""
+        """批量保存用户书籍，按 (user_id, bookId) 去重
+
+        Args:
+            user_books: 用户书籍列表
+            book_map: bookId → WereadBook 映射，用于设置 Link 关联
+        """
         if not user_books:
             return []
 
@@ -52,11 +78,15 @@ class WereadRepo:
         new_books = []
         updated = []
         for ub in user_books:
+            if book_map and ub.bookId in book_map:
+                ub.book = Link(book_map[ub.bookId])
             if (ub.user_id, ub.bookId) in existing_map:
                 doc = existing_map[(ub.user_id, ub.bookId)]
                 doc.readUpdateTime = ub.readUpdateTime
                 doc.finishReading = ub.finishReading
                 doc.secret = ub.secret
+                if book_map and ub.bookId in book_map:
+                    doc.book = Link(book_map[ub.bookId])
                 await doc.save()
                 updated.append(doc)
             else:
@@ -162,8 +192,10 @@ class WereadRepo:
     async def get_user_shelf(
         self, user_id
     ) -> tuple[list[UserBook], list[Archive]]:
-        """获取用户书架信息"""
-        user_books = await UserBook.find(UserBook.user_id == user_id).to_list()
+        """获取用户书架信息，自动加载关联的 WereadBook"""
+        user_books = await UserBook.find(
+            UserBook.user_id == user_id, fetch_links=True
+        ).to_list()
         user_archives = await Archive.find(
             Archive.user_id == user_id
         ).to_list()
@@ -171,3 +203,34 @@ class WereadRepo:
             f"获取用户 {user_id} 书架信息：{len(user_books)} 本书，{len(user_archives)} 个书单"
         )
         return user_books, user_archives
+
+    async def upsert_read_detail_snapshot(
+        self, snapshot: ReadDetailSnapshot
+    ) -> ReadDetailSnapshot:
+        """按 (user_id, mode, baseTime) 去重，存在则更新，否则插入"""
+        existing = await ReadDetailSnapshot.find_one(
+            (ReadDetailSnapshot.user_id == snapshot.user_id)
+            & (ReadDetailSnapshot.mode == snapshot.mode)
+            & (ReadDetailSnapshot.baseTime == snapshot.baseTime)
+        )
+        if existing:
+            snapshot.id = existing.id
+            await snapshot.save()
+            return snapshot
+        await snapshot.insert()
+        return snapshot
+
+    async def get_read_detail_snapshots(
+        self,
+        user_id: int,
+        mode: str | None = None,
+    ) -> list[ReadDetailSnapshot]:
+        """查询用户历史快照，按 baseTime 升序"""
+        query: dict = {"user_id": user_id}
+        if mode:
+            query["mode"] = mode
+        return (
+            await ReadDetailSnapshot.find(query)
+            .sort("baseTime")
+            .to_list()
+        )

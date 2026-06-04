@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 import httpx
 import orjson
-from redis.asyncio import Redis as AsyncRedis
+
+if TYPE_CHECKING:
+    from redis.asyncio import Redis as AsyncRedis
 
 from app.core import logger
 from app.core.config import get_settings
@@ -13,51 +16,33 @@ from app.utils.qweather_jwt import generate_qweather_jwt
 _QWEATHER_BASE_URL = get_settings().QWEATHER_BASE_URL.rstrip("/")
 
 
-class WeatherDomainError(Exception):
-    def __init__(self, message: str, code: int) -> None:
-        super().__init__(message)
-        self.message = message
-        self.code = code
+class _QWeatherClient:
+    """Private QWeather HTTP client with auth + caching."""
 
+    def __init__(self, redis: AsyncRedis) -> None:
+        self._redis = redis
 
-class WeatherService:
-    @staticmethod
-    async def get_qweather_jwt(redis: AsyncRedis) -> str:
-        cache_key = "qweather:jwt"
-        cached_jwt = await redis.get(cache_key)
-        if cached_jwt:
-            if isinstance(cached_jwt, bytes):
-                return cached_jwt.decode()
-            return str(cached_jwt)
+    async def get(
+        self,
+        path: str,
+        *,
+        params: dict,
+        cache_key: str,
+        ttl: int,
+    ) -> dict:
+        """Authenticated, cached GET. Raises WeatherDomainError on failure."""
+        cached = await self._redis.get(cache_key)
+        if cached:
+            return orjson.loads(cached)
 
-        encoded_jwt: str = generate_qweather_jwt()
-        await redis.set(cache_key, encoded_jwt, ex=24 * 3600)
-        return encoded_jwt
-
-    @staticmethod
-    async def get_qweather_tide(
-        redis: AsyncRedis, harbor: str, date: str
-    ) -> tuple[dict, bool]:
-        cache_key: str = f"qweather:tide:{harbor}:{date}"
-        cached_data = await redis.get(cache_key)
-
-        encoded_jwt = await WeatherService.get_qweather_jwt(redis)
-        if cached_data:
-            return orjson.loads(cached_data), True
-
-        url = _QWEATHER_BASE_URL + "/v7/ocean/tide"
-        headers = {"Authorization": f"Bearer {encoded_jwt}"}
-        payload = {
-            "location": harbor,
-            "date": date,
-        }
+        jwt = await self._get_jwt()
+        url = _QWEATHER_BASE_URL + path
+        headers = {"Authorization": f"Bearer {jwt}"}
 
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(
-                    url,
-                    headers=headers,
-                    params=payload,
+                    url, headers=headers, params=params
                 )
                 response.raise_for_status()
                 data = response.json()
@@ -69,42 +54,77 @@ class WeatherService:
             ) from exc
         except httpx.HTTPError as exc:
             raise WeatherDomainError(
-                f"Failed to fetch QWeather data: {exc!s}",
-                503,
+                f"Failed to fetch QWeather data: {exc!s}", 503
             ) from exc
 
-        await redis.set(cache_key, orjson.dumps(data), ex=12 * 3600)
+        await self._redis.set(cache_key, orjson.dumps(data), ex=ttl)
+        return data
+
+    def resolve_location(
+        self,
+        location: str | None,
+        location_id: str | None,
+    ) -> tuple[str, dict]:
+        """Validate location input, return (value, params_dict).
+
+        Raises WeatherDomainError if both/neither provided.
+        """
+        if location_id:
+            return location_id, {"location": location_id}
+        if location:
+            return location, {"location": location}
+        raise WeatherDomainError("必须提供位置信息", 400)
+
+    async def _get_jwt(self) -> str:
+        """Cached JWT generation."""
+        cache_key = "qweather:jwt"
+        cached_jwt = await self._redis.get(cache_key)
+        if cached_jwt:
+            if isinstance(cached_jwt, bytes):
+                return cached_jwt.decode()
+            return str(cached_jwt)
+
+        encoded_jwt: str = generate_qweather_jwt()
+        await self._redis.set(cache_key, encoded_jwt, ex=24 * 3600)
+        return encoded_jwt
+
+
+class WeatherDomainError(Exception):
+    def __init__(self, message: str, code: int) -> None:
+        super().__init__(message)
+        self.message = message
+        self.code = code
+
+
+class WeatherService:
+    async def get_qweather_tide(
+        self, redis: AsyncRedis, harbor: str, date: str
+    ) -> tuple[dict, bool]:
+        cache_key: str = f"qweather:tide:{harbor}:{date}"
+        cached = await redis.get(cache_key)
+        if cached:
+            return orjson.loads(cached), True
+
+        client = _QWeatherClient(redis)
+        data = await client.get(
+            "/v7/ocean/tide",
+            params={"location": harbor, "date": date},
+            cache_key=cache_key,
+            ttl=12 * 3600,
+        )
         return data, False
 
-    @staticmethod
     async def get_qweather_location(
-        location: str, type_: str, redis: AsyncRedis
+        self, location: str, type_: str, redis: AsyncRedis
     ) -> dict:
-        url = f"{_QWEATHER_BASE_URL}/geo/v2/poi/lookup"
-        encoded_jwt = await WeatherService.get_qweather_jwt(redis)
-        headers = {"Authorization": f"Bearer {encoded_jwt}"}
-        params = {"location": location, "type": type_}
-
-        try:
-            async with httpx.AsyncClient() as client:
-                response = await client.get(
-                    url,
-                    headers=headers,
-                    params=params,
-                )
-                response.raise_for_status()
-                return response.json()
-        except httpx.HTTPStatusError as exc:
-            response = exc.response
-            raise WeatherDomainError(
-                f"QWeather API error: {response.status_code} - {response.text}",
-                response.status_code,
-            ) from exc
-        except httpx.HTTPError as exc:
-            raise WeatherDomainError(
-                f"Failed to fetch QWeather location: {exc!s}",
-                503,
-            ) from exc
+        client = _QWeatherClient(redis)
+        cache_key = f"qweather:location:{location}:{type_}"
+        return await client.get(
+            "/geo/v2/poi/lookup",
+            params={"location": location, "type": type_},
+            cache_key=cache_key,
+            ttl=24 * 3600,
+        )
 
     async def get_weather_forecast(
         self,
@@ -113,44 +133,14 @@ class WeatherService:
         location: str | None = None,
         location_id: str | None = None,
     ) -> dict:
-        if location_id:
-            cache_key = f"qweather:forecast:{location_id}:{days}d"
-        elif location:
-            cache_key = f"qweather:forecast:{location}:{days}d"
-        else:
-            raise WeatherDomainError("必须提供位置信息", 400)
-        cached_data = await redis.get(cache_key)
-        if cached_data:
-            return orjson.loads(cached_data)
-
-        url = f"{_QWEATHER_BASE_URL}/v7/weather/{days}d"
-
-        encoded_jwt = await WeatherService.get_qweather_jwt(redis)
-        headers = {"Authorization": f"Bearer {encoded_jwt}"}
-        params = {"location": location or location_id}
-
-        try:
-            async with httpx.AsyncClient() as client:
-                res = await client.get(
-                    url=url,
-                    headers=headers,
-                    params=params,
-                )
-                res.raise_for_status()
-
-                await redis.set(cache_key, orjson.dumps(res.json()), ex=3600)
-                return res.json()
-        except httpx.HTTPStatusError as exc:
-            response = exc.response
-            raise WeatherDomainError(
-                f"QWeather API error: {response.status_code} - {response.text}",
-                response.status_code,
-            ) from exc
-        except httpx.HTTPError as exc:
-            raise WeatherDomainError(
-                f"Failed to fetch QWeather forecast: {exc!s}",
-                503,
-            ) from exc
+        client = _QWeatherClient(redis)
+        loc_value, params = client.resolve_location(location, location_id)
+        return await client.get(
+            f"/v7/weather/{days}d",
+            params=params,
+            cache_key=f"qweather:forecast:{loc_value}:{days}d",
+            ttl=3600,
+        )
 
     async def get_current_weather(
         self,
@@ -158,80 +148,23 @@ class WeatherService:
         location: str | None = None,
         location_id: str | None = None,
     ) -> dict:
-        if location_id:
-            cache_key = f"qweather:current:{location_id}"
-        elif location:
-            cache_key = f"qweather:current:{location}"
-        else:
-            raise WeatherDomainError("必须提供位置信息", 400)
-        cached_data = await redis.get(cache_key)
-        if cached_data:
-            return orjson.loads(cached_data)
-
-        url = f"{_QWEATHER_BASE_URL}/v7/weather/now"
-
-        encoded_jwt = await WeatherService.get_qweather_jwt(redis)
-        headers = {"Authorization": f"Bearer {encoded_jwt}"}
-        params = {"location": location or location_id}
-
-        try:
-            async with httpx.AsyncClient() as client:
-                res = await client.get(
-                    url=url,
-                    headers=headers,
-                    params=params,
-                )
-                res.raise_for_status()
-
-                await redis.set(cache_key, orjson.dumps(res.json()), ex=600)
-                return res.json()
-        except httpx.HTTPStatusError as exc:
-            response = exc.response
-            raise WeatherDomainError(
-                f"QWeather API error: {response.status_code} - {response.text}",
-                response.status_code,
-            ) from exc
-        except httpx.HTTPError as exc:
-            raise WeatherDomainError(
-                f"Failed to fetch QWeather current weather: {exc!s}",
-                503,
-            ) from exc
+        client = _QWeatherClient(redis)
+        loc_value, params = client.resolve_location(location, location_id)
+        return await client.get(
+            "/v7/weather/now",
+            params=params,
+            cache_key=f"qweather:current:{loc_value}",
+            ttl=600,
+        )
 
     async def get_poi_lookup(self, location: str, redis: AsyncRedis) -> dict:
-        cache_key = f"qweather:poi:{location}:scenic"
-        cached_data = await redis.get(cache_key)
-        if cached_data:
-            return orjson.loads(cached_data)
-
-        url = f"{_QWEATHER_BASE_URL}/geo/v2/poi/lookup"
-        encoded_jwt = await WeatherService.get_qweather_jwt(redis)
-        headers = {"Authorization": f"Bearer {encoded_jwt}"}
-        params = {"location": location, "type": "scenic"}
-
-        try:
-            async with httpx.AsyncClient() as client:
-                res = await client.get(
-                    url=url,
-                    headers=headers,
-                    params=params,
-                )
-                res.raise_for_status()
-
-                await redis.set(
-                    cache_key, orjson.dumps(res.json()), ex=24 * 3600
-                )
-                return res.json()
-        except httpx.HTTPStatusError as exc:
-            response = exc.response
-            raise WeatherDomainError(
-                f"QWeather API error: {response.status_code} - {response.text}",
-                response.status_code,
-            ) from exc
-        except httpx.HTTPError as exc:
-            raise WeatherDomainError(
-                f"Failed to fetch QWeather POI lookup: {exc!s}",
-                503,
-            ) from exc
+        client = _QWeatherClient(redis)
+        return await client.get(
+            "/geo/v2/poi/lookup",
+            params={"location": location, "type": "scenic"},
+            cache_key=f"qweather:poi:{location}:scenic",
+            ttl=24 * 3600,
+        )
 
     async def get_hourly_weather(
         self,
@@ -240,43 +173,14 @@ class WeatherService:
         location_id: str | None = None,
         location: str | None = None,
     ) -> dict:
-        if location_id:
-            cache_key = f"qweather:hourly:{location_id}"
-        elif location:
-            cache_key = f"qweather:hourly:{location}"
-        else:
-            raise WeatherDomainError("必须提供位置信息", 400)
-        cached_data = await redis.get(cache_key)
-        if cached_data:
-            return orjson.loads(cached_data)
-
-        url = f"{_QWEATHER_BASE_URL}/v7/weather/{hours}h"
-        encoded_jwt = await WeatherService.get_qweather_jwt(redis)
-        headers = {"Authorization": f"Bearer {encoded_jwt}"}
-        params = {"location": location or location_id}
-
-        try:
-            async with httpx.AsyncClient() as client:
-                res = await client.get(
-                    url=url,
-                    headers=headers,
-                    params=params,
-                )
-                res.raise_for_status()
-
-                await redis.set(cache_key, orjson.dumps(res.json()), ex=1800)
-                return res.json()
-        except httpx.HTTPStatusError as exc:
-            response = exc.response
-            raise WeatherDomainError(
-                f"QWeather API error: {response.status_code} - {response.text}",
-                response.status_code,
-            ) from exc
-        except httpx.HTTPError as exc:
-            raise WeatherDomainError(
-                f"Failed to fetch QWeather hourly weather: {exc!s}",
-                503,
-            ) from exc
+        client = _QWeatherClient(redis)
+        loc_value, params = client.resolve_location(location, location_id)
+        return await client.get(
+            f"/v7/weather/{hours}h",
+            params=params,
+            cache_key=f"qweather:hourly:{loc_value}",
+            ttl=1800,
+        )
 
     async def get_indices(
         self,
@@ -284,44 +188,15 @@ class WeatherService:
         location: str | None = None,
         location_id: str | None = None,
     ) -> dict:
-        if location_id:
-            cache_key = f"qweather:indices:{location_id}"
-        elif location:
-            cache_key = f"qweather:indices:{location}"
-        else:
-            raise WeatherDomainError("必须提供位置信息", 400)
-
-        cached_data = await redis.get(cache_key)
-        if cached_data:
-            return orjson.loads(cached_data)
-
-        url = f"{_QWEATHER_BASE_URL}/v7/indices/1d"
-        encoded_jwt = await WeatherService.get_qweather_jwt(redis)
-        headers = {"Authorization": f"Bearer {encoded_jwt}"}
-        params = {"location": location or location_id, "type": "4"}
-        try:
-            async with httpx.AsyncClient() as client:
-                res = await client.get(
-                    url=url,
-                    headers=headers,
-                    params=params,
-                )
-                res.raise_for_status()
-                await redis.set(
-                    cache_key, orjson.dumps(res.json()), ex=12 * 3600
-                )
-                return res.json()
-        except httpx.HTTPStatusError as exc:
-            response = exc.response
-            raise WeatherDomainError(
-                f"QWeather API error: {response.status_code} - {response.text}",
-                response.status_code,
-            ) from exc
-        except httpx.HTTPError as exc:
-            raise WeatherDomainError(
-                f"Failed to fetch QWeather indices: {exc!s}",
-                503,
-            ) from exc
+        client = _QWeatherClient(redis)
+        loc_value, params = client.resolve_location(location, location_id)
+        params["type"] = "4"
+        return await client.get(
+            "/v7/indices/1d",
+            params=params,
+            cache_key=f"qweather:indices:{loc_value}",
+            ttl=12 * 3600,
+        )
 
     async def get_nearby_tsta(self, location: str, redis: AsyncRedis) -> dict:
         """获取指定经纬度附近的潮汐站点（TSTA）信息。
@@ -329,32 +204,15 @@ class WeatherService:
         Returns
             dict: 包含站点名称和ID的字典，例如 {"name": "站点名称", "id": "站点ID"}。
         """
-        url = f"{_QWEATHER_BASE_URL}/geo/v2/poi/lookup"
-        encoded_jwt = await self.get_qweather_jwt(redis)
-        headers = {"Authorization": f"Bearer {encoded_jwt}"}
-        params = {"location": location, "type": "TSTA"}
-        try:
-            async with httpx.AsyncClient() as client:
-                res = await client.get(
-                    url=url,
-                    headers=headers,
-                    params=params,
-                )
-                res.raise_for_status()
-                res = res.json()
-                data = res.get("poi", [])[0] if res.get("poi") else {}
-                return {"id": data.get("id")}
-        except httpx.HTTPStatusError as exc:
-            response = exc.response
-            raise WeatherDomainError(
-                f"QWeather API error: {response.status_code} - {response.text}",
-                response.status_code,
-            ) from exc
-        except httpx.HTTPError as exc:
-            raise WeatherDomainError(
-                f"Failed to fetch QWeather nearby TSTA: {exc!s}",
-                503,
-            ) from exc
+        client = _QWeatherClient(redis)
+        data = await client.get(
+            "/geo/v2/poi/lookup",
+            params={"location": location, "type": "TSTA"},
+            cache_key=f"qweather:tsta:{location}",
+            ttl=24 * 3600,
+        )
+        poi = data.get("poi", [])[0] if data.get("poi") else {}
+        return {"id": poi.get("id")}
 
     async def get_full_weather_data(
         self, location: str, redis: AsyncRedis

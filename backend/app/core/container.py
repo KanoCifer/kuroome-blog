@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from dataclasses import dataclass
 
 from pymongo.asynchronous.database import AsyncDatabase
 from redis.asyncio import Redis as AsyncRedis
@@ -33,10 +34,32 @@ from app.services.monitor_service import MonitorService
 from app.services.public_service import PublicService
 from app.services.rss_service import RssService
 from app.services.sub_service import SubService
-from app.services.user_service import UserService
+from app.services.user import GitHubAuthService, PasskeyService, UserService
 from app.services.weather_service import WeatherService
-from app.services.weread_service import WereadService
+from app.services.weread import WereadService
 from app.utils import redis_cache
+
+
+@dataclass
+class UserServices:
+    """User 相关的服务集合"""
+
+    user: UserService
+    passkey: PasskeyService
+    github: GitHubAuthService
+
+
+@asynccontextmanager
+async def get_user_services():
+    """获取 User 相关的所有服务"""
+    async with get_async_session() as session:
+        user_repo = UserRepo(session)
+        user_service = UserService(repo=user_repo)
+        passkey_service = PasskeyService(user_service=user_service)
+        github_service = GitHubAuthService(user_service=user_service)
+        yield UserServices(
+            user=user_service, passkey=passkey_service, github=github_service
+        )
 
 
 @asynccontextmanager

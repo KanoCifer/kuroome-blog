@@ -17,6 +17,7 @@ from app.core.container import (
     get_rss_service,
     get_sub_service,
     get_user_service,
+    get_user_services,
     get_weather_service,
     get_weread_service,
 )
@@ -25,6 +26,11 @@ from app.core.container import (
 async def user_service_dep():
     async with get_user_service() as service:
         yield service
+
+
+async def user_services_dep():
+    async with get_user_services() as services:
+        yield services
 
 
 async def admin_service_dep():

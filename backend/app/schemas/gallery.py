@@ -5,7 +5,7 @@ class GalleryImage(BaseModel):
     """图片画廊中的单张图片信息"""
 
     id: str
-    uploadedAt: str | None = Field(  # noqa: N815
+    uploadedAt: str | None = Field(
         default=None, description="图片上传时间，ISO格式字符串"
     )
     url: str
