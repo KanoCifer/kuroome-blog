@@ -8,7 +8,7 @@
 - 提交前执行对应语言的格式化与 lint，使用 Conventional Commits 格式。
 - 编辑器已配置 format-on-save（Prettier frontend/react-app，Ruff backend）— 不要重复格式化。
 - 样式必须使用语义化 Tailwind class（`bg-background`, `text-foreground` 等），禁止硬编码颜色（`bg-black/75`, `text-white/90`）。详见 design-system.md。
-- 后端使用 `uv` 管理依赖（非 pip），运行命令前先 `cd backend && uv sync`。
+- 后端使用 `uv` 管理依赖。
 
 ## 2) Project Overview
 
