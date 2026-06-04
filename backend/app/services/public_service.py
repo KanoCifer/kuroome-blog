@@ -15,6 +15,7 @@ from app.repositories.gallery_repo import GalleryRepo
 from app.repositories.public_repo import PublicRepo
 from app.schemas.aiagent import WeatherAnalysisInput
 from app.schemas.gallery import GalleryInput
+from app.utils.sse import sse_event
 
 _FRONTEND_URL = get_settings().FRONTEND_URL.rstrip("/")
 
@@ -252,11 +253,6 @@ Sitemap: {sitemap_url}
             response = await client.get(url, params=params)
             return response.json()
 
-    @staticmethod
-    def _to_sse_event(content: str, is_end: bool) -> str:
-        data = {"content": content, "is_end": is_end}
-        return f"data:{orjson.dumps(data).decode()}\n\n"
-
     async def analyze_weather(
         self, weather_data: WeatherAnalysisInput, model_id: str | None = None
     ):
@@ -279,14 +275,14 @@ Sitemap: {sitemap_url}
                 model_id=model_id,
                 on_index_calculated=_on_index_calculated,
             ):
-                yield self._to_sse_event(chunk, False)
-            yield self._to_sse_event("", True)
+                yield sse_event({"content": chunk, "is_end": False})
+            yield sse_event({"content": "", "is_end": True})
         except ValueError as exc:
-            yield self._to_sse_event(f"[ERROR] {exc!r}", True)
+            yield sse_event({"content": f"[ERROR] {exc!r}", "is_end": True})
         except RuntimeError as exc:
-            yield self._to_sse_event(f"[ERROR] {exc!r}", True)
+            yield sse_event({"content": f"[ERROR] {exc!r}", "is_end": True})
         except Exception as exc:
-            yield self._to_sse_event(f"[ERROR] 天气分析失败: {exc!r}", True)
+            yield sse_event({"content": f"[ERROR] 天气分析失败: {exc!r}", "is_end": True})
 
     async def set_pic_gallery(
         self, redis: AsyncRedis, images: GalleryInput

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import asyncio
-import json
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime, timedelta
 
 import psutil
 
 from app.repositories.monitor_repo import MonitorRepo
+from app.utils.sse import sse_event
 
 
 class MonitorDomainError(Exception):
@@ -49,10 +49,6 @@ class MonitorService:
             "disk_used": disk_used,
             "disk_usage": disk_usage,
         }
-
-    @staticmethod
-    def _to_sse_event(payload: dict[str, float | int | None]) -> str:
-        return f"data: {json.dumps(payload)}\n\n"
 
     async def get_overview(self, days: int) -> dict:
         end_time = datetime.now(UTC)
@@ -183,7 +179,7 @@ class MonitorService:
     async def stream_server_status(self) -> AsyncIterator[str]:
         while True:
             payload = self._get_server_status_payload()
-            yield self._to_sse_event(payload)
+            yield sse_event(payload)
             await asyncio.sleep(5)
 
     async def get_daily_summary(self, date: datetime) -> dict:

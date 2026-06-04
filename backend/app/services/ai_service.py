@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from collections.abc import AsyncIterator
 from typing import Any
 
@@ -12,6 +11,7 @@ from app.schemas.aiagent import (
     ChatRequest,
     HistoryRequest,
 )
+from app.utils.sse import sse_event
 
 
 class AiService:
@@ -22,11 +22,6 @@ class AiService:
     ) -> None:
         self.repo = repo
         self.summarizer = summarizer
-
-    @staticmethod
-    def _to_sse_event(content: str, is_end: bool) -> str:
-        data = {"content": content, "is_end": is_end}
-        return f"data:{json.dumps(data, ensure_ascii=False)}\n\n"
 
     async def summary_stream(
         self,
@@ -39,15 +34,15 @@ class AiService:
                 title=payload.title,
                 user_id=user_id,
             ):
-                yield self._to_sse_event(str(chunk), False)
-            yield self._to_sse_event("", True)
+                yield sse_event({"content": str(chunk), "is_end": False})
+            yield sse_event({"content": "", "is_end": True})
         except ValueError as exc:
-            yield self._to_sse_event(f"[ERROR] {exc!r}", True)
+            yield sse_event({"content": f"[ERROR] {exc!r}", "is_end": True})
         except RuntimeError as exc:
-            yield self._to_sse_event(f"[ERROR] {exc!r}", True)
+            yield sse_event({"content": f"[ERROR] {exc!r}", "is_end": True})
         except Exception as exc:
             logger.error(f"❌ 文章总结失败: {exc!r}")
-            yield self._to_sse_event("[ERROR] 文章总结失败,请稍后重试", True)
+            yield sse_event({"content": "[ERROR] 文章总结失败,请稍后重试", "is_end": True})
 
     async def chat_stream(
         self,
@@ -62,15 +57,15 @@ class AiService:
                 article_content=payload.article_content,
                 article_title=payload.article_title,
             ):
-                yield self._to_sse_event(str(chunk), False)
-            yield self._to_sse_event("", True)
+                yield sse_event({"content": str(chunk), "is_end": False})
+            yield sse_event({"content": "", "is_end": True})
         except ValueError as exc:
-            yield self._to_sse_event(f"[ERROR] {exc!r}", True)
+            yield sse_event({"content": f"[ERROR] {exc!r}", "is_end": True})
         except RuntimeError as exc:
-            yield self._to_sse_event(f"[ERROR] {exc!r}", True)
+            yield sse_event({"content": f"[ERROR] {exc!r}", "is_end": True})
         except Exception as exc:
             logger.error(f"❌ 对话失败: {exc!r}")
-            yield self._to_sse_event("[ERROR] 对话失败,请稍后重试", True)
+            yield sse_event({"content": "[ERROR] 对话失败,请稍后重试", "is_end": True})
 
     async def get_user_history(self, user_id: str) -> dict[str, list[dict]]:
         sessions = await self.summarizer.get_user_sessions(user_id=user_id)
