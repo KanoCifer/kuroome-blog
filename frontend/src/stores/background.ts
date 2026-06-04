@@ -58,6 +58,20 @@ export const useBackgroundStore = defineStore('background', () => {
 
   let autoSwitchTimer: ReturnType<typeof setInterval> | null = null;
 
+  const startAutoSwitch = () => {
+    if (autoSwitchTimer) {
+      clearInterval(autoSwitchTimer);
+      autoSwitchTimer = null;
+    }
+    if (mode.value === 'random' && autoSwitchInterval.value > 0) {
+      autoSwitchTimer = setInterval(() => {
+        randomIndex.value = Math.floor(
+          Math.random() * BACKGROUND_IMAGES.length,
+        );
+      }, autoSwitchInterval.value * 1000);
+    }
+  };
+
   const saveAutoSwitch = (seconds: number) => {
     autoSwitchInterval.value = seconds;
     localStorage.setItem('bg-auto-switch', String(seconds));
@@ -65,21 +79,22 @@ export const useBackgroundStore = defineStore('background', () => {
 
   watch(
     [mode, autoSwitchInterval],
-    ([m, interval]) => {
+    startAutoSwitch,
+    { immediate: true },
+  );
+
+  const handleVisibilityChange = () => {
+    if (document.hidden) {
       if (autoSwitchTimer) {
         clearInterval(autoSwitchTimer);
         autoSwitchTimer = null;
       }
-      if (m === 'random' && interval > 0) {
-        autoSwitchTimer = setInterval(() => {
-          randomIndex.value = Math.floor(
-            Math.random() * BACKGROUND_IMAGES.length,
-          );
-        }, interval * 1000);
-      }
-    },
-    { immediate: true },
-  );
+    } else {
+      startAutoSwitch();
+    }
+  };
+
+  document.addEventListener('visibilitychange', handleVisibilityChange);
 
   return {
     backgroundImages: BACKGROUND_IMAGES,
