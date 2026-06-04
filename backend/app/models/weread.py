@@ -60,7 +60,7 @@ class UserBook(Document):
     user_id: Annotated[int, Indexed()]  # 用户ID
     bookId: str
     bookInfo: Link[WereadBook] | None = None
-    readProgress: readProgress | None = None
+    readProgress: 'readProgress | None' = None
     isTop: bool = False
     readUpdateTime: int | None = None
     finishReading: bool = False
