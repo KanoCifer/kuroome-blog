@@ -13,6 +13,7 @@ from app.repositories import (
     BookRepo,
     DevTaskRepo,
     FishingRepo,
+    FriendLinkRepo,
     GalleryRepo,
     MessageRepo,
     MonitorRepo,
@@ -200,5 +201,6 @@ async def get_weather_service():
 
 @asynccontextmanager
 async def get_friendlink_service():
-    service = FriendLinkService()
+    repo = FriendLinkRepo()
+    service = FriendLinkService(repo=repo)
     yield service

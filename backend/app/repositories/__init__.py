@@ -11,6 +11,7 @@ from app.repositories.rss_repo import RssRepo
 from app.repositories.sub_repo import SubRepo
 from app.repositories.devtask_repo import DevTaskRepo
 from app.repositories.user_repo import UserRepo
+from app.repositories.friendlink_repo import FriendLinkRepo
 from app.repositories.weread_repo import WereadRepo
 
 __all__ = [
@@ -26,6 +27,7 @@ __all__ = [
     "RssRepo",
     "SubRepo",
     "DevTaskRepo",
+    "FriendLinkRepo",
     "UserRepo",
     "WereadRepo",
 ]

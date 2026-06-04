@@ -59,7 +59,9 @@ class WereadShelfService(WereadBaseService):
 
     async def sync_my_books(self, user_id: int):
         """从微信读书同步书架并保存到数据库"""
-        raw = await self._send_http_request(user_id=user_id, api_name="/shelf/sync")
+        raw = await self._send_http_request(
+            user_id=user_id, api_name="/shelf/sync"
+        )
         books_data, archives = self._parse_book_data(raw)
 
         from app.models.weread import Archive, UserBook, WereadBook
@@ -78,6 +80,7 @@ class WereadShelfService(WereadBaseService):
                 readUpdateTime=b.get("readUpdateTime"),
                 finishReading=b.get("finishReading", False),
                 secret=b.get("secret", False),
+                readProgress=None,
             )
             for b in books_data
         ]
