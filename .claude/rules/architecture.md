@@ -45,19 +45,16 @@ Vue (`frontend/`) and React (`react-app/`) share backend services but maintain i
 - `services/` — service layer
 - `components/` — shared components
 
-## Auto-Format Hook
-
-`.claude/settings.local.json` auto-formats edits via Prettier (frontend/react-app) and Ruff (backend). Do not double-format.
-
 ## API Contract Change Flow
 
 After modifying `backend/app/schemas/`, sync both frontends:
+
 - `frontend/src/api/` — Vue API client
 - `react-app/src/services/` — React service layer
 
 ## Key Constraints
 
-- 同一本 Book（title + author 相同）在全局库中唯一，用户重复添加会报错
+- 同一本书在全局库中唯一，用户重复添加会报错
 - Fishing index 计算分两步：专家规则公式 → Ridge 回归残差校准
 - 双前端（Vue + React）维护独立状态 Store，API 契约修改必须在两端同步
 - 管理员功能硬编码（`user.id in (1, 2)`），非 RBAC 系统
