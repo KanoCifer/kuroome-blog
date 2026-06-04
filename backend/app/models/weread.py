@@ -42,7 +42,7 @@ class WereadBook(Document):
         cache_expiration_time = 600  # 缓存过期时间，单位为秒
 
 
-class readProgress(BaseModel):
+class ReadProgress(BaseModel):
     """用户的阅读进度
     对应一个 bookId
     """
@@ -60,7 +60,7 @@ class UserBook(Document):
     user_id: Annotated[int, Indexed()]  # 用户ID
     bookId: str
     bookInfo: Link[WereadBook] | None = None
-    readProgress: 'readProgress | None' = None
+    readProgress: ReadProgress | None = None
     isTop: bool = False
     readUpdateTime: int | None = None
     finishReading: bool = False
