@@ -17,7 +17,7 @@ from app.api.des.des import fishing_service_dep, weather_service_dep
 from app.api.des.redis import get_redis
 from app.models.models import User
 from app.schemas.response import APIResponse
-from app.services.fishing_index import (
+from app.services.fishing.fishing_index import (
     FEEDBACK_SCORES,
     FishingRecord,
     build_record,
@@ -25,7 +25,7 @@ from app.services.fishing_index import (
     get_qweather_index,
     parse_tide_info,
 )
-from app.services.fishing_service import FishingService
+from app.services.fishing.fishing_service import FishingService
 from app.services.weather_service import WeatherService
 
 logger = logging.getLogger(__name__)

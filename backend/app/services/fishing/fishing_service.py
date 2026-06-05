@@ -9,13 +9,16 @@ from collections.abc import Callable
 
 from app.core.logger import logger
 from app.repositories.fishing_repo import FishingRepo
-from app.services.fishing_expert import FishingExpertScorer, fishing_expert
-from app.services.fishing_index import (
+from app.services.fishing.fishing_expert import (
+    FishingExpertScorer,
+    fishing_expert,
+)
+from app.services.fishing.fishing_index import (
     FishingRecord,
     TideInfo,
     record_to_dict,
 )
-from app.services.fishing_model_service import (
+from app.services.fishing.fishing_model_service import (
     FishingModelService,
     fishing_model_service,
 )

@@ -28,7 +28,7 @@ from app.services.ai_service import AiService
 from app.services.blog_service import BlogService
 from app.services.book_service import BookService
 from app.services.devtask_service import DevTaskService
-from app.services.fishing_service import FishingService
+from app.services.fishing.fishing_service import FishingService
 from app.services.friendlink_service import FriendLinkService
 from app.services.message_service import MessageService
 from app.services.monitor_service import MonitorService

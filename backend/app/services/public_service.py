@@ -258,7 +258,7 @@ Sitemap: {sitemap_url}
     ):
         """根据天气数据进行分析并生成报告"""
         from app.core.weather_analyzer import weather_analyzer
-        from app.services.fishing_index import parse_tide_info
+        from app.services.fishing.fishing_index import parse_tide_info
 
         async def _on_index_calculated(data: dict, ai_score: int) -> None:
             """训练回调：AI 分析完成后保存反馈并触发自动训练"""

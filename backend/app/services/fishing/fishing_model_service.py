@@ -175,9 +175,6 @@ class FishingModelService:
         if self.model is None or self.scaler is None:
             self._init_model()
 
-        X = self._extract_features(record).reshape(1, -1)  # noqa: N806
-        X_scaled = self.scaler.transform(X)
-
         # SGDRegressor 不支持 partial_fit，改用滑动窗口
         # 对于少量数据，直接全量训练更稳定
         return {"skipped": True, "reason": "建议使用全量训练"}

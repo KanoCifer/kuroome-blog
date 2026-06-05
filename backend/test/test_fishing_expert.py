@@ -1,6 +1,6 @@
 import pytest
 
-from app.services.fishing_expert import FishingExpertScorer
+from app.services.fishing.fishing_expert import FishingExpertScorer
 
 
 def test_weights_sum_to_one() -> None:

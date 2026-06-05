@@ -1,0 +1,1 @@
+"""Fishing-related service package."""

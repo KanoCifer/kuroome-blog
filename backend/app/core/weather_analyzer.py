@@ -399,8 +399,8 @@ class WeatherAnalyzer:
 
 def _create_weather_analyzer() -> WeatherAnalyzer:
     """创建全局 WeatherAnalyzer 实例，从 FishingExpertScorer 注入权重"""
-    from app.services.fishing_expert import FishingExpertScorer
-    from app.services.fishing_index import parse_tide_info
+    from app.services.fishing.fishing_expert import FishingExpertScorer
+    from app.services.fishing.fishing_index import parse_tide_info
 
     return WeatherAnalyzer(
         expert_weights=FishingExpertScorer.WEIGHTS,
