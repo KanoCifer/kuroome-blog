@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 
 from app.api.des.auth import manager
 from app.api.des.des import weread_service_dep
+from app.core.exceptions import APIError
 from app.schemas.response import APIResponse
 from app.schemas.weread import SaveUserInfoIn
 
@@ -18,7 +19,7 @@ async def save_user_info(
     try:
         await weread_service.save_user_info(current_user.id, data.api_key)
     except ValueError as exc:
-        return APIResponse.error(message=str(exc))
+        raise APIError(message=str(exc))
     return APIResponse.ok(message="User information saved successfully")
 
 
@@ -33,7 +34,7 @@ async def get_user_shelf(
             current_user.id
         )
     except ValueError as exc:
-        return APIResponse.error(message=str(exc))
+        raise APIError(message=str(exc))
     user_books_data = []
     for b in user_books:
         d = b.model_dump(mode="json")
@@ -63,7 +64,7 @@ async def get_book_info(
     try:
         book = await weread_service.get_book_info(bookId)
     except ValueError as exc:
-        return APIResponse.error(message=str(exc))
+        raise APIError(message=str(exc))
     return APIResponse.ok(
         data=book.model_dump(mode="json"),
         message="Book information retrieved successfully",
@@ -79,7 +80,7 @@ async def sync_my_books(
     try:
         count = await weread_service.sync_my_books(current_user.id)
     except ValueError as exc:
-        return APIResponse.error(message=str(exc))
+        raise APIError(message=str(exc))
     return APIResponse.ok(
         data={"imported_count": count},
         message=f"Successfully imported {count} books from WeRead",

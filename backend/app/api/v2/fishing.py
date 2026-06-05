@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field
 from redis.asyncio import Redis as AsyncRedis
 
 from app.api.des.auth import manager
+from app.core.exceptions import APIError
 from app.api.des.des import fishing_service_dep, weather_service_dep
 from app.api.des.redis import get_redis
 from app.models.models import User
@@ -137,7 +138,7 @@ async def get_fishing_index(
         )
     except Exception as e:
         logger.error(f"[钓鱼指数] 获取天气数据失败: {e}", exc_info=True)
-        return APIResponse.error(message=f"无法获取天气数据，请稍后再试: {e}")
+        raise APIError(message=f"无法获取天气数据，请稍后再试: {e}")
 
     # 解析潮汐数据
     tide_data = weather_data.get("tide", {})

@@ -7,7 +7,7 @@ from app.api.des.auth import get_admin_user
 from app.api.des.des import monitor_service_dep
 from app.models.models import User
 from app.schemas.response import APIResponse
-from app.services.monitor_service import MonitorDomainError, MonitorService
+from app.services.monitor_service import MonitorService
 
 router = APIRouter(prefix="/status", tags=["monitor-status"])
 
@@ -21,10 +21,7 @@ async def get_overview(
     current_user: User = Depends(get_admin_user),
     monitor_service: MonitorService = Depends(monitor_service_dep),
 ):
-    try:
-        payload = await monitor_service.get_overview(days)
-    except MonitorDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
+    payload = await monitor_service.get_overview(days)
 
     return APIResponse.ok(
         data=payload,
@@ -40,10 +37,7 @@ async def get_visitors(
     current_user: User = Depends(get_admin_user),
     monitor_service: MonitorService = Depends(monitor_service_dep),
 ):
-    try:
-        payload = await monitor_service.get_visitors(days, page, page_size)
-    except MonitorDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
+    payload = await monitor_service.get_visitors(days, page, page_size)
 
     return APIResponse.ok(
         data=payload,
@@ -59,10 +53,7 @@ async def get_user_logins(
     current_user: User = Depends(get_admin_user),
     monitor_service: MonitorService = Depends(monitor_service_dep),
 ):
-    try:
-        payload = await monitor_service.get_user_logins(days, page, page_size)
-    except MonitorDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
+    payload = await monitor_service.get_user_logins(days, page, page_size)
 
     return APIResponse.ok(
         data=payload,
@@ -75,10 +66,7 @@ async def get_server_status(
     current_user: User = Depends(get_admin_user),
     monitor_service: MonitorService = Depends(monitor_service_dep),
 ):
-    try:
-        payload = await monitor_service.get_server_status()
-    except MonitorDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
+    payload = await monitor_service.get_server_status()
 
     return APIResponse.ok(
         data=payload,

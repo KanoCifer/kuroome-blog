@@ -28,13 +28,3 @@ class APIResponse(BaseModel):
                 status="success", data=data, message=message, code=code
             ).model_dump(mode="json"),
         )
-
-    @classmethod
-    def error(cls, message: str, code: int = 400) -> JSONResponse:
-        """错误响应的便捷方法 - 返回带 HTTP 状态码的 JSONResponse"""
-        return JSONResponse(
-            status_code=code,
-            content=cls(status="error", message=message, code=code).model_dump(
-                mode="json"
-            ),
-        )

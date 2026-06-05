@@ -7,6 +7,8 @@ from typing import Any
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from fastapi.responses import JSONResponse
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 # ============================================================================
@@ -205,3 +207,31 @@ def register_exception_handlers(app: Any) -> None:
     )
     app.add_exception_handler(APIError, api_exception_handler)
     app.add_exception_handler(Exception, generic_exception_handler)
+    app.add_exception_handler(
+        RateLimitExceeded, _rate_limit_exceeded_handler  # type: ignore
+    )
+
+
+# ============================================================================
+# Domain Errors — 继承 APIError，自动走统一异常处理
+# ============================================================================
+
+
+class MessageDomainError(APIError):
+    pass
+
+
+class WeatherDomainError(APIError):
+    pass
+
+
+class AdminDomainError(APIError):
+    pass
+
+
+class RssDomainError(APIError):
+    pass
+
+
+class BlogDomainError(APIError):
+    pass

@@ -18,12 +18,13 @@ from app.api.des.db import get_session
 from app.api.des.des import admin_service_dep
 from app.api.des.redis import get_redis
 from app.core import get_settings
+from app.core.exceptions import APIError
 from app.core.logger import logger
 from app.models.models import User
 from app.schemas import VisitorData
 from app.schemas.response import APIResponse
 from app.schemas.schemas import BlogPostIn, BlogPostUpdate
-from app.services.admin_service import AdminDomainError, AdminService
+from app.services.admin_service import AdminService
 from app.tasks import send_feishu_message
 from app.utils import get_redis_lock
 
@@ -40,16 +41,13 @@ async def add_post(
     current_user: User = Depends(get_admin_user),
     admin_service: AdminService = Depends(admin_service_dep),
 ):
-    try:
-        new_id = await admin_service.add_post(
-            title=data.title,
-            body=data.body,
-            summary=data.summary,
-            category_id=data.category_id,
-            is_pinned=data.is_pinned,
-        )
-    except AdminDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
+    new_id = await admin_service.add_post(
+        title=data.title,
+        body=data.body,
+        summary=data.summary,
+        category_id=data.category_id,
+        is_pinned=data.is_pinned,
+    )
 
     return APIResponse.ok(
         data={"_id": new_id},
@@ -63,17 +61,14 @@ async def update_post(
     current_user: User = Depends(get_admin_user),
     admin_service: AdminService = Depends(admin_service_dep),
 ):
-    try:
-        await admin_service.update_post(
-            post_id=data.id,
-            title=data.title,
-            body=data.body,
-            summary=data.summary,
-            category_id=data.category_id,
-            is_pinned=data.is_pinned,
-        )
-    except AdminDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
+    await admin_service.update_post(
+        post_id=data.id,
+        title=data.title,
+        body=data.body,
+        summary=data.summary,
+        category_id=data.category_id,
+        is_pinned=data.is_pinned,
+    )
 
     return APIResponse.ok(
         data={"_id": data.id},
@@ -87,13 +82,10 @@ async def delete_post(
     current_user: User = Depends(get_admin_user),
     admin_service: AdminService = Depends(admin_service_dep),
 ):
-    try:
-        await admin_service.delete_post(post_id=post_id)
-        logger.info(
-            f"Blog post with ID {post_id} deleted by admin {current_user.username}"
-        )
-    except AdminDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
+    await admin_service.delete_post(post_id=post_id)
+    logger.info(
+        f"Blog post with ID {post_id} deleted by admin {current_user.username}"
+    )
 
     return APIResponse.ok(
         data={"_id": post_id},
@@ -125,10 +117,7 @@ async def approve_comment(
     current_user: User = Depends(get_admin_user),
     admin_service: AdminService = Depends(admin_service_dep),
 ):
-    try:
-        await admin_service.approve_comment(comment_id=comment_id)
-    except AdminDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
+    await admin_service.approve_comment(comment_id=comment_id)
 
     return APIResponse.ok(message="Comment approved successfully")
 
@@ -139,10 +128,7 @@ async def delete_comment(
     current_user: User = Depends(get_admin_user),
     admin_service: AdminService = Depends(admin_service_dep),
 ):
-    try:
-        await admin_service.delete_comment(comment_id=comment_id)
-    except AdminDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
+    await admin_service.delete_comment(comment_id=comment_id)
 
     return APIResponse.ok(message="Comment deleted successfully")
 
@@ -157,10 +143,7 @@ async def get_admin_messages(
     current_user: User = Depends(get_admin_user),
     admin_service: AdminService = Depends(admin_service_dep),
 ):
-    try:
-        payload = await admin_service.get_admin_messages()
-    except AdminDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
+    payload = await admin_service.get_admin_messages()
 
     return APIResponse.ok(
         data=payload,
@@ -174,10 +157,7 @@ async def approve_message(
     current_user: User = Depends(get_admin_user),
     admin_service: AdminService = Depends(admin_service_dep),
 ):
-    try:
-        await admin_service.approve_message(message_id=message_id)
-    except AdminDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
+    await admin_service.approve_message(message_id=message_id)
     return APIResponse.ok(message="Message has been approved.")
 
 
@@ -187,10 +167,7 @@ async def delete_message(
     current_user: User = Depends(get_admin_user),
     admin_service: AdminService = Depends(admin_service_dep),
 ):
-    try:
-        await admin_service.delete_message(message_id=message_id)
-    except AdminDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
+    await admin_service.delete_message(message_id=message_id)
     return APIResponse.ok(message="Message has been deleted.")
 
 
@@ -357,7 +334,7 @@ async def webhook_deploy(
                 data={"status": "in_progress"},
             )
         logger.error(f"Failed to trigger deployment: {e!s}")
-        return APIResponse.error(
+        raise APIError(
             message="Failed to trigger deployment",
             code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )

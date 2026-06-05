@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 
 from app.api.des.auth import get_admin_user
+from app.core.exceptions import APIError
 from app.models.models import User
 from app.core.container import get_friendlink_service
 from app.schemas.friendlink import (
@@ -32,7 +33,7 @@ async def get_link(link_id: str) -> JSONResponse:
     async with get_friendlink_service() as service:
         link = await service.get_link(link_id)
     if not link:
-        return APIResponse.error(message="Friend link not found", code=404)
+        raise APIError(message="Friend link not found", code=404)
     return APIResponse.ok(data={"link": _serialize(link)})
 
 
@@ -63,7 +64,7 @@ async def update_link(
             )
             return APIResponse.ok(data={"link": _serialize(link)})
         except ValueError as e:
-            return APIResponse.error(message=str(e), code=404)
+            raise APIError(message=str(e), code=404)
 
 
 @router.delete("/{link_id}")
@@ -76,7 +77,7 @@ async def delete_link(
             await service.delete_link(link_id)
             return APIResponse.ok(message="Friend link deleted")
         except ValueError as e:
-            return APIResponse.error(message=str(e), code=404)
+            raise APIError(message=str(e), code=404)
 
 
 @router.put("/reorder")

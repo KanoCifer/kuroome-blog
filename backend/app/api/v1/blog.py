@@ -8,10 +8,11 @@ from starlette import status
 
 from app.api.des.auth import manager
 from app.api.des.des import blog_service_dep
+from app.core.exceptions import APIError
 from app.models.models import User
 from app.schemas.response import APIResponse
 from app.schemas.schemas import PostComment
-from app.services.blog_service import BlogDomainError, BlogService
+from app.services.blog_service import BlogService
 from app.utils import redis_cache
 from app.utils.media import save_upload_image
 
@@ -26,7 +27,7 @@ async def upload_blog_image(
 ) -> JSONResponse:
     """Upload blog image and return public URL."""
     if not file or not file.filename:
-        return APIResponse.error(
+        raise APIError(
             message="No image provided.",
             code=status.HTTP_400_BAD_REQUEST,
         )
@@ -50,10 +51,7 @@ async def get_blogs(
     blog_service: BlogService = Depends(blog_service_dep),
 ) -> JSONResponse:
     """Get paginated list of blog articles."""
-    try:
-        data = await blog_service.get_blogs(page=page, search=search)
-    except BlogDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
+    data = await blog_service.get_blogs(page=page, search=search)
     return APIResponse.ok(data=data, message="Blogs retrieved successfully")
 
 
@@ -65,10 +63,7 @@ async def get_blog_post(
     blog_service: BlogService = Depends(blog_service_dep),
 ):
     """Get a single blog post by ID."""
-    try:
-        post_data = await blog_service.get_blog_post(_id)
-    except BlogDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
+    post_data = await blog_service.get_blog_post(_id)
     return APIResponse.ok(
         data=post_data, message="Blog post retrieved successfully"
     )
@@ -82,10 +77,7 @@ async def get_blog(
     blog_service: BlogService = Depends(blog_service_dep),
 ):
     """Get a single blog post by ID."""
-    try:
-        post_data = await blog_service.get_blog_post(_id)
-    except BlogDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
+    post_data = await blog_service.get_blog_post(_id)
     return APIResponse.ok(
         data=post_data, message="Blog post retrieved successfully"
     )
@@ -97,10 +89,7 @@ async def post_comment(
     blog_service: BlogService = Depends(blog_service_dep),
 ):
     """Submit a new comment to a blog post."""
-    try:
-        result = await blog_service.post_comment(data)
-    except BlogDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
+    result = await blog_service.post_comment(data)
 
     return APIResponse.ok(
         data=result,
@@ -113,10 +102,7 @@ async def get_categories(
     blog_service: BlogService = Depends(blog_service_dep),
 ):
     """Get all categories with post counts."""
-    try:
-        categories = await blog_service.get_categories()
-    except BlogDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
+    categories = await blog_service.get_categories()
 
     return APIResponse.ok(
         data=categories,
@@ -130,10 +116,7 @@ async def get_posts_by_category(
     blog_service: BlogService = Depends(blog_service_dep),
 ):
     """Get posts by category."""
-    try:
-        data = await blog_service.get_posts_by_category(category_id)
-    except BlogDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
+    data = await blog_service.get_posts_by_category(category_id)
 
     category_name = data["category"]["name"]
     return APIResponse.ok(
@@ -148,10 +131,7 @@ async def get_category_posts(
     blog_service: BlogService = Depends(blog_service_dep),
 ):
     """Get posts by category."""
-    try:
-        data = await blog_service.get_posts_by_category(category_id)
-    except BlogDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
+    data = await blog_service.get_posts_by_category(category_id)
 
     category_name = data["category"]["name"]
     return APIResponse.ok(

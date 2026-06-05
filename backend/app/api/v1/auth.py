@@ -23,7 +23,7 @@ from app.api.des.limiter import limiter
 from app.api.des.redis import AsyncRedis, get_redis
 from app.core.config import settings
 from app.core.container import UserServices
-from app.core.exceptions import GitHubAuthError
+from app.core.exceptions import APIError, GitHubAuthError
 from app.core.logger import logger
 from app.models.models import User
 from app.schemas.auth import (
@@ -99,14 +99,14 @@ async def refresh_token(
     """
     token: str | None = refresh_token or request.headers.get("refresh_token")
     if not token:
-        return APIResponse.error(
+        raise APIError(
             message="刷新令牌不存在",
             code=status.HTTP_401_UNAUTHORIZED,
         )
 
     result = await user_service.refresh_user_token(token)
     if result is None:
-        return APIResponse.error(
+        raise APIError(
             message="无效的刷新令牌或已过期",
             code=status.HTTP_401_UNAUTHORIZED,
         )
@@ -149,7 +149,7 @@ async def login(
     )
 
     if user is None:
-        return APIResponse.error(
+        raise APIError(
             message="用户名或密码错误",
             code=status.HTTP_401_UNAUTHORIZED,
         )
@@ -190,7 +190,7 @@ async def update_user_settings(
     try:
         result = await user_service.update_settings(user, data)
     except ValueError:
-        return APIResponse.error(
+        raise APIError(
             message="Username already exists.",
             code=status.HTTP_400_BAD_REQUEST,
         )
@@ -224,7 +224,7 @@ async def me(
 ):
     result = await user_service.get_user_with_profile(current_user.id)
     if result is None:
-        return APIResponse.error(
+        raise APIError(
             message="用户不存在",
             code=status.HTTP_404_NOT_FOUND,
         )
@@ -250,7 +250,7 @@ async def register(
         redis=redis,
     )
     if user is None:
-        return APIResponse.error(
+        raise APIError(
             message="用户名已存在或邮箱已注册或验证码无效",
             code=status.HTTP_400_BAD_REQUEST,
         )
@@ -280,14 +280,14 @@ async def send_email_code(
         )
         email_addr = emailinfo.normalized
     except EmailNotValidError as e:
-        return APIResponse.error(
+        raise APIError(
             message=f"邮箱格式无效: {e!s}",
             code=status.HTTP_400_BAD_REQUEST,
         )
 
     code = await user_service.send_verification_code(email_addr, redis)
     if code is None:
-        return APIResponse.error(
+        raise APIError(
             message="验证码存储失败",
             code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
@@ -301,7 +301,7 @@ async def send_email_code(
         if not result.is_error:
             logger.info("验证码发送成功")
     except Exception as e:
-        return APIResponse.error(
+        raise APIError(
             message=f"验证码发送失败: {e!s}",
             code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
@@ -332,7 +332,7 @@ async def passkey_registration_options(
             message="Passkey 注册选项生成成功",
         )
     except ValueError:
-        return APIResponse.error(
+        raise APIError(
             message="您的账户已经绑定了Passkey",
             code=status.HTTP_400_BAD_REQUEST,
         )
@@ -353,7 +353,7 @@ async def passkey_register(
         user, body.response, redis, origin
     )
     if error:
-        return APIResponse.error(
+        raise APIError(
             message=error, code=status.HTTP_400_BAD_REQUEST
         )
 
@@ -379,7 +379,7 @@ async def passkey_delete(
 ):
     success = await user_services.passkey.delete_passkey(user)
     if not success:
-        return APIResponse.error(
+        raise APIError(
             message="您的账户尚未绑定Passkey",
             code=status.HTTP_400_BAD_REQUEST,
         )
@@ -397,7 +397,7 @@ async def passkey_authenticate(
         assertion.assertion, redis, request
     )
     if error or user is None or tokens is None:
-        return APIResponse.error(
+        raise APIError(
             message=error or "认证失败", code=status.HTTP_400_BAD_REQUEST
         )
 

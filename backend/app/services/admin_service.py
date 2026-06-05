@@ -5,15 +5,9 @@ from datetime import UTC, datetime
 from bson import ObjectId
 from bson.errors import InvalidId
 
+from app.core.exceptions import AdminDomainError
 from app.models.beanie import MessageBoard, Post
 from app.repositories.admin_repo import AdminRepo
-
-
-class AdminDomainError(Exception):
-    def __init__(self, message: str, code: int) -> None:
-        super().__init__(message)
-        self.message = message
-        self.code = code
 
 
 class AdminService:

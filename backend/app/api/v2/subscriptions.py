@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.des.auth import manager
 from app.api.des.des import notification_service_dep, sub_service_dep
-from app.core.exceptions import NotFoundError
+from app.core.exceptions import APIError, NotFoundError
 from app.models.models import User
 from app.notification import NotificationPayload
 from app.schemas.response import APIResponse
@@ -84,7 +84,7 @@ async def update_global_notification_config(
         user_id=current_user.id, config_data=config_data.model_dump()
     )
     if updated_config is None:
-        return APIResponse.error(message="更新全局通知配置失败")
+        raise APIError(message="更新全局通知配置失败")
     return APIResponse.ok(
         data={"config": updated_config}, message="更新全局通知配置成功"
     )
@@ -239,6 +239,6 @@ async def test_subscription_notification(
         return APIResponse.ok(
             data={"results": result}, message="测试通知发送成功"
         )
-    return APIResponse.error(
+    raise APIError(
         message=f"测试通知发送失败，请检查渠道配置。结果: {result}"
     )

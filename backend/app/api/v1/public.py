@@ -21,6 +21,7 @@ from app.api.des.des import public_service_dep
 from app.api.des.limiter import limiter
 from app.api.des.redis import get_redis
 from app.core.config import get_settings
+from app.core.exceptions import APIError
 from app.models.models import User
 from app.schemas.aiagent import WeatherAnalysisInput
 from app.schemas.gallery import GalleryInput
@@ -176,7 +177,7 @@ async def get_amap_security_key(request: Request) -> JSONResponse:
     )
     allowed_origins = get_settings().AMAP_KEY_ALLOWED_ORIGINS.split(",")
     if origin and not any(o in origin for o in allowed_origins):
-        return APIResponse.error(
+        raise APIError(
             message="Forbidden: invalid origin",
             code=403,
         )
@@ -239,7 +240,7 @@ async def upload_blog_image(
 ) -> JSONResponse:
     """Upload blog image and return public URL."""
     if not file or not file.filename:
-        return APIResponse.error(
+        raise APIError(
             message="No image provided.",
             code=status.HTTP_400_BAD_REQUEST,
         )
@@ -271,7 +272,7 @@ async def set_pic_gallery(
             message="Picture gallery updated successfully",
         )
     except Exception as exc:
-        return APIResponse.error(
+        raise APIError(
             message=f"Failed to update picture gallery: {exc!s}",
             code=500,
         )
@@ -290,7 +291,7 @@ async def get_pic_gallery(
             message="Picture gallery retrieved successfully",
         )
     except Exception as exc:
-        return APIResponse.error(
+        raise APIError(
             message=f"Failed to retrieve picture gallery: {exc!s}",
             code=500,
         )

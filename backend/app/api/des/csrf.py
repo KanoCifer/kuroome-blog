@@ -25,6 +25,7 @@ from fastapi import Cookie, Depends, HTTPException, Request, Response, status
 from itsdangerous import SignatureExpired, TimestampSigner
 
 from app.core.config import settings
+from app.core.exceptions import APIError
 from app.schemas.response import APIResponse
 
 if TYPE_CHECKING:
@@ -134,7 +135,7 @@ def setup_csrf(app: FastAPI) -> None:
         client_token = csrf_from_header or csrf_from_cookie
 
         if not client_token or not csrf_manager.verify_token(client_token):
-            return APIResponse.error(
+            raise APIError(
                 message="CSRF token missing or invalid",
                 code=status.HTTP_403_FORBIDDEN,
             )

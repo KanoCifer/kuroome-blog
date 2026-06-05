@@ -13,6 +13,7 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from redis.asyncio import Redis as AsyncRedis
 
+from app.core.exceptions import RssDomainError
 from app.core.logger import logger
 from app.models.models import RssInfo
 from app.repositories.rss_repo import RssRepo
@@ -133,15 +134,6 @@ def _extract_entry_content(entry: dict[str, Any]) -> str:
     if isinstance(raw_content, str):
         return raw_content
     return str(entry.get("summary", ""))
-
-
-class RssDomainError(Exception):
-    """RSS 领域错误，表示在处理 RSS 相关业务逻辑时发生的错误，包含错误消息和 HTTP 状态码。"""
-
-    def __init__(self, message: str, code: int = 400) -> None:
-        super().__init__(message)
-        self.message = message
-        self.code = code
 
 
 # ======= RSS 业务逻辑处理类 =======

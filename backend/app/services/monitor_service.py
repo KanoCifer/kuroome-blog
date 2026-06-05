@@ -10,13 +10,6 @@ from app.repositories.monitor_repo import MonitorRepo
 from app.utils.sse import sse_event
 
 
-class MonitorDomainError(Exception):
-    def __init__(self, message: str, code: int) -> None:
-        super().__init__(message)
-        self.message = message
-        self.code = code
-
-
 class MonitorService:
     def __init__(
         self,

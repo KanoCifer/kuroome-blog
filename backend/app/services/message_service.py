@@ -2,15 +2,9 @@ from __future__ import annotations
 
 from html import escape
 
+from app.core.exceptions import MessageDomainError
 from app.repositories.message_repo import MessageRepo
 from app.schemas.message import MessageIn
-
-
-class MessageDomainError(Exception):
-    def __init__(self, message: str, code: int) -> None:
-        super().__init__(message)
-        self.message = message
-        self.code = code
 
 
 class MessageService:

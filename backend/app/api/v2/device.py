@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 
 from app.api.des.auth import manager
 from app.api.des.des import device_service_dep
-from app.core.exceptions import NotFoundError
+from app.core.exceptions import APIError, NotFoundError
 from app.models.models import DeviceTrack, User
 from app.schemas.device import (
     DeviceInput,
@@ -76,7 +76,7 @@ async def update_device(
         device_id, **device_input.model_dump(exclude_unset=True)
     )
     if not updated_device:
-        return APIResponse.error(message="设备信息不存在或更新失败")
+        raise APIError(message="设备信息不存在或更新失败")
     response: DeviceResponse = DeviceResponse.model_validate(updated_device)
     return APIResponse.ok(
         data={"device": response}, message="更新设备信息成功"

@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 from app.api.des.auth import manager
 from app.api.des.des import devtask_service_dep
+from app.core.exceptions import APIError
 from app.models.models import User
 from app.schemas.devtask import DevTaskCreate, DevTaskUpdate
 from app.schemas.response import APIResponse
@@ -65,7 +66,7 @@ async def patch_task(
         td["id"] = str(updated.id)
         return APIResponse.ok(data={"task": td}, message="DevTask updated")
     except ValueError as e:
-        return APIResponse.error(message=str(e), code=404)
+        raise APIError(message=str(e), code=404)
 
 
 @router.delete("/{task_id}")
@@ -78,7 +79,7 @@ async def delete_task(
         await service.delete_task(user.id, task_id)
         return APIResponse.ok(message="DevTask deleted")
     except ValueError as e:
-        return APIResponse.error(message=str(e), code=404)
+        raise APIError(message=str(e), code=404)
 
 
 @router.put("/reorder")

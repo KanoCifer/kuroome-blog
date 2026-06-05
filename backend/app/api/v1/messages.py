@@ -16,7 +16,7 @@ from app.schemas.response import APIResponse
 from app.schemas.schemas import (
     MessageIn,
 )
-from app.services.message_service import MessageDomainError, MessageService
+from app.services.message_service import MessageService
 
 router = APIRouter(prefix="/messages", tags=["messages"])
 
@@ -26,18 +26,12 @@ async def get_messages(
     message_service: MessageService = Depends(message_service_dep),
 ):
     """Get approved messages from message board."""
-    try:
-        payload = await message_service.get_messages()
+    payload = await message_service.get_messages()
 
-        return APIResponse.ok(
-            data=payload,
-            message="Messages retrieved successfully",
-        )
-    except MessageDomainError as e:
-        return APIResponse.error(
-            message=e.message,
-            code=e.code,
-        )
+    return APIResponse.ok(
+        data=payload,
+        message="Messages retrieved successfully",
+    )
 
 
 @router.post("", response_model=APIResponse)
@@ -51,18 +45,12 @@ async def create_message(
     """Submit a new message to message board (pending review)."""
     is_admin = user is not None and user.is_admin
 
-    try:
-        data = await message_service.create_message(message_in, is_admin)
+    data = await message_service.create_message(message_in, is_admin)
 
-        return APIResponse.ok(
-            data=data,
-            message="Message submitted successfully, pending review",
-        )
-    except MessageDomainError as e:
-        return APIResponse.error(
-            message=e.message,
-            code=e.code,
-        )
+    return APIResponse.ok(
+        data=data,
+        message="Message submitted successfully, pending review",
+    )
 
 
 # =============================================================================

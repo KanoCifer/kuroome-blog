@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 
 from app.core import logger
 from app.core.config import get_settings
+from app.core.exceptions import WeatherDomainError
 from app.utils.qweather_jwt import generate_qweather_jwt
 
 _QWEATHER_BASE_URL = get_settings().QWEATHER_BASE_URL.rstrip("/")
@@ -87,13 +88,6 @@ class _QWeatherClient:
         encoded_jwt: str = generate_qweather_jwt()
         await self._redis.set(cache_key, encoded_jwt, ex=24 * 3600)
         return encoded_jwt
-
-
-class WeatherDomainError(Exception):
-    def __init__(self, message: str, code: int) -> None:
-        super().__init__(message)
-        self.message = message
-        self.code = code
 
 
 class WeatherService:

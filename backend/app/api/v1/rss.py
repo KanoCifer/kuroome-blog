@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse, Response
 
 from app.api.des.auth import manager
 from app.api.des.des import rss_service_dep
+from app.core.exceptions import APIError
 from app.core.logger import logger
 from app.models.models import User
 from app.schemas.response import APIResponse
@@ -13,7 +14,6 @@ from app.schemas.schemas import (
     RssRequest,
 )
 from app.services.rss_service import (
-    RssDomainError,
     RssService,
     _is_forbidden_target,
 )
@@ -31,11 +31,11 @@ async def proxy_rss_image(
     """代理 RSS 图片, 避免浏览器直接跨域加载失败。"""
     parsed = urlparse(url)
     if parsed.scheme not in {"http", "https"}:
-        return APIResponse.error(
+        raise APIError(
             message="仅支持 http/https 图片地址", code=400
         )
     if not parsed.hostname or await _is_forbidden_target(parsed.hostname):
-        return APIResponse.error(message="不允许访问该图片地址", code=400)
+        raise APIError(message="不允许访问该图片地址", code=400)
 
     try:
         async with httpx.AsyncClient(
@@ -44,18 +44,18 @@ async def proxy_rss_image(
         ) as client:
             upstream = await client.get(url)
     except httpx.HTTPError:
-        return APIResponse.error(message="拉取图片失败", code=502)
+        raise APIError(message="拉取图片失败", code=502)
 
     if upstream.status_code >= 400:
-        return APIResponse.error(message="拉取图片失败", code=502)
+        raise APIError(message="拉取图片失败", code=502)
 
     content_type = upstream.headers.get("content-type", "")
     if not content_type.lower().startswith("image/"):
-        return APIResponse.error(message="目标资源不是图片", code=400)
+        raise APIError(message="目标资源不是图片", code=400)
 
     content = upstream.content
     if len(content) > _IMAGE_PROXY_MAX_BYTES:
-        return APIResponse.error(message="图片过大，超过 10MB", code=413)
+        raise APIError(message="图片过大，超过 10MB", code=413)
 
     headers = {
         "Cache-Control": "public, max-age=3600",
@@ -86,15 +86,12 @@ async def parse_rss(
     rss_info = None
 
     if save_to_db:
-        try:
-            rss_info = await rss_service.save_rss_info(
-                url=rss_url, user_id=current_user.id
-            )
-            logger.info(
-                f"用户 {current_user.username} 保存了RSS链接: {rss_url}"
-            )
-        except RssDomainError as exc:
-            return APIResponse.error(message=exc.message, code=exc.code)
+        rss_info = await rss_service.save_rss_info(
+            url=rss_url, user_id=current_user.id
+        )
+        logger.info(
+            f"用户 {current_user.username} 保存了RSS链接: {rss_url}"
+        )
 
     if not save_to_db:
         cached_payload = await rss_service.get_cached_feed(rss_url)
@@ -105,28 +102,19 @@ async def parse_rss(
         result = await rss_service.fetch_and_parse_feed(
             url=rss_url, save_to_db=save_to_db, rss_info=rss_info
         )
-    except RssDomainError as exc:
-        logger.error(f"解析RSS链接失败: {exc!r}")
-        return APIResponse.error(message=exc.message, code=exc.code)
+    except APIError:
+        raise
     except Exception as exc:
         logger.error(f"解析RSS链接失败: {exc!r}")
-        return APIResponse.error(message=f"解析RSS链接失败: {exc!r}", code=500)
+        raise APIError(message=f"解析RSS链接失败: {exc!r}", code=500)
     feed_meta = result["feed_meta"]
     entries = result["entries"]
 
     if save_to_db:
-        try:
-            await rss_service.save_entries_to_mongo(
-                feed_url=rss_url,
-                entries=entries,
-            )
-        except RssDomainError as exc:
-            logger.error(
-                "将RSS条目保存到MongoDB失败: user=%s, url=%s, error=%s",
-                current_user.id,
-                rss_url,
-                exc.message,
-            )
+        await rss_service.save_entries_to_mongo(
+            feed_url=rss_url,
+            entries=entries,
+        )
 
     await rss_service.set_cached_feed(
         url=rss_url,
@@ -162,20 +150,11 @@ async def get_article(
     current_user: User = Depends(manager),
     rss_service: RssService = Depends(rss_service_dep),
 ):
-    try:
-        response = await rss_service.get_article_for_user(
-            article_id=article_id,
-            user_id=current_user.id,
-        )
-        return APIResponse.ok(data=response.model_dump())
-    except RssDomainError as exc:
-        logger.warning(
-            "获取 RSS 文章失败: user=%s, article_id=%s, error=%s",
-            current_user.id,
-            article_id,
-            exc.message,
-        )
-        return APIResponse.error(message=exc.message, code=exc.code)
+    response = await rss_service.get_article_for_user(
+        article_id=article_id,
+        user_id=current_user.id,
+    )
+    return APIResponse.ok(data=response.model_dump())
 
 
 # 获取当前用户的RSS订阅列表
@@ -213,17 +192,11 @@ async def refresh_subscription(
             result["saved_count"],
         )
         return APIResponse.ok(data=result)
-    except RssDomainError as exc:
-        logger.warning(
-            "手动刷新 RSS 失败: user=%s, subscription_id=%s, error=%s",
-            current_user.id,
-            subscription_id,
-            exc.message,
-        )
-        return APIResponse.error(message=exc.message, code=exc.code)
+    except APIError:
+        raise
     except Exception as exc:
         logger.error(f"手动刷新RSS失败: {exc!r}")
-        return APIResponse.error(message=f"手动刷新RSS失败: {exc!r}", code=500)
+        raise APIError(message=f"手动刷新RSS失败: {exc!r}", code=500)
 
 
 # 删除RSS订阅及其所有文章
@@ -241,8 +214,6 @@ async def delete_subscription(
         )
         logger.info(f"用户 {current_user.username} 删除了RSS订阅: {rss_url}")
         return APIResponse.ok(data={"message": "订阅已删除"})
-    except RssDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
 
 
 # 标记文章为已读
@@ -253,14 +224,11 @@ async def mark_article_read(
     rss_service: RssService = Depends(rss_service_dep),
 ):
     """标记文章为已读(将用户ID添加到read_by列表,使用$addToSet实现幂等性)"""
-    try:
-        await rss_service.mark_article_read_state(
-            article_id=article_id,
-            user_id=current_user.id,
-            read=True,
-        )
-    except RssDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
+    await rss_service.mark_article_read_state(
+        article_id=article_id,
+        user_id=current_user.id,
+        read=True,
+    )
 
     logger.info(f"用户 {current_user.id} 标记文章 {article_id} 为已读")
     return APIResponse.ok(data={"message": "文章已标记为已读"})
@@ -274,14 +242,11 @@ async def mark_article_unread(
     rss_service: RssService = Depends(rss_service_dep),
 ):
     """标记文章为未读(从read_by列表中移除用户ID)"""
-    try:
-        await rss_service.mark_article_read_state(
-            article_id=article_id,
-            user_id=current_user.id,
-            read=False,
-        )
-    except RssDomainError as exc:
-        return APIResponse.error(message=exc.message, code=exc.code)
+    await rss_service.mark_article_read_state(
+        article_id=article_id,
+        user_id=current_user.id,
+        read=False,
+    )
 
     logger.info(f"用户 {current_user.id} 标记文章 {article_id} 为未读")
     return APIResponse.ok(data={"message": "文章已标记为未读"})

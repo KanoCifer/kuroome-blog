@@ -7,15 +7,9 @@ from typing import Any
 from bson import ObjectId
 from bson.errors import InvalidId
 
+from app.core.exceptions import BlogDomainError
 from app.repositories.blog_repo import BlogRepo
 from app.schemas.comment import PostComment
-
-
-class BlogDomainError(Exception):
-    def __init__(self, message: str, code: int) -> None:
-        super().__init__(message)
-        self.message = message
-        self.code = code
 
 
 class BlogService:
