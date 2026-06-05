@@ -31,9 +31,7 @@ async def proxy_rss_image(
     """代理 RSS 图片, 避免浏览器直接跨域加载失败。"""
     parsed = urlparse(url)
     if parsed.scheme not in {"http", "https"}:
-        raise APIError(
-            message="仅支持 http/https 图片地址", code=400
-        )
+        raise APIError(message="仅支持 http/https 图片地址", code=400)
     if not parsed.hostname or await _is_forbidden_target(parsed.hostname):
         raise APIError(message="不允许访问该图片地址", code=400)
 
@@ -89,9 +87,7 @@ async def parse_rss(
         rss_info = await rss_service.save_rss_info(
             url=rss_url, user_id=current_user.id
         )
-        logger.info(
-            f"用户 {current_user.username} 保存了RSS链接: {rss_url}"
-        )
+        logger.info(f"用户 {current_user.username} 保存了RSS链接: {rss_url}")
 
     if not save_to_db:
         cached_payload = await rss_service.get_cached_feed(rss_url)
@@ -194,9 +190,6 @@ async def refresh_subscription(
         return APIResponse.ok(data=result)
     except APIError:
         raise
-    except Exception as exc:
-        logger.error(f"手动刷新RSS失败: {exc!r}")
-        raise APIError(message=f"手动刷新RSS失败: {exc!r}", code=500)
 
 
 # 删除RSS订阅及其所有文章
@@ -207,13 +200,12 @@ async def delete_subscription(
     rss_service: RssService = Depends(rss_service_dep),
 ):
     """删除RSS订阅及其关联的所有文章"""
-    try:
-        rss_url = await rss_service.delete_subscription_for_user(
-            subscription_id=subscription_id,
-            user_id=current_user.id,
-        )
-        logger.info(f"用户 {current_user.username} 删除了RSS订阅: {rss_url}")
-        return APIResponse.ok(data={"message": "订阅已删除"})
+    rss_url = await rss_service.delete_subscription_for_user(
+        subscription_id=subscription_id,
+        user_id=current_user.id,
+    )
+    logger.info(f"用户 {current_user.username} 删除了RSS订阅: {rss_url}")
+    return APIResponse.ok(data={"message": "订阅已删除"})
 
 
 # 标记文章为已读
