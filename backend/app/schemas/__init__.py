@@ -29,14 +29,6 @@ from app.schemas.blog import (
     BlogPostUpdate,
     CategoryIn,
 )
-from app.schemas.book import (
-    AddBookIn,
-    BookOut,
-    BookQuery,
-    BooksOut,
-    BookStatusIn,
-    UpdateBookIn,
-)
 from app.schemas.category import CategoriesOut, CategoryOut
 from app.schemas.comment import (
     AdminCommentOut,
@@ -90,7 +82,6 @@ from app.schemas.weather import (
 )
 
 __all__ = [
-    "AddBookIn",
     "AdminCommentOut",
     "AdminCommentsOut",
     "AdminMessageOut",
@@ -101,10 +92,6 @@ __all__ = [
     "BlogPostGet",
     "BlogPostIn",
     "BlogPostUpdate",
-    "BookOut",
-    "BookQuery",
-    "BookStatusIn",
-    "BooksOut",
     "BootstrapEmailContent",
     "CategoriesOut",
     "CategoryIn",
@@ -152,7 +139,6 @@ __all__ = [
     "DevTaskCreate",
     "DevTaskOut",
     "DevTaskUpdate",
-    "UpdateBookIn",
     "UserOut",
     "UserProfileOut",
     "UserSettingsIn",

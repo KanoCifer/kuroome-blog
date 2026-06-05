@@ -61,8 +61,7 @@
 <script setup lang="ts">
 import BentoCard from '@/components/bento/BentoCard.vue';
 import { useAnimateNumber } from '@/composables/useAnimateNumber';
-import { bookService } from '@/service/bookService';
-import type { BookItem } from '@/types';
+import { wereadService } from '@/service/wereadService/index';
 import { BookOpen } from '@lucide/vue';
 import { onMounted, ref } from 'vue';
 
@@ -72,9 +71,9 @@ const bookCovers = ['bg-red-400', 'bg-blue-400', 'bg-green-400'];
 
 onMounted(async () => {
   try {
-    const response = await bookService.getBooks({ per_page: 100 });
-    const books = response.data?.books || [];
-    const readingBooks = books.filter((b: BookItem) => !b.iscompleted);
+    const response = await wereadService.getUserShelf();
+    const books = response.data?.user_books || [];
+    const readingBooks = books.filter((b) => !b.finishReading);
     animateTo(readingBooks.length || 10);
   } catch {
     console.warn('Failed to fetch reading books, using default count');

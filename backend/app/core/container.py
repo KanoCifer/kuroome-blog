@@ -10,7 +10,6 @@ from app.repositories import (
     AdminRepo,
     AiRepo,
     BlogRepo,
-    BookRepo,
     DevTaskRepo,
     FishingRepo,
     FriendLinkRepo,
@@ -26,7 +25,6 @@ from app.repositories import (
 from app.services.admin_service import AdminService
 from app.services.ai_service import AiService
 from app.services.blog_service import BlogService
-from app.services.book_service import BookService
 from app.services.devtask_service import DevTaskService
 from app.services.fishing.fishing_service import FishingService
 from app.services.friendlink_service import FriendLinkService
@@ -76,14 +74,6 @@ async def get_admin_service():
     async with get_async_session() as session:
         admin_repo = AdminRepo(session)
         service = AdminService(repo=admin_repo, cache=redis_cache)
-        yield service
-
-
-@asynccontextmanager
-async def get_book_service():
-    async with get_async_session() as session:
-        book_repo = BookRepo(session)
-        service = BookService(repo=book_repo)
         yield service
 
 

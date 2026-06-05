@@ -41,16 +41,6 @@ const router = createRouter({
   },
   routes: [
     {
-      path: '/home',
-      name: 'home',
-      component: () => import('@/views/pages/HomeView.vue'),
-      meta: {
-        title: "Kuroome's Blog - 个人阅读清单与博客",
-        description: '个人阅读清单管理项目，包含博客系统、书籍管理和阅读记录',
-        keywords: '阅读清单,博客,书籍管理,个人知识库',
-      },
-    },
-    {
       path: '/',
       name: 'entry',
       component: () => import('@/views/entry/EntryView.vue'),

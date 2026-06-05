@@ -1,7 +1,6 @@
 from app.repositories.admin_repo import AdminRepo
 from app.repositories.ai_repo import AiRepo
 from app.repositories.blog_repo import BlogRepo
-from app.repositories.book_repo import BookRepo
 from app.repositories.fishing_repo import FishingRepo
 from app.repositories.gallery_repo import GalleryRepo
 from app.repositories.message_repo import MessageRepo
@@ -18,7 +17,6 @@ __all__ = [
     "AdminRepo",
     "AiRepo",
     "BlogRepo",
-    "BookRepo",
     "FishingRepo",
     "GalleryRepo",
     "MessageRepo",

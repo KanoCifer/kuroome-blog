@@ -97,17 +97,6 @@ export interface PostResponse {
 }
 
 // 书籍类型定义
-export interface BookItem {
-  id: number;
-  title: string;
-  author: string;
-  bookid?: string | null;
-  cover: string | null;
-  iscompleted: boolean;
-  add_date?: string | null;
-  update_date?: string | null;
-}
-
 export interface Pagination {
   page: number;
   per_page: number;
@@ -117,17 +106,6 @@ export interface Pagination {
   has_next: boolean;
   prev_num: number | null;
   next_num: number | null;
-}
-
-export interface BookListData {
-  books: BookItem[];
-  pagination: Pagination;
-}
-
-export interface BookListResponse {
-  status: string;
-  message: string;
-  data?: BookListData;
 }
 
 export interface LoginForm {

@@ -6,7 +6,6 @@ import { BentoGreeting } from './components/BentoGreeting';
 import { BentoMap } from './components/BentoMap';
 import { BentoMemo } from './components/BentoMemo';
 import { BentoProfile } from './components/BentoProfile';
-import { BentoReadingList } from './components/BentoReadingList';
 import { BentoTech } from './components/BentoTech';
 import { BentoTodo } from './components/BentoTodo';
 import { BentoWeb } from './components/BentoWeb';
@@ -42,17 +41,14 @@ export default function Home() {
           <BentoTech />
         </div>
         <div className="order-7 w-[calc(50%-0.5rem)] min-w-0">
-          <BentoReadingList />
-        </div>
-        <div className="order-8 w-[calc(50%-0.5rem)] min-w-0">
           <BentoMap />
         </div>
 
-        <div className="order-9 w-full min-w-0">
+        <div className="order-8 w-full min-w-0">
           <BentoTodo />
         </div>
 
-        <div className="order-10 w-full min-w-0">
+        <div className="order-9 w-full min-w-0">
           <BentoWeb />
         </div>
       </div>

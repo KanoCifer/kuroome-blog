@@ -5,7 +5,6 @@ from app.core.container import (
     get_admin_service,
     get_ai_service,
     get_blog_service,
-    get_book_service,
     get_device_service,
     get_devtask_service,
     get_fishing_service,
@@ -35,11 +34,6 @@ async def user_services_dep():
 
 async def admin_service_dep():
     async with get_admin_service() as service:
-        yield service
-
-
-async def book_service_dep():
-    async with get_book_service() as service:
         yield service
 
 

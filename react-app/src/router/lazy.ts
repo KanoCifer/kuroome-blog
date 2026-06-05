@@ -16,11 +16,6 @@ export const BlogPost = lazy(() => import('../views/Blog/BlogPostView'));
 export const RssWorkspace = lazy(() => import('../views/Rss/RssWorkspaceView'));
 export const RssArticle = lazy(() => import('../views/Rss/RssArticleView'));
 export const TodoList = lazy(() => import('../views/Todo/TodoListView'));
-export const ReadingList = lazy(
-  () => import('../views/ReadingList/ReadingListView'),
-);
-export const BookShelf = lazy(() => import('../views/Book/BookShelfView'));
-export const ImportBook = lazy(() => import('../views/Book/ImportBookView'));
 export const PicGallery = lazy(() => import('../views/Pic/PicGalleryView'));
 export const ImageToolbox = lazy(
   () => import('../views/Toolbox/ImageToolboxView'),

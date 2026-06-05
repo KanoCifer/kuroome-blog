@@ -25,47 +25,6 @@ from app.models import Base
 fake = faker.Faker()
 
 
-# 多对多关联模型，连接用户和书籍，包含额外字段
-class UserBook(Base):
-    __tablename__ = "user_book"
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("user.id"), primary_key=True
-    )
-    book_id: Mapped[int] = mapped_column(
-        ForeignKey("book.id"), primary_key=True
-    )
-    iscompleted: Mapped[bool] = mapped_column(default=False)
-    add_date: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        default=lambda: datetime.now(UTC),
-        index=True,
-    )
-    update_date: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        default=lambda: datetime.now(UTC),
-        onupdate=lambda: datetime.now(UTC),
-        index=True,
-    )
-    # Relationships
-    user: Mapped[User] = relationship(back_populates="user_book")
-    book: Mapped[Book] = relationship(back_populates="user_book")
-
-    def __init__(
-        self,
-        user_id: int,
-        book_id: int,
-        iscompleted: bool = False,
-        add_date: datetime | None = None,
-    ):
-        self.user_id = user_id
-        self.book_id = book_id
-        self.iscompleted = iscompleted
-        self.add_date = add_date if add_date is not None else datetime.now(UTC)
-
-    def __repr__(self):
-        return f"<UserBook User ID: {self.user_id}, Book ID: {self.book_id}>"
-
-
 # 用户模型
 class User(Base):
     __tablename__ = "user"
@@ -101,8 +60,6 @@ class User(Base):
     profile: Mapped[Profile | None] = relationship(
         back_populates="user", uselist=False, cascade="all, delete-orphan"
     )
-    # 多对多关系与书籍
-    user_book: Mapped[list[UserBook]] = relationship(back_populates="user")
     # 一对多关系与RSS链接
     rss_info: Mapped[list[RssInfo]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
@@ -211,37 +168,6 @@ class Profile(Base):
     def __repr__(self):
         return f"<Profile {self.id} - User ID: {self.user_id}>"
 
-
-# 书籍模型
-class Book(Base):
-    __tablename__ = "book"
-    id: Mapped[int] = mapped_column(
-        Integer, primary_key=True, autoincrement=True
-    )
-    title: Mapped[str] = mapped_column(String(200), index=True)
-    author: Mapped[str] = mapped_column(String(60), index=True)
-    bookid: Mapped[str | None] = mapped_column(
-        String(50), unique=True, nullable=True
-    )
-    cover: Mapped[str | None] = mapped_column(String(200), nullable=True)
-
-    # 多对多关系与用户
-    user_book: Mapped[list[UserBook]] = relationship(back_populates="book")
-
-    def __init__(
-        self,
-        title: str,
-        author: str,
-        bookid: str | None = None,
-        cover: str | None = None,
-    ):
-        self.title = title
-        self.author = author
-        self.bookid = bookid or None
-        self.cover = cover or None
-
-    def __repr__(self):
-        return f"<Book {self.title} by {self.author}>"
 
 
 class Category(Base):
