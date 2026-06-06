@@ -519,8 +519,13 @@ const getFullMediaUrl = (relativeUrl: string): string => {
   if (relativeUrl.startsWith('http://') || relativeUrl.startsWith('https://')) {
     return relativeUrl;
   }
-  // Prepend API base URL
-  return `${apiBase}${relativeUrl}`;
+  // Extract origin from apiBase to avoid duplicating path prefix (e.g. /api)
+  try {
+    const url = new URL(apiBase);
+    return `${url.origin}${relativeUrl}`;
+  } catch {
+    return `${apiBase}${relativeUrl}`;
+  }
 };
 
 // Random layout seeds (cached per image index)
