@@ -39,11 +39,15 @@
       >
         <button
           type="button"
-          class="border-border bg-card/60 hover:bg-accent flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
+          class="border-border bg-card/60 hover:bg-accent flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors disabled:opacity-50"
+          :disabled="isSyncing"
           @click="handleSync"
           aria-label="同步书架"
         >
-          <CloudSync class="text-foreground h-5 w-5" />
+          <CloudSync
+            class="text-foreground h-5 w-5"
+            :class="{ 'animate-spin': isSyncing }"
+          />
         </button>
       </div>
 
@@ -228,6 +232,7 @@ const errorMessage = ref('');
 const books = ref<WereadUserBook[]>([]);
 const coverMap = ref<Record<string, string>>({});
 
+const isSyncing = ref(false);
 const statsStore = useReadStatsStore();
 const weeklySnapshot = computed(() => statsStore.weeklySnapshot);
 
@@ -316,6 +321,7 @@ const fetchBooks = async () => {
 };
 
 const handleSync = async () => {
+  isSyncing.value = true;
   try {
     const res = await wereadService.syncMyBooks();
     if (res.status === 'success') {
@@ -332,6 +338,8 @@ const handleSync = async () => {
     };
     errorMessage.value =
       error?.response?.data?.message || error?.message || '同步失败';
+  } finally {
+    isSyncing.value = false;
   }
 };
 

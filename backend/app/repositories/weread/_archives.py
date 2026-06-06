@@ -1,5 +1,4 @@
 from app.models.weread import Archive
-from app.repositories.weread._upsert import upsert
 
 
 class ArchiveRepo:
@@ -38,4 +37,10 @@ class ArchiveRepo:
             (Archive.user_id == archive.user_id)
             & (Archive.name == archive.name)
         )
-        return await upsert(archive, find_one)
+        existing = await find_one
+        if existing:
+            archive.id = existing.id
+            await archive.save()
+        else:
+            await archive.insert()
+        return archive

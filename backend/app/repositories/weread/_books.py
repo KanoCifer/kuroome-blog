@@ -1,8 +1,4 @@
-from beanie import BulkWriter
-from pymongo import InsertOne
-
 from app.models.weread import WereadBook
-from app.repositories.weread._upsert import upsert
 
 
 class BookRepo:
@@ -11,40 +7,38 @@ class BookRepo:
     async def save_books_bulk(
         self, books: list[WereadBook]
     ) -> dict[str, WereadBook]:
-        """批量保存书籍，按 bookId 去重，并返回 bookId → WereadBook 映射"""
-        book_ids = [b.bookId for b in books]
-        existing = await WereadBook.find(
-            {"_id": {"$in": book_ids}}
-        ).to_list()
-        existing_map = {b.bookId: b for b in existing}
+        """批量保存书籍，以 id（_id = bookId）去重，返回 bookId → WereadBook 映射
 
-        book_map = {}
-        new_books = []
-        for book in books:
-            if book.bookId in existing_map:
-                doc = existing_map[book.bookId]
-                update_data = book.model_dump(exclude={"id"})
-                for field, value in update_data.items():
-                    setattr(doc, field, value)
-                await doc.save()
-                book_map[book.bookId] = doc
-            else:
-                new_books.append(book)
-                book_map[book.bookId] = book
+        已有记录：跳过（增量同步默认不覆盖）
+        新记录：insert()，DuplicateKey 时回退为查找已有文档
+        """
+        if not books:
+            return {}
 
-        if new_books:
-            async with BulkWriter() as bulk:
-                for book in new_books:
-                    bulk.add_operation(WereadBook, InsertOne(book.model_dump(exclude={"id"})))
+        # 一次查出已有 id，跳过已存在书籍
+        book_ids = [b.id for b in books]
+        existing = await WereadBook.find({"_id": {"$in": book_ids}}).to_list()
+        existing_ids = {b.id for b in existing}
+
+        book_map: dict[str, WereadBook] = {}
+        # 已有文档直接加入映射
+        for doc in existing:
+            book_map[doc.id] = doc
+
+        # 只保存新增书籍
+        new_books = [b for b in books if b.id not in existing_ids]
+        for book in new_books:
+            try:
+                await book.insert()
+            except Exception:
+                # 极端竞态：另一请求已插入，查找已有文档
+                doc = await WereadBook.find_one({"_id": book.id})
+                if doc:
+                    book.id = doc.id
+            book_map[book.id] = book
 
         return book_map
 
-    async def save_book_info(self, book_info) -> WereadBook:
-        """保存书籍信息"""
-        book = WereadBook(**book_info)
-        return await upsert(book, WereadBook.find_one({"_id": book.bookId}))
-
     async def get_book_info(self, book_id) -> WereadBook | None:
         """获取书籍信息"""
-        book = await WereadBook.find_one({"_id": book_id})
-        return book
+        return await WereadBook.find_one({"_id": book_id})

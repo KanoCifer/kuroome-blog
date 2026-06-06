@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import asyncio
 import re
 
-from beanie import Link, WriteRules
-
+from app.core.logger import logger
 from app.models.weread import Archive, UserBook, WereadBook
 from app.services.weread.base import WereadBaseService
 from app.services.weread.utils import _map_book_info, _parse_shelf_books
@@ -44,45 +44,91 @@ class WereadShelfService(WereadBaseService):
     async def save_user_archive(self, archive_info):
         return await self.repo.save_user_archive(archive_info)
 
-    async def sync_my_books(self, user_id: int):
-        """从微信读书同步书架：先调 /shelf/sync 获取书单，再逐本调 /book/info 获取详情，
-        最后通过 link_rule=WriteRules.WRITE 级联写入 WereadBook 和 UserBook"""
+    async def sync_my_books(self, user_id: int, force: bool = False):
+        """从微信读书同步书架
+
+        Args:
+            user_id: 用户ID
+            force: True 时强制重新拉取所有书籍详情；False 时跳过已有书籍
+        """
         # 1. 同步书架，获取 bookId 列表和书架特有字段
         raw = await self._send_http_request(
             user_id=user_id, api_name="/shelf/sync"
         )
         shelf_books, archives = _parse_shelf_books(raw)
+        logger.info(
+            f"[sync] user={user_id} shelf books={len(shelf_books)}, archives={len(archives)}"
+        )
 
         if not shelf_books:
             return 0
 
-        # 2. 逐本获取详细信息
-        detailed_books = []
-        for b in shelf_books:
-            book_id = b["bookId"]
-            try:
-                info = await self._send_http_request(
-                    user_id=user_id,
-                    api_name="/book/info",
-                    extra={"bookId": book_id},
-                )
-                detailed_books.append(_map_book_info(info))
-            except ValueError:
-                # 某本书获取详情失败时，用书架基础信息兜底
-                detailed_books.append(
-                    {
+        # 2. 增量：跳过已有书籍，仅拉取新增
+        all_book_ids = [b["bookId"] for b in shelf_books]
+        if not force:
+            existing = await WereadBook.find(
+                {"_id": {"$in": all_book_ids}}
+            ).to_list()
+            existing_ids = {b.id for b in existing}
+            new_shelf = [
+                b for b in shelf_books if b["bookId"] not in existing_ids
+            ]
+            logger.info(
+                f"[sync] user={user_id} total={len(shelf_books)}, existing={len(existing_ids)}, new={len(new_shelf)}"
+            )
+        else:
+            new_shelf = shelf_books
+            existing_ids: set[str] = set()
+
+        # 3. 全量时或新增书籍：并发获取书籍详情
+        if new_shelf:
+            sem = asyncio.Semaphore(15)
+
+            async def _fetch_book(b: dict):
+                book_id = b["bookId"]
+                try:
+                    async with sem:
+                        info = await self._send_http_request(
+                            user_id=user_id,
+                            api_name="/book/info",
+                            extra={"bookId": book_id},
+                        )
+                    return _map_book_info(info)
+                except ValueError:
+                    logger.warning(
+                        f"[sync] book info failed, bookId={book_id}, using fallback"
+                    )
+                    return {
                         "bookId": book_id,
                         "title": b.get("title"),
                         "author": b.get("author"),
                         "cover": b.get("cover"),
                     }
-                )
 
-        # 3. 构建 WereadBook（含完整详情）并批量保存
-        weread_books = [WereadBook(**info) for info in detailed_books]
-        book_map = await self.repo.save_books_bulk(weread_books)
+            detailed_books = await asyncio.gather(
+                *[_fetch_book(b) for b in new_shelf]
+            )
 
-        # 4. 构建 UserBook，通过 Link + WriteRules.WRITE 级联写入
+            # 4. 保存新增 WereadBook
+            weread_books = [WereadBook(**info) for info in detailed_books]
+            new_book_map = await self.repo.save_books_bulk(weread_books)
+            logger.info(
+                f"[sync] saved WereadBook: {len(new_book_map)} new books"
+            )
+        else:
+            new_book_map = {}
+
+        # 5. 已有书籍也需加入 book_map（用于 UserBook Link）
+        if not force:
+            existing_books = await WereadBook.find(
+                {"_id": {"$in": list(existing_ids)}}
+            ).to_list()
+            book_map = {b.id: b for b in existing_books}
+            book_map.update(new_book_map)
+        else:
+            book_map = new_book_map
+
+        # 6. 构建 UserBook
         user_books = []
         for b in shelf_books:
             ub = UserBook(
@@ -95,14 +141,15 @@ class WereadShelfService(WereadBaseService):
                 readProgress=None,
             )
             if b["bookId"] in book_map:
-                ub.bookInfo = Link(
-                    book_map[b["bookId"]], link_rule=WriteRules.WRITE
-                )
+                ub.bookInfo = book_map[b["bookId"]]  # type: ignore[assignment]
             user_books.append(ub)
 
-        await self.repo.save_user_books_bulk(user_books, book_map=book_map)
+        saved = await self.repo.save_user_books_bulk(
+            user_books, book_map=book_map
+        )
+        logger.info(f"[sync] saved UserBook: {len(saved)} books")
 
-        # 5. 保存书单
+        # 7. 保存书单
         archive_docs = [Archive(**a) for a in archives]
         await self.repo.save_user_archives_bulk(archive_docs)
 

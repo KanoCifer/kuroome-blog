@@ -1,7 +1,7 @@
-from beanie import Link, WriteRules
+from pymongo.errors import DuplicateKeyError
 
-from app.models.weread import UserBook, WereadBook
-from app.repositories.weread._upsert import upsert
+from app.core.logger import logger
+from app.models.weread import UserBook
 
 
 class UserBookRepo:
@@ -10,53 +10,69 @@ class UserBookRepo:
     async def save_user_books_bulk(
         self,
         user_books: list[UserBook],
-        book_map: dict[str, WereadBook] | None = None,
+        book_map: dict | None = None,
     ) -> list[UserBook]:
         """批量保存用户书籍，按 (user_id, bookId) 去重
 
-        Args:
-            user_books: 用户书籍列表
-            book_map: bookId → WereadBook 映射，用于设置 Link 关联
+        - 已有记录：就地更新字段后 save()
+        - 新记录：逐本 insert()，DuplicateKey 时回退为更新
         """
         if not user_books:
             return []
 
         conditions = [
-            {
-                "user_id": ub.user_id,
-                "bookId": ub.bookId,
-            }
-            for ub in user_books
+            {"user_id": ub.user_id, "bookId": ub.bookId} for ub in user_books
         ]
         existing = await UserBook.find({"$or": conditions}).to_list()
         existing_map = {(ub.user_id, ub.bookId): ub for ub in existing}
 
-        new_books = []
         updated = []
+        new_books: list[UserBook] = []
         for ub in user_books:
             if book_map and ub.bookId in book_map:
-                ub.bookInfo = Link(
-                    book_map[ub.bookId], link_rule=WriteRules.WRITE
-                )
-            if (ub.user_id, ub.bookId) in existing_map:
-                doc = existing_map[(ub.user_id, ub.bookId)]
+                ub.bookInfo = book_map[ub.bookId]  # type: ignore[assignment]
+            key = (ub.user_id, ub.bookId)
+            if key in existing_map:
+                doc = existing_map[key]
                 doc.readUpdateTime = ub.readUpdateTime
                 doc.finishReading = ub.finishReading
                 doc.secret = ub.secret
                 doc.isTop = ub.isTop
                 if book_map and ub.bookId in book_map:
-                    doc.bookInfo = Link(
-                        book_map[ub.bookId], link_rule=WriteRules.WRITE
-                    )
-                await doc.save(link_rule=WriteRules.WRITE)
+                    doc.bookInfo = book_map[ub.bookId]  # type: ignore[assignment]
+                await doc.save()
                 updated.append(doc)
             else:
                 new_books.append(ub)
 
-        if new_books:
-            for ub in new_books:
-                await ub.save(link_rule=WriteRules.WRITE)
-        return updated + new_books
+        inserted = []
+        for ub in new_books:
+            try:
+                await ub.insert()
+                inserted.append(ub)
+            except DuplicateKeyError:
+                # 极端竞态：insert 期间另一请求已写入，回退为更新
+                existing_doc = await UserBook.find_one(
+                    UserBook.user_id == ub.user_id,
+                    UserBook.bookId == ub.bookId,
+                )
+                if existing_doc:
+                    existing_doc.readUpdateTime = ub.readUpdateTime
+                    existing_doc.finishReading = ub.finishReading
+                    existing_doc.secret = ub.secret
+                    existing_doc.isTop = ub.isTop
+                    if book_map and ub.bookId in book_map:
+                        existing_doc.bookInfo = book_map[ub.bookId]  # type: ignore[assignment]
+                    await existing_doc.save()
+                    inserted.append(existing_doc)
+                    logger.warning(
+                        f"[sync] DuplicateKey on UserBook user={ub.user_id} book={ub.bookId}, upserted"
+                    )
+        logger.info(
+            f"[sync] UserBook: {len(updated)} updated, {len(inserted)} inserted"
+        )
+
+        return updated + inserted
 
     async def save_user_book(self, user_book_info) -> UserBook:
         """保存用户书籍信息"""
@@ -65,4 +81,19 @@ class UserBookRepo:
             (UserBook.user_id == user_book.user_id)
             & (UserBook.bookId == user_book.bookId)
         )
-        return await upsert(user_book, find_one, link_rule=WriteRules.WRITE)
+        existing = await find_one
+        if existing:
+            user_book.id = existing.id
+            await user_book.save()
+        else:
+            try:
+                await user_book.insert()
+            except DuplicateKeyError:
+                existing = await UserBook.find_one(
+                    (UserBook.user_id == user_book.user_id)
+                    & (UserBook.bookId == user_book.bookId)
+                )
+                if existing:
+                    user_book.id = existing.id
+                    await user_book.save()
+        return user_book

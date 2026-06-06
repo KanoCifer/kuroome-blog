@@ -1,8 +1,8 @@
 from datetime import UTC, datetime
 from typing import Annotated
 
-from beanie import Document, Indexed, Insert, Link, before_event
-from pydantic import BaseModel, Field
+from beanie import Document, Indexed, Link
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class User(Document):
@@ -18,9 +18,11 @@ class User(Document):
 
 
 class WereadBook(Document):
-    """单本书籍的具体信息，_id 即 bookId"""
+    """单本书籍的具体信息，_id 即微信读书 bookId"""
 
-    bookId: Annotated[str, Indexed()]
+    model_config = ConfigDict(populate_by_name=True)
+
+    id: str = Field(alias="bookId")
     title: str
     author: str
     translator: str | None = None

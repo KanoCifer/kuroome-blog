@@ -13,8 +13,8 @@ export const wereadService = {
     return wereadGateway.getBookInfo(bookId);
   },
 
-  async syncMyBooks() {
-    return wereadGateway.syncMyBooks();
+  async syncMyBooks(force = false) {
+    return wereadGateway.syncMyBooks(force);
   },
 
   async getReadProgress(refresh = false) {

@@ -66,7 +66,7 @@ async def get_book_info(
     except ValueError:
         raise APIError(message="Invalid book ID") from None
     return APIResponse.ok(
-        data=book.model_dump(mode="json"),
+        data=book.model_dump(mode="json", by_alias=True),
         message="Book information retrieved successfully",
     )
 
@@ -75,10 +75,11 @@ async def get_book_info(
 async def sync_my_books(
     current_user=Depends(manager),
     weread_service=Depends(weread_service_dep),
+    force: bool = False,
 ):
-    """从远端同步我的书籍"""
+    """从远端同步我的书籍，force=true 时强制重新拉取所有书籍详情"""
     try:
-        count = await weread_service.sync_my_books(current_user.id)
+        count = await weread_service.sync_my_books(current_user.id, force=force)
     except ValueError:
         raise APIError(message="Invalid user ID") from None
     return APIResponse.ok(
