@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from beanie import FindMany, SortDirection
+from beanie import SortDirection
+from beanie.odm.queries.find import FindMany
 from bson import ObjectId
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession

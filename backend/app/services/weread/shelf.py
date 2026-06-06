@@ -67,7 +67,7 @@ class WereadShelfService(WereadBaseService):
         all_book_ids = [b["bookId"] for b in shelf_books]
         if not force:
             existing = await WereadBook.find(
-                {"_id": {"$in": all_book_ids}}
+                {"bookId": {"$in": all_book_ids}}
             ).to_list()
             existing_ids = {b.id for b in existing}
             new_shelf = [
@@ -121,7 +121,7 @@ class WereadShelfService(WereadBaseService):
         # 5. 已有书籍也需加入 book_map（用于 UserBook Link）
         if not force:
             existing_books = await WereadBook.find(
-                {"_id": {"$in": list(existing_ids)}}
+                {"bookId": {"$in": list(existing_ids)}}
             ).to_list()
             book_map = {b.id: b for b in existing_books}
             book_map.update(new_book_map)

@@ -8,7 +8,7 @@ from redis.asyncio import Redis as AsyncRedis
 
 from app.api.des.auth import manager
 from app.models.models import Profile, User
-from app.repositories.user_repo import UserRepo
+from app.repositories.user import UserRepo
 from app.schemas.schemas import UserSettingsIn
 from app.schemas.user import UserInfo, UserProfileOut
 from app.utils.compress_image import compress_avartar

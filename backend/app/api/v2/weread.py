@@ -1,9 +1,11 @@
+from beanie import Link
 from fastapi import APIRouter, Depends
 
 from app.api.des.auth import manager
 from app.api.des.des import weread_service_dep
 from app.core.exceptions import APIError
 from app.core.response import APIResponse
+from app.models.weread import UserBook, WereadBook
 from app.schemas.weread import SaveUserInfoIn
 
 router = APIRouter(prefix="/weread", tags=["weread"])
@@ -37,8 +39,13 @@ async def get_user_shelf(
         raise APIError(message="Invalid user ID") from None
     user_books_data = []
     for b in user_books:
-        d = b.model_dump(mode="json")
-        if b.bookInfo:
+        if b.bookInfo and isinstance(b.bookInfo, Link):
+            try:
+                await b.fetch_link(UserBook.bookInfo)
+            except Exception:
+                pass
+        d = b.model_dump(mode="json", exclude={"bookInfo"})
+        if b.bookInfo and isinstance(b.bookInfo, WereadBook):
             d["title"] = b.bookInfo.title
             d["author"] = b.bookInfo.author
         else:
