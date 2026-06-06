@@ -509,6 +509,20 @@ const galleryRef = ref<HTMLElement | null>(null);
 const authStore = useAuthStore();
 const canEdit = computed(() => authStore.isAdmin);
 
+// API base URL for constructing full media URLs
+const apiBase = import.meta.env.VITE_API_BASE || 'https://api.kanocifer.chat';
+
+// Construct full media URL from relative path
+const getFullMediaUrl = (relativeUrl: string): string => {
+  if (!relativeUrl) return '';
+  // If already a full URL, return as is
+  if (relativeUrl.startsWith('http://') || relativeUrl.startsWith('https://')) {
+    return relativeUrl;
+  }
+  // Prepend API base URL
+  return `${apiBase}${relativeUrl}`;
+};
+
 // Random layout seeds (cached per image index)
 const layoutSeeds = ref<
   Map<number, { x: number; y: number; rotation: number; zIndex: number }>
@@ -581,9 +595,12 @@ const editDescription = ref('');
 const fetchGalleryImages = async () => {
   try {
     const response = await galleryGateway.getGallery();
-    images.value = response.images;
+    // Convert relative URLs to full media URLs
+    images.value = response.images.map((img) => ({
+      ...img,
+      url: getFullMediaUrl(img.url),
+    }));
     generateLayoutSeeds();
-    console.log(images.value);
   } catch {
     useNotificationStore().error('获取照片墙数据失败');
   }
@@ -739,7 +756,8 @@ const uploadPic = async (file: File) => {
   try {
     const res = await galleryGateway.uploadGalleryImage(formData);
     useNotificationStore().success('图片上传成功');
-    return res.url;
+    // Convert relative URL to full media URL
+    return getFullMediaUrl(res.url);
   } catch {
     useNotificationStore().error('图片上传失败');
     return null;

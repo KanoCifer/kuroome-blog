@@ -21,29 +21,75 @@
 
 ---
 
+## 目录
+
+- [功能特性](#功能特性)
+- [界面预览](#界面预览)
+- [技术栈](#技术栈)
+- [快速开始](#快速开始)
+- [常用命令](#常用命令)
+- [项目结构](#项目结构)
+- [架构设计](#架构设计)
+- [API 端点](#api-端点-5555)
+- [定时任务](#定时任务)
+- [环境变量](#环境变量)
+- [代码风格](#代码风格)
+- [提交规范](#提交规范)
+- [部署](#部署)
+- [License](#license)
+
+---
+
 ## 功能特性
 
-| 功能模块         | 描述                                                                    |
-| ---------------- | ----------------------------------------------------------------------- |
-| **用户系统**     | 注册、登录、个人资料、JWT/Cookie 认证、Passkey (WebAuthn)、GitHub OAuth |
-| **书籍管理**     | 书籍 CRUD、书架展示、阅读进度追踪                                       |
-| **微信读书**     | 从微信读书导入书籍                                                      |
-| **博客系统**     | 文章发布、分类、标签、评论                                              |
-| **留言板**       | 访客留言、管理                                                          |
-| **RSS 阅读器**   | RSS 订阅解析、文章聚合、定时刷新                                        |
-| **AI 助手**      | 文章总结（Redis 缓存）                                                  |
-| **钓点智能分析** | 融合天气数据与钓点特征生成智能指数，支持反馈闭环与多端一致展示          |
-| **待办事项**     | 任务管理、每日提醒（飞书通知）                                          |
-| **后台监控**     | 系统运行数据监控、访客追踪                                              |
-| **图库管理**     | 图片上传、管理、PostgreSQL 持久化存储                                    |
-| **多主题系统**   | Vue/React 双端 7 套配色方案（森林绿、天空蓝、玫瑰红、薄雾等），一键切换 |
-| **背景图切换**   | 固定/随机背景图选择器，10 张高质量背景                                  |
-| **Cookie 同意**  | GDPR 合规 Cookie 同意弹窗                                              |
-| **实时访客统计** | WebSocket 实时在线人数统计                                              |
-| **自动分流**     | 根据 User-Agent 自动将移动端路由到 React App，桌面端访问 Vue App        |
-| **安全**         | CSRF 保护、JWT、权限控制、WebAuthn/Passkey                              |
-| **订阅管理**     | 管理你的付费订阅，邮件订阅、RSS 订阅、飞书通知订阅                      |
-| **设备管理**     | 设备跟踪管理、设备里程碑通知、移动端/桌面端切换                          |
+### 核心功能
+
+| 功能模块         | 描述                                                                                         |
+| ---------------- | -------------------------------------------------------------------------------------------- |
+| **用户系统**     | 注册（邮箱验证）、登录、个人资料、JWT/Cookie 认证、Passkey (WebAuthn) 无密码登录、GitHub OAuth 绑定 |
+| **博客系统**     | 文章发布/编辑（Markdown 编辑器 + 自动保存草稿）、分类、评论（Twikoo）、审核管理             |
+| **微信读书**     | 书架同步、全屏书架视图、阅读统计（周/月/年/总）、阅读进度追踪（Vue/React 双端）             |
+| **RSS 阅读器**   | RSS 订阅解析、文章聚合、已读标记、图片代理、定时自动刷新                                     |
+| **AI 助手**      | 文章总结 + AI 对话（SSE 流式响应）、会话历史缓存                                             |
+| **钓点智能分析** | 专家规则（9 特征加权）→ ML 残差校准（Ridge 回归），融合天气/潮汐数据，反馈闭环自动训练      |
+| **订阅管理**     | 付费订阅追踪、账单周期计算、月度费用统计、到期提醒（飞书/Bark/邮件，可配多渠道）            |
+| **设备管理**     | 设备资产跟踪、里程碑提醒（100 天/1 年等）、每日成本分析、价格趋势图                         |
+| **开发任务看板** | Kanban 三列（待办/进行中/完成），优先级排序、拖拽排序                                         |
+| **留言板**       | 访客留言、审核管理                                                                           |
+| **友链管理**     | 友链 CRUD、排序、每日精选轮换、友链申请表单                                                  |
+| **图库管理**     | 图片上传、拖拽重排、全屏查看，DB + Redis 双写持久化存储                                       |
+| **图片工具箱**   | 浏览器端图片压缩 + 格式转换（WebP/JPEG/PNG），纯本地处理                                     |
+
+### 基础设施
+
+| 功能模块         | 描述                                                                                         |
+| ---------------- | -------------------------------------------------------------------------------------------- |
+| **多主题系统**   | Vue/React 双端 7 套配色方案（森林绿、天空蓝、玫瑰红、薄雾等），CSS 自定义属性一键切换       |
+| **Bento 首页**   | Vue 端 13 个卡片可拖拽重排，支持布局保存/重置；React 端纯 CSS 网格布局                      |
+| **背景图切换**   | 固定/随机背景图选择器，多张高质量背景                                                        |
+| **通知渠道**     | 飞书 Webhook + Bark 推送 + 邮件（FastMail），Redis 去重 + 分布式锁防并发                     |
+| **实时访客统计** | WebSocket 在线人数，Redis Set + Hash 多标签页引用计数，Pub/Sub 广播，支持水平扩展            |
+| **后台监控**     | 访客分析（浏览器/OS/页面/趋势）、登录日志、服务器状态（CPU/内存/磁盘）实时流                |
+| **系统状态页**   | 公开状态页：版本信息、服务指标、系统信息、WebSocket 延迟图                                   |
+| **SEO 支持**     | robots.txt + sitemap.xml 自动生成（含博客文章），1 小时缓存                                  |
+| **点赞系统**     | 站点级点赞，Redis 存储，每日 25 次限流                                                       |
+| **AI 天气分析**  | LLM 驱动天气分析流式响应，React 钓鱼地图集成                                                 |
+| **自动分流**     | 根据 User-Agent 自动将移动端路由到 React App，桌面端访问 Vue App                             |
+| **自动部署**     | Gitee webhook 自动部署，HMAC 签名验证                                                        |
+| **Cookie 同意**  | GDPR 合规 Cookie 同意弹窗                                                                    |
+| **安全**         | CSRF 保护、JWT（12h access + 30d refresh）、权限控制、WebAuthn/Passkey、GitHub OAuth          |
+
+## 界面预览
+
+| 首页 Bento 布局 |
+|:---:|
+| ![首页](docs/images/首页.png) |
+
+| 关于页面 | 主题系统 |
+|:---:|:---:|
+| ![关于](docs/images/关于.png) | ![主题系统](docs/images/主题系统.png) |
+
+Bento 首页支持 13 个卡片拖拽重排与布局保存；7 套配色方案可一键切换，覆盖暗色/亮色模式。
 
 ## 技术栈
 
@@ -137,27 +183,37 @@ pnpm run build-only                     # 仅构建 (跳过 type-check)
 ```
 backend/app/
 ├── api/
-│   ├── des/                  # 数据库连接管理 (Redis, MongoDB)
-│   └── v1/                   # API 端点
-│       ├── admin.py         # 管理员功能
-│       ├── ai.py            # AI 助手
-│       ├── auth.py          # 认证 (登录/注册/Passkey/OAuth)
-│       ├── blog.py          # 博客系统
-│       ├── books.py         # 书籍管理
-│       ├── messages.py      # 留言板
-│       ├── monitor.py       # 系统监控
-│       ├── public.py        # 公共接口
-│       ├── publish.py       # 文章发布
-│       ├── rss.py           # RSS 订阅器
-│       ├── todos.py         # 待办事项
-│       └── weread.py        # 微信读书导入
+│   ├── des/                  # 依赖注入 (认证、CSRF、DB、Redis、限流)
+│   ├── v1/                   # API v1 端点
+│   │   ├── admin.py         # 管理员 (内容审核、自动部署)
+│   │   ├── ai.py            # AI 助手 (总结/对话/历史)
+│   │   ├── auth.py          # 认证 (登录/注册/Passkey/OAuth)
+│   │   ├── blog.py          # 博客系统 (文章/评论/分类)
+│   │   ├── messages.py      # 留言板
+│   │   ├── monitor.py       # 系统监控 (访客分析/服务器状态)
+│   │   ├── public.py        # 公共接口 (状态/点赞/SEO/天气分析/图库)
+│   │   └── rss.py           # RSS 订阅器
+│   └── v2/                   # API v2 端点
+│       ├── device.py        # 设备管理
+│       ├── devtasks.py      # 开发任务看板
+│       ├── fishing.py       # 钓点智能指数
+│       ├── friendlinks.py   # 友链管理
+│       ├── public.py        # WebSocket 实时访客
+│       ├── subscriptions.py # 订阅管理
+│       ├── weather.py       # 天气数据
+│       └── weread.py        # 微信读书
 ├── core/                     # 核心配置 (config, security, exceptions, AI Agent)
 ├── models/
-│   ├── models.py            # SQLAlchemy 关系模型 (User, Book, Profile, etc.)
-│   └── beanie.py            # MongoDB Beanie 文档模型 (Post, MessageBoard, RssArticle)
+│   ├── models.py            # SQLAlchemy 关系模型 (User, Profile, Subscription, Device, etc.)
+│   ├── beanie.py            # MongoDB 文档模型 (Post, MessageBoard, RssArticle, DevTask, etc.)
+│   ├── fishing.py           # 钓鱼模型 (FishingRecord, FishingModelMeta)
+│   └── weread.py            # 微信读书模型 (WereadBook, UserBook, Archive)
 ├── repositories/             # 数据访问层
 ├── schemas/                  # Pydantic schemas (按领域拆分)
 ├── services/                 # 业务逻辑层
+│   ├── user/                # 用户认证子包 (UserService, GitHubAuth, Passkey)
+│   ├── weread/              # 微信读书子包 (Shelf, Stats)
+│   └── fishing/             # 钓鱼子包 (ExpertScorer, ModelService)
 ├── tasks/                    # Taskiq 异步任务
 │   ├── aps_tasks.py         # 定时任务 (RSS 刷新、数据迁移)
 │   ├── broker.py            # RabbitMQ 任务代理
@@ -170,28 +226,31 @@ backend/app/
 └── main.py                   # FastAPI 入口
 
 frontend/src/
+├── api/                      # API Gateway 层 (按领域拆分，直接调用后端)
 ├── assets/                   # 静态资源 (CSS、图片)
 ├── auth/                     # 认证逻辑 (sideEffects)
 ├── components/
-│   ├── aiagent/              # AI 组件
+│   ├── ai/                   # AI 天气分析组件
 │   ├── article/              # 文章组件
-│   ├── basic/                # 基础组件
-│   ├── bento/                # Bento 网格布局
-│   ├── blog/                 # 博客组件
+│   ├── basic/                # 基础组件 (布局、导航、地图容器)
+│   ├── bento/                # Bento 网格卡片组件
+│   ├── blog/                 # 博客组件 (Twikoo 评论)
 │   ├── books/                # 书籍组件
 │   ├── editor/               # Markdown 编辑器
+│   ├── friendlink/           # 友链申请表单
 │   ├── icons/                # 图标组件
-│   ├── layout/               # 布局组件
-│   ├── map/                  # 地图组件
+│   ├── layout/               # 布局组件 (背景切换、主题、Cookie 同意)
+│   ├── map/                  # 天气/潮汐可视化组件
 │   ├── memo/                 # 备忘录组件
-│   ├── message/              # 消息组件
+│   ├── message/              # 留言板/评论管理组件
 │   ├── nav/                  # 导航组件
 │   └── ui/                   # shadcn-vue UI 组件
+├── composables/              # Vue 组合式函数
 ├── data/                     # 静态数据
 ├── layouts/                  # 布局组件
 ├── lib/                      # 第三方库封装
+├── plugins/                  # Vue 插件
 ├── router/                   # Vue Router 配置
-├── service/                  # API 调用封装 (按领域拆分)
 ├── stores/                   # Pinia 状态管理
 │   ├── auth.ts               # 认证状态
 │   ├── counter.ts            # 计数器
@@ -201,25 +260,31 @@ frontend/src/
 ├── types/                    # TypeScript 类型定义
 ├── utils/                    # 工具函数
 └── views/                    # 页面组件
-    ├── analyse/              # 分析页面
-    ├── auth/                 # 认证页面
-    ├── blog/                 # 博客页面
-    ├── books/                # 书籍页面
-    ├── entry/                # 入口页面
-    ├── general/              # 通用页面
-    ├── pic/                  # 图片页面
-    ├── rss/                  # RSS 页面
-    └── toolbox/              # 工具箱页面
+    ├── analytics/            # 后台分析 (访客/服务器监控)
+    ├── auth/                 # 认证页面 (登录/注册/设置)
+    ├── blog/                 # 博客页面 (列表/文章/编辑器)
+    ├── books/                # 微信读书 (书架/统计/导入)
+    ├── device/               # 设备管理 (资产跟踪/成本分析)
+    ├── entry/                # Bento 首页 (13 个可拖拽卡片)
+    ├── fishing/              # 钓鱼地图 (指数/反馈/天气)
+    ├── messages/             # 留言/评论管理
+    ├── pages/                # 静态页面 (关于/友链/状态/隐私/更新日志)
+    ├── pic/                  # 图库管理
+    ├── rss/                  # RSS 阅读器
+    ├── subscription/         # 订阅管理 (费用/提醒)
+    ├── todos/                # 开发任务看板
+    └── toolbox/              # 图片工具箱 (压缩/格式转换)
 
 react-app/src/
 ├── api/                      # API 请求封装 (request, csrf, refresh)
 ├── auth/                     # 认证逻辑 (hydrate, tokenService, heartbeat)
 ├── assets/                   # 静态资源 (CSS, Lottie 动画)
 ├── components/
-│   ├── basic/                # 基础组件 (BasicLayout, BasicDetail, BasicFooter)
+│   ├── basic/                # 基础组件 (布局、导航、Cookie 同意、设置)
 │   ├── bento/                # Bento 卡片组件
-│   ├── books/                # 书籍组件
-│   └── editor/               # Markdown 编辑器
+│   ├── blog/                 # Twikoo 评论组件
+│   └── books/                # 书籍组件
+├── hooks/                    # 自定义 Hooks
 ├── router/                   # React Router 配置
 ├── services/                 # 服务层 (blog, book, rss, todo, gallery, upload)
 ├── stores/                   # Zustand 状态管理
@@ -231,16 +296,21 @@ react-app/src/
 ├── types/                    # TypeScript 类型定义
 ├── utils/                    # 工具函数 (formatdate, imageCompressor, visitorTracker)
 ├── views/                    # 页面组件
-│   ├── Auth/                 # 认证页面
-│   ├── Blog/                 # 博客页面
-│   ├── Book/                 # 书籍页面
-│   ├── FishingMap/           # 钓鱼地图
-│   ├── Home/                 # 首页 (Bento 布局)
+│   ├── Analytics/            # 后台分析 (访客/登录日志/服务器状态)
+│   ├── Auth/                 # 认证页面 (登录/注册/设置)
+│   ├── Blog/                 # 博客页面 (列表/文章)
+│   ├── BookShelf/            # 微信读书 (书架/统计)
+│   ├── device/               # 设备管理 (资产跟踪/成本分析)
+│   ├── FishingMap/           # 钓鱼地图 (AI 天气分析/潮汐/指数)
+│   ├── Home/                 # Bento 首页
 │   ├── NotFound/             # 404 页面
-│   ├── Pic/                  # 图片页面
-│   ├── ReadingList/          # 阅读清单
-│   ├── Subscription/         # 订阅管理
-│   ├── Toolbox/              # 工具箱
+│   ├── pages/                # 静态页面 (友链/状态)
+│   ├── Pic/                  # 图库管理
+│   ├── Rss/                  # RSS 阅读器
+│   ├── subscription/         # 订阅管理 (费用/提醒)
+│   ├── Todo/                 # 开发任务看板
+│   ├── Toolbox/              # 图片工具箱
+│   ├── Website/              # 网站目录
 │   └── general/              # 通用页面
 ├── App.tsx                   # React 入口
 └── main.tsx                  # React 渲染入口
@@ -284,7 +354,7 @@ flowchart LR
 
 ### 后端分层设计
 
-- **API 层 (`api/v1`)**：参数校验、鉴权、响应封装，不承载复杂业务。
+- **API 层 (`api/v1`, `api/v2`)**：参数校验、鉴权、响应封装，不承载复杂业务。
 - **Service 层 (`services`)**：核心业务逻辑，组合仓储与外部依赖。
 - **Repository 层 (`repositories`)**：数据访问抽象，隔离 SQL/ORM 查询细节。
 - **Schema 层 (`schemas`)**：请求/响应模型定义，保证输入输出契约稳定。
@@ -297,7 +367,9 @@ flowchart LR
 - **Views (`views/`)**：页面级容器，按业务领域组织。
 - **Components (`components/`)**：可复用 UI 组件，减少重复实现。
 - **Stores (`stores/`)**：Pinia 全局状态（用户、主题、通知、业务状态）。
-- **Auth + Service (`auth/`, `service/`)**：认证副作用、token 续期、API 调用封装。
+- **API Gateway (`api/`)**：按领域拆分的 Gateway 层，直接调用后端 API。
+- **Auth (`auth/`)**：认证副作用、token 续期。
+- **Composables (`composables/`)**：Vue 组合式函数，复用业务逻辑。
 - **Router (`router/`)**：路由注册、权限拦截、页面元信息管理。
 
 #### React 移动端
@@ -318,25 +390,37 @@ flowchart LR
 
 ## API 端点 (:5555)
 
-| 路由                    | 描述                                  |
-| ----------------------- | ------------------------------------- |
-| `/api/v1/auth`          | 认证 (登录/注册/Passkey/OAuth)        |
-| `/api/v1/books`         | 书籍管理 (CRUD、阅读进度)             |
-| `/api/v1/users`         | 用户资料 (设置、头像)                 |
-| `/api/v1/blog`          | 博客系统 (文章/评论/分类)             |
-| `/api/v1/messages`      | 留言板                                |
-| `/api/v1/weread`        | 微信读书导入                          |
-| `/api/v1/rss`           | RSS 订阅器                            |
-| `/api/v1/admin`         | 管理员 (内容审核)                     |
-| `/api/v1/ai`            | AI 助手 (文章摘要)                    |
-| `/api/v1/todos`         | 待办事项                              |
-| `/api/v1/monitor`       | 系统监控                              |
-| `/api/v1/public`        | 公共接口（含天气/钓点聚合能力）       |
-| `/api/v1/publish`       | 文章发布                              |
-| `/api/v2/fishing`       | 钓点智能指数与分析相关接口            |
-| `/api/v2/subscriptions` | 订阅管理 (新增/编辑/通知)             |
+| 路由                       | 描述                                        |
+| -------------------------- | ------------------------------------------- |
+| `/api/v1/auth`             | 认证 (登录/注册/Passkey/OAuth/用户资料)     |
+| `/api/v1/blog`             | 博客系统 (文章/评论/分类)                   |
+| `/api/v1/rss`              | RSS 订阅器 (订阅/文章/刷新)                 |
+| `/api/v1/agent`            | AI 助手 (文章总结/AI 对话/会话历史)         |
+| `/api/v1/messages`         | 留言板                                      |
+| `/api/v1/admin`            | 管理员 (内容审核/分析/自动部署)             |
+| `/api/v1/status`           | 系统监控 (访客分析/登录日志/服务器状态)     |
+| `/api/v1/public`           | 公共接口 (状态/点赞/SEO/天气分析/图库)      |
+| `/api/v2/weread`           | 微信读书 (书架同步/阅读统计/进度)           |
+| `/api/v2/fishing`          | 钓点智能指数 (计算/反馈/统计/模型权重)      |
+| `/api/v2/subscriptions`    | 订阅管理 (CRUD/提醒配置/到期检测)           |
+| `/api/v2/device`           | 设备管理 (CRUD/里程碑/提醒)                 |
+| `/api/v2/weather`          | 天气数据 (潮汐/完整天气)                    |
+| `/api/v2/friend-links`     | 友链管理 (CRUD/排序)                        |
+| `/api/v2/devtasks`         | 开发任务看板 (CRUD/排序)                    |
+| `/api/v2/publicv2/ws`      | WebSocket 实时访客统计                      |
 
-### 最近改动（v3.0.0）
+### 最近改动（v3.2.0）
+
+- **微信读书书架**：新增书架 API 和全屏书架视图，阅读统计双端同步（Vue + React）。
+- **后端架构重构**：服务层拆分为独立包模块（user、weread、friend_link），统一响应格式和错误处理，提取 SSE/FriendLinkRepo/中间件为独立模块。
+- **API 清理**：移除遗留 v1 Book CRUD，BentoReadingList 全面迁移至 v2 weread API；清理旧表和遗留代码。
+- **前端简化**：Vue 端移除 service 层，直接调用 gateway；整合 fishing_service。
+- **状态页**：新增服务/系统信息卡片，React 端同步嵌套 API 结构。
+- **登录重设计**：分屏布局重构登录/注册页面。
+- **多主题 & 背景**：React 端主题支持、新增多张背景图、背景自动切换暂停逻辑。
+
+<details>
+<summary>v3.0.0 历史改动</summary>
 
 - **多主题系统**：Vue/React 双端 7 套配色方案，基于 CSS 自定义属性实现一键切换。
 - **钓鱼升级**：AI 天气分析（支持模型切换）、后台训练任务、柱状图降水显示、移动端横向滑动修复。
@@ -344,24 +428,78 @@ flowchart LR
 - **相册重构**：图片存储从文件系统迁移至 PostgreSQL 持久化。
 - **架构清理**：废弃 `frontend-architecture-analysis.md`，移除无用静态资源。
 
+</details>
+
 ## 定时任务
 
-| 任务                    | 调度规则                   | 功能                             |
-| ----------------------- | -------------------------- | -------------------------------- |
-| `refresh_rss_feeds`     | 每天 10:00 (Asia/Shanghai) | 刷新所有 RSS 订阅源              |
-| `run_migration_job`     | 每 30 分钟                 | 迁移 Redis 访客数据到 PostgreSQL |
-| `check_user_heartbeats` | 定时                       | 检查用户心跳                     |
-| `send_todo`             | 每天 09:00                 | 发送待办提醒（飞书通知）         |
+| 任务                      | 调度规则                   | 功能                                       |
+| ------------------------- | -------------------------- | ------------------------------------------ |
+| `refresh_rss_feeds`       | 每天 10:00 (Asia/Shanghai) | 刷新所有 RSS 订阅源，飞书推送刷新统计      |
+| `run_migration_job`       | 每 1 小时                  | 批量迁移 Redis 访客数据到 PostgreSQL        |
+| `send_daily_summary`      | 每天 08:00                 | 昨日访客分析日报（Top 页面/浏览器/OS）飞书推送 |
+| `send_todo`               | 每天 09:00                 | 未完成待办提醒飞书推送                      |
+| `subscription_check_task` | 每 4 小时                  | 订阅到期提醒（30/7/3/1 天前 + 当天）       |
+| `check_device_milestones` | 按需触发                   | 设备里程碑通知（100 天/1 年等）             |
 
-## 配置
+## 环境变量
 
-```env
-SECRET_KEY=your-secret-key-here
-DATABASE_URL=postgresql+psycopg2://user:pass@localhost/readinglist
-MONGO_URI=mongodb://localhost:27017/readinglist
-REDIS_URL=redis://localhost:6379/0
-RABBITMQ_URL=amqp://guest:guest@localhost:5672/
-```
+复制 `backend/.env.example` 为 `backend/.env`，按需配置：
+
+### 必填
+
+| 变量 | 说明 | 示例 |
+|------|------|------|
+| `SECRET_KEY` | JWT 签名密钥 | `openssl rand -hex 32` 生成 |
+| `DATABASE_URL` | PostgreSQL 异步连接串 | `postgresql+asyncpg://user:pass@localhost/dbname` |
+| `MONGO_URI` | MongoDB 连接串 | `mongodb://localhost:27017/` |
+| `REDIS_URL` | Redis 连接串 | `redis://localhost:6379/0` |
+| `RABBITMQ_URL` | RabbitMQ 连接串（Taskiq 任务队列） | `amqp://guest:guest@localhost:5672/` |
+
+### 认证 & 安全
+
+| 变量 | 说明 | 默认值 |
+|------|------|--------|
+| `CSRF_COOKIE_SECURE` | CSRF Cookie 是否仅 HTTPS | `True` |
+| `WEBAUTHN_RP_ID` | WebAuthn Relying Party ID | `kanocifer.chat` |
+| `WEBAUTHN_ORIGIN` | WebAuthn Origin | `https://kanocifer.chat` |
+| `GITHUB_CLIENT_ID` | GitHub OAuth App Client ID | — |
+| `GITHUB_CLIENT_SECRET` | GitHub OAuth App Client Secret | — |
+| `GITHUB_REDIRECT_URI` | GitHub OAuth 回调地址 | `http://localhost:5555/api/v1/auth/github/callback` |
+| `JWT_PRIVATE_KEY` | 自定义 JWT 私钥（可选） | — |
+| `COOKIE_DOMAIN` | Cookie 跨域域名（生产环境设置） | — |
+
+### 邮件 & 通知
+
+| 变量 | 说明 | 默认值 |
+|------|------|--------|
+| `MAIL_USERNAME` | 邮件发送账号 | — |
+| `MAIL_PASSWORD` | 邮件发送密码 | — |
+| `ADMIN_EMAIL` | 管理员邮箱（接收通知） | — |
+| `FEISHU_WEBHOOK_URL` | 飞书 Webhook 地址（任务提醒/日报） | — |
+| `SEND_BOOT_EMAIL` | 启动时是否发送通知邮件 | `True` |
+
+### AI & 第三方服务
+
+| 变量 | 说明 | 默认值 |
+|------|------|--------|
+| `API_KEY` | AI 服务 API Key（文章总结/对话） | — |
+| `AMAP_SECURITY_CODE` | 高德地图安全密钥 | — |
+| `AMAP_WEB_KEY` | 高德地图 Web 服务 Key | — |
+| `AMAP_KEY_ALLOWED_ORIGINS` | 允许获取高德密钥的前端来源（逗号分隔） | `http://localhost:5173,...` |
+| `QWEATHER_BASE_URL` | 和风天气 API 基础地址 | — |
+| `VITE_JS_API_TOKEN` | 前端 API Token | — |
+
+### 运维 & 调试
+
+| 变量 | 说明 | 默认值 |
+|------|------|--------|
+| `REDIS_MAX_CONNECTIONS` | Redis 连接池最大连接数 | `50` |
+| `ENABLE_TRACKING` | 是否启用访客追踪 | `True` |
+| `SAVE_LOGS` | 是否保存日志 | `True` |
+| `ADMIN_USER_IDS` | 管理员用户 ID 列表 | `[1, 2]` |
+| `GITEE_WEBHOOK_SECRET` | Gitee 自动部署 Webhook 密钥 | — |
+| `FRONTEND_URL` | 前端地址（CORS/重定向） | `https://kanocifer.chat` |
+| `DB_MIGRATE_URL` | 数据库迁移用同步连接串（Alembic） | `postgresql+psycopg://user:pass@localhost/dbname` |
 
 ## 代码风格
 
