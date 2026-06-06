@@ -119,8 +119,15 @@ def setup_csrf(app: FastAPI) -> None:
 
         skip_paths = [
             "/api/v1/auth/login",
+            "/api/v1/auth/logout",
+            "/api/v1/auth/",
             "/api/v1/auth/register",
             "/api/v1/auth/email/code",
+            "/api/v1/auth/passkey/authenticate",
+            "/api/v1/public/like",
+            "/api/v1/public/set-pic-gallery",
+            "/api/v1/blog/comments",
+            "/api/v2/fishing/feedback",
             "/api/v1/admin/track",
             "/api/v1/admin/deploy",
             "/api/v2/weather/tide",
