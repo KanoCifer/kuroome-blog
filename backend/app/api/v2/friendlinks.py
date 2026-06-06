@@ -2,15 +2,15 @@ from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 
 from app.api.des.auth import get_admin_user
-from app.core.exceptions import APIError
-from app.models.models import User
 from app.core.container import get_friendlink_service
+from app.core.exceptions import APIError
+from app.core.response import APIResponse
+from app.models.models import User
 from app.schemas.friendlink import (
     FriendLinkCreate,
     FriendLinkReorder,
     FriendLinkUpdate,
 )
-from app.schemas.response import APIResponse
 
 router = APIRouter(prefix="/friend-links", tags=["friend-links"])
 
@@ -37,7 +37,7 @@ async def get_link(link_id: str) -> JSONResponse:
     return APIResponse.ok(data={"link": _serialize(link)})
 
 
-@router.post("", status_code=status.HTTP_201_CREATED)
+@router.post("")
 async def create_link(
     data: FriendLinkCreate,
     _: User = Depends(get_admin_user),
@@ -47,7 +47,7 @@ async def create_link(
     return APIResponse.ok(
         data={"link": _serialize(link)},
         message="Friend link created",
-        code=status.HTTP_201_CREATED,
+        status_code=status.HTTP_201_CREATED,
     )
 
 
@@ -64,7 +64,7 @@ async def update_link(
             )
             return APIResponse.ok(data={"link": _serialize(link)})
         except ValueError as e:
-            raise APIError(message=str(e), code=404)
+            raise APIError(message=str(e), code=404) from e
 
 
 @router.delete("/{link_id}")
@@ -77,7 +77,7 @@ async def delete_link(
             await service.delete_link(link_id)
             return APIResponse.ok(message="Friend link deleted")
         except ValueError as e:
-            raise APIError(message=str(e), code=404)
+            raise APIError(message=str(e), code=404) from e
 
 
 @router.put("/reorder")

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import Request
+from fastapi import HTTPException, Request
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from fastapi.responses import JSONResponse
 from slowapi import _rate_limit_exceeded_handler
@@ -12,11 +12,11 @@ from slowapi.errors import RateLimitExceeded
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 # ============================================================================
-# Custom Exception Classes
+# Base + HTTP Semantic Exceptions
 # ============================================================================
 
 
-class APIError(Exception):
+class APIError(HTTPException):
     """Base API error class.
 
     Attributes:
@@ -31,15 +31,23 @@ class APIError(Exception):
         code: int = 500,
         errors: dict[str, Any] | None = None,
     ) -> None:
-        super().__init__(message)
+        super().__init__(status_code=code)
         self.message = message
         self.code = code
         self.errors = errors or {}
 
 
-class NotFoundError(APIError):
-    """Resource not found error."""
+class UnauthorizedError(APIError):
+    def __init__(self, message: str = "Unauthorized", **kwargs: Any) -> None:
+        super().__init__(message=message, code=401, **kwargs)
 
+
+class ForbiddenError(APIError):
+    def __init__(self, message: str = "Forbidden", **kwargs: Any) -> None:
+        super().__init__(message=message, code=403, **kwargs)
+
+
+class NotFoundError(APIError):
     def __init__(
         self, message: str = "Resource not found", **kwargs: Any
     ) -> None:
@@ -47,8 +55,6 @@ class NotFoundError(APIError):
 
 
 class ValidationError(APIError):
-    """Validation error exception."""
-
     def __init__(
         self,
         message: str = "Validation failed",
@@ -58,27 +64,11 @@ class ValidationError(APIError):
         super().__init__(message=message, code=422, errors=errors, **kwargs)
 
 
-class UnauthorizedError(APIError):
-    """Unauthorized access error."""
-
-    def __init__(self, message: str = "Unauthorized", **kwargs: Any) -> None:
-        super().__init__(message=message, code=401, **kwargs)
-
-
 class TodoLockError(APIError):
-    """Lock acquisition failed for todo operations."""
-
     def __init__(
         self, message: str = "Server busy, please retry.", **kwargs: Any
     ) -> None:
         super().__init__(message=message, code=423, **kwargs)
-
-
-class ForbiddenError(APIError):
-    """Forbidden access error."""
-
-    def __init__(self, message: str = "Forbidden", **kwargs: Any) -> None:
-        super().__init__(message=message, code=403, **kwargs)
 
 
 class GitHubAuthError(Exception):
@@ -90,130 +80,7 @@ class GitHubAuthError(Exception):
 
 
 # ============================================================================
-# Error Response Format
-# ============================================================================
-
-
-def create_error_response(
-    message: str,
-    code: int,
-    status: str = "error",
-    errors: dict[str, Any] | None = None,
-    **kwargs: Any,
-) -> dict[str, Any]:
-    response = {
-        "status": status,
-        "message": message,
-        "data": errors if errors is not None else {},
-        **kwargs,
-    }
-    return response
-
-
-# ============================================================================
-# Exception Handlers
-# ============================================================================
-
-
-async def http_exception_handler(
-    request: Request, exc: StarletteHTTPException
-) -> JSONResponse:
-    """Handle Starlette/FastAPI HTTP exceptions."""
-    response_data = create_error_response(
-        message=exc.detail,
-        code=exc.status_code,
-        status="error",
-    )
-    return JSONResponse(
-        status_code=exc.status_code,
-        content=response_data,
-    )
-
-
-async def validation_exception_handler(
-    request: Request, exc: RequestValidationError
-) -> JSONResponse:
-    """Handle FastAPI request validation errors."""
-    errors = {}
-    for error in exc.errors():
-        loc = ".".join(str(x) for x in error.get("loc", []))
-        msg = error.get("msg", "")
-        if loc:
-            errors[loc] = msg
-        else:
-            errors["general"] = msg
-
-    response_data = create_error_response(
-        message="Validation failed",
-        code=422,
-        status="error",
-        errors=errors,
-    )
-    return JSONResponse(
-        status_code=422,
-        content=response_data,
-    )
-
-
-async def api_exception_handler(
-    request: Request, exc: APIError
-) -> JSONResponse:
-    """Handle custom API errors."""
-    response_data = create_error_response(
-        message=exc.message,
-        code=exc.code,
-        status="error",
-        errors=exc.errors if exc.errors else None,
-    )
-    return JSONResponse(
-        status_code=exc.code,
-        content=response_data,
-    )
-
-
-async def generic_exception_handler(
-    request: Request, exc: Exception
-) -> JSONResponse:
-    """Handle unexpected exceptions (500 Internal Server Error)."""
-    # Log the exception here if needed
-    response_data = create_error_response(
-        message="Internal server error",
-        code=500,
-        status="error",
-    )
-    return JSONResponse(
-        status_code=500,
-        content=response_data,
-    )
-
-
-# ============================================================================
-# Register All Handlers
-# ============================================================================
-
-
-def register_exception_handlers(app: Any) -> None:
-    """Register all exception handlers with the FastAPI application.
-
-    Args:
-        app: FastAPI application instance
-    """
-    app.add_exception_handler(StarletteHTTPException, http_exception_handler)
-    app.add_exception_handler(
-        RequestValidationError, validation_exception_handler
-    )
-    app.add_exception_handler(
-        ResponseValidationError, validation_exception_handler
-    )
-    app.add_exception_handler(APIError, api_exception_handler)
-    app.add_exception_handler(Exception, generic_exception_handler)
-    app.add_exception_handler(
-        RateLimitExceeded, _rate_limit_exceeded_handler  # type: ignore
-    )
-
-
-# ============================================================================
-# Domain Errors — 继承 APIError，自动走统一异常处理
+# Domain Errors — marker subclasses per service, auto routed by APIError handler
 # ============================================================================
 
 
@@ -235,3 +102,86 @@ class RssDomainError(APIError):
 
 class BlogDomainError(APIError):
     pass
+
+
+# ============================================================================
+# Response Helper + Exception Handlers
+# ============================================================================
+
+
+def _create_error_response(
+    message: str,
+    status: str = "error",
+    errors: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    return {
+        "status": status,
+        "message": message,
+        "data": errors if errors is not None else {},
+    }
+
+
+async def _http_exception_handler(
+    request: Request, exc: StarletteHTTPException
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=_create_error_response(message=exc.detail),
+    )
+
+
+async def _validation_exception_handler(
+    request: Request, exc: RequestValidationError
+) -> JSONResponse:
+    errors: dict[str, str] = {}
+    for error in exc.errors():
+        loc = ".".join(str(x) for x in error.get("loc", []))
+        msg = error.get("msg", "")
+        errors[loc or "general"] = msg
+    return JSONResponse(
+        status_code=422,
+        content=_create_error_response(
+            message="Validation failed",
+            errors=errors,
+        ),
+    )
+
+
+async def _api_exception_handler(
+    request: Request, exc: APIError
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.code,
+        content=_create_error_response(
+            message=exc.message,
+            errors=exc.errors or None,
+        ),
+    )
+
+
+async def _generic_exception_handler(
+    request: Request, exc: Exception
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=500,
+        content=_create_error_response(message="Internal server error"),
+    )
+
+
+# ============================================================================
+# Register
+# ============================================================================
+
+
+def register_exception_handlers(app: Any) -> None:
+    """Register all exception handlers with the FastAPI application."""
+    app.add_exception_handler(HTTPException, _http_exception_handler)
+    app.add_exception_handler(
+        RequestValidationError, _validation_exception_handler
+    )
+    app.add_exception_handler(
+        ResponseValidationError, _validation_exception_handler
+    )
+    app.add_exception_handler(APIError, _api_exception_handler)
+    app.add_exception_handler(Exception, _generic_exception_handler)
+    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # type: ignore

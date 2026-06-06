@@ -169,10 +169,11 @@ class MonitorService:
     async def get_server_status(self) -> dict[str, float | int | None]:
         return self._get_server_status_payload()
 
-    async def stream_server_status(self) -> AsyncIterator[str]:
+    async def stream_server_status(
+        self,
+    ) -> AsyncIterator[dict[str, float | int | None]]:
         while True:
-            payload = self._get_server_status_payload()
-            yield sse_event(payload)
+            yield self._get_server_status_payload()
             await asyncio.sleep(5)
 
     async def get_daily_summary(self, date: datetime) -> dict:

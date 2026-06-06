@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 
 from app.api.des.auth import manager
 from app.api.des.des import notification_service_dep, sub_service_dep
 from app.core.exceptions import APIError, NotFoundError
+from app.core.response import APIResponse
 from app.models.models import User
 from app.notification import NotificationPayload
-from app.schemas.response import APIResponse
 from app.schemas.sub import (
     CreateOneSubRequest,
     GlobalConfigIn,
@@ -118,7 +118,9 @@ async def create_subscription(
     )
     response = SubResponse.model_validate(subscription).model_dump(mode="json")
     return APIResponse.ok(
-        data={"subscription": response}, message="创建订阅成功"
+        data={"subscription": response},
+        message="创建订阅成功",
+        status_code=status.HTTP_201_CREATED,
     )
 
 
@@ -239,6 +241,4 @@ async def test_subscription_notification(
         return APIResponse.ok(
             data={"results": result}, message="测试通知发送成功"
         )
-    raise APIError(
-        message=f"测试通知发送失败，请检查渠道配置。结果: {result}"
-    )
+    raise APIError(message=f"测试通知发送失败，请检查渠道配置。结果: {result}")

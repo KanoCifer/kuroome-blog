@@ -20,9 +20,9 @@ from app.api.des.redis import get_redis
 from app.core import get_settings
 from app.core.exceptions import APIError
 from app.core.logger import logger
+from app.core.response import APIResponse
 from app.models.models import User
 from app.schemas import VisitorData
-from app.schemas.response import APIResponse
 from app.schemas.schemas import BlogPostIn, BlogPostUpdate
 from app.services.admin_service import AdminService
 from app.tasks import send_feishu_message
@@ -52,6 +52,7 @@ async def add_post(
     return APIResponse.ok(
         data={"_id": new_id},
         message="Blog post added successfully",
+        status_code=status.HTTP_201_CREATED,
     )
 
 
@@ -138,7 +139,7 @@ async def delete_comment(
 # =============================================================================
 
 
-@router.get("/messages", response_model=APIResponse)
+@router.get("/messages")
 async def get_admin_messages(
     current_user: User = Depends(get_admin_user),
     admin_service: AdminService = Depends(admin_service_dep),

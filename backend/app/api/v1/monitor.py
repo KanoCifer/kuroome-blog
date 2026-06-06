@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import StreamingResponse
+from fastapi.sse import EventSourceResponse
 
 from app.api.des.auth import get_admin_user
 from app.api.des.des import monitor_service_dep
+from app.core.response import APIResponse
 from app.models.models import User
-from app.schemas.response import APIResponse
 from app.services.monitor_service import MonitorService
 
 router = APIRouter(prefix="/status", tags=["monitor-status"])
@@ -81,12 +82,4 @@ async def get_server_status_stream(
 ):
     event_generator = monitor_service.stream_server_status()
 
-    return StreamingResponse(
-        event_generator,
-        media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
-            "X-Accel-Buffering": "no",
-        },
-    )
+    return EventSourceResponse(event_generator)

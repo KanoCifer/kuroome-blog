@@ -9,8 +9,8 @@ from starlette import status
 from app.api.des.auth import manager
 from app.api.des.des import blog_service_dep
 from app.core.exceptions import APIError
+from app.core.response import APIResponse
 from app.models.models import User
-from app.schemas.response import APIResponse
 from app.schemas.schemas import PostComment
 from app.services.blog_service import BlogService
 from app.utils import redis_cache
@@ -39,7 +39,6 @@ async def upload_blog_image(
             "filename": relative_path,
         },
         message="Image uploaded successfully.",
-        code=status.HTTP_200_OK,
     )
 
 
@@ -94,6 +93,7 @@ async def post_comment(
     return APIResponse.ok(
         data=result,
         message="Comment submitted successfully, pending review",
+        status_code=status.HTTP_201_CREATED,
     )
 
 

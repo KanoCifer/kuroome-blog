@@ -13,11 +13,11 @@ from pydantic import BaseModel, Field
 from redis.asyncio import Redis as AsyncRedis
 
 from app.api.des.auth import manager
-from app.core.exceptions import APIError
 from app.api.des.des import fishing_service_dep, weather_service_dep
 from app.api.des.redis import get_redis
+from app.core.exceptions import APIError
+from app.core.response import APIResponse
 from app.models.models import User
-from app.schemas.response import APIResponse
 from app.services.fishing.fishing_index import (
     FEEDBACK_SCORES,
     FishingRecord,
@@ -137,8 +137,8 @@ async def get_fishing_index(
             f"[钓鱼指数] 获取天气数据成功: {list(weather_data.keys())}"
         )
     except Exception as e:
-        logger.error(f"[钓鱼指数] 获取天气数据失败: {e}", exc_info=True)
-        raise APIError(message=f"无法获取天气数据，请稍后再试: {e}")
+        logger.error(f"[钓鱼指数] 获取天气数据失败: {e!r}", exc_info=True)
+        raise APIError(message="无法获取天气数据，请稍后再试") from None
 
     # 解析潮汐数据
     tide_data = weather_data.get("tide", {})
@@ -263,8 +263,7 @@ async def get_weights(
     expert_weights = service.expert.WEIGHTS
     residual_weights = service.model_svc.get_weights()
 
-    return APIResponse(
-        status="success",
+    return APIResponse.ok(
         data={
             "expert_weights": expert_weights,
             "residual_weights": residual_weights,

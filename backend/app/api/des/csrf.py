@@ -26,7 +26,7 @@ from itsdangerous import SignatureExpired, TimestampSigner
 
 from app.core.config import settings
 from app.core.exceptions import APIError
-from app.schemas.response import APIResponse
+from app.core.response import APIResponse
 
 if TYPE_CHECKING:
     from fastapi import FastAPI

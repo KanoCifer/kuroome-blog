@@ -22,10 +22,10 @@ from app.api.des.limiter import limiter
 from app.api.des.redis import get_redis
 from app.core.config import get_settings
 from app.core.exceptions import APIError
+from app.core.response import APIResponse
 from app.models.models import User
 from app.schemas.aiagent import WeatherAnalysisInput
 from app.schemas.gallery import GalleryInput
-from app.schemas.response import APIResponse
 from app.services.public_service import PublicService
 from app.utils.media import save_upload_image
 
@@ -49,15 +49,10 @@ async def get_api_status(
         }
     """
 
-    response = APIResponse(
-        status="success",
+    return APIResponse.ok(
         data=public_service.get_api_status(),
         message="API is running",
     )
-
-    # Cache for 60 seconds
-
-    return response
 
 
 @router.get("/status-detail")
@@ -252,7 +247,6 @@ async def upload_blog_image(
             "filename": relative_path,
         },
         message="Image uploaded successfully.",
-        code=status.HTTP_200_OK,
     )
 
 
@@ -275,7 +269,7 @@ async def set_pic_gallery(
         raise APIError(
             message=f"Failed to update picture gallery: {exc!s}",
             code=500,
-        )
+        ) from exc
 
 
 @router.get("/pic-gallery")
@@ -294,4 +288,4 @@ async def get_pic_gallery(
         raise APIError(
             message=f"Failed to retrieve picture gallery: {exc!s}",
             code=500,
-        )
+        ) from exc

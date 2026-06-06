@@ -5,9 +5,9 @@ from pydantic import BaseModel
 from app.api.des.auth import manager
 from app.api.des.des import devtask_service_dep
 from app.core.exceptions import APIError
+from app.core.response import APIResponse
 from app.models.models import User
 from app.schemas.devtask import DevTaskCreate, DevTaskUpdate
-from app.schemas.response import APIResponse
 from app.services.devtask_service import DevTaskService
 
 router = APIRouter(prefix="/devtasks", tags=["devtasks"])
@@ -23,7 +23,11 @@ async def get_tasks(
     service: DevTaskService = Depends(devtask_service_dep),
 ) -> JSONResponse:
     tasks = await service.get_all_tasks()
-    grouped: dict[str, list[dict]] = {"todo": [], "in-progress": [], "done": []}
+    grouped: dict[str, list[dict]] = {
+        "todo": [],
+        "in-progress": [],
+        "done": [],
+    }
     for t in tasks:
         td = t.model_dump()
         td["id"] = str(t.id)
@@ -31,7 +35,7 @@ async def get_tasks(
     return APIResponse.ok(data={"tasks": grouped})
 
 
-@router.post("", status_code=status.HTTP_201_CREATED)
+@router.post("")
 async def create_task(
     data: DevTaskCreate,
     user: User = Depends(manager),
@@ -45,7 +49,7 @@ async def create_task(
     return APIResponse.ok(
         data={"task": td},
         message="DevTask created",
-        code=status.HTTP_201_CREATED,
+        status_code=status.HTTP_201_CREATED,
     )
 
 
@@ -66,7 +70,7 @@ async def patch_task(
         td["id"] = str(updated.id)
         return APIResponse.ok(data={"task": td}, message="DevTask updated")
     except ValueError as e:
-        raise APIError(message=str(e), code=404)
+        raise APIError(message=str(e), code=404) from e
 
 
 @router.delete("/{task_id}")
@@ -79,7 +83,7 @@ async def delete_task(
         await service.delete_task(user.id, task_id)
         return APIResponse.ok(message="DevTask deleted")
     except ValueError as e:
-        raise APIError(message=str(e), code=404)
+        raise APIError(message=str(e), code=404) from e
 
 
 @router.put("/reorder")

@@ -8,7 +8,7 @@ from redis.asyncio import Redis as AsyncRedis
 
 from app.api.des.des import weather_service_dep
 from app.api.des.redis import get_redis
-from app.schemas.response import APIResponse
+from app.core.response import APIResponse
 from app.services.weather_service import WeatherService
 
 router = APIRouter(prefix="/weather", tags=["weather"])

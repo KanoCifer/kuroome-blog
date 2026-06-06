@@ -6,13 +6,13 @@ including message submission, listing, and admin moderation.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, status
 
 from app.api.des.auth import manager
 from app.api.des.des import message_service_dep
 from app.api.des.limiter import limiter
+from app.core.response import APIResponse
 from app.models.models import User
-from app.schemas.response import APIResponse
 from app.schemas.schemas import (
     MessageIn,
 )
@@ -21,7 +21,7 @@ from app.services.message_service import MessageService
 router = APIRouter(prefix="/messages", tags=["messages"])
 
 
-@router.get("", response_model=APIResponse)
+@router.get("")
 async def get_messages(
     message_service: MessageService = Depends(message_service_dep),
 ):
@@ -34,7 +34,7 @@ async def get_messages(
     )
 
 
-@router.post("", response_model=APIResponse)
+@router.post("")
 @limiter.limit("10/minute")
 async def create_message(
     request: Request,
@@ -50,6 +50,7 @@ async def create_message(
     return APIResponse.ok(
         data=data,
         message="Message submitted successfully, pending review",
+        status_code=status.HTTP_201_CREATED,
     )
 
 

@@ -1,11 +1,12 @@
 from collections.abc import Sequence
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 
 from app.api.des.auth import manager
 from app.api.des.des import device_service_dep
 from app.core.exceptions import APIError, NotFoundError
+from app.core.response import APIResponse
 from app.models.models import DeviceTrack, User
 from app.schemas.device import (
     DeviceInput,
@@ -14,7 +15,6 @@ from app.schemas.device import (
     DeviceUpdateInput,
     ReminderConfigUpdate,
 )
-from app.schemas.response import APIResponse
 from app.services.device_service import DeviceService
 
 router = APIRouter(prefix="/device", tags=["device"])
@@ -60,7 +60,11 @@ async def create_device(
         user_id=user.id, **device_input.model_dump()
     )
     response: DeviceResponse = DeviceResponse.model_validate(device)
-    return APIResponse.ok(data={"device": response}, message="创建设备成功")
+    return APIResponse.ok(
+        data={"device": response},
+        message="创建设备成功",
+        status_code=status.HTTP_201_CREATED,
+    )
 
 
 @router.put("/{device_id}")

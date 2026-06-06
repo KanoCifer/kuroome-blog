@@ -25,13 +25,13 @@ from app.core.config import settings
 from app.core.container import UserServices
 from app.core.exceptions import APIError, GitHubAuthError
 from app.core.logger import logger
+from app.core.response import APIResponse
 from app.models.models import User
 from app.schemas.auth import (
     EmailSchema,
     PasskeyAuthRequest,
     PasskeyRegistrationRequest,
 )
-from app.schemas.response import APIResponse
 from app.schemas.schemas import LoginIn, RegisterIn, UserSettingsIn
 from app.services.user import UserService
 from app.tasks import send_code
@@ -78,7 +78,7 @@ def _build_login_response(
 # ------------------------------------------------------------------ #
 
 
-@router.get("/csrf-token", response_model=APIResponse)
+@router.get("/csrf-token")
 async def csrf_token(response: Response) -> JSONResponse:
     """生成 CSRF token 并设置 cookie，前端可以调用此接口获取 token 以支持后续的认证请求。"""
     res: JSONResponse = APIResponse.ok(message="CSRF token 已生成")
@@ -114,7 +114,6 @@ async def refresh_token(
 
     response: JSONResponse = APIResponse.ok(
         message="访问令牌已刷新",
-        code=status.HTTP_200_OK,
         data={"refresh_token": tokens["refresh_token"]},
     )
     cookie_domain = settings.COOKIE_DOMAIN
@@ -131,7 +130,7 @@ async def refresh_token(
     return response
 
 
-@router.post("/login", response_model=APIResponse)
+@router.post("/login")
 @limiter.limit(limit_value="5/minute")
 async def login(
     request: Request,
@@ -162,7 +161,7 @@ async def login(
     )
 
 
-@router.post("/logout", response_model=APIResponse)
+@router.post("/logout")
 async def logout(
     user: User = Depends(manager),
     user_service: UserService = Depends(user_service_dep),
@@ -172,7 +171,6 @@ async def logout(
     cookie_domain = settings.COOKIE_DOMAIN
     response = APIResponse.ok(
         message="已退出登录",
-        code=status.HTTP_200_OK,
     )
     response.delete_cookie(key="refresh_token", domain=cookie_domain or None)
     response.delete_cookie(
@@ -189,16 +187,15 @@ async def update_user_settings(
 ):
     try:
         result = await user_service.update_settings(user, data)
-    except ValueError:
+    except Exception:
         raise APIError(
             message="Username already exists.",
             code=status.HTTP_400_BAD_REQUEST,
-        )
+        ) from None
 
     return APIResponse.ok(
         data=result,
         message="Profile updated successfully.",
-        code=status.HTTP_200_OK,
     )
 
 
@@ -213,7 +210,6 @@ async def upload_avatar(
     return APIResponse.ok(
         data=result,
         message="Avatar uploaded successfully.",
-        code=status.HTTP_200_OK,
     )
 
 
@@ -232,7 +228,6 @@ async def me(
     return APIResponse.ok(
         data=user_service.user_to_dict(user, profile),
         message="获取用户信息成功",
-        code=status.HTTP_200_OK,
     )
 
 
@@ -262,7 +257,7 @@ async def register(
             "is_admin": user.is_admin,
         },
         message="注册成功",
-        code=status.HTTP_201_CREATED,
+        status_code=status.HTTP_201_CREATED,
     )
 
 
@@ -283,7 +278,7 @@ async def send_email_code(
         raise APIError(
             message=f"邮箱格式无效: {e!s}",
             code=status.HTTP_400_BAD_REQUEST,
-        )
+        ) from None
 
     code = await user_service.send_verification_code(email_addr, redis)
     if code is None:
@@ -304,11 +299,10 @@ async def send_email_code(
         raise APIError(
             message=f"验证码发送失败: {e!s}",
             code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
+        ) from None
 
     return APIResponse.ok(
         message="验证码发送成功，请检查您的邮箱! (如果未收到邮件，请检查垃圾邮件箱)",
-        code=status.HTTP_202_ACCEPTED,
     )
 
 
@@ -335,7 +329,7 @@ async def passkey_registration_options(
         raise APIError(
             message="您的账户已经绑定了Passkey",
             code=status.HTTP_400_BAD_REQUEST,
-        )
+        ) from None
 
 
 @router.post("/passkey/register")
@@ -353,9 +347,7 @@ async def passkey_register(
         user, body.response, redis, origin
     )
     if error:
-        raise APIError(
-            message=error, code=status.HTTP_400_BAD_REQUEST
-        )
+        raise APIError(message=error, code=status.HTTP_400_BAD_REQUEST)
 
     return APIResponse.ok(message="Passkey 注册成功")
 

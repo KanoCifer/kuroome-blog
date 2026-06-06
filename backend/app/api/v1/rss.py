@@ -8,8 +8,8 @@ from app.api.des.auth import manager
 from app.api.des.des import rss_service_dep
 from app.core.exceptions import APIError
 from app.core.logger import logger
+from app.core.response import APIResponse
 from app.models.models import User
-from app.schemas.response import APIResponse
 from app.schemas.schemas import (
     RssRequest,
 )
@@ -42,7 +42,7 @@ async def proxy_rss_image(
         ) as client:
             upstream = await client.get(url)
     except httpx.HTTPError:
-        raise APIError(message="拉取图片失败", code=502)
+        raise APIError(message="拉取图片失败", code=502) from None
 
     if upstream.status_code >= 400:
         raise APIError(message="拉取图片失败", code=502)
@@ -102,7 +102,7 @@ async def parse_rss(
         raise
     except Exception as exc:
         logger.error(f"解析RSS链接失败: {exc!r}")
-        raise APIError(message=f"解析RSS链接失败: {exc!r}", code=500)
+        raise APIError(message=f"解析RSS链接失败: {exc!r}", code=500) from exc
     feed_meta = result["feed_meta"]
     entries = result["entries"]
 
