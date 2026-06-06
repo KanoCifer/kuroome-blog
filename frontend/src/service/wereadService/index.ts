@@ -16,4 +16,8 @@ export const wereadService = {
   async syncMyBooks() {
     return wereadGateway.syncMyBooks();
   },
+
+  async getReadProgress(refresh = false) {
+    return wereadGateway.getReadProgress(refresh);
+  },
 };

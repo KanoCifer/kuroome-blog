@@ -223,6 +223,17 @@ const router = createRouter({
       },
     },
     {
+      path: '/bookshelf/stats',
+      name: 'bookshelf-stats',
+      component: () => import('@/views/books/BookStats.vue'),
+      meta: {
+        title: "阅读统计 - Kuroome's Blog",
+        description: '微信读书阅读统计数据与趋势分析',
+        keywords: '阅读统计,阅读数据,微信读书',
+        requiresAuth: true,
+      },
+    },
+    {
       path: '/analytics',
       name: 'analytics',
       component: () => import('@/views/analytics/AnalyticsView.vue'),

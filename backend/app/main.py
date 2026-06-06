@@ -32,26 +32,8 @@ from app.tasks import broker, send_feishu_message
 from app.utils import close_cache_redis
 
 
-async def cleanup_resources(app: FastAPI):
-    """关闭所有资源连接包括 Redis MongoDB PostgreSQL"""
-    await close_redis(app)  # 关闭 Redis 连接池
-    await close_cache_redis()  # 关闭缓存 Redis 连接
-    await app.state.client.close()  # 关闭 MongoDB 连接
-    await close_mongo_client(app)  # 关闭 MongoDB 客户端
-    await close_db_connections()  # 关闭数据库连接池
-
-    # 关闭 Taskiq broker
-    try:
-        await broker.shutdown()
-        app_logger.info("Taskiq broker shutdown successfully")
-    except Exception as e:
-        app_logger.warning(f"Taskiq broker shutdown failed: {e!s}")
-
-
-# 生命周期，初始化和清理资源
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """Application lifespan manager."""
+async def initialize_resources(app: FastAPI):
+    """初始化所有资源连接：MongoDB、Beanie、Redis、Taskiq"""
     await init_mongo(app)
     await init_beanie(
         database=app.state.mongo,
@@ -72,7 +54,6 @@ async def lifespan(app: FastAPI):
     )
     app.state.redis = await init_redis()
 
-    # 启动 Taskiq broker
     try:
         await broker.startup()
         app_logger.info("Taskiq broker started successfully")
@@ -82,7 +63,6 @@ async def lifespan(app: FastAPI):
     app_logger.debug(f"Settings:{get_settings().model_dump()}")
     app_logger.info("FastAPI started successfully.")
 
-    # 发送引导邮件和飞书消息
     if app.state.redis is not None and get_settings().SEND_BOOT_EMAIL:
         try:
             app_logger.info("✅启动通知任务已添加到队列")
@@ -95,9 +75,27 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             app_logger.warning(f"❌发送启动通知失败: {e!s}")
 
-    yield
 
-    # 应用关闭时的清理工作
+async def cleanup_resources(app: FastAPI):
+    """关闭所有资源连接：Redis、MongoDB、PostgreSQL、Taskiq"""
+    await close_redis(app)
+    await close_cache_redis()
+    await app.state.client.close()
+    await close_mongo_client(app)
+    await close_db_connections()
+
+    try:
+        await broker.shutdown()
+        app_logger.info("Taskiq broker shutdown successfully")
+    except Exception as e:
+        app_logger.warning(f"Taskiq broker shutdown failed: {e!s}")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan manager."""
+    await initialize_resources(app)
+    yield
     await cleanup_resources(app=app)
 
 

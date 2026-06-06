@@ -29,7 +29,7 @@ async def get_tasks(
         "done": [],
     }
     for t in tasks:
-        td = t.model_dump()
+        td = t.model_dump(mode="json")
         td["id"] = str(t.id)
         grouped[t.status].append(td)
     return APIResponse.ok(data={"tasks": grouped})

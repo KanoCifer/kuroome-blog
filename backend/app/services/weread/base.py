@@ -33,14 +33,18 @@ class WereadBaseService:
         api_name: str,
         extra: dict | None = None,
     ):
-        header, payload = await self._build_http_payload(user_id, api_name, extra)
+        header, payload = await self._build_http_payload(
+            user_id, api_name, extra
+        )
         try:
             timeout = httpx.Timeout(15.0)
-            async with httpx.AsyncClient(timeout=timeout, headers=header) as client:
+            async with httpx.AsyncClient(
+                timeout=timeout, headers=header
+            ) as client:
                 res = await client.post(self.base_url, json=payload)
                 res.raise_for_status()
                 return res.json()
         except httpx.ConnectError:
             raise ValueError("网络连接失败") from None
         except httpx.HTTPError as exc:
-            raise ValueError(f"HTTP 请求失败: {exc}") from exc
+            raise ValueError(f"HTTP 请求失败: {exc!s}") from exc

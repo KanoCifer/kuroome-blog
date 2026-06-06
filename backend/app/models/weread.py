@@ -1,8 +1,7 @@
 from datetime import UTC, datetime
 from typing import Annotated
 
-import pymongo
-from beanie import Document, Indexed, Link
+from beanie import Document, Indexed, Insert, Link, before_event
 from pydantic import BaseModel, Field
 
 
@@ -19,14 +18,15 @@ class User(Document):
 
 
 class WereadBook(Document):
-    """单本书籍的具体信息"""
+    """单本书籍的具体信息，_id 即 bookId"""
 
-    bookId: Annotated[str, Indexed(unique=True)]
+    bookId: Annotated[str, Indexed()]
     title: str
     author: str
     translator: str | None = None
     cover: str | None = None
     introduction: str | None = None
+    category: str | None = None
     publisher: str | None = None
     publishTime: str | None = None
     isbn: str | None = None
@@ -107,11 +107,26 @@ class PreferCategoryItem(BaseModel):
     readingCount: int
 
 
-class ReadDetailSnapshot(Document):
-    """一次 /readdata/detail 查询的完整快照，支持趋势图 & 排行"""
+class PreferAuthorItem(BaseModel):
+    """偏好作者"""
 
-    user_id: Annotated[int, Indexed()]
-    mode: Annotated[str, Indexed()]  # weekly | monthly | annually | overall
+    authorId: int | None = None
+    name: str | None = None
+    readingTime: str | None = None  # 格式化时长，如 "17小时50分钟"
+
+
+class PreferPublisherItem(BaseModel):
+    """偏好出版社"""
+
+    name: str | None = None
+    count: int = 0
+
+
+class ReadDetailSnapshot(BaseModel):
+    """一次 /readdata/detail 查询的完整快照，支持趋势图 & 排行（存于 Redis）"""
+
+    user_id: int
+    mode: str  # weekly | monthly | annually | overall
     baseTime: int
     fetched_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
@@ -132,15 +147,5 @@ class ReadDetailSnapshot(Document):
     readStat: list[ReadStatItem] | None = None
     preferCategory: list[PreferCategoryItem] | None = None
     preferTime: list[int] | None = None  # 24h阅读时段分布
-    preferAuthor: list[str] | None = None
-    preferPublisher: list[str] | None = None
-
-    class Settings:
-        name = "read_detail_snapshots"
-        indexes = [  # noqa: RUF012
-            [
-                ("user_id", pymongo.ASCENDING),
-                ("mode", pymongo.ASCENDING),
-                ("baseTime", pymongo.DESCENDING),
-            ],
-        ]
+    preferAuthor: list[PreferAuthorItem] | None = None
+    preferPublisher: list[PreferPublisherItem] | None = None

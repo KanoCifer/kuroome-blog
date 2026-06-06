@@ -6,7 +6,7 @@
     />
 
     <RouterLink
-      to="/home"
+      to="/bookshelf"
       class="relative flex h-full flex-col justify-between p-1"
     >
       <!-- 顶部：图标和标题 -->

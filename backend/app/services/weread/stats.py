@@ -1,27 +1,51 @@
 from __future__ import annotations
 
+from app.models.weread import ReadDetailSnapshot
+from app.repositories.weread import ReadDetailCache
 from app.services.weread.base import WereadBaseService
 
 
 class WereadStatsService(WereadBaseService):
     """微信读书阅读统计服务"""
 
+    def __init__(self, repo, cache: ReadDetailCache | None = None) -> None:
+        super().__init__(repo)
+        self.cache = cache or ReadDetailCache()
+
     # ── 阅读统计 ─────────────────────────────────────────────────
 
-    async def sync_read_detail(self, user_id: int, mode: str = "monthly") -> int:
+    async def sync_read_detail(
+        self, user_id: int, mode: str = "weekly"
+    ) -> ReadDetailSnapshot:
         """同步阅读统计，返回保存的快照数"""
         raw = await self._send_http_request(
             user_id, api_name="/readdata/detail", extra={"mode": mode}
         )
         snapshot = self._parse_read_detail(raw, user_id, mode)
-        await self.repo.upsert_read_detail_snapshot(snapshot)
-        return 1
+        await self.cache.upsert(snapshot)
+        return snapshot
+
+    async def orchestra_read_detail(
+        self, user_id: int, *, force_refresh: bool = False
+    ) -> list[ReadDetailSnapshot]:
+        """获取阅读统计，优先 Redis 缓存，缓存为空时自动拉取远端；force_refresh=True 则跳过缓存"""
+        snapshots = []
+        for mode in ["weekly", "monthly", "annually", "overall"]:
+            snapshot = None
+            if not force_refresh:
+                snapshot = await self.cache.get_latest(
+                    user_id, mode
+                )
+            if snapshot is None:
+                snapshot = await self.sync_read_detail(user_id, mode)
+            snapshots.append(snapshot)
+        return snapshots
 
     async def get_read_detail_trends(
         self, user_id: int, mode: str = "monthly"
     ) -> list[dict]:
         """查询历史阅读快照，按时间升序"""
-        snapshots = await self.repo.get_read_detail_snapshots(user_id, mode)
+        snapshots = await self.cache.list(user_id, mode)
         return [
             {
                 "baseTime": s.baseTime,
@@ -49,10 +73,9 @@ class WereadStatsService(WereadBaseService):
         ]
 
     def _parse_read_detail(self, raw: dict, user_id: int, mode: str):
-        """将 /readdata/detail 原始响应解析为快照文档"""
+        """将 /readdata/detail 原始响应解析为快照"""
         from app.models.weread import (
             PreferCategoryItem,
-            ReadDetailSnapshot,
             ReadLongestItem,
         )
 
@@ -60,10 +83,18 @@ class WereadStatsService(WereadBaseService):
         if raw.get("readLongest"):
             read_longest = [
                 ReadLongestItem(
-                    bookId=item.get("book", {}).get("bookInfo", {}).get("bookId"),
-                    title=item.get("book", {}).get("bookInfo", {}).get("title"),
-                    author=item.get("book", {}).get("bookInfo", {}).get("author"),
-                    cover=item.get("book", {}).get("bookInfo", {}).get("cover"),
+                    bookId=item.get("book", {})
+                    .get("bookInfo", {})
+                    .get("bookId"),
+                    title=item.get("book", {})
+                    .get("bookInfo", {})
+                    .get("title"),
+                    author=item.get("book", {})
+                    .get("bookInfo", {})
+                    .get("author"),
+                    cover=item.get("book", {})
+                    .get("bookInfo", {})
+                    .get("cover"),
                     readTime=item.get("readTime", 0),
                 )
                 for item in raw["readLongest"]

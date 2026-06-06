@@ -34,6 +34,7 @@ export interface WereadBookDetail {
   translator: string | null;
   cover: string | null;
   introduction: string | null;
+  category: string | null;
   publisher: string | null;
   publishTime: string | null;
   isbn: string | null;
@@ -49,11 +50,67 @@ export interface WereadShelfData {
   archives: WereadArchive[];
 }
 
+export interface ReadLongestItem {
+  bookId: string | null;
+  title: string | null;
+  author: string | null;
+  cover: string | null;
+  readTime: number;
+}
+
+export interface ReadStatItem {
+  label: string;
+  value: number;
+}
+
+export interface PreferCategoryItem {
+  categoryTitle: string;
+  readingTime: number;
+  readingCount: number;
+}
+
+export interface PreferAuthorItem {
+  authorId: number | null;
+  name: string | null;
+  readingTime: string | null;
+}
+
+export interface PreferPublisherItem {
+  name: string | null;
+  count: number;
+}
+
+export interface ReadDetailSnapshot {
+  user_id: number;
+  mode: string;
+  baseTime: number;
+  fetched_at: string;
+  totalReadTime: number | null;
+  readDays: number | null;
+  dayAverageReadTime: number | null;
+  compare: number | null;
+  readRate: number | null;
+  wrReadTime: number | null;
+  wrListenTime: number | null;
+  readTimes: Record<string, number> | null;
+  readLongest: ReadLongestItem[] | null;
+  readStat: ReadStatItem[] | null;
+  preferCategory: PreferCategoryItem[] | null;
+  preferTime: number[] | null;
+  preferAuthor: PreferAuthorItem[] | null;
+  preferPublisher: PreferPublisherItem[] | null;
+}
+
+export interface WereadReadProgressData {
+  snapshots: ReadDetailSnapshot[];
+}
+
 export interface WereadGateway {
   saveUserInfo(apiKey: string): Promise<ApiResponse<null>>;
   getUserShelf(): Promise<ApiResponse<WereadShelfData>>;
   getBookInfo(bookId: string): Promise<ApiResponse<WereadBookDetail>>;
   syncMyBooks(): Promise<ApiResponse<{ imported_count: number }>>;
+  getReadProgress(refresh?: boolean): Promise<ApiResponse<WereadReadProgressData>>;
 }
 
 export const wereadGateway: WereadGateway = {
@@ -86,6 +143,16 @@ export const wereadGateway: WereadGateway = {
   > {
     const res = await request.get<ApiResponse<{ imported_count: number }>>(
       'v2/weread/sync-my-books',
+    );
+    return res.data;
+  },
+
+  async getReadProgress(
+    refresh = false,
+  ): Promise<ApiResponse<WereadReadProgressData>> {
+    const res = await request.get<ApiResponse<WereadReadProgressData>>(
+      'v2/weread/read-progress',
+      { params: { refresh } },
     );
     return res.data;
   },

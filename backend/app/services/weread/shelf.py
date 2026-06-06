@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import re
 
+from beanie import Link, WriteRules
+
+from app.models.weread import Archive, UserBook, WereadBook
 from app.services.weread.base import WereadBaseService
+from app.services.weread.utils import _map_book_info, _parse_shelf_books
 
 
 class WereadShelfService(WereadBaseService):
@@ -40,53 +44,66 @@ class WereadShelfService(WereadBaseService):
     async def save_user_archive(self, archive_info):
         return await self.repo.save_user_archive(archive_info)
 
-    def _parse_book_data(self, raw):
-        books = raw.get("books", [])
-        archives = raw.get("archives", [])
-        parsed_books = [
-            {
-                "bookId": book.get("bookId"),
-                "title": book.get("title"),
-                "author": book.get("author"),
-                "cover": book.get("cover"),
-                "readUpdateTime": book.get("readUpdateTime"),
-                "finishReading": book.get("finishReading"),
-                "secret": book.get("secret"),
-            }
-            for book in books
-        ]
-        return parsed_books, archives
-
     async def sync_my_books(self, user_id: int):
-        """从微信读书同步书架并保存到数据库"""
+        """从微信读书同步书架：先调 /shelf/sync 获取书单，再逐本调 /book/info 获取详情，
+        最后通过 link_rule=WriteRules.WRITE 级联写入 WereadBook 和 UserBook"""
+        # 1. 同步书架，获取 bookId 列表和书架特有字段
         raw = await self._send_http_request(
             user_id=user_id, api_name="/shelf/sync"
         )
-        books_data, archives = self._parse_book_data(raw)
+        shelf_books, archives = _parse_shelf_books(raw)
 
-        from app.models.weread import Archive, UserBook, WereadBook
+        if not shelf_books:
+            return 0
 
-        weread_books = [WereadBook(**b) for b in books_data]
-        await self.repo.save_books_bulk(weread_books)
+        # 2. 逐本获取详细信息
+        detailed_books = []
+        for b in shelf_books:
+            book_id = b["bookId"]
+            try:
+                info = await self._send_http_request(
+                    user_id=user_id,
+                    api_name="/book/info",
+                    extra={"bookId": book_id},
+                )
+                detailed_books.append(_map_book_info(info))
+            except ValueError:
+                # 某本书获取详情失败时，用书架基础信息兜底
+                detailed_books.append(
+                    {
+                        "bookId": book_id,
+                        "title": b.get("title"),
+                        "author": b.get("author"),
+                        "cover": b.get("cover"),
+                    }
+                )
 
-        book_map = await self.repo.get_book_map_by_ids(
-            [b.bookId for b in weread_books]
-        )
+        # 3. 构建 WereadBook（含完整详情）并批量保存
+        weread_books = [WereadBook(**info) for info in detailed_books]
+        book_map = await self.repo.save_books_bulk(weread_books)
 
-        user_books = [
-            UserBook(
+        # 4. 构建 UserBook，通过 Link + WriteRules.WRITE 级联写入
+        user_books = []
+        for b in shelf_books:
+            ub = UserBook(
                 user_id=user_id,
                 bookId=b["bookId"],
                 readUpdateTime=b.get("readUpdateTime"),
                 finishReading=b.get("finishReading", False),
                 secret=b.get("secret", False),
+                isTop=b.get("isTop", False),
                 readProgress=None,
             )
-            for b in books_data
-        ]
+            if b["bookId"] in book_map:
+                ub.bookInfo = Link(
+                    book_map[b["bookId"]], link_rule=WriteRules.WRITE
+                )
+            user_books.append(ub)
+
         await self.repo.save_user_books_bulk(user_books, book_map=book_map)
 
+        # 5. 保存书单
         archive_docs = [Archive(**a) for a in archives]
         await self.repo.save_user_archives_bulk(archive_docs)
 
-        return len(books_data)
+        return len(shelf_books)

@@ -126,10 +126,9 @@ async def get_devtask_service():
 
 @asynccontextmanager
 async def get_weread_service():
-    async with get_async_session() as session:
-        weread_repo = WereadRepo(session)
-        service = WereadService(repo=weread_repo)
-        yield service
+    weread_repo = WereadRepo()
+    service = WereadService(repo=weread_repo)
+    yield service
 
 
 @asynccontextmanager
