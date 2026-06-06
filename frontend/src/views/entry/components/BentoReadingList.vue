@@ -61,7 +61,7 @@
 <script setup lang="ts">
 import BentoCard from '@/components/bento/BentoCard.vue';
 import { useAnimateNumber } from '@/composables/useAnimateNumber';
-import { wereadService } from '@/service/wereadService/index';
+import { wereadGateway } from '@/api/wereadGateway';
 import { BookOpen } from '@lucide/vue';
 import { onMounted, ref } from 'vue';
 
@@ -71,8 +71,8 @@ const bookCovers = ['bg-red-400', 'bg-blue-400', 'bg-green-400'];
 
 onMounted(async () => {
   try {
-    const response = await wereadService.getUserShelf();
-    const books = response.data?.user_books || [];
+    const response = await wereadGateway.getUserShelf();
+    const books = response.data?.user_books ?? [];
     const readingBooks = books.filter((b) => !b.finishReading);
     animateTo(readingBooks.length || 10);
   } catch {

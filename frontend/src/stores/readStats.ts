@@ -1,5 +1,4 @@
-import type { ReadDetailSnapshot } from '@/api/wereadGateway';
-import { wereadService } from '@/service/wereadService';
+import { wereadGateway, type ReadDetailSnapshot } from '@/api/wereadGateway';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
@@ -24,7 +23,7 @@ export const useReadStatsStore = defineStore('readStats', () => {
     isLoading.value = true;
     error.value = '';
     try {
-      const res = await wereadService.getReadProgress(forceRefresh);
+      const res = await wereadGateway.getReadProgress(forceRefresh);
       if (res.status === 'success' && res.data) {
         snapshots.value = res.data.snapshots;
       } else {

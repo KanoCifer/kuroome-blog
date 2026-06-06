@@ -232,7 +232,7 @@
 <script setup lang="ts">
 import type { WereadUserBook } from '@/api/wereadGateway';
 import { useReadStatsStore } from '@/stores/readStats';
-import { wereadService } from '@/service/wereadService/index';
+import { wereadGateway } from '@/api/wereadGateway';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { CloudSync } from '@lucide/vue';
@@ -292,7 +292,7 @@ const setupObserver = () => {
 const loadCover = async (bookId: string) => {
   if (coverMap.value[bookId]) return;
   try {
-    const res = await wereadService.getBookInfo(bookId);
+    const res = await wereadGateway.getBookInfo(bookId);
     if (res.status === 'success' && res.data?.cover) {
       coverMap.value = { ...coverMap.value, [bookId]: res.data.cover };
     }
@@ -313,7 +313,7 @@ const fetchBooks = async () => {
   isLoading.value = true;
   errorMessage.value = '';
   try {
-    const res = await wereadService.getUserShelf();
+    const res = await wereadGateway.getUserShelf();
     if (res.status === 'success' && res.data) {
       books.value = res.data.user_books;
     } else {
@@ -334,7 +334,7 @@ const fetchBooks = async () => {
 const handleSync = async () => {
   isSyncing.value = true;
   try {
-    const res = await wereadService.syncMyBooks();
+    const res = await wereadGateway.syncMyBooks();
     if (res.status === 'success') {
       await fetchBooks();
       await nextTick();

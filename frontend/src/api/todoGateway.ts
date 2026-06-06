@@ -1,9 +1,36 @@
 import request from '@/api/request';
-import type {
-  CreateDevTaskPayload,
-  DevTask,
-  DevTaskResponse,
-} from '@/service/todoService/types';
+
+export type DevTaskPriority = 'low' | 'high' | 'default';
+export type DevTaskStatus = 'todo' | 'in-progress' | 'done';
+
+export interface DevTask {
+  id: string;
+  title: string;
+  status: DevTaskStatus;
+  createdAt: string;
+  updatedAt: string;
+  description?: string;
+  dueDate?: string;
+  priority: DevTaskPriority;
+  sortOrder?: number;
+}
+
+export interface DevTaskResponse {
+  tasks: {
+    todo: DevTask[];
+    'in-progress': DevTask[];
+    done: DevTask[];
+  };
+}
+
+export interface CreateDevTaskPayload {
+  title: string;
+  description?: string;
+  dueDate?: string;
+  priority?: DevTaskPriority;
+  status?: DevTaskStatus;
+  sortOrder?: number;
+}
 
 export interface DevTaskGateway {
   fetchTasks(): Promise<DevTaskResponse['tasks']>;

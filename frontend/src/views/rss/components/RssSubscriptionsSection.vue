@@ -113,7 +113,7 @@
 <script setup lang="ts">
 import { getSubscriptionTitle, getFeedProtocol } from '../rssUtils';
 import { formatDate } from '@/utils/formatdate';
-import type { SubscriptionItem } from '@/service/rssService';
+import type { SubscriptionItem } from '@/api/rssGateway';
 
 defineProps<{
   subscriptions: SubscriptionItem[];

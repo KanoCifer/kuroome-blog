@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { blogService } from '@/service/blogService';
+import { blogGateway } from '@/api/blogGateway';
 import { useAuthStore } from '@/stores/auth';
 import { useNotificationStore } from '@/stores/notification';
 import { computed, ref } from 'vue';
@@ -50,7 +50,7 @@ const handleSubmit = async () => {
       post_id: String(props.postId),
       body: body.value,
     });
-    await blogService.postLegacyComment({
+    await blogGateway.postLegacyComment({
       post_id: String(props.postId),
       body: body.value,
       author:

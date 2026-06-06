@@ -1,4 +1,4 @@
-import { rssService } from '@/service/rssService';
+import { rssGateway } from '@/api/rssGateway';
 import { useNotificationStore } from '@/stores/notification';
 import { useStorage } from '@vueuse/core';
 import { ref } from 'vue';
@@ -53,7 +53,7 @@ export const useRssParse = () => {
     }
 
     try {
-      const parsedData = await rssService.parseRss({
+      const parsedData = await rssGateway.parseRss({
         rss_url: rssUrl,
         save_to_db: rssForm.value.saveToDb,
       });

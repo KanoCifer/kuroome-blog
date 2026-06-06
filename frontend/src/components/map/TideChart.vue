@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { weatherService } from '@/service/weatherService';
+import { weatherGateway } from '@/api/weatherGateway';
 import { useNotificationStore } from '@/stores/notification';
 import dayjs from 'dayjs';
 import { computed, onMounted, ref, watch } from 'vue';
@@ -50,7 +50,7 @@ const checkDarkMode = () => {
 const fetchTideData = async (harbor: string, date: string) => {
   loading.value = true;
   try {
-    const res = await weatherService.getTide({ harbor, date });
+    const res = await weatherGateway.getTide({ harbor, date });
     if (res.tideHourly && res.tideHourly.length > 0) {
       tideData.value = {
         updateTime: res.updateTime,

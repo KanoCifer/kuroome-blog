@@ -198,7 +198,7 @@
 </template>
 
 <script setup lang="ts">
-import { wereadService } from '@/service/wereadService';
+import { wereadGateway } from '@/api/wereadGateway';
 import { useNotificationStore } from '@/stores/notification';
 import { computed, ref } from 'vue';
 
@@ -234,7 +234,7 @@ const handleSubmit = async () => {
   loading.value = true;
   saved.value = false;
   try {
-    const response = await wereadService.saveUserInfo(apiKey.value.trim());
+    const response = await wereadGateway.saveUserInfo(apiKey.value.trim());
     if (response.status === 'success') {
       saved.value = true;
       apiKey.value = '';

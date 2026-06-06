@@ -72,7 +72,7 @@
 import BentoCard from '@/components/bento/BentoCard.vue';
 import { useAnimateNumber } from '@/composables/useAnimateNumber';
 import fishingSpots from '@/data/fishing-spots.json';
-import { fishingService } from '@/service/fishingService';
+import { fishingGateway } from '@/api/fishingGateway';
 import { DEFAULT_MAP_CENTER, useFishingMapStore } from '@/stores/fishingMap';
 import type { TideData } from '@/views/fishing/types';
 import dayjs from 'dayjs';
@@ -148,7 +148,7 @@ onMounted(async () => {
   }
 
   try {
-    const stats = await fishingService.fetchFishingStats();
+    const stats = await fishingGateway.getFishingStats();
     totalRecords.value = stats.total_records;
     if (stats.latest_record_time) {
       lastRecord.value = formatRelativeTime(stats.latest_record_time);

@@ -454,7 +454,7 @@
 <script setup lang="ts">
 import BasicDetail from '@/components/basic/BasicDetail.vue';
 import IconUser from '@/components/icons/IconUser.vue';
-import { analyticsService } from '@/service/analyticsService';
+import { analyticsGateway } from '@/api/analyticsGateway';
 import { useAuthStore } from '@/stores/auth';
 import dayjs from 'dayjs';
 import { computed, onMounted, ref, watch } from 'vue';
@@ -542,7 +542,7 @@ const formatDateTime = (dateStr: string | null): string => {
 
 const fetchOverview = async () => {
   try {
-    const res = await analyticsService.getOverview(selectedDays.value);
+    const res = await analyticsGateway.getOverview(selectedDays.value);
     if (res.code === 200) {
       overviewData.value = res.data as unknown as OverviewData;
     } else {
@@ -556,7 +556,7 @@ const fetchOverview = async () => {
 
 const fetchLoginLogs = async () => {
   try {
-    const res = await analyticsService.getUserLogins({
+    const res = await analyticsGateway.getUserLogins({
       days: selectedDays.value,
       page: loginLogsPage.value,
       page_size: 20,

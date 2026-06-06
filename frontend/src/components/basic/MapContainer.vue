@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { mapService } from '@/service/mapService';
+import { mapGateway } from '@/api/mapGateway';
 import type {
   AMapDriving,
   AMapMapInstance,
@@ -69,7 +69,7 @@ let clickHandler: ((e: unknown) => void) | null = null;
 
 const fetchSecurityKey = async (): Promise<string> => {
   try {
-    const response = await mapService.getSecurityKey();
+    const response = await mapGateway.getSecurityKey();
     const encodedKey = response.securityJsCode || '';
 
     if (encodedKey) {

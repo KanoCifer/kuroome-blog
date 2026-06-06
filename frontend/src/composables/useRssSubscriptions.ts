@@ -1,5 +1,4 @@
-import { rssService } from '@/service/rssService';
-import type { SubscriptionItem } from '@/service/rssService';
+import { rssGateway, type SubscriptionItem } from '@/api/rssGateway';
 import { useNotificationStore } from '@/stores/notification';
 import { getSubscriptionTitle } from '@/views/rss/rssUtils';
 import { ref } from 'vue';
@@ -17,7 +16,7 @@ export const useRssSubscriptions = () => {
     subscriptionsError.value = '';
 
     try {
-      const data = await rssService.getSubscriptions();
+      const data = await rssGateway.getSubscriptions();
       if (!Array.isArray(data)) {
         throw new Error('订阅列表格式错误');
       }
@@ -37,7 +36,7 @@ export const useRssSubscriptions = () => {
     subscription: SubscriptionItem,
   ): Promise<void> => {
     try {
-      await rssService.refreshSubscription(subscription.id);
+      await rssGateway.refreshSubscription(subscription.id);
       notifier.success(`已刷新：${getSubscriptionTitle(subscription)}`);
       await fetchSubscriptions();
     } catch (error: unknown) {
@@ -59,7 +58,7 @@ export const useRssSubscriptions = () => {
     }
 
     try {
-      await rssService.deleteSubscription(subscription.id);
+      await rssGateway.deleteSubscription(subscription.id);
       notifier.success('订阅删除成功');
       await fetchSubscriptions();
       return true;

@@ -2,7 +2,7 @@
 import BasicDetail from '@/components/basic/BasicDetail.vue';
 import MarkdownEditor from '@/components/editor/MarkdownEditor.vue';
 import IconSave from '@/components/icons/IconSave.vue';
-import { blogService } from '@/service/blogService';
+import { blogGateway } from '@/api/blogGateway';
 import { useNotificationStore } from '@/stores/notification';
 import type { Category, CategoryResponseItem } from '@/types';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
@@ -149,7 +149,7 @@ const handleKeydown = (e: KeyboardEvent) => {
 // Fetch categories
 const fetchCategories = async () => {
   try {
-    const legacyCategories = await blogService.getLegacyCategories();
+    const legacyCategories = await blogGateway.getLegacyCategories();
     categories.value = legacyCategories.map(
       (cat): CategoryResponseItem => ({
         id: cat.id,
@@ -169,7 +169,7 @@ const fetchCategories = async () => {
 const fetchPost = async (id: string) => {
   loading.value = true;
   try {
-    const post = await blogService.getLegacyPost(id);
+    const post = await blogGateway.getLegacyPost(id);
     title.value = post.title || '';
     summary.value = post.summary || '';
     debouncedTitle.value = post.title || '';
@@ -246,10 +246,10 @@ const handleSubmit = async () => {
 
     if (isEdit.value && postId.value) {
       const updatePayload = { ...payload, _id: postId.value };
-      await blogService.updateLegacyPost(updatePayload);
+      await blogGateway.updateLegacyPost(updatePayload);
       notification.success('文章更新成功');
     } else {
-      await blogService.createLegacyPost(payload);
+      await blogGateway.createLegacyPost(payload);
       notification.success('文章发布成功');
     }
 

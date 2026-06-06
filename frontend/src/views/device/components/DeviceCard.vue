@@ -110,7 +110,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Device } from '@/service/deviceService';
+import type { Device } from '@/api/deviceGateway';
 import dayjs from 'dayjs';
 import { computed, ref } from 'vue';
 import MilestoneConfigForm from './MilestoneConfigForm.vue';

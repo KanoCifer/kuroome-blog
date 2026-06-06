@@ -15,7 +15,7 @@ import {
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 import DelIcon from '@/components/icons/DelIcon.vue';
 import EditIcon from '@/components/icons/EditIcon.vue';
-import { blogService } from '@/service/blogService';
+import { blogGateway } from '@/api/blogGateway';
 import { useAuthStore } from '@/stores/auth';
 import { useNotificationStore } from '@/stores/notification';
 import type { Post } from '@/types';
@@ -48,7 +48,7 @@ const fetchPost = async () => {
   errorMessage.value = '';
 
   try {
-    const res = await blogService.getLegacyPost(postId.value);
+    const res = await blogGateway.getLegacyPost(postId.value);
     post.value = res as unknown as Post;
   } catch (err: unknown) {
     console.error(err);
@@ -164,7 +164,7 @@ const confirmDelete = async () => {
 
 const handleDelete = async () => {
   try {
-    await blogService.deleteLegacyPost(postId.value);
+    await blogGateway.deleteLegacyPost(postId.value);
     useNotificationStore().success('文章删除成功');
     router.push('/blog');
   } catch (err: unknown) {

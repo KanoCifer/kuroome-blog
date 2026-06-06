@@ -1,6 +1,9 @@
-import { devTaskGateway } from '@/api/todoGateway';
-import type { DevTask, DevTaskStatus } from '@/service/todoService/types';
-import { type CreateDevTaskPayload } from '@/service/todoService/types';
+import {
+  devTaskGateway,
+  type CreateDevTaskPayload,
+  type DevTask,
+  type DevTaskStatus,
+} from '@/api/todoGateway';
 import { useAuthStore } from '@/stores/auth';
 import { useNotificationStore } from '@/stores/notification';
 import { useStorage } from '@vueuse/core';

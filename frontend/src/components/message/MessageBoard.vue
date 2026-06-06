@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { messageService } from '@/service/messageService';
+import { messageGateway } from '@/api/messageGateway';
 import { useAuthStore } from '@/stores/auth';
 import type { Message } from '@/types';
 import { formatDate } from '@/utils/formatdate';
@@ -21,12 +21,8 @@ if (auth.isAuthenticated) {
 const fetchMessages = async () => {
   loading.value = true;
   try {
-    const response = await messageService.getMessages();
-    const data = response.data;
-    if (data.status === 'success') {
-      messages.value = data.data.messages;
-      console.log('Fetched messages:', messages.value);
-    }
+    const result = await messageGateway.getMessages();
+    messages.value = result.messages;
   } catch (error) {
     console.error('Failed to fetch messages:', error);
   } finally {
@@ -40,35 +36,18 @@ const handleSubmit = async () => {
   submitting.value = true;
 
   try {
-    console.log('Submitting message...', {
+    await messageGateway.postMessage({
       name: name.value,
       message: message.value,
     });
-
-    const response = await messageService.postMessage({
-      name: name.value,
-      message: message.value,
-    });
-
-    console.log('Response status:', response.status);
-
-    const data = response.data;
-    console.log('Response data:', data);
-
-    if (data.status === 'success') {
-      successMessage.value = data.message;
-      name.value = '';
-      message.value = '';
-      await fetchMessages();
-    } else if (data.status === 'error' && data.errors) {
-      errors.value = data.errors;
-    } else {
-      console.warn('Unexpected response:', data);
-    }
+    successMessage.value = '留言发布成功';
+    name.value = '';
+    message.value = '';
+    await fetchMessages();
   } catch (error) {
     console.error('Failed to submit message:', error);
     errors.value = {
-      name: ['Network error. Please check console for details.'],
+      name: ['提交失败，请稍后重试'],
     };
   } finally {
     submitting.value = false;

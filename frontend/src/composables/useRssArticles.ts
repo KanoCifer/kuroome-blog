@@ -1,4 +1,4 @@
-import { rssService } from '@/service/rssService';
+import { rssGateway } from '@/api/rssGateway';
 import type { RssArticle } from '@/types';
 import { useNotificationStore } from '@/stores/notification';
 import { computed, ref } from 'vue';
@@ -61,7 +61,7 @@ export const useRssArticles = () => {
         params.search = search;
       }
 
-      const response = await rssService.getArticles(params);
+      const response = await rssGateway.getArticles(params);
       articles.value = response.items;
       totalItems.value = response.total;
       currentPage.value = response.page;

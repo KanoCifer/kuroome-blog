@@ -166,7 +166,7 @@
 import BasicDetail from '@/components/basic/BasicDetail.vue';
 import DevTaskCard from './components/DevTaskCard.vue';
 import TodoColumn from './components/TodoColumn.vue';
-import type { DevTask, DevTaskStatus } from '@/service/todoService/types';
+import type { DevTask, DevTaskStatus } from '@/api/todoGateway';
 import { useTodoStore } from '@/stores/todos';
 import { useDraggable, type DraggableEvent } from 'vue-draggable-plus';
 import { onMounted, ref, watch } from 'vue';

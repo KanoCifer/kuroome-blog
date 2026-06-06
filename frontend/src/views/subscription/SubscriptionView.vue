@@ -4,7 +4,7 @@ import type {
   TestNotificationPayload,
 } from '@/api/subscriptionGateway';
 import BasicDetail from '@/components/basic/BasicDetail.vue';
-import { subscriptionService } from '@/service/subscriptionService';
+import { subscriptionGateway } from '@/api/subscriptionGateway';
 import { useNotificationStore } from '@/stores/notification';
 import { formatDate } from '@/utils/formatdate';
 import ReminderConfigModal from '@/views/subscription/components/ReminderConfigModal.vue';
@@ -129,7 +129,7 @@ async function fetchSubscriptions(): Promise<void> {
   }
 
   try {
-    const data = await subscriptionService.getSubscriptions();
+    const data = await subscriptionGateway.getSubscriptions();
     subscriptions.value = data;
     if (data.length === 0) {
       selectedSubId.value = null;
@@ -172,7 +172,7 @@ async function handleCreateSubscription(
 
   isCreating.value = true;
   try {
-    const created = await subscriptionService.createSubscription(
+    const created = await subscriptionGateway.createSubscription(
       toCreatePayload(form),
     );
     subscriptions.value = [created, ...subscriptions.value];
@@ -210,7 +210,7 @@ async function handleUpdateSubscription(
 
   isUpdating.value = true;
   try {
-    const updated = await subscriptionService.updateSubscription(
+    const updated = await subscriptionGateway.updateSubscription(
       editTargetId.value,
       toUpdatePayload(form),
     );
@@ -257,7 +257,7 @@ async function handleSaveReminderConfig(): Promise<void> {
 
   isSavingReminder.value = true;
   try {
-    const updated = await subscriptionService.updateReminders(
+    const updated = await subscriptionGateway.updateReminders(
       reminderTargetId.value,
       createReminderPayload(reminderForm),
     );
@@ -297,7 +297,7 @@ async function handleTestNotification(): Promise<void> {
       channels: reminderForm.channels,
       config: createReminderPayload(reminderForm),
     };
-    const result = await subscriptionService.testNotification(
+    const result = await subscriptionGateway.testNotification(
       reminderTargetId.value,
       payload,
     );
@@ -331,7 +331,7 @@ async function handleToggleStatus(subscription: Subscription): Promise<void> {
   const nextStatus = subscription.status === 'active' ? 'paused' : 'active';
   pendingStatusId.value = subscription.id;
   try {
-    const updated = await subscriptionService.updateStatus(
+    const updated = await subscriptionGateway.updateStatus(
       subscription.id,
       nextStatus,
     );
@@ -354,7 +354,7 @@ async function handleDeleteSubscription(
 
   deletePendingId.value = subscription.id;
   try {
-    await subscriptionService.deleteSubscription(subscription.id);
+    await subscriptionGateway.deleteSubscription(subscription.id);
     subscriptions.value = subscriptions.value.filter(
       (item) => item.id !== subscription.id,
     );

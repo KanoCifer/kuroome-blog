@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { blogService } from '@/service/blogService';
+import { blogGateway } from '@/api/blogGateway';
 import IconTags from '@/components/icons/IconTags.vue';
 import type { Category, CategoryResponseItem, Post } from '@/types';
 import { onMounted, ref, watch } from 'vue';
@@ -105,7 +105,7 @@ watch(
 
 const fetchCategories = async () => {
   try {
-    const response = await blogService.getLegacyCategories();
+    const response = await blogGateway.getLegacyCategories();
     categories.value = response.map(
       (cat): CategoryResponseItem => ({
         id: cat.id,
@@ -123,7 +123,7 @@ const fetchCategories = async () => {
 const fetchPostsByCategory = async (categoryId: number) => {
   isLoading.value = true;
   try {
-    const response = await blogService.getPostsByLegacyCategory(categoryId);
+    const response = await blogGateway.getPostsByLegacyCategory(categoryId);
     const posts: Post[] = response.posts.map((post) => ({
       ...(post as unknown as Post),
       category: post.category

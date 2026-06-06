@@ -190,8 +190,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Device, DeviceInput } from '@/service/deviceService';
-import { deviceService } from '@/service/deviceService';
+import type { Device, DeviceInput } from '@/api/deviceGateway';
+import { deviceGateway } from '@/api/deviceGateway';
 import { useNotificationStore } from '@/stores/notification';
 import { ref } from 'vue';
 
@@ -216,7 +216,7 @@ async function fetchDevices() {
   isLoading.value = true;
   error.value = null;
   try {
-    const data = await deviceService.getUserDevices();
+    const data = await deviceGateway.getUserDevices();
     devices.value = data;
   } catch (fetchError) {
     error.value =
@@ -233,7 +233,7 @@ async function handleToggleStatus(device: Device) {
   const nextStatus = device.status === 'active' ? 'retired' : 'active';
   pendingId.value = device.id;
   try {
-    await deviceService.updateDeviceStatus(device.id, nextStatus);
+    await deviceGateway.updateDeviceStatus(device.id, nextStatus);
     notificationStore.success(
       nextStatus === 'retired' ? '设备已标记为退役' : '设备已恢复使用',
     );
@@ -255,7 +255,7 @@ async function handleDeleteDevice(device: Device) {
   }
   pendingId.value = device.id;
   try {
-    await deviceService.deleteDevice(device.id);
+    await deviceGateway.deleteDevice(device.id);
     devices.value = devices.value.filter((item) => item.id !== device.id);
     notificationStore.success('设备已删除');
   } catch (deleteError) {

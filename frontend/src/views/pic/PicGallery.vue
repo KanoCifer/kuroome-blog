@@ -474,7 +474,7 @@
 
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
-import { galleryService } from '@/service/galleryService';
+import { galleryGateway } from '@/api/galleryGateway';
 import { useAuthStore } from '@/stores/auth';
 import { useNotificationStore } from '@/stores/notification';
 import dayjs from 'dayjs';
@@ -580,7 +580,7 @@ const editDescription = ref('');
 // 获取照片墙图片数据
 const fetchGalleryImages = async () => {
   try {
-    const response = await galleryService.getGallery();
+    const response = await galleryGateway.getGallery();
     images.value = response.images;
     generateLayoutSeeds();
     console.log(images.value);
@@ -737,7 +737,7 @@ const uploadPic = async (file: File) => {
   formData.append('file', file);
 
   try {
-    const res = await galleryService.uploadGalleryImage(formData);
+    const res = await galleryGateway.uploadGalleryImage(formData);
     useNotificationStore().success('图片上传成功');
     return res.url;
   } catch {
@@ -749,7 +749,7 @@ const uploadPic = async (file: File) => {
 // 保存照片墙数据
 const saveGallery = async () => {
   try {
-    await galleryService.saveGallery({
+    await galleryGateway.saveGallery({
       images: images.value.map((img) => ({
         id: img.id,
         url: img.url,

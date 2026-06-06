@@ -1,5 +1,5 @@
 import { onBeforeUnmount, ref } from 'vue';
-import { uploadService } from '@/service/uploadService';
+import { uploadGateway } from '@/api/uploadGateway';
 
 export function useMarkdownImage() {
   const blobFileMap = ref<Map<string, File>>(new Map());
@@ -107,7 +107,7 @@ export function useMarkdownImage() {
       entries.map(async ([blobUrl, file]) => {
         const formData = new FormData();
         formData.append('file', file);
-        const response = await uploadService.uploadEditorImage(formData);
+        const response = await uploadGateway.uploadEditorImage(formData);
         URL.revokeObjectURL(blobUrl);
         return { blobUrl, serverUrl: response.url };
       }),

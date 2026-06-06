@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { fishingService } from '@/service/fishingService';
+import { fishingGateway } from '@/api/fishingGateway';
 import { useNotificationStore } from '@/stores/notification';
 import type {
   FishingFeedbackData,
@@ -60,7 +60,7 @@ const handleSubmit = async () => {
       tide_range: props.fishingData.tide_range,
       hours_to_next_tide: props.fishingData.hours_to_next_tide,
     };
-    await fishingService.submitFishingFeedback(payload);
+    await fishingGateway.postFishingFeedback(payload);
 
     notifier.success('反馈已提交，感谢您的分享！');
     selectedFeedback.value = null;

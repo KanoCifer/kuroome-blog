@@ -383,7 +383,7 @@
 
 <script setup lang="ts">
 import { IconTooling, RssIcon } from '@/components/icons';
-import { socialService } from '@/service/socialService';
+import { socialGateway } from '@/api/socialGateway';
 import { useCardLayoutStore } from '@/stores/cardLayout';
 import { useNotificationStore } from '@/stores/notification';
 import SettingIcon from '@/components/icons/SettingIcon.vue';
@@ -431,7 +431,7 @@ const goToNewPost = () => {
 
 const handleLike = async () => {
   try {
-    await socialService.likeOnce({ likes_count: 1 });
+    await socialGateway.likeOnce({ likes_count: 1 });
     liked.value = true;
     likesCount.value += 1;
   } catch (error) {
@@ -448,7 +448,7 @@ const handleLike = async () => {
 
 onMounted(async () => {
   try {
-    const response = await socialService.getLikes();
+    const response = await socialGateway.getLikes();
     likesCount.value = response.likes_count || 0;
   } catch {
     notifier.error('获取点赞数失败，请稍后重试');

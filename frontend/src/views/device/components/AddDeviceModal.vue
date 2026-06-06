@@ -165,9 +165,9 @@
 </template>
 
 <script setup lang="ts">
-import { deviceService } from '@/service/deviceService';
+import { deviceGateway } from '@/api/deviceGateway';
 import { useNotificationStore } from '@/stores/notification';
-import type { DeviceInput } from '@/service/deviceService';
+import type { DeviceInput } from '@/api/deviceGateway';
 import { reactive, ref, watch } from 'vue';
 import dayjs from 'dayjs';
 
@@ -263,7 +263,7 @@ async function handleSubmit() {
   };
 
   try {
-    await deviceService.createDevice(payload);
+    await deviceGateway.createDevice(payload);
     useNotificationStore().success('设备添加成功');
     emit('success', payload);
     handleClose();

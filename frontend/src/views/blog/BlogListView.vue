@@ -279,7 +279,7 @@
 
 <script setup lang="ts">
 import BasicDetail from '@/components/basic/BasicDetail.vue';
-import { blogService } from '@/service/blogService';
+import { blogGateway } from '@/api/blogGateway';
 import { useNotificationStore } from '@/stores/notification';
 import type { BlogPagination, Category, Post } from '@/types';
 import BentoCalendar from '@/views/entry/components/BentoCalendar.vue';
@@ -350,7 +350,7 @@ const fetchPosts = async (page: number = 1) => {
       searchQuery.value = route.query.search;
     }
 
-    const res = await blogService.getBlogs({
+    const res = await blogGateway.getBlogs({
       page,
       search: typeof params.search === 'string' ? params.search : undefined,
     });

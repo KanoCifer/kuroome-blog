@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth';
 import { useNotificationStore } from '@/stores/notification';
-import { blogService } from '@/service/blogService';
+import { blogGateway } from '@/api/blogGateway';
 import type { Comment } from '@/types';
 import CommentForm from './CommentForm.vue';
 import CommentItem from './CommentItem.vue';
@@ -47,7 +47,7 @@ const handleReply = async (commentId: string, body: string) => {
       return;
     }
 
-    await blogService.postLegacyComment({
+    await blogGateway.postLegacyComment({
       post_id: props.postId,
       body: body,
       reply_to: commentId,

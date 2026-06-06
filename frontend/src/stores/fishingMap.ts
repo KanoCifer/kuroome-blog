@@ -1,5 +1,5 @@
-import { fishingService } from '@/service/fishingService';
-import { weatherService } from '@/service/weatherService';
+import { fishingGateway } from '@/api/fishingGateway';
+import { weatherGateway } from '@/api/weatherGateway';
 import { useNotificationStore } from '@/stores/notification';
 import type {
   FishingIndexData,
@@ -13,6 +13,19 @@ import type {
 import dayjs from 'dayjs';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+
+function resolveLocationName(
+  fullData: WeatherFullResponse | undefined,
+  now: WeatherNow | undefined,
+): string {
+  const directName = fullData?.locationName?.trim();
+  const hourlyName = (
+    fullData?.hourly as { locationName?: string } | undefined
+  )?.locationName?.trim();
+  if (directName) return directName;
+  if (hourlyName) return hourlyName;
+  return now?.text ? '当前位置' : '钓鱼地点';
+}
 
 export const DEFAULT_MAP_CENTER: [number, number] = [113.389549, 23.050067];
 
@@ -60,20 +73,27 @@ export const useFishingMapStore = defineStore('fishingMap', () => {
     indexError.value = '';
 
     try {
-      const [weatherRes, fishingIndex] = await Promise.all([
-        weatherService.fetchWeatherFull({ location }),
-        fishingService.fetchFishingIndex({ location }),
+      const [data, fishingIndex] = await Promise.all([
+        weatherGateway.getWeatherFull({ location }),
+        fishingGateway.getFishingIndex({ location }),
       ]);
 
       if (seq !== fetchSeq) return;
 
-      fullWeatherData.value = weatherRes.fullWeatherData;
-      liveWeather.value = weatherRes.now ?? null;
-      forecasts.value = weatherRes.daily ?? [];
-      weatherHourly.value = weatherRes.hourly ?? [];
-      locationName.value = weatherRes.locationName;
-      weatherIndices.value = weatherRes.indices;
-      tideData.value = weatherRes.tideData;
+      const now = data.current?.now;
+      const daily = data.daily?.daily;
+      const hourlyWrapper = data.hourly as
+        | { hourly?: WeatherHourly[] }
+        | undefined;
+      const hourly = hourlyWrapper?.hourly ?? [];
+
+      fullWeatherData.value = data;
+      liveWeather.value = now ?? null;
+      forecasts.value = daily ?? [];
+      weatherHourly.value = hourly;
+      locationName.value = resolveLocationName(data, now);
+      weatherIndices.value = data.indices?.daily ?? [];
+      tideData.value = data.tide ?? null;
       indexData.value = fishingIndex;
     } catch (err) {
       if (seq !== fetchSeq) return;
@@ -96,7 +116,7 @@ export const useFishingMapStore = defineStore('fishingMap', () => {
   ): Promise<void> {
     tideLoading.value = true;
     try {
-      const res = await weatherService.getTide({ harbor, date });
+      const res = await weatherGateway.getTide({ harbor, date });
       panelTideData.value = {
         updateTime: res.updateTime,
         tideTable: res.tideTable,

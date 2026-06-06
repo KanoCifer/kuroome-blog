@@ -223,7 +223,7 @@
 <script setup lang="ts">
 import CommentsTab from '@/components/message/CommentsTab.vue';
 import MessagesTab from '@/components/message/MessagesTab.vue';
-import { messageService } from '@/service/messageService';
+import { messageGateway } from '@/api/messageGateway';
 import { useAuthStore } from '@/stores/auth';
 import type { Comment, Message } from '@/types';
 import { useScroll } from '@vueuse/core';
@@ -282,23 +282,11 @@ const fetchMessages = async () => {
   loading.value = true;
   error.value = '';
   try {
-    const response = await messageService.getAdminMessages();
-
-    const result = response.data;
-    if (response.status === 200) {
-      const pending = result.data?.pending ? result.data.pending : [];
-      const approved = result.data?.approved ? result.data.approved : [];
-
-      pendingMessages.value = pending as Message[];
-      approvedMessages.value = approved as Message[];
-    } else {
-      error.value =
-        result.error?.message ||
-        result.description ||
-        'Failed to load messages';
-    }
+    const result = await messageGateway.getAdminMessages();
+    pendingMessages.value = result.pending || [];
+    approvedMessages.value = result.approved || [];
   } catch {
-    error.value = 'Network error occurred';
+    error.value = '加载留言失败';
   } finally {
     loading.value = false;
   }
@@ -308,23 +296,11 @@ const fetchComments = async () => {
   loading.value = true;
   error.value = '';
   try {
-    const response = await messageService.getAdminComments();
-
-    const result = response.data;
-    if (response.status === 200) {
-      const pending = result.data?.pending ? result.data.pending : [];
-      const approved = result.data?.approved ? result.data.approved : [];
-
-      pendingComments.value = pending as Comment[];
-      approvedComments.value = approved as Comment[];
-    } else {
-      error.value =
-        result.error?.message ||
-        result.description ||
-        'Failed to load comments';
-    }
+    const result = await messageGateway.getAdminComments();
+    pendingComments.value = result.pending || [];
+    approvedComments.value = result.approved || [];
   } catch {
-    error.value = 'Network error occurred';
+    error.value = '加载评论失败';
   } finally {
     loading.value = false;
   }
@@ -334,16 +310,15 @@ const handleApprove = async (itemId: string) => {
   actionLoading.value = itemId;
   try {
     if (activeTab.value === 'messages') {
-      await messageService.approveAdminMessage(itemId);
+      await messageGateway.approveAdminMessage(itemId);
       await fetchMessages();
     } else {
-      await messageService.approveAdminComment(itemId);
+      await messageGateway.approveAdminComment(itemId);
       await fetchComments();
     }
   } catch (err) {
-    if (err instanceof Error)
-      error.value = err.message || 'Network error occurred';
-    else error.value = 'Network error occurred';
+    if (err instanceof Error) error.value = err.message || '操作失败';
+    else error.value = '操作失败';
   } finally {
     actionLoading.value = null;
   }
@@ -353,16 +328,15 @@ const handleDelete = async (itemId: string) => {
   actionLoading.value = itemId;
   try {
     if (activeTab.value === 'messages') {
-      await messageService.deleteAdminMessage(itemId);
+      await messageGateway.deleteAdminMessage(itemId);
       await fetchMessages();
     } else {
-      await messageService.deleteAdminComment(itemId);
+      await messageGateway.deleteAdminComment(itemId);
       await fetchComments();
     }
   } catch (err) {
-    if (err instanceof Error)
-      error.value = err.message || 'Network error occurred';
-    else error.value = 'Network error occurred';
+    if (err instanceof Error) error.value = err.message || '操作失败';
+    else error.value = '操作失败';
   } finally {
     actionLoading.value = null;
   }

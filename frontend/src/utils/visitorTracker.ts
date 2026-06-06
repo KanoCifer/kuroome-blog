@@ -1,4 +1,4 @@
-import { analyticsService } from '@/service/analyticsService';
+import { analyticsGateway } from '@/api/analyticsGateway';
 import { useStorage } from '@vueuse/core';
 import { UAParser } from 'ua-parser-js';
 import { v4 } from 'uuid';
@@ -43,7 +43,7 @@ export async function reportVisitorData() {
   try {
     const data = collectVisitorData();
     // 发送POST请求到FastAPI后端接口
-    await analyticsService.reportVisitorData(data);
+    await analyticsGateway.reportVisitorData(data);
   } catch (error) {
     // 上报失败不影响主流程，仅控制台打印
     if (error instanceof Error) {

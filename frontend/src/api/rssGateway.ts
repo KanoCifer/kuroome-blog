@@ -36,6 +36,18 @@ export interface RefreshResult {
   saved_count: number;
 }
 
+export interface SubscriptionItem {
+  id: number;
+  rssUrl: string;
+  feedTitle: string | null;
+  feedLink: string | null;
+  feedDescription: string | null;
+  feedPublishedAt: string | null;
+  entryCount: number;
+  lastFetchedAt: string | null;
+  createdAt: string | null;
+}
+
 export interface RssGateway {
   parseRss(payload: ParseRssPayload): Promise<ParseRssResponse>;
   getArticles(params: {
@@ -45,7 +57,7 @@ export interface RssGateway {
     search?: string;
   }): Promise<RssArticleListResponse>;
   getArticle(articleId: string): Promise<RssArticle>;
-  getSubscriptions(): Promise<RssSubscription[]>;
+  getSubscriptions(): Promise<SubscriptionItem[]>;
   refreshSubscription(subscriptionId: number): Promise<RefreshResult>;
   deleteSubscription(subscriptionId: number): Promise<void>;
   markArticleRead(articleId: string): Promise<void>;
@@ -81,11 +93,21 @@ export const rssGateway: RssGateway = {
     return res.data.data;
   },
 
-  async getSubscriptions(): Promise<RssSubscription[]> {
+  async getSubscriptions(): Promise<SubscriptionItem[]> {
     const res = await request.get<{ data: RssSubscription[] }>(
       'v1/rss/subscriptions',
     );
-    return res.data.data;
+    return res.data.data.map((sub) => ({
+      id: sub.id,
+      rssUrl: sub.rss_url,
+      feedTitle: sub.feed_title ?? null,
+      feedLink: sub.feed_link ?? null,
+      feedDescription: sub.feed_description ?? null,
+      feedPublishedAt: sub.feed_published_at ?? null,
+      entryCount: sub.entry_count ?? 0,
+      lastFetchedAt: sub.last_fetched_at ?? null,
+      createdAt: sub.created_at ?? null,
+    }));
   },
 
   async refreshSubscription(subscriptionId: number): Promise<RefreshResult> {

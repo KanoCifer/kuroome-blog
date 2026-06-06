@@ -442,9 +442,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Device } from '@/service/deviceService';
-import { deviceGateway } from '@/api/deviceGateway';
-import { deviceService } from '@/service/deviceService';
+import { deviceGateway, type Device } from '@/api/deviceGateway';
 import { useNotificationStore } from '@/stores/notification';
 import { reactive, ref, watch, onMounted } from 'vue';
 import dayjs from 'dayjs';
@@ -593,7 +591,7 @@ async function handleTestNotification() {
   if (testLoading.value) return;
   testLoading.value = true;
   try {
-    await deviceService.testNotification(props.device.id);
+    await deviceGateway.testNotification(props.device.id);
     notificationStore.success('测试通知已发送，请检查您的通知渠道');
   } catch (err) {
     const msg =
@@ -644,7 +642,7 @@ async function handleSubmit() {
   };
 
   try {
-    const updated = await deviceService.updateDeviceReminderConfig(
+    const updated = await deviceGateway.updateDeviceReminderConfig(
       props.device.id,
       payload,
     );

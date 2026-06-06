@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { rssService } from '@/service/rssService';
+import { rssGateway } from '@/api/rssGateway';
 import BasicDetail from '@/components/basic/BasicDetail.vue';
 import ArticleSummaryCard from '@/components/blog/ArticleSummaryCard.vue';
 import { useNotificationStore } from '@/stores/notification';
@@ -100,7 +100,7 @@ const fetchArticle = async () => {
   isLoading.value = true;
   errorMessage.value = '';
   try {
-    article.value = await rssService.getArticle(articleId.value);
+    article.value = await rssGateway.getArticle(articleId.value);
   } catch (err: unknown) {
     console.error(err);
     errorMessage.value =
@@ -120,11 +120,11 @@ const toggleReadStatus = async () => {
 
   try {
     if (isCurrentlyRead) {
-      await rssService.markArticleUnread(articleId.value);
+      await rssGateway.markArticleUnread(articleId.value);
       article.value.is_read = false;
       notifier.success('已标记为未读');
     } else {
-      await rssService.markArticleRead(articleId.value);
+      await rssGateway.markArticleRead(articleId.value);
       article.value.is_read = true;
       notifier.success('已标记为已读');
     }
@@ -153,7 +153,7 @@ watch(
   async (newPercent) => {
     if (newPercent === 100 && article.value && !article.value.is_read) {
       try {
-        await rssService.markArticleRead(articleId.value);
+        await rssGateway.markArticleRead(articleId.value);
         article.value.is_read = true;
         notifier.success('已读完！');
       } catch {
