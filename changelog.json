@@ -1,0 +1,53 @@
+[
+  {
+    "version": "3.2.0",
+    "date": "2026-06-06",
+    "title": "微信读书书架全屏视图 & 后端架构重构",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "微信读书书架全屏视图，支持书架 API 和阅读统计同步（Vue + React 双端）"
+      },
+      {
+        "type": "feat",
+        "content": "React 状态页同步嵌套 API 结构，新增 weread shelf 展示"
+      },
+      {
+        "type": "feat",
+        "content": "页面隐藏时暂停背景自动切换"
+      },
+      {
+        "type": "feat",
+        "content": "修复 SSE 地址错误"
+      },
+      {
+        "type": "refactor",
+        "content": "后端服务层拆分为独立包模块（user、weread、friend_link），统一响应格式和错误处理"
+      },
+      {
+        "type": "refactor",
+        "content": "提取 SSE 事件格式化、FriendLinkRepo、中间件/路由为独立模块，清理 main.py"
+      },
+      {
+        "type": "refactor",
+        "content": "移除遗留 v1 Book CRUD，BentoReadingList 迁移至 v2 weread API；清理遗留 try/except 和旧表"
+      },
+      {
+        "type": "refactor",
+        "content": "前端移除 service 层，直接调用 gateway；整合 fishing_service"
+      },
+      {
+        "type": "fix",
+        "content": "解决 Beanie 2.x 兼容性和微信读书导入/查询问题"
+      },
+      {
+        "type": "fix",
+        "content": "修复 readProgress 类型注解冲突、类型错误"
+      },
+      {
+        "type": "fix",
+        "content": "天气分析请求添加 CSRF token 和认证信息"
+      }
+    ]
+  }
+]
