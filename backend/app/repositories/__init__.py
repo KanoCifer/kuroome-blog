@@ -1,31 +1,35 @@
 from app.repositories.admin_repo import AdminRepo
 from app.repositories.ai_repo import AiRepo
 from app.repositories.blog_repo import BlogRepo
+from app.repositories.device_repo import DeviceRepo
+from app.repositories.devtask_repo import DevTaskRepo
 from app.repositories.fishing_repo import FishingRepo
+from app.repositories.friendlink_repo import FriendLinkRepo
 from app.repositories.gallery_repo import GalleryRepo
 from app.repositories.message_repo import MessageRepo
 from app.repositories.monitor_repo import MonitorRepo
+from app.repositories.notification_repo import NotificationRepo
 from app.repositories.public_repo import PublicRepo
 from app.repositories.rss_repo import RssRepo
 from app.repositories.sub_repo import SubRepo
-from app.repositories.devtask_repo import DevTaskRepo
-from app.repositories.user_repo import UserRepo
-from app.repositories.friendlink_repo import FriendLinkRepo
+from app.repositories.user import UserRepo
 from app.repositories.weread import WereadRepo
 
 __all__ = [
     "AdminRepo",
     "AiRepo",
     "BlogRepo",
+    "DevTaskRepo",
+    "DeviceRepo",
     "FishingRepo",
+    "FriendLinkRepo",
     "GalleryRepo",
     "MessageRepo",
     "MonitorRepo",
+    "NotificationRepo",
     "PublicRepo",
     "RssRepo",
     "SubRepo",
-    "DevTaskRepo",
-    "FriendLinkRepo",
     "UserRepo",
     "WereadRepo",
 ]

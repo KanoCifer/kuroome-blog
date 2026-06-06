@@ -3,26 +3,22 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from fastapi import Request
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from werkzeug.security import generate_password_hash
 
 from app.core import logger
-from app.models.models import PasskeyCredential, Profile, User
+from app.models.models import User
 
 
-class UserRepo:
-    """用户数据访问层，封装所有用户相关的数据库查询操作。"""
+class UserMixin:
+    """User 表 CRUD 操作。"""
 
-    def __init__(self, session: AsyncSession) -> None:
-        """
-        :param session: SQLAlchemy 异步会话实例
-        """
-        self.session: AsyncSession = session
+    session: AsyncSession
 
     # ------------------------------------------------------------------ #
-    # User CRUD
+    # Query
     # ------------------------------------------------------------------ #
 
     async def get_by_id(
@@ -103,6 +99,8 @@ class UserRepo:
         :param email: 邮箱地址
         :return: 用户对象或 None
         """
+        from app.models.models import Profile
+
         result = await self.session.execute(
             select(User)
             .join(Profile)
@@ -113,6 +111,10 @@ class UserRepo:
             )
         )
         return result.scalar_one_or_none()
+
+    # ------------------------------------------------------------------ #
+    # Create / Update
+    # ------------------------------------------------------------------ #
 
     async def create_user(
         self,
@@ -177,8 +179,6 @@ class UserRepo:
         :param user_id: 用户 ID
         :param active: 是否在线
         """
-        from sqlalchemy import update
-
         stmt = update(User).where(User.id == user_id).values(active=active)
         await self.session.execute(stmt)
         await self.session.flush()
@@ -223,8 +223,6 @@ class UserRepo:
         :param user_id: 用户 ID
         :param username: 新的用户名
         """
-        from sqlalchemy import update
-
         stmt = update(User).where(User.id == user_id).values(username=username)
         await self.session.execute(stmt)
         await self.session.flush()
@@ -238,8 +236,6 @@ class UserRepo:
         :param user_id: 用户 ID
         :param name: 新的显示名称
         """
-        from sqlalchemy import update
-
         stmt = update(User).where(User.id == user_id).values(name=name)
         await self.session.execute(stmt)
         await self.session.flush()
@@ -253,8 +249,6 @@ class UserRepo:
         :param user_id: 用户 ID
         :param password: 明文密码（会自动哈希）
         """
-        from sqlalchemy import update
-
         stmt = (
             update(User)
             .where(User.id == user_id)
@@ -264,101 +258,8 @@ class UserRepo:
         await self.session.flush()
 
     # ------------------------------------------------------------------ #
-    # Profile CRUD
+    # Misc
     # ------------------------------------------------------------------ #
-
-    async def get_profile(self, user_id: int) -> Profile | None:
-        """
-        根据用户 ID 查询 Profile。
-
-        :param user_id: 用户 ID
-        :return: Profile 对象或 None
-        """
-        result = await self.session.execute(
-            select(Profile).where(Profile.user_id == user_id)
-        )
-        return result.scalar_one_or_none()
-
-    async def create_profile(
-        self,
-        user_id: int,
-        email: str | None = None,
-        photo: str | None = "default.png",
-    ) -> Profile:
-        """
-        创建用户 Profile。
-
-        :param user_id: 用户 ID
-        :param email: 邮箱地址
-        :param photo: 头像文件名，默认 "default.png"
-        :return: 已创建的 Profile 对象
-        """
-        profile = Profile(user_id=user_id)
-        if email:
-            profile.email = email
-        if photo:
-            profile.photo = photo
-        self.session.add(profile)
-        return profile
-
-    async def ensure_profile(self, user: User) -> Profile:
-        """
-        确保用户有 Profile，不存在则自动创建。
-
-        :param user: 用户对象
-        :return: Profile 对象
-        """
-        if not user.profile:
-            profile = Profile(user_id=user.id)
-            self.session.add(profile)
-            await self.session.flush()
-            await self.session.refresh(user)
-            return profile
-        return user.profile
-
-    async def update_profile(
-        self,
-        profile: Profile,
-        *,
-        email: str | None = None,
-        gender: str | None = None,
-        mobile: str | None = None,
-        photo: str | None = None,
-    ) -> None:
-        """
-        更新 Profile 字段（仅更新非 None 的字段）。
-
-        :param profile: Profile 对象
-        :param email: 邮箱地址
-        :param gender: 性别
-        :param mobile: 手机号
-        :param photo: 头像文件名
-        """
-        if email is not None:
-            profile.email = email
-        if gender is not None:
-            profile.gender = gender
-        if mobile is not None:
-            profile.mobile = mobile
-        if photo is not None:
-            profile.photo = photo
-
-    async def is_email_taken(
-        self, email: str, *, exclude_user_id: int | None = None
-    ) -> bool:
-        """
-        检查邮箱是否已被占用。
-
-        :param email: 邮箱地址
-        :param exclude_user_id: 排除的用户 ID（更新自身时使用）
-        :return: True 表示已被占用
-        """
-        stmt = select(Profile).where(Profile.email == email)
-        result = await self.session.execute(stmt)
-        profile = result.scalar_one_or_none()
-        if profile is None:
-            return False
-        return not (exclude_user_id and profile.user_id == exclude_user_id)
 
     async def is_username_taken(
         self, username: str, *, exclude_user_id: int | None = None
@@ -376,93 +277,6 @@ class UserRepo:
         if user is None:
             return False
         return not (exclude_user_id and user.id == exclude_user_id)
-
-    # ------------------------------------------------------------------ #
-    # Passkey CRUD
-    # ------------------------------------------------------------------ #
-
-    async def get_passkey_by_user_id(
-        self, user_id: int
-    ) -> PasskeyCredential | None:
-        """
-        根据用户 ID 查询 Passkey 凭证。
-
-        :param user_id: 用户 ID
-        :return: PasskeyCredential 对象或 None
-        """
-        result = await self.session.execute(
-            select(PasskeyCredential).where(
-                PasskeyCredential.user_id == user_id
-            )
-        )
-        return result.scalar_one_or_none()
-
-    async def get_passkey_by_credential_id(
-        self, credential_id: str
-    ) -> PasskeyCredential | None:
-        """
-        根据凭证 ID 查询 Passkey，预加载 User 和 Profile。
-
-        :param credential_id: Passkey 凭证 ID
-        :return: PasskeyCredential 对象或 None
-        """
-        result = await self.session.execute(
-            select(PasskeyCredential)
-            .where(PasskeyCredential.credential_id == credential_id)
-            .options(
-                selectinload(PasskeyCredential.user).selectinload(
-                    User.profile
-                ),
-                selectinload(PasskeyCredential.user).selectinload(
-                    User.passkey_credential
-                ),
-            )
-        )
-        return result.scalar_one_or_none()
-
-    async def create_passkey(
-        self,
-        user_id: int,
-        credential_id: str,
-        public_key: str,
-        sign_count: int,
-    ) -> PasskeyCredential:
-        """
-        创建 Passkey 凭证。
-
-        :param user_id: 用户 ID
-        :param credential_id: 凭证 ID（Base64URL 编码）
-        :param public_key: 公钥（Base64URL 编码）
-        :param sign_count: 签名计数器初始值
-        :return: 已创建的 PasskeyCredential 对象
-        """
-        credential = PasskeyCredential(
-            user_id=user_id,
-            credential_id=credential_id,
-            public_key=public_key,
-            sign_count=sign_count,
-        )
-        self.session.add(credential)
-        return credential
-
-    async def update_passkey_sign_count(
-        self, credential: PasskeyCredential, sign_count: int
-    ) -> None:
-        """
-        更新 Passkey 签名计数器。
-
-        :param credential: PasskeyCredential 对象
-        :param sign_count: 新的签名计数值
-        """
-        credential.sign_count = sign_count
-
-    async def delete_passkey(self, credential: PasskeyCredential) -> None:
-        """
-        删除 Passkey 凭证。
-
-        :param credential: PasskeyCredential 对象
-        """
-        await self.session.delete(credential)
 
     async def refresh_user(self, user: User) -> None:
         """

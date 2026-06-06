@@ -1,14 +1,14 @@
 from collections.abc import Sequence
 from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.des.db import AsyncSession
 from app.models.models import DeviceTrack
 
 
 class DeviceRepo:
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.session: AsyncSession = session
 
     async def create_device_track(self, user_id: int, **data) -> DeviceTrack:
@@ -32,11 +32,8 @@ class DeviceRepo:
 
     async def delete_device_tracks_by_user_id(self, user_id: int) -> None:
         """根据用户ID删除设备跟踪记录"""
-        stmt = select(DeviceTrack).where(DeviceTrack.user_id == user_id)
-        result = await self.session.execute(stmt)
-        device_tracks = result.scalars().all()
-        for device_track in device_tracks:
-            await self.session.delete(device_track)
+        stmt = delete(DeviceTrack).where(DeviceTrack.user_id == user_id)
+        await self.session.execute(stmt)
         await self.session.flush()
 
     async def delete_device_track_by_id(self, track_id: int) -> bool:

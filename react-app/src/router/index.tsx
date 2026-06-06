@@ -6,6 +6,8 @@ import {
   Analytics,
   BlogList,
   BlogPost,
+  BookShelf,
+  BookStats,
   Changelog,
   DeviceTracker,
   FishingMap,
@@ -157,6 +159,16 @@ export const router = createBrowserRouter([
       {
         path: '/device-tracker',
         element: <DeviceTracker />,
+        loader: authLoader,
+      },
+      {
+        path: '/bookshelf',
+        element: <BookShelf />,
+        loader: authLoader,
+      },
+      {
+        path: '/bookshelf/stats',
+        element: <BookStats />,
         loader: authLoader,
       },
       {

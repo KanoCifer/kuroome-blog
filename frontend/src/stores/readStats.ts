@@ -42,12 +42,39 @@ export const useReadStatsStore = defineStore('readStats', () => {
     }
   }
 
+  // 读过/读完/笔记等统计
+  const readStatItems = computed(() => weeklySnapshot.value?.readStat ?? []);
+
+  // 偏好作者
+  const preferAuthors = computed(
+    () => weeklySnapshot.value?.preferAuthor ?? [],
+  );
+
+  // 偏好出版社
+  const preferPublishers = computed(
+    () => weeklySnapshot.value?.preferPublisher ?? [],
+  );
+
+  // 文字/听书时长
+  const readListenRatio = computed(() => {
+    const s = weeklySnapshot.value;
+    if (!s) return { read: 0, listen: 0 };
+    return {
+      read: s.wrReadTime ?? 0,
+      listen: s.wrListenTime ?? 0,
+    };
+  });
+
   return {
     snapshots,
     isLoading,
     error,
     snapshotByMode,
     weeklySnapshot,
+    readStatItems,
+    preferAuthors,
+    preferPublishers,
+    readListenRatio,
     fetchStats,
   };
 });

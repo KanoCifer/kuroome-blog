@@ -10,12 +10,14 @@ from app.repositories import (
     AdminRepo,
     AiRepo,
     BlogRepo,
+    DeviceRepo,
     DevTaskRepo,
     FishingRepo,
     FriendLinkRepo,
     GalleryRepo,
     MessageRepo,
     MonitorRepo,
+    NotificationRepo,
     PublicRepo,
     RssRepo,
     SubRepo,
@@ -151,13 +153,10 @@ async def get_ai_service(
 @asynccontextmanager
 async def get_notification_service(dispatcher=None):
     from app.notification.dispatcher import NotificationDispatcher
+    from app.services.notification_service import NotificationService
 
     async with get_async_session() as session:
-        from app.repositories.notification_repo import NotificationRepo
-
         repo = NotificationRepo(session)
-        from app.services.notification_service import NotificationService
-
         _dispatcher = dispatcher or NotificationDispatcher()
         service = NotificationService(_dispatcher, repo=repo)
         yield service
@@ -165,12 +164,10 @@ async def get_notification_service(dispatcher=None):
 
 @asynccontextmanager
 async def get_device_service():
-    from app.repositories.device_repo import DeviceRepo
+    from app.services.device_service import DeviceService
 
     async with get_async_session() as session:
         repo = DeviceRepo(session)
-        from app.services.device_service import DeviceService
-
         service = DeviceService(repo=repo)
         yield service
 

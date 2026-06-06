@@ -15,7 +15,7 @@ from app.models.models import RssInfo
 class RssRepo:
     """RSS 相关的数据库操作类，负责与数据库进行交互以管理 RSS 文章数据。"""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         """获取异步数据库会话实例，并在后续方法中使用该会话进行数据库操作。"""
         self.session: AsyncSession = session
 

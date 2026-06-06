@@ -76,7 +76,7 @@
       class="border-border bg-card mx-auto mt-6 mb-4 w-[calc(100%-2rem)] max-w-6xl cursor-pointer rounded-2xl border p-4 shadow-sm transition-shadow hover:shadow-md sm:px-6 md:mt-8 md:mb-6 md:px-10"
       @click="router.push('/bookshelf/stats')"
     >
-      <div class="flex items-center gap-6">
+      <div class="flex items-center gap-4 sm:gap-6">
         <div class="flex-1">
           <p class="text-muted-foreground mb-1 text-xs">本周阅读</p>
           <p class="text-foreground text-xl font-bold">
@@ -84,7 +84,18 @@
           </p>
         </div>
         <div class="bg-border h-10 w-px" />
-        <div v-if="latestBook" class="flex min-w-0 flex-1 items-center gap-3">
+        <div class="flex-1">
+          <p class="text-muted-foreground mb-1 text-xs">阅读天数</p>
+          <p class="text-foreground text-xl font-bold">
+            {{ weeklySnapshot.readDays ?? 0 }}
+            <span class="text-muted-foreground text-xs font-normal">天</span>
+          </p>
+        </div>
+        <div class="bg-border hidden h-10 w-px sm:block" />
+        <div
+          v-if="latestBook"
+          class="hidden min-w-0 flex-1 items-center gap-3 sm:flex"
+        >
           <img
             v-if="latestBook.cover"
             :src="latestBook.cover"

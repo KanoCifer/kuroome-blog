@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from beanie import SortDirection
+from beanie import FindMany, SortDirection
 from bson import ObjectId
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -35,7 +35,7 @@ class AdminRepo:
     async def delete_post_by_id(self, post_id: ObjectId) -> None:
         await Post.find_one(Post.id == post_id).delete()
 
-    def get_recent_posts(self, limit: int = 100):
+    def get_recent_posts(self, limit: int = 100) -> FindMany[Post]:
         return (
             Post.find()
             .sort([("created_at", SortDirection.DESCENDING)])

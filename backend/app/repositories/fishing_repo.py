@@ -8,9 +8,6 @@ from app.models.fishing import FishingRecord
 
 
 class FishingRepo:
-    def __init__(self) -> None:
-        pass
-
     async def save_fishing_record(self, record: dict) -> ObjectId:
         """保存钓鱼记录到 MongoDB"""
         doc = FishingRecord(**record)

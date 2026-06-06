@@ -227,6 +227,140 @@
               </div>
             </div>
           </div>
+
+          <!-- Read/Listen Ratio -->
+          <div
+            v-if="hasReadListenData"
+            class="bg-card mb-6 rounded-xl p-4 sm:p-6"
+          >
+            <h3 class="text-foreground mb-4 text-sm font-medium">
+              阅读方式
+            </h3>
+            <div class="flex items-center gap-6">
+              <div class="flex-1">
+                <div class="mb-2 flex items-center justify-between">
+                  <span class="text-muted-foreground text-xs">文字阅读</span>
+                  <span class="text-foreground text-sm font-medium">
+                    {{ formatDuration(activeSnapshot.wrReadTime) }}
+                  </span>
+                </div>
+                <div class="bg-muted h-2 overflow-hidden rounded-full">
+                  <div
+                    class="bg-primary h-full rounded-full transition-all"
+                    :style="{ width: `${readPercent}%` }"
+                  />
+                </div>
+              </div>
+              <div class="flex-1">
+                <div class="mb-2 flex items-center justify-between">
+                  <span class="text-muted-foreground text-xs">听书</span>
+                  <span class="text-foreground text-sm font-medium">
+                    {{ formatDuration(activeSnapshot.wrListenTime) }}
+                  </span>
+                </div>
+                <div class="bg-muted h-2 overflow-hidden rounded-full">
+                  <div
+                    class="bg-success h-full rounded-full transition-all"
+                    :style="{ width: `${listenPercent}%` }"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Read Stat Summary -->
+          <div
+            v-if="activeSnapshot.readStat && activeSnapshot.readStat.length > 0"
+            class="bg-card mb-6 rounded-xl p-4 sm:p-6"
+          >
+            <h3 class="text-foreground mb-4 text-sm font-medium">阅读概览</h3>
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <div
+                v-for="stat in activeSnapshot.readStat"
+                :key="stat.label"
+                class="text-center"
+              >
+                <p class="text-foreground text-2xl font-bold">
+                  {{ stat.value }}
+                </p>
+                <p class="text-muted-foreground text-xs">{{ stat.label }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prefer Authors -->
+          <div
+            v-if="
+              activeSnapshot.preferAuthor &&
+              activeSnapshot.preferAuthor.length > 0
+            "
+            class="bg-card mb-6 rounded-xl p-4 sm:p-6"
+          >
+            <h3 class="text-foreground mb-4 text-sm font-medium">
+              偏好作者
+            </h3>
+            <div class="space-y-3">
+              <div
+                v-for="(author, index) in activeSnapshot.preferAuthor.slice(
+                  0,
+                  5,
+                )"
+                :key="author.authorId ?? index"
+                class="flex items-center justify-between"
+              >
+                <div class="flex items-center gap-3">
+                  <span
+                    class="bg-muted text-muted-foreground flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium"
+                  >
+                    {{ index + 1 }}
+                  </span>
+                  <span class="text-foreground text-sm font-medium">
+                    {{ author.name ?? '未知作者' }}
+                  </span>
+                </div>
+                <span class="text-muted-foreground text-sm">
+                  {{ author.readingTime ?? '--' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prefer Publishers -->
+          <div
+            v-if="
+              activeSnapshot.preferPublisher &&
+              activeSnapshot.preferPublisher.length > 0
+            "
+            class="bg-card mb-6 rounded-xl p-4 sm:p-6"
+          >
+            <h3 class="text-foreground mb-4 text-sm font-medium">
+              偏好出版社
+            </h3>
+            <div class="space-y-3">
+              <div
+                v-for="(pub, index) in activeSnapshot.preferPublisher.slice(
+                  0,
+                  5,
+                )"
+                :key="pub.name ?? index"
+                class="flex items-center justify-between"
+              >
+                <div class="flex items-center gap-3">
+                  <span
+                    class="bg-muted text-muted-foreground flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium"
+                  >
+                    {{ index + 1 }}
+                  </span>
+                  <span class="text-foreground text-sm font-medium">
+                    {{ pub.name ?? '未知出版社' }}
+                  </span>
+                </div>
+                <span class="text-muted-foreground text-sm">
+                  {{ pub.count }} 本
+                </span>
+              </div>
+            </div>
+          </div>
         </template>
       </div>
     </div>
@@ -313,6 +447,24 @@ function formatDuration(seconds: number | null): string {
   if (h > 0) return `${h}h ${m}m`;
   return `${m}m`;
 }
+
+// Read/Listen ratio
+const hasReadListenData = computed(() => {
+  const s = activeSnapshot.value;
+  return s && ((s.wrReadTime ?? 0) > 0 || (s.wrListenTime ?? 0) > 0);
+});
+
+const readPercent = computed(() => {
+  const s = activeSnapshot.value;
+  if (!s) return 0;
+  const read = s.wrReadTime ?? 0;
+  const listen = s.wrListenTime ?? 0;
+  const total = read + listen;
+  if (total === 0) return 0;
+  return Math.round((read / total) * 100);
+});
+
+const listenPercent = computed(() => 100 - readPercent.value);
 
 function formatCompare(val: number | null): string {
   if (val == null) return '--';
