@@ -16,7 +16,7 @@ import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 import DelIcon from '@/components/icons/DelIcon.vue';
 import EditIcon from '@/components/icons/EditIcon.vue';
 import { blogGateway } from '@/api/blogGateway';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/auth/stores/auth';
 import { useNotificationStore } from '@/stores/notification';
 import type { Post } from '@/types';
 import { formatDate } from '@/utils/formatdate';

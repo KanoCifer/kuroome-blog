@@ -19,6 +19,7 @@ interface LoginResponseData {
   gender?: string | null;
   mobile?: string | null;
   photo?: string | null;
+  access_token: string;
   refresh_token: string;
   has_passkey: boolean;
   github_bound: boolean;
@@ -26,12 +27,14 @@ interface LoginResponseData {
 
 export interface LoginResult {
   user: UserInfo | null;
+  accessToken: string;
   refreshToken: string;
   raw: LoginResponseData | undefined;
 }
 
 export interface PasskeyLoginResult {
   user: UserInfo | null;
+  accessToken: string;
   refreshToken: string;
   raw: LoginResponseData | undefined;
 }
@@ -56,15 +59,16 @@ const extractData = (res: { data: ApiResponse<unknown> }): unknown => {
 };
 
 const buildLoginResult = (data: LoginResponseData): LoginResult => {
-  const { refresh_token, ...userFields } = data;
+  const { access_token, refresh_token, ...userFields } = data;
   return {
     user: userFields as UserInfo,
+    accessToken: access_token,
     refreshToken: refresh_token,
     raw: data,
   };
 };
 const emptyLoginResult = (): LoginResult => {
-  return { user: null, refreshToken: '', raw: undefined };
+  return { user: null, accessToken: '', refreshToken: '', raw: undefined };
 };
 
 export function createAuthGateway(): AuthGateway {

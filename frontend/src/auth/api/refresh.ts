@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { setAccessToken } from '@/auth/tokenService';
 
 const refreshTokenEndpoint = 'v1/auth/refresh-token';
 
@@ -26,10 +27,13 @@ export async function refreshAccessToken() {
 }
 
 export async function refreshToken(): Promise<void> {
-  // refresh_token 从 cookie 自动发送（带 domain），后端从 cookie 读取
-  await refreshRequest.get(refreshTokenEndpoint, {
+  const res = await refreshRequest.get(refreshTokenEndpoint, {
     _isRefreshToken: true,
   });
+  const accessToken = res.data?.data?.access_token;
+  if (accessToken) {
+    setAccessToken(accessToken);
+  }
 }
 
 export function isrefreshTokenRequest(config: {

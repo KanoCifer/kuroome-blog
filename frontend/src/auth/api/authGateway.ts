@@ -21,21 +21,21 @@ interface LoginResponseData {
   gender?: string | null;
   mobile?: string | null;
   photo?: string | null;
-  refresh_token: string;
+  access_token: string;
   has_passkey: boolean;
   github_bound: boolean;
 }
 
 export interface LoginResult {
   user: UserInfo | null;
-  refreshToken: string;
   raw: LoginResponseData | undefined;
+  accessToken: string;
 }
 
 export interface PasskeyLoginResult {
   user: UserInfo | null;
-  refreshToken: string;
   raw: LoginResponseData | undefined;
+  accessToken: string;
 }
 
 // ------------------------------------------------------------------ #
@@ -47,16 +47,16 @@ function unwrapEnvelope<T>(res: { data: Envelope<T> }): T | undefined {
 }
 
 function buildLoginResult(data: LoginResponseData): LoginResult {
-  const { refresh_token, ...userFields } = data;
+  const { ...userFields } = data;
   return {
     user: userFields as UserInfo,
-    refreshToken: refresh_token,
     raw: data,
+    accessToken: data.access_token,
   };
 }
 
 function emptyLoginResult(): LoginResult {
-  return { user: null, refreshToken: '', raw: undefined };
+  return { user: null, raw: undefined, accessToken: '' };
 }
 
 // ------------------------------------------------------------------ #

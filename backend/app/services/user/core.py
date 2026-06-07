@@ -6,7 +6,7 @@ from datetime import timedelta
 from fastapi import Request
 from redis.asyncio import Redis as AsyncRedis
 
-from app.api.des.auth import manager
+from app.api.des.auth import create_access_token, resolve_user_from_token
 from app.models.models import Profile, User
 from app.repositories.user import UserRepo
 from app.schemas.schemas import UserSettingsIn
@@ -52,18 +52,18 @@ class UserService:
         Otherwise, 12 hours / 7 days.
         """
         if remember_me:
-            access_token = manager.create_access_token(
-                data={"sub": str(user.id)}, expires=timedelta(days=7)
+            access_token = create_access_token(
+                sub=str(user.id), expires=timedelta(days=7)
             )
-            refresh_token = manager.create_access_token(
-                data={"sub": str(user.id)}, expires=timedelta(days=30)
+            refresh_token = create_access_token(
+                sub=str(user.id), expires=timedelta(days=30)
             )
         else:
-            access_token = manager.create_access_token(
-                data={"sub": str(user.id)}, expires=timedelta(hours=12)
+            access_token = create_access_token(
+                sub=str(user.id), expires=timedelta(hours=12)
             )
-            refresh_token = manager.create_access_token(
-                data={"sub": str(user.id)}, expires=timedelta(days=7)
+            refresh_token = create_access_token(
+                sub=str(user.id), expires=timedelta(days=7)
             )
         return {
             "access_token": access_token,
@@ -244,7 +244,7 @@ class UserService:
         authenticate_user().
         """
         try:
-            user = await manager.get_current_user(token)
+            user = await resolve_user_from_token(token)
         except Exception:
             return None
         if user is None:

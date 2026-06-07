@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { authGateway } from '@/api/authGateway';
+import { authGateway } from '@/auth/api/authGateway';
 import IconCloud from '@/components/icons/IconCloud.vue';
 import IconLock from '@/components/icons/IconLock.vue';
 import { useNotificationStore } from '@/stores/notification';

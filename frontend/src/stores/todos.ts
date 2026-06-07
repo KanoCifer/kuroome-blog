@@ -4,7 +4,7 @@ import {
   type DevTask,
   type DevTaskStatus,
 } from '@/api/todoGateway';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/auth/stores/auth';
 import { useNotificationStore } from '@/stores/notification';
 import { useStorage } from '@vueuse/core';
 import { defineStore } from 'pinia';

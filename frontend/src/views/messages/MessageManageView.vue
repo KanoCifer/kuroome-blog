@@ -224,7 +224,7 @@
 import CommentsTab from '@/components/message/CommentsTab.vue';
 import MessagesTab from '@/components/message/MessagesTab.vue';
 import { messageGateway } from '@/api/messageGateway';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/auth/stores/auth';
 import type { Comment, Message } from '@/types';
 import { useScroll } from '@vueuse/core';
 import dayjs from 'dayjs';

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { messageGateway } from '@/api/messageGateway';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/auth/stores/auth';
 import type { Message } from '@/types';
 import { formatDate } from '@/utils/formatdate';
 import { onMounted, ref } from 'vue';

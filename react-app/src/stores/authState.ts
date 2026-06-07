@@ -1,7 +1,7 @@
 import { createAuthGateway } from '@/auth/authGateway';
+import { tokenService } from '@/auth/tokenService';
 import type { UserInfo } from '@/auth/types';
 import { userCache } from '@/auth/userCache';
-import { saveRefreshTokenToStorage } from '@/auth/refreshToken';
 import type { PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/browser';
 import { create } from 'zustand';
 
@@ -77,9 +77,9 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   login: async (username, password, rememberMe) => {
     const result = await authGateway.login(username, password, rememberMe);
-    // 登录成功后更新状态、保存 refresh token 和 userCache
-    if (result.refreshToken) {
-      saveRefreshTokenToStorage(result.refreshToken);
+    // 登录成功后更新状态、保存 access token 和 userCache
+    if (result.accessToken) {
+      tokenService.save(result.accessToken);
     }
     if (result.user) {
       userCache.set(result.user);
@@ -93,6 +93,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: () => {
     if (isLoggingOut) return;
     isLoggingOut = true;
+    tokenService.clear();
     userCache.clear();
     authGateway
       .logout()
@@ -111,9 +112,9 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   loginWithPasskey: async (assertion: unknown) => {
     const result = await authGateway.loginWithPasskey(assertion);
-    // 登录成功后更新状态、保存 refresh token 和 userCache
-    if (result.refreshToken) {
-      saveRefreshTokenToStorage(result.refreshToken);
+    // 登录成功后更新状态、保存 access token 和 userCache
+    if (result.accessToken) {
+      tokenService.save(result.accessToken);
     }
     if (result.user) {
       userCache.set(result.user);

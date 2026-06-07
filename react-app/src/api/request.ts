@@ -1,8 +1,7 @@
 import axios, { AxiosError } from 'axios';
-import { getRefreshTokenFromStorage } from '../auth/refreshToken';
 import { fetchAndStoreCSRF } from './csrf';
 import { isrefreshTokenRequest, refreshAccessToken } from './refresh';
-// keep latest CSRF token so it can be sent in headers
+import { tokenService } from '../auth/tokenService';
 
 export interface ApiResponse<T = unknown> {
   status: 'success' | 'error';
@@ -21,6 +20,15 @@ const request = axios.create({
   baseURL: import.meta.env.VITE_API_BASE || '/api',
   timeout: 10000,
   withCredentials: true,
+});
+
+// 动态注入 Authorization header
+request.interceptors.request.use((config) => {
+  const token = tokenService.get();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 request.interceptors.response.use(
@@ -62,11 +70,6 @@ request.interceptors.response.use(
     ) {
       // 标记已重试，防止无限循环
       _cfg._retry = true;
-
-      const refreshToken = getRefreshTokenFromStorage();
-      if (!refreshToken) {
-        return Promise.reject(error);
-      }
 
       try {
         await refreshAccessToken();

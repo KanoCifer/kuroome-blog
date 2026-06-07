@@ -475,7 +475,7 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import { galleryGateway } from '@/api/galleryGateway';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/auth/stores/auth';
 import { useNotificationStore } from '@/stores/notification';
 import dayjs from 'dayjs';
 import {

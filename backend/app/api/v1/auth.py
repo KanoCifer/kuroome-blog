@@ -16,7 +16,11 @@ from fastapi import (
 from fastapi.responses import JSONResponse, RedirectResponse
 from webauthn.helpers import options_to_json_dict
 
-from app.api.des.auth import manager
+from app.api.des.auth import (
+    ACCESS_TOKEN_COOKIE,
+    manager,
+    resolve_user_from_token,
+)
 from app.api.des.csrf import csrf_manager
 from app.api.des.des import user_service_dep, user_services_dep
 from app.api.des.limiter import limiter
@@ -58,9 +62,9 @@ def _build_login_response(
     data is assembled by UserService.build_login_data() — this function
     only handles HTTP presentation concerns (cookies, response envelope).
     """
+    data["access_token"] = access_token
     response: JSONResponse = APIResponse.ok(data=data, message=message)
     cookie_domain = settings.COOKIE_DOMAIN
-    manager.set_cookie(response=response, token=access_token)
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
@@ -114,10 +118,12 @@ async def refresh_token(
 
     response: JSONResponse = APIResponse.ok(
         message="访问令牌已刷新",
-        data={"refresh_token": tokens["refresh_token"]},
+        data={
+            "access_token": tokens["access_token"],
+            "refresh_token": tokens["refresh_token"],
+        },
     )
     cookie_domain = settings.COOKIE_DOMAIN
-    manager.set_cookie(response=response, token=tokens["access_token"])
     response.set_cookie(
         key="refresh_token",
         value=tokens["refresh_token"],
@@ -174,7 +180,7 @@ async def logout(
     )
     response.delete_cookie(key="refresh_token", domain=cookie_domain or None)
     response.delete_cookie(
-        key=manager.cookie_name, domain=cookie_domain or None
+        key=ACCESS_TOKEN_COOKIE, domain=cookie_domain or None
     )
     return response
 
@@ -492,9 +498,13 @@ async def github_callback(
     oauth_mode = request.session.pop("oauth_mode", "login")
 
     if oauth_mode == "bind":
-        try:
-            current_user = await manager(request)
-        except Exception:
+        refresh_token = request.cookies.get("refresh_token")
+        if not refresh_token:
+            return RedirectResponse(
+                url=settings.FRONTEND_URL + "/settings?error=not_logged_in"
+            )
+        current_user = await resolve_user_from_token(refresh_token)
+        if current_user is None:
             return RedirectResponse(
                 url=settings.FRONTEND_URL + "/settings?error=not_logged_in"
             )
@@ -519,7 +529,6 @@ async def github_callback(
 
         response = RedirectResponse(url=settings.FRONTEND_URL)
         cookie_domain = settings.COOKIE_DOMAIN
-        manager.set_cookie(response=response, token=tokens["access_token"])
         response.set_cookie(
             key="refresh_token",
             value=tokens["refresh_token"],

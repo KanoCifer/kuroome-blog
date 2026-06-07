@@ -85,7 +85,7 @@
 
 <script setup lang="ts">
 import { ChevronDownIcon } from '@/components/icons';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/auth/stores/auth';
 import type { Component } from 'vue';
 import { computed, onUnmounted, ref } from 'vue';
 

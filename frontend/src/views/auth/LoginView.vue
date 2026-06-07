@@ -6,7 +6,7 @@ import type { LoginForm } from '@/types';
 import { ShieldUser } from '@lucide/vue';
 import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
-import { useAuthenticate } from '@/composables/useAuthenticate';
+import { useAuthenticate } from '@/auth/composables/useAuthenticate';
 
 const {
   errors,

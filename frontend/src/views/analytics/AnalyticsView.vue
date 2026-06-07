@@ -455,7 +455,7 @@
 import BasicDetail from '@/components/basic/BasicDetail.vue';
 import IconUser from '@/components/icons/IconUser.vue';
 import { analyticsGateway } from '@/api/analyticsGateway';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/auth/stores/auth';
 import dayjs from 'dayjs';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';

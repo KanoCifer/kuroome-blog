@@ -64,7 +64,7 @@ import {
   MessageIcon,
   RegisterIcon,
 } from '@/components/icons';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/auth/stores/auth';
 import { Image } from '@lucide/vue';
 import { Motion, type MotionProps } from 'motion-v';
 import { onUnmounted, ref, watch } from 'vue';

@@ -553,8 +553,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { authGateway } from '@/api/authGateway';
-import { useAuthStore } from '@/stores/auth';
+import { authGateway } from '@/auth/api/authGateway';
+import { useAuthStore } from '@/auth/stores/auth';
 import type { ProfileForm } from '@/types';
 import { startRegistration } from '@simplewebauthn/browser';
 import { computed, onMounted, ref } from 'vue';

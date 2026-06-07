@@ -1,6 +1,6 @@
-import { createAuthGateway } from '@/api/authGateway';
+import { createAuthGateway } from '@/auth/api/authGateway';
 import { getAuthSideEffects } from '@/auth/sideEffects';
-import { tokenService } from '@/auth/tokenService';
+import { getAccessToken as getToken, setAccessToken } from '@/auth/tokenService';
 import { reconnectWs } from '@/plugins/visitorWs';
 import type { UserInfo } from '@/auth/types';
 import { userCache } from '@/auth/userCache';
@@ -16,15 +16,17 @@ export const useAuthStore = defineStore('auth', () => {
   const isHydrated = ref(false); // 是否初始化过
   const authGateway = createAuthGateway();
   const sideEffects = getAuthSideEffects();
-
+  const accessToken = ref('');
   const isAuthenticated = computed(() => !!user.value);
   const isAdmin = computed(() => !!user.value?.is_admin);
 
-  const saveRefreshToken = (token: string) => {
-    tokenService.save(token);
-  };
-
   // ---------------------- 方法（Actions） ----------------------
+  //
+  //
+  // 获取accessToken
+  const getAccessToken = () => {
+    return getToken();
+  };
 
   // 2. 获取当前登录用户信息
   async function fetchUser(
@@ -93,14 +95,13 @@ export const useAuthStore = defineStore('auth', () => {
       // 登录响应中已包含用户信息，直接使用并缓存
       const userData = res.user;
       user.value = userData;
+      accessToken.value = res.accessToken;
+      setAccessToken(res.accessToken);
       userCache.set(userData);
-
-      saveRefreshToken(res.refreshToken);
-
       // 启动心跳上报
       reconnectWs();
 
-      sideEffects.notifySuccess('登录成功');
+      sideEffects.notifySuccess('登录成功，欢迎回来！');
       return res.raw;
     } catch (error) {
       sideEffects.notifyError('登录失败');
@@ -117,10 +118,11 @@ export const useAuthStore = defineStore('auth', () => {
       const res = await authGateway.loginWithPasskey(assertion);
 
       await initCSRF();
-      saveRefreshToken(res.refreshToken);
 
       const userData = res.user;
       user.value = userData;
+      accessToken.value = res.accessToken;
+      setAccessToken(res.accessToken);
       userCache.set(userData);
 
       reconnectWs();
@@ -149,13 +151,12 @@ export const useAuthStore = defineStore('auth', () => {
       sideEffects.notifyError('登出失败');
     } finally {
       user.value = null;
+      accessToken.value = '';
+      setAccessToken('');
       userCache.clear();
 
       // 停止心跳上报
       reconnectWs();
-
-      // 清除刷新令牌
-      saveRefreshToken('');
 
       try {
         await sideEffects.navigateToHome();
@@ -188,5 +189,6 @@ export const useAuthStore = defineStore('auth', () => {
     loginWithGitHub,
     logout,
     refreshUser,
+    getAccessToken,
   };
 });

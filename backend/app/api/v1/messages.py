@@ -39,11 +39,11 @@ async def get_messages(
 async def create_message(
     request: Request,
     message_in: MessageIn,
-    user: User | None = Depends(manager),
+    user: User = Depends(manager),
     message_service: MessageService = Depends(message_service_dep),
 ):
     """Submit a new message to message board (pending review)."""
-    is_admin = user is not None and user.is_admin
+    is_admin = user.is_admin
 
     data = await message_service.create_message(message_in, is_admin)
 

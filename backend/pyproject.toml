@@ -29,7 +29,6 @@ dependencies = [
     "passlib[bcrypt]>=1.7.4",
     "cachetools>=7.0.5",
     "cryptography>=46.0.5",
-    "fastapi-login>=1.10.3",
     "fastapi-mail>=1.6.2",
     "slowapi>=0.1.9",
     "beanie>=2.0.1",
@@ -51,6 +50,7 @@ dependencies = [
     "numpy>=2.4.4",
     "scikit-learn>=1.8.0",
     "websockets>=16.0",
+    "pyjwt>=2.13.0",
 ]
 
 [tool.setuptools.packages.find]

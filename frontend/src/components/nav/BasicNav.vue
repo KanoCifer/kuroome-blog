@@ -56,7 +56,7 @@ import {
   ChangelogIcon,
   HomeIcon,
 } from '@/components/icons';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/auth/stores/auth';
 import { useDebounce } from '@vueuse/core';
 import { Image } from '@lucide/vue';
 import { motion } from 'motion-v';

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { fetchAndStoreCSRF } from '@/api/csrf';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/auth/stores/auth';
 import { useNotificationStore } from '@/stores/notification';
 import { AnimatePresence, motion } from 'motion-v';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';

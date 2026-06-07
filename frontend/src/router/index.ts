@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/auth/stores/auth';
 import { reportVisitorData } from '@/utils/visitorTracker';
 import {
   createMemoryHistory,

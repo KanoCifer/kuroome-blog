@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { blogGateway } from '@/api/blogGateway';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/auth/stores/auth';
 import { useNotificationStore } from '@/stores/notification';
 import { computed, ref } from 'vue';
 
