@@ -1,5 +1,3 @@
-import { configureAuthSideEffects } from '@/auth/sideEffects';
-import { useNotificationStore } from '@/stores/notification';
 import { createHead } from '@vueuse/head';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
@@ -27,16 +25,6 @@ const pinia = createPinia();
 const head = createHead();
 
 setActivePinia(pinia);
-const notifier = useNotificationStore(pinia);
-configureAuthSideEffects({
-  notifySuccess: (message: string) => {
-    notifier.success(message);
-  },
-  notifyError: (message: string) => {
-    notifier.error(message);
-  },
-  navigateToHome: async () => await router.push('/'),
-});
 
 app.use(pinia);
 app.use(router);

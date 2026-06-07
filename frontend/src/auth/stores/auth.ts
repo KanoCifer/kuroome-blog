@@ -1,9 +1,10 @@
 import { createAuthGateway } from '@/auth/api/authGateway';
-import { getAuthSideEffects } from '@/auth/sideEffects';
 import { getAccessToken as getToken, setAccessToken } from '@/auth/tokenService';
 import { reconnectWs } from '@/plugins/visitorWs';
 import type { UserInfo } from '@/auth/types';
 import { userCache } from '@/auth/userCache';
+import { useNotificationStore } from '@/stores/notification';
+import router from '@/router';
 import { isAxiosError } from 'axios';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
@@ -15,7 +16,7 @@ export const useAuthStore = defineStore('auth', () => {
   const loading = ref(false);
   const isHydrated = ref(false); // 是否初始化过
   const authGateway = createAuthGateway();
-  const sideEffects = getAuthSideEffects();
+  const notifier = useNotificationStore();
   const accessToken = ref('');
   const isAuthenticated = computed(() => !!user.value);
   const isAdmin = computed(() => !!user.value?.is_admin);
@@ -43,7 +44,7 @@ export const useAuthStore = defineStore('auth', () => {
       const status = isAxiosError(err) ? err.response?.status : undefined;
       const isUnauthenticated = status === 401;
       if (!(options.silentOnUnauthenticated && isUnauthenticated)) {
-        sideEffects.notifyError('登陆过期，请重新登录！');
+        notifier.error('登陆过期，请重新登录！');
       }
       user.value = null;
       userCache.clear();
@@ -70,7 +71,7 @@ export const useAuthStore = defineStore('auth', () => {
       await fetchUser({ silentOnUnauthenticated: true });
       isHydrated.value = true;
     } catch {
-      sideEffects.notifyError('认证初始化失败');
+      notifier.error('认证初始化失败');
       user.value = null;
       userCache.clear();
       isHydrated.value = true;
@@ -101,10 +102,10 @@ export const useAuthStore = defineStore('auth', () => {
       // 启动心跳上报
       reconnectWs();
 
-      sideEffects.notifySuccess('登录成功，欢迎回来！');
+      notifier.success('登录成功，欢迎回来！');
       return res.raw;
     } catch (error) {
-      sideEffects.notifyError('登录失败');
+      notifier.error('登录失败');
       throw error;
     } finally {
       loading.value = false;
@@ -127,10 +128,10 @@ export const useAuthStore = defineStore('auth', () => {
 
       reconnectWs();
 
-      sideEffects.notifySuccess('Passkey 登录成功！欢迎回来！');
+      notifier.success('Passkey 登录成功！欢迎回来！');
       return res.raw;
     } catch (error) {
-      sideEffects.notifyError('Passkey 登录失败');
+      notifier.error('Passkey 登录失败');
       throw error;
     } finally {
       loading.value = false;
@@ -148,7 +149,7 @@ export const useAuthStore = defineStore('auth', () => {
       await authGateway.logout(); // 调用后端登出接口
     } catch {
       // console.error("登出失败:", err);
-      sideEffects.notifyError('登出失败');
+      notifier.error('登出失败');
     } finally {
       user.value = null;
       accessToken.value = '';
@@ -159,12 +160,12 @@ export const useAuthStore = defineStore('auth', () => {
       reconnectWs();
 
       try {
-        await sideEffects.navigateToHome();
+        await router.push('/');
       } catch (error) {
         console.error('跳转首页失败:', error);
       }
 
-      sideEffects.notifySuccess('已退出登录');
+      notifier.success('已退出登录');
       loading.value = false;
     }
   }
