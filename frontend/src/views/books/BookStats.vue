@@ -117,7 +117,7 @@
 
         <template v-else-if="activeSnapshot">
           <!-- Mode Tabs -->
-          <div class="mb-6 flex gap-1 rounded-xl bg-card p-1">
+          <div class="mb-3 flex gap-1 rounded-xl bg-card p-1">
             <button
               v-for="mode in modes"
               :key="mode.key"
@@ -134,135 +134,503 @@
             </button>
           </div>
 
-          <!-- Summary Cards -->
-          <div class="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <div class="bg-card rounded-xl p-4">
-              <p class="text-muted-foreground mb-1 text-xs">总阅读时长</p>
-              <p class="text-foreground text-2xl font-bold">
-                {{ formatDuration(activeSnapshot.totalReadTime) }}
-              </p>
-            </div>
-            <div class="bg-card rounded-xl p-4">
-              <p class="text-muted-foreground mb-1 text-xs">阅读天数</p>
-              <p class="text-foreground text-2xl font-bold">
-                {{ activeSnapshot.readDays ?? 0 }}
-                <span class="text-muted-foreground text-sm font-normal">天</span>
-              </p>
-            </div>
-            <div class="bg-card rounded-xl p-4">
-              <p class="text-muted-foreground mb-1 text-xs">日均时长</p>
-              <p class="text-foreground text-2xl font-bold">
-                {{ formatDuration(activeSnapshot.dayAverageReadTime) }}
-              </p>
-            </div>
-            <div class="bg-card rounded-xl p-4">
-              <p class="text-muted-foreground mb-1 text-xs">环比变化</p>
-              <p
-                class="text-2xl font-bold"
-                :class="
-                  (activeSnapshot.compare ?? 0) >= 0
-                    ? 'text-success'
-                    : 'text-destructive'
-                "
+          <!-- Refresh action row -->
+          <div
+            class="text-muted-foreground mb-6 flex items-center justify-between text-xs"
+          >
+            <span class="tabular-nums">
+              <template v-if="lastRefreshedAt">
+                数据更新于 {{ lastRefreshedAt.format('HH:mm') }}
+              </template>
+              <template v-else>—</template>
+            </span>
+            <button
+              type="button"
+              class="border-border text-foreground hover:bg-accent hover:text-accent-foreground inline-flex items-center gap-1.5 rounded-lg border bg-card px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+              :disabled="statsStore.isLoading"
+              @click="handleRefresh"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                class="h-3.5 w-3.5"
+                :class="{ 'animate-spin': statsStore.isLoading }"
               >
-                {{ formatCompare(activeSnapshot.compare) }}
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182"
+                />
+              </svg>
+              刷新数据
+            </button>
+          </div>
+
+          <!-- Summary Metrics -->
+          <div class="mb-8 grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-4">
+            <div
+              v-for="metric in summaryMetrics"
+              :key="metric.key"
+              class="group bg-card hover:border-primary/40 relative overflow-hidden rounded-xl border p-4 transition-colors"
+            >
+              <div
+                class="absolute top-0 right-0 h-16 w-16 rounded-full opacity-[0.06] transition-opacity group-hover:opacity-[0.12]"
+                :class="metric.bgClass"
+              />
+              <p class="text-muted-foreground mb-1 text-xs">
+                {{ metric.label }}
+              </p>
+              <p
+                class="text-foreground relative text-2xl font-bold tabular-nums"
+              >
+                {{ metric.value }}
+                <span
+                  v-if="metric.unit"
+                  class="text-muted-foreground text-sm font-normal"
+                >
+                  {{ metric.unit }}
+                </span>
               </p>
             </div>
           </div>
 
-          <!-- Trend Chart -->
-          <div
-            v-if="activeSnapshot.readTimes"
-            class="bg-card mb-6 rounded-xl p-4 sm:p-6"
-          >
-            <h3 class="text-foreground mb-4 text-sm font-medium">阅读趋势</h3>
-            <div class="h-64 sm:h-80">
-              <v-chart :option="trendOption" autoresize />
+          <!-- Section: 阅读行为 -->
+          <div class="mb-8 space-y-6">
+            <h2
+              class="text-muted-foreground flex items-center gap-2 text-xs font-medium tracking-wider uppercase"
+            >
+              <span class="bg-border h-px flex-1" />
+              阅读行为
+              <span class="bg-border h-px flex-1" />
+            </h2>
+
+            <!-- Trend Chart -->
+            <div
+              v-if="activeSnapshot.readTimes"
+              class="bg-card relative overflow-hidden rounded-xl border"
+            >
+              <div class="bg-primary/60 absolute top-0 right-0 left-0 h-[2px]" />
+              <div class="p-4 sm:p-6">
+                <header class="mb-4 flex items-start gap-3">
+                  <div
+                    class="bg-primary/10 text-primary flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.8"
+                      stroke="currentColor"
+                      class="h-5 w-5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"
+                      />
+                    </svg>
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <h3 class="text-foreground text-base font-semibold">
+                      阅读趋势
+                    </h3>
+                    <p class="text-muted-foreground mt-0.5 text-xs">
+                      每日阅读时长变化
+                    </p>
+                  </div>
+                </header>
+                <div class="h-64 sm:h-80">
+                  <v-chart :option="trendOption" autoresize />
+                </div>
+              </div>
+            </div>
+
+            <!-- Read/Listen Ratio -->
+            <div
+              v-if="hasReadListenData"
+              class="bg-card relative overflow-hidden rounded-xl border"
+            >
+              <div class="bg-success/60 absolute top-0 right-0 left-0 h-[2px]" />
+              <div class="p-4 sm:p-6">
+                <header class="mb-4 flex items-start gap-3">
+                  <div
+                    class="bg-success/10 text-success flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.8"
+                      stroke="currentColor"
+                      class="h-5 w-5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
+                      />
+                    </svg>
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <h3 class="text-foreground text-base font-semibold">
+                      阅读方式
+                    </h3>
+                    <p class="text-muted-foreground mt-0.5 text-xs">
+                      文字阅读 vs 听书 时长占比
+                    </p>
+                  </div>
+                </header>
+                <div class="space-y-4">
+                  <div>
+                    <div class="mb-2 flex items-center justify-between">
+                      <span class="text-foreground flex items-center gap-2 text-sm">
+                        <span
+                          class="bg-primary inline-block h-2 w-2 rounded-full"
+                        />
+                        文字阅读
+                      </span>
+                      <span class="text-foreground text-sm font-medium tabular-nums">
+                        {{ formatDuration(activeSnapshot.wrReadTime) }}
+                        <span class="text-muted-foreground text-xs">
+                          · {{ readPercent }}%
+                        </span>
+                      </span>
+                    </div>
+                    <div class="bg-muted h-2 overflow-hidden rounded-full">
+                      <div
+                        class="bg-primary h-full rounded-full transition-all duration-500"
+                        :style="{ width: `${readPercent}%` }"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <div class="mb-2 flex items-center justify-between">
+                      <span class="text-foreground flex items-center gap-2 text-sm">
+                        <span
+                          class="bg-success inline-block h-2 w-2 rounded-full"
+                        />
+                        听书
+                      </span>
+                      <span class="text-foreground text-sm font-medium tabular-nums">
+                        {{ formatDuration(activeSnapshot.wrListenTime) }}
+                        <span class="text-muted-foreground text-xs">
+                          · {{ listenPercent }}%
+                        </span>
+                      </span>
+                    </div>
+                    <div class="bg-muted h-2 overflow-hidden rounded-full">
+                      <div
+                        class="bg-success h-full rounded-full transition-all duration-500"
+                        :style="{ width: `${listenPercent}%` }"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Read Longest Chart -->
-          <div
-            v-if="
-              activeSnapshot.readLongest && activeSnapshot.readLongest.length > 0
-            "
-            class="bg-card mb-6 rounded-xl p-4 sm:p-6"
-          >
-            <h3 class="text-foreground mb-4 text-sm font-medium">
+          <!-- Section: 阅读偏好 -->
+          <div class="mb-8 space-y-6">
+            <h2
+              class="text-muted-foreground flex items-center gap-2 text-xs font-medium tracking-wider uppercase"
+            >
+              <span class="bg-border h-px flex-1" />
+              阅读偏好
+              <span class="bg-border h-px flex-1" />
+            </h2>
+
+            <!-- Two-column: Category + Time Distribution -->
+            <div class="grid gap-6 lg:grid-cols-2">
+              <!-- Prefer Category -->
+              <div
+                v-if="
+                  activeSnapshot.preferCategory &&
+                  activeSnapshot.preferCategory.length > 0
+                "
+                class="bg-card relative overflow-hidden rounded-xl border"
+              >
+                <div
+                  class="bg-warning/60 absolute top-0 right-0 left-0 h-[2px]"
+                />
+                <div class="p-4 sm:p-6">
+                  <header class="mb-4 flex items-start gap-3">
+                    <div
+                      class="bg-warning/10 text-warning flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.8"
+                        stroke="currentColor"
+                        class="h-5 w-5"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"
+                        />
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M6 6h.008v.008H6V6Z"
+                        />
+                      </svg>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <h3 class="text-foreground text-base font-semibold">
+                        分类偏好
+                      </h3>
+                      <p class="text-muted-foreground mt-0.5 text-xs">
+                        各品类阅读时长占比
+                      </p>
+                    </div>
+                  </header>
+                  <div class="h-64 sm:h-72">
+                    <v-chart :option="categoryOption" autoresize />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Prefer Time -->
+              <div
+                v-if="activeSnapshot.preferTime"
+                class="bg-card relative overflow-hidden rounded-xl border"
+              >
+                <div
+                  class="bg-primary/60 absolute top-0 right-0 left-0 h-[2px]"
+                />
+                <div class="p-4 sm:p-6">
+                  <header class="mb-4 flex items-start gap-3">
+                    <div
+                      class="bg-primary/10 text-primary flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.8"
+                        stroke="currentColor"
+                        class="h-5 w-5"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                        />
+                      </svg>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <h3 class="text-foreground text-base font-semibold">
+                        时段分布
+                      </h3>
+                      <p class="text-muted-foreground mt-0.5 text-xs">
+                        一天中各时段的阅读频率
+                      </p>
+                    </div>
+                  </header>
+                  <div class="h-64 sm:h-72">
+                    <v-chart :option="preferTimeOption" autoresize />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: 阅读排行 -->
+          <div class="mb-8 space-y-6">
+            <h2
+              class="text-muted-foreground flex items-center gap-2 text-xs font-medium tracking-wider uppercase"
+            >
+              <span class="bg-border h-px flex-1" />
               阅读排行
-            </h3>
-            <div class="h-64 sm:h-80">
-              <v-chart :option="longestOption" autoresize />
-            </div>
-          </div>
+              <span class="bg-border h-px flex-1" />
+            </h2>
 
-          <!-- Two-column: Category + Time Distribution -->
-          <div class="mb-6 grid gap-6 lg:grid-cols-2">
-            <!-- Prefer Category -->
+            <!-- Read Longest Chart -->
             <div
               v-if="
-                activeSnapshot.preferCategory &&
-                activeSnapshot.preferCategory.length > 0
+                activeSnapshot.readLongest && activeSnapshot.readLongest.length > 0
               "
-              class="bg-card rounded-xl p-4 sm:p-6"
+              class="bg-card relative overflow-hidden rounded-xl border"
             >
-              <h3 class="text-foreground mb-4 text-sm font-medium">
-                分类偏好
-              </h3>
-              <div class="h-64 sm:h-72">
-                <v-chart :option="categoryOption" autoresize />
+              <div
+                class="bg-warning/60 absolute top-0 right-0 left-0 h-[2px]"
+              />
+              <div class="p-4 sm:p-6">
+                <header class="mb-4 flex items-start gap-3">
+                  <div
+                    class="bg-warning/10 text-warning flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.8"
+                      stroke="currentColor"
+                      class="h-5 w-5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-4.5A3.375 3.375 0 0 0 18.375 11.25H5.625A3.375 3.375 0 0 0 3 14.625V18.75m9-11.25h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"
+                      />
+                    </svg>
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <h3 class="text-foreground text-base font-semibold">
+                      阅读排行
+                    </h3>
+                    <p class="text-muted-foreground mt-0.5 text-xs">
+                      单本阅读时长 Top 10
+                    </p>
+                  </div>
+                </header>
+                <div class="h-64 sm:h-80">
+                  <v-chart :option="longestOption" autoresize />
+                </div>
               </div>
             </div>
 
-            <!-- Prefer Time -->
-            <div
-              v-if="activeSnapshot.preferTime"
-              class="bg-card rounded-xl p-4 sm:p-6"
-            >
-              <h3 class="text-foreground mb-4 text-sm font-medium">
-                时段分布
-              </h3>
-              <div class="h-64 sm:h-72">
-                <v-chart :option="preferTimeOption" autoresize />
+            <!-- Two-column: Author + Publisher -->
+            <div class="grid gap-6 lg:grid-cols-2">
+              <!-- Prefer Authors -->
+              <div
+                v-if="
+                  activeSnapshot.preferAuthor &&
+                  activeSnapshot.preferAuthor.length > 0
+                "
+                class="bg-card relative overflow-hidden rounded-xl border"
+              >
+                <div
+                  class="bg-primary/60 absolute top-0 right-0 left-0 h-[2px]"
+                />
+                <div class="p-4 sm:p-6">
+                  <header class="mb-4 flex items-start gap-3">
+                    <div
+                      class="bg-primary/10 text-primary flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.8"
+                        stroke="currentColor"
+                        class="h-5 w-5"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                        />
+                      </svg>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <h3 class="text-foreground text-base font-semibold">
+                        偏好作者
+                      </h3>
+                      <p class="text-muted-foreground mt-0.5 text-xs">
+                        阅读时长最多的作者
+                      </p>
+                    </div>
+                  </header>
+                  <div class="space-y-2.5">
+                    <div
+                      v-for="(author, index) in activeSnapshot.preferAuthor.slice(
+                        0,
+                        5,
+                      )"
+                      :key="author.authorId ?? index"
+                      class="hover:bg-accent/50 flex items-center justify-between gap-3 rounded-lg px-2 py-2 transition-colors"
+                    >
+                      <div class="flex min-w-0 items-center gap-3">
+                        <span
+                          class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold"
+                          :class="rankBadgeClass(index)"
+                        >
+                          {{ index + 1 }}
+                        </span>
+                        <span class="text-foreground truncate text-sm font-medium">
+                          {{ author.name ?? '未知作者' }}
+                        </span>
+                      </div>
+                      <span class="text-muted-foreground flex-shrink-0 text-sm tabular-nums">
+                        {{ author.readingTime ?? '--' }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
 
-          <!-- Read/Listen Ratio -->
-          <div
-            v-if="hasReadListenData"
-            class="bg-card mb-6 rounded-xl p-4 sm:p-6"
-          >
-            <h3 class="text-foreground mb-4 text-sm font-medium">
-              阅读方式
-            </h3>
-            <div class="flex items-center gap-6">
-              <div class="flex-1">
-                <div class="mb-2 flex items-center justify-between">
-                  <span class="text-muted-foreground text-xs">文字阅读</span>
-                  <span class="text-foreground text-sm font-medium">
-                    {{ formatDuration(activeSnapshot.wrReadTime) }}
-                  </span>
-                </div>
-                <div class="bg-muted h-2 overflow-hidden rounded-full">
-                  <div
-                    class="bg-primary h-full rounded-full transition-all"
-                    :style="{ width: `${readPercent}%` }"
-                  />
-                </div>
-              </div>
-              <div class="flex-1">
-                <div class="mb-2 flex items-center justify-between">
-                  <span class="text-muted-foreground text-xs">听书</span>
-                  <span class="text-foreground text-sm font-medium">
-                    {{ formatDuration(activeSnapshot.wrListenTime) }}
-                  </span>
-                </div>
-                <div class="bg-muted h-2 overflow-hidden rounded-full">
-                  <div
-                    class="bg-success h-full rounded-full transition-all"
-                    :style="{ width: `${listenPercent}%` }"
-                  />
+              <!-- Prefer Publishers -->
+              <div
+                v-if="
+                  activeSnapshot.preferPublisher &&
+                  activeSnapshot.preferPublisher.length > 0
+                "
+                class="bg-card relative overflow-hidden rounded-xl border"
+              >
+                <div
+                  class="bg-success/60 absolute top-0 right-0 left-0 h-[2px]"
+                />
+                <div class="p-4 sm:p-6">
+                  <header class="mb-4 flex items-start gap-3">
+                    <div
+                      class="bg-success/10 text-success flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.8"
+                        stroke="currentColor"
+                        class="h-5 w-5"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z"
+                        />
+                      </svg>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <h3 class="text-foreground text-base font-semibold">
+                        偏好出版社
+                      </h3>
+                      <p class="text-muted-foreground mt-0.5 text-xs">
+                        阅读册数最多的出版社
+                      </p>
+                    </div>
+                  </header>
+                  <div class="space-y-2.5">
+                    <div
+                      v-for="(pub, index) in activeSnapshot.preferPublisher.slice(
+                        0,
+                        5,
+                      )"
+                      :key="pub.name ?? index"
+                      class="hover:bg-accent/50 flex items-center justify-between gap-3 rounded-lg px-2 py-2 transition-colors"
+                    >
+                      <div class="flex min-w-0 items-center gap-3">
+                        <span
+                          class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold"
+                          :class="rankBadgeClass(index)"
+                        >
+                          {{ index + 1 }}
+                        </span>
+                        <span class="text-foreground truncate text-sm font-medium">
+                          {{ pub.name ?? '未知出版社' }}
+                        </span>
+                      </div>
+                      <span class="text-muted-foreground flex-shrink-0 text-sm tabular-nums">
+                        {{ pub.count }} 本
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -271,93 +639,53 @@
           <!-- Read Stat Summary -->
           <div
             v-if="activeSnapshot.readStat && activeSnapshot.readStat.length > 0"
-            class="bg-card mb-6 rounded-xl p-4 sm:p-6"
+            class="bg-card relative overflow-hidden rounded-xl border"
           >
-            <h3 class="text-foreground mb-4 text-sm font-medium">阅读概览</h3>
-            <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <div
-                v-for="stat in activeSnapshot.readStat"
-                :key="stat.label"
-                class="text-center"
-              >
-                <p class="text-foreground text-2xl font-bold">
-                  {{ stat.value }}
-                </p>
-                <p class="text-muted-foreground text-xs">{{ stat.label }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Prefer Authors -->
-          <div
-            v-if="
-              activeSnapshot.preferAuthor &&
-              activeSnapshot.preferAuthor.length > 0
-            "
-            class="bg-card mb-6 rounded-xl p-4 sm:p-6"
-          >
-            <h3 class="text-foreground mb-4 text-sm font-medium">
-              偏好作者
-            </h3>
-            <div class="space-y-3">
-              <div
-                v-for="(author, index) in activeSnapshot.preferAuthor.slice(
-                  0,
-                  5,
-                )"
-                :key="author.authorId ?? index"
-                class="flex items-center justify-between"
-              >
-                <div class="flex items-center gap-3">
-                  <span
-                    class="bg-muted text-muted-foreground flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium"
+            <div
+              class="bg-warning/60 absolute top-0 right-0 left-0 h-[2px]"
+            />
+            <div class="p-4 sm:p-6">
+              <header class="mb-4 flex items-start gap-3">
+                <div
+                  class="bg-warning/10 text-warning flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.8"
+                    stroke="currentColor"
+                    class="h-5 w-5"
                   >
-                    {{ index + 1 }}
-                  </span>
-                  <span class="text-foreground text-sm font-medium">
-                    {{ author.name ?? '未知作者' }}
-                  </span>
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"
+                    />
+                  </svg>
                 </div>
-                <span class="text-muted-foreground text-sm">
-                  {{ author.readingTime ?? '--' }}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Prefer Publishers -->
-          <div
-            v-if="
-              activeSnapshot.preferPublisher &&
-              activeSnapshot.preferPublisher.length > 0
-            "
-            class="bg-card mb-6 rounded-xl p-4 sm:p-6"
-          >
-            <h3 class="text-foreground mb-4 text-sm font-medium">
-              偏好出版社
-            </h3>
-            <div class="space-y-3">
-              <div
-                v-for="(pub, index) in activeSnapshot.preferPublisher.slice(
-                  0,
-                  5,
-                )"
-                :key="pub.name ?? index"
-                class="flex items-center justify-between"
-              >
-                <div class="flex items-center gap-3">
-                  <span
-                    class="bg-muted text-muted-foreground flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium"
-                  >
-                    {{ index + 1 }}
-                  </span>
-                  <span class="text-foreground text-sm font-medium">
-                    {{ pub.name ?? '未知出版社' }}
-                  </span>
+                <div class="min-w-0 flex-1">
+                  <h3 class="text-foreground text-base font-semibold">
+                    阅读概览
+                  </h3>
+                  <p class="text-muted-foreground mt-0.5 text-xs">
+                    累计数据概览
+                  </p>
                 </div>
-                <span class="text-muted-foreground text-sm">
-                  {{ pub.count }} 本
-                </span>
+              </header>
+              <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div
+                  v-for="stat in activeSnapshot.readStat"
+                  :key="stat.label"
+                  class="bg-muted/40 hover:bg-muted/60 rounded-lg p-3 text-center transition-colors"
+                >
+                  <p class="text-foreground text-xl font-bold tabular-nums sm:text-2xl">
+                    {{ stat.value }}
+                  </p>
+                  <p class="text-muted-foreground mt-1 text-xs">
+                    {{ stat.label }}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -477,6 +805,56 @@ function formatTimestamp(ts: string): string {
   if (!d.isValid()) return ts;
   return d.format('MM/DD');
 }
+
+// Rank badge color — top-3 stand out, the rest fade
+function rankBadgeClass(index: number): string {
+  if (index === 0) return 'bg-primary text-primary-foreground';
+  if (index === 1) return 'bg-primary/70 text-primary-foreground';
+  if (index === 2) return 'bg-primary/40 text-foreground';
+  return 'bg-muted text-muted-foreground';
+}
+
+// Summary metrics — used in the top metrics row
+const summaryMetrics = computed<
+  Array<{
+    key: string;
+    label: string;
+    value: string;
+    unit?: string;
+    bgClass: string;
+  }>
+>(() => {
+  const s = activeSnapshot.value;
+  if (!s) return [];
+  const compare = s.compare ?? 0;
+  return [
+    {
+      key: 'total',
+      label: '总阅读时长',
+      value: formatDuration(s.totalReadTime),
+      bgClass: 'bg-primary',
+    },
+    {
+      key: 'days',
+      label: '阅读天数',
+      value: String(s.readDays ?? 0),
+      unit: '天',
+      bgClass: 'bg-success',
+    },
+    {
+      key: 'avg',
+      label: '日均时长',
+      value: formatDuration(s.dayAverageReadTime),
+      bgClass: 'bg-warning',
+    },
+    {
+      key: 'compare',
+      label: '环比变化',
+      value: formatCompare(compare),
+      bgClass: compare >= 0 ? 'bg-success' : 'bg-destructive',
+    },
+  ];
+});
 
 // ── Trend chart ──
 
@@ -666,6 +1044,7 @@ function handleBack() {
 
 function handleRefresh() {
   statsStore.fetchStats(true);
+  lastRefreshedAt.value = dayjs();
 }
 
 onMounted(() => {
@@ -673,6 +1052,17 @@ onMounted(() => {
     statsStore.fetchStats();
   }
 });
+
+const lastRefreshedAt = ref<dayjs.Dayjs | null>(null);
+
+// Track when data last arrived — covers both initial load and refresh.
+watch(
+  () => statsStore.snapshots,
+  (val) => {
+    if (val.length) lastRefreshedAt.value = dayjs();
+  },
+  { immediate: true },
+);
 
 // Reset tab when data changes
 watch(
