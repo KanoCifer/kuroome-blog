@@ -1,4 +1,5 @@
 import { createAuthGateway } from '@/auth/api/authGateway';
+import { refreshAccessToken } from '@/auth/api/refresh';
 import { getAccessToken as getToken, setAccessToken } from '@/auth/tokenService';
 import { reconnectWs } from '@/plugins/visitorWs';
 import type { UserInfo } from '@/auth/types';
@@ -57,7 +58,11 @@ export const useAuthStore = defineStore('auth', () => {
     if (isHydrated.value) return; // 避免重复初始化
 
     try {
-      // 1. 先尝试从缓存读取
+      // 1. 主动刷新 access token（利用 cookie 中的 refresh_token），
+      //    避免后续请求因内存中无 token 而先 401 再刷新
+      await refreshAccessToken();
+
+      // 2. 先尝试从缓存读取
       const cachedUser = userCache.get();
       if (cachedUser) {
         user.value = cachedUser;
@@ -67,11 +72,11 @@ export const useAuthStore = defineStore('auth', () => {
         return;
       }
 
-      // 2. 缓存不存在，从后端获取
+      // 3. 缓存不存在，从后端获取
       await fetchUser({ silentOnUnauthenticated: true });
       isHydrated.value = true;
     } catch {
-      notifier.error('认证初始化失败');
+      // refresh 失败说明未登录或 cookie 过期，静默处理
       user.value = null;
       userCache.clear();
       isHydrated.value = true;

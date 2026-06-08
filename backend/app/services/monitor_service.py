@@ -7,7 +7,6 @@ from datetime import UTC, datetime, timedelta
 import psutil
 
 from app.repositories.monitor_repo import MonitorRepo
-from app.utils.sse import sse_event
 
 
 class MonitorService:

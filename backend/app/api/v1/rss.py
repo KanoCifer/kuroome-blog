@@ -137,7 +137,7 @@ async def get_articles(
         feed_url=feed_url,
         search=search,
     )
-    return APIResponse.ok(data=result.model_dump())
+    return APIResponse.ok(data=result.model_dump(mode="json"))
 
 
 @router.get("/articles/{article_id}")
@@ -163,7 +163,7 @@ async def get_subscriptions(
     subscriptions = await rss_service.get_subscriptions_for_user(
         user_id=current_user.id
     )
-    data = [sub.model_dump() for sub in subscriptions]
+    data = [sub.model_dump(mode="json") for sub in subscriptions]
     return APIResponse.ok(data=data)
 
 

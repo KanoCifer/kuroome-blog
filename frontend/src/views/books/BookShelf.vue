@@ -46,7 +46,7 @@
         >
           <CloudSync
             class="text-foreground h-5 w-5"
-            :class="{ 'animate-spin': isSyncing }"
+            :class="{ 'animate-breathe': isSyncing }"
           />
         </button>
       </div>

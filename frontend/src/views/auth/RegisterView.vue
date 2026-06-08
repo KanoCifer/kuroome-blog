@@ -5,7 +5,7 @@ import IconLock from '@/components/icons/IconLock.vue';
 import { useNotificationStore } from '@/stores/notification';
 import type { RegisterForm } from '@/types';
 import axios from 'axios';
-import { Mail, ShieldUser } from '@lucide/vue';
+import { Mail, Loader2, ShieldUser } from '@lucide/vue';
 import { ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 
@@ -173,7 +173,7 @@ const handleSubmit = async () => {
         <form @submit.prevent="handleSubmit" class="w-full">
           <!-- 用户名 -->
           <div>
-            <div class="relative my-3">
+            <div class="relative my-4">
               <div
                 class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
               >
@@ -213,7 +213,7 @@ const handleSubmit = async () => {
 
           <!-- 邮箱 -->
           <div>
-            <div class="relative my-3">
+            <div class="relative my-4">
               <div
                 class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
               >
@@ -253,7 +253,7 @@ const handleSubmit = async () => {
 
           <!-- 密码 -->
           <div>
-            <div class="relative my-3">
+            <div class="relative my-4">
               <div
                 class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
               >
@@ -293,7 +293,7 @@ const handleSubmit = async () => {
 
           <!-- 确认密码 -->
           <div>
-            <div class="relative my-3">
+            <div class="relative my-4">
               <div
                 class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
               >
@@ -333,7 +333,7 @@ const handleSubmit = async () => {
 
           <!-- 邮箱验证码 -->
           <div>
-            <div class="relative my-3">
+            <div class="relative my-4">
               <div
                 class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
               >
@@ -383,9 +383,10 @@ const handleSubmit = async () => {
           <div class="mt-6">
             <button
               type="submit"
-              class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-primary/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
+              class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-primary/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               :disabled="isSubmitting"
             >
+              <Loader2 v-if="isSubmitting" class="h-5 w-5 animate-spin" />
               {{ isSubmitting ? '注册中...' : '注册' }}
             </button>
           </div>

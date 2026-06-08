@@ -543,7 +543,7 @@ const formatDateTime = (dateStr: string | null): string => {
 const fetchOverview = async () => {
   try {
     const res = await analyticsGateway.getOverview(selectedDays.value);
-    if (res.code === 200) {
+    if (res.status === 'success') {
       overviewData.value = res.data as unknown as OverviewData;
     } else {
       error.value = res.message || 'Failed to load overview data';
@@ -561,7 +561,7 @@ const fetchLoginLogs = async () => {
       page: loginLogsPage.value,
       page_size: 20,
     });
-    if (res.code === 200) {
+    if (res.status === 'success') {
       loginLogsData.value = res.data as unknown as LoginLogsResponse;
     } else {
       error.value = res.message || 'Failed to load login logs';

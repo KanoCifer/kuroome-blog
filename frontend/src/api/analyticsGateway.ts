@@ -2,6 +2,7 @@ import request from '@/api/request';
 import type { ApiResponse } from '@/api/request';
 
 export interface AnalyticsOverviewData {
+  status?: string;
   code?: number;
   data: Record<string, unknown>;
   message?: string;
