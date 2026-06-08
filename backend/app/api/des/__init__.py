@@ -1,4 +1,3 @@
-from app.api.des.csrf import setup_csrf
 from app.api.des.db import (
     AsyncSessionFactory,
     close_db_connections,
@@ -20,5 +19,4 @@ __all__ = [
     "init_mongo",
     "init_redis",
     "limiter",
-    "setup_csrf",
 ]

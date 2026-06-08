@@ -7,7 +7,6 @@ from fastapi import Request
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
-from app.api.des import setup_csrf
 from app.core import get_settings
 
 if TYPE_CHECKING:
@@ -33,8 +32,6 @@ def register_middleware(app: FastAPI) -> None:
         allow_headers=["*"],
         expose_headers=["Set-Cookie"],
     )
-
-    setup_csrf(app=app)
 
     @app.middleware("http")
     async def add_process_time_header(request: Request, call_next):

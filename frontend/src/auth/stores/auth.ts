@@ -78,10 +78,6 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function initCSRF() {
-    await authGateway.initCSRF();
-  }
-
   async function getPasskeyAuthenticationOptions() {
     return authGateway.getPasskeyAuthenticationOptions();
   }
@@ -91,8 +87,6 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true;
     try {
       const res = await authGateway.login(username, password, rememberMe);
-      // 登录成功后获取 CSRF Token
-      await initCSRF();
       // 登录响应中已包含用户信息，直接使用并缓存
       const userData = res.user;
       user.value = userData;
@@ -117,8 +111,6 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       const res = await authGateway.loginWithPasskey(assertion);
-
-      await initCSRF();
 
       const userData = res.user;
       user.value = userData;

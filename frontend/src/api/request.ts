@@ -1,5 +1,4 @@
 import axios, { AxiosError } from 'axios';
-import { fetchAndStoreCSRF } from './csrf';
 import { isrefreshTokenRequest, refreshAccessToken } from '@/auth/api/refresh';
 import { getAccessToken } from '@/auth/tokenService';
 
@@ -28,25 +27,6 @@ request.interceptors.request.use((config) => {
   }
   return config;
 });
-
-request.interceptors.response.use(
-  (response) => response,
-
-  async (error: AxiosError<ApiResponse>) => {
-    const config = error.config;
-    const errorMessage = error.response?.data?.message;
-    if (errorMessage && errorMessage.includes('CSRF') && config) {
-      const _config = config as typeof config & { _retryCount?: number };
-      _config._retryCount = (_config._retryCount || 0) + 1;
-
-      if (_config._retryCount <= 3) {
-        await fetchAndStoreCSRF();
-        return request(_config);
-      }
-    }
-    return Promise.reject(error);
-  },
-);
 
 // 添加401自动刷新token拦截器
 request.interceptors.response.use(

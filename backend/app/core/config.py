@@ -23,7 +23,6 @@ class Settings(BaseSettings):
     API_TITLE: str = "Reading List API"
     API_DESCRIPTION: str = "API文档。Personal reading tracker API built with FastAPI, PostgreSQL, and MongoDB. Manage your reading list, track progress, and get book recommendations."
     API_KEY: str = ""
-    CSRF_COOKIE_SECURE: bool = True
     # WebAuthn / Passkey settings
     WEBAUTHN_RP_ID: str = "kanocifer.chat"
     WEBAUTHN_ORIGIN: str = "https://kanocifer.chat"

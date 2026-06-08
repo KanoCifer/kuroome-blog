@@ -16,12 +16,7 @@ from fastapi import (
 from fastapi.responses import JSONResponse, RedirectResponse
 from webauthn.helpers import options_to_json_dict
 
-from app.api.des.auth import (
-    ACCESS_TOKEN_COOKIE,
-    manager,
-    resolve_user_from_token,
-)
-from app.api.des.csrf import csrf_manager
+from app.api.des.auth import manager, resolve_user_from_token
 from app.api.des.des import user_service_dep, user_services_dep
 from app.api.des.limiter import limiter
 from app.api.des.redis import AsyncRedis, get_redis
@@ -69,25 +64,16 @@ def _build_login_response(
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        samesite="lax",
+        samesite="strict",
         secure=True,
         domain=cookie_domain or None,
     )
-    csrf_manager.set_csrf_cookie(response)
     return response
 
 
 # ------------------------------------------------------------------ #
 # Auth endpoints
 # ------------------------------------------------------------------ #
-
-
-@router.get("/csrf-token")
-async def csrf_token(response: Response) -> JSONResponse:
-    """生成 CSRF token 并设置 cookie，前端可以调用此接口获取 token 以支持后续的认证请求。"""
-    res: JSONResponse = APIResponse.ok(message="CSRF token 已生成")
-    csrf_manager.set_csrf_cookie(res)
-    return res
 
 
 @router.get("/refresh-token")
@@ -128,11 +114,10 @@ async def refresh_token(
         key="refresh_token",
         value=tokens["refresh_token"],
         httponly=True,
-        samesite="lax",
+        samesite="strict",
         secure=True,
         domain=cookie_domain or None,
     )
-    csrf_manager.set_csrf_cookie(response)
     return response
 
 
@@ -179,9 +164,6 @@ async def logout(
         message="已退出登录",
     )
     response.delete_cookie(key="refresh_token", domain=cookie_domain or None)
-    response.delete_cookie(
-        key=ACCESS_TOKEN_COOKIE, domain=cookie_domain or None
-    )
     return response
 
 
@@ -533,10 +515,9 @@ async def github_callback(
             key="refresh_token",
             value=tokens["refresh_token"],
             httponly=True,
-            samesite="lax",
+            samesite="strict",
             secure=True,
             domain=cookie_domain or None,
         )
-        csrf_manager.set_csrf_cookie(response)
 
         return response

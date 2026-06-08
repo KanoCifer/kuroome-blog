@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { fetchAndStoreCSRF } from '@/api/csrf';
 import { useAuthStore } from '@/auth/stores/auth';
 import { useNotificationStore } from '@/stores/notification';
 import { AnimatePresence, motion } from 'motion-v';
@@ -110,7 +109,6 @@ async function loadChatHistory() {
 }
 
 onMounted(async () => {
-  await fetchAndStoreCSRF();
   // 页面加载时自动检查是否有已缓存的总结
   await checkCachedSummary();
 });
@@ -282,7 +280,6 @@ async function onGenerate() {
     notifier.error('请先登录以使用AI功能');
     return;
   }
-  await fetchAndStoreCSRF();
   await generateSummaryStream();
 }
 
@@ -291,7 +288,6 @@ async function onSendChat() {
     notifier.error('请先登录以使用AI功能');
     return;
   }
-  await fetchAndStoreCSRF();
   await sendChatMessage();
 }
 

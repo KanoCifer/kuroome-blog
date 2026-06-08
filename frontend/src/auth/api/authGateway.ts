@@ -1,4 +1,3 @@
-import { fetchAndStoreCSRF } from '@/api/csrf';
 import request from '@/api/request';
 import type { UserInfo } from '@/auth/types';
 import type { AxiosResponse } from 'axios';
@@ -120,7 +119,6 @@ export const authGateway = {
 
 export interface AuthGateway {
   fetchUser: () => Promise<UserInfo | null>;
-  initCSRF: () => Promise<void>;
   getPasskeyAuthenticationOptions: () => Promise<PublicKeyCredentialRequestOptionsJSON>;
   login: (
     username: string,
@@ -137,10 +135,6 @@ export function createAuthGateway(): AuthGateway {
     async fetchUser(): Promise<UserInfo | null> {
       const res = await request.get<Envelope<UserInfo | null>>('v1/auth/me');
       return res.data.data || null;
-    },
-
-    async initCSRF(): Promise<void> {
-      await fetchAndStoreCSRF();
     },
 
     async getPasskeyAuthenticationOptions(): Promise<PublicKeyCredentialRequestOptionsJSON> {

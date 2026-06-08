@@ -48,8 +48,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         return;
       }
 
-      await authGateway.initCSRF();
-
       if (!userCache.get()) {
         try {
           const userData = await authGateway.fetchUser();

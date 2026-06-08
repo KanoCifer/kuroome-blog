@@ -20,7 +20,6 @@ if settings.SECRET_KEY is None:
     raise ValueError("SECRET_KEY must not be None")
 
 ALGORITHM = "HS256"
-ACCESS_TOKEN_COOKIE = "access-token"  # 仅用于 logout 时清理旧 cookie
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
