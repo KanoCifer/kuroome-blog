@@ -2,6 +2,7 @@ import { createAuthGateway } from '@/auth/authGateway';
 import { tokenService } from '@/auth/tokenService';
 import type { UserInfo } from '@/auth/types';
 import { userCache } from '@/auth/userCache';
+import { refreshAccessToken } from '@/api/refresh';
 import type { PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/browser';
 import { create } from 'zustand';
 
@@ -39,26 +40,30 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
 
     hydrationPromise = (async () => {
-      if (userCache.get()) {
-        set({
-          isAuthenticated: true,
-          user: userCache.get(),
-          isHydrated: true,
-        });
-        return;
-      }
+      try {
+        // 1. 主动刷新 access token（利用 cookie 中的 refresh_token），
+        //    避免后续请求因内存中无 token 而先 401 再刷新
+        await refreshAccessToken();
 
-      if (!userCache.get()) {
+        // 2. 先尝试从缓存读取
+        const cachedUser = userCache.get();
+        if (cachedUser) {
+          set({
+            isAuthenticated: true,
+            user: cachedUser,
+            isHydrated: true,
+          });
+          return;
+        }
+
+        // 3. 缓存不存在，从后端获取
         try {
           const userData = await authGateway.fetchUser();
-          // 原子更新：确保 user 和 isHydrated 同时更新，避免 loader 看到中间状态
           set({
             isAuthenticated: !!userData,
             user: userData,
             isHydrated: true,
           });
-          if (userData) {
-          }
         } catch (err) {
           console.error('获取用户信息失败:', err);
           set({
@@ -67,6 +72,13 @@ export const useAuthStore = create<AuthState>((set) => ({
             isHydrated: true,
           });
         }
+      } catch {
+        // refresh 失败说明未登录或 cookie 过期，静默处理
+        set({
+          isAuthenticated: false,
+          user: null,
+          isHydrated: true,
+        });
       }
     })();
 
