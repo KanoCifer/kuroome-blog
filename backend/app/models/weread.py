@@ -2,7 +2,7 @@ from datetime import UTC, datetime
 from typing import Annotated
 
 from beanie import Document, Indexed, Link
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
 
 
 class User(Document):
@@ -18,11 +18,13 @@ class User(Document):
 
 
 class WereadBook(Document):
-    """单本书籍的具体信息，_id 即微信读书 bookId"""
+    """单本书籍的具体信息，_id 即微信读书 bookId（str）
 
-    model_config = ConfigDict(populate_by_name=True)
+    _id 复用 bookId 的设计：让 UserBook.bookInfo 这个 Link 字段在
+    fetch_links 时能直接通过 _id 完成 $lookup，避免 Link 静默失败。
+    """
 
-    id: str = Field(alias="bookId")
+    id: str = Field(alias="_id")  # 即微信读书 bookId  # pyright: ignore[reportIncompatibleVariableOverride,reportGeneralTypeIssues]
     title: str
     author: str
     translator: str | None = None

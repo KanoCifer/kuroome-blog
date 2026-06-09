@@ -6,7 +6,7 @@ import re
 from app.core.logger import logger
 from app.models.weread import Archive, UserBook, WereadBook
 from app.services.weread.base import WereadBaseService
-from app.services.weread.utils import _map_book_info, _parse_shelf_books
+from app.services.weread.utils import map_book_info, parse_shelf_books
 
 
 class WereadShelfService(WereadBaseService):
@@ -36,7 +36,15 @@ class WereadShelfService(WereadBaseService):
     # ── 书架 ──────────────────────────────────────────────────────
 
     async def get_user_shelf(self, user_id: int):
-        return await self.repo.get_user_shelf(user_id)
+        user_books, archives = await self.repo.get_user_shelf(user_id)
+        # 把 bookInfo 嵌套字段拍平到顶层，匹配前端 WereadUserBook 扁平契约
+        book_data = []
+        for b in user_books:
+            data = b.model_dump(mode="json", by_alias=True)
+            info = data.pop("bookInfo", None) or {}
+            data.update(info)
+            book_data.append(data)
+        return book_data, archives
 
     async def save_user_book(self, user_book_info):
         return await self.repo.save_user_book(user_book_info)
@@ -55,7 +63,7 @@ class WereadShelfService(WereadBaseService):
         raw = await self._send_http_request(
             user_id=user_id, api_name="/shelf/sync"
         )
-        shelf_books, archives = _parse_shelf_books(raw)
+        shelf_books, archives = parse_shelf_books(raw)
         logger.info(
             f"[sync] user={user_id} shelf books={len(shelf_books)}, archives={len(archives)}"
         )
@@ -93,7 +101,7 @@ class WereadShelfService(WereadBaseService):
                             api_name="/book/info",
                             extra={"bookId": book_id},
                         )
-                    return _map_book_info(info)
+                    return map_book_info(info)
                 except ValueError:
                     logger.warning(
                         f"[sync] book info failed, bookId={book_id}, using fallback"

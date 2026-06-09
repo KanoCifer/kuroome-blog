@@ -135,10 +135,11 @@
           class="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
         >
           <div v-for="i in 8" :key="i" class="animate-pulse">
-            <div class="bg-muted aspect-2/3 rounded-xl" />
-            <div class="mt-3 space-y-2">
-              <div class="bg-muted h-4 w-3/4 rounded" />
-              <div class="bg-muted h-3 w-1/2 rounded" />
+            <div class="bg-muted aspect-3/4 rounded-xl" />
+            <div class="mt-2 px-1.5 space-y-1.5">
+              <div class="bg-muted h-3 w-5/6 rounded" />
+              <div class="bg-muted h-3 w-3/4 rounded" />
+              <div class="bg-muted h-2.5 w-1/2 rounded" />
             </div>
           </div>
         </div>
@@ -174,55 +175,86 @@
         <!-- Books grid -->
         <div
           v-else
-          class="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+          class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
         >
-          <div
+          <a
             v-for="(book, index) in visibleBooks"
             :key="book.bookId"
-            class="group cursor-pointer"
-            :data-book-id="book.bookId"
+            :href="`weread://reading?bId=${book.bookId}`"
+            class="group block"
+            @click.prevent="handleBookClick(book.bookId)"
           >
             <div
-              class="bg-card hover:shadow-primary/5 relative aspect-2/3 overflow-hidden rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
+              class="bg-card hover:shadow-primary/5 relative overflow-hidden rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
               :style="{ animationDelay: `${index * 30}ms` }"
             >
-              <img
-                v-if="coverMap[book.bookId]"
-                :src="coverMap[book.bookId]"
-                :alt="book.title"
-                class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                loading="lazy"
-                @error="
-                  ($event.target as HTMLImageElement).style.display = 'none'
-                "
-              />
-              <div
-                v-else
-                class="bg-muted flex h-full w-full items-center justify-center"
-              >
-                <span class="text-muted-foreground/40 font-serif text-2xl">{{
-                  book.title.slice(0, 1)
-                }}</span>
+              <div class="relative aspect-3/4 overflow-hidden">
+                <img
+                  v-if="book.cover"
+                  :src="book.cover"
+                  :alt="book.title"
+                  class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                  loading="lazy"
+                  @error="
+                    ($event.target as HTMLImageElement).style.display = 'none'
+                  "
+                />
+                <div
+                  v-else
+                  class="bg-muted flex h-full w-full items-center justify-center"
+                >
+                  <span class="text-muted-foreground/40 font-serif text-2xl">{{
+                    book.title.slice(0, 1)
+                  }}</span>
+                </div>
+
+                <!-- Hover overlay with open icon -->
+                <div
+                  class="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors duration-300 group-hover:bg-black/30"
+                >
+                  <div
+                    class="bg-background/90 text-foreground flex h-10 w-10 items-center justify-center rounded-full opacity-0 shadow-lg backdrop-blur-sm transition-all duration-300 group-hover:opacity-100"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                      stroke="currentColor"
+                      class="h-5 w-5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                      />
+                    </svg>
+                  </div>
+                </div>
+
+                <div
+                  v-if="book.finishReading"
+                  class="bg-success/90 absolute top-2 right-2 rounded-full px-2 py-0.5 text-[10px] font-medium text-white"
+                >
+                  已读
+                </div>
               </div>
-              <div
-                v-if="book.finishReading"
-                class="bg-success/90 absolute top-2 right-2 rounded-full px-2 py-0.5 text-[10px] font-medium text-white"
-              >
-                已读
+              <div class="px-1.5 py-2">
+                <p
+                  class="text-foreground line-clamp-2 text-xs font-medium leading-snug"
+                  :title="book.title"
+                >
+                  {{ book.title }}
+                </p>
+                <p
+                  class="text-muted-foreground mt-1 truncate text-[11px] leading-snug"
+                  :title="book.author"
+                >
+                  {{ book.author }}
+                </p>
               </div>
             </div>
-            <div class="mt-2.5 px-0.5">
-              <p
-                class="text-foreground truncate text-sm font-medium"
-                :title="book.title"
-              >
-                {{ book.title }}
-              </p>
-              <p class="text-muted-foreground truncate text-xs">
-                {{ book.author }}
-              </p>
-            </div>
-          </div>
+          </a>
         </div>
       </div>
     </div>
@@ -233,7 +265,7 @@
 import type { WereadUserBook } from '@/api/wereadGateway';
 import { useReadStatsStore } from '@/stores/readStats';
 import { wereadGateway } from '@/api/wereadGateway';
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { CloudSync } from '@lucide/vue';
 
@@ -241,7 +273,6 @@ const router = useRouter();
 const isLoading = ref(true);
 const errorMessage = ref('');
 const books = ref<WereadUserBook[]>([]);
-const coverMap = ref<Record<string, string>>({});
 
 const isSyncing = ref(false);
 const statsStore = useReadStatsStore();
@@ -263,50 +294,18 @@ function formatDuration(seconds: number | null): string {
 
 const visibleBooks = computed(() => books.value.filter((b) => !b.secret));
 
-let observer: IntersectionObserver | null = null;
-
-const setupObserver = () => {
-  observer?.disconnect();
-
-  observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        const bookId = (entry.target as HTMLElement).dataset.bookId;
-        if (!bookId || coverMap.value[bookId]) {
-          observer!.unobserve(entry.target);
-          continue;
-        }
-        observer!.unobserve(entry.target);
-        loadCover(bookId);
-      }
-    },
-    { rootMargin: '200px' },
-  );
-
-  document.querySelectorAll('[data-book-id]').forEach((el) => {
-    observer!.observe(el);
-  });
-};
-
-const loadCover = async (bookId: string) => {
-  if (coverMap.value[bookId]) return;
-  try {
-    const res = await wereadGateway.getBookInfo(bookId);
-    if (res.status === 'success' && res.data?.cover) {
-      coverMap.value = { ...coverMap.value, [bookId]: res.data.cover };
-    }
-  } catch {
-    /* ignore failed cover loads */
-  }
-};
-
 const handleBack = () => {
   if (window.history.length > 1) {
     router.back();
   } else {
     router.push('/');
   }
+};
+
+const handleBookClick = (bookId: string) => {
+  const link = document.createElement('a');
+  link.href = `weread://reading?bId=${bookId}`;
+  link.click();
 };
 
 const fetchBooks = async () => {
@@ -337,8 +336,6 @@ const handleSync = async () => {
     const res = await wereadGateway.syncMyBooks();
     if (res.status === 'success') {
       await fetchBooks();
-      await nextTick();
-      setupObserver();
     } else {
       throw new Error(res.message || '同步失败');
     }
@@ -356,11 +353,5 @@ const handleSync = async () => {
 
 onMounted(async () => {
   await Promise.all([fetchBooks(), statsStore.fetchStats()]);
-  await nextTick();
-  setupObserver();
-});
-
-onBeforeUnmount(() => {
-  observer?.disconnect();
 });
 </script>

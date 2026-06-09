@@ -32,7 +32,6 @@ watch(
   (newPath) => {
     isEntryView.value = newPath === '/';
     isAboutView.value = newPath === '/about';
-    bgStore.reroll();
 
     if (newPath === '/') {
       showBasicNav.value = false;

@@ -1,11 +1,9 @@
-from beanie import Link
 from fastapi import APIRouter, Depends
 
 from app.api.des.auth import manager
 from app.api.des.des import weread_service_dep
 from app.core.exceptions import APIError
 from app.core.response import APIResponse
-from app.models.weread import UserBook, WereadBook
 from app.schemas.weread import SaveUserInfoIn
 
 router = APIRouter(prefix="/weread", tags=["weread"])
@@ -32,31 +30,16 @@ async def get_user_shelf(
 ):
     """获取用户书架信息"""
     try:
-        user_books, archives = await weread_service.get_user_shelf(
+        user_books_data, archives_data = await weread_service.get_user_shelf(
             current_user.id
         )
     except ValueError:
         raise APIError(message="Invalid user ID") from None
-    user_books_data = []
-    for b in user_books:
-        if b.bookInfo and isinstance(b.bookInfo, Link):
-            try:
-                await b.fetch_link(UserBook.bookInfo)
-            except Exception:
-                pass
-        d = b.model_dump(mode="json", exclude={"bookInfo"})
-        if b.bookInfo and isinstance(b.bookInfo, WereadBook):
-            d["title"] = b.bookInfo.title
-            d["author"] = b.bookInfo.author
-        else:
-            d["title"] = ""
-            d["author"] = ""
-        user_books_data.append(d)
 
     return APIResponse.ok(
         data={
             "user_books": user_books_data,
-            "archives": [a.model_dump(mode="json") for a in archives],
+            "archives": archives_data,
         },
         message="User bookshelf information retrieved successfully",
     )
@@ -86,7 +69,9 @@ async def sync_my_books(
 ):
     """从远端同步我的书籍，force=true 时强制重新拉取所有书籍详情"""
     try:
-        count = await weread_service.sync_my_books(current_user.id, force=force)
+        count = await weread_service.sync_my_books(
+            current_user.id, force=force
+        )
     except ValueError:
         raise APIError(message="Invalid user ID") from None
     return APIResponse.ok(

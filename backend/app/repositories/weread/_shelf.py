@@ -6,14 +6,15 @@ class ShelfQuery:
     """书架复合查询"""
 
     async def get_user_shelf(
-        self, user_id
+        self, user_id: int
     ) -> tuple[list[UserBook], list[Archive]]:
         """获取用户书架信息，自动加载关联的 WereadBook"""
         user_books = (
             await UserBook.find(UserBook.user_id == user_id, fetch_links=True)
-            .sort(-UserBook.readUpdateTime)  # pyright: ignore
+            .sort(-UserBook.readUpdateTime)  # pyright: ignore[reportArgumentType, reportOptionalOperand]
             .to_list()
         )
+        # logger.info(user_books)
         user_archives = await Archive.find(
             Archive.user_id == user_id
         ).to_list()

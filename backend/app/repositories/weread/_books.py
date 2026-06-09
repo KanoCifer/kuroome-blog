@@ -7,7 +7,7 @@ class BookRepo:
     async def save_books_bulk(
         self, books: list[WereadBook]
     ) -> dict[str, WereadBook]:
-        """批量保存书籍，以 bookId 去重，返回 bookId → WereadBook 映射
+        """批量保存书籍，以 _id (= bookId) 去重，返回 bookId → WereadBook 映射
 
         已有记录：跳过（增量同步默认不覆盖）
         新记录：insert()，DuplicateKey 时回退为查找已有文档
@@ -15,10 +15,10 @@ class BookRepo:
         if not books:
             return {}
 
-        # 一次查出已有 bookId，跳过已存在书籍
+        # 一次查出已有 _id，跳过已存在书籍
         book_ids = [b.id for b in books]
         existing = await WereadBook.find(
-            {"bookId": {"$in": book_ids}}
+            {"_id": {"$in": book_ids}}
         ).to_list()
         existing_ids = {b.id for b in existing}
 
@@ -34,7 +34,7 @@ class BookRepo:
                 await book.insert()
             except Exception:
                 # 极端竞态：另一请求已插入，查找已有文档
-                doc = await WereadBook.find_one({"bookId": book.id})
+                doc = await WereadBook.find_one({"_id": book.id})
                 if doc:
                     book.id = doc.id
             book_map[book.id] = book
@@ -43,4 +43,4 @@ class BookRepo:
 
     async def get_book_info(self, book_id) -> WereadBook | None:
         """获取书籍信息"""
-        return await WereadBook.find_one({"bookId": book_id})
+        return await WereadBook.find_one({"_id": book_id})

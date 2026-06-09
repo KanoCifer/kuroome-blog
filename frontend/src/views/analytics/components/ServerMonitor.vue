@@ -207,6 +207,7 @@ import { useThemeStore } from '@/stores/theme';
 import dayjs from 'dayjs';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import VChart from 'vue-echarts';
+import { useOrigin } from '@/composables/useOrigin';
 
 // Types
 interface ServerStatus {
@@ -460,9 +461,12 @@ const fetchStatusSSE = async () => {
 
   console.log('Establishing SSE connection for server status...');
   try {
-    const es = new EventSource('/api/v1/status/server/status/stream', {
-      withCredentials: true,
-    });
+    const es = new EventSource(
+      useOrigin('/api/v1/status/server/status/stream'),
+      {
+        withCredentials: true,
+      },
+    );
 
     es.onopen = () => {
       console.log('SSE connection established');

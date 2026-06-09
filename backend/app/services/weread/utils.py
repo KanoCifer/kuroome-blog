@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 
-def _parse_shelf_books(raw: dict) -> tuple[list[dict], list[dict]]:
+def parse_shelf_books(raw: dict) -> tuple[list[dict], list[dict]]:
     """解析 /shelf/sync 回包，拆出书籍基础信息和书单"""
     books = raw.get("books", [])
     archives = raw.get("archives", [])
@@ -21,15 +21,16 @@ def _parse_shelf_books(raw: dict) -> tuple[list[dict], list[dict]]:
     return parsed, archives
 
 
-def _map_book_info(raw: dict) -> dict:
+def map_book_info(raw: dict) -> dict:
     """将 /book/info 回包映射为 WereadBook 模型字段
 
     API 字段 → 模型字段：
+      bookId → id（_id 复用 bookId）
       intro → introduction
       newRatingDetail → newRatingDetails
     """
     return {
-        "bookId": raw.get("bookId"),
+        "id": raw.get("bookId"),
         "title": raw.get("title"),
         "author": raw.get("author"),
         "translator": raw.get("translator"),
