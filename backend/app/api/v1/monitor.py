@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Query
-from fastapi.responses import StreamingResponse
 from fastapi.sse import EventSourceResponse
 
 from app.api.des.auth import get_admin_user
@@ -75,11 +74,10 @@ async def get_server_status(
     )
 
 
-@router.get("/server/status/stream")
+@router.get("/server/status/stream", response_class=EventSourceResponse)
 async def get_server_status_stream(
     current_user: User = Depends(get_admin_user),
     monitor_service: MonitorService = Depends(monitor_service_dep),
 ):
-    event_generator = monitor_service.stream_server_status()
-
-    return EventSourceResponse(event_generator)
+    async for data in monitor_service.stream_server_status():
+        yield data

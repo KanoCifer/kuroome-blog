@@ -204,10 +204,12 @@
 
 <script setup lang="ts">
 import { useThemeStore } from '@/stores/theme';
+import { fetchEventSource } from '@microsoft/fetch-event-source';
 import dayjs from 'dayjs';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import VChart from 'vue-echarts';
 import { useOrigin } from '@/composables/useOrigin';
+import { getAccessToken } from '@/auth/tokenService';
 
 // Types
 interface ServerStatus {
@@ -243,7 +245,7 @@ const emit = defineEmits<{
 const loading = ref(false);
 const serverStatus = ref<ServerStatus | null>(null);
 const history = ref<HistoryItem[]>([]);
-const eventSource = ref<EventSource | null>(null);
+const eventSourceAbort = ref<AbortController | null>(null);
 const isSSEConnected = ref(false);
 
 // theme store for dark/light detection
@@ -454,63 +456,68 @@ const historyChartOption = computed(() => ({
 
 const fetchStatusSSE = async () => {
   // Close existing connection if any
-  if (eventSource.value) {
-    eventSource.value.close();
-    eventSource.value = null;
+  if (eventSourceAbort.value) {
+    eventSourceAbort.value.abort();
+    eventSourceAbort.value = null;
   }
 
-  console.log('Establishing SSE connection for server status...');
+  const ctrl = new AbortController();
+  eventSourceAbort.value = ctrl;
+
+  console.log(
+    'Establishing SSE connection for server status. accessToken:',
+    getAccessToken(),
+  );
   try {
-    const es = new EventSource(
-      useOrigin('/api/v1/status/server/status/stream'),
-      {
-        withCredentials: true,
+    await fetchEventSource(useOrigin('/api/v1/status/server/status/stream'), {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${getAccessToken()}`,
       },
-    );
+      signal: ctrl.signal,
+      async onopen() {
+        console.log('SSE connection established');
+        isSSEConnected.value = true;
+      },
+      onmessage(event) {
+        const data = JSON.parse(event.data);
+        serverStatus.value = data;
+        emit('status-update', data);
 
-    es.onopen = () => {
-      console.log('SSE connection established');
-      isSSEConnected.value = true;
-    };
+        // Add to history
+        history.value.push({
+          timestamp: new Date().toISOString(),
+          cpu: data.cpu_percent,
+          memory: data.mem_usage,
+        });
 
-    es.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      serverStatus.value = data;
-      emit('status-update', data);
-
-      // Add to history
-      history.value.push({
-        timestamp: new Date().toISOString(),
-        cpu: data.cpu_percent,
-        memory: data.mem_usage,
-      });
-
-      // Keep only last 100 records (~8 minutes of data at 5s intervals)
-      if (history.value.length > 100) {
-        history.value = history.value.slice(-100);
-      }
-    };
-
-    es.onerror = (err) => {
-      console.error('SSE error:', err);
-      es.close();
-      eventSource.value = null;
-      isSSEConnected.value = false;
-    };
-
-    eventSource.value = es;
+        // Keep only last 100 records (~8 minutes of data at 5s intervals)
+        if (history.value.length > 100) {
+          history.value = history.value.slice(-100);
+        }
+      },
+      onerror() {
+        isSSEConnected.value = false;
+        ctrl.abort();
+      },
+      onclose() {
+        isSSEConnected.value = false;
+      },
+    });
   } catch (err) {
-    console.error('Failed to establish SSE connection:', err);
+    if ((err as Error).name !== 'AbortError') {
+      console.error('Failed to establish SSE connection:', err);
+    }
     isSSEConnected.value = false;
   }
 };
 
 // Toggle auto refresh
 const toggleAutoRefresh = () => {
-  if (isSSEConnected.value && eventSource.value) {
+  if (isSSEConnected.value && eventSourceAbort.value) {
     // Pause: close connection
-    eventSource.value.close();
-    eventSource.value = null;
+    eventSourceAbort.value.abort();
+    eventSourceAbort.value = null;
     isSSEConnected.value = false;
     console.log('SSE connection closed');
   } else {
@@ -533,9 +540,9 @@ onMounted(() => {
 
 onUnmounted(() => {
   // Clean up SSE connection when component is destroyed
-  if (eventSource.value) {
-    eventSource.value.close();
-    eventSource.value = null;
+  if (eventSourceAbort.value) {
+    eventSourceAbort.value.abort();
+    eventSourceAbort.value = null;
     isSSEConnected.value = false;
   }
 });
