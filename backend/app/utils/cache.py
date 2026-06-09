@@ -1,14 +1,11 @@
-import asyncio
 import inspect
 import json
-from datetime import datetime, timedelta
 from functools import wraps
 from typing import Any
 
 import orjson
 from cachetools.keys import hashkey
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
 from redis.asyncio import ConnectionPool
 from redis.asyncio import Redis as AsyncRedis
 
@@ -22,15 +19,28 @@ CONNECTION_POOL = ConnectionPool.from_url(
 )
 
 
-class CacheItem(BaseModel):
-    value: Any
-    expires_at: datetime
+def _orjson_dumps(obj: Any) -> bytes:
+    """使用 orjson 序列化; 回退到内置 json (兼容无法直接序列化的类型)。"""
+
+    try:
+        return orjson.dumps(obj)
+    except TypeError:
+        # orjson 对复杂对象（如 datetime、Pydantic 模型）可能报错，使用标准 json 做最后回退
+        return json.dumps(obj, default=str).encode("utf-8")
+
+
+def _orjson_loads(data: str | bytes) -> bytes:
+    if isinstance(data, str):
+        data = data.encode("utf-8")
+    return orjson.loads(data)
 
 
 class AsyncCache:
-    def __init__(self) -> None:
-        self._cache: dict[str, CacheItem] = {}
-        self._lock = asyncio.Lock()
+    """基于 Redis 的异步缓存，支持装饰器和手动 set/get。"""
+
+    def __init__(self, redis_client: AsyncRedis) -> None:
+        self.redis: AsyncRedis = redis_client
+        self._cache_prefix = "cache:"
 
     # 装饰器
     def __call__(
@@ -83,73 +93,6 @@ class AsyncCache:
         key = hashkey(*args, **kwargs)
         return str(key)
 
-    async def __setitem__(self, key: str, value: Any) -> None:
-        """支持 cache[key] = value 方式设置缓存"""
-        await self.set(key, value)
-
-    async def __getitem__(self, key: str) -> Any:
-        """支持 cache[key] 方式获取缓存"""
-        return await self.get(key)
-
-    async def set(self, key, value: Any, ttl: int = 60) -> None:
-        expires_at: datetime = datetime.now() + timedelta(seconds=ttl)
-        async with self._lock:
-            self._cache[key] = CacheItem(value=value, expires_at=expires_at)
-
-    async def get(self, key) -> Any:
-        async with self._lock:
-            if key not in self._cache:
-                return None
-
-            item: CacheItem = self._cache[key]
-            if datetime.now() > item.expires_at:
-                del self._cache[key]  # 过期则删除
-                return None
-
-            return item.value
-
-    async def delete(self, key) -> None:
-        async with self._lock:
-            if key in self._cache:
-                del self._cache[key]
-
-    async def clear(self) -> None:
-        async with self._lock:
-            self._cache.clear()
-
-
-def _orjson_dumps(obj: Any) -> bytes:
-    """使用 orjson 序列化; 回退到内置 json (兼容无法直接序列化的类型)。"""
-
-    try:
-        return orjson.dumps(obj)
-    except TypeError:
-        # orjson 对复杂对象（如 datetime、Pydantic 模型）可能报错，使用标准 json 做最后回退
-        return json.dumps(obj, default=str).encode("utf-8")
-
-
-def _orjson_loads(data: str | bytes) -> bytes:
-    if isinstance(data, str):
-        data = data.encode("utf-8")
-    return orjson.loads(data)
-
-
-class AsyncRedisCache(AsyncCache):
-    """基于 Redis 缓存"""
-
-    def __init__(self, redis_client: AsyncRedis) -> None:
-        super().__init__()
-        self.redis: AsyncRedis = redis_client
-        self._cache_prefix = "cache:"
-
-    def __call__(
-        self,
-        func: Any | None = None,
-        ttl: int = 60,
-        exclude: list[str] | None = None,
-    ) -> Any:
-        return super().__call__(func, ttl, exclude)
-
     async def set(self, key, value: Any, ttl: int = 60) -> None:
         redis_key = self._cache_prefix + str(key)
 
@@ -201,12 +144,6 @@ class AsyncRedisCache(AsyncCache):
 
         return parsed
 
-    def __setitem__(self, key, value: Any) -> None:
-        asyncio.run(self.set(key, value))
-
-    def __getitem__(self, key) -> Any:
-        return asyncio.run(self.get(key))
-
     async def delete(self, key) -> None:
         redis_key = self._cache_prefix + str(key)
         await self.redis.delete(redis_key)
@@ -240,10 +177,10 @@ def init_redis_cache() -> AsyncRedis:
     return redis_cache_client
 
 
-redis_cache = AsyncRedisCache(redis_client=init_redis_cache())
+redis_cache = AsyncCache(redis_client=init_redis_cache())
 
 
-async def get_redis_cache() -> AsyncRedisCache:
+async def get_redis_cache() -> AsyncCache:
     return redis_cache
 
 

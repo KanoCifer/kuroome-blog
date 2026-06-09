@@ -877,7 +877,7 @@ const trendOption = computed(() => {
   return {
     tooltip: {
       trigger: 'axis',
-      formatter: (params: unknown) => {
+      formatter: (params: { name: string; value: number }[]) => {
         return (
           params[0].name + '：' + Math.round(params[0].value / 60) + ' 分钟'
         );
