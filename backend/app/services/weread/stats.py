@@ -81,24 +81,19 @@ class WereadStatsService(WereadBaseService):
 
         read_longest = None
         if raw.get("readLongest"):
-            read_longest = [
-                ReadLongestItem(
-                    bookId=item.get("book", {})
-                    .get("bookInfo", {})
-                    .get("bookId"),
-                    title=item.get("book", {})
-                    .get("bookInfo", {})
-                    .get("title"),
-                    author=item.get("book", {})
-                    .get("bookInfo", {})
-                    .get("author"),
-                    cover=item.get("book", {})
-                    .get("bookInfo", {})
-                    .get("cover"),
-                    readTime=item.get("readTime", 0),
+            read_longest = []
+            for item in raw["readLongest"]:
+                # 有声内容走 albumInfo，电子书/出版书走 book，且 book 是扁平结构
+                info = item.get("book") or item.get("albumInfo") or {}
+                read_longest.append(
+                    ReadLongestItem(
+                        bookId=info.get("bookId"),
+                        title=info.get("title"),
+                        author=info.get("author"),
+                        cover=info.get("cover"),
+                        readTime=item.get("readTime", 0),
+                    )
                 )
-                for item in raw["readLongest"]
-            ]
 
         prefer_category = None
         if raw.get("preferCategory"):

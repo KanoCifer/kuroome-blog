@@ -2,11 +2,7 @@
   <div class="bg-background flex min-h-[calc(100dvh-4rem)] flex-col">
     <!-- Hero Image Section -->
     <div class="relative h-[30vh] flex-shrink-0 overflow-hidden md:h-[35vh]">
-      <img
-        src="/card/card-1.jpeg"
-        alt=""
-        class="h-full w-full object-cover"
-      />
+      <img src="/card/card-1.jpeg" alt="" class="h-full w-full object-cover" />
       <div
         class="from-background/40 via-background/5 to-background pointer-events-none absolute inset-0 bg-gradient-to-b"
       />
@@ -117,7 +113,7 @@
 
         <template v-else-if="activeSnapshot">
           <!-- Mode Tabs -->
-          <div class="mb-3 flex gap-1 rounded-xl bg-card p-1">
+          <div class="bg-card mb-3 flex gap-1 rounded-xl p-1">
             <button
               v-for="mode in modes"
               :key="mode.key"
@@ -146,7 +142,7 @@
             </span>
             <button
               type="button"
-              class="border-border text-foreground hover:bg-accent hover:text-accent-foreground inline-flex items-center gap-1.5 rounded-lg border bg-card px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+              class="border-border text-foreground hover:bg-accent hover:text-accent-foreground bg-card inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
               :disabled="statsStore.isLoading"
               @click="handleRefresh"
             >
@@ -170,7 +166,7 @@
           </div>
 
           <!-- Summary Metrics -->
-          <div class="mb-8 grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-4">
+          <div class="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
             <div
               v-for="metric in summaryMetrics"
               :key="metric.key"
@@ -210,9 +206,11 @@
             <!-- Trend Chart -->
             <div
               v-if="activeSnapshot.readTimes"
-              class="bg-card relative overflow-hidden rounded-xl border"
+              class="bg-card relative overflow-hidden rounded-xl border shadow-sm transition-shadow duration-300 hover:shadow-lg"
             >
-              <div class="bg-primary/60 absolute top-0 right-0 left-0 h-[2px]" />
+              <div
+                class="bg-primary/60 absolute top-0 right-0 left-0 h-[2px]"
+              />
               <div class="p-4 sm:p-6">
                 <header class="mb-4 flex items-start gap-3">
                   <div
@@ -253,7 +251,9 @@
               v-if="hasReadListenData"
               class="bg-card relative overflow-hidden rounded-xl border"
             >
-              <div class="bg-success/60 absolute top-0 right-0 left-0 h-[2px]" />
+              <div
+                class="bg-success/60 absolute top-0 right-0 left-0 h-[2px]"
+              />
               <div class="p-4 sm:p-6">
                 <header class="mb-4 flex items-start gap-3">
                   <div
@@ -286,13 +286,17 @@
                 <div class="space-y-4">
                   <div>
                     <div class="mb-2 flex items-center justify-between">
-                      <span class="text-foreground flex items-center gap-2 text-sm">
+                      <span
+                        class="text-foreground flex items-center gap-2 text-sm"
+                      >
                         <span
                           class="bg-primary inline-block h-2 w-2 rounded-full"
                         />
                         文字阅读
                       </span>
-                      <span class="text-foreground text-sm font-medium tabular-nums">
+                      <span
+                        class="text-foreground text-sm font-medium tabular-nums"
+                      >
                         {{ formatDuration(activeSnapshot.wrReadTime) }}
                         <span class="text-muted-foreground text-xs">
                           · {{ readPercent }}%
@@ -308,13 +312,17 @@
                   </div>
                   <div>
                     <div class="mb-2 flex items-center justify-between">
-                      <span class="text-foreground flex items-center gap-2 text-sm">
+                      <span
+                        class="text-foreground flex items-center gap-2 text-sm"
+                      >
                         <span
                           class="bg-success inline-block h-2 w-2 rounded-full"
                         />
                         听书
                       </span>
-                      <span class="text-foreground text-sm font-medium tabular-nums">
+                      <span
+                        class="text-foreground text-sm font-medium tabular-nums"
+                      >
                         {{ formatDuration(activeSnapshot.wrListenTime) }}
                         <span class="text-muted-foreground text-xs">
                           · {{ listenPercent }}%
@@ -454,7 +462,8 @@
             <!-- Read Longest Chart -->
             <div
               v-if="
-                activeSnapshot.readLongest && activeSnapshot.readLongest.length > 0
+                activeSnapshot.readLongest &&
+                activeSnapshot.readLongest.length > 0
               "
               class="bg-card relative overflow-hidden rounded-xl border"
             >
@@ -540,10 +549,9 @@
                   </header>
                   <div class="space-y-2.5">
                     <div
-                      v-for="(author, index) in activeSnapshot.preferAuthor.slice(
-                        0,
-                        5,
-                      )"
+                      v-for="(
+                        author, index
+                      ) in activeSnapshot.preferAuthor.slice(0, 5)"
                       :key="author.authorId ?? index"
                       class="hover:bg-accent/50 flex items-center justify-between gap-3 rounded-lg px-2 py-2 transition-colors"
                     >
@@ -554,11 +562,15 @@
                         >
                           {{ index + 1 }}
                         </span>
-                        <span class="text-foreground truncate text-sm font-medium">
+                        <span
+                          class="text-foreground truncate text-sm font-medium"
+                        >
                           {{ author.name ?? '未知作者' }}
                         </span>
                       </div>
-                      <span class="text-muted-foreground flex-shrink-0 text-sm tabular-nums">
+                      <span
+                        class="text-muted-foreground flex-shrink-0 text-sm tabular-nums"
+                      >
                         {{ author.readingTime ?? '--' }}
                       </span>
                     </div>
@@ -608,10 +620,9 @@
                   </header>
                   <div class="space-y-2.5">
                     <div
-                      v-for="(pub, index) in activeSnapshot.preferPublisher.slice(
-                        0,
-                        5,
-                      )"
+                      v-for="(
+                        pub, index
+                      ) in activeSnapshot.preferPublisher.slice(0, 5)"
                       :key="pub.name ?? index"
                       class="hover:bg-accent/50 flex items-center justify-between gap-3 rounded-lg px-2 py-2 transition-colors"
                     >
@@ -622,11 +633,15 @@
                         >
                           {{ index + 1 }}
                         </span>
-                        <span class="text-foreground truncate text-sm font-medium">
+                        <span
+                          class="text-foreground truncate text-sm font-medium"
+                        >
                           {{ pub.name ?? '未知出版社' }}
                         </span>
                       </div>
-                      <span class="text-muted-foreground flex-shrink-0 text-sm tabular-nums">
+                      <span
+                        class="text-muted-foreground flex-shrink-0 text-sm tabular-nums"
+                      >
                         {{ pub.count }} 本
                       </span>
                     </div>
@@ -641,9 +656,7 @@
             v-if="activeSnapshot.readStat && activeSnapshot.readStat.length > 0"
             class="bg-card relative overflow-hidden rounded-xl border"
           >
-            <div
-              class="bg-warning/60 absolute top-0 right-0 left-0 h-[2px]"
-            />
+            <div class="bg-warning/60 absolute top-0 right-0 left-0 h-[2px]" />
             <div class="p-4 sm:p-6">
               <header class="mb-4 flex items-start gap-3">
                 <div
@@ -679,7 +692,9 @@
                   :key="stat.label"
                   class="bg-muted/40 hover:bg-muted/60 rounded-lg p-3 text-center transition-colors"
                 >
-                  <p class="text-foreground text-xl font-bold tabular-nums sm:text-2xl">
+                  <p
+                    class="text-foreground text-xl font-bold tabular-nums sm:text-2xl"
+                  >
                     {{ stat.value }}
                   </p>
                   <p class="text-muted-foreground mt-1 text-xs">
@@ -696,7 +711,6 @@
 </template>
 
 <script setup lang="ts">
-import type { ReadDetailSnapshot } from '@/api/wereadGateway';
 import { useReadStatsStore } from '@/stores/readStats';
 import dayjs from 'dayjs';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
@@ -744,13 +758,9 @@ onUnmounted(() => observer?.disconnect());
 const textColor = computed(() => (isDark.value ? '#e5e7eb' : '#1f2937'));
 const subtextColor = computed(() => (isDark.value ? '#9ca3af' : '#6b7280'));
 const axisColor = computed(() => (isDark.value ? '#4b5563' : '#d1d5db'));
-const splitLineColor = computed(() =>
-  isDark.value ? '#374151' : '#f3f4f6',
-);
+const splitLineColor = computed(() => (isDark.value ? '#374151' : '#f3f4f6'));
 
-const primaryColor = computed(() =>
-  isDark.value ? '#60a5fa' : '#3b82f6',
-);
+const primaryColor = computed(() => (isDark.value ? '#60a5fa' : '#3b82f6'));
 const primaryRgba = computed(() =>
   isDark.value ? 'rgba(96,165,250,' : 'rgba(59,130,246,',
 );
@@ -865,7 +875,14 @@ const trendOption = computed(() => {
     ([a], [b]) => Number(a) - Number(b),
   );
   return {
-    tooltip: { trigger: 'axis' },
+    tooltip: {
+      trigger: 'axis',
+      formatter: (params: unknown) => {
+        return (
+          params[0].name + '：' + Math.round(params[0].value / 60) + ' 分钟'
+        );
+      },
+    },
     grid: { left: 50, right: 20, top: 20, bottom: 30 },
     xAxis: {
       type: 'category',
@@ -915,9 +932,7 @@ const trendOption = computed(() => {
 const longestOption = computed(() => {
   const items = activeSnapshot.value?.readLongest ?? [];
   if (!items.length) return {};
-  const sorted = [...items]
-    .sort((a, b) => a.readTime - b.readTime)
-    .slice(-10);
+  const sorted = [...items].sort((a, b) => a.readTime - b.readTime).slice(-10);
   return {
     tooltip: {
       trigger: 'axis',

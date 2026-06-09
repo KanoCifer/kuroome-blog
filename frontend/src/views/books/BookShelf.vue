@@ -1,130 +1,12 @@
 <template>
   <div class="bg-background flex min-h-[calc(100dvh-4rem)] flex-col">
-    <!-- Hero Image Section -->
-    <div class="relative h-[40vh] flex-shrink-0 overflow-hidden md:h-[45vh]">
-      <img src="/card/card-1.jpeg" alt="" class="h-full w-full object-cover" />
-      <div
-        class="from-background/40 via-background/5 to-background pointer-events-none absolute inset-0 bg-gradient-to-b"
-      />
+    <BookShelfHero
+      :book-count="isLoading ? null : displayedBooks.length"
+      :is-syncing="isSyncing"
+      @sync="handleSync"
+    />
 
-      <!-- Back Button -->
-      <div
-        class="absolute top-0 right-0 left-0 z-10 flex items-center px-4 py-4 md:px-6"
-      >
-        <button
-          type="button"
-          class="border-border bg-card/60 hover:bg-accent flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
-          @click="handleBack"
-          aria-label="返回"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-            class="text-foreground h-5 w-5"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
-            />
-          </svg>
-        </button>
-      </div>
-      <!-- Sync Button -->
-      <div
-        class="absolute top-0 right-0 z-10 flex items-center px-4 py-4 md:px-6"
-      >
-        <button
-          type="button"
-          class="border-border bg-card/60 hover:bg-accent flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors disabled:opacity-50"
-          :disabled="isSyncing"
-          @click="handleSync"
-          aria-label="同步书架"
-        >
-          <CloudSync
-            class="text-foreground h-5 w-5"
-            :class="{ 'animate-breathe': isSyncing }"
-          />
-        </button>
-      </div>
-
-      <!-- Title Overlay -->
-      <div
-        class="absolute right-0 bottom-0 left-0 z-10 px-6 pb-6 md:px-10 md:pb-8"
-      >
-        <h1
-          class="font-serif text-3xl font-bold text-white drop-shadow-lg md:text-5xl"
-        >
-          我的书架
-        </h1>
-        <div class="mt-2 flex items-center gap-3">
-          <span class="text-sm text-white/75 md:text-base">微信读书</span>
-          <span class="h-1 w-1 rounded-full bg-white/40" />
-          <span v-if="!isLoading" class="text-sm text-white/75 md:text-base"
-            >{{ visibleBooks.length }} 本书</span
-          >
-        </div>
-      </div>
-    </div>
-
-    <!-- Stats Summary Bar -->
-    <div
-      v-if="weeklySnapshot"
-      class="border-border bg-card mx-auto mt-6 mb-4 w-[calc(100%-2rem)] max-w-6xl cursor-pointer rounded-2xl border p-4 shadow-sm transition-shadow hover:shadow-md sm:px-6 md:mt-8 md:mb-6 md:px-10"
-      @click="router.push('/bookshelf/stats')"
-    >
-      <div class="flex items-center gap-4 sm:gap-6">
-        <div class="flex-1">
-          <p class="text-muted-foreground mb-1 text-xs">本周阅读</p>
-          <p class="text-foreground text-xl font-bold">
-            {{ formatDuration(weeklySnapshot.totalReadTime) }}
-          </p>
-        </div>
-        <div class="bg-border h-10 w-px" />
-        <div class="flex-1">
-          <p class="text-muted-foreground mb-1 text-xs">阅读天数</p>
-          <p class="text-foreground text-xl font-bold">
-            {{ weeklySnapshot.readDays ?? 0 }}
-            <span class="text-muted-foreground text-xs font-normal">天</span>
-          </p>
-        </div>
-        <div class="bg-border hidden h-10 w-px sm:block" />
-        <div
-          v-if="latestBook"
-          class="hidden min-w-0 flex-1 items-center gap-3 sm:flex"
-        >
-          <img
-            v-if="latestBook.cover"
-            :src="latestBook.cover"
-            :alt="latestBook.title ?? ''"
-            class="h-12 w-9 flex-shrink-0 rounded object-cover shadow-sm"
-          />
-          <div class="min-w-0">
-            <p class="text-muted-foreground mb-0.5 text-xs">最近在读</p>
-            <p class="text-foreground truncate text-sm font-medium">
-              {{ latestBook.title }}
-            </p>
-          </div>
-        </div>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="2"
-          stroke="currentColor"
-          class="text-muted-foreground h-5 w-5 flex-shrink-0"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M8.25 4.5l7.5 7.5-7.5 7.5"
-          />
-        </svg>
-      </div>
-    </div>
+    <BookShelfStatsBar />
 
     <!-- Books Section -->
     <div class="flex-1 pb-8">
@@ -161,7 +43,7 @@
           </button>
         </div>
 
-        <!-- Empty state -->
+        <!-- Empty shelf -->
         <div
           v-else-if="visibleBooks.length === 0"
           class="flex flex-col items-center justify-center py-20"
@@ -172,89 +54,46 @@
           </p>
         </div>
 
-        <!-- Books grid -->
-        <div
-          v-else
-          class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
-        >
-          <a
-            v-for="(book, index) in visibleBooks"
-            :key="book.bookId"
-            :href="`weread://reading?bId=${book.bookId}`"
-            class="group block"
-            @click.prevent="handleBookClick(book.bookId)"
-          >
-            <div
-              class="bg-card hover:shadow-primary/5 relative overflow-hidden rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-              :style="{ animationDelay: `${index * 30}ms` }"
-            >
-              <div class="relative aspect-3/4 overflow-hidden">
-                <img
-                  v-if="book.cover"
-                  :src="book.cover"
-                  :alt="book.title"
-                  class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                  loading="lazy"
-                  @error="
-                    ($event.target as HTMLImageElement).style.display = 'none'
-                  "
-                />
-                <div
-                  v-else
-                  class="bg-muted flex h-full w-full items-center justify-center"
-                >
-                  <span class="text-muted-foreground/40 font-serif text-2xl">{{
-                    book.title.slice(0, 1)
-                  }}</span>
-                </div>
-
-                <!-- Hover overlay with open icon -->
-                <div
-                  class="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors duration-300 group-hover:bg-black/30"
-                >
-                  <div
-                    class="bg-background/90 text-foreground flex h-10 w-10 items-center justify-center rounded-full opacity-0 shadow-lg backdrop-blur-sm transition-all duration-300 group-hover:opacity-100"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="2"
-                      stroke="currentColor"
-                      class="h-5 w-5"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-                      />
-                    </svg>
-                  </div>
-                </div>
-
-                <div
-                  v-if="book.finishReading"
-                  class="bg-success/90 absolute top-2 right-2 rounded-full px-2 py-0.5 text-[10px] font-medium text-white"
-                >
-                  已读
-                </div>
-              </div>
-              <div class="px-1.5 py-2">
-                <p
-                  class="text-foreground line-clamp-2 text-xs font-medium leading-snug"
-                  :title="book.title"
-                >
-                  {{ book.title }}
-                </p>
-                <p
-                  class="text-muted-foreground mt-1 truncate text-[11px] leading-snug"
-                  :title="book.author"
-                >
-                  {{ book.author }}
-                </p>
-              </div>
+        <!-- Has books: search + results -->
+        <div v-else>
+          <!-- Search bar -->
+          <div class="mb-4">
+            <div class="relative">
+              <Search
+                class="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2"
+              />
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="搜索书名或作者…"
+                class="border-border bg-card placeholder:text-muted-foreground/50 focus:border-primary focus:ring-primary/20 w-full rounded-xl border py-2 pr-4 pl-9 text-sm outline-none transition-colors focus:ring-2"
+              />
             </div>
-          </a>
+          </div>
+
+          <!-- No results -->
+          <div
+            v-if="displayedBooks.length === 0"
+            class="flex flex-col items-center justify-center py-16"
+          >
+            <p class="text-muted-foreground text-sm">
+              没有找到「{{ searchQuery }}」相关的书籍
+            </p>
+          </div>
+
+          <!-- Books grid -->
+          <div
+            v-else
+            class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
+          >
+            <BookCard
+              v-for="(book, index) in displayedBooks"
+              :key="book.bookId"
+              :book="book"
+              :index="index"
+              @select="handleBookClick"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -262,93 +101,33 @@
 </template>
 
 <script setup lang="ts">
-import type { WereadUserBook } from '@/api/wereadGateway';
 import { useReadStatsStore } from '@/stores/readStats';
-import { wereadGateway } from '@/api/wereadGateway';
+import { useWereadShelf } from '@/composables/useWereadShelf';
 import { computed, onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { CloudSync } from '@lucide/vue';
+import { Search } from '@lucide/vue';
+import BookCard from './components/BookCard.vue';
+import BookShelfHero from './components/BookShelfHero.vue';
+import BookShelfStatsBar from './components/BookShelfStatsBar.vue';
 
-const router = useRouter();
-const isLoading = ref(true);
-const errorMessage = ref('');
-const books = ref<WereadUserBook[]>([]);
-
-const isSyncing = ref(false);
+const searchQuery = ref('');
 const statsStore = useReadStatsStore();
-const weeklySnapshot = computed(() => statsStore.weeklySnapshot);
 
-const latestBook = computed(() => {
-  const s = statsStore.weeklySnapshot;
-  if (!s?.readLongest?.length) return null;
-  return s.readLongest[0];
+const { isLoading, errorMessage, isSyncing, visibleBooks, fetchBooks, handleSync } =
+  useWereadShelf();
+
+const displayedBooks = computed(() => {
+  const list = visibleBooks.value;
+  const q = searchQuery.value.trim().toLowerCase();
+  if (!q) return list;
+  return list.filter(
+    (b) => b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q)
+  );
 });
-
-function formatDuration(seconds: number | null): string {
-  if (!seconds || seconds <= 0) return '0';
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  if (h > 0) return `${h}h ${m}m`;
-  return `${m}m`;
-}
-
-const visibleBooks = computed(() => books.value.filter((b) => !b.secret));
-
-const handleBack = () => {
-  if (window.history.length > 1) {
-    router.back();
-  } else {
-    router.push('/');
-  }
-};
 
 const handleBookClick = (bookId: string) => {
   const link = document.createElement('a');
   link.href = `weread://reading?bId=${bookId}`;
   link.click();
-};
-
-const fetchBooks = async () => {
-  isLoading.value = true;
-  errorMessage.value = '';
-  try {
-    const res = await wereadGateway.getUserShelf();
-    if (res.status === 'success' && res.data) {
-      books.value = res.data.user_books;
-    } else {
-      throw new Error(res.message || '获取书架失败');
-    }
-  } catch (err: unknown) {
-    const error = err as {
-      response?: { data?: { message?: string } };
-      message?: string;
-    };
-    errorMessage.value =
-      error?.response?.data?.message || error?.message || '获取书架失败';
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-const handleSync = async () => {
-  isSyncing.value = true;
-  try {
-    const res = await wereadGateway.syncMyBooks();
-    if (res.status === 'success') {
-      await fetchBooks();
-    } else {
-      throw new Error(res.message || '同步失败');
-    }
-  } catch (err: unknown) {
-    const error = err as {
-      response?: { data?: { message?: string } };
-      message?: string;
-    };
-    errorMessage.value =
-      error?.response?.data?.message || error?.message || '同步失败';
-  } finally {
-    isSyncing.value = false;
-  }
 };
 
 onMounted(async () => {
