@@ -6,6 +6,7 @@ export interface WereadUserBook {
   bookId: string;
   title: string;
   author: string;
+  cover: string | null;
   isTop: boolean;
   readUpdateTime: string | null;
   finishReading: boolean;

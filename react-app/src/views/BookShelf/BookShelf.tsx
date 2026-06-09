@@ -4,8 +4,8 @@ import {
   selectWeeklySnapshot,
 } from '@/stores/readStatsStore';
 import { wereadService } from '@/services/wereadService';
-import { ArrowLeft, RefreshCw } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { ArrowLeft, ExternalLink, RefreshCw } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function formatDuration(seconds: number | null): string {
@@ -19,7 +19,6 @@ function formatDuration(seconds: number | null): string {
 export default function BookShelf() {
   const navigate = useNavigate();
   const [books, setBooks] = useState<WereadUserBook[]>([]);
-  const [coverMap, setCoverMap] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -30,24 +29,6 @@ export default function BookShelf() {
   const latestBook = weeklySnapshot?.readLongest?.[0] ?? null;
 
   const visibleBooks = books.filter((b) => !b.secret);
-
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const bookRefs = useRef<Map<string, HTMLDivElement>>(new Map());
-
-  const loadCover = useCallback(
-    async (bookId: string) => {
-      if (coverMap[bookId]) return;
-      try {
-        const res = await wereadService.getBookInfo(bookId);
-        if (res.status === 'success' && res.data?.cover) {
-          setCoverMap((prev) => ({ ...prev, [bookId]: res.data!.cover! }));
-        }
-      } catch {
-        /* ignore */
-      }
-    },
-    [coverMap],
-  );
 
   const fetchBooks = useCallback(async () => {
     setIsLoading(true);
@@ -102,54 +83,15 @@ export default function BookShelf() {
     }
   }, [navigate]);
 
-  // Setup intersection observer for lazy loading covers
-  useEffect(() => {
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          const bookId = (entry.target as HTMLElement).dataset.bookId;
-          if (!bookId || coverMap[bookId]) {
-            observerRef.current?.unobserve(entry.target);
-            continue;
-          }
-          observerRef.current?.unobserve(entry.target);
-          loadCover(bookId);
-        }
-      },
-      { rootMargin: '200px' },
-    );
+  const handleBookClick = useCallback((bookId: string) => {
+    const link = document.createElement('a');
+    link.href = `weread://reading?bId=${bookId}`;
+    link.click();
+  }, []);
 
-    return () => observerRef.current?.disconnect();
-  }, [coverMap, loadCover]);
-
-  // Observe book elements
-  useEffect(() => {
-    const observer = observerRef.current;
-    if (!observer) return;
-
-    bookRefs.current.forEach((el) => {
-      observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, [visibleBooks]);
-
-  // Initial data fetch
   useEffect(() => {
     Promise.all([fetchBooks(), statsStore.fetchStats()]);
   }, [fetchBooks, statsStore]);
-
-  const setBookRef = useCallback(
-    (bookId: string) => (el: HTMLDivElement | null) => {
-      if (el) {
-        bookRefs.current.set(bookId, el);
-      } else {
-        bookRefs.current.delete(bookId);
-      }
-    },
-    [],
-  );
 
   return (
     <div className="bg-background flex min-h-[calc(100dvh-4rem)] flex-col">
@@ -272,13 +214,14 @@ export default function BookShelf() {
         <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 md:px-10">
           {/* Loading skeleton */}
           {isLoading && (
-            <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="animate-pulse">
-                  <div className="bg-muted aspect-2/3 rounded-xl" />
-                  <div className="mt-3 space-y-2">
-                    <div className="bg-muted h-4 w-3/4 rounded" />
-                    <div className="bg-muted h-3 w-1/2 rounded" />
+                  <div className="bg-muted aspect-3/4 rounded-xl" />
+                  <div className="mt-2 space-y-1.5 px-1.5">
+                    <div className="bg-muted h-3 w-5/6 rounded" />
+                    <div className="bg-muted h-3 w-3/4 rounded" />
+                    <div className="bg-muted h-2.5 w-1/2 rounded" />
                   </div>
                 </div>
               ))}
@@ -313,53 +256,70 @@ export default function BookShelf() {
 
           {/* Books grid */}
           {!isLoading && !errorMessage && visibleBooks.length > 0 && (
-            <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
               {visibleBooks.map((book, index) => (
-                <div
+                <a
                   key={book.bookId}
-                  ref={setBookRef(book.bookId)}
-                  className="group cursor-pointer"
-                  data-book-id={book.bookId}
+                  href={`weread://reading?bId=${book.bookId}`}
+                  className="group block"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleBookClick(book.bookId);
+                  }}
                 >
                   <div
-                    className="bg-card hover:shadow-primary/5 relative aspect-2/3 overflow-hidden rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
+                    className="bg-card hover:shadow-primary/5 relative overflow-hidden rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                     style={{ animationDelay: `${index * 30}ms` }}
                   >
-                    {coverMap[book.bookId] ? (
-                      <img
-                        src={coverMap[book.bookId]}
-                        alt={book.title}
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                        loading="lazy"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <div className="bg-muted flex h-full w-full items-center justify-center">
-                        <span className="text-muted-foreground/40 font-serif text-2xl">
-                          {book.title.slice(0, 1)}
-                        </span>
+                    <div className="relative aspect-3/4 overflow-hidden">
+                      {book.cover ? (
+                        <img
+                          src={book.cover}
+                          alt={book.title}
+                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                          loading="lazy"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display =
+                              'none';
+                          }}
+                        />
+                      ) : (
+                        <div className="bg-muted flex h-full w-full items-center justify-center">
+                          <span className="text-muted-foreground/40 font-serif text-2xl">
+                            {book.title.slice(0, 1)}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Hover overlay with open icon */}
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors duration-300 group-hover:bg-black/30">
+                        <div className="bg-background/90 text-foreground flex h-10 w-10 items-center justify-center rounded-full opacity-0 shadow-lg backdrop-blur-sm transition-all duration-300 group-hover:opacity-100">
+                          <ExternalLink className="h-5 w-5" />
+                        </div>
                       </div>
-                    )}
-                    {book.finishReading && (
-                      <div className="bg-success/90 absolute top-2 right-2 rounded-full px-2 py-0.5 text-[10px] font-medium text-white">
-                        已读
-                      </div>
-                    )}
+
+                      {book.finishReading && (
+                        <div className="bg-success/90 absolute top-2 right-2 rounded-full px-2 py-0.5 text-[10px] font-medium text-white">
+                          已读
+                        </div>
+                      )}
+                    </div>
+                    <div className="px-1.5 py-2">
+                      <p
+                        className="text-foreground line-clamp-2 text-xs font-medium leading-snug"
+                        title={book.title}
+                      >
+                        {book.title}
+                      </p>
+                      <p
+                        className="text-muted-foreground mt-1 truncate text-[11px] leading-snug"
+                        title={book.author}
+                      >
+                        {book.author}
+                      </p>
+                    </div>
                   </div>
-                  <div className="mt-2.5 px-0.5">
-                    <p
-                      className="text-foreground truncate text-sm font-medium"
-                      title={book.title}
-                    >
-                      {book.title}
-                    </p>
-                    <p className="text-muted-foreground truncate text-xs">
-                      {book.author}
-                    </p>
-                  </div>
-                </div>
+                </a>
               ))}
             </div>
           )}
