@@ -359,28 +359,30 @@ onUnmounted(() => {
     </template>
   </BasicDetail>
 
-  <AlertDialog
-    :open="showDeleteDialog"
-    @update:open="showDeleteDialog = $event"
-  >
-    <AlertDialogContent class="sm:max-w-[425px]">
-      <AlertDialogHeader>
-        <AlertDialogTitle>Are you sure delete this Post?</AlertDialogTitle>
-        <AlertDialogDescription>
-          The action cannot be undone.
-        </AlertDialogDescription>
-      </AlertDialogHeader>
-      <AlertDialogFooter>
-        <AlertDialogCancel>Cancel</AlertDialogCancel>
-        <AlertDialogAction
-          class="bg-destructive hover:bg-destructive/90 text-white"
-          @click="confirmDelete"
-        >
-          Delete
-        </AlertDialogAction>
-      </AlertDialogFooter>
-    </AlertDialogContent>
-  </AlertDialog>
+  <Teleport to="body">
+    <AlertDialog
+      :open="showDeleteDialog"
+      @update:open="showDeleteDialog = $event"
+    >
+      <AlertDialogContent class="sm:max-w-[425px]">
+        <AlertDialogHeader>
+          <AlertDialogTitle>Are you sure delete this Post?</AlertDialogTitle>
+          <AlertDialogDescription>
+            The action cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            class="bg-destructive hover:bg-destructive/90 text-white"
+            @click="confirmDelete"
+          >
+            Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  </Teleport>
 </template>
 
 <style>
