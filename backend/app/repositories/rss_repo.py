@@ -8,7 +8,7 @@ from bson import ObjectId
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.beanie import RssArticle, RssArticleGuidProjection
+from app.models.rss import RssArticle, RssArticleGuidProjection
 from app.models.models import RssInfo
 
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from app.models.beanie import FriendLinks
+from app.models.friendlink import FriendLinks
 from app.repositories.friendlink_repo import FriendLinkRepo
 
 

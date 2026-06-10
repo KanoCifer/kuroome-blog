@@ -6,7 +6,8 @@ from bson import ObjectId
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.beanie import MessageBoard, Post
+from app.models.blog import Post
+from app.models.message import MessageBoard
 from app.models.models import Category
 
 

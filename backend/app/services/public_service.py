@@ -119,70 +119,6 @@ Allow: /
 Sitemap: {sitemap_url}
 """
 
-    async def build_sitemap_xml(self) -> str:
-        urlset = Element(
-            "urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        )
-
-        today = datetime.now(UTC).isoformat().split("T")[0]
-
-        # Static public pages
-        self._append_static_url(urlset, _FRONTEND_URL, today, "daily", "1.0")
-        self._append_static_url(
-            urlset, f"{_FRONTEND_URL}/blog", today, "daily", "0.9"
-        )
-        self._append_static_url(
-            urlset, f"{_FRONTEND_URL}/about", today, "monthly", "0.7"
-        )
-        self._append_static_url(
-            urlset, f"{_FRONTEND_URL}/fishing-map", today, "weekly", "0.7"
-        )
-        self._append_static_url(
-            urlset, f"{_FRONTEND_URL}/gallery", today, "weekly", "0.7"
-        )
-        self._append_static_url(
-            urlset, f"{_FRONTEND_URL}/changelog", today, "weekly", "0.6"
-        )
-        self._append_static_url(
-            urlset, f"{_FRONTEND_URL}/websites", today, "monthly", "0.6"
-        )
-        self._append_static_url(
-            urlset, f"{_FRONTEND_URL}/todos", today, "weekly", "0.5"
-        )
-        self._append_static_url(
-            urlset,
-            f"{_FRONTEND_URL}/toolbox/image-toolbox",
-            today,
-            "monthly",
-            "0.5",
-        )
-
-        # Blog posts from DB
-        try:
-            posts = await self.repo.list_sitemap_posts()
-            for post in posts:
-                url = SubElement(urlset, "url")
-                loc = SubElement(url, "loc")
-                loc.text = f"{_FRONTEND_URL}/blog/{post['_id']}"
-                if "updated_at" in post:
-                    lastmod = SubElement(url, "lastmod")
-                    lastmod_text = post["updated_at"]
-                    if hasattr(lastmod_text, "isoformat"):
-                        lastmod.text = lastmod_text.isoformat().split("T")[0]
-                    else:
-                        lastmod.text = str(lastmod_text)[:10]
-                changefreq = SubElement(url, "changefreq")
-                changefreq.text = "weekly"
-                priority = SubElement(url, "priority")
-                priority.text = "0.8"
-        except Exception:
-            pass
-
-        return '<?xml version="1.0" encoding="UTF-8"?>\n' + tostring(
-            urlset,
-            encoding="unicode",
-        )
-
     @staticmethod
     def _append_static_url(
         urlset: Element,
@@ -282,7 +218,9 @@ Sitemap: {sitemap_url}
         except RuntimeError as exc:
             yield sse_event({"content": f"[ERROR] {exc!r}", "is_end": True})
         except Exception as exc:
-            yield sse_event({"content": f"[ERROR] 天气分析失败: {exc!r}", "is_end": True})
+            yield sse_event(
+                {"content": f"[ERROR] 天气分析失败: {exc!r}", "is_end": True}
+            )
 
     async def set_pic_gallery(
         self, redis: AsyncRedis, images: GalleryInput
@@ -318,7 +256,7 @@ Sitemap: {sitemap_url}
 
     async def get_pic_gallery(self, redis: AsyncRedis) -> list[dict]:
         """获取图片画廊数据，优先走 Redis 缓存，miss 时回源 DB。"""
-        cached = await redis.lrange("pic_gallery:images", 0, -1)
+        cached = await redis.lrange("pic_gallery:images", 0, -1)  # pyright: ignore[reportGeneralTypeIssues]
         if cached:
             return [orjson.loads(img) for img in cached]  # type: ignore
 
@@ -347,3 +285,35 @@ Sitemap: {sitemap_url}
                 return result
 
         return []
+
+    # ── Changelog ──────────────────────────────────────────────
+
+    async def get_changelogs(self) -> list[dict]:
+        """获取所有 changelog。"""
+        docs = await self.repo.get_changelogs()
+        return [d.model_dump(mode="json", exclude_none=True) for d in docs]
+
+    async def get_changelog_by_version(self, version: str) -> dict | None:
+        """根据版本号获取单条 changelog。"""
+        doc = await self.repo.get_changelog_by_version(version)
+        return doc.model_dump(mode="json") if doc else None
+
+    async def save_changelog(self, data: dict) -> dict:
+        """保存或更新 changelog。"""
+        doc = await self.repo.save_changelog(data)
+        return doc.model_dump(mode="json", exclude_none=True)
+
+    async def import_changelogs_from_json(self, items: list[dict]) -> dict:
+        """从 JSON 数据批量导入 changelog，返回统计信息。"""
+        inserted = await self.repo.save_changelogs(items)
+        total = len(items)
+        skipped = total - inserted
+        return {
+            "total": total,
+            "inserted": inserted,
+            "skipped": skipped,
+        }
+
+    async def delete_changelog(self, version: str) -> bool:
+        """根据版本号删除 changelog。"""
+        return await self.repo.delete_changelog(version)

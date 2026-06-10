@@ -1,4 +1,4 @@
-from app.models.beanie import DevTask
+from app.models.devtask import DevTask
 from app.repositories.devtask_repo import DevTaskRepo
 
 

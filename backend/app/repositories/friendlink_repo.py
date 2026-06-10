@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from beanie import PydanticObjectId
 
-from app.models.beanie import FriendLinks
+from app.models.friendlink import FriendLinks
 
 
 class FriendLinkRepo:

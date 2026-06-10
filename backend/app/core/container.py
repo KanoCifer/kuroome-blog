@@ -1,7 +1,6 @@
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 
-from pymongo.asynchronous.database import AsyncDatabase
 from redis.asyncio import Redis as AsyncRedis
 
 from app.api.des.db import get_async_session
@@ -103,9 +102,9 @@ async def get_monitor_service():
 
 
 @asynccontextmanager
-async def get_public_service(mongodb: AsyncDatabase):
+async def get_public_service():
     async with get_async_session() as session:
-        public_repo = PublicRepo(mongodb=mongodb)
+        public_repo = PublicRepo()
         gallery_repo = GalleryRepo(session)
         service = PublicService(repo=public_repo, gallery_repo=gallery_repo)
         yield service

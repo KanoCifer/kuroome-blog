@@ -1,6 +1,14 @@
 <script setup lang="ts">
-import changelog from '@/data/changelog.json';
+import { ref, onMounted } from 'vue';
 import { motion } from 'motion-v';
+import { changelogGateway, type Changelog } from '@/api/changelogGateway';
+
+const changelog = ref<Changelog[]>([]);
+
+onMounted(async () => {
+  changelog.value = await changelogGateway.getChangelogs();
+});
+
 const getTypeLabel = (type: string): string => {
   const labels: Record<string, string> = {
     feat: '新功能',

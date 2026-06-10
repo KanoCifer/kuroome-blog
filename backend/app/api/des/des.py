@@ -52,9 +52,8 @@ async def monitor_service_dep():
         yield service
 
 
-async def public_service_dep(request: Request):
-    mongodb = request.app.state.mongo
-    async with get_public_service(mongodb=mongodb) as service:
+async def public_service_dep():
+    async with get_public_service() as service:
         yield service
 
 

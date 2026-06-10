@@ -7,7 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.models.beanie import SubscriptionLog
+from app.models.subscription import SubscriptionLog
 from app.models.models import Profile, Subscription
 
 

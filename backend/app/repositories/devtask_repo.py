@@ -2,7 +2,7 @@ from datetime import UTC, datetime
 
 from beanie import PydanticObjectId
 
-from app.models.beanie import DevTask
+from app.models.devtask import DevTask
 
 
 class DevTaskRepo:

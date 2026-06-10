@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 
 from beanie import SortDirection
 
-from app.models.beanie import MessageBoard
+from app.models.message import MessageBoard
 
 
 class MessageRepo:

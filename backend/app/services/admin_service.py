@@ -6,7 +6,8 @@ from bson import ObjectId
 from bson.errors import InvalidId
 
 from app.core.exceptions import AdminDomainError
-from app.models.beanie import MessageBoard, Post
+from app.models.blog import Post
+from app.models.message import MessageBoard
 from app.repositories.admin_repo import AdminRepo
 
 

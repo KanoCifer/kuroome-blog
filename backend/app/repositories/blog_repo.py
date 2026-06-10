@@ -7,7 +7,7 @@ from bson import ObjectId
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.beanie import Comment, Post
+from app.models.blog import Comment, Post
 from app.models.models import Category
 
 

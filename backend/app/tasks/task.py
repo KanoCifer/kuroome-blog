@@ -17,13 +17,10 @@ from taskiq import (
 from app.core.config import get_settings
 from app.core.logger import logger
 from app.core.mail import MailConfig
-from app.models.beanie import (
-    MessageBoard,
-    Post,
-    RssArticle,
-    RssFeed,
-    SubscriptionLog,
-)
+from app.models.blog import Post
+from app.models.message import MessageBoard
+from app.models.rss import RssArticle, RssFeed
+from app.models.subscription import SubscriptionLog
 from app.schemas import (
     EmailCodeContent,
 )
