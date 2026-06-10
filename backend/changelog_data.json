@@ -1,5 +1,46 @@
 [
   {
+    "version": "3.3.0",
+    "date": "2026-06-10",
+    "title": "Beanie 模型模块化、书架缓存与双端 UI 打磨",
+    "changes": [
+      { "type": "feat", "content": "Beanie 模型拆分为独立模块，新增 Changelog MongoDB 支持" },
+      { "type": "feat", "content": "书架接口增加 Redis 缓存，写入时自动失效" },
+      { "type": "feat", "content": "React 端 Changelog 改为从后端 API 获取" },
+      { "type": "feat", "content": "React 端同步登录态主动刷新与 Vue 对齐" },
+      { "type": "feat", "content": "Vue 端 BookStats 卡片化重构，支持刷新操作" },
+      { "type": "fix", "content": "修复博客页面首次访问与返回导航不显示内容" },
+      { "type": "fix", "content": "修复 AlertDialog Transition 警告与模板根节点问题" },
+      { "type": "fix", "content": "修复监控 SSE 认证与 EventSource header 问题" },
+      { "type": "fix", "content": "统一 Vue 端 head 管理，修复图片画廊 media URL 双重前缀" },
+      { "type": "fix", "content": "微信读书封面 URL 升级 HTTPS 避免混合内容" },
+      { "type": "fix", "content": "移除 CSRF 中间件，加固 refresh_token cookie 安全策略" },
+      { "type": "refactor", "content": "认证模块重构：移除 sideEffects 抽象层，重组 auth 模块结构" },
+      { "type": "refactor", "content": "BookShelf 拆分为 composable 与子组件，React 端同步卡片布局" },
+      { "type": "refactor", "content": "微信读书复用 bookId 作为 WereadBook _id 优化 Link 查询" },
+      { "type": "style", "content": "打磨 Bento 卡片、下拉菜单、阅读统计、Hero 区域、博客列表与个人资料 UI" },
+      { "type": "docs", "content": "README 增加截图展示与功能表格重构" }
+    ]
+  },
+  {
+    "version": "3.2.0",
+    "date": "2026-06-05",
+    "title": "微信读书书架、后端架构重整与状态页同步",
+    "changes": [
+      { "type": "feat", "content": "新增微信读书书架 API 与全屏书架视图，双端同步阅读统计" },
+      { "type": "feat", "content": "React 端同步状态监控页面，支持嵌套 API 数据结构" },
+      { "type": "feat", "content": "Vue 端页面隐藏时暂停背景图自动切换" },
+      { "type": "fix", "content": "修复 Beanie 2.x 与微信读书模型导入/查询兼容问题" },
+      { "type": "fix", "content": "修复天气分析接口缺少 CSRF token 与 credentials" },
+      { "type": "fix", "content": "修复 readProgress 类型注解冲突与遗留 try-except" },
+      { "type": "refactor", "content": "后端统一响应格式与错误处理，提取中间件/路由初始化" },
+      { "type": "refactor", "content": "微信读书 repo 拆分为 package，内联 upsert 逻辑" },
+      { "type": "refactor", "content": "拆分 user/weread service 为独立模块，提取 FriendLinkRepo" },
+      { "type": "refactor", "content": "移除 v1 书籍 CRUD，BentoReadingList 迁移至 v2" },
+      { "type": "refactor", "content": "Vue 端移除 service 层，组件直接调用 gateway" }
+    ]
+  },
+  {
     "version": "3.1.0",
     "date": "2026-06-02",
     "title": "状态监控、微信读书集成与双端评论系统升级",

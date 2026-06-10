@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/auth/stores/auth';
 import { useNotificationStore } from '@/stores/notification';
+import { useArticleChat } from '@/composables/useArticleChat';
+import { useArticleSummary } from '@/composables/useArticleSummary';
+import { useShimmerTips } from '@/composables/useShimmerTips';
 import { AnimatePresence, motion } from 'motion-v';
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
-
-interface ChatMessage {
-  role: 'user' | 'assistant';
-  content: string;
-}
+import { computed, onMounted, ref, watch } from 'vue';
 
 enum CardMode {
   SUMMARY = 'summary',
@@ -23,264 +21,63 @@ const auth = useAuthStore();
 const notifier = useNotificationStore();
 const apiBase = import.meta.env.VITE_API_BASE || '/api';
 
+const articleCtx = { title: props.title, content: props.content };
+const {
+  loading: summaryLoading,
+  summary,
+  hasGenerated: summaryHasGenerated,
+  errorMessage: summaryError,
+  canSummarize,
+  checkCachedSummary,
+  generate,
+} = useArticleSummary(articleCtx, apiBase);
+const {
+  messages,
+  chatInput,
+  loading: chatLoading,
+  errorMessage: chatError,
+  canChat,
+  bindContainer,
+  enterChat,
+  clearChat,
+  send,
+  onInputKeydown,
+} = useArticleChat(articleCtx, apiBase);
+const { tips: textShimmer, active: shimmerActive } = useShimmerTips();
+
 const cardMode = ref<CardMode>(CardMode.SUMMARY);
-const loading = ref<boolean>(false);
-const summary = ref<string>('');
-const hasGenerated = ref<boolean>(false);
-const errorMessage = ref<string>('');
 
-const messages = ref<ChatMessage[]>([]);
-const chatInput = ref<string>('');
-const sessionId = ref<string>('');
-const messagesContainer = ref<HTMLElement | null>(null);
-
-const pureContent = computed(() =>
-  props.content.replaceAll(/<[^>]+>/g, '').trim(),
+const loading = computed(() => summaryLoading.value || chatLoading.value);
+const hasGenerated = computed(
+  () => summaryHasGenerated.value || messages.value.length > 0,
+);
+const errorMessage = computed(
+  () => summaryError.value || chatError.value,
 );
 
-const canSummarize = computed(
-  () => pureContent.value.length > 0 && !loading.value,
-);
-
-const canChat = computed(
-  () =>
-    hasGenerated.value && chatInput.value.trim().length > 0 && !loading.value,
-);
-
-/** 生成对话会话 ID（新对话或清空时使用） */
-function generateSessionId() {
-  return `summary_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
-}
-
-/**
- * 检查是否有已缓存的文章总结
- * 使用 POST + JSON body 传递文章内容，避免 GET 查询参数过长导致 431 错误
- * 页面加载时自动调用，命中缓存则直接显示历史总结
- */
-async function checkCachedSummary() {
-  if (!auth.isAuthenticated || !pureContent.value) return;
-  try {
-    const res = await fetch(`${apiBase}/v1/agent/history/summary`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        article_content: pureContent.value,
-        article_title: props.title || undefined,
-      }),
-    });
-    if (!res.ok) return;
-    const data = await res.json();
-    if (data.cached && data.summary) {
-      summary.value = data.summary;
-      hasGenerated.value = true;
-    }
-  } catch {
-    // 缓存查询失败不影响正常使用，静默忽略
-  }
-}
-
-/**
- * 加载历史对话记录
- * 切换到对话模式时调用，恢复之前与 AI 的聊天上下文
- * 同样使用 POST 避免 431 错误
- */
-async function loadChatHistory() {
-  if (!auth.isAuthenticated || !pureContent.value) return;
-  try {
-    const res = await fetch(`${apiBase}/v1/agent/history/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        article_content: pureContent.value,
-        article_title: props.title || undefined,
-      }),
-    });
-    if (!res.ok) return;
-    const data = await res.json();
-    if (data.cached && data.messages?.length > 0) {
-      messages.value = data.messages;
-      sessionId.value = data.session_id;
-    }
-  } catch {
-    // 缓存查询失败不影响正常使用，静默忽略
-  }
-}
-
-onMounted(async () => {
-  // 页面加载时自动检查是否有已缓存的总结
-  await checkCachedSummary();
+watch(loading, (on) => {
+  shimmerActive.value = on;
 });
 
-// 登录状态变化时重新检查缓存（兼容登录后切换回页面的场景）
+onMounted(async () => {
+  await checkCachedSummary(auth.isAuthenticated);
+});
+
 watch(
   () => auth.isAuthenticated,
   async (isAuth) => {
     if (isAuth && !summary.value && !loading.value) {
-      await checkCachedSummary();
+      await checkCachedSummary(isAuth);
     }
   },
 );
-
-async function scrollToBottom() {
-  await nextTick();
-  if (messagesContainer.value) {
-    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
-  }
-}
-
-async function generateSummaryStream() {
-  if (!canSummarize.value) {
-    notifier.error('文章内容为空，无法总结');
-    return;
-  }
-
-  loading.value = true;
-  errorMessage.value = '';
-  summary.value = '';
-
-  try {
-    const response = await fetch(`${apiBase}/v1/agent/summary/stream`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        title: props.title || '',
-        content: pureContent.value,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const reader = response.body?.getReader();
-    if (!reader) throw new Error('无法读取响应流');
-
-    const decoder = new TextDecoder('utf-8');
-    let buffer = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const parts = buffer.split('\n\n');
-      buffer = parts.pop() || '';
-
-      for (const part of parts) {
-        if (!part.trim() || !part.startsWith('data:')) continue;
-        const jsonStr = part.replace(/^data:\s*/, '').trim();
-        if (jsonStr === '[DONE]') {
-          hasGenerated.value = true;
-          break;
-        }
-        try {
-          const data = JSON.parse(jsonStr);
-          if (data.content) summary.value += data.content;
-          if (data.is_end) hasGenerated.value = true;
-        } catch {
-          // ignore parse errors
-        }
-      }
-    }
-  } catch (error: unknown) {
-    errorMessage.value =
-      error instanceof Error ? error.message : 'AI总结失败，请稍后重试';
-    notifier.error(errorMessage.value);
-  } finally {
-    loading.value = false;
-  }
-}
-
-async function sendChatMessage() {
-  if (!canChat.value) return;
-
-  const userMessage = chatInput.value.trim();
-  chatInput.value = '';
-
-  if (!sessionId.value) {
-    sessionId.value = generateSessionId();
-  }
-
-  messages.value.push({ role: 'user', content: userMessage });
-  messages.value.push({ role: 'assistant', content: '' });
-  await scrollToBottom();
-
-  loading.value = true;
-  errorMessage.value = '';
-
-  const assistantIdx = messages.value.length - 1;
-  const isFirstMessage =
-    messages.value.filter((m) => m.role === 'user').length === 1;
-
-  try {
-    const body: Record<string, string> = {
-      message: userMessage,
-      session_id: sessionId.value,
-    };
-    if (isFirstMessage) {
-      body.article_content = pureContent.value;
-      body.article_title = props.title || '';
-    }
-
-    const response = await fetch(`${apiBase}/v1/agent/chat/stream`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const reader = response.body?.getReader();
-    if (!reader) throw new Error('无法读取响应流');
-
-    const decoder = new TextDecoder('utf-8');
-    let buffer = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const parts = buffer.split('\n\n');
-      buffer = parts.pop() || '';
-
-      for (const part of parts) {
-        if (!part.trim() || !part.startsWith('data:')) continue;
-        const jsonStr = part.replace(/^data:\s*/, '').trim();
-        if (jsonStr === '[DONE]') break;
-        try {
-          const data = JSON.parse(jsonStr);
-          if (data.content) {
-            messages.value[assistantIdx].content += data.content;
-            await scrollToBottom();
-          }
-          if (data.is_end) break;
-        } catch {
-          // ignore parse errors
-        }
-      }
-    }
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : '对话失败，请稍后重试';
-    messages.value[assistantIdx].content = `[ERROR] ${msg}`;
-    notifier.error(msg);
-  } finally {
-    loading.value = false;
-  }
-}
 
 async function onGenerate() {
   if (!auth.isAuthenticated) {
     notifier.error('请先登录以使用AI功能');
     return;
   }
-  await generateSummaryStream();
+  await generate((msg) => notifier.error(msg));
 }
 
 async function onSendChat() {
@@ -288,57 +85,17 @@ async function onSendChat() {
     notifier.error('请先登录以使用AI功能');
     return;
   }
-  await sendChatMessage();
+  await send((msg) => notifier.error(msg));
 }
 
 function onChatKeydown(e: KeyboardEvent) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    onSendChat();
-  }
+  onInputKeydown(e, onSendChat);
 }
 
-/** 切换到对话模式：加载历史对话或创建新会话 */
 async function switchToChat() {
   cardMode.value = CardMode.CHAT;
-  if (!sessionId.value) {
-    await loadChatHistory();
-    if (!sessionId.value) {
-      sessionId.value = generateSessionId();
-    }
-  }
+  await enterChat(auth.isAuthenticated);
 }
-
-function clearChat() {
-  messages.value = [];
-  sessionId.value = generateSessionId();
-}
-
-const textShimmer = ref<string[]>([
-  '正在分析文章结构...',
-  '正在提取关键信息...',
-  '正在生成总结内容...',
-]);
-let textShimmerInterval: ReturnType<typeof setInterval> | null = null;
-
-watch(
-  () => loading.value,
-  (newVal) => {
-    if (newVal) {
-      textShimmerInterval = setInterval(() => {
-        const first = textShimmer.value.shift();
-        if (first) textShimmer.value.push(first);
-      }, 2000);
-    } else if (textShimmerInterval) {
-      clearInterval(textShimmerInterval);
-      textShimmerInterval = null;
-    }
-  },
-);
-
-onUnmounted(() => {
-  if (textShimmerInterval) clearInterval(textShimmerInterval);
-});
 </script>
 
 <template>
@@ -436,7 +193,7 @@ onUnmounted(() => {
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
             />
           </svg>
-          {{ loading ? '总结中...' : hasGenerated ? '重新总结' : '生成总结' }}
+          {{ loading ? '总结中...' : summaryHasGenerated ? '重新总结' : '生成总结' }}
         </button>
         <button
           v-if="cardMode === CardMode.CHAT && messages.length > 0"
@@ -483,7 +240,7 @@ onUnmounted(() => {
       ></div>
       <template v-else>
         <div
-          ref="messagesContainer"
+          :ref="bindContainer"
           class="mb-1 max-h-80 space-y-3 overflow-y-auto pr-1"
         >
           <div

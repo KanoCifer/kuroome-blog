@@ -1,0 +1,102 @@
+import { computed, ref } from 'vue';
+import { consumeSseStream } from './useSseStream';
+
+export interface ArticleContext {
+  title?: string;
+  content: string;
+}
+
+interface CachedSummaryResponse {
+  cached?: boolean;
+  summary?: string;
+}
+
+interface SummaryStreamFrame {
+  content?: string;
+  is_end?: boolean;
+}
+
+/**
+ * 封装"AI 文章总结"的状态：缓存检查、生成、流式拼接、错误提示。
+ * 组件只需绑定 loading/summary/hasGenerated/errorMessage，配合 canSummarize 控制按钮。
+ */
+export function useArticleSummary(ctx: ArticleContext, apiBase: string) {
+  const loading = ref(false);
+  const summary = ref('');
+  const hasGenerated = ref(false);
+  const errorMessage = ref('');
+
+  const pureContent = computed(() => ctx.content.replaceAll(/<[^>]+>/g, '').trim());
+
+  const canSummarize = computed(
+    () => pureContent.value.length > 0 && !loading.value,
+  );
+
+  /** 静默查询后端缓存的总结，命中则直接展示。 */
+  async function checkCachedSummary(authenticated: boolean) {
+    if (!authenticated || !pureContent.value) return;
+    try {
+      const res = await fetch(`${apiBase}/v1/agent/history/summary`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          article_content: pureContent.value,
+          article_title: ctx.title || undefined,
+        }),
+      });
+      if (!res.ok) return;
+      const data = (await res.json()) as CachedSummaryResponse;
+      if (data.cached && data.summary) {
+        summary.value = data.summary;
+        hasGenerated.value = true;
+      }
+    } catch {
+      // 缓存查询失败不影响正常使用
+    }
+  }
+
+  async function generate(notifyError: (msg: string) => void) {
+    if (!canSummarize.value) {
+      notifyError('文章内容为空，无法总结');
+      return;
+    }
+
+    loading.value = true;
+    errorMessage.value = '';
+    summary.value = '';
+
+    try {
+      await consumeSseStream<SummaryStreamFrame>(
+        {
+          url: `${apiBase}/v1/agent/summary/stream`,
+          body: { title: ctx.title || '', content: pureContent.value },
+        },
+        {
+          onData: (data) => {
+            if (data.content) summary.value += data.content;
+          },
+          onDone: () => {
+            hasGenerated.value = true;
+          },
+        },
+      );
+    } catch (error: unknown) {
+      errorMessage.value =
+        error instanceof Error ? error.message : 'AI总结失败，请稍后重试';
+      notifyError(errorMessage.value);
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  return {
+    loading,
+    summary,
+    hasGenerated,
+    errorMessage,
+    canSummarize,
+    checkCachedSummary,
+    generate,
+  };
+}
