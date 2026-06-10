@@ -5,6 +5,7 @@ from app.api.des.des import weread_service_dep
 from app.core.exceptions import APIError
 from app.core.response import APIResponse
 from app.schemas.weread import SaveUserInfoIn
+from app.utils import redis_cache
 
 router = APIRouter(prefix="/weread", tags=["weread"])
 
@@ -24,6 +25,7 @@ async def save_user_info(
 
 
 @router.get("/bookshelf")
+@redis_cache()
 async def get_user_shelf(
     current_user=Depends(manager),
     weread_service=Depends(weread_service_dep),
