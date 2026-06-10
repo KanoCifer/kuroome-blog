@@ -3,6 +3,7 @@ from __future__ import annotations
 from app.models.weread import ReadDetailSnapshot
 from app.repositories.weread import ReadDetailCache
 from app.services.weread.base import WereadBaseService
+from app.services.weread.utils import _normalize_cover_url
 
 
 class WereadStatsService(WereadBaseService):
@@ -90,7 +91,7 @@ class WereadStatsService(WereadBaseService):
                         bookId=info.get("bookId"),
                         title=info.get("title"),
                         author=info.get("author"),
-                        cover=info.get("cover"),
+                        cover=_normalize_cover_url(info.get("cover")),
                         readTime=item.get("readTime", 0),
                     )
                 )

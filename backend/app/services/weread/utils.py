@@ -1,6 +1,16 @@
 from __future__ import annotations
 
 
+def _normalize_cover_url(cover: str | None) -> str | None:
+    """微信读书 API 返回的 cover/avatar 偶发走 http 协议，前端在 https 站点
+    下会触发 Mixed Content 警告。这里统一把外链升级到 https。"""
+    if not cover:
+        return cover
+    if cover.startswith("http://"):
+        return "https://" + cover[len("http://"):]
+    return cover
+
+
 def parse_shelf_books(raw: dict) -> tuple[list[dict], list[dict]]:
     """解析 /shelf/sync 回包，拆出书籍基础信息和书单"""
     books = raw.get("books", [])
@@ -10,7 +20,7 @@ def parse_shelf_books(raw: dict) -> tuple[list[dict], list[dict]]:
             "bookId": b.get("bookId"),
             "title": b.get("title"),
             "author": b.get("author"),
-            "cover": b.get("cover"),
+            "cover": _normalize_cover_url(b.get("cover")),
             "readUpdateTime": b.get("readUpdateTime"),
             "finishReading": b.get("finishReading"),
             "secret": b.get("secret"),
@@ -34,7 +44,7 @@ def map_book_info(raw: dict) -> dict:
         "title": raw.get("title"),
         "author": raw.get("author"),
         "translator": raw.get("translator"),
-        "cover": raw.get("cover"),
+        "cover": _normalize_cover_url(raw.get("cover")),
         "introduction": raw.get("intro"),
         "category": raw.get("category"),
         "publisher": raw.get("publisher"),
