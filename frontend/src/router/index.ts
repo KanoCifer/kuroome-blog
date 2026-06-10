@@ -61,8 +61,8 @@ const router = createRouter({
       },
     },
     {
-      path: '/changelog',
-      name: 'changelog',
+      path: '/version-log',
+      name: 'version-log',
       component: () => import('@/views/pages/ChangelogView.vue'),
       meta: {
         title: "变更日志 - Kuroome's Blog",

@@ -27,7 +27,7 @@ const closeToast = () => {
 };
 
 const goToChangelog = () => {
-  router.push('/changelog');
+  router.push('/version-log');
   closeToast();
 };
 </script>

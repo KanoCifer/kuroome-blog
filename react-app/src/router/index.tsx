@@ -101,7 +101,7 @@ export const router = createBrowserRouter([
         element: <ImageToolbox />,
       },
       {
-        path: '/changelog',
+        path: '/version-log',
         element: <Changelog />,
       },
       {

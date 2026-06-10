@@ -41,7 +41,7 @@
       </div>
       <!-- 更新日志按钮 -->
       <button
-        @click.stop="$router.push('/changelog')"
+        @click.stop="$router.push('/version-log')"
         class="squircle bg-primary/10 text-primary ring-primary/20 hover:bg-primary/20 ml-4 shrink-0 px-3 py-2 text-xs font-bold ring transition-all hover:scale-105"
       >
         Changelog

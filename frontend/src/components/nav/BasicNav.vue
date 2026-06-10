@@ -72,7 +72,7 @@ const navItems = [
   { to: '/blog', icon: BlogIcon },
   { to: '/bookshelf', icon: BookshelfIcon },
   { to: '/gallery', icon: Image },
-  { to: '/changelog', icon: ChangelogIcon },
+  { to: '/version-log', icon: ChangelogIcon },
 ];
 
 // State

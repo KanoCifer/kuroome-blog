@@ -34,7 +34,7 @@ const navItems = [
   { path: '/blog', label: '近期文章', icon: BookOpen },
   { path: '/bookshelf', label: '我的书架', icon: BookOpen },
   { path: '/gallery', label: '图片画廊', icon: ImageIcon },
-  { path: '/changelog', label: '更新日志', icon: History },
+  { path: '/version-log', label: '更新日志', icon: History },
   { path: '/rss', label: 'RSS 订阅', icon: Rss },
   { path: '/subscription', label: 'SubTracker', icon: IconCoin },
   { path: '/toolbox/image-toolbox', label: '图片工具', icon: Wrench },
