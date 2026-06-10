@@ -26,7 +26,19 @@ from app.schemas import VisitorData
 from app.schemas.schemas import BlogPostIn, BlogPostUpdate
 from app.services.admin_service import AdminService
 from app.tasks import send_feishu_message
-from app.utils import get_redis_lock
+from app.utils import get_redis_lock, redis_cache
+
+# 写后失效的读接口函数名(SCAN 模式: cache:<name>|*)
+_BLOG_READ_FUNCS = ("get_blogs", "get_blog_post", "get_blog")
+_COMMENT_READ_FUNCS = ("get_blogs", "get_blog_post")
+
+
+async def _safe_invalidate(*func_names: str) -> None:
+    """写后清理缓存。失败降级为日志,不影响主流程。"""
+    try:
+        await redis_cache.invalidate(*func_names)
+    except Exception:
+        logger.exception("cache invalidation failed (non-fatal)")
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -48,6 +60,7 @@ async def add_post(
         category_id=data.category_id,
         is_pinned=data.is_pinned,
     )
+    await _safe_invalidate(*_BLOG_READ_FUNCS)
 
     return APIResponse.ok(
         data={"_id": new_id},
@@ -70,6 +83,7 @@ async def update_post(
         category_id=data.category_id,
         is_pinned=data.is_pinned,
     )
+    await _safe_invalidate(*_BLOG_READ_FUNCS)
 
     return APIResponse.ok(
         data={"_id": data.id},
@@ -87,6 +101,7 @@ async def delete_post(
     logger.info(
         f"Blog post with ID {post_id} deleted by admin {current_user.username}"
     )
+    await _safe_invalidate(*_BLOG_READ_FUNCS)
 
     return APIResponse.ok(
         data={"_id": post_id},
@@ -119,6 +134,7 @@ async def approve_comment(
     admin_service: AdminService = Depends(admin_service_dep),
 ):
     await admin_service.approve_comment(comment_id=comment_id)
+    await _safe_invalidate(*_COMMENT_READ_FUNCS)
 
     return APIResponse.ok(message="Comment approved successfully")
 
@@ -130,6 +146,7 @@ async def delete_comment(
     admin_service: AdminService = Depends(admin_service_dep),
 ):
     await admin_service.delete_comment(comment_id=comment_id)
+    await _safe_invalidate(*_COMMENT_READ_FUNCS)
 
     return APIResponse.ok(message="Comment deleted successfully")
 

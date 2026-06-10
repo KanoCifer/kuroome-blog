@@ -9,6 +9,7 @@ from starlette import status
 from app.api.des.auth import manager
 from app.api.des.des import blog_service_dep
 from app.core.exceptions import APIError
+from app.core.logger import logger
 from app.core.response import APIResponse
 from app.models.models import User
 from app.schemas.schemas import PostComment
@@ -17,6 +18,14 @@ from app.utils import redis_cache
 from app.utils.media import save_upload_image
 
 router = APIRouter(tags=["blog"])
+
+
+async def _safe_invalidate(*func_names: str) -> None:
+    """写后清理缓存。失败降级为日志,不影响主流程。"""
+    try:
+        await redis_cache.invalidate(*func_names)
+    except Exception:
+        logger.exception("cache invalidation failed (non-fatal)")
 
 
 @router.post("/upload-image")
@@ -89,6 +98,7 @@ async def post_comment(
 ):
     """Submit a new comment to a blog post."""
     result = await blog_service.post_comment(data)
+    await _safe_invalidate("get_blogs", "get_blog_post")
 
     return APIResponse.ok(
         data=result,

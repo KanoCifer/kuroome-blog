@@ -3,7 +3,6 @@ import json
 from functools import wraps
 from typing import Any
 
-import orjson
 from cachetools.keys import hashkey
 from fastapi.responses import JSONResponse
 from redis.asyncio import ConnectionPool
@@ -17,22 +16,6 @@ CONNECTION_POOL = ConnectionPool.from_url(
     decode_responses=True,
     max_connections=get_settings().REDIS_MAX_CONNECTIONS,
 )
-
-
-def _orjson_dumps(obj: Any) -> bytes:
-    """使用 orjson 序列化; 回退到内置 json (兼容无法直接序列化的类型)。"""
-
-    try:
-        return orjson.dumps(obj)
-    except TypeError:
-        # orjson 对复杂对象（如 datetime、Pydantic 模型）可能报错，使用标准 json 做最后回退
-        return json.dumps(obj, default=str).encode("utf-8")
-
-
-def _orjson_loads(data: str | bytes) -> bytes:
-    if isinstance(data, str):
-        data = data.encode("utf-8")
-    return orjson.loads(data)
 
 
 class AsyncCache:
@@ -88,31 +71,64 @@ class AsyncCache:
 
         return wrapper
 
-    def _make_key(self, *args, **kwargs):
-        """生成唯一的缓存键"""
-        key = hashkey(*args, **kwargs)
-        return str(key)
+    def _make_key(self, func_name: str, **params) -> str:
+        """生成唯一的缓存键
+
+        显式带 func_name 前缀,这样 invalidate() 可以用 SCAN 按函数名通配删除。
+        """
+        return f"{func_name}|{hashkey(**params)}"
+
+    async def invalidate(self, *func_names: str) -> int:
+        """按视图函数名批量删除其生成的所有缓存 key。返回删除条数。
+
+        失败时降级为日志,不影响调用方主流程。
+        """
+        if not func_names:
+            return 0
+        deleted = 0
+        for name in func_names:
+            pattern = self._cache_prefix + name + "|*"
+            try:
+                keys: list[str] = [
+                    k
+                    async for k in self.redis.scan_iter(
+                        match=pattern, count=200
+                    )
+                ]
+            except Exception:
+                logger.exception(f"Cache invalidate scan failed for {name!r}")
+                continue
+            if keys:
+                try:
+                    await self.redis.delete(*keys)
+                except Exception:
+                    logger.exception(
+                        f"Cache invalidate delete failed for {name!r}"
+                    )
+                    continue
+                deleted += len(keys)
+        if deleted:
+            logger.info(f"Invalidated {deleted} cache keys for {func_names}")
+        return deleted
 
     async def set(self, key, value: Any, ttl: int = 60) -> None:
         redis_key = self._cache_prefix + str(key)
 
         # 支持缓存 FastAPI 的 JSONResponse（包含 status_code / headers / body）
         if isinstance(value, JSONResponse):
-            # JSONResponse.body 可能是 bytes 或 memoryview
-            body_bytes = bytes(value.body)
-            json_bytes = _orjson_dumps(
+            payload: str = json.dumps(
                 {
                     "__type__": "JSONResponse",
                     "status_code": value.status_code,
                     "media_type": value.media_type,
                     "headers": dict(value.headers),
-                    "body": body_bytes.decode("utf-8"),
+                    "body": bytes(value.body).decode("utf-8"),
                 }
             )
         else:
-            json_bytes: bytes = _orjson_dumps(value)
+            payload = json.dumps(value)
 
-        await self.redis.set(redis_key, json_bytes, ex=ttl)
+        await self.redis.set(redis_key, payload, ex=ttl)
 
     async def get(self, key) -> Any:
         redis_key = self._cache_prefix + str(key)
@@ -120,7 +136,7 @@ class AsyncCache:
         if value is None:
             return None
 
-        parsed = _orjson_loads(value)
+        parsed = json.loads(value)
         if (
             isinstance(parsed, dict)
             and parsed.get("__type__") == "JSONResponse"
@@ -128,9 +144,7 @@ class AsyncCache:
             # 还原 JSONResponse
             body = parsed.get("body")
             try:
-                content = (
-                    _orjson_loads(body) if isinstance(body, str) else body
-                )
+                content = json.loads(body) if isinstance(body, str) else body
             except Exception:
                 # 如果 body 不是有效的 JSON（理论上不太可能），则当作原始字符串返回
                 content = body
