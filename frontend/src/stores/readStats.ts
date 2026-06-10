@@ -19,6 +19,10 @@ export const useReadStatsStore = defineStore('readStats', () => {
     () => snapshotByMode.value['weekly'] ?? null,
   );
 
+  const monthlySnapshot = computed(
+    () => snapshotByMode.value['monthly'] ?? null,
+  );
+
   async function fetchStats(forceRefresh = false) {
     isLoading.value = true;
     error.value = '';
@@ -70,6 +74,7 @@ export const useReadStatsStore = defineStore('readStats', () => {
     error,
     snapshotByMode,
     weeklySnapshot,
+    monthlySnapshot,
     readStatItems,
     preferAuthors,
     preferPublishers,

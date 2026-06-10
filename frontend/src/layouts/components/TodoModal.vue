@@ -42,11 +42,11 @@
     >
       <div
         v-if="isOpen"
-        class="fixed inset-0 z-9999 flex justify-end"
+        class="fixed top-1/2 right-20 z-9999 flex max-w-lg min-w-90 -translate-y-1/2 justify-end"
         @click.self="close"
       >
         <div
-          class="bg-card dark:bg-card relative z-10 flex h-full w-full max-w-md flex-col rounded-l-2xl shadow-2xl"
+          class="bg-card/90 relative z-10 flex h-[90dvh] w-full flex-col rounded-2xl shadow-2xl backdrop-blur-xs"
         >
           <!-- Header -->
           <div

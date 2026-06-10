@@ -1,10 +1,20 @@
 <template>
-  <BentoCard class="flex flex-col select-none">
-    <div class="mb-3 flex items-center justify-between">
-      <h3 class="text-foreground text-lg font-semibold">
-        {{ monthLabel }}
-      </h3>
-      <span class="text-muted-foreground text-sm">{{ yearLabel }}</span>
+  <BentoCard class="group flex flex-col gap-2 select-none">
+    <!-- 顶部：图标和标题 -->
+    <!-- Hearder -->
+    <div class="flex items-baseline justify-between">
+      <div
+        class="bg-primary/15 flex h-10 w-10 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110 group-hover:rounded-xl"
+      >
+        <CalendarDays class="h-4 w-4 text-blue-500" />
+      </div>
+
+      <div class="mb-3 flex items-center justify-end-safe gap-3">
+        <h3 class="text-foreground text-lg font-semibold">
+          {{ monthLabel }}
+        </h3>
+        <span class="text-muted-foreground text-sm">{{ yearLabel }}</span>
+      </div>
     </div>
 
     <!-- Weekday headers -->
@@ -51,6 +61,7 @@
 import BentoCard from '@/components/bento/BentoCard.vue';
 import dayjs from 'dayjs';
 import { computed } from 'vue';
+import { CalendarDays } from '@lucide/vue';
 
 const now = dayjs();
 

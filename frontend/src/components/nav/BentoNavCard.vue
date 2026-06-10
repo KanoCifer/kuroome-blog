@@ -97,8 +97,7 @@ const userMenuItems: DropdownItem[] = [
   {
     icon: LogoutIcon,
     label: 'Logout',
-    class:
-      'text-primary dark:text-primary rounded-xl font-bold hover:bg-primary rounded-full transition-colors duration-300 hover:text-white',
+    class: 'text-primary font-bold',
     onClick: () => auth.logout(),
   },
 ];
@@ -108,15 +107,11 @@ const guestMenuItems: DropdownItem[] = [
   {
     icon: LoginIcon,
     label: 'Login',
-    class:
-      'hover:bg-primary rounded-full transition-colors duration-300 hover:text-white',
     to: '/login',
   },
   {
     icon: RegisterIcon,
     label: 'Register',
-    class:
-      'hover:bg-primary rounded-full transition-colors duration-300 hover:text-white',
     to: '/register',
   },
 ];

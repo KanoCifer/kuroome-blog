@@ -16,41 +16,39 @@
     >
       <div
         v-if="isUserMenuOpen"
-        class="bg-muted/60 dark:bg-accent ring-primary absolute top-16 right-0 z-9999 mt-2 w-auto rounded-3xl p-px shadow-lg ring-2 dark:shadow-gray-50/5"
+        class="bg-card absolute top-16 right-0 z-9999 mt-2 w-auto rounded-2xl p-1 shadow-xl ring-1 ring-black/5 dark:ring-white/10"
       >
-        <div class="bg-muted dark:bg-card rounded-[23px]">
-          <ol>
-            <li v-for="(item, idx) in visibleItems" :key="idx">
-              <!-- 分隔线 -->
-              <div
-                v-if="item.divider"
-                class="bg-border dark:bg-border mx-4 h-px"
-              />
-              <!-- 路由链接 -->
-              <RouterLink
-                v-else-if="item.to"
-                :to="item.to"
-                @click="closeUserMenuImmediately"
-                class="text-foreground dark:text-foreground dark:hover:bg-accent hover:bg-primary flex items-center gap-2 rounded-full px-4 py-2 font-serif transition-colors duration-300 hover:text-white"
-                :class="item.class"
-              >
-                <component :is="item.icon" class="h-4 w-4" />
-                {{ item.label }}
-              </RouterLink>
-              <!-- 操作按钮 -->
-              <button
-                v-else
-                @click.prevent="handleItemClick(item)"
-                :disabled="item.disabled"
-                class="flex w-full cursor-pointer items-center gap-2 px-4 py-2 font-serif"
-                :class="item.class"
-              >
-                <component :is="item.icon" class="h-4 w-4" />
-                {{ item.label }}
-              </button>
-            </li>
-          </ol>
-        </div>
+        <ol>
+          <li v-for="(item, idx) in visibleItems" :key="idx">
+            <!-- 分隔线 -->
+            <div
+              v-if="item.divider"
+              class="bg-border my-1 mx-2 h-px"
+            />
+            <!-- 路由链接 -->
+            <RouterLink
+              v-else-if="item.to"
+              :to="item.to"
+              @click="closeUserMenuImmediately"
+              class="text-foreground hover:bg-accent hover:text-accent-foreground flex items-center gap-2.5 rounded-xl px-3 py-2 font-serif text-sm transition-colors duration-150 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
+              :class="item.class"
+            >
+              <component :is="item.icon" class="h-4 w-4 shrink-0" />
+              {{ item.label }}
+            </RouterLink>
+            <!-- 操作按钮 -->
+            <button
+              v-else
+              @click.prevent="handleItemClick(item)"
+              :disabled="item.disabled"
+              class="text-foreground hover:bg-accent hover:text-accent-foreground flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 font-serif text-sm transition-colors duration-150 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50"
+              :class="item.class"
+            >
+              <component :is="item.icon" class="h-4 w-4 shrink-0" />
+              {{ item.label }}
+            </button>
+          </li>
+        </ol>
       </div>
     </transition>
 
