@@ -2,7 +2,7 @@
   <div>
     <!-- Title Section with Parallax -->
     <div
-      class="relative -z-5 mx-0 mt-[40vh] flex flex-col items-center justify-center bg-transparent"
+      class="relative -z-5 mx-0 mt-16 flex flex-col items-center justify-center bg-transparent sm:mt-24"
       :style="titleStyle"
     >
       <div>
@@ -21,7 +21,7 @@
         </div>
       </div>
     </div>
-    <div class="relative mt-[40vh] w-full">
+    <div class="relative mt-16 w-full sm:mt-24">
       <!-- Scroll Indicator -->
       <div
         class="absolute -top-10 left-1/2 -translate-x-1/2 animate-bounce cursor-pointer text-white"

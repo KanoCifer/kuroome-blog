@@ -375,8 +375,14 @@ router.beforeEach(async (to) => {
   return true;
 });
 
-// 路由跳转后：标题/描述/关键词已由各页面 useHead 接管，路由层只上报访问数据
-router.afterEach(() => {
+// 路由跳转后：标题/描述/关键词已由各页面 useHead 接管
+// 路径变化时复位滚动位置（避免从其他页滚到 /blog 或 /blog 返回时仍停在原位导致空白），
+// 仅 query / hash 变化（如分页、锚点）保持原滚动位置
+router.afterEach((to, from) => {
+  if (to.path !== from.path && typeof window !== 'undefined') {
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+  }
+
   // 防抖：避免短时间内多次跳转重复上报
   // 声明 window.visitorReportTimer 以消除 TS 报错
   clearTimeout(window.visitorReportTimer);
