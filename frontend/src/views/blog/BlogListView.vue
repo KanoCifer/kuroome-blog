@@ -5,56 +5,88 @@
     :onBack="() => $router.push('/')"
   >
     <div class="col-span-full container mx-auto min-h-dvh max-w-6xl px-4 py-8">
-      <div class="mb-6 flex flex-col gap-4">
-        <!-- 搜索框 -->
-        <div class="flex w-full items-center justify-between gap-4">
-          <div class="relative w-fit">
-            <div
-              class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+      <!-- 工具栏：搜索 + 分类 chip + New Post -->
+      <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div class="relative w-full sm:max-w-md sm:flex-1">
+          <div
+            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="text-muted-foreground h-5 w-5"
+              aria-hidden="true"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="2"
-                stroke="currentColor"
-                class="text-muted-foreground h-5 w-5"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                />
-              </svg>
-            </div>
-            <input
-              v-model="searchQuery"
-              type="search"
-              placeholder="搜索文章标题和内容..."
-              class="text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 border-border bg-card block w-full rounded-xl border py-3 pr-4 pl-10 text-sm focus:ring-2 focus:outline-none"
-              @keyup.enter="handleSearch"
-            />
-            <button
-              v-if="searchQuery"
-              @click="clearSearch"
-              class="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center pr-3"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="2"
-                stroke="currentColor"
-                class="h-5 w-5"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+              />
+            </svg>
           </div>
+          <input
+            v-model="searchQuery"
+            type="search"
+            placeholder="搜索文章标题和内容..."
+            aria-label="搜索文章"
+            class="text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 border-border bg-card block w-full rounded-xl border py-3 pr-10 pl-10 text-sm focus:ring-2 focus:outline-none"
+            @keyup.enter="handleSearch"
+          />
+          <button
+            v-if="searchQuery"
+            type="button"
+            aria-label="清空搜索"
+            class="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center pr-3"
+            @click="clearSearch"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="h-5 w-5"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2 sm:ml-auto">
+          <!-- 当前分类 chip：列表区顶部永久可见，去掉 sidebar 之后不会丢失上下文 -->
+          <button
+            v-if="activeCategory"
+            type="button"
+            class="border-border bg-card text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
+            @click="handleResetFilter"
+          >
+            <span class="text-primary">#</span>
+            <span>{{ activeCategory }}</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="h-3.5 w-3.5"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+            <span class="sr-only">清除分类筛选</span>
+          </button>
           <router-link
             v-if="user.isAuthenticated"
             to="/blog/new"
@@ -65,6 +97,7 @@
               class="mr-2 h-4 w-4"
               viewBox="0 0 20 20"
               fill="currentColor"
+              aria-hidden="true"
             >
               <path
                 fill-rule="evenodd"
@@ -76,32 +109,42 @@
           </router-link>
         </div>
       </div>
+
       <div class="flex flex-col gap-8 lg:flex-row">
         <!-- Main Content -->
         <div class="min-w-0 flex-1">
-          <!-- Loading State -->
+          <!-- 列表顶部锚点：翻页时滚到这里 -->
+          <div id="blog-list-top" aria-hidden="true" />
+
+          <!-- 统一空态样式：圆角 / 边框 / 图标尺寸一致，仅文案与动作不同 -->
           <div
             v-if="isLoading"
-            class="border-border bg-card flex flex-col items-center justify-center rounded-xl border px-6 py-16 text-center"
+            role="status"
+            aria-live="polite"
+            class="border-border bg-card/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center"
           >
             <div
-              class="border-primary/20 border-t-primary mb-4 h-10 w-10 animate-spin rounded-full border-4"
+              class="border-primary/20 border-t-primary mb-5 h-12 w-12 animate-spin rounded-full border-4"
             ></div>
-            <p class="text-muted-foreground">加载中...</p>
+            <h3 class="text-foreground text-base font-semibold">加载中…</h3>
+            <p class="text-muted-foreground mt-2 text-sm">
+              正在为你取回最新的文章
+            </p>
           </div>
 
-          <!-- Error State -->
           <div
             v-else-if="errorMessage"
-            class="border-destructive/30 bg-destructive/10 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-16 text-center"
+            role="alert"
+            class="border-destructive/30 bg-destructive/5 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="text-destructive/60 mb-4 h-12 w-12"
+              class="text-destructive/70 mb-5 h-14 w-14"
               fill="none"
               viewBox="0 0 24 24"
               stroke-width="1.5"
               stroke="currentColor"
+              aria-hidden="true"
             >
               <path
                 stroke-linecap="round"
@@ -109,28 +152,31 @@
                 d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
               />
             </svg>
-            <p class="text-destructive text-lg font-medium">加载失败</p>
-            <p class="text-destructive/80 mt-1 text-sm">{{ errorMessage }}</p>
+            <h3 class="text-destructive text-base font-semibold">加载失败</h3>
+            <p class="text-destructive/80 mt-2 max-w-sm text-sm">
+              {{ errorMessage }}
+            </p>
             <button
-              class="bg-destructive hover:bg-destructive/90 focus:ring-ring mt-4 rounded-lg px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-offset-2 focus:outline-none"
+              type="button"
+              class="bg-destructive hover:bg-destructive/90 focus:ring-ring mt-5 rounded-lg px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-offset-2 focus:outline-none"
               @click="fetchPosts(1)"
             >
               重试
             </button>
           </div>
 
-          <!-- Empty State -->
           <div
             v-else-if="posts.length === 0"
-            class="border-border bg-muted flex flex-col items-center justify-center rounded-xl border border-dashed px-6 py-16 text-center"
+            class="border-border bg-card/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="text-muted-foreground/40 mb-4 h-12 w-12"
+              class="text-muted-foreground/50 mb-5 h-14 w-14"
               fill="none"
               viewBox="0 0 24 24"
               stroke-width="1.5"
               stroke="currentColor"
+              aria-hidden="true"
             >
               <path
                 stroke-linecap="round"
@@ -138,16 +184,33 @@
                 d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
               />
             </svg>
-            <p class="text-muted-foreground text-lg font-medium">
-              No blog posts available.
-            </p>
-            <p class="text-muted-foreground/70 mt-1 text-sm">
+            <h3 class="text-foreground text-base font-semibold">
+              {{ activeCategory ? '该分类下还没有文章' : '还没有任何文章' }}
+            </h3>
+            <p class="text-muted-foreground mt-2 max-w-sm text-sm">
               {{
                 activeCategory
-                  ? 'There are no posts in this category yet.'
-                  : 'Check back later for new content.'
+                  ? '试试其他分类，或清空筛选查看全部文章。'
+                  : '新内容正在路上，过会儿再来看看吧。'
               }}
             </p>
+            <div class="mt-5 flex items-center gap-2">
+              <button
+                v-if="activeCategory"
+                type="button"
+                class="border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg border px-4 py-2 text-sm font-medium"
+                @click="handleResetFilter"
+              >
+                查看全部文章
+              </button>
+              <router-link
+                v-if="user.isAuthenticated"
+                to="/blog/new"
+                class="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 text-sm font-semibold"
+              >
+                写第一篇文章
+              </router-link>
+            </div>
           </div>
 
           <!-- Blog Post List with page transition -->
@@ -169,7 +232,7 @@
             </motion.div>
           </AnimatePresence>
 
-          <!-- Pagination -->
+          <!-- Pagination: 统一算法，gap ≥ 2 时自动插入省略号 -->
           <nav
             v-if="pagination && pagination.pages > 1"
             class="mt-10"
@@ -178,10 +241,11 @@
             <ul
               class="border-border/80 bg-card/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2"
             >
-              <!-- Previous Button -->
               <li>
                 <button
+                  type="button"
                   :disabled="!pagination?.has_prev"
+                  :aria-disabled="!pagination?.has_prev"
                   class="focus-visible:ring-ring inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                   :class="
                     pagination?.has_prev
@@ -190,61 +254,55 @@
                   "
                   @click="goToPage(pagination!.prev_num!)"
                 >
-                  <span aria-hidden="true">&laquo;</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="2"
+                    stroke="currentColor"
+                    class="h-4 w-4"
+                    aria-hidden="true"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
                   <span class="hidden sm:inline">上一页</span>
                 </button>
               </li>
 
-              <!-- Page Numbers -->
-              <!-- 显示第一页 -->
-              <li v-if="pagination && pagination.page > 3">
-                <button
-                  class="focus-visible:ring-ring text-muted-foreground hover:bg-accent hover:text-foreground inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-                  @click="goToPage(1)"
-                >
-                  1
-                </button>
-              </li>
+              <template v-for="(item, i) in pageSegments" :key="`seg-${i}`">
+                <li v-if="item === 'ellipsis'">
+                  <span
+                    class="text-muted-foreground/60 px-1 text-sm select-none"
+                    aria-hidden="true"
+                    >…</span
+                  >
+                </li>
+                <li v-else>
+                  <button
+                    type="button"
+                    :aria-current="item === pagination?.page ? 'page' : undefined"
+                    class="focus-visible:ring-ring inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                    :class="
+                      item === pagination?.page
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                    "
+                    @click="goToPage(item)"
+                  >
+                    {{ item }}
+                  </button>
+                </li>
+              </template>
 
-              <!-- 省略号 -->
-              <li v-if="pagination && pagination.page > 4">
-                <span class="text-muted-foreground/60 px-1 text-sm">...</span>
-              </li>
-
-              <!-- 显示当前页附近的页码 -->
-              <li v-for="pageNum in getVisiblePages" :key="pageNum">
-                <button
-                  class="focus-visible:ring-ring inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-                  :class="
-                    pageNum === pagination?.page
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:bg-accent hover:text-foreground'
-                  "
-                  @click="goToPage(pageNum)"
-                >
-                  {{ pageNum }}
-                </button>
-              </li>
-
-              <!-- 省略号 -->
-              <li v-if="pagination && pagination.page < pagination.pages - 3">
-                <span class="text-muted-foreground/60 px-1 text-sm">...</span>
-              </li>
-
-              <!-- 显示最后一页 -->
-              <li v-if="pagination && pagination.page < pagination.pages - 2">
-                <button
-                  class="focus-visible:ring-ring text-muted-foreground hover:bg-accent hover:text-foreground inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-                  @click="goToPage(pagination.pages)"
-                >
-                  {{ pagination.pages }}
-                </button>
-              </li>
-
-              <!-- Next Button -->
               <li>
                 <button
+                  type="button"
                   :disabled="!pagination?.has_next"
+                  :aria-disabled="!pagination?.has_next"
                   class="focus-visible:ring-ring inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                   :class="
                     pagination?.has_next
@@ -254,14 +312,28 @@
                   @click="goToPage(pagination!.next_num!)"
                 >
                   <span class="hidden sm:inline">下一页</span>
-                  <span aria-hidden="true">&raquo;</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="2"
+                    stroke="currentColor"
+                    class="h-4 w-4"
+                    aria-hidden="true"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
                 </button>
               </li>
             </ul>
           </nav>
         </div>
         <!-- HomeSideBar Style Sidebar -->
-        <div class="col-span-1 w-full shrink-0 lg:w-72">
+        <div class="w-full shrink-0 lg:w-72">
           <div class="sticky top-24 h-fit space-y-6">
             <BentoProfileCard />
             <BentoCalendar />
@@ -319,24 +391,28 @@ const parsePageFromQuery = (pageQuery: unknown): number => {
   return Number.isNaN(parsedPage) || parsedPage < 1 ? 1 : parsedPage;
 };
 
-// 获取可见页码范围
-const getVisiblePages = computed(() => {
+// 分页段：数字 / 省略号 混合序列
+// 1 与最末页始终显示；当前页 ±2 范围显示；其余位置用省略号补齐
+const pageSegments = computed<(number | 'ellipsis')[]>(() => {
   if (!pagination.value) return [];
-
-  const totalPages = pagination.value.pages;
+  const total = pagination.value.pages;
   const current = pagination.value.page;
-  const visiblePages = [];
+  if (total <= 1) return [1];
 
-  // 显示当前页附近的页码
-  for (
-    let i = Math.max(2, current - 2);
-    i <= Math.min(totalPages - 1, current + 2);
-    i++
-  ) {
-    visiblePages.push(i);
+  const set = new Set<number>([1, total]);
+  for (let i = current - 1; i <= current + 1; i++) {
+    if (i >= 1 && i <= total) set.add(i);
   }
+  const sorted = [...set].sort((a, b) => a - b);
 
-  return visiblePages;
+  const out: (number | 'ellipsis')[] = [];
+  for (let i = 0; i < sorted.length; i++) {
+    if (i > 0 && sorted[i] - sorted[i - 1] > 1) {
+      out.push('ellipsis');
+    }
+    out.push(sorted[i]);
+  }
+  return out;
 });
 
 const fetchPosts = async (page: number = 1) => {
@@ -381,9 +457,13 @@ const goToPage = (page: number) => {
       delete query.search;
     }
     router.push({ query });
-    document
-      .getElementById('main-content')
-      ?.scrollIntoView({ behavior: 'smooth' });
+    // 滚到列表顶部锚点，避免从 #main-content 跳屏
+    const anchor = document.getElementById('blog-list-top');
+    if (anchor) {
+      const top =
+        anchor.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
   }
 };
 

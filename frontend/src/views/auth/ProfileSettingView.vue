@@ -279,8 +279,8 @@ onMounted(() => {
             reading identity.
           </h1>
           <p class="mt-6 max-w-md text-lg text-zinc-400">
-            Update your profile, manage your passkeys, and connect the
-            accounts that power your reading life.
+            Update your profile, manage your passkeys, and connect the accounts
+            that power your reading life.
           </p>
         </div>
       </div>
@@ -652,7 +652,7 @@ onMounted(() => {
               <button
                 type="button"
                 :disabled="unbindingGitHub"
-                class="text-primary-foreground focus:ring-primary inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-black px-8 py-2.5 font-bold shadow-lg transition-colors hover:bg-black/90 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                class="text-primary-foreground focus:ring-primary inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-black px-8 py-2.5 font-bold shadow-lg transition-colors hover:bg-black/90 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:text-white"
               >
                 <Loader2 v-if="unbindingGitHub" class="h-5 w-5 animate-spin" />
                 <Trash2 v-else class="h-5 w-5" />
@@ -663,9 +663,8 @@ onMounted(() => {
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action will unbind your GitHub account from your
-                  profile. You will no longer be able to log in with GitHub
-                  after this.
+                  This action will unbind your GitHub account from your profile.
+                  You will no longer be able to log in with GitHub after this.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

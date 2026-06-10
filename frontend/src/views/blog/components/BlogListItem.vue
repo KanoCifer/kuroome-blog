@@ -16,10 +16,11 @@
           aria-hidden="true"
         />
 
-        <!-- Pinned badge -->
-        <div v-if="post.is_pinned" class="mb-4">
+        <!-- 顶部元数据：置顶 / 日期 / 分类 -->
+        <div class="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1.5">
           <span
-            class="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium"
+            v-if="post.is_pinned"
+            class="bg-primary/15 text-primary inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -34,11 +35,23 @@
             </svg>
             置顶
           </span>
+          <span
+            v-if="post.category"
+            class="text-foreground/80 text-xs font-medium"
+          >
+            # {{ post.category.name }}
+          </span>
+          <time
+            class="text-foreground/70 text-xs tabular-nums"
+            :datetime="post.created_at"
+          >
+            {{ formatDate(post.created_at) }}
+          </time>
         </div>
 
-        <!-- Title -->
+        <!-- Title: 始终用 text-foreground 保证对比度 -->
         <h2
-          class="text-primary group-hover:text-primary group-hover:bg-primary/30 w-fit rounded-full px-3 py-2 font-serif text-2xl leading-snug transition-all duration-300 ease-out group-hover:-translate-y-1 group-hover:shadow-sm"
+          class="text-foreground group-hover:text-primary font-serif text-2xl leading-snug font-semibold transition-colors duration-300 ease-out"
           style="text-wrap: balance"
         >
           {{ post.title }}
@@ -50,28 +63,75 @@
           aria-hidden="true"
         />
 
-        <!-- Summary -->
+        <!-- Summary: 留出固定高度，缺数据时也不塌陷 -->
         <p
           v-if="post.summary"
-          class="line-clamp-3 text-sm leading-relaxed text-gray-500 dark:text-white/70"
+          class="text-foreground/75 line-clamp-2 min-h-[2.75rem] text-sm leading-relaxed"
         >
           {{ post.summary }}
         </p>
+        <p v-else class="text-foreground/40 min-h-[2.75rem] text-sm italic">
+          （暂无摘要）
+        </p>
 
-        <!-- Footer meta -->
+        <!-- Footer meta: 阅读时长 / 字数 / 浏览量 -->
         <footer
-          class="mt-5 flex items-center gap-2 text-xs text-gray-500 dark:text-white/70"
+          class="text-foreground/60 mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs"
         >
-          <time class="text-gray-600 dark:text-white/70">{{
-            formatDate(post.created_at)
-          }}</time>
-          <span
-            v-if="post.category"
-            class="flex items-center gap-2 text-gray-500 dark:text-white/70"
-          >
-            <span aria-hidden="true" class="text-border/60">·</span>
-            # {{ post.category.name }}
+          <span class="inline-flex items-center gap-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="text-foreground/60 h-3.5 w-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z"
+              />
+            </svg>
+            <span class="text-foreground/60"
+              >{{ readingTimeMinutes }} 分钟阅读</span
+            >
           </span>
+          <template v-if="CHAR_COUNT > 0">
+            <span aria-hidden="true" class="text-border">·</span>
+            <span class="text-foreground/60 tabular-nums">{{
+              wordCountText
+            }}</span>
+          </template>
+          <template v-if="post.views">
+            <span aria-hidden="true" class="text-border">·</span>
+            <span
+              class="text-foreground/60 inline-flex items-center gap-1 tabular-nums"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-3.5 w-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              {{ post.views }}
+            </span>
+          </template>
         </footer>
       </article>
     </router-link>
@@ -82,9 +142,32 @@
 import type { Post } from '@/types';
 import { formatDate } from '@/utils/formatdate';
 import { motion } from 'motion-v';
+import { computed } from 'vue';
 
-defineProps<{
+const props = defineProps<{
   post: Post;
   index?: number;
 }>();
+
+// 中文按字符算阅读时间，约 300 字/分钟；纯 markdown 内容先剥标签
+const PLAIN_TEXT = computed(() => {
+  const raw = props.post.content || props.post.body || '';
+  return raw
+    .replace(/<[^>]+>/g, '')
+    .replace(/[#*_`>\-![\]()~]/g, '')
+    .trim();
+});
+
+const CHAR_COUNT = computed(() => [...PLAIN_TEXT.value].length);
+
+const wordCountText = computed(() => {
+  const n = CHAR_COUNT.value;
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}k 字`;
+  return `${n} 字`;
+});
+
+const readingTimeMinutes = computed(() => {
+  // 300 字/分钟，最少 1 分钟
+  return Math.max(1, Math.round(CHAR_COUNT.value / 300));
+});
 </script>
