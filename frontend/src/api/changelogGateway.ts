@@ -1,6 +1,6 @@
 import request from './request';
 
-interface Changelog {
+export interface Changelog {
   version: string;
   date: string;
   title: string;
