@@ -375,12 +375,8 @@ router.beforeEach(async (to) => {
   return true;
 });
 
-// 路由跳转后设置页面 meta 标签（只在客户端执行）
-router.afterEach((to) => {
-  // 设置页面标题（只在浏览器环境中执行）
-  if (to.meta.title && typeof document !== 'undefined') {
-    document.title = to.meta.title as string;
-  }
+// 路由跳转后：标题/描述/关键词已由各页面 useHead 接管，路由层只上报访问数据
+router.afterEach(() => {
   // 防抖：避免短时间内多次跳转重复上报
   // 声明 window.visitorReportTimer 以消除 TS 报错
   clearTimeout(window.visitorReportTimer);

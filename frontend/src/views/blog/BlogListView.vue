@@ -284,7 +284,7 @@ import { useNotificationStore } from '@/stores/notification';
 import type { BlogPagination, Category, Post } from '@/types';
 import BentoCalendar from '@/views/entry/components/BentoCalendar.vue';
 import BentoProfileCard from '@/views/entry/components/BentoProfileCard.vue';
-import { useHead } from '@unhead/vue';
+import { useHead } from '@vueuse/head';
 import { AnimatePresence, motion } from 'motion-v';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';

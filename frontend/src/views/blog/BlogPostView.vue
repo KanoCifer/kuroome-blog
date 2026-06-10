@@ -20,7 +20,7 @@ import { useAuthStore } from '@/auth/stores/auth';
 import { useNotificationStore } from '@/stores/notification';
 import type { Post } from '@/types';
 import { formatDate } from '@/utils/formatdate';
-import { useHead } from '@unhead/vue';
+import { useHead } from '@vueuse/head';
 import hljs from 'highlight.js/lib/common';
 import 'highlight.js/scss/rainbow.scss';
 import { marked } from 'marked';
