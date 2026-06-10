@@ -44,7 +44,7 @@ ok "Dependencies synced"
 
 step "Running database migrations"
 /home/kano/.local/bin/uv run alembic upgrade head
-uv run python scripts/insert_changelog.py
+/home/kano/.local/bin/uv run python scripts/insert_changelog.py
 ok "Migrations applied"
 
 step "Building frontend"
