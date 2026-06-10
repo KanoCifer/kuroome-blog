@@ -1,27 +1,7 @@
-import changelogData from '@/data/changelog.json';
+import { useEffect, useState } from 'react';
+
+import { changelogGateway, type Changelog } from '@/api/changelogGateway';
 import { motion } from 'framer-motion';
-
-type ChangeType =
-  | 'feat'
-  | 'fix'
-  | 'refactor'
-  | 'style'
-  | 'docs'
-  | 'perf'
-  | 'test'
-  | 'chore';
-
-interface ChangelogItem {
-  type: ChangeType | string;
-  content: string;
-}
-
-interface ChangelogRelease {
-  version: string;
-  date: string;
-  title: string;
-  changes: ChangelogItem[];
-}
 
 const getTypeLabel = (type: string): string => {
   const labels: Record<string, string> = {
@@ -69,7 +49,24 @@ const getTypeClass = (type: string): string => {
 };
 
 export default function ChangelogView() {
-  const changelog = changelogData as ChangelogRelease[];
+  const [changelog, setChangelog] = useState<Changelog[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    changelogGateway
+      .getChangelogs()
+      .then(setChangelog)
+      .catch(() => setChangelog([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-full items-center justify-center">
+        <div className="border-primary h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <div
