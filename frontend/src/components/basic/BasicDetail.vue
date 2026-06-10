@@ -8,10 +8,10 @@
       aria-labelledby="basic-detail-title"
     >
       <!-- 极淡主题色光晕，10 套主题共用语义 token -->
-      <div
+      <!-- <div
         aria-hidden="true"
         class="from-primary/8 via-primary/0 to-primary/0 pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b"
-      ></div>
+      ></div> -->
 
       <div
         class="mb-3 flex items-center gap-2 text-xs tracking-[0.3em] text-white uppercase"

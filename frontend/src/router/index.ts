@@ -171,6 +171,7 @@ const router = createRouter({
         title: "登录 - Kuroome's Blog",
         description: "登录 Kuroome's Blog",
         keywords: '登录,用户认证,账户管理',
+        transition: 'fade',
       },
     },
     {
@@ -181,6 +182,7 @@ const router = createRouter({
         title: "注册 - Kuroome's Blog",
         description: "注册 Kuroome's Blog 账户",
         keywords: '注册,用户认证,账户管理',
+        transition: 'slide-up',
       },
     },
     {
@@ -198,6 +200,7 @@ const router = createRouter({
         title: "个人设置 - Kuroome's Blog",
         description: '管理个人账户信息和偏好设置',
         keywords: '个人设置,账户信息,偏好设置',
+        transition: 'slide-left',
       },
     },
     {
@@ -220,6 +223,7 @@ const router = createRouter({
         description: '个人书架，管理你的阅读清单和书籍信息',
         keywords: '书架,阅读清单,书籍管理',
         requiresAuth: true,
+        transition: 'scale',
       },
     },
     {

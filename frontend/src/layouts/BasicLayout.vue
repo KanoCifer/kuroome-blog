@@ -10,7 +10,7 @@ import { useCardLayout } from '@/composables/useCardLayout';
 import { useBackgroundStore } from '@/stores/background';
 import { useThemeStore } from '@/stores/theme';
 import { AnimatePresence } from 'motion-v';
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { RouterView, useRoute } from 'vue-router';
 
 const bgStore = useBackgroundStore();
@@ -62,6 +62,9 @@ onMounted(() => initObserver());
 onBeforeUnmount(() => scrollObserver?.disconnect());
 
 watch(sentinelRef, () => initObserver());
+
+// 路由过渡动画：从 meta.transition 读取，未定义时用默认 slide-up
+const transitionName = computed(() => (route.meta.transition as string) ?? 'slide-up');
 
 // 导航栏滚动隐藏逻辑
 // const isHeaderVisible = ref(true);
@@ -209,18 +212,9 @@ watch(sentinelRef, () => initObserver());
         <template v-if="isEntryView">
           <component :is="Component" :key="$route.path" />
         </template>
-        <transition
-          v-else
-          mode="out-in"
-          enter-active-class="transition-all transform-gpu duration-300 ease-out"
-          enter-from-class="translate-y-20 opacity-0"
-          enter-to-class="translate-y-0 opacity-100"
-          leave-active-class="transition-all transform-gpu duration-200 ease-out"
-          leave-from-class="translate-y-0 opacity-100"
-          leave-to-class="translate-y-20 opacity-0"
-        >
+        <Transition v-else :name="transitionName" mode="out-in">
           <component :is="Component" :key="$route.path" />
-        </transition>
+        </Transition>
       </RouterView>
     </main>
 
@@ -269,3 +263,57 @@ watch(sentinelRef, () => initObserver());
     </AnimatePresence>
   </div>
 </template>
+
+<style scoped>
+/* fade — login */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* slide-up — register / default */
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.3s ease-out;
+}
+.slide-up-enter-from {
+  transform: translateY(20px);
+  opacity: 0;
+}
+.slide-up-leave-to {
+  transform: translateY(-10px);
+  opacity: 0;
+}
+
+/* slide-left — settings */
+.slide-left-enter-active,
+.slide-left-leave-active {
+  transition: all 0.3s ease-out;
+}
+.slide-left-enter-from {
+  transform: translateX(30px);
+  opacity: 0;
+}
+.slide-left-leave-to {
+  transform: translateX(-30px);
+  opacity: 0;
+}
+
+/* scale — bookshelf */
+.scale-enter-active,
+.scale-leave-active {
+  transition: all 0.35s ease-out;
+}
+.scale-enter-from {
+  transform: scale(0.95);
+  opacity: 0;
+}
+.scale-leave-to {
+  transform: scale(1.02);
+  opacity: 0;
+}
+</style>

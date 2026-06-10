@@ -29,7 +29,8 @@
               :class="delayStatus.dotClass"
             ></span>
           </span>
-          延迟 {{ delayStatus.label }}
+          延迟
+          <span :class="delayStatus.textClass">{{ delayStatus.label }}</span>
           <ExternalLink class="h-3 w-3 opacity-60" />
         </router-link>
       </div>
@@ -87,9 +88,11 @@ const delayStatus = computed(() => {
   const ms = connectionDelay?.value ?? 0;
   if (!ms) return { label: '-- ms', dotClass: 'bg-muted-foreground/40' };
   const label = `${Math.round(ms)} ms`;
-  if (ms < 200) return { label, dotClass: 'bg-emerald-500' };
-  if (ms < 2000) return { label, dotClass: 'bg-yellow-500' };
-  return { label, dotClass: 'bg-red-500' };
+  if (ms < 200)
+    return { label, dotClass: 'bg-emerald-500', textClass: 'text-emerald-500' };
+  if (ms < 2000)
+    return { label, dotClass: 'bg-yellow-500', textClass: 'text-yellow-500' };
+  return { label, dotClass: 'bg-red-500', textClass: 'text-red-500' };
 });
 
 defineProps<{

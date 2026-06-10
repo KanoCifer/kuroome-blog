@@ -8,6 +8,11 @@ const BACKGROUND_IMAGES = Array.from(
   (_, i) => `/background/bg-${i + 1}.webp`,
 );
 
+const BACKGROUND_THUMBS = Array.from(
+  { length: 15 },
+  (_, i) => `/background/thumb/bg-${i + 1}.webp`,
+);
+
 export const useBackgroundStore = defineStore('background', () => {
   const mode = ref<BackgroundMode>(
     (localStorage.getItem('readinglist_bg_mode') as BackgroundMode) || 'fixed',
@@ -98,6 +103,7 @@ export const useBackgroundStore = defineStore('background', () => {
 
   return {
     backgroundImages: BACKGROUND_IMAGES,
+    backgroundThumbs: BACKGROUND_THUMBS,
     mode,
     fixedIndex,
     randomIndex,
