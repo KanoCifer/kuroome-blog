@@ -229,6 +229,7 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <div>
   <BasicDetail :title="post?.title || ''" :subtitle="subtitle">
     <!-- Loading -->
     <div v-if="isLoading" class="sm:col-span-2 lg:col-span-3">
@@ -383,6 +384,7 @@ onUnmounted(() => {
       </AlertDialogContent>
     </AlertDialog>
   </Teleport>
+  </div>
 </template>
 
 <style>
