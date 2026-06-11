@@ -574,3 +574,33 @@ a {
   border-top: 1px solid var(--border);
   margin: 2.5rem 0;
 }
+
+/* Summary card animations */
+.summary-card {
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 16px -2px oklch(from var(--color-primary) l c h / 0.08),
+    0 1px 4px oklch(from var(--color-primary) l c h / 0.04);
+}
+
+.summary-card.is-loading {
+  animation: card-breathe 2s ease-in-out infinite;
+}
+
+@keyframes card-breathe {
+  0%,
+  100% {
+    border-color: oklch(from var(--color-primary) l c h / 0.15);
+  }
+  50% {
+    border-color: oklch(from var(--color-primary) l c h / 0.35);
+    box-shadow: 0 4px 20px oklch(from var(--color-primary) l c h / 0.08);
+  }
+}
