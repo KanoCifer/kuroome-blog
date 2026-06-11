@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from collections.abc import AsyncIterable
+
 from fastapi import APIRouter, Body, Depends, Request
 from fastapi.responses import StreamingResponse
+from fastapi.sse import EventSourceResponse, ServerSentEvent
 
 from app.api.des.auth import optional_user
 from app.api.des.des import ai_service_dep, public_service_dep
@@ -34,27 +37,18 @@ def _resolve_user_id(user: User | None, request: Request) -> str:
 # ── 文章摘要 ──────────────────────────────────────────────
 
 
-@router.post("/summary/stream")
+@router.post("/summary/stream", response_class=EventSourceResponse)
 @limiter.limit("5/minute")
 async def summary_article_stream(
     request: Request,
     payload: ArticleSummaryRequest,
     user: User | None = Depends(optional_user),
     ai_service: AiService = Depends(ai_service_dep),
-):
-    event_generator = ai_service.summary_stream(
-        payload, _resolve_user_id(user, request)
-    )
-
-    return StreamingResponse(
-        event_generator,
-        media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
-            "X-Accel-Buffering": "no",
-        },
-    )
+) -> AsyncIterable[ServerSentEvent]:
+    async for chunk in ai_service.summary_stream(
+        payload, _resolve_user_id(user, request), model=payload.model
+    ):
+        yield ServerSentEvent(data={"content": chunk})
 
 
 # ── 对话 ──────────────────────────────────────────────────
@@ -92,9 +86,7 @@ async def get_user_history(
     user: User | None = Depends(optional_user),
     ai_service: AiService = Depends(ai_service_dep),
 ):
-    return await ai_service.get_user_history(
-        _resolve_user_id(user, request)
-    )
+    return await ai_service.get_user_history(_resolve_user_id(user, request))
 
 
 @router.post("/history/summary")

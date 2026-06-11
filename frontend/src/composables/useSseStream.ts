@@ -1,7 +1,7 @@
 export interface SseHandlers<T = unknown> {
   /** Called for each parsed JSON data frame (after `[DONE]` sentinel is filtered). */
   onData: (data: T) => void;
-  /** Called when the stream emits `[DONE]` or `{is_end: true}`. */
+  /** Called when the stream emits `[DONE]` */
   onDone?: () => void;
 }
 
@@ -16,7 +16,10 @@ export interface SseRequestOptions {
  * 解析一段 SSE 文本块，返回 {events, rest}，rest 留作下次拼接。
  * 跳过空行、非 data: 开头、解析失败的行。
  */
-export function parseSseChunk(buffer: string): { events: string[]; rest: string } {
+export function parseSseChunk(buffer: string): {
+  events: string[];
+  rest: string;
+} {
   const parts = buffer.split('\n\n');
   const rest = parts.pop() || '';
   const events: string[] = [];
@@ -29,13 +32,12 @@ export function parseSseChunk(buffer: string): { events: string[]; rest: string 
 
 /**
  * POST 一个 JSON body 并以 SSE 流的形式消费响应。
- * 收到每个 data 帧时调用 onData，遇到 [DONE] 或 is_end=true 时调用 onDone。
+ * 收到每个 data 帧时调用 onData，遇到 [DONE] 时调用 onDone。
  * 统一处理 reader / decoder / buffer，调用方只需关心业务逻辑。
  */
-export async function consumeSseStream<T = { content?: string; is_end?: boolean }>(
-  options: SseRequestOptions,
-  handlers: SseHandlers<T>,
-): Promise<void> {
+export async function consumeSseStream<
+  T = { content?: string },
+>(options: SseRequestOptions, handlers: SseHandlers<T>): Promise<void> {
   const response = await fetch(options.url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -45,7 +47,7 @@ export async function consumeSseStream<T = { content?: string; is_end?: boolean 
   });
 
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    throw new Error('网络连接失败，请重试');
   }
 
   const reader = response.body?.getReader();
@@ -71,10 +73,7 @@ export async function consumeSseStream<T = { content?: string; is_end?: boolean 
       try {
         const data = JSON.parse(jsonStr) as T;
         handlers.onData(data);
-        if ((data as { is_end?: boolean }).is_end) {
-          finished = true;
-          break;
-        }
+        continue;
       } catch {
         // 忽略单帧解析错误，继续消费后续帧
       }

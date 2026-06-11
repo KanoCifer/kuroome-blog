@@ -27,22 +27,19 @@ class AiService:
         self,
         payload: ArticleSummaryRequest,
         user_id: str,
+        model: str | None = None,
     ) -> AsyncIterator[str]:
         try:
             async for chunk in self.summarizer.run_summarization_astream(
                 content=payload.content,
                 title=payload.title,
                 user_id=user_id,
+                model_name=model,
             ):
-                yield sse_event({"content": str(chunk), "is_end": False})
-            yield sse_event({"content": "", "is_end": True})
-        except ValueError as exc:
-            yield sse_event({"content": f"[ERROR] {exc!r}", "is_end": True})
-        except RuntimeError as exc:
-            yield sse_event({"content": f"[ERROR] {exc!r}", "is_end": True})
+                yield str(chunk)
         except Exception as exc:
             logger.error(f"❌ 文章总结失败: {exc!r}")
-            yield sse_event({"content": "[ERROR] 文章总结失败,请稍后重试", "is_end": True})
+            yield "[ERROR] 文章总结失败,请稍后重试"
 
     async def chat_stream(
         self,
@@ -65,7 +62,9 @@ class AiService:
             yield sse_event({"content": f"[ERROR] {exc!r}", "is_end": True})
         except Exception as exc:
             logger.error(f"❌ 对话失败: {exc!r}")
-            yield sse_event({"content": "[ERROR] 对话失败,请稍后重试", "is_end": True})
+            yield sse_event(
+                {"content": "[ERROR] 对话失败,请稍后重试", "is_end": True}
+            )
 
     async def get_user_history(self, user_id: str) -> dict[str, list[dict]]:
         sessions = await self.summarizer.get_user_sessions(user_id=user_id)

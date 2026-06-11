@@ -39,3 +39,4 @@ CLAUDE.local.md
 backend/models/*.joblib
 .zed/
 .scratch/
+.claude/skills/teach/

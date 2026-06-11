@@ -5,6 +5,17 @@ import { useArticleSummary } from '@/composables/useArticleSummary';
 import { useShimmerTips } from '@/composables/useShimmerTips';
 import { AnimatePresence, motion } from 'motion-v';
 import { computed, onMounted, ref, watch } from 'vue';
+import { Marked } from 'marked';
+import dompurify from 'dompurify';
+
+const marked = new Marked();
+function renderMarkdown(text: string): string {
+  return dompurify.sanitize(marked.parse(text) as string);
+}
+
+const renderedSummary = computed(() =>
+  summary.value ? renderMarkdown(summary.value) : '',
+);
 
 enum CardMode {
   SUMMARY = 'summary',
@@ -26,6 +37,8 @@ const {
   hasGenerated: summaryHasGenerated,
   errorMessage: summaryError,
   canSummarize,
+  selectedModel,
+  modelOptions,
   checkCachedSummary,
   generate,
 } = useArticleSummary(articleCtx, apiBase);
@@ -41,6 +54,7 @@ const {
   send,
   onInputKeydown,
 } = useArticleChat(articleCtx, apiBase);
+
 const { tips: textShimmer, active: shimmerActive } = useShimmerTips();
 
 const cardMode = ref<CardMode>(CardMode.SUMMARY);
@@ -49,9 +63,7 @@ const loading = computed(() => summaryLoading.value || chatLoading.value);
 const hasGenerated = computed(
   () => summaryHasGenerated.value || messages.value.length > 0,
 );
-const errorMessage = computed(
-  () => summaryError.value || chatError.value,
-);
+const errorMessage = computed(() => summaryError.value || chatError.value);
 
 watch(loading, (on) => {
   shimmerActive.value = on;
@@ -81,82 +93,109 @@ async function switchToChat() {
 
 <template>
   <section
-    class="summary-card shadow-glow border-primary/20 bg-primary/10 dark:border-border dark:bg-card/70 mb-6 overflow-hidden rounded-2xl border p-5 transition-all"
+    class="summary-card bg-card/60 dark:bg-card/50 border-border/60 mb-6 overflow-hidden rounded-2xl border shadow-sm transition-all"
     :class="{ 'is-loading': loading }"
   >
-    <div class="mb-3 flex items-center justify-between gap-3">
-      <h3
-        class="text-primary dark:text-primary flex items-center gap-2 text-base font-semibold"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="lucide lucide-bot-icon lucide-bot"
+    <!-- Header -->
+    <div class="flex items-center justify-between gap-3 px-5 pt-4 pb-3">
+      <div class="flex items-center gap-2.5">
+        <div
+          class="bg-primary/10 dark:bg-primary/15 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
         >
-          <path d="M12 8V4H8" />
-          <rect width="16" height="12" x="4" y="8" rx="2" />
-          <path d="M2 14h2" />
-          <path d="M20 14h2" />
-          <path d="M15 13v2" />
-          <path d="M9 13v2" />
-        </svg>
-        <template v-if="cardMode === CardMode.SUMMARY"> AI 文章总结 </template>
-        <template v-else> AI 对话 </template>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="17"
+            height="17"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="text-primary"
+          >
+            <path d="M12 8V4H8" />
+            <rect width="16" height="12" x="4" y="8" rx="2" />
+            <path d="M2 14h2" />
+            <path d="M20 14h2" />
+            <path d="M15 13v2" />
+            <path d="M9 13v2" />
+          </svg>
+        </div>
+        <h3 class="text-foreground text-base font-semibold tracking-tight">
+          <template v-if="cardMode === CardMode.SUMMARY"> AI 总结 </template>
+          <template v-else> AI 对话 </template>
+        </h3>
         <AnimatePresence mode="wait">
           <motion.span
             v-if="loading"
             :key="textShimmer[0]"
-            :initial="{ opacity: 0, y: 10 }"
+            :initial="{ opacity: 0, y: 6 }"
             :animate="{ opacity: 1, y: 0 }"
-            :exit="{ opacity: 0, y: -10 }"
-            :transition="{ duration: 0.3 }"
-            class="animate-shimmer pl-2 text-xs"
+            :exit="{ opacity: 0, y: -6 }"
+            :transition="{ duration: 0.25 }"
+            class="text-muted-foreground text-sm"
           >
-            {{ textShimmer[0] }}</motion.span
-          >
+            {{ textShimmer[0] }}
+          </motion.span>
         </AnimatePresence>
-      </h3>
-      <div class="flex items-center gap-2">
-        <button
-          class="cursor-pointer rounded-md px-2 py-1 text-xs"
-          :class="
-            cardMode === CardMode.SUMMARY
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-primary/20 text-primary dark:bg-card dark:text-foreground'
-          "
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <!-- Mode tabs — segmented control -->
+        <div class="bg-muted/60 dark:bg-muted/40 inline-flex rounded-lg p-0.5">
+          <button
+            class="relative cursor-pointer rounded-md px-3 py-1 text-sm font-medium transition-all"
+            :class="
+              cardMode === CardMode.SUMMARY
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            "
+            :disabled="loading"
+            @click="cardMode = CardMode.SUMMARY"
+          >
+            总结
+          </button>
+          <button
+            class="relative cursor-pointer rounded-md px-3 py-1 text-sm font-medium transition-all"
+            :class="
+              cardMode === CardMode.CHAT
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            "
+            :disabled="loading"
+            @click="switchToChat"
+          >
+            对话
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toolbar: model selector + action button -->
+    <div class="flex items-center gap-2 px-5 pb-3">
+      <template v-if="cardMode === CardMode.SUMMARY">
+        <select
+          v-model="selectedModel"
+          class="border-border/70 bg-muted/40 text-foreground dark:border-border/70 dark:bg-muted/30 dark:text-foreground focus:ring-ring cursor-pointer rounded-md border px-2.5 py-1.5 text-sm transition-colors focus:ring-1 focus:outline-none"
           :disabled="loading"
-          @click="cardMode = CardMode.SUMMARY"
         >
-          总结
-        </button>
+          <option
+            v-for="opt in modelOptions"
+            :key="opt.value"
+            :value="opt.value"
+          >
+            {{ opt.label }}
+          </option>
+        </select>
         <button
-          class="cursor-pointer rounded-md px-2 py-1 text-xs"
-          :class="
-            cardMode === CardMode.CHAT
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-primary/20 text-primary dark:bg-card dark:text-foreground'
-          "
-          :disabled="loading"
-          @click="switchToChat"
-        >
-          对话
-        </button>
-        <button
-          v-if="cardMode === CardMode.SUMMARY"
-          class="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-primary/30 dark:disabled:bg-primary/30 inline-flex cursor-pointer items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition disabled:cursor-not-allowed"
+          class="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-primary/30 dark:disabled:bg-primary/30 ml-auto inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed"
           :disabled="!canSummarize"
           @click="onGenerate"
         >
           <svg
             v-if="loading"
-            class="h-4 w-4 animate-spin"
+            class="h-3.5 w-3.5 animate-spin"
             viewBox="0 0 24 24"
             fill="none"
           >
@@ -174,142 +213,188 @@ async function switchToChat() {
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
             />
           </svg>
-          {{ loading ? '总结中...' : summaryHasGenerated ? '重新总结' : '生成总结' }}
+          {{
+            loading
+              ? '总结中...'
+              : summaryHasGenerated
+                ? '重新总结'
+                : '生成总结'
+          }}
         </button>
+      </template>
+      <template v-else>
         <button
-          v-if="cardMode === CardMode.CHAT && messages.length > 0"
-          class="text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-foreground cursor-pointer rounded-md px-2 py-1 text-xs"
+          v-if="messages.length > 0"
+          class="text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-foreground ml-auto cursor-pointer rounded-md px-2.5 py-1 text-sm transition-colors"
           :disabled="loading"
           @click="clearChat"
         >
-          清空
+          清空对话
         </button>
-      </div>
+      </template>
     </div>
 
+    <!-- Error message -->
     <p
       v-if="errorMessage"
-      class="text-destructive dark:text-destructive text-sm"
+      class="text-destructive dark:text-destructive px-5 pb-3 text-sm"
     >
       {{ errorMessage }}
     </p>
 
+    <!-- Summary content -->
     <template v-if="cardMode === CardMode.SUMMARY">
-      <Transition name="summary-fade" mode="out-in">
-        <p
-          v-if="summary"
-          key="result"
-          class="text-foreground dark:text-foreground text-sm leading-7 whitespace-pre-line"
-        >
-          {{ summary
-          }}<span v-if="loading" class="animate-breathe ml-0.5">|</span>
-        </p>
-        <p
-          v-else
-          key="placeholder"
-          class="text-muted-foreground dark:text-muted-foreground text-sm"
-        >
-          点击"生成总结"，快速提炼当前文章重点。
-        </p>
-      </Transition>
-    </template>
-
-    <template v-else>
-      <div
-        v-if="!hasGenerated"
-        class="text-muted-foreground dark:text-muted-foreground text-sm"
-      ></div>
-      <template v-else>
-        <div
-          :ref="bindContainer"
-          class="mb-1 max-h-80 space-y-3 overflow-y-auto pr-1"
-        >
+      <div class="border-border/40 border-t px-5 pt-4 pb-5">
+        <Transition name="summary-fade" mode="out-in">
           <div
-            v-for="(msg, idx) in messages"
-            :key="idx"
-            class="flex"
-            :class="msg.role === 'user' ? 'justify-end' : 'justify-start'"
-          >
+            v-if="summary"
+            key="result"
+            class="prose dark:prose-invert max-w-none"
+            v-html="renderedSummary"
+          ></div>
+          <div v-else key="placeholder" class="flex items-center gap-3 py-3">
             <div
-              class="max-w-[85%] rounded-xl px-3 py-2 text-sm leading-6 whitespace-pre-line"
-              :class="
-                msg.role === 'user'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-card text-foreground dark:bg-card dark:text-foreground shadow-sm'
-              "
+              class="bg-muted/50 dark:bg-muted/30 flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
             >
-              <template v-if="msg.content">
-                {{ msg.content
-                }}<span
-                  v-if="
-                    loading &&
-                    idx === messages.length - 1 &&
-                    msg.role === 'assistant'
-                  "
-                  class="animate-breathe ml-0.5"
-                  >|</span
-                >
-              </template>
-              <template v-else-if="loading && idx === messages.length - 1">
-                <span class="text-muted-foreground animate-pulse"
-                  >思考中...</span
-                >
-              </template>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-3 flex items-center gap-2">
-          <input
-            v-model="chatInput"
-            type="text"
-            placeholder="继续提问..."
-            class="border-border bg-card text-foreground placeholder-muted-foreground focus:border-ring focus:ring-ring dark:border-border dark:bg-card dark:text-foreground dark:placeholder-muted-foreground dark:focus:border-ring dark:focus:ring-ring flex-1 rounded-lg border px-3 py-2 text-sm focus:ring-1 focus:outline-none"
-            :disabled="loading"
-            @keydown="onChatKeydown"
-          />
-          <button
-            class="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-primary/30 dark:disabled:bg-primary/30 inline-flex cursor-pointer items-center justify-center rounded-lg px-3 py-2 text-sm font-medium transition disabled:cursor-not-allowed"
-            :disabled="!canChat"
-            @click="onSendChat"
-          >
-            <svg
-              v-if="loading"
-              class="h-4 w-4 animate-spin"
-              viewBox="0 0 24 24"
-              fill="none"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
                 stroke="currentColor"
-                stroke-width="4"
-              />
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-              />
-            </svg>
-            <svg
-              v-else
-              class="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
+                stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                d="M5 12h14M12 5l7 7-7 7"
-              />
-            </svg>
-          </button>
-        </div>
-      </template>
+                class="text-muted-foreground"
+              >
+                <path
+                  d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"
+                />
+                <path d="M14 2v6h6" />
+                <path d="M16 13H8" />
+                <path d="M16 17H8" />
+                <path d="M10 9H8" />
+              </svg>
+            </div>
+            <p
+              class="text-muted-foreground dark:text-muted-foreground text-base leading-relaxed"
+            >
+              点击「生成总结」，快速提炼文章核心要点
+            </p>
+          </div>
+        </Transition>
+      </div>
+    </template>
+
+    <!-- Chat content -->
+    <template v-else>
+      <div class="border-border/40 border-t">
+        <template v-if="!hasGenerated">
+          <div class="px-5 py-6 text-center">
+            <p class="text-muted-foreground text-base">
+              切换到对话模式后，输入问题即可开始讨论文章内容
+            </p>
+          </div>
+        </template>
+        <template v-else>
+          <div
+            :ref="bindContainer"
+            class="max-h-72 space-y-2.5 overflow-y-auto px-5 py-4"
+          >
+            <div
+              v-for="(msg, idx) in messages"
+              :key="idx"
+              class="flex"
+              :class="msg.role === 'user' ? 'justify-end' : 'justify-start'"
+            >
+              <div
+                class="max-w-[80%] rounded-2xl px-3.5 py-2.5 text-base leading-relaxed"
+                :class="
+                  msg.role === 'user'
+                    ? 'bg-primary text-primary-foreground whitespace-pre-line'
+                    : 'bg-muted/50 text-foreground dark:bg-muted/30 dark:text-foreground prose dark:prose-invert max-w-none'
+                "
+              >
+                <template v-if="msg.role === 'user'">
+                  {{ msg.content }}
+                </template>
+                <template v-else>
+                  <div
+                    v-if="msg.content"
+                    v-html="renderMarkdown(msg.content)"
+                  ></div>
+                  <span
+                    v-if="loading && idx === messages.length - 1 && msg.content"
+                    class="text-muted-foreground ml-0.5 animate-pulse"
+                    >▎</span
+                  >
+                </template>
+                <template
+                  v-if="loading && idx === messages.length - 1 && !msg.content"
+                >
+                  <span class="text-muted-foreground animate-pulse"
+                    >思考中...</span
+                  >
+                </template>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="border-border/40 flex items-center gap-2 border-t px-4 py-3"
+          >
+            <input
+              v-model="chatInput"
+              type="text"
+              placeholder="继续提问..."
+              class="border-border/70 bg-muted/30 text-foreground placeholder-muted-foreground focus:border-ring focus:ring-ring dark:border-border/70 dark:bg-muted/20 dark:text-foreground dark:placeholder-muted-foreground dark:focus:border-ring dark:focus:ring-ring flex-1 rounded-lg border px-3.5 py-2.5 text-base transition-colors focus:ring-1 focus:outline-none"
+              :disabled="loading"
+              @keydown="onChatKeydown"
+            />
+            <button
+              class="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-primary/30 dark:disabled:bg-primary/30 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg transition disabled:cursor-not-allowed"
+              :disabled="!canChat"
+              @click="onSendChat"
+            >
+              <svg
+                v-if="loading"
+                class="h-4 w-4 animate-spin"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                />
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
+              </svg>
+              <svg
+                v-else
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M5 12h14M12 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          </div>
+        </template>
+      </div>
     </template>
   </section>
 </template>
@@ -317,42 +402,41 @@ async function switchToChat() {
 <style scoped>
 .summary-card {
   transition:
-    transform 220ms ease,
-    box-shadow 220ms ease,
-    border-color 220ms ease;
-}
-.shadow-glow {
-  box-shadow: 0 1px 20px rgba(105, 163, 255, 0.253);
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    border-color 200ms ease;
 }
 
 .summary-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 16px -2px oklch(from var(--color-primary) l c h / 0.08),
+    0 1px 4px oklch(from var(--color-primary) l c h / 0.04);
 }
 
 .summary-card.is-loading {
-  animation: card-breathe 1.6s ease-in-out infinite;
+  animation: card-breathe 2s ease-in-out infinite;
 }
 
 .summary-fade-enter-active,
 .summary-fade-leave-active {
-  transition: all 260ms ease;
+  transition: all 200ms ease;
 }
 
 .summary-fade-enter-from,
 .summary-fade-leave-to {
   opacity: 0;
-  transform: translateY(4px);
+  transform: translateY(3px);
 }
 
 @keyframes card-breathe {
   0%,
   100% {
-    box-shadow: 0 0 0 rgba(59, 130, 246, 0);
-    border-color: rgb(191 219 254);
+    border-color: oklch(from var(--color-primary) l c h / 0.15);
   }
   50% {
-    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.16);
-    border-color: rgb(147 197 253);
+    border-color: oklch(from var(--color-primary) l c h / 0.35);
+    box-shadow: 0 4px 20px oklch(from var(--color-primary) l c h / 0.08);
   }
 }
 </style>

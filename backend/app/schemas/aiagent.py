@@ -10,6 +10,7 @@ class ArticleSummaryRequest(BaseModel):
 
     content: str = Field(min_length=1, description="文章正文")
     title: str | None = Field(default=None, description="文章标题")
+    model: str | None = Field(default=None, description="模型名称")
 
 
 class ChatRequest(BaseModel):

@@ -1,9 +1,9 @@
 import { ref, watch, onUnmounted } from 'vue';
 
 const SHIMMER_TIPS = [
-  '正在分析文章结构...',
-  '正在提取关键信息...',
-  '正在生成总结内容...',
+  '分析文章结构…',
+  '提取关键信息…',
+  '生成总结内容…',
 ];
 
 /**

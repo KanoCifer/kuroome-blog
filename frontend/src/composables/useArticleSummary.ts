@@ -16,6 +16,12 @@ interface SummaryStreamFrame {
   is_end?: boolean;
 }
 
+/** 可选模型列表 */
+export const MODEL_OPTIONS = [
+  { label: 'Ring 2.6', value: 'Ring 2.6' },
+  { label: 'Ling 2.6', value: 'Ling 2.6' },
+] as const;
+
 /**
  * 封装"AI 文章总结"的状态：缓存检查、生成、流式拼接、错误提示。
  * 组件只需绑定 loading/summary/hasGenerated/errorMessage，配合 canSummarize 控制按钮。
@@ -25,8 +31,11 @@ export function useArticleSummary(ctx: ArticleContext, apiBase: string) {
   const summary = ref('');
   const hasGenerated = ref(false);
   const errorMessage = ref('');
+  const selectedModel = ref<string>(MODEL_OPTIONS[0].value);
 
-  const pureContent = computed(() => ctx.content.replaceAll(/<[^>]+>/g, '').trim());
+  const pureContent = computed(() =>
+    ctx.content.replaceAll(/<[^>]+>/g, '').trim(),
+  );
 
   const canSummarize = computed(
     () => pureContent.value.length > 0 && !loading.value,
@@ -56,7 +65,10 @@ export function useArticleSummary(ctx: ArticleContext, apiBase: string) {
     }
   }
 
-  async function generate(notifyError: (msg: string) => void) {
+  async function generate(
+    notifyError: (msg: string) => void,
+    model?: string,
+  ) {
     if (!canSummarize.value) {
       notifyError('文章内容为空，无法总结');
       return;
@@ -70,7 +82,11 @@ export function useArticleSummary(ctx: ArticleContext, apiBase: string) {
       await consumeSseStream<SummaryStreamFrame>(
         {
           url: `${apiBase}/v2/llm/summary/stream`,
-          body: { title: ctx.title || '', content: pureContent.value },
+          body: {
+            title: ctx.title || '',
+            content: pureContent.value,
+            model: model || selectedModel.value,
+          },
         },
         {
           onData: (data) => {
@@ -96,6 +112,8 @@ export function useArticleSummary(ctx: ArticleContext, apiBase: string) {
     hasGenerated,
     errorMessage,
     canSummarize,
+    selectedModel,
+    modelOptions: MODEL_OPTIONS,
     checkCachedSummary,
     generate,
   };
