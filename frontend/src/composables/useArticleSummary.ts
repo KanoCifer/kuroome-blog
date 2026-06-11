@@ -32,9 +32,9 @@ export function useArticleSummary(ctx: ArticleContext, apiBase: string) {
     () => pureContent.value.length > 0 && !loading.value,
   );
 
-  /** 静默查询后端缓存的总结，命中则直接展示。 */
-  async function checkCachedSummary(authenticated: boolean) {
-    if (!authenticated || !pureContent.value) return;
+  /** 静默查询后端缓存的总结，命中则直接展示。未登录也会发起，命中即显示。 */
+  async function checkCachedSummary() {
+    if (!pureContent.value) return;
     try {
       const res = await fetch(`${apiBase}/v1/agent/history/summary`, {
         method: 'POST',

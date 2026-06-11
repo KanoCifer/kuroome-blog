@@ -1,3 +1,11 @@
+"""Auth dependencies.
+
+提供两类用户解析：
+- `manager`（= `get_current_user`）：强制 Bearer token，缺失或无效一律 401。57 处调用方零修改。
+- `optional_user`：允许匿名（无 Authorization 头或 token 无效），返回 User | None。
+  仅供公开 AI 端点等"未登录可用"的场景；调用方需自行决定如何回退（IP、cookie 等）。
+"""
+
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
@@ -21,7 +29,13 @@ if settings.SECRET_KEY is None:
 
 ALGORITHM = "HS256"
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
+# 强校验：缺 token 抛 401。auto_error=True（默认值），保留旧行为。
+oauth2_scheme_strict = OAuth2PasswordBearer(tokenUrl="/auth/token")
+
+# 弱校验：缺 token 不抛错，handler 自取 None。供 optional_user 使用。
+oauth2_scheme_optional = OAuth2PasswordBearer(
+    tokenUrl="/auth/token", auto_error=False
+)
 
 
 def create_access_token(*, sub: str, expires: timedelta) -> str:
@@ -62,7 +76,7 @@ async def resolve_user_from_token(token: str) -> User | None:
 
 
 async def get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    token: Annotated[str, Depends(oauth2_scheme_strict)],
 ) -> User:
     """从 Authorization: Bearer 头取 access token, 返回 User."""
     user = await resolve_user_from_token(token)
@@ -73,6 +87,20 @@ async def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
     return user
+
+
+async def optional_user(
+    token: Annotated[str | None, Depends(oauth2_scheme_optional)],
+) -> User | None:
+    """可选用户依赖：未登录 / token 无效返回 None，登录成功返回 User。
+
+    设计意图：让 AI 总结 / 对话等端点对未登录用户开放，由调用方在 handler
+    中按需把 `user_id` 退回到 `anon:<ip>` 一类的访客标识。
+    IP 由 handler 通过 `request.client.host` 自行取得。
+    """
+    if not token:
+        return None
+    return await resolve_user_from_token(token)
 
 
 # 保留 manager 别名: 14 个文件 57 处 Depends(manager) 零修改

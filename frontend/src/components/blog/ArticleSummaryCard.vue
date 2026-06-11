@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useAuthStore } from '@/auth/stores/auth';
 import { useNotificationStore } from '@/stores/notification';
 import { useArticleChat } from '@/composables/useArticleChat';
 import { useArticleSummary } from '@/composables/useArticleSummary';
@@ -17,7 +16,6 @@ const props = defineProps<{
   content: string;
 }>();
 
-const auth = useAuthStore();
 const notifier = useNotificationStore();
 const apiBase = import.meta.env.VITE_API_BASE || '/api';
 
@@ -60,31 +58,14 @@ watch(loading, (on) => {
 });
 
 onMounted(async () => {
-  await checkCachedSummary(auth.isAuthenticated);
+  await checkCachedSummary();
 });
 
-watch(
-  () => auth.isAuthenticated,
-  async (isAuth) => {
-    if (isAuth && !summary.value && !loading.value) {
-      await checkCachedSummary(isAuth);
-    }
-  },
-);
-
 async function onGenerate() {
-  if (!auth.isAuthenticated) {
-    notifier.error('请先登录以使用AI功能');
-    return;
-  }
   await generate((msg) => notifier.error(msg));
 }
 
 async function onSendChat() {
-  if (!auth.isAuthenticated) {
-    notifier.error('请先登录以使用AI功能');
-    return;
-  }
   await send((msg) => notifier.error(msg));
 }
 
@@ -94,7 +75,7 @@ function onChatKeydown(e: KeyboardEvent) {
 
 async function switchToChat() {
   cardMode.value = CardMode.CHAT;
-  await enterChat(auth.isAuthenticated);
+  await enterChat();
 }
 </script>
 

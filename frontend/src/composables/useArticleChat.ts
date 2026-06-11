@@ -62,9 +62,9 @@ export function useArticleChat(ctx: ArticleContext, apiBase: string) {
     }
   }
 
-  /** 静默查询历史对话，命中则恢复上下文。 */
-  async function loadHistory(authenticated: boolean) {
-    if (!authenticated || !ctx.content) return;
+  /** 静默查询历史对话，命中则恢复上下文。未登录也会发起，命中即恢复。 */
+  async function loadHistory() {
+    if (!ctx.content) return;
     const pureContent = ctx.content.replaceAll(/<[^>]+>/g, '').trim();
     if (!pureContent) return;
     try {
@@ -89,9 +89,9 @@ export function useArticleChat(ctx: ArticleContext, apiBase: string) {
   }
 
   /** 切换到对话模式：尝试加载历史，没有则创建新会话。 */
-  async function enterChat(authenticated: boolean) {
+  async function enterChat() {
     if (!sessionId.value) {
-      await loadHistory(authenticated);
+      await loadHistory();
       if (!sessionId.value) sessionId.value = generateSessionId();
     }
   }
