@@ -10,7 +10,6 @@ from app.schemas.aiagent import (
     ChatRequest,
     HistoryRequest,
 )
-from app.utils.sse import sse_event
 
 
 class AiService:
@@ -42,7 +41,7 @@ class AiService:
         payload: ChatRequest,
         user_id: str,
         model: str | None = None,
-    ) -> AsyncIterator[str]:
+    ) -> AsyncIterator[dict]:
         try:
             async for chunk in self.summarizer.chat(
                 message=payload.message,
@@ -52,17 +51,15 @@ class AiService:
                 article_title=payload.article_title,
                 model_name=model,
             ):
-                yield sse_event({"content": str(chunk), "is_end": False})
-            yield sse_event({"content": "", "is_end": True})
+                yield {"content": str(chunk), "is_end": False}
+            yield {"content": "", "is_end": True}
         except ValueError as exc:
-            yield sse_event({"content": f"[ERROR] {exc!r}", "is_end": True})
+            yield {"content": f"[ERROR] {exc!r}", "is_end": True}
         except RuntimeError as exc:
-            yield sse_event({"content": f"[ERROR] {exc!r}", "is_end": True})
+            yield {"content": f"[ERROR] {exc!r}", "is_end": True}
         except Exception as exc:
             logger.error(f"❌ 对话失败: {exc!r}")
-            yield sse_event(
-                {"content": "[ERROR] 对话失败,请稍后重试", "is_end": True}
-            )
+            yield {"content": "[ERROR] 对话失败,请稍后重试", "is_end": True}
 
     async def get_user_history(self, user_id: str) -> dict[str, list[dict]]:
         sessions = await self.summarizer.get_history(user_id=user_id)

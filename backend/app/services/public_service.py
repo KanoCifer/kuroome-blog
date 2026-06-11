@@ -15,7 +15,6 @@ from app.repositories.gallery_repo import GalleryRepo
 from app.repositories.public_repo import PublicRepo
 from app.schemas.aiagent import WeatherAnalysisInput
 from app.schemas.gallery import GalleryInput
-from app.utils.sse import sse_event
 
 _FRONTEND_URL = get_settings().FRONTEND_URL.rstrip("/")
 
@@ -211,16 +210,14 @@ Sitemap: {sitemap_url}
                 model_id=model_id,
                 on_index_calculated=_on_index_calculated,
             ):
-                yield sse_event({"content": chunk, "is_end": False})
-            yield sse_event({"content": "", "is_end": True})
+                yield {"content": chunk, "is_end": False}
+            yield {"content": "", "is_end": True}
         except ValueError as exc:
-            yield sse_event({"content": f"[ERROR] {exc!r}", "is_end": True})
+            yield {"content": f"[ERROR] {exc!r}", "is_end": True}
         except RuntimeError as exc:
-            yield sse_event({"content": f"[ERROR] {exc!r}", "is_end": True})
+            yield {"content": f"[ERROR] {exc!r}", "is_end": True}
         except Exception as exc:
-            yield sse_event(
-                {"content": f"[ERROR] 天气分析失败: {exc!r}", "is_end": True}
-            )
+            yield {"content": f"[ERROR] 天气分析失败: {exc!r}", "is_end": True}
 
     async def set_pic_gallery(
         self, redis: AsyncRedis, images: GalleryInput

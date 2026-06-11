@@ -3,7 +3,6 @@ from __future__ import annotations
 from collections.abc import AsyncIterable
 
 from fastapi import APIRouter, Body, Depends, Request
-from fastapi.responses import StreamingResponse
 from fastapi.sse import EventSourceResponse, ServerSentEvent
 
 from app.api.des.auth import optional_user
@@ -54,27 +53,18 @@ async def summary_article_stream(
 # ── 对话 ──────────────────────────────────────────────────
 
 
-@router.post("/chat/stream")
+@router.post("/chat/stream", response_class=EventSourceResponse)
 @limiter.limit("20/minute")
 async def chat_stream(
     request: Request,
     payload: ChatRequest,
     user: User | None = Depends(optional_user),
     ai_service: AiService = Depends(ai_service_dep),
-):
-    event_generator = ai_service.chat_stream(
+) -> AsyncIterable[ServerSentEvent]:
+    async for chunk in ai_service.chat_stream(
         payload, _resolve_user_id(user, request), model=payload.model
-    )
-
-    return StreamingResponse(
-        event_generator,
-        media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
-            "X-Accel-Buffering": "no",
-        },
-    )
+    ):
+        yield ServerSentEvent(data=chunk)
 
 
 # ── 历史记录 ──────────────────────────────────────────────
@@ -124,7 +114,7 @@ async def debug_sessions(
 # ── 天气分析 ──────────────────────────────────────────────
 
 
-@router.post("/weather-analysis")
+@router.post("/weather-analysis", response_class=EventSourceResponse)
 @limiter.limit("50/hour")
 async def analyze_weather(
     request: Request,  # limiter 需要
@@ -132,17 +122,9 @@ async def analyze_weather(
         ..., description="Weather data to analyze"
     ),
     public_service: PublicService = Depends(public_service_dep),
-) -> StreamingResponse:
+) -> AsyncIterable[ServerSentEvent]:
     """根据天气数据进行分析并生成报告。"""
-    event_generator = public_service.analyze_weather(
+    async for chunk in public_service.analyze_weather(
         weather_data, model_id=weather_data.model_id
-    )
-    return StreamingResponse(
-        event_generator,
-        media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
-            "X-Accel-Buffering": "no",
-        },
-    )
+    ):
+        yield ServerSentEvent(data=chunk)
