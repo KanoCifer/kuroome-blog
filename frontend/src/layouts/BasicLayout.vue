@@ -64,7 +64,9 @@ onBeforeUnmount(() => scrollObserver?.disconnect());
 watch(sentinelRef, () => initObserver());
 
 // 路由过渡动画：从 meta.transition 读取，未定义时用默认 slide-up
-const transitionName = computed(() => (route.meta.transition as string) ?? 'slide-up');
+const transitionName = computed(
+  () => (route.meta.transition as string) ?? 'slide-up',
+);
 
 // 导航栏滚动隐藏逻辑
 // const isHeaderVisible = ref(true);
@@ -234,26 +236,25 @@ const transitionName = computed(() => (route.meta.transition as string) ?? 'slid
     <AnimatePresence>
       <BasicNav
         v-if="showBasicNav"
-        key="basic-nav"
-        layoutId="nav-card"
-        :initial="{ opacity: 1 }"
         :animate="{
           opacity: 1,
-          ...(isNavCompact ? { left: 200, x: 0 } : {}),
+          y: 0,
+          ...(isNavCompact ? { left: '11%' } : { left: '50%' }),
         }"
-        :exit="{ opacity: 0 }"
-        :transition="{ type: 'spring', bounce: 0.4, duration: 0.7 }"
-        class="group fixed top-4 left-1/2 z-50 -translate-x-1/2"
+        :initial="{ opacity: 0, y: -40, left: '50%' }"
+        :exit="{ opacity: 0, y: -40 }"
+        :transition="{ type: 'spring', bounce: 0.3, duration: 0.5 }"
+        class="group fixed top-12 z-50 -translate-x-1/2 -translate-y-1/2"
       />
+    </AnimatePresence>
+    <AnimatePresence>
       <BentoNavCard
-        v-else
-        key="bento-nav"
-        layoutId="nav-card"
+        v-if="!showBasicNav"
         class="fixed z-50 w-68 -translate-x-1/2 -translate-y-1/2"
         :style="[navCardPosition]"
         :initial="{ scale: 0.5, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
-        :exit="{ transition: { duration: 0.5 } }"
+        :exit="{ scale: 0.5, opacity: 0 }"
         :transition="{
           type: 'spring',
           bounce: 0.3,

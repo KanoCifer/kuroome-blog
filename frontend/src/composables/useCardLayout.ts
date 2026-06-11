@@ -251,6 +251,7 @@ export function useCardLayout(containerRef: Ref<HTMLElement | null>) {
   });
 
   return {
+    centerX,
     containerStyle,
     picPosition,
     greetingPosition,
