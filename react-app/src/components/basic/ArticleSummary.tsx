@@ -59,7 +59,7 @@ function useArticleSummary() {
       }, 2000);
 
       try {
-        const response = await fetch(`${apiBase}/v1/agent/summary/stream`, {
+        const response = await fetch(`${apiBase}/v2/llm/summary/stream`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',

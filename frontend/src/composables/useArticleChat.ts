@@ -68,7 +68,7 @@ export function useArticleChat(ctx: ArticleContext, apiBase: string) {
     const pureContent = ctx.content.replaceAll(/<[^>]+>/g, '').trim();
     if (!pureContent) return;
     try {
-      const res = await fetch(`${apiBase}/v1/agent/history/chat`, {
+      const res = await fetch(`${apiBase}/v2/llm/history/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -138,7 +138,7 @@ export function useArticleChat(ctx: ArticleContext, apiBase: string) {
 
     try {
       await consumeSseStream<ChatStreamFrame>(
-        { url: `${apiBase}/v1/agent/chat/stream`, body },
+        { url: `${apiBase}/v2/llm/chat/stream`, body },
         {
           onData: async (data) => {
             if (data.content) {

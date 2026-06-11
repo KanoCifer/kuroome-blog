@@ -7,7 +7,6 @@ from fastapi.staticfiles import StaticFiles
 
 from app.api.v1 import (
     admin,
-    ai,
     auth,
     blog,
     messages,
@@ -20,6 +19,7 @@ from app.api.v2 import (
     device,
     fishing,
     friendlinks,
+    llm,
     subscriptions,
     weather,
 )
@@ -45,11 +45,11 @@ def register_router(app: FastAPI):
     app.include_router(router=public.router, prefix="/api/v1")
     app.include_router(router=rss.router, prefix="/api/v1")
     app.include_router(router=monitor.router, prefix="/api/v1")
-    app.include_router(router=ai.router, prefix="/api/v1")
     app.include_router(router=publish.router, prefix="/api/v1")
 
     # v2 版本API
     app.include_router(router=subscriptions.router, prefix="/api/v2")
+    app.include_router(router=llm.router, prefix="/api/v2")
     app.include_router(router=device.router, prefix="/api/v2")
     app.include_router(router=fishing.router, prefix="/api/v2")
     app.include_router(router=weather.router, prefix="/api/v2")

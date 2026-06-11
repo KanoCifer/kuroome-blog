@@ -5,6 +5,7 @@ from app.api.v2 import (
     devtasks,
     fishing,
     friendlinks,
+    llm,
     subscriptions,
     weather,
 )

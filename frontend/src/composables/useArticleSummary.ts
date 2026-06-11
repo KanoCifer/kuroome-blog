@@ -36,7 +36,7 @@ export function useArticleSummary(ctx: ArticleContext, apiBase: string) {
   async function checkCachedSummary() {
     if (!pureContent.value) return;
     try {
-      const res = await fetch(`${apiBase}/v1/agent/history/summary`, {
+      const res = await fetch(`${apiBase}/v2/llm/history/summary`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -69,7 +69,7 @@ export function useArticleSummary(ctx: ArticleContext, apiBase: string) {
     try {
       await consumeSseStream<SummaryStreamFrame>(
         {
-          url: `${apiBase}/v1/agent/summary/stream`,
+          url: `${apiBase}/v2/llm/summary/stream`,
           body: { title: ctx.title || '', content: pureContent.value },
         },
         {

@@ -1,20 +1,22 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Body, Depends, Request
 from fastapi.responses import StreamingResponse
 
 from app.api.des.auth import optional_user
-from app.api.des.des import ai_service_dep
+from app.api.des.des import ai_service_dep, public_service_dep
 from app.api.des.limiter import client_key, limiter
 from app.models.models import User
 from app.schemas.aiagent import (
     ArticleSummaryRequest,
     ChatRequest,
     HistoryRequest,
+    WeatherAnalysisInput,
 )
 from app.services.ai_service import AiService
+from app.services.public_service import PublicService
 
-router = APIRouter(prefix="/agent", tags=["agent"])
+router = APIRouter(prefix="/llm", tags=["llm"])
 
 
 def _resolve_user_id(user: User | None, request: Request) -> str:
@@ -27,6 +29,9 @@ def _resolve_user_id(user: User | None, request: Request) -> str:
     if user is not None:
         return str(user.id)
     return f"anon:{client_key(request)}"
+
+
+# ── 文章摘要 ──────────────────────────────────────────────
 
 
 @router.post("/summary/stream")
@@ -52,6 +57,9 @@ async def summary_article_stream(
     )
 
 
+# ── 对话 ──────────────────────────────────────────────────
+
+
 @router.post("/chat/stream")
 @limiter.limit("20/minute")
 async def chat_stream(
@@ -73,6 +81,9 @@ async def chat_stream(
             "X-Accel-Buffering": "no",
         },
     )
+
+
+# ── 历史记录 ──────────────────────────────────────────────
 
 
 @router.get("/history")
@@ -110,8 +121,38 @@ async def get_cached_chat(
     )
 
 
+# ── Debug ─────────────────────────────────────────────────
+
+
 @router.get("/debug/sessions")
 async def debug_sessions(
     ai_service: AiService = Depends(ai_service_dep),
 ):
     return ai_service.get_debug_sessions()
+
+
+# ── 天气分析 ──────────────────────────────────────────────
+
+
+@router.post("/weather-analysis")
+@limiter.limit("50/hour")
+async def analyze_weather(
+    request: Request,  # limiter 需要
+    weather_data: WeatherAnalysisInput = Body(
+        ..., description="Weather data to analyze"
+    ),
+    public_service: PublicService = Depends(public_service_dep),
+) -> StreamingResponse:
+    """根据天气数据进行分析并生成报告。"""
+    event_generator = public_service.analyze_weather(
+        weather_data, model_id=weather_data.model_id
+    )
+    return StreamingResponse(
+        event_generator,
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )

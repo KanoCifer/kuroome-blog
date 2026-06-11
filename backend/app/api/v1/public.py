@@ -13,7 +13,6 @@ from fastapi import APIRouter, Body, Depends, File, Request, UploadFile
 from fastapi.responses import JSONResponse, PlainTextResponse
 from redis.asyncio import Redis as AsyncRedis
 from starlette import status
-from starlette.responses import StreamingResponse
 
 from app.api.des.auth import manager
 from app.api.des.db import get_async_session
@@ -24,7 +23,6 @@ from app.core.config import get_settings
 from app.core.exceptions import APIError
 from app.core.response import APIResponse
 from app.models.models import User
-from app.schemas.aiagent import WeatherAnalysisInput
 from app.schemas.gallery import GalleryInput
 from app.services.public_service import PublicService
 from app.utils.media import save_upload_image
@@ -197,33 +195,6 @@ async def reverse_geocode(
     return APIResponse.ok(
         data=data,
         message="Reverse geocode completed successfully",
-    )
-
-
-@router.post("/llm/weather-analysis")
-@limiter.limit("50/hour")
-async def analyze_weather(
-    request: Request,
-    weather_data: WeatherAnalysisInput = Body(
-        ..., description="Weather data to analyze"
-    ),
-    public_service: PublicService = Depends(public_service_dep),
-) -> StreamingResponse:
-    """根据天气数据进行分析并生成报告。
-    param weather_data: 需要分析的天气数据。
-    param model_id: AI 模型 ID，默认使用配置中的模型。
-    """
-    event_generator = public_service.analyze_weather(
-        weather_data, model_id=weather_data.model_id
-    )
-    return StreamingResponse(
-        event_generator,
-        media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
-            "X-Accel-Buffering": "no",
-        },
     )
 
 

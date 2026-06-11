@@ -172,7 +172,7 @@ const _doFetch = async () => {
   hasGenerated.value = false;
 
   try {
-    const response = await fetch(`${apiBase}/v1/llm/weather-analysis`, {
+    const response = await fetch(`${apiBase}/v2/llm/weather-analysis`, {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },

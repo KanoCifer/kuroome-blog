@@ -73,7 +73,7 @@ export const fishingMapService = (): FishingMapService => {
       onChunk: (content: string) => void,
       signal?: AbortSignal,
     ): Promise<void> {
-      const response = await fetch(`${apiBase}/v1/llm/weather-analysis`, {
+      const response = await fetch(`${apiBase}/v2/llm/weather-analysis`, {
         method: 'POST',
         credentials: 'include',
         headers: {
