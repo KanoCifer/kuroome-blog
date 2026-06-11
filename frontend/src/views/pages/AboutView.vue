@@ -8,7 +8,7 @@ const AboutIMG = '/images/about.webp';
 // Greeting typewriter
 const greeting = useTypewriter();
 const GREETING_TEXT = '你好；)';
-const GREETING_SPEED = 200;
+const GREETING_SPEED = 1; // 1 char/frame ≈ 60 chars/sec
 
 // Bio typewriter — each line types sequentially
 const bioLines = [
@@ -32,7 +32,7 @@ const bioLines = [
 ];
 
 const activeLineIdx = ref(-1);
-const BIO_SPEED = 50;
+const BIO_SPEED = 1; // 1 char/frame ≈ 60 chars/sec
 
 const allBioDone = computed(
   () => bioLines.length > 0 && bioLines.every((l) => l.hook.isDone.value),
@@ -77,7 +77,7 @@ onMounted(() => {
       </motion.div>
 
       <div class="greeting-wrapper">
-        <span class="greeting-text">{{ greeting.displayed.value }}</span>
+        <span class="greeting-text">{{ greeting.text.value }}</span>
         <span v-if="!greeting.isDone.value" class="cursor-blink"></span>
       </div>
     </div>
@@ -89,7 +89,7 @@ onMounted(() => {
     <div class="bio-section flex flex-col items-center gap-1 text-center">
       <div v-for="(line, i) in bioLines" :key="i" class="bio-line-wrapper">
         <span :class="line.class" class="bio-text">{{
-          line.hook.displayed.value
+          line.hook.text.value
         }}</span>
         <span
           v-if="activeLineIdx === i && !line.hook.isDone.value"

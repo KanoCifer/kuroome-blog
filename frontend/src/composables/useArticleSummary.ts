@@ -1,5 +1,6 @@
 import { computed, ref } from 'vue';
 import { consumeSseStream } from './useSseStream';
+import { useTypewriter } from './useTypewriter';
 
 export interface ArticleContext {
   title?: string;
@@ -28,7 +29,8 @@ export const MODEL_OPTIONS = [
  */
 export function useArticleSummary(ctx: ArticleContext, apiBase: string) {
   const loading = ref(false);
-  const summary = ref('');
+  const tw = useTypewriter();
+  const summary = tw.text;
   const hasGenerated = ref(false);
   const errorMessage = ref('');
   const selectedModel = ref<string>(MODEL_OPTIONS[0].value);
@@ -76,7 +78,7 @@ export function useArticleSummary(ctx: ArticleContext, apiBase: string) {
 
     loading.value = true;
     errorMessage.value = '';
-    summary.value = '';
+    tw.reset();
 
     try {
       await consumeSseStream<SummaryStreamFrame>(
@@ -90,9 +92,10 @@ export function useArticleSummary(ctx: ArticleContext, apiBase: string) {
         },
         {
           onData: (data) => {
-            if (data.content) summary.value += data.content;
+            if (data.content) tw.push(data.content);
           },
           onDone: () => {
+            tw.done();
             hasGenerated.value = true;
           },
         },
