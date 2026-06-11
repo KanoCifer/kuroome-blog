@@ -50,6 +50,7 @@ def create_agent(
         instructions=instructions,
         tools=tools or [create_web_search_tools()],
         db=db,
+        markdown=True,
         add_history_to_context=True,
         num_history_runs=10,
         **kwargs,
