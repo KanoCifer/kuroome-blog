@@ -115,10 +115,14 @@ async def run(apply: bool) -> None:
     if apply:
         new_count = await target_coll.count_documents({})
         legacy_count = await legacy_coll.count_documents({})
-        print(f"  legacy={legacy_count}  new={new_count}  match={new_count == legacy_count}")
+        print(
+            f"  legacy={legacy_count}  new={new_count}  match={new_count == legacy_count}"
+        )
 
         # 抽样：找一个 UserBook，看 bookInfo 的 DBRef 引用能不能解析到新 _id
-        ub = await db.weread_user_books.find_one({"bookInfo": {"$exists": True}})
+        ub = await db.weread_user_books.find_one(
+            {"bookInfo": {"$exists": True}}
+        )
         if ub:
             ref = ub["bookInfo"]
             # bson DBRef 对象：collection / id 属性
@@ -127,7 +131,9 @@ async def run(apply: bool) -> None:
             print(f"  样本 UserBook.bookInfo: ref={coll!r} id={oid!r}")
             target = await target_coll.find_one({"_id": oid})
             if target:
-                print(f"  ✅ DBRef 解析到新 _id 成功：title={target.get('title')!r}")
+                print(
+                    f"  ✅ DBRef 解析到新 _id 成功：title={target.get('title')!r}"
+                )
             else:
                 print(f"  ❌ DBRef 解析失败，{TARGET} 找不到 _id={oid!r}")
 

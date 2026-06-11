@@ -63,7 +63,7 @@ async def chat_stream(
     ai_service: AiService = Depends(ai_service_dep),
 ):
     event_generator = ai_service.chat_stream(
-        payload, _resolve_user_id(user, request)
+        payload, _resolve_user_id(user, request), model=payload.model
     )
 
     return StreamingResponse(
@@ -96,7 +96,7 @@ async def get_cached_summary(
     user: User | None = Depends(optional_user),
     ai_service: AiService = Depends(ai_service_dep),
 ):
-    return await ai_service.get_cached_summary(
+    return ai_service.get_cached_summary(
         payload, _resolve_user_id(user, request)
     )
 
@@ -108,9 +108,7 @@ async def get_cached_chat(
     user: User | None = Depends(optional_user),
     ai_service: AiService = Depends(ai_service_dep),
 ):
-    return await ai_service.get_cached_chat(
-        payload, _resolve_user_id(user, request)
-    )
+    return ai_service.get_cached_chat(payload, _resolve_user_id(user, request))
 
 
 # ── Debug ─────────────────────────────────────────────────

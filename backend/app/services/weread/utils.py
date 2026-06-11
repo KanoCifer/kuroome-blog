@@ -7,7 +7,7 @@ def _normalize_cover_url(cover: str | None) -> str | None:
     if not cover:
         return cover
     if cover.startswith("http://"):
-        return "https://" + cover[len("http://"):]
+        return "https://" + cover[len("http://") :]
     return cover
 
 

@@ -17,9 +17,7 @@ class BookRepo:
 
         # 一次查出已有 _id，跳过已存在书籍
         book_ids = [b.id for b in books]
-        existing = await WereadBook.find(
-            {"_id": {"$in": book_ids}}
-        ).to_list()
+        existing = await WereadBook.find({"_id": {"$in": book_ids}}).to_list()
         existing_ids = {b.id for b in existing}
 
         book_map: dict[str, WereadBook] = {}

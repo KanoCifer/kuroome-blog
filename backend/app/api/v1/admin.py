@@ -40,6 +40,7 @@ async def _safe_invalidate(*func_names: str) -> None:
     except Exception:
         logger.exception("cache invalidation failed (non-fatal)")
 
+
 router = APIRouter(prefix="/admin", tags=["admin"])
 
 # =============================================================================

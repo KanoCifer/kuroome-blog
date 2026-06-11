@@ -41,7 +41,9 @@ async def run(apply: bool, json_path: Path) -> None:
     # 查已存在的 version，避免重复插入
     existing = await coll.distinct("version")
     existing_set = set(existing)
-    print(f"🗄️  MongoDB 已有 {len(existing_set)} 个版本：{sorted(existing_set)}")
+    print(
+        f"🗄️  MongoDB 已有 {len(existing_set)} 个版本：{sorted(existing_set)}"
+    )
 
     to_insert = []
     skipped = []
@@ -50,12 +52,14 @@ async def run(apply: bool, json_path: Path) -> None:
         if ver in existing_set:
             skipped.append(ver)
             continue
-        to_insert.append({
-            "version": ver,
-            "date": entry.get("date", ""),
-            "title": entry.get("title", ""),
-            "changes": entry.get("changes", []),
-        })
+        to_insert.append(
+            {
+                "version": ver,
+                "date": entry.get("date", ""),
+                "title": entry.get("title", ""),
+                "changes": entry.get("changes", []),
+            }
+        )
 
     if skipped:
         print(f"⏭️  跳过已存在：{skipped}")
@@ -67,7 +71,9 @@ async def run(apply: bool, json_path: Path) -> None:
 
     print(f"\n将插入 {len(to_insert)} 个新版本：")
     for doc in to_insert:
-        print(f"  v{doc['version']} ({doc['date']}) — {doc['title']}  [{len(doc['changes'])} changes]")
+        print(
+            f"  v{doc['version']} ({doc['date']}) — {doc['title']}  [{len(doc['changes'])} changes]"
+        )
 
     if not apply:
         print("\n(dry-run 模式，未写入)")
@@ -84,9 +90,15 @@ async def run(apply: bool, json_path: Path) -> None:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="迁移 changelog.json 到 MongoDB")
-    parser.add_argument("--apply", action="store_true", help="实际执行迁移（默认 dry-run）")
-    parser.add_argument("--file", type=Path, default=DEFAULT_JSON, help="changelog.json 路径")
+    parser = argparse.ArgumentParser(
+        description="迁移 changelog.json 到 MongoDB"
+    )
+    parser.add_argument(
+        "--apply", action="store_true", help="实际执行迁移（默认 dry-run）"
+    )
+    parser.add_argument(
+        "--file", type=Path, default=DEFAULT_JSON, help="changelog.json 路径"
+    )
     args = parser.parse_args()
 
     if not args.file.exists():

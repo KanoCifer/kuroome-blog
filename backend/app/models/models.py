@@ -169,7 +169,6 @@ class Profile(Base):
         return f"<Profile {self.id} - User ID: {self.user_id}>"
 
 
-
 class Category(Base):
     """
     博客分类模型

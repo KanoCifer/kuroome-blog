@@ -1,5 +1,4 @@
 from app.repositories.admin_repo import AdminRepo
-from app.repositories.ai_repo import AiRepo
 from app.repositories.blog_repo import BlogRepo
 from app.repositories.device_repo import DeviceRepo
 from app.repositories.devtask_repo import DevTaskRepo
@@ -17,7 +16,6 @@ from app.repositories.weread import WereadRepo
 
 __all__ = [
     "AdminRepo",
-    "AiRepo",
     "BlogRepo",
     "DevTaskRepo",
     "DeviceRepo",

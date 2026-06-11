@@ -4,10 +4,9 @@ from dataclasses import dataclass
 from redis.asyncio import Redis as AsyncRedis
 
 from app.api.des.db import get_async_session
-from app.core.agent import ArticleSummarizer, article_summarizer
+from app.core.agent import ArticleSummarizer
 from app.repositories import (
     AdminRepo,
-    AiRepo,
     BlogRepo,
     DeviceRepo,
     DevTaskRepo,
@@ -141,11 +140,9 @@ async def get_sub_service():
 
 
 @asynccontextmanager
-async def get_ai_service(
-    summarizer: ArticleSummarizer = article_summarizer,
-):
-    ai_repo = AiRepo()
-    service = AiService(repo=ai_repo, summarizer=summarizer)
+async def get_ai_service():
+    summarizer = ArticleSummarizer()
+    service = AiService(summarizer=summarizer)
     yield service
 
 

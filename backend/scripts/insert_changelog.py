@@ -60,7 +60,9 @@ async def run(dry_run: bool, json_path: Path) -> None:
     print(f"\n将执行 {len(operations)} 条操作：{inserts} 新增，{updates} 更新")
     for e in entries:
         status = "🆕" if e["version"] not in existing_versions else "🔄"
-        print(f"  {status} v{e['version']} ({e.get('date', '')}) — {e.get('title', '')}")
+        print(
+            f"  {status} v{e['version']} ({e.get('date', '')}) — {e.get('title', '')}"
+        )
 
     if dry_run:
         print("\n(dry-run 模式，未写入)")
@@ -68,7 +70,9 @@ async def run(dry_run: bool, json_path: Path) -> None:
         return
 
     result = await coll.bulk_write(operations, ordered=False)
-    print(f"\n✅ 完成：新增 {result.upserted_count}，更新 {result.modified_count}")
+    print(
+        f"\n✅ 完成：新增 {result.upserted_count}，更新 {result.modified_count}"
+    )
 
     total = await coll.count_documents({})
     print(f"📊 集合当前共 {total} 条文档")
@@ -76,9 +80,18 @@ async def run(dry_run: bool, json_path: Path) -> None:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="插入/更新 changelog 到 MongoDB")
-    parser.add_argument("--dry-run", action="store_true", help="预览变更，不写入")
-    parser.add_argument("--file", type=Path, default=DEFAULT_FILE, help="changelog JSON 文件路径")
+    parser = argparse.ArgumentParser(
+        description="插入/更新 changelog 到 MongoDB"
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true", help="预览变更，不写入"
+    )
+    parser.add_argument(
+        "--file",
+        type=Path,
+        default=DEFAULT_FILE,
+        help="changelog JSON 文件路径",
+    )
     args = parser.parse_args()
 
     if not args.file.exists():

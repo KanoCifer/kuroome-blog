@@ -24,7 +24,9 @@ class WereadBook(Document):
     fetch_links 时能直接通过 _id 完成 $lookup，避免 Link 静默失败。
     """
 
-    id: str = Field(alias="_id")  # 即微信读书 bookId  # pyright: ignore[reportIncompatibleVariableOverride,reportGeneralTypeIssues]
+    id: str = Field(
+        alias="_id"
+    )  # 即微信读书 bookId  # pyright: ignore[reportIncompatibleVariableOverride,reportGeneralTypeIssues]
     title: str
     author: str
     translator: str | None = None

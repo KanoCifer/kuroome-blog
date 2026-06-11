@@ -34,9 +34,7 @@ class WereadStatsService(WereadBaseService):
         for mode in ["weekly", "monthly", "annually", "overall"]:
             snapshot = None
             if not force_refresh:
-                snapshot = await self.cache.get_latest(
-                    user_id, mode
-                )
+                snapshot = await self.cache.get_latest(user_id, mode)
             if snapshot is None:
                 snapshot = await self.sync_read_detail(user_id, mode)
             snapshots.append(snapshot)

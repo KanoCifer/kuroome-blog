@@ -4,8 +4,7 @@ from collections.abc import AsyncIterator
 from typing import Any
 
 from app.core import logger
-from app.core.agent import ArticleSummarizer, article_summarizer
-from app.repositories.ai_repo import AiRepo
+from app.core.agent import ArticleSummarizer
 from app.schemas.aiagent import (
     ArticleSummaryRequest,
     ChatRequest,
@@ -15,12 +14,9 @@ from app.utils.sse import sse_event
 
 
 class AiService:
-    def __init__(
-        self,
-        repo: AiRepo,
-        summarizer: ArticleSummarizer = article_summarizer,
-    ) -> None:
-        self.repo = repo
+    """AiService — 薄封装层，仅负责 try/except + SSE 包装。"""
+
+    def __init__(self, summarizer: ArticleSummarizer) -> None:
         self.summarizer = summarizer
 
     async def summary_stream(
@@ -30,7 +26,7 @@ class AiService:
         model: str | None = None,
     ) -> AsyncIterator[str]:
         try:
-            async for chunk in self.summarizer.run_summarization_astream(
+            async for chunk in self.summarizer.summarize(
                 content=payload.content,
                 title=payload.title,
                 user_id=user_id,
@@ -45,14 +41,16 @@ class AiService:
         self,
         payload: ChatRequest,
         user_id: str,
+        model: str | None = None,
     ) -> AsyncIterator[str]:
         try:
-            async for chunk in self.summarizer.chat_stream(
+            async for chunk in self.summarizer.chat(
                 message=payload.message,
                 session_id=payload.session_id,
                 user_id=user_id,
                 article_content=payload.article_content,
                 article_title=payload.article_title,
+                model_name=model,
             ):
                 yield sse_event({"content": str(chunk), "is_end": False})
             yield sse_event({"content": "", "is_end": True})
@@ -67,15 +65,15 @@ class AiService:
             )
 
     async def get_user_history(self, user_id: str) -> dict[str, list[dict]]:
-        sessions = await self.summarizer.get_user_sessions(user_id=user_id)
+        sessions = await self.summarizer.get_history(user_id=user_id)
         return {"sessions": sessions}
 
-    async def get_cached_summary(
+    def get_cached_summary(
         self,
         payload: HistoryRequest,
         user_id: str,
     ) -> dict[str, Any]:
-        result = await self.summarizer.get_summary_session(
+        result = self.summarizer.get_cached_summary(
             user_id=user_id,
             title=payload.article_title,
             content=payload.article_content,
@@ -84,12 +82,12 @@ class AiService:
             return {"cached": True, **result}
         return {"cached": False}
 
-    async def get_cached_chat(
+    def get_cached_chat(
         self,
         payload: HistoryRequest,
         user_id: str,
     ) -> dict[str, Any]:
-        result = await self.summarizer.get_chat_session(
+        result = self.summarizer.get_cached_chat(
             user_id=user_id,
             title=payload.article_title,
             content=payload.article_content,
@@ -99,7 +97,7 @@ class AiService:
         return {"cached": False}
 
     def get_debug_sessions(self) -> dict[str, Any]:
-        sessions = self.repo.get_agent_sessions()
+        sessions = self.summarizer.get_agent_sessions()
         result = []
         for session in sessions[:5]:
             if isinstance(session, dict):

@@ -138,7 +138,7 @@ class WsVisitorService:
                 raw = await asyncio.wait_for(
                     websocket.receive_text(), timeout=90
                 )
-            except (TimeoutError, WebSocketDisconnect):
+            except TimeoutError, WebSocketDisconnect:
                 break
 
             try:

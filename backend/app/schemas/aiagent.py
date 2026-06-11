@@ -20,6 +20,7 @@ class ChatRequest(BaseModel):
     session_id: str = Field(min_length=1, description="会话 ID")
     article_content: str | None = Field(default=None, description="文章正文")
     article_title: str | None = Field(default=None, description="文章标题")
+    model: str | None = Field(default=None, description="模型名称")
 
 
 class HistoryRequest(BaseModel):
