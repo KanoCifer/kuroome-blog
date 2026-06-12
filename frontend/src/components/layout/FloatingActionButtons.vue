@@ -459,13 +459,16 @@ const handleLike = async () => {
 onMounted(() => {
   setTimeout(() => {
     floatingIn.value = true;
-  }, 300);
+  }, 800);
 
-  socialGateway.getLikes().then((response) => {
-    likesCount.value = response.likes_count || 0;
-  }).catch(() => {
-    notifier.error('获取点赞数失败，请稍后重试');
-  });
+  socialGateway
+    .getLikes()
+    .then((response) => {
+      likesCount.value = response.likes_count || 0;
+    })
+    .catch(() => {
+      notifier.error('获取点赞数失败，请稍后重试');
+    });
 });
 
 const goToRss = () => {

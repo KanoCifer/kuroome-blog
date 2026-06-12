@@ -20,7 +20,9 @@ const route = useRoute();
 const layoutContainer = ref<HTMLElement | null>(null);
 const isEntryView = ref<boolean>(false);
 const isAboutView = ref<boolean>(false);
-const showBasicNav = ref<boolean>(route.path !== '/');
+// 延迟初始值：首次 watch immediate 执行前不渲染任何导航组件，
+// 避免刷新时 BentoNavCard 先闪现再消失
+const showBasicNav = ref<boolean | null>(null);
 const isNavCompact = ref<boolean>(false);
 
 // Card layout for BentoNavCard positioning on entry view
@@ -235,7 +237,7 @@ const transitionName = computed(
     <!-- Navigation: cross-route layoutId morph -->
     <AnimatePresence>
       <BasicNav
-        v-if="showBasicNav"
+        v-if="showBasicNav === true"
         :animate="{
           opacity: 1,
           y: 0,
@@ -249,7 +251,7 @@ const transitionName = computed(
     </AnimatePresence>
     <AnimatePresence>
       <BentoNavCard
-        v-if="!showBasicNav"
+        v-if="showBasicNav === false"
         class="fixed z-50 w-68 -translate-x-1/2 -translate-y-1/2"
         :style="[navCardPosition]"
         :initial="{ scale: 0.5, opacity: 0 }"

@@ -186,11 +186,37 @@ html {
     }
   }
 
+  /* Status dot pulse: step-based opacity, no per-frame interpolation */
+  --animate-dot-pulse: dot-pulse 2s step-end infinite;
+  @keyframes dot-pulse {
+    0%,
+    49% {
+      opacity: 1;
+    }
+    50%,
+    100% {
+      opacity: 0.4;
+    }
+  }
+
   --animate-timer-ping: timer-ping 1s linear infinite;
   @keyframes timer-ping {
     0% {
       opacity: 1;
     }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* Blink animation: step-based, no per-frame interpolation — GPU idle between steps */
+  --animate-timer-blink: timer-blink 2s step-end infinite;
+  @keyframes timer-blink {
+    0%,
+    49% {
+      opacity: 1;
+    }
+    50%,
     100% {
       opacity: 0;
     }
