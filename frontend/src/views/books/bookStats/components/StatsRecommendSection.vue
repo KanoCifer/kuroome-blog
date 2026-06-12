@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { BookRecommendItem } from '@/api/wereadGateway';
-import { computed } from 'vue';
+import { Motion } from 'motion-v';
+import { computed, ref } from 'vue';
+import BookRecommendDetail from './BookRecommendDetail.vue';
+import { RECOMMEND_COVER_LAYOUT_ID_PREFIX } from './recommendLayoutId';
 
 const props = defineProps<{
   books: BookRecommendItem[];
@@ -29,6 +32,17 @@ function readingCountLabel(n: number): string {
 const showSkeleton = computed(
   () => props.loading && props.books.length === 0,
 );
+
+/** 当前打开的推荐书；null = 模态关闭 */
+const activeBook = ref<BookRecommendItem | null>(null);
+
+function openBook(book: BookRecommendItem) {
+  activeBook.value = book;
+}
+
+function closeBook() {
+  activeBook.value = null;
+}
 </script>
 
 <template>
@@ -114,15 +128,15 @@ const showSkeleton = computed(
       class="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 md:-mx-10 md:px-10"
       style="scroll-padding-inline: 1rem"
     >
-      <a
+      <button
         v-for="book in books"
         :key="book.bookId"
-        :href="`https://weread.qq.com/web/reader/${book.bookId}`"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="group bg-card hover:border-primary/40 flex w-56 flex-shrink-0 snap-start flex-col gap-3 rounded-2xl border border-transparent p-4 transition-colors sm:w-60"
+        type="button"
+        class="group bg-card hover:border-primary/40 flex w-56 flex-shrink-0 snap-start flex-col gap-3 rounded-2xl border border-transparent p-4 text-left transition-colors sm:w-60"
+        @click="openBook(book)"
       >
-        <div
+        <Motion
+          :layoutId="RECOMMEND_COVER_LAYOUT_ID_PREFIX + book.bookId"
           class="bg-muted relative aspect-[2/3] w-full overflow-hidden rounded-md shadow-sm"
         >
           <img
@@ -151,7 +165,7 @@ const showSkeleton = computed(
             </svg>
             {{ ratingScore(book.newRating) }}
           </span>
-        </div>
+        </Motion>
         <div class="min-w-0">
           <p
             class="text-foreground line-clamp-2 font-serif text-base leading-tight"
@@ -177,7 +191,7 @@ const showSkeleton = computed(
         >
           {{ readingCountLabel(book.readingCount) }}
         </p>
-      </a>
+      </button>
 
       <!-- Load more 卡片 -->
       <button
@@ -205,5 +219,7 @@ const showSkeleton = computed(
         <span>{{ loading ? '加载中…' : '更多推荐' }}</span>
       </button>
     </div>
+
+    <BookRecommendDetail :book="activeBook" @close="closeBook" />
   </section>
 </template>

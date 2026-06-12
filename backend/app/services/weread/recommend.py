@@ -5,14 +5,14 @@ from app.services.weread.utils import _normalize_cover_url
 
 
 class RecommendResponse(BaseModel):
-    bookId: str  # noqa: N815
+    bookId: str
     title: str
     author: str
     cover: str | None = None
     reason: str
-    readingCount: int = 0  # noqa: N815
-    searchIdx: int = 0  # noqa: N815
-    newRating: int = 0  # noqa: N815  0-100
+    readingCount: int = 0
+    searchIdx: int = 0
+    newRating: int = 0  # 0-100
     intro: str | None = None
     category: str | None = None
 

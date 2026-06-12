@@ -2,7 +2,7 @@
   <div class="relative h-[40vh] flex-shrink-0 overflow-hidden md:h-[45vh]">
     <img src="/card/card-1.jpeg" alt="" class="h-full w-full object-cover" />
     <div
-      class="from-background/40 via-background/5 to-background pointer-events-none absolute inset-0 bg-gradient-to-b"
+      class="from-background/40 via-background/5 to-background/40 pointer-events-none absolute inset-0 bg-gradient-to-b"
     />
 
     <!-- Back Button -->
@@ -50,9 +50,9 @@
       </button>
     </div>
 
-    <!-- Title Overlay -->
+    <!-- Title Overlay(标题区:给 ribbon 让出底部 56px 空间) -->
     <div
-      class="absolute right-0 bottom-0 left-0 z-10 px-6 pb-6 md:px-10 md:pb-8"
+      class="absolute right-0 bottom-14 left-0 z-10 px-6 md:bottom-16 md:px-10"
     >
       <h1
         class="font-serif text-3xl font-bold text-white drop-shadow-lg md:text-5xl"
@@ -66,6 +66,11 @@
           >{{ bookCount }} 本书</span
         >
       </div>
+    </div>
+
+    <!-- Ribbon slot(贴 hero 底部) -->
+    <div class="absolute right-0 bottom-0 left-0 z-10">
+      <slot name="ribbon" />
     </div>
   </div>
 </template>

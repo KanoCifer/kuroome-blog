@@ -116,6 +116,8 @@ export interface BookRecommendItem {
   readingCount: number;
   searchIdx: number;
   newRating: number; // 0-100
+  intro: string | null;
+  category: string | null;
 }
 
 export interface WereadGateway {

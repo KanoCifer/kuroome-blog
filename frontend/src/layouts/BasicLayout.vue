@@ -249,21 +249,18 @@ const transitionName = computed(
         class="group fixed top-12 z-50 -translate-x-1/2 -translate-y-1/2"
       />
     </AnimatePresence>
-    <AnimatePresence>
-      <BentoNavCard
-        v-if="showBasicNav === false"
-        class="fixed z-50 w-68 -translate-x-1/2 -translate-y-1/2"
-        :style="[navCardPosition]"
-        :initial="{ scale: 0.5, opacity: 0 }"
-        :animate="{ scale: 1, opacity: 1 }"
-        :exit="{ scale: 0.5, opacity: 0 }"
-        :transition="{
-          type: 'spring',
-          bounce: 0.3,
-          duration: 0.5,
-        }"
-      />
-    </AnimatePresence>
+    <BentoNavCard
+      v-if="showBasicNav === false"
+      class="fixed z-50 w-68 -translate-x-1/2 -translate-y-1/2"
+      :style="[navCardPosition]"
+      :initial="{ scale: 0.5, opacity: 0 }"
+      :animate="{ scale: 1, opacity: 1 }"
+      :transition="{
+        type: 'spring',
+        bounce: 0.3,
+        duration: 0.5,
+      }"
+    />
   </div>
 </template>
 

@@ -25,7 +25,7 @@
         <li class="relative flex items-center gap-4 px-2">
           <!-- Indicator -->
           <motion.div
-            class="bg-muted dark:bg-accent pointer-events-none absolute top-0 left-0 z-1 h-12 w-12 rounded-full shadow-sm"
+            class="bg-primary/20 pointer-events-none absolute top-0 left-0 z-1 h-12 w-12 rounded-full shadow-sm"
             :animate="{ x: indicatorX }"
             :transition="{ type: 'spring', stiffness: 320, damping: 30 }"
           />

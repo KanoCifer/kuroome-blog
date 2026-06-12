@@ -1,62 +1,74 @@
 <template>
-  <div
+  <button
     v-if="weeklySnapshot"
-    class="border-border bg-card mx-auto mt-6 mb-4 w-[calc(100%-2rem)] max-w-6xl cursor-pointer rounded-2xl border p-4 shadow-sm transition-shadow hover:shadow-md sm:px-6 md:mt-8 md:mb-6 md:px-10"
+    type="button"
+    class="group block w-full border-t border-white/15 bg-black/30 px-4 py-2.5 text-left backdrop-blur-md transition-colors hover:bg-black/40 sm:px-6 md:px-10 md:py-3"
     @click="router.push('/bookshelf/stats')"
   >
-    <div class="flex items-center gap-4 sm:gap-6">
-      <div class="flex-1">
-        <p class="text-muted-foreground mb-1 text-xs">本周阅读</p>
-        <p class="text-foreground text-xl font-bold">
+    <div
+      class="mx-auto flex max-w-6xl items-center gap-3 sm:gap-5"
+    >
+      <!-- 本周阅读时长 -->
+      <span class="inline-flex items-baseline gap-1.5 text-white">
+        <span class="text-white/60 text-xs font-medium">本周</span>
+        <span class="font-serif text-sm font-bold tabular-nums sm:text-base">
           {{ formatDuration(weeklySnapshot.totalReadTime) }}
-        </p>
-      </div>
-      <div class="bg-border h-10 w-px" />
-      <div class="flex-1">
-        <p class="text-muted-foreground mb-1 text-xs">阅读天数</p>
-        <p class="text-foreground text-xl font-bold">
+        </span>
+      </span>
+
+      <Dot />
+
+      <!-- 阅读天数 -->
+      <span class="inline-flex items-baseline gap-1.5 text-white">
+        <span class="text-white/60 text-xs font-medium">阅读</span>
+        <span class="font-serif text-sm font-bold tabular-nums sm:text-base">
           {{ weeklySnapshot.readDays ?? 0 }}
-          <span class="text-muted-foreground text-xs font-normal">天</span>
-        </p>
-      </div>
-      <div class="bg-border hidden h-10 w-px sm:block" />
-      <div
-        v-if="latestBook"
-        class="hidden min-w-0 flex-1 items-center gap-3 sm:flex"
+        </span>
+        <span class="text-white/60 text-xs">天</span>
+      </span>
+
+      <!-- 最近在读(sm 以上才显示,移动端太挤) -->
+      <template v-if="latestBook">
+        <Dot class="hidden sm:inline-block" />
+        <span
+          class="hidden min-w-0 flex-1 items-baseline gap-1.5 text-white sm:inline-flex"
+        >
+          <span class="text-white/60 flex-shrink-0 text-xs font-medium">
+            最近
+          </span>
+          <span
+            class="truncate text-sm font-medium"
+            :title="latestBook.title ?? ''"
+          >
+            「{{ latestBook.title }}」
+          </span>
+          <span
+            v-if="recencyLabel"
+            class="text-white/60 flex-shrink-0 text-xs"
+          >
+            {{ recencyLabel }}
+          </span>
+        </span>
+      </template>
+
+      <!-- 占位让 CTA 靠右(没有 latestBook 时) -->
+      <span v-else class="flex-1" />
+
+      <!-- CTA -->
+      <span
+        class="text-white/70 group-hover:text-white inline-flex flex-shrink-0 items-center gap-1 text-xs font-medium transition-colors"
       >
-        <img
-          v-if="latestBook.cover"
-          :src="latestBook.cover"
-          :alt="latestBook.title ?? ''"
-          class="h-12 w-9 flex-shrink-0 rounded object-cover shadow-sm"
-        />
-        <div class="min-w-0">
-          <p class="text-muted-foreground mb-0.5 text-xs">最近在读</p>
-          <p class="text-foreground truncate text-sm font-medium">
-            {{ latestBook.title }}
-          </p>
-        </div>
-      </div>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="2"
-        stroke="currentColor"
-        class="text-muted-foreground h-5 w-5 flex-shrink-0"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M8.25 4.5l7.5 7.5-7.5 7.5"
-        />
-      </svg>
+        <span class="hidden sm:inline">看详情</span>
+        <ChevronRight class="h-3.5 w-3.5" />
+      </span>
     </div>
-  </div>
+  </button>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ChevronRight } from '@lucide/vue';
+import dayjs from 'dayjs';
+import { computed, h } from 'vue';
 import { useRouter } from 'vue-router';
 import { useReadStatsStore } from '@/stores/readStats';
 
@@ -64,10 +76,27 @@ const router = useRouter();
 const statsStore = useReadStatsStore();
 
 const weeklySnapshot = computed(() => statsStore.weeklySnapshot);
+
 const latestBook = computed(() => {
   const s = statsStore.weeklySnapshot;
   if (!s?.readLongest?.length) return null;
   return s.readLongest[0];
+});
+
+const recencyLabel = computed(() => {
+  // readLongest 里的项目目前没有 readUpdateTime 字段(它来自周快照),
+  // 暂用 weeklySnapshot 的 fetched_at 作为相对时间提示,后期接入更精确字段时替换。
+  const ts = statsStore.weeklySnapshot?.fetched_at;
+  if (!ts) return '';
+  const d = dayjs(ts);
+  if (!d.isValid()) return '';
+  const diffH = dayjs().diff(d, 'hour');
+  if (diffH < 1) return '刚刚';
+  if (diffH < 24) return `${diffH} 小时前`;
+  const diffD = dayjs().diff(d, 'day');
+  if (diffD === 1) return '昨天';
+  if (diffD < 7) return `${diffD} 天前`;
+  return d.format('M/D');
 });
 
 function formatDuration(seconds: number | null): string {
@@ -77,4 +106,11 @@ function formatDuration(seconds: number | null): string {
   if (h > 0) return `${h}h ${m}m`;
   return `${m}m`;
 }
+
+// 内联小点分隔符
+const Dot = () =>
+  h('span', {
+    'aria-hidden': 'true',
+    class: 'h-1 w-1 flex-shrink-0 rounded-full bg-white/30',
+  });
 </script>

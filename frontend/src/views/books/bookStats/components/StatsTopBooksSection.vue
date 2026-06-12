@@ -49,6 +49,18 @@ defineProps<{
           >
             {{ book.author }}
           </p>
+          <div
+            v-if="book.tags.length"
+            class="mt-1.5 flex flex-wrap items-center gap-1"
+          >
+            <span
+              v-for="tag in book.tags"
+              :key="tag"
+              class="bg-primary/15 text-primary rounded-full px-2 py-0.5 text-xs font-medium"
+            >
+              {{ tag }}
+            </span>
+          </div>
         </div>
         <div class="flex flex-1 items-center gap-3">
           <div class="bg-muted h-1 flex-1 overflow-hidden rounded-full">
