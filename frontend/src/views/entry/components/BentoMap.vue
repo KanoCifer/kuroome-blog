@@ -141,20 +141,17 @@ function formatRelativeTime(isoString: string): string {
 onMounted(async () => {
   animateTo(fishingSpots.length);
 
-  try {
-    await store.fetchWeatherAndFishing(DEFAULT_MAP_CENTER);
-  } catch {
-    // card shows defaults on failure
-  }
+  // Fire both requests in parallel — no need to wait sequentially
+  const [, statsRes] = await Promise.allSettled([
+    store.fetchWeatherAndFishing(DEFAULT_MAP_CENTER),
+    fishingGateway.getFishingStats(),
+  ]);
 
-  try {
-    const stats = await fishingGateway.getFishingStats();
-    totalRecords.value = stats.total_records;
-    if (stats.latest_record_time) {
-      lastRecord.value = formatRelativeTime(stats.latest_record_time);
+  if (statsRes.status === 'fulfilled') {
+    totalRecords.value = statsRes.value.total_records;
+    if (statsRes.value.latest_record_time) {
+      lastRecord.value = formatRelativeTime(statsRes.value.latest_record_time);
     }
-  } catch {
-    // card shows "--" on failure
   }
 });
 </script>

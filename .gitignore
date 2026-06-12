@@ -40,3 +40,4 @@ backend/models/*.joblib
 .zed/
 .scratch/
 .claude/skills/teach/
+.claude/settings.json

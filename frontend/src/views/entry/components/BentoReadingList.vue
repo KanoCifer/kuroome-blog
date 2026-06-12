@@ -88,10 +88,8 @@ function formatDuration(seconds: number): string {
 
 onMounted(async () => {
   try {
-    const [shelfRes] = await Promise.all([
-      wereadGateway.getUserShelf(),
-      readStats.fetchStats(),
-    ]);
+    // Only fetch shelf for the count — stats are non-critical for first paint
+    const shelfRes = await wereadGateway.getUserShelf();
     const books = shelfRes.data?.user_books ?? [];
     const readingBooks = books.filter((b) => !b.finishReading);
     animateTo(readingBooks.length || 10);
@@ -99,5 +97,10 @@ onMounted(async () => {
     console.warn('Failed to fetch reading data, using default count');
     animateTo(5);
   }
+
+  // Defer stats fetch — weekly/monthly reading time is secondary data
+  requestIdleCallback
+    ? requestIdleCallback(() => readStats.fetchStats())
+    : setTimeout(() => readStats.fetchStats(), 0);
 });
 </script>

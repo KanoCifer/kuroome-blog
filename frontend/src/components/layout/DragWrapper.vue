@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import { useCardDrag } from '@/composables/useCardDrag';
 import { useCardLayoutStore } from '@/stores/cardLayout';
-import { onMounted, onUnmounted, type CSSProperties } from 'vue';
+import type { CSSProperties } from 'vue';
 
 const props = defineProps<{
   cardName: string;
@@ -32,14 +32,4 @@ function onPointerDown(e: PointerEvent) {
     ((e.target as HTMLElement).closest('.drag-wrapper') as HTMLElement);
   if (el) drag.onCardPointerDown(e, props.cardName, el);
 }
-
-onMounted(() => {
-  window.addEventListener('pointermove', drag.onCardPointerMove);
-  window.addEventListener('pointerup', drag.onCardPointerUp);
-});
-
-onUnmounted(() => {
-  window.removeEventListener('pointermove', drag.onCardPointerMove);
-  window.removeEventListener('pointerup', drag.onCardPointerUp);
-});
 </script>

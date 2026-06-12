@@ -17,6 +17,7 @@
         v-if="show.BentoMap"
         :initial="{ scale: 0, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
+        :transition="{ delay: cardDelay('BentoMap'), duration: 0.4 }"
         class="h-auto w-2xs min-w-fit"
       />
     </DragWrapper>
@@ -25,6 +26,7 @@
         v-if="show.BentoProfileCard"
         :initial="{ scale: 0.5, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
+        :transition="{ delay: cardDelay('BentoProfileCard'), duration: 0.4 }"
         ref="boxRef"
         class="h-70 w-90 min-w-fit"
       />
@@ -42,6 +44,7 @@
         v-if="show.BentoClock"
         :initial="{ scale: 0, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
+        :transition="{ delay: cardDelay('BentoClock'), duration: 0.4 }"
         ref="clockRef"
         class="w-auto"
       />
@@ -51,6 +54,7 @@
         v-if="show.BentoCalendar"
         :initial="{ scale: 0, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
+        :transition="{ delay: cardDelay('BentoCalendar'), duration: 0.4 }"
         ref="calRef"
         class="w-auto"
       />
@@ -60,6 +64,7 @@
         v-if="show.BentoTech"
         :initial="{ scale: 0.5, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
+        :transition="{ delay: cardDelay('BentoTech'), duration: 0.4 }"
         class="h-2xs w-68 p-2!"
       />
     </DragWrapper>
@@ -69,10 +74,7 @@
         v-if="show.BentoReadingList"
         :initial="{ scale: 0, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
-        :transition="{
-          type: 'spring',
-          duration: 0.3,
-        }"
+        :transition="{ delay: cardDelay('BentoReadingList'), duration: 0.3 }"
         class="w-60 cursor-pointer"
       />
     </DragWrapper>
@@ -82,6 +84,7 @@
         v-if="show.TodoCard"
         :initial="{ scale: 0.5, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
+        :transition="{ delay: cardDelay('TodoCard'), duration: 0.4 }"
         class="w-52"
       />
     </DragWrapper>
@@ -93,10 +96,7 @@
         v-if="show.BentoPic"
         :initial="{ scale: 0, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
-        :transition="{
-          type: 'spring',
-          duration: 0.3,
-        }"
+        :transition="{ delay: cardDelay('BentoPic'), duration: 0.3 }"
         class="w-80 cursor-pointer p-2!"
       />
       <!-- 中间的照片卡片 -->
@@ -167,7 +167,7 @@ import SettingsModal from '@/components/layout/SettingsModal.vue';
 import { useCardLayout } from '@/composables/useCardLayout';
 import { useCardLayoutStore } from '@/stores/cardLayout';
 import { useThemeStore } from '@/stores/theme';
-import { nextTick, onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import BentoMap from './components/BentoMap.vue';
 import BentoPic from './components/BentoPic.vue';
 import GreetingToast from './components/GreetingToast.vue';
@@ -222,36 +222,22 @@ const openSettings = () => {
   isSettingsOpen.value = true;
 };
 
-const show = ref<Record<string, boolean>>({
-  BentoProfileCard: false,
-  BentoClock: false,
-  BentoCalendar: false,
-  BentoTech: false,
-  BentoReadingList: false,
-  TodoCard: false,
-  BentoMap: false,
+const show = reactive<Record<string, boolean>>({
+  BentoProfileCard: true,
+  BentoClock: true,
+  BentoCalendar: true,
+  BentoTech: true,
+  BentoReadingList: true,
+  TodoCard: true,
+  BentoMap: true,
+  BentoPic: true,
 });
 
 const ANIMATION_DELAY = 0.1;
 
-// Staggered animation entry by order from card-styles.json
-onMounted(async () => {
-  await nextTick();
-
-  cardNamesByOrder.forEach((cardName) => {
-    const order = cardStyles[cardName]?.order || 0;
-    const delay = order * ANIMATION_DELAY * 1000;
-    setTimeout(() => {
-      requestAnimationFrame(() => {
-        show.value[cardName] = true;
-      });
-    }, delay);
-  });
-
-  // Refresh dimensions after all cards have rendered
-  const maxDelay = maxOrder * ANIMATION_DELAY * 1000;
-  setTimeout(() => {
-    window.dispatchEvent(new Event('resize'));
-  }, maxDelay);
-});
+// Compute stagger delay (in seconds) for each card based on its order
+function cardDelay(cardName: string): number {
+  const order = cardStyles[cardName]?.order || 0;
+  return order * ANIMATION_DELAY;
+}
 </script>

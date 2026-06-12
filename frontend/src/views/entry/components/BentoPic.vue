@@ -4,7 +4,14 @@
     @click.stop="$router.push('/gallery')"
   >
     <!-- 背景渐变 -->
-    <img :src="imageSrc" class="squircle w-full p-0" />
+    <img
+      loading="lazy"
+      decoding="async"
+      :src="imageSrc"
+      style="max-width: 100%; height: auto"
+      class="squircle bg-muted w-full object-cover p-0"
+      alt="Bento Card Image"
+    />
   </BentoCard>
 </template>
 

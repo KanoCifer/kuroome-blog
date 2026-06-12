@@ -6,6 +6,8 @@ interface CardOffset {
   y: number;
 }
 
+const EMPTY_OFFSET: CardOffset = Object.freeze({ x: 0, y: 0 });
+
 const STORAGE_KEY = 'readinglist_card_offsets';
 
 function loadOffsets(): Record<string, CardOffset> {
@@ -25,17 +27,28 @@ export const useCardLayoutStore = defineStore('cardLayout', () => {
   // -- Per-card offsets persisted to localStorage --
   const offsets = ref<Record<string, CardOffset>>(loadOffsets());
 
-  function persistOffsets() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(offsets.value));
-  }
+  // -- Stable per-card offset views (avoid creating new objects on every read) --
+  const _offsetCache = new Map<string, CardOffset>();
 
-  // -- Actions --
+  /** Returns a stable reference — same object if offset hasn't changed */
   function getOffset(cardName: string): CardOffset {
-    return offsets.value[cardName] ?? { x: 0, y: 0 };
+    const raw = offsets.value[cardName];
+    if (!raw) return EMPTY_OFFSET;
+
+    const cached = _offsetCache.get(cardName);
+    if (cached && cached.x === raw.x && cached.y === raw.y) return cached;
+
+    const entry = Object.freeze({ x: raw.x, y: raw.y });
+    _offsetCache.set(cardName, entry);
+    return entry;
   }
 
   function setOffset(cardName: string, offset: CardOffset) {
     offsets.value = { ...offsets.value, [cardName]: offset };
+  }
+
+  function persistOffsets() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(offsets.value));
   }
 
   function startEditing() {

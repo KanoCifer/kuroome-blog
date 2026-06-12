@@ -399,7 +399,7 @@ import SettingIcon from '@/components/icons/SettingIcon.vue';
 import { useStorage } from '@vueuse/core';
 import { AxiosError } from 'axios';
 import { CreditCard } from '@lucide/vue';
-import { onMounted, ref, nextTick } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -414,13 +414,6 @@ function toggleEditLayout() {
     layoutStore.startEditing();
   }
 }
-
-onMounted(() => {
-  nextTick();
-  setTimeout(() => {
-    floatingIn.value = true;
-  }, 300);
-});
 
 const STORAGE_KEY = 'readinglist_memo';
 const memoText = useStorage<string>(STORAGE_KEY, '');
@@ -463,13 +456,16 @@ const handleLike = async () => {
   }
 };
 
-onMounted(async () => {
-  try {
-    const response = await socialGateway.getLikes();
+onMounted(() => {
+  setTimeout(() => {
+    floatingIn.value = true;
+  }, 300);
+
+  socialGateway.getLikes().then((response) => {
     likesCount.value = response.likes_count || 0;
-  } catch {
+  }).catch(() => {
     notifier.error('获取点赞数失败，请稍后重试');
-  }
+  });
 });
 
 const goToRss = () => {

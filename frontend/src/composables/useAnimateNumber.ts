@@ -1,28 +1,42 @@
 import { onUnmounted, ref } from 'vue';
 
-export function useAnimateNumber(duration = 800, steps = 20) {
+export function useAnimateNumber(duration = 800) {
   const displayValue = ref(0);
-  let timer: ReturnType<typeof setInterval> | null = null;
+  let rafId: number | null = null;
+  let startTime: number | null = null;
+  let targetValue = 0;
+
+  function tick(now: number) {
+    if (startTime === null) startTime = now;
+
+    // Pause animation when tab is hidden
+    if (document.hidden) {
+      rafId = requestAnimationFrame(tick);
+      return;
+    }
+
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+
+    displayValue.value = Math.floor(progress * targetValue);
+
+    if (progress < 1) {
+      rafId = requestAnimationFrame(tick);
+    } else {
+      displayValue.value = targetValue;
+      rafId = null;
+    }
+  }
 
   const animateTo = (target: number) => {
-    if (timer) clearInterval(timer);
-
-    const increment = target / steps;
-    let current = 0;
-
-    timer = setInterval(() => {
-      current += increment;
-      if (current >= target) {
-        displayValue.value = target;
-        if (timer) clearInterval(timer);
-      } else {
-        displayValue.value = Math.floor(current);
-      }
-    }, duration / steps);
+    if (rafId !== null) cancelAnimationFrame(rafId);
+    targetValue = target;
+    startTime = null;
+    rafId = requestAnimationFrame(tick);
   };
 
   onUnmounted(() => {
-    if (timer) clearInterval(timer);
+    if (rafId !== null) cancelAnimationFrame(rafId);
   });
 
   return { displayValue, animateTo };

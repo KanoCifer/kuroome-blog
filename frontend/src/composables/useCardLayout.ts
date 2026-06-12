@@ -1,6 +1,6 @@
 import cardStyles from '@/data/card-styles.json';
 import { useCardLayoutStore } from '@/stores/cardLayout';
-import { computed, type Ref } from 'vue';
+import { computed, shallowRef, watch, type CSSProperties, type Ref } from 'vue';
 import { useLayoutCenter } from './useLayoutCenter';
 
 /** Card style entry from card-styles.json */
@@ -52,7 +52,7 @@ function px(value: number): string {
 }
 
 /** Build {top, left} style object for absolute-positioned cards */
-function position(top: number, left: number) {
+function position(top: number, left: number): CSSProperties {
   return { top: px(top), left: px(left) };
 }
 
@@ -64,6 +64,26 @@ function cascadeTop(
   gap: number,
 ): number {
   return prevCenterY + prevHeight / 2 + gap + thisHeight / 2;
+}
+
+/** Create a shallowRef<CSSProperties> that only updates when top/left actually change */
+function usePositionRef(
+  source: () => CSSProperties,
+): Ref<CSSProperties> {
+  const pos = shallowRef<CSSProperties>(source());
+
+  watch(
+    source,
+    (next) => {
+      // Only trigger reactivity when top or left actually changed
+      if (pos.value.top !== next.top || pos.value.left !== next.left) {
+        pos.value = next;
+      }
+    },
+    { flush: 'sync' },
+  );
+
+  return pos;
 }
 
 // ── Composable ──────────────────────────────────────────
@@ -187,62 +207,56 @@ export function useCardLayout(containerRef: Ref<HTMLElement | null>) {
     () => _techBaseY.value + layoutStore.getOffset('BentoTech').y,
   );
 
-  // ── Position objects ──
+  // ── Position objects (shallowRef — only triggers when string values change) ──
 
-  // Center column
-  const picPosition = computed(() => {
+  const picPosition = usePositionRef(() => {
     const o = layoutStore.getOffset('BentoPic');
     return position(_picCenterY.value, centerX.value + o.x);
   });
-  const profilePosition = computed(() => {
+  const profilePosition = usePositionRef(() => {
     const o = layoutStore.getOffset('BentoProfileCard');
     return position(_profileCenterY.value, centerX.value + o.x);
   });
-  const listCardPosition = computed(() => {
+  const listCardPosition = usePositionRef(() => {
     const o = layoutStore.getOffset('BentoReadingList');
     return position(
       _listCenterY.value,
       centerX.value + LAYOUT.TODO_X_ADJUST + o.x,
     );
   });
-
-  const todoCardPosition = computed(() => {
+  const todoCardPosition = usePositionRef(() => {
     const o = layoutStore.getOffset('TodoCard');
     return position(_todoCenterY.value + 50, centerX.value + o.x + 300);
   });
-
-  // Left column
-  const navCardPosition = computed(() => {
+  const navCardPosition = usePositionRef(() => {
     const o = layoutStore.getOffset('BentoNavCard');
     return position(
       _navCenterY.value,
       leftAnchor.value + LAYOUT.NAV_X_ADJUST + o.x,
     );
   });
-  const techPosition = computed(() => {
+  const techPosition = usePositionRef(() => {
     const o = layoutStore.getOffset('BentoTech');
     return position(
       _techCenterY.value,
       leftAnchor.value + LAYOUT.CARD_SPACING + LAYOUT.TECH_X_ADJUST + o.x,
     );
   });
-
-  // Right column
-  const clockCardPosition = computed(() => {
+  const clockCardPosition = usePositionRef(() => {
     const o = layoutStore.getOffset('BentoClock');
     return position(
       _clockCenterY.value,
       rightAnchor.value + LAYOUT.RIGHT_COL_X + LAYOUT.CLOCK_X_ADJUST + o.x,
     );
   });
-  const calendarPosition = computed(() => {
+  const calendarPosition = usePositionRef(() => {
     const o = layoutStore.getOffset('BentoCalendar');
     return position(
       _calCenterY.value,
       rightAnchor.value + LAYOUT.RIGHT_COL_X + LAYOUT.CAL_X_DELTA + o.x,
     );
   });
-  const greetingPosition = computed(() => {
+  const greetingPosition = usePositionRef(() => {
     const o = layoutStore.getOffset('BentoMap');
     return position(
       _greetingCenterY.value,

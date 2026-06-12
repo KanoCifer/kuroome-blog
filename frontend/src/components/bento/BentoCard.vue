@@ -1,8 +1,6 @@
 <template>
   <motion.div
-    :whileHover="{ scale: 1.02 }"
-    :whilePress="{ scale: 0.98 }"
-    class="card squircle border-border bg-card/75 rounded-[64px] border p-6"
+    class="card border-border squircle bg-card/95 rounded-[64px] border p-6"
   >
     <slot></slot>
   </motion.div>
