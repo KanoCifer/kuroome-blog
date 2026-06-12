@@ -173,7 +173,8 @@ const titleStyle = computed(() => {
 
 // 主体卡片随滚动 scaleX 扩张：从 0.85 闭合到 1，小屏关闭
 // 用 rAF 节流避免 Safari 每像素触发 style 重写
-const rawScale = ref(1);
+// 初始值必须匹配 y=0 时的 scale，避免首帧从 1 跳到 0.85 的闪烁
+const rawScale = ref(Math.min(1, 0.85 + y.value * 0.0005));
 const ticking = ref(false);
 
 const updateScale = () => {

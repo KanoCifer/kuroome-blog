@@ -5,11 +5,15 @@
     <link rel="icon" href="/favicon.ico" type="image/png" sizes="32x32" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- 预连接 API 源：提前完成 DNS + TLS 握手 -->
+    <link rel="preconnect" href="https://api.kanocifer.chat" />
     <!-- 预加载字体文件 -->
     <link rel="preload" href="/fonts/qweather-icons.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
     <link rel="preload" href="/fonts/HarmonyOS_Sans_Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous" />
     <link rel="preload" href="/fonts/HarmonyOS_Sans_Medium.ttf" as="font" type="font/ttf" crossorigin="anonymous" />
     <link rel="preload" href="/fonts/HarmonyOS_Sans_Bold.ttf" as="font" type="font/ttf" crossorigin="anonymous" />
+    <!-- LCP 图片预加载：浏览器解析 HTML 时立即开始下载 -->
+    <link rel="preload" href="/card/card-1-thumb.jpeg" as="image" />
     <link rel="stylesheet" href="/fonts/qweather-icons.css" />
   </head>
   <body>

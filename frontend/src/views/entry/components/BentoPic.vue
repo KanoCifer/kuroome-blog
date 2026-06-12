@@ -3,9 +3,10 @@
     class="group relative min-w-0 overflow-hidden"
     @click.stop="$router.push('/gallery')"
   >
-    <!-- 背景渐变 -->
+    <!-- LCP 元素：不能用 lazy，必须 eager + fetchpriority=high -->
     <img
-      loading="lazy"
+      loading="eager"
+      fetchpriority="high"
       decoding="async"
       :src="imageSrc"
       style="max-width: 100%; height: auto"

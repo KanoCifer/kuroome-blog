@@ -103,6 +103,8 @@ export function BentoProfile() {
             <img
               src="/images/about.webp"
               alt="Kuroome"
+              loading="eager"
+              fetchPriority="high"
               className="h-full w-full object-cover transition duration-500 hover:scale-105"
             />
           </div>
