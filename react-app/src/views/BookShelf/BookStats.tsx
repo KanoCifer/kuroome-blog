@@ -1,4 +1,8 @@
-import { useReadStatsStore, selectSnapshotByMode } from '@/stores/readStatsStore';
+import {
+  useReadStatsStore,
+  selectSnapshotByMode,
+  selectSnapshots,
+} from '@/stores/readStatsStore';
 import ReactEChartsCore from 'echarts-for-react';
 import { LineChart, BarChart, PieChart } from 'echarts/charts';
 import {
@@ -9,7 +13,7 @@ import {
 import * as echarts from 'echarts/core';
 import { SVGRenderer } from 'echarts/renderers';
 import dayjs from 'dayjs';
-import { ArrowLeft, RefreshCw } from 'lucide-react';
+import { ArrowLeft, ArrowRight, RefreshCw, Star } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -63,6 +67,155 @@ function formatTimestamp(ts: string): string {
   return d.format('MM/DD');
 }
 
+function ratingScore(v: number): string {
+  if (!v || v <= 0) return '--';
+  return ((v / 100) * 10).toFixed(1);
+}
+
+function readingCountLabel(n: number): string {
+  if (!n || n <= 0) return '';
+  if (n >= 10000) return `${(n / 10000).toFixed(1)} 万人在读`;
+  return `${n} 人在读`;
+}
+
+interface RecommendSectionProps {
+  books: import('@/api/wereadGateway').BookRecommendItem[];
+  loading: boolean;
+  hasMore: boolean;
+  error: string;
+  onRefresh: () => void;
+  onLoadMore: () => void;
+}
+
+function RecommendSection({
+  books,
+  loading,
+  hasMore,
+  error,
+  onRefresh,
+  onLoadMore,
+}: RecommendSectionProps) {
+  const showSkeleton = loading && books.length === 0;
+  return (
+    <div className="bg-card mb-6 rounded-xl p-4 sm:p-6">
+      <div className="mb-4 flex items-end justify-between gap-4">
+        <div>
+          <p className="text-muted-foreground mb-1 text-xs">读完这些之后</p>
+          <h3 className="text-foreground font-serif text-lg font-semibold tracking-tight sm:text-xl">
+            接下来读什么
+          </h3>
+        </div>
+        <button
+          type="button"
+          className="text-muted-foreground hover:text-foreground hover:bg-accent inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          disabled={loading}
+          onClick={onRefresh}
+          aria-label="换一批"
+        >
+          <RefreshCw
+            className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`}
+          />
+          换一批
+        </button>
+      </div>
+
+      {showSkeleton ? (
+        <div className="-mx-4 flex gap-3 overflow-x-auto px-4 sm:-mx-6 sm:px-6">
+          {[0, 1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="flex w-40 flex-shrink-0 animate-pulse flex-col gap-2"
+            >
+              <div className="bg-muted aspect-[2/3] w-full rounded-md" />
+              <div className="bg-muted h-3 w-3/4 rounded" />
+              <div className="bg-muted h-3 w-1/2 rounded" />
+            </div>
+          ))}
+        </div>
+      ) : error && books.length === 0 ? (
+        <div className="text-muted-foreground flex flex-col items-center justify-center rounded-xl border border-dashed py-8 text-center text-sm">
+          <p className="text-destructive mb-2">{error}</p>
+          <button
+            type="button"
+            className="bg-destructive/10 text-destructive hover:bg-destructive/20 rounded-lg px-3 py-1 text-xs font-medium transition-colors"
+            onClick={onRefresh}
+          >
+            重试
+          </button>
+        </div>
+      ) : !loading && books.length === 0 ? (
+        <div className="text-muted-foreground rounded-xl border border-dashed py-8 text-center text-sm">
+          暂时没有推荐
+        </div>
+      ) : (
+        <div
+          className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 sm:-mx-6 sm:px-6"
+          style={{ scrollPaddingInline: '1rem' }}
+        >
+          {books.map((book) => (
+            <a
+              key={book.bookId}
+              href={`https://weread.qq.com/web/reader/${book.bookId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group bg-background hover:border-primary/40 flex w-40 flex-shrink-0 snap-start flex-col gap-2 rounded-xl border border-transparent p-2 transition-colors"
+            >
+              <div className="bg-muted relative aspect-[2/3] w-full overflow-hidden rounded-md shadow-sm">
+                {book.cover && (
+                  <img
+                    src={book.cover}
+                    alt={book.title}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                  />
+                )}
+                {book.newRating > 0 && (
+                  <span className="bg-background/80 text-foreground absolute top-1.5 right-1.5 inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium tabular-nums backdrop-blur-md">
+                    <Star className="text-primary h-2.5 w-2.5 fill-current" />
+                    {ratingScore(book.newRating)}
+                  </span>
+                )}
+              </div>
+              <p className="text-foreground line-clamp-2 font-serif text-sm leading-tight">
+                {book.title}
+              </p>
+              {book.author && (
+                <p className="text-muted-foreground truncate text-[11px]">
+                  {book.author}
+                </p>
+              )}
+              {book.reason && (
+                <p className="text-muted-foreground line-clamp-2 text-[11px] leading-relaxed">
+                  {book.reason}
+                </p>
+              )}
+              {book.readingCount > 0 && (
+                <p className="text-muted-foreground/80 mt-auto text-[10px] tabular-nums">
+                  {readingCountLabel(book.readingCount)}
+                </p>
+              )}
+            </a>
+          ))}
+
+          {hasMore && (
+            <button
+              type="button"
+              className="text-muted-foreground hover:text-foreground hover:border-primary/40 flex w-28 flex-shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-xl border border-dashed text-xs transition-colors disabled:opacity-50"
+              disabled={loading}
+              onClick={onLoadMore}
+            >
+              <ArrowRight
+                className={`h-4 w-4 ${loading ? 'animate-pulse' : ''}`}
+              />
+              <span>{loading ? '加载中…' : '更多'}</span>
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function BookStats() {
   const navigate = useNavigate();
   const [activeMode, setActiveMode] = useState<ModeKey>('weekly');
@@ -70,9 +223,17 @@ export default function BookStats() {
     document.documentElement.classList.contains('dark'),
   );
 
-  const { snapshots, isLoading, error, fetchStats } = useReadStatsStore();
+  const { isLoading, error, fetchStats } = useReadStatsStore();
+  const snapshots = useReadStatsStore(selectSnapshots);
   const snapshotByMode = useReadStatsStore(selectSnapshotByMode);
   const activeSnapshot = snapshotByMode[activeMode] ?? null;
+
+  // 推荐
+  const recommends = useReadStatsStore((s) => s.recommends);
+  const isLoadingRecommends = useReadStatsStore((s) => s.isLoadingRecommends);
+  const recommendError = useReadStatsStore((s) => s.recommendError);
+  const hasMoreRecommends = useReadStatsStore((s) => s.hasMoreRecommends);
+  const fetchRecommends = useReadStatsStore((s) => s.fetchRecommends);
 
   const activeModeLabel =
     MODES.find((m) => m.key === activeMode)?.label ?? '';
@@ -296,7 +457,7 @@ export default function BookStats() {
   }, [navigate]);
 
   const handleRefresh = useCallback(() => {
-    fetchStats(true);
+    fetchStats();
   }, [fetchStats]);
 
   // Initial fetch
@@ -305,6 +466,13 @@ export default function BookStats() {
       fetchStats();
     }
   }, [snapshots.length, fetchStats]);
+
+  // 推荐独立加载
+  useEffect(() => {
+    if (recommends.length === 0) {
+      fetchRecommends(true);
+    }
+  }, [recommends.length, fetchRecommends]);
 
   // Reset tab when data changes
   useEffect(() => {
@@ -664,6 +832,16 @@ export default function BookStats() {
                     </div>
                   </div>
                 )}
+
+              {/* 接下来读什么 · 推荐 */}
+              <RecommendSection
+                books={recommends}
+                loading={isLoadingRecommends}
+                hasMore={hasMoreRecommends}
+                error={recommendError}
+                onRefresh={() => fetchRecommends(true)}
+                onLoadMore={() => fetchRecommends(false)}
+              />
             </>
           )}
         </div>

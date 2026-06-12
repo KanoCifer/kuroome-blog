@@ -37,6 +37,7 @@ ignore = [
     "RUF002", # Allow ambiguous characters in docstrings (Chinese punctuation)
     "RUF003", # Allow ambiguous characters in comments (Chinese)
     "B008",   # Allow using mutable default arguments (e.g. dicts in Pydantic models)
+    "N815",   # Allow type ignore comments
 ]
 
 # Allow unused variables when prefixed with underscore

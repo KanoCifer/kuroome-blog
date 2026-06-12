@@ -96,6 +96,8 @@ class ReadLongestItem(BaseModel):
     author: str | None = None
     cover: str | None = None
     readTime: int = 0  # 秒
+    finished: int = 0
+    tags: list[str] = Field(default_factory=list)  # 标签
 
 
 class ReadStatItem(BaseModel):
@@ -129,7 +131,10 @@ class PreferPublisherItem(BaseModel):
 
 
 class ReadDetailSnapshot(BaseModel):
-    """一次 /readdata/detail 查询的完整快照，支持趋势图 & 排行（存于 Redis）"""
+    """一次 /readdata/detail 查询的完整快照，支持趋势图 & 排行。
+
+    不持久化；视图层按需直拉远端，仅做接口级 Redis 缓存。
+    """
 
     user_id: int
     mode: str  # weekly | monthly | annually | overall

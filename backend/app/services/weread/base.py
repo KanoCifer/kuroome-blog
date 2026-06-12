@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any, ClassVar
+
 import httpx
 
 
@@ -7,7 +9,7 @@ class WereadBaseService:
     """微信读书 HTTP 客户端基础设施"""
 
     base_url = "https://i.weread.qq.com/api/agent/gateway"
-    headers = {"Content-Type": "application/json"}
+    headers: ClassVar[dict[str, str]] = {"Content-Type": "application/json"}
     skill_version = "1.0.3"
 
     def __init__(self, repo) -> None:
@@ -32,7 +34,7 @@ class WereadBaseService:
         user_id: int,
         api_name: str,
         extra: dict | None = None,
-    ):
+    ) -> Any:
         header, payload = await self._build_http_payload(
             user_id, api_name, extra
         )

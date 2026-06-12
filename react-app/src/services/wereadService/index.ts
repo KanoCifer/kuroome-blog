@@ -1,4 +1,4 @@
-import { wereadGateway } from '@/api/wereadGateway';
+import { wereadGateway, type ReadStatsMode } from '@/api/wereadGateway';
 
 export const wereadService = {
   async saveUserInfo(apiKey: string) {
@@ -17,7 +17,11 @@ export const wereadService = {
     return wereadGateway.syncMyBooks(force);
   },
 
-  async getReadProgress(refresh = false) {
-    return wereadGateway.getReadProgress(refresh);
+  async getReadProgress(mode: ReadStatsMode, baseTime?: number | null) {
+    return wereadGateway.getReadProgress(mode, baseTime);
+  },
+
+  async getBooksRecommend(count = 12, maxIdx = 0) {
+    return wereadGateway.getBooksRecommend(count, maxIdx);
   },
 };

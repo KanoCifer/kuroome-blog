@@ -1,0 +1,69 @@
+<script setup lang="ts">
+import type { ReadLongestItem } from '@/api/wereadGateway';
+
+defineProps<{
+  books: ReadLongestItem[];
+  barPercent: (t: number) => number;
+  formatDuration: (seconds: number | null | undefined) => string;
+}>();
+</script>
+
+<template>
+  <section class="mb-14">
+    <h2
+      class="text-foreground mb-6 font-serif text-2xl font-semibold tracking-tight sm:text-3xl"
+    >
+      让你停不下来的是
+    </h2>
+    <ol class="space-y-3">
+      <li
+        v-for="(book, i) in books"
+        :key="book.bookId ?? i"
+        class="flex items-center gap-4"
+      >
+        <span
+          class="text-muted-foreground w-5 flex-shrink-0 text-right font-mono text-xs tabular-nums"
+        >
+          {{ i + 1 }}
+        </span>
+        <div
+          class="bg-muted relative h-[42px] w-8 flex-shrink-0 overflow-hidden rounded-sm shadow-sm"
+        >
+          <img
+            v-if="book.cover"
+            :src="book.cover"
+            :alt="book.title ?? ''"
+            loading="lazy"
+            class="h-full w-full object-cover"
+          />
+        </div>
+        <div class="min-w-0 flex-1">
+          <p
+            class="text-foreground truncate font-serif text-base leading-tight"
+          >
+            {{ book.title ?? '未知书目' }}
+          </p>
+          <p
+            v-if="book.author"
+            class="text-muted-foreground mt-0.5 truncate text-xs"
+          >
+            {{ book.author }}
+          </p>
+        </div>
+        <div class="flex flex-1 items-center gap-3">
+          <div class="bg-muted h-1 flex-1 overflow-hidden rounded-full">
+            <div
+              class="bg-primary h-full rounded-full transition-all duration-700"
+              :style="{ width: `${barPercent(book.readTime)}%` }"
+            />
+          </div>
+          <span
+            class="text-muted-foreground w-16 flex-shrink-0 text-right text-sm tabular-nums"
+          >
+            {{ formatDuration(book.readTime) }}
+          </span>
+        </div>
+      </li>
+    </ol>
+  </section>
+</template>

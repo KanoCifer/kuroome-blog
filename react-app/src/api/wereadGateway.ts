@@ -97,8 +97,19 @@ export interface ReadDetailSnapshot {
   preferPublisher: PreferPublisherItem[] | null;
 }
 
-export interface WereadReadProgressData {
-  snapshots: ReadDetailSnapshot[];
+export interface WereadReadProgressData extends ReadDetailSnapshot {}
+
+export type ReadStatsMode = 'weekly' | 'monthly' | 'annually' | 'overall';
+
+export interface BookRecommendItem {
+  bookId: string;
+  title: string;
+  author: string;
+  cover: string | null;
+  reason: string;
+  readingCount: number;
+  searchIdx: number;
+  newRating: number; // 0-100
 }
 
 export const wereadGateway = {
@@ -134,11 +145,25 @@ export const wereadGateway = {
   },
 
   async getReadProgress(
-    refresh = false,
+    mode: ReadStatsMode,
+    baseTime?: number | null,
   ): Promise<ApiResponse<WereadReadProgressData>> {
+    const params: Record<string, string | number> = { mode };
+    if (baseTime != null && mode !== 'overall') params.baseTime = baseTime;
     const res = await request.get<ApiResponse<WereadReadProgressData>>(
       'v2/weread/read-progress',
-      { params: { refresh } },
+      { params },
+    );
+    return res.data;
+  },
+
+  async getBooksRecommend(
+    count = 12,
+    maxIdx = 0,
+  ): Promise<ApiResponse<BookRecommendItem[]>> {
+    const res = await request.get<ApiResponse<BookRecommendItem[]>>(
+      'v2/weread/books-recommend',
+      { params: { count, maxIdx } },
     );
     return res.data;
   },

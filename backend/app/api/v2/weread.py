@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends
+from typing import Literal
+
+from fastapi import APIRouter, Depends, Query
 
 from app.api.des.auth import manager
 from app.api.des.des import weread_service_dep
@@ -83,19 +85,43 @@ async def sync_my_books(
 
 
 @router.get("/read-progress")
+@redis_cache(ttl=300)
 async def get_read_progress(
+    mode: Literal["weekly", "monthly", "annually", "overall"] = Query(...),
+    baseTime: int | None = Query(  # noqa: N803
+        None,
+        description="目标周期的 unix 秒。缺省 = 当前周期；overall 模式忽略此参数。",
+    ),
     user=Depends(manager),
     weread_service=Depends(weread_service_dep),
-    refresh: bool = False,
 ):
-    """获取阅读进度
-    优先返回 Redis 缓存，缓存为空时自动拉取远端；
-    ?refresh=true 跳过缓存直接拉取远端。
+    """获取指定 mode + 周期的阅读统计快照。
+
+    - 不再保存任何快照，每次按需直拉远端
+    - 接口级缓存 300s，key 含 (user, mode, baseTime)
     """
-    snapshots = await weread_service.orchestra_read_detail(
-        user.id, force_refresh=refresh
+    snapshot = await weread_service.orchestra_read_detail(
+        user.id, mode=mode, base_time=baseTime
     )
     return APIResponse.ok(
-        data={"snapshots": [s.model_dump(mode="json") for s in snapshots]},
+        data=snapshot.model_dump(mode="json"),
         message="Read progress retrieved successfully",
+    )
+
+
+@router.get("/books-recommend")
+@redis_cache(ttl=300)
+async def get_books_recommend(
+    user=Depends(manager),
+    weread_service=Depends(weread_service_dep),
+    count: int = Query(12),
+    maxIdx: int = Query(0),  # noqa: N803
+):
+    """获取推荐阅读的书籍"""
+    books = await weread_service.fetch_books_recommend(
+        user.id, count=count, maxIdx=maxIdx
+    )
+    return APIResponse.ok(
+        data=[book.model_dump(mode="json") for book in books],
+        message="Books recommend retrieved successfully",
     )

@@ -57,6 +57,7 @@ export interface ReadLongestItem {
   author: string | null;
   cover: string | null;
   readTime: number;
+  tags: string[];
 }
 
 export interface ReadStatItem {
@@ -102,18 +103,36 @@ export interface ReadDetailSnapshot {
   preferPublisher: PreferPublisherItem[] | null;
 }
 
-export interface WereadReadProgressData {
-  snapshots: ReadDetailSnapshot[];
+export interface WereadReadProgressData extends ReadDetailSnapshot {}
+
+export type ReadStatsMode = 'weekly' | 'monthly' | 'annually' | 'overall';
+
+export interface BookRecommendItem {
+  bookId: string;
+  title: string;
+  author: string;
+  cover: string | null;
+  reason: string;
+  readingCount: number;
+  searchIdx: number;
+  newRating: number; // 0-100
 }
 
 export interface WereadGateway {
   saveUserInfo(apiKey: string): Promise<ApiResponse<null>>;
   getUserShelf(): Promise<ApiResponse<WereadShelfData>>;
   getBookInfo(bookId: string): Promise<ApiResponse<WereadBookDetail>>;
-  syncMyBooks(force?: boolean): Promise<ApiResponse<{ imported_count: number }>>;
+  syncMyBooks(
+    force?: boolean,
+  ): Promise<ApiResponse<{ imported_count: number }>>;
   getReadProgress(
-    refresh?: boolean,
+    mode: ReadStatsMode,
+    baseTime?: number | null,
   ): Promise<ApiResponse<WereadReadProgressData>>;
+  getBooksRecommend(
+    count?: number,
+    maxIdx?: number,
+  ): Promise<ApiResponse<BookRecommendItem[]>>;
 }
 
 export const wereadGateway: WereadGateway = {
@@ -149,11 +168,25 @@ export const wereadGateway: WereadGateway = {
   },
 
   async getReadProgress(
-    refresh = false,
+    mode: ReadStatsMode,
+    baseTime?: number | null,
   ): Promise<ApiResponse<WereadReadProgressData>> {
+    const params: Record<string, string | number> = { mode };
+    if (baseTime != null && mode !== 'overall') params.baseTime = baseTime;
     const res = await request.get<ApiResponse<WereadReadProgressData>>(
       'v2/weread/read-progress',
-      { params: { refresh } },
+      { params },
+    );
+    return res.data;
+  },
+
+  async getBooksRecommend(
+    count = 12,
+    maxIdx = 0,
+  ): Promise<ApiResponse<BookRecommendItem[]>> {
+    const res = await request.get<ApiResponse<BookRecommendItem[]>>(
+      'v2/weread/books-recommend',
+      { params: { count, maxIdx } },
     );
     return res.data;
   },
