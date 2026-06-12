@@ -38,6 +38,7 @@ ignore = [
     "RUF003", # Allow ambiguous characters in comments (Chinese)
     "B008",   # Allow using mutable default arguments (e.g. dicts in Pydantic models)
     "N815",   # Allow type ignore comments
+    "N803",  # Allow snake_case in Pydantic models
 ]
 
 # Allow unused variables when prefixed with underscore

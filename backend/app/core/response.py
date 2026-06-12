@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from starlette.responses import JSONResponse
+from fastapi.responses import ORJSONResponse
 
 
-class APIResponse(JSONResponse):
+class APIResponse(ORJSONResponse):
     """Unified response envelope. Use `APIResponse.ok(...)` to return directly from endpoints."""
 
     @staticmethod

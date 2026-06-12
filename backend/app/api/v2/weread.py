@@ -51,7 +51,7 @@ async def get_user_shelf(
 
 @router.get("/book/{bookId}")
 async def get_book_info(
-    bookId: str,  # noqa: N803
+    bookId: str,
     weread_service=Depends(weread_service_dep),
 ):
     """获取书籍信息"""
@@ -88,7 +88,7 @@ async def sync_my_books(
 @redis_cache(ttl=300)
 async def get_read_progress(
     mode: Literal["weekly", "monthly", "annually", "overall"] = Query(...),
-    baseTime: int | None = Query(  # noqa: N803
+    baseTime: int | None = Query(
         None,
         description="目标周期的 unix 秒。缺省 = 当前周期；overall 模式忽略此参数。",
     ),
@@ -115,7 +115,7 @@ async def get_books_recommend(
     user=Depends(manager),
     weread_service=Depends(weread_service_dep),
     count: int = Query(12),
-    maxIdx: int = Query(0),  # noqa: N803
+    maxIdx: int = Query(0),
 ):
     """获取推荐阅读的书籍"""
     books = await weread_service.fetch_books_recommend(
