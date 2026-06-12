@@ -17,7 +17,12 @@
         v-if="show.BentoMap"
         :initial="{ scale: 0, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
-        :transition="{ delay: cardDelay('BentoMap'), duration: 0.4 }"
+        :transition="{
+          type: 'spring',
+          stiffness: 300,
+          damping: 20,
+          delay: cardDelay('BentoMap'),
+        }"
         class="h-auto w-2xs min-w-fit"
       />
     </DragWrapper>
@@ -26,7 +31,12 @@
         v-if="show.BentoProfileCard"
         :initial="{ scale: 0.5, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
-        :transition="{ delay: cardDelay('BentoProfileCard'), duration: 0.4 }"
+        :transition="{
+          type: 'spring',
+          stiffness: 300,
+          damping: 20,
+          delay: cardDelay('BentoProfileCard'),
+        }"
         ref="boxRef"
         class="h-70 w-90 min-w-fit"
       />
@@ -44,7 +54,12 @@
         v-if="show.BentoClock"
         :initial="{ scale: 0, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
-        :transition="{ delay: cardDelay('BentoClock'), duration: 0.4 }"
+        :transition="{
+          type: 'spring',
+          stiffness: 300,
+          damping: 20,
+          delay: cardDelay('BentoClock'),
+        }"
         ref="clockRef"
         class="w-auto"
       />
@@ -54,7 +69,12 @@
         v-if="show.BentoCalendar"
         :initial="{ scale: 0, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
-        :transition="{ delay: cardDelay('BentoCalendar'), duration: 0.4 }"
+        :transition="{
+          type: 'spring',
+          stiffness: 300,
+          damping: 20,
+          delay: cardDelay('BentoCalendar'),
+        }"
         ref="calRef"
         class="w-auto"
       />
@@ -64,8 +84,13 @@
         v-if="show.BentoTech"
         :initial="{ scale: 0.5, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
-        :transition="{ delay: cardDelay('BentoTech'), duration: 0.4 }"
-        class="h-2xs w-68 p-2!"
+        :transition="{
+          type: 'spring',
+          stiffness: 300,
+          damping: 20,
+          delay: cardDelay('BentoTech'),
+        }"
+        class="h-2xs w-68 p-4!"
       />
     </DragWrapper>
 
@@ -74,7 +99,12 @@
         v-if="show.BentoReadingList"
         :initial="{ scale: 0, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
-        :transition="{ delay: cardDelay('BentoReadingList'), duration: 0.3 }"
+        :transition="{
+          type: 'spring',
+          stiffness: 300,
+          damping: 20,
+          delay: cardDelay('BentoReadingList'),
+        }"
         class="w-60 cursor-pointer"
       />
     </DragWrapper>
@@ -84,7 +114,12 @@
         v-if="show.TodoCard"
         :initial="{ scale: 0.5, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
-        :transition="{ delay: cardDelay('TodoCard'), duration: 0.4 }"
+        :transition="{
+          type: 'spring',
+          stiffness: 300,
+          damping: 20,
+          delay: cardDelay('TodoCard'),
+        }"
         class="w-52"
       />
     </DragWrapper>
@@ -96,7 +131,12 @@
         v-if="show.BentoPic"
         :initial="{ scale: 0, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
-        :transition="{ delay: cardDelay('BentoPic'), duration: 0.3 }"
+        :transition="{
+          type: 'spring',
+          stiffness: 300,
+          damping: 20,
+          delay: cardDelay('BentoPic'),
+        }"
         class="w-80 cursor-pointer p-2!"
       />
       <!-- 中间的照片卡片 -->

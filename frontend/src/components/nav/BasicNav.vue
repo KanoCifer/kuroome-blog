@@ -1,7 +1,7 @@
 <template>
   <motion.div>
     <nav
-      class="squircle bg-card/65 dark:shadow-primary/20 z-9999 flex items-center gap-2 px-1 py-2 shadow-md backdrop-blur-sm"
+      class="nav squircle bg-card/90 dark:shadow-primary/10 z-9999 flex items-center gap-2 px-1 py-2 shadow-md backdrop-blur-sm"
     >
       <ul class="flex items-center gap-2 font-medium">
         <!-- Avatar -->
@@ -15,7 +15,7 @@
             />
             <img
               v-else
-              src="/images/about.webp"
+              src="/images/about-thumb.webp"
               alt="Default Avatar"
               class="h-10 w-10 rounded-full object-cover ring-2 ring-white/50 transition-transform hover:scale-105 dark:ring-gray-700/50"
             />
@@ -112,6 +112,12 @@ const avatarUrl = computed(() => {
   if (auth.user?.photo) {
     return `/api/v1/media/${auth.user.photo}`;
   }
-  return '/images/about.webp';
+  return '/images/about-thumb.webp';
 });
 </script>
+
+<style scoped>
+.nav {
+  box-shadow: rgba(255, 255, 255, 0.35) 0px 0px 20px 0px inset;
+}
+</style>

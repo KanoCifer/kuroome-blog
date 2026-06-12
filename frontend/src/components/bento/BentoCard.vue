@@ -1,7 +1,5 @@
 <template>
-  <motion.div
-    class="card border-border squircle bg-card/95 rounded-[64px] border p-6"
-  >
+  <motion.div class="card border-border squircle bg-card/95 border p-6">
     <slot></slot>
   </motion.div>
 </template>

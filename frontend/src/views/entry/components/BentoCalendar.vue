@@ -1,5 +1,12 @@
 <template>
-  <BentoCard class="group flex flex-col gap-2 select-none">
+  <BentoCard
+    class="group relative flex flex-col gap-2 overflow-hidden select-none"
+  >
+    <!-- 背景水波纹效果 -->
+    <div
+      class="absolute inset-0 bg-linear-to-br from-teal-500/10 via-cyan-500/5 to-blue-500/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+    />
+
     <!-- 顶部：图标和标题 -->
     <!-- Hearder -->
     <div class="flex items-baseline justify-between">

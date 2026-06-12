@@ -2,7 +2,7 @@ import { computed, ref } from 'vue';
 
 const CARD_IMAGES = Array.from(
   { length: 3 },
-  (_, i) => `/card/card-${i + 1}.jpeg`,
+  (_, i) => `/card/card-${i + 1}-thumb.jpeg`,
 );
 
 const CARD_KEY = 'readinglist_card_imgae_index';

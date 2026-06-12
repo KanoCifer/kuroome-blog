@@ -1,10 +1,14 @@
 <template>
-  <BentoCard class="flex w-64 flex-col items-center justify-center select-none">
-    <p class="text-muted-foreground text-sm font-medium tracking-wider">
+  <BentoCard class="group relative flex w-64 flex-col items-center justify-center overflow-hidden select-none">
+    <!-- 背景水波纹效果 -->
+    <div
+      class="absolute inset-0 bg-linear-to-br from-indigo-500/10 via-blue-500/5 to-purple-500/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+    />
+    <p class="text-muted-foreground relative text-sm font-medium tracking-wider">
       {{ dateLabel }}
     </p>
     <BentoClockTime />
-    <p class="text-muted-foreground mt-1 text-sm">
+    <p class="text-muted-foreground relative mt-1 text-sm">
       {{ weekdayLabel }}
     </p>
   </BentoCard>

@@ -3,7 +3,7 @@ import { computed, onMounted, ref, nextTick } from 'vue';
 import { motion } from 'motion-v';
 import { useTypewriter } from '@/composables/useTypewriter';
 
-const AboutIMG = '/images/about.webp';
+const AboutIMG = '/images/about-thumb.webp';
 
 // Greeting typewriter
 const greeting = useTypewriter();

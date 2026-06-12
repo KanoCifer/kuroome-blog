@@ -1,12 +1,37 @@
 <template>
-  <BentoCard>
-    <div class="p-4">
-      <h3
-        class="text-muted-foreground mb-2 ml-2 text-xs font-bold tracking-wider uppercase"
-      >
-        TechStack
-      </h3>
-      <div class="flex flex-wrap gap-2">
+  <BentoCard class="group relative overflow-hidden">
+    <!-- 背景水波纹效果 -->
+    <div
+      class="absolute inset-0 bg-linear-to-br from-violet-500/10 via-fuchsia-500/5 to-pink-500/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+    />
+    <div class="relative">
+      <!-- Header -->
+      <div class="mx-3 flex items-center justify-between">
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-500/15 transition-transform duration-300 group-hover:scale-110 group-hover:rounded-xl"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 text-violet-500"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="16 18 22 12 16 6" />
+            <polyline points="8 6 2 12 8 18" />
+          </svg>
+        </div>
+        <h3
+          class="text-muted-foreground text-xs font-bold tracking-wider uppercase"
+        >
+          TechStack
+        </h3>
+      </div>
+
+      <div class="mt-3 flex flex-wrap gap-2">
         <span
           v-for="tech in techStack"
           :key="tech.name"

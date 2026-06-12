@@ -1,7 +1,11 @@
 <template>
   <!-- Profile Card -->
-  <BentoCard class="flex items-center justify-center">
-    <div class="flex flex-col items-center justify-center text-center">
+  <BentoCard class="group relative flex items-center justify-center overflow-hidden">
+    <!-- 背景水波纹效果 -->
+    <div
+      class="absolute inset-0 bg-linear-to-br from-cyan-500/10 via-teal-500/5 to-blue-500/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+    />
+    <div class="relative flex flex-col items-center justify-center text-center">
       <!-- Avatar with Glow + Active Badge -->
       <div class="group relative mb-4">
         <!-- 青/蓝色渐变 -->
@@ -9,7 +13,7 @@
           class="absolute -inset-1 rounded-full bg-linear-to-br from-cyan-300 to-blue-400 opacity-50 blur"
         ></div>
         <img
-          src="/images/about.webp"
+          src="/images/about-thumb.webp"
           alt="Kuroome"
           class="relative h-32 w-32 transform transform-gpu rounded-full border-4 border-white object-cover shadow-xl transition duration-500 group-hover:scale-105"
         />

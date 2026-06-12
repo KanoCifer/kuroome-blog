@@ -84,7 +84,8 @@
       <div
         aria-hidden="true"
         :style="sectionStyle"
-        class="bg-card border-border absolute inset-0 rounded-t-[40px] border-x border-t shadow-sm"
+        class="bg-card border-border absolute inset-0 rounded-t-[40px] border-x border-t shadow-[inset_0_0_20px_0px_rgba(255,255,255,0.35)]"
+        style="contain: layout style"
       ></div>
 
       <!-- 内容层：原地不动 -->
@@ -171,14 +172,30 @@ const titleStyle = computed(() => {
 });
 
 // 主体卡片随滚动 scaleX 扩张：从 0.85 闭合到 1，小屏关闭
+// 用 rAF 节流避免 Safari 每像素触发 style 重写
+const rawScale = ref(1);
+const ticking = ref(false);
+
+const updateScale = () => {
+  rawScale.value = Math.min(1, 0.85 + y.value * 0.0005);
+  ticking.value = false;
+};
+
+watch(y, () => {
+  if (!ticking.value) {
+    ticking.value = true;
+    requestAnimationFrame(updateScale);
+  }
+});
+
 const sectionStyle = computed(() => {
   if (prefersReducedMotion.value || isSmallScreen.value) {
     return { width: '100%' };
   }
-  const scale = Math.min(1, 0.85 + y.value * 0.0005);
   return {
-    transform: `scaleX(${scale})`,
+    transform: `translateZ(0) scaleX(${rawScale.value})`,
     transformOrigin: 'top center',
+    willChange: 'transform',
     width: '100%',
   };
 });
