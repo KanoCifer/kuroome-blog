@@ -5,7 +5,7 @@ import type {
   FishingFeedbackResponse,
   FishingIndexData,
   FishingStats,
-} from '@/views/fishing/types';
+} from '@/types/fishing';
 
 export interface FishingGateway {
   getFishingIndex(payload: {

@@ -1,93 +1,25 @@
 <script setup lang="ts">
 import TideCard from '@/components/map/TideCard.vue';
 import WeatherCard from '@/components/map/WeatherCard.vue';
-import { useFishingAnalysis } from '@/composables/useFishingAnalysis';
-import {
-  type FishingMapInstance,
-  useFishingRoute,
-} from '@/composables/useFishingRoute';
-import fishingSpotsData from '@/data/fishing-spots.json';
-import { useFishingFeedback } from '@/composables/useFishingFeedback';
-import { DEFAULT_MAP_CENTER, useFishingMapStore } from '@/stores/fishingMap';
-import type { MapMarker } from '@/types/marker';
-import FishingAnalysisDrawer from '@/views/fishing/components/FishingAnalysisDrawer.vue';
-import FishingDashboardHeader from '@/views/fishing/components/FishingDashboardHeader.vue';
-import FishingFeedbackForm from '@/views/fishing/components/FishingFeedbackForm.vue';
-import FishingIndexCard from '@/views/fishing/components/FishingIndexCard.vue';
-import FishingMapTile from '@/views/fishing/components/FishingMapTile.vue';
-import HourlyWeather from '@/views/fishing/components/HourlyWeather.vue';
+import AnalysisDrawer from '@/views/fishing/components/AnalysisDrawer.vue';
+import DashboardHeader from '@/views/fishing/components/DashboardHeader.vue';
+import FeedbackFormDialog from '@/views/fishing/components/FeedbackFormDialog.vue';
+import HourlyChartCard from '@/views/fishing/components/HourlyChartCard.vue';
+import IndexHeroCard from '@/views/fishing/components/IndexHeroCard.vue';
+import MapTile from '@/views/fishing/components/MapTile.vue';
 import QuickFeedbackBanner from '@/views/fishing/components/QuickFeedbackBanner.vue';
-import type { FishingIndexData } from '@/views/fishing/types';
-import { storeToRefs } from 'pinia';
-import { computed, onMounted, ref, useTemplateRef } from 'vue';
+import { useFishingDashboard } from '@/views/fishing/composables/useFishingDashboard';
+import { onMounted } from 'vue';
 
-const fishingSpots = ref<MapMarker[]>(fishingSpotsData as MapMarker[]);
-const mapTileRef = useTemplateRef<FishingMapInstance>('mapTileRef');
+const dash = useFishingDashboard();
+const { route, feedback, analysis } = dash;
 
-const fishingMapStore = useFishingMapStore();
-const { indexData } = storeToRefs(fishingMapStore);
-
-const userPosition = ref<[number, number] | null>(null);
-const activeLocation = computed<[number, number]>(
-  () => userPosition.value ?? DEFAULT_MAP_CENTER,
-);
-
-const route = useFishingRoute();
-const { isPlanning, routeInfo, selectedSpotIndex, planFromMarker, clearRoute } =
-  route;
-
-const feedback = useFishingFeedback();
-const analysis = useFishingAnalysis();
-
-const showFeedbackBanner = computed(
-  () => !isPlanning.value && !routeInfo.value,
-);
-
-async function onMarkerClick(index: number) {
-  const map = mapTileRef.value;
-  if (!map) return;
-  const spot = fishingSpots.value?.[index];
-  if (!spot) return;
-  await planFromMarker(map, index, spot);
-}
-
-function onClearRoute() {
-  const map = mapTileRef.value;
-  if (!map) return;
-  clearRoute(map);
-}
-
-function onFeedbackClick(data: FishingIndexData) {
-  feedback.openFeedback(data, selectedSpotIndex.value);
-}
-
-function onQuickFeedback() {
-  if (!indexData.value) return;
-  feedback.openFeedback(indexData.value, null);
-}
-
-const onMapReady = () => {
-  void (async () => {
-    const map = mapTileRef.value;
-    if (!map) return;
-    try {
-      const position = await map.getCurrentPosition();
-      userPosition.value = position;
-      await fishingMapStore.fetchWeatherAndFishing(position);
-    } catch {
-      // 静默:定位失败不弹窗
-    }
-  })();
-};
-
-onMounted(() => {
-  void fishingMapStore.fetchWeatherAndFishing(DEFAULT_MAP_CENTER);
-});
+onMounted(dash.init);
 </script>
 
 <template>
   <div class="bg-background min-h-screen">
-    <FishingDashboardHeader
+    <DashboardHeader
       :analysis-open="analysis.open.value"
       :analysis-has-data="analysis.hasData.value"
       @toggle-analysis="analysis.toggle"
@@ -97,9 +29,9 @@ onMounted(() => {
       class="mx-auto flex max-w-screen-2xl flex-col gap-4 px-4 py-4 sm:px-6 sm:py-5"
     >
       <QuickFeedbackBanner
-        :visible="showFeedbackBanner"
-        :disabled="!indexData"
-        @submit="onQuickFeedback"
+        :visible="dash.showFeedbackBanner.value"
+        :disabled="!dash.indexData.value"
+        @submit="dash.onQuickFeedback"
       />
 
       <!--
@@ -115,31 +47,32 @@ onMounted(() => {
         <div
           class="fishing-map-wrapper border-border order-2 h-[360px] overflow-hidden rounded-2xl border shadow-sm md:order-1 md:col-span-6 md:h-full lg:col-span-8"
         >
-          <FishingMapTile
+          <MapTile
             ref="mapTileRef"
-            :markers="fishingSpots"
-            :is-planning="isPlanning"
-            :route-info="routeInfo"
-            @marker-click="onMarkerClick"
-            @map-ready="onMapReady"
-            @clear-route="onClearRoute"
+            :markers="dash.fishingSpots.value"
+            :is-planning="route.isPlanning.value"
+            :route-info="route.routeInfo.value"
+            @marker-click="dash.onMarkerClick"
+            @map-ready="dash.onMapReady"
+            @clear-route="dash.onClearRoute"
+            @error="dash.onMapError"
           />
         </div>
 
         <!-- Fishing Index (hero,移动端优先排在 Map 之前) -->
         <div class="order-1 md:order-2 md:col-span-6 lg:col-span-4">
-          <FishingIndexCard
-            :location="activeLocation"
-            @feedback-click="onFeedbackClick"
+          <IndexHeroCard
+            @refresh="dash.refreshIndex"
+            @feedback-click="dash.onFeedbackClick"
           />
         </div>
 
         <!-- 底排:Weather / Hourly / Tide -->
         <div class="order-3 md:col-span-3 lg:col-span-4">
-          <WeatherCard :location="activeLocation" />
+          <WeatherCard :location="dash.activeLocation.value" />
         </div>
         <div class="order-4 md:col-span-3 lg:col-span-4">
-          <HourlyWeather />
+          <HourlyChartCard />
         </div>
         <div class="order-5 md:col-span-6 lg:col-span-4">
           <TideCard />
@@ -153,7 +86,7 @@ onMounted(() => {
       </p>
     </main>
 
-    <FishingFeedbackForm
+    <FeedbackFormDialog
       v-if="feedback.open.value && feedback.currentFishingData.value"
       :is-open="feedback.open.value"
       :fishing-data="feedback.currentFishingData.value"
@@ -163,7 +96,7 @@ onMounted(() => {
       @success="feedback.closeFeedback"
     />
 
-    <FishingAnalysisDrawer
+    <AnalysisDrawer
       :open="analysis.open.value"
       :payload="analysis.payload.value"
       @close="analysis.close"
@@ -173,8 +106,8 @@ onMounted(() => {
 
 <style scoped>
 /*
- * Map tile 的 hover 浮起 —— FishingMapTile 不在 FishingCard 内(padding=none),
- * 单独在外层 .fishing-map-wrapper 上加同款 lift,与 FishingCard 行为一致
+ * Map tile 的 hover 浮起 —— MapTile 不在 DashboardCard 内(padding=none),
+ * 单独在外层 .fishing-map-wrapper 上加同款 lift,与 DashboardCard 行为一致
  */
 .fishing-map-wrapper {
   position: relative;

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useFishingMapStore } from '@/stores/fishingMap';
 import { formatDate } from '@/utils/formatdate';
-import FishingCard from '@/views/fishing/components/FishingCard.vue';
+import DashboardCard from '@/views/fishing/components/DashboardCard.vue';
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
 
@@ -22,7 +22,7 @@ const openQWeather = () => {
 </script>
 
 <template>
-  <FishingCard interactive @click="openQWeather">
+  <DashboardCard interactive @click="openQWeather">
     <!-- Header -->
     <div class="mb-4 flex items-start justify-between gap-3">
       <div class="min-w-0">
@@ -188,5 +188,5 @@ const openQWeather = () => {
       <p class="text-secondary-foreground text-sm">查看实时天气情况</p>
       <p class="text-muted-foreground mt-1 text-xs">选择最佳钓鱼时间</p>
     </div>
-  </FishingCard>
+  </DashboardCard>
 </template>

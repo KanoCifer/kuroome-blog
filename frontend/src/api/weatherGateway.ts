@@ -4,7 +4,7 @@ import type {
   WeatherDay,
   WeatherFullResponse,
   WeatherNow,
-} from '@/views/fishing/types';
+} from '@/types/weather';
 
 export interface TideResponse extends TideData {
   code: string;

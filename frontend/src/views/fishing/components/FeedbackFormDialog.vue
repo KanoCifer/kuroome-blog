@@ -5,7 +5,7 @@ import type {
   FishingFeedbackData,
   FishingFeedbackLevel,
   FishingFeedbackPayload,
-} from '@/views/fishing/types';
+} from '@/types/fishing';
 import dayjs from 'dayjs';
 import { ref } from 'vue';
 

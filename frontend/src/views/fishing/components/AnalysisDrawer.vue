@@ -8,7 +8,7 @@
  * - 与 Map 的路线浮层在视觉上彻底分离 (一个底部、一个右侧)
  */
 import WeatherAnalysis from '@/components/ai/WeatherAnalysis.vue';
-import type { WeatherAnalysisPayload } from '@/views/fishing/types';
+import type { WeatherAnalysisPayload } from '@/types/fishing';
 import { X } from '@lucide/vue';
 
 defineProps<{

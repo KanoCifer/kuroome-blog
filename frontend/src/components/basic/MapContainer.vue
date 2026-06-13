@@ -1,12 +1,29 @@
 <template>
-  <div ref="containerRef" class="map-container shadow-md"></div>
+  <div class="relative h-full w-full">
+    <div ref="containerRef" class="map-container shadow-md"></div>
+    <button
+      v-if="props.showGeolocation"
+      type="button"
+      :class="[
+        'bg-card/90 text-foreground hover:bg-card border-border/40 absolute right-2.5 bottom-5 z-10 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-colors disabled:opacity-50',
+        isLocating && 'text-primary',
+      ]"
+      :disabled="isLocating"
+      aria-label="定位到当前位置"
+      @click="handleLocateClick"
+    >
+      <Locate v-if="!isLocating" class="h-4 w-4" />
+      <Loader2 v-else class="h-4 w-4 animate-spin" />
+    </button>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { mapGateway } from '@/api/mapGateway';
 import AMapLoader from '@amap/amap-jsapi-loader';
+import { Loader2, Locate } from '@lucide/vue';
 import type { MapMarker } from '@/types/marker';
-import { onMounted, onUnmounted, watch, useTemplateRef } from 'vue';
+import { onMounted, onUnmounted, ref, watch, useTemplateRef } from 'vue';
 
 /* -------------------------------------------------------------------------
  * 插件服务类型 —— @types/amap-js-api 只覆盖核心 map API。
@@ -18,19 +35,18 @@ interface DrivingService {
   search(
     origin: [number, number] | AMap.LngLat,
     destination: [number, number] | AMap.LngLat,
-    callback: (status: 'complete' | 'no_data' | string, result: unknown) => void,
+    callback: (
+      status: 'complete' | 'no_data' | string,
+      result: unknown,
+    ) => void,
   ): void;
   clear(): void;
 }
 
-interface GeolocationService {
-  getCurrentPosition(
+interface CitySearchService {
+  getLocalCity(
     callback: (status: 'complete' | string, result: unknown) => void,
   ): void;
-}
-
-interface CitySearchService {
-  getLocalCity(callback: (status: 'complete' | string, result: unknown) => void): void;
 }
 
 /**
@@ -38,12 +54,6 @@ interface CitySearchService {
  * loader 返回 any,这里断言后即可在组件内用 AMap.X 访问。
  */
 type AMapWithPlugins = typeof AMap & {
-  Geolocation: new (options?: {
-    enableHighAccuracy?: boolean;
-    timeout?: number;
-    buttonPosition?: string;
-    buttonOffset?: AMap.Pixel;
-  }) => GeolocationService;
   CitySearch: new () => CitySearchService;
   Driving: new (options?: {
     map?: AMap.Map;
@@ -81,7 +91,6 @@ const props = withDefaults(defineProps<Props>(), {
   plugins: () => [
     'AMap.Scale',
     'AMap.ToolBar',
-    'AMap.Geolocation',
     'AMap.CitySearch',
     'AMap.Driving',
   ],
@@ -96,6 +105,7 @@ const emit = defineEmits<{
   (e: 'click', event: unknown): void;
   (e: 'markerClick', index: number): void;
   (e: 'mapReady', map: unknown): void;
+  (e: 'error', message: string): void;
 }>();
 
 let map: AMap.Map | null = null;
@@ -103,6 +113,9 @@ let markerInstances: AMap.Marker[] = [];
 let driving: DrivingService | null = null;
 let currentRoute: AMap.Polyline | null = null;
 let clickHandler: ((e: unknown) => void) | null = null;
+let userLocationMarker: AMap.Marker | null = null;
+
+const isLocating = ref(false);
 
 const fetchSecurityKey = async (): Promise<string> => {
   try {
@@ -138,9 +151,6 @@ onMounted(async () => {
   if (props.showScale && !plugins.includes('AMap.Scale')) {
     plugins.push('AMap.Scale');
   }
-  if (props.showGeolocation && !plugins.includes('AMap.Geolocation')) {
-    plugins.push('AMap.Geolocation');
-  }
 
   AMapLoader.load({
     key: import.meta.env.VITE_JS_API,
@@ -170,15 +180,6 @@ onMounted(async () => {
       if (props.showScale) {
         const scale = new AMap.Scale();
         map.addControl(scale);
-      }
-
-      if (props.showGeolocation) {
-        const geolocation = new AMap.Geolocation({
-          timeout: 10000,
-          buttonPosition: 'RB',
-          buttonOffset: new AMap.Pixel(10, 20),
-        });
-        map.addControl(geolocation);
       }
 
       // 添加标记点
@@ -365,9 +366,30 @@ const clearRoute = () => {
   }
 };
 
+/**
+ * WGS-84 → GCJ-02 坐标转换 (AMap.convertFrom)。
+ * navigator.geolocation 返回 WGS-84,AMap 内部使用 GCJ-02;
+ * 不转换的话偏差 ~100-700m,驾车/步行路线起点会偏到隔壁马路。
+ */
+const wgs84ToGcj02 = (lng: number, lat: number): Promise<[number, number]> => {
+  return new Promise((resolve, reject) => {
+    const AMap = (window as unknown as { AMap: AMapWithPlugins }).AMap;
+    AMap.convertFrom([lng, lat], 'gps', (status, result) => {
+      if (status !== 'complete' || typeof result === 'string' || !result.locations.length) {
+        // 转换失败时降级返回原始坐标,不阻断流程
+        resolve([lng, lat]);
+        return;
+      }
+      const [loc] = result.locations;
+      resolve([loc.getLng(), loc.getLat()]);
+    });
+  });
+};
+
 // 获取用户当前位置
-// 链路:浏览器 Geolocation → AMap CitySearch(IP 定位,矩形中心) → 报错
-// 桌面 Mac / 关 Wi-Fi 时 CoreLocation 必失败,IP 兜底是核心路径
+// 链路:浏览器原生 Geolocation (WGS-84,街道级 ~10m) → convertFrom → GCJ-02 →
+//      AMap.CitySearch (GCJ-02,城市级矩形中心 ~5km) → 报错
+// 桌面 Mac / 关 Wi-Fi 时 CoreLocation 必失败,IP 兜底仍是核心路径
 const getCurrentPosition = (): Promise<[number, number]> => {
   return new Promise((resolve, reject) => {
     if (!map) {
@@ -375,10 +397,10 @@ const getCurrentPosition = (): Promise<[number, number]> => {
       return;
     }
 
-    const AMap = (window as unknown as { AMap: AMapWithPlugins }).AMap;
-
+    // IP 兜底:AMap CitySearch(GCJ-02,城市级矩形中心)
     const tryIPFallback = (browserReason: string) => {
       try {
+        const AMap = (window as unknown as { AMap: AMapWithPlugins }).AMap;
         const citySearch = new AMap.CitySearch();
         citySearch.getLocalCity((status: string, result: unknown) => {
           if (status !== 'complete') {
@@ -415,28 +437,81 @@ const getCurrentPosition = (): Promise<[number, number]> => {
       }
     };
 
-    try {
-      const geolocation = new AMap.Geolocation({ timeout: 10000 });
-      geolocation.getCurrentPosition((status: string, result: unknown) => {
-        if (status === 'complete') {
-          const geoResult = result as {
-            position: { lng: number; lat: number };
-          };
-          resolve([geoResult.position.lng, geoResult.position.lat]);
-          return;
-        }
-        const errResult = result as {
-          info?: string;
-          message?: string;
-        } | null;
-        const reason = errResult?.info || errResult?.message || '未知错误';
-        tryIPFallback(reason);
-      });
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      tryIPFallback(msg);
+    // GeolocationPositionError → 可读标签
+    const labelGeoError = (err: GeolocationPositionError): string => {
+      switch (err.code) {
+        case err.PERMISSION_DENIED:
+          return '用户拒绝授权';
+        case err.POSITION_UNAVAILABLE:
+          return '位置不可用(可能关 Wi-Fi / 关 macOS 定位服务)';
+        case err.TIMEOUT:
+          return '定位超时';
+        default:
+          return `未知错误 (${err.message || 'code=' + err.code})`;
+      }
+    };
+
+    // 首选:浏览器原生 Geolocation(街道级精度,WGS-84 → 转 GCJ-02)
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const gcj = await wgs84ToGcj02(
+            pos.coords.longitude,
+            pos.coords.latitude,
+          );
+          resolve(gcj);
+        },
+        (err) => {
+          tryIPFallback(labelGeoError(err));
+        },
+        {
+          enableHighAccuracy: false, // 桌面场景:省电 + 网络定位更快
+          timeout: 10_000,
+          maximumAge: 60_000, // 1 分钟内复用,避免重复弹权限
+        },
+      );
+      return;
     }
+
+    // 浏览器不支持 Geolocation(罕见,老浏览器),直接走 IP
+    tryIPFallback('浏览器不支持 Geolocation API');
   });
+};
+
+// 定位按钮点击:复用 getCurrentPosition 的双链路,然后 setCenter + 打点
+const handleLocateClick = async () => {
+  isLocating.value = true;
+  try {
+    const [lng, lat] = await getCurrentPosition();
+    if (!map) return;
+    map.setCenter([lng, lat]);
+    map.setZoom(15);
+    showUserLocationMarker(lng, lat);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error('定位失败:', msg);
+    emit('error', `定位失败: ${msg}`);
+  } finally {
+    isLocating.value = false;
+  }
+};
+
+// 在用户位置打一个 marker;后续点击先清旧的
+const showUserLocationMarker = (lng: number, lat: number) => {
+  if (!map) return;
+  if (userLocationMarker) {
+    map.remove(userLocationMarker);
+    userLocationMarker = null;
+  }
+  const AMap = (window as unknown as { AMap: AMapWithPlugins }).AMap;
+  userLocationMarker = new AMap.Marker({
+    position: [lng, lat],
+    content:
+      '<div style="width:16px;height:16px;background:#1e88e5;border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 4px rgba(30,136,229,0.25);"></div>',
+    offset: new AMap.Pixel(-10, -10),
+    zIndex: 200,
+  });
+  map.add(userLocationMarker);
 };
 
 // 暴露方法给父组件
@@ -450,6 +525,7 @@ onUnmounted(() => {
   // 清除标记点
   markerInstances.forEach((marker) => marker.setMap(null));
   markerInstances = [];
+  userLocationMarker = null;
 
   // 清除路线
   driving?.clear();

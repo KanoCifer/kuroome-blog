@@ -74,7 +74,7 @@ import { useAnimateNumber } from '@/composables/useAnimateNumber';
 import fishingSpots from '@/data/fishing-spots.json';
 import { fishingGateway } from '@/api/fishingGateway';
 import { DEFAULT_MAP_CENTER, useFishingMapStore } from '@/stores/fishingMap';
-import type { TideData } from '@/views/fishing/types';
+import type { TideData } from '@/types/weather';
 import dayjs from 'dayjs';
 import { Cloud, CloudRain, FishingRod, Sun, Waves, Wind } from '@lucide/vue';
 import { computed, onMounted, ref, type Component } from 'vue';

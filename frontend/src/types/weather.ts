@@ -1,3 +1,10 @@
+/**
+ * 天气与潮汐相关的网关响应类型。
+ *
+ * 来源：和风天气 API + 国家海洋预报台潮汐 API。
+ * 仅描述网络层数据，不夹带 view-only 派生字段。
+ */
+
 export interface TideTableItem {
   fxTime: string;
   height: number | string;
@@ -121,75 +128,4 @@ export interface WeatherFullResponse {
   indices?: WeatherIndicesResponse;
   locationName?: string;
   poiId?: string;
-}
-
-export type FishingLevel = '爆护' | '好' | '一般' | '差' | '空军';
-export type FishingIndexLevel = FishingLevel | '极好';
-export type FishingFeedbackLevel = FishingLevel;
-
-export interface FishingIndexData {
-  fishing_index: number;
-  expert_score: number;
-  residual: number;
-  level: FishingIndexLevel;
-  feature_breakdown: Record<string, number>;
-}
-
-export interface FishingFeedbackData {
-  fishing_index: number;
-  level: FishingIndexLevel;
-  temperature: number;
-  humidity: number;
-  pressure: number;
-  wind_speed: number;
-  precipitation: number;
-  indices: number;
-  tide_level: number;
-  tide_type?: '涨潮' | '退潮';
-  tide_range: number;
-  hours_to_next_tide: number;
-}
-
-export interface FishingFeedbackPayload {
-  location_id: string;
-  location_name: string;
-  fishing_time: string;
-  temperature?: number;
-  humidity?: number;
-  pressure?: number;
-  wind_speed?: number;
-  precipitation?: number;
-  indices?: number;
-  tide_level?: number;
-  tide_type?: '涨潮' | '退潮';
-  tide_range?: number;
-  hours_to_next_tide?: number;
-  feedback: FishingFeedbackLevel;
-}
-
-export interface FishingFeedbackResponse {
-  success: boolean;
-  record_id: string;
-  expert_score: number;
-  residual: number;
-}
-
-export interface FishingStats {
-  total_records: number;
-  latest_record_time: string | null;
-}
-
-/**
- * 喂给 <WeatherAnalysis> 组件的聚合数据。
- * 在 useFishingAnalysis 中拼装,在 FishingAnalysisDrawer / WeatherAnalysis 中消费。
- * 字段都是 optional —— Live / forecast / tide 任一为空,WeatherAnalysis 内部按需处理。
- */
-export interface WeatherAnalysisPayload {
-  liveWeather?: WeatherNow | null;
-  forecasts?: WeatherDay[];
-  tideData?: TideData | null;
-  weatherIndices?: Array<Record<string, unknown>>;
-  fishingIndex?: FishingIndexData;
-  locationName?: string;
-  tideSpotName?: string;
 }

@@ -9,11 +9,13 @@
  * 抽出原因: 原本散落在 FishingMapView.vue, view 里业务状态太多。
  */
 import { useFishingMapStore } from '@/stores/fishingMap';
+import { useTidePanelStore } from '@/stores/tidePanel';
 import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
 
 export function useFishingAnalysis() {
   const fishingMapStore = useFishingMapStore();
+  const tidePanelStore = useTidePanelStore();
   const {
     liveWeather,
     forecasts,
@@ -21,8 +23,8 @@ export function useFishingAnalysis() {
     weatherIndices,
     locationName,
     indexData,
-    panelTideSpotName,
   } = storeToRefs(fishingMapStore);
+  const { panelTideSpotName } = storeToRefs(tidePanelStore);
 
   const open = ref(false);
 

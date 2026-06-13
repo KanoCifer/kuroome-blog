@@ -18,7 +18,7 @@ import {
   formatDuration,
   type FishingMapInstance,
   type RouteInfo,
-} from '@/composables/useFishingRoute';
+} from '@/views/fishing/composables/useFishingRoute';
 import { DEFAULT_MAP_CENTER } from '@/stores/fishingMap';
 import type { MapMarker } from '@/types/marker';
 import { Loader2 } from '@lucide/vue';
@@ -46,6 +46,7 @@ const emit = defineEmits<{
   (e: 'marker-click', index: number): void;
   (e: 'map-ready'): void;
   (e: 'clear-route'): void;
+  (e: 'error', message: string): void;
 }>();
 
 const innerRef = useTemplateRef<FishingMapInstance>('innerRef');
@@ -81,6 +82,7 @@ defineExpose<FishingMapInstance>({
       :isDarkMode="isDarkMode"
       @marker-click="(i: number) => emit('marker-click', i)"
       @map-ready="emit('map-ready')"
+      @error="(msg: string) => emit('error', msg)"
     />
 
     <Transition

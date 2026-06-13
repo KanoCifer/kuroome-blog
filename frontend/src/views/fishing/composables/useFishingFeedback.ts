@@ -9,11 +9,8 @@
  * 避免污染 view 组件。
  */
 import { useFishingMapStore } from '@/stores/fishingMap';
-import type {
-  FishingFeedbackData,
-  FishingIndexData,
-  TideData,
-} from '@/views/fishing/types';
+import type { FishingFeedbackData, FishingIndexData } from '@/types/fishing';
+import type { TideData } from '@/types/weather';
 import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 

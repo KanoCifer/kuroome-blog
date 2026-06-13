@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { useChartColors, withAlpha } from '@/composables/useChartColors';
-import { HARBOR_OPTIONS, useFishingMapStore } from '@/stores/fishingMap';
-import FishingCard from '@/views/fishing/components/FishingCard.vue';
+import { HARBOR_OPTIONS, useTidePanelStore } from '@/stores/tidePanel';
+import DashboardCard from '@/views/fishing/components/DashboardCard.vue';
 import dayjs from 'dayjs';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted } from 'vue';
 import VChart from 'vue-echarts';
 
-const fishingMapStore = useFishingMapStore();
+const tidePanelStore = useTidePanelStore();
 const {
   panelTideData,
   tideLoading,
   selectedHarbor: selectedHarborState,
   selectedDate: selectedDateState,
   panelTideSpotName,
-} = storeToRefs(fishingMapStore);
+} = storeToRefs(tidePanelStore);
 
 const tideData = computed(() => panelTideData.value);
 const loading = computed(() => tideLoading.value);
@@ -23,11 +23,11 @@ const { palette } = useChartColors();
 
 const selectedHarbor = computed({
   get: () => selectedHarborState.value,
-  set: (value: string) => fishingMapStore.setSelectedHarbor(value),
+  set: (value: string) => tidePanelStore.setSelectedHarbor(value),
 });
 const selectedDate = computed({
   get: () => selectedDateState.value,
-  set: (value: string) => fishingMapStore.setSelectedDate(value),
+  set: (value: string) => tidePanelStore.setSelectedDate(value),
 });
 
 const dateOptions = computed(() =>
@@ -256,7 +256,7 @@ const tideOptions = computed(() => {
 
 onMounted(() => {
   if (!panelTideData.value) {
-    void fishingMapStore.fetchPanelTide(
+    void tidePanelStore.fetchPanelTide(
       selectedHarborState.value,
       selectedDateState.value,
     );
@@ -265,7 +265,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <FishingCard>
+  <DashboardCard>
     <!-- Header -->
     <div class="mb-4 flex items-start justify-between gap-2">
       <div class="min-w-0">
@@ -372,5 +372,5 @@ onMounted(() => {
       </div>
       <p class="text-secondary-foreground text-sm">暂无潮汐数据</p>
     </div>
-  </FishingCard>
+  </DashboardCard>
 </template>

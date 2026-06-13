@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { useFishingMapStore } from '@/stores/fishingMap';
-import FishingCard from '@/views/fishing/components/FishingCard.vue';
-import type { FishingIndexData } from '@/views/fishing/types';
+import type { FishingIndexData } from '@/types/fishing';
+import DashboardCard from '@/views/fishing/components/DashboardCard.vue';
 import { FishingRod, Loader } from '@lucide/vue';
 import { storeToRefs } from 'pinia';
 
-interface Props {
-  location?: [number, number];
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  location: () => [113.389549, 23.050067],
-});
-
+/**
+ * Hero 钓鱼指数卡。
+ *
+ * - 数据来源：fishingMap store（dashboard 主流）
+ * - 不再持有 location prop —— 刷新由父级 dashboard composable 调度，
+ *   保证用 activeLocation（用户定位 / 默认中心）而不是组件局部默认值
+ */
 const emit = defineEmits<{
   (e: 'feedback-click', data: FishingIndexData): void;
+  (e: 'refresh'): void;
 }>();
 
 const fishingMapStore = useFishingMapStore();
@@ -61,17 +61,13 @@ const formatFeatureName = (name: string): string => {
   return mapping[name] || name;
 };
 
-const fetchIndex = async () => {
-  await fishingMapStore.fetchWeatherAndFishing(props.location);
-};
-
 const handleFeedback = () => {
   if (indexData.value) emit('feedback-click', indexData.value);
 };
 </script>
 
 <template>
-  <FishingCard tone="hero" padding="default">
+  <DashboardCard tone="hero" padding="default">
     <!-- 标题 + 刷新 + 图标 -->
     <div class="mb-4 flex items-start justify-between gap-3">
       <div>
@@ -87,7 +83,7 @@ const handleFeedback = () => {
           class="text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           type="button"
           :disabled="loading"
-          @click="fetchIndex"
+          @click="emit('refresh')"
         >
           <Loader v-if="loading" class="h-3 w-3 animate-spin" />
           {{ loading ? '刷新中' : '刷新' }}
@@ -185,5 +181,5 @@ const handleFeedback = () => {
       </button>
     </template>
     <p v-else class="text-muted-foreground text-sm">暂无数据</p>
-  </FishingCard>
+  </DashboardCard>
 </template>

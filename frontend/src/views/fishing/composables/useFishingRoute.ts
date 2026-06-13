@@ -6,8 +6,8 @@
  * - 串行化并发请求（routeSeq 守卫：重复点击 marker 不会触发多次 planRoute）
  * - 错误统一走 notification store，不再用浏览器 alert
  *
- * 不持有 MapContainer ref —— 由调用方在调用 planFromMarker 时传入，
- * 避免与组件模板 ref 生命周期耦合。
+ * map 通过 getter 注入：调用方只在创建 composable 时挂一次，之后所有
+ * planFromMarker / clearRoute 都自取，view 不再每次空判 ref。
  */
 import { useNotificationStore } from '@/stores/notification';
 import type { MapMarker } from '@/types/marker';
@@ -45,7 +45,7 @@ export function formatDuration(seconds: number): string {
   return `${hours} 小时 ${minutes} 分钟`;
 }
 
-export function useFishingRoute() {
+export function useFishingRoute(getMap: () => FishingMapInstance | null) {
   const notifier = useNotificationStore();
 
   const isPlanning = ref(false);
@@ -56,10 +56,12 @@ export function useFishingRoute() {
   let routeSeq = 0;
 
   async function planFromMarker(
-    map: FishingMapInstance,
     index: number,
     spot: MapMarker,
   ): Promise<void> {
+    const map = getMap();
+    if (!map) return;
+
     const mySeq = ++routeSeq;
     selectedSpotIndex.value = index;
     isPlanning.value = true;
@@ -88,7 +90,9 @@ export function useFishingRoute() {
     }
   }
 
-  function clearRoute(map: FishingMapInstance): void {
+  function clearRoute(): void {
+    const map = getMap();
+    if (!map) return;
     map.clearRoute();
     routeInfo.value = null;
     selectedSpotIndex.value = null;

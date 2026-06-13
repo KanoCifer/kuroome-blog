@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useChartColors, withAlpha } from '@/composables/useChartColors';
 import { useFishingMapStore } from '@/stores/fishingMap';
-import FishingCard from '@/views/fishing/components/FishingCard.vue';
+import DashboardCard from '@/views/fishing/components/DashboardCard.vue';
 import dayjs from 'dayjs';
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
@@ -172,7 +172,7 @@ const chartOption = computed(() => {
 </script>
 
 <template>
-  <FishingCard>
+  <DashboardCard>
     <div class="mb-3 flex items-start justify-between gap-3">
       <div>
         <h3 class="text-foreground text-lg font-semibold tracking-tight">
@@ -217,5 +217,5 @@ const chartOption = computed(() => {
         <p class="text-muted-foreground text-sm">正在加载天气数据...</p>
       </div>
     </div>
-  </FishingCard>
+  </DashboardCard>
 </template>
