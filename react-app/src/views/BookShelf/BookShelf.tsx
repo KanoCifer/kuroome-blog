@@ -35,7 +35,7 @@ export default function BookShelf() {
     setErrorMessage('');
     try {
       const res = await wereadService.getUserShelf();
-      if (res.status === 'success' && res.data) {
+      if (res.data) {
         setBooks(res.data.user_books);
       } else {
         throw new Error(res.message || '获取书架失败');
@@ -56,12 +56,8 @@ export default function BookShelf() {
   const handleSync = useCallback(async () => {
     setIsSyncing(true);
     try {
-      const res = await wereadService.syncMyBooks();
-      if (res.status === 'success') {
-        await fetchBooks();
-      } else {
-        throw new Error(res.message || '同步失败');
-      }
+      await wereadService.syncMyBooks();
+      await fetchBooks();
     } catch (err: unknown) {
       const error = err as {
         response?: { data?: { message?: string } };

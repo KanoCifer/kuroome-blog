@@ -3,7 +3,6 @@ import { isrefreshTokenRequest, refreshAccessToken } from './refresh';
 import { tokenService } from '../auth/tokenService';
 
 export interface ApiResponse<T = unknown> {
-  status: 'success' | 'error';
   message: string;
   data: T;
   code?: number;

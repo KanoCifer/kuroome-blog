@@ -30,7 +30,7 @@ async def get_user_devices(
     response: list[DeviceResponse] = [
         DeviceResponse.model_validate(device) for device in devices
     ]
-    return APIResponse.ok(
+    return APIResponse(
         data={"devices": response}, message="获取设备列表成功"
     )
 
@@ -44,12 +44,12 @@ async def get_device_by_id(
     """根据设备ID获取设备信息"""
     device = await service.get_owned_device(device_id, user.id)
     response: DeviceResponse = DeviceResponse.model_validate(device)
-    return APIResponse.ok(
+    return APIResponse(
         data={"device": response}, message="获取设备信息成功"
     )
 
 
-@router.post("")
+@router.post("", status_code=status.HTTP_201_CREATED)
 async def create_device(
     device_input: DeviceInput,
     user: User = Depends(manager),
@@ -60,10 +60,9 @@ async def create_device(
         user_id=user.id, **device_input.model_dump()
     )
     response: DeviceResponse = DeviceResponse.model_validate(device)
-    return APIResponse.ok(
+    return APIResponse(
         data={"device": response},
         message="创建设备成功",
-        status_code=status.HTTP_201_CREATED,
     )
 
 
@@ -82,7 +81,7 @@ async def update_device(
     if not updated_device:
         raise APIError(message="设备信息不存在或更新失败")
     response: DeviceResponse = DeviceResponse.model_validate(updated_device)
-    return APIResponse.ok(
+    return APIResponse(
         data={"device": response}, message="更新设备信息成功"
     )
 
@@ -97,7 +96,7 @@ async def delete_device(
     await service.get_owned_device(device_id, user.id)
     if not await service.delete_device(device_id):
         raise NotFoundError("设备删除失败")
-    return APIResponse.ok(message="删除设备成功")
+    return APIResponse(message="删除设备成功")
 
 
 @router.delete("")
@@ -107,7 +106,7 @@ async def delete_all_devices(
 ):
     """删除用户的所有设备"""
     await service.repo.delete_device_tracks_by_user_id(user.id)
-    return APIResponse.ok(message="删除所有设备成功")
+    return APIResponse(message="删除所有设备成功")
 
 
 @router.patch("/{device_id}/status")
@@ -125,7 +124,7 @@ async def update_device_status(
     if not updated_device:
         raise NotFoundError("设备状态更新失败")
     response: DeviceResponse = DeviceResponse.model_validate(updated_device)
-    return APIResponse.ok(
+    return APIResponse(
         data={"device": response}, message="更新设备状态成功"
     )
 
@@ -147,7 +146,7 @@ async def update_device_reminders(
     if not updated_device:
         raise NotFoundError("提醒配置更新失败")
     response: DeviceResponse = DeviceResponse.model_validate(updated_device)
-    return APIResponse.ok(
+    return APIResponse(
         data={"device": response}, message="更新提醒配置成功"
     )
 
@@ -165,7 +164,7 @@ async def get_upcoming_devices(
     response: list[DeviceResponse] = [
         DeviceResponse.model_validate(device) for device in devices
     ]
-    return APIResponse.ok(
+    return APIResponse(
         data={"devices": response}, message="获取即将到达里程碑的设备成功"
     )
 
@@ -206,6 +205,6 @@ async def test_device_notification(
         channels=channels,
     )
 
-    return APIResponse.ok(
+    return APIResponse(
         data={"results": results}, message="测试通知发送完成"
     )

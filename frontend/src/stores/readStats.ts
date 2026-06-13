@@ -70,7 +70,7 @@ export const useReadStatsStore = defineStore('readStats', () => {
         const next: Record<string, ReadDetailSnapshot> = { ...snapshots.value };
         ALL_MODES.forEach((m, i) => {
           const r = results[i];
-          if (r.status === 'success' && r.data) {
+          if (r.data) {
             next[snapshotKey(m, null)] = r.data;
           }
         });
@@ -79,7 +79,7 @@ export const useReadStatsStore = defineStore('readStats', () => {
       }
 
       const res = await wereadGateway.getReadProgress(mode, baseTime);
-      if (res.status === 'success' && res.data) {
+      if (res.data) {
         snapshots.value = {
           ...snapshots.value,
           [snapshotKey(mode, baseTime)]: res.data,
@@ -122,7 +122,7 @@ export const useReadStatsStore = defineStore('readStats', () => {
     try {
       const maxIdx = reset ? 0 : recommendMaxIdx.value;
       const res = await wereadGateway.getBooksRecommend(count, maxIdx);
-      if (res.status !== 'success' || !res.data) {
+      if (!res.data) {
         throw new Error(res.message || '获取推荐失败');
       }
       const list = res.data;

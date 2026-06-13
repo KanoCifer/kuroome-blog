@@ -111,11 +111,9 @@ class BlogDomainError(APIError):
 
 def _create_error_response(
     message: str,
-    status: str = "error",
     errors: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     return {
-        "status": status,
         "message": message,
         "data": errors if errors is not None else {},
     }

@@ -92,7 +92,7 @@ async def parse_rss(
     if not save_to_db:
         cached_payload = await rss_service.get_cached_feed(rss_url)
         if cached_payload:
-            return APIResponse.ok(data=cached_payload)
+            return APIResponse(data=cached_payload)
 
     try:
         result = await rss_service.fetch_and_parse_feed(
@@ -118,7 +118,7 @@ async def parse_rss(
         entries=entries,
     )
 
-    return APIResponse.ok(data={"meta": feed_meta, "entries": entries})
+    return APIResponse(data={"meta": feed_meta, "entries": entries})
 
 
 @router.get("/articles")
@@ -129,7 +129,7 @@ async def get_articles(
     search: str | None = Query(None, min_length=1),
     current_user: User = Depends(manager),
     rss_service: RssService = Depends(rss_service_dep),
-) -> JSONResponse:
+) -> APIResponse:
     result = await rss_service.get_articles_for_user(
         user_id=current_user.id,
         page=page,
@@ -137,7 +137,7 @@ async def get_articles(
         feed_url=feed_url,
         search=search,
     )
-    return APIResponse.ok(data=result.model_dump(mode="json"))
+    return APIResponse(data=result.model_dump(mode="json"))
 
 
 @router.get("/articles/{article_id}")
@@ -150,7 +150,7 @@ async def get_article(
         article_id=article_id,
         user_id=current_user.id,
     )
-    return APIResponse.ok(data=response.model_dump())
+    return APIResponse(data=response.model_dump())
 
 
 # 获取当前用户的RSS订阅列表
@@ -164,7 +164,7 @@ async def get_subscriptions(
         user_id=current_user.id
     )
     data = [sub.model_dump(mode="json") for sub in subscriptions]
-    return APIResponse.ok(data=data)
+    return APIResponse(data=data)
 
 
 # 手动刷新某个RSS订阅，拉取并保存最新文章
@@ -187,7 +187,7 @@ async def refresh_subscription(
             result["rss_url"],
             result["saved_count"],
         )
-        return APIResponse.ok(data=result)
+        return APIResponse(data=result)
     except APIError:
         raise
 
@@ -205,7 +205,7 @@ async def delete_subscription(
         user_id=current_user.id,
     )
     logger.info(f"用户 {current_user.username} 删除了RSS订阅: {rss_url}")
-    return APIResponse.ok(data={"message": "订阅已删除"})
+    return APIResponse(data={"message": "订阅已删除"})
 
 
 # 标记文章为已读
@@ -223,7 +223,7 @@ async def mark_article_read(
     )
 
     logger.info(f"用户 {current_user.id} 标记文章 {article_id} 为已读")
-    return APIResponse.ok(data={"message": "文章已标记为已读"})
+    return APIResponse(data={"message": "文章已标记为已读"})
 
 
 # 标记文章为未读
@@ -241,4 +241,4 @@ async def mark_article_unread(
     )
 
     logger.info(f"用户 {current_user.id} 标记文章 {article_id} 为未读")
-    return APIResponse.ok(data={"message": "文章已标记为未读"})
+    return APIResponse(data={"message": "文章已标记为未读"})

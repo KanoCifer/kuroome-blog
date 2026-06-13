@@ -90,7 +90,7 @@ const handleSubmit = async () => {
       email_code: form.value.emailCode || '',
     });
 
-    if (response.data.status === 'success') {
+    if (response.data) {
       router.push('/login');
       notifier.success('注册成功！请使用您的账号登录');
     }

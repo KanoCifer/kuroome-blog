@@ -24,7 +24,7 @@ Vue (`frontend/`) and React (`react-app/`) share backend services but maintain i
 ## API Conventions
 
 - **Base path**: `/api/v1/` (core), `/api/v2/` (extensions: subscription, device, fishing, weather)
-- **Response format**: unified `{status, message, data, code}` envelope
+- **Response format**: unified `{message, data}` envelope; HTTP status code is the source of truth for success/failure
 - **Auth**: JWT access token (12h) + refresh token HTTP-only cookie (30d), optional Passkey / GitHub OAuth
 - **Concurrency**: Todo writes use Redis lock; conflict returns HTTP 423
 - **Task queue**: Taskiq + RabbitMQ for async background jobs

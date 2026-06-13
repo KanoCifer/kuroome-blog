@@ -1,20 +1,42 @@
-"""Standardized API response — JSONResponse subclass for direct use in endpoints."""
+"""Standardized API response — Pydantic envelope + ORJSONResponse helper.
+
+- ``APIResponse[T]`` — Pydantic generic envelope; use as ``response_model``
+  annotation so OpenAPI / type tooling sees the wrapper shape.
+- ``envelope_response(...)`` — returns an ``ORJSONResponse`` with the same
+  envelope content. Use this when an endpoint also needs to mutate the
+  response (cookies, headers).
+
+The wire format is intentionally minimal: ``{message, data}``. HTTP status
+code is the source of truth for success/failure — error envelopes are
+emitted by handlers in ``app.core.exceptions``.
+"""
 
 from __future__ import annotations
 
+from typing import Any
+
 from fastapi.responses import ORJSONResponse
+from pydantic import BaseModel
 
 
-class APIResponse(ORJSONResponse):
-    """Unified response envelope. Use `APIResponse.ok(...)` to return directly from endpoints."""
+class APIResponse[T](BaseModel):
+    """Unified response envelope."""
 
-    @staticmethod
-    def ok(
-        data: dict | list | None = None,
-        message: str = "success",
-        status_code: int = 200,
-    ) -> APIResponse:
-        return APIResponse(
-            status_code=status_code,
-            content={"status": "success", "message": message, "data": data},
-        )
+    message: str = "success"
+    data: T | None = None
+
+
+def envelope_response(
+    data: Any = None,
+    message: str = "success",
+    status_code: int = 200,
+) -> ORJSONResponse:
+    """Return an ORJSONResponse wrapped in the standard envelope.
+
+    Use when the endpoint also needs to ``set_cookie`` / mutate headers.
+    Otherwise prefer returning a dict and annotating ``response_model=APIResponse[T]``.
+    """
+    return ORJSONResponse(
+        status_code=status_code,
+        content={"message": message, "data": data},
+    )

@@ -235,13 +235,9 @@ const handleSubmit = async () => {
   saved.value = false;
   try {
     const response = await wereadGateway.saveUserInfo(apiKey.value.trim());
-    if (response.status === 'success') {
-      saved.value = true;
-      apiKey.value = '';
-      notifier.success(response.message || 'API Key 已保存');
-    } else {
-      notifier.error(response.message || '保存失败，请稍后重试');
-    }
+    saved.value = true;
+    apiKey.value = '';
+    notifier.success(response.message || 'API Key 已保存');
   } catch (err: unknown) {
     const error = err as { message?: string };
     notifier.error(error?.message || '保存失败，请稍后重试');

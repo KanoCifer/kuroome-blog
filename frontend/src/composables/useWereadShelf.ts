@@ -23,7 +23,7 @@ export const useWereadShelf = () => {
     errorMessage.value = '';
     try {
       const res = await wereadGateway.getUserShelf();
-      if (res.status === 'success' && res.data) {
+      if (res.data) {
         books.value = res.data.user_books;
       } else {
         throw new Error(res.message || '获取书架失败');
@@ -43,12 +43,8 @@ export const useWereadShelf = () => {
   const handleSync = async (): Promise<void> => {
     isSyncing.value = true;
     try {
-      const res = await wereadGateway.syncMyBooks();
-      if (res.status === 'success') {
-        await fetchBooks();
-      } else {
-        throw new Error(res.message || '同步失败');
-      }
+      await wereadGateway.syncMyBooks();
+      await fetchBooks();
     } catch (err: unknown) {
       const error = err as {
         response?: { data?: { message?: string } };

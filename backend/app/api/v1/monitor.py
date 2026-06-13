@@ -23,7 +23,7 @@ async def get_overview(
 ):
     payload = await monitor_service.get_overview(days)
 
-    return APIResponse.ok(
+    return APIResponse(
         data=payload,
         message="Visitor overview data retrieved successfully",
     )
@@ -39,7 +39,7 @@ async def get_visitors(
 ):
     payload = await monitor_service.get_visitors(days, page, page_size)
 
-    return APIResponse.ok(
+    return APIResponse(
         data=payload,
         message="Visitor list retrieved successfully",
     )
@@ -55,7 +55,7 @@ async def get_user_logins(
 ):
     payload = await monitor_service.get_user_logins(days, page, page_size)
 
-    return APIResponse.ok(
+    return APIResponse(
         data=payload,
         message="User login logs retrieved successfully",
     )
@@ -68,7 +68,7 @@ async def get_server_status(
 ):
     payload = await monitor_service.get_server_status()
 
-    return APIResponse.ok(
+    return APIResponse(
         data=payload,
         message="Server status retrieved successfully",
     )

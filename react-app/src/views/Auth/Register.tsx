@@ -132,7 +132,7 @@ export default function Register() {
         email_code: form.emailCode,
       });
 
-      if (response.data.status === 'success') {
+      if (response.data) {
         navigate('/login');
         notifier.success('注册成功！请使用您的账号登录');
       }

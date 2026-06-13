@@ -33,11 +33,11 @@ router = APIRouter(tags=["public"])
 @router.get("/status")
 async def get_api_status(
     public_service: PublicService = Depends(public_service_dep),
-) -> APIResponse:
+):
     """Get API status.
 
     Returns:
-        APIResponse: API running status
+        ORJSONResponse: API running status
 
     Example:
         {
@@ -47,7 +47,7 @@ async def get_api_status(
         }
     """
 
-    return APIResponse.ok(
+    return APIResponse(
         data=public_service.get_api_status(),
         message="API is running",
     )
@@ -56,7 +56,7 @@ async def get_api_status(
 @router.get("/status-detail")
 async def get_status_detail(
     public_service: PublicService = Depends(public_service_dep),
-) -> JSONResponse:
+) -> APIResponse:
     """Public status detail endpoint for the status page.
 
     Returns version info, service metrics, and system info.
@@ -65,7 +65,7 @@ async def get_status_detail(
     async with get_async_session() as session:
         data = await public_service.get_status_detail(session)
 
-    return APIResponse.ok(
+    return APIResponse(
         data=data,
         message="Status detail retrieved successfully",
     )
@@ -124,15 +124,15 @@ async def add_like(
     likes_count: int = Body(
         ..., gt=0, embed=True, description="Number of likes to add"
     ),
-) -> JSONResponse:
+) -> APIResponse:
     """Add a like to the site.
 
     Returns:
-        JSONResponse: Current total likes count
+        APIResponse: Current total likes count
     """
     total = await PublicService.add_like(redis, likes_count)
 
-    return APIResponse.ok(
+    return APIResponse(
         data={"likes_count": total},
         message="Like added successfully",
     )
@@ -141,22 +141,22 @@ async def add_like(
 @router.get("/likes")
 async def get_likes(
     redis: AsyncRedis = Depends(get_redis),
-) -> JSONResponse:
+) -> APIResponse:
     """Get total likes count.
 
     Returns:
-        JSONResponse: Current total likes count
+        APIResponse: Current total likes count
     """
     total_likes = await PublicService.get_likes(redis)
 
-    return APIResponse.ok(
+    return APIResponse(
         data={"likes_count": total_likes},
         message="Likes count retrieved successfully",
     )
 
 
 @router.get("/amap/security-key")
-async def get_amap_security_key(request: Request) -> JSONResponse:
+async def get_amap_security_key(request: Request) -> APIResponse:
     """获取高德地图安全密钥，用于前端调用高德地图相关接口时的安全验证。
 
     该接口暴露给客户端是安全的，因为：
@@ -177,7 +177,7 @@ async def get_amap_security_key(request: Request) -> JSONResponse:
 
     encoded_key = PublicService.get_amap_security_key()
 
-    return APIResponse.ok(data={"securityJsCode": encoded_key})
+    return APIResponse(data={"securityJsCode": encoded_key})
 
 
 @router.post("/geocode/regeo")
@@ -186,13 +186,13 @@ async def reverse_geocode(
     request: Request,
     location: str = Body(..., description="Location coordinates: lng,lat"),
     extensions: str = Body("base", description="Extensions type"),
-) -> JSONResponse:
+) -> APIResponse:
     """逆地理编码接口代理，根据经纬度坐标获取地址信息和兴趣点信息。
     已废弃，使用 /geo/v2/poi/lookup 替代。
     """
     data = await PublicService.reverse_geocode(location, extensions)
 
-    return APIResponse.ok(
+    return APIResponse(
         data=data,
         message="Reverse geocode completed successfully",
     )
@@ -203,7 +203,7 @@ async def upload_blog_image(
     request: Request,
     file: UploadFile = File(),
     user: User = Depends(manager),
-) -> JSONResponse:
+) -> APIResponse:
     """Upload blog image and return public URL."""
     if not file or not file.filename:
         raise APIError(
@@ -212,7 +212,7 @@ async def upload_blog_image(
         )
     relative_path = save_upload_image(file, f"gallery/{user.id}")
 
-    return APIResponse.ok(
+    return APIResponse(
         data={
             "url": f"/api/v1/media/{relative_path}",
             "filename": relative_path,
@@ -226,14 +226,14 @@ async def set_pic_gallery(
     redis: AsyncRedis = Depends(get_redis),
     images: GalleryInput = Body(..., description="List of image data to set"),
     public_service: PublicService = Depends(public_service_dep),
-) -> JSONResponse:
+) -> APIResponse:
     """Set picture gallery data."""
     try:
         await public_service.set_pic_gallery(
             redis=redis,
             images=images,
         )
-        return APIResponse.ok(
+        return APIResponse(
             message="Picture gallery updated successfully",
         )
     except Exception as exc:
@@ -251,7 +251,7 @@ async def get_pic_gallery(
     """从图像库中获取图片列表。"""
     try:
         images = await public_service.get_pic_gallery(redis=redis)
-        return APIResponse.ok(
+        return APIResponse(
             data={"images": images},
             message="Picture gallery retrieved successfully",
         )

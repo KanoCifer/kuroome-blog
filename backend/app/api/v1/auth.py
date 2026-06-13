@@ -9,7 +9,6 @@ from fastapi import (
     Depends,
     File,
     Request,
-    Response,
     UploadFile,
     status,
 )
@@ -24,7 +23,7 @@ from app.core.config import settings
 from app.core.container import UserServices
 from app.core.exceptions import APIError, GitHubAuthError
 from app.core.logger import logger
-from app.core.response import APIResponse
+from app.core.response import APIResponse, envelope_response
 from app.models.models import User
 from app.schemas.auth import (
     EmailSchema,
@@ -58,7 +57,7 @@ def _build_login_response(
     only handles HTTP presentation concerns (cookies, response envelope).
     """
     data["access_token"] = access_token
-    response: JSONResponse = APIResponse.ok(data=data, message=message)
+    response: JSONResponse = envelope_response(data=data, message=message)
     cookie_domain = settings.COOKIE_DOMAIN
     response.set_cookie(
         key="refresh_token",
@@ -102,7 +101,7 @@ async def refresh_token(
         )
     _, tokens = result
 
-    response: JSONResponse = APIResponse.ok(
+    response: JSONResponse = envelope_response(
         message="访问令牌已刷新",
         data={
             "access_token": tokens["access_token"],
@@ -160,7 +159,7 @@ async def logout(
     await user_service.logout(user)
 
     cookie_domain = settings.COOKIE_DOMAIN
-    response = APIResponse.ok(
+    response = envelope_response(
         message="已退出登录",
     )
     response.delete_cookie(key="refresh_token", domain=cookie_domain or None)
@@ -181,7 +180,7 @@ async def update_user_settings(
             code=status.HTTP_400_BAD_REQUEST,
         ) from None
 
-    return APIResponse.ok(
+    return APIResponse(
         data=result,
         message="Profile updated successfully.",
     )
@@ -195,7 +194,7 @@ async def upload_avatar(
 ):
     result = await user_service.upload_avatar(user, image)
 
-    return APIResponse.ok(
+    return APIResponse(
         data=result,
         message="Avatar uploaded successfully.",
     )
@@ -213,13 +212,13 @@ async def me(
             code=status.HTTP_404_NOT_FOUND,
         )
     user, profile = result
-    return APIResponse.ok(
+    return APIResponse(
         data=user_service.user_to_dict(user, profile),
         message="获取用户信息成功",
     )
 
 
-@router.post("/register")
+@router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register(
     data: RegisterIn,
     redis: AsyncRedis = Depends(get_redis),
@@ -238,14 +237,13 @@ async def register(
             code=status.HTTP_400_BAD_REQUEST,
         )
 
-    return APIResponse.ok(
+    return APIResponse(
         data={
             "id": user.id,
             "username": user.username,
             "is_admin": user.is_admin,
         },
         message="注册成功",
-        status_code=status.HTTP_201_CREATED,
     )
 
 
@@ -289,7 +287,7 @@ async def send_email_code(
             code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         ) from None
 
-    return APIResponse.ok(
+    return APIResponse(
         message="验证码发送成功，请检查您的邮箱! (如果未收到邮件，请检查垃圾邮件箱)",
     )
 
@@ -309,7 +307,7 @@ async def passkey_registration_options(
         options = await user_services.passkey.create_registration_options(
             redis, user
         )
-        return APIResponse.ok(
+        return APIResponse(
             data=options_to_json_dict(options),
             message="Passkey 注册选项生成成功",
         )
@@ -337,7 +335,7 @@ async def passkey_register(
     if error:
         raise APIError(message=error, code=status.HTTP_400_BAD_REQUEST)
 
-    return APIResponse.ok(message="Passkey 注册成功")
+    return APIResponse(message="Passkey 注册成功")
 
 
 @router.get("/passkey/authentication-options")
@@ -346,7 +344,7 @@ async def passkey_authentication_options(
     user_services: UserServices = Depends(user_services_dep),
 ):
     options = await user_services.passkey.create_options(redis)
-    return APIResponse.ok(
+    return APIResponse(
         data=options_to_json_dict(options),
         message="Passkey 认证选项生成成功",
     )
@@ -363,7 +361,7 @@ async def passkey_delete(
             message="您的账户尚未绑定Passkey",
             code=status.HTTP_400_BAD_REQUEST,
         )
-    return APIResponse.ok(message="Passkey 删除成功")
+    return APIResponse(message="Passkey 删除成功")
 
 
 @router.post("/passkey/authenticate")

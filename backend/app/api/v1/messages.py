@@ -28,13 +28,13 @@ async def get_messages(
     """Get approved messages from message board."""
     payload = await message_service.get_messages()
 
-    return APIResponse.ok(
+    return APIResponse(
         data=payload,
         message="Messages retrieved successfully",
     )
 
 
-@router.post("")
+@router.post("", status_code=status.HTTP_201_CREATED)
 @limiter.limit("10/minute")
 async def create_message(
     request: Request,
@@ -47,13 +47,7 @@ async def create_message(
 
     data = await message_service.create_message(message_in, is_admin)
 
-    return APIResponse.ok(
+    return APIResponse(
         data=data,
         message="Message submitted successfully, pending review",
-        status_code=status.HTTP_201_CREATED,
     )
-
-
-# =============================================================================
-# Message Board Admin APIs have been moved to admin.py
-# =============================================================================

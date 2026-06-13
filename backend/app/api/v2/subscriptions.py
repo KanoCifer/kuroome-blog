@@ -33,7 +33,7 @@ async def get_subscriptions(
         SubResponse.model_validate(sub).model_dump(mode="json")
         for sub in subscriptions
     ]
-    return APIResponse.ok(
+    return APIResponse(
         data={"subscriptions": response},
         message="获取订阅列表成功",
     )
@@ -53,7 +53,7 @@ async def get_upcoming_subscriptions(
         SubResponse.model_validate(sub).model_dump(mode="json")
         for sub in user_due_subs
     ]
-    return APIResponse.ok(
+    return APIResponse(
         data={"subscriptions": response},
         message="获取即将到期的订阅成功",
     )
@@ -63,14 +63,12 @@ async def get_upcoming_subscriptions(
 async def get_global_notification_config(
     current_user: User = Depends(manager),
     sub_service: SubService = Depends(sub_service_dep),
-) -> JSONResponse:
+) -> APIResponse:
     """获取用户的全局通知配置"""
     config = await sub_service.get_user_global_reminder_config(
         user_id=current_user.id
     )
-    return APIResponse.ok(
-        data={"config": config}, message="获取全局通知配置成功"
-    )
+    return APIResponse(data={"config": config}, message="获取全局通知配置成功")
 
 
 @router.put("/global-config")
@@ -78,14 +76,14 @@ async def update_global_notification_config(
     config_data: GlobalConfigIn,
     current_user: User = Depends(manager),
     sub_service: SubService = Depends(sub_service_dep),
-) -> JSONResponse:
+) -> APIResponse:
     """更新用户的全局通知配置"""
     updated_config = await sub_service.update_user_global_reminder_config(
         user_id=current_user.id, config_data=config_data.model_dump()
     )
     if updated_config is None:
         raise APIError(message="更新全局通知配置失败")
-    return APIResponse.ok(
+    return APIResponse(
         data={"config": updated_config}, message="更新全局通知配置成功"
     )
 
@@ -101,12 +99,12 @@ async def get_subscription(
         sub_id, current_user.id
     )
     response = SubResponse.model_validate(subscription).model_dump(mode="json")
-    return APIResponse.ok(
+    return APIResponse(
         data={"subscription": response}, message="获取订阅详情成功"
     )
 
 
-@router.post("")
+@router.post("", status_code=status.HTTP_201_CREATED)
 async def create_subscription(
     sub_data: CreateOneSubRequest,
     current_user: User = Depends(manager),
@@ -117,10 +115,9 @@ async def create_subscription(
         user_id=current_user.id, **sub_data.model_dump()
     )
     response = SubResponse.model_validate(subscription).model_dump(mode="json")
-    return APIResponse.ok(
+    return APIResponse(
         data={"subscription": response},
         message="创建订阅成功",
-        status_code=status.HTTP_201_CREATED,
     )
 
 
@@ -143,9 +140,7 @@ async def update_subscription(
         if updated_subscription
         else None
     )
-    return APIResponse.ok(
-        data={"subscription": response}, message="更新订阅成功"
-    )
+    return APIResponse(data={"subscription": response}, message="更新订阅成功")
 
 
 @router.delete("/{sub_id}")
@@ -158,7 +153,7 @@ async def delete_subscription(
     await sub_service.get_owned_subscription(sub_id, current_user.id)
     if not await sub_service.delete_subscription(sub_id):
         raise NotFoundError("删除订阅失败")
-    return APIResponse.ok(message="删除订阅成功")
+    return APIResponse(message="删除订阅成功")
 
 
 @router.patch("/{sub_id}/status")
@@ -176,7 +171,7 @@ async def update_subscription_status(
     response = SubResponse.model_validate(updated_subscription).model_dump(
         mode="json"
     )
-    return APIResponse.ok(
+    return APIResponse(
         data={"subscription": response}, message="更新订阅状态成功"
     )
 
@@ -198,7 +193,7 @@ async def update_subscription_reminders(
     response = SubResponse.model_validate(updated_subscription).model_dump(
         mode="json"
     )
-    return APIResponse.ok(
+    return APIResponse(
         data={"subscription": response}, message="更新订阅提醒成功"
     )
 
@@ -238,7 +233,7 @@ async def test_subscription_notification(
 
     success = any(result.values())
     if success:
-        return APIResponse.ok(
+        return APIResponse(
             data={"results": result}, message="测试通知发送成功"
         )
     raise APIError(message=f"测试通知发送失败，请检查渠道配置。结果: {result}")

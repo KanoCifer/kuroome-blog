@@ -21,7 +21,7 @@ class DevTaskReorder(BaseModel):
 @router.get("")
 async def get_tasks(
     service: DevTaskService = Depends(devtask_service_dep),
-) -> JSONResponse:
+) -> APIResponse:
     tasks = await service.get_all_tasks()
     grouped: dict[str, list[dict]] = {
         "todo": [],
@@ -32,24 +32,23 @@ async def get_tasks(
         td = t.model_dump(mode="json")
         td["id"] = str(t.id)
         grouped[t.status].append(td)
-    return APIResponse.ok(data={"tasks": grouped})
+    return APIResponse(data={"tasks": grouped})
 
 
-@router.post("")
+@router.post("", status_code=status.HTTP_201_CREATED)
 async def create_task(
     data: DevTaskCreate,
     user: User = Depends(manager),
     service: DevTaskService = Depends(devtask_service_dep),
-) -> JSONResponse:
+) -> APIResponse:
     task = await service.create_task(
         user_id=user.id, task_data=data.model_dump()
     )
     td = task.model_dump()
     td["id"] = str(task.id)
-    return APIResponse.ok(
+    return APIResponse(
         data={"task": td},
         message="DevTask created",
-        status_code=status.HTTP_201_CREATED,
     )
 
 
@@ -59,7 +58,7 @@ async def patch_task(
     data: DevTaskUpdate,
     user: User = Depends(manager),
     service: DevTaskService = Depends(devtask_service_dep),
-) -> JSONResponse:
+) -> APIResponse:
     try:
         updated = await service.update_task(
             user_id=user.id,
@@ -68,7 +67,7 @@ async def patch_task(
         )
         td = updated.model_dump()
         td["id"] = str(updated.id)
-        return APIResponse.ok(data={"task": td}, message="DevTask updated")
+        return APIResponse(data={"task": td}, message="DevTask updated")
     except ValueError as e:
         raise APIError(message=str(e), code=404) from e
 
@@ -78,10 +77,10 @@ async def delete_task(
     task_id: str,
     user: User = Depends(manager),
     service: DevTaskService = Depends(devtask_service_dep),
-) -> JSONResponse:
+) -> APIResponse:
     try:
         await service.delete_task(user.id, task_id)
-        return APIResponse.ok(message="DevTask deleted")
+        return APIResponse(message="DevTask deleted")
     except ValueError as e:
         raise APIError(message=str(e), code=404) from e
 
@@ -91,14 +90,14 @@ async def reorder_tasks(
     data: DevTaskReorder,
     user: User = Depends(manager),
     service: DevTaskService = Depends(devtask_service_dep),
-) -> JSONResponse:
+) -> APIResponse:
     tasks = await service.reorder_tasks(user.id, data.status, data.ordered_ids)
     task_dicts = []
     for t in tasks:
         td = t.model_dump()
         td["id"] = str(t.id)
         task_dicts.append(td)
-    return APIResponse.ok(
+    return APIResponse(
         data={"tasks": task_dicts},
         message="DevTasks reordered",
     )

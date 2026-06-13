@@ -121,7 +121,7 @@ async def get_fishing_index(
     redis: AsyncRedis = Depends(get_redis),
     weather_svc: WeatherService = Depends(weather_service_dep),
     service: FishingService = Depends(fishing_service_dep),
-) -> JSONResponse:
+) -> APIResponse:
     """
     获取指定地点的钓鱼指数
 
@@ -175,7 +175,7 @@ async def get_fishing_index(
         resp_data.location_name = weather_data.get("locationName")
         resp_data.tide_data = weather_data.get("tide")
 
-    return APIResponse.ok(data=resp_data.model_dump())
+    return APIResponse(data=resp_data.model_dump())
 
 
 @router.post("/feedback", response_model=FishingFeedbackResponse)
@@ -184,7 +184,7 @@ async def submit_feedback(
     background_tasks: BackgroundTasks,
     _: AsyncRedis = Depends(get_redis),
     service: FishingService = Depends(fishing_service_dep),
-) -> JSONResponse:
+) -> APIResponse:
     """
     提交钓鱼反馈
 
@@ -230,7 +230,7 @@ async def submit_feedback(
     # 自动训练检查（异步，不阻塞响应）
     background_tasks.add_task(service.auto_train_if_needed, source="all")
 
-    return APIResponse.ok(
+    return APIResponse(
         data=FishingFeedbackResponse(
             success=True,
             record_id=str(record_id),
@@ -244,17 +244,17 @@ async def submit_feedback(
 @router.get("/stats")
 async def get_fishing_stats(
     service: FishingService = Depends(fishing_service_dep),
-) -> JSONResponse:
+) -> APIResponse:
     """获取钓鱼统计数据（总记录数 + 最近记录时间）"""
     stats = await service.get_stats()
-    return APIResponse.ok(data=stats)
+    return APIResponse(data=stats)
 
 
 @router.get("/weights")
 async def get_weights(
     _: User = Depends(manager),
     service: FishingService = Depends(fishing_service_dep),
-) -> APIResponse:
+):
     """
     查看模型权重
 
@@ -263,7 +263,7 @@ async def get_weights(
     expert_weights = service.expert.WEIGHTS
     residual_weights = service.model_svc.get_weights()
 
-    return APIResponse.ok(
+    return APIResponse(
         data={
             "expert_weights": expert_weights,
             "residual_weights": residual_weights,

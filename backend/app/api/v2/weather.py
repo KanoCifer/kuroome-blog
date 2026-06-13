@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Query
-from fastapi.responses import JSONResponse
 from redis.asyncio import Redis as AsyncRedis
 
 from app.api.des.des import weather_service_dep
@@ -20,17 +19,17 @@ async def get_qweather_tide(
     harbor: str = Query("P2352", description="港口代码"),
     redis: AsyncRedis = Depends(get_redis),
     weather_svc: WeatherService = Depends(weather_service_dep),
-) -> JSONResponse:
+) -> APIResponse:
     """获取潮汐数据。"""
     data, from_cache = await weather_svc.get_qweather_tide(
         redis=redis, harbor=harbor, date=date
     )
     if from_cache:
-        return APIResponse.ok(
+        return APIResponse(
             data=data,
             message="Tide information retrieved from cache",
         )
-    return APIResponse.ok(
+    return APIResponse(
         data=data,
         message="Tide information retrieved successfully",
     )
@@ -43,12 +42,12 @@ async def get_full_weather_data(
     ),
     redis: AsyncRedis = Depends(get_redis),
     weather_svc: WeatherService = Depends(weather_service_dep),
-) -> JSONResponse:
+) -> APIResponse:
     """通过经纬度坐标获取完整的天气数据。"""
     raw_data = await weather_svc.get_full_weather_data(
         location=location, redis=redis
     )
-    return APIResponse.ok(
+    return APIResponse(
         data=raw_data,
         message="Full weather data retrieved successfully",
     )

@@ -51,7 +51,7 @@ export const useReadStatsStore = create<ReadStatsState>((set, get) => ({
         const next = { ...get().snapshotMap };
         ALL_MODES.forEach((m, i) => {
           const r = results[i];
-          if (r.status === 'success' && r.data) {
+          if (r.data) {
             next[snapshotKey(m, null)] = r.data;
           }
         });
@@ -60,7 +60,7 @@ export const useReadStatsStore = create<ReadStatsState>((set, get) => ({
       }
 
       const res = await wereadService.getReadProgress(mode, baseTime);
-      if (res.status === 'success' && res.data) {
+      if (res.data) {
         set({
           snapshotMap: {
             ...get().snapshotMap,
@@ -91,7 +91,7 @@ export const useReadStatsStore = create<ReadStatsState>((set, get) => ({
     try {
       const maxIdx = reset ? 0 : get().recommendMaxIdx;
       const res = await wereadService.getBooksRecommend(count, maxIdx);
-      if (res.status !== 'success' || !res.data) {
+      if (!res.data) {
         throw new Error(res.message || '获取推荐失败');
       }
       const list = res.data;
