@@ -17,14 +17,17 @@
 - Desktop: Vue 3 (`frontend/`), Mobile: React 19 (`react-app/`)
 - **双前端架构**: Vue + React 共享后端服务，各自维护独立状态 Store；API 契约修改需同步两端
 - 修改 `backend/app/schemas/` 后，必须同步 `frontend/src/api/` 和 `react-app/src/services/`。
+- 缓存模块在 `app/plugins/cache/`（不在 `app/utils/`）。端点用 `@redis_cache(ttl=N, exclude=[...])`，`exclude` 跳过 Depends 参数（不参与 cache key）
 
 ## 3) Documentation Index
 
 始终加载的规则（`.claude/rules/`）：
+
 - [commands.md](.claude/rules/commands.md) — 所有构建/测试/格式化命令
 - [architecture.md](.claude/rules/architecture.md) — 架构分层、API 约定、关键约束
 
 按需查阅（`docs/rules/`，Claude 会在相关任务中主动读取）：
+
 - [code-style.md](docs/rules/code-style.md) — 代码风格规范
 - [design-system.md](docs/rules/design-system.md) — 语义化 token、组件样式规则、禁止事项
 - [domain.md](docs/rules/domain.md) — 领域词汇表

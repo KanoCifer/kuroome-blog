@@ -26,8 +26,8 @@ from app.models.message import MessageBoard
 from app.models.rss import RssArticle
 from app.models.subscription import SubscriptionLog
 from app.models.weread import Archive, User, UserBook, WereadBook
-from app.router import register_router, setup_media
 from app.plugins.cache import close_cache_redis
+from app.router import register_router, setup_media
 from app.tasks import broker, send_feishu_message
 
 

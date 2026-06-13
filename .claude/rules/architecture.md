@@ -20,6 +20,7 @@ Vue (`frontend/`) and React (`react-app/`) share backend services but maintain i
 - `schemas/` — Pydantic request/response models
 - `core/` — config, security, exceptions, logging
 - `tasks/` — background jobs (Taskiq + APScheduler)
+- `plugins/` — 可插拔横切模块（如 `cache/`），结构：`<name>/__init__.py` 重新导出公开 API + `<name>/<name>.py` 实现
 
 ## API Conventions
 

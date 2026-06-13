@@ -11,8 +11,8 @@ from app.api.des.auth import manager
 from app.api.des.des import weread_service_dep
 from app.core.exceptions import APIError
 from app.core.response import APIResponse
-from app.schemas.weread import SaveUserInfoIn
 from app.plugins.cache import redis_cache
+from app.schemas.weread import SaveUserInfoIn
 
 router = APIRouter(prefix="/weread", tags=["weread"])
 

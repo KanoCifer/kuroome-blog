@@ -27,8 +27,7 @@ class AsyncCache:
     ) -> Any:
         """支持 @cache 和 @cache(ttl=xx) 两种用法。
 
-        缓存层只认 Pydantic/dict，端点不应返回 ``ORJSONResponse``
-        （手写 Response 多用于 set_cookie，本身就不该被缓存）。
+        缓存层只认 Pydantic/dict
         """
         excluded = set(exclude or [])
 
@@ -83,10 +82,7 @@ class AsyncCache:
         """
         try:
             keys: list[str] = [
-                k
-                async for k in self.redis.scan_iter(
-                    match=pattern, count=200
-                )
+                k async for k in self.redis.scan_iter(match=pattern, count=200)
             ]
         except Exception:
             logger.exception(f"Cache scan failed for {pattern!r}")
