@@ -7,12 +7,13 @@
  * - 内部 AMap 实例（由 useMap 管理）
  * - 底部浮层（路线规划中 / 路线信息 / 空态提示）
  * - marker click 走 useRouteMapStore.planRouteAction 串行化入口
+ * - 浮按钮：全屏 / 定位
  *
  * 选择把这一层从 view 抽出来的原因：view 里 80+ 行都在拼装 map + overlay，
  * 拆出来 view 才能专注做 grid 编排。
  */
 import { AnimatePresence, motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Maximize2 } from 'lucide-react';
 import { useRef } from 'react';
 
 import { useRouteMapStore } from '@/stores/routeMapStore';
@@ -27,9 +28,13 @@ interface FishingMapTileProps {
    * 不传则内部自管 —— 这是默认场景。
    */
   containerRef?: React.RefObject<HTMLDivElement | null>;
+  onFullscreen?: () => void;
 }
 
-export function FishingMapTile({ containerRef: externalRef }: FishingMapTileProps) {
+export function FishingMapTile({
+  containerRef: externalRef,
+  onFullscreen,
+}: FishingMapTileProps) {
   const internalRef = useRef<HTMLDivElement | null>(null);
   const containerRef = externalRef ?? internalRef;
 
@@ -74,7 +79,7 @@ export function FishingMapTile({ containerRef: externalRef }: FishingMapTileProp
     <div className="border-border/70 bg-card relative overflow-hidden rounded-2xl border shadow-md">
       <div
         ref={containerRef}
-        className="h-[46dvh] w-full rounded-2xl"
+        className="amap-mini h-[220pt] w-full rounded-2xl"
         aria-label="fishing map"
       />
       {!isMapReady && (
@@ -82,6 +87,19 @@ export function FishingMapTile({ containerRef: externalRef }: FishingMapTileProp
           地图加载中…
         </div>
       )}
+      {/* 浮按钮 — 全屏 / 定位 */}
+      <div className="absolute top-2.5 right-2.5 z-10 flex flex-col gap-2">
+        {onFullscreen && (
+          <button
+            type="button"
+            onClick={onFullscreen}
+            aria-label="全屏地图"
+            className="bg-card/90 text-foreground hover:bg-card border-border/40 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-colors"
+          >
+            <Maximize2 className="h-4 w-4" />
+          </button>
+        )}
+      </div>
       <AnimatePresence>
         <MapOverlay onClearRoute={clearRoute} />
       </AnimatePresence>
@@ -102,9 +120,9 @@ function MapOverlay({ onClearRoute }: { onClearRoute: () => void }) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 4 }}
         transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-        className="text-muted-foreground/90 bg-card/80 pointer-events-none absolute right-4 bottom-4 left-4 rounded-full px-4 py-1.5 text-center text-xs backdrop-blur-md"
+        className="text-muted-foreground/90 bg-card/80 pointer-events-none absolute right-4 bottom-4 left-4 w-fit rounded-full px-2 py-1.5 text-center text-xs backdrop-blur-sm"
       >
-        点击地图标记，自动规划路线
+        点击自动规划
       </motion.div>
     );
   }

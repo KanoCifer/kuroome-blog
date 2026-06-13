@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FishingMap · iPhone Redesign · Variant 2 (Editorial 出版风)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,700;1,6..72,300;1,6..72,400&family=Noto+Serif+SC:wght@300;400;500;700;900&family=Noto+Sans+SC:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #f4efe6;
+      --paper-2: #ede4d3;
+      --ink: #1a1814;
+      --ink-2: #5b554a;
+      --ink-3: #8c8676;
+      --hairline: rgba(26, 24, 20, 0.12);
+      --accent: #b8491c;
+      --accent-2: #d4a06a;
+      --moss: #4a5d3a;
+      --water: #4a7080;
+      --font-disp: "Newsreader", "Noto Serif SC", "Songti SC", serif;
+      --font-body: "Noto Serif SC", "Newsreader", serif;
+      --font-mono: "JetBrains Mono", "SF Mono", monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: #d8cfbf; font-family: var(--font-body); color: var(--ink); }
+    body { padding: 32px 24px 80px; }
+    h1.spec-title { font-family: var(--font-disp); font-size: 28px; font-weight: 500; font-style: italic; letter-spacing: -0.01em; margin: 0 0 4px; }
+    .spec-sub { font-size: 13px; color: var(--ink-2); margin: 0 0 32px; max-width: 720px; line-height: 1.5; }
+    .logic-pill { display: inline-block; font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 0; border: 1px solid var(--ink); color: var(--ink); margin-left: 12px; vertical-align: middle; }
+    .row { display: flex; flex-wrap: wrap; gap: 32px; padding: 16px 0 24px; align-items: flex-start; justify-content: center; }
+    .phone-slot { display: flex; flex-direction: column; align-items: center; }
+    .phone-label { font-family: var(--font-disp); font-size: 13px; font-style: italic; color: var(--ink-2); margin: 0 0 12px; letter-spacing: 0.01em; max-width: 250px; text-align: center; }
+    .legend { background: var(--paper); border: 1px solid var(--hairline); border-radius: 0; padding: 16px 20px; margin: 32px auto 0; font-size: 12px; line-height: 1.7; color: var(--ink-2); max-width: 760px; font-family: var(--font-body); }
+    .legend strong { color: var(--ink); font-weight: 600; }
+    .iphone { display: inline-block; padding: 10px; background: #1a1814; border-radius: 50px; box-shadow: 0 0 0 1.5px #2a2520, 0 18px 50px rgba(0,0,0,0.25); }
+    .iphone .screen { position: relative; border-radius: 40px; overflow: hidden; background: var(--paper); width: 393px; height: 852px; }
+    .iphone .status { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; font-family: -apple-system, sans-serif; font-size: 16px; font-weight: 600; color: var(--ink); z-index: 20; pointer-events: none; }
+    .iphone .island { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 124px; height: 36px; background: #1a1814; border-radius: 999px; z-index: 30; }
+    .iphone .content { position: absolute; top: 54px; left: 0; right: 0; bottom: 34px; overflow: hidden; }
+    .iphone .home { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); width: 140px; height: 5px; background: rgba(26,24,20,0.4); border-radius: 999px; z-index: 10; }
+    .app { width: 100%; height: 100%; background: var(--paper); display: flex; flex-direction: column; }
+    .app-header { padding: 14px 22px 10px; border-bottom: 0.5px solid var(--hairline); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .app-header .title { display: flex; align-items: baseline; gap: 8px; }
+    .app-header .title h1 { font-family: var(--font-disp); font-style: italic; font-size: 22px; font-weight: 500; margin: 0; letter-spacing: -0.01em; }
+    .app-header .title .dot { font-size: 18px; color: var(--ink-2); }
+    .app-header .title .sub { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-2); }
+    .app-header .ai-btn { display: inline-flex; align-items: center; gap: 4px; padding: 6px 10px; min-height: 30px; border-radius: 999px; background: transparent; color: var(--ink); font-family: var(--font-body); font-size: 12px; font-weight: 500; border: 1px solid var(--ink); cursor: pointer; }
+    .app-header .ai-btn .dot { width: 6px; height: 6px; border-radius: 999px; background: var(--accent); }
+    .app-body { flex: 1; overflow-y: auto; padding: 0 22px 60px; }
+    .chapter-mark { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-3); margin: 28px 0 8px; }
+    .map-frame { position: relative; height: 200px; background: linear-gradient(180deg, #d8c9a7 0%, #c2b08b 100%); border: 0.5px solid var(--ink); border-radius: 2px; overflow: hidden; }
+    .map-frame .water { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(74,112,128,0.35), rgba(74,112,128,0.55)); }
+    .map-frame .land { position: absolute; inset: 0; background: radial-gradient(ellipse 40% 30% at 30% 80%, rgba(74,93,58,0.45), transparent 60%), radial-gradient(ellipse 35% 25% at 75% 25%, rgba(74,93,58,0.35), transparent 60%); }
+    .map-frame .grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(26,24,20,0.08) 0.5px, transparent 0.5px), linear-gradient(90deg, rgba(26,24,20,0.08) 0.5px, transparent 0.5px); background-size: 20px 20px; }
+    .map-frame .compass { position: absolute; top: 12px; left: 12px; width: 28px; height: 28px; border-radius: 50%; background: var(--paper); border: 0.5px solid var(--ink); display: flex; align-items: center; justify-content: center; font-family: var(--font-disp); font-size: 12px; font-style: italic; color: var(--ink); }
+    .map-frame .marker { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 1.5px solid var(--paper); transform: translate(-50%, -50%); box-shadow: 0 0 0 1px var(--accent); }
+    .map-frame .marker.blue { background: var(--water); box-shadow: 0 0 0 1px var(--water); }
+    .map-frame .marker.active { width: 22px; height: 22px; background: var(--accent); }
+    .map-frame .marker.active::after { content: "1"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--paper); font-family: var(--font-disp); font-style: italic; font-size: 13px; font-weight: 700; }
+    .map-frame .route { position: absolute; top: 45%; left: 30%; width: 45%; height: 0; border-top: 1.5px dashed var(--ink); transform: rotate(12deg); transform-origin: left center; }
+    .map-frame .ctrl { position: absolute; width: 36px; height: 36px; border-radius: 0; background: var(--paper); border: 0.5px solid var(--ink); display: flex; align-items: center; justify-content: center; font-family: var(--font-disp); font-style: italic; font-size: 16px; cursor: pointer; }
+    .map-frame .full { top: 12px; right: 12px; }
+    .map-frame .locate { bottom: 12px; right: 12px; }
+    .map-frame .route-pill { position: absolute; bottom: 12px; left: 12px; padding: 6px 12px; background: var(--ink); color: var(--paper); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.05em; }
+    .map-frame .route-pill .num { font-family: var(--font-disp); font-size: 16px; font-style: italic; }
+    .section { margin: 28px 0 0; padding-top: 24px; border-top: 0.5px solid var(--hairline); }
+    .section h2 { font-family: var(--font-disp); font-style: italic; font-size: 28px; font-weight: 500; margin: 0 0 4px; letter-spacing: -0.01em; }
+    .section .lede { font-size: 13px; color: var(--ink-2); margin: 0 0 16px; line-height: 1.5; font-style: italic; }
+    .index-num { display: flex; align-items: baseline; gap: 16px; margin: 8px 0 18px; padding-bottom: 16px; border-bottom: 0.5px solid var(--hairline); }
+    .index-num .big { font-family: var(--font-disp); font-style: italic; font-size: 80px; font-weight: 300; line-height: 0.9; color: var(--accent); letter-spacing: -0.04em; }
+    .index-num .side { display: flex; flex-direction: column; gap: 2px; }
+    .index-num .verdict { font-family: var(--font-disp); font-style: italic; font-size: 22px; color: var(--accent); }
+    .index-num .stamp { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-3); }
+    .index-num .quote { font-family: var(--font-disp); font-style: italic; font-size: 14px; color: var(--ink-2); max-width: 160px; line-height: 1.4; margin-top: 6px; }
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-bottom: 18px; border-top: 0.5px solid var(--hairline); border-bottom: 0.5px solid var(--hairline); }
+    .metrics > div { padding: 12px 8px; text-align: center; border-right: 0.5px solid var(--hairline); }
+    .metrics > div:last-child { border-right: 0; }
+    .metrics .k { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-3); }
+    .metrics .v { font-family: var(--font-disp); font-style: italic; font-size: 24px; font-weight: 500; color: var(--ink); margin-top: 2px; }
+    .actions { display: flex; gap: 0; }
+    .actions button { flex: 1; padding: 16px; min-height: 48px; font-family: var(--font-disp); font-style: italic; font-size: 15px; cursor: pointer; }
+    .actions .primary { background: var(--ink); color: var(--paper); border: 0; }
+    .actions .secondary { background: transparent; color: var(--ink); border: 0.5px solid var(--ink); border-left: 0; }
+    .wx-head { display: flex; justify-content: space-between; align-items: flex-end; margin: 0 0 12px; }
+    .wx-loc { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-2); }
+    .wx-temp { font-family: var(--font-disp); font-style: italic; font-size: 56px; line-height: 0.9; font-weight: 300; letter-spacing: -0.04em; }
+    .wx-temp .deg { color: var(--ink-3); }
+    .wx-state { font-family: var(--font-disp); font-style: italic; font-size: 18px; color: var(--ink-2); margin-bottom: 14px; }
+    .wx-rows { display: flex; flex-direction: column; gap: 0; }
+    .wx-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 0.5px solid var(--hairline); }
+    .wx-row:last-child { border-bottom: 0.5px solid var(--hairline); }
+    .wx-row .k { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-2); }
+    .wx-row .v { font-family: var(--font-disp); font-style: italic; font-size: 16px; font-weight: 500; }
+    .wx-row .v.green { color: var(--moss); }
+    .wx-forecast { display: flex; gap: 0; margin-top: 14px; border-top: 0.5px solid var(--hairline); border-bottom: 0.5px solid var(--hairline); }
+    .wx-forecast .day { flex: 1; padding: 10px 2px; text-align: center; border-right: 0.5px solid var(--hairline); }
+    .wx-forecast .day:last-child { border-right: 0; }
+    .wx-forecast .day .when { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-2); }
+    .wx-forecast .day .ic { font-size: 20px; margin: 4px 0; }
+    .wx-forecast .day .t { font-family: var(--font-disp); font-style: italic; font-size: 13px; }
+    .wx-forecast .day.active { background: var(--ink); color: var(--paper); }
+    .wx-forecast .day.active .when { color: var(--paper-2); }
+    .chips { display: flex; gap: 8px; margin: 14px 0 12px; flex-wrap: nowrap; overflow-x: auto; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip { flex-shrink: 0; padding: 6px 12px; min-height: 30px; font-family: var(--font-disp); font-style: italic; font-size: 13px; color: var(--ink); background: transparent; border: 0.5px solid var(--ink); border-radius: 999px; cursor: pointer; }
+    .chip.active { background: var(--ink); color: var(--paper); }
+    .tide-chart { height: 120px; background: var(--paper-2); border: 0.5px solid var(--hairline); padding: 12px 8px; position: relative; }
+    .tide-chart svg { width: 100%; height: 100%; }
+    .tide-foot { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 12px; }
+    .tide-foot > div { padding: 8px 0; border-top: 0.5px solid var(--ink); }
+    .tide-foot .k { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-2); }
+    .tide-foot .v { font-family: var(--font-disp); font-style: italic; font-size: 22px; font-weight: 500; }
+    .tide-foot .v.water { color: var(--water); }
+    .tide-foot .v.moss { color: var(--moss); }
+    .hour-chart { height: 100px; background: var(--paper-2); border: 0.5px solid var(--hairline); padding: 10px 6px; position: relative; margin-top: 10px; }
+    .hour-chart svg { width: 100%; height: 100%; }
+    .hour-legend { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-2); display: flex; gap: 14px; }
+    .hour-legend .sw { display: inline-block; width: 8px; height: 2px; margin-right: 4px; vertical-align: middle; }
+    .hour-legend .sw.r { background: var(--water); }
+    .hour-legend .sw.t { background: var(--accent); }
+    .sheet-backdrop { position: absolute; inset: 0; background: rgba(26,24,20,0.5); z-index: 30; }
+    .sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 40; background: var(--paper); border-top: 0.5px solid var(--ink); max-height: 88%; display: flex; flex-direction: column; }
+    .sheet-handle { width: 32px; height: 2px; background: var(--ink); margin: 8px auto 4px; }
+    .sheet-head { padding: 4px 22px 16px; border-bottom: 0.5px solid var(--hairline); }
+    .sheet-head h2 { font-family: var(--font-disp); font-style: italic; font-size: 26px; font-weight: 500; margin: 0; letter-spacing: -0.01em; }
+    .sheet-head .sub { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-2); margin-top: 4px; }
+    .sheet-body { flex: 1; overflow-y: auto; padding: 18px 22px 28px; }
+    .ai-status { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+    .ai-stream { background: var(--paper-2); border-left: 2px solid var(--accent); padding: 14px 16px; font-size: 14px; line-height: 1.7; color: var(--ink); font-family: var(--font-body); white-space: pre-wrap; }
+    .ai-model { width: 100%; padding: 10px 0; min-height: 38px; border: 0; border-bottom: 0.5px solid var(--ink); background: transparent; font-family: var(--font-disp); font-style: italic; font-size: 14px; color: var(--ink); margin-top: 14px; }
+    .ai-cta { width: 100%; padding: 16px; min-height: 48px; background: var(--ink); color: var(--paper); border: 0; font-family: var(--font-disp); font-style: italic; font-size: 16px; margin-top: 16px; cursor: pointer; }
+    .fb-info { font-family: var(--font-disp); font-style: italic; font-size: 16px; line-height: 1.7; color: var(--ink); margin-bottom: 18px; padding-bottom: 14px; border-bottom: 0.5px solid var(--hairline); }
+    .fb-info .accent { color: var(--accent); }
+    .fb-choices { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin-bottom: 18px; border-top: 0.5px solid var(--ink); border-bottom: 0.5px solid var(--ink); }
+    .fb-choice { min-height: 64px; background: transparent; border: 0; border-right: 0.5px solid var(--hairline); font-family: var(--font-disp); font-style: italic; font-size: 14px; color: var(--ink); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+    .fb-choice:last-child { border-right: 0; }
+    .fb-choice.selected { background: var(--ink); color: var(--paper); }
+    .fb-actions { display: flex; gap: 0; }
+    .fb-actions button { flex: 1; padding: 16px; min-height: 48px; font-family: var(--font-disp); font-style: italic; font-size: 15px; cursor: pointer; }
+    .fb-actions .cancel { background: transparent; color: var(--ink); border: 0.5px solid var(--ink); border-right: 0; }
+    .fb-actions .submit { background: var(--ink); color: var(--paper); border: 0; }
+    .feat-list { display: flex; flex-direction: column; gap: 0; }
+    .feat { padding: 12px 0; border-top: 0.5px solid var(--hairline); display: flex; align-items: center; gap: 12px; }
+    .feat:last-child { border-bottom: 0.5px solid var(--ink); }
+    .feat .k { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-2); width: 60px; }
+    .feat .bar { flex: 1; height: 2px; background: var(--hairline); position: relative; }
+    .feat .bar div { position: absolute; left: 0; top: 0; height: 100%; background: var(--accent); }
+    .feat .v { font-family: var(--font-disp); font-style: italic; font-size: 18px; width: 36px; text-align: right; }
+    .map-fs { position: absolute; inset: 0; background: linear-gradient(180deg, #d8c9a7 0%, #c2b08b 100%); z-index: 20; }
+    .map-fs .water { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(74,112,128,0.4), rgba(74,112,128,0.6)); }
+    .map-fs .land { position: absolute; inset: 0; background: radial-gradient(ellipse 40% 30% at 30% 80%, rgba(74,93,58,0.45), transparent 60%), radial-gradient(ellipse 35% 25% at 75% 25%, rgba(74,93,58,0.35), transparent 60%); }
+    .map-fs .grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(26,24,20,0.08) 0.5px, transparent 0.5px), linear-gradient(90deg, rgba(26,24,20,0.08) 0.5px, transparent 0.5px); background-size: 24px 24px; }
+    .map-fs .pin { position: absolute; width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--paper); display: flex; align-items: center; justify-content: center; font-family: var(--font-disp); font-style: italic; font-size: 14px; font-weight: 700; transform: translate(-50%, -50%); }
+    .map-fs .pin.r { background: var(--accent); color: var(--paper); }
+    .map-fs .pin.b { background: var(--water); color: var(--paper); }
+    .map-fs .route { position: absolute; top: 38%; left: 32%; width: 50%; height: 0; border-top: 1.5px dashed var(--ink); transform: rotate(15deg); transform-origin: left center; }
+    .map-fs .close-fs { position: absolute; top: 60px; right: 12px; width: 38px; height: 38px; background: var(--paper); border: 0.5px solid var(--ink); display: flex; align-items: center; justify-content: center; font-family: var(--font-disp); font-size: 18px; cursor: pointer; z-index: 5; }
+    .map-fs .info { position: absolute; top: 110px; left: 12px; right: 60px; background: var(--paper); border: 0.5px solid var(--ink); padding: 12px 16px; }
+    .map-fs .info .name { font-family: var(--font-disp); font-style: italic; font-size: 18px; font-weight: 500; }
+    .map-fs .info .meta { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-2); margin-top: 4px; }
+    .map-fs .info .dist { font-family: var(--font-disp); font-style: italic; font-size: 13px; color: var(--accent); margin-top: 6px; }
+    .footer-line { text-align: center; font-family: var(--font-disp); font-style: italic; font-size: 13px; color: var(--ink-2); margin: 32px 0 16px; }
+    .footer-line::before, .footer-line::after { content: "—"; margin: 0 12px; color: var(--ink-3); }
+  </style>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <h1 class="spec-title">FishingMap · iPhone Redesign <span class="logic-pill">V2 · Editorial 出版物</span></h1>
+  <p class="spec-sub">以「在出钓与阅读之间, 留一片安静」为情感主线 · Newsreader 斜体 + Noto Serif SC 中文 · 米色 paper + 一个 rust orange accent · 卡片之间 hairline 而非阴影 · 数字用斜体大字 · 信息密度偏克制</p>
+
+  <div id="root"></div>
+
+  <div class="legend">
+    <strong>关键变化</strong>:
+    ① 字体: Newsreader 斜体做 display, Noto Serif SC 做中文 ·
+    ② 颜色: 米色 paper (#f4efe6) + ink (#1a1814) + rust accent (#b8491c), 无阴影只用 hairline ·
+    ③ 指数: 80pt 斜体大字 + 引语"今日宜出钓" ·
+    ④ 天气: 列表行 (k: 小写大写 mono label / v: 斜体) 替代卡片网格 ·
+    ⑤ 潮汐 chip / 24h 预报: 等宽 column border 分隔 ·
+    ⑥ Sheet: 衬线 h2 + 单色 ink 底 ·
+    ⑦ 反馈: 5 反馈选项纯文字 + 数字, 没有 emoji ·
+    ⑧ 整片节奏慢, 信息密度低于 v1, 跟「留一片安静」主题匹配
+  </div>
+
+  <script type="text/babel" data-presets="env,react">
+    const { useState } = React;
+
+    const LOC = "黄埔港 · 广州";
+    const TIDE_SPOTS = ["黄埔港", "大亚湾", "舟山", "青岛"];
+    const DATES = ["今日", "明日", "周三", "周四", "周五", "周六", "周日", "下周一"];
+    const FEEDBACK = ["爆护", "好", "一般", "差", "空军"];
+    const FEATURES = [
+      { k: "气温", v: "24°" },
+      { k: "湿度", v: "65%" },
+      { k: "气压", v: "1012" },
+      { k: "风速", v: "3.2 m/s" },
+      { k: "降水", v: "2 mm" },
+      { k: "涨潮", v: "18:24" },
+      { k: "距潮", v: "1.5h" },
+      { k: "潮差", v: "1.8 m" },
+      { k: "指数", v: "87" }
+    ];
+    const FEATURE_PCT = [80, 65, 70, 25, 5, 75, 50, 60, 87];
+    const FORECAST_ICONS = ["☀", "⛅", "🌧", "🌤", "☁", "⛅", "☀", "⛅"];
+
+    function IPhone({ children }) {
+      return (
+        <div className="iphone">
+          <div className="screen">
+            <div className="status">
+              <span>9:41</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 12 }}>
+                  <div style={{ width: 3, height: 4, background: "currentColor", borderRadius: 1 }} />
+                  <div style={{ width: 3, height: 6, background: "currentColor", borderRadius: 1 }} />
+                  <div style={{ width: 3, height: 9, background: "currentColor", borderRadius: 1 }} />
+                  <div style={{ width: 3, height: 11, background: "currentColor", borderRadius: 1 }} />
+                </div>
+                <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 11.5a1 1 0 100-2 1 1 0 000 2z" fill="currentColor" /><path d="M3 7.5a7 7 0 0110 0" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" /><path d="M1 4.5a11 11 0 0114 0" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" opacity="0.7" /></svg>
+                <div style={{ width: 26, height: 12, border: "1.5px solid currentColor", borderRadius: 3, padding: 1, position: "relative", opacity: 0.8 }}>
+                  <div style={{ width: "85%", height: "100%", background: "currentColor", borderRadius: 1, opacity: 0.9 }} />
+                </div>
+              </div>
+            </div>
+            <div className="island" />
+            <div className="content">{children}</div>
+            <div className="home" />
+          </div>
+        </div>
+      );
+    }
+
+    function AppHeader() {
+      return (
+        <div className="app-header">
+          <div className="title">
+            <h1>钓鱼地图</h1>
+            <span className="dot">·</span>
+            <span className="sub">黄埔港</span>
+          </div>
+          <button className="ai-btn">AI <span className="dot" /></button>
+        </div>
+      );
+    }
+
+    function ScreenMainTop() {
+      return (
+        <div className="app">
+          <AppHeader />
+          <div className="app-body">
+            <div className="chapter-mark">第一章 · 此刻</div>
+            <div className="map-frame">
+              <div className="grid" />
+              <div className="water" />
+              <div className="land" />
+              <div className="compass">N</div>
+              <div className="marker active" style={{ top: "55%", left: "30%" }} />
+              <div className="marker blue" style={{ top: "30%", left: "65%" }} />
+              <div className="marker" style={{ top: "70%", left: "80%" }} />
+              <div className="route" />
+              <div className="ctrl full">⤢</div>
+              <div className="ctrl locate">◉</div>
+              <div className="route-pill"><span className="num">3.2</span> km</div>
+            </div>
+            <div className="section">
+              <h2>今日指数</h2>
+              <p className="lede">综合天气、潮汐、风力、降水 — 得出此刻的判断。</p>
+              <div className="index-num">
+                <div className="big">87</div>
+                <div className="side">
+                  <div className="verdict">爆护</div>
+                  <div className="stamp">FISHING INDEX · NOW</div>
+                  <div className="quote">「今日宜出钓」</div>
+                </div>
+              </div>
+              <div className="metrics">
+                <div><div className="k">默认</div><div className="v">82</div></div>
+                <div><div className="k">残差</div><div className="v">+5</div></div>
+                <div><div className="k">综合</div><div className="v">87</div></div>
+              </div>
+              <div className="actions">
+                <button className="primary">反馈今日指数</button>
+                <button className="secondary">详情</button>
+              </div>
+            </div>
+            <div className="footer-line">在出钓与阅读之间，留一片安静</div>
+          </div>
+        </div>
+      );
+    }
+
+    function ScreenMainScrolled() {
+      return (
+        <div className="app">
+          <AppHeader />
+          <div className="app-body">
+            <div className="chapter-mark">第二章 · 天气</div>
+            <div className="section" style={{ marginTop: 0, paddingTop: 0, borderTop: 0 }}>
+              <h2>晴 · 微风</h2>
+              <p className="lede">实时数据，2026 年 6 月 13 日午后。</p>
+              <div className="wx-head">
+                <div className="wx-loc">{LOC}</div>
+                <div className="wx-temp">24<span className="deg">°</span></div>
+              </div>
+              <div className="wx-state">体感 22°，东南风 3.2 m/s。</div>
+              <div className="wx-rows">
+                <div className="wx-row"><span className="k">体感</span><span className="v">22°</span></div>
+                <div className="wx-row"><span className="k">能见度</span><span className="v">15 km</span></div>
+                <div className="wx-row"><span className="k">风</span><span className="v">3.2 m/s · 东南</span></div>
+                <div className="wx-row"><span className="k">湿度</span><span className="v">65%</span></div>
+                <div className="wx-row"><span className="k">气压</span><span className="v green">1012 hPa · 正常</span></div>
+              </div>
+              <div className="wx-forecast">
+                {["今日", "明日", "周三", "周四", "周五", "周六", "周日"].map((d, i) => (
+                  <div className={`day ${i === 0 ? "active" : ""}`} key={d}>
+                    <div className="when">{d}</div>
+                    <div className="ic">{FORECAST_ICONS[i]}</div>
+                    <div className="t">{26 - i}°/{19 + (i % 2)}°</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="section">
+              <div className="chapter-mark" style={{ margin: "0 0 6px" }}>第三章 · 潮汐</div>
+              <h2>潮涨 · 潮落</h2>
+              <p className="lede">黄埔港 · 6 月 13 日 · 涨潮前 1.5 小时宜出钓。</p>
+              <div className="chips">
+                {TIDE_SPOTS.map((s, i) => <button className={`chip ${i === 0 ? "active" : ""}`} key={s}>{s}</button>)}
+              </div>
+              <div className="chips">
+                {DATES.map((d, i) => <button className={`chip ${i === 0 ? "active" : ""}`} key={d}>{d}</button>)}
+              </div>
+              <div className="tide-chart">
+                <svg viewBox="0 0 320 100" preserveAspectRatio="none">
+                  <defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#4a7080" stopOpacity="0.3" /><stop offset="1" stopColor="#4a7080" stopOpacity="0" /></linearGradient></defs>
+                  {(() => {
+                    const data = Array.from({ length: 24 }, (_, i) => 1.4 + Math.sin((i / 12) * Math.PI) * 1.0);
+                    const min = 0.3, max = 2.5, pad = 4, W = 320, H = 100;
+                    const pts = data.map((v, i) => [pad + (i / 23) * (W - pad * 2), H - pad - ((v - min) / (max - min)) * (H - pad * 2)]);
+                    const path = pts.map((p, i) => (i === 0 ? "M" : "L") + p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ");
+                    return <>
+                      <path d={path + ` L${pts[23][0]},${H - pad} L${pts[0][0]},${H - pad} Z`} fill="url(#tg)" />
+                      <path d={path} fill="none" stroke="#4a7080" strokeWidth="1.8" />
+                      <line x1={pts[0][0]} x2={pts[0][0]} y1={pad} y2={H - pad} stroke="#b8491c" strokeWidth="0.8" strokeDasharray="2 2" />
+                      <text x={pts[0][0] + 4} y={pad + 8} fontSize="8" fill="#b8491c" fontStyle="italic">现在</text>
+                    </>;
+                  })()}
+                </svg>
+              </div>
+              <div className="tide-foot">
+                <div><div className="k">↗ 最高 · 18:24</div><div className="v water">2.4 m</div></div>
+                <div><div className="k">↘ 最低 · 02:15</div><div className="v moss">0.3 m</div></div>
+              </div>
+            </div>
+
+            <div className="section">
+              <div className="chapter-mark" style={{ margin: "0 0 6px" }}>第四章 · 二十四小时</div>
+              <h2>风起 · 云涌</h2>
+              <p className="lede">未来 24 小时降水与温度趋势。</p>
+              <div className="hour-legend">
+                <span><span className="sw r" />降水</span>
+                <span><span className="sw t" />温度</span>
+              </div>
+              <div className="hour-chart">
+                <svg viewBox="0 0 320 100" preserveAspectRatio="none">
+                  {(() => {
+                    const pad = 4, W = 320, H = 100;
+                    const data = Array.from({ length: 24 }, (_, i) => ({ temp: 22 + Math.sin((i / 24) * Math.PI) * 6, rain: i > 12 && i < 18 ? Math.random() * 5 : 0.4 }));
+                    const barW = (W - pad * 2) / 24 * 0.55;
+                    const gap = (W - pad * 2) / 24;
+                    return data.map((d, i) => {
+                      const x = pad + i * gap + (gap - barW) / 2;
+                      const h = (d.rain / 6) * (H - pad * 2) * 0.45;
+                      const y = H - pad - h;
+                      return <rect key={i} x={x} y={y} width={barW} height={h} fill="#4a7080" rx="1" />;
+                    });
+                  })()}
+                  {(() => {
+                    const pad = 4, W = 320, H = 100;
+                    const data = Array.from({ length: 24 }, (_, i) => 22 + Math.sin((i / 24) * Math.PI) * 6);
+                    const minT = 16, maxT = 32;
+                    const pts = data.map((v, i) => {
+                      const x = pad + i * ((W - pad * 2) / 24) + ((W - pad * 2) / 24) / 2;
+                      const y = H - pad - ((v - minT) / (maxT - minT)) * (H - pad * 2) * 0.85;
+                      return [x, y];
+                    });
+                    const path = pts.map((p, i) => (i === 0 ? "M" : "L") + p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ");
+                    return <path d={path} fill="none" stroke="#b8491c" strokeWidth="1.5" />;
+                  })()}
+                </svg>
+              </div>
+            </div>
+            <div className="footer-line">在出钓与阅读之间，留一片安静</div>
+          </div>
+        </div>
+      );
+    }
+
+    function ScreenMapFS() {
+      return (
+        <div className="app">
+          <AppHeader />
+          <div className="app-body" style={{ padding: 0, position: "relative" }}>
+            <div className="map-fs">
+              <div className="grid" />
+              <div className="water" />
+              <div className="land" />
+              <div className="pin r" style={{ top: "32%", left: "30%" }}>1</div>
+              <div className="pin b" style={{ top: "55%", left: "62%" }}>2</div>
+              <div className="pin r" style={{ top: "72%", left: "20%" }}>3</div>
+              <div className="route" />
+              <div className="close-fs">✕</div>
+              <div className="info">
+                <div className="name">黄埔港 · 钓点 2</div>
+                <div className="meta">鲈鱼 · 鲷鱼 · 六月旺季</div>
+                <div className="dist">3.2 km · 8 min</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function ScreenAISheet() {
+      return (
+        <div className="app" style={{ position: "relative" }}>
+          <AppHeader />
+          <div className="app-body" style={{ opacity: 0.2 }}>
+            <div style={{ height: 600, background: "var(--paper-2)" }} />
+          </div>
+          <div className="sheet-backdrop" />
+          <div className="sheet">
+            <div className="sheet-handle" />
+            <div className="sheet-head">
+              <h2>AI 分析</h2>
+              <div className="sub">基于天气 + 潮汐</div>
+            </div>
+            <div className="sheet-body">
+              <div className="ai-status">正在生成 · Ling 2.6</div>
+              <div className="ai-stream">今日适合出钓。
+
+气温 24°C 体感舒适，东南风 3.2 m/s，水面波纹细腻。气压 1012 hPa 处于上升通道，鱼口活跃。
+
+建议时段：05:30-08:00 / 17:30-19:30。
+
+潮汐：18:24 达最高潮 2.4m，涨潮前 1.5h 最佳。
+
+装备：2.1m 路亚竿，铅头钩 7g，米诺 9cm。</div>
+              <select className="ai-model">
+                <option>Ling 2.6</option>
+                <option>Ling 2.6 Flash</option>
+                <option>Ring 2.5</option>
+              </select>
+              <button className="ai-cta">重新分析</button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function ScreenFeedback() {
+      const [picked, setPicked] = useState("爆护");
+      return (
+        <div className="app" style={{ position: "relative" }}>
+          <AppHeader />
+          <div className="app-body" style={{ opacity: 0.2 }}>
+            <div style={{ height: 600 }} />
+          </div>
+          <div className="sheet-backdrop" />
+          <div className="sheet">
+            <div className="sheet-handle" />
+            <div className="sheet-head">
+              <h2>钓完了？</h2>
+              <div className="sub">三个问题 · 三十秒</div>
+            </div>
+            <div className="sheet-body">
+              <div className="fb-info">
+                地点：<span className="accent">{LOC}</span><br />
+                当前指数：<span className="accent">87 · 爆护</span>
+              </div>
+              <div className="fb-choices">
+                {FEEDBACK.map(v => <button key={v} className={`fb-choice ${picked === v ? "selected" : ""}`} onClick={() => setPicked(v)}>{v}</button>)}
+              </div>
+              <div className="fb-actions">
+                <button className="cancel">取消</button>
+                <button className="submit">确认</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function ScreenFeatures() {
+      return (
+        <div className="app" style={{ position: "relative" }}>
+          <AppHeader />
+          <div className="app-body" style={{ opacity: 0.2 }}>
+            <div style={{ height: 600 }} />
+          </div>
+          <div className="sheet-backdrop" />
+          <div className="sheet">
+            <div className="sheet-handle" />
+            <div className="sheet-head">
+              <h2>特征详情</h2>
+              <div className="sub">9 项子特征</div>
+            </div>
+            <div className="sheet-body">
+              <div className="feat-list">
+                {FEATURES.map((f, i) => (
+                  <div className="feat" key={f.k}>
+                    <div className="k">{f.k}</div>
+                    <div className="bar"><div style={{ width: FEATURE_PCT[i] + "%" }} /></div>
+                    <div className="v">{f.v}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function Slot({ label, children }) {
+      return <div className="phone-slot"><div className="phone-label">{label}</div><IPhone>{children}</IPhone></div>;
+    }
+
+    function App() {
+      return (
+        <div className="row">
+          <Slot label="1 · 主屏顶部 — 地图 + 指数大字"><ScreenMainTop /></Slot>
+          <Slot label="2 · 主屏下滑 — 天气 / 潮汐 / 24h"><ScreenMainScrolled /></Slot>
+          <Slot label="3 · 地图全屏 — 选钓点"><ScreenMapFS /></Slot>
+          <Slot label="4 · AI 分析底部 sheet"><ScreenAISheet /></Slot>
+          <Slot label="5 · 反馈表单底部 sheet"><ScreenFeedback /></Slot>
+          <Slot label="6 · 指数特征详情 sheet"><ScreenFeatures /></Slot>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>

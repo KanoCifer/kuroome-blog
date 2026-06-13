@@ -18,21 +18,41 @@ interface WeatherCardProps {
 // 气压等级映射
 const getPressureLevel = (
   pressure: number,
-): { label: string; color: string } => {
-  if (pressure < 1000) return { label: '偏低', color: 'text-primary' };
-  if (pressure < 1010) return { label: '正常', color: 'text-success' };
-  if (pressure < 1020) return { label: '正常', color: 'text-success' };
-  if (pressure < 1030) return { label: '偏高', color: 'text-warning' };
-  return { label: '很高', color: 'text-destructive' };
+): { label: string; color: string; dot: string } => {
+  if (pressure < 1000)
+    return {
+      label: '偏低',
+      color: 'text-warning',
+      dot: 'bg-warning',
+    };
+  if (pressure < 1010)
+    return {
+      label: '正常',
+      color: 'text-success',
+      dot: 'bg-success',
+    };
+  if (pressure < 1020)
+    return {
+      label: '正常',
+      color: 'text-success',
+      dot: 'bg-success',
+    };
+  if (pressure < 1030)
+    return {
+      label: '偏高',
+      color: 'text-warning',
+      dot: 'bg-warning',
+    };
+  return {
+    label: '很高',
+    color: 'text-destructive',
+    dot: 'bg-destructive',
+  };
 };
 
-const getLiveWeatherBg = (temp: number) => {
-  if (temp <= 0) return 'from-blue-500/40 to-blue-600/20';
-  if (temp <= 15) return 'from-cyan-500/40 to-blue-600/20';
-  if (temp <= 25) return 'from-green-500/40 to-blue-600/20';
-  if (temp <= 35) return 'from-yellow-500/40 to-red-600/20';
-  return 'from-red-500/40 to-red-600/20';
-};
+// 头部温度 chip 的渐变 — 暖色基调，不随温度分色，保持视觉一致
+const TEMP_CHIP_GRADIENT =
+  'from-warning/40 via-warning/30 to-destructive/30';
 
 export function WeatherCard({
   location = [113.389549, 23.050067],
@@ -63,14 +83,14 @@ export function WeatherCard({
         </div>
         {liveWeather ? (
           <div
-            className={`flex items-center gap-1.5 rounded-xl bg-linear-to-r ${getLiveWeatherBg(Number(liveWeather.temp))} px-3 py-1.5`}
+            className={`flex items-center gap-1.5 rounded-xl bg-linear-to-r ${TEMP_CHIP_GRADIENT} px-3 py-1.5`}
           >
-            <span className="text-foreground text-lg font-bold">
+            <span className="text-foreground text-lg font-bold tabular-nums">
               {liveWeather.temp}°
             </span>
-            <div className="flex items-center gap-1 rounded-lg px-2 py-1">
-              <i className={`qi-${liveWeather.icon} text-xl`} />
-              <span className="text-muted-foreground text-xs">
+            <div className="bg-card/30 flex items-center gap-1 rounded-lg px-1.5 py-1 backdrop-blur-sm">
+              <i className={`qi-${liveWeather.icon} text-base`} />
+              <span className="text-foreground/80 text-xs">
                 {liveWeather.text}
               </span>
             </div>
@@ -86,111 +106,111 @@ export function WeatherCard({
         <p className="text-destructive text-xs">{error}</p>
       ) : liveWeather ? (
         <div>
-          {/* 主数据行 */}
+          {/* 主数据行 — 2x3 网格 */}
           <div className="mb-3 grid grid-cols-2 gap-2">
             {/* 体感温度 */}
-            <div className="bg-secondary flex items-center gap-2 rounded-xl p-2.5">
-              <div className="bg-warning/20 flex h-9 w-9 items-center justify-center rounded-lg">
+            <div className="border-border/40 bg-secondary/60 flex items-center gap-2 rounded-xl border p-2.5">
+              <div className="bg-warning/20 flex h-10 w-10 items-center justify-center rounded-lg">
                 <Thermometer className="text-warning h-4 w-4" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-muted-foreground text-[10px]">体感温度</p>
-                <p className="text-foreground text-sm font-bold">
+                <p className="text-foreground text-sm font-bold tabular-nums">
                   {liveWeather.feelsLike}°C
                 </p>
               </div>
             </div>
 
             {/* 能见度 */}
-            <div className="bg-secondary flex items-center gap-2 rounded-xl p-2.5">
-              <div className="bg-success/20 flex h-9 w-9 items-center justify-center rounded-lg">
+            <div className="border-border/40 bg-secondary/60 flex items-center gap-2 rounded-xl border p-2.5">
+              <div className="bg-success/20 flex h-10 w-10 items-center justify-center rounded-lg">
                 <Eye className="text-success h-4 w-4" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-muted-foreground text-[10px]">能见度</p>
-                <p className="text-foreground text-sm font-bold">
+                <p className="text-foreground text-sm font-bold tabular-nums">
                   {liveWeather.vis} km
+                </p>
+              </div>
+            </div>
+
+            {/* 风力 */}
+            <div className="border-border/40 bg-secondary/60 flex items-center gap-2 rounded-xl border p-2.5">
+              <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-lg">
+                <Navigation
+                  className="text-muted-foreground h-4 w-4"
+                  style={{
+                    transform: `rotate(${Number(liveWeather.wind360)}deg)`,
+                  }}
+                />
+              </div>
+              <div className="min-w-0">
+                <p className="text-muted-foreground text-[10px]">
+                  {liveWeather.windDir}
+                </p>
+                <p className="text-foreground text-sm font-bold tabular-nums">
+                  {(Number(liveWeather.windSpeed) / 3.6).toFixed(1)}m/s
+                </p>
+              </div>
+            </div>
+
+            {/* 湿度 */}
+            <div className="border-border/40 bg-secondary/60 flex items-center gap-2 rounded-xl border p-2.5">
+              <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-lg">
+                <Droplets className="text-muted-foreground h-4 w-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-muted-foreground text-[10px]">湿度</p>
+                <p className="text-foreground text-sm font-bold tabular-nums">
+                  {liveWeather.humidity}%
+                </p>
+              </div>
+            </div>
+
+            {/* 气压 */}
+            <div className="border-border/40 bg-secondary/60 flex items-center gap-2 rounded-xl border p-2.5">
+              <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-lg">
+                <Gauge className="text-muted-foreground h-4 w-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-muted-foreground text-[10px]">气压</p>
+                <p className="text-foreground text-sm font-bold tabular-nums">
+                  {liveWeather.pressure} hPa
+                </p>
+              </div>
+            </div>
+
+            {/* 状态 */}
+            <div className="border-border/40 bg-secondary/60 flex items-center gap-2 rounded-xl border p-2.5">
+              <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-lg">
+                <div
+                  className={`h-2.5 w-2.5 rounded-full ${pressureLevel?.dot ?? 'bg-muted-foreground'}`}
+                />
+              </div>
+              <div className="min-w-0">
+                <p className="text-muted-foreground text-[10px]">状态</p>
+                <p
+                  className={`text-sm font-bold ${pressureLevel?.color ?? 'text-muted-foreground'}`}
+                >
+                  {pressureLevel?.label ?? '--'}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* 气象指标条 */}
-          <div className="bg-secondary mb-3 flex gap-1.5 overflow-hidden rounded-xl p-2">
-            <div className="flex flex-1 flex-col items-center">
-              <Navigation
-                className="h-4 w-4"
-                style={{
-                  transform: `rotate(${Number(liveWeather.wind360)}deg)`,
-                }}
-              />
-              <span className="text-muted-foreground mt-1 text-[10px]">
-                {liveWeather.windDir}
-              </span>
-              <span className="text-foreground text-[11px] font-bold">
-                {(Number(liveWeather.windSpeed) / 3.6).toFixed(1)}m/s
-              </span>
-            </div>
-            <div className="border-border flex flex-1 flex-col items-center border-x">
-              <Droplets className="h-4 w-4" />
-              <span className="text-muted-foreground mt-1 text-[10px]">
-                湿度
-              </span>
-              <span className="text-foreground text-[11px] font-bold">
-                {liveWeather.humidity}%
-              </span>
-            </div>
-            <div className="border-border flex flex-1 flex-col items-center border-r">
-              <Gauge className="h-4 w-4" />
-              <span className="text-muted-foreground mt-1 text-[10px]">
-                气压
-              </span>
-              <span className="text-foreground text-[11px] font-bold">
-                {liveWeather.pressure}
-              </span>
-            </div>
-            <div className="flex flex-1 flex-col items-center">
-              <div className="flex h-4 w-4 items-center justify-center">
-                <div
-                  className={`h-2 w-2 rounded-full ${
-                    pressureLevel?.color.includes('primary')
-                      ? 'bg-primary'
-                      : pressureLevel?.color.includes('success')
-                        ? 'bg-success'
-                        : pressureLevel?.color.includes('warning')
-                          ? 'bg-warning'
-                          : pressureLevel?.color.includes('destructive')
-                            ? 'bg-destructive'
-                            : 'bg-muted-foreground'
-                  }`}
-                />
-              </div>
-              <span className="text-muted-foreground mt-1 text-[10px]">
-                状态
-              </span>
-              <span
-                className={`text-[11px] font-bold ${pressureLevel?.color || 'text-muted-foreground'}`}
-              >
-                {pressureLevel?.label || '--'}
-              </span>
-            </div>
-          </div>
-
-          {/* 预报 */}
+          {/* 预报 — 3 个固定 chip：今天 / 明天 / 后天 */}
           {!!forecasts.length && (
-            <div className="flex gap-1.5">
+            <div className="grid grid-cols-3 gap-2">
               {forecasts.slice(0, 3).map((day, i) => (
                 <div
                   key={day.fxDate}
-                  className="bg-secondary flex-1 rounded-xl p-2"
+                  className="border-border/40 bg-secondary/60 flex h-[88px] flex-col items-center justify-between rounded-xl border py-2"
                 >
-                  <p className="text-muted-foreground text-center text-[10px]">
+                  <p className="text-muted-foreground text-center text-[10px] font-medium">
                     {i === 0 ? '今天' : dayjs(day.fxDate).format('MM/DD')}
                   </p>
-                  <div className="mt-1 flex justify-center">
-                    <i className={`qi-${day.iconDay} text-2xl`} />
-                  </div>
-                  <p className="text-foreground text-center text-[11px] font-bold">
+                  <i className={`qi-${day.iconDay} text-2xl`} />
+                  <p className="text-foreground text-center text-[11px] font-bold tabular-nums">
                     {day.tempMax}°/{day.tempMin}°
                   </p>
                 </div>

@@ -130,6 +130,8 @@ export function AnalysisContent({
     <>
       <AIAnalysisWidget
         onGenerate={(modelId) => void generateAnalysis(modelId)}
+        embedded
+        hideFab
       />
       {feedbackOpen && currentFishingData && (
         <FishingFeedbackForm

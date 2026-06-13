@@ -604,3 +604,24 @@ a {
     box-shadow: 0 4px 20px oklch(from var(--color-primary) l c h / 0.08);
   }
 }
+
+/* 高德地图全屏容器 — 把 logo + 版权钉到左下角，
+   防止某层祖先 flex/transform 把绝对定位元素挤偏。 */
+.amap-fs .amap-logo {
+  left: 8px !important;
+  right: auto !important;
+  bottom: 8px !important;
+  top: auto !important;
+}
+.amap-fs .amap-copyright {
+  left: 70px !important;
+  right: auto !important;
+  bottom: 8px !important;
+  top: auto !important;
+}
+
+/* 小窗地图容器 — 隐藏 logo + 版权（仅内部使用，对外发布前需复核高德 ToS） */
+.amap-mini .amap-logo,
+.amap-mini .amap-copyright {
+  display: none !important;
+}

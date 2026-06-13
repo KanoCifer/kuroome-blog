@@ -10,7 +10,6 @@ import { TideChart } from './TideChart';
 export function TideCard() {
   const {
     panelTideData: tideData,
-    panelTideSpotName: tideSpotName,
     tideLoading: loading,
     selectedHarbor,
     selectedDate,
@@ -181,46 +180,53 @@ export function TideCard() {
       {/* Decorative gradient orbs */}
       <div className="from-success/20 to-success/10 pointer-events-none absolute bottom-16 left-16 h-32 w-32 overflow-hidden rounded-full bg-linear-to-tr blur-3xl transition-transform duration-700 group-hover:scale-110"></div>
 
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <div className="min-w-0">
-          <h3 className="text-foreground text-sm font-semibold">潮汐预报</h3>
-          <p className="text-muted-foreground truncate text-xs">
-            {tideSpotName}
-          </p>
+      <div className="mb-3 flex flex-col gap-2">
+        <h3 className="text-foreground text-sm font-semibold">潮汐预报</h3>
+        {/* 港口 — 横向 scroll chip */}
+        <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
+          {HARBOR_OPTIONS.map((opt) => (
+            <button
+              key={opt.code}
+              type="button"
+              onClick={() => setSelectedHarbor(opt.code)}
+              className={`min-h-9 shrink-0 rounded-full px-3.5 text-xs font-medium transition-colors ${
+                selectedHarbor === opt.code
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-secondary text-card-foreground hover:bg-accent'
+              }`}
+            >
+              {opt.name}
+            </button>
+          ))}
         </div>
-        <div className="flex shrink-0 items-center gap-1.5">
-          <select
-            value={selectedHarbor}
-            onChange={(e) => setSelectedHarbor(e.target.value)}
-            className="border-border bg-card/80 text-card-foreground focus:ring-ring cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
-          >
-            {HARBOR_OPTIONS.map((opt) => (
-              <option key={opt.code} value={opt.code}>
-                {opt.name}
-              </option>
-            ))}
-          </select>
-          <select
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="border-border bg-card/80 text-card-foreground focus:ring-ring cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
-          >
-            {dateOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label} {opt.weekday}
-              </option>
-            ))}
-          </select>
+        {/* 日期 — 横向 scroll chip */}
+        <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
+          {dateOptions.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => setSelectedDate(opt.value)}
+              className={`min-h-9 shrink-0 rounded-full px-3.5 text-xs font-medium transition-colors ${
+                selectedDate === opt.value
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-secondary text-card-foreground hover:bg-accent'
+              }`}
+            >
+              {opt.label} {opt.weekday}
+            </button>
+          ))}
         </div>
       </div>
 
       {loading ? (
-        <div className="min-h-[200px]">
+        <div className="min-h-[260px]">
           <SkeletonCard hasChart hasBottomRow />
         </div>
       ) : tideData ? (
-        <div className="min-h-[200px]">
-          <TideChart option={tideChartOption} />
+        <div className="min-h-[260px]">
+          <div className="h-[200px]">
+            <TideChart option={tideChartOption} />
+          </div>
           <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
             <div className="bg-card/60 rounded-lg px-3 py-2">
               <p className="text-muted-foreground">
@@ -243,7 +249,7 @@ export function TideCard() {
           </div>
         </div>
       ) : (
-        <div className="min-h-[200px]">
+        <div className="min-h-[260px]">
           <p className="text-muted-foreground text-sm">暂无潮汐数据</p>
         </div>
       )}

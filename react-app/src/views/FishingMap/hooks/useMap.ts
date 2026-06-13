@@ -34,6 +34,7 @@ export function useMap(
   const drivingRef = useRef<AMapDriving | null>(null);
   const currentRouteRef = useRef<AMapPolyline | null>(null);
   const onMarkerClickRef = useRef(onMarkerClick);
+  const getSecurityJsCodeRef = useRef(getSecurityJsCode);
   const routeActionsRef = useRef(useRouteMapStore.getState());
   const geolocationRef = useRef<AMapGeolocationInstance | null>(null);
 
@@ -158,6 +159,10 @@ export function useMap(
   }, [onMarkerClick]);
 
   useEffect(() => {
+    getSecurityJsCodeRef.current = getSecurityJsCode;
+  }, [getSecurityJsCode]);
+
+  useEffect(() => {
     let clickHandler: ((event: unknown) => void) | null = null;
     const containerElement = containerRef.current;
     let map: AMapMapInstance | null = null;
@@ -169,7 +174,7 @@ export function useMap(
 
       try {
         // 获取安全 JS Code 并配置全局变量
-        const securityJsCode = await getSecurityJsCode();
+        const securityJsCode = await getSecurityJsCodeRef.current();
         window._AMapSecurityConfig = {
           securityJsCode,
         };
@@ -284,7 +289,10 @@ export function useMap(
         containerElement.innerHTML = '';
       }
     };
-  }, [containerRef, getUserPosition, getSecurityJsCode, handleMarkerClick]);
+    // 仅在挂载时初始化一次，container 之外的依赖通过 ref 镜像最新值，
+    // 避免反馈/全屏等无关 state 变化导致地图 destroy + 重建（DOM 回流）。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [containerRef]);
 
   return {
     isMapReady,

@@ -189,36 +189,39 @@ export function HourlyWeather() {
       <div className="from-primary/10 to-primary/5 pointer-events-none absolute -top-8 -right-8 h-40 w-40 rounded-full bg-linear-to-br blur-3xl" />
       <div className="from-warning/15 to-warning/5 pointer-events-none absolute -bottom-6 -left-6 h-32 w-32 rounded-full bg-linear-to-tr blur-2xl" />
       {/* 内容区 */}
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-3 flex items-baseline justify-between">
         <div>
           <h3 className="text-foreground text-sm font-semibold">
-            小时天气预报{' '}
-            <span className="text-muted-foreground text-xs">未来24小时</span>
+            小时天气预报
+            <span className="text-muted-foreground ml-1.5 text-xs">未来24小时</span>
           </h3>
           <p className="text-muted-foreground text-xs">天气变化趋势</p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="bg-card/60 flex items-center gap-1.5 rounded-full px-3 py-1.5 shadow-sm">
-            <span className="bg-primary h-2.5 w-2.5 rounded-full" />
-            <span className="text-muted-foreground text-xs">降水量</span>
-          </div>
-          <div className="bg-card/60 flex items-center gap-1.5 rounded-full px-3 py-1.5 shadow-sm">
-            <span className="bg-warning h-2.5 w-2.5 rounded-full" />
-            <span className="text-muted-foreground text-xs">温度</span>
-          </div>
+        {/* 单行 inline legend */}
+        <div className="text-muted-foreground flex items-center gap-3 text-xs">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="bg-primary h-1.5 w-3 rounded" />
+            降水
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <span className="bg-warning h-1.5 w-3 rounded" />
+            温度
+          </span>
         </div>
       </div>
 
-      {weatherHourly ? (
-        <HourlyWeatherChart option={option} />
-      ) : (
-        <div className="full flex items-center justify-center">
-          <div className="text-center">
-            <div className="border-border border-t-primary mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-2" />
-            <p className="text-muted-foreground text-sm">正在加载天气数据...</p>
+      <div className="h-[240px]">
+        {weatherHourly ? (
+          <HourlyWeatherChart option={option} />
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <div className="text-center">
+              <div className="border-border border-t-primary mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-2" />
+              <p className="text-muted-foreground text-sm">正在加载天气数据...</p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

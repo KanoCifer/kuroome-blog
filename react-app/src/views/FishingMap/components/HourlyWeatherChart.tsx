@@ -41,5 +41,12 @@ interface HourlyWeatherChartProps {
 }
 
 export function HourlyWeatherChart({ option }: HourlyWeatherChartProps) {
-  return <ReactEChartsCore option={option} notMerge lazyUpdate />;
+  return (
+    <ReactEChartsCore
+      option={option}
+      notMerge
+      lazyUpdate
+      style={{ height: '100%', width: '100%' }}
+    />
+  );
 }

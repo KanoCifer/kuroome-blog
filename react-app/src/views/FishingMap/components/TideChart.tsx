@@ -38,5 +38,12 @@ interface TideChartProps {
 }
 
 export function TideChart({ option }: TideChartProps) {
-  return <ReactEChartsCore option={option} notMerge lazyUpdate />;
+  return (
+    <ReactEChartsCore
+      option={option}
+      notMerge
+      lazyUpdate
+      style={{ height: '100%', width: '100%' }}
+    />
+  );
 }

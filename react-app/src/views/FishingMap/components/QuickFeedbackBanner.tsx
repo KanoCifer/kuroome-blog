@@ -39,7 +39,7 @@ export function QuickFeedbackBanner({
         type="button"
         disabled={disabled}
         onClick={onSubmit}
-        className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground rounded-lg px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors disabled:cursor-not-allowed"
+        className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground min-h-11 rounded-full px-5 py-2.5 text-sm font-medium whitespace-nowrap transition-colors disabled:cursor-not-allowed"
       >
         反馈今日指数
       </button>
