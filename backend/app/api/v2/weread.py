@@ -1,13 +1,18 @@
-from typing import Literal
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Literal
 
 from fastapi import APIRouter, Depends, Query
+
+if TYPE_CHECKING:
+    from app.models.models import User
 
 from app.api.des.auth import manager
 from app.api.des.des import weread_service_dep
 from app.core.exceptions import APIError
 from app.core.response import APIResponse
 from app.schemas.weread import SaveUserInfoIn
-from app.utils import redis_cache
+from app.plugins.cache import redis_cache
 
 router = APIRouter(prefix="/weread", tags=["weread"])
 
@@ -23,13 +28,13 @@ async def save_user_info(
         await weread_service.save_user_info(current_user.id, data.api_key)
     except ValueError:
         raise APIError(message="Invalid API key") from None
-    return APIResponse.ok(message="User information saved successfully")
+    return APIResponse(message="User information saved successfully")
 
 
 @router.get("/bookshelf")
-@redis_cache()
+@redis_cache(exclude=["weread_service"])
 async def get_user_shelf(
-    current_user=Depends(manager),
+    current_user: User = Depends(manager),
     weread_service=Depends(weread_service_dep),
 ):
     """获取用户书架信息"""
@@ -40,7 +45,7 @@ async def get_user_shelf(
     except ValueError:
         raise APIError(message="Invalid user ID") from None
 
-    return APIResponse.ok(
+    return APIResponse(
         data={
             "user_books": user_books_data,
             "archives": archives_data,
@@ -59,7 +64,7 @@ async def get_book_info(
         book = await weread_service.get_book_info(bookId)
     except ValueError:
         raise APIError(message="Invalid book ID") from None
-    return APIResponse.ok(
+    return APIResponse(
         data=book.model_dump(mode="json", by_alias=True),
         message="Book information retrieved successfully",
     )
@@ -78,7 +83,7 @@ async def sync_my_books(
         )
     except ValueError:
         raise APIError(message="Invalid user ID") from None
-    return APIResponse.ok(
+    return APIResponse(
         data={"imported_count": count},
         message=f"Successfully imported {count} books from WeRead",
     )
@@ -103,7 +108,7 @@ async def get_read_progress(
     snapshot = await weread_service.orchestra_read_detail(
         user.id, mode=mode, base_time=baseTime
     )
-    return APIResponse.ok(
+    return APIResponse(
         data=snapshot.model_dump(mode="json"),
         message="Read progress retrieved successfully",
     )
@@ -121,7 +126,7 @@ async def get_books_recommend(
     books = await weread_service.fetch_books_recommend(
         user.id, count=count, maxIdx=maxIdx
     )
-    return APIResponse.ok(
+    return APIResponse(
         data=[book.model_dump(mode="json") for book in books],
         message="Books recommend retrieved successfully",
     )

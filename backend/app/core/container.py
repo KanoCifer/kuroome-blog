@@ -36,7 +36,7 @@ from app.services.sub_service import SubService
 from app.services.user import GitHubAuthService, PasskeyService, UserService
 from app.services.weather_service import WeatherService
 from app.services.weread import WereadService
-from app.utils import redis_cache
+from app.plugins.cache import redis_cache
 
 
 @dataclass

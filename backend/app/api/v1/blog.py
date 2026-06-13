@@ -14,7 +14,7 @@ from app.core.response import APIResponse
 from app.models.models import User
 from app.schemas.schemas import PostComment
 from app.services.blog_service import BlogService
-from app.utils import redis_cache
+from app.plugins.cache import redis_cache
 from app.utils.media import save_upload_image
 
 router = APIRouter(tags=["blog"])
@@ -33,7 +33,7 @@ async def _safe_invalidate(*func_names: str) -> None:
 async def upload_blog_image(
     file: UploadFile = File(),
     user: User = Depends(manager),
-) -> JSONResponse:
+) -> APIResponse:
     """Upload blog image and return public URL."""
     if not file or not file.filename:
         raise APIError(
@@ -42,7 +42,7 @@ async def upload_blog_image(
         )
 
     relative_path = save_upload_image(file, f"posts/{user.id}")
-    return APIResponse.ok(
+    return APIResponse(
         data={
             "url": f"/api/v1/media/{relative_path}",
             "filename": relative_path,
@@ -57,10 +57,10 @@ async def get_blogs(
     page: int = 1,
     search: str | None = Query(None, min_length=1),
     blog_service: BlogService = Depends(blog_service_dep),
-) -> JSONResponse:
+) -> APIResponse:
     """Get paginated list of blog articles."""
     data = await blog_service.get_blogs(page=page, search=search)
-    return APIResponse.ok(data=data, message="Blogs retrieved successfully")
+    return APIResponse(data=data, message="Blogs retrieved successfully")
 
 
 ### 获取单个博客文章详情（修复：增加了对 ObjectId 的验证，处理了分类信息和评论树的构建） ###
@@ -72,7 +72,7 @@ async def get_blog_post(
 ):
     """Get a single blog post by ID."""
     post_data = await blog_service.get_blog_post(_id)
-    return APIResponse.ok(
+    return APIResponse(
         data=post_data, message="Blog post retrieved successfully"
     )
 
@@ -86,12 +86,12 @@ async def get_blog(
 ):
     """Get a single blog post by ID."""
     post_data = await blog_service.get_blog_post(_id)
-    return APIResponse.ok(
+    return APIResponse(
         data=post_data, message="Blog post retrieved successfully"
     )
 
 
-@router.post("/comments")
+@router.post("/comments", status_code=status.HTTP_201_CREATED)
 async def post_comment(
     data: PostComment,
     blog_service: BlogService = Depends(blog_service_dep),
@@ -100,10 +100,9 @@ async def post_comment(
     result = await blog_service.post_comment(data)
     await _safe_invalidate("get_blogs", "get_blog_post")
 
-    return APIResponse.ok(
+    return APIResponse(
         data=result,
         message="Comment submitted successfully, pending review",
-        status_code=status.HTTP_201_CREATED,
     )
 
 
@@ -114,7 +113,7 @@ async def get_categories(
     """Get all categories with post counts."""
     categories = await blog_service.get_categories()
 
-    return APIResponse.ok(
+    return APIResponse(
         data=categories,
         message="Categories retrieved successfully",
     )
@@ -129,7 +128,7 @@ async def get_posts_by_category(
     data = await blog_service.get_posts_by_category(category_id)
 
     category_name = data["category"]["name"]
-    return APIResponse.ok(
+    return APIResponse(
         data=data,
         message=f"Posts in category '{category_name}' retrieved successfully",
     )
@@ -144,7 +143,7 @@ async def get_category_posts(
     data = await blog_service.get_posts_by_category(category_id)
 
     category_name = data["category"]["name"]
-    return APIResponse.ok(
+    return APIResponse(
         data=data,
         message=f"Posts in category '{category_name}' retrieved successfully",
     )

@@ -26,7 +26,8 @@ from app.schemas import VisitorData
 from app.schemas.schemas import BlogPostIn, BlogPostUpdate
 from app.services.admin_service import AdminService
 from app.tasks import send_feishu_message
-from app.utils import get_redis_lock, redis_cache
+from app.plugins.cache import redis_cache
+from app.utils import get_redis_lock
 
 # 写后失效的读接口函数名(SCAN 模式: cache:<name>|*)
 _BLOG_READ_FUNCS = ("get_blogs", "get_blog_post", "get_blog")
@@ -48,7 +49,7 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 # =============================================================================
 
 
-@router.post("/post/add")
+@router.post("/post/add", status_code=status.HTTP_201_CREATED)
 async def add_post(
     data: BlogPostIn,
     current_user: User = Depends(get_admin_user),
@@ -63,10 +64,9 @@ async def add_post(
     )
     await _safe_invalidate(*_BLOG_READ_FUNCS)
 
-    return APIResponse.ok(
+    return APIResponse(
         data={"_id": new_id},
         message="Blog post added successfully",
-        status_code=status.HTTP_201_CREATED,
     )
 
 
@@ -86,7 +86,7 @@ async def update_post(
     )
     await _safe_invalidate(*_BLOG_READ_FUNCS)
 
-    return APIResponse.ok(
+    return APIResponse(
         data={"_id": data.id},
         message="Blog post updated successfully",
     )
@@ -104,7 +104,7 @@ async def delete_post(
     )
     await _safe_invalidate(*_BLOG_READ_FUNCS)
 
-    return APIResponse.ok(
+    return APIResponse(
         data={"_id": post_id},
         message="Blog post deleted successfully",
     )
@@ -122,7 +122,7 @@ async def get_admin_comments(
 ):
     payload = await admin_service.get_admin_comments()
 
-    return APIResponse.ok(
+    return APIResponse(
         data=payload,
         message="Comments retrieved successfully",
     )
@@ -137,7 +137,7 @@ async def approve_comment(
     await admin_service.approve_comment(comment_id=comment_id)
     await _safe_invalidate(*_COMMENT_READ_FUNCS)
 
-    return APIResponse.ok(message="Comment approved successfully")
+    return APIResponse(message="Comment approved successfully")
 
 
 @router.delete("/comments/{comment_id}/delete")
@@ -149,7 +149,7 @@ async def delete_comment(
     await admin_service.delete_comment(comment_id=comment_id)
     await _safe_invalidate(*_COMMENT_READ_FUNCS)
 
-    return APIResponse.ok(message="Comment deleted successfully")
+    return APIResponse(message="Comment deleted successfully")
 
 
 # =============================================================================
@@ -164,7 +164,7 @@ async def get_admin_messages(
 ):
     payload = await admin_service.get_admin_messages()
 
-    return APIResponse.ok(
+    return APIResponse(
         data=payload,
         message="Messages retrieved successfully",
     )
@@ -177,17 +177,17 @@ async def approve_message(
     admin_service: AdminService = Depends(admin_service_dep),
 ):
     await admin_service.approve_message(message_id=message_id)
-    return APIResponse.ok(message="Message has been approved.")
+    return APIResponse(message="Message has been approved.")
 
 
-@router.delete("/messages/{message_id}/delete")
+@router.delete("/messages/{message_id}/delete", status_code=204)
 async def delete_message(
     message_id: str,
     current_user: User = Depends(get_admin_user),
     admin_service: AdminService = Depends(admin_service_dep),
 ):
     await admin_service.delete_message(message_id=message_id)
-    return APIResponse.ok(message="Message has been deleted.")
+    return APIResponse(message="Message has been deleted.")
 
 
 @router.post("/track")
@@ -262,7 +262,7 @@ async def run_deployment() -> None:
 async def webhook_deploy(
     request: Request,
     redis: AsyncRedis = Depends(get_redis),
-) -> JSONResponse:
+) -> APIResponse:
     """
     Gitee Webhook 自动部署接口
     """
@@ -341,14 +341,14 @@ async def webhook_deploy(
             )
             await send_feishu_message.kiq("API服务正在部署中，请稍候...")
             asyncio.create_task(run_deployment())  # noqa: RUF006
-            return APIResponse.ok(
+            return APIResponse(
                 message="Deployment triggered successfully",
                 data={"status": "pending"},
             )
     except Exception as e:
         if "无法获取锁" in str(e):
             logger.info("Deployment already in progress, skipping")
-            return APIResponse.ok(
+            return APIResponse(
                 message="Deployment already in progress",
                 data={"status": "in_progress"},
             )

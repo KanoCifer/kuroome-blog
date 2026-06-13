@@ -5,7 +5,6 @@ from datetime import datetime
 
 from beanie import init_beanie
 from fastapi import FastAPI
-from redis.utils import C
 
 from app.api.des import (
     close_db_connections,
@@ -19,17 +18,17 @@ from app.core import get_settings, register_exception_handlers
 from app.core import logger as app_logger
 from app.middleware import register_middleware
 from app.models.blog import Post
+from app.models.changelog import Changelog
 from app.models.devtask import DevTask
+from app.models.fishing import FishingModelMeta, FishingRecord
 from app.models.friendlink import FriendLinks
 from app.models.message import MessageBoard
 from app.models.rss import RssArticle
 from app.models.subscription import SubscriptionLog
-from app.models.changelog import Changelog
-from app.models.fishing import FishingModelMeta, FishingRecord
 from app.models.weread import Archive, User, UserBook, WereadBook
 from app.router import register_router, setup_media
+from app.plugins.cache import close_cache_redis
 from app.tasks import broker, send_feishu_message
-from app.utils import close_cache_redis
 
 
 async def initialize_resources(app: FastAPI):

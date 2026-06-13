@@ -7,7 +7,7 @@ from app.api.des.des import public_service_dep
 from app.core.response import APIResponse
 from app.services.public_service import PublicService
 from app.services.ws_visitor_service import WsVisitorService
-from app.utils.cache import redis_cache
+from app.plugins.cache import redis_cache
 
 router = APIRouter(prefix="/publicv2", tags=["publicv2"])
 
@@ -23,4 +23,4 @@ async def websocket_endpoint(websocket: WebSocket):
 @router.get("/changelogs")
 @redis_cache(ttl=3600)
 async def get_changelogs(svc: PublicService = Depends(public_service_dep)):
-    return APIResponse.ok(await svc.get_changelogs())
+    return APIResponse(data=await svc.get_changelogs())
