@@ -4,23 +4,65 @@ import { useRouteMapStore } from '@/stores/routeMapStore';
 import AMapLoader from '@amap/amap-jsapi-loader';
 
 import { MAP_CENTER, MAP_ZOOM, fishingSpots } from '../constants';
-import type {
-  AMapDriving,
-  AMapDrivingResult,
-  AMapGeolocationInstance,
-  AMapMapInstance,
-  AMapMarkerInstance,
-  AMapNamespace,
-  AMapPolyline,
-  AMapSecurityConfig,
-  GeolocationStatusEvent,
-  RouteInfo,
-} from '../types';
+import type { GeolocationStatusEvent, RouteInfo } from '../types';
+
+/* -------------------------------------------------------------------------
+ * 插件服务类型 —— @types/amap-js-api 只覆盖核心 map API。
+ * Driving / Geolocation / ToolBar / Scale 属于插件服务,没有官方类型;
+ * 只在本 hook 使用,内联为私有接口。
+ * ----------------------------------------------------------------------- */
+
+interface DrivingService {
+  search(
+    origin: [number, number] | AMap.LngLat,
+    destination: [number, number] | AMap.LngLat,
+    callback: (
+      status: 'complete' | 'no_data' | string,
+      result: AMapDrivingResult | string,
+    ) => void,
+  ): void;
+  clear(): void;
+}
+
+interface AMapDrivingResult {
+  routes: Array<{
+    distance: number;
+    time: number;
+    steps: Array<{ path: [number, number][] }>;
+  }>;
+}
+
+interface GeolocationService {
+  getCurrentPosition(
+    callback: (status: 'complete' | string, result: GeolocationStatusEvent) => void,
+  ): void;
+}
+
+/**
+ * 把官方 AMap 核心类 + 插件 ctor 合并为单一视图,
+ * loader 返回 any / window.AMap 取自全局,这里用 AMapWithPlugins
+ * 统一类型,组件内即可 AMap.X 访问。
+ */
+type AMapWithPlugins = typeof AMap & {
+  Geolocation: new (options?: {
+    enableHighAccuracy?: boolean;
+    timeout?: number;
+    offset?: [number, number];
+    position?: string;
+  }) => GeolocationService;
+  Driving: new (options?: {
+    map?: AMap.Map;
+    policy?: number;
+    showTraffic?: boolean;
+  }) => DrivingService;
+  ToolBar: new (opts?: { position?: string }) => object;
+  Scale: new () => object;
+};
 
 declare global {
   interface Window {
-    _AMapSecurityConfig?: AMapSecurityConfig;
-    AMap?: AMapNamespace;
+    _AMapSecurityConfig?: { securityJsCode: string };
+    AMap?: AMapWithPlugins;
   }
 }
 
@@ -29,14 +71,14 @@ export function useMap(
   getSecurityJsCode: () => Promise<string>,
   onMarkerClick: (index: number, userPosition: [number, number]) => void,
 ) {
-  const mapInstanceRef = useRef<AMapMapInstance | null>(null);
-  const markerInstancesRef = useRef<AMapMarkerInstance[]>([]);
-  const drivingRef = useRef<AMapDriving | null>(null);
-  const currentRouteRef = useRef<AMapPolyline | null>(null);
+  const mapInstanceRef = useRef<AMap.Map | null>(null);
+  const markerInstancesRef = useRef<AMap.Marker[]>([]);
+  const drivingRef = useRef<DrivingService | null>(null);
+  const currentRouteRef = useRef<AMap.Polyline | null>(null);
   const onMarkerClickRef = useRef(onMarkerClick);
   const getSecurityJsCodeRef = useRef(getSecurityJsCode);
   const routeActionsRef = useRef(useRouteMapStore.getState());
-  const geolocationRef = useRef<AMapGeolocationInstance | null>(null);
+  const geolocationRef = useRef<GeolocationService | null>(null);
 
   const [isMapReady, setIsMapReady] = useState(false);
   const [userPosition, setUserPosition] = useState<[number, number] | null>(
@@ -165,7 +207,7 @@ export function useMap(
   useEffect(() => {
     let clickHandler: ((event: unknown) => void) | null = null;
     const containerElement = containerRef.current;
-    let map: AMapMapInstance | null = null;
+    let map: AMap.Map | null = null;
 
     const initializeMap = async () => {
       if (!containerElement) {
@@ -195,7 +237,8 @@ export function useMap(
             'AMap.Marker',
           ],
         })
-          .then(async (AMap) => {
+          .then(async (loadedAMap) => {
+            const AMap = loadedAMap as AMapWithPlugins;
             map = new AMap.Map(containerElement, {
               viewMode: '2D',
               zoom: MAP_ZOOM,

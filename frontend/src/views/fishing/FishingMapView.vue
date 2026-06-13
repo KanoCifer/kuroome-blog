@@ -9,7 +9,7 @@ import {
 import fishingSpotsData from '@/data/fishing-spots.json';
 import { useFishingFeedback } from '@/composables/useFishingFeedback';
 import { DEFAULT_MAP_CENTER, useFishingMapStore } from '@/stores/fishingMap';
-import type { AMapMarker } from '@/types/maptype';
+import type { MapMarker } from '@/types/marker';
 import FishingAnalysisDrawer from '@/views/fishing/components/FishingAnalysisDrawer.vue';
 import FishingDashboardHeader from '@/views/fishing/components/FishingDashboardHeader.vue';
 import FishingFeedbackForm from '@/views/fishing/components/FishingFeedbackForm.vue';
@@ -21,7 +21,7 @@ import type { FishingIndexData } from '@/views/fishing/types';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref, useTemplateRef } from 'vue';
 
-const fishingSpots = ref<AMapMarker[]>(fishingSpotsData as AMapMarker[]);
+const fishingSpots = ref<MapMarker[]>(fishingSpotsData as MapMarker[]);
 const mapTileRef = useTemplateRef<FishingMapInstance>('mapTileRef');
 
 const fishingMapStore = useFishingMapStore();

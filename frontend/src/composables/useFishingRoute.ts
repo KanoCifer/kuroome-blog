@@ -10,7 +10,7 @@
  * 避免与组件模板 ref 生命周期耦合。
  */
 import { useNotificationStore } from '@/stores/notification';
-import type { AMapMarker } from '@/types/maptype';
+import type { MapMarker } from '@/types/marker';
 import { ref } from 'vue';
 
 export interface RouteInfo {
@@ -58,7 +58,7 @@ export function useFishingRoute() {
   async function planFromMarker(
     map: FishingMapInstance,
     index: number,
-    spot: AMapMarker,
+    spot: MapMarker,
   ): Promise<void> {
     const mySeq = ++routeSeq;
     selectedSpotIndex.value = index;

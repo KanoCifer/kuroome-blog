@@ -73,6 +73,7 @@
     "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "^4.3.0",
     "@tsconfig/node24": "^24.0.4",
+    "@types/amap-js-api": "^1.4.16",
     "@types/jsdom": "^28.0.3",
     "@types/node": "^25.9.3",
     "@types/swagger-ui": "^5.32.0",

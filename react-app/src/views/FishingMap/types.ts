@@ -1,27 +1,10 @@
-import type {
-  AMapDriving,
-  AMapDrivingResult,
-  AMapGeolocationInstance,
-  AMapMapInstance,
-  AMapMarker,
-  AMapMarkerInstance,
-  AMapNamespace,
-  AMapPolyline,
-  AMapSecurityConfig,
-  GeolocationStatusEvent,
-} from '@/types/maptype';
-
-export type {
-  AMapDriving,
-  AMapDrivingResult,
-  AMapGeolocationInstance,
-  AMapMapInstance,
-  AMapMarker,
-  AMapMarkerInstance,
-  AMapNamespace,
-  AMapPolyline,
-  AMapSecurityConfig,
-  GeolocationStatusEvent,
+/**
+ * AMap.Geolocation.getCurrentPosition 回调的 result 形状（领域类型,非 SDK 类型）。
+ * 官方 @types/amap-js-api 把事件 payload 标为 any,这里手工声明以收紧下游。
+ */
+export type GeolocationStatusEvent = {
+  position: { lng: number; lat: number };
+  info?: string;
 };
 
 export interface ApiEnvelope<T> {

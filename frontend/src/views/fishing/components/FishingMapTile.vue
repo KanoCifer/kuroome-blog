@@ -20,7 +20,7 @@ import {
   type RouteInfo,
 } from '@/composables/useFishingRoute';
 import { DEFAULT_MAP_CENTER } from '@/stores/fishingMap';
-import type { AMapMarker } from '@/types/maptype';
+import type { MapMarker } from '@/types/marker';
 import { Loader2 } from '@lucide/vue';
 import { useTemplateRef, ref } from 'vue';
 import { useThemeStore } from '@/stores/theme';
@@ -30,7 +30,7 @@ const { theme } = storeToRefs(useThemeStore());
 const isDarkMode = ref<boolean>(theme.value === 'dark');
 
 interface Props {
-  markers: AMapMarker[];
+  markers: MapMarker[];
   isPlanning: boolean;
   routeInfo: RouteInfo | null;
   center?: [number, number];
