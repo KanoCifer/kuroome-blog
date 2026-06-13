@@ -51,8 +51,7 @@ const getPressureLevel = (
 };
 
 // 头部温度 chip 的渐变 — 暖色基调，不随温度分色，保持视觉一致
-const TEMP_CHIP_GRADIENT =
-  'from-warning/40 via-warning/30 to-destructive/30';
+const TEMP_CHIP_GRADIENT = 'from-warning/40 via-warning/30 to-destructive/30';
 
 export function WeatherCard({
   location = [113.389549, 23.050067],

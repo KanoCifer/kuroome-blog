@@ -313,14 +313,7 @@ onUnmounted(() => {
         @click="cancelAnalysis"
       >
         <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <rect
-            x="6"
-            y="6"
-            width="12"
-            height="12"
-            rx="1"
-            fill="currentColor"
-          />
+          <rect x="6" y="6" width="12" height="12" rx="1" fill="currentColor" />
         </svg>
         取消分析
       </button>
@@ -384,15 +377,9 @@ onUnmounted(() => {
           >
             <p>{{ textShimmer[0] }}</p>
             <div class="mt-3 space-y-2">
-              <div
-                class="bg-muted h-3 w-full animate-pulse rounded"
-              ></div>
-              <div
-                class="bg-muted h-3 w-5/6 animate-pulse rounded"
-              ></div>
-              <div
-                class="bg-muted h-3 w-2/3 animate-pulse rounded"
-              ></div>
+              <div class="bg-muted h-3 w-full animate-pulse rounded"></div>
+              <div class="bg-muted h-3 w-5/6 animate-pulse rounded"></div>
+              <div class="bg-muted h-3 w-2/3 animate-pulse rounded"></div>
             </div>
           </motion.div>
           <motion.div
@@ -426,7 +413,8 @@ onUnmounted(() => {
       </div>
 
       <div class="text-muted-foreground text-xs leading-relaxed">
-        天气更新: {{ formatDate(normalizedData?.liveWeather?.obsTime) ?? '--' }}<br />
+        天气更新: {{ formatDate(normalizedData?.liveWeather?.obsTime) ?? '--'
+        }}<br />
         潮汐更新: {{ formatDate(normalizedData?.tideData?.updateTime) ?? '--' }}
       </div>
     </div>

@@ -302,7 +302,7 @@ export default function BookShelf() {
                     </div>
                     <div className="px-1.5 py-2">
                       <p
-                        className="text-foreground line-clamp-2 text-xs font-medium leading-snug"
+                        className="text-foreground line-clamp-2 text-xs leading-snug font-medium"
                         title={book.title}
                       >
                         {book.title}

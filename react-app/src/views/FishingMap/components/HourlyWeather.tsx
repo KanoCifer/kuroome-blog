@@ -193,7 +193,9 @@ export function HourlyWeather() {
         <div>
           <h3 className="text-foreground text-sm font-semibold">
             小时天气预报
-            <span className="text-muted-foreground ml-1.5 text-xs">未来24小时</span>
+            <span className="text-muted-foreground ml-1.5 text-xs">
+              未来24小时
+            </span>
           </h3>
           <p className="text-muted-foreground text-xs">天气变化趋势</p>
         </div>
@@ -217,7 +219,9 @@ export function HourlyWeather() {
           <div className="flex h-full items-center justify-center">
             <div className="text-center">
               <div className="border-border border-t-primary mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-2" />
-              <p className="text-muted-foreground text-sm">正在加载天气数据...</p>
+              <p className="text-muted-foreground text-sm">
+                正在加载天气数据...
+              </p>
             </div>
           </div>
         )}

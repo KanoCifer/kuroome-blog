@@ -281,7 +281,11 @@ onMounted(() => {
           v-model="selectedHarbor"
           class="border-border bg-card text-foreground focus:ring-primary cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
         >
-          <option v-for="opt in HARBOR_OPTIONS" :key="opt.code" :value="opt.code">
+          <option
+            v-for="opt in HARBOR_OPTIONS"
+            :key="opt.code"
+            :value="opt.code"
+          >
             {{ opt.name }}
           </option>
         </select>
@@ -289,7 +293,11 @@ onMounted(() => {
           v-model="selectedDate"
           class="border-border bg-card text-foreground focus:ring-primary cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
         >
-          <option v-for="opt in dateOptions" :key="opt.value" :value="opt.value">
+          <option
+            v-for="opt in dateOptions"
+            :key="opt.value"
+            :value="opt.value"
+          >
             {{ opt.label }} {{ opt.weekday }}
           </option>
         </select>
@@ -309,7 +317,11 @@ onMounted(() => {
 
     <!-- Chart -->
     <div v-else-if="tideData">
-      <v-chart :option="tideOptions" style="width: 100%; height: 240px" autoresize />
+      <v-chart
+        :option="tideOptions"
+        style="width: 100%; height: 240px"
+        autoresize
+      />
 
       <div class="mt-3 grid grid-cols-2 gap-3">
         <div class="bg-warning/10 border-warning/20 rounded-xl border p-3">

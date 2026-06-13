@@ -12,11 +12,7 @@ import { useCallback, useState } from 'react';
 
 import { useFishingMapStore } from '@/stores/fishingMapStore';
 
-import type {
-  FishingFeedbackData,
-  FishingIndexData,
-  TideData,
-} from '../types';
+import type { FishingFeedbackData, FishingIndexData, TideData } from '../types';
 
 /** 风力等级（1-3）：风速 km/h 除以 3 向上取整再夹到 [1, 3] */
 export function deriveWindLevel(

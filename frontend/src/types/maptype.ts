@@ -37,11 +37,16 @@ export interface AMapMapInstance {
   on: (event: 'click', handler: (e: unknown) => void) => void;
   setCenter: (center: [number, number]) => void;
   setZoom: (zoom: number) => void;
+  setMapStyle: (style: string) => void;
   add: (overlay: unknown) => void;
   remove: (overlay: unknown) => void;
   setFitView: () => void;
   destroy: () => void;
   off: (event: 'click', handler: (e: unknown) => void) => void;
+}
+
+export interface AMapTileLayerInstance {
+  setMap: (mapInstance: AMapMapInstance | null) => void;
 }
 
 export interface AMapMarkerInstance {
@@ -56,9 +61,7 @@ export interface AMapGeolocationInstance {
 }
 
 export interface AMapCitySearchInstance {
-  getLocalCity: (
-    callback: (status: string, result: unknown) => void,
-  ) => void;
+  getLocalCity: (callback: (status: string, result: unknown) => void) => void;
 }
 
 export interface AMapNamespace {
@@ -75,8 +78,13 @@ export interface AMapNamespace {
       viewMode: '2D' | '3D';
       zoom: number;
       center: [number, number];
+      layers?: unknown[];
+      mapStyle?: string;
     },
   ) => AMapMapInstance;
+  TileLayer: {
+    Satellite: new () => AMapTileLayerInstance;
+  };
   Marker: new (options: {
     position: [number, number];
     content?: string;

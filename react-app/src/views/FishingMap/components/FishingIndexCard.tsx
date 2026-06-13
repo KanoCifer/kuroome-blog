@@ -111,14 +111,15 @@ export function FishingIndexCard({
             >
               反馈今日指数
             </button>
-            {onDetailClick && Object.keys(indexData.feature_breakdown).length > 0 && (
-              <button
-                onClick={handleDetail}
-                className="min-h-11 rounded-full bg-primary/10 px-5 text-sm font-medium text-primary transition-colors hover:bg-primary/15"
-              >
-                详情
-              </button>
-            )}
+            {onDetailClick &&
+              Object.keys(indexData.feature_breakdown).length > 0 && (
+                <button
+                  onClick={handleDetail}
+                  className="bg-primary/10 text-primary hover:bg-primary/15 min-h-11 rounded-full px-5 text-sm font-medium transition-colors"
+                >
+                  详情
+                </button>
+              )}
           </div>
         </div>
       ) : (

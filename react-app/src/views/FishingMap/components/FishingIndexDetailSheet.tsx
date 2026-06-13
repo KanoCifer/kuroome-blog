@@ -68,7 +68,9 @@ export function FishingIndexDetailSheet({ open, data, onClose }: Props) {
               <div className="bg-muted-foreground/40 mx-auto h-1 w-9 rounded-full" />
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-foreground text-lg font-semibold">特征详情</h3>
+                  <h3 className="text-foreground text-lg font-semibold">
+                    特征详情
+                  </h3>
                   <p className="text-muted-foreground mt-0.5 text-xs">
                     9 项子特征 · 综合指数 {data.fishing_index} · {data.level}
                   </p>
@@ -96,8 +98,12 @@ export function FishingIndexDetailSheet({ open, data, onClose }: Props) {
                         className="border-border/40 bg-secondary/40 rounded-2xl border p-3"
                       >
                         <div className="mb-2 flex items-baseline justify-between">
-                          <span className="text-muted-foreground text-xs font-medium">{label}</span>
-                          <span className="text-foreground text-sm font-semibold tabular-nums">{value}</span>
+                          <span className="text-muted-foreground text-xs font-medium">
+                            {label}
+                          </span>
+                          <span className="text-foreground text-sm font-semibold tabular-nums">
+                            {value}
+                          </span>
                         </div>
                         <div className="bg-card relative h-1.5 w-full overflow-hidden rounded-full">
                           <div
@@ -111,7 +117,7 @@ export function FishingIndexDetailSheet({ open, data, onClose }: Props) {
                         </div>
                       </div>
                     );
-                  }
+                  },
                 )}
               </div>
             </div>

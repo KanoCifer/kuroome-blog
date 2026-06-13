@@ -203,7 +203,11 @@ const chartOption = computed(() => {
       v-if="weatherHourly && weatherHourly.length > 0"
       class="relative flex-1"
     >
-      <v-chart :option="chartOption" style="width: 100%; height: 280px" autoresize />
+      <v-chart
+        :option="chartOption"
+        style="width: 100%; height: 280px"
+        autoresize
+      />
     </div>
     <div v-else class="flex flex-1 items-center justify-center py-8">
       <div class="text-center">

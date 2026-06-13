@@ -26,7 +26,12 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
     modelOptions,
   } = useArticleSummary();
 
-  const { tips: textShimmer, active: shimmerActive, setActive: setShimmerActive, reset: resetShimmer } = useShimmerTips();
+  const {
+    tips: textShimmer,
+    active: shimmerActive,
+    setActive: setShimmerActive,
+    reset: resetShimmer,
+  } = useShimmerTips();
 
   const renderedSummary = useMemo(
     () => (summary ? renderMarkdown(summary) : ''),
@@ -39,7 +44,9 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
   }, [loading, setShimmerActive, resetShimmer]);
 
   return (
-    <section className={`summary-card border-border/60 bg-card/60 dark:bg-card/50 mx-4 mb-6 overflow-hidden rounded-2xl border shadow-sm transition-all${loading ? ' is-loading' : ''}`}>
+    <section
+      className={`summary-card border-border/60 bg-card/60 dark:bg-card/50 mx-4 mb-6 overflow-hidden rounded-2xl border shadow-sm transition-all${loading ? 'is-loading' : ''}`}
+    >
       {/* Header */}
       <div className="flex items-center justify-between gap-3 px-5 pt-4 pb-3">
         <div className="flex items-center gap-2.5">
@@ -83,7 +90,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
 
         <div className="flex items-center gap-2">
           <select
-            className="bg-muted/50 text-foreground border-border/60 cursor-pointer rounded-lg border px-2 py-1 text-xs outline-none transition-colors"
+            className="bg-muted/50 text-foreground border-border/60 cursor-pointer rounded-lg border px-2 py-1 text-xs transition-colors outline-none"
             value={selectedModel}
             onChange={(e) => setSelectedModel(e.target.value)}
           >
@@ -98,11 +105,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
             disabled={!content.trim() || loading}
             onClick={() => generateSummary({ title, content })}
           >
-            {loading
-              ? '总结中...'
-              : hasGenerated
-                ? '重新总结'
-                : '生成总结'}
+            {loading ? '总结中...' : hasGenerated ? '重新总结' : '生成总结'}
           </button>
         </div>
       </div>

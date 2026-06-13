@@ -73,7 +73,11 @@ export function FishingAnalysisDrawer({
             role="dialog"
             aria-label="AI 分析"
           >
-            <SheetBody onClose={onClose} onGenerate={onGenerate} variant="desktop" />
+            <SheetBody
+              onClose={onClose}
+              onGenerate={onGenerate}
+              variant="desktop"
+            />
           </motion.aside>
         </>
       )}
@@ -95,7 +99,7 @@ function SheetBody({
     return (
       <>
         <div className="bg-muted-foreground/40 mx-auto mt-2 h-1 w-9 rounded-full" />
-        <div className="flex items-center justify-between border-b border-border px-5 py-3">
+        <div className="border-border flex items-center justify-between border-b px-5 py-3">
           <div>
             <h3 className="text-foreground text-lg font-semibold">AI 分析</h3>
             <p className="text-muted-foreground mt-0.5 text-xs">
@@ -121,7 +125,9 @@ function SheetBody({
     <>
       <div className="border-border flex items-center justify-between border-b px-5 py-4">
         <div>
-          <h3 className="text-foreground font-family-averia text-lg">AI 分析</h3>
+          <h3 className="text-foreground font-family-averia text-lg">
+            AI 分析
+          </h3>
           <p className="text-muted-foreground mt-0.5 text-xs">
             基于当前天气与潮汐综合判断
           </p>
@@ -141,4 +147,3 @@ function SheetBody({
     </>
   );
 }
-

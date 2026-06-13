@@ -76,8 +76,7 @@ export const useReadStatsStore = create<ReadStatsState>((set, get) => ({
         response?: { data?: { message?: string } };
       };
       set({
-        error:
-          e?.response?.data?.message || e?.message || '获取阅读统计失败',
+        error: e?.response?.data?.message || e?.message || '获取阅读统计失败',
       });
     } finally {
       set({ isLoading: false });

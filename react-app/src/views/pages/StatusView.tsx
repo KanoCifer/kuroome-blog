@@ -503,7 +503,8 @@ export default function StatusView() {
                       启动时间 / 运行时间
                     </span>
                     <span className="text-foreground text-sm">
-                      {formatStartTime(serverStatus.service.startTime)} (GMT+8) |{' '}
+                      {formatStartTime(serverStatus.service.startTime)} (GMT+8)
+                      |{' '}
                       {formatUptime(
                         Math.floor(
                           (now - serverStatus.service.startTime * 1000) / 1000,

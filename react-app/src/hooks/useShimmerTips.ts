@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-const SHIMMER_TIPS = [
-  '分析文章结构…',
-  '提取关键信息…',
-  '生成总结内容…',
-];
+const SHIMMER_TIPS = ['分析文章结构…', '提取关键信息…', '生成总结内容…'];
 
 /**
  * 轮播一组提示文案，active 为 true 时启动、false 时清理。

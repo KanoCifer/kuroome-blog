@@ -205,7 +205,8 @@ onMounted(() => {
   }
 }
 .fishing-dashboard > * {
-  animation: fishing-dashboard-fade-up 460ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation: fishing-dashboard-fade-up 460ms cubic-bezier(0.22, 1, 0.36, 1)
+    backwards;
 }
 .fishing-dashboard > *:nth-child(1) {
   animation-delay: 0ms;

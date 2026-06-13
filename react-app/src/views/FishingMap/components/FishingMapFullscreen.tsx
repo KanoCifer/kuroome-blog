@@ -54,7 +54,7 @@ function FullscreenContent({ onClose }: { onClose: () => void }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
-      className="fixed inset-0 z-50 bg-background"
+      className="bg-background fixed inset-0 z-50"
     >
       <div
         ref={containerRef}

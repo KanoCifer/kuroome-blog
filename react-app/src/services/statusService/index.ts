@@ -1,9 +1,6 @@
 import type { ApiResponse } from '@/api/request';
 import { extractData } from '@/api/request';
-import {
-  statusGateway,
-  type StatusDetailApiData,
-} from '@/api/statusGateway';
+import { statusGateway, type StatusDetailApiData } from '@/api/statusGateway';
 
 export interface ServiceInfo {
   runtime: string;

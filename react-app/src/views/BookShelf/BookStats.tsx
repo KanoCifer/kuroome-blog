@@ -235,8 +235,7 @@ export default function BookStats() {
   const hasMoreRecommends = useReadStatsStore((s) => s.hasMoreRecommends);
   const fetchRecommends = useReadStatsStore((s) => s.fetchRecommends);
 
-  const activeModeLabel =
-    MODES.find((m) => m.key === activeMode)?.label ?? '';
+  const activeModeLabel = MODES.find((m) => m.key === activeMode)?.label ?? '';
 
   // Dark mode detection
   useEffect(() => {
@@ -327,7 +326,14 @@ export default function BookStats() {
         },
       ],
     };
-  }, [activeSnapshot, axisColor, subtextColor, splitLineColor, primaryColor, primaryRgba]);
+  }, [
+    activeSnapshot,
+    axisColor,
+    subtextColor,
+    splitLineColor,
+    primaryColor,
+    primaryRgba,
+  ]);
 
   // Read longest chart option
   const longestOption = useMemo(() => {
@@ -378,7 +384,14 @@ export default function BookStats() {
         },
       ],
     };
-  }, [activeSnapshot, axisColor, subtextColor, splitLineColor, textColor, primaryColor]);
+  }, [
+    activeSnapshot,
+    axisColor,
+    subtextColor,
+    splitLineColor,
+    textColor,
+    primaryColor,
+  ]);
 
   // Category chart option
   const categoryOption = useMemo(() => {
@@ -569,7 +582,7 @@ export default function BookStats() {
           {activeSnapshot && (
             <>
               {/* Mode Tabs */}
-              <div className="mb-6 flex gap-1 rounded-xl bg-card p-1">
+              <div className="bg-card mb-6 flex gap-1 rounded-xl p-1">
                 {MODES.map((mode) => (
                   <button
                     key={mode.key}
@@ -597,9 +610,7 @@ export default function BookStats() {
                   </p>
                 </div>
                 <div className="bg-card rounded-xl p-4">
-                  <p className="text-muted-foreground mb-1 text-xs">
-                    阅读天数
-                  </p>
+                  <p className="text-muted-foreground mb-1 text-xs">阅读天数</p>
                   <p className="text-foreground text-2xl font-bold">
                     {activeSnapshot.readDays ?? 0}
                     <span className="text-muted-foreground text-sm font-normal">
@@ -608,17 +619,13 @@ export default function BookStats() {
                   </p>
                 </div>
                 <div className="bg-card rounded-xl p-4">
-                  <p className="text-muted-foreground mb-1 text-xs">
-                    日均时长
-                  </p>
+                  <p className="text-muted-foreground mb-1 text-xs">日均时长</p>
                   <p className="text-foreground text-2xl font-bold">
                     {formatDuration(activeSnapshot.dayAverageReadTime)}
                   </p>
                 </div>
                 <div className="bg-card rounded-xl p-4">
-                  <p className="text-muted-foreground mb-1 text-xs">
-                    环比变化
-                  </p>
+                  <p className="text-muted-foreground mb-1 text-xs">环比变化</p>
                   <p
                     className={`text-2xl font-bold ${
                       (activeSnapshot.compare ?? 0) >= 0
