@@ -27,6 +27,7 @@ export interface Props {
   showToolBar?: boolean;
   showScale?: boolean;
   showGeolocation?: boolean;
+  isDarkMode?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -44,6 +45,7 @@ const props = withDefaults(defineProps<Props>(), {
   showToolBar: true,
   showScale: true,
   showGeolocation: false,
+  isDarkMode: false,
 });
 
 const emit = defineEmits<{
@@ -120,6 +122,10 @@ onMounted(async () => {
         viewMode: props.viewMode,
         zoom: props.zoom,
         center: props.center,
+        layers: [new AMap.TileLayer.Satellite()],
+        mapStyle: props.isDarkMode
+          ? 'amap://styles/dark'
+          : 'amap://styles/normal',
       });
 
       // 添加控件
@@ -215,6 +221,17 @@ watch(
   (newZoom) => {
     if (map && newZoom !== undefined) {
       map.setZoom(newZoom);
+    }
+  },
+);
+
+watch(
+  () => props.isDarkMode,
+  (isDarkMode) => {
+    if (map) {
+      map.setMapStyle(
+        isDarkMode ? 'amap://styles/dark' : 'amap://styles/normal',
+      );
     }
   },
 );
@@ -330,38 +347,36 @@ const getCurrentPosition = (): Promise<[number, number]> => {
     const tryIPFallback = (browserReason: string) => {
       try {
         const citySearch = new AMap.CitySearch();
-        citySearch.getLocalCity(
-          (status: string, result: unknown) => {
-            if (status !== 'complete') {
-              const err = result as { info?: string } | null;
-              reject(
-                new Error(
-                  `浏览器定位失败 (${browserReason});IP 定位也失败 (${err?.info || '未知'})。` +
-                    '请检查 macOS 位置服务 / Wi-Fi / 浏览器位置权限,或临时关闭广告拦截扩展',
-                ),
-              );
-              return;
-            }
-            const r = result as { rectangle?: string };
-            if (!r.rectangle) {
-              reject(new Error('IP 定位未返回坐标范围'));
-              return;
-            }
-            const [p1, p2] = r.rectangle.split(';');
-            if (!p1 || !p2) {
-              reject(new Error('IP 定位坐标格式异常'));
-              return;
-            }
-            const [lng1, lat1] = p1.split(',').map(Number);
-            const [lng2, lat2] = p2.split(',').map(Number);
-            if ([lng1, lat1, lng2, lat2].some(Number.isNaN)) {
-              reject(new Error('IP 定位坐标解析失败'));
-              return;
-            }
-            // 矩形中心(精度到城市级,够钓鱼指数计算)
-            resolve([(lng1 + lng2) / 2, (lat1 + lat2) / 2]);
-          },
-        );
+        citySearch.getLocalCity((status: string, result: unknown) => {
+          if (status !== 'complete') {
+            const err = result as { info?: string } | null;
+            reject(
+              new Error(
+                `浏览器定位失败 (${browserReason});IP 定位也失败 (${err?.info || '未知'})。` +
+                  '请检查 macOS 位置服务 / Wi-Fi / 浏览器位置权限,或临时关闭广告拦截扩展',
+              ),
+            );
+            return;
+          }
+          const r = result as { rectangle?: string };
+          if (!r.rectangle) {
+            reject(new Error('IP 定位未返回坐标范围'));
+            return;
+          }
+          const [p1, p2] = r.rectangle.split(';');
+          if (!p1 || !p2) {
+            reject(new Error('IP 定位坐标格式异常'));
+            return;
+          }
+          const [lng1, lat1] = p1.split(',').map(Number);
+          const [lng2, lat2] = p2.split(',').map(Number);
+          if ([lng1, lat1, lng2, lat2].some(Number.isNaN)) {
+            reject(new Error('IP 定位坐标解析失败'));
+            return;
+          }
+          // 矩形中心(精度到城市级,够钓鱼指数计算)
+          resolve([(lng1 + lng2) / 2, (lat1 + lat2) / 2]);
+        });
       } catch (e) {
         reject(new Error(e instanceof Error ? e.message : String(e)));
       }
@@ -381,8 +396,7 @@ const getCurrentPosition = (): Promise<[number, number]> => {
           info?: string;
           message?: string;
         } | null;
-        const reason =
-          errResult?.info || errResult?.message || '未知错误';
+        const reason = errResult?.info || errResult?.message || '未知错误';
         tryIPFallback(reason);
       });
     } catch (e) {

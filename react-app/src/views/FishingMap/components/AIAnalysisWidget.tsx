@@ -20,6 +20,15 @@ marked.setOptions({
 
 interface AIAnalysisWidgetProps {
   onGenerate: (modelId: string) => void;
+  /**
+   * 嵌入模式：去掉 fixed 定位与 portal，改为流式布局。
+   * 与 hideFab 配合，可放进 drawer / sheet 等容器内。
+   */
+  embedded?: boolean;
+  /**
+   * 隐藏 FAB 入口（由父组件 header 或 drawer 触发开关）。
+   */
+  hideFab?: boolean;
 }
 
 const SHIMMER_TEXTS = [
@@ -30,17 +39,19 @@ const SHIMMER_TEXTS = [
 
 function renderMarkdown(content: string): string {
   try {
-    // console.log('Rendering markdown content:', content);
     const rawHtml = marked.parse(content, { async: false }) as string;
     return DOMPurify.sanitize(rawHtml);
   } catch {
     console.error('Error rendering markdown content:', content);
-
     return content;
   }
 }
 
-export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
+export function AIAnalysisWidget({
+  onGenerate,
+  embedded = false,
+  hideFab = false,
+}: AIAnalysisWidgetProps) {
   const {
     analysisOpen,
     analysisLoading,
@@ -66,7 +77,6 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
         clearInterval(shimmerTimerRef.current);
         shimmerTimerRef.current = null;
       }
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShimmerIndex(0);
     }
     return () => {
@@ -90,6 +100,97 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
     return 'bg-muted/10 text-muted-foreground';
   })();
 
+  // 内嵌模式：去掉 fixed + portal，改为流式容器
+  if (embedded) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <span
+            className={`${statusClass} rounded-full px-2.5 py-0.5 text-xs font-medium`}
+          >
+            {statusLabel}
+          </span>
+          {analysisOpen && (
+            <button
+              onClick={closeAnalysis}
+              className="text-muted-foreground hover:bg-accent rounded-full p-1"
+              aria-label="关闭分析"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
+
+        <div className="space-y-3">
+          {!analysisHasData ? (
+            <EmptyState
+              icon={<CloudOff className="h-6 w-6" />}
+              title="等待天气与潮汐数据加载"
+              subtitle="数据到位后即可生成分析"
+            />
+          ) : analysisLoading ? (
+            <LoadingState shimmerText={SHIMMER_TEXTS[shimmerIndex]} />
+          ) : analysisError ? (
+            <ErrorState message={analysisError} />
+          ) : analysisResult ? (
+            <ResultState html={renderMarkdown(analysisResult)} />
+          ) : (
+            <PlaceholderState />
+          )}
+
+          {!analysisLoading && (
+            <div className="flex items-center gap-2">
+              <select
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value)}
+                className="border-border bg-secondary text-card-foreground flex-1 rounded-lg border px-3 py-1.5 text-xs"
+              >
+                {AI_MODELS.map((model) => (
+                  <option key={model.id} value={model.id}>
+                    {model.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {analysisLoading ? (
+            <button
+              onClick={() => {
+                abortAnalysis();
+              }}
+              className="bg-destructive hover:bg-destructive/90 relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium text-white transition"
+            >
+              <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
+                <rect
+                  x="6"
+                  y="6"
+                  width="12"
+                  height="12"
+                  rx="1"
+                  fill="currentColor"
+                />
+              </svg>
+              取消分析
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                onGenerate(selectedModel);
+                setAnalysisLoading(true);
+              }}
+              disabled={!analysisHasData}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition disabled:cursor-not-allowed"
+            >
+              {analysisResult ? '重新分析' : '生成分析'}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // 弹层模式（默认）：FAB + portal 居中浮层
   return (
     <>
       {createPortal(
@@ -103,12 +204,10 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
                 transition={{ duration: 0.35, ease: 'easeOut' }}
                 className="group border-border/50 from-card/80 to-card/40 relative mb-3 w-[90vw] max-w-sm overflow-hidden rounded-3xl border bg-linear-to-br shadow-2xl backdrop-blur-sm"
               >
-                {/* Decorative blobs */}
                 <div className="pointer-events-none absolute -top-16 -right-16 h-32 w-32 rounded-full bg-linear-to-br from-indigo-300/30 to-sky-500/20 blur-2xl transition-transform duration-700 group-hover:scale-110" />
                 <div className="pointer-events-none absolute -bottom-12 -left-12 h-24 w-24 rounded-full bg-linear-to-tr from-emerald-300/20 to-cyan-400/10 blur-2xl transition-transform duration-700 group-hover:scale-110" />
 
                 <div className="relative z-10">
-                  {/* Header */}
                   <div className="border-border/70 flex items-start justify-between gap-3 border-b px-4 py-3">
                     <div>
                       <h3 className="text-foreground text-sm font-bold tracking-tight">
@@ -134,7 +233,6 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
                     </div>
                   </div>
 
-                  {/* Content */}
                   <div className="space-y-3 px-4 py-3">
                     {!analysisHasData ? (
                       <EmptyState
@@ -152,7 +250,6 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
                       <PlaceholderState />
                     )}
 
-                    {/* 模型选择器 */}
                     {!analysisLoading && (
                       <div className="flex items-center gap-2">
                         <select
@@ -213,8 +310,7 @@ export function AIAnalysisWidget({ onGenerate }: AIAnalysisWidgetProps) {
         document.body,
       )}
 
-      {/* FAB */}
-      {!analysisOpen && (
+      {!hideFab && !analysisOpen && (
         <button
           onClick={toggleAnalysis}
           className="border-primary-foreground/50 from-primary/90 to-primary/85 text-primary-foreground fixed right-4 bottom-50 z-50 flex h-12 w-12 items-center justify-center rounded-full border bg-linear-to-br shadow-lg backdrop-blur transition-all hover:-translate-y-0.5 hover:shadow-xl sm:right-6 sm:bottom-24 sm:h-14 sm:w-14"

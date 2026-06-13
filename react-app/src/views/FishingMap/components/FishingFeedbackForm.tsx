@@ -5,13 +5,17 @@ import { useNotificationStore } from '@/stores/notificationState';
 import { useFishingMapStore } from '@/stores/fishingMapStore';
 import dayjs from 'dayjs';
 import { fishingMapService } from '../service';
-import type { FishingFeedbackData, FishingLevel, TideData } from '../types';
+import type { FishingFeedbackData, FishingLevel } from '../types';
 
 interface FishingFeedbackFormProps {
+  /**
+   * 由 useFishingFeedback.openFeedback 拼装好的 FishingFeedbackData：
+   * 包含 liveWeather 实时值 + 潮汐表派生（涨退 / 潮差 / 距下一潮）。
+   * 表单只负责 UI 渲染与提交，不再做派生。
+   */
   fishingData: FishingFeedbackData;
   locationId: string;
   locationName: string;
-  tideData?: TideData | null;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
@@ -28,7 +32,6 @@ export function FishingFeedbackForm({
   fishingData,
   locationId,
   locationName,
-  tideData,
   onSuccess,
   onCancel,
 }: FishingFeedbackFormProps) {
@@ -42,30 +45,12 @@ export function FishingFeedbackForm({
     null,
   );
 
+  /**
+   * 提交时再覆盖一次实时天气字段 —— 用户打开表单后等 30 秒再提交，
+   * 这时 liveWeather 已经更新，覆盖一次能让指数校准用的特征更贴近实际。
+   * 潮汐 / 风级（indices）已由 hook 锁定，不在这里再覆盖。
+   */
   const feedbackPayload = useMemo(() => {
-    // 优先使用 context 中的实时数据，不再依赖父组件拼装
-    let tideLevel = 1.5;
-    let tideType: '涨潮' | '退潮' = '涨潮';
-    let tideRange = 1.5;
-    let hoursToNextTide = 3.0;
-
-    if (tideData?.tideTable?.length) {
-      const currentTide = tideData.tideTable[0];
-      const nextTide = tideData.tideTable[1];
-      tideType = currentTide.type === 'H' ? '涨潮' : '退潮';
-      tideLevel = Number(currentTide.height) || 1.5;
-      if (nextTide) {
-        const nextLevel = Number(nextTide.height) || 1.5;
-        tideRange = Math.abs(nextLevel - tideLevel);
-        hoursToNextTide =
-          (new Date(nextTide.fxTime).getTime() -
-            new Date(currentTide.fxTime).getTime()) /
-          (1000 * 60 * 60);
-      }
-    }
-
-    const windLevel = 2;
-
     return {
       location_id: locationId,
       location_name: locationName,
@@ -76,11 +61,11 @@ export function FishingFeedbackForm({
       pressure: Number(liveWeather?.pressure) || fishingData.pressure,
       wind_speed: Number(liveWeather?.windSpeed) || fishingData.wind_speed,
       precipitation: Number(liveWeather?.precip) || fishingData.precipitation,
-      indices: windLevel,
-      tide_level: tideLevel,
-      tide_type: tideType,
-      tide_range: tideRange,
-      hours_to_next_tide: hoursToNextTide,
+      indices: fishingData.indices,
+      tide_level: fishingData.tide_level,
+      tide_type: fishingData.tide_type,
+      tide_range: fishingData.tide_range,
+      hours_to_next_tide: fishingData.hours_to_next_tide,
     };
   }, [
     fishingData,
@@ -88,7 +73,6 @@ export function FishingFeedbackForm({
     locationId,
     locationName,
     selectedFeedback,
-    tideData,
   ]);
 
   const handleSubmit = useCallback(

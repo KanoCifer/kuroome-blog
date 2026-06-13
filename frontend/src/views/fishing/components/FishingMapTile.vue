@@ -22,7 +22,12 @@ import {
 import { DEFAULT_MAP_CENTER } from '@/stores/fishingMap';
 import type { AMapMarker } from '@/types/maptype';
 import { Loader2 } from '@lucide/vue';
-import { useTemplateRef } from 'vue';
+import { useTemplateRef, ref } from 'vue';
+import { useThemeStore } from '@/stores/theme';
+import { storeToRefs } from 'pinia';
+
+const { theme } = storeToRefs(useThemeStore());
+const isDarkMode = ref<boolean>(theme.value === 'dark');
 
 interface Props {
   markers: AMapMarker[];
@@ -73,6 +78,7 @@ defineExpose<FishingMapInstance>({
       :show-tool-bar="true"
       :show-scale="true"
       :show-geolocation="true"
+      :isDarkMode="isDarkMode"
       @marker-click="(i: number) => emit('marker-click', i)"
       @map-ready="emit('map-ready')"
     />

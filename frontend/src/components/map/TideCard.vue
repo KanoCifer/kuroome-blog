@@ -198,6 +198,15 @@ const tideOptions = computed(() => {
         symbol: 'none',
         lineStyle: { color: p.primary, width: 2.5 },
         itemStyle: { color: p.primary },
+        // hover 时 echarts 6 默认会把 series 切到 emphasis,把面积 + markPoint
+        // 推到 blur 态(opacity 接近 0),整张图看似变白消失。显式禁用 emphasis
+        // 并把 blur 锁回原透明度,确保 hover 时图形保持稳定
+        emphasis: { disabled: true },
+        blur: {
+          areaStyle: { opacity: 1 },
+          itemStyle: { opacity: 1 },
+          lineStyle: { opacity: 1 },
+        },
         areaStyle: {
           color: {
             type: 'linear',
@@ -229,16 +238,16 @@ const tideOptions = computed(() => {
               }
             : undefined,
         markPoint: {
-          symbol: 'pin',
-          symbolSize: 38,
+          symbol: 'circle',
+          symbolSize: 9,
           data: markPointData,
-          label: {
-            show: true,
-            color: p.card,
-            fontSize: 10,
-            fontWeight: 600,
-            formatter: (pt: { value: string }) => pt.value,
+          // dot 风格:实心圆 + 卡片色描边,hover 时的数据走 tooltip 不走 label,
+          // 避免在曲线上叠一个大标签挡住波形
+          itemStyle: {
+            borderColor: p.card,
+            borderWidth: 2,
           },
+          label: { show: false },
         },
       },
     ],

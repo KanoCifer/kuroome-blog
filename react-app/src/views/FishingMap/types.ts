@@ -291,3 +291,18 @@ export interface AnalysisChunk {
   is_end?: boolean;
   scores?: FishingScores;
 }
+
+/**
+ * 喂给 AI 分析组件的聚合数据。
+ * 在 useFishingAnalysis hook 中拼装，在 FishingAnalysisDrawer / AIAnalysisWidget 中消费。
+ * 字段都是 optional —— Live / forecast / tide 任一为空时，AI 内部按需处理。
+ */
+export interface WeatherAnalysisPayload {
+  liveWeather?: WeatherNow | null;
+  forecasts?: WeatherDay[];
+  tideData?: TideData | null;
+  weatherIndices?: WeatherIndex[];
+  fishingIndex?: FishingIndexData;
+  locationName?: string;
+  tideSpotName?: string;
+}

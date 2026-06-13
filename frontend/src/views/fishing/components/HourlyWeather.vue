@@ -144,6 +144,10 @@ const chartOption = computed(() => {
           },
           borderRadius: [3, 3, 0, 0],
         },
+        // hover 温度线时 axis tooltip 会触发整图 blur,显式把 bar 的 blur 态
+        // 锁回原色,避免 echarts 6 默认把 opacity 压到 ~0 → 柱形看似消失
+        emphasis: { disabled: true },
+        blur: { itemStyle: { opacity: 1 } },
       },
       {
         name: '温度',
@@ -157,7 +161,9 @@ const chartOption = computed(() => {
         showSymbol: false, // 默认隐藏,hover 时显示
         itemStyle: { color: p.warning, borderWidth: 2, borderColor: p.card },
         smooth: 0.3,
-        emphasis: { focus: 'series' },
+        // 不能用 focus: 'series' —— echarts 6 会把 bar 推到 blur 态
+        // (opacity ≈ 0) 导致柱形 hover 时整片消失。改 'self' 只高亮线本身
+        emphasis: { focus: 'self' },
         z: 3,
       },
     ],

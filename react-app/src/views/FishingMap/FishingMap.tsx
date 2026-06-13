@@ -1,128 +1,147 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 import { motion } from 'framer-motion';
 
 import { useFishingMapStore } from '@/stores/fishingMapStore';
+import { useRouteMapStore } from '@/stores/routeMapStore';
 
 import { AnalysisContent } from './components/AnalysisContent';
+import { FishingAnalysisDrawer } from './components/FishingAnalysisDrawer';
+import { FishingDashboardHeader } from './components/FishingDashboardHeader';
+import { FishingFeedbackForm } from './components/FishingFeedbackForm';
 import { FishingIndexCard } from './components/FishingIndexCard';
-import { FishingMapHeader } from './components/FishingMapHeader';
+import { FishingMapTile } from './components/FishingMapTile';
 import { HourlyWeather } from './components/HourlyWeather';
-import { MapPanel } from './components/MapPanel';
-import { RouteStatusCard } from './components/RouteStatusCard';
+import { QuickFeedbackBanner } from './components/QuickFeedbackBanner';
 import { TideCard } from './components/TideCard';
 import { WeatherCard } from './components/WeatherCard';
 import { MAP_CENTER, fishingSpots } from './constants';
 import { AnalysisContextProvider } from './contexts/AnalysisContext';
-import { useMap } from './hooks/useMap';
+import { useFishingAnalysis } from './hooks/useFishingAnalysis';
+import { useFishingFeedback } from './hooks/useFishingFeedback';
 import { fishingMapService } from './service';
-import type { FishingFeedbackData, FishingIndexData } from './types';
+import type { FishingIndexData } from './types';
 
 export default function FishingMap() {
   const service = useMemo(() => fishingMapService(), []);
-  const mapContainerRef = useRef<HTMLDivElement | null>(null);
 
-  const [feedbackOpen, setFeedbackOpen] = useState(false);
-  const [currentFishingData, setCurrentFishingData] =
-    useState<FishingFeedbackData | null>(null);
+  // —— 状态聚合：三个 hook 接管 view 里所有派生状态 ——
+  const analysis = useFishingAnalysis();
+  const feedback = useFishingFeedback();
 
-  const getSecurityJsCode = useCallback(
-    () => service.getSecurityJsCode(),
-    [service],
+  const { userPosition, isPlanningRoute, routeInfo } = useRouteMapStore(
+    useShallow((s) => ({
+      userPosition: s.userPosition,
+      isPlanningRoute: s.isPlanningRoute,
+      routeInfo: s.routeInfo,
+    })),
   );
 
-  const handleMarkerClick = useCallback(
-    async (index: number, userPosition: [number, number]) => {
-      const selectedSpot = fishingSpots[index];
-      if (!selectedSpot || !userPosition) return;
-      try {
-        await planRouteRef.current(userPosition, selectedSpot.position);
-      } catch {
-        // error handled in planRoute
-      }
-    },
-    [],
+  const fetchWeatherAndFishing = useFishingMapStore(
+    (s) => s.fetchWeatherAndFishing,
   );
-
-  const { userPosition, planRoute } = useMap(
-    mapContainerRef,
-    getSecurityJsCode,
-    handleMarkerClick,
-  );
-  const planRouteRef = useRef(planRoute);
-
-  // Initial data fetch when user position is known
-  useEffect(() => {
-    if (userPosition) {
-      void useFishingMapStore.getState().fetchWeatherAndFishing(userPosition);
-    }
-  }, [userPosition]);
-
-  const liveWeather = useFishingMapStore((s) => s.liveWeather);
+  const indexData = useFishingMapStore((s) => s.indexData);
   const tideData = useFishingMapStore((s) => s.tideData);
 
-  const analysisHasData = liveWeather !== null && tideData !== null;
+  // —— 副作用：用户定位到位后拉数据；初始按地图中心拉 ——
+  useEffect(() => {
+    if (userPosition) {
+      void fetchWeatherAndFishing(userPosition);
+    }
+  }, [userPosition, fetchWeatherAndFishing]);
 
+  useEffect(() => {
+    void fetchWeatherAndFishing(MAP_CENTER);
+  }, [fetchWeatherAndFishing]);
+
+  // —— Quick feedback banner 可见性：没有路线规划时显示 ——
+  const showFeedbackBanner = !isPlanningRoute && !routeInfo;
+
+  // —— feedback 表单数据切到 hook 注入（不再在 view 拼装） ——
   const handleFeedbackClick = useCallback(
     (data: FishingIndexData) => {
-      setCurrentFishingData({
-        fishing_index: data.fishing_index,
-        level: data.level,
-        temperature: liveWeather ? Number(liveWeather.temp) : 20,
-        humidity: liveWeather ? Number(liveWeather.humidity) : 50,
-        pressure: liveWeather ? Number(liveWeather.pressure) : 1013,
-        wind_speed: liveWeather ? Number(liveWeather.windSpeed) : 0,
-        precipitation: liveWeather ? Number(liveWeather.precip) : 0,
-        indices: 2,
-        tide_level:
-          tideData &&
-          'tideHourly' in tideData &&
-          tideData.tideHourly?.[0]?.height
-            ? Number(tideData.tideHourly[0].height)
-            : 1.5,
-        tide_type: undefined,
-        tide_range: 1.5,
-        hours_to_next_tide: 3.0,
-      });
-      setFeedbackOpen(true);
+      feedback.openFeedback(data, null);
     },
-    [liveWeather, tideData],
+    [feedback],
   );
 
-  return (
-    <AnalysisContextProvider analysisHasData={analysisHasData}>
-      <div className="bg-background/90 fixed inset-0 w-screen" />
-      <FishingMapHeader />
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative mx-auto mb-24 min-h-dvh w-full max-w-xl px-4 pt-4"
-      >
-        <section className="space-y-4">
-          <RouteStatusCard />
-          <MapPanel mapContainerRef={mapContainerRef} />
-          <div className="grid grid-cols-1 gap-4">
-            <FishingIndexCard
-              location={userPosition ?? MAP_CENTER}
-              onFeedbackClick={handleFeedbackClick}
-            />
-            <WeatherCard location={userPosition ?? MAP_CENTER} />
-            <TideCard />
-            <HourlyWeather />
-          </div>
-        </section>
+  const handleQuickFeedback = useCallback(() => {
+    if (!indexData) return;
+    feedback.openFeedback(indexData, null);
+  }, [feedback, indexData]);
 
-        <AnalysisContent
-          service={service}
-          feedbackOpen={feedbackOpen}
-          currentFishingData={currentFishingData}
-          feedbackLocationId="default"
-          feedbackLocationName="钓鱼地点"
-          tideData={tideData}
-          tideSpotName="黄埔港"
-          onFeedbackClose={() => setFeedbackOpen(false)}
+  return (
+    <AnalysisContextProvider analysisHasData={analysis.hasData}>
+      <FishingDashboardHeader
+        analysisOpen={analysis.open}
+        analysisHasData={analysis.hasData}
+        onToggleAnalysis={analysis.toggle}
+      />
+
+      <motion.main
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        className="relative mx-auto mb-24 min-h-dvh w-full max-w-xl space-y-4 px-4 pt-4"
+      >
+        <QuickFeedbackBanner
+          visible={showFeedbackBanner}
+          disabled={!indexData}
+          onSubmit={handleQuickFeedback}
         />
-      </motion.div>
+
+        <FishingMapTile />
+
+        <FishingIndexCard
+          location={userPosition ?? MAP_CENTER}
+          onFeedbackClick={handleFeedbackClick}
+        />
+        <WeatherCard location={userPosition ?? MAP_CENTER} />
+        <TideCard />
+        <HourlyWeather />
+
+        <p className="text-muted-foreground/70 font-family-averia pt-2 text-center text-sm italic">
+          在出钓与阅读之间，留一片安静
+        </p>
+      </motion.main>
+
+      {feedback.open && feedback.currentFishingData && (
+        <FishingFeedbackForm
+          fishingData={feedback.currentFishingData}
+          locationId={feedback.locationId}
+          locationName={feedback.locationName}
+          onSuccess={feedback.closeFeedback}
+          onCancel={feedback.closeFeedback}
+        />
+      )}
+
+      <FishingAnalysisDrawer
+        open={analysis.open}
+        onClose={analysis.close}
+        onGenerate={() => {
+          // AI service 调用由 AnalysisContent 桥接（见下）；drawer 仅作为 UI 容器。
+        }}
+      />
+
+      {/*
+        桥接 AnalysisContent 副作用：它维护 analysisAbortRef 与 generateAnalysis
+        service 调用，从 useFishingMapStore 拿 payload，并通过 useAnalysisContext
+        写结果。这里不再需要 feedback / currentFishingData / tideSpotName 参数。
+      */}
+      <AnalysisContent
+        service={service}
+        feedbackOpen={false}
+        currentFishingData={null}
+        feedbackLocationId="default"
+        feedbackLocationName="钓鱼地点"
+        tideData={tideData}
+        tideSpotName="黄埔港"
+        onFeedbackClose={() => undefined}
+      />
     </AnalysisContextProvider>
   );
 }
+
+// 引用 fishingSpots 以保树摇不掉（marker data 由 FishingMapTile 内部 useMap 直接读）
+void fishingSpots;

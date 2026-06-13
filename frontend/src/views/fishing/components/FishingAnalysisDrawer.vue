@@ -50,13 +50,13 @@ defineEmits<{
         v-if="open"
         class="bg-card border-border fixed top-0 right-0 z-50 flex h-screen w-[420px] max-w-[90vw] flex-col border-l shadow-2xl"
         role="dialog"
-        aria-label="智能分析"
+        aria-label="AI 分析"
       >
         <div
           class="border-border flex items-center justify-between border-b px-5 py-4"
         >
           <div>
-            <h3 class="text-foreground font-family-averia text-lg">智能分析</h3>
+            <h3 class="text-foreground font-family-averia text-lg">AI 分析</h3>
             <p class="text-muted-foreground mt-0.5 text-xs">
               基于当前天气与潮汐综合判断
             </p>
@@ -71,7 +71,7 @@ defineEmits<{
           </button>
         </div>
 
-        <div class="flex-1 overflow-y-auto px-5 py-4">
+        <div class="flex flex-1 flex-col overflow-y-auto px-5 py-4">
           <WeatherAnalysis :weather_data="payload" :auto-analyze="open" />
         </div>
       </aside>

@@ -37,7 +37,7 @@ const openQWeather = () => {
         </p>
       </div>
       <div
-        class="bg-primary text-primary-foreground flex h-11 w-11 shrink-0 items-center justify-center rounded-xl shadow-sm"
+        class="bg-primary text-primary-foreground flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl shadow-sm transition-all duration-300 group-hover:rounded-xl"
       >
         <i
           v-if="liveWeather"
@@ -135,10 +135,10 @@ const openQWeather = () => {
         </div>
       </div>
 
-      <!-- 未来 4 天 -->
+      <!-- 未来 3 天 -->
       <div v-if="forecasts.length > 0" class="flex-1">
         <p class="text-muted-foreground mb-2 text-xs">未来天气</p>
-        <div class="grid grid-cols-4 gap-1.5">
+        <div class="grid grid-cols-3 gap-1.5">
           <div
             v-for="day in forecasts.slice(0, 4)"
             :key="day.fxDate"

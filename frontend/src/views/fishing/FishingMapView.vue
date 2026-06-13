@@ -109,11 +109,11 @@ onMounted(() => {
         - 手机: 单列,Index 优先,然后 Map / Weather / Hourly / Tide
       -->
       <div
-        class="grid grid-cols-1 gap-4 md:grid-cols-6 md:grid-rows-[minmax(360px,520px)_auto] lg:grid-cols-12"
+        class="fishing-dashboard grid grid-cols-1 gap-4 md:grid-cols-6 md:grid-rows-[minmax(360px,520px)_auto] lg:grid-cols-12"
       >
         <!-- Map tile (主舞台) -->
         <div
-          class="border-border order-2 h-[360px] overflow-hidden rounded-2xl md:order-1 md:col-span-6 md:h-full lg:col-span-8"
+          class="fishing-map-wrapper border-border order-2 h-[360px] overflow-hidden rounded-2xl border shadow-sm md:order-1 md:col-span-6 md:h-full lg:col-span-8"
         >
           <FishingMapTile
             ref="mapTileRef"
@@ -170,3 +170,71 @@ onMounted(() => {
     />
   </div>
 </template>
+
+<style scoped>
+/*
+ * Map tile 的 hover 浮起 —— FishingMapTile 不在 FishingCard 内(padding=none),
+ * 单独在外层 .fishing-map-wrapper 上加同款 lift,与 FishingCard 行为一致
+ */
+.fishing-map-wrapper {
+  position: relative;
+  transition:
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 240ms ease;
+}
+.fishing-map-wrapper:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 22px -8px oklch(0% 0 0 / 0.14),
+    0 2px 6px -2px oklch(0% 0 0 / 0.06);
+}
+
+/*
+ * Dashboard 网格的入场 stagger —— 5 个 tile 按 DOM 顺序 60ms 步进淡入
+ * (B 方向: 让"留一片安静"的钓鱼 dashboard 也有"刚开锅"的呼吸感)
+ */
+@keyframes fishing-dashboard-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.fishing-dashboard > * {
+  animation: fishing-dashboard-fade-up 460ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.fishing-dashboard > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.fishing-dashboard > *:nth-child(2) {
+  animation-delay: 60ms;
+}
+.fishing-dashboard > *:nth-child(3) {
+  animation-delay: 120ms;
+}
+.fishing-dashboard > *:nth-child(4) {
+  animation-delay: 180ms;
+}
+.fishing-dashboard > *:nth-child(5) {
+  animation-delay: 240ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fishing-dashboard > * {
+    animation: none;
+  }
+  .fishing-map-wrapper:hover {
+    transform: none;
+  }
+}
+
+@media (hover: none) {
+  .fishing-map-wrapper:hover {
+    transform: none;
+  }
+}
+</style>

@@ -49,7 +49,7 @@ defineEmits<{
             aria-hidden="true"
           />
         </span>
-        <span class="hidden sm:inline">智能分析</span>
+        <span class="hidden sm:inline">AI 分析</span>
       </button>
     </div>
   </header>

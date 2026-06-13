@@ -1,52 +1,50 @@
 <template>
-  <motion.div>
-    <nav
-      class="nav squircle bg-card/90 dark:shadow-primary/10 z-9999 flex items-center gap-2 px-1 py-2 shadow-md backdrop-blur-sm"
-    >
-      <ul class="flex items-center gap-2 font-medium">
-        <!-- Avatar -->
-        <li class="ml-2 shrink-0">
-          <RouterLink to="/">
-            <img
-              v-if="auth.isAuthenticated && auth.user?.photo"
-              :src="avatarUrl"
-              :alt="currentUserName"
-              class="h-10 w-10 rounded-full object-cover ring-2 ring-white/50 transition-transform hover:scale-105 dark:ring-gray-700/50"
-            />
-            <img
-              v-else
-              src="/images/about-thumb.webp"
-              alt="Default Avatar"
-              class="h-10 w-10 rounded-full object-cover ring-2 ring-white/50 transition-transform hover:scale-105 dark:ring-gray-700/50"
-            />
-          </RouterLink>
-        </li>
-        <!-- Navigation Icons -->
-        <li class="relative flex items-center gap-4 px-2">
-          <!-- Indicator -->
-          <motion.div
-            class="bg-primary/20 pointer-events-none absolute top-0 left-0 z-1 h-12 w-12 rounded-full shadow-sm"
-            :animate="{ x: indicatorX }"
-            :transition="{ type: 'spring', stiffness: 320, damping: 30 }"
+  <motion.nav
+    class="nav squircle bg-card/90 z-9999 flex items-center gap-2 px-1 py-2 backdrop-blur-sm"
+  >
+    <ul class="flex items-center gap-2 font-medium">
+      <!-- Avatar -->
+      <li class="ml-2 shrink-0">
+        <RouterLink to="/">
+          <img
+            v-if="auth.isAuthenticated && auth.user?.photo"
+            :src="avatarUrl"
+            :alt="currentUserName"
+            class="h-10 w-10 rounded-full object-cover ring-2 ring-white/50 transition-transform hover:scale-105 dark:ring-gray-700/50"
           />
-          <!-- Nav Items -->
-          <RouterLink
-            v-for="(item, index) in navItems"
-            :key="item.to"
-            :to="item.to"
-            class="text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-foreground relative z-10 flex h-12 w-12 items-center justify-center rounded-full transition-colors"
-            :class="{
-              'text-primary dark:text-primary': isActive(item.to),
-            }"
-            @mouseenter="hoveredIndex = index"
-            @mouseleave="hoveredIndex = activeIndex"
-          >
-            <component :is="item.icon" class="h-6 w-6" />
-          </RouterLink>
-        </li>
-      </ul>
-    </nav>
-  </motion.div>
+          <img
+            v-else
+            src="/images/about-thumb.webp"
+            alt="Default Avatar"
+            class="h-10 w-10 rounded-full object-cover ring-2 ring-white/50 transition-transform hover:scale-105 dark:ring-gray-700/50"
+          />
+        </RouterLink>
+      </li>
+      <!-- Navigation Icons -->
+      <li class="relative flex items-center gap-4 px-2">
+        <!-- Indicator -->
+        <motion.div
+          class="bg-primary/20 pointer-events-none absolute top-0 left-0 z-1 h-12 w-12 rounded-full shadow-sm"
+          :animate="{ x: indicatorX }"
+          :transition="{ type: 'spring', stiffness: 320, damping: 30 }"
+        />
+        <!-- Nav Items -->
+        <RouterLink
+          v-for="(item, index) in navItems"
+          :key="item.to"
+          :to="item.to"
+          class="text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-foreground relative z-10 flex h-12 w-12 items-center justify-center rounded-full transition-colors"
+          :class="{
+            'text-primary dark:text-primary': isActive(item.to),
+          }"
+          @mouseenter="hoveredIndex = index"
+          @mouseleave="hoveredIndex = activeIndex"
+        >
+          <component :is="item.icon" class="h-6 w-6" />
+        </RouterLink>
+      </li>
+    </ul>
+  </motion.nav>
 </template>
 
 <script setup lang="ts">
@@ -118,6 +116,17 @@ const avatarUrl = computed(() => {
 
 <style scoped>
 .nav {
-  box-shadow: rgba(255, 255, 255, 0.35) 0px 0px 20px 0px inset;
+  /* 浅色模式: 内白高光 + 深色投影浮起 */
+  box-shadow:
+    rgba(255, 255, 255, 0.35) 0px 0px 20px 0px inset,
+    0 6px 16px -4px rgba(0, 0, 0, 0.12),
+    0 4px 8px -2px rgba(0, 0, 0, 0.08);
+}
+:global(.dark) .nav {
+  /* 深色模式: 弱内白高光 + 白色光晕漂浮 */
+  box-shadow:
+    rgba(255, 255, 255, 0.06) 0px 0px 20px 0px inset,
+    0 0 24px -4px rgba(255, 255, 255, 0.12),
+    0 0 8px -2px rgba(255, 255, 255, 0.08);
 }
 </style>
