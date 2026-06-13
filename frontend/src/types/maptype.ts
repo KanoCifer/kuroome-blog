@@ -55,6 +55,12 @@ export interface AMapGeolocationInstance {
   ) => void;
 }
 
+export interface AMapCitySearchInstance {
+  getLocalCity: (
+    callback: (status: string, result: unknown) => void,
+  ) => void;
+}
+
 export interface AMapNamespace {
   Geolocation: new (options?: {
     enableHighAccuracy?: boolean;
@@ -62,6 +68,7 @@ export interface AMapNamespace {
     buttonPosition?: string;
     buttonOffset?: unknown;
   }) => AMapGeolocationInstance;
+  CitySearch: new () => AMapCitySearchInstance;
   Map: new (
     container: HTMLDivElement,
     options: {

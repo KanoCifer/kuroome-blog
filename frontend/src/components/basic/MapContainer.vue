@@ -37,6 +37,7 @@ const props = withDefaults(defineProps<Props>(), {
     'AMap.Scale',
     'AMap.ToolBar',
     'AMap.Geolocation',
+    'AMap.CitySearch',
     'AMap.Driving',
   ],
   markers: () => [],
@@ -315,6 +316,8 @@ const clearRoute = () => {
 };
 
 // 获取用户当前位置
+// 链路:浏览器 Geolocation → AMap CitySearch(IP 定位,矩形中心) → 报错
+// 桌面 Mac / 关 Wi-Fi 时 CoreLocation 必失败,IP 兜底是核心路径
 const getCurrentPosition = (): Promise<[number, number]> => {
   return new Promise((resolve, reject) => {
     if (!map) {
@@ -324,28 +327,67 @@ const getCurrentPosition = (): Promise<[number, number]> => {
 
     const AMap = (window as { AMap: AMapNamespace }).AMap;
 
+    const tryIPFallback = (browserReason: string) => {
+      try {
+        const citySearch = new AMap.CitySearch();
+        citySearch.getLocalCity(
+          (status: string, result: unknown) => {
+            if (status !== 'complete') {
+              const err = result as { info?: string } | null;
+              reject(
+                new Error(
+                  `浏览器定位失败 (${browserReason});IP 定位也失败 (${err?.info || '未知'})。` +
+                    '请检查 macOS 位置服务 / Wi-Fi / 浏览器位置权限,或临时关闭广告拦截扩展',
+                ),
+              );
+              return;
+            }
+            const r = result as { rectangle?: string };
+            if (!r.rectangle) {
+              reject(new Error('IP 定位未返回坐标范围'));
+              return;
+            }
+            const [p1, p2] = r.rectangle.split(';');
+            if (!p1 || !p2) {
+              reject(new Error('IP 定位坐标格式异常'));
+              return;
+            }
+            const [lng1, lat1] = p1.split(',').map(Number);
+            const [lng2, lat2] = p2.split(',').map(Number);
+            if ([lng1, lat1, lng2, lat2].some(Number.isNaN)) {
+              reject(new Error('IP 定位坐标解析失败'));
+              return;
+            }
+            // 矩形中心(精度到城市级,够钓鱼指数计算)
+            resolve([(lng1 + lng2) / 2, (lat1 + lat2) / 2]);
+          },
+        );
+      } catch (e) {
+        reject(new Error(e instanceof Error ? e.message : String(e)));
+      }
+    };
+
     try {
-      const geolocation = new AMap.Geolocation({
-        enableHighAccuracy: true,
-        timeout: 10000,
-      });
+      const geolocation = new AMap.Geolocation({ timeout: 10000 });
       geolocation.getCurrentPosition((status: string, result: unknown) => {
         if (status === 'complete') {
           const geoResult = result as {
             position: { lng: number; lat: number };
           };
           resolve([geoResult.position.lng, geoResult.position.lat]);
-        } else {
-          const errResult = result as {
-            info?: string;
-            message?: string;
-          } | null;
-          const reason = errResult?.info || errResult?.message || '未知错误';
-          reject(new Error(`获取位置失败: ${reason}`));
+          return;
         }
+        const errResult = result as {
+          info?: string;
+          message?: string;
+        } | null;
+        const reason =
+          errResult?.info || errResult?.message || '未知错误';
+        tryIPFallback(reason);
       });
-    } catch (error) {
-      reject(new Error(error instanceof Error ? error.message : String(error)));
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      tryIPFallback(msg);
     }
   });
 };
