@@ -79,7 +79,7 @@ const handleSubmit = async () => {
     <transition name="modal-fade">
       <div
         v-if="isOpen"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        class="bg-foreground/40 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
       >
         <div class="bg-card mx-4 w-full max-w-md rounded-2xl p-6 shadow-xl">
           <h3 class="text-foreground mb-4 text-lg font-semibold">

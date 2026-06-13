@@ -91,7 +91,9 @@
             v-if="filter === 'all' && (showReadingRail || showRecommendRail)"
             class="mt-2 mb-3 flex items-baseline justify-between"
           >
-            <h2 class="text-foreground font-serif text-xl font-bold md:text-2xl">
+            <h2
+              class="text-foreground font-serif text-xl font-bold md:text-2xl"
+            >
               全部书架
             </h2>
             <span class="text-muted-foreground text-xs tabular-nums">
@@ -110,10 +112,7 @@
           </div>
 
           <!-- List variant -->
-          <div
-            v-else-if="density === 'list'"
-            class="flex flex-col gap-2"
-          >
+          <div v-else-if="density === 'list'" class="flex flex-col gap-2">
             <BookCard
               v-for="(book, index) in displayedBooks"
               :key="book.bookId"
@@ -125,10 +124,7 @@
           </div>
 
           <!-- Grid variant -->
-          <div
-            v-else
-            :class="gridClass"
-          >
+          <div v-else :class="gridClass">
             <BookCard
               v-for="(book, index) in displayedBooks"
               :key="book.bookId"
@@ -200,8 +196,14 @@ watch([filter, sort, density], ([f, s, d]) => {
 
 const statsStore = useReadStatsStore();
 
-const { isLoading, errorMessage, isSyncing, visibleBooks, fetchBooks, handleSync } =
-  useWereadShelf();
+const {
+  isLoading,
+  errorMessage,
+  isSyncing,
+  visibleBooks,
+  fetchBooks,
+  handleSync,
+} = useWereadShelf();
 
 // ── 状态分桶 ─────────────────────────────────────────────────
 const buckets = computed(() => {

@@ -67,9 +67,7 @@ function cascadeTop(
 }
 
 /** Create a shallowRef<CSSProperties> that only updates when top/left actually change */
-function usePositionRef(
-  source: () => CSSProperties,
-): Ref<CSSProperties> {
+function usePositionRef(source: () => CSSProperties): Ref<CSSProperties> {
   const pos = shallowRef<CSSProperties>(source());
 
   watch(

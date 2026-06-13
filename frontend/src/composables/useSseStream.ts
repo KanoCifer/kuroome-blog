@@ -35,9 +35,10 @@ export function parseSseChunk(buffer: string): {
  * 收到每个 data 帧时调用 onData，遇到 [DONE] 时调用 onDone。
  * 统一处理 reader / decoder / buffer，调用方只需关心业务逻辑。
  */
-export async function consumeSseStream<
-  T = { content?: string },
->(options: SseRequestOptions, handlers: SseHandlers<T>): Promise<void> {
+export async function consumeSseStream<T = { content?: string }>(
+  options: SseRequestOptions,
+  handlers: SseHandlers<T>,
+): Promise<void> {
   const response = await fetch(options.url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

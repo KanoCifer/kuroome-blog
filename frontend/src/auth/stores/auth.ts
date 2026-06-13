@@ -1,6 +1,9 @@
 import { createAuthGateway } from '@/auth/api/authGateway';
 import { refreshAccessToken } from '@/auth/api/refresh';
-import { getAccessToken as getToken, setAccessToken } from '@/auth/tokenService';
+import {
+  getAccessToken as getToken,
+  setAccessToken,
+} from '@/auth/tokenService';
 import { reconnectWs } from '@/plugins/visitorWs';
 import type { UserInfo } from '@/auth/types';
 import { userCache } from '@/auth/userCache';

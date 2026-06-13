@@ -1,10 +1,14 @@
 <template>
-  <BentoCard class="group relative flex w-64 flex-col items-center justify-center overflow-hidden select-none">
+  <BentoCard
+    class="group relative flex w-64 flex-col items-center justify-center overflow-hidden select-none"
+  >
     <!-- 背景水波纹效果 -->
     <div
       class="absolute inset-0 bg-linear-to-br from-indigo-500/10 via-blue-500/5 to-purple-500/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
     />
-    <p class="text-muted-foreground relative text-sm font-medium tracking-wider">
+    <p
+      class="text-muted-foreground relative text-sm font-medium tracking-wider"
+    >
       {{ dateLabel }}
     </p>
     <BentoClockTime />
@@ -34,8 +38,7 @@ function refreshDateLabels() {
 
 onMounted(() => {
   // Refresh at midnight
-  const msUntilMidnight =
-    dayjs().endOf('day').valueOf() - Date.now() + 1000;
+  const msUntilMidnight = dayjs().endOf('day').valueOf() - Date.now() + 1000;
   dateTimer = setTimeout(() => {
     refreshDateLabels();
     // Then check every hour in case of timezone shifts

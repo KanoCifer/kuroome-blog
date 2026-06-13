@@ -178,3 +178,18 @@ export interface FishingStats {
   total_records: number;
   latest_record_time: string | null;
 }
+
+/**
+ * 喂给 <WeatherAnalysis> 组件的聚合数据。
+ * 在 useFishingAnalysis 中拼装,在 FishingAnalysisDrawer / WeatherAnalysis 中消费。
+ * 字段都是 optional —— Live / forecast / tide 任一为空,WeatherAnalysis 内部按需处理。
+ */
+export interface WeatherAnalysisPayload {
+  liveWeather?: WeatherNow | null;
+  forecasts?: WeatherDay[];
+  tideData?: TideData | null;
+  weatherIndices?: Array<Record<string, unknown>>;
+  fishingIndex?: FishingIndexData;
+  locationName?: string;
+  tideSpotName?: string;
+}

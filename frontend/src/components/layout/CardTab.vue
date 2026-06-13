@@ -11,7 +11,11 @@ const { cardIndex, cardImages, setCardIndex } = useCardImage();
       <label class="text-muted-foreground mb-3 block text-sm font-medium">
         选择卡片配图
       </label>
-      <ImageGrid :images="cardImages" :selected="cardIndex" @select="setCardIndex" />
+      <ImageGrid
+        :images="cardImages"
+        :selected="cardIndex"
+        @select="setCardIndex"
+      />
     </div>
   </div>
 </template>

@@ -74,7 +74,7 @@
     <div
       v-else
       ref="railEl"
-      class="scroll-px-4 sm:scroll-px-6 md:scroll-px-10 -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:gap-4 sm:px-6 md:-mx-10 md:px-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      class="-mx-4 flex snap-x snap-mandatory scroll-px-4 [scrollbar-width:none] gap-3 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:scroll-px-6 sm:gap-4 sm:px-6 md:-mx-10 md:scroll-px-10 md:px-10 [&::-webkit-scrollbar]:hidden"
     >
       <button
         v-for="book in books"
@@ -144,10 +144,7 @@
         @click="$emit('loadMore')"
         aria-label="加载更多推荐"
       >
-        <ArrowRight
-          class="h-4 w-4"
-          :class="{ 'animate-spin': loading }"
-        />
+        <ArrowRight class="h-4 w-4" :class="{ 'animate-spin': loading }" />
         <span>{{ loading ? '加载中…' : '更多' }}</span>
       </button>
     </div>
@@ -176,14 +173,11 @@ defineEmits<{
   (e: 'loadMore'): void;
 }>();
 
-const showSkeleton = computed(
-  () => props.loading && props.books.length === 0,
-);
+const showSkeleton = computed(() => props.loading && props.books.length === 0);
 
 // 始终显示 section header(让用户知道有这区块),除非完全没数据且没在 loading 且没错误
 const shouldRender = computed(
-  () =>
-    props.loading || props.books.length > 0 || !!props.error,
+  () => props.loading || props.books.length > 0 || !!props.error,
 );
 
 /** 远端 newRating 是 0-100 整数,转成 0-10 分小数 */

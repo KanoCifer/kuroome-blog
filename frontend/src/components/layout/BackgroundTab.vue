@@ -108,7 +108,9 @@ const autoSwitchOptions = [
         <button
           @click="backgroundStore.randomize()"
           class="border-border hover:border-primary flex items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all"
-          :class="{ 'border-primary bg-primary/5': backgroundStore.mode === 'random' }"
+          :class="{
+            'border-primary bg-primary/5': backgroundStore.mode === 'random',
+          }"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -132,7 +134,9 @@ const autoSwitchOptions = [
         <button
           @click="backgroundStore.mode = 'fixed'"
           class="border-border hover:border-primary flex items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all"
-          :class="{ 'border-primary bg-primary/5': backgroundStore.mode === 'fixed' }"
+          :class="{
+            'border-primary bg-primary/5': backgroundStore.mode === 'fixed',
+          }"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

@@ -149,7 +149,8 @@ export function useArticleChat(ctx: ArticleContext, apiBase: string) {
         },
       );
     } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : '对话失败，请稍后重试';
+      const msg =
+        error instanceof Error ? error.message : '对话失败，请稍后重试';
       messages.value[assistantIdx].content = `[ERROR] ${msg}`;
       notifyError(msg);
     } finally {

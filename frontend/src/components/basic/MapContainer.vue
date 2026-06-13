@@ -1,5 +1,5 @@
 <template>
-  <div ref="containerRef" class="map-container shadow-lg"></div>
+  <div ref="containerRef" class="map-container shadow-md"></div>
 </template>
 
 <script setup lang="ts">
@@ -14,7 +14,9 @@ import type {
   AMapSecurityConfig,
 } from '@/types/maptype';
 import AMapLoader from '@amap/amap-jsapi-loader';
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, watch, useTemplateRef } from 'vue';
+
+const containerRef = useTemplateRef<HTMLDivElement>('containerRef');
 
 export interface Props {
   center?: [number, number];
@@ -60,7 +62,6 @@ declare global {
   }
 }
 
-const containerRef = ref<HTMLDivElement | null>(null);
 let map: AMapMapInstance | null = null;
 let markerInstances: AMapMarkerInstance[] = [];
 let driving: AMapDriving | null = null;
@@ -75,19 +76,15 @@ const fetchSecurityKey = async (): Promise<string> => {
     if (encodedKey) {
       try {
         const decoded = atob(encodedKey);
-        // console.debug("[AMap] Security key fetched & decoded:", decoded);
+
         return decoded;
       } catch {
-        // console.warn("[AMap] Failed to decode security key, using as-is");
         return encodedKey;
       }
     }
 
-    // Fallback to env var if API returns empty
-    // console.warn("[AMap] API returned empty security key, using env var fallback");
     return import.meta.env.VITE_AMAP_SECURITY_CODE || '';
   } catch {
-    // console.error("[AMap] Failed to fetch security key:", error);
     return import.meta.env.VITE_AMAP_SECURITY_CODE || '';
   }
 };
@@ -137,7 +134,6 @@ onMounted(async () => {
 
       if (props.showGeolocation) {
         const geolocation = new AMap.Geolocation({
-          enableHighAccuracy: true,
           timeout: 10000,
           buttonPosition: 'RB',
           buttonOffset: new AMap.Pixel(10, 20),
@@ -327,19 +323,30 @@ const getCurrentPosition = (): Promise<[number, number]> => {
     }
 
     const AMap = (window as { AMap: AMapNamespace }).AMap;
-    const geolocation = new AMap.Geolocation({
-      enableHighAccuracy: true,
-      timeout: 10000,
-    });
 
-    geolocation.getCurrentPosition((status: string, result: unknown) => {
-      if (status === 'complete') {
-        const geoResult = result as { position: { lng: number; lat: number } };
-        resolve([geoResult.position.lng, geoResult.position.lat]);
-      } else {
-        reject(new Error('获取位置失败'));
-      }
-    });
+    try {
+      const geolocation = new AMap.Geolocation({
+        enableHighAccuracy: true,
+        timeout: 10000,
+      });
+      geolocation.getCurrentPosition((status: string, result: unknown) => {
+        if (status === 'complete') {
+          const geoResult = result as {
+            position: { lng: number; lat: number };
+          };
+          resolve([geoResult.position.lng, geoResult.position.lat]);
+        } else {
+          const errResult = result as {
+            info?: string;
+            message?: string;
+          } | null;
+          const reason = errResult?.info || errResult?.message || '未知错误';
+          reject(new Error(`获取位置失败: ${reason}`));
+        }
+      });
+    } catch (error) {
+      reject(new Error(error instanceof Error ? error.message : String(error)));
+    }
   });
 };
 
@@ -384,6 +391,6 @@ onUnmounted(() => {
   padding: 0px;
   margin: 0px;
   width: 100%;
-  height: 600px;
+  height: 100%;
 }
 </style>

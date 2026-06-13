@@ -74,13 +74,17 @@ const schemes: { value: ColorScheme; label: string; colors: string[] }[] = [
         <div
           class="h-6 w-11 rounded-full p-0.5 transition-colors"
           :class="
-            themeStore.showFooter === 'true' ? 'bg-primary' : 'bg-muted-foreground/30'
+            themeStore.showFooter === 'true'
+              ? 'bg-primary'
+              : 'bg-muted-foreground/30'
           "
         >
           <div
             class="h-5 w-5 rounded-full bg-white shadow-md transition-transform"
             :class="
-              themeStore.showFooter === 'true' ? 'translate-x-5' : 'translate-x-0'
+              themeStore.showFooter === 'true'
+                ? 'translate-x-5'
+                : 'translate-x-0'
             "
           />
         </div>
@@ -98,7 +102,9 @@ const schemes: { value: ColorScheme; label: string; colors: string[] }[] = [
           :key="theme.value"
           @click="selectTheme(theme.value as Theme, $event)"
           class="border-border hover:border-primary flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-all"
-          :class="{ 'border-primary bg-primary/5': themeStore.theme === theme.value }"
+          :class="{
+            'border-primary bg-primary/5': themeStore.theme === theme.value,
+          }"
         >
           <span v-html="theme.icon"></span>
           <span class="text-xs font-medium">{{ theme.label }}</span>
@@ -118,12 +124,16 @@ const schemes: { value: ColorScheme; label: string; colors: string[] }[] = [
           :class="{ 'border-primary bg-muted': themeStore.font === 'default' }"
         >
           <span class="font-sans text-sm font-medium">默认字体</span>
-          <span class="text-muted-foreground font-sans text-xs">PingFang SC</span>
+          <span class="text-muted-foreground font-sans text-xs"
+            >PingFang SC</span
+          >
         </button>
         <button
           @click="themeStore.applyFont('harmonyos')"
           class="border-border hover:border-primary flex flex-col items-center gap-1 rounded-xl border-2 p-3 transition-all"
-          :class="{ 'border-primary bg-muted': themeStore.font === 'harmonyos' }"
+          :class="{
+            'border-primary bg-muted': themeStore.font === 'harmonyos',
+          }"
         >
           <span
             class="font-family-harmonyos text-sm font-medium"
@@ -148,7 +158,9 @@ const schemes: { value: ColorScheme; label: string; colors: string[] }[] = [
           :key="scheme.value"
           @click="themeStore.setScheme(scheme.value)"
           class="border-border hover:border-primary flex w-full items-center gap-3 rounded-xl border-2 p-3 transition-all"
-          :class="{ 'border-primary bg-primary/5': themeStore.scheme === scheme.value }"
+          :class="{
+            'border-primary bg-primary/5': themeStore.scheme === scheme.value,
+          }"
         >
           <div class="flex gap-1">
             <span

@@ -69,7 +69,10 @@ const goToChangelog = () => {
             <!-- 图标：呼吸发光 -->
             <div
               class="animate-icon-glow bg-warning/15 ring-warning/20 relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ring-1"
-              style="box-shadow: 0 0 12px color-mix(in srgb, var(--color-warning) 25%, transparent)"
+              style="
+                box-shadow: 0 0 12px
+                  color-mix(in srgb, var(--color-warning) 25%, transparent);
+              "
             >
               <svg
                 v-if="isDay"

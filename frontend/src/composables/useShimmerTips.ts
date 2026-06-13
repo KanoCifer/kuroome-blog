@@ -1,10 +1,6 @@
 import { ref, watch, onUnmounted } from 'vue';
 
-const SHIMMER_TIPS = [
-  '分析文章结构…',
-  '提取关键信息…',
-  '生成总结内容…',
-];
+const SHIMMER_TIPS = ['分析文章结构…', '提取关键信息…', '生成总结内容…'];
 
 /**
  * 轮播一组提示文案，loading 时启动、停止时清理。

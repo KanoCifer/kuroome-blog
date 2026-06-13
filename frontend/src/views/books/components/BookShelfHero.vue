@@ -62,7 +62,9 @@
       <div class="mt-2 flex items-center gap-3">
         <span class="text-sm text-white/75 md:text-base">微信读书</span>
         <span class="h-1 w-1 rounded-full bg-white/40" />
-        <span v-if="bookCount !== null" class="text-sm text-white/75 md:text-base"
+        <span
+          v-if="bookCount !== null"
+          class="text-sm text-white/75 md:text-base"
           >{{ bookCount }} 本书</span
         >
       </div>

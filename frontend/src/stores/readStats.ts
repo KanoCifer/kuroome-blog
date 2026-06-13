@@ -40,9 +40,7 @@ export const useReadStatsStore = defineStore('readStats', () => {
   const snapshotByMode = currentByMode;
   const currentSnapshots = computed(() => Object.values(currentByMode.value));
 
-  const weeklySnapshot = computed(
-    () => currentByMode.value['weekly'] ?? null,
-  );
+  const weeklySnapshot = computed(() => currentByMode.value['weekly'] ?? null);
   const monthlySnapshot = computed(
     () => currentByMode.value['monthly'] ?? null,
   );
@@ -111,10 +109,7 @@ export const useReadStatsStore = defineStore('readStats', () => {
    * - reset=true（默认）→ 从头拉，覆盖现有列表
    * - reset=false → 从 recommendMaxIdx 续取，追加到列表末尾
    */
-  async function fetchRecommends(
-    reset = true,
-    count = 12,
-  ): Promise<void> {
+  async function fetchRecommends(reset = true, count = 12): Promise<void> {
     if (isLoadingRecommends.value) return;
     if (!reset && !hasMoreRecommends.value) return;
     isLoadingRecommends.value = true;

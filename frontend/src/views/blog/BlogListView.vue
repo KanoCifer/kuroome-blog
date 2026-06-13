@@ -284,7 +284,9 @@
                 <li v-else>
                   <button
                     type="button"
-                    :aria-current="item === pagination?.page ? 'page' : undefined"
+                    :aria-current="
+                      item === pagination?.page ? 'page' : undefined
+                    "
                     class="focus-visible:ring-ring inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                     :class="
                       item === pagination?.page
@@ -460,8 +462,7 @@ const goToPage = (page: number) => {
     // 滚到列表顶部锚点，避免从 #main-content 跳屏
     const anchor = document.getElementById('blog-list-top');
     if (anchor) {
-      const top =
-        anchor.getBoundingClientRect().top + window.scrollY - 80;
+      const top = anchor.getBoundingClientRect().top + window.scrollY - 80;
       window.scrollTo({ top, behavior: 'smooth' });
     }
   }

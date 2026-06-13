@@ -5,12 +5,10 @@
     class="group block w-full border-t border-white/15 bg-black/30 px-4 py-2.5 text-left backdrop-blur-md transition-colors hover:bg-black/40 sm:px-6 md:px-10 md:py-3"
     @click="router.push('/bookshelf/stats')"
   >
-    <div
-      class="mx-auto flex max-w-6xl items-center gap-3 sm:gap-5"
-    >
+    <div class="mx-auto flex max-w-6xl items-center gap-3 sm:gap-5">
       <!-- 本周阅读时长 -->
       <span class="inline-flex items-baseline gap-1.5 text-white">
-        <span class="text-white/60 text-xs font-medium">本周</span>
+        <span class="text-xs font-medium text-white/60">本周</span>
         <span class="font-serif text-sm font-bold tabular-nums sm:text-base">
           {{ formatDuration(weeklySnapshot.totalReadTime) }}
         </span>
@@ -20,11 +18,11 @@
 
       <!-- 阅读天数 -->
       <span class="inline-flex items-baseline gap-1.5 text-white">
-        <span class="text-white/60 text-xs font-medium">阅读</span>
+        <span class="text-xs font-medium text-white/60">阅读</span>
         <span class="font-serif text-sm font-bold tabular-nums sm:text-base">
           {{ weeklySnapshot.readDays ?? 0 }}
         </span>
-        <span class="text-white/60 text-xs">天</span>
+        <span class="text-xs text-white/60">天</span>
       </span>
 
       <!-- 最近在读(sm 以上才显示,移动端太挤) -->
@@ -33,7 +31,7 @@
         <span
           class="hidden min-w-0 flex-1 items-baseline gap-1.5 text-white sm:inline-flex"
         >
-          <span class="text-white/60 flex-shrink-0 text-xs font-medium">
+          <span class="flex-shrink-0 text-xs font-medium text-white/60">
             最近
           </span>
           <span
@@ -42,10 +40,7 @@
           >
             「{{ latestBook.title }}」
           </span>
-          <span
-            v-if="recencyLabel"
-            class="text-white/60 flex-shrink-0 text-xs"
-          >
+          <span v-if="recencyLabel" class="flex-shrink-0 text-xs text-white/60">
             {{ recencyLabel }}
           </span>
         </span>
@@ -56,7 +51,7 @@
 
       <!-- CTA -->
       <span
-        class="text-white/70 group-hover:text-white inline-flex flex-shrink-0 items-center gap-1 text-xs font-medium transition-colors"
+        class="inline-flex flex-shrink-0 items-center gap-1 text-xs font-medium text-white/70 transition-colors group-hover:text-white"
       >
         <span class="hidden sm:inline">看详情</span>
         <ChevronRight class="h-3.5 w-3.5" />

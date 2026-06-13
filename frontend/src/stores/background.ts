@@ -82,11 +82,7 @@ export const useBackgroundStore = defineStore('background', () => {
     localStorage.setItem('bg-auto-switch', String(seconds));
   };
 
-  watch(
-    [mode, autoSwitchInterval],
-    startAutoSwitch,
-    { immediate: true },
-  );
+  watch([mode, autoSwitchInterval], startAutoSwitch, { immediate: true });
 
   const handleVisibilityChange = () => {
     if (document.hidden) {

@@ -8,7 +8,10 @@
     <div
       class="absolute inset-0 bg-linear-to-br from-violet-500/10 via-purple-500/5 to-indigo-500/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
     />
-    <RouterLink to="/todos" class="relative flex h-full items-center gap-3 px-4 py-2">
+    <RouterLink
+      to="/todos"
+      class="relative flex h-full items-center gap-3 px-4 py-2"
+    >
       <div
         class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-500/15 transition-transform duration-300 group-hover:scale-110"
       >

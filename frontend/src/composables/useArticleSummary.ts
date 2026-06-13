@@ -67,10 +67,7 @@ export function useArticleSummary(ctx: ArticleContext, apiBase: string) {
     }
   }
 
-  async function generate(
-    notifyError: (msg: string) => void,
-    model?: string,
-  ) {
+  async function generate(notifyError: (msg: string) => void, model?: string) {
     if (!canSummarize.value) {
       notifyError('文章内容为空，无法总结');
       return;

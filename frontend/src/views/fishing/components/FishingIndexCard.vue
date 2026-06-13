@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useFishingMapStore } from '@/stores/fishingMap';
+import FishingCard from '@/views/fishing/components/FishingCard.vue';
 import type { FishingIndexData } from '@/views/fishing/types';
 import { FishingRod, Loader } from '@lucide/vue';
-import { motion } from 'motion-v';
 import { storeToRefs } from 'pinia';
 
 interface Props {
@@ -23,8 +23,9 @@ const {
   indexLoading: loading,
   indexError: error,
 } = storeToRefs(fishingMapStore);
-// console.log("钓鱼指数数据：", indexData.value);
-const levelColors: Record<string, string> = {
+
+/** 顶部大数字配色 (text-* 语义 token) */
+const levelTextColor: Record<string, string> = {
   爆护: 'text-success',
   好: 'text-primary',
   一般: 'text-warning',
@@ -32,29 +33,17 @@ const levelColors: Record<string, string> = {
   空军: 'text-muted-foreground',
 };
 
-const levelBg: Record<string, string> = {
-  爆护: 'bg-success/10',
-  好: 'bg-primary/10',
-  一般: 'bg-warning/10',
-  差: 'bg-destructive/10',
-  空军: 'bg-muted',
-};
-
-const getGaugeColor = (percentage: number): string => {
-  if (percentage >= 85) return '#22c55e';
-  if (percentage >= 70) return '#06b6d4';
-  if (percentage >= 50) return '#f97316';
-  if (percentage <= 30) return '#ef4444';
-  return '#3b82f6'; // blue-500
-};
-
-const getGaugeStyle = (value: number) => {
-  if (!value) return {};
-  const percentage = Math.round(value * 100);
-  return {
-    width: `${percentage}%`,
-    background: `linear-gradient(90deg, ${getGaugeColor(percentage)}cc, ${getGaugeColor(percentage)})`,
-  };
+/**
+ * Gauge 进度条配色 —— 用 Tailwind gradient + 语义 token,避免硬编码 hex
+ * 这里只决定 class,实际宽度仍走 inline style (因为依赖运行时 value)
+ */
+const gaugeGradientClass = (percentage: number): string => {
+  if (percentage >= 85) return 'bg-gradient-to-r from-success/70 to-success';
+  if (percentage >= 70) return 'bg-gradient-to-r from-primary/70 to-primary';
+  if (percentage >= 50) return 'bg-gradient-to-r from-warning/70 to-warning';
+  if (percentage <= 30)
+    return 'bg-gradient-to-r from-destructive/70 to-destructive';
+  return 'bg-gradient-to-r from-primary/50 to-primary/90';
 };
 
 const formatFeatureName = (name: string): string => {
@@ -73,55 +62,45 @@ const formatFeatureName = (name: string): string => {
 };
 
 const fetchIndex = async () => {
-  console.log('刷新钓鱼指数，位置：', props.location);
   await fishingMapStore.fetchWeatherAndFishing(props.location);
 };
 
 const handleFeedback = () => {
-  if (indexData.value) {
-    emit('feedback-click', indexData.value);
-  }
+  if (indexData.value) emit('feedback-click', indexData.value);
 };
 </script>
 
 <template>
-  <article
-    class="group squircle border-border/20 relative flex h-full cursor-pointer flex-col overflow-hidden border p-6 shadow-lg transition-all duration-500 hover:-translate-y-2 hover:shadow-xl"
-    :class="indexData ? levelBg[indexData.level] || 'bg-muted' : 'bg-muted'"
-  >
-    <div
-      class="pointer-events-none absolute top-0 right-0 overflow-hidden rounded-full p-8 blur-3xl"
-    >
-      <div
-        class="h-24 w-24 rounded-full bg-linear-to-br from-blue-200/60 to-green-200/60"
-      />
-    </div>
-
-    <!-- 钓鱼指数标题和说明 -->
-    <div class="mb-3 flex items-center justify-between">
+  <FishingCard tone="hero" padding="default">
+    <!-- 标题 + 刷新 + 图标 -->
+    <div class="mb-4 flex items-start justify-between gap-3">
       <div>
-        <h3 class="text-foreground text-lg font-bold tracking-tight">
+        <h3 class="text-foreground text-lg font-semibold tracking-tight">
           钓鱼指数
         </h3>
-        <p class="text-muted-foreground text-sm">基于实时天气、潮汐综合计算</p>
+        <p class="text-muted-foreground mt-0.5 text-sm">
+          基于实时天气、潮汐综合计算
+        </p>
       </div>
-      <div class="flex items-center gap-3">
+      <div class="flex shrink-0 items-center gap-2">
         <button
-          class="bg-card/60 text-muted-foreground hover:bg-card/80 flex h-fit cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-sm disabled:cursor-not-allowed"
+          class="text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+          type="button"
           :disabled="loading"
           @click="fetchIndex"
         >
           <Loader v-if="loading" class="h-3 w-3 animate-spin" />
-          {{ loading ? '刷新中...' : '刷新' }}
+          {{ loading ? '刷新中' : '刷新' }}
         </button>
         <div
-          class="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-sky-400 to-blue-500 shadow-lg shadow-sky-500/25 transition-transform duration-300 group-hover:scale-110"
+          class="bg-primary text-primary-foreground flex h-11 w-11 items-center justify-center rounded-xl shadow-sm"
         >
-          <FishingRod class="text-primary-foreground" />
+          <FishingRod class="h-5 w-5" />
         </div>
       </div>
     </div>
 
+    <!-- 主数据 / loading / error -->
     <p v-if="loading && !indexData" class="text-muted-foreground text-sm">
       加载中...
     </p>
@@ -129,83 +108,82 @@ const handleFeedback = () => {
       {{ error }}
     </p>
     <template v-else-if="indexData">
-      <div class="mb-3 flex items-end gap-3">
+      <div class="mb-4 flex items-end gap-3">
         <span
-          class="text-5xl font-bold"
-          :class="levelColors[indexData.level] || 'text-muted-foreground'"
+          class="text-5xl leading-none font-bold tabular-nums"
+          :class="levelTextColor[indexData.level] || 'text-muted-foreground'"
         >
           {{ indexData.fishing_index }}
         </span>
         <span
           class="mb-1 text-lg font-medium"
-          :class="levelColors[indexData.level] || 'text-muted-foreground'"
+          :class="levelTextColor[indexData.level] || 'text-muted-foreground'"
         >
           {{ indexData.level }}
         </span>
       </div>
 
-      <div class="mb-3 grid grid-cols-3 gap-2 text-center text-xs">
-        <div
-          class="bg-card/60 rounded-lg px-2 py-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-        >
-          默认权重
-          <div class="text-foreground mt-1 font-medium">
+      <!-- 三联指标 -->
+      <div class="mb-4 grid grid-cols-3 gap-2 text-center text-xs">
+        <div class="bg-muted/40 rounded-lg px-2 py-2">
+          <p class="text-muted-foreground">默认权重</p>
+          <p class="text-foreground mt-1 font-medium tabular-nums">
             {{ indexData.expert_score }}
-          </div>
+          </p>
         </div>
-        <div
-          class="bg-card/60 rounded-lg px-2 py-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-        >
-          权重调整
-          <div class="text-foreground mt-1 font-medium">
+        <div class="bg-muted/40 rounded-lg px-2 py-2">
+          <p class="text-muted-foreground">权重调整</p>
+          <p class="text-foreground mt-1 font-medium tabular-nums">
             {{ indexData.residual > 0 ? '+' : '' }}{{ indexData.residual }}
-          </div>
+          </p>
         </div>
-        <div
-          class="bg-card/60 rounded-lg px-2 py-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-        >
-          综合指数
-          <div class="text-foreground mt-1 font-medium">
+        <div class="bg-muted/40 rounded-lg px-2 py-2">
+          <p class="text-muted-foreground">综合</p>
+          <p class="text-foreground mt-1 font-medium tabular-nums">
             {{ indexData.fishing_index }}
-          </div>
+          </p>
         </div>
       </div>
 
+      <!-- 特征详情 (默认展开,小尺寸) -->
       <details
         v-if="Object.keys(indexData.feature_breakdown).length > 0"
         open
-        class="mt-4 cursor-pointer text-xs"
+        class="text-xs"
       >
-        <summary class="text-muted-foreground">特征详情</summary>
+        <summary
+          class="text-muted-foreground hover:text-foreground cursor-pointer select-none"
+        >
+          特征详情
+        </summary>
         <div class="mt-2 grid grid-cols-3 gap-2">
-          <motion.div
+          <div
             v-for="(value, keyName) in indexData.feature_breakdown"
             :key="keyName"
-            class="border-border/60 bg-card/60 rounded-xl border p-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+            class="border-border/60 bg-muted/30 rounded-xl border p-2.5"
           >
-            <div class="text-foreground text-xs">
-              {{ formatFeatureName(keyName) }}
-            </div>
-
+            <p class="text-foreground">{{ formatFeatureName(keyName) }}</p>
             <div
-              class="bg-muted relative mt-1 h-1.5 w-full overflow-hidden rounded-full"
+              class="bg-muted relative mt-1.5 h-1.5 w-full overflow-hidden rounded-full"
             >
               <div
                 class="absolute inset-y-0 left-0 rounded-full transition-all duration-700 ease-out"
-                :style="getGaugeStyle(value)"
+                :class="gaugeGradientClass(Math.round(value * 100))"
+                :style="{ width: `${Math.round(value * 100)}%` }"
               />
             </div>
-          </motion.div>
+          </div>
         </div>
       </details>
 
       <button
-        class="bg-primary text-primary-foreground hover:bg-primary/90 mt-3 w-full rounded-lg px-3 py-2 text-sm font-medium"
+        class="bg-primary text-primary-foreground hover:bg-primary/90 mt-auto w-full rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+        type="button"
         @click="handleFeedback"
       >
         提交钓鱼反馈
       </button>
     </template>
     <p v-else class="text-muted-foreground text-sm">暂无数据</p>
-  </article>
+  </FishingCard>
 </template>

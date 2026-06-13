@@ -29,9 +29,7 @@ function readingCountLabel(n: number): string {
   return `${n} 人在读`;
 }
 
-const showSkeleton = computed(
-  () => props.loading && props.books.length === 0,
-);
+const showSkeleton = computed(() => props.loading && props.books.length === 0);
 
 /** 当前打开的推荐书；null = 模态关闭 */
 const activeBook = ref<BookRecommendItem | null>(null);

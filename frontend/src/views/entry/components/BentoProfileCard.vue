@@ -1,6 +1,8 @@
 <template>
   <!-- Profile Card -->
-  <BentoCard class="group relative flex items-center justify-center overflow-hidden">
+  <BentoCard
+    class="group relative flex items-center justify-center overflow-hidden"
+  >
     <!-- 背景水波纹效果 -->
     <div
       class="absolute inset-0 bg-linear-to-br from-cyan-500/10 via-teal-500/5 to-blue-500/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100"

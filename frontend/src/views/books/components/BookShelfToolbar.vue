@@ -12,7 +12,7 @@
           :value="searchQuery"
           type="text"
           placeholder="搜索书名或作者…"
-          class="border-border bg-card placeholder:text-muted-foreground/50 focus:border-primary focus:ring-primary/20 w-full rounded-xl border py-2 pr-3 pl-9 text-sm outline-none transition-colors focus:ring-2"
+          class="border-border bg-card placeholder:text-muted-foreground/50 focus:border-primary focus:ring-primary/20 w-full rounded-xl border py-2 pr-3 pl-9 text-sm transition-colors outline-none focus:ring-2"
           @input="onSearchInput"
         />
       </div>
@@ -71,10 +71,7 @@
             @click="onSelectSort(opt.key)"
           >
             <span>{{ opt.label }}</span>
-            <Check
-              v-if="sort === opt.key"
-              class="text-primary h-3.5 w-3.5"
-            />
+            <Check v-if="sort === opt.key" class="text-primary h-3.5 w-3.5" />
           </button>
         </div>
       </div>
@@ -82,7 +79,7 @@
 
     <!-- Row 2: 状态 chip -->
     <div
-      class="mt-3 -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-0.5"
+      class="-mx-1 mt-3 flex gap-1.5 overflow-x-auto px-1 pb-0.5"
       role="tablist"
       aria-label="书籍状态"
     >
@@ -192,7 +189,10 @@ function countOf(key: ShelfFilter) {
 function onDocClick(e: MouseEvent) {
   if (!sortMenuOpen.value) return;
   const target = e.target as HTMLElement;
-  if (!target.closest?.('[aria-haspopup="menu"]') && !target.closest?.('[role="menu"]')) {
+  if (
+    !target.closest?.('[aria-haspopup="menu"]') &&
+    !target.closest?.('[role="menu"]')
+  ) {
     sortMenuOpen.value = false;
   }
 }
