@@ -4,8 +4,10 @@ from fastapi.responses import JSONResponse
 from app.api.des.auth import get_admin_user
 from app.core.container import get_friendlink_service
 from app.core.exceptions import APIError
+from app.core.logger import logger
 from app.core.response import APIResponse
 from app.models.models import User
+from app.plugins.cache import redis_cache
 from app.schemas.friendlink import (
     FriendLinkCreate,
     FriendLinkReorder,
@@ -21,7 +23,16 @@ def _serialize(link) -> dict:
     return d
 
 
+async def _safe_invalidate(*func_names: str) -> None:
+    """写后清理缓存。失败降级为日志,不影响主流程。"""
+    try:
+        await redis_cache.invalidate(*func_names)
+    except Exception:
+        logger.exception("cache invalidation failed (non-fatal)")
+
+
 @router.get("")
+@redis_cache(ttl=600)
 async def list_links() -> APIResponse:
     async with get_friendlink_service() as service:
         links = await service.get_links()
@@ -29,6 +40,7 @@ async def list_links() -> APIResponse:
 
 
 @router.get("/{link_id}")
+@redis_cache(ttl=600)
 async def get_link(link_id: str) -> APIResponse:
     async with get_friendlink_service() as service:
         link = await service.get_link(link_id)
@@ -44,6 +56,7 @@ async def create_link(
 ) -> APIResponse:
     async with get_friendlink_service() as service:
         link = await service.create_link(data.model_dump())
+    await _safe_invalidate("list_links", "get_link")
     return APIResponse(
         data={"link": _serialize(link)},
         message="Friend link created",
@@ -61,6 +74,7 @@ async def update_link(
             link = await service.update_link(
                 link_id, data.model_dump(exclude_unset=True)
             )
+            await _safe_invalidate("list_links", "get_link")
             return APIResponse(data={"link": _serialize(link)})
         except ValueError as e:
             raise APIError(message=str(e), code=404) from e
@@ -74,6 +88,7 @@ async def delete_link(
     async with get_friendlink_service() as service:
         try:
             await service.delete_link(link_id)
+            await _safe_invalidate("list_links", "get_link")
             return APIResponse(message="Friend link deleted")
         except ValueError as e:
             raise APIError(message=str(e), code=404) from e
@@ -86,6 +101,7 @@ async def reorder_links(
 ) -> APIResponse:
     async with get_friendlink_service() as service:
         links = await service.reorder_links(data.ordered_ids)
+    await _safe_invalidate("list_links", "get_link")
     return APIResponse(
         data={"links": [_serialize(link) for link in links]},
         message="Friend links reordered",

@@ -21,8 +21,10 @@ from app.api.des.limiter import limiter
 from app.api.des.redis import get_redis
 from app.core.config import get_settings
 from app.core.exceptions import APIError
+from app.core.logger import logger
 from app.core.response import APIResponse
 from app.models.models import User
+from app.plugins.cache import redis_cache
 from app.schemas.gallery import GalleryInput
 from app.services.public_service import PublicService
 from app.utils.media import save_upload_image
@@ -30,7 +32,16 @@ from app.utils.media import save_upload_image
 router = APIRouter(tags=["public"])
 
 
+async def _safe_invalidate(*func_names: str) -> None:
+    """写后清理缓存。失败降级为日志,不影响主流程。"""
+    try:
+        await redis_cache.invalidate(*func_names)
+    except Exception:
+        logger.exception("cache invalidation failed (non-fatal)")
+
+
 @router.get("/status")
+@redis_cache(ttl=30, exclude=["public_service"])
 async def get_api_status(
     public_service: PublicService = Depends(public_service_dep),
 ):
@@ -54,6 +65,7 @@ async def get_api_status(
 
 
 @router.get("/status-detail")
+@redis_cache(ttl=60, exclude=["public_service"])
 async def get_status_detail(
     public_service: PublicService = Depends(public_service_dep),
 ) -> APIResponse:
@@ -131,6 +143,7 @@ async def add_like(
         APIResponse: Current total likes count
     """
     total = await PublicService.add_like(redis, likes_count)
+    await _safe_invalidate("get_likes")
 
     return APIResponse(
         data={"likes_count": total},
@@ -139,6 +152,7 @@ async def add_like(
 
 
 @router.get("/likes")
+@redis_cache(ttl=30, exclude=["redis"])
 async def get_likes(
     redis: AsyncRedis = Depends(get_redis),
 ) -> APIResponse:
@@ -211,6 +225,7 @@ async def upload_blog_image(
             code=status.HTTP_400_BAD_REQUEST,
         )
     relative_path = save_upload_image(file, f"gallery/{user.id}")
+    await _safe_invalidate("get_pic_gallery")
 
     return APIResponse(
         data={
@@ -233,6 +248,7 @@ async def set_pic_gallery(
             redis=redis,
             images=images,
         )
+        await _safe_invalidate("get_pic_gallery")
         return APIResponse(
             message="Picture gallery updated successfully",
         )
@@ -244,6 +260,7 @@ async def set_pic_gallery(
 
 
 @router.get("/pic-gallery")
+@redis_cache(ttl=600, exclude=["redis", "public_service"])
 async def get_pic_gallery(
     redis: AsyncRedis = Depends(get_redis),
     public_service: PublicService = Depends(public_service_dep),

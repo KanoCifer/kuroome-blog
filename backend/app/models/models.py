@@ -88,6 +88,18 @@ class User(Base):
     def __repr__(self):
         return f"<User {self.username}>"
 
+    def __hash__(self) -> int:
+        # SQLAlchemy 默认按对象身份 hash，导致同 id 的不同实例 hash 不同
+        # 缓存 key（如 @redis_cache）需要按业务主键 id 去重
+        return hash(self.id) if self.id is not None else id(self)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, User):
+            return NotImplemented
+        if self.id is None or other.id is None:
+            return self is other
+        return self.id == other.id
+
     # 获取用户的真实 IP 地址，考虑了代理服务器的情况
     @staticmethod
     def get_real_ip(request: Request) -> str:

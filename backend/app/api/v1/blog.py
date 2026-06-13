@@ -12,9 +12,9 @@ from app.core.exceptions import APIError
 from app.core.logger import logger
 from app.core.response import APIResponse
 from app.models.models import User
+from app.plugins.cache import redis_cache
 from app.schemas.schemas import PostComment
 from app.services.blog_service import BlogService
-from app.plugins.cache import redis_cache
 from app.utils.media import save_upload_image
 
 router = APIRouter(tags=["blog"])
@@ -26,6 +26,16 @@ async def _safe_invalidate(*func_names: str) -> None:
         await redis_cache.invalidate(*func_names)
     except Exception:
         logger.exception("cache invalidation failed (non-fatal)")
+
+
+_BLOG_CACHE_FUNCS = (
+    "get_blogs",
+    "get_blog_post",
+    "get_blog",
+    "get_categories",
+    "get_category_posts",
+    "get_posts_by_category",
+)
 
 
 @router.post("/upload-image")
@@ -98,7 +108,7 @@ async def post_comment(
 ):
     """Submit a new comment to a blog post."""
     result = await blog_service.post_comment(data)
-    await _safe_invalidate("get_blogs", "get_blog_post")
+    await _safe_invalidate(*_BLOG_CACHE_FUNCS)
 
     return APIResponse(
         data=result,
@@ -107,6 +117,7 @@ async def post_comment(
 
 
 @router.get("/categories")
+@redis_cache(ttl=300, exclude=["blog_service"])
 async def get_categories(
     blog_service: BlogService = Depends(blog_service_dep),
 ):
@@ -120,6 +131,7 @@ async def get_categories(
 
 
 @router.post("/category")
+@redis_cache(ttl=120, exclude=["blog_service"])
 async def get_posts_by_category(
     category_id: Annotated[int, Query(..., description="Category ID")],
     blog_service: BlogService = Depends(blog_service_dep),
@@ -135,6 +147,7 @@ async def get_posts_by_category(
 
 
 @router.get("/blogs/categories/{category_id}")
+@redis_cache(ttl=120, exclude=["blog_service"])
 async def get_category_posts(
     category_id: Annotated[int, Path(..., description="Category ID")],
     blog_service: BlogService = Depends(blog_service_dep),

@@ -13,6 +13,7 @@ from app.api.des.des import message_service_dep
 from app.api.des.limiter import limiter
 from app.core.response import APIResponse
 from app.models.models import User
+from app.plugins.cache import redis_cache
 from app.schemas.schemas import (
     MessageIn,
 )
@@ -22,6 +23,7 @@ router = APIRouter(prefix="/messages", tags=["messages"])
 
 
 @router.get("")
+@redis_cache(ttl=120, exclude=["message_service"])
 async def get_messages(
     message_service: MessageService = Depends(message_service_dep),
 ):

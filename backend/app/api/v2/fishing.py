@@ -18,6 +18,7 @@ from app.api.des.redis import get_redis
 from app.core.exceptions import APIError
 from app.core.response import APIResponse
 from app.models.models import User
+from app.plugins.cache import redis_cache
 from app.services.fishing.fishing_index import (
     FEEDBACK_SCORES,
     FishingRecord,
@@ -32,6 +33,14 @@ from app.services.weather_service import WeatherService
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/fishing", tags=["fishing"])
+
+
+async def _safe_invalidate(*func_names: str) -> None:
+    """写后清理缓存。失败降级为日志,不影响主流程。"""
+    try:
+        await redis_cache.invalidate(*func_names)
+    except Exception:
+        logger.exception("cache invalidation failed (non-fatal)")
 
 
 class FishingIndexResponse(BaseModel):
@@ -115,6 +124,7 @@ def _build_record_from_request(req: FishingFeedbackRequest) -> dict:
 
 
 @router.get("/index")
+@redis_cache(ttl=300, exclude=["redis", "weather_svc", "service"])
 async def get_fishing_index(
     location: str = Query(..., description="经纬度坐标，格式为 'lng,lat'"),
     enriched: bool = Query(False, description="是否附加天气数据"),
@@ -226,6 +236,9 @@ async def submit_feedback(
     }
     record_id = await service.save_feedback(doc_data)
     logger.info(f"[钓鱼反馈] 已保存记录: {record_id}")
+
+    # 反馈数据进入训练集，会改变模型残差 → 让缓存的指数最多存在 5 分钟
+    await _safe_invalidate("get_fishing_index")
 
     # 自动训练检查（异步，不阻塞响应）
     background_tasks.add_task(service.auto_train_if_needed, source="all")
