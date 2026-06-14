@@ -1,137 +1,73 @@
-<script setup lang="ts">
-import type { BookRecommendItem } from '@/api/wereadGateway';
-import { Motion } from 'motion-v';
-import { computed, ref } from 'vue';
-import BookRecommendDetail from './BookRecommendDetail.vue';
-import { RECOMMEND_COVER_LAYOUT_ID_PREFIX } from './recommendLayoutId';
-
-const props = defineProps<{
-  books: BookRecommendItem[];
-  loading: boolean;
-  hasMore: boolean;
-  error?: string;
-}>();
-
-const emit = defineEmits<{
-  (e: 'refresh'): void;
-  (e: 'loadMore'): void;
-}>();
-
-/** 远端 newRating 是 0-100 整数，转成 0-5 星显示用的小数 */
-function ratingScore(v: number): string {
-  if (!v || v <= 0) return '--';
-  return ((v / 100) * 10).toFixed(1);
-}
-
-function readingCountLabel(n: number): string {
-  if (!n || n <= 0) return '';
-  if (n >= 10000) return `${(n / 10000).toFixed(1)} 万人在读`;
-  return `${n} 人在读`;
-}
-
-const showSkeleton = computed(() => props.loading && props.books.length === 0);
-
-/** 当前打开的推荐书；null = 模态关闭 */
-const activeBook = ref<BookRecommendItem | null>(null);
-
-function openBook(book: BookRecommendItem) {
-  activeBook.value = book;
-}
-
-function closeBook() {
-  activeBook.value = null;
-}
-</script>
-
 <template>
-  <section class="mb-14">
-    <div class="mb-6 flex items-end justify-between gap-4">
-      <div>
-        <p class="text-muted-foreground mb-1 text-sm">读完这些之后</p>
-        <h2
-          class="text-foreground font-serif text-2xl font-semibold tracking-tight sm:text-3xl"
+  <BookRecommendGrid
+    :books="books"
+    :loading="loading"
+    :has-more="hasMore"
+    :error="error"
+    section-class="mb-14"
+    :list-class="listClass"
+    @refresh="$emit('refresh')"
+    @load-more="$emit('loadMore')"
+  >
+    <template #header="{ loading: isLoading, onRefresh }">
+      <div class="mb-6 flex items-end justify-between gap-4">
+        <div>
+          <p class="text-muted-foreground mb-1 text-sm">读完这些之后</p>
+          <h2
+            class="text-foreground font-serif text-2xl font-semibold tracking-tight sm:text-3xl"
+          >
+            接下来读什么
+          </h2>
+        </div>
+        <button
+          type="button"
+          class="text-muted-foreground hover:text-foreground hover:bg-accent inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          :disabled="isLoading"
+          @click="onRefresh"
+          aria-label="换一批"
         >
-          接下来读什么
-        </h2>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="h-4 w-4"
+            :class="{ 'animate-spin': isLoading }"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+            />
+          </svg>
+          换一批
+        </button>
       </div>
-      <button
-        type="button"
-        class="text-muted-foreground hover:text-foreground hover:bg-accent inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
-        :disabled="loading"
-        @click="emit('refresh')"
-        aria-label="换一批"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="2"
-          stroke="currentColor"
-          class="h-4 w-4"
-          :class="{ 'animate-spin': loading }"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-          />
-        </svg>
-        换一批
-      </button>
-    </div>
+    </template>
 
-    <!-- Skeleton -->
-    <div
-      v-if="showSkeleton"
-      class="-mx-4 flex gap-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 md:-mx-10 md:px-10"
-    >
+    <template #skeleton="{ count }">
       <div
-        v-for="i in 4"
-        :key="i"
-        class="bg-card flex w-56 flex-shrink-0 animate-pulse flex-col gap-3 rounded-2xl p-4"
+        class="-mx-4 flex gap-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 md:-mx-10 md:px-10"
       >
-        <div class="bg-muted aspect-[2/3] w-full rounded-md" />
-        <div class="bg-muted h-4 w-3/4 rounded" />
-        <div class="bg-muted h-3 w-1/2 rounded" />
-        <div class="bg-muted h-3 w-full rounded" />
+        <div
+          v-for="i in count"
+          :key="i"
+          class="bg-card flex w-56 flex-shrink-0 animate-pulse flex-col gap-3 rounded-2xl p-4"
+        >
+          <div class="bg-muted aspect-[2/3] w-full rounded-md" />
+          <div class="bg-muted h-4 w-3/4 rounded" />
+          <div class="bg-muted h-3 w-1/2 rounded" />
+          <div class="bg-muted h-3 w-full rounded" />
+        </div>
       </div>
-    </div>
+    </template>
 
-    <!-- Error -->
-    <div
-      v-else-if="error && books.length === 0"
-      class="text-muted-foreground flex flex-col items-center justify-center rounded-2xl border border-dashed py-10 text-center text-sm"
-    >
-      <p class="text-destructive mb-3">{{ error }}</p>
+    <template #card="{ book, open, ratingScore }">
       <button
-        type="button"
-        class="bg-destructive/10 text-destructive hover:bg-destructive/20 rounded-xl px-4 py-1.5 text-sm font-medium transition-colors"
-        @click="emit('refresh')"
-      >
-        重试
-      </button>
-    </div>
-
-    <!-- Empty -->
-    <div
-      v-else-if="!loading && books.length === 0"
-      class="text-muted-foreground rounded-2xl border border-dashed py-10 text-center text-sm"
-    >
-      暂时没有推荐
-    </div>
-
-    <!-- Carousel -->
-    <div
-      v-else
-      class="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 md:-mx-10 md:px-10"
-      style="scroll-padding-inline: 1rem"
-    >
-      <button
-        v-for="book in books"
-        :key="book.bookId"
         type="button"
         class="group bg-card hover:border-primary/40 flex w-56 flex-shrink-0 snap-start flex-col gap-3 rounded-2xl border border-transparent p-4 text-left transition-colors sm:w-60"
-        @click="openBook(book)"
+        @click="open(book)"
       >
         <Motion
           :layoutId="RECOMMEND_COVER_LAYOUT_ID_PREFIX + book.bookId"
@@ -190,14 +126,14 @@ function closeBook() {
           {{ readingCountLabel(book.readingCount) }}
         </p>
       </button>
+    </template>
 
-      <!-- Load more 卡片 -->
+    <template #load-more="{ loading: isLoading, onLoadMore }">
       <button
-        v-if="hasMore"
         type="button"
         class="text-muted-foreground hover:text-foreground hover:border-primary/40 flex w-40 flex-shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-2xl border border-dashed text-sm transition-colors disabled:opacity-50 sm:w-44"
-        :disabled="loading"
-        @click="emit('loadMore')"
+        :disabled="isLoading"
+        @click="onLoadMore"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -206,7 +142,7 @@ function closeBook() {
           stroke-width="2"
           stroke="currentColor"
           class="h-5 w-5"
-          :class="{ 'animate-spin': loading }"
+          :class="{ 'animate-spin': isLoading }"
         >
           <path
             stroke-linecap="round"
@@ -214,10 +150,41 @@ function closeBook() {
             d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
           />
         </svg>
-        <span>{{ loading ? '加载中…' : '更多推荐' }}</span>
+        <span>{{ isLoading ? '加载中…' : '更多推荐' }}</span>
       </button>
-    </div>
-
-    <BookRecommendDetail :book="activeBook" @close="closeBook" />
-  </section>
+    </template>
+  </BookRecommendGrid>
 </template>
+
+<script setup lang="ts">
+import type { BookRecommendItem } from '@/api/wereadGateway';
+import { Motion } from 'motion-v';
+import { computed } from 'vue';
+import BookRecommendGrid from '@/components/weread/BookRecommendGrid.vue';
+import { RECOMMEND_COVER_LAYOUT_ID_PREFIX } from '@/components/weread/recommendLayoutId';
+
+defineProps<{
+  books: BookRecommendItem[];
+  loading: boolean;
+  hasMore: boolean;
+  error?: string;
+}>();
+
+defineEmits<{
+  (e: 'refresh'): void;
+  (e: 'loadMore'): void;
+}>();
+
+/** N 人在读 → "1.2 万人在读" / "342 人在读" */
+function readingCountLabel(n: number): string {
+  if (!n || n <= 0) return '';
+  if (n >= 10000) return `${(n / 10000).toFixed(1)} 万人在读`;
+  return `${n} 人在读`;
+}
+
+/** 宽卡片场景的 carousel 容器:gap-4 + 滚动 snap 留 1rem padding */
+const listClass = computed(
+  () =>
+    '-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 md:-mx-10 md:px-10 [scroll-padding-inline:1rem]',
+);
+</script>

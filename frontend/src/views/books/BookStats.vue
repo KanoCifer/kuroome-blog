@@ -1,53 +1,11 @@
 <template>
   <div class="bg-background flex min-h-[calc(100dvh-4rem)] flex-col">
-    <!-- ── Hero ─────────────────────────────────────────────────────── -->
-    <div class="relative h-[30vh] flex-shrink-0 overflow-hidden md:h-[35vh]">
-      <img src="/card/card-1.jpeg" alt="" class="h-full w-full object-cover" />
-      <div
-        class="from-background/40 via-background/5 to-background pointer-events-none absolute inset-0 bg-gradient-to-b"
-      />
-
-      <!-- Back -->
-      <div
-        class="absolute top-0 right-0 left-0 z-10 flex items-center px-4 py-4 md:px-6"
-      >
-        <button
-          type="button"
-          class="border-border bg-card/60 hover:bg-accent flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
-          @click="handleBack"
-          aria-label="返回"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-            class="text-foreground h-5 w-5"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
-            />
-          </svg>
-        </button>
-      </div>
-
-      <!-- Title -->
-      <div
-        class="absolute right-0 bottom-0 left-0 z-10 px-6 pb-6 md:px-10 md:pb-8"
-      >
-        <h1
-          class="font-serif text-3xl font-bold text-white drop-shadow-lg md:text-5xl"
-        >
-          阅读统计
-        </h1>
-        <p class="mt-2 text-sm text-white/75 md:text-base">
-          微信读书 · 你的阅读时间记录
-        </p>
-      </div>
-    </div>
+    <PageHero
+      title="阅读统计"
+      subtitle="微信读书 · 你的阅读时间记录"
+      size="sm"
+      back-fallback="/bookshelf"
+    />
 
     <div class="flex-1 pb-12">
       <div class="mx-auto max-w-3xl px-4 py-8 sm:px-6 md:px-10 md:py-10">
@@ -261,9 +219,10 @@
 <script setup lang="ts">
 import type { ReadStatsMode } from '@/api/wereadGateway';
 import { useReadStatsStore } from '@/stores/readStats';
+import { formatDuration } from '@/utils/format/duration';
+import PageHero from '@/components/shared/PageHero.vue';
 import dayjs from 'dayjs';
 import { onMounted, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
 import StatsPreferencesSection from './bookStats/components/StatsPreferencesSection.vue';
 import StatsRecommendSection from './bookStats/components/StatsRecommendSection.vue';
 import StatsRefreshFooter from './bookStats/components/StatsRefreshFooter.vue';
@@ -280,7 +239,6 @@ const MODES = [
   { key: 'overall', label: '累计' },
 ] as const satisfies ReadonlyArray<{ key: ReadStatsMode; label: string }>;
 
-const router = useRouter();
 const statsStore = useReadStatsStore();
 
 // 解构出顶层 ref / 函数，模板里直接用(自动 unwrap)
@@ -319,7 +277,6 @@ const {
   topPublishers,
   hasPreferenceData,
   hasAnyData,
-  formatDuration,
 } = useStatsView(activeSnapshot, activeMode, theme);
 
 // ── Refresh tracking ──────────────────────────────────────────
@@ -343,11 +300,6 @@ onMounted(() => {
     statsStore.fetchRecommends(true);
   }
 });
-
-function handleBack() {
-  if (window.history.length > 1) router.back();
-  else router.push('/bookshelf');
-}
 
 function reloadRecommends() {
   statsStore.fetchRecommends(true);
