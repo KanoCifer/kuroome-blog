@@ -82,12 +82,12 @@ export function usePeriodNavigation(statsStore: Store) {
     // 不让翻到未来：到达 / 越过 anchor 时回归 null（=当前周期）
     if (anchor != null && next >= anchor) {
       viewBaseTime.value = { ...viewBaseTime.value, [mode]: null };
-      await statsStore.fetchStats(mode, null);
+      await statsStore.fetchPeriod(mode, null);
       return;
     }
 
     viewBaseTime.value = { ...viewBaseTime.value, [mode]: next };
-    await statsStore.fetchStats(mode, next);
+    await statsStore.fetchPeriod(mode, next);
   }
 
   async function goPrev() {
@@ -102,12 +102,12 @@ export function usePeriodNavigation(statsStore: Store) {
   async function switchMode(mode: ReadStatsMode) {
     activeMode.value = mode;
     if (!statsStore.getSnapshot(mode, viewBaseTime.value[mode])) {
-      await statsStore.fetchStats(mode, viewBaseTime.value[mode]);
+      await statsStore.fetchPeriod(mode, viewBaseTime.value[mode]);
     }
   }
 
   async function reloadCurrent() {
-    await statsStore.fetchStats(
+    await statsStore.fetchPeriod(
       activeMode.value,
       viewBaseTime.value[activeMode.value],
     );

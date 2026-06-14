@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import type {
-  PreferAuthorItem,
-  PreferCategoryItem,
-  PreferPublisherItem,
-} from '@/api/wereadGateway';
+import type { ReadDetailSnapshot } from '@/api/wereadGateway';
+import { toRef } from 'vue';
+import { usePreferenceView } from '../composables/usePreferenceView';
 
-defineProps<{
-  categories: (PreferCategoryItem & { share: number })[];
-  authors: PreferAuthorItem[];
-  publishers: PreferPublisherItem[];
+const props = defineProps<{
+  snapshot: ReadDetailSnapshot;
 }>();
+
+const snapshotRef = toRef(props, 'snapshot');
+const { topCategories, topAuthors, topPublishers, hasData } =
+  usePreferenceView(snapshotRef);
 </script>
 
 <template>
-  <section class="mb-14">
+  <section v-if="hasData" class="mb-14">
     <h2
       class="text-foreground mb-6 font-serif text-2xl font-semibold tracking-tight sm:text-3xl"
     >
@@ -21,13 +21,13 @@ defineProps<{
     </h2>
     <dl class="space-y-5 text-sm sm:text-base">
       <div
-        v-if="categories.length"
+        v-if="topCategories.length"
         class="grid grid-cols-[5rem_1fr] gap-x-5 gap-y-1 sm:grid-cols-[6rem_1fr]"
       >
         <dt class="text-muted-foreground pt-1">品类</dt>
         <dd class="flex flex-wrap gap-x-3 gap-y-1.5">
           <span
-            v-for="cat in categories"
+            v-for="cat in topCategories"
             :key="cat.categoryTitle"
             class="text-foreground"
           >
@@ -40,13 +40,13 @@ defineProps<{
       </div>
 
       <div
-        v-if="authors.length"
+        v-if="topAuthors.length"
         class="grid grid-cols-[5rem_1fr] gap-x-5 gap-y-1 sm:grid-cols-[6rem_1fr]"
       >
         <dt class="text-muted-foreground pt-1">作者</dt>
         <dd class="flex flex-wrap gap-x-3 gap-y-1.5">
           <span
-            v-for="(author, idx) in authors"
+            v-for="(author, idx) in topAuthors"
             :key="author.authorId ?? idx"
             class="text-foreground"
           >
@@ -64,13 +64,13 @@ defineProps<{
       </div>
 
       <div
-        v-if="publishers.length"
+        v-if="topPublishers.length"
         class="grid grid-cols-[5rem_1fr] gap-x-5 gap-y-1 sm:grid-cols-[6rem_1fr]"
       >
         <dt class="text-muted-foreground pt-1">出版社</dt>
         <dd class="flex flex-wrap gap-x-3 gap-y-1.5">
           <span
-            v-for="(pub, idx) in publishers"
+            v-for="(pub, idx) in topPublishers"
             :key="pub.name ?? idx"
             class="text-foreground"
           >

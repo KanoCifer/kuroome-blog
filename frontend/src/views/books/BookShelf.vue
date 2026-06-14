@@ -6,57 +6,20 @@
       @sync="handleSync"
     >
       <template #ribbon>
-        <BookShelfStatsBar />
+        <BookShelfStatsBar :weekly-snapshot="statsStore.weeklySnapshot" />
       </template>
     </BookShelfHero>
 
     <!-- Books Section -->
     <div class="flex-1 pb-8">
       <div class="mx-auto max-w-6xl px-4 py-6 sm:px-6 md:px-10">
-        <!-- Loading skeleton -->
-        <div v-if="isLoading">
-          <div class="bg-muted mb-4 h-9 w-full animate-pulse rounded-xl" />
-          <div
-            class="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
-          >
-            <div v-for="i in 8" :key="i" class="animate-pulse">
-              <div class="bg-muted aspect-3/4 rounded-xl" />
-              <div class="mt-2 space-y-1.5 px-1.5">
-                <div class="bg-muted h-3 w-5/6 rounded" />
-                <div class="bg-muted h-3 w-3/4 rounded" />
-                <div class="bg-muted h-2.5 w-1/2 rounded" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Error state -->
-        <div
-          v-else-if="errorMessage"
-          class="flex flex-col items-center justify-center py-20"
-        >
-          <p class="text-destructive mb-4 text-center text-sm">
-            {{ errorMessage }}
-          </p>
-          <button
-            type="button"
-            class="bg-destructive/10 text-destructive hover:bg-destructive/20 rounded-xl px-5 py-2 text-sm font-medium transition-colors"
-            @click="fetchBooks"
-          >
-            重试
-          </button>
-        </div>
-
-        <!-- Empty shelf -->
-        <div
-          v-else-if="visibleBooks.length === 0"
-          class="flex flex-col items-center justify-center py-20"
-        >
-          <p class="text-muted-foreground font-medium">暂无书籍</p>
-          <p class="text-muted-foreground/60 mt-1 text-sm">
-            你的微信读书书架还是空的
-          </p>
-        </div>
+        <BookShelfStateView
+          v-if="isLoading || errorMessage || visibleBooks.length === 0"
+          :is-loading="isLoading"
+          :error-message="errorMessage"
+          :is-empty="visibleBooks.length === 0"
+          @retry="fetchBooks"
+        />
 
         <!-- Has books: toolbar + (reading rail) + grid/list -->
         <template v-else>
@@ -157,6 +120,7 @@ import BookShelfHero from './components/BookShelfHero.vue';
 import BookShelfReadingRail from './components/BookShelfReadingRail.vue';
 import BookShelfRecommendRail from './components/BookShelfRecommendRail.vue';
 import BookShelfStatsBar from './components/BookShelfStatsBar.vue';
+import BookShelfStateView from './components/BookShelfStateView.vue';
 import BookShelfToolbar from './components/BookShelfToolbar.vue';
 import { useShelfView } from './composables/useShelfView';
 
@@ -197,7 +161,7 @@ function loadMoreRecommends() {
 }
 
 onMounted(async () => {
-  await Promise.all([fetchBooks(), statsStore.fetchStats()]);
+  await Promise.all([fetchBooks(), statsStore.fetchCurrentAll()]);
   // 推荐独立拉取(已被 BookStats 拉过则不重复)
   if (statsStore.recommends.length === 0) {
     statsStore.fetchRecommends(true);

@@ -1,13 +1,12 @@
 import {
   wereadGateway,
+  READ_STATS_MODES,
   type BookRecommendItem,
   type ReadDetailSnapshot,
   type ReadStatsMode,
 } from '@/api/wereadGateway';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
-
-const ALL_MODES: ReadStatsMode[] = ['weekly', 'monthly', 'annually', 'overall'];
 
 /** snapshots key = `${mode}:${baseTime ?? 'current'}` */
 function snapshotKey(mode: ReadStatsMode, baseTime?: number | null): string {
@@ -29,7 +28,7 @@ export const useReadStatsStore = defineStore('readStats', () => {
   // ── 当前周期的 4 个快照（用于 BookStats 顶层 tabs） ──
   const currentByMode = computed(() => {
     const map: Record<string, ReadDetailSnapshot> = {};
-    for (const mode of ALL_MODES) {
+    for (const mode of READ_STATS_MODES) {
       const s = snapshots.value[snapshotKey(mode, null)];
       if (s) map[mode] = s;
     }
@@ -46,36 +45,47 @@ export const useReadStatsStore = defineStore('readStats', () => {
   );
 
   /**
-   * 拉取指定 mode + 周期的快照。baseTime=null 代表当前周期。
-   * 不传 mode 时退化为当前周期 4 mode 并发拉取（首屏行为）。
+   * 首屏 4 mode 并发拉取。每个 mode 走独立请求,失败不影响其他 mode。
+   * 部分失败时已成功的 mode 会写入 snapshots,失败的 mode 静默跳过(下次重试覆盖)。
    */
-  async function fetchStats(): Promise<void>;
-  async function fetchStats(
+  async function fetchCurrentAll(): Promise<void> {
+    isLoading.value = true;
+    error.value = '';
+    try {
+      const results = await Promise.all(
+        READ_STATS_MODES.map((m) => wereadGateway.getReadProgress(m, null)),
+      );
+      const next: Record<string, ReadDetailSnapshot> = { ...snapshots.value };
+      READ_STATS_MODES.forEach((m, i) => {
+        const r = results[i];
+        if (r.data) {
+          next[snapshotKey(m, null)] = r.data;
+        }
+      });
+      snapshots.value = next;
+    } catch (err: unknown) {
+      const e = err as {
+        message?: string;
+        response?: { data?: { message?: string } };
+      };
+      error.value =
+        e?.response?.data?.message || e?.message || '获取阅读统计失败';
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /**
+   * 拉取指定 mode + 周期的单条快照。baseTime=null 代表当前周期。
+   * 切换 tab / 翻页 / 重试 走这条。
+   */
+  async function fetchPeriod(
     mode: ReadStatsMode,
-    baseTime?: number | null,
-  ): Promise<void>;
-  async function fetchStats(
-    mode?: ReadStatsMode,
     baseTime: number | null = null,
   ): Promise<void> {
     isLoading.value = true;
     error.value = '';
     try {
-      if (!mode) {
-        const results = await Promise.all(
-          ALL_MODES.map((m) => wereadGateway.getReadProgress(m, null)),
-        );
-        const next: Record<string, ReadDetailSnapshot> = { ...snapshots.value };
-        ALL_MODES.forEach((m, i) => {
-          const r = results[i];
-          if (r.data) {
-            next[snapshotKey(m, null)] = r.data;
-          }
-        });
-        snapshots.value = next;
-        return;
-      }
-
       const res = await wereadGateway.getReadProgress(mode, baseTime);
       if (res.data) {
         snapshots.value = {
@@ -182,7 +192,8 @@ export const useReadStatsStore = defineStore('readStats', () => {
     preferAuthors,
     preferPublishers,
     readListenRatio,
-    fetchStats,
+    fetchCurrentAll,
+    fetchPeriod,
     getSnapshot,
     // 推荐
     recommends,

@@ -65,17 +65,18 @@ import { ChevronRight } from '@lucide/vue';
 import dayjs from 'dayjs';
 import { computed, h } from 'vue';
 import { useRouter } from 'vue-router';
-import { useReadStatsStore } from '@/stores/readStats';
+import type { ReadDetailSnapshot } from '@/api/wereadGateway';
 import { formatDuration } from '@/utils/format/duration';
 import { formatRelative } from '@/utils/format/relative';
 
-const router = useRouter();
-const statsStore = useReadStatsStore();
+const props = defineProps<{
+  weeklySnapshot: ReadDetailSnapshot | null;
+}>();
 
-const weeklySnapshot = computed(() => statsStore.weeklySnapshot);
+const router = useRouter();
 
 const latestBook = computed(() => {
-  const s = statsStore.weeklySnapshot;
+  const s = props.weeklySnapshot;
   if (!s?.readLongest?.length) return null;
   return s.readLongest[0];
 });
@@ -89,7 +90,7 @@ const latestBook = computed(() => {
  * 作 proxy;后续接入更精确字段时直接换入参即可。
  */
 const recencyLabel = computed(() => {
-  const ts = statsStore.weeklySnapshot?.fetched_at;
+  const ts = props.weeklySnapshot?.fetched_at;
   if (!ts) return '';
   const d = dayjs(ts);
   if (!d.isValid()) return '';

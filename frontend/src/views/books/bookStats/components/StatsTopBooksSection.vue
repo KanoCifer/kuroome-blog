@@ -1,15 +1,23 @@
 <script setup lang="ts">
-import type { ReadLongestItem } from '@/api/wereadGateway';
+import type { ReadDetailSnapshot, ReadStatsMode } from '@/api/wereadGateway';
+import { formatDuration } from '@/utils/format/duration';
+import { computed, toRef } from 'vue';
+import { useLongestView } from '../composables/useLongestView';
 
-defineProps<{
-  books: ReadLongestItem[];
-  barPercent: (t: number) => number;
-  formatDuration: (seconds: number | null | undefined) => string;
+const props = defineProps<{
+  snapshot: ReadDetailSnapshot;
+  mode: ReadStatsMode;
 }>();
+
+const snapshotRef = toRef(props, 'snapshot');
+const { topBooks, barPercent } = useLongestView(snapshotRef);
+
+const formatRead = (s: number | null | undefined) => formatDuration(s);
+const visible = computed(() => topBooks.value.length > 0);
 </script>
 
 <template>
-  <section class="mb-14">
+  <section v-if="visible" class="mb-14">
     <h2
       class="text-foreground mb-6 font-serif text-2xl font-semibold tracking-tight sm:text-3xl"
     >
@@ -17,7 +25,7 @@ defineProps<{
     </h2>
     <ol class="space-y-3">
       <li
-        v-for="(book, i) in books"
+        v-for="(book, i) in topBooks"
         :key="book.bookId ?? i"
         class="flex items-center gap-4"
       >
@@ -72,7 +80,7 @@ defineProps<{
           <span
             class="text-muted-foreground w-16 flex-shrink-0 text-right text-sm tabular-nums"
           >
-            {{ formatDuration(book.readTime) }}
+            {{ formatRead(book.readTime) }}
           </span>
         </div>
       </li>

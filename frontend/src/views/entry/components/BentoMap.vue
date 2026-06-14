@@ -75,6 +75,7 @@ import fishingSpots from '@/data/fishing-spots.json';
 import { fishingGateway } from '@/api/fishingGateway';
 import { DEFAULT_MAP_CENTER, useFishingMapStore } from '@/stores/fishingMap';
 import type { TideData } from '@/types/weather';
+import { formatRelative } from '@/utils/format/relative';
 import dayjs from 'dayjs';
 import { Cloud, CloudRain, FishingRod, Sun, Waves, Wind } from '@lucide/vue';
 import { computed, onMounted, ref, type Component } from 'vue';
@@ -123,21 +124,6 @@ function deriveTideStatus(tideData: TideData | null): string {
   return '未知潮汐';
 }
 
-function formatRelativeTime(isoString: string): string {
-  const now = dayjs();
-  const then = dayjs(isoString);
-  const diffMinutes = now.diff(then, 'minute');
-
-  if (diffMinutes < 1) return '刚刚';
-  if (diffMinutes < 60) return `${diffMinutes}分钟前`;
-  const diffHours = now.diff(then, 'hour');
-  if (diffHours < 24) return `${diffHours}小时前`;
-  const diffDays = now.diff(then, 'day');
-  if (diffDays < 30) return `${diffDays}天前`;
-  const diffMonths = now.diff(then, 'month');
-  return `${diffMonths}个月前`;
-}
-
 onMounted(async () => {
   animateTo(fishingSpots.length);
 
@@ -150,7 +136,7 @@ onMounted(async () => {
   if (statsRes.status === 'fulfilled') {
     totalRecords.value = statsRes.value.total_records;
     if (statsRes.value.latest_record_time) {
-      lastRecord.value = formatRelativeTime(statsRes.value.latest_record_time);
+      lastRecord.value = formatRelative(statsRes.value.latest_record_time);
     }
   }
 });

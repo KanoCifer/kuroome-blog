@@ -124,7 +124,7 @@
           <!-- ── 段落一：你读了多少 ─────────────────────────────── -->
           <section class="mb-14">
             <p class="text-muted-foreground mb-3 text-sm">
-              {{ paragraphOneEyebrow }}
+              {{ eyebrow }}
             </p>
             <p
               class="text-foreground font-serif text-5xl leading-tight font-bold tracking-tight tabular-nums sm:text-6xl md:text-7xl"
@@ -132,41 +132,28 @@
               {{ formatDuration(activeSnapshot.totalReadTime) }}
             </p>
             <p class="text-muted-foreground mt-4 text-base sm:text-lg">
-              {{ paragraphOneSubtitle }}
+              {{ subtitle }}
             </p>
           </section>
 
           <!-- ── 段落二：让你停不下来的是 ─────────────────────────── -->
           <StatsTopBooksSection
-            v-if="topReadLongest.length"
-            :books="topReadLongest"
-            :bar-percent="longestBarPercent"
-            :format-duration="formatDuration"
+            v-if="activeSnapshot"
+            :snapshot="activeSnapshot"
+            :mode="activeMode"
           />
 
           <!-- ── 段落三：你的阅读节奏 ─────────────────────────────── -->
           <StatsRhythmSection
-            v-if="hasRhythmData"
+            v-if="activeSnapshot && hasRhythmData"
             :snapshot="activeSnapshot"
-            :has-trend-data="hasTrendData"
-            :has-prefer-time-data="hasPreferTimeData"
-            :has-read-listen-data="hasReadListenData"
-            :trend-subtitle="trendSubtitle"
-            :prefer-time-subtitle="preferTimeSubtitle"
-            :read-listen-subtitle="readListenSubtitle"
-            :trend-option="trendOption"
-            :prefer-time-option="preferTimeOption"
-            :read-percent="readPercent"
-            :listen-percent="listenPercent"
-            :format-duration="formatDuration"
+            :mode="activeMode"
           />
 
           <!-- ── 段落四：你偏好的 ─────────────────────────────────── -->
           <StatsPreferencesSection
-            v-if="hasPreferenceData"
-            :categories="topCategories"
-            :authors="topAuthors"
-            :publishers="topPublishers"
+            v-if="activeSnapshot && hasPreferenceData"
+            :snapshot="activeSnapshot"
           />
 
           <!-- ── 段落 4.5：接下来读什么（推荐） ───────────────────── -->
@@ -222,15 +209,17 @@ import { useReadStatsStore } from '@/stores/readStats';
 import { formatDuration } from '@/utils/format/duration';
 import PageHero from '@/components/shared/PageHero.vue';
 import dayjs from 'dayjs';
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import StatsPreferencesSection from './bookStats/components/StatsPreferencesSection.vue';
 import StatsRecommendSection from './bookStats/components/StatsRecommendSection.vue';
 import StatsRefreshFooter from './bookStats/components/StatsRefreshFooter.vue';
 import StatsRhythmSection from './bookStats/components/StatsRhythmSection.vue';
 import StatsTopBooksSection from './bookStats/components/StatsTopBooksSection.vue';
-import { useEChartsTheme } from './bookStats/composables/useEChartsTheme';
+import { useLongestView } from './bookStats/composables/useLongestView';
+import { useOverviewView } from './bookStats/composables/useOverviewView';
+import { usePreferenceView } from './bookStats/composables/usePreferenceView';
+import { useRhythmView } from './bookStats/composables/useRhythmView';
 import { usePeriodNavigation } from './bookStats/composables/usePeriodNavigation';
-import { useStatsView } from './bookStats/composables/useStatsView';
 
 const MODES = [
   { key: 'weekly', label: '本周' },
@@ -254,30 +243,31 @@ const {
   reloadCurrent,
 } = usePeriodNavigation(statsStore);
 
-const theme = useEChartsTheme();
+// 段落级 narrow composables,只暴露模板真正关心的几个键
+const { eyebrow, subtitle } = useOverviewView(activeSnapshot, activeMode);
+const { hasData: hasLongestData } = useLongestView(activeSnapshot);
+const { hasData: hasRhythmData } = useRhythmView(
+  activeSnapshot,
+  activeMode,
+  // theme 在 section 内部独立取,这里仅作整页哨兵
+  {
+    primaryColor: computed(() => ''),
+    subtextColor: computed(() => ''),
+    axisColor: computed(() => ''),
+    splitLineColor: computed(() => ''),
+    mutedFillColor: computed(() => ''),
+  },
+);
+const { hasData: hasPreferenceData } = usePreferenceView(activeSnapshot);
 
-const {
-  paragraphOneEyebrow,
-  paragraphOneSubtitle,
-  topReadLongest,
-  longestBarPercent,
-  hasTrendData,
-  hasPreferTimeData,
-  hasReadListenData,
-  hasRhythmData,
-  trendSubtitle,
-  preferTimeSubtitle,
-  readListenSubtitle,
-  readPercent,
-  listenPercent,
-  trendOption,
-  preferTimeOption,
-  topCategories,
-  topAuthors,
-  topPublishers,
-  hasPreferenceData,
-  hasAnyData,
-} = useStatsView(activeSnapshot, activeMode, theme);
+// 整页级"是否完全空"——任一段有数据就不空,匹配旧 hasAnyData 语义
+const hasAnyData = computed(
+  () =>
+    (activeSnapshot.value?.totalReadTime ?? 0) > 0 ||
+    hasLongestData.value ||
+    hasRhythmData.value ||
+    hasPreferenceData.value,
+);
 
 // ── Refresh tracking ──────────────────────────────────────────
 const lastRefreshedAt = ref<dayjs.Dayjs | null>(null);
@@ -293,7 +283,7 @@ watch(
 onMounted(() => {
   // 初次加载：当前周期
   if (!activeSnapshot.value) {
-    statsStore.fetchStats(activeMode.value, null);
+    statsStore.fetchPeriod(activeMode.value, null);
   }
   // 推荐独立拉取（不绑定 mode）
   if (statsStore.recommends.length === 0) {

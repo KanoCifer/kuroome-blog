@@ -34,7 +34,19 @@
             :showStatus="true"
             @select="$emit('select', book)"
           >
-            <template #corner-tl> </template>
+            <template #corner-tl>
+              <!--
+                "你正在读" rail 的 recency 角标:
+                - 仅 reading 状态显示(已读完没有 recency 语义)
+                - 角标独占左上,与右上 statusLabel "在读" 互不重叠
+              -->
+              <span
+                v-if="book.readUpdateTime && !book.finishReading"
+                class="bg-background/85 text-foreground/80 rounded-full px-2 py-0.5 text-[10px] font-medium shadow-sm backdrop-blur-sm"
+              >
+                {{ formatRelative(book.readUpdateTime) }}
+              </span>
+            </template>
           </WereadBookCard>
         </div>
       </div>
@@ -45,6 +57,7 @@
 <script setup lang="ts">
 import type { WereadUserBook } from '@/api/wereadGateway';
 import WereadBookCard from '@/components/weread/WereadBookCard.vue';
+import { formatRelative } from '@/utils/format/relative';
 import dayjs from 'dayjs';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 

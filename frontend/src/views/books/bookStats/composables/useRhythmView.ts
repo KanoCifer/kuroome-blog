@@ -1,4 +1,7 @@
-import type { ReadDetailSnapshot, ReadStatsMode } from '@/api/wereadGateway';
+import type {
+  ReadDetailSnapshot,
+  ReadStatsMode,
+} from '@/api/wereadGateway';
 import { formatDuration } from '@/utils/format/duration';
 import dayjs from 'dayjs';
 import type { ComputedRef, Ref } from 'vue';
@@ -7,51 +10,27 @@ import type { useEChartsTheme } from './useEChartsTheme';
 
 type Snapshot = ReadDetailSnapshot | null;
 
+const TREND_SUBTITLE_BY_MODE: Record<ReadStatsMode, string> = {
+  weekly: '每天的阅读时长',
+  monthly: '本月每天的阅读时长',
+  annually: '本年每月的阅读时长',
+  overall: '阅读时长走势',
+};
+
 /**
- * 接收 active snapshot + active mode + theme colors，输出 BookStats 各
- * 段落的派生数据：文案、top 排序、占比、hasXxxData 哨兵、ECharts options。
+ * 段落三(阅读节奏)——三段式:
+ *   1. 趋势(每日/月阅读时长柱图)
+ *   2. 时段(24h 阅读频次柱图,带 peak 高亮)
+ *   3. 文字 vs 听书 占比条
+ *
+ * 三个 hasXxxData 哨兵 + 整段 hasData;3 个 ECharts option;3 段文案。
  */
-export function useStatsView(
+export function useRhythmView(
   snapshot: ComputedRef<Snapshot> | Ref<Snapshot>,
   mode: ComputedRef<ReadStatsMode> | Ref<ReadStatsMode>,
   theme: ReturnType<typeof useEChartsTheme>,
 ) {
-  // ── 段落一文案 ─────────────────────────────────────────────────
-  const paragraphOneEyebrow = computed(() => {
-    const m = mode.value;
-    if (m === 'overall') return '从开始到现在,你一共读了';
-    if (m === 'weekly') return '这一周,你读了';
-    if (m === 'monthly') return '这个月,你读了';
-    return '这一年,你读了';
-  });
-
-  const paragraphOneSubtitle = computed(() => {
-    const s = snapshot.value;
-    if (!s) return '';
-    const days = s.readDays ?? 0;
-    const avg = formatDuration(s.dayAverageReadTime ?? 0);
-    if (mode.value === 'overall') {
-      return `覆盖 ${days} 天 · 日均 ${avg}`;
-    }
-    const compare = formatCompareSentence(s.compare, mode.value);
-    const head = `${days} 天有阅读 · 日均 ${avg}`;
-    return compare ? `${head}${compare}` : head;
-  });
-
-  // ── 段落二（最长阅读）─────────────────────────────────────────
-  const topReadLongest = computed(() => {
-    const items = snapshot.value?.readLongest ?? [];
-    return [...items].sort((a, b) => b.readTime - a.readTime).slice(0, 5);
-  });
-
-  const longestMaxTime = computed(() => topReadLongest.value[0]?.readTime ?? 1);
-
-  function longestBarPercent(t: number): number {
-    if (longestMaxTime.value <= 0) return 0;
-    return Math.max(4, Math.round((t / longestMaxTime.value) * 100));
-  }
-
-  // ── 段落三（节奏）─────────────────────────────────────────────
+  // ── 哨兵 ─────────────────────────────────────────────────────
   const hasTrendData = computed(() => {
     const t = snapshot.value?.readTimes;
     return !!t && Object.keys(t).length > 0;
@@ -67,18 +46,13 @@ export function useStatsView(
     return !!s && ((s.wrReadTime ?? 0) > 0 || (s.wrListenTime ?? 0) > 0);
   });
 
-  const hasRhythmData = computed(
+  const hasData = computed(
     () =>
       hasTrendData.value || hasPreferTimeData.value || hasReadListenData.value,
   );
 
-  const trendSubtitle = computed(() => {
-    const m = mode.value;
-    if (m === 'weekly') return '每天的阅读时长';
-    if (m === 'monthly') return '本月每天的阅读时长';
-    if (m === 'annually') return '本年每月的阅读时长';
-    return '阅读时长走势';
-  });
+  // ── 段落文案 ─────────────────────────────────────────────────
+  const trendSubtitle = computed(() => TREND_SUBTITLE_BY_MODE[mode.value]);
 
   const peakTimeLabel = computed(() => {
     const times = snapshot.value?.preferTime;
@@ -117,45 +91,7 @@ export function useStatsView(
     return '文字阅读 与 听书 的占比';
   });
 
-  // ── 段落四（偏好）────────────────────────────────────────────
-  const topCategories = computed(() => {
-    const cats = snapshot.value?.preferCategory ?? [];
-    if (!cats.length) return [];
-    const total = cats.reduce((sum, c) => sum + (c.readingTime ?? 0), 0) || 1;
-    return cats
-      .map((c) => ({ ...c, share: (c.readingTime ?? 0) / total }))
-      .sort((a, b) => b.share - a.share)
-      .slice(0, 4);
-  });
-
-  const topAuthors = computed(() =>
-    (snapshot.value?.preferAuthor ?? []).slice(0, 5),
-  );
-
-  const topPublishers = computed(() =>
-    (snapshot.value?.preferPublisher ?? []).slice(0, 5),
-  );
-
-  const hasPreferenceData = computed(
-    () =>
-      topCategories.value.length > 0 ||
-      topAuthors.value.length > 0 ||
-      topPublishers.value.length > 0,
-  );
-
-  // ── 整页有无任何数据 ─────────────────────────────────────────
-  const hasAnyData = computed(() => {
-    const s = snapshot.value;
-    if (!s) return false;
-    return (
-      (s.totalReadTime ?? 0) > 0 ||
-      (s.readLongest && s.readLongest.length > 0) ||
-      hasRhythmData.value ||
-      hasPreferenceData.value
-    );
-  });
-
-  // ── ECharts options（极简、无渐变填充）───────────────────────
+  // ── ECharts options(无渐变填充)──────────────────────────────
   function formatTrendLabel(ts: string): string {
     const d = dayjs.unix(Number(ts));
     if (!d.isValid()) return ts;
@@ -262,17 +198,10 @@ export function useStatsView(
   });
 
   return {
-    // 段落一
-    paragraphOneEyebrow,
-    paragraphOneSubtitle,
-    // 段落二
-    topReadLongest,
-    longestBarPercent,
-    // 段落三
     hasTrendData,
     hasPreferTimeData,
     hasReadListenData,
-    hasRhythmData,
+    hasData,
     trendSubtitle,
     preferTimeSubtitle,
     readListenSubtitle,
@@ -280,29 +209,5 @@ export function useStatsView(
     listenPercent,
     trendOption,
     preferTimeOption,
-    // 段落四
-    topCategories,
-    topAuthors,
-    topPublishers,
-    hasPreferenceData,
-    // 整体
-    hasAnyData,
   };
-}
-
-function formatCompareSentence(
-  val: number | null | undefined,
-  mode: ReadStatsMode,
-): string {
-  if (val == null) return '';
-  const pct = Math.round(Math.abs(val) * 100);
-  if (pct === 0) return '';
-  const dir = val >= 0 ? '多' : '少';
-  const ref = {
-    weekly: '上周',
-    monthly: '上月',
-    annually: '去年',
-    overall: '',
-  }[mode];
-  return ` · 比${ref}${dir} ${pct}%`;
 }

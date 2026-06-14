@@ -1,25 +1,43 @@
 <script setup lang="ts">
-import type { ReadDetailSnapshot } from '@/api/wereadGateway';
+import type { ReadDetailSnapshot, ReadStatsMode } from '@/api/wereadGateway';
+import { formatDuration } from '@/utils/format/duration';
+import { computed, toRef } from 'vue';
 import VChart from 'vue-echarts';
+import { useEChartsTheme } from '../composables/useEChartsTheme';
+import { useRhythmView } from '../composables/useRhythmView';
 
-defineProps<{
+const props = defineProps<{
   snapshot: ReadDetailSnapshot;
-  hasTrendData: boolean;
-  hasPreferTimeData: boolean;
-  hasReadListenData: boolean;
-  trendSubtitle: string;
-  preferTimeSubtitle: string;
-  readListenSubtitle: string;
-  trendOption: Record<string, unknown>;
-  preferTimeOption: Record<string, unknown>;
-  readPercent: number;
-  listenPercent: number;
-  formatDuration: (seconds: number | null | undefined) => string;
+  mode: ReadStatsMode;
 }>();
+
+// 把非 ref 的 props 包成 ref，让 narrow composable 可以订阅
+const snapshotRef = toRef(props, 'snapshot');
+const modeRef = toRef(props, 'mode');
+const theme = useEChartsTheme();
+
+const {
+  hasTrendData,
+  hasPreferTimeData,
+  hasReadListenData,
+  hasData,
+  trendSubtitle,
+  preferTimeSubtitle,
+  readListenSubtitle,
+  readPercent,
+  listenPercent,
+  trendOption,
+  preferTimeOption,
+} = useRhythmView(snapshotRef, modeRef, theme);
+
+const formatRead = (s: number | null | undefined) => formatDuration(s);
+const formatListen = (s: number | null | undefined) => formatDuration(s);
+
+const visible = computed(() => hasData.value);
 </script>
 
 <template>
-  <section class="mb-14 space-y-10">
+  <section v-if="visible" class="mb-14 space-y-10">
     <h2
       class="text-foreground font-serif text-2xl font-semibold tracking-tight sm:text-3xl"
     >
@@ -68,14 +86,14 @@ defineProps<{
           <span class="bg-primary inline-block h-2 w-2 rounded-full" />
           文字阅读
           <span class="text-foreground tabular-nums">
-            {{ formatDuration(snapshot.wrReadTime) }} · {{ readPercent }}%
+            {{ formatRead(snapshot.wrReadTime) }} · {{ readPercent }}%
           </span>
         </span>
         <span class="flex items-center gap-2">
           <span class="bg-success inline-block h-2 w-2 rounded-full" />
           听书
           <span class="text-foreground tabular-nums">
-            {{ formatDuration(snapshot.wrListenTime) }} · {{ listenPercent }}%
+            {{ formatListen(snapshot.wrListenTime) }} · {{ listenPercent }}%
           </span>
         </span>
       </div>
