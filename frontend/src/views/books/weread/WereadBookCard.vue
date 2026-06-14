@@ -95,7 +95,7 @@ function onImgError(e: Event) {
 <template>
   <button
     type="button"
-    class="focus-visible:ring-ring focus-visible:ring-offset-background block w-full cursor-pointer rounded-xl text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+    class="group focus-visible:ring-ring focus-visible:ring-offset-background block w-full cursor-pointer rounded-xl text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
     @click="handleSelect"
   >
     <!-- ─── List variant: 横向单行 ────────────────────────────── -->
@@ -163,7 +163,7 @@ function onImgError(e: Event) {
     <!-- ─── Grid variants: standard / compact ─────────────────── -->
     <div
       v-else
-      class="book-card bg-card hover:shadow-primary/5 relative overflow-hidden rounded-xl shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl"
+      class="book-card bg-card ring-border/0 group-hover:ring-border/40 relative overflow-hidden rounded-xl shadow-sm ring-1 ring-inset transition-[transform,box-shadow] duration-300 ease-out group-hover:-translate-y-1 group-hover:shadow-lg group-hover:shadow-primary/10"
       :style="gridAnimStyle"
     >
       <div class="relative aspect-3/4 overflow-hidden">
@@ -171,7 +171,7 @@ function onImgError(e: Event) {
           v-if="book.cover"
           :src="book.cover"
           :alt="book.title"
-          class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+          class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
           loading="lazy"
           decoding="async"
           @error="onImgError"
@@ -189,12 +189,15 @@ function onImgError(e: Event) {
           </span>
         </div>
 
-        <!-- hover 浮出"查看"按钮 -->
+        <!-- hover: 自下而上渐变薄纱,只暗化下半部,封面标题仍可读 -->
         <div
-          class="absolute inset-0 flex items-center justify-center bg-foreground/0 transition-colors duration-300 group-hover:bg-foreground/35"
-        >
+          class="pointer-events-none absolute inset-0 bg-gradient-to-t from-foreground/40 via-foreground/10 to-transparent opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100"
+        />
+
+        <!-- hover: 中央动作按钮(带 scale 弹入) -->
+        <div class="absolute inset-0 flex items-center justify-center">
           <div
-            class="bg-card/95 text-foreground flex h-9 w-9 items-center justify-center rounded-full opacity-0 shadow-lg backdrop-blur-sm transition-all duration-300 group-hover:opacity-100"
+            class="bg-background/90 text-foreground ring-border/50 flex h-9 w-9 scale-90 items-center justify-center rounded-full opacity-0 shadow-md ring-1 backdrop-blur-md transition-all duration-300 ease-out group-hover:scale-100 group-hover:opacity-100"
           >
             <ChevronRight class="h-4 w-4" />
           </div>

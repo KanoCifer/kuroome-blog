@@ -56,7 +56,7 @@
 
 <script setup lang="ts">
 import type { WereadUserBook } from '@/api/wereadGateway';
-import WereadBookCard from '@/components/weread/WereadBookCard.vue';
+import WereadBookCard from '@/views/books/weread/WereadBookCard.vue';
 import { formatRelative } from '@/utils/format/relative';
 import dayjs from 'dayjs';
 import { onBeforeUnmount, onMounted, ref } from 'vue';

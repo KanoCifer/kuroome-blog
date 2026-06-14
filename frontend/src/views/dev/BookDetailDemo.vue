@@ -6,9 +6,9 @@ import {
   type WereadBookProgress,
   type WereadUserBook,
 } from '@/api/wereadGateway';
-import WereadBookCard from '@/components/weread/WereadBookCard.vue';
-import WereadBookDetailPanel from '@/components/weread/WereadBookDetailPanel.vue';
-import { useWereadBookDetailSingleton } from '@/components/weread/composables/useWereadBookDetailSingleton';
+import WereadBookCard from '@/views/books/weread/WereadBookCard.vue';
+import WereadBookDetailPanel from '@/views/books/weread/WereadBookDetailPanel.vue';
+import { useWereadBookDetailSingleton } from '@/views/books/composables/useWereadBookDetailSingleton';
 
 useHead({
   title: '书籍详情面板演示 - Kuroome',

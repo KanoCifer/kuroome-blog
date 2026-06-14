@@ -15,7 +15,7 @@
  *   `< 1y`      → X 个月前
  *   `>= 1y`     → X 年前
  *
- * 替代 `components/weread/utils/format.ts` 里的同名函数(已补"昨天"分支)
+ * 替代 `views/books/weread/utils/format.ts` 里的同名函数(已补"昨天"分支)
  * 与 `BookShelfStatsBar` 里手抄的 `recencyLabel`。
  */
 function toUnixSeconds(t: number | string | null | undefined): number | null {

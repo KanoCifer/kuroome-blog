@@ -112,9 +112,9 @@
 <script setup lang="ts">
 import { useWereadShelf } from '@/composables/useWereadShelf';
 import { useReadStatsStore } from '@/stores/readStats';
-import WereadBookCard from '@/components/weread/WereadBookCard.vue';
-import WereadBookDetailPanel from '@/components/weread/WereadBookDetailPanel.vue';
-import { useWereadBookDetailSingleton } from '@/components/weread/composables/useWereadBookDetailSingleton';
+import WereadBookCard from '@/views/books/weread/WereadBookCard.vue';
+import WereadBookDetailPanel from '@/views/books/weread/WereadBookDetailPanel.vue';
+import { useWereadBookDetailSingleton } from '@/views/books/composables/useWereadBookDetailSingleton';
 import { onMounted } from 'vue';
 import BookShelfHero from './components/BookShelfHero.vue';
 import BookShelfReadingRail from './components/BookShelfReadingRail.vue';

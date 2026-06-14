@@ -116,8 +116,8 @@
 import type { BookRecommendItem } from '@/api/wereadGateway';
 import { ArrowRight, RefreshCw, Star } from '@lucide/vue';
 import { Motion } from 'motion-v';
-import BookRecommendGrid from '@/components/weread/BookRecommendGrid.vue';
-import { RECOMMEND_COVER_LAYOUT_ID_PREFIX } from '@/components/weread/recommendLayoutId';
+import BookRecommendGrid from '@/views/books/weread/BookRecommendGrid.vue';
+import { RECOMMEND_COVER_LAYOUT_ID_PREFIX } from '@/views/books/weread/recommendLayoutId';
 
 defineProps<{
   books: BookRecommendItem[];
