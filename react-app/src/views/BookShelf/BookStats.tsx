@@ -4,26 +4,32 @@ import {
   selectSnapshots,
 } from '@/stores/readStatsStore';
 import ReactEChartsCore from 'echarts-for-react';
-import { LineChart, BarChart, PieChart } from 'echarts/charts';
+import { HeatmapChart, LineChart, BarChart, PieChart } from 'echarts/charts';
 import {
   GridComponent,
   TooltipComponent,
   LegendComponent,
+  VisualMapComponent,
 } from 'echarts/components';
 import * as echarts from 'echarts/core';
 import { SVGRenderer } from 'echarts/renderers';
 import dayjs from 'dayjs';
+import isoWeek from 'dayjs/plugin/isoWeek';
 import { ArrowLeft, ArrowRight, RefreshCw, Star } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+dayjs.extend(isoWeek);
 
 echarts.use([
   TooltipComponent,
   GridComponent,
   LegendComponent,
+  VisualMapComponent,
   LineChart,
   BarChart,
   PieChart,
+  HeatmapChart,
   SVGRenderer,
 ]);
 
@@ -494,6 +500,137 @@ export default function BookStats() {
     }
   }, [snapshotByMode, activeMode]);
 
+  // ── 年视图日历热力图 ───────────────────────────────────────
+  const yearlyHeatmap = useReadStatsStore((s) => s.yearlyHeatmap);
+  const fetchYearlyHeatmap = useReadStatsStore((s) => s.fetchYearlyHeatmap);
+  const currentYear = useMemo(() => new Date().getFullYear(), []);
+  const currentHeatmap =
+    yearlyHeatmap[currentYear] ?? null;
+
+  useEffect(() => {
+    if (activeMode === 'annually') {
+      fetchYearlyHeatmap(currentYear);
+    }
+  }, [activeMode, currentYear, fetchYearlyHeatmap]);
+
+  const yearHeatmapOption = useMemo(() => {
+    if (activeMode !== 'annually' || !currentHeatmap) return {};
+    const firstDay = dayjs(`${currentYear}-01-01`);
+    const lastDay = dayjs(`${currentYear}-12-31`);
+
+    const dayValue: Record<string, number> = {};
+    let maxVal = 0;
+    for (const [ts, secs] of Object.entries(currentHeatmap)) {
+      const d = dayjs.unix(Number(ts));
+      if (!d.isValid() || d.year() !== currentYear) continue;
+      const dateStr = d.format('YYYY-MM-DD');
+      dayValue[dateStr] = secs;
+      if (secs > maxVal) maxVal = secs;
+    }
+
+    const firstIsoWeek = firstDay.isoWeek();
+    const data: [number, number, number][] = [];
+    const monthLabels: { weekIdx: number; month: number }[] = [];
+    const seenMonths = new Set<number>();
+    let cursor = firstDay.clone();
+    while (cursor.isBefore(lastDay) || cursor.isSame(lastDay, 'day')) {
+      const dateStr = cursor.format('YYYY-MM-DD');
+      const val = dayValue[dateStr] ?? 0;
+      const dow = cursor.day() === 0 ? 6 : cursor.day() - 1;
+      const wDiff = cursor.isoWeek() - firstIsoWeek;
+      const weekIdx = wDiff < 0 ? 0 : wDiff;
+      data.push([weekIdx, dow, val]);
+      const m = cursor.month() + 1;
+      if (!seenMonths.has(m) && cursor.date() <= 7) {
+        seenMonths.add(m);
+        monthLabels.push({ weekIdx, month: m });
+      }
+      cursor = cursor.add(1, 'day');
+    }
+
+    const maxWeekIdx = data.reduce((m, d) => Math.max(m, d[0]), 0);
+
+    return {
+      tooltip: {
+        formatter: (p: { value: [number, number, number] }) => {
+          const [w, d, v] = p.value;
+          const weekStart = firstDay
+            .clone()
+            .startOf('isoWeek')
+            .add(w, 'week');
+          const date = weekStart.add(d, 'day');
+          return `${date.format('YYYY-MM-DD')}<br/>${formatDuration(v)}`;
+        },
+      },
+      grid: { left: 24, right: 8, top: 18, bottom: 32, containLabel: false },
+      xAxis: {
+        type: 'category',
+        data: Array.from({ length: maxWeekIdx + 1 }, (_, i) => i),
+        splitArea: { show: false },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        axisLabel: {
+          show: true,
+          color: subtextColor,
+          fontSize: 10,
+          interval: 0,
+          formatter: (val: string) => {
+            const found = monthLabels.find((m) => m.weekIdx === Number(val));
+            return found ? `${found.month}月` : '';
+          },
+        },
+      },
+      yAxis: {
+        type: 'category',
+        data: ['一', '', '三', '', '五', '', '日'],
+        splitArea: { show: false },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        axisLabel: { color: subtextColor, fontSize: 10 },
+        inverse: true,
+      },
+      visualMap: {
+        min: 0,
+        max: Math.max(maxVal, 60),
+        calculable: false,
+        orient: 'horizontal',
+        left: 'center',
+        bottom: 0,
+        itemWidth: 10,
+        itemHeight: 10,
+        text: ['多', '少'],
+        textStyle: { color: subtextColor, fontSize: 11 },
+        inRange: {
+          color: [primaryRgba + '0.12)', primaryRgba + '1)'],
+        },
+      },
+      series: [
+        {
+          type: 'heatmap',
+          data,
+          itemStyle: { borderRadius: 2, borderColor: 'transparent' },
+          emphasis: {
+            itemStyle: {
+              borderColor: primaryColor,
+              borderWidth: 1,
+            },
+          },
+          progressive: 1000,
+        },
+      ],
+    };
+  }, [
+    activeMode,
+    currentHeatmap,
+    currentYear,
+    subtextColor,
+    primaryColor,
+    primaryRgba,
+  ]);
+
+  const hasYearHeatmap =
+    activeMode === 'annually' && !!currentHeatmap && Object.keys(currentHeatmap).length > 0;
+
   return (
     <div className="bg-background flex min-h-[calc(100dvh-4rem)] flex-col">
       {/* Hero Image Section */}
@@ -655,6 +792,26 @@ export default function BookStats() {
                 </div>
               )}
 
+              {/* Year Heatmap (annually only) */}
+              {hasYearHeatmap && (
+                <div className="bg-card mb-6 rounded-xl p-4 sm:p-6">
+                  <h3 className="text-foreground mb-1 text-sm font-medium">
+                    本年的阅读足迹
+                  </h3>
+                  <p className="text-muted-foreground mb-4 text-xs">
+                    本年每日的阅读时长
+                  </p>
+                  <div className="h-44 sm:h-48">
+                    <ReactEChartsCore
+                      echarts={echarts}
+                      option={yearHeatmapOption}
+                      style={{ height: '100%', width: '100%' }}
+                      opts={{ renderer: 'svg' }}
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* Read Longest Chart */}
               {activeSnapshot.readLongest &&
                 activeSnapshot.readLongest.length > 0 && (
@@ -763,12 +920,12 @@ export default function BookStats() {
                     </h3>
                     <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                       {activeSnapshot.readStat.map((stat) => (
-                        <div key={stat.label} className="text-center">
+                        <div key={stat.stat} className="text-center">
                           <p className="text-foreground text-2xl font-bold">
-                            {stat.value}
+                            {stat.counts}
                           </p>
                           <p className="text-muted-foreground text-xs">
-                            {stat.label}
+                            {stat.stat}
                           </p>
                         </div>
                       ))}
@@ -788,7 +945,7 @@ export default function BookStats() {
                         .slice(0, 5)
                         .map((author, index) => (
                           <div
-                            key={author.authorId ?? index}
+                            key={author.name ?? index}
                             className="flex items-center justify-between"
                           >
                             <div className="flex items-center gap-3">

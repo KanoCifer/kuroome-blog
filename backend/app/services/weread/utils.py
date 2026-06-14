@@ -1,6 +1,28 @@
 from __future__ import annotations
 
 
+def _calc_timestamp_to_fetch(year: int):
+    """计算要获取哪些 baseTime 的 monthly 数据。
+
+    返回该年每个月初的 unix 秒时间戳:
+    - 当前年: 1 月 ~ 当月(含)
+    - 过去/未来年: 1 月 ~ 12 月
+
+    只返回月初时间戳,避免混入"现在这一刻"造成跨年数据污染。
+    """
+    from datetime import datetime
+
+    now = datetime.now()
+    now_month = now.month
+    now_year = now.year
+
+    last_month = now_month if year == now_year else 12
+    return [
+        int(datetime(year, month, 1, tzinfo=now.tzinfo).timestamp())
+        for month in range(1, last_month + 1)
+    ]
+
+
 def _normalize_cover_url(cover: str | None) -> str | None:
     """微信读书 API 返回的 cover/avatar 偶发走 http 协议，前端在 https 站点
     下会触发 Mixed Content 警告。这里统一把外链升级到 https。"""

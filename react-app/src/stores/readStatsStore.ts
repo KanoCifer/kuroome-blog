@@ -20,6 +20,14 @@ interface ReadStatsState {
   /** 不传 mode → 当前周期 4 个 mode 并发拉取 */
   fetchStats: (mode?: ReadStatsMode, baseTime?: number | null) => Promise<void>;
 
+  // ── 年视图热力图（按日 readTimes） ───────────────────
+  /** key = year -> { dayUnixSec: secs }，按 year 缓存避免串台 */
+  yearlyHeatmap: Record<number, Record<string, number>>;
+  yearlyHeatmapYear: number | null;
+  isLoadingYearlyHeatmap: boolean;
+  yearlyHeatmapError: string;
+  fetchYearlyHeatmap: (year?: number) => Promise<void>;
+
   // ── 推荐 ────────────────────────────────────────────────
   recommends: BookRecommendItem[];
   isLoadingRecommends: boolean;
@@ -40,6 +48,11 @@ export const useReadStatsStore = create<ReadStatsState>((set, get) => ({
   recommendError: '',
   recommendMaxIdx: 0,
   hasMoreRecommends: true,
+
+  yearlyHeatmap: {},
+  yearlyHeatmapYear: null,
+  isLoadingYearlyHeatmap: false,
+  yearlyHeatmapError: '',
 
   fetchStats: async (mode, baseTime = null) => {
     set({ isLoading: true, error: '' });
@@ -80,6 +93,32 @@ export const useReadStatsStore = create<ReadStatsState>((set, get) => ({
       });
     } finally {
       set({ isLoading: false });
+    }
+  },
+
+  fetchYearlyHeatmap: async (year) => {
+    const targetYear = year ?? new Date().getFullYear();
+    if (get().isLoadingYearlyHeatmap) return;
+    if (get().yearlyHeatmap[targetYear]) return; // 命中缓存
+    set({ isLoadingYearlyHeatmap: true, yearlyHeatmapError: '' });
+    try {
+      const res = await wereadService.getYearlyHeatmap(targetYear);
+      const data = res.data?.readTimes ?? {};
+      set((s) => ({
+        yearlyHeatmap: { ...s.yearlyHeatmap, [targetYear]: data },
+        yearlyHeatmapYear: targetYear,
+      }));
+    } catch (err: unknown) {
+      const e = err as {
+        message?: string;
+        response?: { data?: { message?: string } };
+      };
+      set({
+        yearlyHeatmapError:
+          e?.response?.data?.message || e?.message || '获取年热力图失败',
+      });
+    } finally {
+      set({ isLoadingYearlyHeatmap: false });
     }
   },
 

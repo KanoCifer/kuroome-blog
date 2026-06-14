@@ -21,6 +21,10 @@ export const wereadService = {
     return wereadGateway.getReadProgress(mode, baseTime);
   },
 
+  async getYearlyHeatmap(year?: number) {
+    return wereadGateway.getYearlyHeatmap(year);
+  },
+
   async getBookProgress(bookId: string, refresh = false) {
     return wereadGateway.getBookProgress(bookId, refresh);
   },

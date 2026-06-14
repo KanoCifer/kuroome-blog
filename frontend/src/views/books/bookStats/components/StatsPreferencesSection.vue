@@ -47,17 +47,17 @@ const { topCategories, topAuthors, topPublishers, hasData } =
         <dd class="flex flex-wrap gap-x-3 gap-y-1.5">
           <span
             v-for="(author, idx) in topAuthors"
-            :key="author.authorId ?? idx"
+            :key="author.name ?? idx"
             class="text-foreground"
           >
             <span class="font-serif">
               {{ author.name ?? '未知' }}
             </span>
             <span
-              v-if="author.readingTime"
+              v-if="author.readTime"
               class="text-muted-foreground ml-1 text-xs"
             >
-              {{ author.readingTime }}
+              {{ author.readTime }}
             </span>
           </span>
         </dd>

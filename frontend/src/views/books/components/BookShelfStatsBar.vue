@@ -75,10 +75,12 @@ const props = defineProps<{
 
 const router = useRouter();
 
-const latestBook = computed(() => {
+const latestBook = computed<{ title: string | null } | null>(() => {
   const s = props.weeklySnapshot;
   if (!s?.readLongest?.length) return null;
-  return s.readLongest[0];
+  const item = s.readLongest[0];
+  const info = item.book ?? item.albumInfo ?? {};
+  return { title: (info as Record<string, unknown>)?.title as string | null ?? null };
 });
 
 /**

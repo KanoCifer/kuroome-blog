@@ -136,16 +136,27 @@ async def get_read_progress(
         None,
         description="目标周期的 unix 秒。缺省 = 当前周期；overall 模式忽略此参数。",
     ),
-    user=Depends(manager),
+    perDay: bool = Query(False, description="按日拉取,用于年视图热力图"),
+    year: int | None = Query(None, description="查询的年份,缺省为当前年份"),
+    current_user: User = Depends(manager),
     weread_service=Depends(weread_service_dep),
 ):
     """获取指定 mode + 周期的阅读统计快照。
 
-    - 不再保存任何快照，每次按需直拉远端
-    - 接口级缓存 300s，key 含 (user, mode, baseTime)
+    - 不再保存任何快照,每次按需直拉远端
+    - 接口级缓存 300s,key 含 (user, mode, baseTime, perDay, year)
+    - perDay=True 时走日级热力图分支:并发拉 12 个月合并每日 readTimes
     """
+    if perDay:
+        read_times: dict[str, int] = await weread_service.fetch_yearly_heatmap(
+            current_user.id, year=year
+        )
+        return APIResponse(
+            data={"readTimes": read_times},
+            message="Read times retrieved successfully",
+        )
     snapshot = await weread_service.orchestra_read_detail(
-        user.id, mode=mode, base_time=baseTime
+        current_user.id, mode=mode, base_time=baseTime
     )
     return APIResponse(
         data=snapshot.model_dump(mode="json"),

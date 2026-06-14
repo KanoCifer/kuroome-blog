@@ -152,8 +152,9 @@
 
           <!-- ── 段落三·年：本年的阅读足迹(仅年视图) ─────────────── -->
           <StatsYearHeatmapSection
-            v-if="activeSnapshot && hasYearHeatmapData"
-            :snapshot="activeSnapshot"
+            v-if="activeMode === 'annually' && hasYearHeatmapData"
+            :heatmap="currentHeatmap"
+            :year="currentYear"
             :mode="activeMode"
           />
 
@@ -184,16 +185,16 @@
           >
             <div
               v-for="stat in activeSnapshot.readStat"
-              :key="stat.label"
+              :key="stat.stat"
               class="text-left"
             >
               <p
                 class="text-foreground font-serif text-3xl font-bold tabular-nums sm:text-4xl"
               >
-                {{ stat.value }}
+                {{ stat.counts }}
               </p>
               <p class="text-muted-foreground mt-1 text-xs sm:text-sm">
-                {{ stat.label }}
+                {{ stat.stat }}
               </p>
             </div>
           </section>
@@ -268,17 +269,17 @@ const { hasData: hasRhythmData } = useRhythmView(
   },
 );
 const { hasData: hasPreferenceData } = usePreferenceView(activeSnapshot);
+
+// ── 年视图热力图 ──────────────────────────────────────────────
+const currentYear = computed(() => new Date().getFullYear());
+const currentHeatmap = computed(
+  () => statsStore.yearlyHeatmap[currentYear.value] ?? null,
+);
+// heatmap 改为纯 CSS grid,composable 不再依赖 ECharts theme
 const { hasData: hasYearHeatmapData } = useYearHeatmapView(
-  activeSnapshot,
+  currentHeatmap,
+  currentYear,
   activeMode,
-  // theme 在 section 内部独立取,这里仅作整页哨兵
-  {
-    primaryColor: computed(() => ''),
-    subtextColor: computed(() => ''),
-    axisColor: computed(() => ''),
-    splitLineColor: computed(() => ''),
-    mutedFillColor: computed(() => ''),
-  },
 );
 
 // 整页级"是否完全空"——任一段有数据就不空,匹配旧 hasAnyData 语义
@@ -298,6 +299,17 @@ watch(
   () => activeSnapshot.value?.fetched_at,
   (val) => {
     if (val) lastRefreshedAt.value = dayjs(val);
+  },
+  { immediate: true },
+);
+
+// 进入/切到 annually 时按需拉取热力图;store 内部按 year 缓存 + loading 互斥
+watch(
+  () => activeMode.value,
+  (m) => {
+    if (m === 'annually') {
+      statsStore.fetchYearlyHeatmap(currentYear.value);
+    }
   },
   { immediate: true },
 );

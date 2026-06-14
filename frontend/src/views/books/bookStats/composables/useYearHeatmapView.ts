@@ -1,167 +1,159 @@
-import type { ReadDetailSnapshot, ReadStatsMode } from '@/api/wereadGateway';
+import type { ReadStatsMode } from '@/api/wereadGateway';
 import { formatDuration } from '@/utils/format/duration';
 import dayjs from 'dayjs';
-import isoWeek from 'dayjs/plugin/isoWeek';
 import type { ComputedRef, Ref } from 'vue';
 import { computed } from 'vue';
-import type { useEChartsTheme } from './useEChartsTheme';
 
-dayjs.extend(isoWeek);
+/**
+ * key = dayUnixSec(字符串) -> 当日阅读秒数。
+ * 数据来自 /read-progress?perDay=true,key 形如 "1704067200"。
+ */
+export type YearlyHeatmapData = Record<string, number> | null;
 
-type Snapshot = ReadDetailSnapshot | null;
+/** 单个单元格;level 0..4 对应 5 级色阶。 */
+export type HeatmapCell = {
+  /** YYYY-MM-DD */
+  date: string;
+  level: 0 | 1 | 2 | 3 | 4;
+  /** 当日阅读秒数 */
+  secs: number;
+};
 
 /**
  * 段落三·年视图日历热力图——GitHub 风格 53 周 × 7 天 grid。
  *
- * 数据源:readTimes(annually mode 下 WeRead /readdata/detail 返回 12 个月桶,
- * key 是月初 unix 秒,value 是当月总秒数)。每日 cell 用「当月总量 / 当月天数」
- * 均匀分摊(明确标注为估算,后续可换日级数据源提升精度)。
+ * 数据源:YearlyHeatmapData,key 是当天 0:00 的 unix 秒字符串(WeRead 原生
+ * monthly readTimes 形状),value 是当天的阅读秒数。无读的日子不出现在
+ * 数据里,grid 渲染时 `?? 0` 兜底。改用日级真实数据,不再做"月总量/天数
+ * 均匀分摊"的估算。
  *
- * 不用 ECharts calendar 组件——calendar+heatmap 的 visualMap 默认
- * dimension=0 会把日期字符串误当数值。改用普通 heatmap + 三元组 data
- * [weekIdx, dayOfWeek(0=Mon..6=Sun), value],visualMap 直接吃第三维。
+ * 不用 ECharts——visualMap+heatmap 在多主题下的颜色梯度、月份/图例定位
+ * 都不稳定,改用纯 CSS grid 渲染,让 design-system 的语义 token 直接
+ * 驱动 cell 颜色。
  *
- * hasData 哨兵(仅 annually 有数据)+ 1 个 ECharts heatmap option + 1 段文案。
+ * 5 级色阶用 4 分位数划分(只统计非零日),贴合用户实际阅读分布;
+ * 若全年只有 1 天阅读,4 个分位都退化到该值,所有活跃日均 L4。
+ *
+ * 网格列 = 周(周一起),网格行 = 周一..周日;一年固定 53 列。第一列顶部
+ * 会有 (Jan 1 dayOfWeek - 1) 个空槽,保证列与周对齐;末列同理。
+ *
+ * 返回 view:{ weeks, monthLabels, totalActiveDays, maxSeconds }。
+ * 渲染端用 CSS grid + 显式 gridColumn/gridRow 定位,完全控制布局。
  */
 export function useYearHeatmapView(
-  snapshot: ComputedRef<Snapshot> | Ref<Snapshot>,
+  heatmap: ComputedRef<YearlyHeatmapData> | Ref<YearlyHeatmapData>,
+  year: ComputedRef<number> | Ref<number>,
   mode: ComputedRef<ReadStatsMode> | Ref<ReadStatsMode>,
-  theme: ReturnType<typeof useEChartsTheme>,
 ) {
-  // ── 哨兵 ─────────────────────────────────────────────────────
+  // ── 哨兵 ────────────────────────────────────────────────────
   const hasData = computed(() => {
     if (mode.value !== 'annually') return false;
-    const t = snapshot.value?.readTimes;
+    const t = heatmap.value;
     return !!t && Object.keys(t).length > 0;
   });
 
   // ── 段落文案 ─────────────────────────────────────────────────
-  const subtitle = computed(() => '本年每日的阅读时长(按月总量估算)');
+  const subtitle = computed(() => '本年每日的阅读时长');
 
-  // ── ECharts heatmap option (53 周 × 7 天 grid) ──────────────
-  const heatmapOption = computed(() => {
-    const readTimes = snapshot.value?.readTimes;
-    if (!readTimes) return {};
-    const entries = Object.entries(readTimes).sort(
-      ([a], [b]) => Number(a) - Number(b),
-    );
-    if (!entries.length) return {};
-
-    const year = dayjs.unix(Number(entries[0][0])).year();
-    const firstDay = dayjs(`${year}-01-01`);
-    const lastDay = dayjs(`${year}-12-31`);
-
-    // 每月总量平摊到该月每天 → Map<dateStr, seconds>
-    const dayValue: Record<string, number> = {};
-    let maxVal = 0;
-    entries.forEach(([ts, secs]) => {
-      const d = dayjs.unix(Number(ts));
-      if (!d.isValid()) return;
-      const daysInMonth = d.daysInMonth();
-      const perDay = Math.round(secs / daysInMonth);
-      for (let day = 1; day <= daysInMonth; day++) {
-        const dateStr = d.date(day).format('YYYY-MM-DD');
-        dayValue[dateStr] = perDay;
-        if (perDay > maxVal) maxVal = perDay;
-      }
-    });
-
-    // 遍历全年每一天 → [weekIdx, dayOfWeek(0=Mon..6=Sun), seconds]
-    const firstIsoWeek = firstDay.isoWeek();
-    const data: [number, number, number][] = [];
-    // 记录每月首次出现的 weekIdx,在 xAxis 上画月份标签
-    const monthLabels: { weekIdx: number; month: number }[] = [];
-    const seenMonths = new Set<number>();
-    let cursor = firstDay.clone();
-    while (cursor.isBefore(lastDay) || cursor.isSame(lastDay, 'day')) {
-      const dateStr = cursor.format('YYYY-MM-DD');
-      const val = dayValue[dateStr] ?? 0;
-      // 0=Mon..6=Sun (与中文 一-日 对应)
-      const dow = cursor.day() === 0 ? 6 : cursor.day() - 1;
-      const wDiff = cursor.isoWeek() - firstIsoWeek;
-      const weekIdx = wDiff < 0 ? 0 : wDiff;
-      data.push([weekIdx, dow, val]);
-      const m = cursor.month() + 1;
-      if (!seenMonths.has(m) && cursor.date() <= 7) {
-        seenMonths.add(m);
-        monthLabels.push({ weekIdx, month: m });
-      }
-      cursor = cursor.add(1, 'day');
+  // ── 主体数据 ─────────────────────────────────────────────────
+  const view = computed(() => {
+    const data_ = heatmap.value;
+    if (!data_) {
+      return {
+        weeks: [] as (HeatmapCell | null)[][],
+        monthLabels: [] as { weekIdx: number; month: number }[],
+        totalActiveDays: 0,
+        maxSeconds: 0,
+      };
     }
 
-    const maxWeekIdx = data.reduce((m, d) => Math.max(m, d[0]), 0);
+    const yr = year.value;
+    const firstDay = dayjs(`${yr}-01-01`);
+    const lastDay = dayjs(`${yr}-12-31`);
+
+    // dayTs(unix秒) -> dateStr -> secs,跳过无效/越界日
+    const dayValue: Record<string, number> = {};
+    let maxVal = 0;
+    for (const [ts, secs] of Object.entries(data_)) {
+      const d = dayjs.unix(Number(ts));
+      if (!d.isValid() || d.year() !== yr) continue;
+      dayValue[d.format('YYYY-MM-DD')] = secs;
+      if (secs > maxVal) maxVal = secs;
+    }
+
+    // 4 分位:仅在非零日内做分布统计
+    const nonZero = Object.values(dayValue)
+      .filter((s) => s > 0)
+      .sort((a, b) => a - b);
+    const q = (p: number) => {
+      if (nonZero.length === 0) return 0;
+      const idx = Math.min(nonZero.length - 1, Math.floor(p * nonZero.length));
+      return nonZero[idx];
+    };
+    const q1 = q(0.25);
+    const q2 = q(0.5);
+    const q3 = q(0.75);
+
+    // 计算网格列数:首日周首偏移 + 全年天数,向上取整到 7
+    const offset = (firstDay.day() + 6) % 7; // Mon=0 ... Sun=6
+    const totalDays = lastDay.diff(firstDay, 'day') + 1;
+    const totalCells = offset + totalDays;
+    const weekCount = Math.ceil(totalCells / 7);
+
+    const weeks: (HeatmapCell | null)[][] = Array.from(
+      { length: weekCount },
+      () => Array.from({ length: 7 }, () => null),
+    );
+    const monthLabels: { weekIdx: number; month: number }[] = [];
+    const seenMonths = new Set<number>();
+
+    let cursor = firstDay.clone();
+    let dayIdx = 0;
+    let totalActiveDays = 0;
+    while (cursor.isSame(lastDay) || cursor.isBefore(lastDay, 'day')) {
+      const pos = offset + dayIdx;
+      const wIdx = Math.floor(pos / 7);
+      const dOfW = pos % 7; // 0=Mon..6=Sun
+      const dateStr = cursor.format('YYYY-MM-DD');
+      const secs = dayValue[dateStr] ?? 0;
+      const level: 0 | 1 | 2 | 3 | 4 =
+        secs <= 0
+          ? 0
+          : secs <= q1
+            ? 1
+            : secs <= q2
+              ? 2
+              : secs <= q3
+                ? 3
+                : 4;
+      weeks[wIdx][dOfW] = { date: dateStr, level, secs };
+      if (secs > 0) totalActiveDays++;
+      const m = cursor.month() + 1;
+      if (!seenMonths.has(m) && cursor.date() === 1) {
+        seenMonths.add(m);
+        monthLabels.push({ weekIdx: wIdx, month: m });
+      }
+      cursor = cursor.add(1, 'day');
+      dayIdx++;
+    }
 
     return {
-      tooltip: {
-        formatter: (p: { value: [number, number, number] }) => {
-          const [w, d, v] = p.value;
-          const weekStart = firstDay.clone().startOf('isoWeek').add(w, 'week');
-          const date = weekStart.add(d, 'day');
-          return `${date.format('YYYY-MM-DD')}<br/>${formatDuration(v)}`;
-        },
-      },
-      grid: { left: 24, right: 8, top: 18, bottom: 32, containLabel: false },
-      xAxis: {
-        type: 'category',
-        data: Array.from({ length: maxWeekIdx + 1 }, (_, i) => i),
-        splitArea: { show: false },
-        axisLine: { show: false },
-        axisTick: { show: false },
-        axisLabel: {
-          show: true,
-          color: theme.subtextColor.value,
-          fontSize: 10,
-          interval: 0,
-          formatter: (val: string) => {
-            const found = monthLabels.find((m) => m.weekIdx === Number(val));
-            return found ? `${found.month}月` : '';
-          },
-        },
-      },
-      yAxis: {
-        type: 'category',
-        data: ['一', '', '三', '', '五', '', '日'],
-        splitArea: { show: false },
-        axisLine: { show: false },
-        axisTick: { show: false },
-        axisLabel: { color: theme.subtextColor.value, fontSize: 10 },
-        inverse: true, // 一 在顶部
-      },
-      visualMap: {
-        min: 0,
-        max: Math.max(maxVal, 60),
-        calculable: false,
-        orient: 'horizontal',
-        left: 'center',
-        bottom: 0,
-        itemWidth: 10,
-        itemHeight: 10,
-        text: ['多', '少'],
-        textStyle: { color: theme.subtextColor.value, fontSize: 11 },
-        inRange: {
-          color: [theme.mutedFillColor.value, theme.primaryColor.value],
-        },
-      },
-      series: [
-        {
-          type: 'heatmap',
-          data,
-          itemStyle: { borderRadius: 2, borderColor: 'transparent' },
-          emphasis: {
-            itemStyle: {
-              borderColor: theme.primaryColor.value,
-              borderWidth: 1,
-            },
-          },
-          progressive: 1000,
-        },
-      ],
+      weeks,
+      monthLabels,
+      totalActiveDays,
+      maxSeconds: maxVal,
     };
   });
+
+  const totalActiveDays = computed(() => view.value.totalActiveDays);
+  const maxSeconds = computed(() => view.value.maxSeconds);
 
   return {
     hasData,
     subtitle,
-    heatmapOption,
+    view,
+    totalActiveDays,
+    maxSeconds,
+    formatDuration,
   };
 }

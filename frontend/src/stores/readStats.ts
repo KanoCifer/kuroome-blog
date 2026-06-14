@@ -18,6 +18,13 @@ export const useReadStatsStore = defineStore('readStats', () => {
   const isLoading = ref(false);
   const error = ref('');
 
+  // ── 年视图热力图（按日 readTimes） ─────────────────────────
+  // 用 key = year 区分多份缓存,避免切年时数据串台
+  const yearlyHeatmap = ref<Record<number, Record<string, number>>>({});
+  const yearlyHeatmapYear = ref<number | null>(null);
+  const isLoadingYearlyHeatmap = ref(false);
+  const yearlyHeatmapError = ref('');
+
   // ── 推荐 ────────────────────────────────────────────────────
   const recommends = ref<BookRecommendItem[]>([]);
   const isLoadingRecommends = ref(false);
@@ -59,7 +66,7 @@ export const useReadStatsStore = defineStore('readStats', () => {
       READ_STATS_MODES.forEach((m, i) => {
         const r = results[i];
         if (r.data) {
-          next[snapshotKey(m, null)] = r.data;
+          next[snapshotKey(m, null)] = r.data as ReadDetailSnapshot;
         }
       });
       snapshots.value = next;
@@ -90,7 +97,7 @@ export const useReadStatsStore = defineStore('readStats', () => {
       if (res.data) {
         snapshots.value = {
           ...snapshots.value,
-          [snapshotKey(mode, baseTime)]: res.data,
+          [snapshotKey(mode, baseTime)]: res.data as ReadDetailSnapshot,
         };
       } else {
         throw new Error(res.message || '获取阅读统计失败');
@@ -112,6 +119,35 @@ export const useReadStatsStore = defineStore('readStats', () => {
     baseTime: number | null = null,
   ): ReadDetailSnapshot | null {
     return snapshots.value[snapshotKey(mode, baseTime)] ?? null;
+  }
+
+  /**
+   * 拉取指定年份的日级阅读时长(年视图热力图)。
+   * - 已缓存的 year 跳过网络层(store 维度)
+   * - isLoading 期间对同 year 重复调用直接 no-op
+   * - 失败回 error 但保留旧数据
+   */
+  async function fetchYearlyHeatmap(year?: number): Promise<void> {
+    const targetYear = year ?? new Date().getFullYear();
+    if (isLoadingYearlyHeatmap.value) return;
+    if (yearlyHeatmap.value[targetYear]) return; // 命中缓存
+    isLoadingYearlyHeatmap.value = true;
+    yearlyHeatmapError.value = '';
+    try {
+      const res = await wereadGateway.getYearlyHeatmap(targetYear);
+      const data = res.data?.readTimes ?? {};
+      yearlyHeatmap.value = { ...yearlyHeatmap.value, [targetYear]: data };
+      yearlyHeatmapYear.value = targetYear;
+    } catch (err: unknown) {
+      const e = err as {
+        message?: string;
+        response?: { data?: { message?: string } };
+      };
+      yearlyHeatmapError.value =
+        e?.response?.data?.message || e?.message || '获取年热力图失败';
+    } finally {
+      isLoadingYearlyHeatmap.value = false;
+    }
   }
 
   /**
@@ -195,6 +231,12 @@ export const useReadStatsStore = defineStore('readStats', () => {
     fetchCurrentAll,
     fetchPeriod,
     getSnapshot,
+    // 年视图热力图
+    yearlyHeatmap,
+    yearlyHeatmapYear,
+    isLoadingYearlyHeatmap,
+    yearlyHeatmapError,
+    fetchYearlyHeatmap,
     // 推荐
     recommends,
     isLoadingRecommends,

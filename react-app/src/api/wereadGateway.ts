@@ -47,58 +47,112 @@ export interface WereadShelfData {
   archives: WereadArchive[];
 }
 
-export interface ReadLongestItem {
+// ── 原始类型（对应 backend weread_detail_raw.py）─────────────────────
+// 四种 mode (weekly/monthly/annually/overall) 返回的字段逐级递增：
+// - Weekly     → 基础统计 + rank
+// - Monthly    → 同上 + preferCategory + readStat
+// - Annually   → 同上 + preferAuthor + preferCp + preferPublisher + readRate/wrReadTime
+// - Overall    → 同上 + preferTime + preferTimeWord + medals
+
+export interface ReadDetailBook {
   bookId: string | null;
   title: string | null;
   author: string | null;
+  translator: string | null;
+  intro: string | null;
   cover: string | null;
+}
+
+export interface ReadDetailRawLongestItem {
+  book: ReadDetailBook | null;
+  albumInfo: Record<string, unknown> | null;
   readTime: number;
+  tags: string[];
 }
 
-export interface ReadStatItem {
-  label: string;
-  value: number;
+export interface ReadDetailRawRank {
+  text: string;
+  scheme: string;
 }
 
-export interface PreferCategoryItem {
-  categoryTitle: string;
-  readingTime: number;
-  readingCount: number;
+export interface ReadDetailRawStat {
+  stat: string;
+  counts: string;
 }
 
-export interface PreferAuthorItem {
-  authorId: number | null;
+export interface ReadDetailRawAuthorItem {
   name: string | null;
-  readingTime: string | null;
+  count: number | null;
+  readTime: string | null;
 }
 
-export interface PreferPublisherItem {
+export interface ReadDetailRawCategoryItem {
+  categoryTitle: string;
+  readingCount: number;
+  readingTime: number;
+}
+
+export interface ReadDetailRawPublisherItem {
   name: string | null;
   count: number;
 }
 
-export interface ReadDetailSnapshot {
+export interface ReadDetailRawCopyrightInfo {
+  name: string;
+  userVid: number;
+  role: number;
+  avatar: string;
+  cpType: number;
+}
+
+// ── 四种 mode 的层级模型（与 Python raw models 1:1）──
+
+export interface ReadDetailRawBase {
   user_id: number;
   mode: string;
   baseTime: number;
   fetched_at: string;
-  totalReadTime: number | null;
+}
+
+export interface ReadDetailWeeklyRaw extends ReadDetailRawBase {
+  readTimes: Record<string, number> | null;
   readDays: number | null;
-  dayAverageReadTime: number | null;
+  readLongest: ReadDetailRawLongestItem[] | null;
+  rank: ReadDetailRawRank | null;
   compare: number | null;
+  dayAverageReadTime: number | null;
+  totalReadTime: number | null;
+}
+
+export interface ReadDetailMonthlyRaw extends ReadDetailWeeklyRaw {
+  preferCategory: ReadDetailRawCategoryItem[] | null;
+  preferCategoryWord: string | null;
+  readStat: ReadDetailRawStat[] | null;
+}
+
+export interface ReadDetailAnnuallyRaw extends ReadDetailMonthlyRaw {
+  preferAuthor: ReadDetailRawAuthorItem[] | null;
+  authorCount: number | null;
+  preferPublisher: ReadDetailRawPublisherItem[] | null;
   readRate: number | null;
   wrReadTime: number | null;
   wrListenTime: number | null;
-  readTimes: Record<string, number> | null;
-  readLongest: ReadLongestItem[] | null;
-  readStat: ReadStatItem[] | null;
-  preferCategory: PreferCategoryItem[] | null;
-  preferTime: number[] | null;
-  preferAuthor: PreferAuthorItem[] | null;
-  preferPublisher: PreferPublisherItem[] | null;
 }
 
-export interface WereadReadProgressData extends ReadDetailSnapshot {}
+export interface ReadDetailOverallRaw extends ReadDetailAnnuallyRaw {
+  preferTime: number[] | null;
+  preferTimeWord: string | null;
+}
+
+/** 旧名称兼容 — 实际指向 mode-all 的 OverallRaw */
+export type ReadDetailSnapshot = ReadDetailOverallRaw;
+
+/** API 返回：按 mode 返回不同字段集 */
+export type WereadReadProgressData =
+  | ReadDetailWeeklyRaw
+  | ReadDetailMonthlyRaw
+  | ReadDetailAnnuallyRaw
+  | ReadDetailOverallRaw;
 
 export type ReadStatsMode = 'weekly' | 'monthly' | 'annually' | 'overall';
 
@@ -121,6 +175,12 @@ export interface BookRecommendItem {
   readingCount: number;
   searchIdx: number;
   newRating: number; // 0-100
+}
+
+/** read-progress?perDay=true 的 data 形状 */
+export interface WereadYearlyHeatmap {
+  /** dayUnixSec(字符串) -> 秒;key 形如 "1704067200" */
+  readTimes: Record<string, number>;
 }
 
 export const wereadGateway = {
@@ -162,6 +222,21 @@ export const wereadGateway = {
     const params: Record<string, string | number> = { mode };
     if (baseTime != null && mode !== 'overall') params.baseTime = baseTime;
     const res = await request.get<ApiResponse<WereadReadProgressData>>(
+      'v2/weread/read-progress',
+      { params },
+    );
+    return res.data;
+  },
+
+  async getYearlyHeatmap(
+    year?: number,
+  ): Promise<ApiResponse<WereadYearlyHeatmap>> {
+    const params: Record<string, string | number | boolean> = {
+      mode: 'annually',
+      perDay: true,
+    };
+    if (year != null) params.year = year;
+    const res = await request.get<ApiResponse<WereadYearlyHeatmap>>(
       'v2/weread/read-progress',
       { params },
     );
