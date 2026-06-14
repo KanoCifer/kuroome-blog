@@ -1,5 +1,58 @@
 [
   {
+    "version": "3.6.0",
+    "date": "2026-06-14",
+    "title": "书籍模块 P0 落地与 Weread 组件抽取",
+    "changes": [
+      { "type": "refactor", "content": "书籍模块 P0 落地：weread 组件抽取、Vue/React 双端契约同步" },
+      { "type": "refactor", "content": "书籍推荐模块合并与 PageHero 共享组件抽取" },
+      { "type": "refactor", "content": "bookStats composable 拆分与 formatters 统一" },
+      { "type": "refactor", "content": "weread 视图迁移至 views/books/ 目录，统一书籍模块路径" },
+      { "type": "refactor", "content": "微信读书 ReadProgress user_id 索引调整为非唯一（多端同步可写）" },
+      { "type": "style", "content": "WereadBookCard 卡片 hover 动画时长统一为 300ms，class 顺序规范化" },
+      { "type": "style", "content": "BookShelfReadingRail 滚动条样式统一为 scrollbar-none 工具类" }
+    ]
+  },
+  {
+    "version": "3.5.0",
+    "date": "2026-06-13",
+    "title": "性能优化、后端架构升级、FishingMap 模块化与阅读统计重构",
+    "changes": [
+      { "type": "feat", "content": "阅读统计重构并新增书籍推荐模块，支持推荐详情弹窗（motion-v morph 过渡）" },
+      { "type": "feat", "content": "FAB 按钮新增 slide-in 入场动画" },
+      { "type": "refactor", "content": "后端统一响应模型重构，统一 API envelope 与错误处理" },
+      { "type": "refactor", "content": "缓存模块迁移至 plugins/cache/，标准化 redis_cache 装饰器覆盖范围" },
+      { "type": "refactor", "content": "FishingMap 模块重构：拆分为子模块，新增 WGS-84 坐标转换" },
+      { "type": "refactor", "content": "FishingMap UI 完成重构，新增详情/全屏组件" },
+      { "type": "refactor", "content": "AMap 类型迁移到 @types/amap-js-api，修复 ts 类型错误" },
+      { "type": "perf", "content": "切换 ORJSONResponse 类，提升 JSON 序列化性能" },
+      { "type": "perf", "content": "扩大 redis_cache 覆盖范围，修复 User.__hash__ 一致性" },
+      { "type": "perf", "content": "优化 LCP 加载性能（Vue + React 双端）" },
+      { "type": "perf", "content": "优化卡片布局与拖拽性能" },
+      { "type": "perf", "content": "用 step-based 动画替换无限插值动画，降低 CPU 占用" },
+      { "type": "fix", "content": "修复 AMap 定位在桌面 Mac 必失败的 bug" },
+      { "type": "chore", "content": "项目代码格式化与 CLAUDE.md 更新" }
+    ]
+  },
+  {
+    "version": "3.4.0",
+    "date": "2026-06-11",
+    "title": "AI 体系重构与 Changelog 收尾",
+    "changes": [
+      { "type": "feat", "content": "AI 助手新增模型选择与会话历史，支持 SSE 流式输出" },
+      { "type": "feat", "content": "AI 总结/对话放开未登录使用，新增 IP 限流" },
+      { "type": "feat", "content": "AI 提示词精炼并支持 Markdown 渲染输出" },
+      { "type": "feat", "content": "前端提取 useTypewriter composable，实现流式打字机效果" },
+      { "type": "refactor", "content": "AI 端点从 v1/agent 迁移到 v2/llm，统一 LLM 模块结构" },
+      { "type": "refactor", "content": "SSE 流式响应迁移至 FastAPI 原生 EventSourceResponse" },
+      { "type": "refactor", "content": "ArticleSummarizer 移除共享 model/agent 状态，解耦并发安全" },
+      { "type": "refactor", "content": "React 端提取 hooks 与 composables 同步对齐" },
+      { "type": "refactor", "content": "/changelog 路由重命名为 /version-log，类型与后端 ChangelogItem 对齐" },
+      { "type": "fix", "content": "修复文章总结卡片类型导出与 changelog 响应类型问题" },
+      { "type": "chore", "content": "更新前端依赖" }
+    ]
+  },
+  {
     "version": "3.3.0",
     "date": "2026-06-10",
     "title": "Beanie 模型模块化、书架缓存与双端 UI 打磨",

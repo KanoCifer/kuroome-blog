@@ -150,6 +150,13 @@
             :mode="activeMode"
           />
 
+          <!-- ── 段落三·年：本年的阅读足迹(仅年视图) ─────────────── -->
+          <StatsYearHeatmapSection
+            v-if="activeSnapshot && hasYearHeatmapData"
+            :snapshot="activeSnapshot"
+            :mode="activeMode"
+          />
+
           <!-- ── 段落四：你偏好的 ─────────────────────────────────── -->
           <StatsPreferencesSection
             v-if="activeSnapshot && hasPreferenceData"
@@ -215,10 +222,12 @@ import StatsRecommendSection from './bookStats/components/StatsRecommendSection.
 import StatsRefreshFooter from './bookStats/components/StatsRefreshFooter.vue';
 import StatsRhythmSection from './bookStats/components/StatsRhythmSection.vue';
 import StatsTopBooksSection from './bookStats/components/StatsTopBooksSection.vue';
+import StatsYearHeatmapSection from './bookStats/components/StatsYearHeatmapSection.vue';
 import { useLongestView } from './bookStats/composables/useLongestView';
 import { useOverviewView } from './bookStats/composables/useOverviewView';
 import { usePreferenceView } from './bookStats/composables/usePreferenceView';
 import { useRhythmView } from './bookStats/composables/useRhythmView';
+import { useYearHeatmapView } from './bookStats/composables/useYearHeatmapView';
 import { usePeriodNavigation } from './bookStats/composables/usePeriodNavigation';
 
 const MODES = [
@@ -259,6 +268,18 @@ const { hasData: hasRhythmData } = useRhythmView(
   },
 );
 const { hasData: hasPreferenceData } = usePreferenceView(activeSnapshot);
+const { hasData: hasYearHeatmapData } = useYearHeatmapView(
+  activeSnapshot,
+  activeMode,
+  // theme 在 section 内部独立取,这里仅作整页哨兵
+  {
+    primaryColor: computed(() => ''),
+    subtextColor: computed(() => ''),
+    axisColor: computed(() => ''),
+    splitLineColor: computed(() => ''),
+    mutedFillColor: computed(() => ''),
+  },
+);
 
 // 整页级"是否完全空"——任一段有数据就不空,匹配旧 hasAnyData 语义
 const hasAnyData = computed(
@@ -266,7 +287,8 @@ const hasAnyData = computed(
     (activeSnapshot.value?.totalReadTime ?? 0) > 0 ||
     hasLongestData.value ||
     hasRhythmData.value ||
-    hasPreferenceData.value,
+    hasPreferenceData.value ||
+    hasYearHeatmapData.value,
 );
 
 // ── Refresh tracking ──────────────────────────────────────────

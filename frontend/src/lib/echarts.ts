@@ -1,5 +1,6 @@
-import { BarChart, GaugeChart, LineChart, PieChart } from 'echarts/charts';
+import { BarChart, GaugeChart, HeatmapChart, LineChart, PieChart } from 'echarts/charts';
 import {
+  CalendarComponent,
   GridComponent,
   LegendComponent,
   MarkAreaComponent,
@@ -7,6 +8,7 @@ import {
   MarkPointComponent,
   TitleComponent,
   TooltipComponent,
+  VisualMapComponent,
 } from 'echarts/components';
 import { use } from 'echarts/core';
 import { CanvasRenderer, SVGRenderer } from 'echarts/renderers';
@@ -16,12 +18,15 @@ use([
   SVGRenderer,
   BarChart,
   GaugeChart,
+  HeatmapChart,
   LineChart,
   PieChart,
+  CalendarComponent,
   TitleComponent,
   TooltipComponent,
   LegendComponent,
   GridComponent,
+  VisualMapComponent,
   MarkLineComponent,
   MarkPointComponent,
   MarkAreaComponent,

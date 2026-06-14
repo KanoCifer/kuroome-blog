@@ -71,7 +71,9 @@ const statusLine = computed(() => {
 });
 
 const titleSize = computed(() => (isCompact.value ? 'text-[11px]' : 'text-sm'));
-const authorSize = computed(() => (isCompact.value ? 'text-[10px]' : 'text-xs'));
+const authorSize = computed(() =>
+  isCompact.value ? 'text-[10px]' : 'text-xs',
+);
 
 const badgeCls = computed(() =>
   readingState.value === 'finished'
@@ -101,7 +103,7 @@ function onImgError(e: Event) {
     <!-- ─── List variant: 横向单行 ────────────────────────────── -->
     <div
       v-if="isList"
-      class="border-border/60 bg-card hover:bg-accent/40 hover:shadow-primary/5 flex items-center gap-3 rounded-xl border p-3 transition-all duration-200 sm:gap-4 sm:p-4"
+      class="border-border/60 bg-card hover:bg-accent/40 hover:shadow-primary/5 flex items-center gap-3 rounded-xl border p-3 transition-all duration-300 sm:gap-4 sm:p-4"
     >
       <div
         class="bg-muted relative h-16 w-12 flex-shrink-0 overflow-hidden rounded-md shadow-sm sm:h-20 sm:w-14"
@@ -126,7 +128,7 @@ function onImgError(e: Event) {
       </div>
       <div class="min-w-0 flex-1">
         <p
-          class="text-foreground font-serif line-clamp-1 font-medium"
+          class="text-foreground line-clamp-1 font-serif font-medium"
           :class="titleSize"
           :title="book.title"
         >
@@ -163,7 +165,7 @@ function onImgError(e: Event) {
     <!-- ─── Grid variants: standard / compact ─────────────────── -->
     <div
       v-else
-      class="book-card bg-card ring-border/0 group-hover:ring-border/40 relative overflow-hidden rounded-xl shadow-sm ring-1 ring-inset transition-[transform,box-shadow] duration-300 ease-out group-hover:-translate-y-1 group-hover:shadow-lg group-hover:shadow-primary/10"
+      class="book-card bg-card ring-border/0 group-hover:ring-border/40 group-hover:shadow-primary/10 relative overflow-hidden rounded-xl shadow-sm ring-1 transition-all duration-300 ease-out ring-inset group-hover:-translate-y-1 group-hover:shadow-lg"
       :style="gridAnimStyle"
     >
       <div class="relative aspect-3/4 overflow-hidden">
@@ -191,7 +193,7 @@ function onImgError(e: Event) {
 
         <!-- hover: 自下而上渐变薄纱,只暗化下半部,封面标题仍可读 -->
         <div
-          class="pointer-events-none absolute inset-0 bg-gradient-to-t from-foreground/40 via-foreground/10 to-transparent opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100"
+          class="from-foreground/40 via-foreground/10 pointer-events-none absolute inset-0 bg-gradient-to-t to-transparent opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100"
         />
 
         <!-- hover: 中央动作按钮(带 scale 弹入) -->
@@ -219,7 +221,7 @@ function onImgError(e: Event) {
       </div>
       <div :class="isCompact ? 'px-1 py-1.5' : 'px-1.5 py-2'">
         <p
-          class="text-foreground font-serif line-clamp-2 leading-snug font-medium"
+          class="text-foreground line-clamp-2 font-serif leading-snug font-medium"
           :class="titleSize"
           :title="book.title"
         >

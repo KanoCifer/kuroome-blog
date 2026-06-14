@@ -409,8 +409,38 @@ flowchart LR
 | `/api/v2/devtasks`         | 开发任务看板 (CRUD/排序)                    |
 | `/api/v2/publicv2/ws`      | WebSocket 实时访客统计                      |
 
-### 最近改动（v3.2.0）
+### 最近改动（v3.4.0 / v3.5.0 / v3.6.0）
 
+**v3.4.0 (2026-06-11) — AI 体系重构与 Changelog 收尾**
+- **AI 助手升级**：新增模型选择与会话历史，SSE 流式响应迁移至 FastAPI 原生 EventSourceResponse；支持 Markdown 渲染输出与流式打字机效果。
+- **AI 体验开放**：AI 总结/对话放开未登录使用，新增 IP 限流；提示词精炼提升输出质量。
+- **后端 LLM 模块**：AI 端点从 v1/agent 迁移到 v2/llm，ArticleSummarizer 移除共享 model/agent 状态。
+- **Changelog 收尾**：`/changelog` 路由重命名为 `/version-log`，类型与后端 ChangelogItem 对齐。
+- **React 端对齐**：提取 hooks 与 composables 与 Vue 端同步。
+
+**v3.5.0 (2026-06-13) — 性能优化、后端架构与 FishingMap 模块化**
+- **性能优化**：ORJSONResponse 切换、redis_cache 覆盖扩大、LCP 优化（Vue + React 双端）、卡片布局与拖拽性能优化、step-based 动画替换无限插值。
+- **后端架构**：响应模型统一重构，缓存模块迁移至 `plugins/cache/`，API envelope 与错误处理标准化。
+- **FishingMap 重构**：模块拆分子模块，新增 WGS-84 坐标转换、详情/全屏组件；AMap 类型迁移到 `@types/amap-js-api`。
+- **阅读统计重构**：新增书籍推荐模块，支持推荐详情弹窗（motion-v morph 过渡）；FAB 按钮 slide-in 动画。
+- **修复**：AMap 桌面 Mac 定位失败。
+
+**v3.6.0 (2026-06-14) — 书籍模块 P0 落地与 Weread 组件抽取**
+- **书籍模块 P0 落地**：weread 组件抽取、Vue/React 双端契约同步、PageHero 共享组件抽取。
+- **推荐合并与拆分**：书籍推荐模块合并、bookStats composable 拆分、formatters 统一。
+- **weread 视图迁移**至 `views/books/`，统一模块路径。
+- **样式统一**：微信读书卡片 hover 动画时长、class 顺序、滚动条工具类规范化；ReadProgress user_id 索引调整为非唯一（多端同步可写）。
+
+<details>
+<summary>v3.2.0 / v3.3.0 历史改动</summary>
+
+**v3.3.0 (2026-06-10)**
+- **Beanie 模型模块化**：独立模块拆分，新增 Changelog MongoDB 支持。
+- **书架 Redis 缓存**：写入时自动失效，React 端改从 API 获取 changelog。
+- **双端 UI 打磨**：Bento 卡片、下拉菜单、阅读统计、Hero、博客列表、个人资料 polish。
+- **修复**：博客页面首次访问、AlertDialog Transition 警告、监控 SSE 认证、head 统一、微信读书封面 HTTPS、CSRF 中间件移除。
+
+**v3.2.0 (2026-06-05)**
 - **微信读书书架**：新增书架 API 和全屏书架视图，阅读统计双端同步（Vue + React）。
 - **后端架构重构**：服务层拆分为独立包模块（user、weread、friend_link），统一响应格式和错误处理，提取 SSE/FriendLinkRepo/中间件为独立模块。
 - **API 清理**：移除遗留 v1 Book CRUD，BentoReadingList 全面迁移至 v2 weread API；清理旧表和遗留代码。
@@ -419,14 +449,24 @@ flowchart LR
 - **登录重设计**：分屏布局重构登录/注册页面。
 - **多主题 & 背景**：React 端主题支持、新增多张背景图、背景自动切换暂停逻辑。
 
-<details>
-<summary>v3.0.0 历史改动</summary>
+</details>
 
-- **多主题系统**：Vue/React 双端 7 套配色方案，基于 CSS 自定义属性实现一键切换。
-- **钓鱼升级**：AI 天气分析（支持模型切换）、后台训练任务、柱状图降水显示、移动端横向滑动修复。
-- **基础设施**：背景图固定/随机选择器、Averia 装饰字体、Cookie 同意弹窗、访客 WebSocket 实时统计。
-- **相册重构**：图片存储从文件系统迁移至 PostgreSQL 持久化。
-- **架构清理**：废弃 `frontend-architecture-analysis.md`，移除无用静态资源。
+<details>
+<summary>v3.0.0 / v3.1.0 历史改动</summary>
+
+**v3.1.0 (2026-06-02)**
+- **Service Status 页面**（Vue/React 双端）：服务/系统信息卡片 + ECharts 图表。
+- **微信读书集成 API Key 模式**。
+- **Twikoo 评论系统**（Vue/React 双端），前端 Markdown 渲染。
+- **登录/注册页面重设计**（分栏布局）。
+- **DevTasks 看板** + v2 API。
+- **修复**：Redis 缓存清理 SCAN、API 错误拦截器、卡片配图刷新后重置。
+
+**v3.0.0 (2026-05-10)**
+- **多主题系统**：Vue/React 双端各 7 套配色方案（森林绿、天空蓝、玫瑰红、薄雾、羊皮纸、鼠尾草、默认）。
+- **钓鱼升级**：AI 天气分析、模型切换、后台训练任务、移动端体验优化。
+- **基础设施**：Cookie 同意弹窗、访客 WebSocket 实时统计、图片存储迁移至 PostgreSQL。
+- **AI 分析**：切换 Markdown 输出，降水图表改为柱状图。
 
 </details>
 

@@ -64,7 +64,7 @@ class ReadProgress(BaseModel):
 
 
 class UserBook(Document):
-    user_id: Annotated[int, Indexed(unique=True)]  # 用户ID
+    user_id: Annotated[int, Indexed()]  # 用户ID
     bookId: str
     bookInfo: Link[WereadBook] | None = None
     readProgress: ReadProgress | None = None
