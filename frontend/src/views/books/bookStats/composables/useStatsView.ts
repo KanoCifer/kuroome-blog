@@ -1,18 +1,11 @@
 import type { ReadDetailSnapshot, ReadStatsMode } from '@/api/wereadGateway';
+import { formatDuration } from '@/utils/format/duration';
 import dayjs from 'dayjs';
 import type { ComputedRef, Ref } from 'vue';
 import { computed } from 'vue';
 import type { useEChartsTheme } from './useEChartsTheme';
 
 type Snapshot = ReadDetailSnapshot | null;
-
-export function formatDuration(seconds: number | null | undefined): string {
-  if (!seconds || seconds <= 0) return '0';
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  if (h > 0) return m > 0 ? `${h}h ${m}m` : `${h}h`;
-  return `${m}m`;
-}
 
 /**
  * 接收 active snapshot + active mode + theme colors，输出 BookStats 各
@@ -294,8 +287,6 @@ export function useStatsView(
     hasPreferenceData,
     // 整体
     hasAnyData,
-    // 工具
-    formatDuration,
   };
 }
 

@@ -21,6 +21,10 @@ export const wereadService = {
     return wereadGateway.getReadProgress(mode, baseTime);
   },
 
+  async getBookProgress(bookId: string, refresh = false) {
+    return wereadGateway.getBookProgress(bookId, refresh);
+  },
+
   async getBooksRecommend(count = 12, maxIdx = 0) {
     return wereadGateway.getBooksRecommend(count, maxIdx);
   },

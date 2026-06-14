@@ -343,6 +343,17 @@ const router = createRouter({
       },
     },
     {
+      path: '/dev/book-detail',
+      name: 'dev-book-detail',
+      component: () => import('@/views/dev/BookDetailDemo.vue'),
+      meta: {
+        title: '书籍详情面板演示 - Kuroome',
+        description:
+          '书籍卡片点击打开浮层详情面板的演示,展示进度条、阅读统计、继续阅读入口。',
+        keywords: '书籍详情,浮层,面板,演示',
+      },
+    },
+    {
       path: '/status',
       name: 'status',
       component: () => import('@/views/pages/StatusView.vue'),

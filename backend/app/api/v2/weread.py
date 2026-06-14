@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING, Literal
 
 from fastapi import APIRouter, Depends, Query
 
+from app.core.logger import logger
+
 if TYPE_CHECKING:
     from app.models.models import User
 
@@ -67,6 +69,43 @@ async def get_book_info(
     return APIResponse(
         data=book.model_dump(mode="json", by_alias=True),
         message="Book information retrieved successfully",
+    )
+
+
+@router.get("/book/{bookId}/progress")
+async def get_book_progress(
+    bookId: str,
+    current_user=Depends(manager),
+    weread_service=Depends(weread_service_dep),
+    refresh: bool = Query(
+        False,
+        description="true 时强制从远端 weRead 刷新;false 时本地优先,本地空时首次拉取。",
+    ),
+):
+    """获取单本书阅读进度。
+
+    - refresh=false: 本地 Mongo 优先,本地空时触发首次远端拉取
+    - refresh=true: 直接强制远端刷新(写回本地)
+    """
+    try:
+        if refresh:
+            data = await weread_service.refresh_book_progress(
+                bookId, current_user.id
+            )
+        else:
+            data = await weread_service.get_book_progress(
+                bookId, current_user.id
+            )
+            if data is None:  # 本地空 → 首次拉
+                data = await weread_service.refresh_book_progress(
+                    bookId, current_user.id
+                )
+    except ValueError as e:
+        logger.error(f"获取阅读进度失败: {e}")
+        raise APIError(message="获取阅读进度失败") from e
+    return APIResponse(
+        data=data,
+        message="Book progress retrieved successfully",
     )
 
 

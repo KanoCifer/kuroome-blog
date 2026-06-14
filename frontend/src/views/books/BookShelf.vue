@@ -72,7 +72,7 @@
           <BookShelfReadingRail
             v-if="showReadingRail"
             :books="recentReading"
-            @select="handleBookClick"
+            @select="selectBook"
           />
 
           <!-- 「接下来读什么」推荐 rail:同样仅 filter=all 且非搜索状态时显示 -->
@@ -113,86 +113,52 @@
 
           <!-- List variant -->
           <div v-else-if="density === 'list'" class="flex flex-col gap-2">
-            <BookCard
+            <WereadBookCard
               v-for="(book, index) in displayedBooks"
               :key="book.bookId"
               :book="book"
               :index="index"
               variant="list"
-              @select="handleBookClick"
+              @select="selectBook"
             />
           </div>
 
           <!-- Grid variant -->
           <div v-else :class="gridClass">
-            <BookCard
+            <WereadBookCard
               v-for="(book, index) in displayedBooks"
               :key="book.bookId"
               :book="book"
               :index="index"
-              :variant="density"
-              @select="handleBookClick"
+              @select="selectBook"
             />
           </div>
         </template>
       </div>
     </div>
+
+    <!-- 详情面板 -->
+    <WereadBookDetailPanel
+      :book="selectedBook"
+      :open="isOpen"
+      @close="close"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { WereadUserBook } from '@/api/wereadGateway';
 import { useWereadShelf } from '@/composables/useWereadShelf';
 import { useReadStatsStore } from '@/stores/readStats';
-import dayjs from 'dayjs';
-import { computed, onMounted, ref, watch } from 'vue';
-import BookCard from './components/BookCard.vue';
+import WereadBookCard from '@/components/weread/WereadBookCard.vue';
+import WereadBookDetailPanel from '@/components/weread/WereadBookDetailPanel.vue';
+import { useWereadBookDetailSingleton } from '@/components/weread/composables/useWereadBookDetailSingleton';
+import { onMounted } from 'vue';
 import BookShelfHero from './components/BookShelfHero.vue';
 import BookShelfReadingRail from './components/BookShelfReadingRail.vue';
 import BookShelfRecommendRail from './components/BookShelfRecommendRail.vue';
 import BookShelfStatsBar from './components/BookShelfStatsBar.vue';
 import BookShelfToolbar from './components/BookShelfToolbar.vue';
-import type {
-  ShelfDensity,
-  ShelfFilter,
-  ShelfSort,
-} from './components/BookShelfToolbar.vue';
-
-const STORAGE_KEY = 'bookshelf:view-prefs';
-
-const searchQuery = ref('');
-const filter = ref<ShelfFilter>('all');
-const sort = ref<ShelfSort>('recent');
-const density = ref<ShelfDensity>('standard');
-
-// 读偏好
-try {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (raw) {
-    const saved = JSON.parse(raw) as {
-      filter?: ShelfFilter;
-      sort?: ShelfSort;
-      density?: ShelfDensity;
-    };
-    if (saved.filter) filter.value = saved.filter;
-    if (saved.sort) sort.value = saved.sort;
-    if (saved.density) density.value = saved.density;
-  }
-} catch {
-  /* ignore */
-}
-
-// 写偏好
-watch([filter, sort, density], ([f, s, d]) => {
-  try {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ filter: f, sort: s, density: d }),
-    );
-  } catch {
-    /* ignore */
-  }
-});
+import { useShelfView } from './composables/useShelfView';
 
 const statsStore = useReadStatsStore();
 
@@ -205,48 +171,23 @@ const {
   handleSync,
 } = useWereadShelf();
 
-// ── 状态分桶 ─────────────────────────────────────────────────
-const buckets = computed(() => {
-  const reading: WereadUserBook[] = [];
-  const finished: WereadUserBook[] = [];
-  const wishlist: WereadUserBook[] = [];
-  for (const b of visibleBooks.value) {
-    if (b.finishReading) finished.push(b);
-    else if (b.readUpdateTime) reading.push(b);
-    else wishlist.push(b);
-  }
-  return { reading, finished, wishlist };
-});
+// ── 详情面板状态 (单例 — 整个应用共享同一份) ────────────────
+const { selectedBook, isOpen, selectBook, close } = useWereadBookDetailSingleton();
 
-const counts = computed(() => ({
-  all: visibleBooks.value.length,
-  reading: buckets.value.reading.length,
-  finished: buckets.value.finished.length,
-  wishlist: buckets.value.wishlist.length,
-}));
-
-// ── 「你正在读」横向 rail 数据(最近翻开的 12 本)─────────────
-const recentReading = computed(() => {
-  return [...buckets.value.reading]
-    .sort((a, b) => {
-      const ta = a.readUpdateTime ? dayjs(a.readUpdateTime).valueOf() : 0;
-      const tb = b.readUpdateTime ? dayjs(b.readUpdateTime).valueOf() : 0;
-      return tb - ta;
-    })
-    .slice(0, 12);
-});
-
-const showReadingRail = computed(
-  () =>
-    filter.value === 'all' &&
-    searchQuery.value.trim() === '' &&
-    recentReading.value.length > 0,
-);
-
-// ── 推荐 rail 显示条件:filter=all 且非搜索时露出 ────────────
-const showRecommendRail = computed(
-  () => filter.value === 'all' && searchQuery.value.trim() === '',
-);
+// ── 视图状态机: 偏好 / 分桶 / 排序 / 派生 UI ───────────────
+const {
+  searchQuery,
+  filter,
+  sort,
+  density,
+  counts,
+  recentReading,
+  showReadingRail,
+  showRecommendRail,
+  displayedBooks,
+  gridClass,
+  noResultMessage,
+} = useShelfView(visibleBooks);
 
 function reloadRecommends() {
   statsStore.fetchRecommends(true);
@@ -254,68 +195,6 @@ function reloadRecommends() {
 function loadMoreRecommends() {
   statsStore.fetchRecommends(false);
 }
-
-// ── 筛选 + 搜索 + 排序 ───────────────────────────────────────
-const displayedBooks = computed(() => {
-  let list: WereadUserBook[];
-  if (filter.value === 'reading') list = buckets.value.reading;
-  else if (filter.value === 'finished') list = buckets.value.finished;
-  else if (filter.value === 'wishlist') list = buckets.value.wishlist;
-  else list = visibleBooks.value;
-
-  // 搜索
-  const q = searchQuery.value.trim().toLowerCase();
-  if (q) {
-    list = list.filter(
-      (b) =>
-        b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q),
-    );
-  }
-
-  // 排序
-  const sorted = [...list];
-  if (sort.value === 'title') {
-    sorted.sort((a, b) => a.title.localeCompare(b.title, 'zh-Hans-CN'));
-  } else if (sort.value === 'author') {
-    sorted.sort((a, b) =>
-      (a.author || '').localeCompare(b.author || '', 'zh-Hans-CN'),
-    );
-  } else {
-    // recent: isTop 置顶,然后 readUpdateTime DESC,null 排末尾
-    sorted.sort((a, b) => {
-      if (a.isTop !== b.isTop) return a.isTop ? -1 : 1;
-      const ta = a.readUpdateTime ? dayjs(a.readUpdateTime).valueOf() : 0;
-      const tb = b.readUpdateTime ? dayjs(b.readUpdateTime).valueOf() : 0;
-      return tb - ta;
-    });
-  }
-  return sorted;
-});
-
-// ── Grid 类名(按密度变列数和间距)─────────────────────────────
-const gridClass = computed(() => {
-  if (density.value === 'compact') {
-    return 'grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8';
-  }
-  // standard
-  return 'grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6';
-});
-
-// ── 空结果文案 ───────────────────────────────────────────────
-const noResultMessage = computed(() => {
-  const q = searchQuery.value.trim();
-  if (q) return `没有找到「${q}」相关的书籍`;
-  if (filter.value === 'reading') return '当前没有在读的书';
-  if (filter.value === 'finished') return '还没有读完的书';
-  if (filter.value === 'wishlist') return '没有待读的书';
-  return '暂无书籍';
-});
-
-const handleBookClick = (bookId: string) => {
-  const link = document.createElement('a');
-  link.href = `weread://reading?bId=${bookId}`;
-  link.click();
-};
 
 onMounted(async () => {
   await Promise.all([fetchBooks(), statsStore.fetchStats()]);

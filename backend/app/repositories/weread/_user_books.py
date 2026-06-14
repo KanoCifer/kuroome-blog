@@ -1,7 +1,7 @@
 from pymongo.errors import DuplicateKeyError
 
 from app.core.logger import logger
-from app.models.weread import UserBook
+from app.models.weread import ReadProgress, UserBook
 
 
 class UserBookRepo:
@@ -97,3 +97,28 @@ class UserBookRepo:
                     user_book.id = existing.id
                     await user_book.save()
         return user_book
+
+    async def save_book_progress(
+        self, bookId: str, user_id: int, progress: ReadProgress
+    ) -> bool:
+        """用 $set 局部更新 readProgress,避免整文档重写。
+
+        Returns: True 表示有文档被修改;False 表示书不在用户书架上。
+        """
+        result = await UserBook.find_one(
+            UserBook.user_id == user_id,
+            UserBook.bookId == bookId,
+        ).update_one(
+            {"$set": {"readProgress": progress.model_dump(mode="json")}}
+        )
+        return result.modified_count > 0
+
+    async def get_book_progress(
+        self, bookId: str, user_id: int
+    ) -> ReadProgress | None:
+        """获取书籍阅读进度;书不在书架上返回 None。"""
+        user_book = await UserBook.find_one(
+            UserBook.user_id == user_id,
+            UserBook.bookId == bookId,
+        )
+        return user_book.readProgress if user_book else None

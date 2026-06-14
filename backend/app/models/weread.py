@@ -1,6 +1,7 @@
 from datetime import UTC, datetime
-from typing import Annotated
+from typing import Annotated, ClassVar
 
+import pymongo
 from beanie import Document, Indexed, Link
 from pydantic import BaseModel, Field
 
@@ -21,7 +22,7 @@ class WereadBook(Document):
     """单本书籍的具体信息，_id 即微信读书 bookId（str）
 
     _id 复用 bookId 的设计：让 UserBook.bookInfo 这个 Link 字段在
-    fetch_links 时能直接通过 _id 完成 $lookup，避免 Link 静默失败。
+    fetch_links 时能直接通过 _id 完成 $lookup。
     """
 
     id: str = Field(
@@ -56,10 +57,10 @@ class ReadProgress(BaseModel):
     chapterUid: int | None = None
     chapterOffset: int | None = None
     progress: int | None = None
-    updateTime: int | None = None
-    recordReadingTime: int
+    updateTime: int | None = None  # 最后阅读时间
+    readingTime: int
     finishTime: int | None = None
-    isStartReading: str | None = None
+    isStartReading: int  # 是否开始读
 
 
 class UserBook(Document):
@@ -77,6 +78,12 @@ class UserBook(Document):
         name = "weread_user_books"
         use_cache = True
         cache_expiration_time = 600  # 缓存过期时间，单位为秒
+        indexes: ClassVar[list] = [
+            [
+                ("user_id", pymongo.ASCENDING),
+                ("readUpdateTime", pymongo.DESCENDING),
+            ]
+        ]
 
 
 class Archive(Document):

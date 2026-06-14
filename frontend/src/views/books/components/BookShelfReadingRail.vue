@@ -24,56 +24,19 @@
         ref="railEl"
         class="flex snap-x snap-mandatory scroll-px-4 [scrollbar-width:none] gap-3 overflow-x-auto px-4 pb-2 sm:scroll-px-6 sm:gap-4 sm:px-6 md:scroll-px-10 md:px-10 [&::-webkit-scrollbar]:hidden"
       >
-        <a
+        <div
           v-for="book in books"
           :key="book.bookId"
-          :href="`weread://reading?bId=${book.bookId}`"
-          class="group block w-28 flex-shrink-0 snap-start sm:w-32 md:w-36"
-          @click.prevent="$emit('select', book.bookId)"
+          class="w-28 flex-shrink-0 snap-start sm:w-32 md:w-36"
         >
-          <div
-            class="bg-card relative aspect-3/4 overflow-hidden rounded-xl shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl"
+          <WereadBookCard
+            :book="book"
+            :showStatus="true"
+            @select="$emit('select', book)"
           >
-            <img
-              v-if="book.cover"
-              :src="book.cover"
-              :alt="book.title"
-              class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-              loading="lazy"
-              @error="
-                ($event.target as HTMLImageElement).style.display = 'none'
-              "
-            />
-            <div
-              v-else
-              class="bg-muted flex h-full w-full items-center justify-center"
-            >
-              <span class="text-muted-foreground/40 font-serif text-2xl">
-                {{ book.title.slice(0, 1) }}
-              </span>
-            </div>
-
-            <!-- 「最近翻开」时间徽标 -->
-            <div
-              v-if="recencyLabel(book)"
-              class="bg-background/85 text-foreground absolute top-2 left-2 rounded-full px-2 py-0.5 text-[10px] font-medium backdrop-blur-md"
-            >
-              {{ recencyLabel(book) }}
-            </div>
-          </div>
-          <p
-            class="text-foreground mt-2 line-clamp-2 px-1 text-xs leading-snug font-medium"
-            :title="book.title"
-          >
-            {{ book.title }}
-          </p>
-          <p
-            class="text-muted-foreground mt-0.5 truncate px-1 text-[11px]"
-            :title="book.author"
-          >
-            {{ book.author }}
-          </p>
-        </a>
+            <template #corner-tl> </template>
+          </WereadBookCard>
+        </div>
       </div>
     </div>
   </section>
@@ -81,15 +44,16 @@
 
 <script setup lang="ts">
 import type { WereadUserBook } from '@/api/wereadGateway';
+import WereadBookCard from '@/components/weread/WereadBookCard.vue';
 import dayjs from 'dayjs';
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 
-const props = defineProps<{
+defineProps<{
   books: WereadUserBook[];
 }>();
 
 defineEmits<{
-  (e: 'select', bookId: string): void;
+  (e: 'select', book: WereadUserBook): void;
 }>();
 
 const railEl = ref<HTMLDivElement | null>(null);
@@ -119,24 +83,5 @@ function scrollByPage(dir: 1 | -1) {
   el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: 'smooth' });
 }
 
-// 「3 分钟前 / 2 小时前 / 昨天 / 3 天前」
-function recencyLabel(book: WereadUserBook): string {
-  if (!book.readUpdateTime) return '';
-  const ts = dayjs(book.readUpdateTime);
-  if (!ts.isValid()) return '';
-  const now = dayjs();
-  const diffMin = now.diff(ts, 'minute');
-  if (diffMin < 1) return '刚刚';
-  if (diffMin < 60) return `${diffMin} 分钟前`;
-  const diffH = now.diff(ts, 'hour');
-  if (diffH < 24) return `${diffH} 小时前`;
-  const diffD = now.diff(ts, 'day');
-  if (diffD === 1) return '昨天';
-  if (diffD < 7) return `${diffD} 天前`;
-  if (diffD < 30) return `${Math.floor(diffD / 7)} 周前`;
-  return ts.format('M/D');
-}
-
-// 防止 unused warning(props 在模板里用了,这里给一个显式 export 让 SFC tool 满意)
 defineExpose({ scrollByPage });
 </script>

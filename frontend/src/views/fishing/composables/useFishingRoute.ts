@@ -10,6 +10,7 @@
  * planFromMarker / clearRoute 都自取，view 不再每次空判 ref。
  */
 import { useNotificationStore } from '@/stores/notification';
+import { formatDuration } from '@/utils/format/duration';
 import type { MapMarker } from '@/types/marker';
 import { ref } from 'vue';
 
@@ -35,14 +36,6 @@ export interface FishingMapInstance {
 export function formatDistance(meters: number): string {
   if (meters < 1000) return `${Math.round(meters)} 米`;
   return `${(meters / 1000).toFixed(1)} 公里`;
-}
-
-/** 秒 → "xx 分钟" 或 "x 小时 yy 分钟" */
-export function formatDuration(seconds: number): string {
-  if (seconds < 3600) return `${Math.round(seconds / 60)} 分钟`;
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.round((seconds % 3600) / 60);
-  return `${hours} 小时 ${minutes} 分钟`;
 }
 
 export function useFishingRoute(getMap: () => FishingMapInstance | null) {

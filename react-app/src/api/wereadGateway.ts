@@ -11,6 +11,7 @@ export interface WereadUserBook {
   readUpdateTime: string | null;
   finishReading: boolean;
   secret: boolean;
+  readProgress: WereadBookProgress | null;
   updated_at: string;
 }
 
@@ -101,6 +102,16 @@ export interface WereadReadProgressData extends ReadDetailSnapshot {}
 
 export type ReadStatsMode = 'weekly' | 'monthly' | 'annually' | 'overall';
 
+export interface WereadBookProgress {
+  chapterUid: number | null;
+  chapterOffset: number | null;
+  progress: number | null;
+  updateTime: number | null;
+  readingTime: number;
+  finishTime: number | null;
+  isStartReading: string | null;
+}
+
 export interface BookRecommendItem {
   bookId: string;
   title: string;
@@ -153,6 +164,17 @@ export const wereadGateway = {
     const res = await request.get<ApiResponse<WereadReadProgressData>>(
       'v2/weread/read-progress',
       { params },
+    );
+    return res.data;
+  },
+
+  async getBookProgress(
+    bookId: string,
+    refresh = false,
+  ): Promise<ApiResponse<WereadBookProgress | null>> {
+    const res = await request.get<ApiResponse<WereadBookProgress | null>>(
+      `v2/weread/book/${bookId}/progress`,
+      { params: { refresh } },
     );
     return res.data;
   },

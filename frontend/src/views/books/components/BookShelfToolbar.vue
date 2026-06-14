@@ -120,10 +120,11 @@ import {
   List,
   Search,
 } from '@lucide/vue';
-
-export type ShelfFilter = 'all' | 'reading' | 'finished' | 'wishlist';
-export type ShelfSort = 'recent' | 'title' | 'author';
-export type ShelfDensity = 'compact' | 'standard' | 'list';
+import type {
+  ShelfDensity,
+  ShelfFilter,
+  ShelfSort,
+} from '../composables/useShelfView';
 
 interface Counts {
   all: number;

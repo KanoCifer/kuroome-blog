@@ -63,6 +63,7 @@ import BentoCard from '@/components/bento/BentoCard.vue';
 import { useAnimateNumber } from '@/composables/useAnimateNumber';
 import { wereadGateway } from '@/api/wereadGateway';
 import { useReadStatsStore } from '@/stores/readStats';
+import { formatDuration } from '@/utils/format/duration';
 import { BookOpen } from '@lucide/vue';
 import { onMounted, computed } from 'vue';
 
@@ -76,15 +77,6 @@ const weeklyMinutes = computed(
 const monthlyMinutes = computed(
   () => readStats.monthlySnapshot?.totalReadTime ?? 0,
 );
-
-function formatDuration(seconds: number): string {
-  if (!seconds) return '0分钟';
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  if (h === 0) return `${m}分钟`;
-  if (m === 0) return `${h}小时`;
-  return `${h}小时${m}分`;
-}
 
 onMounted(async () => {
   try {

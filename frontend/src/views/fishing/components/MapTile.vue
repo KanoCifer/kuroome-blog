@@ -15,10 +15,10 @@
 import MapContainer from '@/components/basic/MapContainer.vue';
 import {
   formatDistance,
-  formatDuration,
   type FishingMapInstance,
   type RouteInfo,
 } from '@/views/fishing/composables/useFishingRoute';
+import { formatDuration } from '@/utils/format/duration';
 import { DEFAULT_MAP_CENTER } from '@/stores/fishingMap';
 import type { MapMarker } from '@/types/marker';
 import { Loader2 } from '@lucide/vue';

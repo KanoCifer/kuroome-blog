@@ -66,6 +66,8 @@ import dayjs from 'dayjs';
 import { computed, h } from 'vue';
 import { useRouter } from 'vue-router';
 import { useReadStatsStore } from '@/stores/readStats';
+import { formatDuration } from '@/utils/format/duration';
+import { formatRelative } from '@/utils/format/relative';
 
 const router = useRouter();
 const statsStore = useReadStatsStore();
@@ -78,29 +80,22 @@ const latestBook = computed(() => {
   return s.readLongest[0];
 });
 
+/**
+ * 统计快照的"最近"提示。
+ * - < 7 天走 formatRelative(包含"刚刚 / X 小时前 / 昨天 / X 天前")
+ * - ≥ 7 天视为历史快照,显示绝对日期更明确
+ *
+ * 读 longest 列表本身没带 readUpdateTime 字段,暂以 weeklySnapshot.fetched_at
+ * 作 proxy;后续接入更精确字段时直接换入参即可。
+ */
 const recencyLabel = computed(() => {
-  // readLongest 里的项目目前没有 readUpdateTime 字段(它来自周快照),
-  // 暂用 weeklySnapshot 的 fetched_at 作为相对时间提示,后期接入更精确字段时替换。
   const ts = statsStore.weeklySnapshot?.fetched_at;
   if (!ts) return '';
   const d = dayjs(ts);
   if (!d.isValid()) return '';
-  const diffH = dayjs().diff(d, 'hour');
-  if (diffH < 1) return '刚刚';
-  if (diffH < 24) return `${diffH} 小时前`;
-  const diffD = dayjs().diff(d, 'day');
-  if (diffD === 1) return '昨天';
-  if (diffD < 7) return `${diffD} 天前`;
-  return d.format('M/D');
+  if (dayjs().diff(d, 'day') >= 7) return d.format('M/D');
+  return formatRelative(ts);
 });
-
-function formatDuration(seconds: number | null): string {
-  if (!seconds || seconds <= 0) return '0';
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  if (h > 0) return `${h}h ${m}m`;
-  return `${m}m`;
-}
 
 // 内联小点分隔符
 const Dot = () =>
