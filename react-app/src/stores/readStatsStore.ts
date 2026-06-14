@@ -65,7 +65,7 @@ export const useReadStatsStore = create<ReadStatsState>((set, get) => ({
         ALL_MODES.forEach((m, i) => {
           const r = results[i];
           if (r.data) {
-            next[snapshotKey(m, null)] = r.data;
+            next[snapshotKey(m, null)] = r.data as ReadDetailSnapshot;
           }
         });
         set({ snapshotMap: next });
@@ -77,7 +77,7 @@ export const useReadStatsStore = create<ReadStatsState>((set, get) => ({
         set({
           snapshotMap: {
             ...get().snapshotMap,
-            [snapshotKey(mode, baseTime)]: res.data,
+            [snapshotKey(mode, baseTime)]: res.data as ReadDetailSnapshot,
           },
         });
       } else {

@@ -170,10 +170,10 @@ export default function BookShelf() {
             <div className="bg-border hidden h-10 w-px sm:block" />
             {latestBook && (
               <div className="hidden min-w-0 flex-1 items-center gap-3 sm:flex">
-                {latestBook.cover && (
+                {latestBook.book?.cover && (
                   <img
-                    src={latestBook.cover}
-                    alt={latestBook.title ?? ''}
+                    src={latestBook.book?.cover}
+                    alt={latestBook.book?.title ?? ''}
                     className="h-12 w-9 flex-shrink-0 rounded object-cover shadow-sm"
                   />
                 )}
@@ -182,7 +182,7 @@ export default function BookShelf() {
                     最近在读
                   </p>
                   <p className="text-foreground truncate text-sm font-medium">
-                    {latestBook.title}
+                    {latestBook.book?.title}
                   </p>
                 </div>
               </div>

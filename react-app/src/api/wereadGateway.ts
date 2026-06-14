@@ -144,7 +144,7 @@ export interface ReadDetailOverallRaw extends ReadDetailAnnuallyRaw {
   preferTimeWord: string | null;
 }
 
-/** 旧名称兼容 — 实际指向 mode-all 的 OverallRaw */
+/** 旧名称兼容 — 实际指向 mode-all 的 OverallRaw (store 用它存所有 mode 的宽类型) */
 export type ReadDetailSnapshot = ReadDetailOverallRaw;
 
 /** API 返回：按 mode 返回不同字段集 */

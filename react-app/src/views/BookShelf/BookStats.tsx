@@ -370,7 +370,7 @@ export default function BookStats() {
       },
       yAxis: {
         type: 'category',
-        data: sorted.map((i) => i.title ?? ''),
+        data: sorted.map((i) => i.book?.title ?? ''),
         axisLine: { lineStyle: { color: axisColor } },
         axisLabel: {
           color: textColor,
@@ -957,7 +957,7 @@ export default function BookStats() {
                               </span>
                             </div>
                             <span className="text-muted-foreground text-sm">
-                              {author.readingTime ?? '--'}
+                              {author.readTime ?? '--'}
                             </span>
                           </div>
                         ))}
