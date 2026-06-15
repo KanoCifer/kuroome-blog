@@ -15,7 +15,7 @@ from fastapi import (
 from fastapi.responses import JSONResponse, RedirectResponse
 from webauthn.helpers import options_to_json_dict
 
-from app.api.des.auth import manager, resolve_user_from_token
+from app.api.des.auth import get_current_user_full, manager, resolve_user_from_token
 from app.api.des.des import user_service_dep, user_services_dep
 from app.api.des.limiter import limiter
 from app.api.des.redis import AsyncRedis, get_redis
@@ -153,7 +153,7 @@ async def login(
 
 @router.post("/logout")
 async def logout(
-    user: User = Depends(manager),
+    user: User = Depends(get_current_user_full),
     user_service: UserService = Depends(user_service_dep),
 ):
     await user_service.logout(user)
@@ -169,7 +169,7 @@ async def logout(
 @router.put("/settings")
 async def update_user_settings(
     data: UserSettingsIn,
-    user: User = Depends(manager),
+    user: User = Depends(get_current_user_full),
     user_service: UserService = Depends(user_service_dep),
 ):
     try:
@@ -189,7 +189,7 @@ async def update_user_settings(
 @router.put("/upload-pic")
 async def upload_avatar(
     image: Annotated[UploadFile, File()],
-    user: User = Depends(manager),
+    user: User = Depends(get_current_user_full),
     user_service: UserService = Depends(user_service_dep),
 ):
     result = await user_service.upload_avatar(user, image)
@@ -202,10 +202,10 @@ async def upload_avatar(
 
 @router.get("/me")
 async def me(
-    current_user: User = Depends(manager),
+    current_user: int = Depends(manager),
     user_service: UserService = Depends(user_service_dep),
 ):
-    result = await user_service.get_user_with_profile(current_user.id)
+    result = await user_service.get_user_with_profile(current_user)
     if result is None:
         raise APIError(
             message="用户不存在",
@@ -299,7 +299,7 @@ async def send_email_code(
 
 @router.get("/passkey/registration-options")
 async def passkey_registration_options(
-    user: User = Depends(manager),
+    user: User = Depends(get_current_user_full),
     user_services: UserServices = Depends(user_services_dep),
     redis: AsyncRedis = Depends(get_redis),
 ):
@@ -322,7 +322,7 @@ async def passkey_registration_options(
 async def passkey_register(
     request: Request,
     body: PasskeyRegistrationRequest,
-    user: User = Depends(manager),
+    user: User = Depends(get_current_user_full),
     user_services: UserServices = Depends(user_services_dep),
     redis: AsyncRedis = Depends(get_redis),
 ):
@@ -352,7 +352,7 @@ async def passkey_authentication_options(
 
 @router.delete("/passkey/delete")
 async def passkey_delete(
-    user: User = Depends(manager),
+    user: User = Depends(get_current_user_full),
     user_services: UserServices = Depends(user_services_dep),
 ):
     success = await user_services.passkey.delete_passkey(user)
@@ -412,7 +412,7 @@ async def github_login(
 @router.get("/github/bind")
 async def github_bind(
     request: Request,
-    current_user: User = Depends(manager),
+    current_user: int = Depends(manager),
     user_services: UserServices = Depends(user_services_dep),
 ):
     auth_url, state, code_verifier, mode = (
@@ -426,7 +426,7 @@ async def github_bind(
 
 @router.post("/github/unbind")
 async def github_unbind(
-    current_user: User = Depends(manager),
+    current_user: User = Depends(get_current_user_full),
     user_services: UserServices = Depends(user_services_dep),
 ):
     url = settings.FRONTEND_URL + "/settings?error=github_not_bound"

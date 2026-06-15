@@ -2,14 +2,13 @@ from urllib.parse import urlparse
 
 import httpx
 from fastapi import APIRouter, Depends, Query
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import Response
 
 from app.api.des.auth import manager
 from app.api.des.des import rss_service_dep
 from app.core.exceptions import APIError
 from app.core.logger import logger
 from app.core.response import APIResponse
-from app.models.models import User
 from app.schemas.schemas import (
     RssRequest,
 )
@@ -26,7 +25,7 @@ _IMAGE_PROXY_MAX_BYTES = 10 * 1024 * 1024  # 10MB
 @router.get("/image-proxy")
 async def proxy_rss_image(
     url: str = Query(..., min_length=8, max_length=2048),
-    user: User = Depends(manager),
+    user: int = Depends(manager),
 ):
     """代理 RSS 图片, 避免浏览器直接跨域加载失败。"""
     parsed = urlparse(url)
@@ -74,7 +73,7 @@ async def proxy_rss_image(
 @router.post("/parse-rss")
 async def parse_rss(
     rss_request: RssRequest,
-    current_user: User = Depends(manager),
+    current_user: int = Depends(manager),
     rss_service: RssService = Depends(rss_service_dep),
 ):
     """解析RSS链接返回RSS内容"""
@@ -85,9 +84,9 @@ async def parse_rss(
 
     if save_to_db:
         rss_info = await rss_service.save_rss_info(
-            url=rss_url, user_id=current_user.id
+            url=rss_url, user_id=current_user
         )
-        logger.info(f"用户 {current_user.username} 保存了RSS链接: {rss_url}")
+        logger.info(f"用户 {current_user} 保存了RSS链接: {rss_url}")
 
     if not save_to_db:
         cached_payload = await rss_service.get_cached_feed(rss_url)
@@ -127,11 +126,11 @@ async def get_articles(
     limit: int = 20,
     feed_url: str | None = None,
     search: str | None = Query(None, min_length=1),
-    current_user: User = Depends(manager),
+    current_user: int = Depends(manager),
     rss_service: RssService = Depends(rss_service_dep),
 ) -> APIResponse:
     result = await rss_service.get_articles_for_user(
-        user_id=current_user.id,
+        user_id=current_user,
         page=page,
         limit=limit,
         feed_url=feed_url,
@@ -143,12 +142,12 @@ async def get_articles(
 @router.get("/articles/{article_id}")
 async def get_article(
     article_id: str,
-    current_user: User = Depends(manager),
+    current_user: int = Depends(manager),
     rss_service: RssService = Depends(rss_service_dep),
 ):
     response = await rss_service.get_article_for_user(
         article_id=article_id,
-        user_id=current_user.id,
+        user_id=current_user,
     )
     return APIResponse(data=response.model_dump())
 
@@ -156,12 +155,12 @@ async def get_article(
 # 获取当前用户的RSS订阅列表
 @router.get("/subscriptions")
 async def get_subscriptions(
-    current_user: User = Depends(manager),
+    current_user: int = Depends(manager),
     rss_service: RssService = Depends(rss_service_dep),
 ):
     """获取当前用户的RSS订阅列表"""
     subscriptions = await rss_service.get_subscriptions_for_user(
-        user_id=current_user.id
+        user_id=current_user
     )
     data = [sub.model_dump(mode="json") for sub in subscriptions]
     return APIResponse(data=data)
@@ -171,19 +170,19 @@ async def get_subscriptions(
 @router.post("/subscriptions/{subscription_id}/refresh")
 async def refresh_subscription(
     subscription_id: int,
-    current_user: User = Depends(manager),
+    current_user: int = Depends(manager),
     rss_service: RssService = Depends(rss_service_dep),
 ):
     """手动刷新指定订阅并保存新文章"""
     try:
         result = await rss_service.refresh_subscription(
             subscription_id=subscription_id,
-            user_id=current_user.id,
+            user_id=current_user,
         )
 
         logger.info(
             "用户 %s 手动刷新RSS: %s, 新增 %s 篇文章",
-            current_user.username,
+            current_user,
             result["rss_url"],
             result["saved_count"],
         )
@@ -196,15 +195,15 @@ async def refresh_subscription(
 @router.delete("/subscriptions/{subscription_id}")
 async def delete_subscription(
     subscription_id: int,
-    current_user: User = Depends(manager),
+    current_user: int = Depends(manager),
     rss_service: RssService = Depends(rss_service_dep),
 ):
     """删除RSS订阅及其关联的所有文章"""
     rss_url = await rss_service.delete_subscription_for_user(
         subscription_id=subscription_id,
-        user_id=current_user.id,
+        user_id=current_user,
     )
-    logger.info(f"用户 {current_user.username} 删除了RSS订阅: {rss_url}")
+    logger.info(f"用户 {current_user} 删除了RSS订阅: {rss_url}")
     return APIResponse(data={"message": "订阅已删除"})
 
 
@@ -212,17 +211,17 @@ async def delete_subscription(
 @router.post("/articles/{article_id}/read")
 async def mark_article_read(
     article_id: str,
-    current_user: User = Depends(manager),
+    current_user: int = Depends(manager),
     rss_service: RssService = Depends(rss_service_dep),
 ):
     """标记文章为已读(将用户ID添加到read_by列表,使用$addToSet实现幂等性)"""
     await rss_service.mark_article_read_state(
         article_id=article_id,
-        user_id=current_user.id,
+        user_id=current_user,
         read=True,
     )
 
-    logger.info(f"用户 {current_user.id} 标记文章 {article_id} 为已读")
+    logger.info(f"用户 {current_user} 标记文章 {article_id} 为已读")
     return APIResponse(data={"message": "文章已标记为已读"})
 
 
@@ -230,15 +229,15 @@ async def mark_article_read(
 @router.delete("/articles/{article_id}/read")
 async def mark_article_unread(
     article_id: str,
-    current_user: User = Depends(manager),
+    current_user: int = Depends(manager),
     rss_service: RssService = Depends(rss_service_dep),
 ):
     """标记文章为未读(从read_by列表中移除用户ID)"""
     await rss_service.mark_article_read_state(
         article_id=article_id,
-        user_id=current_user.id,
+        user_id=current_user,
         read=False,
     )
 
-    logger.info(f"用户 {current_user.id} 标记文章 {article_id} 为未读")
+    logger.info(f"用户 {current_user} 标记文章 {article_id} 为未读")
     return APIResponse(data={"message": "文章已标记为未读"})

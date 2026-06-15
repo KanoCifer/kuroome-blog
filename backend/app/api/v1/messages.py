@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Request, status
 
-from app.api.des.auth import manager
+from app.api.des.auth import get_current_user_full
 from app.api.des.des import message_service_dep
 from app.api.des.limiter import limiter
 from app.core.response import APIResponse
@@ -41,7 +41,7 @@ async def get_messages(
 async def create_message(
     request: Request,
     message_in: MessageIn,
-    user: User = Depends(manager),
+    user: User = Depends(get_current_user_full),
     message_service: MessageService = Depends(message_service_dep),
 ):
     """Submit a new message to message board (pending review)."""

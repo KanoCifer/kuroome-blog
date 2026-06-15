@@ -23,7 +23,6 @@ from app.core.config import get_settings
 from app.core.exceptions import APIError
 from app.core.logger import logger
 from app.core.response import APIResponse
-from app.models.models import User
 from app.plugins.cache import redis_cache
 from app.schemas.gallery import GalleryInput
 from app.services.public_service import PublicService
@@ -216,7 +215,7 @@ async def reverse_geocode(
 async def upload_blog_image(
     request: Request,
     file: UploadFile = File(),
-    user: User = Depends(manager),
+    user: int = Depends(manager),
 ) -> APIResponse:
     """Upload blog image and return public URL."""
     if not file or not file.filename:
@@ -224,7 +223,7 @@ async def upload_blog_image(
             message="No image provided.",
             code=status.HTTP_400_BAD_REQUEST,
         )
-    relative_path = save_upload_image(file, f"gallery/{user.id}")
+    relative_path = save_upload_image(file, f"gallery/{user}")
     await _safe_invalidate("get_pic_gallery")
 
     return APIResponse(

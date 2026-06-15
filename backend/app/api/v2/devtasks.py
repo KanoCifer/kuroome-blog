@@ -6,7 +6,6 @@ from app.api.des.auth import manager
 from app.api.des.des import devtask_service_dep
 from app.core.exceptions import APIError
 from app.core.response import APIResponse
-from app.models.models import User
 from app.schemas.devtask import DevTaskCreate, DevTaskUpdate
 from app.services.devtask_service import DevTaskService
 
@@ -38,11 +37,11 @@ async def get_tasks(
 @router.post("", status_code=status.HTTP_201_CREATED)
 async def create_task(
     data: DevTaskCreate,
-    user: User = Depends(manager),
+    user: int = Depends(manager),
     service: DevTaskService = Depends(devtask_service_dep),
 ) -> APIResponse:
     task = await service.create_task(
-        user_id=user.id, task_data=data.model_dump()
+        user_id=user, task_data=data.model_dump()
     )
     td = task.model_dump()
     td["id"] = str(task.id)
@@ -56,12 +55,12 @@ async def create_task(
 async def patch_task(
     task_id: str,
     data: DevTaskUpdate,
-    user: User = Depends(manager),
+    user: int = Depends(manager),
     service: DevTaskService = Depends(devtask_service_dep),
 ) -> APIResponse:
     try:
         updated = await service.update_task(
-            user_id=user.id,
+            user_id=user,
             task_id=task_id,
             update_data=data.model_dump(exclude_unset=True),
         )
@@ -75,11 +74,11 @@ async def patch_task(
 @router.delete("/{task_id}")
 async def delete_task(
     task_id: str,
-    user: User = Depends(manager),
+    user: int = Depends(manager),
     service: DevTaskService = Depends(devtask_service_dep),
 ) -> APIResponse:
     try:
-        await service.delete_task(user.id, task_id)
+        await service.delete_task(user, task_id)
         return APIResponse(message="DevTask deleted")
     except ValueError as e:
         raise APIError(message=str(e), code=404) from e
@@ -88,10 +87,10 @@ async def delete_task(
 @router.put("/reorder")
 async def reorder_tasks(
     data: DevTaskReorder,
-    user: User = Depends(manager),
+    user: int = Depends(manager),
     service: DevTaskService = Depends(devtask_service_dep),
 ) -> APIResponse:
-    tasks = await service.reorder_tasks(user.id, data.status, data.ordered_ids)
+    tasks = await service.reorder_tasks(user, data.status, data.ordered_ids)
     task_dicts = []
     for t in tasks:
         td = t.model_dump()

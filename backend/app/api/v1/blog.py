@@ -11,7 +11,6 @@ from app.api.des.des import blog_service_dep
 from app.core.exceptions import APIError
 from app.core.logger import logger
 from app.core.response import APIResponse
-from app.models.models import User
 from app.plugins.cache import redis_cache
 from app.schemas.schemas import PostComment
 from app.services.blog_service import BlogService
@@ -42,7 +41,7 @@ _BLOG_CACHE_FUNCS = (
 @router.post("/blog/upload-image")
 async def upload_blog_image(
     file: UploadFile = File(),
-    user: User = Depends(manager),
+    user: int = Depends(manager),
 ) -> APIResponse:
     """Upload blog image and return public URL."""
     if not file or not file.filename:
@@ -51,7 +50,7 @@ async def upload_blog_image(
             code=status.HTTP_400_BAD_REQUEST,
         )
 
-    relative_path = save_upload_image(file, f"posts/{user.id}")
+    relative_path = save_upload_image(file, f"posts/{user}")
     return APIResponse(
         data={
             "url": f"/api/v1/media/{relative_path}",

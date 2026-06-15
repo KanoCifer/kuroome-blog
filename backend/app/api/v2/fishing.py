@@ -17,7 +17,6 @@ from app.api.des.des import fishing_service_dep, weather_service_dep
 from app.api.des.redis import get_redis
 from app.core.exceptions import APIError
 from app.core.response import APIResponse
-from app.models.models import User
 from app.plugins.cache import redis_cache
 from app.services.fishing.fishing_index import (
     FEEDBACK_SCORES,
@@ -265,7 +264,7 @@ async def get_fishing_stats(
 
 @router.get("/weights")
 async def get_weights(
-    _: User = Depends(manager),
+    _: int = Depends(manager),
     service: FishingService = Depends(fishing_service_dep),
 ):
     """

@@ -100,7 +100,7 @@ async def delete_post(
 ):
     await admin_service.delete_post(post_id=post_id)
     logger.info(
-        f"Blog post with ID {post_id} deleted by admin {current_user.username}"
+        f"Blog post with ID {post_id} deleted by admin {current_user.id}"
     )
     await _safe_invalidate(*_BLOG_READ_FUNCS)
 

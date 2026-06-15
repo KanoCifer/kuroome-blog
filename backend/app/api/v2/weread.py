@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import Literal
 
 from fastapi import APIRouter, Depends, Query
 
 from app.core.logger import logger
-
-if TYPE_CHECKING:
-    from app.models.models import User
 
 from app.api.des.auth import manager
 from app.api.des.des import weread_service_dep
@@ -22,12 +19,12 @@ router = APIRouter(prefix="/weread", tags=["weread"])
 @router.post("/user-info")
 async def save_user_info(
     data: SaveUserInfoIn,
-    current_user=Depends(manager),
+    current_user: int = Depends(manager),
     weread_service=Depends(weread_service_dep),
 ):
     """保存微信读书用户信息"""
     try:
-        await weread_service.save_user_info(current_user.id, data.api_key)
+        await weread_service.save_user_info(current_user, data.api_key)
     except ValueError:
         raise APIError(message="Invalid API key") from None
     return APIResponse(message="User information saved successfully")
@@ -36,13 +33,13 @@ async def save_user_info(
 @router.get("/bookshelf")
 @redis_cache(exclude=["weread_service"])
 async def get_user_shelf(
-    current_user: User = Depends(manager),
+    current_user: int = Depends(manager),
     weread_service=Depends(weread_service_dep),
 ):
     """获取用户书架信息"""
     try:
         user_books_data, archives_data = await weread_service.get_user_shelf(
-            current_user.id
+            current_user
         )
     except ValueError:
         raise APIError(message="Invalid user ID") from None
@@ -75,7 +72,7 @@ async def get_book_info(
 @router.get("/book/{bookId}/progress")
 async def get_book_progress(
     bookId: str,
-    current_user=Depends(manager),
+    current_user: int = Depends(manager),
     weread_service=Depends(weread_service_dep),
     refresh: bool = Query(
         False,
@@ -90,15 +87,15 @@ async def get_book_progress(
     try:
         if refresh:
             data = await weread_service.refresh_book_progress(
-                bookId, current_user.id
+                bookId, current_user
             )
         else:
             data = await weread_service.get_book_progress(
-                bookId, current_user.id
+                bookId, current_user
             )
             if data is None:  # 本地空 → 首次拉
                 data = await weread_service.refresh_book_progress(
-                    bookId, current_user.id
+                    bookId, current_user
                 )
     except ValueError as e:
         logger.error(f"获取阅读进度失败: {e}")
@@ -111,14 +108,14 @@ async def get_book_progress(
 
 @router.get("/sync-my-books")
 async def sync_my_books(
-    current_user=Depends(manager),
+    current_user: int = Depends(manager),
     weread_service=Depends(weread_service_dep),
     force: bool = False,
 ):
     """从远端同步我的书籍，force=true 时强制重新拉取所有书籍详情"""
     try:
         count = await weread_service.sync_my_books(
-            current_user.id, force=force
+            current_user, force=force
         )
     except ValueError:
         raise APIError(message="Invalid user ID") from None
@@ -138,7 +135,7 @@ async def get_read_progress(
     ),
     perDay: bool = Query(False, description="按日拉取,用于年视图热力图"),
     year: int | None = Query(None, description="查询的年份,缺省为当前年份"),
-    current_user: User = Depends(manager),
+    current_user: int = Depends(manager),
     weread_service=Depends(weread_service_dep),
 ):
     """获取指定 mode + 周期的阅读统计快照。
@@ -149,14 +146,14 @@ async def get_read_progress(
     """
     if perDay:
         read_times: dict[str, int] = await weread_service.fetch_yearly_heatmap(
-            current_user.id, year=year
+            current_user, year=year
         )
         return APIResponse(
             data={"readTimes": read_times},
             message="Read times retrieved successfully",
         )
     snapshot = await weread_service.orchestra_read_detail(
-        current_user.id, mode=mode, base_time=baseTime
+        current_user, mode=mode, base_time=baseTime
     )
     return APIResponse(
         data=snapshot.model_dump(mode="json"),
@@ -167,14 +164,14 @@ async def get_read_progress(
 @router.get("/books-recommend")
 @redis_cache(ttl=300)
 async def get_books_recommend(
-    user=Depends(manager),
+    user: int = Depends(manager),
     weread_service=Depends(weread_service_dep),
     count: int = Query(12),
     maxIdx: int = Query(0),
 ):
     """获取推荐阅读的书籍"""
     books = await weread_service.fetch_books_recommend(
-        user.id, count=count, maxIdx=maxIdx
+        user, count=count, maxIdx=maxIdx
     )
     return APIResponse(
         data=[book.model_dump(mode="json") for book in books],
