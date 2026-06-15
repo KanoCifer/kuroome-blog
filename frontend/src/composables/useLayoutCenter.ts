@@ -16,7 +16,9 @@ export function useLayoutCenter(
   containerRef: Ref<HTMLElement | null>,
 ): LayoutCenter {
   const viewportHeight = ref<number>(window.innerHeight);
-  const parentWidth = ref<number>(0);
+  const parentWidth = ref<number>(
+    typeof window !== 'undefined' ? window.innerWidth : 0,
+  );
 
   const layoutHeight = computed<number>(() =>
     Math.max(viewportHeight.value, 820),

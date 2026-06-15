@@ -19,6 +19,7 @@ interface ThemeState {
   theme: Theme;
   font: FontFamily;
   scheme: ColorScheme;
+  showFooter: boolean;
   setTheme: (theme: Theme) => void;
   setFont: (font: FontFamily) => void;
   setScheme: (scheme: ColorScheme) => void;
@@ -27,6 +28,7 @@ interface ThemeState {
     clientX: number;
     clientY: number;
   }) => void;
+  toggleFooter: () => void;
 }
 
 export type { Theme, FontFamily, ColorScheme };
@@ -63,6 +65,7 @@ export const useThemeState = create<ThemeState>()(
       theme: 'system',
       font: 'default',
       scheme: 'sky-blue',
+      showFooter: localStorage.getItem('show-footer') !== 'false',
 
       setTheme: (theme) => {
         applyTheme(theme);
@@ -94,6 +97,12 @@ export const useThemeState = create<ThemeState>()(
           get().setTheme(nextTheme);
         });
       },
+
+      toggleFooter: () => {
+        const next = !get().showFooter;
+        set({ showFooter: next });
+        localStorage.setItem('show-footer', String(next));
+      },
     }),
     {
       name: 'theme-storage',
@@ -112,6 +121,7 @@ export const useThemeState = create<ThemeState>()(
         theme: state.theme,
         font: state.font,
         scheme: state.scheme,
+        showFooter: state.showFooter,
       }),
     },
   ),

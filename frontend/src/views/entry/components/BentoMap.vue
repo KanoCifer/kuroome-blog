@@ -124,7 +124,17 @@ function deriveTideStatus(tideData: TideData | null): string {
   return '未知潮汐';
 }
 
-onMounted(async () => {
+onMounted(() => {
+  // Defer to idle — let the spring entrance animation finish first
+  // before kicking off the count-up rAF + network requests
+  if (requestIdleCallback) {
+    requestIdleCallback(() => runMapInit());
+  } else {
+    setTimeout(runMapInit, 200);
+  }
+});
+
+async function runMapInit() {
   animateTo(fishingSpots.length);
 
   // Fire both requests in parallel — no need to wait sequentially
@@ -139,5 +149,5 @@ onMounted(async () => {
       lastRecord.value = formatRelative(statsRes.value.latest_record_time);
     }
   }
-});
+}
 </script>

@@ -1,5 +1,44 @@
 [
   {
+    "version": "3.7.0",
+    "date": "2026-06-15",
+    "title": "偏好设置文学手账风格重做与显示页脚开关",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "新增「显示页脚」开关（Vue + React 双端一致）：useThemeStore / useThemeState 新增 showFooter 状态与 toggleFooter action，BasicFooter / BasicFooter.vue 据此决定是否渲染"
+      },
+      {
+        "type": "style",
+        "content": "Vue SettingsModal 文学手账视觉重做：Chapter 副标 + 28px 衬线标题 + 斜体英文 + 12px 主色装饰线 + 装帧书脊 + 壹貳叁章节书签 + 底部 Settings · v3.1 / ka·no·ci·fer"
+      },
+      {
+        "type": "style",
+        "content": "Vue AppearanceTab 视觉对齐：配色方案改 72px 三色竖条 + 诗意描述（高远澄澈/落纸烟云/桃夭未央/独坐幽篁等），toggle 改 iOS 风格，主题/字体卡片改 rounded-md"
+      },
+      {
+        "type": "style",
+        "content": "Vue BackgroundTab 视觉对齐：移除硬编码颜色（bg-gray-200/70 等），滑块 accent-primary，卡片 rounded-md 与 hover border-primary"
+      },
+      {
+        "type": "style",
+        "content": "Vue CardTab 改 3:4 渐变卡 6 槽，使用 useCardImage 真图循环"
+      },
+      {
+        "type": "style",
+        "content": "React SettingMoal 文学手账视觉重做，与 Vue 1:1 对齐：4 段（页面元素 / 主题模式 / 字体 / 配色方案）+ 章节序号 壹貳叁肆"
+      },
+      {
+        "type": "perf",
+        "content": "BentoMap 初始化延迟到 requestIdleCallback，让春季入场动画完成后再触发 count-up rAF 与网络请求"
+      },
+      {
+        "type": "refactor",
+        "content": "useLayoutCenter.parentWidth 初始化为 window.innerWidth（兼容 SSR/服务端渲染场景）"
+      }
+    ]
+  },
+  {
     "version": "3.6.0",
     "date": "2026-06-14",
     "title": "书籍模块 P0 落地与 Weread 组件抽取",
