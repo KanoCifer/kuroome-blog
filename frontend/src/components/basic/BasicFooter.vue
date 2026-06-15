@@ -1,76 +1,100 @@
 <template>
-  <!-- Footer -->
+  <!-- 页脚：文学手账卷末 · 单行 -->
   <footer
     class="transition-colors duration-1000"
     :class="
       !isEntryView
-        ? 'border-border border-t bg-white dark:bg-black'
-        : 'border-0 bg-transparent'
+        ? 'border-border/40 border-t bg-white dark:bg-black'
+        : 'border-0'
     "
   >
     <div
-      class="text-muted-foreground mx-auto flex w-full max-w-7xl flex-row flex-wrap items-center justify-between gap-3 px-6 py-3 text-base"
+      class="text-muted-foreground mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-5 gap-y-1.5 px-6 py-2.5 text-[11px]"
     >
-      <!-- 左侧：版权信息 -->
-      <div class="flex items-center gap-2">
-        &copy; 2026 By KanoCifer
-        <span class="text-muted-foreground mx-1 text-sm">|</span>
-        <router-link
-          to="/status"
-          class="hover:text-foreground inline-flex items-center gap-1.5 transition-colors"
+      <!-- 左：站名 + 版权章回标 -->
+      <div class="flex items-baseline gap-2.5">
+        <span class="text-foreground/80 font-serif text-[13px] italic"
+          >ka·no·ci·fer</span
         >
-          <span class="relative flex h-2 w-2">
-            <span
-              class="animate-dot-pulse absolute inline-flex h-full w-full rounded-full"
-              :class="delayStatus.dotClass"
-            ></span>
-            <span
-              class="relative inline-flex h-2 w-2 rounded-full"
-              :class="delayStatus.dotClass"
-            ></span>
-          </span>
-          延迟
-          <span :class="delayStatus.textClass">{{ delayStatus.label }}</span>
-          <ExternalLink class="h-3 w-3 opacity-60" />
-        </router-link>
+        <span aria-hidden="true" class="text-border/50">·</span>
+        <span class="font-mono text-[10px] tracking-[0.2em] uppercase"
+          >© 卷一·2026</span
+        >
       </div>
 
-      <!-- 右侧：链接与状态 -->
-      <div class="flex items-center gap-4">
+      <!-- 中：实时状态（延迟 + 在线） -->
+      <div class="flex items-center gap-3">
+        <StatusHoverPopover>
+          <template #trigger>
+            <router-link
+              to="/status"
+              class="hover:text-foreground inline-flex items-center gap-1.5 transition-colors"
+            >
+              <span class="relative flex h-1.5 w-1.5">
+                <span
+                  class="absolute inline-flex h-full w-full animate-ping rounded-full"
+                  :class="delayStatus.dotClass"
+                />
+                <span
+                  class="relative inline-flex h-1.5 w-1.5 rounded-full"
+                  :class="delayStatus.dotClass"
+                />
+              </span>
+              <span class="font-mono tracking-[0.1em]">延迟</span>
+              <span
+                :class="delayStatus.textClass"
+                class="font-mono tabular-nums"
+                >{{ delayStatus.label }}</span
+              >
+            </router-link>
+          </template>
+        </StatusHoverPopover>
+        <span aria-hidden="true" class="text-border/50">·</span>
         <span class="inline-flex items-center gap-1.5">
-          <span class="relative flex h-2 w-2">
+          <span class="relative flex h-1.5 w-1.5">
             <span
-              class="bg-success animate-dot-pulse absolute inline-flex h-full w-full rounded-full"
-            ></span>
+              class="bg-success absolute inline-flex h-full w-full animate-ping rounded-full opacity-60"
+            />
             <span
-              class="bg-success relative inline-flex h-2 w-2 rounded-full"
-            ></span>
+              class="bg-success relative inline-flex h-1.5 w-1.5 rounded-full"
+            />
           </span>
-          {{ visitorCount.count }} 人在线
+          <span class="font-mono tabular-nums"
+            >{{ visitorCount.count }} 人在线</span
+          >
         </span>
+      </div>
 
+      <!-- 右：链接组 -->
+      <div class="flex items-center gap-3">
         <a
           href="https://github.com/KanoCifer/Flask-Example"
           target="_blank"
-          class="hover:text-foreground flex items-center gap-1.5 transition-colors"
+          rel="noopener"
+          class="hover:text-foreground inline-flex items-center gap-1.5 transition-colors"
         >
           <img
             src="https://github.githubassets.com/favicons/favicon.svg"
-            class="h-4 w-4 opacity-70 grayscale"
+            class="h-3.5 w-3.5 opacity-60 grayscale"
             alt="Github"
           />
-          KanoCifer
+          <span class="font-mono tracking-[0.1em]">GitHub</span>
         </a>
-
-        <a class="hover:text-foreground transition-colors" target="_blank"
+        <span aria-hidden="true" class="text-border/50">·</span>
+        <a
+          href="https://beian.miit.gov.cn/"
+          target="_blank"
+          rel="noopener"
+          class="hover:text-foreground font-mono transition-colors"
           >粤ICP备2026018113号</a
         >
-
+        <span aria-hidden="true" class="text-border/50">·</span>
         <router-link
           to="/privacy"
           class="hover:text-foreground transition-colors"
-          >隐私政策</router-link
         >
+          <span class="font-mono tracking-[0.1em]">隐私政策</span>
+        </router-link>
       </div>
     </div>
   </footer>
@@ -78,9 +102,9 @@
 
 <script setup lang="ts">
 import { connectionDelay } from '@/plugins/visitorWs';
+import StatusHoverPopover from '@/components/basic/StatusHoverPopover.vue';
 import { useVisitorCountStore } from '@/stores/visitorCount';
 import { computed } from 'vue';
-import { ExternalLink } from '@lucide/vue';
 
 const visitorCount = useVisitorCountStore();
 
