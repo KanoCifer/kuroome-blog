@@ -74,7 +74,7 @@ const autoSwitchOptions = [
           step="1"
           :value="themeStore.bgBlur"
           @input="onInputBlur"
-          class="accent-primary w-full cursor-pointer appearance-none"
+          class="accent-primary w-full cursor-pointer"
         />
       </div>
 
@@ -92,7 +92,7 @@ const autoSwitchOptions = [
           step="5"
           :value="Math.round(themeStore.bgBrightness * 100)"
           @input="onInputBrightness"
-          class="accent-primary w-full cursor-pointer appearance-none"
+          class="accent-primary w-full cursor-pointer"
         />
       </div>
 
@@ -110,7 +110,7 @@ const autoSwitchOptions = [
           step="1"
           :value="Math.round(themeStore.bgScale * 100)"
           @input="onInputScale"
-          class="accent-primary w-full cursor-pointer appearance-none"
+          class="accent-primary w-full cursor-pointer"
         />
       </div>
     </div>
@@ -141,7 +141,9 @@ const autoSwitchOptions = [
             stroke-width="1.5"
             stroke-linecap="round"
             :class="
-              backgroundStore.mode === 'random' ? 'text-primary' : 'text-foreground'
+              backgroundStore.mode === 'random'
+                ? 'text-primary'
+                : 'text-foreground'
             "
           >
             <polyline points="16 3 21 3 21 8" />
@@ -153,7 +155,9 @@ const autoSwitchOptions = [
           <span
             class="text-sm font-medium"
             :class="
-              backgroundStore.mode === 'random' ? 'text-primary' : 'text-foreground'
+              backgroundStore.mode === 'random'
+                ? 'text-primary'
+                : 'text-foreground'
             "
           >
             随机切换
@@ -177,7 +181,9 @@ const autoSwitchOptions = [
             stroke-width="1.5"
             stroke-linecap="round"
             :class="
-              backgroundStore.mode === 'fixed' ? 'text-primary' : 'text-foreground'
+              backgroundStore.mode === 'fixed'
+                ? 'text-primary'
+                : 'text-foreground'
             "
           >
             <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -187,7 +193,9 @@ const autoSwitchOptions = [
           <span
             class="text-sm font-medium"
             :class="
-              backgroundStore.mode === 'fixed' ? 'text-primary' : 'text-foreground'
+              backgroundStore.mode === 'fixed'
+                ? 'text-primary'
+                : 'text-foreground'
             "
           >
             固定背景

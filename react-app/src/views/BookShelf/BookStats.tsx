@@ -12,7 +12,7 @@ import {
   VisualMapComponent,
 } from 'echarts/components';
 import * as echarts from 'echarts/core';
-import { SVGRenderer } from 'echarts/renderers';
+import { CanvasRenderer } from 'echarts/renderers';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import { ArrowLeft, ArrowRight, RefreshCw, Star } from 'lucide-react';
@@ -30,7 +30,7 @@ echarts.use([
   BarChart,
   PieChart,
   HeatmapChart,
-  SVGRenderer,
+  CanvasRenderer,
 ]);
 
 type ModeKey = 'weekly' | 'monthly' | 'annually' | 'overall';
@@ -504,8 +504,7 @@ export default function BookStats() {
   const yearlyHeatmap = useReadStatsStore((s) => s.yearlyHeatmap);
   const fetchYearlyHeatmap = useReadStatsStore((s) => s.fetchYearlyHeatmap);
   const currentYear = useMemo(() => new Date().getFullYear(), []);
-  const currentHeatmap =
-    yearlyHeatmap[currentYear] ?? null;
+  const currentHeatmap = yearlyHeatmap[currentYear] ?? null;
 
   useEffect(() => {
     if (activeMode === 'annually') {
@@ -554,10 +553,7 @@ export default function BookStats() {
       tooltip: {
         formatter: (p: { value: [number, number, number] }) => {
           const [w, d, v] = p.value;
-          const weekStart = firstDay
-            .clone()
-            .startOf('isoWeek')
-            .add(w, 'week');
+          const weekStart = firstDay.clone().startOf('isoWeek').add(w, 'week');
           const date = weekStart.add(d, 'day');
           return `${date.format('YYYY-MM-DD')}<br/>${formatDuration(v)}`;
         },
@@ -629,7 +625,9 @@ export default function BookStats() {
   ]);
 
   const hasYearHeatmap =
-    activeMode === 'annually' && !!currentHeatmap && Object.keys(currentHeatmap).length > 0;
+    activeMode === 'annually' &&
+    !!currentHeatmap &&
+    Object.keys(currentHeatmap).length > 0;
 
   return (
     <div className="bg-background flex min-h-[calc(100dvh-4rem)] flex-col">

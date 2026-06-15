@@ -84,7 +84,7 @@
       <div
         aria-hidden="true"
         :style="sectionStyle"
-        class="bg-card border-border absolute inset-0 rounded-t-[40px] border-x border-t shadow-[inset_0_0_20px_0px_rgba(255,255,255,0.35)]"
+        class="bg-background/95 border-border absolute inset-0 rounded-t-[40px] border-x border-t shadow-[inset_0_0_20px_0px_rgba(255,255,255,0.35)]"
         style="contain: layout style"
       ></div>
 

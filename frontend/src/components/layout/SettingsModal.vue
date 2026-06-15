@@ -98,10 +98,12 @@
 
           <!-- 底部 -->
           <footer
-            class="text-muted-foreground border-border flex items-center justify-between border-t px-8 py-3 font-mono text-[11px]"
+            class="border-border flex items-center justify-between border-t px-8 py-3 font-mono text-[11px]"
           >
-            <span>Settings · v3.1</span>
-            <span class="font-serif italic">ka·no·ci·fer</span>
+            <span class="text-muted-foreground font-sans">Settings · v3.8</span>
+            <span class="text-muted-foreground font-serif italic"
+              >ka·no·ci·fer</span
+            >
           </footer>
         </div>
       </div>

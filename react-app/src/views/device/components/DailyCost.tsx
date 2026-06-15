@@ -10,7 +10,7 @@ import {
   TooltipComponent,
 } from 'echarts/components';
 import * as echarts from 'echarts/core';
-import { SVGRenderer } from 'echarts/renderers';
+import { CanvasRenderer } from 'echarts/renderers';
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
@@ -23,7 +23,7 @@ echarts.use([
   GridComponent,
   LegendComponent,
   LineChart,
-  SVGRenderer,
+  CanvasRenderer,
 ]);
 
 export function DailyCost({

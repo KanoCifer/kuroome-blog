@@ -21,9 +21,9 @@ import {
   // ToolboxComponent,
   TooltipComponent,
 } from 'echarts/components';
-// Import renderer, note that introducing the CanvasRenderer or SVGRenderer is a required step
+// Import renderer, note that introducing the CanvasRenderer or CanvasRenderer is a required step
 import { type Device } from '@/services/deviceService';
-import { SVGRenderer } from 'echarts/renderers';
+import { CanvasRenderer } from 'echarts/renderers';
 import { motion } from 'framer-motion';
 import { useMemo } from 'react';
 import { createPortal } from 'react-dom';
@@ -34,7 +34,7 @@ echarts.use([
   TooltipComponent,
   GridComponent,
   PieChart,
-  SVGRenderer,
+  CanvasRenderer,
 ]);
 
 const isDark = document.documentElement.classList.contains('dark');

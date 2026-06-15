@@ -1,4 +1,10 @@
-import { BarChart, GaugeChart, HeatmapChart, LineChart, PieChart } from 'echarts/charts';
+import {
+  BarChart,
+  GaugeChart,
+  HeatmapChart,
+  LineChart,
+  PieChart,
+} from 'echarts/charts';
 import {
   CalendarComponent,
   GridComponent,
@@ -11,11 +17,10 @@ import {
   VisualMapComponent,
 } from 'echarts/components';
 import { use } from 'echarts/core';
-import { CanvasRenderer, SVGRenderer } from 'echarts/renderers';
+import { CanvasRenderer } from 'echarts/renderers';
 
 use([
   CanvasRenderer,
-  SVGRenderer,
   BarChart,
   GaugeChart,
   HeatmapChart,

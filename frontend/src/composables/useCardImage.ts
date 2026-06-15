@@ -1,9 +1,14 @@
 import { computed, ref } from 'vue';
 
-const CARD_IMAGES = Array.from(
+const STATIC_IMAGES = Array.from(
   { length: 3 },
   (_, i) => `/card/card-${i + 1}-thumb.jpeg`,
 );
+
+const CARD_IMAGES: readonly string[] = [
+  ...STATIC_IMAGES,
+  `https://picsum.photos/300/200`,
+];
 
 const CARD_KEY = 'readinglist_card_imgae_index';
 

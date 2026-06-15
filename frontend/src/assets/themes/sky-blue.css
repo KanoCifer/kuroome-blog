@@ -45,28 +45,28 @@
 }
 
 [data-color-scheme='sky-blue'].dark {
-  --ink: oklch(0.985 0.002 247.839);
-  --paper: oklch(0.13 0.028 261.692);
-  --warm-gray: oklch(0.278 0.033 256.848);
-  --muted-text: oklch(0.707 0.022 261.325);
-  --accent-amber: oklch(0.569 0.148 70.08);
-  --accent-sage: oklch(0.527 0.154 149.214);
-  --accent-slate: oklch(0.551 0.027 264.364);
-  --accent-rose: oklch(0.704 0.191 22.216);
-  --workspace-accent: var(--color-blue-500);
-  --workspace-accent-contrast: oklch(0.21 0.034 264.665);
-  --card-bg: oklch(0.21 0.034 264.665);
-  --surface: oklch(0.21 0.034 264.665 / 0.8);
-  --surface-foreground: oklch(0.985 0.002 247.839);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --gradient-primary-from: var(--color-blue-400);
-  --gradient-primary-to: var(--color-sky-400);
-  --gradient-decorative-from: var(--color-indigo-800);
-  --gradient-decorative-to: var(--color-sky-800);
+  --ink: oklch(0.96 0.012 261);
+  --paper: oklch(0.13 0.028 262);
+  --warm-gray: oklch(0.34 0.03 257);
+  --muted-text: oklch(0.78 0.022 261);
+  --accent-amber: oklch(0.78 0.16 70);
+  --accent-sage: oklch(0.72 0.15 149);
+  --accent-slate: oklch(0.7 0.03 264);
+  --accent-rose: oklch(0.78 0.18 22);
+  --workspace-accent: oklch(0.7 0.16 258);
+  --workspace-accent-contrast: oklch(0.13 0.028 262);
+  --card-bg: oklch(0.27 0.034 264);
+  --surface: oklch(0.27 0.034 264 / 0.85);
+  --surface-foreground: oklch(0.96 0.012 261);
+  --chart-1: oklch(0.7 0.18 258);
+  --chart-2: oklch(0.78 0.15 188);
+  --chart-3: oklch(0.82 0.16 70);
+  --chart-4: oklch(0.72 0.2 304);
+  --chart-5: oklch(0.75 0.2 16);
+  --gradient-primary-from: oklch(0.62 0.16 258);
+  --gradient-primary-to: oklch(0.55 0.14 218);
+  --gradient-decorative-from: oklch(0.4 0.12 262 / 0.35);
+  --gradient-decorative-to: oklch(0.38 0.1 218 / 0.25);
   /* shadcn token bridge */
   --background: var(--paper);
   --foreground: var(--ink);

@@ -23,8 +23,8 @@ import {
   // ToolboxComponent,
   TooltipComponent,
 } from 'echarts/components';
-// Import renderer, note that introducing the CanvasRenderer or SVGRenderer is a required step
-import { SVGRenderer } from 'echarts/renderers';
+// Import renderer, note that introducing the CanvasRenderer or CanvasRenderer is a required step
+import { CanvasRenderer } from 'echarts/renderers';
 
 // Register the required components
 echarts.use([
@@ -32,7 +32,7 @@ echarts.use([
   TooltipComponent,
   GridComponent,
   LineChart,
-  SVGRenderer,
+  CanvasRenderer,
   MarkAreaComponent,
 ]);
 

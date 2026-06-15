@@ -137,7 +137,7 @@
           damping: 20,
           delay: cardDelay('BentoPic'),
         }"
-        class="w-80 cursor-pointer p-2!"
+        class="cursor-pointer p-2!"
       />
       <!-- 中间的照片卡片 -->
     </DragWrapper>
