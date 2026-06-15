@@ -1,11 +1,13 @@
 <template>
   <BasicDetail
-    :title="activeCategory ? `Category: ${activeCategory}` : 'Blog'"
-    subtitle="分享阅读心得、技术思考与读书笔记"
+    :title="heroTitle"
+    :subtitle="heroSubtitle"
     :onBack="() => $router.push('/')"
   >
     <div class="col-span-full container mx-auto min-h-dvh max-w-6xl px-4 py-8">
-      <!-- 工具栏：搜索 + 分类 chip + New Post -->
+      <!-- ──────────────────────────────────────────────────────────── -->
+      <!--  工具栏：搜索 + 分类 chip + New Post                          -->
+      <!-- ──────────────────────────────────────────────────────────── -->
       <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
         <div class="relative w-full sm:max-w-md sm:flex-1">
           <div
@@ -17,7 +19,7 @@
               viewBox="0 0 24 24"
               stroke-width="2"
               stroke="currentColor"
-              class="text-muted-foreground h-5 w-5"
+              class="text-muted-foreground h-4 w-4"
               aria-hidden="true"
             >
               <path
@@ -30,9 +32,9 @@
           <input
             v-model="searchQuery"
             type="search"
-            placeholder="搜索文章标题和内容..."
+            placeholder="在字里行间，寻一句心动…"
             aria-label="搜索文章"
-            class="text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 border-border bg-card block w-full rounded-xl border py-3 pr-10 pl-10 text-sm focus:ring-2 focus:outline-none"
+            class="text-foreground placeholder:text-muted-foreground/70 placeholder:font-serif placeholder:italic focus:border-primary focus:ring-primary/20 border-border bg-card font-serif w-full rounded-xl border py-3 pr-10 pl-10 text-sm focus:ring-2 focus:outline-none"
             @keyup.enter="handleSearch"
           />
           <button
@@ -48,7 +50,7 @@
               viewBox="0 0 24 24"
               stroke-width="2"
               stroke="currentColor"
-              class="h-5 w-5"
+              class="h-4 w-4"
               aria-hidden="true"
             >
               <path
@@ -61,15 +63,15 @@
         </div>
 
         <div class="flex items-center gap-2 sm:ml-auto">
-          <!-- 当前分类 chip：列表区顶部永久可见，去掉 sidebar 之后不会丢失上下文 -->
+          <!-- 当前分类 chip：章节章 文学风，列表区顶部永久可见 -->
           <button
             v-if="activeCategory"
             type="button"
             class="border-border bg-card text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
             @click="handleResetFilter"
           >
-            <span class="text-primary">#</span>
-            <span>{{ activeCategory }}</span>
+            <span class="text-primary/70 font-serif italic">#</span>
+            <span class="font-serif">{{ activeCategory }}</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -105,7 +107,7 @@
                 clip-rule="evenodd"
               />
             </svg>
-            New Post
+            写一篇
           </router-link>
         </div>
       </div>
@@ -115,6 +117,55 @@
         <div class="min-w-0 flex-1">
           <!-- 列表顶部锚点：翻页时滚到这里 -->
           <div id="blog-list-top" aria-hidden="true" />
+
+          <!-- ────────────────────────────────────────────────────── -->
+          <!--  卷一 · 章节目录头：未选分类时显示                       -->
+          <!-- ────────────────────────────────────────────────────── -->
+          <div
+            v-if="!activeCategory"
+            class="mb-6 flex items-end justify-between gap-4 pb-3"
+          >
+            <div class="flex items-baseline gap-3">
+              <span
+                class="text-muted-foreground font-mono text-[10px] tracking-[0.4em] uppercase"
+                >Volume · 壹</span
+              >
+              <h2
+                class="text-foreground font-serif text-base font-semibold sm:text-lg"
+              >
+                近期文章
+              </h2>
+            </div>
+            <div class="text-muted-foreground/70 flex items-center gap-1.5">
+              <div class="bg-primary/40 h-px w-6" />
+              <span class="font-mono text-[10px] tracking-[0.2em] uppercase"
+                >Recent</span
+              >
+            </div>
+          </div>
+
+          <!-- ────────────────────────────────────────────────────── -->
+          <!--  分类视图头：选中分类时显示                              -->
+          <!-- ────────────────────────────────────────────────────── -->
+          <div v-else class="mb-6 flex items-end justify-between gap-4 pb-3">
+            <div class="flex items-baseline gap-3">
+              <span
+                class="text-muted-foreground font-mono text-[10px] tracking-[0.4em] uppercase"
+                >Volume · 壹</span
+              >
+              <h2
+                class="text-foreground font-serif text-base font-semibold sm:text-lg"
+              >
+                <span class="text-primary/70 mr-1">#</span>{{ activeCategory }}
+              </h2>
+            </div>
+            <div class="text-muted-foreground/70 flex items-center gap-1.5">
+              <div class="bg-primary/40 h-px w-6" />
+              <span class="font-mono text-[10px] tracking-[0.2em] uppercase"
+                >Category</span
+              >
+            </div>
+          </div>
 
           <!-- 统一空态样式：圆角 / 边框 / 图标尺寸一致，仅文案与动作不同 -->
           <div
@@ -126,9 +177,9 @@
             <div
               class="border-primary/20 border-t-primary mb-5 h-12 w-12 animate-spin rounded-full border-4"
             ></div>
-            <h3 class="text-foreground text-base font-semibold">加载中…</h3>
-            <p class="text-muted-foreground mt-2 text-sm">
-              正在为你取回最新的文章
+            <h3 class="text-foreground text-base font-semibold">正在翻开新的一页…</h3>
+            <p class="text-muted-foreground mt-2 text-sm italic font-serif">
+              Loading the latest pages
             </p>
           </div>
 
@@ -152,7 +203,7 @@
                 d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
               />
             </svg>
-            <h3 class="text-destructive text-base font-semibold">加载失败</h3>
+            <h3 class="text-destructive text-base font-semibold">页面失落了</h3>
             <p class="text-destructive/80 mt-2 max-w-sm text-sm">
               {{ errorMessage }}
             </p>
@@ -161,7 +212,7 @@
               class="bg-destructive hover:bg-destructive/90 focus:ring-ring mt-5 rounded-lg px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-offset-2 focus:outline-none"
               @click="fetchPosts(1)"
             >
-              重试
+              重新翻一页
             </button>
           </div>
 
@@ -184,14 +235,14 @@
                 d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
               />
             </svg>
-            <h3 class="text-foreground text-base font-semibold">
-              {{ activeCategory ? '该分类下还没有文章' : '还没有任何文章' }}
+            <h3 class="text-foreground font-serif text-base font-semibold">
+              {{ activeCategory ? '此卷尚是空白' : '书页尚待落墨' }}
             </h3>
-            <p class="text-muted-foreground mt-2 max-w-sm text-sm">
+            <p class="text-muted-foreground mt-2 max-w-sm text-sm italic font-serif">
               {{
                 activeCategory
-                  ? '试试其他分类，或清空筛选查看全部文章。'
-                  : '新内容正在路上，过会儿再来看看吧。'
+                  ? '此卷尚无篇章，待你我来添一笔。'
+                  : '一切好故事，都从空白的扉页开始。'
               }}
             </p>
             <div class="mt-5 flex items-center gap-2">
@@ -201,14 +252,14 @@
                 class="border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg border px-4 py-2 text-sm font-medium"
                 @click="handleResetFilter"
               >
-                查看全部文章
+                翻看全卷
               </button>
               <router-link
                 v-if="user.isAuthenticated"
                 to="/blog/new"
                 class="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 text-sm font-semibold"
               >
-                写第一篇文章
+                落笔第一篇
               </router-link>
             </div>
           </div>
@@ -221,7 +272,7 @@
               :animate="{ opacity: 1, y: 0 }"
               :exit="{ opacity: 0, y: -12 }"
               :transition="{ duration: 0.25, ease: 'easeInOut' }"
-              class="space-y-6"
+              class="space-y-5"
             >
               <BlogListItem
                 v-for="(post, index) in posts"
@@ -346,6 +397,18 @@
             />
           </div>
         </div>
+      </div>
+
+      <!-- ──────────────────────────────────────────────────────────── -->
+      <!--  底部装饰：与 SettingsModal · ka·no·ci·fer 对齐              -->
+      <!-- ──────────────────────────────────────────────────────────── -->
+      <div
+        class="text-muted-foreground mt-12 flex items-center justify-between border-t border-border/50 pt-4 font-mono text-[10px] tracking-[0.2em] uppercase"
+      >
+        <span>Essays · 卷一</span>
+        <span class="font-serif italic normal-case tracking-normal"
+          >ka·no·ci·fer</span
+        >
       </div>
     </div>
   </BasicDetail>
@@ -513,34 +576,47 @@ watch(
   { immediate: true },
 );
 
+// ─────────────────────────────────────────────────────────────────
+// 文学手账头部文案：随笔录 / 卷·{分类}，对齐 BasicDetail 动态 title
+// ─────────────────────────────────────────────────────────────────
+const heroTitle = computed(() => {
+  return activeCategory.value ? `卷·${activeCategory.value}` : '随笔录';
+});
+
+const heroSubtitle = computed(() => {
+  return activeCategory.value
+    ? `Selected essays in ${activeCategory.value}`
+    : 'Essays on reading, thinking & quiet days';
+});
+
 useHead(() => ({
   title: activeCategory.value
-    ? `Category: ${activeCategory.value} - ReadingList Blog`
-    : 'ReadingList Blog - 阅读与分享',
+    ? `${activeCategory.value} - ReadingList 随笔录`
+    : 'ReadingList 随笔录 - 阅读 · 思考 · 慢时光',
   meta: [
     {
       name: 'description',
       content: activeCategory.value
-        ? `探索 ${activeCategory.value} 分类下的所有文章 - 个人阅读心得、技术分享、读书笔记`
-        : 'ReadingList 博客 - 分享个人阅读心得、技术文章、读书笔记，记录阅读的美好时光',
+        ? `阅读 ${activeCategory.value} 分类下的所有文章 - 个人阅读心得、技术分享、读书笔记`
+        : 'ReadingList 随笔录 - 分享个人阅读心得、技术文章、读书笔记，记录阅读的美好时光',
     },
     {
       name: 'keywords',
       content: activeCategory.value
         ? `${activeCategory.value}, 博客, 阅读, 技术分享, 读书笔记, ReadingList`
-        : '博客, 阅读, 技术分享, 读书笔记, ReadingList, 个人博客, 阅读心得',
+        : '博客, 阅读, 技术分享, 读书笔记, ReadingList, 个人博客, 阅读心得, 随笔',
     },
     {
       property: 'og:title',
       content: activeCategory.value
-        ? `${activeCategory.value} 分类文章 - ReadingList`
-        : 'ReadingList Blog',
+        ? `${activeCategory.value} 分类文章 - ReadingList 随笔录`
+        : 'ReadingList 随笔录',
     },
     {
       property: 'og:description',
       content: activeCategory.value
         ? `探索 ${activeCategory.value} 分类下的所有文章`
-        : 'ReadingList 博客 - 分享个人阅读心得、技术文章、读书笔记',
+        : 'ReadingList 随笔录 - 分享个人阅读心得、技术文章、读书笔记',
     },
     {
       property: 'og:type',
@@ -556,13 +632,13 @@ useHead(() => ({
       name: 'twitter:title',
       content: activeCategory.value
         ? `${activeCategory.value} 分类文章 - ReadingList`
-        : 'ReadingList Blog',
+        : 'ReadingList 随笔录',
     },
     {
       name: 'twitter:description',
       content: activeCategory.value
         ? `探索 ${activeCategory.value} 分类下的所有文章`
-        : 'ReadingList 博客 - 分享个人阅读心得、技术文章、读书笔记',
+        : 'ReadingList 随笔录 - 分享个人阅读心得、技术文章、读书笔记',
     },
   ],
 }));
