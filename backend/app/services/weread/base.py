@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from typing import Any, ClassVar
 
 import httpx
@@ -34,19 +35,26 @@ class WereadBaseService:
         user_id: int,
         api_name: str,
         extra: dict | None = None,
+        retries: int = 2,
     ) -> Any:
         header, payload = await self._build_http_payload(
             user_id, api_name, extra
         )
-        try:
-            timeout = httpx.Timeout(15.0)
-            async with httpx.AsyncClient(
-                timeout=timeout, headers=header
-            ) as client:
-                res = await client.post(self.base_url, json=payload)
-                res.raise_for_status()
-                return res.json()
-        except httpx.ConnectError:
-            raise ValueError("网络连接失败") from None
-        except httpx.HTTPError as exc:
-            raise ValueError(f"HTTP 请求失败: {exc!s}") from exc
+        last_exc: Exception | None = None
+        for attempt in range(retries + 1):
+            try:
+                timeout = httpx.Timeout(30.0)
+                async with httpx.AsyncClient(
+                    timeout=timeout, headers=header
+                ) as client:
+                    res = await client.post(self.base_url, json=payload)
+                    res.raise_for_status()
+                    return res.json()
+            except httpx.ConnectError:
+                raise ValueError("网络连接失败") from None
+            except httpx.HTTPError as exc:
+                last_exc = exc
+                if attempt < retries:
+                    await asyncio.sleep(1.0 * (attempt + 1))
+                    continue
+        raise ValueError(f"HTTP 请求失败: {last_exc!s}") from last_exc
