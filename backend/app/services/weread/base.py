@@ -4,7 +4,8 @@ import asyncio
 from typing import Any, ClassVar
 
 import httpx2
-from core.exceptions import APIError
+
+from app.core.exceptions import APIError
 
 
 class WereadBaseService:
