@@ -5,7 +5,7 @@ from __future__ import annotations
 import secrets
 from urllib.parse import urlencode
 
-import httpx
+import httpx2
 from fastapi import Request
 
 from app.core.config import settings
@@ -136,7 +136,7 @@ class GitHubAuthService:
         Raises GitHubAuthError on any failure (timeout, HTTP error, network error).
         """
         try:
-            async with httpx.AsyncClient() as client:
+            async with httpx2.AsyncClient() as client:
                 token_resp = await client.post(
                     "https://github.com/login/oauth/access_token",
                     json={
@@ -147,7 +147,7 @@ class GitHubAuthService:
                         "code_verifier": code_verifier,
                     },
                     headers={"Accept": "application/json"},
-                    timeout=httpx.Timeout(
+                    timeout=httpx2.Timeout(
                         connect=10.0, read=30.0, write=10.0, pool=5.0
                     ),
                     follow_redirects=True,
@@ -155,15 +155,15 @@ class GitHubAuthService:
                 token_resp.raise_for_status()
                 token_data = token_resp.json()
         except (
-            httpx.ReadTimeout,
-            httpx.ConnectTimeout,
-            httpx.PoolTimeout,
+            httpx2.ReadTimeout,
+            httpx2.ConnectTimeout,
+            httpx2.PoolTimeout,
         ) as e:
             raise GitHubAuthError("github_timeout") from e
-        except httpx.HTTPStatusError as e:
+        except httpx2.HTTPStatusError as e:
             logger.error(f"GitHub token exchange failed: {e.response.text}")
             raise GitHubAuthError("github_auth_failed") from e
-        except httpx.NetworkError as e:
+        except httpx2.NetworkError as e:
             logger.error(f"GitHub network error: {e!s}")
             raise GitHubAuthError("github_network_error") from e
         except ValueError as e:
@@ -184,11 +184,11 @@ class GitHubAuthService:
         Raises GitHubAuthError on any failure.
         """
         try:
-            async with httpx.AsyncClient() as client:
+            async with httpx2.AsyncClient() as client:
                 user_resp = await client.get(
                     "https://api.github.com/user",
                     headers={"Authorization": f"Bearer {access_token}"},
-                    timeout=httpx.Timeout(
+                    timeout=httpx2.Timeout(
                         connect=10.0, read=30.0, write=10.0, pool=5.0
                     ),
                     follow_redirects=True,
@@ -196,15 +196,15 @@ class GitHubAuthService:
                 user_resp.raise_for_status()
                 return user_resp.json()
         except (
-            httpx.ReadTimeout,
-            httpx.ConnectTimeout,
-            httpx.PoolTimeout,
+            httpx2.ReadTimeout,
+            httpx2.ConnectTimeout,
+            httpx2.PoolTimeout,
         ) as e:
             raise GitHubAuthError("github_timeout") from e
-        except httpx.HTTPStatusError as e:
+        except httpx2.HTTPStatusError as e:
             logger.error(f"GitHub user info failed: {e.response.text}")
             raise GitHubAuthError("github_user_info_failed") from e
-        except httpx.NetworkError as e:
+        except httpx2.NetworkError as e:
             logger.error(f"GitHub network error: {e!s}")
             raise GitHubAuthError("github_network_error") from e
         except ValueError as e:

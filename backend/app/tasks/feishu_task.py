@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 
-import httpx
+import httpx2
 from taskiq import (
     Context,
     TaskiqDepends,
@@ -108,10 +108,10 @@ async def send_feishu_message(
                 )
             )
             try:
-                async with httpx.AsyncClient(
-                    timeout=httpx.Timeout(10.0)
+                async with httpx2.AsyncClient(
+                    timeout=httpx2.Timeout(10.0)
                 ) as client:
-                    response: httpx.Response = await client.post(
+                    response: httpx2.Response = await client.post(
                         url=url, json=payload.model_dump()
                     )
                     response.raise_for_status()

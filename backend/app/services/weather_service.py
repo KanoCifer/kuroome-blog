@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
-import httpx
+import httpx2
 import orjson
 
 if TYPE_CHECKING:
@@ -41,19 +41,19 @@ class _QWeatherClient:
         headers = {"Authorization": f"Bearer {jwt}"}
 
         try:
-            async with httpx.AsyncClient() as client:
+            async with httpx2.AsyncClient() as client:
                 response = await client.get(
                     url, headers=headers, params=params
                 )
                 response.raise_for_status()
                 data = response.json()
-        except httpx.HTTPStatusError as exc:
+        except httpx2.HTTPStatusError as exc:
             response = exc.response
             raise WeatherDomainError(
                 f"QWeather API error: {response.status_code} - {response.text}",
                 response.status_code,
             ) from exc
-        except httpx.HTTPError as exc:
+        except httpx2.HTTPError as exc:
             raise WeatherDomainError(
                 f"Failed to fetch QWeather data: {exc!s}", 503
             ) from exc

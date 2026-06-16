@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 import feedparser
-import httpx
+import httpx2
 import orjson
 from bson import ObjectId
 from bson.errors import InvalidId
@@ -201,8 +201,9 @@ class RssService:
     ) -> dict[str, Any]:
         try:
             # 异步获取feed内容，带超时控制
-            async with httpx.AsyncClient(
-                timeout=httpx.Timeout(10.0, connect=5.0), follow_redirects=True
+            async with httpx2.AsyncClient(
+                timeout=httpx2.Timeout(10.0, connect=5.0),
+                follow_redirects=True,
             ) as client:
                 resp = await client.get(url)
                 resp.raise_for_status()
@@ -221,7 +222,7 @@ class RssService:
 
             feed_meta = _build_feed_meta(feed)
             feed_published_at = _parse_feed_published_datetime(feed)
-        except httpx.HTTPError as exc:
+        except httpx2.HTTPError as exc:
             raise RssDomainError(f"Failed to fetch feed: {exc}", 502) from exc
         except RssDomainError:
             raise

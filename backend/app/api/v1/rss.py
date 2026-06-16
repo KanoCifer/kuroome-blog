@@ -1,6 +1,6 @@
 from urllib.parse import urlparse
 
-import httpx
+import httpx2
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import Response
 
@@ -18,7 +18,7 @@ from app.services.rss_service import (
 )
 
 router = APIRouter(prefix="/rss", tags=["rss"])
-_IMAGE_PROXY_TIMEOUT = httpx.Timeout(15.0, connect=10.0)
+_IMAGE_PROXY_TIMEOUT = httpx2.Timeout(15.0, connect=10.0)
 _IMAGE_PROXY_MAX_BYTES = 10 * 1024 * 1024  # 10MB
 
 
@@ -35,12 +35,12 @@ async def proxy_rss_image(
         raise APIError(message="不允许访问该图片地址", code=400)
 
     try:
-        async with httpx.AsyncClient(
+        async with httpx2.AsyncClient(
             timeout=_IMAGE_PROXY_TIMEOUT,
             follow_redirects=True,
         ) as client:
             upstream = await client.get(url)
-    except httpx.HTTPError:
+    except httpx2.HTTPError:
         raise APIError(message="拉取图片失败", code=502) from None
 
     if upstream.status_code >= 400:

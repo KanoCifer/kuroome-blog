@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 from typing import Any, ClassVar
 
-import httpx
+import httpx2
 
 
 class WereadBaseService:
@@ -43,16 +43,16 @@ class WereadBaseService:
         last_exc: Exception | None = None
         for attempt in range(retries + 1):
             try:
-                timeout = httpx.Timeout(30.0)
-                async with httpx.AsyncClient(
+                timeout = httpx2.Timeout(30.0)
+                async with httpx2.AsyncClient(
                     timeout=timeout, headers=header
                 ) as client:
                     res = await client.post(self.base_url, json=payload)
                     res.raise_for_status()
                     return res.json()
-            except httpx.ConnectError:
+            except httpx2.ConnectError:
                 raise ValueError("网络连接失败") from None
-            except httpx.HTTPError as exc:
+            except httpx2.HTTPError as exc:
                 last_exc = exc
                 if attempt < retries:
                     await asyncio.sleep(1.0 * (attempt + 1))

@@ -17,6 +17,7 @@ dependencies = [
     "redis>=7.3.0",
     "requests>=2.32.5",
     "httpx>=0.28.1",
+    "httpx2[brotli,http2,socks]>=2.4.0",
     "sqlalchemy[asyncio]>=2.0.47",
     "typing-extensions>=4.15.0",
     "werkzeug>=3.1.6",

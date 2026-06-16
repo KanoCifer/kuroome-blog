@@ -1,4 +1,4 @@
-import httpx
+import httpx2
 
 from app.core.config import get_settings
 from app.core.logger import logger
@@ -37,8 +37,8 @@ class FeishuNotificationChannel(NotifierBase):
                 "content": {"text": message},
             }
 
-            async with httpx.AsyncClient(
-                timeout=httpx.Timeout(10.0)
+            async with httpx2.AsyncClient(
+                timeout=httpx2.Timeout(10.0)
             ) as client:
                 response = await client.post(
                     url=webhook_url, json=feishu_payload
@@ -100,8 +100,8 @@ class FeishuNotificationChannel(NotifierBase):
                 "content": {"text": message},
             }
 
-            async with httpx.AsyncClient(
-                timeout=httpx.Timeout(10.0)
+            async with httpx2.AsyncClient(
+                timeout=httpx2.Timeout(10.0)
             ) as client:
                 response = await client.post(
                     url=webhook_url, json=feishu_payload

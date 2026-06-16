@@ -6,7 +6,7 @@
 import asyncio
 from datetime import datetime
 
-import httpx
+import httpx2
 import pytest
 
 from app.core import get_settings
@@ -63,7 +63,7 @@ async def send_feishu_text_message(url: str, text: str) -> dict:
         content={"text": text},
     )
 
-    async with httpx.AsyncClient(timeout=httpx.Timeout(10.0)) as client:
+    async with httpx2.AsyncClient(timeout=httpx2.Timeout(10.0)) as client:
         response = await client.post(url, json=payload.model_dump())
         return {
             "status_code": response.status_code,
@@ -101,7 +101,7 @@ async def send_feishu_post_message(url: str, title: str, message: str) -> dict:
     }
     payload = FeishuRichTextContent(msg_type="post", content=content)
 
-    async with httpx.AsyncClient(timeout=httpx.Timeout(10.0)) as client:
+    async with httpx2.AsyncClient(timeout=httpx2.Timeout(10.0)) as client:
         response = await client.post(url, json=payload.model_dump())
         return {
             "status_code": response.status_code,

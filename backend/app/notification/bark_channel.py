@@ -1,4 +1,4 @@
-import httpx
+import httpx2
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
@@ -44,8 +44,8 @@ class BarkNotificationChannel(NotifierBase):
                 "sound": "alarm",
             }
 
-            async with httpx.AsyncClient(
-                timeout=httpx.Timeout(10.0)
+            async with httpx2.AsyncClient(
+                timeout=httpx2.Timeout(10.0)
             ) as client:
                 response = await client.post(url=url, json=bark_body)
                 response.raise_for_status()
@@ -117,8 +117,8 @@ class BarkNotificationChannel(NotifierBase):
                 "sound": "alarm",
             }
 
-            async with httpx.AsyncClient(
-                timeout=httpx.Timeout(10.0)
+            async with httpx2.AsyncClient(
+                timeout=httpx2.Timeout(10.0)
             ) as client:
                 response = await client.post(url=url, json=bark_body)
                 response.raise_for_status()

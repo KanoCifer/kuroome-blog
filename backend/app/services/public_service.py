@@ -4,7 +4,7 @@ import base64
 from datetime import UTC, datetime
 from xml.etree.ElementTree import Element, SubElement, tostring
 
-import httpx
+import httpx2
 import orjson
 from redis.asyncio import Redis as AsyncRedis
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -169,7 +169,7 @@ Sitemap: {sitemap_url}
             "city": city,
             "extensions": extensions,
         }
-        async with httpx.AsyncClient() as client:
+        async with httpx2.AsyncClient() as client:
             response = await client.get(url, params=params)
             data = response.json()
 
@@ -184,7 +184,7 @@ Sitemap: {sitemap_url}
             "location": location,
             "extensions": extensions,
         }
-        async with httpx.AsyncClient() as client:
+        async with httpx2.AsyncClient() as client:
             response = await client.get(url, params=params)
             return response.json()
 
