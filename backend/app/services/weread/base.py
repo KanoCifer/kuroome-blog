@@ -4,6 +4,7 @@ import asyncio
 from typing import Any, ClassVar
 
 import httpx2
+from core.exceptions import APIError
 
 
 class WereadBaseService:
@@ -51,10 +52,10 @@ class WereadBaseService:
                     res.raise_for_status()
                     return res.json()
             except httpx2.ConnectError:
-                raise ValueError("网络连接失败") from None
+                raise APIError("网络连接失败") from None
             except httpx2.HTTPError as exc:
                 last_exc = exc
                 if attempt < retries:
                     await asyncio.sleep(1.0 * (attempt + 1))
                     continue
-        raise ValueError(f"HTTP 请求失败: {last_exc!s}") from last_exc
+        raise APIError("请求失败，请稍后重试") from last_exc
