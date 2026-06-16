@@ -177,7 +177,8 @@ async function loadRealProgress(bookId: string): Promise<void> {
 }
 
 // ── 详情面板状态 (单例 — 与 BookShelf 共享) ────────────────
-const { selectedBook, isOpen, selectBook, close } = useWereadBookDetailSingleton();
+const { selectedBook, isOpen, selectBook, close } =
+  useWereadBookDetailSingleton();
 
 function handleCardClick(book: MockBook): void {
   // 转成 WereadUserBook 喂给 panel

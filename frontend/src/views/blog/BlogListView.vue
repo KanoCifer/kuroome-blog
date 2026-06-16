@@ -34,7 +34,7 @@
             type="search"
             placeholder="在字里行间，寻一句心动…"
             aria-label="搜索文章"
-            class="text-foreground placeholder:text-muted-foreground/70 placeholder:font-serif placeholder:italic focus:border-primary focus:ring-primary/20 border-border bg-card font-serif w-full rounded-xl border py-3 pr-10 pl-10 text-sm focus:ring-2 focus:outline-none"
+            class="text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:ring-primary/20 border-border bg-card w-full rounded-xl border py-3 pr-10 pl-10 font-serif text-sm placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             @keyup.enter="handleSearch"
           />
           <button
@@ -177,8 +177,10 @@
             <div
               class="border-primary/20 border-t-primary mb-5 h-12 w-12 animate-spin rounded-full border-4"
             ></div>
-            <h3 class="text-foreground text-base font-semibold">正在翻开新的一页…</h3>
-            <p class="text-muted-foreground mt-2 text-sm italic font-serif">
+            <h3 class="text-foreground text-base font-semibold">
+              正在翻开新的一页…
+            </h3>
+            <p class="text-muted-foreground mt-2 font-serif text-sm italic">
               Loading the latest pages
             </p>
           </div>
@@ -238,7 +240,9 @@
             <h3 class="text-foreground font-serif text-base font-semibold">
               {{ activeCategory ? '此卷尚是空白' : '书页尚待落墨' }}
             </h3>
-            <p class="text-muted-foreground mt-2 max-w-sm text-sm italic font-serif">
+            <p
+              class="text-muted-foreground mt-2 max-w-sm font-serif text-sm italic"
+            >
               {{
                 activeCategory
                   ? '此卷尚无篇章，待你我来添一笔。'
@@ -403,10 +407,10 @@
       <!--  底部装饰：与 SettingsModal · ka·no·ci·fer 对齐              -->
       <!-- ──────────────────────────────────────────────────────────── -->
       <div
-        class="text-muted-foreground mt-12 flex items-center justify-between border-t border-border/50 pt-4 font-mono text-[10px] tracking-[0.2em] uppercase"
+        class="text-muted-foreground border-border/50 mt-12 flex items-center justify-between border-t pt-4 font-mono text-[10px] tracking-[0.2em] uppercase"
       >
         <span>Essays · 卷一</span>
-        <span class="font-serif italic normal-case tracking-normal"
+        <span class="font-serif tracking-normal normal-case italic"
           >ka·no·ci·fer</span
         >
       </div>

@@ -1,7 +1,4 @@
-import type {
-  ReadDetailSnapshot,
-  ReadStatsMode,
-} from '@/api/wereadGateway';
+import type { ReadDetailSnapshot, ReadStatsMode } from '@/api/wereadGateway';
 import { formatDuration } from '@/utils/format/duration';
 import type { ComputedRef, Ref } from 'vue';
 import { computed } from 'vue';

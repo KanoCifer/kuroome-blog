@@ -73,9 +73,7 @@
           <line x1="12" y1="17" x2="12.01" y2="17" />
         </svg>
       </div>
-      <h3 class="text-foreground font-serif text-xl font-bold">
-        书架加载失败
-      </h3>
+      <h3 class="text-foreground font-serif text-xl font-bold">书架加载失败</h3>
       <p class="text-muted-foreground mt-2 text-sm">
         {{ errorMessage }}
       </p>
@@ -133,13 +131,8 @@
         <rect x="68" y="16" width="10" height="44" rx="1.2" />
       </svg>
       <h3 class="text-foreground font-serif text-xl font-bold">暂无书籍</h3>
-      <p class="text-muted-foreground mt-2 text-sm">
-        你的微信读书书架还是空的
-      </p>
-      <div
-        v-if="$slots['empty-action']"
-        class="mt-6 flex justify-center"
-      >
+      <p class="text-muted-foreground mt-2 text-sm">你的微信读书书架还是空的</p>
+      <div v-if="$slots['empty-action']" class="mt-6 flex justify-center">
         <slot name="empty-action" />
       </div>
     </div>

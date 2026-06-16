@@ -21,14 +21,14 @@
           aria-hidden="true"
         />
 
-        <div
-          :class="[
-            'flex gap-5 sm:gap-7',
-            isFeatured ? 'sm:gap-9' : '',
-          ]"
-        >
+        <div :class="['flex gap-5 sm:gap-7', isFeatured ? 'sm:gap-9' : '']">
           <!-- 封面：杂志感 3:4；featured 用 lg，其余 md -->
-          <div :class="['shrink-0', isFeatured ? 'sm:w-56 lg:w-64' : 'w-32 sm:w-44']">
+          <div
+            :class="[
+              'shrink-0',
+              isFeatured ? 'sm:w-56 lg:w-64' : 'w-32 sm:w-44',
+            ]"
+          >
             <BlogCover
               :cover="post.cover ?? null"
               :title="post.title"
@@ -69,10 +69,7 @@
                 {{ post.category.name }}
               </span>
               <span aria-hidden="true" class="text-border">·</span>
-              <time
-                class="tabular-nums"
-                :datetime="post.created_at"
-              >
+              <time class="tabular-nums" :datetime="post.created_at">
                 {{ formatDate(post.created_at) }}
               </time>
             </div>
@@ -109,7 +106,7 @@
               :class="[
                 'text-foreground/75 leading-relaxed',
                 isFeatured
-                  ? 'line-clamp-3 sm:line-clamp-4 mt-1 text-sm sm:text-[15px]'
+                  ? 'mt-1 line-clamp-3 text-sm sm:line-clamp-4 sm:text-[15px]'
                   : 'line-clamp-2 text-sm',
               ]"
             >

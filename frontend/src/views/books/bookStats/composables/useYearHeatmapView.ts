@@ -117,15 +117,7 @@ export function useYearHeatmapView(
       const dateStr = cursor.format('YYYY-MM-DD');
       const secs = dayValue[dateStr] ?? 0;
       const level: 0 | 1 | 2 | 3 | 4 =
-        secs <= 0
-          ? 0
-          : secs <= q1
-            ? 1
-            : secs <= q2
-              ? 2
-              : secs <= q3
-                ? 3
-                : 4;
+        secs <= 0 ? 0 : secs <= q1 ? 1 : secs <= q2 ? 2 : secs <= q3 ? 3 : 4;
       weeks[wIdx][dOfW] = { date: dateStr, level, secs };
       if (secs > 0) totalActiveDays++;
       const m = cursor.month() + 1;

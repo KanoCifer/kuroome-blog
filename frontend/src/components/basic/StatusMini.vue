@@ -43,7 +43,9 @@
           class="text-foreground/80 font-mono text-[11px] tracking-[0.1em] uppercase"
           >{{ row.label }}</span
         >
-        <span class="text-muted-foreground/70 text-[11px]">{{ row.status }}</span>
+        <span class="text-muted-foreground/70 text-[11px]">{{
+          row.status
+        }}</span>
         <span
           class="text-foreground ml-auto font-mono text-[12px] tabular-nums"
           >{{ row.value }}</span
@@ -54,10 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  fetchStatusDetail,
-  type StatusDetailData,
-} from '@/api/statusGateway';
+import { fetchStatusDetail, type StatusDetailData } from '@/api/statusGateway';
 import { connectionDelay, isConnected, sendPing } from '@/plugins/visitorWs';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 

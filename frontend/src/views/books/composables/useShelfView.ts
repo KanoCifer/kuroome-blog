@@ -72,7 +72,10 @@ function sortByRecent(a: WereadUserBook, b: WereadUserBook): number {
   return tb - ta;
 }
 
-const SORTERS: Record<ShelfSort, (a: WereadUserBook, b: WereadUserBook) => number> = {
+const SORTERS: Record<
+  ShelfSort,
+  (a: WereadUserBook, b: WereadUserBook) => number
+> = {
   title: sortByTitle,
   author: sortByAuthor,
   recent: sortByRecent,

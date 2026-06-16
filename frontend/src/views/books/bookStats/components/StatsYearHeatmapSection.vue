@@ -20,14 +20,8 @@ const heatmapRef = toRef(props, 'heatmap');
 const yearRef = toRef(props, 'year');
 const modeRef = toRef(props, 'mode');
 
-const {
-  hasData,
-  subtitle,
-  view,
-  totalActiveDays,
-  maxSeconds,
-  formatDuration,
-} = useYearHeatmapView(heatmapRef, yearRef, modeRef);
+const { hasData, subtitle, view, totalActiveDays, maxSeconds, formatDuration } =
+  useYearHeatmapView(heatmapRef, yearRef, modeRef);
 
 // ── 显示常量 ──────────────────────────────────────────────
 // 仅显示 Mon / Wed / Fri,与 GitHub contribution graph 一致;
@@ -95,7 +89,7 @@ function onCellLeave() {
     </p>
 
     <div
-      class="border-border overflow-x-auto rounded-lg border bg-card/50 p-3 sm:p-4"
+      class="border-border bg-card/50 overflow-x-auto rounded-lg border p-3 sm:p-4"
       role="img"
       :aria-label="`${year}年阅读足迹,共${totalActiveDays}天有阅读`"
     >
@@ -143,7 +137,7 @@ function onCellLeave() {
             <div
               v-for="(cell, di) in week"
               :key="`c-${wi}-${di}`"
-              class="aspect-square cursor-help rounded-[2px] transition-transform hover:scale-125 hover:z-10"
+              class="aspect-square cursor-help rounded-[2px] transition-transform hover:z-10 hover:scale-125"
               :class="cellClass(cell)"
               :style="{ gridColumn: wi + 2, gridRow: di + 2 }"
               :title="cell ? formatTooltipDate(cell.date) : ''"

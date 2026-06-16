@@ -31,16 +31,66 @@ const schemes: {
   colors: string[];
   desc: string;
 }[] = [
-  { value: 'sky-blue', label: 'Sky Blue', colors: ['#3b82f6', '#0ea5e9', '#6366f1'], desc: '高远澄澈 · 3 色' },
-  { value: 'forest-green', label: 'Forest Green', colors: ['#16a34a', '#0d9488', '#65a30d'], desc: '林深时见 · 3 色' },
-  { value: 'paper', label: 'Paper · 纸', colors: ['#c8713a', '#5a7a62', '#8a653f'], desc: '落纸烟云 · 3 色' },
-  { value: 'sage', label: 'Sage', colors: ['#4d6f57', '#8b7146', '#5e7072'], desc: '清隽素雅 · 3 色' },
-  { value: 'mist', label: 'Mist', colors: ['#4f687a', '#5d7569', '#927255'], desc: '烟岚氤氲 · 3 色' },
-  { value: 'blush', label: 'Blush', colors: ['#a5656f', '#6a7866', '#a06d4f'], desc: '桃夭未央 · 3 色' },
-  { value: 'spring', label: '春暖 Spring', colors: ['#35bfab', '#f59e0b', '#10b981'], desc: '万物生发 · 3 色' },
-  { value: 'autumn', label: '秋实 Autumn', colors: ['#de4331', '#eab308', '#3b82f6'], desc: '橙黄橘绿 · 3 色' },
-  { value: 'clear-sky', label: '晴空 Clear Sky', colors: ['#2fcbe7', '#eab308', '#ffffff'], desc: '万里无云 · 3 色' },
-  { value: 'midnight', label: '深夜 Midnight', colors: ['#2a48f3'], desc: '独坐幽篁 · 1 色' },
+  {
+    value: 'sky-blue',
+    label: 'Sky Blue',
+    colors: ['#3b82f6', '#0ea5e9', '#6366f1'],
+    desc: '高远澄澈 · 3 色',
+  },
+  {
+    value: 'forest-green',
+    label: 'Forest Green',
+    colors: ['#16a34a', '#0d9488', '#65a30d'],
+    desc: '林深时见 · 3 色',
+  },
+  {
+    value: 'paper',
+    label: 'Paper · 纸',
+    colors: ['#c8713a', '#5a7a62', '#8a653f'],
+    desc: '落纸烟云 · 3 色',
+  },
+  {
+    value: 'sage',
+    label: 'Sage',
+    colors: ['#4d6f57', '#8b7146', '#5e7072'],
+    desc: '清隽素雅 · 3 色',
+  },
+  {
+    value: 'mist',
+    label: 'Mist',
+    colors: ['#4f687a', '#5d7569', '#927255'],
+    desc: '烟岚氤氲 · 3 色',
+  },
+  {
+    value: 'blush',
+    label: 'Blush',
+    colors: ['#a5656f', '#6a7866', '#a06d4f'],
+    desc: '桃夭未央 · 3 色',
+  },
+  {
+    value: 'spring',
+    label: '春暖 Spring',
+    colors: ['#35bfab', '#f59e0b', '#10b981'],
+    desc: '万物生发 · 3 色',
+  },
+  {
+    value: 'autumn',
+    label: '秋实 Autumn',
+    colors: ['#de4331', '#eab308', '#3b82f6'],
+    desc: '橙黄橘绿 · 3 色',
+  },
+  {
+    value: 'clear-sky',
+    label: '晴空 Clear Sky',
+    colors: ['#2fcbe7', '#eab308', '#ffffff'],
+    desc: '万里无云 · 3 色',
+  },
+  {
+    value: 'midnight',
+    label: '深夜 Midnight',
+    colors: ['#2a48f3'],
+    desc: '独坐幽篁 · 1 色',
+  },
 ];
 </script>
 
@@ -67,14 +117,14 @@ const schemes: {
         </div>
         <div
           class="h-6 w-11 rounded-full p-0.5 transition-colors"
-          :class="
-            themeStore.showFooter === 'true' ? 'bg-primary' : 'bg-muted'
-          "
+          :class="themeStore.showFooter === 'true' ? 'bg-primary' : 'bg-muted'"
         >
           <div
             class="bg-card h-5 w-5 rounded-full shadow-md transition-transform"
             :class="
-              themeStore.showFooter === 'true' ? 'translate-x-5' : 'translate-x-0'
+              themeStore.showFooter === 'true'
+                ? 'translate-x-5'
+                : 'translate-x-0'
             "
           />
         </div>
@@ -124,7 +174,9 @@ const schemes: {
 
     <!-- 字体 -->
     <div>
-      <h2 class="text-foreground mb-1 font-serif text-lg font-semibold">字体</h2>
+      <h2 class="text-foreground mb-1 font-serif text-lg font-semibold">
+        字体
+      </h2>
       <p class="text-muted-foreground mb-4 text-xs italic">Reading font</p>
 
       <div class="grid grid-cols-2 gap-3">
@@ -145,7 +197,7 @@ const schemes: {
           >
             默认字体
           </span>
-          <span class="text-muted-foreground text-[10px] font-mono">
+          <span class="text-muted-foreground font-mono text-[10px]">
             PingFang SC
           </span>
         </button>
@@ -164,7 +216,9 @@ const schemes: {
           >
             HarmonyOS Sans
           </span>
-          <span class="text-muted-foreground text-[10px] font-mono">鸿蒙字体</span>
+          <span class="text-muted-foreground font-mono text-[10px]"
+            >鸿蒙字体</span
+          >
         </button>
       </div>
     </div>
@@ -190,10 +244,7 @@ const schemes: {
               : 'border-border bg-card hover:border-primary'
           "
         >
-          <div
-            v-if="scheme.colors.length > 1"
-            class="flex w-[72px] flex-col"
-          >
+          <div v-if="scheme.colors.length > 1" class="flex w-[72px] flex-col">
             <div
               v-for="(color, i) in scheme.colors"
               :key="i"

@@ -11,10 +11,10 @@
         :align="'end'"
         :side-offset="8"
         :collision-padding="12"
-        class="z-[100] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 w-[420px] rounded-lg outline-none"
+        class="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 z-[100] w-[420px] rounded-lg outline-none"
       >
         <div
-          class="bg-popover/95 supports-[backdrop-filter]:bg-popover/80 overflow-hidden rounded-lg border border-border/60 shadow-xl backdrop-blur-md"
+          class="bg-popover/95 supports-[backdrop-filter]:bg-popover/80 border-border/60 overflow-hidden rounded-lg border shadow-xl backdrop-blur-md"
         >
           <header
             class="border-border/40 bg-muted/30 flex items-center gap-2.5 border-b px-3 py-2"
@@ -25,7 +25,7 @@
               <span class="h-2 w-2 rounded-full bg-emerald-400/70" />
             </div>
             <span
-              class="text-foreground/80 font-serif text-[12px] italic tracking-wide"
+              class="text-foreground/80 font-serif text-[12px] tracking-wide italic"
               >Service Status</span
             >
             <span

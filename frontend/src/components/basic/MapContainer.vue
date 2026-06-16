@@ -375,7 +375,11 @@ const wgs84ToGcj02 = (lng: number, lat: number): Promise<[number, number]> => {
   return new Promise((resolve, reject) => {
     const AMap = (window as unknown as { AMap: AMapWithPlugins }).AMap;
     AMap.convertFrom([lng, lat], 'gps', (status, result) => {
-      if (status !== 'complete' || typeof result === 'string' || !result.locations.length) {
+      if (
+        status !== 'complete' ||
+        typeof result === 'string' ||
+        !result.locations.length
+      ) {
         // 转换失败时降级返回原始坐标,不阻断流程
         resolve([lng, lat]);
         return;

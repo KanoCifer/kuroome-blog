@@ -167,7 +167,12 @@ export type WereadReadProgressData =
  * 加新 mode 时:push 到这个数组,Record<ReadStatsMode, T> 仍需手动同步 4-mode 形状
  * (这是 issue 06 的工作,4 mode 下不划算)。
  */
-export const READ_STATS_MODES = ['weekly', 'monthly', 'annually', 'overall'] as const;
+export const READ_STATS_MODES = [
+  'weekly',
+  'monthly',
+  'annually',
+  'overall',
+] as const;
 
 export type ReadStatsMode = (typeof READ_STATS_MODES)[number];
 
@@ -204,9 +209,7 @@ export interface WereadGateway {
     baseTime?: number | null,
   ): Promise<ApiResponse<WereadReadProgressData>>;
   /** 年视图日历热力图:拉取指定年份每日的阅读时长(秒) */
-  getYearlyHeatmap(
-    year?: number,
-  ): Promise<ApiResponse<WereadYearlyHeatmap>>;
+  getYearlyHeatmap(year?: number): Promise<ApiResponse<WereadYearlyHeatmap>>;
   getBookProgress(
     bookId: string,
     refresh?: boolean,

@@ -20,8 +20,7 @@ export interface FlatLongestItem {
 
 function flattenItem(item: ReadDetailRawLongestItem): FlatLongestItem {
   const info: Record<string, unknown> =
-    (item.book as unknown as Record<string, unknown>) ??
-    (item.albumInfo ?? {});
+    (item.book as unknown as Record<string, unknown>) ?? item.albumInfo ?? {};
   return {
     bookId: (info.bookId as string) ?? null,
     title: (info.title as string) ?? null,
@@ -35,7 +34,9 @@ function flattenItem(item: ReadDetailRawLongestItem): FlatLongestItem {
 /**
  * 段落二(让你停不下来的是)——最长阅读 top 5 排序与条形占比。
  */
-export function useLongestView(snapshot: ComputedRef<Snapshot> | Ref<Snapshot>) {
+export function useLongestView(
+  snapshot: ComputedRef<Snapshot> | Ref<Snapshot>,
+) {
   const topBooks = computed(() => {
     const items = snapshot.value?.readLongest ?? [];
     return [...items]

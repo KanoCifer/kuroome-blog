@@ -80,7 +80,9 @@ const latestBook = computed<{ title: string | null } | null>(() => {
   if (!s?.readLongest?.length) return null;
   const item = s.readLongest[0];
   const info = item.book ?? item.albumInfo ?? {};
-  return { title: (info as Record<string, unknown>)?.title as string | null ?? null };
+  return {
+    title: ((info as Record<string, unknown>)?.title as string | null) ?? null,
+  };
 });
 
 /**

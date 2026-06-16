@@ -101,11 +101,7 @@
     </div>
 
     <!-- 详情面板 -->
-    <WereadBookDetailPanel
-      :book="selectedBook"
-      :open="isOpen"
-      @close="close"
-    />
+    <WereadBookDetailPanel :book="selectedBook" :open="isOpen" @close="close" />
   </div>
 </template>
 
@@ -136,7 +132,8 @@ const {
 } = useWereadShelf();
 
 // ── 详情面板状态 (单例 — 整个应用共享同一份) ────────────────
-const { selectedBook, isOpen, selectBook, close } = useWereadBookDetailSingleton();
+const { selectedBook, isOpen, selectBook, close } =
+  useWereadBookDetailSingleton();
 
 // ── 视图状态机: 偏好 / 分桶 / 排序 / 派生 UI ───────────────
 const {

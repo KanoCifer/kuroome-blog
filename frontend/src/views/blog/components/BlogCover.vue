@@ -2,7 +2,7 @@
   <div
     :class="[
       'relative overflow-hidden rounded-xl',
-      'border border-border/60 bg-muted',
+      'border-border/60 bg-muted border',
       sizeClasses,
     ]"
   >
@@ -48,9 +48,7 @@
       </div>
 
       <!-- 底部：标题（衬线）+ 装饰小线 + 副标斜体 -->
-      <div
-        class="absolute inset-x-0 bottom-0 flex flex-col gap-1.5 p-3 sm:p-4"
-      >
+      <div class="absolute inset-x-0 bottom-0 flex flex-col gap-1.5 p-3 sm:p-4">
         <div class="flex items-center gap-1.5">
           <div class="bg-primary-foreground/70 h-px w-5" />
           <span
@@ -111,13 +109,20 @@ const seedHash = computed(() => {
 // picsum 占位：3:4 比例，按 size 选合适分辨率
 const placeholderUrl = computed(() => {
   const [w, h] =
-    props.size === 'lg' ? [600, 800] : props.size === 'sm' ? [300, 400] : [400, 533];
+    props.size === 'lg'
+      ? [600, 800]
+      : props.size === 'sm'
+        ? [300, 400]
+        : [400, 533];
   return `https://picsum.photos/seed/${seedHash.value}/${w}/${h}`;
 });
 
 // 章节序号 No.001 / No.002 ... 稳定来自 seed
 const chapterLabel = computed(() => {
-  const n = (Number.parseInt(seedHash.value.replace(/\D/g, '').slice(0, 4) || '0', 36) % 999) + 1;
+  const n =
+    (Number.parseInt(seedHash.value.replace(/\D/g, '').slice(0, 4) || '0', 36) %
+      999) +
+    1;
   return `No.${String(n).padStart(3, '0')}`;
 });
 

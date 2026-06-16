@@ -5,11 +5,7 @@
  * - FishingFeedback*：用户提交的体验反馈
  * - WeatherAnalysisPayload：喂给 <WeatherAnalysis> AI 分析的聚合 view-model
  */
-import type {
-  TideData,
-  WeatherDay,
-  WeatherNow,
-} from '@/types/weather';
+import type { TideData, WeatherDay, WeatherNow } from '@/types/weather';
 
 export type FishingLevel = '爆护' | '好' | '一般' | '差' | '空军';
 export type FishingIndexLevel = FishingLevel | '极好';

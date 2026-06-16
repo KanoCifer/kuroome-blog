@@ -48,10 +48,7 @@ export function useFishingRoute(getMap: () => FishingMapInstance | null) {
   // 串行化守卫：每次 planFromMarker 递增，旧的 await 在 finally/错误分支被吞掉
   let routeSeq = 0;
 
-  async function planFromMarker(
-    index: number,
-    spot: MapMarker,
-  ): Promise<void> {
+  async function planFromMarker(index: number, spot: MapMarker): Promise<void> {
     const map = getMap();
     if (!map) return;
 

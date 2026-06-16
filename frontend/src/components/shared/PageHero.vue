@@ -90,18 +90,16 @@ const heightClass = computed(() =>
           {{ title }}
         </h1>
         <div v-if="eyebrow || subtitle" class="mt-2 flex items-center gap-3">
-          <span
-            v-if="eyebrow"
-            class="text-sm text-white/75 md:text-base"
-          >{{ eyebrow }}</span>
+          <span v-if="eyebrow" class="text-sm text-white/75 md:text-base">{{
+            eyebrow
+          }}</span>
           <span
             v-if="eyebrow && subtitle"
             class="h-1 w-1 rounded-full bg-white/40"
           />
-          <span
-            v-if="subtitle"
-            class="text-sm text-white/75 md:text-base"
-          >{{ subtitle }}</span>
+          <span v-if="subtitle" class="text-sm text-white/75 md:text-base">{{
+            subtitle
+          }}</span>
         </div>
       </slot>
     </div>

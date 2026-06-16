@@ -4,7 +4,10 @@ import { BookOpen, Eye, EyeOff, Loader, RefreshCw, X } from '@lucide/vue';
 import { AnimatePresence, motion } from 'motion-v';
 import type { WereadBookProgress, WereadUserBook } from '@/api/wereadGateway';
 import { useWereadBookProgress } from '../composables/useWereadBookProgress';
-import { deterministicCoverGradient, formatProgressPercent } from './utils/format';
+import {
+  deterministicCoverGradient,
+  formatProgressPercent,
+} from './utils/format';
 import { formatDuration } from '@/utils/format/duration';
 import { formatRelative } from '@/utils/format/relative';
 
@@ -174,9 +177,7 @@ const coverGradient = computed(() =>
                 >
                   {{ book.title }}
                 </h2>
-                <p
-                  class="text-muted-foreground text-base"
-                >
+                <p class="text-muted-foreground text-base">
                   {{ book.author }}
                 </p>
               </div>
