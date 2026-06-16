@@ -6,18 +6,20 @@ export interface WereadUserInfo {
 }
 
 export interface WereadUserBook {
-  id: string;
-  user_id: number;
+  id?: string;
+  user_id?: number;
   bookId: string;
   title: string;
   author: string;
   cover: string | null;
+  category: string | null;
   isTop: boolean;
-  readUpdateTime: string | null;
+  readUpdateTime: number | null;
+  updateTime: number | null;
   finishReading: boolean;
   secret: boolean;
   readProgress: WereadBookProgress | null;
-  updated_at: string;
+  updated_at?: string;
 }
 
 export interface WereadArchive {
@@ -196,9 +198,7 @@ export interface WereadGateway {
   saveUserInfo(apiKey: string): Promise<ApiResponse<null>>;
   getUserShelf(): Promise<ApiResponse<WereadShelfData>>;
   getBookInfo(bookId: string): Promise<ApiResponse<WereadBookDetail>>;
-  syncMyBooks(
-    force?: boolean,
-  ): Promise<ApiResponse<{ imported_count: number }>>;
+  syncMyBooks(): Promise<ApiResponse<{ imported_count: number }>>;
   getReadProgress(
     mode: ReadStatsMode,
     baseTime?: number | null,
@@ -245,12 +245,10 @@ export const wereadGateway: WereadGateway = {
     return res.data;
   },
 
-  async syncMyBooks(
-    force = false,
-  ): Promise<ApiResponse<{ imported_count: number }>> {
+  async syncMyBooks(): Promise<ApiResponse<{ imported_count: number }>> {
     const res = await request.get<ApiResponse<{ imported_count: number }>>(
       'v2/weread/sync-my-books',
-      { timeout: 60000, params: { force } },
+      { timeout: 60000 },
     );
     return res.data;
   },

@@ -67,8 +67,8 @@ function sortByAuthor(a: WereadUserBook, b: WereadUserBook): number {
 /** "recent": isTop 置顶,其余按 readUpdateTime DESC,空排末尾 */
 function sortByRecent(a: WereadUserBook, b: WereadUserBook): number {
   if (a.isTop !== b.isTop) return a.isTop ? -1 : 1;
-  const ta = a.readUpdateTime ? dayjs(a.readUpdateTime).valueOf() : 0;
-  const tb = b.readUpdateTime ? dayjs(b.readUpdateTime).valueOf() : 0;
+  const ta = a.readUpdateTime ? dayjs(a.readUpdateTime * 1000).valueOf() : 0;
+  const tb = b.readUpdateTime ? dayjs(b.readUpdateTime * 1000).valueOf() : 0;
   return tb - ta;
 }
 

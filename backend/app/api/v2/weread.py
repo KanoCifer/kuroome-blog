@@ -4,11 +4,10 @@ from typing import Literal
 
 from fastapi import APIRouter, Depends, Query
 
-from app.core.logger import logger
-
 from app.api.des.auth import manager
 from app.api.des.des import weread_service_dep
 from app.core.exceptions import APIError
+from app.core.logger import logger
 from app.core.response import APIResponse
 from app.plugins.cache import redis_cache
 from app.schemas.weread import SaveUserInfoIn
@@ -31,12 +30,12 @@ async def save_user_info(
 
 
 @router.get("/bookshelf")
-@redis_cache(exclude=["weread_service"])
+@redis_cache(ttl=60, exclude=["weread_service"])
 async def get_user_shelf(
     current_user: int = Depends(manager),
     weread_service=Depends(weread_service_dep),
 ):
-    """获取用户书架信息"""
+    """获取用户书架信息（代理远端，60s 缓存）"""
     try:
         user_books_data, archives_data = await weread_service.get_user_shelf(
             current_user
@@ -56,11 +55,12 @@ async def get_user_shelf(
 @router.get("/book/{bookId}")
 async def get_book_info(
     bookId: str,
+    current_user: int = Depends(manager),
     weread_service=Depends(weread_service_dep),
 ):
-    """获取书籍信息"""
+    """获取书籍信息（本地优先，miss 时从远端拉取）"""
     try:
-        book = await weread_service.get_book_info(bookId)
+        book = await weread_service.get_book_info(bookId, user_id=current_user)
     except ValueError:
         raise APIError(message="Invalid book ID") from None
     return APIResponse(
@@ -110,12 +110,11 @@ async def get_book_progress(
 async def sync_my_books(
     current_user: int = Depends(manager),
     weread_service=Depends(weread_service_dep),
-    force: bool = False,
 ):
-    """从远端同步我的书籍，force=true 时强制重新拉取所有书籍详情"""
+    """从远端同步我的书籍（仅持久化书架数据，详情按需获取）"""
     try:
         count = await weread_service.sync_my_books(
-            current_user, force=force
+            current_user
         )
     except ValueError:
         raise APIError(message="Invalid user ID") from None

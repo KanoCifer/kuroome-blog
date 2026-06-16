@@ -10,7 +10,6 @@ class UserBookRepo:
     async def save_user_books_bulk(
         self,
         user_books: list[UserBook],
-        book_map: dict | None = None,
     ) -> list[UserBook]:
         """批量保存用户书籍，按 (user_id, bookId) 去重
 
@@ -29,17 +28,18 @@ class UserBookRepo:
         updated = []
         new_books: list[UserBook] = []
         for ub in user_books:
-            if book_map and ub.bookId in book_map:
-                ub.bookInfo = book_map[ub.bookId]  # type: ignore[assignment]
             key = (ub.user_id, ub.bookId)
             if key in existing_map:
                 doc = existing_map[key]
+                doc.title = ub.title
+                doc.author = ub.author
+                doc.cover = ub.cover
+                doc.category = ub.category
                 doc.readUpdateTime = ub.readUpdateTime
+                doc.updateTime = ub.updateTime
                 doc.finishReading = ub.finishReading
                 doc.secret = ub.secret
                 doc.isTop = ub.isTop
-                if book_map and ub.bookId in book_map:
-                    doc.bookInfo = book_map[ub.bookId]  # type: ignore[assignment]
                 await doc.save()
                 updated.append(doc)
             else:
@@ -57,12 +57,15 @@ class UserBookRepo:
                     UserBook.bookId == ub.bookId,
                 )
                 if existing_doc:
+                    existing_doc.title = ub.title
+                    existing_doc.author = ub.author
+                    existing_doc.cover = ub.cover
+                    existing_doc.category = ub.category
                     existing_doc.readUpdateTime = ub.readUpdateTime
+                    existing_doc.updateTime = ub.updateTime
                     existing_doc.finishReading = ub.finishReading
                     existing_doc.secret = ub.secret
                     existing_doc.isTop = ub.isTop
-                    if book_map and ub.bookId in book_map:
-                        existing_doc.bookInfo = book_map[ub.bookId]  # type: ignore[assignment]
                     await existing_doc.save()
                     inserted.append(existing_doc)
                     logger.warning(

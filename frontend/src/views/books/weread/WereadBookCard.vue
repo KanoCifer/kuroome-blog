@@ -60,7 +60,7 @@ const statusLabel = computed(() =>
 const statusLine = computed(() => {
   if (props.book.finishReading) return '已读完';
   if (!props.book.readUpdateTime) return '尚未翻开';
-  const ts = dayjs(props.book.readUpdateTime);
+  const ts = dayjs(props.book.readUpdateTime * 1000);
   if (!ts.isValid()) return '在读';
   const diffD = dayjs().diff(ts, 'day');
   if (diffD === 0) return '今天还在读';

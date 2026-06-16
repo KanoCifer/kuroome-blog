@@ -68,10 +68,15 @@ class ReadProgress(BaseModel):
 class UserBook(Document):
     user_id: Annotated[int, Indexed()]
     bookId: str
+    title: str | None = None
+    author: str | None = None
+    cover: str | None = None
+    category: str | None = None
     bookInfo: Link[WereadBook] | None = None
     readProgress: ReadProgress | None = None
     isTop: bool = False
     readUpdateTime: int | None = None
+    updateTime: int | None = None
     finishReading: bool = False
     secret: bool = False
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import re
 
 from app.core.logger import logger
@@ -27,23 +26,64 @@ class WereadShelfService(WereadBaseService):
 
     # ── 书籍信息 ──────────────────────────────────────────────────
 
-    async def get_book_info(self, book_id: str):
+    async def get_book_info(self, book_id: str, user_id: int | None = None):
+        """获取书籍信息，本地优先，miss 时从远端拉取并缓存。
+
+        Args:
+            book_id: 微信读书 bookId
+            user_id: 提供 user_id 时，本地 miss 可触发远端拉取
+        """
         book = await self.repo.get_book_info(book_id)
-        if not book:
+        if book:
+            return book
+        # 本地 miss：有 user_id 才能调远端
+        if user_id is None:
             raise ValueError("书籍信息不存在")
-        return book
+        try:
+            raw = await self._send_http_request(
+                user_id=user_id,
+                api_name="/book/info",
+                extra={"bookId": book_id},
+            )
+        except ValueError:
+            raise ValueError("书籍信息不存在") from None
+        info = map_book_info(raw)
+        weread_book = WereadBook(**info)
+        await weread_book.insert()
+        logger.info(f"[book-info] lazy fetch & cached: bookId={book_id}")
+        return weread_book
 
     # ── 书架 ──────────────────────────────────────────────────────
 
     async def get_user_shelf(self, user_id: int):
-        user_books, archives = await self.repo.get_user_shelf(user_id)
-        # 把 bookInfo 嵌套字段拍平到顶层，匹配前端 WereadUserBook 扁平契约
-        book_data = []
-        for b in user_books:
-            data = b.model_dump(mode="json", by_alias=True)
-            info = data.pop("bookInfo", None) or {}
-            data.update(info)
-            book_data.append(data)
+        """实时获取用户书架：代理 /shelf/sync，顺手持久化到 MongoDB。
+
+        返回 (books_data, archives_data)，供 API 层直接返回。
+        """
+        raw = await self._send_http_request(
+            user_id=user_id, api_name="/shelf/sync"
+        )
+        shelf_books, archives = parse_shelf_books(raw)
+
+        # 顺便持久化（不阻塞返回，但当前是同步写）
+        await self._persist_shelf(user_id, shelf_books, archives)
+
+        # 返回给前端的扁平结构
+        book_data = [
+            {
+                "bookId": b["bookId"],
+                "title": b.get("title"),
+                "author": b.get("author"),
+                "cover": b.get("cover"),
+                "category": b.get("category"),
+                "readUpdateTime": b.get("readUpdateTime"),
+                "updateTime": b.get("updateTime"),
+                "finishReading": b.get("finishReading", False),
+                "secret": b.get("secret", False),
+                "isTop": b.get("isTop", False),
+            }
+            for b in shelf_books
+        ]
         return book_data, archives
 
     async def save_user_book(self, user_book_info):
@@ -52,14 +92,12 @@ class WereadShelfService(WereadBaseService):
     async def save_user_archive(self, archive_info):
         return await self.repo.save_user_archive(archive_info)
 
-    async def sync_my_books(self, user_id: int, force: bool = False):
-        """从微信读书同步书架
+    async def sync_my_books(self, user_id: int):
+        """从微信读书同步书架（全量导入场景）。
 
-        Args:
-            user_id: 用户ID
-            force: True 时强制重新拉取所有书籍详情；False 时跳过已有书籍
+        与 get_user_shelf 不同，此接口主要做持久化，返回导入数量。
+        不再批量拉 /book/info，详情改为按需获取。
         """
-        # 1. 同步书架，获取 bookId 列表和书架特有字段
         raw = await self._send_http_request(
             user_id=user_id, api_name="/shelf/sync"
         )
@@ -71,94 +109,43 @@ class WereadShelfService(WereadBaseService):
         if not shelf_books:
             return 0
 
-        # 2. 增量：跳过已有书籍，仅拉取新增
-        all_book_ids = [b["bookId"] for b in shelf_books]
-        if not force:
-            existing = await WereadBook.find(
-                {"bookId": {"$in": all_book_ids}}
-            ).to_list()
-            existing_ids = {b.id for b in existing}
-            new_shelf = [
-                b for b in shelf_books if b["bookId"] not in existing_ids
-            ]
-            logger.info(
-                f"[sync] user={user_id} total={len(shelf_books)}, existing={len(existing_ids)}, new={len(new_shelf)}"
-            )
-        else:
-            new_shelf = shelf_books
-            existing_ids: set[str] = set()
+        # 持久化
+        await self._persist_shelf(user_id, shelf_books, archives)
+        return len(shelf_books)
 
-        # 3. 全量时或新增书籍：并发获取书籍详情
-        if new_shelf:
-            sem = asyncio.Semaphore(15)
+    # ── 内部：持久化书架到 MongoDB ────────────────────────────
 
-            async def _fetch_book(b: dict):
-                book_id = b["bookId"]
-                try:
-                    async with sem:
-                        info = await self._send_http_request(
-                            user_id=user_id,
-                            api_name="/book/info",
-                            extra={"bookId": book_id},
-                        )
-                    return map_book_info(info)
-                except ValueError:
-                    logger.warning(
-                        f"[sync] book info failed, bookId={book_id}, using fallback"
-                    )
-                    return {
-                        "bookId": book_id,
-                        "title": b.get("title"),
-                        "author": b.get("author"),
-                        "cover": b.get("cover"),
-                    }
-
-            detailed_books = await asyncio.gather(
-                *[_fetch_book(b) for b in new_shelf]
-            )
-
-            # 4. 保存新增 WereadBook
-            weread_books = [WereadBook(**info) for info in detailed_books]
-            new_book_map = await self.repo.save_books_bulk(weread_books)
-            logger.info(
-                f"[sync] saved WereadBook: {len(new_book_map)} new books"
-            )
-        else:
-            new_book_map = {}
-
-        # 5. 已有书籍也需加入 book_map（用于 UserBook Link）
-        if not force:
-            existing_books = await WereadBook.find(
-                {"bookId": {"$in": list(existing_ids)}}
-            ).to_list()
-            book_map = {b.id: b for b in existing_books}
-            book_map.update(new_book_map)
-        else:
-            book_map = new_book_map
-
-        # 6. 构建 UserBook
-        user_books = []
-        for b in shelf_books:
-            ub = UserBook(
+    async def _persist_shelf(
+        self,
+        user_id: int,
+        shelf_books: list[dict],
+        archives: list[dict],
+    ) -> None:
+        """将书架数据写入 MongoDB（UserBook + Archive）。"""
+        # 1. 构建 UserBook
+        user_books = [
+            UserBook(
                 user_id=user_id,
                 bookId=b["bookId"],
+                title=b.get("title"),
+                author=b.get("author"),
+                cover=b.get("cover"),
+                category=b.get("category"),
                 readUpdateTime=b.get("readUpdateTime"),
+                updateTime=b.get("updateTime"),
                 finishReading=b.get("finishReading", False),
                 secret=b.get("secret", False),
                 isTop=b.get("isTop", False),
                 readProgress=None,
             )
-            if b["bookId"] in book_map:
-                ub.bookInfo = book_map[b["bookId"]]  # type: ignore[assignment]
-            user_books.append(ub)
+            for b in shelf_books
+        ]
+        await self.repo.save_user_books_bulk(user_books)
 
-        saved = await self.repo.save_user_books_bulk(
-            user_books, book_map=book_map
-        )
-        logger.info(f"[sync] saved UserBook: {len(saved)} books")
-
-        # 7. 保存书单
+        # 2. 保存书单
         archive_docs = [Archive(**a) for a in archives]
         await self.repo.save_user_archives_bulk(archive_docs)
 
-        return len(shelf_books)
+        logger.info(
+            f"[persist] user={user_id} books={len(user_books)}, archives={len(archive_docs)}"
+        )
