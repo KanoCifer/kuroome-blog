@@ -71,6 +71,7 @@ import { onUnmounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import type { DropdownItem } from './UserDropdown.vue';
 import UserDropdown from './UserDropdown.vue';
+import MomentIcon from '@/components/moments/MomentIcon.vue';
 
 const auth = useAuthStore();
 const route = useRoute();
@@ -121,6 +122,7 @@ const navItems = [
   { path: '/', label: '首页', icon: HomeIcon },
   { path: '/blog', label: '近期文章', icon: BlogIcon },
   { path: '/bookshelf', label: '我的书架', icon: BookshelfIcon },
+  { path: '/moments', label: '碎碎念', icon: MomentIcon },
   { path: '/gallery', label: '图片画廊', icon: Image },
   { path: '/about', label: '关于网站', icon: AboutIcon },
 ];

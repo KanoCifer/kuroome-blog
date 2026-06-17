@@ -206,9 +206,8 @@ const handlePrivacyScroll = (e: Event) => {
     <AlertDialog
       :open="showPrivacyPreview"
       @update:open="showPrivacyPreview = $event"
-      class="animate-message-pop"
     >
-      <AlertDialogContent class="sm:max-w-[500px]">
+      <AlertDialogContent class="animate-message-pop sm:max-w-[500px]">
         <AlertDialogHeader>
           <AlertDialogTitle class="text-[16px] font-medium"
             >隐私协议核心摘要</AlertDialogTitle

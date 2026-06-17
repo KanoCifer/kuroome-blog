@@ -59,6 +59,7 @@ function onClick(e: MouseEvent) {
 <template>
   <Teleport to="body">
     <dialog
+      v-if="isOpen"
       ref="dialogRef"
       data-slot="alert-dialog-content"
       :data-state="isOpen ? 'open' : 'closed'"

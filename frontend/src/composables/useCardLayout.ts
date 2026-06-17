@@ -29,7 +29,7 @@ const LAYOUT = {
   // First-card vertical ratios (subsequent cards cascade)
   GREETING_TOP_RATIO: 0.16,
   LIST_TOP_RATIO: 0.19,
-  NAV_TOP_RATIO: 0.4,
+  NAV_TOP_RATIO: 0.43,
 
   // Vertical fine-tuning (px) for first cards only
   LIST_Y_ADJUST: -20,
@@ -229,7 +229,7 @@ export function useCardLayout(containerRef: Ref<HTMLElement | null>) {
   const navCardPosition = usePositionRef(() => {
     const o = layoutStore.getOffset('BentoNavCard');
     return position(
-      _navCenterY.value,
+      _navCenterY.value - 20,
       leftAnchor.value + LAYOUT.NAV_X_ADJUST + o.x,
     );
   });
