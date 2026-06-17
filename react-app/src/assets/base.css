@@ -1,15 +1,6 @@
 @import 'tailwindcss';
 @import 'themes/index.css';
 
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(200%);
-  }
-}
-
 @font-face {
   font-family: 'HarmonyOS Sans';
   font-style: normal;
@@ -91,6 +82,9 @@ html::-webkit-scrollbar {
   --font-family-alibaba:
     '阿里妈妈方圆体 VF Regular', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 
+  --font-family-dongfang:
+    '阿里妈妈东方大楷 Regular', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+
   --animate-tt-spin: tt-spin 0.8s ease-in-out forwards;
 
   @keyframes tt-spin {
@@ -99,23 +93,6 @@ html::-webkit-scrollbar {
     }
     100% {
       rotate: 60deg;
-    }
-  }
-
-  --animate-bounce-up: bounce-up 2s infinite;
-
-  --font-family-dongfang:
-    '阿里妈妈东方大楷 Regular', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-
-  @keyframes bounce-up {
-    0%,
-    100% {
-      transform: translateY(25%);
-      animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
-    }
-    50% {
-      transform: none;
-      animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
     }
   }
 
@@ -133,47 +110,9 @@ html::-webkit-scrollbar {
       filter: blur(0px) brightness(1);
     }
   }
-}
 
-@theme {
-  --animate-scale-easeOutElastic: scale-easeOutElastic 0.5s;
-  @keyframes scale-easeOutElastic {
-    0% {
-      transform: scale(1);
-    }
-
-    16% {
-      transform: scale(-0.32);
-    }
-
-    28% {
-      transform: scale(0.13);
-    }
-
-    44% {
-      transform: scale(-0.05);
-    }
-
-    59% {
-      transform: scale(0.02);
-    }
-
-    73% {
-      transform: scale(-0.01);
-    }
-
-    88% {
-      transform: scale(0);
-    }
-
-    100% {
-      transform: scale(0);
-    }
-  }
-}
-
-@theme {
   --animate-breathe: breathe 1s infinite;
+
   @keyframes breathe {
     0%,
     100% {
@@ -185,40 +124,16 @@ html::-webkit-scrollbar {
   }
 }
 
-@theme {
-  --animate-shimmer: shimmer 2s linear infinite;
-  @keyframes shimmer {
-    0% {
-      background-position: 200% 0;
-    }
-    100% {
-      background-position: -200% 0;
-    }
-  }
-}
-
-.animate-shimmer {
-  @apply from-muted via-muted-foreground/60 to-muted-foreground bg-linear-to-r bg-size-[200%] bg-clip-text text-transparent;
-}
-
 button {
   @apply cursor-pointer;
-}
-
-footer {
-  @apply text-muted-foreground mx-auto w-full min-w-0 p-4 text-center text-sm;
 }
 
 a {
   @apply cursor-pointer;
 }
 
-.modal {
-  @apply rounded-3xl;
-}
-
-.modal-body {
-  @apply text-card-foreground text-lg;
+footer {
+  @apply text-muted-foreground mx-auto w-full min-w-0 p-4 text-center text-sm;
 }
 
 :root[data-font='harmonyos'] {
@@ -269,16 +184,6 @@ a {
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
 
-  /* Sidebar — derived from existing vars (shadcn compat) */
-  --color-sidebar: var(--warm-gray);
-  --color-sidebar-foreground: var(--ink);
-  --color-sidebar-primary: var(--workspace-accent);
-  --color-sidebar-primary-foreground: var(--workspace-accent-contrast);
-  --color-sidebar-accent: var(--warm-gray);
-  --color-sidebar-accent-foreground: var(--ink);
-  --color-sidebar-border: var(--warm-gray);
-  --color-sidebar-ring: var(--accent-slate);
-
   /* Extended app tokens */
   --color-surface: var(--surface);
   --color-surface-foreground: var(--surface-foreground);
@@ -287,7 +192,6 @@ a {
   --color-warning: var(--accent-amber);
   --color-warning-foreground: var(--ink);
   --color-brand-devices: var(--workspace-accent);
-  --color-brand-books: var(--accent-sage);
   --color-gradient-primary-from: var(--gradient-primary-from);
   --color-gradient-primary-to: var(--gradient-primary-to);
   --color-gradient-decorative-from: var(--gradient-decorative-from);
