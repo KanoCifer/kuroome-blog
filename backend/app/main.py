@@ -28,8 +28,9 @@ from app.models.rss import RssArticle
 from app.models.subscription import SubscriptionLog
 from app.models.weread import Archive, User, UserBook, WereadBook
 from app.plugins.cache import close_cache_redis
+from app.plugins.notification import Message, NotificationContext, notify
+from app.plugins.task import TaskPlugin
 from app.router import register_router, setup_media
-from app.tasks import broker, send_feishu_message
 
 
 async def initialize_resources(app: FastAPI):
@@ -56,8 +57,9 @@ async def initialize_resources(app: FastAPI):
     )
     app.state.redis = await init_redis()
 
+    app.state.task_plugin = TaskPlugin()
     try:
-        await broker.startup()
+        await app.state.task_plugin.startup()
         app_logger.info("Taskiq broker started successfully")
     except Exception as e:
         app_logger.warning(f"Taskiq broker failed to start: {e!s}")
@@ -69,10 +71,15 @@ async def initialize_resources(app: FastAPI):
         try:
             app_logger.info("✅启动通知任务已添加到队列")
             now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            await send_feishu_message.kiq(
-                message=f"✅Kuroome Blog API 已成功启动！当前时间：{now}",
-                msg_type="post",
-                title="💻Kuroome Blog API 启动通知",
+            await notify(
+                channels=["feishu"],
+                message=Message(
+                    title="💻Kuroome Blog API 启动通知",
+                    body=f"✅Kuroome Blog API 已成功启动！当前时间：{now}",
+                ),
+                ctx=NotificationContext(
+                    feishu_webhook_url=get_settings().FEISHU_WEBHOOK_URL
+                ),
             )
         except Exception as e:
             app_logger.warning(f"❌发送启动通知失败: {e!s}")
@@ -87,7 +94,7 @@ async def cleanup_resources(app: FastAPI):
     await close_db_connections()
 
     try:
-        await broker.shutdown()
+        await app.state.task_plugin.shutdown()
         app_logger.info("Taskiq broker shutdown successfully")
     except Exception as e:
         app_logger.warning(f"Taskiq broker shutdown failed: {e!s}")

@@ -26,7 +26,7 @@ from app.plugins.cache import redis_cache
 from app.schemas import VisitorData
 from app.schemas.schemas import BlogPostIn, BlogPostUpdate
 from app.services.admin_service import AdminService
-from app.tasks import send_feishu_message
+from app.plugins.notification import Message, NotificationContext, notify
 from app.utils import get_redis_lock
 
 # 写后失效的读接口函数名(SCAN 模式: cache:<name>|*)
@@ -298,7 +298,16 @@ async def webhook_deploy(
             logger.info(
                 f"Deployment triggered by webhook from {get_remote_address(request)}"
             )
-            await send_feishu_message.kiq("API服务正在部署中，请稍候...")
+            await notify(
+                channels=["feishu"],
+                message=Message(
+                    title="部署通知",
+                    body="API服务正在部署中，请稍候...",
+                ),
+                ctx=NotificationContext(
+                    feishu_webhook_url=get_settings().FEISHU_WEBHOOK_URL
+                ),
+            )
             asyncio.create_task(run_deployment())  # noqa: RUF006
             return APIResponse(
                 message="Deployment triggered successfully",

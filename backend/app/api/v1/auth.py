@@ -32,7 +32,7 @@ from app.schemas.auth import (
 )
 from app.schemas.schemas import LoginIn, RegisterIn, UserSettingsIn
 from app.services.user import UserService
-from app.tasks import send_code
+from app.plugins.task import send_code
 
 router = APIRouter(
     prefix="/auth",
