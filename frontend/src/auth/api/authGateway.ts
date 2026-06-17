@@ -1,11 +1,20 @@
 import request from '@/api/request';
 import type { UserInfo } from '@/auth/types';
 import type { AxiosResponse } from 'axios';
-import type { PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/browser';
+import type {
+  PublicKeyCredentialCreationOptionsJSON,
+  PublicKeyCredentialRequestOptionsJSON,
+} from '@simplewebauthn/browser';
 
 // ------------------------------------------------------------------ #
 // Types
 // ------------------------------------------------------------------ #
+
+/** Backend API response envelope — every endpoint returns { message, data } */
+interface ApiResponse<T> {
+  message: string;
+  data: T | null;
+}
 
 interface Envelope<T> {
   data: T;
@@ -63,13 +72,17 @@ function emptyLoginResult(): LoginResult {
 // ------------------------------------------------------------------ #
 
 export const authGateway = {
-  uploadAvatar(formData: FormData): Promise<AxiosResponse<unknown>> {
+  uploadAvatar(
+    formData: FormData,
+  ): Promise<AxiosResponse<ApiResponse<Record<string, unknown>>>> {
     return request.put('v1/auth/upload-pic', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
 
-  getPasskeyRegistrationOptions(): Promise<AxiosResponse<unknown>> {
+  getPasskeyRegistrationOptions(): Promise<
+    AxiosResponse<ApiResponse<PublicKeyCredentialCreationOptionsJSON>>
+  > {
     return request.get('v1/auth/passkey/registration-options');
   },
 
@@ -92,7 +105,7 @@ export const authGateway = {
     email: string | null;
     mobile: string | null;
     password: string | null;
-  }): Promise<AxiosResponse<unknown>> {
+  }): Promise<AxiosResponse<ApiResponse<Record<string, unknown>>>> {
     return request.put('v1/auth/settings', payload);
   },
 

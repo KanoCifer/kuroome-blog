@@ -92,16 +92,10 @@ const handlePhotoUpload = async (event: Event) => {
   formData.append('image', file);
 
   try {
-    const response = await authGateway.uploadAvatar(formData);
-
-    if (response.data) {
-      await authStore.fetchUser();
-      message.value = 'Avatar updated successfully!';
-      messageType.value = 'success';
-    } else {
-      message.value = response.data?.message || 'Failed to upload avatar';
-      messageType.value = 'error';
-    }
+    await authGateway.uploadAvatar(formData);
+    await authStore.fetchUser();
+    message.value = 'Avatar updated successfully!';
+    messageType.value = 'success';
   } catch (error) {
     console.error('Avatar upload error:', error);
     message.value = 'Network error, please try again';
@@ -130,8 +124,9 @@ const handleAddPasskey = async () => {
   try {
     const optionsRes = await authGateway.getPasskeyRegistrationOptions();
     const options = optionsRes.data.data;
+    if (!options) throw new Error('Failed to get passkey registration options');
 
-    const credential = await startRegistration(options);
+    const credential = await startRegistration({ optionsJSON: options });
 
     await authGateway.registerPasskey({
       response: credential,
@@ -207,17 +202,11 @@ const handleSubmit = async () => {
       password: form.value.password || null,
     };
 
-    const response = await authGateway.updateProfileSettings(payload);
-
-    if (response.data.code === 200) {
-      await authStore.fetchUser();
-      form.value.password = '';
-      message.value = 'Profile updated successfully!';
-      messageType.value = 'success';
-    } else {
-      message.value = response.data.message || 'Failed to update profile';
-      messageType.value = 'error';
-    }
+    await authGateway.updateProfileSettings(payload);
+    await authStore.fetchUser();
+    form.value.password = '';
+    message.value = 'Profile updated successfully!';
+    messageType.value = 'success';
   } catch (error) {
     console.error('Settings update error:', error);
     message.value = 'Network error, please try again';
