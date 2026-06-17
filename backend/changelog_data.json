@@ -1,5 +1,92 @@
 [
   {
+    "version": "3.9.0",
+    "date": "2026-06-17",
+    "title": "Moments 碎碎念、博客封面、日历热力图、shadcn-vue 替换",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "新增碎碎念（Moments）页面，支持创建/查看/编辑/删除"
+      },
+      {
+        "type": "feat",
+        "content": "博客文章封面显示与编辑支持"
+      },
+      {
+        "type": "feat",
+        "content": "新增日历热力图，优化书籍卡片样式"
+      },
+      {
+        "type": "feat",
+        "content": "书籍推荐详情弹窗（motion-v morph）与阅读统计重构"
+      },
+      {
+        "type": "feat",
+        "content": "页脚重设计与状态悬浮弹窗；偏好设置文学手账重做，支持显示页脚开关"
+      },
+      {
+        "type": "feat",
+        "content": "提取 useTypewriter composable，实现平滑流式打字效果"
+      },
+      {
+        "type": "feat",
+        "content": "Bento 卡片打磨与 Safari 性能修复；FAB 滑入动画"
+      },
+      {
+        "type": "feat",
+        "content": "优化 Prompt，支持 Markdown 渲染"
+      },
+      {
+        "type": "refactor",
+        "content": "前端 shadcn-vue/reka-ui 替换为手写 UI 组件"
+      },
+      {
+        "type": "refactor",
+        "content": "后端缓存模块迁移至 plugins/，统一 API 响应信封格式"
+      },
+      {
+        "type": "refactor",
+        "content": "Task、Notification 模块抽取为纯插件；任务遗留代码清理"
+      },
+      {
+        "type": "refactor",
+        "content": "Weread 模块重构：展平模型、CSS Grid 热力图、年阅读详情"
+      },
+      {
+        "type": "refactor",
+        "content": "FishingMap UI 重构：坐标标注、详情弹窗、全屏支持"
+      },
+      {
+        "type": "refactor",
+        "content": "认证拆分（int/User 变体）；双端契约同步 P0 落地"
+      },
+      {
+        "type": "refactor",
+        "content": "推荐与 PageHero 合并，BookStats composable 拆分"
+      },
+      {
+        "type": "fix",
+        "content": "修复 Dialog 无法关闭、导入错误、Weread 异常处理与请求重试"
+      },
+      {
+        "type": "fix",
+        "content": "修复 AMap 桌面 Mac 定位失败、React 嵌套路径断言、TS 类型错误"
+      },
+      {
+        "type": "perf",
+        "content": "扩大 Redis 缓存覆盖；改用 orjson 响应；前端 LCP 优化与动画性能提升"
+      },
+      {
+        "type": "style",
+        "content": "主题配色优化与 ECharts 暗色模式适配；FishingMap UI 样式重构"
+      },
+      {
+        "type": "chore",
+        "content": "后端依赖更新：httpx 迁移至 httpx2"
+      }
+    ]
+  },
+  {
     "version": "3.8.0",
     "date": "2026-06-15",
     "title": "博客列表文学手账重做与文章封面图占位",
