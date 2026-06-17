@@ -97,67 +97,6 @@ class AdminService:
         await self.repo.delete_post_by_id(oid)
         await self.cache.clear()
 
-    async def get_admin_comments(self) -> dict[str, list[dict]]:
-        pending: list[dict] = []
-        approved: list[dict] = []
-
-        cursor = self.repo.get_recent_posts(limit=100)
-        async for post in cursor:
-            post_id_str = str(post.id)
-            post_title = post.title or "Untitled"
-
-            for comment in post.comments:
-                item = {
-                    "id": str(comment.id),
-                    "post_id": post_id_str,
-                    "post_title": post_title,
-                    "author": comment.author or "Anonymous",
-                    "email": comment.email or "",
-                    "body": comment.body or "",
-                    "site": comment.site or "",
-                    "from_admin": comment.from_admin or False,
-                    "reviewed": comment.reviewed or False,
-                    "replied_id": str(comment.replied_id)
-                    if comment.replied_id
-                    else None,
-                    "created_at": comment.created_at
-                    if comment.created_at
-                    else None,
-                }
-                if comment.reviewed:
-                    approved.append(item)
-                else:
-                    pending.append(item)
-
-        def sort_key(item: dict) -> float:
-            created_at = item.get("created_at")
-            if isinstance(created_at, datetime):
-                if created_at.tzinfo is None:
-                    created_at = created_at.replace(tzinfo=UTC)
-                return created_at.timestamp()
-            return 0.0
-
-        pending.sort(key=sort_key, reverse=True)
-        approved.sort(key=sort_key, reverse=True)
-        return {"pending": pending, "approved": approved}
-
-    async def approve_comment(self, *, comment_id: str) -> None:
-        oid = self._to_object_id(comment_id, "Invalid comment ID")
-        try:
-            await self.repo.approve_comment(oid)
-        except Exception as exc:
-            raise AdminDomainError(
-                f"Failed to approve comment: {exc!s}", 500
-            ) from exc
-        await self.cache.clear()
-
-    async def delete_comment(self, *, comment_id: str) -> None:
-        oid = self._to_object_id(comment_id, "Invalid comment ID")
-        result = await self.repo.delete_comment(oid)
-        if result.modified_count == 0:
-            raise AdminDomainError("Comment not found", 404)
-        await self.cache.clear()
-
     async def get_admin_messages(self) -> dict[str, list[dict]]:
         try:
             pending_messages = await self.repo.list_messages(review=0)

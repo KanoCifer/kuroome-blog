@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-from typing import Any
-
 from beanie import SortDirection
 from bson import ObjectId
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.blog import Comment, Post
+from app.models.blog import Post
 from app.models.models import Category
 
 
@@ -70,28 +68,6 @@ class BlogRepo:
 
     async def get_post_by_id(self, post_id: ObjectId) -> Post | None:
         return await Post.find_one({"_id": post_id})
-
-    async def comment_exists_in_post(
-        self,
-        *,
-        post_id: ObjectId,
-        comment_id: ObjectId,
-    ) -> bool:
-        post = await Post.find_one(
-            {"_id": post_id, "comments._id": comment_id}
-        )
-        return post is not None
-
-    async def append_comment(
-        self, *, post_id: ObjectId, comment: dict[str, Any]
-    ) -> bool:
-        post = await Post.find_one({"_id": post_id})
-        if post is None:
-            return False
-        embedded_comment = Comment.model_validate(comment)
-        post.comments.append(embedded_comment)
-        await post.save()
-        return True
 
     async def list_posts_by_category(self, category_id: int) -> list[Post]:
         return await (

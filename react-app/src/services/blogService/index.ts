@@ -1,7 +1,7 @@
 import { blogGateway } from '@/api/blogGateway';
 import { extractData } from '@/api/request';
 import type { ApiResponse } from '@/api/request';
-import type { BlogPost, Category, BlogPagination, Comment } from '@/types'; // Comment used by countComments
+import type { BlogPost, Category, BlogPagination } from '@/types';
 
 // 博客列表项（处理后的）
 export interface BlogListItem {
@@ -14,7 +14,6 @@ export interface BlogListItem {
   is_pinned: boolean;
   created_at: string;
   updated_at: string;
-  comment_count: number;
 }
 
 // 博客列表（处理后的）
@@ -35,7 +34,6 @@ export interface BlogDetail {
   is_pinned: boolean;
   created_at: string;
   updated_at: string;
-  comments: Comment[];
 }
 
 // 分类列表项
@@ -76,13 +74,6 @@ export interface BlogService {
 export const blogService = (): BlogService => {
   const gateway = blogGateway();
 
-  // 递归计算评论数
-  const countComments = (comments: Comment[]): number => {
-    return comments.reduce((count, c) => {
-      return count + 1 + countComments(c.comments || []);
-    }, 0);
-  };
-
   return {
     async getBlogs(query) {
       const res = await gateway.getBlogs(query);
@@ -106,9 +97,6 @@ export const blogService = (): BlogService => {
           (post as BlogPost & { is_pinned?: boolean }).is_pinned || false,
         created_at: post.created_at,
         updated_at: post.updated_at,
-        comment_count: countComments(
-          (post as BlogPost & { comments?: Comment[] }).comments || [],
-        ),
       }));
 
       return {

@@ -1,7 +1,7 @@
 import type { AxiosResponse } from 'axios';
 
 import request from '@/api/request';
-import type { BlogPagination, BlogPost, Category, Comment } from '@/types';
+import type { BlogPagination, BlogPost, Category } from '@/types';
 
 interface BlogQuery {
   page?: number;
@@ -25,7 +25,6 @@ interface BlogPostResponse {
   created_at: string;
   updated_at: string;
   category: { id: number; name: string } | null;
-  comments: Comment[];
 }
 
 export interface blogGateway {

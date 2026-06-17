@@ -8,32 +8,12 @@ from starlette import status
 from app.api.des.auth import manager
 from app.api.des.des import blog_service_dep
 from app.core.exceptions import APIError
-from app.core.logger import logger
 from app.core.response import APIResponse
 from app.plugins.cache import redis_cache
-from app.schemas.schemas import PostComment
 from app.services.blog_service import BlogService
 from app.utils.media import save_upload_image
 
 router = APIRouter(tags=["blog"])
-
-
-async def _safe_invalidate(*func_names: str) -> None:
-    """写后清理缓存。失败降级为日志,不影响主流程。"""
-    try:
-        await redis_cache.invalidate(*func_names)
-    except Exception:
-        logger.exception("cache invalidation failed (non-fatal)")
-
-
-_BLOG_CACHE_FUNCS = (
-    "get_blogs",
-    "get_blog_post",
-    "get_blog",
-    "get_categories",
-    "get_category_posts",
-    "get_posts_by_category",
-)
 
 
 @router.post("/upload-image")
@@ -99,21 +79,6 @@ async def get_blog(
     )
 
 
-@router.post("/comments", status_code=status.HTTP_201_CREATED)
-async def post_comment(
-    data: PostComment,
-    blog_service: BlogService = Depends(blog_service_dep),
-):
-    """Submit a new comment to a blog post."""
-    result = await blog_service.post_comment(data)
-    await _safe_invalidate(*_BLOG_CACHE_FUNCS)
-
-    return APIResponse(
-        data=result,
-        message="Comment submitted successfully, pending review",
-    )
-
-
 @router.get("/categories")
 @redis_cache(ttl=300, exclude=["blog_service"])
 async def get_categories(
@@ -161,5 +126,5 @@ async def get_category_posts(
 
 
 # =============================================================================
-# Post and Comment Management Endpoints have been moved to admin.py
+# Post Management Endpoints have been moved to admin.py
 # =============================================================================

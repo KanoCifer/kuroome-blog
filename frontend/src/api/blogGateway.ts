@@ -1,5 +1,5 @@
 import request from '@/api/request';
-import type { BlogPagination, BlogPost, Category, Comment } from '@/types';
+import type { BlogPagination, BlogPost, Category } from '@/types';
 
 export interface BlogQuery {
   page?: number;
@@ -24,21 +24,11 @@ export interface BlogPostResponse {
   created_at: string;
   updated_at: string;
   category: { id: number; name: string } | null;
-  comments: Comment[];
-}
-
-export interface PostCommentPayload {
-  post_id: string;
-  body: string;
-  author: string;
-  reply_to?: string;
-  reply_to_author?: string;
 }
 
 export interface BlogGateway {
   getBlogs(query?: BlogQuery): Promise<BlogListResponse>;
   getBlogPost(postId: string): Promise<BlogPostResponse>;
-  postComment(payload: PostCommentPayload): Promise<{ _id: string }>;
   getCategories(): Promise<Category[]>;
   getPostsByCategory(
     categoryId: number,
@@ -66,7 +56,6 @@ export interface BlogGateway {
   getPostsByLegacyCategory(
     categoryId: number,
   ): Promise<{ posts: BlogPost[]; category: { id: number; name: string } }>;
-  postLegacyComment(payload: PostCommentPayload): Promise<void>;
 }
 
 export const blogGateway: BlogGateway = {
@@ -80,14 +69,6 @@ export const blogGateway: BlogGateway = {
   async getBlogPost(postId: string): Promise<BlogPostResponse> {
     const res = await request.get<{ data: BlogPostResponse }>(
       `v1/blogs/${postId}`,
-    );
-    return res.data.data;
-  },
-
-  async postComment(payload: PostCommentPayload): Promise<{ _id: string }> {
-    const res = await request.post<{ data: { _id: string } }>(
-      'v1/blogs/comments',
-      payload,
     );
     return res.data.data;
   },
@@ -147,9 +128,5 @@ export const blogGateway: BlogGateway = {
       params: { category_id: categoryId },
     });
     return res.data.data;
-  },
-
-  async postLegacyComment(payload: PostCommentPayload): Promise<void> {
-    await request.post('v1/comments', payload);
   },
 };

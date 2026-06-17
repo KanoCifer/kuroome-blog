@@ -30,14 +30,6 @@ from app.schemas.blog import (
     CategoryIn,
 )
 from app.schemas.category import CategoriesOut, CategoryOut
-from app.schemas.comment import (
-    AdminCommentOut,
-    AdminCommentsOut,
-    CommentOut,
-    CommentsOut,
-    GetComment,
-    PostComment,
-)
 from app.schemas.devtask import DevTaskCreate, DevTaskOut, DevTaskUpdate
 from app.schemas.email import BootstrapEmailContent, EmailCodeContent
 from app.schemas.feishu import FeishuMessageContent, FeishuRichTextContent
@@ -47,6 +39,16 @@ from app.schemas.message import (
     MessageIn,
     MessageOut,
     MessagesOut,
+)
+from app.schemas.moment import (
+    MomentAttachmentIn,
+    MomentAttachmentOut,
+    MomentCreate,
+    MomentListOut,
+    MomentLocationIn,
+    MomentLocationOut,
+    MomentOut,
+    MomentUpdate,
 )
 from app.schemas.pagination import PaginationSchema
 from app.schemas.rss import (
@@ -82,8 +84,6 @@ from app.schemas.weather import (
 )
 
 __all__ = [
-    "AdminCommentOut",
-    "AdminCommentsOut",
     "AdminMessageOut",
     "AdminMessagesOut",
     "ArticleSummaryRequest",
@@ -97,17 +97,17 @@ __all__ = [
     "CategoryIn",
     "CategoryOut",
     "ChatRequest",
-    "CommentOut",
-    "CommentsOut",
     "CurrentWeather",
     "DailyForecast",
     "DailyWeather",
+    "DevTaskCreate",
+    "DevTaskOut",
+    "DevTaskUpdate",
     "EmailCodeContent",
     "EmailCodeIn",
     "EmailSchema",
     "FeishuMessageContent",
     "FeishuRichTextContent",
-    "GetComment",
     "GitHubOAuthConfig",
     "HistoryRequest",
     "HourlyForecast",
@@ -120,11 +120,18 @@ __all__ = [
     "MessageIn",
     "MessageOut",
     "MessagesOut",
+    "MomentAttachmentIn",
+    "MomentAttachmentOut",
+    "MomentCreate",
+    "MomentListOut",
+    "MomentLocationIn",
+    "MomentLocationOut",
+    "MomentOut",
+    "MomentUpdate",
     "NowWeather",
     "PaginationSchema",
     "PasskeyAuthRequest",
     "PasskeyRegistrationRequest",
-    "PostComment",
     "RegisterIn",
     "RegisterOut",
     "RssArticleListResponse",
@@ -136,9 +143,6 @@ __all__ = [
     "TideData",
     "TideHourly",
     "TideItem",
-    "DevTaskCreate",
-    "DevTaskOut",
-    "DevTaskUpdate",
     "UserOut",
     "UserProfileOut",
     "UserSettingsIn",

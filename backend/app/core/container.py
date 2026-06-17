@@ -5,6 +5,7 @@ from redis.asyncio import Redis as AsyncRedis
 
 from app.api.des.db import get_async_session
 from app.core.agent import ArticleSummarizer
+from app.plugins.cache import redis_cache
 from app.repositories import (
     AdminRepo,
     BlogRepo,
@@ -14,6 +15,7 @@ from app.repositories import (
     FriendLinkRepo,
     GalleryRepo,
     MessageRepo,
+    MomentRepo,
     MonitorRepo,
     NotificationRepo,
     PublicRepo,
@@ -29,6 +31,7 @@ from app.services.devtask_service import DevTaskService
 from app.services.fishing.fishing_service import FishingService
 from app.services.friendlink_service import FriendLinkService
 from app.services.message_service import MessageService
+from app.services.moment_service import MomentService
 from app.services.monitor_service import MonitorService
 from app.services.public_service import PublicService
 from app.services.rss_service import RssService
@@ -36,7 +39,6 @@ from app.services.sub_service import SubService
 from app.services.user import GitHubAuthService, PasskeyService, UserService
 from app.services.weather_service import WeatherService
 from app.services.weread import WereadService
-from app.plugins.cache import redis_cache
 
 
 @dataclass
@@ -81,7 +83,7 @@ async def get_admin_service():
 async def get_blog_service():
     async with get_async_session() as session:
         blog_repo = BlogRepo(session)
-        service = BlogService(repo=blog_repo, cache=redis_cache)
+        service = BlogService(repo=blog_repo)
         yield service
 
 
@@ -89,6 +91,13 @@ async def get_blog_service():
 async def get_message_service():
     message_repo = MessageRepo()
     service = MessageService(repo=message_repo)
+    yield service
+
+
+@asynccontextmanager
+async def get_moment_service():
+    moment_repo = MomentRepo()
+    service = MomentService(repo=moment_repo)
     yield service
 
 

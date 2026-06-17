@@ -31,7 +31,6 @@ from app.utils import get_redis_lock
 
 # 写后失效的读接口函数名(SCAN 模式: cache:<name>|*)
 _BLOG_READ_FUNCS = ("get_blogs", "get_blog_post", "get_blog")
-_COMMENT_READ_FUNCS = ("get_blogs", "get_blog_post")
 
 
 async def _safe_invalidate(*func_names: str) -> None:
@@ -110,48 +109,6 @@ async def delete_post(
         data={"_id": post_id},
         message="Blog post deleted successfully",
     )
-
-
-# =============================================================================
-# Comment Management Endpoints
-# =============================================================================
-
-
-@router.get("/comments")
-async def get_admin_comments(
-    current_user: User = Depends(get_admin_user),
-    admin_service: AdminService = Depends(admin_service_dep),
-):
-    payload = await admin_service.get_admin_comments()
-
-    return APIResponse(
-        data=payload,
-        message="Comments retrieved successfully",
-    )
-
-
-@router.post("/comments/{comment_id}/approve")
-async def approve_comment(
-    comment_id: str,
-    current_user: User = Depends(get_admin_user),
-    admin_service: AdminService = Depends(admin_service_dep),
-):
-    await admin_service.approve_comment(comment_id=comment_id)
-    await _safe_invalidate(*_COMMENT_READ_FUNCS)
-
-    return APIResponse(message="Comment approved successfully")
-
-
-@router.delete("/comments/{comment_id}/delete")
-async def delete_comment(
-    comment_id: str,
-    current_user: User = Depends(get_admin_user),
-    admin_service: AdminService = Depends(admin_service_dep),
-):
-    await admin_service.delete_comment(comment_id=comment_id)
-    await _safe_invalidate(*_COMMENT_READ_FUNCS)
-
-    return APIResponse(message="Comment deleted successfully")
 
 
 # =============================================================================

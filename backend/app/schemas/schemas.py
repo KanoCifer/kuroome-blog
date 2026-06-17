@@ -30,14 +30,7 @@ from app.schemas.blog import (
     CategoryIn,
 )
 from app.schemas.category import CategoriesOut, CategoryOut
-from app.schemas.comment import (
-    AdminCommentOut,
-    AdminCommentsOut,
-    CommentOut,
-    CommentsOut,
-    GetComment,
-    PostComment,
-)
+from app.schemas.devtask import DevTaskCreate, DevTaskOut, DevTaskUpdate
 from app.schemas.email import BootstrapEmailContent, EmailCodeContent
 from app.schemas.feishu import FeishuMessageContent, FeishuRichTextContent
 from app.schemas.message import (
@@ -47,6 +40,16 @@ from app.schemas.message import (
     MessageOut,
     MessagesOut,
 )
+from app.schemas.moment import (
+    MomentAttachmentIn,
+    MomentAttachmentOut,
+    MomentCreate,
+    MomentListOut,
+    MomentLocationIn,
+    MomentLocationOut,
+    MomentOut,
+    MomentUpdate,
+)
 from app.schemas.pagination import PaginationSchema
 from app.schemas.rss import (
     RssArticleListResponse,
@@ -55,7 +58,6 @@ from app.schemas.rss import (
     RssRequest,
     RssSubscriptionResponse,
 )
-from app.schemas.devtask import DevTaskCreate, DevTaskOut, DevTaskUpdate
 from app.schemas.user import (
     ImageUploadOut,
     UserOut,
@@ -65,8 +67,6 @@ from app.schemas.user import (
 )
 
 __all__ = [
-    "AdminCommentOut",
-    "AdminCommentsOut",
     "AdminMessageOut",
     "AdminMessagesOut",
     "ArticleSummaryRequest",
@@ -80,14 +80,14 @@ __all__ = [
     "CategoryIn",
     "CategoryOut",
     "ChatRequest",
-    "CommentOut",
-    "CommentsOut",
+    "DevTaskCreate",
+    "DevTaskOut",
+    "DevTaskUpdate",
     "EmailCodeContent",
     "EmailCodeIn",
     "EmailSchema",
     "FeishuMessageContent",
     "FeishuRichTextContent",
-    "GetComment",
     "GitHubOAuthConfig",
     "HistoryRequest",
     "ImageUploadOut",
@@ -96,9 +96,16 @@ __all__ = [
     "MessageIn",
     "MessageOut",
     "MessagesOut",
+    "MomentAttachmentIn",
+    "MomentAttachmentOut",
+    "MomentCreate",
+    "MomentListOut",
+    "MomentLocationIn",
+    "MomentLocationOut",
+    "MomentOut",
+    "MomentUpdate",
     "PaginationSchema",
     "PasskeyRegistrationRequest",
-    "PostComment",
     "RegisterIn",
     "RegisterOut",
     "RssArticleListResponse",
@@ -107,9 +114,6 @@ __all__ = [
     "RssRequest",
     "RssSubscriptionResponse",
     "SummaryInput",
-    "DevTaskCreate",
-    "DevTaskOut",
-    "DevTaskUpdate",
     "UserOut",
     "UserProfileOut",
     "UserSettingsIn",

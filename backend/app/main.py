@@ -23,6 +23,7 @@ from app.models.devtask import DevTask
 from app.models.fishing import FishingModelMeta, FishingRecord
 from app.models.friendlink import FriendLinks
 from app.models.message import MessageBoard
+from app.models.moment import Moment
 from app.models.rss import RssArticle
 from app.models.subscription import SubscriptionLog
 from app.models.weread import Archive, User, UserBook, WereadBook
@@ -38,6 +39,7 @@ async def initialize_resources(app: FastAPI):
         database=app.state.mongo,
         document_models=[
             MessageBoard,
+            Moment,
             Post,
             RssArticle,
             SubscriptionLog,

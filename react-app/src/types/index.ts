@@ -16,7 +16,6 @@ export interface Post {
   updated_at?: string;
   category?: Category;
   is_pinned?: boolean;
-  comments?: Comment[];
 }
 
 // 博客文章类型（MongoDB 存储，使用 _id 主键）
@@ -67,28 +66,6 @@ export interface ApiResponse<T = unknown> {
   status: string;
   message: string;
   data?: T;
-}
-
-// 评论类型定义（通用）
-export interface Comment {
-  id?: number;
-  _id: string; // 确保 _id 是必填字段，解决类型错误
-  post_id?: number | string;
-  user_id?: number;
-  name?: string;
-  content?: string;
-  created_at: string; // 确保 created_at 是必填字段
-  updated_at?: string;
-  replied_id?: string | null;
-  from_admin?: boolean;
-  reviewed?: boolean;
-  author: string; // 确保 author 是必填字段，解决类型错误
-  email?: string;
-  body: string; // 确保 body 是必填字段
-  site?: string;
-  comments?: Comment[];
-  reply_to_author?: string;
-  post_title?: string;
 }
 
 export interface PostResponse {

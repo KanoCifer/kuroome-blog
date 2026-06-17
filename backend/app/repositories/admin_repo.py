@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from beanie import SortDirection
-from beanie.odm.queries.find import FindMany
 from bson import ObjectId
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -36,24 +35,6 @@ class AdminRepo:
 
     async def delete_post_by_id(self, post_id: ObjectId) -> None:
         await Post.find_one(Post.id == post_id).delete()
-
-    def get_recent_posts(self, limit: int = 100) -> FindMany[Post]:
-        return (
-            Post.find()
-            .sort([("created_at", SortDirection.DESCENDING)])
-            .limit(limit)
-        )
-
-    async def approve_comment(self, comment_id: ObjectId):
-        return await Post.find_one({"comments._id": comment_id}).update(
-            {"$set": {"comments.$[com].reviewed": True}},
-            array_filters=[{"com._id": comment_id}],
-        )  # type: ignore
-
-    async def delete_comment(self, comment_id: ObjectId):
-        return await Post.find_one({"comments._id": comment_id}).update(
-            {"$pull": {"comments": {"_id": comment_id}}},
-        )  # type: ignore
 
     async def list_messages(self, *, review: int, limit: int | None = None):
         query = MessageBoard.find({"review": review}).sort(

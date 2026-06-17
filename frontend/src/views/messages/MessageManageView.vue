@@ -7,7 +7,7 @@
     >
       <div>
         <h1 class="text-foreground max-w-6xl text-center font-serif text-7xl">
-          {{ activeTab === 'messages' ? '留言管理' : '评论管理' }}
+          留言管理
         </h1>
         <!-- Description -->
         <div
@@ -60,31 +60,6 @@
                 />
               </svg>
               留言
-            </button>
-            <button
-              type="button"
-              @click="activeTab = 'comments'"
-              :class="[
-                'flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all',
-                activeTab === 'comments'
-                  ? 'bg-primary text-primary-foreground shadow-md'
-                  : 'text-muted-foreground hover:bg-accent',
-              ]"
-            >
-              <svg
-                class="h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
-                />
-              </svg>
-              评论
             </button>
           </div>
 
@@ -180,16 +155,6 @@
               @delete="handleDelete"
             />
           </div>
-          <div v-show="activeTab === 'comments'" class="tab-content">
-            <CommentsTab
-              :pending-comments="pendingComments"
-              :approved-comments="approvedComments"
-              :loading="loading"
-              :action-loading="actionLoading"
-              @approve="handleApprove"
-              @delete="handleDelete"
-            />
-          </div>
         </div>
 
         <!-- Back to Home -->
@@ -221,11 +186,10 @@
 </template>
 
 <script setup lang="ts">
-import CommentsTab from '@/components/message/CommentsTab.vue';
 import MessagesTab from '@/components/message/MessagesTab.vue';
 import { messageGateway } from '@/api/messageGateway';
 import { useAuthStore } from '@/auth/stores/auth';
-import type { Comment, Message } from '@/types';
+import type { Message } from '@/types';
 import { useScroll } from '@vueuse/core';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -243,11 +207,9 @@ const auth = useAuthStore();
 const router = useRouter();
 const { y } = useScroll(window);
 
-const activeTab = ref<'messages' | 'comments'>('messages');
+const activeTab = ref<'messages'>('messages');
 const pendingMessages = ref<Message[]>([]);
 const approvedMessages = ref<Message[]>([]);
-const pendingComments = ref<Comment[]>([]);
-const approvedComments = ref<Comment[]>([]);
 const loading = ref(false);
 const error = ref('');
 const actionLoading = ref<string | null>(null);
@@ -274,8 +236,8 @@ onMounted(async () => {
     return;
   }
 
-  // 初始化时同时加载两个 tab 的数据，保持状态
-  await Promise.all([fetchMessages(), fetchComments()]);
+  // 初始化时加载留言数据
+  await fetchMessages();
 });
 
 const fetchMessages = async () => {
@@ -292,30 +254,11 @@ const fetchMessages = async () => {
   }
 };
 
-const fetchComments = async () => {
-  loading.value = true;
-  error.value = '';
-  try {
-    const result = await messageGateway.getAdminComments();
-    pendingComments.value = result.pending || [];
-    approvedComments.value = result.approved || [];
-  } catch {
-    error.value = '加载评论失败';
-  } finally {
-    loading.value = false;
-  }
-};
-
 const handleApprove = async (itemId: string) => {
   actionLoading.value = itemId;
   try {
-    if (activeTab.value === 'messages') {
-      await messageGateway.approveAdminMessage(itemId);
-      await fetchMessages();
-    } else {
-      await messageGateway.approveAdminComment(itemId);
-      await fetchComments();
-    }
+    await messageGateway.approveAdminMessage(itemId);
+    await fetchMessages();
   } catch (err) {
     if (err instanceof Error) error.value = err.message || '操作失败';
     else error.value = '操作失败';
@@ -327,13 +270,8 @@ const handleApprove = async (itemId: string) => {
 const handleDelete = async (itemId: string) => {
   actionLoading.value = itemId;
   try {
-    if (activeTab.value === 'messages') {
-      await messageGateway.deleteAdminMessage(itemId);
-      await fetchMessages();
-    } else {
-      await messageGateway.deleteAdminComment(itemId);
-      await fetchComments();
-    }
+    await messageGateway.deleteAdminMessage(itemId);
+    await fetchMessages();
   } catch (err) {
     if (err instanceof Error) error.value = err.message || '操作失败';
     else error.value = '操作失败';
@@ -343,11 +281,7 @@ const handleDelete = async (itemId: string) => {
 };
 
 const handleRefresh = async () => {
-  if (activeTab.value === 'messages') {
-    await fetchMessages();
-  } else {
-    await fetchComments();
-  }
+  await fetchMessages();
 };
 
 const goBack = () => {

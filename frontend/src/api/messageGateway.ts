@@ -1,5 +1,5 @@
 import request from '@/api/request';
-import type { Comment, Message } from '@/types';
+import type { Message } from '@/types';
 
 export interface MessageGateway {
   getMessages(): Promise<{ messages: Message[] }>;
@@ -13,12 +13,6 @@ export interface MessageGateway {
   }>;
   approveAdminMessage(messageId: string): Promise<void>;
   deleteAdminMessage(messageId: string): Promise<void>;
-  getAdminComments(): Promise<{
-    pending: Comment[];
-    approved: Comment[];
-  }>;
-  approveAdminComment(commentId: string): Promise<void>;
-  deleteAdminComment(commentId: string): Promise<void>;
 }
 
 export const messageGateway: MessageGateway = {
@@ -56,23 +50,5 @@ export const messageGateway: MessageGateway = {
 
   async deleteAdminMessage(messageId: string): Promise<void> {
     await request.delete(`v1/admin/messages/${messageId}/delete`);
-  },
-
-  async getAdminComments(): Promise<{
-    pending: Comment[];
-    approved: Comment[];
-  }> {
-    const res = await request.get<{
-      data: { pending: Comment[]; approved: Comment[] };
-    }>('v1/admin/comments');
-    return res.data.data;
-  },
-
-  async approveAdminComment(commentId: string): Promise<void> {
-    await request.post(`v1/admin/comments/${commentId}/approve`);
-  },
-
-  async deleteAdminComment(commentId: string): Promise<void> {
-    await request.delete(`v1/admin/comments/${commentId}/delete`);
   },
 };
