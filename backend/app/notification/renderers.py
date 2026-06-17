@@ -1,102 +1,73 @@
+"""领域渲染层 —— 把领域 payload 渲染成通用 :class:`Message` 的纯函数。
+
+纯函数：只依据入参返回 :class:`Message`，无副作用，可独立单测。
+传输层（:mod:`app.plugins.notification.channels`）只认 Message 通用文本，
+不再嵌入领域字段与 HTML 模板。
+"""
+
+from __future__ import annotations
+
 from datetime import UTC, datetime
 from html import escape
 
-from fastapi_mail import FastMail, MessageSchema, MessageType
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
-
-from app.api.des.db import get_async_session
-from app.core.config import get_settings
-from app.core.logger import logger
-from app.core.mail import MailConfig
-from app.models.models import User
-
-from . import (  # noqa: TID252
-    DeviceNotificationPayload,
-    NotificationPayload,
-    NotifierBase,
-)
+from app.notification.payloads import DevicePayload, SubscriptionPayload
+from app.plugins.notification import Message
 
 
-class EmailNotificationChannel(NotifierBase):
-    """邮件通知渠道"""
+def _ensure_aware(dt: datetime) -> datetime:
+    """PGSQL DateTime 不带时区；渲染时假定 UTC。"""
+    return dt.replace(tzinfo=UTC) if dt.tzinfo is None else dt
 
-    @property
-    def channel(self) -> str:
-        return "email"
 
-    async def send(
-        self, user_id: int, payload: NotificationPayload, config: dict
-    ) -> bool:
-        """发送邮件通知"""
-        try:
-            # 优先从 config 获取邮箱，兜底查 Profile
-            email_address = config.get("email") or await self._get_user_email(
-                user_id
-            )
-            if not email_address:
-                logger.warning(
-                    f"[Email] User {user_id} has no email configured"
-                )
-                return False
+def render_subscription_reminder(payload: SubscriptionPayload) -> Message:
+    """订阅续费提醒 → Message（纯文本 body + HTML）。"""
+    days_text = (
+        f"还有 {payload.days_until} 天"
+        if payload.days_until > 0
+        else "今天到期"
+    )
+    body = (
+        f"📦 {payload.subscription_name}\n"
+        f"🏢 {payload.provider}\n"
+        f"💰 {payload.currency} {payload.price}\n"
+        f"📅 {payload.next_billing_date.strftime('%Y-%m-%d')}\n"
+        f"⏰ {days_text}"
+    )
+    return Message(
+        title=payload.title,
+        body=body,
+        html=_render_subscription_html(payload, days_text),
+    )
 
-            if not await self.validate_config():
-                logger.warning("[Email] Mail server not configured")
-                return False
 
-            html_body = self._build_html(payload)
-            message = MessageSchema(
-                subject=f"订阅续费提醒: {payload.subscription_name}",
-                recipients=[email_address],  # type: ignore
-                body=html_body,
-                subtype=MessageType.html,
-            )
+def render_device_milestone(payload: DevicePayload) -> Message:
+    """设备周年提醒 → Message（纯文本 body + HTML）。"""
+    purchase_date = _ensure_aware(payload.purchase_date)
+    years = (datetime.now(UTC) - purchase_date).days // 365
+    body = (
+        f"📱 {payload.name}\n"
+        f"💰 {payload.currency} {payload.price}\n"
+        f"📅 购买于 {payload.purchase_date.strftime('%Y-%m-%d')}\n"
+        f"🎉 已使用 {years} 年"
+    )
+    return Message(
+        title=payload.title,
+        body=body,
+        html=_render_device_html(payload, years),
+    )
 
-            fm = FastMail(MailConfig.conf)
-            await fm.send_message(message)
-            logger.info(
-                f"[Email] Notification sent to {email_address} "
-                f"for subscription '{payload.subscription_name}'"
-            )
-            return True
 
-        except Exception as e:
-            logger.error(f"[Email] Failed to send notification: {e!r}")
-            return False
+def _render_subscription_html(
+    payload: SubscriptionPayload, days_text: str
+) -> str:
+    """构建订阅续费提醒邮件 HTML（迁移自原 email_channel._build_html）。"""
+    subscription_name = escape(payload.subscription_name)
+    provider = escape(payload.provider)
+    price = f"{payload.price:,.2f}"
+    status_bg = "#E8F8EF" if payload.days_until > 0 else "#FDECEE"
+    status_color = "#157347" if payload.days_until > 0 else "#B42318"
 
-    async def validate_config(self) -> bool:
-        """验证邮件通知配置是否有效"""
-        settings = get_settings()
-        return bool(settings.MAIL_USERNAME and settings.MAIL_PASSWORD)
-
-    async def _get_user_email(self, user_id: int) -> str | None:
-        """获取用户邮箱"""
-        async with get_async_session() as session:
-            stmt = (
-                select(User)
-                .where(User.id == user_id)
-                .options(selectinload(User.profile))
-            )
-            result = await session.execute(stmt)
-            user = result.scalar_one_or_none()
-            if not user or not user.profile:
-                return None
-            return user.profile.email
-
-    def _build_html(self, payload: NotificationPayload) -> str:
-        """构建邮件 HTML 内容"""
-        subscription_name = escape(payload.subscription_name)
-        provider = escape(payload.provider)
-        price = f"{payload.price:,.2f}"
-        days_text = (
-            f"还有 {payload.days_until} 天"
-            if payload.days_until > 0
-            else "今天到期"
-        )
-        status_bg = "#E8F8EF" if payload.days_until > 0 else "#FDECEE"
-        status_color = "#157347" if payload.days_until > 0 else "#B42318"
-
-        return f"""
+    return f"""
         <div style="margin:0;padding:24px 0;background:#F5F7FB;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
             <tr>
@@ -178,53 +149,15 @@ class EmailNotificationChannel(NotifierBase):
         </div>
         """
 
-    async def send_device_reminder(
-        self, user_id: int, payload: DeviceNotificationPayload, config: dict
-    ) -> bool:
-        """发送设备周年提醒邮件"""
-        try:
-            email_address = config.get("email") or await self._get_user_email(
-                user_id
-            )
-            if not email_address:
-                logger.warning(
-                    f"[Email] User {user_id} has no email configured"
-                )
-                return False
 
-            if not await self.validate_config():
-                logger.warning("[Email] Mail server not configured")
-                return False
+def _render_device_html(payload: DevicePayload, years: int) -> str:
+    """构建设备周年提醒邮件 HTML（迁移自原 email_channel._build_device_html）。"""
+    device_name = escape(payload.name)
+    price = f"{payload.price:,.2f}"
+    days = (datetime.now(UTC).date() - payload.purchase_date.date()).days
+    anniversary_text = f"{years}周年"
 
-            html_body = self._build_device_html(payload)
-            message = MessageSchema(
-                subject=f"设备周年提醒: {payload.name}",
-                recipients=[email_address],  # type: ignore
-                body=html_body,
-                subtype=MessageType.html,
-            )
-
-            fm = FastMail(MailConfig.conf)
-            await fm.send_message(message)
-            logger.info(
-                f"[Email] Device reminder sent to {email_address} "
-                f"for device '{payload.name}'"
-            )
-            return True
-
-        except Exception as e:
-            logger.error(f"[Email] Failed to send device reminder: {e!r}")
-            return False
-
-    def _build_device_html(self, payload: DeviceNotificationPayload) -> str:
-        """构建设备周年提醒邮件 HTML 内容"""
-        device_name = escape(payload.name)
-        price = f"{payload.price:,.2f}"
-        days = (datetime.now(UTC).date() - payload.purchase_date.date()).days
-        years = (datetime.now(UTC) - payload.purchase_date).days // 365
-        anniversary_text = f"{years}周年"
-
-        return f"""
+    return f"""
         <div style="margin:0;padding:24px 0;background:#F5F7FB;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
             <tr>

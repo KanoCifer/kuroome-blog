@@ -179,7 +179,9 @@ async def test_device_notification(
     device = await service.get_owned_device(device_id, user)
 
     from app.notification import DeviceNotificationPayload
-    from app.notification.dispatcher import NotificationDispatcher
+    from app.notification.context import context_from_config
+    from app.notification.renderers import render_device_milestone
+    from app.plugins.notification import NotificationPlugin
 
     # 构建测试通知
     days_owned: int = (
@@ -197,13 +199,10 @@ async def test_device_notification(
     reminder_config = device.reminder_config or {}
     channels = reminder_config.get("channels", ["email"])
 
-    dispatcher = NotificationDispatcher()
-    results = await dispatcher.dispatch_device_reminder(
-        payload=payload,
-        reminder_config=reminder_config,
-        user_id=user,
-        channels=channels,
-    )
+    ctx = await context_from_config(user, reminder_config)
+    message = render_device_milestone(payload)
+    plugin = NotificationPlugin()
+    results = await plugin.notify(channels, message, ctx)
 
     return APIResponse(
         data={"results": results}, message="测试通知发送完成"

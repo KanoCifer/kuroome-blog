@@ -156,14 +156,14 @@ async def get_ai_service():
 
 
 @asynccontextmanager
-async def get_notification_service(dispatcher=None):
-    from app.notification.dispatcher import NotificationDispatcher
+async def get_notification_service(plugin=None):
+    from app.plugins.notification import NotificationPlugin
     from app.services.notification_service import NotificationService
 
     async with get_async_session() as session:
         repo = NotificationRepo(session)
-        _dispatcher = dispatcher or NotificationDispatcher()
-        service = NotificationService(_dispatcher, repo=repo)
+        _plugin = plugin or NotificationPlugin()
+        service = NotificationService(plugin=_plugin, repo=repo)
         yield service
 
 

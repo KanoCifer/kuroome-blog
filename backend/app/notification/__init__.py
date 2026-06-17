@@ -1,60 +1,22 @@
-from __future__ import annotations
+"""通知业务层 —— 领域渲染 + context 构造 + payload 定义。
 
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from datetime import datetime
+传输层见 :mod:`app.plugins.notification`（纯通用，无业务依赖）。
 
+本模块保留旧导入路径兼容：
+- ``NotificationPayload`` → :class:`app.notification.payloads.SubscriptionPayload`
+- ``DeviceNotificationPayload`` → :class:`app.notification.payloads.DevicePayload`
+"""
 
-@dataclass
-class NotificationPayload:
-    """通知载荷"""
+from app.notification.payloads import (
+    DeviceNotificationPayload,
+    DevicePayload,
+    NotificationPayload,
+    SubscriptionPayload,
+)
 
-    title: str
-    body: str
-    subscription_name: str
-    provider: str
-    price: float
-    currency: str
-    days_until: int
-    next_billing_date: datetime
-
-
-@dataclass
-class DeviceNotificationPayload:
-    """设备通知载荷"""
-
-    title: str
-    body: str
-    name: str
-    price: float
-    currency: str
-    purchase_date: datetime
-
-
-class NotifierBase(ABC):
-    """通知器基类"""
-
-    @property
-    @abstractmethod
-    def channel(self) -> str:
-        """通知渠道名称"""
-        raise NotImplementedError("channel属性需要在子类中实现")
-
-    @abstractmethod
-    async def send(
-        self, user_id: int, payload: NotificationPayload, config: dict
-    ) -> bool:
-        """发送通知，config 为订阅的 reminder_config JSON"""
-        raise NotImplementedError("send_notification方法需要在子类中实现")
-
-    @abstractmethod
-    async def validate_config(self) -> bool:
-        """验证通知配置"""
-        raise NotImplementedError("validate_config方法需要在子类中实现")
-
-    @abstractmethod
-    async def send_device_reminder(
-        self, user_id: int, payload: DeviceNotificationPayload, config: dict
-    ) -> bool:
-        """发送设备提醒"""
-        raise NotImplementedError("send_device_reminder方法需要在子类中实现")
+__all__ = [
+    "DeviceNotificationPayload",
+    "DevicePayload",
+    "NotificationPayload",
+    "SubscriptionPayload",
+]

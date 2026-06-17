@@ -1,42 +1,58 @@
-from app.notification.dispatcher import NotificationDispatcher
+"""通知业务服务 —— 桥接领域逻辑与通用通知传输插件。"""
+
+from __future__ import annotations
+
+from app.notification.context import context_from_config
+from app.notification.payloads import DevicePayload, SubscriptionPayload
+from app.notification.renderers import (
+    render_device_milestone,
+    render_subscription_reminder,
+)
+from app.plugins.notification import NotificationPlugin
 from app.repositories.notification_repo import NotificationRepo
 
 
 class NotificationService:
+    """通知服务 —— 负责订阅/设备提醒的发送编排。
+
+    依赖：
+    - ``plugin``: 通用通知传输插件（渠道注册表可注入，便于测试）。
+    - ``repo``: 通知数据仓库。
+    """
+
     def __init__(
-        self, dispatcher: NotificationDispatcher, repo: NotificationRepo
-    ):
-        self.dispatcher: NotificationDispatcher = dispatcher
-        self.repo: NotificationRepo = repo
+        self, plugin: NotificationPlugin, repo: NotificationRepo
+    ) -> None:
+        self._plugin = plugin
+        self.repo = repo
 
     async def get_all_subscriptions(self):
         return await self.repo.get_all_subscriptions_orm()
 
     async def get_all_active_subscriptions(self):
-        """获取所有活跃订阅"""
         return await self.repo.get_all_active_subscriptions()
 
-    async def get_subscription(self, user_id):
+    async def get_subscription(self, user_id: int):
         return await self.repo.get_subscription_by_user(user_id)
 
-    async def send_reminder(self, payload, config, user_id, channels):
-        """发送提醒"""
-        result: dict[str, bool] = await self.dispatcher.dispatch(
-            payload=payload,
-            reminder_config=config,
-            user_id=user_id,
-            channels=channels,
-        )
-        return result
+    async def send_reminder(
+        self,
+        payload: SubscriptionPayload,
+        config: dict,
+        user_id: int,
+        channels: list[str],
+    ) -> dict[str, bool]:
+        ctx = await context_from_config(user_id, config)
+        message = render_subscription_reminder(payload)
+        return await self._plugin.notify(channels, message, ctx)
 
-    async def send_device_reminder(self, payload, config, user_id, channels):
-        """发送设备提醒"""
-        result: dict[
-            str, bool
-        ] = await self.dispatcher.dispatch_device_reminder(
-            payload=payload,
-            reminder_config=config,
-            user_id=user_id,
-            channels=channels,
-        )
-        return result
+    async def send_device_reminder(
+        self,
+        payload: DevicePayload,
+        config: dict,
+        user_id: int,
+        channels: list[str],
+    ) -> dict[str, bool]:
+        ctx = await context_from_config(user_id, config)
+        message = render_device_milestone(payload)
+        return await self._plugin.notify(channels, message, ctx)
