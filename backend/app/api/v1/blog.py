@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, Path, Query, UploadFile
-from fastapi.responses import JSONResponse
 from starlette import status
 
 from app.api.des.auth import manager

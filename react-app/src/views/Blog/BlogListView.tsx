@@ -28,6 +28,17 @@ function PostCard({ post, index }: PostCardProps) {
     >
       <Link to={`/blog/${post._id}`} className="group block">
         <article className="border-border/40 bg-card group-hover:border-primary/25 relative overflow-hidden rounded-3xl border p-6 shadow-sm transition-all duration-500 ease-out group-hover:-translate-y-1.5 group-hover:shadow-md">
+          {post.cover && (
+            <div className="border-border bg-muted mb-4 aspect-[16/9] overflow-hidden rounded-2xl border">
+              <img
+                src={post.cover}
+                alt={`${post.title} 封面`}
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+            </div>
+          )}
+
           {/* Left spine accent */}
           <div
             className="bg-primary absolute top-0 left-0 h-full w-1 origin-top scale-y-0 rounded-r-full transition-transform duration-500 ease-out group-hover:scale-y-100"
@@ -130,6 +141,7 @@ export default function BlogListView() {
               title: post.title,
               body: post.body,
               summary: post.summary || '',
+              cover: post.cover,
               category: post.category,
               is_pinned: false,
               created_at: post.created_at,

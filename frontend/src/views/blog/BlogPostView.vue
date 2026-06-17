@@ -124,6 +124,13 @@ useHead(() => {
         .join(', ')
     : '文章未找到, 阅读清单, ReadingList';
 
+  const imageMeta = post.value?.cover
+    ? [
+        { property: 'og:image', content: post.value.cover },
+        { name: 'twitter:image', content: post.value.cover },
+      ]
+    : [];
+
   return {
     title,
     meta: [
@@ -151,6 +158,7 @@ useHead(() => {
       },
       { name: 'twitter:title', content: post.value?.title ?? '文章未找到' },
       { name: 'twitter:description', content: desc },
+      ...imageMeta,
     ],
   };
 });
@@ -307,6 +315,12 @@ onUnmounted(() => {
           v-if="post"
           class="border-border bg-card overflow-hidden rounded-2xl border shadow-sm sm:col-span-2 lg:col-span-3"
         >
+          <img
+            v-if="post.cover"
+            :src="post.cover"
+            :alt="`${post.title} 封面`"
+            class="h-72 w-full object-cover"
+          />
           <div class="border-border border-b p-8">
             <h1 class="text-foreground mb-4 text-3xl leading-tight font-bold">
               {{ post.title }}

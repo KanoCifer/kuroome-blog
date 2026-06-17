@@ -25,6 +25,7 @@ export interface BlogPost {
   title: string;
   body: string;
   summary?: string;
+  cover?: string | null;
   created_at: string;
   updated_at: string;
   category_id: number;

@@ -288,6 +288,16 @@ export default function BlogPostView() {
 
             {/* Hero */}
             <div className="px-5 pt-4">
+              {post.cover && (
+                <div className="border-border bg-muted mb-5 aspect-[16/9] overflow-hidden rounded-2xl border">
+                  <img
+                    src={post.cover}
+                    alt={`${post.title} 封面`}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              )}
+
               {post.is_pinned && (
                 <div className="bg-primary/15 text-primary mb-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium">
                   <svg

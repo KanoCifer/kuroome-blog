@@ -3,6 +3,7 @@ import BasicDetail from '@/components/basic/BasicDetail.vue';
 import MarkdownEditor from '@/components/editor/MarkdownEditor.vue';
 import IconSave from '@/components/icons/IconSave.vue';
 import { blogGateway } from '@/api/blogGateway';
+import { uploadGateway } from '@/api/uploadGateway';
 import { useNotificationStore } from '@/stores/notification';
 import type { Category, CategoryResponseItem } from '@/types';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
@@ -17,11 +18,14 @@ const isEdit = ref(false);
 const postId = ref<string | null>(null);
 const title = ref('');
 const summary = ref('');
+const cover = ref('');
 const debouncedTitle = ref('');
 const category = ref('');
 const pin = ref(false);
 const categories = ref<Category[]>([]);
 const loading = ref(false);
+const coverUploading = ref(false);
+const coverInputRef = ref<HTMLInputElement | null>(null);
 const error = ref('');
 
 // Markdown state
@@ -52,6 +56,7 @@ const saveDraft = () => {
   const draft = {
     title: title.value,
     summary: summary.value,
+    cover: cover.value,
     markdownBody: markdownBody.value,
     category: category.value,
     pin: pin.value,
@@ -64,7 +69,7 @@ const saveDraft = () => {
 
 // Watch changes and trigger auto-save
 watch(
-  [title, summary, markdownBody, category, pin],
+  [title, summary, cover, markdownBody, category, pin],
   () => {
     hasUnsavedChanges.value = true;
     if (autoSaveEnabled.value) {
@@ -83,6 +88,7 @@ const restoreDraft = (): boolean => {
     const draft = JSON.parse(saved);
     title.value = draft.title || '';
     summary.value = draft.summary || '';
+    cover.value = draft.cover || '';
     markdownBody.value = draft.markdownBody || '';
     category.value = draft.category || '';
     pin.value = draft.pin || false;
@@ -132,6 +138,27 @@ const getCurrentContent = (): string => {
   return markdownBody.value;
 };
 
+const handleCoverUpload = async (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('file', file);
+  coverUploading.value = true;
+  try {
+    const response = await uploadGateway.uploadEditorImage(formData);
+    cover.value = response.url;
+    notification.success('封面上传成功');
+  } catch (err) {
+    console.error(err);
+    notification.error('封面上传失败');
+  } finally {
+    coverUploading.value = false;
+    target.value = '';
+  }
+};
+
 // Manual save draft (Cmd+S)
 const handleSaveDraft = () => {
   saveDraft();
@@ -172,6 +199,7 @@ const fetchPost = async (id: string) => {
     const post = await blogGateway.getLegacyPost(id);
     title.value = post.title || '';
     summary.value = post.summary || '';
+    cover.value = post.cover || '';
     debouncedTitle.value = post.title || '';
     category.value = post.category_id ? String(post.category_id) : '';
     pin.value = Boolean(post.is_pinned);
@@ -241,6 +269,7 @@ const handleSubmit = async () => {
       category_id: Number(category.value),
       body: currentContent,
       summary: summary.value,
+      cover: cover.value.trim() || null,
       is_pinned: pin.value ? 1 : 0,
     };
 
@@ -427,6 +456,63 @@ onBeforeUnmount(() => {
               placeholder="添加文章描述..."
               class="text-foreground placeholder:text-muted-foreground min-w-0 flex-1 border-0 bg-transparent text-base outline-0 focus:ring-0"
             />
+          </div>
+
+          <!-- Cover -->
+          <div class="bg-border mx-4 h-px"></div>
+          <div
+            class="group focus-within:bg-accent/30 flex flex-col gap-3 rounded-2xl px-4 py-3 transition-colors sm:flex-row sm:items-center"
+          >
+            <span class="text-muted-foreground shrink-0 text-sm font-medium"
+              >封面</span
+            >
+            <div class="flex min-w-0 flex-1 items-center gap-2">
+              <input
+                v-model="cover"
+                type="text"
+                placeholder="粘贴封面 URL，或上传图片..."
+                class="text-foreground placeholder:text-muted-foreground min-w-0 flex-1 border-0 bg-transparent text-base outline-0 focus:ring-0"
+              />
+              <input
+                ref="coverInputRef"
+                type="file"
+                accept="image/*"
+                class="hidden"
+                @change="handleCoverUpload"
+              />
+              <button
+                type="button"
+                :disabled="coverUploading"
+                class="border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50"
+                @click="coverInputRef?.click()"
+              >
+                {{ coverUploading ? '上传中...' : '上传' }}
+              </button>
+              <button
+                v-if="cover"
+                type="button"
+                class="text-muted-foreground hover:text-foreground shrink-0 text-xs transition"
+                @click="cover = ''"
+              >
+                清除
+              </button>
+            </div>
+            <div
+              class="border-border bg-muted h-20 w-16 shrink-0 overflow-hidden rounded-lg border"
+            >
+              <img
+                v-if="cover"
+                :src="cover"
+                :alt="`${title || '文章'} 封面预览`"
+                class="h-full w-full object-cover"
+              />
+              <div
+                v-else
+                class="text-muted-foreground flex h-full w-full items-center justify-center px-2 text-center text-[10px]"
+              >
+                随机占位
+              </div>
+            </div>
           </div>
         </div>
 

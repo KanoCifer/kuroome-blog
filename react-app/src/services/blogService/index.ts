@@ -9,6 +9,7 @@ export interface BlogListItem {
   title: string;
   body: string;
   summary: string;
+  cover?: string | null;
   category: { id: number; name: string } | null;
   is_pinned: boolean;
   created_at: string;
@@ -29,6 +30,7 @@ export interface BlogDetail {
   _id: string;
   title: string;
   body: string;
+  cover?: string | null;
   category: { id: number; name: string } | null;
   is_pinned: boolean;
   created_at: string;
@@ -56,6 +58,7 @@ export interface BlogService {
     title: string;
     category_id: number;
     body: string;
+    cover?: string | null;
     is_pinned: number;
   }): Promise<{ _id: string }>;
   updateLegacyPost(payload: {
@@ -63,6 +66,7 @@ export interface BlogService {
     title: string;
     category_id: number;
     body: string;
+    cover?: string | null;
     is_pinned: number;
   }): Promise<{ _id: string }>;
   deleteLegacyPost(postId: string): Promise<void>;
@@ -96,6 +100,7 @@ export const blogService = (): BlogService => {
         title: post.title,
         body: post.body,
         summary: (post as BlogPost & { summary?: string }).summary || '',
+        cover: post.cover,
         category: post.category,
         is_pinned:
           (post as BlogPost & { is_pinned?: boolean }).is_pinned || false,

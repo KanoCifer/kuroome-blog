@@ -22,11 +22,11 @@ from app.core.exceptions import APIError
 from app.core.logger import logger
 from app.core.response import APIResponse
 from app.models.models import User
+from app.plugins.cache import redis_cache
 from app.schemas import VisitorData
 from app.schemas.schemas import BlogPostIn, BlogPostUpdate
 from app.services.admin_service import AdminService
 from app.tasks import send_feishu_message
-from app.plugins.cache import redis_cache
 from app.utils import get_redis_lock
 
 # 写后失效的读接口函数名(SCAN 模式: cache:<name>|*)
@@ -59,6 +59,7 @@ async def add_post(
         title=data.title,
         body=data.body,
         summary=data.summary,
+        cover=data.cover,
         category_id=data.category_id,
         is_pinned=data.is_pinned,
     )
@@ -81,6 +82,7 @@ async def update_post(
         title=data.title,
         body=data.body,
         summary=data.summary,
+        cover=data.cover,
         category_id=data.category_id,
         is_pinned=data.is_pinned,
     )

@@ -9,6 +9,9 @@ export const uploadGateway: UploadGateway = {
     const res = await request.post<{ data: { url: string } }>(
       'v1/upload-image',
       formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      },
     );
     return res.data.data;
   },

@@ -6,7 +6,7 @@
       sizeClasses,
     ]"
   >
-    <!-- 真实封面：后端实现后启用 -->
+    <!-- 真实封面 -->
     <img
       v-if="cover"
       :src="cover"
@@ -76,7 +76,7 @@ import { computed } from 'vue';
 
 const props = withDefaults(
   defineProps<{
-    /** 真实封面 URL；后端未实现时留空 */
+    /** 真实封面 URL；留空时使用占位图 */
     cover?: string | null;
     /** 文章标题（占位时叠在图上） */
     title: string;

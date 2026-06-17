@@ -63,6 +63,6 @@ def setup_media(app: FastAPI) -> None:
     media_dir: Path = Path(__file__).resolve().parent.parent / "media"
     app.mount(
         path="/api/v1/media/",
-        app=StaticFiles(directory=str(media_dir), check_dir=True),
+        app=StaticFiles(directory=media_dir),
         name="media",
     )

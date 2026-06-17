@@ -18,6 +18,7 @@ export interface BlogPostResponse {
   title: string;
   body: string;
   summary?: string | null;
+  cover?: string | null;
   category_id: number;
   is_pinned: boolean;
   created_at: string;
@@ -48,6 +49,7 @@ export interface BlogGateway {
     category_id: number;
     body: string;
     summary?: string | null;
+    cover?: string | null;
     is_pinned: number;
   }): Promise<{ _id: string }>;
   updateLegacyPost(payload: {
@@ -56,6 +58,7 @@ export interface BlogGateway {
     category_id: number;
     body: string;
     summary?: string | null;
+    cover?: string | null;
     is_pinned: number;
   }): Promise<{ _id: string }>;
   deleteLegacyPost(postId: string): Promise<void>;
