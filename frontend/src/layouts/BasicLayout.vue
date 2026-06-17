@@ -241,7 +241,7 @@ const transitionName = computed(
         :animate="{
           opacity: 1,
           y: 0,
-          ...(isNavCompact ? { left: 200 } : { left: '50%' }),
+          ...(isNavCompact ? { left: 240 } : { left: '50%' }),
         }"
         :initial="{ opacity: 0, y: -40, left: '50%' }"
         :exit="{ opacity: 0, y: -40 }"

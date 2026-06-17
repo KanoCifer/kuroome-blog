@@ -6,6 +6,7 @@ import {
   Analytics,
   BlogList,
   BlogPost,
+  MomentList,
   BookShelf,
   BookStats,
   Changelog,
@@ -131,6 +132,10 @@ export const router = createBrowserRouter([
       {
         path: '/blog/:postId',
         element: <BlogPost />,
+      },
+      {
+        path: '/moments',
+        element: <MomentList />,
       },
       {
         path: '/rss',

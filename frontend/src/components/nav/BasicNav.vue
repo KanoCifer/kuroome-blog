@@ -54,6 +54,7 @@ import {
   ChangelogIcon,
   HomeIcon,
 } from '@/components/icons';
+import MomentIcon from '@/components/moments/MomentIcon.vue';
 import { useAuthStore } from '@/auth/stores/auth';
 import { useDebounce } from '@vueuse/core';
 import { Image } from '@lucide/vue';
@@ -68,6 +69,7 @@ const route = useRoute();
 const navItems = [
   { to: '/', icon: HomeIcon },
   { to: '/blog', icon: BlogIcon },
+  { to: '/moments', icon: MomentIcon },
   { to: '/bookshelf', icon: BookshelfIcon },
   { to: '/gallery', icon: Image },
   { to: '/version-log', icon: ChangelogIcon },

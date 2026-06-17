@@ -20,6 +20,7 @@ import { ImportIcon } from './icon/ImportIcon';
 import { LoginIcon } from './icon/LoginIcon';
 import { LogoutIcon } from './icon/LogoutIcon';
 import { MessagesIcon } from './icon/MessagesIcon';
+import { MomentIcon } from './icon/MomentIcon';
 import { MoreIcon } from './icon/MoreIcon';
 import { RegisterIcon } from './icon/RegisterIcon';
 import { Settings } from './icon/Settings';
@@ -119,7 +120,7 @@ export function BasicNav() {
 
   // 判断当前路径是否属于"更多"范畴
   const isMore = useMemo(() => {
-    return !['/', '/blog', '/rss'].includes(location.pathname);
+    return !['/', '/blog', '/rss', '/moments'].includes(location.pathname);
   }, [location.pathname]);
 
   const ref = useRef<HTMLDivElement>(null);
@@ -164,6 +165,13 @@ export function BasicNav() {
                 onClick={() => handleNav('/bookshelf')}
                 iconColor="text-orange-500"
                 iconBg="bg-orange-100"
+              />
+              <MenuItem
+                icon={<MomentIcon className="h-6 w-6" />}
+                label="Moments"
+                onClick={() => handleNav('/moments')}
+                iconColor="text-amber-500"
+                iconBg="bg-amber-100"
               />
               <MenuItem
                 icon={<MessagesIcon className="h-6 w-6" />}

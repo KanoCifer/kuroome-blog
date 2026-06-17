@@ -38,3 +38,4 @@ export { default as IconInfoCircle } from './IconInfoCircle.vue';
 export { default as IconLinkChain } from './IconLinkChain.vue';
 export { default as IconRefresh } from './IconRefresh.vue';
 export { default as IconUsersGroup } from './IconUsersGroup.vue';
+export { default as PinIcon } from './PinIcon.vue';

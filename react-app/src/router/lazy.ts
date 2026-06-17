@@ -13,6 +13,7 @@ export const Changelog = lazy(() => import('../views/general/ChangelogView'));
 export const Website = lazy(() => import('../views/Website/WebsiteView'));
 export const BlogList = lazy(() => import('../views/Blog/BlogListView'));
 export const BlogPost = lazy(() => import('../views/Blog/BlogPostView'));
+export const MomentList = lazy(() => import('../views/Moments/MomentListView'));
 export const RssWorkspace = lazy(() => import('../views/Rss/RssWorkspaceView'));
 export const RssArticle = lazy(() => import('../views/Rss/RssArticleView'));
 export const TodoList = lazy(() => import('../views/Todo/TodoListView'));

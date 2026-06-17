@@ -333,6 +333,16 @@ const router = createRouter({
       },
     },
     {
+      path: '/moments',
+      name: 'moments',
+      component: () => import('@/views/moments/MomentListView.vue'),
+      meta: {
+        title: "碎碎念 - Kuroome's Blog",
+        description: '日常的只言片语，汇成一卷散装活页。',
+        keywords: '碎碎念,moments,日常,随笔',
+      },
+    },
+    {
       path: '/toolbox/image-toolbox',
       name: 'image-toolbox',
       component: () => import('@/views/toolbox/ImageToolboxView.vue'),
