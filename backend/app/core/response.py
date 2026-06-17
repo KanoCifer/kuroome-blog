@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi.responses import ORJSONResponse
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 
@@ -30,13 +30,13 @@ def envelope_response(
     data: Any = None,
     message: str = "success",
     status_code: int = 200,
-) -> ORJSONResponse:
-    """Return an ORJSONResponse wrapped in the standard envelope.
+) -> JSONResponse:
+    """Return a JSONResponse wrapped in the standard envelope.
 
     Use when the endpoint also needs to ``set_cookie`` / mutate headers.
     Otherwise prefer returning a dict and annotating ``response_model=APIResponse[T]``.
     """
-    return ORJSONResponse(
+    return JSONResponse(
         status_code=status_code,
         content={"message": message, "data": data},
     )

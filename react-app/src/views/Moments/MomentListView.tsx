@@ -367,7 +367,7 @@ export default function MomentListView() {
         <button
           type="button"
           onClick={() => openEditor(null)}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 fixed right-6 bottom-6 z-30 inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-[13px] font-medium shadow-lg transition-all hover:shadow-xl"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 fixed right-6 bottom-6 z-[60] inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-[13px] font-medium shadow-lg transition-all hover:shadow-xl"
           aria-label="新建碎碎念"
         >
           <svg
@@ -413,7 +413,7 @@ export default function MomentListView() {
       {/* 删除确认 modal（inline，避免依赖缺失的 shadcn Dialog） */}
       {deleteConfirmOpen && (
         <div
-          className="bg-background/60 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+          className="bg-background/60 fixed inset-0 z-[70] flex items-center justify-center p-4 backdrop-blur-sm"
           onClick={() => setDeleteConfirmOpen(false)}
         >
           <div

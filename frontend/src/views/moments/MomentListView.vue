@@ -164,7 +164,7 @@
     <button
       v-if="isAdmin"
       type="button"
-      class="bg-primary text-primary-foreground hover:bg-primary/90 fixed right-6 bottom-6 z-30 inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-[13px] font-medium shadow-lg transition-all hover:shadow-xl"
+      class="bg-primary text-primary-foreground hover:bg-primary/90 fixed right-6 bottom-6 z-[60] inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-[13px] font-medium shadow-lg transition-all hover:shadow-xl"
       aria-label="新建碎碎念"
       @click="openEditor(null)"
     >
@@ -211,41 +211,51 @@
     />
 
     <!-- 删除确认 -->
-    <AlertDialog v-model:open="deleteConfirmOpen">
-      <AlertDialogContent class="sm:max-w-[420px]">
-        <AlertDialogHeader>
-          <AlertDialogTitle>删除这条碎碎念？</AlertDialogTitle>
-          <AlertDialogDescription>
-            将软删除该条记录（deleted_at 置位），列表中将不再展示。
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>取消</AlertDialogCancel>
-          <AlertDialogAction
-            class="bg-destructive text-white hover:bg-destructive/90"
-            @click="handleDelete"
-          >
-            删除
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <Modal
+      :open="deleteConfirmOpen"
+      size="sm"
+      :mask-closable="!deleting"
+      :esc-closable="!deleting"
+      @close="onDeleteCancel"
+    >
+      <div class="px-6 pt-6 pb-5">
+        <h2
+          class="text-foreground font-serif text-lg font-medium italic"
+        >
+          删除这条碎碎念？
+        </h2>
+        <p class="text-muted-foreground mt-2 text-sm leading-relaxed">
+          将软删除该条记录（deleted_at 置位），列表中将不再展示。
+        </p>
+      </div>
+      <div
+        class="border-border/40 flex items-center justify-end gap-2 border-t px-6 py-4"
+      >
+        <button
+          type="button"
+          :disabled="deleting"
+          class="border-border/60 text-foreground hover:bg-accent inline-flex items-center justify-center rounded-lg border px-4 py-1.5 text-[13px] transition-colors disabled:opacity-50"
+          @click="onDeleteCancel"
+        >
+          取消
+        </button>
+        <button
+          type="button"
+          :disabled="deleting"
+          class="bg-destructive text-white hover:bg-destructive/90 inline-flex items-center justify-center rounded-lg px-4 py-1.5 text-[13px] font-medium shadow-sm transition-colors disabled:opacity-50"
+          @click="handleDelete"
+        >
+          {{ deleting ? '删除中…' : '删除' }}
+        </button>
+      </div>
+    </Modal>
   </BasicDetail>
 </template>
 
 <script setup lang="ts">
 import BasicDetail from '@/components/basic/BasicDetail.vue';
 import { useAuthStore } from '@/auth/stores/auth';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import Modal from '@/components/ui/modal/Modal.vue';
 import { useMomentsStore } from '@/stores/moments';
 import { useNotificationStore } from '@/stores/notification';
 import type { Moment, MomentUpdatePayload } from '@/types';
@@ -302,7 +312,10 @@ function setTag(tag: string | null) {
   router.replace({ name: 'moments', query });
 }
 
-async function load(page = publicPage.value, tag: string | null = activeTag.value) {
+async function load(
+  page = publicPage.value,
+  tag: string | null = activeTag.value,
+) {
   errorMessage.value = null;
   try {
     await store.fetchPublic({
@@ -311,8 +324,7 @@ async function load(page = publicPage.value, tag: string | null = activeTag.valu
       tag: tag ?? undefined,
     });
   } catch (err: unknown) {
-    errorMessage.value =
-      err instanceof Error ? err.message : '加载碎碎念失败';
+    errorMessage.value = err instanceof Error ? err.message : '加载碎碎念失败';
   }
 }
 
@@ -322,7 +334,9 @@ function reload() {
 
 function goPage(page: number) {
   if (page < 1 || page > totalPages.value) return;
-  const query: Record<string, string> = { ...(route.query as Record<string, string>) };
+  const query: Record<string, string> = {
+    ...(route.query as Record<string, string>),
+  };
   query.page = String(page);
   router.replace({ name: 'moments', query });
 }
@@ -364,7 +378,8 @@ const detailIndex = computed(() =>
 
 const hasPrev = computed(() => detailIndex.value > 0);
 const hasNext = computed(
-  () => detailIndex.value >= 0 && detailIndex.value < publicList.value.length - 1,
+  () =>
+    detailIndex.value >= 0 && detailIndex.value < publicList.value.length - 1,
 );
 
 const activeVolumeLabel = computed(() => {
@@ -440,6 +455,7 @@ async function handleEditorSubmit(payload: MomentUpdatePayload) {
 // ────────────────────────────────────────────────────────────
 const deleteConfirmOpen = ref(false);
 const deletingMoment = ref<Moment | null>(null);
+const deleting = ref(false);
 
 function confirmDelete(moment: Moment | null) {
   if (!moment) return;
@@ -448,16 +464,25 @@ function confirmDelete(moment: Moment | null) {
   if (detailOpen.value) detailOpen.value = false;
 }
 
+function onDeleteCancel() {
+  if (deleting.value) return;
+  deleteConfirmOpen.value = false;
+  deletingMoment.value = null;
+}
+
 async function handleDelete() {
   const m = deletingMoment.value;
-  if (!m) return;
+  if (!m || deleting.value) return;
+  deleting.value = true;
   try {
     await store.remove(m.id);
     notifier.success('已删除');
-    deletingMoment.value = null;
     deleteConfirmOpen.value = false;
+    deletingMoment.value = null;
   } catch (err: unknown) {
     notifier.error(err instanceof Error ? err.message : '删除失败');
+  } finally {
+    deleting.value = false;
   }
 }
 

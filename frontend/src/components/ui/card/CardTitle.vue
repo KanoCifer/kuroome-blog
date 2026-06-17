@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue';
-import { cn } from '@/lib/utils';
 
 const props = defineProps<{
   class?: HTMLAttributes['class'];
 }>();
+
+defineOptions({
+  name: 'UiCardTitle',
+});
 </script>
 
 <template>
   <h3
     data-slot="card-title"
-    :class="cn('leading-none font-semibold', props.class)"
+    :class="['leading-none font-semibold', props.class]"
   >
     <slot />
   </h3>

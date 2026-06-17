@@ -1,25 +1,34 @@
 <script setup lang="ts">
-import type { AlertDialogCancelProps } from 'reka-ui';
+/**
+ * 取消按钮。点击时关闭弹窗。
+ * 用 form method="dialog" 也能在内部任意位置关闭（浏览器会触发 close 事件），
+ * 但这里我们用显式 setOpen(false) 保持可预测。
+ */
 import type { HTMLAttributes } from 'vue';
-import { reactiveOmit } from '@vueuse/core';
-import { AlertDialogCancel } from 'reka-ui';
-import { cn } from '@/lib/utils';
-import { buttonVariants } from '@/components/ui/button';
+import { inject } from 'vue';
 
-const props = defineProps<
-  AlertDialogCancelProps & { class?: HTMLAttributes['class'] }
->();
+const setOpen = inject<(v: boolean) => void>('alertDialog.setOpen', () => {});
 
-const delegatedProps = reactiveOmit(props, 'class');
+const props = defineProps<{
+  class?: HTMLAttributes['class'];
+}>();
+
+defineOptions({
+  name: 'UiAlertDialogCancel',
+});
+
+function onClick() {
+  setOpen(false);
+}
 </script>
 
 <template>
-  <AlertDialogCancel
-    v-bind="delegatedProps"
-    :class="
-      cn(buttonVariants({ variant: 'outline' }), 'mt-2 sm:mt-0', props.class)
-    "
+  <button
+    data-slot="alert-dialog-cancel"
+    type="button"
+    :class="['inline-flex h-9 items-center justify-center rounded-md border bg-background px-4 text-[13px] font-medium shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] outline-none disabled:pointer-events-none disabled:opacity-50 sm:mt-0 dark:bg-input/30 dark:border-input dark:hover:bg-input/50', props.class]"
+    @click="onClick"
   >
     <slot />
-  </AlertDialogCancel>
+  </button>
 </template>

@@ -1,24 +1,54 @@
 <script setup lang="ts">
-import type { SliderRootEmits, SliderRootProps } from 'reka-ui';
+/**
+ * Slider：基于原生 <input type="range">。
+ * - 浏览器自带的 a11y、键盘、pointer、RTL、触屏行为直接复用。
+ * - 支持 :default-value / :min / :max / :step / v-model。
+ * - v-model 接收 number（单 thumb）或 number[]（多 thumb，兼容 shadcn 语义）。
+ */
 import type { HTMLAttributes } from 'vue';
-import { reactiveOmit } from '@vueuse/core';
-import {
-  SliderRange,
-  SliderRoot,
-  SliderThumb,
-  SliderTrack,
-  useForwardPropsEmits,
-} from 'reka-ui';
-import { cn } from '@/lib/utils';
+import { computed } from 'vue';
 
-const props = defineProps<
-  SliderRootProps & { class?: HTMLAttributes['class'] }
->();
-const emits = defineEmits<SliderRootEmits>();
+type SliderValue = number | number[];
 
-const delegatedProps = reactiveOmit(props, 'class');
+interface Props {
+  modelValue?: SliderValue;
+  defaultValue?: SliderValue;
+  min?: number;
+  max?: number;
+  step?: number;
+  disabled?: boolean;
+  name?: string;
+  class?: HTMLAttributes['class'];
+}
 
-const forwarded = useForwardPropsEmits(delegatedProps, emits);
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: undefined,
+  defaultValue: 0,
+  min: 0,
+  max: 100,
+  step: 1,
+  disabled: false,
+});
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: SliderValue): void;
+}>();
+
+const isArray = computed(
+  () => Array.isArray(props.modelValue) || Array.isArray(props.defaultValue),
+);
+
+const internal = computed<number>(() => {
+  if (props.modelValue !== undefined) {
+    return Array.isArray(props.modelValue) ? props.modelValue[0] : props.modelValue;
+  }
+  return Array.isArray(props.defaultValue) ? props.defaultValue[0] : props.defaultValue;
+});
+
+function onInput(e: Event) {
+  const v = Number((e.target as HTMLInputElement).value);
+  emit('update:modelValue', isArray.value ? [v] : v);
+}
 
 defineOptions({
   name: 'UiSlider',
@@ -26,32 +56,21 @@ defineOptions({
 </script>
 
 <template>
-  <SliderRoot
-    v-slot="{ modelValue }"
+  <input
+    type="range"
+    :value="internal"
+    :min="min"
+    :max="max"
+    :step="step"
+    :disabled="disabled"
+    :name="name"
     data-slot="slider"
-    :class="
-      cn(
-        'relative flex w-full touch-none items-center select-none data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col',
-        props.class,
-      )
-    "
-    v-bind="forwarded"
-  >
-    <SliderTrack
-      data-slot="slider-track"
-      class="bg-muted relative grow overflow-hidden rounded-full data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5"
-    >
-      <SliderRange
-        data-slot="slider-range"
-        class="bg-primary absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full"
-      />
-    </SliderTrack>
-
-    <SliderThumb
-      v-for="(_, key) in modelValue"
-      :key="key"
-      data-slot="slider-thumb"
-      class="border-primary ring-ring/50 block size-4 shrink-0 rounded-full border bg-white shadow-sm transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
-    />
-  </SliderRoot>
+    :class="[
+      'border-input bg-muted/30 ring-ring/30 focus-visible:ring-ring/40 h-1.5 w-full cursor-pointer appearance-none rounded-full outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50',
+      '[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-primary [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-sm [&::-webkit-slider-thumb]:transition-[color,box-shadow] [&::-webkit-slider-thumb]:hover:ring-4 [&::-webkit-slider-thumb]:focus-visible:ring-4',
+      '[&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border [&::-moz-range-thumb]:border-primary [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-sm',
+      props.class,
+    ]"
+    @input="onInput"
+  />
 </template>

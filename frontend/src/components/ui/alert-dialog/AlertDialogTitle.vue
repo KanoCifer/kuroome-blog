@@ -1,23 +1,27 @@
 <script setup lang="ts">
-import type { AlertDialogTitleProps } from 'reka-ui';
+/**
+ * 弹窗标题。注入 Content 的 labelledBy id 用于 a11y。
+ */
 import type { HTMLAttributes } from 'vue';
-import { reactiveOmit } from '@vueuse/core';
-import { AlertDialogTitle } from 'reka-ui';
-import { cn } from '@/lib/utils';
+import { inject } from 'vue';
 
-const props = defineProps<
-  AlertDialogTitleProps & { class?: HTMLAttributes['class'] }
->();
+const labelledBy = inject<string | undefined>('alertDialog.labelledBy', undefined);
 
-const delegatedProps = reactiveOmit(props, 'class');
+const props = defineProps<{
+  class?: HTMLAttributes['class'];
+}>();
+
+defineOptions({
+  name: 'UiAlertDialogTitle',
+});
 </script>
 
 <template>
-  <AlertDialogTitle
+  <h2
     data-slot="alert-dialog-title"
-    v-bind="delegatedProps"
-    :class="cn('text-lg font-semibold', props.class)"
+    :id="labelledBy"
+    :class="['text-lg font-semibold', props.class]"
   >
     <slot />
-  </AlertDialogTitle>
+  </h2>
 </template>

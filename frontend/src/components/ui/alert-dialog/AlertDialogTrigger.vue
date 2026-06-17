@@ -1,12 +1,28 @@
 <script setup lang="ts">
-import type { AlertDialogTriggerProps } from 'reka-ui';
-import { AlertDialogTrigger } from 'reka-ui';
+/**
+ * 触发器：把点击事件转发到 provide 的 setOpen(true)。
+ * - 当默认 slot 有内容时直接渲染（通常是一个 button）。
+ * - `as-child` 只是 shadcn 兼容语法，行为上等价——slot 内容包在 click 下即可。
+ */
+import { inject } from 'vue';
 
-const props = defineProps<AlertDialogTriggerProps>();
+const setOpen = inject<(v: boolean) => void>('alertDialog.setOpen', () => {});
+
+defineOptions({
+  name: 'UiAlertDialogTrigger',
+});
 </script>
 
 <template>
-  <AlertDialogTrigger data-slot="alert-dialog-trigger" v-bind="props">
+  <span
+    v-if="$slots.default"
+    data-slot="alert-dialog-trigger"
+    role="button"
+    tabindex="0"
+    @click="setOpen(true)"
+    @keydown.enter.prevent="setOpen(true)"
+    @keydown.space.prevent="setOpen(true)"
+  >
     <slot />
-  </AlertDialogTrigger>
+  </span>
 </template>
