@@ -372,7 +372,8 @@ const clearRoute = () => {
  * 不转换的话偏差 ~100-700m,驾车/步行路线起点会偏到隔壁马路。
  */
 const wgs84ToGcj02 = (lng: number, lat: number): Promise<[number, number]> => {
-  return new Promise((resolve, reject) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  return new Promise((resolve, _reject) => {
     const AMap = (window as unknown as { AMap: AMapWithPlugins }).AMap;
     AMap.convertFrom([lng, lat], 'gps', (status, result) => {
       if (

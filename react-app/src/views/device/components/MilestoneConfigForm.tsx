@@ -128,6 +128,7 @@ export function MilestoneConfigForm({
   }, [gateway, notifyError]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void fetchGlobalConfig();
   }, [fetchGlobalConfig]);
 

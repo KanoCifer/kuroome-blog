@@ -16,7 +16,6 @@ function getCssVar(
 
 function createTransitionIcon(
   targetTheme: 'light' | 'dark' | 'system',
-  _inkColor: string,
 ): HTMLElement {
   const container = document.createElement('div');
   container.style.cssText = `
@@ -56,12 +55,6 @@ export function playThemeTransition(
     '--paper',
     isDark ? '#0f172a' : '#ffffff',
   );
-  const inkColor = getCssVar(
-    isDark,
-    scheme,
-    '--ink',
-    isDark ? '#f8fafc' : '#0f172a',
-  );
 
   const cx = event.clientX;
   const cy = event.clientY;
@@ -77,7 +70,7 @@ export function playThemeTransition(
     transition: clip-path 0.6s ease-in-out;
   `;
 
-  const icon = createTransitionIcon(targetTheme, inkColor);
+  const icon = createTransitionIcon(targetTheme);
   overlay.appendChild(icon);
 
   document.body.appendChild(overlay);

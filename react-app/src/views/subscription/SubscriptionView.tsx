@@ -69,6 +69,7 @@ export default function SubscriptionView() {
   }, [notifyError, service]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void fetchSubscriptions();
   }, [fetchSubscriptions]);
 

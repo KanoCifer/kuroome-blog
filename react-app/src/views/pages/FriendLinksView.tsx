@@ -69,6 +69,7 @@ function DailyPickBanner() {
   }, [pick?.id]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshPick();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

@@ -92,7 +92,7 @@ export function FishingFeedbackForm({
         setLoading(false);
       }
     },
-    [feedbackPayload, notifyError, notifySuccess, onSuccess, service],
+    [feedbackPayload, notifyError, notifySuccess, onSuccess, service, selectedFeedback],
   );
 
   return (

@@ -5,7 +5,7 @@ import { useWebsocket } from './hooks/useWebsocket';
 import { useAuthStore } from './stores/authState';
 import { useTodoState } from './stores/todoState';
 import { useVisitorCountStore } from './stores/visitorCountStore';
-import { getVisitorId } from './utils/visitorTracker';
+import { getVisitorId } from './utils/visitorId';
 import { buildWsUrl } from './utils/buildWsUrl';
 
 function App() {

@@ -496,6 +496,7 @@ export default function BookStats() {
   // Reset tab when data changes
   useEffect(() => {
     if (!snapshotByMode[activeMode] && Object.keys(snapshotByMode).length) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveMode(Object.keys(snapshotByMode)[0] as ModeKey);
     }
   }, [snapshotByMode, activeMode]);

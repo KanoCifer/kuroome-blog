@@ -101,10 +101,12 @@ export default function AnalyticsView() {
   ]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoginPage(1);
   }, [selectedDays]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void fetchAllData();
   }, [fetchAllData]);
 

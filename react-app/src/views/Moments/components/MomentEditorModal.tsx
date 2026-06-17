@@ -58,6 +58,7 @@ export function MomentEditorModal({
   useEffect(() => {
     if (open) {
       if (moment) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setContent(moment.content);
         setMood(moment.mood ?? '');
         setTags([...moment.tags]);

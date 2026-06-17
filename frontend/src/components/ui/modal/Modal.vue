@@ -46,6 +46,8 @@
 import { AnimatePresence, motion } from 'motion-v';
 import { computed, onBeforeUnmount, watch } from 'vue';
 
+defineOptions({ name: 'UiModal' });
+
 const props = withDefaults(
   defineProps<{
     open: boolean;

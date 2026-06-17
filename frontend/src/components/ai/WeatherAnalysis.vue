@@ -1,4 +1,5 @@
 <script setup lang="ts">
+/* eslint-disable vue/no-v-text-v-html-on-component -- renderedSummary is sanitized via DOMPurify; motion.div renders a plain div */
 /**
  * AI 天气分析 - 抽屉内嵌扁平组件
  *

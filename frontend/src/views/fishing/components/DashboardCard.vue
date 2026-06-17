@@ -69,11 +69,6 @@ const whileHover = computed(() => {
       '0 8px 22px -8px oklch(0% 0 0 / 0.14), 0 2px 6px -2px oklch(0% 0 0 / 0.06)',
   };
 });
-
-/** Hero 卡片的 border 颜色随 hover 浅化,motion-v 接管 */
-const whileHoverBorderColor = computed(() =>
-  props.tone === 'hero' ? 'oklch(from var(--primary) l c h / 0.55)' : undefined,
-);
 </script>
 
 <template>

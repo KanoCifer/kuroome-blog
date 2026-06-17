@@ -237,8 +237,6 @@ const {
   listCardPosition,
   todoCardPosition,
   cardStyles,
-  cardNamesByOrder,
-  maxOrder,
 } = useCardLayout(parentContainer);
 
 const layoutStore = useCardLayoutStore();

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ReadStatsMode } from '@/api/wereadGateway';
 import dayjs from 'dayjs';
-import { computed, ref, toRef } from 'vue';
+import { ref, toRef } from 'vue';
 import {
   useYearHeatmapView,
   type HeatmapCell,

@@ -155,6 +155,7 @@ export function CookieConsent() {
   // Track if the user has scrolled to the bottom of the privacy policy preview
   // to enable the "Accept" button, ensuring they actually skimmed it.
   const handlePrivacyScroll = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_e: React.UIEvent<HTMLDivElement>) => {
       // Your logic here
     },

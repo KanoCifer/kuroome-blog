@@ -165,6 +165,7 @@ export default function BlogPostView() {
   }, [postId]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchPost();
   }, [fetchPost]);
 

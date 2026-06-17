@@ -46,13 +46,21 @@ export default function MomentListView() {
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const initialPage = useMemo(() => {
-    const raw = searchParams.get('page');
-    const n = raw ? Number(raw) : 1;
-    return Number.isFinite(n) && n > 0 ? n : 1;
-  }, []);
+  const initialPage = useMemo(
+    () => {
+      const raw = searchParams.get('page');
+      const n = raw ? Number(raw) : 1;
+      return Number.isFinite(n) && n > 0 ? n : 1;
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- computed once at mount
+    [],
+  );
 
-  const initialTag = useMemo(() => searchParams.get('tag') ?? null, []);
+  const initialTag = useMemo(
+    () => searchParams.get('tag') ?? null,
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- computed once at mount
+    [],
+  );
 
   // ── 数据加载 ──
   const load = async (page: number, tag: string | null) => {
@@ -69,6 +77,7 @@ export default function MomentListView() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void load(initialPage, initialTag);
     // 监听 query 变化
     // eslint-disable-next-line react-hooks/exhaustive-deps

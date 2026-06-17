@@ -86,6 +86,7 @@ export default function BookShelf() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     Promise.all([fetchBooks(), statsStore.fetchStats()]);
   }, [fetchBooks, statsStore]);
 

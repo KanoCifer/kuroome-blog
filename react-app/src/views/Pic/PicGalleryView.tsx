@@ -1,6 +1,5 @@
 import {
   galleryService,
-  type GalleryService,
   type Picture,
 } from '@/services/galleryService';
 import { useAuthStore } from '@/stores/authState';
@@ -45,11 +44,7 @@ function createPictureId(): string {
 export default function PicGalleryView() {
   const auth = useAuthStore();
   const notifier = useNotificationStore();
-  const serviceRef = useRef<GalleryService | null>(null);
-  if (!serviceRef.current) {
-    serviceRef.current = galleryService();
-  }
-  const service = serviceRef.current;
+  const service = useMemo(() => galleryService(), []);
   const canEdit = Boolean(auth.user?.is_admin);
 
   const [images, setImages] = useState<Picture[]>([]);
@@ -101,11 +96,13 @@ export default function PicGalleryView() {
   }, [generateLayoutSeeds, notifier, service]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void fetchGalleryImages();
   }, [fetchGalleryImages]);
 
   useEffect(() => {
     if (!canEdit) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsEditMode(false);
       setShowUploadModal(false);
     }

@@ -28,7 +28,7 @@ const props = withDefaults(
   },
 );
 
-const { back } = usePageBack();
+const { back: goBack } = usePageBack();
 
 const heightClass = computed(() =>
   props.size === 'sm' ? 'h-[30vh] md:h-[35vh]' : 'h-[40vh] md:h-[45vh]',
@@ -51,7 +51,7 @@ const heightClass = computed(() =>
         type="button"
         class="border-border bg-card/60 hover:bg-accent flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
         aria-label="返回"
-        @click="back(backFallback)"
+        @click="goBack(backFallback)"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

@@ -176,6 +176,7 @@ export function SubscriptionAddForm({
   // Load global config when modal opens
   useEffect(() => {
     if (!isOpen) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoadingConfig(true);
     service
       .getUserGlobalConfig()

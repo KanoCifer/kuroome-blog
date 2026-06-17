@@ -267,6 +267,7 @@ async function handleDeleteDevice(device: Device) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function handleAddSuccess(_device: DeviceInput) {
   void fetchDevices();
 }

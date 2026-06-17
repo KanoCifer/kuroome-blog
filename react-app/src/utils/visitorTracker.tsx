@@ -1,30 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { UAParser } from 'ua-parser-js';
-import { v4 } from 'uuid';
+import { getVisitorId } from './visitorId';
 import request from '../api/request';
-// 生成 UUID 作为访客唯一标识
-function generateVisitorId() {
-  return v4();
-}
-
-const setVisitorId = (id: string) => {
-  localStorage.setItem('visitor_id', id);
-};
-
-const getStoredVisitorId = (): string | null => {
-  return localStorage.getItem('visitor_id');
-};
-
-// 初始化访客ID
-export function getVisitorId() {
-  let visitorId = getStoredVisitorId();
-  if (!visitorId) {
-    visitorId = generateVisitorId();
-    setVisitorId(visitorId);
-  }
-  return visitorId;
-}
 
 // 收集前端可获取的追踪信息
 const collectVisitorData = () => {

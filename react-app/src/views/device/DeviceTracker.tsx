@@ -1,10 +1,9 @@
 import {
   deviceService,
   type Device,
-  type DeviceService,
 } from '@/services/deviceService';
 import { useNotificationStore } from '@/stores/notificationState';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { motion } from 'framer-motion';
 import {
@@ -19,11 +18,7 @@ import { AddDeviceForm } from './components/AddDeviceForm';
 import { PriceAnalytics } from './components/PriceAnalytics';
 
 export default function DeviceTracker() {
-  const serviceRef = useRef<DeviceService | null>(null);
-  if (!serviceRef.current) {
-    serviceRef.current = deviceService();
-  }
-  const service = serviceRef.current;
+  const service = useMemo(() => deviceService(), []);
   const notifySuccess = useNotificationStore((state) => state.success);
 
   const [devices, setDevices] = useState<Device[]>([]);
@@ -52,6 +47,7 @@ export default function DeviceTracker() {
   }, [service]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void fetchDevices();
   }, [fetchDevices]);
 

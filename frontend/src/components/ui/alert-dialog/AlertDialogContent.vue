@@ -7,7 +7,7 @@
  *   Title / Description 自行 inject 'alertDialog.labelledBy' / 'describedBy' 设置 id。
  */
 import type { HTMLAttributes } from 'vue';
-import { computed, inject, nextTick, provide, ref, useTemplateRef, watch } from 'vue';
+import { computed, inject, nextTick, provide, useTemplateRef, watch } from 'vue';
 
 interface Props {
   class?: HTMLAttributes['class'];

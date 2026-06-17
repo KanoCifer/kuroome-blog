@@ -50,6 +50,10 @@ export function useWebsocket(options: UseWebSocketOptions) {
     }
   }, []);
 
+  // Ref to the latest connect — lets the setTimeout below avoid the TDZ
+  // warning from react-hooks/immutability while still calling the live version.
+  const connectRef = useRef<(() => void) | null>(null);
+
   const connect = useCallback(() => {
     stopPing();
     if (reconnectTimerRef.current) {
@@ -74,7 +78,10 @@ export function useWebsocket(options: UseWebSocketOptions) {
         reconnectBaseMs * Math.pow(2, reconnectAttemptRef.current),
         reconnectMaxMs,
       );
-      reconnectTimerRef.current = setTimeout(connect, delay);
+      reconnectTimerRef.current = setTimeout(
+        () => connectRef.current?.(),
+        delay,
+      );
       reconnectAttemptRef.current++;
       return;
     }
@@ -134,7 +141,10 @@ export function useWebsocket(options: UseWebSocketOptions) {
           reconnectBaseMs * Math.pow(2, reconnectAttemptRef.current),
           reconnectMaxMs,
         );
-        reconnectTimerRef.current = setTimeout(connect, delay);
+        reconnectTimerRef.current = setTimeout(
+          () => connectRef.current?.(),
+          delay,
+        );
         reconnectAttemptRef.current++;
       }
     };
@@ -143,6 +153,12 @@ export function useWebsocket(options: UseWebSocketOptions) {
       ws.close();
     };
   }, [url, reconnectBaseMs, reconnectMaxMs, pingIntervalMs, stopPing]);
+
+  // Keep ref pointing at the latest connect so the setTimeout above
+  // can re-invoke it without referring to a forward-declared const.
+  useEffect(() => {
+    connectRef.current = connect;
+  }, [connect]);
 
   const disconnect = useCallback(() => {
     stopPing();

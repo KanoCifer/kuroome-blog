@@ -17,7 +17,6 @@ const open = ref(false);
 const triggerRef = useTemplateRef<HTMLElement>('triggerRef');
 const popoverRef = useTemplateRef<HTMLElement>('popoverRef');
 
-const triggerBox = useElementBounding(triggerRef);
 const popoverBox = useElementBounding(popoverRef);
 
 const OFFSET = 8;

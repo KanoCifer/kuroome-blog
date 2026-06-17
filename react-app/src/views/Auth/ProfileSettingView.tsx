@@ -64,6 +64,7 @@ export default function ProfileSettingView() {
 
   useEffect(() => {
     if (auth.user) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm({
         name: auth.user.name || '',
         username: auth.user.username || '',
@@ -97,6 +98,7 @@ export default function ProfileSettingView() {
         missing_pkce_info: 'Missing PKCE information, please try again',
         github_auth_failed: 'GitHub authentication failed, please try again',
       };
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setGithubMessage(errorMessages[error] || 'GitHub binding failed');
       setGithubMessageType('error');
       window.history.replaceState({}, document.title, window.location.pathname);

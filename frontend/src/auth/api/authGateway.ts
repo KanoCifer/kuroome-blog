@@ -63,25 +63,25 @@ function emptyLoginResult(): LoginResult {
 // ------------------------------------------------------------------ #
 
 export const authGateway = {
-  uploadAvatar(formData: FormData): Promise<AxiosResponse<any>> {
+  uploadAvatar(formData: FormData): Promise<AxiosResponse<unknown>> {
     return request.put('v1/auth/upload-pic', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
 
-  getPasskeyRegistrationOptions(): Promise<AxiosResponse<any>> {
+  getPasskeyRegistrationOptions(): Promise<AxiosResponse<unknown>> {
     return request.get('v1/auth/passkey/registration-options');
   },
 
-  registerPasskey(payload: { response: unknown }): Promise<AxiosResponse<any>> {
+  registerPasskey(payload: { response: unknown }): Promise<AxiosResponse<unknown>> {
     return request.post('v1/auth/passkey/register', payload);
   },
 
-  deletePasskey(): Promise<AxiosResponse<any>> {
+  deletePasskey(): Promise<AxiosResponse<unknown>> {
     return request.delete('v1/auth/passkey/delete');
   },
 
-  unbindGithub(): Promise<AxiosResponse<any>> {
+  unbindGithub(): Promise<AxiosResponse<unknown>> {
     return request.post('v1/auth/github/unbind');
   },
 
@@ -92,13 +92,13 @@ export const authGateway = {
     email: string | null;
     mobile: string | null;
     password: string | null;
-  }): Promise<AxiosResponse<any>> {
+  }): Promise<AxiosResponse<unknown>> {
     return request.put('v1/auth/settings', payload);
   },
 
   sendRegisterEmailCode(payload: {
     email: string;
-  }): Promise<AxiosResponse<any>> {
+  }): Promise<AxiosResponse<unknown>> {
     return request.post('v1/auth/email/code', payload);
   },
 
@@ -108,7 +108,7 @@ export const authGateway = {
     password: string;
     confirm_password: string;
     email_code: string;
-  }): Promise<AxiosResponse<any>> {
+  }): Promise<AxiosResponse<unknown>> {
     return request.post('v1/auth/register', payload);
   },
 };

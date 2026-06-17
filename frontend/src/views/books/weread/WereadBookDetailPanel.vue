@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import { BookOpen, Eye, EyeOff, Loader, RefreshCw, X } from '@lucide/vue';
+import { computed, watch } from 'vue';
+import { BookOpen, Eye, EyeOff, RefreshCw, X } from '@lucide/vue';
 import { AnimatePresence, motion } from 'motion-v';
 import type { WereadBookProgress, WereadUserBook } from '@/api/wereadGateway';
 import { useWereadBookProgress } from '../composables/useWereadBookProgress';

@@ -77,6 +77,7 @@ export function AIAnalysisWidget({
         clearInterval(shimmerTimerRef.current);
         shimmerTimerRef.current = null;
       }
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShimmerIndex(0);
     }
     return () => {

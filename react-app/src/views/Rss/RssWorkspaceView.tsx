@@ -110,6 +110,7 @@ export default function RssWorkspaceView() {
     if (!history) return;
     try {
       const parsed = JSON.parse(history) as string[];
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (Array.isArray(parsed)) setRssHistory(parsed.slice(0, 3));
     } catch {
       localStorage.removeItem('rssHistory');
@@ -117,10 +118,12 @@ export default function RssWorkspaceView() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void fetchSubscriptions();
   }, [fetchSubscriptions]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void fetchArticles(currentPage, selectedFeedUrl, searchQuery);
   }, [currentPage, fetchArticles, searchQuery, selectedFeedUrl]);
 

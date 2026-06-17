@@ -445,7 +445,6 @@
 import { deviceGateway, type Device } from '@/api/deviceGateway';
 import { useNotificationStore } from '@/stores/notification';
 import { reactive, ref, watch, onMounted } from 'vue';
-import dayjs from 'dayjs';
 
 type Channel = 'email' | 'feishu' | 'bark';
 
