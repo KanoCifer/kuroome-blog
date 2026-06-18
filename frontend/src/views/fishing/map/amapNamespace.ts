@@ -19,6 +19,13 @@
 import { mapGateway } from '@/api/mapGateway';
 import AMapLoader from '@amap/amap-jsapi-loader';
 
+// ---- AMap 安全密钥全局声明 ----
+declare global {
+  interface Window {
+    _AMapSecurityConfig?: { securityJsCode: string };
+  }
+}
+
 // ---- AMap 插件类型 (官方 @types/amap-js-api 只覆盖核心) ----
 
 interface DrivingService {
