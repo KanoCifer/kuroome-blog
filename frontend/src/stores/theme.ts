@@ -131,11 +131,6 @@ export const useThemeStore = defineStore('theme', () => {
     applyScheme(newScheme);
   };
 
-  // Cleanup listener on unmount
-  const _cleanup = () => {
-    mediaQuery.removeEventListener('change', handleSystemChange);
-  };
-
   const toggleTheme = () => {
     if (theme.value === 'light') {
       setTheme('dark');

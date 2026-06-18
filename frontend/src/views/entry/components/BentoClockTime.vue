@@ -8,11 +8,11 @@ const minuteKey = ref(dayjs().format('YYYY-MM-DD HH:mm'));
 
 const hourLabel = computed(() => {
   // Access minuteKey to establish reactivity dependency
-  minuteKey.value;
+  void minuteKey.value;
   return dayjs().format('HH');
 });
 const minuteLabel = computed(() => {
-  minuteKey.value;
+  void minuteKey.value;
   return dayjs().format('mm');
 });
 

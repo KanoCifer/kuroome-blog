@@ -1,5 +1,4 @@
 import type {
-  ReadDetailBook,
   ReadDetailRawLongestItem,
   ReadDetailSnapshot,
 } from '@/api/wereadGateway';

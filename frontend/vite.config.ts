@@ -1,9 +1,9 @@
-import { fileURLToPath, URL } from "node:url";
+import { fileURLToPath, URL } from 'node:url';
 
-import tailwindcss from "@tailwindcss/vite";
-import vue from "@vitejs/plugin-vue";
-import { defineConfig } from "vite";
-import vueDevTools from "vite-plugin-vue-devtools";
+import tailwindcss from '@tailwindcss/vite';
+import vue from '@vitejs/plugin-vue';
+import { defineConfig } from 'vite';
+import vueDevTools from 'vite-plugin-vue-devtools';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -11,17 +11,17 @@ export default defineConfig({
     vue(),
     vueDevTools({
       componentInspector: true,
-      launchEditor: "zed",
+      launchEditor: 'zed',
     }),
     tailwindcss(),
   ],
   resolve: {
     alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
   build: {
-    minify: "oxc",
+    minify: 'oxc',
     cssMinify: true,
     sourcemap: false,
     terserOptions: {
@@ -36,38 +36,38 @@ export default defineConfig({
       : {
           output: {
             manualChunks(id) {
-              if (!id.includes("node_modules")) return;
+              if (!id.includes('node_modules')) return;
 
               // ✅ 富文本（最大优先级）
-              if (id.includes("@tiptap")) {
-                return "tiptap";
+              if (id.includes('@tiptap')) {
+                return 'tiptap';
               }
 
               // ✅ 代码高亮
-              if (id.includes("highlight.js") || id.includes("lowlight")) {
-                return "syntax-highlight";
+              if (id.includes('highlight.js')) {
+                return 'syntax-highlight';
               }
 
               // ✅ 动画
-              if (id.includes("lottie-web")) {
-                return "lottie";
+              if (id.includes('lottie-web')) {
+                return 'lottie';
               }
 
               // ✅ Vue 生态（注意顺序！）
-              if (id.includes("vue-router")) return "router";
-              if (id.includes("pinia")) return "store";
-              if (id.includes("node_modules/vue/")) return "vue";
+              if (id.includes('vue-router')) return 'router';
+              if (id.includes('pinia')) return 'store';
+              if (id.includes('node_modules/vue/')) return 'vue';
 
               // ✅ 工具库
-              if (id.includes("axios")) return "axios";
-              if (id.includes("dayjs")) return "dayjs";
+              if (id.includes('axios')) return 'axios';
+              if (id.includes('dayjs')) return 'dayjs';
             },
           },
           // 忽略lottie-web的eval警告（第三方库问题，无法修复）
           onwarn(warning, warn) {
             if (
-              warning.code === "EVAL" &&
-              warning.id?.includes("node_modules/lottie-web")
+              warning.code === 'EVAL' &&
+              warning.id?.includes('node_modules/lottie-web')
             ) {
               return;
             }
@@ -76,13 +76,13 @@ export default defineConfig({
         },
   },
   optimizeDeps: {
-    include: ["vue3-lottie"],
+    include: ['vue3-lottie'],
   },
   server: {
     port: 5173,
     proxy: {
-      "/api/": {
-        target: "http://localhost:5555", // FastApi 后端地址
+      '/api/': {
+        target: 'http://localhost:5555', // FastApi 后端地址
         changeOrigin: true,
         ws: true,
       },

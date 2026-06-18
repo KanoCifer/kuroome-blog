@@ -4,10 +4,10 @@ declare module 'axios' {
   interface AxiosRequestConfig {
     _isRefreshToken?: boolean;
   }
-  interface CreateAxiosDefaults<D = unknown> {
+  interface CreateAxiosDefaults {
     _isRefreshToken?: boolean;
   }
-  interface AxiosDefaults<D = unknown> {
+  interface AxiosDefaults {
     _isRefreshToken?: boolean;
   }
 }

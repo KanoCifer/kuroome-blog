@@ -27,23 +27,23 @@ export function useEChartsTheme() {
 
   // 显式 touch themeVersion 让 computed 跟随主题切换重算
   const subtextColor = computed(() => {
-    themeVersion.value;
+    void themeVersion.value;
     return resolveCssColor('--muted-foreground', '#6b7280');
   });
   const axisColor = computed(() => {
-    themeVersion.value;
+    void themeVersion.value;
     return resolveCssColor('--border', '#e5e7eb');
   });
   const splitLineColor = computed(() => {
-    themeVersion.value;
+    void themeVersion.value;
     return resolveCssColor('--border', '#f3f4f6');
   });
   const primaryColor = computed(() => {
-    themeVersion.value;
+    void themeVersion.value;
     return resolveCssColor('--primary', '#3b82f6');
   });
   const mutedFillColor = computed(() => {
-    themeVersion.value;
+    void themeVersion.value;
     return resolveCssColor('--muted', '#e5e7eb');
   });
 

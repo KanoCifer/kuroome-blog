@@ -18,6 +18,7 @@ function getCssVar(
 
 function createTransitionIcon(
   targetTheme: Theme,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _inkColor: string,
 ): HTMLElement {
   const container = document.createElement('div');

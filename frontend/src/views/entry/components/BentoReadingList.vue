@@ -91,8 +91,10 @@ onMounted(async () => {
   }
 
   // Defer stats fetch — weekly/monthly reading time is secondary data
-  requestIdleCallback
-    ? requestIdleCallback(() => readStats.fetchCurrentAll())
-    : setTimeout(() => readStats.fetchCurrentAll(), 0);
+  if (requestIdleCallback) {
+    requestIdleCallback(() => readStats.fetchCurrentAll());
+  } else {
+    setTimeout(() => readStats.fetchCurrentAll(), 0);
+  }
 });
 </script>

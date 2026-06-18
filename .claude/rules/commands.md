@@ -30,7 +30,7 @@ pnpm run dev                      # dev server (:5173)
 pnpm run build                    # build (only if user asks)
 pnpm run build-only               # vite build only
 pnpm run type-check               # vue-tsc (must run after modifying frontend)
-pnpm run lint                     # oxlint + eslint
+pnpm run lint                     # eslint
 pnpm run format                   # prettier write
 pnpm run test:unit                # vitest
 ```

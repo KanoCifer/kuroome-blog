@@ -21,7 +21,7 @@ export default defineConfig({
           if (!id.includes('node_modules')) return;
 
           // ✅ 代码高亮
-          if (id.includes('highlight.js') || id.includes('lowlight')) {
+          if (id.includes('highlight.js')) {
             return 'syntax-highlight';
           }
 
