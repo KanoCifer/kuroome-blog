@@ -1,13 +1,6 @@
 <script setup lang="ts">
-/**
- * 文学手账风 mini-window：hover ~400ms 弹出，自渲染精简状态卡。
- * 用 Vue 计时器 + Teleport 实现：
- *  - 鼠标进入 trigger 区域后 openDelay 毫秒才显示浮层
- *  - 鼠标离开时 closeDelay 毫秒后收起（允许鼠标从 trigger 移到浮层）
- *  - 浮层在 trigger 之上（bottom）、靠右（end）对齐
- */
 import { onBeforeUnmount, ref, useTemplateRef } from 'vue';
-import { useElementBounding, useEventListener } from '@vueuse/core';
+import { useEventListener } from '@vueuse/core';
 import StatusMini from './StatusMini.vue';
 import { useVisitorCountStore } from '@/stores/visitorCount';
 
@@ -17,35 +10,19 @@ const open = ref(false);
 const triggerRef = useTemplateRef<HTMLElement>('triggerRef');
 const popoverRef = useTemplateRef<HTMLElement>('popoverRef');
 
-const popoverBox = useElementBounding(popoverRef);
-
-const OFFSET = 8;
-const COLLISION = 12;
-
 const popoverStyle = ref<Record<string, string>>({});
 
 function updatePosition() {
   const t = triggerRef.value;
-  if (!t) return;
-  const winW = window.innerWidth;
-  const tRect = t.getBoundingClientRect();
-  // 宽度预设 420px（与原 reka-ui 版一致）
-  const w = 420;
-  // 默认 top: trigger 上方，end: 右侧贴齐 trigger 右边
-  const ph: number = popoverBox.height.value || 0;
-  let top = tRect.top - OFFSET - ph;
-  // 上方空间不够则改到下方
-  if (top < COLLISION) {
-    top = tRect.bottom + OFFSET;
-  }
-  let left = tRect.right - w;
-  if (left < COLLISION) left = COLLISION;
-  if (left + w > winW - COLLISION) left = winW - COLLISION - w;
+  const tRect = t?.getBoundingClientRect();
+  if (!tRect) return;
+
+  const left = tRect.right - 420;
   popoverStyle.value = {
     position: 'fixed',
-    top: `${top}px`,
+    top: `${tRect.top - 18 * tRect.height}px`,
     left: `${left}px`,
-    width: `${w}px`,
+    width: '420px',
     zIndex: '100',
   };
 }
@@ -86,7 +63,9 @@ function scheduleClose() {
   }, 150);
 }
 
-useEventListener(window, 'scroll', () => open.value && updatePosition(), { passive: true });
+useEventListener(window, 'scroll', () => open.value && updatePosition(), {
+  passive: true,
+});
 useEventListener(window, 'resize', () => open.value && updatePosition());
 
 onBeforeUnmount(() => clearTimers());

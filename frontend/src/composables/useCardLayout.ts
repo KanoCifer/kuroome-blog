@@ -62,23 +62,81 @@ interface CardSpec {
 // Ordered so every `cascadeFrom` target appears before its dependents.
 const cardSpecs: CardSpec[] = [
   // ── First row (ratio-anchored) ──
-  { as: 'greetingPosition',  name: 'BentoMap',         column: 'right',  xOffset: -30,  topRatio: 0.16 },
-  { as: 'picPosition',       name: 'BentoPic',         column: 'center', xOffset: 0,    topRatio: 0.19, yOffset: -20 },
-  { as: 'navCardPosition',   name: 'BentoNavCard',     column: 'left',   xOffset: 20,   topRatio: 0.43, yOffset: -20 },
+  {
+    as: 'greetingPosition',
+    name: 'BentoMap',
+    column: 'right',
+    xOffset: -30,
+    topRatio: 0.16,
+  },
+  {
+    as: 'picPosition',
+    name: 'BentoPic',
+    column: 'center',
+    xOffset: 0,
+    topRatio: 0.19,
+    yOffset: -20,
+  },
+  {
+    as: 'navCardPosition',
+    name: 'BentoNavCard',
+    column: 'left',
+    xOffset: 20,
+    topRatio: 0.43,
+    yOffset: -40,
+  },
 
   // ── Right column: Map → Clock → Calendar ──
-  { as: 'clockCardPosition', name: 'BentoClock',       column: 'right',  xOffset: -46,  cascadeFrom: 'BentoMap' },
-  { as: 'calendarPosition',  name: 'BentoCalendar',    column: 'right',  xOffset: 4,    cascadeFrom: 'BentoClock' },
+  {
+    as: 'clockCardPosition',
+    name: 'BentoClock',
+    column: 'right',
+    xOffset: -46,
+    cascadeFrom: 'BentoMap',
+  },
+  {
+    as: 'calendarPosition',
+    name: 'BentoCalendar',
+    column: 'right',
+    xOffset: 4,
+    cascadeFrom: 'BentoClock',
+  },
 
   // ── Center column: Pic → ProfileCard → ReadingList ──
-  { as: 'profilePosition',   name: 'BentoProfileCard', column: 'center', xOffset: 0,    cascadeFrom: 'BentoPic',        yOffset: -20 },
-  { as: 'listCardPosition',  name: 'BentoReadingList', column: 'center', xOffset: 40,   cascadeFrom: 'BentoProfileCard' },
+  {
+    as: 'profilePosition',
+    name: 'BentoProfileCard',
+    column: 'center',
+    xOffset: 0,
+    cascadeFrom: 'BentoPic',
+    yOffset: -20,
+  },
+  {
+    as: 'listCardPosition',
+    name: 'BentoReadingList',
+    column: 'center',
+    xOffset: 40,
+    cascadeFrom: 'BentoProfileCard',
+  },
 
   // ── Left column: NavCard → Tech ──
-  { as: 'techPosition',      name: 'BentoTech',        column: 'left',   xOffset: 102,  cascadeFrom: 'BentoNavCard',    yOffset: 90 },
+  {
+    as: 'techPosition',
+    name: 'BentoTech',
+    column: 'left',
+    xOffset: 102,
+    cascadeFrom: 'BentoNavCard',
+    yOffset: 110,
+  },
 
   // ── Floating card: Todo cascades from the Calendar row ──
-  { as: 'todoCardPosition',  name: 'TodoCard',         column: 'center', xOffset: 300,  cascadeFrom: 'BentoCalendar' },
+  {
+    as: 'todoCardPosition',
+    name: 'TodoCard',
+    column: 'center',
+    xOffset: 300,
+    cascadeFrom: 'BentoCalendar',
+  },
 ];
 
 // ── Layout helpers ──────────────────────────────────────
@@ -129,10 +187,7 @@ export function useCardLayout(containerRef: Ref<HTMLElement | null>) {
   // Column anchors
   const leftAnchor = computed(
     () =>
-      centerX.value -
-      widthOf('BentoNavCard') / 2 -
-      cardSpacing -
-      sideColumnGap,
+      centerX.value - widthOf('BentoNavCard') / 2 - cardSpacing - sideColumnGap,
   );
   const rightAnchor = computed(
     () =>
