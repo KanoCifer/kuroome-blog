@@ -5,7 +5,8 @@
 - 修改前端代码后，必须运行类型检查：
   - Vue: `cd frontend && pnpm run type-check`
   - React: `cd react-app && pnpm run type-check`
-- 提交前执行对应语言的格式化与 lint，使用 Conventional Commits 格式。
+- **提交前必跑**：(1) 改前端 → `pnpm run type-check` (2) 改后端 → `ruff check .` (3) 各自语言的 lint + format
+- 用 Conventional Commits 格式（`refactor(frontend): ...` 之类）
 - 编辑器已配置 format-on-save（Prettier frontend/react-app，Ruff backend）— 不要重复格式化。
 - 样式必须使用语义化 Tailwind class（`bg-background`, `text-foreground` 等），禁止硬编码颜色（`bg-black/75`, `text-white/90`）。详见 design-system.md。
 - 后端使用 `uv` 管理依赖。
@@ -18,6 +19,7 @@
 - **双前端架构**: Vue + React 共享后端服务，各自维护独立状态 Store；API 契约修改需同步两端
 - 修改 `backend/app/schemas/` 后，必须同步 `frontend/src/api/` 和 `react-app/src/services/`。
 - 缓存模块在 `app/plugins/cache/`（不在 `app/utils/`）。端点用 `@redis_cache(ttl=N, exclude=[...])`，`exclude` 跳过 Depends 参数（不参与 cache key）
+- **`composables/` 按域分目录**（`shared/ card/ article/ rss/ weread/ comment/ todo/`），与 `views/` `components/` 分域策略一致；每个子目录用 `index.ts` 桶导出，跨域 import 走桶 `from '@/composables/<domain>'`，不要直接指向具体文件
 
 ## 3) Documentation Index
 
