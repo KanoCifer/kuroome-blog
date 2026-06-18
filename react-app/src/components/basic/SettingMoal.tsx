@@ -142,7 +142,7 @@ export function SettingModal({
             <header className="relative px-8 pt-10 pb-6 text-center">
               <button
                 onClick={onClose}
-                className="text-muted-foreground hover:bg-accent hover:text-accent-foreground absolute top-6 right-6 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+                className="text-muted-foreground hover:bg-muted hover:text-foreground absolute top-6 right-6 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
                 aria-label="关闭"
               >
                 <X className="h-5 w-5" />

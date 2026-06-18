@@ -34,7 +34,7 @@
             type="search"
             placeholder="在字里行间，寻一句心动…"
             aria-label="搜索文章"
-            class="text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:ring-primary/20 border-border bg-card w-full rounded-xl border py-3 pr-10 pl-10 font-serif text-sm placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:ring-primary/20 border-border bg-background w-full rounded-xl border py-3 pr-10 pl-10 font-serif text-sm placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             @keyup.enter="handleSearch"
           />
           <button
@@ -67,7 +67,7 @@
           <button
             v-if="activeCategory"
             type="button"
-            class="border-border bg-card text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
+            class="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
             @click="handleResetFilter"
           >
             <span class="text-primary/70 font-serif italic">#</span>
@@ -172,7 +172,7 @@
             v-if="isLoading"
             role="status"
             aria-live="polite"
-            class="border-border bg-card/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center"
+            class="border-border bg-background/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center"
           >
             <div
               class="border-primary/20 border-t-primary mb-5 h-12 w-12 animate-spin rounded-full border-4"
@@ -220,7 +220,7 @@
 
           <div
             v-else-if="posts.length === 0"
-            class="border-border bg-card/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center"
+            class="border-border bg-background/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -253,7 +253,7 @@
               <button
                 v-if="activeCategory"
                 type="button"
-                class="border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg border px-4 py-2 text-sm font-medium"
+                class="border-border text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg border px-4 py-2 text-sm font-medium"
                 @click="handleResetFilter"
               >
                 翻看全卷
@@ -294,7 +294,7 @@
             aria-label="博客分页"
           >
             <ul
-              class="border-border/80 bg-card/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2"
+              class="border-border/80 bg-background/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2"
             >
               <li>
                 <button
@@ -304,7 +304,7 @@
                   class="focus-visible:ring-ring inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                   :class="
                     pagination?.has_prev
-                      ? 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                      ? 'text-muted-foreground hover:bg-muted hover:text-foreground'
                       : 'text-muted-foreground/50 cursor-not-allowed'
                   "
                   @click="goToPage(pagination!.prev_num!)"
@@ -346,7 +346,7 @@
                     :class="
                       item === pagination?.page
                         ? 'bg-primary text-primary-foreground'
-                        : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                     "
                     @click="goToPage(item)"
                   >
@@ -363,7 +363,7 @@
                   class="focus-visible:ring-ring inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                   :class="
                     pagination?.has_next
-                      ? 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                      ? 'text-muted-foreground hover:bg-muted hover:text-foreground'
                       : 'text-muted-foreground/50 cursor-not-allowed'
                   "
                   @click="goToPage(pagination!.next_num!)"

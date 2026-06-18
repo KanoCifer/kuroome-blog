@@ -2,7 +2,7 @@
   <BasicDetail title="图片工具箱" subtitle="本地压缩与格式转换">
     <div class="col-span-full">
       <div
-        class="squircle border-border/60 bg-card/50 overflow-hidden border shadow-sm"
+        class="squircle border-border/60 bg-background/50 overflow-hidden border shadow-sm"
       >
         <div class="flex flex-col lg:flex-row lg:items-stretch">
           <!-- 左侧配置面板 -->
@@ -60,7 +60,7 @@
                     type="number"
                     min="1"
                     :disabled="!enableMaxWidth"
-                    class="text-foreground placeholder:text-muted-foreground focus:border-foreground border-border bg-card disabled:bg-muted disabled:text-muted-foreground w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
+                    class="text-foreground placeholder:text-muted-foreground focus:border-foreground border-border bg-background disabled:bg-muted disabled:text-muted-foreground w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
                   />
                   <span
                     class="text-muted-foreground absolute top-1/2 right-4 -translate-y-1/2 text-xs"
@@ -113,7 +113,7 @@
                     :class="
                       outputType === option.value
                         ? 'border-foreground bg-foreground text-background'
-                        : 'border-border bg-card text-muted-foreground hover:border-muted-foreground'
+                        : 'border-border bg-background text-muted-foreground hover:border-muted-foreground'
                     "
                     @click="outputType = option.value"
                   >
@@ -143,7 +143,7 @@
                   type="text"
                   spellcheck="false"
                   placeholder="留空则使用原文件名"
-                  class="text-foreground placeholder:text-muted-foreground focus:border-foreground border-border bg-card w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
+                  class="text-foreground placeholder:text-muted-foreground focus:border-foreground border-border bg-background w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
                 />
               </div>
 
@@ -183,7 +183,7 @@
                 <button
                   type="button"
                   :disabled="!processedBlob"
-                  class="text-foreground hover:bg-accent border-border bg-card flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium shadow-md transition-all hover:scale-105 hover:shadow-lg disabled:opacity-50"
+                  class="text-foreground hover:bg-muted border-border bg-background flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium shadow-md transition-all hover:scale-105 hover:shadow-lg disabled:opacity-50"
                   @click="download"
                 >
                   <svg
@@ -224,8 +224,8 @@
                   isOverDropZone
                     ? 'border-foreground bg-foreground/5'
                     : originalFile
-                      ? 'bg-card border-transparent shadow-sm'
-                      : 'border-border bg-card hover:border-muted-foreground'
+                      ? 'bg-background border-transparent shadow-sm'
+                      : 'border-border bg-background hover:border-muted-foreground'
                 "
                 @click="triggerFilePicker"
               >
@@ -290,7 +290,7 @@
                     </div>
                     <button
                       type="button"
-                      class="text-foreground bg-card ring-border hover:bg-accent rounded-full px-4 py-1.5 text-xs font-bold shadow-sm ring-1 transition-all"
+                      class="text-foreground bg-background ring-border hover:bg-muted rounded-full px-4 py-1.5 text-xs font-bold shadow-sm ring-1 transition-all"
                       @click.stop="triggerFilePicker"
                     >
                       更换图片
@@ -314,7 +314,7 @@
               >
                 <!-- 原图预览 -->
                 <div
-                  class="group bg-card relative flex flex-col overflow-hidden rounded-3xl shadow-sm"
+                  class="group bg-background relative flex flex-col overflow-hidden rounded-3xl shadow-sm"
                 >
                   <div
                     class="border-border/50 flex items-center justify-between border-b p-4"
@@ -371,7 +371,7 @@
 
                 <!-- 处理后预览 -->
                 <div
-                  class="group bg-card relative flex flex-col overflow-hidden rounded-3xl shadow-sm"
+                  class="group bg-background relative flex flex-col overflow-hidden rounded-3xl shadow-sm"
                 >
                   <div
                     class="border-border/50 flex items-center justify-between border-b p-4"

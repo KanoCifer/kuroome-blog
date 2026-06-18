@@ -10,7 +10,7 @@
     >
       <article
         :class="[
-          'border-border/40 bg-card group-hover:border-primary/30 relative overflow-hidden rounded-2xl border p-5 shadow-sm transition-all duration-500 ease-out',
+          'border-border/40 bg-background group-hover:border-primary/30 relative overflow-hidden rounded-2xl border p-5 shadow-sm transition-all duration-500 ease-out',
           'group-hover:-translate-y-0.5 group-hover:shadow-md',
           isFeatured ? 'sm:p-7' : '',
         ]"

@@ -1,7 +1,7 @@
 <template>
   <section
     id="rss-articles"
-    class="border-border bg-card rounded-2xl border p-6"
+    class="border-border bg-background rounded-2xl border p-6"
   >
     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
       <div>
@@ -26,7 +26,7 @@
           :value="searchQuery"
           type="search"
           placeholder="搜索文章标题和内容..."
-          class="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border py-3 pr-24 pl-4 text-sm focus:ring-2 focus:outline-none"
+          class="border-border bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border py-3 pr-24 pl-4 text-sm focus:ring-2 focus:outline-none"
           @input="
             $emit(
               'update:searchQuery',
@@ -38,7 +38,7 @@
         <div class="absolute inset-y-0 right-2 flex items-center gap-1">
           <button
             type="button"
-            class="text-primary hover:bg-accent rounded-md px-2 py-1 text-xs font-medium transition-colors"
+            class="text-primary hover:bg-muted rounded-md px-2 py-1 text-xs font-medium transition-colors"
             @click="$emit('search')"
           >
             搜索
@@ -46,7 +46,7 @@
           <button
             v-if="searchQuery"
             type="button"
-            class="text-primary hover:bg-accent rounded-md px-2 py-1 text-xs font-medium transition-colors"
+            class="text-primary hover:bg-muted rounded-md px-2 py-1 text-xs font-medium transition-colors"
             @click="$emit('clearSearch')"
           >
             清空
@@ -63,7 +63,7 @@
       </span>
       <button
         type="button"
-        class="border-primary/30 text-primary hover:bg-accent rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors"
+        class="border-primary/30 text-primary hover:bg-muted rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors"
         @click="$emit('clearFeedFilter')"
       >
         清除筛选
@@ -97,7 +97,7 @@
         <li
           v-for="article in articles"
           :key="article.id"
-          class="border-border bg-card hover:border-primary/30 rounded-xl border p-4 transition-all"
+          class="border-border bg-background hover:border-primary/30 rounded-xl border p-4 transition-all"
         >
           <div class="flex flex-col gap-3">
             <div class="flex flex-wrap items-start justify-between gap-2">

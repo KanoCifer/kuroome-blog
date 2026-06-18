@@ -634,7 +634,7 @@ export default function PicGalleryView() {
               <button
                 type="button"
                 onClick={closeUploadModal}
-                className="text-muted-foreground hover:bg-accent hover:text-foreground absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+                className="text-muted-foreground hover:bg-muted hover:text-foreground absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -723,7 +723,7 @@ export default function PicGalleryView() {
               <div className="mt-8 flex gap-3">
                 <button
                   type="button"
-                  className="border-border bg-card text-card-foreground hover:bg-accent flex-1 rounded-xl border py-3 text-sm font-medium shadow-sm transition-colors"
+                  className="border-border bg-card text-card-foreground hover:bg-muted flex-1 rounded-xl border py-3 text-sm font-medium shadow-sm transition-colors"
                   onClick={closeUploadModal}
                 >
                   取消

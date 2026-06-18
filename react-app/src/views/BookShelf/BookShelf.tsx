@@ -105,7 +105,7 @@ export default function BookShelf() {
         <div className="absolute top-0 right-0 left-0 z-10 flex items-center px-4 py-4 md:px-6">
           <button
             type="button"
-            className="border-border bg-card/60 hover:bg-accent flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
+            className="border-border bg-card/60 hover:bg-muted flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
             onClick={handleBack}
             aria-label="返回"
           >
@@ -117,7 +117,7 @@ export default function BookShelf() {
         <div className="absolute top-0 right-0 z-10 flex items-center px-4 py-4 md:px-6">
           <button
             type="button"
-            className="border-border bg-card/60 hover:bg-accent flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors disabled:opacity-50"
+            className="border-border bg-card/60 hover:bg-muted flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors disabled:opacity-50"
             disabled={isSyncing}
             onClick={handleSync}
             aria-label="同步书架"

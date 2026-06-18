@@ -96,7 +96,7 @@ onBeforeUnmount(() => clearTimers());
       @mouseleave="scheduleClose"
     >
       <div
-        class="bg-popover/95 supports-[backdrop-filter]:bg-popover/80 border-border/60 overflow-hidden rounded-lg border shadow-xl backdrop-blur-md"
+        class="bg-background/95 supports-[backdrop-filter]:bg-background/80 border-border/60 overflow-hidden rounded-lg border shadow-xl backdrop-blur-md"
       >
         <header
           class="border-border/40 bg-muted/30 flex items-center gap-2.5 border-b px-3 py-2"

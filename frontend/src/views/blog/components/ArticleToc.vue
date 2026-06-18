@@ -28,7 +28,7 @@
             'group flex w-full items-start rounded-lg px-3 py-2 text-left text-sm transition-all',
             activeId === item.id
               ? 'bg-primary/15 text-primary'
-              : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+              : 'text-muted-foreground hover:bg-muted hover:text-foreground',
           ]"
           :style="{ paddingLeft: `${(item.level - 1) * 12 + 12}px` }"
         >

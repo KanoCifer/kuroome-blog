@@ -114,7 +114,7 @@ export function AIAnalysisWidget({
           {analysisOpen && (
             <button
               onClick={closeAnalysis}
-              className="text-muted-foreground hover:bg-accent rounded-full p-1"
+              className="text-muted-foreground hover:bg-muted rounded-full p-1"
               aria-label="关闭分析"
             >
               <X className="h-3.5 w-3.5" />
@@ -226,7 +226,7 @@ export function AIAnalysisWidget({
                       </span>
                       <button
                         onClick={closeAnalysis}
-                        className="text-muted-foreground hover:bg-accent rounded-full p-1"
+                        className="text-muted-foreground hover:bg-muted rounded-full p-1"
                         aria-label="关闭分析"
                       >
                         <X className="h-3.5 w-3.5" />

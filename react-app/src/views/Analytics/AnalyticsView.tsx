@@ -169,7 +169,7 @@ export default function AnalyticsView() {
             value={formatNumber(overviewData?.uniqueVisitorIds ?? 0)}
             subtitle="By ID"
             icon={<UserRound className="h-4 w-4" />}
-            iconClassName="bg-accent text-accent-foreground"
+            iconClassName="bg-muted text-foreground"
           />
           <StatsCard
             title="Avg/Day"

@@ -30,7 +30,7 @@ const emit = defineEmits<{
 
 <template>
   <aside class="xl:sticky xl:top-24 xl:h-fit">
-    <section class="border-border/80 bg-card rounded-3xl border p-5 shadow-sm">
+    <section class="border-border/80 bg-background rounded-3xl border p-5 shadow-sm">
       <h3 class="text-foreground text-sm font-semibold tracking-wide uppercase">
         详情面板
       </h3>
@@ -112,21 +112,21 @@ const emit = defineEmits<{
         <div class="grid grid-cols-2 gap-2">
           <button
             type="button"
-            class="border-border bg-card text-card-foreground hover:bg-accent rounded-xl border px-3 py-2 text-sm font-medium transition"
+            class="border-border bg-background text-foreground hover:bg-muted rounded-xl border px-3 py-2 text-sm font-medium transition"
             @click="emit('edit', selectedSubscription)"
           >
             编辑订阅
           </button>
           <button
             type="button"
-            class="border-primary/30 bg-primary/15 text-primary hover:bg-accent rounded-xl border px-3 py-2 text-sm font-medium transition"
+            class="border-primary/30 bg-primary/15 text-primary hover:bg-muted rounded-xl border px-3 py-2 text-sm font-medium transition"
             @click="emit('reminder', selectedSubscription)"
           >
             通知配置
           </button>
           <button
             type="button"
-            class="border-border bg-card text-card-foreground hover:bg-accent rounded-xl border px-3 py-2 text-sm font-medium transition disabled:opacity-60"
+            class="border-border bg-background text-foreground hover:bg-muted rounded-xl border px-3 py-2 text-sm font-medium transition disabled:opacity-60"
             :disabled="pendingStatusId === selectedSubscription.id"
             @click="emit('toggleStatus', selectedSubscription)"
           >

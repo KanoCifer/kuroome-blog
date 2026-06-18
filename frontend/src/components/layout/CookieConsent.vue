@@ -119,7 +119,7 @@ const handlePrivacyScroll = (e: Event) => {
     >
       <div
         v-if="showBanner && !consentGiven"
-        class="group border-border bg-card/95 fixed right-4 bottom-6 z-50 w-[340px] overflow-hidden rounded-2xl border shadow-lg backdrop-blur-sm transition-all duration-300 hover:shadow-xl sm:right-8 sm:bottom-8 sm:w-[380px]"
+        class="group border-border bg-background/95 fixed right-4 bottom-6 z-50 w-[340px] overflow-hidden rounded-2xl border shadow-lg backdrop-blur-sm transition-all duration-300 hover:shadow-xl sm:right-8 sm:bottom-8 sm:w-[380px]"
       >
         <div class="relative px-5 py-5">
           <!-- 标题行 -->
@@ -180,13 +180,13 @@ const handlePrivacyScroll = (e: Event) => {
           <!-- 操作按钮 -->
           <div class="flex items-center gap-2">
             <button
-              class="border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-all duration-200 active:scale-[0.97]"
+              class="border-border text-muted-foreground hover:bg-muted hover:text-foreground flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-all duration-200 active:scale-[0.97]"
               @click="openSettings"
             >
               自定义
             </button>
             <button
-              class="border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-all duration-200 active:scale-[0.97]"
+              class="border-border text-muted-foreground hover:bg-muted hover:text-foreground flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-all duration-200 active:scale-[0.97]"
               @click="rejectAll"
             >
               拒绝
@@ -286,7 +286,7 @@ const handlePrivacyScroll = (e: Event) => {
 
         <AlertDialogFooter class="mt-4">
           <AlertDialogCancel
-            class="border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 rounded-xl border px-4 text-[12px] font-medium"
+            class="border-border text-muted-foreground hover:bg-muted hover:text-foreground h-9 rounded-xl border px-4 text-[12px] font-medium"
           >
             返回
           </AlertDialogCancel>
@@ -349,7 +349,7 @@ const handlePrivacyScroll = (e: Event) => {
 
         <AlertDialogFooter>
           <AlertDialogCancel
-            class="border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground h-9 rounded-xl border px-4 text-[12px] font-medium transition-all duration-200"
+            class="border-border text-muted-foreground hover:bg-muted hover:text-foreground h-9 rounded-xl border px-4 text-[12px] font-medium transition-all duration-200"
           >
             取消
           </AlertDialogCancel>

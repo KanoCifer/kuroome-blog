@@ -34,7 +34,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <section class="border-border/80 bg-card rounded-3xl border p-5 shadow-sm">
+  <section class="border-border/80 bg-background rounded-3xl border p-5 shadow-sm">
     <header class="mb-4 flex items-center justify-between gap-3">
       <h3 class="text-foreground text-sm font-semibold tracking-wide uppercase">
         订阅列表
@@ -80,7 +80,7 @@ const emit = defineEmits<{
       <article
         v-for="subscription in subscriptions"
         :key="subscription.id"
-        class="bg-card border-border/10 cursor-pointer rounded-2xl border p-5 shadow-[0_12px_40px_rgb(0,0,0,0.04)] transition hover:shadow-[0_20px_50px_rgb(0,0,0,0.06)]"
+        class="bg-background border-border/10 cursor-pointer rounded-2xl border p-5 shadow-[0_12px_40px_rgb(0,0,0,0.04)] transition hover:shadow-[0_20px_50px_rgb(0,0,0,0.06)]"
         :class="
           selectedSubId === subscription.id
             ? 'border-primary/30 ring-primary/20 ring-2'
@@ -91,7 +91,7 @@ const emit = defineEmits<{
         <div class="flex items-start justify-between gap-4">
           <div class="flex min-w-0 items-center gap-4">
             <div
-              class="border-border bg-card text-muted-foreground flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border text-lg font-bold"
+              class="border-border bg-background text-muted-foreground flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border text-lg font-bold"
             >
               {{ subscription.name.charAt(0).toUpperCase() }}
             </div>
@@ -164,21 +164,21 @@ const emit = defineEmits<{
         <div class="mt-4 grid grid-cols-4 gap-2">
           <button
             type="button"
-            class="border-border bg-card text-card-foreground hover:bg-accent rounded-xl border px-3 py-2 text-xs font-medium transition"
+            class="border-border bg-background text-foreground hover:bg-muted rounded-xl border px-3 py-2 text-xs font-medium transition"
             @click.stop="emit('edit', subscription)"
           >
             编辑
           </button>
           <button
             type="button"
-            class="border-primary/30 bg-primary/15 text-primary hover:bg-accent rounded-xl border px-3 py-2 text-xs font-medium transition"
+            class="border-primary/30 bg-primary/15 text-primary hover:bg-muted rounded-xl border px-3 py-2 text-xs font-medium transition"
             @click.stop="emit('reminder', subscription)"
           >
             通知
           </button>
           <button
             type="button"
-            class="border-border bg-card text-card-foreground hover:bg-accent rounded-xl border px-3 py-2 text-xs font-medium transition disabled:opacity-60"
+            class="border-border bg-background text-foreground hover:bg-muted rounded-xl border px-3 py-2 text-xs font-medium transition disabled:opacity-60"
             :disabled="pendingStatusId === subscription.id"
             @click.stop="emit('toggleStatus', subscription)"
           >

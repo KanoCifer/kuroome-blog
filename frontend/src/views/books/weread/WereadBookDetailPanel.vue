@@ -122,12 +122,12 @@ const coverGradient = computed(() =>
             damping: 32,
             mass: 0.8,
           }"
-          class="bg-card border-border/60 relative w-full max-w-4xl overflow-hidden rounded-3xl border shadow-2xl"
+          class="bg-background border-border/60 relative w-full max-w-4xl overflow-hidden rounded-3xl border shadow-2xl"
         >
           <!-- 关闭按钮 -->
           <button
             type="button"
-            class="bg-card/80 text-foreground hover:bg-card border-border/40 absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
+            class="bg-background/80 text-foreground hover:bg-background border-border/40 absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
             aria-label="关闭"
             @click="emit('close')"
           >

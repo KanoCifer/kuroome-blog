@@ -16,7 +16,7 @@
     >
       <div
         v-if="isUserMenuOpen"
-        class="bg-card absolute top-16 right-0 z-9999 mt-2 w-auto rounded-2xl p-1 shadow-xl ring-1 ring-black/5 dark:ring-white/10"
+        class="bg-background absolute top-16 right-0 z-9999 mt-2 w-auto rounded-2xl p-1 shadow-xl ring-1 ring-black/5 dark:ring-white/10"
       >
         <ol>
           <li v-for="(item, idx) in visibleItems" :key="idx">
@@ -27,7 +27,7 @@
               v-else-if="item.to"
               :to="item.to"
               @click="closeUserMenuImmediately"
-              class="text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring flex items-center gap-2.5 rounded-xl px-3 py-2 font-serif text-sm transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
+              class="text-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring flex items-center gap-2.5 rounded-xl px-3 py-2 font-serif text-sm transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
               :class="item.class"
             >
               <component :is="item.icon" class="h-4 w-4 shrink-0" />
@@ -38,7 +38,7 @@
               v-else
               @click.prevent="handleItemClick(item)"
               :disabled="item.disabled"
-              class="text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 font-serif text-sm transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+              class="text-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 font-serif text-sm transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
               :class="item.class"
             >
               <component :is="item.icon" class="h-4 w-4 shrink-0" />

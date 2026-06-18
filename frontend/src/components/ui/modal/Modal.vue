@@ -29,7 +29,7 @@
             mass: 0.8,
           }"
           :class="[
-            'bg-card border-border/60 relative w-full overflow-hidden rounded-2xl border shadow-2xl',
+            'bg-background border-border/60 relative w-full overflow-hidden rounded-2xl border shadow-2xl',
             sizeClass,
           ]"
           role="dialog"

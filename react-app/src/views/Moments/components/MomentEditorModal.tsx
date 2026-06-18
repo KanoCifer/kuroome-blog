@@ -212,7 +212,7 @@ export function MomentEditorModal({
                           'flex h-8 w-8 items-center justify-center rounded-lg border text-[16px] transition-colors',
                           mood === e
                             ? 'border-primary bg-primary/10'
-                            : 'border-border/40 bg-card hover:bg-accent',
+                            : 'border-border/40 bg-card hover:bg-muted',
                         ].join(' ')}
                       >
                         {e}
@@ -243,7 +243,7 @@ export function MomentEditorModal({
                     {tags.map((tag, i) => (
                       <span
                         key={tag + i}
-                        className="bg-accent text-accent-foreground inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[12px]"
+                        className="bg-muted text-foreground inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[12px]"
                       >
                         <span className="text-primary/70 font-serif">#</span>
                         {tag}
@@ -289,7 +289,7 @@ export function MomentEditorModal({
                           'flex cursor-pointer items-start gap-2 rounded-lg border px-2.5 py-2',
                           visibility === opt.value
                             ? 'border-primary bg-primary/5'
-                            : 'border-border/40 bg-card hover:bg-accent',
+                            : 'border-border/40 bg-card hover:bg-muted',
                         ].join(' ')}
                       >
                         <input
@@ -362,7 +362,7 @@ export function MomentEditorModal({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="border-border/60 text-foreground hover:bg-accent inline-flex w-full items-center justify-center rounded-lg border px-3 py-1.5 text-[12px] transition-colors"
+                    className="border-border/60 text-foreground hover:bg-muted inline-flex w-full items-center justify-center rounded-lg border px-3 py-1.5 text-[12px] transition-colors"
                   >
                     取消
                   </button>

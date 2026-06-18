@@ -107,7 +107,7 @@ const schemes: {
 
       <div
         @click="themeStore.toggleFooter()"
-        class="border-border bg-card hover:border-primary flex cursor-pointer items-center justify-between rounded-md border px-4 py-3 transition-colors"
+        class="border-border bg-background hover:border-primary flex cursor-pointer items-center justify-between rounded-md border px-4 py-3 transition-colors"
       >
         <div>
           <div class="text-foreground text-sm font-medium">显示页脚</div>
@@ -120,7 +120,7 @@ const schemes: {
           :class="themeStore.showFooter === 'true' ? 'bg-primary' : 'bg-muted'"
         >
           <div
-            class="bg-card h-5 w-5 rounded-full shadow-md transition-transform"
+            class="bg-background h-5 w-5 rounded-full shadow-md transition-transform"
             :class="
               themeStore.showFooter === 'true'
                 ? 'translate-x-5'
@@ -147,7 +147,7 @@ const schemes: {
           :class="
             themeStore.theme === theme.value
               ? 'border-primary bg-primary/5'
-              : 'border-border bg-card hover:border-primary'
+              : 'border-border bg-background hover:border-primary'
           "
         >
           <span
@@ -186,7 +186,7 @@ const schemes: {
           :class="
             themeStore.font === 'default'
               ? 'border-primary bg-primary/5'
-              : 'border-border bg-card hover:border-primary'
+              : 'border-border bg-background hover:border-primary'
           "
         >
           <span
@@ -207,7 +207,7 @@ const schemes: {
           :class="
             themeStore.font === 'harmonyos'
               ? 'border-primary bg-primary/5'
-              : 'border-border bg-card hover:border-primary'
+              : 'border-border bg-background hover:border-primary'
           "
         >
           <span
@@ -241,7 +241,7 @@ const schemes: {
           :class="
             themeStore.scheme === scheme.value
               ? 'border-primary bg-primary/5'
-              : 'border-border bg-card hover:border-primary'
+              : 'border-border bg-background hover:border-primary'
           "
         >
           <div v-if="scheme.colors.length > 1" class="flex w-[72px] flex-col">

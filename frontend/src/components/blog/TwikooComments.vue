@@ -23,7 +23,7 @@ watch(
 
 <template>
   <div
-    class="border-border bg-card overflow-hidden rounded-2xl border shadow-sm"
+    class="border-border bg-background overflow-hidden rounded-2xl border shadow-sm"
   >
     <div class="border-border flex gap-2 border-b px-8 py-5">
       <svg

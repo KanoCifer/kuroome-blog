@@ -2,7 +2,7 @@
   <Modal :open="open" size="xl" @close="emit('update:open', false)">
     <!-- 顶栏 -->
     <header
-      class="border-border/40 bg-card sticky top-0 z-10 flex items-center justify-between gap-2 border-b px-6 py-4"
+      class="border-border/40 bg-background sticky top-0 z-10 flex items-center justify-between gap-2 border-b px-6 py-4"
     >
       <div>
         <div
@@ -54,7 +54,7 @@
             rows="8"
             :maxlength="2000"
             placeholder="今天想到什么..."
-            class="bg-card border-input text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-ring/20 min-h-[180px] w-full resize-y rounded-lg border px-4 py-3 font-serif text-[15px] leading-loose focus:ring-2 focus:outline-none"
+            class="bg-background border-input text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-ring/20 min-h-[180px] w-full resize-y rounded-lg border px-4 py-3 font-serif text-[15px] leading-loose focus:ring-2 focus:outline-none"
           />
           <div
             class="text-muted-foreground mt-1.5 flex items-center justify-between font-mono text-[10px] tracking-wide"
@@ -87,7 +87,7 @@
                 'flex h-8 w-8 items-center justify-center rounded-lg border text-[16px] transition-colors',
                 form.mood === e
                   ? 'border-primary bg-primary/10'
-                  : 'border-border/40 bg-card hover:bg-accent',
+                  : 'border-border/40 bg-background hover:bg-muted',
               ]"
               @click="toggleMood(e)"
             >
@@ -99,7 +99,7 @@
             type="text"
             maxlength="50"
             placeholder="或自定义心情..."
-            class="bg-card border-input text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-ring/20 mt-2 w-full rounded-lg border px-3 py-1.5 text-[13px] focus:ring-2 focus:outline-none"
+            class="bg-background border-input text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-ring/20 mt-2 w-full rounded-lg border px-3 py-1.5 text-[13px] focus:ring-2 focus:outline-none"
           />
         </div>
 
@@ -114,12 +114,12 @@
             >
           </div>
           <div
-            class="bg-card border-input flex flex-wrap items-center gap-1.5 rounded-lg border px-2 py-1.5"
+            class="bg-background border-input flex flex-wrap items-center gap-1.5 rounded-lg border px-2 py-1.5"
           >
             <span
               v-for="(tag, i) in form.tags"
               :key="tag + i"
-              class="bg-accent text-accent-foreground inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[12px]"
+              class="bg-muted text-foreground inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[12px]"
             >
               <span class="text-primary/70 font-serif">#</span>{{ tag }}
               <button
@@ -162,7 +162,7 @@
                 'flex cursor-pointer items-start gap-2 rounded-lg border px-2.5 py-2',
                 form.visibility === v
                   ? 'border-primary bg-primary/5'
-                  : 'border-border/40 bg-card hover:bg-accent',
+                  : 'border-border/40 bg-background hover:bg-muted',
               ]"
             >
               <input
@@ -187,7 +187,7 @@
           </div>
           <select
             v-model="form.status"
-            class="bg-card border-input text-foreground w-full rounded-lg border px-2.5 py-1.5 text-[13px]"
+            class="bg-background border-input text-foreground w-full rounded-lg border px-2.5 py-1.5 text-[13px]"
           >
             <option value="published">已发布</option>
             <option value="draft">草稿</option>
@@ -220,7 +220,7 @@
           </button>
           <button
             type="button"
-            class="border-border/60 text-foreground hover:bg-accent inline-flex w-full items-center justify-center rounded-lg border px-3 py-1.5 text-[12px] transition-colors"
+            class="border-border/60 text-foreground hover:bg-muted inline-flex w-full items-center justify-center rounded-lg border px-3 py-1.5 text-[12px] transition-colors"
             @click="emit('update:open', false)"
           >
             取消

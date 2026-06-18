@@ -12,7 +12,7 @@ import { motion } from 'motion-v';
       class="mx-auto mt-36 mb-20 flex max-w-3xl flex-col"
     >
       <div
-        class="squircle border-border bg-card/70 border p-8 shadow-sm md:p-12"
+        class="squircle border-border bg-background/70 border p-8 shadow-sm md:p-12"
       >
         <article class="text-foreground space-y-8 text-base leading-relaxed">
           <!-- 标题 -->

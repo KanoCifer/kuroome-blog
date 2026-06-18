@@ -7,7 +7,7 @@
     <button
       type="button"
       :class="[
-        'bg-card/90 text-foreground hover:bg-card border-border/40 absolute right-2.5 bottom-5 z-9999 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-colors disabled:opacity-50',
+        'bg-background/90 text-foreground hover:bg-background border-border/40 absolute right-2.5 bottom-5 z-9999 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-colors disabled:opacity-50',
         isLocating && 'text-primary',
       ]"
       :disabled="isLocating"
@@ -29,7 +29,7 @@
     >
       <div
         v-if="isPlanning || routeInfo"
-        class="bg-card/90 border-border absolute right-4 bottom-4 left-4 mx-auto w-fit rounded-2xl border p-4 shadow-lg backdrop-blur-md"
+        class="bg-background/90 border-border absolute right-4 bottom-4 left-4 mx-auto w-fit rounded-2xl border p-4 shadow-lg backdrop-blur-md"
       >
         <div
           v-if="isPlanning"
@@ -67,7 +67,7 @@
 
     <p
       v-if="!isPlanning && !routeInfo"
-      class="text-muted-foreground/90 bg-card/70 absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full px-4 py-1.5 text-xs backdrop-blur-md"
+      class="text-muted-foreground/90 bg-background/70 absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full px-4 py-1.5 text-xs backdrop-blur-md"
     >
       点击地图标记，自动规划路线
     </p>

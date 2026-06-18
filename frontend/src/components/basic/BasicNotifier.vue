@@ -17,7 +17,7 @@
 
         <!-- 弹窗内容 -->
         <div
-          class="bg-card dark:bg-card relative z-10 w-11/12 max-w-md transform-gpu rounded-2xl p-8 shadow-2xl"
+          class="bg-background dark:bg-background relative z-10 w-11/12 max-w-md transform-gpu rounded-2xl p-8 shadow-2xl"
         >
           <!-- 警告图标 -->
           <div class="mb-6 flex justify-center">

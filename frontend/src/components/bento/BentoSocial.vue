@@ -7,7 +7,7 @@
       target="_blank"
       rel="noopener noreferrer"
       :aria-label="social.name"
-      class="group bg-card/60 text-muted-foreground hover:border-accent hover:bg-accent hover:text-accent-foreground dark:bg-card relative flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-white/50 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+      class="group bg-background/60 text-muted-foreground hover:border-muted hover:bg-muted hover:text-foreground dark:bg-background relative flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-white/50 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
     >
       <span
         class="bg-primary text-primary-foreground absolute -top-10 scale-0 rounded-lg px-3 py-1 text-sm font-medium opacity-0 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100"

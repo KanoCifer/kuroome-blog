@@ -379,7 +379,7 @@ export default function ImageToolboxView() {
                   <button
                     type="button"
                     disabled={!processedBlob}
-                    className="border-border bg-card text-card-foreground hover:bg-accent flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium transition-all disabled:opacity-50"
+                    className="border-border bg-card text-card-foreground hover:bg-muted flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium transition-all disabled:opacity-50"
                     onClick={downloadProcessedImage}
                   >
                     <svg
@@ -477,7 +477,7 @@ export default function ImageToolboxView() {
                         </div>
                         <button
                           type="button"
-                          className="bg-card text-card-foreground ring-border hover:bg-accent rounded-full px-4 py-1.5 text-xs font-bold shadow-sm ring-1 transition-all"
+                          className="bg-card text-card-foreground ring-border hover:bg-muted rounded-full px-4 py-1.5 text-xs font-bold shadow-sm ring-1 transition-all"
                           onClick={(event) => {
                             event.stopPropagation();
                             openFilePicker();

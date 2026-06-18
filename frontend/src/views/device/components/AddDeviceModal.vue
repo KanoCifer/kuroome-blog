@@ -16,11 +16,11 @@
         class="fixed inset-x-8 inset-y-24 z-50 flex items-center justify-center"
       >
         <div
-          class="bg-card max-h-full w-full max-w-md overflow-y-auto rounded-2xl shadow-2xl"
+          class="bg-background max-h-full w-full max-w-md overflow-y-auto rounded-2xl shadow-2xl"
         >
           <!-- Header -->
           <div
-            class="bg-card border-border sticky top-0 z-10 border-b px-6 pt-6 pb-4"
+            class="bg-background border-border sticky top-0 z-10 border-b px-6 pt-6 pb-4"
           >
             <div class="flex items-start justify-between gap-3">
               <div>
@@ -54,7 +54,7 @@
                 type="text"
                 placeholder="例如：iPhone 15 Pro Max"
                 maxlength="100"
-                class="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                class="border-border bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
               />
             </label>
 
@@ -66,7 +66,7 @@
               <input
                 v-model="form.purchase_date"
                 type="date"
-                class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                class="border-border bg-background text-foreground focus:border-primary focus:ring-primary/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
               />
             </label>
 
@@ -78,7 +78,7 @@
                 </span>
                 <select
                   v-model="form.currency"
-                  class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/30 w-full cursor-pointer appearance-none rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                  class="border-border bg-background text-foreground focus:border-primary focus:ring-primary/30 w-full cursor-pointer appearance-none rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 >
                   <option v-for="c in currencyOptions" :key="c" :value="c">
                     {{ c }}
@@ -96,7 +96,7 @@
                   min="0"
                   step="0.01"
                   placeholder="0.00"
-                  class="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                  class="border-border bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
             </div>
@@ -110,7 +110,7 @@
                 v-model="form.notes"
                 type="text"
                 placeholder="例如：256GB 银色、国行版本"
-                class="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                class="border-border bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
               />
             </label>
 
@@ -129,7 +129,7 @@
                     'flex-1 rounded-full px-3 py-2.5 text-xs font-semibold transition-all duration-200',
                     form.status === option.value
                       ? 'bg-primary text-primary-foreground shadow-primary/25 shadow-lg'
-                      : 'text-muted-foreground hover:bg-accent',
+                      : 'text-muted-foreground hover:bg-muted',
                   ]"
                 >
                   {{ option.label }}

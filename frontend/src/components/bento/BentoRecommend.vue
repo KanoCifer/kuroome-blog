@@ -6,7 +6,7 @@
     <div class="relative z-10 flex h-full flex-col justify-between p-2">
       <!-- Icon / Logo -->
       <div
-        class="bg-accent text-accent-foreground mb-4 flex h-12 w-12 items-center justify-center rounded-full"
+        class="bg-muted text-foreground mb-4 flex h-12 w-12 items-center justify-center rounded-full"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -25,12 +25,12 @@
       </div>
       <div>
         <div
-          class="text-accent-foreground mb-1 text-xs font-bold tracking-wide uppercase"
+          class="text-foreground mb-1 text-xs font-bold tracking-wide uppercase"
         >
           Recommended Read
         </div>
         <h3
-          class="text-foreground group-hover:text-accent-foreground mb-2 text-lg leading-tight font-bold transition-colors"
+          class="text-foreground group-hover:text-foreground mb-2 text-lg leading-tight font-bold transition-colors"
         >
           {{ item.title }}
         </h3>

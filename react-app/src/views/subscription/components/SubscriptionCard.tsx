@@ -160,7 +160,7 @@ export function SubscriptionCard({
           <button
             type="button"
             onClick={() => openModal('edit')}
-            className="border-border bg-card text-foreground hover:bg-accent rounded-full border px-4 py-3 text-sm font-bold transition-all active:scale-95"
+            className="border-border bg-card text-foreground hover:bg-muted rounded-full border px-4 py-3 text-sm font-bold transition-all active:scale-95"
           >
             编辑与通知
           </button>

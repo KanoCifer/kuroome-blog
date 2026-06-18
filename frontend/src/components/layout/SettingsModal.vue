@@ -15,7 +15,7 @@
       >
         <!-- Drawer content -->
         <div
-          class="bg-card relative z-10 flex h-full w-full max-w-[480px] flex-col"
+          class="bg-background relative z-10 flex h-full w-full max-w-[480px] flex-col"
         >
           <!-- 装帧书脊 -->
           <div class="bg-primary absolute top-0 bottom-0 left-0 w-[3px]" />
@@ -24,7 +24,7 @@
           <header class="relative px-8 pt-10 pb-6 text-center">
             <button
               @click="close"
-              class="text-muted-foreground hover:bg-accent hover:text-accent-foreground absolute top-6 right-6 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+              class="text-muted-foreground hover:bg-muted hover:text-foreground absolute top-6 right-6 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
               aria-label="关闭"
             >
               <IconClose class="h-5 w-5" />
@@ -72,7 +72,7 @@
                 :class="
                   activeTab === tab.key
                     ? 'border-primary bg-primary/5'
-                    : 'group-hover:bg-accent'
+                    : 'group-hover:bg-muted'
                 "
               >
                 <span

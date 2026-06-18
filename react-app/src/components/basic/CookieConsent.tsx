@@ -203,13 +203,13 @@ export function CookieConsent() {
               </p>
               <div className="flex items-center gap-2">
                 <button
-                  className="border-border text-muted-foreground hover:bg-accent hover:text-card-foreground flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-all duration-200 active:scale-[0.97]"
+                  className="border-border text-muted-foreground hover:bg-muted hover:text-card-foreground flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-all duration-200 active:scale-[0.97]"
                   onClick={openSettings}
                 >
                   自定义
                 </button>
                 <button
-                  className="border-border text-muted-foreground hover:bg-accent hover:text-card-foreground flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-all duration-200 active:scale-[0.97]"
+                  className="border-border text-muted-foreground hover:bg-muted hover:text-card-foreground flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-all duration-200 active:scale-[0.97]"
                   onClick={rejectAll}
                 >
                   拒绝
@@ -289,7 +289,7 @@ export function CookieConsent() {
               <div className="relative mt-4 flex justify-end gap-2">
                 <button
                   onClick={() => setShowPrivacyPreview(false)}
-                  className="border-border text-muted-foreground hover:bg-accent hover:text-card-foreground h-9 rounded-xl border px-4 text-[12px] font-medium transition-all duration-200"
+                  className="border-border text-muted-foreground hover:bg-muted hover:text-card-foreground h-9 rounded-xl border px-4 text-[12px] font-medium transition-all duration-200"
                 >
                   返回
                 </button>
@@ -361,7 +361,7 @@ export function CookieConsent() {
               <div className="relative mt-4 flex justify-end gap-2">
                 <button
                   onClick={() => setShowSettings(false)}
-                  className="border-border text-muted-foreground hover:bg-accent hover:text-card-foreground h-9 rounded-xl border px-4 text-[12px] font-medium transition-all duration-200"
+                  className="border-border text-muted-foreground hover:bg-muted hover:text-card-foreground h-9 rounded-xl border px-4 text-[12px] font-medium transition-all duration-200"
                 >
                   取消
                 </button>

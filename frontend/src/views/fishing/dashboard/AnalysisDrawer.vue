@@ -48,7 +48,7 @@ defineEmits<{
     >
       <aside
         v-if="open"
-        class="bg-card border-border fixed top-0 right-0 z-50 flex h-screen w-[420px] max-w-[90vw] flex-col border-l shadow-2xl"
+        class="bg-background border-border fixed top-0 right-0 z-50 flex h-screen w-[420px] max-w-[90vw] flex-col border-l shadow-2xl"
         role="dialog"
         aria-label="AI 分析"
       >
@@ -62,7 +62,7 @@ defineEmits<{
             </p>
           </div>
           <button
-            class="text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+            class="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex h-8 w-8 items-center justify-center rounded-full transition-colors"
             type="button"
             aria-label="关闭分析"
             @click="$emit('close')"

@@ -1,5 +1,8 @@
 <template>
-  <section id="rss-parse" class="border-border bg-card rounded-2xl border p-6">
+  <section
+    id="rss-parse"
+    class="border-border bg-background rounded-2xl border p-6"
+  >
     <div class="mb-5 flex items-center justify-between gap-3">
       <div>
         <h2 class="text-primary text-xl font-bold">解析订阅地址</h2>
@@ -25,7 +28,7 @@
           :value="rssUrl"
           type="text"
           placeholder="https://example.com/feed.xml"
-          class="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border px-4 py-3 transition-all focus:ring-2 focus:outline-none"
+          class="border-border bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border px-4 py-3 transition-all focus:ring-2 focus:outline-none"
           @input="
             $emit('update:rssUrl', ($event.target as HTMLInputElement).value)
           "
@@ -34,7 +37,7 @@
 
       <button
         type="button"
-        class="border-primary/30 bg-primary/15 text-primary hover:bg-accent rounded-xl border px-5 py-3 text-sm font-medium transition-colors"
+        class="border-primary/30 bg-primary/15 text-primary hover:bg-muted rounded-xl border px-5 py-3 text-sm font-medium transition-colors"
         @click="$emit('update:saveToDb', !saveToDb)"
       >
         {{ saveToDb ? '已启用保存' : '保存到订阅' }}
@@ -43,7 +46,7 @@
       <button
         type="submit"
         :disabled="parseLoading"
-        class="bg-warning text-warning-foreground hover:bg-warning/90 focus:ring-warning disabled:hover:bg-warning rounded-xl px-6 py-3 text-sm font-semibold transition-all focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70"
+        class="bg-warning text-foreground hover:bg-warning/90 focus:ring-warning disabled:hover:bg-warning rounded-xl px-6 py-3 text-sm font-semibold transition-all focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70"
       >
         {{ parseLoading ? '解析中...' : '开始解析' }}
       </button>
@@ -55,7 +58,7 @@
         v-for="feed in exampleFeeds"
         :key="feed.url"
         type="button"
-        class="bg-primary/15 text-primary hover:bg-accent rounded-full px-3 py-1 text-xs font-medium transition-colors"
+        class="bg-primary/15 text-primary hover:bg-muted rounded-full px-3 py-1 text-xs font-medium transition-colors"
         @click="$emit('update:rssUrl', feed.url)"
       >
         {{ feed.name }}
@@ -71,7 +74,7 @@
         v-for="historyUrl in rssHistory.slice(0, 3)"
         :key="historyUrl"
         type="button"
-        class="bg-primary/15 text-primary hover:bg-accent rounded-full px-3 py-1 text-xs font-medium transition-colors"
+        class="bg-primary/15 text-primary hover:bg-muted rounded-full px-3 py-1 text-xs font-medium transition-colors"
         @click="$emit('update:rssUrl', historyUrl)"
       >
         {{ historyUrl }}
@@ -116,7 +119,7 @@
         <li
           v-for="(entry, index) in parseEntries"
           :key="`${entry.link}-${index}`"
-          class="border-border bg-card rounded-xl border p-4"
+          class="border-border bg-background rounded-xl border p-4"
         >
           <a
             :href="entry.link"

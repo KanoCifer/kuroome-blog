@@ -261,7 +261,7 @@ export function SubscriptionNotifyForm({
                   className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all ${
                     checked
                       ? 'bg-primary text-primary-foreground shadow-[0_4px_12px_rgba(0,40,142,0.25)]'
-                      : 'border-border bg-card text-card-foreground hover:bg-accent border'
+                      : 'border-border bg-card text-card-foreground hover:bg-muted border'
                   } `}
                 >
                   <option.icon size={16} />
@@ -286,7 +286,7 @@ export function SubscriptionNotifyForm({
                   className={`flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 transition-all ${
                     checked
                       ? 'border-primary/20 bg-primary/10 border'
-                      : 'border-border bg-card hover:bg-accent border'
+                      : 'border-border bg-card hover:bg-muted border'
                   } `}
                 >
                   <div

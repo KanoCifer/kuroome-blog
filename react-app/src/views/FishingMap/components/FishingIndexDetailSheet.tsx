@@ -79,7 +79,7 @@ export function FishingIndexDetailSheet({ open, data, onClose }: Props) {
                   type="button"
                   onClick={onClose}
                   aria-label="关闭"
-                  className="hover:bg-accent text-muted-foreground inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
+                  className="hover:bg-muted text-muted-foreground inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
                 >
                   <X className="h-4 w-4" />
                 </button>

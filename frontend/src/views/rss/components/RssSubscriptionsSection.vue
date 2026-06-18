@@ -1,7 +1,7 @@
 <template>
   <section
     id="rss-subscriptions"
-    class="border-border bg-card rounded-2xl border p-6"
+    class="border-border bg-background rounded-2xl border p-6"
   >
     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
       <div>
@@ -50,7 +50,7 @@
         :class="
           activeSubscriptionId === subscription.id
             ? 'border-primary/30 bg-primary/5'
-            : 'border-border bg-card hover:border-border/70'
+            : 'border-border bg-background hover:border-border/70'
         "
       >
         <div
@@ -91,7 +91,7 @@
             </button>
             <button
               type="button"
-              class="bg-success text-success-foreground hover:bg-success/90 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+              class="bg-success text-primary-foreground hover:bg-success/90 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
               @click="$emit('refresh', subscription)"
             >
               刷新文章

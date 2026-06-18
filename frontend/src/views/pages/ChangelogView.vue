@@ -119,7 +119,7 @@ const getTypeClass = (type: string): string => {
             <!-- Content Card -->
             <div class="-mx-8 w-full md:w-1/2">
               <div
-                class="group squircle border-border bg-card/80 cursor-pointer border p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl md:p-8"
+                class="group squircle border-border bg-background/80 cursor-pointer border p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl md:p-8"
               >
                 <!-- Version Badge & Date -->
                 <div class="mb-4 flex flex-wrap items-center gap-3">
@@ -200,7 +200,7 @@ const getTypeClass = (type: string): string => {
                 class="bg-primary absolute inset-0 -m-2 rounded-full opacity-30 blur-md transition-all duration-300 group-hover:opacity-50 group-hover:blur-lg"
               ></div>
               <div
-                class="bg-card ring-primary/20 relative flex h-full w-full items-center justify-center rounded-full ring-4"
+                class="bg-background ring-primary/20 relative flex h-full w-full items-center justify-center rounded-full ring-4"
               >
                 <div class="bg-primary h-3 w-3 rounded-full"></div>
               </div>
@@ -211,7 +211,7 @@ const getTypeClass = (type: string): string => {
               class="absolute top-6 left-0 z-10 h-6 w-6 -translate-x-1/2 md:hidden"
             >
               <div
-                class="bg-card ring-primary/20 relative flex h-full w-full items-center justify-center rounded-full ring-3"
+                class="bg-background ring-primary/20 relative flex h-full w-full items-center justify-center rounded-full ring-3"
               >
                 <div class="bg-primary h-2 w-2 rounded-full"></div>
               </div>

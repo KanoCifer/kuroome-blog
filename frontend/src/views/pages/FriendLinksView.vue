@@ -3,7 +3,7 @@
     <div class="col-span-full mx-auto w-full max-w-6xl">
       <!-- 每日推荐横幅 -->
       <div
-        class="border-border bg-card/30 group relative mb-6 cursor-pointer overflow-hidden rounded-4xl border p-6 shadow-sm transition-all duration-300 hover:shadow-lg sm:p-8"
+        class="border-border bg-background/30 group relative mb-6 cursor-pointer overflow-hidden rounded-4xl border p-6 shadow-sm transition-all duration-300 hover:shadow-lg sm:p-8"
         @click="$router.push('/websites')"
       >
         <Transition name="pick-switch" mode="out-in">
@@ -128,7 +128,7 @@
             </div>
 
             <!-- 信息行 -->
-            <div class="bg-card/60 space-y-2 rounded-xl p-4">
+            <div class="bg-background/60 space-y-2 rounded-xl p-4">
               <div class="flex items-center gap-3 text-sm">
                 <span class="text-muted-foreground w-16 shrink-0 font-medium"
                   >URL</span
@@ -167,7 +167,7 @@
             :href="link.url"
             target="_blank"
             rel="noopener noreferrer"
-            class="group border-border bg-card/30 hover:bg-primary block cursor-pointer overflow-hidden rounded-4xl border p-8 shadow-sm transition-all duration-300 hover:shadow-xl"
+            class="group border-border bg-background/30 hover:bg-primary block cursor-pointer overflow-hidden rounded-4xl border p-8 shadow-sm transition-all duration-300 hover:shadow-xl"
           >
             <div class="flex items-start gap-5">
               <div
@@ -215,7 +215,7 @@
           <!-- 空状态 -->
           <div
             v-if="links.length === 0"
-            class="border-border bg-card/30 flex flex-col items-center justify-center rounded-4xl border py-16"
+            class="border-border bg-background/30 flex flex-col items-center justify-center rounded-4xl border py-16"
           >
             <IconUsersGroup class="text-muted-foreground mb-4 h-16 w-16" />
             <p class="text-muted-foreground text-lg">暂无友链</p>
@@ -228,7 +228,7 @@
         <!-- ======== 右列：申请须知 + GitHub Issue ======== -->
         <div class="space-y-6 lg:col-span-1">
           <div
-            class="border-border bg-card/30 overflow-hidden rounded-4xl border p-8 shadow-sm"
+            class="border-border bg-background/30 overflow-hidden rounded-4xl border p-8 shadow-sm"
           >
             <!-- Header -->
             <div class="mb-6">
@@ -444,9 +444,8 @@ const copySelfInfo = async () => {
 }
 #tcomment .el-input__inner:focus,
 #tcomment .el-textarea__inner:focus {
-  border-color: var(--workspace-accent);
-  box-shadow: 0 0 0 3px
-    color-mix(in oklch, var(--workspace-accent) 15%, transparent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent) 15%, transparent);
 }
 #tcomment .el-textarea__inner {
   line-height: 1.7;
@@ -462,14 +461,14 @@ const copySelfInfo = async () => {
 }
 
 #tcomment .el-button--primary {
-  background: var(--workspace-accent);
-  border-color: var(--workspace-accent);
-  color: var(--workspace-accent-contrast);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
 }
 #tcomment .el-button--primary:hover {
   opacity: 0.88;
-  background: var(--workspace-accent);
-  border-color: var(--workspace-accent);
+  background: var(--accent);
+  border-color: var(--accent);
 }
 #tcomment .el-button--primary:active {
   opacity: 0.78;
@@ -489,9 +488,9 @@ const copySelfInfo = async () => {
   .el-button:not(.el-button--primary):not(.el-button--danger):not(
     .el-button--text
   ):hover {
-  border-color: var(--workspace-accent);
-  color: var(--workspace-accent);
-  background: color-mix(in oklch, var(--workspace-accent) 8%, var(--card-bg));
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in oklch, var(--accent) 8%, var(--card-bg));
 }
 
 #tcomment .el-button--text {
@@ -499,7 +498,7 @@ const copySelfInfo = async () => {
   padding: 0.25rem 0.5rem;
 }
 #tcomment .el-button--text:hover {
-  color: var(--workspace-accent);
+  color: var(--accent);
   background: transparent;
 }
 
@@ -542,8 +541,8 @@ const copySelfInfo = async () => {
   font-weight: 500;
 }
 #tcomment .el-pager li.active {
-  background: var(--workspace-accent);
-  color: var(--workspace-accent-contrast);
+  background: var(--accent);
+  color: var(--accent-contrast);
 }
 
 #tcomment .OwO {

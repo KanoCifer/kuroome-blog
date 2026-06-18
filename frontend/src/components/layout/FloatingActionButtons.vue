@@ -308,7 +308,7 @@
         @click.self="closeMemo"
       >
         <div
-          class="bg-card relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl p-6 shadow-2xl"
+          class="bg-background relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl p-6 shadow-2xl"
         >
           <button
             @click="closeMemo"

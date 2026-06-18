@@ -34,7 +34,7 @@ const clearMemo = () => {
   >
     <button
       @click="toggleMemo"
-      class="squircle border-border/50 bg-card/55 text-foreground ring-border/30 flex w-auto cursor-pointer items-center justify-center border px-6 py-4 shadow-sm ring transition-colors"
+      class="squircle border-border/50 bg-background/55 text-foreground ring-border/30 flex w-auto cursor-pointer items-center justify-center border px-6 py-4 shadow-sm ring transition-colors"
       title="备忘录"
     >
       <IconMemo class="mr-2 size-8" />
@@ -73,7 +73,7 @@ const clearMemo = () => {
         >
           <!-- Modal content -->
           <div
-            class="bg-card relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl p-6 shadow-2xl"
+            class="bg-background relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl p-6 shadow-2xl"
           >
             <!-- Close button -->
             <button

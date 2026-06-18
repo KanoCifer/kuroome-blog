@@ -56,7 +56,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="about-page bg-card flex min-h-screen flex-col items-center justify-center px-6 py-20"
+    class="about-page bg-background flex min-h-screen flex-col items-center justify-center px-6 py-20"
   >
     <!-- Hero: greeting + avatar -->
     <div
@@ -211,7 +211,7 @@ onMounted(() => {
   background: linear-gradient(
     135deg,
     var(--color-primary),
-    var(--color-accent)
+    var(--color-muted)
   );
   opacity: 0.25;
   filter: blur(14px);

@@ -27,7 +27,7 @@ const clearMemo = () => {
 <template>
   <button
     @click="toggleMemo"
-    class="bg-muted/50 text-foreground hover:bg-accent/70 dark:bg-card/50 dark:text-foreground dark:hover:bg-accent/70 flex h-9 w-9 items-center justify-center rounded-full transition-colors"
+    class="bg-muted/50 text-foreground hover:bg-muted/70 dark:bg-background/50 dark:text-foreground dark:hover:bg-muted/70 flex h-9 w-9 items-center justify-center rounded-full transition-colors"
     title="备忘录"
   >
     <IconMemo class="h-4 w-4" />
@@ -53,12 +53,12 @@ const clearMemo = () => {
 
         <!-- Modal content -->
         <div
-          class="bg-card dark:bg-card relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl p-6 shadow-2xl"
+          class="bg-background dark:bg-background relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl p-6 shadow-2xl"
         >
           <!-- Close button -->
           <button
             @click="closeMemo"
-            class="text-muted-foreground hover:bg-accent hover:text-secondary-foreground dark:hover:bg-accent dark:hover:text-foreground absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full"
+            class="text-muted-foreground hover:bg-muted hover:text-secondary-foreground dark:hover:bg-muted dark:hover:text-foreground absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full"
           >
             <svg
               class="h-5 w-5"
@@ -87,7 +87,7 @@ const clearMemo = () => {
           <textarea
             v-model="memoText"
             placeholder="在这里写下你的想法..."
-            class="border-border bg-muted text-foreground placeholder-muted-foreground focus:border-ring focus:ring-ring dark:border-border dark:bg-card dark:text-foreground dark:placeholder-muted-foreground mb-4 w-full resize-none rounded-xl border px-4 py-3 text-sm focus:ring-2 focus:outline-none"
+            class="border-border bg-muted text-foreground placeholder-muted-foreground focus:border-ring focus:ring-ring dark:border-border dark:bg-background dark:text-foreground dark:placeholder-muted-foreground mb-4 w-full resize-none rounded-xl border px-4 py-3 text-sm focus:ring-2 focus:outline-none"
             rows="10"
           ></textarea>
 
@@ -101,7 +101,7 @@ const clearMemo = () => {
             </span>
             <button
               @click="clearMemo"
-              class="border-border bg-muted text-secondary-foreground hover:bg-accent hover:text-foreground dark:border-border dark:bg-card dark:text-muted-foreground dark:hover:bg-accent dark:hover:text-foreground flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors"
+              class="border-border bg-muted text-secondary-foreground hover:bg-muted hover:text-foreground dark:border-border dark:bg-background dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-foreground flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

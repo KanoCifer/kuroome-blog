@@ -83,7 +83,7 @@ function setupCodeCopy(
     btn.innerHTML = COPY_ICON_SVG;
     btn.title = '复制';
     btn.className =
-      'absolute top-2 right-2 p-1.5 rounded-md bg-muted/80 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-accent cursor-pointer';
+      'absolute top-2 right-2 p-1.5 rounded-md bg-muted/80 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-muted cursor-pointer';
     btn.setAttribute('aria-label', '复制代码');
 
     const handleClick = () => {
@@ -190,7 +190,7 @@ export default function BlogPostView() {
         <div className="flex items-center gap-3 px-4 py-3">
           <button
             onClick={() => navigate(-1)}
-            className="hover:bg-accent flex h-11 w-11 items-center justify-center rounded-full transition-transform active:scale-95"
+            className="hover:bg-muted flex h-11 w-11 items-center justify-center rounded-full transition-transform active:scale-95"
           >
             <svg
               className="text-foreground h-5 w-5"
@@ -246,7 +246,7 @@ export default function BlogPostView() {
               <div className="flex items-center justify-end gap-2 px-5 pt-4">
                 <button
                   onClick={() => navigate(`/blog/edit/${post._id}`)}
-                  className="bg-accent text-foreground hover:bg-accent/80 inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors"
+                  className="bg-muted text-foreground hover:bg-muted/80 inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -406,7 +406,7 @@ export default function BlogPostView() {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setShowDeleteDialog(false)}
-                className="bg-accent text-foreground hover:bg-accent/80 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors"
+                className="bg-muted text-foreground hover:bg-muted/80 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors"
               >
                 取消
               </button>

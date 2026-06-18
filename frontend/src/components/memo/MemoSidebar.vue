@@ -27,7 +27,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="border-border bg-card/80 dark:border-border dark:bg-card/80 rounded-3xl border p-5 shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-md"
+    class="border-border bg-background/80 dark:border-border dark:bg-background/80 rounded-3xl border p-5 shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-md"
   >
     <div class="mb-3 flex items-center gap-2">
       <IconMemo
@@ -43,7 +43,7 @@ onMounted(() => {
       v-model="memoText"
       @input="saveMemo"
       placeholder="在这里写下你的想法..."
-      class="border-border bg-muted text-foreground placeholder-muted-foreground focus:border-ring focus:ring-ring dark:border-border dark:bg-card dark:text-foreground dark:placeholder-muted-foreground mb-3 w-full resize-none rounded-xl border px-3 py-2 text-xs focus:ring-2 focus:outline-none"
+      class="border-border bg-muted text-foreground placeholder-muted-foreground focus:border-ring focus:ring-ring dark:border-border dark:bg-background dark:text-foreground dark:placeholder-muted-foreground mb-3 w-full resize-none rounded-xl border px-3 py-2 text-xs focus:ring-2 focus:outline-none"
       rows="6"
     ></textarea>
     <div class="flex items-center justify-between">
@@ -55,7 +55,7 @@ onMounted(() => {
       </span>
       <button
         @click="clearMemo"
-        class="border-border bg-muted text-secondary-foreground hover:bg-accent hover:text-foreground dark:border-border dark:bg-card dark:text-muted-foreground dark:hover:bg-accent dark:hover:text-foreground flex items-center gap-1 rounded-lg border px-2 py-1 text-[10px] font-medium transition-colors"
+        class="border-border bg-muted text-secondary-foreground hover:bg-muted hover:text-foreground dark:border-border dark:bg-background dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-foreground flex items-center gap-1 rounded-lg border px-2 py-1 text-[10px] font-medium transition-colors"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

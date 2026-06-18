@@ -5,12 +5,10 @@
   --paper: #ffffff;
   --warm-gray: oklch(0.96 0.01 240);
   --muted-text: oklch(0.6 0.02 240);
-  --accent-amber: oklch(0.8 0.15 80);
-  --accent-sage: oklch(0.7 0.1 160);
   --accent-slate: oklch(0.7 0.03 260);
   --accent-rose: oklch(0.65 0.15 20);
-  --workspace-accent: #2fcbe7;
-  --workspace-accent-contrast: oklch(0.98 0.01 240);
+  --accent: #2fcbe7;
+  --accent-contrast: oklch(0.98 0.01 240);
   --card-bg: #ffffff;
   --surface: oklch(0.98 0.01 240 / 0.75);
   --surface-foreground: oklch(0.2 0.03 240);
@@ -23,25 +21,6 @@
   --gradient-primary-to: var(--color-cyan-400);
   --gradient-decorative-from: var(--color-sky-200);
   --gradient-decorative-to: var(--color-cyan-200);
-  /* shadcn token bridge */
-  --background: var(--paper);
-  --foreground: var(--ink);
-  --card: var(--card-bg);
-  --card-foreground: var(--ink);
-  --popover: var(--card-bg);
-  --popover-foreground: var(--ink);
-  --primary: var(--workspace-accent);
-  --primary-foreground: var(--workspace-accent-contrast);
-  --secondary: var(--warm-gray);
-  --secondary-foreground: var(--ink);
-  --muted: var(--warm-gray);
-  --muted-foreground: var(--muted-text);
-  --accent: var(--warm-gray);
-  --accent-foreground: var(--ink);
-  --destructive: var(--accent-rose);
-  --border: var(--warm-gray);
-  --input: var(--warm-gray);
-  --ring: var(--accent-slate);
 }
 
 [data-color-scheme='clear-sky'].dark {
@@ -49,12 +28,10 @@
   --paper: oklch(0.13 0.03 240);
   --warm-gray: oklch(0.34 0.025 240);
   --muted-text: oklch(0.78 0.02 240);
-  --accent-amber: oklch(0.82 0.14 80);
-  --accent-sage: oklch(0.74 0.12 160);
   --accent-slate: oklch(0.72 0.03 260);
   --accent-rose: oklch(0.78 0.15 20);
-  --workspace-accent: oklch(0.78 0.13 200);
-  --workspace-accent-contrast: oklch(0.13 0.03 240);
+  --accent: oklch(0.78 0.13 200);
+  --accent-contrast: oklch(0.13 0.03 240);
   --card-bg: oklch(0.27 0.03 240);
   --surface: oklch(0.27 0.03 240 / 0.85);
   --surface-foreground: oklch(0.96 0.012 240);
@@ -67,23 +44,4 @@
   --gradient-primary-to: oklch(0.6 0.12 220);
   --gradient-decorative-from: oklch(0.4 0.1 200 / 0.35);
   --gradient-decorative-to: oklch(0.35 0.1 220 / 0.25);
-  /* shadcn token bridge */
-  --background: var(--paper);
-  --foreground: var(--ink);
-  --card: var(--card-bg);
-  --card-foreground: var(--ink);
-  --popover: var(--card-bg);
-  --popover-foreground: var(--ink);
-  --primary: var(--workspace-accent);
-  --primary-foreground: var(--workspace-accent-contrast);
-  --secondary: var(--warm-gray);
-  --secondary-foreground: var(--ink);
-  --muted: var(--warm-gray);
-  --muted-foreground: var(--muted-text);
-  --accent: var(--warm-gray);
-  --accent-foreground: var(--ink);
-  --destructive: var(--accent-rose);
-  --border: var(--warm-gray);
-  --input: var(--warm-gray);
-  --ring: var(--accent-slate);
 }

@@ -93,7 +93,7 @@ async function switchToChat() {
 
 <template>
   <section
-    class="summary-card bg-card/60 dark:bg-card/50 border-border/60 mb-6 overflow-hidden rounded-2xl border shadow-sm transition-all"
+    class="summary-card bg-background/60 dark:bg-background/50 border-border/60 mb-6 overflow-hidden rounded-2xl border shadow-sm transition-all"
     :class="{ 'is-loading': loading }"
   >
     <!-- Header -->

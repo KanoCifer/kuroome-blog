@@ -52,7 +52,7 @@ export function BentoTodo() {
             </span>
             <Link
               to="/todos"
-              className="text-muted-foreground hover:bg-accent hover:text-foreground cursor-pointer rounded-md p-1 outline-0 transition-colors"
+              className="text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer rounded-md p-1 outline-0 transition-colors"
               title="查看详情"
             >
               <svg

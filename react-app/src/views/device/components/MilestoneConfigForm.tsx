@@ -355,7 +355,7 @@ export function MilestoneConfigForm({
                         className={`relative flex flex-col items-center gap-1 rounded-xl px-3 py-3 text-xs font-semibold transition-all duration-200 ${
                           active
                             ? 'bg-primary text-primary-foreground shadow-primary/25 shadow-lg'
-                            : 'bg-card text-muted-foreground hover:bg-accent shadow-sm'
+                            : 'bg-card text-muted-foreground hover:bg-muted shadow-sm'
                         }`}
                       >
                         <span className="text-base">
@@ -462,7 +462,7 @@ export function MilestoneConfigForm({
                         className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold transition-all duration-200 ${
                           active
                             ? 'bg-primary text-primary-foreground shadow-primary/25 shadow-lg'
-                            : 'bg-card text-muted-foreground hover:bg-accent shadow-sm'
+                            : 'bg-card text-muted-foreground hover:bg-muted shadow-sm'
                         }`}
                       >
                         {opt.icon}

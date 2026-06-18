@@ -47,7 +47,7 @@
       >
         <Motion
           :layoutId="RECOMMEND_COVER_LAYOUT_ID_PREFIX + book.bookId"
-          class="bg-card relative aspect-3/4 overflow-hidden rounded-xl shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl"
+          class="bg-background relative aspect-3/4 overflow-hidden rounded-xl shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl"
         >
           <img
             v-if="book.cover"

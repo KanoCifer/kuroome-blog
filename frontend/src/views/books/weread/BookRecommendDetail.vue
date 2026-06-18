@@ -79,7 +79,7 @@ onUnmounted(() => {
             bounce: 0.1,
             visualDuration: 0.5,
           }"
-          class="bg-card border-border relative w-full max-w-3xl overflow-hidden rounded-t-3xl border shadow-2xl sm:rounded-3xl"
+          class="bg-background border-border relative w-full max-w-3xl overflow-hidden rounded-t-3xl border shadow-2xl sm:rounded-3xl"
         >
           <div class="grid grid-cols-1 sm:grid-cols-[200px_1fr]">
             <!-- Cover column — the morph happens here -->
@@ -133,7 +133,7 @@ onUnmounted(() => {
 
                 <button
                   type="button"
-                  class="text-muted-foreground hover:bg-accent hover:text-foreground -mt-1 -mr-1 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full transition-colors"
+                  class="text-muted-foreground hover:bg-muted hover:text-foreground -mt-1 -mr-1 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full transition-colors"
                   aria-label="关闭"
                   @click="emit('close')"
                 >

@@ -110,7 +110,7 @@ function SheetBody({
             type="button"
             aria-label="关闭分析"
             onClick={onClose}
-            className="hover:bg-accent text-muted-foreground inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
+            className="hover:bg-muted text-muted-foreground inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
           >
             <X className="h-4 w-4" />
           </button>
@@ -136,7 +136,7 @@ function SheetBody({
           type="button"
           aria-label="关闭分析"
           onClick={onClose}
-          className="text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
+          className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
         >
           <X className="h-4 w-4" />
         </button>

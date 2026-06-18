@@ -16,11 +16,11 @@
         class="fixed inset-x-4 inset-y-24 z-50 flex items-center justify-center sm:inset-x-auto sm:inset-y-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2"
       >
         <div
-          class="bg-card max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl shadow-2xl dark:shadow-xl dark:shadow-slate-900/60"
+          class="bg-background max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl shadow-2xl dark:shadow-xl dark:shadow-slate-900/60"
         >
           <!-- Header -->
           <div
-            class="bg-card border-border sticky top-0 z-10 border-b px-6 pt-6 pb-4"
+            class="bg-background border-border sticky top-0 z-10 border-b px-6 pt-6 pb-4"
           >
             <div class="flex items-start justify-between gap-3">
               <div class="flex items-center gap-3">
@@ -65,7 +65,7 @@
           >
             <!-- Enable Toggle -->
             <div
-              class="border-border bg-card flex items-center justify-between rounded-2xl border px-5 py-4 shadow-sm"
+              class="border-border bg-background flex items-center justify-between rounded-2xl border px-5 py-4 shadow-sm"
             >
               <div class="flex items-center gap-3">
                 <div
@@ -159,7 +159,7 @@
                     'relative flex flex-col items-center gap-1 rounded-xl px-3 py-3 text-xs font-semibold transition-all duration-200',
                     form.milestones.includes(preset.days)
                       ? 'bg-primary text-primary-foreground shadow-primary/25 shadow-lg'
-                      : 'bg-card text-muted-foreground hover:bg-accent border-border border shadow-sm',
+                      : 'bg-background text-muted-foreground hover:bg-muted border-border border shadow-sm',
                   ]"
                 >
                   <span class="text-base">{{
@@ -204,7 +204,7 @@
                     type="number"
                     min="1"
                     placeholder="自定义天数..."
-                    class="text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 border-border bg-card w-full rounded-xl border py-2.5 pr-12 pl-4 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                    class="text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 border-border bg-background w-full rounded-xl border py-2.5 pr-12 pl-4 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                   />
                   <span
                     class="text-muted-foreground pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-xs"
@@ -214,7 +214,7 @@
                 <button
                   type="button"
                   @click="addCustomMilestone"
-                  class="border-border bg-card text-muted-foreground hover:border-primary/30 hover:bg-primary/10 hover:text-primary flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-all active:scale-95"
+                  class="border-border bg-background text-muted-foreground hover:border-primary/30 hover:bg-primary/10 hover:text-primary flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-all active:scale-95"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -331,7 +331,7 @@
                     'flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold transition-all duration-200',
                     form.channels.includes(opt.value)
                       ? 'bg-primary text-primary-foreground shadow-primary/25 shadow-lg'
-                      : 'bg-card text-muted-foreground hover:bg-accent border-border border shadow-sm',
+                      : 'bg-background text-muted-foreground hover:bg-muted border-border border shadow-sm',
                   ]"
                 >
                   <span v-html="opt.icon" />
@@ -351,7 +351,7 @@
                   v-model="form.email"
                   type="email"
                   placeholder="example@domain.com"
-                  class="text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 border-border bg-card w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                  class="text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 border-border bg-background w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
 
@@ -366,7 +366,7 @@
                   v-model="form.feishu_webhook_url"
                   type="url"
                   placeholder="https://open.feishu.cn/open-apis/bot/v2/hook/..."
-                  class="text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 border-border bg-card w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                  class="text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 border-border bg-background w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
 
@@ -381,7 +381,7 @@
                   v-model="form.bark_device_key"
                   type="text"
                   placeholder="设备Key或完整推送URL"
-                  class="text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 border-border bg-card w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                  class="text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 border-border bg-background w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
             </div>

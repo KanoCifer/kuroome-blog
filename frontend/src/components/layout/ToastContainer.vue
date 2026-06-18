@@ -81,7 +81,7 @@ onUnmounted(() => {
         :exit="{ opacity: 0, y: -40, scale: 0.9 }"
         :transition="{ type: 'spring', damping: 30, stiffness: 500 }"
         :class="[
-          'squircle border-border/20 bg-card/80 text-foreground dark:border-border/80 dark:bg-background/80 dark:text-foreground absolute top-0 left-0 flex h-20 w-full items-center justify-between gap-3 border shadow-xl backdrop-blur-sm transition-colors duration-200',
+          'squircle border-border/20 bg-background/80 text-foreground dark:border-border/80 dark:bg-background/80 dark:text-foreground absolute top-0 left-0 flex h-20 w-full items-center justify-between gap-3 border shadow-xl backdrop-blur-sm transition-colors duration-200',
         ]"
       >
         <component

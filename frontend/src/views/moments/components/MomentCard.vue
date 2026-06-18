@@ -15,7 +15,7 @@
         'focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2',
         moment.is_pinned
           ? 'bg-warning/8 border-warning/30'
-          : 'bg-card border-border/40 hover:border-primary/25',
+          : 'bg-background border-border/40 hover:border-primary/25',
       ]"
       @click="emit('open', moment.id)"
       @keydown.enter.prevent="emit('open', moment.id)"
@@ -44,7 +44,7 @@
       >
         <button
           type="button"
-          class="text-muted-foreground hover:text-primary border-border/40 bg-card/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
+          class="text-muted-foreground hover:text-primary border-border/40 bg-background/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
           :aria-label="`编辑 ${moment.id}`"
           @click="emit('edit', moment)"
         >
@@ -52,7 +52,7 @@
         </button>
         <button
           type="button"
-          class="text-muted-foreground hover:text-destructive border-border/40 bg-card/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
+          class="text-muted-foreground hover:text-destructive border-border/40 bg-background/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
           :aria-label="`删除 ${moment.id}`"
           @click="emit('delete', moment)"
         >

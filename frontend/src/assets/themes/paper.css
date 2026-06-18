@@ -5,12 +5,10 @@
   --paper: oklch(0.97 0.013 50);
   --warm-gray: oklch(0.95 0.018 50);
   --muted-text: #9a918a;
-  --accent-amber: #c8713a;
-  --accent-sage: #5a7a62;
   --accent-slate: #5a6b7a;
   --accent-rose: #b35a5a;
-  --workspace-accent: #8a653f;
-  --workspace-accent-contrast: #fffaf5;
+  --accent: #8a653f;
+  --accent-contrast: #fffaf5;
   --card-bg: oklch(0.99 0.008 50);
   --surface: oklch(0.97 0.013 50 / 0.75);
   --surface-foreground: #1a1613;
@@ -23,25 +21,6 @@
   --gradient-primary-to: #c8713a;
   --gradient-decorative-from: #f2e7db;
   --gradient-decorative-to: #d4b396;
-  /* shadcn token bridge */
-  --background: var(--paper);
-  --foreground: var(--ink);
-  --card: var(--card-bg);
-  --card-foreground: var(--ink);
-  --popover: var(--card-bg);
-  --popover-foreground: var(--ink);
-  --primary: var(--workspace-accent);
-  --primary-foreground: var(--workspace-accent-contrast);
-  --secondary: var(--warm-gray);
-  --secondary-foreground: var(--ink);
-  --muted: var(--warm-gray);
-  --muted-foreground: var(--muted-text);
-  --accent: var(--warm-gray);
-  --accent-foreground: var(--ink);
-  --destructive: var(--accent-rose);
-  --border: var(--warm-gray);
-  --input: var(--warm-gray);
-  --ring: var(--accent-slate);
 }
 
 [data-color-scheme='paper'].dark {
@@ -49,12 +28,10 @@
   --paper: #14100d;
   --warm-gray: #3e3225;
   --muted-text: #b0a89e;
-  --accent-amber: #e09a5e;
-  --accent-sage: #8aaa90;
   --accent-slate: #8a9baa;
   --accent-rose: #d49a9a;
-  --workspace-accent: #c08560;
-  --workspace-accent-contrast: #14100d;
+  --accent: #c08560;
+  --accent-contrast: #14100d;
   --card-bg: #2a221b;
   --surface: #2a221be6;
   --surface-foreground: #ede5dc;
@@ -67,23 +44,4 @@
   --gradient-primary-to: #e09a5e;
   --gradient-decorative-from: #34291f;
   --gradient-decorative-to: #5e4a36;
-  /* shadcn token bridge */
-  --background: var(--paper);
-  --foreground: var(--ink);
-  --card: var(--card-bg);
-  --card-foreground: var(--ink);
-  --popover: var(--card-bg);
-  --popover-foreground: var(--ink);
-  --primary: var(--workspace-accent);
-  --primary-foreground: var(--workspace-accent-contrast);
-  --secondary: var(--warm-gray);
-  --secondary-foreground: var(--ink);
-  --muted: var(--warm-gray);
-  --muted-foreground: var(--muted-text);
-  --accent: var(--warm-gray);
-  --accent-foreground: var(--ink);
-  --destructive: var(--accent-rose);
-  --border: var(--warm-gray);
-  --input: var(--warm-gray);
-  --ring: var(--accent-slate);
 }

@@ -3,7 +3,7 @@
     class="flex flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8"
   >
     <div
-      class="bg-card/70 mx-auto max-w-md rounded-4xl p-8 text-center backdrop-blur-sm"
+      class="bg-background/70 mx-auto max-w-md rounded-4xl p-8 text-center backdrop-blur-sm"
     >
       <!-- 404 数字动画 -->
       <div class="relative mx-auto h-32 w-32">
@@ -60,7 +60,7 @@
 
         <button
           type="button"
-          class="bg-card text-foreground ring-border hover:bg-accent focus:ring-ring inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium ring-1 transition-all ring-inset focus:ring-2 focus:outline-none"
+          class="bg-background text-foreground ring-border hover:bg-muted focus:ring-ring inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium ring-1 transition-all ring-inset focus:ring-2 focus:outline-none"
           @click="goBack"
         >
           <svg

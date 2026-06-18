@@ -59,7 +59,7 @@ export function Notifier() {
           {n.message}
         </div>
         <button
-          className="text-muted-foreground hover:bg-accent hover:text-card-foreground mr-2 shrink-0 cursor-pointer rounded-md p-1 transition-colors"
+          className="text-muted-foreground hover:bg-muted hover:text-card-foreground mr-2 shrink-0 cursor-pointer rounded-md p-1 transition-colors"
           onClick={() => notificationStore.dismiss(n.id)}
           aria-label="dismiss"
         >

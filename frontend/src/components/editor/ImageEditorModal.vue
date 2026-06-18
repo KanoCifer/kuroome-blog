@@ -40,14 +40,14 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
         @click.self="emit('close')"
       >
-        <div class="bg-card w-full max-w-md rounded-3xl shadow-2xl">
+        <div class="bg-background w-full max-w-md rounded-3xl shadow-2xl">
           <div
             class="border-border flex items-center justify-between border-b px-6 py-4"
           >
             <h3 class="text-foreground text-base font-semibold">编辑图片</h3>
             <button
               type="button"
-              class="text-muted-foreground hover:bg-accent bg-muted rounded-full px-3 py-1 text-xs font-semibold transition"
+              class="text-muted-foreground hover:bg-muted bg-muted rounded-full px-3 py-1 text-xs font-semibold transition"
               @click="emit('close')"
             >
               关闭
@@ -71,7 +71,7 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
                 :value="alt"
                 type="text"
                 placeholder="图片说明 (Alt)"
-                class="text-foreground placeholder:text-muted-foreground focus:border-ring border-border bg-card w-full rounded-xl border px-3 py-2 text-sm outline-none"
+                class="text-foreground placeholder:text-muted-foreground focus:border-ring border-border bg-background w-full rounded-xl border px-3 py-2 text-sm outline-none"
                 @input="
                   emit('update:alt', ($event.target as HTMLInputElement).value)
                 "
@@ -83,7 +83,7 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
                   type="number"
                   min="0"
                   placeholder="宽度"
-                  class="text-foreground placeholder:text-muted-foreground focus:border-ring border-border bg-card w-full rounded-xl border px-3 py-2 text-sm outline-none"
+                  class="text-foreground placeholder:text-muted-foreground focus:border-ring border-border bg-background w-full rounded-xl border px-3 py-2 text-sm outline-none"
                   @input="
                     emit(
                       'update:width',
@@ -96,7 +96,7 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
                   type="number"
                   min="0"
                   placeholder="高度"
-                  class="text-foreground placeholder:text-muted-foreground focus:border-ring border-border bg-card w-full rounded-xl border px-3 py-2 text-sm outline-none"
+                  class="text-foreground placeholder:text-muted-foreground focus:border-ring border-border bg-background w-full rounded-xl border px-3 py-2 text-sm outline-none"
                   @input="
                     emit(
                       'update:height',
@@ -121,7 +121,7 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
               />
               <button
                 type="button"
-                class="text-muted-foreground hover:bg-accent border-border rounded-xl border px-3 py-2 text-xs font-semibold transition"
+                class="text-muted-foreground hover:bg-muted border-border rounded-xl border px-3 py-2 text-xs font-semibold transition"
                 @click="replaceInputRef?.click()"
               >
                 替换图片

@@ -200,7 +200,7 @@ watch(
             class="inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors"
             :class="
               article.is_read
-                ? 'bg-muted text-foreground hover:bg-accent'
+                ? 'bg-muted text-foreground hover:bg-muted'
                 : 'bg-primary text-primary-foreground hover:bg-primary/90'
             "
           >
@@ -252,7 +252,7 @@ watch(
 
         <!-- Article Body -->
         <div
-          class="border-border bg-card overflow-hidden rounded-2xl border shadow-sm"
+          class="border-border bg-background overflow-hidden rounded-2xl border shadow-sm"
         >
           <div class="border-border border-border border-b p-8">
             <h1 class="text-primary mb-4 text-3xl leading-tight font-bold">

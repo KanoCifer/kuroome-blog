@@ -1,6 +1,6 @@
 <template>
   <motion.nav
-    class="nav squircle bg-card/90 z-9999 flex items-center gap-2 px-1 py-2 backdrop-blur-sm"
+    class="nav squircle bg-background/90 z-9999 flex items-center gap-2 px-1 py-2 backdrop-blur-sm"
   >
     <ul class="flex items-center gap-2 font-medium">
       <!-- Avatar -->

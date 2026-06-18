@@ -113,7 +113,7 @@ export function LoginLogsPanel({
 
               <div className="grid grid-cols-2 gap-2">
                 <button
-                  className="border-border hover:bg-accent rounded-lg border px-3 py-2 font-medium disabled:cursor-not-allowed disabled:opacity-50"
+                  className="border-border hover:bg-muted rounded-lg border px-3 py-2 font-medium disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={data.page <= 1}
                   onClick={() => onPageChange(data.page - 1)}
                   type="button"
@@ -121,7 +121,7 @@ export function LoginLogsPanel({
                   Previous
                 </button>
                 <button
-                  className="border-border hover:bg-accent rounded-lg border px-3 py-2 font-medium disabled:cursor-not-allowed disabled:opacity-50"
+                  className="border-border hover:bg-muted rounded-lg border px-3 py-2 font-medium disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={data.page >= data.totalPages}
                   onClick={() => onPageChange(data.page + 1)}
                   type="button"

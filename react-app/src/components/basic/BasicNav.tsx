@@ -206,7 +206,7 @@ export function BasicNav() {
                 label="Theme"
                 onClick={(e) => toggleTheme(e)}
                 iconColor="text-primary"
-                iconBg="bg-accent"
+                iconBg="bg-muted"
               />
               <MenuItem
                 icon={<AboutIcon className="h-6 w-6" />}

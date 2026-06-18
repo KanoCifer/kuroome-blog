@@ -61,44 +61,16 @@
   font-display: swap;
 }
 
-html,
-body {
+:root {
   -webkit-font-smoothing: antialiased;
   -webkit-overflow-scrolling: touch;
-}
-
-html {
   box-sizing: border-box;
+  margin: 0;
 }
 
-@layer base {
-  body {
-    @apply m-0;
-  }
-
-  #app {
-    @apply min-h-screen;
-  }
-
-  * {
-    @apply border-border outline-ring/50;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-
-button {
-  @apply cursor-pointer;
-}
-
+button,
 a {
-  @apply cursor-pointer;
-}
-
-footer {
-  @apply text-muted mx-auto w-full min-w-0 p-4 text-center text-sm;
+  cursor: pointer;
 }
 
 /* 代码块 - macOS 风格（文章展示） */
@@ -119,7 +91,7 @@ footer {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  @apply bg-red-500;
+  background: red;
   box-shadow:
     20px 0 0 #eab308,
     40px 0 0 #22c55e;
@@ -127,48 +99,6 @@ footer {
 
 .prose pre code {
   @apply mt-2 p-1 text-sm leading-relaxed text-slate-200;
-}
-
-/* Task list (Tailwind) */
-ul[data-type='taskList'] {
-  @apply ml-0 list-none p-0;
-}
-
-ul[data-type='taskList'] > li {
-  @apply flex flex-nowrap items-center gap-2 py-1;
-}
-
-ul[data-type='taskList'] > li > label {
-  @apply mr-0 inline-flex flex-none items-center select-none;
-}
-
-ul[data-type='taskList'] > li > label input[type='checkbox'] {
-  @apply m-0 h-4 w-4 align-middle;
-}
-
-ul[data-type='taskList'] > li > div {
-  @apply min-w-0 flex-1;
-}
-
-ul[data-type='taskList'] > li > div p {
-  @apply m-0;
-}
-
-/* checked state -> strike-through */
-ul[data-type='taskList'] > li[data-checked='true'] > div,
-ul[data-type='taskList'] > li[data-checked='true'] > div p {
-  @apply text-gray-500 line-through opacity-60;
-}
-
-/* nested taskList reset */
-ul[data-type='taskList'] ul[data-type='taskList'] {
-  @apply m-0;
-}
-
-/* dark mode adjustments */
-.dark ul[data-type='taskList'] > li[data-checked='true'] > div,
-.dark ul[data-type='taskList'] > li[data-checked='true'] > div p {
-  @apply text-gray-400;
 }
 
 :root[data-font='harmonyos'] {
@@ -245,25 +175,18 @@ ul[data-type='taskList'] ul[data-type='taskList'] {
   /* Core */
   --color-background: var(--paper);
   --color-foreground: var(--ink);
-  --color-card: var(--card-bg);
-  --color-card-foreground: var(--ink);
-  --color-popover: var(--card-bg);
-  --color-popover-foreground: var(--ink);
 
   /* Primary */
-  --color-primary: var(--workspace-accent);
-  --color-primary-foreground: var(--workspace-accent-contrast);
+  --color-primary: var(--accent);
+  --color-primary-foreground: var(--accent-contrast);
 
-  /* Secondary / Muted / Accent — all derived from warm-gray */
+  /* Secondary / Muted */
   --color-secondary: var(--warm-gray);
   --color-secondary-foreground: var(--ink);
   --color-muted: var(--warm-gray);
   --color-muted-foreground: var(--muted-text);
-  --color-accent: var(--warm-gray);
-  --color-accent-foreground: var(--ink);
 
   /* Semantic */
-  --color-destructive: var(--accent-rose);
   --color-border: var(--warm-gray);
   --color-input: var(--warm-gray);
   --color-ring: var(--accent-slate);
@@ -277,12 +200,11 @@ ul[data-type='taskList'] ul[data-type='taskList'] {
 
   /* Extended app tokens */
   --color-surface: var(--surface);
+  --color-destructive: var(--color-rose-500);
   --color-surface-foreground: var(--surface-foreground);
-  --color-success: var(--accent-sage);
-  --color-success-foreground: var(--workspace-accent-contrast);
-  --color-warning: var(--accent-amber);
-  --color-warning-foreground: var(--ink);
-  --color-brand-devices: var(--workspace-accent);
+  --color-success: var(--color-emerald-500);
+  --color-warning: var(--color-amber-500);
+  --color-brand-devices: var(--accent);
   --color-gradient-primary-from: var(--gradient-primary-from);
   --color-gradient-primary-to: var(--gradient-primary-to);
   --color-gradient-decorative-from: var(--gradient-decorative-from);

@@ -205,7 +205,7 @@ export default function ConfigManage() {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="font-headline text-on-surface border-border hover:bg-accent flex-1 rounded-full border px-4 py-3 text-sm font-semibold transition-all active:scale-[0.98]"
+                  className="font-headline text-on-surface border-border hover:bg-muted flex-1 rounded-full border px-4 py-3 text-sm font-semibold transition-all active:scale-[0.98]"
                 >
                   取消
                 </button>

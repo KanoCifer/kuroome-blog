@@ -124,7 +124,7 @@ export function FishingFeedbackForm({
             type="button"
             aria-label="关闭"
             onClick={onCancel}
-            className="hover:bg-accent text-muted-foreground inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
+            className="hover:bg-muted text-muted-foreground inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
           >
             <X className="h-4 w-4" />
           </button>
@@ -169,7 +169,7 @@ export function FishingFeedbackForm({
               <button
                 type="button"
                 onClick={onCancel}
-                className="border-border text-card-foreground hover:bg-accent min-h-11 flex-1 rounded-full border px-4 text-sm font-medium transition-colors"
+                className="border-border text-card-foreground hover:bg-muted min-h-11 flex-1 rounded-full border px-4 text-sm font-medium transition-colors"
                 disabled={loading}
               >
                 取消

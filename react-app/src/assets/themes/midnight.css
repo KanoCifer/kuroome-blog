@@ -5,8 +5,6 @@
   --paper: var(--color-indigo-50);
   --warm-gray: oklch(0.95 0.02 280);
   --muted-text: oklch(0.55 0.03 280);
-  --accent-amber: oklch(0.75 0.15 80);
-  --accent-sage: oklch(0.65 0.1 160);
   --accent-slate: oklch(0.7 0.05 280);
   --accent-rose: oklch(0.6 0.18 20);
   --workspace-accent: oklch(0.5082 0.2535 267.3);
@@ -49,8 +47,6 @@
   --paper: oklch(0.12 0.03 280);
   --warm-gray: oklch(0.2 0.03 280);
   --muted-text: oklch(0.65 0.03 280);
-  --accent-amber: oklch(0.65 0.12 80);
-  --accent-sage: oklch(0.55 0.1 160);
   --accent-slate: oklch(0.6 0.05 280);
   --accent-rose: oklch(0.65 0.15 20);
   --workspace-accent: oklch(0.5082 0.2535 267.3);

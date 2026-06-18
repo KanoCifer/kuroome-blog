@@ -279,7 +279,7 @@ onMounted(() => {
       <div class="flex shrink-0 items-center gap-1.5">
         <select
           v-model="selectedHarbor"
-          class="border-border bg-card text-foreground focus:ring-primary cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
+          class="border-border bg-background text-foreground focus:ring-primary cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
         >
           <option
             v-for="opt in HARBOR_OPTIONS"
@@ -291,7 +291,7 @@ onMounted(() => {
         </select>
         <select
           v-model="selectedDate"
-          class="border-border bg-card text-foreground focus:ring-primary cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
+          class="border-border bg-background text-foreground focus:ring-primary cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
         >
           <option
             v-for="opt in dateOptions"

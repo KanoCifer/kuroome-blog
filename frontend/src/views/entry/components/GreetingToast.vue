@@ -40,13 +40,13 @@ const goToChangelog = () => {
     >
       <div
         v-if="showToast"
-        class="group border-border bg-card/95 fixed bottom-6 left-4 z-50 w-[300px] overflow-hidden rounded-2xl border shadow-lg backdrop-blur-sm transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-xl sm:bottom-8 sm:left-8"
+        class="group border-border bg-background/95 fixed bottom-6 left-4 z-50 w-[300px] overflow-hidden rounded-2xl border shadow-lg backdrop-blur-sm transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-xl sm:bottom-8 sm:left-8"
       >
         <div class="relative px-4 py-4">
           <!-- 关闭按钮 -->
           <button
             @click="closeToast"
-            class="text-muted-foreground/60 hover:bg-accent hover:text-foreground absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full transition-all duration-200 hover:scale-110"
+            class="text-muted-foreground/60 hover:bg-muted hover:text-foreground absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full transition-all duration-200 hover:scale-110"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

@@ -250,7 +250,7 @@ function EditBottomSheet({
           <h2 className="text-foreground text-lg font-semibold">编辑任务</h2>
           <button
             onClick={onClose}
-            className="text-muted-foreground hover:bg-accent cursor-pointer rounded-lg p-1"
+            className="text-muted-foreground hover:bg-muted cursor-pointer rounded-lg p-1"
           >
             <svg
               className="h-6 w-6"
@@ -571,7 +571,7 @@ export default function TodoListView() {
                 </h2>
                 <button
                   onClick={closeAddForm}
-                  className="text-muted-foreground hover:bg-accent cursor-pointer rounded-lg p-1"
+                  className="text-muted-foreground hover:bg-muted cursor-pointer rounded-lg p-1"
                 >
                   <svg
                     className="h-6 w-6"

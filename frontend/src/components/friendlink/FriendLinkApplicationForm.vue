@@ -82,7 +82,7 @@ const handleSubmit = () => {
 
 <template>
   <div
-    class="bg-card/80 ring-border mx-auto mt-12 mb-4 rounded-3xl p-4 py-8 shadow-lg ring-1 hover:shadow-xl motion-safe:transition-shadow motion-safe:duration-300"
+    class="bg-background/80 ring-border mx-auto mt-12 mb-4 rounded-3xl p-4 py-8 shadow-lg ring-1 hover:shadow-xl motion-safe:transition-shadow motion-safe:duration-300"
   >
     <div class="mx-4 my-2">
       <!-- 申请须知 -->

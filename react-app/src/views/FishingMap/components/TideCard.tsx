@@ -192,7 +192,7 @@ export function TideCard() {
               className={`min-h-9 shrink-0 rounded-full px-3.5 text-xs font-medium transition-colors ${
                 selectedHarbor === opt.code
                   ? 'bg-primary text-primary-foreground'
-                  : 'bg-secondary text-card-foreground hover:bg-accent'
+                  : 'bg-secondary text-card-foreground hover:bg-muted'
               }`}
             >
               {opt.name}
@@ -209,7 +209,7 @@ export function TideCard() {
               className={`min-h-9 shrink-0 rounded-full px-3.5 text-xs font-medium transition-colors ${
                 selectedDate === opt.value
                   ? 'bg-primary text-primary-foreground'
-                  : 'bg-secondary text-card-foreground hover:bg-accent'
+                  : 'bg-secondary text-card-foreground hover:bg-muted'
               }`}
             >
               {opt.label} {opt.weekday}

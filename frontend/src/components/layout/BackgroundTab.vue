@@ -129,7 +129,7 @@ const autoSwitchOptions = [
           :class="
             backgroundStore.mode === 'random'
               ? 'border-primary bg-primary/5'
-              : 'border-border bg-card hover:border-primary'
+              : 'border-border bg-background hover:border-primary'
           "
         >
           <svg
@@ -169,7 +169,7 @@ const autoSwitchOptions = [
           :class="
             backgroundStore.mode === 'fixed'
               ? 'border-primary bg-primary/5'
-              : 'border-border bg-card hover:border-primary'
+              : 'border-border bg-background hover:border-primary'
           "
         >
           <svg
@@ -221,7 +221,7 @@ const autoSwitchOptions = [
           :class="
             backgroundStore.autoSwitchInterval === opt.value
               ? 'border-primary bg-primary/5 text-primary font-medium'
-              : 'border-border bg-card text-foreground hover:border-primary'
+              : 'border-border bg-background text-foreground hover:border-primary'
           "
         >
           {{ opt.label }}

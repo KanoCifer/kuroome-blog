@@ -10,18 +10,18 @@
     <div v-if="isEditing" class="space-y-2.5">
       <input
         v-model="editForm.title"
-        class="border-border bg-card focus:border-primary text-foreground w-full rounded-lg border px-2.5 py-1.5 text-sm font-medium outline-none"
+        class="border-border bg-background focus:border-primary text-foreground w-full rounded-lg border px-2.5 py-1.5 text-sm font-medium outline-none"
       />
       <textarea
         v-model="editForm.description"
         rows="2"
-        class="focus:border-primary border-border bg-card text-foreground w-full resize-none rounded-lg border px-2.5 py-1.5 text-xs outline-none"
+        class="focus:border-primary border-border bg-background text-foreground w-full resize-none rounded-lg border px-2.5 py-1.5 text-xs outline-none"
         placeholder="描述..."
       ></textarea>
       <div class="flex items-center gap-2">
         <select
           v-model="editForm.priority"
-          class="border-border bg-card text-foreground cursor-pointer rounded-full border px-2 py-1 text-xs outline-none"
+          class="border-border bg-background text-foreground cursor-pointer rounded-full border px-2 py-1 text-xs outline-none"
         >
           <option value="default">默认</option>
           <option value="low">低</option>
@@ -30,12 +30,12 @@
         <input
           type="date"
           v-model="editForm.dueDate"
-          class="border-border bg-card text-foreground cursor-pointer rounded-full border px-2 py-1 text-xs outline-none"
+          class="border-border bg-background text-foreground cursor-pointer rounded-full border px-2 py-1 text-xs outline-none"
         />
         <div class="ml-auto flex gap-1.5">
           <button
             @click="cancelEdit"
-            class="bg-muted text-foreground hover:bg-accent cursor-pointer rounded-lg px-2.5 py-1 text-xs font-medium transition-colors"
+            class="bg-muted text-foreground hover:bg-muted cursor-pointer rounded-lg px-2.5 py-1 text-xs font-medium transition-colors"
           >
             取消
           </button>

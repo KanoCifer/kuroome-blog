@@ -26,7 +26,7 @@
       <button
         v-if="addingToStatus !== status"
         @click="$emit('startAdd', status)"
-        class="text-muted-foreground hover:text-foreground hover:bg-accent flex w-full cursor-pointer items-center gap-1.5 rounded-lg px-2 py-2 text-xs transition-colors"
+        class="text-muted-foreground hover:text-foreground hover:bg-muted flex w-full cursor-pointer items-center gap-1.5 rounded-lg px-2 py-2 text-xs transition-colors"
       >
         <svg
           class="h-3.5 w-3.5"
@@ -49,14 +49,14 @@
           ref="inputRef"
           type="text"
           :placeholder="`添加${title}任务...`"
-          class="border-border bg-card focus:border-primary text-foreground w-full rounded-lg border px-2.5 py-1.5 text-sm outline-none"
+          class="border-border bg-background focus:border-primary text-foreground w-full rounded-lg border px-2.5 py-1.5 text-sm outline-none"
           @keyup.enter="submit"
           @keyup.escape="$emit('cancelQuickAdd')"
         />
         <div class="flex items-center gap-1.5">
           <button
             @click="$emit('cancelQuickAdd')"
-            class="text-muted-foreground hover:bg-accent cursor-pointer rounded-md px-2 py-1 text-xs transition-colors"
+            class="text-muted-foreground hover:bg-muted cursor-pointer rounded-md px-2 py-1 text-xs transition-colors"
           >
             取消
           </button>

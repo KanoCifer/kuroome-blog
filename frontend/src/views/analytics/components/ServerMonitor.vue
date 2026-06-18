@@ -34,7 +34,7 @@
         <button
           type="button"
           @click="toggleAutoRefresh"
-          class="text-foreground hover:bg-accent bg-muted rounded-xl px-4 py-2 text-sm font-medium transition-colors"
+          class="text-foreground hover:bg-muted bg-muted rounded-xl px-4 py-2 text-sm font-medium transition-colors"
         >
           {{ isSSEConnected ? 'Pause' : 'Start' }} Auto-refresh
         </button>
@@ -44,7 +44,7 @@
     <!-- Server Status Cards -->
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
       <!-- CPU Gauge -->
-      <div :class="`bg-card rounded-2xl p-6 shadow-lg ${customClass || ''}`">
+      <div :class="`bg-background rounded-2xl p-6 shadow-lg ${customClass || ''}`">
         <div class="mb-4 flex items-center justify-between">
           <h3 class="text-foreground text-lg font-bold">
             <div class="flex items-center gap-2">
@@ -77,7 +77,7 @@
       </div>
 
       <!-- Memory Gauge -->
-      <div :class="`bg-card rounded-2xl p-6 shadow-lg ${customClass || ''}`">
+      <div :class="`bg-background rounded-2xl p-6 shadow-lg ${customClass || ''}`">
         <div class="mb-4 flex items-center justify-between">
           <h3 class="text-foreground text-lg font-bold">
             <div class="flex items-center gap-2">
@@ -112,7 +112,7 @@
       </div>
 
       <!-- Disk Usage Card -->
-      <div :class="`bg-card rounded-2xl p-6 shadow-lg ${customClass || ''}`">
+      <div :class="`bg-background rounded-2xl p-6 shadow-lg ${customClass || ''}`">
         <div class="mb-4 flex items-center justify-between">
           <h3 class="text-foreground text-lg font-bold">
             <div class="flex items-center gap-2">
@@ -168,7 +168,7 @@
     </div>
 
     <!-- Server History Chart -->
-    <div :class="`bg-card rounded-2xl p-6 shadow-lg ${customClass || ''}`">
+    <div :class="`bg-background rounded-2xl p-6 shadow-lg ${customClass || ''}`">
       <h3
         class="text-foreground mb-4 flex items-center gap-2 text-lg font-bold"
       >

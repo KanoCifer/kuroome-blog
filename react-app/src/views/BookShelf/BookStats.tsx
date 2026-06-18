@@ -113,7 +113,7 @@ function RecommendSection({
         </div>
         <button
           type="button"
-          className="text-muted-foreground hover:text-foreground hover:bg-accent inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          className="text-muted-foreground hover:text-foreground hover:bg-muted inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40"
           disabled={loading}
           onClick={onRefresh}
           aria-label="换一批"
@@ -645,7 +645,7 @@ export default function BookStats() {
         <div className="absolute top-0 right-0 left-0 z-10 flex items-center px-4 py-4 md:px-6">
           <button
             type="button"
-            className="border-border bg-card/60 hover:bg-accent flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
+            className="border-border bg-card/60 hover:bg-muted flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
             onClick={handleBack}
             aria-label="返回"
           >
@@ -657,7 +657,7 @@ export default function BookStats() {
         <div className="absolute top-0 right-0 z-10 flex items-center px-4 py-4 md:px-6">
           <button
             type="button"
-            className="border-border bg-card/60 hover:bg-accent flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
+            className="border-border bg-card/60 hover:bg-muted flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
             onClick={handleRefresh}
             aria-label="刷新统计"
           >
@@ -726,7 +726,7 @@ export default function BookStats() {
                     className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
                       activeMode === mode.key
                         ? 'bg-primary text-primary-foreground shadow-sm'
-                        : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                     }`}
                     onClick={() => setActiveMode(mode.key)}
                   >

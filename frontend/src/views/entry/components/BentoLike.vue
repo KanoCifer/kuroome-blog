@@ -4,7 +4,7 @@
     :animate="{ scale: 1 }"
     :whileHover="{ scale: 1.1 }"
     :whilePress="{ scale: 0.9 }"
-    class="bg-card/55 ring-border/30 relative cursor-pointer rounded-full ring"
+    class="bg-background/55 ring-border/30 relative cursor-pointer rounded-full ring"
     @click="playAnimation"
   >
     <span

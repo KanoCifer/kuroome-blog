@@ -426,10 +426,10 @@ onBeforeUnmount(() => {
         class="space-y-4"
       >
         <!-- Title and Summary -->
-        <div class="border-border bg-card rounded-3xl border p-2 shadow-sm">
+        <div class="border-border bg-background rounded-3xl border p-2 shadow-sm">
           <!-- Title -->
           <div
-            class="group focus-within:bg-accent/30 rounded-2xl transition-colors"
+            class="group focus-within:bg-muted/30 rounded-2xl transition-colors"
           >
             <input
               v-model="title"
@@ -445,7 +445,7 @@ onBeforeUnmount(() => {
 
           <!-- Summary -->
           <div
-            class="group focus-within:bg-accent/30 flex items-center gap-3 rounded-2xl px-4 py-3 transition-colors"
+            class="group focus-within:bg-muted/30 flex items-center gap-3 rounded-2xl px-4 py-3 transition-colors"
           >
             <span class="text-muted-foreground shrink-0 text-sm font-medium"
               >摘要</span
@@ -461,7 +461,7 @@ onBeforeUnmount(() => {
           <!-- Cover -->
           <div class="bg-border mx-4 h-px"></div>
           <div
-            class="group focus-within:bg-accent/30 flex flex-col gap-3 rounded-2xl px-4 py-3 transition-colors sm:flex-row sm:items-center"
+            class="group focus-within:bg-muted/30 flex flex-col gap-3 rounded-2xl px-4 py-3 transition-colors sm:flex-row sm:items-center"
           >
             <span class="text-muted-foreground shrink-0 text-sm font-medium"
               >封面</span
@@ -483,7 +483,7 @@ onBeforeUnmount(() => {
               <button
                 type="button"
                 :disabled="coverUploading"
-                class="border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50"
+                class="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50"
                 @click="coverInputRef?.click()"
               >
                 {{ coverUploading ? '上传中...' : '上传' }}
@@ -542,7 +542,7 @@ onBeforeUnmount(() => {
                 'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all',
                 pin
                   ? 'border-warning bg-warning/10 text-warning'
-                  : 'border-border bg-card text-muted-foreground hover:border-border/80',
+                  : 'border-border bg-background text-muted-foreground hover:border-border/80',
               ]"
             >
               <svg
@@ -574,7 +574,7 @@ onBeforeUnmount(() => {
                   'flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-semibold transition-all',
                   category
                     ? 'border-primary/30 bg-primary/5 text-primary'
-                    : 'border-border bg-card text-muted-foreground hover:border-border/80',
+                    : 'border-border bg-background text-muted-foreground hover:border-border/80',
                 ]"
               >
                 <span>{{ currentCategory || '选择分类' }}</span>
@@ -601,7 +601,7 @@ onBeforeUnmount(() => {
               >
                 <div
                   v-if="categoryMenuOpen"
-                  class="border-border bg-card absolute top-full right-0 z-50 mt-1 w-48 rounded-xl border shadow-lg"
+                  class="border-border bg-background absolute top-full right-0 z-50 mt-1 w-48 rounded-xl border shadow-lg"
                 >
                   <div class="p-1">
                     <button
@@ -615,8 +615,8 @@ onBeforeUnmount(() => {
                       :class="[
                         'w-full rounded-lg px-3 py-2 text-left text-sm transition-colors',
                         category === String(cat.id)
-                          ? 'bg-accent text-foreground'
-                          : 'text-muted-foreground hover:bg-accent/50',
+                          ? 'bg-muted text-foreground'
+                          : 'text-muted-foreground hover:bg-muted/50',
                       ]"
                     >
                       {{ cat.name }}
@@ -634,7 +634,7 @@ onBeforeUnmount(() => {
                 'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all',
                 autoSaveEnabled
                   ? 'border-success/30 bg-success/10 text-success'
-                  : 'border-border bg-card text-muted-foreground',
+                  : 'border-border bg-background text-muted-foreground',
               ]"
               :title="
                 autoSaveEnabled
@@ -662,7 +662,7 @@ onBeforeUnmount(() => {
             <button
               type="button"
               @click="handleSaveDraft"
-              class="border-border bg-card text-muted-foreground hover:border-border/80 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all"
+              class="border-border bg-background text-muted-foreground hover:border-border/80 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all"
             >
               <IconSave />
               保存草稿
@@ -672,7 +672,7 @@ onBeforeUnmount(() => {
 
         <!-- Editor Area -->
         <div
-          class="border-border bg-card overflow-hidden rounded-3xl border shadow-sm"
+          class="border-border bg-background overflow-hidden rounded-3xl border shadow-sm"
         >
           <!-- Markdown Editor -->
           <div class="h-[calc(100vh-320px)] min-h-[500px]">
@@ -685,7 +685,7 @@ onBeforeUnmount(() => {
           <button
             type="button"
             @click="handleCancel"
-            class="border-border bg-card text-muted-foreground hover:bg-accent rounded-full border px-6 py-2 text-sm font-medium transition-all"
+            class="border-border bg-background text-muted-foreground hover:bg-muted rounded-full border px-6 py-2 text-sm font-medium transition-all"
           >
             取消
           </button>

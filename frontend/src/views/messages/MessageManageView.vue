@@ -32,7 +32,7 @@
       <div class="mx-auto max-w-5xl space-y-6 pt-24 pb-12">
         <!-- Action Bar -->
         <div
-          class="border-border/60 bg-card/80 relative z-10 flex flex-col items-center justify-between gap-4 rounded-2xl border p-4 shadow-sm sm:flex-row"
+          class="border-border/60 bg-background/80 relative z-10 flex flex-col items-center justify-between gap-4 rounded-2xl border p-4 shadow-sm sm:flex-row"
         >
           <!-- Tab Navigation -->
           <div class="flex gap-2">
@@ -43,7 +43,7 @@
                 'flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all',
                 activeTab === 'messages'
                   ? 'bg-primary text-primary-foreground shadow-md'
-                  : 'text-muted-foreground hover:bg-accent',
+                  : 'text-muted-foreground hover:bg-muted',
               ]"
             >
               <svg
@@ -90,7 +90,7 @@
             </button>
             <button
               @click="goBack"
-              class="group border-border bg-card text-foreground hover:bg-accent flex cursor-pointer items-center gap-2 rounded-xl border px-5 py-2.5 font-medium shadow-sm transition-all select-none hover:shadow-md"
+              class="group border-border bg-background text-foreground hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl border px-5 py-2.5 font-medium shadow-sm transition-all select-none hover:shadow-md"
             >
               <svg
                 class="h-4 w-4 transition-transform group-hover:-translate-x-1"
@@ -130,7 +130,7 @@
         <!-- Loading State -->
         <div
           v-if="loading"
-          class="squircle border-border/60 bg-card/30 overflow-hidden rounded-2xl border p-6 shadow-sm"
+          class="squircle border-border/60 bg-background/30 overflow-hidden rounded-2xl border p-6 shadow-sm"
         >
           <div class="py-8">
             <div class="space-y-4">

@@ -4,7 +4,7 @@
   >
     <button
       @click="$emit('startEdit')"
-      class="text-muted-foreground hover:bg-accent hover:text-primary cursor-pointer rounded-md p-1 transition-colors"
+      class="text-muted-foreground hover:bg-muted hover:text-primary cursor-pointer rounded-md p-1 transition-colors"
       title="编辑"
     >
       <svg

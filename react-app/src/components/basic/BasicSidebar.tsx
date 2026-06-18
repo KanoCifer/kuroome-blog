@@ -64,13 +64,13 @@ function DropDownItems() {
       <>
         <Link
           to="/settings"
-          className="hover:bg-accent flex items-center gap-2 rounded-xl p-2 select-none"
+          className="hover:bg-muted flex items-center gap-2 rounded-xl p-2 select-none"
         >
           <User className="h-4 w-4" /> Profile
         </Link>
         <Link
           to="/import"
-          className="hover:bg-accent flex items-center gap-2 rounded-xl p-2 select-none"
+          className="hover:bg-muted flex items-center gap-2 rounded-xl p-2 select-none"
         >
           <FileUp className="h-4 w-4" /> Import
         </Link>
@@ -78,13 +78,13 @@ function DropDownItems() {
           <>
             <Link
               to="/messages"
-              className="hover:bg-accent flex items-center gap-2 rounded-xl p-2 select-none"
+              className="hover:bg-muted flex items-center gap-2 rounded-xl p-2 select-none"
             >
               <MessageSquare className="h-4 w-4" /> Messages
             </Link>
             <Link
               to="/analytics"
-              className="hover:bg-accent flex items-center gap-2 rounded-xl p-2 select-none"
+              className="hover:bg-muted flex items-center gap-2 rounded-xl p-2 select-none"
             >
               <BarChart className="h-4 w-4" /> Analytics
             </Link>
@@ -106,13 +106,13 @@ function DropDownItems() {
       <>
         <Link
           to="/login"
-          className="hover:bg-accent flex items-center gap-2 rounded-xl p-2 select-none"
+          className="hover:bg-muted flex items-center gap-2 rounded-xl p-2 select-none"
         >
           <LogIn className="h-4 w-4" /> Login
         </Link>
         <Link
           to="/register"
-          className="hover:bg-accent flex items-center gap-2 rounded-xl p-2 select-none"
+          className="hover:bg-muted flex items-center gap-2 rounded-xl p-2 select-none"
         >
           <UserPlus className="h-4 w-4" /> Register
         </Link>

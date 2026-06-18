@@ -44,7 +44,7 @@ export function CategorySidebar({
           className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
             activeCategoryId === null
               ? 'bg-primary text-primary-foreground'
-              : 'bg-muted text-foreground hover:bg-accent'
+              : 'bg-muted text-foreground hover:bg-muted'
           }`}
         >
           <span>全部</span>
@@ -68,7 +68,7 @@ export function CategorySidebar({
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
                 activeCategoryId === category.id
                   ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-foreground hover:bg-accent'
+                  : 'bg-muted text-foreground hover:bg-muted'
               }`}
             >
               <span>{category.name}</span>

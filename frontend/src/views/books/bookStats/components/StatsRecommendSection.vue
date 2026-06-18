@@ -21,7 +21,7 @@
         </div>
         <button
           type="button"
-          class="text-muted-foreground hover:text-foreground hover:bg-accent inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          class="text-muted-foreground hover:text-foreground hover:bg-muted inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
           :disabled="isLoading"
           @click="onRefresh"
           aria-label="换一批"
@@ -53,7 +53,7 @@
         <div
           v-for="i in count"
           :key="i"
-          class="bg-card flex w-56 flex-shrink-0 animate-pulse flex-col gap-3 rounded-2xl p-4"
+          class="bg-background flex w-56 flex-shrink-0 animate-pulse flex-col gap-3 rounded-2xl p-4"
         >
           <div class="bg-muted aspect-[2/3] w-full rounded-md" />
           <div class="bg-muted h-4 w-3/4 rounded" />
@@ -66,7 +66,7 @@
     <template #card="{ book, open, ratingScore }">
       <button
         type="button"
-        class="group bg-card hover:border-primary/40 flex w-56 flex-shrink-0 snap-start flex-col gap-3 rounded-2xl border border-transparent p-4 text-left transition-colors sm:w-60"
+        class="group bg-background hover:border-primary/40 flex w-56 flex-shrink-0 snap-start flex-col gap-3 rounded-2xl border border-transparent p-4 text-left transition-colors sm:w-60"
         @click="open(book)"
       >
         <Motion

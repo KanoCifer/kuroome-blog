@@ -89,7 +89,7 @@ watch(
           @click="emit('close')"
         />
         <section
-          class="border-border bg-card relative z-10 w-full max-w-2xl rounded-2xl border p-5 shadow-2xl"
+          class="border-border bg-background relative z-10 w-full max-w-2xl rounded-2xl border p-5 shadow-2xl"
         >
           <header class="mb-4 flex items-start justify-between gap-4">
             <div>
@@ -102,7 +102,7 @@ watch(
             </div>
             <button
               type="button"
-              class="border-border text-muted-foreground hover:bg-accent rounded-lg border px-3 py-1 text-xs transition"
+              class="border-border text-muted-foreground hover:bg-muted rounded-lg border px-3 py-1 text-xs transition"
               @click="emit('close')"
             >
               关闭
@@ -119,7 +119,7 @@ watch(
                   v-model="localForm.name"
                   type="text"
                   placeholder="例如：Spotify Premium"
-                  class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-background text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
               <label class="space-y-1">
@@ -130,7 +130,7 @@ watch(
                   v-model="localForm.provider"
                   type="text"
                   placeholder="例如：Spotify"
-                  class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-background text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
             </div>
@@ -146,7 +146,7 @@ watch(
                   min="0"
                   step="0.01"
                   placeholder="0.00"
-                  class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-background text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
               <label class="space-y-1">
@@ -159,7 +159,7 @@ watch(
                   :list="`subscription-currency-options-${mode}`"
                   maxlength="10"
                   placeholder="例如：USD / CNY / 元"
-                  class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-background text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
                 <datalist :id="`subscription-currency-options-${mode}`">
                   <option
@@ -175,7 +175,7 @@ watch(
                 >
                 <select
                   v-model="localForm.billing_cycle"
-                  class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-background text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 >
                   <option
                     v-for="cycle in cycleOptions"
@@ -199,7 +199,7 @@ watch(
                 <input
                   v-model="localForm.next_billing_date"
                   type="date"
-                  class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-background text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
               <label v-if="includeStatus" class="space-y-1">
@@ -208,7 +208,7 @@ watch(
                 >
                 <select
                   v-model="localForm.status"
-                  class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-background text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 >
                   <option
                     v-for="status in statusOptions"
@@ -229,7 +229,7 @@ watch(
                 v-model="localForm.notes"
                 rows="3"
                 placeholder="可选备注，例如套餐人数、自动续费规则等。"
-                class="border-border bg-card text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                class="border-border bg-background text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
               />
             </label>
 
@@ -243,7 +243,7 @@ watch(
             <footer class="flex justify-end gap-2">
               <button
                 type="button"
-                class="border-border text-muted-foreground hover:bg-accent rounded-xl border px-3 py-2 text-sm transition"
+                class="border-border text-muted-foreground hover:bg-muted rounded-xl border px-3 py-2 text-sm transition"
                 @click="emit('close')"
               >
                 取消

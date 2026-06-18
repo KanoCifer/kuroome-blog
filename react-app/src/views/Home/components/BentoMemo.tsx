@@ -68,7 +68,7 @@ export function BentoMemo() {
             >
               <button
                 onClick={closeMemo}
-                className="text-muted-foreground hover:bg-accent hover:text-accent-foreground absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full"
+                className="text-muted-foreground hover:bg-muted hover:text-foreground absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full"
               >
                 <svg
                   className="h-5 w-5"
@@ -108,7 +108,7 @@ export function BentoMemo() {
                 </span>
                 <button
                   onClick={clearMemo}
-                  className="border-border bg-muted text-muted-foreground hover:bg-accent hover:text-foreground flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors"
+                  className="border-border bg-muted text-muted-foreground hover:bg-muted hover:text-foreground flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

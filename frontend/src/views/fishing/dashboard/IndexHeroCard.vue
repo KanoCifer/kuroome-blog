@@ -80,7 +80,7 @@ const handleFeedback = () => {
       </div>
       <div class="flex shrink-0 items-center gap-2">
         <button
-          class="text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+          class="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           type="button"
           :disabled="loading"
           @click="emit('refresh')"

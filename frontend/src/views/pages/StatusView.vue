@@ -279,7 +279,7 @@ onUnmounted(() => {
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <!-- API -->
         <div
-          class="border-border bg-card rounded-xl border p-5 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+          class="border-border bg-background rounded-xl border p-5 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
         >
           <div class="mb-3 flex items-center gap-2">
             <span class="relative flex h-2 w-2">
@@ -304,7 +304,7 @@ onUnmounted(() => {
 
         <!-- WebSocket -->
         <div
-          class="border-border bg-card rounded-xl border p-5 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+          class="border-border bg-background rounded-xl border p-5 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
         >
           <div class="mb-3 flex items-center gap-2">
             <span class="relative flex h-2 w-2">
@@ -327,7 +327,7 @@ onUnmounted(() => {
 
         <!-- Database -->
         <div
-          class="border-border bg-card rounded-xl border p-5 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+          class="border-border bg-background rounded-xl border p-5 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
         >
           <div class="mb-3 flex items-center gap-2">
             <span class="relative flex h-2 w-2">
@@ -360,7 +360,7 @@ onUnmounted(() => {
       </div>
 
       <!-- Latency chart -->
-      <div class="border-border bg-card rounded-xl border p-5 shadow-md">
+      <div class="border-border bg-background rounded-xl border p-5 shadow-md">
         <div class="mb-4 flex items-center justify-between">
           <h2 class="text-foreground font-medium">延迟趋势</h2>
           <div class="flex items-center gap-1.5">
@@ -384,7 +384,7 @@ onUnmounted(() => {
       </div>
 
       <!-- 版本信息 -->
-      <div class="border-border bg-card rounded-xl border p-6 shadow-md">
+      <div class="border-border bg-background rounded-xl border p-6 shadow-md">
         <div class="mb-4 flex items-center gap-2">
           <svg
             class="text-muted-foreground h-5 w-5"
@@ -424,7 +424,7 @@ onUnmounted(() => {
       </div>
 
       <!-- 服务信息 + 系统信息 -->
-      <div class="border-border bg-card rounded-xl border p-6 shadow-md">
+      <div class="border-border bg-background rounded-xl border p-6 shadow-md">
         <div class="mb-5 flex items-center justify-between">
           <div class="flex items-center gap-2">
             <svg

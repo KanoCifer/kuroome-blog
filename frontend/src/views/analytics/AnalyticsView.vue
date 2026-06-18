@@ -24,12 +24,12 @@
     <!-- Filter Card -->
     <div class="col-span-1 sm:col-span-2 lg:col-span-3">
       <div
-        class="squircle border-border/60 bg-card/80 flex flex-col items-center justify-between gap-4 border p-4 shadow-sm sm:flex-row"
+        class="squircle border-border/60 bg-background/80 flex flex-col items-center justify-between gap-4 border p-4 shadow-sm sm:flex-row"
       >
         <!-- Days Filter -->
         <div class="relative">
           <button
-            class="border-border bg-card text-foreground hover:border-border/70 hover:bg-muted focus:border-primary focus:ring-primary/20 flex items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-medium shadow-sm transition-all focus:ring-2"
+            class="border-border bg-background text-foreground hover:border-border/70 hover:bg-muted focus:border-primary focus:ring-primary/20 flex items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-medium shadow-sm transition-all focus:ring-2"
             @click="showDropdown = !showDropdown"
             @mouseenter="handleMouseIn"
             @mouseleave="handleMouseOut"
@@ -75,7 +75,7 @@
           >
             <div
               v-if="showDropdown"
-              class="border-border bg-card absolute top-full left-0 z-50 mt-2 w-fit rounded-xl border whitespace-nowrap shadow-lg"
+              class="border-border bg-background absolute top-full left-0 z-50 mt-2 w-fit rounded-xl border whitespace-nowrap shadow-lg"
               @mouseenter="handleMouseIn"
               @mouseleave="handleMouseOut"
             >
@@ -86,7 +86,7 @@
                   selectedDays = option;
                   showDropdown = false;
                 "
-                class="text-foreground hover:bg-accent block w-full rounded-xl px-4 py-2.5 text-left text-sm transition-colors"
+                class="text-foreground hover:bg-muted block w-full rounded-xl px-4 py-2.5 text-left text-sm transition-colors"
               >
                 Last {{ option }} days
               </button>
@@ -130,7 +130,7 @@
           <div
             v-for="i in 4"
             :key="i"
-            class="bg-card/60 squircle h-32 animate-pulse"
+            class="bg-background/60 squircle h-32 animate-pulse"
           ></div>
         </div>
       </template>
@@ -139,7 +139,7 @@
       <div v-else class="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <!-- Total Visits (PV) -->
         <div
-          class="group squircle border-border/60 bg-card/30 cursor-pointer overflow-hidden border p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+          class="group squircle border-border/60 bg-background/30 cursor-pointer overflow-hidden border p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
         >
           <div class="mb-3 flex items-center gap-2">
             <div
@@ -177,7 +177,7 @@
 
         <!-- Unique Visitors (UV) -->
         <div
-          class="group squircle border-border/60 bg-card/30 cursor-pointer overflow-hidden border p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+          class="group squircle border-border/60 bg-background/30 cursor-pointer overflow-hidden border p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
         >
           <div class="mb-3 flex items-center gap-2">
             <div
@@ -209,11 +209,11 @@
 
         <!-- Visitor IDs -->
         <div
-          class="group squircle border-border/60 bg-card/30 cursor-pointer overflow-hidden border p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+          class="group squircle border-border/60 bg-background/30 cursor-pointer overflow-hidden border p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
         >
           <div class="mb-3 flex items-center gap-2">
             <div
-              class="bg-accent text-accent-foreground flex h-10 w-10 items-center justify-center rounded-xl"
+              class="bg-muted text-foreground flex h-10 w-10 items-center justify-center rounded-xl"
             >
               <svg
                 class="h-5 w-5"
@@ -241,7 +241,7 @@
 
         <!-- Avg Visits Per Day -->
         <div
-          class="group squircle border-border/60 bg-card/30 cursor-pointer overflow-hidden border p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+          class="group squircle border-border/60 bg-background/30 cursor-pointer overflow-hidden border p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
         >
           <div class="mb-3 flex items-center gap-2">
             <div
@@ -310,7 +310,7 @@
     <!-- User Login Logs Table - Full Width -->
     <div class="col-span-1 sm:col-span-2 lg:col-span-3">
       <div
-        class="squircle border-border/60 bg-card/30 overflow-hidden border p-6 shadow-sm"
+        class="squircle border-border/60 bg-background/30 overflow-hidden border p-6 shadow-sm"
       >
         <h2
           class="text-foreground mb-4 flex items-center gap-2 text-lg font-bold"
@@ -370,7 +370,7 @@
               <tr
                 v-for="log in loginLogsData?.list"
                 :key="log.user_id"
-                class="hover:bg-accent/30 text-sm transition-colors"
+                class="hover:bg-muted/30 text-sm transition-colors"
               >
                 <td class="py-4">
                   <div class="flex items-center gap-3">
@@ -433,14 +433,14 @@
             <button
               :disabled="loginLogsData.page <= 1"
               @click="changePage(loginLogsData.page - 1)"
-              class="hover:bg-accent text-foreground rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+              class="hover:bg-muted text-foreground rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
             >
               Previous
             </button>
             <button
               :disabled="loginLogsData.page >= loginLogsData.total_pages"
               @click="changePage(loginLogsData.page + 1)"
-              class="hover:bg-accent text-foreground rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+              class="hover:bg-muted text-foreground rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
             >
               Next
             </button>

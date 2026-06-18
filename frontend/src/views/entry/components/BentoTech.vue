@@ -63,7 +63,7 @@ const techStack = [
 // TODO(human): Replace hardcoded color classes with theme-aware semantic tokens.
 // Each entry currently uses a hand-picked color (green, rose, teal, etc.) that doesn't
 // adapt when the user switches themes. Choose an approach:
-// 1. Use theme accent tokens (accent-*, accessible via CSS vars like bg-accent-amber/10)
+// 1. Use theme accent tokens (accent-*, accessible via CSS vars like bg-muted-amber/10)
 // 2. Use opacity variants of bg-primary/accent (keeps variety, follows theme)
 // 3. Derive colors from CSS custom properties with hue rotation
 const colorClasses: Record<string, string> = {

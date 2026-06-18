@@ -69,7 +69,7 @@
               :aria-describedby="
                 hasFieldError ? 'api-key-error' : 'api-key-hint'
               "
-              class="border-input bg-card text-foreground placeholder:text-muted-foreground/70 focus:ring-primary/20 w-full rounded-2xl border px-5 py-4 pr-14 font-mono text-base transition-all duration-200 focus:ring-2 focus:outline-none"
+              class="border-input bg-background text-foreground placeholder:text-muted-foreground/70 focus:ring-primary/20 w-full rounded-2xl border px-5 py-4 pr-14 font-mono text-base transition-all duration-200 focus:ring-2 focus:outline-none"
               :class="
                 hasFieldError
                   ? 'border-destructive focus:border-destructive focus:ring-destructive/20'

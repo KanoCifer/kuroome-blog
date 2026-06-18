@@ -15,7 +15,7 @@
               'flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
               activeCategoryId === null
                 ? 'bg-primary/15 text-primary font-medium'
-                : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
             ]"
           >
             <span class="flex items-center gap-2">
@@ -38,7 +38,7 @@
               'flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
               activeCategoryId === category.id
                 ? 'bg-primary/15 text-primary font-medium'
-                : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
             ]"
           >
             <span class="flex items-center gap-2">

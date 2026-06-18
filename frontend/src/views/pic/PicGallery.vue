@@ -15,7 +15,7 @@
 
     <!-- Header -->
     <header
-      class="bg-card/70 sticky top-0 z-30 border-b border-white/40 shadow-[inset_0_-1px_0_rgba(255,255,255,0.5)] backdrop-blur-2xl dark:border-white/10 dark:shadow-none"
+      class="bg-background/70 sticky top-0 z-30 border-b border-white/40 shadow-[inset_0_-1px_0_rgba(255,255,255,0.5)] backdrop-blur-2xl dark:border-white/10 dark:shadow-none"
     >
       <div class="mx-auto flex max-w-6xl items-center justify-end px-6 py-4">
         <div class="flex items-center gap-3">
@@ -120,7 +120,7 @@
       >
         <!-- Polaroid Frame -->
         <div
-          class="group bg-card ring-border/5 relative flex flex-col items-center rounded-sm p-2 shadow-xl ring-1 transition-shadow hover:shadow-2xl sm:p-3"
+          class="group bg-background ring-border/5 relative flex flex-col items-center rounded-sm p-2 shadow-xl ring-1 transition-shadow hover:shadow-2xl sm:p-3"
           :style="{ width: `${getImageSize(index) + 24}px` }"
         >
           <div
@@ -160,7 +160,7 @@
           initial="{ opacity: 0, y: 20 }"
           animate="{ opacity: 1, y: 0 }"
           :transition="{ duration: 0.8, type: 'spring' }"
-          class="bg-card/60 relative max-w-md rounded-[2rem] border border-white/80 p-10 text-center shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] backdrop-blur-xl dark:border-gray-800/80"
+          class="bg-background/60 relative max-w-md rounded-[2rem] border border-white/80 p-10 text-center shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] backdrop-blur-xl dark:border-gray-800/80"
         >
           <div
             class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-linear-to-tr from-blue-50 to-indigo-50 text-blue-500 shadow-inner dark:from-blue-900/30 dark:to-indigo-900/30 dark:text-blue-400"
@@ -185,7 +185,7 @@
     </div>
 
     <div
-      class="bg-card/80 rounded-2xl border border-white/50 p-2 shadow-[0_10px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl dark:border-white/10"
+      class="bg-background/80 rounded-2xl border border-white/50 p-2 shadow-[0_10px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl dark:border-white/10"
     >
       <div class="flex items-center gap-2">
         <Button
@@ -245,7 +245,7 @@
             :animate="{ opacity: 1, scale: 1, y: 0 }"
             :exit="{ opacity: 0, scale: 0.95, y: 10 }"
             :transition="{ type: 'spring', damping: 25, stiffness: 300 }"
-            class="bg-card/95 relative z-10 flex max-h-full w-full max-w-5xl flex-col overflow-hidden rounded-[2rem] shadow-2xl ring-1 ring-white/20 backdrop-blur-2xl md:flex-row dark:ring-white/10"
+            class="bg-background/95 relative z-10 flex max-h-full w-full max-w-5xl flex-col overflow-hidden rounded-[2rem] shadow-2xl ring-1 ring-white/20 backdrop-blur-2xl md:flex-row dark:ring-white/10"
           >
             <!-- Close Button -->
             <button
@@ -267,12 +267,12 @@
             </div>
 
             <!-- Details Area -->
-            <div class="bg-card/50 flex w-full flex-col p-6 md:w-1/3 md:p-10">
+            <div class="bg-background/50 flex w-full flex-col p-6 md:w-1/3 md:p-10">
               <div class="flex-1">
                 <div class="mb-8 hidden justify-end md:flex">
                   <button
                     @click="closeImageDetail"
-                    class="text-muted-foreground hover:bg-accent bg-muted/80 flex h-10 w-10 items-center justify-center rounded-full transition-colors"
+                    class="text-muted-foreground hover:bg-muted bg-muted/80 flex h-10 w-10 items-center justify-center rounded-full transition-colors"
                   >
                     <X class="h-5 w-5" />
                   </button>
@@ -296,7 +296,7 @@
                     v-model="editDescription"
                     rows="3"
                     placeholder="输入新的描述..."
-                    class="text-foreground placeholder:text-muted-foreground focus:border-foreground focus:ring-foreground border-border/80 bg-card w-full resize-none rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
+                    class="text-foreground placeholder:text-muted-foreground focus:border-foreground focus:ring-foreground border-border/80 bg-background w-full resize-none rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
                   ></textarea>
                   <div class="flex justify-end gap-4 pt-2">
                     <Button
@@ -354,12 +354,12 @@
             :animate="{ opacity: 1, scale: 1, y: 0 }"
             :exit="{ opacity: 0, scale: 0.95, y: 10 }"
             :transition="{ type: 'spring', damping: 25, stiffness: 300 }"
-            class="bg-card/95 relative z-10 w-full max-w-md rounded-[2rem] p-6 shadow-2xl ring-1 ring-white/20 backdrop-blur-2xl md:p-8 dark:ring-white/10"
+            class="bg-background/95 relative z-10 w-full max-w-md rounded-[2rem] p-6 shadow-2xl ring-1 ring-white/20 backdrop-blur-2xl md:p-8 dark:ring-white/10"
           >
             <!-- Close Button -->
             <button
               @click="showUploadModal = false"
-              class="text-muted-foreground hover:bg-accent hover:text-foreground absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+              class="text-muted-foreground hover:bg-muted hover:text-foreground absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
             >
               <X class="h-5 w-5" />
             </button>
@@ -416,7 +416,7 @@
               <!-- Placeholder -->
               <div v-else class="flex flex-col items-center">
                 <div
-                  class="bg-card ring-border/5 mb-4 flex h-14 w-14 items-center justify-center rounded-full shadow-sm ring-1 transition-transform group-hover:scale-110"
+                  class="bg-background ring-border/5 mb-4 flex h-14 w-14 items-center justify-center rounded-full shadow-sm ring-1 transition-transform group-hover:scale-110"
                 >
                   <ImagePlus
                     class="text-muted-foreground group-hover:text-primary h-6 w-6 transition-colors"
@@ -443,7 +443,7 @@
                 v-model="uploadDescription"
                 type="text"
                 placeholder="为这张图片添加描述..."
-                class="text-foreground placeholder:text-muted-foreground focus:border-foreground focus:ring-foreground border-border/80 bg-card mt-2 w-full rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
+                class="text-foreground placeholder:text-muted-foreground focus:border-foreground focus:ring-foreground border-border/80 bg-background mt-2 w-full rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
               />
             </div>
 

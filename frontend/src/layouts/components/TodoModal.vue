@@ -46,7 +46,7 @@
         @click.self="close"
       >
         <div
-          class="bg-card/90 relative z-10 flex h-[90dvh] w-full flex-col rounded-2xl shadow-2xl backdrop-blur-xs"
+          class="bg-background/90 relative z-10 flex h-[90dvh] w-full flex-col rounded-2xl shadow-2xl backdrop-blur-xs"
         >
           <!-- Header -->
           <div
@@ -62,7 +62,7 @@
             </h3>
             <button
               @click="close"
-              class="text-muted-foreground hover:bg-accent hover:text-secondary-foreground dark:hover:bg-accent dark:hover:text-foreground flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+              class="text-muted-foreground hover:bg-muted hover:text-secondary-foreground dark:hover:bg-muted dark:hover:text-foreground flex h-8 w-8 items-center justify-center rounded-full transition-colors"
             >
               <svg
                 class="h-5 w-5"
@@ -86,7 +86,7 @@
             <button
               v-if="!showAddForm"
               @click="showAddForm = true"
-              class="border-border/60 bg-card/60 hover:border-primary/30 mb-5 flex w-full cursor-pointer items-center gap-2 rounded-xl border p-3 text-sm text-gray-400 shadow-sm transition-all hover:text-gray-600 dark:hover:text-gray-300"
+              class="border-border/60 bg-background/60 hover:border-primary/30 mb-5 flex w-full cursor-pointer items-center gap-2 rounded-xl border p-3 text-sm text-gray-400 shadow-sm transition-all hover:text-gray-600 dark:hover:text-gray-300"
             >
               <svg
                 class="h-4 w-4"
@@ -107,7 +107,7 @@
             <!-- Expanded add form -->
             <div
               v-else
-              class="border-border/60 bg-card/60 mb-5 overflow-hidden rounded-2xl border p-4 shadow-sm"
+              class="border-border/60 bg-background/60 mb-5 overflow-hidden rounded-2xl border p-4 shadow-sm"
             >
               <input
                 v-model="newTaskForm.title"
@@ -122,12 +122,12 @@
                   v-model="newTaskForm.description"
                   placeholder="描述... (可选)"
                   rows="2"
-                  class="border-border bg-card/80 focus:border-primary focus:bg-card focus:ring-primary/15 w-full resize-none rounded-xl border p-2.5 text-sm transition-all outline-none focus:ring-4"
+                  class="border-border bg-background/80 focus:border-primary focus:bg-background focus:ring-primary/15 w-full resize-none rounded-xl border p-2.5 text-sm transition-all outline-none focus:ring-4"
                 ></textarea>
                 <div class="flex items-center gap-3">
                   <select
                     v-model="newTaskForm.priority"
-                    class="border-border bg-card text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
+                    class="border-border bg-background text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
                   >
                     <option value="low">低</option>
                     <option value="default">默认</option>
@@ -137,12 +137,12 @@
                   <input
                     v-model="newTaskForm.dueDate"
                     type="date"
-                    class="border-border bg-card text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
+                    class="border-border bg-background text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
                   />
                   <div class="ml-auto flex gap-2">
                     <button
                       @click="cancelAdd"
-                      class="bg-muted text-foreground hover:bg-accent cursor-pointer rounded-xl px-3 py-1.5 text-sm font-medium transition-colors"
+                      class="bg-muted text-foreground hover:bg-muted cursor-pointer rounded-xl px-3 py-1.5 text-sm font-medium transition-colors"
                     >
                       取消
                     </button>

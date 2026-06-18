@@ -81,7 +81,7 @@ const handleSubmit = async () => {
         v-if="isOpen"
         class="bg-foreground/40 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
       >
-        <div class="bg-card mx-4 w-full max-w-md rounded-2xl p-6 shadow-xl">
+        <div class="bg-background mx-4 w-full max-w-md rounded-2xl p-6 shadow-xl">
           <h3 class="text-foreground mb-4 text-lg font-semibold">
             钓鱼反馈
             <span class="text-muted-foreground ml-2 text-sm font-normal"
@@ -112,7 +112,7 @@ const handleSubmit = async () => {
                   :class="
                     selectedFeedback === option.value
                       ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-foreground hover:bg-accent'
+                      : 'bg-muted text-foreground hover:bg-muted'
                   "
                   @click="selectedFeedback = option.value"
                 >
@@ -124,7 +124,7 @@ const handleSubmit = async () => {
             <div class="flex gap-3 pt-2">
               <button
                 type="button"
-                class="border-border text-foreground hover:bg-accent flex-1 rounded-lg border px-4 py-2 text-sm font-medium"
+                class="border-border text-foreground hover:bg-muted flex-1 rounded-lg border px-4 py-2 text-sm font-medium"
                 :disabled="loading"
                 @click="$emit('cancel')"
               >

@@ -222,7 +222,7 @@ const setupCodeCopy = () => {
     const button = document.createElement('button');
     button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2z"/></svg>`;
     button.className =
-      'copy-btn absolute top-2 right-3 rounded-lg bg-card px-2 py-1 hover:bg-gray-300';
+      'copy-btn absolute top-2 right-3 rounded-lg bg-background px-2 py-1 hover:bg-gray-300';
     block.style.position = 'relative';
     block.appendChild(button);
   });
@@ -242,7 +242,7 @@ onUnmounted(() => {
       <!-- Loading -->
       <div v-if="isLoading" class="sm:col-span-2 lg:col-span-3">
         <div
-          class="border-border bg-card animate-pulse space-y-6 rounded-2xl border p-8 shadow-sm"
+          class="border-border bg-background animate-pulse space-y-6 rounded-2xl border p-8 shadow-sm"
         >
           <div class="bg-muted mb-6 h-8 w-3/4 rounded" />
           <div class="mb-8 flex gap-4">
@@ -297,7 +297,7 @@ onUnmounted(() => {
         >
           <router-link
             :to="`/blog/edit/${post._id}`"
-            class="bg-accent text-foreground hover:bg-accent/80 inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors"
+            class="bg-muted text-foreground hover:bg-muted/80 inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors"
           >
             <EditIcon />
             编辑
@@ -313,7 +313,7 @@ onUnmounted(() => {
 
         <div
           v-if="post"
-          class="border-border bg-card overflow-hidden rounded-2xl border shadow-sm sm:col-span-2 lg:col-span-3"
+          class="border-border bg-background overflow-hidden rounded-2xl border shadow-sm sm:col-span-2 lg:col-span-3"
         >
           <img
             v-if="post.cover"

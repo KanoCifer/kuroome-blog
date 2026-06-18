@@ -26,7 +26,7 @@ function onClick() {
   <button
     data-slot="alert-dialog-cancel"
     type="button"
-    :class="['inline-flex h-9 items-center justify-center rounded-md border bg-background px-4 text-[13px] font-medium shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] outline-none disabled:pointer-events-none disabled:opacity-50 sm:mt-0 dark:bg-input/30 dark:border-input dark:hover:bg-input/50', props.class]"
+    :class="['inline-flex h-9 items-center justify-center rounded-md border bg-background px-4 text-[13px] font-medium shadow-xs transition-colors hover:bg-muted hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] outline-none disabled:pointer-events-none disabled:opacity-50 sm:mt-0 dark:bg-input/30 dark:border-input dark:hover:bg-input/50', props.class]"
     @click="onClick"
   >
     <slot />

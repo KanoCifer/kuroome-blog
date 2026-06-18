@@ -36,7 +36,7 @@ export function FishingDashboardHeader({
           aria-pressed={analysisOpen}
           aria-label={analysisOpen ? '关闭 AI 分析' : '打开 AI 分析'}
           onClick={onToggleAnalysis}
-          className={`border-border bg-card/80 hover:bg-accent text-foreground inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2.5 text-sm backdrop-blur-sm transition-colors ${
+          className={`border-border bg-card/80 hover:bg-muted text-foreground inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2.5 text-sm backdrop-blur-sm transition-colors ${
             analysisOpen ? 'border-primary text-primary bg-primary/10' : ''
           }`}
         >

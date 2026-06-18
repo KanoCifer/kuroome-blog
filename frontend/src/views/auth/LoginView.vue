@@ -52,7 +52,7 @@ const showPassword = ref<boolean>(false);
     </div>
 
     <!-- 右侧 Login Form -->
-    <div class="bg-card flex w-full items-center justify-center p-8 lg:w-1/2">
+    <div class="bg-background flex w-full items-center justify-center p-8 lg:w-1/2">
       <div class="w-full max-w-sm xl:max-w-md">
         <!-- 表头 -->
         <div class="mb-8 flex flex-col items-center lg:items-start">
@@ -233,7 +233,7 @@ const showPassword = ref<boolean>(false);
                 class="peer sr-only"
               />
               <div
-                class="border-border bg-card peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-primary/10 hover:border-primary/30 rounded-xl border-2 px-3 py-2 shadow-sm transition-all duration-200 select-none group-active:scale-95"
+                class="border-border bg-background peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-primary/10 hover:border-primary/30 rounded-xl border-2 px-3 py-2 shadow-sm transition-all duration-200 select-none group-active:scale-95"
               >
                 <span
                   class="text-muted-foreground peer-checked:text-primary text-sm font-medium transition-colors"
@@ -249,7 +249,7 @@ const showPassword = ref<boolean>(false);
               <span class="border-border w-full border-t"></span>
             </div>
             <div class="relative flex justify-center text-xs uppercase">
-              <span class="bg-card text-muted-foreground px-2">
+              <span class="bg-background text-muted-foreground px-2">
                 Or continue with
               </span>
             </div>

@@ -37,7 +37,7 @@ const handleDeleteMessage = (messageId: string) => {
   <div class="space-y-6">
     <!-- Pending Messages Section -->
     <div
-      class="bg-card/80 ring-border dark:ring-border rounded-3xl p-6 shadow-xl ring-1 dark:bg-gray-800/80"
+      class="bg-background/80 ring-border dark:ring-border rounded-3xl p-6 shadow-xl ring-1 dark:bg-gray-800/80"
     >
       <h2
         class="text-foreground dark:text-foreground mb-6 flex items-center gap-2 text-xl font-bold"
@@ -181,7 +181,7 @@ const handleDeleteMessage = (messageId: string) => {
 
     <!-- Approved Messages Section -->
     <div
-      class="bg-card/80 ring-border dark:ring-border rounded-3xl p-6 shadow-xl ring-1 dark:bg-gray-800/80"
+      class="bg-background/80 ring-border dark:ring-border rounded-3xl p-6 shadow-xl ring-1 dark:bg-gray-800/80"
     >
       <h2
         class="text-foreground dark:text-foreground mb-6 flex items-center gap-2 text-xl font-bold"
