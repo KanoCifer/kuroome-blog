@@ -1,6 +1,7 @@
 import { fishingGateway } from '@/api/fishingGateway';
 import { weatherGateway } from '@/api/weatherGateway';
 import { useNotificationStore } from '@/stores/notification';
+import { useSequencedTask } from '@/composables/useSequencedTask';
 import type { FishingIndexData } from '@/types/fishing';
 import type {
   TideData,
@@ -36,7 +37,8 @@ export const DEFAULT_MAP_CENTER: [number, number] = [113.389549, 23.050067];
 export const useFishingMapStore = defineStore('fishingMap', () => {
   const notifier = useNotificationStore();
 
-  let fetchSeq = 0;
+  // 「最新调用胜出」竞态守卫：旧 fetch 的回写被吞掉
+  const fetchSeq = useSequencedTask();
 
   const fullWeatherData = ref<WeatherFullResponse | null>(null);
   const liveWeather = ref<WeatherNow | null>(null);
@@ -56,7 +58,7 @@ export const useFishingMapStore = defineStore('fishingMap', () => {
   async function fetchWeatherAndFishing(
     location: [number, number],
   ): Promise<void> {
-    const seq = ++fetchSeq;
+    const mine = fetchSeq.begin();
     weatherLoading.value = true;
     indexLoading.value = true;
     weatherError.value = '';
@@ -68,7 +70,7 @@ export const useFishingMapStore = defineStore('fishingMap', () => {
         fishingGateway.getFishingIndex({ location }),
       ]);
 
-      if (seq !== fetchSeq) return;
+      if (!fetchSeq.isActive(mine)) return;
 
       const now = data.current?.now;
       const daily = data.daily?.daily;
@@ -86,14 +88,14 @@ export const useFishingMapStore = defineStore('fishingMap', () => {
       tideData.value = data.tide ?? null;
       indexData.value = fishingIndex;
     } catch (err) {
-      if (seq !== fetchSeq) return;
+      if (!fetchSeq.isActive(mine)) return;
       const message =
         err instanceof Error ? err.message : '获取钓鱼地图数据失败';
       weatherError.value = message;
       indexError.value = message;
       notifier.error(message);
     } finally {
-      if (seq === fetchSeq) {
+      if (fetchSeq.isActive(mine)) {
         weatherLoading.value = false;
         indexLoading.value = false;
       }

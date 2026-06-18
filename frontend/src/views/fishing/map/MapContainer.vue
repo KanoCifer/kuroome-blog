@@ -1,0 +1,230 @@
+<template>
+  <div class="relative h-full w-full">
+    <!-- 地图实例 -->
+    <div ref="containerRef" class="map-container shadow-md"></div>
+
+    <!-- 定位按钮：浏览器原生方式获取 -->
+    <button
+      type="button"
+      :class="[
+        'bg-card/90 text-foreground hover:bg-card border-border/40 absolute right-2.5 bottom-5 z-9999 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-colors disabled:opacity-50',
+        isLocating && 'text-primary',
+      ]"
+      :disabled="isLocating"
+      aria-label="定位到当前位置"
+      @click="handleLocateClick"
+    >
+      <Locate v-if="!isLocating" class="h-4 w-4" />
+      <Loader2 v-else class="h-4 w-4 animate-spin" />
+    </button>
+
+    <!-- 路线浮层（原 MapTile 折叠进来） -->
+    <Transition
+      enter-active-class="transition-all duration-300 ease-out"
+      enter-from-class="opacity-0 translate-y-2"
+      enter-to-class="opacity-100 translate-y-0"
+      leave-active-class="transition-all duration-200 ease-in"
+      leave-from-class="opacity-100 translate-y-0"
+      leave-to-class="opacity-0 translate-y-2"
+    >
+      <div
+        v-if="isPlanning || routeInfo"
+        class="bg-card/90 border-border absolute right-4 bottom-4 left-4 mx-auto w-fit rounded-2xl border p-4 shadow-lg backdrop-blur-md"
+      >
+        <div
+          v-if="isPlanning"
+          class="text-muted-foreground flex items-center gap-3"
+        >
+          <Loader2 class="h-4 w-4 animate-spin" />
+          <span class="text-sm">正在规划路线...</span>
+        </div>
+        <div
+          v-else-if="routeInfo"
+          class="flex items-center justify-between gap-4"
+        >
+          <div class="space-y-1.5">
+            <p class="text-muted-foreground text-xs tracking-[0.2em] uppercase">
+              路线信息
+            </p>
+            <p
+              class="text-foreground font-family-averia text-2xl leading-none tabular-nums sm:text-3xl"
+            >
+              <span>{{ formatDistance(routeInfo.distance) }}</span>
+              <span class="text-muted-foreground mx-2 text-base">·</span>
+              <span>{{ formatDuration(routeInfo.time) }}</span>
+            </p>
+          </div>
+          <button
+            class="bg-destructive text-primary-foreground hover:bg-destructive/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+            type="button"
+            @click="emit('clearRoute')"
+          >
+            清除路线
+          </button>
+        </div>
+      </div>
+    </Transition>
+
+    <p
+      v-if="!isPlanning && !routeInfo"
+      class="text-muted-foreground/90 bg-card/70 absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full px-4 py-1.5 text-xs backdrop-blur-md"
+    >
+      点击地图标记，自动规划路线
+    </p>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { Loader2, Locate } from '@lucide/vue';
+import type { MapMarker } from '@/types/marker';
+import { loadAMapNamespace } from '@/views/fishing/map/amapNamespace';
+import { FishingMapRuntime } from '@/views/fishing/map/fishingMapRuntime';
+import {
+  formatDistance,
+  type FishingMapInstance,
+  type RouteInfo,
+} from '@/views/fishing/composables/useFishingRoute';
+import { formatDuration } from '@/utils/format/duration';
+import { DEFAULT_MAP_CENTER } from '@/stores/fishingMap';
+import { onMounted, onUnmounted, ref, watch, useTemplateRef } from 'vue';
+
+declare global {
+  interface Window {
+    _AMapSecurityConfig: { securityJsCode: string };
+  }
+}
+
+/*
+ * MapContainer 现在是浅组件:只负责容器 DOM、AMap 加载与 map 实例生命周期。
+ * 所有行为(标记 / 路线 / 定位)下沉到 FishingMapRuntime,经 FishingMapInstance
+ * 接口暴露,可注入 in-memory AMap 引擎测试。
+ */
+
+const containerRef = useTemplateRef<HTMLDivElement>('containerRef');
+
+interface Props {
+  markers?: MapMarker[];
+  /** 路线浮层状态(由 dashboard 的 useFishingRoute 驱动) */
+  isPlanning?: boolean;
+  routeInfo?: RouteInfo | null;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  markers: () => [],
+  isPlanning: false,
+  routeInfo: null,
+});
+
+const emit = defineEmits<{
+  (e: 'click', event: unknown): void;
+  (e: 'markerClick', index: number): void;
+  (e: 'mapReady'): void;
+  (e: 'error', message: string): void;
+  (e: 'clearRoute'): void;
+}>();
+
+let map: AMap.Map | null = null;
+let runtime: FishingMapRuntime | null = null;
+let clickHandler: ((e: unknown) => void) | null = null;
+
+const isLocating = ref(false);
+
+onMounted(async () => {
+  try {
+    const AMap = await loadAMapNamespace();
+    if (!containerRef.value) return;
+
+    map = new AMap.Map(containerRef.value, {
+      viewMode: '2D',
+      zoom: 11,
+      center: DEFAULT_MAP_CENTER,
+      layers: [new AMap.TileLayer.Satellite()],
+      mapStyle: 'amap://styles/normal',
+    });
+
+    map.addControl(new AMap.ToolBar({ position: 'RT' }));
+    map.addControl(new AMap.Scale());
+
+    // 行为下沉到 runtime;map 实例由本组件持有,卸载时销毁
+    runtime = new FishingMapRuntime(map, AMap);
+    runtime.onMarkerClick = (index) => emit('markerClick', index);
+    runtime.renderMarkers(props.markers);
+
+    clickHandler = (e: unknown) => emit('click', e);
+    map.on('click', clickHandler);
+
+    emit('mapReady');
+  } catch (e: unknown) {
+    console.error('AMap loading error:', e);
+  }
+});
+
+// 监听标记点变化
+watch(
+  () => props.markers,
+  () => {
+    runtime?.renderMarkers(props.markers);
+  },
+  { deep: true },
+);
+
+// 定位按钮点击:runtime 解析位置 → setCenter + 打点
+const handleLocateClick = async () => {
+  if (!map || !runtime) return;
+  isLocating.value = true;
+  try {
+    const [lng, lat] = await runtime.getCurrentPosition();
+    if (!map) return;
+    map.setCenter([lng, lat]);
+    map.setZoom(15);
+    runtime.showUserLocationMarker(lng, lat);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error('定位失败:', msg);
+    emit('error', `定位失败: ${msg}`);
+  } finally {
+    isLocating.value = false;
+  }
+};
+
+// 暴露行为接口给父组件（经 FishingMapInstance 类型约束）
+defineExpose<FishingMapInstance>({
+  planRoute: (start, end): Promise<RouteInfo> => {
+    if (!runtime) return Promise.reject(new Error('地图未就绪'));
+    return runtime.planRoute(start, end);
+  },
+  clearRoute: () => runtime?.clearRoute(),
+  getCurrentPosition: () => {
+    if (!runtime) return Promise.reject(new Error('地图未就绪'));
+    return runtime.getCurrentPosition();
+  },
+});
+
+onUnmounted(() => {
+  runtime?.dispose();
+  runtime = null;
+
+  if (map && clickHandler) {
+    map.off('click', clickHandler);
+    clickHandler = null;
+  }
+
+  if (map) {
+    map.destroy();
+    map = null;
+  }
+
+  if (containerRef.value) {
+    containerRef.value.innerHTML = '';
+  }
+});
+</script>
+
+<style scoped>
+.map-container {
+  padding: 0px;
+  margin: 0px;
+  width: 100%;
+  height: 100%;
+}
+</style>

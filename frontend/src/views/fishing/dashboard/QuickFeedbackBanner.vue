@@ -6,7 +6,6 @@
  * 不再用 warning 色调,改成 muted + 主按钮,跟 dashboard 网格协调。
  */
 defineProps<{
-  visible: boolean;
   disabled?: boolean;
 }>();
 
@@ -25,7 +24,7 @@ defineEmits<{
     leave-to-class="opacity-0 -translate-y-1"
   >
     <section
-      v-if="visible"
+      v-if="!disabled"
       class="border-border bg-muted/30 flex flex-col items-start gap-3 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5"
     >
       <div>

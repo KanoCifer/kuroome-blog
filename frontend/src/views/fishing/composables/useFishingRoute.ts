@@ -1,17 +1,6 @@
-/**
- * 钓点路线规划逻辑
- *
- * 职责：
- * - 管理路线规划状态（planning / routeInfo / selectedSpot）
- * - 串行化并发请求（routeSeq 守卫：重复点击 marker 不会触发多次 planRoute）
- * - 错误统一走 notification store，不再用浏览器 alert
- *
- * map 通过 getter 注入：调用方只在创建 composable 时挂一次，之后所有
- * planFromMarker / clearRoute 都自取，view 不再每次空判 ref。
- */
 import { useNotificationStore } from '@/stores/notification';
-import { formatDuration } from '@/utils/format/duration';
 import type { MapMarker } from '@/types/marker';
+import { useSequencedTask } from '@/composables/useSequencedTask';
 import { ref } from 'vue';
 
 export interface RouteInfo {
@@ -19,10 +8,6 @@ export interface RouteInfo {
   time: number;
 }
 
-/**
- * MapContainer 暴露给父组件的实例方法子集（不引入完整 vue 文件依赖）。
- * 若 MapContainer.vue 的 defineExpose 变更，这里需要同步。
- */
 export interface FishingMapInstance {
   planRoute: (
     start: [number, number],
@@ -45,28 +30,28 @@ export function useFishingRoute(getMap: () => FishingMapInstance | null) {
   const routeInfo = ref<RouteInfo | null>(null);
   const selectedSpotIndex = ref<number | null>(null);
 
-  // 串行化守卫：每次 planFromMarker 递增，旧的 await 在 finally/错误分支被吞掉
-  let routeSeq = 0;
+  // 「最新调用胜出」竞态守卫：旧 await 在 finally/错误分支被吞掉
+  const seq = useSequencedTask();
 
   async function planFromMarker(index: number, spot: MapMarker): Promise<void> {
     const map = getMap();
     if (!map) return;
 
-    const mySeq = ++routeSeq;
+    const mine = seq.begin();
     selectedSpotIndex.value = index;
     isPlanning.value = true;
     routeInfo.value = null;
 
     try {
       const position = await map.getCurrentPosition();
-      if (mySeq !== routeSeq) return;
+      if (!seq.isActive(mine)) return;
 
       const result = await map.planRoute(position, spot.position);
-      if (mySeq !== routeSeq) return;
+      if (!seq.isActive(mine)) return;
 
       routeInfo.value = result;
     } catch (err) {
-      if (mySeq !== routeSeq) return;
+      if (!seq.isActive(mine)) return;
       const message =
         err instanceof Error
           ? err.message
@@ -74,7 +59,7 @@ export function useFishingRoute(getMap: () => FishingMapInstance | null) {
       notifier.error(message);
       selectedSpotIndex.value = null;
     } finally {
-      if (mySeq === routeSeq) {
+      if (seq.isActive(mine)) {
         isPlanning.value = false;
       }
     }

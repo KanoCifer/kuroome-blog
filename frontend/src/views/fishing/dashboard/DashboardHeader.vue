@@ -20,17 +20,17 @@ defineEmits<{
 
 <template>
   <header
-    class="border-border/40 bg-card/80 sticky top-0 z-30 border-b backdrop-blur-sm"
+    class="border-border/40 bg-card/80 top-0 z-30 border-b backdrop-blur-sm"
   >
     <div
       class="mx-auto flex max-w-screen-2xl items-center justify-between px-4 py-3 sm:px-6"
     >
       <div class="flex items-baseline gap-3">
-        <h1 class="text-foreground font-family-averia text-lg">钓鱼地图</h1>
+        <h1 class="text-foreground font-serif text-xl">钓鱼地图</h1>
         <span
-          class="text-muted-foreground hidden text-xs tracking-[0.2em] uppercase sm:inline"
+          class="text-muted-foreground font-serif text-xs tracking-[0.2em] italic"
         >
-          kanocifer
+          ka·no·ci·fer
         </span>
       </div>
 

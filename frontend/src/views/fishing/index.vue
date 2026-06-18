@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import TideCard from '@/components/map/TideCard.vue';
-import WeatherCard from '@/components/map/WeatherCard.vue';
-import AnalysisDrawer from '@/views/fishing/components/AnalysisDrawer.vue';
-import DashboardHeader from '@/views/fishing/components/DashboardHeader.vue';
-import FeedbackFormDialog from '@/views/fishing/components/FeedbackFormDialog.vue';
-import HourlyChartCard from '@/views/fishing/components/HourlyChartCard.vue';
-import IndexHeroCard from '@/views/fishing/components/IndexHeroCard.vue';
-import MapTile from '@/views/fishing/components/MapTile.vue';
-import QuickFeedbackBanner from '@/views/fishing/components/QuickFeedbackBanner.vue';
+defineOptions({ name: 'FishingMapView' });
+import TideCard from '@/views/fishing/dashboard/TideCard.vue';
+import WeatherCard from '@/views/fishing/dashboard/WeatherCard.vue';
+import AnalysisDrawer from '@/views/fishing/dashboard/AnalysisDrawer.vue';
+import DashboardHeader from '@/views/fishing/dashboard/DashboardHeader.vue';
+import FeedbackFormDialog from '@/views/fishing/dashboard/FeedbackFormDialog.vue';
+import HourlyChartCard from '@/views/fishing/dashboard/HourlyChartCard.vue';
+import IndexHeroCard from '@/views/fishing/dashboard/IndexHeroCard.vue';
+import MapContainer from '@/views/fishing/map/MapContainer.vue';
+import QuickFeedbackBanner from '@/views/fishing/dashboard/QuickFeedbackBanner.vue';
 import { useFishingDashboard } from '@/views/fishing/composables/useFishingDashboard';
 import { onMounted } from 'vue';
 
 const dash = useFishingDashboard();
-const { route, feedback, analysis } = dash;
+const { feedback, analysis } = dash;
 
 onMounted(dash.init);
 </script>
@@ -20,8 +21,8 @@ onMounted(dash.init);
 <template>
   <div class="bg-background min-h-screen">
     <DashboardHeader
-      :analysis-open="analysis.open.value"
-      :analysis-has-data="analysis.hasData.value"
+      :analysis-open="dash.analysisOpen.value"
+      :analysis-has-data="dash.analysisHasData.value"
       @toggle-analysis="analysis.toggle"
     />
 
@@ -29,7 +30,6 @@ onMounted(dash.init);
       class="mx-auto flex max-w-screen-2xl flex-col gap-4 px-4 py-4 sm:px-6 sm:py-5"
     >
       <QuickFeedbackBanner
-        :visible="dash.showFeedbackBanner.value"
         :disabled="!dash.indexData.value"
         @submit="dash.onQuickFeedback"
       />
@@ -47,11 +47,11 @@ onMounted(dash.init);
         <div
           class="fishing-map-wrapper border-border order-2 h-[360px] overflow-hidden rounded-2xl border shadow-sm md:order-1 md:col-span-6 md:h-full lg:col-span-8"
         >
-          <MapTile
+          <MapContainer
             ref="mapTileRef"
             :markers="dash.fishingSpots.value"
-            :is-planning="route.isPlanning.value"
-            :route-info="route.routeInfo.value"
+            :is-planning="dash.isPlanning.value"
+            :route-info="dash.routeInfo.value"
             @marker-click="dash.onMarkerClick"
             @map-ready="dash.onMapReady"
             @clear-route="dash.onClearRoute"
@@ -67,11 +67,11 @@ onMounted(dash.init);
           />
         </div>
 
-        <!-- 底排:Weather / Hourly / Tide -->
-        <div class="order-3 md:col-span-3 lg:col-span-4">
+        <!-- 底排:Weather (3) / Hourly (5) / Tide (4) = 12 -->
+        <div class="order-3 md:col-span-3 lg:col-span-3">
           <WeatherCard :location="dash.activeLocation.value" />
         </div>
-        <div class="order-4 md:col-span-3 lg:col-span-4">
+        <div class="order-4 md:col-span-3 lg:col-span-5">
           <HourlyChartCard />
         </div>
         <div class="order-5 md:col-span-6 lg:col-span-4">
@@ -87,28 +87,24 @@ onMounted(dash.init);
     </main>
 
     <FeedbackFormDialog
-      v-if="feedback.open.value && feedback.currentFishingData.value"
-      :is-open="feedback.open.value"
-      :fishing-data="feedback.currentFishingData.value"
-      :location-id="feedback.locationId.value"
-      :location-name="feedback.locationName.value"
+      v-if="dash.feedbackOpen.value && dash.currentFishingData.value"
+      :is-open="dash.feedbackOpen.value"
+      :fishing-data="dash.currentFishingData.value"
+      :location-id="dash.feedbackLocationId.value"
+      :location-name="dash.feedbackLocationName.value"
       @cancel="feedback.closeFeedback"
       @success="feedback.closeFeedback"
     />
 
     <AnalysisDrawer
-      :open="analysis.open.value"
-      :payload="analysis.payload.value"
+      :open="dash.analysisOpen.value"
+      :payload="dash.analysisPayload.value"
       @close="analysis.close"
     />
   </div>
 </template>
 
 <style scoped>
-/*
- * Map tile 的 hover 浮起 —— MapTile 不在 DashboardCard 内(padding=none),
- * 单独在外层 .fishing-map-wrapper 上加同款 lift,与 DashboardCard 行为一致
- */
 .fishing-map-wrapper {
   position: relative;
   transition:
@@ -123,10 +119,6 @@ onMounted(dash.init);
     0 2px 6px -2px oklch(0% 0 0 / 0.06);
 }
 
-/*
- * Dashboard 网格的入场 stagger —— 5 个 tile 按 DOM 顺序 60ms 步进淡入
- * (B 方向: 让"留一片安静"的钓鱼 dashboard 也有"刚开锅"的呼吸感)
- */
 @keyframes fishing-dashboard-fade-up {
   from {
     opacity: 0;

@@ -6,7 +6,7 @@
  * - 从 store 拼装 WeatherAnalysis 所需的 payload (live/forecasts/tide/index/location)
  * - 判定是否有可分析的数据 (用于 header 按钮上的小红点)
  *
- * 抽出原因: 原本散落在 FishingMapView.vue, view 里业务状态太多。
+ * 抽出原因: 原本散落在 view 顶层, view 里业务状态太多。
  */
 import { useFishingMapStore } from '@/stores/fishingMap';
 import { useTidePanelStore } from '@/stores/tidePanel';

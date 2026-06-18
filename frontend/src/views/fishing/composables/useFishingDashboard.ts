@@ -1,10 +1,3 @@
-/**
- * Fishing dashboard 的页面级状态接线。
- *
- * 把原本散在 FishingMapView.vue 里的 mapTileRef / userPosition / activeLocation /
- * onMapReady / onMarkerClick / onClearRoute / init 收成一组语义清晰的输出，
- * view 模板只负责布局 + 把这些 binding 挂到子组件上。
- */
 import fishingSpotsData from '@/data/fishing-spots.json';
 import { DEFAULT_MAP_CENTER, useFishingMapStore } from '@/stores/fishingMap';
 import { useNotificationStore } from '@/stores/notification';
@@ -99,7 +92,18 @@ export function useFishingDashboard() {
     activeLocation,
     indexData,
 
-    // sub-composables
+    // 拍平的子 composable refs (模板里直接 dash.isPlanning 等,避免三层点链)
+    isPlanning: route.isPlanning,
+    routeInfo: route.routeInfo,
+    feedbackOpen: feedback.open,
+    currentFishingData: feedback.currentFishingData,
+    feedbackLocationId: feedback.locationId,
+    feedbackLocationName: feedback.locationName,
+    analysisOpen: analysis.open,
+    analysisPayload: analysis.payload,
+    analysisHasData: analysis.hasData,
+
+    // sub-composables (仅 handlers 内部使用,不暴露给模板)
     route,
     feedback,
     analysis,

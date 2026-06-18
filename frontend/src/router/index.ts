@@ -103,7 +103,7 @@ const router = createRouter({
     {
       path: '/fishing-map',
       name: 'fishing-map',
-      component: () => import('@/views/fishing/FishingMapView.vue'),
+      component: () => import('@/views/fishing/index.vue'),
       meta: {
         title: "钓鱼地图 - Kuroome's Blog",
         description: '探索钓鱼地点和钓点信息',

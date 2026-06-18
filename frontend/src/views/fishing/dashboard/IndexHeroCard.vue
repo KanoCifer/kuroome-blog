@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useFishingMapStore } from '@/stores/fishingMap';
 import type { FishingIndexData } from '@/types/fishing';
-import DashboardCard from '@/views/fishing/components/DashboardCard.vue';
+import DashboardCard from '@/views/fishing/dashboard/DashboardCard.vue';
 import { FishingRod, Loader } from '@lucide/vue';
 import { storeToRefs } from 'pinia';
 
@@ -67,7 +67,7 @@ const handleFeedback = () => {
 </script>
 
 <template>
-  <DashboardCard tone="hero" padding="default">
+  <DashboardCard tone="hero" padding="default" class="group">
     <!-- 标题 + 刷新 + 图标 -->
     <div class="mb-4 flex items-start justify-between gap-3">
       <div>
@@ -89,7 +89,7 @@ const handleFeedback = () => {
           {{ loading ? '刷新中' : '刷新' }}
         </button>
         <div
-          class="bg-primary text-primary-foreground flex h-11 w-11 items-center justify-center rounded-xl shadow-sm"
+          class="bg-primary text-primary-foreground flex h-11 w-11 items-center justify-center rounded-2xl shadow-sm transition-all duration-300 group-hover:rounded-xl"
         >
           <FishingRod class="h-5 w-5" />
         </div>

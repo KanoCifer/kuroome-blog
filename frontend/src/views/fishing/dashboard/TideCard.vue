@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useChartColors, withAlpha } from '@/composables/useChartColors';
 import { HARBOR_OPTIONS, useTidePanelStore } from '@/stores/tidePanel';
-import DashboardCard from '@/views/fishing/components/DashboardCard.vue';
+import DashboardCard from './DashboardCard.vue';
 import dayjs from 'dayjs';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted } from 'vue';

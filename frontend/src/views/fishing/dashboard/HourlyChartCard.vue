@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useChartColors, withAlpha } from '@/composables/useChartColors';
 import { useFishingMapStore } from '@/stores/fishingMap';
-import DashboardCard from '@/views/fishing/components/DashboardCard.vue';
+import DashboardCard from '@/views/fishing/dashboard/DashboardCard.vue';
 import dayjs from 'dayjs';
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
@@ -205,7 +205,7 @@ const chartOption = computed(() => {
     >
       <v-chart
         :option="chartOption"
-        style="width: 100%; height: 280px"
+        style="width: 100%; height: 100%"
         autoresize
       />
     </div>

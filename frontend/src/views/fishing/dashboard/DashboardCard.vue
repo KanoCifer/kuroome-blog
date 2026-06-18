@@ -107,10 +107,10 @@ const whileHover = computed(() => {
  * 父级 .fishing-card--hero:hover 触发,与 motion-v 浮起同步出现
  */
 .fishing-card--hero {
-  border-color: oklch(from var(--primary) l c h / 0.18);
+  border-color: oklch(from var(--primary) l c h / 0.3);
 }
 .fishing-card--hero:hover {
-  border-color: oklch(from var(--primary) l c h / 0.55);
+  border-color: oklch(from var(--primary) l c h / 0.6);
 }
 
 .hero-glow {
