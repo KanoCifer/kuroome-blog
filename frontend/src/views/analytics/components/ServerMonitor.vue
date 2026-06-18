@@ -208,7 +208,7 @@ import { fetchEventSource } from '@microsoft/fetch-event-source';
 import dayjs from 'dayjs';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import VChart from 'vue-echarts';
-import { useOrigin } from '@/composables/useOrigin';
+import { useOrigin } from '@/composables/shared';
 import { getAccessToken } from '@/auth/tokenService';
 
 // Types

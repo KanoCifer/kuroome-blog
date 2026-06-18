@@ -71,9 +71,9 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { useRssParse } from '@/composables/useRssParse';
-import { useRssSubscriptions } from '@/composables/useRssSubscriptions';
-import { useRssArticles } from '@/composables/useRssArticles';
+import { useRssParse } from '@/composables/rss';
+import { useRssSubscriptions } from '@/composables/rss';
+import { useRssArticles } from '@/composables/rss';
 import { BasicDetail } from '@/components/basic';
 import RssParseSection from './components/RssParseSection.vue';
 import RssSubscriptionsSection from './components/RssSubscriptionsSection.vue';

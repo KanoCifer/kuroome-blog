@@ -324,7 +324,7 @@
 <script setup lang="ts">
 import { BasicDetail } from '@/components/basic';
 import { TagPill } from '@/components/ui/tag-pill';
-import { useImageError } from '@/composables/useImageError';
+import { useImageError } from '@/composables/shared';
 import friendLinksData from '@/data/friendlinks.json';
 import websitesData from '@/data/websites.json';
 import { useNotificationStore } from '@/stores/notification';

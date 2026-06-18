@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ImageEditorModal from '@/components/editor/ImageEditorModal.vue';
-import { useMarkdownImage } from '@/composables/useMarkdownImage';
+import { useMarkdownImage } from '@/composables/article';
 import DOMPurify from 'dompurify';
 import hljs from 'highlight.js/lib/common';
 import 'highlight.js/styles/github-dark.css';

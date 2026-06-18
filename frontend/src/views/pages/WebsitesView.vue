@@ -100,7 +100,7 @@
 import { BasicDetail } from '@/components/basic';
 import websitesData from '@/data/websites.json';
 import type { Website } from '@/types';
-import { useImageError } from '@/composables/useImageError';
+import { useImageError } from '@/composables/shared';
 import { onMounted, ref } from 'vue';
 import { motion } from 'motion-v';
 

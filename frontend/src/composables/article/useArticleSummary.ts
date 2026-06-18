@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue';
 import { consumeSseStream } from './useSseStream';
-import { useTypewriter } from './useTypewriter';
+import { useTypewriter } from '@/composables/shared/useTypewriter';
 
 export interface ArticleContext {
   title?: string;

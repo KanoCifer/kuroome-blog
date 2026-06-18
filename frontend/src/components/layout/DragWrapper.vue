@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { useCardDrag } from '@/composables/useCardDrag';
+import { useCardDrag } from '@/composables/card';
 import { useCardLayoutStore } from '@/stores/cardLayout';
 import type { CSSProperties } from 'vue';
 

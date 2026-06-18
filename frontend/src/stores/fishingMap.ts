@@ -1,7 +1,7 @@
 import { fishingGateway } from '@/api/fishingGateway';
 import { weatherGateway } from '@/api/weatherGateway';
 import { useNotificationStore } from '@/stores/notification';
-import { useSequencedTask } from '@/composables/useSequencedTask';
+import { useSequencedTask } from '@/composables/shared';
 import type { FishingIndexData } from '@/types/fishing';
 import type {
   TideData,

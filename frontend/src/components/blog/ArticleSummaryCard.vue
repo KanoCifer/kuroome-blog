@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useNotificationStore } from '@/stores/notification';
-import { useArticleChat } from '@/composables/useArticleChat';
-import { useArticleSummary } from '@/composables/useArticleSummary';
-import { useShimmerTips } from '@/composables/useShimmerTips';
+import { useArticleChat } from '@/composables/article';
+import { useArticleSummary } from '@/composables/article';
+import { useShimmerTips } from '@/composables/shared';
 import { AnimatePresence, motion } from 'motion-v';
 import { computed, onMounted, ref, watch } from 'vue';
 import { Marked } from 'marked';

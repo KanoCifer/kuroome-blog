@@ -54,7 +54,7 @@
 <script setup lang="ts">
 import websitesData from '@/data/websites.json';
 import type { Website } from '@/types';
-import { useImageError } from '@/composables/useImageError';
+import { useImageError } from '@/composables/shared';
 
 const { handleImageError } = useImageError();
 

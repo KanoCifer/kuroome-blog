@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import BentoCard from '@/components/bento/BentoCard.vue';
-import { useCardImage } from '@/composables/useCardImage';
+import { useCardImage } from '@/composables/card';
 
 const { imageSrc } = useCardImage();
 </script>

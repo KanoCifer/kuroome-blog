@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useChartColors, withAlpha } from '@/composables/useChartColors';
+import { useChartColors, withAlpha } from '@/composables/shared';
 import { HARBOR_OPTIONS, useTidePanelStore } from '@/stores/tidePanel';
 import DashboardCard from './DashboardCard.vue';
 import dayjs from 'dayjs';

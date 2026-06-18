@@ -1,6 +1,6 @@
 import { useNotificationStore } from '@/stores/notification';
 import type { MapMarker } from '@/types/marker';
-import { useSequencedTask } from '@/composables/useSequencedTask';
+import { useSequencedTask } from '@/composables/shared';
 import { ref } from 'vue';
 
 export interface RouteInfo {

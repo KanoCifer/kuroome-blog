@@ -6,7 +6,7 @@ import TodoModal from '@/layouts/components/TodoModal.vue';
 import CookieConsent from '@/components/layout/CookieConsent.vue';
 import ToastContainer from '@/components/layout/ToastContainer.vue';
 import BasicNav from '@/components/nav/BasicNav.vue';
-import { useCardLayout } from '@/composables/useCardLayout';
+import { useCardLayout } from '@/composables/card';
 import { useBackgroundStore } from '@/stores/background';
 import { useThemeStore } from '@/stores/theme';
 import { AnimatePresence } from 'motion-v';

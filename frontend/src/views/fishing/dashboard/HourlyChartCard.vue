@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useChartColors, withAlpha } from '@/composables/useChartColors';
+import { useChartColors, withAlpha } from '@/composables/shared';
 import { useFishingMapStore } from '@/stores/fishingMap';
 import DashboardCard from '@/views/fishing/dashboard/DashboardCard.vue';
 import dayjs from 'dayjs';

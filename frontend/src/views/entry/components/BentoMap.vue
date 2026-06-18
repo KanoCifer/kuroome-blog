@@ -70,7 +70,7 @@
 
 <script setup lang="ts">
 import BentoCard from '@/components/bento/BentoCard.vue';
-import { useAnimateNumber } from '@/composables/useAnimateNumber';
+import { useAnimateNumber } from '@/composables/shared';
 import fishingSpots from '@/data/fishing-spots.json';
 import { fishingGateway } from '@/api/fishingGateway';
 import { DEFAULT_MAP_CENTER, useFishingMapStore } from '@/stores/fishingMap';

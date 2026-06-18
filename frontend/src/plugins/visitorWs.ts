@@ -1,4 +1,4 @@
-import { useWebSocket } from '@/composables/useWebSocket';
+import { useWebSocket } from '@/composables/shared';
 import { useVisitorCountStore } from '@/stores/visitorCount';
 import { getVisitorId } from '@/utils/visitorTracker';
 import type { Pinia } from 'pinia';

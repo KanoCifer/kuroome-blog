@@ -218,7 +218,7 @@
 
 <script setup lang="ts">
 import DevTaskCard from '@/views/todos/components/DevTaskCard.vue';
-import { useTodoDrawer } from '@/composables/useTodoDrawer';
+import { useTodoDrawer } from '@/composables/todo';
 import type { DevTask, DevTaskPriority } from '@/api/todoGateway';
 import { useTodoStore } from '@/stores/todos';
 import { storeToRefs } from 'pinia';

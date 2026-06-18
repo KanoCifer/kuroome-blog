@@ -514,8 +514,8 @@
 <script setup lang="ts">
 import { BasicDetail } from '@/components/basic';
 import { Slider } from '@/components/ui/slider';
-import { useImageProcessor } from '@/composables/useImageProcessor';
-import { usePreviewDialog } from '@/composables/usePreviewDialog';
+import { useImageProcessor } from '@/composables/shared';
+import { usePreviewDialog } from '@/composables/card';
 import { formatBytes } from '@/utils/handlePic';
 import { useDropZone } from '@vueuse/core';
 import { computed, useTemplateRef } from 'vue';

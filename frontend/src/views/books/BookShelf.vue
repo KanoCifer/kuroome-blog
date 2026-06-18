@@ -106,7 +106,7 @@
 </template>
 
 <script setup lang="ts">
-import { useWereadShelf } from '@/composables/useWereadShelf';
+import { useWereadShelf } from '@/composables/weread';
 import { useReadStatsStore } from '@/stores/readStats';
 import WereadBookCard from '@/views/books/weread/WereadBookCard.vue';
 import WereadBookDetailPanel from '@/views/books/weread/WereadBookDetailPanel.vue';

@@ -60,7 +60,7 @@
 
 <script setup lang="ts">
 import BentoCard from '@/components/bento/BentoCard.vue';
-import { useAnimateNumber } from '@/composables/useAnimateNumber';
+import { useAnimateNumber } from '@/composables/shared';
 import { wereadGateway } from '@/api/wereadGateway';
 import { useReadStatsStore } from '@/stores/readStats';
 import { formatDuration } from '@/utils/format/duration';

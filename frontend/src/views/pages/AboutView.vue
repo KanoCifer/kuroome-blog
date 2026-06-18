@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, nextTick } from 'vue';
 import { motion } from 'motion-v';
-import { useTypewriter } from '@/composables/useTypewriter';
+import { useTypewriter } from '@/composables/shared';
 
 const AboutIMG = '/images/about-thumb.webp';
 
