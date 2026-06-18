@@ -8,8 +8,8 @@
     "build": "tsc -b && vite build",
     "build-only": "vite build",
     "type-check": "tsc -b",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "pnpm exec oxlint .",
+    "lint:fix": "pnpm exec oxlint . --fix",
     "preview": "vite preview",
     "format": "pnpm exec prettier src --write",
     "test:unit": "vitest run"
@@ -45,8 +45,6 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.4",
-    "@tailwindcss/typography": "^0.5.20",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/amap-js-api": "^1.4.16",
@@ -55,16 +53,12 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.2",
     "daisyui": "^5.5.23",
-    "eslint": "^9.39.4",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.3",
-    "globals": "^17.6.0",
     "happy-dom": "^20.10.4",
+    "oxlint": "^1.70.0",
     "prettier": "^3.8.4",
     "prettier-plugin-tailwindcss": "^0.7.4",
     "sass": "^1.101.0",
     "typescript": "~5.9.3",
-    "typescript-eslint": "^8.61.1",
     "vite": "^8.0.16",
     "vitest": "^4.1.9"
   }

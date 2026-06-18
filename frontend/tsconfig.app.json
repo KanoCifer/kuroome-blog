@@ -6,7 +6,7 @@
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "moduleResolution": "bundler",
     "paths": {
-      "@/*": ["./src/*"]
-    }
-  }
+      "@/*": ["./src/*"],
+    },
+  },
 }

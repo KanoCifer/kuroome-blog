@@ -18,8 +18,9 @@
 </template>
 
 <script setup lang="ts">
+import { useChartColors } from '@/composables/shared';
 import type { Device } from '@/api/deviceGateway';
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed } from 'vue';
 import VChart from 'vue-echarts';
 
 const props = defineProps<{
@@ -28,21 +29,10 @@ const props = defineProps<{
   onClose: () => void;
 }>();
 
-const isDark = ref(document.documentElement.classList.contains('dark'));
-
-onMounted(() => {
-  const observer = new MutationObserver(() => {
-    isDark.value = document.documentElement.classList.contains('dark');
-  });
-  observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['class'],
-  });
-  onUnmounted(() => observer.disconnect());
-});
+const { palette } = useChartColors();
 
 const chartOption = computed(() => {
-  const isDarkMode = document.documentElement.classList.contains('dark');
+  const p = palette.value;
   return {
     title: {
       text: 'Device Price Distribution',
@@ -51,7 +41,7 @@ const chartOption = computed(() => {
       textStyle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: isDarkMode ? '#ccc' : 'rgb(50, 50, 50)',
+        color: p.foreground,
       },
     },
     tooltip: {
@@ -74,14 +64,7 @@ const chartOption = computed(() => {
     },
     series: [
       {
-        color: [
-          '#ee6666',
-          '#73c0de',
-          '#3ba272',
-          '#fc8452',
-          '#9a60b4',
-          '#ea7ccc',
-        ],
+        color: p.series,
         type: 'pie',
         data: props.data.map((device) => ({
           name: device.name,

@@ -1,13 +1,13 @@
 # Code Style
 
-## Backend (Python)
+## Backend (FastAPI)
 
 - Imports: absolute imports only (`from app...`)
-- Naming: functions/variables `snake_case`, classes `PascalCase`, constants `UPPER_SNAKE_CASE`
-- Error handling: never use bare `except:`; services raise domain errors, API layer maps HTTP responses; never swallow errors silently
+- Naming: functions/variables `snake_case`, classes `PascalCase`
+- Services raise errors, API layer maps HTTP responses
 - Async: prefer async/await for DB-related operations
 
-## Frontend (Vue + TypeScript)
+## Frontend (Vue + TS)
 
 - Use `<script setup lang="ts">` + Composition API
 - Type safety: avoid `any`; use `unknown` + narrowing for external inputs; keep props/emits/store types explicit

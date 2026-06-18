@@ -6,29 +6,22 @@
   - Vue: `cd frontend && pnpm run type-check`
   - React: `cd react-app && pnpm run type-check`
 - **提交前必跑**：(1) 改前端 → `pnpm run type-check` (2) 改后端 → `ruff check .` (3) 各自语言的 lint + format
-- 用 Conventional Commits 格式（`refactor(frontend): ...` 之类）
-- 编辑器已配置 format-on-save（Prettier frontend/react-app，Ruff backend）— 不要重复格式化。
-- 样式必须使用语义化 Tailwind class（`bg-background`, `text-foreground` 等），禁止硬编码颜色（`bg-black/75`, `text-white/90`）。详见 design-system.md。
+- 样式必须使用语义化 Tailwind class（`bg-background`, `text-foreground` 等），禁止硬编码颜色（`bg-black/75`, `text-white/90`）。
 - 后端使用 `uv` 管理依赖。
 
 ## 2) Project Overview
 
-- **ReadingList**（kanocifer.chat）— 个人阅读追踪 + 博客系统。名称源于日语 "kuro neko"（黑猫）
-- Stack: FastAPI + SQLAlchemy 2.0 async (PostgreSQL) + Beanie (MongoDB) + Redis
+- kanocifer.chat 个人阅读追踪 + 博客系统。名称源于日语 "kuro neko"（黑猫）
+- Backend: FastAPI + SQLAlchemy 2.0 async (PostgreSQL) + Beanie (MongoDB) + Redis
 - Desktop: Vue 3 (`frontend/`), Mobile: React 19 (`react-app/`)
 - **双前端架构**: Vue + React 共享后端服务，各自维护独立状态 Store；API 契约修改需同步两端
 - 修改 `backend/app/schemas/` 后，必须同步 `frontend/src/api/` 和 `react-app/src/services/`。
-- 缓存模块在 `app/plugins/cache/`（不在 `app/utils/`）。端点用 `@redis_cache(ttl=N, exclude=[...])`，`exclude` 跳过 Depends 参数（不参与 cache key）
+- 缓存模块在 `app/plugins/cache/`。端点用 `@redis_cache(ttl=N, exclude=[...])`，`exclude` 跳过 Depends 参数（不参与 cache key）
 - **`composables/` 按域分目录**（`shared/ card/ article/ rss/ weread/ comment/ todo/`），与 `views/` `components/` 分域策略一致；每个子目录用 `index.ts` 桶导出，跨域 import 走桶 `from '@/composables/<domain>'`，不要直接指向具体文件
 
 ## 3) Documentation Index
 
-始终加载的规则（`.claude/rules/`）：
-
-- [commands.md](.claude/rules/commands.md) — 所有构建/测试/格式化命令
-- [architecture.md](.claude/rules/architecture.md) — 架构分层、API 约定、关键约束
-
-按需查阅（`docs/rules/`，Claude 会在相关任务中主动读取）：
+按需查阅`docs/rules/`：
 
 - [code-style.md](docs/rules/code-style.md) — 代码风格规范
 - [design-system.md](docs/rules/design-system.md) — 语义化 token、组件样式规则、禁止事项

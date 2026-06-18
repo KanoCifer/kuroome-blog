@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["vue", "typescript", "vitest"],
+  "env": {
+    "browser": true
+  },
+  "categories": {
+    "correctness": "deny",
+    "suspicious": "warn",
+    "perf": "deny"
+  },
+  "ignorePatterns": ["dist/", "dist-ssr/", "coverage/"]
+}

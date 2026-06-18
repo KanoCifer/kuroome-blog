@@ -36,9 +36,10 @@
 </template>
 
 <script setup lang="ts">
+import { useChartColors, withAlpha } from '@/composables/shared';
 import type { Device } from '@/api/deviceGateway';
 import dayjs from 'dayjs';
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed } from 'vue';
 import VChart from 'vue-echarts';
 
 const props = defineProps<{
@@ -47,21 +48,10 @@ const props = defineProps<{
   onClose: () => void;
 }>();
 
-// Detect dark mode
-const isDark = ref(document.documentElement.classList.contains('dark'));
-
-onMounted(() => {
-  const observer = new MutationObserver(() => {
-    isDark.value = document.documentElement.classList.contains('dark');
-  });
-  observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['class'],
-  });
-  onUnmounted(() => observer.disconnect());
-});
+const { palette } = useChartColors();
 
 const chartOption = computed(() => {
+  const p = palette.value;
   const purchaseDate = dayjs(props.data.purchase_date);
   const now = dayjs();
 
@@ -81,11 +71,6 @@ const chartOption = computed(() => {
     seriesData.push(dailyCost);
   }
 
-  const textColor = isDark.value ? '#e5e7eb' : '#1f2937';
-  const subtextColor = isDark.value ? '#9ca3af' : '#6b7280';
-  const axisColor = isDark.value ? '#4b5563' : '#d1d5db';
-  const splitLineColor = isDark.value ? '#374151' : '#f3f4f6';
-
   return {
     backgroundColor: 'transparent',
     title: {
@@ -93,16 +78,16 @@ const chartOption = computed(() => {
       subtext: `Current: ¥${currentDailyCost.toFixed(2)}/day | Total: ¥${props.data.price}`,
       left: 0,
       top: 8,
-      textStyle: { fontSize: 16, fontWeight: 'bold', color: textColor },
-      subtextStyle: { fontSize: 12, color: subtextColor },
+      textStyle: { fontSize: 16, fontWeight: 'bold', color: p.foreground },
+      subtextStyle: { fontSize: 12, color: p.mutedForeground },
     },
     tooltip: {
       trigger: 'axis',
-      backgroundColor: isDark.value ? '#1f2937' : '#fff',
-      textStyle: { color: textColor },
+      backgroundColor: p.card,
+      textStyle: { color: p.foreground },
       formatter: (params: { name: string; value: number }[]) => {
-        const p = params[0];
-        return `${p.name}<br/>Daily Cost: <b>¥${p.value.toFixed(2)}</b>`;
+        const param = params[0];
+        return `${param.name}<br/>Daily Cost: <b>¥${param.value.toFixed(2)}</b>`;
       },
     },
     grid: {
@@ -112,9 +97,9 @@ const chartOption = computed(() => {
     xAxis: {
       type: 'category',
       data: xAxisData,
-      axisLine: { lineStyle: { color: axisColor } },
+      axisLine: { lineStyle: { color: p.border } },
       axisLabel: {
-        color: textColor,
+        color: p.mutedForeground,
         fontSize: 10,
         interval: 30,
         rotate: 45,
@@ -125,18 +110,18 @@ const chartOption = computed(() => {
       type: 'log',
       name: '¥/day',
       max: Math.ceil(props.data.price * 1.1),
-      nameTextStyle: { color: textColor, fontSize: 11 },
+      nameTextStyle: { color: p.foreground, fontSize: 11 },
       axisLine: { show: false },
-      splitLine: { lineStyle: { color: splitLineColor } },
-      axisLabel: { color: textColor },
+      splitLine: { lineStyle: { color: p.border, opacity: 0.5 } },
+      axisLabel: { color: p.mutedForeground },
     },
     series: [
       {
         type: 'line',
         smooth: true,
         data: seriesData,
-        lineStyle: { color: '#3b82f6', width: 2 },
-        itemStyle: { color: '#3b82f6' },
+        lineStyle: { color: p.series[0], width: 2 },
+        itemStyle: { color: p.series[0] },
         areaStyle: {
           color: {
             type: 'linear',
@@ -145,8 +130,8 @@ const chartOption = computed(() => {
             x2: 0,
             y2: 1,
             colorStops: [
-              { offset: 0, color: 'rgba(59,130,246,0.35)' },
-              { offset: 1, color: 'rgba(59,130,246,0.02)' },
+              { offset: 0, color: withAlpha(p.series[0], 0.35) },
+              { offset: 1, color: withAlpha(p.series[0], 0.02) },
             ],
           },
         },
@@ -155,14 +140,14 @@ const chartOption = computed(() => {
             ? {
                 symbol: ['none', 'none'],
                 lineStyle: {
-                  color: '#f59e0b',
+                  color: p.warning,
                   type: 'dashed',
                   width: 1.5,
                 },
                 label: {
                   show: true,
                   formatter: '现在',
-                  color: '#f59e0b',
+                  color: p.warning,
                   fontWeight: '600',
                   fontSize: 12,
                 },

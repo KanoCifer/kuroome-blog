@@ -2,56 +2,92 @@
 
 ## Token Architecture
 
-三层结构，每层不可跨级使用：
-
 ```
 Layer 1: Raw tokens (oklch/hex)
-  --ink, --paper, --warm-gray, --muted, --accent-amber, --accent-sage,
-  --accent-slate, --accent-rose, --workspace-accent, --card-bg, --surface ...
+  --ink, --paper, --warm-gray, --muted-text, --accent-amber, --accent-sage,
+  --accent-slate, --accent-rose, --workspace-accent, --card-bg, --surface …
 
 Layer 2: Theme files (per color-scheme)
-  frontend/src/assets/themes/*.css   (10 schemes)
+  frontend/src/assets/themes/*.css   (10 schemes × 41 variables)
   react-app/src/assets/themes/*.css  (6 schemes)
   激活方式: root element 上设 data-color-scheme="sky-blue"
 
 Layer 3: Semantic tokens (Tailwind @theme inline)
-  --color-background, --color-foreground, --color-card, --color-primary ...
-  对应 Tailwind class: bg-background, text-foreground, bg-card, bg-primary ...
+  --color-background, --color-foreground, --color-card, --color-primary …
+  对应 Tailwind class: bg-background, text-foreground, bg-card, bg-primary …
 ```
 
 **规则: 只使用 Layer 3 的 Tailwind class。禁止直接引用 Layer 1 的 CSS 变量或硬编码颜色值。**
 
+### 消费者路径
+
+```
+Layer 1 (theme 文件内 oklch/hex 原始色)
+  ↓ @theme inline 桥接
+Layer 2 (语义 token: --background / --foreground / --primary / --border …)
+  ↓ Tailwind class 绑定
+Layer 3 (Tailwind class: bg-background / bg-primary / border …)
+        ↓                    ↙
+  Vue / React 组件         ECharts / 图表
+  (Tailwind class,         (useChartColors / useEChartsTheme,
+   ~90% 用量)               resolveCssColor 读 --color-primary 等)
+```
+
+## Theme Files
+
+`frontend/src/assets/themes/` 与 `react-app/src/assets/themes/` **结构完全对齐**
+（10 文件 × 41 变量），由各自 `index.css` 一并 `@import` 到 `base.css`：
+
+| 文件               | 变量数 | 风格                      |
+| ------------------ | ------ | ------------------------- |
+| `sky-blue.css`     | 41     | 默认 · 高远澄澈（蓝/靛）  |
+| `forest-green.css` | 41     | 林深时见（绿/青/苔）      |
+| `paper.css`        | 41     | 落纸烟云（暖灰/赭/墨）    |
+| `sage.css`         | 41     | 清隽素雅（鼠尾草/驼）     |
+| `mist.css`         | 41     | 烟岚氤氲（灰蓝/青/赭）    |
+| `blush.css`        | 41     | 桃夭未央（藕粉/陶）       |
+| `spring.css`       | 41     | 万物生发（青绿/橙黄）     |
+| `autumn.css`       | 41     | 橙黄橘绿（朱/黄/蓝）      |
+| `clear-sky.css`    | 41     | 晴空（青蓝/鹅黄/白）      |
+| `midnight.css`     | 41     | 深夜（深靛，1 色 accent） |
+
 ## Semantic Token Reference
+
+`base.css` 通过 Tailwind v4 `@theme inline` 把 Layer 1 变量桥接为 Layer 3 语义类。
+下表标注了各 Layer 1 变量的被引用次数（全项目 grep），反映实际活跃度。
 
 ### Surface & Text
 
-| Tailwind class            | 映射到                      | 用途          |
-| ------------------------- | --------------------------- | ------------- |
-| `bg-background`           | `var(--paper)`              | 页面背景      |
-| `text-foreground`         | `var(--ink)`                | 主文本        |
-| `bg-card`                 | `var(--card-bg)`            | 卡片/弹窗背景 |
-| `text-card-foreground`    | `var(--ink)`                | 卡片内文本    |
-| `bg-surface`              | `var(--surface)`            | 半透明浮层    |
-| `text-surface-foreground` | `var(--surface-foreground)` | 浮层文本      |
+| Tailwind class            | 映射到                      | 引用次数 | 用途             |
+| ------------------------- | --------------------------- | -------- | ---------------- |
+| `bg-background`           | `var(--paper)`              | 23       | 页面背景         |
+| `text-foreground`         | `var(--ink)`                | 118      | 主文本（最高频） |
+| `bg-card`                 | `var(--card-bg)`            | 46       | 卡片/弹窗背景    |
+| `text-card-foreground`    | `var(--ink)`                | —        | 卡片内文本       |
+| `bg-surface`              | `var(--surface)`            | 1        | 半透明浮层       |
+| `text-surface-foreground` | `var(--surface-foreground)` | 1        | 浮层文字         |
 
 ### Primary & Accent
 
-| Tailwind class            | 映射到                             | 用途            |
-| ------------------------- | ---------------------------------- | --------------- |
-| `bg-primary`              | `var(--workspace-accent)`          | 主按钮/强调背景 |
-| `text-primary-foreground` | `var(--workspace-accent-contrast)` | 主按钮上的文字  |
-| `text-primary`            | `var(--workspace-accent)`          | 强调文字        |
+| Tailwind class            | 映射到                             | 引用次数 | 用途            |
+| ------------------------- | ---------------------------------- | -------- | --------------- |
+| `bg-primary`              | `var(--workspace-accent)`          | 25       | 主按钮/强调背景 |
+| `text-primary-foreground` | `var(--workspace-accent-contrast)` | 25       | 主按钮上的文字  |
+| `text-primary`            | `var(--workspace-accent)`          | —        | 强调文字        |
 
 ### Secondary / Muted / Accent
 
-| Tailwind class              | 映射到             | 用途             |
-| --------------------------- | ------------------ | ---------------- |
-| `bg-secondary`              | `var(--warm-gray)` | 次要背景         |
-| `text-secondary-foreground` | `var(--ink)`       | 次要背景上的文字 |
-| `bg-muted`                  | `var(--warm-gray)` | 静默背景         |
-| `text-muted-foreground`     | `var(--muted)`     | 辅助说明文字     |
-| `bg-accent`                 | `var(--warm-gray)` | hover 高亮背景   |
-| `text-accent-foreground`    | `var(--ink)`       | hover 高亮文字   |
+| Tailwind class              | 映射到              | 引用次数 | 用途                            |
+| --------------------------- | ------------------- | -------- | ------------------------------- |
+| `bg-secondary`              | `var(--warm-gray)`  | 118      | 次要背景（与 --warm-gray 共享） |
+| `text-secondary-foreground` | `var(--ink)`        | —        | 次要背景上的文字                |
+| `bg-muted`                  | `var(--warm-gray)`  | 8        | 静默背景                        |
+| `text-muted-foreground`     | `var(--muted-text)` | 23       | 辅助说明文字                    |
+| `bg-accent`                 | `var(--warm-gray)`  | —        | hover 高亮背景                  |
+| `text-accent-foreground`    | `var(--ink)`        | —        | hover 高亮文字                  |
+
+> `--warm-gray` 被 118 次引用（与 `--ink` 并列最高），是所有中性灰相关 token 的直接来源。
+> `text-muted-foreground` 桥接到 `var(--muted-text)` 而非 `var(--muted)`；`--muted` 变量在主题文件中**未定义**（见下文附录），但其名下的 `bg-muted` 实际走 `var(--warm-gray)` 通路，功能不受影响。
 
 ### Border & Input
 
@@ -63,35 +99,109 @@ Layer 3: Semantic tokens (Tailwind @theme inline)
 
 ### Semantic Status
 
-| Tailwind class     | 映射到                | 用途      |
-| ------------------ | --------------------- | --------- |
-| `bg-destructive`   | `var(--accent-rose)`  | 危险操作  |
-| `text-destructive` | `var(--accent-rose)`  | 危险文字  |
-| `bg-success`       | `var(--accent-sage)`  | 成功状态  |
-| `text-success`     | `var(--accent-sage)`  | 成功文字  |
-| `bg-warning`       | `var(--accent-amber)` | 警告/强调 |
-| `text-warning`     | `var(--accent-amber)` | 警告文字  |
+| Tailwind class     | 映射到                | 用途      | 备注                    |
+| ------------------ | --------------------- | --------- | ----------------------- |
+| `bg-destructive`   | `var(--accent-rose)`  | 危险操作  | semantic 色源头，不能删 |
+| `text-destructive` | `var(--accent-rose)`  | 危险文字  | 同上                    |
+| `bg-success`       | `var(--accent-sage)`  | 成功状态  | 同上                    |
+| `text-success`     | `var(--accent-sage)`  | 成功文字  | 同上                    |
+| `bg-warning`       | `var(--accent-amber)` | 警告/强调 | 同上                    |
+| `text-warning`     | `var(--accent-amber)` | 警告文字  | 同上                    |
+
+> `accent-amber/sage/slate/rose` 组件中 0 处直接引用，但它们是语义色的源头，**不能删除**。
+
+### Chart & Gradient
+
+| Tailwind class                  | 映射到                       | 引用次数    | 使用位置                                                                                                   |
+| ------------------------------- | ---------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------- |
+| `bg-chart-1` … `bg-chart-5`     | `--chart-1` … `--chart-5`    | 7 + runtime | `BentoTech.vue`, `ChangelogView.vue`, 以及 `useChartColors` 运行时解析（chart palette 中的 `series` 数组） |
+| `from-gradient-primary-from`    | `--gradient-primary-from`    | 1           | 主题 bridge                                                                                                |
+| `to-gradient-primary-to`        | `--gradient-primary-to`      | 1           | 主题 bridge                                                                                                |
+| `from-gradient-decorative-from` | `--gradient-decorative-from` | 1           | 主题 bridge                                                                                                |
+| `to-gradient-decorative-to`     | `--gradient-decorative-to`   | 1           | 主题 bridge                                                                                                |
 
 ### Radius
 
-| Token         | 值                          |
-| ------------- | --------------------------- |
-| `rounded-sm`  | `calc(var(--radius) - 4px)` |
-| `rounded-md`  | `calc(var(--radius) - 2px)` |
-| `rounded-lg`  | `var(--radius)` (0.625rem)  |
-| `rounded-xl`  | `calc(var(--radius) + 4px)` |
-| `rounded-2xl` | `calc(var(--radius) + 8px)` |
+| Token         | 值                          | 引用次数          |
+| ------------- | --------------------------- | ----------------- |
+| `rounded-sm`  | `calc(var(--radius) - 4px)` | —                 |
+| `rounded-md`  | `calc(var(--radius) - 2px)` | —                 |
+| `rounded-lg`  | `var(--radius)` (0.625rem)  | 7（全局圆角基线） |
+| `rounded-xl`  | `calc(var(--radius) + 4px)` | —                 |
+| `rounded-2xl` | `calc(var(--radius) + 8px)` | —                 |
+
+## Consumer Architecture
+
+### 两套消费者对比
+
+| 消费者                           | 读取方式                                       | 用到的变量                                                                                                                               |
+| -------------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| **Vue / React 组件**（绝大多数） | Tailwind class                                 | `primary`/`foreground`/`border`/`muted-foreground`/`card`/`surface` 等                                                                   |
+| **ECharts 图表**                 | `resolveCssColor('--color-primary', fallback)` | `--color-primary` `--color-warning` `--color-foreground` `--color-muted-foreground` `--color-border` `--color-card` `--color-chart-1..5` |
+| **主题切换动画**                 | 直接写 `data-color-scheme` 属性                | —（不读颜色，只切属性触发 transition）                                                                                                   |
+| **明/暗模式**                    | `html.dark` class                              | 主题文件里的 `.dark` 块覆盖同名列                                                                                                        |
+
+### 图表色使用 Vue
+
+`useChartColors()` 提供 `ChartPalette` 响应式对象，涵盖两类颜色：
+
+| 字段              | 对应 CSS 变量              | 用途                                      |
+| ----------------- | -------------------------- | ----------------------------------------- |
+| `primary`         | `--color-primary`          | 数据线色、标记                            |
+| `warning`         | `--color-warning`          | 温度线、markLine                          |
+| `foreground`      | `--color-foreground`       | 图表文字                                  |
+| `mutedForeground` | `--color-muted-foreground` | 坐标轴标签、tooltip 辅助文字              |
+| `border`          | `--color-border`           | 轴线、分割线、tooltip 边框                |
+| `card`            | `--color-card`             | tooltip 背景                              |
+| `series`          | `--color-chart-1..5`       | ECharts `color` 数组（多系列饼图/柱图等） |
+
+`withAlpha(color, alpha)` 工具函数用于渐变 `colorStops` 中取半透明版。用法：
+
+```ts
+const { palette } = useChartColors();
+const chartOption = computed(() => ({
+  textStyle: { color: palette.value.foreground },
+  series: [
+    {
+      color: palette.value.series, // 多系列
+      areaStyle: {
+        color: {
+          type: "linear",
+          colorStops: [
+            { offset: 0, color: withAlpha(palette.value.series[0], 0.35) },
+            { offset: 1, color: withAlpha(palette.value.series[0], 0.02) },
+          ],
+        },
+      },
+    },
+  ],
+}));
+```
+
+> 任何同类数据，直接在 `series[0].color` 或顶层 `color` 赋值 `palette.series`，不要硬编码 hex/oklch。
+> 不要从 `localStorage` 读 `data-color-scheme` 自行解析颜色。
+
+### 保留说明
+
+以下变量看似低引用但实际重要：
+
+- **4 个 font-family** — `theme.ts` 通过 `data-font="harmonyos"` 切换；alibaba/dongfang/averia 在 `@theme` 中定义供未来使用
+- **`accent-amber/sage/slate/rose`** — 语义色 `destructive/success/warning/ring` 的源头，不能删
+- **`chart-1..5`** — 7 处 Tailwind class 引用（`BentoTech.vue`, `ChangelogView.vue`），活跃
+- **`gradient-*-from/to`** — `BentoRecent.vue`, `BentoRecommend.vue`, `ChangelogView.vue` 引用，活跃
+- **`brand-devices`** — 6+ 组件引用，活跃
+- **`@custom-variant dark`** / **`tw-animate-css`** — Tailwind / Anime 框架依赖
 
 ## Vue vs React 差异
 
-| 维度        | Vue (`frontend/`)                     | React (`react-app/`) |
-| ----------- | ------------------------------------- | -------------------- |
-| UI 库       | shadcn-vue (New York style)           | 无，手写组件         |
-| 动画        | reka-ui 内置 + CSS transition         | framer-motion        |
-| 主题数量    | 10 个配色方案                         | 6 个配色方案         |
-| 颜色格式    | oklch 为主                            | oklch + hex 混用     |
-| cn() 工具   | `@/lib/utils` (clsx + tailwind-merge) | 无                   |
-| AlertDialog | shadcn AlertDialog 组件               | 自定义 DialogOverlay |
+| 维度        | Vue (`frontend/`)                                                                 | React (`react-app/`) |
+| ----------- | --------------------------------------------------------------------------------- | -------------------- |
+| UI 方案     | 自研手写组件（`@/components/ui/`），命名前缀 `UiButton` / `UiCard` / `UiModal` 等 | 无，手写组件         |
+| 动画        | `motion-v` + `tw-animate-css` + CSS transition                                    | framer-motion        |
+| 主题数量    | 10 个配色方案                                                                     | 6 个配色方案         |
+| 颜色格式    | oklch 为主                                                                        | oklch + hex 混用     |
+| cn() 工具   | `@/lib/utils` (clsx + tailwind-merge)                                             | 无                   |
+| AlertDialog | 自研 `<AlertDialog>` 基于原生 `<dialog>` + `showModal()`                          | 自定义 DialogOverlay |
 
 **API 契约修改时，两端的样式不需要同步（各自独立），但 token 名称一致。**
 
@@ -99,12 +209,12 @@ Layer 3: Semantic tokens (Tailwind @theme inline)
 
 ### Dialog / Modal / AlertDialog
 
-Vue 端使用 shadcn AlertDialog 时，`AlertDialogContent` 已自带:
+Vue 端 `UiAlertDialog` 基于原生 `<dialog>` + `showModal()` 实现，自带：
 
 - `bg-background` 背景
 - `border` + `shadow-lg` 边框和阴影
-- open/close zoom + fade 动画
-- 居中定位 + overlay
+- `::backdrop` 遮罩
+- 居中定位 + 浏览器级焦点陷阱 + Esc 关闭
 
 **只需传入尺寸 class，不要覆盖背景/边框/阴影:**
 
@@ -112,37 +222,45 @@ Vue 端使用 shadcn AlertDialog 时，`AlertDialogContent` 已自带:
 <!-- 正确 -->
 <AlertDialogContent class="sm:max-w-[500px]">
 
-<!-- 错误: 覆盖了 shadcn 的语义样式 -->
+<!-- 错误: 覆盖组件内置的语义样式 -->
 <AlertDialogContent class="border-white/[0.06] bg-black/80 backdrop-blur-2xl">
 ```
 
 ### 按钮
 
-使用 shadcn Button variants (Vue) 或对应 token class:
-
-| 场景     | Vue (shadcn)                     | React (手动)                                                 |
-| -------- | -------------------------------- | ------------------------------------------------------------ |
-| 主操作   | `<Button>` (default variant)     | `bg-primary text-primary-foreground hover:bg-primary/90`     |
-| 次要操作 | `<Button variant="outline">`     | `border border-border text-muted-foreground hover:bg-accent` |
-| 危险操作 | `<Button variant="destructive">` | `bg-destructive text-white hover:bg-destructive/90`          |
-| Ghost    | `<Button variant="ghost">`       | `hover:bg-accent hover:text-accent-foreground`               |
+| 场景     | Vue (`UiButton`)                   | React (手动)                                                 |
+| -------- | ---------------------------------- | ------------------------------------------------------------ |
+| 主操作   | `<UiButton>` (default variant)     | `bg-primary text-primary-foreground hover:bg-primary/90`     |
+| 次要操作 | `<UiButton variant="outline">`     | `border border-border text-muted-foreground hover:bg-accent` |
+| 危险操作 | `<UiButton variant="destructive">` | `bg-destructive text-white hover:bg-destructive/90`          |
+| Ghost    | `<UiButton variant="ghost">`       | `hover:bg-accent hover:text-accent-foreground`               |
 
 ### 半透明 Banner
 
 需要半透明效果时，用 token + 透明度，不要硬编码:
 
-```vue
+```html
 <!-- 正确 -->
-<div class="bg-card/95 backdrop-blur-sm border border-border">
-
-<!-- 错误 -->
-<div class="bg-black/75 backdrop-blur-2xl border-white/[0.06]">
+<div class="bg-card/95 backdrop-blur-sm border border-border"></div>
 ```
+
+## 使用建议
+
+1. **新增组件**：永远走 Tailwind class（Layer 3），不要写 `var(--ink)`。
+2. **新增配色方案**：复制 `sky-blue.css` 改 41 个变量即可。
+3. **写图表色（Vue）**：用 `useChartColors()` 拿 `ChartPalette`，通过 `palette.series` 设置 ECharts 系列色、`palette.foreground` 等设置 chrome 色。React 图表暂未使用主题色，直接硬编码。
+4. **加新色**：先在 Semantic Token Reference 找一个最接近语义的 token，没有再考虑新增 Layer 1 变量；新增后记得：
+   - 在 10 个主题文件里都补全
+   - 在 `base.css` `@theme inline` 里桥接成 Tailwind class
+   - 在本文档 Semantic Token Reference 里登记
+5. **遇到死代码**：
+   - **不**要新增预留变量 — 历史上 `status-active/cooling/abandoned` 4 个主题有、6 个没有，11 个月 0 引用，最后只能清理
+   - **先全项目 grep**，再决定删除或补齐到 10 文件
 
 ## 禁止事项
 
 1. **硬编码颜色**: `bg-black/75`, `text-white/90`, `border-white/[0.06]`, `bg-amber-400`
-2. **Glassmorphism 覆盖**: 不要用 `bg-black/80 backdrop-blur-2xl` 覆盖 shadcn 组件
+2. **组件样式覆盖**: 不要用 `bg-black/80 backdrop-blur-2xl` 覆盖内置组件样式
 3. **装饰性模糊光晕**: 不要添加 `pointer-events-none absolute -top-20 -right-20 bg-amber-500/8 blur-3xl` 等装饰元素
 4. **跨层引用**: 不要在组件模板中直接写 `var(--ink)` 或 `var(--warm-gray)`
 5. **任意 `text-white`**: 浅色模式下不可见，用 `text-foreground` 或 `text-card-foreground`
@@ -152,8 +270,8 @@ Vue 端使用 shadcn AlertDialog 时，`AlertDialogContent` 已自带:
 - [ ] 所有颜色使用 semantic token class，无硬编码 hex/oklch/rgba
 - [ ] 边框用 `border-border` 或 `border-input`
 - [ ] 文本用 `text-foreground` / `text-muted-foreground` / `text-card-foreground`
-- [ ] 按钮用 shadcn variants 或对应 token class
-- [ ] 弹窗/对话框不覆盖 shadcn 默认的背景/边框/阴影
+- [ ] 按钮用 `UiButton` variant 或对应 token class（React 端手写）
+- [ ] 弹窗/对话框不覆盖内置的背景/边框/阴影
 - [ ] hover 状态用 `hover:bg-accent hover:text-accent-foreground`
 - [ ] focus 状态用 `focus:ring-ring` 或 `focus-visible:border-ring`
 - [ ] 浅色和深色模式下均可用（无需额外 `.dark` 覆盖）
