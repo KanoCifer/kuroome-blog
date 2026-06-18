@@ -22,7 +22,7 @@ import AMapLoader from '@amap/amap-jsapi-loader';
 // ---- AMap 安全密钥全局声明 ----
 declare global {
   interface Window {
-    _AMapSecurityConfig?: { securityJsCode: string };
+    _AMapSecurityConfig: { securityJsCode: string };
   }
 }
 
