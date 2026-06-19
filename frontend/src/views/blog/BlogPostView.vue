@@ -218,11 +218,11 @@ const setupCodeCopy = () => {
 
   const codeBlocks = contentContainer.querySelectorAll('pre');
   codeBlocks.forEach((block) => {
-    block.classList.add('w-[80%]', 'whitespace-pre-wrap');
+    block.classList.add('w-full', 'whitespace-pre-wrap');
     const button = document.createElement('button');
-    button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2z"/></svg>`;
+    button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;
     button.className =
-      'copy-btn absolute top-2 right-3 rounded-lg bg-background px-2 py-1 hover:bg-gray-300';
+      'copy-btn absolute top-1 w-fit right-3 rounded-lg bg-secondary/90 p-1 text-foreground';
     block.style.position = 'relative';
     block.appendChild(button);
   });
@@ -418,7 +418,7 @@ onUnmounted(() => {
     opacity 0.2s ease-out,
     transform 0.2s ease-out;
   padding: 4px 8px;
-  background: var(--muted);
+  background: bg-background;
   color: white;
   border-radius: 4px;
   pointer-events: none;
@@ -596,22 +596,4 @@ onUnmounted(() => {
   opacity: 0.8;
 }
 
-/* 暗色模式变量覆盖 */
-/*.dark .article-content {
-  --tw-prose-invert-body: var(--foreground);
-  --tw-prose-invert-headings: var(--foreground);
-  --tw-prose-invert-links: var(--primary);
-  --tw-prose-invert-bold: var(--foreground);
-  --tw-prose-invert-counters: var(--muted-foreground);
-  --tw-prose-invert-bullets: var(--muted-foreground);
-  --tw-prose-invert-hr: var(--border);
-  --tw-prose-invert-quotes: var(--muted-foreground);
-  --tw-prose-invert-quote-borders: var(--primary);
-  --tw-prose-invert-captions: var(--muted-foreground);
-  --tw-prose-invert-code: var(--foreground);
-  --tw-prose-invert-pre-code: var(--foreground);
-  --tw-prose-invert-pre-bg: var(--muted);
-  --tw-prose-invert-th-borders: var(--border);
-  --tw-prose-invert-td-borders: var(--border);
-}*/
 </style>

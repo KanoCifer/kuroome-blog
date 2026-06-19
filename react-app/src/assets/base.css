@@ -163,15 +163,17 @@ footer {
   --color-primary: var(--workspace-accent);
   --color-primary-foreground: var(--workspace-accent-contrast);
 
-  /* Secondary / Muted */
-  --color-secondary: var(--warm-gray);
+  /* Secondary / Muted
+     --secondary: 略深于 --warm-gray,用于次要按钮 (bg-secondary)
+     --warm-gray: 共用 muted / input / 卡片底,作为"低权重表面"
+     两者拉开明度阶梯,避免按钮、卡片、输入框互相打架 */
+  --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--ink);
   --color-muted: var(--warm-gray);
   --color-muted-foreground: var(--muted-text);
 
-  /* Semantic */
-  --color-destructive: var(--accent-rose);
-  --color-border: var(--warm-gray);
+  /* Border 比 muted 再浅一档,作为描边/分割线 */
+  --color-border: var(--border-color);
   --color-input: var(--warm-gray);
   --color-ring: var(--accent-slate);
 
@@ -205,6 +207,8 @@ footer {
   --ink: oklch(0.13 0.028 261.692);
   --paper: oklch(1 0 0);
   --warm-gray: oklch(0.967 0.003 264.542);
+  --secondary: oklch(0.92 0.022 260);
+  --border-color: oklch(0.88 0.02 260);
   --muted-text: oklch(0.551 0.027 264.364);
   --accent-slate: oklch(0.707 0.022 261.325);
   --accent-rose: oklch(0.577 0.245 27.325);
@@ -255,6 +259,8 @@ footer {
   --ink: oklch(0.985 0.002 247.839);
   --paper: oklch(0.13 0.028 261.692);
   --warm-gray: oklch(0.278 0.033 256.848);
+  --secondary: oklch(0.4 0.04 258);
+  --border-color: oklch(0.24 0.025 260);
   --muted-text: oklch(0.707 0.022 261.325);
   --accent-slate: oklch(0.551 0.027 264.364);
   --accent-rose: oklch(0.704 0.191 22.216);

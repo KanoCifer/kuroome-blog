@@ -73,32 +73,80 @@ a {
   cursor: pointer;
 }
 
-/* 代码块 - macOS 风格（文章展示） */
+/* 代码块 — 主题化终端风 */
 .prose pre {
-  @apply relative my-4 overflow-hidden rounded-3xl border border-gray-200 bg-gray-800 pt-10 shadow-md dark:border-gray-700;
+  position: relative;
+  margin: 1.25rem 0;
+  padding: 2.75rem 1.25rem 1.25rem;
+  overflow: hidden;
+  overflow-x: auto;
+  border-radius: var(--radius);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklch, var(--ink) 92%, transparent),
+    color-mix(in oklch, var(--ink) 96%, transparent)
+  );
+  color: color-mix(in oklch, var(--paper) 88%, transparent);
+  font-family:
+    ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', 'Roboto Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  box-shadow:
+    inset 0 1px 0 0 color-mix(in oklch, var(--paper) 8%, transparent),
+    0 1px 2px color-mix(in oklch, var(--ink) 6%, transparent);
+  border: 1px solid color-mix(in oklch, var(--ink) 12%, transparent);
+  isolation: isolate;
 }
 
+/* 顶部 chrome bar — 三枚按钮 + 语言标签 */
 .prose pre::before {
   content: '';
-  @apply absolute inset-x-0 top-0 mb-1 flex h-10 items-center border-b border-gray-600 bg-gray-700 py-2;
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2.25rem;
+  background: color-mix(in oklch, var(--ink) 88%, transparent);
+  border-bottom: 1px solid color-mix(in oklch, var(--paper) 6%, transparent);
+  z-index: 0;
 }
 
+/* 三个细圆点 — macOS 风格红绿灯 */
 .prose pre::after {
   content: '';
   position: absolute;
-  top: 14px;
-  left: 24px;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: red;
+  top: 0.875rem;
+  left: 1rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 9999px;
+  background: var(--color-rose-500);
   box-shadow:
-    20px 0 0 #eab308,
-    40px 0 0 #22c55e;
+    1.125rem 0 0 var(--color-amber-500),
+    2.25rem 0 0 var(--color-emerald-500);
+  z-index: 1;
 }
 
+/* 代码本体 — 浮在 chrome bar 之上 */
 .prose pre code {
-  @apply mt-2 p-1 text-sm leading-relaxed text-slate-200;
+  display: block;
+  position: relative;
+  z-index: 1;
+  margin-top: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+  border: none;
+}
+
+/* 行内代码 — 与块级代码视觉区分 */
+.prose :not(pre) > code {
+  padding: 0.15em 0.4em;
+  border-radius: calc(var(--radius) - 4px);
+  background: color-mix(in oklch, var(--warm-gray) 80%, transparent);
+  color: color-mix(in oklch, var(--ink) 88%, transparent);
+  font-size: 0.875em;
+  font-weight: 500;
+  border: 1px solid color-mix(in oklch, var(--border-color) 60%, transparent);
 }
 
 :root[data-font='harmonyos'] {
@@ -181,13 +229,13 @@ a {
   --color-primary-foreground: var(--accent-contrast);
 
   /* Secondary / Muted */
-  --color-secondary: var(--warm-gray);
+  --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--ink);
   --color-muted: var(--warm-gray);
   --color-muted-foreground: var(--muted-text);
 
-  /* Semantic */
-  --color-border: var(--warm-gray);
+  /* Border */
+  --color-border: var(--border-color);
   --color-input: var(--warm-gray);
   --color-ring: var(--accent-slate);
 
@@ -198,7 +246,6 @@ a {
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
 
-  /* Extended app tokens */
   --color-surface: var(--surface);
   --color-destructive: var(--color-rose-500);
   --color-success: var(--color-emerald-500);

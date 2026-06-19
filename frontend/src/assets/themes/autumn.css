@@ -4,6 +4,8 @@
   --ink: oklch(0.2 0.05 40);
   --paper: var(--color-orange-50);
   --warm-gray: oklch(0.95 0.02 40);
+  --secondary: oklch(0.92 0.025 40);
+  --border-color: oklch(0.88 0.022 40);
   --muted-text: oklch(0.55 0.03 40);
   --accent-slate: oklch(0.7 0.03 260);
   --accent-rose: oklch(0.6 0.2 25);
@@ -27,6 +29,8 @@
   --ink: oklch(0.96 0.015 40);
   --paper: oklch(0.14 0.03 40);
   --warm-gray: oklch(0.34 0.035 40);
+  --secondary: oklch(0.4 0.045 40);
+  --border-color: oklch(0.24 0.03 40);
   --muted-text: oklch(0.78 0.025 40);
   --accent-slate: oklch(0.72 0.03 260);
   --accent-rose: oklch(0.78 0.16 25);

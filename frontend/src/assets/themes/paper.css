@@ -4,6 +4,8 @@
   --ink: #1a1613;
   --paper: oklch(0.97 0.013 50);
   --warm-gray: oklch(0.95 0.018 50);
+  --secondary: oklch(0.92 0.022 50);
+  --border-color: oklch(0.88 0.02 50);
   --muted-text: #9a918a;
   --accent-slate: #5a6b7a;
   --accent-rose: #b35a5a;
@@ -27,6 +29,8 @@
   --ink: #ede5dc;
   --paper: #14100d;
   --warm-gray: #3e3225;
+  --secondary: #4a3c2d;
+  --border-color: #2c231a;
   --muted-text: #b0a89e;
   --accent-slate: #8a9baa;
   --accent-rose: #d49a9a;
