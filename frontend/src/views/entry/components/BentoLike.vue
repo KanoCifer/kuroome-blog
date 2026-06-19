@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { socialGateway } from '@/api/socialGateway';
+import { socialGateway } from '@/api/blog';
 import { useNotificationStore } from '@/stores/notification';
 import { AxiosError } from 'axios';
 import type { AnimationItem } from 'lottie-web';

@@ -1,4 +1,4 @@
-import type { ReadDetailSnapshot } from '@/api/wereadGateway';
+import type { ReadDetailSnapshot } from '@/api/weread';
 import type { ComputedRef, Ref } from 'vue';
 import { computed } from 'vue';
 

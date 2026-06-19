@@ -212,7 +212,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ReadStatsMode } from '@/api/wereadGateway';
+import type { ReadStatsMode } from '@/api/weread';
 import { useReadStatsStore } from '@/stores/readStats';
 import { formatDuration } from '@/utils/format/duration';
 import PageHero from '@/components/shared/PageHero.vue';

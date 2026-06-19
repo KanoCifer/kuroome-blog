@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { blogGateway } from '@/api/blogGateway';
+import { blogGateway } from '@/api/public';
 import IconTags from '@/components/icons/IconTags.vue';
 import type { Category, CategoryResponseItem, Post } from '@/types';
 import { onMounted, ref, watch } from 'vue';

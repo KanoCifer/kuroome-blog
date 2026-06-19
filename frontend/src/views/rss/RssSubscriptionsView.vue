@@ -78,7 +78,7 @@ import { BasicDetail } from '@/components/basic';
 import RssParseSection from './components/RssParseSection.vue';
 import RssSubscriptionsSection from './components/RssSubscriptionsSection.vue';
 import RssArticlesSection from './components/RssArticlesSection.vue';
-import type { SubscriptionItem } from '@/api/rssGateway';
+import type { SubscriptionItem } from '@/api/rss';
 
 const route = useRoute();
 

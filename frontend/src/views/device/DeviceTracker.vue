@@ -190,8 +190,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Device, DeviceInput } from '@/api/deviceGateway';
-import { deviceGateway } from '@/api/deviceGateway';
+import type { Device, DeviceInput } from '@/api/shared';
+import { deviceGateway } from '@/api/shared';
 import { useNotificationStore } from '@/stores/notification';
 import { ref } from 'vue';
 

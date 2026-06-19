@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ReadStatsMode } from '@/api/wereadGateway';
+import type { ReadStatsMode } from '@/api/weread';
 import dayjs from 'dayjs';
 import { ref, toRef } from 'vue';
 import {

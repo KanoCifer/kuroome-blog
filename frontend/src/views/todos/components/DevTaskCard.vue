@@ -206,7 +206,7 @@
 </template>
 
 <script setup lang="ts">
-import type { DevTask, DevTaskPriority } from '@/api/todoGateway';
+import type { DevTask, DevTaskPriority } from '@/api/todo';
 import { STATUS_LABELS } from '@/stores/todos';
 import { ref } from 'vue';
 import ActionsSlot from './DevTaskCardActions.vue';

@@ -65,7 +65,7 @@ import { ChevronRight } from '@lucide/vue';
 import dayjs from 'dayjs';
 import { computed, h } from 'vue';
 import { useRouter } from 'vue-router';
-import type { ReadDetailSnapshot } from '@/api/wereadGateway';
+import type { ReadDetailSnapshot } from '@/api/weread';
 import { formatDuration } from '@/utils/format/duration';
 import { formatRelative } from '@/utils/format/relative';
 

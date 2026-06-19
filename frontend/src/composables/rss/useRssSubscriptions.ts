@@ -1,4 +1,4 @@
-import { rssGateway, type SubscriptionItem } from '@/api/rssGateway';
+import { rssGateway, type SubscriptionItem } from '@/api/rss';
 import { useNotificationStore } from '@/stores/notification';
 import { getSubscriptionTitle } from '@/views/rss/rssUtils';
 import { ref } from 'vue';

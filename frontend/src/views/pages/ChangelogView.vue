@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { motion } from 'motion-v';
-import { changelogGateway, type Changelog } from '@/api/changelogGateway';
+import { changelogGateway, type Changelog } from '@/api/public';
 
 const changelog = ref<Changelog[]>([]);
 

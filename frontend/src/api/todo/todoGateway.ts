@@ -1,4 +1,4 @@
-import request from '@/api/request';
+import request from '@/api/shared/request';
 
 export type DevTaskPriority = 'low' | 'high' | 'default';
 export type DevTaskStatus = 'todo' | 'in-progress' | 'done';

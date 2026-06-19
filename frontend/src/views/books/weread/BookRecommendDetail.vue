@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { BookRecommendItem } from '@/api/wereadGateway';
+import type { BookRecommendItem } from '@/api/weread';
 import { AnimatePresence, Motion } from 'motion-v';
 import { onMounted, onUnmounted, watch } from 'vue';
 import { RECOMMEND_COVER_LAYOUT_ID_PREFIX } from './recommendLayoutId';

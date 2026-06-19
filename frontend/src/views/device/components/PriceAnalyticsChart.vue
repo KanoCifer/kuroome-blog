@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import { useChartColors } from '@/composables/shared';
-import type { Device } from '@/api/deviceGateway';
+import type { Device } from '@/api/shared';
 import { computed } from 'vue';
 import VChart from 'vue-echarts';
 

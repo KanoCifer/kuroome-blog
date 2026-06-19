@@ -1,4 +1,4 @@
-import request from './request';
+import request from '@/api/shared/request';
 
 export interface ChangelogItem {
   type: string;

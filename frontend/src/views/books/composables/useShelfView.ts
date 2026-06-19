@@ -14,7 +14,7 @@
  *
  * `searchQuery` 故意不持久化 — 它是会话级状态,刷新即清空符合预期。
  */
-import type { WereadUserBook } from '@/api/wereadGateway';
+import type { WereadUserBook } from '@/api/weread';
 import dayjs from 'dayjs';
 import { computed, ref, watch, type Ref } from 'vue';
 

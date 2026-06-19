@@ -1,5 +1,5 @@
-import request from '@/api/request';
-import type { ApiResponse } from '@/api/request';
+import request from '@/api/shared/request';
+import type { ApiResponse } from '@/api/shared/request';
 
 export interface VersionInfo {
   repo_url: string;

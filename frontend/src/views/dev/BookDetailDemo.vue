@@ -5,7 +5,7 @@ import {
   wereadGateway,
   type WereadBookProgress,
   type WereadUserBook,
-} from '@/api/wereadGateway';
+} from '@/api/weread';
 import WereadBookCard from '@/views/books/weread/WereadBookCard.vue';
 import WereadBookDetailPanel from '@/views/books/weread/WereadBookDetailPanel.vue';
 import { useWereadBookDetailSingleton } from '@/views/books/composables/useWereadBookDetailSingleton';

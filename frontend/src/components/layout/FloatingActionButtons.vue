@@ -392,7 +392,7 @@
 
 <script setup lang="ts">
 import { IconTooling, RssIcon } from '@/components/icons';
-import { socialGateway } from '@/api/socialGateway';
+import { socialGateway } from '@/api/blog';
 import { useCardLayoutStore } from '@/stores/cardLayout';
 import { useNotificationStore } from '@/stores/notification';
 import SettingIcon from '@/components/icons/SettingIcon.vue';

@@ -165,9 +165,9 @@
 </template>
 
 <script setup lang="ts">
-import { deviceGateway } from '@/api/deviceGateway';
+import { deviceGateway } from '@/api/shared';
 import { useNotificationStore } from '@/stores/notification';
-import type { DeviceInput } from '@/api/deviceGateway';
+import type { DeviceInput } from '@/api/shared';
 import { reactive, ref, watch } from 'vue';
 import dayjs from 'dayjs';
 

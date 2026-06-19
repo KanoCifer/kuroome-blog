@@ -27,7 +27,7 @@
  * - `clearAfterClose()` 在 @after-leave 钩子里清空 selectedBook
  */
 import { computed, ref } from 'vue';
-import type { WereadUserBook } from '@/api/wereadGateway';
+import type { WereadUserBook } from '@/api/weread';
 
 const _selectedBook = ref<WereadUserBook | null>(null);
 const _isOpen = ref(false);

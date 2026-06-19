@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronRight } from '@lucide/vue';
-import type { WereadUserBook } from '@/api/wereadGateway';
+import type { WereadUserBook } from '@/api/weread';
 import dayjs from 'dayjs';
 import { computed } from 'vue';
 import { deterministicCoverGradient } from './utils/format';

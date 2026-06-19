@@ -2,7 +2,7 @@ import type {
   CreateSubscriptionPayload,
   Subscription,
   UpdateSubscriptionPayload,
-} from '@/api/subscriptionGateway';
+} from '@/api/rss';
 import type {
   ReminderFormState,
   SubscriptionFormState,

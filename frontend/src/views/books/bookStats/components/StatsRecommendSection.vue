@@ -157,7 +157,7 @@
 </template>
 
 <script setup lang="ts">
-import type { BookRecommendItem } from '@/api/wereadGateway';
+import type { BookRecommendItem } from '@/api/weread';
 import { Motion } from 'motion-v';
 import { computed } from 'vue';
 import BookRecommendGrid from '@/views/books/weread/BookRecommendGrid.vue';

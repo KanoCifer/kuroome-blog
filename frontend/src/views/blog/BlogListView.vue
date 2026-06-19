@@ -420,7 +420,7 @@
 
 <script setup lang="ts">
 import BasicDetail from '@/components/basic/BasicDetail.vue';
-import { blogGateway } from '@/api/blogGateway';
+import { blogGateway } from '@/api/public';
 import { useNotificationStore } from '@/stores/notification';
 import type { BlogPagination, Category, Post } from '@/types';
 import BentoCalendar from '@/views/entry/components/BentoCalendar.vue';

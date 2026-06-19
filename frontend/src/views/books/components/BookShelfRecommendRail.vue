@@ -113,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import type { BookRecommendItem } from '@/api/wereadGateway';
+import type { BookRecommendItem } from '@/api/weread';
 import { ArrowRight, RefreshCw, Star } from '@lucide/vue';
 import { Motion } from 'motion-v';
 import BookRecommendGrid from '@/views/books/weread/BookRecommendGrid.vue';

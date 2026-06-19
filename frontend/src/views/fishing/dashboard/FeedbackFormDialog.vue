@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { fishingGateway } from '@/api/fishingGateway';
+import { fishingGateway } from '@/api/fishing';
 import { useNotificationStore } from '@/stores/notification';
 import type {
   FishingFeedbackData,

@@ -1,4 +1,4 @@
-import request from '@/api/request';
+import request from '@/api/shared/request';
 
 /** 订阅数据类型 */
 export interface Subscription {

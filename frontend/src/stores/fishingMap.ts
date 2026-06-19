@@ -1,5 +1,5 @@
-import { fishingGateway } from '@/api/fishingGateway';
-import { weatherGateway } from '@/api/weatherGateway';
+import { fishingGateway } from '@/api/fishing';
+import { weatherGateway } from '@/api/fishing';
 import { useNotificationStore } from '@/stores/notification';
 import { useSequencedTask } from '@/composables/shared';
 import type { FishingIndexData } from '@/types/fishing';

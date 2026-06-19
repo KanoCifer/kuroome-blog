@@ -1,4 +1,4 @@
-import request from '@/api/request';
+import request from '@/api/shared/request';
 
 export interface UploadGateway {
   uploadEditorImage(formData: FormData): Promise<{ url: string }>;

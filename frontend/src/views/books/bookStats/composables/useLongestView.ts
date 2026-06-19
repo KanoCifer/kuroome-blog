@@ -1,7 +1,7 @@
 import type {
   ReadDetailRawLongestItem,
   ReadDetailSnapshot,
-} from '@/api/wereadGateway';
+} from '@/api/weread';
 import type { ComputedRef, Ref } from 'vue';
 import { computed } from 'vue';
 

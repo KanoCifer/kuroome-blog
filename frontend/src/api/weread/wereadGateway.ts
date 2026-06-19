@@ -1,4 +1,4 @@
-import request, { type ApiResponse } from '@/api/request';
+import request, { type ApiResponse } from '@/api/shared/request';
 
 export interface WereadUserInfo {
   user_id: number;

@@ -4,7 +4,7 @@ import {
   type BookRecommendItem,
   type ReadDetailSnapshot,
   type ReadStatsMode,
-} from '@/api/wereadGateway';
+} from '@/api/weread';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 

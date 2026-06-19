@@ -1,8 +1,8 @@
-import { momentsGateway } from '@/api/momentsGateway';
+import { momentsGateway } from '@/api/moments';
 import type {
   ListAdminMomentsParams,
   ListPublicMomentsParams,
-} from '@/api/momentsGateway';
+} from '@/api/moments';
 import type {
   Moment,
   MomentCreatePayload,

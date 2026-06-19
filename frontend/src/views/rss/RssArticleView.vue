@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { rssGateway } from '@/api/rssGateway';
+import { rssGateway } from '@/api/rss';
 import BasicDetail from '@/components/basic/BasicDetail.vue';
 import ArticleSummaryCard from '@/components/blog/ArticleSummaryCard.vue';
 import { useNotificationStore } from '@/stores/notification';

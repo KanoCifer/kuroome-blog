@@ -2,9 +2,9 @@
 import type {
   Subscription,
   TestNotificationPayload,
-} from '@/api/subscriptionGateway';
+} from '@/api/rss';
 import BasicDetail from '@/components/basic/BasicDetail.vue';
-import { subscriptionGateway } from '@/api/subscriptionGateway';
+import { subscriptionGateway } from '@/api/rss';
 import { useNotificationStore } from '@/stores/notification';
 import { formatDate } from '@/utils/formatdate';
 import ReminderConfigModal from '@/views/subscription/components/ReminderConfigModal.vue';

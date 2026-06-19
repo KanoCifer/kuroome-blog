@@ -442,7 +442,7 @@
 </template>
 
 <script setup lang="ts">
-import { deviceGateway, type Device } from '@/api/deviceGateway';
+import { deviceGateway, type Device } from '@/api/shared';
 import { useNotificationStore } from '@/stores/notification';
 import { reactive, ref, watch, onMounted } from 'vue';
 

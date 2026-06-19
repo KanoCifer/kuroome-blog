@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ReadDetailSnapshot, ReadStatsMode } from '@/api/wereadGateway';
+import type { ReadDetailSnapshot, ReadStatsMode } from '@/api/weread';
 import { formatDuration } from '@/utils/format/duration';
 import { computed, toRef } from 'vue';
 import VChart from 'vue-echarts';

@@ -1,4 +1,4 @@
-import { wereadGateway, type WereadUserBook } from '@/api/wereadGateway';
+import { wereadGateway, type WereadUserBook } from '@/api/weread';
 import { computed, ref } from 'vue';
 
 /**

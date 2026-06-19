@@ -454,7 +454,7 @@
 <script setup lang="ts">
 import BasicDetail from '@/components/basic/BasicDetail.vue';
 import IconUser from '@/components/icons/IconUser.vue';
-import { analyticsGateway } from '@/api/analyticsGateway';
+import { analyticsGateway } from '@/api/shared';
 import { useAuthStore } from '@/auth/stores/auth';
 import dayjs from 'dayjs';
 import { computed, onMounted, ref, watch } from 'vue';

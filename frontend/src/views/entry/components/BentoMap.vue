@@ -72,7 +72,7 @@
 import BentoCard from '@/components/bento/BentoCard.vue';
 import { useAnimateNumber } from '@/composables/shared';
 import fishingSpots from '@/data/fishing-spots.json';
-import { fishingGateway } from '@/api/fishingGateway';
+import { fishingGateway } from '@/api/fishing';
 import { DEFAULT_MAP_CENTER, useFishingMapStore } from '@/stores/fishingMap';
 import type { TideData } from '@/types/weather';
 import { formatRelative } from '@/utils/format/relative';

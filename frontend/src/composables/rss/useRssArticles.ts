@@ -1,4 +1,4 @@
-import { rssGateway } from '@/api/rssGateway';
+import { rssGateway } from '@/api/rss';
 import type { RssArticle } from '@/types';
 import { useNotificationStore } from '@/stores/notification';
 import { computed, ref } from 'vue';

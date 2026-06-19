@@ -3,7 +3,7 @@ import {
   type CreateDevTaskPayload,
   type DevTask,
   type DevTaskStatus,
-} from '@/api/todoGateway';
+} from '@/api/todo';
 import { useAuthStore } from '@/auth/stores/auth';
 import { useNotificationStore } from '@/stores/notification';
 import { useStorage } from '@vueuse/core';

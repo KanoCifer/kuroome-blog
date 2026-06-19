@@ -2,8 +2,8 @@
 import BasicDetail from '@/components/basic/BasicDetail.vue';
 import MarkdownEditor from '@/components/editor/MarkdownEditor.vue';
 import IconSave from '@/components/icons/IconSave.vue';
-import { blogGateway } from '@/api/blogGateway';
-import { uploadGateway } from '@/api/uploadGateway';
+import { blogGateway } from '@/api/public';
+import { uploadGateway } from '@/api/blog';
 import { useNotificationStore } from '@/stores/notification';
 import type { Category, CategoryResponseItem } from '@/types';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';

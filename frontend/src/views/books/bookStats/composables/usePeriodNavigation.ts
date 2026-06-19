@@ -1,4 +1,4 @@
-import type { ReadStatsMode } from '@/api/wereadGateway';
+import type { ReadStatsMode } from '@/api/weread';
 import type { useReadStatsStore } from '@/stores/readStats';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';

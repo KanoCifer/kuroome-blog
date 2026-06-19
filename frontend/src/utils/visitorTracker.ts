@@ -1,4 +1,4 @@
-import { analyticsGateway } from '@/api/analyticsGateway';
+import { analyticsGateway } from '@/api/shared';
 import { useStorage } from '@vueuse/core';
 import { UAParser } from 'ua-parser-js';
 import { v4 } from 'uuid';

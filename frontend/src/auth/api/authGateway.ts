@@ -1,4 +1,4 @@
-import request from '@/api/request';
+import request from '@/api/shared/request';
 import type { UserInfo } from '@/auth/types';
 import type { AxiosResponse } from 'axios';
 import type {

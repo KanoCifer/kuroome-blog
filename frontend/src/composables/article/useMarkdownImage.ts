@@ -1,5 +1,5 @@
 import { onBeforeUnmount, ref } from 'vue';
-import { uploadGateway } from '@/api/uploadGateway';
+import { uploadGateway } from '@/api/blog';
 
 export function useMarkdownImage() {
   const blobFileMap = ref<Map<string, File>>(new Map());

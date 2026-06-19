@@ -2,7 +2,7 @@
 import { computed, watch } from 'vue';
 import { BookOpen, Eye, EyeOff, RefreshCw, X } from '@lucide/vue';
 import { AnimatePresence, motion } from 'motion-v';
-import type { WereadBookProgress, WereadUserBook } from '@/api/wereadGateway';
+import type { WereadBookProgress, WereadUserBook } from '@/api/weread';
 import { useWereadBookProgress } from '../composables/useWereadBookProgress';
 import {
   deterministicCoverGradient,

@@ -61,7 +61,7 @@
 <script setup lang="ts">
 import BentoCard from '@/components/bento/BentoCard.vue';
 import { useAnimateNumber } from '@/composables/shared';
-import { wereadGateway } from '@/api/wereadGateway';
+import { wereadGateway } from '@/api/weread';
 import { useReadStatsStore } from '@/stores/readStats';
 import { formatDuration } from '@/utils/format/duration';
 import { BookOpen } from '@lucide/vue';

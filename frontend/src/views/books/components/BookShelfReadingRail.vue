@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import type { WereadUserBook } from '@/api/wereadGateway';
+import type { WereadUserBook } from '@/api/weread';
 import WereadBookCard from '@/views/books/weread/WereadBookCard.vue';
 import { formatRelative } from '@/utils/format/relative';
 import { onBeforeUnmount, onMounted, ref } from 'vue';

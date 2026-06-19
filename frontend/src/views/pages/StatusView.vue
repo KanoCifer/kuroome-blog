@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { connectionDelay, isConnected, sendPing } from '@/plugins/visitorWs';
 import { useVisitorCountStore } from '@/stores/visitorCount';
-import { fetchStatusDetail, type StatusDetailData } from '@/api/statusGateway';
+import { fetchStatusDetail, type StatusDetailData } from '@/api/shared';
 import { computed, onMounted, onUnmounted, ref, watchEffect } from 'vue';
 import { motion } from 'motion-v';
 import VChart from 'vue-echarts';

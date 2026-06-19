@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { BookRecommendItem } from '@/api/wereadGateway';
+import type { BookRecommendItem } from '@/api/weread';
 import { computed, ref } from 'vue';
 import BookRecommendDetail from './BookRecommendDetail.vue';
 
