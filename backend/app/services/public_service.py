@@ -4,7 +4,6 @@ import base64
 from xml.etree.ElementTree import Element, SubElement
 
 import httpx2
-import orjson
 from redis.asyncio import Redis as AsyncRedis
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -150,30 +149,6 @@ Sitemap: {sitemap_url}
         settings = get_settings()
         security_code = settings.AMAP_SECURITY_CODE
         return base64.b64encode(security_code.encode()).decode()
-
-    @staticmethod
-    async def get_weather(
-        redis: AsyncRedis,
-        city: str,
-        extensions: str,
-    ) -> tuple[dict, bool]:
-        cache_key = f"weather:{city}:{extensions}"
-        cached_data = await redis.get(cache_key)
-        if cached_data:
-            return orjson.loads(cached_data), True
-
-        url = "https://restapi.amap.com/v3/weather/weatherInfo"
-        params = {
-            "key": get_settings().AMAP_WEB_KEY,
-            "city": city,
-            "extensions": extensions,
-        }
-        async with httpx2.AsyncClient() as client:
-            response = await client.get(url, params=params)
-            data = response.json()
-
-        await redis.set(cache_key, orjson.dumps(data), ex=60 * 60)
-        return data, False
 
     @staticmethod
     async def reverse_geocode(location: str, extensions: str) -> dict:
