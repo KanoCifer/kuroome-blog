@@ -243,7 +243,7 @@ Sitemap: {sitemap_url}
         if self.gallery_repo is None:
             return []
 
-        db_images = await self.gallery_repo.list_all()
+        db_images: list[GalleryImage] = await self.gallery_repo.list_all()
         return [self._serialize_gallery_image(img) for img in db_images]
 
     @staticmethod
