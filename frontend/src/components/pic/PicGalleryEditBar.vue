@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-background/70 fixed bottom-4 left-1/2 z-30 w-fit -translate-x-1/2 transform"
+    class="fixed bottom-4 left-1/2 z-30 w-fit -translate-x-1/2"
   >
     <div class="flex items-center gap-3">
       <Button
@@ -14,16 +14,13 @@
         <component :is="isEditMode ? Check : Edit2" class="h-4 w-4" />
         {{ isEditMode ? '完成编辑' : '编辑模式' }}
       </Button>
-      <Button
-        key="shuffle-btn"
-        variant="outline"
-        size="sm"
+      <button
         @click="$emit('shuffle')"
-        class="border-border/60 h-9 gap-2 rounded-full px-4 shadow-sm"
+        class="border-border/60 h-9 gap-2 text-primary-foreground rounded-lg px-4 shadow-sm bg-secondary flex items-center"
       >
         <Shuffle class="h-4 w-4" />
         重排
-      </Button>
+      </button>
       <Transition
         enter-active-class="transition-all  duration-300 ease-in-out"
         enter-from-class="translate-x-full opacity-0"

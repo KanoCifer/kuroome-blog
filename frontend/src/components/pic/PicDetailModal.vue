@@ -1,13 +1,24 @@
 <template>
   <Teleport to="body">
+    <motion.div
+      v-if="image"
+      :initial="{ opacity: 0, backdropFilter: 'blur(0px)' }"
+      :animate="{ opacity: 1, backdropFilter: 'blur(8px)' }"
+      :transition="{ duration: 0.3 }"
+      class="fixed inset-0 bg-black/45"
+    >
+    </motion.div>
+  </Teleport>
+  <Teleport to="body">
     <transition
-      enter-active-class="transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+      enter-active-class="transition-all duration-300 ease-out"
       enter-from-class="opacity-0"
       enter-to-class="opacity-100"
-      leave-active-class="transition-all duration-200 ease-in"
+      leave-active-class="transition-all duration-300 ease-in"
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
+
       <div
         v-if="image"
         class="fixed inset-0 z-9999 flex items-center justify-center p-4 md:p-8"
@@ -21,11 +32,11 @@
           role="dialog"
           aria-modal="true"
           aria-labelledby="pdm-title"
-          class="bg-card text-card-foreground border-border/60 relative z-10 grid w-full max-w-5xl overflow-hidden rounded-2xl border shadow-[0_12px_32px_color-mix(in_oklch,var(--ink)_10%,transparent)] backdrop-blur-2xl md:grid-cols-[1.45fr_1fr]"
+          class="bg-card text-card-foreground border-border/60 relative z-10 grid w-full max-w-5xl overflow-hidden rounded-2xl border shadow-[0_12px_32px_color-mix(in_oklch,var(--ink)_10%,transparent)]  md:grid-cols-[1.45fr_1fr]"
         >
           <!-- ============= 左侧：胶片查看 ============= -->
           <section
-            class="bg-muted/40 relative flex min-h-0 flex-col gap-4 p-8 pb-6"
+            class="bg-muted/80 relative flex min-h-0 flex-col gap-4 p-8 pb-6"
             aria-label="胶片查看区"
           >
             <header class="flex items-center justify-between gap-3">
@@ -49,7 +60,7 @@
             </header>
 
             <figure
-              class="bg-warm-gray relative aspect-[4/3] min-h-[320px] flex-1 overflow-hidden rounded-[14px] shadow-[0_14px_36px_color-mix(in_oklch,var(--ink)_18%,transparent)] ring-1 ring-[color-mix(in_oklch,var(--ink)_12%,transparent)]"
+              class="bg-secondary relative aspect-[4/3] min-h-[320px] flex-1 overflow-hidden rounded-[14px] shadow-[0_14px_36px_color-mix(in_oklch,var(--ink)_18%,transparent)] ring-1 ring-[color-mix(in_oklch,var(--ink)_12%,transparent)]"
               role="img"
               :aria-label="image.description || '胶片照片'"
             >
@@ -158,7 +169,7 @@
 
           <!-- ============= 右侧：元数据 ============= -->
           <section
-            class="bg-card flex min-h-0 flex-col gap-5 p-8 pb-6"
+            class="bg-muted flex min-h-0 flex-col gap-5 p-8 pb-6"
             aria-label="图片信息"
           >
             <header class="flex items-center justify-between">
@@ -325,7 +336,7 @@
               <p
                 v-else
                 :class="[
-                  'min-h-24 rounded-xl border border-dashed px-4 py-3.5 text-[18px] leading-[1.55] whitespace-pre-wrap',
+                  'min-h-24 rounded-xl border border-dashed px-4 py-3.5 text-[18px] leading-[1.55] whitespace-pre-wrap font-family-dongfang',
                   isEmpty
                     ? 'text-muted-foreground/70 grid place-items-center text-center italic'
                     : 'text-foreground/90',
@@ -356,7 +367,7 @@
             <div class="mt-auto flex items-center gap-2.5 pt-2">
               <button
                 type="button"
-                class="text-ink/70 hover:text-ink hover:bg-ink/[0.04] inline-flex items-center gap-2 rounded-full border border-[color-mix(in_oklch,var(--ink)_14%,transparent)] bg-transparent px-[18px] py-2.5 text-[13.5px] font-medium tracking-[0.01em] transition-colors hover:border-[color-mix(in_oklch,var(--ink)_30%,transparent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+                class="text-ink/70 hover:text-ink hover:bg-primary inline-flex items-center gap-2 rounded-full border border-[color-mix(in_oklch,var(--ink)_14%,transparent)] bg-transparent px-[18px] py-2.5 text-[13.5px] font-medium tracking-[0.01em] transition-colors hover:border-[color-mix(in_oklch,var(--ink)_30%,transparent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
                 style="min-height: 36px"
                 aria-label="复制图片信息"
                 @click="onCopy"
@@ -403,7 +414,7 @@
 
               <button
                 type="button"
-                class="bg-ink text-paper ml-auto inline-flex items-center gap-2 rounded-full border border-[color:var(--ink)] px-[18px] py-2.5 text-[13.5px] font-medium tracking-[0.01em] transition-colors hover:bg-[color-mix(in_oklch,var(--ink)_90%,var(--accent))] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+                class="bg-secondary text-paper ml-auto inline-flex items-center gap-2 rounded-full border border-[color:var(--ink)] px-[18px] py-2.5 text-[13.5px] font-medium tracking-[0.01em] transition-colors hover:bg-[color-mix(in_oklch,var(--ink)_90%,var(--accent))] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
                 style="min-height: 36px"
                 :aria-label="
                   editable && isEditing ? '保存对描述的修改' : '确认'

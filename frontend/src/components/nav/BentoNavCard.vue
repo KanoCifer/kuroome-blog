@@ -87,7 +87,6 @@ const props = defineProps<{
 const userMenuItems: DropdownItem[] = [
   { icon: IconUser, label: 'Profile', to: '/settings' },
   { icon: ImportIcon, label: 'Import', to: '/import' },
-  { icon: MessageIcon, label: 'Messages', to: '/messages', adminOnly: true },
   {
     icon: IconAnalytics,
     label: 'Analytics',

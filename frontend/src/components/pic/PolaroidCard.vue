@@ -220,8 +220,8 @@ const onClick = (e: MouseEvent) => {
   z-index: 1;
 }
 
-:global(.dark) .polaroid::before {
+/*:global(.dark) .polaroid::before {
   background: color-mix(in oklch, var(--paper) 3%, transparent);
   mix-blend-mode: screen;
-}
+}*/
 </style>
