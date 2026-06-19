@@ -26,14 +26,12 @@ export const usePolaroidLayout = ({ images }: UsePolaroidLayoutOptions) => {
     layoutSeeds.value.clear();
     maxZIndex.value = images.value.length;
     images.value.forEach((_, index) => {
-      // Keep them roughly within the center but scattered
-      const xRange = Math.random() * 60 + 10; // 10-70% from left
-      const yRange = Math.random() * 50 + 10; // 10-60% from top
-
+      // 以容器中心为基准的小幅随机偏移，形成"堆"而非"撒"
+      // x/y 均值 50%（几何中心），±12% 抖动保证集中在中间
       layoutSeeds.value.set(index, {
-        x: xRange,
-        y: yRange,
-        rotation: (Math.random() - 0.5 ) *10 ,
+        x: 50 + (Math.random() - 0.5) * 24, // 38-62% from left
+        y: 50 + (Math.random() - 0.5) * 20, // 40-60% from top
+        rotation: (Math.random() - 0.5) * 24, // ±12°, 更接近随手散落的手感
         zIndex: index + 1,
       });
     });
@@ -60,6 +58,9 @@ export const usePolaroidLayout = ({ images }: UsePolaroidLayoutOptions) => {
     return {
       left: `${seed.x}%`,
       top: `${seed.y}%`,
+      // 用独立 CSS `translate` 属性做居中补偿，而非 `transform`
+      // motion-v 的 animate.rotate 走 transform，二者叠加不冲突
+      translate: '-50% -50%',
       zIndex: seed.zIndex,
     };
   };
