@@ -1,7 +1,6 @@
 from app.services.admin_service import AdminService
 from app.services.ai_service import AiService
 from app.services.blog_service import BlogService
-from app.services.message_service import MessageService
 from app.services.monitor_service import MonitorService
 from app.services.public_service import PublicService
 from app.services.rss_service import RssService
@@ -14,7 +13,6 @@ __all__ = [
     "AdminService",
     "AiService",
     "BlogService",
-    "MessageService",
     "MonitorService",
     "PublicService",
     "RssService",

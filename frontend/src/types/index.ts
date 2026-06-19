@@ -110,16 +110,6 @@ export interface RegisterForm {
   emailCode?: string;
 }
 
-// 留言板类型定义（管理界面用）
-export interface Message {
-  id: string;
-  name: string;
-  message: string;
-  created_at: string;
-  review: number;
-  from_admin?: boolean;
-}
-
 // 目录项类型定义
 export interface TocItem {
   id: string;

@@ -186,12 +186,6 @@ const router = createRouter({
       },
     },
     {
-      path: '/messages',
-      name: 'message-manage',
-      component: () => import('@/views/messages/MessageManageView.vue'),
-      meta: { requiresAuth: true },
-    },
-    {
       path: '/settings',
       name: 'settings',
       component: () => import('@/views/auth/ProfileSettingView.vue'),

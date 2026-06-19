@@ -9,7 +9,6 @@ from app.core.container import (
     get_devtask_service,
     get_fishing_service,
     get_friendlink_service,
-    get_message_service,
     get_moment_service,
     get_monitor_service,
     get_notification_service,
@@ -40,11 +39,6 @@ async def admin_service_dep():
 
 async def blog_service_dep():
     async with get_blog_service() as service:
-        yield service
-
-
-async def message_service_dep():
-    async with get_message_service() as service:
         yield service
 
 

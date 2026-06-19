@@ -33,13 +33,6 @@ from app.schemas.category import CategoriesOut, CategoryOut
 from app.schemas.devtask import DevTaskCreate, DevTaskOut, DevTaskUpdate
 from app.schemas.email import BootstrapEmailContent, EmailCodeContent
 from app.schemas.feishu import FeishuMessageContent, FeishuRichTextContent
-from app.schemas.message import (
-    AdminMessageOut,
-    AdminMessagesOut,
-    MessageIn,
-    MessageOut,
-    MessagesOut,
-)
 from app.schemas.moment import (
     MomentAttachmentIn,
     MomentAttachmentOut,
@@ -67,8 +60,6 @@ from app.schemas.user import (
 )
 
 __all__ = [
-    "AdminMessageOut",
-    "AdminMessagesOut",
     "ArticleSummaryRequest",
     "BlogIn",
     "BlogPostDelete",
@@ -93,9 +84,6 @@ __all__ = [
     "ImageUploadOut",
     "LoginIn",
     "LoginOut",
-    "MessageIn",
-    "MessageOut",
-    "MessagesOut",
     "MomentAttachmentIn",
     "MomentAttachmentOut",
     "MomentCreate",

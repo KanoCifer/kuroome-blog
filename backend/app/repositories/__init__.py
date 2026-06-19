@@ -5,7 +5,6 @@ from app.repositories.devtask_repo import DevTaskRepo
 from app.repositories.fishing_repo import FishingRepo
 from app.repositories.friendlink_repo import FriendLinkRepo
 from app.repositories.gallery_repo import GalleryRepo
-from app.repositories.message_repo import MessageRepo
 from app.repositories.moment_repo import MomentRepo
 from app.repositories.monitor_repo import MonitorRepo
 from app.repositories.notification_repo import NotificationRepo
@@ -23,7 +22,6 @@ __all__ = [
     "FishingRepo",
     "FriendLinkRepo",
     "GalleryRepo",
-    "MessageRepo",
     "MomentRepo",
     "MonitorRepo",
     "NotificationRepo",

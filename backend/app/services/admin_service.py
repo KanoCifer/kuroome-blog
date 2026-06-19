@@ -7,7 +7,6 @@ from bson.errors import InvalidId
 
 from app.core.exceptions import AdminDomainError
 from app.models.blog import Post
-from app.models.message import MessageBoard
 from app.repositories.admin_repo import AdminRepo
 
 
@@ -96,58 +95,3 @@ class AdminService:
             raise AdminDomainError("Blog post not found", 404)
         await self.repo.delete_post_by_id(oid)
         await self.cache.clear()
-
-    async def get_admin_messages(self) -> dict[str, list[dict]]:
-        try:
-            pending_messages = await self.repo.list_messages(review=0)
-            approved_messages = await self.repo.list_messages(
-                review=1,
-                limit=50,
-            )
-        except Exception as exc:
-            raise AdminDomainError(
-                f"Failed to retrieve messages: {exc!s}",
-                500,
-            ) from exc
-
-        def format_message(msg: MessageBoard) -> dict:
-            return {
-                "id": str(msg.id),
-                "name": msg.name,
-                "message": msg.message,
-                "created_at": msg.created_at,
-                "review": msg.review if hasattr(msg, "review") else 0,
-            }
-
-        return {
-            "pending": [format_message(msg) for msg in pending_messages],
-            "approved": [format_message(msg) for msg in approved_messages],
-        }
-
-    async def approve_message(self, *, message_id: str) -> None:
-        try:
-            oid = ObjectId(message_id)
-        except Exception as exc:
-            raise AdminDomainError("Invalid message ID.", 400) from exc
-
-        msg = await self.repo.get_message_by_id(oid)
-        if not msg:
-            raise AdminDomainError("Message not found.", 404)
-
-        msg.review = 1
-        await self.repo.save_message(msg)
-
-    async def delete_message(self, *, message_id: str) -> None:
-        try:
-            oid = ObjectId(message_id)
-        except Exception as exc:
-            raise AdminDomainError("Invalid message ID.", 400) from exc
-
-        try:
-            await self.repo.delete_message_by_id(oid)
-            await self.cache.clear()
-        except Exception as exc:
-            raise AdminDomainError(
-                f"Failed to delete message: {exc!s}",
-                500,
-            ) from exc

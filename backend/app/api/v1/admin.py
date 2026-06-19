@@ -111,44 +111,6 @@ async def delete_post(
     )
 
 
-# =============================================================================
-# Message Board Management Endpoints
-# =============================================================================
-
-
-@router.get("/messages")
-async def get_admin_messages(
-    current_user: User = Depends(get_admin_user),
-    admin_service: AdminService = Depends(admin_service_dep),
-):
-    payload = await admin_service.get_admin_messages()
-
-    return APIResponse(
-        data=payload,
-        message="Messages retrieved successfully",
-    )
-
-
-@router.post("/messages/{message_id}/approve")
-async def approve_message(
-    message_id: str,
-    current_user: User = Depends(get_admin_user),
-    admin_service: AdminService = Depends(admin_service_dep),
-):
-    await admin_service.approve_message(message_id=message_id)
-    return APIResponse(message="Message has been approved.")
-
-
-@router.delete("/messages/{message_id}/delete", status_code=204)
-async def delete_message(
-    message_id: str,
-    current_user: User = Depends(get_admin_user),
-    admin_service: AdminService = Depends(admin_service_dep),
-):
-    await admin_service.delete_message(message_id=message_id)
-    return APIResponse(message="Message has been deleted.")
-
-
 @router.post("/track")
 async def track_visitor(
     data: VisitorData,

@@ -65,14 +65,12 @@ async def _on_worker_startup(state: TaskiqState) -> None:
     mongo_db = state.mongo_client["readinglist"]
 
     from app.models.blog import Post
-    from app.models.message import MessageBoard
     from app.models.rss import RssArticle, RssFeed
     from app.models.subscription import SubscriptionLog
 
     await init_beanie(
         database=mongo_db,
         document_models=[
-            MessageBoard,
             Post,
             RssArticle,
             RssFeed,

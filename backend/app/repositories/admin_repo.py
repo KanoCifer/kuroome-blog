@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-from beanie import SortDirection
 from bson import ObjectId
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.blog import Post
-from app.models.message import MessageBoard
 from app.models.models import Category
 
 
@@ -35,23 +33,3 @@ class AdminRepo:
 
     async def delete_post_by_id(self, post_id: ObjectId) -> None:
         await Post.find_one(Post.id == post_id).delete()
-
-    async def list_messages(self, *, review: int, limit: int | None = None):
-        query = MessageBoard.find({"review": review}).sort(
-            [("created_at", SortDirection.DESCENDING)]
-        )
-        if limit is not None:
-            query = query.limit(limit)
-        return await query.to_list()
-
-    async def get_message_by_id(
-        self,
-        message_id: ObjectId,
-    ) -> MessageBoard | None:
-        return await MessageBoard.get(message_id)
-
-    async def save_message(self, message: MessageBoard) -> None:
-        await message.save()
-
-    async def delete_message_by_id(self, message_id: ObjectId) -> None:
-        await MessageBoard.find(MessageBoard.id == message_id).delete()

@@ -14,7 +14,6 @@ from app.repositories import (
     FishingRepo,
     FriendLinkRepo,
     GalleryRepo,
-    MessageRepo,
     MomentRepo,
     MonitorRepo,
     NotificationRepo,
@@ -30,7 +29,6 @@ from app.services.blog_service import BlogService
 from app.services.devtask_service import DevTaskService
 from app.services.fishing.fishing_service import FishingService
 from app.services.friendlink_service import FriendLinkService
-from app.services.message_service import MessageService
 from app.services.moment_service import MomentService
 from app.services.monitor_service import MonitorService
 from app.services.public_service import PublicService
@@ -85,13 +83,6 @@ async def get_blog_service():
         blog_repo = BlogRepo(session)
         service = BlogService(repo=blog_repo)
         yield service
-
-
-@asynccontextmanager
-async def get_message_service():
-    message_repo = MessageRepo()
-    service = MessageService(repo=message_repo)
-    yield service
 
 
 @asynccontextmanager

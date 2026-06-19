@@ -31,7 +31,7 @@
         </h3>
       </div>
 
-      <div class="mt-3 flex flex-wrap gap-2">
+      <div class="mt-3 ml-3 flex flex-wrap gap-2">
         <span
           v-for="tech in techStack"
           :key="tech.name"

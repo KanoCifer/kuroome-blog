@@ -9,7 +9,6 @@ from app.api.v1 import (
     admin,
     auth,
     blog,
-    messages,
     moments,
     monitor,
     public,
@@ -42,7 +41,6 @@ def register_router(app: FastAPI):
     app.include_router(router=admin.router, prefix="/api/v1")
     app.include_router(router=auth.router, prefix="/api/v1")
     app.include_router(router=blog.router, prefix="/api/v1")
-    app.include_router(router=messages.router, prefix="/api/v1")
     app.include_router(router=moments.router, prefix="/api/v1")
     app.include_router(router=public.router, prefix="/api/v1")
     app.include_router(router=rss.router, prefix="/api/v1")
