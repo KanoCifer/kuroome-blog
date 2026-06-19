@@ -14,7 +14,7 @@
         @click.self="$emit('close')"
       >
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-md"></div>
+        <div class="absolute inset-0 bg-black/45 backdrop-blur-md"></div>
 
         <!-- Modal Content -->
         <motion.div
@@ -22,12 +22,12 @@
           :animate="{ opacity: 1, scale: 1, y: 0 }"
           :exit="{ opacity: 0, scale: 0.95, y: 10 }"
           :transition="{ type: 'spring', damping: 25, stiffness: 300 }"
-          class="bg-background/95 relative z-10 flex max-h-full w-full max-w-5xl flex-col overflow-hidden rounded-[2rem] shadow-2xl ring-1 ring-white/20 backdrop-blur-2xl md:flex-row dark:ring-white/10"
+          class="bg-background/95 border-border/60 relative z-10 flex max-h-full w-full max-w-5xl flex-col overflow-hidden rounded-[2rem] border shadow-2xl backdrop-blur-2xl md:flex-row"
         >
           <!-- Close Button (mobile) -->
           <button
             @click="$emit('close')"
-            class="text-muted-foreground absolute top-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-black/10 backdrop-blur-md transition-all hover:scale-105 hover:bg-black/20 active:scale-95 md:hidden dark:bg-white/10 dark:hover:bg-white/20"
+            class="text-muted-foreground hover:bg-muted hover:text-foreground absolute top-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md transition-all hover:scale-105 active:scale-95 md:hidden"
           >
             <X class="h-5 w-5" />
           </button>
@@ -39,7 +39,7 @@
             <img
               :src="image.url"
               :alt="image.description"
-              class="h-auto max-h-full w-auto max-w-full rounded-xl object-contain shadow-lg ring-1 ring-black/5 dark:ring-white/10"
+              class="h-auto max-h-full w-auto max-w-full rounded-xl object-contain shadow-lg ring-1 ring-border"
             />
           </div>
 

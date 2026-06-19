@@ -2,18 +2,18 @@
   <div class="bg-background fixed inset-0 z-40 overflow-hidden">
     <!-- Subtle Dot Pattern Background -->
     <div
-      class="pointer-events-none absolute inset-0 z-0 opacity-40 dark:opacity-20"
+      class="text-muted-foreground/40 pointer-events-none absolute inset-0 z-0 opacity-40 dark:opacity-20"
       style="
         background-image: radial-gradient(
           circle at 1px 1px,
-          #9ca3af 1.5px,
+          currentColor 1.5px,
           transparent 0
         );
         background-size: 32px 32px;
       "
     ></div>
 
-    <PicGalleryHeader
+    <PicGalleryEditBar
       :can-edit="canEdit"
       :is-edit-mode="isEditMode"
       @toggle-edit="toggleEditMode"
@@ -24,7 +24,7 @@
     <!-- Gallery Container -->
     <div
       ref="galleryRef"
-      class="relative z-10 mx-auto h-full w-full max-w-7xl px-4 pt-24 pb-40 sm:px-6 sm:pb-12"
+      class="relative z-10 mx-auto h-full w-full px-4 pt-24 pb-40 sm:px-6 sm:pb-12"
     >
       <!-- Polaroid Cards -->
       <PolaroidCard
@@ -51,10 +51,10 @@
           initial="{ opacity: 0, y: 20 }"
           animate="{ opacity: 1, y: 0 }"
           :transition="{ duration: 0.8, type: 'spring' }"
-          class="bg-background/60 relative max-w-md rounded-[2rem] border border-white/80 p-10 text-center shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] backdrop-blur-xl dark:border-gray-800/80"
+          class="bg-background/60 border-border relative max-w-md rounded-[2rem] border p-10 text-center shadow-2xl backdrop-blur-xl"
         >
           <div
-            class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-linear-to-tr from-blue-50 to-indigo-50 text-blue-500 shadow-inner dark:from-blue-900/30 dark:to-indigo-900/30 dark:text-blue-400"
+            class="bg-primary/10 text-primary mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl"
           >
             <ImageOff class="h-10 w-10" stroke-width="1.5" />
           </div>
@@ -93,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import PicGalleryHeader from '@/components/pic/PicGalleryHeader.vue';
+import PicGalleryEditBar from '@/components/pic/PicGalleryEditBar.vue';
 import PicDetailModal from '@/components/pic/PicDetailModal.vue';
 import PicUploadModal from '@/components/pic/PicUploadModal.vue';
 import PolaroidCard from '@/components/pic/PolaroidCard.vue';
@@ -103,12 +103,12 @@ import { useAuthStore } from '@/auth/stores/auth';
 import { useNotificationStore } from '@/stores/notification';
 import { ImageOff } from '@lucide/vue';
 import { motion } from 'motion-v';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch, useTemplateRef } from 'vue';
 
 const authStore = useAuthStore();
 const canEdit = computed(() => authStore.isAdmin);
 
-const galleryRef = ref<HTMLElement | null>(null);
+const galleryRef = useTemplateRef<HTMLElement>('galleryRef');
 
 // --- domain composables ---
 const {

@@ -1,23 +1,20 @@
 <template>
-  <header
-    class="bg-background/70 sticky top-0 z-30 border-b border-white/40 shadow-[inset_0_-1px_0_rgba(255,255,255,0.5)] backdrop-blur-2xl dark:border-white/10 dark:shadow-none"
+  <div
+    class="bg-background/70 bottom-4 z-30 w-fit fixed left-1/2 transform -translate-x-1/2"
   >
-    <div class="mx-auto flex max-w-6xl items-center justify-end px-6 py-4">
-      <div class="flex items-center gap-3">
+    <div class="flex items-center gap-3">
         <Button
           v-if="canEdit"
           variant="outline"
           size="sm"
           @click="$emit('toggle-edit')"
-          class="border-border/60 h-9 gap-2 rounded-full px-4 shadow-sm transition-colors"
-          :class="isEditMode ? 'bg-primary text-primary dark:bg-primary/30' : ''"
+          class="border-border/60 h-9 gap-2 rounded-full px-4 shadow-sm transition-all duration-300"
+          :class="isEditMode ? 'bg-primary text-primary-foreground' : ''"
         >
           <component :is="isEditMode ? Check : Edit2" class="h-4 w-4" />
           {{ isEditMode ? '完成编辑' : '编辑模式' }}
         </Button>
-        <TransitionGroup name="fade">
-          <Button
-            v-if="isEditMode && canEdit"
+                  <Button
             key="shuffle-btn"
             variant="outline"
             size="sm"
@@ -27,6 +24,14 @@
             <Shuffle class="h-4 w-4" />
             重排
           </Button>
+        <Transition
+          enter-active-class="transition-all  duration-300 ease-in-out"
+          enter-from-class="translate-x-full opacity-0"
+          enter-to-class="translate-x-0 opacity-100"
+          leave-active-class="transition-all  duration-300 ease-in-out"
+          leave-from-class="translate-x-0 opacity-100"
+          leave-to-class="-translate-x-full opacity-0"
+        >
           <Button
             v-if="isEditMode && canEdit"
             key="upload-btn"
@@ -38,10 +43,9 @@
             <Upload class="h-4 w-4" />
             上传图片
           </Button>
-        </TransitionGroup>
+        </Transition>
       </div>
     </div>
-  </header>
 </template>
 
 <script setup lang="ts">

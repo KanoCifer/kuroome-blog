@@ -67,7 +67,7 @@
           class="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         >
           <div
-            class="translate-y-4 transform rounded-full bg-white/20 p-3 text-white opacity-0 backdrop-blur-md transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100"
+            class="translate-y-4 transform rounded-full bg-background/20 p-3 text-white opacity-0 backdrop-blur-md transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100"
           >
             <Maximize2 class="h-5 w-5" />
           </div>

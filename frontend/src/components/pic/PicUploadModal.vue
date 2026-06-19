@@ -14,7 +14,7 @@
         @click.self="$emit('close')"
       >
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-md"></div>
+        <div class="absolute inset-0 bg-black/45 backdrop-blur-md"></div>
 
         <!-- Modal Content -->
         <motion.div
@@ -22,7 +22,7 @@
           :animate="{ opacity: 1, scale: 1, y: 0 }"
           :exit="{ opacity: 0, scale: 0.95, y: 10 }"
           :transition="{ type: 'spring', damping: 25, stiffness: 300 }"
-          class="bg-background/95 relative z-10 w-full max-w-md rounded-[2rem] p-6 shadow-2xl ring-1 ring-white/20 backdrop-blur-2xl md:p-8 dark:ring-white/10"
+          class="bg-background/95 border-border/60 relative z-10 w-full max-w-md rounded-[2rem] border p-6 shadow-2xl backdrop-blur-2xl md:p-8"
         >
           <!-- Close Button -->
           <button
@@ -75,7 +75,7 @@
                 class="absolute inset-0 flex items-center justify-center rounded-xl bg-black/40 opacity-0 transition-opacity group-hover:opacity-100"
               >
                 <span
-                  class="rounded-full bg-black/40 px-3 py-1.5 text-sm font-medium text-white backdrop-blur-md"
+                  class="rounded-full bg-background/30 px-3 py-1.5 text-sm font-medium text-white backdrop-blur-md"
                   >更换图片</span
                 >
               </div>

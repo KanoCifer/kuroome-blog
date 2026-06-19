@@ -33,7 +33,7 @@ export const usePolaroidLayout = ({ images }: UsePolaroidLayoutOptions) => {
       layoutSeeds.value.set(index, {
         x: xRange,
         y: yRange,
-        rotation: (Math.random() - 0.5) * 30, // -15 to 15 degrees for casual scatter
+        rotation: (Math.random() - 0.5 ) *10 ,
         zIndex: index + 1,
       });
     });
