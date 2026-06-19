@@ -19,13 +19,15 @@ export interface TideData {
 
 export interface WeatherHourly {
   fxTime: string;
-  temp?: number;
-  precip?: number;
-  humidity?: number;
-  pressure?: number;
+  /** QWeather 返回字符串数值,如 "29";消费方需自行 Number() 转换 */
+  temp?: string;
+  /** QWeather 返回字符串数值,如 "0.5";消费方需自行 Number() 转换 */
+  precip?: string;
+  humidity?: string;
+  pressure?: string;
   windDir?: string;
   windScale?: string;
-  windSpeed?: number;
+  windSpeed?: string;
   text?: string;
   icon?: string;
 }

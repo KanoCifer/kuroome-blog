@@ -201,7 +201,6 @@ a {
   /* Extended app tokens */
   --color-surface: var(--surface);
   --color-destructive: var(--color-rose-500);
-  --color-surface-foreground: var(--surface-foreground);
   --color-success: var(--color-emerald-500);
   --color-warning: var(--color-amber-500);
   --color-brand-devices: var(--accent);

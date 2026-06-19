@@ -1,4 +1,17 @@
 <script setup lang="ts">
+/**
+ * HourlyChartCard —— 24h 天气时序:降水柱 + 温度线
+ *
+ * 设计语言:深蓝夜航 (data-dense, monospace-aware, single accent)
+ * - 头部 4 列度量 (Time window / Peak rain / Δ Temp / Best window)
+ *   数字用 tabular-nums 衬出"测量仪表"感,标签全大写小字 + 0.08em tracking
+ * - 图表区:1px 虚线水平网格 + 0px 垂直网格;温度线 2px solid,锚点空心圆 hover 显
+ * - 单焦点:温度暖橙,降水冷蓝;Hover 时副线降透明度,主线 + 锚点突出
+ * - 无圆角重影 / 无渐变 / 无图标:让数据自己说话
+ *
+ * 契约(不可改):无 props / 无 emit;数据从 useFishingMapStore().weatherHourly
+ * 注入,调色板从 useChartColors().palette 注入。父级调用 <HourlyChartCard /> 不动。
+ */
 import { useChartColors, withAlpha } from '@/composables/shared';
 import { useFishingMapStore } from '@/stores/fishingMap';
 import DashboardCard from '@/views/fishing/dashboard/DashboardCard.vue';
@@ -11,45 +24,125 @@ const fishingMapStore = useFishingMapStore();
 const { weatherHourly } = storeToRefs(fishingMapStore);
 const { palette } = useChartColors();
 
-const chartOption = computed(() => {
-  if (!weatherHourly.value || weatherHourly.value.length === 0) return {};
-  const p = palette.value;
+/* ------------------------------------------------------------------ *
+ * Derived metrics —— 头部 4 列度量的真实数据
+ * ------------------------------------------------------------------ */
+const metrics = computed(() => {
+  const list = weatherHourly.value ?? [];
+  if (list.length === 0) {
+    return {
+      window: '—',
+      peakRain: { value: '0.0', unit: 'mm', at: '—' },
+      tempRange: { lo: '—', hi: '—', spread: '—' },
+      bestWindow: { value: '—', note: '等待数据' },
+    };
+  }
 
+  const start = dayjs(list[0]!.fxTime).format('HH:mm');
+  const end = dayjs(list[list.length - 1]!.fxTime).format('HH:mm');
+  const window = `${start} → ${end}`;
+
+  /* QWeather 返回的 precip/temp 是字符串 ("0.5"/"29"),统一转 Number,
+   * 否则 Math.max(...rains) 返回 number 而 rains 是 string[] → indexOf 严格相等
+   * 永远 -1 → list[-1] 抛错,整个 metrics computed 崩溃,卡片停在加载态。 */
+  const rains = list.map((it) => Number(it.precip) || 0);
+  const temps = list.map((it) => Number(it.temp) || 0);
+  const peakIdx = rains.indexOf(Math.max(...rains));
+  const peakRain = {
+    value: (rains[peakIdx] ?? 0).toFixed(1),
+    unit: 'mm',
+    at: dayjs(list[peakIdx]!.fxTime).format('HH:mm'),
+  };
+
+  const tMin = Math.min(...temps);
+  const tMax = Math.max(...temps);
+  const tempRange = {
+    lo: `${Math.round(tMin)}°`,
+    hi: `${Math.round(tMax)}°`,
+    spread: `${Math.abs(Math.round(tMax - tMin))}°`,
+  };
+
+  /* 最佳窗口:在有数据的范围内,挑温度最接近中位数 + 降水最低的连续 3h */
+  const medianTemp =
+    [...temps].sort((a, b) => a - b)[Math.floor(temps.length / 2)] ?? 0;
+  let bestStart = 0;
+  let bestScore = -Infinity;
+  for (let i = 0; i + 2 < list.length; i++) {
+    const avgTemp =
+      ((temps[i] ?? 0) + (temps[i + 1] ?? 0) + (temps[i + 2] ?? 0)) / 3;
+    const avgRain =
+      ((rains[i] ?? 0) + (rains[i + 1] ?? 0) + (rains[i + 2] ?? 0)) / 3;
+    const tempPenalty = Math.abs(avgTemp - medianTemp);
+    /* 温度越接近中位越好 (+), 降水越低越好 (+) */
+    const score = -tempPenalty * 1.2 - avgRain * 4;
+    if (score > bestScore) {
+      bestScore = score;
+      bestStart = i;
+    }
+  }
+  const bestEnd = Math.min(bestStart + 2, list.length - 1);
+  const bestWindow = {
+    value: `${dayjs(list[bestStart]!.fxTime).format('HH:mm')}–${dayjs(
+      list[bestEnd]!.fxTime,
+    ).format('HH:mm')}`,
+    note: `降水 ${(rains.slice(bestStart, bestEnd + 1).reduce((a, b) => a + b, 0) / 3).toFixed(1)}mm/h`,
+  };
+
+  return { window, peakRain, tempRange, bestWindow };
+});
+
+/* ------------------------------------------------------------------ *
+ * ECharts option —— 主体图表
+ * ------------------------------------------------------------------ */
+const chartOption = computed(() => {
+  try {
+  if (!weatherHourly.value || weatherHourly.value.length === 0) return {};
+
+  const p = palette.value;
   const xData = weatherHourly.value.map((item) =>
     dayjs(item.fxTime).format('HH:mm'),
   );
-  const rainData = weatherHourly.value.map((item) => item.precip ?? 0);
-  const tempData = weatherHourly.value.map((item) => item.temp ?? 0);
+  const rainData = weatherHourly.value.map((item) => Number(item.precip) || 0);
+  const tempData = weatherHourly.value.map((item) => Number(item.temp) || 0);
 
   const tempMax = Math.max(...tempData);
   const tempMin = Math.min(...tempData);
-  // 让温度线在图表中段震荡:min/max 各留 4-6 度余量,避免线贴边
   const tempAxisMin = Math.floor(tempMin - 4);
   const tempAxisMax = Math.ceil(tempMax + 4);
-  // 降雨轴:大多数情况降水都很小,只在有数据时撑大,空数据保持 8mm 基线
   const rainPeak = Math.max(...rainData);
   const rainAxisMax = Math.max(8, Math.ceil(rainPeak * 1.6));
 
+  /* label interval: 24h 数据,每 4h 一个 (共 ~6) */
+  const xInterval = Math.max(0, Math.floor(xData.length / 6) - 1);
+
+  /* 暖橙温度焦点色:从 --warning 派生的更亮的 accent,1px solid 线 + hover 锚点 */
+  const tempColor = p.warning;
+  const rainColor = p.primary;
+
   return {
     backgroundColor: 'transparent',
-    // 关键:禁用 animation 避免 setOption 触发 interpolate1DArray 死循环
-    // (palette 已稳定引用,正常不会反复 setOption;但 v-chart 在 props 变更时
-    //  仍可能用 mergeOption 走 animation 通路,此处明确关掉)
     animation: false,
-    textStyle: { color: p.foreground, fontSize: 12 },
+    textStyle: { color: p.foreground, fontFamily: 'inherit' },
+
     tooltip: {
       trigger: 'axis',
+      confine: true,
       backgroundColor: p.card,
-      borderColor: p.border,
+      borderColor: withAlpha(p.foreground, 0.08),
       borderWidth: 1,
-      borderRadius: 10,
-      padding: [10, 14],
-      textStyle: { color: p.foreground, fontSize: 12 },
+      borderRadius: 8,
+      padding: [10, 12],
+      extraCssText: `box-shadow: 0 8px 24px -8px ${withAlpha(p.foreground, 0.18)};`,
+      textStyle: { color: p.foreground, fontSize: 12, fontFamily: 'inherit' },
       axisPointer: {
         type: 'line',
-        lineStyle: { color: p.border, type: 'dashed', width: 1 },
+        lineStyle: {
+          color: withAlpha(tempColor, 0.55),
+          type: 'solid',
+          width: 1,
+        },
+        snap: true,
       },
-      // 自定义 formatter 让数字带单位,温度优先
       formatter: (params: unknown) => {
         const arr = params as Array<{
           axisValue: string;
@@ -60,34 +153,46 @@ const chartOption = computed(() => {
         const time = arr[0]?.axisValue ?? '';
         const lines = arr
           .map((it) => {
-            const unit = it.seriesName.includes('温度') ? '°C' : 'mm';
-            return `<div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
-              ${it.marker}
-              <span style="color:${p.mutedForeground};font-size:11px;">${it.seriesName.replace(/\s*\(.+?\)/, '')}</span>
-              <span style="font-weight:600;margin-left:auto;">${it.data}${unit}</span>
+            const isTemp = it.seriesName.includes('温度');
+            const unit = isTemp ? '°C' : 'mm';
+            return `<div style="display:flex;align-items:center;gap:8px;margin-top:3px;">
+              <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${
+                isTemp ? tempColor : rainColor
+              };"></span>
+              <span style="color:${p.mutedForeground};font-size:11px;letter-spacing:0.02em;">${it.seriesName}</span>
+              <span style="font-weight:600;margin-left:auto;font-variant-numeric:tabular-nums;color:${
+                isTemp ? tempColor : p.foreground
+              };">${it.data}${unit}</span>
             </div>`;
           })
           .join('');
-        return `<div style="font-weight:600;font-size:11px;color:${p.mutedForeground};margin-bottom:4px;">${time}</div>${lines}`;
+        return `<div style="font-weight:600;font-size:11px;color:${p.mutedForeground};margin-bottom:4px;letter-spacing:0.04em;">${time}</div>${lines}`;
       },
     },
-    legend: { show: false }, // header 区已有 legend pill
-    grid: { left: 8, right: 8, top: 16, bottom: 8, containLabel: true },
+
+    legend: { show: false },
+
+    /* 紧凑 grid:让图表区尽量留给数据本身,顶部只留 12px 给 tooltip 不被裁 */
+    grid: { left: 4, right: 4, top: 12, bottom: 4, containLabel: true },
+
     xAxis: {
       type: 'category',
       boundaryGap: true,
       data: xData,
-      axisLine: { lineStyle: { color: p.border, width: 1 } },
+      axisLine: { show: false },
       axisTick: { show: false },
+      splitLine: { show: false },
       axisLabel: {
         color: p.mutedForeground,
         fontSize: 10,
-        // 24h 数据,每隔 4h 显示一个标签 (共 6-7 个),避免拥挤
-        interval: Math.max(0, Math.floor(xData.length / 6) - 1),
+        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+        interval: xInterval,
+        margin: 8,
       },
     },
+
     yAxis: [
-      // 左轴 - 降水 (主轴显示)
+      /* 左轴 —— 降水 (mm) */
       {
         type: 'value',
         position: 'left',
@@ -95,18 +200,25 @@ const chartOption = computed(() => {
         max: rainAxisMax,
         axisLine: { show: false },
         axisTick: { show: false },
+        splitNumber: 3,
         splitLine: {
           show: true,
-          lineStyle: { color: p.border, type: 'dashed', opacity: 0.5 },
+          lineStyle: {
+            color: withAlpha(p.border, 0.55),
+            type: 'dashed',
+            width: 1,
+          },
         },
         axisLabel: {
           color: p.mutedForeground,
-          fontSize: 10,
-          formatter: (v: number) => `${v}mm`,
+          fontSize: 9,
+          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+          formatter: (v: number) =>
+            v === Math.floor(v) ? `${v}` : v.toFixed(1),
+          margin: 6,
         },
-        splitNumber: 3,
       },
-      // 右轴 - 温度
+      /* 右轴 —— 温度 (°C) */
       {
         type: 'value',
         position: 'right',
@@ -114,94 +226,156 @@ const chartOption = computed(() => {
         max: tempAxisMax,
         axisLine: { show: false },
         axisTick: { show: false },
+        splitNumber: 3,
         splitLine: { show: false },
         axisLabel: {
-          color: p.warning,
-          fontSize: 10,
-          formatter: (v: number) => `${v}°`,
+          color: withAlpha(tempColor, 0.85),
+          fontSize: 9,
+          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+          formatter: (v: number) => `${Math.round(v)}°`,
+          margin: 6,
         },
-        splitNumber: 3,
       },
     ],
+
     series: [
+      /* 降水柱 —— 实心 + 顶部 1px 边,只在 hover 邻接时提亮 */
       {
-        name: '降水量',
+        name: '降水 (mm)',
         type: 'bar',
         data: rainData,
         yAxisIndex: 0,
-        barMaxWidth: 18,
+        barMaxWidth: 10,
+        barMinHeight: 1,
         itemStyle: {
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: withAlpha(p.primary, 0.95) },
-              { offset: 1, color: withAlpha(p.primary, 0.55) },
-            ],
-          },
-          borderRadius: [3, 3, 0, 0],
+          color: withAlpha(rainColor, 0.78),
+          borderColor: rainColor,
+          borderWidth: 0,
+          borderRadius: [2, 2, 0, 0],
         },
-        // hover 温度线时 axis tooltip 会触发整图 blur,显式把 bar 的 blur 态
-        // 锁回原色,避免 echarts 6 默认把 opacity 压到 ~0 → 柱形看似消失
-        emphasis: { disabled: true },
-        blur: { itemStyle: { opacity: 1 } },
+        emphasis: {
+          focus: 'self',
+          itemStyle: {
+            color: rainColor,
+            borderColor: rainColor,
+            borderWidth: 0,
+          },
+        },
+        blur: { itemStyle: { opacity: 0.25 } },
+        z: 2,
       },
+      /* 温度线 —— 单一焦点;hover 显空心锚点 */
       {
-        name: '温度',
+        name: '温度 (°C)',
         type: 'line',
         data: tempData,
         yAxisIndex: 1,
-        lineStyle: { width: 2, color: p.warning },
-        // 温度只画线 + 圆点,不再填充面积 (面积会盖住降雨柱)
+        smooth: 0.25,
         symbol: 'circle',
-        symbolSize: 4,
-        showSymbol: false, // 默认隐藏,hover 时显示
-        itemStyle: { color: p.warning, borderWidth: 2, borderColor: p.card },
-        smooth: 0.3,
-        // 不能用 focus: 'series' —— echarts 6 会把 bar 推到 blur 态
-        // (opacity ≈ 0) 导致柱形 hover 时整片消失。改 'self' 只高亮线本身
-        emphasis: { focus: 'self' },
+        symbolSize: 5,
+        showSymbol: false,
+        lineStyle: { width: 2, color: tempColor, cap: 'round', join: 'round' },
+        itemStyle: {
+          color: p.card,
+          borderColor: tempColor,
+          borderWidth: 1.6,
+        },
+        emphasis: {
+          focus: 'self',
+          scale: 1.4,
+          itemStyle: {
+            color: tempColor,
+            borderColor: p.card,
+            borderWidth: 1.6,
+          },
+          lineStyle: { width: 2.5 },
+        },
+        blur: {
+          lineStyle: { opacity: 0.35 },
+          itemStyle: { opacity: 0.35 },
+        },
         z: 3,
       },
     ],
   };
+  } catch (e) {
+    console.log('[chartOption] THREW:', e instanceof Error ? e.message : String(e));
+    return {};
+  }
 });
 </script>
 
 <template>
   <DashboardCard>
-    <div class="mb-3 flex items-start justify-between gap-3">
-      <div>
-        <h3 class="text-foreground text-lg font-semibold tracking-tight">
-          小时天气预报
-          <span class="text-muted-foreground ml-1.5 text-xs font-normal">
-            未来 24 小时
-          </span>
+    <!-- ============================================================== -->
+    <!-- Header: title row + 4-column metrics strip                     -->
+    <!-- ============================================================== -->
+    <header class="hourly-header">
+      <div class="hourly-title">
+        <h3 class="hourly-h3">
+          <span class="hourly-h3__main">小时天气</span>
+          <span class="hourly-h3__sub">HOURLY · NEXT 24H</span>
         </h3>
-        <p class="text-muted-foreground mt-0.5 text-sm">降水柱 · 温度线</p>
+        <p class="hourly-sub">降水柱 · 温度线</p>
       </div>
-      <div class="flex items-center gap-2">
-        <div
-          class="bg-muted/40 flex items-center gap-1.5 rounded-full px-2.5 py-1"
-        >
-          <span class="bg-primary h-2 w-2 rounded-full" />
-          <span class="text-foreground text-xs">降水</span>
-        </div>
-        <div
-          class="bg-muted/40 flex items-center gap-1.5 rounded-full px-2.5 py-1"
-        >
-          <span class="bg-warning h-2 w-2 rounded-full" />
-          <span class="text-foreground text-xs">温度</span>
-        </div>
-      </div>
-    </div>
 
+      <div class="hourly-legend" aria-hidden="true">
+        <span class="legend-pill">
+          <span class="legend-dot legend-dot--rain" />
+          <span class="legend-label">降水</span>
+        </span>
+        <span class="legend-pill">
+          <span class="legend-dot legend-dot--temp" />
+          <span class="legend-label">温度</span>
+        </span>
+      </div>
+    </header>
+
+    <!-- Metrics strip —— 单行 4 列,数字大、字母小 -->
+    <dl class="hourly-metrics" data-od-id="hourly-metrics">
+      <div class="metric">
+        <dt class="metric-label">窗口</dt>
+        <dd class="metric-value metric-value--text">{{ metrics.window }}</dd>
+      </div>
+      <div class="metric">
+        <dt class="metric-label">峰值降水</dt>
+        <dd class="metric-value">
+          <span class="metric-num">{{ metrics.peakRain.value }}</span>
+          <span class="metric-unit">{{ metrics.peakRain.unit }}</span>
+          <span class="metric-foot">@{{ metrics.peakRain.at }}</span>
+        </dd>
+      </div>
+      <div class="metric">
+        <dt class="metric-label">温度区间</dt>
+        <dd class="metric-value">
+          <span class="metric-num metric-num--temp">{{
+            metrics.tempRange.lo
+          }}</span>
+          <span class="metric-dash">→</span>
+          <span class="metric-num metric-num--temp">{{
+            metrics.tempRange.hi
+          }}</span>
+          <span class="metric-foot">Δ {{ metrics.tempRange.spread }}</span>
+        </dd>
+      </div>
+      <div class="metric metric--accent">
+        <dt class="metric-label">推荐窗口</dt>
+        <dd class="metric-value">
+          <span class="metric-num metric-num--accent">{{
+            metrics.bestWindow.value
+          }}</span>
+          <span class="metric-foot">{{ metrics.bestWindow.note }}</span>
+        </dd>
+      </div>
+    </dl>
+
+    <!-- ============================================================== -->
+    <!-- Chart body                                                     -->
+    <!-- ============================================================== -->
     <div
       v-if="weatherHourly && weatherHourly.length > 0"
-      class="relative flex-1"
+      class="hourly-chart"
+      data-od-id="hourly-chart"
     >
       <v-chart
         :option="chartOption"
@@ -209,13 +383,272 @@ const chartOption = computed(() => {
         autoresize
       />
     </div>
-    <div v-else class="flex flex-1 items-center justify-center py-8">
-      <div class="text-center">
-        <div
-          class="border-border border-t-primary mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-2"
-        />
-        <p class="text-muted-foreground text-sm">正在加载天气数据...</p>
-      </div>
+    <div v-else class="hourly-empty" data-od-id="hourly-empty">
+      <div class="hourly-empty__spinner" aria-hidden="true" />
+      <p class="hourly-empty__text">正在加载天气数据…</p>
     </div>
   </DashboardCard>
 </template>
+
+<style scoped>
+/* ==================================================================
+ * HourlyChartCard —— 深蓝夜航 (data-dense)
+ *   - 4 列度量条:用 tabular-nums 把数字当仪表读
+ *   - 头部到图表:1px 顶边压节奏
+ *   - 图表:1px 虚线水平网格 + 暖橙温度线 + 冷蓝降水柱
+ *   - 无圆角重影,无渐变,无图标,无 emoji
+ * ================================================================== */
+
+.hourly-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.hourly-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.hourly-h3 {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--color-foreground);
+}
+.hourly-h3__main {
+  /* 中文主标 —— system sans */
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+}
+.hourly-h3__sub {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  color: var(--color-muted-foreground);
+  text-transform: uppercase;
+}
+.hourly-sub {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-muted-foreground);
+  letter-spacing: 0.01em;
+}
+
+/* Legend —— 无圆角胶囊,纯左色点 + 小字 */
+.hourly-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+.legend-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--color-foreground);
+  letter-spacing: 0.04em;
+}
+.legend-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 1px;
+}
+.legend-dot--rain {
+  background: var(--color-primary);
+}
+.legend-dot--temp {
+  background: var(--color-warning);
+  border-radius: 50%;
+}
+.legend-label {
+  font-weight: 500;
+}
+
+/* ------------------------------------------------------------------
+ * Metrics strip —— 4 列 1 行,数字仪表化
+ * ------------------------------------------------------------------ */
+.hourly-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin: 0 0 14px;
+  padding: 12px 0 14px;
+  border-top: 1px solid
+    color-mix(in oklch, var(--color-border) 60%, transparent);
+  border-bottom: 1px solid
+    color-mix(in oklch, var(--color-border) 60%, transparent);
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 14px;
+  border-right: 1px solid
+    color-mix(in oklch, var(--color-border) 40%, transparent);
+}
+.metric:first-child {
+  padding-left: 0;
+}
+.metric:last-child {
+  padding-right: 0;
+  border-right: 0;
+}
+.metric--accent .metric-num--accent {
+  color: var(--color-warning);
+}
+
+.metric-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted-foreground);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  margin: 0;
+}
+
+.metric-value {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.metric-value--text {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-foreground);
+}
+.metric-num {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.05;
+  color: var(--color-foreground);
+}
+.metric-num--temp {
+  color: var(--color-warning);
+}
+.metric-num--accent {
+  color: var(--color-warning);
+}
+.metric-unit {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-muted-foreground);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.04em;
+}
+.metric-dash {
+  font-size: 14px;
+  color: var(--color-muted-foreground);
+  font-weight: 400;
+}
+.metric-foot {
+  font-size: 10px;
+  color: var(--color-muted-foreground);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.06em;
+  margin-left: 2px;
+}
+
+/* ------------------------------------------------------------------
+ * Chart body
+ * ------------------------------------------------------------------ */
+.hourly-chart {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.hourly-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 180px;
+}
+.hourly-empty__spinner {
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid color-mix(in oklch, var(--color-border) 70%, transparent);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: hourly-spin 0.9s linear infinite;
+}
+.hourly-empty__text {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-muted-foreground);
+  letter-spacing: 0.04em;
+}
+
+@keyframes hourly-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ------------------------------------------------------------------
+ * Responsive: <640px 折叠为 2x2 网格
+ * ------------------------------------------------------------------ */
+@media (max-width: 640px) {
+  .hourly-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .hourly-metrics {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px 0;
+  }
+  .metric {
+    padding: 0 10px;
+  }
+  .metric:nth-child(2) {
+    border-right: 0;
+  }
+  .metric:nth-child(1),
+  .metric:nth-child(2) {
+    padding-bottom: 12px;
+    border-bottom: 1px solid
+      color-mix(in oklch, var(--color-border) 40%, transparent);
+  }
+  .metric:nth-child(3) {
+    padding-left: 0;
+  }
+  .metric:nth-child(4) {
+    padding-right: 0;
+  }
+  .metric-num {
+    font-size: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hourly-empty__spinner {
+    animation: none;
+  }
+}
+</style>

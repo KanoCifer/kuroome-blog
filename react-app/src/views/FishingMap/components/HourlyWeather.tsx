@@ -13,8 +13,9 @@ export function HourlyWeather() {
     const xData = weatherHourly.map((item) =>
       dayjs(item.fxTime).format('HH:mm'),
     );
-    const rainData = weatherHourly.map((item) => item.precip ?? 0);
-    const tempData = weatherHourly.map((item) => item.temp ?? 0);
+    // QWeather 返回字符串数值 ("0.5"/"29"),转 Number 保证 tooltip/axis 计算正确
+    const rainData = weatherHourly.map((item) => Number(item.precip) || 0);
+    const tempData = weatherHourly.map((item) => Number(item.temp) || 0);
 
     return {
       backgroundColor: 'transparent',
