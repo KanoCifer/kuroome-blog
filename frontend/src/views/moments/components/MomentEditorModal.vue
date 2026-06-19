@@ -10,9 +10,7 @@
         >
           {{ isEdit ? 'EDIT' : 'NEW' }} · {{ isEdit ? '编辑' : '写一句' }}
         </div>
-        <h2
-          class="text-foreground font-serif text-lg font-medium italic"
-        >
+        <h2 class="text-foreground font-serif text-lg font-medium italic">
           {{ isEdit ? '改一改' : '碎碎念' }}
         </h2>
       </div>
@@ -61,8 +59,7 @@
           >
             <span v-if="lastSavedAt">已保存草稿 · {{ lastSavedAt }}</span>
             <span v-else>&nbsp;</span>
-            <span
-              :class="form.content.length > 2000 ? 'text-destructive' : ''"
+            <span :class="form.content.length > 2000 ? 'text-destructive' : ''"
               >{{ form.content.length }} / 2000</span
             >
           </div>
@@ -172,8 +169,12 @@
                 class="mt-1"
               />
               <div>
-                <div class="text-foreground text-[12px] font-medium">{{ l }}</div>
-                <div class="text-muted-foreground mt-0.5 text-[11px]">{{ d }}</div>
+                <div class="text-foreground text-[12px] font-medium">
+                  {{ l }}
+                </div>
+                <div class="text-muted-foreground mt-0.5 text-[11px]">
+                  {{ d }}
+                </div>
               </div>
             </label>
           </div>
@@ -201,7 +202,9 @@
           >
             选项
           </div>
-          <label class="text-foreground mb-1.5 flex items-center gap-2 text-[12px]">
+          <label
+            class="text-foreground mb-1.5 flex items-center gap-2 text-[12px]"
+          >
             <input v-model="form.is_pinned" type="checkbox" /> 置顶
           </label>
           <label class="text-foreground flex items-center gap-2 text-[12px]">

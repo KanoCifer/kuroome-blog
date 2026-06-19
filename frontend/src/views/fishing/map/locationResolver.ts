@@ -63,7 +63,9 @@ export async function resolveCurrentPosition(
     }
   };
 
-  const tryIPFallback = async (browserReason: string): Promise<[number, number]> => {
+  const tryIPFallback = async (
+    browserReason: string,
+  ): Promise<[number, number]> => {
     try {
       return await converter.locateByIp();
     } catch (ipErr) {

@@ -9,7 +9,7 @@ This module provides public endpoints that do not require authentication:
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Body, Depends, File, Request, UploadFile
+from fastapi import APIRouter, Body, Depends, Request, UploadFile
 from fastapi.responses import PlainTextResponse
 from redis.asyncio import Redis as AsyncRedis
 from starlette import status
@@ -211,13 +211,37 @@ async def reverse_geocode(
     )
 
 
-@router.post("/upload-gallery-image")
-async def upload_blog_image(
-    request: Request,
-    file: UploadFile = File(),
+@router.post("/upload")
+async def upload_file(
+    file: UploadFile,
     user: int = Depends(manager),
 ) -> APIResponse:
-    """Upload blog image and return public URL."""
+    """通用图片上传端点,独立于 gallery。
+
+    登录后可上传图片,保存到 uploads/{user}/ 下并返回公开访问 URL。
+    """
+    if not file or not file.filename:
+        raise APIError(
+            message="No image provided.",
+            code=status.HTTP_400_BAD_REQUEST,
+        )
+    relative_path = save_upload_image(file, f"uploads/{user}")
+
+    return APIResponse(
+        data={
+            "url": f"/api/v1/media/{relative_path}",
+            "filename": relative_path,
+        },
+        message="Image uploaded successfully.",
+    )
+
+
+@router.post("/upload-gallery-image")
+async def upload_blog_image(
+    file: UploadFile,
+    user: int = Depends(manager),
+) -> APIResponse:
+    """上传图片墙图片接口"""
     if not file or not file.filename:
         raise APIError(
             message="No image provided.",
@@ -248,8 +272,9 @@ async def set_pic_gallery(
             message="Picture gallery updated successfully",
         )
     except Exception as exc:
+        logger.error(f"Failed to update picture gallery: {exc!r}")
         raise APIError(
-            message=f"Failed to update picture gallery: {exc!s}",
+            message="Failed to update picture gallery",
             code=500,
         ) from exc
 
@@ -267,7 +292,8 @@ async def get_pic_gallery(
             message="Picture gallery retrieved successfully",
         )
     except Exception as exc:
+        logger.error(f"Failed to retrieve picture gallery: {exc!r}")
         raise APIError(
-            message=f"Failed to retrieve picture gallery: {exc!s}",
+            message="Failed to retrieve picture gallery",
             code=500,
         ) from exc

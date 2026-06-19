@@ -1,5 +1,7 @@
 <template>
-  <div class="squircle border-border/60 bg-background h-full border p-6 shadow-sm">
+  <div
+    class="squircle border-border/60 bg-background h-full border p-6 shadow-sm"
+  >
     <h2 class="text-foreground mb-4 flex items-center gap-2 text-lg font-bold">
       <icon-trend class="size-6" /> Visits Trend (Last {{ selectedDays }} days)
     </h2>

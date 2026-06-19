@@ -168,8 +168,7 @@ onUnmounted(() => {
             @click="selectScheme(schemeItem.value)"
             class="text-foreground hover:bg-muted dark:text-foreground dark:hover:bg-muted flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm transition-colors"
             :class="{
-              'bg-muted dark:bg-muted':
-                themeStore.scheme === schemeItem.value,
+              'bg-muted dark:bg-muted': themeStore.scheme === schemeItem.value,
               'rounded-t-lg': index === 0,
               'rounded-b-lg': index === schemes.length - 1,
             }"

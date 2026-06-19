@@ -1,7 +1,9 @@
 <template>
   <motion.div
     class="absolute origin-center"
-    :class="isDraggable ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'"
+    :class="
+      isDraggable ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'
+    "
     :style="layoutStyle"
     :initial="{
       opacity: 0,
@@ -53,12 +55,12 @@
       - 阴影双层，hover 时同步加深
     -->
     <div
-      class="polaroid relative flex flex-col rounded-[2px] group"
+      class="polaroid group relative flex flex-col rounded-[2px]"
       :style="{ width: `${size + 24}px` }"
     >
       <!-- 顶部窄白边 + 图片容器 -->
       <div
-        class="polaroid-top relative mx-2 overflow-hidden rounded-[1px] mt-3 group-hover:mt-0 group-hover:mx-0 transition-all duration-300"
+        class="polaroid-top relative mx-2 mt-3 overflow-hidden rounded-[1px] transition-all duration-300 group-hover:mx-0 group-hover:mt-0"
       >
         <div
           class="polaroid-photo relative w-full overflow-hidden"
@@ -91,7 +93,7 @@
         class="polaroid-bottom relative flex items-center justify-center"
         :style="{ height: '56px', paddingBottom: '12px' }"
       >
-        <span class="polaroid-date select-none font-family-averia">
+        <span class="polaroid-date font-family-averia select-none">
           {{ dateLabel }}
         </span>
       </div>

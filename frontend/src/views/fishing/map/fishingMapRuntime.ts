@@ -21,7 +21,10 @@ interface DrivingService {
   search(
     origin: [number, number] | AMap.LngLat,
     destination: [number, number] | AMap.LngLat,
-    callback: (status: 'complete' | 'no_data' | string, result: unknown) => void,
+    callback: (
+      status: 'complete' | 'no_data' | string,
+      result: unknown,
+    ) => void,
   ): void;
   clear(): void;
 }
@@ -88,7 +91,10 @@ export class FishingMapRuntime {
   }
 
   /** 规划驾车路线;返回距离(米)与耗时(秒)。失败抛带可读信息的 Error */
-  planRoute(start: [number, number], end: [number, number]): Promise<RouteInfo> {
+  planRoute(
+    start: [number, number],
+    end: [number, number],
+  ): Promise<RouteInfo> {
     return new Promise((resolve, reject) => {
       const driving = this.ensureDriving();
       driving.clear();
@@ -159,7 +165,10 @@ export class FishingMapRuntime {
     return new Promise((resolve) => {
       this.ns.convertFrom([lng, lat], 'gps', (status, result) => {
         const r = result as
-          | { info?: string; locations?: Array<{ getLng(): number; getLat(): number }> }
+          | {
+              info?: string;
+              locations?: Array<{ getLng(): number; getLat(): number }>;
+            }
           | string
           | undefined;
         if (
@@ -217,5 +226,3 @@ export class FishingMapRuntime {
     return this.driving;
   }
 }
-
-

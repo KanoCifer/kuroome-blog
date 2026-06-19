@@ -1,10 +1,12 @@
 import request from '@/api/shared/request';
+import type { ExifInfo } from '@/composables/pic';
 
 export interface GalleryImage {
   id: string;
   url: string;
   description: string;
   uploadedAt?: string;
+  exif?: ExifInfo | null;
 }
 
 export interface GalleryResponse {

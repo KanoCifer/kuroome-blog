@@ -5,7 +5,10 @@
 import type { HTMLAttributes } from 'vue';
 import { inject } from 'vue';
 
-const labelledBy = inject<string | undefined>('alertDialog.labelledBy', undefined);
+const labelledBy = inject<string | undefined>(
+  'alertDialog.labelledBy',
+  undefined,
+);
 
 const props = defineProps<{
   class?: HTMLAttributes['class'];

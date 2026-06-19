@@ -2,7 +2,10 @@
 import type { HTMLAttributes } from 'vue';
 import { inject } from 'vue';
 
-const describedBy = inject<string | undefined>('alertDialog.describedBy', undefined);
+const describedBy = inject<string | undefined>(
+  'alertDialog.describedBy',
+  undefined,
+);
 
 const props = defineProps<{
   class?: HTMLAttributes['class'];

@@ -595,5 +595,4 @@ onUnmounted(() => {
 .article-content :where(a:hover):not(:where([class~='not-prose'] *)) {
   opacity: 0.8;
 }
-
 </style>

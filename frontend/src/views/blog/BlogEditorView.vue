@@ -426,7 +426,9 @@ onBeforeUnmount(() => {
         class="space-y-4"
       >
         <!-- Title and Summary -->
-        <div class="border-border bg-background rounded-3xl border p-2 shadow-sm">
+        <div
+          class="border-border bg-background rounded-3xl border p-2 shadow-sm"
+        >
           <!-- Title -->
           <div
             class="group focus-within:bg-muted/30 rounded-2xl transition-colors"

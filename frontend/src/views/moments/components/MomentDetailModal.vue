@@ -14,7 +14,7 @@
         </span>
         <span
           v-if="moment?.is_pinned"
-          class="text-warning inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.18em]"
+          class="text-warning inline-flex items-center gap-1 text-[10px] font-semibold tracking-[0.18em] uppercase"
         >
           <span aria-hidden="true">·</span>
           <PinIcon class="h-3 w-3" />
@@ -113,7 +113,7 @@
 
         <!-- 元数据条 -->
         <div
-          class="text-muted-foreground mt-10 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-dashed border-border/40 pt-4 font-mono text-[11px] tracking-wide"
+          class="text-muted-foreground border-border/40 mt-10 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-dashed pt-4 font-mono text-[11px] tracking-wide"
         >
           <span>发布于 {{ moment.published_at ?? moment.created_at }}</span>
           <span v-if="moment.source" class="text-muted-foreground/60">·</span>
@@ -146,11 +146,11 @@
         </dl>
 
         <div
-          class="text-muted-foreground mt-6 border-t border-dashed border-border/40 pt-4 font-mono text-[10px] tracking-[0.18em] uppercase"
+          class="text-muted-foreground border-border/40 mt-6 border-t border-dashed pt-4 font-mono text-[10px] tracking-[0.18em] uppercase"
         >
           KEYBOARD
         </div>
-        <ul class="mt-3 space-y-1.5 text-[12px] text-muted-foreground">
+        <ul class="text-muted-foreground mt-3 space-y-1.5 text-[12px]">
           <li class="flex items-center gap-2">
             <Kbd label="J" /><span>下一条</span>
           </li>

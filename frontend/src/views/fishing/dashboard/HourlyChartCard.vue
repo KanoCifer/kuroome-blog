@@ -96,66 +96,68 @@ const metrics = computed(() => {
  * ------------------------------------------------------------------ */
 const chartOption = computed(() => {
   try {
-  if (!weatherHourly.value || weatherHourly.value.length === 0) return {};
+    if (!weatherHourly.value || weatherHourly.value.length === 0) return {};
 
-  const p = palette.value;
-  const xData = weatherHourly.value.map((item) =>
-    dayjs(item.fxTime).format('HH:mm'),
-  );
-  const rainData = weatherHourly.value.map((item) => Number(item.precip) || 0);
-  const tempData = weatherHourly.value.map((item) => Number(item.temp) || 0);
+    const p = palette.value;
+    const xData = weatherHourly.value.map((item) =>
+      dayjs(item.fxTime).format('HH:mm'),
+    );
+    const rainData = weatherHourly.value.map(
+      (item) => Number(item.precip) || 0,
+    );
+    const tempData = weatherHourly.value.map((item) => Number(item.temp) || 0);
 
-  const tempMax = Math.max(...tempData);
-  const tempMin = Math.min(...tempData);
-  const tempAxisMin = Math.floor(tempMin - 4);
-  const tempAxisMax = Math.ceil(tempMax + 4);
-  const rainPeak = Math.max(...rainData);
-  const rainAxisMax = Math.max(8, Math.ceil(rainPeak * 1.6));
+    const tempMax = Math.max(...tempData);
+    const tempMin = Math.min(...tempData);
+    const tempAxisMin = Math.floor(tempMin - 4);
+    const tempAxisMax = Math.ceil(tempMax + 4);
+    const rainPeak = Math.max(...rainData);
+    const rainAxisMax = Math.max(8, Math.ceil(rainPeak * 1.6));
 
-  /* label interval: 24h 数据,每 4h 一个 (共 ~6) */
-  const xInterval = Math.max(0, Math.floor(xData.length / 6) - 1);
+    /* label interval: 24h 数据,每 4h 一个 (共 ~6) */
+    const xInterval = Math.max(0, Math.floor(xData.length / 6) - 1);
 
-  /* 暖橙温度焦点色:从 --warning 派生的更亮的 accent,1px solid 线 + hover 锚点 */
-  const tempColor = p.warning;
-  const rainColor = p.primary;
+    /* 暖橙温度焦点色:从 --warning 派生的更亮的 accent,1px solid 线 + hover 锚点 */
+    const tempColor = p.warning;
+    const rainColor = p.primary;
 
-  return {
-    backgroundColor: 'transparent',
-    animation: false,
-    textStyle: { color: p.foreground, fontFamily: 'inherit' },
+    return {
+      backgroundColor: 'transparent',
+      animation: false,
+      textStyle: { color: p.foreground, fontFamily: 'inherit' },
 
-    tooltip: {
-      trigger: 'axis',
-      confine: true,
-      backgroundColor: p.card,
-      borderColor: withAlpha(p.foreground, 0.08),
-      borderWidth: 1,
-      borderRadius: 8,
-      padding: [10, 12],
-      extraCssText: `box-shadow: 0 8px 24px -8px ${withAlpha(p.foreground, 0.18)};`,
-      textStyle: { color: p.foreground, fontSize: 12, fontFamily: 'inherit' },
-      axisPointer: {
-        type: 'line',
-        lineStyle: {
-          color: withAlpha(tempColor, 0.55),
-          type: 'solid',
-          width: 1,
+      tooltip: {
+        trigger: 'axis',
+        confine: true,
+        backgroundColor: p.card,
+        borderColor: withAlpha(p.foreground, 0.08),
+        borderWidth: 1,
+        borderRadius: 8,
+        padding: [10, 12],
+        extraCssText: `box-shadow: 0 8px 24px -8px ${withAlpha(p.foreground, 0.18)};`,
+        textStyle: { color: p.foreground, fontSize: 12, fontFamily: 'inherit' },
+        axisPointer: {
+          type: 'line',
+          lineStyle: {
+            color: withAlpha(tempColor, 0.55),
+            type: 'solid',
+            width: 1,
+          },
+          snap: true,
         },
-        snap: true,
-      },
-      formatter: (params: unknown) => {
-        const arr = params as Array<{
-          axisValue: string;
-          seriesName: string;
-          data: number;
-          marker: string;
-        }>;
-        const time = arr[0]?.axisValue ?? '';
-        const lines = arr
-          .map((it) => {
-            const isTemp = it.seriesName.includes('温度');
-            const unit = isTemp ? '°C' : 'mm';
-            return `<div style="display:flex;align-items:center;gap:8px;margin-top:3px;">
+        formatter: (params: unknown) => {
+          const arr = params as Array<{
+            axisValue: string;
+            seriesName: string;
+            data: number;
+            marker: string;
+          }>;
+          const time = arr[0]?.axisValue ?? '';
+          const lines = arr
+            .map((it) => {
+              const isTemp = it.seriesName.includes('温度');
+              const unit = isTemp ? '°C' : 'mm';
+              return `<div style="display:flex;align-items:center;gap:8px;margin-top:3px;">
               <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${
                 isTemp ? tempColor : rainColor
               };"></span>
@@ -164,142 +166,150 @@ const chartOption = computed(() => {
                 isTemp ? tempColor : p.foreground
               };">${it.data}${unit}</span>
             </div>`;
-          })
-          .join('');
-        return `<div style="font-weight:600;font-size:11px;color:${p.mutedForeground};margin-bottom:4px;letter-spacing:0.04em;">${time}</div>${lines}`;
-      },
-    },
-
-    legend: { show: false },
-
-    /* 紧凑 grid:让图表区尽量留给数据本身,顶部只留 12px 给 tooltip 不被裁 */
-    grid: { left: 4, right: 4, top: 12, bottom: 4, containLabel: true },
-
-    xAxis: {
-      type: 'category',
-      boundaryGap: true,
-      data: xData,
-      axisLine: { show: false },
-      axisTick: { show: false },
-      splitLine: { show: false },
-      axisLabel: {
-        color: p.mutedForeground,
-        fontSize: 10,
-        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-        interval: xInterval,
-        margin: 8,
-      },
-    },
-
-    yAxis: [
-      /* 左轴 —— 降水 (mm) */
-      {
-        type: 'value',
-        position: 'left',
-        min: 0,
-        max: rainAxisMax,
-        axisLine: { show: false },
-        axisTick: { show: false },
-        splitNumber: 3,
-        splitLine: {
-          show: true,
-          lineStyle: {
-            color: withAlpha(p.border, 0.55),
-            type: 'dashed',
-            width: 1,
-          },
-        },
-        axisLabel: {
-          color: p.mutedForeground,
-          fontSize: 9,
-          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-          formatter: (v: number) =>
-            v === Math.floor(v) ? `${v}` : v.toFixed(1),
-          margin: 6,
+            })
+            .join('');
+          return `<div style="font-weight:600;font-size:11px;color:${p.mutedForeground};margin-bottom:4px;letter-spacing:0.04em;">${time}</div>${lines}`;
         },
       },
-      /* 右轴 —— 温度 (°C) */
-      {
-        type: 'value',
-        position: 'right',
-        min: tempAxisMin,
-        max: tempAxisMax,
+
+      legend: { show: false },
+
+      /* 紧凑 grid:让图表区尽量留给数据本身,顶部只留 12px 给 tooltip 不被裁 */
+      grid: { left: 4, right: 4, top: 12, bottom: 4, containLabel: true },
+
+      xAxis: {
+        type: 'category',
+        boundaryGap: true,
+        data: xData,
         axisLine: { show: false },
         axisTick: { show: false },
-        splitNumber: 3,
         splitLine: { show: false },
         axisLabel: {
-          color: withAlpha(tempColor, 0.85),
-          fontSize: 9,
+          color: p.mutedForeground,
+          fontSize: 10,
           fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-          formatter: (v: number) => `${Math.round(v)}°`,
-          margin: 6,
+          interval: xInterval,
+          margin: 8,
         },
       },
-    ],
 
-    series: [
-      /* 降水柱 —— 实心 + 顶部 1px 边,只在 hover 邻接时提亮 */
-      {
-        name: '降水 (mm)',
-        type: 'bar',
-        data: rainData,
-        yAxisIndex: 0,
-        barMaxWidth: 10,
-        barMinHeight: 1,
-        itemStyle: {
-          color: withAlpha(rainColor, 0.78),
-          borderColor: rainColor,
-          borderWidth: 0,
-          borderRadius: [2, 2, 0, 0],
+      yAxis: [
+        /* 左轴 —— 降水 (mm) */
+        {
+          type: 'value',
+          position: 'left',
+          min: 0,
+          max: rainAxisMax,
+          axisLine: { show: false },
+          axisTick: { show: false },
+          splitNumber: 3,
+          splitLine: {
+            show: true,
+            lineStyle: {
+              color: withAlpha(p.border, 0.55),
+              type: 'dashed',
+              width: 1,
+            },
+          },
+          axisLabel: {
+            color: p.mutedForeground,
+            fontSize: 9,
+            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+            formatter: (v: number) =>
+              v === Math.floor(v) ? `${v}` : v.toFixed(1),
+            margin: 6,
+          },
         },
-        emphasis: {
-          focus: 'self',
+        /* 右轴 —— 温度 (°C) */
+        {
+          type: 'value',
+          position: 'right',
+          min: tempAxisMin,
+          max: tempAxisMax,
+          axisLine: { show: false },
+          axisTick: { show: false },
+          splitNumber: 3,
+          splitLine: { show: false },
+          axisLabel: {
+            color: withAlpha(tempColor, 0.85),
+            fontSize: 9,
+            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+            formatter: (v: number) => `${Math.round(v)}°`,
+            margin: 6,
+          },
+        },
+      ],
+
+      series: [
+        /* 降水柱 —— 实心 + 顶部 1px 边,只在 hover 邻接时提亮 */
+        {
+          name: '降水 (mm)',
+          type: 'bar',
+          data: rainData,
+          yAxisIndex: 0,
+          barMaxWidth: 10,
+          barMinHeight: 1,
           itemStyle: {
-            color: rainColor,
+            color: withAlpha(rainColor, 0.78),
             borderColor: rainColor,
             borderWidth: 0,
+            borderRadius: [2, 2, 0, 0],
           },
+          emphasis: {
+            focus: 'self',
+            itemStyle: {
+              color: rainColor,
+              borderColor: rainColor,
+              borderWidth: 0,
+            },
+          },
+          blur: { itemStyle: { opacity: 0.25 } },
+          z: 2,
         },
-        blur: { itemStyle: { opacity: 0.25 } },
-        z: 2,
-      },
-      /* 温度线 —— 单一焦点;hover 显空心锚点 */
-      {
-        name: '温度 (°C)',
-        type: 'line',
-        data: tempData,
-        yAxisIndex: 1,
-        smooth: 0.25,
-        symbol: 'circle',
-        symbolSize: 5,
-        showSymbol: false,
-        lineStyle: { width: 2, color: tempColor, cap: 'round', join: 'round' },
-        itemStyle: {
-          color: p.card,
-          borderColor: tempColor,
-          borderWidth: 1.6,
-        },
-        emphasis: {
-          focus: 'self',
-          scale: 1.4,
-          itemStyle: {
+        /* 温度线 —— 单一焦点;hover 显空心锚点 */
+        {
+          name: '温度 (°C)',
+          type: 'line',
+          data: tempData,
+          yAxisIndex: 1,
+          smooth: 0.25,
+          symbol: 'circle',
+          symbolSize: 5,
+          showSymbol: false,
+          lineStyle: {
+            width: 2,
             color: tempColor,
-            borderColor: p.card,
+            cap: 'round',
+            join: 'round',
+          },
+          itemStyle: {
+            color: p.card,
+            borderColor: tempColor,
             borderWidth: 1.6,
           },
-          lineStyle: { width: 2.5 },
+          emphasis: {
+            focus: 'self',
+            scale: 1.4,
+            itemStyle: {
+              color: tempColor,
+              borderColor: p.card,
+              borderWidth: 1.6,
+            },
+            lineStyle: { width: 2.5 },
+          },
+          blur: {
+            lineStyle: { opacity: 0.35 },
+            itemStyle: { opacity: 0.35 },
+          },
+          z: 3,
         },
-        blur: {
-          lineStyle: { opacity: 0.35 },
-          itemStyle: { opacity: 0.35 },
-        },
-        z: 3,
-      },
-    ],
-  };
+      ],
+    };
   } catch (e) {
-    console.log('[chartOption] THREW:', e instanceof Error ? e.message : String(e));
+    console.log(
+      '[chartOption] THREW:',
+      e instanceof Error ? e.message : String(e),
+    );
     return {};
   }
 });

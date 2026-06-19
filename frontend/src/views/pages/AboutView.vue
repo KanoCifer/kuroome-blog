@@ -208,11 +208,7 @@ onMounted(() => {
   position: absolute;
   inset: -4px;
   border-radius: 9999px;
-  background: linear-gradient(
-    135deg,
-    var(--color-primary),
-    var(--color-muted)
-  );
+  background: linear-gradient(135deg, var(--color-primary), var(--color-muted));
   opacity: 0.25;
   filter: blur(14px);
   transition: opacity 0.5s ease;

@@ -10,6 +10,9 @@ class GalleryImage(BaseModel):
     )
     url: str
     description: str
+    exif: dict[str, str] | None = Field(
+        default=None, description="图片的EXIF信息"
+    )
 
 
 class GalleryInput(BaseModel):

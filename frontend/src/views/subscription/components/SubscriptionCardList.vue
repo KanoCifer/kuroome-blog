@@ -34,7 +34,9 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <section class="border-border/80 bg-background rounded-3xl border p-5 shadow-sm">
+  <section
+    class="border-border/80 bg-background rounded-3xl border p-5 shadow-sm"
+  >
     <header class="mb-4 flex items-center justify-between gap-3">
       <h3 class="text-foreground text-sm font-semibold tracking-wide uppercase">
         订阅列表

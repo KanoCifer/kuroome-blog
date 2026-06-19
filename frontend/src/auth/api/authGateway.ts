@@ -86,7 +86,9 @@ export const authGateway = {
     return request.get('v1/auth/passkey/registration-options');
   },
 
-  registerPasskey(payload: { response: unknown }): Promise<AxiosResponse<unknown>> {
+  registerPasskey(payload: {
+    response: unknown;
+  }): Promise<AxiosResponse<unknown>> {
     return request.post('v1/auth/passkey/register', payload);
   },
 

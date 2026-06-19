@@ -30,7 +30,9 @@ const emit = defineEmits<{
 
 <template>
   <aside class="xl:sticky xl:top-24 xl:h-fit">
-    <section class="border-border/80 bg-background rounded-3xl border p-5 shadow-sm">
+    <section
+      class="border-border/80 bg-background rounded-3xl border p-5 shadow-sm"
+    >
       <h3 class="text-foreground text-sm font-semibold tracking-wide uppercase">
         详情面板
       </h3>

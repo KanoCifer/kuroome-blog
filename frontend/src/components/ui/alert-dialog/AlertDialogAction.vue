@@ -29,7 +29,10 @@ function onClick(e: MouseEvent) {
   <button
     data-slot="alert-dialog-action"
     type="button"
-    :class="['inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-[13px] font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] outline-none disabled:pointer-events-none disabled:opacity-50', props.class]"
+    :class="[
+      'bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:border-ring focus-visible:ring-ring/50 inline-flex h-9 items-center justify-center rounded-md px-4 text-[13px] font-medium shadow-sm transition-colors outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50',
+      props.class,
+    ]"
     @click="onClick"
   >
     <slot />

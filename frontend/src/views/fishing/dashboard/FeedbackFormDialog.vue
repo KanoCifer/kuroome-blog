@@ -81,7 +81,9 @@ const handleSubmit = async () => {
         v-if="isOpen"
         class="bg-foreground/40 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
       >
-        <div class="bg-background mx-4 w-full max-w-md rounded-2xl p-6 shadow-xl">
+        <div
+          class="bg-background mx-4 w-full max-w-md rounded-2xl p-6 shadow-xl"
+        >
           <h3 class="text-foreground mb-4 text-lg font-semibold">
             钓鱼反馈
             <span class="text-muted-foreground ml-2 text-sm font-normal"

@@ -78,8 +78,7 @@ export const useMomentsStore = defineStore('moments', () => {
       publicActiveTag.value = tag ?? null;
       return data;
     } catch (err) {
-      error.value =
-        err instanceof Error ? err.message : '加载碎碎念失败';
+      error.value = err instanceof Error ? err.message : '加载碎碎念失败';
       throw err;
     } finally {
       loading.value = false;
@@ -92,7 +91,8 @@ export const useMomentsStore = defineStore('moments', () => {
     try {
       const page = params.page ?? adminPage.value;
       const page_size = params.page_size ?? adminPageSize.value;
-      const status = params.status !== undefined ? params.status : adminStatus.value;
+      const status =
+        params.status !== undefined ? params.status : adminStatus.value;
       const data = await momentsGateway.listAdmin({
         page,
         page_size,
@@ -105,8 +105,7 @@ export const useMomentsStore = defineStore('moments', () => {
       adminStatus.value = status ?? null;
       return data;
     } catch (err) {
-      error.value =
-        err instanceof Error ? err.message : '加载碎碎念失败';
+      error.value = err instanceof Error ? err.message : '加载碎碎念失败';
       throw err;
     } finally {
       loading.value = false;
@@ -123,8 +122,7 @@ export const useMomentsStore = defineStore('moments', () => {
       current.value = data.moment;
       return data.moment;
     } catch (err) {
-      error.value =
-        err instanceof Error ? err.message : '加载碎碎念失败';
+      error.value = err instanceof Error ? err.message : '加载碎碎念失败';
       throw err;
     } finally {
       loading.value = false;
@@ -138,8 +136,7 @@ export const useMomentsStore = defineStore('moments', () => {
       const data = await momentsGateway.create(payload);
       return data.moment;
     } catch (err) {
-      error.value =
-        err instanceof Error ? err.message : '发布碎碎念失败';
+      error.value = err instanceof Error ? err.message : '发布碎碎念失败';
       throw err;
     } finally {
       submitting.value = false;
@@ -157,8 +154,7 @@ export const useMomentsStore = defineStore('moments', () => {
       }
       return data.moment;
     } catch (err) {
-      error.value =
-        err instanceof Error ? err.message : '更新碎碎念失败';
+      error.value = err instanceof Error ? err.message : '更新碎碎念失败';
       throw err;
     } finally {
       submitting.value = false;
@@ -177,8 +173,7 @@ export const useMomentsStore = defineStore('moments', () => {
         current.value = null;
       }
     } catch (err) {
-      error.value =
-        err instanceof Error ? err.message : '删除碎碎念失败';
+      error.value = err instanceof Error ? err.message : '删除碎碎念失败';
       throw err;
     } finally {
       submitting.value = false;

@@ -148,7 +148,9 @@ const handleSubmit = async () => {
     </div>
 
     <!-- 右侧 Register Form -->
-    <div class="bg-background flex w-full items-center justify-center p-8 lg:w-1/2">
+    <div
+      class="bg-background flex w-full items-center justify-center p-8 lg:w-1/2"
+    >
       <div class="w-full max-w-sm xl:max-w-md">
         <!-- 表头 -->
         <div class="mb-8 flex flex-col items-center lg:items-start">

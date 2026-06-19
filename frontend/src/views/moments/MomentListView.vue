@@ -219,9 +219,7 @@
       @close="onDeleteCancel"
     >
       <div class="px-6 pt-6 pb-5">
-        <h2
-          class="text-foreground font-serif text-lg font-medium italic"
-        >
+        <h2 class="text-foreground font-serif text-lg font-medium italic">
           删除这条碎碎念？
         </h2>
         <p class="text-muted-foreground mt-2 text-sm leading-relaxed">
@@ -242,7 +240,7 @@
         <button
           type="button"
           :disabled="deleting"
-          class="bg-destructive text-white hover:bg-destructive/90 inline-flex items-center justify-center rounded-lg px-4 py-1.5 text-[13px] font-medium shadow-sm transition-colors disabled:opacity-50"
+          class="bg-destructive hover:bg-destructive/90 inline-flex items-center justify-center rounded-lg px-4 py-1.5 text-[13px] font-medium text-white shadow-sm transition-colors disabled:opacity-50"
           @click="handleDelete"
         >
           {{ deleting ? '删除中…' : '删除' }}

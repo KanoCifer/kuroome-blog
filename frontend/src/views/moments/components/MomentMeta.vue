@@ -16,7 +16,8 @@
 
     <!-- 标签在前置位 -->
     <span v-if="moment.tags.length" class="text-border" aria-hidden="true"
-      >·</span>
+      >·</span
+    >
 
     <!-- 时间戳 -->
     <time class="tabular-nums" :datetime="moment.published_at ?? ''">
@@ -26,7 +27,7 @@
     <!-- 置顶标 -->
     <span
       v-if="moment.is_pinned"
-      class="text-warning inline-flex items-center gap-1 font-semibold uppercase tracking-[0.18em]"
+      class="text-warning inline-flex items-center gap-1 font-semibold tracking-[0.18em] uppercase"
     >
       <span aria-hidden="true">·</span>
       <PinIcon class="h-3 w-3" />

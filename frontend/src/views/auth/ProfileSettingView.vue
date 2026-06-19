@@ -277,7 +277,9 @@ onMounted(() => {
     </div>
 
     <!-- 右侧 Profile Form -->
-    <div class="bg-background flex w-full items-center justify-center p-8 lg:w-1/2">
+    <div
+      class="bg-background flex w-full items-center justify-center p-8 lg:w-1/2"
+    >
       <div class="w-full max-w-md xl:max-w-xl">
         <div class="mb-8 flex flex-col items-center lg:items-start">
           <div
@@ -543,7 +545,9 @@ onMounted(() => {
             <span class="border-border w-full border-t"></span>
           </div>
           <div class="relative flex justify-center text-xs uppercase">
-            <span class="bg-background text-muted-foreground px-2"> Security </span>
+            <span class="bg-background text-muted-foreground px-2">
+              Security
+            </span>
           </div>
         </div>
 

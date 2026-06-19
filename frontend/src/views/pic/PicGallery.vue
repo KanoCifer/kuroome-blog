@@ -78,10 +78,16 @@
     <PicDetailModal
       :image="selectedImage"
       :editable="canEdit && isEditMode"
-      :formatted-date="selectedImage ? formatDate(selectedImage.uploadedAt) : ''"
+      :formatted-date="
+        selectedImage ? formatDate(selectedImage.uploadedAt) : ''
+      "
+      :frame-no="selectedIndex + 1"
+      :exif="selectedImage?.exif ?? undefined"
       @close="closeImageDetail"
       @update="onUpdateDescription"
       @delete="onDeleteImage"
+      @prev="navigateImage(-1)"
+      @next="navigateImage(1)"
     />
 
     <PicUploadModal
@@ -163,13 +169,24 @@ watch(canEdit, (value) => {
 
 // --- detail modal ---
 const selectedImage = ref<Picture | null>(null);
+const selectedIndex = ref(-1);
 
-const openImageDetail = (image: Picture) => {
+const openImageDetail = (image: Picture, index: number) => {
   selectedImage.value = image;
+  selectedIndex.value = index;
 };
 
 const closeImageDetail = () => {
   selectedImage.value = null;
+  selectedIndex.value = -1;
+};
+
+const navigateImage = (delta: number) => {
+  if (images.value.length === 0) return;
+  const next =
+    (selectedIndex.value + delta + images.value.length) % images.value.length;
+  selectedIndex.value = next;
+  selectedImage.value = images.value[next];
 };
 
 const onUpdateDescription = async (id: string, description: string) => {

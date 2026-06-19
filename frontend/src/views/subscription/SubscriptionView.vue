@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import type {
-  Subscription,
-  TestNotificationPayload,
-} from '@/api/rss';
+import type { Subscription, TestNotificationPayload } from '@/api/rss';
 import BasicDetail from '@/components/basic/BasicDetail.vue';
 import { subscriptionGateway } from '@/api/rss';
 import { useNotificationStore } from '@/stores/notification';

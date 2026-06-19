@@ -20,7 +20,9 @@ defineOptions({
   name: 'UiButton',
 });
 
-const classes = computed(() => buttonClasses(props.variant, props.size, props.class));
+const classes = computed(() =>
+  buttonClasses(props.variant, props.size, props.class),
+);
 </script>
 
 <template>

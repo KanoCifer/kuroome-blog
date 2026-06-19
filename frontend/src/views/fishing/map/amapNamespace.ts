@@ -32,7 +32,10 @@ interface DrivingService {
   search(
     origin: [number, number] | AMap.LngLat,
     destination: [number, number] | AMap.LngLat,
-    callback: (status: 'complete' | 'no_data' | string, result: unknown) => void,
+    callback: (
+      status: 'complete' | 'no_data' | string,
+      result: unknown,
+    ) => void,
   ): void;
   clear(): void;
 }

@@ -1,10 +1,23 @@
 import request, { extractData } from '@/api/request';
 
+export interface ExifInfo {
+  camera?: string;
+  lens?: string;
+  iso?: number;
+  exposure?: string;
+  aperture?: string;
+  focalLength?: string;
+  focalLength35?: string;
+  takenAt?: string;
+  gps?: { lat: number; lng: number };
+}
+
 export interface Picture {
   id: string;
   uploadedAt?: string;
   url: string;
   description: string;
+  exif?: ExifInfo | null;
 }
 
 export interface GalleryData {

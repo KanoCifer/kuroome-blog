@@ -421,6 +421,9 @@ class GalleryImage(Base):
         default=lambda: datetime.now(UTC),
         onupdate=lambda: datetime.now(UTC),
     )
+    exif: Mapped[dict[str, str] | None] = mapped_column(
+        JSON, default=None
+    )
 
     user_id: Mapped[int | None] = mapped_column(
         Integer, ForeignKey("user.id"), nullable=True, index=True

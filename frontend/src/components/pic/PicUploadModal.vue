@@ -75,7 +75,7 @@
                 class="absolute inset-0 flex items-center justify-center rounded-xl bg-black/40 opacity-0 transition-opacity group-hover:opacity-100"
               >
                 <span
-                  class="rounded-full bg-background/30 px-3 py-1.5 text-sm font-medium text-white backdrop-blur-md"
+                  class="bg-background/30 rounded-full px-3 py-1.5 text-sm font-medium text-white backdrop-blur-md"
                   >更换图片</span
                 >
               </div>

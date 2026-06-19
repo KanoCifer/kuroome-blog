@@ -30,7 +30,7 @@
       <!-- 置顶别针徽章 -->
       <span
         v-if="moment.is_pinned"
-        class="bg-warning/15 text-warning absolute -top-2 left-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] shadow-sm"
+        class="bg-warning/15 text-warning absolute -top-2 left-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-[0.18em] uppercase shadow-sm"
       >
         <PinIcon class="h-3 w-3" />
         <span>置顶</span>
@@ -39,7 +39,7 @@
       <!-- admin 浮动操作（hover 出现，避免抢戏） -->
       <div
         v-if="isAdmin"
-        class="absolute top-2 right-2 flex items-center gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100"
+        class="absolute top-2 right-2 flex items-center gap-1 opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100"
         @click.stop
       >
         <button

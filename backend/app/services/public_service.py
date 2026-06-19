@@ -7,6 +7,7 @@ import httpx2
 from redis.asyncio import Redis as AsyncRedis
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core import logger
 from app.core.config import get_settings
 from app.models.models import GalleryImage
 from app.repositories.gallery_repo import GalleryRepo
@@ -194,7 +195,10 @@ Sitemap: {sitemap_url}
             yield {"content": f"[ERROR] 天气分析失败: {exc!r}", "is_end": True}
 
     async def set_pic_gallery(self, images: GalleryInput) -> None:
-        """设置照片墙数据（持久化到 DB）。"""
+        """设置照片墙数据（持久化到 Postgres）"""
+        from app.utils.get_exif import get_exif_data
+        from app.utils.media import get_image_path
+
         if not images.images:
             if self.gallery_repo is not None:
                 await self.gallery_repo.delete_all()
@@ -203,13 +207,19 @@ Sitemap: {sitemap_url}
         if self.gallery_repo is None:
             return
 
+        relative_paths = [get_image_path(img.url) for img in images.images]
+        exif_data = [get_exif_data(path) for path in relative_paths]
+
         db_images = [
             GalleryImage(
                 url=img.url,
                 description=img.description,
                 sort_order=idx,
+                exif=exif,
             )
-            for idx, img in enumerate(images.images)
+            for idx, (img, exif) in enumerate(
+                zip(images.images, exif_data, strict=False)
+            )
         ]
         await self.gallery_repo.save_images(db_images)
 
@@ -217,9 +227,12 @@ Sitemap: {sitemap_url}
         """获取照片墙数据（DB 直取，缓存由 API 层 redis_cache 负责）。"""
         if self.gallery_repo is None:
             return []
-
-        db_images: list[GalleryImage] = await self.gallery_repo.list_all()
-        return [self._serialize_gallery_image(img) for img in db_images]
+        try:
+            db_images: list[GalleryImage] = await self.gallery_repo.list_all()
+            return [self._serialize_gallery_image(img) for img in db_images]
+        except Exception as e:
+            logger.error(f"Failed to get pic gallery: {e}")
+            return []
 
     @staticmethod
     def _serialize_gallery_image(img: GalleryImage) -> dict:
@@ -230,6 +243,7 @@ Sitemap: {sitemap_url}
             "uploadedAt": (
                 img.uploaded_at.isoformat() if img.uploaded_at else None
             ),
+            "exif": img.exif,
         }
 
     # ── Changelog ──────────────────────────────────────────────

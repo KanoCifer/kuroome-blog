@@ -26,7 +26,9 @@ const emit = defineEmits<{
 
 const internal = ref(props.defaultOpen);
 const isControlled = props.open !== undefined;
-const current = ref<boolean>(isControlled ? (props.open as boolean) : internal.value);
+const current = ref<boolean>(
+  isControlled ? (props.open as boolean) : internal.value,
+);
 
 watch(
   () => props.open,
