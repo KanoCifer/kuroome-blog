@@ -1,8 +1,9 @@
 import { galleryGateway } from '@/api/weread/galleryGateway';
 import { useNotificationStore } from '@/stores/notification';
+import { rewriteMediaUrl } from '@/composables/shared';
 import dayjs from 'dayjs';
 import { computed, ref, watch } from 'vue';
-import { getFullMediaUrl, newPictureId, type Picture } from './useGallery';
+import { newPictureId, type Picture } from './useGallery';
 
 // 上传流程：文件校验、预览、上传（不含持久化，由调用方处理新图片）
 export const useGalleryUpload = () => {
@@ -65,7 +66,7 @@ export const useGalleryUpload = () => {
       try {
         const res = await galleryGateway.uploadGalleryImage(formData);
         useNotificationStore().success('图片上传成功');
-        url = getFullMediaUrl(res.url);
+        url = rewriteMediaUrl(res.url);
       } catch {
         useNotificationStore().error('图片上传失败');
         return null;

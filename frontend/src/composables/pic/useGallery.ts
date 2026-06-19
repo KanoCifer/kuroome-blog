@@ -1,5 +1,6 @@
 import { galleryGateway } from '@/api/weread/galleryGateway';
 import { useNotificationStore } from '@/stores/notification';
+import { rewriteMediaUrl } from '@/composables/shared';
 import dayjs from 'dayjs';
 import { v4 } from 'uuid';
 import { ref } from 'vue';
@@ -25,25 +26,6 @@ export interface Picture {
   exif?: ExifInfo | null;
 }
 
-// API base URL for constructing full media URLs
-const apiBase = import.meta.env.VITE_API_BASE || 'https://api.kanocifer.chat';
-
-// Construct full media URL from relative path
-export const getFullMediaUrl = (relativeUrl: string): string => {
-  if (!relativeUrl) return '';
-  // If already a full URL, return as is
-  if (relativeUrl.startsWith('http://') || relativeUrl.startsWith('https://')) {
-    return relativeUrl;
-  }
-  // Extract origin from apiBase to avoid duplicating path prefix (e.g. /api)
-  try {
-    const url = new URL(apiBase);
-    return `${url.origin}${relativeUrl}`;
-  } catch {
-    return `${apiBase}${relativeUrl}`;
-  }
-};
-
 // 照片墙数据与持久化
 export const useGallery = () => {
   const images = ref<Picture[]>([]);
@@ -55,7 +37,7 @@ export const useGallery = () => {
       // Convert relative URLs to full media URLs
       images.value = response.images.map((img) => ({
         ...img,
-        url: getFullMediaUrl(img.url),
+        url: rewriteMediaUrl(img.url),
       }));
     } catch {
       useNotificationStore().error('获取照片墙数据失败');
