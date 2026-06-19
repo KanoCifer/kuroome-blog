@@ -332,7 +332,7 @@
       },
       {
         "type": "fix",
-        "content": "统一 Vue 端 head 管理，修复图片画廊 media URL 双重前缀"
+        "content": "统一 Vue 端 head 管理，修复照片墙 media URL 双重前缀"
       },
       {
         "type": "fix",

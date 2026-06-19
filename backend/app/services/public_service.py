@@ -194,7 +194,7 @@ Sitemap: {sitemap_url}
             yield {"content": f"[ERROR] 天气分析失败: {exc!r}", "is_end": True}
 
     async def set_pic_gallery(self, images: GalleryInput) -> None:
-        """设置图片画廊数据（持久化到 DB）。"""
+        """设置照片墙数据（持久化到 DB）。"""
         if not images.images:
             if self.gallery_repo is not None:
                 await self.gallery_repo.delete_all()
@@ -214,7 +214,7 @@ Sitemap: {sitemap_url}
         await self.gallery_repo.save_images(db_images)
 
     async def get_pic_gallery(self) -> list[dict]:
-        """获取图片画廊数据（DB 直取，缓存由 API 层 redis_cache 负责）。"""
+        """获取照片墙数据（DB 直取，缓存由 API 层 redis_cache 负责）。"""
         if self.gallery_repo is None:
             return []
 

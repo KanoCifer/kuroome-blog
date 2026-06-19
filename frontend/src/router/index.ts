@@ -269,9 +269,9 @@ const router = createRouter({
       name: 'gallery',
       component: () => import('@/views/pic/PicGallery.vue'),
       meta: {
-        title: "图片画廊 - Kuroome's Blog",
+        title: "照片墙 - Kuroome's Blog",
         description: '展示精选图片的画廊，支持拖拽浏览',
-        keywords: '图片画廊,精选图片,拖拽浏览',
+        keywords: '照片墙,精选图片,拖拽浏览',
       },
     },
     {

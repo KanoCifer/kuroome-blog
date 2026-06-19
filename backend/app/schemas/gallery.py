@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 
 
 class GalleryImage(BaseModel):
-    """图片画廊中的单张图片信息"""
+    """照片墙中的单张图片信息"""
 
     id: str
     uploadedAt: str | None = Field(
@@ -13,7 +13,7 @@ class GalleryImage(BaseModel):
 
 
 class GalleryInput(BaseModel):
-    """图片画廊输入体"""
+    """照片墙输入体"""
 
     images: list[GalleryImage] = Field(
         default_factory=list, description="图片列表"
@@ -21,7 +21,7 @@ class GalleryInput(BaseModel):
 
 
 class GalleryResponse(BaseModel):
-    """图片画廊响应体"""
+    """照片墙响应体"""
 
     images: list[GalleryImage] = Field(
         default_factory=list, description="图片列表"

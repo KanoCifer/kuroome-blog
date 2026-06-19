@@ -123,7 +123,7 @@ const navItems = [
   { path: '/blog', label: '近期文章', icon: BlogIcon },
   { path: '/bookshelf', label: '我的书架', icon: BookshelfIcon },
   { path: '/moments', label: '碎碎念', icon: MomentIcon },
-  { path: '/gallery', label: '图片画廊', icon: Image },
+  { path: '/gallery', label: '照片墙', icon: Image },
   { path: '/about', label: '关于网站', icon: AboutIcon },
 ];
 
