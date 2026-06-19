@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import base64
-from datetime import UTC, datetime
-from xml.etree.ElementTree import Element, SubElement, tostring
+from xml.etree.ElementTree import Element, SubElement
 
 import httpx2
 import orjson
@@ -219,69 +218,44 @@ Sitemap: {sitemap_url}
         except Exception as exc:
             yield {"content": f"[ERROR] 天气分析失败: {exc!r}", "is_end": True}
 
-    async def set_pic_gallery(
-        self, redis: AsyncRedis, images: GalleryInput
-    ) -> None:
-        """设置图片画廊数据（双写到 DB 和 Redis）。"""
+    async def set_pic_gallery(self, images: GalleryInput) -> None:
+        """设置图片画廊数据（持久化到 DB）。"""
         if not images.images:
-            await redis.delete("pic_gallery:images")
             if self.gallery_repo is not None:
                 await self.gallery_repo.delete_all()
             return
 
-        # 写入 DB
-        if self.gallery_repo is not None:
-            db_images = [
-                GalleryImage(
-                    url=img.url,
-                    description=img.description,
-                    sort_order=idx,
-                )
-                for idx, img in enumerate(images.images)
-            ]
-            await self.gallery_repo.save_images(db_images)
+        if self.gallery_repo is None:
+            return
 
-        # 写入 Redis（缓存）
-        await redis.delete("pic_gallery:images")
-        pipeline = redis.pipeline()
-        for image in images.images:
-            pipeline.rpush(
-                "pic_gallery:images",
-                orjson.dumps(image.model_dump()),
+        db_images = [
+            GalleryImage(
+                url=img.url,
+                description=img.description,
+                sort_order=idx,
             )
-        await pipeline.execute()
+            for idx, img in enumerate(images.images)
+        ]
+        await self.gallery_repo.save_images(db_images)
 
-    async def get_pic_gallery(self, redis: AsyncRedis) -> list[dict]:
-        """获取图片画廊数据，优先走 Redis 缓存，miss 时回源 DB。"""
-        cached = await redis.lrange("pic_gallery:images", 0, -1)  # pyright: ignore[reportGeneralTypeIssues]
-        if cached:
-            return [orjson.loads(img) for img in cached]  # type: ignore
+    async def get_pic_gallery(self) -> list[dict]:
+        """获取图片画廊数据（DB 直取，缓存由 API 层 redis_cache 负责）。"""
+        if self.gallery_repo is None:
+            return []
 
-        # 缓存 miss，从 DB 回源
-        if self.gallery_repo is not None:
-            db_images = await self.gallery_repo.list_all()
-            if db_images:
-                result = [
-                    {
-                        "id": str(img.id),
-                        "url": img.url,
-                        "description": img.description,
-                        "uploadedAt": (
-                            img.uploaded_at.isoformat()
-                            if img.uploaded_at
-                            else None
-                        ),
-                    }
-                    for img in db_images
-                ]
-                # 异步回填缓存
-                pipeline = redis.pipeline()
-                for item in result:
-                    pipeline.rpush("pic_gallery:images", orjson.dumps(item))
-                await pipeline.execute()
-                return result
+        db_images = await self.gallery_repo.list_all()
+        return [self._serialize_gallery_image(img) for img in db_images]
 
-        return []
+    @staticmethod
+    def _serialize_gallery_image(img: GalleryImage) -> dict:
+        return {
+            "id": str(img.id),
+            "url": img.url,
+            "description": img.description,
+            "uploadedAt": (
+                img.uploaded_at.isoformat() if img.uploaded_at else None
+            ),
+        }
 
     # ── Changelog ──────────────────────────────────────────────
 

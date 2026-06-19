@@ -10,7 +10,7 @@ This module provides public endpoints that do not require authentication:
 from __future__ import annotations
 
 from fastapi import APIRouter, Body, Depends, File, Request, UploadFile
-from fastapi.responses import JSONResponse, PlainTextResponse
+from fastapi.responses import PlainTextResponse
 from redis.asyncio import Redis as AsyncRedis
 from starlette import status
 
@@ -237,16 +237,12 @@ async def upload_blog_image(
 
 @router.post("/set-pic-gallery")
 async def set_pic_gallery(
-    redis: AsyncRedis = Depends(get_redis),
     images: GalleryInput = Body(..., description="List of image data to set"),
     public_service: PublicService = Depends(public_service_dep),
 ) -> APIResponse:
     """Set picture gallery data."""
     try:
-        await public_service.set_pic_gallery(
-            redis=redis,
-            images=images,
-        )
+        await public_service.set_pic_gallery(images=images)
         await _safe_invalidate("get_pic_gallery")
         return APIResponse(
             message="Picture gallery updated successfully",
@@ -259,14 +255,13 @@ async def set_pic_gallery(
 
 
 @router.get("/pic-gallery")
-@redis_cache(ttl=600, exclude=["redis", "public_service"])
+@redis_cache(ttl=600, exclude=["public_service"])
 async def get_pic_gallery(
-    redis: AsyncRedis = Depends(get_redis),
     public_service: PublicService = Depends(public_service_dep),
 ):
     """从图像库中获取图片列表。"""
     try:
-        images = await public_service.get_pic_gallery(redis=redis)
+        images = await public_service.get_pic_gallery()
         return APIResponse(
             data={"images": images},
             message="Picture gallery retrieved successfully",
