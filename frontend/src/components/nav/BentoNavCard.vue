@@ -19,10 +19,9 @@
     <div class="relative">
       <!-- 导航指示器 -->
       <Motion
-        class="bg-primary/60 absolute top-0 left-0 h-14 w-full transform-gpu rounded-3xl shadow-sm will-change-transform"
+        class="bg-primary absolute top-0 left-0 z-0 h-14 w-full transform-gpu rounded-3xl shadow-sm will-change-transform"
         :animate="{ y: hoverNavIndex * (52 + 4) }"
         :transition="{ visualDuration: 0.3, bounce: 0.15, type: 'spring' }"
-        style="z-index: -1"
       />
 
       <ol class="flex flex-col gap-1">

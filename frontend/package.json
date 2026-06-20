@@ -10,18 +10,15 @@
     "test:unit": "vitest",
     "build-only": "vite build",
     "type-check": "vue-tsc -b",
-    "lint": "node_modules/.bin/oxlint .",
+    "lint": "pnpm exec oxlint .",
     "lint:fix": "pnpm exec oxlint . --fix",
-    "format": "pnpm exec prettier ./src --write",
-    "build:css": "tailwindcss -i ./src/assets/base.css -o ./src/assets/main.css --minify",
-    "watch:css": "tailwindcss -i ./src/assets/base.css -o ./src/assets/main.css --watch"
+    "format": "pnpm exec prettier ./src --write"
   },
   "dependencies": {
     "@amap/amap-jsapi-loader": "^1.0.1",
     "@lucide/vue": "^1.20.0",
     "@microsoft/fetch-event-source": "^2.0.1",
     "@simplewebauthn/browser": "^13.3.0",
-    "@tailwindcss/cli": "^4.3.1",
     "@types/markdown-it": "^14.1.2",
     "@unhead/vue": "^3.1.4",
     "@vueuse/core": "^14.3.0",
