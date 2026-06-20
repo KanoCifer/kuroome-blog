@@ -15,3 +15,4 @@ class Base(DeclarativeBase):
 
 
 from . import models  # noqa
+from . import log  # noqa

@@ -59,4 +59,33 @@ if get_settings().SAVE_LOGS:
         encoding="utf-8",
     )
 
+
+def _safe_db_sink(message):
+    """将带 `persist=True` 的日志通过 Taskiq 异步入库。
+
+    在 sink 内部延迟 import，避免与 task 模块的循环导入
+    （task → broker → logger → task）。
+    """
+    record = message.record
+    if not record["extra"].get("persist"):
+        return
+    try:
+        extra = {k: v for k, v in record["extra"].items() if k != "persist"}
+        from app.plugins.task.tasks.log_task import log_task
+
+        log_task.kiq(  # pyright: ignore[reportUnusedCoroutine]
+            {
+                "timestamp": record["time"].timestamp(),
+                "level": record["level"].name,
+                "message": record["message"],
+                "extra": extra,
+            }
+        )
+    except Exception as e:
+        sys.stderr.write(f"[log-sink] {e}\n")
+
+
+if get_settings().SAVE_LOGS:
+    logger.add(sink=_safe_db_sink, level="INFO", format="{message}")
+
 __all__ = ["logger"]

@@ -67,20 +67,29 @@ async def initialize_resources(app: FastAPI):
 
     if app.state.redis is not None and get_settings().SEND_BOOT_EMAIL:
         try:
-            app_logger.info("✅启动通知任务已添加到队列")
             now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            await notify(
-                channels=["feishu"],
-                message=Message(
-                    title="💻Kuroome Blog API 启动通知",
-                    body=f"✅Kuroome Blog API 已成功启动！当前时间：{now}",
-                ),
-                ctx=NotificationContext(
-                    feishu_webhook_url=get_settings().FEISHU_WEBHOOK_URL
-                ),
+            app_logger.bind(persist=True).info(f"API服务启动｜时间：{now}")
+
+            # 分布式锁：多 worker 并发启动时，只有第一个抢到锁的进程发送启动通知，
+            # 其余进程跳过，避免重复发送。锁带 TTL 兜底异常退出未释放的情况。
+            acquired = await app.state.redis.set(
+                "notify:boot:lock", now, nx=True, ex=60
             )
-        except Exception as e:
-            app_logger.warning(f"❌发送启动通知失败: {e!s}")
+            if not acquired:
+                app_logger.info("启动通知已由其它 worker 发送，跳过")
+            else:
+                await notify(
+                    channels=["feishu"],
+                    message=Message(
+                        title="💻Kuroome Blog API 启动通知",
+                        body=f"✅Kuroome Blog API 已成功启动！当前时间：{now}",
+                    ),
+                    ctx=NotificationContext(
+                        feishu_webhook_url=get_settings().FEISHU_WEBHOOK_URL
+                    ),
+                )
+        except Exception:
+            app_logger.bind(persist=True).warning("❌发送启动通知失败")
 
 
 async def cleanup_resources(app: FastAPI):
