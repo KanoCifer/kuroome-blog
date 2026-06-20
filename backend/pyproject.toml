@@ -35,6 +35,7 @@ dependencies = [
     "beanie>=2.0.1",
     "apscheduler>=3.11.2",
     "psutil>=7.2.2",
+    "py-cpuinfo>=9.0.0",
     "feedparser>=6.0.12",
     "taskiq[reload]>=0.12.1",
     "taskiq-redis>=1.2.2",

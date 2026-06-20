@@ -38,6 +38,7 @@ class PublicService:
         import time
 
         import psutil
+        from cpuinfo import get_cpu_info
         from sqlalchemy import text
 
         from app.core.startup import SERVER_START_TIME
@@ -78,6 +79,15 @@ class PublicService:
         # --- System Info ---
         load_avg = [round(x, 2) for x in psutil.getloadavg()]
 
+        # py-cpuinfo 提供比 platform.processor() 更准确的 CPU 型号与逻辑核数
+        try:
+            cpu_info = get_cpu_info()
+            cpu_model = cpu_info.get("brand_raw") or platform.processor() or "Unknown"
+            cpu_count_logical = cpu_info.get("count") or psutil.cpu_count(logical=True)
+        except Exception:
+            cpu_model = platform.processor() or "Unknown"
+            cpu_count_logical = psutil.cpu_count(logical=True)
+
         system_info = {
             "system_time": time.strftime(
                 "%Y/%m/%d %H:%M:%S", time.localtime()
@@ -86,9 +96,9 @@ class PublicService:
             "os_name": f"{platform.system()} {platform.release()}",
             "os_version": platform.version(),
             "kernel_version": platform.release(),
-            "cpu_model": platform.processor() or "Unknown",
+            "cpu_model": cpu_model,
             "cpu_count_physical": psutil.cpu_count(logical=False),
-            "cpu_count_logical": psutil.cpu_count(logical=True),
+            "cpu_count_logical": cpu_count_logical,
             "load_average": {
                 "1m": load_avg[0],
                 "5m": load_avg[1],
