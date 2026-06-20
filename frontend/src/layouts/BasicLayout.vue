@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { BasicFooter } from '@/components/basic';
-import { BentoNavCard } from '@/components/bento';
 import BackToTop from '@/components/layout/BackToTop.vue';
 import TodoModal from '@/layouts/components/TodoModal.vue';
 import CookieConsent from '@/components/layout/CookieConsent.vue';
 import ToastContainer from '@/components/layout/ToastContainer.vue';
 import BasicNav from '@/components/nav/BasicNav.vue';
-import { useCardLayout } from '@/composables/card';
 import { useBackgroundStore } from '@/stores/background';
 import { useThemeStore } from '@/stores/theme';
 import { AnimatePresence } from 'motion-v';
@@ -24,9 +22,6 @@ const isAboutView = ref<boolean>(false);
 // 避免刷新时 BentoNavCard 先闪现再消失
 const showBasicNav = ref<boolean | null>(null);
 const isNavCompact = ref<boolean>(false);
-
-// Card layout for BentoNavCard positioning on entry view
-const { navCardPosition } = useCardLayout(layoutContainer);
 
 // 监听路由变化
 watch(
@@ -170,18 +165,6 @@ const transitionName = computed(
         class="group fixed top-12 z-50 -translate-x-1/2 -translate-y-1/2"
       />
     </AnimatePresence>
-    <BentoNavCard
-      v-if="showBasicNav === false"
-      class="fixed z-50 w-68 -translate-x-1/2 -translate-y-1/2"
-      :style="[navCardPosition]"
-      :initial="{ scale: 0.5, opacity: 0 }"
-      :animate="{ scale: 1, opacity: 1 }"
-      :transition="{
-        type: 'spring',
-        bounce: 0.3,
-        duration: 0.5,
-      }"
-    />
   </div>
 </template>
 

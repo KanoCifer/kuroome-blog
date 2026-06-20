@@ -11,6 +11,18 @@
     />
     <!-- Greeting 弹窗 -->
     <GreetingToast />
+    <DragWrapper :position="navCardPosition" card-name="BentoNavCard">
+      <BentoNavCard
+        :initial="{ scale: 0.5, opacity: 0 }"
+        :animate="{ scale: 1, opacity: 1 }"
+        :transition="{
+          type: 'spring',
+          bounce: 0.3,
+          duration: 0.5,
+        }"
+        class="w-68"
+      />
+    </DragWrapper>
     <!-- 钓点卡片 -->
     <DragWrapper :position="greetingPosition" card-name="BentoMap">
       <BentoMap
@@ -196,6 +208,7 @@ import { BasicFooter } from '@/components/basic';
 import {
   BentoCalendar,
   BentoClock,
+  BentoNavCard,
   BentoProfileCard,
   BentoReadingList,
   BentoTech,
@@ -231,6 +244,7 @@ const {
   greetingPosition,
   picPosition,
   profilePosition,
+  navCardPosition,
   clockCardPosition,
   calendarPosition,
   techPosition,
