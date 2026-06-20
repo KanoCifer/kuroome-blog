@@ -9,7 +9,7 @@ import { motion } from 'motion-v';
 </script>
 
 <style scoped>
-@reference "@/assets/base.css";
+@reference "@/assets/base.scss";
 
 .card {
   box-shadow:

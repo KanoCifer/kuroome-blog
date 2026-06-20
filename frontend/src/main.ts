@@ -6,7 +6,7 @@ import 'highlight.js/styles/atom-one-dark.css';
 import { createPinia, setActivePinia } from 'pinia';
 import { createApp } from 'vue';
 import App from './App.vue';
-import './assets/base.css';
+import './assets/base.scss';
 import './assets/squircle.css';
 import './lib/echarts';
 import { initVisitorWebSocket } from './plugins/visitorWs';
