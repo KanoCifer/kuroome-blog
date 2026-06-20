@@ -21,6 +21,7 @@ from app.api.v2 import (
     friendlinks,
     llm,
     subscriptions,
+    system,
     weather,
 )
 from app.api.v2 import (
@@ -57,6 +58,7 @@ def register_router(app: FastAPI):
     app.include_router(router=friendlinks.router, prefix="/api/v2")
     app.include_router(router=devtasks_v2.router, prefix="/api/v2")
     app.include_router(router=weread_v2.router, prefix="/api/v2")
+    app.include_router(router=system.router, prefix="/api/v2")
 
 
 def setup_media(app: FastAPI) -> None:

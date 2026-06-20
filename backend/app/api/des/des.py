@@ -15,6 +15,7 @@ from app.core.container import (
     get_public_service,
     get_rss_service,
     get_sub_service,
+    get_system_service,
     get_user_service,
     get_user_services,
     get_weather_service,
@@ -49,6 +50,11 @@ async def moment_service_dep():
 
 async def monitor_service_dep():
     async with get_monitor_service() as service:
+        yield service
+
+
+async def system_service_dep():
+    async with get_system_service() as service:
         yield service
 
 

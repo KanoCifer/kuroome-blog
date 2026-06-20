@@ -33,6 +33,7 @@ from app.schemas.category import CategoriesOut, CategoryOut
 from app.schemas.devtask import DevTaskCreate, DevTaskOut, DevTaskUpdate
 from app.schemas.email import BootstrapEmailContent, EmailCodeContent
 from app.schemas.feishu import FeishuMessageContent, FeishuRichTextContent
+from app.schemas.log import LogResponse
 from app.schemas.moment import (
     MomentAttachmentIn,
     MomentAttachmentOut,
@@ -106,6 +107,7 @@ __all__ = [
     "ImageUploadOut",
     "IndexItem",
     "IndicesData",
+    "LogResponse",
     "LoginIn",
     "LoginOut",
     "MomentAttachmentIn",
