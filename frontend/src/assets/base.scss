@@ -6,7 +6,7 @@
 @font-face {
   font-family: 'HarmonyOS Sans';
   font-style: normal;
-  font-weight: 400;
+  font-weight: normal;
   font-display: swap;
   src: url('/fonts/HarmonyOS_Sans_Regular.ttf') format('truetype');
 }
@@ -14,7 +14,7 @@
 @font-face {
   font-family: 'HarmonyOS Sans';
   font-style: normal;
-  font-weight: 500;
+  font-weight: medium;
   font-display: swap;
   src: url('/fonts/HarmonyOS_Sans_Medium.ttf') format('truetype');
 }
@@ -22,7 +22,7 @@
 @font-face {
   font-family: 'HarmonyOS Sans';
   font-style: normal;
-  font-weight: 700;
+  font-weight: bold;
   font-display: swap;
   src: url('/fonts/HarmonyOS_Sans_Bold.ttf') format('truetype');
 }
@@ -37,6 +37,8 @@
   font-variation-settings:
     'BEVL' 80,
     'wght' 500;
+  font-style: normal;
+  font-weight: normal;
   font-display: swap;
 }
 
@@ -100,57 +102,51 @@ a {
     0 1px 2px color-mix(in oklch, var(--ink) 6%, transparent);
   border: 1px solid color-mix(in oklch, var(--ink) 12%, transparent);
   isolation: isolate;
-}
 
-/* 顶部 chrome bar — 三枚按钮 + 语言标签 */
-.prose pre::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 2.25rem;
-  background: color-mix(in oklch, var(--ink) 88%, transparent);
-  border-bottom: 1px solid color-mix(in oklch, var(--paper) 6%, transparent);
-  z-index: 0;
-}
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 2.25rem;
+    background: color-mix(in oklch, var(--ink) 88%, transparent);
+    border-bottom: 1px solid color-mix(in oklch, var(--paper) 6%, transparent);
+    z-index: 0;
+  }
 
-/* 三个细圆点 — macOS 风格红绿灯 */
-.prose pre::after {
-  content: '';
-  position: absolute;
-  top: 0.875rem;
-  left: 1rem;
-  width: 0.75rem;
-  height: 0.75rem;
-  border-radius: 9999px;
-  background: var(--color-rose-500);
-  box-shadow:
-    1.125rem 0 0 var(--color-amber-500),
-    2.25rem 0 0 var(--color-emerald-500);
-  z-index: 1;
-}
-
-/* 代码本体 — 浮在 chrome bar 之上 */
-.prose pre code {
-  display: block;
-  position: relative;
-  z-index: 1;
-  margin-top: 0;
-  padding: 0;
-  background: transparent;
-  color: inherit;
-  font-size: inherit;
-  border: none;
-}
-
-/* 行内代码 — 与块级代码视觉区分 */
-.prose :not(pre) > code {
-  padding: 0.15em 0.4em;
-  border-radius: calc(var(--radius) - 4px);
-  background: color-mix(in oklch, var(--warm-gray) 80%, transparent);
-  color: color-mix(in oklch, var(--ink) 88%, transparent);
-  font-size: 0.875em;
-  font-weight: 500;
-  border: 1px solid color-mix(in oklch, var(--border-color) 60%, transparent);
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0.875rem;
+    left: 1rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 9999px;
+    background: var(--color-rose-500);
+    box-shadow:
+      1.125rem 0 0 var(--color-amber-500),
+      2.25rem 0 0 var(--color-emerald-500);
+    z-index: 1;
+  }
+  & code {
+    display: block;
+    position: relative;
+    z-index: 1;
+    margin-top: 0;
+    padding: 0;
+    background: transparent;
+    color: inherit;
+    font-size: inherit;
+    border: none;
+  }
+  &:not(pre) > code {
+    padding: 0.15em 0.4em;
+    border-radius: calc(var(--radius) - 4px);
+    background: color-mix(in oklch, var(--warm-gray) 80%, transparent);
+    color: color-mix(in oklch, var(--ink) 88%, transparent);
+    font-size: 0.875em;
+    font-weight: 500;
+    border: 1px solid color-mix(in oklch, var(--border-color) 60%, transparent);
+  }
 }
 
 :root[data-font='harmonyos'] {
