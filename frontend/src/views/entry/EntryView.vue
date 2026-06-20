@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative h-dvh w-full"
+    class="relative min-h-dvh w-full"
     :style="containerStyle"
     ref="parentContainer"
   >

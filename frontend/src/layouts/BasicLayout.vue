@@ -77,7 +77,7 @@ const transitionName = computed(
     class="relative isolate"
     :class="
       isEntryView
-        ? 'flex h-dvh flex-col overflow-hidden'
+        ? 'flex min-h-dvh flex-col'
         : 'grid min-h-dvh grid-rows-[auto_1fr_auto]'
     "
   >
