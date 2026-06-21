@@ -1,8 +1,11 @@
-"""Taskiq broker factory + worker lifecycle + TaskPlugin wrapper.
+"""Taskiq broker factory + worker lifecycle events.
 
 The broker is a module-level singleton (required by @broker.task import-time
-decoration).  TaskPlugin wraps its lifecycle for callers — no caller touches
-the broker directly.
+decoration). Callers drive its lifecycle directly from the FastAPI lifespan
+through ``broker.startup()`` / ``broker.shutdown()``, guarded by
+``broker.is_worker_process`` so the web process connects to RabbitMQ (enabling
+``.kiq()``) while the worker process — which manages its own broker startup —
+does not double-start.
 """
 
 from __future__ import annotations
@@ -84,32 +87,3 @@ async def _on_worker_startup(state: TaskiqState) -> None:
 async def _on_worker_shutdown(state: TaskiqState) -> None:
     await state.redis.aclose()
     await state.mongo_client.close()
-
-
-# ---------------------------------------------------------------------------
-# Public lifecycle wrapper
-# ---------------------------------------------------------------------------
-
-
-class TaskPlugin:
-    """Lifecycle manager for the Taskiq broker.
-
-    Hide RabbitMQ URL, Redis result backend, SmartRetryMiddleware config,
-    and worker event handlers behind a two-method interface.
-
-    Usage in FastAPI lifespan::
-
-        plugin = TaskPlugin()
-        await plugin.startup()
-        ...
-        await plugin.shutdown()
-    """
-
-    def __init__(self, _broker: AioPikaBroker | None = None) -> None:
-        self._broker = _broker or broker
-
-    async def startup(self) -> None:
-        await self._broker.startup()
-
-    async def shutdown(self) -> None:
-        await self._broker.shutdown()

@@ -28,7 +28,7 @@ from app.models.subscription import SubscriptionLog
 from app.models.weread import Archive, User, UserBook, WereadBook
 from app.plugins.cache import close_cache_redis
 from app.plugins.notification import Message, NotificationContext, notify
-from app.plugins.task import TaskPlugin
+from app.plugins.task import broker
 from app.router import register_router, setup_media
 
 
@@ -55,12 +55,13 @@ async def initialize_resources(app: FastAPI):
     )
     app.state.redis = await init_redis()
 
-    app.state.task_plugin = TaskPlugin()
-    try:
-        await app.state.task_plugin.startup()
-        app_logger.info("Taskiq broker started successfully")
-    except Exception as e:
-        app_logger.warning(f"Taskiq broker failed to start: {e!s}")
+    # Web 进程启动 broker 以便 .kiq() 入队；worker 进程自管 broker，跳过避免重复启动。
+    if not broker.is_worker_process:
+        try:
+            await broker.startup()
+            app_logger.info("Taskiq broker started successfully")
+        except Exception as e:
+            app_logger.warning(f"Taskiq broker failed to start: {e!s}")
 
     app_logger.debug(f"Settings:{get_settings().model_dump()}")
     app_logger.info("FastAPI started successfully.")
@@ -100,11 +101,12 @@ async def cleanup_resources(app: FastAPI):
     await close_mongo_client(app)
     await close_db_connections()
 
-    try:
-        await app.state.task_plugin.shutdown()
-        app_logger.info("Taskiq broker shutdown successfully")
-    except Exception as e:
-        app_logger.warning(f"Taskiq broker shutdown failed: {e!s}")
+    if not broker.is_worker_process:
+        try:
+            await broker.shutdown()
+            app_logger.info("Taskiq broker shutdown successfully")
+        except Exception as e:
+            app_logger.warning(f"Taskiq broker shutdown failed: {e!s}")
 
 
 @asynccontextmanager
