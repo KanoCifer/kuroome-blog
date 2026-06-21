@@ -23,10 +23,10 @@ from app.core.logger import logger
 from app.core.response import APIResponse
 from app.models.models import User
 from app.plugins.cache import redis_cache
+from app.plugins.notification import Message, NotificationContext, notify
 from app.schemas import VisitorData
 from app.schemas.schemas import BlogPostIn, BlogPostUpdate
 from app.services.admin_service import AdminService
-from app.plugins.notification import Message, NotificationContext, notify
 from app.utils import get_redis_lock
 
 # 写后失效的读接口函数名(SCAN 模式: cache:<name>|*)
@@ -254,6 +254,7 @@ async def webhook_deploy(
     logger.info(
         f"Deployment triggered by webhook from {get_remote_address(request)}"
     )
+    logger.bind(persist=True).info("后端服务升级")
 
     try:
         async with get_redis_lock(redis, "deploy_lock", ttl=300):
@@ -286,4 +287,4 @@ async def webhook_deploy(
         raise APIError(
             message="Failed to trigger deployment",
             code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
+        ) from e

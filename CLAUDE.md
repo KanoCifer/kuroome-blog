@@ -30,6 +30,10 @@
 
 ## Agent skills
 
+### Design Context
+
+See [PRODUCT.md](PRODUCT.md) for register, audience, brand personality (书卷气 · 准 · 适), anti-references, and design principles. The 3-layer token contract and 禁止事项 list live in [design-system.md](docs/rules/design-system.md); the canonical color/typography/visual system is being captured separately as DESIGN.md (run `/impeccable document` to generate it from existing tokens).
+
 ### Issue tracker
 
 Local markdown — issues live as files under `.scratch/<feature>/`. See `docs/agents/issue-tracker.md`.
