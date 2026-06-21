@@ -397,7 +397,7 @@ defineExpose({
             </button>
           </div>
           <div
-            class="prose prose-slate dark:prose-invert max-w-none flex-1 overflow-y-auto px-6 py-4"
+            class="prose max-w-none flex-1 overflow-y-auto px-6 py-4"
           >
             <div v-html="renderedMarkdown" @click="handlePreviewClick"></div>
           </div>

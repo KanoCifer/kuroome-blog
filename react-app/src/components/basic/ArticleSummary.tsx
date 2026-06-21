@@ -114,7 +114,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
       <div className="border-border/40 border-t px-5 pt-4 pb-5">
         {summary ? (
           <div
-            className="prose dark:prose-invert max-w-none"
+            className="prose max-w-none"
             dangerouslySetInnerHTML={{ __html: renderedSummary }}
           />
         ) : (

@@ -385,7 +385,7 @@ export default function BlogPostView() {
                 {/* Markdown body */}
                 <div
                   ref={contentRef}
-                  className="article-content prose prose-lg dark:prose-invert max-w-none"
+                  className="prose prose-lg max-w-none"
                 >
                   {renderedBodyWithOrigin ? (
                     <div dangerouslySetInnerHTML={{ __html: renderedBodyWithOrigin }} />

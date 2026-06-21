@@ -384,7 +384,7 @@ onUnmounted(() => {
               :content="post.body || ''"
             />
             <div
-              class="prose prose-lg dark:prose-invert article-content max-w-none"
+              class="prose prose-lg max-w-none"
             >
               <div v-if="post.body" v-html="renderedBodyWithOrigin" />
               <div v-else class="text-muted-foreground italic">暂无内容</div>
@@ -441,8 +441,8 @@ onUnmounted(() => {
     opacity 0.2s ease-out,
     transform 0.2s ease-out;
   padding: 4px 8px;
-  background: bg-background;
-  color: white;
+  background: var(--ink);
+  color: var(--paper);
   border-radius: 4px;
   pointer-events: none;
   font-size: 0.875rem;
@@ -453,169 +453,5 @@ onUnmounted(() => {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
-/* ── 文章阅读体验优化 ── */
-.article-content {
-  /* 行高与阅读节奏 */
-  --warm: var(--warm-gray);
-  --tw-prose-body: var(--foreground);
-  --tw-prose-headings: var(--foreground);
-  --tw-prose-links: var(--primary);
-  --tw-prose-bold: var(--foreground);
-  --tw-prose-counters: var(--muted-foreground);
-  --tw-prose-bullets: var(--muted-foreground);
-  --tw-prose-hr: var(--border);
-  --tw-prose-quotes: var(--muted-foreground);
-  --tw-prose-quote-borders: var(--primary);
-  --tw-prose-captions: var(--muted-foreground);
-  --tw-prose-code: var(--foreground);
-  --tw-prose-pre-code: var(--foreground);
-  --tw-prose-pre-bg: var(--muted);
-  --tw-prose-th-borders: var(--border);
-  --tw-prose-td-borders: var(--border);
-
-  font-size: 1.1rem;
-  line-height: 2;
-  font-weight: 500;
-  font-family: 'HarmonyOS Sans';
-}
-
-/* 标题层级优化 */
-.article-content :where(h1):not(:where([class~='not-prose'] *)) {
-  font-size: 2.25rem;
-  font-weight: 700;
-  margin-top: 2.5rem;
-  margin-bottom: 1.25rem;
-  line-height: 1.2;
-}
-
-.article-content :where(h2):not(:where([class~='not-prose'] *)) {
-  font-size: 1.75rem;
-  font-weight: 600;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  line-height: 1.3;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.article-content :where(h3):not(:where([class~='not-prose'] *)) {
-  font-size: 1.375rem;
-  font-weight: 600;
-  margin-top: 1.75rem;
-  margin-bottom: 0.75rem;
-  line-height: 1.35;
-}
-
-/* 段落间距 */
-.article-content :where(p):not(:where([class~='not-prose'] *)) {
-  margin-bottom: 1.25rem;
-}
-
-/* 引用块美化 */
-.article-content :where(blockquote):not(:where([class~='not-prose'] *)) {
-  border-left-width: 4px;
-  border-left-color: var(--primary);
-  background: var(--warm);
-  padding: 1rem 1.25rem;
-  border-radius: 0 0.5rem 0.5rem 0;
-  font-style: italic;
-  margin: 1.5rem 0;
-}
-
-.article-content :where(blockquote p):not(:where([class~='not-prose'] *)) {
-  margin-bottom: 0;
-}
-
-/* 代码块优化 */
-.article-content :where(pre):not(:where([class~='not-prose'] *)) {
-  border-radius: 0.75rem;
-  padding: 1.25rem;
-  margin: 1.5rem 0;
-  overflow-x: auto;
-  background: var(--muted);
-}
-
-.article-content :where(code):not(:where([class~='not-prose'] *)) {
-  font-size: 0.875em;
-  padding: 0.15em 0.35em;
-  border-radius: 0.25rem;
-  background: var(--warm);
-  border: 1px solid color-mix(in oklch, var(--primary) 15%, transparent);
-  font-family:
-    ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', 'Roboto Mono', monospace;
-  vertical-align: 0.05em;
-}
-
-.article-content :where(pre code):not(:where([class~='not-prose'] *)) {
-  background: transparent;
-  padding: 0;
-  font-size: 1rem;
-  line-height: 1.7;
-  font-family:
-    ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', 'Roboto Mono', monospace;
-}
-
-/* 列表优化 */
-.article-content :where(ul, ol):not(:where([class~='not-prose'] *)) {
-  margin: 1.25rem 0;
-  padding-left: 1.75rem;
-}
-
-.article-content :where(li):not(:where([class~='not-prose'] *)) {
-  margin-bottom: 0.5rem;
-}
-
-/* 图片居中 + 圆角 */
-.article-content :where(img):not(:where([class~='not-prose'] *)) {
-  border-radius: 0.75rem;
-  margin: 1.5rem auto;
-  display: block;
-  max-width: 100%;
-  height: auto;
-}
-
-/* 表格横向滚动 */
-.article-content :where(table):not(:where([class~='not-prose'] *)) {
-  display: block;
-  overflow-x: auto;
-  white-space: nowrap;
-  border-collapse: separate;
-  border-spacing: 0;
-  margin: 1.5rem 0;
-  font-size: 0.9375rem;
-}
-
-.article-content :where(th, td):not(:where([class~='not-prose'] *)) {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.article-content :where(th):not(:where([class~='not-prose'] *)) {
-  font-weight: 600;
-  background: var(--muted);
-  text-align: left;
-}
-
-.article-content :where(tr:hover):not(:where([class~='not-prose'] *)) {
-  background: color-mix(in oklch, var(--muted) 30%, var(--card));
-}
-
-/* 分隔线 */
-.article-content :where(hr):not(:where([class~='not-prose'] *)) {
-  margin: 2.5rem 0;
-  border-color: var(--border);
-}
-
-/* 链接样式 */
-.article-content :where(a):not(:where([class~='not-prose'] *)) {
-  color: var(--primary);
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-  text-decoration-thickness: 1px;
-  transition: opacity 0.2s;
-}
-
-.article-content :where(a:hover):not(:where([class~='not-prose'] *)) {
-  opacity: 0.8;
-}
+/* 文章阅读体验由 .prose（base.scss）统一提供。 */
 </style>

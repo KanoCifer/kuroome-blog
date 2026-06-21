@@ -351,7 +351,7 @@ watch(
               :content="article.content || article.summary || ''"
             />
             <div
-              class="prose prose-lg prose-a:text-primary prose-img:rounded-xl dark:prose-invert max-w-none"
+              class="prose prose-lg max-w-none"
               v-html="safeContent"
             ></div>
           </div>

@@ -375,7 +375,7 @@ function ErrorState({ message }: { message: string }) {
 function ResultState({ html }: { html: string }) {
   return (
     <div
-      className="prose prose-sm dark:prose-invert text-card-foreground max-h-[50vh] min-h-16 overflow-y-auto sm:max-h-[60vh]"
+      className="prose prose-sm text-card-foreground max-h-[50vh] min-h-16 overflow-y-auto sm:max-h-[60vh]"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );

@@ -249,7 +249,7 @@ async function switchToChat() {
           <div
             v-if="summary"
             key="result"
-            class="prose dark:prose-invert max-w-none"
+            class="prose max-w-none"
             v-html="renderedSummary"
           ></div>
           <div v-else key="placeholder" class="flex items-center gap-3 py-3">
@@ -313,7 +313,7 @@ async function switchToChat() {
                 :class="
                   msg.role === 'user'
                     ? 'bg-primary text-primary-foreground whitespace-pre-line'
-                    : 'bg-muted/50 text-foreground dark:bg-muted/30 dark:text-foreground prose dark:prose-invert max-w-none'
+                    : 'bg-muted/50 text-foreground dark:bg-muted/30 dark:text-foreground prose max-w-none'
                 "
               >
                 <template v-if="msg.role === 'user'">

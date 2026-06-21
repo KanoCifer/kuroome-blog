@@ -113,7 +113,7 @@ export default function RssArticleView() {
               <ArticleSummaryCard title={article.title} content={pureContent} />
 
               <div
-                className="prose prose-sm dark:prose-invert bg-card ring-border mt-4 max-w-none rounded-2xl p-4 ring-1"
+                className="prose prose-sm bg-card ring-border mt-4 max-w-none rounded-2xl p-4 ring-1"
                 dangerouslySetInnerHTML={{ __html: html }}
               />
             </motion.article>
