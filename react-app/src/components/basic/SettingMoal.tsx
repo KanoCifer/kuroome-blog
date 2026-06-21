@@ -15,64 +15,28 @@ const COLOR_SCHEMES: {
   desc: string;
 }[] = [
   {
-    value: 'sky-blue',
-    label: 'Sky Blue',
-    colors: ['#3b82f6', '#0ea5e9', '#6366f1'],
-    desc: '高远澄澈 · 3 色',
-  },
-  {
-    value: 'forest-green',
-    label: 'Forest Green',
-    colors: ['#16a34a', '#0d9488', '#65a30d'],
-    desc: '林深时见 · 3 色',
-  },
-  {
     value: 'paper',
     label: 'Paper · 纸',
-    colors: ['#c8713a', '#5a7a62', '#8a653f'],
+    colors: ['#a87649', '#7a8e6b', '#5a6b7a'],
     desc: '落纸烟云 · 3 色',
   },
   {
     value: 'sage',
     label: 'Sage',
-    colors: ['#4d6f57', '#8b7146', '#5e7072'],
+    colors: ['#6e8d6e', '#a89968', '#7d8a9b'],
     desc: '清隽素雅 · 3 色',
   },
   {
     value: 'mist',
     label: 'Mist',
-    colors: ['#4f687a', '#5d7569', '#927255'],
+    colors: ['#6c8aa4', '#7d9d8a', '#b09878'],
     desc: '烟岚氤氲 · 3 色',
   },
   {
     value: 'blush',
     label: 'Blush',
-    colors: ['#a5656f', '#6a7866', '#a06d4f'],
+    colors: ['#a87180', '#7d9080', '#8a7474'],
     desc: '桃夭未央 · 3 色',
-  },
-  {
-    value: 'spring',
-    label: '春暖 Spring',
-    colors: ['#35bfab', '#f59e0b', '#10b981'],
-    desc: '万物生发 · 3 色',
-  },
-  {
-    value: 'autumn',
-    label: '秋实 Autumn',
-    colors: ['#de4331', '#eab308', '#3b82f6'],
-    desc: '橙黄橘绿 · 3 色',
-  },
-  {
-    value: 'clear-sky',
-    label: '晴空 Clear Sky',
-    colors: ['#2fcbe7', '#eab308', '#ffffff'],
-    desc: '万里无云 · 3 色',
-  },
-  {
-    value: 'midnight',
-    label: '深夜 Midnight',
-    colors: ['#2a48f3'],
-    desc: '独坐幽篁 · 1 色',
   },
 ];
 
@@ -324,7 +288,7 @@ export function SettingModal({
                     </h2>
                   </div>
                   <p className="text-muted-foreground mb-4 text-xs italic">
-                    Color scheme · 十种调性
+                    Color scheme · 四种调性
                   </p>
 
                   <div className="space-y-2.5">

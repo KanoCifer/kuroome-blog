@@ -26,36 +26,10 @@ const themes: { value: Theme; label: string; icon: string }[] = [
 ];
 
 const schemes: { value: ColorScheme; label: string; colors: string[] }[] = [
-  {
-    value: 'sky-blue',
-    label: 'Sky Blue',
-    colors: ['#3b82f6', '#0ea5e9', '#6366f1'],
-  },
-  {
-    value: 'forest-green',
-    label: 'Forest Green',
-    colors: ['#16a34a', '#0d9488', '#65a30d'],
-  },
-  { value: 'paper', label: 'Paper', colors: ['#c8713a', '#5a7a62', '#8a653f'] },
-  { value: 'sage', label: 'Sage', colors: ['#4d6f57', '#8b7146', '#5e7072'] },
-  { value: 'mist', label: 'Mist', colors: ['#4f687a', '#5d7569', '#927255'] },
-  { value: 'blush', label: 'Blush', colors: ['#a5656f', '#6a7866', '#a06d4f'] },
-  {
-    value: 'spring',
-    label: '春暖 (Spring)',
-    colors: ['#35bfab', '#f59e0b', '#10b981'],
-  },
-  {
-    value: 'autumn',
-    label: '秋实 (Autumn)',
-    colors: ['#de4331', '#eab308', '#3b82f6'],
-  },
-  {
-    value: 'clear-sky',
-    label: '晴空 (Clear Sky)',
-    colors: ['#2fcbe7', '#eab308', '#ffffff'],
-  },
-  { value: 'midnight', label: '深夜 (Midnight)', colors: ['#2a48f3'] },
+  { value: 'paper', label: 'Paper', colors: ['#a87649', '#7a8e6b', '#5a6b7a'] },
+  { value: 'sage', label: 'Sage', colors: ['#6e8d6e', '#a89968', '#7d8a9b'] },
+  { value: 'mist', label: 'Mist', colors: ['#6c8aa4', '#7d9d8a', '#b09878'] },
+  { value: 'blush', label: 'Blush', colors: ['#a87180', '#7d9080', '#8a7474'] },
 ];
 
 const currentTheme = computed(

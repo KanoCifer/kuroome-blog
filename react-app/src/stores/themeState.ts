@@ -4,17 +4,14 @@ import { playThemeTransition } from '../utils/themeTransition';
 
 type Theme = 'light' | 'dark' | 'system';
 type FontFamily = 'default' | 'harmonyos';
-type ColorScheme =
-  | 'sky-blue'
-  | 'forest-green'
-  | 'paper'
-  | 'sage'
-  | 'mist'
-  | 'blush'
-  | 'spring'
-  | 'autumn'
-  | 'clear-sky'
-  | 'midnight';
+type ColorScheme = 'paper' | 'sage' | 'mist' | 'blush';
+
+const COLOR_SCHEMES: readonly ColorScheme[] = ['paper', 'sage', 'mist', 'blush'];
+
+const isColorScheme = (v: unknown): v is ColorScheme =>
+  typeof v === 'string' && (COLOR_SCHEMES as readonly string[]).includes(v);
+
+const safeScheme = (v: unknown): ColorScheme => (isColorScheme(v) ? v : 'paper');
 interface ThemeState {
   theme: Theme;
   font: FontFamily;
@@ -56,6 +53,7 @@ const applyFont = (newFont: FontFamily) => {
 };
 
 const applyScheme = (newScheme: ColorScheme) => {
+  if (!isColorScheme(newScheme)) return;
   document.documentElement.setAttribute('data-color-scheme', newScheme);
 };
 
@@ -64,7 +62,7 @@ export const useThemeState = create<ThemeState>()(
     (set, get) => ({
       theme: 'system',
       font: 'default',
-      scheme: 'sky-blue',
+      scheme: 'paper',
       showFooter: localStorage.getItem('show-footer') !== 'false',
 
       setTheme: (theme) => {
@@ -78,6 +76,7 @@ export const useThemeState = create<ThemeState>()(
       },
 
       setScheme: (scheme) => {
+        if (!isColorScheme(scheme)) return;
         applyScheme(scheme);
         set({ scheme });
       },
@@ -114,7 +113,7 @@ export const useThemeState = create<ThemeState>()(
         if (state?.font) {
           applyFont(state.font);
         }
-        applyScheme(state?.scheme ?? 'sky-blue');
+        applyScheme(safeScheme(state?.scheme));
       },
 
       partialize: (state) => ({
@@ -123,6 +122,18 @@ export const useThemeState = create<ThemeState>()(
         scheme: state.scheme,
         showFooter: state.showFooter,
       }),
+
+      // Storage written by older versions may contain a removed scheme
+      // (e.g. sky-blue, autumn). Coerce it back to the new default so the
+      // rehydrated value always lands in the current union.
+      merge: (persisted, current) => {
+        const p = (persisted ?? {}) as Partial<ThemeState>;
+        return {
+          ...current,
+          ...p,
+          scheme: safeScheme(p.scheme ?? current.scheme),
+        };
+      },
     },
   ),
 );
