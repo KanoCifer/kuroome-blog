@@ -1,0 +1,51 @@
+/* Sky Blue — 天空蓝（默认） */
+[data-color-scheme='sky-blue'] {
+  --radius: 0.625rem;
+  --ink: oklch(0.13 0.028 261.692);
+  --paper: var(--color-blue-50);
+  --warm-gray: oklch(0.95 0.018 260);
+  --secondary: oklch(0.92 0.022 260);
+  --border-color: oklch(0.88 0.02 260);
+  --muted-text: oklch(0.551 0.027 264.364);
+  --accent-slate: oklch(0.707 0.022 261.325);
+  --accent-rose: oklch(0.577 0.245 27.325);
+  --accent: oklch(0.63 0.27 254);
+  --accent-contrast: var(--color-blue-50);
+  --card-bg: var(--color-blue-50);
+  --surface: oklch(0.97 0.013 260 / 0.75);
+  --surface-foreground: oklch(0.13 0.028 261.692);
+  --chart-1: oklch(62.631% 0.20155 260.563);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --gradient-primary-from: var(--color-blue-600);
+  --gradient-primary-to: var(--color-sky-600);
+  --gradient-decorative-from: var(--color-indigo-300);
+  --gradient-decorative-to: var(--color-sky-500);
+}
+
+[data-color-scheme='sky-blue'].dark {
+  --ink: oklch(0.96 0.012 261);
+  --paper: oklch(0.13 0.028 262);
+  --warm-gray: oklch(0.34 0.03 257);
+  --secondary: oklch(0.4 0.04 258);
+  --border-color: oklch(0.24 0.025 260);
+  --muted-text: oklch(0.78 0.022 261);
+  --accent-slate: oklch(0.7 0.03 264);
+  --accent-rose: oklch(0.78 0.18 22);
+  --accent: oklch(0.7 0.16 258);
+  --accent-contrast: oklch(0.13 0.028 262);
+  --card-bg: oklch(0.27 0.034 264);
+  --surface: oklch(0.27 0.034 264 / 0.85);
+  --surface-foreground: oklch(0.96 0.012 261);
+  --chart-1: oklch(0.7 0.18 258);
+  --chart-2: oklch(0.78 0.15 188);
+  --chart-3: oklch(0.82 0.16 70);
+  --chart-4: oklch(0.72 0.2 304);
+  --chart-5: oklch(0.75 0.2 16);
+  --gradient-primary-from: oklch(0.62 0.16 258);
+  --gradient-primary-to: oklch(0.55 0.14 218);
+  --gradient-decorative-from: oklch(0.4 0.12 262 / 0.35);
+  --gradient-decorative-to: oklch(0.38 0.1 218 / 0.25);
+}

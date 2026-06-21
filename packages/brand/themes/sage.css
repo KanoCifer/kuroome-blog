@@ -1,0 +1,51 @@
+/* Sage — 鼠尾草绿 */
+[data-color-scheme='sage'] {
+  --radius: 0.625rem;
+  --ink: #172018;
+  --paper: oklch(0.97 0.013 145);
+  --warm-gray: oklch(0.95 0.018 145);
+  --secondary: oklch(0.92 0.022 145);
+  --border-color: oklch(0.88 0.02 145);
+  --muted-text: #7f8c81;
+  --accent-slate: #5e7072;
+  --accent-rose: #9a6860;
+  --accent: #4f7657;
+  --accent-contrast: #f6fbf7;
+  --card-bg: oklch(0.99 0.008 145);
+  --surface: oklch(0.97 0.013 145 / 0.75);
+  --surface-foreground: #172018;
+  --chart-1: #4d6f57;
+  --chart-2: #8b7146;
+  --chart-3: #5e7072;
+  --chart-4: #9a6860;
+  --chart-5: #907548;
+  --gradient-primary-from: #4f7657;
+  --gradient-primary-to: #5e7072;
+  --gradient-decorative-from: #deebe1;
+  --gradient-decorative-to: #9ebda6;
+}
+
+[data-color-scheme='sage'].dark {
+  --ink: #e6ede4;
+  --paper: #111711;
+  --warm-gray: #3a463a;
+  --secondary: #4a5a4a;
+  --border-color: #2a352a;
+  --muted-text: #a8b4a8;
+  --accent-slate: #8a9aaa;
+  --accent-rose: #c89898;
+  --accent: #7ab088;
+  --accent-contrast: #111711;
+  --card-bg: #283228;
+  --surface: #283228e6;
+  --surface-foreground: #e6ede4;
+  --chart-1: #88b89a;
+  --chart-2: #c8b478;
+  --chart-3: #8a9aaa;
+  --chart-4: #c89898;
+  --chart-5: #d4b46a;
+  --gradient-primary-from: #7ab088;
+  --gradient-primary-to: #8a9aaa;
+  --gradient-decorative-from: #2c352c;
+  --gradient-decorative-to: #4a5a4a;
+}

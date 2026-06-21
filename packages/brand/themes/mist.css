@@ -1,0 +1,51 @@
+/* Mist — 雾蓝冷调 */
+[data-color-scheme='mist'] {
+  --radius: 0.625rem;
+  --ink: #161c21;
+  --paper: oklch(0.97 0.01 225);
+  --warm-gray: oklch(0.95 0.015 225);
+  --secondary: oklch(0.92 0.018 225);
+  --border-color: oklch(0.88 0.016 225);
+  --muted-text: #7d8791;
+  --accent-slate: #4f687a;
+  --accent-rose: #9b6b71;
+  --accent: #4f6d88;
+  --accent-contrast: #f7fafc;
+  --card-bg: oklch(0.99 0.008 225);
+  --surface: oklch(0.97 0.01 225 / 0.75);
+  --surface-foreground: #161c21;
+  --chart-1: #4f687a;
+  --chart-2: #5d7569;
+  --chart-3: #927255;
+  --chart-4: #9b6b71;
+  --chart-5: #94724a;
+  --gradient-primary-from: #4f6d88;
+  --gradient-primary-to: #4f687a;
+  --gradient-decorative-from: #dde7f0;
+  --gradient-decorative-to: #9fb2c5;
+}
+
+[data-color-scheme='mist'].dark {
+  --ink: #e0e6ed;
+  --paper: #10171d;
+  --warm-gray: #36404c;
+  --secondary: #424e5a;
+  --border-color: #252e38;
+  --muted-text: #a8b2bc;
+  --accent-slate: #88a8ba;
+  --accent-rose: #c89a9a;
+  --accent: #88a8ba;
+  --accent-contrast: #10171d;
+  --card-bg: #232c36;
+  --surface: #232c36e6;
+  --surface-foreground: #e0e6ed;
+  --chart-1: #88a8ba;
+  --chart-2: #88aa9a;
+  --chart-3: #c8a87a;
+  --chart-4: #c89a9a;
+  --chart-5: #d4b850;
+  --gradient-primary-from: #88a8ba;
+  --gradient-primary-to: #88aa9a;
+  --gradient-decorative-from: #2a323b;
+  --gradient-decorative-to: #4a5a6a;
+}

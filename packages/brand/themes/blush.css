@@ -1,0 +1,51 @@
+/* Blush — 薄红陶色 */
+[data-color-scheme='blush'] {
+  --radius: 0.625rem;
+  --ink: #201716;
+  --paper: oklch(0.97 0.013 355);
+  --warm-gray: oklch(0.95 0.018 355);
+  --secondary: oklch(0.92 0.022 355);
+  --border-color: oklch(0.88 0.02 355);
+  --muted-text: #97827c;
+  --accent-slate: #64707a;
+  --accent-rose: #ad6966;
+  --accent: #a5656f;
+  --accent-contrast: #fff7f8;
+  --card-bg: oklch(0.99 0.008 355);
+  --surface: oklch(0.97 0.013 355 / 0.75);
+  --surface-foreground: #201716;
+  --chart-1: #a5656f;
+  --chart-2: #6a7866;
+  --chart-3: #64707a;
+  --chart-4: #a06d4f;
+  --chart-5: #ad6966;
+  --gradient-primary-from: #a5656f;
+  --gradient-primary-to: #ad6966;
+  --gradient-decorative-from: #f2dfe1;
+  --gradient-decorative-to: #d2a1a7;
+}
+
+[data-color-scheme='blush'].dark {
+  --ink: #ede4e0;
+  --paper: #191110;
+  --warm-gray: #403230;
+  --secondary: #4e3d3a;
+  --border-color: #2d2322;
+  --muted-text: #b8a8a6;
+  --accent-slate: #8a9aaa;
+  --accent-rose: #d89090;
+  --accent: #c47a85;
+  --accent-contrast: #191110;
+  --card-bg: #2d2120;
+  --surface: #2d2120e6;
+  --surface-foreground: #ede4e0;
+  --chart-1: #c47a85;
+  --chart-2: #8aa28a;
+  --chart-3: #8a9aaa;
+  --chart-4: #c89a7a;
+  --chart-5: #d89090;
+  --gradient-primary-from: #c47a85;
+  --gradient-primary-to: #d89090;
+  --gradient-decorative-from: #382b2a;
+  --gradient-decorative-to: #5e4848;
+}

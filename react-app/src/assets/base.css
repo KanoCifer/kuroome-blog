@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@import 'themes/index.css';
+@import '../../../packages/brand/themes/index.css';
 
 @font-face {
   font-family: 'HarmonyOS Sans';
@@ -23,19 +23,6 @@
   font-weight: 700;
   font-display: swap;
   src: url('/fonts/HarmonyOS_Sans_Bold.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: '阿里妈妈方圆体 VF Regular';
-  src:
-    url('//at.alicdn.com/wf/webfont/IycYNJ7qsIni/JzWMyKA8U06c.woff2')
-      format('woff2'),
-    url('//at.alicdn.com/wf/webfont/IycYNJ7qsIni/qFzBtDuQpN4i.woff')
-      format('woff');
-  font-variation-settings:
-    'BEVL' 80,
-    'wght' 500;
-  font-display: swap;
 }
 
 @font-face {
@@ -79,9 +66,6 @@ html::-webkit-scrollbar {
   }
 }
 @theme {
-  --font-family-alibaba:
-    '阿里妈妈方圆体 VF Regular', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-
   --font-family-dongfang:
     '阿里妈妈东方大楷 Regular', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 
@@ -375,11 +359,10 @@ footer {
 }
 
 .article-content blockquote {
-  border-left-width: 4px;
-  border-left-color: var(--primary);
-  background: var(--warm-gray);
+  border: 1px solid color-mix(in oklch, var(--primary) 25%, transparent);
+  background: color-mix(in oklch, var(--warm-gray) 70%, transparent);
   padding: 1rem 1.25rem;
-  border-radius: 0 0.5rem 0.5rem 0;
+  border-radius: 0.625rem;
   font-style: italic;
   margin: 1.5rem 0;
 }
@@ -389,7 +372,7 @@ footer {
 }
 
 .article-content pre {
-  border-radius: 0.75rem;
+  border-radius: 0.875rem;
   padding: 1.25rem;
   margin: 1.5rem 0;
   overflow-x: auto;
@@ -399,7 +382,7 @@ footer {
 .article-content code {
   font-size: 0.875em;
   padding: 0.15em 0.35em;
-  border-radius: 0.25rem;
+  border-radius: 0.375rem;
   background: var(--warm-gray);
   border: 1px solid color-mix(in oklch, var(--primary) 15%, transparent);
   font-family:
@@ -446,7 +429,7 @@ footer {
 .article-content img {
   display: block;
   margin: 1.5rem auto;
-  border-radius: 0.75rem;
+  border-radius: 0.875rem;
   max-width: 100%;
   height: auto;
 }
