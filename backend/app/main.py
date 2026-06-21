@@ -69,7 +69,6 @@ async def initialize_resources(app: FastAPI):
     if app.state.redis is not None and get_settings().SEND_BOOT_EMAIL:
         try:
             now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            app_logger.bind(persist=True).info(f"API服务启动｜时间：{now}")
 
             # 分布式锁：多 worker 并发启动时，只有第一个抢到锁的进程发送启动通知，
             # 其余进程跳过，避免重复发送。锁带 TTL 兜底异常退出未释放的情况。
@@ -79,6 +78,7 @@ async def initialize_resources(app: FastAPI):
             if not acquired:
                 app_logger.info("启动通知已由其它 worker 发送，跳过")
             else:
+                app_logger.bind(persist=True).info(f"API服务启动｜时间：{now}")
                 await notify(
                     channels=["feishu"],
                     message=Message(
