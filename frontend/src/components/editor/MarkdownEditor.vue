@@ -347,7 +347,7 @@ defineExpose({
         </div>
       </div>
 
-      <div class="relative flex-1">
+      <div class="relative h-full flex-1">
         <!-- Focus mode dimming overlay -->
         <div
           v-if="isFocusMode"
@@ -360,7 +360,7 @@ defineExpose({
           @keydown="handleKeydown"
           @paste="handlePaste"
           :class="[
-            'placeholder:text-muted-foreground/60 h-full w-full resize-none bg-transparent outline-none focus:ring-0',
+            'placeholder:text-muted-foreground/60 bg-muted field-sizing-content h-full min-h-80 w-full outline-none focus:ring-0',
             'px-8 py-6 text-lg leading-relaxed',
             'font-serif',
           ]"
@@ -396,9 +396,7 @@ defineExpose({
               关闭
             </button>
           </div>
-          <div
-            class="prose max-w-none flex-1 overflow-y-auto px-6 py-4"
-          >
+          <div class="prose max-w-none flex-1 overflow-y-auto px-6 py-4">
             <div v-html="renderedMarkdown" @click="handlePreviewClick"></div>
           </div>
         </div>

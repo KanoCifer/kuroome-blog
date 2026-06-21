@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import BasicDetail from '@/components/basic/BasicDetail.vue';
 import MarkdownEditor from '@/components/editor/MarkdownEditor.vue';
+import UiButton from '@/components/ui/button/Button.vue';
 import IconSave from '@/components/icons/IconSave.vue';
 import { blogGateway } from '@/api/public';
 import { uploadGateway } from '@/api/blog';
@@ -20,7 +20,6 @@ const postId = ref<string | null>(null);
 const title = ref('');
 const summary = ref('');
 const cover = ref('');
-const debouncedTitle = ref('');
 const category = ref('');
 const pin = ref(false);
 const categories = ref<Category[]>([]);
@@ -33,8 +32,23 @@ const error = ref('');
 const markdownBody = ref('');
 const markdownEditorRef = ref<InstanceType<typeof MarkdownEditor> | null>(null);
 
-// Category dropdown
-const categoryMenuOpen = ref(false);
+// Meta drawer (summary + cover): collapsed by default — the writing canvas
+// is the focal point, metadata is peek-on-demand.
+const metaOpen = ref(false);
+
+// Category dropdown: local click-outside, matching the pattern used in
+// ThemeToggle / BackgroundSwitcher (see frontend/src/components/layout/).
+const categoryOpen = ref(false);
+const categoryMenuRef = ref<HTMLElement | null>(null);
+const handleCategoryClickOutside = (event: MouseEvent) => {
+  if (!categoryMenuRef.value) return;
+  if (!categoryMenuRef.value.contains(event.target as Node)) {
+    categoryOpen.value = false;
+  }
+};
+const handleCategoryKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape') categoryOpen.value = false;
+};
 
 // Computed current category name
 const currentCategory = computed(() => {
@@ -46,7 +60,9 @@ const currentCategory = computed(() => {
 });
 
 // 非 http(s) 开头的封面 src 用 https://api.kanocifer.chat 作为前缀（仅在 https 环境下生效）
-const coverPreviewSrc = computed(() => (cover.value ? useOrigin(cover.value) : ''));
+const coverPreviewSrc = computed(() =>
+  cover.value ? useOrigin(cover.value) : '',
+);
 
 // Draft management
 const draftKey = computed(() => `blog-draft-${postId.value || 'new'}`);
@@ -121,22 +137,6 @@ const handleBeforeUnload = (e: BeforeUnloadEvent) => {
   }
 };
 
-// Category dropdown handlers
-let closeTimeout: ReturnType<typeof setTimeout> | null = null;
-const handleCategoryMouseEnter = () => {
-  if (closeTimeout) {
-    clearTimeout(closeTimeout);
-    closeTimeout = null;
-  }
-  categoryMenuOpen.value = true;
-};
-
-const handleCategoryMouseLeave = () => {
-  closeTimeout = setTimeout(() => {
-    categoryMenuOpen.value = false;
-  }, 150);
-};
-
 // Get current markdown content (stored as-is, no HTML conversion)
 const getCurrentContent = (): string => {
   return markdownBody.value;
@@ -204,12 +204,14 @@ const fetchPost = async (id: string) => {
     title.value = post.title || '';
     summary.value = post.summary || '';
     cover.value = post.cover || '';
-    debouncedTitle.value = post.title || '';
     category.value = post.category_id ? String(post.category_id) : '';
     pin.value = Boolean(post.is_pinned);
 
-    // Load content - convert HTML to markdown for editor
+    // Load content — stored as raw markdown
     markdownBody.value = post.body || '';
+
+    // Auto-open meta drawer if cover or summary is set on an existing post
+    if (post.summary || post.cover) metaOpen.value = true;
   } catch (err: unknown) {
     error.value = err instanceof Error ? err.message : '加载文章失败';
     notification.error(error.value);
@@ -301,9 +303,60 @@ const handleCancel = () => {
   router.back();
 };
 
+const discardDraftAndLoadServer = async () => {
+  showDraftRestore.value = false;
+  if (postId.value) await fetchPost(postId.value);
+};
+
+const adoptDraft = () => {
+  restoreDraft();
+  showDraftRestore.value = false;
+  notification.success('已恢复草稿');
+};
+
+// Word count for the footer indicator
+const wordCount = computed(() => {
+  const text = markdownBody.value.trim();
+  if (!text) return 0;
+  // Strip markdown syntax noise: code fences, image/link syntax, headings
+  const stripped = text
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/`[^`]*`/g, '')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+    .replace(/\[[^\]]*\]\([^)]*\)/g, '')
+    .replace(/^#+\s+/gm, '')
+    .replace(/[*_>~\-]+/g, ' ');
+  // CJK-aware count: each CJK char = 1, run of non-CJK = 1 word
+  const cjkChars = (stripped.match(/[一-鿿㐀-䶿]/g) || []).length;
+  const latinWords = (
+    stripped.replace(/[一-鿿㐀-䶿]/g, ' ').match(/[A-Za-z0-9]+/g) || []
+  ).length;
+  return cjkChars + latinWords;
+});
+
+// Reading time, rounded up to a minute
+const readingMinutes = computed(() =>
+  Math.max(1, Math.round(wordCount.value / 400)),
+);
+
+// Status line: 准备就绪 / 已保存 X:X:X / 未保存更改
+const savedAtLabel = computed(() => {
+  if (hasUnsavedChanges.value) return '未保存的更改';
+  if (lastSavedAt.value) {
+    const t = lastSavedAt.value.toLocaleTimeString('zh-CN', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    return `草稿已存 · ${t}`;
+  }
+  return '准备就绪';
+});
+
 onMounted(async () => {
   window.addEventListener('keydown', handleKeydown);
   window.addEventListener('beforeunload', handleBeforeUnload);
+  document.addEventListener('click', handleCategoryClickOutside);
+  document.addEventListener('keydown', handleCategoryKeydown);
 
   await fetchCategories();
   const id = route.params.id;
@@ -330,401 +383,549 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleKeydown);
   window.removeEventListener('beforeunload', handleBeforeUnload);
+  document.removeEventListener('click', handleCategoryClickOutside);
+  document.removeEventListener('keydown', handleCategoryKeydown);
   if (autoSaveTimer) clearTimeout(autoSaveTimer);
 });
 </script>
 
 <template>
-  <BasicDetail
-    :title="isEdit ? '编辑文章' : '发布新文章'"
-    :subtitle="isEdit && postId ? `ID: ${postId}` : '选择编辑模式，开始创作'"
-  >
-    <div class="col-span-full mx-auto w-full">
-      <!-- Draft Restore Dialog -->
-      <div
-        v-if="showDraftRestore"
-        class="bg-primary/5 border-primary/20 mb-6 rounded-2xl border p-4"
-      >
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="bg-primary/10 text-primary rounded-full p-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                class="h-5 w-5"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0V5.36l-.31-.31A7 7 0 003.239 8.188a.75.75 0 101.448.389A5.5 5.5 0 0113.89 6.11l.311.31h-2.432a.75.75 0 000 1.5h4.243a.75.75 0 00.53-.219z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-            </div>
-            <div>
-              <p class="text-foreground text-sm font-medium">
-                检测到未保存的草稿
-              </p>
-              <p class="text-muted-foreground text-xs">
-                上次保存于
-                {{ lastSavedAt ? lastSavedAt.toLocaleString() : '未知' }}
-              </p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <button
-              type="button"
-              @click="
-                showDraftRestore = false;
-                if (postId) fetchPost(postId);
-              "
-              class="text-muted-foreground hover:text-foreground text-sm transition"
-            >
-              放弃
-            </button>
-            <button
-              type="button"
-              @click="
-                restoreDraft();
-                showDraftRestore = false;
-                notification.success('已恢复草稿');
-              "
-              class="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-4 py-1.5 text-sm font-medium transition"
-            >
-              恢复草稿
-            </button>
-          </div>
-        </div>
-      </div>
+  <!--
+    写作台 · Writing desk
+    一个工具页，不是详情页。BasicDetail 那种 hero 折纸壳子被剥离了 —
+    标题就是输入框，编辑器就是主角，元数据折叠在抽屉里。
 
-      <!-- Error Message -->
-      <div
-        v-if="error"
-        class="bg-destructive/10 text-destructive mb-6 rounded-lg p-4"
+    视觉策略：
+    · 页面底色 = bg-muted (warm-gray)，像书桌的木板
+    · 编辑器在它之上浮起 = bg-muted (paper)，靠 inset highlight + 软阴影分层
+    · 状态不用彩色 chip（bg-warning/10 等），改用单一字色 + 留白 + 描线
+    · 所有动画 honor prefers-reduced-motion
+  -->
+  <div class="bg-background min-h-dvh">
+    <div class="mx-auto w-full max-w-6xl px-5 pt-8 pb-28 sm:px-8 sm:pt-10">
+      <!-- ─── Top bar: wordmark · breadcrumb · status ─── -->
+      <header
+        class="text-muted-foreground mb-7 flex items-center gap-3 text-xs"
       >
-        <div class="flex items-center">
-          <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+        <button
+          type="button"
+          class="hover:text-foreground -mx-2 inline-flex items-center gap-1.5 rounded-md px-2 py-1 transition-colors"
+          @click="$router.go(-1)"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            class="h-3.5 w-3.5"
+            aria-hidden="true"
+          >
             <path
               fill-rule="evenodd"
-              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+              d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z"
               clip-rule="evenodd"
             />
           </svg>
-          {{ error }}
+          <span>书房</span>
+        </button>
+
+        <span aria-hidden="true" class="text-border">/</span>
+
+        <span class="text-foreground/80 font-serif">
+          {{ isEdit ? '校样' : '新篇' }}
+        </span>
+
+        <span
+          v-if="isEdit && postId"
+          class="text-muted-foreground/60 font-mono"
+        >
+          #{{ postId }}
+        </span>
+
+        <!-- Status: 单一字色，靠前缀"·"呼吸，不用 bg-pill 灯拼色 -->
+        <span class="ml-auto font-serif tracking-wide italic">
+          <span aria-hidden="true" class="mr-1.5">·</span>{{ savedAtLabel }}
+        </span>
+      </header>
+
+      <!-- ─── Draft restore: 角落小吐司，不抢镜 ─── -->
+      <div
+        v-if="showDraftRestore"
+        role="status"
+        class="bg-muted border-border mb-6 flex items-center gap-3 rounded-2xl border px-4 py-3 shadow-sm"
+      >
+        <span
+          class="text-muted-foreground ring-border inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full ring-1"
+          aria-hidden="true"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            class="h-3.5 w-3.5"
+          >
+            <path
+              d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0V5.36l-.31-.31A7 7 0 003.239 8.188a.75.75 0 101.448.389A5.5 5.5 0 0113.89 6.11l.311.31h-2.432a.75.75 0 000 1.5h4.243a.75.75 0 00.53-.219z"
+            />
+          </svg>
+        </span>
+        <div class="min-w-0 flex-1 text-xs">
+          <p class="text-foreground font-serif">上次留有未完的草稿</p>
+          <p class="text-muted-foreground mt-0.5">
+            {{
+              lastSavedAt
+                ? `保存于 ${lastSavedAt.toLocaleString('zh-CN', { hour12: false })}`
+                : '时间不明'
+            }}
+          </p>
+        </div>
+        <div class="flex shrink-0 items-center gap-3 text-xs">
+          <button
+            type="button"
+            class="text-muted-foreground hover:text-foreground transition-colors"
+            @click="discardDraftAndLoadServer"
+          >
+            放弃
+          </button>
+          <button
+            type="button"
+            class="text-foreground hover:text-primary font-serif transition-colors"
+            @click="adoptDraft"
+          >
+            续写 →
+          </button>
         </div>
       </div>
 
-      <!-- Loading State -->
-      <div v-if="loading && isEdit" class="py-12 text-center">
-        <div
-          class="border-border/50 border-t-primary mx-auto h-8 w-8 animate-spin rounded-full border-2"
-        ></div>
-        <p class="text-muted-foreground mt-2">加载文章中...</p>
+      <!-- ─── Error: 内联短条 ─── -->
+      <div
+        v-if="error"
+        role="alert"
+        class="text-muted-foreground border-border bg-muted/70 mb-6 flex items-start gap-2 rounded-xl border px-4 py-3 text-sm"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          class="text-muted-foreground mt-0.5 h-4 w-4 shrink-0"
+          aria-hidden="true"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        <span class="font-serif italic">{{ error }}</span>
       </div>
 
-      <!-- Form -->
+      <!-- ─── Loading ─── -->
+      <div v-if="loading && isEdit" class="py-20 text-center">
+        <div
+          class="border-border border-t-foreground mx-auto h-7 w-7 animate-spin rounded-full border-2 motion-reduce:animate-none"
+          aria-hidden="true"
+        ></div>
+        <p class="text-muted-foreground mt-3 font-serif text-xs italic">
+          正取文稿…
+        </p>
+      </div>
+
+      <!-- ─── The writing form ─── -->
       <form
         v-else
-        @submit.prevent="handleSubmit"
         ref="formRef"
-        class="space-y-4"
+        @submit.prevent="handleSubmit"
+        class="space-y-6"
       >
-        <!-- Title and Summary -->
-        <div
-          class="border-border bg-background rounded-3xl border p-2 shadow-sm"
-        >
-          <!-- Title -->
+        <!-- 标题：作品门面，serif 大字，输入即设计 -->
+        <div>
+          <input
+            v-model="title"
+            type="text"
+            required
+            maxlength="120"
+            :placeholder="isEdit ? '校订标题' : '无题'"
+            aria-label="文章标题"
+            class="text-foreground placeholder:text-muted-foreground/50 w-full border-0 bg-transparent px-0 py-1 font-serif text-3xl leading-tight font-medium tracking-tight outline-0 focus:ring-0 sm:text-4xl"
+            style="caret-color: var(--accent, currentColor)"
+          />
           <div
-            class="group focus-within:bg-muted/30 rounded-2xl transition-colors"
-          >
-            <input
-              v-model="title"
-              type="text"
-              required
-              placeholder="在此输入文章标题..."
-              class="text-foreground placeholder:text-muted-foreground block w-full border-0 bg-transparent px-4 py-4 text-3xl font-bold outline-0 focus:ring-0 sm:text-2xl"
-            />
-          </div>
-
-          <!-- Divider -->
-          <div class="bg-border mx-4 h-px"></div>
-
-          <!-- Summary -->
-          <div
-            class="group focus-within:bg-muted/30 flex items-center gap-3 rounded-2xl px-4 py-3 transition-colors"
-          >
-            <span class="text-muted-foreground shrink-0 text-sm font-medium"
-              >摘要</span
-            >
-            <input
-              v-model="summary"
-              type="text"
-              placeholder="添加文章描述..."
-              class="text-foreground placeholder:text-muted-foreground min-w-0 flex-1 border-0 bg-transparent text-base outline-0 focus:ring-0"
-            />
-          </div>
-
-          <!-- Cover -->
-          <div class="bg-border mx-4 h-px"></div>
-          <div
-            class="group focus-within:bg-muted/30 flex flex-col gap-3 rounded-2xl px-4 py-3 transition-colors sm:flex-row sm:items-center"
-          >
-            <span class="text-muted-foreground shrink-0 text-sm font-medium"
-              >封面</span
-            >
-            <div class="flex min-w-0 flex-1 items-center gap-2">
-              <input
-                v-model="cover"
-                type="text"
-                placeholder="粘贴封面 URL，或上传图片..."
-                class="text-foreground placeholder:text-muted-foreground min-w-0 flex-1 border-0 bg-transparent text-base outline-0 focus:ring-0"
-              />
-              <input
-                ref="coverInputRef"
-                type="file"
-                accept="image/*"
-                class="hidden"
-                @change="handleCoverUpload"
-              />
-              <button
-                type="button"
-                :disabled="coverUploading"
-                class="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50"
-                @click="coverInputRef?.click()"
-              >
-                {{ coverUploading ? '上传中...' : '上传' }}
-              </button>
-              <button
-                v-if="cover"
-                type="button"
-                class="text-muted-foreground hover:text-foreground shrink-0 text-xs transition"
-                @click="cover = ''"
-              >
-                清除
-              </button>
-            </div>
-            <div
-              class="border-border bg-muted h-20 w-16 shrink-0 overflow-hidden rounded-lg border"
-            >
-              <img
-                v-if="cover"
-                :src="coverPreviewSrc"
-                :alt="`${title || '文章'} 封面预览`"
-                class="h-full w-full object-cover"
-              />
-              <div
-                v-else
-                class="text-muted-foreground flex h-full w-full items-center justify-center px-2 text-center text-[10px]"
-              >
-                随机占位
-              </div>
-            </div>
-          </div>
+            class="via-border mt-1 h-px bg-gradient-to-r from-transparent to-transparent"
+            aria-hidden="true"
+          ></div>
         </div>
 
-        <!-- Controls Bar -->
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <!-- Save Status -->
-          <div class="text-muted-foreground flex items-center gap-2 text-xs">
-            <span
-              :class="[
-                'h-2 w-2 rounded-full transition-colors',
-                hasUnsavedChanges ? 'bg-warning animate-pulse' : 'bg-success',
-              ]"
-            ></span>
-            <span v-if="hasUnsavedChanges">未保存更改</span>
-            <span v-else-if="lastSavedAt"
-              >已保存 {{ lastSavedAt.toLocaleTimeString() }}</span
-            >
-            <span v-else>准备就绪</span>
-          </div>
-
-          <div class="flex flex-wrap items-center gap-2">
-            <!-- Pin Button -->
+        <!--
+          分类 · 置顶 · 抽屉触发
+          统一形态：描线圆角牌，去掉所有 bg-warning/10 / bg-success/10 /
+          bg-primary/10 灯拼色；改用字色 + 字距表达语义。
+        -->
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <!-- Category menu -->
+          <div ref="categoryMenuRef" class="relative">
             <button
               type="button"
-              @click="pin = !pin"
+              :aria-expanded="categoryOpen"
+              aria-haspopup="listbox"
               :class="[
-                'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all',
-                pin
-                  ? 'border-warning bg-warning/10 text-warning'
-                  : 'border-border bg-background text-muted-foreground hover:border-border/80',
+                'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 transition-colors',
+                categoryOpen
+                  ? 'border-foreground/30 bg-muted text-foreground'
+                  : 'border-border bg-muted text-muted-foreground hover:text-foreground',
               ]"
+              @click="categoryOpen = !categoryOpen"
             >
+              <span class="text-muted-foreground/70 tracking-wider">分类</span>
+              <span
+                :class="
+                  currentCategory
+                    ? 'text-foreground font-serif'
+                    : 'text-muted-foreground/70 font-serif italic'
+                "
+              >
+                {{ currentCategory || '未选' }}
+              </span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
                 fill="currentColor"
-                class="h-3.5 w-3.5"
-              >
-                <path
-                  d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 4.5a.75.75 0 001.09 0l4.25-4.5a.75.75 0 00-1.09-1.03l-2.955 3.129V2.75z"
-                />
-                <path
-                  d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z"
-                />
-              </svg>
-              {{ pin ? '已置顶' : '置顶' }}
-            </button>
-
-            <!-- Category Selector -->
-            <div
-              class="group relative"
-              @mouseenter="handleCategoryMouseEnter"
-              @mouseleave="handleCategoryMouseLeave"
-            >
-              <button
-                type="button"
-                @click="categoryMenuOpen = !categoryMenuOpen"
                 :class="[
-                  'flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-semibold transition-all',
-                  category
-                    ? 'border-primary/30 bg-primary/5 text-primary'
-                    : 'border-border bg-background text-muted-foreground hover:border-border/80',
+                  'h-3 w-3 transition-transform duration-200 motion-reduce:transition-none',
+                  categoryOpen ? 'rotate-180' : '',
                 ]"
-              >
-                <span>{{ currentCategory || '选择分类' }}</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  class="text-muted-foreground h-3.5 w-3.5"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </button>
-              <transition
-                enter-active-class="transition-all duration-200 ease-out"
-                enter-from-class="opacity-0 scale-95 -translate-y-1"
-                enter-to-class="opacity-100 scale-100 translate-y-0"
-                leave-active-class="transition-all duration-150 ease-in"
-                leave-from-class="opacity-100 scale-100 translate-y-0"
-                leave-to-class="opacity-0 scale-95 -translate-y-1"
-              >
-                <div
-                  v-if="categoryMenuOpen"
-                  class="border-border bg-background absolute top-full right-0 z-50 mt-1 w-48 rounded-xl border shadow-lg"
-                >
-                  <div class="p-1">
-                    <button
-                      type="button"
-                      v-for="cat in categories"
-                      :key="cat.id"
-                      @click="
-                        category = String(cat.id);
-                        categoryMenuOpen = false;
-                      "
-                      :class="[
-                        'w-full rounded-lg px-3 py-2 text-left text-sm transition-colors',
-                        category === String(cat.id)
-                          ? 'bg-muted text-foreground'
-                          : 'text-muted-foreground hover:bg-muted/50',
-                      ]"
-                    >
-                      {{ cat.name }}
-                    </button>
-                  </div>
-                </div>
-              </transition>
-            </div>
-
-            <!-- Auto-save Toggle -->
-            <button
-              type="button"
-              @click="autoSaveEnabled = !autoSaveEnabled"
-              :class="[
-                'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all',
-                autoSaveEnabled
-                  ? 'border-success/30 bg-success/10 text-success'
-                  : 'border-border bg-background text-muted-foreground',
-              ]"
-              :title="
-                autoSaveEnabled
-                  ? '自动保存已开启 (Cmd+S 手动触发)'
-                  : '自动保存已关闭'
-              "
-            >
-              <svg
-                v-if="autoSaveEnabled"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                class="h-3.5 w-3.5"
+                aria-hidden="true"
               >
                 <path
                   fill-rule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
                   clip-rule="evenodd"
                 />
               </svg>
-              <span>{{ autoSaveEnabled ? '自动' : '手动' }}</span>
             </button>
-
-            <!-- Save Draft Button -->
-            <button
-              type="button"
-              @click="handleSaveDraft"
-              class="border-border bg-background text-muted-foreground hover:border-border/80 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all"
+            <transition
+              enter-active-class="transition duration-150 ease-out motion-reduce:transition-none"
+              enter-from-class="opacity-0"
+              enter-to-class="opacity-100"
+              leave-active-class="transition duration-100 ease-in motion-reduce:transition-none"
+              leave-from-class="opacity-100"
+              leave-to-class="opacity-0"
             >
-              <IconSave />
-              保存草稿
-            </button>
+              <div
+                v-if="categoryOpen"
+                role="listbox"
+                class="bg-muted border-border absolute top-full left-0 z-30 mt-1.5 w-56 overflow-hidden rounded-xl border shadow-lg"
+              >
+                <div class="p-1">
+                  <button
+                    v-for="cat in categories"
+                    :key="cat.id"
+                    type="button"
+                    role="option"
+                    :aria-selected="category === String(cat.id)"
+                    :class="[
+                      'flex w-full items-baseline justify-between gap-3 rounded-lg px-3 py-2 text-left text-xs transition-colors',
+                      category === String(cat.id)
+                        ? 'bg-muted text-foreground'
+                        : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
+                    ]"
+                    @click="
+                      () => {
+                        category = String(cat.id);
+                        categoryOpen = false;
+                      }
+                    "
+                  >
+                    <span class="font-serif">{{ cat.name }}</span>
+                    <span
+                      class="text-muted-foreground/50 font-mono text-[10px]"
+                    >
+                      {{ cat.post_count }}
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </transition>
           </div>
+
+          <!-- Pin: 单一字色 + 字距表达"已置顶"，不再用 warning 色块 -->
+          <button
+            type="button"
+            :class="[
+              'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 transition-colors',
+              pin
+                ? 'border-foreground/40 bg-foreground text-background'
+                : 'border-border bg-muted text-muted-foreground hover:text-foreground',
+            ]"
+            :aria-pressed="pin"
+            @click="pin = !pin"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              class="h-3.5 w-3.5"
+              aria-hidden="true"
+            >
+              <path
+                d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 4.5a.75.75 0 001.09 0l4.25-4.5a.75.75 0 00-1.09-1.03l-2.955 3.129V2.75z"
+              />
+              <path
+                d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z"
+              />
+            </svg>
+            <span class="tracking-wide">{{ pin ? '已置顶' : '置顶' }}</span>
+          </button>
+
+          <!-- Meta drawer trigger: 去掉小气泡数字徽章，简化为单行 -->
+          <button
+            type="button"
+            :class="[
+              'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 transition-colors',
+              metaOpen
+                ? 'border-foreground/30 bg-muted text-foreground'
+                : 'border-border bg-muted text-muted-foreground hover:text-foreground',
+            ]"
+            :aria-expanded="metaOpen"
+            aria-controls="meta-drawer"
+            @click="metaOpen = !metaOpen"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              class="h-3.5 w-3.5"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10zm.75 4.5a.75.75 0 000 1.5h14.5a.75.75 0 000-1.5H2.75z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            <span class="tracking-wide">摘要 · 封面</span>
+            <span
+              v-if="summary || cover"
+              class="text-foreground/60 ml-0.5 font-serif italic"
+              aria-hidden="true"
+            >
+              ·
+              {{
+                [summary, cover].filter(Boolean).length === 1
+                  ? '已填一项'
+                  : '已填两项'
+              }}
+            </span>
+          </button>
         </div>
 
-        <!-- Editor Area -->
-        <div
-          class="border-border bg-background overflow-hidden rounded-3xl border shadow-sm"
+        <!-- ─── Meta drawer: summary + cover ─── -->
+        <transition
+          enter-active-class="transition duration-200 ease-out motion-reduce:transition-none"
+          enter-from-class="opacity-0"
+          enter-to-class="opacity-100"
+          leave-active-class="transition duration-150 ease-in motion-reduce:transition-none"
+          leave-from-class="opacity-100"
+          leave-to-class="opacity-0"
         >
-          <!-- Markdown Editor -->
-          <div class="h-[calc(100vh-320px)] min-h-[500px]">
+          <div
+            v-if="metaOpen"
+            id="meta-drawer"
+            class="border-border bg-muted/60 space-y-4 rounded-2xl border p-5"
+          >
+            <!-- Summary -->
+            <div>
+              <label
+                class="text-muted-foreground mb-1.5 block font-serif text-[11px] tracking-wider uppercase italic"
+              >
+                摘要
+              </label>
+              <textarea
+                v-model="summary"
+                rows="2"
+                maxlength="200"
+                placeholder="两三行，写给读者的开场白…"
+                class="text-foreground placeholder:text-muted-foreground/60 border-border bg-muted focus:border-foreground/40 focus:ring-foreground/10 w-full resize-none rounded-lg border px-3 py-2 font-serif text-sm leading-relaxed outline-0 focus:ring-1"
+              />
+              <p
+                class="text-muted-foreground/60 mt-1 text-right font-mono text-[10px]"
+              >
+                {{ summary.length }} / 200
+              </p>
+            </div>
+
+            <!-- Cover -->
+            <div>
+              <label
+                class="text-muted-foreground mb-1.5 block font-serif text-[11px] tracking-wider uppercase italic"
+              >
+                封面
+              </label>
+              <div class="flex gap-3">
+                <div class="min-w-0 flex-1 space-y-2">
+                  <input
+                    v-model="cover"
+                    type="text"
+                    placeholder="粘贴封面 URL"
+                    class="text-foreground placeholder:text-muted-foreground/60 border-border bg-muted focus:border-foreground/40 focus:ring-foreground/10 w-full rounded-lg border px-3 py-2 font-mono text-sm outline-0 focus:ring-1"
+                  />
+                  <div class="flex items-center gap-3 text-xs">
+                    <input
+                      ref="coverInputRef"
+                      type="file"
+                      accept="image/*"
+                      class="hidden"
+                      @change="handleCoverUpload"
+                    />
+                    <button
+                      type="button"
+                      :disabled="coverUploading"
+                      class="text-muted-foreground hover:text-foreground transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                      @click="coverInputRef?.click()"
+                    >
+                      {{ coverUploading ? '上传中…' : '上传图片' }}
+                    </button>
+                    <button
+                      v-if="cover"
+                      type="button"
+                      class="text-muted-foreground/70 hover:text-foreground transition-colors"
+                      @click="cover = ''"
+                    >
+                      清除
+                    </button>
+                  </div>
+                </div>
+                <div
+                  class="border-border bg-muted h-20 w-28 shrink-0 overflow-hidden rounded-lg border"
+                >
+                  <img
+                    v-if="cover"
+                    :src="coverPreviewSrc"
+                    :alt="`${title || '文章'} 封面预览`"
+                    class="h-full w-full object-cover"
+                  />
+                  <div
+                    v-else
+                    class="text-muted-foreground/50 flex h-full w-full items-center justify-center font-serif text-[10px] italic"
+                  >
+                    无封面
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </transition>
+
+        <!-- ─── The writing canvas ─── -->
+        <!--
+          桌面 · 抬起的一张纸。页面底色是 --warm-gray (bg-muted)，
+          编辑器在它之上用 --paper (bg-muted) 浮起，靠阴影分层。
+        -->
+        <div
+          class="bg-muted border-border/60 overflow-hidden rounded-2xl border shadow-[0_1px_0_0_rgba(255,255,255,0.6)_inset,0_2px_4px_-1px_rgba(0,0,0,0.04),0_8px_24px_-8px_rgba(0,0,0,0.12)]"
+        >
+          <div class="h-full">
             <MarkdownEditor ref="markdownEditorRef" v-model="markdownBody" />
           </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="flex items-center justify-end gap-3 pb-12">
+        <!-- ─── Footer dock ─── -->
+        <!--
+          简化成三段：左 = 计量 · 中 = 自动保存（不用 bg-success/10 灯拼色，
+          改用一行的字色 + 描线开关）· 右 = 取消 + 发布。
+          用 sticky bottom 跟随滚动，bg-muted/85 backdrop-blur 与纸面对齐。
+        -->
+        <div
+          class="text-muted-foreground border-border/70 bg-muted/85 sticky bottom-3 -mx-3 flex items-center gap-3 rounded-2xl border px-4 py-2.5 text-xs shadow-sm backdrop-blur-md sm:mx-0"
+        >
+          <!-- 计量 -->
+          <span class="hidden items-center gap-2 font-serif sm:inline-flex">
+            <span>{{ wordCount }} 字</span>
+            <span aria-hidden="true" class="text-border">·</span>
+            <span class="italic">约 {{ readingMinutes }} 分钟</span>
+          </span>
+
+          <!-- 自动保存：把"自动/手动"改成单一 toggle，去掉 success 色块 -->
           <button
             type="button"
-            @click="handleCancel"
-            class="border-border bg-background text-muted-foreground hover:bg-muted rounded-full border px-6 py-2 text-sm font-medium transition-all"
+            :class="[
+              'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 transition-colors',
+              autoSaveEnabled
+                ? 'border-foreground/30 bg-muted text-foreground'
+                : 'border-border bg-muted text-muted-foreground hover:text-foreground',
+            ]"
+            :title="
+              autoSaveEnabled ? '自动保存 · ⌘S 手动触发' : '自动保存已关闭'
+            "
+            :aria-pressed="autoSaveEnabled"
+            :aria-label="autoSaveEnabled ? '关闭自动保存' : '开启自动保存'"
+            @click="autoSaveEnabled = !autoSaveEnabled"
           >
-            取消
+            <span
+              :class="[
+                'h-1.5 w-1.5 rounded-full transition-colors',
+                autoSaveEnabled ? 'bg-foreground/70' : 'bg-muted-foreground/30',
+              ]"
+              aria-hidden="true"
+            ></span>
+            <span class="tracking-wide">{{
+              autoSaveEnabled ? '自动' : '手动'
+            }}</span>
           </button>
-          <button
-            type="submit"
-            :disabled="loading"
-            class="bg-foreground text-background hover:bg-foreground/90 inline-flex items-center justify-center rounded-full px-6 py-2 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <svg
-              v-if="loading"
-              class="mr-2 h-4 w-4 animate-spin"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
+
+          <span class="ml-auto flex items-center gap-1">
+            <button
+              type="button"
+              class="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-colors"
+              title="保存草稿 (⌘S)"
+              aria-label="保存草稿"
+              @click="handleSaveDraft"
             >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-            {{ isEdit ? '保存修改' : '发布文章' }}
-          </button>
+              <IconSave class="h-3 w-3" />
+              <span class="tracking-wide">存草</span>
+            </button>
+
+            <span aria-hidden="true" class="text-border mx-1">·</span>
+
+            <button
+              type="button"
+              class="text-muted-foreground hover:text-foreground rounded-full px-3 py-1 transition-colors"
+              @click="handleCancel"
+            >
+              取消
+            </button>
+
+            <UiButton
+              type="submit"
+              :disabled="loading"
+              size="sm"
+              class="rounded-full"
+            >
+              <svg
+                v-if="loading"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                class="h-3.5 w-3.5 animate-spin motion-reduce:animate-none"
+                aria-hidden="true"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                />
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
+              </svg>
+              {{ isEdit ? '保存校样' : '发布新篇' }}
+            </UiButton>
+          </span>
         </div>
       </form>
     </div>
-  </BasicDetail>
+  </div>
 </template>

@@ -138,7 +138,7 @@ const router = createRouter({
       meta: { requiresAuth: true, title: "发布文章 - Kuroome's Blog" },
     },
     {
-      path: '/blog/edit/:id',
+      path: '/blog/:id/edit',
       name: 'blog-edit',
       component: () => import('@/views/blog/BlogEditorView.vue'),
       meta: { requiresAuth: true, title: "编辑文章 - Kuroome's Blog" },
@@ -382,6 +382,12 @@ router.beforeEach(async (to) => {
 
   if (!auth.isHydrated) {
     await auth.hydrateAuth();
+  }
+
+  // 已登录用户访问 /login 或 /register：直接跳走，避免看到登录/注册表单
+  if (auth.isAuthenticated && (to.name === 'login' || to.name === 'register')) {
+    const redirect = (to.query.redirect as string) || '/';
+    return { path: redirect };
   }
 
   const needsAuth = to.matched.some(

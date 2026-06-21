@@ -314,7 +314,7 @@ onUnmounted(() => {
           class="flex items-center justify-end gap-2 sm:col-span-2 lg:col-span-3"
         >
           <router-link
-            :to="`/blog/edit/${post._id}`"
+            :to="`/blog/${post._id}/edit`"
             class="bg-muted text-foreground hover:bg-muted/80 inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors"
           >
             <EditIcon />
@@ -383,9 +383,7 @@ onUnmounted(() => {
               :title="post.title"
               :content="post.body || ''"
             />
-            <div
-              class="prose prose-lg max-w-none"
-            >
+            <div class="prose prose-lg max-w-none">
               <div v-if="post.body" v-html="renderedBodyWithOrigin" />
               <div v-else class="text-muted-foreground italic">暂无内容</div>
             </div>

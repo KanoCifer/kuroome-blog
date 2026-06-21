@@ -44,6 +44,24 @@ async function authLoader() {
   return null;
 }
 
+// 已登录用户守卫 loader：用于 /login 和 /register
+// 已登录状态下访问这两个路由会被重定向到首页或 ?redirect= 指定路径
+async function guestOnlyLoader({ request }: { request: Request }) {
+  const { useAuthStore } = await import('../stores/authState');
+  const store = useAuthStore.getState();
+
+  if (!store.isHydrated) {
+    await store.hydrateAuth();
+  }
+
+  if (store.isAuthenticated) {
+    const url = new URL(request.url);
+    const redirectTarget = url.searchParams.get('redirect') || '/';
+    return redirect(redirectTarget);
+  }
+  return null;
+}
+
 async function adminLoader() {
   const { useAuthStore } = await import('../stores/authState');
   const store = useAuthStore.getState();
@@ -79,10 +97,12 @@ export const router = createBrowserRouter([
       {
         path: '/login',
         element: <Login />,
+        loader: guestOnlyLoader,
       },
       {
         path: '/register',
         element: <Register />,
+        loader: guestOnlyLoader,
       },
       {
         path: '/settings',
