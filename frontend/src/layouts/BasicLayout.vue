@@ -127,13 +127,14 @@ const transitionName = computed(
     <!-- Main Content -->
     <main class="relative flex-1 scroll-smooth">
       <!-- 路由出口 -->
-
       <RouterView v-slot="{ Component }">
         <template v-if="isEntryView">
           <component :is="Component" :key="$route.path" />
         </template>
         <Transition v-else :name="transitionName" mode="out-in">
-          <component :is="Component" :key="$route.path" />
+          <div :key="$route.path">
+            <component :is="Component" />
+          </div>
         </Transition>
       </RouterView>
     </main>
