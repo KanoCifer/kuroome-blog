@@ -2,6 +2,7 @@ import type { BlogListItem, CategoryItem } from '@/services/blogService';
 import { blogService } from '@/services/blogService';
 import type { BlogPagination as BlogPaginationType } from '@/types';
 import { formatDate } from '@/utils/formatdate';
+import { useOrigin } from '@/hooks/useOrigin';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -17,6 +18,9 @@ interface PostCardProps {
 }
 
 function PostCard({ post, index }: PostCardProps) {
+  // 非 http(s) 开头的 src 用 https://api.kanocifer.chat 作为前缀（仅在 https 环境下生效）
+  const coverSrc = useOrigin(post.cover ?? '');
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -31,7 +35,7 @@ function PostCard({ post, index }: PostCardProps) {
           {post.cover && (
             <div className="border-border bg-muted mb-4 aspect-[16/9] overflow-hidden rounded-2xl border">
               <img
-                src={post.cover}
+                src={coverSrc}
                 alt={`${post.title} 封面`}
                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"

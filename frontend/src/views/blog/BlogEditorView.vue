@@ -4,6 +4,7 @@ import MarkdownEditor from '@/components/editor/MarkdownEditor.vue';
 import IconSave from '@/components/icons/IconSave.vue';
 import { blogGateway } from '@/api/public';
 import { uploadGateway } from '@/api/blog';
+import { useOrigin } from '@/composables/shared';
 import { useNotificationStore } from '@/stores/notification';
 import type { Category, CategoryResponseItem } from '@/types';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
@@ -43,6 +44,9 @@ const currentCategory = computed(() => {
   );
   return selectedCategory ? selectedCategory.name : '';
 });
+
+// 非 http(s) 开头的封面 src 用 https://api.kanocifer.chat 作为前缀（仅在 https 环境下生效）
+const coverPreviewSrc = computed(() => (cover.value ? useOrigin(cover.value) : ''));
 
 // Draft management
 const draftKey = computed(() => `blog-draft-${postId.value || 'new'}`);
@@ -504,7 +508,7 @@ onBeforeUnmount(() => {
             >
               <img
                 v-if="cover"
-                :src="cover"
+                :src="coverPreviewSrc"
                 :alt="`${title || '文章'} 封面预览`"
                 class="h-full w-full object-cover"
               />

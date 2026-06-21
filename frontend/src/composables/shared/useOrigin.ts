@@ -25,7 +25,11 @@ export function useOrigin(url: string) {
   if (location.protocol === 'http:') {
     return url;
   }
-  return 'https://api.kanocifer.chat' + url;
+  // 已是 http(s) 绝对 URL 时原样返回，避免双前缀
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  return 'https://api.kanocifer.chat' + (url.startsWith('/') ? '' : '/') + url;
 }
 
 /**

@@ -17,6 +17,7 @@ import DelIcon from '@/components/icons/DelIcon.vue';
 import EditIcon from '@/components/icons/EditIcon.vue';
 import { blogGateway } from '@/api/public';
 import { useAuthStore } from '@/auth/stores/auth';
+import { useOrigin } from '@/composables/shared';
 import { useNotificationStore } from '@/stores/notification';
 import type { Post } from '@/types';
 import { formatDate } from '@/utils/formatdate';
@@ -94,6 +95,23 @@ const renderedBody = computed(() => {
     async: false,
     breaks: false,
   }) as string;
+});
+
+// 非 http(s) 开头的 src 用 https://api.kanocifer.chat 作为前缀（仅在 https 环境下生效）
+const coverSrc = computed(() =>
+  post.value?.cover ? useOrigin(post.value.cover) : '',
+);
+
+// 渲染正文中所有 <img src="...">，非 http(s) 开头的补上前缀
+const renderedBodyWithOrigin = computed(() => {
+  if (!renderedBody.value) return '';
+  return renderedBody.value.replace(
+    /<img\s+([^>]*?)src=["']([^"']+)["']([^>]*)>/gi,
+    (match, pre, src, post) => {
+      const fixed = useOrigin(src);
+      return `<img ${pre}src="${fixed}"${post}>`;
+    },
+  );
 });
 
 const subtitle = computed(() => {
@@ -315,12 +333,17 @@ onUnmounted(() => {
           v-if="post"
           class="border-border bg-background overflow-hidden rounded-2xl border shadow-sm sm:col-span-2 lg:col-span-3"
         >
-          <img
+          <div
             v-if="post.cover"
-            :src="post.cover"
-            :alt="`${post.title} 封面`"
-            class="h-72 w-full object-cover"
-          />
+            class="border-border bg-muted aspect-[16/9] w-full overflow-hidden border-x border-t"
+          >
+            <img
+              :src="coverSrc"
+              :alt="`${post.title} 封面`"
+              class="h-full w-full object-cover"
+              loading="lazy"
+            />
+          </div>
           <div class="border-border border-b p-8">
             <h1 class="text-foreground mb-4 text-3xl leading-tight font-bold">
               {{ post.title }}
@@ -363,7 +386,7 @@ onUnmounted(() => {
             <div
               class="prose prose-lg dark:prose-invert article-content max-w-none"
             >
-              <div v-if="post.body" v-html="renderedBody" />
+              <div v-if="post.body" v-html="renderedBodyWithOrigin" />
               <div v-else class="text-muted-foreground italic">暂无内容</div>
             </div>
           </div>

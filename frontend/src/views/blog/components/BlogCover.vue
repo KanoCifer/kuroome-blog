@@ -9,7 +9,7 @@
     <!-- 真实封面 -->
     <img
       v-if="cover"
-      :src="cover"
+      :src="coverSrc"
       :alt="title"
       class="absolute inset-0 h-full w-full object-cover"
       loading="lazy"
@@ -72,6 +72,7 @@
 </template>
 
 <script setup lang="ts">
+import { useOrigin } from '@/composables/shared';
 import { computed } from 'vue';
 
 const props = withDefaults(
@@ -94,6 +95,9 @@ const props = withDefaults(
     size: 'md',
   },
 );
+
+// 非 http(s) 开头的 src 用 https://api.kanocifer.chat 作为前缀（仅在 https 环境下生效）
+const coverSrc = computed(() => (props.cover ? useOrigin(props.cover) : ''));
 
 // 稳定 hash：用作 picsum seed
 const seedHash = computed(() => {

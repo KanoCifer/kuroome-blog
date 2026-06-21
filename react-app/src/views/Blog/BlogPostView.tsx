@@ -5,6 +5,7 @@ import { TwikooComments } from '@/components/blog/TwikooComments';
 import { useAuthStore } from '@/stores/authState';
 import { useNotificationStore } from '@/stores/notificationState';
 import { formatDate } from '@/utils/formatdate';
+import { useOrigin } from '@/hooks/useOrigin';
 import { AnimatePresence, motion } from 'framer-motion';
 import hljs from 'highlight.js/lib/common';
 import 'highlight.js/styles/github.css';
@@ -134,6 +135,18 @@ export default function BlogPostView() {
   // Render markdown to HTML
   const renderedBody = post?.body
     ? (marked.parse(post.body, { async: false, breaks: false }) as string)
+    : '';
+
+  // 非 http(s) 开头的 src 用 https://api.kanocifer.chat 作为前缀（仅在 https 环境下生效）
+  const coverSrc = post?.cover ? useOrigin(post.cover) : '';
+
+  // 渲染正文中所有 <img src="...">，非 http(s) 开头的补上前缀
+  const renderedBodyWithOrigin = renderedBody
+    ? renderedBody.replace(
+        /<img\s+([^>]*?)src=["']([^"']+)["']([^>]*)>/gi,
+        (_match, pre: string, src: string, postAttr: string) =>
+          `<img ${pre}src="${useOrigin(src)}"${postAttr}>`,
+      )
     : '';
 
   // Highlight code blocks + setup copy buttons after content renders
@@ -292,7 +305,7 @@ export default function BlogPostView() {
               {post.cover && (
                 <div className="border-border bg-muted mb-5 aspect-[16/9] overflow-hidden rounded-2xl border">
                   <img
-                    src={post.cover}
+                    src={coverSrc}
                     alt={`${post.title} 封面`}
                     className="h-full w-full object-cover"
                   />
@@ -374,8 +387,8 @@ export default function BlogPostView() {
                   ref={contentRef}
                   className="article-content prose prose-lg dark:prose-invert max-w-none"
                 >
-                  {renderedBody ? (
-                    <div dangerouslySetInnerHTML={{ __html: renderedBody }} />
+                  {renderedBodyWithOrigin ? (
+                    <div dangerouslySetInnerHTML={{ __html: renderedBodyWithOrigin }} />
                   ) : (
                     <p className="text-muted-foreground italic">暂无内容</p>
                   )}
