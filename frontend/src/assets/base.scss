@@ -84,6 +84,14 @@ a {
   cursor: pointer;
 }
 
+.nav-glass-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
 /* =========================================================================
    .prose — 文章正文展示系统
    -------------------------------------------------------------------------
@@ -221,7 +229,11 @@ a {
 .prose del {
   color: var(--muted-text);
   text-decoration: line-through;
-  text-decoration-color: color-mix(in oklch, var(--muted-text) 50%, transparent);
+  text-decoration-color: color-mix(
+    in oklch,
+    var(--muted-text) 50%,
+    transparent
+  );
 }
 
 /* —— 列表 —— */

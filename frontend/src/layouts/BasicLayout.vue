@@ -8,7 +8,7 @@ import BasicNav from '@/components/nav/BasicNav.vue';
 import { useBackgroundStore } from '@/stores/background';
 import { useThemeStore } from '@/stores/theme';
 import { AnimatePresence } from 'motion-v';
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { RouterView, useRoute } from 'vue-router';
 
 const bgStore = useBackgroundStore();
@@ -21,7 +21,6 @@ const isAboutView = ref<boolean>(false);
 // 延迟初始值：首次 watch immediate 执行前不渲染任何导航组件，
 // 避免刷新时 BentoNavCard 先闪现再消失
 const showBasicNav = ref<boolean | null>(null);
-const isNavCompact = ref<boolean>(false);
 
 // 监听路由变化
 watch(
@@ -39,26 +38,6 @@ watch(
   },
   { immediate: true },
 );
-
-let scrollObserver: IntersectionObserver | null = null;
-const sentinelRef = ref<HTMLElement | null>(null);
-
-const initObserver = () => {
-  scrollObserver?.disconnect();
-  if (!sentinelRef.value) return;
-  scrollObserver = new IntersectionObserver(
-    ([entry]) => {
-      isNavCompact.value = !entry.isIntersecting;
-    },
-    { threshold: 0 },
-  );
-  scrollObserver.observe(sentinelRef.value);
-};
-
-onMounted(() => initObserver());
-onBeforeUnmount(() => scrollObserver?.disconnect());
-
-watch(sentinelRef, () => initObserver());
 
 // 路由过渡动画：从 meta.transition 读取，未定义时用默认 slide-up
 const transitionName = computed(
@@ -117,13 +96,7 @@ const transitionName = computed(
       </div>
     </header>
 
-    <!-- 滚动检测哨兵（页面顶部不可见 fixed div） -->
-    <div
-      ref="sentinelRef"
-      class="pointer-events-none absolute top-0 left-0 z-0 h-px w-px opacity-0"
-      aria-hidden="true"
-    />
-
+    <!-- 滚动检测哨兵（页面顶部不可见 fixed div）-->
     <!-- Main Content -->
     <main class="relative flex-1 scroll-smooth">
       <!-- 路由出口 -->
@@ -151,15 +124,11 @@ const transitionName = computed(
     <!-- Todo Drawer: global floating button + right slide-in drawer -->
     <TodoModal />
 
-    <!-- Navigation: cross-route layoutId morph -->
+    <!-- Navigation: 始终居中，无 compact/居中切换 -->
     <AnimatePresence>
       <BasicNav
         v-if="showBasicNav === true"
-        :animate="{
-          opacity: 1,
-          y: 0,
-          ...(isNavCompact ? { left: 240 } : { left: '50%' }),
-        }"
+        :animate="{ opacity: 1, y: 0, left: '50%' }"
         :initial="{ opacity: 0, y: -40, left: '50%' }"
         :exit="{ opacity: 0, y: -40 }"
         :transition="{ type: 'spring', bounce: 0.3, duration: 0.5 }"
