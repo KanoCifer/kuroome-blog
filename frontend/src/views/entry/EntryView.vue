@@ -167,33 +167,36 @@
     <!-- Edit Layout Toolbar -->
     <Teleport to="body">
       <Transition
-        enter-active-class="transition-all duration-300 ease-out"
+        enter-active-class="transition-[opacity,transform] duration-300 ease-out"
         enter-from-class="opacity-0 translate-y-4"
         enter-to-class="opacity-100 translate-y-0"
-        leave-active-class="transition-all duration-200 ease-in"
+        leave-active-class="transition-[opacity,transform] duration-200 ease-in"
         leave-from-class="opacity-100 translate-y-0"
         leave-to-class="opacity-0 translate-y-4"
       >
         <div
           v-if="layoutStore.isEditing"
-          class="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 rounded-2xl bg-white/90 px-5 py-3 shadow-lg backdrop-blur-md dark:bg-neutral-800/90"
+          class="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-2xl border border-border bg-background/90 px-4 py-2 shadow-lg backdrop-blur-md"
         >
-          <span class="text-sm font-medium text-neutral-500">编辑布局</span>
+          <span class="px-1 text-sm font-medium text-muted-foreground">
+            编辑布局
+          </span>
+          <span class="mx-1 h-5 w-px bg-border" aria-hidden="true" />
           <button
             @click="layoutStore.cancelEditing()"
-            class="cursor-pointer rounded-xl border border-neutral-300 px-4 py-1.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700"
+            class="active:scale-[0.96] cursor-pointer rounded-xl border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
           >
             取消
           </button>
           <button
             @click="layoutStore.saveEditing()"
-            class="cursor-pointer rounded-xl bg-blue-500 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-600"
+            class="active:scale-[0.96] cursor-pointer rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             保存
           </button>
           <button
             @click="layoutStore.resetAllOffsets()"
-            class="cursor-pointer rounded-xl border border-red-300 px-4 py-1.5 text-sm font-medium text-red-500 transition-colors hover:bg-red-50 dark:border-red-700 dark:hover:bg-red-900/30"
+            class="active:scale-[0.96] cursor-pointer rounded-xl border border-destructive/30 px-4 py-2 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
           >
             重置
           </button>

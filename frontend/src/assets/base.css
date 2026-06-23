@@ -109,3 +109,26 @@
   --color-gradient-decorative-from: var(--gradient-decorative-from);
   --color-gradient-decorative-to: var(--gradient-decorative-to);
 }
+
+/* Global border-as-shadow system.
+   Any element with a non-zero Tailwind border-width class automatically gets
+   a layered box-shadow outline REPLACING the hard border. The original 1px
+   border is made transparent (since shadow is a more flexible, theme-adaptive
+   replacement), and the shadow adapts to the active theme via --foreground
+   at low alpha. */
+@layer base {
+  :where([class~='border']) {
+    box-shadow:
+      0px 0px 0px 1px rgba(0, 0, 0, 0.06),
+      0px 1px 2px -1px rgba(0, 0, 0, 0.06),
+      0px 2px 4px 0px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 200ms ease-out;
+  }
+
+  :where([class~='border']):hover {
+    box-shadow:
+      0px 0px 0px 1px rgba(0, 0, 0, 0.08),
+      0px 1px 2px -1px rgba(0, 0, 0, 0.08),
+      0px 2px 4px 0px rgba(0, 0, 0, 0.06);
+  }
+}

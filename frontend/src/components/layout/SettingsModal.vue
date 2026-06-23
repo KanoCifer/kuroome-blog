@@ -1,12 +1,12 @@
 <template>
   <Teleport to="body">
     <transition
-      enter-active-class="transition-all duration-500 ease-out transform-gpu"
-      enter-from-class="opacity-0 translate-x-full"
-      enter-to-class="opacity-100 translate-x-0"
-      leave-active-class="transition-all duration-300 ease-in transform-gpu"
-      leave-from-class="opacity-100 translate-x-0"
-      leave-to-class="opacity-0 translate-x-full"
+      enter-active-class="transition-all duration-500 ease-in-out"
+      enter-from-class="translate-x-full"
+      enter-to-class="translate-x-0"
+      leave-active-class="transition-all duration-500"
+      leave-from-class="opacity-100 blur-0 ranslate-x-0"
+      leave-to-class="opacity-0 blur-2 translate-x-4"
     >
       <div
         v-if="modelValue"
@@ -24,7 +24,7 @@
           <header class="relative px-8 pt-10 pb-6 text-center">
             <button
               @click="close"
-              class="text-muted-foreground hover:bg-muted hover:text-foreground absolute top-6 right-6 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+              class="text-muted-foreground hover:bg-muted hover:text-foreground absolute top-6 right-6 flex h-10 w-10 items-center justify-center rounded-full transition-colors active:scale-[0.96]"
               aria-label="关闭"
             >
               <IconClose class="h-5 w-5" />
@@ -55,7 +55,7 @@
               v-for="(tab, i) in tabs"
               :key="tab.key"
               @click="activeTab = tab.key"
-              class="group relative flex w-[88px] flex-col items-center transition-colors"
+              class="group relative flex w-[88px] flex-col items-center rounded-lg py-1 transition-colors active:scale-[0.96]"
             >
               <span
                 class="font-serif text-[11px] tracking-[0.2em]"

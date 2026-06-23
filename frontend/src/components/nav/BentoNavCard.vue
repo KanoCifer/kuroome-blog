@@ -19,8 +19,8 @@
     <div class="relative">
       <!-- 导航指示器 -->
       <Motion
-        class="bg-primary absolute top-0 left-0 z-0 h-14 w-full transform-gpu rounded-3xl shadow-sm will-change-transform"
-        :animate="{ y: hoverNavIndex * (52 + 4) }"
+        class="bg-primary absolute top-0 left-0 z-0 h-[52px] w-full transform-gpu rounded-3xl shadow-sm will-change-transform"
+        :animate="{ y: hoverNavIndex * 56 }"
         :transition="{ visualDuration: 0.3, bounce: 0.15, type: 'spring' }"
       />
 
@@ -32,11 +32,11 @@
         >
           <RouterLink
             :to="item.path"
-            class="relative z-10 flex items-center gap-4 rounded-3xl py-3.5 pr-5 pl-6 font-medium transition-colors duration-150"
+            class="active:scale-[0.98] relative z-10 flex items-center gap-4 rounded-3xl px-6 py-3.5 font-medium transition-colors duration-150"
             :class="
               hoverNavIndex === index
-                ? 'text-white/80'
-                : 'text-foreground dark:text-muted-foreground dark:hover:text-foreground'
+                ? 'text-primary-foreground'
+                : 'text-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-foreground'
             "
           >
             <component :is="item.icon" class="h-6 w-6" />
