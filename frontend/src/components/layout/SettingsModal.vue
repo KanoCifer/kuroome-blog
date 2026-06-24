@@ -1,12 +1,12 @@
 <template>
   <Teleport to="body">
     <transition
-      enter-active-class="transition-all duration-500 ease-in-out"
+      enter-active-class="transition-all duration-700 ease-in-out transform-gpu"
       enter-from-class="translate-x-full"
       enter-to-class="translate-x-0"
-      leave-active-class="transition-all duration-500"
-      leave-from-class="opacity-100 blur-0 ranslate-x-0"
-      leave-to-class="opacity-0 blur-2 translate-x-4"
+      leave-active-class="transition-all duration-300"
+      leave-from-class="opacity-100 blur-0 translate-x-0"
+      leave-to-class="opacity-0 blur-sm translate-x-4"
     >
       <div
         v-if="modelValue"

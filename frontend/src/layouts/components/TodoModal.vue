@@ -36,9 +36,9 @@
       enter-active-class="transition-all duration-500 ease-out transform-gpu"
       enter-from-class="opacity-0 translate-x-full"
       enter-to-class="opacity-100 translate-x-0"
-      leave-active-class="transition-all duration-300 ease-in transform-gpu"
-      leave-from-class="opacity-100 translate-x-0"
-      leave-to-class="opacity-0 translate-x-full"
+      leave-active-class="transition-all duration-300 transform-gpu"
+      leave-from-class="opacity-100 translate-x-0 blur-0"
+      leave-to-class="opacity-0 translate-x-4 blur-ms"
     >
       <div
         v-if="isOpen"

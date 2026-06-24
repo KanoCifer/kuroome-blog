@@ -1,11 +1,23 @@
 <template>
-  <motion.div class="card border-border squircle bg-background/85 border p-6">
+  <motion.div
+    class="card group border-border squircle bg-background/85 relative overflow-hidden border p-6"
+  >
+    <div
+      v-if="hoverEffect"
+      class="via-primary-foreground/25 absolute inset-0 -translate-x-full bg-linear-to-r from-transparent to-transparent transition-transform duration-500 group-hover:translate-x-full"
+    />
     <slot></slot>
   </motion.div>
 </template>
 
 <script setup lang="ts">
 import { motion } from 'motion-v';
+
+interface Props {
+  hoverEffect?: boolean;
+}
+
+const { hoverEffect = true } = defineProps<Props>();
 </script>
 
 <style scoped>

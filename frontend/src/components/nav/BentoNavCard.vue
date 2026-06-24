@@ -4,6 +4,7 @@
     :initial="props.initial"
     :animate="props.animate"
     :transition="props.transition"
+    :hoverEffect="false"
   >
     <!-- 用户信息 + 下拉菜单 -->
     <UserDropdown :items="userMenuItems" :guest-items="guestMenuItems" />
@@ -32,7 +33,7 @@
         >
           <RouterLink
             :to="item.path"
-            class="active:scale-[0.98] relative z-10 flex items-center gap-4 rounded-3xl px-6 py-3.5 font-medium transition-colors duration-150"
+            class="relative z-10 flex items-center gap-4 rounded-3xl px-6 py-3.5 font-medium transition-colors duration-150 active:scale-[0.98]"
             :class="
               hoverNavIndex === index
                 ? 'text-primary-foreground'
