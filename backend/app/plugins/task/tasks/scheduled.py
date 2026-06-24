@@ -142,8 +142,8 @@ async def run_migration_job(context: Context = TaskiqDepends()):
 
             if not valid_items:
                 duration = time.perf_counter() - start_time
-                logger.info(
-                    f"[MigrationJob] ✅ Completed | duration={duration:.2f}s | 0 items to migrate"
+                logger.bind(job="migration", duration=duration).info(
+                    "migration completed, 0 items to migrate"
                 )
                 return {
                     "status": "success",
@@ -160,14 +160,14 @@ async def run_migration_job(context: Context = TaskiqDepends()):
             except json.JSONDecodeError as e:
                 error_msg = str(e)
                 parse_duration = time.perf_counter() - parse_start
-                logger.warning(
-                    f"[MigrationJob] JSON parsing failed | error={error_msg} | parse_duration={parse_duration:.2f}s"
-                )
+                logger.bind(
+                    job="migration", error=error_msg, parse_duration=parse_duration
+                ).warning("migration json parsing failed")
                 for item in reversed(valid_items):
                     redis.lpush(queue_key, item)
                 duration = time.perf_counter() - start_time
-                logger.error(
-                    f"[MigrationJob] ❌ Job failed | duration={duration:.2f}s | error=JSON parsing failed"
+                logger.bind(job="migration", duration=duration).error(
+                    "migration failed, json parsing error"
                 )
                 return {
                     "status": "failed",
@@ -210,18 +210,18 @@ async def run_migration_job(context: Context = TaskiqDepends()):
                             data_dict[field] = value[:max_len]
                     track_objects.append(VisitorTrack(**data_dict))
 
-                logger.info(
-                    f"[MigrationJob] Adding {len(track_objects)} objects to session"
+                logger.bind(job="migration", count=len(track_objects)).info(
+                    "migration adding objects to session"
                 )
                 session.add_all(track_objects)
 
-                logger.info("[MigrationJob] Committing to database...")
+                logger.bind(job="migration").info("migration committing to database")
                 try:
                     await session.commit()
-                    logger.info("[MigrationJob] Commit successful")
-                except Exception as db_error:
-                    logger.exception(
-                        f"[MigrationJob] Database commit failed: {db_error!r}"
+                    logger.bind(job="migration").info("migration commit successful")
+                except Exception:
+                    logger.bind(job="migration").exception(
+                        "migration database commit failed"
                     )
                     raise
 
@@ -229,9 +229,15 @@ async def run_migration_job(context: Context = TaskiqDepends()):
                 db_duration = time.perf_counter() - db_start
 
             duration = time.perf_counter() - start_time
-            logger.info(
-                f"[MigrationJob]✅Completed | duration={duration:.2f}s | fetched={len(valid_items)} | migrated={processed_count} | fetch={fetch_duration:.2f}s | parse={parse_duration:.2f}s | db={db_duration:.2f}s"
-            )
+            logger.bind(
+                job="migration",
+                duration=duration,
+                fetched=len(valid_items),
+                migrated=processed_count,
+                fetch_duration=fetch_duration,
+                parse_duration=parse_duration,
+                db_duration=db_duration,
+            ).info("migration completed")
             return {
                 "status": "success",
                 "total": len(valid_items),
@@ -241,17 +247,19 @@ async def run_migration_job(context: Context = TaskiqDepends()):
 
         except Exception as e:
             duration = time.perf_counter() - start_time
-            logger.exception(
-                f"[MigrationJob] ❌ Job failed | duration={duration:.2f}s | error={e!s}"
+            logger.bind(job="migration", duration=duration).exception(
+                "migration job failed"
             )
             if "valid_items" in locals() and valid_items:
                 restore_start = time.perf_counter()
                 for item in reversed(valid_items):
                     await redis.lpush(queue_key, item)  # type: ignore
                 restore_duration = time.perf_counter() - restore_start
-                logger.info(
-                    f"[MigrationJob] Restored {len(valid_items)} items back to Redis | restore_duration={restore_duration:.2f}s"
-                )
+                logger.bind(
+                    job="migration",
+                    count=len(valid_items),
+                    restore_duration=restore_duration,
+                ).info("migration restored items back to redis")
             return {
                 "status": "failed",
                 "error": str(e),
@@ -271,11 +279,11 @@ async def run_migration_job(context: Context = TaskiqDepends()):
 async def refresh_rss_feeds(context: Context = TaskiqDepends()):
     """Daily RSS refresh at 10:00 (Asia/Shanghai) for all users."""
     start_time = time.perf_counter()
-    logger.info("[RSSRefreshJob] 🔄 Starting RSS feed refresh job")
+    logger.info("[RSSRefreshJob] starting RSS feed refresh job")
     settings = get_settings()
 
     if not settings.FEISHU_WEBHOOK_URL:
-        logger.warning("⚠️ 未配置飞书webhook，RSS 刷新结果将不发送飞书通知")
+        logger.warning("feishu webhook not configured, RSS refresh result will not notify")
 
     try:
         from app.core.container import get_rss_service
@@ -285,7 +293,7 @@ async def refresh_rss_feeds(context: Context = TaskiqDepends()):
 
         duration = time.perf_counter() - start_time
         logger.info(
-            f"[RSSRefreshJob] ✅ Job completed | duration={duration:.2f}s | "
+            f"[RSSRefreshJob] job completed | duration={duration:.2f}s | "
             f"total_feeds={stats['total_feeds']} | success={stats['success']} | "
             f"failed={stats['failed']} | new_articles={stats['new_articles']}"
         )
@@ -316,7 +324,7 @@ async def refresh_rss_feeds(context: Context = TaskiqDepends()):
         error_msg = str(e)
         duration = time.perf_counter() - start_time
         logger.exception(
-            f"[RSSRefreshJob] ❌ Job failed | duration={duration:.2f}s | error={error_msg}"
+            f"[RSSRefreshJob] job failed | duration={duration:.2f}s | error={error_msg}"
         )
         message = (
             f"❌RSS 刷新失败！\n错误信息: {error_msg}\n耗时: {duration:.2f}秒"
@@ -345,7 +353,7 @@ async def send_daily_summary(context: Context = TaskiqDepends()):
     settings = get_settings()
 
     if not settings.FEISHU_WEBHOOK_URL:
-        logger.warning("⚠️ 未配置飞书webhook，跳过发送每日统计飞书消息")
+        logger.warning("feishu webhook not configured, skip daily summary notification")
         return
 
     today_shanghai = datetime.now(SHANGHAI_TZ).replace(
@@ -359,7 +367,7 @@ async def send_daily_summary(context: Context = TaskiqDepends()):
 
         redis = context.state.redis
         if redis is None:
-            logger.warning("Taskiq Redis 未初始化，跳过发送每日统计飞书消息")
+            logger.warning("taskiq redis not initialized, skip daily summary notification")
             return
 
         async with get_monitor_service() as monitor_service:
@@ -384,7 +392,7 @@ async def send_daily_summary(context: Context = TaskiqDepends()):
             device_stats=device_stats,
         )
         if not message.strip():
-            logger.warning("每日统计消息为空，跳过发送")
+            logger.warning("daily summary message empty, skip sending")
             return
 
         title = f"📊 昨日访问统计 - {yesterday_str}"
@@ -393,7 +401,7 @@ async def send_daily_summary(context: Context = TaskiqDepends()):
 
     except Exception as e:
         error_msg = str(e)
-        logger.error(f"❌ 发送每日统计飞书消息失败: {error_msg}")
+        logger.error(f"daily summary notification failed: {error_msg}")
         await _send_notification(
             title="❌每日访问统计失败通知",
             body=f"❌每日访问统计发送失败！\n错误信息: {error_msg}",
@@ -414,12 +422,12 @@ async def send_todo(context: Context = TaskiqDepends()):
     """每天早上9点发送待办事项提醒给用户"""
     settings = get_settings()
     if not settings.FEISHU_WEBHOOK_URL:
-        logger.warning("⚠️ 未配置飞书webhook，跳过发送待办提醒飞书消息")
+        logger.warning("feishu webhook not configured, skip todo reminder notification")
         return
 
     redis = getattr(context.state, "redis", None)
     if redis is None:
-        logger.warning("Taskiq Redis 未初始化，跳过发送待办提醒飞书消息")
+        logger.warning("taskiq redis not initialized, skip todo reminder notification")
         return
 
     todos = await redis.get("todos:1")

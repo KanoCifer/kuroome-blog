@@ -54,6 +54,10 @@ class Settings(BaseSettings):
     ENABLE_TRACKING: bool = True
     ADMIN_USER_IDS: list[int] = [1, 2]
     SAVE_LOGS: bool = True
+    # 终端/文件日志级别（规约见 docs/rules/logging.md）
+    LOG_LEVEL: str = "INFO"
+    # DB 持久化阈值：仅 ≥ 此级别入库，避免 Log 表随业务量膨胀（默认 WARNING）
+    DB_LOG_LEVEL: str = "WARNING"
 
     model_config = SettingsConfigDict(
         env_file=get_env_file_path(),

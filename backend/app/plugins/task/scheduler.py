@@ -14,4 +14,4 @@ scheduler = TaskiqScheduler(
     sources=[LabelScheduleSource(broker)],
 )
 
-logger.info("[Taskiq] ✅ All scheduled tasks registered successfully")
+logger.bind(component="taskiq").info("all scheduled tasks registered successfully")

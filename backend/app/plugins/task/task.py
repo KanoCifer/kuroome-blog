@@ -21,6 +21,7 @@ from taskiq_redis import RedisAsyncResultBackend
 
 from app.core.config import get_settings
 from app.core.logger import logger
+from app.plugins.task.middlewares import TraceMiddleware
 
 # ---------------------------------------------------------------------------
 # Module-level broker — must exist at import time for @broker.task decorators
@@ -47,11 +48,12 @@ broker: AioPikaBroker = (
             use_jitter=True,
             use_delay_exponent=True,
             max_delay_exponent=6,
-        )
+        ),
+        TraceMiddleware(),
     )
 )
 
-logger.info("[Taskiq] ✅ Broker initialized")
+logger.bind(component="taskiq").info("broker initialized")
 
 
 # ---------------------------------------------------------------------------

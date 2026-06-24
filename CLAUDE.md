@@ -7,6 +7,7 @@
   - React: `cd react-app && pnpm run type-check`
 - **提交前必跑**：(1) 改前端 → `pnpm run type-check` (2) 改后端 → `ruff check .` (3) 各自语言的 lint + format
 - 样式必须使用语义化 Tailwind class（`bg-background`, `text-foreground` 等），禁止硬编码颜色（`bg-black/75`, `text-white/90`）。
+- 用户没有特殊要求，静止执行`pnpm build`
 - 后端使用 `uv` 管理依赖。
 
 ## 2) Project Overview
@@ -27,6 +28,7 @@
 - [design-system.md](docs/rules/design-system.md) — 语义化 token、组件样式规则、禁止事项
 - [domain.md](docs/rules/domain.md) — 领域词汇表
 - [environment.md](docs/rules/environment.md) — 环境变量、关键文件
+- [logging.md](docs/rules/logging.md) — 日志编排规约 structlog
 
 ## Agent skills
 

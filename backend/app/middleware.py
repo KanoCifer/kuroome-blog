@@ -36,14 +36,31 @@ def register_middleware(app: FastAPI) -> None:
     @app.middleware("http")
     async def add_process_time_header(request: Request, call_next):
         from app.core import logger as app_logger
+        from app.core.logging_context import (
+            reset_trace_id,
+            set_trace_id,
+            trace_id_ctx,
+        )
 
+        token = set_trace_id()
+        trace_id = trace_id_ctx.get()
         start_time: float = time.perf_counter()
-        response = await call_next(request)
-        process_time: float = round(time.perf_counter() - start_time, 6)
+        try:
+            response = await call_next(request)
+        finally:
+            process_time: float = round(time.perf_counter() - start_time, 6)
+            reset_trace_id(token)
 
-        if process_time > 1.0:
-            app_logger.warning(
-                f"Request to {request.url.path} took {process_time}s and returned status code {response.status_code}"
-            )
+        # 慢请求才进 DB（persist）；普通请求留文件 log。trace_id 已复位，
+        # 故在上文 set 后立即取值缓存，bind 时带回去。
+        app_logger.bind(
+            trace_id=trace_id,
+            method=request.method,
+            path=request.url.path,
+            status=response.status_code,
+            duration=process_time,
+            persist=(process_time > 1.0),
+        ).info("http request completed")
         response.headers["X-Process-Time"] = f"{process_time}s"
+        response.headers["X-Trace-Id"] = trace_id
         return response
