@@ -72,7 +72,7 @@ export default function RssArticleView() {
 
   return (
     <div className="bg-background min-h-dvh pb-28">
-      <header className="bg-card/85 sticky top-0 z-10 h-15 px-4 py-3 backdrop-blur-md"></header>
+      <header className="bg-background/85 sticky top-0 z-10 h-15 px-4 py-3 backdrop-blur-md"></header>
       <main className="mx-auto w-full max-w-dvw px-4 py-4">
         <AnimatePresence mode="wait">
           {loading ? (
@@ -113,7 +113,7 @@ export default function RssArticleView() {
               <ArticleSummaryCard title={article.title} content={pureContent} />
 
               <div
-                className="prose prose-sm bg-card ring-border mt-4 max-w-none rounded-2xl p-4 ring-1"
+                className="prose prose-sm bg-background ring-border mt-4 max-w-none rounded-2xl p-4 ring-1"
                 dangerouslySetInnerHTML={{ __html: html }}
               />
             </motion.article>

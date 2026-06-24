@@ -39,7 +39,7 @@ export function MomentCard({
           'focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2',
           moment.is_pinned
             ? 'bg-warning/8 border-warning/30'
-            : 'bg-card border-border/40 hover:border-primary/25',
+            : 'bg-background border-border/40 hover:border-primary/25',
         ].join(' ')}
         onClick={() => onOpen?.(moment.id)}
         onKeyDown={(e) => {
@@ -55,17 +55,17 @@ export function MomentCard({
         />
 
         {moment.is_pinned && (
-          <span className="bg-warning/15 text-warning absolute -top-2 left-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] shadow-sm">
+          <span className="bg-warning/15 text-warning absolute -top-2 left-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-[0.18em] uppercase shadow-sm">
             <PinIcon className="h-3 w-3" />
             <span>置顶</span>
           </span>
         )}
 
         {isAdmin && (
-          <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
+          <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100">
             <button
               type="button"
-              className="text-muted-foreground hover:text-primary border-border/40 bg-card/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
+              className="text-muted-foreground hover:text-primary border-border/40 bg-background/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
               aria-label={`编辑 ${moment.id}`}
               onClick={(e) => {
                 e.stopPropagation();
@@ -76,7 +76,7 @@ export function MomentCard({
             </button>
             <button
               type="button"
-              className="text-muted-foreground hover:text-destructive border-border/40 bg-card/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
+              className="text-muted-foreground hover:text-destructive border-border/40 bg-background/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
               aria-label={`删除 ${moment.id}`}
               onClick={(e) => {
                 e.stopPropagation();

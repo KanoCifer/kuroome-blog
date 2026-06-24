@@ -245,7 +245,7 @@ export default function ImageToolboxView() {
   return (
     <BasicDetail title="图片工具箱" subtitle="本地压缩与格式转换">
       <div className="col-span-full">
-        <div className="squircle border-border/60 bg-card/50 overflow-hidden border shadow-sm">
+        <div className="squircle border-border/60 bg-background/50 overflow-hidden border shadow-sm">
           <div className="flex flex-col lg:flex-row lg:items-stretch">
             <aside className="border-border/60 w-full shrink-0 border-b p-6 lg:w-80 lg:border-r lg:border-b-0">
               <header className="mb-8">
@@ -283,7 +283,7 @@ export default function ImageToolboxView() {
                       type="number"
                       min={1}
                       disabled={!enableMaxWidth}
-                      className="border-border bg-card focus:border-ring disabled:bg-secondary disabled:text-muted-foreground w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
+                      className="border-border bg-background focus:border-ring disabled:bg-secondary disabled:text-muted-foreground w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
                     />
                     <span className="text-muted-foreground absolute top-1/2 right-4 -translate-y-1/2 text-xs">
                       px
@@ -331,7 +331,7 @@ export default function ImageToolboxView() {
                         className={`rounded-xl border py-2 text-xs font-medium transition-all ${
                           outputType === option.value
                             ? 'border-foreground bg-foreground text-background'
-                            : 'border-border bg-card text-muted-foreground hover:border-border'
+                            : 'border-border bg-background text-muted-foreground hover:border-border'
                         }`}
                         onClick={() => setOutputType(option.value)}
                       >
@@ -379,7 +379,7 @@ export default function ImageToolboxView() {
                   <button
                     type="button"
                     disabled={!processedBlob}
-                    className="border-border bg-card text-card-foreground hover:bg-muted flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium transition-all disabled:opacity-50"
+                    className="border-border bg-background text-card-foreground hover:bg-muted flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium transition-all disabled:opacity-50"
                     onClick={downloadProcessedImage}
                   >
                     <svg
@@ -417,8 +417,8 @@ export default function ImageToolboxView() {
                     isDraggingOver
                       ? 'border-foreground bg-foreground/5'
                       : originalFile
-                        ? 'bg-card border-transparent shadow-sm'
-                        : 'border-border bg-card hover:border-border'
+                        ? 'bg-background border-transparent shadow-sm'
+                        : 'border-border bg-background hover:border-border'
                   }`}
                   onClick={openFilePicker}
                   onDragOver={handleDragOver}
@@ -477,7 +477,7 @@ export default function ImageToolboxView() {
                         </div>
                         <button
                           type="button"
-                          className="bg-card text-card-foreground ring-border hover:bg-muted rounded-full px-4 py-1.5 text-xs font-bold shadow-sm ring-1 transition-all"
+                          className="bg-background text-card-foreground ring-border hover:bg-muted rounded-full px-4 py-1.5 text-xs font-bold shadow-sm ring-1 transition-all"
                           onClick={(event) => {
                             event.stopPropagation();
                             openFilePicker();
@@ -500,7 +500,7 @@ export default function ImageToolboxView() {
 
                 {originalFile && (
                   <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <div className="group bg-card relative flex flex-col overflow-hidden rounded-3xl shadow-sm">
+                    <div className="group bg-background relative flex flex-col overflow-hidden rounded-3xl shadow-sm">
                       <div className="border-border flex items-center justify-between border-b p-4">
                         <span className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
                           原始图像
@@ -551,7 +551,7 @@ export default function ImageToolboxView() {
                       </div>
                     </div>
 
-                    <div className="group bg-card relative flex flex-col overflow-hidden rounded-3xl shadow-sm">
+                    <div className="group bg-background relative flex flex-col overflow-hidden rounded-3xl shadow-sm">
                       <div className="border-border flex items-center justify-between border-b p-4">
                         <div className="flex items-center gap-2">
                           <span className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
@@ -668,7 +668,7 @@ export default function ImageToolboxView() {
             >
               <button
                 type="button"
-                className="bg-card/10 text-foreground hover:bg-card/20 absolute top-6 right-6 h-10 w-10 rounded-full transition-colors"
+                className="bg-background/10 text-foreground hover:bg-background/20 absolute top-6 right-6 h-10 w-10 rounded-full transition-colors"
                 onClick={closePreviewDialog}
               >
                 ✕

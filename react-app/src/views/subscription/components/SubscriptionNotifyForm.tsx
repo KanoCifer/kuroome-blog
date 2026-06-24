@@ -141,7 +141,7 @@ function SecondaryButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`font-headline text-on-surface border-primary/60 bg-primary/5 hover:bg-card/70 flex-1 rounded-full border px-4 py-2 text-sm font-semibold backdrop-blur-md transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 ${className} `}
+      className={`font-headline text-on-surface border-primary/60 bg-primary/5 hover:bg-background/70 flex-1 rounded-full border px-4 py-2 text-sm font-semibold backdrop-blur-md transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 ${className} `}
     >
       {children}
     </button>
@@ -261,7 +261,7 @@ export function SubscriptionNotifyForm({
                   className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all ${
                     checked
                       ? 'bg-primary text-primary-foreground shadow-[0_4px_12px_rgba(0,40,142,0.25)]'
-                      : 'border-border bg-card text-card-foreground hover:bg-muted border'
+                      : 'border-border bg-background text-card-foreground hover:bg-muted border'
                   } `}
                 >
                   <option.icon size={16} />
@@ -286,7 +286,7 @@ export function SubscriptionNotifyForm({
                   className={`flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 transition-all ${
                     checked
                       ? 'border-primary/20 bg-primary/10 border'
-                      : 'border-border bg-card hover:bg-muted border'
+                      : 'border-border bg-background hover:bg-muted border'
                   } `}
                 >
                   <div
@@ -322,7 +322,7 @@ export function SubscriptionNotifyForm({
               value={form.email}
               onChange={(event) => handleChange('email', event.target.value)}
               placeholder="your@email.com"
-              className="text-on-surface placeholder:text-outline/50 bg-card focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
+              className="text-on-surface placeholder:text-outline/50 bg-background focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
             />
           </div>
         )}
@@ -338,7 +338,7 @@ export function SubscriptionNotifyForm({
                 handleChange('feishu_webhook_url', event.target.value)
               }
               placeholder="https://open.feishu.cn/..."
-              className="text-on-surface placeholder:text-outline/50 bg-card focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
+              className="text-on-surface placeholder:text-outline/50 bg-background focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
             />
           </div>
         )}
@@ -354,7 +354,7 @@ export function SubscriptionNotifyForm({
                 handleChange('bark_device_key', event.target.value)
               }
               placeholder="填写 Bark 设备 Key"
-              className="text-on-surface placeholder:text-outline/50 bg-card focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
+              className="text-on-surface placeholder:text-outline/50 bg-background focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
             />
           </div>
         )}

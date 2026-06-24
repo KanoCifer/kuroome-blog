@@ -253,7 +253,7 @@ export const BentoNavSidebar: React.FC = () => {
           duration: 0.3,
           ease: 'easeInOut',
         }}
-        className="bg-card/90 fixed top-0 left-0 z-100 flex h-screen w-80 flex-col gap-6 rounded-r-4xl p-6 backdrop-blur-sm"
+        className="bg-background/90 fixed top-0 left-0 z-100 flex h-screen w-80 flex-col gap-6 rounded-r-4xl p-6 backdrop-blur-sm"
       >
         {/* 下拉菜单 */}
         <div ref={dropdownRef} className="relative">
@@ -291,7 +291,7 @@ export const BentoNavSidebar: React.FC = () => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="selection-none bg-card absolute top-full left-0 z-50 mt-4 flex w-60 flex-col gap-1 rounded-2xl p-2 shadow-xl"
+              className="selection-none bg-background absolute top-full left-0 z-50 mt-4 flex w-60 flex-col gap-1 rounded-2xl p-2 shadow-xl"
             >
               <DropDownItems />
             </motion.div>

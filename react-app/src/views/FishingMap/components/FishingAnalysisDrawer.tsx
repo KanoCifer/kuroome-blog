@@ -56,7 +56,7 @@ export function FishingAnalysisDrawer({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="bg-card border-border fixed inset-x-0 bottom-0 z-50 flex h-[50dvh] max-h-[50dvh] flex-col rounded-t-2xl border-t shadow-2xl sm:hidden"
+            className="bg-background border-border fixed inset-x-0 bottom-0 z-50 flex h-[50dvh] max-h-[50dvh] flex-col rounded-t-2xl border-t shadow-2xl sm:hidden"
             role="dialog"
             aria-label="AI 分析"
           >
@@ -69,7 +69,7 @@ export function FishingAnalysisDrawer({
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="bg-card border-border fixed top-0 right-0 z-50 hidden h-screen w-[420px] max-w-[90vw] flex-col border-l shadow-2xl sm:flex"
+            className="bg-background border-border fixed top-0 right-0 z-50 hidden h-screen w-[420px] max-w-[90vw] flex-col border-l shadow-2xl sm:flex"
             role="dialog"
             aria-label="AI 分析"
           >

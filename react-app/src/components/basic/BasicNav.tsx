@@ -50,7 +50,7 @@ function NavItem({ icon, to, isActive, activeIcon }: NavItemProps) {
       <div className="flex items-center justify-center">
         <Link
           to={to}
-          className={`flex h-14 w-16 items-center justify-center rounded-full transition-all duration-300 hover:scale-110 active:scale-95 ${
+          className={`flex h-14 w-16 items-center justify-center rounded-full transition duration-300 hover:scale-110 active:scale-[0.96] ${
             isActive
               ? 'bg-primary/10 text-primary'
               : 'text-muted-foreground hover:text-primary'
@@ -67,10 +67,11 @@ function MenuItem({ icon, label, onClick, iconColor, iconBg }: MenuItemProps) {
   return (
     <motion.button
       variants={{
-        hidden: { opacity: 0, scale: 0.5, y: 20 },
-        visible: { opacity: 1, scale: 1, y: 0 },
+        hidden: { opacity: 0 },
+        visible: { opacity: 1, transition: { duration: 0.2 } },
+        exit: { opacity: 0, transition: { duration: 0.15 } },
       }}
-      className="border-border/20 bg-card/40 flex items-center gap-2 rounded-2xl border p-4 transition-transform active:scale-95"
+      className="border-border/20 bg-background/40 flex items-center gap-2 rounded-xl border p-4 transition-transform active:scale-[0.96]"
       onClick={(e) => onClick(e)}
     >
       <div
@@ -135,7 +136,7 @@ export function BasicNav() {
         <AnimatePresence>
           {showMenu && (
             <motion.div
-              className="bg-background/20 fixed inset-0 z-59 backdrop-blur-[2px]"
+              className="bg-foreground/30 fixed inset-0 isolate z-0 backdrop-blur-[2px]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -153,11 +154,31 @@ export function BasicNav() {
           {showMenu && (
             <motion.div
               key="more-menu"
-              className="scrollbar-hide border-border/20 bg-card/80 fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] left-1/2 z-60 grid w-full max-w-[calc(100vw-4rem)] -translate-x-1/2 grid-cols-2 gap-2 overflow-hidden rounded-[2rem] border p-5 shadow-xl backdrop-blur-sm"
+              className="scrollbar-hide bg-background/80 border-border/20 fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] left-1/2 isolate z-100 grid w-full max-w-[calc(100vw-4rem)] grid-cols-2 gap-2 overflow-hidden rounded-4xl border p-5 shadow-lg backdrop-blur-sm"
               initial="hidden"
               animate="visible"
               ref={ref}
-              exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.3 } }}
+              exit="exit"
+              variants={{
+                hidden: { opacity: 0, y: 24, x: '-50%' },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  x: '-50%',
+                  transition: {
+                    duration: 0.28,
+                    ease: [0.2, 0, 0, 1],
+                    staggerChildren: 0.04,
+                    delayChildren: 0.05,
+                  },
+                },
+                exit: {
+                  opacity: 0,
+                  y: 16,
+                  x: '-50%',
+                  transition: { duration: 0.2, ease: 'easeIn' },
+                },
+              }}
             >
               <MenuItem
                 icon={<BookshelfIcon className="h-6 w-6" />}
@@ -261,7 +282,7 @@ export function BasicNav() {
           {hidden ? null : (
             <motion.nav
               id="mobile-nav"
-              className="bg-card/80 fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] left-1/2 z-65 flex h-16 max-w-md -translate-x-1/2 items-center justify-around rounded-full px-6 py-3 shadow-lg backdrop-blur-sm"
+              className="bg-background/80 fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] left-1/2 z-65 flex h-16 max-w-md -translate-x-1/2 items-center justify-around rounded-full px-6 py-3 shadow-lg backdrop-blur-sm"
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 80, opacity: 0 }}
@@ -294,7 +315,7 @@ export function BasicNav() {
               <div className="flex items-center justify-center">
                 <button
                   onClick={() => setShowMenu((v) => !v)}
-                  className={`flex h-14 w-16 items-center justify-center rounded-full transition-all duration-200 ${
+                  className={`flex h-14 w-16 items-center justify-center rounded-full transition duration-200 hover:scale-110 active:scale-[0.96] ${
                     showMenu || isMore
                       ? 'bg-primary/10 text-primary'
                       : 'text-muted-foreground hover:text-primary'

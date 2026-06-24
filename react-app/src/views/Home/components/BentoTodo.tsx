@@ -22,7 +22,7 @@ export function BentoTodo() {
   const taskList = tasks.slice(0, 3).map((t) => (
     <div key={t.id} className="group flex items-start gap-3 py-2.5">
       <button
-        className={`mt-0.5 shrink-0 cursor-pointer rounded border px-1.5 py-0.5 text-xs font-medium ${statusClass(t.status)}`}
+        className={`mt-0.5 shrink-0 cursor-pointer rounded border px-1.5 py-0.5 text-xs font-medium transition-transform active:scale-[0.96] ${statusClass(t.status)}`}
         onClick={() => todo.cycleStatus(t.id)}
       >
         {STATUS_LABELS[t.status]}
@@ -47,12 +47,12 @@ export function BentoTodo() {
             {title}
           </h3>
           <div className="flex items-center gap-2">
-            <span className="text-muted-foreground text-xs font-medium">
+            <span className="text-muted-foreground text-xs font-medium tabular-nums">
               {doneCount} / {tasks.length}
             </span>
             <Link
               to="/todos"
-              className="text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer rounded-md p-1 outline-0 transition-colors"
+              className="text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer rounded-md p-2 outline-0 transition-colors"
               title="查看详情"
             >
               <svg

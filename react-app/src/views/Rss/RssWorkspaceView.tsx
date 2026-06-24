@@ -157,7 +157,7 @@ export default function RssWorkspaceView() {
 
   return (
     <div className="bg-background min-h-dvh pb-28">
-      <header className="bg-card/80 sticky top-0 z-10 backdrop-blur-md">
+      <header className="bg-background/80 sticky top-0 z-10 backdrop-blur-md">
         <div className="ml-12 max-w-2xl px-4 py-4">
           <h1 className="text-foreground text-2xl font-bold">Rss工作台</h1>
           <p className="text-muted-foreground mt-1 text-sm">Rss相关功能</p>
@@ -168,7 +168,7 @@ export default function RssWorkspaceView() {
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-card ring-border rounded-2xl p-4 ring-1"
+          className="bg-background ring-border rounded-2xl p-4 ring-1"
         >
           <input
             value={rssUrl}
@@ -226,7 +226,7 @@ export default function RssWorkspaceView() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-card ring-border rounded-2xl p-4 ring-1"
+          className="bg-background ring-border rounded-2xl p-4 ring-1"
         >
           <div className="mb-2 flex items-center">
             <h2 className="text-sm font-semibold">我的订阅</h2>
@@ -270,7 +270,7 @@ export default function RssWorkspaceView() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.3 }}
-          className="bg-card ring-border rounded-2xl p-4 ring-1"
+          className="bg-background ring-border rounded-2xl p-4 ring-1"
         >
           <div className="relative mb-2">
             <input

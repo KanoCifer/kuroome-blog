@@ -70,7 +70,7 @@ function FullscreenContent({ onClose }: { onClose: () => void }) {
         type="button"
         onClick={onClose}
         aria-label="退出全屏"
-        className="bg-card/90 border-border/40 hover:bg-card absolute top-[calc(env(safe-area-inset-top,0)+12px)] right-3 z-10 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-colors"
+        className="bg-background/90 border-border/40 hover:bg-background absolute top-[calc(env(safe-area-inset-top,0)+12px)] right-3 z-10 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-colors"
       >
         <X className="h-4 w-4" />
       </button>
@@ -101,7 +101,7 @@ function RouteOverlay({
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 8 }}
         transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-        className="bg-card/90 border-border absolute inset-x-3 bottom-3 rounded-2xl border p-4 shadow-lg backdrop-blur-md"
+        className="bg-background/90 border-border absolute inset-x-3 bottom-3 rounded-2xl border p-4 shadow-lg backdrop-blur-md"
       >
         <p className="text-muted-foreground text-sm">正在规划路线…</p>
       </motion.div>
@@ -117,7 +117,7 @@ function RouteOverlay({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 8 }}
       transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-      className="bg-card/90 border-border absolute inset-x-3 bottom-3 rounded-2xl border p-4 shadow-lg backdrop-blur-md"
+      className="bg-background/90 border-border absolute inset-x-3 bottom-3 rounded-2xl border p-4 shadow-lg backdrop-blur-md"
     >
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0 space-y-1">

@@ -1,7 +1,4 @@
-import {
-  deviceService,
-  type Device,
-} from '@/services/deviceService';
+import { deviceService, type Device } from '@/services/deviceService';
 import { useNotificationStore } from '@/stores/notificationState';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -126,7 +123,7 @@ export default function DeviceTracker() {
           {/* Total Price (Spans 2) */}
           <div
             onClick={() => setIsAnalyticsOpen(true)}
-            className="squircle border-border bg-card col-span-2 flex cursor-pointer items-center justify-between border p-6 shadow-lg"
+            className="squircle border-border bg-background col-span-2 flex cursor-pointer items-center justify-between border p-6 shadow-lg"
           >
             <div>
               <p className="text-muted-foreground text-sm font-medium">
@@ -162,7 +159,7 @@ export default function DeviceTracker() {
           />
 
           {/* Active */}
-          <div className="squircle border-border bg-card border p-5 shadow-lg">
+          <div className="squircle border-border bg-background border p-5 shadow-lg">
             <div className="bg-success/10 text-success mb-3 flex h-10 w-10 items-center justify-center rounded-full">
               <svg
                 className="h-5 w-5"
@@ -184,7 +181,7 @@ export default function DeviceTracker() {
             </p>
           </div>
           {/* Total */}
-          <div className="squircle border-border bg-card border p-5 shadow-lg">
+          <div className="squircle border-border bg-background border p-5 shadow-lg">
             <div className="bg-warning/10 text-warning mb-3 flex h-10 w-10 items-center justify-center rounded-full">
               <svg
                 className="h-5 w-5"

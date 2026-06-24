@@ -43,7 +43,7 @@ function StatusBadge({ active }: { active: boolean }) {
 
 function MobileLogCard({ item }: { item: UserLoginLogItem }) {
   return (
-    <article className="border-border/60 bg-card rounded-3xl border p-4">
+    <article className="border-border/60 bg-background rounded-3xl border p-4">
       <div className="flex items-start justify-between gap-3">
         <UserAvatar item={item} />
         <StatusBadge active={item.active} />
@@ -73,7 +73,7 @@ export function LoginLogsPanel({
   onPageChange,
 }: LoginLogsPanelProps) {
   return (
-    <section className="border-border/60 bg-card/85 overflow-hidden rounded-3xl border p-3.5 shadow-sm">
+    <section className="border-border/60 bg-background/85 overflow-hidden rounded-3xl border p-3.5 shadow-sm">
       <h3 className="text-foreground mb-3 text-base font-semibold">
         User Login Logs
       </h3>

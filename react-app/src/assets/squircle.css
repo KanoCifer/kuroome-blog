@@ -5,7 +5,7 @@
   /* 超椭圆特性 */
   @supports (corner-shape: squircle) {
     corner-shape: squircle;
-    border-radius: 90px;
+    border-radius: 64px;
   }
 }
 

@@ -304,7 +304,7 @@ export default function StatusView() {
         {/* Service cards */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {/* API */}
-          <div className="border-border bg-card rounded-xl border p-5 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+          <div className="border-border bg-background rounded-xl border p-5 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
             <div className="mb-3 flex items-center gap-2">
               <StatusDot
                 className={apiHealthy ? 'bg-emerald-500' : 'bg-red-500'}
@@ -320,7 +320,7 @@ export default function StatusView() {
           </div>
 
           {/* WebSocket */}
-          <div className="border-border bg-card rounded-xl border p-5 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+          <div className="border-border bg-background rounded-xl border p-5 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
             <div className="mb-3 flex items-center gap-2">
               <StatusDot className={wsDotClass} />
               <span className="text-foreground font-medium">WebSocket</span>
@@ -332,7 +332,7 @@ export default function StatusView() {
           </div>
 
           {/* Database */}
-          <div className="border-border bg-card rounded-xl border p-5 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+          <div className="border-border bg-background rounded-xl border p-5 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
             <div className="mb-3 flex items-center gap-2">
               <StatusDot
                 className={
@@ -353,7 +353,7 @@ export default function StatusView() {
         </div>
 
         {/* Latency chart */}
-        <div className="border-border bg-card rounded-xl border p-5 shadow-md">
+        <div className="border-border bg-background rounded-xl border p-5 shadow-md">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-foreground font-medium">延迟趋势</h2>
             <div className="flex items-center gap-1.5">
@@ -379,7 +379,7 @@ export default function StatusView() {
         </div>
 
         {/* Version Info */}
-        <div className="border-border bg-card rounded-xl border p-6 shadow-md">
+        <div className="border-border bg-background rounded-xl border p-6 shadow-md">
           <div className="mb-4 flex items-center gap-2">
             <svg
               className="text-muted-foreground h-5 w-5"
@@ -423,7 +423,7 @@ export default function StatusView() {
         </div>
 
         {/* Service Info + System Info */}
-        <div className="border-border bg-card rounded-xl border p-6 shadow-md">
+        <div className="border-border bg-background rounded-xl border p-6 shadow-md">
           <div className="mb-5 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <svg

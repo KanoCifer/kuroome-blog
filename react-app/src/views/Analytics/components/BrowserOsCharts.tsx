@@ -72,7 +72,7 @@ export function BrowserOsCharts({
 
   return (
     <div className="grid grid-cols-1 gap-3">
-      <article className="border-border/60 bg-card/85 rounded-3xl border p-3.5 shadow-sm">
+      <article className="border-border/60 bg-background/85 rounded-3xl border p-3.5 shadow-sm">
         <h3 className="text-foreground text-base font-semibold">
           Browser Distribution
         </h3>
@@ -91,7 +91,7 @@ export function BrowserOsCharts({
         </Suspense>
       </article>
 
-      <article className="border-border/60 bg-card/85 rounded-3xl border p-3.5 shadow-sm">
+      <article className="border-border/60 bg-background/85 rounded-3xl border p-3.5 shadow-sm">
         <h3 className="text-foreground text-base font-semibold">
           OS Distribution
         </h3>

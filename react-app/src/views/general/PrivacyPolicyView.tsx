@@ -12,7 +12,7 @@ export default function PrivacyPolicyView() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="border-border/60 bg-card/80 w-full max-w-2xl rounded-2xl border p-6 shadow-sm backdrop-blur-sm md:p-10"
+        className="border-border/60 bg-background/80 w-full max-w-2xl rounded-2xl border p-6 shadow-sm backdrop-blur-sm md:p-10"
       >
         <article className="text-card-foreground space-y-7 text-base leading-relaxed">
           {/* 标题 */}

@@ -85,7 +85,7 @@ export default function FishingMap() {
 
   return (
     <AnalysisContextProvider analysisHasData={analysis.hasData}>
-      <div className="bg-card/95">
+      <div className="bg-background/95">
         <FishingDashboardHeader
           analysisOpen={analysis.open}
           analysisHasData={analysis.hasData}

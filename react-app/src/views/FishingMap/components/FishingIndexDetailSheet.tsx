@@ -60,7 +60,7 @@ export function FishingIndexDetailSheet({ open, data, onClose }: Props) {
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="bg-card border-border fixed inset-x-0 bottom-0 z-50 flex h-[88dvh] max-h-[88dvh] flex-col rounded-t-2xl border-t shadow-2xl"
+            className="bg-background border-border fixed inset-x-0 bottom-0 z-50 flex h-[88dvh] max-h-[88dvh] flex-col rounded-t-2xl border-t shadow-2xl"
             role="dialog"
             aria-label="特征详情"
           >
@@ -105,7 +105,7 @@ export function FishingIndexDetailSheet({ open, data, onClose }: Props) {
                             {value}
                           </span>
                         </div>
-                        <div className="bg-card relative h-1.5 w-full overflow-hidden rounded-full">
+                        <div className="bg-background relative h-1.5 w-full overflow-hidden rounded-full">
                           <div
                             className="absolute inset-y-0 left-0 rounded-full"
                             style={{

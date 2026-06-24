@@ -68,7 +68,7 @@ export function AreaTrendChart({ trend }: AreaTrendChartProps) {
   }, [trend]);
 
   return (
-    <article className="border-border/60 bg-card/85 rounded-3xl border p-3.5 shadow-sm">
+    <article className="border-border/60 bg-background/85 rounded-3xl border p-3.5 shadow-sm">
       <h3 className="text-foreground text-base font-semibold">Visit Trend</h3>
       <p className="text-muted-foreground mt-1 text-xs">
         Daily visits in selected period

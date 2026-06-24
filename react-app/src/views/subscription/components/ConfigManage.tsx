@@ -147,7 +147,7 @@ export default function ConfigManage() {
                     handleChange('email', event.target.value)
                   }
                   placeholder="your@email.com"
-                  className="text-on-surface placeholder:text-outline/50 bg-card focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
+                  className="text-on-surface placeholder:text-outline/50 bg-background focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
                 />
               </div>
 
@@ -164,7 +164,7 @@ export default function ConfigManage() {
                     handleChange('feishu_webhook_url', event.target.value)
                   }
                   placeholder="https://open.feishu.cn/..."
-                  className="text-on-surface placeholder:text-outline/50 bg-card focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
+                  className="text-on-surface placeholder:text-outline/50 bg-background focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
                 />
               </div>
 
@@ -181,7 +181,7 @@ export default function ConfigManage() {
                     handleChange('bark_device_key', event.target.value)
                   }
                   placeholder="填写 Bark 设备 Key"
-                  className="text-on-surface placeholder:text-outline/50 bg-card focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
+                  className="text-on-surface placeholder:text-outline/50 bg-background focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
                 />
               </div>
 

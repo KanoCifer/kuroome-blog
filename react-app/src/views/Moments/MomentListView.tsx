@@ -226,7 +226,7 @@ export default function MomentListView() {
                   'rounded-full px-3 py-1 font-medium transition-colors',
                   publicActiveTag === null
                     ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'bg-card text-muted-foreground hover:bg-muted border-border/60 border',
+                    : 'bg-background text-muted-foreground hover:bg-muted border-border/60 border',
                 ].join(' ')}
                 onClick={() => setTag(null)}
               >
@@ -240,7 +240,7 @@ export default function MomentListView() {
                     'rounded-full px-3 py-1 font-medium transition-colors',
                     publicActiveTag === tag
                       ? 'bg-primary text-primary-foreground shadow-sm'
-                      : 'bg-card text-muted-foreground hover:bg-muted border-border/60 border',
+                      : 'bg-background text-muted-foreground hover:bg-muted border-border/60 border',
                   ].join(' ')}
                   onClick={() => setTag(tag)}
                 >
@@ -285,7 +285,7 @@ export default function MomentListView() {
               {[0, 1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="bg-card/60 border-border/40 h-32 animate-pulse rounded-2xl border"
+                  className="bg-background/60 border-border/40 h-32 animate-pulse rounded-2xl border"
                 />
               ))}
             </div>
@@ -305,7 +305,11 @@ export default function MomentListView() {
             </div>
           ) : (
             <MomentEmptyState
-              title={publicActiveTag ? `还没有 #${publicActiveTag} 的碎碎念` : '还没有碎碎念'}
+              title={
+                publicActiveTag
+                  ? `还没有 #${publicActiveTag} 的碎碎念`
+                  : '还没有碎碎念'
+              }
               description="等到想写一句的时候，再来吧。"
             />
           )}
@@ -318,7 +322,7 @@ export default function MomentListView() {
               <button
                 type="button"
                 disabled={publicPage <= 1}
-                className="bg-card text-foreground hover:bg-muted border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+                className="bg-background text-foreground hover:bg-muted border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
                 onClick={() => goPage(publicPage - 1)}
               >
                 <svg
@@ -346,7 +350,7 @@ export default function MomentListView() {
               <button
                 type="button"
                 disabled={publicPage >= totalPages}
-                className="bg-card text-foreground hover:bg-muted border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+                className="bg-background text-foreground hover:bg-muted border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
                 onClick={() => goPage(publicPage + 1)}
               >
                 下一页
@@ -426,7 +430,7 @@ export default function MomentListView() {
           onClick={() => setDeleteConfirmOpen(false)}
         >
           <div
-            className="bg-card border-border/40 w-full max-w-[420px] rounded-xl border p-6 shadow-xl"
+            className="bg-background border-border/40 w-full max-w-[420px] rounded-xl border p-6 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-foreground font-serif text-lg font-medium">
@@ -446,7 +450,7 @@ export default function MomentListView() {
               <button
                 type="button"
                 onClick={handleDelete}
-                className="bg-destructive text-white hover:bg-destructive/90 inline-flex items-center rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors"
+                className="bg-destructive hover:bg-destructive/90 inline-flex items-center rounded-lg px-3 py-1.5 text-[13px] font-medium text-white transition-colors"
               >
                 删除
               </button>

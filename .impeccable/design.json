@@ -503,19 +503,71 @@
       "Vue desktop + React mobile share the same token system; the mobile side is not a stripped-down mirror"
     ],
     "rules": [
-      { "name": "The Ten-Rooms Rule", "section": "colors", "body": "Every theme is a complete identity, not a recolor. Switching data-color-scheme swaps the entire token graph atomically — ink, paper, accent, gradients, charts all change together. The site is not a SaaS with a 'dark mode toggle'; it is a study with ten rooms, each with its own paint." },
-      { "name": "The One-Voice Rule", "section": "colors", "body": "A given screen uses ONE accent value, at ≤15% surface coverage. Bento nav indicator (bg-primary/20), primary CTA, focused ring, and one highlighted card are the entire accent vocabulary per view. The accent's rarity is the point." },
-      { "name": "The Theme-Not-Warmth Rule", "section": "colors", "body": "Tinted neutrals add 0.005–0.015 chroma toward the theme's own hue, not toward warm or cool 'because the brand feels that way.' Sky-blue paper is tinted toward blue, not toward warmth; autumn paper is tinted toward orange, not toward red. There is no 'always warm' or 'always cool' paper." },
-      { "name": "The Hex-Legacy Rule", "section": "colors", "body": "Four themes (paper, sage, mist, blush) are still expressed in hex; the other six are oklch. The oklch versions are being migrated to. When extending a theme, match its existing format. Do not mix oklch and hex within one theme." },
-      { "name": "The CJK-First Rule", "section": "typography", "body": "The body stack must be CJK-capable on day one. The default is PingFang SC / Microsoft YaHei (every modern OS has one of these), and the HarmonyOS toggle adds 'HarmonyOS Sans' at the front. Averia is Latin-only and must NEVER be set as font-sans or applied to CJK content. CJK display lives in font-family-dongfang; CJK body lives in the body stack (default or harmonyos, both fine for CJK)." },
-      { "name": "The HarmonyOS-Is-An-Opt-In Rule", "section": "typography", "body": "HarmonyOS Sans is not the default body font — it is a user-level runtime toggle exposed in Settings → Appearance → Font. Default visitors never load the three .ttf files for visible content; they only pay the preload cost. New components must not assume HarmonyOS is the active body font. If a feature is meant to use HarmonyOS for non-display purposes (e.g. clock numerals), use font-family-harmonyos explicitly rather than relying on the toggle." },
-      { "name": "The One-Display-Font-Per-Moment Rule", "section": "typography", "body": "Averia and 东方大楷 do not appear in the same line of text. Averia carries Latin display, 东方大楷 carries CJK display. If a heading mixes scripts, the CJK portion uses 东方大楷 and the Latin portion uses Averia via font-family-{averia|dongfang} toggles per element." },
-      { "name": "The Label-Is-Label Rule", "section": "typography", "body": "Uppercase tracked labels (the Label row above) appear as eyebrows, kickers, version chips, and status badges. They are NEVER applied to body or paragraph text. One kicker per major section is voice; eyebrow-on-every-section is the AI scaffolding reflex." },
-      { "name": "The 4.5-Not-3 Rule", "section": "typography", "body": "Body text hits ≥4.5:1 against its surface; large display text (≥18px or bold ≥14px) hits ≥3:1. Muted gray 'for elegance' is the single biggest reason AI designs feel hard to read; the muted-text token is the floor, and any proposed token darker than that must justify itself." },
-      { "name": "The Lift-From-Below Rule", "section": "elevation", "body": "Surfaces lift by ambient occlusion underneath and a soft white inset highlight on top. They do not float by glassmorphism. backdrop-blur-* is reserved for floating UI over imagery (nav, dropdowns, modals); never for content cards on solid backgrounds." },
-      { "name": "The Reduced-Motion-Honors-Depth Rule", "section": "elevation", "body": "Every entrance animation gated on prefers-reduced-motion: reduce MUST still complete with the depth visible. Card entry by spring is fine; if reduced-motion is on, the card snaps in with its shadow intact. The shadow is the depth, not the entry." },
-      { "name": "The 12% Ceiling", "section": "elevation", "body": "Color-tinted shadows on primary actions use ≤30% alpha (shadow-primary/30). The shadow is the hint of an accent, not the accent itself. Going past 30% reads as a colored outline pretending to be a shadow." },
-      { "name": "The Inset-White-Highlight Rule", "section": "elevation", "body": "Bento cards, the floating nav, and the BasicDetail inner section all carry an inset white highlight at rgba(255,255,255,0.35) (light) or rgba(255,255,255,0.06) (dark). This is the 'paper held under a lamp' effect. The highlight is what separates this system from flat SaaS cards with one drop shadow." }
+      {
+        "name": "The Ten-Rooms Rule",
+        "section": "colors",
+        "body": "Every theme is a complete identity, not a recolor. Switching data-color-scheme swaps the entire token graph atomically — ink, paper, accent, gradients, charts all change together. The site is not a SaaS with a 'dark mode toggle'; it is a study with ten rooms, each with its own paint."
+      },
+      {
+        "name": "The One-Voice Rule",
+        "section": "colors",
+        "body": "A given screen uses ONE accent value, at ≤15% surface coverage. Bento nav indicator (bg-primary/20), primary CTA, focused ring, and one highlighted card are the entire accent vocabulary per view. The accent's rarity is the point."
+      },
+      {
+        "name": "The Theme-Not-Warmth Rule",
+        "section": "colors",
+        "body": "Tinted neutrals add 0.005–0.015 chroma toward the theme's own hue, not toward warm or cool 'because the brand feels that way.' Sky-blue paper is tinted toward blue, not toward warmth; autumn paper is tinted toward orange, not toward red. There is no 'always warm' or 'always cool' paper."
+      },
+      {
+        "name": "The Hex-Legacy Rule",
+        "section": "colors",
+        "body": "Four themes (paper, sage, mist, blush) are still expressed in hex; the other six are oklch. The oklch versions are being migrated to. When extending a theme, match its existing format. Do not mix oklch and hex within one theme."
+      },
+      {
+        "name": "The CJK-First Rule",
+        "section": "typography",
+        "body": "The body stack must be CJK-capable on day one. The default is PingFang SC / Microsoft YaHei (every modern OS has one of these), and the HarmonyOS toggle adds 'HarmonyOS Sans' at the front. Averia is Latin-only and must NEVER be set as font-sans or applied to CJK content. CJK display lives in font-family-dongfang; CJK body lives in the body stack (default or harmonyos, both fine for CJK)."
+      },
+      {
+        "name": "The HarmonyOS-Is-An-Opt-In Rule",
+        "section": "typography",
+        "body": "HarmonyOS Sans is not the default body font — it is a user-level runtime toggle exposed in Settings → Appearance → Font. Default visitors never load the three .ttf files for visible content; they only pay the preload cost. New components must not assume HarmonyOS is the active body font. If a feature is meant to use HarmonyOS for non-display purposes (e.g. clock numerals), use font-family-harmonyos explicitly rather than relying on the toggle."
+      },
+      {
+        "name": "The One-Display-Font-Per-Moment Rule",
+        "section": "typography",
+        "body": "Averia and 东方大楷 do not appear in the same line of text. Averia carries Latin display, 东方大楷 carries CJK display. If a heading mixes scripts, the CJK portion uses 东方大楷 and the Latin portion uses Averia via font-family-{averia|dongfang} toggles per element."
+      },
+      {
+        "name": "The Label-Is-Label Rule",
+        "section": "typography",
+        "body": "Uppercase tracked labels (the Label row above) appear as eyebrows, kickers, version chips, and status badges. They are NEVER applied to body or paragraph text. One kicker per major section is voice; eyebrow-on-every-section is the AI scaffolding reflex."
+      },
+      {
+        "name": "The 4.5-Not-3 Rule",
+        "section": "typography",
+        "body": "Body text hits ≥4.5:1 against its surface; large display text (≥18px or bold ≥14px) hits ≥3:1. Muted gray 'for elegance' is the single biggest reason AI designs feel hard to read; the muted-text token is the floor, and any proposed token darker than that must justify itself."
+      },
+      {
+        "name": "The Lift-From-Below Rule",
+        "section": "elevation",
+        "body": "Surfaces lift by ambient occlusion underneath and a soft white inset highlight on top. They do not float by glassmorphism. backdrop-blur-* is reserved for floating UI over imagery (nav, dropdowns, modals); never for content cards on solid backgrounds."
+      },
+      {
+        "name": "The Reduced-Motion-Honors-Depth Rule",
+        "section": "elevation",
+        "body": "Every entrance animation gated on prefers-reduced-motion: reduce MUST still complete with the depth visible. Card entry by spring is fine; if reduced-motion is on, the card snaps in with its shadow intact. The shadow is the depth, not the entry."
+      },
+      {
+        "name": "The 12% Ceiling",
+        "section": "elevation",
+        "body": "Color-tinted shadows on primary actions use ≤30% alpha (shadow-primary/30). The shadow is the hint of an accent, not the accent itself. Going past 30% reads as a colored outline pretending to be a shadow."
+      },
+      {
+        "name": "The Inset-White-Highlight Rule",
+        "section": "elevation",
+        "body": "Bento cards, the floating nav, and the BasicDetail inner section all carry an inset white highlight at rgba(255,255,255,0.35) (light) or rgba(255,255,255,0.06) (dark). This is the 'paper held under a lamp' effect. The highlight is what separates this system from flat SaaS cards with one drop shadow."
+      }
     ],
     "dos": [
       "Do use the semantic Tailwind utilities (bg-background, text-foreground, bg-primary, bg-muted, border-border, ring-ring, bg-chart-1..5, from-gradient-primary-from, bg-surface, bg-brand-devices). These are the Layer 3 contract. The project lints for hardcoded colors at the layer above.",
@@ -548,7 +600,7 @@
       "Don't ship a specific rejected direction. The settings modal 文学手账 / 季节面板 / 命令中心 three-way (design-demos/), moments page v1/v2/v3, fishing weather card 诗意气象 / 天空剧场 (weather-card-redesign/) — these were walked and walked back. Do not propose them again.",
       "Don't animate CSS layout properties unless truly needed. Translate, scale, opacity are the defaults; clip-path, mask, and shadow/glow are the premium materials when they materially improve the effect. Width/height/margin/padding transitions are layout, not motion.",
       "Don't use motion as a fallback for missing depth. The lift-from-below shadow is the depth; motion is the acknowledgment of state change. If the shadow is missing, motion will not save it.",
-      "Don't ship bg-card or text-card-foreground in Vue. The Vue @theme incline typo means those classes have no Tailwind source. They work in React (the @theme inline block exposes them) but not in Vue. Use bg-background and text-foreground on the Vue side.",
+      "Don't ship bg-background or text-card-foreground in Vue. The Vue @theme incline typo means those classes have no Tailwind source. They work in React (the @theme inline block exposes them) but not in Vue. Use bg-background and text-foreground on the Vue side.",
       "Don't ship the 阿里妈妈方圆体 (alibaba) font. It is defined in @theme but has zero component references. The display font is Averia (Latin) and 东方大楷 (CJK); the body font is HarmonyOS Sans.",
       "Don't set font-family-averia on CJK content. Averia has no CJK glyphs; it will fall back to the body stack and look broken.",
       "Don't ship a hero heading above 4.5rem (72px). clamp(1.875rem, 4vw + 1rem, 4.5rem) is the ceiling. Above that the page is shouting, not designing.",

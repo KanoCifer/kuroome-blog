@@ -34,7 +34,7 @@ export function SubscriptionModal({
         onClick={onClose}
       />
 
-      <div className="bg-card relative z-10 flex max-h-[calc(100dvh-8rem)] w-full max-w-176 flex-col overflow-hidden rounded-2xl shadow-2xl">
+      <div className="bg-background relative z-10 flex max-h-[calc(100dvh-8rem)] w-full max-w-176 flex-col overflow-hidden rounded-2xl shadow-2xl">
         <div className="flex-1 overflow-y-auto p-4">{children}</div>
       </div>
     </motion.div>,

@@ -115,7 +115,7 @@ export function BackToTop({ className }: BackToTopProps) {
             </svg>
 
             {/* Tooltip */}
-            <span className="bg-card text-card-foreground absolute right-full mr-3 rounded-lg px-3 py-1 text-sm whitespace-nowrap opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+            <span className="bg-background text-card-foreground absolute right-full mr-3 rounded-lg px-3 py-1 text-sm whitespace-nowrap opacity-0 transition-opacity duration-200 group-hover:opacity-100">
               回到顶部
               <span className="border-l-card absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 border-4 border-transparent"></span>
             </span>

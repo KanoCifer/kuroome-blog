@@ -76,7 +76,7 @@ export function FishingMapTile({
   );
 
   return (
-    <div className="border-border/70 bg-card relative overflow-hidden rounded-2xl border shadow-md">
+    <div className="border-border/70 bg-background relative overflow-hidden rounded-2xl border shadow-md">
       <div
         ref={containerRef}
         className="amap-mini h-[220pt] w-full rounded-2xl"
@@ -94,7 +94,7 @@ export function FishingMapTile({
             type="button"
             onClick={onFullscreen}
             aria-label="全屏地图"
-            className="bg-card/90 text-foreground hover:bg-card border-border/40 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-colors"
+            className="bg-background/90 text-foreground hover:bg-background border-border/40 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-colors"
           >
             <Maximize2 className="h-4 w-4" />
           </button>
@@ -120,7 +120,7 @@ function MapOverlay({ onClearRoute }: { onClearRoute: () => void }) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 4 }}
         transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-        className="text-muted-foreground/90 bg-card/80 pointer-events-none absolute right-4 bottom-4 left-4 w-fit rounded-full px-2 py-1.5 text-center text-xs backdrop-blur-sm"
+        className="text-muted-foreground/90 bg-background/80 pointer-events-none absolute right-4 bottom-4 left-4 w-fit rounded-full px-2 py-1.5 text-center text-xs backdrop-blur-sm"
       >
         点击自动规划
       </motion.div>
@@ -135,7 +135,7 @@ function MapOverlay({ onClearRoute }: { onClearRoute: () => void }) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 8 }}
         transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-        className="bg-card/90 border-border pointer-events-auto absolute right-4 bottom-4 left-4 rounded-2xl border p-4 shadow-lg backdrop-blur-md"
+        className="bg-background/90 border-border pointer-events-auto absolute right-4 bottom-4 left-4 rounded-2xl border p-4 shadow-lg backdrop-blur-md"
       >
         <div className="text-muted-foreground flex items-center gap-3">
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -154,7 +154,7 @@ function MapOverlay({ onClearRoute }: { onClearRoute: () => void }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 8 }}
       transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-      className="bg-card/90 border-border pointer-events-auto absolute right-4 bottom-4 left-4 rounded-2xl border p-4 shadow-lg backdrop-blur-md"
+      className="bg-background/90 border-border pointer-events-auto absolute right-4 bottom-4 left-4 rounded-2xl border p-4 shadow-lg backdrop-blur-md"
     >
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0 space-y-1">

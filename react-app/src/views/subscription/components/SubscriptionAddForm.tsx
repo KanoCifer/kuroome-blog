@@ -305,7 +305,7 @@ export function SubscriptionAddForm({
                   key={suggestion.name}
                   type="button"
                   onClick={() => applyQuickSuggestion(suggestion, setForm)}
-                  className="border-border/40 bg-card/60 hover:bg-card/80 flex items-center gap-2 rounded-full border px-3 py-1.5 shadow-sm backdrop-blur-sm transition-all duration-200 hover:scale-105"
+                  className="border-border/40 bg-background/60 hover:bg-background/80 flex items-center gap-2 rounded-full border px-3 py-1.5 shadow-sm backdrop-blur-sm transition-all duration-200 hover:scale-105"
                 >
                   <span
                     className={`h-4 w-4 rounded-sm ${suggestion.color} flex items-center justify-center`}
@@ -505,7 +505,7 @@ export function SubscriptionAddForm({
                   className={`relative h-6 w-11 rounded-full transition-colors ${showReminder ? 'bg-primary' : 'bg-muted'} `}
                 >
                   <span
-                    className={`bg-card absolute top-0.5 left-0.5 h-5 w-5 rounded-full shadow-sm transition-transform ${showReminder ? 'translate-x-5' : 'translate-x-0'} `}
+                    className={`bg-background absolute top-0.5 left-0.5 h-5 w-5 rounded-full shadow-sm transition-transform ${showReminder ? 'translate-x-5' : 'translate-x-0'} `}
                   />
                 </button>
               </label>
@@ -527,7 +527,7 @@ export function SubscriptionAddForm({
                             className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all ${
                               checked
                                 ? 'bg-primary text-primary-foreground shadow-[0_4px_12px_rgba(0,40,142,0.25)]'
-                                : 'border-border bg-card text-card-foreground hover:bg-muted border'
+                                : 'border-border bg-background text-card-foreground hover:bg-muted border'
                             } `}
                           >
                             <option.icon size={16} />
@@ -552,7 +552,7 @@ export function SubscriptionAddForm({
                             className={`flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 transition-all ${
                               checked
                                 ? 'border-primary/20 bg-primary/10 border'
-                                : 'border-border bg-card hover:bg-muted border'
+                                : 'border-border bg-background hover:bg-muted border'
                             } `}
                           >
                             <div
@@ -595,7 +595,7 @@ export function SubscriptionAddForm({
                           handleReminderChange('email', event.target.value)
                         }
                         placeholder="your@email.com"
-                        className="text-on-surface placeholder:text-outline/50 bg-card focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
+                        className="text-on-surface placeholder:text-outline/50 bg-background focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
                       />
                     </div>
                   )}
@@ -615,7 +615,7 @@ export function SubscriptionAddForm({
                           )
                         }
                         placeholder="https://open.feishu.cn/..."
-                        className="text-on-surface placeholder:text-outline/50 bg-card focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
+                        className="text-on-surface placeholder:text-outline/50 bg-background focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
                       />
                     </div>
                   )}
@@ -635,7 +635,7 @@ export function SubscriptionAddForm({
                           )
                         }
                         placeholder="填写 Bark 设备 Key"
-                        className="text-on-surface placeholder:text-outline/50 bg-card focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
+                        className="text-on-surface placeholder:text-outline/50 bg-background focus:ring-ring/20 w-full rounded-xl border-0 px-4 py-3 text-sm transition-all focus:ring-2"
                       />
                     </div>
                   )}

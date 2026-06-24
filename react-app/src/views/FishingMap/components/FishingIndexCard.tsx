@@ -43,7 +43,7 @@ export function FishingIndexCard({
     : '';
 
   return (
-    <article className="border-border/40 bg-card relative rounded-2xl border p-4 shadow-sm">
+    <article className="border-border/40 bg-background relative rounded-2xl border p-4 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
         <div>
           <h3 className="text-foreground text-sm font-semibold">钓鱼指数</h3>
@@ -53,7 +53,7 @@ export function FishingIndexCard({
         </div>
         <button
           onClick={() => void refetch()}
-          className="bg-card/60 text-muted-foreground hover:bg-card/80 flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-sm disabled:cursor-not-allowed"
+          className="bg-background/60 text-muted-foreground hover:bg-background/80 flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-sm disabled:cursor-not-allowed"
           disabled={loading}
         >
           <Loader
@@ -83,20 +83,20 @@ export function FishingIndexCard({
           </div>
 
           <div className="mb-3 grid grid-cols-3 gap-2 text-center text-xs">
-            <div className="bg-card/60 rounded-lg px-2 py-2">
+            <div className="bg-background/60 rounded-lg px-2 py-2">
               默认权重
               <div className="text-foreground mt-1 font-medium tabular-nums">
                 {indexData.expert_score}
               </div>
             </div>
-            <div className="bg-card/60 rounded-lg px-2 py-2">
+            <div className="bg-background/60 rounded-lg px-2 py-2">
               权重调整
               <div className="text-foreground mt-1 font-medium tabular-nums">
                 {indexData.residual > 0 ? '+' : ''}
                 {indexData.residual}
               </div>
             </div>
-            <div className="bg-card/60 rounded-lg px-2 py-2">
+            <div className="bg-background/60 rounded-lg px-2 py-2">
               综合指数
               <div className="text-foreground mt-1 font-medium tabular-nums">
                 {indexData.fishing_index}

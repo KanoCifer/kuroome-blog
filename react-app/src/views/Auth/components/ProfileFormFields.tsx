@@ -95,7 +95,7 @@ export function ProfileFormFields({
               onChange={() => toggleGender('male')}
               className="peer sr-only"
             />
-            <div className="border-border bg-card/70 peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-primary/10 hover:border-primary/30 flex items-center justify-center rounded-2xl border-2 py-3.5 transition-all duration-300 group-active:scale-95 peer-checked:shadow-lg">
+            <div className="border-border bg-background/70 peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-primary/10 hover:border-primary/30 flex items-center justify-center rounded-2xl border-2 py-3.5 transition-all duration-300 group-active:scale-95 peer-checked:shadow-lg">
               <span className="text-muted-foreground peer-checked:text-primary text-sm font-medium transition-colors">
                 Male
               </span>
@@ -109,7 +109,7 @@ export function ProfileFormFields({
               onChange={() => toggleGender('female')}
               className="peer sr-only"
             />
-            <div className="border-border bg-card/70 peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-primary/10 hover:border-primary/30 flex items-center justify-center rounded-2xl border-2 py-3.5 transition-all duration-300 group-active:scale-95 peer-checked:shadow-lg">
+            <div className="border-border bg-background/70 peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-primary/10 hover:border-primary/30 flex items-center justify-center rounded-2xl border-2 py-3.5 transition-all duration-300 group-active:scale-95 peer-checked:shadow-lg">
               <span className="text-muted-foreground peer-checked:text-primary text-sm font-medium transition-colors">
                 Female
               </span>

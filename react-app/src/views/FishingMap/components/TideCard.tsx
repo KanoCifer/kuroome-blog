@@ -228,7 +228,7 @@ export function TideCard() {
             <TideChart option={tideChartOption} />
           </div>
           <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-            <div className="bg-card/60 rounded-lg px-3 py-2">
+            <div className="bg-background/60 rounded-lg px-3 py-2">
               <p className="text-muted-foreground">
                 最高潮:{dayjs(highTide?.fxTime).format('HH:mm')}
                 <span className="text-primary">↗</span>
@@ -237,7 +237,7 @@ export function TideCard() {
                 {highTide ? Number(highTide.height).toFixed(2) : '--'}m
               </p>
             </div>
-            <div className="bg-card/60 rounded-lg px-3 py-2">
+            <div className="bg-background/60 rounded-lg px-3 py-2">
               <p className="text-muted-foreground">
                 最低潮:{dayjs(lowTide?.fxTime).format('HH:mm')}
                 <span className="text-primary">↘</span>

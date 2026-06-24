@@ -55,7 +55,7 @@ export function BentoMemo() {
         <>
           <div
             onClick={closeMemo}
-            className="bg-background/20 fixed inset-0 z-50 backdrop-blur-[2px]"
+            className="bg-foreground/30 fixed inset-0 z-50 backdrop-blur-[2px]"
             style={{ animation: 'memo-fade-in 0.2s ease-out' }}
           />
           <div
@@ -63,7 +63,7 @@ export function BentoMemo() {
             style={{ animation: 'memo-pop-in 0.2s ease-out' }}
           >
             <div
-              className="bg-card pointer-events-auto relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl p-6 shadow-2xl"
+              className="bg-background pointer-events-auto relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl p-6 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <button

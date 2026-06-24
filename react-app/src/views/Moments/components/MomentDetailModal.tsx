@@ -86,10 +86,10 @@ export function MomentDetailModal({
             exit={{ opacity: 0, scale: 0.97, y: 4 }}
             transition={{ duration: 0.18 }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-card border-border/40 relative flex max-h-[88vh] w-full max-w-[720px] flex-col overflow-hidden rounded-xl border shadow-xl"
+            className="bg-background border-border/40 relative flex max-h-[88vh] w-full max-w-[720px] flex-col overflow-hidden rounded-xl border shadow-xl"
           >
             {/* Header */}
-            <div className="border-border/40 bg-card sticky top-0 z-10 flex items-center justify-between gap-2 border-b px-6 py-4">
+            <div className="border-border/40 bg-background sticky top-0 z-10 flex items-center justify-between gap-2 border-b px-6 py-4">
               <div className="flex items-center gap-3">
                 <span className="text-foreground/70 font-serif text-sm italic">
                   {volumeLabel}
@@ -101,7 +101,7 @@ export function MomentDetailModal({
                     : moment.created_at.replace('T', ' ').slice(0, 16)}
                 </span>
                 {moment.is_pinned && (
-                  <span className="text-warning inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.18em]">
+                  <span className="text-warning inline-flex items-center gap-1 text-[10px] font-semibold tracking-[0.18em] uppercase">
                     <span aria-hidden="true">·</span>
                     <PinIcon className="h-3 w-3" />
                     <span>置顶</span>
@@ -192,7 +192,7 @@ export function MomentDetailModal({
                     ))}
                   </div>
                 )}
-                <div className="text-muted-foreground mt-10 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-dashed border-border/40 pt-4 font-mono text-[11px] tracking-wide">
+                <div className="text-muted-foreground border-border/40 mt-10 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-dashed pt-4 font-mono text-[11px] tracking-wide">
                   <span>发布于 {moment.published_at ?? moment.created_at}</span>
                   {moment.source && (
                     <>
@@ -214,20 +214,27 @@ export function MomentDetailModal({
                   <MetaRow label="卷序" value={volumeLabel} mono />
                   <MetaRow
                     label="心情"
-                    value={isPureEmoji(moment.mood ?? '') ? moment.mood ?? '' : moment.mood ?? '—'}
+                    value={
+                      isPureEmoji(moment.mood ?? '')
+                        ? (moment.mood ?? '')
+                        : (moment.mood ?? '—')
+                    }
                   />
                   <MetaRow label="标签" value={moment.tags.join(' · ')} />
                   {moment.location?.name && (
                     <MetaRow label="地点" value={moment.location.name} />
                   )}
-                  <MetaRow label="可见性" value={VISIBILITY_LABEL[moment.visibility]} />
+                  <MetaRow
+                    label="可见性"
+                    value={VISIBILITY_LABEL[moment.visibility]}
+                  />
                   <MetaRow label="状态" value={STATUS_LABEL[moment.status]} />
                 </dl>
 
-                <div className="text-muted-foreground mt-6 border-t border-dashed border-border/40 pt-4 font-mono text-[10px] tracking-[0.18em] uppercase">
+                <div className="text-muted-foreground border-border/40 mt-6 border-t border-dashed pt-4 font-mono text-[10px] tracking-[0.18em] uppercase">
                   KEYBOARD
                 </div>
-                <ul className="mt-3 space-y-1.5 text-[12px] text-muted-foreground">
+                <ul className="text-muted-foreground mt-3 space-y-1.5 text-[12px]">
                   <li className="flex items-center gap-2">
                     <Kbd label="J" />
                     <span>下一条</span>
@@ -278,7 +285,7 @@ function MetaRow({
 
 function Kbd({ label }: { label: string }) {
   return (
-    <kbd className="text-foreground/80 font-mono text-[10px] px-1.5 py-0.5 bg-card border border-border/40 rounded">
+    <kbd className="text-foreground/80 bg-background border-border/40 rounded border px-1.5 py-0.5 font-mono text-[10px]">
       {label}
     </kbd>
   );

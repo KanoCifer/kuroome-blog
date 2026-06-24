@@ -192,7 +192,7 @@ export default function Register() {
 
         {/* Register Card */}
         <div
-          className={`border-border/50 bg-card/70 w-full max-w-100 rounded-4xl border p-6 shadow-xl transition-all delay-100 duration-700 ease-out ${
+          className={`border-border/50 bg-background/70 w-full max-w-100 rounded-4xl border p-6 shadow-xl transition-all delay-100 duration-700 ease-out ${
             isReady ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}
         >

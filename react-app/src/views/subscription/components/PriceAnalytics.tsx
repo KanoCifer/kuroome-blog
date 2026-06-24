@@ -119,7 +119,7 @@ export function PriceAnalytics({
 
       {isOpen &&
         createPortal(
-          <motion.div className="bg-card fixed top-1/2 left-1/2 z-50 h-[60vh] w-[90vw] max-w-md min-w-0 -translate-x-1/2 -translate-y-1/2 rounded-2xl p-4">
+          <motion.div className="bg-background fixed top-1/2 left-1/2 z-50 h-[60vh] w-[90vw] max-w-md min-w-0 -translate-x-1/2 -translate-y-1/2 rounded-2xl p-4">
             <ReactEChartsCore
               option={option}
               style={{ width: '100%', height: '100%' }}

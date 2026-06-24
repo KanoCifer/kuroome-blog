@@ -20,7 +20,7 @@ export function FishingDashboardHeader({
   onToggleAnalysis,
 }: FishingDashboardHeaderProps) {
   return (
-    <header className="border-border/40 bg-card/80 sticky top-0 z-30 border-b backdrop-blur-sm">
+    <header className="border-border/40 bg-background/80 sticky top-0 z-30 border-b backdrop-blur-sm">
       <div className="flex items-center justify-between px-4 py-3 sm:px-5">
         <div className="ml-12 flex items-baseline gap-3">
           <h1 className="text-foreground font-family-dongfang text-lg font-semibold sm:text-xl">
@@ -36,7 +36,7 @@ export function FishingDashboardHeader({
           aria-pressed={analysisOpen}
           aria-label={analysisOpen ? '关闭 AI 分析' : '打开 AI 分析'}
           onClick={onToggleAnalysis}
-          className={`border-border bg-card/80 hover:bg-muted text-foreground inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2.5 text-sm backdrop-blur-sm transition-colors ${
+          className={`border-border bg-background/80 hover:bg-muted text-foreground inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2.5 text-sm backdrop-blur-sm transition-colors ${
             analysisOpen ? 'border-primary text-primary bg-primary/10' : ''
           }`}
         >

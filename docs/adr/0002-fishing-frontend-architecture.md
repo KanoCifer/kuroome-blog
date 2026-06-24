@@ -29,6 +29,7 @@ Accepted
 `MapContainer.vue` 重构前在组件内同时管 5 类行为(标记 / 路线 / 定位 / 反编码 / 打点),既管 DOM 又管业务,无法单测。
 
 重构后:
+
 - `MapContainer.vue` 退化为浅组件,只管 DOM 容器、AMap SDK 加载、map 实例生命周期
 - 所有行为下沉到 `fishingMapRuntime.ts` 的 `FishingMapRuntime` 类
 - 通过 `AMapEngine` 端口注入 `{ map, ns }`,生产用真实 AMap,测试可注入 in-memory 引擎
@@ -36,6 +37,7 @@ Accepted
 ### 3. 端口与适配器 (Hexagonal)
 
 `locationResolver.ts` 定义 `CoordConverter` 端口:
+
 - `fromGps(lng, lat)`: WGS-84 → GCJ-02
 - `locateByIp()`: IP 兜底定位
 
@@ -48,13 +50,13 @@ Accepted
 ```ts
 const mine = seq.begin();
 const result = await map.planRoute(position, spot.position);
-if (!seq.isActive(mine)) return;  // 已被新调用覆盖,静默
+if (!seq.isActive(mine)) return; // 已被新调用覆盖,静默
 routeInfo.value = result;
 ```
 
 ### 5. 共享 Chrome 抽象 (DashboardCard)
 
-所有 tile 共享 `DashboardCard` 包装,统一 `bg-card / border-border` 语义 token,`tone='hero' | 'default'` 决定视觉档位,motion-v 接管 GPU 动画。
+所有 tile 共享 `DashboardCard` 包装,统一 `bg-background / border-border` 语义 token,`tone='hero' | 'default'` 决定视觉档位,motion-v 接管 GPU 动画。
 
 ## Consequences
 
@@ -414,30 +416,30 @@ flowchart LR
 
 ## 外部依赖矩阵
 
-| 来源 | 用途 |
-|---|---|
-| `@amap/amap-jsapi-loader` | AMap SDK 动态加载 |
-| `vue-echarts` + ECharts 6 | HourlyChartCard 双轴图(降水柱+温度线) |
-| `motion-v` | DashboardCard whileHover 动画 |
-| `@lucide/vue` | 图标 (FishingRod/Bot/Locate/Loader2/X) |
-| `@/api/mapGateway` | 高德安全密钥 |
-| `@/api/fishingGateway` | 提交钓鱼反馈 |
-| `@/stores/fishingMap` | 中心 store:indexData / liveWeather / tide / weatherHourly / forecasts |
-| `@/stores/tidePanel` | 潮汐面板选中状态 |
-| `@/stores/notification` | toast |
-| `@/composables/useSequencedTask` | 异步竞态守卫 |
-| `@/composables/useChartColors` | ECharts 语义色板 |
+| 来源                             | 用途                                                                  |
+| -------------------------------- | --------------------------------------------------------------------- |
+| `@amap/amap-jsapi-loader`        | AMap SDK 动态加载                                                     |
+| `vue-echarts` + ECharts 6        | HourlyChartCard 双轴图(降水柱+温度线)                                 |
+| `motion-v`                       | DashboardCard whileHover 动画                                         |
+| `@lucide/vue`                    | 图标 (FishingRod/Bot/Locate/Loader2/X)                                |
+| `@/api/mapGateway`               | 高德安全密钥                                                          |
+| `@/api/fishingGateway`           | 提交钓鱼反馈                                                          |
+| `@/stores/fishingMap`            | 中心 store:indexData / liveWeather / tide / weatherHourly / forecasts |
+| `@/stores/tidePanel`             | 潮汐面板选中状态                                                      |
+| `@/stores/notification`          | toast                                                                 |
+| `@/composables/useSequencedTask` | 异步竞态守卫                                                          |
+| `@/composables/useChartColors`   | ECharts 语义色板                                                      |
 
 ## 关键设计原则
 
-| 原则 | 体现 |
-|---|---|
-| **单一数据源** | 跨子模块共享 `useFishingMapStore`;`useFishingDashboard` 暴露 `route/feedback/analysis` 三块子状态 |
-| **关注点分离** | `FishingMapView.vue` 0 行业务逻辑,只编排;业务全在 composable |
-| **深模块 / 浅组件** | `MapContainer` 只管 DOM+SDK 加载;行为全部下沉到 `FishingMapRuntime`(可单测) |
-| **端口与适配器** | `CoordConverter` 接口,生产用 AMap,测试可注入 in-memory |
-| **模板 ref 解耦** | `useTemplateRef<FishingMapInstance>` 静态类型化,不再 `as unknown as ...` |
-| **响应式布局** | 12/6/1 列 grid,移动端 Index 优先,无 JS 即可用 |
+| 原则                | 体现                                                                                              |
+| ------------------- | ------------------------------------------------------------------------------------------------- |
+| **单一数据源**      | 跨子模块共享 `useFishingMapStore`;`useFishingDashboard` 暴露 `route/feedback/analysis` 三块子状态 |
+| **关注点分离**      | `FishingMapView.vue` 0 行业务逻辑,只编排;业务全在 composable                                      |
+| **深模块 / 浅组件** | `MapContainer` 只管 DOM+SDK 加载;行为全部下沉到 `FishingMapRuntime`(可单测)                       |
+| **端口与适配器**    | `CoordConverter` 接口,生产用 AMap,测试可注入 in-memory                                            |
+| **模板 ref 解耦**   | `useTemplateRef<FishingMapInstance>` 静态类型化,不再 `as unknown as ...`                          |
+| **响应式布局**      | 12/6/1 列 grid,移动端 Index 优先,无 JS 即可用                                                     |
 
 ## 视觉布局
 
@@ -464,6 +466,7 @@ flowchart LR
 ```
 
 **响应式**:
+
 - `lg+`: 12 列,Map(8) + Index(4) → 底排 Weather(3)+Hourly(5)+Tide(4)
 - `md`: 6 列,Map+Index 同列,底排自适应
 - mobile: 单列,Index 优先,Map 居次

@@ -5,7 +5,7 @@ interface DeviceHeaderProps {
 
 export function DeviceHeader({ onClick }: DeviceHeaderProps) {
   return (
-    <header className="border-border bg-card/90 sticky top-0 z-10 border-b px-4 py-4 backdrop-blur-md">
+    <header className="border-border bg-background/90 sticky top-0 z-10 border-b px-4 py-4 backdrop-blur-md">
       <div className="mx-auto w-full max-w-2xl">
         <div className="flex items-start justify-between gap-3">
           <div className="ml-12 space-y-1">

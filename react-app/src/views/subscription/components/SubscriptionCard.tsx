@@ -86,11 +86,11 @@ export function SubscriptionCard({
 
   return (
     <div className="space-y-4">
-      <article className="squircle border-border bg-card border p-6 shadow-lg">
+      <article className="squircle border-border bg-background border p-6 shadow-lg">
         <div className="mb-6 flex items-start justify-between">
           <div className="flex items-center gap-4">
             {/* Logo placeholder */}
-            <div className="border-border bg-card flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border shadow-inner">
+            <div className="border-border bg-background flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border shadow-inner">
               <span className="text-muted-foreground text-2xl font-bold">
                 {subscription.name.charAt(0).toUpperCase()}
               </span>
@@ -160,7 +160,7 @@ export function SubscriptionCard({
           <button
             type="button"
             onClick={() => openModal('edit')}
-            className="border-border bg-card text-foreground hover:bg-muted rounded-full border px-4 py-3 text-sm font-bold transition-all active:scale-95"
+            className="border-border bg-background text-foreground hover:bg-muted rounded-full border px-4 py-3 text-sm font-bold transition-all active:scale-95"
           >
             编辑与通知
           </button>
@@ -178,8 +178,8 @@ export function SubscriptionCard({
                 onClick={() => setActiveTab('edit')}
                 className={`rounded-xl px-3 py-2 text-sm font-medium transition ${
                   activeTab === 'edit'
-                    ? 'bg-card text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:bg-card/70'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:bg-background/70'
                 }`}
               >
                 基础信息
@@ -189,8 +189,8 @@ export function SubscriptionCard({
                 onClick={() => setActiveTab('notify')}
                 className={`rounded-xl px-3 py-2 text-sm font-medium transition ${
                   activeTab === 'notify'
-                    ? 'bg-card text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:bg-card/70'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:bg-background/70'
                 }`}
               >
                 通知配置

@@ -2,7 +2,7 @@ export function DeviceLoadingSkeleton() {
   return (
     <div className="space-y-6">
       {/* Card skeleton */}
-      <div className="border-border bg-card animate-pulse rounded-xl border p-6 shadow-[0_12px_40px_rgb(0,0,0,0.06)]">
+      <div className="border-border bg-background animate-pulse rounded-xl border p-6 shadow-[0_12px_40px_rgb(0,0,0,0.06)]">
         <div className="mb-6 flex items-start justify-between">
           <div className="flex items-center gap-4">
             <div className="bg-secondary h-14 w-14 rounded-2xl" />
@@ -24,7 +24,7 @@ export function DeviceLoadingSkeleton() {
       </div>
 
       {/* Card skeleton 2 */}
-      <div className="border-border bg-card animate-pulse rounded-xl border p-6 shadow-[0_12px_40px_rgb(0,0,0,0.06)]">
+      <div className="border-border bg-background animate-pulse rounded-xl border p-6 shadow-[0_12px_40px_rgb(0,0,0,0.06)]">
         <div className="mb-6 flex items-start justify-between">
           <div className="flex items-center gap-4">
             <div className="bg-secondary h-14 w-14 rounded-2xl" />

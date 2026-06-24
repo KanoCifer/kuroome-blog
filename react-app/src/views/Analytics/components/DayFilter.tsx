@@ -24,7 +24,7 @@ export function DayFilter({ selectedDays, onChange }: DayFilterProps) {
               className={`rounded-xl border px-3 py-2 text-sm font-medium transition-colors ${
                 active
                   ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-border bg-card text-card-foreground'
+                  : 'border-border bg-background text-card-foreground'
               }`}
               onClick={() => onChange(option)}
               type="button"

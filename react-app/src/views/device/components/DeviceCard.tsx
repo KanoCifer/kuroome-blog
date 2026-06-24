@@ -49,7 +49,7 @@ export function DeviceCard({
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         onClick={() => setIsDailyCostOpen(true)}
-        className="squircle border-border bg-card border p-6 shadow-lg"
+        className="squircle border-border bg-background border p-6 shadow-lg"
       >
         {/* 分析图表 */}
         <DailyCost
@@ -61,7 +61,7 @@ export function DeviceCard({
         <div className="mb-6 flex items-start justify-between">
           <div className="flex items-center gap-4">
             {/* Logo placeholder */}
-            <div className="border-border bg-card flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border shadow-inner">
+            <div className="border-border bg-background flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border shadow-inner">
               <span className="text-primary text-2xl font-bold">
                 {device.name.charAt(0).toUpperCase()}
               </span>

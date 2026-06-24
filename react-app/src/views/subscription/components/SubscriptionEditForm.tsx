@@ -107,7 +107,7 @@ function SecondaryButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`border-primary/60 bg-primary/5 hover:bg-card/70 w-full rounded-full border px-5 py-4 font-semibold transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 ${className} `}
+      className={`border-primary/60 bg-primary/5 hover:bg-background/70 w-full rounded-full border px-5 py-4 font-semibold transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 ${className} `}
     >
       {children}
     </button>
@@ -264,7 +264,7 @@ export function SubscriptionEditForm({
                     className={`flex-1 rounded-lg px-2 py-2.5 text-[11px] font-bold transition-all ${
                       isActive
                         ? 'bg-primary text-primary-foreground shadow-md'
-                        : 'text-on-surface-variant bg-muted hover:bg-card/50 font-medium'
+                        : 'text-on-surface-variant bg-muted hover:bg-background/50 font-medium'
                     } `}
                   >
                     {option.label}

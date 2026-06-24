@@ -23,11 +23,12 @@ const EMOJI_PRESETS = [
   '🪴',
 ] as const;
 
-const VIS_OPTIONS: { value: MomentVisibility; label: string; desc: string }[] = [
-  { value: 'public', label: '公开', desc: '任何访客可见' },
-  { value: 'unlisted', label: '不列出', desc: '链接可访问，但不在列表' },
-  { value: 'private', label: '不公开', desc: '仅自己' },
-];
+const VIS_OPTIONS: { value: MomentVisibility; label: string; desc: string }[] =
+  [
+    { value: 'public', label: '公开', desc: '任何访客可见' },
+    { value: 'unlisted', label: '不列出', desc: '链接可访问，但不在列表' },
+    { value: 'private', label: '不公开', desc: '仅自己' },
+  ];
 
 export interface MomentEditorModalProps {
   open: boolean;
@@ -133,10 +134,10 @@ export function MomentEditorModal({
             exit={{ opacity: 0, scale: 0.97, y: 4 }}
             transition={{ duration: 0.18 }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-card border-border/40 relative flex max-h-[88vh] w-full max-w-[760px] flex-col overflow-hidden rounded-xl border shadow-xl"
+            className="bg-background border-border/40 relative flex max-h-[88vh] w-full max-w-[760px] flex-col overflow-hidden rounded-xl border shadow-xl"
           >
             {/* Header */}
-            <div className="border-border/40 bg-card sticky top-0 z-10 flex items-center justify-between gap-2 border-b px-6 py-4">
+            <div className="border-border/40 bg-background sticky top-0 z-10 flex items-center justify-between gap-2 border-b px-6 py-4">
               <div>
                 <div className="text-muted-foreground font-mono text-[10px] tracking-[0.18em] uppercase">
                   {isEdit ? 'EDIT · 编辑' : 'NEW · 写一句'}
@@ -182,11 +183,15 @@ export function MomentEditorModal({
                     rows={8}
                     maxLength={2000}
                     placeholder="今天想到什么..."
-                    className="bg-card border-input text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-ring/20 min-h-[180px] w-full resize-y rounded-lg border px-4 py-3 font-serif text-[15px] leading-loose focus:ring-2 focus:outline-none"
+                    className="bg-background border-input text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-ring/20 min-h-[180px] w-full resize-y rounded-lg border px-4 py-3 font-serif text-[15px] leading-loose focus:ring-2 focus:outline-none"
                   />
                   <div className="text-muted-foreground mt-1.5 flex items-center justify-between font-mono text-[10px] tracking-wide">
                     <span>&nbsp;</span>
-                    <span className={content.length > 2000 ? 'text-destructive' : ''}>
+                    <span
+                      className={
+                        content.length > 2000 ? 'text-destructive' : ''
+                      }
+                    >
                       {content.length} / 2000
                     </span>
                   </div>
@@ -212,7 +217,7 @@ export function MomentEditorModal({
                           'flex h-8 w-8 items-center justify-center rounded-lg border text-[16px] transition-colors',
                           mood === e
                             ? 'border-primary bg-primary/10'
-                            : 'border-border/40 bg-card hover:bg-muted',
+                            : 'border-border/40 bg-background hover:bg-muted',
                         ].join(' ')}
                       >
                         {e}
@@ -225,7 +230,7 @@ export function MomentEditorModal({
                     type="text"
                     maxLength={50}
                     placeholder="或自定义心情..."
-                    className="bg-card border-input text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-ring/20 mt-2 w-full rounded-lg border px-3 py-1.5 text-[13px] focus:ring-2 focus:outline-none"
+                    className="bg-background border-input text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-ring/20 mt-2 w-full rounded-lg border px-3 py-1.5 text-[13px] focus:ring-2 focus:outline-none"
                   />
                 </div>
 
@@ -239,7 +244,7 @@ export function MomentEditorModal({
                       回车添加，× 删除 · ≤20
                     </span>
                   </div>
-                  <div className="bg-card border-input flex flex-wrap items-center gap-1.5 rounded-lg border px-2 py-1.5">
+                  <div className="bg-background border-input flex flex-wrap items-center gap-1.5 rounded-lg border px-2 py-1.5">
                     {tags.map((tag, i) => (
                       <span
                         key={tag + i}
@@ -289,7 +294,7 @@ export function MomentEditorModal({
                           'flex cursor-pointer items-start gap-2 rounded-lg border px-2.5 py-2',
                           visibility === opt.value
                             ? 'border-primary bg-primary/5'
-                            : 'border-border/40 bg-card hover:bg-muted',
+                            : 'border-border/40 bg-background hover:bg-muted',
                         ].join(' ')}
                       >
                         <input
@@ -320,7 +325,7 @@ export function MomentEditorModal({
                   <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value as MomentStatus)}
-                    className="bg-card border-input text-foreground w-full rounded-lg border px-2.5 py-1.5 text-[13px]"
+                    className="bg-background border-input text-foreground w-full rounded-lg border px-2.5 py-1.5 text-[13px]"
                   >
                     <option value="published">已发布</option>
                     <option value="draft">草稿</option>

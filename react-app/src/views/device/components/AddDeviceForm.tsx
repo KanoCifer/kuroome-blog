@@ -145,9 +145,9 @@ export function AddDeviceForm({ onClose, onSuccess }: AddDeviceFormProps) {
           transition={{ type: 'spring', duration: 0.4 }}
           className="fixed inset-x-8 inset-y-24 z-50 flex items-center justify-center"
         >
-          <div className="bg-card max-h-full w-full max-w-md overflow-y-auto rounded-2xl shadow-2xl">
+          <div className="bg-background max-h-full w-full max-w-md overflow-y-auto rounded-2xl shadow-2xl">
             {/* Header */}
-            <div className="border-border bg-card sticky top-0 z-10 border-b px-6 pt-6 pb-4">
+            <div className="border-border bg-background sticky top-0 z-10 border-b px-6 pt-6 pb-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className="text-foreground font-serif text-2xl font-bold">
@@ -178,7 +178,7 @@ export function AddDeviceForm({ onClose, onSuccess }: AddDeviceFormProps) {
                   onChange={(event) => handleChange('name', event.target.value)}
                   placeholder="例如：iPhone 15 Pro Max"
                   maxLength={100}
-                  className="border-input bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-ring w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                  className="border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-ring w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
 
@@ -193,7 +193,7 @@ export function AddDeviceForm({ onClose, onSuccess }: AddDeviceFormProps) {
                   onChange={(event) =>
                     handleChange('purchase_date', event.target.value)
                   }
-                  className="border-input bg-card text-foreground focus:border-primary focus:ring-ring w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                  className="border-input bg-background text-foreground focus:border-primary focus:ring-ring w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
 
@@ -209,7 +209,7 @@ export function AddDeviceForm({ onClose, onSuccess }: AddDeviceFormProps) {
                       onChange={(event) =>
                         handleChange('currency', event.target.value)
                       }
-                      className="border-input bg-card text-foreground focus:border-primary focus:ring-ring w-full cursor-pointer appearance-none rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                      className="border-input bg-background text-foreground focus:border-primary focus:ring-ring w-full cursor-pointer appearance-none rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                     >
                       {currencyOptions.map((c) => (
                         <option key={c} value={c}>
@@ -237,7 +237,7 @@ export function AddDeviceForm({ onClose, onSuccess }: AddDeviceFormProps) {
                         handleChange('price', event.target.value)
                       }
                       placeholder="0.00"
-                      className="border-input bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-ring w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                      className="border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-ring w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                     />
                   </div>
                 </label>
@@ -254,7 +254,7 @@ export function AddDeviceForm({ onClose, onSuccess }: AddDeviceFormProps) {
                     handleChange('notes', event.target.value)
                   }
                   placeholder="例如：256GB 银色、国行版本"
-                  className="border-input bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-ring w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                  className="border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-ring w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
 

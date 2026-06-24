@@ -11,9 +11,9 @@ export function BentoCalendar() {
   const weekdayHeaders = weekdayLabels.map((label, idx) => (
     <span
       key={idx}
-      className={`py-1 text-xs font-medium ${
+      className={`py-1 text-xs font-medium tabular-nums ${
         idx === weekday
-          ? 'bg-primary/10 text-primary rounded-2xl font-bold'
+          ? 'bg-primary/10 text-primary rounded-xl font-bold'
           : ''
       }`}
     >
@@ -52,7 +52,7 @@ export function BentoCalendar() {
     <BentoCard className="flex flex-col">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-foreground text-lg font-semibold">{monthLabel}</h3>
-        <span className="text-muted-foreground text-sm">{yearLabel}</span>
+        <span className="text-muted-foreground text-sm tabular-nums">{yearLabel}</span>
       </div>
       {/* 表头 */}
       <div className="mb-1 grid grid-cols-7 text-center">{weekdayHeaders}</div>

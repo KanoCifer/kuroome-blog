@@ -70,7 +70,7 @@ export function WeatherCard({
   return (
     <article
       onClick={openQWeather}
-      className="border-border bg-card cursor-pointer overflow-hidden rounded-2xl border p-3 shadow-sm transition-all hover:shadow-md active:scale-[0.98]"
+      className="border-border bg-background cursor-pointer overflow-hidden rounded-2xl border p-3 shadow-sm transition-all hover:shadow-md active:scale-[0.98]"
     >
       {/* Header */}
       <div className="mb-3 flex items-center justify-between">
@@ -87,7 +87,7 @@ export function WeatherCard({
             <span className="text-foreground text-lg font-bold tabular-nums">
               {liveWeather.temp}°
             </span>
-            <div className="bg-card/30 flex items-center gap-1 rounded-lg px-1.5 py-1 backdrop-blur-sm">
+            <div className="bg-background/30 flex items-center gap-1 rounded-lg px-1.5 py-1 backdrop-blur-sm">
               <i className={`qi-${liveWeather.icon} text-base`} />
               <span className="text-foreground/80 text-xs">
                 {liveWeather.text}

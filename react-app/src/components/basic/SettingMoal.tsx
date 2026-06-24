@@ -93,7 +93,7 @@ export function SettingModal({
 
           {/* 抽屉 */}
           <motion.div
-            className="bg-card fixed top-0 left-0 z-9999 flex h-full w-full max-w-md flex-col transition-colors duration-300"
+            className="bg-background fixed top-0 left-0 z-9999 flex h-full w-full max-w-md flex-col transition-colors duration-300"
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
@@ -146,7 +146,7 @@ export function SettingModal({
 
                   <div
                     onClick={toggleFooter}
-                    className="border-border bg-card hover:border-primary flex cursor-pointer items-center justify-between rounded-md border px-4 py-3 transition-colors"
+                    className="border-border bg-background hover:border-primary flex cursor-pointer items-center justify-between rounded-md border px-4 py-3 transition-colors"
                   >
                     <div>
                       <div className="text-foreground text-sm font-medium">
@@ -162,7 +162,7 @@ export function SettingModal({
                       }`}
                     >
                       <div
-                        className={`bg-card h-5 w-5 rounded-full shadow-md transition-transform ${
+                        className={`bg-background h-5 w-5 rounded-full shadow-md transition-transform ${
                           showFooter ? 'translate-x-5' : 'translate-x-0'
                         }`}
                       />
@@ -195,7 +195,7 @@ export function SettingModal({
                         className={`flex flex-col items-center gap-2 rounded-md border-2 p-3 transition-colors ${
                           theme === value
                             ? 'border-primary bg-primary/5'
-                            : 'border-border bg-card hover:border-primary'
+                            : 'border-border bg-background hover:border-primary'
                         }`}
                       >
                         <Icon
@@ -237,7 +237,7 @@ export function SettingModal({
                       className={`flex flex-col items-center gap-1 rounded-md border-2 p-3 transition-colors ${
                         font === 'default'
                           ? 'border-primary bg-primary/5'
-                          : 'border-border bg-card hover:border-primary'
+                          : 'border-border bg-background hover:border-primary'
                       }`}
                     >
                       <span
@@ -258,7 +258,7 @@ export function SettingModal({
                       className={`flex flex-col items-center gap-1 rounded-md border-2 p-3 transition-colors ${
                         font === 'harmonyos'
                           ? 'border-primary bg-primary/5'
-                          : 'border-border bg-card hover:border-primary'
+                          : 'border-border bg-background hover:border-primary'
                       }`}
                     >
                       <span
@@ -299,7 +299,7 @@ export function SettingModal({
                         className={`flex w-full items-stretch overflow-hidden rounded-md border-2 transition-colors ${
                           scheme === s.value
                             ? 'border-primary bg-primary/5'
-                            : 'border-border bg-card hover:border-primary'
+                            : 'border-border bg-background hover:border-primary'
                         }`}
                       >
                         {s.colors.length > 1 ? (

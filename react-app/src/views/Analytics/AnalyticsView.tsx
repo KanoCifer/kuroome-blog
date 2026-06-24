@@ -125,7 +125,7 @@ export default function AnalyticsView() {
           </p>
         </section>
 
-        <section className="border-border/60 bg-card/80 rounded-3xl border p-3.5 shadow-sm">
+        <section className="border-border/60 bg-background/80 rounded-3xl border p-3.5 shadow-sm">
           <DayFilter selectedDays={selectedDays} onChange={setSelectedDays} />
 
           <button

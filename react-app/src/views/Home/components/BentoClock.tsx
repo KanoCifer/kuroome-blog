@@ -37,7 +37,7 @@ export function BentoClock() {
         </svg>
       </div>
       <div>
-        <div className="text-foreground font-serif text-4xl font-extrabold tracking-tighter">
+        <div className="text-foreground font-serif text-4xl font-extrabold tracking-tighter tabular-nums">
           {timeLabel}
         </div>
         <div className="text-muted-foreground mt-1 text-sm font-medium">

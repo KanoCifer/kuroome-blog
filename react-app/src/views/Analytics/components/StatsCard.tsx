@@ -16,7 +16,7 @@ export function StatsCard({
   iconClassName,
 }: StatsCardProps) {
   return (
-    <article className="group border-border/60 bg-card/85 overflow-hidden rounded-3xl border p-3.5 shadow-sm transition-all duration-300">
+    <article className="group border-border/60 bg-background/85 overflow-hidden rounded-3xl border p-3.5 shadow-sm transition-all duration-300">
       <div className="mb-2 flex items-center gap-2">
         <div
           className={`flex h-8 w-8 items-center justify-center rounded-lg ${iconClassName}`}

@@ -92,7 +92,14 @@ export function FishingFeedbackForm({
         setLoading(false);
       }
     },
-    [feedbackPayload, notifyError, notifySuccess, onSuccess, service, selectedFeedback],
+    [
+      feedbackPayload,
+      notifyError,
+      notifySuccess,
+      onSuccess,
+      service,
+      selectedFeedback,
+    ],
   );
 
   return (
@@ -113,7 +120,7 @@ export function FishingFeedbackForm({
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-        className="bg-card border-border fixed inset-x-0 bottom-0 z-50 flex h-auto max-h-[90dvh] flex-col rounded-t-2xl border-t shadow-2xl sm:top-1/2 sm:right-auto sm:bottom-auto sm:left-1/2 sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl sm:border"
+        className="bg-background border-border fixed inset-x-0 bottom-0 z-50 flex h-auto max-h-[90dvh] flex-col rounded-t-2xl border-t shadow-2xl sm:top-1/2 sm:right-auto sm:bottom-auto sm:left-1/2 sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl sm:border"
         role="dialog"
         aria-label="钓鱼反馈"
       >

@@ -63,7 +63,7 @@ export function PopularPagesChart({ pages }: PopularPagesChartProps) {
   }, [pages]);
 
   return (
-    <article className="border-border/60 bg-card/85 h-100 rounded-3xl border p-3.5 shadow-sm">
+    <article className="border-border/60 bg-background/85 h-100 rounded-3xl border p-3.5 shadow-sm">
       <h3 className="text-foreground text-base font-semibold">Popular Pages</h3>
       <p className="text-muted-foreground mt-1 text-xs">Top viewed paths</p>
       <ReactECharts

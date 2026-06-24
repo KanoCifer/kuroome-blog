@@ -177,7 +177,7 @@ export function CookieConsent() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.95 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="group border-border bg-card/95 fixed bottom-6 left-1/2 z-9999 w-[340px] -translate-x-1/2 overflow-hidden rounded-2xl border shadow-2xl backdrop-blur-sm transition-all duration-300 sm:bottom-8 sm:w-[380px]"
+            className="group border-border bg-background/95 fixed bottom-6 left-1/2 z-9999 w-[340px] -translate-x-1/2 overflow-hidden rounded-2xl border shadow-2xl backdrop-blur-sm transition-all duration-300 sm:bottom-8 sm:w-[380px]"
           >
             <div className="relative px-5 py-5">
               <div className="mb-3 flex items-center justify-between">
@@ -235,7 +235,7 @@ export function CookieConsent() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="border-border bg-card/95 relative w-full max-w-[500px] overflow-hidden rounded-2xl border p-6 shadow-2xl backdrop-blur-sm"
+              className="border-border bg-background/95 relative w-full max-w-[500px] overflow-hidden rounded-2xl border p-6 shadow-2xl backdrop-blur-sm"
             >
               <h2 className="text-card-foreground relative text-[16px] font-medium">
                 隐私协议核心摘要
@@ -315,7 +315,7 @@ export function CookieConsent() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="border-border bg-card/95 relative w-full max-w-[400px] overflow-hidden rounded-2xl border p-6 shadow-2xl backdrop-blur-sm"
+              className="border-border bg-background/95 relative w-full max-w-[400px] overflow-hidden rounded-2xl border p-6 shadow-2xl backdrop-blur-sm"
             >
               <h2 className="text-card-foreground relative text-[15px] font-medium">
                 Cookie 偏好设置

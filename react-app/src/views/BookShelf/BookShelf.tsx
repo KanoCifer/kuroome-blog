@@ -105,7 +105,7 @@ export default function BookShelf() {
         <div className="absolute top-0 right-0 left-0 z-10 flex items-center px-4 py-4 md:px-6">
           <button
             type="button"
-            className="border-border bg-card/60 hover:bg-muted flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
+            className="border-border bg-background/60 hover:bg-muted flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
             onClick={handleBack}
             aria-label="返回"
           >
@@ -117,7 +117,7 @@ export default function BookShelf() {
         <div className="absolute top-0 right-0 z-10 flex items-center px-4 py-4 md:px-6">
           <button
             type="button"
-            className="border-border bg-card/60 hover:bg-muted flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors disabled:opacity-50"
+            className="border-border bg-background/60 hover:bg-muted flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors disabled:opacity-50"
             disabled={isSyncing}
             onClick={handleSync}
             aria-label="同步书架"
@@ -148,7 +148,7 @@ export default function BookShelf() {
       {/* Stats Summary Bar */}
       {weeklySnapshot && (
         <div
-          className="border-border bg-card mx-auto mt-6 mb-4 w-[calc(100%-2rem)] max-w-6xl cursor-pointer rounded-2xl border p-4 shadow-sm transition-shadow hover:shadow-md sm:px-6 md:mt-8 md:mb-6 md:px-10"
+          className="border-border bg-background mx-auto mt-6 mb-4 w-[calc(100%-2rem)] max-w-6xl cursor-pointer rounded-2xl border p-4 shadow-sm transition-shadow hover:shadow-md sm:px-6 md:mt-8 md:mb-6 md:px-10"
           onClick={() => navigate('/bookshelf/stats')}
         >
           <div className="flex items-center gap-4 sm:gap-6">
@@ -265,7 +265,7 @@ export default function BookShelf() {
                   }}
                 >
                   <div
-                    className="bg-card hover:shadow-primary/5 relative overflow-hidden rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                    className="bg-background hover:shadow-primary/5 relative overflow-hidden rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                     style={{ animationDelay: `${index * 30}ms` }}
                   >
                     <div className="relative aspect-3/4 overflow-hidden">

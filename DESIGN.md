@@ -127,6 +127,7 @@ The system ships **ten complete color schemes** — sky-blue, forest-green, pape
 Density is comfortable, not tight. The dominant surface is paper; the dominant type is Chinese-set HarmonyOS Sans with Averia Gruesa Libre accents for English display. Shadows are **layered ambient + inset white highlight** (the "lifted paper" treatment), never flat, never glassmorphism. The system is explicitly **not** a SaaS cream-bg dashboard, an AI bento grid, an editorial-magazine layout, or a tech-company marketing site — those lanes are documented in `PRODUCT.md` as anti-references and in §6 as Don'ts. The site is the author's, used every day, and that single-author / multi-reader shape is what every choice serves.
 
 **Key Characteristics:**
+
 - 10 named themes × light/dark = 20 distinct surfaces, sharing one token architecture
 - OKLCH color space throughout; `color-mix(in oklch, var(--ink) N%, transparent)` for shadow/rgba synthesis
 - Three-layer token contract: raw theme vars → `data-color-scheme` activation → semantic Tailwind utilities (`bg-background`, `text-foreground`, etc.)
@@ -138,20 +139,24 @@ Density is comfortable, not tight. The dominant surface is paper; the dominant t
 
 ## 2. Colors
 
-The palette is **Restrained by token, Committed by choice**. Each theme uses tinted neutrals for ~80% of the surface and one saturated accent for ≤15%, but the *selection* of accent is a brand statement — vermillion for autumn, copper for paper, electric blue for sky-blue, royal blue for midnight. The default sky-blue is the "neutral" voice of the brand; the other nine are committed statements.
+The palette is **Restrained by token, Committed by choice**. Each theme uses tinted neutrals for ~80% of the surface and one saturated accent for ≤15%, but the _selection_ of accent is a brand statement — vermillion for autumn, copper for paper, electric blue for sky-blue, royal blue for midnight. The default sky-blue is the "neutral" voice of the brand; the other nine are committed statements.
 
 The default theme is **`sky-blue`** (the values in the frontmatter are sky-blue). All ten themes follow the same role schema; only the hue base and accent value change. `data-color-scheme="<theme-name>"` on the root element swaps the entire palette.
 
 ### Primary
+
 - **Electric Indigo** (`{colors.accent}` — `oklch(0.63 0.27 254)`): the sky-blue accent. Used for primary actions, focused state, the bento nav indicator (`bg-primary/20`), and the Hero "back" button. Carries ≤10% of any given screen by rule. Other themes' accents: forest-green `oklch(0.405 0.101 131)`, paper `#8a653f` (copper, hex legacy), sage `#4f7657`, mist `#4f6d88`, blush `#a5656f`, spring `#35bfab`, autumn `#de4331` (vermillion), clear-sky `#2fcbe7` (cyan), midnight `#2a48f3` (royal blue).
 
 ### Secondary
+
 - **Slate Blue** (`{colors.accent-slate}` — `oklch(0.707 0.022 261.325)`): focus-ring color, neutral secondary action. Quiet by intent — this is the "you can have this too, in a less loud voice" accent.
 
 ### Destructive
+
 - **Vermillion Rose** (`{colors.accent-rose}` — `oklch(0.577 0.245 27.325)`): destructive actions, error states, danger. The same hue family across all themes so the meaning doesn't shift when the theme does.
 
 ### Neutral (Tinted with Hue)
+
 - **Ink** (`{colors.ink}` — `oklch(0.13 0.028 261.692)`): body text, primary foreground. Dark per theme; this is the "ink on paper" voice.
 - **Paper** (`{colors.paper}` — `oklch(0.985 0.013 260)`): page background, card surface, modal panel. Tinted 0.013 chroma toward the theme hue — not warm-by-default, not cool-by-default, **theme-by-default**.
 - **Warm Gray** (`{colors.warm-gray}` — `oklch(0.95 0.018 260)`): the "low-weight surface" — input backgrounds, secondary buttons, tag pills, hover states.
@@ -161,26 +166,28 @@ The default theme is **`sky-blue`** (the values in the frontmatter are sky-blue)
 - **Surface** (`{colors.surface}` — `oklch(0.97 0.013 260 / 0.75)`): translucent floating layer (nav, dropdowns, modals over imagery). The 0.75 alpha is the explicit ceiling.
 
 ### Charts
+
 - **Chart 1–5** (`{colors.chart-1}` through `{colors.chart-5}`): five-series palette used in DevTasks, analytics, and `BentoTech`. All five carry 4.5:1+ against paper.
 
 ### Gradients
+
 - **Primary gradient** (`from-{colors.gradient-primary-from}` → `to-{colors.gradient-primary-to}`): single CTA surfaces, ribbon backgrounds, top-of-page bento. Used in 2-3 places only, never as decoration on default surfaces.
 - **Decorative gradient** (`from-{colors.gradient-decorative-from}` → `to-{colors.gradient-decorative-to}`): reserved for empty states and onboarding moments; never on solid content.
 
 ### The Ten Themes
 
-| Theme | `data-color-scheme` | Hue | Accent (light/dark) | Character |
-|---|---|---|---|---|
-| Sky Blue (default) | `sky-blue` | 261° indigo | `oklch(0.63 0.27 254)` / `oklch(0.7 0.16 258)` | Default voice; electric blue over cool paper |
-| Forest Green | `forest-green` | 145° green | `oklch(0.405 0.101 131)` / `oklch(0.72 0.13 145)` | Deep moss over pale paper; for a quiet day |
-| Paper | `paper` | 50° warm | `#8a653f` copper / `#c08560` | 私人书房; legacy hex, parchment-and-copper |
-| Sage | `sage` | 145° muted | `#4f7657` / `#7ab088` | 鼠尾草; herb-garden green |
-| Mist | `mist` | 225° cool | `#4f6d88` / `#88a8ba` | 雾蓝; cool dusk-blue |
-| Blush | `blush` | 355° warm | `#a5656f` / `#c47a85` | 薄红陶; dusty rose |
-| Spring | `spring` | 160° teal | `#35bfab` / mint | 春暖; teal ink on teal-50 paper |
-| Autumn | `autumn` | 40° warm | `#de4331` / vermillion | 秋实; vermillion on orange-50 |
-| Clear Sky | `clear-sky` | 240° cool | `#2fcbe7` / cyan | 晴空; pure-white paper, cyan accent |
-| Midnight | `midnight` | 280° indigo | `#2a48f3` / royal blue | 深夜; deep indigo, royal blue accent |
+| Theme              | `data-color-scheme` | Hue         | Accent (light/dark)                               | Character                                    |
+| ------------------ | ------------------- | ----------- | ------------------------------------------------- | -------------------------------------------- |
+| Sky Blue (default) | `sky-blue`          | 261° indigo | `oklch(0.63 0.27 254)` / `oklch(0.7 0.16 258)`    | Default voice; electric blue over cool paper |
+| Forest Green       | `forest-green`      | 145° green  | `oklch(0.405 0.101 131)` / `oklch(0.72 0.13 145)` | Deep moss over pale paper; for a quiet day   |
+| Paper              | `paper`             | 50° warm    | `#8a653f` copper / `#c08560`                      | 私人书房; legacy hex, parchment-and-copper   |
+| Sage               | `sage`              | 145° muted  | `#4f7657` / `#7ab088`                             | 鼠尾草; herb-garden green                    |
+| Mist               | `mist`              | 225° cool   | `#4f6d88` / `#88a8ba`                             | 雾蓝; cool dusk-blue                         |
+| Blush              | `blush`             | 355° warm   | `#a5656f` / `#c47a85`                             | 薄红陶; dusty rose                           |
+| Spring             | `spring`            | 160° teal   | `#35bfab` / mint                                  | 春暖; teal ink on teal-50 paper              |
+| Autumn             | `autumn`            | 40° warm    | `#de4331` / vermillion                            | 秋实; vermillion on orange-50                |
+| Clear Sky          | `clear-sky`         | 240° cool   | `#2fcbe7` / cyan                                  | 晴空; pure-white paper, cyan accent          |
+| Midnight           | `midnight`          | 280° indigo | `#2a48f3` / royal blue                            | 深夜; deep indigo, royal blue accent         |
 
 ### Named Rules
 
@@ -195,7 +202,7 @@ The default theme is **`sky-blue`** (the values in the frontmatter are sky-blue)
 ## 3. Typography
 
 **Body Font (default):** `font-sans` resolves to the system stack — `'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, 'Segoe UI', sans-serif`. Chinese-set on every platform with a CJK system font.
-**Body Font (HarmonyOS toggle):** When the user opts in via Settings → Appearance → Font → HarmonyOS, `:root[data-font='harmonyos']` overrides `--font-sans` and `--default-font-family` to `'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif`. This is a **user-level runtime switch**, not a theme-level change. Both frontends expose it; both pre-load the three HarmonyOS_Sans_{Regular,Medium,Bold}.ttf files in `index.html` so the toggle is instant.
+**Body Font (HarmonyOS toggle):** When the user opts in via Settings → Appearance → Font → HarmonyOS, `:root[data-font='harmonyos']` overrides `--font-sans` and `--default-font-family` to `'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif`. This is a **user-level runtime switch**, not a theme-level change. Both frontends expose it; both pre-load the three HarmonyOS*Sans*{Regular,Medium,Bold}.ttf files in `index.html` so the toggle is instant.
 **Display Font:** Averia Gruesa Libre (Latin) + 阿里妈妈东方大楷 (CJK brush) — used selectively, never for body
 **Serif (Tailwind default):** system serif stack (ui-serif → Georgia → Cambria) — used for blog content, login heroes, literary views
 **Mono:** system mono (ui-monospace → SFMono-Regular → Menlo) — for tabular nums, version strings, terminal chrome
@@ -203,6 +210,7 @@ The default theme is **`sky-blue`** (the values in the frontmatter are sky-blue)
 **Character:** Literary register without being decorative. The display font is rounded, slightly informal, distinctly Latin (Averia has personality like a hand-drawn bookplate); the body font is whatever the user chose — by default the platform's CJK system stack, optionally HarmonyOS Sans. The body is meant to disappear into the content; the display is meant to carry the literary register where it actually appears (greetings, polaroid dates, AI analysis titles).
 
 ### Hierarchy
+
 - **Display** (Averia Gruesa Libre, weight 400, `letter-spacing: -0.02em`): used in 9 Vue + 5 React sites — bento greeting, clock time, polaroid date label, fishing dashboard subtitle, device card label, AI analysis drawer title. CJK sibling: `font-family-dongfang` exclusively for Chinese display (not mixed with Averia).
 - **Hero (h1)** (serif, weight 500, `clamp(1.875rem, 4vw + 1rem, 4.5rem)`, `line-height: 1.1`, `letter-spacing: -0.025em`): page titles on `BasicDetail` / `BasicDetail` (React) and `PageHero` — max ceiling 4.5rem (72px) so the page reads as composed, not as shouting. Word-by-word stagger animation gated on `prefers-reduced-motion`.
 - **Headline (h2-h3)** (serif, weight 500–600, `text-3xl` to `text-5xl`): section titles, modal headers. Same family as Hero but smaller.
@@ -212,6 +220,7 @@ The default theme is **`sky-blue`** (the values in the frontmatter are sky-blue)
 - **Mono** (system mono, `0.8125rem` (13px)): tabular-nums timestamps, version strings, status codes, terminal/console chrome.
 
 ### Pairing Logic
+
 - Latin display: **Averia Gruesa Libre** (rounded, slightly informal)
 - CJK display: **阿里妈妈东方大楷** (brush-style CJK display)
 - Body: **`font-sans`** — system CJK stack by default (`PingFang SC` / `Microsoft YaHei`); **HarmonyOS Sans** (Regular 400 / Medium 500 / Bold 700) only when the user opts in via Settings → Appearance → Font. The three `.ttf` files are preloaded so the toggle is instant.
@@ -246,6 +255,7 @@ The system uses **layered ambient drop shadow + inset white highlight** as the d
 - **Color-tinted shadows** (`shadow-primary/30`, `shadow-brand-devices/30`): for primary CTAs and the device tracker only.
 
 ### Modal Backdrop
+
 - Standard: `bg-black/45 backdrop-blur-[10px]` (the project default; in active cleanup toward `bg-ink/45` or no-blur per design-system.md rules).
 - Native dialog (AlertDialog): `backdrop:bg-black/80` (heavier 80% on `<dialog>`).
 - **Forbidden**: arbitrary `bg-black/75 backdrop-blur-2xl` decorative glass on user content.
@@ -256,7 +266,7 @@ The system uses **layered ambient drop shadow + inset white highlight** as the d
 
 **The Reduced-Motion-Honors-Depth Rule.** Every entrance animation gated on `prefers-reduced-motion: reduce` MUST still complete with the depth visible. Card entry by spring is fine; if reduced-motion is on, the card snaps in with its shadow intact. The shadow is the depth, not the entry.
 
-**The 12% Ceiling.** Color-tinted shadows on primary actions use ≤30% alpha (`shadow-primary/30`). The shadow is the *hint* of an accent, not the accent itself. Going past 30% reads as a colored outline pretending to be a shadow.
+**The 12% Ceiling.** Color-tinted shadows on primary actions use ≤30% alpha (`shadow-primary/30`). The shadow is the _hint_ of an accent, not the accent itself. Going past 30% reads as a colored outline pretending to be a shadow.
 
 **The Inset-White-Highlight Rule.** Bento cards, the floating nav, and the BasicDetail inner section all carry an inset white highlight at `rgba(255,255,255,0.35)` (light) or `rgba(255,255,255,0.06)` (dark). This is the "paper held under a lamp" effect. The highlight is what separates this system from flat SaaS cards with one drop shadow.
 
@@ -291,16 +301,16 @@ The system uses **layered ambient drop shadow + inset white highlight** as the d
 ### Navigation
 
 - **Vue floating nav** (`BasicNav.vue`): squircle floating pill, 6 nav items, `bg-background/90 backdrop-blur-sm`, `z-9999`. Spring-animated indicator (`stiffness: 320, damping: 30`) is `bg-primary/20 rounded-full h-12 w-12`. Avatar at the left edge.
-- **React sidebar** (`BasicSidebar.tsx`): `bg-card/90 fixed top-0 left-0 z-100 flex h-screen w-80 flex-col gap-6 rounded-r-4xl p-6 backdrop-blur-sm`. Right-rounded squircle, full-height. Mobile uses a bottom-sheet `BasicNav.tsx` instead.
+- **React sidebar** (`BasicSidebar.tsx`): `bg-background/90 fixed top-0 left-0 z-100 flex h-screen w-80 flex-col gap-6 rounded-r-4xl p-6 backdrop-blur-sm`. Right-rounded squircle, full-height. Mobile uses a bottom-sheet `BasicNav.tsx` instead.
 - **Nav indicator:** the active state is a soft accent fill, NOT a bold underline, NOT a colored bar, NOT an arrow. The indicator slides on `stiffness: 320, damping: 30` — fast enough to feel responsive, soft enough to feel paper.
 
 ### Modal
 
 - **Vue `Modal.vue`:** `bg-background border-border/60 relative w-full overflow-hidden rounded-2xl border shadow-2xl`. Sizes: sm 420px / md 560px / lg 720px / xl 880px. Motion: fade overlay 180ms; panel spring `stiffness: 340, damping: 32, mass: 0.8` (scale 0.95→1, y 12→0). Body scroll lock with scrollbar compensation.
 - **Vue `AlertDialog` (native `<dialog>`):** `bg-background backdrop:bg-black/80` + `data-[state=open]:animate-in fade-in-0 zoom-in-95` from `tw-animate-css`. Spring `duration: 200`.
-- **Vue `PicDetailModal` (signature):** film-strip layout, `bg-card text-card-foreground border-border/60 max-w-5xl rounded-2xl md:grid-cols-[1.45fr_1fr]`. `bg-ink text-paper` film-label chip in top-left. Custom `0 12px 32px color-mix(in oklch, var(--ink) 10%, transparent)` shadow.
-- **React `MomentDetailModal`:** `bg-background/60 backdrop-blur-sm` mask, `bg-card border-border/40 max-w-[720px] rounded-xl shadow-xl`. Motion `duration: 0.18` (scale 0.96→1, y 8→0).
-- **React `SettingMoal`:** right-side drawer, `bg-card/95 border-border/50 rounded-l-2xl shadow-2xl`. Slides in from the right.
+- **Vue `PicDetailModal` (signature):** film-strip layout, `bg-background text-card-foreground border-border/60 max-w-5xl rounded-2xl md:grid-cols-[1.45fr_1fr]`. `bg-ink text-paper` film-label chip in top-left. Custom `0 12px 32px color-mix(in oklch, var(--ink) 10%, transparent)` shadow.
+- **React `MomentDetailModal`:** `bg-background/60 backdrop-blur-sm` mask, `bg-background border-border/40 max-w-[720px] rounded-xl shadow-xl`. Motion `duration: 0.18` (scale 0.96→1, y 8→0).
+- **React `SettingMoal`:** right-side drawer, `bg-background/95 border-border/50 rounded-l-2xl shadow-2xl`. Slides in from the right.
 
 ### Chips / Tag Pills
 
@@ -318,7 +328,7 @@ The shared hero used by `/`, `/moments`, `/bookshelf`, `/bookshelf/stats`. Eyebr
 
 The home-page bento grid. 14 draggable cards (`BentoCalendar`, `BentoCat`, `BentoClock`, `BentoClockTime`, `BentoGreeting`, `BentoLike`, `BentoMap`, `BentoMemo`, `BentoNewPost`, `BentoPic`, `BentoProfileCard`, `BentoReadingList`, `BentoTech`, `BentoWebsites`) on a free-position canvas, not a CSS grid. Squircle shape (`corner-shape: squircle; border-radius: 90px`). Layered ambient + inset white highlight shadow. motion-v `Motion` entry (spring `bounce: 0.3, duration: 0.5`).
 
-**Why it's a signature:** the bento grid is the only place the system uses card-as-affordance for a whole page. Every other surface treats cards as a *list item*, not a *page primitive*. The 13-card count is a constraint of the home, not a template to apply elsewhere.
+**Why it's a signature:** the bento grid is the only place the system uses card-as-affordance for a whole page. Every other surface treats cards as a _list item_, not a _page primitive_. The 13-card count is a constraint of the home, not a template to apply elsewhere.
 
 ## 6. Do's and Don'ts
 
@@ -357,8 +367,8 @@ The strategic anti-references from `PRODUCT.md` carry through to the visual spec
 - **Don't** ship text that overflows its container. Test heading copy at every breakpoint; if it overflows, reduce the `clamp` max or rewrite the copy. The viewport is part of the design.
 - **Don't** ship a specific rejected direction. The settings modal "文学手账 / 季节面板 / 命令中心" three-way (`design-demos/`), moments page v1/v2/v3, fishing weather card "诗意气象 / 天空剧场" (`weather-card-redesign/`) — these were walked and walked back. Do not propose them again.
 - **Don't** animate CSS layout properties unless truly needed. Translate, scale, opacity are the defaults; clip-path, mask, and shadow/glow are the premium materials when they materially improve the effect. Width/height/margin/padding transitions are layout, not motion.
-- **Don't** use motion as a fallback for missing depth. The lift-from-below shadow is the depth; motion is the *acknowledgment* of state change. If the shadow is missing, motion will not save it.
-- **Don't** ship `bg-card` or `text-card-foreground` in Vue. The Vue `@theme incline` typo means those classes have no Tailwind source. They work in React (the `@theme inline` block exposes them) but not in Vue. Use `bg-background` and `text-foreground` on the Vue side.
+- **Don't** use motion as a fallback for missing depth. The lift-from-below shadow is the depth; motion is the _acknowledgment_ of state change. If the shadow is missing, motion will not save it.
+- **Don't** ship `bg-background` or `text-card-foreground` in Vue. The Vue `@theme incline` typo means those classes have no Tailwind source. They work in React (the `@theme inline` block exposes them) but not in Vue. Use `bg-background` and `text-foreground` on the Vue side.
 - **Don't** ship the `阿里妈妈方圆体` (alibaba) font. It is defined in `@theme` but has zero component references. The display font is Averia (Latin) and 东方大楷 (CJK); the body font is HarmonyOS Sans.
 - **Don't** set `font-family-averia` on CJK content. Averia has no CJK glyphs; it will fall back to the body stack and look broken.
 - **Don't** ship a hero heading above 4.5rem (72px). `clamp(1.875rem, 4vw + 1rem, 4.5rem)` is the ceiling. Above that the page is shouting, not designing.

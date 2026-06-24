@@ -213,7 +213,7 @@ export default function SubscriptionView() {
           {/* Monthly Estimate (Spans 2) */}
           <div
             onClick={() => setIsAnalyticsOpen(true)}
-            className="squircle border-border bg-card col-span-2 flex items-center justify-between border p-6 shadow-lg"
+            className="squircle border-border bg-background col-span-2 flex items-center justify-between border p-6 shadow-lg"
           >
             <div>
               <p className="text-muted-foreground text-sm font-medium">
@@ -248,7 +248,7 @@ export default function SubscriptionView() {
           />
 
           {/* Active */}
-          <div className="squircle border-border bg-card border p-5 shadow-lg">
+          <div className="squircle border-border bg-background border p-5 shadow-lg">
             <div className="bg-success/10 text-success mb-3 flex h-10 w-10 items-center justify-center rounded-full">
               <svg
                 className="h-5 w-5"
@@ -270,7 +270,7 @@ export default function SubscriptionView() {
             </p>
           </div>
           {/* Total */}
-          <div className="squircle border-border bg-card border p-5 shadow-lg">
+          <div className="squircle border-border bg-background border p-5 shadow-lg">
             <div className="bg-warning/10 text-warning mb-3 flex h-10 w-10 items-center justify-center rounded-full">
               <svg
                 className="h-5 w-5"

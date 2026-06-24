@@ -107,7 +107,7 @@ function TaskCard({
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.2 }}
       onClick={() => onCardClick(task)}
-      className="group border-border/60 bg-card cursor-pointer rounded-xl border p-3.5 shadow-sm transition-shadow active:shadow-md"
+      className="group border-border/60 bg-background cursor-pointer rounded-xl border p-3.5 shadow-sm transition-shadow active:shadow-md"
     >
       <div className="flex items-start gap-2.5">
         {/* Status badge */}
@@ -244,7 +244,7 @@ function EditBottomSheet({
         exit={{ y: '100%' }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         onClick={(e) => e.stopPropagation()}
-        className="bg-card absolute right-0 bottom-0 left-0 max-h-[85dvh] overflow-y-auto rounded-t-3xl p-6"
+        className="bg-background absolute right-0 bottom-0 left-0 max-h-[85dvh] overflow-y-auto rounded-t-3xl p-6"
       >
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-foreground text-lg font-semibold">编辑任务</h2>
@@ -274,7 +274,7 @@ function EditBottomSheet({
             onChange={(e) => setTitle(e.target.value)}
             type="text"
             placeholder="任务内容..."
-            className="border-border bg-card focus:border-primary w-full rounded-xl border px-4 py-3 text-base outline-none"
+            className="border-border bg-background focus:border-primary w-full rounded-xl border px-4 py-3 text-base outline-none"
             autoFocus
           />
 
@@ -283,7 +283,7 @@ function EditBottomSheet({
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
             placeholder="添加描述... (可选)"
-            className="border-border bg-card focus:border-primary w-full resize-none rounded-xl border px-4 py-3 text-sm outline-none"
+            className="border-border bg-background focus:border-primary w-full resize-none rounded-xl border px-4 py-3 text-sm outline-none"
           />
 
           <div className="flex flex-wrap items-center gap-4">
@@ -294,7 +294,7 @@ function EditBottomSheet({
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as DevTaskPriority)}
-                className="border-border bg-card cursor-pointer rounded-lg border px-3 py-2 text-sm"
+                className="border-border bg-background cursor-pointer rounded-lg border px-3 py-2 text-sm"
               >
                 <option value="default">默认</option>
                 <option value="low">低</option>
@@ -310,7 +310,7 @@ function EditBottomSheet({
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="border-border bg-card cursor-pointer rounded-lg border px-3 py-2 text-sm"
+                className="border-border bg-background cursor-pointer rounded-lg border px-3 py-2 text-sm"
               />
             </div>
           </div>
@@ -464,7 +464,7 @@ export default function TodoListView() {
       className="bg-background relative min-h-dvh pb-24"
     >
       {/* Header */}
-      <div className="bg-card sticky top-0 z-10 ml-12 flex items-center justify-between px-4 py-4">
+      <div className="bg-background sticky top-0 z-10 ml-12 flex items-center justify-between px-4 py-4">
         <div>
           <h1 className="text-foreground text-xl font-semibold">开发任务</h1>
           <p className="text-muted-foreground text-sm">{tasks.length} 项任务</p>
@@ -485,7 +485,7 @@ export default function TodoListView() {
       {/* Tab layout */}
       <div className="flex flex-col">
         {/* Tab bar */}
-        <div className="border-border/50 bg-card flex items-center gap-1 border-b px-4">
+        <div className="border-border/50 bg-background flex items-center gap-1 border-b px-4">
           {COLUMNS.map((col) => {
             const isActive = activeTab === col.status;
             const count = grouped[col.status].length;
@@ -563,7 +563,7 @@ export default function TodoListView() {
               exit={{ y: '100%' }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-card absolute right-0 bottom-0 left-0 max-h-[85dvh] overflow-y-auto rounded-t-3xl p-6"
+              className="bg-background absolute right-0 bottom-0 left-0 max-h-[85dvh] overflow-y-auto rounded-t-3xl p-6"
             >
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-foreground text-lg font-semibold">
@@ -595,7 +595,7 @@ export default function TodoListView() {
                   onChange={(e) => setNewTitle(e.target.value)}
                   type="text"
                   placeholder="任务内容..."
-                  className="border-border bg-card focus:border-primary w-full rounded-xl border px-4 py-3 text-base outline-none"
+                  className="border-border bg-background focus:border-primary w-full rounded-xl border px-4 py-3 text-base outline-none"
                   autoFocus
                 />
 
@@ -604,7 +604,7 @@ export default function TodoListView() {
                   onChange={(e) => setNewDescription(e.target.value)}
                   rows={2}
                   placeholder="添加描述... (可选)"
-                  className="border-border bg-card focus:border-primary w-full resize-none rounded-xl border px-4 py-3 text-sm outline-none"
+                  className="border-border bg-background focus:border-primary w-full resize-none rounded-xl border px-4 py-3 text-sm outline-none"
                 />
 
                 <div className="flex flex-wrap items-center gap-4">
@@ -617,7 +617,7 @@ export default function TodoListView() {
                       onChange={(e) =>
                         setNewStatus(e.target.value as DevTaskStatus)
                       }
-                      className="border-border bg-card cursor-pointer rounded-lg border px-3 py-2 text-sm"
+                      className="border-border bg-background cursor-pointer rounded-lg border px-3 py-2 text-sm"
                     >
                       <option value="todo">待办</option>
                       <option value="in-progress">开发中</option>
@@ -634,7 +634,7 @@ export default function TodoListView() {
                       onChange={(e) =>
                         setNewPriority(e.target.value as DevTaskPriority)
                       }
-                      className="border-border bg-card cursor-pointer rounded-lg border px-3 py-2 text-sm"
+                      className="border-border bg-background cursor-pointer rounded-lg border px-3 py-2 text-sm"
                     >
                       <option value="default">默认</option>
                       <option value="low">低</option>
@@ -650,7 +650,7 @@ export default function TodoListView() {
                       type="date"
                       value={newDueDate}
                       onChange={(e) => setNewDueDate(e.target.value)}
-                      className="border-border bg-card cursor-pointer rounded-lg border px-3 py-2 text-sm"
+                      className="border-border bg-background cursor-pointer rounded-lg border px-3 py-2 text-sm"
                     />
                   </div>
                 </div>

@@ -116,7 +116,7 @@ export function BentoHero() {
               className="h-full w-full object-cover transition duration-500 hover:scale-105"
             />
           </div>
-          <div className="bg-primary-foreground/20 border-primary-foreground absolute right-0 bottom-0 flex h-6 w-6 items-center justify-center rounded-full border-2">
+          <div className="bg-primary-foreground/20 border-primary-foreground absolute right-0 bottom-0 flex h-6 w-6 items-center justify-center rounded-full border-2 ring-2 ring-primary">
             <svg
               className="text-primary h-3 w-3"
               fill="currentColor"
@@ -145,7 +145,7 @@ export function BentoHero() {
         <div className="flex shrink-0 items-center gap-2">
           <button
             title="切换到 Vue 版本"
-            className="bg-primary-foreground/15 hover:bg-primary-foreground/25 text-primary-foreground flex h-9 w-9 items-center justify-center rounded-full transition-transform duration-150 hover:scale-110 active:scale-90"
+            className="bg-primary-foreground/15 hover:bg-primary-foreground/25 text-primary-foreground flex h-9 w-9 items-center justify-center rounded-full transition-transform duration-150 hover:scale-110 active:scale-95"
             onClick={switchToVue}
           >
             <svg viewBox="0 0 256 221" className="h-4 w-4" fill="currentColor">
@@ -154,11 +154,11 @@ export function BentoHero() {
           </button>
           <button
             title="喜欢这个网站吗？点个赞吧！"
-            className="bg-primary-foreground/15 hover:bg-primary-foreground/25 relative flex h-9 w-9 items-center justify-center rounded-full transition-transform duration-150 hover:scale-110 active:scale-90"
+            className="bg-primary-foreground/15 hover:bg-primary-foreground/25 relative flex h-9 w-9 items-center justify-center rounded-full transition-transform duration-150 hover:scale-110 active:scale-95"
             onClick={handleLike}
           >
             <LikeAnimation />
-            <span className="bg-destructive absolute -top-1 -right-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold text-white">
+            <span className="bg-destructive absolute -top-1 -right-1 min-w-5 rounded-full px-1.5 py-0.5 text-center text-[10px] font-bold text-white tabular-nums">
               {likesCount}
             </span>
           </button>
@@ -169,7 +169,7 @@ export function BentoHero() {
       <div className="relative z-10 mt-5 flex items-center justify-between gap-3">
         <button
           onClick={() => navigate('/todos')}
-          className="bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30 rounded-full px-5 py-2 text-sm font-semibold backdrop-blur-md transition-all active:scale-95"
+          className="bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30 rounded-full px-5 py-2 text-sm font-semibold backdrop-blur-md transition-transform active:scale-[0.96]"
         >
           Check Today's Tasks
         </button>

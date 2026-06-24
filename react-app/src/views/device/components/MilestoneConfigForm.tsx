@@ -269,9 +269,9 @@ export function MilestoneConfigForm({
           transition={{ type: 'spring', duration: 0.4 }}
           className="fixed inset-x-4 inset-y-24 z-50 flex items-center justify-center sm:inset-x-auto sm:inset-y-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2"
         >
-          <div className="bg-card max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl shadow-2xl">
+          <div className="bg-background max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl shadow-2xl">
             {/* Header */}
-            <div className="border-border bg-card sticky top-0 z-10 border-b px-6 pt-6 pb-4">
+            <div className="border-border bg-background sticky top-0 z-10 border-b px-6 pt-6 pb-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className="bg-primary shadow-primary/30 flex h-10 w-10 items-center justify-center rounded-xl shadow-lg">
@@ -297,7 +297,7 @@ export function MilestoneConfigForm({
               className="bg-background space-y-6 p-6"
             >
               {/* Enable Toggle */}
-              <div className="border-border bg-card flex items-center justify-between rounded-2xl border px-5 py-4 shadow-sm">
+              <div className="border-border bg-background flex items-center justify-between rounded-2xl border px-5 py-4 shadow-sm">
                 <div className="flex items-center gap-3">
                   {form.enabled ? (
                     <div className="bg-primary flex h-9 w-9 items-center justify-center rounded-xl shadow-md">
@@ -327,7 +327,7 @@ export function MilestoneConfigForm({
                   }`}
                 >
                   <span
-                    className={`bg-card absolute top-0.5 h-5 w-5 rounded-full shadow-md transition-transform duration-300 ${
+                    className={`bg-background absolute top-0.5 h-5 w-5 rounded-full shadow-md transition-transform duration-300 ${
                       form.enabled ? 'translate-x-5.5' : 'translate-x-0.5'
                     }`}
                   />
@@ -355,7 +355,7 @@ export function MilestoneConfigForm({
                         className={`relative flex flex-col items-center gap-1 rounded-xl px-3 py-3 text-xs font-semibold transition-all duration-200 ${
                           active
                             ? 'bg-primary text-primary-foreground shadow-primary/25 shadow-lg'
-                            : 'bg-card text-muted-foreground hover:bg-muted shadow-sm'
+                            : 'bg-background text-muted-foreground hover:bg-muted shadow-sm'
                         }`}
                       >
                         <span className="text-base">
@@ -371,7 +371,7 @@ export function MilestoneConfigForm({
                           Day {preset.days}
                         </span>
                         {active && (
-                          <span className="bg-card absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full shadow">
+                          <span className="bg-background absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full shadow">
                             <ChevronRight size={8} className="text-primary" />
                           </span>
                         )}
@@ -389,7 +389,7 @@ export function MilestoneConfigForm({
                       value={customMilestone}
                       onChange={(e) => setCustomMilestone(e.target.value)}
                       placeholder="自定义天数..."
-                      className="border-input bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-ring w-full rounded-xl border py-2.5 pr-16 pl-4 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                      className="border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-ring w-full rounded-xl border py-2.5 pr-16 pl-4 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                     />
                     <span className="text-muted-foreground pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-xs">
                       天
@@ -398,7 +398,7 @@ export function MilestoneConfigForm({
                   <button
                     type="button"
                     onClick={addCustomMilestone}
-                    className="border-input bg-card text-muted-foreground hover:border-primary/30 hover:bg-primary/10 hover:text-primary flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-all active:scale-95"
+                    className="border-input bg-background text-muted-foreground hover:border-primary/30 hover:bg-primary/10 hover:text-primary flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-all active:scale-95"
                   >
                     <Plus size={18} />
                   </button>
@@ -462,7 +462,7 @@ export function MilestoneConfigForm({
                         className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold transition-all duration-200 ${
                           active
                             ? 'bg-primary text-primary-foreground shadow-primary/25 shadow-lg'
-                            : 'bg-card text-muted-foreground hover:bg-muted shadow-sm'
+                            : 'bg-background text-muted-foreground hover:bg-muted shadow-sm'
                         }`}
                       >
                         {opt.icon}
@@ -483,7 +483,7 @@ export function MilestoneConfigForm({
                       value={form.email}
                       onChange={(e) => set('email', e.target.value)}
                       placeholder="example@domain.com"
-                      className="border-input bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-ring w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                      className="border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-ring w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                     />
                   </label>
                 )}
@@ -500,7 +500,7 @@ export function MilestoneConfigForm({
                         set('feishu_webhook_url', e.target.value)
                       }
                       placeholder="https://open.feishu.cn/open-apis/bot/v2/hook/..."
-                      className="border-input bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-ring w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                      className="border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-ring w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                     />
                   </label>
                 )}
@@ -515,7 +515,7 @@ export function MilestoneConfigForm({
                       value={form.bark_device_key}
                       onChange={(e) => set('bark_device_key', e.target.value)}
                       placeholder="设备Key或完整推送URL"
-                      className="border-input bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-ring w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                      className="border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-ring w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                     />
                   </label>
                 )}

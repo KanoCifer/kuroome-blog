@@ -18,7 +18,6 @@
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-
       <div
         v-if="image"
         class="fixed inset-0 z-9999 flex items-center justify-center p-4 md:p-8"
@@ -32,7 +31,7 @@
           role="dialog"
           aria-modal="true"
           aria-labelledby="pdm-title"
-          class="bg-card text-card-foreground border-border/60 relative z-10 grid w-full max-w-5xl overflow-hidden rounded-2xl border shadow-[0_12px_32px_color-mix(in_oklch,var(--ink)_10%,transparent)]  md:grid-cols-[1.45fr_1fr]"
+          class="bg-background text-card-foreground border-border/60 relative z-10 grid w-full max-w-5xl overflow-hidden rounded-2xl border shadow-[0_12px_32px_color-mix(in_oklch,var(--ink)_10%,transparent)] md:grid-cols-[1.45fr_1fr]"
         >
           <!-- ============= 左侧：胶片查看 ============= -->
           <section
@@ -232,7 +231,7 @@
               role="group"
               aria-label="拍摄参数"
             >
-              <div class="bg-card p-2.5">
+              <div class="bg-background p-2.5">
                 <div
                   class="text-muted-foreground mb-1 text-[10px] tracking-[0.16em] uppercase"
                   style="font-family: var(--font-mono)"
@@ -249,7 +248,7 @@
                   {{ camera }}
                 </div>
               </div>
-              <div class="bg-card p-2.5">
+              <div class="bg-background p-2.5">
                 <div
                   class="text-muted-foreground mb-1 text-[10px] tracking-[0.16em] uppercase"
                   style="font-family: var(--font-mono)"
@@ -266,7 +265,7 @@
                   {{ lens }}
                 </div>
               </div>
-              <div class="bg-card p-2.5">
+              <div class="bg-background p-2.5">
                 <div
                   class="text-muted-foreground mb-1 text-[10px] tracking-[0.16em] uppercase"
                   style="font-family: var(--font-mono)"
@@ -283,7 +282,7 @@
                   {{ aperture }}
                 </div>
               </div>
-              <div class="bg-card p-2.5">
+              <div class="bg-background p-2.5">
                 <div
                   class="text-muted-foreground mb-1 text-[10px] tracking-[0.16em] uppercase"
                   style="font-family: var(--font-mono)"
@@ -328,7 +327,7 @@
                 v-model="localDescription"
                 rows="4"
                 aria-label="编辑拍摄笔记"
-                class="bg-card text-foreground placeholder:text-muted-foreground focus:border-accent focus:ring-accent/20 w-full resize-y rounded-xl border border-[color-mix(in_oklch,var(--ink)_18%,transparent)] px-4 py-3.5 text-[14.5px] leading-[1.55] transition-shadow focus:ring-2 focus:outline-none"
+                class="bg-background text-foreground placeholder:text-muted-foreground focus:border-accent focus:ring-accent/20 w-full resize-y rounded-xl border border-[color-mix(in_oklch,var(--ink)_18%,transparent)] px-4 py-3.5 text-[14.5px] leading-[1.55] transition-shadow focus:ring-2 focus:outline-none"
                 style="font-family: var(--font-sans)"
                 @keydown.esc="toggleEdit"
               ></textarea>
@@ -336,7 +335,7 @@
               <p
                 v-else
                 :class="[
-                  'min-h-24 rounded-xl border border-dashed px-4 py-3.5 text-[18px] leading-[1.55] whitespace-pre-wrap font-family-dongfang',
+                  'font-family-dongfang min-h-24 rounded-xl border border-dashed px-4 py-3.5 text-[18px] leading-[1.55] whitespace-pre-wrap',
                   isEmpty
                     ? 'text-muted-foreground/70 grid place-items-center text-center italic'
                     : 'text-foreground/90',

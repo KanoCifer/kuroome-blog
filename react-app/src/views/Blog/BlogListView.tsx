@@ -31,7 +31,7 @@ function PostCard({ post, index }: PostCardProps) {
       transition={{ type: 'spring', duration: 0.5, delay: index * 0.06 }}
     >
       <Link to={`/blog/${post._id}`} className="group block">
-        <article className="border-border/40 bg-card group-hover:border-primary/25 relative overflow-hidden rounded-3xl border p-6 shadow-sm transition-all duration-500 ease-out group-hover:-translate-y-1.5 group-hover:shadow-md">
+        <article className="border-border/40 bg-background group-hover:border-primary/25 relative overflow-hidden rounded-3xl border p-6 shadow-sm transition-all duration-500 ease-out group-hover:-translate-y-1.5 group-hover:shadow-md">
           {post.cover && (
             <div className="border-border bg-muted mb-4 aspect-[16/9] overflow-hidden rounded-2xl border">
               <img
@@ -256,7 +256,7 @@ export default function BlogListView() {
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             placeholder="搜索文章标题和内容..."
-            className="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 block w-full rounded-xl border py-3 pr-4 pl-10 text-sm focus:ring-2 focus:outline-none"
+            className="border-border bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 block w-full rounded-xl border py-3 pr-4 pl-10 text-sm focus:ring-2 focus:outline-none"
           />
           {searchQuery && (
             <button

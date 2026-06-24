@@ -198,7 +198,7 @@ export default function Login() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
-          className={`} border-border/50 bg-card/70 w-full max-w-100 rounded-4xl border p-6 shadow-xl`}
+          className={`} border-border/50 bg-background/70 w-full max-w-100 rounded-4xl border p-6 shadow-xl`}
         >
           <form className="flex flex-col" onSubmit={handleSubmit}>
             {/* Username Field */}
@@ -280,7 +280,7 @@ export default function Login() {
                   }
                   className="peer sr-only"
                 />
-                <div className="border-border bg-card peer-checked:border-primary peer-checked:bg-primary peer-focus:ring-ring/20 z-5 flex h-5.5 w-5.5 items-center justify-center rounded-lg border-2 transition-all duration-200 peer-focus:ring-2">
+                <div className="border-border bg-background peer-checked:border-primary peer-checked:bg-primary peer-focus:ring-ring/20 z-5 flex h-5.5 w-5.5 items-center justify-center rounded-lg border-2 transition-all duration-200 peer-focus:ring-2">
                   <svg
                     className="text-primary-foreground z-5 h-3 w-3 opacity-0 transition-all duration-200 peer-checked:opacity-100"
                     fill="none"
@@ -320,7 +320,7 @@ export default function Login() {
             <button
               type="button"
               disabled={isPasskeySubmitting}
-              className="bg-card text-foreground disabled:bg-muted flex w-full items-center justify-center space-x-2 rounded-full py-4 text-[15px] font-bold shadow-lg transition-all active:scale-[0.98] disabled:opacity-70"
+              className="bg-background text-foreground disabled:bg-muted flex w-full items-center justify-center space-x-2 rounded-full py-4 text-[15px] font-bold shadow-lg transition-all active:scale-[0.98] disabled:opacity-70"
               onClick={handlePasskeyLogin}
             >
               <IconKey className="size-5" />

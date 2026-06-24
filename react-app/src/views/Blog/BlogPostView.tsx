@@ -15,7 +15,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 function LoadingSkeleton() {
   return (
-    <div className="border-border bg-card animate-pulse space-y-6 rounded-2xl border p-6 shadow-sm sm:p-8">
+    <div className="border-border bg-background animate-pulse space-y-6 rounded-2xl border p-6 shadow-sm sm:p-8">
       <div className="space-y-4">
         <div className="bg-muted h-8 w-3/4 rounded-lg" />
         <div className="bg-muted h-4 w-1/4 rounded" />
@@ -374,7 +374,7 @@ export default function BlogPostView() {
             <div className="bg-muted mx-5 my-4 h-px" />
 
             {/* Content card */}
-            <div className="border-border bg-card mx-5 overflow-hidden rounded-2xl border shadow-sm">
+            <div className="border-border bg-background mx-5 overflow-hidden rounded-2xl border shadow-sm">
               <div className="p-5 sm:p-8">
                 {/* Article Summary */}
                 <ArticleSummaryCard
@@ -383,12 +383,13 @@ export default function BlogPostView() {
                 />
 
                 {/* Markdown body */}
-                <div
-                  ref={contentRef}
-                  className="prose prose-lg max-w-none"
-                >
+                <div ref={contentRef} className="prose prose-lg max-w-none">
                   {renderedBodyWithOrigin ? (
-                    <div dangerouslySetInnerHTML={{ __html: renderedBodyWithOrigin }} />
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: renderedBodyWithOrigin,
+                      }}
+                    />
                   ) : (
                     <p className="text-muted-foreground italic">暂无内容</p>
                   )}
@@ -411,7 +412,7 @@ export default function BlogPostView() {
             className="bg-foreground/80 fixed inset-0 backdrop-blur-sm"
             onClick={() => setShowDeleteDialog(false)}
           />
-          <div className="bg-card border-border relative w-full max-w-sm rounded-2xl border p-6 shadow-lg">
+          <div className="bg-background border-border relative w-full max-w-sm rounded-2xl border p-6 shadow-lg">
             <h3 className="text-foreground text-lg font-semibold">确认删除</h3>
             <p className="text-muted-foreground mt-2 text-sm">
               确定要删除这篇文章吗？此操作无法撤销。
