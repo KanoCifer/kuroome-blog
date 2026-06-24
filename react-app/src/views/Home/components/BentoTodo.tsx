@@ -40,7 +40,7 @@ export function BentoTodo() {
   ));
 
   return (
-    <BentoCard>
+    <BentoCard className="h-full">
       <div className="flex h-full flex-col">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-muted-foreground group-hover:text-foreground text-xs font-bold tracking-wide uppercase transition-colors duration-300">

@@ -20,7 +20,7 @@ export function BentoClock() {
   }, []);
 
   return (
-    <BentoCard>
+    <BentoCard className="h-full">
       <div>
         <svg
           className="text-primary h-6 w-6"

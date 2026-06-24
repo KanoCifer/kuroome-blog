@@ -153,7 +153,7 @@ export function BasicNav() {
           {showMenu && (
             <motion.div
               key="more-menu"
-              className="scrollbar-hide border-border/20 bg-card/80 fixed bottom-22 left-1/2 z-60 grid w-full max-w-[calc(100vw-4rem)] -translate-x-1/2 grid-cols-2 gap-2 overflow-hidden rounded-[2rem] border p-5 shadow-xl backdrop-blur-sm"
+              className="scrollbar-hide border-border/20 bg-card/80 fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] left-1/2 z-60 grid w-full max-w-[calc(100vw-4rem)] -translate-x-1/2 grid-cols-2 gap-2 overflow-hidden rounded-[2rem] border p-5 shadow-xl backdrop-blur-sm"
               initial="hidden"
               animate="visible"
               ref={ref}
@@ -261,7 +261,7 @@ export function BasicNav() {
           {hidden ? null : (
             <motion.nav
               id="mobile-nav"
-              className="bg-card/80 fixed bottom-4 left-1/2 z-65 flex h-16 max-w-md -translate-x-1/2 items-center justify-around rounded-full px-6 py-3 shadow-lg backdrop-blur-sm"
+              className="bg-card/80 fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] left-1/2 z-65 flex h-16 max-w-md -translate-x-1/2 items-center justify-around rounded-full px-6 py-3 shadow-lg backdrop-blur-sm"
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 80, opacity: 0 }}

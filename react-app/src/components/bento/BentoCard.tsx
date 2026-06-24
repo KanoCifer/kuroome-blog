@@ -16,7 +16,7 @@ export function BentoCard({ children, className, onClick }: BentoCardProps) {
           rgba(255, 255, 255, 0.35) 0px 0px 20px 0px inset
         `,
       }}
-      className={`bento-card squircle border-border/60 bg-card/75 rounded-[64px] border p-6 ${className || ''}`}
+      className={`bento-card border-border/60 bg-card/75 rounded-[var(--bento-radius,3.5rem)] border p-6 ${className || ''}`}
       onClick={onClick}
     >
       {children}

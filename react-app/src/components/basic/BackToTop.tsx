@@ -63,7 +63,7 @@ export function BackToTop({ className }: BackToTopProps) {
             onClick={backToTop}
             aria-label="回到顶部"
             title="回到顶部"
-            className={`group z-50 flex h-14 w-14 transform-gpu cursor-pointer items-center justify-center overflow-hidden rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:shadow-2xl focus:outline-none ${className || 'fixed bottom-12 left-1/2 -translate-x-1/2'}`}
+            className={`group z-50 flex h-14 w-14 transform-gpu cursor-pointer items-center justify-center overflow-hidden rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:shadow-2xl focus:outline-none ${className || 'fixed bottom-[calc(3rem+env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2'}`}
           >
             {/* 背景进度环 */}
             <svg

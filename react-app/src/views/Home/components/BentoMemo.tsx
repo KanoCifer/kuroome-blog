@@ -37,8 +37,8 @@ export function BentoMemo() {
 
   return (
     <>
-      <div onClick={toggleMemo} className="cursor-pointer">
-        <BentoCard>
+      <div onClick={toggleMemo} className="h-full cursor-pointer">
+        <BentoCard className="h-full">
           <div className="bg-warning/20 flex h-10 w-10 items-center justify-center rounded-lg">
             <MemoIcon className="text-warning size-6" />
           </div>

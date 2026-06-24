@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 export function BentoMap() {
   return (
     <Link to="/fishing-map" className="group block h-full">
-      <BentoCard className="min-w-0 cursor-pointer p-5">
+      <BentoCard className="h-full min-w-0 cursor-pointer p-5">
         <div className="flex h-full flex-col justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="bg-primary/10 text-primary ring-primary/20 flex size-10 items-center justify-center rounded-2xl ring-1 sm:size-12">
