@@ -20,6 +20,7 @@ function cleanup() {
     activeElement.value.style.zIndex = '';
     activeElement.value.style.cursor = '';
     activeElement.value.style.translate = '';
+    activeElement.value.style.willChange = '';
   }
   draggingCard.value = null;
   activeElement.value = null;
@@ -85,6 +86,7 @@ export function useCardDrag() {
 
     element.style.zIndex = '100';
     element.style.cursor = 'grabbing';
+    element.style.willChange = 'transform';
 
     // Register listeners lazily — only while dragging
     window.addEventListener('pointermove', onPointerMove);
