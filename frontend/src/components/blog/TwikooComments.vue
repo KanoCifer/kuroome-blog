@@ -50,7 +50,3 @@ watch(
     </div>
   </div>
 </template>
-
-<style>
-@import 'twikoo/dist/twikoo.css';
-</style>
