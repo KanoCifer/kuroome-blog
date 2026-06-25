@@ -3,15 +3,23 @@ import { defineStore } from 'pinia';
 
 export type BackgroundMode = 'fixed' | 'random';
 
-const BACKGROUND_IMAGES = Array.from(
-  { length: 15 },
-  (_, i) => `/background/bg-${i + 1}.webp`,
-);
+const BACKGROUND_IMAGES = [
+  '/background/bg-4.webp',
+  '/background/bg-6.webp',
+  '/background/bg-7.webp',
+  '/background/bg-8.webp',
+  '/background/bg-11.webp',
+  '/background/bg-14.webp',
+];
 
-const BACKGROUND_THUMBS = Array.from(
-  { length: 15 },
-  (_, i) => `/background/thumb/bg-${i + 1}.webp`,
-);
+const BACKGROUND_THUMBS = [
+  '/background/thumb/bg-4.webp',
+  '/background/thumb/bg-6.webp',
+  '/background/thumb/bg-7.webp',
+  '/background/thumb/bg-8.webp',
+  '/background/thumb/bg-11.webp',
+  '/background/thumb/bg-14.webp',
+];
 
 export const useBackgroundStore = defineStore('background', () => {
   const mode = ref<BackgroundMode>(
