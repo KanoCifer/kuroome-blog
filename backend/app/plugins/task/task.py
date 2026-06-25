@@ -39,7 +39,11 @@ _result_backend = RedisAsyncResultBackend(
 )
 
 broker: AioPikaBroker = (
-    AioPikaBroker(get_settings().RABBITMQ_URL)
+    AioPikaBroker(
+        get_settings().RABBITMQ_URL,
+        heartbeat=120,
+        connection_name="taskiq-worker",
+    )
     .with_result_backend(_result_backend)
     .with_middlewares(
         SmartRetryMiddleware(
