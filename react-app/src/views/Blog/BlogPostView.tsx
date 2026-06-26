@@ -1,5 +1,4 @@
 import { ArticleSummaryCard } from '@/components/basic/ArticleSummary';
-import { BackToTop } from '@/components/basic/BackToTop';
 import type { BlogDetail } from '@/services/blogService';
 import { blogService } from '@/services/blogService';
 import { TwikooComments } from '@/components/blog/TwikooComments';
@@ -7,7 +6,6 @@ import { useAuthStore } from '@/stores/authState';
 import { useNotificationStore } from '@/stores/notificationState';
 import { formatDate } from '@/utils/formatdate';
 import { useOrigin } from '@/hooks/useOrigin';
-import { AnimatePresence, motion } from 'framer-motion';
 import hljs from 'highlight.js/lib/common';
 import 'highlight.js/styles/github.css';
 import { marked } from 'marked';
@@ -16,18 +14,16 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 function LoadingSkeleton() {
   return (
-    <div className="border-border bg-background animate-pulse space-y-6 rounded-2xl border p-6 shadow-sm sm:p-8">
-      <div className="space-y-4">
-        <div className="bg-muted h-8 w-3/4 rounded-lg" />
-        <div className="bg-muted h-4 w-1/4 rounded" />
-      </div>
-      <div className="bg-border/60 h-1 w-16" />
-      <div className="space-y-3">
-        <div className="bg-muted h-4 w-full rounded" />
-        <div className="bg-muted h-4 w-full rounded" />
-        <div className="bg-muted h-4 w-5/6 rounded" />
-        <div className="bg-muted h-4 w-full rounded" />
-        <div className="bg-muted h-4 w-4/5 rounded" />
+    <div className="mx-auto max-w-[42rem] px-6 py-16">
+      <div className="bg-muted/70 mb-8 h-5 w-20 rounded skeleton-pulse" />
+      <div className="bg-muted/70 mb-4 h-9 w-4/5 rounded skeleton-pulse" />
+      <div className="bg-muted/70 mb-12 h-4 w-2/5 rounded skeleton-pulse" />
+      <div className="bg-muted/70 aspect-[16/9] w-full rounded-xl skeleton-pulse" />
+      <div className="mt-10 space-y-4">
+        <div className="bg-muted/70 h-4 w-full rounded skeleton-pulse" />
+        <div className="bg-muted/70 h-4 w-full rounded skeleton-pulse" />
+        <div className="bg-muted/70 h-4 w-5/6 rounded skeleton-pulse" />
+        <div className="bg-muted/70 h-4 w-full rounded skeleton-pulse" />
       </div>
     </div>
   );
@@ -262,73 +258,37 @@ export default function BlogPostView() {
     <div className="bg-background min-h-dvh">
       <ReadingProgress />
 
-      {/* Header */}
-      <div className="bg-surface/90 sticky top-0 z-20 border-b border-border/40 backdrop-blur-md">
-        <div className="mx-auto flex w-full max-w-md items-center gap-3 px-[max(1rem,env(safe-area-inset-left))] py-3 pr-[max(1rem,env(safe-area-inset-right))]">
-          <button
-            onClick={() => navigate(-1)}
-            className="hover:bg-muted active:scale-[0.96] flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all duration-150"
-            aria-label="返回"
-          >
-            <svg
-              className="text-foreground h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
-          <h1 className="text-foreground flex-1 truncate text-base font-medium">
-            {post?.title || '文章'}
-          </h1>
-        </div>
+      {/* 极简返回条：替代旧 Scroll 指示器，回随笔录 */}
+      <div className="mx-auto max-w-[42rem] px-6 pt-10 sm:pt-14">
+        <a
+          onClick={() => navigate('/blog')}
+          className="text-muted-foreground hover:text-primary group inline-flex items-center gap-1.5 text-[13px] font-medium tracking-wide transition-colors cursor-pointer"
+        >
+          <span className="transition-transform duration-200 group-hover:-translate-x-0.5">←</span>
+          随笔录
+        </a>
       </div>
 
-      <AnimatePresence mode="wait">
-        {isLoading ? (
-          <motion.div
-            key="loading"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="mx-auto w-full max-w-md px-[max(1.25rem,env(safe-area-inset-left))] pt-6 pr-[max(1.25rem,env(safe-area-inset-right))]"
-          >
-            <LoadingSkeleton />
-          </motion.div>
+      {isLoading ? (
+          <LoadingSkeleton />
         ) : error ? (
-          <motion.div
-            key="error"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="mx-auto w-full max-w-md px-[max(1.25rem,env(safe-area-inset-left))] pt-6 pr-[max(1.25rem,env(safe-area-inset-right))]"
-          >
+          <div className="mx-auto max-w-[42rem] px-6 py-24">
             <ErrorState message={error} onRetry={fetchPost} />
-          </motion.div>
+          </div>
         ) : post ? (
-          <motion.article
-            key="content"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="mx-auto w-full max-w-md px-[max(1.25rem,env(safe-area-inset-left))] pb-24 pr-[max(1.25rem,env(safe-area-inset-right))]"
+          <article
+            className="mx-auto max-w-[42rem] px-6 pt-8 pb-20 sm:pt-10"
           >
             {/* Admin actions */}
             {showEditButton && (
-              <div className="mt-4 flex items-center justify-end gap-2">
+              <div className="mb-8 flex items-center justify-end gap-2">
                 <button
                   onClick={() => navigate(`/blog/edit/${post._id}`)}
-                  className="bg-muted text-foreground hover:bg-muted/80 active:scale-[0.96] inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-150"
+                  className="bg-muted text-foreground hover:bg-muted/80 active:scale-[0.96] inline-flex cursor-pointer items-center gap-2 rounded-lg px-3.5 py-1.5 text-[13px] font-medium transition-all duration-150"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
+                    className="h-3.5 w-3.5"
                     fill="none"
                     viewBox="0 0 24 24"
                     strokeWidth="1.5"
@@ -344,11 +304,11 @@ export default function BlogPostView() {
                 </button>
                 <button
                   onClick={() => setShowDeleteDialog(true)}
-                  className="bg-destructive/10 text-destructive hover:bg-destructive/15 active:scale-[0.96] inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-150"
+                  className="bg-destructive/10 text-destructive hover:bg-destructive/15 active:scale-[0.96] inline-flex cursor-pointer items-center gap-2 rounded-lg px-3.5 py-1.5 text-[13px] font-medium transition-all duration-150"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
+                    className="h-3.5 w-3.5"
                     fill="none"
                     viewBox="0 0 24 24"
                     strokeWidth="1.5"
@@ -365,47 +325,53 @@ export default function BlogPostView() {
               </div>
             )}
 
-            {/* Article header — editorial */}
-            <header className="pt-8">
-              {/* Eyebrow / kicker */}
-              <div className="text-primary mb-4 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em]">
-                <span className="bg-primary h-px w-5" />
-                {post.category?.name || '未分类'}
-              </div>
+            {/* 刊号式元信息带：出版物气质，mono 大字距 */}
+            <div className="text-muted-foreground mb-6 flex items-center justify-between border-b pb-3 font-mono text-[10px] tracking-[0.18em] uppercase">
+              <span>Vol · 随笔录</span>
+              <span className="text-muted-foreground/70">No · {post._id?.slice(-6) || '——'}</span>
+            </div>
 
-              {/* Headline */}
-              <h1
-                data-od-id="headline"
-                className="text-foreground text-[1.875rem] leading-[1.18] font-semibold tracking-[-0.01em] sm:text-[2.125rem]"
-              >
-                {post.title}
-              </h1>
+            {/* Eyebrow / kicker */}
+            <div className="text-primary mb-5 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em]">
+              <span className="bg-primary h-px w-5" />
+              {post.category?.name || '未分类'}
+            </div>
 
-              {/* Deck / standfirst — 阅读时长 + 字数，作为引言式元信息 */}
-              <p className="text-muted-foreground mt-4 text-[15px] leading-relaxed tabular-nums">
-                约 {stats.minutes} 分钟阅读 · {stats.count.toLocaleString()} 字
-              </p>
+            {/* Headline */}
+            <h1 className="text-foreground font-serif text-[clamp(1.875rem,5vw,2.5rem)] leading-[1.18] font-medium tracking-[-0.02em] text-balance">
+              {post.title}
+            </h1>
 
-              {/* Byline / dateline */}
-              <div className="text-muted-foreground mt-5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs tracking-wide">
+            {/* Deck — 阅读时长 + 字数 */}
+            <p className="text-muted-foreground mt-5 text-[15px] leading-relaxed tracking-[0.01em] tabular-nums">
+              约 {stats.minutes} 分钟阅读 · {stats.count.toLocaleString()} 字
+            </p>
+
+            {/* Byline / dateline */}
+            <div className="text-muted-foreground mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[13px] tracking-[0.02em]">
+              {post.author && (
+                <span className="text-foreground/80 font-medium">{post.author}</span>
+              )}
+              {post.author && post.created_at && (
+                <span className="bg-border h-3 w-px" />
+              )}
+              {post.created_at && (
                 <time dateTime={post.created_at}>
-                  {post.created_at ? formatDate(post.created_at, 'YYYY-MM-DD') : '未知日期'}
+                  {formatDate(post.created_at, 'YYYY-MM-DD')}
                 </time>
-                {hasUpdate && (
-                  <>
-                    <span className="bg-border h-3 w-px" />
-                    <span>
-                      更新于 {formatDate(post.updated_at!, 'YYYY-MM-DD')}
-                    </span>
-                  </>
-                )}
-              </div>
-            </header>
+              )}
+              {hasUpdate && (
+                <>
+                  <span className="bg-border h-3 w-px" />
+                  <span>更新于 {formatDate(post.updated_at!, 'YYYY-MM-DD')}</span>
+                </>
+              )}
+            </div>
 
-            {/* Hero image + caption */}
+            {/* 封面置顶：主视觉先行 */}
             {post.cover && (
-              <figure className="mt-7">
-                <div className="border-border bg-muted aspect-[16/9] overflow-hidden rounded-xl border">
+              <figure className="mb-10 mt-10 overflow-hidden rounded-xl">
+                <div className="bg-muted aspect-[16/9] w-full overflow-hidden">
                   <img
                     src={coverSrc}
                     alt={`${post.title} 封面`}
@@ -414,19 +380,16 @@ export default function BlogPostView() {
                     style={{ boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.08)' }}
                   />
                 </div>
-                <figcaption className="text-muted-foreground mt-2 text-[11px] tracking-[0.04em]">
+                <figcaption className="text-muted-foreground mt-2.5 text-[11px] tracking-[0.04em]">
                   封面 · {post.category?.name || 'ReadingList'}
                 </figcaption>
               </figure>
             )}
 
-            {/* Content */}
-            <div className="mt-9">
-              {/* Article Summary */}
+            {/* 正文 */}
+            <div className="prose prose-lg max-w-none">
               <ArticleSummaryCard title={post?.title} content={post?.body || ''} />
-
-              {/* Markdown body */}
-              <div ref={contentRef} className="prose prose-lg mt-7 max-w-none">
+              <div ref={contentRef} className="prose-body whitespace-pre-wrap">
                 {renderedBodyWithOrigin ? (
                   <div
                     dangerouslySetInnerHTML={{
@@ -439,19 +402,30 @@ export default function BlogPostView() {
               </div>
             </div>
 
-            {/* Article footer — 复制链接 + 更新时间 */}
-            <footer className="mt-12 border-t border-border/60 pt-6">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="text-muted-foreground text-xs tracking-wide">
-                  {hasUpdate
-                    ? `最后更新于 ${formatDate(post.updated_at!, 'YYYY-MM-DD')}`
-                    : post.created_at
-                      ? `发布于 ${formatDate(post.created_at, 'YYYY-MM-DD')}`
-                      : ''}
+            {/* 文章脚：作者署名块 + 复制链接 */}
+            <footer className="border-border mt-14 border-t pt-8">
+              <div className="flex flex-wrap items-start justify-between gap-5">
+                <div className="flex items-center gap-3.5">
+                  <span className="text-foreground ring-border flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-muted font-serif text-sm font-semibold ring-1">
+                    {(post.author || 'K').slice(0, 1)}
+                  </span>
+                  <div className="min-w-0">
+                    <div className="text-foreground text-[14px] font-medium tracking-wide">
+                      {post.author || 'Kurroome'}
+                    </div>
+                    <div className="text-muted-foreground text-[12px] tracking-[0.02em] mt-0.5">
+                      {hasUpdate
+                        ? `最后更新于 ${formatDate(post.updated_at!, 'YYYY-MM-DD')}`
+                        : post.created_at
+                          ? `发布于 ${formatDate(post.created_at, 'YYYY-MM-DD')}`
+                          : ''}
+                    </div>
+                  </div>
                 </div>
                 <button
+                  type="button"
                   onClick={handleCopyLink}
-                  className="text-muted-foreground hover:text-primary active:scale-[0.96] inline-flex cursor-pointer items-center gap-1.5 text-xs font-medium tracking-wide transition-all duration-150"
+                  className="text-muted-foreground hover:text-primary active:scale-[0.96] inline-flex cursor-pointer items-center gap-1.5 text-[12px] font-medium tracking-[0.02em] transition-all duration-150"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -476,11 +450,8 @@ export default function BlogPostView() {
             <div className="mt-10">
               <TwikooComments path={`/blog/${postId}`} />
             </div>
-          </motion.article>
+          </article>
         ) : null}
-      </AnimatePresence>
-
-      <BackToTop className="fixed right-4 bottom-[calc(env(safe-area-inset-bottom,0px)+5.5rem)]" />
 
       {/* Delete confirmation dialog */}
       {showDeleteDialog && (

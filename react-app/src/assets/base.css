@@ -258,3 +258,17 @@ footer {
 .amap-mini .amap-copyright {
   display: none !important;
 }
+
+/* Skeleton pulse — gentler than Tailwind's animate-pulse */
+.skeleton-pulse {
+  animation: skeleton-pulse 1.8s ease-in-out infinite;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+}
