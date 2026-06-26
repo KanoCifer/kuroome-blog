@@ -22,10 +22,8 @@ watch(
 </script>
 
 <template>
-  <div
-    class="border-border bg-background overflow-hidden rounded-2xl border shadow-sm"
-  >
-    <div class="border-border flex gap-2 border-b px-8 py-5">
+  <div class="">
+    <div class="flex gap-2 border-b px-1 py-5">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="24"

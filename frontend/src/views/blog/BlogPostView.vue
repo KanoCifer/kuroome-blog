@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { BasicDetail } from '@/components/basic';
 import ArticleSummaryCard from '@/components/blog/ArticleSummaryCard.vue';
 import TwikooComments from '@/components/blog/TwikooComments.vue';
 import {
@@ -12,7 +11,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 import DelIcon from '@/components/icons/DelIcon.vue';
 import EditIcon from '@/components/icons/EditIcon.vue';
 import { blogGateway } from '@/api/public';
@@ -65,8 +63,56 @@ const handleRetry = () => {
   fetchPost();
 };
 
+// 阅读统计：剥离 markdown 标记后，分别计中文字符与西文词数，
+// 按 400 字/分钟（中文）+ 200 词/分钟（西文）估算阅读时长。
+// 不编造指标——无正文时返回 1 分钟 / 0 字。
+function readingStats(body: string): { minutes: number; count: number } {
+  if (!body) return { minutes: 1, count: 0 };
+  const plain = body
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/`[^`]*`/g, ' ')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/[#>*_~]/g, ' ')
+    .replace(/\s+/g, ' ');
+  const cjk = (plain.match(/[一-鿿]/g) || []).length;
+  const words = (plain.replace(/[一-鿿]/g, ' ').match(/[A-Za-z0-9]+/g) || [])
+    .length;
+  const count = cjk + words;
+  const minutes = Math.max(1, Math.round(cjk / 400 + words / 200));
+  return { minutes, count };
+}
+
+const stats = computed(() => readingStats(post.value?.body || ''));
+
+// 更新时间仅在与创建时间不同时才展示，避免噪音
+const hasUpdate = computed(
+  () =>
+    !!post.value?.updated_at &&
+    !!post.value?.created_at &&
+    post.value.updated_at !== post.value.created_at,
+);
+
+// 顶部阅读进度条：跟随窗口滚动
+const readProgress = ref(0);
+const updateProgress = () => {
+  const el = document.documentElement;
+  const max = el.scrollHeight - el.clientHeight;
+  readProgress.value = max > 0 ? Math.min(1, el.scrollTop / max) : 0;
+};
+
+const handleCopyLink = () => {
+  navigator.clipboard
+    .writeText(window.location.href)
+    .then(() => useNotificationStore().success('链接已复制'))
+    .catch(() => useNotificationStore().error('复制失败'));
+};
+
 onMounted(() => {
   fetchPost();
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  window.addEventListener('resize', updateProgress);
+  updateProgress();
 });
 
 watch(
@@ -112,14 +158,6 @@ const renderedBodyWithOrigin = computed(() => {
       return `<img ${pre}src="${fixed}"${post}>`;
     },
   );
-});
-
-const subtitle = computed(() => {
-  if (!post.value) return '';
-  const { author, created_at, category } = post.value;
-  return [author, created_at && formatDate(created_at), category?.name]
-    .filter(Boolean)
-    .join(' · ');
 });
 
 useHead(() => {
@@ -251,152 +289,245 @@ onUnmounted(() => {
   if (contentContainer && clickHandler) {
     contentContainer.removeEventListener('click', clickHandler);
   }
+  window.removeEventListener('scroll', updateProgress);
+  window.removeEventListener('resize', updateProgress);
 });
 </script>
 
 <template>
-  <div>
-    <BasicDetail :title="post?.title || ''" :subtitle="subtitle">
-      <!-- Loading -->
-      <div v-if="isLoading" class="sm:col-span-2 lg:col-span-3">
-        <div
-          class="border-border bg-background animate-pulse space-y-6 rounded-2xl border p-8 shadow-sm"
+  <div class="blog-post bg-background">
+    <!-- 阅读进度条：跟随窗口滚动 -->
+    <div
+      class="bg-border/50 fixed inset-x-0 top-0 z-30 h-[2px] overflow-hidden"
+      aria-hidden="true"
+    >
+      <div
+        class="bg-primary h-full origin-left transition-[width] duration-150 ease-out will-change-[width]"
+        :style="{ width: `${readProgress * 100}%` }"
+      ></div>
+    </div>
+
+    <!-- 极简返回条：替代旧 Scroll 指示器，回随笔录 -->
+    <div class="mx-auto max-w-[42rem] px-6 pt-10 sm:pt-14">
+      <router-link
+        to="/blog"
+        class="text-muted-foreground hover:text-primary group inline-flex items-center gap-1.5 text-[13px] font-medium tracking-wide transition-colors"
+      >
+        <span
+          class="transition-transform duration-200 group-hover:-translate-x-0.5"
+          >←</span
         >
-          <div class="bg-muted mb-6 h-8 w-3/4 rounded" />
-          <div class="mb-8 flex gap-4">
-            <div class="bg-muted h-4 w-24 rounded" />
-            <div class="bg-muted h-4 w-32 rounded" />
-          </div>
-          <div class="space-y-4">
-            <div class="bg-muted h-4 w-full rounded" />
-            <div class="bg-muted h-4 w-full rounded" />
-            <div class="bg-muted h-4 w-5/6 rounded" />
-            <div class="bg-muted h-4 w-full rounded" />
-            <div class="bg-muted h-4 w-4/5 rounded" />
-          </div>
-        </div>
+        随笔录
+      </router-link>
+    </div>
+
+    <!-- Loading -->
+    <div v-if="isLoading" class="mx-auto max-w-[42rem] px-6 py-16">
+      <div class="bg-muted/70 mb-8 h-5 w-20 rounded skeleton-pulse" />
+      <div class="bg-muted/70 mb-4 h-9 w-4/5 rounded skeleton-pulse" />
+      <div class="bg-muted/70 mb-12 h-4 w-2/5 rounded skeleton-pulse" />
+      <div class="bg-muted/70 aspect-[16/9] w-full rounded-xl skeleton-pulse" />
+      <div class="mt-10 space-y-4">
+        <div class="bg-muted/70 h-4 w-full rounded skeleton-pulse" />
+        <div class="bg-muted/70 h-4 w-full rounded skeleton-pulse" />
+        <div class="bg-muted/70 h-4 w-5/6 rounded skeleton-pulse" />
+        <div class="bg-muted/70 h-4 w-full rounded skeleton-pulse" />
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div v-else-if="errorMessage" class="mx-auto max-w-[42rem] px-6 py-24">
+      <div
+        class="border-destructive/30 bg-destructive/5 flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 text-center"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="text-destructive mb-4 h-12 w-12"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+          />
+        </svg>
+        <p class="text-destructive text-lg font-medium">加载失败</p>
+        <p class="text-muted-foreground mt-1 text-sm">{{ errorMessage }}</p>
+        <button
+          @click="handleRetry"
+          class="bg-destructive/90 hover:bg-destructive active:scale-[0.96] mt-4 cursor-pointer rounded-lg px-4 py-2 text-sm font-medium text-white transition-all duration-150"
+        >
+          重试
+        </button>
+      </div>
+    </div>
+
+    <!-- Article -->
+    <article
+      v-else-if="post"
+      class="mx-auto max-w-[42rem] px-6 pt-8 pb-20 sm:pt-10"
+    >
+      <!-- 管理员操作 -->
+      <div
+        v-if="showEditButton"
+        class="mb-8 flex items-center justify-end gap-2"
+      >
+        <router-link
+          :to="`/blog/${post._id}/edit`"
+          class="bg-muted text-foreground hover:bg-muted/80 active:scale-[0.96] inline-flex cursor-pointer items-center gap-2 rounded-lg px-3.5 py-1.5 text-[13px] font-medium transition-all duration-150"
+        >
+          <EditIcon />
+          编辑
+        </router-link>
+        <button
+          @click="showDeleteDialog = true"
+          class="bg-destructive/10 text-destructive hover:bg-destructive/15 active:scale-[0.96] inline-flex cursor-pointer items-center gap-2 rounded-lg px-3.5 py-1.5 text-[13px] font-medium transition-all duration-150"
+        >
+          <DelIcon />
+          删除
+        </button>
       </div>
 
-      <!-- Error -->
-      <div v-else-if="errorMessage" class="sm:col-span-2 lg:col-span-3">
-        <div
-          class="border-destructive/30 bg-destructive/5 flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 text-center"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="text-destructive mb-4 h-12 w-12"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-            />
-          </svg>
-          <p class="text-destructive text-lg font-medium">加载失败</p>
-          <p class="text-muted-foreground mt-1 text-sm">{{ errorMessage }}</p>
-          <button
-            @click="handleRetry"
-            class="bg-destructive/90 hover:bg-destructive mt-4 cursor-pointer rounded-lg px-4 py-2 text-sm font-medium text-white"
-          >
-            重试
-          </button>
+      <!-- 封面置顶：主视觉先行 -->
+      <figure v-if="post.cover" class="mb-10 overflow-hidden rounded-xl">
+        <div class="bg-muted aspect-[16/9] w-full overflow-hidden">
+          <img
+            :src="coverSrc"
+            :alt="`${post.title} 封面`"
+            class="h-full w-full object-cover"
+            loading="lazy"
+            style="box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);"
+          />
         </div>
-      </div>
-
-      <!-- Content -->
-      <template v-else>
-        <div
-          v-if="showEditButton && post"
-          class="flex items-center justify-end gap-2 sm:col-span-2 lg:col-span-3"
+        <figcaption
+          class="text-muted-foreground mt-2.5 text-[11px] tracking-[0.04em]"
         >
-          <router-link
-            :to="`/blog/${post._id}/edit`"
-            class="bg-muted text-foreground hover:bg-muted/80 inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors"
-          >
-            <EditIcon />
-            编辑
-          </router-link>
-          <button
-            @click="showDeleteDialog = true"
-            class="bg-destructive/10 text-destructive hover:bg-destructive/15 inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors"
-          >
-            <DelIcon />
-            删除
-          </button>
+          封面 · {{ post.category?.name || 'ReadingList' }}
+        </figcaption>
+      </figure>
+
+      <!-- 文章头：刊号带 → 眉标 → 大标题 → deck → byline -->
+      <header class="mb-12">
+        <!-- 刊号式元信息带：出版物气质，mono 大字距 -->
+        <div
+          class="text-muted-foreground mb-6 flex items-center justify-between border-b pb-3 font-mono text-[10px] tracking-[0.18em] uppercase"
+        >
+          <span>Vol · 随笔录</span>
+          <span class="text-muted-foreground/70">No · {{ post._id?.slice(-6) || '——' }}</span>
         </div>
 
+        <!-- Eyebrow / kicker — accent 唯一一次正式出场 -->
         <div
-          v-if="post"
-          class="border-border bg-background overflow-hidden rounded-2xl border shadow-sm sm:col-span-2 lg:col-span-3"
+          class="text-primary mb-5 flex items-center gap-2 text-[11px] font-semibold tracking-[0.14em] uppercase"
         >
-          <div
-            v-if="post.cover"
-            class="border-border bg-muted aspect-[16/9] w-full overflow-hidden border-x border-t"
-          >
-            <img
-              :src="coverSrc"
-              :alt="`${post.title} 封面`"
-              class="h-full w-full object-cover"
-              loading="lazy"
-            />
-          </div>
-          <div class="border-border border-b p-8">
-            <h1 class="text-foreground mb-4 text-3xl leading-tight font-bold">
-              {{ post.title }}
-            </h1>
-
-            <div class="text-primary flex flex-wrap gap-x-6 gap-y-3 text-sm">
-              <div
-                v-if="post.author"
-                class="flex items-center gap-1.5 font-medium"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="h-4 w-4"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-                  />
-                </svg>
-                {{ post.author }}
-              </div>
-
-              <div v-if="post.created_at" class="flex items-center gap-1.5">
-                <CalendarIcon />
-                {{ formatDate(post.created_at) }}
-              </div>
-            </div>
-          </div>
-
-          <div class="p-8">
-            <ArticleSummaryCard
-              :title="post.title"
-              :content="post.body || ''"
-            />
-            <div class="prose prose-lg max-w-none">
-              <div v-if="post.body" v-html="renderedBodyWithOrigin" />
-              <div v-else class="text-muted-foreground italic">暂无内容</div>
-            </div>
-          </div>
+          <span class="bg-primary h-px w-5"></span>
+          {{ post.category?.name || '未分类' }}
         </div>
 
-        <TwikooComments
-          v-if="post"
-          :path="`/blog/${postId}`"
-          class="sm:col-span-2 lg:col-span-3"
+        <h1
+          class="text-foreground font-serif text-[clamp(1.875rem,5vw,2.5rem)] leading-[1.18] font-medium tracking-[-0.02em] text-balance"
+        >
+          {{ post.title }}
+        </h1>
+
+        <!-- Deck / standfirst — 阅读时长 + 字数 -->
+        <p
+          class="text-muted-foreground mt-5 text-[15px] leading-relaxed tracking-[0.01em] tabular-nums"
+        >
+          约 {{ stats.minutes }} 分钟阅读 ·
+          {{ stats.count.toLocaleString() }} 字
+        </p>
+
+        <!-- Byline / dateline -->
+        <div
+          class="text-muted-foreground mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[13px] tracking-[0.02em]"
+        >
+          <span v-if="post.author" class="text-foreground/80 font-medium">
+            {{ post.author }}
+          </span>
+          <span
+            v-if="post.author && post.created_at"
+            class="bg-border h-3 w-px"
+          ></span>
+          <time v-if="post.created_at" :datetime="post.created_at">
+            {{ formatDate(post.created_at) }}
+          </time>
+          <template v-if="hasUpdate">
+            <span class="bg-border h-3 w-px"></span>
+            <span>更新于 {{ formatDate(post.updated_at) }}</span>
+          </template>
+        </div>
+      </header>
+
+      <!-- 正文 -->
+      <div class="prose prose-lg max-w-none">
+        <ArticleSummaryCard :title="post.title" :content="post.body || ''" />
+        <div
+          class="prose-body whitespace-pre-wrap"
+          v-if="post.body"
+          v-html="renderedBodyWithOrigin"
         />
-      </template>
-    </BasicDetail>
+        <div v-else class="text-muted-foreground italic">暂无内容</div>
+      </div>
+
+      <!-- 文章脚：作者署名块 + 复制链接 -->
+      <footer class="border-border mt-14 border-t pt-8">
+        <div class="flex flex-wrap items-start justify-between gap-5">
+          <div class="flex items-center gap-3.5">
+            <span
+              class="text-foreground ring-border flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-muted font-serif text-sm font-semibold ring-1"
+              >{{ (post.author || 'K').slice(0, 1) }}</span
+            >
+            <div class="min-w-0">
+              <div class="text-foreground text-[14px] font-medium tracking-wide">
+                {{ post.author || 'Kurroome' }}
+              </div>
+              <div
+                class="text-muted-foreground text-[12px] tracking-[0.02em] mt-0.5"
+              >
+                {{
+                  hasUpdate
+                    ? `最后更新于 ${formatDate(post.updated_at)}`
+                    : post.created_at
+                      ? `发布于 ${formatDate(post.created_at)}`
+                      : ''
+                }}
+              </div>
+            </div>
+          </div>
+          <button
+            type="button"
+            @click="handleCopyLink"
+            class="text-muted-foreground hover:text-primary active:scale-[0.96] inline-flex cursor-pointer items-center gap-1.5 text-[12px] font-medium tracking-[0.02em] transition-all duration-150"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-3.5 w-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.8"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
+              />
+            </svg>
+            复制链接
+          </button>
+        </div>
+      </footer>
+    </article>
+
+    <TwikooComments
+      v-if="post"
+      :path="`/blog/${postId}`"
+      class="mx-auto max-w-[42rem] px-6 pb-24"
+    />
 
     <Teleport to="body">
       <AlertDialog
@@ -405,18 +536,16 @@ onUnmounted(() => {
       >
         <AlertDialogContent class="sm:max-w-[425px]">
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure delete this Post?</AlertDialogTitle>
-            <AlertDialogDescription>
-              The action cannot be undone.
-            </AlertDialogDescription>
+            <AlertDialogTitle>确认删除这篇文章？</AlertDialogTitle>
+            <AlertDialogDescription> 此操作无法撤销。 </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>取消</AlertDialogCancel>
             <AlertDialogAction
               class="bg-destructive hover:bg-destructive/90 text-white"
               @click="confirmDelete"
             >
-              Delete
+              删除
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -436,8 +565,8 @@ onUnmounted(() => {
   transform: translateX(-50%) translateY(4px);
   opacity: 0;
   transition:
-    opacity 0.2s ease-out,
-    transform 0.2s ease-out;
+    opacity 0.2s cubic-bezier(0.2, 0, 0, 1),
+    transform 0.2s cubic-bezier(0.2, 0, 0, 1);
   padding: 4px 8px;
   background: var(--ink);
   color: var(--paper);
@@ -452,4 +581,44 @@ onUnmounted(() => {
   transform: translateX(-50%) translateY(0);
 }
 /* 文章阅读体验由 .prose（base.scss）统一提供。 */
+
+/* —— ① 首段 drop cap：editorial 签名时刻，accent 第 2 次出场 —— */
+.prose-body > p:first-of-type::first-letter {
+  float: left;
+  font-family: ui-serif, Georgia, 'Times New Roman', serif;
+  font-size: 3.4em;
+  line-height: 0.82;
+  font-weight: 600;
+  margin: 0.08em 0.12em 0 0;
+  color: var(--accent);
+}
+
+/* —— ④ 章节编号：CSS counter，长文目录感 —— */
+.prose-body {
+  counter-reset: h2-section;
+}
+.prose-body h2::before {
+  counter-increment: h2-section;
+  content: '§ ' counter(h2-section) '  ';
+  font-family: ui-monospace, 'JetBrains Mono', Menlo, monospace;
+  font-size: 0.62em;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--muted-text);
+  vertical-align: 0.18em;
+}
+
+/* —— Skeleton pulse —— */
+.skeleton-pulse {
+  animation: skeleton-pulse 1.8s ease-in-out infinite;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+}
 </style>

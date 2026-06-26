@@ -1,4 +1,5 @@
 import { ArticleSummaryCard } from '@/components/basic/ArticleSummary';
+import { BackToTop } from '@/components/basic/BackToTop';
 import type { BlogDetail } from '@/services/blogService';
 import { blogService } from '@/services/blogService';
 import { TwikooComments } from '@/components/blog/TwikooComments';
@@ -59,7 +60,7 @@ function ErrorState({
       <p className="text-muted-foreground mt-1 text-sm">{message}</p>
       <button
         onClick={onRetry}
-        className="bg-destructive/90 hover:bg-destructive mt-4 cursor-pointer rounded-lg px-5 py-2.5 text-sm font-medium text-white transition-transform active:scale-95"
+        className="bg-destructive/90 hover:bg-destructive active:scale-[0.96] mt-4 cursor-pointer rounded-lg px-5 py-2.5 text-sm font-medium text-white transition-all duration-150"
       >
         重试
       </button>
@@ -108,6 +109,54 @@ function setupCodeCopy(
   return () => cleanups.forEach((fn) => fn());
 }
 
+/**
+ * 阅读统计：剥离 markdown 标记后，分别计中文字符与西文词数，
+ * 按 400 字/分钟（中文）+ 200 词/分钟（西文）估算阅读时长。
+ * 不编造指标——无正文时返回 1 分钟 / 0 字。
+ */
+function readingStats(body: string): { minutes: number; count: number } {
+  if (!body) return { minutes: 1, count: 0 };
+  const plain = body
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/`[^`]*`/g, ' ')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/[#>*_~]/g, ' ')
+    .replace(/\s+/g, ' ');
+  const cjk = (plain.match(/[一-鿿]/g) || []).length;
+  const words = (plain.replace(/[一-鿿]/g, ' ').match(/[A-Za-z0-9]+/g) || []).length;
+  const count = cjk + words;
+  const minutes = Math.max(1, Math.round(cjk / 400 + words / 200));
+  return { minutes, count };
+}
+
+/** 顶部阅读进度条：跟随窗口滚动，scaleX 0→1。 */
+function ReadingProgress() {
+  const [progress, setProgress] = useState(0);
+  useEffect(() => {
+    const onScroll = () => {
+      const el = document.documentElement;
+      const max = el.scrollHeight - el.clientHeight;
+      setProgress(max > 0 ? Math.min(1, el.scrollTop / max) : 0);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, []);
+  return (
+    <div className="bg-border/50 fixed inset-x-0 top-0 z-30 h-[2px] overflow-hidden">
+      <div
+        className="bg-primary h-full origin-left transition-[width] duration-150 ease-out will-change-[width]"
+        style={{ width: `${progress * 100}%` }}
+      />
+    </div>
+  );
+}
+
 export default function BlogPostView() {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
@@ -148,6 +197,12 @@ export default function BlogPostView() {
           `<img ${pre}src="${useOrigin(src)}"${postAttr}>`,
       )
     : '';
+
+  const stats = post?.body ? readingStats(post.body) : { minutes: 1, count: 0 };
+  const hasUpdate =
+    !!post?.updated_at &&
+    !!post?.created_at &&
+    post.updated_at !== post.created_at;
 
   // Highlight code blocks + setup copy buttons after content renders
   useEffect(() => {
@@ -196,14 +251,24 @@ export default function BlogPostView() {
     }
   };
 
+  const handleCopyLink = () => {
+    navigator.clipboard
+      .writeText(window.location.href)
+      .then(() => notification.success('链接已复制'))
+      .catch(() => notification.error('复制失败'));
+  };
+
   return (
     <div className="bg-background min-h-dvh">
+      <ReadingProgress />
+
       {/* Header */}
-      <div className="bg-surface sticky top-0 z-10 backdrop-blur-md">
-        <div className="flex items-center gap-3 px-4 py-3">
+      <div className="bg-surface/90 sticky top-0 z-20 border-b border-border/40 backdrop-blur-md">
+        <div className="mx-auto flex w-full max-w-md items-center gap-3 px-[max(1rem,env(safe-area-inset-left))] py-3 pr-[max(1rem,env(safe-area-inset-right))]">
           <button
             onClick={() => navigate(-1)}
-            className="hover:bg-muted flex h-11 w-11 items-center justify-center rounded-full transition-transform active:scale-95"
+            className="hover:bg-muted active:scale-[0.96] flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all duration-150"
+            aria-label="返回"
           >
             <svg
               className="text-foreground h-5 w-5"
@@ -219,7 +284,7 @@ export default function BlogPostView() {
               />
             </svg>
           </button>
-          <h1 className="text-foreground flex-1 truncate text-lg font-semibold">
+          <h1 className="text-foreground flex-1 truncate text-base font-medium">
             {post?.title || '文章'}
           </h1>
         </div>
@@ -232,7 +297,7 @@ export default function BlogPostView() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="px-5 pt-5"
+            className="mx-auto w-full max-w-md px-[max(1.25rem,env(safe-area-inset-left))] pt-6 pr-[max(1.25rem,env(safe-area-inset-right))]"
           >
             <LoadingSkeleton />
           </motion.div>
@@ -242,7 +307,7 @@ export default function BlogPostView() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="px-5 pt-5"
+            className="mx-auto w-full max-w-md px-[max(1.25rem,env(safe-area-inset-left))] pt-6 pr-[max(1.25rem,env(safe-area-inset-right))]"
           >
             <ErrorState message={error} onRetry={fetchPost} />
           </motion.div>
@@ -252,14 +317,14 @@ export default function BlogPostView() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="pb-20"
+            className="mx-auto w-full max-w-md px-[max(1.25rem,env(safe-area-inset-left))] pb-24 pr-[max(1.25rem,env(safe-area-inset-right))]"
           >
             {/* Admin actions */}
             {showEditButton && (
-              <div className="flex items-center justify-end gap-2 px-5 pt-4">
+              <div className="mt-4 flex items-center justify-end gap-2">
                 <button
                   onClick={() => navigate(`/blog/edit/${post._id}`)}
-                  className="bg-muted text-foreground hover:bg-muted/80 inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors"
+                  className="bg-muted text-foreground hover:bg-muted/80 active:scale-[0.96] inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-150"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -279,7 +344,7 @@ export default function BlogPostView() {
                 </button>
                 <button
                   onClick={() => setShowDeleteDialog(true)}
-                  className="bg-destructive/10 text-destructive hover:bg-destructive/15 inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors"
+                  className="bg-destructive/10 text-destructive hover:bg-destructive/15 active:scale-[0.96] inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-150"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -300,110 +365,122 @@ export default function BlogPostView() {
               </div>
             )}
 
-            {/* Hero */}
-            <div className="px-5 pt-4">
-              {post.cover && (
-                <div className="border-border bg-muted mb-5 aspect-[16/9] overflow-hidden rounded-2xl border">
+            {/* Article header — editorial */}
+            <header className="pt-8">
+              {/* Eyebrow / kicker */}
+              <div className="text-primary mb-4 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em]">
+                <span className="bg-primary h-px w-5" />
+                {post.category?.name || '未分类'}
+              </div>
+
+              {/* Headline */}
+              <h1
+                data-od-id="headline"
+                className="text-foreground text-[1.875rem] leading-[1.18] font-semibold tracking-[-0.01em] sm:text-[2.125rem]"
+              >
+                {post.title}
+              </h1>
+
+              {/* Deck / standfirst — 阅读时长 + 字数，作为引言式元信息 */}
+              <p className="text-muted-foreground mt-4 text-[15px] leading-relaxed tabular-nums">
+                约 {stats.minutes} 分钟阅读 · {stats.count.toLocaleString()} 字
+              </p>
+
+              {/* Byline / dateline */}
+              <div className="text-muted-foreground mt-5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs tracking-wide">
+                <time dateTime={post.created_at}>
+                  {post.created_at ? formatDate(post.created_at, 'YYYY-MM-DD') : '未知日期'}
+                </time>
+                {hasUpdate && (
+                  <>
+                    <span className="bg-border h-3 w-px" />
+                    <span>
+                      更新于 {formatDate(post.updated_at!, 'YYYY-MM-DD')}
+                    </span>
+                  </>
+                )}
+              </div>
+            </header>
+
+            {/* Hero image + caption */}
+            {post.cover && (
+              <figure className="mt-7">
+                <div className="border-border bg-muted aspect-[16/9] overflow-hidden rounded-xl border">
                   <img
                     src={coverSrc}
                     alt={`${post.title} 封面`}
                     className="h-full w-full object-cover"
+                    loading="lazy"
+                    style={{ boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.08)' }}
                   />
                 </div>
-              )}
+                <figcaption className="text-muted-foreground mt-2 text-[11px] tracking-[0.04em]">
+                  封面 · {post.category?.name || 'ReadingList'}
+                </figcaption>
+              </figure>
+            )}
 
-              {post.is_pinned && (
-                <div className="bg-primary/15 text-primary mb-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-3.5 w-3.5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
-                  </svg>
-                  置顶文章
-                </div>
-              )}
+            {/* Content */}
+            <div className="mt-9">
+              {/* Article Summary */}
+              <ArticleSummaryCard title={post?.title} content={post?.body || ''} />
 
-              <h1 className="text-foreground text-2xl leading-tight font-bold sm:text-3xl">
-                {post.title}
-              </h1>
-
-              <div className="text-primary mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm">
-                <div className="flex items-center gap-1.5 font-medium">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="h-4 w-4"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-                    />
-                  </svg>
-                  {post.category?.name || '未分类'}
-                </div>
-                {post.created_at && (
-                  <div className="flex items-center gap-1.5">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="1.5"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
-                      />
-                    </svg>
-                    {formatDate(post.created_at)}
-                  </div>
+              {/* Markdown body */}
+              <div ref={contentRef} className="prose prose-lg mt-7 max-w-none">
+                {renderedBodyWithOrigin ? (
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: renderedBodyWithOrigin,
+                    }}
+                  />
+                ) : (
+                  <p className="text-muted-foreground italic">暂无内容</p>
                 )}
               </div>
             </div>
 
-            {/* Divider */}
-            <div className="bg-muted mx-5 my-4 h-px" />
-
-            {/* Content card */}
-            <div className="border-border bg-background mx-5 overflow-hidden rounded-2xl border shadow-sm">
-              <div className="p-5 sm:p-8">
-                {/* Article Summary */}
-                <ArticleSummaryCard
-                  title={post?.title}
-                  content={post?.body || ''}
-                />
-
-                {/* Markdown body */}
-                <div ref={contentRef} className="prose prose-lg max-w-none">
-                  {renderedBodyWithOrigin ? (
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: renderedBodyWithOrigin,
-                      }}
-                    />
-                  ) : (
-                    <p className="text-muted-foreground italic">暂无内容</p>
-                  )}
+            {/* Article footer — 复制链接 + 更新时间 */}
+            <footer className="mt-12 border-t border-border/60 pt-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="text-muted-foreground text-xs tracking-wide">
+                  {hasUpdate
+                    ? `最后更新于 ${formatDate(post.updated_at!, 'YYYY-MM-DD')}`
+                    : post.created_at
+                      ? `发布于 ${formatDate(post.created_at, 'YYYY-MM-DD')}`
+                      : ''}
                 </div>
+                <button
+                  onClick={handleCopyLink}
+                  className="text-muted-foreground hover:text-primary active:scale-[0.96] inline-flex cursor-pointer items-center gap-1.5 text-xs font-medium tracking-wide transition-all duration-150"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-3.5 w-3.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.8"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
+                    />
+                  </svg>
+                  复制链接
+                </button>
               </div>
-            </div>
+            </footer>
 
             {/* Comments */}
-            <div className="px-5 pt-5">
+            <div className="mt-10">
               <TwikooComments path={`/blog/${postId}`} />
             </div>
           </motion.article>
         ) : null}
       </AnimatePresence>
+
+      <BackToTop className="fixed right-4 bottom-[calc(env(safe-area-inset-bottom,0px)+5.5rem)]" />
 
       {/* Delete confirmation dialog */}
       {showDeleteDialog && (
@@ -420,13 +497,13 @@ export default function BlogPostView() {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setShowDeleteDialog(false)}
-                className="bg-muted text-foreground hover:bg-muted/80 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors"
+                className="bg-muted text-foreground hover:bg-muted/80 active:scale-[0.96] rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-150"
               >
                 取消
               </button>
               <button
                 onClick={handleDelete}
-                className="bg-destructive hover:bg-destructive/90 rounded-xl px-4 py-2.5 text-sm font-medium text-white transition-colors"
+                className="bg-destructive hover:bg-destructive/90 active:scale-[0.96] rounded-xl px-4 py-2.5 text-sm font-medium text-white transition-all duration-150"
               >
                 删除
               </button>

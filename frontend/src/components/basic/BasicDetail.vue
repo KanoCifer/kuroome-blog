@@ -14,7 +14,7 @@
       ></div> -->
 
       <div
-        class="mb-3 flex items-center gap-2 text-xs tracking-[0.3em] text-foreground/80 uppercase"
+        class="text-foreground/80 mb-3 flex items-center gap-2 text-xs tracking-[0.3em] uppercase mix-blend-multiply"
       >
         <span class="bg-primary/60 inline-block h-px w-6"></span>
         <span>kanocifer</span>
@@ -54,7 +54,7 @@
       <a
         href="#main-content"
         :class="[
-          'scroll-indicator hover:text-foreground mt-12 inline-flex flex-col items-center gap-1 text-xs text-foreground/60 transition-opacity duration-500',
+          'scroll-indicator hover:text-foreground text-foreground/60 mt-12 inline-flex flex-col items-center gap-1 text-xs transition-opacity duration-500',
           indicatorVisible ? 'opacity-100' : 'pointer-events-none opacity-0',
         ]"
         @click.prevent="scrollToContent"
@@ -103,7 +103,7 @@
         <button
           type="button"
           :aria-label="onBack ? '返回' : '返回上一页'"
-          class="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring active:scale-[0.96] inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium shadow-sm transition-[background-color,transform,box-shadow] duration-300 hover:scale-[1.02] hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+          class="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium shadow-sm transition-[background-color,transform,box-shadow] duration-300 hover:scale-[1.02] hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.96]"
           @click="onBack === undefined ? $router.back() : onBack()"
         >
           <svg

@@ -7,253 +7,262 @@
  *     「同尺寸卡片网格」slop）；评论之间用发丝分隔线断开，像笔记本横线。
  *   - 输入区是一方安静的书写台；昵称用 serif，呼应书房字体语气。
  *   - 回复用 1px 发丝竖线串联（非 >1px 彩色侧条，那是明令禁止的）。
- *
- * 为什么直接写 CSS 而不用 Tailwind class
- *   Twikoo 运行时注入第三方 DOM，吃不到 Tailwind 工具类。按设计系统规约，
- *   注入式 DOM 与 ECharts 同路径——引用 Layer 2 语义 token（var(--color-*)、
- *   var(--font-*)），不碰 Layer 1 原始色、不硬编码颜色。
- *
  * 作用域：所有规则前缀 .twikoo，不污染全局。主题随 [data-color-scheme] + .dark 自动切换。
  */
 
 .twikoo {
-  /* token 别名——集中映射，便于一处改全处变 */
-  --tk-radius: var(--radius);
-  --tk-r-sm: calc(var(--radius) - 4px); /* rounded-sm */
-  --tk-r-md: calc(var(--radius) - 2px); /* rounded-md */
-  --tk-r-lg: var(--radius); /* rounded-lg 基线 */
-  --tk-r-xl: calc(var(--radius) + 4px); /* rounded-xl */
-  --tk-r-2xl: calc(var(--radius) + 8px); /* rounded-2xl */
+    /* token 别名——集中映射，便于一处改全处变 */
+    --tk-radius: var(--radius);
+    --tk-r-sm: calc(var(--radius) - 4px); /* rounded-sm */
+    --tk-r-md: calc(var(--radius) - 2px); /* rounded-md */
+    --tk-r-lg: var(--radius); /* rounded-lg 基线 */
+    --tk-r-xl: calc(var(--radius) + 4px); /* rounded-xl */
+    --tk-r-2xl: calc(var(--radius) + 8px); /* rounded-2xl */
 
-  --tk-text: var(--color-foreground);
-  --tk-muted: var(--color-muted-foreground);
-  --tk-border: var(--color-border);
-  --tk-primary: var(--color-primary);
-  --tk-primary-contrast: var(--color-primary-foreground);
-  --tk-surface: var(--color-background);
-  --tk-secondary: var(--color-secondary);
-  --tk-destructive: var(--color-destructive);
-  --tk-success: var(--color-success);
-  --tk-ring: color-mix(in oklch, var(--color-primary) 32%, transparent);
+    --tk-text: var(--color-foreground);
+    --tk-muted: var(--color-muted-foreground);
+    --tk-border: var(--color-border);
+    --tk-primary: var(--color-primary);
+    --tk-primary-contrast: var(--color-primary-foreground);
+    --tk-surface: var(--color-background);
+    --tk-secondary: var(--color-secondary);
+    --tk-destructive: var(--color-destructive);
+    --tk-success: var(--color-success);
+    --tk-ring: color-mix(in oklch, var(--color-primary) 32%, transparent);
 
-  --tk-ease: cubic-bezier(0.22, 1, 0.36, 1); /* ease-out-quint */
-  --tk-dur: 200ms;
+    --tk-ease: cubic-bezier(0.22, 1, 0.36, 1); /* ease-out-quint */
+    --tk-dur: 200ms;
 
-  color: var(--tk-text);
-  font-family: var(--font-sans);
-  font-size: 0.95rem;
-  line-height: 1.7;
+    color: var(--tk-text);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    line-height: 1.7;
 }
 
 /* 尊重减少动效偏好：所有过渡退化为瞬时 */
 @media (prefers-reduced-motion: reduce) {
-  .twikoo,
-  .twikoo * {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-  }
+    .twikoo,
+    .twikoo * {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
 }
 
 /* ---- 书写台（提交区）---- */
 .twikoo .tk-submit {
-  border-bottom: 1px solid var(--tk-border);
-  padding-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
 }
 
 /* 昵称/邮箱/网址输入行 */
 .twikoo .tk-meta-input {
-  margin-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
 }
 
 .twikoo .tk-meta-input .el-input-group__prepend {
-  background: var(--tk-secondary) !important;
-  border: 1px solid var(--tk-border) !important;
-  border-right: none !important;
-  border-radius: var(--tk-r-md) 0 0 var(--tk-r-md) !important;
-  color: var(--tk-muted) !important;
-  padding: 0 0.75rem !important;
+    background: var(--tk-secondary) !important;
+    border: 1px solid var(--tk-border) !important;
+    border-right: none !important;
+    border-radius: var(--tk-r-md) 0 0 var(--tk-r-md) !important;
+    color: var(--tk-muted) !important;
+    padding: 0 0.75rem !important;
 }
 
 .twikoo .tk-meta-input .el-input__inner {
-  background: var(--tk-surface) !important;
-  border: 1px solid var(--tk-border) !important;
-  border-radius: 0 var(--tk-r-md) var(--tk-r-md) 0 !important;
-  color: var(--tk-text) !important;
-  height: 38px;
-  transition: border-color var(--tk-dur) var(--tk-ease),
-    box-shadow var(--tk-dur) var(--tk-ease);
+    background: var(--tk-surface) !important;
+    border: 1px solid var(--tk-border) !important;
+    border-radius: 0 var(--tk-r-md) var(--tk-r-md) 0 !important;
+    color: var(--tk-text) !important;
+    height: 38px;
+    transition:
+        border-color var(--tk-dur) var(--tk-ease),
+        box-shadow var(--tk-dur) var(--tk-ease);
 }
 
 .twikoo .tk-meta-input .el-input__inner::placeholder {
-  color: var(--tk-muted) !important;
+    color: var(--tk-muted) !important;
 }
 
 .twikoo .tk-meta-input .el-input__inner:focus {
-  border-color: var(--tk-primary) !important;
-  box-shadow: 0 0 0 2px var(--tk-ring) !important;
+    border-color: var(--tk-primary) !important;
+    box-shadow: 0 0 0 2px var(--tk-ring) !important;
 }
 
 /* 校验失败态用 destructive，非硬编码红 */
 .twikoo .tk-meta-input .el-input input:invalid {
-  border-color: var(--tk-destructive) !important;
-  box-shadow: none;
+    border-color: var(--tk-destructive) !important;
+    box-shadow: none;
 }
 
 /* ---- 正文输入框 ---- */
 .twikoo .tk-input .el-textarea__inner {
-  background: var(--tk-surface) !important;
-  border: 1px solid var(--tk-border) !important;
-  border-radius: var(--tk-r-lg) !important;
-  color: var(--tk-text) !important;
-  line-height: 1.7;
-  min-height: 120px !important;
-  padding: 0.875rem 1rem !important;
-  transition: border-color var(--tk-dur) var(--tk-ease),
-    box-shadow var(--tk-dur) var(--tk-ease);
+    background: var(--tk-surface) !important;
+    border: 1px solid var(--tk-border) !important;
+    border-radius: var(--tk-r-lg) !important;
+    color: var(--tk-text) !important;
+    line-height: 1.7;
+    min-height: 120px !important;
+    padding: 0.875rem 1rem !important;
+    transition:
+        border-color var(--tk-dur) var(--tk-ease),
+        box-shadow var(--tk-dur) var(--tk-ease);
 }
 
 .twikoo .tk-input .el-textarea__inner::placeholder {
-  color: var(--tk-muted) !important;
+    color: var(--tk-muted) !important;
 }
 
 .twikoo .tk-input .el-textarea__inner:focus {
-  border-color: var(--tk-primary) !important;
-  box-shadow: 0 0 0 2px var(--tk-ring) !important;
+    border-color: var(--tk-primary) !important;
+    box-shadow: 0 0 0 2px var(--tk-ring) !important;
 }
 
 /* ---- 操作行（预览/表情/发送）---- */
 .twikoo .tk-row.actions {
-  margin-top: 0.75rem;
-  margin-bottom: 0;
-  gap: 0.5rem;
+    margin-top: 0.75rem;
+    margin-bottom: 0;
+    gap: 0.5rem;
 }
 
 /* 按钮：默认克制，主按钮承载 accent */
 .twikoo .el-button {
-  border-radius: var(--tk-r-md) !important;
-  border: 1px solid var(--tk-border) !important;
-  background: var(--tk-surface) !important;
-  color: var(--tk-text) !important;
-  font-weight: 500;
-  transition: border-color var(--tk-dur) var(--tk-ease),
-    color var(--tk-dur) var(--tk-ease), background-color var(--tk-dur) var(--tk-ease);
+    border-radius: var(--tk-r-md) !important;
+    border: 1px solid var(--tk-border) !important;
+    background: var(--tk-surface) !important;
+    color: var(--tk-text) !important;
+    font-weight: 500;
+    transition:
+        border-color var(--tk-dur) var(--tk-ease),
+        color var(--tk-dur) var(--tk-ease),
+        background-color var(--tk-dur) var(--tk-ease);
 }
 
 .twikoo .el-button:hover,
 .twikoo .el-button:focus {
-  border-color: var(--tk-primary) !important;
-  color: var(--tk-primary) !important;
-  background: var(--tk-secondary) !important;
+    border-color: var(--tk-primary) !important;
+    color: var(--tk-primary) !important;
+    background: var(--tk-secondary) !important;
 }
 
 .twikoo .el-button--primary {
-  background: var(--tk-primary) !important;
-  border-color: var(--tk-primary) !important;
-  color: var(--tk-primary-contrast) !important;
+    background: var(--tk-primary) !important;
+    border-color: var(--tk-primary) !important;
+    color: var(--tk-primary-contrast) !important;
 }
 
 .twikoo .el-button--primary:hover,
 .twikoo .el-button--primary:focus {
-  opacity: 0.88;
-  background: var(--tk-primary) !important;
-  color: var(--tk-primary-contrast) !important;
+    opacity: 0.88;
+    background: var(--tk-primary) !important;
+    color: var(--tk-primary-contrast) !important;
 }
 
 .twikoo .el-button--primary.is-disabled,
 .twikoo .el-button--primary.is-disabled:hover {
-  opacity: 0.45;
-  cursor: not-allowed;
+    opacity: 0.45;
+    cursor: not-allowed;
 }
 
 /* 文字按钮（表情/登录）不画框 */
 .twikoo .el-button--text {
-  border-color: transparent !important;
-  background: transparent !important;
-  color: var(--tk-muted) !important;
+    border-color: transparent !important;
+    background: transparent !important;
+    color: var(--tk-muted) !important;
 }
 
 .twikoo .el-button--text:hover {
-  color: var(--tk-primary) !important;
-  background: transparent !important;
+    color: var(--tk-primary) !important;
+    background: transparent !important;
 }
 
 /* ---- 标题与计数 ---- */
 .twikoo .tk-comments-title {
-  margin-bottom: 0.5rem;
-  color: var(--tk-text);
+    margin-bottom: 0.5rem;
+    color: var(--tk-text);
 }
 
 .twikoo .tk-comments-count {
-  color: var(--tk-muted);
-  font-size: 0.8rem;
+    color: var(--tk-muted);
+    font-size: 0.8rem;
 }
 
 /* ---- 批注主体：发丝分隔，不套卡片 ---- */
 .twikoo .tk-comments-container > .tk-comment {
-  margin-top: 0;
-  padding: 1.25rem 0;
-  border-top: 1px solid var(--tk-border);
-  border-radius: 0;
-  background: transparent;
-  transition: background-color var(--tk-dur) var(--tk-ease);
+    margin-top: 0;
+    padding: 1.25rem 0;
+    border-top: 1px solid var(--tk-border);
+    border-radius: 0;
+    background: transparent;
+    transition: background-color var(--tk-dur) var(--tk-ease);
 }
 
 /* 首条评论无上分隔线（标题已断开） */
 .twikoo .tk-comments-container > .tk-comment:first-child {
-  border-top: none;
-  padding-top: 0.5rem;
+    border-top: none;
+    padding-top: 0.5rem;
 }
 
 /* 悬停仅作轻量阅读高亮，不抬升/不投影 */
 .twikoo .tk-comments-container > .tk-comment:hover {
-  background: color-mix(in oklch, var(--tk-secondary) 45%, transparent);
+    background: color-mix(in oklch, var(--tk-secondary) 45%, transparent);
 }
 
 /* 头像保持圆，但收敛尺寸 */
 .twikoo .tk-avatar,
 .twikoo .tk-avatar-img {
-  border-radius: 50%;
+    border-radius: 50%;
 }
 
 /* 昵称用 serif——书房语气；链接态走 primary */
 .twikoo .tk-nick,
 .twikoo .tk-replies .tk-nick-link {
-  font-family: var(--font-serif);
-  font-weight: 600;
-  color: var(--tk-text) !important;
+    font-family: var(--font-serif);
+    font-weight: 600;
+    color: var(--tk-text) !important;
 }
 
 .twikoo a.tk-nick-link {
-  color: var(--tk-text);
-  transition: color var(--tk-dur) var(--tk-ease);
+    color: var(--tk-text);
+    transition: color var(--tk-dur) var(--tk-ease);
 }
 
 .twikoo a.tk-nick-link:hover {
-  color: var(--tk-primary);
+    color: var(--tk-primary);
 }
 
 /* 博主/身份标签：实色 chip，圆角走 sm 尺度 */
 .twikoo .tk-tag {
-  border-radius: var(--tk-r-sm) !important;
-  border: 1px solid var(--tk-primary) !important;
-  background: color-mix(in oklch, var(--tk-primary) 12%, transparent) !important;
-  color: var(--tk-primary) !important;
-  font-size: 0.72rem !important;
-  line-height: 1.4;
-  padding: 0 0.4rem !important;
+    border-radius: var(--tk-r-sm) !important;
+    border: 1px solid var(--tk-primary) !important;
+    background: color-mix(
+        in oklch,
+        var(--tk-primary) 12%,
+        transparent
+    ) !important;
+    color: var(--tk-primary) !important;
+    font-size: 0.72rem !important;
+    line-height: 1.4;
+    padding: 0 0.4rem !important;
 }
 
 .twikoo .tk-tag-green {
-  background: color-mix(in oklch, var(--tk-success) 14%, transparent) !important;
-  border-color: var(--tk-success) !important;
-  color: var(--tk-success) !important;
+    background: color-mix(
+        in oklch,
+        var(--tk-success) 14%,
+        transparent
+    ) !important;
+    border-color: var(--tk-success) !important;
+    color: var(--tk-success) !important;
 }
 
 .twikoo .tk-tag-red {
-  background: color-mix(in oklch, var(--tk-destructive) 14%, transparent) !important;
-  border-color: var(--tk-destructive) !important;
-  color: var(--tk-destructive) !important;
+    background: color-mix(
+        in oklch,
+        var(--tk-destructive) 14%,
+        transparent
+    ) !important;
+    border-color: var(--tk-destructive) !important;
+    color: var(--tk-destructive) !important;
 }
 
 /* 时间/设备信息：弱化为批注元数据 */
@@ -261,238 +270,245 @@
 .twikoo .tk-time,
 .twikoo .tk-extras,
 .twikoo .tk-extra {
-  color: var(--tk-muted) !important;
-  font-size: 0.78rem;
+    color: var(--tk-muted) !important;
+    font-size: 0.78rem;
 }
 
 .twikoo .tk-extra {
-  background: transparent;
-  padding: 0;
-  margin: 0;
+    background: transparent;
+    padding: 0;
+    margin: 0;
 }
 
 /* 评论正文 */
 .twikoo .tk-content {
-  margin-top: 0.5rem;
-  color: var(--tk-text);
-  line-height: 1.75;
+    margin-top: 0.5rem;
+    color: var(--tk-text);
+    line-height: 1.75;
 }
 
 .twikoo .tk-content p {
-  margin: 0.4em 0;
+    margin: 0.4em 0;
 }
 
 .twikoo .tk-content a {
-  color: var(--tk-primary);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  text-decoration-color: color-mix(in oklch, var(--tk-primary) 40%, transparent);
-  transition: text-decoration-color var(--tk-dur) var(--tk-ease);
+    color: var(--tk-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-color: color-mix(
+        in oklch,
+        var(--tk-primary) 40%,
+        transparent
+    );
+    transition: text-decoration-color var(--tk-dur) var(--tk-ease);
 }
 
 .twikoo .tk-content a:hover {
-  text-decoration-color: var(--tk-primary);
+    text-decoration-color: var(--tk-primary);
 }
 
 .twikoo .tk-content blockquote {
-  margin: 0.6em 0;
-  padding: 0.2em 0.9em;
-  border-left: 1px solid var(--tk-border);
-  color: var(--tk-muted);
+    margin: 0.6em 0;
+    padding: 0.2em 0.9em;
+    border-left: 1px solid var(--tk-border);
+    color: var(--tk-muted);
 }
 
 .twikoo .tk-content code {
-  font-family: var(--font-mono);
-  font-size: 0.85em;
-  background: var(--tk-secondary);
-  border-radius: var(--tk-r-sm);
-  padding: 0.1em 0.35em;
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--tk-secondary);
+    border-radius: var(--tk-r-sm);
+    padding: 0.1em 0.35em;
 }
 
 .twikoo .tk-content pre {
-  background: var(--tk-secondary);
-  border: 1px solid var(--tk-border);
-  border-radius: var(--tk-r-md);
-  padding: 0.9rem 1rem;
-  overflow-x: auto;
-  font-size: 0.85rem;
+    background: var(--tk-secondary);
+    border: 1px solid var(--tk-border);
+    border-radius: var(--tk-r-md);
+    padding: 0.9rem 1rem;
+    overflow-x: auto;
+    font-size: 0.85rem;
 }
 
 .twikoo .tk-content pre code {
-  background: transparent;
-  padding: 0;
+    background: transparent;
+    padding: 0;
 }
 
 /* ---- 回复：发丝竖线串联（1px，非彩色侧条）---- */
 .twikoo .tk-replies,
 .twikoo .tk-replies-expand {
-  margin-top: 0.5rem;
-  padding-left: 1rem;
-  border-left: 1px solid var(--tk-border);
+    margin-top: 0.5rem;
+    padding-left: 1rem;
+    border-left: 1px solid var(--tk-border);
 }
 
 .twikoo .tk-replies .tk-comment {
-  padding: 0.9rem 0;
-  border-top: 1px solid color-mix(in oklch, var(--tk-border) 60%, transparent);
-  border-radius: 0;
-  background: transparent;
+    padding: 0.9rem 0;
+    border-top: 1px solid color-mix(in oklch, var(--tk-border) 60%, transparent);
+    border-radius: 0;
+    background: transparent;
 }
 
 .twikoo .tk-replies .tk-comment:first-child {
-  border-top: none;
+    border-top: none;
 }
 
 .twikoo .tk-replies .tk-comment:hover {
-  background: color-mix(in oklch, var(--tk-secondary) 45%, transparent);
+    background: color-mix(in oklch, var(--tk-secondary) 45%, transparent);
 }
 
 /* ---- 点赞/回复操作 ---- */
 .twikoo .tk-actions {
-  margin-top: 0.4rem;
-  gap: 0.25rem;
+    margin-top: 0.4rem;
+    gap: 0.25rem;
 }
 
 .twikoo .tk-action,
 .twikoo .tk-action-link {
-  color: var(--tk-muted);
-  font-size: 0.8rem;
-  transition: color var(--tk-dur) var(--tk-ease);
+    color: var(--tk-muted);
+    font-size: 0.8rem;
+    transition: color var(--tk-dur) var(--tk-ease);
 }
 
 .twikoo .tk-action:hover,
 .twikoo .tk-action-link:hover {
-  color: var(--tk-primary);
+    color: var(--tk-primary);
 }
 
 .twikoo .tk-action-icon,
 .twikoo .tk-icon,
 .twikoo svg {
-  color: var(--tk-muted);
-  transition: color var(--tk-dur) var(--tk-ease);
+    color: var(--tk-muted);
+    transition: color var(--tk-dur) var(--tk-ease);
 }
 
 .twikoo .tk-action-icon:hover,
 .twikoo .tk-icon:hover {
-  color: var(--tk-primary);
+    color: var(--tk-primary);
 }
 
 /* 已点赞：accent 着色 */
 .twikoo .tk-liked .tk-action-icon,
 .twikoo .tk-liked .tk-action-icon-solid {
-  color: var(--tk-primary);
+    color: var(--tk-primary);
 }
 
 .twikoo .tk-action-count {
-  color: var(--tk-muted);
-  font-size: 0.78rem;
+    color: var(--tk-muted);
+    font-size: 0.78rem;
 }
 
 /* ---- 预览区 ---- */
 .twikoo .tk-preview-container {
-  margin-top: 0.5rem;
-  border: 1px solid var(--tk-border);
-  border-radius: var(--tk-r-lg);
-  background: var(--tk-surface);
-  padding: 0.9rem 1rem;
+    margin-top: 0.5rem;
+    border: 1px solid var(--tk-border);
+    border-radius: var(--tk-r-lg);
+    background: var(--tk-surface);
+    padding: 0.9rem 1rem;
 }
 
 /* ---- 加载更多 ---- */
 .twikoo .tk-expand {
-  width: 100%;
-  text-align: center;
-  padding: 0.65rem;
-  margin-top: 0.5rem;
-  border: 1px solid var(--tk-border);
-  border-radius: var(--tk-r-2xl);
-  background: var(--tk-surface);
-  color: var(--tk-muted);
-  cursor: pointer;
-  letter-spacing: 0.04em;
-  transition: border-color var(--tk-dur) var(--tk-ease),
-    color var(--tk-dur) var(--tk-ease),
-    background-color var(--tk-dur) var(--tk-ease);
+    width: 100%;
+    text-align: center;
+    padding: 0.65rem;
+    margin-top: 0.5rem;
+    border: 1px solid var(--tk-border);
+    border-radius: var(--tk-r-2xl);
+    background: var(--tk-surface);
+    color: var(--tk-muted);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition:
+        border-color var(--tk-dur) var(--tk-ease),
+        color var(--tk-dur) var(--tk-ease),
+        background-color var(--tk-dur) var(--tk-ease);
 }
 
 .twikoo .tk-expand:hover {
-  border-color: var(--tk-primary);
-  color: var(--tk-primary);
-  background: var(--tk-secondary);
+    border-color: var(--tk-primary);
+    color: var(--tk-primary);
+    background: var(--tk-secondary);
 }
 
 /* ---- 空状态/错误 ---- */
 .twikoo .tk-comments-no,
 .twikoo .tk-comments-error {
-  color: var(--tk-muted);
-  text-align: center;
-  padding: 1.5rem 0;
+    color: var(--tk-muted);
+    text-align: center;
+    padding: 1.5rem 0;
 }
 
 .twikoo .tk-error-message {
-  color: var(--tk-destructive);
+    color: var(--tk-destructive);
 }
 
 /* ---- 表情面板（OwO）---- */
 .twikoo .OwO .OwO-body {
-  border: 1px solid var(--tk-border);
-  border-radius: var(--tk-r-lg);
-  background: var(--tk-surface);
-  box-shadow: 0 8px 24px -8px color-mix(in oklch, var(--tk-text) 18%, transparent);
+    border: 1px solid var(--tk-border);
+    border-radius: var(--tk-r-lg);
+    background: var(--tk-surface);
+    box-shadow: 0 8px 24px -8px
+        color-mix(in oklch, var(--tk-text) 18%, transparent);
 }
 
 .twikoo .OwO .OwO-packages {
-  border-bottom: 1px solid var(--tk-border);
-  background: var(--tk-secondary);
+    border-bottom: 1px solid var(--tk-border);
+    background: var(--tk-secondary);
 }
 
 .twikoo .OwO .OwO-package-active {
-  background: var(--tk-surface);
-  border-bottom: 2px solid var(--tk-primary);
-  color: var(--tk-primary);
+    background: var(--tk-surface);
+    border-bottom: 2px solid var(--tk-primary);
+    color: var(--tk-primary);
 }
 
 .twikoo .OwO .OwO-items .OwO-item:hover {
-  background: var(--tk-secondary);
-  border-radius: var(--tk-r-sm);
+    background: var(--tk-secondary);
+    border-radius: var(--tk-r-sm);
 }
 
 /* ---- 加载遮罩 ---- */
 .twikoo .el-loading-mask {
-  background: color-mix(in oklch, var(--tk-surface) 72%, transparent) !important;
+    background: color-mix(
+        in oklch,
+        var(--tk-surface) 72%,
+        transparent
+    ) !important;
 }
 
 .twikoo .el-loading-spinner .path,
 .twikoo .el-loading-spinner .circular {
-  stroke: var(--tk-primary);
+    stroke: var(--tk-primary);
 }
 
 .twikoo .el-loading-text {
-  color: var(--tk-muted);
+    color: var(--tk-muted);
 }
 
 /* ---- 分页（若开启）---- */
 .twikoo .tk-pagination .tk-pagination-pager,
 .twikoo .tk-pagination .btn-prev,
 .twikoo .tk-pagination .btn-next {
-  border: 1px solid var(--tk-border);
-  border-radius: var(--tk-r-md);
-  background: var(--tk-surface);
-  color: var(--tk-muted);
-  transition: all var(--tk-dur) var(--tk-ease);
+    border: 1px solid var(--tk-border);
+    border-radius: var(--tk-r-md);
+    background: var(--tk-surface);
+    color: var(--tk-muted);
+    transition: all var(--tk-dur) var(--tk-ease);
 }
 
 .twikoo .tk-pagination .tk-pagination-pager:hover,
 .twikoo .tk-pagination .btn-prev:hover,
 .twikoo .tk-pagination .btn-next:hover {
-  border-color: var(--tk-primary);
-  color: var(--tk-primary);
+    border-color: var(--tk-primary);
+    color: var(--tk-primary);
 }
 
 .twikoo .tk-pagination .tk-pagination-pager.active,
 .twikoo .tk-pagination .tk-pagination-pager.active:hover {
-  background: var(--tk-primary);
-  border-color: var(--tk-primary);
-  color: var(--tk-primary-contrast);
+    background: var(--tk-primary);
+    border-color: var(--tk-primary);
+    color: var(--tk-primary-contrast);
 }
-
-
-
