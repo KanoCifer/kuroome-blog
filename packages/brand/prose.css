@@ -678,10 +678,6 @@
   background: color-mix(in oklch, var(--secondary) 50%, transparent);
 }
 
-:where(.dark) .prose pre {
-  background: color-mix(in oklch, var(--ink) 95%, transparent);
-}
-
 :where(.dark) .prose mark {
   background: color-mix(in oklch, var(--accent) 28%, transparent);
 }
