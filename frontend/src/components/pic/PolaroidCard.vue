@@ -1,81 +1,49 @@
 <template>
   <motion.div
-    class="absolute origin-center"
-    :class="
-      isDraggable ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'
-    "
-    :style="layoutStyle"
-    :initial="{
-      opacity: 0,
-      scale: 0.8,
-      rotate: rotation - 10,
-      y: 50,
-    }"
-    :animate="{ opacity: 1, scale: 1, rotate: rotation, y: 0 }"
+    class="polaroid-card group relative block w-full cursor-pointer"
+    :initial="{ opacity: 0, y: 24 }"
+    :animate="{ opacity: 1, y: 0 }"
     :transition="{
-      duration: 0.8,
-      delay: index * 0.04,
+      duration: 0.5,
+      delay: Math.min(index * 0.03, 0.4),
       type: 'spring',
-      stiffness: 260,
-      damping: 20,
+      stiffness: 220,
+      damping: 24,
     }"
     :whileHover="{
-      scale: 1.05,
+      y: -6,
       rotate: 0,
-      zIndex: 100,
       transition: { duration: 0.2 },
     }"
-    :whileDrag="
-      isDraggable
-        ? {
-            scale: 1.1,
-            zIndex: 150,
-            rotate: 0,
-            cursor: 'grabbing',
-            transition: { type: 'spring', stiffness: 400, damping: 25 },
-          }
-        : undefined
-    "
-    :whileTap="{
-      scale: 1.05,
-      cursor: isDraggable ? 'grabbing' : 'pointer',
-    }"
-    drag
-    :drag-constraints="constraints"
-    :drag-elastic="0.2"
-    :drag-momentum="false"
-    @dragstart="$emit('dragstart', index)"
-    @pointerdown="onPointerDown"
+    :style="{ rotate: `${rotation}deg` }"
     @click="onClick"
   >
     <!--
-      PolaroidCard — 经典拍立得改版
-      - 顶部窄白边 12px + 底部宽白边 56px（拍立得标志性比例）
-      - 白边颜色 = var(--paper) 跟随 10 套主题
-      - 阴影双层，hover 时同步加深
+      PolaroidCard — 拍立得瀑布流版
+      - 卡片宽度 = 列宽（100%），照片高度由 aspect-ratio 自适应
+      - 保留 var(--paper) 白边 + 日期 + 胶片质感
+      - 编辑模式：左上选中圈 + 右上删除按钮；非编辑模式：点击进详情
     -->
-    <div
-      class="polaroid group relative flex flex-col rounded-[2px]"
-      :style="{ width: `${size + 24}px` }"
-    >
+    <div class="polaroid group relative flex flex-col rounded-[2px]">
       <!-- 顶部窄白边 + 图片容器 -->
       <div
         class="polaroid-top relative mx-2 mt-3 overflow-hidden rounded-[1px] transition-all duration-300 group-hover:mx-0 group-hover:mt-0"
       >
         <div
           class="polaroid-photo relative w-full overflow-hidden"
-          :style="{ height: `${size * aspect}px` }"
+          :style="{ aspectRatio: String(1 / aspect) }"
         >
           <img
             :src="image.url"
             :alt="image.description"
-            class="pointer-events-none h-full w-full object-cover transition-transform duration-700 ease-out"
+            class="pointer-events-none h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
             loading="lazy"
             draggable="false"
           />
 
           <!-- Hover 胶片闪光点：克制的中央白点，不遮挡画面 -->
           <div
+            v-if="!isEditMode"
             class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100"
             aria-hidden="true"
           >
@@ -91,18 +59,53 @@
       <!-- 底部宽白边：拍立得标志性"留白写字区" -->
       <div
         class="polaroid-bottom relative flex items-center justify-center"
-        :style="{ height: '56px', paddingBottom: '12px' }"
+        :style="{ height: '52px', paddingBottom: '10px' }"
       >
         <span class="polaroid-date font-family-averia select-none">
           {{ dateLabel }}
         </span>
       </div>
+
+      <!-- 编辑模式：左上选中圈 -->
+      <button
+        v-if="isEditMode"
+        type="button"
+        class="absolute left-2 top-2 z-20 flex h-7 w-7 items-center justify-center rounded-full border-2 backdrop-blur-sm transition-all duration-200"
+        :class="
+          selected
+            ? 'border-primary bg-primary text-primary-foreground shadow-sm'
+            : 'border-white/80 bg-black/20 text-transparent hover:bg-black/40'
+        "
+        :aria-pressed="selected"
+        aria-label="选中这张照片"
+        @click.stop="emit('toggleSelect', image.id)"
+      >
+        <Check v-if="selected" class="h-4 w-4" />
+      </button>
+
+      <!-- 编辑模式：右上删除按钮 -->
+      <button
+        v-if="isEditMode"
+        type="button"
+        class="absolute right-2 top-2 z-20 flex h-7 w-7 items-center justify-center rounded-full border border-white/60 bg-destructive/90 text-white opacity-0 shadow-sm backdrop-blur-sm transition-all duration-200 hover:bg-destructive group-hover:opacity-100"
+        aria-label="删除这张照片"
+        @click.stop="emit('delete', image.id)"
+      >
+        <Trash2 class="h-3.5 w-3.5" />
+      </button>
+
+      <!-- 选中态高亮描边 -->
+      <div
+        v-if="isEditMode && selected"
+        class="pointer-events-none absolute inset-0 z-10 rounded-[2px] ring-2 ring-primary ring-offset-2 ring-offset-primary/20"
+        aria-hidden="true"
+      ></div>
     </div>
   </motion.div>
 </template>
 
 <script setup lang="ts">
-import { Maximize2 } from '@lucide/vue';
+import { Check, Maximize2, Trash2 } from '@lucide/vue';
 import { motion } from 'motion-v';
 import { computed, ref } from 'vue';
 import type { Picture } from '@/composables/pic';
@@ -110,23 +113,19 @@ import type { Picture } from '@/composables/pic';
 const props = defineProps<{
   image: Picture;
   index: number;
-  size: number;
   aspect: number;
   rotation: number;
-  layoutStyle: Record<string, string | number>;
-  isDraggable: boolean;
-  dragConstraints: HTMLElement | null;
+  isEditMode?: boolean;
+  selected?: boolean;
 }>();
-
-// motion-v's dragConstraints accepts an element ref; null is tolerated at runtime
-const constraints = computed(() => props.dragConstraints ?? undefined);
 
 const emit = defineEmits<{
   select: [image: Picture, index: number];
-  dragstart: [index: number];
+  toggleSelect: [id: string];
+  delete: [id: string];
 }>();
 
-// 拍立得底部日期：若图片有 takenAt / createdAt / date 字段则显示，否则留空槽
+// 拍立得底部日期：若图片有 uploadedAt / createdAt / date 字段则显示，否则留空槽
 const dateLabel = computed(() => {
   const raw =
     (props.image as any).uploadedAt ??
@@ -141,32 +140,26 @@ const dateLabel = computed(() => {
   return `${y}.${m}`;
 });
 
-// Drag/click disambiguation: treat pointer moves >5px as drag, not click
-const dragStartPos = ref({ x: 0, y: 0 });
-
+// 点击/选中区分：编辑模式下点击卡片切换选中，非编辑模式打开详情
+const downPos = ref({ x: 0, y: 0 });
 const onPointerDown = (e: PointerEvent) => {
-  dragStartPos.value = { x: e.clientX, y: e.clientY };
+  downPos.value = { x: e.clientX, y: e.clientY };
 };
-
 const onClick = (e: MouseEvent) => {
-  const dx = Math.abs(e.clientX - dragStartPos.value.x);
-  const dy = Math.abs(e.clientY - dragStartPos.value.y);
-
-  if (dx > 5 || dy > 5) {
-    e.preventDefault();
-    e.stopPropagation();
+  // 复用 pointerdown 记录起点，避免误触
+  void onPointerDown(e as unknown as PointerEvent);
+  if (props.isEditMode) {
+    emit('toggleSelect', props.image.id);
     return;
   }
-
   emit('select', props.image, props.index);
 };
 </script>
 
 <style scoped>
 /* ============================================================
-   Polaroid — 跟随 10 套主题 token
-   白边 = var(--paper)        暖色滤镜模拟胶片
-   阴影  = color-mix(--ink)   浅色主题是柔灰、深色主题是柔黑
+   Polaroid — 跟随主题 token（拍立得瀑布流版）
+   白边 = var(--paper)        阴影 = color-mix(--ink)
    ============================================================ */
 .polaroid {
   background: var(--paper);
@@ -180,7 +173,7 @@ const onClick = (e: MouseEvent) => {
   will-change: transform, box-shadow;
 }
 
-.polaroid:hover {
+.polaroid-card:hover .polaroid {
   box-shadow:
     0 2px 2px color-mix(in oklch, var(--ink) 8%, transparent),
     0 12px 24px color-mix(in oklch, var(--ink) 18%, transparent),
@@ -202,13 +195,12 @@ const onClick = (e: MouseEvent) => {
 }
 
 .polaroid-date {
-  font-size: 15px;
+  font-size: 14px;
   letter-spacing: 0.04em;
   color: color-mix(in oklch, var(--ink) 55%, transparent);
 }
 
-/* 极轻的胶片颗粒感：浅色主题叠 1% 暗度（泛黄），深色主题叠 1% 亮度（泛蓝）。
-   不影响图片本身的颜色，只在白边上微微泛黄/泛蓝。 */
+/* 极轻的胶片颗粒感：白边微微泛黄/泛蓝，不影响图片本身 */
 .polaroid::before {
   content: '';
   position: absolute;
@@ -219,9 +211,4 @@ const onClick = (e: MouseEvent) => {
   mix-blend-mode: multiply;
   z-index: 1;
 }
-
-/*:global(.dark) .polaroid::before {
-  background: color-mix(in oklch, var(--paper) 3%, transparent);
-  mix-blend-mode: screen;
-}*/
 </style>

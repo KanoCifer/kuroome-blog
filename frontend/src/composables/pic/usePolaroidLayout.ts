@@ -2,94 +2,60 @@ import { useNotificationStore } from '@/stores/notification';
 import { ref, type Ref } from 'vue';
 import type { Picture } from './useGallery';
 
-interface LayoutSeed {
-  x: number;
-  y: number;
-  rotation: number;
-  zIndex: number;
-}
-
 interface UsePolaroidLayoutOptions {
   images: Ref<Picture[]>;
 }
 
-// Polaroid 堆叠布局算法：随机位置/旋转/尺寸，拖拽时提升 z-index
+/**
+ * Polaroid 瀑布流布局（方案 A）
+ *
+ * 从"随机堆叠 pile"改为 CSS columns 瀑布流后，布局算法大幅简化：
+ * - 卡片位置由 columns 流式排布，不再需要 x/y 绝对定位
+ * - 仍保留每张照片稳定的 aspect 比例与轻微旋转，维持拍立得手感
+ * - 选中态、删除由组件层处理；本 composable 只负责"视觉种子"
+ */
 export const usePolaroidLayout = ({ images }: UsePolaroidLayoutOptions) => {
-  // Random layout seeds (cached per image index)
-  const layoutSeeds = ref<Map<number, LayoutSeed>>(new Map());
+  // 每张照片的视觉种子：aspect 比例 + 旋转角度（缓存，避免重渲染抖动）
+  const visualSeeds = ref<Map<number, { aspect: number; rotation: number }>>(
+    new Map(),
+  );
 
-  // Max z-index to bring dragging items to front
-  const maxZIndex = ref(10);
+  const ASPECTS = [1, 1.25, 0.8, 1.5]; // 1:1, 4:5, 5:4, 2:3
 
-  // Generate random layout seeds for each image (Polaroid pile look)
+  // 为每张图片生成稳定的视觉种子（aspect + 轻微旋转）
   const generateLayoutSeeds = () => {
-    layoutSeeds.value.clear();
-    maxZIndex.value = images.value.length;
+    visualSeeds.value.clear();
     images.value.forEach((_, index) => {
-      // 以容器中心为基准的小幅随机偏移，形成"堆"而非"撒"
-      // x/y 均值 50%（几何中心），±12% 抖动保证集中在中间
-      layoutSeeds.value.set(index, {
-        x: 50 + (Math.random() - 0.5) * 24, // 38-62% from left
-        y: 50 + (Math.random() - 0.5) * 20, // 40-60% from top
-        rotation: (Math.random() - 0.5) * 24, // ±12°, 更接近随手散落的手感
-        zIndex: index + 1,
+      visualSeeds.value.set(index, {
+        aspect: ASPECTS[index % ASPECTS.length],
+        // ±3° 轻微旋转，比堆叠版克制——瀑布流里大幅旋转会破坏列对齐
+        rotation: (Math.random() - 0.5) * 6,
       });
     });
   };
 
-  // Shuffle images layout
   const shuffleImages = () => {
     generateLayoutSeeds();
-    useNotificationStore().success('照片已重新洗牌');
+    useNotificationStore().success('照片已重新排布');
   };
 
-  const bringToFront = (index: number) => {
-    const seed = layoutSeeds.value.get(index);
-    if (seed) {
-      maxZIndex.value += 1;
-      seed.zIndex = maxZIndex.value;
-    }
-  };
+  // 保留空壳 bringToFront，避免外部调用处（已迁移）误用时报错——返回 no-op
+  const bringToFront = (_index: number) => {};
 
-  // Get style for each image card
-  const getImageStyle = (index: number): Record<string, string | number> => {
-    const seed = layoutSeeds.value.get(index);
-    if (!seed) return {};
-    return {
-      left: `${seed.x}%`,
-      top: `${seed.y}%`,
-      // 用独立 CSS `translate` 属性做居中补偿，而非 `transform`
-      // motion-v 的 animate.rotate 走 transform，二者叠加不冲突
-      translate: '-50% -50%',
-      zIndex: seed.zIndex,
-    };
-  };
-
-  // Get consistent size for variety, slightly larger for polaroids
-  const getImageSize = (index: number) => {
-    const seed = (index * 137) % 100;
-    return 220 + seed;
-  };
-
-  // Get aspect ratio, prefer standard photo formats
   const getAspectRatio = (index: number) => {
-    const ratios = [1, 1.25, 0.8, 1.5]; // 1:1, 4:5, 5:4, 2:3
-    return ratios[index % ratios.length];
+    return visualSeeds.value.get(index)?.aspect ?? ASPECTS[index % ASPECTS.length];
   };
 
-  // Get cached rotation for an image (kept stable across renders)
   const getRotation = (index: number) => {
-    return layoutSeeds.value.get(index)?.rotation ?? 0;
+    return visualSeeds.value.get(index)?.rotation ?? 0;
   };
 
   return {
-    layoutSeeds,
+    visualSeeds,
     generateLayoutSeeds,
     shuffleImages,
     bringToFront,
-    getImageStyle,
-    getImageSize,
     getAspectRatio,
     getRotation,
   };
-};
+}

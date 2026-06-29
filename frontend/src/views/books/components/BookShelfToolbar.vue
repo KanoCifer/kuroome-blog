@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-background/85 sticky top-0 z-20 -mx-4 mb-6 px-4 pt-3 pb-3 backdrop-blur-md sm:-mx-6 sm:px-6 md:-mx-10 md:px-10"
+    class="bg-background/85 top-0 z-20 -mx-4 mb-6 px-4 pt-3 pb-3 backdrop-blur-md sm:-mx-6 sm:px-6 md:-mx-10 md:px-10"
   >
     <!-- Row 1: 搜索 + 密度切换 -->
     <div class="flex items-center gap-2">

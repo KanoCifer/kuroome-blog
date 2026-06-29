@@ -41,22 +41,46 @@
           上传图片
         </Button>
       </Transition>
+
+      <!-- 删除选中：仅在编辑模式且有选中时出现 -->
+      <Transition
+        enter-active-class="transition-all duration-300 ease-in-out"
+        enter-from-class="translate-x-full opacity-0"
+        enter-to-class="translate-x-0 opacity-100"
+        leave-active-class="transition-all duration-300 ease-in-out"
+        leave-from-class="translate-x-0 opacity-100"
+        leave-to-class="translate-x-full opacity-0"
+      >
+        <Button
+          v-if="isEditMode && canEdit && selectedCount > 0"
+          key="delete-btn"
+          variant="destructive"
+          size="sm"
+          @click="$emit('delete-selected')"
+          class="h-9 gap-2 rounded-full px-4 shadow-md"
+        >
+          <Trash2 class="h-4 w-4" />
+          删除选中 {{ selectedCount }}
+        </Button>
+      </Transition>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
-import { Check, Edit2, Shuffle, Upload } from '@lucide/vue';
+import { Check, Edit2, Shuffle, Trash2, Upload } from '@lucide/vue';
 
 defineProps<{
   canEdit: boolean;
   isEditMode: boolean;
+  selectedCount?: number;
 }>();
 
 defineEmits<{
   'toggle-edit': [];
   shuffle: [];
   upload: [];
+  'delete-selected': [];
 }>();
 </script>
