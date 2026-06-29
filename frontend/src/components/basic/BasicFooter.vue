@@ -13,12 +13,10 @@
     >
       <!-- 左：站名 + 版权章回标 -->
       <div class="flex items-baseline gap-2.5">
-        <span class="text-foreground/80 font-serif text-[13px] italic"
-          >ka·no·ci·fer</span
-        >
+        <span class="font-serif text-[13px] italic">ka·no·ci·fer</span>
         <span aria-hidden="true" class="text-border/50">·</span>
         <span class="font-mono text-[10px] tracking-[0.2em] uppercase"
-          >© 卷一·2026</span
+          >©2026</span
         >
       </div>
 
@@ -30,7 +28,7 @@
               to="/status"
               class="hover:text-foreground inline-flex items-center gap-1.5 transition-colors"
             >
-              <span class="relative flex h-1.5 w-1.5">
+              <span class="status-dot relative flex h-1.5 w-1.5">
                 <span
                   class="absolute inline-flex h-full w-full animate-ping rounded-full"
                   :class="delayStatus.dotClass"
@@ -123,3 +121,11 @@ defineProps<{
   isEntryView: boolean;
 }>();
 </script>
+
+<style lang="scss" scoped>
+footer {
+  :deep(*) {
+    color: var(--color-foreground);
+  }
+}
+</style>

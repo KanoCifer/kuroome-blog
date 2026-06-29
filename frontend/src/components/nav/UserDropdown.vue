@@ -3,7 +3,7 @@
     @click="openUserMenu"
     @mouseenter="openUserMenu"
     @mouseleave="closeUserMenu"
-    class="hover:border-primary mb-8 flex items-center gap-4 rounded-3xl p-2 px-2 transition-colors hover:border-2"
+    class="mb-8 flex items-center gap-4 rounded-3xl p-2 px-2 transition-colors"
   >
     <!-- 下拉菜单 -->
     <transition

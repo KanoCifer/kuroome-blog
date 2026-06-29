@@ -40,10 +40,12 @@
       </div>
 
       <!-- Name -->
-      <h2 class="text-foreground font-family-averia white- mb-2 text-2xl">
+      <h2 class="text-foreground font-family-averia mb-2 text-2xl">
         I'm <span class="text-primary text-3xl font-bold">Kuroome</span>.
       </h2>
-      <p class="font-family-averia white- mb-2 text-2xl">Welcome to my site!</p>
+      <p class="font-family-averia text-foreground mb-2 text-2xl">
+        Welcome to my site!
+      </p>
 
       <!-- Visitor Count -->
       <div class="text-muted-foreground mt-3 flex items-center gap-1.5 text-xs">
@@ -67,30 +69,6 @@
         </svg>
         <span>{{ visitorCount.count }} 人在线</span>
       </div>
-
-      <!-- Bio/Bullet Points -->
-      <!-- <div
-            class="mt-2 w-full space-y-3 text-left text-sm text-gray-600 dark:text-gray-300"
-          >
-            <div class="flex items-start gap-3">
-              <span
-                class="mt-1.5 flex h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400"
-              ></span>
-              <span>国际政治专业在读学生</span>
-            </div>
-            <div class="flex items-start gap-3">
-              <span
-                class="mt-1.5 flex h-1.5 w-1.5 shrink-0 rounded-full bg-purple-400"
-              ></span>
-              <span>正在自学编程与开发</span>
-            </div>
-            <div class="flex items-start gap-3">
-              <span
-                class="mt-1.5 flex h-1.5 w-1.5 shrink-0 rounded-full bg-pink-400"
-              ></span>
-              <span>爱好编程、阅读、钓鱼等</span>
-            </div>
-          </div> -->
     </div>
   </BentoCard>
 </template>

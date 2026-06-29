@@ -1,14 +1,30 @@
 <template>
   <div
-    class="squircle border-border/60 bg-background h-full border p-6 shadow-sm"
+    class="border-border/60 bg-background h-full rounded-3xl border p-6 shadow-sm"
   >
     <h2 class="text-foreground mb-4 flex items-center gap-2 text-lg font-bold">
       <icon-analytics class="size-6" /> OS Distribution
     </h2>
     <div
-      v-if="loading && !osStats"
+      v-if="loading && !hasOsData"
       class="bg-muted h-64 animate-pulse rounded-xl"
     ></div>
+    <!-- Empty state -->
+    <div
+      v-else-if="!hasOsData"
+      class="flex h-64 flex-col items-center justify-center gap-3 px-6 text-center"
+    >
+      <div
+        class="bg-muted text-muted-foreground/50 flex h-12 w-12 items-center justify-center rounded-full"
+      >
+        <icon-analytics class="size-6" />
+      </div>
+      <p class="text-foreground text-sm font-medium">No OS data yet</p>
+      <p class="text-muted-foreground max-w-xs text-xs">
+        Operating system distribution will appear here once visitors reach your
+        site.
+      </p>
+    </div>
     <div v-else class="h-64 w-full overflow-hidden">
       <v-chart :option="osChartOption" autoresize class="h-full w-full" />
     </div>
@@ -31,6 +47,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const hasOsData = computed(() => (props.osStats ?? []).length > 0);
 
 const osChartOption = computed(() => {
   const data = props.osStats ?? [];

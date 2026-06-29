@@ -1,15 +1,31 @@
 <template>
   <div
-    class="squircle border-border/60 bg-background h-full border p-6 shadow-sm"
+    class="border-border/60 bg-background h-full rounded-3xl border p-6 shadow-sm"
   >
     <h2 class="text-foreground flex items-center gap-2 text-lg font-bold">
       <icon-popular class="size-6" /> Popular Pages
     </h2>
     <div
       v-if="loading && !overviewData"
-      class="bg-muted h-full animate-pulse rounded-xl"
+      class="bg-muted h-full min-h-[18rem] animate-pulse rounded-xl"
     ></div>
-    <div v-else class="h-full w-full overflow-hidden">
+    <!-- Empty state -->
+    <div
+      v-else-if="!hasPagesData"
+      class="flex min-h-[18rem] flex-col items-center justify-center gap-3 px-6 text-center"
+    >
+      <div
+        class="bg-muted text-muted-foreground/50 flex h-12 w-12 items-center justify-center rounded-full"
+      >
+        <icon-popular class="size-6" />
+      </div>
+      <p class="text-foreground text-sm font-medium">No page views yet</p>
+      <p class="text-muted-foreground max-w-xs text-xs">
+        The most-visited pages will appear here once your site starts receiving
+        traffic.
+      </p>
+    </div>
+    <div v-else class="h-full min-h-[18rem] w-full overflow-hidden">
       <v-chart :option="popularPagesChartOption" autoresize />
     </div>
   </div>
@@ -39,6 +55,10 @@ const props = defineProps<{
   loading: boolean;
   overviewData: OverviewData | null;
 }>();
+
+const hasPagesData = computed(
+  () => (props.overviewData?.top_pages ?? []).length > 0,
+);
 
 const popularPagesChartOption = computed(() => {
   const pages = props.overviewData?.top_pages ?? [];

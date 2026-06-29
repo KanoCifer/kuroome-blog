@@ -30,7 +30,7 @@ const showPassword = ref<boolean>(false);
   <div class="bg-background flex min-h-screen">
     <!-- 左侧 Branding (仅在大屏幕显示) -->
     <div
-      class="relative hidden w-1/2 flex-col justify-between bg-zinc-950 p-10 text-white lg:flex"
+      class="relative hidden w-3/5 flex-col justify-between bg-zinc-950 p-10 text-white lg:flex"
     >
       <div class="flex items-center gap-2 text-xl font-bold tracking-tight">
         <IconCloud class="text-primary size-8" />
@@ -53,7 +53,7 @@ const showPassword = ref<boolean>(false);
 
     <!-- 右侧 Login Form -->
     <div
-      class="bg-background flex w-full items-center justify-center p-8 lg:w-1/2"
+      class="bg-background flex w-full items-center justify-center p-8 lg:w-2/5"
     >
       <div class="w-full max-w-sm xl:max-w-md">
         <!-- 表头 -->

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="squircle border-border/60 bg-background h-full border p-6 shadow-sm"
+    class="border-border/60 bg-background h-full rounded-3xl border p-6 shadow-sm"
   >
     <h2 class="text-foreground mb-4 flex items-center gap-2 text-lg font-bold">
       <icon-trend class="size-6" /> Visits Trend (Last {{ selectedDays }} days)
@@ -9,6 +9,22 @@
       v-if="loading && !overviewData"
       class="bg-muted h-80 animate-pulse rounded-xl"
     ></div>
+    <!-- Empty state -->
+    <div
+      v-else-if="!hasTrendData"
+      class="flex h-80 flex-col items-center justify-center gap-3 px-6 text-center"
+    >
+      <div
+        class="bg-muted text-muted-foreground/50 flex h-12 w-12 items-center justify-center rounded-full"
+      >
+        <icon-trend class="size-6" />
+      </div>
+      <p class="text-foreground text-sm font-medium">No visits recorded yet</p>
+      <p class="text-muted-foreground max-w-xs text-xs">
+        Visit data for the last {{ selectedDays }} days will appear here once
+        your site starts receiving traffic.
+      </p>
+    </div>
     <div v-else class="h-80 w-full overflow-hidden">
       <v-chart :option="trendChartOption" autoresize class="h-full w-full" />
     </div>
@@ -32,6 +48,10 @@ const props = defineProps<{
   overviewData: OverviewData | null;
   selectedDays: number;
 }>();
+
+const hasTrendData = computed(
+  () => (props.overviewData?.daily_trend ?? []).length > 0,
+);
 
 const trendChartOption = computed(() => {
   const data = props.overviewData?.daily_trend ?? [];

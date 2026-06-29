@@ -1,14 +1,29 @@
 <template>
   <div
-    class="squircle border-border/60 bg-background h-full border p-6 shadow-sm"
+    class="border-border/60 bg-background h-full rounded-3xl border p-6 shadow-sm"
   >
     <h2 class="text-foreground mb-4 flex items-center gap-2 text-lg font-bold">
       <icon-analytics class="size-6" /> Browser Distribution
     </h2>
     <div
-      v-if="loading && !browserStats"
+      v-if="loading && !hasBrowserData"
       class="bg-muted h-64 animate-pulse rounded-xl"
     ></div>
+    <!-- Empty state -->
+    <div
+      v-else-if="!hasBrowserData"
+      class="flex h-64 flex-col items-center justify-center gap-3 px-6 text-center"
+    >
+      <div
+        class="bg-muted text-muted-foreground/50 flex h-12 w-12 items-center justify-center rounded-full"
+      >
+        <icon-analytics class="size-6" />
+      </div>
+      <p class="text-foreground text-sm font-medium">No browser data yet</p>
+      <p class="text-muted-foreground max-w-xs text-xs">
+        Browser distribution will appear here once visitors reach your site.
+      </p>
+    </div>
     <div v-else class="h-64 w-full overflow-hidden">
       <v-chart :option="browserChartOption" autoresize class="h-full w-full" />
     </div>
@@ -32,6 +47,10 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const hasBrowserData = computed(
+  () => (props.browserStats ?? []).length > 0,
+);
 
 const browserChartOption = computed(() => {
   const rawData = props.browserStats ?? [];
