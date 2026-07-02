@@ -15,7 +15,7 @@ import orjson
 from redis.asyncio import Redis as AsyncRedis
 from taskiq import Context, TaskiqDepends
 
-from app.api.des.db import AsyncSessionFactory
+from app.api.des.db import get_async_session
 from app.core.config import get_settings
 from app.core.logger import logger
 from app.models.models import VisitorTrack
@@ -29,7 +29,9 @@ SHANGHAI_TZ = ZoneInfo("Asia/Shanghai")
 
 def _feishu_ctx() -> NotificationContext:
     """Build NotificationContext for the global Feishu webhook."""
-    return NotificationContext(feishu_webhook_url=get_settings().FEISHU_WEBHOOK_URL)
+    return NotificationContext(
+        feishu_webhook_url=get_settings().FEISHU_WEBHOOK_URL
+    )
 
 
 async def _send_notification(
@@ -161,7 +163,9 @@ async def run_migration_job(context: Context = TaskiqDepends()):
                 error_msg = str(e)
                 parse_duration = time.perf_counter() - parse_start
                 logger.bind(
-                    job="migration", error=error_msg, parse_duration=parse_duration
+                    job="migration",
+                    error=error_msg,
+                    parse_duration=parse_duration,
                 ).warning("migration json parsing failed")
                 for item in reversed(valid_items):
                     redis.lpush(queue_key, item)
@@ -179,7 +183,7 @@ async def run_migration_job(context: Context = TaskiqDepends()):
             transform_duration = time.perf_counter() - transform_start
 
             db_start = time.perf_counter()
-            async with AsyncSessionFactory() as session:
+            async with get_async_session() as session:
                 track_objects: list[VisitorTrack] = []
 
                 max_lengths = {
@@ -214,16 +218,6 @@ async def run_migration_job(context: Context = TaskiqDepends()):
                     "migration adding objects to session"
                 )
                 session.add_all(track_objects)
-
-                logger.bind(job="migration").info("migration committing to database")
-                try:
-                    await session.commit()
-                    logger.bind(job="migration").info("migration commit successful")
-                except Exception:
-                    logger.bind(job="migration").exception(
-                        "migration database commit failed"
-                    )
-                    raise
 
                 processed_count = len(track_objects)
                 db_duration = time.perf_counter() - db_start
@@ -283,7 +277,9 @@ async def refresh_rss_feeds(context: Context = TaskiqDepends()):
     settings = get_settings()
 
     if not settings.FEISHU_WEBHOOK_URL:
-        logger.warning("feishu webhook not configured, RSS refresh result will not notify")
+        logger.warning(
+            "feishu webhook not configured, RSS refresh result will not notify"
+        )
 
     try:
         from app.core.container import get_rss_service
@@ -310,9 +306,7 @@ async def refresh_rss_feeds(context: Context = TaskiqDepends()):
                 f"总耗时: {duration:.2f}秒"
             )
 
-        await _send_notification(
-            title="✅Rss 刷新完成通知", body=message
-        )
+        await _send_notification(title="✅Rss 刷新完成通知", body=message)
 
         return {
             "status": "success",
@@ -329,9 +323,7 @@ async def refresh_rss_feeds(context: Context = TaskiqDepends()):
         message = (
             f"❌RSS 刷新失败！\n错误信息: {error_msg}\n耗时: {duration:.2f}秒"
         )
-        await _send_notification(
-            title="❌Rss 刷新失败通知", body=message
-        )
+        await _send_notification(title="❌Rss 刷新失败通知", body=message)
         return {
             "status": "failed",
             "error": str(e),
@@ -353,7 +345,9 @@ async def send_daily_summary(context: Context = TaskiqDepends()):
     settings = get_settings()
 
     if not settings.FEISHU_WEBHOOK_URL:
-        logger.warning("feishu webhook not configured, skip daily summary notification")
+        logger.warning(
+            "feishu webhook not configured, skip daily summary notification"
+        )
         return
 
     today_shanghai = datetime.now(SHANGHAI_TZ).replace(
@@ -367,7 +361,9 @@ async def send_daily_summary(context: Context = TaskiqDepends()):
 
         redis = context.state.redis
         if redis is None:
-            logger.warning("taskiq redis not initialized, skip daily summary notification")
+            logger.warning(
+                "taskiq redis not initialized, skip daily summary notification"
+            )
             return
 
         async with get_monitor_service() as monitor_service:
@@ -422,12 +418,16 @@ async def send_todo(context: Context = TaskiqDepends()):
     """每天早上9点发送待办事项提醒给用户"""
     settings = get_settings()
     if not settings.FEISHU_WEBHOOK_URL:
-        logger.warning("feishu webhook not configured, skip todo reminder notification")
+        logger.warning(
+            "feishu webhook not configured, skip todo reminder notification"
+        )
         return
 
     redis = getattr(context.state, "redis", None)
     if redis is None:
-        logger.warning("taskiq redis not initialized, skip todo reminder notification")
+        logger.warning(
+            "taskiq redis not initialized, skip todo reminder notification"
+        )
         return
 
     todos = await redis.get("todos:1")
