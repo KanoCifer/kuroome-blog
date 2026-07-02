@@ -18,11 +18,117 @@
 
     <!-- Dashboard grid -->
     <main class="mx-auto max-w-6xl px-6 pb-16 sm:px-8">
-      <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <!-- Filter row -->
+      <div class="mt-8">
+        <div
+          class="border-border/60 bg-background flex flex-col items-center justify-between gap-3 rounded-2xl border p-3 sm:flex-row"
+        >
+          <!-- Days Filter -->
+          <div class="relative">
+            <button
+              ref="dropdownTrigger"
+              class="border-border bg-background text-foreground hover:border-border/70 hover:bg-muted focus:border-primary focus:ring-primary/20 flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition-all focus:ring-2"
+              :aria-expanded="showDropdown"
+              aria-haspopup="listbox"
+              @click="showDropdown = !showDropdown"
+            >
+              <svg
+                class="text-muted-foreground h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              Last {{ selectedDays }} Days
+              <svg
+                class="text-muted-foreground h-3.5 w-3.5 transition-transform"
+                :class="{ 'rotate-180': showDropdown }"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+
+            <transition
+              enter-active-class="transition-all transform-gpu duration-150 ease-out"
+              enter-from-class="opacity-0 scale-95 -translate-y-1"
+              enter-to-class="opacity-100 scale-100 translate-y-0"
+              leave-active-class="transition-all transform-gpu duration-100 ease-in"
+              leave-from-class="opacity-100 scale-100 translate-y-0"
+              leave-to-class="opacity-0 scale-95 -translate-y-1"
+            >
+              <ul
+                v-if="showDropdown"
+                ref="dropdownMenu"
+                role="listbox"
+                aria-label="Date range"
+                class="border-border bg-background absolute top-full left-0 z-50 mt-2 w-44 overflow-hidden rounded-xl border shadow-lg"
+              >
+                <li
+                  v-for="option in [7, 30, 90]"
+                  :key="option"
+                  role="option"
+                  :aria-selected="selectedDays === option"
+                  class="focus:bg-muted cursor-pointer px-4 py-2.5 text-sm transition-colors focus:outline-none"
+                  :class="
+                    selectedDays === option
+                      ? 'bg-muted text-foreground font-medium'
+                      : 'text-foreground hover:bg-muted'
+                  "
+                  @click.prevent="onSelectDays(option)"
+                >
+                  Last {{ option }} days
+                </li>
+              </ul>
+            </transition>
+          </div>
+
+          <!-- Refresh Button -->
+          <button
+            type="button"
+            :disabled="loading && !!overviewData"
+            @click="fetchAllData"
+            class="bg-primary text-primary-foreground hover:bg-primary/90 flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <svg
+              :class="[
+                loading && !overviewData ? 'animate-spin' : '',
+                'h-4 w-4 transition-transform',
+              ]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            {{ loading && !overviewData ? 'Loading...' : 'Refresh' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <!-- Error Message - Full Width -->
         <div v-if="error" class="col-span-1 sm:col-span-2 lg:col-span-3">
           <div
-            class="bg-destructive/5 border-destructive/20 text-destructive rounded-3xl border p-4"
+            class="bg-destructive/5 border-destructive/20 text-destructive rounded-2xl border p-4"
           >
             <div class="flex items-center gap-2">
               <svg
@@ -41,277 +147,156 @@
           </div>
         </div>
 
-        <!-- Filter Card -->
-        <div class="col-span-1 sm:col-span-2 lg:col-span-3">
-          <div
-            class="border-border/60 bg-background flex flex-col items-center justify-between gap-4 rounded-3xl border p-4 sm:flex-row"
-          >
-            <!-- Days Filter -->
-            <div class="relative">
-              <button
-                class="border-border bg-background text-foreground hover:border-border/70 hover:bg-muted focus:border-primary focus:ring-primary/20 flex items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-medium shadow-sm transition-all focus:ring-2"
-                @click="showDropdown = !showDropdown"
-                @mouseenter="handleMouseIn"
-                @mouseleave="handleMouseOut"
-              >
-                <svg
-                  class="text-muted-foreground h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                Last {{ selectedDays }} Days
-                <svg
-                  class="text-muted-foreground h-3 w-3 transition-transform"
-                  :class="{ 'rotate-180': showDropdown }"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-
-              <!-- Dropdown Menu -->
-              <transition
-                enter-active-class="transition-all transform-gpu duration-200 ease-out"
-                enter-from-class="opacity-0 scale-95 -translate-y-1"
-                enter-to-class="opacity-100 scale-100 translate-y-0"
-                leave-active-class="transition-all transform-gpu duration-150 ease-in"
-                leave-from-class="opacity-100 scale-100 translate-y-0"
-                leave-to-class="opacity-0 scale-95 -translate-y-1"
-              >
-                <div
-                  v-if="showDropdown"
-                  class="border-border bg-background absolute top-full left-0 z-50 mt-2 w-fit rounded-xl border whitespace-nowrap shadow-lg"
-                  @mouseenter="handleMouseIn"
-                  @mouseleave="handleMouseOut"
-                >
-                  <button
-                    v-for="option in [7, 30, 90]"
-                    :key="option"
-                    @click="
-                      selectedDays = option;
-                      showDropdown = false;
-                    "
-                    class="text-foreground hover:bg-muted block w-full rounded-xl px-4 py-2.5 text-left text-sm transition-colors"
-                  >
-                    Last {{ option }} days
-                  </button>
-                </div>
-              </transition>
-            </div>
-
-            <!-- Refresh Button -->
-            <button
-              type="button"
-              :disabled="loading"
-              @click="fetchAllData"
-              class="group bg-primary text-primary-foreground hover:bg-primary/90 flex cursor-pointer items-center gap-2 rounded-xl px-5 py-2.5 font-medium shadow-md transition-all select-none hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <svg
-                :class="[
-                  loading ? 'animate-spin' : 'group-hover:rotate-180',
-                  'h-4 w-4 transition-transform',
-                ]"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-              {{ loading ? 'Loading...' : 'Refresh' }}
-            </button>
-          </div>
-        </div>
-
         <!-- Stats Cards Row - Full Width -->
-        <div class="col-span-1 sm:col-span-2 lg:col-span-3">
+        <div
+          class="col-span-1 sm:col-span-2 lg:col-span-3"
+          :class="{
+            'pointer-events-none opacity-60': loading && !!overviewData,
+          }"
+          style="transition: opacity 0.2s ease"
+        >
           <!-- Loading Skeleton -->
-          <template v-if="loading && !overviewData">
-            <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
-              <div
-                v-for="i in 4"
-                :key="i"
-                class="bg-muted/50 h-28 animate-pulse rounded-3xl"
-              ></div>
-            </div>
-          </template>
+          <div
+            v-if="loading && !overviewData"
+            class="grid grid-cols-2 gap-4 lg:grid-cols-4"
+          >
+            <div
+              v-for="i in 4"
+              :key="i"
+              class="bg-muted/50 h-28 animate-pulse rounded-2xl"
+            ></div>
+          </div>
 
           <!-- Actual Stats Cards -->
-          <div v-else class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <div
+            v-else-if="overviewData"
+            class="grid grid-cols-2 gap-4 lg:grid-cols-4"
+          >
             <!-- Total Visits (PV) -->
-            <div
-              class="border-border/60 bg-background flex flex-col gap-4 rounded-3xl border p-5"
+            <StatTile
+              label="Total Visits"
+              :value="overviewData.total_visits"
+              :sparkline="sparklinePoints"
+              :sparkline-color="'text-primary'"
+              accent="bg-primary/10 text-primary"
             >
-              <div class="flex items-center justify-between">
-                <span class="text-muted-foreground text-sm font-medium"
-                  >Total Visits</span
+              <template #icon>
+                <svg
+                  class="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                <div
-                  class="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-lg"
-                >
-                  <svg
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <div>
-                <p class="text-foreground text-3xl font-bold tracking-tight">
-                  {{ formatNumber(overviewData?.total_visits ?? 0) }}
-                </p>
-                <p class="text-muted-foreground mt-1 text-xs">Page Views</p>
-              </div>
-            </div>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
+                </svg>
+              </template>
+            </StatTile>
 
             <!-- Unique Visitors (UV) -->
-            <div
-              class="border-border/60 bg-background flex flex-col gap-4 rounded-3xl border p-5"
+            <StatTile
+              label="Unique Visitors"
+              :value="overviewData.unique_visitors"
+              accent="bg-success/10 text-success"
             >
-              <div class="flex items-center justify-between">
-                <span class="text-muted-foreground text-sm font-medium"
-                  >Unique Visitors</span
+              <template #icon>
+                <svg
+                  class="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                <div
-                  class="bg-success/10 text-success flex h-9 w-9 items-center justify-center rounded-lg"
-                >
-                  <svg
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <div>
-                <p class="text-foreground text-3xl font-bold tracking-tight">
-                  {{ formatNumber(overviewData?.unique_visitors ?? 0) }}
-                </p>
-                <p class="text-muted-foreground mt-1 text-xs">By IP address</p>
-              </div>
-            </div>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                </svg>
+              </template>
+            </StatTile>
 
             <!-- Visitor IDs -->
-            <div
-              class="border-border/60 bg-background flex flex-col gap-4 rounded-3xl border p-5"
+            <StatTile
+              label="Visitor IDs"
+              :value="overviewData.unique_visitor_ids"
+              accent="bg-muted text-muted-foreground"
             >
-              <div class="flex items-center justify-between">
-                <span class="text-muted-foreground text-sm font-medium"
-                  >Visitor IDs</span
+              <template #icon>
+                <svg
+                  class="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                <div
-                  class="bg-muted text-foreground flex h-9 w-9 items-center justify-center rounded-lg"
-                >
-                  <svg
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <div>
-                <p class="text-foreground text-3xl font-bold tracking-tight">
-                  {{ formatNumber(overviewData?.unique_visitor_ids ?? 0) }}
-                </p>
-                <p class="text-muted-foreground mt-1 text-xs">By visitor ID</p>
-              </div>
-            </div>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+              </template>
+            </StatTile>
 
             <!-- Avg Visits Per Day -->
-            <div
-              class="border-border/60 bg-background flex flex-col gap-4 rounded-3xl border p-5"
+            <StatTile
+              label="Avg / Day"
+              :value="avgVisitsPerDay"
+              value-suffix=""
+              accent="bg-warning/10 text-warning"
             >
-              <div class="flex items-center justify-between">
-                <span class="text-muted-foreground text-sm font-medium"
-                  >Avg/Day</span
+              <template #icon>
+                <svg
+                  class="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                <div
-                  class="bg-warning/10 text-warning flex h-9 w-9 items-center justify-center rounded-lg"
-                >
-                  <svg
-                    class="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <div>
-                <p class="text-foreground text-3xl font-bold tracking-tight">
-                  {{ avgVisitsPerDay }}
-                </p>
-                <p class="text-muted-foreground mt-1 text-xs">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
+              </template>
+              <template #footer>
+                <span class="text-muted-foreground text-xs">
                   Last {{ selectedDays }} days
-                </p>
-              </div>
-            </div>
+                </span>
+              </template>
+            </StatTile>
           </div>
         </div>
 
         <!-- Charts Section -->
-        <div class="col-span-1 sm:col-span-2">
+        <div
+          class="col-span-1 sm:col-span-2"
+          :class="{ 'opacity-60': loading && !!overviewData }"
+          style="transition: opacity 0.2s ease"
+        >
           <TrendChartCard
             :loading="loading"
             :overview-data="overviewData"
             :selected-days="selectedDays"
           />
         </div>
-        <div class="col-span-1">
+        <div
+          class="col-span-1"
+          :class="{ 'opacity-60': loading && !!overviewData }"
+          style="transition: opacity 0.2s ease"
+        >
           <PopularPagesChartCard
             :loading="loading"
             :overview-data="overviewData"
@@ -319,13 +304,21 @@
         </div>
 
         <!-- Device & Browser Analytics Section -->
-        <div class="col-span-1">
+        <div
+          class="col-span-1"
+          :class="{ 'opacity-60': loading && !!overviewData }"
+          style="transition: opacity 0.2s ease"
+        >
           <OsCharts
             :loading="loading"
             :os-stats="overviewData?.os_stats ?? []"
           />
         </div>
-        <div class="col-span-1 sm:col-span-2">
+        <div
+          class="col-span-1 sm:col-span-2"
+          :class="{ 'opacity-60': loading && !!overviewData }"
+          style="transition: opacity 0.2s ease"
+        >
           <BrowserAnalytics
             :loading="loading"
             :browser-stats="overviewData?.browser_stats ?? []"
@@ -342,9 +335,13 @@
         </div>
 
         <!-- User Login Logs Table - Full Width -->
-        <div class="col-span-1 sm:col-span-2 lg:col-span-3">
+        <div
+          class="col-span-1 sm:col-span-2 lg:col-span-3"
+          :class="{ 'opacity-60': loading && !!loginLogsData }"
+          style="transition: opacity 0.2s ease"
+        >
           <div
-            class="border-border/60 bg-background overflow-hidden rounded-3xl border p-6"
+            class="border-border/60 bg-background overflow-hidden rounded-3xl border p-5"
           >
             <h2
               class="text-foreground mb-4 flex items-center gap-2 text-lg font-bold"
@@ -353,7 +350,7 @@
               User Login Logs
             </h2>
 
-            <!-- Loading State -->
+            <!-- Loading State (only on initial load) -->
             <div v-if="loading && !loginLogsData" class="py-8">
               <div class="space-y-3">
                 <div
@@ -393,7 +390,7 @@
                     class="border-border text-muted-foreground border-b text-left text-sm"
                   >
                     <th class="pb-3 font-medium">User</th>
-                    <th class="pb-3 font-medium">Login Count</th>
+                    <th class="pb-3 font-medium">Logins</th>
                     <th class="pb-3 font-medium">Last Login</th>
                     <th class="pb-3 font-medium">Current Login</th>
                     <th class="pb-3 font-medium">Last IP</th>
@@ -402,11 +399,11 @@
                 </thead>
                 <tbody class="divide-border divide-y">
                   <tr
-                    v-for="log in loginLogsData?.list"
+                    v-for="log in loginLogsData?.list ?? []"
                     :key="log.user_id"
                     class="hover:bg-muted/30 text-sm transition-colors"
                   >
-                    <td class="py-4">
+                    <td class="py-3.5">
                       <div class="flex items-center gap-3">
                         <div
                           class="bg-primary/15 text-primary flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold"
@@ -423,23 +420,27 @@
                         </div>
                       </div>
                     </td>
-                    <td class="py-4">
+                    <td class="py-3.5">
                       <span
-                        class="bg-success/20 text-success inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                        class="bg-success/20 text-success inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium tabular-nums"
                       >
-                        {{ log.login_count }} times
+                        {{ log.login_count }}
                       </span>
                     </td>
-                    <td class="text-foreground/80 py-4">
+                    <td class="text-foreground/80 py-3.5 tabular-nums">
                       {{ formatDateTime(log.last_login_at) }}
                     </td>
-                    <td class="text-foreground/80 py-4">
+                    <td class="text-foreground/80 py-3.5 tabular-nums">
                       {{ formatDateTime(log.current_login_at) }}
                     </td>
-                    <td class="text-muted-foreground py-4 font-mono text-xs">
+                    <td
+                      class="text-muted-foreground py-3.5 font-mono text-xs tabular-nums"
+                    >
                       {{ log.last_login_ip || '-' }}
                     </td>
-                    <td class="text-muted-foreground py-4 font-mono text-xs">
+                    <td
+                      class="text-muted-foreground py-3.5 font-mono text-xs tabular-nums"
+                    >
                       {{ log.current_login_ip || '-' }}
                     </td>
                   </tr>
@@ -465,14 +466,19 @@
               </p>
               <div class="flex gap-2">
                 <button
-                  :disabled="loginLogsData.page <= 1"
+                  :disabled="
+                    loginLogsData.page <= 1 || (!!loading && !!loginLogsData)
+                  "
                   @click="changePage(loginLogsData.page - 1)"
                   class="hover:bg-muted text-foreground rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Previous
                 </button>
                 <button
-                  :disabled="loginLogsData.page >= loginLogsData.total_pages"
+                  :disabled="
+                    loginLogsData.page >= loginLogsData.total_pages ||
+                    (!!loading && !!loginLogsData)
+                  "
                   @click="changePage(loginLogsData.page + 1)"
                   class="hover:bg-muted text-foreground rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                 >
@@ -492,13 +498,14 @@ import IconUser from '@/components/icons/IconUser.vue';
 import { analyticsGateway } from '@/api/shared';
 import { useAuthStore } from '@/auth/stores/auth';
 import dayjs from 'dayjs';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import TrendChartCard from './components/TrendChartCard.vue';
 import BrowserAnalytics from './components/BrowserAnalytics.vue';
 import OsCharts from './components/OsCharts.vue';
 import PopularPagesChartCard from './components/PopularPagesChartCard.vue';
 import ServerMonitor from './components/ServerMonitor.vue';
+import StatTile from './components/StatTile.vue';
 
 // Types
 interface OverviewData {
@@ -551,25 +558,34 @@ const loginLogsData = ref<LoginLogsResponse | null>(null);
 const loginLogsPage = ref(1);
 const serverMonitorRef = ref<InstanceType<typeof ServerMonitor> | null>(null);
 const showDropdown = ref<boolean>(false);
+const dropdownTrigger = ref<HTMLElement | null>(null);
+const dropdownMenu = ref<HTMLElement | null>(null);
 
 // Computed
 const avgVisitsPerDay = computed(() => {
   if (!overviewData.value?.total_visits || !selectedDays.value) return '0';
   const avg = overviewData.value.total_visits / selectedDays.value;
+  // Sparkline-style formatted number — compact 1-decimal.
+  if (avg >= 1000) return (avg / 1000).toFixed(1) + 'K';
   return avg.toFixed(1);
 });
 
-// Methods
-const formatNumber = (num: number): string => {
-  if (num >= 1000000) {
-    return (num / 1000000).toFixed(1) + 'M';
-  }
-  if (num >= 1000) {
-    return (num / 1000).toFixed(1) + 'K';
-  }
-  return num.toString();
-};
+/** 14-point series for the Total Visits sparkline (sorted asc by date). */
+const sparklinePoints = computed(() => {
+  const trend = overviewData.value?.daily_trend ?? [];
+  if (trend.length === 0) return [] as number[];
+  const sorted = [...trend].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+  );
+  const points = sorted.map((d) => d.count);
+  // Always return at least 7 points (pad front) so the tile never looks empty.
+  const target = Math.max(7, Math.min(points.length, 14));
+  if (points.length >= target) return points.slice(-target);
+  const pad = Array.from({ length: target - points.length }, () => 0);
+  return [...pad, ...points];
+});
 
+// Methods
 const formatDateTime = (dateStr: string | null): string => {
   if (!dateStr) return '-';
   return dayjs(dateStr).format('YYYY-MM-DD HH:mm');
@@ -610,15 +626,32 @@ const fetchAllData = async () => {
 };
 
 const changePage = (page: number) => {
+  if (loading.value) return;
   loginLogsPage.value = page;
   fetchLoginLogs();
+};
+
+const onSelectDays = (days: number) => {
+  selectedDays.value = days;
+  showDropdown.value = false;
+};
+
+// Close dropdown when clicking outside.
+const onDocClick = (e: MouseEvent) => {
+  if (!showDropdown.value) return;
+  const target = e.target as Node;
+  if (
+    dropdownTrigger.value?.contains(target) ||
+    dropdownMenu.value?.contains(target)
+  )
+    return;
+  showDropdown.value = false;
 };
 
 // Watch for days selection change
 watch(
   selectedDays,
   (newVal, oldVal) => {
-    // Guard: prevent infinite loop by comparing values
     if (newVal === oldVal) return;
     loginLogsPage.value = 1;
     fetchAllData();
@@ -628,6 +661,7 @@ watch(
 
 // Lifecycle
 onMounted(async () => {
+  document.addEventListener('click', onDocClick);
   // Check auth
   if (auth.user === null && !auth.loading) {
     await auth.fetchUser();
@@ -641,19 +675,7 @@ onMounted(async () => {
   await fetchAllData();
 });
 
-// Dropdown hover handlers to prevent it from disappearing when moving mouse
-let dropdownHoverTimeout: number | null = null;
-const handleMouseIn = () => {
-  if (dropdownHoverTimeout) {
-    clearTimeout(dropdownHoverTimeout);
-    dropdownHoverTimeout = null;
-  }
-
-  showDropdown.value = true;
-};
-const handleMouseOut = () => {
-  dropdownHoverTimeout = window.setTimeout(() => {
-    showDropdown.value = false;
-  }, 200);
-};
+onUnmounted(() => {
+  document.removeEventListener('click', onDocClick);
+});
 </script>

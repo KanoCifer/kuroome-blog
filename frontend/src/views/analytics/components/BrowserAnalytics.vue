@@ -2,9 +2,10 @@
   <div
     class="border-border/60 bg-background h-full rounded-3xl border p-6 shadow-sm"
   >
-    <h2 class="text-foreground mb-4 flex items-center gap-2 text-lg font-bold">
+    <h2 class="text-foreground mb-2 flex items-center gap-2 text-lg font-bold">
       <icon-analytics class="size-6" /> Browser Distribution
     </h2>
+    <p class="text-muted-foreground mb-4 text-xs">Share of visits by browser</p>
     <div
       v-if="loading && !hasBrowserData"
       class="bg-muted h-64 animate-pulse rounded-xl"
@@ -32,13 +33,21 @@
 
 <script setup lang="ts">
 import IconAnalytics from '@/components/icons/IconAnalytics.vue';
+import { useChartColors, withAlpha } from '@/composables/shared';
 import { computed } from 'vue';
 import VChart from 'vue-echarts';
+
+const MAX_BROWSERS = 5;
 
 interface BrowserStat {
   browser_name: string;
   browser_version: string;
   count: number;
+}
+
+interface BrowserRow extends BrowserStat {
+  displayName: string;
+  pct: number;
 }
 
 interface Props {
@@ -48,98 +57,115 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const hasBrowserData = computed(
-  () => (props.browserStats ?? []).length > 0,
+const { palette } = useChartColors();
+
+const hasBrowserData = computed(() => (props.browserStats ?? []).length > 0);
+
+const total = computed(() =>
+  (props.browserStats ?? []).reduce((s, it) => s + it.count, 0),
 );
 
-const browserChartOption = computed(() => {
-  const rawData = props.browserStats ?? [];
-
-  // 按访问量降序排序，取前9个，其余合并为Others（总共最多10项）
-  const sortedData = [...rawData].sort((a, b) => b.count - a.count);
-  let processedData: BrowserStat[] = [];
-
-  if (sortedData.length <= 10) {
-    processedData = sortedData;
-  } else {
-    const top9 = sortedData.slice(0, 9);
-    const othersCount = sortedData
-      .slice(9)
-      .reduce((sum, item) => sum + item.count, 0);
-    processedData = [
-      ...top9,
-      {
-        browser_name: 'Others',
-        browser_version: '',
-        count: othersCount,
-      },
-    ];
-  }
-
-  const colorPalette = [
-    '#3b82f6', // Chrome 蓝
-    '#ea4335', // Edge/Google 红
-    '#4285f4', // Firefox 蓝
-    '#fbbd00', // Safari 黄
-    '#00bfa5', // Opera 青
-    '#7b1fa2', // IE 紫
-    '#f06292', // 其他浏览器 粉
-    '#ff9800', // 橙
+/** Descending list capped at MAX_BROWSERS, tail folded into "Other". */
+const chartRows = computed<BrowserRow[]>(() => {
+  const raw = [...(props.browserStats ?? [])].sort((a, b) => b.count - a.count);
+  const t = total.value || 1;
+  const head = raw.slice(0, MAX_BROWSERS - 1).map((r) => ({
+    ...r,
+    displayName: r.browser_name
+      ? `${r.browser_name} ${r.browser_version || ''}`.trim()
+      : 'Unknown',
+    pct: (r.count / t) * 100,
+  }));
+  if (raw.length <= MAX_BROWSERS) return head;
+  const othersCount = raw
+    .slice(MAX_BROWSERS - 1)
+    .reduce((s, it) => s + it.count, 0);
+  return [
+    ...head,
+    {
+      browser_name: 'Other',
+      browser_version: '',
+      count: othersCount,
+      displayName: 'Other',
+      pct: (othersCount / t) * 100,
+    },
   ];
+});
+
+const browserChartOption = computed(() => {
+  const p = palette.value;
+  const rows = chartRows.value;
+  const display = [...rows].reverse();
 
   return {
     tooltip: {
-      trigger: 'item',
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      borderColor: '#e5e7eb',
-      textStyle: {
-        color: '#374151',
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      confine: true,
+      backgroundColor: p.card,
+      borderColor: p.border,
+      borderWidth: 1,
+      textStyle: { color: p.foreground },
+      formatter: (params: unknown) => {
+        const arr = params as Array<{ name: string; value: number }>;
+        const it = arr[0];
+        if (!it) return '';
+        const row = display.find((r) => r.displayName === it.name);
+        const pct = row ? row.pct.toFixed(1) : '0';
+        return `<div style="font-weight:600;color:${p.foreground};">${it.name}</div><div style="color:${p.mutedForeground};margin-top:2px;">${it.value.toLocaleString()} (${pct}%)</div>`;
       },
-      formatter: '{b}: {c} ({d}%)',
     },
-    legend: {
-      orient: 'vertical',
-      left: 'left',
-      top: 'center',
-      textStyle: {
-        color: '#6b7280',
+    grid: {
+      left: 0,
+      right: 56,
+      bottom: 0,
+      top: 0,
+      containLabel: true,
+    },
+    xAxis: {
+      type: 'value',
+      show: false,
+      max: Math.max(...rows.map((r) => r.count), 1) * 1.2,
+    },
+    yAxis: {
+      type: 'category',
+      inverse: true,
+      data: display.map((r) => r.displayName),
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: {
+        color: p.foreground,
+        fontSize: 11,
+        fontWeight: 500,
+        width: 120,
+        overflow: 'truncate',
       },
     },
     series: [
       {
         name: 'Browser',
-        type: 'pie',
-        radius: ['40%', '70%'],
-        center: ['65%', '50%'],
-        avoidLabelOverlap: false,
-        itemStyle: {
-          borderRadius: 8,
-          borderColor: '#fff',
-          borderWidth: 2,
-        },
-        label: {
-          show: false,
-          position: 'center',
-        },
-        emphasis: {
-          label: {
-            show: true,
-            fontSize: 20,
-            fontWeight: 'bold',
-          },
-        },
-        labelLine: {
-          show: false,
-        },
-        data: processedData.map((item, index) => ({
-          value: item.count,
-          name: item.browser_name
-            ? `${item.browser_name} ${item.browser_version || ''}`.trim()
-            : 'Unknown',
+        type: 'bar',
+        data: display.map((r, i) => ({
+          value: r.count,
           itemStyle: {
-            color: colorPalette[index % colorPalette.length],
+            color: p.series[i % p.series.length],
+            borderRadius: [0, 4, 4, 0],
           },
         })),
+        barMaxWidth: 20,
+        label: {
+          show: true,
+          position: 'right',
+          color: p.mutedForeground,
+          fontSize: 10,
+          fontWeight: 600,
+          distance: 8,
+          formatter: (params: { dataIndex: number }) => {
+            const row = display[params.dataIndex];
+            if (!row) return '';
+            return `${row.pct.toFixed(1)}%`;
+          },
+        },
       },
     ],
   };

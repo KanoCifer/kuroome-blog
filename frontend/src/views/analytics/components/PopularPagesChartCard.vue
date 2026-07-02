@@ -2,9 +2,12 @@
   <div
     class="border-border/60 bg-background h-full rounded-3xl border p-6 shadow-sm"
   >
-    <h2 class="text-foreground flex items-center gap-2 text-lg font-bold">
+    <h2 class="text-foreground mb-2 flex items-center gap-2 text-lg font-bold">
       <icon-popular class="size-6" /> Popular Pages
     </h2>
+    <p class="text-muted-foreground mb-4 text-xs">
+      Top 8 by views in selected period
+    </p>
     <div
       v-if="loading && !overviewData"
       class="bg-muted h-full min-h-[18rem] animate-pulse rounded-xl"
@@ -33,22 +36,15 @@
 
 <script setup lang="ts">
 import IconPopular from '@/components/icons/IconPopular.vue';
+import { useChartColors, withAlpha } from '@/composables/shared';
 import { computed } from 'vue';
 import VChart from 'vue-echarts';
 
+const MAX_ITEMS = 8;
+
 interface OverviewData {
-  total_visits: number;
-  unique_visitors: number;
-  unique_visitor_ids: number;
   top_pages: { page_path: string; count: number }[];
-  browser_stats: {
-    browser_name: string;
-    browser_version: string;
-    count: number;
-  }[];
-  os_stats: { os_name: string; count: number }[];
-  daily_trend: { date: string; count: number }[];
-  period_days: number;
+  [key: string]: unknown;
 }
 
 const props = defineProps<{
@@ -56,81 +52,95 @@ const props = defineProps<{
   overviewData: OverviewData | null;
 }>();
 
+const { palette } = useChartColors();
+
 const hasPagesData = computed(
   () => (props.overviewData?.top_pages ?? []).length > 0,
 );
 
-const popularPagesChartOption = computed(() => {
+interface PageRow {
+  page_path: string;
+  count: number;
+}
+
+const chartData = computed<PageRow[]>(() => {
   const pages = props.overviewData?.top_pages ?? [];
-  const sortedPages = [...pages].reverse();
+  // Sort asc so largest bar sits at the top of the horizontal chart.
+  const sorted = [...pages].sort((a, b) => a.count - b.count);
+  if (sorted.length <= MAX_ITEMS) return sorted;
+  const head = sorted.slice(0, MAX_ITEMS - 1);
+  const othersCount = sorted
+    .slice(MAX_ITEMS - 1)
+    .reduce((sum, it) => sum + it.count, 0);
+  return [...head, { page_path: 'Other', count: othersCount }];
+});
+
+const popularPagesChartOption = computed(() => {
+  const p = palette.value;
+  const rows = chartData.value;
+  const data = rows.map((r) => r.count);
+  const maxVal = Math.max(...data, 1);
 
   return {
     tooltip: {
       trigger: 'axis',
-      axisPointer: {
-        type: 'shadow',
-      },
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      borderColor: '#e5e7eb',
-      textStyle: {
-        color: '#374151',
+      axisPointer: { type: 'shadow' },
+      confine: true,
+      backgroundColor: p.card,
+      borderColor: p.border,
+      borderWidth: 1,
+      textStyle: { color: p.foreground },
+      formatter: (params: unknown) => {
+        const arr = params as Array<{ name: string; value: number }>;
+        const it = arr[0];
+        if (!it) return '';
+        return `<div style="font-weight:600;color:${p.foreground};">${it.name}</div><div style="color:${p.mutedForeground};margin-top:2px;">${it.value.toLocaleString()} views</div>`;
       },
     },
     grid: {
       left: 0,
-      right: 0,
+      right: 48,
       bottom: 0,
+      top: 0,
       containLabel: true,
     },
     xAxis: {
       type: 'value',
-      axisLine: {
-        show: false,
-      },
-      axisLabel: {
-        color: '#6b7280',
-      },
-      splitLine: {
-        lineStyle: {
-          color: '#f3f4f6',
-        },
-      },
+      show: false,
+      max: maxVal * 1.15,
     },
     yAxis: {
       type: 'category',
-      data: sortedPages.map((p) => p.page_path || '/'),
-      axisLine: {
-        lineStyle: {
-          color: '#e5e7eb',
-        },
-      },
+      inverse: true,
+      data: rows.map((r) => r.page_path),
+      axisLine: { show: false },
+      axisTick: { show: false },
       axisLabel: {
-        color: '#6b7280',
+        color: p.foreground,
         fontSize: 11,
-        width: 40,
-        overflow: 'truncate',
+        fontWeight: 500,
       },
     },
     series: [
       {
         name: 'Views',
         type: 'bar',
-        barWidth: '60%',
+        data,
+        barMaxWidth: 20,
         itemStyle: {
+          color: p.series[0],
           borderRadius: [0, 4, 4, 0],
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 1,
-            y2: 0,
-            colorStops: [
-              { offset: 0, color: 'rgba(255, 101, 0, 0.8)' },
-              { offset: 1, color: 'rgba(255, 190, 147, 0.8)' },
-            ],
-          },
         },
-        data: sortedPages.map((p) => p.count),
+        label: {
+          show: true,
+          position: 'right',
+          color: p.mutedForeground,
+          fontSize: 11,
+          fontWeight: 600,
+          distance: 8,
+          formatter: (params: { value: number }) =>
+            params.value.toLocaleString(),
+        },
       },
     ],
   };

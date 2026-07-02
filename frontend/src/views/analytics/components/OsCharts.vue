@@ -2,9 +2,12 @@
   <div
     class="border-border/60 bg-background h-full rounded-3xl border p-6 shadow-sm"
   >
-    <h2 class="text-foreground mb-4 flex items-center gap-2 text-lg font-bold">
+    <h2 class="text-foreground mb-2 flex items-center gap-2 text-lg font-bold">
       <icon-analytics class="size-6" /> OS Distribution
     </h2>
+    <p class="text-muted-foreground mb-4 text-xs">
+      Share of visits by operating system
+    </p>
     <div
       v-if="loading && !hasOsData"
       class="bg-muted h-64 animate-pulse rounded-xl"
@@ -33,8 +36,11 @@
 
 <script setup lang="ts">
 import IconAnalytics from '@/components/icons/IconAnalytics.vue';
+import { useChartColors, withAlpha } from '@/composables/shared';
 import { computed } from 'vue';
 import VChart from 'vue-echarts';
+
+const MAX_SLICES = 5;
 
 interface OsStat {
   os_name: string;
@@ -48,73 +54,104 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const { palette } = useChartColors();
+
 const hasOsData = computed(() => (props.osStats ?? []).length > 0);
 
-const osChartOption = computed(() => {
-  const data = props.osStats ?? [];
+const total = computed(() =>
+  (props.osStats ?? []).reduce((s, it) => s + it.count, 0),
+);
 
-  const colorPalette = [
-    '#3b82f6', // 蓝
-    '#10b981', // 绿
-    '#f59e0b', // 橙
-    '#ef4444', // 红
-    '#8b5cf6', // 紫
-    '#ec4899', // 粉
-    '#6366f1', // 靛蓝
-    '#14b8a6', // 青
+/** Head of the distribution + an "Other" tail if > MAX_SLICES buckets. */
+const chartRows = computed<Array<OsStat & { pct: number }>>(() => {
+  const raw = [...(props.osStats ?? [])].sort((a, b) => b.count - a.count);
+  const t = total.value || 1;
+  if (raw.length <= MAX_SLICES) {
+    return raw.map((r) => ({ ...r, pct: (r.count / t) * 100 }));
+  }
+  const head = raw.slice(0, MAX_SLICES - 1);
+  const othersCount = raw
+    .slice(MAX_SLICES - 1)
+    .reduce((s, it) => s + it.count, 0);
+  return [
+    ...head.map((r) => ({ ...r, pct: (r.count / t) * 100 })),
+    { os_name: 'Other', count: othersCount, pct: (othersCount / t) * 100 },
   ];
+});
+
+const osChartOption = computed(() => {
+  const p = palette.value;
+  const rows = chartRows.value;
+  // Render largest-at-top: invert the descending sort.
+  const display = [...rows].reverse();
 
   return {
     tooltip: {
-      trigger: 'item',
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      borderColor: '#e5e7eb',
-      textStyle: {
-        color: '#374151',
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      confine: true,
+      backgroundColor: p.card,
+      borderColor: p.border,
+      borderWidth: 1,
+      textStyle: { color: p.foreground },
+      formatter: (params: unknown) => {
+        const arr = params as Array<{ name: string; value: number }>;
+        const it = arr[0];
+        if (!it) return '';
+        const row = display.find((r) => r.os_name === it.name);
+        const pct = row ? row.pct.toFixed(1) : '0';
+        return `<div style="font-weight:600;color:${p.foreground};">${it.name}</div><div style="color:${p.mutedForeground};margin-top:2px;">${it.value.toLocaleString()} (${pct}%)</div>`;
       },
-      formatter: '{b}: {c} ({d}%)',
     },
-    legend: {
-      orient: 'vertical',
-      left: 'left',
-      top: 'center',
-      textStyle: {
-        color: '#6b7280',
+    grid: {
+      left: 0,
+      right: 56,
+      bottom: 0,
+      top: 0,
+      containLabel: true,
+    },
+    xAxis: {
+      type: 'value',
+      show: false,
+      max: Math.max(...rows.map((r) => r.count), 1) * 1.2,
+    },
+    yAxis: {
+      type: 'category',
+      inverse: true,
+      data: display.map((r) => r.os_name),
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: {
+        color: p.foreground,
+        fontSize: 11,
+        fontWeight: 500,
       },
     },
     series: [
       {
         name: 'OS',
-        type: 'pie',
-        radius: ['40%', '70%'],
-        center: ['65%', '50%'],
-        avoidLabelOverlap: false,
-        itemStyle: {
-          borderRadius: 8,
-          borderColor: '#fff',
-          borderWidth: 2,
-        },
-        label: {
-          show: false,
-          position: 'center',
-        },
-        emphasis: {
-          label: {
-            show: true,
-            fontSize: 20,
-            fontWeight: 'bold',
-          },
-        },
-        labelLine: {
-          show: false,
-        },
-        data: data.map((item, index) => ({
-          value: item.count,
-          name: item.os_name || 'Unknown',
+        type: 'bar',
+        data: display.map((r, i) => ({
+          value: r.count,
           itemStyle: {
-            color: colorPalette[index % colorPalette.length],
+            color: p.series[i % p.series.length],
+            borderRadius: [0, 4, 4, 0],
           },
         })),
+        barMaxWidth: 20,
+        label: {
+          show: true,
+          position: 'right',
+          color: p.mutedForeground,
+          fontSize: 10,
+          fontWeight: 600,
+          distance: 8,
+          formatter: (params: { dataIndex: number }) => {
+            const row = display[params.dataIndex];
+            if (!row) return '';
+            return `${row.pct.toFixed(1)}%`;
+          },
+        },
       },
     ],
   };

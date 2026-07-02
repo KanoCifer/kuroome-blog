@@ -33,6 +33,7 @@
 
 <script setup lang="ts">
 import IconTrend from '@/components/icons/IconTrend.vue';
+import { useChartColors, withAlpha } from '@/composables/shared';
 import dayjs from 'dayjs';
 import { computed } from 'vue';
 import VChart from 'vue-echarts';
@@ -49,23 +50,32 @@ const props = defineProps<{
   selectedDays: number;
 }>();
 
+const { palette } = useChartColors();
+
 const hasTrendData = computed(
   () => (props.overviewData?.daily_trend ?? []).length > 0,
 );
 
 const trendChartOption = computed(() => {
+  const p = palette.value;
   const data = props.overviewData?.daily_trend ?? [];
   const sortedData = [...data].sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
   );
 
+  const stroke = p.series[0];
+
   return {
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      borderColor: '#e5e7eb',
-      textStyle: {
-        color: '#374151',
+      confine: true,
+      backgroundColor: p.card,
+      borderColor: p.border,
+      borderWidth: 1,
+      textStyle: { color: p.foreground },
+      axisPointer: {
+        type: 'line',
+        lineStyle: { color: withAlpha(p.foreground, 0.18), width: 1 },
       },
     },
     grid: {
@@ -78,29 +88,17 @@ const trendChartOption = computed(() => {
       type: 'category',
       boundaryGap: false,
       data: sortedData.map((d) => d.date),
-      axisLine: {
-        lineStyle: {
-          color: '#e5e7eb',
-        },
-      },
+      axisLine: { lineStyle: { color: p.border } },
       axisLabel: {
-        color: '#6b7280',
+        color: p.mutedForeground,
         formatter: (value: string) => dayjs(value).format('MM/DD'),
       },
     },
     yAxis: {
       type: 'value',
-      axisLine: {
-        show: false,
-      },
-      axisLabel: {
-        color: '#6b7280',
-      },
-      splitLine: {
-        lineStyle: {
-          color: '#f3f4f6',
-        },
-      },
+      axisLine: { show: false },
+      axisLabel: { color: p.mutedForeground },
+      splitLine: { lineStyle: { color: withAlpha(p.border, 0.45) } },
     },
     series: [
       {
@@ -108,14 +106,9 @@ const trendChartOption = computed(() => {
         type: 'line',
         smooth: true,
         symbol: 'circle',
-        symbolSize: 6,
-        lineStyle: {
-          width: 3,
-          color: '#3b82f6',
-        },
-        itemStyle: {
-          color: '#3b82f6',
-        },
+        symbolSize: 8,
+        lineStyle: { width: 2, color: stroke, cap: 'round' },
+        itemStyle: { color: stroke },
         areaStyle: {
           color: {
             type: 'linear',
@@ -124,8 +117,8 @@ const trendChartOption = computed(() => {
             x2: 0,
             y2: 1,
             colorStops: [
-              { offset: 0, color: 'rgba(59, 130, 246, 0.3)' },
-              { offset: 1, color: 'rgba(59, 130, 246, 0.05)' },
+              { offset: 0, color: withAlpha(stroke, 0.22) },
+              { offset: 1, color: withAlpha(stroke, 0.02) },
             ],
           },
         },
