@@ -24,7 +24,7 @@ api/  ──→  services/  ──→  repositories/
 | 路由定义、路径参数解析 | 业务规则的 if/else |
 | 请求体校验（Pydantic schema → 调用 service） | 直接调 httpx / requests 访问外部 API |
 | 构造 HTTP Response（JSONResponse、RedirectResponse） | 构造 SQL / ODM 查询 |
-| 设置/删除 Cookie、CSRF token | Token 创建逻辑 |
+| 设置/删除 Cookie | Token 创建逻辑 |
 | Session 读写（存储 state、code_verifier 等） | 判断用户是否到期 |
 | 速率限制（`@limiter.limit`） | 数据聚合计算 |
 | 认证依赖注入（`Depends(manager)`） | 密码验证 |

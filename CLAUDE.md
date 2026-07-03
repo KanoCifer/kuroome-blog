@@ -40,14 +40,14 @@
 
 项目规则（`docs/rules/`）：
 
-- [code-style.md](docs/rules/code-style.md) — 代码风格规范
-- [design-system.md](docs/rules/design-system.md) — 语义化 token、组件样式规则、禁止事项
-- [domain.md](docs/rules/domain.md) — 领域词汇表
-- [environment.md](docs/rules/environment.md) — 环境变量、关键文件
-- [logging.md](docs/rules/logging.md) — 日志编排规约 structlog
-
-- [architecture.md](docs/rules/architecture.md) — 后端分层、API 约定
+- [architecture.md](docs/rules/architecture.md) — 后端分层、数据层、API 约定、双端分流
+- [code-style.md](docs/rules/code-style.md) — 后端/ Vue/ React 代码风格
 - [commands.md](docs/rules/commands.md) — 常用命令速查
+- [design-system.md](docs/rules/design-system.md) — 3 层 token 架构、组件规则、禁止事项
+- [domain.md](docs/rules/domain.md) — 领域词汇表
+- [environment.md](docs/rules/environment.md) — 环境变量、端口、工具链版本
+- [logging.md](docs/rules/logging.md) — 日志编排规约 (structlog + Taskiq 落库)
+- [testing.md](docs/rules/testing.md) — 前端测试规范 (Vue + React + Vitest 4)
 
 设计系统：
 

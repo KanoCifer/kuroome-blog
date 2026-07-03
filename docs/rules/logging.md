@@ -8,6 +8,7 @@
 - structlog 经 `wrap_for_formatter` 把事件交回 stdlib `logging`，由 `ProcessorFormatter` 统一渲染：业务日志与 uvicorn / taskiq / sqlalchemy 等 foreign 记录走**同一条**处理器链、同一套 JSON 长相。foreign logger（`uvicorn.*` / `taskiq` / `sqlalchemy.engine`）清掉自带 handler、开 `propagate` 透传到 root，**禁止**各框架各自向 stderr 输出第二套格式。
 - 终端在 TTY 下用 `ConsoleRenderer`（dev 可读），非 TTY 与文件统一 `JSONRenderer`。
 - 禁止 `import logging` 后直接用 stdlib 根 logger 打业务日志；业务日志只用 `structlog` 的 `logger`。
+- 日志级别由 `LOG_LEVEL` 环境变量控制（默认 INFO），DB 入库阈值由 `DB_LOG_LEVEL` 控制（默认 WARNING）。
 
 ## 2. 三文件路由
 
@@ -68,14 +69,15 @@ logger.bind(channel="feishu").warning("webhook url not configured, skip")
 
 ## 6. 串联——trace_id
 
-- FastAPI middleware + taskiq startup hook 注入 `trace_id` 到 `contextvar`，loguru format 自动带上。
+- FastAPI middleware + taskiq `TraceMiddleware` 注入 `trace_id` 到 `contextvar`（见 `logging_context.py`），structlog processor 自动带上。
 - 排查时 `grep <trace_id>` 一次操作的整条链（HTTP → service → repo → redis → db）一次出齐。
 - 这是跨模块串联的正确手段，取代"分文件"。
 
 ## 7. 持久化——DB 收紧
 
-- DB 入库默认只持久化 `WARNING+`，或要求 `logger.bind(persist=True)` 显式标记才入库。
+- DB 入库默认只持久化 `WARNING+`（`DB_LOG_LEVEL`），或要求 `logger.bind(persist=True)` 显式标记才入库。
 - 实现为 root 上的专用 `_DBHandler`：终端处理器 `_db_enqueue` 做双门准入（`persist` 或 level ≥ `DB_LOG_LEVEL`），fire-and-forget 经 `log_task.kiq()` 入队。每条记录只入队一次（`_db_enqueue` 仅在该 handler 运行，不在 `shared_processors` 里）。
+- 日志写入 PostgreSQL `log` 表（SQLAlchemy 模型），可通过 `/api/v2/system/log` 分页查询。
 - 收紧后 `Log` 表降一个数量级，真正关键日志才入库；INFO 轨迹仍可查 `app_info.log`（有轮转保留）。
 
 ## 8. 中文 / 英文
