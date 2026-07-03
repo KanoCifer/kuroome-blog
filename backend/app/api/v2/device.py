@@ -35,6 +35,24 @@ async def get_user_devices(
     )
 
 
+@router.get("/upcoming")
+async def get_upcoming_devices(
+    days_ahead: int = 30,
+    user: int = Depends(manager),
+    service: DeviceService = Depends(device_service_dep),
+):
+    """获取即将到达里程碑的设备"""
+    devices: Sequence[
+        DeviceTrack
+    ] = await service.get_upcoming_milestone_devices(user, days_ahead)
+    response: list[DeviceResponse] = [
+        DeviceResponse.model_validate(device) for device in devices
+    ]
+    return APIResponse(
+        data={"devices": response}, message="获取即将到达里程碑的设备成功"
+    )
+
+
 @router.get("/{device_id}")
 async def get_device_by_id(
     device_id: int,
@@ -148,24 +166,6 @@ async def update_device_reminders(
     response: DeviceResponse = DeviceResponse.model_validate(updated_device)
     return APIResponse(
         data={"device": response}, message="更新提醒配置成功"
-    )
-
-
-@router.get("/upcoming")
-async def get_upcoming_devices(
-    days_ahead: int = 30,
-    user: int = Depends(manager),
-    service: DeviceService = Depends(device_service_dep),
-):
-    """获取即将到达里程碑的设备"""
-    devices: Sequence[
-        DeviceTrack
-    ] = await service.get_upcoming_milestone_devices(user, days_ahead)
-    response: list[DeviceResponse] = [
-        DeviceResponse.model_validate(device) for device in devices
-    ]
-    return APIResponse(
-        data={"devices": response}, message="获取即将到达里程碑的设备成功"
     )
 
 
