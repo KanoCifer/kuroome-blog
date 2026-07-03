@@ -6,6 +6,8 @@
 import { vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 
+declare const global: typeof globalThis;
+
 // --- requestAnimationFrame / cancelAnimationFrame ---
 let rafId = 0;
 const rafCallbacks = new Map<number, FrameRequestCallback>();
@@ -48,6 +50,7 @@ Object.defineProperty(window, 'matchMedia', {
 class MockIntersectionObserver implements IntersectionObserver {
   readonly root = null;
   readonly rootMargin = '';
+  readonly scrollMargin = '';
   readonly thresholds = [];
   observe = vi.fn();
   unobserve = vi.fn();

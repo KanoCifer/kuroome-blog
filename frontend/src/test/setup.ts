@@ -5,6 +5,8 @@
 
 import { vi } from 'vitest';
 
+declare const global: typeof globalThis;
+
 // --- requestAnimationFrame / cancelAnimationFrame ---
 // happy-dom 可能不实现 rAF，手动提供确定性行为
 let rafId = 0;
@@ -68,6 +70,7 @@ if (typeof localStorage === 'undefined') {
 class MockIntersectionObserver implements IntersectionObserver {
   readonly root = null;
   readonly rootMargin = '';
+  readonly scrollMargin = '';
   readonly thresholds = [];
   observe = vi.fn();
   unobserve = vi.fn();
