@@ -61,6 +61,9 @@ include = ["watchlist"]
 [tool.pytest.ini_options]
 testpaths = ["./test"]
 pythonpath = [".", ".."]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
 
 [dependency-groups]
 dev = ["pytest>=9.0.2", "watchdog>=6.0.0"]

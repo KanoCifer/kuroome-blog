@@ -80,7 +80,7 @@ class User(Base):
 
     def __init__(self, *args, **kwargs):
         """允许在初始化时直接传入 password 参数并自动生成哈希值"""
-        password = kwargs.get("password")
+        password = kwargs.pop("password", None)
         super().__init__(*args, **kwargs)
         if password:
             self.raw_password = password  # 通过 setter 自动生成哈希值
