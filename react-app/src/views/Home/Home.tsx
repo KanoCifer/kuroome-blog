@@ -4,7 +4,6 @@ import { BentoCalendar } from './components/BentoCalendar';
 import { BentoClock } from './components/BentoClock';
 import { BentoHero } from './components/BentoHero';
 import { BentoMap } from './components/BentoMap';
-import { BentoMemo } from './components/BentoMemo';
 import { BentoTech } from './components/BentoTech';
 import { BentoTodo } from './components/BentoTodo';
 import { BentoWeb } from './components/BentoWeb';
@@ -32,23 +31,17 @@ export default function Home() {
           <BentoHero />
         </div>
 
-        {/* 时间 + 速记 两栏 */}
+        {/* 时间 */}
         <div
           className="bento-delay-2 col-span-3 min-w-0"
           style={{ ['--bento-radius' as string]: '1.75rem' }}
         >
           <BentoClock />
         </div>
-        <div
-          className="bento-delay-3 col-span-3 min-w-0"
-          style={{ ['--bento-radius' as string]: '1.75rem' }}
-        >
-          <BentoMemo />
-        </div>
 
         {/* 开发任务 — 主功能区 */}
         <div
-          className="bento-delay-4 col-span-6 min-w-0"
+          className="bento-delay-3 col-span-6 min-w-0"
           style={{ ['--bento-radius' as string]: '2rem' }}
         >
           <BentoTodo />
@@ -56,7 +49,7 @@ export default function Home() {
 
         {/* 日历 */}
         <div
-          className="bento-delay-5 col-span-6 min-w-0"
+          className="bento-delay-4 col-span-6 min-w-0"
           style={{ ['--bento-radius' as string]: '2rem' }}
         >
           <BentoCalendar />
@@ -64,13 +57,13 @@ export default function Home() {
 
         {/* 钓点 + 每日精选 两栏 */}
         <div
-          className="bento-delay-6 col-span-3 min-w-0"
+          className="bento-delay-5 col-span-3 min-w-0"
           style={{ ['--bento-radius' as string]: '1.75rem' }}
         >
           <BentoMap />
         </div>
         <div
-          className="bento-delay-7 col-span-3 min-w-0"
+          className="bento-delay-6 col-span-3 min-w-0"
           style={{ ['--bento-radius' as string]: '1.75rem' }}
         >
           <BentoWeb />
@@ -78,7 +71,7 @@ export default function Home() {
 
         {/* 技术栈 */}
         <div
-          className="bento-delay-8 col-span-6 min-w-0"
+          className="bento-delay-7 col-span-6 min-w-0"
           style={{ ['--bento-radius' as string]: '2rem' }}
         >
           <BentoTech />

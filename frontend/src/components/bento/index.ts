@@ -5,7 +5,6 @@ export { default as BentoClock } from '../../views/entry/components/BentoClock.v
 export { default as BentoGreeting } from '../../views/entry/components/BentoGreeting.vue';
 export { default as BentoLike } from '../../views/entry/components/BentoLike.vue';
 export { default as BentoMap } from '../../views/entry/components/BentoMap.vue';
-export { default as BentoMemo } from '../../views/entry/components/BentoMemo.vue';
 export { default as BentoNewPost } from '../../views/entry/components/BentoNewPost.vue';
 export { default as BentoProfileCard } from '../../views/entry/components/BentoProfileCard.vue';
 export { default as BentoReadingList } from '../../views/entry/components/BentoReadingList.vue';

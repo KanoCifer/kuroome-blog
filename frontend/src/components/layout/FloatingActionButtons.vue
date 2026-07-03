@@ -84,43 +84,8 @@
       </button>
     </div>
 
-    <!-- Memo button -->
-    <div class="fixed top-40 right-4 z-50 flex flex-col gap-2">
-      <button
-        @click="openMemo"
-        class="group bg-secondary hover:bg-primary flex h-10 cursor-pointer items-center overflow-hidden rounded-full px-2.5 shadow-md transition-all duration-300 ease-out"
-        title="备忘录"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="text-primary h-5 w-5 shrink-0 transition-colors duration-300 group-hover:text-white"
-        >
-          <path
-            d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-          />
-          <polyline points="14 2 14 8 20 8" />
-          <line x1="16" y1="13" x2="8" y2="13" />
-          <line x1="16" y1="17" x2="8" y2="17" />
-          <polyline points="10 9 9 9 8 9" />
-        </svg>
-        <span
-          class="max-w-0 min-w-0 text-sm font-medium whitespace-nowrap text-white opacity-0 transition-all duration-300 ease-out group-hover:ml-1.5 group-hover:max-w-20 group-hover:opacity-100"
-        >
-          备忘录
-        </span>
-      </button>
-    </div>
-
     <!-- Like button -->
-    <div class="fixed top-52 right-4 z-50 flex flex-col gap-2">
+    <div class="fixed top-[7.5rem] right-4 z-50 flex flex-col gap-2">
       <button
         @click="handleLike"
         class="group bg-secondary flex h-10 cursor-pointer items-center overflow-hidden rounded-full px-2.5 shadow-md transition-all duration-300 ease-out hover:bg-rose-500"
@@ -159,7 +124,7 @@
     </div>
 
     <!-- Edit Layout button -->
-    <div class="fixed top-64 right-4 z-50 flex flex-col gap-2">
+    <div class="fixed top-40 right-4 z-50 flex flex-col gap-2">
       <button
         @click="toggleEditLayout"
         class="group bg-secondary hover:bg-primary flex h-10 cursor-pointer items-center overflow-hidden rounded-full px-2.5 shadow-md transition-all duration-300 ease-out"
@@ -192,7 +157,7 @@
     </div>
 
     <!-- Switch to mobile button -->
-    <div class="fixed top-76 right-4 z-50 flex flex-col gap-2">
+    <div class="fixed top-52 right-4 z-50 flex flex-col gap-2">
       <button
         @click="$emit('switchToMobile')"
         class="group bg-secondary hover:bg-primary flex h-10 cursor-pointer items-center overflow-hidden rounded-full px-2.5 shadow-md transition-all duration-300 ease-out"
@@ -222,7 +187,7 @@
     </div>
 
     <!-- RSS button -->
-    <div class="fixed top-88 right-4 z-50 flex flex-col gap-2">
+    <div class="fixed top-64 right-4 z-50 flex flex-col gap-2">
       <button
         @click="goToRss"
         class="group bg-secondary hover:bg-primary flex h-10 cursor-pointer items-center overflow-hidden rounded-full px-2.5 shadow-md transition-all duration-300 ease-out"
@@ -240,7 +205,7 @@
     </div>
 
     <!-- Subscription button -->
-    <div class="fixed top-100 right-4 z-50 flex flex-col gap-2">
+    <div class="fixed top-76 right-4 z-50 flex flex-col gap-2">
       <button
         @click="goToSubscription"
         class="group bg-secondary hover:bg-primary flex h-10 cursor-pointer items-center overflow-hidden rounded-full px-2.5 shadow-md transition-all duration-300 ease-out"
@@ -258,7 +223,7 @@
     </div>
 
     <!-- Image Toolbox button -->
-    <div class="fixed top-112 right-4 z-50 flex flex-col gap-2">
+    <div class="fixed top-88 right-4 z-50 flex flex-col gap-2">
       <button
         @click="goToImageToolbox"
         class="group bg-secondary hover:bg-primary flex h-10 cursor-pointer items-center overflow-hidden rounded-full px-2.5 shadow-md transition-all duration-300 ease-out"
@@ -275,119 +240,6 @@
       </button>
     </div>
   </div>
-
-  <!-- Memo Modal -->
-  <Teleport to="body">
-    <transition
-      enter-active-class="transition-opacity duration-300 ease-out"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="transition-opacity duration-200 ease-in"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
-    >
-      <div
-        v-if="isMemoOpen"
-        class="fixed inset-0 z-9998 bg-black/60 backdrop-blur-sm"
-        @click="closeMemo"
-      ></div>
-    </transition>
-  </Teleport>
-  <Teleport to="body">
-    <transition
-      enter-active-class="transition-all duration-300 ease-out"
-      enter-from-class="opacity-0 scale-95"
-      enter-to-class="opacity-100 scale-100"
-      leave-active-class="transition-all duration-200 ease-in"
-      leave-from-class="opacity-100 scale-100"
-      leave-to-class="opacity-0 scale-95"
-    >
-      <div
-        v-if="isMemoOpen"
-        class="fixed inset-0 z-9999 flex items-center justify-center"
-        @click.self="closeMemo"
-      >
-        <div
-          class="bg-background relative z-10 w-11/12 max-w-lg transform-gpu rounded-3xl p-6 shadow-2xl"
-        >
-          <button
-            @click="closeMemo"
-            class="text-muted-foreground hover:bg-muted hover:text-foreground absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full"
-          >
-            <svg
-              class="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-          <h3
-            class="text-foreground mb-4 flex items-center gap-2 font-serif text-xl font-bold"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path
-                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-              />
-              <polyline points="14 2 14 8 20 8" />
-              <line x1="16" y1="13" x2="8" y2="13" />
-              <line x1="16" y1="17" x2="8" y2="17" />
-              <polyline points="10 9 9 9 8 9" />
-            </svg>
-            备忘录
-          </h3>
-          <textarea
-            v-model="memoText"
-            placeholder="在这里写下你的想法..."
-            class="border-border bg-muted text-foreground placeholder-muted-foreground focus:border-primary focus:ring-primary/30 mb-4 w-full resize-none rounded-xl border px-4 py-3 text-sm focus:ring-2 focus:outline-none"
-            rows="10"
-          ></textarea>
-          <div class="flex items-center justify-between">
-            <span class="text-muted-foreground text-xs">
-              自动保存
-              <span v-if="memoText" class="ml-2">{{ memoText.length }} 字</span>
-            </span>
-            <button
-              @click="clearMemo"
-              class="border-border bg-muted text-muted-foreground hover:bg-secondary hover:text-foreground flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="size-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                />
-              </svg>
-              清空
-            </button>
-          </div>
-        </div>
-      </div>
-    </transition>
-  </Teleport>
 </template>
 
 <script setup lang="ts">
@@ -396,7 +248,6 @@ import { socialGateway } from '@/api/blog';
 import { useCardLayoutStore } from '@/stores/cardLayout';
 import { useNotificationStore } from '@/stores/notification';
 import SettingIcon from '@/components/icons/SettingIcon.vue';
-import { useStorage } from '@vueuse/core';
 import { AxiosError } from 'axios';
 import { CreditCard } from '@lucide/vue';
 import { onMounted, ref } from 'vue';
@@ -415,25 +266,8 @@ function toggleEditLayout() {
   }
 }
 
-const STORAGE_KEY = 'readinglist_memo';
-const memoText = useStorage<string>(STORAGE_KEY, '');
-const isMemoOpen = ref(false);
 const liked = ref(false);
 const likesCount = ref(0);
-
-const openMemo = () => {
-  isMemoOpen.value = true;
-};
-
-const closeMemo = () => {
-  isMemoOpen.value = false;
-};
-
-const clearMemo = () => {
-  if (memoText.value && confirm('确定要清空备忘录吗？')) {
-    memoText.value = '';
-  }
-};
 
 const goToNewPost = () => {
   router.push('/blog/new');
@@ -467,7 +301,7 @@ onMounted(() => {
       likesCount.value = response.likes_count || 0;
     })
     .catch(() => {
-      notifier.error('获取点赞数失败，请稍后重试');
+      notifier.error('获取点赞数失败，请稍后再试');
     });
 });
 

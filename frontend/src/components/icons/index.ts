@@ -12,7 +12,6 @@ export { default as IconDocumentation } from './IconDocumentation.vue';
 export { default as IconEcosystem } from './IconEcosystem.vue';
 export { default as IconError } from './IconError.vue';
 export { default as IconInfo } from './IconInfo.vue';
-export { default as IconMemo } from './IconMemo.vue';
 export { default as IconPopular } from './IconPopular.vue';
 export { default as IconSave } from './IconSave.vue';
 export { default as IconSuccess } from './IconSuccess.vue';
