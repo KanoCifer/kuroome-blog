@@ -1,9 +1,6 @@
 import type { AxiosResponse } from 'axios';
 
-import {
-  momentsGateway,
-  type MomentsGateway,
-} from '@/api/momentsGateway';
+import { momentsGateway, type MomentsGateway } from '@/api/momentsGateway';
 import type { ApiResponse } from '@/api/request';
 import { extractData } from '@/api/request';
 import type {
@@ -40,9 +37,7 @@ export const momentsService = (): MomentsService => {
   const gateway: MomentsGateway = momentsGateway();
 
   const unwrap = <T>(res: AxiosResponse<unknown>): T =>
-    extractData(
-      res as unknown as { data: ApiResponse<unknown> },
-    ) as T;
+    extractData(res as unknown as { data: ApiResponse<unknown> }) as T;
 
   return {
     async listPublic(params) {

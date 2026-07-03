@@ -110,8 +110,7 @@ export const useMomentsStore = create<MomentsState>((set, get) => {
       const state = get();
       const page = params.page ?? state.publicPage;
       const page_size = params.page_size ?? state.publicPageSize;
-      const tag =
-        params.tag !== undefined ? params.tag : state.publicActiveTag;
+      const tag = params.tag !== undefined ? params.tag : state.publicActiveTag;
       set({ loading: true, error: null });
       try {
         const data = await service.listPublic({

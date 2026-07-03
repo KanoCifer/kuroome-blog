@@ -350,10 +350,7 @@ watch(
               :title="article.title"
               :content="article.content || article.summary || ''"
             />
-            <div
-              class="prose prose-lg max-w-none"
-              v-html="safeContent"
-            ></div>
+            <div class="prose prose-lg max-w-none" v-html="safeContent"></div>
           </div>
         </div>
       </template>

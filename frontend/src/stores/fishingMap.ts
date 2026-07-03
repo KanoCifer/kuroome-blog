@@ -75,8 +75,7 @@ export const useFishingMapStore = defineStore('fishingMap', () => {
       const now = data.current?.now;
       const daily = data.daily?.daily;
       const hourlyWrapper = data.hourly as
-        | { hourly?: WeatherHourly[] }
-        | undefined;
+        { hourly?: WeatherHourly[] } | undefined;
       const hourly = hourlyWrapper?.hourly ?? [];
 
       fullWeatherData.value = data;

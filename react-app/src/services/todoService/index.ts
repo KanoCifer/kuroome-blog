@@ -14,8 +14,7 @@ export const devTaskService = (): DevTaskService => ({
   async fetchTasks(): Promise<DevTaskResponse['tasks']> {
     const res = await request.get('v2/devtasks');
     const data = extractData(res) as
-      | { tasks?: DevTaskResponse['tasks'] }
-      | undefined;
+      { tasks?: DevTaskResponse['tasks'] } | undefined;
     return data?.tasks ?? { todo: [], 'in-progress': [], done: [] };
   },
 

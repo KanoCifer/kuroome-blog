@@ -181,15 +181,13 @@ const handleKeydown = (e: KeyboardEvent) => {
 const fetchCategories = async () => {
   try {
     const legacyCategories = await blogGateway.getLegacyCategories();
-    categories.value = legacyCategories.map(
-      (cat): CategoryResponseItem => ({
-        id: cat.id,
-        name: cat.name,
-        description: '',
-        post_count: cat.post_count,
-        posts: [],
-      }),
-    ) as unknown as Category[];
+    categories.value = legacyCategories.map((cat): CategoryResponseItem => ({
+      id: cat.id,
+      name: cat.name,
+      description: '',
+      post_count: cat.post_count,
+      posts: [],
+    })) as unknown as Category[];
   } catch (err) {
     console.error(err);
     notification.error('加载分类失败');

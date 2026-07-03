@@ -42,7 +42,7 @@ export function MomentMeta({ moment, volumeLabel }: MomentMetaProps) {
       </time>
 
       {moment.is_pinned && (
-        <span className="text-warning inline-flex items-center gap-1 font-semibold uppercase tracking-[0.18em]">
+        <span className="text-warning inline-flex items-center gap-1 font-semibold tracking-[0.18em] uppercase">
           <span aria-hidden="true">·</span>
           <PinIcon className="h-3 w-3" />
           <span>置顶</span>

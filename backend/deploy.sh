@@ -63,7 +63,7 @@ export CI=true
 
 step "Setting up Node.js environment"
 source ~/.nvm/nvm.sh
-nvm use 24
+nvm use 26
 ok "Node.js $(node -v)"
 
 step "Pulling latest code"

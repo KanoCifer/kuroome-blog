@@ -304,7 +304,7 @@ export default function PicGalleryView() {
                 }}
               >
                 <div
-                  className="bg-background ring-border group relative cursor-pointer overflow-hidden rounded-2xl ring-1 shadow-sm transition-shadow hover:shadow-md"
+                  className="bg-background ring-border group relative cursor-pointer overflow-hidden rounded-2xl shadow-sm ring-1 transition-shadow hover:shadow-md"
                   onClick={() => openImageDetail(image)}
                 >
                   <img

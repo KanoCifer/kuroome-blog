@@ -6,12 +6,18 @@ type Theme = 'light' | 'dark' | 'system';
 type FontFamily = 'default' | 'harmonyos';
 type ColorScheme = 'paper' | 'sage' | 'mist' | 'blush';
 
-const COLOR_SCHEMES: readonly ColorScheme[] = ['paper', 'sage', 'mist', 'blush'];
+const COLOR_SCHEMES: readonly ColorScheme[] = [
+  'paper',
+  'sage',
+  'mist',
+  'blush',
+];
 
 const isColorScheme = (v: unknown): v is ColorScheme =>
   typeof v === 'string' && (COLOR_SCHEMES as readonly string[]).includes(v);
 
-const safeScheme = (v: unknown): ColorScheme => (isColorScheme(v) ? v : 'paper');
+const safeScheme = (v: unknown): ColorScheme =>
+  isColorScheme(v) ? v : 'paper';
 interface ThemeState {
   theme: Theme;
   font: FontFamily;

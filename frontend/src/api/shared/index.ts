@@ -19,4 +19,8 @@ export type {
 } from './statusGateway';
 
 export { fetchRecentLogs } from './logGateway';
-export type { LogItem, LogListData, FetchRecentLogsOptions } from './logGateway';
+export type {
+  LogItem,
+  LogListData,
+  FetchRecentLogsOptions,
+} from './logGateway';

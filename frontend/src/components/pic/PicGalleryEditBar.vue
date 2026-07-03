@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="fixed bottom-4 left-1/2 z-30 w-fit -translate-x-1/2"
-  >
+  <div class="fixed bottom-4 left-1/2 z-30 w-fit -translate-x-1/2">
     <div class="flex items-center gap-3">
       <Button
         v-if="canEdit"
@@ -16,7 +14,7 @@
       </Button>
       <button
         @click="$emit('shuffle')"
-        class="border-border/60 h-9 gap-2 text-primary-foreground rounded-lg px-4 shadow-sm bg-secondary flex items-center"
+        class="border-border/60 text-primary-foreground bg-secondary flex h-9 items-center gap-2 rounded-lg px-4 shadow-sm"
       >
         <Shuffle class="h-4 w-4" />
         重排

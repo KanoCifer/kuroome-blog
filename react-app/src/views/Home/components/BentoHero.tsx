@@ -116,7 +116,7 @@ export function BentoHero() {
               className="h-full w-full object-cover transition duration-500 hover:scale-105"
             />
           </div>
-          <div className="bg-primary-foreground/20 border-primary-foreground absolute right-0 bottom-0 flex h-6 w-6 items-center justify-center rounded-full border-2 ring-2 ring-primary">
+          <div className="bg-primary-foreground/20 border-primary-foreground ring-primary absolute right-0 bottom-0 flex h-6 w-6 items-center justify-center rounded-full border-2 ring-2">
             <svg
               className="text-primary h-3 w-3"
               fill="currentColor"

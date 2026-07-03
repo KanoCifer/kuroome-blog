@@ -102,15 +102,13 @@ watch(
 const fetchCategories = async () => {
   try {
     const response = await blogGateway.getLegacyCategories();
-    categories.value = response.map(
-      (cat): CategoryResponseItem => ({
-        id: cat.id,
-        name: cat.name,
-        description: '',
-        post_count: cat.post_count || 0,
-        posts: [],
-      }),
-    ) as unknown as Category[];
+    categories.value = response.map((cat): CategoryResponseItem => ({
+      id: cat.id,
+      name: cat.name,
+      description: '',
+      post_count: cat.post_count || 0,
+      posts: [],
+    })) as unknown as Category[];
     totalPosts.value = response.reduce(
       (sum, cat) => sum + (cat.post_count || 0),
       0,

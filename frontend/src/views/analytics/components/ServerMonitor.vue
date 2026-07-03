@@ -2,7 +2,9 @@
   <div class="space-y-6">
     <!-- Header -->
     <div class="flex items-center justify-between">
-      <h2 class="text-foreground flex items-center gap-2 text-2xl font-bold tracking-tight">
+      <h2
+        class="text-foreground flex items-center gap-2 text-2xl font-bold tracking-tight"
+      >
         <svg
           class="h-6 w-6"
           fill="none"
@@ -46,7 +48,9 @@
 
     <!-- Server Status — single card, three cells -->
     <div :class="cardClass">
-      <div class="grid grid-cols-1 divide-y lg:grid-cols-3 lg:divide-x lg:divide-y-0">
+      <div
+        class="grid grid-cols-1 divide-y lg:grid-cols-3 lg:divide-x lg:divide-y-0"
+      >
         <!-- CPU Gauge -->
         <div class="lg:px-6 lg:first:pl-0 lg:last:pr-0">
           <div class="mb-4 flex items-center justify-between">
@@ -138,7 +142,7 @@
             <h3 class="text-foreground text-lg font-bold">
               <span class="flex items-center gap-2">
                 <svg
-                  class="h-5 w-5 text-foreground"
+                  class="text-foreground h-5 w-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -211,7 +215,10 @@
         </svg>
         Resource Usage History
       </h3>
-      <div v-if="!hasHistory" class="bg-muted h-72 animate-pulse rounded-xl"></div>
+      <div
+        v-if="!hasHistory"
+        class="bg-muted h-72 animate-pulse rounded-xl"
+      ></div>
       <div v-else class="h-72 w-full overflow-hidden">
         <v-chart
           :option="historyChartOption"
@@ -344,7 +351,10 @@ const getStatusColor = (percent: number): string => {
 
 // ---- layout helpers ----------------------------------------------------
 const cardClass = computed(() =>
-  ['border-border/60 bg-background border p-6 rounded-3xl', props.customClass || '']
+  [
+    'border-border/60 bg-background border p-6 rounded-3xl',
+    props.customClass || '',
+  ]
     .filter(Boolean)
     .join(' '),
 );
@@ -360,10 +370,7 @@ const connectionLabel = computed(() =>
 const hasHistory = computed(() => history.value.length > 0);
 
 // ---- chart options -----------------------------------------------------
-const buildGaugeOption = (
-  value: number,
-  stops: Array<[number, string]>,
-) => {
+const buildGaugeOption = (value: number, stops: Array<[number, string]>) => {
   const c = chartColors.value;
   return {
     series: [

@@ -43,7 +43,9 @@ export const usePolaroidLayout = ({ images }: UsePolaroidLayoutOptions) => {
   const bringToFront = (_index: number) => {};
 
   const getAspectRatio = (index: number) => {
-    return visualSeeds.value.get(index)?.aspect ?? ASPECTS[index % ASPECTS.length];
+    return (
+      visualSeeds.value.get(index)?.aspect ?? ASPECTS[index % ASPECTS.length]
+    );
   };
 
   const getRotation = (index: number) => {
@@ -58,4 +60,4 @@ export const usePolaroidLayout = ({ images }: UsePolaroidLayoutOptions) => {
     getAspectRatio,
     getRotation,
   };
-}
+};

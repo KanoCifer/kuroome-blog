@@ -70,7 +70,7 @@
       <button
         v-if="isEditMode"
         type="button"
-        class="absolute left-2 top-2 z-20 flex h-7 w-7 items-center justify-center rounded-full border-2 backdrop-blur-sm transition-all duration-200"
+        class="absolute top-2 left-2 z-20 flex h-7 w-7 items-center justify-center rounded-full border-2 backdrop-blur-sm transition-all duration-200"
         :class="
           selected
             ? 'border-primary bg-primary text-primary-foreground shadow-sm'
@@ -87,7 +87,7 @@
       <button
         v-if="isEditMode"
         type="button"
-        class="absolute right-2 top-2 z-20 flex h-7 w-7 items-center justify-center rounded-full border border-white/60 bg-destructive/90 text-white opacity-0 shadow-sm backdrop-blur-sm transition-all duration-200 hover:bg-destructive group-hover:opacity-100"
+        class="bg-destructive/90 hover:bg-destructive absolute top-2 right-2 z-20 flex h-7 w-7 items-center justify-center rounded-full border border-white/60 text-white opacity-0 shadow-sm backdrop-blur-sm transition-all duration-200 group-hover:opacity-100"
         aria-label="删除这张照片"
         @click.stop="emit('delete', image.id)"
       >
@@ -97,7 +97,7 @@
       <!-- 选中态高亮描边 -->
       <div
         v-if="isEditMode && selected"
-        class="pointer-events-none absolute inset-0 z-10 rounded-[2px] ring-2 ring-primary ring-offset-2 ring-offset-primary/20"
+        class="ring-primary ring-offset-primary/20 pointer-events-none absolute inset-0 z-10 rounded-[2px] ring-2 ring-offset-2"
         aria-hidden="true"
       ></div>
     </div>

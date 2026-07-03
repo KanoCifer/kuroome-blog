@@ -23,9 +23,7 @@ export default function Home() {
           内边距走 env(safe-area-inset-*)，适配 iPhone 刘海 / 灵动岛 / Home Indicator。
           依赖 index.html 中 viewport-fit=cover，否则 env() 在 iOS 上恒为 0。
           卡片圆角按宽度分级：hero/全宽最大，半宽收敛，视觉更精致。 */}
-      <div
-        className="bento-grid relative mx-auto grid min-h-dvh w-full max-w-md grid-cols-6 gap-3 overflow-x-hidden pl-[max(1.25rem,env(safe-area-inset-left,1.25rem))] pr-[max(1.25rem,env(safe-area-inset-right,1.25rem))] pb-[calc(env(safe-area-inset-bottom,0px)+8rem)] pt-[calc(env(safe-area-inset-top,0px)+3rem)]"
-      >
+      <div className="bento-grid relative mx-auto grid min-h-dvh w-full max-w-md grid-cols-6 gap-3 overflow-x-hidden pt-[calc(env(safe-area-inset-top,0px)+3rem)] pr-[max(1.25rem,env(safe-area-inset-right,1.25rem))] pb-[calc(env(safe-area-inset-bottom,0px)+8rem)] pl-[max(1.25rem,env(safe-area-inset-left,1.25rem))]">
         {/* Hero — Profile + Greeting 合并，视觉锚点 */}
         <div
           className="bento-delay-1 col-span-6 min-w-0"

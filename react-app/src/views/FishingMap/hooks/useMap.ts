@@ -34,7 +34,10 @@ interface AMapDrivingResult {
 
 interface GeolocationService {
   getCurrentPosition(
-    callback: (status: 'complete' | string, result: GeolocationStatusEvent) => void,
+    callback: (
+      status: 'complete' | string,
+      result: GeolocationStatusEvent,
+    ) => void,
   ): void;
 }
 

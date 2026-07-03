@@ -1,19 +1,9 @@
 export { default as Button } from './Button.vue';
 
 export type ButtonVariant =
-  | 'default'
-  | 'destructive'
-  | 'outline'
-  | 'secondary'
-  | 'ghost'
-  | 'link';
+  'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
 export type ButtonSize =
-  | 'default'
-  | 'sm'
-  | 'lg'
-  | 'icon'
-  | 'icon-sm'
-  | 'icon-lg';
+  'default' | 'sm' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg';
 
 export type ButtonVariants = {
   variant?: ButtonVariant;

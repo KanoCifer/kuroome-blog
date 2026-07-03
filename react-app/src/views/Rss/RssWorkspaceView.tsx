@@ -113,7 +113,7 @@ export default function RssWorkspaceView() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="border-border/60 border-t overflow-hidden"
+              className="border-border/60 overflow-hidden border-t"
             >
               <div className="bg-background/95 mx-auto w-full max-w-md px-4 py-2">
                 <button
@@ -201,7 +201,7 @@ export default function RssWorkspaceView() {
                   <div className="text-muted-foreground/70 mt-2.5 flex items-center gap-2 text-xs">
                     {article.author && <span>{article.author}</span>}
                     {article.author && article.published && (
-                      <span className="h-1 w-1 rounded-full bg-muted-foreground/40" />
+                      <span className="bg-muted-foreground/40 h-1 w-1 rounded-full" />
                     )}
                     {article.published && (
                       <span>{formatDate(article.published)}</span>

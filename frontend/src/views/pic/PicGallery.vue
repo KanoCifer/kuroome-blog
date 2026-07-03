@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-background min-h-screen w-full overflow-y-auto overflow-x-hidden"
+    class="bg-background min-h-screen w-full overflow-x-hidden overflow-y-auto"
   >
     <!-- Subtle Dot Pattern Background -->
     <div
@@ -27,7 +27,7 @@
 
     <!-- Gallery Container — columns 瀑布流，整页纵向滚动 -->
     <div
-      class="gallery-columns relative z-10 mx-auto w-full max-w-[1400px] px-4 pb-32 pt-24 sm:px-6"
+      class="gallery-columns relative z-10 mx-auto w-full max-w-[1400px] px-4 pt-24 pb-32 sm:px-6"
       :style="{
         columnCount: columnsCount,
         columnGap: columnsGap + 'px',
@@ -136,23 +136,23 @@ const {
   formatDate,
 } = useGallery();
 
-const {
-  generateLayoutSeeds,
-  shuffleImages,
-  getAspectRatio,
-  getRotation,
-} = usePolaroidLayout({ images });
+const { generateLayoutSeeds, shuffleImages, getAspectRatio, getRotation } =
+  usePolaroidLayout({ images });
 
 // --- 响应式列数：依据视口宽度决定瀑布流列数 ---
-const viewportWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1280);
-const onResize = () => { viewportWidth.value = window.innerWidth; };
+const viewportWidth = ref(
+  typeof window !== 'undefined' ? window.innerWidth : 1280,
+);
+const onResize = () => {
+  viewportWidth.value = window.innerWidth;
+};
 const columnsCount = computed(() => {
   const w = viewportWidth.value;
-  if (w < 480) return 2;       // 小屏 2 列
-  if (w < 768) return 3;       // 移动端 3 列
-  if (w < 1100) return 4;      // 平板 4 列
-  if (w < 1400) return 5;      // 桌面 5 列
-  return 6;                    // 宽屏 6 列
+  if (w < 480) return 2; // 小屏 2 列
+  if (w < 768) return 3; // 移动端 3 列
+  if (w < 1100) return 4; // 平板 4 列
+  if (w < 1400) return 5; // 桌面 5 列
+  return 6; // 宽屏 6 列
 });
 const columnsGap = computed(() => (viewportWidth.value < 640 ? 10 : 14));
 

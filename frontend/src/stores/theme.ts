@@ -16,9 +16,7 @@ export const useThemeStore = defineStore('theme', () => {
   );
 
   const stored = localStorage.getItem('color-scheme');
-  const scheme = ref<ColorScheme>(
-    isColorScheme(stored) ? stored : 'paper',
-  );
+  const scheme = ref<ColorScheme>(isColorScheme(stored) ? stored : 'paper');
 
   const showFooter = ref<string>(localStorage.getItem('show-footer') || 'true');
 

@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { connectionDelay, isConnected, sendPing } from '@/plugins/visitorWs';
 import { useVisitorCountStore } from '@/stores/visitorCount';
-import { fetchStatusDetail, type StatusDetailData, fetchRecentLogs, type LogItem } from '@/api/shared';
+import {
+  fetchStatusDetail,
+  type StatusDetailData,
+  fetchRecentLogs,
+  type LogItem,
+} from '@/api/shared';
 import { useChartColors, withAlpha } from '@/composables/shared/useChartColors';
 import { computed, onMounted, onUnmounted, ref, watchEffect } from 'vue';
 import { motion } from 'motion-v';
