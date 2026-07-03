@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { useRef } from 'react';
 import { useClickOutside } from '../useClickOutside';
 
 function createRefWithElement(): React.RefObject<HTMLElement | null> {
