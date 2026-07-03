@@ -3,9 +3,6 @@
 ## Backend
 
 ```bash
-# sync dependencies & activate venv
-cd backend && uv sync
-
 # run dev server
 uv run python3 dev.py
 
@@ -16,30 +13,30 @@ uv run alembic upgrade head
 # format & lint
 ruff format . && ruff check .
 
-# run all tests
-uv run pytest backend/ -v
-uv run pytest backend/test/test_fishing_expert.py  # specific file
+# tests
+cd backend && uv run pytest
 ```
 
-## Frontend (`cd frontend`)
+## Frontend
 
 ```bash
 pnpm run dev                      # dev server (:5173)
 pnpm run build                    # build (only if user asks)
 pnpm run build-only               # vite build only
-pnpm run type-check               # vue-tsc -b
+pnpm run type-check
 pnpm run lint                     # oxlint
-pnpm run format                   # prettier write
+pnpm run format                   # prettier
 pnpm run test:unit                # vitest
 ```
 
-## React-app (`cd react-app`)
+## React-app
 
 ```bash
 pnpm run dev                      # dev server (:5174)
 pnpm run build                    # tsc -b && vite build (only if user asks)
 pnpm run build-only               # vite build only
-pnpm run type-check               # tsc -b
+pnpm run type-check
 pnpm run lint                     # oxlint
-pnpm run format                   # prettier --write src/
+pnpm run format                   # prettier
+pnpm run test:unit                # vitest
 ```

@@ -4,7 +4,7 @@
 
 - Backend: FastAPI + SQLAlchemy 2.0 async (PostgreSQL) + Beanie ODM (MongoDB) + Redis
 - Frontend: Vue 3 (`frontend/`), Mobile: React 19 (`react-app/`)
-- Domain terms: see [](../../docs/rules/domain.md)
+- Domain terms: see [domain.md](domain.md)
 
 ## Dual-Frontend
 
