@@ -1,5 +1,60 @@
 [
   {
+    "version": "4.0.0",
+    "date": "2026-07-03",
+    "title": "碎碎念落地、后端日志系统、品牌提取与 Twikoo 主题适配",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "碎碎念模块：类 Twitter 轻量动态（图片/链接/书籍/引用附件、标签、心情、定位、可见性控制），Vue/React 双端对齐，MongoDB 持久化"
+      },
+      {
+        "type": "feat",
+        "content": "后端结构化日志：structlog + Taskiq 异步落库，新增 /api/v2/system/log 分页查询端点（级别/时间过滤）"
+      },
+      {
+        "type": "feat",
+        "content": "Twikoo 主题适配与 .prose 文章展示系统自写（替代 tailwind typography），评论按批注样式呈现"
+      },
+      {
+        "type": "feat",
+        "content": "博客编辑器重写为 writing-desk 风格；隐私政策页重写并补全 12 节数据流"
+      },
+      {
+        "type": "feat",
+        "content": "liquid-glass 导航栏（mix-blend 自动反色）与 borders as soft shadows 交互打磨"
+      },
+      {
+        "type": "feat",
+        "content": "go-backend 目录新增（占位待实现）；服务/系统信息页重构（接入最近事件卡片）"
+      },
+      {
+        "type": "feat",
+        "content": "新增发布接口（/api/v1/publish）与 LLM 模块（/api/v2/llm）"
+      },
+      {
+        "type": "perf",
+        "content": "拖拽流畅度优化、py-cpuinfo 提供更准确的 CPU 信息"
+      },
+      {
+        "type": "fix",
+        "content": "TaskIQ worker channel ack 失败（heartbeat=120）、日志落库链路、迁移任务失败修复"
+      },
+      {
+        "type": "refactor",
+        "content": "memo 功能从双端移除；React 端剥离桌面视图聚焦移动端阅读"
+      },
+      {
+        "type": "refactor",
+        "content": "图库迁移至瀑布流；主题提取为 packages/brand 跨项目共享"
+      },
+      {
+        "type": "refactor",
+        "content": "后端日志系统重构（drop TaskPlugin, lifespan 驱动 broker）"
+      }
+    ]
+  },
+  {
     "version": "3.9.0",
     "date": "2026-06-17",
     "title": "Moments 碎碎念、博客封面、日历热力图、shadcn-vue 替换",
