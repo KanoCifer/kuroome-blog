@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { consumeSseStream } from '../useSseStream';
 
 describe('consumeSseStream', () => {
-  it('解析 SSE 数据帧并调用 onData', async () => {
+  it('解析 SSE 数据帧并调用 onData，流结束后调用 onDone', async () => {
     const chunks = [
       'data: {"content":"Hello"}\n\n',
       'data: {"content":" World"}\n\n',
@@ -36,15 +36,20 @@ describe('consumeSseStream', () => {
     );
 
     expect(onData).toHaveBeenCalledTimes(2);
-    expect.onData).toHaveBeenNthCalledWith(1, { content: 'Hello' });
+    expect(onData).toHaveBeenNthCalledWith(1, { content: 'Hello' });
     expect(onData).toHaveBeenNthCalledWith(2, { content: ' World' });
-    expect(onDone).not.toHaveBeenCalled();
+    // 流结束时 onDone 被调用
+    expect(onDone).toHaveBeenCalledTimes(1);
 
     vi.unstubAllGlobals();
   });
 
-  it('收到 [DONE] 调用 onDone', async () => {
-    const chunks = ['data: {"content":"Hi"}\n\n', 'data: [DONE]\n\n'];
+  it('收到 [DONE] 时停止解析后续帧并调用 onDone', async () => {
+    const chunks = [
+      'data: {"content":"Hi"}\n\n',
+      'data: [DONE]\n\n',
+      'data: {"content":"Ignored"}\n\n',
+    ];
     let idx = 0;
 
     const mockReader = {
@@ -73,7 +78,9 @@ describe('consumeSseStream', () => {
       { onData, onDone },
     );
 
+    // 只有 [DONE] 之前的帧被处理
     expect(onData).toHaveBeenCalledTimes(1);
+    expect(onData).toHaveBeenCalledWith({ content: 'Hi' });
     expect(onDone).toHaveBeenCalledTimes(1);
 
     vi.unstubAllGlobals();
