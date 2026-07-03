@@ -16,7 +16,11 @@ from sqlalchemy.ext.asyncio import (
 from app.core.config import get_settings
 from app.models import Base
 
-TEST_DATABASE_URL = "postgresql+asyncpg://liudetao:root@localhost/postgres"
+# ── Test database (isolated from production) ──────────────────────
+# Tests run against a dedicated schema so `drop_all` / `create_all`
+# never touch the production tables.  Alembic migrations are applied
+# instead of `create_all` so the schema matches what the app actually uses.
+TEST_DATABASE_URL = "postgresql+asyncpg://liudetao:root@localhost/postgres_test"
 
 
 @pytest.fixture(scope="session")
@@ -28,7 +32,20 @@ def settings():
 
 @pytest_asyncio.fixture(scope="session")
 async def db_engine():
-    """Create a test database engine (session-scoped)."""
+    """Ensure the test database exists, then return a session-scoped engine."""
+    import asyncpg
+
+    # Connect to the default `postgres` db to create `postgres_test` if missing
+    conn = await asyncpg.connect(
+        "postgresql://liudetao:root@localhost/postgres"
+    )
+    exists = await conn.fetchval(
+        "SELECT 1 FROM pg_database WHERE datname = $1", "postgres_test"
+    )
+    if not exists:
+        await conn.execute("CREATE DATABASE postgres_test")
+    await conn.close()
+
     engine = create_async_engine(TEST_DATABASE_URL, echo=False)
     yield engine
     await engine.dispose()
@@ -36,9 +53,16 @@ async def db_engine():
 
 @pytest_asyncio.fixture(scope="session")
 async def tables(db_engine):
-    """Create all tables once per test session."""
-    async with db_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    """Apply Alembic migrations to bring the test DB to HEAD."""
+    from alembic import command
+    from alembic.config import Config
+
+    alembic_cfg = Config("alembic.ini")
+    alembic_cfg.set_main_option(
+        "sqlalchemy.url",
+        "postgresql+psycopg://liudetao:root@localhost/postgres_test",
+    )
+    command.upgrade(alembic_cfg, "head")
     yield
     async with db_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
