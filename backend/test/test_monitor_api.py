@@ -22,25 +22,21 @@ pytestmark = pytest.mark.asyncio(loop_scope="session")
 
 
 @pytest_asyncio.fixture
-async def admin_user(db_session):
-    """Create an admin user in the test session."""
-    u = User(username="admin", password="adminpass")
-    u.is_admin = True
-    db_session.add(u)
-    await db_session.flush()
-    return u
+async def monitor_override(api_app, db_session, api_user):
+    """Override monitor_service_dep + get_admin_user.
 
-
-@pytest_asyncio.fixture
-async def monitor_override(api_app, db_session, admin_user):
-    """Override monitor_service_dep + get_admin_user."""
+    ``api_user`` gets id=1 from auto-increment, which is in
+    settings.ADMIN_USER_IDS = [1, 2], so it passes the admin check.
+    We override ``get_admin_user`` to return the test user directly,
+    avoiding the production-session lookup in ``get_current_user_full``.
+    """
     from app.api.des.auth import get_admin_user
 
     async def _override_service():
         yield MonitorService(MonitorRepo(db_session))
 
     async def _override_admin():
-        return admin_user
+        return api_user
 
     api_app.dependency_overrides[monitor_service_dep] = _override_service
     api_app.dependency_overrides[get_admin_user] = _override_admin
