@@ -27,17 +27,17 @@
 
 [data-color-scheme='blush'].dark {
   --ink: oklch(0.94 0.012 355);
-  --paper: oklch(0.18 0.02 355);
-  --warm-gray: oklch(0.36 0.03 355);
-  --secondary: oklch(0.42 0.04 355);
-  --border-color: oklch(0.28 0.025 355);
-  --muted-text: oklch(0.74 0.02 355);
+  --paper: oklch(0.22 0.02 355);
+  --warm-gray: oklch(0.38 0.03 355);
+  --secondary: oklch(0.44 0.04 355);
+  --border-color: oklch(0.32 0.025 355);
+  --muted-text: oklch(0.76 0.02 355);
   --accent-slate: oklch(0.7 0.02 245);
   --accent-rose: oklch(0.74 0.12 355);
   --accent: oklch(0.74 0.11 355);
-  --accent-contrast: oklch(0.18 0.02 355);
-  --card-bg: oklch(0.28 0.025 355);
-  --surface: oklch(0.28 0.025 355 / 0.85);
+  --accent-contrast: oklch(0.22 0.02 355);
+  --card-bg: oklch(0.30 0.025 355);
+  --surface: oklch(0.30 0.025 355 / 0.85);
   --surface-foreground: oklch(0.94 0.012 355);
   --chart-1: oklch(0.74 0.11 355);
   --chart-2: oklch(0.72 0.1 145);

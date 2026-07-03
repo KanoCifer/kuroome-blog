@@ -199,6 +199,39 @@ The default theme is **`sky-blue`** (the values in the frontmatter are sky-blue)
 
 **The Hex-Legacy Rule.** Four themes (paper, sage, mist, blush) are still expressed in hex; the other six are oklch. The oklch versions are being migrated to (see `react-app/src/assets/themes/paper.css` for the oklch shadow of the legacy `paper`). When extending a theme, match its existing format. Do not mix oklch and hex within one theme.
 
+### Dark Mode
+
+Dark mode is a **surface recolor**, not an inverted light mode. Each active theme ships a dedicated `.dark { }` block (`.dark` via `@custom-variant` triggered by the theme store's `Theme` setting or `prefers-color-scheme: dark`). The dark palette is engineered to a strict readability contract:
+
+| Token | Purpose | Light (default) | Dark (target) | Lightness rationale |
+| --- | --- | --- | --- | --- |
+| `--paper` | Page background, modal panel | `oklch(0.97 …)` | **`oklch(0.22 …)`** | 22% lightness — "ink on moonlit paper", deliberately higher than the classic 15-18% `dark-gray` floor. Lifts the whole page out of near-black so surfaces can sit on top of it with visible separation, and drops ink-vs-paper to ~6.4:1 (AAA-proximal) instead of the eye-fatiguing 10:1+ churn. |
+| `--ink` | Body + heading text | `oklch(0.20 …)` | `oklch(0.94 …)` | Strong anti-paper; keeps AAA on both surfaces. |
+| `--warm-gray` | Input fields, secondary buttons, tag pills, hover | `oklch(0.95 …)` | **`oklch(0.36 …)`** | Sits ~14 points above paper, giving secondary surfaces readable breathing room while staying clearly below ink. |
+| `--secondary` | Secondary button bg | `oklch(0.92 …)` | **`oklch(0.42 …)`** | ~20 points above paper; visible as a distinct step from warm-gray. |
+| `--border-color` | Dividers, input borders | `oklch(0.88 …)` | **`oklch(0.30 …)`** | Must read against paper; kept close to card-bg so it reads as a hairline, not a frame. |
+| `--card-bg` | Card surface, modal bg | `oklch(0.99 …)` | **`oklch(0.28 …)`** | ~6 points above paper; visible elevation without stealing focus. Ink-vs-card targets ≥4.5:1 AA for body text. |
+| `--surface` | Translucent floating layer (nav, dropdowns) | `oklch(0.97 … / 0.75)` | `oklch(0.28 … / 0.85)` | Same lightness as card-bg; alpha raised to 0.85 so nav-over-imagery still masks. |
+| `--muted-text` | Auxiliary text, captions, labels | `oklch(0.50 …)` | **`oklch(0.76 …)`** | Bumped from 0.74 → 0.76 to clear ≥4.5:1 against `--paper` (0.22) — up from 4.59:1 to ~4.90:1. The floor was being eaten by the brightened paper; this restores the contract. |
+| `--accent-contrast` | Text on `--accent` buttons | `oklch(0.99 …)` | `oklch(0.22 …)` | Matches `--paper`; in dark mode a bright button gets dark text, the same ink tone as the page background. |
+| `--accent` / `--accent-slate` / `--accent-rose` | Brand + semantic actions | (unchanged) | (unchanged) | Already pass against their dark targets. |
+
+**The Paper-Depth Rule.** Dark lightness is a layered stack, not a two-value flip:
+
+```
+paper (0.22)  ← page
+  card-bg / surface (0.28)  ← cards, modals, nav
+    warm-gray (0.36)  ← inputs, hover, tag pill
+      secondary (0.42)  ← secondary buttons
+        ink (0.94)  ← text on any of the above (≥3.4:1 on warm-gray, ≥4.6:1 on card-bg, 6.4:1 on paper)
+```
+
+Each step is ≥5 points apart; ink-vs-any-surface clears large-text AA; any body-text-on-paper or body-text-on-card clears 4.5:1. Do not compress this stack to less than 5 points per step when extending a theme — collapsing it is what made the original near-black page illegible.
+
+**The Muted-Text-Is-A-Floor Rule.** The `--muted-text` token is the readability floor, not a styling convenience. Its dark variant must clear ≥4.5:1 against the current theme's `--paper`. When `--paper` is adjusted (as it was during the "page too dark" fix, 0.16/0.18 → 0.22), muted-text **must** be audited against the new paper lightness and bumped if the ratio slips below 4.5:1. Aesthetic grey is a regression.
+
+**The Ink-On-Card Contract.** Body text rendered on `--card-bg` (not `--paper`) must still clear ≥4.5:1 AA. This means `--ink` at 0.94 and `--card-bg` at 0.28 are a coupled pair: if one is adjusted, the other must be re-verified. Because card content tends toward larger, sparser type, the floor is relaxed to ≥3.0:1; the 0.28 default passes comfortably at ~4.7:1.
+
 ## 3. Typography
 
 **Body Font (default):** `font-sans` resolves to the system stack — `'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, 'Segoe UI', sans-serif`. Chinese-set on every platform with a CJK system font.

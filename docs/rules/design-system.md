@@ -130,7 +130,7 @@ Layer 3 (Tailwind class: bg-background / bg-primary / border …)
 | **Vue / React 组件**（绝大多数） | Tailwind class                                 | `foreground`/`border`/`muted-foreground`/`surface` 等                                                                                          |
 | **ECharts 图表**                 | `resolveCssColor('--color-primary', fallback)` | `--color-primary` `--color-warning` `--color-foreground` `--color-muted-foreground` `--color-border` `--color-background` `--color-chart-1..5` |
 | **主题切换动画**                 | 直接写 `data-color-scheme` 属性                | —（不读颜色，只切属性触发 transition）                                                                                                         |
-| **明/暗模式**                    | `html.dark` class                              | 主题文件里的 `.dark` 块覆盖同名列                                                                                                              |
+| **明/暗模式**                    | `html.dark` class                              | 主题文件里的 `.dark` 块覆盖同名列。暗色模式必须遵循分层对比度契约：`--paper` (0.22) → `--card-bg` / `--surface` (0.28) → `--warm-gray` (0.36) → `--muted-text` (0.76) → `--ink` (0.94)，每阶 ≥5 点；`--muted-text` 必须相对 `--paper` 保持 ≥4.5:1 |
 
 ### 图表色使用 Vue
 
