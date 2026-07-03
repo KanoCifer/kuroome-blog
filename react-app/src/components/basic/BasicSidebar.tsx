@@ -2,15 +2,12 @@ import { BasicFooter } from '@/components/basic/BasicFooter';
 import { SettingModal } from '@/components/basic/SettingMoal';
 import { useAuthStore } from '@/stores/authState';
 import { useVisitorCountStore } from '@/stores/visitorCountStore';
-import { IconCoin } from '@tabler/icons-react';
 import { motion } from 'framer-motion';
 import {
-  BarChart,
   BookOpen,
   ChevronDown,
   Cog,
   ExternalLink,
-  FileUp,
   History,
   Home,
   Image as ImageIcon,
@@ -18,15 +15,12 @@ import {
   Link2,
   LogIn,
   LogOut,
-  MessageSquare,
-  Rss,
   TextAlignJustify,
   User,
   UserPlus,
-  Wrench,
 } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useClickOutside } from '@/hooks/useClickOutside';
 
 const navItems = [
@@ -35,9 +29,6 @@ const navItems = [
   { path: '/bookshelf', label: '我的书架', icon: BookOpen },
   { path: '/gallery', label: '照片墙', icon: ImageIcon },
   { path: '/version-log', label: '更新日志', icon: History },
-  { path: '/rss', label: 'RSS 订阅', icon: Rss },
-  { path: '/subscription', label: 'SubTracker', icon: IconCoin },
-  { path: '/toolbox/image-toolbox', label: '图片工具', icon: Wrench },
   { path: '/friend-links', label: '友情链接', icon: Link2 },
   { path: '/about', label: '关于网站', icon: Info },
 ];
@@ -68,28 +59,6 @@ function DropDownItems() {
         >
           <User className="h-4 w-4" /> Profile
         </Link>
-        <Link
-          to="/import"
-          className="hover:bg-muted flex items-center gap-2 rounded-xl p-2 select-none"
-        >
-          <FileUp className="h-4 w-4" /> Import
-        </Link>
-        {auth.user?.is_admin && (
-          <>
-            <Link
-              to="/messages"
-              className="hover:bg-muted flex items-center gap-2 rounded-xl p-2 select-none"
-            >
-              <MessageSquare className="h-4 w-4" /> Messages
-            </Link>
-            <Link
-              to="/analytics"
-              className="hover:bg-muted flex items-center gap-2 rounded-xl p-2 select-none"
-            >
-              <BarChart className="h-4 w-4" /> Analytics
-            </Link>
-          </>
-        )}
         <div className="bg-border my-1 h-px"></div>
         <button
           onClick={handleLoginout}
@@ -165,7 +134,6 @@ export const BentoNavSidebar: React.FC = () => {
   const visitorCount = useVisitorCountStore((s) => s.count);
   const connectionDelay = useVisitorCountStore((s) => s.connectionDelay);
   const location = useLocation();
-  const navigate = useNavigate();
   const activeIndex = navItems.findIndex(
     (item) => location.pathname === item.path,
   );
@@ -346,13 +314,7 @@ export const BentoNavSidebar: React.FC = () => {
             </span>
             {visitorCount} 人在线
           </span>
-          <DelayStatus
-            ms={connectionDelay}
-            onClick={() => {
-              navigate('/status');
-              setIsOpen(false);
-            }}
-          />
+          <DelayStatus ms={connectionDelay} />
         </div>
 
         <div className="mb-30 border-t pt-1 text-center text-sm">

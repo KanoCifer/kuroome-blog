@@ -18,20 +18,9 @@ export const RssWorkspace = lazy(() => import('../views/Rss/RssWorkspaceView'));
 export const RssArticle = lazy(() => import('../views/Rss/RssArticleView'));
 export const TodoList = lazy(() => import('../views/Todo/TodoListView'));
 export const PicGallery = lazy(() => import('../views/Pic/PicGalleryView'));
-export const ImageToolbox = lazy(
-  () => import('../views/Toolbox/ImageToolboxView'),
-);
-export const Analytics = lazy(() => import('../views/Analytics/AnalyticsView'));
-export const Subscription = lazy(
-  () => import('../views/subscription/SubscriptionView'),
-);
 export const PrivacyPolicy = lazy(
   () => import('../views/general/PrivacyPolicyView'),
 );
-export const DeviceTracker = lazy(
-  () => import('../views/device/DeviceTracker'),
-);
 export const FriendLinks = lazy(() => import('../views/pages/FriendLinksView'));
-export const Status = lazy(() => import('../views/pages/StatusView'));
 export const BookShelf = lazy(() => import('../views/BookShelf/BookShelf'));
 export const BookStats = lazy(() => import('../views/BookShelf/BookStats'));

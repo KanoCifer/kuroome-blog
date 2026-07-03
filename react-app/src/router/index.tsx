@@ -3,18 +3,15 @@ import { Suspense } from 'react';
 import { createBrowserRouter, redirect } from 'react-router-dom';
 import {
   About,
-  Analytics,
   BlogList,
   BlogPost,
   MomentList,
   BookShelf,
   BookStats,
   Changelog,
-  DeviceTracker,
   FishingMap,
   FriendLinks,
   Home,
-  ImageToolbox,
   Login,
   NotFound,
   PicGallery,
@@ -23,8 +20,6 @@ import {
   Register,
   RssArticle,
   RssWorkspace,
-  Status,
-  Subscription,
   TodoList,
   Website,
 } from './lazy';
@@ -59,25 +54,6 @@ async function guestOnlyLoader({ request }: { request: Request }) {
     const redirectTarget = url.searchParams.get('redirect') || '/';
     return redirect(redirectTarget);
   }
-  return null;
-}
-
-async function adminLoader() {
-  const { useAuthStore } = await import('../stores/authState');
-  const store = useAuthStore.getState();
-
-  if (!store.isHydrated) {
-    await store.hydrateAuth();
-  }
-
-  if (!store.user) {
-    return redirect('/login?redirect=' + window.location.pathname);
-  }
-
-  if (!store.user.is_admin) {
-    return redirect('/');
-  }
-
   return null;
 }
 
@@ -118,10 +94,6 @@ export const router = createBrowserRouter([
         element: <PicGallery />,
       },
       {
-        path: '/toolbox/image-toolbox',
-        element: <ImageToolbox />,
-      },
-      {
         path: '/version-log',
         element: <Changelog />,
       },
@@ -140,10 +112,6 @@ export const router = createBrowserRouter([
       {
         path: '/friend-links',
         element: <FriendLinks />,
-      },
-      {
-        path: '/status',
-        element: <Status />,
       },
       {
         path: '/blog',
@@ -170,21 +138,6 @@ export const router = createBrowserRouter([
       {
         path: '/todos',
         element: <TodoList />,
-      },
-      {
-        path: '/analytics',
-        element: <Analytics />,
-        loader: adminLoader,
-      },
-      {
-        path: '/subscription',
-        element: <Subscription />,
-        loader: authLoader,
-      },
-      {
-        path: '/device-tracker',
-        element: <DeviceTracker />,
-        loader: authLoader,
       },
       {
         path: '/bookshelf',

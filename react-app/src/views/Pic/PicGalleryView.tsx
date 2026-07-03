@@ -5,26 +5,16 @@ import dayjs from 'dayjs';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   Calendar,
-  Check,
-  Edit2,
   ImageOff,
   ImagePlus,
   Loader2,
-  Maximize2,
-  Shuffle,
+  Pencil,
   Trash2,
   Upload,
   UploadCloud,
   X,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
-interface LayoutSeed {
-  x: number;
-  y: number;
-  rotation: number;
-  zIndex: number;
-}
 
 const MAX_UPLOAD_SIZE = 5 * 1024 * 1024;
 
@@ -45,13 +35,6 @@ export default function PicGalleryView() {
   const canEdit = Boolean(auth.user?.is_admin);
 
   const [images, setImages] = useState<Picture[]>([]);
-  const [layoutSeeds, setLayoutSeeds] = useState<Map<number, LayoutSeed>>(
-    new Map(),
-  );
-
-  const galleryRef = useRef<HTMLDivElement>(null);
-  const dragStartPosRef = useRef({ x: 0, y: 0 });
-
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
   const [editDescription, setEditDescription] = useState('');
@@ -62,35 +45,20 @@ export default function PicGalleryView() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploadDescription, setUploadDescription] = useState('');
   const [isUploading, setIsUploading] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
 
   const selectedImage = useMemo(
     () => images.find((img) => img.id === selectedImageId) ?? null,
     [images, selectedImageId],
   );
 
-  const generateLayoutSeeds = useCallback((sourceImages: Picture[]) => {
-    const nextSeeds = new Map<number, LayoutSeed>();
-    sourceImages.forEach((_, index) => {
-      nextSeeds.set(index, {
-        x: Math.random() * 60 + 10,
-        y: Math.random() * 50 + 8,
-        rotation: (Math.random() - 0.5) * 30,
-        zIndex: index + 1,
-      });
-    });
-    setLayoutSeeds(nextSeeds);
-  }, []);
-
   const fetchGalleryImages = useCallback(async () => {
     try {
       const data = await service.getGallery();
       setImages(data.images);
-      generateLayoutSeeds(data.images);
     } catch {
       notifier.error('获取照片墙数据失败');
     }
-  }, [generateLayoutSeeds, notifier, service]);
+  }, [notifier, service]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -144,7 +112,6 @@ export default function PicGalleryView() {
     setShowUploadModal(false);
     setSelectedFile(null);
     setUploadDescription('');
-    setIsDragging(false);
     setPreviewUrl((prev) => {
       if (prev) {
         URL.revokeObjectURL(prev);
@@ -168,68 +135,9 @@ export default function PicGalleryView() {
     setEditDescription('');
   };
 
-  const shuffleImages = () => {
-    if (!ensureAdminPermission()) return;
-    generateLayoutSeeds(images);
-    notifier.success('照片已重新洗牌');
-  };
-
-  const bringToFront = (index: number) => {
-    setLayoutSeeds((prevSeeds) => {
-      const currentMaxZ =
-        prevSeeds.size > 0
-          ? Math.max(
-              ...Array.from(prevSeeds.values()).map((seed) => seed.zIndex),
-            )
-          : 10;
-      const nextZ = currentMaxZ + 1;
-      const nextSeeds = new Map(prevSeeds);
-      const seed = nextSeeds.get(index);
-      if (seed) {
-        nextSeeds.set(index, { ...seed, zIndex: nextZ });
-      }
-      return nextSeeds;
-    });
-  };
-
-  const getImageStyle = (index: number) => {
-    const seed = layoutSeeds.get(index);
-    if (!seed) return {};
-    return {
-      left: `${seed.x}%`,
-      top: `${seed.y}%`,
-      zIndex: seed.zIndex,
-    };
-  };
-
-  const getImageSize = (index: number) => {
-    const seed = (index * 137) % 100;
-    return 120 + (seed % 46);
-  };
-
-  const getAspectRatio = (index: number) => {
-    const ratios = [1, 1.25, 0.8, 1.5];
-    return ratios[index % ratios.length];
-  };
-
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return '';
     return dayjs(dateStr).format('YYYY年MM月DD日 HH:mm');
-  };
-
-  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    dragStartPosRef.current = { x: event.clientX, y: event.clientY };
-  };
-
-  const handlePhotoClick = (image: Picture, event: React.MouseEvent) => {
-    const dx = Math.abs(event.clientX - dragStartPosRef.current.x);
-    const dy = Math.abs(event.clientY - dragStartPosRef.current.y);
-    if (dx > 5 || dy > 5) {
-      event.preventDefault();
-      event.stopPropagation();
-      return;
-    }
-    openImageDetail(image);
   };
 
   const processFile = (file: File) => {
@@ -264,15 +172,6 @@ export default function PicGalleryView() {
     }
   };
 
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragging(false);
-    const file = event.dataTransfer.files?.[0];
-    if (file) {
-      processFile(file);
-    }
-  };
-
   const uploadImage = async () => {
     if (!ensureAdminPermission()) return;
     if (!selectedFile) return;
@@ -293,7 +192,6 @@ export default function PicGalleryView() {
 
       await saveGallery(nextImages);
       setImages(nextImages);
-      generateLayoutSeeds(nextImages);
       notifier.success('图片上传成功');
       closeUploadModal();
     } catch (error) {
@@ -331,7 +229,6 @@ export default function PicGalleryView() {
     try {
       await saveGallery(nextImages);
       setImages(nextImages);
-      generateLayoutSeeds(nextImages);
       closeImageDetail();
       notifier.success('图片已删除');
     } catch (error) {
@@ -341,7 +238,7 @@ export default function PicGalleryView() {
   };
 
   return (
-    <div className="bg-background relative min-h-dvh overflow-hidden pb-40">
+    <div className="bg-background relative min-h-dvh pb-40">
       <div
         className="pointer-events-none absolute inset-0 z-0 opacity-40 dark:opacity-20"
         style={{
@@ -358,102 +255,14 @@ export default function PicGalleryView() {
           </p>
           <h1 className="text-foreground mt-1 text-2xl font-bold">图片墙</h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            拖拽照片自由排布，点击查看详情
+            瀑布流展示，点击查看详情
           </p>
         </div>
       </div>
 
-      <div
-        ref={galleryRef}
-        className="relative z-10 mx-auto mt-3 h-[72dvh] w-full max-w-md px-4"
-      >
-        {images.map((image, index) => {
-          const seed = layoutSeeds.get(index);
-          return (
-            <motion.div
-              key={image.id}
-              className={`absolute origin-center ${
-                isEditMode && canEdit
-                  ? 'cursor-grab active:cursor-grabbing'
-                  : 'cursor-pointer'
-              }`}
-              style={getImageStyle(index)}
-              initial={{
-                opacity: 0,
-                scale: 0.8,
-                rotate: (seed?.rotation ?? 0) - 10,
-                y: 50,
-              }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                rotate: seed?.rotation ?? 0,
-                y: 0,
-              }}
-              transition={{
-                duration: 0.7,
-                delay: index * 0.04,
-                type: 'spring',
-                stiffness: 260,
-                damping: 20,
-              }}
-              whileHover={{
-                scale: 1.05,
-                zIndex: 120,
-                transition: { duration: 0.2 },
-              }}
-              whileDrag={
-                isEditMode && canEdit
-                  ? {
-                      scale: 1.08,
-                      zIndex: 180,
-                      rotate: 0,
-                      transition: {
-                        type: 'spring',
-                        stiffness: 400,
-                        damping: 25,
-                      },
-                    }
-                  : undefined
-              }
-              drag
-              dragConstraints={galleryRef}
-              dragElastic={0.2}
-              dragMomentum={false}
-              onDragStart={() => bringToFront(index)}
-              onPointerDown={handlePointerDown}
-              onClick={(event) => handlePhotoClick(image, event)}
-            >
-              <div
-                className="group bg-background ring-border relative flex flex-col items-center rounded-sm p-2 shadow-xl ring-1 transition-shadow hover:shadow-2xl"
-                style={{ width: `${getImageSize(index) + 16}px` }}
-              >
-                <div
-                  className="bg-muted relative w-full overflow-hidden rounded-sm"
-                  style={{
-                    height: `${getImageSize(index) * getAspectRatio(index)}px`,
-                  }}
-                >
-                  <img
-                    src={image.url}
-                    alt={image.description || 'gallery image'}
-                    className="pointer-events-none h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
-                    draggable={false}
-                  />
-                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                    <div className="translate-y-3 transform rounded-full bg-white/20 p-2.5 text-white opacity-0 backdrop-blur-md transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                      <Maximize2 className="h-4 w-4" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          );
-        })}
-
-        {images.length === 0 && (
-          <div className="flex h-full items-center justify-center">
+      <div className="relative z-10 mx-auto mt-4 w-full max-w-md px-4">
+        {images.length === 0 ? (
+          <div className="flex items-center justify-center py-32">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -480,6 +289,41 @@ export default function PicGalleryView() {
               )}
             </motion.div>
           </div>
+        ) : (
+          <div className="columns-2 gap-3">
+            {images.map((image, index) => (
+              <motion.div
+                key={image.id}
+                className="mb-3 break-inside-avoid"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.4,
+                  delay: index * 0.03,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+              >
+                <div
+                  className="bg-background ring-border group relative cursor-pointer overflow-hidden rounded-2xl ring-1 shadow-sm transition-shadow hover:shadow-md"
+                  onClick={() => openImageDetail(image)}
+                >
+                  <img
+                    src={image.url}
+                    alt={image.description || 'gallery image'}
+                    className="w-full object-cover"
+                    loading="lazy"
+                  />
+                  {image.description && (
+                    <div className="bg-background/90 pointer-events-none absolute inset-x-0 bottom-0 translate-y-full p-2.5 opacity-0 backdrop-blur-sm transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100">
+                      <p className="text-foreground line-clamp-2 text-xs leading-snug">
+                        {image.description}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            ))}
+          </div>
         )}
       </div>
 
@@ -494,32 +338,17 @@ export default function PicGalleryView() {
                   isEditMode ? 'bg-primary/10 text-primary' : 'text-foreground'
                 }`}
               >
-                {isEditMode ? (
-                  <Check className="h-4 w-4" />
-                ) : (
-                  <Edit2 className="h-4 w-4" />
-                )}
-                {isEditMode ? '完成编辑' : '编辑模式'}
+                <Pencil className="h-4 w-4" />
+                {isEditMode ? '完成编辑' : '编辑'}
               </button>
 
-              {isEditMode && (
-                <>
-                  <button
-                    type="button"
-                    onClick={shuffleImages}
-                    className="border-border/70 text-foreground flex h-10 items-center rounded-xl border px-3 shadow-sm"
-                  >
-                    <Shuffle className="h-4 w-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={openUploadModal}
-                    className="bg-foreground text-background hover:bg-foreground/90 flex h-10 items-center rounded-xl px-3 shadow-sm transition-colors"
-                  >
-                    <Upload className="h-4 w-4" />
-                  </button>
-                </>
-              )}
+              <button
+                type="button"
+                onClick={openUploadModal}
+                className="bg-foreground text-background hover:bg-foreground/90 flex h-10 items-center rounded-xl px-3 shadow-sm transition-colors"
+              >
+                <Upload className="h-4 w-4" />
+              </button>
             </div>
           </div>
         </div>
@@ -649,21 +478,8 @@ export default function PicGalleryView() {
               </div>
 
               <div
-                className={`group border-border/80 bg-secondary/50 hover:border-border hover:bg-secondary relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-all ${
-                  isDragging
-                    ? 'border-foreground bg-secondary scale-[0.98]'
-                    : ''
-                }`}
+                className="border-border/80 bg-secondary/50 hover:border-border hover:bg-secondary flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-all"
                 onClick={triggerFileInput}
-                onDragOver={(event) => {
-                  event.preventDefault();
-                  setIsDragging(true);
-                }}
-                onDragLeave={(event) => {
-                  event.preventDefault();
-                  setIsDragging(false);
-                }}
-                onDrop={handleDrop}
               >
                 <input
                   ref={fileInputRef}
@@ -695,7 +511,7 @@ export default function PicGalleryView() {
                       />
                     </div>
                     <p className="text-card-foreground text-sm font-medium">
-                      点击或拖拽图片到此处
+                      点击选择图片
                     </p>
                     <p className="text-muted-foreground mt-2 text-xs">
                       支持 JPG、PNG、GIF、WebP (最大 5MB)

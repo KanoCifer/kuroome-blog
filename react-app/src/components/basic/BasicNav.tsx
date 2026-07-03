@@ -13,10 +13,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authState';
 import { useThemeState } from '../../stores/themeState';
 import { AboutIcon } from './icon/AboutIcon';
-import { AnalyticsIcon } from './icon/AnalyticsIcon';
 import { BookshelfIcon } from './icon/BookshelfIcon';
 import { HomeIcon } from './icon/HomeIcon';
-import { ImportIcon } from './icon/ImportIcon';
 import { LoginIcon } from './icon/LoginIcon';
 import { LogoutIcon } from './icon/LogoutIcon';
 import { MessagesIcon } from './icon/MessagesIcon';
@@ -200,20 +198,6 @@ export function BasicNav() {
                 onClick={() => handleNav('/messages')}
                 iconColor="text-emerald-500"
                 iconBg="bg-emerald-100"
-              />
-              <MenuItem
-                icon={<AnalyticsIcon className="h-6 w-6" />}
-                label="Analytics"
-                onClick={() => handleNav('/analytics')}
-                iconColor="text-cyan-500"
-                iconBg="bg-cyan-100"
-              />
-              <MenuItem
-                icon={<ImportIcon className="h-6 w-6" />}
-                label="Import"
-                onClick={() => handleNav('/import')}
-                iconColor="text-indigo-500"
-                iconBg="bg-indigo-100"
               />
               <MenuItem
                 icon={<Settings className="h-6 w-6" />}
