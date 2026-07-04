@@ -38,7 +38,7 @@
         v-for="(image, index) in images"
         :key="image.id"
         class="mb-4 inline-block w-full break-inside-avoid"
-        :style="{ columnBreakInside: 'avoid' }"
+        :style="{ breakInside: 'avoid' }"
       >
         <PolaroidCard
           :image="image"

@@ -65,7 +65,11 @@ const handleTagKeydown = (event: KeyboardEvent) => {
     if (tagInput.value.trim()) {
       addTag(tagInput.value);
     }
-  } else if (event.key === 'Backspace' && !tagInput.value && tags.value.length) {
+  } else if (
+    event.key === 'Backspace' &&
+    !tagInput.value &&
+    tags.value.length
+  ) {
     tags.value.pop();
   }
 };
@@ -300,7 +304,7 @@ const wordCount = computed(() => {
     .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
     .replace(/\[[^\]]*\]\([^)]*\)/g, '')
     .replace(/^#+\s+/gm, '')
-    .replace(/[*_>~\-]+/g, ' ');
+    .replace(/[*_>~-]+/g, ' ');
   // CJK-aware count: each CJK char = 1, run of non-CJK = 1 word
   const cjkChars = (stripped.match(/[一-鿿㐀-䶿]/g) || []).length;
   const latinWords = (
@@ -554,9 +558,13 @@ onBeforeUnmount(() => {
               v-model="tagInput"
               type="text"
               placeholder="回车新增…"
-              class="bg-transparent text-foreground placeholder:text-muted-foreground/50 min-w-[60px] flex-1 text-xs outline-none"
+              class="text-foreground placeholder:text-muted-foreground/50 min-w-[60px] flex-1 bg-transparent text-xs outline-none"
               @keydown="handleTagKeydown"
-              @blur="() => { if (tagInput.trim()) addTag(tagInput); }"
+              @blur="
+                () => {
+                  if (tagInput.trim()) addTag(tagInput);
+                }
+              "
             />
           </div>
 

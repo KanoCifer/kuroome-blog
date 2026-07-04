@@ -33,7 +33,7 @@ interface BlogPostResponse {
 export interface blogGateway {
   getBlogs(query?: BlogQuery): Promise<AxiosResponse<BlogListResponse>>;
   getBlogPost(postId: string): Promise<AxiosResponse<BlogPostResponse>>;
-  getTags(): Promise<AxiosResponse<TagItem[]>>;
+  getTags(): Promise<AxiosResponse<{ tags: TagItem[] }>>;
   getPostsByTag(
     tag: string,
   ): Promise<AxiosResponse<PostsByTagResponse>>;

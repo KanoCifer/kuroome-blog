@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
     "test:unit": "vitest",
     "build-only": "vite build",
-    "type-check": "vue-tsc --noEmit",
+    "type-check": "vue-tsc -b --noEmit",
     "lint": "pnpm exec oxlint .",
     "lint:fix": "pnpm exec oxlint . --fix",
     "format": "pnpm exec prettier ./src --write"

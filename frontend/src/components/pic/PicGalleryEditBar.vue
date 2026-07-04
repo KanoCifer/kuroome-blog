@@ -50,7 +50,7 @@
         leave-to-class="translate-x-full opacity-0"
       >
         <Button
-          v-if="isEditMode && canEdit && selectedCount > 0"
+          v-if="isEditMode && canEdit && (selectedCount ?? 0) > 0"
           key="delete-btn"
           variant="destructive"
           size="sm"

@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build-only": "vite build",
-    "type-check": "tsc --noEmit",
+    "type-check": "tsc -b --noEmit",
     "lint": "pnpm exec oxlint .",
     "lint:fix": "pnpm exec oxlint . --fix",
     "preview": "vite preview",

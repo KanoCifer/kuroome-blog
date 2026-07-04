@@ -65,13 +65,13 @@
         <div class="flex items-center gap-2 sm:ml-auto">
           <!-- 当前分类 chip：章节章 文学风，列表区顶部永久可见 -->
           <button
-            v-if="activeCategory"
+            v-if="activeTag"
             type="button"
             class="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
             @click="handleResetFilter"
           >
             <span class="text-primary/70 font-serif italic">#</span>
-            <span class="font-serif">{{ activeCategory }}</span>
+            <span class="font-serif">{{ activeTag }}</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -122,7 +122,7 @@
           <!--  卷一 · 章节目录头：未选分类时显示                       -->
           <!-- ────────────────────────────────────────────────────── -->
           <div
-            v-if="!activeCategory"
+            v-if="!activeTag"
             class="mb-6 flex items-end justify-between gap-4 pb-3"
           >
             <div class="flex items-baseline gap-3">
@@ -156,7 +156,7 @@
               <h2
                 class="text-foreground font-serif text-base font-semibold sm:text-lg"
               >
-                <span class="text-primary/70 mr-1">#</span>{{ activeCategory }}
+                <span class="text-primary/70 mr-1">#</span>{{ activeTag }}
               </h2>
             </div>
             <div class="text-muted-foreground/70 flex items-center gap-1.5">
@@ -238,20 +238,20 @@
               />
             </svg>
             <h3 class="text-foreground font-serif text-base font-semibold">
-              {{ activeCategory ? '此卷尚是空白' : '书页尚待落墨' }}
+              {{ activeTag ? '此卷尚是空白' : '书页尚待落墨' }}
             </h3>
             <p
               class="text-muted-foreground mt-2 max-w-sm font-serif text-sm italic"
             >
               {{
-                activeCategory
+                activeTag
                   ? '此卷尚无篇章，待你我来添一笔。'
                   : '一切好故事，都从空白的扉页开始。'
               }}
             </p>
             <div class="mt-5 flex items-center gap-2">
               <button
-                v-if="activeCategory"
+                v-if="activeTag"
                 type="button"
                 class="border-border text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg border px-4 py-2 text-sm font-medium"
                 @click="handleResetFilter"

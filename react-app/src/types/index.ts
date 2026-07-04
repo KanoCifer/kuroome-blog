@@ -27,6 +27,7 @@ export interface BlogPost {
   created_at: string;
   updated_at: string;
   tags: string[];
+  is_pinned?: boolean;
 }
 
 // 标签聚合项（带文章计数）

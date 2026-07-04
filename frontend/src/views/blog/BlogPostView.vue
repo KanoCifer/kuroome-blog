@@ -171,7 +171,7 @@ useHead(() => {
     ? [
         post.value.title,
         post.value.author || 'Kurroome',
-        post.value.category?.name || '博客',
+        post.value.tags?.[0] || '博客',
         '阅读',
         '读书笔记',
         '个人博客',
@@ -210,7 +210,7 @@ useHead(() => {
       { property: 'og:article:modified_time', content: post.value?.updated_at },
       {
         property: 'og:article:section',
-        content: post.value?.category?.name || '博客',
+        content: post.value?.tags?.[0] || '博客',
       },
       { name: 'twitter:title', content: post.value?.title ?? '文章未找到' },
       { name: 'twitter:description', content: desc },
@@ -408,7 +408,7 @@ onUnmounted(() => {
         <figcaption
           class="text-muted-foreground mt-2.5 text-[11px] tracking-[0.04em]"
         >
-          封面 · {{ post.category?.name || 'ReadingList' }}
+          封面 · {{ post.tags?.[0] || 'ReadingList' }}
         </figcaption>
       </figure>
 
@@ -429,7 +429,7 @@ onUnmounted(() => {
           class="text-primary mb-5 flex items-center gap-2 text-[11px] font-semibold tracking-[0.14em] uppercase"
         >
           <span class="bg-primary h-px w-5"></span>
-          {{ post.category?.name || '未分类' }}
+          {{ post.tags?.[0] || '未分类' }}
         </div>
 
         <h1

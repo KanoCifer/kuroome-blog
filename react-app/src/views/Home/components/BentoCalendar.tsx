@@ -22,12 +22,12 @@ export function BentoCalendar() {
   const startOffset = () => {
     const offset = now.startOf('month').day();
 
-    const offsetArray = new Array(offset).fill(0);
+    const offsetArray = Array.from({ length: offset });
 
     return offsetArray.map((_, idx) => <span key={idx}></span>);
   };
 
-  const daysInMonthArray = new Array(now.daysInMonth()).fill(0);
+  const daysInMonthArray = Array.from({ length: now.daysInMonth() });
   const daysInMonth = daysInMonthArray.map((_, idx) => {
     const dayNum = idx + 1;
     const isToday = dayNum === now.date();

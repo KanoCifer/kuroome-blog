@@ -33,7 +33,7 @@
               :cover="post.cover ?? null"
               :title="post.title"
               :seed="post._id ?? post.id ?? post.title"
-              :category-name="post.category?.name"
+              :category-name="post.tags?.[0]"
               :size="isFeatured ? 'lg' : 'md'"
             />
           </div>
@@ -62,11 +62,11 @@
                 置顶
               </span>
               <span
-                v-if="post.category"
+                v-if="post.tags?.length"
                 class="text-foreground/70 inline-flex items-center gap-1 font-medium"
               >
                 <span class="text-primary/70 font-serif">#</span>
-                {{ post.category.name }}
+                {{ post.tags![0] }}
               </span>
               <span aria-hidden="true" class="text-border">·</span>
               <time class="tabular-nums" :datetime="post.created_at">
