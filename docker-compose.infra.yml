@@ -1,0 +1,87 @@
+# 基础设施服务 — Redis / MongoDB / RabbitMQ
+# 由 ssh-server-ops 从服务器 114.132.156.53 实际容器配置导出（2026-07-03
+#
+# 数据卷策略：
+#   所有数据目录使用 Docker named volume，路径与源服务器完全一致。
+#   在**已存在同名 volume 的目标机上运行 `docker compose up -d` 不会覆写数据**
+#   而是复用现有 volume。迁移时请用 `docker volume create` 或外部 volume 先
+#   还原备份，再启动。
+#
+# 注意：服务器原版本为 redis:8.6.2-alpine / mongo:8.2.6 / rabbitmq:4.3.0-alpine，
+# 此处使用新拉取的 tag；如需锁定原版本请将 tag 改为上述 pinned 值。
+#
+#   redis_data       → /var/lib/docker/volumes/redis_data/_data      容器内 /data
+#   mongo_data       → /var/lib/docker/volumes/mongo_data/_data      容器内 /data/db
+#   mongo_configdb   → 容器内 /data/configdb（源为匿名volume，已命名为 mongo_configd
+#   rabbitmq_data    → /var/lib/docker/volumes/rabbitmq_data/_data   容器内 /var/lib/rabbitm
+#
+# Mongo 的 /backup 挂载（/home/kano/mongo_data）在服务器上用作备份目录；
+# 这里以命名卷备份保留，如需其他备份路径请改为 bind mount。
+#
+# 网络：源服务器 mongon 同时接入了 twikoo_default / twikoo_net 两个自定义网络
+# twikoo 应用共存时再创建；本品只保留各服务可互相通信的默认网络。
+#
+# 使用前请检查并替换实际版本号（镜像 tag 已固定为服务器当前版本）。
+
+services:
+  redis:
+    image: redis:8.8-alpine
+    container_name: redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - infra
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    restart: unless-stopped
+    command: ["mongod"]
+    ports:
+      - "127.0.0.1:27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - mongo_configdb:/data/configdb
+      - mongo_backup:/backup
+    networks:
+      - infra
+
+  rabbitmq:
+    image: rabbitmq:4.3.2-alpine
+    container_name: rabbitmq
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - infra
+
+volumes:
+  redis_data:
+    name: redis_data
+    driver: local
+    external: true
+  mongo_data:
+    name: mongo_data
+    driver: local
+    external: true
+  mongo_configdb:
+    name: mongo_configdb
+    driver: local
+  mongo_backup:
+    name: mongo_backup
+    driver: local
+  rabbitmq_data:
+    name: rabbitmq_data
+    driver: local
+    external: true
+
+networks:
+  infra:
+    driver: bridge

@@ -1,5 +1,10 @@
 import request from '@/api/shared/request';
-import type { BlogPagination, BlogPost, Category } from '@/types';
+import type {
+  BlogPagination,
+  BlogPost,
+  PostsByTagResponse,
+  TagItem,
+} from '@/types';
 
 export interface BlogQuery {
   page?: number;
@@ -8,8 +13,7 @@ export interface BlogQuery {
 
 export interface BlogListResponse {
   posts: BlogPost[];
-  categories: Category[];
-  category_counts: Record<number, number>;
+  tags: TagItem[];
   pagination: BlogPagination;
 }
 
@@ -19,25 +23,22 @@ export interface BlogPostResponse {
   body: string;
   summary?: string | null;
   cover?: string | null;
-  category_id: number;
+  tags: string[];
   is_pinned: boolean;
   created_at: string;
   updated_at: string;
-  category: { id: number; name: string } | null;
 }
 
 export interface BlogGateway {
   getBlogs(query?: BlogQuery): Promise<BlogListResponse>;
   getBlogPost(postId: string): Promise<BlogPostResponse>;
-  getCategories(): Promise<Category[]>;
-  getPostsByCategory(
-    categoryId: number,
-  ): Promise<{ posts: BlogPost[]; category: { id: number; name: string } }>;
+  getTags(): Promise<TagItem[]>;
+  getPostsByTag(tag: string): Promise<PostsByTagResponse>;
   getLegacyPost(postId: string): Promise<BlogPostResponse>;
   createLegacyPost(payload: {
     title: string;
-    category_id: number;
     body: string;
+    tags: string[];
     summary?: string | null;
     cover?: string | null;
     is_pinned: number;
@@ -45,17 +46,13 @@ export interface BlogGateway {
   updateLegacyPost(payload: {
     _id: string;
     title: string;
-    category_id: number;
     body: string;
+    tags: string[];
     summary?: string | null;
     cover?: string | null;
     is_pinned: number;
   }): Promise<{ _id: string }>;
   deleteLegacyPost(postId: string): Promise<void>;
-  getLegacyCategories(): Promise<Category[]>;
-  getPostsByLegacyCategory(
-    categoryId: number,
-  ): Promise<{ posts: BlogPost[]; category: { id: number; name: string } }>;
 }
 
 export const blogGateway: BlogGateway = {
@@ -73,17 +70,15 @@ export const blogGateway: BlogGateway = {
     return res.data.data;
   },
 
-  async getCategories(): Promise<Category[]> {
-    const res = await request.get<{ data: Category[] }>('v1/blogs/categories');
-    return res.data.data;
+  async getTags(): Promise<TagItem[]> {
+    const res = await request.get<{ data: { tags: TagItem[] } }>('v1/tags');
+    return res.data.data.tags;
   },
 
-  async getPostsByCategory(
-    categoryId: number,
-  ): Promise<{ posts: BlogPost[]; category: { id: number; name: string } }> {
-    const res = await request.get<{
-      data: { posts: BlogPost[]; category: { id: number; name: string } };
-    }>(`v1/blogs/categories/${categoryId}`);
+  async getPostsByTag(tag: string): Promise<PostsByTagResponse> {
+    const res = await request.get<{ data: PostsByTagResponse }>(
+      `v1/tags/${encodeURIComponent(tag)}/posts`,
+    );
     return res.data.data;
   },
 
@@ -112,21 +107,5 @@ export const blogGateway: BlogGateway = {
 
   async deleteLegacyPost(postId: string): Promise<void> {
     await request.delete(`v1/admin/post/${postId}/delete`);
-  },
-
-  async getLegacyCategories(): Promise<Category[]> {
-    const res = await request.get<{ data: Category[] }>('v1/categories');
-    return res.data.data;
-  },
-
-  async getPostsByLegacyCategory(
-    categoryId: number,
-  ): Promise<{ posts: BlogPost[]; category: { id: number; name: string } }> {
-    const res = await request.post<{
-      data: { posts: BlogPost[]; category: { id: number; name: string } };
-    }>('v1/category', null, {
-      params: { category_id: categoryId },
-    });
-    return res.data.data;
   },
 };

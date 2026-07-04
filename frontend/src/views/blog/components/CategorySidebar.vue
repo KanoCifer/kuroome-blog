@@ -9,50 +9,39 @@
         <IconTags class="size-5!"></IconTags>
         Tags
       </h3>
-      <ul class="space-y-2">
-        <!-- 全部文章选项 -->
+      <p v-if="isLoading" class="text-muted-foreground text-sm">加载中…</p>
+      <p
+        v-else-if="tags.length === 0"
+        class="text-muted-foreground text-sm"
+      >
+        暂无标签
+      </p>
+      <ul v-else class="flex flex-wrap gap-2">
         <li>
           <button
-            @click="selectCategory(null)"
+            @click="selectTag(null)"
             :class="[
-              'flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
-              activeCategoryId === null
+              'rounded-full px-3 py-1 text-sm font-medium transition-colors',
+              activeTag === null
                 ? 'bg-blue-100 text-blue-900 dark:bg-blue-900/30 dark:text-blue-200'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white',
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600',
             ]"
           >
-            <p class="flex items-center gap-2">
-              <IconTags></IconTags>
-              全部文章
-            </p>
-            <span
-              v-if="totalPosts !== null"
-              class="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-300"
-            >
-              {{ totalPosts }}
-            </span>
+            全部文章
           </button>
         </li>
-        <!-- 分类列表 -->
-        <li v-for="category in categories" :key="category.id">
+        <li v-for="tag in tags" :key="tag.name">
           <button
-            @click="selectCategory(category.id)"
+            @click="selectTag(tag.name)"
             :class="[
-              'flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
-              activeCategoryId === category.id
+              'inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-medium transition-colors',
+              activeTag === tag.name
                 ? 'bg-blue-100 text-blue-900 dark:bg-blue-900/30 dark:text-blue-200'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white',
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600',
             ]"
           >
-            <p class="flex items-center gap-2">
-              <IconTags></IconTags>
-              {{ category.name }}
-            </p>
-            <span
-              class="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-300"
-            >
-              {{ category.post_count || 0 }}
-            </span>
+            {{ tag.name }}
+            <span class="text-xs opacity-60">{{ tag.count }}</span>
           </button>
         </li>
       </ul>
@@ -63,97 +52,75 @@
 <script setup lang="ts">
 import { blogGateway } from '@/api/public';
 import IconTags from '@/components/icons/IconTags.vue';
-import type { Category, CategoryResponseItem, Post } from '@/types';
+import type { BlogPost, Post, TagItem } from '@/types';
 import { onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
 const router = useRouter();
 
-const categories = ref<Category[]>([]);
-const activeCategoryId = ref<number | null>(null);
+const tags = ref<TagItem[]>([]);
+const activeTag = ref<string | null>(null);
 const isLoading = ref(false);
-const totalPosts = ref<number | null>(null);
 
 const emit = defineEmits<{
-  filterPosts: [posts: Post[], categoryName: string];
+  filterPosts: [posts: Post[], tagName: string];
   resetFilter: [];
 }>();
 
-onMounted(() => {
-  fetchCategories();
-  // 从 URL 参数恢复选中的分类
-  const categoryId = route.query.category;
-  if (categoryId) {
-    activeCategoryId.value = parseInt(categoryId as string, 10);
-    fetchPostsByCategory(activeCategoryId.value);
+onMounted(async () => {
+  await fetchTags();
+  const tag = route.query.tag;
+  if (typeof tag === 'string' && tag) {
+    activeTag.value = tag;
+    await fetchPostsByTag(tag);
   }
 });
 
-// 监听 URL 变化
 watch(
-  () => route.query.category,
-  (newCategoryId) => {
-    if (newCategoryId) {
-      activeCategoryId.value = parseInt(newCategoryId as string, 10);
-      fetchPostsByCategory(activeCategoryId.value);
-    } else {
-      activeCategoryId.value = null;
+  () => route.query.tag,
+  async (newTag) => {
+    if (typeof newTag === 'string' && newTag) {
+      activeTag.value = newTag;
+      await fetchPostsByTag(newTag);
+    } else if (newTag === undefined || newTag === null || newTag === '') {
+      activeTag.value = null;
       emit('resetFilter');
     }
   },
 );
 
-const fetchCategories = async () => {
-  try {
-    const response = await blogGateway.getLegacyCategories();
-    categories.value = response.map((cat): CategoryResponseItem => ({
-      id: cat.id,
-      name: cat.name,
-      description: '',
-      post_count: cat.post_count || 0,
-      posts: [],
-    })) as unknown as Category[];
-  } catch (error) {
-    console.error('Failed to fetch categories:', error);
-  }
-};
-
-const fetchPostsByCategory = async (categoryId: number) => {
+const fetchTags = async () => {
   isLoading.value = true;
   try {
-    const response = await blogGateway.getPostsByLegacyCategory(categoryId);
-    const posts: Post[] = response.posts.map((post) => ({
-      ...(post as unknown as Post),
-      category: post.category
-        ? {
-            id: post.category.id,
-            name: post.category.name,
-            description: '',
-            post_count: 0,
-            created_at: '',
-            updated_at: '',
-          }
-        : undefined,
-    }));
-    const categoryName = response.category?.name || '';
-    emit('filterPosts', posts, categoryName);
+    tags.value = await blogGateway.getTags();
   } catch (error) {
-    console.error('Failed to fetch posts by category:', error);
+    console.error('Failed to fetch tags:', error);
   } finally {
     isLoading.value = false;
   }
 };
 
-const selectCategory = (categoryId: number | null) => {
-  activeCategoryId.value = categoryId;
+const fetchPostsByTag = async (tag: string) => {
+  isLoading.value = true;
+  try {
+    const response = await blogGateway.getPostsByTag(tag);
+    const posts: BlogPost[] = response.posts as unknown as BlogPost[];
+    emit('filterPosts', posts as unknown as Post[], tag);
+  } catch (error) {
+    console.error('Failed to fetch posts by tag:', error);
+  } finally {
+    isLoading.value = false;
+  }
+};
 
-  // 更新 URL，但不刷新页面
-  if (categoryId !== null) {
-    router.replace({ query: { category: categoryId.toString() } });
-    fetchPostsByCategory(categoryId);
+const selectTag = (tag: string | null) => {
+  activeTag.value = tag;
+  if (tag !== null) {
+    router.replace({ query: { ...route.query, tag } });
+    fetchPostsByTag(tag);
   } else {
     const query = { ...route.query };
-    delete query.category;
+    delete query.tag;
     router.replace({ query });
     emit('resetFilter');
   }

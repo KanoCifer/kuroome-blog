@@ -4,28 +4,17 @@ import { useScroll } from '@vueuse/core';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 
-interface Category {
-  id: number;
-  name: string;
-  description: string;
-  post_count: number;
-  posts_count?: number;
-  created_at: string;
-  updated_at: string;
-}
-
 const props = defineProps<{
   title: string;
   author?: string;
   authorInitial?: string;
   publishedDate?: string;
   updatedDate?: string;
-  category?: Category;
+  tags?: string[];
   isLoading: boolean;
   errorMessage?: string;
   backLink: string;
   backText?: string;
-  showCategory?: boolean;
 }>();
 
 const router = useRouter();
@@ -121,7 +110,10 @@ const formattedDate = computed(() =>
               {{ displayDate || formattedDate || '未知时间' }}
             </span>
           </div>
-          <span v-if="showCategory && category" class="flex items-center gap-1">
+          <span
+            v-if="tags && tags.length > 0"
+            class="flex flex-wrap items-center gap-1.5"
+          >
             <svg
               class="h-4 w-4 text-gray-50"
               fill="none"
@@ -136,10 +128,12 @@ const formattedDate = computed(() =>
               />
             </svg>
             <router-link
-              :to="`/blog/category/${category.id}`"
+              v-for="tag in tags"
+              :key="tag"
+              :to="`/blog?tag=${encodeURIComponent(tag)}`"
               class="text-blue-400 hover:text-blue-800 hover:underline dark:hover:text-blue-300"
             >
-              {{ category.name }}
+              #{{ tag }}
             </router-link>
           </span>
         </div>

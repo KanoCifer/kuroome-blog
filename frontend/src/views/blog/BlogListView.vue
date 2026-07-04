@@ -422,7 +422,7 @@
 import BasicDetail from '@/components/basic/BasicDetail.vue';
 import { blogGateway } from '@/api/public';
 import { useNotificationStore } from '@/stores/notification';
-import type { BlogPagination, Category, Post } from '@/types';
+import type { BlogPagination, Post } from '@/types';
 import BentoCalendar from '@/views/entry/components/BentoCalendar.vue';
 import BentoProfileCard from '@/views/entry/components/BentoProfileCard.vue';
 import { useHead } from '@vueuse/head';
@@ -435,7 +435,6 @@ import BlogListItem from './components/BlogListItem.vue';
 const route = useRoute();
 const router = useRouter();
 const posts = ref<Post[]>([]);
-const categories = ref<Category[]>([]);
 const pagination = ref<BlogPagination | null>(null);
 const isLoading = ref(false);
 const errorMessage = ref('');
@@ -447,7 +446,7 @@ const user = ref({
   isAdmin: false,
 });
 
-const activeCategory = ref<string | null>(null);
+const activeTag = ref<string | null>(null);
 
 const currentPage = ref(1);
 
@@ -501,7 +500,6 @@ const fetchPosts = async (page: number = 1) => {
     });
 
     posts.value = res.posts as unknown as Post[];
-    categories.value = res.categories;
     pagination.value = res.pagination;
     currentPage.value = page;
   } catch (err: unknown) {
@@ -556,21 +554,11 @@ const clearSearch = () => {
 };
 
 watch(
-  () => [
-    route.query.page,
-    route.query.search,
-    route.query.category,
-    route.params.categoryId,
-  ],
-  ([pageQuery, searchParam, categoryQuery, categoryParam]) => {
+  () => [route.query.page, route.query.search, route.query.tag],
+  ([pageQuery, searchParam, tagQuery]) => {
     searchQuery.value = typeof searchParam === 'string' ? searchParam : '';
 
-    const hasCategoryQuery =
-      typeof categoryQuery === 'string' && categoryQuery.length > 0;
-    const hasCategoryParam =
-      typeof categoryParam === 'string' && categoryParam.length > 0;
-
-    if (hasCategoryQuery || hasCategoryParam) {
+    if (typeof tagQuery === 'string' && tagQuery.length > 0) {
       return;
     }
 
@@ -581,45 +569,45 @@ watch(
 );
 
 // ─────────────────────────────────────────────────────────────────
-// 文学手账头部文案：随笔录 / 卷·{分类}，对齐 BasicDetail 动态 title
+// 文学手账头部文案：随笔录 / 卷·{标签}
 // ─────────────────────────────────────────────────────────────────
 const heroTitle = computed(() => {
-  return activeCategory.value ? `卷·${activeCategory.value}` : '随笔录';
+  return activeTag.value ? `卷·${activeTag.value}` : '随笔录';
 });
 
 const heroSubtitle = computed(() => {
-  return activeCategory.value
-    ? `Selected essays in ${activeCategory.value}`
+  return activeTag.value
+    ? `Selected essays tagged "${activeTag.value}"`
     : 'Essays on reading, thinking & quiet days';
 });
 
 useHead(() => ({
-  title: activeCategory.value
-    ? `${activeCategory.value} - ReadingList 随笔录`
+  title: activeTag.value
+    ? `${activeTag.value} - ReadingList 随笔录`
     : 'ReadingList 随笔录 - 阅读 · 思考 · 慢时光',
   meta: [
     {
       name: 'description',
-      content: activeCategory.value
-        ? `阅读 ${activeCategory.value} 分类下的所有文章 - 个人阅读心得、技术分享、读书笔记`
+      content: activeTag.value
+        ? `阅读 ${activeTag.value} 标签下的所有文章 - 个人阅读心得、技术分享、读书笔记`
         : 'ReadingList 随笔录 - 分享个人阅读心得、技术文章、读书笔记，记录阅读的美好时光',
     },
     {
       name: 'keywords',
-      content: activeCategory.value
-        ? `${activeCategory.value}, 博客, 阅读, 技术分享, 读书笔记, ReadingList`
+      content: activeTag.value
+        ? `${activeTag.value}, 博客, 阅读, 技术分享, 读书笔记, ReadingList`
         : '博客, 阅读, 技术分享, 读书笔记, ReadingList, 个人博客, 阅读心得, 随笔',
     },
     {
       property: 'og:title',
-      content: activeCategory.value
-        ? `${activeCategory.value} 分类文章 - ReadingList 随笔录`
+      content: activeTag.value
+        ? `${activeTag.value} 标签文章 - ReadingList 随笔录`
         : 'ReadingList 随笔录',
     },
     {
       property: 'og:description',
-      content: activeCategory.value
-        ? `探索 ${activeCategory.value} 分类下的所有文章`
+      content: activeTag.value
+        ? `探索 ${activeTag.value} 标签下的所有文章`
         : 'ReadingList 随笔录 - 分享个人阅读心得、技术文章、读书笔记',
     },
     {
@@ -627,32 +615,31 @@ useHead(() => ({
       content: 'website',
     },
     {
-      property: 'og:url',
-      content: activeCategory.value
-        ? `https://readinglist.example.com/blog/category/${activeCategory.value}`
+      name: 'og:url',
+      content: activeTag.value
+        ? `https://readinglist.example.com/blog?tag=${encodeURIComponent(activeTag.value)}`
         : 'https://readinglist.example.com/blog',
     },
     {
       name: 'twitter:title',
-      content: activeCategory.value
-        ? `${activeCategory.value} 分类文章 - ReadingList`
+      content: activeTag.value
+        ? `${activeTag.value} 标签文章 - ReadingList`
         : 'ReadingList 随笔录',
     },
     {
       name: 'twitter:description',
-      content: activeCategory.value
-        ? `探索 ${activeCategory.value} 分类下的所有文章`
+      content: activeTag.value
+        ? `探索 ${activeTag.value} 标签下的所有文章`
         : 'ReadingList 随笔录 - 分享个人阅读心得、技术文章、读书笔记',
     },
   ],
 }));
 
-const handleFilterPosts = (filteredPosts: Post[], categoryName: string) => {
+const handleFilterPosts = (filteredPosts: Post[], tagName: string) => {
   posts.value = filteredPosts;
-  activeCategory.value = categoryName;
+  activeTag.value = tagName;
   searchQuery.value = '';
-  pagination.value = null; // 分类过滤结果不分页
-  // 清除URL中的search参数
+  pagination.value = null; // 标签过滤结果不分页
   const query = { ...route.query };
   delete query.search;
   router.push({ query });
@@ -660,11 +647,10 @@ const handleFilterPosts = (filteredPosts: Post[], categoryName: string) => {
 
 // 重置过滤
 const handleResetFilter = () => {
-  activeCategory.value = null;
+  activeTag.value = null;
   searchQuery.value = '';
-  // 清除URL中的search和category参数
   const query = { ...route.query };
-  delete query.category;
+  delete query.tag;
   delete query.search;
   router.push({ query });
 };

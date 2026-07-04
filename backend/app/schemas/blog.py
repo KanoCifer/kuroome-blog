@@ -18,7 +18,7 @@ class BlogPostIn(BaseModel):
     body: str
     summary: str | None = None
     cover: str | None = None
-    category_id: int
+    tags: list[str] = Field(default_factory=list)
     is_pinned: int = 0
 
 
@@ -30,7 +30,7 @@ class BlogPostUpdate(BaseModel):
     body: str
     summary: str | None = None
     cover: str | None = None
-    category_id: int
+    tags: list[str] = Field(default_factory=list)
     is_pinned: int = 0
 
 
@@ -46,7 +46,22 @@ class BlogPostGet(BaseModel):
     post_id: str = Field(alias="_id")  # MongoDB _id field
 
 
-class CategoryIn(BaseModel):
-    """Category query input schema."""
+class TagItem(BaseModel):
+    """A single tag with its post count."""
 
-    category_id: int
+    name: str
+    count: int
+
+
+class TagsOut(BaseModel):
+    """Tags list output — one entry per distinct tag."""
+
+    tags: list[TagItem]
+
+
+class PostsByTagOut(BaseModel):
+    """Posts filtered by a single tag."""
+
+    posts: list[dict]
+    tag: str
+    total: int

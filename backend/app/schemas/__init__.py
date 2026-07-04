@@ -27,9 +27,10 @@ from app.schemas.blog import (
     BlogPostGet,
     BlogPostIn,
     BlogPostUpdate,
-    CategoryIn,
+    PostsByTagOut,
+    TagItem,
+    TagsOut,
 )
-from app.schemas.category import CategoriesOut, CategoryOut
 from app.schemas.devtask import DevTaskCreate, DevTaskOut, DevTaskUpdate
 from app.schemas.email import BootstrapEmailContent, EmailCodeContent
 from app.schemas.feishu import FeishuMessageContent, FeishuRichTextContent
@@ -85,9 +86,6 @@ __all__ = [
     "BlogPostIn",
     "BlogPostUpdate",
     "BootstrapEmailContent",
-    "CategoriesOut",
-    "CategoryIn",
-    "CategoryOut",
     "ChatRequest",
     "CurrentWeather",
     "DailyForecast",
@@ -122,6 +120,7 @@ __all__ = [
     "PaginationSchema",
     "PasskeyAuthRequest",
     "PasskeyRegistrationRequest",
+    "PostsByTagOut",
     "RegisterIn",
     "RegisterOut",
     "RssArticleListResponse",
@@ -130,6 +129,8 @@ __all__ = [
     "RssRequest",
     "RssSubscriptionResponse",
     "SummaryInput",
+    "TagItem",
+    "TagsOut",
     "TideData",
     "TideHourly",
     "TideItem",

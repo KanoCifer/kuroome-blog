@@ -1,4 +1,5 @@
-"""Blog category schemas."""
+"""Category schemas — kept for backward compatibility; no longer used by the
+blog tag migration. Safe to remove in a follow-up cleanup."""
 
 from __future__ import annotations
 

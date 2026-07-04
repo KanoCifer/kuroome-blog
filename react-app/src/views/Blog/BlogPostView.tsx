@@ -334,10 +334,10 @@ export default function BlogPostView() {
             </span>
           </div>
 
-          {/* Eyebrow / kicker */}
+          {/* Eyebrow / kicker — first tag (or fallback) */}
           <div className="text-primary mb-5 flex items-center gap-2 text-[11px] font-semibold tracking-[0.14em] uppercase">
             <span className="bg-primary h-px w-5" />
-            {post.category?.name || '未分类'}
+            {post.tags?.[0] || '随笔'}
           </div>
 
           {/* Headline */}
@@ -386,7 +386,7 @@ export default function BlogPostView() {
                 />
               </div>
               <figcaption className="text-muted-foreground mt-2.5 text-[11px] tracking-[0.04em]">
-                封面 · {post.category?.name || 'ReadingList'}
+                封面 · {post.tags?.[0] || 'ReadingList'}
               </figcaption>
             </figure>
           )}

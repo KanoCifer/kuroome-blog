@@ -72,18 +72,16 @@ async def get_user_service():
 
 @asynccontextmanager
 async def get_admin_service():
-    async with get_async_session() as session:
-        admin_repo = AdminRepo(session)
-        service = AdminService(repo=admin_repo, cache=redis_cache)
-        yield service
+    admin_repo = AdminRepo()
+    service = AdminService(repo=admin_repo, cache=redis_cache)
+    yield service
 
 
 @asynccontextmanager
 async def get_blog_service():
-    async with get_async_session() as session:
-        blog_repo = BlogRepo(session)
-        service = BlogService(repo=blog_repo)
-        yield service
+    blog_repo = BlogRepo()
+    service = BlogService(repo=blog_repo)
+    yield service
 
 
 @asynccontextmanager

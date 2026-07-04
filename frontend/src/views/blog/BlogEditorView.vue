@@ -6,7 +6,6 @@ import { blogGateway } from '@/api/public';
 import { uploadGateway } from '@/api/blog';
 import { useOrigin } from '@/composables/shared';
 import { useNotificationStore } from '@/stores/notification';
-import type { Category, CategoryResponseItem } from '@/types';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -20,9 +19,9 @@ const postId = ref<string | null>(null);
 const title = ref('');
 const summary = ref('');
 const cover = ref('');
-const category = ref('');
+const tags = ref<string[]>([]);
+const tagInput = ref('');
 const pin = ref(false);
-const categories = ref<Category[]>([]);
 const loading = ref(false);
 const coverUploading = ref(false);
 const coverInputRef = ref<HTMLInputElement | null>(null);
@@ -36,29 +35,6 @@ const markdownEditorRef = ref<InstanceType<typeof MarkdownEditor> | null>(null);
 // is the focal point, metadata is peek-on-demand.
 const metaOpen = ref(false);
 
-// Category dropdown: local click-outside, matching the pattern used in
-// ThemeToggle / BackgroundSwitcher (see frontend/src/components/layout/).
-const categoryOpen = ref(false);
-const categoryMenuRef = ref<HTMLElement | null>(null);
-const handleCategoryClickOutside = (event: MouseEvent) => {
-  if (!categoryMenuRef.value) return;
-  if (!categoryMenuRef.value.contains(event.target as Node)) {
-    categoryOpen.value = false;
-  }
-};
-const handleCategoryKeydown = (event: KeyboardEvent) => {
-  if (event.key === 'Escape') categoryOpen.value = false;
-};
-
-// Computed current category name
-const currentCategory = computed(() => {
-  if (!category.value) return '';
-  const selectedCategory = categories.value.find(
-    (cat) => String(cat.id) === category.value,
-  );
-  return selectedCategory ? selectedCategory.name : '';
-});
-
 // 非 http(s) 开头的封面 src 用 https://api.kanocifer.chat 作为前缀（仅在 https 环境下生效）
 const coverPreviewSrc = computed(() =>
   cover.value ? useOrigin(cover.value) : '',
@@ -70,6 +46,30 @@ const lastSavedAt = ref<Date | null>(null);
 const hasUnsavedChanges = ref(false);
 const autoSaveEnabled = ref(true);
 
+// Tag input handling
+const addTag = (raw: string) => {
+  const value = raw.trim();
+  if (value && !tags.value.includes(value)) {
+    tags.value.push(value.slice(0, 50));
+  }
+  tagInput.value = '';
+};
+
+const removeTag = (tag: string) => {
+  tags.value = tags.value.filter((t) => t !== tag);
+};
+
+const handleTagKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Enter' || event.key === ',') {
+    event.preventDefault();
+    if (tagInput.value.trim()) {
+      addTag(tagInput.value);
+    }
+  } else if (event.key === 'Backspace' && !tagInput.value && tags.value.length) {
+    tags.value.pop();
+  }
+};
+
 // Auto-save with debounce
 let autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
 const saveDraft = () => {
@@ -78,7 +78,7 @@ const saveDraft = () => {
     summary: summary.value,
     cover: cover.value,
     markdownBody: markdownBody.value,
-    category: category.value,
+    tags: tags.value,
     pin: pin.value,
     savedAt: new Date().toISOString(),
   };
@@ -89,7 +89,7 @@ const saveDraft = () => {
 
 // Watch changes and trigger auto-save
 watch(
-  [title, summary, cover, markdownBody, category, pin],
+  [title, summary, cover, markdownBody, tags, pin],
   () => {
     hasUnsavedChanges.value = true;
     if (autoSaveEnabled.value) {
@@ -110,7 +110,7 @@ const restoreDraft = (): boolean => {
     summary.value = draft.summary || '';
     cover.value = draft.cover || '';
     markdownBody.value = draft.markdownBody || '';
-    category.value = draft.category || '';
+    tags.value = Array.isArray(draft.tags) ? draft.tags : [];
     pin.value = draft.pin || false;
     if (draft.savedAt) lastSavedAt.value = new Date(draft.savedAt);
     return true;
@@ -177,23 +177,6 @@ const handleKeydown = (e: KeyboardEvent) => {
   }
 };
 
-// Fetch categories
-const fetchCategories = async () => {
-  try {
-    const legacyCategories = await blogGateway.getLegacyCategories();
-    categories.value = legacyCategories.map((cat): CategoryResponseItem => ({
-      id: cat.id,
-      name: cat.name,
-      description: '',
-      post_count: cat.post_count,
-      posts: [],
-    })) as unknown as Category[];
-  } catch (err) {
-    console.error(err);
-    notification.error('加载分类失败');
-  }
-};
-
 // Fetch existing post
 const fetchPost = async (id: string) => {
   loading.value = true;
@@ -202,7 +185,7 @@ const fetchPost = async (id: string) => {
     title.value = post.title || '';
     summary.value = post.summary || '';
     cover.value = post.cover || '';
-    category.value = post.category_id ? String(post.category_id) : '';
+    tags.value = Array.isArray(post.tags) ? post.tags : [];
     pin.value = Boolean(post.is_pinned);
 
     // Load content — stored as raw markdown
@@ -231,12 +214,6 @@ const handleSubmit = async () => {
 
   if (!title.value.trim()) {
     error.value = '标题不能为空';
-    notification.error(error.value);
-    return;
-  }
-
-  if (!category.value) {
-    error.value = '请选择分类';
     notification.error(error.value);
     return;
   }
@@ -270,10 +247,10 @@ const handleSubmit = async () => {
   try {
     const payload = {
       title: title.value,
-      category_id: Number(category.value),
       body: currentContent,
       summary: summary.value,
       cover: cover.value.trim() || null,
+      tags: tags.value,
       is_pinned: pin.value ? 1 : 0,
     };
 
@@ -353,10 +330,7 @@ const savedAtLabel = computed(() => {
 onMounted(async () => {
   window.addEventListener('keydown', handleKeydown);
   window.addEventListener('beforeunload', handleBeforeUnload);
-  document.addEventListener('click', handleCategoryClickOutside);
-  document.addEventListener('keydown', handleCategoryKeydown);
 
-  await fetchCategories();
   const id = route.params.id;
 
   if (id && id !== 'new') {
@@ -381,8 +355,6 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleKeydown);
   window.removeEventListener('beforeunload', handleBeforeUnload);
-  document.removeEventListener('click', handleCategoryClickOutside);
-  document.removeEventListener('keydown', handleCategoryKeydown);
   if (autoSaveTimer) clearTimeout(autoSaveTimer);
 });
 </script>
@@ -553,93 +525,40 @@ onBeforeUnmount(() => {
         </div>
 
         <!--
-          分类 · 置顶 · 抽屉触发
-          统一形态：描线圆角牌，去掉所有 bg-warning/10 / bg-success/10 /
-          bg-primary/10 灯拼色；改用字色 + 字距表达语义。
+          标签 · 置顶 · 抽屉触发
+          标签用 chips input：回车/逗号新增，退格删除最后一个，
+          每个 tag 是独立的 chip 带 × 删除按钮。
         -->
         <div class="flex flex-wrap items-center gap-2 text-xs">
-          <!-- Category menu -->
-          <div ref="categoryMenuRef" class="relative">
-            <button
-              type="button"
-              :aria-expanded="categoryOpen"
-              aria-haspopup="listbox"
-              :class="[
-                'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 transition-colors',
-                categoryOpen
-                  ? 'border-foreground/30 bg-muted text-foreground'
-                  : 'border-border bg-muted text-muted-foreground hover:text-foreground',
-              ]"
-              @click="categoryOpen = !categoryOpen"
+          <!-- Tags input -->
+          <div
+            class="border-border bg-muted flex flex-wrap items-center gap-1.5 rounded-full border px-2 py-1"
+          >
+            <span class="text-muted-foreground/70 tracking-wider">标签</span>
+            <span
+              v-for="tag in tags"
+              :key="tag"
+              class="bg-background text-foreground inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs"
             >
-              <span class="text-muted-foreground/70 tracking-wider">分类</span>
-              <span
-                :class="
-                  currentCategory
-                    ? 'text-foreground font-serif'
-                    : 'text-muted-foreground/70 font-serif italic'
-                "
+              #{{ tag }}
+              <button
+                type="button"
+                class="hover:text-destructive text-muted-foreground"
+                :aria-label="`删除标签 ${tag}`"
+                @click="removeTag(tag)"
               >
-                {{ currentCategory || '未选' }}
-              </span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                :class="[
-                  'h-3 w-3 transition-transform duration-200 motion-reduce:transition-none',
-                  categoryOpen ? 'rotate-180' : '',
-                ]"
-                aria-hidden="true"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-            </button>
-            <transition
-              enter-active-class="transition duration-150 ease-out motion-reduce:transition-none"
-              enter-from-class="opacity-0"
-              enter-to-class="opacity-100"
-              leave-active-class="transition duration-100 ease-in motion-reduce:transition-none"
-              leave-from-class="opacity-100"
-              leave-to-class="opacity-0"
-            >
-              <div
-                v-if="categoryOpen"
-                role="listbox"
-                class="bg-muted border-border absolute top-full left-0 z-30 mt-1.5 w-56 overflow-hidden rounded-xl border shadow-lg"
-              >
-                <div class="p-1">
-                  <button
-                    v-for="cat in categories"
-                    :key="cat.id"
-                    type="button"
-                    role="option"
-                    :aria-selected="category === String(cat.id)"
-                    :class="[
-                      'flex w-full items-baseline justify-between gap-3 rounded-lg px-3 py-2 text-left text-xs transition-colors',
-                      category === String(cat.id)
-                        ? 'bg-muted text-foreground'
-                        : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
-                    ]"
-                    @click="
-                      () => {
-                        category = String(cat.id);
-                        categoryOpen = false;
-                      }
-                    "
-                  >
-                    <span class="font-serif">{{ cat.name }}</span>
-                    <span
-                      class="text-muted-foreground/50 font-mono text-[10px]"
-                    >
-                      {{ cat.post_count }}
-                    </span>
-                  </button>
-                </div>
+                ×
+              </button>
+            </span>
+            <input
+              v-model="tagInput"
+              type="text"
+              placeholder="回车新增…"
+              class="bg-transparent text-foreground placeholder:text-muted-foreground/50 min-w-[60px] flex-1 text-xs outline-none"
+              @keydown="handleTagKeydown"
+              @blur="() => { if (tagInput.trim()) addTag(tagInput); }"
+            />
+          </div>
               </div>
             </transition>
           </div>

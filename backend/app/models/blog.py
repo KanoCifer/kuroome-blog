@@ -43,7 +43,8 @@ class Post(Document):
     body: str
     summary: str | None = None
     cover: str | None = None
-    category_id: int | None = None
+    tags: list[str] = Field(default_factory=list)
+    category_id: int | None = None  # legacy, kept for existing docs
     is_pinned: int = 0
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
@@ -58,6 +59,7 @@ class Post(Document):
             IndexModel(
                 [("is_pinned", DESCENDING), ("created_at", DESCENDING)]
             ),
+            IndexModel([("tags", ASCENDING)]),
             IndexModel([("category_id", ASCENDING)]),
             IndexModel([("title", pymongo.TEXT), ("body", pymongo.TEXT)]),
         ]

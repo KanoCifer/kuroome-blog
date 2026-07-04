@@ -1,7 +1,12 @@
 import type { AxiosResponse } from 'axios';
 
 import request from '@/api/request';
-import type { BlogPagination, BlogPost, Category } from '@/types';
+import type {
+  BlogPagination,
+  BlogPost,
+  PostsByTagResponse,
+  TagItem,
+} from '@/types';
 
 interface BlogQuery {
   page?: number;
@@ -10,8 +15,7 @@ interface BlogQuery {
 
 interface BlogListResponse {
   posts: BlogPost[];
-  categories: Category[];
-  category_counts: Record<number, number>;
+  tags: TagItem[];
   pagination: BlogPagination;
 }
 
@@ -20,41 +24,37 @@ interface BlogPostResponse {
   title: string;
   body: string;
   cover?: string | null;
-  category_id: number;
+  tags: string[];
   is_pinned: boolean;
   created_at: string;
   updated_at: string;
-  category: { id: number; name: string } | null;
 }
 
 export interface blogGateway {
   getBlogs(query?: BlogQuery): Promise<AxiosResponse<BlogListResponse>>;
   getBlogPost(postId: string): Promise<AxiosResponse<BlogPostResponse>>;
-  getCategories(): Promise<AxiosResponse<Category[]>>;
-  getPostsByCategory(
-    categoryId: number,
-  ): Promise<
-    AxiosResponse<{ posts: BlogPost[]; category: { id: number; name: string } }>
-  >;
+  getTags(): Promise<AxiosResponse<TagItem[]>>;
+  getPostsByTag(
+    tag: string,
+  ): Promise<AxiosResponse<PostsByTagResponse>>;
   // Legacy endpoints
   getLegacyPost(postId: string): Promise<AxiosResponse<BlogPostResponse>>;
   createLegacyPost(payload: {
     title: string;
-    category_id: number;
     body: string;
+    tags: string[];
     cover?: string | null;
     is_pinned: number;
   }): Promise<AxiosResponse<{ _id: string }>>;
   updateLegacyPost(payload: {
     _id: string;
     title: string;
-    category_id: number;
     body: string;
+    tags: string[];
     cover?: string | null;
     is_pinned: number;
   }): Promise<AxiosResponse<{ _id: string }>>;
   deleteLegacyPost(postId: string): Promise<AxiosResponse<void>>;
-  getLegacyCategories(): Promise<AxiosResponse<Category[]>>;
 }
 
 export const blogGateway = (): blogGateway => {
@@ -71,19 +71,16 @@ export const blogGateway = (): blogGateway => {
       >;
     },
 
-    async getCategories() {
-      return request.get('v1/blogs/categories') as Promise<
-        AxiosResponse<Category[]>
+    async getTags() {
+      return request.get('v1/tags') as Promise<
+        AxiosResponse<{ tags: TagItem[] }>
       >;
     },
 
-    async getPostsByCategory(categoryId: number) {
-      return request.get(`v1/blogs/categories/${categoryId}`) as Promise<
-        AxiosResponse<{
-          posts: BlogPost[];
-          category: { id: number; name: string };
-        }>
-      >;
+    async getPostsByTag(tag: string) {
+      return request.get(
+        `v1/tags/${encodeURIComponent(tag)}/posts`,
+      ) as Promise<AxiosResponse<PostsByTagResponse>>;
     },
 
     async getLegacyPost(postId: string) {
@@ -108,10 +105,6 @@ export const blogGateway = (): blogGateway => {
       return request.delete(`v1/admin/post/${postId}/delete`) as Promise<
         AxiosResponse<void>
       >;
-    },
-
-    async getLegacyCategories() {
-      return request.get('v1/categories') as Promise<AxiosResponse<Category[]>>;
     },
   };
 };

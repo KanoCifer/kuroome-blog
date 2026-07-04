@@ -6,7 +6,6 @@ export interface Post {
   content?: string;
   body: string; // 确保 body 是必填字段
   summary?: string;
-  category_id?: number;
   cover?: string;
   author_id?: number;
   author_name?: string;
@@ -14,7 +13,7 @@ export interface Post {
   views?: number;
   created_at: string; // 确保 created_at 是必填字段
   updated_at?: string;
-  category?: Category;
+  tags?: string[];
   is_pinned?: boolean;
 }
 
@@ -27,18 +26,20 @@ export interface BlogPost {
   cover?: string | null;
   created_at: string;
   updated_at: string;
-  category_id: number;
-  category: { id: number; name: string } | null;
+  tags: string[];
 }
 
-export interface Category {
-  id: number;
+// 标签聚合项（带文章计数）
+export interface TagItem {
   name: string;
-  description: string;
-  post_count: number;
-  posts_count?: number;
-  created_at: string;
-  updated_at: string;
+  count: number;
+}
+
+// 标签筛选结果
+export interface PostsByTagResponse {
+  posts: BlogPost[];
+  tag: string;
+  total: number;
 }
 
 export interface BlogPagination {
@@ -57,7 +58,7 @@ export interface BlogsResponse {
   message: string;
   data: {
     posts: Post[];
-    categories: Category[];
+    tags: TagItem[];
     pagination: BlogPagination;
   };
 }
@@ -121,15 +122,6 @@ export interface TocItem {
 export interface Badge {
   text: string;
   type: 'default' | 'success' | 'error' | 'warning' | 'info';
-}
-
-// 分类响应项类型
-export interface CategoryResponseItem {
-  id: number;
-  name: string;
-  description: string;
-  posts: Post[];
-  post_count?: number;
 }
 
 // RSS 文章类型

@@ -79,49 +79,37 @@ async def get_blog(
     )
 
 
-@router.get("/categories")
+@router.get("/tags")
 @redis_cache(ttl=300, exclude=["blog_service"])
-async def get_categories(
+async def get_tags(
     blog_service: BlogService = Depends(blog_service_dep),
 ):
-    """Get all categories with post counts."""
-    categories = await blog_service.get_categories()
+    """Get all tags with post counts."""
+    tags = await blog_service.list_tags()
 
     return APIResponse(
-        data=categories,
-        message="Categories retrieved successfully",
+        data={"tags": tags},
+        message="Tags retrieved successfully",
     )
 
 
-@router.post("/category")
+@router.get("/tags/{tag}/posts")
 @redis_cache(ttl=120, exclude=["blog_service"])
-async def get_posts_by_category(
-    category_id: Annotated[int, Query(..., description="Category ID")],
+async def get_posts_by_tag(
+    tag: Annotated[str, Path(..., description="Tag name")],
+    page: int = 1,
+    per_page: int = 10,
     blog_service: BlogService = Depends(blog_service_dep),
 ):
-    """Get posts by category."""
-    data = await blog_service.get_posts_by_category(category_id)
-
-    category_name = data["category"]["name"]
-    return APIResponse(
-        data=data,
-        message=f"Posts in category '{category_name}' retrieved successfully",
+    """Get posts filtered by a single tag."""
+    data = await blog_service.get_posts_by_tag(
+        tag,
+        page=page,
+        per_page=per_page,
     )
-
-
-@router.get("/blogs/categories/{category_id}")
-@redis_cache(ttl=120, exclude=["blog_service"])
-async def get_category_posts(
-    category_id: Annotated[int, Path(..., description="Category ID")],
-    blog_service: BlogService = Depends(blog_service_dep),
-):
-    """Get posts by category."""
-    data = await blog_service.get_posts_by_category(category_id)
-
-    category_name = data["category"]["name"]
     return APIResponse(
         data=data,
-        message=f"Posts in category '{category_name}' retrieved successfully",
+        message=f"Posts tagged '{data['tag']}' retrieved successfully",
     )
 
 

@@ -1,4 +1,4 @@
-export function BlogEmptyState({ hasCategory }: { hasCategory: boolean }) {
+export function BlogEmptyState({ hasTag }: { hasTag: boolean }) {
   return (
     <div className="border-border bg-muted flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 text-center">
       <svg
@@ -17,7 +17,7 @@ export function BlogEmptyState({ hasCategory }: { hasCategory: boolean }) {
       </svg>
       <p className="text-muted-foreground text-lg font-medium">暂无文章</p>
       <p className="text-muted-foreground/70 mt-1 text-sm">
-        {hasCategory ? '该分类下还没有文章' : '稍后再来看看吧'}
+        {hasTag ? '该标签下还没有文章' : '稍后再来看看吧'}
       </p>
     </div>
   );

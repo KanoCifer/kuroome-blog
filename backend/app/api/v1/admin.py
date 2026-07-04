@@ -59,7 +59,7 @@ async def add_post(
         body=data.body,
         summary=data.summary,
         cover=data.cover,
-        category_id=data.category_id,
+        tags=data.tags,
         is_pinned=data.is_pinned,
     )
     await _safe_invalidate(*_BLOG_READ_FUNCS)
@@ -82,7 +82,7 @@ async def update_post(
         body=data.body,
         summary=data.summary,
         cover=data.cover,
-        category_id=data.category_id,
+        tags=data.tags,
         is_pinned=data.is_pinned,
     )
     await _safe_invalidate(*_BLOG_READ_FUNCS)

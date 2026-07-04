@@ -1,7 +1,12 @@
 import { blogGateway } from '@/api/blogGateway';
 import { extractData } from '@/api/request';
 import type { ApiResponse } from '@/api/request';
-import type { BlogPost, Category, BlogPagination } from '@/types';
+import type {
+  BlogPost,
+  BlogPagination,
+  PostsByTagResponse,
+  TagItem,
+} from '@/types';
 
 // 博客列表项（处理后的）
 export interface BlogListItem {
@@ -10,7 +15,7 @@ export interface BlogListItem {
   body: string;
   summary: string;
   cover?: string | null;
-  category: { id: number; name: string } | null;
+  tags: string[];
   is_pinned: boolean;
   created_at: string;
   updated_at: string;
@@ -19,8 +24,7 @@ export interface BlogListItem {
 // 博客列表（处理后的）
 export interface BlogList {
   posts: BlogListItem[];
-  categories: Category[];
-  categoryCounts: Record<number, number>;
+  tags: TagItem[];
   pagination: BlogPagination;
 }
 
@@ -30,7 +34,7 @@ export interface BlogDetail {
   title: string;
   body: string;
   cover?: string | null;
-  category: { id: number; name: string } | null;
+  tags: string[];
   is_pinned: boolean;
   created_at: string;
   updated_at: string;
@@ -38,39 +42,29 @@ export interface BlogDetail {
   summary?: string;
 }
 
-// 分类列表项
-export interface CategoryItem {
-  id: number;
-  name: string;
-  post_count: number;
-}
-
 export interface BlogService {
   getBlogs(query?: { page?: number; search?: string }): Promise<BlogList>;
   getBlogPost(postId: string): Promise<BlogDetail>;
-  getCategories(): Promise<CategoryItem[]>;
-  getPostsByCategory(
-    categoryId: number,
-  ): Promise<{ posts: BlogPost[]; category: { id: number; name: string } }>;
+  getTags(): Promise<TagItem[]>;
+  getPostsByTag(tag: string): Promise<PostsByTagResponse>;
   // Legacy endpoints
-  getLegacyPost(postId: string): Promise<BlogDetail & { category_id?: number }>;
+  getLegacyPost(postId: string): Promise<BlogDetail>;
   createLegacyPost(payload: {
     title: string;
-    category_id: number;
     body: string;
+    tags: string[];
     cover?: string | null;
     is_pinned: number;
   }): Promise<{ _id: string }>;
   updateLegacyPost(payload: {
     _id: string;
     title: string;
-    category_id: number;
     body: string;
+    tags: string[];
     cover?: string | null;
     is_pinned: number;
   }): Promise<{ _id: string }>;
   deleteLegacyPost(postId: string): Promise<void>;
-  getLegacyCategories(): Promise<CategoryItem[]>;
 }
 
 export const blogService = (): BlogService => {
@@ -83,8 +77,7 @@ export const blogService = (): BlogService => {
         res as unknown as { data: ApiResponse<unknown> },
       ) as {
         posts: BlogPost[];
-        categories: Category[];
-        category_counts: Record<number, number>;
+        tags: TagItem[];
         pagination: BlogPagination;
       };
 
@@ -92,19 +85,17 @@ export const blogService = (): BlogService => {
         _id: post._id,
         title: post.title,
         body: post.body,
-        summary: (post as BlogPost & { summary?: string }).summary || '',
+        summary: post.summary || '',
         cover: post.cover,
-        category: post.category,
-        is_pinned:
-          (post as BlogPost & { is_pinned?: boolean }).is_pinned || false,
+        tags: post.tags || [],
+        is_pinned: post.is_pinned || false,
         created_at: post.created_at,
         updated_at: post.updated_at,
       }));
 
       return {
         posts,
-        categories: raw.categories,
-        categoryCounts: raw.category_counts,
+        tags: raw.tags,
         pagination: raw.pagination,
       };
     },
@@ -116,24 +107,19 @@ export const blogService = (): BlogService => {
       ) as BlogDetail;
     },
 
-    async getCategories() {
-      const res = await gateway.getCategories();
-      return (
-        extractData(
-          res as unknown as { data: ApiResponse<unknown> },
-        ) as Category[]
-      ).map((c) => ({
-        id: c.id,
-        name: c.name,
-        post_count: c.post_count ?? c.posts_count ?? 0,
-      }));
+    async getTags() {
+      const res = await gateway.getTags();
+      const data = extractData(res as unknown as { data: ApiResponse<unknown> });
+      // gateway 返回 { data: { tags: [...] } } — unwrap
+      return (data as unknown as { tags: TagItem[] }).tags ?? [];
     },
 
-    async getPostsByCategory(categoryId) {
-      const res = await gateway.getPostsByCategory(categoryId);
+    async getPostsByTag(tag: string) {
+      const res = await gateway.getPostsByTag(tag);
       return extractData(res as unknown as { data: ApiResponse<unknown> }) as {
         posts: BlogPost[];
-        category: { id: number; name: string };
+        tag: string;
+        total: number;
       };
     },
 
@@ -141,7 +127,7 @@ export const blogService = (): BlogService => {
       const res = await gateway.getLegacyPost(postId);
       return extractData(
         res as unknown as { data: ApiResponse<unknown> },
-      ) as BlogDetail & { category_id?: number };
+      ) as BlogDetail;
     },
 
     async createLegacyPost(payload) {
@@ -160,19 +146,6 @@ export const blogService = (): BlogService => {
 
     async deleteLegacyPost(postId) {
       await gateway.deleteLegacyPost(postId);
-    },
-
-    async getLegacyCategories() {
-      const res = await gateway.getLegacyCategories();
-      return (
-        extractData(
-          res as unknown as { data: ApiResponse<unknown> },
-        ) as Category[]
-      ).map((c) => ({
-        id: c.id,
-        name: c.name,
-        post_count: c.post_count ?? c.posts_count ?? 0,
-      }));
     },
   };
 };

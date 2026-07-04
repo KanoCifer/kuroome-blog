@@ -1,29 +1,16 @@
 from __future__ import annotations
 
 from beanie import SortDirection
-from bson import ObjectId
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.blog import Post
-from app.models.models import Category
 
 
 class BlogRepo:
-    def __init__(self, session: AsyncSession) -> None:
-        self.session = session
+    """Blog data-access layer — MongoDB only.
 
-    async def list_categories(self) -> list[Category]:
-        result = await self.session.execute(
-            select(Category).order_by(Category.name)
-        )
-        return list(result.scalars().all())
-
-    async def get_category_by_id(self, category_id: int) -> Category | None:
-        result = await self.session.execute(
-            select(Category).where(Category.id == category_id)
-        )
-        return result.scalar_one_or_none()
+    Category lookups (PostgreSQL) have been removed; tags live natively
+    on the Post document. No async session is required.
+    """
 
     async def list_posts(
         self,
@@ -49,29 +36,45 @@ class BlogRepo:
         total = await query.count()
         skip = (page - 1) * per_page
         posts: list[Post] = (
-            await query.sort(sort_criteria)
-            .skip(skip)
-            .limit(per_page)
-            .to_list()
+            await query.sort(sort_criteria).skip(skip).limit(per_page).to_list()
         )
         return posts, total
 
-    async def aggregate_category_counts(self) -> dict[int, int]:
-        pipeline = [{"$group": {"_id": "$category_id", "count": {"$sum": 1}}}]
-        docs: list[dict] = await Post.find_all().aggregate(pipeline).to_list()
-        category_counts: dict[int, int] = {}
-        for doc in docs:
-            cat_id = doc.get("_id")
-            if cat_id is not None:
-                category_counts[int(cat_id)] = int(doc.get("count", 0))
-        return category_counts
+    async def aggregate_tag_counts(self) -> list[dict[str, int]]:
+        """Return [{name, count}] sorted by count desc, then name asc."""
+        pipeline = [
+            {"$unwind": "$tags"},
+            {"$group": {"_id": "$tags", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1, "_id": 1}},
+        ]
+        docs: list[dict] = (
+            await Post.find_all().aggregate(pipeline).to_list()
+        )
+        return [
+            {"name": str(doc["_id"]), "count": int(doc.get("count", 0))}
+            for doc in docs
+            if doc.get("_id") is not None
+        ]
 
-    async def get_post_by_id(self, post_id: ObjectId) -> Post | None:
+    async def get_post_by_id(self, post_id: str) -> Post | None:
         return await Post.find_one({"_id": post_id})
 
-    async def list_posts_by_category(self, category_id: int) -> list[Post]:
-        return await (
-            Post.find(Post.category_id == category_id)
-            .sort([("created_at", SortDirection.DESCENDING)])
-            .to_list()
+    async def list_posts_by_tag(
+        self,
+        tag: str,
+        *,
+        page: int,
+        per_page: int,
+    ) -> tuple[list[Post], int]:
+        """Return (posts, total) for posts matching `tag`."""
+        query = Post.find({"tags": tag})
+        total = await query.count()
+        skip = (page - 1) * per_page
+        sort_criteria = [
+            ("is_pinned", SortDirection.DESCENDING),
+            ("created_at", SortDirection.DESCENDING),
+        ]
+        posts: list[Post] = (
+            await query.sort(sort_criteria).skip(skip).limit(per_page).to_list()
         )
+        return posts, total

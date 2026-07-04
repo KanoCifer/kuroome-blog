@@ -1,6 +1,9 @@
-import type { BlogListItem, CategoryItem } from '@/services/blogService';
+import type { BlogListItem } from '@/services/blogService';
 import { blogService } from '@/services/blogService';
-import type { BlogPagination as BlogPaginationType } from '@/types';
+import type {
+  BlogPagination as BlogPaginationType,
+  TagItem,
+} from '@/types';
 import { formatDate } from '@/utils/formatdate';
 import { useOrigin } from '@/hooks/useOrigin';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -89,14 +92,18 @@ function PostCard({ post, index }: PostCardProps) {
           )}
 
           {/* Footer meta */}
-          <footer className="text-muted-foreground mt-5 flex items-center gap-2 text-xs">
+          <footer className="text-muted-foreground mt-5 flex flex-wrap items-center gap-2 text-xs">
             <time>{formatDate(post.created_at)}</time>
-            {post.category && (
-              <span className="flex items-center gap-2">
-                <span aria-hidden="true" className="text-border/60">
-                  ·
-                </span>
-                # {post.category.name}
+            {post.tags && post.tags.length > 0 && (
+              <span className="flex flex-wrap items-center gap-1.5">
+                {post.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="bg-muted text-muted-foreground rounded-full px-2 py-0.5"
+                  >
+                    #{tag}
+                  </span>
+                ))}
               </span>
             )}
           </footer>
@@ -110,10 +117,7 @@ export default function BlogListView() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [posts, setPosts] = useState<BlogListItem[]>([]);
-  const [categories, setCategories] = useState<CategoryItem[]>([]);
-  const [categoryCounts, setCategoryCounts] = useState<Record<number, number>>(
-    {},
-  );
+  const [tags, setTags] = useState<TagItem[]>([]);
   const [pagination, setPagination] = useState<BlogPaginationType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -121,7 +125,7 @@ export default function BlogListView() {
   const [searchQuery, setSearchQuery] = useState(
     searchParams.get('search') || '',
   );
-  const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null);
+  const [activeTag, setActiveTag] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(
     Number(searchParams.get('page')) || 1,
   );
@@ -129,7 +133,7 @@ export default function BlogListView() {
   const listRef = useRef<HTMLDivElement>(null);
 
   const fetchPosts = useCallback(
-    async (page: number = 1, categoryId?: number | null) => {
+    async (page: number = 1, tag?: string | null) => {
       setIsLoading(true);
       setError(null);
 
@@ -137,8 +141,8 @@ export default function BlogListView() {
         const service = blogService();
         const search = searchParams.get('search') || undefined;
 
-        if (categoryId !== undefined && categoryId !== null) {
-          const result = await service.getPostsByCategory(categoryId);
+        if (tag) {
+          const result = await service.getPostsByTag(tag);
           setPosts(
             result.posts.map((post) => ({
               _id: post._id,
@@ -146,7 +150,7 @@ export default function BlogListView() {
               body: post.body,
               summary: post.summary || '',
               cover: post.cover,
-              category: post.category,
+              tags: post.tags || [],
               is_pinned: false,
               created_at: post.created_at,
               updated_at: post.updated_at,
@@ -156,8 +160,7 @@ export default function BlogListView() {
         } else {
           const result = await service.getBlogs({ page, search });
           setPosts(result.posts);
-          setCategories(result.categories);
-          setCategoryCounts(result.categoryCounts);
+          setTags(result.tags);
           setPagination(result.pagination);
         }
       } catch (err) {
@@ -171,8 +174,8 @@ export default function BlogListView() {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchPosts(currentPage, activeCategoryId);
-  }, [fetchPosts, currentPage, activeCategoryId]);
+    fetchPosts(currentPage, activeTag);
+  }, [fetchPosts, currentPage, activeTag]);
 
   const handleSearch = () => {
     const newParams = new URLSearchParams(searchParams);
@@ -202,22 +205,22 @@ export default function BlogListView() {
     listRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleCategorySelect = (categoryId: number | null) => {
-    setActiveCategoryId(categoryId);
+  const handleTagSelect = (tag: string | null) => {
+    setActiveTag(tag);
     setCurrentPage(1);
     const newParams = new URLSearchParams(searchParams);
     newParams.delete('search');
     newParams.set('page', '1');
-    if (categoryId !== null) {
-      newParams.set('categoryId', categoryId.toString());
+    if (tag !== null) {
+      newParams.set('tag', tag);
     } else {
-      newParams.delete('categoryId');
+      newParams.delete('tag');
     }
     setSearchParams(newParams);
   };
 
   const handleRetry = () => {
-    fetchPosts(currentPage, activeCategoryId);
+    fetchPosts(currentPage, activeTag);
   };
 
   return (
@@ -281,22 +284,13 @@ export default function BlogListView() {
         </div>
       </div>
 
-      {/* Categories */}
+      {/* Tags */}
       <div className="px-5 pb-4">
         <CategorySidebar
-          categories={categories.map((c) => ({
-            id: c.id,
-            name: c.name,
-            description: '',
-            post_count: c.post_count,
-            posts_count: c.post_count,
-            created_at: '',
-            updated_at: '',
-          }))}
-          categoryCounts={categoryCounts}
-          activeCategoryId={activeCategoryId}
-          onSelectCategory={handleCategorySelect}
-          isLoading={isLoading && categories.length === 0}
+          tags={tags}
+          activeTag={activeTag}
+          onSelectTag={handleTagSelect}
+          isLoading={isLoading && tags.length === 0}
         />
       </div>
 
@@ -310,7 +304,7 @@ export default function BlogListView() {
           ) : posts.length === 0 ? (
             <BlogEmptyState
               key="empty"
-              hasCategory={activeCategoryId !== null}
+              hasTag={activeTag !== null}
             />
           ) : (
             <motion.div

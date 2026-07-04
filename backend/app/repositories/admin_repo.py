@@ -1,22 +1,16 @@
 from __future__ import annotations
 
 from bson import ObjectId
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.blog import Post
-from app.models.models import Category
 
 
 class AdminRepo:
-    def __init__(self, session: AsyncSession) -> None:
-        self.session = session
+    """MongoDB-side post writes for the admin surface.
 
-    async def get_category_by_id(self, category_id: int) -> Category | None:
-        result = await self.session.execute(
-            select(Category).where(Category.id == category_id)
-        )
-        return result.scalar_one_or_none()
+    No longer depends on an async SQLAlchemy session — category lookups
+    (the only PG interaction) have been removed in the tag migration.
+    """
 
     async def create_post(self, post: Post):
         return await Post.insert_one(post)

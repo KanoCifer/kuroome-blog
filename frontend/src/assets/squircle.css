@@ -1,10 +1,10 @@
 .squircle {
-  /* 回退方案：标准圆角 (对应 tailwind 的 rounded-3xl 或 4xl) */
   border-radius: 48px;
+  overflow: clip;
 
   /* 超椭圆特性 */
   @supports (corner-shape: squircle) {
     corner-shape: squircle;
-    border-radius: 90px;
+    border-radius: 64px;
   }
 }

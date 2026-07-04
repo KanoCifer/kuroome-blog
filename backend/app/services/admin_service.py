@@ -8,6 +8,7 @@ from bson.errors import InvalidId
 from app.core.exceptions import AdminDomainError
 from app.models.blog import Post
 from app.repositories.admin_repo import AdminRepo
+from app.services.blog_service import BlogService
 
 
 class AdminService:
@@ -29,20 +30,17 @@ class AdminService:
         body: str,
         summary: str | None = None,
         cover: str | None = None,
-        category_id: int,
+        tags: list[str] | None = None,
         is_pinned: int,
     ) -> str:
-        category = await self.repo.get_category_by_id(category_id)
-        if not category:
-            raise AdminDomainError("Category not found", 404)
-
+        cleaned_tags = BlogService._clean_tags(tags)
         now = datetime.now(UTC)
         post = Post(
             title=title,
             body=body,
             summary=summary,
             cover=cover,
-            category_id=category_id,
+            tags=cleaned_tags,
             is_pinned=is_pinned,
             created_at=now,
             updated_at=now,
@@ -62,7 +60,7 @@ class AdminService:
         body: str,
         summary: str | None = None,
         cover: str | None = None,
-        category_id: int,
+        tags: list[str] | None = None,
         is_pinned: int,
     ) -> None:
         oid = self._to_object_id(post_id, "非法的博客ID")
@@ -70,10 +68,7 @@ class AdminService:
         if not existing_post:
             raise AdminDomainError("Blog post not found", 404)
 
-        category = await self.repo.get_category_by_id(category_id)
-        if not category:
-            raise AdminDomainError("Category not found", 404)
-
+        cleaned_tags = BlogService._clean_tags(tags)
         await self.repo.update_post_by_id(
             oid,
             {
@@ -81,7 +76,7 @@ class AdminService:
                 "body": body,
                 "summary": summary,
                 "cover": cover,
-                "category_id": category_id,
+                "tags": cleaned_tags,
                 "is_pinned": is_pinned,
                 "updated_at": datetime.now(UTC),
             },
