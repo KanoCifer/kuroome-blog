@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { authGateway } from '@/auth/api/authGateway';
 import { useAuthStore } from '@/auth/stores/auth';
+import AuthLayout from '@/components/auth/AuthLayout.vue';
 import IconCloud from '@/components/icons/IconCloud.vue';
 import type { ProfileForm } from '@/types';
 import {
@@ -252,11 +253,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="bg-background flex min-h-screen">
-    <!-- 左侧 Branding -->
-    <div
-      class="relative hidden w-1/2 flex-col justify-between bg-zinc-950 p-10 text-white lg:flex"
-    >
+  <AuthLayout
+    brand-width="w-1/2"
+    form-width="lg:w-1/2"
+    form-max-width="max-w-md xl:max-w-xl"
+  >
+    <template #branding>
       <div class="flex items-center gap-2 text-xl font-bold tracking-tight">
         <IconCloud class="text-primary size-8" />
         <span>Kanocifer<span class="text-primary">.chat</span></span>
@@ -274,30 +276,27 @@ onMounted(() => {
         </div>
       </div>
       <div class="z-10 font-serif text-sm text-zinc-500">Kuroome's Blog</div>
-    </div>
+    </template>
 
-    <!-- 右侧 Profile Form -->
-    <div
-      class="bg-background flex w-full items-center justify-center p-8 lg:w-1/2"
-    >
-      <div class="w-full max-w-md xl:max-w-xl">
-        <div class="mb-8 flex flex-col items-center lg:items-start">
-          <div
-            class="bg-primary text-primary-foreground mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)] lg:hidden"
-          >
-            <IconCloud class="size-8" />
-          </div>
-          <h2
-            class="font-headline text-foreground text-center text-3xl text-[28px] font-extrabold tracking-tight lg:text-left"
-          >
-            Profile Settings
-          </h2>
-          <p
-            class="text-muted-foreground mt-2 text-center text-[15px] font-medium lg:text-left"
-          >
-            Manage your profile and security preferences.
-          </p>
+    <template #header>
+      <div class="mb-8 flex flex-col items-center lg:items-start">
+        <div
+          class="bg-primary text-primary-foreground mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)] lg:hidden"
+        >
+          <IconCloud class="size-8" />
         </div>
+        <h2
+          class="font-headline text-foreground text-center text-3xl text-[28px] font-extrabold tracking-tight lg:text-left"
+        >
+          Profile Settings
+        </h2>
+        <p
+          class="text-muted-foreground mt-2 text-center text-[15px] font-medium lg:text-left"
+        >
+          Manage your profile and security preferences.
+        </p>
+      </div>
+    </template>
 
         <div class="mb-8 flex flex-col items-center gap-3">
           <div class="group relative">
@@ -683,7 +682,5 @@ onMounted(() => {
             {{ githubMessage }}
           </p>
         </div>
-      </div>
-    </div>
-  </div>
+  </AuthLayout>
 </template>

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from beanie import SortDirection
+from bson import ObjectId
+from bson.errors import InvalidId
 
 from app.models.blog import Post
 
@@ -57,7 +59,12 @@ class BlogRepo:
         ]
 
     async def get_post_by_id(self, post_id: str) -> Post | None:
-        return await Post.find_one({"_id": post_id})
+        """Look up by _id — accepts both string and ObjectId-like input."""
+        try:
+            oid = ObjectId(post_id)
+        except (InvalidId, TypeError):
+            return None
+        return await Post.find_one({"_id": oid})
 
     async def list_posts_by_tag(
         self,

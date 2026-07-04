@@ -559,9 +559,6 @@ onBeforeUnmount(() => {
               @blur="() => { if (tagInput.trim()) addTag(tagInput); }"
             />
           </div>
-              </div>
-            </transition>
-          </div>
 
           <!-- Pin: 单一字色 + 字距表达"已置顶"，不再用 warning 色块 -->
           <button

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { authGateway } from '@/auth/api/authGateway';
+import AuthLayout from '@/components/auth/AuthLayout.vue';
 import IconCloud from '@/components/icons/IconCloud.vue';
 import IconLock from '@/components/icons/IconLock.vue';
 import { useNotificationStore } from '@/stores/notification';
@@ -123,11 +124,8 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <div class="bg-background flex min-h-screen">
-    <!-- 左侧 Branding (仅在大屏幕显示) -->
-    <div
-      class="relative hidden w-1/2 flex-col justify-between bg-zinc-950 p-10 text-white lg:flex"
-    >
+  <AuthLayout brand-width="w-1/2" form-width="lg:w-1/2">
+    <template #branding>
       <div class="flex items-center gap-2 text-xl font-bold tracking-tight">
         <IconCloud class="text-primary size-8" />
         <span>Kanocifer<span class="text-primary">.chat</span></span>
@@ -145,31 +143,27 @@ const handleSubmit = async () => {
         </div>
       </div>
       <div class="z-10 font-serif text-sm text-zinc-500">Kuroome's Blog</div>
-    </div>
+    </template>
 
-    <!-- 右侧 Register Form -->
-    <div
-      class="bg-background flex w-full items-center justify-center p-8 lg:w-1/2"
-    >
-      <div class="w-full max-w-sm xl:max-w-md">
-        <!-- 表头 -->
-        <div class="mb-8 flex flex-col items-center lg:items-start">
-          <div
-            class="bg-primary text-primary-foreground mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)] lg:hidden"
-          >
-            <IconCloud class="size-8" />
-          </div>
-          <h2
-            class="font-headline text-foreground text-center text-3xl text-[28px] font-extrabold tracking-tight lg:text-left"
-          >
-            Create your account
-          </h2>
-          <p
-            class="text-muted-foreground mt-2 text-center text-[15px] font-medium lg:text-left"
-          >
-            Fill in the details below to get started.
-          </p>
+    <template #header>
+      <div class="mb-8 flex flex-col items-center lg:items-start">
+        <div
+          class="bg-primary text-primary-foreground mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)] lg:hidden"
+        >
+          <IconCloud class="size-8" />
         </div>
+        <h2
+          class="font-headline text-foreground text-center text-3xl text-[28px] font-extrabold tracking-tight lg:text-left"
+        >
+          Create your account
+        </h2>
+        <p
+          class="text-muted-foreground mt-2 text-center text-[15px] font-medium lg:text-left"
+        >
+          Fill in the details below to get started.
+        </p>
+      </div>
+    </template>
 
         <!-- 注册表单 -->
         <form @submit.prevent="handleSubmit" class="w-full">
@@ -412,21 +406,17 @@ const handleSubmit = async () => {
           </span>
         </form>
 
-        <!-- 登录链接 -->
-        <div class="text-muted-foreground mt-8 text-center text-sm">
-          已有账号？
-          <RouterLink
-            to="/login"
-            class="text-primary font-medium hover:underline"
-          >
-            立即登录
-          </RouterLink>
-        </div>
+    <template #footer>
+      <!-- 登录链接 -->
+      <div class="text-muted-foreground mt-8 text-center text-sm">
+        已有账号？
+        <RouterLink
+          to="/login"
+          class="text-primary font-medium hover:underline"
+        >
+          立即登录
+        </RouterLink>
       </div>
-    </div>
-  </div>
+    </template>
+  </AuthLayout>
 </template>
-
-<style scoped>
-/* No custom styles needed - using Tailwind utilities directly */
-</style>

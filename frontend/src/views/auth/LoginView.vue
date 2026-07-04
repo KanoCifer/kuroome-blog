@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AuthLayout from '@/components/auth/AuthLayout.vue';
 import IconCloud from '@/components/icons/IconCloud.vue';
 import IconKey from '@/components/icons/IconKey.vue';
 import IconLock from '@/components/icons/IconLock.vue';
@@ -27,11 +28,8 @@ const showPassword = ref<boolean>(false);
 </script>
 
 <template>
-  <div class="bg-background flex min-h-screen">
-    <!-- 左侧 Branding (仅在大屏幕显示) -->
-    <div
-      class="relative hidden w-3/5 flex-col justify-between bg-zinc-950 p-10 text-white lg:flex"
-    >
+  <AuthLayout brand-width="w-3/5" form-width="lg:w-2/5">
+    <template #branding>
       <div class="flex items-center gap-2 text-xl font-bold tracking-tight">
         <IconCloud class="text-primary size-8" />
         <span>Kanocifer<span class="text-primary">.chat</span></span>
@@ -49,31 +47,27 @@ const showPassword = ref<boolean>(false);
         </div>
       </div>
       <div class="z-10 font-serif text-sm text-zinc-500">Kuroome's Blog</div>
-    </div>
+    </template>
 
-    <!-- 右侧 Login Form -->
-    <div
-      class="bg-background flex w-full items-center justify-center p-8 lg:w-2/5"
-    >
-      <div class="w-full max-w-sm xl:max-w-md">
-        <!-- 表头 -->
-        <div class="mb-8 flex flex-col items-center lg:items-start">
-          <div
-            class="bg-primary text-primary-foreground mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)] lg:hidden"
-          >
-            <IconCloud class="size-8" />
-          </div>
-          <h2
-            class="font-headline text-foreground text-center text-3xl text-[28px] font-extrabold tracking-tight lg:text-left"
-          >
-            Log in to your account
-          </h2>
-          <p
-            class="text-muted-foreground mt-2 text-center text-[15px] font-medium lg:text-left"
-          >
-            Welcome back! Please enter your details.
-          </p>
+    <template #header>
+      <div class="mb-8 flex flex-col items-center lg:items-start">
+        <div
+          class="bg-primary text-primary-foreground mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)] lg:hidden"
+        >
+          <IconCloud class="size-8" />
         </div>
+        <h2
+          class="font-headline text-foreground text-center text-3xl text-[28px] font-extrabold tracking-tight lg:text-left"
+        >
+          Log in to your account
+        </h2>
+        <p
+          class="text-muted-foreground mt-2 text-center text-[15px] font-medium lg:text-left"
+        >
+          Welcome back! Please enter your details.
+        </p>
+      </div>
+    </template>
 
         <!-- 登录表单 -->
         <form @submit.prevent="handleSubmit(form)" class="w-full">
@@ -325,18 +319,19 @@ const showPassword = ref<boolean>(false);
             </button>
           </div>
 
-          <!-- 注册链接 -->
-          <div class="text-muted-foreground mt-8 text-center text-sm">
-            Don't have an account?
-            <RouterLink
-              to="/register"
-              class="hover:text-primary font-semibold underline transition duration-100"
-            >
-              Register here
-            </RouterLink>
-          </div>
         </form>
+
+    <template #footer>
+      <!-- 注册链接 -->
+      <div class="text-muted-foreground mt-8 text-center text-sm">
+        Don't have an account?
+        <RouterLink
+          to="/register"
+          class="hover:text-primary font-semibold underline transition duration-100"
+        >
+          Register here
+        </RouterLink>
       </div>
-    </div>
-  </div>
+    </template>
+  </AuthLayout>
 </template>

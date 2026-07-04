@@ -336,7 +336,10 @@ onUnmounted(() => {
     </div>
 
     <!-- Error -->
-    <div v-else-if="errorMessage" class="mx-auto max-w-[42rem] px-6 py-24">
+    <div
+      v-else-if="errorMessage"
+      class="mx-auto h-screen max-w-[42rem] px-6 py-24"
+    >
       <div
         class="border-destructive/30 bg-destructive/5 flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 text-center"
       >
