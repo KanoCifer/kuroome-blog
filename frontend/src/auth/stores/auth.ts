@@ -91,10 +91,10 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // 4. 登录
-  async function login(username: string, password: string, rememberMe = false) {
+  async function login(username: string, password: string) {
     loading.value = true;
     try {
-      const res = await authGateway.login(username, password, rememberMe);
+      const res = await authGateway.login(username, password);
       // 登录响应中已包含用户信息，直接使用并缓存
       const userData = res.user;
       user.value = userData;

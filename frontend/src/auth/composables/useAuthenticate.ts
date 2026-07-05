@@ -29,7 +29,7 @@ export function useAuthenticate() {
     }
 
     try {
-      await auth.login(form.username, form.password, form.rememberMe);
+      await auth.login(form.username, form.password);
       const redirect = (route.query.redirect as string) || '/';
       router.push(redirect);
     } catch (err: unknown) {

@@ -108,7 +108,6 @@ export default function Login() {
   const [loginForm, setLoginForm] = useState({
     username: '',
     password: '',
-    rememberMe: false,
   });
 
   const [errors, setErrors] = useState<{
@@ -127,11 +126,7 @@ export default function Login() {
     setIsSubmitting(true);
 
     try {
-      await auth.login(
-        loginForm.username,
-        loginForm.password,
-        loginForm.rememberMe,
-      );
+      await auth.login(loginForm.username, loginForm.password);
       const redirect =
         new URLSearchParams(location.search).get('redirect') || '/';
       navigate(redirect);
@@ -266,38 +261,8 @@ export default function Login() {
               )}
             </div>
 
-            {/* Remember Me & Forgot Password */}
-            <div className="mb-6 flex items-center justify-between px-1">
-              <label className="group flex cursor-pointer items-center space-x-2.5">
-                <input
-                  type="checkbox"
-                  checked={loginForm.rememberMe}
-                  onChange={(e) =>
-                    setLoginForm({
-                      ...loginForm,
-                      rememberMe: e.target.checked,
-                    })
-                  }
-                  className="peer sr-only"
-                />
-                <div className="border-border bg-background peer-checked:border-primary peer-checked:bg-primary peer-focus:ring-ring/20 z-5 flex h-5.5 w-5.5 items-center justify-center rounded-lg border-2 transition-all duration-200 peer-focus:ring-2">
-                  <svg
-                    className="text-primary-foreground z-5 h-3 w-3 opacity-0 transition-all duration-200 peer-checked:opacity-100"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                </div>
-                <span className="text-muted-foreground text-[14px] font-medium">
-                  {' '}
-                  Remember Me{' '}
-                </span>
-              </label>
+            {/* Forgot Password */}
+            <div className="mb-6 flex items-center justify-end px-1">
               <a
                 href="#"
                 className="text-primary text-[14px] font-bold hover:underline"

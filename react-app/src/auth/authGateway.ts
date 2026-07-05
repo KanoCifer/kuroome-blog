@@ -41,11 +41,7 @@ export interface PasskeyLoginResult {
 export interface AuthGateway {
   fetchUser: () => Promise<UserInfo | null>;
   getPasskeyAuthenticationOptions: () => Promise<PublicKeyCredentialRequestOptionsJSON>;
-  login: (
-    username: string,
-    password: string,
-    rememberMe: boolean,
-  ) => Promise<LoginResult>;
+  login: (username: string, password: string) => Promise<LoginResult>;
   loginWithPasskey: (assertion: unknown) => Promise<PasskeyLoginResult>;
   loginWithGitHub: () => void;
   logout: () => Promise<void>;
@@ -83,18 +79,10 @@ export function createAuthGateway(): AuthGateway {
       return res.data.data;
     },
 
-    async login(
-      username: string,
-      password: string,
-      rememberMe: boolean,
-    ): Promise<LoginResult> {
+    async login(username: string, password: string): Promise<LoginResult> {
       const res = await request.post<ApiResponse<LoginResponseData>>(
         'v1/auth/login',
-        {
-          username: username,
-          password: password,
-          remember_me: rememberMe,
-        },
+        { username, password },
       );
       if (!res.data.data) {
         notification.error('登录失败，请检查用户名和密码');

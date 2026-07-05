@@ -15,11 +15,7 @@ interface AuthState {
   user: UserInfo | null;
   isHydrated: boolean;
   hydrateAuth: () => Promise<void>;
-  login: (
-    username: string,
-    password: string,
-    rememberMe: boolean,
-  ) => Promise<void>;
+  login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   loginWithPasskey: (assertion: unknown) => Promise<void>;
   getPasskeyAuthenticationOptions: () => Promise<PublicKeyCredentialRequestOptionsJSON>;
@@ -85,8 +81,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     return hydrationPromise;
   },
 
-  login: async (username, password, rememberMe) => {
-    const result = await authGateway.login(username, password, rememberMe);
+  login: async (username, password) => {
+    const result = await authGateway.login(username, password);
     // 登录成功后更新状态、保存 access token 和 userCache
     if (result.accessToken) {
       tokenService.save(result.accessToken);

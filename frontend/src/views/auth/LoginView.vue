@@ -21,7 +21,6 @@ const {
 const form = ref<LoginForm>({
   username: '',
   password: '',
-  rememberMe: false,
 });
 
 const showPassword = ref<boolean>(false);
@@ -190,8 +189,8 @@ const showPassword = ref<boolean>(false);
             </span>
           </div>
 
-          <!-- 提交按钮和记住我 -->
-          <div class="mt-6 flex items-center justify-between">
+          <!-- 提交按钮 -->
+          <div class="mt-6">
             <button
               type="submit"
               class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-primary/30 inline-flex w-32 cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
@@ -220,24 +219,6 @@ const showPassword = ref<boolean>(false);
               </svg>
               {{ isSubmitting ? null : 'Login' }}
             </button>
-
-            <!-- Remember Me Checkbox -->
-            <label class="group relative flex cursor-pointer">
-              <input
-                v-model="form.rememberMe"
-                type="checkbox"
-                class="peer sr-only"
-              />
-              <div
-                class="border-border bg-background peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-primary/10 hover:border-primary/30 rounded-xl border-2 px-3 py-2 shadow-sm transition-all duration-200 select-none group-active:scale-95"
-              >
-                <span
-                  class="text-muted-foreground peer-checked:text-primary text-sm font-medium transition-colors"
-                >
-                  Remember Me
-                </span>
-              </div>
-            </label>
           </div>
 
           <div class="relative mt-8">

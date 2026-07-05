@@ -130,7 +130,7 @@ async def login(
     """使用用户名和密码登录，成功后返回访问令牌和刷新令牌。
 
     param:
-        data: 包含 username, password 和 remember_me 的请求体
+        data: 包含 username 和 password 的请求体
         user_service: 用户服务实例
     """
     user: User | None = await user_service.authenticate_user(
@@ -144,7 +144,7 @@ async def login(
         )
 
     await user_service.record_login(user, request)
-    tokens = user_service.create_tokens(user, remember_me=data.remember_me)
+    tokens = user_service.create_tokens(user)
     login_data = user_service.build_login_data(user, tokens["refresh_token"])
     return _build_login_response(
         login_data, tokens["access_token"], tokens["refresh_token"]

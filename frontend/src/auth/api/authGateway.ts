@@ -135,11 +135,7 @@ export const authGateway = {
 export interface AuthGateway {
   fetchUser: () => Promise<UserInfo | null>;
   getPasskeyAuthenticationOptions: () => Promise<PublicKeyCredentialRequestOptionsJSON>;
-  login: (
-    username: string,
-    password: string,
-    rememberMe: boolean,
-  ) => Promise<LoginResult>;
+  login: (username: string, password: string) => Promise<LoginResult>;
   loginWithPasskey: (assertion: unknown) => Promise<PasskeyLoginResult>;
   logout: () => Promise<void>;
   loginWithGitHub: () => void;
@@ -159,14 +155,10 @@ export function createAuthGateway(): AuthGateway {
       return res.data.data;
     },
 
-    async login(
-      username: string,
-      password: string,
-      rememberMe: boolean,
-    ): Promise<LoginResult> {
+    async login(username: string, password: string): Promise<LoginResult> {
       const res = await request.post<Envelope<LoginResponseData>>(
         'v1/auth/login',
-        { username, password, remember_me: rememberMe },
+        { username, password },
       );
       const data = unwrapEnvelope(res);
       return data ? buildLoginResult(data) : emptyLoginResult();

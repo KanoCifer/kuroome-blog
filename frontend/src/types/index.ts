@@ -90,7 +90,6 @@ export interface Pagination {
 export interface LoginForm {
   username: string;
   password: string;
-  rememberMe?: boolean;
 }
 
 export interface ProfileForm {

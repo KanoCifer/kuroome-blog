@@ -43,28 +43,14 @@ class UserService:
         """Update last login timestamp and IP address."""
         await self.repo.update_login_info(user, request)
 
-    def create_tokens(
-        self, user: User, *, remember_me: bool = False
-    ) -> dict[str, str]:
-        """Generate access and refresh tokens.
-
-        When remember_me=True, tokens last 7/30 days.
-        Otherwise, 12 hours / 7 days.
-        """
-        if remember_me:
-            access_token = create_access_token(
-                sub=str(user.id), expires=timedelta(days=7)
-            )
-            refresh_token = create_access_token(
-                sub=str(user.id), expires=timedelta(days=30)
-            )
-        else:
-            access_token = create_access_token(
-                sub=str(user.id), expires=timedelta(hours=12)
-            )
-            refresh_token = create_access_token(
-                sub=str(user.id), expires=timedelta(days=7)
-            )
+    def create_tokens(self, user: User) -> dict[str, str]:
+        """Generate access (12h) and refresh (7d) tokens."""
+        access_token = create_access_token(
+            sub=str(user.id), expires=timedelta(hours=12)
+        )
+        refresh_token = create_access_token(
+            sub=str(user.id), expires=timedelta(days=7)
+        )
         return {
             "access_token": access_token,
             "refresh_token": refresh_token,
