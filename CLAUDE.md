@@ -21,6 +21,19 @@
 - 缓存模块在 `app/plugins/cache/`。端点用 `@redis_cache(ttl=N, exclude=[...])`，`exclude` 跳过 Depends 参数（不参与 cache key）
 - **`composables/` 按域分目录**（`shared/ card/ article/ pic/ rss/ weread/ comment/ todo/`），与 `views/` `components/` 分域策略一致；每个子目录用 `index.ts` 桶导出，跨域 import 走桶 `from '@/composables/<domain>'`，不要直接指向具体文件
 
+## Go Backend (go-backend/)
+
+`go-backend/` 是 Python `backend/` 的 Go 重写占位(早期阶段),仅 user-auth 垂直切片完整实现。
+
+- **运行**:`cd go-backend && go run ./cmd/server`,启动 `127.0.0.1:5555`(Port 由 Viper 配置,优先级 env > `configs/config.yaml` > defaults)
+- **路由前缀**:`/api/v3/*`,当前仅 `/login /register /refresh-token /logout /me`(public 两组,auth 两组)
+- **框架与存储**:Gin(v1.12) + GORM(v1.31, PostgreSQL via pgx v5) + 官方 MongoDB driver(v2) + go-redis(v9);JWT HS256 + bcrypt;配置用 Viper(v1.21)
+- **分层架构**:`handler → service → repository → model`,响应统一包 `internal/response/`(`Success` / `APIError` 封装了 `{data, message}` 信封)
+- **命名对齐**:与 Python 后端共享同一套环境变量名(`DATABASE_URL / SECRET_KEY / REDIS_URL / MONGO_URI / PORT` 等),可直接复用 `.env`
+- **已知 Bug**:`internal/db/db.go` 的 `InitMongo()` 会 `defer client.Disconnect()` 导致全局 mongo client 初始化后立即断开,调用 `GetMongo()` 返回的是已断开的 client
+- **现状**:无测试、无 Dockerfile、无 CI、无 Makefile;`internal/repository/mongo/`、`internal/router/`、`internal/domain/`、`internal/infra/`、`pkg/jwt/` 为空支架目录;Mongo repo 尚未实现
+- **模块名**:`app`(见 `go.mod`),import 路径均为 `app/internal/...` 而非 GitHub 路径
+
 ## 3) Conventions
 
 - Commit 风格：Conventional Commits（`feat:`, `fix:`, `docs:`, `style:`, `refactor:`, `perf:`, `test:`, `chore:`）

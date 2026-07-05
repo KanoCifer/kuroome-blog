@@ -23,7 +23,7 @@ func APIError(c *gin.Context, message string, statusCode ...int) {
 	if len(statusCode) > 0 {
 		code = statusCode[0]
 	}
-	c.JSON(code, Response{
+	c.AbortWithStatusJSON(code, Response{
 		Data:    nil,
 		Message: message,
 	})
