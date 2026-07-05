@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     MONGO_URI: str = ""
     MAIL_USERNAME: str = ""
     MAIL_PASSWORD: str = ""
-    API_VERSION: str = "3.1.0"
+    API_VERSION: str = "4.0.0"
     API_TITLE: str = "Reading List API"
     API_DESCRIPTION: str = "API文档。Personal reading tracker API built with FastAPI, PostgreSQL, and MongoDB. Manage your reading list, track progress, and get book recommendations."
     API_KEY: str = ""
