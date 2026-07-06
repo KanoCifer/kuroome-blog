@@ -8,7 +8,7 @@ import os
 import subprocess
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import Response
 from redis.asyncio import Redis as AsyncRedis
 from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import AsyncSession
