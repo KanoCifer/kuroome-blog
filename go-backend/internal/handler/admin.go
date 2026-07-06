@@ -1,0 +1,181 @@
+package handler
+
+import (
+	"context"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
+	"errors"
+	"log"
+	"os"
+	"os/exec"
+	"time"
+
+	"github.com/gin-gonic/gin"
+
+	"app/internal/config"
+	"app/internal/dto"
+	"app/internal/response"
+	"app/internal/service"
+)
+
+type AdminService interface {
+	AddPost(post dto.PostIn) (id string, err error)
+	UpdatePost(id string, post dto.PostUpdate) error
+	DeletePost(id string) error
+	TrackVisitor(data dto.VisitorData) error
+}
+
+type AdminHandler struct {
+	adminSvc AdminService
+}
+
+func NewAdminHandler(adminSvc AdminService) *AdminHandler {
+	return &AdminHandler{adminSvc: adminSvc}
+}
+
+func (h *AdminHandler) AddPost(c *gin.Context) {
+	var req dto.PostIn
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.APIError(c, err.Error())
+		return
+	}
+	id, err := h.adminSvc.AddPost(req)
+	if err != nil {
+		response.APIError(c, err.Error(), 500)
+		return
+	}
+	response.Success(c, gin.H{"_id": id}, "Blog post added successfully")
+}
+
+func (h *AdminHandler) UpdatePost(c *gin.Context) {
+	var req dto.PostUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.APIError(c, err.Error())
+		return
+	}
+	if req.ID == "" {
+		response.APIError(c, "_id is required")
+		return
+	}
+	if err := h.adminSvc.UpdatePost(req.ID, req); err != nil {
+		if errors.Is(err, service.ErrPostNotFound) {
+			response.APIError(c, err.Error(), 404)
+			return
+		}
+		response.APIError(c, err.Error(), 500)
+		return
+	}
+	response.Success(c, gin.H{"_id": req.ID}, "Blog post updated successfully")
+}
+
+func (h *AdminHandler) DeletePost(c *gin.Context) {
+	postID := c.Param("post_id")
+	if err := h.adminSvc.DeletePost(postID); err != nil {
+		if errors.Is(err, service.ErrPostNotFound) {
+			response.APIError(c, err.Error(), 404)
+			return
+		}
+		response.APIError(c, err.Error(), 500)
+		return
+	}
+	response.Success(c, gin.H{"_id": postID}, "Blog post deleted successfully")
+}
+
+func (h *AdminHandler) TrackVisitor(c *gin.Context) {
+	if !config.Cfg.ENABLE_TRACKING {
+		c.Status(204)
+		return
+	}
+	var req dto.VisitorData
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.APIError(c, err.Error())
+		return
+	}
+	req.IpAddress = c.ClientIP()
+	if err := h.adminSvc.TrackVisitor(req); err != nil {
+		response.APIError(c, err.Error(), 500)
+		return
+	}
+	c.Status(204)
+}
+
+func (h *AdminHandler) WebhookDeploy(c *gin.Context) {
+	secret := config.Cfg.GITEE_WEBHOOK_SECRET
+	if secret == nil || *secret == "" {
+		response.APIError(c, "Webhook secret not configured", 500)
+		return
+	}
+
+	giteeToken := c.GetHeader("X-Gitee-Token")
+	signatureHeader := c.GetHeader("X-Hub-Signature-256")
+
+	switch {
+	case giteeToken != "":
+		if !hmac.Equal([]byte(giteeToken), []byte(*secret)) {
+			response.APIError(c, "Invalid token", 403)
+			return
+		}
+	case signatureHeader != "":
+		body, err := c.GetRawData()
+		if err != nil {
+			response.APIError(c, "Failed to read request body", 400)
+			return
+		}
+		if !hmacEqualBody(body, *secret, signatureHeader) {
+			response.APIError(c, "Invalid signature", 403)
+			return
+		}
+	default:
+		response.APIError(c, "No authentication provided", 401)
+		return
+	}
+
+	go runDeployment()
+
+	log.Printf("Deployment triggered by webhook from %s", c.ClientIP())
+	response.Success(c, gin.H{"status": "pending"}, "Deployment triggered successfully")
+}
+
+func hmacEqualBody(body []byte, secret, signatureHeader string) bool {
+	const prefix = "sha256="
+	if len(signatureHeader) <= len(prefix) || signatureHeader[:len(prefix)] != prefix {
+		return false
+	}
+	received := signatureHeader[len(prefix):]
+	mac := hmac.New(sha256.New, []byte(secret))
+	mac.Write(body)
+	expected := hex.EncodeToString(mac.Sum(nil))
+	return hmac.Equal([]byte(received), []byte(expected))
+}
+
+func runDeployment() {
+	scriptPath := os.Getenv("DEPLOY_SCRIPT_PATH")
+	if scriptPath == "" {
+		scriptPath = "/home/kano/blog/deploy.sh"
+	}
+	if _, err := os.Stat(scriptPath); os.IsNotExist(err) {
+		log.Printf("Deploy script not found at %s", scriptPath)
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, scriptPath)
+	cmd.Dir = "/home/kano/blog/backend"
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Printf("Deployment failed: %v\nOutput: %s", err, string(output))
+		return
+	}
+	log.Printf("Deployment completed successfully:\n%s", string(output))
+}
+
+func (h *AdminHandler) RegisterRoutes(r *gin.RouterGroup, middleware gin.HandlerFunc) {
+	r.POST("/post/add", middleware, h.AddPost)
+	r.PUT("/post/update", middleware, h.UpdatePost)
+	r.DELETE("/post/:post_id/delete", middleware, h.DeletePost)
+	r.POST("/track", h.TrackVisitor)
+	r.POST("/deploy", h.WebhookDeploy)
+}
