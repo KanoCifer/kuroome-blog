@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"app/internal/model"
 	"errors"
 
 	"github.com/gin-gonic/gin"
@@ -9,17 +10,26 @@ import (
 	"app/internal/response"
 	"app/internal/service"
 )
-
-// Handler 持有业务服务，gin 路由方法挂在其上。
-type Handler struct {
-	userSvc *service.UserService
+type UserService interface {
+	Authenticate(username, password string) (*model.User, error)
+	CreateTokens(u *model.User) (*service.Tokens, error)
+	CreateUser(username, password, email string) (*model.User, *model.Profile, error)
+	GetByID(userID uint) (*model.User, *model.Profile, error)
+	Logout(userID uint)
+	RefreshTokens(refreshToken string) (*service.Tokens, error)
+	UserToDict(u *model.User, p *model.Profile) map[string]any
 }
 
-func NewUserHandler(userSvc *service.UserService) *Handler {
-	return &Handler{userSvc: userSvc}
+// UserHandler 持有业务服务，gin 路由方法挂在其上。
+type UserHandler struct {
+	userSvc UserService
 }
 
-func (h *Handler) Login(c *gin.Context) {
+func NewUserHandler(userSvc UserService) *UserHandler {
+	return &UserHandler{userSvc: userSvc}
+}
+
+func (h *UserHandler) Login(c *gin.Context) {
 	var req dto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.APIError(c, "invalid request body")
@@ -50,7 +60,7 @@ func (h *Handler) Login(c *gin.Context) {
 	})
 }
 
-func (h *Handler) Register(c *gin.Context) {
+func (h *UserHandler) Register(c *gin.Context) {
 	// "/register"
 	var req dto.RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -74,7 +84,7 @@ func (h *Handler) Register(c *gin.Context) {
 	response.Success(c, dto.ToUserResponse(u.ID, u.Username, false), "注册成功")
 }
 
-func (h *Handler) Me(c *gin.Context) {
+func (h *UserHandler) Me(c *gin.Context) {
 	// "/me"
 	userID, _ := c.Get("user_id")
 
@@ -91,13 +101,13 @@ func (h *Handler) Me(c *gin.Context) {
 	response.Success(c, h.userSvc.UserToDict(u, p))
 }
 
-func (h *Handler) Logout(c *gin.Context) {
+func (h *UserHandler) Logout(c *gin.Context) {
 	userID, _ := c.Get("user_id")
 	h.userSvc.Logout(userID.(uint))
 	response.Success(c, nil, "已退出登录")
 }
 
-func (h *Handler) RefreshToken(c *gin.Context) {
+func (h *UserHandler) RefreshToken(c *gin.Context) {
 	var req struct {
 		RefreshToken string `json:"refresh_token" binding:"required"`
 	}
@@ -119,7 +129,7 @@ func (h *Handler) RefreshToken(c *gin.Context) {
 }
 
 // RegisterRoutes 把 handler 方法挂到路由组。
-func (h *Handler) RegisterRoutes(r *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
+func (h *UserHandler) RegisterRoutes(r *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
 	r.POST("/login", h.Login)
 	r.POST("/register", h.Register)
 	r.POST("/refresh-token", h.RefreshToken)

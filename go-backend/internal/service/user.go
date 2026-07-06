@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"slices"
 	"strconv"
 	"time"
 
@@ -11,9 +12,9 @@ import (
 	"gorm.io/gorm"
 
 	"app/internal/config"
-	"app/internal/middleware"
 	"app/internal/model"
 	"app/internal/repository/postgres"
+	"app/pkg/jwt"
 )
 
 var (
@@ -23,9 +24,6 @@ var (
 	ErrUserNotFound       = errors.New("用户不存在")
 	ErrInvalidToken       = errors.New("无效的令牌")
 )
-
-// generateToken 用 middleware 包的统一实现，避免重复
-var generateToken = middleware.GenerateToken
 
 type Tokens struct {
 	AccessToken  string
@@ -128,11 +126,11 @@ func (s *UserService) CreateTokens(u *model.User) (*Tokens, error) {
 	accessExpiry := time.Now().Add(15 * time.Minute)
 	refreshExpiry := time.Now().Add(refreshTTL)
 
-	accessToken, err := generateToken(u.ID, accessExpiry)
+	accessToken, err :=  jwt.GenerateToken(u.ID, accessExpiry)
 	if err != nil {
 		return nil, err
 	}
-	refreshToken, err := generateToken(u.ID, refreshExpiry)
+	refreshToken, err :=  jwt.GenerateToken(u.ID, refreshExpiry)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +149,7 @@ func (s *UserService) CreateTokens(u *model.User) (*Tokens, error) {
 
 // RefreshTokens 校验 refresh token 并轮换
 func (s *UserService) RefreshTokens(refreshToken string) (*Tokens, error) {
-	claims, err := middleware.ParseToken(refreshToken)
+	claims, err := jwt.ParseToken(refreshToken)
 	if err != nil {
 		return nil, ErrInvalidToken
 	}
@@ -181,12 +179,7 @@ func (s *UserService) Logout(userID uint) {
 // ---------- 响应构造 ----------
 
 func (s *UserService) IsAdmin(u *model.User) bool {
-	for _, id := range config.Cfg.ADMIN_USER_IDS {
-		if id == int(u.ID) {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(config.Cfg.ADMIN_USER_IDS, int(u.ID))
 }
 
 func (s *UserService) UserToDict(u *model.User, p *model.Profile) map[string]any {

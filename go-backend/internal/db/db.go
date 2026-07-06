@@ -2,10 +2,12 @@ package db
 
 import (
 	"context"
+	"time"
 
 	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	"go.mongodb.org/mongo-driver/v2/mongo/readpref"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -15,13 +17,15 @@ import (
 
 var (
 	pgDB   *gorm.DB
-	mongoClient *mongo.Client
+	client *mongo.Client
 	rdb    *redis.Client
 )
 
 func InitDB() error {
 	var err error
-	pgDB, err = gorm.Open(postgres.Open(config.Cfg.DATABASE_URL), &gorm.Config{})
+	pgDB, err = gorm.Open(postgres.Open(config.Cfg.DATABASE_URL), &gorm.Config{
+		NamingStrategy: model.NewNamer(),
+	})
 	if err != nil {
 		return err
 	}
@@ -43,24 +47,24 @@ func GetDB() *gorm.DB {
 }
 
 func InitMongo() error {
-	var err error
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(config.Cfg.MONGO_URI).SetServerAPIOptions(serverAPI)
-	client, err := mongo.Connect(opts)
+	c, err := mongo.Connect(opts)
 	if err != nil {
-		panic(err)
+		return err
 	}
-	defer func() {
-		if err = client.Disconnect(context.TODO()); err != nil {
-			panic(err)
-		}
-	}()
-	mongoClient = client
-	return mongoClient.Ping(context.Background(), nil)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	if err := c.Ping(ctx, readpref.Primary()); err != nil {
+		return err
+	}
+	client = c
+	return nil
 }
 
 func GetMongo() *mongo.Client {
-	return mongoClient
+	return client
 }
 
 func InitRedis() error {
@@ -77,8 +81,8 @@ func GetRedis() *redis.Client {
 }
 
 func Close() {
-	if mongoClient != nil {
-		mongoClient.Disconnect(context.Background())
+	if client != nil {
+		client.Disconnect(context.Background())
 	}
 	if rdb != nil {
 		rdb.Close()

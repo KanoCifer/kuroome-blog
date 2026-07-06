@@ -8,7 +8,7 @@ import (
 
 type User struct {
 	gorm.Model
-	GithubID       *int
+	GithubID       *int `gorm:"unique"`
 	Name           string `gorm:"size:50;index"`
 	Username       string `gorm:"size:50;unique"`
 	PasswordHash   string `gorm:"size:200"`
