@@ -51,34 +51,34 @@ Layer 3 (Tailwind class: bg-background / bg-primary / border …)
 ## Semantic Token Reference
 
 `base.css` 通过 Tailwind v4 `@theme inline` 把 Layer 1 变量桥接为 Layer 3 语义类。
-下表标注了各 Layer 1 变量的被引用次数（全项目 grep），反映实际活跃度。
+语义 token 与 Layer 1 变量的映射（只使用 Layer 3 的 Tailwind class）：
 
 ### Surface & Text
 
-| Tailwind class    | 映射到           | 引用次数 | 用途               |
-| ----------------- | ---------------- | -------- | ------------------ |
-| `bg-background`   | `var(--paper)`   | 23       | 页面/卡片/弹窗背景 |
-| `text-foreground` | `var(--ink)`     | 118      | 主文本（最高频）   |
-| `bg-surface`      | `var(--surface)` | 1        | 半透明浮层         |
+| Tailwind class    | 映射到           | 用途               |
+| ----------------- | ---------------- | ------------------ |
+| `bg-background`   | `var(--paper)`   | 页面/卡片/弹窗背景 |
+| `text-foreground` | `var(--ink)`     | 主文本             |
+| `bg-surface`      | `var(--surface)` | 半透明浮层         |
 
 ### Primary
 
-| Tailwind class            | 映射到                   | 引用次数 | 用途            |
-| ------------------------- | ------------------------ | -------- | --------------- |
-| `bg-primary`              | `var(--accent)`          | 25       | 主按钮/强调背景 |
-| `text-primary-foreground` | `var(--accent-contrast)` | 25       | 主按钮上的文字  |
-| `text-primary`            | `var(--accent)`          | —        | 强调文字        |
+| Tailwind class            | 映射到                   | 用途            |
+| ------------------------- | ------------------------ | --------------- |
+| `bg-primary`              | `var(--accent)`          | 主按钮/强调背景 |
+| `text-primary-foreground` | `var(--accent-contrast)` | 主按钮上的文字  |
+| `text-primary`            | `var(--accent)`          | 强调文字        |
 
 ### Secondary / Muted
 
-| Tailwind class              | 映射到              | 引用次数 | 用途                            |
-| --------------------------- | ------------------- | -------- | ------------------------------- |
-| `bg-secondary`              | `var(--warm-gray)`  | 18       | 次要背景（与 --warm-gray 共享） |
-| `text-secondary-foreground` | `var(--ink)`        | —        | 次要背景上的文字                |
-| `bg-muted`                  | `var(--warm-gray)`  | 106      | 静默/hover 高亮背景             |
-| `text-muted-foreground`     | `var(--muted-text)` | 23       | 辅助说明文字                    |
+| Tailwind class              | 映射到              | 用途                            |
+| --------------------------- | ------------------- | ------------------------------- |
+| `bg-secondary`              | `var(--warm-gray)`  | 次要背景                        |
+| `text-secondary-foreground` | `var(--ink)`        | 次要背景上的文字                |
+| `bg-muted`                  | `var(--warm-gray)`  | 静默/hover 高亮背景             |
+| `text-muted-foreground`     | `var(--muted-text)` | 辅助说明文字                    |
 
-> `--warm-gray` 是中性灰 token 的直接来源。`bg-accent`/`text-accent-foreground` 已被清理，统一使用 `bg-muted`/`hover:bg-muted` 表达 hover 高亮。`text-muted-foreground` 桥接到 `var(--muted-text)` 而非 `var(--muted)`；`--muted` 变量在主题文件中**未定义**（见下文附录），但其名下的 `bg-muted` 实际走 `var(--warm-gray)` 通路，功能不受影响。
+> `--warm-gray` 是中性灰 token 的来源。`bg-accent`/`text-accent-foreground` 已清理，统一用 `bg-muted`/`hover:bg-muted` 表达 hover 高亮。
 
 ### Border & Input
 
@@ -90,36 +90,34 @@ Layer 3 (Tailwind class: bg-background / bg-primary / border …)
 
 ### Semantic Status
 
-| Tailwind class     | 映射到                     | 用途      | 备注                    |
-| ------------------ | -------------------------- | --------- | ----------------------- |
-| `bg-destructive`   | `var(--accent-rose)`       | 危险操作  | semantic 色源头，不能删 |
-| `text-destructive` | `var(--accent-rose)`       | 危险文字  | 同上                    |
-| `bg-success`       | `var(--color-emerald-500)` | 成功状态  | 走 Tailwind 默认色板    |
-| `text-success`     | `var(--color-emerald-500)` | 成功文字  | 同上                    |
-| `bg-warning`       | `var(--color-amber-500)`   | 警告/强调 | 走 Tailwind 默认色板    |
-| `text-warning`     | `var(--color-amber-500)`   | 警告文字  | 同上                    |
+| Tailwind class     | 映射到                     | 用途      |
+| ------------------ | -------------------------- | --------- |
+| `bg-destructive`   | `var(--accent-rose)`       | 危险操作  |
+| `text-destructive` | `var(--accent-rose)`       | 危险文字  |
+| `bg-success`       | `var(--color-emerald-500)` | 成功状态（Tailwind 默认色板） |
+| `text-success`     | `var(--color-emerald-500)` | 成功文字  |
+| `bg-warning`       | `var(--color-amber-500)`   | 警告/强调 |
+| `text-warning`     | `var(--color-amber-500)`   | 警告文字  |
 
-> `accent-slate/rose` 是 `ring` / `destructive` 的源，**不能删除**。`accent-sage/amber` 已被清理，改用 Tailwind emerald/amber 色板。
+> `accent-slate/rose` 是 `ring` / `destructive` 的源，**不能删除**。`accent-sage/amber` 已清理，改用 Tailwind emerald/amber 色板。
 
 ### Chart & Gradient
 
-| Tailwind class                  | 映射到                       | 引用次数    | 使用位置                                                                                                   |
-| ------------------------------- | ---------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------- |
-| `bg-chart-1` … `bg-chart-5`     | `--chart-1` … `--chart-5`    | 7 + runtime | `BentoTech.vue`, `ChangelogView.vue`, 以及 `useChartColors` 运行时解析（chart palette 中的 `series` 数组） |
-| `from-gradient-primary-from`    | `--gradient-primary-from`    | 1           | 主题 bridge                                                                                                |
-| `to-gradient-primary-to`        | `--gradient-primary-to`      | 1           | 主题 bridge                                                                                                |
-| `from-gradient-decorative-from` | `--gradient-decorative-from` | 1           | 主题 bridge                                                                                                |
-| `to-gradient-decorative-to`     | `--gradient-decorative-to`   | 1           | 主题 bridge                                                                                                |
+| Tailwind class              | 映射到                    | 使用位置                                                          |
+| --------------------------- | ------------------------- | ----------------------------------------------------------------- |
+| `bg-chart-1` … `bg-chart-5` | `--chart-1` … `--chart-5` | `BentoTech.vue`, `ChangelogView.vue`, `useChartColors` 运行时解析 |
+| `gradient-primary-*`        | `--gradient-primary-*`    | 主题 bridge                                                       |
+| `gradient-decorative-*`     | `--gradient-decorative-*` | 主题 bridge                                                       |
 
 ### Radius
 
-| Token         | 值                          | 引用次数          |
-| ------------- | --------------------------- | ----------------- |
-| `rounded-sm`  | `calc(var(--radius) - 4px)` | —                 |
-| `rounded-md`  | `calc(var(--radius) - 2px)` | —                 |
-| `rounded-lg`  | `var(--radius)` (0.625rem)  | 7（全局圆角基线） |
-| `rounded-xl`  | `calc(var(--radius) + 4px)` | —                 |
-| `rounded-2xl` | `calc(var(--radius) + 8px)` | —                 |
+| Token         | 值                          |
+| ------------- | --------------------------- |
+| `rounded-sm`  | `calc(var(--radius) - 4px)` |
+| `rounded-md`  | `calc(var(--radius) - 2px)` |
+| `rounded-lg`  | `var(--radius)` (0.625rem)  |
+| `rounded-xl`  | `calc(var(--radius) + 4px)` |
+| `rounded-2xl` | `calc(var(--radius) + 8px)` |
 
 ## Consumer Architecture
 
@@ -172,15 +170,12 @@ const chartOption = computed(() => ({
 > 任何同类数据，直接在 `series[0].color` 或顶层 `color` 赋值 `palette.series`，不要硬编码 hex/oklch。
 > 不要从 `localStorage` 读 `data-color-scheme` 自行解析颜色。
 
-### 保留说明
+### 保留说明（看似低用但不可删）
 
-以下变量看似低引用但实际重要：
-
-- **4 个 font-family** — `theme.ts` 通过 `data-font="harmonyos"` 切换；alibaba/dongfang/averia 在 `@theme` 中定义供未来使用
-- **`accent-slate/rose`** — 语义色 `ring/destructive` 的源头，不能删
-- **`chart-1..5`** — 7 处 Tailwind class 引用（`BentoTech.vue`, `ChangelogView.vue`），活跃
-- **`gradient-*-from/to`** — `BentoRecent.vue`, `BentoRecommend.vue`, `ChangelogView.vue` 引用，活跃
-- **`brand-devices`** — 6+ 组件引用，活跃
+- **`accent-slate/rose`** — 语义色 `ring` / `destructive` 的源头
+- **`chart-1..5`** — 图表系列色，Vue 端 `useChartColors` 运行时解析
+- **`gradient-*-from/to`** — `BentoRecent` / `BentoRecommend` / `ChangelogView` 引用
+- **`brand-devices`** — 多组件引用的设备色
 - **`@custom-variant dark`** / **`tw-animate-css`** — Tailwind / Anime 框架依赖
 
 ## Vue vs React 差异

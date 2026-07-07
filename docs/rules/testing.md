@@ -90,12 +90,6 @@ flushRAF(0); // 推进一帧，时间戳 0
 | Store | stores/ (Pinia) | stores/ (Zustand) | `setActivePinia` / `act()` | 🟡 中 |
 | 组件 | components/ | components/ | `@vue/test-utils` / `@testing-library/react` | 🟢 低 |
 
-## 当前测试覆盖
-
-- **Vue frontend**: utils (formatdate, resolveColor), composables (useTypewriter, useAnimateNumber, useGreeting, useOrigin, useSequencedTask, useShimmerTips, useImageError), stores (counter, cardLayout, notification, visitorCount, theme)
-- **React app**: utils (formatdate, visitorId), hooks (useTwikoo, useWebsocket, useSseStream, useShimmerTips, useClickOutside, useOrigin), stores (visitorCountStore, deviceState)
-- **Backend**: core config, services, repositories, schemas, API endpoints
-
 ## 类型检查
 
 - Vue 测试文件纳入 `vue-tsc` 类型检查（`tsconfig.vitest.json` 包含 `src/**/__tests__/*`）

@@ -21,7 +21,7 @@ Vue (`frontend/`) and React (`react-app/`) share backend services but maintain i
 - **Redis 8**: caching (`@redis_cache` decorator), sessions, visitor tracking, distributed locks
 - **RabbitMQ** (Taskiq): async task queue — RSS refresh, email, boot notifications, log persistence
 
-> Gotcha: `DATABASE_URL` uses asyncpg (app runtime), `DB_MIGRATE_URL` uses psycopg (Alembic sync). Using the wrong URL for migrations will fail.
+> Gotcha: `DATABASE_URL` (asyncpg) 应用与迁移均使用；`DB_MIGRATE_URL` 虽定义但 Alembic 实际读 `DATABASE_URL`（`psycopg` 非依赖项）。迁移不要依赖 `DB_MIGRATE_URL`。
 
 ## Backend Layering
 
