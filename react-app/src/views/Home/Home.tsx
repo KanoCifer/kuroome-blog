@@ -33,7 +33,7 @@ export default function Home() {
 
         {/* 时间 */}
         <div
-          className="bento-delay-2 col-span-3 min-w-0"
+          className="bento-delay-2 col-span-6 min-w-0"
           style={{ ['--bento-radius' as string]: '1.75rem' }}
         >
           <BentoClock />

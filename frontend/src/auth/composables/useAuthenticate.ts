@@ -32,12 +32,8 @@ export function useAuthenticate() {
       await auth.login(form.username, form.password);
       const redirect = (route.query.redirect as string) || '/';
       router.push(redirect);
-    } catch (err: unknown) {
-      // 后端返回的 APIResponse 在 request.ts 已转成 Error.message
-      if (err instanceof Error) {
-        // 把简单错误显示在 password 字段上（根据项目需要可更细化）
-        errors.value.password = '用户名或密码错误';
-      }
+    } catch {
+      errors.value.password = '用户名或密码错误';
     } finally {
       isSubmitting.value = false;
     }
@@ -59,10 +55,8 @@ export function useAuthenticate() {
       await auth.loginWithPasskey(assertion);
       const redirect = (route.query.redirect as string) || '/';
       router.push(redirect);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        errors.value.passkey = err.message;
-      }
+    } catch {
+      errors.value.passkey = '登录失败，请稍后重试';
     } finally {
       isPasskeySubmitting.value = false;
     }
