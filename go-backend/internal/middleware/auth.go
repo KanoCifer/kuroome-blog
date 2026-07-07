@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"app/internal/config"
 	"app/pkg/jwt"
 )
 
@@ -35,11 +36,18 @@ func AuthMiddleware() gin.HandlerFunc {
 
 func AdminMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userID, _ := c.Get("user_id")
-		if userID != 1 && userID != 2 {
+		userIDVal, _ := c.Get("user_id")
+		userID, ok := userIDVal.(int)
+		if !ok {
 			c.AbortWithStatusJSON(403, gin.H{"error": "Admin access required"})
 			return
 		}
-		c.Next()
+		for _, id := range config.Cfg.ADMIN_USER_IDS {
+			if userID == id {
+				c.Next()
+				return
+			}
+		}
+		c.AbortWithStatusJSON(403, gin.H{"error": "Admin access required"})
 	}
 }

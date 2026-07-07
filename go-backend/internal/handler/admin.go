@@ -63,6 +63,10 @@ func (h *AdminHandler) UpdatePost(c *gin.Context) {
 			response.APIError(c, err.Error(), 404)
 			return
 		}
+		if errors.Is(err, service.ErrInvalidPostID) {
+			response.APIError(c, err.Error(), 400)
+			return
+		}
 		response.APIError(c, err.Error(), 500)
 		return
 	}
@@ -74,6 +78,10 @@ func (h *AdminHandler) DeletePost(c *gin.Context) {
 	if err := h.adminSvc.DeletePost(postID); err != nil {
 		if errors.Is(err, service.ErrPostNotFound) {
 			response.APIError(c, err.Error(), 404)
+			return
+		}
+		if errors.Is(err, service.ErrInvalidPostID) {
+			response.APIError(c, err.Error(), 400)
 			return
 		}
 		response.APIError(c, err.Error(), 500)

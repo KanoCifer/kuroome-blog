@@ -21,6 +21,7 @@ var (
 	ErrInvalidCredentials = errors.New("用户名或密码错误")
 	ErrUserExists         = errors.New("用户名已存在")
 	ErrEmailExists        = errors.New("邮箱已注册")
+	ErrInvalidEmailCode   = errors.New("验证码无效")
 	ErrUserNotFound       = errors.New("用户不存在")
 	ErrInvalidToken       = errors.New("无效的令牌")
 )
@@ -72,12 +73,18 @@ func (s *UserService) GetByUsername(username string) (*model.User, *model.Profil
 
 // ---------- 注册 ----------
 
-func (s *UserService) CreateUser(username, password, email string) (*model.User, *model.Profile, error) {
+func (s *UserService) CreateUser(username, password, email, emailCode string) (*model.User, *model.Profile, error) {
 	if s.repo.UsernameExists(username) {
 		return nil, nil, ErrUserExists
 	}
 	if email != "" && s.repo.EmailExists(email) {
 		return nil, nil, ErrEmailExists
+	}
+
+	if emailCode != "" {
+		if !s.verifyEmailCode(email, emailCode) {
+			return nil, nil, ErrInvalidEmailCode
+		}
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -221,4 +228,19 @@ func parseUint(s string) (uint, error) {
 // gormModel 快速构造仅带 ID 的 model.User
 func gormModel(id uint) gorm.Model {
 	return gorm.Model{ID: id}
+}
+
+// verifyEmailCode 校验 Redis 中的注册验证码（signup_code:{email}）。
+func (s *UserService) verifyEmailCode(email, code string) bool {
+	if s.redis == nil || email == "" {
+		return false
+	}
+	ctx := context.Background()
+	key := "signup_code:" + email
+	stored, err := s.redis.Get(ctx, key).Result()
+	if err != nil || stored != code {
+		return false
+	}
+	s.redis.Del(ctx, key)
+	return true
 }

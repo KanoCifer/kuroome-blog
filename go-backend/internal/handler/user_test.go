@@ -25,7 +25,7 @@ func init() {
 type mockUserService struct {
 	authenticateFn func(username, password string) (*model.User, error)
 	createTokensFn func(u *model.User) (*service.Tokens, error)
-	createUserFn   func(username, password, email string) (*model.User, *model.Profile, error)
+	createUserFn   func(username, password, email, emailCode string) (*model.User, *model.Profile, error)
 	getByIDFn      func(userID uint) (*model.User, *model.Profile, error)
 	logoutFn       func(userID uint)
 	refreshFn      func(refreshToken string) (*service.Tokens, error)
@@ -43,8 +43,8 @@ func (m *mockUserService) CreateTokens(u *model.User) (*service.Tokens, error) {
 	return &service.Tokens{AccessToken: "access", RefreshToken: "refresh"}, nil
 }
 
-func (m *mockUserService) CreateUser(username, password, email string) (*model.User, *model.Profile, error) {
-	return m.createUserFn(username, password, email)
+func (m *mockUserService) CreateUser(username, password, email, emailCode string) (*model.User, *model.Profile, error) {
+	return m.createUserFn(username, password, email, emailCode)
 }
 
 func (m *mockUserService) GetByID(userID uint) (*model.User, *model.Profile, error) {
@@ -184,7 +184,7 @@ func TestLogin_TokenError(t *testing.T) {
 
 func TestRegister_Success(t *testing.T) {
 	svc := &mockUserService{
-		createUserFn: func(username, password, email string) (*model.User, *model.Profile, error) {
+		createUserFn: func(username, password, email, emailCode string) (*model.User, *model.Profile, error) {
 			return &model.User{Model: gormModel(5), Username: username}, nil, nil
 		},
 	}
@@ -208,7 +208,7 @@ func TestRegister_Success(t *testing.T) {
 
 func TestRegister_UserExists(t *testing.T) {
 	svc := &mockUserService{
-		createUserFn: func(username, password, email string) (*model.User, *model.Profile, error) {
+		createUserFn: func(username, password, email, emailCode string) (*model.User, *model.Profile, error) {
 			return nil, nil, service.ErrUserExists
 		},
 	}
@@ -228,7 +228,7 @@ func TestRegister_UserExists(t *testing.T) {
 
 func TestRegister_EmailExists(t *testing.T) {
 	svc := &mockUserService{
-		createUserFn: func(username, password, email string) (*model.User, *model.Profile, error) {
+		createUserFn: func(username, password, email, emailCode string) (*model.User, *model.Profile, error) {
 			return nil, nil, service.ErrEmailExists
 		},
 	}
@@ -246,9 +246,29 @@ func TestRegister_EmailExists(t *testing.T) {
 	}
 }
 
+func TestRegister_InvalidEmailCode(t *testing.T) {
+	svc := &mockUserService{
+		createUserFn: func(username, password, email, emailCode string) (*model.User, *model.Profile, error) {
+			return nil, nil, service.ErrInvalidEmailCode
+		},
+	}
+	h := NewUserHandler(svc)
+
+	w := doRequest(h.Register, http.MethodPost, "/register", jsonBody(t, dto.RegisterRequest{
+		Username:  "bob",
+		Password:  "secret123",
+		Email:     "bob@example.com",
+		EmailCode: "wrong",
+	}))
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("status = %d, want %d", w.Code, http.StatusBadRequest)
+	}
+}
+
 func TestRegister_InvalidBody(t *testing.T) {
 	svc := &mockUserService{
-		createUserFn: func(username, password, email string) (*model.User, *model.Profile, error) {
+		createUserFn: func(username, password, email, emailCode string) (*model.User, *model.Profile, error) {
 			return &model.User{}, nil, nil
 		},
 	}

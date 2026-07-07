@@ -13,7 +13,7 @@ import (
 type UserService interface {
 	Authenticate(username, password string) (*model.User, error)
 	CreateTokens(u *model.User) (*service.Tokens, error)
-	CreateUser(username, password, email string) (*model.User, *model.Profile, error)
+	CreateUser(username, password, email, emailCode string) (*model.User, *model.Profile, error)
 	GetByID(userID uint) (*model.User, *model.Profile, error)
 	Logout(userID uint)
 	RefreshTokens(refreshToken string) (*service.Tokens, error)
@@ -68,13 +68,15 @@ func (h *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
-	u, _, err := h.userSvc.CreateUser(req.Username, req.Password, req.Email)
+	u, _, err := h.userSvc.CreateUser(req.Username, req.Password, req.Email, req.EmailCode)
 	if err != nil {
 		switch {
 		case errors.Is(err, service.ErrUserExists):
 			response.APIError(c, err.Error(), 409)
 		case errors.Is(err, service.ErrEmailExists):
 			response.APIError(c, err.Error(), 409)
+		case errors.Is(err, service.ErrInvalidEmailCode):
+			response.APIError(c, err.Error(), 400)
 		default:
 			response.APIError(c, "server error", 500)
 		}

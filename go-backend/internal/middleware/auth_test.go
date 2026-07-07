@@ -16,7 +16,7 @@ import (
 
 func init() {
 	gin.SetMode(gin.TestMode)
-	config.Cfg = &config.Config{SECRET_KEY: "test-secret"}
+	config.Cfg = &config.Config{SECRET_KEY: "test-secret", ADMIN_USER_IDS: []int{1, 2}}
 }
 
 // newEngine 创建一个挂载被测中间件的 gin 引擎,*httptest.NewRecorder() 发请求。

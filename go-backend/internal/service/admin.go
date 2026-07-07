@@ -15,7 +15,8 @@ import (
 )
 
 var (
-	ErrPostNotFound = errors.New("blog post not found")
+	ErrPostNotFound  = errors.New("blog post not found")
+	ErrInvalidPostID = errors.New("invalid post id")
 )
 
 type AdminService struct {
@@ -52,6 +53,9 @@ func (s *AdminService) AddPost(post dto.PostIn) (string, error) {
 }
 
 func (s *AdminService) UpdatePost(id string, post dto.PostUpdate) error {
+	if _, err := bson.ObjectIDFromHex(id); err != nil {
+		return ErrInvalidPostID
+	}
 	_, err := s.repo.GetPostByID(context.Background(), id)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -76,6 +80,9 @@ func (s *AdminService) UpdatePost(id string, post dto.PostUpdate) error {
 }
 
 func (s *AdminService) DeletePost(id string) error {
+	if _, err := bson.ObjectIDFromHex(id); err != nil {
+		return ErrInvalidPostID
+	}
 	_, err := s.repo.GetPostByID(context.Background(), id)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
