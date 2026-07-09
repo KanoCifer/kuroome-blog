@@ -11,6 +11,7 @@
 
 from __future__ import annotations
 
+import secrets
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
@@ -42,8 +43,17 @@ oauth2_scheme_optional = OAuth2PasswordBearer(
 
 
 def create_access_token(*, sub: str, expires: timedelta) -> str:
-    """Helper to create an encoded JWT access token."""
-    payload = {"sub": sub, "exp": datetime.now(UTC) + expires}
+    """Helper to create an encoded JWT access token.
+
+    Includes a unique ``jti`` (JWT ID) so that two tokens with the same
+    ``sub``/``exp`` can still be distinguished — required for refresh
+    token rotation to detect reuse.
+    """
+    payload = {
+        "sub": sub,
+        "exp": datetime.now(UTC) + expires,
+        "jti": secrets.token_hex(16),
+    }
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=ALGORITHM)
 
 

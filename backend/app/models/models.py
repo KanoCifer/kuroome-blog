@@ -17,7 +17,7 @@ from sqlalchemy import (
     Text,
 )
 from sqlalchemy.orm import Mapped, MappedColumn, mapped_column, relationship
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import check_password_hash
 
 from app.models import Base
 
@@ -122,10 +122,31 @@ class User(Base):
         return request.client.host if request.client else "127.0.0.1"
 
     # 验证密码
-    def validate_password(self, password):
+    def validate_password(self, password: str) -> bool:
+        """验证密码,兼容 bcrypt 与 werkzeug pbkdf2 两种哈希格式.
+
+        新注册 / 密码修改统一使用 bcrypt(前缀 ``$2b$``);存量用户仍使用
+        werkzeug 默认的 pbkdf2:sha256。通过哈希前缀自动分流。
+        """
         if self.password_hash is None:
             return False
+        # 兼容所有 bcrypt 变体: $2a$(Go / 早期实现) / $2b$(Python 默认) / $2y$
+        if self.password_hash[:3] in ("$2a", "$2b", "$2y") and self.password_hash[3:4] == "$":
+            import bcrypt
+
+            return bcrypt.checkpw(
+                password.encode(), self.password_hash.encode()
+            )
         return check_password_hash(self.password_hash, password)
+
+    def needs_hash_upgrade(self) -> bool:
+        """True 表示当前哈希是旧格式(pbkdf2),登录成功后应静默升级到 bcrypt."""
+        if self.password_hash is None:
+            return False
+        return not (
+            self.password_hash[:3] in ("$2a", "$2b", "$2y")
+            and self.password_hash[3:4] == "$"
+        )
 
     @property
     def is_admin(self) -> bool:
@@ -141,8 +162,12 @@ class User(Base):
 
     @raw_password.setter
     def raw_password(self, raw_password):
-        """设置密码时自动生成哈希值"""
-        self.password_hash = generate_password_hash(raw_password)
+        """设置密码时使用 bcrypt 哈希(与 Go 端对齐)."""
+        import bcrypt
+
+        self.password_hash = bcrypt.hashpw(
+            raw_password.encode(), bcrypt.gensalt()
+        ).decode()
 
 
 # 一对一关系的用户资料模型

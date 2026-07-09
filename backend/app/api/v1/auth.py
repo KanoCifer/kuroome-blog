@@ -15,7 +15,11 @@ from fastapi import (
 from fastapi.responses import JSONResponse, RedirectResponse
 from webauthn.helpers import options_to_json_dict
 
-from app.api.des.auth import get_current_user_full, manager, resolve_user_from_token
+from app.api.des.auth import (
+    get_current_user_full,
+    manager,
+    resolve_user_from_token,
+)
 from app.api.des.des import user_service_dep, user_services_dep
 from app.api.des.limiter import limiter
 from app.api.des.redis import AsyncRedis, get_redis
@@ -25,6 +29,7 @@ from app.core.exceptions import APIError, GitHubAuthError
 from app.core.logger import logger
 from app.core.response import APIResponse, envelope_response
 from app.models.models import User
+from app.plugins.task import send_code
 from app.schemas.auth import (
     EmailSchema,
     PasskeyAuthRequest,
@@ -32,7 +37,6 @@ from app.schemas.auth import (
 )
 from app.schemas.schemas import LoginIn, RegisterIn, UserSettingsIn
 from app.services.user import UserService
-from app.plugins.task import send_code
 
 router = APIRouter(
     prefix="/auth",
@@ -80,6 +84,7 @@ async def refresh_token(
     request: Request,
     refresh_token: str = Cookie(None),
     user_service: UserService = Depends(user_service_dep),
+    redis: AsyncRedis = Depends(get_redis),
 ) -> JSONResponse:
     """使用刷新令牌获取新的访问令牌。刷新令牌可以来自 Cookie 或请求头。
 
@@ -93,7 +98,7 @@ async def refresh_token(
             code=status.HTTP_401_UNAUTHORIZED,
         )
 
-    result = await user_service.refresh_user_token(token)
+    result = await user_service.refresh_user_token(token, redis)
     if result is None:
         raise APIError(
             message="无效的刷新令牌或已过期",
@@ -126,6 +131,7 @@ async def login(
     request: Request,
     data: LoginIn,
     user_service: UserService = Depends(user_service_dep),
+    redis: AsyncRedis = Depends(get_redis),
 ) -> JSONResponse:
     """使用用户名和密码登录，成功后返回访问令牌和刷新令牌。
 
@@ -144,7 +150,7 @@ async def login(
         )
 
     await user_service.record_login(user, request)
-    tokens = user_service.create_tokens(user)
+    tokens = await user_service.create_tokens(user, redis)
     login_data = user_service.build_login_data(user, tokens["refresh_token"])
     return _build_login_response(
         login_data, tokens["access_token"], tokens["refresh_token"]
@@ -155,8 +161,9 @@ async def login(
 async def logout(
     user: User = Depends(get_current_user_full),
     user_service: UserService = Depends(user_service_dep),
+    redis: AsyncRedis = Depends(get_redis),
 ):
-    await user_service.logout(user)
+    await user_service.logout(user, redis)
 
     cookie_domain = settings.COOKIE_DOMAIN
     response = envelope_response(
@@ -445,6 +452,7 @@ async def github_callback(
     code: str,
     state: str,
     user_services: UserServices = Depends(user_services_dep),
+    redis: AsyncRedis = Depends(get_redis),
 ):
     if state != request.session.get("oauth_state"):
         return RedirectResponse(
@@ -505,7 +513,7 @@ async def github_callback(
         user = await user_services.github.handle_github_login_callback(
             github_id, username, email, avatar_url, request
         )
-        tokens = user_services.user.create_tokens(user)
+        tokens = await user_services.user.create_tokens(user, redis)
 
         response = RedirectResponse(url=settings.FRONTEND_URL)
         cookie_domain = settings.COOKIE_DOMAIN

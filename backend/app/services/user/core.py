@@ -33,32 +33,53 @@ class UserService:
     async def authenticate_user(
         self, username: str, password: str
     ) -> User | None:
-        """Validate username and password, return User if valid."""
+        """Validate username and password, return User if valid.
+
+        On success, if the user still uses an old werkzeug pbkdf2 hash,
+        it is silently upgraded to bcrypt (same algorithm as the Go backend).
+        """
         user = await self.repo.get_by_username_with_relations(username)
         if user is None or not user.validate_password(password):
             return None
+        if user.needs_hash_upgrade():
+            await self.repo.set_password(user, password)
         return user
 
     async def record_login(self, user: User, request: Request) -> None:
         """Update last login timestamp and IP address."""
         await self.repo.update_login_info(user, request)
 
-    def create_tokens(self, user: User) -> dict[str, str]:
-        """Generate access (12h) and refresh (7d) tokens."""
+    async def create_tokens(
+        self, user: User, redis: AsyncRedis | None = None
+    ) -> dict[str, str]:
+        """Generate access (1h) and refresh (7d) tokens.
+
+        When *redis* is provided, the refresh token is stored at
+        ``refresh:{user_id}`` so that logout / rotation can invalidate it.
+        Passing ``None`` degrades gracefully (stateless, same as before).
+        """
         access_token = create_access_token(
-            sub=str(user.id), expires=timedelta(hours=12)
+            sub=str(user.id), expires=timedelta(hours=1)
         )
         refresh_token = create_access_token(
             sub=str(user.id), expires=timedelta(days=7)
         )
+        if redis is not None:
+            await redis.set(
+                f"refresh:{user.id}", refresh_token, ex=7 * 24 * 3600
+            )
         return {
             "access_token": access_token,
             "refresh_token": refresh_token,
         }
 
-    async def logout(self, user: User) -> None:
-        """Mark user offline."""
+    async def logout(
+        self, user: User, redis: AsyncRedis | None = None
+    ) -> None:
+        """Mark user offline and invalidate the refresh token."""
         await self.repo.set_active_by_id(user.id, False)
+        if redis is not None:
+            await redis.delete(f"refresh:{user.id}")
 
     # ------------------------------------------------------------------ #
     # User info
@@ -221,13 +242,17 @@ class UserService:
         return data
 
     async def refresh_user_token(
-        self, token: str
+        self, token: str, redis: AsyncRedis | None = None
     ) -> tuple[User, dict[str, str]] | None:
         """Validate a refresh token and issue a new token pair.
 
-        Returns (user, tokens_dict) on success, None if the token is invalid
-        or expired. Follows the same None-on-failure convention as
-        authenticate_user().
+        When *redis* is provided, checks the presented token against the
+        stored whitelist (if any) and rotates: the old entry is replaced
+        by the new refresh token.  Without *redis* the check is skipped
+        (stateless, backward-compatible).
+
+        Returns (user, tokens_dict) on success, None if the token is
+        invalid, expired, or fails the whitelist check.
         """
         try:
             user = await resolve_user_from_token(token)
@@ -235,5 +260,18 @@ class UserService:
             return None
         if user is None:
             return None
-        tokens = self.create_tokens(user)
+        if redis is not None:
+            from app.core.config import settings as _settings
+
+            stored = await redis.get(f"refresh:{user.id}")
+            if _settings.ENFORCE_REDIS_REFRESH:
+                # 严格模式: 无白名单或 token 不匹配均拒绝
+                if stored is None or stored != token:
+                    return None
+            else:
+                # 兼容模式: 仅在有白名单且 token 不匹配时拒绝
+                # (白名单不存在 = 旧 token / 非 Redis 签发的 token,放行)
+                if stored is not None and stored != token:
+                    return None
+        tokens = await self.create_tokens(user, redis)
         return user, tokens

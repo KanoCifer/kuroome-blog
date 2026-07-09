@@ -42,7 +42,7 @@ class PasskeyService:
             raise ValueError("用户已注册 Passkey")
 
         options: PublicKeyCredentialCreationOptions = (
-            generate_passkey_registration_options(str(user.id))
+            generate_passkey_registration_options(user.username)
         )
 
         challenge: str = base64url_encode(options.challenge)
@@ -190,7 +190,7 @@ class PasskeyService:
         if error or user is None:
             return None, None, error or "认证失败"
 
-        tokens = self.user_service.create_tokens(user)
+        tokens = await self.user_service.create_tokens(user, redis)
         return user, tokens, None
 
     async def complete_passkey_registration(

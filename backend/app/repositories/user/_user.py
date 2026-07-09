@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
+import bcrypt
 from fastapi import Request
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from werkzeug.security import generate_password_hash
 
 from app.core import logger
 from app.models.models import User
@@ -186,12 +186,14 @@ class UserMixin:
 
     async def set_password(self, user: User, password: str) -> None:
         """
-        更新用户密码（会生成哈希）。
+        更新用户密码（bcrypt 哈希）。
 
         :param user: 用户对象
         :param password: 明文密码
         """
-        user.password_hash = generate_password_hash(password)
+        user.password_hash = bcrypt.hashpw(
+            password.encode(), bcrypt.gensalt()
+        ).decode()
         await self.session.flush()
 
     async def set_name(self, user: User, name: str) -> None:
@@ -242,17 +244,18 @@ class UserMixin:
 
     async def set_password_by_id(self, user_id: int, password: str) -> None:
         """
-        根据用户 ID 更新密码（直接执行 UPDATE 语句）。
+        根据用户 ID 更新密码（bcrypt 哈希,直接执行 UPDATE 语句）。
 
         用于处理 detached 的 user 对象场景。
 
         :param user_id: 用户 ID
-        :param password: 明文密码（会自动哈希）
+        :param password: 明文密码
         """
+        hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
         stmt = (
             update(User)
             .where(User.id == user_id)
-            .values(password_hash=generate_password_hash(password))
+            .values(password_hash=hashed)
         )
         await self.session.execute(stmt)
         await self.session.flush()

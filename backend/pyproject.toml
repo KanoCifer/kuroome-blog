@@ -65,7 +65,12 @@ asyncio_default_fixture_loop_scope = "session"
 asyncio_default_test_loop_scope = "session"
 
 [dependency-groups]
-dev = ["pytest>=9.0.2", "watchdog>=6.0.0"]
+dev = [
+    "fakeredis>=2.36.2",
+    "pytest>=9.0.2",
+    "pytest-mock>=3.15.1",
+    "watchdog>=6.0.0",
+]
 
 
 [tool.uv]

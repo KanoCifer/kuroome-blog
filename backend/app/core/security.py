@@ -49,14 +49,14 @@ def generate_pkce_pair() -> tuple[str, str]:
 
 
 def generate_passkey_registration_options(
-    user_id: str,
+    username: str,
 ) -> PublicKeyCredentialCreationOptions:
     """生成 Passkey 注册选项"""
     options: PublicKeyCredentialCreationOptions = (
         generate_registration_options(
             rp_name="Kuroome's Blog",
             rp_id=settings.WEBAUTHN_RP_ID,
-            user_name=user_id,
+            user_name=username,
         )
     )
     return options

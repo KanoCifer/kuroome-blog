@@ -53,6 +53,10 @@ class Settings(BaseSettings):
     QWEATHER_BASE_URL: str = ""
     ENABLE_TRACKING: bool = True
     ADMIN_USER_IDS: list[int] = [1, 2]
+    # Refresh token 强制 Redis 校验开关。开启后,refresh 必须在 Redis 中有对应
+    # 白名单条目,否则拒绝。关闭时保持向后兼容(无条目即放行,不检查)。
+    # 建议:部署稳定后置 True。
+    ENFORCE_REDIS_REFRESH: bool = False
     SAVE_LOGS: bool = True
     # 终端/文件日志级别（规约见 docs/rules/logging.md）
     LOG_LEVEL: str = "INFO"
