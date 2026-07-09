@@ -75,11 +75,15 @@ NEW_HEAD=$(git rev-parse HEAD)
 ok "Git pull completed"
 
 BACKEND_CHANGED=false
+GO_BACKEND_CHANGED=false
 FRONTEND_CHANGED=false
 REACT_APP_CHANGED=false
 if [ "$OLD_HEAD" != "$NEW_HEAD" ]; then
   if [ -n "$(git diff --name-only "$OLD_HEAD" "$NEW_HEAD" -- backend/)" ]; then
     BACKEND_CHANGED=true
+  fi
+  if [ -n "$(git diff --name-only "$OLD_HEAD" "$NEW_HEAD" -- go-backend/)" ]; then
+    GO_BACKEND_CHANGED=true
   fi
   if [ -n "$(git diff --name-only "$OLD_HEAD" "$NEW_HEAD" -- frontend/)" ]; then
     FRONTEND_CHANGED=true
@@ -101,6 +105,15 @@ if [ "$BACKEND_CHANGED" = true ]; then
   ok "Migrations applied"
 else
   warn "No backend changes detected — skipping deps sync and migrations"
+fi
+
+if [ "$GO_BACKEND_CHANGED" = true ]; then
+  step "Building Go backend"
+  cd /home/kano/blog/go-backend || exit 1
+  go build -o /home/kano/blog/go-backend/server ./cmd/server
+  ok "Go binary built at /home/kano/blog/go-backend/server"
+else
+  warn "No Go backend changes detected — skipping build"
 fi
 
 if [ "$FRONTEND_CHANGED" = false ] && [ "$REACT_APP_CHANGED" = false ]; then
@@ -141,9 +154,10 @@ else
 fi
 
 step "Restarting services"
-if [ "$BACKEND_CHANGED" = true ]; then
+if [ "$BACKEND_CHANGED" = true ] || [ "$GO_BACKEND_CHANGED" = true ]; then
   sudo supervisorctl reload || true
   sudo supervisorctl update || true
+  /usr/bin/systemctl --user restart gobackend
   ok "Services restarted"
 else
   warn "No backend changes — skipping service restart"
