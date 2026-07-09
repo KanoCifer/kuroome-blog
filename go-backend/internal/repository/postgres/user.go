@@ -57,6 +57,30 @@ func (r *UserRepo) GetByEmail(email string) (*model.User, *model.Profile, error)
 	return u, &p, nil
 }
 
+func (r *UserRepo) GetByGithubID(githubID int) (*model.User, error) {
+	var u model.User
+	err := r.db.Preload("Profile").Where("github_id = ?", githubID).First(&u).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &u, nil
+}
+
+func (r *UserRepo) SetGithubID(userID uint, githubID int) error {
+	return r.db.Model(&model.User{}).
+		Where("id = ?", userID).
+		Update("github_id", githubID).Error
+}
+
+func (r *UserRepo) ClearGithubID(userID uint) error {
+	return r.db.Model(&model.User{}).
+		Where("id = ?", userID).
+		Update("github_id", nil).Error
+}
+
 func (r *UserRepo) UsernameExists(username string) bool {
 	var count int64
 	r.db.Model(&model.User{}).Where("username = ?", username).Count(&count)

@@ -56,6 +56,9 @@ func main() {
 	passkeyHandler := handler.NewPasskeyHandler(state.PasskeySvc(), state.UserSvc())
 	passkeyHandler.RegisterRoutes(v3, middleware.AuthMiddleware())
 
+	githubHandler := handler.NewGitHubHandler(state.GitHubOAuth())
+	githubHandler.RegisterRoutes(v3, middleware.AuthMiddleware())
+
 	addr := fmt.Sprintf("127.0.0.1:%d", config.Cfg.Port)
 	r.Run(addr)
 }

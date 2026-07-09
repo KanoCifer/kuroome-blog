@@ -18,4 +18,9 @@ var (
 	ErrPasskeyExists      = errors.New("您的账户已经绑定了Passkey")
 	ErrPasskeyNotFound    = errors.New("Passkey 凭证不存在")
 	ErrInvalidPasskey     = errors.New("无效的 Passkey 认证响应")
+
+	// GitHub OAuth 错误
+	ErrGitHubNotConfigured = errors.New("GitHub OAuth 未配置")
+	ErrInvalidOAuthState   = errors.New("state 无效或已过期")
+	ErrGitHubAlreadyBound  = errors.New("该 GitHub 账户已被绑定")
 )

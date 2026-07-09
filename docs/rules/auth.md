@@ -171,14 +171,12 @@ Go 与 Python 使用同一 bcrypt 算法家族:
 | Passkey 登录选项 | `GET /passkey/authentication-options` | `GET /passkey/authentication-options` | 公开 |
 | Passkey 登录完成 | `POST /passkey/authenticate` | `POST /passkey/authenticate` | 公开 |
 | Passkey 删除 | `DELETE /passkey/delete` | `DELETE /passkey/delete` | Auth |
-| GitHub 登录 | `GET /github` | 🔲 未实现 | 公开(session) |
-| GitHub 绑定 | `GET /github/bind` | 🔲 未实现 | Auth |
-| GitHub 回调 | `GET /github/callback` | 🔲 未实现 | 公开(session) |
-| GitHub 解绑 | `POST /github/unbind` | 🔲 未实现 | Auth |
+| GitHub 登录 | `GET /github` | `GET /auth/github` | 公开 |
+| GitHub 绑定 | `GET /github/bind` | `GET /github/bind` | Auth |
+| GitHub 回调 | `GET /github/callback` | `GET /auth/github/callback` | 公开 |
+| GitHub 解绑 | `POST /github/unbind` | `POST /github/unbind` | Auth |
 | 邮箱验证码 | `POST /email/code` | — | 公开 |
 
 ## 9. 变更日志
 
-| 日期 | 变更 |
-|---|---|
-| 2026-07-09 | 初版。Python 引入 Redis refresh 白名单(access TTL 12h→1h);JWT 新增 `jti` claim;Go 修复 Admin 路由缺少 Auth 中间件;password hash 统一 bcrypt(存量兼容 pbkdf2)。 |
+| 2026-07-09 | Go 端实现 GitHub OAuth 授权码登录 / 绑定 / 解绑(Redis state, 自动建用户, refresh cookie + access_token 重定向回前端)。 |
