@@ -18,7 +18,7 @@ func NewUserRepo(db *gorm.DB) *UserRepo {
 
 func (r *UserRepo) GetByID(id uint) (*model.User, error) {
 	var u model.User
-	err := r.db.Preload("Profile").First(&u, id).Error
+	err := r.db.Preload("Profile").Preload("PasskeyCredential").First(&u, id).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil
 	}
@@ -31,7 +31,7 @@ func (r *UserRepo) GetByID(id uint) (*model.User, error) {
 
 func (r *UserRepo) GetByUsername(username string) (*model.User, error) {
 	var u model.User
-	err := r.db.Preload("Profile").Where("username = ?", username).First(&u).Error
+	err := r.db.Preload("Profile").Preload("PasskeyCredential").Where("username = ?", username).First(&u).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil
 	}

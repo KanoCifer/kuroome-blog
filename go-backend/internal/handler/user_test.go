@@ -65,7 +65,7 @@ func (m *mockUserService) UserToDict(u *model.User, p *model.Profile) map[string
 	if m.userToDictFn != nil {
 		return m.userToDictFn(u, p)
 	}
-	return map[string]any{"id": u.ID, "username": u.Username}
+	return map[string]any{"id": u.ID, "username": u.Username, "has_passkey": u.PasskeyCredential != nil}
 }
 
 // ---------- helpers ----------
@@ -294,7 +294,7 @@ func TestMe_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 	c.Request, _ = http.NewRequest(http.MethodGet, "/me", nil)
-	c.Set("user_id", uint(7))
+	c.Set("user_id", 7)
 	h.Me(c)
 
 	if w.Code != http.StatusOK {
@@ -313,7 +313,7 @@ func TestMe_UserNotFound(t *testing.T) {
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 	c.Request, _ = http.NewRequest(http.MethodGet, "/me", nil)
-	c.Set("user_id", uint(99))
+	c.Set("user_id", 99)
 	h.Me(c)
 
 	if w.Code != http.StatusNotFound {
@@ -333,7 +333,7 @@ func TestLogout_CallsService(t *testing.T) {
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 	c.Request, _ = http.NewRequest(http.MethodPost, "/logout", nil)
-	c.Set("user_id", uint(42))
+	c.Set("user_id", 42)
 	h.Logout(c)
 
 	if w.Code != http.StatusOK {

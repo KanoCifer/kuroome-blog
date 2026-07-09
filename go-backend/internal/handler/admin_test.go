@@ -50,7 +50,9 @@ func newAdminHandler(svc AdminService) (*AdminHandler, *gin.Engine) {
 	h := NewAdminHandler(svc)
 	r := gin.New()
 	g := r.Group("/api/v3")
-	h.RegisterRoutes(g, func(c *gin.Context) { c.Next() })
+	noopAuth := func(c *gin.Context) { c.Set("user_id", 1); c.Next() }
+	noopAdmin := func(c *gin.Context) { c.Next() }
+	h.RegisterRoutes(g, noopAuth, noopAdmin)
 	return h, r
 }
 

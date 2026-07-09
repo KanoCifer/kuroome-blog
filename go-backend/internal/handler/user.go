@@ -89,9 +89,13 @@ func (h *UserHandler) Register(c *gin.Context) {
 
 func (h *UserHandler) Me(c *gin.Context) {
 	// "/me"
-	userID, _ := c.Get("user_id")
+	_, ok := c.Get("user_id")
+	if !ok {
+		response.APIError(c, "未授权", 401)
+		return
+	}
 
-	u, p, err := h.userSvc.GetByID(userID.(uint))
+	u, p, err := h.userSvc.GetByID(uint(c.GetInt("user_id")))
 	if err != nil {
 		if errors.Is(err, errs.ErrUserNotFound) {
 			response.APIError(c, "用户不存在", 404)
@@ -105,8 +109,13 @@ func (h *UserHandler) Me(c *gin.Context) {
 }
 
 func (h *UserHandler) Logout(c *gin.Context) {
-	userID, _ := c.Get("user_id")
-	h.userSvc.Logout(userID.(uint))
+	_, ok := c.Get("user_id")
+	if !ok {
+		response.APIError(c, "未授权", 401)
+		return
+	}
+
+	h.userSvc.Logout(uint(c.GetInt("user_id")))
 	response.Success(c, nil, "已退出登录")
 }
 

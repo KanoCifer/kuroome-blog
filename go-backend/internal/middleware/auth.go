@@ -17,7 +17,12 @@ func AuthMiddleware() gin.HandlerFunc {
 			c.AbortWithStatusJSON(401, gin.H{"error": "Authorization header is required"})
 			return
 		}
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+		const bearerPrefix = "Bearer "
+		if !strings.HasPrefix(authHeader, bearerPrefix) {
+			c.AbortWithStatusJSON(401, gin.H{"error": "Authorization header must start with 'Bearer '"})
+			return
+		}
+		tokenString := strings.TrimPrefix(authHeader, bearerPrefix)
 		claims, err := jwt.ParseToken(tokenString)
 		if err != nil {
 			c.AbortWithStatusJSON(401, gin.H{"error": "Invalid token"})

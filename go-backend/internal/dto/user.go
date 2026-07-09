@@ -42,3 +42,13 @@ func ToUserResponse(id uint, username string, isAdmin bool) UserResponse {
 		IsAdmin:  isAdmin,
 	}
 }
+
+// PasskeyRegistrationRequest Passkey 注册请求（response 为浏览器返回的 PublicKeyCredential）。
+type PasskeyRegistrationRequest struct {
+	Response map[string]any `json:"response"`
+}
+
+// PasskeyAuthRequest Passkey 认证请求（assertion 为浏览器返回的 AuthenticatorAssertionResponse）。
+type PasskeyAuthRequest struct {
+	Assertion map[string]any `json:"assertion"`
+}

@@ -18,7 +18,8 @@ type User struct {
 	CurrentLoginIP *string
 	LoginCount     int  `gorm:"default:0"`
 	Active         bool `gorm:"default:false"`
-	Profile        *Profile
+	Profile           *Profile
+	PasskeyCredential *PasskeyCredential `gorm:"foreignKey:UserID"`
 }
 
 func (User) TableName() string { return "user" }

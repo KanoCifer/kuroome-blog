@@ -8,25 +8,29 @@ import (
 )
 
 type AppState struct {
-	config   *config.Config
-	userSvc  *service.UserService
-	adminSvc *service.AdminService
+	config     *config.Config
+	userSvc    *service.UserService
+	adminSvc   *service.AdminService
+	passkeySvc *service.PasskeyService
 }
 
 // NewAppState 组装所有 service，作为唯一的组合根入口。
 func NewAppState(
-	config *config.Config,
+	cfg *config.Config,
 	userRepo *postgres.UserRepo,
 	adminRepo *postgres.AdminRepo,
 	redis *redis.Client,
+	passkeySvc *service.PasskeyService,
 ) *AppState {
 	return &AppState{
-		config:   config,
-		userSvc:  service.NewUserService(userRepo, redis),
-		adminSvc: service.NewAdminService(adminRepo, redis),
+		config:     cfg,
+		userSvc:    service.NewUserService(userRepo, redis),
+		adminSvc:   service.NewAdminService(adminRepo, redis),
+		passkeySvc: passkeySvc,
 	}
 }
 
-func (a *AppState) UserSvc() *service.UserService   { return a.userSvc }
-func (a *AppState) AdminSvc() *service.AdminService { return a.adminSvc }
-func (a *AppState) Cfg() *config.Config             { return a.config }
+func (a *AppState) UserSvc() *service.UserService       { return a.userSvc }
+func (a *AppState) AdminSvc() *service.AdminService     { return a.adminSvc }
+func (a *AppState) PasskeySvc() *service.PasskeyService { return a.passkeySvc }
+func (a *AppState) Cfg() *config.Config                 { return a.config }

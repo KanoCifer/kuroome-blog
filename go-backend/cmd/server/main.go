@@ -12,6 +12,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/handler"
 	"github.com/KanoCifer/kuroome-blog/internal/middleware"
 	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
+	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
 func init() {
@@ -36,14 +37,24 @@ func main() {
 
 	userRepo := postgres.NewUserRepo(db.GetDB())
 	adminRepo := postgres.NewAdminRepo(db.GetMongo())
+	passkeyRepo := postgres.NewPasskeyRepo(db.GetDB())
 
-	state := app.NewAppState(config.Cfg, userRepo, adminRepo, db.GetRedis())
+	wa, err := service.NewWebAuthn()
+	if err != nil {
+		log.Fatal(err)
+	}
+	passkeySvc := service.NewPasskeyService(wa, db.GetRedis(), passkeyRepo, userRepo)
+
+	state := app.NewAppState(config.Cfg, userRepo, adminRepo, db.GetRedis(), passkeySvc)
 
 	userHandler := handler.NewUserHandler(state.UserSvc())
 	userHandler.RegisterRoutes(v3, middleware.AuthMiddleware())
 
 	adminHandler := handler.NewAdminHandler(state.AdminSvc())
-	adminHandler.RegisterRoutes(v3, middleware.AdminMiddleware())
+	adminHandler.RegisterRoutes(v3, middleware.AuthMiddleware(), middleware.AdminMiddleware())
+
+	passkeyHandler := handler.NewPasskeyHandler(state.PasskeySvc(), state.UserSvc())
+	passkeyHandler.RegisterRoutes(v3, middleware.AuthMiddleware())
 
 	addr := fmt.Sprintf("127.0.0.1:%d", config.Cfg.Port)
 	r.Run(addr)

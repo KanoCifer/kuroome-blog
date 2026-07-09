@@ -180,10 +180,10 @@ func runDeployment() {
 	log.Printf("Deployment completed successfully:\n%s", string(output))
 }
 
-func (h *AdminHandler) RegisterRoutes(r *gin.RouterGroup, middleware gin.HandlerFunc) {
-	r.POST("/post/add", middleware, h.AddPost)
-	r.PUT("/post/update", middleware, h.UpdatePost)
-	r.DELETE("/post/:post_id/delete", middleware, h.DeletePost)
+func (h *AdminHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFunc, adminMW gin.HandlerFunc) {
+	r.POST("/post/add", authMW, adminMW, h.AddPost)
+	r.PUT("/post/update", authMW, adminMW, h.UpdatePost)
+	r.DELETE("/post/:post_id/delete", authMW, adminMW, h.DeletePost)
 	r.POST("/track", h.TrackVisitor)
 	r.POST("/deploy", h.WebhookDeploy)
 }

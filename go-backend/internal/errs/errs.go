@@ -13,4 +13,9 @@ var (
 	ErrInvalidToken       = errors.New("无效的令牌")
 	ErrPostNotFound       = errors.New("blog post not found")
 	ErrInvalidPostID      = errors.New("invalid post id")
+
+	// Passkey / WebAuthn 错误
+	ErrPasskeyExists      = errors.New("您的账户已经绑定了Passkey")
+	ErrPasskeyNotFound    = errors.New("Passkey 凭证不存在")
+	ErrInvalidPasskey     = errors.New("无效的 Passkey 认证响应")
 )
