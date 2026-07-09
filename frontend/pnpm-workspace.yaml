@@ -5,5 +5,7 @@ allowBuilds:
   maplibre-gl: true
   msw: true
   vue-demi: true
+minimumReleaseAgeExclude:
+  - vite@8.1.4
 overrides:
   lottie-web: 5.13.0

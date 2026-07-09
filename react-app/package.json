@@ -18,7 +18,7 @@
     "@amap/amap-jsapi-loader": "^1.0.1",
     "@fortawesome/fontawesome-svg-core": "^7.3.0",
     "@fortawesome/free-solid-svg-icons": "^7.3.0",
-    "@fortawesome/react-fontawesome": "^3.3.1",
+    "@fortawesome/react-fontawesome": "^3.4.0",
     "@simplewebauthn/browser": "^13.3.0",
     "@tabler/icons-react": "^3.44.0",
     "@tailwindcss/typography": "^0.5.20",
@@ -40,7 +40,7 @@
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.1",
     "tailwindcss": "^4.3.2",
-    "twikoo": "^1.7.13",
+    "twikoo": "^1.7.14",
     "ua-parser-js": "^2.0.10",
     "uuid": "^13.0.2",
     "zustand": "^5.0.14"
@@ -49,18 +49,18 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/amap-js-api": "^1.4.16",
-    "@types/node": "^26.1.0",
+    "@types/node": "^26.1.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
-    "daisyui": "^5.6.7",
+    "daisyui": "^5.6.15",
     "happy-dom": "^20.10.6",
-    "oxlint": "^1.72.0",
+    "oxlint": "^1.73.0",
     "prettier": "^3.9.4",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "sass": "^1.101.0",
-    "typescript": "7.0.1-rc",
-    "vite": "^8.1.3",
-    "vitest": "^4.1.9"
+    "typescript": "^7.0.2",
+    "vite": "^8.1.4",
+    "vitest": "^4.1.10"
   }
 }
