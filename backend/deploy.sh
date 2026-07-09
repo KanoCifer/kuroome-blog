@@ -110,7 +110,8 @@ fi
 if [ "$GO_BACKEND_CHANGED" = true ]; then
   step "Building Go backend"
   cd /home/kano/blog/go-backend || exit 1
-  go build -o /home/kano/blog/go-backend/server ./cmd/server
+  /usr/bin/go mod tidy
+  /usr/bin/go build -o /home/kano/blog/go-backend/server ./cmd/server
   ok "Go binary built at /home/kano/blog/go-backend/server"
 else
   warn "No Go backend changes detected — skipping build"

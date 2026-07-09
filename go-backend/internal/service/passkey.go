@@ -109,7 +109,10 @@ func (s *PasskeyService) BeginRegistration(userID uint) (map[string]any, error) 
 
 	s.storeRegistrationSession(userID, session)
 
-	raw, _ := json.Marshal(creation)
+	// 序列化 creation.Response 而非 creation：go-webauthn 的 CredentialCreation 会
+	// 多包一层 {"publicKey": {...}}，而前端 @simplewebauthn/browser 的
+	// startRegistration 需要的是内层未拆封的 PublicKeyCredentialCreationOptionsJSON。
+	raw, _ := json.Marshal(creation.Response)
 	var m map[string]any
 	_ = json.Unmarshal(raw, &m)
 	return m, nil
@@ -164,7 +167,9 @@ func (s *PasskeyService) BeginLogin() (map[string]any, error) {
 
 	s.storeAuthenticationSession(session.Challenge, session)
 
-	raw, _ := json.Marshal(assertion)
+	// 同 BeginRegistration：CredentialAssertion 会多包一层 {"publicKey": {...}}，
+	// 前端 startAuthentication 需要的是内层未拆封的 PublicKeyCredentialRequestOptionsJSON。
+	raw, _ := json.Marshal(assertion.Response)
 	var m map[string]any
 	_ = json.Unmarshal(raw, &m)
 	return m, nil
