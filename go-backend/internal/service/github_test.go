@@ -9,8 +9,8 @@ import (
 
 func TestAuthURL_ContainsRequiredParams(t *testing.T) {
 	config.Cfg = &config.Config{
-		GITHUB_CLIENT_ID:     "test-client-id",
-		GITHUB_REDIRECT_URI:  "http://localhost:5555/api/v3/auth/github/callback",
+		GITHUB_CLIENT_ID:    "test-client-id",
+		GITHUB_REDIRECT_URI: "http://localhost:5555/api/v3/auth/github/callback",
 	}
 
 	svc := NewGitHubOAuth(nil, nil, nil) // redis/repo not needed for URL gen

@@ -79,7 +79,7 @@ describe('blogGateway (tags migration)', () => {
       });
 
       expect(request.post).toHaveBeenCalledWith(
-        'v1/admin/post/add',
+        'v3/post/add',
         expect.objectContaining({
           title: 'Hello',
           body: 'World',
@@ -111,7 +111,7 @@ describe('blogGateway (tags migration)', () => {
       });
 
       expect(request.put).toHaveBeenCalledWith(
-        'v1/admin/post/update',
+        'v3/post/update',
         expect.objectContaining({
           _id: 'existing',
           tags: ['new-tag'],

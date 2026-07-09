@@ -181,14 +181,14 @@ func (s *UserService) IsAdmin(u *model.User) bool {
 
 func (s *UserService) UserToDict(u *model.User, p *model.Profile) map[string]any {
 	d := map[string]any{
-		"id":            u.ID,
-		"username":      u.Username,
-		"name":          u.Name,
-		"is_admin":      s.IsAdmin(u),
-		"login_count":   u.LoginCount,
-		"active":        u.Active,
-		"has_passkey":   u.PasskeyCredential != nil,
-		"github_bound":  u.GithubID != nil,
+		"id":           u.ID,
+		"username":     u.Username,
+		"name":         u.Name,
+		"is_admin":     s.IsAdmin(u),
+		"login_count":  u.LoginCount,
+		"active":       u.Active,
+		"has_passkey":  u.PasskeyCredential != nil,
+		"github_bound": u.GithubID != nil,
 	}
 	if u.GithubID != nil {
 		d["github_id"] = *u.GithubID

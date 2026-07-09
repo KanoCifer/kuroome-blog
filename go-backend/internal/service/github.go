@@ -56,9 +56,9 @@ const (
 
 // ghUser 是 GitHub /user API 的响应字段子集。
 type ghUser struct {
-	ID    int    `json:"id"`
-	Login string `json:"login"`
-	Email string `json:"email"`
+	ID        int    `json:"id"`
+	Login     string `json:"login"`
+	Email     string `json:"email"`
 	AvatarURL string `json:"avatar_url"`
 }
 
@@ -105,7 +105,9 @@ func (g *GitHubOAuth) AuthURL(mode string, userID uint) (string, error) {
 // HandleCallback 处理 GitHub 回调。
 //
 // login 模式(userID=0): 按 github_id 找用户, 找到返回 (user, tokens, nil);
-//   找不到则自动创建用户后返回 (user, tokens, nil)。
+//
+//	找不到则自动创建用户后返回 (user, tokens, nil)。
+//
 // bind 模式(userID>0): 把 github_id 绑到该用户, 返回 (user, nil, nil)。
 //
 // 出错时返回 (nil, nil, err)。

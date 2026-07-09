@@ -4,7 +4,7 @@ import "time"
 
 type DevTask struct {
 	ID          string     `bson:"_id,omitempty"`
-	UserID     int        `bson:"user_id"`
+	UserID      int        `bson:"user_id"`
 	Title       string     `bson:"title"`
 	Description *string    `bson:"description"`
 	Priority    string     `bson:"priority"`

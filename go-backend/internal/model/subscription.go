@@ -52,17 +52,17 @@ func (ss *SubscriptionStatus) Scan(value any) error {
 }
 
 type Subscription struct {
-	ID               uint               `gorm:"primaryKey;autoIncrement"`
-	Name             string             `gorm:"size:100;not null"`
-	Provider         string             `gorm:"size:100;not null"`
-	Price            float64            `gorm:"not null"`
-	Currency         string             `gorm:"size:10;not null"`
-	BillingCycle     BillingCycle       `gorm:"type:billing_cycle_enum;not null"`
-	NextBillingDate  time.Time          `gorm:"not null"`
-	Status           SubscriptionStatus `gorm:"type:subscription_status_enum;not null"`
-	ReminderConfig   *datatypes.JSON
-	Notes            *string   `gorm:"type:text"`
-	CreatedAt        time.Time `gorm:"index;default:current_timestamp"`
-	UpdatedAt        time.Time
-	UserID           uint `gorm:"index"`
+	ID              uint               `gorm:"primaryKey;autoIncrement"`
+	Name            string             `gorm:"size:100;not null"`
+	Provider        string             `gorm:"size:100;not null"`
+	Price           float64            `gorm:"not null"`
+	Currency        string             `gorm:"size:10;not null"`
+	BillingCycle    BillingCycle       `gorm:"type:billing_cycle_enum;not null"`
+	NextBillingDate time.Time          `gorm:"not null"`
+	Status          SubscriptionStatus `gorm:"type:subscription_status_enum;not null"`
+	ReminderConfig  *datatypes.JSON
+	Notes           *string   `gorm:"type:text"`
+	CreatedAt       time.Time `gorm:"index;default:current_timestamp"`
+	UpdatedAt       time.Time
+	UserID          uint `gorm:"index"`
 }

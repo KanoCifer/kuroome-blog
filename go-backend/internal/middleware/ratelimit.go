@@ -18,11 +18,11 @@ import (
 // key 策略: rl:{scope}:{identifier}, 其中 identifier 通常是客户端 IP。
 // 窗口内累计请求数 → 超限返回 429 + Retry-After。
 type RateLimiter struct {
-	redis    *redis.Client
-	scope    string           // 限流维度名, 如 "login", "register"
-	limit    int              // 窗口内最大请求数
-	window   time.Duration    // 窗口大小
-	keyFunc  func(*gin.Context) string // 自定义 key 生成, 默认 ClientIP
+	redis   *redis.Client
+	scope   string                    // 限流维度名, 如 "login", "register"
+	limit   int                       // 窗口内最大请求数
+	window  time.Duration             // 窗口大小
+	keyFunc func(*gin.Context) string // 自定义 key 生成, 默认 ClientIP
 }
 
 // RateOption 用于 NewRateLimiter 的函数选项。

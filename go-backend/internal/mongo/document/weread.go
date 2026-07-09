@@ -11,31 +11,31 @@ type WereadUser struct {
 }
 
 type WereadBook struct {
-	ID           string    `bson:"_id,omitempty"`
-	Title        string    `bson:"title"`
-	Author       string    `bson:"author"`
-	Translator   *string   `bson:"translator"`
-	Cover        *string   `bson:"cover"`
-	Introduction *string   `bson:"introduction"`
-	Category     *string   `bson:"category"`
-	Publisher    *string   `bson:"publisher"`
-	PublishTime  *string   `bson:"publishTime"`
-	ISBN         *string   `bson:"isbn"`
-	WordCount    *int      `bson:"wordCount"`
-	NewRating    *float64  `bson:"newRating"`
-	NewRatingCount *int    `bson:"newRatingCount"`
+	ID               string         `bson:"_id,omitempty"`
+	Title            string         `bson:"title"`
+	Author           string         `bson:"author"`
+	Translator       *string        `bson:"translator"`
+	Cover            *string        `bson:"cover"`
+	Introduction     *string        `bson:"introduction"`
+	Category         *string        `bson:"category"`
+	Publisher        *string        `bson:"publisher"`
+	PublishTime      *string        `bson:"publishTime"`
+	ISBN             *string        `bson:"isbn"`
+	WordCount        *int           `bson:"wordCount"`
+	NewRating        *float64       `bson:"newRating"`
+	NewRatingCount   *int           `bson:"newRatingCount"`
 	NewRatingDetails map[string]any `bson:"newRatingDetails"`
-	FetchedAt    time.Time `bson:"fetched_at"`
+	FetchedAt        time.Time      `bson:"fetched_at"`
 }
 
 type ReadProgress struct {
-	ChapterUID    *int `bson:"chapterUid"`
-	ChapterOffset *int `bson:"chapterOffset"`
-	Progress      *int `bson:"progress"`
-	UpdateTime    *int `bson:"updateTime"`
-	ReadingTime   int  `bson:"readingTime"`
-	FinishTime    *int `bson:"finishTime"`
-	IsStartReading int `bson:"isStartReading"`
+	ChapterUID     *int `bson:"chapterUid"`
+	ChapterOffset  *int `bson:"chapterOffset"`
+	Progress       *int `bson:"progress"`
+	UpdateTime     *int `bson:"updateTime"`
+	ReadingTime    int  `bson:"readingTime"`
+	FinishTime     *int `bson:"finishTime"`
+	IsStartReading int  `bson:"isStartReading"`
 }
 
 type UserBook struct {

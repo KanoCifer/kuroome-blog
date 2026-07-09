@@ -281,4 +281,3 @@ func TestDeletePasskey_NotFound(t *testing.T) {
 		t.Errorf("status = %d, want 400", w.Code)
 	}
 }
-
