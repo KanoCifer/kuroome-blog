@@ -107,13 +107,15 @@ func (h *PasskeyHandler) Authenticate(c *gin.Context) {
 		response.APIError(c, "server error", 500)
 		return
 	}
-	userData := h.userSvc.UserToDict(user, user.Profile)
 
-	response.Success(c, gin.H{
-		"user":          userData,
-		"access_token":  tokens.AccessToken,
-		"refresh_token": tokens.RefreshToken,
-	}, "Passkey 登录成功")
+	// 写入 refresh_token cookie（与 Python 端一致）。
+	setRefreshCookie(c, tokens.RefreshToken)
+
+	// 用户字段铺平到 data 顶层（与 Python 端 user_to_dict 形状一致）。
+	userData := h.userSvc.UserToDict(user, user.Profile)
+	userData["access_token"] = tokens.AccessToken
+	userData["refresh_token"] = tokens.RefreshToken
+	response.Success(c, userData, "Passkey 登录成功")
 }
 
 // DeletePasskey DELETE /passkey/delete (auth required)

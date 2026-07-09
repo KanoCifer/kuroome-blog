@@ -166,7 +166,7 @@ const handleDeletePasskey = async () => {
 const handleBindGitHub = () => {
   bindingGitHub.value = true;
   githubMessage.value = '';
-  window.location.href = '/api/v1/auth/github/bind';
+  window.location.href = '/api/v3/github/bind';
 };
 
 const handleUnbindGitHub = async () => {

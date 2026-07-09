@@ -60,7 +60,7 @@ func (s *UserService) GetByUsername(username string) (*model.User, *model.Profil
 
 // ---------- 注册 ----------
 
-func (s *UserService) CreateUser(username, password, email, emailCode string) (*model.User, *model.Profile, error) {
+func (s *UserService) CreateUser(username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
 	if s.repo.UsernameExists(username) {
 		return nil, nil, errs.ErrUserExists
 	}
@@ -86,6 +86,9 @@ func (s *UserService) CreateUser(username, password, email, emailCode string) (*
 	var p *model.Profile
 	if email != "" {
 		p = &model.Profile{Email: &email}
+	}
+	if avatarURL != "" {
+		p = &model.Profile{Photo: avatarURL}
 	}
 	if err := s.repo.Create(u, p); err != nil {
 		return nil, nil, err
@@ -185,19 +188,24 @@ func (s *UserService) UserToDict(u *model.User, p *model.Profile) map[string]any
 		"login_count":   u.LoginCount,
 		"active":        u.Active,
 		"has_passkey":   u.PasskeyCredential != nil,
+		"github_bound":  u.GithubID != nil,
 	}
 	if u.GithubID != nil {
 		d["github_id"] = *u.GithubID
 	}
 	if p != nil && p.ID != 0 {
-		profile := map[string]any{}
 		if p.Email != nil {
-			profile["email"] = *p.Email
+			d["email"] = *p.Email
+		}
+		if p.Gender != nil {
+			d["gender"] = *p.Gender
+		}
+		if p.Mobile != nil {
+			d["mobile"] = *p.Mobile
 		}
 		if p.Photo != "" {
-			profile["photo"] = p.Photo
+			d["photo"] = p.Photo
 		}
-		d["profile"] = profile
 	}
 	return d
 }

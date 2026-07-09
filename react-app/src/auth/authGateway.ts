@@ -68,20 +68,20 @@ const emptyLoginResult = (): LoginResult => {
 export function createAuthGateway(): AuthGateway {
   return {
     async fetchUser(): Promise<UserInfo | null> {
-      const res = await request.get<ApiResponse<UserInfo | null>>('v1/auth/me');
+      const res = await request.get<ApiResponse<UserInfo | null>>('v3/me');
       return res.data.data || null;
     },
 
     async getPasskeyAuthenticationOptions(): Promise<PublicKeyCredentialRequestOptionsJSON> {
       const res = await request.get<
         ApiResponse<PublicKeyCredentialRequestOptionsJSON>
-      >('v1/auth/passkey/authentication-options');
+      >('v3/passkey/authentication-options');
       return res.data.data;
     },
 
     async login(username: string, password: string): Promise<LoginResult> {
       const res = await request.post<ApiResponse<LoginResponseData>>(
-        'v1/auth/login',
+        'v3/login',
         { username, password },
       );
       if (!res.data.data) {
@@ -101,7 +101,7 @@ export function createAuthGateway(): AuthGateway {
 
     async loginWithPasskey(assertion: unknown): Promise<PasskeyLoginResult> {
       const res = await request.post<ApiResponse<LoginResponseData>>(
-        'v1/auth/passkey/authenticate',
+        'v3/passkey/authenticate',
         {
           assertion: assertion,
         },
@@ -118,12 +118,12 @@ export function createAuthGateway(): AuthGateway {
     },
 
     async logout(): Promise<void> {
-      await request.post('/v1/auth/logout');
+      await request.post('/v3/logout');
       notification.success('已退出登录');
     },
 
     loginWithGitHub(): void {
-      window.location.href = '/api/v1/auth/github';
+      window.location.href = '/api/v3/auth/github';
     },
   };
 }

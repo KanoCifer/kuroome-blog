@@ -44,7 +44,7 @@ export const analyticsGateway: AnalyticsGateway = {
   },
 
   async reportVisitorData(data: Record<string, unknown>): Promise<void> {
-    await request.post('/v1/admin/track', data, {
+    await request.post('/v3/track', data, {
       timeout: 5000,
       withCredentials: true,
     });

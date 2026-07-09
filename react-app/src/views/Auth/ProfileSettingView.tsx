@@ -201,7 +201,7 @@ export default function ProfileSettingView() {
   const handleBindGitHub = () => {
     setBindingGitHub(true);
     setGithubMessage('');
-    window.location.href = '/api/v1/auth/github/bind';
+    window.location.href = '/api/v3/github/bind';
   };
 
   const handleUnbindGitHub = async () => {
@@ -209,7 +209,7 @@ export default function ProfileSettingView() {
     setGithubMessage('');
 
     try {
-      await request.post('/auth/github/unbind');
+      await request.post('/v3/github/unbind');
       setGithubMessage('GitHub account unbound successfully!');
       setGithubMessageType('success');
       setHasGitHubBound(false);

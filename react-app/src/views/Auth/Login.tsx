@@ -162,7 +162,7 @@ export default function Login() {
   };
 
   const handleGitHubLogin = () => {
-    window.location.href = '/api/v1/auth/github';
+    window.location.href = '/api/v3/auth/github';
   };
 
   return (

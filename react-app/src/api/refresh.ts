@@ -1,11 +1,11 @@
 import axios from 'axios';
 import { tokenService } from '../auth/tokenService';
 
-const refreshTokenEndpoint = '/auth/refresh-token';
+const refreshTokenEndpoint = '/v3/refresh-token';
 
 // 创建独立的axios实例，不使用全局拦截器，避免循环拦截
 const refreshRequest = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE || '/api/v1/',
+  baseURL: import.meta.env.VITE_API_BASE || '/api',
   timeout: 10000,
   withCredentials: true,
   _isRefreshToken: false, // 标记这是刷新token的请求
@@ -27,7 +27,7 @@ export async function refreshAccessToken() {
 }
 
 export async function refreshToken(): Promise<void> {
-  const res = await refreshRequest.get(refreshTokenEndpoint, {
+  const res = await refreshRequest.post(refreshTokenEndpoint, undefined, {
     _isRefreshToken: true,
   });
   const accessToken = res.data?.data?.access_token;

@@ -159,24 +159,37 @@ Go 与 Python 使用同一 bcrypt 算法家族:
 
 | 功能 | Python `/api/v1/auth` | Go `/api/v3` | 中间件 |
 |---|---|---|---|
-| 密码登录 | `POST /login` | `POST /login` | 公开 |
-| 注册 | `POST /register` | `POST /register` | 公开 + 邮箱码 |
-| 刷新 | `GET /refresh-token` | `POST /refresh-token` | 公开(refresh token) |
-| 登出 | `POST /logout` | `POST /logout` | Auth |
-| 当前用户 | `GET /me` | `GET /me` | Auth |
-| 设置 | `PUT /settings` | — | Auth |
-| 头像上传 | `POST /upload-pic` | — | Auth |
-| Passkey 注册选项 | `GET /passkey/registration-options` | `GET /passkey/registration-options` | Auth |
-| Passkey 注册完成 | `POST /passkey/register` | `POST /passkey/register` | Auth |
-| Passkey 登录选项 | `GET /passkey/authentication-options` | `GET /passkey/authentication-options` | 公开 |
-| Passkey 登录完成 | `POST /passkey/authenticate` | `POST /passkey/authenticate` | 公开 |
-| Passkey 删除 | `DELETE /passkey/delete` | `DELETE /passkey/delete` | Auth |
-| GitHub 登录 | `GET /github` | `GET /auth/github` | 公开 |
-| GitHub 绑定 | `GET /github/bind` | `GET /github/bind` | Auth |
-| GitHub 回调 | `GET /github/callback` | `GET /auth/github/callback` | 公开 |
-| GitHub 解绑 | `POST /github/unbind` | `POST /github/unbind` | Auth |
-| 邮箱验证码 | `POST /email/code` | — | 公开 |
+| 密码登录 | `POST /login` | `POST /login`(已切到 Go) | 公开 |
+| 注册 | `POST /register` | —(暂留 Python,缺邮箱码) | 公开 + 邮箱码 |
+| 刷新 | `GET /refresh-token`(cookie) | `POST /refresh-token`(cookie/body,已切到 Go) | 公开(refresh token) |
+| 登出 | `POST /logout` | `POST /logout`(已切到 Go,清 cookie) | Auth |
+| 当前用户 | `GET /me` | `GET /me`(已切到 Go) | Auth |
+| 设置 | `PUT /settings` | —(暂留 Python) | Auth |
+| 头像上传 | `POST /upload-pic` | —(暂留 Python) | Auth |
+| Passkey 注册选项 | `GET /passkey/registration-options` | `GET /passkey/registration-options`(已切到 Go) | Auth |
+| Passkey 注册完成 | `POST /passkey/register` | `POST /passkey/register`(已切到 Go) | Auth |
+| Passkey 登录选项 | `GET /passkey/authentication-options` | `GET /passkey/authentication-options`(已切到 Go) | 公开 |
+| Passkey 登录完成 | `POST /passkey/authenticate` | `POST /passkey/authenticate`(已切到 Go,发 cookie) | 公开 |
+| Passkey 删除 | `DELETE /passkey/delete` | `DELETE /passkey/delete`(已切到 Go) | Auth |
+| GitHub 登录 | `GET /github` | `GET /auth/github`(已切到 Go) | 公开 |
+| GitHub 绑定 | `GET /github/bind` | `GET /github/bind`(已切到 Go) | Auth |
+| GitHub 回调 | `GET /github/callback` | `GET /auth/github/callback`(已切到 Go) | 公开 |
+| GitHub 解绑 | `POST /github/unbind` | `POST /github/unbind`(已切到 Go) | Auth |
+| 邮箱验证码 | `POST /email/code` | —(暂留 Python) | 公开 |
+
+> **前端分流现状(2026-07-09)**: Vue(`frontend`)与 React(`react-app`)的
+> 登录 / 刷新 / 登出 / me / passkey(全套) / GitHub(登录·绑定·解绑·回调) /
+> 后台 post 增删改 / visitor track 均已指向 Go `/api/v3`;注册 / 邮箱码 /
+> 设置 / 头像上传仍走 Python `/api/v1/auth`(Go 端尚未实现注册邮箱码与
+> 设置/上传)。
+>
+> **Go 端契约对齐**:登录 / 刷新 / passkey 登录 / GitHub 登录均会下发
+> HttpOnly `refresh_token` cookie(与 Python 一致);前端静默刷新走
+> `POST /v3/refresh-token`,token 优先取 body、缺失时回退 cookie。响应用
+> 户字段铺平到 `data` 顶层(含 `github_bound` / `has_passkey` / `gender` /
+> `email` / `mobile` / `photo`),与 Python `user_to_dict` 形状一致。
 
 ## 9. 变更日志
 
 | 2026-07-09 | Go 端实现 GitHub OAuth 授权码登录 / 绑定 / 解绑(Redis state, 自动建用户, refresh cookie + access_token 重定向回前端)。 |
+| 2026-07-09 | 前端(Vue + React)认证 / 后台 post / visitor track 调用切到 Go `/api/v3`;Go 端对齐 Python 契约:下发 refresh cookie、刷新支持 cookie、响应用户字段铺平 + `github_bound`。注册 / 邮箱码 / 设置 / 上传仍留 Python。 |

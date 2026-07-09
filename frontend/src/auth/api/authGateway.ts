@@ -83,21 +83,21 @@ export const authGateway = {
   getPasskeyRegistrationOptions(): Promise<
     AxiosResponse<ApiResponse<PublicKeyCredentialCreationOptionsJSON>>
   > {
-    return request.get('v1/auth/passkey/registration-options');
+    return request.get('v3/passkey/registration-options');
   },
 
   registerPasskey(payload: {
     response: unknown;
   }): Promise<AxiosResponse<unknown>> {
-    return request.post('v1/auth/passkey/register', payload);
+    return request.post('v3/passkey/register', payload);
   },
 
   deletePasskey(): Promise<AxiosResponse<unknown>> {
-    return request.delete('v1/auth/passkey/delete');
+    return request.delete('v3/passkey/delete');
   },
 
   unbindGithub(): Promise<AxiosResponse<unknown>> {
-    return request.post('v1/auth/github/unbind');
+    return request.post('v3/github/unbind');
   },
 
   updateProfileSettings(payload: {
@@ -144,20 +144,20 @@ export interface AuthGateway {
 export function createAuthGateway(): AuthGateway {
   return {
     async fetchUser(): Promise<UserInfo | null> {
-      const res = await request.get<Envelope<UserInfo | null>>('v1/auth/me');
+      const res = await request.get<Envelope<UserInfo | null>>('v3/me');
       return res.data.data || null;
     },
 
     async getPasskeyAuthenticationOptions(): Promise<PublicKeyCredentialRequestOptionsJSON> {
       const res = await request.get<
         Envelope<PublicKeyCredentialRequestOptionsJSON>
-      >('v1/auth/passkey/authentication-options');
+      >('v3/passkey/authentication-options');
       return res.data.data;
     },
 
     async login(username: string, password: string): Promise<LoginResult> {
       const res = await request.post<Envelope<LoginResponseData>>(
-        'v1/auth/login',
+        'v3/login',
         { username, password },
       );
       const data = unwrapEnvelope(res);
@@ -166,7 +166,7 @@ export function createAuthGateway(): AuthGateway {
 
     async loginWithPasskey(assertion: unknown): Promise<PasskeyLoginResult> {
       const res = await request.post<Envelope<LoginResponseData>>(
-        'v1/auth/passkey/authenticate',
+        'v3/passkey/authenticate',
         { assertion },
       );
       const data = unwrapEnvelope(res);
@@ -174,11 +174,11 @@ export function createAuthGateway(): AuthGateway {
     },
 
     async logout(): Promise<void> {
-      await request.post('v1/auth/logout');
+      await request.post('v3/logout');
     },
 
     loginWithGitHub(): void {
-      window.location.href = `${import.meta.env.GITHUB_OAUTH_URL}`;
+      window.location.href = '/api/v3/auth/github';
     },
   };
 }

@@ -227,9 +227,11 @@ func TestAuthenticate_Success(t *testing.T) {
 	if data["access_token"] != "access" {
 		t.Errorf("access_token = %v, want access", data["access_token"])
 	}
-	userMap, ok := data["user"].(map[string]any)
-	if !ok || !userMap["has_passkey"].(bool) {
+	if v, ok := data["has_passkey"].(bool); !ok || !v {
 		t.Error("expected has_passkey=true in user data")
+	}
+	if _, ok := data["github_bound"].(bool); !ok {
+		t.Error("expected github_bound field present in user data")
 	}
 }
 

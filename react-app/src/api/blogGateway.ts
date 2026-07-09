@@ -90,19 +90,19 @@ export const blogGateway = (): blogGateway => {
     },
 
     async createLegacyPost(payload) {
-      return request.post('v1/admin/post/add', payload) as Promise<
+      return request.post('v3/post/add', payload) as Promise<
         AxiosResponse<{ _id: string }>
       >;
     },
 
     async updateLegacyPost(payload) {
-      return request.put('v1/admin/post/update', payload) as Promise<
+      return request.put('v3/post/update', payload) as Promise<
         AxiosResponse<{ _id: string }>
       >;
     },
 
     async deleteLegacyPost(postId: string) {
-      return request.delete(`v1/admin/post/${postId}/delete`) as Promise<
+      return request.delete(`v3/post/${postId}/delete`) as Promise<
         AxiosResponse<void>
       >;
     },

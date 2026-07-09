@@ -78,7 +78,7 @@ describe('blogGateway (React — tags migration)', () => {
       });
 
       expect(request.post).toHaveBeenCalledWith(
-        'v1/admin/post/add',
+        'v3/post/add',
         expect.objectContaining({ tags: ['x'] }),
       );
       expect(request.post).not.toHaveBeenCalledWith(
@@ -104,7 +104,7 @@ describe('blogGateway (React — tags migration)', () => {
       });
 
       expect(request.put).toHaveBeenCalledWith(
-        'v1/admin/post/update',
+        'v3/post/update',
         expect.objectContaining({ tags: ['y'] }),
       );
       expect(request.put).not.toHaveBeenCalledWith(

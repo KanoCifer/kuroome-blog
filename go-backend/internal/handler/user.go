@@ -14,7 +14,7 @@ import (
 type UserService interface {
 	Authenticate(username, password string) (*model.User, error)
 	CreateTokens(u *model.User) (*dto.Tokens, error)
-	CreateUser(username, password, email, emailCode string) (*model.User, *model.Profile, error)
+	CreateUser(username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
 	GetByID(userID uint) (*model.User, *model.Profile, error)
 	Logout(userID uint)
 	RefreshTokens(refreshToken string) (*dto.Tokens, error)
@@ -52,13 +52,15 @@ func (h *UserHandler) Login(c *gin.Context) {
 		response.APIError(c, "server error", 500)
 		return
 	}
-	userData := h.userSvc.UserToDict(user, user.Profile)
 
-	response.Success(c, gin.H{
-		"user":          userData,
-		"access_token":  tokens.AccessToken,
-		"refresh_token": tokens.RefreshToken,
-	})
+	// 写入 refresh_token cookie（与 Python 端一致），供前端静默刷新。
+	setRefreshCookie(c, tokens.RefreshToken)
+
+	// 用户字段铺平到 data 顶层（与 Python 端 user_to_dict 形状一致）。
+	userData := h.userSvc.UserToDict(user, user.Profile)
+	userData["access_token"] = tokens.AccessToken
+	userData["refresh_token"] = tokens.RefreshToken
+	response.Success(c, userData, "登录成功")
 }
 
 func (h *UserHandler) Register(c *gin.Context) {
@@ -69,7 +71,7 @@ func (h *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
-	u, _, err := h.userSvc.CreateUser(req.Username, req.Password, req.Email, req.EmailCode)
+	u, _, err := h.userSvc.CreateUser(req.Username, req.Password, req.Email, req.EmailCode, "")
 	if err != nil {
 		switch {
 		case errors.Is(err, errs.ErrUserExists):
@@ -116,28 +118,42 @@ func (h *UserHandler) Logout(c *gin.Context) {
 	}
 
 	h.userSvc.Logout(uint(c.GetInt("user_id")))
+	// 清除 refresh_token cookie（与 Python 端一致）。
+	clearRefreshCookie(c)
 	response.Success(c, nil, "已退出登录")
 }
 
 func (h *UserHandler) RefreshToken(c *gin.Context) {
 	var req struct {
-		RefreshToken string `json:"refresh_token" binding:"required"`
+		RefreshToken string `json:"refresh_token"`
 	}
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.APIError(c, "invalid request body")
+	_ = c.ShouldBindJSON(&req)
+
+	// refresh_token 优先取 body，缺失时回退到 HttpOnly cookie（与 Python 一致）。
+	refreshToken := req.RefreshToken
+	if refreshToken == "" {
+		if cookie, err := c.Cookie("refresh_token"); err == nil {
+			refreshToken = cookie
+		}
+	}
+	if refreshToken == "" {
+		response.APIError(c, "刷新令牌不存在", 401)
 		return
 	}
 
-	tokens, err := h.userSvc.RefreshTokens(req.RefreshToken)
+	tokens, err := h.userSvc.RefreshTokens(refreshToken)
 	if err != nil {
 		response.APIError(c, err.Error(), 401)
 		return
 	}
 
+	// 轮换 refresh cookie（与 Python 端一致）。
+	setRefreshCookie(c, tokens.RefreshToken)
+
 	response.Success(c, gin.H{
 		"access_token":  tokens.AccessToken,
 		"refresh_token": tokens.RefreshToken,
-	})
+	}, "访问令牌已刷新")
 }
 
 // RegisterRoutes 把 handler 方法挂到路由组。

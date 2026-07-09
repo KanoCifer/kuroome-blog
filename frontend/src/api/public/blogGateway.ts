@@ -91,7 +91,7 @@ export const blogGateway: BlogGateway = {
 
   async createLegacyPost(payload): Promise<{ _id: string }> {
     const res = await request.post<{ data: { _id: string } }>(
-      'v1/admin/post/add',
+      'v3/post/add',
       payload,
     );
     return res.data.data;
@@ -99,13 +99,13 @@ export const blogGateway: BlogGateway = {
 
   async updateLegacyPost(payload): Promise<{ _id: string }> {
     const res = await request.put<{ data: { _id: string } }>(
-      'v1/admin/post/update',
+      'v3/post/update',
       payload,
     );
     return res.data.data;
   },
 
   async deleteLegacyPost(postId: string): Promise<void> {
-    await request.delete(`v1/admin/post/${postId}/delete`);
+    await request.delete(`v3/post/${postId}/delete`);
   },
 };

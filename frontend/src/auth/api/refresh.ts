@@ -1,7 +1,7 @@
 import axios, { type CreateAxiosDefaults, type InternalAxiosRequestConfig } from 'axios';
 import { setAccessToken } from '@/auth/tokenService';
 
-const refreshTokenEndpoint = 'v1/auth/refresh-token';
+const refreshTokenEndpoint = 'v3/refresh-token';
 
 interface RefreshAxiosDefaults extends CreateAxiosDefaults {
   _isRefreshToken?: boolean;
@@ -36,7 +36,7 @@ export async function refreshAccessToken() {
 }
 
 export async function refreshToken(): Promise<void> {
-  const res = await refreshRequest.get(refreshTokenEndpoint, {
+  const res = await refreshRequest.post(refreshTokenEndpoint, undefined, {
     _isRefreshToken: true,
   } as RefreshRequestConfig);
   const accessToken = res.data?.data?.access_token;

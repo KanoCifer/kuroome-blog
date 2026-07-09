@@ -25,7 +25,7 @@ func init() {
 type mockUserService struct {
 	authenticateFn func(username, password string) (*model.User, error)
 	createTokensFn func(u *model.User) (*dto.Tokens, error)
-	createUserFn   func(username, password, email, emailCode string) (*model.User, *model.Profile, error)
+	createUserFn   func(username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
 	getByIDFn      func(userID uint) (*model.User, *model.Profile, error)
 	logoutFn       func(userID uint)
 	refreshFn      func(refreshToken string) (*dto.Tokens, error)
@@ -43,8 +43,8 @@ func (m *mockUserService) CreateTokens(u *model.User) (*dto.Tokens, error) {
 	return &dto.Tokens{AccessToken: "access", RefreshToken: "refresh"}, nil
 }
 
-func (m *mockUserService) CreateUser(username, password, email, emailCode string) (*model.User, *model.Profile, error) {
-	return m.createUserFn(username, password, email, emailCode)
+func (m *mockUserService) CreateUser(username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
+	return m.createUserFn(username, password, email, emailCode, avatarURL)
 }
 
 func (m *mockUserService) GetByID(userID uint) (*model.User, *model.Profile, error) {
@@ -65,7 +65,12 @@ func (m *mockUserService) UserToDict(u *model.User, p *model.Profile) map[string
 	if m.userToDictFn != nil {
 		return m.userToDictFn(u, p)
 	}
-	return map[string]any{"id": u.ID, "username": u.Username, "has_passkey": u.PasskeyCredential != nil}
+	return map[string]any{
+		"id":           u.ID,
+		"username":     u.Username,
+		"has_passkey":  u.PasskeyCredential != nil,
+		"github_bound": u.GithubID != nil,
+	}
 }
 
 // ---------- helpers ----------
@@ -102,6 +107,16 @@ func parseResp(t *testing.T, body []byte) (data map[string]any, message string) 
 	return resp.Data, resp.Message
 }
 
+// findCookie 从响应中按名查找 Set-Cookie。
+func findCookie(w *httptest.ResponseRecorder, name string) *http.Cookie {
+	for _, c := range w.Result().Cookies() {
+		if c.Name == name {
+			return c
+		}
+	}
+	return nil
+}
+
 // ---------- Login ----------
 
 func TestLogin_Success(t *testing.T) {
@@ -123,6 +138,15 @@ func TestLogin_Success(t *testing.T) {
 	data, _ := parseResp(t, w.Body.Bytes())
 	if data["access_token"] == nil {
 		t.Error("expected access_token in response")
+	}
+	if cookie := findCookie(w, "refresh_token"); cookie == nil || cookie.Value != "refresh" {
+		t.Error("expected refresh_token cookie to be set on login")
+	}
+	if _, ok := data["has_passkey"].(bool); !ok {
+		t.Error("expected has_passkey field present in user data")
+	}
+	if _, ok := data["github_bound"].(bool); !ok {
+		t.Error("expected github_bound field present in user data")
 	}
 }
 
@@ -184,7 +208,7 @@ func TestLogin_TokenError(t *testing.T) {
 
 func TestRegister_Success(t *testing.T) {
 	svc := &mockUserService{
-		createUserFn: func(username, password, email, emailCode string) (*model.User, *model.Profile, error) {
+		createUserFn: func(username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
 			return &model.User{Model: gormModel(5), Username: username}, nil, nil
 		},
 	}
@@ -208,7 +232,7 @@ func TestRegister_Success(t *testing.T) {
 
 func TestRegister_UserExists(t *testing.T) {
 	svc := &mockUserService{
-		createUserFn: func(username, password, email, emailCode string) (*model.User, *model.Profile, error) {
+		createUserFn: func(username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
 			return nil, nil, errs.ErrUserExists
 		},
 	}
@@ -228,7 +252,7 @@ func TestRegister_UserExists(t *testing.T) {
 
 func TestRegister_EmailExists(t *testing.T) {
 	svc := &mockUserService{
-		createUserFn: func(username, password, email, emailCode string) (*model.User, *model.Profile, error) {
+		createUserFn: func(username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
 			return nil, nil, errs.ErrEmailExists
 		},
 	}
@@ -248,7 +272,7 @@ func TestRegister_EmailExists(t *testing.T) {
 
 func TestRegister_InvalidEmailCode(t *testing.T) {
 	svc := &mockUserService{
-		createUserFn: func(username, password, email, emailCode string) (*model.User, *model.Profile, error) {
+		createUserFn: func(username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
 			return nil, nil, errs.ErrInvalidEmailCode
 		},
 	}
@@ -268,7 +292,7 @@ func TestRegister_InvalidEmailCode(t *testing.T) {
 
 func TestRegister_InvalidBody(t *testing.T) {
 	svc := &mockUserService{
-		createUserFn: func(username, password, email, emailCode string) (*model.User, *model.Profile, error) {
+		createUserFn: func(username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
 			return &model.User{}, nil, nil
 		},
 	}
@@ -385,17 +409,45 @@ func TestRefreshToken_InvalidToken(t *testing.T) {
 func TestRefreshToken_MissingField(t *testing.T) {
 	svc := &mockUserService{
 		refreshFn: func(refreshToken string) (*dto.Tokens, error) {
+			t.Errorf("refreshFn should not be called when no token present")
 			return &dto.Tokens{}, nil
 		},
 	}
 	h := NewUserHandler(svc)
 
-	// 缺少 refresh_token 字段
+	// 缺少 refresh_token 字段且 cookie 中也没有 → 401（与 Python 行为一致）
 	body, _ := json.Marshal(map[string]string{})
 	w := doRequest(h.RefreshToken, http.MethodPost, "/refresh-token", body)
 
-	if w.Code != http.StatusBadRequest {
-		t.Errorf("status = %d, want %d", w.Code, http.StatusBadRequest)
+	if w.Code != http.StatusUnauthorized {
+		t.Errorf("status = %d, want %d", w.Code, http.StatusUnauthorized)
+	}
+}
+
+func TestRefreshToken_FromCookie(t *testing.T) {
+	svc := &mockUserService{
+		refreshFn: func(refreshToken string) (*dto.Tokens, error) {
+			if refreshToken != "cookie-refresh" {
+				t.Errorf("refreshToken = %q, want cookie-refresh", refreshToken)
+			}
+			return &dto.Tokens{AccessToken: "new-access", RefreshToken: "new-refresh"}, nil
+		},
+	}
+	h := NewUserHandler(svc)
+
+	req, _ := http.NewRequest(http.MethodPost, "/refresh-token", nil)
+	req.AddCookie(&http.Cookie{Name: "refresh_token", Value: "cookie-refresh"})
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	h.RefreshToken(c)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("status = %d, want %d", w.Code, http.StatusOK)
+	}
+	data, _ := parseResp(t, w.Body.Bytes())
+	if data["access_token"] != "new-access" {
+		t.Errorf("access_token = %v, want new-access", data["access_token"])
 	}
 }
 
