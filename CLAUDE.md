@@ -49,6 +49,7 @@
 - [domain.md](docs/rules/domain.md) — 领域词汇表
 - [environment.md](docs/rules/environment.md) — 环境变量、端口、工具链版本
 - [go-backend.md](docs/rules/go-backend.md) — Go 重构的分层、鉴权差异、测试、已知遗留
+- [auth.md](docs/rules/auth.md) — **双后端认证统一契约**(JWT/Refresh/Password/Admin,两端必读)
 - [logging.md](docs/rules/logging.md) — 日志编排规约 (structlog + Taskiq 落库)
 - [testing.md](docs/rules/testing.md) — 前端测试规范 (Vue + React + Vitest 4)
 
@@ -64,7 +65,7 @@ See [PRODUCT.md](PRODUCT.md) for register, audience, brand personality (书卷�
 
 ### Issue tracker
 
-Local markdown — issues live as files under `.scratch/<feature>/`. See `docs/agents/issue-tracker.md`.
+GitHub — issues live in the repo's GitHub Issues (`gh` CLI); PRs are not a triage surface. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 

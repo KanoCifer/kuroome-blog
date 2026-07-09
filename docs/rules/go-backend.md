@@ -18,11 +18,15 @@ go test ./...            # 全量单测（handler/service/dto/middleware/jwt 均
 - **包布局**：`internal/{config,db,dto,handler,middleware,model,mongo,repository,response,service,router}`；`pkg/jwt`（JWT 工具）
 - **命名对齐**：复用 Python 后端的 `.env`（`DATABASE_URL / SECRET_KEY / REDIS_URL / MONGO_URI / PORT` 等）
 
-## 鉴权差异（与 Python 端对齐）
+## 鉴权
 
-- admin 鉴权走 `middleware.AdminMiddleware()`，依据 `ADMIN_USER_IDS` 配置（非硬编码）
-- Go `User` model 无 `is_admin` 字段；登录态 `is_admin` 由 `ADMIN_USER_IDS` 判定
-- 注册时 `email_code` 真正校验 Redis `signup_code:{email}`；非法 admin post id 返回 400
+认证统一契约见 **[auth.md](auth.md)**。Go 端要点:
+
+- JWT: `pkg/jwt`, HS256, RegisteredClaims(sub/exp/jti)
+- bcrypt: cost=DefaultCost, `$2a$` 前缀
+- Refresh 白名单: `refresh:{uid}` 于 Redis,单设备轮换
+- Admin: `ADMIN_USER_IDS` 白名单;AdminMiddleware 必须在 AuthMiddleware 之后
+- 注册校验 Redis `signup_code:{email}`;非法 admin post id 返回 400
 
 ## 已知遗留
 
