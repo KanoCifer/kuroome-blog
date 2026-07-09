@@ -138,3 +138,14 @@ func cookieDomain() string {
 	}
 	return ""
 }
+
+// setRefreshCookie 写入 HttpOnly refresh_token cookie（与 Python 端一致），
+// 用于登录 / 刷新 / passkey 登录 / github 登录后让前端静默刷新可用。
+func setRefreshCookie(c *gin.Context, token string) {
+	c.SetCookie("refresh_token", token, 7*24*3600, "/", cookieDomain(), true, true)
+}
+
+// clearRefreshCookie 删除 refresh_token cookie（登出时调用）。
+func clearRefreshCookie(c *gin.Context) {
+	c.SetCookie("refresh_token", "", -1, "/", cookieDomain(), true, true)
+}

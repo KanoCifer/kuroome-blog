@@ -59,6 +59,7 @@ type ghUser struct {
 	ID    int    `json:"id"`
 	Login string `json:"login"`
 	Email string `json:"email"`
+	AvatarURL string `json:"avatar_url"`
 }
 
 // randomState 生成 16 字节的随机 hex 作为 state。
@@ -158,7 +159,8 @@ func (g *GitHubOAuth) loginByGitHub(gh *ghUser) (*model.User, *dto.Tokens, error
 	if email == "" {
 		email = gh.Login + "@github.com"
 	}
-	u, _, err := g.userSvc.CreateUser(username, randomPassword(), email, "")
+	avatarURL := gh.AvatarURL
+	u, _, err := g.userSvc.CreateUser(username, randomPassword(), email, "", avatarURL)
 	if err != nil {
 		return nil, nil, err
 	}

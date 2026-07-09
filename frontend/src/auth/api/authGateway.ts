@@ -178,7 +178,7 @@ export function createAuthGateway(): AuthGateway {
     },
 
     loginWithGitHub(): void {
-      window.location.href = '/api/v1/auth/github';
+      window.location.href = `${import.meta.env.GITHUB_OAUTH_URL}`;
     },
   };
 }
