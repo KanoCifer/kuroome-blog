@@ -141,9 +141,11 @@ func (h *UserHandler) RefreshToken(c *gin.Context) {
 }
 
 // RegisterRoutes 把 handler 方法挂到路由组。
-func (h *UserHandler) RegisterRoutes(r *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
-	r.POST("/login", h.Login)
-	r.POST("/register", h.Register)
+// publicMWs 是应用于 login/register 等公开接口的限流中间件(可变参数)。
+// authMiddleware 是认证中间件, 用于 logout/me 等需登录接口。
+func (h *UserHandler) RegisterRoutes(r *gin.RouterGroup, authMiddleware gin.HandlerFunc, publicMWs ...gin.HandlerFunc) {
+	r.POST("/login", append(publicMWs, h.Login)...)
+	r.POST("/register", append(publicMWs, h.Register)...)
 	r.POST("/refresh-token", h.RefreshToken)
 	r.POST("/logout", authMiddleware, h.Logout)
 	r.GET("/me", authMiddleware, h.Me)

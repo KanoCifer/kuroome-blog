@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -32,6 +33,7 @@ func main() {
 	defer db.Close()
 
 	r := gin.Default()
+	r.Use(middleware.CORS())
 	api := r.Group("/api")
 	v3 := api.Group("/v3")
 
@@ -47,8 +49,12 @@ func main() {
 
 	state := app.NewAppState(config.Cfg, userRepo, adminRepo, db.GetRedis(), passkeySvc)
 
+	// 限流: 登录 / 注册各 5 次 / 分钟
+	loginLimiter := middleware.NewRateLimiter(db.GetRedis(), "login", 5, 60*time.Second)
+	registerLimiter := middleware.NewRateLimiter(db.GetRedis(), "register", 5, 60*time.Second)
+
 	userHandler := handler.NewUserHandler(state.UserSvc())
-	userHandler.RegisterRoutes(v3, middleware.AuthMiddleware())
+	userHandler.RegisterRoutes(v3, middleware.AuthMiddleware(), loginLimiter.Middleware(), registerLimiter.Middleware())
 
 	adminHandler := handler.NewAdminHandler(state.AdminSvc())
 	adminHandler.RegisterRoutes(v3, middleware.AuthMiddleware(), middleware.AdminMiddleware())
