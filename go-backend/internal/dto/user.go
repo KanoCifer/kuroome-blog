@@ -21,6 +21,12 @@ type UserResponse struct {
 	IsAdmin  bool   `json:"is_admin"`
 }
 
+// Tokens access + refresh token 对，由 service 生成、跨层传递。
+type Tokens struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
 // LoginResponse 登录响应
 type LoginResponse struct {
 	UserResponse

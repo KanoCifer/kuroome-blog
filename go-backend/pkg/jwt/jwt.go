@@ -7,7 +7,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 
-	"app/internal/config"
+	"github.com/KanoCifer/kuroome-blog/internal/config"
 )
 
 // GenerateToken 为指定 userID 签发 HS256 JWT，过期时间由 expiresAt 控制。

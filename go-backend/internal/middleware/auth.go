@@ -6,8 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"app/internal/config"
-	"app/pkg/jwt"
+	"github.com/KanoCifer/kuroome-blog/internal/config"
+	"github.com/KanoCifer/kuroome-blog/pkg/jwt"
 )
 
 func AuthMiddleware() gin.HandlerFunc {

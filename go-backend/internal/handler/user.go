@@ -1,22 +1,23 @@
 package handler
 
 import (
-	"app/internal/model"
 	"errors"
+	"github.com/KanoCifer/kuroome-blog/internal/model"
 
 	"github.com/gin-gonic/gin"
 
-	"app/internal/dto"
-	"app/internal/response"
-	"app/internal/service"
+	"github.com/KanoCifer/kuroome-blog/internal/dto"
+	"github.com/KanoCifer/kuroome-blog/internal/errs"
+	"github.com/KanoCifer/kuroome-blog/internal/response"
 )
+
 type UserService interface {
 	Authenticate(username, password string) (*model.User, error)
-	CreateTokens(u *model.User) (*service.Tokens, error)
+	CreateTokens(u *model.User) (*dto.Tokens, error)
 	CreateUser(username, password, email, emailCode string) (*model.User, *model.Profile, error)
 	GetByID(userID uint) (*model.User, *model.Profile, error)
 	Logout(userID uint)
-	RefreshTokens(refreshToken string) (*service.Tokens, error)
+	RefreshTokens(refreshToken string) (*dto.Tokens, error)
 	UserToDict(u *model.User, p *model.Profile) map[string]any
 }
 
@@ -38,7 +39,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 
 	user, err := h.userSvc.Authenticate(req.Username, req.Password)
 	if err != nil {
-		if errors.Is(err, service.ErrInvalidCredentials) {
+		if errors.Is(err, errs.ErrInvalidCredentials) {
 			response.APIError(c, err.Error(), 401)
 			return
 		}
@@ -54,7 +55,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 	userData := h.userSvc.UserToDict(user, user.Profile)
 
 	response.Success(c, gin.H{
-		"user":         userData,
+		"user":          userData,
 		"access_token":  tokens.AccessToken,
 		"refresh_token": tokens.RefreshToken,
 	})
@@ -71,11 +72,11 @@ func (h *UserHandler) Register(c *gin.Context) {
 	u, _, err := h.userSvc.CreateUser(req.Username, req.Password, req.Email, req.EmailCode)
 	if err != nil {
 		switch {
-		case errors.Is(err, service.ErrUserExists):
+		case errors.Is(err, errs.ErrUserExists):
 			response.APIError(c, err.Error(), 409)
-		case errors.Is(err, service.ErrEmailExists):
+		case errors.Is(err, errs.ErrEmailExists):
 			response.APIError(c, err.Error(), 409)
-		case errors.Is(err, service.ErrInvalidEmailCode):
+		case errors.Is(err, errs.ErrInvalidEmailCode):
 			response.APIError(c, err.Error(), 400)
 		default:
 			response.APIError(c, "server error", 500)
@@ -92,7 +93,7 @@ func (h *UserHandler) Me(c *gin.Context) {
 
 	u, p, err := h.userSvc.GetByID(userID.(uint))
 	if err != nil {
-		if errors.Is(err, service.ErrUserNotFound) {
+		if errors.Is(err, errs.ErrUserNotFound) {
 			response.APIError(c, "用户不存在", 404)
 			return
 		}

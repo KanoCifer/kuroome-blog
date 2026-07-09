@@ -10,9 +10,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"app/internal/config"
-	"app/internal/dto"
-	"app/internal/service"
+	"github.com/KanoCifer/kuroome-blog/internal/config"
+	"github.com/KanoCifer/kuroome-blog/internal/dto"
+	"github.com/KanoCifer/kuroome-blog/internal/errs"
 )
 
 func init() {
@@ -132,7 +132,7 @@ func TestAdmin_AddPost_InvalidBody(t *testing.T) {
 
 func TestAdmin_UpdatePost_InvalidID(t *testing.T) {
 	svc := &mockAdminService{
-		updatePostFn: func(id string, post dto.PostUpdate) error { return service.ErrInvalidPostID },
+		updatePostFn: func(id string, post dto.PostUpdate) error { return errs.ErrInvalidPostID },
 	}
 	_, r := newAdminHandler(svc)
 	w, req := putJSON(t, "/api/v3/post/update", dto.PostUpdate{
@@ -149,7 +149,7 @@ func TestAdmin_UpdatePost_InvalidID(t *testing.T) {
 func TestAdmin_UpdatePost_NotFound(t *testing.T) {
 	svc := &mockAdminService{
 		updatePostFn: func(id string, post dto.PostUpdate) error {
-			return service.ErrPostNotFound
+			return errs.ErrPostNotFound
 		},
 	}
 	_, r := newAdminHandler(svc)
@@ -201,7 +201,7 @@ func TestAdmin_UpdatePost_ServerError(t *testing.T) {
 // ---------- DeletePost ----------
 
 func TestAdmin_DeletePost_InvalidID(t *testing.T) {
-	svc := &mockAdminService{deletePostFn: func(id string) error { return service.ErrInvalidPostID }}
+	svc := &mockAdminService{deletePostFn: func(id string) error { return errs.ErrInvalidPostID }}
 	_, r := newAdminHandler(svc)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodDelete, "/api/v3/post/bad-id/delete", nil)
@@ -213,7 +213,7 @@ func TestAdmin_DeletePost_InvalidID(t *testing.T) {
 }
 
 func TestAdmin_DeletePost_NotFound(t *testing.T) {
-	svc := &mockAdminService{deletePostFn: func(id string) error { return service.ErrPostNotFound }}
+	svc := &mockAdminService{deletePostFn: func(id string) error { return errs.ErrPostNotFound }}
 	_, r := newAdminHandler(svc)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodDelete, "/api/v3/post/507f1f77bcf86cd799439011/delete", nil)

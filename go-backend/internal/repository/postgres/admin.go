@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 
-	"app/internal/mongo/document"
+	"github.com/KanoCifer/kuroome-blog/internal/mongo/document"
 )
 
 const (

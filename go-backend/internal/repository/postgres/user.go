@@ -5,7 +5,7 @@ import (
 
 	"gorm.io/gorm"
 
-	"app/internal/model"
+	"github.com/KanoCifer/kuroome-blog/internal/model"
 )
 
 type UserRepo struct {

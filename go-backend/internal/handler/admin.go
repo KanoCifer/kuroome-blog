@@ -13,10 +13,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"app/internal/config"
-	"app/internal/dto"
-	"app/internal/response"
-	"app/internal/service"
+	"github.com/KanoCifer/kuroome-blog/internal/config"
+	"github.com/KanoCifer/kuroome-blog/internal/dto"
+	"github.com/KanoCifer/kuroome-blog/internal/errs"
+	"github.com/KanoCifer/kuroome-blog/internal/response"
 )
 
 type AdminService interface {
@@ -59,11 +59,11 @@ func (h *AdminHandler) UpdatePost(c *gin.Context) {
 		return
 	}
 	if err := h.adminSvc.UpdatePost(req.ID, req); err != nil {
-		if errors.Is(err, service.ErrPostNotFound) {
+		if errors.Is(err, errs.ErrPostNotFound) {
 			response.APIError(c, err.Error(), 404)
 			return
 		}
-		if errors.Is(err, service.ErrInvalidPostID) {
+		if errors.Is(err, errs.ErrInvalidPostID) {
 			response.APIError(c, err.Error(), 400)
 			return
 		}
@@ -76,11 +76,11 @@ func (h *AdminHandler) UpdatePost(c *gin.Context) {
 func (h *AdminHandler) DeletePost(c *gin.Context) {
 	postID := c.Param("post_id")
 	if err := h.adminSvc.DeletePost(postID); err != nil {
-		if errors.Is(err, service.ErrPostNotFound) {
+		if errors.Is(err, errs.ErrPostNotFound) {
 			response.APIError(c, err.Error(), 404)
 			return
 		}
-		if errors.Is(err, service.ErrInvalidPostID) {
+		if errors.Is(err, errs.ErrInvalidPostID) {
 			response.APIError(c, err.Error(), 400)
 			return
 		}

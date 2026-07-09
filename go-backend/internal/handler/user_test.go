@@ -11,9 +11,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
-	"app/internal/dto"
-	"app/internal/model"
-	"app/internal/service"
+	"github.com/KanoCifer/kuroome-blog/internal/dto"
+	"github.com/KanoCifer/kuroome-blog/internal/errs"
+	"github.com/KanoCifer/kuroome-blog/internal/model"
 )
 
 func init() {
@@ -24,11 +24,11 @@ func init() {
 
 type mockUserService struct {
 	authenticateFn func(username, password string) (*model.User, error)
-	createTokensFn func(u *model.User) (*service.Tokens, error)
+	createTokensFn func(u *model.User) (*dto.Tokens, error)
 	createUserFn   func(username, password, email, emailCode string) (*model.User, *model.Profile, error)
 	getByIDFn      func(userID uint) (*model.User, *model.Profile, error)
 	logoutFn       func(userID uint)
-	refreshFn      func(refreshToken string) (*service.Tokens, error)
+	refreshFn      func(refreshToken string) (*dto.Tokens, error)
 	userToDictFn   func(u *model.User, p *model.Profile) map[string]any
 }
 
@@ -36,11 +36,11 @@ func (m *mockUserService) Authenticate(username, password string) (*model.User, 
 	return m.authenticateFn(username, password)
 }
 
-func (m *mockUserService) CreateTokens(u *model.User) (*service.Tokens, error) {
+func (m *mockUserService) CreateTokens(u *model.User) (*dto.Tokens, error) {
 	if m.createTokensFn != nil {
 		return m.createTokensFn(u)
 	}
-	return &service.Tokens{AccessToken: "access", RefreshToken: "refresh"}, nil
+	return &dto.Tokens{AccessToken: "access", RefreshToken: "refresh"}, nil
 }
 
 func (m *mockUserService) CreateUser(username, password, email, emailCode string) (*model.User, *model.Profile, error) {
@@ -57,7 +57,7 @@ func (m *mockUserService) Logout(userID uint) {
 	}
 }
 
-func (m *mockUserService) RefreshTokens(refreshToken string) (*service.Tokens, error) {
+func (m *mockUserService) RefreshTokens(refreshToken string) (*dto.Tokens, error) {
 	return m.refreshFn(refreshToken)
 }
 
@@ -129,7 +129,7 @@ func TestLogin_Success(t *testing.T) {
 func TestLogin_InvalidCredentials(t *testing.T) {
 	svc := &mockUserService{
 		authenticateFn: func(username, password string) (*model.User, error) {
-			return nil, service.ErrInvalidCredentials
+			return nil, errs.ErrInvalidCredentials
 		},
 	}
 	h := NewUserHandler(svc)
@@ -164,7 +164,7 @@ func TestLogin_TokenError(t *testing.T) {
 		authenticateFn: func(username, password string) (*model.User, error) {
 			return &model.User{Model: gormModel(1)}, nil
 		},
-		createTokensFn: func(u *model.User) (*service.Tokens, error) {
+		createTokensFn: func(u *model.User) (*dto.Tokens, error) {
 			return nil, errors.New("jwt error")
 		},
 	}
@@ -209,7 +209,7 @@ func TestRegister_Success(t *testing.T) {
 func TestRegister_UserExists(t *testing.T) {
 	svc := &mockUserService{
 		createUserFn: func(username, password, email, emailCode string) (*model.User, *model.Profile, error) {
-			return nil, nil, service.ErrUserExists
+			return nil, nil, errs.ErrUserExists
 		},
 	}
 	h := NewUserHandler(svc)
@@ -229,7 +229,7 @@ func TestRegister_UserExists(t *testing.T) {
 func TestRegister_EmailExists(t *testing.T) {
 	svc := &mockUserService{
 		createUserFn: func(username, password, email, emailCode string) (*model.User, *model.Profile, error) {
-			return nil, nil, service.ErrEmailExists
+			return nil, nil, errs.ErrEmailExists
 		},
 	}
 	h := NewUserHandler(svc)
@@ -249,7 +249,7 @@ func TestRegister_EmailExists(t *testing.T) {
 func TestRegister_InvalidEmailCode(t *testing.T) {
 	svc := &mockUserService{
 		createUserFn: func(username, password, email, emailCode string) (*model.User, *model.Profile, error) {
-			return nil, nil, service.ErrInvalidEmailCode
+			return nil, nil, errs.ErrInvalidEmailCode
 		},
 	}
 	h := NewUserHandler(svc)
@@ -305,7 +305,7 @@ func TestMe_Success(t *testing.T) {
 func TestMe_UserNotFound(t *testing.T) {
 	svc := &mockUserService{
 		getByIDFn: func(userID uint) (*model.User, *model.Profile, error) {
-			return nil, nil, service.ErrUserNotFound
+			return nil, nil, errs.ErrUserNotFound
 		},
 	}
 	h := NewUserHandler(svc)
@@ -348,8 +348,8 @@ func TestLogout_CallsService(t *testing.T) {
 
 func TestRefreshToken_Success(t *testing.T) {
 	svc := &mockUserService{
-		refreshFn: func(refreshToken string) (*service.Tokens, error) {
-			return &service.Tokens{AccessToken: "new-access", RefreshToken: "new-refresh"}, nil
+		refreshFn: func(refreshToken string) (*dto.Tokens, error) {
+			return &dto.Tokens{AccessToken: "new-access", RefreshToken: "new-refresh"}, nil
 		},
 	}
 	h := NewUserHandler(svc)
@@ -368,8 +368,8 @@ func TestRefreshToken_Success(t *testing.T) {
 
 func TestRefreshToken_InvalidToken(t *testing.T) {
 	svc := &mockUserService{
-		refreshFn: func(refreshToken string) (*service.Tokens, error) {
-			return nil, service.ErrInvalidToken
+		refreshFn: func(refreshToken string) (*dto.Tokens, error) {
+			return nil, errs.ErrInvalidToken
 		},
 	}
 	h := NewUserHandler(svc)
@@ -384,8 +384,8 @@ func TestRefreshToken_InvalidToken(t *testing.T) {
 
 func TestRefreshToken_MissingField(t *testing.T) {
 	svc := &mockUserService{
-		refreshFn: func(refreshToken string) (*service.Tokens, error) {
-			return &service.Tokens{}, nil
+		refreshFn: func(refreshToken string) (*dto.Tokens, error) {
+			return &dto.Tokens{}, nil
 		},
 	}
 	h := NewUserHandler(svc)

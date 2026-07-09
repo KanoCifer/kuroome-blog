@@ -10,8 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 	gt "github.com/golang-jwt/jwt/v5"
 
-	"app/internal/config"
-	apijwt "app/pkg/jwt"
+	"github.com/KanoCifer/kuroome-blog/internal/config"
+	apijwt "github.com/KanoCifer/kuroome-blog/pkg/jwt"
 )
 
 func init() {

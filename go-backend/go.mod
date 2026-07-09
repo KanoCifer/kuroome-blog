@@ -1,4 +1,4 @@
-module app
+module github.com/KanoCifer/kuroome-blog
 
 go 1.26.3
 

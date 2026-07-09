@@ -5,7 +5,7 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
-	"app/internal/model"
+	"github.com/KanoCifer/kuroome-blog/internal/model"
 )
 
 func TestCheckPassword_Correct(t *testing.T) {

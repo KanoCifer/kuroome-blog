@@ -9,14 +9,10 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 
-	"app/internal/dto"
-	"app/internal/mongo/document"
-	"app/internal/repository/postgres"
-)
-
-var (
-	ErrPostNotFound  = errors.New("blog post not found")
-	ErrInvalidPostID = errors.New("invalid post id")
+	"github.com/KanoCifer/kuroome-blog/internal/dto"
+	"github.com/KanoCifer/kuroome-blog/internal/errs"
+	"github.com/KanoCifer/kuroome-blog/internal/mongo/document"
+	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 )
 
 type AdminService struct {
@@ -54,12 +50,12 @@ func (s *AdminService) AddPost(post dto.PostIn) (string, error) {
 
 func (s *AdminService) UpdatePost(id string, post dto.PostUpdate) error {
 	if _, err := bson.ObjectIDFromHex(id); err != nil {
-		return ErrInvalidPostID
+		return errs.ErrInvalidPostID
 	}
 	_, err := s.repo.GetPostByID(context.Background(), id)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return ErrPostNotFound
+			return errs.ErrPostNotFound
 		}
 		return err
 	}
@@ -81,12 +77,12 @@ func (s *AdminService) UpdatePost(id string, post dto.PostUpdate) error {
 
 func (s *AdminService) DeletePost(id string) error {
 	if _, err := bson.ObjectIDFromHex(id); err != nil {
-		return ErrInvalidPostID
+		return errs.ErrInvalidPostID
 	}
 	_, err := s.repo.GetPostByID(context.Background(), id)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return ErrPostNotFound
+			return errs.ErrPostNotFound
 		}
 		return err
 	}

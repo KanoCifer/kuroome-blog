@@ -6,7 +6,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 
-	"app/internal/config"
+	"github.com/KanoCifer/kuroome-blog/internal/config"
 )
 
 func init() {

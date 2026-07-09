@@ -4,7 +4,8 @@ import (
 	"errors"
 	"testing"
 
-	"app/internal/dto"
+	"github.com/KanoCifer/kuroome-blog/internal/dto"
+	"github.com/KanoCifer/kuroome-blog/internal/errs"
 )
 
 // 校验分支不依赖 repo，repo 为 nil 也能覆盖（在调用 repo 前返回）。
@@ -15,7 +16,7 @@ func TestAdminService_UpdatePost_InvalidID(t *testing.T) {
 		PostIn: dto.PostIn{Title: "t", Body: "b"},
 		ID:     "not-a-hex",
 	})
-	if !errors.Is(err, ErrInvalidPostID) {
+	if !errors.Is(err, errs.ErrInvalidPostID) {
 		t.Errorf("err = %v, want ErrInvalidPostID", err)
 	}
 }
@@ -23,7 +24,7 @@ func TestAdminService_UpdatePost_InvalidID(t *testing.T) {
 func TestAdminService_DeletePost_InvalidID(t *testing.T) {
 	svc := &AdminService{}
 	err := svc.DeletePost("%%%")
-	if !errors.Is(err, ErrInvalidPostID) {
+	if !errors.Is(err, errs.ErrInvalidPostID) {
 		t.Errorf("err = %v, want ErrInvalidPostID", err)
 	}
 }

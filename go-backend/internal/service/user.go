@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 	"slices"
 	"strconv"
 	"time"
@@ -11,25 +10,13 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
-	"app/internal/config"
-	"app/internal/model"
-	"app/internal/repository/postgres"
-	"app/pkg/jwt"
+	"github.com/KanoCifer/kuroome-blog/internal/config"
+	"github.com/KanoCifer/kuroome-blog/internal/dto"
+	"github.com/KanoCifer/kuroome-blog/internal/errs"
+	"github.com/KanoCifer/kuroome-blog/internal/model"
+	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
+	"github.com/KanoCifer/kuroome-blog/pkg/jwt"
 )
-
-var (
-	ErrInvalidCredentials = errors.New("用户名或密码错误")
-	ErrUserExists         = errors.New("用户名已存在")
-	ErrEmailExists        = errors.New("邮箱已注册")
-	ErrInvalidEmailCode   = errors.New("验证码无效")
-	ErrUserNotFound       = errors.New("用户不存在")
-	ErrInvalidToken       = errors.New("无效的令牌")
-)
-
-type Tokens struct {
-	AccessToken  string
-	RefreshToken string
-}
 
 type LoginResponse struct {
 	ID       int    `json:"id"`
@@ -55,7 +42,7 @@ func (s *UserService) GetByID(userID uint) (*model.User, *model.Profile, error) 
 		return nil, nil, err
 	}
 	if u == nil {
-		return nil, nil, ErrUserNotFound
+		return nil, nil, errs.ErrUserNotFound
 	}
 	return u, u.Profile, nil
 }
@@ -75,15 +62,15 @@ func (s *UserService) GetByUsername(username string) (*model.User, *model.Profil
 
 func (s *UserService) CreateUser(username, password, email, emailCode string) (*model.User, *model.Profile, error) {
 	if s.repo.UsernameExists(username) {
-		return nil, nil, ErrUserExists
+		return nil, nil, errs.ErrUserExists
 	}
 	if email != "" && s.repo.EmailExists(email) {
-		return nil, nil, ErrEmailExists
+		return nil, nil, errs.ErrEmailExists
 	}
 
 	if emailCode != "" {
 		if !s.verifyEmailCode(email, emailCode) {
-			return nil, nil, ErrInvalidEmailCode
+			return nil, nil, errs.ErrInvalidEmailCode
 		}
 	}
 
@@ -119,25 +106,25 @@ func (s *UserService) Authenticate(username, password string) (*model.User, erro
 		return nil, err
 	}
 	if u == nil {
-		return nil, ErrInvalidCredentials
+		return nil, errs.ErrInvalidCredentials
 	}
 	if !s.CheckPassword(u, password) {
-		return nil, ErrInvalidCredentials
+		return nil, errs.ErrInvalidCredentials
 	}
 	return u, nil
 }
 
 // CreateTokens 生成 access + refresh token，refresh 入库 Redis
-func (s *UserService) CreateTokens(u *model.User) (*Tokens, error) {
+func (s *UserService) CreateTokens(u *model.User) (*dto.Tokens, error) {
 	refreshTTL := 7 * 24 * time.Hour
 	accessExpiry := time.Now().Add(15 * time.Minute)
 	refreshExpiry := time.Now().Add(refreshTTL)
 
-	accessToken, err :=  jwt.GenerateToken(u.ID, accessExpiry)
+	accessToken, err := jwt.GenerateToken(u.ID, accessExpiry)
 	if err != nil {
 		return nil, err
 	}
-	refreshToken, err :=  jwt.GenerateToken(u.ID, refreshExpiry)
+	refreshToken, err := jwt.GenerateToken(u.ID, refreshExpiry)
 	if err != nil {
 		return nil, err
 	}
@@ -148,28 +135,28 @@ func (s *UserService) CreateTokens(u *model.User) (*Tokens, error) {
 		s.redis.Set(ctx, "refresh:"+itoa(int(u.ID)), refreshToken, refreshTTL)
 	}
 
-	return &Tokens{
+	return &dto.Tokens{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
 }
 
 // RefreshTokens 校验 refresh token 并轮换
-func (s *UserService) RefreshTokens(refreshToken string) (*Tokens, error) {
+func (s *UserService) RefreshTokens(refreshToken string) (*dto.Tokens, error) {
 	claims, err := jwt.ParseToken(refreshToken)
 	if err != nil {
-		return nil, ErrInvalidToken
+		return nil, errs.ErrInvalidToken
 	}
 	userID, err := parseUint(claims.Subject)
 	if err != nil {
-		return nil, ErrInvalidToken
+		return nil, errs.ErrInvalidToken
 	}
 
 	// 校验 Redis 里存的和传入的是否一致（防止重放/盗用）
 	if s.redis != nil {
 		stored, err := s.redis.Get(context.Background(), "refresh:"+claims.Subject).Result()
 		if err != nil || stored != refreshToken {
-			return nil, ErrInvalidToken
+			return nil, errs.ErrInvalidToken
 		}
 	}
 
