@@ -1,7 +1,3 @@
-// Package middleware 提供 gin 中间件：CORS 跨域。
-//
-// 手写 CORS 替代 gin-contrib/cors —— 精确控制预检响应，
-// 避免第三方库与 nginx 缓存交互时 Access-Control-Allow-Origin 丢失。
 package middleware
 
 import (
@@ -40,8 +36,8 @@ func CORS() gin.HandlerFunc {
 			c.Header("Access-Control-Allow-Origin", origin)
 			c.Header("Access-Control-Allow-Credentials", "true")
 			c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-			c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, Authorization, X-Requested-With")
-			c.Header("Access-Control-Max-Age", "43200") // 12h
+			c.Header("Access-Control-Allow-Headers", "*")
+			c.Header("Access-Control-Max-Age", "86400")
 			c.Header("Access-Control-Expose-Headers", "X-Process-Time, X-Trace-Id")
 		}
 

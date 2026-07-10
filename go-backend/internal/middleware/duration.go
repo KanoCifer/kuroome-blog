@@ -14,6 +14,7 @@ func Duration() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
 		c.Next()
-		c.Header("X-Process-Time", strconv.FormatInt(time.Since(start).Milliseconds(), 10))
+		p := strconv.FormatInt(time.Since(start).Milliseconds(), 10)
+		c.Header("X-Process-Time", p+"ms")
 	}
 }
