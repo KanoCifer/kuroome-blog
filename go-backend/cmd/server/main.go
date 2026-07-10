@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
 	"github.com/KanoCifer/kuroome-blog/internal/app"
@@ -43,7 +44,7 @@ func main() {
 
 	r := gin.Default()
 	r.Use(middleware.Trace())
-	r.Use(middleware.CORS())
+	r.Use(cors.New(middleware.NewCORSConfig()))
 	api := r.Group("/api")
 	v3 := api.Group("/v3")
 

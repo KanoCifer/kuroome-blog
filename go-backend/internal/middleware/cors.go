@@ -1,9 +1,7 @@
 package middleware
 
 import (
-	"strings"
-
-	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/cors"
 )
 
 // allowedOrigins 是前端来源白名单。Vite dev server + 生产域名。
@@ -19,38 +17,11 @@ func allowedOrigins() []string {
 	}
 }
 
-// CORS 跨域中间件。允许携带 cookie (AllowCredentials), 预检缓存 12h。
-// 来源匹配白名单中的域名(精确匹配), 否则不返回 ACAO。
-func CORS() gin.HandlerFunc {
-	origins := allowedOrigins()
-	hasWildcard := len(origins) == 0
+func NewCORSConfig() cors.Config {
+	config := cors.DefaultConfig()
+	config.AllowOrigins = allowedOrigins()
+	config.AllowCredentials = true
+	config.MaxAge = 12 * 3600 // 12h
 
-	return func(c *gin.Context) {
-		origin := c.GetHeader("Origin")
-		allowed := hasWildcard
-		if !allowed {
-			for _, o := range origins {
-				if strings.EqualFold(o, origin) {
-					allowed = true
-					break
-				}
-			}
-		}
-		if allowed {
-			c.Header("Access-Control-Allow-Origin", origin)
-			c.Header("Access-Control-Allow-Credentials", "true")
-			c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-			c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, Authorization, X-Requested-With")
-			c.Header("Access-Control-Max-Age", "43200") // 12h
-		}
-
-		// 预检请求直接返回 204
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204)
-			return
-		}
-
-		c.Next()
-	}
+	return config
 }
-
