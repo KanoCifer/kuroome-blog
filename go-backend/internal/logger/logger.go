@@ -1,28 +1,56 @@
 package logger
 
 import (
+	"context"
 	"log/slog"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/KanoCifer/kuroome-blog/internal/config"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 // Init 初始化全局 slog logger。需在 config.Load() 之后、其他日志调用之前调用。
+//
+// 路由规则（对齐 Python 端双文件）：
+//   - app.log：INFO <= level < ERROR
+//   - app_error.log：level >= ERROR
+//
+// trace_id 由 Context 注入（见 WithTraceID），handler 自动带到输出。
 func Init(cfg *config.Config) {
 	level := parseLevel(cfg.Server.LogLevel)
-	opts := &slog.HandlerOptions{Level: level}
 
-	var handler slog.Handler
+	appWriter := newLumberjackWriter("logs/app.log")
+	errWriter := newLumberjackWriter("logs/app_error.log")
+
+	opts := &slog.HandlerOptions{Level: slog.LevelDebug}
+	var appHandler, errHandler slog.Handler
 	if cfg.Server.ENV == "prod" {
-		handler = slog.NewJSONHandler(os.Stdout, opts)
+		appHandler = slog.NewJSONHandler(appWriter, opts)
+		errHandler = slog.NewJSONHandler(errWriter, opts)
 	} else {
-		handler = slog.NewTextHandler(os.Stdout, opts)
+		appHandler = slog.NewTextHandler(appWriter, opts)
+		errHandler = slog.NewTextHandler(errWriter, opts)
 	}
-	slog.SetDefault(slog.New(handler))
+
+	router := &routerHandler{appHandler: appHandler, errHandler: errHandler, minLevel: level}
+	slog.SetDefault(slog.New(router))
+}
+
+func newLumberjackWriter(path string) *lumberjack.Logger {
+	_ = os.MkdirAll(filepath.Dir(path), 0o755)
+	return &lumberjack.Logger{
+		Filename:   path,
+		MaxSize:    1, // 1 MB, 与 Python MAX_LOG_SIZE 一致
+		MaxBackups: 5, // 与 Python BACKUP_COUNT 一致
+		MaxAge:     30,
+		Compress:   true,
+	}
 }
 
 func parseLevel(s string) slog.Level {
-	switch s {
+	switch strings.ToUpper(s) {
 	case "DEBUG":
 		return slog.LevelDebug
 	case "WARN", "WARNING":
@@ -32,4 +60,61 @@ func parseLevel(s string) slog.Level {
 	default:
 		return slog.LevelInfo
 	}
+}
+
+// ── level 路由器 ───────────────────────────────────────────────────────────
+
+// routerHandler 按 level 把记录分发到 app.log / app_error.log，并从 Context 注入 trace_id。
+type routerHandler struct {
+	appHandler slog.Handler
+	errHandler slog.Handler
+	minLevel   slog.Leveler
+}
+
+func (r *routerHandler) Enabled(ctx context.Context, level slog.Level) bool {
+	return level >= r.minLevel.Level()
+}
+
+func (r *routerHandler) Handle(ctx context.Context, rec slog.Record) error {
+	if id, ok := traceIDFromContext(ctx); ok && id != "" {
+		rec.AddAttrs(slog.String("trace_id", id))
+	}
+	if rec.Level >= slog.LevelError {
+		return r.errHandler.Handle(ctx, rec)
+	}
+	return r.appHandler.Handle(ctx, rec)
+}
+
+func (r *routerHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
+	return &routerHandler{
+		appHandler: r.appHandler.WithAttrs(attrs),
+		errHandler: r.errHandler.WithAttrs(attrs),
+		minLevel:   r.minLevel,
+	}
+}
+
+func (r *routerHandler) WithGroup(name string) slog.Handler {
+	return &routerHandler{
+		appHandler: r.appHandler.WithGroup(name),
+		errHandler: r.errHandler.WithGroup(name),
+		minLevel:   r.minLevel,
+	}
+}
+
+// ── trace_id 上下文 ─────────────────────────────────────────────────────────
+
+type traceIDKey struct{}
+
+// WithTraceID 把 trace_id 写入 context，供 routerHandler 读取。中间件使用。
+func WithTraceID(ctx context.Context, id string) context.Context {
+	return context.WithValue(ctx, traceIDKey{}, id)
+}
+
+func traceIDFromContext(ctx context.Context) (string, bool) {
+	v := ctx.Value(traceIDKey{})
+	if v == nil {
+		return "", false
+	}
+	s, ok := v.(string)
+	return s, ok
 }

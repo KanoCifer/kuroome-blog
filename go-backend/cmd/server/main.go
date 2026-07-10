@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log/slog"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -35,7 +36,13 @@ func main() {
 	}
 	defer db.Close()
 
+	// 收口 gin 内部日志到 slog（gin access 日志改为通过 Trace 中间件
+	// 的 handler 层记录，不再输出 uvicorn 风格的独立 access 行）。
+	gin.DefaultWriter = &slogWriter{}
+	gin.DefaultErrorWriter = &slogWriter{}
+
 	r := gin.Default()
+	r.Use(middleware.Trace())
 	r.Use(middleware.CORS())
 	api := r.Group("/api")
 	v3 := api.Group("/v3")
@@ -70,4 +77,16 @@ func main() {
 
 	addr := fmt.Sprintf("127.0.0.1:%d", state.Cfg().Server.Port)
 	r.Run(addr)
+}
+
+// slogWriter 把 gin 内部输出（access / panic 恢复）桥接为 slog 记录，
+// 使全仓日志走同一套 JSON handler。
+type slogWriter struct{}
+
+func (slogWriter) Write(p []byte) (int, error) {
+	msg := strings.TrimSpace(string(p))
+	if msg != "" {
+		slog.Default().Info("[gin] " + msg)
+	}
+	return len(p), nil
 }
