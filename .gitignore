@@ -42,3 +42,4 @@ backend/models/*.joblib
 .claude/skills/teach/
 .claude/settings.json
 go-backend/configs/config.yaml
+go-backend/logs/app.log

@@ -115,10 +115,10 @@ func (c *FeishuChannel) Send(
 
 // feishuCard 飞书 interactive card 2.0 顶层结构。
 type feishuCard struct {
-	Schema string          `json:"schema"`
-	Config feishuConfig    `json:"config"`
-	Header feishuHeader    `json:"header"`
-	Body   feishuCardBody  `json:"body"`
+	Schema string         `json:"schema"`
+	Config feishuConfig   `json:"config"`
+	Header feishuHeader   `json:"header"`
+	Body   feishuCardBody `json:"body"`
 }
 
 type feishuConfig struct {
@@ -131,13 +131,13 @@ type feishuHeader struct {
 }
 
 type feishuCardBody struct {
-	Direction string        `json:"direction"`
-	Padding   string        `json:"padding"`
+	Direction string          `json:"direction"`
+	Padding   string          `json:"padding"`
 	Elements  []feishuElement `json:"elements"`
 }
 
 type feishuElement struct {
-	Tag    string `json:"tag"`
+	Tag     string `json:"tag"`
 	Content string `json:"content"`
 }
 

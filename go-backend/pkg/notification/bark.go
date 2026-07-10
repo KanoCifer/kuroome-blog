@@ -19,9 +19,9 @@ const barkTimeout = 10 * time.Second
 
 // barkPayload Bark 推送消息体。
 type barkPayload struct {
-	Body   string `json:"body"`
-	Level  string `json:"level"`
-	Sound  string `json:"sound"`
+	Body  string `json:"body"`
+	Level string `json:"level"`
+	Sound string `json:"sound"`
 }
 
 // BarkChannel Bark iOS 推送传输 adapter。

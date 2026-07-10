@@ -21,7 +21,6 @@ import (
 	"github.com/KanoCifer/kuroome-blog/pkg/notification"
 )
 
-
 const (
 	emailCodeExpire = time.Minute * 5
 	emailCodePrefix = "email_code:"
@@ -107,7 +106,6 @@ func (s *UserService) CreateUser(username, password, email, emailCode, avatarURL
 	}
 	return u, p, nil
 }
-
 
 func (s *UserService) SendEmailCode(email string) bool {
 	var ch notification.Channel = &notification.EmailChannel{}
@@ -249,7 +247,7 @@ func (s *UserService) UserToDict(u *model.User, p *model.Profile) map[string]any
 // ---------- 辅助 ----------
 
 func generateCode() string {
-	return itoa(rand.Intn(100000))
+	return itoa(rand.Intn(999999))
 }
 
 // renderVerificationEmail 渲染验证码邮件 HTML —— 克制样式，与 design-system

@@ -91,4 +91,3 @@ func redisContext(c *gin.Context) context.Context {
 	}
 	return context.Background()
 }
-
