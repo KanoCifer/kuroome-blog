@@ -12,6 +12,7 @@ from itertools import repeat
 from zoneinfo import ZoneInfo
 
 import orjson
+from pydantic import ValidationError
 from redis.asyncio import Redis as AsyncRedis
 from taskiq import Context, TaskiqDepends
 
@@ -154,11 +155,25 @@ async def run_migration_job(context: Context = TaskiqDepends()):
                 }
 
             parse_start = time.perf_counter()
+            parsed_data_list: list[VisitorData] = []
+            invalid_items: list[bytes] = []
+            validation_errors: list[str] = []
             try:
-                parsed_data_list: list[VisitorData] = [
-                    VisitorData(**orjson.loads(item)) for item in valid_items
-                ]
+                for item in valid_items:
+                    raw = orjson.loads(item)
+                    try:
+                        parsed_data_list.append(VisitorData(**raw))
+                    except ValidationError as e:
+                        invalid_items.append(item)
+                        validation_errors.append(str(e))
                 parse_duration = time.perf_counter() - parse_start
+                if invalid_items:
+                    logger.bind(
+                        job="migration",
+                        skipped=len(invalid_items),
+                        errors=validation_errors[:5],
+                        parse_duration=parse_duration,
+                    ).warning("migration skipped invalid items")
             except json.JSONDecodeError as e:
                 error_msg = str(e)
                 parse_duration = time.perf_counter() - parse_start
@@ -228,6 +243,7 @@ async def run_migration_job(context: Context = TaskiqDepends()):
                 duration=duration,
                 fetched=len(valid_items),
                 migrated=processed_count,
+                skipped=len(invalid_items),
                 fetch_duration=fetch_duration,
                 parse_duration=parse_duration,
                 db_duration=db_duration,
@@ -236,6 +252,7 @@ async def run_migration_job(context: Context = TaskiqDepends()):
                 "status": "success",
                 "total": len(valid_items),
                 "migrated": processed_count,
+                "skipped": len(invalid_items),
                 "duration": f"{duration:.2f}s",
             }
 

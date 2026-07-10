@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class VisitorData(BaseModel):
@@ -21,3 +21,11 @@ class VisitorData(BaseModel):
     cpu: str = ""
     ip_address: str | None = None
     visit_time: datetime = datetime.now(UTC)
+
+    @field_validator("visit_time", mode="before")
+    @classmethod
+    def coerce_empty_visit_time(cls, value):
+        """空字符串视为未提供，交由默认值填充。"""
+        if isinstance(value, str) and not value.strip():
+            return None
+        return value
