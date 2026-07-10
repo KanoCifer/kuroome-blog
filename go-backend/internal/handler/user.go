@@ -20,6 +20,7 @@ type UserService interface {
 	Logout(userID uint)
 	RefreshTokens(refreshToken string) (*dto.Tokens, error)
 	UserToDict(u *model.User, p *model.Profile) map[string]any
+	SendEmailCode(email string) bool
 }
 
 // UserHandler 持有业务服务，gin 路由方法挂在其上。
@@ -158,6 +159,23 @@ func (h *UserHandler) RefreshToken(c *gin.Context) {
 	}, "访问令牌已刷新")
 }
 
+
+func (h *UserHandler) EmailCode(c *gin.Context) {
+	var req struct {
+		Email string `json:"email"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.APIError(c, err.Error(), 400)
+		return
+	}
+	if req.Email == "" {
+		response.APIError(c, "邮箱不能为空", 400)
+		return
+	}
+	go h.userSvc.SendEmailCode(req.Email)
+	response.Success(c, nil, "验证码已发送")
+}
+
 // RegisterRoutes 把 handler 方法挂到路由组。
 // publicMWs 是应用于 login/register 等公开接口的限流中间件(可变参数)。
 // authMiddleware 是认证中间件, 用于 logout/me 等需登录接口。
@@ -167,4 +185,5 @@ func (h *UserHandler) RegisterRoutes(r *gin.RouterGroup, authMiddleware gin.Hand
 	r.POST("/refresh-token", h.RefreshToken)
 	r.POST("/logout", authMiddleware, h.Logout)
 	r.GET("/me", authMiddleware, h.Me)
+	r.POST("/email/code", h.EmailCode)
 }

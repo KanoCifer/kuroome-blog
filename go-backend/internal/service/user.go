@@ -2,8 +2,11 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"math/rand"
 	"slices"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -15,6 +18,13 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 	"github.com/KanoCifer/kuroome-blog/pkg/jwt"
+	"github.com/KanoCifer/kuroome-blog/pkg/notification"
+)
+
+
+const (
+	emailCodeExpire = time.Minute * 5
+	emailCodePrefix = "email_code:"
 )
 
 type LoginResponse struct {
@@ -96,6 +106,30 @@ func (s *UserService) CreateUser(username, password, email, emailCode, avatarURL
 		return nil, nil, err
 	}
 	return u, p, nil
+}
+
+
+func (s *UserService) SendEmailCode(email string) bool {
+	var ch notification.Channel = &notification.EmailChannel{}
+	code := generateCode()
+
+	ctx := context.Background()
+
+	key := emailCodePrefix + email
+	s.redis.Set(ctx, key, code, emailCodeExpire)
+
+	msg := buildVerificationEmail(code)
+	return ch.Send(ctx, msg, notification.NotificationContext{Email: email})
+}
+
+// buildVerificationEmail 构造注册验证码邮件内容与纯文本 fallback。
+func buildVerificationEmail(code string) notification.Message {
+	plain := fmt.Sprintf("您的验证码：%s\n请在5分钟内使用。", code)
+	return notification.Message{
+		Title: "kanocifer.chat 注册验证码",
+		Body:  plain,
+		HTML:  renderVerificationHTML(code),
+	}
 }
 
 // ---------- 登录 / 鉴权 ----------
@@ -213,6 +247,51 @@ func (s *UserService) UserToDict(u *model.User, p *model.Profile) map[string]any
 }
 
 // ---------- 辅助 ----------
+
+func generateCode() string {
+	return itoa(rand.Intn(100000))
+}
+
+// renderVerificationEmail 渲染验证码邮件 HTML —— 克制样式，与 design-system
+// "适" 调性对齐：深色大字号 + 等宽字体突出验证码，不用花哨色彩。
+func renderVerificationHTML(code string) string {
+	return fmt.Sprintf(`<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:24px;background:#fafafa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+<table width="100%%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:0 auto;background:#ffffff;border-radius:8px;overflow:hidden;">
+<tr><td style="padding:32px 24px 16px;">
+<p style="margin:0 0 16px;font-size:14px;color:#333333;">这是您的验证码：</p>
+<p style="margin:0 0 24px;font-size:32px;font-weight:700;letter-spacing:4px;color:#1a1a1a;font-family:'SF Mono',Consolas,monospace;">%s</p>
+<p style="margin:0;font-size:13px;color:#888888;">请在5分钟内使用。若非本人操作，请忽略此邮件。</p>
+</td></tr>
+</table>
+</body>
+</html>`, htmlEscape(code))
+}
+
+// htmlEscape 转义 HTML 特殊字符，防止验证码中含 < > & 等破坏模板。
+func htmlEscape(s string) string {
+	var b strings.Builder
+	for _, r := range s {
+		switch r {
+		case '<':
+			b.WriteString("&lt;")
+		case '>':
+			b.WriteString("&gt;")
+		case '&':
+			b.WriteString("&amp;")
+		case '"':
+			b.WriteString("&quot;")
+		default:
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
+}
 
 func itoa(n int) string {
 	return strconv.Itoa(n)

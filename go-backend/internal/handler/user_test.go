@@ -24,13 +24,14 @@ func init() {
 // ---------- mock UserService ----------
 
 type mockUserService struct {
-	authenticateFn func(username, password string) (*model.User, error)
-	createTokensFn func(u *model.User) (*dto.Tokens, error)
-	createUserFn   func(username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
-	getByIDFn      func(userID uint) (*model.User, *model.Profile, error)
-	logoutFn       func(userID uint)
-	refreshFn      func(refreshToken string) (*dto.Tokens, error)
-	userToDictFn   func(u *model.User, p *model.Profile) map[string]any
+	authenticateFn  func(username, password string) (*model.User, error)
+	createTokensFn  func(u *model.User) (*dto.Tokens, error)
+	createUserFn    func(username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
+	getByIDFn       func(userID uint) (*model.User, *model.Profile, error)
+	logoutFn        func(userID uint)
+	refreshFn       func(refreshToken string) (*dto.Tokens, error)
+	sendEmailCodeFn func(email string) bool
+	userToDictFn    func(u *model.User, p *model.Profile) map[string]any
 }
 
 func (m *mockUserService) Authenticate(username, password string) (*model.User, error) {
@@ -60,6 +61,13 @@ func (m *mockUserService) Logout(userID uint) {
 
 func (m *mockUserService) RefreshTokens(refreshToken string) (*dto.Tokens, error) {
 	return m.refreshFn(refreshToken)
+}
+
+func (m *mockUserService) SendEmailCode(email string) bool {
+	if m.sendEmailCodeFn != nil {
+		return m.sendEmailCodeFn(email)
+	}
+	return true
 }
 
 func (m *mockUserService) UserToDict(u *model.User, p *model.Profile) map[string]any {

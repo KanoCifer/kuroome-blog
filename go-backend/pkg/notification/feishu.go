@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
@@ -16,19 +15,15 @@ import (
 // feishuTimeout 飞书 webhook 请求超时。
 const feishuTimeout = 10 * time.Second
 
-// feishuPayload 飞书 text 消息体。
-type feishuPayload struct {
-	MsgType string `json:"msg_type"`
-	Content struct {
-		Text string `json:"text"`
-	} `json:"content"`
-}
+// feishuDefaultCardColor 飞书卡片 header 默认模板色。
+const feishuDefaultCardColor = "green"
 
-// FeishuChannel 飞书 Webhook 传输 adapter。
+// FeishuChannel 飞书 Webhook 传输 adapter —— 以 interactive card 2.0
+// 卡片格式发送通知，header 显示 Title，body 显示 Body（markdown）。
 //
 // webhook_url 来源（保持重构前兼容优先级）：
 //  1. ctx.FeishuWebhookURL（订阅级 reminder_config）；
-//  2. 全局 config.FEISHU_WEBHOOK_URL。
+//  2. 全局 config.Feishu.WebhookURL。
 type FeishuChannel struct {
 	httpClient *http.Client
 }
@@ -57,12 +52,15 @@ func (c *FeishuChannel) Send(
 		return false
 	}
 
-	payload := feishuPayload{MsgType: "text"}
-	payload.Content.Text = fmt.Sprintf("%s\n\n%s", msg.Title, msg.Body)
+	color := msg.Color
+	if color == "" {
+		color = feishuDefaultCardColor
+	}
 
-	body, err := json.Marshal(payload)
+	card := buildFeishuCard(msg.Title, msg.Body, color)
+	body, err := json.Marshal(card)
 	if err != nil {
-		slog.Error("[feishu] marshal payload", "err", err)
+		slog.Error("[feishu] marshal card", "err", err)
 		return false
 	}
 
@@ -111,6 +109,59 @@ func (c *FeishuChannel) Send(
 		return false
 	}
 
-	slog.Info("[feishu] notification sent", "title", msg.Title)
+	slog.Info("[feishu] card sent", "title", msg.Title, "color", color)
 	return true
+}
+
+// feishuCard 飞书 interactive card 2.0 顶层结构。
+type feishuCard struct {
+	Schema string          `json:"schema"`
+	Config feishuConfig    `json:"config"`
+	Header feishuHeader    `json:"header"`
+	Body   feishuCardBody  `json:"body"`
+}
+
+type feishuConfig struct {
+	UpdateMulti bool `json:"update_multi"`
+}
+
+type feishuHeader struct {
+	Title    feishuText `json:"title"`
+	Template string     `json:"template"`
+}
+
+type feishuCardBody struct {
+	Direction string        `json:"direction"`
+	Padding   string        `json:"padding"`
+	Elements  []feishuElement `json:"elements"`
+}
+
+type feishuElement struct {
+	Tag    string `json:"tag"`
+	Content string `json:"content"`
+}
+
+type feishuText struct {
+	Tag     string `json:"tag"`
+	Content string `json:"content"`
+}
+
+// buildFeishuCard 构造一个最小化的飞书卡片 JSON：header 显示 title，
+// body 用 markdown 显示正文内容。
+func buildFeishuCard(title, bodyText, color string) feishuCard {
+	return feishuCard{
+		Schema: "2.0",
+		Config: feishuConfig{UpdateMulti: true},
+		Header: feishuHeader{
+			Title:    feishuText{Tag: "plain_text", Content: title},
+			Template: color,
+		},
+		Body: feishuCardBody{
+			Direction: "vertical",
+			Padding:   "12px",
+			Elements: []feishuElement{
+				{Tag: "markdown", Content: bodyText},
+			},
+		},
+	}
 }

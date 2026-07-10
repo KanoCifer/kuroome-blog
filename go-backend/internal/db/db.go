@@ -2,6 +2,8 @@ package db
 
 import (
 	"context"
+	"log/slog"
+	"os"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -23,7 +25,8 @@ var (
 
 func InitDB() error {
 	var err error
-	pgDB, err = gorm.Open(postgres.Open(config.Cfg.Database.DatabaseURL), &gorm.Config{
+	dsn := databaseURL()
+	pgDB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		NamingStrategy: model.NewNamer(),
 	})
 	if err != nil {
@@ -47,8 +50,13 @@ func GetDB() *gorm.DB {
 }
 
 func InitMongo() error {
+	uri := config.Cfg.Database.MongoURI
+	if uri == "" {
+		slog.Info("[mongo] MONGO_URI not configured, skipping")
+		return nil
+	}
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	opts := options.Client().ApplyURI(config.Cfg.Database.MongoURI).SetServerAPIOptions(serverAPI)
+	opts := options.Client().ApplyURI(uri).SetServerAPIOptions(serverAPI)
 	c, err := mongo.Connect(opts)
 	if err != nil {
 		return err
@@ -78,6 +86,19 @@ func InitRedis() error {
 
 func GetRedis() *redis.Client {
 	return rdb
+}
+
+// databaseURL 优先从环境变量 DATABASE_URL 读取，回退到 config.Cfg。
+// viper 的 AutomaticEnv 在 mapstructure 值为空字符串时不覆盖 default，
+// 导致 viper 读到的 DATABASE_URL 常为空；直接从 os 读可以绕过这个问题。
+func databaseURL() string {
+	if url := os.Getenv("DATABASE_URL"); url != "" {
+		return url
+	}
+	if cfg := config.Cfg; cfg != nil && cfg.Database.DatabaseURL != "" {
+		return cfg.Database.DatabaseURL
+	}
+	return ""
 }
 
 func Close() {

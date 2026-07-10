@@ -9,13 +9,18 @@ import "context"
 
 // Message 通用通知消息 —— 只含文本，不含任何领域字段。
 //
-// Title 为标题；Body 为纯文本正文（Bark / 飞书等纯文本渠道使用）；
+// Title 为标题；Body 为纯文本正文（Bark / 飞书 markdown 渠道使用）；
 // HTML 为 HTML 正文（Email 渠道使用），为空时由 Email 渠道退化为转义后的
 // Body。
+//
+// Color 为飞书卡片的 header 模板色（blue / green / red / orange / yellow /
+// violet / purple / indigo / turquoise / wathet / carmine / grey / default），
+// 空时 FeishuChannel 默认 "green"。其它渠道忽略此字段。
 type Message struct {
 	Title string
 	Body  string
 	HTML  string
+	Color string
 }
 
 // NotificationContext 渠道收件人配置 —— 纯传输层，不含业务 ID，不查库。

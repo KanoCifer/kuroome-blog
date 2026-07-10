@@ -54,9 +54,10 @@ func (c *EmailChannel) Send(
 	}
 	mailMsg.Subject(msg.Title)
 
-	// HTML 优先；为空时退化为转义后的纯文本 body。
+	// HTML + 纯文本双版本：HTML 为主，纯文本作 fallback，兼容所有客户端。
 	if msg.HTML != "" {
-		mailMsg.SetBodyString(gomail.TypeTextHTML, msg.HTML)
+		mailMsg.SetBodyString(gomail.TypeTextPlain, msg.Body)
+		mailMsg.AddAlternativeString(gomail.TypeTextHTML, msg.HTML)
 	} else {
 		mailMsg.SetBodyString(gomail.TypeTextPlain, msg.Body)
 	}
