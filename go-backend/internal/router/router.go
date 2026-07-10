@@ -18,9 +18,9 @@ import (
 
 // Setup 装配 gin 引擎：全局中间件 + 路由注册 + 限流。
 func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
+	r.Use(middleware.Duration())
 	r.Use(middleware.Trace())
 	r.Use(cors.New(middleware.NewCORSConfig()))
-
 	v3 := r.Group("/api/v3")
 
 	// 限流: 登录 / 注册各 5 次 / 分钟。

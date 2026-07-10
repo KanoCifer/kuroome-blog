@@ -21,6 +21,7 @@ func NewCORSConfig() cors.Config {
 	config := cors.DefaultConfig()
 	config.AllowOrigins = allowedOrigins()
 	config.AllowCredentials = true
+	config.AllowHeaders = []string{"*"}
 	config.MaxAge = 12 * 3600 // 12h
 
 	return config

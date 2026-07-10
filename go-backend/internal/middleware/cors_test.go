@@ -5,13 +5,15 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gin-contrib/cors"
+
 	"github.com/gin-gonic/gin"
 )
 
 func TestCORS_AllowsWhitelistedOrigin(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	r := gin.New()
-	r.Use(CORS())
+	r.Use(cors.New(NewCORSConfig()))
 	r.GET("/", func(c *gin.Context) { c.Status(200) })
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -30,7 +32,7 @@ func TestCORS_AllowsWhitelistedOrigin(t *testing.T) {
 func testCORS_RejectsUnknownOrigin(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	r := gin.New()
-	r.Use(CORS())
+	r.Use(cors.New(NewCORSConfig()))
 	r.GET("/", func(c *gin.Context) { c.Status(200) })
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -46,7 +48,7 @@ func testCORS_RejectsUnknownOrigin(t *testing.T) {
 func TestCORS_PreflightReturns204(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	r := gin.New()
-	r.Use(CORS())
+	r.Use(cors.New(NewCORSConfig()))
 	r.GET("/", func(c *gin.Context) { c.Status(200) })
 
 	req := httptest.NewRequest(http.MethodOptions, "/", nil)
