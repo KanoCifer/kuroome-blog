@@ -1,6 +1,8 @@
 # Logging Rules
 
-日志系统的编排规约。配套完整英文方案见 [docs/rules/logging-plan.md](logging-plan.md)。
+日志系统的编排规约（Python 后端）。配套完整英文方案见 [docs/rules/logging-plan.md](logging-plan.md)。
+
+> **Go 端**：Go 后端使用独立日志包 `logger/logger.go`（uber/zap），不经过 structlog。本规约第 1–9 节仅适用于 Python `backend/`。
 
 ## 1. 单一来源
 

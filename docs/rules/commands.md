@@ -24,6 +24,17 @@ uv run pytest -k "config" -v                  # filter by keyword
 uv run pytest --tb=short                      # short traceback
 ```
 
+## Go Backend
+
+```bash
+cd go-backend
+
+go run ./cmd/server          # 启动 -> 127.0.0.1:5555
+go test ./...                # 全量单测
+gofmt -w .                   # 格式化
+go vet ./...                 # 静态检查
+```
+
 ## Desktop (Vue)
 
 ```bash
