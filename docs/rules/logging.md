@@ -10,20 +10,20 @@
 - structlog 经 `wrap_for_formatter` 把事件交回 stdlib `logging`，由 `ProcessorFormatter` 统一渲染：业务日志与 uvicorn / taskiq / sqlalchemy 等 foreign 记录走**同一条**处理器链、同一套 JSON 长相。foreign logger（`uvicorn.*` / `taskiq` / `sqlalchemy.engine`）清掉自带 handler、开 `propagate` 透传到 root，**禁止**各框架各自向 stderr 输出第二套格式。
 - 终端在 TTY 下用 `ConsoleRenderer`（dev 可读），非 TTY 与文件统一 `JSONRenderer`。
 - 禁止 `import logging` 后直接用 stdlib 根 logger 打业务日志；业务日志只用 `structlog` 的 `logger`。
-- 日志级别由 `LOG_LEVEL` 环境变量控制（默认 INFO），DB 入库阈值由 `DB_LOG_LEVEL` 控制（默认 WARNING）。
+- 日志级别由 `LOG_LEVEL` 环境变量控制（默认 INFO）；DB 入库阈值固定为 `WARNING+`（warning / error / critical），按 level 名字集合判定（`_LEVELS_FOR_DB`），不再暴露为运行时配置——保持输出 schema 四键精简。
 
-## 2. 三文件路由
+## 2. 双文件路由
 
 日志**按噪音来源分文件**，不按模块/领域分。一次操作横跨多模块时，靠 `trace_id` grep 串联，而非开多个文件对时间戳。
 
-| 文件         | 内容                   | 级别   | 来源                                      |
-| ------------ | ---------------------- | ------ | ----------------------------------------- |
-| `app.log`    | 业务主轨迹             | INFO+  | service / task 层                         |
-| `error.log`  | 异常与错误             | ERROR+ | 任何层                                    |
-| `access.log` | 外部系统调用、审计事件 | —      | uvicorn access、第三方 API 调用、敏感操作 |
+| 文件           | 内容                   | 级别   | 来源              |
+| -------------- | ---------------------- | ------ | ----------------- |
+| `app_info.log` | 业务主轨迹             | INFO+  | service / task 层 |
+| `app_error.log`| 异常与错误             | ERROR+ | 任何层            |
 
 - 不按 `user` / `article` / `rss` 等领域分文件。跨域调用（如 rss → cache → notify）的日志切不干净，分文件只会让一次排查散落多文件。
-- `app.log` 与 `error.log` 已有；`access.log` 是新增的噪音剥离文件，把 access、第三方调用审计从主轨迹里抽走。
+- 两个文件仅在 `SAVE_LOGS=True` 时启用（受 `LOG_PATH` / `LOG_DIR` 控制路径）；终端（stderr）始终输出。
+- `uvicorn.access` 的自带 handler 被清掉后回传播到 root，进入 `app_info.log`——不再单独剥离 access 轨迹。
 
 ## 3. 结构化——message 给人，extra 给机器
 
@@ -75,12 +75,40 @@ logger.bind(channel="feishu").warning("webhook url not configured, skip")
 - 排查时 `grep <trace_id>` 一次操作的整条链（HTTP → service → repo → redis → db）一次出齐。
 - 这是跨模块串联的正确手段，取代"分文件"。
 
-## 7. 持久化——DB 收紧
+## 7. 持久化——纯 level 门控 + event 表
 
-- DB 入库默认只持久化 `WARNING+`（`DB_LOG_LEVEL`），或要求 `logger.bind(persist=True)` 显式标记才入库。
-- 实现为 root 上的专用 `_DBHandler`：终端处理器 `_db_enqueue` 做双门准入（`persist` 或 level ≥ `DB_LOG_LEVEL`），fire-and-forget 经 `log_task.kiq()` 入队。每条记录只入队一次（`_db_enqueue` 仅在该 handler 运行，不在 `shared_processors` 里）。
-- 日志写入 PostgreSQL `log` 表（SQLAlchemy 模型），可通过 `/api/v2/system/log` 分页查询。
-- 收紧后 `Log` 表降一个数量级，真正关键日志才入库；INFO 轨迹仍可查 `app_info.log`（有轮转保留）。
+### 7.1 Log 表（WARNING+ 自动入库）
+
+DB 入库**仅**持久化 `WARNING+`（warning / error / critical），INFO 不入库。门控按 level 名字集合判定（`_LEVELS_FOR_DB`），不再暴露为运行时配置，也不再提供 `logger.bind(persist=True)` 显式标记。
+
+实现为 root 上的专用 `_DBHandler`：
+
+```
+logger (sync, ProcessorFormatter)
+   │
+   ▼
+_db_enqueue(gate: level ∈ _LEVELS_FOR_DB)   ← 纯 level 门控，不再判 persist
+   │
+   ▼
+asyncio.Queue(maxsize=1000)                  ← 解耦同步 logger 与异步 DB
+   │
+   ▼
+_log_worker()  [background task]             ← 单 consumer，async session 直写 Log 表
+```
+
+- 每条记录只入队一次（`_db_enqueue` 仅作为 `_DBHandler` 的终端处理器运行，不在 `shared_processors` 里）。
+- worker 在 app startup 时通过 `start_log_worker()` 启动（`asyncio.create_task`），shutdown 时先 `await drain_log_queue()` 排空、再 cancel。
+- queue 满时丢弃并留痕 stderr，**绝不**阻塞业务日志流。
+- 日志写入 PostgreSQL `log` 表（SQLAlchemy `Log` 模型），供排查时直接查库；**不**再通过 HTTP 端点分页查询。
+
+### 7.2 Event 表（关键服务事件）
+
+`INFO + persist=True` 在旧设计里意为"这条 INFO 尽管级别低、仍希望落库供查询"。新版去掉 persist 门控后，启动/部署/通知失败这类关键业务事件改由 **`event` 表**承载——给人看的业务事件，区别于 `log` 表的机器噪音。
+
+- 通过 `record_event(type, title, message="", source="", extra=None)` 独立 async 写入（`app/services/event_service.py`），**不经 logger**。
+- 预置 `type`：`startup`（服务启动）、`deploy`（后端升级）、`notify_failure`（通知发送失败）；可扩展自定义类型。
+- 前端以"系统事件"列表展示，通过 `/api/v2/system/events` 分页查询（参数 `type` / `start` / `end` / `page` / `per_page`）。
+- 调用点：`main.py`（startup / notify_failure）、`admin.py`（deploy）。
 
 ## 8. 中文 / 英文
 

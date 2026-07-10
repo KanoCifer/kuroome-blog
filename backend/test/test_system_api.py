@@ -52,12 +52,12 @@ async def test_system_ping(api_client):
     assert resp.json()["status"] == "ok"
 
 
-# ── GET /api/v2/system/log ────────────────────────────────────
+# ── GET /api/v2/system/events ─────────────────────────────────
 
 
 @pytest.mark.asyncio
 async def test_list_events_empty(api_client, system_override):
-    resp = await api_client.get("/api/v2/system/log")
+    resp = await api_client.get("/api/v2/system/events")
     assert resp.status_code == 200
     body = resp.json()
     assert body["data"]["items"] == []
@@ -72,7 +72,7 @@ async def test_list_events_returns_items(
     db_session.add(_make_event(message="event2"))
     await db_session.flush()
 
-    resp = await api_client.get("/api/v2/system/log")
+    resp = await api_client.get("/api/v2/system/events")
     assert resp.status_code == 200
     body = resp.json()
     assert body["data"]["pagination"]["total"] == 2
@@ -88,7 +88,7 @@ async def test_list_events_pagination(
     await db_session.flush()
 
     resp = await api_client.get(
-        "/api/v2/system/log", params={"page": 1, "per_page": 2}
+        "/api/v2/system/events", params={"page": 1, "per_page": 2}
     )
     assert resp.status_code == 200
     body = resp.json()
@@ -108,7 +108,7 @@ async def test_list_events_filter_by_type(
     await db_session.flush()
 
     resp = await api_client.get(
-        "/api/v2/system/log", params={"type": "deploy"}
+        "/api/v2/system/events", params={"type": "deploy"}
     )
     assert resp.status_code == 200
     body = resp.json()

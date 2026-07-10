@@ -30,7 +30,7 @@ export interface FetchRecentEventsOptions {
 
 /**
  * 取最近 N 条服务事件（按时间倒序），用于 StatusView「最近事件」卡片。
- * 后端复用 /api/v2/system/log，仅调整 per_page / type。
+ * 后端复用 /api/v2/system/events，仅调整 per_page / type。
  */
 export async function fetchRecentEvents(
   options: FetchRecentEventsOptions = {},
@@ -42,7 +42,7 @@ export async function fetchRecentEvents(
   };
   if (type) params.type = type;
   const res = await request.get<ApiResponse<EventListData>>(
-    'v2/system/log',
+    'v2/system/events',
     { params },
   );
   return res.data.data.items;

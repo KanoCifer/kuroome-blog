@@ -15,8 +15,8 @@ async def system():
     return {"status": "ok"}
 
 
-@router.get("/log")
-async def get_log(
+@router.get("/events")
+async def get_events(
     page: int = Query(1, ge=1, description="页码，从 1 开始"),
     per_page: int = Query(
         10, ge=1, le=200, description="每页条数，默认最近 10 条"
