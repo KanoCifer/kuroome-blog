@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"log/slog"
 
 	"github.com/gin-gonic/gin"
 
@@ -43,18 +44,23 @@ func (h *UserHandler) Login(c *gin.Context) {
 	user, err := h.userSvc.Authenticate(req.Username, req.Password)
 	if err != nil {
 		if errors.Is(err, errs.ErrInvalidCredentials) {
+			slog.WarnContext(c.Request.Context(), "login failed", "reason", "invalid_credentials", "username", req.Username)
 			response.APIError(c, err.Error(), 401)
 			return
 		}
+		slog.ErrorContext(c.Request.Context(), "login error", "error", err, "username", req.Username)
 		response.APIError(c, "server error", 500)
 		return
 	}
 
 	tokens, err := h.userSvc.CreateTokens(user)
 	if err != nil {
+		slog.ErrorContext(c.Request.Context(), "create tokens error", "error", err, "user_id", user.ID)
 		response.APIError(c, "server error", 500)
 		return
 	}
+
+	slog.InfoContext(c.Request.Context(), "user login", "user_id", user.ID)
 
 	// 写入 refresh_token cookie（与 Python 端一致），供前端静默刷新。
 	setRefreshCookie(c, h.cfg, tokens.RefreshToken)
@@ -78,17 +84,22 @@ func (h *UserHandler) Register(c *gin.Context) {
 	if err != nil {
 		switch {
 		case errors.Is(err, errs.ErrUserExists):
+			slog.WarnContext(c.Request.Context(), "register failed", "reason", "user_exists", "username", req.Username)
 			response.APIError(c, err.Error(), 409)
 		case errors.Is(err, errs.ErrEmailExists):
+			slog.WarnContext(c.Request.Context(), "register failed", "reason", "email_exists", "email", req.Email)
 			response.APIError(c, err.Error(), 409)
 		case errors.Is(err, errs.ErrInvalidEmailCode):
+			slog.WarnContext(c.Request.Context(), "register failed", "reason", "invalid_email_code", "email", req.Email)
 			response.APIError(c, err.Error(), 400)
 		default:
+			slog.ErrorContext(c.Request.Context(), "register error", "error", err, "username", req.Username)
 			response.APIError(c, "server error", 500)
 		}
 		return
 	}
 
+	slog.InfoContext(c.Request.Context(), "user register", "user_id", u.ID, "username", u.Username)
 	response.Success(c, dto.ToUserResponse(u.ID, u.Username, false), "注册成功")
 }
 
@@ -103,9 +114,11 @@ func (h *UserHandler) Me(c *gin.Context) {
 	u, p, err := h.userSvc.GetByID(uint(c.GetInt("user_id")))
 	if err != nil {
 		if errors.Is(err, errs.ErrUserNotFound) {
+			slog.WarnContext(c.Request.Context(), "get user failed", "reason", "user_not_found", "user_id", c.GetInt("user_id"))
 			response.APIError(c, "用户不存在", 404)
 			return
 		}
+		slog.ErrorContext(c.Request.Context(), "get user error", "error", err, "user_id", c.GetInt("user_id"))
 		response.APIError(c, "server error", 500)
 		return
 	}
@@ -146,6 +159,7 @@ func (h *UserHandler) RefreshToken(c *gin.Context) {
 
 	tokens, err := h.userSvc.RefreshTokens(refreshToken)
 	if err != nil {
+		slog.WarnContext(c.Request.Context(), "refresh token failed", "reason", "invalid_token")
 		response.APIError(c, err.Error(), 401)
 		return
 	}
@@ -158,7 +172,6 @@ func (h *UserHandler) RefreshToken(c *gin.Context) {
 		"refresh_token": tokens.RefreshToken,
 	}, "访问令牌已刷新")
 }
-
 
 func (h *UserHandler) EmailCode(c *gin.Context) {
 	var req struct {

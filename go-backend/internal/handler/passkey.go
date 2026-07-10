@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"log/slog"
 
 	"github.com/gin-gonic/gin"
 
@@ -46,9 +47,11 @@ func (h *PasskeyHandler) RegistrationOptions(c *gin.Context) {
 	options, err := h.passkeySvc.BeginRegistration(uint(userID))
 	if err != nil {
 		if errors.Is(err, errs.ErrPasskeyExists) {
+			slog.WarnContext(c.Request.Context(), "passkey registration begin failed", "reason", "passkey_exists", "user_id", userID)
 			response.APIError(c, err.Error(), 400)
 			return
 		}
+		slog.ErrorContext(c.Request.Context(), "passkey registration begin error", "error", err, "user_id", userID)
 		response.APIError(c, err.Error(), 500)
 		return
 	}
@@ -67,12 +70,15 @@ func (h *PasskeyHandler) Register(c *gin.Context) {
 
 	if err := h.passkeySvc.FinishRegistration(uint(userID), req.Response); err != nil {
 		if errors.Is(err, errs.ErrInvalidPasskey) {
+			slog.WarnContext(c.Request.Context(), "passkey registration finish failed", "reason", "invalid_passkey", "user_id", userID)
 			response.APIError(c, err.Error(), 400)
 			return
 		}
+		slog.ErrorContext(c.Request.Context(), "passkey registration finish error", "error", err, "user_id", userID)
 		response.APIError(c, err.Error(), 500)
 		return
 	}
+	slog.InfoContext(c.Request.Context(), "passkey registered", "user_id", userID)
 	response.Success(c, nil, "Passkey 注册成功")
 }
 
@@ -97,18 +103,23 @@ func (h *PasskeyHandler) Authenticate(c *gin.Context) {
 	user, err := h.passkeySvc.FinishLogin(req.Assertion)
 	if err != nil {
 		if errors.Is(err, errs.ErrInvalidPasskey) || errors.Is(err, errs.ErrPasskeyNotFound) {
+			slog.WarnContext(c.Request.Context(), "passkey login failed", "reason", "invalid_passkey")
 			response.APIError(c, err.Error(), 400)
 			return
 		}
+		slog.ErrorContext(c.Request.Context(), "passkey login error", "error", err)
 		response.APIError(c, err.Error(), 500)
 		return
 	}
 
 	tokens, err := h.userSvc.CreateTokens(user)
 	if err != nil {
+		slog.ErrorContext(c.Request.Context(), "create tokens error", "error", err, "user_id", user.ID)
 		response.APIError(c, "server error", 500)
 		return
 	}
+
+	slog.InfoContext(c.Request.Context(), "passkey login", "user_id", user.ID)
 
 	// 写入 refresh_token cookie（与 Python 端一致）。
 	setRefreshCookie(c, h.cfg, tokens.RefreshToken)
@@ -126,12 +137,15 @@ func (h *PasskeyHandler) DeletePasskey(c *gin.Context) {
 
 	if err := h.passkeySvc.DeletePasskey(uint(userID)); err != nil {
 		if errors.Is(err, errs.ErrPasskeyNotFound) {
+			slog.WarnContext(c.Request.Context(), "passkey delete failed", "reason", "passkey_not_found", "user_id", userID)
 			response.APIError(c, "您的账户尚未绑定Passkey", 400)
 			return
 		}
+		slog.ErrorContext(c.Request.Context(), "passkey delete error", "error", err, "user_id", userID)
 		response.APIError(c, err.Error(), 500)
 		return
 	}
+	slog.InfoContext(c.Request.Context(), "passkey deleted", "user_id", userID)
 	response.Success(c, nil, "Passkey 删除成功")
 }
 

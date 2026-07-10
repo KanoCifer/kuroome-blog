@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"log/slog"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -71,12 +72,16 @@ func (h *GitHubHandler) Callback(c *gin.Context) {
 	if err != nil {
 		switch {
 		case errors.Is(err, errs.ErrInvalidOAuthState):
+			slog.WarnContext(c.Request.Context(), "github callback failed", "reason", "invalid_oauth_state")
 			redirectWithError(c, h.cfg, "invalid_oauth_state")
 		case errors.Is(err, errs.ErrUserNotFound):
+			slog.WarnContext(c.Request.Context(), "github callback failed", "reason", "user_not_found")
 			redirectWithError(c, h.cfg, "user_not_found")
 		case errors.Is(err, errs.ErrGitHubAlreadyBound):
+			slog.WarnContext(c.Request.Context(), "github callback failed", "reason", "github_already_bound")
 			redirectWithError(c, h.cfg, "github_already_bound")
 		default:
+			slog.ErrorContext(c.Request.Context(), "github callback error", "error", err)
 			redirectWithError(c, h.cfg, "github_auth_failed")
 		}
 		return

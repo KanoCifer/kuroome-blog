@@ -43,9 +43,11 @@ func (h *AdminHandler) AddPost(c *gin.Context) {
 	}
 	id, err := h.adminSvc.AddPost(req)
 	if err != nil {
+		slog.ErrorContext(c.Request.Context(), "add post error", "error", err)
 		response.APIError(c, err.Error(), 500)
 		return
 	}
+	slog.InfoContext(c.Request.Context(), "post created", "post_id", id)
 	response.Success(c, gin.H{"_id": id}, "Blog post added successfully")
 }
 
@@ -60,34 +62,40 @@ func (h *AdminHandler) UpdatePost(c *gin.Context) {
 		return
 	}
 	if err := h.adminSvc.UpdatePost(req.ID, req); err != nil {
-		if errors.Is(err, errs.ErrPostNotFound) {
+		switch {
+		case errors.Is(err, errs.ErrPostNotFound):
+			slog.WarnContext(c.Request.Context(), "update post failed", "reason", "post_not_found", "post_id", req.ID)
 			response.APIError(c, err.Error(), 404)
-			return
-		}
-		if errors.Is(err, errs.ErrInvalidPostID) {
+		case errors.Is(err, errs.ErrInvalidPostID):
+			slog.WarnContext(c.Request.Context(), "update post failed", "reason", "invalid_post_id", "post_id", req.ID)
 			response.APIError(c, err.Error(), 400)
-			return
+		default:
+			slog.ErrorContext(c.Request.Context(), "update post error", "error", err, "post_id", req.ID)
+			response.APIError(c, err.Error(), 500)
 		}
-		response.APIError(c, err.Error(), 500)
 		return
 	}
+	slog.InfoContext(c.Request.Context(), "post updated", "post_id", req.ID)
 	response.Success(c, gin.H{"_id": req.ID}, "Blog post updated successfully")
 }
 
 func (h *AdminHandler) DeletePost(c *gin.Context) {
 	postID := c.Param("post_id")
 	if err := h.adminSvc.DeletePost(postID); err != nil {
-		if errors.Is(err, errs.ErrPostNotFound) {
+		switch {
+		case errors.Is(err, errs.ErrPostNotFound):
+			slog.WarnContext(c.Request.Context(), "delete post failed", "reason", "post_not_found", "post_id", postID)
 			response.APIError(c, err.Error(), 404)
-			return
-		}
-		if errors.Is(err, errs.ErrInvalidPostID) {
+		case errors.Is(err, errs.ErrInvalidPostID):
+			slog.WarnContext(c.Request.Context(), "delete post failed", "reason", "invalid_post_id", "post_id", postID)
 			response.APIError(c, err.Error(), 400)
-			return
+		default:
+			slog.ErrorContext(c.Request.Context(), "delete post error", "error", err, "post_id", postID)
+			response.APIError(c, err.Error(), 500)
 		}
-		response.APIError(c, err.Error(), 500)
 		return
 	}
+	slog.InfoContext(c.Request.Context(), "post deleted", "post_id", postID)
 	response.Success(c, gin.H{"_id": postID}, "Blog post deleted successfully")
 }
 
