@@ -41,7 +41,7 @@ func main() {
 	adminRepo := postgres.NewAdminRepo(db.GetMongo())
 	passkeyRepo := postgres.NewPasskeyRepo(db.GetDB())
 
-	wa, err := service.NewWebAuthn()
+	wa, err := service.NewWebAuthn(config.Cfg.WebAuthn.RPID, config.Cfg.WebAuthn.Origin)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -53,18 +53,18 @@ func main() {
 	loginLimiter := middleware.NewRateLimiter(db.GetRedis(), "login", 5, 60*time.Second)
 	registerLimiter := middleware.NewRateLimiter(db.GetRedis(), "register", 5, 60*time.Second)
 
-	userHandler := handler.NewUserHandler(state.UserSvc())
+	userHandler := handler.NewUserHandler(state.UserSvc(), state.Cfg())
 	userHandler.RegisterRoutes(v3, middleware.AuthMiddleware(), loginLimiter.Middleware(), registerLimiter.Middleware())
 
-	adminHandler := handler.NewAdminHandler(state.AdminSvc())
-	adminHandler.RegisterRoutes(v3, middleware.AuthMiddleware(), middleware.AdminMiddleware())
+	adminHandler := handler.NewAdminHandler(state.AdminSvc(), state.Cfg())
+	adminHandler.RegisterRoutes(v3, middleware.AuthMiddleware(), middleware.AdminMiddleware(state.Cfg().Admin.UserIDs))
 
-	passkeyHandler := handler.NewPasskeyHandler(state.PasskeySvc(), state.UserSvc())
+	passkeyHandler := handler.NewPasskeyHandler(state.PasskeySvc(), state.UserSvc(), state.Cfg())
 	passkeyHandler.RegisterRoutes(v3, middleware.AuthMiddleware())
 
-	githubHandler := handler.NewGitHubHandler(state.GitHubOAuth())
+	githubHandler := handler.NewGitHubHandler(state.GitHubOAuth(), state.Cfg())
 	githubHandler.RegisterRoutes(v3, middleware.AuthMiddleware())
 
-	addr := fmt.Sprintf("127.0.0.1:%d", config.Cfg.Port)
+	addr := fmt.Sprintf("127.0.0.1:%d", state.Cfg().Server.Port)
 	r.Run(addr)
 }

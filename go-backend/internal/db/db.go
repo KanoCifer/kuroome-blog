@@ -23,7 +23,7 @@ var (
 
 func InitDB() error {
 	var err error
-	pgDB, err = gorm.Open(postgres.Open(config.Cfg.DATABASE_URL), &gorm.Config{
+	pgDB, err = gorm.Open(postgres.Open(config.Cfg.Database.DatabaseURL), &gorm.Config{
 		NamingStrategy: model.NewNamer(),
 	})
 	if err != nil {
@@ -48,7 +48,7 @@ func GetDB() *gorm.DB {
 
 func InitMongo() error {
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	opts := options.Client().ApplyURI(config.Cfg.MONGO_URI).SetServerAPIOptions(serverAPI)
+	opts := options.Client().ApplyURI(config.Cfg.Database.MongoURI).SetServerAPIOptions(serverAPI)
 	c, err := mongo.Connect(opts)
 	if err != nil {
 		return err
@@ -68,7 +68,7 @@ func GetMongo() *mongo.Client {
 }
 
 func InitRedis() error {
-	opts, err := redis.ParseURL(config.Cfg.REDIS_URL)
+	opts, err := redis.ParseURL(config.Cfg.Database.RedisURL)
 	if err != nil {
 		return err
 	}

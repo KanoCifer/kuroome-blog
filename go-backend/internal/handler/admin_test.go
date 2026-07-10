@@ -47,7 +47,7 @@ func (m *mockAdminService) TrackVisitor(data dto.VisitorData) error {
 // ---------- helpers ----------
 
 func newAdminHandler(svc AdminService) (*AdminHandler, *gin.Engine) {
-	h := NewAdminHandler(svc)
+	h := NewAdminHandler(svc, config.Cfg)
 	r := gin.New()
 	g := r.Group("/api/v3")
 	noopAuth := func(c *gin.Context) { c.Set("user_id", 1); c.Next() }
@@ -241,7 +241,7 @@ func TestAdmin_DeletePost_Success(t *testing.T) {
 // ---------- TrackVisitor ----------
 
 func TestAdmin_TrackVisitor_Disabled(t *testing.T) {
-	config.Cfg = &config.Config{ENABLE_TRACKING: false}
+	config.Cfg = &config.Config{Admin: config.AdminConfig{EnableTracking: false}}
 	svc := &mockAdminService{trackFn: func(dto.VisitorData) error { return nil }}
 	_, r := newAdminHandler(svc)
 	w := httptest.NewRecorder()
@@ -255,7 +255,7 @@ func TestAdmin_TrackVisitor_Disabled(t *testing.T) {
 }
 
 func TestAdmin_TrackVisitor_Success(t *testing.T) {
-	config.Cfg = &config.Config{ENABLE_TRACKING: true}
+	config.Cfg = &config.Config{Admin: config.AdminConfig{EnableTracking: true}}
 	svc := &mockAdminService{trackFn: func(dto.VisitorData) error { return nil }}
 	_, r := newAdminHandler(svc)
 	w := httptest.NewRecorder()

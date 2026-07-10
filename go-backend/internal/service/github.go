@@ -21,7 +21,6 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
-	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
@@ -29,20 +28,34 @@ import (
 )
 
 // GitHubOAuth 封装 GitHub OAuth 业务逻辑。
+//
+// clientID / clientSecret / redirectURI 由调用方从 config 注入，避免本包
+// 直接读取全局 config.Cfg。
 type GitHubOAuth struct {
-	redis    *redis.Client
-	userRepo *postgres.UserRepo
-	userSvc  *UserService
-	httpCli  *http.Client
+	redis        *redis.Client
+	userRepo     *postgres.UserRepo
+	userSvc      *UserService
+	httpCli      *http.Client
+	clientID     string
+	clientSecret string
+	redirectURI  string
 }
 
 // NewGitHubOAuth 构造一个 GitHubOAuth 实例, state TTL 10 分钟。
-func NewGitHubOAuth(redis *redis.Client, userRepo *postgres.UserRepo, userSvc *UserService) *GitHubOAuth {
+func NewGitHubOAuth(
+	redis *redis.Client,
+	userRepo *postgres.UserRepo,
+	userSvc *UserService,
+	clientID, clientSecret, redirectURI string,
+) *GitHubOAuth {
 	return &GitHubOAuth{
-		redis:    redis,
-		userRepo: userRepo,
-		userSvc:  userSvc,
-		httpCli:  &http.Client{Timeout: 10 * time.Second},
+		redis:        redis,
+		userRepo:     userRepo,
+		userSvc:      userSvc,
+		httpCli:      &http.Client{Timeout: 10 * time.Second},
+		clientID:     clientID,
+		clientSecret: clientSecret,
+		redirectURI:  redirectURI,
 	}
 }
 
@@ -76,7 +89,7 @@ func randomState() (string, error) {
 // mode="login" 时 userID=0, mode="bind" 时 userID 为当前登录用户。
 // 返回的 URL 应由 handler 发起 302 重定向。
 func (g *GitHubOAuth) AuthURL(mode string, userID uint) (string, error) {
-	if config.Cfg.GITHUB_CLIENT_ID == "" {
+	if g.clientID == "" {
 		return "", errs.ErrGitHubNotConfigured
 	}
 	state, err := randomState()
@@ -95,8 +108,8 @@ func (g *GitHubOAuth) AuthURL(mode string, userID uint) (string, error) {
 	}
 
 	v := url.Values{}
-	v.Set("client_id", config.Cfg.GITHUB_CLIENT_ID)
-	v.Set("redirect_uri", config.Cfg.GITHUB_REDIRECT_URI)
+	v.Set("client_id", g.clientID)
+	v.Set("redirect_uri", g.redirectURI)
 	v.Set("state", state)
 	v.Set("scope", "read:user user:email")
 	return githubAuthURL + "?" + v.Encode(), nil
@@ -203,10 +216,10 @@ func (g *GitHubOAuth) UnbindGitHub(userID uint) error {
 // exchangeCode 用 GitHub 授权码换 access_token。
 func (g *GitHubOAuth) exchangeCode(code string) (string, error) {
 	data := url.Values{}
-	data.Set("client_id", config.Cfg.GITHUB_CLIENT_ID)
-	data.Set("client_secret", config.Cfg.GITHUB_CLIENT_SECRET)
+	data.Set("client_id", g.clientID)
+	data.Set("client_secret", g.clientSecret)
 	data.Set("code", code)
-	data.Set("redirect_uri", config.Cfg.GITHUB_REDIRECT_URI)
+	data.Set("redirect_uri", g.redirectURI)
 
 	req, err := http.NewRequest(http.MethodPost, githubTokenURL, nil)
 	if err != nil {

@@ -29,18 +29,19 @@ type GitHubOAuthService interface {
 // GitHubHandler 持有 GitHub OAuth 服务。
 type GitHubHandler struct {
 	githubSvc GitHubOAuthService
+	cfg       *config.Config
 }
 
 // NewGitHubHandler 构造一个 GitHubHandler。
-func NewGitHubHandler(githubSvc GitHubOAuthService) *GitHubHandler {
-	return &GitHubHandler{githubSvc: githubSvc}
+func NewGitHubHandler(githubSvc GitHubOAuthService, cfg *config.Config) *GitHubHandler {
+	return &GitHubHandler{githubSvc: githubSvc, cfg: cfg}
 }
 
 // Login GET /auth/github — 重定向到 GitHub 授权页(公开)。
 func (h *GitHubHandler) Login(c *gin.Context) {
 	url, err := h.githubSvc.AuthURL("login", 0)
 	if err != nil {
-		redirectWithError(c, "github_not_configured")
+		redirectWithError(c, h.cfg, "github_not_configured")
 		return
 	}
 	c.Redirect(http.StatusFound, url)
@@ -55,7 +56,7 @@ func (h *GitHubHandler) Bind(c *gin.Context) {
 	}
 	url, err := h.githubSvc.AuthURL("bind", uint(userID))
 	if err != nil {
-		redirectWithError(c, "github_not_configured")
+		redirectWithError(c, h.cfg, "github_not_configured")
 		return
 	}
 	c.Redirect(http.StatusFound, url)
@@ -70,13 +71,13 @@ func (h *GitHubHandler) Callback(c *gin.Context) {
 	if err != nil {
 		switch {
 		case errors.Is(err, errs.ErrInvalidOAuthState):
-			redirectWithError(c, "invalid_oauth_state")
+			redirectWithError(c, h.cfg, "invalid_oauth_state")
 		case errors.Is(err, errs.ErrUserNotFound):
-			redirectWithError(c, "user_not_found")
+			redirectWithError(c, h.cfg, "user_not_found")
 		case errors.Is(err, errs.ErrGitHubAlreadyBound):
-			redirectWithError(c, "github_already_bound")
+			redirectWithError(c, h.cfg, "github_already_bound")
 		default:
-			redirectWithError(c, "github_auth_failed")
+			redirectWithError(c, h.cfg, "github_auth_failed")
 		}
 		return
 	}
@@ -88,18 +89,18 @@ func (h *GitHubHandler) Callback(c *gin.Context) {
 			tokens.RefreshToken,
 			7*24*3600,
 			"/",
-			cookieDomain(),
+			cookieDomain(h.cfg),
 			true, // secure
 			true, // httponly
 		)
 		// 把 access_token 作为 query param 传给前端, 前端存入 localStorage
-		target := config.Cfg.FRONTEND_URL + "/login/github?access_token=" + tokens.AccessToken
+		target := h.cfg.Frontend.URL + "/login/github?access_token=" + tokens.AccessToken
 		c.Redirect(http.StatusFound, target)
 		return
 	}
 
 	// bind 模式: user != nil, tokens == nil → 重定向回设置页
-	c.Redirect(http.StatusFound, config.Cfg.FRONTEND_URL+"/settings?success=github_bound")
+	c.Redirect(http.StatusFound, h.cfg.Frontend.URL+"/settings?success=github_bound")
 }
 
 // Unbind POST /github/unbind — 解除绑定(需 Auth)。
@@ -125,15 +126,15 @@ func (h *GitHubHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFun
 }
 
 // redirectWithError 带 error 参数重定向到前端登录/设置页。
-func redirectWithError(c *gin.Context, errorCode string) {
-	base := config.Cfg.FRONTEND_URL
+func redirectWithError(c *gin.Context, cfg *config.Config, errorCode string) {
+	base := cfg.Frontend.URL
 	target := base + "/login?error=" + errorCode
 	c.Redirect(http.StatusFound, target)
 }
 
 // cookieDomain 返回 cookie 使用的 domain。
-func cookieDomain() string {
-	if d := config.Cfg.COOKIE_DOMAIN; d != "" {
+func cookieDomain(cfg *config.Config) string {
+	if d := cfg.Security.CookieDomain; d != "" {
 		return d
 	}
 	return ""
@@ -141,11 +142,11 @@ func cookieDomain() string {
 
 // setRefreshCookie 写入 HttpOnly refresh_token cookie（与 Python 端一致），
 // 用于登录 / 刷新 / passkey 登录 / github 登录后让前端静默刷新可用。
-func setRefreshCookie(c *gin.Context, token string) {
-	c.SetCookie("refresh_token", token, 7*24*3600, "/", cookieDomain(), true, true)
+func setRefreshCookie(c *gin.Context, cfg *config.Config, token string) {
+	c.SetCookie("refresh_token", token, 7*24*3600, "/", cookieDomain(cfg), true, true)
 }
 
 // clearRefreshCookie 删除 refresh_token cookie（登出时调用）。
-func clearRefreshCookie(c *gin.Context) {
-	c.SetCookie("refresh_token", "", -1, "/", cookieDomain(), true, true)
+func clearRefreshCookie(c *gin.Context, cfg *config.Config) {
+	c.SetCookie("refresh_token", "", -1, "/", cookieDomain(cfg), true, true)
 }

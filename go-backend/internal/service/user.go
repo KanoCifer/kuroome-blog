@@ -10,7 +10,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
-	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
@@ -24,14 +23,17 @@ type LoginResponse struct {
 	IsAdmin  bool   `json:"is_admin"`
 }
 
-// UserService 持有 repo 和 redis，负责编排业务逻辑
+// UserService 持有 repo 和 redis，负责编排业务逻辑。
+//
+// adminUserIDs 由调用方从 config 注入，避免本包直接读取全局 config.Cfg。
 type UserService struct {
-	repo  *postgres.UserRepo
-	redis *redis.Client
+	repo         *postgres.UserRepo
+	redis        *redis.Client
+	adminUserIDs []int
 }
 
-func NewUserService(repo *postgres.UserRepo, redis *redis.Client) *UserService {
-	return &UserService{repo: repo, redis: redis}
+func NewUserService(repo *postgres.UserRepo, redis *redis.Client, adminUserIDs []int) *UserService {
+	return &UserService{repo: repo, redis: redis, adminUserIDs: adminUserIDs}
 }
 
 // ---------- 查询 ----------
@@ -176,7 +178,7 @@ func (s *UserService) Logout(userID uint) {
 // ---------- 响应构造 ----------
 
 func (s *UserService) IsAdmin(u *model.User) bool {
-	return slices.Contains(config.Cfg.ADMIN_USER_IDS, int(u.ID))
+	return slices.Contains(s.adminUserIDs, int(u.ID))
 }
 
 func (s *UserService) UserToDict(u *model.User, p *model.Profile) map[string]any {

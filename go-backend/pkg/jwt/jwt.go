@@ -18,7 +18,7 @@ func GenerateToken(userID uint, expiresAt time.Time) (string, error) {
 		Subject:   strconv.FormatUint(uint64(userID), 10),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(config.Cfg.SECRET_KEY))
+	return token.SignedString([]byte(config.Cfg.Security.SecretKey))
 }
 
 // ParseToken 解析并验证 JWT，返回其中的 RegisteredClaims。
@@ -28,7 +28,7 @@ func ParseToken(tokenString string) (*jwt.RegisteredClaims, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, errors.New("unexpected signing method")
 			}
-			return []byte(config.Cfg.SECRET_KEY), nil
+			return []byte(config.Cfg.Security.SecretKey), nil
 		})
 	if err != nil {
 		return nil, err

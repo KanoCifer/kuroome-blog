@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
+	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
@@ -125,7 +126,7 @@ func TestLogin_Success(t *testing.T) {
 			return &model.User{Model: gormModel(1), Username: "alice"}, nil
 		},
 	}
-	h := NewUserHandler(svc)
+	h := NewUserHandler(svc, config.Cfg)
 
 	w := doRequest(h.Login, http.MethodPost, "/login", jsonBody(t, dto.LoginRequest{
 		Username: "alice",
@@ -156,7 +157,7 @@ func TestLogin_InvalidCredentials(t *testing.T) {
 			return nil, errs.ErrInvalidCredentials
 		},
 	}
-	h := NewUserHandler(svc)
+	h := NewUserHandler(svc, config.Cfg)
 
 	w := doRequest(h.Login, http.MethodPost, "/login", jsonBody(t, dto.LoginRequest{
 		Username: "alice",
@@ -174,7 +175,7 @@ func TestLogin_InvalidBody(t *testing.T) {
 			return &model.User{}, nil
 		},
 	}
-	h := NewUserHandler(svc)
+	h := NewUserHandler(svc, config.Cfg)
 
 	w := doRequest(h.Login, http.MethodPost, "/login", []byte("not json"))
 
@@ -192,7 +193,7 @@ func TestLogin_TokenError(t *testing.T) {
 			return nil, errors.New("jwt error")
 		},
 	}
-	h := NewUserHandler(svc)
+	h := NewUserHandler(svc, config.Cfg)
 
 	w := doRequest(h.Login, http.MethodPost, "/login", jsonBody(t, dto.LoginRequest{
 		Username: "alice",
@@ -212,7 +213,7 @@ func TestRegister_Success(t *testing.T) {
 			return &model.User{Model: gormModel(5), Username: username}, nil, nil
 		},
 	}
-	h := NewUserHandler(svc)
+	h := NewUserHandler(svc, config.Cfg)
 
 	w := doRequest(h.Register, http.MethodPost, "/register", jsonBody(t, dto.RegisterRequest{
 		Username:  "bob",
@@ -236,7 +237,7 @@ func TestRegister_UserExists(t *testing.T) {
 			return nil, nil, errs.ErrUserExists
 		},
 	}
-	h := NewUserHandler(svc)
+	h := NewUserHandler(svc, config.Cfg)
 
 	w := doRequest(h.Register, http.MethodPost, "/register", jsonBody(t, dto.RegisterRequest{
 		Username:  "bob",
@@ -256,7 +257,7 @@ func TestRegister_EmailExists(t *testing.T) {
 			return nil, nil, errs.ErrEmailExists
 		},
 	}
-	h := NewUserHandler(svc)
+	h := NewUserHandler(svc, config.Cfg)
 
 	w := doRequest(h.Register, http.MethodPost, "/register", jsonBody(t, dto.RegisterRequest{
 		Username:  "bob",
@@ -276,7 +277,7 @@ func TestRegister_InvalidEmailCode(t *testing.T) {
 			return nil, nil, errs.ErrInvalidEmailCode
 		},
 	}
-	h := NewUserHandler(svc)
+	h := NewUserHandler(svc, config.Cfg)
 
 	w := doRequest(h.Register, http.MethodPost, "/register", jsonBody(t, dto.RegisterRequest{
 		Username:  "bob",
@@ -296,7 +297,7 @@ func TestRegister_InvalidBody(t *testing.T) {
 			return &model.User{}, nil, nil
 		},
 	}
-	h := NewUserHandler(svc)
+	h := NewUserHandler(svc, config.Cfg)
 
 	w := doRequest(h.Register, http.MethodPost, "/register", []byte("not json"))
 
@@ -313,7 +314,7 @@ func TestMe_Success(t *testing.T) {
 			return &model.User{Model: gormModel(7), Username: "alice"}, nil, nil
 		},
 	}
-	h := NewUserHandler(svc)
+	h := NewUserHandler(svc, config.Cfg)
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
@@ -332,7 +333,7 @@ func TestMe_UserNotFound(t *testing.T) {
 			return nil, nil, errs.ErrUserNotFound
 		},
 	}
-	h := NewUserHandler(svc)
+	h := NewUserHandler(svc, config.Cfg)
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
@@ -352,7 +353,7 @@ func TestLogout_CallsService(t *testing.T) {
 	svc := &mockUserService{
 		logoutFn: func(userID uint) { calledWith = userID },
 	}
-	h := NewUserHandler(svc)
+	h := NewUserHandler(svc, config.Cfg)
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
@@ -376,7 +377,7 @@ func TestRefreshToken_Success(t *testing.T) {
 			return &dto.Tokens{AccessToken: "new-access", RefreshToken: "new-refresh"}, nil
 		},
 	}
-	h := NewUserHandler(svc)
+	h := NewUserHandler(svc, config.Cfg)
 
 	body, _ := json.Marshal(map[string]string{"refresh_token": "old-refresh"})
 	w := doRequest(h.RefreshToken, http.MethodPost, "/refresh-token", body)
@@ -396,7 +397,7 @@ func TestRefreshToken_InvalidToken(t *testing.T) {
 			return nil, errs.ErrInvalidToken
 		},
 	}
-	h := NewUserHandler(svc)
+	h := NewUserHandler(svc, config.Cfg)
 
 	body, _ := json.Marshal(map[string]string{"refresh_token": "bad"})
 	w := doRequest(h.RefreshToken, http.MethodPost, "/refresh-token", body)
@@ -413,7 +414,7 @@ func TestRefreshToken_MissingField(t *testing.T) {
 			return &dto.Tokens{}, nil
 		},
 	}
-	h := NewUserHandler(svc)
+	h := NewUserHandler(svc, config.Cfg)
 
 	// 缺少 refresh_token 字段且 cookie 中也没有 → 401（与 Python 行为一致）
 	body, _ := json.Marshal(map[string]string{})
@@ -433,7 +434,7 @@ func TestRefreshToken_FromCookie(t *testing.T) {
 			return &dto.Tokens{AccessToken: "new-access", RefreshToken: "new-refresh"}, nil
 		},
 	}
-	h := NewUserHandler(svc)
+	h := NewUserHandler(svc, config.Cfg)
 
 	req, _ := http.NewRequest(http.MethodPost, "/refresh-token", nil)
 	req.AddCookie(&http.Cookie{Name: "refresh_token", Value: "cookie-refresh"})

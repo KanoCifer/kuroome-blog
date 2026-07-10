@@ -2,12 +2,13 @@ package handler
 
 import (
 	"errors"
-	"github.com/KanoCifer/kuroome-blog/internal/model"
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/errs"
+	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 )
 
@@ -24,10 +25,11 @@ type UserService interface {
 // UserHandler 持有业务服务，gin 路由方法挂在其上。
 type UserHandler struct {
 	userSvc UserService
+	cfg     *config.Config
 }
 
-func NewUserHandler(userSvc UserService) *UserHandler {
-	return &UserHandler{userSvc: userSvc}
+func NewUserHandler(userSvc UserService, cfg *config.Config) *UserHandler {
+	return &UserHandler{userSvc: userSvc, cfg: cfg}
 }
 
 func (h *UserHandler) Login(c *gin.Context) {
@@ -54,7 +56,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 	}
 
 	// 写入 refresh_token cookie（与 Python 端一致），供前端静默刷新。
-	setRefreshCookie(c, tokens.RefreshToken)
+	setRefreshCookie(c, h.cfg, tokens.RefreshToken)
 
 	// 用户字段铺平到 data 顶层（与 Python 端 user_to_dict 形状一致）。
 	userData := h.userSvc.UserToDict(user, user.Profile)
@@ -119,7 +121,7 @@ func (h *UserHandler) Logout(c *gin.Context) {
 
 	h.userSvc.Logout(uint(c.GetInt("user_id")))
 	// 清除 refresh_token cookie（与 Python 端一致）。
-	clearRefreshCookie(c)
+	clearRefreshCookie(c, h.cfg)
 	response.Success(c, nil, "已退出登录")
 }
 
@@ -148,7 +150,7 @@ func (h *UserHandler) RefreshToken(c *gin.Context) {
 	}
 
 	// 轮换 refresh cookie（与 Python 端一致）。
-	setRefreshCookie(c, tokens.RefreshToken)
+	setRefreshCookie(c, h.cfg, tokens.RefreshToken)
 
 	response.Success(c, gin.H{
 		"access_token":  tokens.AccessToken,

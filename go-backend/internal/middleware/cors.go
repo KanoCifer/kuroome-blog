@@ -4,12 +4,9 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-
-	"github.com/KanoCifer/kuroome-blog/internal/config"
 )
 
 // allowedOrigins 是前端来源白名单。Vite dev server + 生产域名。
-// 从 config.Cfg 读取, 未配置时回退到 localhost 开发端口。
 func allowedOrigins() []string {
 	// 生产/Vite 默认都允许的来源
 	return []string{
@@ -57,5 +54,3 @@ func CORS() gin.HandlerFunc {
 	}
 }
 
-// _ 占位,确保 config 在编译期即被引用(避免未来删除 import 时中间件静默失去配置)。
-var _ = config.Cfg

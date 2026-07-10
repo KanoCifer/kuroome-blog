@@ -16,7 +16,10 @@ import (
 
 func init() {
 	gin.SetMode(gin.TestMode)
-	config.Cfg = &config.Config{SECRET_KEY: "test-secret", ADMIN_USER_IDS: []int{1, 2}}
+	config.Cfg = &config.Config{
+		Security: config.SecurityConfig{SecretKey: "test-secret"},
+		Admin:    config.AdminConfig{UserIDs: []int{1, 2}},
+	}
 }
 
 // newEngine 创建一个挂载被测中间件的 gin 引擎,*httptest.NewRecorder() 发请求。
@@ -115,7 +118,7 @@ func TestAdminMiddleware_AdminUser1(t *testing.T) {
 	var called bool
 	r := gin.New()
 	r.Use(func(c *gin.Context) { c.Set("user_id", 1); c.Next() })
-	r.Use(AdminMiddleware())
+	r.Use(AdminMiddleware(config.Cfg.Admin.UserIDs))
 	r.GET("/", func(c *gin.Context) { called = true })
 
 	w := httptest.NewRecorder()
@@ -131,7 +134,7 @@ func TestAdminMiddleware_AdminUser2(t *testing.T) {
 	var called bool
 	r := gin.New()
 	r.Use(func(c *gin.Context) { c.Set("user_id", 2); c.Next() })
-	r.Use(AdminMiddleware())
+	r.Use(AdminMiddleware(config.Cfg.Admin.UserIDs))
 	r.GET("/", func(c *gin.Context) { called = true })
 
 	w := httptest.NewRecorder()
@@ -146,7 +149,7 @@ func TestAdminMiddleware_AdminUser2(t *testing.T) {
 func TestAdminMiddleware_NonAdmin(t *testing.T) {
 	r := gin.New()
 	r.Use(func(c *gin.Context) { c.Set("user_id", 99); c.Next() })
-	r.Use(AdminMiddleware())
+	r.Use(AdminMiddleware(config.Cfg.Admin.UserIDs))
 	r.GET("/", func(c *gin.Context) {})
 
 	w := httptest.NewRecorder()

@@ -23,13 +23,16 @@ func NewAppState(
 	redis *redis.Client,
 	passkeySvc *service.PasskeyService,
 ) *AppState {
-	userSvc := service.NewUserService(userRepo, redis)
+	userSvc := service.NewUserService(userRepo, redis, cfg.Admin.UserIDs)
 	return &AppState{
-		config:      cfg,
-		userSvc:     userSvc,
-		adminSvc:    service.NewAdminService(adminRepo, redis),
-		passkeySvc:  passkeySvc,
-		githubOAuth: service.NewGitHubOAuth(redis, userRepo, userSvc),
+		config:     cfg,
+		userSvc:    userSvc,
+		adminSvc:   service.NewAdminService(adminRepo, redis),
+		passkeySvc: passkeySvc,
+		githubOAuth: service.NewGitHubOAuth(
+			redis, userRepo, userSvc,
+			cfg.GitHub.ClientID, cfg.GitHub.ClientSecret, cfg.GitHub.RedirectURI,
+		),
 	}
 }
 

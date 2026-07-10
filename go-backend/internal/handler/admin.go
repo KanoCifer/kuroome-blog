@@ -28,10 +28,11 @@ type AdminService interface {
 
 type AdminHandler struct {
 	adminSvc AdminService
+	cfg      *config.Config
 }
 
-func NewAdminHandler(adminSvc AdminService) *AdminHandler {
-	return &AdminHandler{adminSvc: adminSvc}
+func NewAdminHandler(adminSvc AdminService, cfg *config.Config) *AdminHandler {
+	return &AdminHandler{adminSvc: adminSvc, cfg: cfg}
 }
 
 func (h *AdminHandler) AddPost(c *gin.Context) {
@@ -91,7 +92,7 @@ func (h *AdminHandler) DeletePost(c *gin.Context) {
 }
 
 func (h *AdminHandler) TrackVisitor(c *gin.Context) {
-	if !config.Cfg.ENABLE_TRACKING {
+	if !h.cfg.Admin.EnableTracking {
 		c.Status(204)
 		return
 	}
@@ -109,7 +110,7 @@ func (h *AdminHandler) TrackVisitor(c *gin.Context) {
 }
 
 func (h *AdminHandler) WebhookDeploy(c *gin.Context) {
-	secret := config.Cfg.GITEE_WEBHOOK_SECRET
+	secret := h.cfg.Gitee.WebhookSecret
 	if secret == nil || *secret == "" {
 		response.APIError(c, "Webhook secret not configured", 500)
 		return

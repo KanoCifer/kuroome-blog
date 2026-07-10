@@ -12,7 +12,6 @@ import (
 	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/redis/go-redis/v9"
 
-	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
@@ -69,12 +68,13 @@ func NewPasskeyService(
 	}
 }
 
-// NewWebAuthn 构造 WebAuthn 实例（依赖 config 中的 RP_ID / ORIGIN）。
-func NewWebAuthn() (*webauthn.WebAuthn, error) {
+// NewWebAuthn 构造 WebAuthn 实例。rpID / rpOrigin 由调用方从 config 注入，
+// 避免本包直接读取全局 config.Cfg。
+func NewWebAuthn(rpID, rpOrigin string) (*webauthn.WebAuthn, error) {
 	return webauthn.New(&webauthn.Config{
-		RPID:                  config.Cfg.WEBAUTHN_RP_ID,
+		RPID:                  rpID,
 		RPDisplayName:         "Kuroome's Blog",
-		RPOrigins:             []string{config.Cfg.WEBAUTHN_ORIGIN},
+		RPOrigins:             []string{rpOrigin},
 		AttestationPreference: protocol.PreferNoAttestation,
 		AuthenticatorSelection: protocol.AuthenticatorSelection{
 			UserVerification: protocol.VerificationPreferred,

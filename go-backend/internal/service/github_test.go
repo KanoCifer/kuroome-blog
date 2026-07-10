@@ -9,11 +9,13 @@ import (
 
 func TestAuthURL_ContainsRequiredParams(t *testing.T) {
 	config.Cfg = &config.Config{
-		GITHUB_CLIENT_ID:    "test-client-id",
-		GITHUB_REDIRECT_URI: "http://localhost:5555/api/v3/auth/github/callback",
+		GitHub: config.GitHubConfig{
+			ClientID:    "test-client-id",
+			RedirectURI: "http://localhost:5555/api/v3/auth/github/callback",
+		},
 	}
 
-	svc := NewGitHubOAuth(nil, nil, nil) // redis/repo not needed for URL gen
+	svc := NewGitHubOAuth(nil, nil, nil, "test-client-id", "", "http://localhost:5555/api/v3/auth/github/callback")
 
 	url, err := svc.AuthURL("login", 0)
 	if err != nil {
@@ -35,8 +37,7 @@ func TestAuthURL_ContainsRequiredParams(t *testing.T) {
 }
 
 func TestAuthURL_RejectsWhenNotConfigured(t *testing.T) {
-	config.Cfg = &config.Config{GITHUB_CLIENT_ID: ""}
-	svc := NewGitHubOAuth(nil, nil, nil)
+	svc := NewGitHubOAuth(nil, nil, nil, "", "", "")
 
 	_, err := svc.AuthURL("login", 0)
 	if err == nil {

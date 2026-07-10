@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/pkg/jwt"
 )
 
@@ -39,7 +38,10 @@ func AuthMiddleware() gin.HandlerFunc {
 	}
 }
 
-func AdminMiddleware() gin.HandlerFunc {
+// AdminMiddleware 返回一个校验当前用户是否属于 adminUserIDs 的 GIN 中间件。
+//
+// adminUserIDs 由调用方从 config 注入，避免本包直接读取全局 config.Cfg。
+func AdminMiddleware(adminUserIDs []int) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userIDVal, _ := c.Get("user_id")
 		userID, ok := userIDVal.(int)
@@ -47,7 +49,7 @@ func AdminMiddleware() gin.HandlerFunc {
 			c.AbortWithStatusJSON(403, gin.H{"error": "Admin access required"})
 			return
 		}
-		for _, id := range config.Cfg.ADMIN_USER_IDS {
+		for _, id := range adminUserIDs {
 			if userID == id {
 				c.Next()
 				return

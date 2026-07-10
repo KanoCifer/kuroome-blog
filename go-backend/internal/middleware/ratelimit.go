@@ -9,8 +9,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
-
-	"github.com/KanoCifer/kuroome-blog/internal/config"
 )
 
 // RateLimiter 是一个用 Redis 滑动窗口实现的简易限流器。
@@ -94,5 +92,3 @@ func redisContext(c *gin.Context) context.Context {
 	return context.Background()
 }
 
-// _ 避免未来删除 config 引用时编译报未使用。
-var _ = config.Cfg

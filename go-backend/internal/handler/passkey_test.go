@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
+	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
@@ -118,7 +119,7 @@ func TestRegistrationOptions_Success(t *testing.T) {
 			return map[string]any{"challenge": "abc", "rp": "test"}, nil
 		},
 	}
-	h := NewPasskeyHandler(svc, nil)
+	h := NewPasskeyHandler(svc, nil, config.Cfg)
 
 	w := doPasskeyRequest(h.RegistrationOptions, http.MethodGet, "/passkey/registration-options", nil)
 	if w.Code != http.StatusOK {
@@ -136,7 +137,7 @@ func TestRegistrationOptions_AlreadyExists(t *testing.T) {
 			return nil, errs.ErrPasskeyExists
 		},
 	}
-	h := NewPasskeyHandler(svc, nil)
+	h := NewPasskeyHandler(svc, nil, config.Cfg)
 
 	w := doPasskeyRequest(h.RegistrationOptions, http.MethodGet, "/passkey/registration-options", nil)
 	if w.Code != 400 {
@@ -152,7 +153,7 @@ func TestPasskeyRegister_Success(t *testing.T) {
 			return nil
 		},
 	}
-	h := NewPasskeyHandler(svc, nil)
+	h := NewPasskeyHandler(svc, nil, config.Cfg)
 
 	body, _ := json.Marshal(dto.PasskeyRegistrationRequest{
 		Response: map[string]any{"id": "cred123"},
@@ -169,7 +170,7 @@ func TestPasskeyRegister_InvalidResponse(t *testing.T) {
 			return errs.ErrInvalidPasskey
 		},
 	}
-	h := NewPasskeyHandler(svc, nil)
+	h := NewPasskeyHandler(svc, nil, config.Cfg)
 
 	body, _ := json.Marshal(dto.PasskeyRegistrationRequest{
 		Response: map[string]any{"id": "bad"},
@@ -188,7 +189,7 @@ func TestAuthenticationOptions_Success(t *testing.T) {
 			return map[string]any{"challenge": "xyz"}, nil
 		},
 	}
-	h := NewPasskeyHandler(svc, nil)
+	h := NewPasskeyHandler(svc, nil, config.Cfg)
 
 	w := doPasskeyRequest(h.AuthenticationOptions, http.MethodGet, "/passkey/authentication-options", nil)
 	if w.Code != http.StatusOK {
@@ -214,7 +215,7 @@ func TestAuthenticate_Success(t *testing.T) {
 			return &dto.Tokens{AccessToken: "access", RefreshToken: "refresh"}, nil
 		},
 	}
-	h := NewPasskeyHandler(svc, mockUserSvc)
+	h := NewPasskeyHandler(svc, mockUserSvc, config.Cfg)
 
 	body, _ := json.Marshal(dto.PasskeyAuthRequest{
 		Assertion: map[string]any{"id": "cred123"},
@@ -241,7 +242,7 @@ func TestAuthenticate_InvalidPasskey(t *testing.T) {
 			return nil, errs.ErrInvalidPasskey
 		},
 	}
-	h := NewPasskeyHandler(svc, nil)
+	h := NewPasskeyHandler(svc, nil, config.Cfg)
 
 	body, _ := json.Marshal(dto.PasskeyAuthRequest{
 		Assertion: map[string]any{"id": "bad"},
@@ -260,7 +261,7 @@ func TestDeletePasskey_Success(t *testing.T) {
 			return nil
 		},
 	}
-	h := NewPasskeyHandler(svc, nil)
+	h := NewPasskeyHandler(svc, nil, config.Cfg)
 
 	w := doPasskeyRequest(h.DeletePasskey, http.MethodDelete, "/passkey/delete", nil)
 	if w.Code != http.StatusOK {
@@ -274,7 +275,7 @@ func TestDeletePasskey_NotFound(t *testing.T) {
 			return errs.ErrPasskeyNotFound
 		},
 	}
-	h := NewPasskeyHandler(svc, nil)
+	h := NewPasskeyHandler(svc, nil, config.Cfg)
 
 	w := doPasskeyRequest(h.DeletePasskey, http.MethodDelete, "/passkey/delete", nil)
 	if w.Code != 400 {

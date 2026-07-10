@@ -10,8 +10,8 @@ import (
 )
 
 func init() {
-	// jwt 包依赖 config.Cfg.SECRET_KEY，测试前注入一个固定密钥。
-	config.Cfg = &config.Config{SECRET_KEY: "test-secret-key"}
+	// jwt 包依赖 config.Cfg.Security.SecretKey，测试前注入一个固定密钥。
+	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret-key"}}
 }
 
 func TestGenerateToken(t *testing.T) {

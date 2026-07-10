@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
@@ -28,13 +29,14 @@ type PasskeyHandler struct {
 		CreateTokens(u *model.User) (*dto.Tokens, error)
 		UserToDict(u *model.User, p *model.Profile) map[string]any
 	}
+	cfg *config.Config
 }
 
 func NewPasskeyHandler(passkeySvc PasskeyService, userSvc interface {
 	CreateTokens(u *model.User) (*dto.Tokens, error)
 	UserToDict(u *model.User, p *model.Profile) map[string]any
-}) *PasskeyHandler {
-	return &PasskeyHandler{passkeySvc: passkeySvc, userSvc: userSvc}
+}, cfg *config.Config) *PasskeyHandler {
+	return &PasskeyHandler{passkeySvc: passkeySvc, userSvc: userSvc, cfg: cfg}
 }
 
 // RegistrationOptions GET /passkey/registration-options (auth required)
@@ -109,7 +111,7 @@ func (h *PasskeyHandler) Authenticate(c *gin.Context) {
 	}
 
 	// 写入 refresh_token cookie（与 Python 端一致）。
-	setRefreshCookie(c, tokens.RefreshToken)
+	setRefreshCookie(c, h.cfg, tokens.RefreshToken)
 
 	// 用户字段铺平到 data 顶层（与 Python 端 user_to_dict 形状一致）。
 	userData := h.userSvc.UserToDict(user, user.Profile)
