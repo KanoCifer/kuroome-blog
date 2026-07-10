@@ -6,7 +6,6 @@ import (
 
 // allowedOrigins 是前端来源白名单。Vite dev server + 生产域名。
 func allowedOrigins() []string {
-	// 生产/Vite 默认都允许的来源
 	return []string{
 		"https://kanocifer.chat",
 		"https://m.kanocifer.chat",
@@ -18,11 +17,14 @@ func allowedOrigins() []string {
 }
 
 func NewCORSConfig() cors.Config {
-	config := cors.DefaultConfig()
-	config.AllowOrigins = allowedOrigins()
-	config.AllowCredentials = true
-	config.AllowHeaders = []string{"*"}
-	config.MaxAge = 12 * 3600 // 12h
-
+	config := cors.Config{
+		AllowOrigins:     allowedOrigins(),
+		AllowCredentials: true,
+		AllowHeaders:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		ExposeHeaders:    []string{"X-Process-Time", "X-Trace-Id"},
+		AllowWebSockets:   true,
+		MaxAge:           12 * 3600, // 12h
+	}
 	return config
 }
