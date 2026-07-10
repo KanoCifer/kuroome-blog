@@ -11,6 +11,7 @@ func allowedOrigins() []string {
 	return []string{
 		"https://kanocifer.chat",
 		"https://m.kanocifer.chat",
+		"https://api.kanocifer.chat",
 		"http://localhost:5173",
 		"http://localhost:5174",
 		"http://127.0.0.1:5173",
@@ -36,7 +37,13 @@ func CORS() gin.HandlerFunc {
 			c.Header("Access-Control-Allow-Origin", origin)
 			c.Header("Access-Control-Allow-Credentials", "true")
 			c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-			c.Header("Access-Control-Allow-Headers", "*")
+			// 预检回显客户端请求的 header，非预检给默认白名单。
+			// 注意：credentials: true 下 "*" 不会被当作通配符，必须显式列出。
+			if requested := c.GetHeader("Access-Control-Request-Headers"); requested != "" {
+				c.Header("Access-Control-Allow-Headers", requested)
+			} else {
+				c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Authorization, Accept")
+			}
 			c.Header("Access-Control-Max-Age", "86400")
 			c.Header("Access-Control-Expose-Headers", "X-Process-Time, X-Trace-Id")
 		}

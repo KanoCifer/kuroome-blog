@@ -5,7 +5,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/KanoCifer/kuroome-blog/internal/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -54,10 +53,15 @@ func TestCORS_PreflightReturns204(t *testing.T) {
 	req := httptest.NewRequest(http.MethodOptions, "/", nil)
 	req.Header.Set("Origin", "http://localhost:5173")
 	req.Header.Set("Access-Control-Request-Method", "POST")
+	req.Header.Set("Access-Control-Request-Headers", "Authorization, Content-Type")
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusNoContent {
 		t.Errorf("preflight status = %d, want 204", w.Code)
+	}
+	// credentials: true 时 "*" 不会被当作通配符，必须显式回显请求头。
+	if got := w.Header().Get("Access-Control-Allow-Headers"); got != "Authorization, Content-Type" {
+		t.Errorf("ACAH = %q, want echo of requested headers", got)
 	}
 }
