@@ -4,8 +4,8 @@ import { useVisitorCountStore } from '@/stores/visitorCount';
 import {
   fetchStatusDetail,
   type StatusDetailData,
-  fetchRecentLogs,
-  type LogItem,
+  fetchRecentEvents,
+  type EventItem,
 } from '@/api/shared';
 import { useChartColors, withAlpha } from '@/composables/shared/useChartColors';
 import { computed, onMounted, onUnmounted, ref, watchEffect } from 'vue';
@@ -30,28 +30,27 @@ async function loadStatus() {
   }
 }
 
-/* ── Recent events (logs) ── */
-const recentLogs = ref<LogItem[]>([]);
+/* ── Recent events ── */
+const recentEvents = ref<EventItem[]>([]);
 let eventsTimer: ReturnType<typeof setInterval> | null = null;
 
-async function loadRecentLogs() {
+async function loadRecentEvents() {
   try {
-    recentLogs.value = await fetchRecentLogs({ perPage: 10, level: 'INFO' });
+    recentEvents.value = await fetchRecentEvents({ perPage: 10 });
   } catch {
     /* silent */
   }
 }
 
-/* level → 语义色（用 chart palette 的语义色，不引未定义 token） */
-const levelClass: Record<string, string> = {
-  ERROR: 'text-danger bg-danger/10',
-  WARNING: 'text-warning bg-warning/10',
-  INFO: 'text-muted-foreground bg-muted',
-  DEBUG: 'text-muted-foreground/70 bg-muted/60',
+/* type → 语义色（用 chart palette 的语义色，不引未定义 token） */
+const typeClass: Record<string, string> = {
+  startup: 'text-success bg-success/10',
+  deploy: 'text-primary bg-primary/10',
+  notify_failure: 'text-danger bg-danger/10',
 };
 
-function levelChipClass(level: string): string {
-  return levelClass[level] ?? 'text-muted-foreground bg-muted';
+function typeChipClass(type: string): string {
+  return typeClass[type] ?? 'text-muted-foreground bg-muted';
 }
 
 function formatLogTime(iso: string): string {
@@ -271,8 +270,8 @@ const chartOption = computed(() => {
 onMounted(() => {
   loadStatus();
   statusTimer = setInterval(loadStatus, 30_000);
-  loadRecentLogs();
-  eventsTimer = setInterval(loadRecentLogs, 30_000);
+  loadRecentEvents();
+  eventsTimer = setInterval(loadRecentEvents, 30_000);
   nowTimer = setInterval(() => {
     now.value = Date.now();
   }, 1000);
@@ -831,29 +830,29 @@ onUnmounted(() => {
               />
               30s
             </span>
-            <span>最近 {{ recentLogs.length }} 条</span>
+            <span>最近 {{ recentEvents.length }} 条</span>
           </div>
         </header>
-        <div v-if="recentLogs.length" class="font-mono text-[12px]">
+        <div v-if="recentEvents.length" class="font-mono text-[12px]">
           <div
-            v-for="(log, idx) in recentLogs"
-            :key="log.id"
+            v-for="(event, idx) in recentEvents"
+            :key="event.id"
             class="border-border flex items-start gap-3 px-4 py-2.5"
-            :class="idx < recentLogs.length - 1 ? 'border-b border-dashed' : ''"
+            :class="idx < recentEvents.length - 1 ? 'border-b border-dashed' : ''"
           >
             <span class="text-muted-foreground shrink-0 tabular-nums">
-              {{ formatLogTime(log.timestamp) }}
+              {{ formatLogTime(event.timestamp) }}
             </span>
             <span
               :class="[
                 'shrink-0 rounded-sm px-1.5 py-0.5 text-[10px] font-medium tracking-[0.06em] uppercase',
-                levelChipClass(log.level),
+                typeChipClass(event.type),
               ]"
             >
-              {{ log.level }}
+              {{ event.type }}
             </span>
             <span class="text-foreground min-w-0 flex-1 break-words">
-              {{ log.message }}
+              {{ event.title }}
             </span>
           </div>
         </div>

@@ -2,6 +2,7 @@ from app.repositories.admin_repo import AdminRepo
 from app.repositories.blog_repo import BlogRepo
 from app.repositories.device_repo import DeviceRepo
 from app.repositories.devtask_repo import DevTaskRepo
+from app.repositories.event_repo import EventRepo
 from app.repositories.fishing_repo import FishingRepo
 from app.repositories.friendlink_repo import FriendLinkRepo
 from app.repositories.gallery_repo import GalleryRepo
@@ -20,6 +21,7 @@ __all__ = [
     "BlogRepo",
     "DevTaskRepo",
     "DeviceRepo",
+    "EventRepo",
     "FishingRepo",
     "FriendLinkRepo",
     "GalleryRepo",

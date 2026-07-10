@@ -18,9 +18,9 @@ export type {
   SystemInfo,
 } from './statusGateway';
 
-export { fetchRecentLogs } from './logGateway';
+export { fetchRecentEvents } from './logGateway';
 export type {
-  LogItem,
-  LogListData,
-  FetchRecentLogsOptions,
+  EventItem,
+  EventListData,
+  FetchRecentEventsOptions,
 } from './logGateway';

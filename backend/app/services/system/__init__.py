@@ -1,52 +1,52 @@
-"""系统运维服务 —— 日志查询等管理类业务。
+"""系统运维服务 —— 事件查询等管理类业务。
 
-桥接 :class:`LogRepo` 与分页元数据组装，端点层只管入参校验与响应封装。
+桥接 :class:`EventRepo` 与分页元数据组装，端点层只管入参校验与响应封装。
 """
 
 from __future__ import annotations
 
 from datetime import datetime
 
-from app.repositories.log_repo import LogRepo
-from app.schemas.log import LogResponse
+from app.repositories.event_repo import EventRepo
+from app.schemas.event import EventResponse
 from app.schemas.pagination import PaginationSchema
 
 
 class SystemService:
-    """系统服务 —— 持有 :class:`LogRepo`，提供日志分页查询。"""
+    """系统服务 —— 持有 :class:`EventRepo`，提供事件分页查询。"""
 
-    def __init__(self, repo: LogRepo) -> None:
-        self.repo: LogRepo = repo
+    def __init__(self, repo: EventRepo) -> None:
+        self.repo: EventRepo = repo
 
-    async def list_logs(
+    async def list_events(
         self,
         *,
         page: int = 1,
         per_page: int = 10,
-        level: str | None = None,
+        type: str | None = None,
         start: datetime | None = None,
         end: datetime | None = None,
-    ) -> tuple[list[LogResponse], PaginationSchema]:
-        """分页查询日志，按时间倒序。
+    ) -> tuple[list[EventResponse], PaginationSchema]:
+        """分页查询事件，按时间倒序。
 
         Returns:
-            (日志视图列表, 分页元数据)
+            (事件视图列表, 分页元数据)
         """
         per_page = max(1, min(per_page, 200))
         page = max(1, page)
         offset = (page - 1) * per_page
 
-        total = await self.repo.count_logs(
-            level=level, start=start, end=end
+        total = await self.repo.count_events(
+            type=type, start=start, end=end
         )
-        logs = await self.repo.get_logs(
-            level=level,
+        events = await self.repo.get_events(
+            type=type,
             start=start,
             end=end,
             offset=offset,
             limit=per_page,
         )
-        items = [LogResponse.model_validate(log) for log in logs]
+        items = [EventResponse.model_validate(event) for event in events]
         pages = (total + per_page - 1) // per_page if total else 0
         pagination = PaginationSchema(
             page=page,

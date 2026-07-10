@@ -1,6 +1,6 @@
-"""API integration tests for /api/v2/system — log listing.
+"""API integration tests for /api/v2/system — event listing.
 
-Tests the system log endpoint with pagination and filtering.
+Tests the system event endpoint with pagination and filtering.
 """
 
 from __future__ import annotations
@@ -11,8 +11,8 @@ import pytest
 import pytest_asyncio
 
 from app.api.des.des import system_service_dep
-from app.models.log import Log
-from app.repositories.log_repo import LogRepo
+from app.models.event import Event
+from app.repositories.event_repo import EventRepo
 from app.services.system import SystemService
 
 pytestmark = pytest.mark.asyncio(loop_scope="session")
@@ -23,21 +23,23 @@ async def system_override(api_app, db_session):
     """Override system_service_dep to use the test session."""
 
     async def _override():
-        yield SystemService(LogRepo(db_session))
+        yield SystemService(EventRepo(db_session))
 
     api_app.dependency_overrides[system_service_dep] = _override
     yield
     del api_app.dependency_overrides[system_service_dep]
 
 
-def _make_log(**overrides):
+def _make_event(**overrides):
     data = {
-        "level": "INFO",
-        "message": "test log",
+        "type": "startup",
+        "source": "boot",
+        "title": "API 启动",
+        "message": "test event",
         "timestamp": datetime.now(UTC),
     }
     data.update(overrides)
-    return Log(**data)
+    return Event(**data)
 
 
 # ── GET /api/v2/system/ (ping) ────────────────────────────────
@@ -54,7 +56,7 @@ async def test_system_ping(api_client):
 
 
 @pytest.mark.asyncio
-async def test_list_logs_empty(api_client, system_override):
+async def test_list_events_empty(api_client, system_override):
     resp = await api_client.get("/api/v2/system/log")
     assert resp.status_code == 200
     body = resp.json()
@@ -63,11 +65,11 @@ async def test_list_logs_empty(api_client, system_override):
 
 
 @pytest.mark.asyncio
-async def test_list_logs_returns_items(
+async def test_list_events_returns_items(
     api_client, system_override, db_session
 ):
-    db_session.add(_make_log(message="log1"))
-    db_session.add(_make_log(message="log2"))
+    db_session.add(_make_event(message="event1"))
+    db_session.add(_make_event(message="event2"))
     await db_session.flush()
 
     resp = await api_client.get("/api/v2/system/log")
@@ -78,11 +80,11 @@ async def test_list_logs_returns_items(
 
 
 @pytest.mark.asyncio
-async def test_list_logs_pagination(
+async def test_list_events_pagination(
     api_client, system_override, db_session
 ):
     for i in range(5):
-        db_session.add(_make_log(message=f"log{i}"))
+        db_session.add(_make_event(message=f"event{i}"))
     await db_session.flush()
 
     resp = await api_client.get(
@@ -97,18 +99,18 @@ async def test_list_logs_pagination(
 
 
 @pytest.mark.asyncio
-async def test_list_logs_filter_by_level(
+async def test_list_events_filter_by_type(
     api_client, system_override, db_session
 ):
-    db_session.add(_make_log(level="INFO", message="info-log"))
-    db_session.add(_make_log(level="ERROR", message="error-log"))
-    db_session.add(_make_log(level="INFO", message="info-log2"))
+    db_session.add(_make_event(type="startup", message="startup-event"))
+    db_session.add(_make_event(type="deploy", message="deploy-event"))
+    db_session.add(_make_event(type="startup", message="startup-event2"))
     await db_session.flush()
 
     resp = await api_client.get(
-        "/api/v2/system/log", params={"level": "ERROR"}
+        "/api/v2/system/log", params={"type": "deploy"}
     )
     assert resp.status_code == 200
     body = resp.json()
     assert body["data"]["pagination"]["total"] == 1
-    assert body["data"]["items"][0]["level"] == "ERROR"
+    assert body["data"]["items"][0]["type"] == "deploy"

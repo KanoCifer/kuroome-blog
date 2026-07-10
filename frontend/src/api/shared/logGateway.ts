@@ -1,16 +1,18 @@
 import request from '@/api/shared/request';
 import type { ApiResponse } from '@/api/shared/request';
 
-export interface LogItem {
+export interface EventItem {
   id: number;
   timestamp: string;
-  level: string;
+  type: string;
+  source: string;
+  title: string;
   message: string;
   extra: Record<string, unknown>;
 }
 
-export interface LogListData {
-  items: LogItem[];
+export interface EventListData {
+  items: EventItem[];
   pagination: {
     page: number;
     per_page: number;
@@ -19,23 +21,29 @@ export interface LogListData {
   };
 }
 
-export interface FetchRecentLogsOptions {
+export interface FetchRecentEventsOptions {
   /** 默认 10 */
   perPage?: number;
-  /** 默认 INFO；传 WARNING/ERROR 之类 */
-  level?: string;
+  /** 按事件类型过滤，如 startup / deploy */
+  type?: string;
 }
 
 /**
- * 取最近 N 条日志（按时间倒序），用于 StatusView「最近事件」卡片。
- * 后端复用 /api/v2/system/log，仅调整 per_page / level。
+ * 取最近 N 条服务事件（按时间倒序），用于 StatusView「最近事件」卡片。
+ * 后端复用 /api/v2/system/log，仅调整 per_page / type。
  */
-export async function fetchRecentLogs(
-  options: FetchRecentLogsOptions = {},
-): Promise<LogItem[]> {
-  const { perPage = 10, level = 'INFO' } = options;
-  const res = await request.get<ApiResponse<LogListData>>('v2/system/log', {
-    params: { page: 1, per_page: perPage, level },
-  });
+export async function fetchRecentEvents(
+  options: FetchRecentEventsOptions = {},
+): Promise<EventItem[]> {
+  const { perPage = 10, type } = options;
+  const params: Record<string, string | number> = {
+    page: 1,
+    per_page: perPage,
+  };
+  if (type) params.type = type;
+  const res = await request.get<ApiResponse<EventListData>>(
+    'v2/system/log',
+    { params },
+  );
   return res.data.data.items;
 }

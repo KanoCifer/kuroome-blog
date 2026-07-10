@@ -14,7 +14,6 @@ from app.repositories import (
     FishingRepo,
     FriendLinkRepo,
     GalleryRepo,
-    LogRepo,
     MomentRepo,
     MonitorRepo,
     NotificationRepo,
@@ -101,10 +100,11 @@ async def get_monitor_service():
 
 @asynccontextmanager
 async def get_system_service():
+    from app.repositories.event_repo import EventRepo
     from app.services.system import SystemService
 
     async with get_async_session() as session:
-        repo = LogRepo(session)
+        repo = EventRepo(session)
         service = SystemService(repo=repo)
         yield service
 
