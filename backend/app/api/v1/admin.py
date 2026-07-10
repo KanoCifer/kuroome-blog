@@ -27,6 +27,7 @@ from app.plugins.notification import Message, NotificationContext, notify
 from app.schemas import VisitorData
 from app.schemas.schemas import BlogPostIn, BlogPostUpdate
 from app.services.admin_service import AdminService
+from app.services.event_service import record_event
 from app.utils import get_redis_lock
 
 # 写后失效的读接口函数名(SCAN 模式: cache:<name>|*)
@@ -254,7 +255,7 @@ async def webhook_deploy(
     logger.info(
         f"Deployment triggered by webhook from {get_remote_address(request)}"
     )
-    logger.bind(persist=True).info("后端服务升级")
+    await record_event("deploy", "后端服务升级", source="webhook_admin")
 
     try:
         async with get_redis_lock(redis, "deploy_lock", ttl=300):

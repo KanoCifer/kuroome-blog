@@ -16,6 +16,7 @@ from app.api.des import (
 )
 from app.core import get_settings, register_exception_handlers
 from app.core import logger as app_logger
+from app.core.logger import drain_log_queue, start_log_worker
 from app.middleware import register_middleware
 from app.models.blog import Post
 from app.models.changelog import Changelog
@@ -30,6 +31,7 @@ from app.plugins.cache import close_cache_redis
 from app.plugins.notification import Message, NotificationContext, notify
 from app.plugins.task import broker
 from app.router import register_router, setup_media
+from app.services.event_service import record_event
 
 
 async def initialize_resources(app: FastAPI):
@@ -63,6 +65,9 @@ async def initialize_resources(app: FastAPI):
         except Exception as e:
             app_logger.warning(f"Taskiq broker failed to start: {e!s}")
 
+    # 启动日志入库 worker（logger.WARNING+ 经 asyncio.Queue 异步落库）
+    app.state.log_worker = start_log_worker()
+
     app_logger.debug(f"Settings:{get_settings().model_dump()}")
     app_logger.info("FastAPI started successfully.")
 
@@ -78,7 +83,9 @@ async def initialize_resources(app: FastAPI):
             if not acquired:
                 app_logger.info("启动通知已由其它 worker 发送，跳过")
             else:
-                app_logger.bind(persist=True).info(f"API服务启动｜时间：{now}")
+                await record_event(
+                    "startup", f"API服务启动｜时间：{now}", source="boot"
+                )
                 await notify(
                     channels=["feishu"],
                     message=Message(
@@ -90,11 +97,16 @@ async def initialize_resources(app: FastAPI):
                     ),
                 )
         except Exception:
-            app_logger.bind(persist=True).warning("❌发送启动通知失败")
+            await record_event("notify_failure", "发送启动通知失败", source="boot")
 
 
 async def cleanup_resources(app: FastAPI):
     """关闭所有资源连接：Redis、MongoDB、PostgreSQL、Taskiq"""
+    # 先排空日志 queue，再关 DB —— 保证落库的日志不因 session 关闭而丢失
+    if hasattr(app.state, "log_worker"):
+        await drain_log_queue()
+        app.state.log_worker.cancel()
+
     await close_redis(app)
     await close_cache_redis()
     await app.state.client.close()

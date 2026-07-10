@@ -5,15 +5,13 @@
 - structlog 经 ``wrap_for_formatter`` 把事件交回 stdlib ``logging``，
   由 ``ProcessorFormatter`` 统一渲染：业务日志与 uvicorn/taskiq/sqlalchemy 等
   foreign 记录走**同一条**处理器链、同一套 JSON 长相。
-- 三文件路由（info/error/access）由各 FileHandler 上的 ``logging.Filter``
-  决定：filter 在 format 之前跑，此时 structlog 记录的 ``record.msg`` 还是
-  event_dict（dict），可据此读 ``persist_to``；foreign 记录用 ``record.name``
-  与 ``record.levelno`` 判断。（structlog 26.x 的 ``ProcessorFormatter`` 不捕获
-  ``DropEvent``，故不能用处理器丢记录。）
+- 双文件路由（info/error）：app_info.log 收 INFO ≤ level < ERROR，
+  app_error.log 收 ERROR+；uvicorn.access 的 handler 清掉后回传播到 root，
+  进 app_info.log。
 - trace_id 由 ``_add_trace_id`` 处理器从 contextvar 注入，FastAPI middleware
   与 taskiq TraceMiddleware 负责设置/复位（见 ``logging_context.py``）。
 - DB 持久化：专用 ``_DBHandler`` 终端处理器 ``_db_enqueue`` 做 fire-and-forget
-  入队，双门准入（``persist`` 或 level ≥ ``DB_LOG_LEVEL``）。
+  入队，纯 level 门控（WARNING+）。
 """
 
 from __future__ import annotations
@@ -24,7 +22,6 @@ import logging
 import logging.handlers
 import os
 import sys
-from datetime import datetime
 from pathlib import Path
 
 import structlog
@@ -36,39 +33,23 @@ from app.core.logging_context import trace_id_ctx
 # 阈值与路径
 # -----------------------------------------------------------------------------
 _LOG_LEVEL = os.getenv("LOG_LEVEL") or get_settings().LOG_LEVEL
-_DB_LOG_LEVEL = get_settings().DB_LOG_LEVEL
-_DB_LEVEL_NO = getattr(
-    logging, _DB_LOG_LEVEL, logging.WARNING
-)  # "WARNING" -> 30
 _ERROR_NO = logging.ERROR
+
+# structlog 输出的 level 名是小写字符串（"warning"/"error"/"critical"）；
+# 不在 shared_processors 里加 level_number（保持输出 schema 四键精简），
+# 故 DB 门控按名字集合判定。
+_LEVELS_FOR_DB = frozenset({"warning", "error", "critical"})
 
 MAX_LOG_SIZE = 1_000_000  # 1 MB
 BACKUP_COUNT = 5
-ACCESS_MAX_LOG_SIZE = 10_000_000  # 10 MB
-ACCESS_BACKUP_COUNT = 3
 
-# 写入 DB extra 时排除的键：渲染/路由元数据、callsite、内部标记。
-# 保留业务 bind 字段与 trace_id（与旧 loguru DB sink 行为一致）。
+# 写入 DB extra 时排除的键：渲染/路由元数据、输出字段、内部标记。
 _DB_EXCLUDE = frozenset(
     {
-        "event",
-        "level",
-        "level_number",
-        "timestamp",
-        "logger",
-        "logger_name",
-        "filename",
-        "func_name",
-        "lineno",
         "_record",
         "_from_structlog",
-        "persist",
-        "persist_to",
     }
 )
-
-# 仅路由到 access.log 的 stdlib logger 名（噪音剥离出主轨迹）
-_ACCESS_ONLY_LOGGERS = frozenset({"uvicorn.access"})
 
 # -----------------------------------------------------------------------------
 # 处理器：trace_id / timestamper
@@ -82,30 +63,32 @@ def _add_trace_id(logger, method_name, event_dict):
     return event_dict
 
 
+def _event_to_message(logger, method_name, event_dict):
+    """把 structlog 的 ``event`` 键重命名为 ``message``。
+
+    ``shared_processors`` 在 structlog.configure 与每个 handler 的
+    ``foreign_pre_chain`` 里各跑一遍；重命名只在首遍生效（后续 ``message`` 已存在、
+    ``event`` 已不存在），天然幂等。
+    """
+    if "event" in event_dict and "message" not in event_dict:
+        event_dict["message"] = event_dict.pop("event")
+    return event_dict
+
+
 # 两端共享的前置链：业务记录与 foreign 记录都跑一遍，产出统一 event_dict。
 # 注意：此处**不得**放 ``filter_by_level`` 或任何副作用处理器——
 #   1. ``filter_by_level`` 在 ``foreign_pre_chain`` 里收到 ``logger=None`` 会抛
 #      AttributeError（foreign 记录没有 structlog wrapper logger）；foreign 记录
 #      的级别过滤交给 stdlib handler 的 ``setLevel``。
-#   2. 副作用处理器会经每个 handler 的 ``foreign_pre_chain`` 各跑一遍而重复触发；
-#      DB 入队放在专用 handler 的终端处理器里，确保每条记录只入队一次。
 shared_processors = [
     _add_trace_id,
+    _event_to_message,
     structlog.stdlib.add_log_level,
-    structlog.stdlib.add_log_level_number,
-    structlog.stdlib.add_logger_name,
     structlog.stdlib.PositionalArgumentsFormatter(),
     _timestamper,
     structlog.processors.StackInfoRenderer(),
     structlog.processors.format_exc_info,
     structlog.processors.UnicodeDecoder(),
-    structlog.processors.CallsiteParameterAdder(
-        {
-            structlog.processors.CallsiteParameter.FILENAME,
-            structlog.processors.CallsiteParameter.FUNC_NAME,
-            structlog.processors.CallsiteParameter.LINENO,
-        }
-    ),
 ]
 
 structlog.configure(
@@ -123,24 +106,11 @@ structlog.configure(
 # -----------------------------------------------------------------------------
 # 路由：用 logging.Filter 决定某条记录是否进该 handler
 # -----------------------------------------------------------------------------
-# structlog 26.x 的 ``ProcessorFormatter`` 在其 processor 循环里**不**捕获
-# ``DropEvent``，故不能靠处理器丢记录。``logging.Filter`` 在 format 之前跑，
-# 此时 structlog 记录的 ``record.msg`` 还是 event_dict（dict），foreign 记录
-# 则是原始消息串——据此判断 ``persist_to`` / logger 名 / 级别即可。
-def _is_access_record(record: logging.LogRecord) -> bool:
-    if record.name in _ACCESS_ONLY_LOGGERS:
-        return True
-    msg = record.msg
-    return isinstance(msg, dict) and msg.get("persist_to") == "access"
-
-
 class _InfoFilter(logging.Filter):
-    """app_info.log：INFO <= 级别 < ERROR，排除 access 噪音。"""
+    """app_info.log：INFO <= 级别 < ERROR。"""
 
     def filter(self, record: logging.LogRecord) -> bool:
-        if record.levelno >= _ERROR_NO:
-            return False
-        return not _is_access_record(record)
+        return record.levelno < _ERROR_NO
 
 
 class _ErrorFilter(logging.Filter):
@@ -148,13 +118,6 @@ class _ErrorFilter(logging.Filter):
 
     def filter(self, record: logging.LogRecord) -> bool:
         return record.levelno >= _ERROR_NO
-
-
-class _AccessFilter(logging.Filter):
-    """app_access.log：access / 第三方调用 / 审计事件。"""
-
-    def filter(self, record: logging.LogRecord) -> bool:
-        return _is_access_record(record)
 
 
 # -----------------------------------------------------------------------------
@@ -197,32 +160,49 @@ log_path.parent.mkdir(parents=True, exist_ok=True)
 
 info_log_path = log_path.with_stem(f"{log_path.stem}_info")
 error_log_path = log_path.with_stem(f"{log_path.stem}_error")
-access_log_path = log_path.with_stem(f"{log_path.stem}_access")
 
 
 # -----------------------------------------------------------------------------
-# DB sink：fire-and-forget 持久化到 PostgreSQL
+# DB sink：纯 level 门控，asyncio.Queue 异步入库
 # -----------------------------------------------------------------------------
-# 持有入队任务引用，防止被 GC 提前回收；完成回调里自我清理，无内存泄漏。
-_kiq_tasks: set[asyncio.Task] = set()
+# 解耦同步 logger 与异步 DB：_db_enqueue 纯 level 门控后入队，
+# 后台 _log_worker 单 consumer 取消息、async session 直写 Log 表。
+# maxsize 防内存无限增长；同步入队在 queue 满时丢弃这条（sys.stderr 留痕）。
+_log_queue: asyncio.Queue[dict] = asyncio.Queue(maxsize=1000)
+
+
+async def _log_worker() -> None:
+    """单 consumer：从 _log_queue 取 payload，async session 直写 Log 表。"""
+    from app.api.des.db import get_async_session
+    from app.models.log import Log
+
+    while True:
+        payload = await _log_queue.get()
+        try:
+            async with get_async_session() as session:
+                session.add(
+                    Log(
+                        timestamp=payload["timestamp"],
+                        level=payload["level"],
+                        message=payload["message"],
+                        extra=payload.get("extra") or {},
+                    )
+                )
+                # get_async_session 退出时统一 commit
+        except Exception as e:
+            sys.stderr.write(f"[log-sink] {e}\n")
+        finally:
+            _log_queue.task_done()
 
 
 def _db_enqueue(logger, method_name, event_dict):
-    """将日志通过 Taskiq 异步入库（双门准入，见 ``docs/rules/logging.md`` §7）。
+    """纯 level 门控：level ≥ DB_LOG_LEVEL 才入队，其余丢弃。
 
-    1. 显式 ``persist`` 标记 → 入库；
-       或 level >= ``DB_LOG_LEVEL``（默认 WARNING）→ 入库；
-       其余丢弃，避免 INFO 全量灌进 ``Log`` 表。
-    2. 仅作为 ``_DBHandler`` 的终端处理器运行 → 每条记录只入队一次
-       （shared_processors 不含副作用，foreign 记录多 handler 重复跑也安全）。
-
-    处理器在同步上下文里被调用，无法直接 ``await``；``log_task.kiq()`` 是协程
-    函数，必须 await 才会真正入队，故取运行中的 event loop 用 ``create_task``
-    调度。延迟 import 避免与 task 模块的循环导入（task → broker → logger → task）。
+    仅作为 ``_DBHandler`` 的终端处理器运行 → 每条记录只入队一次。
+    处理器在同步上下文里被调用，用 ``call_soon_threadsafe`` 把入队操作
+    调度到运行中的 event loop；无 loop 或 queue 满时丢弃并留痕 stderr。
     """
-    level_no = event_dict.get("level_number", 0)
-    persist = event_dict.get("persist")
-    if not persist and level_no < _DB_LEVEL_NO:
+    if event_dict.get("level") not in _LEVELS_FOR_DB:
         return ""
 
     try:
@@ -233,29 +213,20 @@ def _db_enqueue(logger, method_name, event_dict):
         return ""
 
     try:
-        extra = {k: v for k, v in event_dict.items() if k not in _DB_EXCLUDE}
-        ts_iso = event_dict.get("timestamp")
-        try:
-            ts_epoch = (
-                datetime.fromisoformat(ts_iso).timestamp() if ts_iso else None
-            )
-        except TypeError, ValueError:
-            ts_epoch = None
-
-        from app.plugins.task.tasks.log_task import log_task
-
-        task = loop.create_task(
-            log_task.kiq(
-                {
-                    "timestamp": ts_epoch,
-                    "level": event_dict.get("level", "info"),
-                    "message": event_dict.get("event", ""),
-                    "extra": extra,
-                }
-            )
-        )
-        _kiq_tasks.add(task)
-        task.add_done_callback(_kiq_tasks.discard)
+        # extra 保留 trace_id 与业务 bind 字段（Log 模型无 trace_id 列，
+        # 故 trace_id 进 JSON extra，可供按链路查询）；level / message /
+        # timestamp 已是顶层列，不进 extra 避免重复。
+        exclude = _DB_EXCLUDE | {"level", "message", "timestamp"}
+        extra = {k: v for k, v in event_dict.items() if k not in exclude}
+        payload = {
+            "timestamp": event_dict.get("timestamp"),
+            "level": event_dict.get("level", "info"),
+            "message": event_dict.get("message", ""),
+            "extra": extra,
+        }
+        loop.call_soon_threadsafe(_log_queue.put_nowait, payload)
+    except asyncio.QueueFull:
+        sys.stderr.write("[log-sink] queue full, record dropped\n")
     except Exception as e:
         sys.stderr.write(f"[log-sink] {e}\n")
     return ""
@@ -269,6 +240,16 @@ class _DBHandler(logging.Handler):
         # 返回值是空串，忽略。sink 自身异常绝不冒泡打断业务日志流。
         with contextlib.suppress(Exception):
             self.format(record)
+
+
+def start_log_worker() -> asyncio.Task:
+    """启动后台 _log_worker；应在 app startup 调用。"""
+    return asyncio.create_task(_log_worker())
+
+
+async def drain_log_queue() -> None:
+    """等待 queue 排空；应在 app shutdown 调用（在 cancel worker 前）。"""
+    await _log_queue.join()
 
 
 # -----------------------------------------------------------------------------
@@ -287,7 +268,7 @@ _stderr_handler.setFormatter(_make_formatter(_stderr_renderer))
 _root.addHandler(_stderr_handler)
 
 if get_settings().SAVE_LOGS:
-    # app_info.log：INFO <= 级别 < ERROR 的主轨迹，排除 access 噪音
+    # app_info.log：INFO <= 级别 < ERROR 的主轨迹
     _info_handler = logging.handlers.RotatingFileHandler(
         info_log_path,
         maxBytes=MAX_LOG_SIZE,
@@ -311,23 +292,9 @@ if get_settings().SAVE_LOGS:
     _error_handler.setFormatter(_make_formatter(_json_renderer))
     _root.addHandler(_error_handler)
 
-    # app_access.log：access / 第三方调用 / 审计事件，从主轨迹剥离
-    _access_handler = logging.handlers.RotatingFileHandler(
-        access_log_path,
-        maxBytes=ACCESS_MAX_LOG_SIZE,
-        backupCount=ACCESS_BACKUP_COUNT,
-        encoding="utf-8",
-    )
-    _access_handler.setLevel(logging.INFO)
-    _access_handler.addFilter(_AccessFilter())
-    _access_handler.setFormatter(_make_formatter(_json_renderer))
-    _root.addHandler(_access_handler)
-
-    # DB 持久化 handler：终端处理器 _db_enqueue 入队，双门准入
+    # DB 持久化 handler：终端处理器 _db_enqueue 入队，纯 level 门控
     _db_handler = _DBHandler()
-    _db_handler.setLevel(
-        logging.INFO
-    )  # 低门栏，让 persist=True 的 INFO 能进；_db_enqueue 再判
+    _db_handler.setLevel(logging.INFO)  # 低门栏放行，_db_enqueue 内部按 level 判定
     _db_handler.setFormatter(_make_formatter(_db_enqueue))
     _root.addHandler(_db_handler)
 
@@ -358,4 +325,4 @@ _install_foreign_propagation()
 
 logger = structlog.get_logger()
 
-__all__ = ["logger"]
+__all__ = ["drain_log_queue", "logger", "start_log_worker"]

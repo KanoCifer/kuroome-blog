@@ -21,7 +21,6 @@ from app.plugins.task.task import broker
 
 # Trigger @broker.task registration for scheduled tasks (not in public API)
 from app.plugins.task.tasks import (
-    log_task,
     scheduled,
     subscription,
 )

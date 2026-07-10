@@ -49,18 +49,12 @@ def register_middleware(app: FastAPI) -> None:
             response = await call_next(request)
         finally:
             process_time: float = round(time.perf_counter() - start_time, 6)
-            reset_trace_id(token)
 
-        # 慢请求才进 DB（persist）；普通请求留文件 log。trace_id 已复位，
-        # 故在上文 set 后立即取值缓存，bind 时带回去。
-        app_logger.bind(
-            trace_id=trace_id,
-            method=request.method,
-            path=request.url.path,
-            status=response.status_code,
-            duration=process_time,
-            persist=(process_time > 1.0),
-        ).info("http request completed")
+        # 在 reset 前 emit —— contextvar 仍持有本次请求的 trace_id，
+        # _add_trace_id 处理器自动注入正确值；reset 后再 inject 会拿到入口旧值。
+        app_logger.info("http request completed")
+        reset_trace_id(token)
+
         response.headers["X-Process-Time"] = f"{process_time}s"
         response.headers["X-Trace-Id"] = trace_id
         return response
