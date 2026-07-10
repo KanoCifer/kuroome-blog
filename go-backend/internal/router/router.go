@@ -21,7 +21,7 @@ func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
 	r.Use(middleware.Trace())
 	r.Use(middleware.CORS())
 
-	v3 := r.Group("/v3")
+	v3 := r.Group("/api/v3")
 
 	// 限流: 登录 / 注册各 5 次 / 分钟。
 	loginLimiter := middleware.NewRateLimiter(redis, "login", 5, 60*time.Second)
