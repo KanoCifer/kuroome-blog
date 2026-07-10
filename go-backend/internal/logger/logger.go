@@ -11,6 +11,8 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
+const ginSource = "gin"
+
 // Init 初始化全局 slog logger。需在 config.Load() 之后、其他日志调用之前调用。
 //
 // 路由规则（对齐 Python 端双文件）：
@@ -117,4 +119,18 @@ func traceIDFromContext(ctx context.Context) (string, bool) {
 	}
 	s, ok := v.(string)
 	return s, ok
+}
+
+// GinLogWriter 适配 io.Writer，把 gin 内部输出桥接为 slog 记录。
+// 全仓日志走同一套 JSON / Text handler，不再输出 uvicorn 风格的独立行。
+//
+// 用法：在 main 中赋值给 gin.DefaultWriter / gin.DefaultErrorWriter。
+type GinLogWriter struct{}
+
+func (GinLogWriter) Write(p []byte) (int, error) {
+	msg := strings.TrimSpace(string(p))
+	if msg != "" {
+		slog.Default().Info(msg, "source", ginSource)
+	}
+	return len(p), nil
 }

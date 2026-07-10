@@ -1,0 +1,41 @@
+// Package router 集中注册所有业务路由。
+//
+// handler 各自通过 RegisterRoutes 挂载到传入的 *gin.RouterGroup，
+// 便于按版本分组（当前统一前缀 /api/v3）。
+package router
+
+import (
+	"time"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
+
+	"github.com/KanoCifer/kuroome-blog/internal/app"
+	"github.com/KanoCifer/kuroome-blog/internal/handler"
+	"github.com/KanoCifer/kuroome-blog/internal/middleware"
+)
+
+// Setup 装配 gin 引擎：全局中间件 + 路由注册 + 限流。
+func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
+	r.Use(middleware.Trace())
+	r.Use(cors.New(middleware.NewCORSConfig()))
+
+	v3 := r.Group("/api/v3")
+
+	// 限流: 登录 / 注册各 5 次 / 分钟。
+	loginLimiter := middleware.NewRateLimiter(redis, "login", 5, 60*time.Second)
+	registerLimiter := middleware.NewRateLimiter(redis, "register", 5, 60*time.Second)
+
+	userH := handler.NewUserHandler(state.UserSvc(), state.Cfg())
+	userH.RegisterRoutes(v3, middleware.AuthMiddleware(), loginLimiter.Middleware(), registerLimiter.Middleware())
+
+	adminH := handler.NewAdminHandler(state.AdminSvc(), state.Cfg())
+	adminH.RegisterRoutes(v3, middleware.AuthMiddleware(), middleware.AdminMiddleware(state.Cfg().Admin.UserIDs))
+
+	passkeyH := handler.NewPasskeyHandler(state.PasskeySvc(), state.UserSvc(), state.Cfg())
+	passkeyH.RegisterRoutes(v3, middleware.AuthMiddleware())
+
+	githubH := handler.NewGitHubHandler(state.GitHubOAuth(), state.Cfg())
+	githubH.RegisterRoutes(v3, middleware.AuthMiddleware())
+}
