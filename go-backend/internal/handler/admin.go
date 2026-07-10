@@ -6,7 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
-	"log"
+	"log/slog"
 	"os"
 	"os/exec"
 	"time"
@@ -142,7 +142,7 @@ func (h *AdminHandler) WebhookDeploy(c *gin.Context) {
 
 	go runDeployment()
 
-	log.Printf("Deployment triggered by webhook from %s", c.ClientIP())
+	slog.Info("Deployment triggered by webhook", "ip", c.ClientIP())
 	response.Success(c, gin.H{"status": "pending"}, "Deployment triggered successfully")
 }
 
@@ -164,7 +164,7 @@ func runDeployment() {
 		scriptPath = "/home/kano/blog/deploy.sh"
 	}
 	if _, err := os.Stat(scriptPath); os.IsNotExist(err) {
-		log.Printf("Deploy script not found at %s", scriptPath)
+		slog.Error("Deploy script not found", "path", scriptPath)
 		return
 	}
 
@@ -175,10 +175,10 @@ func runDeployment() {
 	cmd.Dir = "/home/kano/blog/backend"
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Printf("Deployment failed: %v\nOutput: %s", err, string(output))
+		slog.Error("Deployment failed", "error", err, "output", string(output))
 		return
 	}
-	log.Printf("Deployment completed successfully:\n%s", string(output))
+	slog.Info("Deployment completed", "output", string(output))
 }
 
 func (h *AdminHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFunc, adminMW gin.HandlerFunc) {

@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
 	"time"
@@ -52,8 +53,8 @@ func GetDB() *gorm.DB {
 func InitMongo() error {
 	uri := config.Cfg.Database.MongoURI
 	if uri == "" {
-		slog.Info("[mongo] MONGO_URI not configured, skipping")
-		return nil
+		slog.Error("[mongo] MONGO_URI not configured, skipping")
+		return fmt.Errorf("MONGO_URI not configured")
 	}
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(uri).SetServerAPIOptions(serverAPI)

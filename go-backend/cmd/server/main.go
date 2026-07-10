@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +11,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/db"
 	"github.com/KanoCifer/kuroome-blog/internal/handler"
+	"github.com/KanoCifer/kuroome-blog/internal/logger"
 	"github.com/KanoCifer/kuroome-blog/internal/middleware"
 	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
@@ -21,14 +22,16 @@ func init() {
 }
 
 func main() {
+	logger.Init(config.Cfg)
+
 	if err := db.InitDB(); err != nil {
-		log.Fatal(err)
+		slog.Error("init db", "error", err)
 	}
 	if err := db.InitMongo(); err != nil {
-		log.Fatal(err)
+		slog.Error("init mongo", "error", err)
 	}
 	if err := db.InitRedis(); err != nil {
-		log.Fatal(err)
+		slog.Error("init redis", "error", err)
 	}
 	defer db.Close()
 
@@ -43,7 +46,7 @@ func main() {
 
 	wa, err := service.NewWebAuthn(config.Cfg.WebAuthn.RPID, config.Cfg.WebAuthn.Origin)
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("init webauthn", "error", err)
 	}
 	passkeySvc := service.NewPasskeyService(wa, db.GetRedis(), passkeyRepo, userRepo)
 

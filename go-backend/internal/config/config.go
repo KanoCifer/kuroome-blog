@@ -35,6 +35,7 @@ type ServerConfig struct {
 	LogLevel   string `mapstructure:"LOG_LEVEL"`
 	DbLogLevel string `mapstructure:"DB_LOG_LEVEL"`
 	SaveLogs   bool   `mapstructure:"SAVE_LOGS"`
+	ENV        string `mapstructure:"ENV"`
 }
 
 // SecurityConfig 安全相关密钥与 Cookie。
@@ -125,6 +126,7 @@ var defaults = map[string]any{
 	"PORT":                     5555,
 	"LOG_LEVEL":                "INFO",
 	"DB_LOG_LEVEL":             "WARNING",
+	"ENV":                      "prod",
 	"SAVE_LOGS":                true,
 	"SECRET_KEY":               "",
 	"JWT_PRIVATE_KEY":          "",
