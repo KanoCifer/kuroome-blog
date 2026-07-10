@@ -157,9 +157,8 @@ fi
 step "Restarting services"
 if [ "$BACKEND_CHANGED" = true ] || [ "$GO_BACKEND_CHANGED" = true ]; then
   sudo supervisorctl reload || true
-  sudo supervisorctl update || true
   /usr/bin/systemctl --user restart gobackend
-  ok "Services restarted"
+  ok "Backend restarted"
 else
   warn "No backend changes — skipping service restart"
 fi

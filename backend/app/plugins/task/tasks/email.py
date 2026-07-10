@@ -17,16 +17,29 @@ from app.schemas import EmailCodeContent
 @broker.task
 async def send_code(email: str, verification_code: str) -> None:
     """发送验证码邮件"""
-    html = f"""<h1>这是您的验证码：</h1>
-    <h1 style=\"color: blue;\">{verification_code}</h1>
-    <p>请在10分钟内使用。</p>
-    """
+    html = f"""<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:24px;background:#fafafa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:0 auto;background:#ffffff;border-radius:8px;overflow:hidden;">
+<tr><td style="padding:32px 24px 16px;">
+<p style="margin:0 0 16px;font-size:14px;color:#333333;">这是您的验证码：</p>
+<p style="margin:0 0 24px;font-size:32px;font-weight:700;letter-spacing:4px;color:#1a1a1a;font-family:'SF Mono',Consolas,monospace;">{verification_code}</p>
+<p style="margin:0;font-size:13px;color:#888888;">请在5分钟内使用。</p>
+</td></tr>
+</table>
+</body>
+</html>
+"""
     valid_email: EmailStr = validate_email(email).email
 
     content = EmailCodeContent(
         recipient=valid_email,
         verification_code=verification_code,
-        subject="ReadingList 注册验证码",
+        subject="kanocifer.chat 注册验证码",
         body=html,
     )
 

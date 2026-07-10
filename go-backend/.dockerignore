@@ -1,0 +1,10 @@
+.git
+.gitignore
+.DS_Store
+server
+*.md
+.env
+.env.*
+docker-compose*.yml
+Dockerfile*
+.impeccable/

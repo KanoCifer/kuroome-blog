@@ -1,0 +1,98 @@
+services:
+  go-backend:
+    build:
+      context: ./go-backend
+      dockerfile: Dockerfile
+    container_name: kuroome-go-backend
+    ports:
+      - "5555:5555"
+    environment:
+      PORT: 5555
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres?sslmode=disable
+      MONGO_URI: mongodb://mongo:27017/
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      # Override these in .env for production:
+      # GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, MAIL_USERNAME, MAIL_PASSWORD, etc.
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - kuroome
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: kuroome-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - kuroome
+
+  redis:
+    image: redis:7-alpine
+    container_name: kuroome-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - kuroome
+
+  mongo:
+    image: mongo:7
+    container_name: kuroome-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+    networks:
+      - kuroome
+
+  rabbitmq:
+    image: rabbitmq:4-alpine
+    container_name: kuroome-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    restart: unless-stopped
+    networks:
+      - kuroome
+
+volumes:
+  postgres_data:
+  redis_data:
+  mongo_data:
+  rabbitmq_data:
+
+networks:
+  kuroome:
+    driver: bridge
