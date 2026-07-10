@@ -39,7 +39,17 @@ EOF
   )" > /dev/null 2>&1 || true
 }
 
-trap 'notify_feishu "❌ FAILED" "red" "Deploy failed"; exit 1' ERR
+FAILED_STEP=""
+
+# 任意命令失败时记录当前步骤并推送 webhook；由调用方在关键步骤前设置
+# FAILED_STEP，这样 webhook 能区分是哪一步挂掉。
+fail() {
+  local reason="${1:-$FAILED_STEP}"
+  notify_feishu "❌ FAILED" "red" "${reason:-Deploy failed}"
+  exit 1
+}
+
+trap 'fail' ERR
 
 step() {
   echo -e "\n${BLUE}▶ $1${NO_COLOR}"
@@ -70,7 +80,7 @@ step "Pulling latest code"
 cd /home/kano/blog || exit 1
 OLD_HEAD=$(git rev-parse HEAD)
 git checkout . || true
-git pull
+FAILED_STEP="Git pull 失败 (网络/冲突)" && git pull
 NEW_HEAD=$(git rev-parse HEAD)
 ok "Git pull completed"
 
@@ -96,12 +106,12 @@ fi
 if [ "$BACKEND_CHANGED" = true ]; then
   step "Updating backend dependencies"
   cd /home/kano/blog/backend || exit 1
-  /home/kano/.local/bin/uv sync
+  FAILED_STEP="Python 依赖安装失败 (uv sync: lockfile 冲突/网络)" && /home/kano/.local/bin/uv sync
   ok "Dependencies synced"
 
   step "Running database migrations"
-  /home/kano/.local/bin/uv run alembic upgrade head
-  /home/kano/.local/bin/uv run python scripts/insert_changelog.py
+  FAILED_STEP="数据库迁移失败 (alembic: schema 冲突/DB 连接)" && /home/kano/.local/bin/uv run alembic upgrade head
+  FAILED_STEP="insert_changelog.py 执行失败" && /home/kano/.local/bin/uv run python scripts/insert_changelog.py
   ok "Migrations applied"
 else
   warn "No backend changes detected — skipping deps sync and migrations"
@@ -110,8 +120,8 @@ fi
 if [ "$GO_BACKEND_CHANGED" = true ]; then
   step "Building Go backend"
   cd /home/kano/blog/go-backend || exit 1
-  /usr/bin/go mod tidy
-  /usr/bin/go build -o /home/kano/blog/go-backend/server ./cmd/server
+  FAILED_STEP="Go mod tidy 失败 (模块下载/网络)" && /usr/bin/go mod tidy
+  FAILED_STEP="Go 编译失败 (语法错误/依赖缺失)" && /usr/bin/go build -o /home/kano/blog/go-backend/server ./cmd/server
   ok "Go binary built at /home/kano/blog/go-backend/server"
 else
   warn "No Go backend changes detected — skipping build"
@@ -139,25 +149,36 @@ else
     warn "No react-app changes detected — skipping build"
   fi
 
-  FAILED=false
+  FRONTEND_OK=true
+  REACT_OK=true
   if [ -n "$PID_FRONTEND" ]; then
-    wait "$PID_FRONTEND" || FAILED=true
-    [ "$FAILED" = false ] && ok "Frontend built" || warn "Frontend build failed"
+    if ! wait "$PID_FRONTEND"; then
+      FRONTEND_OK=false
+      warn "Frontend build failed"
+    else
+      ok "Frontend built"
+    fi
   fi
   if [ -n "$PID_REACT" ]; then
-    wait "$PID_REACT" || FAILED=true
-    [ "$FAILED" = false ] && ok "React app built" || warn "React app build failed"
+    if ! wait "$PID_REACT"; then
+      REACT_OK=false
+      warn "React app build failed"
+    else
+      ok "React app built"
+    fi
   fi
 
-  if [ "$FAILED" = true ]; then
+  if [ "$FRONTEND_OK" = false ] || [ "$REACT_OK" = false ]; then
+    [ "$FRONTEND_OK" = false ] && FAILED_STEP="Vue 前端构建失败 (frontend: 依赖/构建错误)"
+    [ "$REACT_OK" = false ] && FAILED_STEP="React 前端构建失败 (react-app: 依赖/构建错误)"
     exit 1
   fi
 fi
 
 step "Restarting services"
 if [ "$BACKEND_CHANGED" = true ] || [ "$GO_BACKEND_CHANGED" = true ]; then
-  sudo supervisorctl reload || true
-  /usr/bin/systemctl --user restart gobackend
+  FAILED_STEP="supervisorctl reload 失败 (进程配置/权限)" && sudo supervisorctl reload || true
+  FAILED_STEP="gobackend 服务重启失败 (systemctl: 单元/启动错误)" && /usr/bin/systemctl --user restart gobackend
   ok "Backend restarted"
 else
   warn "No backend changes — skipping service restart"
