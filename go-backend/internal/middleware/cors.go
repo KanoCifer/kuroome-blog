@@ -1,7 +1,13 @@
+// Package middleware 提供 gin 中间件：CORS 跨域。
+//
+// 手写 CORS 替代 gin-contrib/cors —— 精确控制预检响应，
+// 避免第三方库与 nginx 缓存交互时 Access-Control-Allow-Origin 丢失。
 package middleware
 
 import (
-	"github.com/gin-contrib/cors"
+	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 // allowedOrigins 是前端来源白名单。Vite dev server + 生产域名。
@@ -16,15 +22,35 @@ func allowedOrigins() []string {
 	}
 }
 
-func NewCORSConfig() cors.Config {
-	config := cors.Config{
-		AllowOrigins:     allowedOrigins(),
-		AllowCredentials: true,
-		AllowHeaders:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		ExposeHeaders:    []string{"X-Process-Time", "X-Trace-Id"},
-		AllowWebSockets:   true,
-		MaxAge:           12 * 3600, // 12h
+// CORS 跨域中间件。白名单精确匹配 Origin；命中则回写完整 CORS 头；
+// OPTIONS 预检直接 204，不进入后续 handler。
+func CORS() gin.HandlerFunc {
+	origins := allowedOrigins()
+
+	return func(c *gin.Context) {
+		origin := c.GetHeader("Origin")
+		var allowed bool
+		for _, o := range origins {
+			if strings.EqualFold(o, origin) {
+				allowed = true
+				break
+			}
+		}
+		if allowed {
+			c.Header("Access-Control-Allow-Origin", origin)
+			c.Header("Access-Control-Allow-Credentials", "true")
+			c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, Authorization, X-Requested-With")
+			c.Header("Access-Control-Max-Age", "43200") // 12h
+			c.Header("Access-Control-Expose-Headers", "X-Process-Time, X-Trace-Id")
+		}
+
+		// 预检请求直接返回 204
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
 	}
-	return config
 }

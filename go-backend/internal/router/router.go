@@ -7,7 +7,6 @@ package router
 import (
 	"time"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 
@@ -20,8 +19,9 @@ import (
 func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
 	r.Use(middleware.Duration())
 	r.Use(middleware.Trace())
-	r.Use(cors.New(middleware.NewCORSConfig()))
-	v3 := r.Group("/api/v3")
+	r.Use(middleware.CORS())
+
+	v3 := r.Group("/v3")
 
 	// 限流: 登录 / 注册各 5 次 / 分钟。
 	loginLimiter := middleware.NewRateLimiter(redis, "login", 5, 60*time.Second)
