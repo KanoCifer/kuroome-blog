@@ -76,7 +76,8 @@ func main() {
 
 	router.Setup(r, state, db.GetRedis())
 
+	sendBootNotification()
+
 	addr := fmt.Sprintf("127.0.0.1:%d", config.Cfg.Server.Port)
 	r.Run(addr)
-	sendBootNotification()
 }
