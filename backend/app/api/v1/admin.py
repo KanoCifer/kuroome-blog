@@ -54,10 +54,8 @@ async def add_post(
     data: BlogPostIn,
     current_user: User = Depends(get_admin_user),
     state: AppState = Depends(get_app_state),
-    session: AsyncSession = Depends(get_session),
 ):
     new_id = await state.admin_svc.add_post(
-        session,
         title=data.title,
         body=data.body,
         summary=data.summary,
@@ -78,10 +76,8 @@ async def update_post(
     data: BlogPostUpdate,
     current_user: User = Depends(get_admin_user),
     state: AppState = Depends(get_app_state),
-    session: AsyncSession = Depends(get_session),
 ):
     await state.admin_svc.update_post(
-        session,
         post_id=data.id,
         title=data.title,
         body=data.body,
@@ -103,9 +99,8 @@ async def delete_post(
     post_id: str,
     current_user: User = Depends(get_admin_user),
     state: AppState = Depends(get_app_state),
-    session: AsyncSession = Depends(get_session),
 ):
-    await state.admin_svc.delete_post(session, post_id=post_id)
+    await state.admin_svc.delete_post(post_id=post_id)
     logger.info(
         f"Blog post with ID {post_id} deleted by admin {current_user.id}"
     )
