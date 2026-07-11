@@ -204,14 +204,16 @@ Sitemap: {sitemap_url}
         except Exception as exc:
             yield {"content": f"[ERROR] 天气分析失败: {exc!r}", "is_end": True}
 
-    async def set_pic_gallery(self, images: GalleryInput) -> None:
+    async def set_pic_gallery(
+        self, session: AsyncSession, images: GalleryInput
+    ) -> None:
         """设置照片墙数据（持久化到 Postgres）"""
         from app.utils.get_exif import get_exif_data
         from app.utils.media import get_image_path
 
         if not images.images:
             if self.gallery_repo is not None:
-                await self.gallery_repo.delete_all()
+                await self.gallery_repo.delete_all(session)
             return
 
         if self.gallery_repo is None:
@@ -231,14 +233,18 @@ Sitemap: {sitemap_url}
                 zip(images.images, exif_data, strict=False)
             )
         ]
-        await self.gallery_repo.save_images(db_images)
+        await self.gallery_repo.save_images(session, db_images)
 
-    async def get_pic_gallery(self) -> list[dict]:
+    async def get_pic_gallery(
+        self, session: AsyncSession
+    ) -> list[dict]:
         """获取照片墙数据（DB 直取，缓存由 API 层 redis_cache 负责）。"""
         if self.gallery_repo is None:
             return []
         try:
-            db_images: list[GalleryImage] = await self.gallery_repo.list_all()
+            db_images: list[GalleryImage] = (
+                await self.gallery_repo.list_all(session)
+            )
             return [self._serialize_gallery_image(img) for img in db_images]
         except Exception as e:
             logger.error(f"Failed to get pic gallery: {e}")

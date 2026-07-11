@@ -7,6 +7,8 @@ from __future__ import annotations
 
 from datetime import datetime
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.repositories.event_repo import EventRepo
 from app.schemas.event import EventResponse
 from app.schemas.pagination import PaginationSchema
@@ -20,6 +22,7 @@ class SystemService:
 
     async def list_events(
         self,
+        session: AsyncSession,
         *,
         page: int = 1,
         per_page: int = 10,
@@ -37,9 +40,10 @@ class SystemService:
         offset = (page - 1) * per_page
 
         total = await self.repo.count_events(
-            type=type, start=start, end=end
+            session, type=type, start=start, end=end
         )
         events = await self.repo.get_events(
+            session,
             type=type,
             start=start,
             end=end,

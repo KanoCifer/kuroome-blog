@@ -5,6 +5,7 @@ from collections.abc import AsyncIterator
 from datetime import UTC, datetime, timedelta
 
 import psutil
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.monitor_repo import MonitorRepo
 
@@ -42,21 +43,23 @@ class MonitorService:
             "disk_usage": disk_usage,
         }
 
-    async def get_overview(self, days: int) -> dict:
+    async def get_overview(
+        self, session: AsyncSession, days: int
+    ) -> dict:
         end_time = datetime.now(UTC)
         start_time = end_time - timedelta(days=days)
 
         repo = self.repo
 
-        total_visits = await repo.count_visits_since(start_time)
-        unique_visitors = await repo.count_unique_visitors_since(start_time)
+        total_visits = await repo.count_visits_since(session, start_time)
+        unique_visitors = await repo.count_unique_visitors_since(session, start_time)
         unique_visitor_ids = await repo.count_unique_visitor_ids_since(
-            start_time
+            session, start_time
         )
-        top_pages = await repo.get_top_pages_since(start_time, limit=10)
-        browser_stats = await repo.get_browser_stats_since(start_time)
-        os_stats = await repo.get_os_stats_since(start_time)
-        daily_trend = await repo.get_daily_trend_since(start_time)
+        top_pages = await repo.get_top_pages_since(session, start_time, limit=10)
+        browser_stats = await repo.get_browser_stats_since(session, start_time)
+        os_stats = await repo.get_os_stats_since(session, start_time)
+        daily_trend = await repo.get_daily_trend_since(session, start_time)
 
         return {
             "total_visits": total_visits,
@@ -69,15 +72,18 @@ class MonitorService:
             "period_days": days,
         }
 
-    async def get_visitors(self, days: int, page: int, page_size: int) -> dict:
+    async def get_visitors(
+        self, session: AsyncSession, days: int, page: int, page_size: int
+    ) -> dict:
         end_time = datetime.now(UTC)
         start_time = end_time - timedelta(days=days)
 
         repo = self.repo
 
-        total = await repo.count_visits_since(start_time)
+        total = await repo.count_visits_since(session, start_time)
         offset = (page - 1) * page_size
         visitors = await repo.list_visitors_since(
+            session,
             start_time,
             offset=offset,
             limit=page_size,
@@ -111,6 +117,7 @@ class MonitorService:
 
     async def get_user_logins(
         self,
+        session: AsyncSession,
         days: int,
         page: int,
         page_size: int,
@@ -120,7 +127,7 @@ class MonitorService:
 
         repo = self.repo
 
-        users = await repo.list_users_with_login_records()
+        users = await repo.list_users_with_login_records(session)
 
         login_logs = []
         for user in users:
@@ -175,7 +182,9 @@ class MonitorService:
             yield self._get_server_status_payload()
             await asyncio.sleep(5)
 
-    async def get_daily_summary(self, date: datetime) -> dict:
+    async def get_daily_summary(
+        self, session: AsyncSession, date: datetime
+    ) -> dict:
         """获取指定日期的访问统计摘要。
 
         Args:
@@ -189,13 +198,13 @@ class MonitorService:
 
         repo = self.repo
 
-        total_visits = await repo.count_visits_between(start, end)
-        unique_visitors = await repo.count_unique_visitors_between(start, end)
-        unique_ips = await repo.count_unique_ips_between(start, end)
-        top_pages = await repo.get_top_pages_between(start, end, limit=5)
-        browser_stats = await repo.get_browser_stats_between(start, end)
-        os_stats = await repo.get_os_stats_between(start, end)
-        device_stats = await repo.get_device_stats_between(start, end)
+        total_visits = await repo.count_visits_between(session, start, end)
+        unique_visitors = await repo.count_unique_visitors_between(session, start, end)
+        unique_ips = await repo.count_unique_ips_between(session, start, end)
+        top_pages = await repo.get_top_pages_between(session, start, end, limit=5)
+        browser_stats = await repo.get_browser_stats_between(session, start, end)
+        os_stats = await repo.get_os_stats_between(session, start, end)
+        device_stats = await repo.get_device_stats_between(session, start, end)
 
         return {
             "date": start.strftime("%Y-%m-%d"),

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.notification.context import context_from_config
 from app.notification.payloads import DevicePayload, SubscriptionPayload
 from app.notification.renderers import (
@@ -26,14 +28,14 @@ class NotificationService:
         self._plugin = plugin
         self.repo = repo
 
-    async def get_all_subscriptions(self):
-        return await self.repo.get_all_subscriptions_orm()
+    async def get_all_subscriptions(self, session: AsyncSession):
+        return await self.repo.get_all_subscriptions_orm(session)
 
-    async def get_all_active_subscriptions(self):
-        return await self.repo.get_all_active_subscriptions()
+    async def get_all_active_subscriptions(self, session: AsyncSession):
+        return await self.repo.get_all_active_subscriptions(session)
 
-    async def get_subscription(self, user_id: int):
-        return await self.repo.get_subscription_by_user(user_id)
+    async def get_subscription(self, session: AsyncSession, user_id: int):
+        return await self.repo.get_subscription_by_user(session, user_id)
 
     async def send_reminder(
         self,

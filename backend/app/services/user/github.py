@@ -7,6 +7,7 @@ from urllib.parse import urlencode
 
 import httpx2
 from fastapi import Request
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.exceptions import GitHubAuthError
@@ -48,6 +49,7 @@ class GitHubAuthService:
 
     async def find_or_create_github_user(
         self,
+        session: AsyncSession,
         github_id: int,
         username: str,
         email: str,
@@ -57,27 +59,32 @@ class GitHubAuthService:
 
         Appends random suffix if username conflicts.
         """
-        user = await self.repo.get_by_github_id(github_id)
+        user = await self.repo.get_by_github_id(session, github_id)
         if user:
             return user
 
-        if await self.repo.is_username_taken(username):
+        if await self.repo.is_username_taken(session, username):
             username = f"{username}_{secrets.token_urlsafe(4)}"
 
         user = await self.repo.create_user(
+            session,
             username=username,
             password=secrets.token_urlsafe(16),
             name=username,
             github_id=github_id,
         )
         await self.repo.create_profile(
-            user_id=user.id, email=email, photo=avatar_url or "default.png"
+            session,
+            user_id=user.id,
+            email=email,
+            photo=avatar_url or "default.png",
         )
-        await self.repo.refresh_user(user)
+        await self.repo.refresh_user(session, user)
         return user
 
     async def bind_github(
         self,
+        session: AsyncSession,
         user: User,
         github_id: int,
         avatar_url: str | None,
@@ -86,22 +93,27 @@ class GitHubAuthService:
 
         Returns "success" or "github_already_bound" if taken.
         """
-        existing = await self.repo.get_by_github_id(github_id)
+        existing = await self.repo.get_by_github_id(session, github_id)
         if existing and existing.id != user.id:
             return "github_already_bound"
 
-        await self.repo.set_github_id(user, github_id)
-        profile = await self.repo.get_profile(user.id)
+        await self.repo.set_github_id(session, user, github_id)
+        profile = await self.repo.get_profile(session, user.id)
         if profile and not profile.photo:
-            await self.repo.update_profile(profile, photo=avatar_url)
+            await self.repo.update_profile(
+                session, profile, photo=avatar_url
+            )
         return "success"
 
-    async def unbind_github(self, user: User) -> None:
+    async def unbind_github(
+        self, session: AsyncSession, user: User
+    ) -> None:
         """Remove GitHub account linkage from user."""
-        await self.repo.set_github_id(user, None)
+        await self.repo.set_github_id(session, user, None)
 
     async def handle_github_login_callback(
         self,
+        session: AsyncSession,
         github_id: int,
         username: str,
         email: str,
@@ -114,20 +126,26 @@ class GitHubAuthService:
         """
         existing_by_email = None
         if email and not email.endswith("@github.com"):
-            existing_by_email = await self.repo.get_by_email(email)
+            existing_by_email = await self.repo.get_by_email(
+                session, email
+            )
 
         if existing_by_email and not existing_by_email.github_id:
-            await self.repo.set_github_id(existing_by_email, github_id)
+            await self.repo.set_github_id(
+                session, existing_by_email, github_id
+            )
             profile = existing_by_email.profile
             if profile and not profile.photo:
-                await self.repo.update_profile(profile, photo=avatar_url)
+                await self.repo.update_profile(
+                    session, profile, photo=avatar_url
+                )
             user = existing_by_email
         else:
             user = await self.find_or_create_github_user(
-                github_id, username, email, avatar_url
+                session, github_id, username, email, avatar_url
             )
 
-        await self.user_service.record_login(user, request)
+        await self.user_service.record_login(session, user, request)
         return user
 
     async def exchange_github_code(self, code: str, code_verifier: str) -> str:

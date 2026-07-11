@@ -12,6 +12,7 @@ import orjson
 from bson import ObjectId
 from bson.errors import InvalidId
 from redis.asyncio import Redis as AsyncRedis
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import RssDomainError
 from app.core.logger import logger
@@ -185,16 +186,19 @@ class RssService:
         redis = self.redis
         await redis.delete(self._build_rss_cache_key(url))
 
-    async def save_rss_info(self, url: str, user_id: int) -> RssInfo:
+    async def save_rss_info(
+        self, session: AsyncSession, url: str, user_id: int,
+    ) -> RssInfo:
         """保存 RSS 信息到数据库中。"""
         repo = self.repo
-        if await repo.check_rssurl_exists(url, user_id):
+        if await repo.check_rssurl_exists(session, url, user_id):
             raise RssDomainError("RSS URL already exists for this user", 409)
-        rss_info = await repo.save_rss_url(url, user_id)
+        rss_info = await repo.save_rss_url(session, url, user_id)
         return rss_info
 
     async def fetch_and_parse_feed(
         self,
+        session: AsyncSession,
         url: str,
         save_to_db: bool = False,
         rss_info: RssInfo | None = None,
@@ -265,28 +269,32 @@ class RssService:
             rss_info.last_fetched_at = fetched_at
 
             repo = self.repo
-            await repo.save_rss_info(rss_info)
+            await repo.save_rss_info(session, rss_info)
 
         return {
             "feed_meta": feed_meta,
             "entries": entries,
         }
 
-    async def get_user_rss_info(self, user_id: int) -> list[str]:
+    async def get_user_rss_info(
+        self, session: AsyncSession, user_id: int,
+    ) -> list[str]:
         """获取用户订阅的 RSS 列表。"""
         repo = self.repo
-        return await repo.get_user_rss_info(user_id)
+        return await repo.get_user_rss_info(session, user_id)
 
     async def get_articles_for_user(
         self,
+        session: AsyncSession,
         user_id: int,
         page: int,
         limit: int,
         feed_url: str | None = None,
         search: str | None = None,
     ) -> RssArticleListResponse:
-        user_feed_urls = await self.get_user_rss_info(user_id)
+        user_feed_urls = await self.get_user_rss_info(session, user_id)
         articles, total = await self.repo.list_articles_for_user(
+            session,
             user_feed_urls=user_feed_urls,
             page=page,
             limit=limit,
@@ -320,6 +328,7 @@ class RssService:
 
     async def get_article_for_user(
         self,
+        session: AsyncSession,
         article_id: str,
         user_id: int,
     ) -> RssArticleResponse:
@@ -328,12 +337,13 @@ class RssService:
         except (InvalidId, ValueError) as exc:
             raise RssDomainError("文章不存在 文章ID错误", 404) from exc
 
-        article = await self.repo.get_article_by_id(oid)
+        article = await self.repo.get_article_by_id(session, oid)
         if article is None:
             raise RssDomainError("文章不存在", 404)
 
         repo = self.repo
         is_allowed = await repo.is_user_subscribed_to_feed(
+            session,
             user_id=user_id,
             feed_url=article.feed_url,
         )
@@ -356,21 +366,26 @@ class RssService:
 
     async def get_subscriptions_for_user(
         self,
+        session: AsyncSession,
         user_id: int,
     ) -> list[RssSubscriptionResponse]:
         repo = self.repo
-        subscriptions = await repo.get_user_subscriptions(user_id)
+        subscriptions = await repo.get_user_subscriptions(session, user_id)
         return [
             RssSubscriptionResponse.model_validate(sub)
             for sub in subscriptions
         ]
 
-    async def get_all_rss_urls(self) -> list[str]:
+    async def get_all_rss_urls(
+        self, session: AsyncSession,
+    ) -> list[str]:
         repo = self.repo
-        return await repo.get_all_rss_urls()
+        return await repo.get_all_rss_urls(session)
 
-    async def refresh_all_feeds(self) -> dict[str, int]:
-        feed_urls = await self.get_all_rss_urls()
+    async def refresh_all_feeds(
+        self, session: AsyncSession,
+    ) -> dict[str, int]:
+        feed_urls = await self.get_all_rss_urls(session)
         if not feed_urls:
             return {
                 "total_feeds": 0,
@@ -388,8 +403,11 @@ class RssService:
             nonlocal success_count, failed_count
             async with semaphore:
                 try:
-                    result = await self.fetch_and_parse_feed(url=feed_url)
+                    result = await self.fetch_and_parse_feed(
+                        session, url=feed_url,
+                    )
                     saved = await self._save_entries_to_mongo(
+                        session,
                         feed_url=feed_url,
                         entries=result["entries"],
                     )
@@ -421,17 +439,20 @@ class RssService:
 
     async def refresh_subscription(
         self,
+        session: AsyncSession,
         subscription_id: int,
         user_id: int,
     ) -> dict[str, Any]:
         """刷新用户的 RSS 订阅，重新获取和解析 feed 内容，并保存新的文章到数据库中。返回刷新结果和统计信息。"""
         rss_info = await self._get_owned_subscription(
+            session,
             subscription_id=subscription_id,
             user_id=user_id,
         )
         await self.invalidate_feed_cache(rss_info.rss_url)
 
         result = await self.fetch_and_parse_feed(
+            session,
             url=rss_info.rss_url,
             save_to_db=True,
             rss_info=rss_info,
@@ -439,6 +460,7 @@ class RssService:
 
         entries = result["entries"]
         saved_count = await self._save_entries_to_mongo(
+            session,
             feed_url=rss_info.rss_url,
             entries=entries,
         )
@@ -451,11 +473,13 @@ class RssService:
 
     async def get_subscription_url_for_user(
         self,
+        session: AsyncSession,
         subscription_id: int,
         user_id: int,
     ) -> str:
         """获取用户的 RSS 订阅 URL，确保用户有权限访问该订阅。"""
         rss_info = await self._get_owned_subscription(
+            session,
             subscription_id=subscription_id,
             user_id=user_id,
         )
@@ -463,19 +487,24 @@ class RssService:
 
     async def delete_subscription_for_user(
         self,
+        session: AsyncSession,
         subscription_id: int,
         user_id: int,
     ) -> str:
         rss_info = await self._get_owned_subscription(
+            session,
             subscription_id=subscription_id,
             user_id=user_id,
         )
-        await self.repo.delete_articles_by_feed_url(rss_info.rss_url)
-        await self.repo.delete_subscription(rss_info)
+        await self.repo.delete_articles_by_feed_url(
+            session, rss_info.rss_url,
+        )
+        await self.repo.delete_subscription(session, rss_info)
         return rss_info.rss_url
 
     async def mark_article_read_state(
         self,
+        session: AsyncSession,
         article_id: str,
         user_id: int,
         read: bool,
@@ -486,6 +515,7 @@ class RssService:
             raise RssDomainError("文章不存在", 404) from exc
 
         await self.repo.update_article_read_state(
+            session,
             oid=oid,
             user_id=user_id,
             read=read,
@@ -493,21 +523,26 @@ class RssService:
 
     async def save_entries_to_mongo(
         self,
+        session: AsyncSession,
         feed_url: str,
         entries: list[dict[str, Any]],
     ) -> int:
         return await self._save_entries_to_mongo(
+            session,
             feed_url=feed_url,
             entries=entries,
         )
 
     async def _get_owned_subscription(
         self,
+        session: AsyncSession,
         subscription_id: int,
         user_id: int,
     ) -> RssInfo:
         """获取用户拥有的 RSS 订阅信息，确保订阅存在且属于该用户。"""
-        rss_info = await self.repo.get_subscription_by_id(subscription_id)
+        rss_info = await self.repo.get_subscription_by_id(
+            session, subscription_id,
+        )
         if rss_info is None:
             raise RssDomainError("订阅不存在", 404)
         if rss_info.user_id != user_id:
@@ -516,11 +551,13 @@ class RssService:
 
     async def _save_entries_to_mongo(
         self,
+        session: AsyncSession,
         feed_url: str,
         entries: list[dict[str, Any]],
     ) -> int:
         try:
             return await self.repo.save_entries_to_mongo(
+                session,
                 feed_url=feed_url,
                 entries=entries,
             )

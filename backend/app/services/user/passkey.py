@@ -5,6 +5,7 @@ from __future__ import annotations
 import orjson
 from fastapi import Request
 from redis.asyncio import Redis as AsyncRedis
+from sqlalchemy.ext.asyncio import AsyncSession
 from webauthn.helpers.structs import (
     PublicKeyCredentialCreationOptions,
     PublicKeyCredentialRequestOptions,
@@ -29,16 +30,21 @@ class PasskeyService:
         self.user_service = user_service
         self.repo = user_service.repo
 
-    async def has_passkey(self, user: User) -> bool:
+    async def has_passkey(
+        self, session: AsyncSession, user: User
+    ) -> bool:
         """Check if user has a registered passkey credential."""
-        cred = await self.repo.get_passkey_by_user_id(user.id)
+        cred = await self.repo.get_passkey_by_user_id(session, user.id)
         return cred is not None
 
     async def create_registration_options(
-        self, redis: AsyncRedis, user: User
+        self,
+        session: AsyncSession,
+        redis: AsyncRedis,
+        user: User,
     ) -> PublicKeyCredentialCreationOptions:
         """Create Passkey registration options and store challenge in Redis."""
-        if await self.has_passkey(user):
+        if await self.has_passkey(session, user):
             raise ValueError("用户已注册 Passkey")
 
         options: PublicKeyCredentialCreationOptions = (
@@ -73,6 +79,7 @@ class PasskeyService:
 
     async def register_passkey(
         self,
+        session: AsyncSession,
         user: User,
         response: dict,
         expected_challenge: str,
@@ -82,7 +89,7 @@ class PasskeyService:
 
         Returns False if user already has passkey or verification fails.
         """
-        if await self.has_passkey(user):
+        if await self.has_passkey(session, user):
             return False
 
         verification = verify_passkey_registration_response(
@@ -95,6 +102,7 @@ class PasskeyService:
         public_key = base64url_encode(verification.credential_public_key)
 
         await self.repo.create_passkey(
+            session,
             user_id=user.id,
             credential_id=credential_id,
             public_key=public_key,
@@ -104,6 +112,7 @@ class PasskeyService:
 
     async def authenticate_passkey(
         self,
+        session: AsyncSession,
         response: dict,
         expected_challenge: str,
         expected_origin: str,
@@ -129,7 +138,7 @@ class PasskeyService:
             return None, "无效的 Passkey 凭证 ID"
 
         credential = await self.repo.get_passkey_by_credential_id(
-            credential_id
+            session, credential_id
         )
         if credential is None:
             return None, "Passkey 凭证不存在"
@@ -149,13 +158,14 @@ class PasskeyService:
             return None, "Passkey 认证验证失败"
 
         await self.repo.update_passkey_sign_count(
-            credential, verification.new_sign_count
+            session, credential, verification.new_sign_count
         )
-        await self.user_service.record_login(user, request)
+        await self.user_service.record_login(session, user, request)
         return user, None
 
     async def complete_passkey_login(
         self,
+        session: AsyncSession,
         assertion_response: dict,
         redis: AsyncRedis,
         request: Request,
@@ -185,7 +195,11 @@ class PasskeyService:
         await redis.delete(f"passkey:authentication:challenge:{challenge}")
 
         user, error = await self.authenticate_passkey(
-            assertion_response, expected_challenge, origin, request
+            session,
+            assertion_response,
+            expected_challenge,
+            origin,
+            request,
         )
         if error or user is None:
             return None, None, error or "认证失败"
@@ -195,6 +209,7 @@ class PasskeyService:
 
     async def complete_passkey_registration(
         self,
+        session: AsyncSession,
         user: User,
         response: dict,
         redis: AsyncRedis,
@@ -213,17 +228,19 @@ class PasskeyService:
         await redis.delete(f"passkey:registration:challenge:{user.id}")
 
         success = await self.register_passkey(
-            user, response, expected_challenge, expected_origin
+            session, user, response, expected_challenge, expected_origin
         )
         if not success:
             return "您的账户已经绑定了Passkey或验证失败"
 
         return None
 
-    async def delete_passkey(self, user: User) -> bool:
+    async def delete_passkey(
+        self, session: AsyncSession, user: User
+    ) -> bool:
         """Delete user's passkey credential. Returns False if none exists."""
-        cred = await self.repo.get_passkey_by_user_id(user.id)
+        cred = await self.repo.get_passkey_by_user_id(session, user.id)
         if not cred:
             return False
-        await self.repo.delete_passkey(cred)
+        await self.repo.delete_passkey(session, cred)
         return True

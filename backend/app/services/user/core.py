@@ -5,6 +5,7 @@ from datetime import timedelta
 
 from fastapi import Request
 from redis.asyncio import Redis as AsyncRedis
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.des.auth import create_access_token, resolve_user_from_token
 from app.models.models import Profile, User
@@ -31,23 +32,27 @@ class UserService:
     # ------------------------------------------------------------------ #
 
     async def authenticate_user(
-        self, username: str, password: str
+        self, session: AsyncSession, username: str, password: str
     ) -> User | None:
         """Validate username and password, return User if valid.
 
         On success, if the user still uses an old werkzeug pbkdf2 hash,
         it is silently upgraded to bcrypt (same algorithm as the Go backend).
         """
-        user = await self.repo.get_by_username_with_relations(username)
+        user = await self.repo.get_by_username_with_relations(
+            session, username
+        )
         if user is None or not user.validate_password(password):
             return None
         if user.needs_hash_upgrade():
-            await self.repo.set_password(user, password)
+            await self.repo.set_password(session, user, password)
         return user
 
-    async def record_login(self, user: User, request: Request) -> None:
+    async def record_login(
+        self, session: AsyncSession, user: User, request: Request
+    ) -> None:
         """Update last login timestamp and IP address."""
-        await self.repo.update_login_info(user, request)
+        await self.repo.update_login_info(session, user, request)
 
     async def create_tokens(
         self, user: User, redis: AsyncRedis | None = None
@@ -74,10 +79,13 @@ class UserService:
         }
 
     async def logout(
-        self, user: User, redis: AsyncRedis | None = None
+        self,
+        session: AsyncSession,
+        user: User,
+        redis: AsyncRedis | None = None,
     ) -> None:
         """Mark user offline and invalidate the refresh token."""
-        await self.repo.set_active_by_id(user.id, False)
+        await self.repo.set_active_by_id(session, user.id, False)
         if redis is not None:
             await redis.delete(f"refresh:{user.id}")
 
@@ -86,16 +94,16 @@ class UserService:
     # ------------------------------------------------------------------ #
 
     async def get_user_with_profile(
-        self, user_id: int
+        self, session: AsyncSession, user_id: int
     ) -> tuple[User, Profile | None] | None:
         """Fetch user with profile, creating profile if missing."""
         user = await self.repo.get_by_id(
-            user_id, with_profile=True, with_passkey=True
+            session, user_id, with_profile=True, with_passkey=True
         )
         if not user:
             return None
         if not user.profile:
-            await self.repo.ensure_profile(user)
+            await self.repo.ensure_profile(session, user)
         return user, user.profile
 
     def user_to_dict(self, user: User, profile: Profile | None = None) -> dict:
@@ -120,6 +128,7 @@ class UserService:
 
     async def register_user(
         self,
+        session: AsyncSession,
         username: str,
         password: str,
         email: str,
@@ -130,10 +139,10 @@ class UserService:
 
         Returns None if username taken, email taken, or code invalid.
         """
-        if await self.repo.get_by_username(username):
+        if await self.repo.get_by_username(session, username):
             return None
 
-        if await self.repo.is_email_taken(email):
+        if await self.repo.is_email_taken(session, email):
             return None
 
         code_key = f"signup_code:{email}"
@@ -142,9 +151,11 @@ class UserService:
             return None
 
         user = await self.repo.create_user(
-            username=username, password=password
+            session, username=username, password=password
         )
-        await self.repo.create_profile(user_id=user.id, email=email)
+        await self.repo.create_profile(
+            session, user_id=user.id, email=email
+        )
         return user
 
     async def send_verification_code(
@@ -163,25 +174,32 @@ class UserService:
     # Profile management
     # ------------------------------------------------------------------ #
 
-    async def update_settings(self, user: User, data: UserSettingsIn) -> dict:
+    async def update_settings(
+        self, session: AsyncSession, user: User, data: UserSettingsIn
+    ) -> dict:
         """Update user profile fields, raising ValueError on duplicate username."""
         if data.username != user.username:
             if await self.repo.is_username_taken(
-                data.username, exclude_user_id=user.id
+                session, data.username, exclude_user_id=user.id
             ):
                 raise ValueError("Username already exists")
-            await self.repo.set_username_by_id(user.id, data.username)
+            await self.repo.set_username_by_id(
+                session, user.id, data.username
+            )
 
-        await self.repo.set_name_by_id(user.id, data.name)
+        await self.repo.set_name_by_id(session, user.id, data.name)
 
         if data.password:
-            await self.repo.set_password_by_id(user.id, data.password)
+            await self.repo.set_password_by_id(
+                session, user.id, data.password
+            )
 
-        profile = await self.repo.get_profile(user.id)
+        profile = await self.repo.get_profile(session, user.id)
         if not profile:
-            profile = await self.repo.create_profile(user.id)
+            profile = await self.repo.create_profile(session, user.id)
 
         await self.repo.update_profile(
+            session,
             profile,
             email=data.email,
             gender=data.gender,
@@ -189,7 +207,9 @@ class UserService:
         )
 
         # Re-fetch to get actual DB values (user may be detached)
-        updated_user = await self.repo.get_by_id(user.id, with_profile=True)
+        updated_user = await self.repo.get_by_id(
+            session, user.id, with_profile=True
+        )
         assert updated_user is not None
         return UserProfileOut(
             id=updated_user.id,
@@ -205,11 +225,13 @@ class UserService:
             photo=updated_user.profile.photo if updated_user.profile else None,
         ).model_dump()
 
-    async def upload_avatar(self, user: User, image) -> dict:
+    async def upload_avatar(
+        self, session: AsyncSession, user: User, image
+    ) -> dict:
         """Upload and compress avatar to 256px thumbnail."""
-        profile = await self.repo.get_profile(user.id)
+        profile = await self.repo.get_profile(session, user.id)
         if not profile:
-            profile = await self.repo.create_profile(user.id)
+            profile = await self.repo.create_profile(session, user.id)
 
         if image and image.filename:
             image_filename = save_upload_image(image, str(user.id))
@@ -218,7 +240,9 @@ class UserService:
             thumbnail_filename = image_filename.replace(".", "-256.")
             thumbnail_path = media_root / thumbnail_filename
             compress_avartar(str(original_path), str(thumbnail_path))
-            await self.repo.update_profile(profile, photo=thumbnail_filename)
+            await self.repo.update_profile(
+                session, profile, photo=thumbnail_filename
+            )
 
         return {
             "id": user.id,
