@@ -58,9 +58,21 @@ func (c *FeishuChannel) Send(
 	}
 
 	card := buildFeishuCard(msg.Title, msg.Body, color)
-	body, err := json.Marshal(card)
+	cardJSON, err := json.Marshal(card)
 	if err != nil {
 		slog.Error("[feishu] marshal card", "err", err)
+		return false
+	}
+	// 飞书 webhook 要求外层包 {"msg_type":"interactive","card":{...}}。
+	body, err := json.Marshal(struct {
+		MsgType string          `json:"msg_type"`
+		Card    json.RawMessage `json:"card"`
+	}{
+		MsgType: "interactive",
+		Card:    cardJSON,
+	})
+	if err != nil {
+		slog.Error("[feishu] marshal envelope", "err", err)
 		return false
 	}
 

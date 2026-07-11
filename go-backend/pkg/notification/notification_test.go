@@ -100,16 +100,23 @@ func TestFeishuSend_DefaultColor(t *testing.T) {
 		t.Fatal("expected success")
 	}
 
-	// 验证 JSON body 里 template 字段为缺省 "green"。
+	// 飞书 webhook 要求外层包 {"msg_type":"interactive","card":{...}}。
 	var parsed map[string]any
 	if err := json.Unmarshal(capturedBody, &parsed); err != nil {
 		t.Fatalf("unmarshal: %v", err)
 	}
-	headerMap, _ := parsed["header"].(map[string]any)
+	if mt, _ := parsed["msg_type"].(string); mt != "interactive" {
+		t.Errorf("msg_type = %q, want interactive", mt)
+	}
+	cardMap, ok := parsed["card"].(map[string]any)
+	if !ok {
+		t.Fatalf("card key missing or not object: %v", parsed)
+	}
+	headerMap, _ := cardMap["header"].(map[string]any)
 	if tmpl, _ := headerMap["template"].(string); tmpl != "green" {
 		t.Errorf("default template = %q, want green", tmpl)
 	}
-	if schema, _ := parsed["schema"].(string); schema != "2.0" {
+	if schema, _ := cardMap["schema"].(string); schema != "2.0" {
 		t.Errorf("schema = %q, want 2.0", schema)
 	}
 }
@@ -124,15 +131,65 @@ func TestFeishuSend_CustomColor(t *testing.T) {
 	defer srv.Close()
 
 	ch := NewFeishuChannel()
-	_ = ch.Send(context.Background(),
+	ok := ch.Send(context.Background(),
 		Message{Title: "alert", Body: "down", Color: "red"},
+		NotificationContext{FeishuWebhookURL: srv.URL})
+	if !ok {
+		t.Fatal("expected success")
+	}
+
+	var parsed map[string]any
+	if err := json.Unmarshal(capturedBody, &parsed); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	cardMap, ok := parsed["card"].(map[string]any)
+	if !ok {
+		t.Fatalf("card key missing or not object: %v", parsed)
+	}
+	headerMap, _ := cardMap["header"].(map[string]any)
+	if tmpl, _ := headerMap["template"].(string); tmpl != "red" {
+		t.Errorf("template = %q, want red", tmpl)
+	}
+}
+
+// 明确验证请求体结构：顶层含 msg_type + card，旧格式（直接裸露 card）
+// 会触发飞书 19002 "params error, msg_type need"。
+func TestFeishuSend_EnvelopeStructure(t *testing.T) {
+	var capturedBody []byte
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		capturedBody, _ = io.ReadAll(r.Body)
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"code":0}`))
+	}))
+	defer srv.Close()
+
+	ch := NewFeishuChannel()
+	_ = ch.Send(context.Background(),
+		Message{Title: "t", Body: "b"},
 		NotificationContext{FeishuWebhookURL: srv.URL})
 
 	var parsed map[string]any
-	_ = json.Unmarshal(capturedBody, &parsed)
-	headerMap := parsed["header"].(map[string]any)
-	if tmpl := headerMap["template"].(string); tmpl != "red" {
-		t.Errorf("template = %q, want red", tmpl)
+	if err := json.Unmarshal(capturedBody, &parsed); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	// 顶层恰好两个 key：msg_type + card（不能再多、不能缺）。
+	if len(parsed) != 2 {
+		t.Fatalf("top-level keys = %d, want 2: %v", len(parsed), parsed)
+	}
+	if _, ok := parsed["msg_type"]; !ok {
+		t.Errorf("missing top-level msg_type key: %v", parsed)
+	}
+	cardRaw, ok := parsed["card"]
+	if !ok {
+		t.Fatalf("missing top-level card key: %v", parsed)
+	}
+	// card 必须是嵌套 JSON 对象（字符串化后再 marshal）。
+	cardMap, ok := cardRaw.(map[string]any)
+	if !ok {
+		t.Fatalf("card = %T, want object", cardRaw)
+	}
+	if _, ok := cardMap["schema"]; !ok {
+		t.Errorf("card missing schema: %v", cardMap)
 	}
 }
 
