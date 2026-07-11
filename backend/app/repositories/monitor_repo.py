@@ -10,17 +10,14 @@ from app.models.models import User, VisitorTrack
 
 
 class MonitorRepo:
-    def __init__(self, session: AsyncSession) -> None:
-        self.session = session
-
     # ------------------------------------------------------------------ #
     # _between 基础查询（被 _since 方法复用）
     # ------------------------------------------------------------------ #
 
     async def count_visits_between(
-        self, start: datetime, end: datetime
+        self, session: AsyncSession, start: datetime, end: datetime
     ) -> int:
-        result = await self.session.execute(
+        result = await session.execute(
             select(func.count(VisitorTrack.id)).where(
                 VisitorTrack.visit_time >= start,
                 VisitorTrack.visit_time < end,
@@ -29,9 +26,9 @@ class MonitorRepo:
         return int(result.scalar_one() or 0)
 
     async def count_unique_visitors_between(
-        self, start: datetime, end: datetime
+        self, session: AsyncSession, start: datetime, end: datetime
     ) -> int:
-        result = await self.session.execute(
+        result = await session.execute(
             select(func.count(func.distinct(VisitorTrack.visitor_id))).where(
                 VisitorTrack.visit_time >= start,
                 VisitorTrack.visit_time < end,
@@ -40,9 +37,9 @@ class MonitorRepo:
         return int(result.scalar_one() or 0)
 
     async def count_unique_ips_between(
-        self, start: datetime, end: datetime
+        self, session: AsyncSession, start: datetime, end: datetime
     ) -> int:
-        result = await self.session.execute(
+        result = await session.execute(
             select(func.count(func.distinct(VisitorTrack.ip_address))).where(
                 VisitorTrack.visit_time >= start,
                 VisitorTrack.visit_time < end,
@@ -51,9 +48,14 @@ class MonitorRepo:
         return int(result.scalar_one() or 0)
 
     async def get_top_pages_between(
-        self, start: datetime, end: datetime, *, limit: int = 5
+        self,
+        session: AsyncSession,
+        start: datetime,
+        end: datetime,
+        *,
+        limit: int = 5,
     ) -> list[dict[str, int | str]]:
-        result = await self.session.execute(
+        result = await session.execute(
             select(
                 VisitorTrack.page_path,
                 func.count(VisitorTrack.id).label("count"),
@@ -71,9 +73,9 @@ class MonitorRepo:
         ]
 
     async def get_browser_stats_between(
-        self, start: datetime, end: datetime
+        self, session: AsyncSession, start: datetime, end: datetime
     ) -> list[dict[str, int | str | None]]:
-        result = await self.session.execute(
+        result = await session.execute(
             select(
                 VisitorTrack.browser_name,
                 func.count(func.distinct(VisitorTrack.visitor_id)).label(
@@ -96,9 +98,9 @@ class MonitorRepo:
         ]
 
     async def get_os_stats_between(
-        self, start: datetime, end: datetime
+        self, session: AsyncSession, start: datetime, end: datetime
     ) -> list[dict[str, int | str | None]]:
-        result = await self.session.execute(
+        result = await session.execute(
             select(
                 VisitorTrack.os_name,
                 func.count(func.distinct(VisitorTrack.visitor_id)).label(
@@ -120,9 +122,9 @@ class MonitorRepo:
         ]
 
     async def get_device_stats_between(
-        self, start: datetime, end: datetime
+        self, session: AsyncSession, start: datetime, end: datetime
     ) -> list[dict[str, int | str | None]]:
-        result = await self.session.execute(
+        result = await session.execute(
             select(
                 VisitorTrack.device_type,
                 func.count(func.distinct(VisitorTrack.visitor_id)).label(
@@ -140,40 +142,45 @@ class MonitorRepo:
             )
         )
         return [
-            {"device_type": row[0], "count": row[1]}
-            for row in result.fetchall()
+            {"device_type": row[0], "count": row[1]} for row in result.fetchall()
         ]
 
     # ------------------------------------------------------------------ #
     # _since 便捷方法（委托给 _between）
     # ------------------------------------------------------------------ #
 
-    async def count_visits_since(self, start_time: datetime) -> int:
+    async def count_visits_since(
+        self, session: AsyncSession, start_time: datetime
+    ) -> int:
         return await self.count_visits_between(
-            start_time, datetime.max.replace(tzinfo=UTC)
+            session, start_time, datetime.max.replace(tzinfo=UTC)
         )
 
-    async def count_unique_visitors_since(self, start_time: datetime) -> int:
+    async def count_unique_visitors_since(
+        self, session: AsyncSession, start_time: datetime
+    ) -> int:
         return await self.count_unique_visitors_between(
-            start_time, datetime.max.replace(tzinfo=UTC)
+            session, start_time, datetime.max.replace(tzinfo=UTC)
         )
 
     async def count_unique_visitor_ids_since(
         self,
+        session: AsyncSession,
         start_time: datetime,
     ) -> int:
         return await self.count_unique_visitors_between(
-            start_time, datetime.max.replace(tzinfo=UTC)
+            session, start_time, datetime.max.replace(tzinfo=UTC)
         )
 
     async def get_top_pages_since(
         self,
+        session: AsyncSession,
         start_time: datetime,
         *,
         limit: int = 10,
     ) -> list[dict[str, int | str]]:
         return await self.get_top_pages_between(
-            start_time, datetime.max.replace(tzinfo=UTC), limit=limit
+            session, start_time, datetime.max.replace(tzinfo=UTC), limit=limit
         )
 
     # ------------------------------------------------------------------ #
@@ -182,10 +189,11 @@ class MonitorRepo:
 
     async def get_browser_stats_since(
         self,
+        session: AsyncSession,
         start_time: datetime,
     ) -> list[dict[str, int | str | None]]:
         count_expr = func.count(VisitorTrack.id).label("count")
-        result = await self.session.execute(
+        result = await session.execute(
             select(
                 VisitorTrack.browser_name,
                 VisitorTrack.browser_version,
@@ -206,9 +214,10 @@ class MonitorRepo:
 
     async def get_os_stats_since(
         self,
+        session: AsyncSession,
         start_time: datetime,
     ) -> list[dict[str, int | str | None]]:
-        result = await self.session.execute(
+        result = await session.execute(
             select(
                 VisitorTrack.os_name,
                 VisitorTrack.os_version,
@@ -229,9 +238,10 @@ class MonitorRepo:
 
     async def get_daily_trend_since(
         self,
+        session: AsyncSession,
         start_time: datetime,
     ) -> list[dict[str, int | str]]:
-        result = await self.session.execute(
+        result = await session.execute(
             select(
                 func.date(VisitorTrack.visit_time).label("date"),
                 func.count(VisitorTrack.id).label("count"),
@@ -250,12 +260,13 @@ class MonitorRepo:
 
     async def list_visitors_since(
         self,
+        session: AsyncSession,
         start_time: datetime,
         *,
         offset: int,
         limit: int,
     ) -> list[VisitorTrack]:
-        result = await self.session.execute(
+        result = await session.execute(
             select(VisitorTrack)
             .where(VisitorTrack.visit_time >= start_time)
             .order_by(VisitorTrack.visit_time.desc())
@@ -264,17 +275,21 @@ class MonitorRepo:
         )
         return list(result.scalars().all())
 
-    async def list_users_with_login_records(self) -> list[User]:
-        result = await self.session.execute(
+    async def list_users_with_login_records(
+        self, session: AsyncSession
+    ) -> list[User]:
+        result = await session.execute(
             select(User).where(User.login_count > 0).order_by(User.id.desc())
         )
         return list(result.scalars().all())
 
-    async def list_users_by_ids(self, user_ids: list[int]) -> list[User]:
+    async def list_users_by_ids(
+        self, session: AsyncSession, user_ids: list[int]
+    ) -> list[User]:
         if not user_ids:
             return []
 
-        result = await self.session.execute(
+        result = await session.execute(
             select(User)
             .where(User.id.in_(user_ids))
             .options(selectinload(User.profile))

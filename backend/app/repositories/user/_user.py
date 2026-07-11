@@ -15,14 +15,13 @@ from app.models.models import User
 class UserMixin:
     """User 表 CRUD 操作。"""
 
-    session: AsyncSession
-
     # ------------------------------------------------------------------ #
     # Query
     # ------------------------------------------------------------------ #
 
     async def get_by_id(
         self,
+        session: AsyncSession,
         user_id: int,
         *,
         with_profile: bool = False,
@@ -31,6 +30,7 @@ class UserMixin:
         """
         根据用户 ID 查询用户。
 
+        :param session: 数据库会话
         :param user_id: 用户 ID
         :param with_profile: 是否预加载 profile 关联
         :param with_passkey: 是否预加载 passkey 关联
@@ -41,31 +41,39 @@ class UserMixin:
             stmt = stmt.options(selectinload(User.profile))
         if with_passkey:
             stmt = stmt.options(selectinload(User.passkey_credential))
-        result = await self.session.execute(stmt)
+        result = await session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_by_username(self, username: str) -> User | None:
+    async def get_by_username(
+        self,
+        session: AsyncSession,
+        username: str,
+    ) -> User | None:
         """
         根据用户名查询用户（不含关联）。
 
+        :param session: 数据库会话
         :param username: 用户名
         :return: 用户对象或 None
         """
-        result = await self.session.execute(
+        result = await session.execute(
             select(User).where(User.username == username)
         )
         return result.scalar_one_or_none()
 
     async def get_by_username_with_relations(
-        self, username: str
+        self,
+        session: AsyncSession,
+        username: str,
     ) -> User | None:
         """
         根据用户名查询用户，预加载 profile 和 passkey。
 
+        :param session: 数据库会话
         :param username: 用户名
         :return: 用户对象或 None
         """
-        result = await self.session.execute(
+        result = await session.execute(
             select(User)
             .where(User.username == username)
             .options(
@@ -75,14 +83,19 @@ class UserMixin:
         )
         return result.scalar_one_or_none()
 
-    async def get_by_github_id(self, github_id: int) -> User | None:
+    async def get_by_github_id(
+        self,
+        session: AsyncSession,
+        github_id: int,
+    ) -> User | None:
         """
         根据 GitHub ID 查询用户。
 
+        :param session: 数据库会话
         :param github_id: GitHub 用户 ID
         :return: 用户对象或 None
         """
-        result = await self.session.execute(
+        result = await session.execute(
             select(User)
             .where(User.github_id == github_id)
             .options(
@@ -92,16 +105,21 @@ class UserMixin:
         )
         return result.scalar_one_or_none()
 
-    async def get_by_email(self, email: str) -> User | None:
+    async def get_by_email(
+        self,
+        session: AsyncSession,
+        email: str,
+    ) -> User | None:
         """
         通过邮箱地址查询用户（JOIN Profile 表）。
 
+        :param session: 数据库会话
         :param email: 邮箱地址
         :return: 用户对象或 None
         """
         from app.models.models import Profile
 
-        result = await self.session.execute(
+        result = await session.execute(
             select(User)
             .join(Profile)
             .where(Profile.email == email)
@@ -118,6 +136,7 @@ class UserMixin:
 
     async def create_user(
         self,
+        session: AsyncSession,
         username: str,
         password: str,
         name: str | None = None,
@@ -126,6 +145,7 @@ class UserMixin:
         """
         创建新用户。
 
+        :param session: 数据库会话
         :param username: 用户名
         :param password: 明文密码（会自动哈希）
         :param name: 显示名称，默认同用户名
@@ -138,18 +158,20 @@ class UserMixin:
             name=name or username,
         )
         user.raw_password = password
-        self.session.add(user)
-        await self.session.flush()
+        session.add(user)
+        await session.flush()
         return user
 
     async def update_login_info(
         self,
+        session: AsyncSession,
         user: User,
         request: Request,
     ) -> None:
         """
         更新用户登录信息（时间戳、IP、计数）。
 
+        :param session: 数据库会话
         :param user: 用户对象
         :param request: FastAPI 请求对象，用于提取客户端 IP
         """
@@ -160,94 +182,142 @@ class UserMixin:
         user.current_login_ip = User.get_real_ip(request)
         user.login_count += 1
 
-    async def set_github_id(self, user: User, github_id: int | None) -> None:
+    async def set_github_id(
+        self,
+        session: AsyncSession,
+        user: User,
+        github_id: int | None,
+    ) -> None:
         """
         设置或清除用户的 GitHub ID 绑定。
 
+        :param session: 数据库会话
         :param user: 用户对象
         :param github_id: GitHub ID，传 None 则解除绑定
         """
         user.github_id = github_id
-        await self.session.flush()
+        await session.flush()
 
-    async def set_active_by_id(self, user_id: int, active: bool) -> None:
+    async def set_active_by_id(
+        self,
+        session: AsyncSession,
+        user_id: int,
+        active: bool,
+    ) -> None:
         """
         根据用户 ID 设置在线状态（直接执行 UPDATE 语句）。
 
         用于处理 detached 的 user 对象场景（如 logout）。
 
+        :param session: 数据库会话
         :param user_id: 用户 ID
         :param active: 是否在线
         """
         stmt = update(User).where(User.id == user_id).values(active=active)
-        await self.session.execute(stmt)
-        await self.session.flush()
+        await session.execute(stmt)
+        await session.flush()
         logger.info(f"Set user {user_id} active={active}")
 
-    async def set_password(self, user: User, password: str) -> None:
+    async def set_password(
+        self,
+        session: AsyncSession,
+        user: User,
+        password: str,
+    ) -> None:
         """
         更新用户密码（bcrypt 哈希）。
 
+        :param session: 数据库会话
         :param user: 用户对象
         :param password: 明文密码
         """
         user.password_hash = bcrypt.hashpw(
             password.encode(), bcrypt.gensalt()
         ).decode()
-        await self.session.flush()
+        await session.flush()
 
-    async def set_name(self, user: User, name: str) -> None:
+    async def set_name(
+        self,
+        session: AsyncSession,
+        user: User,
+        name: str,
+    ) -> None:
         """
         更新用户显示名称。
 
+        :param session: 数据库会话
         :param user: 用户对象
         :param name: 新的显示名称
         """
         user.name = name
-        await self.session.flush()
+        await session.flush()
 
-    async def set_username(self, user: User, username: str) -> None:
+    async def set_username(
+        self,
+        session: AsyncSession,
+        user: User,
+        username: str,
+    ) -> None:
         """
         更新用户名。
 
+        :param session: 数据库会话
         :param user: 用户对象
         :param username: 新的用户名
         """
         user.username = username
-        await self.session.flush()
+        await session.flush()
 
-    async def set_username_by_id(self, user_id: int, username: str) -> None:
+    async def set_username_by_id(
+        self,
+        session: AsyncSession,
+        user_id: int,
+        username: str,
+    ) -> None:
         """
         根据用户 ID 更新用户名（直接执行 UPDATE 语句）。
 
         用于处理 detached 的 user 对象场景。
 
+        :param session: 数据库会话
         :param user_id: 用户 ID
         :param username: 新的用户名
         """
         stmt = update(User).where(User.id == user_id).values(username=username)
-        await self.session.execute(stmt)
-        await self.session.flush()
+        await session.execute(stmt)
+        await session.flush()
 
-    async def set_name_by_id(self, user_id: int, name: str) -> None:
+    async def set_name_by_id(
+        self,
+        session: AsyncSession,
+        user_id: int,
+        name: str,
+    ) -> None:
         """
         根据用户 ID 更新显示名称（直接执行 UPDATE 语句）。
 
         用于处理 detached 的 user 对象场景。
 
+        :param session: 数据库会话
         :param user_id: 用户 ID
         :param name: 新的显示名称
         """
         stmt = update(User).where(User.id == user_id).values(name=name)
-        await self.session.execute(stmt)
-        await self.session.flush()
+        await session.execute(stmt)
+        await session.flush()
 
-    async def set_password_by_id(self, user_id: int, password: str) -> None:
+    async def set_password_by_id(
+        self,
+        session: AsyncSession,
+        user_id: int,
+        password: str,
+    ) -> None:
         """
         根据用户 ID 更新密码（bcrypt 哈希,直接执行 UPDATE 语句）。
 
         用于处理 detached 的 user 对象场景。
 
+        :param session: 数据库会话
         :param user_id: 用户 ID
         :param password: 明文密码
         """
@@ -257,34 +327,44 @@ class UserMixin:
             .where(User.id == user_id)
             .values(password_hash=hashed)
         )
-        await self.session.execute(stmt)
-        await self.session.flush()
+        await session.execute(stmt)
+        await session.flush()
 
     # ------------------------------------------------------------------ #
     # Misc
     # ------------------------------------------------------------------ #
 
     async def is_username_taken(
-        self, username: str, *, exclude_user_id: int | None = None
+        self,
+        session: AsyncSession,
+        username: str,
+        *,
+        exclude_user_id: int | None = None,
     ) -> bool:
         """
         检查用户名是否已被占用。
 
+        :param session: 数据库会话
         :param username: 用户名
         :param exclude_user_id: 排除的用户 ID（更新自身时使用）
         :return: True 表示已被占用
         """
         stmt = select(User).where(User.username == username)
-        result = await self.session.execute(stmt)
+        result = await session.execute(stmt)
         user = result.scalar_one_or_none()
         if user is None:
             return False
         return not (exclude_user_id and user.id == exclude_user_id)
 
-    async def refresh_user(self, user: User) -> None:
+    async def refresh_user(
+        self,
+        session: AsyncSession,
+        user: User,
+    ) -> None:
         """
         从数据库刷新用户对象状态。
 
+        :param session: 数据库会话
         :param user: 用户对象
         """
-        await self.session.refresh(user)
+        await session.refresh(user)

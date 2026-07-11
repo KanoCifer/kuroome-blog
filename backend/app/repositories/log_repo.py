@@ -9,11 +9,9 @@ from app.models.log import Log
 class LogRepo:
     """日志数据访问层 —— 只负责 Log 表的查询与计数。"""
 
-    def __init__(self, session: AsyncSession) -> None:
-        self.session: AsyncSession = session
-
     async def get_logs(
         self,
+        session: AsyncSession,
         *,
         level: str | None = None,
         start: datetime | None = None,
@@ -30,11 +28,12 @@ class LogRepo:
         if end is not None:
             stmt = stmt.where(Log.timestamp <= end)
         stmt = stmt.offset(offset).limit(limit)
-        result = await self.session.execute(stmt)
+        result = await session.execute(stmt)
         return list(result.scalars().all())
 
     async def count_logs(
         self,
+        session: AsyncSession,
         *,
         level: str | None = None,
         start: datetime | None = None,
@@ -48,5 +47,5 @@ class LogRepo:
             stmt = stmt.where(Log.timestamp >= start)
         if end is not None:
             stmt = stmt.where(Log.timestamp <= end)
-        result = await self.session.execute(stmt)
+        result = await session.execute(stmt)
         return int(result.scalar_one())
