@@ -2,19 +2,20 @@
 package middleware
 
 import (
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-// Duration 记录每个请求的 method/path/status/duration，通过 slog 输出。
-// 放在路由组最外层，才能覆盖到恢复链路内的耗时。
+// RequestStart 是存入 gin Context 的请求起始时间 key。
+const RequestStart = "request_start"
+
+// Duration 记录每个请求的耗时。
+// 将起始时间存入 Context，由 response 包在实际写入响应时注入
+// X-Process-Time 头。放在路由组最外层以覆盖完整链路。
 func Duration() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		start := time.Now()
+		c.Set(RequestStart, time.Now())
 		c.Next()
-		p := strconv.FormatInt(time.Since(start).Milliseconds(), 10)
-		c.Header("X-Process-Time", p+"ms")
 	}
 }
