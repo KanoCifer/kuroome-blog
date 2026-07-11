@@ -1,5 +1,144 @@
 [
   {
+    "version": "4.5.0",
+    "date": "2026-07-11",
+    "title": "DI 依赖注入改造与中间件完善",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "slog access log 中间件，X-Process-Time 响应头"
+      },
+      {
+        "type": "refactor",
+        "content": "AppState + session DI 迁移（Service/Repository 层 session 参数化）"
+      },
+      {
+        "type": "fix",
+        "content": "修复部署端点错误与部署脚本路径"
+      },
+      {
+        "type": "fix",
+        "content": "修复飞书通知 JSON 结构与 channel 构造方式"
+      },
+      {
+        "type": "fix",
+        "content": "修复启动通知时序（server blocking 之前发送）"
+      }
+    ]
+  },
+  {
+    "version": "4.4.0",
+    "date": "2026-07-10",
+    "title": "CORS 修复、Blog 迁移与启动通知",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "官方 CORS 中间件替代自定义实现"
+      },
+      {
+        "type": "feat",
+        "content": "Blog 只读接口迁移至 Go 后端"
+      },
+      {
+        "type": "feat",
+        "content": "启动时飞书通知"
+      },
+      {
+        "type": "feat",
+        "content": "接入 duration middleware，返回请求处理时间头"
+      },
+      {
+        "type": "fix",
+        "content": "CORS preflight 修复：回显请求头 + 添加 api origin"
+      },
+      {
+        "type": "fix",
+        "content": "修复 MongoDB ObjectID 在 string 字段的解码问题"
+      },
+      {
+        "type": "fix",
+        "content": "优化 CI 脚本"
+      }
+    ]
+  },
+  {
+    "version": "4.3.0",
+    "date": "2026-07-08",
+    "title": "slog 结构化日志体系落地",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "slog 完整体系：双文件路由 + trace_id + lumberjack 日志轮转"
+      },
+      {
+        "type": "feat",
+        "content": "handler 层统一添加结构化日志"
+      },
+      {
+        "type": "refactor",
+        "content": "log → slog 迁移完成，logger.Init 接入配置"
+      },
+      {
+        "type": "refactor",
+        "content": "简化日志体系：去掉 access.log 持久化/Taskiq，新增 event 表"
+      },
+      {
+        "type": "refactor",
+        "content": "Go 后端抽离 router 包，精简入口文件"
+      }
+    ]
+  },
+  {
+    "version": "4.2.0",
+    "date": "2026-07-06",
+    "title": "通知渠道扩展与 Docker 支持",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "新增 Bark / 飞书 / 邮件验证码通知渠道"
+      },
+      {
+        "type": "feat",
+        "content": "Go 后端邮箱验证码与通知通道集成"
+      },
+      {
+        "type": "feat",
+        "content": "新增 Docker 支持，优化邮件任务处理"
+      },
+      {
+        "type": "refactor",
+        "content": "配置注入由全局 Cfg 改为构造函数注入"
+      },
+      {
+        "type": "fix",
+        "content": "修复 tracking visit_time 空值迁移问题"
+      }
+    ]
+  },
+  {
+    "version": "4.1.0",
+    "date": "2026-07-05",
+    "title": "认证系统迁移 Go 后端与 Redis refresh rotation",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "认证系统迁移至 Go 后端（登录/注册/限流/统一路由）"
+      },
+      {
+        "type": "feat",
+        "content": "GitHub OAuth 登录、绑定与解绑"
+      },
+      {
+        "type": "feat",
+        "content": "Redis refresh token rotation + bcrypt 哈希，统一 TTL 至 1h"
+      },
+      {
+        "type": "fix",
+        "content": "修复 passkey 失效问题"
+      }
+    ]
+  },
+  {
     "version": "4.0.0",
     "date": "2026-07-03",
     "title": "碎碎念落地、后端日志系统、品牌提取与 Twikoo 主题适配",
@@ -142,25 +281,6 @@
     ]
   },
   {
-    "version": "3.8.0",
-    "date": "2026-06-15",
-    "title": "博客列表文学手账重做与文章封面图占位",
-    "changes": [
-      {
-        "type": "feat",
-        "content": "新增 BlogCover 文章封面组件（Vue 端）：3:4 比例，有真实封面时显示图片；无封面时使用 https://picsum.photos/seed/{seed}/{w}/{h} 作为占位图（seed 稳定来自 post._id hash），并叠加文学手账覆盖层（顶部 #分类 + No.XXX 章节标、底部衬线标题 + 装饰小线、顶到底加深渐变保证可读性）。后端封面图接口尚未实现，UI 先行。"
-      },
-      {
-        "type": "style",
-        "content": "BlogListItem 改杂志横版：封面 (3:4) 在左 + 文字区在右，章节章首字符 + 衬线大标题 + 装饰线（featured 走「— 篇 —」章回标） + 摘要 + 阅读时长/字数/浏览量 footer。index=0 自动走 featured（封面更宽、内边距加大、摘要多一行），与第 2 篇起形成视觉层级。"
-      },
-      {
-        "type": "style",
-        "content": "BlogListView 文学手账视觉重做：BasicDetail title 改「随笔录」/「卷·{分类}」，subtitle 改「Essays on reading, thinking & quiet days」；工具栏搜索框 placeholder 改衬线斜体「在字里行间，寻一句心动…」；分类 chip 改 # + 衬线章；正文区上方新增 Volume · 壹 章节目录头 + 右侧 Recent/Category 装饰小线；底部新增「Essays · 卷一 / ka·no·ci·fer」对齐 SettingsModal 风格；空态/加载/错误文案统一改用衬线斜体诗意文案。"
-      }
-    ]
-  },
-  {
     "version": "3.7.0",
     "date": "2026-06-15",
     "title": "偏好设置文学手账风格重做与显示页脚开关",
@@ -196,6 +316,25 @@
       {
         "type": "refactor",
         "content": "useLayoutCenter.parentWidth 初始化为 window.innerWidth（兼容 SSR/服务端渲染场景）"
+      }
+    ]
+  },
+  {
+    "version": "3.8.0",
+    "date": "2026-06-15",
+    "title": "博客列表文学手账重做与文章封面图占位",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "新增 BlogCover 文章封面组件（Vue 端）：3:4 比例，有真实封面时显示图片；无封面时使用 https://picsum.photos/seed/{seed}/{w}/{h} 作为占位图（seed 稳定来自 post._id hash），并叠加文学手账覆盖层（顶部 #分类 + No.XXX 章节标、底部衬线标题 + 装饰小线、顶到底加深渐变保证可读性）。后端封面图接口尚未实现，UI 先行。"
+      },
+      {
+        "type": "style",
+        "content": "BlogListItem 改杂志横版：封面 (3:4) 在左 + 文字区在右，章节章首字符 + 衬线大标题 + 装饰线（featured 走「— 篇 —」章回标） + 摘要 + 阅读时长/字数/浏览量 footer。index=0 自动走 featured（封面更宽、内边距加大、摘要多一行），与第 2 篇起形成视觉层级。"
+      },
+      {
+        "type": "style",
+        "content": "BlogListView 文学手账视觉重做：BasicDetail title 改「随笔录」/「卷·{分类}」，subtitle 改「Essays on reading, thinking & quiet days」；工具栏搜索框 placeholder 改衬线斜体「在字里行间，寻一句心动…」；分类 chip 改 # + 衬线章；正文区上方新增 Volume · 壹 章节目录头 + 右侧 Recent/Category 装饰小线；底部新增「Essays · 卷一 / ka·no·ci·fer」对齐 SettingsModal 风格；空态/加载/错误文案统一改用衬线斜体诗意文案。"
       }
     ]
   },
@@ -893,21 +1032,6 @@
     ]
   },
   {
-    "version": "2.6.0",
-    "date": "2026-03-29",
-    "title": "新增照片画廊功能",
-    "changes": [
-      {
-        "type": "feat",
-        "content": "新增照片画廊功能"
-      },
-      {
-        "type": "fix",
-        "content": "修复了一些bugs"
-      }
-    ]
-  },
-  {
     "version": "2.5.3",
     "date": "2026-03-29",
     "title": "适配Markdown编辑模式",
@@ -923,6 +1047,21 @@
       {
         "type": "feat",
         "content": "新增AI分析天气，提供天气趋势预测和出行建议"
+      }
+    ]
+  },
+  {
+    "version": "2.6.0",
+    "date": "2026-03-29",
+    "title": "新增照片画廊功能",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "新增照片画廊功能"
+      },
+      {
+        "type": "fix",
+        "content": "修复了一些bugs"
       }
     ]
   },
@@ -1073,13 +1212,13 @@
     ]
   },
   {
-    "version": "2.3.9",
+    "version": "2.3.6",
     "date": "2026-03-20",
-    "title": "新增钓点地图功能",
+    "title": "更新部分UI设计和功能优化",
     "changes": [
       {
-        "type": "feat",
-        "content": "新增钓点地图功能，展示钓点位置和相关信息（待完善）"
+        "type": "style",
+        "content": "更新了部分UI设计，提升用户体验"
       },
       {
         "type": "fix",
@@ -1107,13 +1246,13 @@
     ]
   },
   {
-    "version": "2.3.6",
+    "version": "2.3.9",
     "date": "2026-03-20",
-    "title": "更新部分UI设计和功能优化",
+    "title": "新增钓点地图功能",
     "changes": [
       {
-        "type": "style",
-        "content": "更新了部分UI设计，提升用户体验"
+        "type": "feat",
+        "content": "新增钓点地图功能，展示钓点位置和相关信息（待完善）"
       },
       {
         "type": "fix",
@@ -1231,6 +1370,17 @@
     ]
   },
   {
+    "version": "2.2.8",
+    "date": "2026-03-08",
+    "title": "修复了一些bugs",
+    "changes": [
+      {
+        "type": "fix",
+        "content": "修复了一些小的UI问题和功能bug"
+      }
+    ]
+  },
+  {
     "version": "2.2.9",
     "date": "2026-03-08",
     "title": "新增内容搜索功能",
@@ -1246,17 +1396,6 @@
       {
         "type": "feat",
         "content": "完善网站安全机制，新增refresh token机制"
-      }
-    ]
-  },
-  {
-    "version": "2.2.8",
-    "date": "2026-03-08",
-    "title": "修复了一些bugs",
-    "changes": [
-      {
-        "type": "fix",
-        "content": "修复了一些小的UI问题和功能bug"
       }
     ]
   },
@@ -1344,6 +1483,17 @@
     ]
   },
   {
+    "version": "2.1.2",
+    "date": "2026-02-27",
+    "title": "新增服务器资源监控",
+    "changes": [
+      {
+        "type": "feat",
+        "content": "新增服务器资源监控图表"
+      }
+    ]
+  },
+  {
     "version": "2.1.6",
     "date": "2026-02-27",
     "title": "新增Rss解析功能",
@@ -1363,28 +1513,25 @@
     ]
   },
   {
-    "version": "2.1.2",
-    "date": "2026-02-27",
-    "title": "新增服务器资源监控",
-    "changes": [
-      {
-        "type": "feat",
-        "content": "新增服务器资源监控图表"
-      }
-    ]
-  },
-  {
-    "version": "2.1.0",
+    "version": "2.0.1",
     "date": "2026-02-26",
-    "title": "新增后台监控系统",
+    "title": "新增 Changelog 变更日志/新增Track",
     "changes": [
       {
         "type": "feat",
-        "content": "新增后台监控系统"
+        "content": "新增 Changelog 页面，展示网站更新历史"
+      },
+      {
+        "type": "feat",
+        "content": "新增访客追踪功能"
+      },
+      {
+        "type": "style",
+        "content": "代码块样式调整为MacOs风格"
       },
       {
         "type": "fix",
-        "content": "修复了一些小的UI问题和功能bug"
+        "content": "修复了一些bugs"
       }
     ]
   },
@@ -1416,25 +1563,17 @@
     ]
   },
   {
-    "version": "2.0.1",
+    "version": "2.1.0",
     "date": "2026-02-26",
-    "title": "新增 Changelog 变更日志/新增Track",
+    "title": "新增后台监控系统",
     "changes": [
       {
         "type": "feat",
-        "content": "新增 Changelog 页面，展示网站更新历史"
-      },
-      {
-        "type": "feat",
-        "content": "新增访客追踪功能"
-      },
-      {
-        "type": "style",
-        "content": "代码块样式调整为MacOs风格"
+        "content": "新增后台监控系统"
       },
       {
         "type": "fix",
-        "content": "修复了一些bugs"
+        "content": "修复了一些小的UI问题和功能bug"
       }
     ]
   },
