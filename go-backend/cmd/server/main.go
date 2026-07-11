@@ -26,7 +26,7 @@ func sendBootNotification() {
 		slog.Info("boot notification disabled")
 		return
 	}
-	var nc notification.Channel = &notification.FeishuChannel{}
+	nc := notification.NewFeishuChannel()
 	var msg notification.Message = notification.Message{
 		Title: "Go Backend Booted",
 		Body:  "Go Backend Booted successfully",
