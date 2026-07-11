@@ -169,7 +169,7 @@ func hmacEqualBody(body []byte, secret, signatureHeader string) bool {
 func runDeployment() {
 	scriptPath := os.Getenv("DEPLOY_SCRIPT_PATH")
 	if scriptPath == "" {
-		scriptPath = "/home/kano/blog/deploy.sh"
+		scriptPath = "/home/kano/blog/backend/deploy.sh"
 	}
 	if _, err := os.Stat(scriptPath); os.IsNotExist(err) {
 		slog.Error("Deploy script not found", "path", scriptPath)
