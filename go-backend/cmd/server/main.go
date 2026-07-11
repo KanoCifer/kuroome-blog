@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 
@@ -13,10 +14,27 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 	"github.com/KanoCifer/kuroome-blog/internal/router"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
+	"github.com/KanoCifer/kuroome-blog/pkg/notification"
 )
 
 func init() {
 	config.Load()
+}
+
+func sendBootNotification() {
+	if !config.Cfg.Admin.SendBootEmail || config.Cfg.Feishu.WebhookURL == "" {
+		slog.Info("boot notification disabled")
+		return
+	}
+	var nc notification.Channel = &notification.FeishuChannel{}
+	var msg notification.Message = notification.Message{
+		Title: "Go Backend Booted",
+		Body:  "Go Backend Booted successfully",
+		Color: "green",
+	}
+	if !nc.Send(context.Background(), msg, notification.NotificationContext{}) {
+		slog.Error("send boot notification")
+	}
 }
 
 func main() {
@@ -58,4 +76,5 @@ func main() {
 
 	addr := fmt.Sprintf("127.0.0.1:%d", config.Cfg.Server.Port)
 	r.Run(addr)
+	sendBootNotification()
 }
