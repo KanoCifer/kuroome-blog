@@ -2,6 +2,7 @@ package logger
 
 import (
 	"context"
+	"io"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -23,8 +24,8 @@ const ginSource = "gin"
 func Init(cfg *config.Config) {
 	level := parseLevel(cfg.Server.LogLevel)
 
-	appWriter := newLumberjackWriter("logs/app.log")
-	errWriter := newLumberjackWriter("logs/app_error.log")
+	appWriter := io.MultiWriter(os.Stdout, newLumberjackWriter("logs/app.log"))
+	errWriter := io.MultiWriter(os.Stderr, newLumberjackWriter("logs/app_error.log"))
 
 	opts := &slog.HandlerOptions{Level: slog.LevelDebug}
 	var appHandler, errHandler slog.Handler
