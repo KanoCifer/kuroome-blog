@@ -129,7 +129,7 @@ func (h *AdminHandler) WebhookDeploy(c *gin.Context) {
 
 	switch {
 	case giteeToken != "":
-		if !hmac.Equal([]byte(giteeToken), []byte(*secret)) {
+		if giteeToken != *secret {
 			response.APIError(c, "Invalid token", 403)
 			return
 		}
