@@ -60,6 +60,8 @@ func InitMongo() error {
 	}
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(uri).SetServerAPIOptions(serverAPI)
+	// document.Post.ID 为 string 类型，需开启此选项让 driver 将 ObjectID 解码为十六进制字符串
+	opts.SetBSONOptions(&options.BSONOptions{ObjectIDAsHexString: true})
 	c, err := mongo.Connect(opts)
 	if err != nil {
 		return err
