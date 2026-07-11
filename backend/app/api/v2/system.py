@@ -1,10 +1,12 @@
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, Query
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.des.des import system_service_dep
+from app.api.des.appstate import get_app_state
+from app.api.des.db import get_session
+from app.appstate import AppState
 from app.core.response import APIResponse
-from app.services.system import SystemService
 
 router = APIRouter(prefix="/system", tags=["system"])
 
@@ -28,10 +30,12 @@ async def get_events(
         None, description="起始时间（含），ISO 8601"
     ),
     end: datetime | None = Query(None, description="截止时间（含），ISO 8601"),
-    service: SystemService = Depends(system_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
     """分页查询服务事件，按时间倒序，默认返回最近 10 条。"""
-    items, pagination = await service.list_events(
+    items, pagination = await state.system_svc.list_events(
+        session,
         page=page,
         per_page=per_page,
         type=type,

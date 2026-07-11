@@ -13,8 +13,8 @@ pytestmark = pytest.mark.asyncio(loop_scope="session")
 
 
 @pytest_asyncio.fixture
-async def gallery_repo(db_session):
-    return GalleryRepo(db_session)
+async def gallery_repo():
+    return GalleryRepo()
 
 
 @pytest_asyncio.fixture
@@ -38,19 +38,21 @@ def _make_image(**overrides):
 
 
 @pytest.mark.asyncio
-async def test_list_all_returns_empty_when_no_images(gallery_repo):
-    result = await gallery_repo.list_all()
+async def test_list_all_returns_empty_when_no_images(gallery_repo, db_session):
+    result = await gallery_repo.list_all(db_session)
     assert result == []
 
 
 @pytest.mark.asyncio
-async def test_list_all_returns_images_ordered_by_sort_order(gallery_repo, user):
+async def test_list_all_returns_images_ordered_by_sort_order(
+    gallery_repo, db_session
+):
     img1 = _make_image(url="https://a.com/1.jpg", sort_order=2)
     img2 = _make_image(url="https://a.com/2.jpg", sort_order=1)
     img3 = _make_image(url="https://a.com/3.jpg", sort_order=0)
-    await gallery_repo.save_images([img1, img2, img3])
+    await gallery_repo.save_images(db_session, [img1, img2, img3])
 
-    result = await gallery_repo.list_all()
+    result = await gallery_repo.list_all(db_session)
     assert len(result) == 3
     assert result[0].url == "https://a.com/3.jpg"
     assert result[1].url == "https://a.com/2.jpg"
@@ -58,33 +60,40 @@ async def test_list_all_returns_images_ordered_by_sort_order(gallery_repo, user)
 
 
 @pytest.mark.asyncio
-async def test_save_images_replaces_all_existing(gallery_repo):
-    await gallery_repo.save_images([_make_image(url="https://a.com/old.jpg")])
-    assert len(await gallery_repo.list_all()) == 1
+async def test_save_images_replaces_all_existing(gallery_repo, db_session):
+    await gallery_repo.save_images(
+        db_session, [_make_image(url="https://a.com/old.jpg")]
+    )
+    assert len(await gallery_repo.list_all(db_session)) == 1
 
-    await gallery_repo.save_images([_make_image(url="https://a.com/new.jpg")])
-    result = await gallery_repo.list_all()
+    await gallery_repo.save_images(
+        db_session, [_make_image(url="https://a.com/new.jpg")]
+    )
+    result = await gallery_repo.list_all(db_session)
     assert len(result) == 1
     assert result[0].url == "https://a.com/new.jpg"
 
 
 @pytest.mark.asyncio
-async def test_delete_all_removes_everything(gallery_repo):
-    await gallery_repo.save_images([
-        _make_image(url="https://a.com/1.jpg"),
-        _make_image(url="https://a.com/2.jpg"),
-    ])
-    assert len(await gallery_repo.list_all()) == 2
+async def test_delete_all_removes_everything(gallery_repo, db_session):
+    await gallery_repo.save_images(
+        db_session,
+        [
+            _make_image(url="https://a.com/1.jpg"),
+            _make_image(url="https://a.com/2.jpg"),
+        ],
+    )
+    assert len(await gallery_repo.list_all(db_session)) == 2
 
-    await gallery_repo.delete_all()
-    assert await gallery_repo.list_all() == []
+    await gallery_repo.delete_all(db_session)
+    assert await gallery_repo.list_all(db_session) == []
 
 
 @pytest.mark.asyncio
-async def test_list_all_with_user_id(gallery_repo, user):
+async def test_list_all_with_user_id(gallery_repo, user, db_session):
     img = _make_image(url="https://a.com/user.jpg", user_id=user.id)
-    await gallery_repo.save_images([img])
+    await gallery_repo.save_images(db_session, [img])
 
-    result = await gallery_repo.list_all()
+    result = await gallery_repo.list_all(db_session)
     assert len(result) == 1
     assert result[0].user_id == user.id

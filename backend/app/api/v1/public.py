@@ -12,13 +12,15 @@ from __future__ import annotations
 from fastapi import APIRouter, Body, Depends, Request, UploadFile
 from fastapi.responses import PlainTextResponse
 from redis.asyncio import Redis as AsyncRedis
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
+from app.api.des.appstate import get_app_state
 from app.api.des.auth import manager
-from app.api.des.db import get_async_session
-from app.api.des.des import public_service_dep
+from app.api.des.db import get_session
 from app.api.des.limiter import limiter
 from app.api.des.redis import get_redis
+from app.appstate import AppState
 from app.core.config import get_settings
 from app.core.exceptions import APIError
 from app.core.logger import logger
@@ -40,9 +42,9 @@ async def _safe_invalidate(*func_names: str) -> None:
 
 
 @router.get("/status")
-@redis_cache(ttl=30, exclude=["public_service"])
+@redis_cache(ttl=30, exclude=["state"])
 async def get_api_status(
-    public_service: PublicService = Depends(public_service_dep),
+    state: AppState = Depends(get_app_state),
 ):
     """Get API status.
 
@@ -58,23 +60,23 @@ async def get_api_status(
     """
 
     return APIResponse(
-        data=public_service.get_api_status(),
+        data=state.public_svc.get_api_status(),
         message="API is running",
     )
 
 
 @router.get("/status-detail")
-@redis_cache(ttl=60, exclude=["public_service"])
+@redis_cache(ttl=60, exclude=["state", "session"])
 async def get_status_detail(
-    public_service: PublicService = Depends(public_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ) -> APIResponse:
     """Public status detail endpoint for the status page.
 
     Returns version info, service metrics, and system info.
     No authentication required.
     """
-    async with get_async_session() as session:
-        data = await public_service.get_status_detail(session)
+    data = await state.public_svc.get_status_detail(session)
 
     return APIResponse(
         data=data,
@@ -84,7 +86,7 @@ async def get_status_detail(
 
 @router.get("/robots.txt", response_class=PlainTextResponse)
 async def get_robots_txt(
-    public_service: PublicService = Depends(public_service_dep),
+    state: AppState = Depends(get_app_state),
 ) -> PlainTextResponse:
     """Return robots.txt file for search engines.
 
@@ -94,7 +96,7 @@ async def get_robots_txt(
         PlainTextResponse: robots.txt content
     """
 
-    robots_content = public_service.get_robots_txt()
+    robots_content = state.public_svc.get_robots_txt()
 
     # Cache for 3600 seconds (1 hour)
 
@@ -107,7 +109,7 @@ async def get_robots_txt(
 
 @router.get("/sitemap.xml")
 async def get_sitemap_xml(
-    public_service: PublicService = Depends(public_service_dep),
+    state: AppState = Depends(get_app_state),
 ) -> PlainTextResponse:
     """Generate and return sitemap.xml for SEO.
 
@@ -116,7 +118,7 @@ async def get_sitemap_xml(
     Returns:
         PlainTextResponse: sitemap.xml content
     """
-    xml_content = await public_service.build_sitemap_xml()
+    xml_content = await state.public_svc.build_sitemap_xml()
 
     # Cache for 3600 seconds (1 hour)
 
@@ -262,11 +264,12 @@ async def upload_blog_image(
 @router.post("/set-pic-gallery")
 async def set_pic_gallery(
     images: GalleryInput = Body(..., description="List of image data to set"),
-    public_service: PublicService = Depends(public_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ) -> APIResponse:
     """Set picture gallery data."""
     try:
-        await public_service.set_pic_gallery(images=images)
+        await state.public_svc.set_pic_gallery(session, images=images)
         await _safe_invalidate("get_pic_gallery")
         return APIResponse(
             message="Picture gallery updated successfully",
@@ -280,13 +283,14 @@ async def set_pic_gallery(
 
 
 @router.get("/pic-gallery")
-@redis_cache(ttl=600, exclude=["public_service"])
+@redis_cache(ttl=600, exclude=["state", "session"])
 async def get_pic_gallery(
-    public_service: PublicService = Depends(public_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
     """从图像库中获取图片列表。"""
     try:
-        images = await public_service.get_pic_gallery()
+        images = await state.public_svc.get_pic_gallery(session)
         return APIResponse(
             data={"images": images},
             message="Picture gallery retrieved successfully",

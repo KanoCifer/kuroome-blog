@@ -3,19 +3,19 @@ from urllib.parse import urlparse
 import httpx2
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import Response
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.des.appstate import get_app_state
 from app.api.des.auth import manager
-from app.api.des.des import rss_service_dep
+from app.api.des.db import get_session
+from app.appstate import AppState
 from app.core.exceptions import APIError
 from app.core.logger import logger
 from app.core.response import APIResponse
 from app.schemas.schemas import (
     RssRequest,
 )
-from app.services.rss_service import (
-    RssService,
-    _is_forbidden_target,
-)
+from app.services.rss_service import _is_forbidden_target
 
 router = APIRouter(prefix="/rss", tags=["rss"])
 _IMAGE_PROXY_TIMEOUT = httpx2.Timeout(15.0, connect=10.0)
@@ -74,7 +74,8 @@ async def proxy_rss_image(
 async def parse_rss(
     rss_request: RssRequest,
     current_user: int = Depends(manager),
-    rss_service: RssService = Depends(rss_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
     """解析RSS链接返回RSS内容"""
 
@@ -83,19 +84,19 @@ async def parse_rss(
     rss_info = None
 
     if save_to_db:
-        rss_info = await rss_service.save_rss_info(
-            url=rss_url, user_id=current_user
+        rss_info = await state.rss_svc.save_rss_info(
+            session, url=rss_url, user_id=current_user
         )
         logger.info(f"用户 {current_user} 保存了RSS链接: {rss_url}")
 
     if not save_to_db:
-        cached_payload = await rss_service.get_cached_feed(rss_url)
+        cached_payload = await state.rss_svc.get_cached_feed(rss_url)
         if cached_payload:
             return APIResponse(data=cached_payload)
 
     try:
-        result = await rss_service.fetch_and_parse_feed(
-            url=rss_url, save_to_db=save_to_db, rss_info=rss_info
+        result = await state.rss_svc.fetch_and_parse_feed(
+            session, url=rss_url, save_to_db=save_to_db, rss_info=rss_info
         )
     except APIError:
         raise
@@ -106,12 +107,13 @@ async def parse_rss(
     entries = result["entries"]
 
     if save_to_db:
-        await rss_service.save_entries_to_mongo(
+        await state.rss_svc.save_entries_to_mongo(
+            session,
             feed_url=rss_url,
             entries=entries,
         )
 
-    await rss_service.set_cached_feed(
+    await state.rss_svc.set_cached_feed(
         url=rss_url,
         feed_meta=feed_meta,
         entries=entries,
@@ -127,9 +129,11 @@ async def get_articles(
     feed_url: str | None = None,
     search: str | None = Query(None, min_length=1),
     current_user: int = Depends(manager),
-    rss_service: RssService = Depends(rss_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ) -> APIResponse:
-    result = await rss_service.get_articles_for_user(
+    result = await state.rss_svc.get_articles_for_user(
+        session,
         user_id=current_user,
         page=page,
         limit=limit,
@@ -143,9 +147,11 @@ async def get_articles(
 async def get_article(
     article_id: str,
     current_user: int = Depends(manager),
-    rss_service: RssService = Depends(rss_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
-    response = await rss_service.get_article_for_user(
+    response = await state.rss_svc.get_article_for_user(
+        session,
         article_id=article_id,
         user_id=current_user,
     )
@@ -156,11 +162,13 @@ async def get_article(
 @router.get("/subscriptions")
 async def get_subscriptions(
     current_user: int = Depends(manager),
-    rss_service: RssService = Depends(rss_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
     """获取当前用户的RSS订阅列表"""
-    subscriptions = await rss_service.get_subscriptions_for_user(
-        user_id=current_user
+    subscriptions = await state.rss_svc.get_subscriptions_for_user(
+        session,
+        user_id=current_user,
     )
     data = [sub.model_dump(mode="json") for sub in subscriptions]
     return APIResponse(data=data)
@@ -171,11 +179,13 @@ async def get_subscriptions(
 async def refresh_subscription(
     subscription_id: int,
     current_user: int = Depends(manager),
-    rss_service: RssService = Depends(rss_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
     """手动刷新指定订阅并保存新文章"""
     try:
-        result = await rss_service.refresh_subscription(
+        result = await state.rss_svc.refresh_subscription(
+            session,
             subscription_id=subscription_id,
             user_id=current_user,
         )
@@ -196,10 +206,12 @@ async def refresh_subscription(
 async def delete_subscription(
     subscription_id: int,
     current_user: int = Depends(manager),
-    rss_service: RssService = Depends(rss_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
     """删除RSS订阅及其关联的所有文章"""
-    rss_url = await rss_service.delete_subscription_for_user(
+    rss_url = await state.rss_svc.delete_subscription_for_user(
+        session,
         subscription_id=subscription_id,
         user_id=current_user,
     )
@@ -212,10 +224,12 @@ async def delete_subscription(
 async def mark_article_read(
     article_id: str,
     current_user: int = Depends(manager),
-    rss_service: RssService = Depends(rss_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
     """标记文章为已读(将用户ID添加到read_by列表,使用$addToSet实现幂等性)"""
-    await rss_service.mark_article_read_state(
+    await state.rss_svc.mark_article_read_state(
+        session,
         article_id=article_id,
         user_id=current_user,
         read=True,
@@ -230,10 +244,12 @@ async def mark_article_read(
 async def mark_article_unread(
     article_id: str,
     current_user: int = Depends(manager),
-    rss_service: RssService = Depends(rss_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
     """标记文章为未读(从read_by列表中移除用户ID)"""
-    await rss_service.mark_article_read_state(
+    await state.rss_svc.mark_article_read_state(
+        session,
         article_id=article_id,
         user_id=current_user,
         read=False,

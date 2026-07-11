@@ -15,8 +15,8 @@ pytestmark = pytest.mark.asyncio(loop_scope="session")
 
 
 @pytest_asyncio.fixture
-async def log_repo(db_session):
-    return LogRepo(db_session)
+async def log_repo():
+    return LogRepo()
 
 
 @pytest_asyncio.fixture
@@ -36,29 +36,30 @@ async def sample_logs(db_session):
 
 
 @pytest.mark.asyncio
-async def test_get_logs_returns_all_when_no_filter(log_repo, sample_logs):
-    result = await log_repo.get_logs()
+async def test_get_logs_returns_all_when_no_filter(log_repo, db_session, sample_logs):
+    result = await log_repo.get_logs(db_session)
     assert len(result) == 4
 
 
 @pytest.mark.asyncio
-async def test_get_logs_orders_by_timestamp_desc(log_repo, sample_logs):
-    result = await log_repo.get_logs()
+async def test_get_logs_orders_by_timestamp_desc(log_repo, db_session, sample_logs):
+    result = await log_repo.get_logs(db_session)
     timestamps = [log.timestamp for log in result]
     assert timestamps == sorted(timestamps, reverse=True)
 
 
 @pytest.mark.asyncio
-async def test_get_logs_filters_by_level(log_repo, sample_logs):
-    result = await log_repo.get_logs(level="INFO")
+async def test_get_logs_filters_by_level(log_repo, db_session, sample_logs):
+    result = await log_repo.get_logs(db_session, level="INFO")
     assert len(result) == 2
     assert all(log.level == "INFO" for log in result)
 
 
 @pytest.mark.asyncio
-async def test_get_logs_filters_by_time_range(log_repo, sample_logs):
+async def test_get_logs_filters_by_time_range(log_repo, db_session, sample_logs):
     now = datetime.now(UTC)
     result = await log_repo.get_logs(
+        db_session,
         start=now - timedelta(hours=2, minutes=30),
         end=now - timedelta(minutes=30),
     )
@@ -66,9 +67,9 @@ async def test_get_logs_filters_by_time_range(log_repo, sample_logs):
 
 
 @pytest.mark.asyncio
-async def test_get_logs_pagination(log_repo, sample_logs):
-    page1 = await log_repo.get_logs(offset=0, limit=2)
-    page2 = await log_repo.get_logs(offset=2, limit=2)
+async def test_get_logs_pagination(log_repo, db_session, sample_logs):
+    page1 = await log_repo.get_logs(db_session, offset=0, limit=2)
+    page2 = await log_repo.get_logs(db_session, offset=2, limit=2)
     assert len(page1) == 2
     assert len(page2) == 2
     # No overlap between pages
@@ -78,28 +79,29 @@ async def test_get_logs_pagination(log_repo, sample_logs):
 
 
 @pytest.mark.asyncio
-async def test_get_logs_returns_empty_when_no_match(log_repo, sample_logs):
-    result = await log_repo.get_logs(level="DEBUG")
+async def test_get_logs_returns_empty_when_no_match(log_repo, db_session, sample_logs):
+    result = await log_repo.get_logs(db_session, level="DEBUG")
     assert result == []
 
 
 @pytest.mark.asyncio
-async def test_count_logs_returns_total(log_repo, sample_logs):
-    count = await log_repo.count_logs()
+async def test_count_logs_returns_total(log_repo, db_session, sample_logs):
+    count = await log_repo.count_logs(db_session)
     assert count == 4
 
 
 @pytest.mark.asyncio
-async def test_count_logs_with_level_filter(log_repo, sample_logs):
-    assert await log_repo.count_logs(level="INFO") == 2
-    assert await log_repo.count_logs(level="ERROR") == 1
-    assert await log_repo.count_logs(level="DEBUG") == 0
+async def test_count_logs_with_level_filter(log_repo, db_session, sample_logs):
+    assert await log_repo.count_logs(db_session, level="INFO") == 2
+    assert await log_repo.count_logs(db_session, level="ERROR") == 1
+    assert await log_repo.count_logs(db_session, level="DEBUG") == 0
 
 
 @pytest.mark.asyncio
-async def test_count_logs_with_time_range(log_repo, sample_logs):
+async def test_count_logs_with_time_range(log_repo, db_session, sample_logs):
     now = datetime.now(UTC)
     count = await log_repo.count_logs(
+        db_session,
         start=now - timedelta(hours=1, minutes=30),
     )
     assert count == 2

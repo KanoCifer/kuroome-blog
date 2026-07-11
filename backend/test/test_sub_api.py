@@ -12,24 +12,11 @@ from datetime import UTC, datetime, timedelta
 import pytest
 import pytest_asyncio
 
-from app.api.des.des import sub_service_dep
 from app.models.models import User
 from app.repositories.sub_repo import SubRepo
 from app.services.sub_service import SubService
 
 pytestmark = pytest.mark.asyncio(loop_scope="session")
-
-
-@pytest_asyncio.fixture
-async def sub_override(api_app, db_session):
-    """Override sub_service_dep to use the test session."""
-
-    async def _override():
-        yield SubService(SubRepo(db_session))
-
-    api_app.dependency_overrides[sub_service_dep] = _override
-    yield
-    del api_app.dependency_overrides[sub_service_dep]
 
 
 @pytest_asyncio.fixture
@@ -85,7 +72,7 @@ async def test_list_subscriptions_requires_auth(db_session):
 
 
 @pytest.mark.asyncio
-async def test_list_subscriptions_empty(api_client, sub_override, api_user):
+async def test_list_subscriptions_empty(api_client, api_user):
     resp = await api_client.get("/api/v2/subscriptions")
     assert resp.status_code == 200
     body = resp.json()
@@ -95,13 +82,17 @@ async def test_list_subscriptions_empty(api_client, sub_override, api_user):
 
 @pytest.mark.asyncio
 async def test_list_subscriptions_returns_user_subs(
-    api_client, sub_override, api_user, other_user, db_session
+    api_client, api_user, other_user, db_session
 ):
-    svc = SubService(SubRepo(db_session))
-    await svc.create_one_subscription(api_user.id, **_sub_payload(name="U1"))
-    await svc.create_one_subscription(api_user.id, **_sub_payload(name="U2"))
+    svc = SubService(SubRepo())
     await svc.create_one_subscription(
-        other_user.id, **_sub_payload(name="Other")
+        db_session, api_user.id, **_sub_payload(name="U1")
+    )
+    await svc.create_one_subscription(
+        db_session, api_user.id, **_sub_payload(name="U2")
+    )
+    await svc.create_one_subscription(
+        db_session, other_user.id, **_sub_payload(name="Other")
     )
 
     resp = await api_client.get("/api/v2/subscriptions")
@@ -115,11 +106,11 @@ async def test_list_subscriptions_returns_user_subs(
 
 @pytest.mark.asyncio
 async def test_get_subscription_by_id(
-    api_client, sub_override, api_user, db_session
+    api_client, api_user, db_session
 ):
-    svc = SubService(SubRepo(db_session))
+    svc = SubService(SubRepo())
     sub = await svc.create_one_subscription(
-        api_user.id, **_sub_payload(name="FindMe")
+        db_session, api_user.id, **_sub_payload(name="FindMe")
     )
 
     resp = await api_client.get(f"/api/v2/subscriptions/{sub.id}")
@@ -130,9 +121,7 @@ async def test_get_subscription_by_id(
 
 
 @pytest.mark.asyncio
-async def test_get_subscription_not_found(
-    api_client, sub_override, api_user
-):
+async def test_get_subscription_not_found(api_client, api_user):
     resp = await api_client.get("/api/v2/subscriptions/99999")
     assert resp.status_code == 404
     assert "不存在" in resp.json()["message"]
@@ -140,11 +129,11 @@ async def test_get_subscription_not_found(
 
 @pytest.mark.asyncio
 async def test_get_subscription_forbidden(
-    api_client, sub_override, other_user, db_session
+    api_client, other_user, db_session
 ):
-    svc = SubService(SubRepo(db_session))
+    svc = SubService(SubRepo())
     sub = await svc.create_one_subscription(
-        other_user.id, **_sub_payload(name="Private")
+        db_session, other_user.id, **_sub_payload(name="Private")
     )
 
     resp = await api_client.get(f"/api/v2/subscriptions/{sub.id}")
@@ -156,9 +145,7 @@ async def test_get_subscription_forbidden(
 
 
 @pytest.mark.asyncio
-async def test_create_subscription(
-    api_client, sub_override, api_user
-):
+async def test_create_subscription(api_client, api_user):
     resp = await api_client.post(
         "/api/v2/subscriptions", json=_sub_payload(name="Spotify")
     )
@@ -170,9 +157,7 @@ async def test_create_subscription(
 
 
 @pytest.mark.asyncio
-async def test_create_subscription_validation_error(
-    api_client, sub_override, api_user
-):
+async def test_create_subscription_validation_error(api_client, api_user):
     """Missing required fields → 422."""
     resp = await api_client.post(
         "/api/v2/subscriptions", json={"name": "Incomplete"}
@@ -185,11 +170,11 @@ async def test_create_subscription_validation_error(
 
 @pytest.mark.asyncio
 async def test_update_subscription(
-    api_client, sub_override, api_user, db_session
+    api_client, api_user, db_session
 ):
-    svc = SubService(SubRepo(db_session))
+    svc = SubService(SubRepo())
     sub = await svc.create_one_subscription(
-        api_user.id, **_sub_payload(name="OldName", price=10.0)
+        db_session, api_user.id, **_sub_payload(name="OldName", price=10.0)
     )
 
     resp = await api_client.put(
@@ -203,9 +188,7 @@ async def test_update_subscription(
 
 
 @pytest.mark.asyncio
-async def test_update_subscription_not_found(
-    api_client, sub_override, api_user
-):
+async def test_update_subscription_not_found(api_client, api_user):
     resp = await api_client.put(
         "/api/v2/subscriptions/99999", json={"name": "X"}
     )
@@ -217,11 +200,11 @@ async def test_update_subscription_not_found(
 
 @pytest.mark.asyncio
 async def test_delete_subscription(
-    api_client, sub_override, api_user, db_session
+    api_client, api_user, db_session
 ):
-    svc = SubService(SubRepo(db_session))
+    svc = SubService(SubRepo())
     sub = await svc.create_one_subscription(
-        api_user.id, **_sub_payload(name="ToDelete")
+        db_session, api_user.id, **_sub_payload(name="ToDelete")
     )
 
     resp = await api_client.delete(f"/api/v2/subscriptions/{sub.id}")
@@ -234,9 +217,7 @@ async def test_delete_subscription(
 
 
 @pytest.mark.asyncio
-async def test_delete_subscription_not_found(
-    api_client, sub_override, api_user
-):
+async def test_delete_subscription_not_found(api_client, api_user):
     resp = await api_client.delete("/api/v2/subscriptions/99999")
     assert resp.status_code == 404
 
@@ -246,11 +227,11 @@ async def test_delete_subscription_not_found(
 
 @pytest.mark.asyncio
 async def test_update_subscription_status(
-    api_client, sub_override, api_user, db_session
+    api_client, api_user, db_session
 ):
-    svc = SubService(SubRepo(db_session))
+    svc = SubService(SubRepo())
     sub = await svc.create_one_subscription(
-        api_user.id, **_sub_payload(status="active")
+        db_session, api_user.id, **_sub_payload(status="active")
     )
 
     resp = await api_client.patch(
@@ -266,11 +247,12 @@ async def test_update_subscription_status(
 
 @pytest.mark.asyncio
 async def test_get_upcoming_subscriptions(
-    api_client, sub_override, api_user, db_session
+    api_client, api_user, db_session
 ):
     now = datetime.now(UTC)
-    svc = SubService(SubRepo(db_session))
+    svc = SubService(SubRepo())
     await svc.create_one_subscription(
+        db_session,
         api_user.id,
         **_sub_payload(
             name="Due",
@@ -279,6 +261,7 @@ async def test_get_upcoming_subscriptions(
         ),
     )
     await svc.create_one_subscription(
+        db_session,
         api_user.id,
         **_sub_payload(
             name="Future",

@@ -1,12 +1,14 @@
 from fastapi import APIRouter, Depends, Query, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.des.appstate import get_app_state
 from app.api.des.auth import get_admin_user
-from app.api.des.des import moment_service_dep
+from app.api.des.db import get_session
+from app.appstate import AppState
 from app.core.response import APIResponse
 from app.models.models import User
 from app.models.moment import MomentStatus
 from app.schemas.moment import MomentCreate, MomentUpdate
-from app.services.moment_service import MomentService
 
 router = APIRouter(prefix="/moments", tags=["moments"])
 
@@ -16,9 +18,11 @@ async def list_public_moments(
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
     tag: str | None = Query(default=None, max_length=50),
-    service: MomentService = Depends(moment_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ) -> APIResponse:
-    data = await service.list_public_moments(
+    data = await state.moment_svc.list_public_moments(
+        session,
         page=page,
         page_size=page_size,
         tag=tag,
@@ -32,9 +36,11 @@ async def list_admin_moments(
     page_size: int = Query(default=20, ge=1, le=100),
     moment_status: MomentStatus | None = Query(default=None, alias="status"),
     current_user: User = Depends(get_admin_user),
-    service: MomentService = Depends(moment_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ) -> APIResponse:
-    data = await service.list_admin_moments(
+    data = await state.moment_svc.list_admin_moments(
+        session,
         page=page,
         page_size=page_size,
         status=moment_status,
@@ -45,9 +51,10 @@ async def list_admin_moments(
 @router.get("/{moment_id}")
 async def get_public_moment(
     moment_id: str,
-    service: MomentService = Depends(moment_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ) -> APIResponse:
-    moment = await service.get_public_moment(moment_id)
+    moment = await state.moment_svc.get_public_moment(session, moment_id)
     return APIResponse(data={"moment": moment})
 
 
@@ -55,9 +62,10 @@ async def get_public_moment(
 async def get_admin_moment(
     moment_id: str,
     current_user: User = Depends(get_admin_user),
-    service: MomentService = Depends(moment_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ) -> APIResponse:
-    moment = await service.get_admin_moment(moment_id)
+    moment = await state.moment_svc.get_admin_moment(session, moment_id)
     return APIResponse(data={"moment": moment})
 
 
@@ -65,9 +73,12 @@ async def get_admin_moment(
 async def create_moment(
     data: MomentCreate,
     current_user: User = Depends(get_admin_user),
-    service: MomentService = Depends(moment_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ) -> APIResponse:
-    moment = await service.create_moment(user_id=current_user.id, data=data)
+    moment = await state.moment_svc.create_moment(
+        session, user_id=current_user.id, data=data
+    )
     return APIResponse(data={"moment": moment}, message="Moment created")
 
 
@@ -76,9 +87,12 @@ async def update_moment(
     moment_id: str,
     data: MomentUpdate,
     current_user: User = Depends(get_admin_user),
-    service: MomentService = Depends(moment_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ) -> APIResponse:
-    moment = await service.update_moment(moment_id=moment_id, data=data)
+    moment = await state.moment_svc.update_moment(
+        session, moment_id=moment_id, data=data
+    )
     return APIResponse(data={"moment": moment}, message="Moment updated")
 
 
@@ -86,7 +100,8 @@ async def update_moment(
 async def delete_moment(
     moment_id: str,
     current_user: User = Depends(get_admin_user),
-    service: MomentService = Depends(moment_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ) -> APIResponse:
-    await service.delete_moment(moment_id)
+    await state.moment_svc.delete_moment(session, moment_id)
     return APIResponse(message="Moment deleted")

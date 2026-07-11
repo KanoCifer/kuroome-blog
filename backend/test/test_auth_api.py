@@ -12,24 +12,9 @@ from __future__ import annotations
 import pytest
 import pytest_asyncio
 
-from app.api.des.des import user_service_dep
 from app.models.models import User
-from app.repositories.user import UserRepo
-from app.services.user.core import UserService
 
 pytestmark = pytest.mark.asyncio(loop_scope="session")
-
-
-@pytest_asyncio.fixture
-async def user_override(api_app, db_session):
-    """Override user_service_dep to use the test session."""
-
-    async def _override():
-        yield UserService(UserRepo(db_session))
-
-    api_app.dependency_overrides[user_service_dep] = _override
-    yield
-    del api_app.dependency_overrides[user_service_dep]
 
 
 @pytest_asyncio.fixture
@@ -45,7 +30,7 @@ async def login_user(db_session):
 
 
 @pytest.mark.asyncio
-async def test_login_success(api_client, user_override, login_user):
+async def test_login_success(api_client, api_user, login_user):
     resp = await api_client.post(
         "/api/v1/auth/login",
         json={
@@ -62,7 +47,7 @@ async def test_login_success(api_client, user_override, login_user):
 
 
 @pytest.mark.asyncio
-async def test_login_wrong_password(api_client, user_override, login_user):
+async def test_login_wrong_password(api_client, api_user, login_user):
     resp = await api_client.post(
         "/api/v1/auth/login",
         json={
@@ -76,7 +61,7 @@ async def test_login_wrong_password(api_client, user_override, login_user):
 
 
 @pytest.mark.asyncio
-async def test_login_user_not_found(api_client, user_override, login_user):
+async def test_login_user_not_found(api_client, api_user, login_user):
     resp = await api_client.post(
         "/api/v1/auth/login",
         json={
@@ -89,7 +74,7 @@ async def test_login_user_not_found(api_client, user_override, login_user):
 
 
 @pytest.mark.asyncio
-async def test_login_validation_error(api_client, user_override, login_user):
+async def test_login_validation_error(api_client, api_user, login_user):
     """Missing password → 422."""
     resp = await api_client.post(
         "/api/v1/auth/login",

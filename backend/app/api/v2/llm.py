@@ -5,17 +5,16 @@ from collections.abc import AsyncIterable
 from fastapi import APIRouter, Body, Depends, Request
 from fastapi.sse import EventSourceResponse, ServerSentEvent
 
+from app.api.des.appstate import get_app_state
 from app.api.des.auth import optional_user
-from app.api.des.des import ai_service_dep, public_service_dep
 from app.api.des.limiter import client_key, limiter
+from app.appstate import AppState
 from app.schemas.aiagent import (
     ArticleSummaryRequest,
     ChatRequest,
     HistoryRequest,
     WeatherAnalysisInput,
 )
-from app.services.ai_service import AiService
-from app.services.public_service import PublicService
 
 router = APIRouter(prefix="/llm", tags=["llm"])
 
@@ -41,9 +40,9 @@ async def summary_article_stream(
     request: Request,
     payload: ArticleSummaryRequest,
     user: int | None = Depends(optional_user),
-    ai_service: AiService = Depends(ai_service_dep),
+    state: AppState = Depends(get_app_state),
 ) -> AsyncIterable[ServerSentEvent]:
-    async for chunk in ai_service.summary_stream(
+    async for chunk in state.ai_svc.summary_stream(
         payload, _resolve_user_id(user, request), model=payload.model
     ):
         yield ServerSentEvent(data={"content": chunk})
@@ -58,9 +57,9 @@ async def chat_stream(
     request: Request,
     payload: ChatRequest,
     user: int | None = Depends(optional_user),
-    ai_service: AiService = Depends(ai_service_dep),
+    state: AppState = Depends(get_app_state),
 ) -> AsyncIterable[ServerSentEvent]:
-    async for chunk in ai_service.chat_stream(
+    async for chunk in state.ai_svc.chat_stream(
         payload, _resolve_user_id(user, request), model=payload.model
     ):
         yield ServerSentEvent(data=chunk)
@@ -73,9 +72,11 @@ async def chat_stream(
 async def get_user_history(
     request: Request,
     user: int | None = Depends(optional_user),
-    ai_service: AiService = Depends(ai_service_dep),
+    state: AppState = Depends(get_app_state),
 ):
-    return await ai_service.get_user_history(_resolve_user_id(user, request))
+    return await state.ai_svc.get_user_history(
+        _resolve_user_id(user, request)
+    )
 
 
 @router.post("/history/summary")
@@ -83,9 +84,9 @@ async def get_cached_summary(
     request: Request,
     payload: HistoryRequest,
     user: int | None = Depends(optional_user),
-    ai_service: AiService = Depends(ai_service_dep),
+    state: AppState = Depends(get_app_state),
 ):
-    return ai_service.get_cached_summary(
+    return state.ai_svc.get_cached_summary(
         payload, _resolve_user_id(user, request)
     )
 
@@ -95,9 +96,11 @@ async def get_cached_chat(
     request: Request,
     payload: HistoryRequest,
     user: int | None = Depends(optional_user),
-    ai_service: AiService = Depends(ai_service_dep),
+    state: AppState = Depends(get_app_state),
 ):
-    return ai_service.get_cached_chat(payload, _resolve_user_id(user, request))
+    return state.ai_svc.get_cached_chat(
+        payload, _resolve_user_id(user, request)
+    )
 
 
 # ── Debug ─────────────────────────────────────────────────
@@ -105,9 +108,9 @@ async def get_cached_chat(
 
 @router.get("/debug/sessions")
 async def debug_sessions(
-    ai_service: AiService = Depends(ai_service_dep),
+    state: AppState = Depends(get_app_state),
 ):
-    return ai_service.get_debug_sessions()
+    return state.ai_svc.get_debug_sessions()
 
 
 # ── 天气分析 ──────────────────────────────────────────────
@@ -120,10 +123,10 @@ async def analyze_weather(
     weather_data: WeatherAnalysisInput = Body(
         ..., description="Weather data to analyze"
     ),
-    public_service: PublicService = Depends(public_service_dep),
+    state: AppState = Depends(get_app_state),
 ) -> AsyncIterable[ServerSentEvent]:
     """根据天气数据进行分析并生成报告。"""
-    async for chunk in public_service.analyze_weather(
+    async for chunk in state.public_svc.analyze_weather(
         weather_data, model_id=weather_data.model_id
     ):
         yield ServerSentEvent(data=chunk)

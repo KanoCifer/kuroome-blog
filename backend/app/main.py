@@ -14,6 +14,7 @@ from app.api.des import (
     init_redis,
     limiter,
 )
+from app.appstate import new_app_state
 from app.core import get_settings, register_exception_handlers
 from app.core import logger as app_logger
 from app.core.logger import drain_log_queue, start_log_worker
@@ -56,6 +57,9 @@ async def initialize_resources(app: FastAPI):
         ],
     )
     app.state.redis = await init_redis()
+
+    # 构造 service 单例，挂载到 app.state.services（Go 端 app.NewAppState 对齐）。
+    app.state.services = new_app_state(app.state.redis)
 
     # Web 进程启动 broker 以便 .kiq() 入队；worker 进程自管 broker，跳过避免重复启动。
     if not broker.is_worker_process:

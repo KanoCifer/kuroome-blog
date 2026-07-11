@@ -8,13 +8,13 @@ import logging
 from typing import Literal
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Query
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from redis.asyncio import Redis as AsyncRedis
 
+from app.api.des.appstate import get_app_state
 from app.api.des.auth import manager
-from app.api.des.des import fishing_service_dep, weather_service_dep
 from app.api.des.redis import get_redis
+from app.appstate import AppState
 from app.core.exceptions import APIError
 from app.core.response import APIResponse
 from app.plugins.cache import redis_cache
@@ -26,8 +26,7 @@ from app.services.fishing.fishing_index import (
     get_qweather_index,
     parse_tide_info,
 )
-from app.services.fishing.fishing_service import FishingService
-from app.services.weather_service import WeatherService
+from app.services.weather_service import weather_service
 
 logger = logging.getLogger(__name__)
 
@@ -123,13 +122,12 @@ def _build_record_from_request(req: FishingFeedbackRequest) -> dict:
 
 
 @router.get("/index")
-@redis_cache(ttl=300, exclude=["redis", "weather_svc", "service"])
+@redis_cache(ttl=300, exclude=["redis", "state"])
 async def get_fishing_index(
     location: str = Query(..., description="经纬度坐标，格式为 'lng,lat'"),
     enriched: bool = Query(False, description="是否附加天气数据"),
     redis: AsyncRedis = Depends(get_redis),
-    weather_svc: WeatherService = Depends(weather_service_dep),
-    service: FishingService = Depends(fishing_service_dep),
+    state: AppState = Depends(get_app_state),
 ) -> APIResponse:
     """
     获取指定地点的钓鱼指数
@@ -141,7 +139,9 @@ async def get_fishing_index(
         f"[钓鱼指数] 收到请求 location={location}, enriched={enriched}"
     )
     try:
-        weather_data = await weather_svc.get_full_weather_data(location, redis)
+        weather_data = await weather_service.get_full_weather_data(
+            location, redis
+        )
         logger.info(
             f"[钓鱼指数] 获取天气数据成功: {list(weather_data.keys())}"
         )
@@ -161,7 +161,7 @@ async def get_fishing_index(
 
     # 计算钓鱼指数
     fishing_index, expert_score, residual, feature_breakdown = (
-        service.calculate_fishing_index(record)
+        state.fishing_svc.calculate_fishing_index(record)
     )
     logger.info(
         f"[钓鱼指数] 计算完成: index={fishing_index}, expert={expert_score}, residual={residual}"
@@ -192,7 +192,7 @@ async def submit_feedback(
     payload: FishingFeedbackRequest,
     background_tasks: BackgroundTasks,
     _: AsyncRedis = Depends(get_redis),
-    service: FishingService = Depends(fishing_service_dep),
+    state: AppState = Depends(get_app_state),
 ) -> APIResponse:
     """
     提交钓鱼反馈
@@ -214,7 +214,7 @@ async def submit_feedback(
         indices=payload.indices,
     )
     _fishing_idx, expert_score_from_svc, _residual, _features = (
-        service.calculate_fishing_index(fishing_record)
+        state.fishing_svc.calculate_fishing_index(fishing_record)
     )
 
     # 用户实际评分
@@ -233,14 +233,16 @@ async def submit_feedback(
         "feedback_score": actual_score,
         "expert_score": expert_score_from_svc,
     }
-    record_id = await service.save_feedback(doc_data)
+    record_id = await state.fishing_svc.save_feedback(doc_data)
     logger.info(f"[钓鱼反馈] 已保存记录: {record_id}")
 
     # 反馈数据进入训练集，会改变模型残差 → 让缓存的指数最多存在 5 分钟
     await _safe_invalidate("get_fishing_index")
 
     # 自动训练检查（异步，不阻塞响应）
-    background_tasks.add_task(service.auto_train_if_needed, source="all")
+    background_tasks.add_task(
+        state.fishing_svc.auto_train_if_needed, source="all"
+    )
 
     return APIResponse(
         data=FishingFeedbackResponse(
@@ -255,25 +257,25 @@ async def submit_feedback(
 
 @router.get("/stats")
 async def get_fishing_stats(
-    service: FishingService = Depends(fishing_service_dep),
+    state: AppState = Depends(get_app_state),
 ) -> APIResponse:
     """获取钓鱼统计数据（总记录数 + 最近记录时间）"""
-    stats = await service.get_stats()
+    stats = await state.fishing_svc.get_stats()
     return APIResponse(data=stats)
 
 
 @router.get("/weights")
 async def get_weights(
     _: int = Depends(manager),
-    service: FishingService = Depends(fishing_service_dep),
+    state: AppState = Depends(get_app_state),
 ):
     """
     查看模型权重
 
     返回专家权重和 sklearn 残差模型权重
     """
-    expert_weights = service.expert.WEIGHTS
-    residual_weights = service.model_svc.get_weights()
+    expert_weights = state.fishing_svc.expert.WEIGHTS
+    residual_weights = state.fishing_svc.model_svc.get_weights()
 
     return APIResponse(
         data={

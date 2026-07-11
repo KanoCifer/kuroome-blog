@@ -1,6 +1,6 @@
 """API integration tests for /api/v2/system — event listing.
 
-Tests the system event endpoint with pagination and filtering.
+Tests the system ping and event endpoints with pagination and filtering.
 """
 
 from __future__ import annotations
@@ -8,26 +8,10 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 import pytest
-import pytest_asyncio
 
-from app.api.des.des import system_service_dep
 from app.models.event import Event
-from app.repositories.event_repo import EventRepo
-from app.services.system import SystemService
 
 pytestmark = pytest.mark.asyncio(loop_scope="session")
-
-
-@pytest_asyncio.fixture
-async def system_override(api_app, db_session):
-    """Override system_service_dep to use the test session."""
-
-    async def _override():
-        yield SystemService(EventRepo(db_session))
-
-    api_app.dependency_overrides[system_service_dep] = _override
-    yield
-    del api_app.dependency_overrides[system_service_dep]
 
 
 def _make_event(**overrides):
@@ -46,7 +30,7 @@ def _make_event(**overrides):
 
 
 @pytest.mark.asyncio
-async def test_system_ping(api_client):
+async def test_system_ping(api_client, api_user):
     resp = await api_client.get("/api/v2/system/")
     assert resp.status_code == 200
     assert resp.json()["status"] == "ok"
@@ -56,7 +40,7 @@ async def test_system_ping(api_client):
 
 
 @pytest.mark.asyncio
-async def test_list_events_empty(api_client, system_override):
+async def test_list_events_empty(api_client, api_user):
     resp = await api_client.get("/api/v2/system/events")
     assert resp.status_code == 200
     body = resp.json()
@@ -66,7 +50,7 @@ async def test_list_events_empty(api_client, system_override):
 
 @pytest.mark.asyncio
 async def test_list_events_returns_items(
-    api_client, system_override, db_session
+    api_client, api_user, db_session
 ):
     db_session.add(_make_event(message="event1"))
     db_session.add(_make_event(message="event2"))
@@ -81,7 +65,7 @@ async def test_list_events_returns_items(
 
 @pytest.mark.asyncio
 async def test_list_events_pagination(
-    api_client, system_override, db_session
+    api_client, api_user, db_session
 ):
     for i in range(5):
         db_session.add(_make_event(message=f"event{i}"))
@@ -100,7 +84,7 @@ async def test_list_events_pagination(
 
 @pytest.mark.asyncio
 async def test_list_events_filter_by_type(
-    api_client, system_override, db_session
+    api_client, api_user, db_session
 ):
     db_session.add(_make_event(type="startup", message="startup-event"))
     db_session.add(_make_event(type="deploy", message="deploy-event"))

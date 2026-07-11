@@ -14,7 +14,6 @@ operate on documents they create and delete).
 
 from __future__ import annotations
 
-import asyncio
 from datetime import UTC, datetime
 
 import pytest
@@ -56,10 +55,9 @@ async def mongo_init():
         return
 
     from beanie import init_beanie
+    from pymongo import AsyncMongoClient
 
     from app.core.config import get_settings
-
-    from pymongo import AsyncMongoClient
 
     settings = get_settings()
     client = AsyncMongoClient(settings.MONGO_URI)
@@ -188,7 +186,7 @@ class TestListTags:
 class TestGetPostsByTag:
     async def test_filters_by_single_tag(self, blog_service):
         p1 = await _make_post(title="A", tags=["python"]).insert()
-        p2 = await _make_post(title="B", tags=["go"]).insert()
+        await _make_post(title="B", tags=["go"]).insert()
         p3 = await _make_post(title="C", tags=["python", "fastapi"]).insert()
 
         result = await blog_service.get_posts_by_tag("python")
@@ -206,11 +204,13 @@ class TestGetPostsByTag:
         assert result == {"posts": [], "tag": "missing", "total": 0}
 
     async def test_requires_tag_arg(self, blog_service):
-        with pytest.raises(Exception):  # BlogDomainError
+        from app.core.exceptions import BlogDomainError
+
+        with pytest.raises(BlogDomainError):
             await blog_service.get_posts_by_tag("  ")
 
     async def test_pagination(self, blog_service):
-        for i in range(15):
+        for _ in range(15):
             await _make_post(tags=["p"]).insert()
 
         page1 = await blog_service.get_posts_by_tag("p", page=1, per_page=10)
@@ -332,46 +332,14 @@ class TestAdminUpdatePost:
 # ─────────────────────────────────────────────────────────────────
 
 
-@pytest_asyncio.fixture
-async def blog_override(api_app, mongo_init):
-    """Override blog_service_dep to use BlogRepo() without a session."""
-    if mongo_init is None:
-        pytest.skip("MongoDB unavailable")
-
-    from app.api.des.des import blog_service_dep
-
-    async def _override():
-        yield BlogService(BlogRepo())
-
-    api_app.dependency_overrides[blog_service_dep] = _override
-    yield
-    del api_app.dependency_overrides[blog_service_dep]
-
-
-@pytest_asyncio.fixture
-async def admin_override(api_app, mongo_init):
-    """Override admin_service_dep to use a no-cache AdminService."""
-    if mongo_init is None:
-        pytest.skip("MongoDB unavailable")
-
-    from app.api.des.des import admin_service_dep
-
-    async def _override():
-        yield AdminService(AdminRepo(), cache=_NoOpCache())
-
-    api_app.dependency_overrides[admin_service_dep] = _override
-    yield
-    del api_app.dependency_overrides[admin_service_dep]
-
-
 class TestTagsEndpoints:
-    async def test_get_tags_empty(self, api_client, blog_override):
+    async def test_get_tags_empty(self, api_client, api_user):
         resp = await api_client.get("/api/v1/tags")
         assert resp.status_code == 200
         body = resp.json()
         assert body["data"]["tags"] == []
 
-    async def test_get_tags_with_data(self, api_client, blog_override):
+    async def test_get_tags_with_data(self, api_client, api_user):
         await _make_post(tags=["python"]).insert()
         await _make_post(tags=["python", "go"]).insert()
 
@@ -381,7 +349,7 @@ class TestTagsEndpoints:
         by_name = {t["name"]: t["count"] for t in body["data"]["tags"]}
         assert by_name == {"python": 2, "go": 1}
 
-    async def test_get_posts_by_tag(self, api_client, blog_override):
+    async def test_get_posts_by_tag(self, api_client, api_user):
         p = await _make_post(title="Match", tags=["fastapi"]).insert()
         await _make_post(title="NoMatch", tags=["django"]).insert()
 
@@ -393,7 +361,7 @@ class TestTagsEndpoints:
         assert body["data"]["posts"][0]["_id"] == str(p.id)
 
     async def test_get_posts_by_tag_url_encoded(
-        self, api_client, blog_override
+        self, api_client, api_user
     ):
         await _make_post(tags=["C++"]).insert()
 
@@ -403,7 +371,7 @@ class TestTagsEndpoints:
 
 
 class TestAdminPostEndpoints:
-    async def test_add_post_with_tags(self, api_client, admin_override):
+    async def test_add_post_with_tags(self, api_client, api_user):
         resp = await api_client.post(
             "/api/v1/admin/post/add",
             json={
@@ -417,7 +385,7 @@ class TestAdminPostEndpoints:
         assert "_id" in resp.json()["data"]
 
     async def test_add_post_without_category_id(
-        self, api_client, admin_override
+        self, api_client, api_user
     ):
         """Schema no longer requires category_id — posting without it succeeds."""
         resp = await api_client.post(
@@ -431,7 +399,7 @@ class TestAdminPostEndpoints:
         )
         assert resp.status_code == 201
 
-    async def test_update_post_with_tags(self, api_client, admin_override):
+    async def test_update_post_with_tags(self, api_client, api_user):
         # Create
         create_resp = await api_client.post(
             "/api/v1/admin/post/add",
@@ -461,7 +429,7 @@ class TestAdminPostEndpoints:
         assert post.tags == ["new"]
 
     async def test_add_post_stores_tags_in_mongo(
-        self, api_client, admin_override
+        self, api_client, api_user
     ):
         resp = await api_client.post(
             "/api/v1/admin/post/add",

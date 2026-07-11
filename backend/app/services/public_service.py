@@ -182,12 +182,15 @@ Sitemap: {sitemap_url}
 
         async def _on_index_calculated(data: dict, ai_score: int) -> None:
             """训练回调：AI 分析完成后保存反馈并触发自动训练"""
-            from app.core.container import get_fishing_service
+            # FishingService uses Mongo-backed repo (no session needed);
+            # use a lightweight module-level-style instance for this callback.
+            from app.repositories import FishingRepo
+            from app.services.fishing.fishing_service import FishingService
 
-            async with get_fishing_service() as svc:
-                await svc.save_ai_analysis_feedback(
-                    data, ai_score, parse_tide_info
-                )
+            svc = FishingService(repo=FishingRepo())
+            await svc.save_ai_analysis_feedback(
+                data, ai_score, parse_tide_info
+            )
 
         try:
             async for chunk in weather_analyzer.analyze_weather_stream(

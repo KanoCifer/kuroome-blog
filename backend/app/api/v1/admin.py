@@ -13,10 +13,11 @@ from redis.asyncio import Redis as AsyncRedis
 from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.des.appstate import get_app_state
 from app.api.des.auth import get_admin_user
 from app.api.des.db import get_session
-from app.api.des.des import admin_service_dep
 from app.api.des.redis import get_redis
+from app.appstate import AppState
 from app.core import get_settings
 from app.core.exceptions import APIError
 from app.core.logger import logger
@@ -26,7 +27,6 @@ from app.plugins.cache import redis_cache
 from app.plugins.notification import Message, NotificationContext, notify
 from app.schemas import VisitorData
 from app.schemas.schemas import BlogPostIn, BlogPostUpdate
-from app.services.admin_service import AdminService
 from app.services.event_service import record_event
 from app.utils import get_redis_lock
 
@@ -53,9 +53,11 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 async def add_post(
     data: BlogPostIn,
     current_user: User = Depends(get_admin_user),
-    admin_service: AdminService = Depends(admin_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
-    new_id = await admin_service.add_post(
+    new_id = await state.admin_svc.add_post(
+        session,
         title=data.title,
         body=data.body,
         summary=data.summary,
@@ -75,9 +77,11 @@ async def add_post(
 async def update_post(
     data: BlogPostUpdate,
     current_user: User = Depends(get_admin_user),
-    admin_service: AdminService = Depends(admin_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
-    await admin_service.update_post(
+    await state.admin_svc.update_post(
+        session,
         post_id=data.id,
         title=data.title,
         body=data.body,
@@ -98,9 +102,10 @@ async def update_post(
 async def delete_post(
     post_id: str,
     current_user: User = Depends(get_admin_user),
-    admin_service: AdminService = Depends(admin_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
-    await admin_service.delete_post(post_id=post_id)
+    await state.admin_svc.delete_post(session, post_id=post_id)
     logger.info(
         f"Blog post with ID {post_id} deleted by admin {current_user.id}"
     )

@@ -2,9 +2,12 @@ from collections.abc import Sequence
 from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.des.appstate import get_app_state
 from app.api.des.auth import manager
-from app.api.des.des import device_service_dep
+from app.api.des.db import get_session
+from app.appstate import AppState
 from app.core.exceptions import APIError, NotFoundError
 from app.core.response import APIResponse
 from app.models.models import DeviceTrack
@@ -15,7 +18,6 @@ from app.schemas.device import (
     DeviceUpdateInput,
     ReminderConfigUpdate,
 )
-from app.services.device_service import DeviceService
 
 router = APIRouter(prefix="/device", tags=["device"])
 
@@ -23,10 +25,13 @@ router = APIRouter(prefix="/device", tags=["device"])
 @router.get("")
 async def get_user_devices(
     user: int = Depends(manager),
-    service: DeviceService = Depends(device_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
     """获取用户的设备列表"""
-    devices: Sequence[DeviceTrack] = await service.get_user_devices(user)
+    devices: Sequence[DeviceTrack] = await state.device_svc.get_user_devices(
+        session, user
+    )
     response: list[DeviceResponse] = [
         DeviceResponse.model_validate(device) for device in devices
     ]
@@ -39,12 +44,15 @@ async def get_user_devices(
 async def get_upcoming_devices(
     days_ahead: int = 30,
     user: int = Depends(manager),
-    service: DeviceService = Depends(device_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
     """获取即将到达里程碑的设备"""
     devices: Sequence[
         DeviceTrack
-    ] = await service.get_upcoming_milestone_devices(user, days_ahead)
+    ] = await state.device_svc.get_upcoming_milestone_devices(
+        session, user, days_ahead
+    )
     response: list[DeviceResponse] = [
         DeviceResponse.model_validate(device) for device in devices
     ]
@@ -57,10 +65,11 @@ async def get_upcoming_devices(
 async def get_device_by_id(
     device_id: int,
     user: int = Depends(manager),
-    service: DeviceService = Depends(device_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
     """根据设备ID获取设备信息"""
-    device = await service.get_owned_device(device_id, user)
+    device = await state.device_svc.get_owned_device(session, device_id, user)
     response: DeviceResponse = DeviceResponse.model_validate(device)
     return APIResponse(
         data={"device": response}, message="获取设备信息成功"
@@ -71,11 +80,12 @@ async def get_device_by_id(
 async def create_device(
     device_input: DeviceInput,
     user: int = Depends(manager),
-    service: DeviceService = Depends(device_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
     """创建新设备"""
-    device: DeviceTrack = await service.create_device(
-        user_id=user, **device_input.model_dump()
+    device: DeviceTrack = await state.device_svc.create_device(
+        session, user_id=user, **device_input.model_dump()
     )
     response: DeviceResponse = DeviceResponse.model_validate(device)
     return APIResponse(
@@ -89,12 +99,13 @@ async def update_device(
     device_id: int,
     device_input: DeviceUpdateInput,
     user: int = Depends(manager),
-    service: DeviceService = Depends(device_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
     """更新设备信息"""
-    await service.get_owned_device(device_id, user)
-    updated_device: DeviceTrack | None = await service.update_device(
-        device_id, **device_input.model_dump(exclude_unset=True)
+    await state.device_svc.get_owned_device(session, device_id, user)
+    updated_device: DeviceTrack | None = await state.device_svc.update_device(
+        session, device_id, **device_input.model_dump(exclude_unset=True)
     )
     if not updated_device:
         raise APIError(message="设备信息不存在或更新失败")
@@ -108,11 +119,12 @@ async def update_device(
 async def delete_device(
     device_id: int,
     user: int = Depends(manager),
-    service: DeviceService = Depends(device_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
     """删除设备"""
-    await service.get_owned_device(device_id, user)
-    if not await service.delete_device(device_id):
+    await state.device_svc.get_owned_device(session, device_id, user)
+    if not await state.device_svc.delete_device(session, device_id):
         raise NotFoundError("设备删除失败")
     return APIResponse(message="删除设备成功")
 
@@ -120,10 +132,11 @@ async def delete_device(
 @router.delete("")
 async def delete_all_devices(
     user: int = Depends(manager),
-    service: DeviceService = Depends(device_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
     """删除用户的所有设备"""
-    await service.repo.delete_device_tracks_by_user_id(user)
+    await state.device_svc.repo.delete_device_tracks_by_user_id(session, user)
     return APIResponse(message="删除所有设备成功")
 
 
@@ -132,12 +145,15 @@ async def update_device_status(
     device_id: int,
     status_update: DeviceStatusUpdate,
     user: int = Depends(manager),
-    service: DeviceService = Depends(device_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
     """更新设备状态（active/retired）"""
-    await service.get_owned_device(device_id, user)
-    updated_device: DeviceTrack | None = await service.update_device_status(
-        device_id, status=status_update.status
+    await state.device_svc.get_owned_device(session, device_id, user)
+    updated_device: DeviceTrack | None = (
+        await state.device_svc.update_device_status(
+            session, device_id, status=status_update.status
+        )
     )
     if not updated_device:
         raise NotFoundError("设备状态更新失败")
@@ -152,14 +168,15 @@ async def update_device_reminders(
     device_id: int,
     reminder_update: ReminderConfigUpdate,
     user: int = Depends(manager),
-    service: DeviceService = Depends(device_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
     """更新设备提醒配置"""
-    await service.get_owned_device(device_id, user)
+    await state.device_svc.get_owned_device(session, device_id, user)
     updated_device: (
         DeviceTrack | None
-    ) = await service.update_device_reminder_config(
-        device_id, reminder_config=reminder_update.reminder_config
+    ) = await state.device_svc.update_device_reminder_config(
+        session, device_id, reminder_config=reminder_update.reminder_config
     )
     if not updated_device:
         raise NotFoundError("提醒配置更新失败")
@@ -173,10 +190,11 @@ async def update_device_reminders(
 async def test_device_notification(
     device_id: int,
     user: int = Depends(manager),
-    service: DeviceService = Depends(device_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
     """测试通知发送"""
-    device = await service.get_owned_device(device_id, user)
+    device = await state.device_svc.get_owned_device(session, device_id, user)
 
     from app.notification import DeviceNotificationPayload
     from app.notification.context import context_from_config

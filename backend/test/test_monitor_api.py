@@ -11,38 +11,10 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 
 import pytest
-import pytest_asyncio
 
-from app.api.des.des import monitor_service_dep
 from app.models.models import User, VisitorTrack
-from app.repositories.monitor_repo import MonitorRepo
-from app.services.monitor_service import MonitorService
 
 pytestmark = pytest.mark.asyncio(loop_scope="session")
-
-
-@pytest_asyncio.fixture
-async def monitor_override(api_app, db_session, api_user):
-    """Override monitor_service_dep + get_admin_user.
-
-    ``api_user`` gets id=1 from auto-increment, which is in
-    settings.ADMIN_USER_IDS = [1, 2], so it passes the admin check.
-    We override ``get_admin_user`` to return the test user directly,
-    avoiding the production-session lookup in ``get_current_user_full``.
-    """
-    from app.api.des.auth import get_admin_user
-
-    async def _override_service():
-        yield MonitorService(MonitorRepo(db_session))
-
-    async def _override_admin():
-        return api_user
-
-    api_app.dependency_overrides[monitor_service_dep] = _override_service
-    api_app.dependency_overrides[get_admin_user] = _override_admin
-    yield
-    del api_app.dependency_overrides[monitor_service_dep]
-    del api_app.dependency_overrides[get_admin_user]
 
 
 def _make_visit(**overrides):
@@ -71,7 +43,7 @@ def _make_visit(**overrides):
 
 @pytest.mark.asyncio
 async def test_get_overview(
-    api_client, monitor_override, db_session
+    api_client, api_user, db_session
 ):
     now = datetime.now(UTC)
     db_session.add(_make_visit(visit_time=now))
@@ -90,7 +62,7 @@ async def test_get_overview(
 
 @pytest.mark.asyncio
 async def test_get_visitors(
-    api_client, monitor_override, db_session
+    api_client, api_user, db_session
 ):
     now = datetime.now(UTC)
     db_session.add(_make_visit(visit_time=now, visitor_id="v1"))
@@ -106,7 +78,7 @@ async def test_get_visitors(
 
 @pytest.mark.asyncio
 async def test_get_visitors_pagination(
-    api_client, monitor_override, db_session
+    api_client, api_user, db_session
 ):
     now = datetime.now(UTC)
     for i in range(3):
@@ -130,7 +102,7 @@ async def test_get_visitors_pagination(
 
 @pytest.mark.asyncio
 async def test_get_user_logins(
-    api_client, monitor_override, db_session
+    api_client, api_user, db_session
 ):
     now = datetime.now(UTC)
     u1 = User(username="login1", password="pass")
@@ -156,7 +128,7 @@ async def test_get_user_logins(
 
 
 @pytest.mark.asyncio
-async def test_get_server_status(api_client, monitor_override):
+async def test_get_server_status(api_client, api_user):
     resp = await api_client.get("/api/v1/status/server/status")
     assert resp.status_code == 200
     body = resp.json()

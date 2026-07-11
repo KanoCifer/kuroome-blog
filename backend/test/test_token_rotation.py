@@ -19,7 +19,7 @@ from app.services.user.core import UserService
 class FakeRepo:
     """Minimal stub — these tests never hit the DB."""
 
-    async def set_active_by_id(self, user_id: int, active: bool) -> None:
+    async def set_active_by_id(self, session, user_id: int, active: bool) -> None:
         pass
 
 
@@ -110,7 +110,7 @@ async def test_logout_invalidates_refresh(service, redis, mocker):
     )
 
     tokens = await service.create_tokens(FakeUser(), redis)  # type: ignore[arg-type]
-    await service.logout(FakeUser(), redis)  # type: ignore[arg-type]
+    await service.logout(None, FakeUser(), redis)  # type: ignore[arg-type]
 
     result = await service.refresh_user_token(tokens["refresh_token"], redis)
     assert result is None

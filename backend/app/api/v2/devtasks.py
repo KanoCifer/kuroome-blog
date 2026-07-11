@@ -1,13 +1,12 @@
 from fastapi import APIRouter, Depends, status
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
+from app.api.des.appstate import get_app_state
 from app.api.des.auth import manager
-from app.api.des.des import devtask_service_dep
+from app.appstate import AppState
 from app.core.exceptions import APIError
 from app.core.response import APIResponse
 from app.schemas.devtask import DevTaskCreate, DevTaskUpdate
-from app.services.devtask_service import DevTaskService
 
 router = APIRouter(prefix="/devtasks", tags=["devtasks"])
 
@@ -19,9 +18,9 @@ class DevTaskReorder(BaseModel):
 
 @router.get("")
 async def get_tasks(
-    service: DevTaskService = Depends(devtask_service_dep),
+    state: AppState = Depends(get_app_state),
 ) -> APIResponse:
-    tasks = await service.get_all_tasks()
+    tasks = await state.devtask_svc.get_all_tasks()
     grouped: dict[str, list[dict]] = {
         "todo": [],
         "in-progress": [],
@@ -38,9 +37,9 @@ async def get_tasks(
 async def create_task(
     data: DevTaskCreate,
     user: int = Depends(manager),
-    service: DevTaskService = Depends(devtask_service_dep),
+    state: AppState = Depends(get_app_state),
 ) -> APIResponse:
-    task = await service.create_task(
+    task = await state.devtask_svc.create_task(
         user_id=user, task_data=data.model_dump()
     )
     td = task.model_dump()
@@ -56,10 +55,10 @@ async def patch_task(
     task_id: str,
     data: DevTaskUpdate,
     user: int = Depends(manager),
-    service: DevTaskService = Depends(devtask_service_dep),
+    state: AppState = Depends(get_app_state),
 ) -> APIResponse:
     try:
-        updated = await service.update_task(
+        updated = await state.devtask_svc.update_task(
             user_id=user,
             task_id=task_id,
             update_data=data.model_dump(exclude_unset=True),
@@ -75,10 +74,10 @@ async def patch_task(
 async def delete_task(
     task_id: str,
     user: int = Depends(manager),
-    service: DevTaskService = Depends(devtask_service_dep),
+    state: AppState = Depends(get_app_state),
 ) -> APIResponse:
     try:
-        await service.delete_task(user, task_id)
+        await state.devtask_svc.delete_task(user, task_id)
         return APIResponse(message="DevTask deleted")
     except ValueError as e:
         raise APIError(message=str(e), code=404) from e
@@ -88,9 +87,11 @@ async def delete_task(
 async def reorder_tasks(
     data: DevTaskReorder,
     user: int = Depends(manager),
-    service: DevTaskService = Depends(devtask_service_dep),
+    state: AppState = Depends(get_app_state),
 ) -> APIResponse:
-    tasks = await service.reorder_tasks(user, data.status, data.ordered_ids)
+    tasks = await state.devtask_svc.reorder_tasks(
+        user, data.status, data.ordered_ids
+    )
     task_dicts = []
     for t in tasks:
         td = t.model_dump()

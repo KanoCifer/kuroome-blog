@@ -7,24 +7,11 @@ from datetime import UTC, datetime, timedelta
 import pytest
 import pytest_asyncio
 
-from app.api.des.des import device_service_dep
 from app.models.models import User
 from app.repositories.device_repo import DeviceRepo
 from app.services.device_service import DeviceService
 
 pytestmark = pytest.mark.asyncio(loop_scope="session")
-
-
-@pytest_asyncio.fixture
-async def device_override(api_app, db_session):
-    """Override device_service_dep to use the test session."""
-
-    async def _override():
-        yield DeviceService(DeviceRepo(db_session))
-
-    api_app.dependency_overrides[device_service_dep] = _override
-    yield
-    del api_app.dependency_overrides[device_service_dep]
 
 
 @pytest_asyncio.fixture
@@ -54,7 +41,7 @@ ISO_UTC = UTC
 
 
 @pytest.mark.asyncio
-async def test_list_devices_empty(api_client, device_override, api_user):
+async def test_list_devices_empty(api_client, api_user):
     resp = await api_client.get("/api/v2/device")
     assert resp.status_code == 200
     assert resp.json()["data"]["devices"] == []
@@ -62,7 +49,7 @@ async def test_list_devices_empty(api_client, device_override, api_user):
 
 @pytest.mark.asyncio
 async def test_list_devices_filters_by_user(
-    api_client, device_override, api_user, other_user, db_session
+    api_client, api_user, other_user, db_session
 ):
     svc = DeviceService(DeviceRepo(db_session))
     await svc.create_device(api_user.id, **_device_payload(name="U1"))
@@ -79,7 +66,7 @@ async def test_list_devices_filters_by_user(
 
 @pytest.mark.asyncio
 async def test_get_device_by_id(
-    api_client, device_override, api_user, db_session
+    api_client, api_user, db_session
 ):
     svc = DeviceService(DeviceRepo(db_session))
     device = await svc.create_device(api_user.id, **_device_payload(name="FindMe"))
@@ -90,14 +77,14 @@ async def test_get_device_by_id(
 
 
 @pytest.mark.asyncio
-async def test_get_device_not_found(api_client, device_override, api_user):
+async def test_get_device_not_found(api_client, api_user):
     resp = await api_client.get("/api/v2/device/99999")
     assert resp.status_code == 404
 
 
 @pytest.mark.asyncio
 async def test_get_device_forbidden(
-    api_client, device_override, other_user, db_session
+    api_client, other_user, db_session
 ):
     svc = DeviceService(DeviceRepo(db_session))
     device = await svc.create_device(other_user.id, **_device_payload(name="Private"))
@@ -110,7 +97,7 @@ async def test_get_device_forbidden(
 
 
 @pytest.mark.asyncio
-async def test_create_device(api_client, device_override, api_user):
+async def test_create_device(api_client, api_user):
     resp = await api_client.post(
         "/api/v2/device", json=_device_payload(name="iPad")
     )
@@ -122,7 +109,7 @@ async def test_create_device(api_client, device_override, api_user):
 
 @pytest.mark.asyncio
 async def test_create_device_validation_error(
-    api_client, device_override, api_user
+    api_client, api_user
 ):
     resp = await api_client.post(
         "/api/v2/device", json={"name": "NoPrice"}
@@ -135,7 +122,7 @@ async def test_create_device_validation_error(
 
 @pytest.mark.asyncio
 async def test_update_device(
-    api_client, device_override, api_user, db_session
+    api_client, api_user, db_session
 ):
     svc = DeviceService(DeviceRepo(db_session))
     device = await svc.create_device(api_user.id, **_device_payload(name="Old"))
@@ -149,7 +136,7 @@ async def test_update_device(
 
 @pytest.mark.asyncio
 async def test_update_device_not_found(
-    api_client, device_override, api_user
+    api_client, api_user
 ):
     resp = await api_client.put("/api/v2/device/99999", json={"name": "X"})
     assert resp.status_code == 404
@@ -160,7 +147,7 @@ async def test_update_device_not_found(
 
 @pytest.mark.asyncio
 async def test_delete_device(
-    api_client, device_override, api_user, db_session
+    api_client, api_user, db_session
 ):
     svc = DeviceService(DeviceRepo(db_session))
     device = await svc.create_device(api_user.id, **_device_payload(name="ToDelete"))
@@ -175,7 +162,7 @@ async def test_delete_device(
 
 @pytest.mark.asyncio
 async def test_delete_device_not_found(
-    api_client, device_override, api_user
+    api_client, api_user
 ):
     resp = await api_client.delete("/api/v2/device/99999")
     assert resp.status_code == 404
@@ -186,7 +173,7 @@ async def test_delete_device_not_found(
 
 @pytest.mark.asyncio
 async def test_update_device_status(
-    api_client, device_override, api_user, db_session
+    api_client, api_user, db_session
 ):
     svc = DeviceService(DeviceRepo(db_session))
     device = await svc.create_device(api_user.id, **_device_payload(status="active"))
@@ -204,7 +191,7 @@ async def test_update_device_status(
 
 @pytest.mark.asyncio
 async def test_get_upcoming_milestone_devices(
-    api_client, device_override, api_user, db_session
+    api_client, api_user, db_session
 ):
     today = datetime.now(UTC)
     svc = DeviceService(DeviceRepo(db_session))

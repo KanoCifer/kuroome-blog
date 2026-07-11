@@ -13,18 +13,20 @@ from fastapi import (
     status,
 )
 from fastapi.responses import JSONResponse, RedirectResponse
+from sqlalchemy.ext.asyncio import AsyncSession
 from webauthn.helpers import options_to_json_dict
 
+from app.api.des.appstate import get_app_state
 from app.api.des.auth import (
     get_current_user_full,
     manager,
     resolve_user_from_token,
 )
-from app.api.des.des import user_service_dep, user_services_dep
+from app.api.des.db import get_session
 from app.api.des.limiter import limiter
 from app.api.des.redis import AsyncRedis, get_redis
+from app.appstate import AppState
 from app.core.config import settings
-from app.core.container import UserServices
 from app.core.exceptions import APIError, GitHubAuthError
 from app.core.logger import logger
 from app.core.response import APIResponse, envelope_response
@@ -36,7 +38,6 @@ from app.schemas.auth import (
     PasskeyRegistrationRequest,
 )
 from app.schemas.schemas import LoginIn, RegisterIn, UserSettingsIn
-from app.services.user import UserService
 
 router = APIRouter(
     prefix="/auth",
@@ -83,7 +84,7 @@ def _build_login_response(
 async def refresh_token(
     request: Request,
     refresh_token: str = Cookie(None),
-    user_service: UserService = Depends(user_service_dep),
+    state: AppState = Depends(get_app_state),
     redis: AsyncRedis = Depends(get_redis),
 ) -> JSONResponse:
     """使用刷新令牌获取新的访问令牌。刷新令牌可以来自 Cookie 或请求头。
@@ -98,7 +99,7 @@ async def refresh_token(
             code=status.HTTP_401_UNAUTHORIZED,
         )
 
-    result = await user_service.refresh_user_token(token, redis)
+    result = await state.user_svc.refresh_user_token(token, redis)
     if result is None:
         raise APIError(
             message="无效的刷新令牌或已过期",
@@ -130,17 +131,17 @@ async def refresh_token(
 async def login(
     request: Request,
     data: LoginIn,
-    user_service: UserService = Depends(user_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
     redis: AsyncRedis = Depends(get_redis),
 ) -> JSONResponse:
     """使用用户名和密码登录，成功后返回访问令牌和刷新令牌。
 
     param:
         data: 包含 username 和 password 的请求体
-        user_service: 用户服务实例
     """
-    user: User | None = await user_service.authenticate_user(
-        data.username, data.password
+    user: User | None = await state.user_svc.authenticate_user(
+        session, data.username, data.password
     )
 
     if user is None:
@@ -149,9 +150,9 @@ async def login(
             code=status.HTTP_401_UNAUTHORIZED,
         )
 
-    await user_service.record_login(user, request)
-    tokens = await user_service.create_tokens(user, redis)
-    login_data = user_service.build_login_data(user, tokens["refresh_token"])
+    await state.user_svc.record_login(session, user, request)
+    tokens = await state.user_svc.create_tokens(user, redis)
+    login_data = state.user_svc.build_login_data(user, tokens["refresh_token"])
     return _build_login_response(
         login_data, tokens["access_token"], tokens["refresh_token"]
     )
@@ -160,10 +161,11 @@ async def login(
 @router.post("/logout")
 async def logout(
     user: User = Depends(get_current_user_full),
-    user_service: UserService = Depends(user_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
     redis: AsyncRedis = Depends(get_redis),
 ):
-    await user_service.logout(user, redis)
+    await state.user_svc.logout(session, user, redis)
 
     cookie_domain = settings.COOKIE_DOMAIN
     response = envelope_response(
@@ -177,10 +179,11 @@ async def logout(
 async def update_user_settings(
     data: UserSettingsIn,
     user: User = Depends(get_current_user_full),
-    user_service: UserService = Depends(user_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
     try:
-        result = await user_service.update_settings(user, data)
+        result = await state.user_svc.update_settings(session, user, data)
     except Exception:
         raise APIError(
             message="Username already exists.",
@@ -197,9 +200,10 @@ async def update_user_settings(
 async def upload_avatar(
     image: Annotated[UploadFile, File()],
     user: User = Depends(get_current_user_full),
-    user_service: UserService = Depends(user_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
-    result = await user_service.upload_avatar(user, image)
+    result = await state.user_svc.upload_avatar(session, user, image)
 
     return APIResponse(
         data=result,
@@ -210,9 +214,10 @@ async def upload_avatar(
 @router.get("/me")
 async def me(
     current_user: int = Depends(manager),
-    user_service: UserService = Depends(user_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
-    result = await user_service.get_user_with_profile(current_user)
+    result = await state.user_svc.get_user_with_profile(session, current_user)
     if result is None:
         raise APIError(
             message="用户不存在",
@@ -220,7 +225,7 @@ async def me(
         )
     user, profile = result
     return APIResponse(
-        data=user_service.user_to_dict(user, profile),
+        data=state.user_svc.user_to_dict(user, profile),
         message="获取用户信息成功",
     )
 
@@ -228,10 +233,12 @@ async def me(
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register(
     data: RegisterIn,
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
     redis: AsyncRedis = Depends(get_redis),
-    user_service: UserService = Depends(user_service_dep),
 ):
-    user = await user_service.register_user(
+    user = await state.user_svc.register_user(
+        session,
         username=data.username,
         password=data.password,
         email=data.email,
@@ -257,8 +264,8 @@ async def register(
 @router.post("/email/code")
 async def send_email_code(
     email: EmailSchema,
+    state: AppState = Depends(get_app_state),
     redis: AsyncRedis = Depends(get_redis),
-    user_service: UserService = Depends(user_service_dep),
 ):
     email_addr = email.email
     try:
@@ -273,7 +280,7 @@ async def send_email_code(
             code=status.HTTP_400_BAD_REQUEST,
         ) from None
 
-    code = await user_service.send_verification_code(email_addr, redis)
+    code = await state.user_svc.send_verification_code(email_addr, redis)
     if code is None:
         raise APIError(
             message="验证码存储失败",
@@ -307,12 +314,13 @@ async def send_email_code(
 @router.get("/passkey/registration-options")
 async def passkey_registration_options(
     user: User = Depends(get_current_user_full),
-    user_services: UserServices = Depends(user_services_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
     redis: AsyncRedis = Depends(get_redis),
 ):
     try:
-        options = await user_services.passkey.create_registration_options(
-            redis, user
+        options = await state.passkey_svc.create_registration_options(
+            session, redis, user
         )
         return APIResponse(
             data=options_to_json_dict(options),
@@ -330,14 +338,15 @@ async def passkey_register(
     request: Request,
     body: PasskeyRegistrationRequest,
     user: User = Depends(get_current_user_full),
-    user_services: UserServices = Depends(user_services_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
     redis: AsyncRedis = Depends(get_redis),
 ):
     # Use configured origin (the frontend domain), not request.base_url
     # because the browser sends the page origin, not the API host
     origin = settings.WEBAUTHN_ORIGIN
-    error = await user_services.passkey.complete_passkey_registration(
-        user, body.response, redis, origin
+    error = await state.passkey_svc.complete_passkey_registration(
+        session, user, body.response, redis, origin
     )
     if error:
         raise APIError(message=error, code=status.HTTP_400_BAD_REQUEST)
@@ -347,10 +356,10 @@ async def passkey_register(
 
 @router.get("/passkey/authentication-options")
 async def passkey_authentication_options(
+    state: AppState = Depends(get_app_state),
     redis: AsyncRedis = Depends(get_redis),
-    user_services: UserServices = Depends(user_services_dep),
 ):
-    options = await user_services.passkey.create_options(redis)
+    options = await state.passkey_svc.create_options(redis)
     return APIResponse(
         data=options_to_json_dict(options),
         message="Passkey 认证选项生成成功",
@@ -360,9 +369,10 @@ async def passkey_authentication_options(
 @router.delete("/passkey/delete")
 async def passkey_delete(
     user: User = Depends(get_current_user_full),
-    user_services: UserServices = Depends(user_services_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
-    success = await user_services.passkey.delete_passkey(user)
+    success = await state.passkey_svc.delete_passkey(session, user)
     if not success:
         raise APIError(
             message="您的账户尚未绑定Passkey",
@@ -375,18 +385,19 @@ async def passkey_delete(
 async def passkey_authenticate(
     request: Request,
     assertion: PasskeyAuthRequest,
-    user_services: UserServices = Depends(user_services_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
     redis: AsyncRedis = Depends(get_redis),
 ):
-    user, tokens, error = await user_services.passkey.complete_passkey_login(
-        assertion.assertion, redis, request
+    user, tokens, error = await state.passkey_svc.complete_passkey_login(
+        session, assertion.assertion, redis, request
     )
     if error or user is None or tokens is None:
         raise APIError(
             message=error or "认证失败", code=status.HTTP_400_BAD_REQUEST
         )
 
-    login_data = user_services.user.build_login_data(
+    login_data = state.user_svc.build_login_data(
         user, tokens["refresh_token"]
     )
     return _build_login_response(
@@ -405,10 +416,10 @@ async def passkey_authenticate(
 @router.get("/github")
 async def github_login(
     request: Request,
-    user_services: UserServices = Depends(user_services_dep),
+    state: AppState = Depends(get_app_state),
 ):
-    auth_url, state, code_verifier, mode = (
-        user_services.github.generate_oauth_url(mode="login")
+    auth_url, _oauth_state, code_verifier, mode = (
+        state.github_svc.generate_oauth_url(mode="login")
     )
     request.session["oauth_state"] = state
     request.session["code_verifier"] = code_verifier
@@ -420,10 +431,10 @@ async def github_login(
 async def github_bind(
     request: Request,
     current_user: int = Depends(manager),
-    user_services: UserServices = Depends(user_services_dep),
+    state: AppState = Depends(get_app_state),
 ):
-    auth_url, state, code_verifier, mode = (
-        user_services.github.generate_oauth_url(mode="bind")
+    auth_url, _oauth_state, code_verifier, mode = (
+        state.github_svc.generate_oauth_url(mode="bind")
     )
     request.session["oauth_state"] = state
     request.session["code_verifier"] = code_verifier
@@ -434,13 +445,14 @@ async def github_bind(
 @router.post("/github/unbind")
 async def github_unbind(
     current_user: User = Depends(get_current_user_full),
-    user_services: UserServices = Depends(user_services_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
     url = settings.FRONTEND_URL + "/settings?error=github_not_bound"
     if not current_user.github_id:
         return RedirectResponse(url=url)
 
-    await user_services.github.unbind_github(current_user)
+    await state.github_svc.unbind_github(session, current_user)
     return RedirectResponse(
         url=settings.FRONTEND_URL + "/settings?success=github_unbound"
     )
@@ -451,7 +463,8 @@ async def github_callback(
     request: Request,
     code: str,
     state: str,
-    user_services: UserServices = Depends(user_services_dep),
+    app_state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
     redis: AsyncRedis = Depends(get_redis),
 ):
     if state != request.session.get("oauth_state"):
@@ -467,10 +480,10 @@ async def github_callback(
 
     # Exchange code for access token
     try:
-        access_token = await user_services.github.exchange_github_code(
+        access_token = await app_state.github_svc.exchange_github_code(
             code, code_verifier
         )
-        github_user = await user_services.github.fetch_github_user_info(
+        github_user = await app_state.github_svc.fetch_github_user_info(
             access_token
         )
     except GitHubAuthError as e:
@@ -497,8 +510,8 @@ async def github_callback(
                 url=settings.FRONTEND_URL + "/settings?error=not_logged_in"
             )
 
-        result = await user_services.github.bind_github(
-            current_user, github_id, avatar_url
+        result = await app_state.github_svc.bind_github(
+            session, current_user, github_id, avatar_url
         )
         if result == "github_already_bound":
             return RedirectResponse(
@@ -510,10 +523,10 @@ async def github_callback(
             url=settings.FRONTEND_URL + "/settings?success=github_bound"
         )
     else:
-        user = await user_services.github.handle_github_login_callback(
-            github_id, username, email, avatar_url, request
+        user = await app_state.github_svc.handle_github_login_callback(
+            session, github_id, username, email, avatar_url, request
         )
-        tokens = await user_services.user.create_tokens(user, redis)
+        tokens = await app_state.user_svc.create_tokens(user, redis)
 
         response = RedirectResponse(url=settings.FRONTEND_URL)
         cookie_domain = settings.COOKIE_DOMAIN

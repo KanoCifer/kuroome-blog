@@ -2,12 +2,14 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Query
 from fastapi.sse import EventSourceResponse
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.des.appstate import get_app_state
 from app.api.des.auth import get_admin_user
-from app.api.des.des import monitor_service_dep
+from app.api.des.db import get_session
+from app.appstate import AppState
 from app.core.response import APIResponse
 from app.models.models import User
-from app.services.monitor_service import MonitorService
 
 router = APIRouter(prefix="/status", tags=["monitor-status"])
 
@@ -19,9 +21,10 @@ MAX_DAYS = 90
 async def get_overview(
     days: int = Query(DEFAULT_DAYS, ge=1, le=MAX_DAYS, description="统计天数"),
     current_user: User = Depends(get_admin_user),
-    monitor_service: MonitorService = Depends(monitor_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
-    payload = await monitor_service.get_overview(days)
+    payload = await state.monitor_svc.get_overview(session, days)
 
     return APIResponse(
         data=payload,
@@ -35,9 +38,10 @@ async def get_visitors(
     page: int = Query(1, ge=1, description="页码"),
     page_size: int = Query(20, ge=1, le=100, description="每页数量"),
     current_user: User = Depends(get_admin_user),
-    monitor_service: MonitorService = Depends(monitor_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
-    payload = await monitor_service.get_visitors(days, page, page_size)
+    payload = await state.monitor_svc.get_visitors(session, days, page, page_size)
 
     return APIResponse(
         data=payload,
@@ -51,9 +55,10 @@ async def get_user_logins(
     page: int = Query(1, ge=1, description="页码"),
     page_size: int = Query(20, ge=1, le=100, description="每页数量"),
     current_user: User = Depends(get_admin_user),
-    monitor_service: MonitorService = Depends(monitor_service_dep),
+    state: AppState = Depends(get_app_state),
+    session: AsyncSession = Depends(get_session),
 ):
-    payload = await monitor_service.get_user_logins(days, page, page_size)
+    payload = await state.monitor_svc.get_user_logins(session, days, page, page_size)
 
     return APIResponse(
         data=payload,
@@ -64,9 +69,9 @@ async def get_user_logins(
 @router.get("/server/status")
 async def get_server_status(
     current_user: User = Depends(get_admin_user),
-    monitor_service: MonitorService = Depends(monitor_service_dep),
+    state: AppState = Depends(get_app_state),
 ):
-    payload = await monitor_service.get_server_status()
+    payload = await state.monitor_svc.get_server_status()
 
     return APIResponse(
         data=payload,
@@ -77,7 +82,7 @@ async def get_server_status(
 @router.get("/server/status/stream", response_class=EventSourceResponse)
 async def get_server_status_stream(
     current_user: User = Depends(get_admin_user),
-    monitor_service: MonitorService = Depends(monitor_service_dep),
+    state: AppState = Depends(get_app_state),
 ):
-    async for data in monitor_service.stream_server_status():
+    async for data in state.monitor_svc.stream_server_status():
         yield data

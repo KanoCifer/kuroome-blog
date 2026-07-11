@@ -15,8 +15,8 @@ pytestmark = pytest.mark.asyncio(loop_scope="session")
 
 
 @pytest_asyncio.fixture
-async def monitor_repo(db_session):
-    return MonitorRepo(db_session)
+def monitor_repo():
+    return MonitorRepo()
 
 
 def _make_visit(**overrides):
@@ -41,61 +41,61 @@ def _make_visit(**overrides):
 
 
 @pytest.mark.asyncio
-async def test_count_visits_between(monitor_repo):
+async def test_count_visits_between(monitor_repo, db_session):
     now = datetime.now(UTC)
     past = now - timedelta(hours=1)
     future = now + timedelta(hours=1)
 
-    monitor_repo.session.add(_make_visit(visit_time=past))
-    monitor_repo.session.add(_make_visit(visit_time=now))
-    monitor_repo.session.add(_make_visit(visit_time=future))
-    await monitor_repo.session.flush()
+    db_session.add(_make_visit(visit_time=past))
+    db_session.add(_make_visit(visit_time=now))
+    db_session.add(_make_visit(visit_time=future))
+    await db_session.flush()
 
     start = now - timedelta(minutes=30)
     end = now + timedelta(minutes=30)
-    count = await monitor_repo.count_visits_between(start, end)
+    count = await monitor_repo.count_visits_between(db_session, start, end)
     assert count == 1
 
 
 @pytest.mark.asyncio
-async def test_count_unique_visitors_between(monitor_repo):
+async def test_count_unique_visitors_between(monitor_repo, db_session):
     now = datetime.now(UTC)
-    monitor_repo.session.add(_make_visit(visitor_id="v1", visit_time=now))
-    monitor_repo.session.add(_make_visit(visitor_id="v1", visit_time=now))
-    monitor_repo.session.add(_make_visit(visitor_id="v2", visit_time=now))
-    await monitor_repo.session.flush()
+    db_session.add(_make_visit(visitor_id="v1", visit_time=now))
+    db_session.add(_make_visit(visitor_id="v1", visit_time=now))
+    db_session.add(_make_visit(visitor_id="v2", visit_time=now))
+    await db_session.flush()
 
     count = await monitor_repo.count_unique_visitors_between(
-        now - timedelta(minutes=1), now + timedelta(minutes=1)
+        db_session, now - timedelta(minutes=1), now + timedelta(minutes=1)
     )
     assert count == 2
 
 
 @pytest.mark.asyncio
-async def test_count_unique_ips_between(monitor_repo):
+async def test_count_unique_ips_between(monitor_repo, db_session):
     now = datetime.now(UTC)
-    monitor_repo.session.add(_make_visit(ip_address="1.1.1.1", visit_time=now))
-    monitor_repo.session.add(_make_visit(ip_address="1.1.1.1", visit_time=now))
-    monitor_repo.session.add(_make_visit(ip_address="2.2.2.2", visit_time=now))
-    await monitor_repo.session.flush()
+    db_session.add(_make_visit(ip_address="1.1.1.1", visit_time=now))
+    db_session.add(_make_visit(ip_address="1.1.1.1", visit_time=now))
+    db_session.add(_make_visit(ip_address="2.2.2.2", visit_time=now))
+    await db_session.flush()
 
     count = await monitor_repo.count_unique_ips_between(
-        now - timedelta(minutes=1), now + timedelta(minutes=1)
+        db_session, now - timedelta(minutes=1), now + timedelta(minutes=1)
     )
     assert count == 2
 
 
 @pytest.mark.asyncio
-async def test_get_top_pages_between(monitor_repo):
+async def test_get_top_pages_between(monitor_repo, db_session):
     now = datetime.now(UTC)
     for _ in range(5):
-        monitor_repo.session.add(_make_visit(page_path="/popular", visit_time=now))
+        db_session.add(_make_visit(page_path="/popular", visit_time=now))
     for _ in range(2):
-        monitor_repo.session.add(_make_visit(page_path="/less", visit_time=now))
-    await monitor_repo.session.flush()
+        db_session.add(_make_visit(page_path="/less", visit_time=now))
+    await db_session.flush()
 
     top = await monitor_repo.get_top_pages_between(
-        now - timedelta(minutes=1), now + timedelta(minutes=1), limit=2
+        db_session, now - timedelta(minutes=1), now + timedelta(minutes=1), limit=2
     )
     assert len(top) == 2
     assert top[0]["page_path"] == "/popular"
@@ -103,21 +103,21 @@ async def test_get_top_pages_between(monitor_repo):
 
 
 @pytest.mark.asyncio
-async def test_get_browser_stats_between(monitor_repo):
+async def test_get_browser_stats_between(monitor_repo, db_session):
     now = datetime.now(UTC)
-    monitor_repo.session.add(
+    db_session.add(
         _make_visit(browser_name="Chrome", visitor_id="v1", visit_time=now)
     )
-    monitor_repo.session.add(
+    db_session.add(
         _make_visit(browser_name="Chrome", visitor_id="v2", visit_time=now)
     )
-    monitor_repo.session.add(
+    db_session.add(
         _make_visit(browser_name="Firefox", visitor_id="v3", visit_time=now)
     )
-    await monitor_repo.session.flush()
+    await db_session.flush()
 
     stats = await monitor_repo.get_browser_stats_between(
-        now - timedelta(minutes=1), now + timedelta(minutes=1)
+        db_session, now - timedelta(minutes=1), now + timedelta(minutes=1)
     )
     assert len(stats) == 2
     assert stats[0]["browser_name"] == "Chrome"
@@ -125,84 +125,84 @@ async def test_get_browser_stats_between(monitor_repo):
 
 
 @pytest.mark.asyncio
-async def test_get_os_stats_between(monitor_repo):
+async def test_get_os_stats_between(monitor_repo, db_session):
     now = datetime.now(UTC)
-    monitor_repo.session.add(
+    db_session.add(
         _make_visit(os_name="macOS", visitor_id="v1", visit_time=now)
     )
-    monitor_repo.session.add(
+    db_session.add(
         _make_visit(os_name="Windows", visitor_id="v2", visit_time=now)
     )
-    await monitor_repo.session.flush()
+    await db_session.flush()
 
     stats = await monitor_repo.get_os_stats_between(
-        now - timedelta(minutes=1), now + timedelta(minutes=1)
+        db_session, now - timedelta(minutes=1), now + timedelta(minutes=1)
     )
     assert len(stats) == 2
 
 
 @pytest.mark.asyncio
-async def test_get_device_stats_between(monitor_repo):
+async def test_get_device_stats_between(monitor_repo, db_session):
     now = datetime.now(UTC)
-    monitor_repo.session.add(
+    db_session.add(
         _make_visit(device_type="desktop", visitor_id="v1", visit_time=now)
     )
-    monitor_repo.session.add(
+    db_session.add(
         _make_visit(device_type="mobile", visitor_id="v2", visit_time=now)
     )
-    monitor_repo.session.add(
+    db_session.add(
         _make_visit(device_type="mobile", visitor_id="v3", visit_time=now)
     )
-    await monitor_repo.session.flush()
+    await db_session.flush()
 
     stats = await monitor_repo.get_device_stats_between(
-        now - timedelta(minutes=1), now + timedelta(minutes=1)
+        db_session, now - timedelta(minutes=1), now + timedelta(minutes=1)
     )
     assert stats[0]["device_type"] == "mobile"
     assert stats[0]["count"] == 2
 
 
 @pytest.mark.asyncio
-async def test_count_visits_since(monitor_repo):
+async def test_count_visits_since(monitor_repo, db_session):
     now = datetime.now(UTC)
     old = now - timedelta(days=10)
-    monitor_repo.session.add(_make_visit(visit_time=old))
-    monitor_repo.session.add(_make_visit(visit_time=now))
-    await monitor_repo.session.flush()
+    db_session.add(_make_visit(visit_time=old))
+    db_session.add(_make_visit(visit_time=now))
+    await db_session.flush()
 
-    count = await monitor_repo.count_visits_since(now - timedelta(days=1))
+    count = await monitor_repo.count_visits_since(db_session, now - timedelta(days=1))
     assert count == 1
 
 
 @pytest.mark.asyncio
-async def test_list_visitors_since(monitor_repo):
+async def test_list_visitors_since(monitor_repo, db_session):
     now = datetime.now(UTC)
     old = now - timedelta(days=10)
-    monitor_repo.session.add(_make_visit(visit_time=old, visitor_id="old"))
-    monitor_repo.session.add(_make_visit(visit_time=now, visitor_id="new"))
-    await monitor_repo.session.flush()
+    db_session.add(_make_visit(visit_time=old, visitor_id="old"))
+    db_session.add(_make_visit(visit_time=now, visitor_id="new"))
+    await db_session.flush()
 
     results = await monitor_repo.list_visitors_since(
-        now - timedelta(days=1), offset=0, limit=10
+        db_session, now - timedelta(days=1), offset=0, limit=10
     )
     assert len(results) == 1
     assert results[0].visitor_id == "new"
 
 
 @pytest.mark.asyncio
-async def test_list_visitors_since_pagination(monitor_repo):
+async def test_list_visitors_since_pagination(monitor_repo, db_session):
     now = datetime.now(UTC)
     for i in range(5):
-        monitor_repo.session.add(
+        db_session.add(
             _make_visit(visitor_id=f"v{i}", visit_time=now)
         )
-    await monitor_repo.session.flush()
+    await db_session.flush()
 
     page1 = await monitor_repo.list_visitors_since(
-        now - timedelta(minutes=1), offset=0, limit=2
+        db_session, now - timedelta(minutes=1), offset=0, limit=2
     )
     page2 = await monitor_repo.list_visitors_since(
-        now - timedelta(minutes=1), offset=2, limit=2
+        db_session, now - timedelta(minutes=1), offset=2, limit=2
     )
     assert len(page1) == 2
     assert len(page2) == 2
@@ -219,11 +219,11 @@ async def test_list_users_with_login_records(monitor_repo, db_session):
     db_session.add_all([u1, u2, u3])
     await db_session.flush()
 
-    results = await monitor_repo.list_users_with_login_records()
+    results = await monitor_repo.list_users_with_login_records(db_session)
     assert len(results) == 2
     assert all(u.login_count > 0 for u in results)
 
 
 @pytest.mark.asyncio
-async def test_list_users_by_ids_empty(monitor_repo):
-    assert await monitor_repo.list_users_by_ids([]) == []
+async def test_list_users_by_ids_empty(monitor_repo, db_session):
+    assert await monitor_repo.list_users_by_ids(db_session, []) == []

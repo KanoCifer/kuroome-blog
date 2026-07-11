@@ -16,8 +16,8 @@ pytestmark = pytest.mark.asyncio(loop_scope="session")
 
 
 @pytest_asyncio.fixture
-async def system_service(db_session):
-    return SystemService(EventRepo(db_session))
+async def system_service():
+    return SystemService(EventRepo())
 
 
 def _make_event(**overrides):
@@ -34,8 +34,8 @@ def _make_event(**overrides):
 
 
 @pytest.mark.asyncio
-async def test_list_events_empty(system_service):
-    items, pagination = await system_service.list_events()
+async def test_list_events_empty(system_service, db_session):
+    items, pagination = await system_service.list_events(db_session)
     assert items == []
     assert pagination.total == 0
     assert pagination.pages == 0
@@ -47,7 +47,7 @@ async def test_list_events_returns_items(system_service, db_session):
     db_session.add(_make_event(message="event2"))
     await db_session.flush()
 
-    items, pagination = await system_service.list_events()
+    items, pagination = await system_service.list_events(db_session)
     assert pagination.total == 2
     assert len(items) == 2
     assert pagination.has_prev is False
@@ -61,7 +61,7 @@ async def test_list_events_pagination(system_service, db_session):
     await db_session.flush()
 
     items, pagination = await system_service.list_events(
-        page=1, per_page=2
+        db_session, page=1, per_page=2
     )
     assert pagination.total == 5
     assert pagination.pages == 3
@@ -69,7 +69,7 @@ async def test_list_events_pagination(system_service, db_session):
     assert pagination.has_next is True
     assert pagination.next_num == 2
 
-    items2, _ = await system_service.list_events(page=3, per_page=2)
+    items2, _ = await system_service.list_events(db_session, page=3, per_page=2)
     assert len(items2) == 1
 
 
@@ -80,7 +80,7 @@ async def test_list_events_filter_by_type(system_service, db_session):
     db_session.add(_make_event(type="startup", message="startup-event2"))
     await db_session.flush()
 
-    items, pagination = await system_service.list_events(type="startup")
+    items, pagination = await system_service.list_events(db_session, type="startup")
     assert pagination.total == 2
     assert all(item.type == "startup" for item in items)
 
@@ -92,7 +92,7 @@ async def test_list_events_per_page_clamped(system_service, db_session):
     await db_session.flush()
 
     items, pagination = await system_service.list_events(
-        per_page=9999
+        db_session, per_page=9999
     )
     assert pagination.per_page == 200
     assert len(items) == 5
@@ -103,6 +103,6 @@ async def test_list_events_page_minimum_one(system_service, db_session):
     db_session.add(_make_event(message="event1"))
     await db_session.flush()
 
-    items, pagination = await system_service.list_events(page=0)
+    items, pagination = await system_service.list_events(db_session, page=0)
     assert pagination.page == 1
     assert len(items) == 1

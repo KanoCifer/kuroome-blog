@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 
 import pytest
 import pytest_asyncio
@@ -91,34 +92,47 @@ async def db_session(db_engine, tables) -> AsyncGenerator[AsyncSession]:
 
 
 # ─────────────────────────────────────────────────────────────────
-# Phase 4 — API test fixtures
+# Phase 5 — API test fixtures (AppState DI) ─────────────────────
 # ─────────────────────────────────────────────────────────────────
 
 
+@asynccontextmanager
+async def _test_lifespan(app):
+    """Minimal lifespan: construct AppState without Redis/Mongo/Taskiq."""
+    from app.appstate import new_app_state
+
+    app.state.services = new_app_state(None)  # type: ignore[arg-type]
+    yield
+
+
 @pytest_asyncio.fixture
-async def api_app(db_session, api_user) -> AsyncGenerator:
-    """Lightweight FastAPI app for API tests.
+async def api_app(db_session) -> AsyncGenerator:
+    """Lightweight FastAPI app for API tests — Phase 5 AppState 模式.
 
-    Includes routers + exception handlers but **no lifespan** (no
-    Mongo/Redis/Taskiq initialization).  Overrides ``manager`` to
-    return the test user's ID, and overrides service dependencies
-    to use ``db_session`` instead of the production engine.
-
-    Depends on ``api_user`` so the global user ID is always set
-    before the auth override lambda runs.
+    不经过 main.py lifespan（无 Mongo/Redis/Taskiq 依赖），
+    用 _test_lifespan 手动构造 AppState 单例。
+    router 通过 ``Depends(get_app_state)`` 获取 ``state``、
+    通过 ``Depends(get_session)`` 获取请求级 session —— 这里覆盖
+    ``get_session`` 让它始终返回 rollback-isolated ``db_session``。
     """
     from fastapi import FastAPI
 
+    from app.api.des.db import get_session
     from app.api.des.auth import manager
     from app.core import register_exception_handlers
     from app.router import register_router
 
-    test_app = FastAPI()
+    test_app = FastAPI(lifespan=_test_lifespan)
     register_router(test_app)
     register_exception_handlers(test_app)
 
-    # Auth: return the test user's ID (set by ``api_user`` fixture
-    # via the ``_api_user_id`` session attribute).
+    # Inject the rollback-isolated session into the DI graph.
+    async def _session_override():
+        yield db_session
+
+    test_app.dependency_overrides[get_session] = _session_override
+
+    # Auth: return the test user's ID (set by ``api_user`` fixture).
     test_app.dependency_overrides[manager] = lambda: _get_api_user_id()
 
     yield test_app
