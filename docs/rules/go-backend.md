@@ -38,6 +38,9 @@ go test ./...            # 全量单测（handler/service/dto/middleware/jwt 均
 - `middleware/auth.go` — JWT 校验（`Authorization: Bearer`）
 - `middleware/ratelimit.go` — Redis 滑动窗口限速，key `rl:{scope}:{ip}`，超限返回 429 + `Retry-After`
 - `middleware/cors.go` — CORS（白名单由 `AMAP_KEY_ALLOWED_ORIGINS` 等配置控制）
+- `middleware/slog.go` — Gin 官方推荐的 slog access log 中间件（`method/path/status/latency/trace_id` 单行结构化输出），替代 gin 默认 plaintext Logger
+- `middleware/trace.go` — trace_id 注入，Slog 中间件读取同一值保证 access log 与 handler 日志串联
+- `middleware/duration.go` — 请求起始时间，供 response 层写 `X-Process-Time` 头
 
 ## GitHub OAuth
 

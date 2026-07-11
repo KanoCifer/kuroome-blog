@@ -5,6 +5,7 @@
 package router
 
 import (
+	"log/slog"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -19,6 +20,8 @@ import (
 func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
 	r.Use(middleware.Duration())
 	r.Use(middleware.Trace())
+	// Slog 在 Trace 之后，才能读到 trace_id。
+	r.Use(middleware.SlogMiddleware(slog.Default()))
 	r.Use(middleware.CORS())
 
 	v3 := r.Group("/api/v3")

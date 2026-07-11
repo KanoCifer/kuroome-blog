@@ -51,12 +51,15 @@ func main() {
 	}
 	defer db.Close()
 
-	// 收口 gin 内部日志到 slog。访问日志由 Trace 中间件在 handler 层记录，
-	// 不再输出 uvicorn 风格的独立 access 行。
+	// 收口 gin 内部日志到 slog。访问日志由 SlogMiddleware 单行结构化输出，
+	// 不再经过 gin 默认的 plaintext Logger。
 	gin.DefaultWriter = logger.GinLogWriter{}
 	gin.DefaultErrorWriter = logger.GinLogWriter{}
 
-	r := gin.Default()
+	// gin.New() 而非 gin.Default()：收口 gin 内部日志到 slog（见 GinLogWriter）后，
+	// 显式挂载 Recovery + SlogMiddleware，替代默认的 plaintext Logger。
+	r := gin.New()
+	r.Use(gin.Recovery())
 
 	wa, err := service.NewWebAuthn(config.Cfg.WebAuthn.RPID, config.Cfg.WebAuthn.Origin)
 	if err != nil {
