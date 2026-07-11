@@ -12,12 +12,13 @@ go test ./...            # 全量单测（handler/service/dto/middleware/jwt 均
 
 ## 框架 & 分层
 
-- **框架**：Gin + GORM(PostgreSQL) + MongoDB driver(v2) + go-redis(v9)；JWT HS256 + bcrypt；配置用 Viper
+- **框架**：Gin + SQL 直连(PostgreSQL) + MongoDB driver(v2) + go-redis(v9)；JWT HS256 + bcrypt；配置用 Viper + 环境变量
 - **分层**：`handler → service → repository → model`，响应统一包 `internal/response/`（`Success` / `APIError` 封装 `{data, message}` 信封）
 - **解耦**：handler 通过接口（`UserService` / `AdminService`）依赖 service，便于 mock 测试
-- **包布局**：`internal/{config,db,dto,handler,middleware,model,mongo,repository,response,service,router}`；`pkg/jwt`（JWT 工具）；`pkg/notification/`（通知通道）；`logger/`（独立日志包）
+- **包布局**：`internal/{app,config,db,dto,errs,handler,logger,middleware,model,mongo,repository,response,router,service}`；`pkg/jwt`（JWT 工具）；`pkg/notification/`（通知通道）
 - **命名对齐**：复用 Python 后端的 `.env`（`DATABASE_URL / SECRET_KEY / REDIS_URL / MONGO_URI / PORT` 等）
 - **配置注入**：新 service/handler 通过构造函数接收配置，避免直接读取全局 `config.Cfg`（旧代码仍有残留，迁移中）
+- **日志**：`internal/logger/` 基于 `log/slog`，双文件路由（app_info / app_error）+ trace_id 注入 + lumberjack 轮转
 
 ## 鉴权
 
@@ -48,12 +49,11 @@ go test ./...            # 全量单测（handler/service/dto/middleware/jwt 均
 
 ## Docker & 部署
 
-- `go-backend/Dockerfile` — Go 服务镜像
-- `docker-compose.yml`（根目录）— 应用服务编排；`docker-compose.infra.yml` — 基础设施（Postgres/Redis/Mongo）
+- `go-backend/Dockerfile` — 多阶段构建（golang-alpine → alpine），Alpine 最小镜像
 - 部署脚本：`backend/deploy.sh`（Python 后端）；Go 部署见 `cmd/server`
 
 ## 已知遗留
 
-- `internal/router/` 当前为空 —— 路由在 `cmd/server/main.go` 经 `handler.RegisterRoutes(...)` 内联注册到 `/api/v3` 组
 - `internal/repository/mongo/`、`internal/domain/`、`internal/infra/` 仅规划、尚未创建目录
 - Mongo repo 误置于 `internal/repository/postgres/`（package 名 `postgres`，实际走 MongoDB `posts` 集合）；文档模型在 `internal/mongo/document/`
+- 部分旧 handler 仍直接读取全局 `config.Cfg`，未完成构造函数注入迁移

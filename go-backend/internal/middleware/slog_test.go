@@ -45,13 +45,13 @@ func TestSlogMiddleware(t *testing.T) {
 
 	// 核心字段存在且值正确。
 	checks := map[string]any{
-		"level":    "INFO",
-		"msg":      "request",
-		"method":   "GET",
-		"path":     "/ping",
-		"query":    "k=v",
-		"status":   float64(200), // JSON numbers decode as float64
-		"trace_id": "abc123",
+		"level":     "INFO",
+		"msg":       "request",
+		"method":    "GET",
+		"path":      "/ping",
+		"query":     "k=v",
+		"status":    float64(200), // JSON numbers decode as float64
+		"trace_id":  "abc123",
 		"client_ip": "192.0.2.1",
 	}
 	for k, want := range checks {

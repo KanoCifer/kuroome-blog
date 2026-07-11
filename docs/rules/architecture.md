@@ -2,7 +2,7 @@
 
 ## Overview
 
-- Backend: FastAPI + SQLAlchemy 2.0 async (PostgreSQL) + Beanie ODM (MongoDB) + Redis 8 + structlog (Taskiq 异步落库)
+- Backend: FastAPI + SQLAlchemy 2.0 async (PostgreSQL) + Beanie ODM (MongoDB) + Redis 8 + structlog（双文件路由 + event 表落库）; Go 后端 (`go-backend/`) 使用 slog + 同构 `.env`，路由 `/api/v3/*`，逐步承载认证/Blog/Admin
 - Desktop: Vue 3.5 (`frontend/`) + Vite 8 + Tailwind CSS v4 + Pinia 3
 - Mobile: React 19 (`react-app/`) + Vite 8 + Tailwind CSS v4 + Zustand 5
 - Domain terms: see [domain.md](domain.md)
@@ -43,4 +43,4 @@ Vue (`frontend/`) and React (`react-app/`) share backend services but maintain i
 - **Response format**: unified `APIResponse(message, data)` envelope
 - **Auth**: JWT (12h access + 30d refresh) + SameSite Cookie (CSRF removed in favor of SameSite)
 - **Task queue**: Taskiq + RabbitMQ for async background jobs
-- **Logging**: structlog → stdlib `ProcessorFormatter` → three files (info/error/access) + DB persist (WARNING+ or `persist=True`)
+- **Logging**: structlog → stdlib `ProcessorFormatter` → 双文件 (info/error)；关键业务事件走 `event` 表（startup/deploy/notify_failure），不再通过 HTTP 端点分页查询日志

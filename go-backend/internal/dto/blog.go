@@ -33,9 +33,9 @@ type PaginationOut struct {
 
 // BlogListOut 博客列表响应 —— 与 Python get_blogs 返回形状一致。
 type BlogListOut struct {
-	Posts      []PostOut      `json:"posts"`
-	Tags       []TagOut       `json:"tags"`
-	Pagination PaginationOut  `json:"pagination"`
+	Posts      []PostOut     `json:"posts"`
+	Tags       []TagOut      `json:"tags"`
+	Pagination PaginationOut `json:"pagination"`
 }
 
 // PostsByTagOut 标签筛选响应 —— 与 Python get_posts_by_tag 返回形状一致。

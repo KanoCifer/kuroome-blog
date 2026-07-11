@@ -14,8 +14,9 @@
 [![Zustand](https://img.shields.io/badge/Zustand-5-FFB000?logo=zustand)](https://zustand-demo.pmnd.rs/)
 [![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3.13-FF6600?logo=rabbitmq)](https://www.rabbitmq.com/)
 [![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite)](https://vitejs.dev/)
+[![Go](https://img.shields.io/badge/Go-1.26-00ADD8?logo=go)](https://go.dev/)
 
-基于 **FastAPI + Vue 3 + React** 的全栈个人网站，支持**桌面端/移动端自动分流**。
+基于 **FastAPI + Go + Vue 3 + React** 的全栈个人网站，支持**桌面端/移动端自动分流**。
 
 > 在线地址: [https://kanocifer.chat](https://kanocifer.chat)
 
@@ -28,18 +29,14 @@
   - [基础设施](#基础设施)
 - [界面预览](#界面预览)
 - [技术栈](#技术栈)
-- [快速开始](#快速开始)
-- [常用命令](#常用命令)
 - [项目结构](#项目结构)
 - [架构设计](#架构设计)
   - [总体架构](#总体架构前后端分离--移动端自动分流)
   - [API 端点](#api-端点-5555)
-  - [最近改动](#最近改动v370--v380)
+  - [最近改动](#最近改动v410--v450)
 - [定时任务](#定时任务)
 - [环境变量](#环境变量)
-- [代码风格](#代码风格)
-- [提交规范](#提交规范)
-- [部署](#部署)
+- [更多信息](#更多信息快速开始--代码风格)
 - [License](#license)
 
 ---
@@ -67,24 +64,25 @@
 
 ### 基础设施
 
-| 功能模块         | 描述                                                                                                      |
-| ---------------- | --------------------------------------------------------------------------------------------------------- |
-| **多主题系统**   | Vue/React 双端 7 套配色方案（森林绿、天空蓝、玫瑰红、薄雾、羊皮纸、鼠尾草、默认），CSS 自定义属性一键切换 |
-| **Bento 首页**   | Vue 端可拖拽重排卡片，支持布局保存/重置；React 端纯 CSS 网格布局                                          |
-| **背景图切换**   | 固定/随机背景图选择器，精选多张高质量背景                                                                 |
-| **通知渠道**     | 飞书 Webhook + Bark 推送 + 邮件（FastMail），Redis 去重 + 分布式锁防并发                                  |
-| **实时访客统计** | WebSocket 在线人数，Redis Set + Hash 多标签页引用计数，Pub/Sub 广播，支持水平扩展                         |
-| **后台监控**     | 访客分析（浏览器/OS/页面/趋势）、登录日志、服务器状态（CPU/内存/磁盘）实时流（仅 Vue 管理端）             |
-| **系统状态页**   | 公开状态页：版本信息、服务指标、系统信息、WebSocket 延迟图、日志查询（`/api/v2/system/log`）              |
-| **SEO 支持**     | robots.txt + sitemap.xml 自动生成（含博客文章），1 小时缓存                                               |
-| **点赞系统**     | 站点级点赞，Redis 存储，每日 25 次限流                                                                    |
-| **AI 天气分析**  | LLM 驱动天气分析流式响应，React 钓鱼地图集成                                                              |
-| **自动分流**     | 根据 User-Agent 自动将移动端路由到 React App，桌面端访问 Vue App                                          |
-| **自动部署**     | Gitee webhook 自动部署，HMAC 签名验证                                                                     |
-| **Cookie 同意**  | GDPR 合规 Cookie 同意弹窗                                                                                 |
-| **后端日志**     | structlog 结构化日志 + Taskiq 异步落库 + 分页查询 API                                                     |
-| **安全**         | JWT（12h access + 30d refresh）+ SameSite Cookie + 权限控制 + WebAuthn/Passkey + GitHub OAuth             |
-| **Go 后端占位**  | `go-backend/` 目录已预留，待未来重写                                                                      |
+| 功能模块         | 描述                                                                                                       |
+| ---------------- | ---------------------------------------------------------------------------------------------------------- |
+| **多主题系统**   | Vue/React 双端 4 套配色方案（paper / sage / mist / blush），CSS 自定义属性一键切换                         |
+| **Bento 首页**   | Vue 端可拖拽重排卡片，支持布局保存/重置；React 端纯 CSS 网格布局                                           |
+| **背景图切换**   | 固定/随机背景图选择器，精选多张高质量背景                                                                  |
+| **通知渠道**     | 飞书 Webhook + Bark 推送 + 邮件（FastMail），Redis 去重 + 分布式锁防并发                                   |
+| **实时访客统计** | WebSocket 在线人数，Redis Set + Hash 多标签页引用计数，Pub/Sub 广播，支持水平扩展                          |
+| **后台监控**     | 访客分析（浏览器/OS/页面/趋势）、登录日志、服务器状态（CPU/内存/磁盘）实时流（仅 Vue 管理端）              |
+| **系统状态页**   | 公开状态页：版本信息、服务指标、系统信息、WebSocket 延迟图、日志查询（`/api/v2/system/log`）               |
+| **SEO 支持**     | robots.txt + sitemap.xml 自动生成（含博客文章），1 小时缓存                                                |
+| **点赞系统**     | 站点级点赞，Redis 存储，每日 25 次限流                                                                     |
+| **AI 天气分析**  | LLM 驱动天气分析流式响应，React 钓鱼地图集成                                                               |
+| **自动分流**     | 根据 User-Agent 自动将移动端路由到 React App，桌面端访问 Vue App                                           |
+| **自动部署**     | Gitee webhook 自动部署，HMAC 签名验证                                                                      |
+| **Cookie 同意**  | GDPR 合规 Cookie 同意弹窗                                                                                  |
+| **后端日志**     | slog 结构化日志（双文件路由 + trace_id + lumberjack 轮转）、event 表 + `/api/v3/system/events` 查询        |
+| **安全**         | JWT（12h access + 30d refresh）+ SameSite Cookie + 权限控制 + WebAuthn/Passkey + GitHub OAuth              |
+| **Go 后端**      | Gin 框架独立服务（`go-backend/`），路由前缀 `/api/v3/*`，已承载认证/Blog/Passkey/Admin，逐步替代 Python 层 |
+| **Docker 支持**  | Go 后端多阶段 Dockerfile + `.dockerignore`， Alpine 最小镜像                                               |
 
 ## 界面预览
 
@@ -96,11 +94,12 @@
 | :---------------------------: | :-----------------------------------: |
 | ![关于](docs/images/关于.png) | ![主题系统](docs/images/主题系统.png) |
 
-Bento 首页支持 13 个卡片拖拽重排与布局保存；7 套配色方案可一键切换，覆盖暗色/亮色模式。
+Bento 首页支持 13 个卡片拖拽重排与布局保存；4 套配色方案可一键切换，覆盖暗色/亮色模式。
 
 ## 技术栈
 
-- **后端**: FastAPI + SQLAlchemy 2.0 + Alembic + PostgreSQL + MongoDB (Beanie) + Redis + Taskiq (RabbitMQ) + 结构化日志（Taskiq 异步落库）
+- **后端**: FastAPI + SQLAlchemy 2.0 + Alembic + PostgreSQL + MongoDB (Beanie) + Redis + Taskiq (RabbitMQ) + slog 结构化日志（双文件路由 + trace_id + lumberjack 轮转）
+- **Go 后端**: Gin + slog + Redis，路由前缀 `/api/v3/*`，多阶段 Docker 构建
 - **桌面端 (Vue)**: Vue 3.5 + TypeScript + Vite 8 + Tailwind CSS v4 + Pinia 3 + motion-v + ECharts 6 + liquid-glass 导航
 - **移动端 (React)**: React 19 + TypeScript + Vite 8 + Tailwind CSS v4 + Zustand 5 + Framer Motion + ECharts 6
 - **AI/智能能力**: Agno + 自建钓点指数推理模型 + LLM 总结/对话（模型可选择）
@@ -171,6 +170,28 @@ backend/app/
 ├── middleware.py             # 中间件注册
 ├── router.py                # 路由注册
 └── main.py                   # FastAPI 入口
+
+go-backend/                     # Go 后端（Gin，路由 /api/v3/*）
+├── cmd/server/                # 入口
+├── internal/
+│   ├── app/                   # AppState 依赖注入容器
+│   ├── config/                # 配置加载（env vars）
+│   ├── db/                    # PostgreSQL 连接
+│   ├── mongo/                 # MongoDB 连接
+│   ├── logger/                # slog 初始化（双文件 + trace_id）
+│   ├── middleware/            # CORS / 限流 / access log / admin
+│   ├── router/                # 路由注册
+│   ├── handler/               # HTTP handlers（auth/blog/admin/passkey/github）
+│   ├── service/               # 业务逻辑层
+│   ├── repository/            # 数据访问层
+│   ├── model/                 # 数据模型
+│   ├── dto/                   # 请求/响应 DTO
+│   ├── response/              # 统一响应封装
+│   └── errs/                  # 错误处理
+├── configs/                   # 配置文件
+├── logs/                      # 日志输出目录
+├── Dockerfile                 # 多阶段构建（golang-alpine → alpine）
+└── go.mod
 
 frontend/src/
 ├── api/                      # API Gateway 层 (按领域拆分，直接调用后端)
@@ -313,7 +334,7 @@ react-app/src/
 
 - **Frontend (Vue 3 + TypeScript)**：桌面端 SPA，负责页面渲染、交互状态管理、路由与鉴权守卫。
 - **React App (React 19 + TypeScript)**：移动端 SPA，针对移动设备优化，提供触控友好的界面。
-- **Backend (FastAPI)**：负责 REST API、业务编排、认证授权、任务调度。
+- **Backend**：Python FastAPI（`/api/v1` + `/api/v2`，业务编排、定时任务）+ Go Gin（`/api/v3`，认证/Blog/Admin，逐步迁移中）。
 - **Data Layer**：PostgreSQL（核心业务数据）+ MongoDB（文档型数据）+ Redis（缓存/会话）+ RabbitMQ（异步队列）。
 
 ```mermaid
@@ -321,13 +342,18 @@ flowchart LR
     U[User Browser] --> D{Mobile?}
     D -->|Yes| R[React App\nm.kanocifer.chat]
     D -->|No| F[Vue App\nkanocifer.chat]
-    F -->|HTTP / SameSite Cookie| B[Backend API\nFastAPI]
+    F -->|HTTP / SameSite Cookie| B[Backend API]
     R -->|HTTP / SameSite Cookie| B
-    B --> PG[(PostgreSQL)]
-    B --> MG[(MongoDB)]
-    B --> RD[(Redis)]
-    B --> RMQ[(RabbitMQ)]
-    B --> TQ[Taskiq Worker]
+    B -->|/api/v1,/api/v2| P[Python\nFastAPI]
+    B -->|/api/v3| G[Gin\ngo-backend]
+    P --> PG[(PostgreSQL)]
+    P --> MG[(MongoDB)]
+    P --> RD[(Redis)]
+    P --> RMQ[(RabbitMQ)]
+    P --> TQ[Taskiq Worker]
+    G --> PG
+    G --> MG
+    G --> RD
 ```
 
 ### Fishing Index 服务架构
@@ -346,11 +372,23 @@ flowchart LR
 
 ### 后端分层设计
 
+#### Python (FastAPI, `/api/v1` + `/api/v2`)
+
 - **API 层 (`api/v1`, `api/v2`)**：参数校验、鉴权、响应封装，不承载复杂业务。
 - **Service 层 (`services`)**：核心业务逻辑，组合仓储与外部依赖。
 - **Repository 层 (`repositories`)**：数据访问抽象，隔离 SQL/ORM 查询细节。
 - **Schema 层 (`schemas`)**：请求/响应模型定义，保证输入输出契约稳定。
 - **Core/Tasks 层 (`core`, `tasks`)**：配置、日志、异常处理、异步任务与定时任务。
+
+#### Go (Gin, `/api/v3`)
+
+- **Router (`internal/router`)**：集中注册所有业务路由，前缀 `/api/v3`。
+- **Handler (`internal/handler`)**：HTTP 请求处理，参数绑定 + 调用 service。
+- **Service (`internal/service`)**：核心业务逻辑。
+- **Repository (`internal/repository`)**：数据访问层。
+- **AppState (`internal/app`)**：依赖注入容器，管理 DB/Redis/Mongo 连接。
+- **Middleware (`internal/middleware`)**：CORS、限流、access log、admin 鉴权。
+- **Logger (`internal/logger`)**：slog 初始化（双文件路由 + trace_id + lumberjack）。
 
 ### 前端模块设计
 
@@ -404,6 +442,22 @@ flowchart LR
 | `/api/v2/devtasks`      | 开发任务看板 (CRUD/排序)                |
 | `/api/v2/system`        | 系统探活与日志 (/, /log)                |
 | `/api/v2/publicv2/ws`   | WebSocket 实时访客统计                  |
+| `/api/v3/auth`          | Go 后端认证 (登录/注册/Passkey/OAuth)   |
+| `/api/v3/blog`          | Go 后端博客只读接口                     |
+| `/api/v3/admin`         | Go 后端管理接口                         |
+| `/api/v3/system/events` | Go 后端事件日志查询                     |
+
+## 最近改动（v4.1.0 – v4.5.0）
+
+| 版本       | 日期  | 主要变更                                                                                       |
+| ---------- | ----- | ---------------------------------------------------------------------------------------------- |
+| **v4.5.0** | 07-11 | DI 依赖注入改造（AppState + session 参数化）、slog access log 中间件、部署/飞书修复            |
+| **v4.4.0** | 07-10 | CORS 官方中间件替换、Blog 只读接口迁移 Go、启动飞书通知、duration middleware                   |
+| **v4.3.0** | 07-08 | slog 结构化日志体系落地（双文件路由 + trace_id + lumberjack）、event 表替代 access.log         |
+| **v4.2.0** | 07-06 | 通知渠道扩展（Bark/飞书/邮件验证码）、Docker 支持、构造函数配置注入                            |
+| **v4.1.0** | 07-05 | 认证系统迁移 Go 后端（登录/注册/限流）、GitHub OAuth 绑定解绑、Redis refresh rotation + bcrypt |
+
+> 完整历史见 `/api/v2/changelog` 接口或前端「更新日志」页面。
 
 ## 定时任务
 
@@ -474,6 +528,18 @@ flowchart LR
 | `FRONTEND_URL`          | 前端地址（CORS/重定向）                           | `https://kanocifer.chat`                          |
 | `DB_MIGRATE_URL`        | 数据库迁移用同步连接串（Alembic，**非 asyncpg**） | `postgresql+psycopg://user:pass@localhost/dbname` |
 | `LOG_RETENTION_DAYS`    | 日志保留天数                                      | `30`                                              |
+
+## 更多信息（快速开始 & 代码风格）
+
+| 文档                         | 内容                                  |
+| ---------------------------- | ------------------------------------- |
+| `docs/rules/architecture.md` | 后端分层、数据层、API 约定、双端分流  |
+| `docs/rules/commands.md`     | 常用命令速查                          |
+| `docs/rules/code-style.md`   | 后端 / Vue / React 代码风格           |
+| `docs/rules/environment.md`  | 环境变量、端口、工具链版本            |
+| `docs/rules/auth.md`         | 双后端认证统一契约                    |
+| `docs/rules/go-backend.md`   | Go 重构分层、鉴权差异、测试、已知遗留 |
+| `docs/rules/testing.md`      | 前端测试规范                          |
 
 ## License
 

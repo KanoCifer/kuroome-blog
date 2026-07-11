@@ -24,6 +24,7 @@
 
 - **运行**:`cd go-backend && go run ./cmd/server` → `127.0.0.1:5555`，路由前缀 `/api/v3/*`
 - **命名对齐**:复用 Python 后端的 `.env`（`DATABASE_URL / SECRET_KEY / REDIS_URL / MONGO_URI / PORT` 等）
+- **日志**: `internal/logger/` 基于 `log/slog`，双文件路由 + trace_id + lumberjack 轮转
 - **关键差异**:admin 走 `middleware.AdminMiddleware()` + `ADMIN_USER_IDS`（非 `is_admin` 字段）；`email_code` 真校验 Redis `signup_code:{email}`；非法 admin post id 返回 400
 
 ## 3) Environment & Gotchas

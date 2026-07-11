@@ -20,6 +20,15 @@
 - Error handling: async flows use try/catch; narrow caught values before property access; route user-visible failures to notification flows
 - Lint/format: Oxlint (`pnpm run lint:fix`) + Prettier (with `prettier-plugin-tailwindcss` auto-sort); no ESLint
 
+## Go Backend
+
+- Imports: 标准库 → 第三方 → 内部包，三组空行分隔；`internal/` 包按层划分
+- 错误处理: 显式 `if err != nil`，禁止 panic；下层返回 error，上层包装上下文
+- 日志: 使用 `internal/logger` 的 `slog`，禁止 `fmt.Println`
+- Handler 通过接口依赖 Service（便于 mock 测试），构造函数注入配置
+- 格式化: `gofmt -w .`；静态检查: `go vet ./...`
+- 测试: `go test ./...`（handler/service/dto/middleware 全覆盖）
+
 ## Mobile (React + TS)
 
 - Use function components + hooks
