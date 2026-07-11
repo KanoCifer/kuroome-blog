@@ -641,12 +641,12 @@ onBeforeUnmount(() => {
 
         <!-- ─── Meta drawer: summary + cover ─── -->
         <transition
-          enter-active-class="transition duration-200 ease-out motion-reduce:transition-none"
-          enter-from-class="opacity-0"
+          enter-active-class="transition duration-200 ease-out motion-reduce:transition-none motion-reduce:opacity-100"
+          enter-from-class="opacity-0 motion-reduce:opacity-100"
           enter-to-class="opacity-100"
           leave-active-class="transition duration-150 ease-in motion-reduce:transition-none"
           leave-from-class="opacity-100"
-          leave-to-class="opacity-0"
+          leave-to-class="opacity-0 motion-reduce:opacity-100"
         >
           <div
             v-if="metaOpen"
@@ -742,7 +742,7 @@ onBeforeUnmount(() => {
           编辑器在它之上用 --paper (bg-muted) 浮起，靠阴影分层。
         -->
         <div
-          class="bg-muted border-border/60 overflow-hidden rounded-2xl border shadow-[0_1px_0_0_rgba(255,255,255,0.6)_inset,0_2px_4px_-1px_rgba(0,0,0,0.04),0_8px_24px_-8px_rgba(0,0,0,0.12)]"
+          class="bg-muted border-border/60 overflow-hidden rounded-2xl border shadow-[0_1px_0_0_oklch(from_var(--paper)_l_c_h_/_0.6)_inset,0_2px_4px_-1px_oklch(from_var(--ink)_l_c_h_/_0.04),0_8px_24px_-8px_oklch(from_var(--ink)_l_c_h_/_0.12)]"
         >
           <div class="h-full">
             <MarkdownEditor ref="markdownEditorRef" v-model="markdownBody" />

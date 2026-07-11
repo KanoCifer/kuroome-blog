@@ -1,27 +1,27 @@
 ---
 name: kanocifer.chat
-description: A single-author reading tracker and blog system with 10 themed color schemes — a study with twenty surfaces, not a SaaS.
+description: A single-author reading tracker and blog system with 4 themed color schemes — a study with eight surfaces, not a SaaS.
 colors:
-  ink: "oklch(0.13 0.028 261.692)"
-  paper: "oklch(0.985 0.013 260)"
-  surface: "oklch(0.97 0.013 260 / 0.75)"
-  warm-gray: "oklch(0.95 0.018 260)"
-  secondary: "oklch(0.92 0.022 260)"
-  muted-text: "oklch(0.551 0.027 264.364)"
-  accent: "oklch(0.63 0.27 254)"
-  accent-slate: "oklch(0.707 0.022 261.325)"
-  accent-rose: "oklch(0.577 0.245 27.325)"
-  border: "oklch(0.88 0.02 260)"
-  accent-contrast: "oklch(0.985 0.013 260)"
-  chart-1: "oklch(0.626 0.202 261)"
-  chart-2: "oklch(0.6 0.118 185)"
-  chart-3: "oklch(0.398 0.07 227)"
-  chart-4: "oklch(0.828 0.189 84)"
-  chart-5: "oklch(0.769 0.188 70)"
-  gradient-primary-from: "oklch(0.62 0.16 258)"
-  gradient-primary-to: "oklch(0.55 0.14 218)"
-  gradient-decorative-from: "oklch(0.7 0.12 262)"
-  gradient-decorative-to: "oklch(0.7 0.12 218)"
+  ink: "oklch(0.2 0.018 50)"
+  paper: "oklch(0.97 0.013 50)"
+  surface: "oklch(0.97 0.013 50 / 0.75)"
+  warm-gray: "oklch(0.95 0.018 50)"
+  secondary: "oklch(0.92 0.022 50)"
+  muted-text: "oklch(0.42 0.015 50)"
+  accent: "oklch(0.5 0.08 50)"
+  accent-slate: "oklch(0.55 0.025 245)"
+  accent-rose: "oklch(0.58 0.13 28)"
+  border: "oklch(0.88 0.02 50)"
+  accent-contrast: "oklch(0.99 0.003 50)"
+  chart-1: "oklch(0.6 0.14 50)"
+  chart-2: "oklch(0.55 0.08 145)"
+  chart-3: "oklch(0.55 0.025 245)"
+  chart-4: "oklch(0.58 0.13 28)"
+  chart-5: "oklch(0.7 0.13 85)"
+  gradient-primary-from: "oklch(0.5 0.08 50)"
+  gradient-primary-to: "oklch(0.6 0.14 50)"
+  gradient-decorative-from: "oklch(0.92 0.025 50)"
+  gradient-decorative-to: "oklch(0.78 0.06 50)"
   success: "oklch(0.696 0.17 162)"
   warning: "oklch(0.769 0.188 70)"
   destructive: "oklch(0.577 0.245 27)"
@@ -122,13 +122,13 @@ components:
 
 kanocifer.chat is a personal study with a paint box. One author (Kuroome) reads, fishes, and writes; the site tracks all three and publishes the last. The interface reads as a quiet, deliberate workshop — paper-fold heroes, literary typography, and a single black cat (kuro neko, 黒猫) sitting in the corner. The brand voice is **书卷气 · 准 · 适** (literary register, exact, measured): every token name is opinionated, every decision is committed, and nothing is performed for an audience.
 
-The system ships **ten complete color schemes** — sky-blue, forest-green, paper, sage, mist, blush, spring, autumn, clear-sky, midnight — each with its own light and dark variant. Twenty surfaces total, all sharing one token architecture. The palette is the brand: changing themes is not decoration but identity. `data-color-scheme="<name>"` on `<html>` swaps the entire surface vocabulary atomically, with a 600ms clip-path sun/moon/monitor transition as the visible "click" of the toggle. The default (`sky-blue`) is what visitors first see; the others are how the author lives in the site.
+The system ships **four complete color schemes** — paper, sage, mist, blush — each with its own light and dark variant. Eight surfaces total, all sharing one token architecture. The palette is the brand: changing themes is not decoration but identity. `data-color-scheme="<name>"` on `<html>` swaps the entire surface vocabulary atomically, with a 600ms clip-path sun/moon/monitor transition as the visible "click" of the toggle. The default (`paper`) is what visitors first see; the others are how the author lives in the site.
 
 Density is comfortable, not tight. The dominant surface is paper; the dominant type is Chinese-set HarmonyOS Sans with Averia Gruesa Libre accents for English display. Shadows are **layered ambient + inset white highlight** (the "lifted paper" treatment), never flat, never glassmorphism. The system is explicitly **not** a SaaS cream-bg dashboard, an AI bento grid, an editorial-magazine layout, or a tech-company marketing site — those lanes are documented in `PRODUCT.md` as anti-references and in §6 as Don'ts. The site is the author's, used every day, and that single-author / multi-reader shape is what every choice serves.
 
 **Key Characteristics:**
 
-- 10 named themes × light/dark = 20 distinct surfaces, sharing one token architecture
+- 4 named themes × light/dark = 8 distinct surfaces, sharing one token architecture
 - OKLCH color space throughout; `color-mix(in oklch, var(--ink) N%, transparent)` for shadow/rgba synthesis
 - Three-layer token contract: raw theme vars → `data-color-scheme` activation → semantic Tailwind utilities (`bg-background`, `text-foreground`, etc.)
 - Chinese-first typography; Latin display fonts (Averia Gruesa Libre) carry the literary register without competing with CJK
@@ -139,31 +139,31 @@ Density is comfortable, not tight. The dominant surface is paper; the dominant t
 
 ## 2. Colors
 
-The palette is **Restrained by token, Committed by choice**. Each theme uses tinted neutrals for ~80% of the surface and one saturated accent for ≤15%, but the _selection_ of accent is a brand statement — vermillion for autumn, copper for paper, electric blue for sky-blue, royal blue for midnight. The default sky-blue is the "neutral" voice of the brand; the other nine are committed statements.
+The palette is **Restrained by token, Committed by choice**. Each theme uses tinted neutrals for ~80% of the surface and one saturated accent for ≤15%, but the _selection_ of accent is a brand statement — copper for paper, herb-garden for sage, dusk-blue for mist, dusty-rose for blush. The default paper is the "neutral" voice of the brand; the other three are committed statements.
 
-The default theme is **`sky-blue`** (the values in the frontmatter are sky-blue). All ten themes follow the same role schema; only the hue base and accent value change. `data-color-scheme="<theme-name>"` on the root element swaps the entire palette.
+The default theme is **`paper`** (the values in the frontmatter are paper). All four themes follow the same role schema; only the hue base and accent value change. `data-color-scheme="<theme-name>"` on the root element swaps the entire palette.
 
 ### Primary
 
-- **Electric Indigo** (`{colors.accent}` — `oklch(0.63 0.27 254)`): the sky-blue accent. Used for primary actions, focused state, the bento nav indicator (`bg-primary/20`), and the Hero "back" button. Carries ≤10% of any given screen by rule. Other themes' accents: forest-green `oklch(0.405 0.101 131)`, paper `#8a653f` (copper, hex legacy), sage `#4f7657`, mist `#4f6d88`, blush `#a5656f`, spring `#35bfab`, autumn `#de4331` (vermillion), clear-sky `#2fcbe7` (cyan), midnight `#2a48f3` (royal blue).
+- **Copper** (`{colors.accent}` — `oklch(0.5 0.08 50)`): the paper default accent. Used for primary actions, focused state, the bento nav indicator (`bg-primary/20`), and the Hero "back" button. Carries ≤10% of any given screen by rule. Other themes' accents: sage `oklch(0.5 0.08 145)`, mist `oklch(0.5 0.06 225)`, blush `oklch(0.55 0.09 355)`.
 
 ### Secondary
 
-- **Slate Blue** (`{colors.accent-slate}` — `oklch(0.707 0.022 261.325)`): focus-ring color, neutral secondary action. Quiet by intent — this is the "you can have this too, in a less loud voice" accent.
+- **Soft Blue** (`{colors.accent-slate}` — `oklch(0.55 0.025 245)`): focus-ring color, neutral secondary action. Quiet by intent — this is the "you can have this too, in a less loud voice" accent.
 
 ### Destructive
 
-- **Vermillion Rose** (`{colors.accent-rose}` — `oklch(0.577 0.245 27.325)`): destructive actions, error states, danger. The same hue family across all themes so the meaning doesn't shift when the theme does.
+- **Vermillion Rose** (`{colors.accent-rose}` — `oklch(0.58 0.13 28)`): destructive actions, error states, danger. The same hue family across all themes so the meaning doesn't shift when the theme does.
 
 ### Neutral (Tinted with Hue)
 
-- **Ink** (`{colors.ink}` — `oklch(0.13 0.028 261.692)`): body text, primary foreground. Dark per theme; this is the "ink on paper" voice.
-- **Paper** (`{colors.paper}` — `oklch(0.985 0.013 260)`): page background, card surface, modal panel. Tinted 0.013 chroma toward the theme hue — not warm-by-default, not cool-by-default, **theme-by-default**.
-- **Warm Gray** (`{colors.warm-gray}` — `oklch(0.95 0.018 260)`): the "low-weight surface" — input backgrounds, secondary buttons, tag pills, hover states.
-- **Secondary** (`{colors.secondary}` — `oklch(0.92 0.022 260)`): step up from warm-gray; secondary button background, slightly more saturated.
-- **Muted Text** (`{colors.muted-text}` — `oklch(0.551 0.027 264.364)`): auxiliary text, captions, labels. Hits ≥4.5:1 against `paper` in light mode; against `paper` dark equivalent in dark mode.
-- **Border** (`{colors.border}` — `oklch(0.88 0.02 260)`): dividers, input borders, hairline rules.
-- **Surface** (`{colors.surface}` — `oklch(0.97 0.013 260 / 0.75)`): translucent floating layer (nav, dropdowns, modals over imagery). The 0.75 alpha is the explicit ceiling.
+- **Ink** (`{colors.ink}` — `oklch(0.2 0.018 50)`): body text, primary foreground. Dark per theme; this is the "ink on paper" voice.
+- **Paper** (`{colors.paper}` — `oklch(0.97 0.013 50)`): page background, card surface, modal panel. Tinted 0.013 chroma toward the theme hue — not warm-by-default, not cool-by-default, **theme-by-default**.
+- **Warm Gray** (`{colors.warm-gray}` — `oklch(0.95 0.018 50)`): the "low-weight surface" — input backgrounds, secondary buttons, tag pills, hover states.
+- **Secondary** (`{colors.secondary}` — `oklch(0.92 0.022 50)`): step up from warm-gray; secondary button background, slightly more saturated.
+- **Muted Text** (`{colors.muted-text}` — `oklch(0.42 0.015 50)`): auxiliary text, captions, labels. Hits ≥4.5:1 against `paper` in light mode; against `paper` dark equivalent in dark mode.
+- **Border** (`{colors.border}` — `oklch(0.88 0.02 50)`): dividers, input borders, hairline rules.
+- **Surface** (`{colors.surface}` — `oklch(0.97 0.013 50 / 0.75)`): translucent floating layer (nav, dropdowns, modals over imagery). The 0.75 alpha is the explicit ceiling.
 
 ### Charts
 
@@ -174,30 +174,24 @@ The default theme is **`sky-blue`** (the values in the frontmatter are sky-blue)
 - **Primary gradient** (`from-{colors.gradient-primary-from}` → `to-{colors.gradient-primary-to}`): single CTA surfaces, ribbon backgrounds, top-of-page bento. Used in 2-3 places only, never as decoration on default surfaces.
 - **Decorative gradient** (`from-{colors.gradient-decorative-from}` → `to-{colors.gradient-decorative-to}`): reserved for empty states and onboarding moments; never on solid content.
 
-### The Ten Themes
+### The Four Themes
 
-| Theme              | `data-color-scheme` | Hue         | Accent (light/dark)                               | Character                                    |
-| ------------------ | ------------------- | ----------- | ------------------------------------------------- | -------------------------------------------- |
-| Sky Blue (default) | `sky-blue`          | 261° indigo | `oklch(0.63 0.27 254)` / `oklch(0.7 0.16 258)`    | Default voice; electric blue over cool paper |
-| Forest Green       | `forest-green`      | 145° green  | `oklch(0.405 0.101 131)` / `oklch(0.72 0.13 145)` | Deep moss over pale paper; for a quiet day   |
-| Paper              | `paper`             | 50° warm    | `#8a653f` copper / `#c08560`                      | 私人书房; legacy hex, parchment-and-copper   |
-| Sage               | `sage`              | 145° muted  | `#4f7657` / `#7ab088`                             | 鼠尾草; herb-garden green                    |
-| Mist               | `mist`              | 225° cool   | `#4f6d88` / `#88a8ba`                             | 雾蓝; cool dusk-blue                         |
-| Blush              | `blush`             | 355° warm   | `#a5656f` / `#c47a85`                             | 薄红陶; dusty rose                           |
-| Spring             | `spring`            | 160° teal   | `#35bfab` / mint                                  | 春暖; teal ink on teal-50 paper              |
-| Autumn             | `autumn`            | 40° warm    | `#de4331` / vermillion                            | 秋实; vermillion on orange-50                |
-| Clear Sky          | `clear-sky`         | 240° cool   | `#2fcbe7` / cyan                                  | 晴空; pure-white paper, cyan accent          |
-| Midnight           | `midnight`          | 280° indigo | `#2a48f3` / royal blue                            | 深夜; deep indigo, royal blue accent         |
+| Theme   | `data-color-scheme` | Hue         | Accent (light / dark)                           | Character                        |
+| ------- | ------------------- | ----------- | ----------------------------------------------- | -------------------------------- |
+| Paper   | `paper`             | 50° warm    | `oklch(0.5 0.08 50)` / `oklch(0.74 0.1 50)`     | 私人书房; parchment-and-copper   |
+| Sage    | `sage`              | 145° muted  | `oklch(0.5 0.08 145)` / `oklch(0.74 0.1 145)`   | 鼠尾草; herb-garden green        |
+| Mist    | `mist`              | 225° cool   | `oklch(0.5 0.06 225)` / `oklch(0.74 0.08 225)`   | 雾蓝; cool dusk-blue             |
+| Blush   | `blush`             | 355° warm   | `oklch(0.55 0.09 355)` / `oklch(0.74 0.11 355)`  | 薄红陶; dusty rose               |
+
+All four themes are expressed in OKLCH. Each theme ships a dedicated `.dark { }` block with lightness values engineered to the readability contract in the Dark Mode section below.
 
 ### Named Rules
 
-**The Ten-Rooms Rule.** Every theme is a complete identity, not a recolor. Switching `data-color-scheme` swaps the entire token graph atomically — ink, paper, accent, gradients, charts all change together. The site is not a SaaS with a "dark mode toggle"; it is a study with ten rooms, each with its own paint.
+**The Four-Rooms Rule.** Every theme is a complete identity, not a recolor. Switching `data-color-scheme` swaps the entire token graph atomically — ink, paper, accent, gradients, charts all change together. The site is not a SaaS with a "dark mode toggle"; it is a study with four rooms, each with its own paint.
 
 **The One-Voice Rule.** A given screen uses ONE accent value, at ≤15% surface coverage. Bento nav indicator (`bg-primary/20`), primary CTA, focused ring, and one highlighted card are the entire accent vocabulary per view. The accent's rarity is the point.
 
-**The Theme-Not-Warmth Rule.** Tinted neutrals add 0.005–0.015 chroma toward the **theme's own hue**, not toward warm or cool "because the brand feels that way." Sky-blue paper is tinted toward blue, not toward warmth; autumn paper is tinted toward orange, not toward red. There is no "always warm" or "always cool" paper.
-
-**The Hex-Legacy Rule.** Four themes (paper, sage, mist, blush) are still expressed in hex; the other six are oklch. The oklch versions are being migrated to (see `react-app/src/assets/themes/paper.css` for the oklch shadow of the legacy `paper`). When extending a theme, match its existing format. Do not mix oklch and hex within one theme.
+**The Theme-Not-Warmth Rule.** Tinted neutrals add 0.005–0.015 chroma toward the **theme's own hue**, not toward warm or cool "because the brand feels that way." Paper paper is tinted toward orange, not toward warmth; mist paper is tinted toward blue, not toward red. There is no "always warm" or "always cool" paper.
 
 ### Dark Mode
 
@@ -212,7 +206,7 @@ Dark mode is a **surface recolor**, not an inverted light mode. Each active them
 | `--border-color` | Dividers, input borders | `oklch(0.88 …)` | **`oklch(0.30 …)`** | Must read against paper; kept close to card-bg so it reads as a hairline, not a frame. |
 | `--card-bg` | Card surface, modal bg | `oklch(0.99 …)` | **`oklch(0.28 …)`** | ~6 points above paper; visible elevation without stealing focus. Ink-vs-card targets ≥4.5:1 AA for body text. |
 | `--surface` | Translucent floating layer (nav, dropdowns) | `oklch(0.97 … / 0.75)` | `oklch(0.28 … / 0.85)` | Same lightness as card-bg; alpha raised to 0.85 so nav-over-imagery still masks. |
-| `--muted-text` | Auxiliary text, captions, labels | `oklch(0.50 …)` | **`oklch(0.76 …)`** | Bumped from 0.74 → 0.76 to clear ≥4.5:1 against `--paper` (0.22) — up from 4.59:1 to ~4.90:1. The floor was being eaten by the brightened paper; this restores the contract. |
+| `--muted-text` | Auxiliary text, captions, labels | `oklch(0.42 …)` | **`oklch(0.78 …)`** | Light variant bumped from 0.50 → 0.42 to clear ≥4.5:1 against `--paper` (0.97). Dark variant bumped from 0.76 → 0.78 to restore margin against `--paper` (0.22). Aesthetic grey is a regression. |
 | `--accent-contrast` | Text on `--accent` buttons | `oklch(0.99 …)` | `oklch(0.22 …)` | Matches `--paper`; in dark mode a bright button gets dark text, the same ink tone as the page background. |
 | `--accent` / `--accent-slate` / `--accent-rose` | Brand + semantic actions | (unchanged) | (unchanged) | Already pass against their dark targets. |
 
@@ -228,9 +222,9 @@ paper (0.22)  ← page
 
 Each step is ≥5 points apart; ink-vs-any-surface clears large-text AA; any body-text-on-paper or body-text-on-card clears 4.5:1. Do not compress this stack to less than 5 points per step when extending a theme — collapsing it is what made the original near-black page illegible.
 
-**The Muted-Text-Is-A-Floor Rule.** The `--muted-text` token is the readability floor, not a styling convenience. Its dark variant must clear ≥4.5:1 against the current theme's `--paper`. When `--paper` is adjusted (as it was during the "page too dark" fix, 0.16/0.18 → 0.22), muted-text **must** be audited against the new paper lightness and bumped if the ratio slips below 4.5:1. Aesthetic grey is a regression.
+**The Muted-Text-Is-A-Floor Rule.** The `--muted-text` token is the readability floor, not a styling convenience. Its light variant must clear ≥4.5:1 against the light `--paper`; its dark variant must clear ≥4.5:1 against the dark `--paper`. When either `--paper` is adjusted, muted-text **must** be re-audited against the new paper lightness and bumped if the ratio slips below 4.5:1. Aesthetic grey is a regression.
 
-**The Ink-On-Card Contract.** Body text rendered on `--card-bg` (not `--paper`) must still clear ≥4.5:1 AA. This means `--ink` at 0.94 and `--card-bg` at 0.28 are a coupled pair: if one is adjusted, the other must be re-verified. Because card content tends toward larger, sparser type, the floor is relaxed to ≥3.0:1; the 0.28 default passes comfortably at ~4.7:1.
+**The Ink-On-Card Contract.** Body text rendered on `--card-bg` (not `--paper`) must still clear ≥4.5:1 AA. This means `--ink` and `--card-bg` are a coupled pair: if one is adjusted, the other must be re-verified. Because card content tends toward larger, sparser type, the floor is relaxed to ≥3.0:1.
 
 ## 3. Typography
 
@@ -287,6 +281,10 @@ The system uses **layered ambient drop shadow + inset white highlight** as the d
 - **Tailwind utility shadows** (`shadow-xs`, `shadow-sm`, `shadow-md`, `shadow-lg`, `shadow-xl`, `shadow-2xl`): use Tailwind's defaults for utility surfaces; reserve custom shadows for the signatures above.
 - **Color-tinted shadows** (`shadow-primary/30`, `shadow-brand-devices/30`): for primary CTAs and the device tracker only.
 
+### Decorative Elements
+
+- **Decorative h-line** (`bg-primary/40`, `h-px` or `w-px`): section dividers, the "— 篇 —" book-chapter decorations in BlogListItem, the accent rule under category headings in BlogListView. The fixed 40% alpha of the primary token ($\leq$ 5% surface coverage by the One-Voice Rule) is the canonical decorative-line treatment. Do not invent new alphas per component — this single step keeps the chrome consistent.
+
 ### Modal Backdrop
 
 - Standard: `bg-black/45 backdrop-blur-[10px]` (the project default; in active cleanup toward `bg-ink/45` or no-blur per design-system.md rules).
@@ -302,6 +300,18 @@ The system uses **layered ambient drop shadow + inset white highlight** as the d
 **The 12% Ceiling.** Color-tinted shadows on primary actions use ≤30% alpha (`shadow-primary/30`). The shadow is the _hint_ of an accent, not the accent itself. Going past 30% reads as a colored outline pretending to be a shadow.
 
 **The Inset-White-Highlight Rule.** Bento cards, the floating nav, and the BasicDetail inner section all carry an inset white highlight at `rgba(255,255,255,0.35)` (light) or `rgba(255,255,255,0.06)` (dark). This is the "paper held under a lamp" effect. The highlight is what separates this system from flat SaaS cards with one drop shadow.
+
+**The Layered-Shadow Rule.** Theme-adaptive shadows are built from multiple `color-mix(in oklch, var(--ink) N%, transparent)` layers at increasing blur radius and decreasing alpha — never a fixed `rgba(0,0,0,…)` value. A canonical three-layer ambient shadow reads:
+
+```
+0 1px 1px color-mix(in oklch, var(--ink) 6%, transparent),
+0 6px 14px color-mix(in oklch, var(--ink) 10%, transparent),
+0 18px 32px color-mix(in oklch, var(--ink) 8%, transparent)
+```
+
+When an inset white highlight is needed, prepend `0 1px 0 0 oklch(from var(--paper) l c h / 0.6) inset`. The writing-canvas treatment in BlogEditorView (line 745) is the reference implementation.
+
+**The No-Fixed-RGBA Rule.** Hard-coded `rgba(255,255,255,…)` or `rgba(0,0,0,…)` shadows are a code-review red flag — they read as dark-on-dark halos in light themes and vanish in dark themes. Every surface shadow MUST derive from `var(--ink)` or `var(--paper)` through `color-mix` or `oklch(from …)` so it tracks the active theme.
 
 ## 5. Components
 
@@ -363,6 +373,15 @@ The home-page bento grid. 14 draggable cards (`BentoCalendar`, `BentoCat`, `Bent
 
 **Why it's a signature:** the bento grid is the only place the system uses card-as-affordance for a whole page. Every other surface treats cards as a _list item_, not a _page primitive_. The 13-card count is a constraint of the home, not a template to apply elsewhere.
 
+### Utilities & Patterns
+
+- **Border-as-Shadow** (`:where([class~='border'])` in both `base.css` files): any element with a non-zero Tailwind border-width class automatically gets a layered `box-shadow` outline replacing the hard border (which is made transparent). Shadow adapts to theme via `rgba(0,0,0,α)` at low alpha, with hover deepening. This is the default "card edge" treatment for non-themed containers.
+- **Card-entrance stagger** (`.animate-enter`): `animation: enter 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94)` with `--delay` and `--stagger` CSS vars for word-by-word or item-by-item orchestration. Used on hero titles, list reveals.
+- **Summary card hover lift** (`.summary-card`): `translateY(-1px)` + color-tinted shadow via `oklch(from var(--color-primary) l c h / 0.08)`. The `.is-loading` state triggers `card-breathe` keyframes (2s ease-in-out, border-color + box-shadow oscillation).
+- **Skeleton pulse** (`.skeleton-pulse`): gentler than Tailwind's `animate-pulse` — 1.8s ease-in-out, opacity 0.4↔0.7.
+- **Tabular numbers** (`.tabular-nums`): `font-variant-numeric: tabular-nums` utility for timestamps, counters, version strings.
+- **iOS form fix**: `input, textarea, select { font-size: 16px }` prevents Safari auto-zoom on focus.
+
 ## 6. Do's and Don'ts
 
 The strategic anti-references from `PRODUCT.md` carry through to the visual spec by name. The site is not a SaaS, not a magazine, not a tech-company marketing surface. The Don'ts below are force-multipliers of the brand line, not stylistic preferences.
@@ -379,13 +398,13 @@ The strategic anti-references from `PRODUCT.md` carry through to the visual spec
 - **Do** make the active nav indicator a soft accent fill (`bg-primary/20`), not a colored bar, not an underline.
 - **Do** use the `Label` type style (uppercase, tracked, 11px) for short eyebrows, kickers, version chips. One kicker per major section.
 - **Do** keep the modal backdrop at `bg-black/45 backdrop-blur-[10px]` or lighter. Anything heavier is glassmorphism-as-decoration, banned.
-- **Do** when adding a new accent role (success, warning, destructive), match the existing `oklch(0.696 0.17 162)` / `oklch(0.769 0.188 70)` / `oklch(0.577 0.245 27)` values exactly across all ten themes. Semantic colors do not shift with the theme.
+- **Do** when adding a new accent role (success, warning, destructive), use the same oklch values across all themes — semantic colors (`oklch(0.696 0.17 162)` success / `oklch(0.769 0.188 70)` warning / `oklch(0.577 0.245 27)` destructive) do not shift with the theme.
 - **Do** round modal panels to `rounded-2xl` (18px) or larger. Smaller radii feel like alert dialogs.
 - **Do** extend the `squircle.css` utility rather than redefining `border-radius: 90px` inline. One source for the signature shape.
 
 ### Don't:
 
-- **Don't** hardcode color values in component code. `bg-black/75`, `text-white/90`, `from-violet-500/10 via-fuchsia-500/5 to-pink-500/10` are all banned by `docs/rules/design-system.md`. The `@theme incline` typo in `frontend/src/assets/base.css:76` is a pre-existing bug — when fixed, those Tailwind classes will start working; the hex/rgba bans stay.
+- **Don't** hardcode color values in component code. `bg-black/75`, `text-white/90`, `from-violet-500/10 via-fuchsia-500/5 to-pink-500/10` are all banned by `docs/rules/design-system.md`.
 - **Don't** ship a SaaS cream-bg dashboard. No `bg-amber-50` body, no navy-and-gold fintech palette, no Tailwind starter look. The 10-theme oklch palette exists precisely to make "cream default" impossible.
 - **Don't** ship AI-bento / eyebrow / glass cards. No `text-xs tracking-[0.3em] uppercase` eyebrow above every section. No `bg-black/45 backdrop-blur-md` decorative glass on user content. No `bg-linear-to-br from-violet-500/10 via-fuchsia-500/5 to-pink-500/10` hover-glow on every card. The 13-card bento home is the only bento, and it is the kitchen, not the wallpaper.
 - **Don't** ship a tech-company marketing site aesthetic. No `/pricing`, no `/enterprise`, no comparison tables, no "trusted by N teams" social proof. The site has no customers and does not want to look like it does.
@@ -401,7 +420,7 @@ The strategic anti-references from `PRODUCT.md` carry through to the visual spec
 - **Don't** ship a specific rejected direction. The settings modal "文学手账 / 季节面板 / 命令中心" three-way (`design-demos/`), moments page v1/v2/v3, fishing weather card "诗意气象 / 天空剧场" (`weather-card-redesign/`) — these were walked and walked back. Do not propose them again.
 - **Don't** animate CSS layout properties unless truly needed. Translate, scale, opacity are the defaults; clip-path, mask, and shadow/glow are the premium materials when they materially improve the effect. Width/height/margin/padding transitions are layout, not motion.
 - **Don't** use motion as a fallback for missing depth. The lift-from-below shadow is the depth; motion is the _acknowledgment_ of state change. If the shadow is missing, motion will not save it.
-- **Don't** ship `bg-background` or `text-card-foreground` in Vue. The Vue `@theme incline` typo means those classes have no Tailwind source. They work in React (the `@theme inline` block exposes them) but not in Vue. Use `bg-background` and `text-foreground` on the Vue side.
+- **Don't** assume `text-card-foreground` is safe everywhere — only use it where a `--card-foreground` token is actually defined in the active `@theme` block.
 - **Don't** ship the `阿里妈妈方圆体` (alibaba) font. It is defined in `@theme` but has zero component references. The display font is Averia (Latin) and 东方大楷 (CJK); the body font is HarmonyOS Sans.
 - **Don't** set `font-family-averia` on CJK content. Averia has no CJK glyphs; it will fall back to the body stack and look broken.
 - **Don't** ship a hero heading above 4.5rem (72px). `clamp(1.875rem, 4vw + 1rem, 4.5rem)` is the ceiling. Above that the page is shouting, not designing.

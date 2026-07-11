@@ -138,7 +138,7 @@ footer {
   --font-sans: 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
-@theme incline {
+@theme inline {
   /* Core */
   --color-background: var(--paper);
   --color-foreground: var(--ink);

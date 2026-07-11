@@ -1,37 +1,37 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-06-21T00:00:00.000Z",
+  "generatedAt": "2026-07-11T00:00:00.000Z",
   "title": "Design System: kanocifer.chat",
   "extensions": {
     "colorMeta": {
       "ink": {
         "role": "neutral",
         "displayName": "Ink (foreground)",
-        "canonical": "oklch(0.13 0.028 261.692)",
+        "canonical": "oklch(0.2 0.018 50)",
         "tonalRamp": [
-          "oklch(0.12 0.028 261.692)",
-          "oklch(0.2 0.025 261.692)",
-          "oklch(0.32 0.025 261.692)",
-          "oklch(0.45 0.025 261.692)",
-          "oklch(0.55 0.025 261.692)",
-          "oklch(0.7 0.02 261.692)",
-          "oklch(0.85 0.015 261.692)",
-          "oklch(0.95 0.01 261.692)"
+          "oklch(0.12 0.028 50)",
+          "oklch(0.2 0.025 50)",
+          "oklch(0.32 0.025 50)",
+          "oklch(0.45 0.025 50)",
+          "oklch(0.55 0.025 50)",
+          "oklch(0.7 0.02 50)",
+          "oklch(0.85 0.015 50)",
+          "oklch(0.95 0.01 50)"
         ]
       },
       "paper": {
         "role": "neutral",
         "displayName": "Paper (page background)",
-        "canonical": "oklch(0.985 0.013 260)",
+        "canonical": "oklch(0.97 0.013 50)",
         "tonalRamp": [
-          "oklch(0.13 0.02 260)",
-          "oklch(0.25 0.02 260)",
-          "oklch(0.4 0.02 260)",
-          "oklch(0.55 0.018 260)",
-          "oklch(0.7 0.018 260)",
-          "oklch(0.85 0.015 260)",
-          "oklch(0.94 0.013 260)",
-          "oklch(0.985 0.013 260)"
+          "oklch(0.13 0.02 50)",
+          "oklch(0.25 0.02 50)",
+          "oklch(0.4 0.02 50)",
+          "oklch(0.55 0.018 50)",
+          "oklch(0.7 0.018 50)",
+          "oklch(0.85 0.015 50)",
+          "oklch(0.94 0.013 50)",
+          "oklch(0.97 0.013 50)"
         ]
       },
       "surface": {
@@ -52,91 +52,91 @@
       "warm-gray": {
         "role": "neutral",
         "displayName": "Warm Gray (low-weight surface)",
-        "canonical": "oklch(0.95 0.018 260)",
+        "canonical": "oklch(0.95 0.018 50)",
         "tonalRamp": [
-          "oklch(0.34 0.03 260)",
-          "oklch(0.5 0.025 260)",
-          "oklch(0.65 0.022 260)",
-          "oklch(0.78 0.02 260)",
-          "oklch(0.88 0.018 260)",
-          "oklch(0.92 0.018 260)",
-          "oklch(0.95 0.018 260)",
-          "oklch(0.97 0.015 260)"
+          "oklch(0.34 0.03 50)",
+          "oklch(0.5 0.025 50)",
+          "oklch(0.65 0.022 50)",
+          "oklch(0.78 0.02 50)",
+          "oklch(0.88 0.018 50)",
+          "oklch(0.92 0.018 50)",
+          "oklch(0.95 0.018 50)",
+          "oklch(0.97 0.015 50)"
         ]
       },
       "secondary": {
         "role": "neutral",
         "displayName": "Secondary (step up from warm-gray)",
-        "canonical": "oklch(0.92 0.022 260)",
+        "canonical": "oklch(0.92 0.022 50)",
         "tonalRamp": [
-          "oklch(0.4 0.04 260)",
-          "oklch(0.55 0.035 260)",
-          "oklch(0.7 0.03 260)",
-          "oklch(0.82 0.025 260)",
-          "oklch(0.88 0.022 260)",
-          "oklch(0.9 0.022 260)",
-          "oklch(0.92 0.022 260)",
-          "oklch(0.95 0.02 260)"
+          "oklch(0.4 0.04 50)",
+          "oklch(0.55 0.035 50)",
+          "oklch(0.7 0.03 50)",
+          "oklch(0.82 0.025 50)",
+          "oklch(0.88 0.022 50)",
+          "oklch(0.9 0.022 50)",
+          "oklch(0.92 0.022 50)",
+          "oklch(0.95 0.02 50)"
         ]
       },
       "muted-text": {
         "role": "neutral",
         "displayName": "Muted Text (auxiliary, ≥4.5:1)",
-        "canonical": "oklch(0.551 0.027 264.364)",
+        "canonical": "oklch(0.42 0.015 50)",
         "tonalRamp": [
-          "oklch(0.3 0.027 264.364)",
-          "oklch(0.4 0.027 264.364)",
-          "oklch(0.5 0.027 264.364)",
-          "oklch(0.551 0.027 264.364)",
-          "oklch(0.65 0.025 264.364)",
-          "oklch(0.75 0.022 264.364)",
-          "oklch(0.85 0.018 264.364)",
-          "oklch(0.95 0.012 264.364)"
+          "oklch(0.2 0.018 50)",
+          "oklch(0.3 0.018 50)",
+          "oklch(0.4 0.015 50)",
+          "oklch(0.42 0.015 50)",
+          "oklch(0.55 0.015 50)",
+          "oklch(0.7 0.015 50)",
+          "oklch(0.85 0.012 50)",
+          "oklch(0.95 0.01 50)"
         ]
       },
       "border": {
         "role": "neutral",
         "displayName": "Border (hairline divider)",
-        "canonical": "oklch(0.88 0.02 260)",
+        "canonical": "oklch(0.88 0.02 50)",
         "tonalRamp": [
-          "oklch(0.18 0.025 260)",
-          "oklch(0.3 0.025 260)",
-          "oklch(0.45 0.022 260)",
-          "oklch(0.6 0.022 260)",
-          "oklch(0.75 0.02 260)",
-          "oklch(0.88 0.02 260)",
-          "oklch(0.93 0.018 260)",
-          "oklch(0.97 0.015 260)"
+          "oklch(0.18 0.025 50)",
+          "oklch(0.3 0.025 50)",
+          "oklch(0.45 0.022 50)",
+          "oklch(0.6 0.022 50)",
+          "oklch(0.75 0.02 50)",
+          "oklch(0.88 0.02 50)",
+          "oklch(0.93 0.018 50)",
+          "oklch(0.97 0.015 50)"
         ]
       },
       "accent": {
         "role": "primary",
-        "displayName": "Electric Indigo (sky-blue accent)",
-        "canonical": "oklch(0.63 0.27 254)",
+        "displayName": "Copper (paper accent)",
+        "canonical": "oklch(0.5 0.08 50)",
         "tonalRamp": [
-          "oklch(0.25 0.15 254)",
-          "oklch(0.35 0.18 254)",
-          "oklch(0.45 0.22 254)",
-          "oklch(0.55 0.25 254)",
-          "oklch(0.63 0.27 254)",
-          "oklch(0.72 0.24 254)",
-          "oklch(0.82 0.18 254)",
-          "oklch(0.92 0.1 254)"
+          "oklch(0.25 0.06 50)",
+          "oklch(0.35 0.07 50)",
+          "oklch(0.45 0.08 50)",
+          "oklch(0.5 0.08 50)",
+          "oklch(0.6 0.08 50)",
+          "oklch(0.72 0.07 50)",
+          "oklch(0.82 0.06 50)",
+          "oklch(0.92 0.04 50)"
         ]
       },
       "accent-slate": {
         "role": "secondary",
-        "displayName": "Slate Blue (focus ring)",
-        "canonical": "oklch(0.707 0.022 261.325)",
+        "displayName": "Soft Blue (focus ring)",
+        "canonical": "oklch(0.55 0.025 245)",
         "tonalRamp": [
-          "oklch(0.25 0.022 261.325)",
-          "oklch(0.4 0.022 261.325)",
-          "oklch(0.55 0.022 261.325)",
-          "oklch(0.65 0.022 261.325)",
-          "oklch(0.707 0.022 261.325)",
-          "oklch(0.8 0.018 261.325)",
-          "oklch(0.88 0.015 261.325)",
-          "oklch(0.95 0.012 261.325)"
+          "oklch(0.25 0.025 245)",
+          "oklch(0.4 0.025 245)",
+          "oklch(0.55 0.025 245)",
+          "oklch(0.65 0.025 245)",
+          "oklch(0.75 0.022 245)",
+          "oklch(0.8 0.018 245)",
+          "oklch(0.88 0.015 245)",
+          "oklch(0.95 0.012 245)"
         ]
       },
       "accent-rose": {
@@ -181,85 +181,37 @@
       }
     },
     "themes": {
-      "sky-blue": {
-        "displayName": "Sky Blue (default)",
-        "hueBase": 261,
-        "accent": "oklch(0.63 0.27 254)",
-        "ink": "oklch(0.13 0.028 261.692)",
-        "paper": "oklch(0.985 0.013 260)",
-        "character": "Default voice; electric blue over cool paper. The neutral of the brand."
-      },
-      "forest-green": {
-        "displayName": "Forest Green (森林绿)",
-        "hueBase": 145,
-        "accent": "oklch(0.405 0.101 131)",
-        "ink": "oklch(0.13 0.028 145)",
-        "paper": "oklch(0.97 0.013 131)",
-        "character": "Deep moss over pale paper; for a quiet day."
-      },
       "paper": {
-        "displayName": "Paper (纸色暖调)",
+        "displayName": "Paper (纸色暖调, default)",
         "hueBase": 50,
-        "accent": "#8a653f",
-        "ink": "#1a1613",
+        "accent": "oklch(0.5 0.08 50)",
+        "ink": "oklch(0.2 0.018 50)",
         "paper": "oklch(0.97 0.013 50)",
-        "character": "私人书房; legacy hex, parchment-and-copper. The literary register's home."
+        "character": "私人书房; parchment-and-copper. The literary register's home. Default theme."
       },
       "sage": {
         "displayName": "Sage (鼠尾草绿)",
         "hueBase": 145,
-        "accent": "#4f7657",
-        "ink": "#172018",
+        "accent": "oklch(0.5 0.08 145)",
+        "ink": "oklch(0.2 0.018 145)",
         "paper": "oklch(0.97 0.013 145)",
         "character": "Herb-garden green; muted and slightly cool."
       },
       "mist": {
         "displayName": "Mist (雾蓝冷调)",
         "hueBase": 225,
-        "accent": "#4f6d88",
-        "ink": "#161c21",
+        "accent": "oklch(0.5 0.06 225)",
+        "ink": "oklch(0.2 0.018 225)",
         "paper": "oklch(0.97 0.01 225)",
         "character": "Cool dusk-blue over cool paper."
       },
       "blush": {
         "displayName": "Blush (薄红陶色)",
         "hueBase": 355,
-        "accent": "#a5656f",
-        "ink": "#201716",
+        "accent": "oklch(0.55 0.09 355)",
+        "ink": "oklch(0.22 0.022 355)",
         "paper": "oklch(0.97 0.013 355)",
         "character": "Dusty rose; warm without being loud."
-      },
-      "spring": {
-        "displayName": "Spring (春暖)",
-        "hueBase": 160,
-        "accent": "#35bfab",
-        "ink": "oklch(0.2 0.05 160)",
-        "paper": "var(--color-teal-50)",
-        "character": "Teal ink on teal-50 paper; bright and awake."
-      },
-      "autumn": {
-        "displayName": "Autumn (秋实)",
-        "hueBase": 40,
-        "accent": "#de4331",
-        "ink": "oklch(0.2 0.05 40)",
-        "paper": "var(--color-orange-50)",
-        "character": "Vermillion on orange-50; the committed statement."
-      },
-      "clear-sky": {
-        "displayName": "Clear Sky (晴空)",
-        "hueBase": 240,
-        "accent": "#2fcbe7",
-        "ink": "oklch(0.2 0.03 240)",
-        "paper": "#ffffff",
-        "character": "Pure-white paper with cyan accent; the cleanest surface in the system."
-      },
-      "midnight": {
-        "displayName": "Midnight (深夜)",
-        "hueBase": 280,
-        "accent": "#2a48f3",
-        "ink": "oklch(0.2 0.05 280)",
-        "paper": "var(--color-indigo-50)",
-        "character": "Deep indigo paper with royal blue accent; for the late shift."
       }
     },
     "typographyMeta": {
@@ -331,6 +283,21 @@
         "name": "primary-cta-tint",
         "value": "shadow-primary/30",
         "purpose": "Color-tinted shadow for primary CTAs. 30% alpha ceiling."
+      },
+      {
+        "name": "layered-ambient",
+        "value": "0 1px 1px color-mix(in oklch, var(--ink) 6%, transparent), 0 6px 14px color-mix(in oklch, var(--ink) 10%, transparent), 0 18px 32px color-mix(in oklch, var(--ink) 8%, transparent)",
+        "purpose": "Canonical three-layer ambient shadow. Theme-adaptive via ink token."
+      },
+      {
+        "name": "layered-lifted-paper",
+        "value": "0 1px 0 0 oklch(from var(--paper) l c h / 0.6) inset, 0 2px 4px -1px oklch(from var(--ink) l c h / 0.04), 0 8px 24px -8px oklch(from var(--ink) l c h / 0.12)",
+        "purpose": "Writing canvas — inset white highlight + ambient occlusion. Theme adaptive."
+      },
+      {
+        "name": "decorative-h-line",
+        "value": "bg-primary/40, h-px or w-px",
+        "purpose": "Section dividers and book-chapter decorations. Single canonical alpha (40%)."
       }
     ],
     "motion": [
@@ -413,7 +380,7 @@
       "refersTo": "button-primary",
       "description": "The single accent on the page. Use once per screen.",
       "html": "<button class=\"ds-btn-primary\">Continue Reading</button>",
-      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--accent, oklch(0.63 0.27 254)); color: var(--accent-contrast, oklch(0.985 0.013 260)); border: none; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; line-height: 1.25; cursor: pointer; transition: background 0.18s ease-out, transform 0.18s cubic-bezier(0.22, 1, 0.36, 1); outline: none; } .ds-btn-primary:hover { background: color-mix(in oklch, var(--accent) 88%, transparent); } .ds-btn-primary:focus-visible { box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent-slate) 50%, transparent); } .ds-btn-primary:active { transform: scale(0.98); } .ds-btn-primary:disabled { opacity: 0.5; pointer-events: none; }"
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--accent, oklch(0.5 0.08 50)); color: var(--accent-contrast, oklch(0.97 0.013 50)); border: none; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; line-height: 1.25; cursor: pointer; transition: background 0.18s ease-out, transform 0.18s cubic-bezier(0.22, 1, 0.36, 1); outline: none; } .ds-btn-primary:hover { background: color-mix(in oklch, var(--accent) 88%, transparent); } .ds-btn-primary:focus-visible { box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent-slate) 50%, transparent); } .ds-btn-primary:active { transform: scale(0.98); } .ds-btn-primary:disabled { opacity: 0.5; pointer-events: none; }"
     },
     {
       "name": "Button (secondary)",
@@ -421,7 +388,7 @@
       "refersTo": "button-secondary",
       "description": "Quieter voice for the second action. Step up from ghost.",
       "html": "<button class=\"ds-btn-secondary\">Cancel</button>",
-      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--secondary, oklch(0.92 0.022 260)); color: var(--ink, oklch(0.13 0.028 261.692)); border: none; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; line-height: 1.25; cursor: pointer; transition: background 0.18s ease-out; outline: none; } .ds-btn-secondary:hover { background: color-mix(in oklch, var(--secondary) 80%, transparent); } .ds-btn-secondary:focus-visible { box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent-slate) 50%, transparent); } .ds-btn-secondary:disabled { opacity: 0.5; pointer-events: none; }"
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--secondary, oklch(0.92 0.022 260)); color: var(--ink, oklch(0.2 0.018 50)); border: none; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; line-height: 1.25; cursor: pointer; transition: background 0.18s ease-out; outline: none; } .ds-btn-secondary:hover { background: color-mix(in oklch, var(--secondary) 80%, transparent); } .ds-btn-secondary:focus-visible { box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent-slate) 50%, transparent); } .ds-btn-secondary:disabled { opacity: 0.5; pointer-events: none; }"
     },
     {
       "name": "Button (ghost)",
@@ -429,7 +396,7 @@
       "refersTo": "button-ghost",
       "description": "No chrome until hover. The 'no commitment' button.",
       "html": "<button class=\"ds-btn-ghost\">Skip</button>",
-      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1rem; background: transparent; color: var(--ink, oklch(0.13 0.028 261.692)); border: none; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; line-height: 1.25; cursor: pointer; transition: background 0.18s ease-out, color 0.18s ease-out; outline: none; } .ds-btn-ghost:hover { background: var(--warm-gray, oklch(0.95 0.018 260)); } .ds-btn-ghost:focus-visible { box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent-slate) 50%, transparent); }"
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1rem; background: transparent; color: var(--ink, oklch(0.2 0.018 50)); border: none; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; line-height: 1.25; cursor: pointer; transition: background 0.18s ease-out, color 0.18s ease-out; outline: none; } .ds-btn-ghost:hover { background: var(--warm-gray, oklch(0.95 0.018 260)); } .ds-btn-ghost:focus-visible { box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent-slate) 50%, transparent); }"
     },
     {
       "name": "Card (default)",
@@ -437,7 +404,7 @@
       "refersTo": "card-default",
       "description": "Static content panel. Border + light shadow. The workhorse.",
       "html": "<article class=\"ds-card-default\"><h3>Reading progress</h3><p>You've finished 4 of 12 books this quarter.</p></article>",
-      "css": ".ds-card-default { display: flex; flex-direction: column; gap: 1.5rem; padding: 1.5rem 0; background: var(--paper, oklch(0.985 0.013 260)); color: var(--ink, oklch(0.13 0.028 261.692)); border: 1px solid var(--border, oklch(0.88 0.02 260)); border-radius: 0.875rem; box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 6%, transparent); } .ds-card-default h3 { margin: 0; font-size: 1.125rem; font-weight: 600; } .ds-card-default p { margin: 0; font-size: 0.9375rem; line-height: 1.65; color: var(--muted-text, oklch(0.551 0.027 264.364)); }"
+      "css": ".ds-card-default { display: flex; flex-direction: column; gap: 1.5rem; padding: 1.5rem 0; background: var(--paper, oklch(0.97 0.013 50)); color: var(--ink, oklch(0.2 0.018 50)); border: 1px solid var(--border, oklch(0.88 0.02 260)); border-radius: 0.875rem; box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 6%, transparent); } .ds-card-default h3 { margin: 0; font-size: 1.125rem; font-weight: 600; } .ds-card-default p { margin: 0; font-size: 0.9375rem; line-height: 1.65; color: var(--muted-text, oklch(0.42 0.015 50)); }"
     },
     {
       "name": "Bento card (signature)",
@@ -445,7 +412,7 @@
       "refersTo": "bento-card",
       "description": "Squircle floating card with layered ambient + inset white highlight. The home-page signature.",
       "html": "<div class=\"ds-bento-card\"><span class=\"ds-bento-eyebrow\">TODAY</span><h3>Three books on the desk</h3></div>",
-      "css": ".ds-bento-card { position: relative; padding: 1.25rem; background: var(--paper, oklch(0.985 0.013 260)); color: var(--ink, oklch(0.13 0.028 261.692)); border-radius: 90px; corner-shape: squircle; box-shadow: color-mix(in srgb, var(--color-foreground, var(--ink)) 12%, transparent) 0px 40px 50px -32px, color-mix(in srgb, var(--color-foreground, var(--ink)) 8%, transparent) 0px 60px 80px -48px, rgba(255, 255, 255, 0.35) 0px 0px 20px 0px inset; } .ds-bento-eyebrow { display: inline-block; font-family: ui-monospace, monospace; font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; color: var(--muted-text, oklch(0.551 0.027 264.364)); } .ds-bento-card h3 { margin: 0.5rem 0 0; font-family: 'Averia Gruesa Libre', system-ui, sans-serif; font-size: 1.5rem; font-weight: 400; letter-spacing: -0.02em; } @supports not (corner-shape: squircle) { .ds-bento-card { border-radius: 48px; } }"
+      "css": ".ds-bento-card { position: relative; padding: 1.25rem; background: var(--paper, oklch(0.97 0.013 50)); color: var(--ink, oklch(0.2 0.018 50)); border-radius: 90px; corner-shape: squircle; box-shadow: color-mix(in srgb, var(--color-foreground, var(--ink)) 12%, transparent) 0px 40px 50px -32px, color-mix(in srgb, var(--color-foreground, var(--ink)) 8%, transparent) 0px 60px 80px -48px, rgba(255, 255, 255, 0.35) 0px 0px 20px 0px inset; } .ds-bento-eyebrow { display: inline-block; font-family: ui-monospace, monospace; font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; color: var(--muted-text, oklch(0.42 0.015 50)); } .ds-bento-card h3 { margin: 0.5rem 0 0; font-family: 'Averia Gruesa Libre', system-ui, sans-serif; font-size: 1.5rem; font-weight: 400; letter-spacing: -0.02em; } @supports not (corner-shape: squircle) { .ds-bento-card { border-radius: 48px; } }"
     },
     {
       "name": "Input (search + login)",
@@ -453,7 +420,7 @@
       "refersTo": "input-field",
       "description": "Rounded-xl, bg-muted, literary placeholder. Used in search and login flows.",
       "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Search the library…\" />",
-      "css": ".ds-input { width: 100%; padding: 0.75rem 1rem; background: var(--warm-gray, oklch(0.95 0.018 260)); color: var(--ink, oklch(0.13 0.028 261.692)); border: 1px solid var(--border, oklch(0.88 0.02 260)); border-radius: 0.875rem; font-size: 0.875rem; line-height: 1.25; outline: none; transition: border-color 0.18s ease-out, box-shadow 0.18s ease-out; } .ds-input::placeholder { font-family: ui-serif, Georgia, serif; font-style: italic; color: var(--muted-text, oklch(0.551 0.027 264.364)); } .ds-input:hover { border-color: color-mix(in oklch, var(--border) 70%, var(--ink)); } .ds-input:focus { border-color: var(--accent, oklch(0.63 0.27 254)); box-shadow: 0 0 0 2px color-mix(in oklch, var(--accent) 30%, transparent); } .ds-input:disabled { opacity: 0.5; cursor: not-allowed; }"
+      "css": ".ds-input { width: 100%; padding: 0.75rem 1rem; background: var(--warm-gray, oklch(0.95 0.018 260)); color: var(--ink, oklch(0.2 0.018 50)); border: 1px solid var(--border, oklch(0.88 0.02 260)); border-radius: 0.875rem; font-size: 0.875rem; line-height: 1.25; outline: none; transition: border-color 0.18s ease-out, box-shadow 0.18s ease-out; } .ds-input::placeholder { font-family: ui-serif, Georgia, serif; font-style: italic; color: var(--muted-text, oklch(0.42 0.015 50)); } .ds-input:hover { border-color: color-mix(in oklch, var(--border) 70%, var(--ink)); } .ds-input:focus { border-color: var(--accent, oklch(0.5 0.08 50)); box-shadow: 0 0 0 2px color-mix(in oklch, var(--accent) 30%, transparent); } .ds-input:disabled { opacity: 0.5; cursor: not-allowed; }"
     },
     {
       "name": "Navigation (floating pill, Vue)",
@@ -461,7 +428,7 @@
       "refersTo": "nav-floating-pill",
       "description": "Squircle floating pill with spring-animated accent indicator. Vue desktop nav.",
       "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item is-active\">Home</a><a class=\"ds-nav-item\">Books</a><a class=\"ds-nav-item\">Moments</a></nav>",
-      "css": ".ds-nav { position: fixed; top: 1rem; left: 50%; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.375rem; background: color-mix(in oklch, var(--paper, oklch(0.985 0.013 260)) 90%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-radius: 90px; corner-shape: squircle; box-shadow: inset rgba(255, 255, 255, 0.35) 0 0 20px 0, 0 6px 16px -4px rgba(0, 0, 0, 0.12), 0 4px 8px -2px rgba(0, 0, 0, 0.08); z-index: 9999; } .ds-nav-item { position: relative; padding: 0.625rem 1rem; font-size: 0.875rem; font-weight: 500; color: var(--muted-text, oklch(0.551 0.027 264.364)); text-decoration: none; border-radius: 9999px; transition: color 0.18s ease-out; cursor: pointer; } .ds-nav-item.is-active { color: var(--ink, oklch(0.13 0.028 261.692)); } .ds-nav-item.is-active::before { content: ''; position: absolute; inset: 0; background: color-mix(in oklch, var(--accent, oklch(0.63 0.27 254)) 20%, transparent); border-radius: 9999px; z-index: -1; } @supports not (corner-shape: squircle) { .ds-nav { border-radius: 48px; } }"
+      "css": ".ds-nav { position: fixed; top: 1rem; left: 50%; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.375rem; background: color-mix(in oklch, var(--paper, oklch(0.97 0.013 50)) 90%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-radius: 90px; corner-shape: squircle; box-shadow: inset rgba(255, 255, 255, 0.35) 0 0 20px 0, 0 6px 16px -4px rgba(0, 0, 0, 0.12), 0 4px 8px -2px rgba(0, 0, 0, 0.08); z-index: 9999; } .ds-nav-item { position: relative; padding: 0.625rem 1rem; font-size: 0.875rem; font-weight: 500; color: var(--muted-text, oklch(0.42 0.015 50)); text-decoration: none; border-radius: 9999px; transition: color 0.18s ease-out; cursor: pointer; } .ds-nav-item.is-active { color: var(--ink, oklch(0.2 0.018 50)); } .ds-nav-item.is-active::before { content: ''; position: absolute; inset: 0; background: color-mix(in oklch, var(--accent, oklch(0.5 0.08 50)) 20%, transparent); border-radius: 9999px; z-index: -1; } @supports not (corner-shape: squircle) { .ds-nav { border-radius: 48px; } }"
     },
     {
       "name": "Modal panel",
@@ -469,7 +436,7 @@
       "refersTo": "modal-panel",
       "description": "rounded-2xl paper panel over a bg-black/45 backdrop-blur-[10px] mask. Standard modal.",
       "html": "<div class=\"ds-modal-panel\"><h2>Settings</h2><p>Choose a theme to switch the study's paint.</p></div>",
-      "css": ".ds-modal-panel { position: relative; width: 100%; max-width: 560px; padding: 1.5rem; background: var(--paper, oklch(0.985 0.013 260)); color: var(--ink, oklch(0.13 0.028 261.692)); border: 1px solid color-mix(in oklch, var(--border, oklch(0.88 0.02 260)) 60%, transparent); border-radius: 1.125rem; box-shadow: 0 12px 32px color-mix(in oklch, var(--ink) 10%, transparent); } .ds-modal-panel h2 { margin: 0 0 0.5rem; font-family: ui-serif, Georgia, serif; font-size: 1.5rem; font-weight: 500; letter-spacing: -0.02em; } .ds-modal-panel p { margin: 0; color: var(--muted-text, oklch(0.551 0.027 264.364)); line-height: 1.65; }"
+      "css": ".ds-modal-panel { position: relative; width: 100%; max-width: 560px; padding: 1.5rem; background: var(--paper, oklch(0.97 0.013 50)); color: var(--ink, oklch(0.2 0.018 50)); border: 1px solid color-mix(in oklch, var(--border, oklch(0.88 0.02 260)) 60%, transparent); border-radius: 1.125rem; box-shadow: 0 12px 32px color-mix(in oklch, var(--ink) 10%, transparent); } .ds-modal-panel h2 { margin: 0 0 0.5rem; font-family: ui-serif, Georgia, serif; font-size: 1.5rem; font-weight: 500; letter-spacing: -0.02em; } .ds-modal-panel p { margin: 0; color: var(--muted-text, oklch(0.42 0.015 50)); line-height: 1.65; }"
     },
     {
       "name": "Tag pill (label / chip)",
@@ -477,7 +444,7 @@
       "refersTo": "tag-pill",
       "description": "Muted background, rounded-full, 11px tracked. Used for blog categories, version chips, status labels.",
       "html": "<span class=\"ds-tag-pill\">Reading</span>",
-      "css": ".ds-tag-pill { display: inline-flex; align-items: center; padding: 0.25rem 0.625rem; background: var(--warm-gray, oklch(0.95 0.018 260)); color: var(--muted-text, oklch(0.551 0.027 264.364)); border-radius: 9999px; font-family: 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; }"
+      "css": ".ds-tag-pill { display: inline-flex; align-items: center; padding: 0.25rem 0.625rem; background: var(--warm-gray, oklch(0.95 0.018 260)); color: var(--muted-text, oklch(0.42 0.015 50)); border-radius: 9999px; font-family: 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; }"
     },
     {
       "name": "Hero h1 (clamp serif)",
@@ -485,14 +452,14 @@
       "refersTo": "hero",
       "description": "The page h1 — clamp(1.875rem, 4vw + 1rem, 4.5rem), serif, weight 500, letter-spacing -0.025em. Used on BasicDetail.",
       "html": "<h1 class=\"ds-hero\">私人书房 · The Study</h1>",
-      "css": ".ds-hero { margin: 0; font-family: ui-serif, Georgia, 'Times New Roman', serif; font-size: clamp(1.875rem, 4vw + 1rem, 4.5rem); font-weight: 500; line-height: 1.1; letter-spacing: -0.025em; color: var(--ink, oklch(0.13 0.028 261.692)); text-wrap: balance; max-width: 72rem; margin-inline: auto; text-align: center; padding-inline: 1.5rem; } @media (prefers-reduced-motion: no-preference) { .ds-hero .word { display: inline-block; opacity: 0; transform: translateY(12px); animation: title-word-in 600ms cubic-bezier(0.22, 1, 0.36, 1) forwards; } .ds-hero .word:nth-child(2) { animation-delay: 80ms; } .ds-hero .word:nth-child(3) { animation-delay: 160ms; } .ds-hero .word:nth-child(4) { animation-delay: 240ms; } } @keyframes title-word-in { to { opacity: 1; transform: translateY(0); } }"
+      "css": ".ds-hero { margin: 0; font-family: ui-serif, Georgia, 'Times New Roman', serif; font-size: clamp(1.875rem, 4vw + 1rem, 4.5rem); font-weight: 500; line-height: 1.1; letter-spacing: -0.025em; color: var(--ink, oklch(0.2 0.018 50)); text-wrap: balance; max-width: 72rem; margin-inline: auto; text-align: center; padding-inline: 1.5rem; } @media (prefers-reduced-motion: no-preference) { .ds-hero .word { display: inline-block; opacity: 0; transform: translateY(12px); animation: title-word-in 600ms cubic-bezier(0.22, 1, 0.36, 1) forwards; } .ds-hero .word:nth-child(2) { animation-delay: 80ms; } .ds-hero .word:nth-child(3) { animation-delay: 160ms; } .ds-hero .word:nth-child(4) { animation-delay: 240ms; } } @keyframes title-word-in { to { opacity: 1; transform: translateY(0); } }"
     }
   ],
   "narrative": {
-    "northStar": "The Black Cat's Study — Ten Rooms, Twenty Surfaces.",
-    "overview": "kanocifer.chat is a personal study with a paint box. One author (Kuroome) reads, fishes, and writes; the site tracks all three and publishes the last. The interface reads as a quiet, deliberate workshop — paper-fold heroes, literary typography, and a single black cat (kuro neko, 黒猫) sitting in the corner. The brand voice is 书卷气 · 准 · 适 (literary register, exact, measured): every token name is opinionated, every decision is committed, and nothing is performed for an audience.\n\nThe system ships ten complete color schemes — sky-blue, forest-green, paper, sage, mist, blush, spring, autumn, clear-sky, midnight — each with its own light and dark variant. Twenty surfaces total, all sharing one token architecture. The palette is the brand: changing themes is not decoration but identity. data-color-scheme=\"<name>\" on <html> swaps the entire surface vocabulary atomically, with a 600ms clip-path sun/moon/monitor transition as the visible \"click\" of the toggle. The default (sky-blue) is what visitors first see; the others are how the author lives in the site.\n\nDensity is comfortable, not tight. The dominant surface is paper; the dominant type is Chinese-set HarmonyOS Sans with Averia Gruesa Libre accents for English display. Shadows are layered ambient + inset white highlight (the \"lifted paper\" treatment), never flat, never glassmorphism. The system is explicitly not a SaaS cream-bg dashboard, an AI bento grid, an editorial-magazine layout, or a tech-company marketing site — those lanes are documented in PRODUCT.md as anti-references and in §6 as Don'ts. The site is the author's, used every day, and that single-author / multi-reader shape is what every choice serves.",
+    "northStar": "The Black Cat's Study — Four Rooms, Eight Surfaces.",
+    "overview": "kanocifer.chat is a personal study with a paint box. One author (Kuroome) reads, fishes, and writes; the site tracks all three and publishes the last. The interface reads as a quiet, deliberate workshop — paper-fold heroes, literary typography, and a single black cat (kuro neko, 黒猫) sitting in the corner. The brand voice is 书卷气 · 准 · 适 (literary register, exact, measured): every token name is opinionated, every decision is committed, and nothing is performed for an audience.\n\nThe system ships four complete color schemes — paper, sage, mist, blush — each with its own light and dark variant. Eight surfaces total, all sharing one token architecture. The palette is the brand: changing themes is not decoration but identity. data-color-scheme=\"<name>\" on <html> swaps the entire surface vocabulary atomically, with a 600ms clip-path sun/moon/monitor transition as the visible \"click\" of the toggle. The default (paper) is what visitors first see; the others are how the author lives in the site.\n\nDensity is comfortable, not tight. The dominant surface is paper; the dominant type is Chinese-set HarmonyOS Sans with Averia Gruesa Libre accents for English display. Shadows are layered ambient + inset white highlight (the \"lifted paper\" treatment), never flat, never glassmorphism. The system is explicitly not a SaaS cream-bg dashboard, an AI bento grid, an editorial-magazine layout, or a tech-company marketing site — those lanes are documented in PRODUCT.md as anti-references and in §6 as Don'ts. The site is the author's, used every day, and that single-author / multi-reader shape is what every choice serves.",
     "keyCharacteristics": [
-      "10 named themes × light/dark = 20 distinct surfaces, sharing one token architecture",
+      "4 named themes × light/dark = 8 distinct surfaces, sharing one token architecture",
       "OKLCH color space throughout; color-mix(in oklch, var(--ink) N%, transparent) for shadow/rgba synthesis",
       "Three-layer token contract: raw theme vars → data-color-scheme activation → semantic Tailwind utilities (bg-background, text-foreground, etc.)",
       "Chinese-first typography; system CJK stack (PingFang SC / Microsoft YaHei) is the default body, with HarmonyOS Sans available as a user-level toggle",
@@ -504,9 +471,9 @@
     ],
     "rules": [
       {
-        "name": "The Ten-Rooms Rule",
+        "name": "The Four-Rooms Rule",
         "section": "colors",
-        "body": "Every theme is a complete identity, not a recolor. Switching data-color-scheme swaps the entire token graph atomically — ink, paper, accent, gradients, charts all change together. The site is not a SaaS with a 'dark mode toggle'; it is a study with ten rooms, each with its own paint."
+        "body": "Every theme is a complete identity, not a recolor. Switching data-color-scheme swaps the entire token graph atomically — ink, paper, accent, gradients, charts all change together. The site is not a SaaS with a 'dark mode toggle'; it is a study with four rooms, each with its own paint."
       },
       {
         "name": "The One-Voice Rule",
@@ -516,12 +483,7 @@
       {
         "name": "The Theme-Not-Warmth Rule",
         "section": "colors",
-        "body": "Tinted neutrals add 0.005–0.015 chroma toward the theme's own hue, not toward warm or cool 'because the brand feels that way.' Sky-blue paper is tinted toward blue, not toward warmth; autumn paper is tinted toward orange, not toward red. There is no 'always warm' or 'always cool' paper."
-      },
-      {
-        "name": "The Hex-Legacy Rule",
-        "section": "colors",
-        "body": "Four themes (paper, sage, mist, blush) are still expressed in hex; the other six are oklch. The oklch versions are being migrated to. When extending a theme, match its existing format. Do not mix oklch and hex within one theme."
+        "body": "Tinted neutrals add 0.005–0.015 chroma toward the theme's own hue, not toward warm or cool 'because the brand feels that way.' Paper paper is tinted toward orange, not toward warmth; mist paper is tinted toward blue, not toward red. There is no 'always warm' or 'always cool' paper."
       },
       {
         "name": "The CJK-First Rule",
@@ -567,6 +529,16 @@
         "name": "The Inset-White-Highlight Rule",
         "section": "elevation",
         "body": "Bento cards, the floating nav, and the BasicDetail inner section all carry an inset white highlight at rgba(255,255,255,0.35) (light) or rgba(255,255,255,0.06) (dark). This is the 'paper held under a lamp' effect. The highlight is what separates this system from flat SaaS cards with one drop shadow."
+      },
+      {
+        "name": "The Layered-Shadow Rule",
+        "section": "elevation",
+        "body": "Theme-adaptive shadows are built from multiple color-mix(in oklch, var(--ink) N%, transparent) layers at increasing blur radius and decreasing alpha — never a fixed rgba(0,0,0,…). Reference implementations: BlogEditorView writing canvas (line 745) and BlogListItem card (resting)."
+      },
+      {
+        "name": "The No-Fixed-RGBA Rule",
+        "section": "elevation",
+        "body": "Hard-coded rgba(255,255,255,…) or rgba(0,0,0,…) shadows are a code-review red flag — they read as dark-on-dark halos in light themes and vanish in dark themes. Every surface shadow MUST derive from var(--ink) or var(--paper) through color-mix or oklch(from …). Use Tailwind's shadow-xs/sm/md utilities only for surfaces that don't need theme adaptation."
       }
     ],
     "dos": [

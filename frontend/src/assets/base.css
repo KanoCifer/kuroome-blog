@@ -90,7 +90,7 @@
   --delay: 80ms;
 }
 
-@theme incline {
+@theme inline {
   /* Core */
   --color-background: var(--paper);
   --color-foreground: var(--ink);

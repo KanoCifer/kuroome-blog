@@ -244,6 +244,9 @@ const setupCodeCopy = () => {
   const contentContainer = document.querySelector('.prose');
   if (!contentContainer) return;
 
+  // Early return: buttons already present — skip re-appending on body re-render
+  if (contentContainer.querySelector('.copy-btn')) return;
+
   if (clickHandler) {
     contentContainer.removeEventListener('click', clickHandler);
   }
@@ -402,7 +405,7 @@ onUnmounted(() => {
             :alt="`${post.title} 封面`"
             class="h-full w-full object-cover"
             loading="lazy"
-            style="box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08)"
+            style="box-shadow: inset 0 0 0 1px oklch(from var(--ink) l c h / 0.08)"
           />
         </div>
         <figcaption
@@ -577,7 +580,7 @@ onUnmounted(() => {
   padding: 4px 8px;
   background: var(--ink);
   color: var(--paper);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   pointer-events: none;
   font-size: 0.875rem;
   white-space: nowrap;
@@ -600,6 +603,17 @@ onUnmounted(() => {
   color: var(--accent);
 }
 
+/* Drop cap rag guard: below 30rem the 3.4em float crushes 1-2 char opening lines */
+@media (max-width: 30rem) {
+  .prose-body > p:first-of-type::first-letter {
+    float: none;
+    font-size: 1em;
+    font-weight: inherit;
+    margin: 0;
+    color: inherit;
+  }
+}
+
 /* —— ④ 章节编号：CSS counter，长文目录感 —— */
 .prose-body {
   counter-reset: h2-section;
@@ -607,7 +621,7 @@ onUnmounted(() => {
 .prose-body h2::before {
   counter-increment: h2-section;
   content: '§ ' counter(h2-section) '  ';
-  font-family: ui-monospace, 'JetBrains Mono', Menlo, monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.62em;
   font-weight: 500;
   letter-spacing: 0.04em;
