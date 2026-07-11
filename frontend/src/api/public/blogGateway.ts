@@ -57,7 +57,7 @@ export interface BlogGateway {
 
 export const blogGateway: BlogGateway = {
   async getBlogs(query?: BlogQuery): Promise<BlogListResponse> {
-    const res = await request.get<{ data: BlogListResponse }>('v1/blogs', {
+    const res = await request.get<{ data: BlogListResponse }>('v3/blogs', {
       params: query,
     });
     return res.data.data;
@@ -65,25 +65,25 @@ export const blogGateway: BlogGateway = {
 
   async getBlogPost(postId: string): Promise<BlogPostResponse> {
     const res = await request.get<{ data: BlogPostResponse }>(
-      `v1/blogs/${postId}`,
+      `v3/blogs/${postId}`,
     );
     return res.data.data;
   },
 
   async getTags(): Promise<TagItem[]> {
-    const res = await request.get<{ data: { tags: TagItem[] } }>('v1/tags');
+    const res = await request.get<{ data: { tags: TagItem[] } }>('v3/tags');
     return res.data.data.tags;
   },
 
   async getPostsByTag(tag: string): Promise<PostsByTagResponse> {
     const res = await request.get<{ data: PostsByTagResponse }>(
-      `v1/tags/${encodeURIComponent(tag)}/posts`,
+      `v3/tags/${encodeURIComponent(tag)}/posts`,
     );
     return res.data.data;
   },
 
   async getLegacyPost(postId: string): Promise<BlogPostResponse> {
-    const res = await request.get<{ data: BlogPostResponse }>('v1/post', {
+    const res = await request.get<{ data: BlogPostResponse }>('v3/post', {
       params: { _id: postId },
     });
     return res.data.data;

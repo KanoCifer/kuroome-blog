@@ -38,4 +38,7 @@ func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
 
 	githubH := handler.NewGitHubHandler(state.GitHubOAuth(), state.Cfg())
 	githubH.RegisterRoutes(v3, middleware.AuthMiddleware())
+
+	blogH := handler.NewBlogHandler(state.BlogSvc())
+	blogH.RegisterRoutes(v3)
 }

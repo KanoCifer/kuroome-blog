@@ -11,6 +11,7 @@ type AppState struct {
 	config      *config.Config
 	userSvc     *service.UserService
 	adminSvc    *service.AdminService
+	blogSvc     *service.BlogService
 	passkeySvc  *service.PasskeyService
 	githubOAuth *service.GitHubOAuth
 }
@@ -20,6 +21,7 @@ func NewAppState(
 	cfg *config.Config,
 	userRepo *postgres.UserRepo,
 	adminRepo *postgres.AdminRepo,
+	blogSvc *service.BlogService,
 	redis *redis.Client,
 	passkeySvc *service.PasskeyService,
 ) *AppState {
@@ -28,6 +30,7 @@ func NewAppState(
 		config:     cfg,
 		userSvc:    userSvc,
 		adminSvc:   service.NewAdminService(adminRepo, redis),
+		blogSvc:    blogSvc,
 		passkeySvc: passkeySvc,
 		githubOAuth: service.NewGitHubOAuth(
 			redis, userRepo, userSvc,
@@ -38,6 +41,7 @@ func NewAppState(
 
 func (a *AppState) UserSvc() *service.UserService       { return a.userSvc }
 func (a *AppState) AdminSvc() *service.AdminService     { return a.adminSvc }
+func (a *AppState) BlogSvc() *service.BlogService       { return a.blogSvc }
 func (a *AppState) PasskeySvc() *service.PasskeyService { return a.passkeySvc }
 func (a *AppState) GitHubOAuth() *service.GitHubOAuth   { return a.githubOAuth }
 func (a *AppState) Cfg() *config.Config                 { return a.config }

@@ -35,7 +35,7 @@ describe('blogGateway (React — tags migration)', () => {
       const gateway = blogGateway();
       const resp = await gateway.getTags();
 
-      expect(request.get).toHaveBeenCalledWith('v1/tags');
+      expect(request.get).toHaveBeenCalledWith('v3/tags');
       expect(resp.data).toEqual({
         tags: [
           { name: 'python', count: 2 },
@@ -58,7 +58,7 @@ describe('blogGateway (React — tags migration)', () => {
       const gateway = blogGateway();
       const resp = await gateway.getPostsByTag('C++');
 
-      expect(request.get).toHaveBeenCalledWith('v1/tags/C%2B%2B/posts');
+      expect(request.get).toHaveBeenCalledWith('v3/tags/C%2B%2B/posts');
       expect(resp.data.tag).toBe('C++');
     });
   });

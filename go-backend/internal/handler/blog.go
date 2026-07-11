@@ -1,0 +1,103 @@
+package handler
+
+import (
+	"errors"
+	"log/slog"
+	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/KanoCifer/kuroome-blog/internal/dto"
+	"github.com/KanoCifer/kuroome-blog/internal/errs"
+	"github.com/KanoCifer/kuroome-blog/internal/response"
+)
+
+// BlogService 博客读表面 —— handler 依赖接口，便于 mock 测试。
+type BlogService interface {
+	ListPosts(page int, search string) (*dto.BlogListOut, error)
+	GetPost(id string) (*dto.PostOut, error)
+	ListTags() ([]dto.TagOut, error)
+	ListPostsByTag(tag string, page, perPage int) (*dto.PostsByTagOut, error)
+}
+
+// BlogHandler 处理博客读请求（公开接口，无需鉴权）。
+type BlogHandler struct {
+	blogSvc BlogService
+}
+
+func NewBlogHandler(blogSvc BlogService) *BlogHandler {
+	return &BlogHandler{blogSvc: blogSvc}
+}
+
+func (h *BlogHandler) GetBlogs(c *gin.Context) {
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	search := c.Query("search")
+
+	data, err := h.blogSvc.ListPosts(page, search)
+	if err != nil {
+		slog.ErrorContext(c.Request.Context(), "get blogs", "error", err)
+		response.APIError(c, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	response.Success(c, data, "Blogs retrieved successfully")
+}
+
+func (h *BlogHandler) GetBlogPost(c *gin.Context) {
+	_id := c.Param("id")
+	if _id == "" {
+		_id = c.Query("_id")
+	}
+
+	data, err := h.blogSvc.GetPost(_id)
+	if err != nil {
+		switch {
+		case errors.Is(err, errs.ErrInvalidPostID):
+			response.APIError(c, err.Error(), http.StatusBadRequest)
+		case errors.Is(err, errs.ErrPostNotFound):
+			response.APIError(c, err.Error(), http.StatusNotFound)
+		default:
+			slog.ErrorContext(c.Request.Context(), "get blog post", "error", err)
+			response.APIError(c, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	response.Success(c, data, "Blog post retrieved successfully")
+}
+
+func (h *BlogHandler) GetTags(c *gin.Context) {
+	tags, err := h.blogSvc.ListTags()
+	if err != nil {
+		slog.ErrorContext(c.Request.Context(), "get tags", "error", err)
+		response.APIError(c, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	response.Success(c, gin.H{"tags": tags}, "Tags retrieved successfully")
+}
+
+func (h *BlogHandler) GetPostsByTag(c *gin.Context) {
+	tag := c.Param("tag")
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	perPage, _ := strconv.Atoi(c.DefaultQuery("per_page", "10"))
+
+	data, err := h.blogSvc.ListPostsByTag(tag, page, perPage)
+	if err != nil {
+		if errors.Is(err, errs.ErrInvalidPostID) {
+			response.APIError(c, "Tag is required", http.StatusBadRequest)
+			return
+		}
+		slog.ErrorContext(c.Request.Context(), "get posts by tag", "error", err)
+		response.APIError(c, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	response.Success(c, data, "Posts retrieved successfully")
+}
+
+// RegisterRoutes 挂载博客读路由到 v3 组。
+func (h *BlogHandler) RegisterRoutes(r *gin.RouterGroup) {
+	r.GET("/blogs", h.GetBlogs)
+	r.GET("/blogs/:id", h.GetBlogPost)
+	r.GET("/post", h.GetBlogPost)
+	r.GET("/tags", h.GetTags)
+	r.GET("/tags/:tag/posts", h.GetPostsByTag)
+}

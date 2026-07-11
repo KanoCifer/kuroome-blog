@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
+	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"go.mongodb.org/mongo-driver/v2/mongo/readpref"
@@ -19,9 +20,10 @@ import (
 )
 
 var (
-	pgDB   *gorm.DB
-	client *mongo.Client
-	rdb    *redis.Client
+	pgDB    *gorm.DB
+	client  *mongo.Client   // kept for Close()/disconnect
+	mongoDB *mongo.Database // resolved handle, what repos consume
+	rdb     *redis.Client
 )
 
 func InitDB() error {
@@ -69,11 +71,24 @@ func InitMongo() error {
 		return err
 	}
 	client = c
+	mongoDB = client.Database("readinglist")
+	if mongoDB != nil {
+		_, _ = mongoDB.Collection("posts").Indexes().CreateOne(
+			context.Background(),
+			mongo.IndexModel{
+				Keys: bson.D{{Key: "title", Value: "text"}, {Key: "body", Value: "text"}},
+			},
+		)
+	}
 	return nil
 }
 
 func GetMongo() *mongo.Client {
 	return client
+}
+
+func GetMongoDB() *mongo.Database {
+	return mongoDB
 }
 
 func InitRedis() error {

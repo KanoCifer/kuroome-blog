@@ -37,7 +37,7 @@ describe('blogGateway (tags migration)', () => {
 
       const tags = await blogGateway.getTags();
 
-      expect(request.get).toHaveBeenCalledWith('v1/tags');
+      expect(request.get).toHaveBeenCalledWith('v3/tags');
       expect(tags).toEqual([
         { name: 'python', count: 3 },
         { name: 'go', count: 1 },
@@ -59,7 +59,7 @@ describe('blogGateway (tags migration)', () => {
 
       const result = await blogGateway.getPostsByTag('C++');
 
-      expect(request.get).toHaveBeenCalledWith('v1/tags/C%2B%2B/posts');
+      expect(request.get).toHaveBeenCalledWith('v3/tags/C%2B%2B/posts');
       expect(result.tag).toBe('C++');
       expect(result.total).toBe(1);
     });

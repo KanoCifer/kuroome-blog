@@ -63,11 +63,13 @@ func main() {
 		slog.Error("init webauthn", "error", err)
 	}
 	passkeySvc := service.NewPasskeyService(wa, db.GetRedis(), postgres.NewPasskeyRepo(db.GetDB()), postgres.NewUserRepo(db.GetDB()))
+	blogSvc := service.NewBlogService(db.GetMongoDB())
 
 	state := app.NewAppState(
 		config.Cfg,
 		postgres.NewUserRepo(db.GetDB()),
-		postgres.NewAdminRepo(db.GetMongo()),
+		postgres.NewAdminRepo(db.GetMongoDB()),
+		blogSvc,
 		db.GetRedis(),
 		passkeySvc,
 	)

@@ -60,31 +60,31 @@ export interface blogGateway {
 export const blogGateway = (): blogGateway => {
   return {
     async getBlogs(query?: BlogQuery) {
-      return request.get('v1/blogs', { params: query }) as Promise<
+      return request.get('v3/blogs', { params: query }) as Promise<
         AxiosResponse<BlogListResponse>
       >;
     },
 
     async getBlogPost(postId: string) {
-      return request.get(`v1/blogs/${postId}`) as Promise<
+      return request.get(`v3/blogs/${postId}`) as Promise<
         AxiosResponse<BlogPostResponse>
       >;
     },
 
     async getTags() {
-      return request.get('v1/tags') as Promise<
+      return request.get('v3/tags') as Promise<
         AxiosResponse<{ tags: TagItem[] }>
       >;
     },
 
     async getPostsByTag(tag: string) {
       return request.get(
-        `v1/tags/${encodeURIComponent(tag)}/posts`,
+        `v3/tags/${encodeURIComponent(tag)}/posts`,
       ) as Promise<AxiosResponse<PostsByTagResponse>>;
     },
 
     async getLegacyPost(postId: string) {
-      return request.get('v1/post', { params: { _id: postId } }) as Promise<
+      return request.get('v3/post', { params: { _id: postId } }) as Promise<
         AxiosResponse<BlogPostResponse>
       >;
     },
