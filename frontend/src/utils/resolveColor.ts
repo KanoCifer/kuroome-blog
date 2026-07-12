@@ -22,9 +22,13 @@ function getProbe(): CanvasRenderingContext2D | null {
 
 /**
  * 读取 :root 上的 CSS 变量，返回浏览器解析后的标准 rgb 字符串。
- * 失败时返回 fallback（通常是一个 hex 字面量）。
+ * 仅用在客户端(onMounted)——CSS 变量在此时已存在,解析到对应 rgb。
+ * fallback 供解析失败或 SSR 兜底;默认黑色,保证 ECharts 一定拿到合法色值。
  */
-export function resolveCssColor(cssVar: string, fallback: string): string {
+export function resolveCssColor(
+  cssVar: string,
+  fallback = '#000000',
+): string {
   if (typeof document === 'undefined') return fallback;
   const raw = getComputedStyle(document.documentElement)
     .getPropertyValue(cssVar)

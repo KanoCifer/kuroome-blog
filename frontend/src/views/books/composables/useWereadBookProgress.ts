@@ -21,6 +21,10 @@ export function useWereadBookProgress(bookId: Ref<string | null>) {
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
+  // 当前 in-flight 请求归属的 bookId。请求返回时若 bookId 已变化,
+  // 说明用户已经切走了,丢弃这本旧书的响应,避免覆盖新书的数据。
+  let activeFetchId: string | null = null;
+
   async function fetchProgress(refresh = false): Promise<void> {
     const id = bookId.value;
     if (!id) return;
@@ -29,15 +33,18 @@ export function useWereadBookProgress(bookId: Ref<string | null>) {
     if (!refresh) {
       const cached = _cache.get(id);
       if (cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
+        if (activeFetchId !== id) return; // 已经切走,连 cache 也不回填
         progress.value = cached.progress;
         return;
       }
     }
 
+    activeFetchId = id;
     isLoading.value = true;
     error.value = null;
     try {
       const res = await wereadGateway.getBookProgress(id, refresh);
+      if (activeFetchId !== id) return; // 请求期间已经切走,静默丢弃
       if (res.data) {
         progress.value = res.data;
         _cache.set(id, { progress: res.data, fetchedAt: Date.now() });
@@ -45,10 +52,11 @@ export function useWereadBookProgress(bookId: Ref<string | null>) {
         error.value = res.message || '加载进度失败';
       }
     } catch (e) {
+      if (activeFetchId !== id) return; // 同上
       const msg = e instanceof Error ? e.message : '加载进度失败';
       error.value = msg;
     } finally {
-      isLoading.value = false;
+      if (activeFetchId === id) isLoading.value = false;
     }
   }
 

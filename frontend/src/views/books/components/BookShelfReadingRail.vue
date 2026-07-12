@@ -70,6 +70,7 @@ defineEmits<{
 
 const railEl = ref<HTMLDivElement | null>(null);
 const hasOverflow = ref(false);
+const ro = ref<ResizeObserver | null>(null);
 
 function checkOverflow() {
   const el = railEl.value;
@@ -77,16 +78,15 @@ function checkOverflow() {
   hasOverflow.value = el.scrollWidth > el.clientWidth + 4;
 }
 
-let ro: ResizeObserver | null = null;
 onMounted(() => {
   checkOverflow();
   if (typeof ResizeObserver !== 'undefined' && railEl.value) {
-    ro = new ResizeObserver(checkOverflow);
-    ro.observe(railEl.value);
+    ro.value = new ResizeObserver(checkOverflow);
+    ro.value.observe(railEl.value);
   }
 });
 onBeforeUnmount(() => {
-  ro?.disconnect();
+  ro.value?.disconnect();
 });
 
 function scrollByPage(dir: 1 | -1) {
