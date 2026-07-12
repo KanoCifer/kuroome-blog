@@ -14,6 +14,7 @@ type AppState struct {
 	blogSvc     *service.BlogService
 	passkeySvc  *service.PasskeyService
 	githubOAuth *service.GitHubOAuth
+	wssvc       *service.WSService
 }
 
 // NewAppState 组装所有 service，作为唯一的组合根入口。
@@ -24,6 +25,7 @@ func NewAppState(
 	blogSvc *service.BlogService,
 	redis *redis.Client,
 	passkeySvc *service.PasskeyService,
+	wssvc *service.WSService,
 ) *AppState {
 	userSvc := service.NewUserService(userRepo, redis, cfg.Admin.UserIDs)
 	return &AppState{
@@ -32,6 +34,7 @@ func NewAppState(
 		adminSvc:   service.NewAdminService(adminRepo, redis),
 		blogSvc:    blogSvc,
 		passkeySvc: passkeySvc,
+		wssvc:      wssvc,
 		githubOAuth: service.NewGitHubOAuth(
 			redis, userRepo, userSvc,
 			cfg.GitHub.ClientID, cfg.GitHub.ClientSecret, cfg.GitHub.RedirectURI,
@@ -43,5 +46,6 @@ func (a *AppState) UserSvc() *service.UserService       { return a.userSvc }
 func (a *AppState) AdminSvc() *service.AdminService     { return a.adminSvc }
 func (a *AppState) BlogSvc() *service.BlogService       { return a.blogSvc }
 func (a *AppState) PasskeySvc() *service.PasskeyService { return a.passkeySvc }
+func (a *AppState) WSSvc() *service.WSService           { return a.wssvc }
 func (a *AppState) GitHubOAuth() *service.GitHubOAuth   { return a.githubOAuth }
 func (a *AppState) Cfg() *config.Config                 { return a.config }

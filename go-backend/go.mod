@@ -3,6 +3,7 @@ module github.com/KanoCifer/kuroome-blog
 go 1.26.3
 
 require (
+	github.com/coder/websocket v1.8.15
 	github.com/gin-gonic/gin v1.12.0
 	github.com/go-webauthn/webauthn v0.17.4
 	github.com/golang-jwt/jwt/v5 v5.3.1

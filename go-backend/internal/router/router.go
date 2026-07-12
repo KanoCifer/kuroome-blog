@@ -44,4 +44,7 @@ func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
 
 	blogH := handler.NewBlogHandler(state.BlogSvc())
 	blogH.RegisterRoutes(v3)
+
+	wsH := handler.NewWSHandler(state.WSSvc())
+	wsH.RegisterRoutes(v3)
 }

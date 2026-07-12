@@ -67,6 +67,7 @@ func main() {
 	}
 	passkeySvc := service.NewPasskeyService(wa, db.GetRedis(), postgres.NewPasskeyRepo(db.GetDB()), postgres.NewUserRepo(db.GetDB()))
 	blogSvc := service.NewBlogService(db.GetMongoDB())
+	wssvc := service.NewWSService(db.GetRedis())
 
 	state := app.NewAppState(
 		config.Cfg,
@@ -75,6 +76,7 @@ func main() {
 		blogSvc,
 		db.GetRedis(),
 		passkeySvc,
+		wssvc,
 	)
 
 	router.Setup(r, state, db.GetRedis())
