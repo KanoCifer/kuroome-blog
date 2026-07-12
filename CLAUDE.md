@@ -20,7 +20,7 @@
 
 ## Go Backend (go-backend/)
 
-`go-backend/` 是 Python `backend/` 的 Go 重构（核心功能已实现，持续完善中）。运行 `@docs/rules/go-backend.md` 查分层、鉴权差异、测试与已知遗留。要点：
+`go-backend/` 是 Python `backend/` 的 Go 重构（核心功能已实现，持续完善中）。详见 [go-backend.md](docs/rules/go-backend.md) 查分层、鉴权差异、测试与已知遗留。要点：
 
 - **运行**:`cd go-backend && go run ./cmd/server` → `127.0.0.1:5555`，路由前缀 `/api/v3/*`
 - **命名对齐**:复用 Python 后端的 `.env`（`DATABASE_URL / SECRET_KEY / REDIS_URL / MONGO_URI / PORT` 等）
@@ -31,11 +31,9 @@
 
 环境变量与端口见 [environment.md](docs/rules/environment.md)；命令见 [commands.md](docs/rules/commands.md)。要点：
 
-- **双数据库 URL**：`DATABASE_URL`（asyncpg）应用使用；`DB_MIGRATE_URL` 已定义但 Alembic 实际仍读取 `DATABASE_URL` 并以异步引擎运行（`psycopg` 不是依赖项）。迁移时只需关注 `DATABASE_URL`，不要依赖 `DB_MIGRATE_URL`。
 - **Beanie 模型注册**：新增 MongoDB 文档模型必须加入 `main.py` 的 `init_beanie()` 的 `document_models` 列表，否则不会创建集合。
 - **Ruff**：`ban-relative-imports = "all"`（禁止相对导入，只用绝对导入）；`line-length = 79`；允许中文字符。
-- **Prettier**：`prettier-plugin-tailwindcss` 自动排序 Tailwind class。
-- **端口**：后端 `127.0.0.1:5555`（非 8000），前端通过 Vite proxy 转发 `/api/`（Vue `:5173` / React `:5174`）。
+- **端口**：后端 `127.0.0.1:5555`，前端通过 Vite proxy 转发 `/api/`（Vue `:5173` / React `:5174`）。
 - **工具链**：Python ≥3.14，Node ^26.4，Go 1.26。
 - **前端 lint/format**：两个前端均用 `oxlint` 做 lint、`prettier-plugin-tailwindcss` 排序 Tailwind class（非 eslint）。
 
