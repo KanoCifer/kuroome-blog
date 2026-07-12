@@ -7,7 +7,7 @@ import type {
   FishingFeedbackPayload,
 } from '@/types/fishing';
 import dayjs from 'dayjs';
-import { ref } from 'vue';
+import { nextTick, ref, watch } from 'vue';
 
 interface Props {
   isOpen: boolean;
@@ -34,6 +34,44 @@ const FEEDBACK_OPTIONS: { value: FishingFeedbackLevel; label: string }[] = [
 const notifier = useNotificationStore();
 const loading = ref(false);
 const selectedFeedback = ref<FishingFeedbackLevel | null>(null);
+
+// 弹窗进出动画:显隐状态与入场/出场类解耦,出场动画播完才移除 DOM
+const visible = ref(false);
+const isOpen = ref(false);
+let closeTimer: ReturnType<typeof setTimeout> | null = null;
+
+watch(
+  () => props.isOpen,
+  (val) => {
+    if (val) {
+      visible.value = true;
+      if (closeTimer) {
+        clearTimeout(closeTimer);
+        closeTimer = null;
+      }
+      nextTick(() => {
+        isOpen.value = true;
+      });
+    } else {
+      isOpen.value = false;
+      const closeMs =
+        parseFloat(
+          getComputedStyle(document.documentElement).getPropertyValue(
+            '--modal-close-dur',
+          ),
+        ) || 150;
+      closeTimer = setTimeout(() => {
+        visible.value = false;
+        closeTimer = null;
+      }, closeMs);
+    }
+  },
+  { immediate: true },
+);
+
+function handleCancel() {
+  if (!loading.value) emit('cancel');
+}
 
 const handleSubmit = async () => {
   if (!selectedFeedback.value) {
@@ -76,14 +114,16 @@ const handleSubmit = async () => {
 
 <template>
   <teleport to="body">
-    <transition name="modal-fade">
-      <div
-        v-if="isOpen"
-        class="bg-foreground/40 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
-      >
-        <div
-          class="bg-background mx-4 w-full max-w-md rounded-2xl p-6 shadow-xl"
-        >
+    <div
+      v-if="visible"
+      class="t-modal-overlay"
+      :class="{ 'is-open': isOpen }"
+      role="dialog"
+      aria-modal="true"
+      aria-label="钓鱼反馈"
+      @click.self="handleCancel"
+    >
+      <div class="t-modal" :class="{ 'is-open': isOpen }">
           <h3 class="text-foreground mb-4 text-lg font-semibold">
             钓鱼反馈
             <span class="text-muted-foreground ml-2 text-sm font-normal"
@@ -142,8 +182,79 @@ const handleSubmit = async () => {
               </button>
             </div>
           </div>
-        </div>
       </div>
-    </transition>
+    </div>
   </teleport>
 </template>
+
+<style scoped>
+/*
+ * t-modal —— transitions.dev modal (scale-up open / softer scale-down close)
+ * --modal-* 变量局部定义,仅作用于本弹窗,无全局污染
+ */
+.t-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: oklch(from var(--foreground) l c h / 0.4);
+  backdrop-filter: blur(2px);
+  --modal-open-dur: 250ms;
+  --modal-close-dur: 150ms;
+  --modal-scale: 0.96;
+  --modal-scale-close: 0.96;
+  --modal-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--modal-open-dur) var(--modal-ease);
+  will-change: opacity;
+}
+.t-modal-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.t-modal-overlay:not(.is-open) {
+  transition: opacity var(--modal-close-dur) var(--modal-ease);
+}
+
+.t-modal {
+  transform-origin: center;
+  transform: scale(var(--modal-scale));
+  opacity: 0;
+  pointer-events: none;
+  width: 100%;
+  max-width: 28rem;
+  margin: 0 1rem;
+  border-radius: var(--radius-2xl, 1rem);
+  background: var(--color-background, #fff);
+  padding: 1.5rem;
+  box-shadow: 0 20px 60px -10px oklch(0% 0 0 / 0.25);
+  transition:
+    transform var(--modal-open-dur) var(--modal-ease),
+    opacity var(--modal-open-dur) var(--modal-ease);
+  will-change: transform, opacity;
+}
+.t-modal.is-open {
+  transform: scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+.t-modal:not(.is-open) {
+  transform: scale(var(--modal-scale-close));
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform var(--modal-close-dur) var(--modal-ease),
+    opacity var(--modal-close-dur) var(--modal-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-modal,
+  .t-modal-overlay {
+    transition: none !important;
+  }
+}
+</style>

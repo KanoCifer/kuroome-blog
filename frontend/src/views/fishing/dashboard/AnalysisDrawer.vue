@@ -10,15 +10,52 @@
 import WeatherAnalysis from '@/components/ai/WeatherAnalysis.vue';
 import type { WeatherAnalysisPayload } from '@/types/fishing';
 import { X } from '@lucide/vue';
+import { nextTick, ref, watch } from 'vue';
 
-defineProps<{
+const props = defineProps<{
   open: boolean;
   payload: WeatherAnalysisPayload | null;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'close'): void;
 }>();
+
+const panelRef = ref<HTMLElement | null>(null);
+let triggerEl: HTMLElement | null = null;
+
+const FOCUSABLE =
+  'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
+
+function trapFocus(e: KeyboardEvent) {
+  if (e.key !== 'Tab' || !panelRef.value) return;
+  const nodes = panelRef.value.querySelectorAll<HTMLElement>(FOCUSABLE);
+  if (nodes.length === 0) return;
+  const first = nodes[0];
+  const last = nodes[nodes.length - 1];
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
+}
+
+watch(
+  () => props.open,
+  async (isOpen) => {
+    if (isOpen) {
+      triggerEl = (document.activeElement as HTMLElement) ?? null;
+      await nextTick();
+      const first = panelRef.value?.querySelector<HTMLElement>(FOCUSABLE);
+      first?.focus();
+    } else {
+      triggerEl?.focus();
+      triggerEl = null;
+    }
+  },
+);
 </script>
 
 <template>
@@ -48,9 +85,13 @@ defineEmits<{
     >
       <aside
         v-if="open"
+        ref="panelRef"
         class="bg-background border-border fixed top-0 right-0 z-50 flex h-screen w-[420px] max-w-[90vw] flex-col border-l shadow-2xl"
         role="dialog"
+        aria-modal="true"
         aria-label="AI 分析"
+        @keydown="trapFocus"
+        @keydown.esc="emit('close')"
       >
         <div
           class="border-border flex items-center justify-between border-b px-5 py-4"

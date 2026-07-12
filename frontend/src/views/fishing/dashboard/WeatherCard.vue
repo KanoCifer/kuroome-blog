@@ -73,9 +73,9 @@ const forecastIconClass = (textDay: string): string => {
       </div>
     </div>
 
-    <!-- Loading -->
+    <!-- Loading (仅初次无数据时示,避免刷新时卸载数据分支重发动画) -->
     <div
-      v-if="isLoading"
+      v-if="isLoading && !liveWeather"
       class="relative z-10 flex flex-1 flex-col items-center justify-center py-8"
     >
       <div
@@ -84,9 +84,9 @@ const forecastIconClass = (textDay: string): string => {
       <span class="text-muted-foreground mt-3 text-sm">获取天气数据...</span>
     </div>
 
-    <!-- Error -->
+    <!-- Error (仅初次无数据时示,有数据时静默失败保留旧值) -->
     <div
-      v-else-if="error"
+      v-else-if="error && !liveWeather"
       class="bg-destructive/10 relative z-10 rounded-xl p-4"
     >
       <p class="text-destructive flex items-center gap-2 text-sm">

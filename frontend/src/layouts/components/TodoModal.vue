@@ -1,7 +1,7 @@
 <template>
   <!-- Floating trigger button -->
   <Teleport to="body">
-    <div class="fixed right-4 bottom-24 z-50">
+    <div class="fixed right-4 bottom-40 z-50">
       <button
         @click="toggleDrawer"
         class="group bg-secondary hover:bg-primary flex h-10 cursor-pointer items-center overflow-hidden rounded-full px-2.5 shadow-md transition-all duration-300 ease-out"

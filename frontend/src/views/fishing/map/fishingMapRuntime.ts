@@ -90,6 +90,11 @@ export class FishingMapRuntime {
     this.markers = [];
   }
 
+  /** 容器尺寸变化后通知 AMap 重新测量(运行时方法,类型未声明) */
+  resize(): void {
+    (this.map as unknown as { resize: () => void }).resize();
+  }
+
   /** 规划驾车路线;返回距离(米)与耗时(秒)。失败抛带可读信息的 Error */
   planRoute(
     start: [number, number],

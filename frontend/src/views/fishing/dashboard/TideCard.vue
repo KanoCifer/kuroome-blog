@@ -279,6 +279,7 @@ onMounted(() => {
       <div class="flex shrink-0 items-center gap-1.5">
         <select
           v-model="selectedHarbor"
+          aria-label="选择港口"
           class="border-border bg-background text-foreground focus:ring-primary cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
         >
           <option
@@ -291,6 +292,7 @@ onMounted(() => {
         </select>
         <select
           v-model="selectedDate"
+          aria-label="选择日期"
           class="border-border bg-background text-foreground focus:ring-primary cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
         >
           <option

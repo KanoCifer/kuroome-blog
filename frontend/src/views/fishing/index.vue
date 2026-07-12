@@ -27,25 +27,18 @@ onMounted(dash.init);
     />
 
     <main
-      class="mx-auto flex max-w-screen-2xl flex-col gap-4 px-4 py-4 sm:px-6 sm:py-5"
+      class="mx-auto flex max-w-screen-2xl flex-col gap-6 px-4 py-5 sm:px-6 sm:py-8"
     >
       <QuickFeedbackBanner
         :disabled="!dash.indexData.value"
         @submit="dash.onQuickFeedback"
       />
 
-      <!--
-        Dashboard 网格:
-        - 桌面 (lg+): 12 列,Map(8) + Index(4) → Weather(4) + Hourly(4) + Tide(4)
-        - 平板 (md): 6 列,Map / Index 同列 → Weather + Hourly → Tide(全宽)
-        - 手机: 单列,Index 优先,然后 Map / Weather / Hourly / Tide
-      -->
       <div
-        class="fishing-dashboard grid grid-cols-1 gap-4 md:grid-cols-6 md:grid-rows-[minmax(360px,520px)_auto] lg:grid-cols-12"
+        class="fishing-dashboard grid grid-cols-1 gap-4 md:grid-cols-6 md:grid-rows-[minmax(420px,580px)_auto] lg:grid-cols-12"
       >
-        <!-- Map tile (主舞台) -->
         <div
-          class="fishing-map-wrapper border-border order-2 h-[360px] overflow-hidden rounded-2xl border shadow-sm md:order-1 md:col-span-6 md:h-full lg:col-span-8"
+          class="fishing-map-wrapper border-border order-2 h-[300px] overflow-hidden rounded-2xl border shadow-sm md:order-1 md:col-span-6 md:h-full lg:col-span-8"
         >
           <MapContainer
             ref="mapTileRef"
@@ -79,11 +72,14 @@ onMounted(dash.init);
         </div>
       </div>
 
-      <p
-        class="text-muted-foreground/70 font-family-averia pt-2 text-center text-sm italic"
-      >
-        在出钓与阅读之间，留一片安静
-      </p>
+      <footer class="fishing-tagline pt-6 text-center">
+        <span class="fishing-tagline-rule" aria-hidden="true" />
+        <p
+          class="text-muted-foreground font-family-averia tracking-wide italic"
+        >
+          在出钓与阅读之间，留一片安静
+        </p>
+      </footer>
     </main>
 
     <FeedbackFormDialog
@@ -119,38 +115,37 @@ onMounted(dash.init);
     0 2px 6px -2px oklch(0% 0 0 / 0.06);
 }
 
-@keyframes fishing-dashboard-fade-up {
+@keyframes fishing-dashboard-rise {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
-.fishing-dashboard > * {
-  animation: fishing-dashboard-fade-up 460ms cubic-bezier(0.22, 1, 0.36, 1)
-    backwards;
+@media (prefers-reduced-motion: no-preference) {
+  .fishing-dashboard {
+    animation: fishing-dashboard-rise 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
 }
-.fishing-dashboard > *:nth-child(1) {
-  animation-delay: 0ms;
-}
-.fishing-dashboard > *:nth-child(2) {
-  animation-delay: 60ms;
-}
-.fishing-dashboard > *:nth-child(3) {
-  animation-delay: 120ms;
-}
-.fishing-dashboard > *:nth-child(4) {
-  animation-delay: 180ms;
-}
-.fishing-dashboard > *:nth-child(5) {
-  animation-delay: 240ms;
+
+.fishing-tagline-rule {
+  display: block;
+  height: 1px;
+  width: 64px;
+  margin: 0 auto 16px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    oklch(from var(--muted-foreground) l c h / 0.5),
+    transparent
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fishing-dashboard > * {
+  .fishing-dashboard {
     animation: none;
   }
   .fishing-map-wrapper:hover {

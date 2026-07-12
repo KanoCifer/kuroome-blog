@@ -118,6 +118,7 @@
   --color-chart-5: var(--chart-5);
 
   --color-surface: var(--surface);
+  --color-card: var(--paper);
   --color-destructive: var(--color-rose-500);
   --color-success: var(--color-emerald-500);
   --color-warning: var(--color-amber-500);

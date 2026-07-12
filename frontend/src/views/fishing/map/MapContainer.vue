@@ -1,81 +1,106 @@
 <template>
-  <div class="relative h-full w-full">
-    <!-- 地图实例 -->
-    <div ref="containerRef" class="map-container shadow-md"></div>
-
-    <!-- 定位按钮：浏览器原生方式获取 -->
-    <button
-      type="button"
+  <Teleport to="body" :disabled="!isFullscreen">
+    <div
       :class="[
-        'bg-background/90 text-foreground hover:bg-background border-border/40 absolute right-2.5 bottom-5 z-9999 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-colors disabled:opacity-50',
-        isLocating && 'text-primary',
+        isFullscreen
+          ? 'fixed inset-0 overflow-hidden'
+          : 'relative h-full w-full',
       ]"
-      :disabled="isLocating"
-      aria-label="定位到当前位置"
-      @click="handleLocateClick"
     >
-      <Locate v-if="!isLocating" class="h-4 w-4" />
-      <Loader2 v-else class="h-4 w-4 animate-spin" />
-    </button>
+      <!-- 地图实例 -->
+      <div ref="containerRef" class="map-container shadow-md"></div>
 
-    <!-- 路线浮层（原 MapTile 折叠进来） -->
-    <Transition
-      enter-active-class="transition-all duration-300 ease-out"
-      enter-from-class="opacity-0 translate-y-2"
-      enter-to-class="opacity-100 translate-y-0"
-      leave-active-class="transition-all duration-200 ease-in"
-      leave-from-class="opacity-100 translate-y-0"
-      leave-to-class="opacity-0 translate-y-2"
-    >
-      <div
-        v-if="isPlanning || routeInfo"
-        class="bg-background/90 border-border absolute right-4 bottom-4 left-4 mx-auto w-fit rounded-2xl border p-4 shadow-lg backdrop-blur-md"
+      <!-- 定位按钮：浏览器原生方式获取 -->
+      <button
+        type="button"
+        :class="[
+          'bg-background/90 text-foreground hover:bg-background border-border/40 absolute right-2.5 bottom-5 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-all duration-200 ease-out disabled:opacity-50 active:scale-95',
+          isLocating && 'text-primary',
+        ]"
+        :disabled="isLocating"
+        aria-label="定位到当前位置"
+        @click="handleLocateClick"
+      >
+        <!-- 图标交叉淡入淡出(非 motion 库:cubic-bezier 过渡 + 缩放 + 模糊) -->
+        <span class="icon-crossfade" :class="{ 'is-active': isLocating }" aria-hidden="true">
+          <Locate class="h-4 w-4 icon-crossfade__item icon-crossfade__item--enter" />
+          <Loader2 class="h-4 w-4 icon-crossfade__item icon-crossfade__item--exit" />
+        </span>
+      </button>
+
+      <!-- 地图全屏按钮 -->
+      <button
+        type="button"
+        class="bg-background/90 text-foreground hover:bg-background border-border/40 absolute right-2.5 bottom-20 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-all duration-200 ease-out disabled:opacity-50 active:scale-95"
+        @click="handleFullscreen"
+      >
+        <span class="icon-crossfade" :class="{ 'is-active': isFullscreen }" aria-hidden="true">
+          <Maximize class="h-4 w-4 icon-crossfade__item icon-crossfade__item--enter" />
+          <Minimize class="h-4 w-4 icon-crossfade__item icon-crossfade__item--exit" />
+        </span>
+      </button>
+
+      <!-- 路线浮层（原 MapTile 折叠进来） -->
+      <Transition
+        enter-active-class="transition-all duration-300 ease-out"
+        enter-from-class="opacity-0 translate-y-2"
+        enter-to-class="opacity-100 translate-y-0"
+        leave-active-class="transition-all duration-200 ease-in"
+        leave-from-class="opacity-100 translate-y-0"
+        leave-to-class="opacity-0 translate-y-2"
       >
         <div
-          v-if="isPlanning"
-          class="text-muted-foreground flex items-center gap-3"
+          v-if="isPlanning || routeInfo"
+          class="bg-background/90 border-border absolute right-4 bottom-4 left-4 mx-auto w-fit rounded-2xl border p-4 shadow-lg backdrop-blur-md"
         >
-          <Loader2 class="h-4 w-4 animate-spin" />
-          <span class="text-sm">正在规划路线...</span>
-        </div>
-        <div
-          v-else-if="routeInfo"
-          class="flex items-center justify-between gap-4"
-        >
-          <div class="space-y-1.5">
-            <p class="text-muted-foreground text-xs tracking-[0.2em] uppercase">
-              路线信息
-            </p>
-            <p
-              class="text-foreground font-family-averia text-2xl leading-none tabular-nums sm:text-3xl"
-            >
-              <span>{{ formatDistance(routeInfo.distance) }}</span>
-              <span class="text-muted-foreground mx-2 text-base">·</span>
-              <span>{{ formatDuration(routeInfo.time) }}</span>
-            </p>
-          </div>
-          <button
-            class="bg-destructive text-primary-foreground hover:bg-destructive/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
-            type="button"
-            @click="emit('clearRoute')"
+          <div
+            v-if="isPlanning"
+            class="text-muted-foreground flex items-center gap-3"
           >
-            清除路线
-          </button>
+            <Loader2 class="h-4 w-4 animate-spin" />
+            <span class="text-sm">正在规划路线...</span>
+          </div>
+          <div
+            v-else-if="routeInfo"
+            class="flex items-center justify-between gap-4"
+          >
+            <div class="space-y-1.5">
+              <p
+                class="text-muted-foreground text-xs tracking-[0.2em] uppercase"
+              >
+                路线信息
+              </p>
+              <p
+                class="text-foreground font-family-averia text-2xl leading-none tabular-nums sm:text-3xl"
+              >
+                <span>{{ formatDistance(routeInfo.distance) }}</span>
+                <span class="text-muted-foreground mx-2 text-base">·</span>
+                <span>{{ formatDuration(routeInfo.time) }}</span>
+              </p>
+            </div>
+            <button
+              class="bg-destructive text-primary-foreground hover:bg-destructive/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+              type="button"
+              @click="emit('clearRoute')"
+            >
+              清除路线
+            </button>
+          </div>
         </div>
-      </div>
-    </Transition>
+      </Transition>
 
-    <p
-      v-if="!isPlanning && !routeInfo"
-      class="text-muted-foreground/90 bg-background/70 absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full px-4 py-1.5 text-xs backdrop-blur-md"
-    >
-      点击地图标记，自动规划路线
-    </p>
-  </div>
+      <p
+        v-if="!isPlanning && !routeInfo"
+        class="text-muted-foreground/90 bg-background/70 absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full px-4 py-1.5 text-xs backdrop-blur-md"
+      >
+        点击地图标记，自动规划路线
+      </p>
+    </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
-import { Loader2, Locate } from '@lucide/vue';
+import { Loader2, Locate, Maximize, Minimize } from '@lucide/vue';
 import type { MapMarker } from '@/types/marker';
 import { loadAMapNamespace } from '@/views/fishing/map/amapNamespace';
 import { FishingMapRuntime } from '@/views/fishing/map/fishingMapRuntime';
@@ -86,7 +111,14 @@ import {
 } from '@/views/fishing/composables/useFishingRoute';
 import { formatDuration } from '@/utils/format/duration';
 import { DEFAULT_MAP_CENTER } from '@/stores/fishingMap';
-import { onMounted, onUnmounted, ref, watch, useTemplateRef } from 'vue';
+import {
+  nextTick,
+  onMounted,
+  onUnmounted,
+  ref,
+  watch,
+  useTemplateRef,
+} from 'vue';
 
 declare global {
   interface Window {
@@ -128,6 +160,7 @@ let runtime: FishingMapRuntime | null = null;
 let clickHandler: ((e: unknown) => void) | null = null;
 
 const isLocating = ref(false);
+const isFullscreen = ref(false);
 
 onMounted(async () => {
   try {
@@ -167,6 +200,18 @@ watch(
   },
   { deep: true },
 );
+
+// 全屏按钮点击:Teleport 后容器被重新挂载,AMap 不会自动重新测量尺寸
+watch(isFullscreen, async (fullscreen) => {
+  await nextTick();
+  if (map) {
+    runtime?.resize();
+  }
+});
+
+const handleFullscreen = () => {
+  isFullscreen.value = !isFullscreen.value;
+};
 
 // 定位按钮点击:runtime 解析位置 → setCenter + 打点
 const handleLocateClick = async () => {
@@ -226,5 +271,49 @@ onUnmounted(() => {
   margin: 0px;
   width: 100%;
   height: 100%;
+}
+
+/*
+ * 图标交叉淡入淡出 —— 无 motion 库时用 CSS 过渡模仿 (principle #7)
+ * 默认态:enter 图标显示 / exit 图标隐藏;is-active 翻转
+ * cubic-bezier(0.2, 0, 0, 1) 提供 enter 与 exit 双向动画
+ */
+.icon-crossfade {
+  position: relative;
+  display: inline-flex;
+  width: 1rem;
+  height: 1rem;
+}
+.icon-crossfade__item {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  transition:
+    opacity 200ms cubic-bezier(0.2, 0, 0, 1),
+    transform 200ms cubic-bezier(0.2, 0, 0, 1),
+    filter 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+.icon-crossfade__item--enter {
+  opacity: 1;
+  transform: scale(1);
+  filter: blur(0);
+}
+.icon-crossfade__item--exit {
+  opacity: 0;
+  transform: scale(0.25);
+  filter: blur(4px);
+}
+.icon-crossfade.is-active .icon-crossfade__item--enter {
+  opacity: 0;
+  transform: scale(0.25);
+  filter: blur(4px);
+}
+.icon-crossfade.is-active .icon-crossfade__item--exit {
+  opacity: 1;
+  transform: scale(1);
+  filter: blur(0);
+}
+.icon-crossfade.is-active .icon-crossfade__item--exit.animate-spin {
+  animation: spin 1s linear infinite;
 }
 </style>

@@ -306,8 +306,8 @@ const chartOption = computed(() => {
       ],
     };
   } catch (e) {
-    console.log(
-      '[chartOption] THREW:',
+    console.error(
+      '[HourlyChartCard] chartOption 构建失败:',
       e instanceof Error ? e.message : String(e),
     );
     return {};
