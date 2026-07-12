@@ -9,8 +9,15 @@ type PostOut struct {
 	Cover     *string  `json:"cover"`
 	Tags      []string `json:"tags"`
 	IsPinned  int      `json:"is_pinned"`
+	Views     int      `json:"views"`
+	Likes     int      `json:"likes"`
 	CreatedAt string   `json:"created_at"`
 	UpdatedAt string   `json:"updated_at"`
+}
+
+// LikeOut 点赞响应 —— 返回递增后的最新喜欢数。
+type LikeOut struct {
+	Likes int `json:"likes"`
 }
 
 // TagOut 标签聚合项 —— 与 Python aggregate_tag_counts 形状一致。

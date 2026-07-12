@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import DelIcon from '@/components/icons/DelIcon.vue';
 import EditIcon from '@/components/icons/EditIcon.vue';
+import { Eye, Heart } from '@lucide/vue';
 import { blogGateway } from '@/api/public';
 import { useAuthStore } from '@/auth/stores/auth';
 import { useOrigin } from '@/composables/shared';
@@ -34,6 +35,13 @@ const post = ref<Post | null>(null);
 const isLoading = ref(false);
 const errorMessage = ref('');
 
+// 点赞：一次性表态。服务端不做重复判定（匿名），
+// 故「是否已赞」由 localStorage 在客户端持久化，避免重复提交。
+const isLiked = ref(false);
+const likesCount = ref(0);
+const isLiking = ref(false);
+const LIKED_KEY = (id: string) => `readinglist:liked:${id}`;
+
 const auth = useAuthStore();
 const showEditButton = computed(() => !!auth.user?.is_admin);
 
@@ -49,6 +57,10 @@ const fetchPost = async () => {
   try {
     const res = await blogGateway.getLegacyPost(postId.value);
     post.value = res as unknown as Post;
+
+    likesCount.value = (res as unknown as Post).likes ?? 0;
+    isLiked.value =
+      localStorage.getItem(LIKED_KEY(postId.value)) === '1';
   } catch (err: unknown) {
     console.error(err);
     errorMessage.value =
@@ -61,6 +73,27 @@ const fetchPost = async () => {
 
 const handleRetry = () => {
   fetchPost();
+};
+
+// 点赞：乐观反馈 + 服务端确认。先禁、再请求，成功后以返回的最新数为准。
+// 失败则回滚并提示，用户可重试。
+const handleLike = async () => {
+  if (!postId.value || isLiked.value || isLiking.value) return;
+
+  isLiking.value = true;
+  try {
+    const likes = await blogGateway.likePost(postId.value);
+    likesCount.value = likes;
+    isLiked.value = true;
+    localStorage.setItem(LIKED_KEY(postId.value), '1');
+    useNotificationStore().success('已标记为喜欢');
+  } catch (err: unknown) {
+    console.error(err);
+    const msg = err instanceof Error ? err.message : '操作失败，请稍后重试';
+    useNotificationStore().error(msg);
+  } finally {
+    isLiking.value = false;
+  }
 };
 
 // 阅读统计：剥离 markdown 标记后，分别计中文字符与西文词数，
@@ -441,12 +474,41 @@ onUnmounted(() => {
           {{ post.title }}
         </h1>
 
-        <!-- Deck / standfirst — 阅读时长 + 字数 -->
+        <!-- Deck / standfirst — 阅读时长 + 字数 + 阅读量 + 可点击喜欢 -->
         <p
           class="text-muted-foreground mt-5 text-[15px] leading-relaxed tracking-[0.01em] tabular-nums"
         >
           约 {{ stats.minutes }} 分钟阅读 ·
           {{ stats.count.toLocaleString() }} 字
+          <span
+            v-if="post.views != null"
+            class="inline-flex items-center gap-1"
+          >
+            · <Eye class="h-3.5 w-3.5" /> {{ post.views }}
+          </span>
+          <span v-if="post.likes != null" class="inline-flex items-center">
+            ·
+            <button
+              type="button"
+              :aria-label="
+                isLiked ? `已喜欢 · 当前 ${likesCount}` : `喜欢 · 当前 ${likesCount}`
+              "
+              :disabled="isLiked || isLiking"
+              class="inline-flex cursor-pointer items-center gap-1 rounded transition-colors duration-150 active:scale-[0.96] disabled:cursor-default"
+              :class="
+                isLiked
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              "
+              @click="handleLike"
+            >
+              <Heart
+                class="h-3.5 w-3.5 transition-all duration-150"
+                :class="isLiked ? 'fill-primary' : ''"
+              />
+              {{ likesCount }}
+            </button>
+          </span>
         </p>
 
         <!-- Byline / dateline -->

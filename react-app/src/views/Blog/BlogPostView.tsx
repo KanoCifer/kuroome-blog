@@ -9,6 +9,7 @@ import { useOrigin } from '@/hooks/useOrigin';
 import hljs from 'highlight.js/lib/common';
 import 'highlight.js/styles/github.css';
 import { marked } from 'marked';
+import { Eye, Heart } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -166,6 +167,13 @@ export default function BlogPostView() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
+  // 点赞：一次性表态。服务端不做重复判定（匿名），
+  // 故「是否已赞」由 localStorage 在客户端持久化，避免重复提交。
+  const [isLiked, setIsLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+  const [isLiking, setIsLiking] = useState(false);
+  const likedKey = (id: string) => `readinglist:liked:${id}`;
+
   const showEditButton = isAuthenticated && user?.is_admin;
 
   // SEO: set document title
@@ -222,6 +230,8 @@ export default function BlogPostView() {
       const service = blogService();
       const result = await service.getBlogPost(postId);
       setPost(result);
+      setLikesCount(result.likes ?? 0);
+      setIsLiked(localStorage.getItem(likedKey(postId)) === '1');
     } catch (err) {
       setError(err instanceof Error ? err.message : '加载文章失败');
     } finally {
@@ -253,6 +263,26 @@ export default function BlogPostView() {
       .writeText(window.location.href)
       .then(() => notification.success('链接已复制'))
       .catch(() => notification.error('复制失败'));
+  };
+
+  // 点赞：乐观反馈 + 服务端确认。先禁、再请求，成功后以返回的最新数为准。
+  const handleLike = async () => {
+    if (!postId || isLiked || isLiking) return;
+
+    setIsLiking(true);
+    try {
+      const service = blogService();
+      const likes = await service.likePost(postId);
+      setLikesCount(likes);
+      setIsLiked(true);
+      localStorage.setItem(likedKey(postId), '1');
+      notification.success('已标记为喜欢');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '操作失败，请稍后重试';
+      notification.error(msg);
+    } finally {
+      setIsLiking(false);
+    }
   };
 
   return (
@@ -345,9 +375,41 @@ export default function BlogPostView() {
             {post.title}
           </h1>
 
-          {/* Deck — 阅读时长 + 字数 */}
-          <p className="text-muted-foreground mt-5 text-[15px] leading-relaxed tracking-[0.01em] tabular-nums">
+          {/* Deck — 阅读时长 + 字数 + 阅读量 + 可点击喜欢 */}
+          <p className="text-muted-foreground mt-5 inline-flex flex-wrap items-center gap-x-1 text-[15px] leading-relaxed tracking-[0.01em] tabular-nums">
             约 {stats.minutes} 分钟阅读 · {stats.count.toLocaleString()} 字
+            {post.views != null && (
+              <>
+                <span className="text-muted-foreground/50">·</span>
+                <Eye className="h-3.5 w-3.5" />
+                <span>{post.views}</span>
+              </>
+            )}
+            {post.likes != null && (
+              <>
+                <span className="text-muted-foreground/50">·</span>
+                <button
+                  type="button"
+                  aria-label={
+                    isLiked ? `已喜欢 · 当前 ${likesCount}` : `喜欢 · 当前 ${likesCount}`
+                  }
+                  disabled={isLiked || isLiking}
+                  onClick={handleLike}
+                  className={`inline-flex cursor-pointer items-center gap-1 rounded transition-colors duration-150 active:scale-[0.96] disabled:cursor-default ${
+                    isLiked
+                      ? 'text-primary'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Heart
+                    className={`h-3.5 w-3.5 transition-all duration-150 ${
+                      isLiked ? 'fill-primary' : ''
+                    }`}
+                  />
+                  <span>{likesCount}</span>
+                </button>
+              </>
+            )}
           </p>
 
           {/* Byline / dateline */}

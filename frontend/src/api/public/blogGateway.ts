@@ -25,6 +25,8 @@ export interface BlogPostResponse {
   cover?: string | null;
   tags: string[];
   is_pinned: boolean;
+  views?: number;
+  likes?: number;
   created_at: string;
   updated_at: string;
 }
@@ -34,6 +36,7 @@ export interface BlogGateway {
   getBlogPost(postId: string): Promise<BlogPostResponse>;
   getTags(): Promise<TagItem[]>;
   getPostsByTag(tag: string): Promise<PostsByTagResponse>;
+  likePost(postId: string): Promise<number>;
   getLegacyPost(postId: string): Promise<BlogPostResponse>;
   createLegacyPost(payload: {
     title: string;
@@ -80,6 +83,13 @@ export const blogGateway: BlogGateway = {
       `v3/tags/${encodeURIComponent(tag)}/posts`,
     );
     return res.data.data;
+  },
+
+  async likePost(postId: string): Promise<number> {
+    const res = await request.post<{ data: { likes: number } }>(
+      `v3/blogs/${postId}/like`,
+    );
+    return res.data.data.likes;
   },
 
   async getLegacyPost(postId: string): Promise<BlogPostResponse> {

@@ -26,6 +26,8 @@ interface BlogPostResponse {
   cover?: string | null;
   tags: string[];
   is_pinned: boolean;
+  views?: number;
+  likes?: number;
   created_at: string;
   updated_at: string;
 }
@@ -33,6 +35,7 @@ interface BlogPostResponse {
 export interface blogGateway {
   getBlogs(query?: BlogQuery): Promise<AxiosResponse<BlogListResponse>>;
   getBlogPost(postId: string): Promise<AxiosResponse<BlogPostResponse>>;
+  likePost(postId: string): Promise<AxiosResponse<{ likes: number }>>;
   getTags(): Promise<AxiosResponse<{ tags: TagItem[] }>>;
   getPostsByTag(
     tag: string,
@@ -68,6 +71,12 @@ export const blogGateway = (): blogGateway => {
     async getBlogPost(postId: string) {
       return request.get(`v3/blogs/${postId}`) as Promise<
         AxiosResponse<BlogPostResponse>
+      >;
+    },
+
+    async likePost(postId: string) {
+      return request.post(`v3/blogs/${postId}/like`) as Promise<
+        AxiosResponse<{ likes: number }>
       >;
     },
 

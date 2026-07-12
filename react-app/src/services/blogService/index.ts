@@ -36,6 +36,8 @@ export interface BlogDetail {
   cover?: string | null;
   tags: string[];
   is_pinned: boolean;
+  views?: number;
+  likes?: number;
   created_at: string;
   updated_at: string;
   author?: string;
@@ -45,6 +47,7 @@ export interface BlogDetail {
 export interface BlogService {
   getBlogs(query?: { page?: number; search?: string }): Promise<BlogList>;
   getBlogPost(postId: string): Promise<BlogDetail>;
+  likePost(postId: string): Promise<number>;
   getTags(): Promise<TagItem[]>;
   getPostsByTag(tag: string): Promise<PostsByTagResponse>;
   // Legacy endpoints
@@ -105,6 +108,14 @@ export const blogService = (): BlogService => {
       return extractData(
         res as unknown as { data: ApiResponse<unknown> },
       ) as BlogDetail;
+    },
+
+    async likePost(postId: string) {
+      const res = await gateway.likePost(postId);
+      const data = extractData(
+        res as unknown as { data: ApiResponse<unknown> },
+      ) as { likes: number };
+      return data.likes;
     },
 
     async getTags() {

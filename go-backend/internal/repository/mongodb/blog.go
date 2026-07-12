@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"errors"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -115,6 +116,53 @@ func (r *BlogRepository) GetPostByID(ctx context.Context, id string) (*document.
 		return nil, err
 	}
 	return &post, nil
+}
+
+// IncrementViews 原子递增单篇文章的浏览量 —— 用于阅读计数。
+// 仅更新 views 字段，不影响其它字段或 UpdatedAt。
+func (r *BlogRepository) IncrementViews(ctx context.Context, id string) error {
+	oid, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	res, err := r.db.UpdateOne(
+		ctx,
+		bson.M{"_id": oid},
+		bson.M{"$inc": bson.M{"views": 1}},
+	)
+	if err != nil {
+		return err
+	}
+	if res.MatchedCount == 0 {
+		return mongo.ErrNoDocuments
+	}
+	return nil
+}
+
+// IncrementLikes 原子递增单篇文章的喜欢数并返回递增后的值。
+// 通过 FindOneAndUpdate + ReturnDocument(After) 在一次往返中完成 $+读取，
+// 避免 UpdateOne 后再单独 GetPostByI​D 的两次往返与 TOCTOU 窗口。
+func (r *BlogRepository) IncrementLikes(ctx context.Context, id string) (int, error) {
+	oid, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		return 0, err
+	}
+	var updated struct {
+		Likes int `bson:"likes"`
+	}
+	err = r.db.FindOneAndUpdate(
+		ctx,
+		bson.M{"_id": oid},
+		bson.M{"$inc": bson.M{"likes": 1}},
+		options.FindOneAndUpdate().SetReturnDocument(options.After),
+	).Decode(&updated)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return 0, mongo.ErrNoDocuments
+		}
+		return 0, err
+	}
+	return updated.Likes, nil
 }
 
 // ListPostsByTag 按标签分页列出文章，按置顶 > 创建时间排序。

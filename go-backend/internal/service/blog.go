@@ -41,6 +41,8 @@ func serializePost(p document.Post) dto.PostOut {
 		Cover:     p.Cover,
 		Tags:      p.Tags,
 		IsPinned:  p.IsPinned,
+		Views:     p.Views,
+		Likes:     p.Likes,
 		CreatedAt: t(p.CreatedAt),
 		UpdatedAt: t(p.UpdatedAt),
 	}
@@ -129,6 +131,27 @@ func (s *BlogService) GetPost(id string) (*dto.PostOut, error) {
 	}
 	out := serializePost(*post)
 	return &out, nil
+}
+
+// IncrementViews 原子递增单篇文章的浏览量。
+// 调用方以 fire-and-forget goroutine 触发，不阻塞读取路径。
+func (s *BlogService) IncrementViews(id string) error {
+	if id == "" {
+		return errs.ErrInvalidPostID
+	}
+	return s.repo.IncrementViews(context.Background(), id)
+}
+
+// LikePost 原子递增单篇文章的喜欢数并返回递增后的值。
+// 一次性表态：调用方（handler / 客户端）负责幂等，服务端不做重复判定。
+func (s *BlogService) LikePost(id string) (int, error) {
+	if id == "" {
+		return 0, errs.ErrInvalidPostID
+	}
+	if _, err := bson.ObjectIDFromHex(id); err != nil {
+		return 0, errs.ErrInvalidPostID
+	}
+	return s.repo.IncrementLikes(context.Background(), id)
 }
 
 // ListTags 列出所有标签及文章数 —— 与 Python list_tags 对齐。

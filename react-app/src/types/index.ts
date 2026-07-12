@@ -11,6 +11,7 @@ export interface Post {
   author_name?: string;
   author?: string;
   views?: number;
+  likes?: number;
   created_at: string; // 确保 created_at 是必填字段
   updated_at?: string;
   tags?: string[];
@@ -24,6 +25,8 @@ export interface BlogPost {
   body: string;
   summary?: string;
   cover?: string | null;
+  views?: number;
+  likes?: number;
   created_at: string;
   updated_at: string;
   tags: string[];

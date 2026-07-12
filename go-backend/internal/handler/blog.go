@@ -17,6 +17,8 @@ import (
 type BlogService interface {
 	ListPosts(page int, search string) (*dto.BlogListOut, error)
 	GetPost(id string) (*dto.PostOut, error)
+	IncrementViews(id string) error
+	LikePost(id string) (int, error)
 	ListTags() ([]dto.TagOut, error)
 	ListPostsByTag(tag string, page, perPage int) (*dto.PostsByTagOut, error)
 }
@@ -62,6 +64,12 @@ func (h *BlogHandler) GetBlogPost(c *gin.Context) {
 		}
 		return
 	}
+	// Fire-and-forget view increment —— 阅读量计数，不阻塞返回响应。
+	go func() {
+		if err := h.blogSvc.IncrementViews(_id); err != nil {
+			slog.ErrorContext(c.Request.Context(), "increment views", "error", err, "id", _id)
+		}
+	}()
 	response.Success(c, data, "Blog post retrieved successfully")
 }
 
@@ -93,10 +101,31 @@ func (h *BlogHandler) GetPostsByTag(c *gin.Context) {
 	response.Success(c, data, "Posts retrieved successfully")
 }
 
+// LikePost 处理点赞请求（公开接口，无需鉴权）—— 原子递增并返回最新喜欢数。
+func (h *BlogHandler) LikePost(c *gin.Context) {
+	id := c.Param("id")
+
+	likes, err := h.blogSvc.LikePost(id)
+	if err != nil {
+		switch {
+		case errors.Is(err, errs.ErrInvalidPostID):
+			response.APIError(c, err.Error(), http.StatusBadRequest)
+		case errors.Is(err, errs.ErrPostNotFound):
+			response.APIError(c, err.Error(), http.StatusNotFound)
+		default:
+			slog.ErrorContext(c.Request.Context(), "like post", "error", err, "id", id)
+			response.APIError(c, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	response.Success(c, dto.LikeOut{Likes: likes}, "Liked successfully")
+}
+
 // RegisterRoutes 挂载博客读路由到 v3 组。
 func (h *BlogHandler) RegisterRoutes(r *gin.RouterGroup) {
 	r.GET("/blogs", h.GetBlogs)
 	r.GET("/blogs/:id", h.GetBlogPost)
+	r.POST("/blogs/:id/like", h.LikePost)
 	r.GET("/post", h.GetBlogPost)
 	r.GET("/tags", h.GetTags)
 	r.GET("/tags/:tag/posts", h.GetPostsByTag)
