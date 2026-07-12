@@ -1,31 +1,24 @@
 <template>
-  <div
-    class="border-border/60 bg-background h-full rounded-3xl border p-6 shadow-sm"
-  >
-    <h2 class="text-foreground mb-2 flex items-center gap-2 text-lg font-bold">
-      <icon-analytics class="size-6" /> Browser Distribution
-    </h2>
-    <p class="text-muted-foreground mb-4 text-xs">Share of visits by browser</p>
+  <div class="flex flex-col">
+    <h3 class="text-foreground mb-2 flex items-center gap-2 text-sm font-medium">
+      <icon-analytics class="size-4" /> 浏览器分布
+    </h3>
+    <p class="text-muted-foreground mb-3 text-xs">
+      按浏览器分类的访问占比
+    </p>
     <div
       v-if="loading && !hasBrowserData"
-      class="bg-muted h-64 animate-pulse rounded-xl"
+      class="bg-muted h-56 animate-pulse rounded-xl"
     ></div>
-    <!-- Empty state -->
     <div
       v-else-if="!hasBrowserData"
-      class="flex h-64 flex-col items-center justify-center gap-3 px-6 text-center"
+      class="text-muted-foreground flex h-56 flex-col items-center justify-center gap-2 px-4 text-center"
     >
-      <div
-        class="bg-muted text-muted-foreground/50 flex h-12 w-12 items-center justify-center rounded-full"
-      >
-        <icon-analytics class="size-6" />
-      </div>
-      <p class="text-foreground text-sm font-medium">No browser data yet</p>
-      <p class="text-muted-foreground max-w-xs text-xs">
-        Browser distribution will appear here once visitors reach your site.
-      </p>
+      <icon-analytics class="text-muted-foreground/50 size-7" />
+      <p class="text-sm font-medium">暂无浏览器数据</p>
+      <p class="text-xs">浏览器分布会在访客到达后显示在这里。</p>
     </div>
-    <div v-else class="h-64 w-full overflow-hidden">
+    <div v-else class="h-56 w-full overflow-hidden">
       <v-chart :option="browserChartOption" autoresize class="h-full w-full" />
     </div>
   </div>
@@ -59,7 +52,9 @@ const props = defineProps<Props>();
 
 const { palette } = useChartColors();
 
-const hasBrowserData = computed(() => (props.browserStats ?? []).length > 0);
+const hasBrowserData = computed(
+  () => (props.browserStats ?? []).length > 0,
+);
 
 const total = computed(() =>
   (props.browserStats ?? []).reduce((s, it) => s + it.count, 0),
@@ -83,10 +78,10 @@ const chartRows = computed<BrowserRow[]>(() => {
   return [
     ...head,
     {
-      browser_name: 'Other',
+      browser_name: '其他',
       browser_version: '',
       count: othersCount,
-      displayName: 'Other',
+      displayName: '其他',
       pct: (othersCount / t) * 100,
     },
   ];
@@ -143,7 +138,7 @@ const browserChartOption = computed(() => {
     },
     series: [
       {
-        name: 'Browser',
+        name: '浏览器',
         type: 'bar',
         data: display.map((r, i) => ({
           value: r.count,
@@ -171,5 +166,3 @@ const browserChartOption = computed(() => {
   };
 });
 </script>
-
-<style scoped></style>

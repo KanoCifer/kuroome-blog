@@ -2,30 +2,26 @@
   <div
     class="border-border/60 bg-background h-full rounded-3xl border p-6 shadow-sm"
   >
-    <h2 class="text-foreground mb-4 flex items-center gap-2 text-lg font-bold">
-      <icon-trend class="size-6" /> Visits Trend (Last {{ selectedDays }} days)
+    <h2 class="text-foreground mb-4 flex items-center gap-2 text-sm font-medium">
+      <icon-trend class="size-5" />
+      访问趋势 · 最近 {{ selectedDays }} 天
     </h2>
     <div
       v-if="loading && !overviewData"
-      class="bg-muted h-80 animate-pulse rounded-xl"
+      class="bg-muted h-72 animate-pulse rounded-xl"
     ></div>
     <!-- Empty state -->
     <div
       v-else-if="!hasTrendData"
-      class="flex h-80 flex-col items-center justify-center gap-3 px-6 text-center"
+      class="flex h-72 flex-col items-center justify-center gap-2 px-6 text-center"
     >
-      <div
-        class="bg-muted text-muted-foreground/50 flex h-12 w-12 items-center justify-center rounded-full"
-      >
-        <icon-trend class="size-6" />
-      </div>
-      <p class="text-foreground text-sm font-medium">No visits recorded yet</p>
+      <icon-trend class="text-muted-foreground/50 size-8" />
+      <p class="text-foreground text-sm font-medium">暂无访问记录</p>
       <p class="text-muted-foreground max-w-xs text-xs">
-        Visit data for the last {{ selectedDays }} days will appear here once
-        your site starts receiving traffic.
+        网站开始接收流量后，近 {{ selectedDays }} 天的访问趋势将显示在这里。
       </p>
     </div>
-    <div v-else class="h-80 w-full overflow-hidden">
+    <div v-else class="h-72 w-full overflow-hidden">
       <v-chart :option="trendChartOption" autoresize class="h-full w-full" />
     </div>
   </div>
@@ -102,11 +98,11 @@ const trendChartOption = computed(() => {
     },
     series: [
       {
-        name: 'Visits',
+        name: '访问量',
         type: 'line',
         smooth: true,
         symbol: 'circle',
-        symbolSize: 8,
+        symbolSize: 6,
         lineStyle: { width: 2, color: stroke, cap: 'round' },
         itemStyle: { color: stroke },
         areaStyle: {
@@ -117,7 +113,7 @@ const trendChartOption = computed(() => {
             x2: 0,
             y2: 1,
             colorStops: [
-              { offset: 0, color: withAlpha(stroke, 0.22) },
+              { offset: 0, color: withAlpha(stroke, 0.18) },
               { offset: 1, color: withAlpha(stroke, 0.02) },
             ],
           },

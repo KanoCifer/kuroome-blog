@@ -1,37 +1,38 @@
 <template>
   <div
-    class="border-border/60 bg-background flex flex-col gap-3 rounded-2xl border p-5"
+    class="border-border/60 bg-background flex flex-col gap-2 rounded-2xl border p-4"
   >
     <div class="flex items-center justify-between">
-      <span class="text-muted-foreground text-sm font-medium">{{ label }}</span>
+      <span
+        class="text-muted-foreground font-mono text-[10px] font-medium tracking-[0.18em] uppercase"
+        >{{ label }}</span
+      >
       <div
-        class="flex h-9 w-9 items-center justify-center rounded-lg"
+        class="flex h-7 w-7 items-center justify-center rounded-md"
         :class="accent"
       >
         <slot name="icon" />
       </div>
     </div>
-    <div>
-      <span class="text-foreground block text-3xl leading-tight font-bold">
-        {{ formattedValue }}
-      </span>
-      <div v-if="$slots.footer" class="mt-1">
-        <slot name="footer" />
-      </div>
+    <span class="text-foreground block text-2xl leading-tight font-medium tabular-nums">
+      {{ formattedValue }}
+    </span>
+    <div v-if="$slots.footer" class="text-xs">
+      <slot name="footer" />
     </div>
-    <!-- Optional sparkline: a 12/14-point mini trend rendered as pure SVG. -->
+    <!-- Optional sparkline: a 14-point mini trend rendered as pure SVG. -->
     <svg
       v-if="hasSparkline"
       :viewBox="`0 0 ${sparkWidth} ${sparkHeight}`"
-      class="mt-auto h-8 w-full"
-      :class="sparklineColor"
+      class="mt-auto h-6 w-full"
+      :class="sparklineClass"
       preserveAspectRatio="none"
       aria-hidden="true"
     >
       <polyline
         fill="none"
         stroke="currentColor"
-        stroke-width="2"
+        stroke-width="1.75"
         stroke-linecap="round"
         stroke-linejoin="round"
         :points="sparkpolyline"
@@ -51,11 +52,11 @@ const props = defineProps<{
   /** Numeric trend series (asc order). Empty = no sparkline. */
   sparkline?: number[];
   /** Tailwind text-* class whose currentColor becomes the sparkline stroke. */
-  sparklineColor?: string;
+  sparklineClass?: string;
 }>();
 
 const sparkWidth = 120;
-const sparkHeight = 32;
+const sparkHeight = 24;
 
 const formattedValue = computed(() => {
   const v = props.value;

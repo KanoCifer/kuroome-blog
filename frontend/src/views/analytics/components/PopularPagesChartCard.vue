@@ -2,33 +2,28 @@
   <div
     class="border-border/60 bg-background h-full rounded-3xl border p-6 shadow-sm"
   >
-    <h2 class="text-foreground mb-2 flex items-center gap-2 text-lg font-bold">
-      <icon-popular class="size-6" /> Popular Pages
+    <h2 class="text-foreground mb-2 flex items-center gap-2 text-sm font-medium">
+      <icon-popular class="size-5" /> 热门页面
     </h2>
     <p class="text-muted-foreground mb-4 text-xs">
-      Top 8 by views in selected period
+      所选时段内浏览量前 8 的页面
     </p>
     <div
       v-if="loading && !overviewData"
-      class="bg-muted h-full min-h-[18rem] animate-pulse rounded-xl"
+      class="bg-muted h-full min-h-[14rem] animate-pulse rounded-xl"
     ></div>
     <!-- Empty state -->
     <div
       v-else-if="!hasPagesData"
-      class="flex min-h-[18rem] flex-col items-center justify-center gap-3 px-6 text-center"
+      class="flex min-h-[14rem] flex-col items-center justify-center gap-2 px-6 text-center"
     >
-      <div
-        class="bg-muted text-muted-foreground/50 flex h-12 w-12 items-center justify-center rounded-full"
-      >
-        <icon-popular class="size-6" />
-      </div>
-      <p class="text-foreground text-sm font-medium">No page views yet</p>
+      <icon-popular class="text-muted-foreground/50 size-8" />
+      <p class="text-foreground text-sm font-medium">暂无页面浏览数据</p>
       <p class="text-muted-foreground max-w-xs text-xs">
-        The most-visited pages will appear here once your site starts receiving
-        traffic.
+        开始接收流量后，热门页面将显示在这里。
       </p>
     </div>
-    <div v-else class="h-full min-h-[18rem] w-full overflow-hidden">
+    <div v-else class="h-full min-h-[14rem] w-full overflow-hidden">
       <v-chart :option="popularPagesChartOption" autoresize />
     </div>
   </div>
@@ -72,7 +67,7 @@ const chartData = computed<PageRow[]>(() => {
   const othersCount = sorted
     .slice(MAX_ITEMS - 1)
     .reduce((sum, it) => sum + it.count, 0);
-  return [...head, { page_path: 'Other', count: othersCount }];
+  return [...head, { page_path: '其他', count: othersCount }];
 });
 
 const popularPagesChartOption = computed(() => {
@@ -94,7 +89,7 @@ const popularPagesChartOption = computed(() => {
         const arr = params as Array<{ name: string; value: number }>;
         const it = arr[0];
         if (!it) return '';
-        return `<div style="font-weight:600;color:${p.foreground};">${it.name}</div><div style="color:${p.mutedForeground};margin-top:2px;">${it.value.toLocaleString()} views</div>`;
+        return `<div style="font-weight:600;color:${p.foreground};">${it.name}</div><div style="color:${p.mutedForeground};margin-top:2px;">${it.value.toLocaleString()} 次浏览</div>`;
       },
     },
     grid: {
@@ -123,7 +118,7 @@ const popularPagesChartOption = computed(() => {
     },
     series: [
       {
-        name: 'Views',
+        name: '浏览量',
         type: 'bar',
         data,
         barMaxWidth: 20,
