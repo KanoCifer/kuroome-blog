@@ -23,8 +23,12 @@
         文章发布并获得浏览量后，热门文章将显示在这里。
       </p>
     </div>
-    <div v-else class="h-full min-h-[14rem] w-full overflow-hidden">
-      <v-chart :option="chartOption" autoresize />
+    <div v-else class="h-80 w-full overflow-hidden">
+      <v-chart
+        :option="chartOption"
+        autoresize
+        class="h-full w-full"
+      />
     </div>
   </div>
 </template>

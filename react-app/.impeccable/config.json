@@ -1,0 +1,9 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [
+      "src/views/Blog/BlogPostView.tsx"
+    ],
+    "ignoreValues": []
+  }
+}

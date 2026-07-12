@@ -23,8 +23,12 @@
         开始接收流量后，热门页面将显示在这里。
       </p>
     </div>
-    <div v-else class="h-full min-h-[14rem] w-full overflow-hidden">
-      <v-chart :option="popularPagesChartOption" autoresize />
+    <div v-else class="h-72 w-full overflow-hidden">
+      <v-chart
+        :option="popularPagesChartOption"
+        autoresize
+        class="h-full w-full"
+      />
     </div>
   </div>
 </template>
