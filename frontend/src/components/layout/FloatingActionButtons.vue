@@ -8,9 +8,11 @@
       <button
         @click="$emit('openSettings')"
         class="fab group bg-secondary hover:bg-primary"
-        title="偏好设置"
+        aria-label="偏好设置"
       >
-        <SettingIcon class="fab-icon text-primary group-hover:text-white" />
+        <SettingIcon
+          class="fab-icon text-primary group-hover:text-primary-foreground"
+        />
         <span class="fab-label">偏好设置</span>
       </button>
     </div>
@@ -20,7 +22,7 @@
       <button
         @click="goToNewPost"
         class="fab group bg-primary hover:bg-primary/90"
-        title="写文章"
+        aria-label="写文章"
       >
         <svg
           class="fab-icon text-primary-foreground"
@@ -34,6 +36,7 @@
           <path d="M12 5v14M5 12h14" />
         </svg>
         <span class="fab-label text-primary-foreground">新建</span>
+
       </button>
     </div>
 
@@ -45,10 +48,10 @@
           'fab group',
           liked ? 'bg-rose-500' : 'bg-primary hover:bg-rose-500',
         ]"
-        title="点赞"
+        aria-label="点赞"
       >
         <svg
-          :class="['fab-icon text-white']"
+          :class="['fab-icon text-primary-foreground']"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -60,9 +63,7 @@
             d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
           />
         </svg>
-        <span :class="['fab-label', liked ? 'text-white' : 'text-white']">{{
-          likesCount
-        }}</span>
+        <span class="fab-label text-primary-foreground">{{ likesCount }}</span>
       </button>
     </div>
 
@@ -71,10 +72,10 @@
       <button
         @click="$emit('goToFriendLinks')"
         class="fab group bg-secondary hover:bg-primary"
-        title="友情链接"
+        aria-label="友情链接"
       >
         <svg
-          class="fab-icon text-primary group-hover:text-white"
+          class="fab-icon text-primary group-hover:text-primary-foreground"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -98,10 +99,10 @@
       <button
         @click="toggleEditLayout"
         class="fab group bg-secondary hover:bg-primary"
-        :title="layoutStore.isEditing ? '退出编辑' : '编辑布局'"
+        :aria-label="layoutStore.isEditing ? '退出编辑' : '编辑布局'"
       >
         <svg
-          class="fab-icon text-primary group-hover:text-white"
+          class="fab-icon text-primary group-hover:text-primary-foreground"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -124,10 +125,10 @@
       <button
         @click="$emit('switchToMobile')"
         class="fab group bg-secondary hover:bg-primary"
-        title="切换到移动版"
+        aria-label="切换到移动版"
       >
         <svg
-          class="fab-icon text-primary group-hover:text-white"
+          class="fab-icon text-primary group-hover:text-primary-foreground"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -147,9 +148,9 @@
       <button
         @click="goToRss"
         class="fab group bg-secondary hover:bg-primary"
-        title="RSS"
+        aria-label="RSS"
       >
-        <RssIcon class="fab-icon text-primary group-hover:text-white" />
+        <RssIcon class="fab-icon text-primary group-hover:text-primary-foreground" />
         <span class="fab-label">RSS</span>
       </button>
     </div>
@@ -159,9 +160,9 @@
       <button
         @click="goToSubscription"
         class="fab group bg-secondary hover:bg-primary"
-        title="订阅管理"
+        aria-label="订阅管理"
       >
-        <CreditCard class="fab-icon text-primary group-hover:text-white" />
+        <CreditCard class="fab-icon text-primary group-hover:text-primary-foreground" />
         <span class="fab-label">订阅</span>
       </button>
     </div>
@@ -171,9 +172,9 @@
       <button
         @click="goToImageToolbox"
         class="fab group bg-secondary hover:bg-primary"
-        title="图片工具"
+        aria-label="图片工具"
       >
-        <IconTooling class="fab-icon text-primary group-hover:text-white" />
+        <IconTooling class="fab-icon text-primary group-hover:text-primary-foreground" />
         <span class="fab-label">图片工具</span>
       </button>
     </div>

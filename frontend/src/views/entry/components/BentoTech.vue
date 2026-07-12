@@ -8,11 +8,11 @@
       <!-- Header -->
       <div class="mx-3 flex items-center justify-between">
         <div
-          class="flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-500/15 transition-transform duration-300 group-hover:scale-110 group-hover:rounded-xl"
+          class="flex h-10 w-10 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110 group-hover:rounded-xl"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4 text-violet-500"
+            class="text-foreground size-6"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"

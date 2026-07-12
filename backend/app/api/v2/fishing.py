@@ -187,7 +187,7 @@ async def get_fishing_index(
     return APIResponse(data=resp_data.model_dump())
 
 
-@router.post("/feedback", response_model=FishingFeedbackResponse)
+@router.post("/feedback")
 async def submit_feedback(
     payload: FishingFeedbackRequest,
     background_tasks: BackgroundTasks,

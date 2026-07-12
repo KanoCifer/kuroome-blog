@@ -15,10 +15,8 @@
       >
         <!-- Drawer content -->
         <div
-          class="bg-background relative z-10 flex h-full w-full max-w-[480px] flex-col"
+          class="bg-background relative z-10 flex h-full w-full max-w-[480px] flex-col shadow-[inset_3px_0_0_0_var(--color-primary)]"
         >
-          <!-- 装帧书脊 -->
-          <div class="bg-primary absolute top-0 bottom-0 left-0 w-[3px]" />
 
           <!-- 标题区 -->
           <header class="relative px-8 pt-10 pb-6 text-center">

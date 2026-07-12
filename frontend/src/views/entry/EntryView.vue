@@ -33,7 +33,7 @@
           type: 'spring',
           stiffness: 300,
           damping: 20,
-          delay: cardDelay('BentoMap'),
+          delay: DELAY.BentoMap,
         }"
         class="h-auto w-2xs min-w-fit"
       />
@@ -47,9 +47,8 @@
           type: 'spring',
           stiffness: 300,
           damping: 20,
-          delay: cardDelay('BentoProfileCard'),
+          delay: DELAY.BentoProfileCard,
         }"
-        ref="boxRef"
         class="h-70 w-90 min-w-fit"
       />
     </DragWrapper>
@@ -70,9 +69,8 @@
           type: 'spring',
           stiffness: 300,
           damping: 20,
-          delay: cardDelay('BentoClock'),
+          delay: DELAY.BentoClock,
         }"
-        ref="clockRef"
         class="w-auto"
       />
     </DragWrapper>
@@ -85,9 +83,8 @@
           type: 'spring',
           stiffness: 300,
           damping: 20,
-          delay: cardDelay('BentoCalendar'),
+          delay: DELAY.BentoCalendar,
         }"
-        ref="calRef"
         class="w-auto"
       />
     </DragWrapper>
@@ -100,7 +97,7 @@
           type: 'spring',
           stiffness: 300,
           damping: 20,
-          delay: cardDelay('BentoTech'),
+          delay: DELAY.BentoTech,
         }"
         class="h-2xs w-68 p-4!"
       />
@@ -115,7 +112,7 @@
           type: 'spring',
           stiffness: 300,
           damping: 20,
-          delay: cardDelay('BentoReadingList'),
+          delay: DELAY.BentoReadingList,
         }"
         class="w-60 cursor-pointer"
       />
@@ -130,7 +127,7 @@
           type: 'spring',
           stiffness: 300,
           damping: 20,
-          delay: cardDelay('TodoCard'),
+          delay: DELAY.TodoCard,
         }"
         class="w-52"
       />
@@ -147,7 +144,7 @@
           type: 'spring',
           stiffness: 300,
           damping: 20,
-          delay: cardDelay('BentoPic'),
+          delay: DELAY.BentoPic,
         }"
         class="cursor-pointer p-2!"
       />
@@ -167,10 +164,10 @@
     <!-- Edit Layout Toolbar -->
     <Teleport to="body">
       <Transition
-        enter-active-class="transition-[opacity,transform] duration-300 ease-out"
+        enter-active-class="edit-toolbar-enter"
         enter-from-class="opacity-0 translate-y-4"
         enter-to-class="opacity-100 translate-y-0"
-        leave-active-class="transition-[opacity,transform] duration-200 ease-in"
+        leave-active-class="edit-toolbar-leave"
         leave-from-class="opacity-100 translate-y-0"
         leave-to-class="opacity-0 translate-y-4"
       >
@@ -223,14 +220,25 @@ import SettingsModal from '@/components/layout/SettingsModal.vue';
 import { useCardLayout } from '@/composables/card';
 import { useCardLayoutStore } from '@/stores/cardLayout';
 import { useThemeStore } from '@/stores/theme';
-import { onMounted, onUnmounted, reactive, ref } from 'vue';
+import cardStylesData from '@/data/card-styles.json';
+import { onMounted, onUnmounted, ref } from 'vue';
 import BentoMap from './components/BentoMap.vue';
 import BentoPic from './components/BentoPic.vue';
 import GreetingToast from './components/GreetingToast.vue';
 
+type CardName =
+  | 'BentoMap'
+  | 'BentoProfileCard'
+  | 'BentoClock'
+  | 'BentoCalendar'
+  | 'BentoTech'
+  | 'BentoReadingList'
+  | 'TodoCard'
+  | 'BentoPic';
+
 const themeStore = useThemeStore();
-const isEntryView = ref<boolean>(true);
-const isAboutView = ref<boolean>(false);
+const isEntryView = true;
+const isAboutView = false;
 
 const switchToMobile = () => {
   const expires = new Date();
@@ -253,7 +261,6 @@ const {
   techPosition,
   listCardPosition,
   todoCardPosition,
-  cardStyles,
 } = useCardLayout(parentContainer);
 
 const layoutStore = useCardLayoutStore();
@@ -277,7 +284,7 @@ const openSettings = () => {
   isSettingsOpen.value = true;
 };
 
-const show = reactive<Record<string, boolean>>({
+const show = {
   BentoProfileCard: true,
   BentoClock: true,
   BentoCalendar: true,
@@ -286,13 +293,41 @@ const show = reactive<Record<string, boolean>>({
   TodoCard: true,
   BentoMap: true,
   BentoPic: true,
-});
+} as const satisfies Record<CardName, true>;
 
 const ANIMATION_DELAY = 0.1;
 
-// Compute stagger delay (in seconds) for each card based on its order
-function cardDelay(cardName: string): number {
-  const order = cardStyles[cardName]?.order || 0;
-  return order * ANIMATION_DELAY;
+function buildDelays(): Record<CardName, number> {
+  const delays = {} as Record<CardName, number>;
+  for (const [name, entry] of Object.entries(cardStylesData) as [
+    CardName,
+    { order: number },
+  ][]) {
+    delays[name] = entry.order * ANIMATION_DELAY;
+  }
+  return delays;
 }
+
+const DELAY = buildDelays();
 </script>
+
+<style scoped>
+.edit-toolbar-enter {
+  transition:
+    opacity 300ms ease-out,
+    transform 300ms ease-out;
+}
+
+.edit-toolbar-leave {
+  transition:
+    opacity 200ms ease-in,
+    transform 200ms ease-in;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .edit-toolbar-enter,
+  .edit-toolbar-leave {
+    transition-duration: 0ms;
+  }
+}
+</style>

@@ -11,9 +11,9 @@
     <!-- Hearder -->
     <div class="flex items-baseline justify-between">
       <div
-        class="bg-primary/15 flex h-10 w-10 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110 group-hover:rounded-xl"
+        class="flex h-10 w-10 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110 group-hover:rounded-xl"
       >
-        <CalendarDays class="h-4 w-4 text-blue-500" />
+        <CalendarDays class="text-foreground size-6" />
       </div>
 
       <div class="mb-3 flex items-center justify-end-safe gap-3">
