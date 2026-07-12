@@ -29,8 +29,8 @@ if TYPE_CHECKING:
     from redis.asyncio import Redis as AsyncRedis
 
 VISITOR_COUNT_CHANNEL = "ws:visitor_count_changed"
-VISITOR_SET_KEY = "visitors"
-VISITOR_CONN_HASH_KEY = "visitor:conns"
+VISITOR_SET_KEY = "ws:visitors"
+VISITOR_CONN_HASH_KEY = "ws:visitor:conns"
 
 
 @asynccontextmanager
