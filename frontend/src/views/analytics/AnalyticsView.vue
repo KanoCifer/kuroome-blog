@@ -261,29 +261,24 @@
                 />
               </svg>
             </button>
-            <transition
-              enter-active-class="transition-all duration-200 ease-out"
-              enter-from-class="opacity-0 -translate-y-1"
-              enter-to-class="opacity-100 translate-y-0"
-              leave-active-class="transition-all duration-150 ease-in"
-              leave-from-class="opacity-100 translate-y-0"
-              leave-to-class="opacity-0 -translate-y-1"
+            <div
+              id="os-browser-panel"
+              class="grid transition-[grid-template-rows] duration-200 ease-out"
+              :class="[showOsBrowser ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]']"
             >
-              <div
-                v-if="showOsBrowser"
-                id="os-browser-panel"
-                class="grid grid-cols-1 gap-4 px-6 pb-6 sm:grid-cols-2"
-              >
-                <OsCharts
-                  :loading="loading"
-                  :os-stats="overviewData?.os_stats ?? []"
-                />
-                <BrowserAnalytics
-                  :loading="loading"
-                  :browser-stats="overviewData?.browser_stats ?? []"
-                />
+              <div class="col-span-1 min-h-0 overflow-hidden sm:col-span-2">
+                <div class="grid grid-cols-1 gap-4 px-6 pb-6 sm:grid-cols-2">
+                  <OsCharts
+                    :loading="loading"
+                    :os-stats="overviewData?.os_stats ?? []"
+                  />
+                  <BrowserAnalytics
+                    :loading="loading"
+                    :browser-stats="overviewData?.browser_stats ?? []"
+                  />
+                </div>
               </div>
-            </transition>
+            </div>
           </div>
         </div>
 

@@ -14,6 +14,12 @@ type PostUpdate struct {
 	ID string `json:"_id" binding:"required"`
 }
 
+type PostViewData struct {
+	Title   string `json:"title"`
+	Views   int    `json:"views"`
+}
+
+
 type VisitorData struct {
 	VisitorID        string `json:"visitor_id" binding:"required"`
 	PageURL          string `json:"page_url" binding:"required"`

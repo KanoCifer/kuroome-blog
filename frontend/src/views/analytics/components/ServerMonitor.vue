@@ -1,7 +1,241 @@
 <template>
   <div :class="cardClass">
-    <!-- Collapsed status bar (default) -->
-    <div v-if="collapsed" class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div
+      class="grid transition-[grid-template-rows] duration-300 ease-out"
+      :class="collapsed ? 'grid-rows-[0fr]' : 'grid-rows-[1fr]'"
+    >
+      <!-- Expandable detail row -->
+      <div id="server-monitor-detail" class="min-h-0 overflow-hidden">
+        <!-- Header -->
+        <div class="flex items-center justify-between">
+          <h2
+            class="text-foreground flex items-center gap-2 text-lg font-bold tracking-tight"
+          >
+            <svg
+              class="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"
+              />
+            </svg>
+            服务器系统监控
+          </h2>
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              @click="toggleCollapsed"
+              class="bg-muted text-foreground hover:bg-muted/80 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors"
+              :aria-expanded="!collapsed"
+              aria-controls="server-monitor-detail"
+            >
+              收起
+            </button>
+            <button
+              type="button"
+              @click="toggleAutoRefresh"
+              class="bg-muted text-foreground hover:bg-muted/80 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors"
+            >
+              {{ isSSEConnected ? '暂停' : '开始' }} 自动刷新
+            </button>
+          </div>
+        </div>
+
+        <!-- Server Status — single card, three cells -->
+        <div
+          class="border-border/60 bg-background mt-4 overflow-hidden rounded-2xl border p-6"
+        >
+          <div
+            class="grid grid-cols-1 divide-y lg:grid-cols-3 lg:divide-x lg:divide-y-0"
+          >
+            <!-- CPU Gauge -->
+            <div class="lg:px-6 lg:first:pl-0 lg:last:pr-0">
+              <div class="mb-4 flex items-center justify-between">
+                <h3 class="text-foreground text-sm font-medium">
+                  <span class="flex items-center gap-2">
+                    <svg
+                      class="h-4 w-4"
+                      :style="{ color: chartColors.cpu }"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+                      />
+                    </svg>
+                    CPU
+                  </span>
+                </h3>
+                <span
+                  class="text-muted-foreground text-xs font-medium tabular-nums"
+                >
+                  {{ serverStatus?.cpu_cores ?? 0 }} 核
+                </span>
+              </div>
+              <div class="h-44">
+                <div
+                  v-if="!serverStatus"
+                  class="bg-muted h-full w-full animate-pulse rounded-xl"
+                ></div>
+                <v-chart
+                  v-else
+                  :option="cpuGaugeOption"
+                  autoresize
+                  class="h-full w-full"
+                />
+              </div>
+            </div>
+
+            <!-- Memory Gauge -->
+            <div class="lg:px-6">
+              <div class="mb-4 flex items-center justify-between">
+                <h3 class="text-foreground text-sm font-medium">
+                  <span class="flex items-center gap-2">
+                    <svg
+                      class="h-4 w-4"
+                      :style="{ color: chartColors.mem }"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                      />
+                    </svg>
+                    内存
+                  </span>
+                </h3>
+                <span
+                  class="text-muted-foreground text-xs font-medium tabular-nums"
+                >
+                  {{ serverStatus ? serverStatus.mem_used.toFixed(0) : '—' }} MB /
+                  {{ serverStatus ? serverStatus.mem_total.toFixed(0) : '—' }} MB
+                </span>
+              </div>
+              <div class="h-44">
+                <div
+                  v-if="!serverStatus"
+                  class="bg-muted h-full w-full animate-pulse rounded-xl"
+                ></div>
+                <v-chart
+                  v-else
+                  :option="memoryGaugeOption"
+                  autoresize
+                  class="h-full w-full"
+                />
+              </div>
+            </div>
+
+            <!-- Disk Usage -->
+            <div class="lg:px-6">
+              <div class="mb-4 flex items-center justify-between">
+                <h3 class="text-foreground text-sm font-medium">
+                  <span class="flex items-center gap-2">
+                    <svg
+                      class="text-foreground h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"
+                      />
+                    </svg>
+                    磁盘
+                  </span>
+                </h3>
+                <span
+                  class="text-xs font-medium tabular-nums"
+                  :style="{ color: getStatusColor(serverStatus?.disk_usage ?? 0) }"
+                >
+                  {{ serverStatus ? serverStatus.disk_usage.toFixed(1) : '—' }}%
+                </span>
+              </div>
+              <div class="space-y-4">
+                <div class="space-y-2">
+                  <div class="flex justify-between text-sm">
+                    <span class="text-muted-foreground">已用</span>
+                    <span class="text-foreground font-medium tabular-nums">
+                      {{ serverStatus?.disk_used.toFixed(2) ?? '—' }} GB
+                    </span>
+                  </div>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-muted-foreground">总计</span>
+                    <span class="text-foreground font-medium tabular-nums">
+                      {{ serverStatus?.disk_total.toFixed(2) ?? '—' }} GB
+                    </span>
+                  </div>
+                </div>
+                <div class="bg-border h-4 w-full overflow-hidden rounded-full">
+                  <div
+                    :style="{
+                      width: `${serverStatus?.disk_usage ?? 0}%`,
+                      backgroundColor: getStatusColor(
+                        serverStatus?.disk_usage ?? 0,
+                      ),
+                    }"
+                    class="h-full rounded-full transition-all duration-500"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Server History Chart -->
+        <div
+          class="border-border/60 bg-background mt-4 overflow-hidden rounded-2xl border p-6"
+        >
+          <h3
+            class="text-foreground mb-4 flex items-center gap-2 text-sm font-medium"
+          >
+            <svg
+              class="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
+              />
+            </svg>
+            资源使用历史
+          </h3>
+          <div
+            v-if="!hasHistory"
+            class="bg-muted h-64 animate-pulse rounded-xl"
+          ></div>
+          <div v-else class="h-64 w-full overflow-hidden">
+            <v-chart
+              :option="historyChartOption"
+              autoresize
+              class="h-full w-full"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sticky status bar row (always visible) -->
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div class="flex items-center gap-4">
         <h2 class="text-foreground flex items-center gap-2 text-sm font-medium">
           <svg
@@ -74,237 +308,8 @@
           :aria-expanded="!collapsed"
           aria-controls="server-monitor-detail"
         >
-          展开
+          {{ collapsed ? '展开' : '收起' }}
         </button>
-      </div>
-    </div>
-
-    <!-- Expanded detail view -->
-    <div v-else id="server-monitor-detail">
-      <!-- Header -->
-      <div class="flex items-center justify-between">
-        <h2
-          class="text-foreground flex items-center gap-2 text-lg font-bold tracking-tight"
-        >
-          <svg
-            class="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"
-            />
-          </svg>
-          服务器系统监控
-        </h2>
-        <div class="flex items-center gap-2">
-          <button
-            type="button"
-            @click="toggleCollapsed"
-            class="bg-muted text-foreground hover:bg-muted/80 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors"
-            :aria-expanded="!collapsed"
-            aria-controls="server-monitor-detail"
-          >
-            收起
-          </button>
-          <button
-            type="button"
-            @click="toggleAutoRefresh"
-            class="bg-muted text-foreground hover:bg-muted/80 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors"
-          >
-            {{ isSSEConnected ? '暂停' : '开始' }} 自动刷新
-          </button>
-        </div>
-      </div>
-
-      <!-- Server Status — single card, three cells -->
-      <div
-        class="border-border/60 bg-background mt-4 overflow-hidden rounded-2xl border p-6"
-      >
-        <div
-          class="grid grid-cols-1 divide-y lg:grid-cols-3 lg:divide-x lg:divide-y-0"
-        >
-          <!-- CPU Gauge -->
-          <div class="lg:px-6 lg:first:pl-0 lg:last:pr-0">
-            <div class="mb-4 flex items-center justify-between">
-              <h3 class="text-foreground text-sm font-medium">
-                <span class="flex items-center gap-2">
-                  <svg
-                    class="h-4 w-4"
-                    :style="{ color: chartColors.cpu }"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
-                    />
-                  </svg>
-                  CPU
-                </span>
-              </h3>
-              <span
-                class="text-muted-foreground text-xs font-medium tabular-nums"
-              >
-                {{ serverStatus?.cpu_cores ?? 0 }} 核
-              </span>
-            </div>
-            <div class="h-44">
-              <div
-                v-if="!serverStatus"
-                class="bg-muted h-full w-full animate-pulse rounded-xl"
-              ></div>
-              <v-chart
-                v-else
-                :option="cpuGaugeOption"
-                autoresize
-                class="h-full w-full"
-              />
-            </div>
-          </div>
-
-          <!-- Memory Gauge -->
-          <div class="lg:px-6">
-            <div class="mb-4 flex items-center justify-between">
-              <h3 class="text-foreground text-sm font-medium">
-                <span class="flex items-center gap-2">
-                  <svg
-                    class="h-4 w-4"
-                    :style="{ color: chartColors.mem }"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                    />
-                  </svg>
-                  内存
-                </span>
-              </h3>
-              <span
-                class="text-muted-foreground text-xs font-medium tabular-nums"
-              >
-                {{ serverStatus ? serverStatus.mem_used.toFixed(0) : '—' }} MB /
-                {{ serverStatus ? serverStatus.mem_total.toFixed(0) : '—' }} MB
-              </span>
-            </div>
-            <div class="h-44">
-              <div
-                v-if="!serverStatus"
-                class="bg-muted h-full w-full animate-pulse rounded-xl"
-              ></div>
-              <v-chart
-                v-else
-                :option="memoryGaugeOption"
-                autoresize
-                class="h-full w-full"
-              />
-            </div>
-          </div>
-
-          <!-- Disk Usage -->
-          <div class="lg:px-6">
-            <div class="mb-4 flex items-center justify-between">
-              <h3 class="text-foreground text-sm font-medium">
-                <span class="flex items-center gap-2">
-                  <svg
-                    class="text-foreground h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"
-                    />
-                  </svg>
-                  磁盘
-                </span>
-              </h3>
-              <span
-                class="text-xs font-medium tabular-nums"
-                :style="{ color: getStatusColor(serverStatus?.disk_usage ?? 0) }"
-              >
-                {{ serverStatus ? serverStatus.disk_usage.toFixed(1) : '—' }}%
-              </span>
-            </div>
-            <div class="space-y-4">
-              <div class="space-y-2">
-                <div class="flex justify-between text-sm">
-                  <span class="text-muted-foreground">已用</span>
-                  <span class="text-foreground font-medium tabular-nums">
-                    {{ serverStatus?.disk_used.toFixed(2) ?? '—' }} GB
-                  </span>
-                </div>
-                <div class="flex justify-between text-sm">
-                  <span class="text-muted-foreground">总计</span>
-                  <span class="text-foreground font-medium tabular-nums">
-                    {{ serverStatus?.disk_total.toFixed(2) ?? '—' }} GB
-                  </span>
-                </div>
-              </div>
-              <div class="bg-border h-4 w-full overflow-hidden rounded-full">
-                <div
-                  :style="{
-                    width: `${serverStatus?.disk_usage ?? 0}%`,
-                    backgroundColor: getStatusColor(
-                      serverStatus?.disk_usage ?? 0,
-                    ),
-                  }"
-                  class="h-full rounded-full transition-all duration-500"
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Server History Chart -->
-      <div
-        class="border-border/60 bg-background mt-4 overflow-hidden rounded-2xl border p-6"
-      >
-        <h3
-          class="text-foreground mb-4 flex items-center gap-2 text-sm font-medium"
-        >
-          <svg
-            class="h-4 w-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
-            />
-          </svg>
-          资源使用历史
-        </h3>
-        <div
-          v-if="!hasHistory"
-          class="bg-muted h-64 animate-pulse rounded-xl"
-        ></div>
-        <div v-else class="h-64 w-full overflow-hidden">
-          <v-chart
-            :option="historyChartOption"
-            autoresize
-            class="h-full w-full"
-          />
-        </div>
       </div>
     </div>
   </div>
