@@ -8,7 +8,7 @@ type VisitorTrack struct {
 	PageURL          string    `gorm:"size:200"`
 	PagePath         string    `gorm:"size:200"`
 	Referrer         *string   `gorm:"size:200"`
-	Browser          string    `gorm:"type:text"`
+	Browser          *string   `gorm:"type:text"`
 	ScreenResolution *string   `gorm:"size:100"`
 	Language         *string   `gorm:"size:50"`
 	IPAddress        string    `gorm:"size:100;index"`

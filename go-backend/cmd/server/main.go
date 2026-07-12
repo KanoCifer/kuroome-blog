@@ -73,6 +73,7 @@ func main() {
 		config.Cfg,
 		postgres.NewUserRepo(db.GetDB()),
 		postgres.NewAdminRepo(db.GetMongoDB()),
+		postgres.NewVisitorRepo(db.GetDB()),
 		blogSvc,
 		db.GetRedis(),
 		passkeySvc,

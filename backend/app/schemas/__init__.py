@@ -53,7 +53,6 @@ from app.schemas.rss import (
     RssRequest,
     RssSubscriptionResponse,
 )
-from app.schemas.track import VisitorData
 from app.schemas.user import (
     ImageUploadOut,
     UserOut,
@@ -138,7 +137,6 @@ __all__ = [
     "UserProfileOut",
     "UserSettingsIn",
     "UserSettingsOut",
-    "VisitorData",
     "WeatherData",
     "WeatherRefer",
     "WeatherResponse",

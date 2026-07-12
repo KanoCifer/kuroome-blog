@@ -22,6 +22,7 @@ func NewAppState(
 	cfg *config.Config,
 	userRepo *postgres.UserRepo,
 	adminRepo *postgres.AdminRepo,
+	visitorRepo *postgres.VisitorRepo,
 	blogSvc *service.BlogService,
 	redis *redis.Client,
 	passkeySvc *service.PasskeyService,
@@ -31,7 +32,7 @@ func NewAppState(
 	return &AppState{
 		config:     cfg,
 		userSvc:    userSvc,
-		adminSvc:   service.NewAdminService(adminRepo, redis),
+		adminSvc:   service.NewAdminService(adminRepo, visitorRepo, redis),
 		blogSvc:    blogSvc,
 		passkeySvc: passkeySvc,
 		wssvc:      wssvc,

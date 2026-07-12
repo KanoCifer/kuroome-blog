@@ -3,19 +3,15 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import hmac
-import json
 import os
 import subprocess
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from fastapi.responses import Response
 from redis.asyncio import Redis as AsyncRedis
 from slowapi.util import get_remote_address
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.des.appstate import get_app_state
 from app.api.des.auth import get_admin_user
-from app.api.des.db import get_session
 from app.api.des.redis import get_redis
 from app.appstate import AppState
 from app.core import get_settings
@@ -25,7 +21,6 @@ from app.core.response import APIResponse
 from app.models.models import User
 from app.plugins.cache import redis_cache
 from app.plugins.notification import Message, NotificationContext, notify
-from app.schemas import VisitorData
 from app.schemas.schemas import BlogPostIn, BlogPostUpdate
 from app.services.event_service import record_event
 from app.utils import get_redis_lock
@@ -110,33 +105,6 @@ async def delete_post(
         data={"_id": post_id},
         message="Blog post deleted successfully",
     )
-
-
-@router.post("/track")
-async def track_visitor(
-    data: VisitorData,
-    request: Request,
-    session: AsyncSession = Depends(get_session),
-    redis: AsyncRedis = Depends(get_redis),
-):
-    """Track visitor data sent from the frontend."""
-    if not get_settings().ENABLE_TRACKING:
-        return Response(status_code=204)
-
-    ip_address = get_remote_address(request)
-    visitor_data = VisitorData(
-        **data.model_dump(exclude={"ip_address"}),
-        ip_address=ip_address,
-    )
-    try:
-        await redis.rpush(
-            "app:migration_queue",
-            json.dumps(visitor_data.model_dump(mode="json")),
-        )  # type: ignore
-        return Response(status_code=204)
-    except Exception as e:
-        logger.error(f"Failed to track visitor data: {e!s}")
-        return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # =============================================================================

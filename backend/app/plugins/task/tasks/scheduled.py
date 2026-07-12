@@ -1,29 +1,21 @@
-"""定时任务：数据迁移、RSS 刷新、每日统计、待办提醒。
+"""定时任务：RSS 刷新、每日统计、待办提醒。
 
-这些任务仅由 Taskiq scheduler 调度，不暴露为公开 API。
+Go 端已接管 visitor_track 直写 PostgreSQL，本模块不再承担数据迁移职责。
 """
 
 from __future__ import annotations
 
-import json
 import time
 from datetime import UTC, datetime, timedelta
-from itertools import repeat
 from zoneinfo import ZoneInfo
 
 import orjson
-from pydantic import ValidationError
-from redis.asyncio import Redis as AsyncRedis
 from taskiq import Context, TaskiqDepends
 
-from app.api.des.db import get_async_session
 from app.core.config import get_settings
 from app.core.logger import logger
-from app.models.models import VisitorTrack
 from app.plugins.notification import Message, NotificationContext, notify
 from app.plugins.task.task import broker
-from app.schemas import VisitorData
-from app.utils import get_redis_lock
 
 SHANGHAI_TZ = ZoneInfo("Asia/Shanghai")
 
@@ -110,172 +102,6 @@ def _build_daily_summary_message(
     lines.append("────────────────")
     lines.append("📌 此消息由 BOT 自动发送")
     return "\n".join(lines)
-
-
-@broker.task(
-    schedule=[
-        {
-            "interval": 3600,
-            "schedule_id": "redis_to_db_migration",
-        }
-    ]
-)
-async def run_migration_job(context: Context = TaskiqDepends()):
-    """迁移 Redis 访客数据到 PostgreSQL"""
-    start_time = time.perf_counter()
-    queue_key = "app:migration_queue"
-    batch_size = 200
-    processed_count = 0
-    valid_items = []
-
-    async with get_redis_lock(
-        redis=context.state.redis, key="migration_lock", ttl=300
-    ):
-        try:
-            redis: AsyncRedis = context.state.redis
-            fetch_start = time.perf_counter()
-            pipe = redis.pipeline()
-
-            for _ in repeat(None, batch_size):
-                pipe.lpop(queue_key)
-
-            items = await pipe.execute()
-            valid_items = [item for item in items if item is not None]
-            fetch_duration = time.perf_counter() - fetch_start
-
-            if not valid_items:
-                duration = time.perf_counter() - start_time
-                logger.bind(job="migration", duration=duration).info(
-                    "migration completed, 0 items to migrate"
-                )
-                return {
-                    "status": "success",
-                    "migrated": 0,
-                    "duration": f"{duration:.2f}s",
-                }
-
-            parse_start = time.perf_counter()
-            parsed_data_list: list[VisitorData] = []
-            invalid_items: list[bytes] = []
-            validation_errors: list[str] = []
-            try:
-                for item in valid_items:
-                    raw = orjson.loads(item)
-                    try:
-                        parsed_data_list.append(VisitorData(**raw))
-                    except ValidationError as e:
-                        invalid_items.append(item)
-                        validation_errors.append(str(e))
-                parse_duration = time.perf_counter() - parse_start
-                if invalid_items:
-                    logger.bind(
-                        job="migration",
-                        skipped=len(invalid_items),
-                        errors=validation_errors[:5],
-                        parse_duration=parse_duration,
-                    ).warning("migration skipped invalid items")
-            except json.JSONDecodeError as e:
-                error_msg = str(e)
-                parse_duration = time.perf_counter() - parse_start
-                logger.bind(
-                    job="migration",
-                    error=error_msg,
-                    parse_duration=parse_duration,
-                ).warning("migration json parsing failed")
-                for item in reversed(valid_items):
-                    redis.lpush(queue_key, item)
-                duration = time.perf_counter() - start_time
-                logger.bind(job="migration", duration=duration).error(
-                    "migration failed, json parsing error"
-                )
-                return {
-                    "status": "failed",
-                    "error": error_msg,
-                    "duration": f"{duration:.2f}s",
-                }
-
-            transform_start = time.perf_counter()
-            transform_duration = time.perf_counter() - transform_start
-
-            db_start = time.perf_counter()
-            async with get_async_session() as session:
-                track_objects: list[VisitorTrack] = []
-
-                max_lengths = {
-                    "visitor_id": 100,
-                    "page_url": 200,
-                    "page_path": 200,
-                    "referrer": 200,
-                    "screen_resolution": 100,
-                    "language": 50,
-                    "ip_address": 100,
-                    "browser_name": 100,
-                    "browser_version": 100,
-                    "os_name": 100,
-                    "os_version": 100,
-                    "cpu": 50,
-                    "device_type": 50,
-                }
-
-                for data in parsed_data_list:
-                    data_dict = data.model_dump()
-                    for field, max_len in max_lengths.items():
-                        value = data_dict.get(field)
-                        if (
-                            value
-                            and isinstance(value, str)
-                            and len(value) > max_len
-                        ):
-                            data_dict[field] = value[:max_len]
-                    track_objects.append(VisitorTrack(**data_dict))
-
-                logger.bind(job="migration", count=len(track_objects)).info(
-                    "migration adding objects to session"
-                )
-                session.add_all(track_objects)
-
-                processed_count = len(track_objects)
-                db_duration = time.perf_counter() - db_start
-
-            duration = time.perf_counter() - start_time
-            logger.bind(
-                job="migration",
-                duration=duration,
-                fetched=len(valid_items),
-                migrated=processed_count,
-                skipped=len(invalid_items),
-                fetch_duration=fetch_duration,
-                parse_duration=parse_duration,
-                db_duration=db_duration,
-            ).info("migration completed")
-            return {
-                "status": "success",
-                "total": len(valid_items),
-                "migrated": processed_count,
-                "skipped": len(invalid_items),
-                "duration": f"{duration:.2f}s",
-            }
-
-        except Exception as e:
-            duration = time.perf_counter() - start_time
-            logger.bind(job="migration", duration=duration).exception(
-                "migration job failed"
-            )
-            if "valid_items" in locals() and valid_items:
-                restore_start = time.perf_counter()
-                for item in reversed(valid_items):
-                    await redis.lpush(queue_key, item)  # type: ignore
-                restore_duration = time.perf_counter() - restore_start
-                logger.bind(
-                    job="migration",
-                    count=len(valid_items),
-                    restore_duration=restore_duration,
-                ).info("migration restored items back to redis")
-            return {
-                "status": "failed",
-                "error": str(e),
-                "duration": f"{duration:.2f}s",
-            }
 
 
 @broker.task(

@@ -11,9 +11,8 @@
 通知发送（原 send_feishu_message）已迁移到 :mod:`app.plugins.notification`：
 在 task 代码中直接调用 ``notify(channels=["feishu"], ...)``。
 
-定时任务（run_migration_job / refresh_rss_feeds / send_daily_summary /
-send_todo / subscription_check_task）通过 @broker.task 装饰器自动注册，
-不在此层暴露。
+定时任务（refresh_rss_feeds / send_daily_summary / send_todo / subscription_check_task）
+通过 @broker.task 装饰器自动注册，不在此层暴露。
 """
 
 from app.plugins.task.scheduler import scheduler
