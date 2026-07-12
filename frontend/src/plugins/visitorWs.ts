@@ -17,15 +17,15 @@ export let isConnected: ReturnType<typeof useWebSocket>['isConnected'] | null =
 function buildWsUrl(): string {
   const apiBase = import.meta.env.VITE_API_BASE || '/api';
   if (apiBase.startsWith('http')) {
-    return apiBase.replace(/^http/, 'ws') + '/v2/publicv2/ws';
+    return apiBase.replace(/^http/, 'ws') + '/v3/public/ws';
   }
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const host = window.location.host;
   console.log(
     'WebSocket URL:',
-    `${protocol}//${host}${apiBase}/v2/publicv2/ws`,
+    `${protocol}//${host}${apiBase}/v3/public/ws`,
   );
-  return `${protocol}//${host}${apiBase}/v2/publicv2/ws`;
+  return `${protocol}//${host}${apiBase}/v3/public/ws`;
 }
 
 export function initVisitorWebSocket(pinia: Pinia) {

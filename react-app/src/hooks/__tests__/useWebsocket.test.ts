@@ -57,7 +57,7 @@ describe('useWebsocket', () => {
   it('connects and sends visitor_id on open', () => {
     renderHook(() =>
       useWebsocket({
-        url: 'ws://localhost/api/v2/publicv2/ws',
+        url: 'ws://localhost/api/v3/public/ws',
         visitorId: 'test-visitor-123',
       }),
     );
@@ -66,7 +66,7 @@ describe('useWebsocket', () => {
 
     const ws = MockWebSocket.instances[0];
     expect(ws).toBeDefined();
-    expect(ws.url).toBe('ws://localhost/api/v2/publicv2/ws');
+    expect(ws.url).toBe('ws://localhost/api/v3/public/ws');
     expect(ws.sent).toContainEqual(
       JSON.stringify({ type: 'visitor_id', visitor_id: 'test-visitor-123' }),
     );
