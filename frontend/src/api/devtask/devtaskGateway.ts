@@ -1,0 +1,115 @@
+import request from '@/api/shared/request';
+
+// ── 与后端 document/dev_task.go 枚举对齐 —— 单一真源在后端，前端镜像。 ──
+
+export type DevTaskType = '问题' | '功能需求' | '优化' | '技术债';
+
+export type DevTaskPriority = 'P0 紧急' | 'P1 高' | 'P2 中' | 'P3 低';
+
+export type DevTaskScope = '前端-Vue' | '前端-React' | '后端-Python' | '后端-Go' | '通用';
+
+export type DevTaskStatus = '待评估' | '待排期' | '进行中' | '已搁置' | '已完成';
+
+export interface DevTask {
+  id: string;
+  user_id: number;
+  title: string | null;
+  description?: string | null;
+  detail?: string | null;
+  type: DevTaskType;
+  priority: DevTaskPriority;
+  scope: DevTaskScope;
+  status: DevTaskStatus;
+  sort_order: number;
+  due_date?: string | null;
+  is_deleted: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Pagination {
+  page: number;
+  per_page: number;
+  total: number;
+  pages: number;
+  has_prev: boolean;
+  has_next: boolean;
+  prev_num?: number | null;
+  next_num?: number | null;
+}
+
+export interface DevTaskListResponse {
+  tasks: DevTask[];
+  pagination: Pagination;
+}
+
+export interface ListDevTasksParams {
+  page?: number;
+  per_page?: number;
+  status?: DevTaskStatus;
+  priority?: DevTaskPriority;
+  type?: DevTaskType;
+  include_deleted?: boolean;
+}
+
+export interface CreateDevTaskPayload {
+  title: string;
+  description?: string | null;
+  detail?: string | null;
+  type: DevTaskType;
+  priority: DevTaskPriority;
+  scope: DevTaskScope;
+  due_date?: string | null;
+}
+
+export interface UpdateDevTaskPayload {
+  title?: string | null;
+  description?: string | null;
+  detail?: string | null;
+  type?: DevTaskType;
+  priority?: DevTaskPriority;
+  scope?: DevTaskScope;
+  status?: DevTaskStatus;
+  sort_order?: number;
+  due_date?: string | null;
+}
+
+export interface DevTaskGateway {
+  list(params?: ListDevTasksParams): Promise<DevTaskListResponse>;
+  get(id: string): Promise<DevTask>;
+  create(payload: CreateDevTaskPayload): Promise<DevTask>;
+  update(id: string, payload: UpdateDevTaskPayload): Promise<void>;
+  remove(id: string): Promise<void>;
+  hardDelete(id: string): Promise<void>;
+}
+
+export const devTaskGateway: DevTaskGateway = {
+  async list(params): Promise<DevTaskListResponse> {
+    const res = await request.get<{ data: DevTaskListResponse }>('v3/dev-tasks', {
+      params,
+    });
+    return res.data.data;
+  },
+
+  async get(id: string): Promise<DevTask> {
+    const res = await request.get<{ data: DevTask }>(`v3/dev-tasks/${id}`);
+    return res.data.data;
+  },
+
+  async create(payload: CreateDevTaskPayload): Promise<DevTask> {
+    const res = await request.post<{ data: DevTask }>('v3/dev-tasks', payload);
+    return res.data.data;
+  },
+
+  async update(id: string, payload: UpdateDevTaskPayload): Promise<void> {
+    await request.patch(`v3/dev-tasks/${id}`, payload);
+  },
+
+  async remove(id: string): Promise<void> {
+    await request.delete(`v3/dev-tasks/${id}`);
+  },
+
+  async hardDelete(id: string): Promise<void> {
+    await request.delete(`v3/dev-tasks/${id}/permanent`);
+  },
+};

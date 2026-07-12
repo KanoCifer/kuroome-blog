@@ -19,6 +19,10 @@ var (
 	ErrPasskeyNotFound = errors.New("Passkey 凭证不存在")
 	ErrInvalidPasskey  = errors.New("无效的 Passkey 认证响应")
 
+	// DevTask 错误
+	ErrInvalidTaskID = errors.New("invalid task id")
+	ErrTaskNotFound  = errors.New("task not found")
+
 	// GitHub OAuth 错误
 	ErrGitHubNotConfigured = errors.New("GitHub OAuth 未配置")
 	ErrInvalidOAuthState   = errors.New("state 无效或已过期")

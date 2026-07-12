@@ -58,4 +58,6 @@ type DevTask struct {
 	DueDate     *time.Time      `bson:"due_date,omitempty" json:"due_date,omitempty"`
 	CreatedAt   time.Time       `bson:"created_at" json:"created_at"`
 	UpdatedAt   time.Time       `bson:"updated_at" json:"updated_at"`
+	IsDeleted   bool            `bson:"is_deleted" json:"is_deleted"`
+	ArchivedAt  *time.Time      `bson:"archived_at,omitempty" json:"archived_at,omitempty"`
 }

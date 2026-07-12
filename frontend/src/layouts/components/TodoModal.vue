@@ -217,7 +217,7 @@
 </template>
 
 <script setup lang="ts">
-import DevTaskCard from '@/views/todos/components/DevTaskCard.vue';
+import DevTaskCard from '@/views/todos/components/DevTaskCardV2.vue';
 import { useTodoDrawer } from '@/composables/todo';
 import type { DevTask, DevTaskPriority } from '@/api/todo';
 import { useTodoStore } from '@/stores/todos';

@@ -1,281 +1,171 @@
 <template>
   <li
-    class="group relative rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)]"
-    :class="[
-      isEditing ? '' : 'hover:bg-white/80 dark:hover:bg-white/5',
-      'border border-white/40 bg-white/60 backdrop-blur-xl dark:border-white/5 dark:bg-black/20',
-    ]"
+    class="bg-muted/40 border-border/50 hover:border-border group cursor-grab rounded-lg border p-3 transition-colors active:cursor-grabbing"
+    :class="{ 'opacity-60': isDragging }"
   >
-    <!-- ── Edit mode (shared) ── -->
-    <div v-if="isEditing" class="space-y-2.5">
-      <input
-        v-model="editForm.title"
-        class="border-border bg-background focus:border-primary text-foreground w-full rounded-lg border px-2.5 py-1.5 text-sm font-medium outline-none"
-      />
-      <textarea
-        v-model="editForm.description"
-        rows="2"
-        class="focus:border-primary border-border bg-background text-foreground w-full resize-none rounded-lg border px-2.5 py-1.5 text-xs outline-none"
-        placeholder="描述..."
-      ></textarea>
-      <div class="flex items-center gap-2">
-        <select
-          v-model="editForm.priority"
-          class="border-border bg-background text-foreground cursor-pointer rounded-full border px-2 py-1 text-xs outline-none"
-        >
-          <option value="default">默认</option>
-          <option value="low">低</option>
-          <option value="high">高</option>
-        </select>
-        <input
-          type="date"
-          v-model="editForm.dueDate"
-          class="border-border bg-background text-foreground cursor-pointer rounded-full border px-2 py-1 text-xs outline-none"
-        />
-        <div class="ml-auto flex gap-1.5">
-          <button
-            @click="cancelEdit"
-            class="bg-muted text-foreground hover:bg-muted cursor-pointer rounded-lg px-2.5 py-1 text-xs font-medium transition-colors"
-          >
-            取消
-          </button>
-          <button
-            @click="saveEdit"
-            class="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer rounded-lg px-2.5 py-1 text-xs font-medium transition-colors"
-          >
-            保存
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Todo 卡片 ── -->
-    <div v-else-if="task.status === 'todo'" class="flex items-start gap-2.5">
-      <button
-        class="mt-0.5 shrink-0 cursor-pointer rounded-full border px-2 py-0.5 text-[11px] font-medium"
-        style="background: #eff6ff; color: #1d4ed8"
-        @click="$emit('cycleStatus', task.id)"
+    <!-- 类型 + 优先级 badges -->
+    <div class="mb-1.5 flex flex-wrap items-center gap-1">
+      <span
+        class="rounded-full border px-1.5 py-px text-[10px] font-medium"
+        :class="typeCls"
       >
-        {{ STATUS_LABELS.todo }}
-      </button>
-
-      <div class="min-w-0 flex-1">
-        <p class="text-foreground text-sm leading-snug font-medium">
-          {{ task.title }}
-        </p>
-        <p
-          v-if="task.description"
-          class="text-muted-foreground mt-1 line-clamp-2 text-xs"
-        >
-          {{ task.description }}
-        </p>
-        <div class="mt-1.5 flex flex-wrap items-center gap-1.5">
-          <span
-            class="rounded-full border px-1.5 py-px text-[10px] font-medium"
-            :class="priorityCls(task.priority)"
-          >
-            {{ priorityLabel(task.priority) }}
-          </span>
-          <span
-            v-if="task.dueDate"
-            class="text-muted-foreground flex items-center gap-1 text-[10px]"
-            :class="overdueCls(task.dueDate)"
-          >
-            <svg class="h-2.5 w-2.5" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fill-rule="evenodd"
-                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                clip-rule="evenodd"
-              />
-            </svg>
-            {{ task.dueDate }}
-          </span>
-        </div>
-      </div>
-
-      <ActionsSlot
-        @start-edit="startEdit"
-        @delete="emit('deleteTask', task.id)"
-      />
+        {{ task.type }}
+      </span>
+      <span
+        class="rounded-full border px-1.5 py-px text-[10px] font-medium"
+        :class="priorityCls"
+      >
+        {{ task.priority }}
+      </span>
+      <span
+        v-if="task.scope !== '通用'"
+        class="text-muted-foreground rounded-full border border-border px-1.5 py-px text-[10px]"
+      >
+        {{ task.scope }}
+      </span>
     </div>
 
-    <!-- ── In-Progress 卡片 ── -->
-    <div
-      v-else-if="task.status === 'in-progress'"
-      class="flex items-start gap-2.5"
+    <!-- 标题 -->
+    <p class="text-foreground text-sm leading-snug font-medium">
+      {{ task.title }}
+    </p>
+
+    <!-- 描述 -->
+    <p
+      v-if="task.description"
+      class="text-muted-foreground mt-1 line-clamp-2 text-xs"
     >
-      <button
-        class="mt-0.5 shrink-0 cursor-pointer rounded-full border px-2 py-0.5 text-[11px] font-medium"
-        style="background: #fffbeb; color: #b45309"
-        @click="$emit('cycleStatus', task.id)"
+      {{ task.description }}
+    </p>
+
+    <!-- Detail 摘录 -->
+    <p
+      v-if="task.detail"
+      class="text-muted-foreground/70 border-border/40 mt-1.5 line-clamp-2 border-t pt-1.5 text-[11px] italic"
+    >
+      {{ task.detail }}
+    </p>
+
+    <!-- 底部：截止日 + 操作 -->
+    <div class="mt-2 flex items-center justify-between gap-2">
+      <span
+        v-if="task.due_date"
+        class="flex items-center gap-1 text-[10px]"
+        :class="overdueCls"
       >
-        {{ STATUS_LABELS['in-progress'] }}
-      </button>
+        <svg class="h-2.5 w-2.5" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            fill-rule="evenodd"
+            d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 1 0 100-2H6z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        {{ task.due_date }}
+      </span>
+      <span v-else></span>
 
-      <div class="min-w-0 flex-1">
-        <p class="text-foreground text-sm leading-snug font-medium">
-          {{ task.title }}
-        </p>
-        <p
-          v-if="task.description"
-          class="text-muted-foreground mt-1 line-clamp-2 text-xs"
-        >
-          {{ task.description }}
-        </p>
-        <div class="mt-1.5 flex flex-wrap items-center gap-1.5">
-          <span
-            class="rounded-full border px-1.5 py-px text-[10px] font-medium"
-            :class="priorityCls(task.priority)"
-          >
-            {{ priorityLabel(task.priority) }}
-          </span>
-          <span
-            v-if="task.dueDate"
-            class="text-muted-foreground flex items-center gap-1 text-[10px]"
-            :class="overdueCls(task.dueDate)"
-          >
-            <svg class="h-2.5 w-2.5" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fill-rule="evenodd"
-                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                clip-rule="evenodd"
-              />
-            </svg>
-            {{ task.dueDate }}
-          </span>
-        </div>
-      </div>
-
-      <ActionsSlot
-        @start-edit="startEdit"
-        @delete="emit('deleteTask', task.id)"
-      />
-    </div>
-
-    <!-- ── Done 卡片 ── -->
-    <div v-else class="flex items-start gap-2.5">
-      <button
-        class="mt-0.5 shrink-0 cursor-pointer rounded-full border px-2 py-0.5 text-[11px] font-medium"
-        style="background: #ecfdf5; color: #047857"
-        @click="$emit('cycleStatus', task.id)"
+      <!-- 操作按钮 -->
+      <div
+        class="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
       >
-        {{ STATUS_LABELS.done }}
-      </button>
-
-      <div class="min-w-0 flex-1">
-        <p
-          class="text-muted-foreground text-sm leading-snug font-medium line-through"
+        <button
+          @click="$emit('cycleStatus', task.id)"
+          class="text-muted-foreground hover:bg-muted hover:text-primary cursor-pointer rounded-md p-1 transition-colors"
+          title="推进状态"
         >
-          {{ task.title }}
-        </p>
-        <p
-          v-if="task.description"
-          class="text-muted-foreground mt-1 line-clamp-2 text-xs opacity-60"
+          <svg
+            class="h-3.5 w-3.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 7l5 5m0 0l-5 5m5-5H6"
+            />
+          </svg>
+        </button>
+        <button
+          @click="$emit('edit', task.id)"
+          class="text-muted-foreground hover:bg-muted hover:text-primary cursor-pointer rounded-md p-1 transition-colors"
+          title="编辑"
         >
-          {{ task.description }}
-        </p>
-        <div class="mt-1.5 flex flex-wrap items-center gap-1.5">
-          <span
-            class="rounded-full border px-1.5 py-px text-[10px] font-medium"
-            :class="priorityCls(task.priority)"
+          <svg
+            class="h-3.5 w-3.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
           >
-            {{ priorityLabel(task.priority) }}
-          </span>
-          <span
-            v-if="task.dueDate"
-            class="text-muted-foreground flex items-center gap-1 text-[10px]"
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+            />
+          </svg>
+        </button>
+        <button
+          @click="$emit('delete', task.id)"
+          class="text-muted-foreground hover:bg-destructive/10 hover:text-destructive cursor-pointer rounded-md p-1 transition-colors"
+          title="删除"
+        >
+          <svg
+            class="h-3.5 w-3.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
           >
-            <svg class="h-2.5 w-2.5" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fill-rule="evenodd"
-                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                clip-rule="evenodd"
-              />
-            </svg>
-            {{ task.dueDate }}
-          </span>
-        </div>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            />
+          </svg>
+        </button>
       </div>
-
-      <ActionsSlot
-        @start-edit="startEdit"
-        @delete="emit('deleteTask', task.id)"
-      />
     </div>
   </li>
 </template>
 
 <script setup lang="ts">
-import type { DevTask, DevTaskPriority } from '@/api/todo';
-import { STATUS_LABELS } from '@/stores/todos';
-import { ref } from 'vue';
-import ActionsSlot from './DevTaskCardActions.vue';
+import type { DevTask, DevTaskType } from '@/api/devtask';
 
-const props = defineProps<{ task: DevTask }>();
-
-const emit = defineEmits<{
-  cycleStatus: [id: string];
-  deleteTask: [id: string];
-  updateTask: [id: string, patch: Partial<DevTask>];
+const props = defineProps<{
+  task: DevTask;
+  isDragging?: boolean;
 }>();
 
-// Edit state
-const isEditing = ref(false);
-const editForm = ref({
-  title: '',
-  description: '',
-  dueDate: '',
-  priority: 'default' as DevTaskPriority,
-});
+defineEmits<{
+  cycleStatus: [id: string];
+  edit: [id: string];
+  delete: [id: string];
+}>();
 
-function startEdit() {
-  isEditing.value = true;
-  editForm.value = {
-    title: props.task.title,
-    description: props.task.description || '',
-    dueDate: props.task.dueDate || '',
-    priority: props.task.priority || 'default',
-  };
-}
-
-function saveEdit() {
-  if (!editForm.value.title.trim()) return;
-  emit('updateTask', props.task.id, {
-    title: editForm.value.title.trim(),
-    description: editForm.value.description.trim() || undefined,
-    dueDate: editForm.value.dueDate || undefined,
-    priority: editForm.value.priority,
-  });
-  isEditing.value = false;
-}
-
-function cancelEdit() {
-  isEditing.value = false;
-}
-
-// Priority helpers (kept as tiny fns to avoid repeating 3× in template)
-const PRIORITY_LABEL: Record<DevTaskPriority, string> = {
-  low: '低',
-  high: '高',
-  default: '默认',
-};
-const PRIORITY_CLASS: Record<DevTaskPriority, string> = {
-  low: 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  high: 'border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400',
-  default:
-    'border-gray-200 bg-gray-50 text-gray-700 dark:border-gray-700 dark:bg-gray-800/30 dark:text-gray-400',
+// 类型 badge 颜色：每种类型一个柔和底色，全部走 token + opacity，无硬编码。
+const TYPE_CLASS: Record<DevTaskType, string> = {
+  '问题': 'border-rose-200 bg-rose-50/60 text-rose-700 dark:border-rose-800/60 dark:bg-rose-950/30 dark:text-rose-400',
+  '功能需求': 'border-blue-200 bg-blue-50/60 text-blue-700 dark:border-blue-800/60 dark:bg-blue-950/30 dark:text-blue-400',
+  '优化': 'border-amber-200 bg-amber-50/60 text-amber-700 dark:border-amber-800/60 dark:bg-amber-950/30 dark:text-amber-400',
+  '技术债': 'border-purple-200 bg-purple-50/60 text-purple-700 dark:border-purple-800/60 dark:bg-purple-950/30 dark:text-purple-400',
 };
 
-function priorityLabel(p: DevTaskPriority): string {
-  return PRIORITY_LABEL[p];
-}
-function priorityCls(p: DevTaskPriority): string {
-  return PRIORITY_CLASS[p];
-}
-function overdueCls(dateStr?: string): string {
-  if (!dateStr) return '';
+// 优先级：P0 用 destructive 语义色强调，其余走 token。
+const PRIORITY_CLASS: Record<string, string> = {
+  'P0 紧急': 'border-destructive/40 bg-destructive/10 text-destructive',
+  'P1 高': 'border-orange-200 bg-orange-50/60 text-orange-700 dark:border-orange-800/60 dark:bg-orange-950/30 dark:text-orange-400',
+  'P2 中': 'border-border text-muted-foreground',
+  'P3 低': 'border-border text-muted-foreground/70',
+};
+
+const typeCls = TYPE_CLASS[props.task.type] ?? 'border-border text-muted-foreground';
+const priorityCls = PRIORITY_CLASS[props.task.priority] ?? 'border-border text-muted-foreground';
+
+function overdueCls(dateStr: string): string {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  return new Date(dateStr) < today ? 'text-red-600 dark:text-red-400' : '';
+  return new Date(dateStr) < today ? 'text-destructive' : 'text-muted-foreground';
 }
 </script>

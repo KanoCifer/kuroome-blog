@@ -12,6 +12,7 @@ type AppState struct {
 	userSvc     *service.UserService
 	adminSvc    *service.AdminService
 	blogSvc     *service.BlogService
+	devTaskSvc  *service.DevTaskService
 	passkeySvc  *service.PasskeyService
 	githubOAuth *service.GitHubOAuth
 	wssvc       *service.WSService
@@ -24,6 +25,7 @@ func NewAppState(
 	adminRepo *postgres.AdminRepo,
 	visitorRepo *postgres.VisitorRepo,
 	blogSvc *service.BlogService,
+	devTaskSvc *service.DevTaskService,
 	redis *redis.Client,
 	passkeySvc *service.PasskeyService,
 	wssvc *service.WSService,
@@ -34,6 +36,7 @@ func NewAppState(
 		userSvc:    userSvc,
 		adminSvc:   service.NewAdminService(adminRepo, visitorRepo, redis),
 		blogSvc:    blogSvc,
+		devTaskSvc: devTaskSvc,
 		passkeySvc: passkeySvc,
 		wssvc:      wssvc,
 		githubOAuth: service.NewGitHubOAuth(
@@ -45,8 +48,9 @@ func NewAppState(
 
 func (a *AppState) UserSvc() *service.UserService       { return a.userSvc }
 func (a *AppState) AdminSvc() *service.AdminService     { return a.adminSvc }
-func (a *AppState) BlogSvc() *service.BlogService       { return a.blogSvc }
-func (a *AppState) PasskeySvc() *service.PasskeyService { return a.passkeySvc }
+func (a *AppState) BlogSvc() *service.BlogService         { return a.blogSvc }
+func (a *AppState) DevTaskSvc() *service.DevTaskService   { return a.devTaskSvc }
+func (a *AppState) PasskeySvc() *service.PasskeyService   { return a.passkeySvc }
 func (a *AppState) WSSvc() *service.WSService           { return a.wssvc }
 func (a *AppState) GitHubOAuth() *service.GitHubOAuth   { return a.githubOAuth }
 func (a *AppState) Cfg() *config.Config                 { return a.config }

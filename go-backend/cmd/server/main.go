@@ -67,6 +67,7 @@ func main() {
 	}
 	passkeySvc := service.NewPasskeyService(wa, db.GetRedis(), postgres.NewPasskeyRepo(db.GetDB()), postgres.NewUserRepo(db.GetDB()))
 	blogSvc := service.NewBlogService(db.GetMongoDB())
+	devTaskSvc := service.NewDevTaskService(db.GetMongoDB())
 	wssvc := service.NewWSService(db.GetRedis())
 
 	state := app.NewAppState(
@@ -75,6 +76,7 @@ func main() {
 		postgres.NewAdminRepo(db.GetMongoDB()),
 		postgres.NewVisitorRepo(db.GetDB()),
 		blogSvc,
+		devTaskSvc,
 		db.GetRedis(),
 		passkeySvc,
 		wssvc,
