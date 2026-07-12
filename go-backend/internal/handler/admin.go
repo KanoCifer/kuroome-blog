@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"log/slog"
+	"net/http"
 	"os"
 	"os/exec"
 	"time"
@@ -24,6 +25,7 @@ type AdminService interface {
 	UpdatePost(id string, post dto.PostUpdate) error
 	DeletePost(id string) error
 	TrackVisitor(data dto.VisitorData) error
+	ListPostViewsData() ([]dto.PostViewData, error)
 }
 
 type AdminHandler struct {
@@ -97,6 +99,16 @@ func (h *AdminHandler) DeletePost(c *gin.Context) {
 	}
 	slog.InfoContext(c.Request.Context(), "post deleted", "post_id", postID)
 	response.Success(c, gin.H{"_id": postID}, "Blog post deleted successfully")
+}
+
+func (h *AdminHandler) ListPostViewsData(c *gin.Context) {
+	data, err := h.adminSvc.ListPostViewsData()
+	if err != nil {
+		slog.ErrorContext(c.Request.Context(), "list post views data", "error", err)
+		response.APIError(c, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	response.Success(c, data, "Post views data retrieved successfully")
 }
 
 func (h *AdminHandler) TrackVisitor(c *gin.Context) {
@@ -193,6 +205,7 @@ func (h *AdminHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFunc
 	r.POST("/post/add", authMW, adminMW, h.AddPost)
 	r.PUT("/post/update", authMW, adminMW, h.UpdatePost)
 	r.DELETE("/post/:post_id/delete", authMW, adminMW, h.DeletePost)
+	r.GET("/post/views", authMW, adminMW, h.ListPostViewsData)
 	r.POST("/track", h.TrackVisitor)
 	r.POST("/deploy", h.WebhookDeploy)
 }

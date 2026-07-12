@@ -110,6 +110,16 @@ func (s *AdminService) DeletePost(id string) error {
 	return nil
 }
 
+
+func (s *AdminService) ListPostViewsData() ([]dto.PostViewData, error) {
+	data, err := s.repo.ListPostViewsData(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+
 // TrackVisitor 把一次访问同步写入 PostgreSQL。
 //
 // 历史：前端曾经经 Redis app:migration_queue 缓冲，再由 Python taskiq

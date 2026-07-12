@@ -22,10 +22,11 @@ func init() {
 // ---------- mock AdminService ----------
 
 type mockAdminService struct {
-	addPostFn    func(post dto.PostIn) (string, error)
-	updatePostFn func(id string, post dto.PostUpdate) error
-	deletePostFn func(id string) error
-	trackFn      func(data dto.VisitorData) error
+	addPostFn       func(post dto.PostIn) (string, error)
+	updatePostFn    func(id string, post dto.PostUpdate) error
+	deletePostFn    func(id string) error
+	trackFn         func(data dto.VisitorData) error
+	listViewsDataFn func() ([]dto.PostViewData, error)
 }
 
 func (m *mockAdminService) AddPost(post dto.PostIn) (string, error) {
@@ -42,6 +43,10 @@ func (m *mockAdminService) DeletePost(id string) error {
 
 func (m *mockAdminService) TrackVisitor(data dto.VisitorData) error {
 	return m.trackFn(data)
+}
+
+func (m *mockAdminService) ListPostViewsData() ([]dto.PostViewData, error) {
+	return m.listViewsDataFn()
 }
 
 // ---------- helpers ----------

@@ -8,6 +8,11 @@ export interface AnalyticsOverviewData {
   message?: string;
 }
 
+export interface PostViewData {
+  title: string;
+  views: number;
+}
+
 export interface AnalyticsGateway {
   getOverview(days: number): Promise<AnalyticsOverviewData>;
   getUserLogins(params: {
@@ -15,6 +20,7 @@ export interface AnalyticsGateway {
     page: number;
     page_size: number;
   }): Promise<AnalyticsOverviewData>;
+  getPostViews(): Promise<ApiResponse<PostViewData[]>>;
   reportVisitorData(data: Record<string, unknown>): Promise<void>;
 }
 
@@ -40,6 +46,11 @@ export const analyticsGateway: AnalyticsGateway = {
         params,
       },
     );
+    return res.data;
+  },
+
+  async getPostViews(): Promise<ApiResponse<PostViewData[]>> {
+    const res = await request.get<ApiResponse<PostViewData[]>>('v3/post/views');
     return res.data;
   },
 

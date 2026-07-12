@@ -5,6 +5,7 @@ export { analyticsGateway } from './analyticsGateway';
 export type {
   AnalyticsGateway,
   AnalyticsOverviewData,
+  PostViewData,
 } from './analyticsGateway';
 
 export { deviceGateway } from './deviceGateway';

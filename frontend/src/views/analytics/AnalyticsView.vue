@@ -5,17 +5,17 @@
       <div class="bg-primary/40 mb-4 h-px w-8"></div>
       <div class="flex items-center gap-3">
         <span
-          class="bg-muted text-muted-foreground font-mono inline-block rounded-full px-2.5 py-0.5 text-[10px] font-medium tracking-[0.18em] uppercase"
+          class="bg-muted text-muted-foreground inline-block rounded-full px-2.5 py-0.5 font-mono text-[10px] font-medium tracking-[0.18em] uppercase"
         >
           仅管理员
         </span>
       </div>
       <h1
-        class="text-foreground mt-3 font-family-dongfang text-3xl sm:text-4xl"
+        class="text-foreground font-family-dongfang mt-3 text-3xl sm:text-4xl"
       >
         访客 · 趋势
       </h1>
-      <p class="text-muted-foreground mt-1.5 font-family-averia text-base">
+      <p class="text-muted-foreground font-family-averia mt-1.5 text-base">
         Reading Space · Analytics
       </p>
       <p class="text-muted-foreground mt-1 text-sm">
@@ -30,77 +30,28 @@
         <div
           class="border-border/60 bg-background flex flex-col items-center justify-between gap-3 rounded-2xl border p-3 sm:flex-row"
         >
-          <!-- Days Filter -->
-          <div class="relative">
+          <!-- Days Filter: segmented control (radio group) -->
+          <div
+            role="radiogroup"
+            aria-label="日期范围"
+            class="bg-muted flex rounded-xl p-1"
+          >
             <button
-              ref="dropdownTrigger"
-              class="border-border bg-background text-foreground hover:border-border/70 hover:bg-muted focus:border-primary focus:ring-primary/20 flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition-all focus:ring-2"
-              :aria-expanded="showDropdown"
-              aria-haspopup="listbox"
-              @click="showDropdown = !showDropdown"
+              v-for="option in [7, 30, 90]"
+              :key="option"
+              type="button"
+              role="radio"
+              :aria-checked="selectedDays === option"
+              class="rounded-lg px-4 py-1.5 text-sm font-medium transition-colors"
+              :class="
+                selectedDays === option
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              "
+              @click="selectedDays = option"
             >
-              <svg
-                class="text-muted-foreground h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-              最近 {{ selectedDays }} 天
-              <svg
-                class="text-muted-foreground h-3.5 w-3.5 transition-transform"
-                :class="{ 'rotate-180': showDropdown }"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
+              {{ option }} 天
             </button>
-
-            <transition
-              enter-active-class="transition-all transform-gpu duration-150 ease-out"
-              enter-from-class="opacity-0 scale-95 -translate-y-1"
-              enter-to-class="opacity-100 scale-100 translate-y-0"
-              leave-active-class="transition-all transform-gpu duration-100 ease-in"
-              leave-from-class="opacity-100 scale-100 translate-y-0"
-              leave-to-class="opacity-0 scale-95 -translate-y-1"
-            >
-              <ul
-                v-if="showDropdown"
-                ref="dropdownMenu"
-                role="listbox"
-                aria-label="日期范围"
-                class="border-border bg-background absolute top-full left-0 z-50 mt-2 w-44 overflow-hidden rounded-xl border shadow-lg"
-              >
-                <li
-                  v-for="option in [7, 30, 90]"
-                  :key="option"
-                  role="option"
-                  :aria-selected="selectedDays === option"
-                  class="focus:bg-muted cursor-pointer px-4 py-2.5 text-sm transition-colors focus:outline-none"
-                  :class="
-                    selectedDays === option
-                      ? 'bg-muted text-foreground font-medium'
-                      : 'text-foreground hover:bg-muted'
-                  "
-                  @click.prevent="onSelectDays(option)"
-                >
-                  最近 {{ option }} 天
-                </li>
-              </ul>
-            </transition>
           </div>
 
           <!-- Refresh Button -->
@@ -156,24 +107,21 @@
       <!-- Primary: 3 stat tiles + trend chart -->
       <div
         class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3"
-        :class="{ 'pointer-events-none opacity-60 transition-opacity duration-200': loading && !!overviewData }"
+        :class="{
+          'pointer-events-none opacity-60 transition-opacity duration-200':
+            loading && !!overviewData,
+        }"
       >
         <!-- 3 stat tiles: align-baseline with matching heights -->
         <div class="col-span-1 lg:col-span-3">
-          <div
-            v-if="loading && !overviewData"
-            class="grid grid-cols-3 gap-4"
-          >
+          <div v-if="loading && !overviewData" class="grid grid-cols-3 gap-4">
             <div
               v-for="i in 3"
               :key="i"
               class="bg-muted/50 h-24 animate-pulse rounded-2xl"
             ></div>
           </div>
-          <div
-            v-else-if="overviewData"
-            class="grid grid-cols-3 gap-4"
-          >
+          <div v-else-if="overviewData" class="grid grid-cols-3 gap-4">
             <StatTile
               label="总访问量"
               :value="overviewData.total_visits"
@@ -260,8 +208,8 @@
           </div>
         </div>
 
-        <!-- Trend chart: primary column -->
-        <div class="col-span-1 lg:col-span-2">
+        <!-- Trend chart: full row -->
+        <div class="col-span-1 lg:col-span-3">
           <TrendChartCard
             :loading="loading"
             :overview-data="overviewData"
@@ -270,19 +218,26 @@
         </div>
 
         <!-- Secondary: Popular Pages -->
-        <div class="col-span-1">
+        <div class="col-span-2">
           <PopularPagesChartCard
             :loading="loading"
             :overview-data="overviewData"
           />
         </div>
 
+        <!-- Secondary: Post Views -->
+        <div class="col-span-1">
+          <PostViewsChartCard :loading="loading" :data="postViewsData" />
+        </div>
+
         <!-- Collapsed secondary: 设备 & 浏览器 -->
         <div class="col-span-1 lg:col-span-3">
-          <div class="border-border/60 bg-background overflow-hidden rounded-3xl border">
+          <div
+            class="border-border/60 bg-background overflow-hidden rounded-3xl border"
+          >
             <button
               type="button"
-              class="text-foreground flex w-full items-center justify-between px-6 py-4 text-left transition-colors hover:bg-muted/30"
+              class="text-foreground hover:bg-muted/30 flex w-full items-center justify-between px-6 py-4 text-left transition-colors"
               :aria-expanded="showOsBrowser"
               aria-controls="os-browser-panel"
               @click="showOsBrowser = !showOsBrowser"
@@ -377,7 +332,9 @@
             <div v-else>
               <div class="overflow-x-auto">
                 <table class="w-full">
-                  <caption class="sr-only">用户登录记录表</caption>
+                  <caption class="sr-only">
+                    用户登录记录表
+                  </caption>
                   <thead>
                     <tr
                       class="border-border text-muted-foreground border-b text-left text-sm"
@@ -493,7 +450,7 @@
 <script setup lang="ts">
 import IconUser from '@/components/icons/IconUser.vue';
 import IconAnalytics from '@/components/icons/IconAnalytics.vue';
-import { analyticsGateway } from '@/api/shared';
+import { analyticsGateway, type PostViewData } from '@/api/shared';
 import { useAuthStore } from '@/auth/stores/auth';
 import dayjs from 'dayjs';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
@@ -502,6 +459,7 @@ import TrendChartCard from './components/TrendChartCard.vue';
 import BrowserAnalytics from './components/BrowserAnalytics.vue';
 import OsCharts from './components/OsCharts.vue';
 import PopularPagesChartCard from './components/PopularPagesChartCard.vue';
+import PostViewsChartCard from './components/PostViewsChartCard.vue';
 import ServerMonitor from './components/ServerMonitor.vue';
 import StatTile from './components/StatTile.vue';
 
@@ -553,11 +511,9 @@ const error = ref<string | null>(null);
 const selectedDays = ref(7);
 const overviewData = ref<OverviewData | null>(null);
 const loginLogsData = ref<LoginLogsResponse | null>(null);
+const postViewsData = ref<PostViewData[] | null>(null);
 const loginLogsPage = ref(1);
 const serverMonitorRef = ref<InstanceType<typeof ServerMonitor> | null>(null);
-const showDropdown = ref<boolean>(false);
-const dropdownTrigger = ref<HTMLElement | null>(null);
-const dropdownMenu = ref<HTMLElement | null>(null);
 const showOsBrowser = ref<boolean>(false);
 
 // Computed
@@ -606,6 +562,16 @@ const fetchOverview = async () => {
   }
 };
 
+const fetchPostViews = async () => {
+  try {
+    const res = await analyticsGateway.getPostViews();
+    postViewsData.value = res.data as unknown as PostViewData[];
+  } catch (err) {
+    console.error('Failed to fetch post views:', err);
+    error.value = '加载文章阅读量失败，请重试。';
+  }
+};
+
 const fetchLoginLogs = async () => {
   try {
     const res = await analyticsGateway.getUserLogins({
@@ -624,7 +590,7 @@ const fetchAllData = async () => {
   loading.value = true;
   error.value = '';
   try {
-    await Promise.all([fetchOverview(), fetchLoginLogs()]);
+    await Promise.all([fetchOverview(), fetchPostViews(), fetchLoginLogs()]);
   } finally {
     loading.value = false;
   }
@@ -634,23 +600,6 @@ const changePage = (page: number) => {
   if (loading.value) return;
   loginLogsPage.value = page;
   fetchLoginLogs();
-};
-
-const onSelectDays = (days: number) => {
-  selectedDays.value = days;
-  showDropdown.value = false;
-};
-
-// Close dropdown when clicking outside.
-const onDocClick = (e: MouseEvent) => {
-  if (!showDropdown.value) return;
-  const target = e.target as Node;
-  if (
-    dropdownTrigger.value?.contains(target) ||
-    dropdownMenu.value?.contains(target)
-  )
-    return;
-  showDropdown.value = false;
 };
 
 // Watch for days selection change
@@ -666,7 +615,6 @@ watch(
 
 // Lifecycle
 onMounted(async () => {
-  document.addEventListener('click', onDocClick);
   // Check auth
   if (auth.user === null && !auth.loading) {
     await auth.fetchUser();
@@ -681,6 +629,6 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-  document.removeEventListener('click', onDocClick);
+  // no manual listeners to clean up
 });
 </script>
