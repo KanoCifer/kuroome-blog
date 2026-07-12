@@ -43,3 +43,4 @@ backend/models/*.joblib
 .claude/settings.json
 go-backend/configs/config.yaml
 go-backend/logs/app.log
+go-backend/logs/app_error.log

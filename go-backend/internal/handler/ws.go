@@ -31,7 +31,9 @@ func NewWSHandler(svc WSService) *WSHandler {
 }
 
 func (h *WSHandler) HandleWS(c *gin.Context) {
-	conn, err := websocket.Accept(c.Writer, c.Request, nil)
+	conn, err := websocket.Accept(c.Writer, c.Request, &websocket.AcceptOptions{
+		InsecureSkipVerify: true,
+	})
 	if err != nil {
 		slog.Error("failed to accept websocket", "error", err)
 		return
