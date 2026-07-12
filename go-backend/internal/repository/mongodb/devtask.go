@@ -198,9 +198,6 @@ func (r *DevTaskRepository) NextSlugSeq(ctx context.Context) (int, error) {
 // FindFrontier 返回 agent 当前可认领的任务。
 // 条件: for_agent=true + status=待排期 + blocked_by=空数组 + is_deleted=false。
 // 排序沿用 List 的规则 (sort_order ASC, created_at DESC)，默认最多 10 条。
-//
-// 注意: $size:0 只匹配字段存在且为空数组的文档。老任务(无 blocked_by 字段)不会被匹配。
-// 上线后需要跑一次 migration 给老任务补 blocked_by=[] —— 见 migration 脚本。
 func (r *DevTaskRepository) FindFrontier(ctx context.Context, limit int) ([]document.DevTask, error) {
 	where := bson.M{
 		"for_agent":  true,

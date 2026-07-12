@@ -38,6 +38,16 @@ func NewDevTaskService(db *mongo.Database) *DevTaskService {
 	return &DevTaskService{repo: mongodb.NewDevTaskRepository(db)}
 }
 
+// blockedByOrEmpty 把 nil slice 归一化为空数组，避免 omitempty 在 Mongo 里丢字段。
+// 落库的 blocked_by 始终是 [] 而不是 missing/null，这样 FindFrontier 的 $size:0
+// 查询才能稳定命中。
+func blockedByOrEmpty(s []string) []string {
+	if s == nil {
+		return []string{}
+	}
+	return s
+}
+
 // serializeTask 将文档转为输出 DTO。
 func serializeTask(t document.DevTask) dto.DevTaskOut {
 	return dto.DevTaskOut{
@@ -103,7 +113,7 @@ func (s *DevTaskService) Create(ctx context.Context, userID int, req dto.DevTask
 		Constraints:        req.Constraints,
 		ContextPointers:    req.ContextPointers,
 		ForAgent:  req.ForAgent,
-		BlockedBy: req.BlockedBy,
+		BlockedBy: blockedByOrEmpty(req.BlockedBy),
 		Slug:      slug,
 	}
 
@@ -207,7 +217,7 @@ func (s *DevTaskService) Update(ctx context.Context, id string, req dto.DevTaskU
 		fields["for_agent"] = *req.ForAgent
 	}
 	if req.BlockedBy != nil {
-		fields["blocked_by"] = *req.BlockedBy
+		fields["blocked_by"] = blockedByOrEmpty(*req.BlockedBy)
 	}
 
 	if len(fields) == 0 {
