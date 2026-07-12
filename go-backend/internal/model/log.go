@@ -13,3 +13,8 @@ type Log struct {
 	Message   string    `gorm:"type:text"`
 	Extra     *datatypes.JSON
 }
+
+// TableName 对齐 Python SQLAlchemy 的 __tablename__ = "log"。
+func (Log) TableName() string {
+	return "log"
+}

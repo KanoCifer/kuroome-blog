@@ -15,3 +15,8 @@ type RssInfo struct {
 	UpdatedAt       time.Time
 	UserID          uint `gorm:"index"`
 }
+
+// TableName 对齐 Python SQLAlchemy 的 __tablename__ = "rss_info"。
+func (RssInfo) TableName() string {
+	return "rss_info"
+}

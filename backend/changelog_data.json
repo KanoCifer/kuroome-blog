@@ -6,7 +6,7 @@
     "changes": [
       {
         "type": "refactor",
-        "content": "Go 后端 v3/track 改为 GORM 直写 PostgreSQL,移除 Redis app:migration_queue 缓冲 + Python taskiq run_migration_job 定时迁移链路(该链路因缺显式 commit、browser 列 NOT NULL 约束、VisitorData/VisitorTrack schema 不对齐而持续失败);同步清理 Python 侧废弃 v1/track 端点、run_migration_job 任务、VisitorData schema 及未跟踪的 legacy/aps.py 死代码,并将 visitor_track.browser 列改为 nullable TEXT"
+        "content": "Go 后端 v3/track 改为 GORM 直写 PostgreSQL visitor_track 表,移除 Redis app:migration_queue 缓冲 + Python taskiq run_migration_job 定时迁移链路(该链路因缺显式 commit、browser 列 NOT NULL 约束、VisitorData/VisitorTrack schema 不对齐而持续失败);同步清理 Python 侧废弃 v1/track 端点、run_migration_job 任务、VisitorData schema 及未跟踪的 legacy/aps.py 死代码,并将 visitor_track.browser 列改为 nullable TEXT"
       }
     ]
   },

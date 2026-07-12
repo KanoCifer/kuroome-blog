@@ -19,3 +19,8 @@ type GalleryImage struct {
 	Exif        *datatypes.JSON
 	UserID      *uint `gorm:"index"`
 }
+
+// TableName 对齐 Python SQLAlchemy 的 __tablename__ = "gallery_image"。
+func (GalleryImage) TableName() string {
+	return "gallery_image"
+}

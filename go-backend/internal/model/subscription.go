@@ -66,3 +66,8 @@ type Subscription struct {
 	UpdatedAt       time.Time
 	UserID          uint `gorm:"index"`
 }
+
+// TableName 对齐 Python SQLAlchemy 的 __tablename__ = "subscription"。
+func (Subscription) TableName() string {
+	return "subscription"
+}

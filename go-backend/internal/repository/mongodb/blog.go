@@ -86,7 +86,7 @@ func (r *BlogRepository) AggregateTagCounts(ctx context.Context) ([]dto.TagOut, 
 	}
 	defer cursor.Close(ctx)
 
-	var results []dto.TagOut
+	results := []dto.TagOut{}
 	for cursor.Next(ctx) {
 		var doc struct {
 			ID    string `bson:"_id"`

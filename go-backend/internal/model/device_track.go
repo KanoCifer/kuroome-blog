@@ -41,3 +41,8 @@ type DeviceTrack struct {
 	Status         DeviceStatus `gorm:"type:device_status_enum;not null"`
 	ReminderConfig *datatypes.JSON
 }
+
+// TableName 对齐 Python SQLAlchemy 的 __tablename__ = "device_track"。
+func (DeviceTrack) TableName() string {
+	return "device_track"
+}
