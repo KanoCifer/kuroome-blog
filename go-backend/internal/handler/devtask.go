@@ -20,10 +20,12 @@ import (
 type DevTaskService interface {
 	Create(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error)
 	GetByID(ctx context.Context, id string) (*dto.DevTaskOut, error)
+	GetBySlug(ctx context.Context, slug string) (*dto.DevTaskOut, error)
 	List(ctx context.Context, filter mongodb.ListFilter, page, perPage int) (*dto.DevTaskListOut, error)
 	Update(ctx context.Context, id string, req dto.DevTaskUpdate) error
 	SoftDelete(ctx context.Context, id string) error
 	HardDelete(ctx context.Context, id string) error
+	FindFrontier(ctx context.Context, limit int) ([]dto.DevTaskOut, error)
 }
 
 // DevTaskHandler 处理开发与需求看板请求（需登录 + admin）。
@@ -79,6 +81,24 @@ func (h *DevTaskHandler) GetTask(c *gin.Context) {
 	response.Success(c, data, "Task retrieved successfully")
 }
 
+// GetTaskBySlug 按 slug 查单条任务  GET /api/v3/dev-tasks/by-slug/:slug
+func (h *DevTaskHandler) GetTaskBySlug(c *gin.Context) {
+	slug := c.Param("slug")
+
+	data, err := h.svc.GetBySlug(c.Request.Context(), slug)
+	if err != nil {
+		switch {
+		case errors.Is(err, errs.ErrTaskNotFound):
+			response.APIError(c, err.Error(), http.StatusNotFound)
+		default:
+			slog.ErrorContext(c.Request.Context(), "get dev task by slug", "error", err, "slug", slug)
+			response.APIError(c, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	response.Success(c, data, "Task retrieved successfully")
+}
+
 // listFilter 从 query 参数解析过滤条件。
 func listFilter(c *gin.Context) mongodb.ListFilter {
 	var filter mongodb.ListFilter
@@ -102,6 +122,16 @@ func listFilter(c *gin.Context) mongodb.ListFilter {
 		notDeleted := false
 		filter.IsDeleted = &notDeleted
 	}
+	if f := c.Query("for_agent"); f != "" {
+		switch f {
+		case "true":
+			t := true
+			filter.ForAgent = &t
+		case "false":
+			f := false
+			filter.ForAgent = &f
+		}
+	}
 	return filter
 }
 
@@ -117,6 +147,21 @@ func (h *DevTaskHandler) ListTasks(c *gin.Context) {
 		return
 	}
 	response.Success(c, data, "Tasks retrieved successfully")
+}
+
+// FrontierTasks 返回 agent 当前可认领的任务列表（for_agent=true + 未阻塞 + 待排期）。
+// GET /api/v3/dev-tasks/frontier?limit=10
+func (h *DevTaskHandler) FrontierTasks(c *gin.Context) {
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+
+	data, err := h.svc.FindFrontier(c.Request.Context(), limit)
+	if err != nil {
+		slog.ErrorContext(c.Request.Context(), "frontier dev tasks", "error", err)
+		response.APIError(c, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	// 直接返回数组（无分页 envelope），因为 frontier 语义是"接下来干什么的简短清单"。
+	response.Success(c, data, "Frontier tasks retrieved successfully")
 }
 
 // UpdateTask 部分更新任务  PATCH /api/v3/dev-tasks/:id
@@ -178,6 +223,9 @@ func (h *DevTaskHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFu
 	g := r.Group("/dev-tasks", authMW, adminMW)
 	g.POST("", h.CreateTask)
 	g.GET("", h.ListTasks)
+	// 静态前缀必须注册在 :id 之前 —— Gin 路由按注册顺序匹配，:id 会吞掉同级的静态 path。
+	g.GET("/frontier", h.FrontierTasks)
+	g.GET("/by-slug/:slug", h.GetTaskBySlug)
 	g.GET("/:id", h.GetTask)
 	g.PATCH("/:id", h.UpdateTask)
 	g.DELETE("/:id", h.SoftDeleteTask)

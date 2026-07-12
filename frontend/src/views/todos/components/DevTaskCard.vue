@@ -18,10 +18,16 @@
         {{ task.priority }}
       </span>
       <span
-        v-if="task.scope !== '通用'"
+        v-if="task.scope && task.scope !== '通用'"
         class="text-muted-foreground rounded-full border border-border px-1.5 py-px text-[10px]"
       >
         {{ task.scope }}
+      </span>
+      <span
+        v-if="task.slug"
+        class="bg-primary/10 text-primary rounded-full px-1.5 py-px text-[10px] font-medium"
+      >
+        {{ task.slug }}
       </span>
     </div>
 

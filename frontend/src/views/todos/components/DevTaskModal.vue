@@ -94,24 +94,13 @@
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
-              >范围</span
+              >范围 <span class="text-muted-foreground/60 font-normal">（自由格式 — 例: 前端-React, 后端-Go, AI-LangChain）</span></span
             >
-            <div class="flex flex-wrap gap-1.5">
-              <button
-                v-for="s in SCOPES"
-                :key="s"
-                type="button"
-                @click="form.scope = s"
-                class="cursor-pointer rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors"
-                :class="
-                  form.scope === s
-                    ? 'border-primary/40 bg-primary/10 text-primary'
-                    : 'border-border text-muted-foreground hover:bg-muted'
-                "
-              >
-                {{ s }}
-              </button>
-            </div>
+            <input
+              v-model="form.scope"
+              class="border-border bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/50 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+              placeholder="例如：前端-React"
+            />
           </div>
           <label class="block">
             <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
@@ -176,6 +165,45 @@
             >支持比描述更长的自由文本</span
           >
         </label>
+
+        <!-- ── Spec：验收标准 ── -->
+        <label class="block">
+          <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
+            >验收标准 <span class="text-muted-foreground/60 font-normal">（满足这几条算完成 — agent 会逐条自检）</span></span
+          >
+          <textarea
+            v-model="form.acceptance_criteria"
+            rows="2"
+            class="border-border bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+            placeholder="- 所有接口有单测覆盖&#10;- 文档同步更新&#10;- 性能基准不降级"
+          ></textarea>
+        </label>
+
+        <!-- ── Spec：约束 ── -->
+        <label class="block">
+          <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
+            >约束 <span class="text-muted-foreground/60 font-normal">（agent 不可违反的硬性边界）</span></span
+          >
+          <textarea
+            v-model="form.constraints"
+            rows="2"
+            class="border-border bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+            placeholder="- 不动 src/legacy/ 目录&#10;- 后端继续用 Gin，不换框架&#10;- API 响应格式保持不变"
+          ></textarea>
+        </label>
+
+        <!-- ── Spec：上下文指针 ── -->
+        <label class="block">
+          <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
+            >上下文指针 <span class="text-muted-foreground/60 font-normal">（相关代码 / 文档路径，减少 agent 找文件的往返）</span></span
+          >
+          <textarea
+            v-model="form.context_pointers"
+            rows="2"
+            class="border-border bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+            placeholder="internal/auth/, docs/adr/0003, src/middleware/session.ts"
+          ></textarea>
+        </label>
       </div>
 
       <!-- ── 底部按钮 ── -->
@@ -228,7 +256,6 @@ import type {
   CreateDevTaskPayload,
   DevTask,
   DevTaskPriority,
-  DevTaskScope,
   DevTaskStatus,
   DevTaskType,
   UpdateDevTaskPayload,
@@ -236,13 +263,6 @@ import type {
 
 const TASK_TYPES: DevTaskType[] = ['问题', '功能需求', '优化', '技术债'];
 const PRIORITIES: DevTaskPriority[] = ['P0 紧急', 'P1 高', 'P2 中', 'P3 低'];
-const SCOPES: DevTaskScope[] = [
-  '前端-Vue',
-  '前端-React',
-  '后端-Python',
-  '后端-Go',
-  '通用',
-];
 const STATUSES: DevTaskStatus[] = [
   '待评估',
   '待排期',
@@ -284,9 +304,12 @@ interface FormState {
   detail: string;
   type: DevTaskType;
   priority: DevTaskPriority;
-  scope: DevTaskScope;
+  scope: string;
   status: DevTaskStatus;
   due_date: string;
+  acceptance_criteria: string;
+  constraints: string;
+  context_pointers: string;
 }
 
 const props = defineProps<{
@@ -308,9 +331,12 @@ function defaultForm(): FormState {
     detail: '',
     type: '功能需求',
     priority: 'P2 中',
-    scope: '通用',
+    scope: '',
     status: '待评估',
     due_date: '',
+    acceptance_criteria: '',
+    constraints: '',
+    context_pointers: '',
   };
 }
 
@@ -327,9 +353,12 @@ watch(
         detail: t.detail ?? '',
         type: t.type,
         priority: t.priority,
-        scope: t.scope,
+        scope: t.scope ?? '',
         status: t.status,
         due_date: t.due_date ?? '',
+        acceptance_criteria: t.acceptance_criteria ?? '',
+        constraints: t.constraints ?? '',
+        context_pointers: t.context_pointers ?? '',
       });
     } else {
       Object.assign(form, defaultForm());
@@ -346,8 +375,11 @@ function handleSave() {
     detail: form.detail.trim() || undefined,
     type: form.type,
     priority: form.priority,
-    scope: form.scope,
+    scope: form.scope.trim(),
     due_date: form.due_date || undefined,
+    acceptance_criteria: form.acceptance_criteria.trim() || undefined,
+    constraints: form.constraints.trim() || undefined,
+    context_pointers: form.context_pointers.trim() || undefined,
   };
   if (form.id) {
     emit('saveUpdate', form.id, { ...base, status: form.status });

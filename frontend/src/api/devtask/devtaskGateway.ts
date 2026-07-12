@@ -1,12 +1,14 @@
 import request from '@/api/shared/request';
 
-// ── 与后端 document/dev_task.go 枚举对齐 —— 单一真源在后端，前端镜像。 ──
+// ── 与后端 document/dev_task.go 对齐 —— 单一真源在后端，前端镜像。 ──
 
 export type DevTaskType = '问题' | '功能需求' | '优化' | '技术债';
 
 export type DevTaskPriority = 'P0 紧急' | 'P1 高' | 'P2 中' | 'P3 低';
 
-export type DevTaskScope = '前端-Vue' | '前端-React' | '后端-Python' | '后端-Go' | '通用';
+// Scope 去 enum 化：后端接受任意"<层>-<技术>"格式字符串。前端保留为 string，
+// 但给出常见值作为 placeholder / 提示，不再是闭枚举。
+export type DevTaskScope = string;
 
 export type DevTaskStatus = '待评估' | '待排期' | '进行中' | '已搁置' | '已完成';
 
@@ -25,6 +27,15 @@ export interface DevTask {
   is_deleted: boolean;
   created_at: string;
   updated_at: string;
+  // Spec
+  acceptance_criteria?: string | null;
+  constraints?: string | null;
+  context_pointers?: string | null;
+  // Who / Dependencies
+  for_agent?: boolean;
+  blocked_by?: string[];
+  // Slug —— task-N，人类可读引用
+  slug?: string;
 }
 
 export interface Pagination {
@@ -49,6 +60,7 @@ export interface ListDevTasksParams {
   status?: DevTaskStatus;
   priority?: DevTaskPriority;
   type?: DevTaskType;
+  for_agent?: boolean;
   include_deleted?: boolean;
 }
 
@@ -60,6 +72,13 @@ export interface CreateDevTaskPayload {
   priority: DevTaskPriority;
   scope: DevTaskScope;
   due_date?: string | null;
+  // Spec
+  acceptance_criteria?: string | null;
+  constraints?: string | null;
+  context_pointers?: string | null;
+  // Who / Dependencies
+  for_agent?: boolean;
+  blocked_by?: string[];
 }
 
 export interface UpdateDevTaskPayload {
@@ -72,11 +91,19 @@ export interface UpdateDevTaskPayload {
   status?: DevTaskStatus;
   sort_order?: number;
   due_date?: string | null;
+  // Spec
+  acceptance_criteria?: string | null;
+  constraints?: string | null;
+  context_pointers?: string | null;
+  // Who / Dependencies
+  for_agent?: boolean;
+  blocked_by?: string[];
 }
 
 export interface DevTaskGateway {
   list(params?: ListDevTasksParams): Promise<DevTaskListResponse>;
   get(id: string): Promise<DevTask>;
+  getBySlug(slug: string): Promise<DevTask>;
   create(payload: CreateDevTaskPayload): Promise<DevTask>;
   update(id: string, payload: UpdateDevTaskPayload): Promise<void>;
   remove(id: string): Promise<void>;
@@ -93,6 +120,11 @@ export const devTaskGateway: DevTaskGateway = {
 
   async get(id: string): Promise<DevTask> {
     const res = await request.get<{ data: DevTask }>(`v3/dev-tasks/${id}`);
+    return res.data.data;
+  },
+
+  async getBySlug(slug: string): Promise<DevTask> {
+    const res = await request.get<{ data: DevTask }>(`v3/dev-tasks/by-slug/${slug}`);
     return res.data.data;
   },
 

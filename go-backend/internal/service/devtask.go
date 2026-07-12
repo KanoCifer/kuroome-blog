@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"time"
 
@@ -19,11 +20,14 @@ import (
 type DevTaskRepository interface {
 	Create(ctx context.Context, task *document.DevTask) error
 	GetByID(ctx context.Context, id string) (*document.DevTask, error)
+	GetBySlug(ctx context.Context, slug string) (*document.DevTask, error)
 	List(ctx context.Context, filter mongodb.ListFilter, page, perPage int) ([]document.DevTask, int64, error)
 	Update(ctx context.Context, id string, fields bson.M) error
 	SoftDelete(ctx context.Context, id string) error
 	HardDelete(ctx context.Context, id string) error
 	ArchiveDoneTasks(ctx context.Context) (int64, error)
+	FindFrontier(ctx context.Context, limit int) ([]document.DevTask, error)
+	NextSlugSeq(ctx context.Context) (int, error)
 }
 
 type DevTaskService struct {
@@ -51,6 +55,12 @@ func serializeTask(t document.DevTask) dto.DevTaskOut {
 		IsDeleted:   t.IsDeleted,
 		CreatedAt:   t.CreatedAt,
 		UpdatedAt:   t.UpdatedAt,
+		AcceptanceCriteria: t.AcceptanceCriteria,
+		Constraints:        t.Constraints,
+		ContextPointers:    t.ContextPointers,
+		ForAgent:  t.ForAgent,
+		BlockedBy: t.BlockedBy,
+		Slug:      t.Slug,
 	}
 }
 
@@ -68,6 +78,14 @@ func serializeTasks(tasks []document.DevTask) []dto.DevTaskOut {
 
 // Create 创建任务。
 func (s *DevTaskService) Create(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error) {
+	// 自增生成 slug —— counters 集合单文档 $inc 保证原子性，并发安全。
+	seq, err := s.repo.NextSlugSeq(ctx)
+	if err != nil {
+		slog.Error("next slug seq", "error", err)
+		return nil, err
+	}
+	slug := fmt.Sprintf("task-%d", seq)
+
 	now := time.Now()
 	task := &document.DevTask{
 		UserID:      userID,
@@ -81,6 +99,12 @@ func (s *DevTaskService) Create(ctx context.Context, userID int, req dto.DevTask
 		DueDate:     req.DueDate,
 		CreatedAt:   now,
 		UpdatedAt:   now,
+		AcceptanceCriteria: req.AcceptanceCriteria,
+		Constraints:        req.Constraints,
+		ContextPointers:    req.ContextPointers,
+		ForAgent:  req.ForAgent,
+		BlockedBy: req.BlockedBy,
+		Slug:      slug,
 	}
 
 	if err := s.repo.Create(ctx, task); err != nil {
@@ -170,6 +194,21 @@ func (s *DevTaskService) Update(ctx context.Context, id string, req dto.DevTaskU
 	if req.DueDate != nil {
 		fields["due_date"] = *req.DueDate
 	}
+	if req.AcceptanceCriteria != nil {
+		fields["acceptance_criteria"] = *req.AcceptanceCriteria
+	}
+	if req.Constraints != nil {
+		fields["constraints"] = *req.Constraints
+	}
+	if req.ContextPointers != nil {
+		fields["context_pointers"] = *req.ContextPointers
+	}
+	if req.ForAgent != nil {
+		fields["for_agent"] = *req.ForAgent
+	}
+	if req.BlockedBy != nil {
+		fields["blocked_by"] = *req.BlockedBy
+	}
 
 	if len(fields) == 0 {
 		return nil
@@ -219,4 +258,35 @@ func (s *DevTaskService) ArchiveDoneTasks(ctx context.Context) (int64, error) {
 		return 0, err
 	}
 	return n, nil
+}
+
+// GetBySlug 按 slug 查单条任务（slug 用 task-N 格式）。
+func (s *DevTaskService) GetBySlug(ctx context.Context, slug string) (*dto.DevTaskOut, error) {
+	if slug == "" {
+		return nil, errs.ErrTaskNotFound
+	}
+	task, err := s.repo.GetBySlug(ctx, slug)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, errs.ErrTaskNotFound
+		}
+		slog.Error("get dev task by slug", "error", err, "slug", slug)
+		return nil, err
+	}
+	out := serializeTask(*task)
+	return &out, nil
+}
+
+// FindFrontier 返回 agent 当前可认领的任务列表 —— Pocock 的 frontier 概念。
+// = for_agent=true + status=待排期 + blocked_by=空 + is_deleted=false，按当前排序规则。
+func (s *DevTaskService) FindFrontier(ctx context.Context, limit int) ([]dto.DevTaskOut, error) {
+	if limit < 1 {
+		limit = 10
+	}
+	tasks, err := s.repo.FindFrontier(ctx, limit)
+	if err != nil {
+		slog.Error("find frontier tasks", "error", err)
+		return nil, err
+	}
+	return serializeTasks(tasks), nil
 }

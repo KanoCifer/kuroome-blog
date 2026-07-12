@@ -44,12 +44,20 @@ func (r *DevTaskRepository) GetByID(ctx context.Context, id string) (*document.D
 	return &task, err
 }
 
+// GetBySlug 按 slug（task-N 格式）查询单条任务。
+func (r *DevTaskRepository) GetBySlug(ctx context.Context, slug string) (*document.DevTask, error) {
+	var task document.DevTask
+	err := r.db.FindOne(ctx, bson.M{"slug": slug, "is_deleted": false}).Decode(&task)
+	return &task, err
+}
+
 // ListFilter 列表查询过滤条件。
 type ListFilter struct {
 	Status   *document.DevTaskStatus
 	Priority *document.DevTaskPriority
 	Type     *document.DevTaskType
 	IsDeleted *bool
+	ForAgent  *bool  // 新增: 按"是否可给 agent"过滤
 }
 
 // List 分页列出任务，支持按状态 / 优先级 / 类型过滤。
@@ -72,6 +80,9 @@ func (r *DevTaskRepository) List(
 		where["is_deleted"] = *filter.IsDeleted
 	} else {
 		where["is_deleted"] = false
+	}
+	if filter.ForAgent != nil {
+		where["for_agent"] = *filter.ForAgent
 	}
 
 	total, err := r.db.CountDocuments(ctx, where)
@@ -158,4 +169,62 @@ func (r *DevTaskRepository) HardDelete(ctx context.Context, id string) error {
 	}
 	_, err = r.db.DeleteOne(ctx, bson.M{"_id": oid})
 	return err
+}
+
+// NextSlugSeq 自增并返回下一个 slug 序号。
+// 用 counters 集合单文档 $inc 保证原子性——并发创建也不会重复。
+// 首次调用时文档不存在，$inc 会自动创建（seq 从 1 开始）。
+func (r *DevTaskRepository) NextSlugSeq(ctx context.Context) (int, error) {
+	const counterID = "devtask_slug"
+
+	res := r.db.Database().Collection("counters").FindOneAndUpdate(
+		ctx,
+		bson.M{"_id": counterID},
+		bson.M{"$inc": bson.M{"seq": 1}},
+		options.FindOneAndUpdate().
+			SetUpsert(true).
+			SetReturnDocument(options.After),
+	)
+
+	var doc struct {
+		Seq int `bson:"seq"`
+	}
+	if err := res.Decode(&doc); err != nil {
+		return 0, err
+	}
+	return doc.Seq, nil
+}
+
+// FindFrontier 返回 agent 当前可认领的任务。
+// 条件: for_agent=true + status=待排期 + blocked_by=空数组 + is_deleted=false。
+// 排序沿用 List 的规则 (sort_order ASC, created_at DESC)，默认最多 10 条。
+//
+// 注意: $size:0 只匹配字段存在且为空数组的文档。老任务(无 blocked_by 字段)不会被匹配。
+// 上线后需要跑一次 migration 给老任务补 blocked_by=[] —— 见 migration 脚本。
+func (r *DevTaskRepository) FindFrontier(ctx context.Context, limit int) ([]document.DevTask, error) {
+	where := bson.M{
+		"for_agent":  true,
+		"status":     document.StatusBacklog,
+		"is_deleted": false,
+		"blocked_by": bson.M{"$size": 0},
+	}
+
+	opts := options.Find().
+		SetSort(bson.D{
+			{Key: "sort_order", Value: 1},
+			{Key: "created_at", Value: -1},
+		}).
+		SetLimit(int64(limit))
+
+	cursor, err := r.db.Find(ctx, where, opts)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var tasks []document.DevTask
+	if err := cursor.All(ctx, &tasks); err != nil {
+		return nil, err
+	}
+	return tasks, nil
 }

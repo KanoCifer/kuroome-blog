@@ -15,6 +15,16 @@ type DevTaskCreate struct {
 	Priority    document.DevTaskPriority `json:"priority" binding:"required"`
 	Scope       document.DevTaskScope  `json:"scope" binding:"required"`
 	DueDate     *time.Time             `json:"due_date"`
+	// Slug 由后端自增生成的 task-N，客户端无需传。
+	// 如需支持自定义 slug 可开放字段。
+	// Spec
+	AcceptanceCriteria *string `json:"acceptance_criteria"`
+	Constraints        *string `json:"constraints"`
+	ContextPointers    *string `json:"context_pointers"`
+	// Who: true = agent 可认领；false = 人做（默认）。
+	ForAgent bool `json:"for_agent"`
+	// Dependencies: 必须在哪些任务完成后才能开始。
+	BlockedBy []string `json:"blocked_by"`
 }
 
 // DevTaskUpdate 更新任务请求（全字段可选，有值才更新）
@@ -28,6 +38,14 @@ type DevTaskUpdate struct {
 	Status      *document.DevTaskStatus `json:"status"`
 	SortOrder   *int                    `json:"sort_order"`
 	DueDate     *time.Time              `json:"due_date"`
+	// Spec
+	AcceptanceCriteria *string `json:"acceptance_criteria"`
+	Constraints        *string `json:"constraints"`
+	ContextPointers    *string `json:"context_pointers"`
+	// Who
+	ForAgent *bool `json:"for_agent"`
+	// Dependencies: 传了覆盖，不传不动。
+	BlockedBy *[]string `json:"blocked_by"`
 }
 
 // DevTaskOut 任务输出
@@ -46,6 +64,15 @@ type DevTaskOut struct {
 	IsDeleted   bool                    `json:"is_deleted"`
 	CreatedAt   time.Time               `json:"created_at"`
 	UpdatedAt   time.Time               `json:"updated_at"`
+	Slug        string                  `json:"slug"`
+	// Spec
+	AcceptanceCriteria *string `json:"acceptance_criteria,omitempty"`
+	Constraints        *string `json:"constraints,omitempty"`
+	ContextPointers    *string `json:"context_pointers,omitempty"`
+	// Who
+	ForAgent bool `json:"for_agent"`
+	// Dependencies
+	BlockedBy []string `json:"blocked_by"`
 }
 
 // DevTaskListOut 任务列表响应
@@ -71,6 +98,12 @@ func ToDevTaskOut(t document.DevTask) DevTaskOut {
 		IsDeleted:   t.IsDeleted,
 		CreatedAt:   t.CreatedAt,
 		UpdatedAt:   t.UpdatedAt,
+		AcceptanceCriteria: t.AcceptanceCriteria,
+		Constraints:        t.Constraints,
+		ContextPointers:    t.ContextPointers,
+		ForAgent:  t.ForAgent,
+		BlockedBy: t.BlockedBy,
+		Slug:      t.Slug,
 	}
 }
 
