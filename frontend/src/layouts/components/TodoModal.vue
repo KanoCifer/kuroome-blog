@@ -4,7 +4,7 @@
     <div class="fixed right-4 bottom-40 z-50">
       <button
         @click="toggleDrawer"
-        class="group bg-secondary hover:bg-primary flex h-10 cursor-pointer items-center overflow-hidden rounded-full px-2.5 shadow-md transition-all duration-300 ease-out"
+        class="group bg-secondary hover:bg-primary flex h-10 cursor-pointer items-center overflow-hidden rounded-full px-2.5 shadow-md transition-all duration-300 ease-out hover:shadow-lg"
         title="开发任务"
       >
         <svg
@@ -32,37 +32,35 @@
 
   <!-- Right drawer -->
   <Teleport to="body">
-    <transition
-      enter-active-class="transition-all duration-500 ease-out transform-gpu"
-      enter-from-class="opacity-0 translate-x-full"
-      enter-to-class="opacity-100 translate-x-0"
-      leave-active-class="transition-all duration-300 transform-gpu"
-      leave-from-class="opacity-100 translate-x-0 blur-0"
-      leave-to-class="opacity-0 translate-x-4 blur-ms"
-    >
-      <div
+    <AnimatePresence>
+      <motion.div
         v-if="isOpen"
-        class="fixed top-1/2 right-20 z-9999 flex max-w-lg min-w-90 -translate-y-1/2 justify-end"
+        :initial="{ opacity: 0, x: 40 }"
+        :animate="{ opacity: 1, x: 0 }"
+        :exit="{ opacity: 0, x: 40 }"
+        :transition="{ type: 'spring', stiffness: 320, damping: 32, mass: 0.8 }"
+        class="bg-background border-border/60 fixed top-1/2 right-20 z-9999 flex max-w-lg min-w-90 -translate-y-1/2 justify-end rounded-2xl border shadow-2xl max-sm:right-2 max-sm:min-w-0"
         @click.self="close"
       >
         <div
-          class="bg-background/90 relative z-10 flex h-[90dvh] w-full flex-col rounded-2xl shadow-2xl backdrop-blur-xs"
+          class="relative z-10 flex h-[90dvh] w-full flex-col overflow-hidden rounded-2xl"
         >
           <!-- Header -->
           <div
             class="border-border flex shrink-0 items-center justify-between border-b px-6 py-4"
           >
             <h3
-              class="text-foreground flex items-center gap-2 font-serif text-lg font-bold"
+              class="text-foreground flex items-center gap-2 font-serif text-lg font-medium"
             >
               开发任务
               <span class="text-muted-foreground text-sm font-normal">{{
-                tasks.length
+                activeCount
               }}</span>
             </h3>
             <button
               @click="close"
-              class="text-muted-foreground hover:bg-muted hover:text-secondary-foreground dark:hover:bg-muted dark:hover:text-foreground flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+              class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-colors"
+              aria-label="关闭"
             >
               <svg
                 class="h-5 w-5"
@@ -86,7 +84,7 @@
             <button
               v-if="!showAddForm"
               @click="showAddForm = true"
-              class="border-border/60 bg-background/60 hover:border-primary/30 mb-5 flex w-full cursor-pointer items-center gap-2 rounded-xl border p-3 text-sm text-gray-400 shadow-sm transition-all hover:text-gray-600 dark:hover:text-gray-300"
+              class="border-border/60 bg-background/60 hover:border-primary/30 text-muted-foreground hover:text-foreground mb-5 flex w-full cursor-pointer items-center gap-2 rounded-xl border p-3 text-sm shadow-sm transition-all"
             >
               <svg
                 class="h-4 w-4"
@@ -107,49 +105,58 @@
             <!-- Expanded add form -->
             <div
               v-else
-              class="border-border/60 bg-background/60 mb-5 overflow-hidden rounded-2xl border p-4 shadow-sm"
+              class="border-border bg-background mb-5 rounded-xl border p-4 shadow-sm"
             >
               <input
-                v-model="newTaskForm.title"
                 ref="addTitleInput"
+                v-model="newTaskForm.title"
                 type="text"
                 placeholder="任务标题..."
-                class="placeholder:text-muted-foreground text-foreground w-full border-none bg-transparent px-1 py-1 text-base font-medium outline-none focus:ring-0"
-                @keyup.enter="submitCreateTask"
+                class="placeholder:text-muted-foreground/50 text-foreground bg-muted focus:border-primary w-full rounded-lg border px-3 py-2 text-sm font-medium outline-none"
+                @keydown.enter="submitCreateTask"
               />
               <div class="mt-3 space-y-3">
                 <textarea
                   v-model="newTaskForm.description"
                   placeholder="描述... (可选)"
-                  rows="2"
-                  class="border-border bg-background/80 focus:border-primary focus:bg-background focus:ring-primary/15 w-full resize-none rounded-xl border p-2.5 text-sm transition-all outline-none focus:ring-4"
+                  rows="3"
+                  class="border-border bg-muted focus:border-primary placeholder:text-muted-foreground/50 text-foreground w-full resize-none rounded-lg border p-2.5 text-sm outline-none"
                 ></textarea>
-                <div class="flex items-center gap-3">
+                <div class="flex flex-wrap items-center gap-2">
+                  <select
+                    v-model="newTaskForm.type"
+                    class="border-border bg-muted text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
+                  >
+                    <option v-for="t in TASK_TYPES" :key="t" :value="t">
+                      {{ t }}
+                    </option>
+                  </select>
                   <select
                     v-model="newTaskForm.priority"
-                    class="border-border bg-background text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
+                    class="border-border bg-muted text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
                   >
-                    <option value="low">低</option>
-                    <option value="default">默认</option>
-                    <option value="low">低</option>
-                    <option value="high">高</option>
+                    <option v-for="p in PRIORITIES" :key="p" :value="p">
+                      {{ p }}
+                    </option>
                   </select>
+                </div>
+                <div class="flex items-center gap-2">
                   <input
-                    v-model="newTaskForm.dueDate"
+                    v-model="newTaskForm.due_date"
                     type="date"
-                    class="border-border bg-background text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
+                    class="border-border bg-muted text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
                   />
                   <div class="ml-auto flex gap-2">
                     <button
                       @click="cancelAdd"
-                      class="bg-muted text-foreground hover:bg-muted cursor-pointer rounded-xl px-3 py-1.5 text-sm font-medium transition-colors"
+                      class="bg-muted text-foreground hover:bg-muted/80 cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
                     >
                       取消
                     </button>
                     <button
                       @click="submitCreateTask"
                       :disabled="!newTaskForm.title.trim()"
-                      class="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer rounded-xl px-4 py-1.5 text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-50"
+                      class="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer rounded-lg px-4 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       添加
                     </button>
@@ -158,25 +165,23 @@
               </div>
             </div>
 
-            <!-- Three status sections -->
-            <div v-for="section in sections" :key="section.status" class="mb-5">
-              <!-- Section header -->
+            <!-- Status sections -->
+            <div v-for="section in sections" :key="section.key" class="mb-5">
               <div class="mb-2 flex items-center gap-2 px-1">
                 <span
                   class="h-2.5 w-2.5 shrink-0 rounded-full"
                   :class="section.dotClass"
-                ></span>
+                />
                 <h4 class="text-foreground text-sm font-semibold">
                   {{ section.title }}
                 </h4>
                 <span
-                  class="text-muted-foreground rounded-full bg-black/5 px-2 py-0.5 text-xs tabular-nums dark:bg-white/10"
+                  class="text-muted-foreground bg-muted rounded-full px-2 py-0.5 text-xs tabular-nums"
                 >
                   {{ section.tasks.length }}
                 </span>
               </div>
 
-              <!-- Cards -->
               <TransitionGroup
                 tag="div"
                 class="space-y-2.5"
@@ -188,102 +193,120 @@
                 leave-to-class="opacity-0 scale-95"
                 move-class="transition-transform duration-300"
               >
-                <DevTaskCard
+                <DrawerTaskCard
                   v-for="task in section.tasks"
                   :key="task.id"
                   :task="task"
-                  @cycle-status="todoStore.cycleStatus"
-                  @delete-task="todoStore.deleteTask"
-                  @update-task="
-                    (id: string, patch: Partial<DevTask>) =>
-                      todoStore.updateTask(id, patch)
-                  "
+                  :done="section.key === 'done'"
+                  @cycle-status="store.cycleStatus"
+                  @delete-task="store.deleteTask"
                 />
               </TransitionGroup>
 
-              <!-- Empty -->
               <p
                 v-if="section.tasks.length === 0"
-                class="py-4 text-center text-xs text-gray-400"
+                class="text-muted-foreground/60 py-4 text-center text-xs"
               >
                 {{ section.emptyText }}
               </p>
             </div>
           </div>
         </div>
-      </div>
-    </transition>
+      </motion.div>
+    </AnimatePresence>
   </Teleport>
 </template>
 
 <script setup lang="ts">
-import DevTaskCard from '@/views/todos/components/DevTaskCardV2.vue';
-import { useTodoDrawer } from '@/composables/todo';
-import type { DevTask, DevTaskPriority } from '@/api/todo';
-import { useTodoStore } from '@/stores/todos';
+import { AnimatePresence, motion } from 'motion-v';
+import DrawerTaskCard from '@/views/todos/components/DrawerTaskCard.vue';
+import { useV3DevTaskStore } from '@/stores/v3devtasks';
+import type { DevTaskPriority, DevTaskType } from '@/api/devtask';
+import { useTaskDrawer } from '@/composables/todo/useTaskDrawer';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref } from 'vue';
 
-const todoStore = useTodoStore();
-const { tasks, todoItems, inProgressItems, doneItems } = storeToRefs(todoStore);
+const TASK_TYPES: DevTaskType[] = ['功能需求', '问题', '优化', '技术债'];
+const PRIORITIES: DevTaskPriority[] = ['P0 紧急', 'P1 高', 'P2 中', 'P3 低'];
 
-const { isOpen, close, toggle } = useTodoDrawer();
+const store = useV3DevTaskStore();
+const { tasks } = storeToRefs(store);
+
+const { isOpen, close, toggle } = useTaskDrawer();
 const toggleDrawer = toggle;
 
-const addTitleInput = ref<HTMLInputElement | null>(null);
+const activeCount = computed(
+  () =>
+    tasks.value.filter((t) => !t.is_deleted && t.status !== '已完成').length,
+);
 
-onMounted(() => {
-  todoStore.hydrateTasks();
-});
-
-// Three sections (vertically stacked in drawer)
+// v3 status → 三个视觉分组：开发中 / 待排期 / 已完成
 const sections = computed(() => [
   {
-    status: 'in-progress' as const,
+    key: 'in-progress',
     title: '开发中',
-    tasks: inProgressItems.value,
-    dotClass: 'bg-amber-500',
-    emptyText: '没有开发中任务',
+    tasks: store.inProgress,
+    dotClass: 'bg-primary',
+    emptyText: '没有进行中的任务',
   },
   {
-    status: 'todo' as const,
-    title: '待办',
-    tasks: todoItems.value,
-    dotClass: 'bg-blue-500',
-    emptyText: '没有待开发任务',
+    key: 'upcoming',
+    title: '待排期',
+    tasks: tasks.value
+      .filter(
+        (t) =>
+          !t.is_deleted &&
+          (t.status === '待评估' ||
+            t.status === '待排期' ||
+            t.status === '已搁置'),
+      )
+      .sort((a, b) => {
+        const w = (p: DevTaskPriority) =>
+          ({ 'P0 紧急': 0, 'P1 高': 1, 'P2 中': 2, 'P3 低': 3 })[p] ?? 9;
+        return w(a.priority) - w(b.priority);
+      }),
+    dotClass: 'bg-chart-3',
+    emptyText: '没有待排期任务',
   },
   {
-    status: 'done' as const,
+    key: 'done',
     title: '已完成',
-    tasks: doneItems.value.slice(0, 8),
+    tasks: tasks.value
+      .filter((t) => !t.is_deleted && t.status === '已完成')
+      .slice(0, 8),
     dotClass: 'bg-emerald-500',
     emptyText: '没有已完成任务',
   },
 ]);
 
-// Add form (collapsed by default)
+// 新建表单（折叠态）
 const showAddForm = ref(false);
+const addTitleInput = ref<HTMLInputElement | null>(null);
 
 const newTaskForm = ref({
   title: '',
   description: '',
-  dueDate: '',
-  priority: 'default' as DevTaskPriority,
+  due_date: '',
+  type: '功能需求' as DevTaskType,
+  priority: 'P2 中' as DevTaskPriority,
 });
 
-const submitCreateTask = () => {
+const submitCreateTask = async () => {
   if (!newTaskForm.value.title.trim()) return;
-  todoStore.createTask({
+  await store.createTask({
     title: newTaskForm.value.title.trim(),
     description: newTaskForm.value.description.trim() || undefined,
-    dueDate: newTaskForm.value.dueDate || undefined,
+    due_date: newTaskForm.value.due_date || undefined,
+    type: newTaskForm.value.type,
     priority: newTaskForm.value.priority,
+    scope: '',
   });
   newTaskForm.value = {
     title: '',
     description: '',
-    dueDate: '',
-    priority: 'default',
+    due_date: '',
+    type: '功能需求',
+    priority: 'P2 中',
   };
   showAddForm.value = false;
 };
@@ -292,9 +315,14 @@ const cancelAdd = () => {
   newTaskForm.value = {
     title: '',
     description: '',
-    dueDate: '',
-    priority: 'default',
+    due_date: '',
+    type: '功能需求',
+    priority: 'P2 中',
   };
   showAddForm.value = false;
 };
+
+onMounted(() => {
+  store.fetchTasks();
+});
 </script>

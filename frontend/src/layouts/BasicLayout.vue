@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { BasicFooter } from '@/components/basic';
 import BackToTop from '@/components/layout/BackToTop.vue';
-import TodoModal from '@/layouts/components/TodoModal.vue';
 import CookieConsent from '@/components/layout/CookieConsent.vue';
 import ToastContainer from '@/components/layout/ToastContainer.vue';
 import BasicNav from '@/components/nav/BasicNav.vue';
+import TodoModal from '@/layouts/components/TodoModal.vue';
 import { useBackgroundStore } from '@/stores/background';
 import { useThemeStore } from '@/stores/theme';
 import { AnimatePresence } from 'motion-v';
@@ -121,9 +121,6 @@ const transitionName = computed(
     <!-- Back to Top Button -->
     <BackToTop />
 
-    <!-- Todo Drawer: global floating button + right slide-in drawer -->
-    <TodoModal />
-
     <!-- Navigation: 始终居中，无 compact/居中切换 -->
     <AnimatePresence>
       <BasicNav
@@ -135,6 +132,9 @@ const transitionName = computed(
         class="group fixed top-12 z-50 -translate-x-1/2 -translate-y-1/2"
       />
     </AnimatePresence>
+
+    <!-- 全局开发任务悬浮抽屉 -->
+    <TodoModal />
   </div>
 </template>
 

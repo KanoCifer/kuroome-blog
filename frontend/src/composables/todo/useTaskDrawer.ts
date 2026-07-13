@@ -2,7 +2,7 @@ import { ref } from 'vue';
 
 const isOpen = ref(false);
 
-export function useTodoDrawer() {
+export function useTaskDrawer() {
   function open() {
     isOpen.value = true;
   }
