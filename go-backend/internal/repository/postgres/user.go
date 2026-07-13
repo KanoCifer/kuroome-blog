@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"errors"
 
 	"gorm.io/gorm"
@@ -91,6 +92,22 @@ func (r *UserRepo) EmailExists(email string) bool {
 	var count int64
 	r.db.Model(&model.Profile{}).Where("email = ?", email).Count(&count)
 	return count > 0
+}
+
+// ListUsersWithLoginRecords 返回有登录记录的用户（login_count > 0），按 id 倒序。
+//
+// 时间窗过滤不在 repo 层做，与 Python monitor_repo 对齐：Python
+// list_users_with_login_records 只过滤 login_count > 0，然后由
+// MonitorService.GetUserLogins 在内存中按 current_login_at /
+// last_login_at 时间窗二次筛选并分页。
+func (r *UserRepo) ListUsersWithLoginRecords(ctx context.Context) ([]model.User, error) {
+	var users []model.User
+	err := r.db.WithContext(ctx).
+		Where("login_count > 0").
+		Order("id desc").
+		Find(&users).
+		Error
+	return users, err
 }
 
 func (r *UserRepo) Create(user *model.User, profile *model.Profile) error {
