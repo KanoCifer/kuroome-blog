@@ -6,9 +6,11 @@ export type {
   DevTaskPriority,
   DevTaskScope,
   DevTaskStatus,
+  DevTaskKind,
   Pagination,
   DevTaskListResponse,
   ListDevTasksParams,
   CreateDevTaskPayload,
   UpdateDevTaskPayload,
+  McpTokenResult,
 } from './devtaskGateway';

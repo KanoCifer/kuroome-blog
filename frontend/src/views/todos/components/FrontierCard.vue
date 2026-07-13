@@ -10,6 +10,7 @@
     <div class="mb-2 flex flex-wrap items-center gap-1">
       <TypeBadge :type="task.type" />
       <PriorityBadge :priority="task.priority" />
+      <KindBadge :kind="task.kind" />
       <span
         v-if="task.scope"
         class="text-muted-foreground border-border rounded-full border px-1.5 py-px text-[10px]"
@@ -96,6 +97,7 @@ import type { DevTask } from '@/api/devtask';
 import { renderMarkdown } from '@/composables/shared';
 import TypeBadge from './TypeBadge.vue';
 import PriorityBadge from './PriorityBadge.vue';
+import KindBadge from './KindBadge.vue';
 
 defineProps<{ task: DevTask }>();
 defineEmits<{

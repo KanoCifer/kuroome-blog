@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -202,10 +203,11 @@ func runDeployment() {
 	slog.Info("Deployment completed", "output", string(output))
 }
 
-// DevTaskToken 为前端签发短期 devtask service-JWT。
-// GET /api/v3/admin/dev-task/token
-// 前端用用户 JWT 调用此端点，后端校验 admin 后返回 1h 有效期的 service token，
-// 用于后续 devtask 看板 API 的 DevTaskMiddleware 鉴权。
+// DevTaskToken 为前端签发 devtask service-JWT。
+// GET /api/v3/dev-task/token?days=N
+// 前端用用户 JWT 调用此端点，后端校验 admin 后返回 service token。
+// days 可选，1..365，默认 1h（兼容看板自身短期 token）；传 days 后按整天计算，
+// 用于 MCP server 等长期服务鉴权。
 func (h *AdminHandler) DevTaskToken(c *gin.Context) {
 	if config.Cfg.Security.DevTaskSecret == "" {
 		response.APIError(c, "devtask secret not configured", http.StatusServiceUnavailable)
@@ -213,6 +215,15 @@ func (h *AdminHandler) DevTaskToken(c *gin.Context) {
 	}
 
 	expiresAt := time.Now().Add(1 * time.Hour)
+	if d := c.Query("days"); d != "" {
+		days, err := strconv.Atoi(d)
+		if err != nil || days < 1 || days > 365 {
+			response.APIError(c, "days must be an integer between 1 and 365", http.StatusBadRequest)
+			return
+		}
+		expiresAt = time.Now().AddDate(0, 0, days)
+	}
+
 	token, err := jwt.GenerateServiceToken(expiresAt, config.Cfg.Security.DevTaskSecret)
 	if err != nil {
 		slog.ErrorContext(c.Request.Context(), "generate devtask service token", "error", err)
@@ -221,8 +232,9 @@ func (h *AdminHandler) DevTaskToken(c *gin.Context) {
 	}
 
 	response.Success(c, gin.H{
-		"token":       token,
-		"expires_at":  expiresAt.Format(time.RFC3339),
+		"token":      token,
+		"expires_at": expiresAt.Format(time.RFC3339),
+		"days":       int(expiresAt.Sub(time.Now()).Hours() / 24),
 	}, "DevTask token issued successfully")
 }
 

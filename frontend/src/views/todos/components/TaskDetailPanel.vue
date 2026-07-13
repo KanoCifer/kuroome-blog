@@ -74,6 +74,7 @@
               <div class="flex flex-wrap gap-1.5">
                 <TypeBadge :type="task.type" />
                 <PriorityBadge :priority="task.priority" />
+                <KindBadge :kind="task.kind" />
                 <span
                   v-if="task.scope"
                   class="text-muted-foreground border-border rounded-full border px-1.5 py-px text-[10px]"
@@ -166,7 +167,10 @@
               <p class="text-muted-foreground font-mono text-[11px] leading-relaxed">
                 ID: {{ task.id }}<br />
                 创建于 {{ (task.created_at || '').slice(0, 10) }}<br />
-                更新于 {{ (task.updated_at || '').slice(0, 10) }}
+                更新于 {{ (task.updated_at || '').slice(0, 10) }}<br />
+                <template v-if="task.parent_slug">
+                  归属 spec: {{ task.parent_slug }}
+                </template>
               </p>
             </div>
           </template>
@@ -206,6 +210,7 @@ import type { DevTask, DevTaskStatus } from '@/api/devtask';
 import { renderMarkdown } from '@/composables/shared';
 import TypeBadge from './TypeBadge.vue';
 import PriorityBadge from './PriorityBadge.vue';
+import KindBadge from './KindBadge.vue';
 
 const STATUSES: DevTaskStatus[] = ['待评估', '待排期', '进行中', '已搁置', '已完成'];
 

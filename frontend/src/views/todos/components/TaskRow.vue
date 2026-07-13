@@ -16,6 +16,7 @@
     <span class="flex shrink-0 items-center gap-1.5">
       <TypeBadge :type="task.type" />
       <PriorityBadge :priority="task.priority" />
+      <KindBadge v-if="task.kind === 'subtask'" :kind="task.kind" />
     </span>
 
     <span
@@ -67,6 +68,7 @@
 import type { DevTask } from '@/api/devtask';
 import TypeBadge from './TypeBadge.vue';
 import PriorityBadge from './PriorityBadge.vue';
+import KindBadge from './KindBadge.vue';
 
 withDefaults(
   defineProps<{

@@ -18,6 +18,9 @@ export type DevTaskStatus =
   | '已搁置'
   | '已完成';
 
+// 任务角色 —— 对应后端 TaskKind。空串 = spec（老文档兜底），前端显示时按 spec 处理。
+export type DevTaskKind = 'spec' | 'subtask';
+
 export interface DevTask {
   id: string;
   user_id: number;
@@ -33,6 +36,10 @@ export interface DevTask {
   is_deleted: boolean;
   created_at: string;
   updated_at: string;
+  // 任务角色：spec（可拆解为子任务）/ subtask（spec 拆解出的子任务）。空串 = spec。
+  kind?: DevTaskKind;
+  // 子任务归属的 spec slug。spec / 独立任务为 null。
+  parent_slug?: string | null;
 }
 
 export interface Pagination {
@@ -58,6 +65,7 @@ export interface ListDevTasksParams {
   priority?: DevTaskPriority;
   type?: DevTaskType;
   include_deleted?: boolean;
+  kind?: DevTaskKind;
 }
 
 export interface CreateDevTaskPayload {
@@ -80,4 +88,6 @@ export interface UpdateDevTaskPayload {
   status?: DevTaskStatus;
   sort_order?: number;
   due_date?: string | null;
+  kind?: DevTaskKind;
+  parent_slug?: string | null;
 }

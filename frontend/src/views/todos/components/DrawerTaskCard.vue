@@ -17,6 +17,7 @@
       >
         {{ task.priority }}
       </span>
+      <KindBadge v-if="task.kind === 'subtask'" :kind="task.kind" />
     </div>
 
     <!-- 标题 -->
@@ -95,6 +96,7 @@
 
 <script setup lang="ts">
 import type { DevTask, DevTaskPriority, DevTaskType } from '@/api/devtask';
+import KindBadge from './KindBadge.vue';
 
 const props = withDefaults(
   defineProps<{

@@ -1,4 +1,4 @@
-import request from '@/api/shared/request';
+import devtaskRequest from './devtaskRequest';
 
 // ── 与后端 document/dev_task.go 对齐 —— 单一真源在后端，前端镜像。 ──
 
@@ -10,7 +10,11 @@ export type DevTaskPriority = 'P0 紧急' | 'P1 高' | 'P2 中' | 'P3 低';
 // 但给出常见值作为 placeholder / 提示，不再是闭枚举。
 export type DevTaskScope = string;
 
-export type DevTaskStatus = '待评估' | '待排期' | '进行中' | '已搁置' | '已完成';
+export type DevTaskStatus =
+  '待评估' | '待排期' | '进行中' | '已搁置' | '已完成';
+
+// 任务角色 —— 对应后端 TaskKind。空串 = spec（老文档兜底），前端显示时按 spec 处理。
+export type DevTaskKind = 'spec' | 'subtask';
 
 export interface DevTask {
   id: string;
@@ -36,6 +40,10 @@ export interface DevTask {
   blocked_by?: string[];
   // Slug —— task-N，人类可读引用
   slug?: string;
+  // 任务角色：spec（可拆解为子任务）/ subtask（spec 拆解出的子任务）。空串 = spec。
+  kind?: DevTaskKind;
+  // 子任务归属的 spec slug。spec / 独立任务为 null。
+  parent_slug?: string | null;
 }
 
 export interface Pagination {
@@ -79,6 +87,9 @@ export interface CreateDevTaskPayload {
   // Who / Dependencies
   for_agent?: boolean;
   blocked_by?: string[];
+  // 任务角色 / 结构归属
+  kind?: DevTaskKind;
+  parent_slug?: string | null;
 }
 
 export interface UpdateDevTaskPayload {
@@ -98,6 +109,16 @@ export interface UpdateDevTaskPayload {
   // Who / Dependencies
   for_agent?: boolean;
   blocked_by?: string[];
+  // 任务角色 / 结构归属
+  kind?: DevTaskKind;
+  parent_slug?: string | null;
+}
+
+// MCP / 长期服务 token 响应
+export interface McpTokenResult {
+  token: string;
+  expires_at: string;
+  days: number;
 }
 
 export interface DevTaskGateway {
@@ -108,40 +129,64 @@ export interface DevTaskGateway {
   update(id: string, payload: UpdateDevTaskPayload): Promise<void>;
   remove(id: string): Promise<void>;
   hardDelete(id: string): Promise<void>;
+  // 签发 MCP / 长期服务 JWT。days: 1..365。
+  issueMcpToken(days: number): Promise<McpTokenResult>;
 }
 
 export const devTaskGateway: DevTaskGateway = {
   async list(params): Promise<DevTaskListResponse> {
-    const res = await request.get<{ data: DevTaskListResponse }>('v3/dev-tasks', {
-      params,
-    });
+    const res = await devtaskRequest.get<{ data: DevTaskListResponse }>(
+      'v3/dev-tasks',
+      {
+        params,
+      },
+    );
     return res.data.data;
   },
 
   async get(id: string): Promise<DevTask> {
-    const res = await request.get<{ data: DevTask }>(`v3/dev-tasks/${id}`);
+    const res = await devtaskRequest.get<{ data: DevTask }>(
+      `v3/dev-tasks/${id}`,
+    );
     return res.data.data;
   },
 
   async getBySlug(slug: string): Promise<DevTask> {
-    const res = await request.get<{ data: DevTask }>(`v3/dev-tasks/by-slug/${slug}`);
+    const res = await devtaskRequest.get<{ data: DevTask }>(
+      `v3/dev-tasks/by-slug/${slug}`,
+    );
     return res.data.data;
   },
 
   async create(payload: CreateDevTaskPayload): Promise<DevTask> {
-    const res = await request.post<{ data: DevTask }>('v3/dev-tasks', payload);
+    const res = await devtaskRequest.post<{ data: DevTask }>(
+      'v3/dev-tasks',
+      payload,
+    );
     return res.data.data;
   },
 
   async update(id: string, payload: UpdateDevTaskPayload): Promise<void> {
-    await request.patch(`v3/dev-tasks/${id}`, payload);
+    await devtaskRequest.patch(`v3/dev-tasks/${id}`, payload);
   },
 
   async remove(id: string): Promise<void> {
-    await request.delete(`v3/dev-tasks/${id}`);
+    await devtaskRequest.delete(`v3/dev-tasks/${id}`);
   },
 
   async hardDelete(id: string): Promise<void> {
-    await request.delete(`v3/dev-tasks/${id}/permanent`);
+    await devtaskRequest.delete(`v3/dev-tasks/${id}/permanent`);
+  },
+
+  async issueMcpToken(days: number): Promise<McpTokenResult> {
+    // 走用户 JWT 的 request（非 service-token），因为这是 admin 身份换长期 token
+    const request = (await import('@/api/shared/request')).default;
+    const res = await request.get<{ data: McpTokenResult }>(
+      'v3/dev-task/token',
+      {
+        params: { days },
+      },
+    );
+    return res.data.data;
   },
 };
