@@ -80,6 +80,35 @@
 
           <!-- Body -->
           <div class="flex-1 overflow-y-auto px-5 py-4">
+            <!-- 未登录空状态 -->
+            <div
+              v-if="!isAuthenticated"
+              class="flex h-full min-h-48 flex-col items-center justify-center gap-2 text-center"
+            >
+              <svg
+                class="text-muted-foreground/40 h-10 w-10"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+              </svg>
+              <p class="text-muted-foreground text-sm">请登录后使用</p>
+              <button
+                class="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring mt-1 cursor-pointer rounded-lg px-4 py-1.5 text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                @click="handleLogin"
+              >
+                去登录
+              </button>
+            </div>
+
+            <!-- 已登录后的可交互内容 -->
+            <div v-else>
             <!-- Collapsed add button -->
             <button
               v-if="!showAddForm"
@@ -210,6 +239,7 @@
                 {{ section.emptyText }}
               </p>
             </div>
+            </div>
           </div>
         </div>
       </motion.div>
@@ -225,15 +255,25 @@ import type { DevTaskPriority, DevTaskType } from '@/api/devtask';
 import { useTaskDrawer } from '@/composables/todo/useTaskDrawer';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref } from 'vue';
+import { useAuthStore } from '@/auth/stores/auth';
+import router from '@/router';
 
 const TASK_TYPES: DevTaskType[] = ['功能需求', '问题', '优化', '技术债'];
 const PRIORITIES: DevTaskPriority[] = ['P0 紧急', 'P1 高', 'P2 中', 'P3 低'];
+
+const authStore = useAuthStore();
+const isAuthenticated = computed(() => authStore.isAuthenticated);
 
 const store = useV3DevTaskStore();
 const { tasks } = storeToRefs(store);
 
 const { isOpen, close, toggle } = useTaskDrawer();
 const toggleDrawer = toggle;
+
+function handleLogin() {
+  close();
+  router.push('/login');
+}
 
 const activeCount = computed(
   () =>
@@ -323,6 +363,9 @@ const cancelAdd = () => {
 };
 
 onMounted(() => {
-  store.fetchTasks();
+  // 未登录时不请求 devtask：避免 devtaskRequest 拦截器反复打 v3/dev-task/token 形成循环
+  if (isAuthenticated.value) {
+    store.fetchTasks();
+  }
 });
 </script>
