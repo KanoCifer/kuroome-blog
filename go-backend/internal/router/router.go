@@ -46,7 +46,8 @@ func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
 	blogH.RegisterRoutes(v3)
 
 	devTaskH := handler.NewDevTaskHandler(state.DevTaskSvc())
-	devTaskH.RegisterRoutes(v3, middleware.AuthMiddleware(), middleware.AdminMiddleware(state.Cfg().Admin.UserIDs))
+	// devtask 走独立的 service-JWT 鉴权，不再依赖用户 JWT + admin 白名单。
+	devTaskH.RegisterRoutes(v3, middleware.DevTaskMiddleware())
 
 	monitorH := handler.NewMonitorHandler(state.MonitorSvc())
 	monitorH.RegisterRoutes(v3, middleware.AuthMiddleware(), middleware.AdminMiddleware(state.Cfg().Admin.UserIDs))

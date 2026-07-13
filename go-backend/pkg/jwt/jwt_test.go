@@ -11,7 +11,10 @@ import (
 
 func init() {
 	// jwt 包依赖 config.Cfg.Security.SecretKey，测试前注入一个固定密钥。
-	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret-key"}}
+	config.Cfg = &config.Config{Security: config.SecurityConfig{
+		SecretKey:     "test-secret-key",
+		DevTaskSecret: "devtask-test-secret",
+	}}
 }
 
 func TestGenerateToken(t *testing.T) {
@@ -80,5 +83,46 @@ func TestParseToken_Empty(t *testing.T) {
 	_, err := ParseToken("")
 	if err == nil {
 		t.Fatal("expected error for empty token, got nil")
+	}
+}
+
+// ── Service token tests ──
+
+func TestServiceToken_RoundTrip(t *testing.T) {
+	tok, err := GenerateServiceToken(time.Now().Add(time.Hour), "devtask-test-secret")
+	if err != nil {
+		t.Fatalf("GenerateServiceToken error: %v", err)
+	}
+	claims, err := ParseServiceToken(tok)
+	if err != nil {
+		t.Fatalf("ParseServiceToken error: %v", err)
+	}
+	if claims.Subject != "devtask-service" {
+		t.Errorf("Subject = %q, want %q", claims.Subject, "devtask-service")
+	}
+	if claims.Role != "service" {
+		t.Errorf("Role = %q, want %q", claims.Role, "service")
+	}
+}
+
+func TestServiceToken_WrongSecret(t *testing.T) {
+	tok, err := GenerateServiceToken(time.Now().Add(time.Hour), "signing-secret")
+	if err != nil {
+		t.Fatalf("GenerateServiceToken error: %v", err)
+	}
+	_, err = ParseServiceToken(tok) // ParseServiceToken uses config.Cfg.DevTaskSecret ("devtask-test-secret")
+	if err == nil {
+		t.Fatal("expected error for token signed with wrong secret, got nil")
+	}
+}
+
+func TestServiceToken_Expired(t *testing.T) {
+	tok, err := GenerateServiceToken(time.Now().Add(-time.Hour), "devtask-test-secret")
+	if err != nil {
+		t.Fatalf("GenerateServiceToken error: %v", err)
+	}
+	_, err = ParseServiceToken(tok)
+	if err == nil {
+		t.Fatal("expected error for expired service token, got nil")
 	}
 }

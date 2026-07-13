@@ -186,9 +186,9 @@ func (h *DevTaskHandler) HardDeleteTask(c *gin.Context) {
 	response.Success(c, nil, "Task permanently deleted")
 }
 
-// RegisterRoutes 挂载 devtask 路由（需 auth + admin）。全链路使用 slug 标识。
-func (h *DevTaskHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFunc, adminMW gin.HandlerFunc) {
-	g := r.Group("/dev-tasks", authMW, adminMW)
+// RegisterRoutes 挂载 devtask 路由（service-JWT 鉴权）。全链路使用 slug 标识。
+func (h *DevTaskHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFunc) {
+	g := r.Group("/dev-tasks", authMW)
 	g.POST("", h.CreateTask)
 	g.GET("", h.ListTasks)
 	// 静态前缀必须注册在 :slug 之前 —— Gin 路由按注册顺序匹配，:slug 会吞掉同级的静态 path。

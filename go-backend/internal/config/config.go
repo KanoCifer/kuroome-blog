@@ -44,6 +44,9 @@ type SecurityConfig struct {
 	JWTPrivateKey string `mapstructure:"JWT_PRIVATE_KEY"`
 	CookieDomain  string `mapstructure:"COOKIE_DOMAIN"`
 	APIKey        string `mapstructure:"API_KEY"`
+	// DevTaskSecret —— 服务级 JWT 签名密钥（devtask / MCP 专用）。
+	// 独立于 SecretKey（用户 JWT），避免 service token 被当作用户 token 接受。
+	DevTaskSecret string `mapstructure:"DEV_TASK_SECRET"`
 }
 
 // DatabaseConfig 数据库连接。
