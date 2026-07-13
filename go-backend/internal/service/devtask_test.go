@@ -17,13 +17,16 @@ import (
 // ---------- mock DevTaskRepository ----------
 
 type mockDevTaskRepo struct {
-	createFn    func(ctx context.Context, task *document.DevTask) error
-	getByIDFn   func(ctx context.Context, id string) (*document.DevTask, error)
-	listFn      func(ctx context.Context, filter mongodb.ListFilter, page, perPage int) ([]document.DevTask, int64, error)
-	updateFn    func(ctx context.Context, id string, fields bson.M) error
-	softDelFn   func(ctx context.Context, id string) error
-	hardDelFn   func(ctx context.Context, id string) error
-	archiveFn   func(ctx context.Context) (int64, error)
+	createFn       func(ctx context.Context, task *document.DevTask) error
+	getByIDFn      func(ctx context.Context, id string) (*document.DevTask, error)
+	getBySlugFn    func(ctx context.Context, slug string) (*document.DevTask, error)
+	listFn         func(ctx context.Context, filter mongodb.ListFilter, page, perPage int) ([]document.DevTask, int64, error)
+	updateFn       func(ctx context.Context, id string, fields bson.M) error
+	softDelFn      func(ctx context.Context, id string) error
+	hardDelFn      func(ctx context.Context, id string) error
+	archiveFn      func(ctx context.Context) (int64, error)
+	findFrontierFn func(ctx context.Context, limit int) ([]document.DevTask, error)
+	nextSlugSeqFn  func(ctx context.Context) (int, error)
 }
 
 func (m *mockDevTaskRepo) Create(ctx context.Context, task *document.DevTask) error {
@@ -32,6 +35,13 @@ func (m *mockDevTaskRepo) Create(ctx context.Context, task *document.DevTask) er
 
 func (m *mockDevTaskRepo) GetByID(ctx context.Context, id string) (*document.DevTask, error) {
 	return m.getByIDFn(ctx, id)
+}
+
+func (m *mockDevTaskRepo) GetBySlug(ctx context.Context, slug string) (*document.DevTask, error) {
+	if m.getBySlugFn != nil {
+		return m.getBySlugFn(ctx, slug)
+	}
+	return nil, nil
 }
 
 func (m *mockDevTaskRepo) List(ctx context.Context, filter mongodb.ListFilter, page, perPage int) ([]document.DevTask, int64, error) {
@@ -52,6 +62,20 @@ func (m *mockDevTaskRepo) HardDelete(ctx context.Context, id string) error {
 
 func (m *mockDevTaskRepo) ArchiveDoneTasks(ctx context.Context) (int64, error) {
 	return m.archiveFn(ctx)
+}
+
+func (m *mockDevTaskRepo) FindFrontier(ctx context.Context, limit int) ([]document.DevTask, error) {
+	if m.findFrontierFn != nil {
+		return m.findFrontierFn(ctx, limit)
+	}
+	return nil, nil
+}
+
+func (m *mockDevTaskRepo) NextSlugSeq(ctx context.Context) (int, error) {
+	if m.nextSlugSeqFn != nil {
+		return m.nextSlugSeqFn(ctx)
+	}
+	return 0, nil
 }
 
 // newService 用 mock repo 构造 service。

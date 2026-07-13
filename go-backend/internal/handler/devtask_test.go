@@ -24,12 +24,14 @@ func init() {
 // ---------- mock DevTaskService ----------
 
 type mockDevTaskService struct {
-	createFn    func(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error)
-	getByIDFn   func(ctx context.Context, id string) (*dto.DevTaskOut, error)
-	listFn      func(ctx context.Context, filter mongodb.ListFilter, page, perPage int) (*dto.DevTaskListOut, error)
-	updateFn    func(ctx context.Context, id string, req dto.DevTaskUpdate) error
-	softDelFn   func(ctx context.Context, id string) error
-	hardDelFn   func(ctx context.Context, id string) error
+	createFn       func(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error)
+	getByIDFn      func(ctx context.Context, id string) (*dto.DevTaskOut, error)
+	getBySlugFn    func(ctx context.Context, slug string) (*dto.DevTaskOut, error)
+	listFn         func(ctx context.Context, filter mongodb.ListFilter, page, perPage int) (*dto.DevTaskListOut, error)
+	updateFn       func(ctx context.Context, id string, req dto.DevTaskUpdate) error
+	softDelFn      func(ctx context.Context, id string) error
+	hardDelFn      func(ctx context.Context, id string) error
+	findFrontierFn func(ctx context.Context, limit int) ([]dto.DevTaskOut, error)
 }
 
 func (m *mockDevTaskService) Create(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error) {
@@ -38,6 +40,13 @@ func (m *mockDevTaskService) Create(ctx context.Context, userID int, req dto.Dev
 
 func (m *mockDevTaskService) GetByID(ctx context.Context, id string) (*dto.DevTaskOut, error) {
 	return m.getByIDFn(ctx, id)
+}
+
+func (m *mockDevTaskService) GetBySlug(ctx context.Context, slug string) (*dto.DevTaskOut, error) {
+	if m.getBySlugFn != nil {
+		return m.getBySlugFn(ctx, slug)
+	}
+	return nil, nil
 }
 
 func (m *mockDevTaskService) List(ctx context.Context, filter mongodb.ListFilter, page, perPage int) (*dto.DevTaskListOut, error) {
@@ -54,6 +63,13 @@ func (m *mockDevTaskService) SoftDelete(ctx context.Context, id string) error {
 
 func (m *mockDevTaskService) HardDelete(ctx context.Context, id string) error {
 	return m.hardDelFn(ctx, id)
+}
+
+func (m *mockDevTaskService) FindFrontier(ctx context.Context, limit int) ([]dto.DevTaskOut, error) {
+	if m.findFrontierFn != nil {
+		return m.findFrontierFn(ctx, limit)
+	}
+	return nil, nil
 }
 
 // ---------- helpers ----------
