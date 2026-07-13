@@ -28,12 +28,11 @@
     <p class="text-foreground text-sm font-medium">{{ task.title }}</p>
 
     <!-- description -->
-    <p
+    <div
       v-if="task.description"
-      class="text-muted-foreground mt-1 line-clamp-2 text-xs"
-    >
-      {{ task.description }}
-    </p>
+      class="prose prose-sm mt-1 max-h-10 overflow-hidden text-xs"
+      v-html="renderMarkdown(task.description)"
+    />
 
     <!-- footer -->
     <div class="mt-3 flex items-center justify-between gap-2">
@@ -94,6 +93,7 @@
 
 <script setup lang="ts">
 import type { DevTask } from '@/api/devtask';
+import { renderMarkdown } from '@/composables/shared';
 import TypeBadge from './TypeBadge.vue';
 import PriorityBadge from './PriorityBadge.vue';
 

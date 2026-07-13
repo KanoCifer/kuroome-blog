@@ -1,5 +1,5 @@
 <script setup lang="ts">
-/* eslint-disable vue/no-v-text-v-html-on-component -- renderedSummary is sanitized via DOMPurify; motion.div renders a plain div */
+/* eslint-disable vue/no-v-text-v-html-on-component -- renderedSummary is sanitized via renderMarkdown; motion.div renders a plain div */
 /**
  * AI 天气分析 - 抽屉内嵌扁平组件
  *
@@ -17,15 +17,9 @@ import { useNotificationStore } from '@/stores/notification';
 import { formatDate } from '@/utils/formatdate';
 import dayjs from 'dayjs';
 const apiBase = import.meta.env.VITE_API_BASE || '/api';
-import DOMPurify from 'dompurify';
-import { marked } from 'marked';
+import { renderMarkdown } from '@/composables/shared';
 import { AnimatePresence, motion } from 'motion-v';
 import { computed, onUnmounted, ref, watch } from 'vue';
-
-marked.setOptions({
-  gfm: true,
-  breaks: true,
-});
 
 interface LiveWeather {
   obsTime: string;
@@ -106,8 +100,7 @@ const errorMessage = ref('');
 const renderedSummary = computed(() => {
   if (!summary.value) return '';
   try {
-    const rawHtml = marked.parse(summary.value, { async: false }) as string;
-    return DOMPurify.sanitize(rawHtml);
+    return renderMarkdown(summary.value);
   } catch {
     return summary.value;
   }

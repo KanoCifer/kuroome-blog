@@ -101,9 +101,10 @@
               <span class="text-muted-foreground mb-1 block text-[10px] font-medium tracking-widest uppercase"
                 >描述</span
               >
-              <p class="text-foreground text-sm leading-relaxed whitespace-pre-wrap">
-                {{ task.description }}
-              </p>
+              <div
+                class="prose prose-sm max-w-none text-foreground"
+                v-html="renderMarkdown(task.description)"
+              />
             </div>
 
             <!-- 详情 -->
@@ -111,9 +112,10 @@
               <span class="text-muted-foreground mb-1 block text-[10px] font-medium tracking-widest uppercase"
                 >详情</span
               >
-              <p class="text-foreground text-sm leading-relaxed whitespace-pre-wrap">
-                {{ task.detail }}
-              </p>
+              <div
+                class="prose prose-sm max-w-none text-foreground"
+                v-html="renderMarkdown(task.detail)"
+              />
             </div>
 
             <!-- 截止日 -->
@@ -129,9 +131,10 @@
               <span class="text-muted-foreground mb-1 block text-[10px] font-medium tracking-widest uppercase"
                 >验收标准</span
               >
-              <p class="text-foreground text-sm leading-relaxed whitespace-pre-wrap">
-                {{ task.acceptance_criteria }}
-              </p>
+              <div
+                class="prose prose-sm max-w-none text-foreground"
+                v-html="renderMarkdown(task.acceptance_criteria)"
+              />
             </div>
 
             <!-- 约束 -->
@@ -139,9 +142,10 @@
               <span class="text-muted-foreground mb-1 block text-[10px] font-medium tracking-widest uppercase"
                 >约束</span
               >
-              <p class="text-foreground text-sm leading-relaxed whitespace-pre-wrap">
-                {{ task.constraints }}
-              </p>
+              <div
+                class="prose prose-sm max-w-none text-foreground"
+                v-html="renderMarkdown(task.constraints)"
+              />
             </div>
 
             <!-- 上下文指针 -->
@@ -199,6 +203,7 @@
 <script setup lang="ts">
 import { AnimatePresence, motion } from 'motion-v';
 import type { DevTask, DevTaskStatus } from '@/api/devtask';
+import { renderMarkdown } from '@/composables/shared';
 import TypeBadge from './TypeBadge.vue';
 import PriorityBadge from './PriorityBadge.vue';
 

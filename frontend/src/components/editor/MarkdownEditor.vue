@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import ImageEditorModal from '@/components/editor/ImageEditorModal.vue';
 import { useMarkdownImage } from '@/composables/article';
-import DOMPurify from 'dompurify';
 import hljs from 'highlight.js/lib/common';
 import 'highlight.js/styles/github-dark.css';
-import { marked } from 'marked';
+import { renderMarkdown } from '@/composables/shared';
 import TurndownService from 'turndown';
 import { computed, nextTick, ref, watch } from 'vue';
 
@@ -184,16 +183,9 @@ const handlePreviewClick = (event: MouseEvent) => {
   image.openImageEditor(target as HTMLImageElement);
 };
 
-// Configure marked
-marked.setOptions({
-  gfm: true,
-  breaks: true,
-});
-
 const renderedMarkdown = computed<string>(() => {
   if (!markdownText.value) return '';
-  const rawHtml = marked.parse(markdownText.value, { async: false }) as string;
-  return DOMPurify.sanitize(rawHtml, {
+  return renderMarkdown(markdownText.value, {
     ADD_ATTR: ['data-md-id', 'data-align'],
     ALLOWED_URI_REGEXP: /^(?:(?:https?|blob):|[^a-z]*|[a-z0-9.+-]*$)/i,
   });

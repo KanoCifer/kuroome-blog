@@ -6,6 +6,7 @@ export * from './useGreeting';
 export * from './useImageError';
 export * from './useImageProcessor';
 export * from './useOrigin';
+export * from './useMarkdown';
 export * from './useSequencedTask';
 export * from './useShimmerTips';
 export * from './useTypewriter';

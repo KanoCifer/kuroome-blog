@@ -5,13 +5,7 @@ import { useArticleSummary } from '@/composables/article';
 import { useShimmerTips } from '@/composables/shared';
 import { AnimatePresence, motion } from 'motion-v';
 import { computed, onMounted, ref, watch } from 'vue';
-import { Marked } from 'marked';
-import dompurify from 'dompurify';
-
-const marked = new Marked();
-function renderMarkdown(text: string): string {
-  return dompurify.sanitize(marked.parse(text) as string);
-}
+import { renderMarkdown } from '@/composables/shared';
 
 const renderedSummary = computed(() =>
   summary.value ? renderMarkdown(summary.value) : '',
