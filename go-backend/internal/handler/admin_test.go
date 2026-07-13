@@ -17,6 +17,10 @@ import (
 
 func init() {
 	gin.SetMode(gin.TestMode)
+	// config.Cfg 被 DevTaskToken handler 读取，测试前注入。
+	if config.Cfg == nil {
+		config.Cfg = &config.Config{Security: config.SecurityConfig{DevTaskSecret: "test-devtask-secret"}}
+	}
 }
 
 // ---------- mock AdminService ----------
@@ -77,6 +81,79 @@ func putJSON(t *testing.T, path string, body any) (*httptest.ResponseRecorder, *
 	req, _ := http.NewRequest(http.MethodPut, path, bytes.NewReader(b))
 	req.Header.Set("Content-Type", "application/json")
 	return w, req
+}
+
+// ---------- DevTaskToken ----------
+
+func TestAdmin_DevTaskToken_Success(t *testing.T) {
+	config.Cfg = &config.Config{Security: config.SecurityConfig{DevTaskSecret: "test-devtask-secret"}}
+	svc := &mockAdminService{}
+	_, r := newAdminHandler(svc)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-task/token", nil)
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("status = %d, want %d; body=%s", w.Code, http.StatusOK, w.Body.String())
+	}
+	var resp struct {
+		Data struct {
+			Token     string `json:"token"`
+			ExpiresAt string `json:"expires_at"`
+		} `json:"data"`
+	}
+	_ = json.Unmarshal(w.Body.Bytes(), &resp)
+	if resp.Data.Token == "" {
+		t.Error("expected non-empty token in response")
+	}
+	if resp.Data.ExpiresAt == "" {
+		t.Error("expected expires_at in response")
+	}
+}
+
+func TestAdmin_DevTaskToken_SecretNotConfigured(t *testing.T) {
+	config.Cfg = &config.Config{Security: config.SecurityConfig{DevTaskSecret: ""}}
+	svc := &mockAdminService{}
+	_, r := newAdminHandler(svc)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-task/token", nil)
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusServiceUnavailable {
+		t.Errorf("status = %d, want %d", w.Code, http.StatusServiceUnavailable)
+	}
+}
+
+func TestAdmin_DevTaskToken_Unauthorized(t *testing.T) {
+	config.Cfg = &config.Config{Security: config.SecurityConfig{DevTaskSecret: "test-devtask-secret"}}
+	svc := &mockAdminService{}
+	h := NewAdminHandler(svc, config.Cfg)
+	r := gin.New()
+	g := r.Group("/api/v3")
+	// 真实 AuthMiddleware — 无 Authorization 头应 401
+	h.RegisterRoutes(g, realAdminAuthMiddleware(), func(c *gin.Context) { c.Next() })
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-task/token", nil)
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusUnauthorized {
+		t.Errorf("status = %d, want %d (missing auth)", w.Code, http.StatusUnauthorized)
+	}
+}
+
+func realAdminAuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		authHeader := c.GetHeader("Authorization")
+		if authHeader == "" {
+			c.AbortWithStatusJSON(401, gin.H{"error": "Authorization header is required"})
+			return
+		}
+		c.Set("user_id", 1)
+		c.Next()
+	}
 }
 
 // ---------- AddPost ----------

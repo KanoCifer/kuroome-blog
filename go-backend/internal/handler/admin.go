@@ -18,6 +18,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
+	"github.com/KanoCifer/kuroome-blog/pkg/jwt"
 )
 
 type AdminService interface {
@@ -201,6 +202,30 @@ func runDeployment() {
 	slog.Info("Deployment completed", "output", string(output))
 }
 
+// DevTaskToken 为前端签发短期 devtask service-JWT。
+// GET /api/v3/admin/dev-task/token
+// 前端用用户 JWT 调用此端点，后端校验 admin 后返回 1h 有效期的 service token，
+// 用于后续 devtask 看板 API 的 DevTaskMiddleware 鉴权。
+func (h *AdminHandler) DevTaskToken(c *gin.Context) {
+	if config.Cfg.Security.DevTaskSecret == "" {
+		response.APIError(c, "devtask secret not configured", http.StatusServiceUnavailable)
+		return
+	}
+
+	expiresAt := time.Now().Add(1 * time.Hour)
+	token, err := jwt.GenerateServiceToken(expiresAt, config.Cfg.Security.DevTaskSecret)
+	if err != nil {
+		slog.ErrorContext(c.Request.Context(), "generate devtask service token", "error", err)
+		response.APIError(c, "failed to generate token", http.StatusInternalServerError)
+		return
+	}
+
+	response.Success(c, gin.H{
+		"token":       token,
+		"expires_at":  expiresAt.Format(time.RFC3339),
+	}, "DevTask token issued successfully")
+}
+
 func (h *AdminHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFunc, adminMW gin.HandlerFunc) {
 	r.POST("/post/add", authMW, adminMW, h.AddPost)
 	r.PUT("/post/update", authMW, adminMW, h.UpdatePost)
@@ -208,4 +233,5 @@ func (h *AdminHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFunc
 	r.GET("/post/views", authMW, adminMW, h.ListPostViewsData)
 	r.POST("/track", h.TrackVisitor)
 	r.POST("/deploy", h.WebhookDeploy)
+	r.GET("/dev-task/token", authMW, adminMW, h.DevTaskToken)
 }
