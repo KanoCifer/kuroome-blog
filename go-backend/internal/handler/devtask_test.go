@@ -73,9 +73,8 @@ func newDevTaskHandler(svc DevTaskService) *gin.Engine {
 	h := NewDevTaskHandler(svc)
 	r := gin.New()
 	g := r.Group("/api/v3")
-	noopAuth := func(c *gin.Context) { c.Set("user_id", 1); c.Next() }
-	noopAdmin := func(c *gin.Context) { c.Next() }
-	h.RegisterRoutes(g, noopAuth, noopAdmin)
+	noopAuth := func(c *gin.Context) { c.Next() }
+	h.RegisterRoutes(g, noopAuth)
 	return r
 }
 
@@ -357,30 +356,27 @@ func TestDevTask_Unauthorized_NoUser(t *testing.T) {
 	h := NewDevTaskHandler(svc)
 	r := gin.New()
 	g := r.Group("/api/v3")
-	// 使用真实 auth 中间件模拟无 token 场景
-	h.RegisterRoutes(g, realAuthMiddleware(), noopAdmin())
+	// 使用真实 devtask-JWT 中间件模拟无 service-token 场景
+	h.RegisterRoutes(g, realDevTaskMiddleware())
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusUnauthorized {
-		t.Errorf("status = %d, want %d (missing auth)", w.Code, http.StatusUnauthorized)
+		t.Errorf("status = %d, want %d (missing service token)", w.Code, http.StatusUnauthorized)
 	}
 }
 
-func realAuthMiddleware() gin.HandlerFunc {
+// realDevTaskMiddleware 模拟 DevTaskMiddleware 的 service-JWT 校验：
+// 无 Authorization 头即 401（由 DevTaskMiddleware 行为决定）。
+func realDevTaskMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
 			c.AbortWithStatusJSON(401, gin.H{"error": "Authorization header is required"})
 			return
 		}
-		c.Set("user_id", 1)
 		c.Next()
 	}
-}
-
-func noopAdmin() gin.HandlerFunc {
-	return func(c *gin.Context) { c.Next() }
 }
