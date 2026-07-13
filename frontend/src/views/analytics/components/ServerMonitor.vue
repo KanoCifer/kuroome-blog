@@ -643,7 +643,7 @@ const fetchStatusSSE = async () => {
   eventSourceAbort.value = ctrl;
 
   try {
-    await fetchEventSource(useOrigin('/api/v1/status/server/status/stream'), {
+    await fetchEventSource(useOrigin('/api/v3/status/server/status/stream'), {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${getAccessToken()}`,

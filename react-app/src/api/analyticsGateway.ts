@@ -83,19 +83,19 @@ export interface AnalyticsGateway {
 export const analyticsGateway = (): AnalyticsGateway => {
   return {
     async getOverview(days) {
-      return request.get('v1/status/overview', {
+      return request.get('v3/status/overview', {
         params: { days },
       }) as Promise<AxiosResponse<OverviewApiData>>;
     },
 
     async getUserLogins(params) {
-      return request.get('v1/status/user-logins', {
+      return request.get('v3/status/user-logins', {
         params,
       }) as Promise<AxiosResponse<UserLoginApiData>>;
     },
 
     async getServerStatus() {
-      return request.get('v1/status/server/status') as Promise<
+      return request.get('v3/status/server/status') as Promise<
         AxiosResponse<ServerStatusApiData>
       >;
     },

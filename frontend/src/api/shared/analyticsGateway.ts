@@ -27,7 +27,7 @@ export interface AnalyticsGateway {
 export const analyticsGateway: AnalyticsGateway = {
   async getOverview(days: number): Promise<AnalyticsOverviewData> {
     const res = await request.get<ApiResponse<Record<string, unknown>>>(
-      'v1/status/overview',
+      'v3/status/overview',
       {
         params: { days },
       },
@@ -41,7 +41,7 @@ export const analyticsGateway: AnalyticsGateway = {
     page_size: number;
   }): Promise<AnalyticsOverviewData> {
     const res = await request.get<ApiResponse<Record<string, unknown>>>(
-      'v1/status/user-logins',
+      'v3/status/user-logins',
       {
         params,
       },
