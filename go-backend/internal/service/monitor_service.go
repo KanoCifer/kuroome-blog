@@ -2,7 +2,12 @@ package service
 
 import (
 	"context"
+	"math"
 	"time"
+
+	"github.com/shirou/gopsutil/v4/cpu"
+	"github.com/shirou/gopsutil/v4/disk"
+	"github.com/shirou/gopsutil/v4/mem"
 
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
@@ -174,4 +179,79 @@ func isoPtr(t *time.Time) *string {
 	}
 	s := t.UTC().Format(time.RFC3339)
 	return &s
+}
+
+// GetServerStatus 返回当前服务器 CPU/内存/磁盘指标，对齐 Python
+// _get_server_status_payload 的字段名、单位与舍入规则。
+//
+// cpu.Percent 用 1s 间隔（与 Python psutil.cpu_percent(interval=1) 一致），
+// 会阻塞约 1s 换取更准的 CPU 利用率。
+func (s *MonitorService) GetServerStatus() (dto.ServerStatus, error) {
+	cpuPercents, err := cpu.Percent(time.Second, false)
+	if err != nil {
+		return dto.ServerStatus{}, err
+	}
+	var cpuPercent float64
+	if len(cpuPercents) > 0 {
+		cpuPercent = cpuPercents[0]
+	}
+
+	cpuCores, err := cpu.Counts(true)
+	if err != nil {
+		return dto.ServerStatus{}, err
+	}
+
+	vm, err := mem.VirtualMemory()
+	if err != nil {
+		return dto.ServerStatus{}, err
+	}
+
+	du, err := disk.Usage("/")
+	if err != nil {
+		return dto.ServerStatus{}, err
+	}
+
+	return dto.ServerStatus{
+		CPUPercent: cpuPercent,
+		CPUCores:  cpuCores,
+		MemTotal:  int(math.Round(float64(vm.Total) / 1024 / 1024)),
+		MemUsed:   int(math.Round(float64(vm.Used) / 1024 / 1024)),
+		MemUsage:  round2(vm.UsedPercent),
+		DiskTotal: round2(float64(du.Total) / 1024 / 1024 / 1024),
+		DiskUsed:  round2(float64(du.Used) / 1024 / 1024 / 1024),
+		DiskUsage: round2(du.UsedPercent),
+	}, nil
+}
+
+// StreamServerStatus 每 5s 推送一帧 server status，直到 ctx 取消。
+// 对齐 Python stream_server_status：一个无限循环，每 5s yield 一次 payload。
+func (s *MonitorService) StreamServerStatus(ctx context.Context) (<-chan dto.ServerStatus, error) {
+	ch := make(chan dto.ServerStatus)
+	go func() {
+		defer close(ch)
+		ticker := time.NewTicker(5 * time.Second)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				status, err := s.GetServerStatus()
+				if err != nil {
+					continue
+				}
+				select {
+				case ch <- status:
+				case <-ctx.Done():
+					return
+				}
+			}
+		}
+	}()
+	return ch, nil
+}
+
+// round2 保留两位小数（对齐 Python round(x, 2) 语义）。
+func round2(x float64) float64 {
+	return math.Round(x*100) / 100
 }

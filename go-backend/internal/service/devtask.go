@@ -17,14 +17,14 @@ import (
 )
 
 // DevTaskRepository devtask 持久层接口 —— service 依赖接口，便于 mock 测试。
+// 所有接口一律使用 slug 作为任务标识，不暴露 ObjectID。
 type DevTaskRepository interface {
 	Create(ctx context.Context, task *document.DevTask) error
-	GetByID(ctx context.Context, id string) (*document.DevTask, error)
 	GetBySlug(ctx context.Context, slug string) (*document.DevTask, error)
 	List(ctx context.Context, filter mongodb.ListFilter, page, perPage int) ([]document.DevTask, int64, error)
-	Update(ctx context.Context, id string, fields bson.M) error
-	SoftDelete(ctx context.Context, id string) error
-	HardDelete(ctx context.Context, id string) error
+	Update(ctx context.Context, slug string, fields bson.M) error
+	SoftDelete(ctx context.Context, slug string) error
+	HardDelete(ctx context.Context, slug string) error
 	ArchiveDoneTasks(ctx context.Context) (int64, error)
 	FindFrontier(ctx context.Context, limit int) ([]document.DevTask, error)
 	NextSlugSeq(ctx context.Context) (int, error)
@@ -68,9 +68,11 @@ func serializeTask(t document.DevTask) dto.DevTaskOut {
 		AcceptanceCriteria: t.AcceptanceCriteria,
 		Constraints:        t.Constraints,
 		ContextPointers:    t.ContextPointers,
-		ForAgent:  t.ForAgent,
-		BlockedBy: t.BlockedBy,
-		Slug:      t.Slug,
+		ForAgent:   t.ForAgent,
+		BlockedBy:  t.BlockedBy,
+		Slug:       t.Slug,
+		Kind:       t.Kind,
+		ParentSlug: t.ParentSlug,
 	}
 }
 
@@ -112,32 +114,15 @@ func (s *DevTaskService) Create(ctx context.Context, userID int, req dto.DevTask
 		AcceptanceCriteria: req.AcceptanceCriteria,
 		Constraints:        req.Constraints,
 		ContextPointers:    req.ContextPointers,
-		ForAgent:  req.ForAgent,
-		BlockedBy: blockedByOrEmpty(req.BlockedBy),
-		Slug:      slug,
+		ForAgent:   req.ForAgent,
+		BlockedBy:  blockedByOrEmpty(req.BlockedBy),
+		Slug:       slug,
+		Kind:       req.Kind,
+		ParentSlug: req.ParentSlug,
 	}
 
 	if err := s.repo.Create(ctx, task); err != nil {
 		slog.Error("create dev task", "error", err, "user_id", userID)
-		return nil, err
-	}
-
-	out := serializeTask(*task)
-	return &out, nil
-}
-
-// GetByID 按 ID 获取单条任务。
-func (s *DevTaskService) GetByID(ctx context.Context, id string) (*dto.DevTaskOut, error) {
-	if _, err := bson.ObjectIDFromHex(id); err != nil {
-		return nil, errs.ErrInvalidTaskID
-	}
-
-	task, err := s.repo.GetByID(ctx, id)
-	if err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, errs.ErrTaskNotFound
-		}
-		slog.Error("get dev task", "error", err, "id", id)
 		return nil, err
 	}
 
@@ -171,11 +156,7 @@ func (s *DevTaskService) List(
 }
 
 // Update 部分更新任务。
-func (s *DevTaskService) Update(ctx context.Context, id string, req dto.DevTaskUpdate) error {
-	if _, err := bson.ObjectIDFromHex(id); err != nil {
-		return errs.ErrInvalidTaskID
-	}
-
+func (s *DevTaskService) Update(ctx context.Context, slug string, req dto.DevTaskUpdate) error {
 	fields := bson.M{}
 	if req.Title != nil {
 		fields["title"] = *req.Title
@@ -219,6 +200,12 @@ func (s *DevTaskService) Update(ctx context.Context, id string, req dto.DevTaskU
 	if req.BlockedBy != nil {
 		fields["blocked_by"] = blockedByOrEmpty(*req.BlockedBy)
 	}
+	if req.Kind != nil {
+		fields["kind"] = *req.Kind
+	}
+	if req.ParentSlug != nil {
+		fields["parent_slug"] = *req.ParentSlug
+	}
 
 	if len(fields) == 0 {
 		return nil
@@ -228,32 +215,26 @@ func (s *DevTaskService) Update(ctx context.Context, id string, req dto.DevTaskU
 	// 确保"仅仅调了 Update"也能推进时间戳。
 	fields["updated_at"] = time.Now()
 
-	if err := s.repo.Update(ctx, id, fields); err != nil {
-		slog.Error("update dev task", "error", err, "id", id)
+	if err := s.repo.Update(ctx, slug, fields); err != nil {
+		slog.Error("update dev task", "error", err, "slug", slug)
 		return err
 	}
 	return nil
 }
 
 // SoftDelete 逻辑删除。
-func (s *DevTaskService) SoftDelete(ctx context.Context, id string) error {
-	if _, err := bson.ObjectIDFromHex(id); err != nil {
-		return errs.ErrInvalidTaskID
-	}
-	if err := s.repo.SoftDelete(ctx, id); err != nil {
-		slog.Error("soft delete dev task", "error", err, "id", id)
+func (s *DevTaskService) SoftDelete(ctx context.Context, slug string) error {
+	if err := s.repo.SoftDelete(ctx, slug); err != nil {
+		slog.Error("soft delete dev task", "error", err, "slug", slug)
 		return err
 	}
 	return nil
 }
 
 // HardDelete 物理删除。
-func (s *DevTaskService) HardDelete(ctx context.Context, id string) error {
-	if _, err := bson.ObjectIDFromHex(id); err != nil {
-		return errs.ErrInvalidTaskID
-	}
-	if err := s.repo.HardDelete(ctx, id); err != nil {
-		slog.Error("hard delete dev task", "error", err, "id", id)
+func (s *DevTaskService) HardDelete(ctx context.Context, slug string) error {
+	if err := s.repo.HardDelete(ctx, slug); err != nil {
+		slog.Error("hard delete dev task", "error", err, "slug", slug)
 		return err
 	}
 	return nil

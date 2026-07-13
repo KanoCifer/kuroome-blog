@@ -32,18 +32,6 @@ func (r *DevTaskRepository) Create(ctx context.Context, task *document.DevTask) 
 	return nil
 }
 
-// GetByID 按 ID 查询单条任务。
-func (r *DevTaskRepository) GetByID(ctx context.Context, id string) (*document.DevTask, error) {
-	oid, err := bson.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-
-	var task document.DevTask
-	err = r.db.FindOne(ctx, bson.M{"_id": oid, "is_deleted": false}).Decode(&task)
-	return &task, err
-}
-
 // GetBySlug 按 slug（task-N 格式）查询单条任务。
 func (r *DevTaskRepository) GetBySlug(ctx context.Context, slug string) (*document.DevTask, error) {
 	var task document.DevTask
@@ -57,7 +45,8 @@ type ListFilter struct {
 	Priority *document.DevTaskPriority
 	Type     *document.DevTaskType
 	IsDeleted *bool
-	ForAgent  *bool  // 新增: 按"是否可给 agent"过滤
+	ForAgent  *bool              // 按"是否可给 agent"过滤
+	Kind      *document.TaskKind // 按任务角色过滤：spec / subtask
 }
 
 // List 分页列出任务，支持按状态 / 优先级 / 类型过滤。
@@ -83,6 +72,9 @@ func (r *DevTaskRepository) List(
 	}
 	if filter.ForAgent != nil {
 		where["for_agent"] = *filter.ForAgent
+	}
+	if filter.Kind != nil {
+		where["kind"] = *filter.Kind
 	}
 
 	total, err := r.db.CountDocuments(ctx, where)
@@ -114,29 +106,20 @@ func (r *DevTaskRepository) List(
 }
 
 // Update 部分更新任务；fields 已由 service 层组装好（含 updated_at）。
-func (r *DevTaskRepository) Update(ctx context.Context, id string, fields bson.M) error {
-	oid, err := bson.ObjectIDFromHex(id)
-	if err != nil {
-		return err
-	}
-
-	_, err = r.db.UpdateOne(
+func (r *DevTaskRepository) Update(ctx context.Context, slug string, fields bson.M) error {
+	_, err := r.db.UpdateOne(
 		ctx,
-		bson.M{"_id": oid},
+		bson.M{"slug": slug},
 		bson.M{"$set": fields},
 	)
 	return err
 }
 
 // SoftDelete 逻辑删除：置 is_deleted=true 并记录归档时间。
-func (r *DevTaskRepository) SoftDelete(ctx context.Context, id string) error {
-	oid, err := bson.ObjectIDFromHex(id)
-	if err != nil {
-		return err
-	}
-	_, err = r.db.UpdateOne(
+func (r *DevTaskRepository) SoftDelete(ctx context.Context, slug string) error {
+	_, err := r.db.UpdateOne(
 		ctx,
-		bson.M{"_id": oid},
+		bson.M{"slug": slug},
 		bson.M{"$set": bson.M{
 			"is_deleted":  true,
 			"archived_at": time.Now(),
@@ -162,12 +145,8 @@ func (r *DevTaskRepository) ArchiveDoneTasks(ctx context.Context) (int64, error)
 }
 
 // HardDelete 物理删除（永久移除）。
-func (r *DevTaskRepository) HardDelete(ctx context.Context, id string) error {
-	oid, err := bson.ObjectIDFromHex(id)
-	if err != nil {
-		return err
-	}
-	_, err = r.db.DeleteOne(ctx, bson.M{"_id": oid})
+func (r *DevTaskRepository) HardDelete(ctx context.Context, slug string) error {
+	_, err := r.db.DeleteOne(ctx, bson.M{"slug": slug})
 	return err
 }
 

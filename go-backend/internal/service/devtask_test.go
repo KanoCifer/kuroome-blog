@@ -9,7 +9,6 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
-	"github.com/KanoCifer/kuroome-blog/internal/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/mongo/document"
 	"github.com/KanoCifer/kuroome-blog/internal/repository/mongodb"
 )
@@ -18,12 +17,11 @@ import (
 
 type mockDevTaskRepo struct {
 	createFn       func(ctx context.Context, task *document.DevTask) error
-	getByIDFn      func(ctx context.Context, id string) (*document.DevTask, error)
 	getBySlugFn    func(ctx context.Context, slug string) (*document.DevTask, error)
 	listFn         func(ctx context.Context, filter mongodb.ListFilter, page, perPage int) ([]document.DevTask, int64, error)
-	updateFn       func(ctx context.Context, id string, fields bson.M) error
-	softDelFn      func(ctx context.Context, id string) error
-	hardDelFn      func(ctx context.Context, id string) error
+	updateFn       func(ctx context.Context, slug string, fields bson.M) error
+	softDelFn      func(ctx context.Context, slug string) error
+	hardDelFn      func(ctx context.Context, slug string) error
 	archiveFn      func(ctx context.Context) (int64, error)
 	findFrontierFn func(ctx context.Context, limit int) ([]document.DevTask, error)
 	nextSlugSeqFn  func(ctx context.Context) (int, error)
@@ -31,10 +29,6 @@ type mockDevTaskRepo struct {
 
 func (m *mockDevTaskRepo) Create(ctx context.Context, task *document.DevTask) error {
 	return m.createFn(ctx, task)
-}
-
-func (m *mockDevTaskRepo) GetByID(ctx context.Context, id string) (*document.DevTask, error) {
-	return m.getByIDFn(ctx, id)
 }
 
 func (m *mockDevTaskRepo) GetBySlug(ctx context.Context, slug string) (*document.DevTask, error) {
@@ -48,16 +42,16 @@ func (m *mockDevTaskRepo) List(ctx context.Context, filter mongodb.ListFilter, p
 	return m.listFn(ctx, filter, page, perPage)
 }
 
-func (m *mockDevTaskRepo) Update(ctx context.Context, id string, fields bson.M) error {
-	return m.updateFn(ctx, id, fields)
+func (m *mockDevTaskRepo) Update(ctx context.Context, slug string, fields bson.M) error {
+	return m.updateFn(ctx, slug, fields)
 }
 
-func (m *mockDevTaskRepo) SoftDelete(ctx context.Context, id string) error {
-	return m.softDelFn(ctx, id)
+func (m *mockDevTaskRepo) SoftDelete(ctx context.Context, slug string) error {
+	return m.softDelFn(ctx, slug)
 }
 
-func (m *mockDevTaskRepo) HardDelete(ctx context.Context, id string) error {
-	return m.hardDelFn(ctx, id)
+func (m *mockDevTaskRepo) HardDelete(ctx context.Context, slug string) error {
+	return m.hardDelFn(ctx, slug)
 }
 
 func (m *mockDevTaskRepo) ArchiveDoneTasks(ctx context.Context) (int64, error) {
@@ -83,16 +77,16 @@ func newService(repo DevTaskRepository) *DevTaskService {
 	return &DevTaskService{repo: repo}
 }
 
-const validID = "507f1f77bcf86cd799439011"
+const testSlug = "task-1"
 
 // ---------- Create ----------
 
 func TestDevTaskService_Create_Success(t *testing.T) {
 	var captured *document.DevTask
 	repo := &mockDevTaskRepo{
+		nextSlugSeqFn: func(ctx context.Context) (int, error) { return 1, nil },
 		createFn: func(ctx context.Context, task *document.DevTask) error {
 			captured = task
-			task.ID = validID
 			return nil
 		},
 	}
@@ -104,8 +98,8 @@ func TestDevTaskService_Create_Success(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Create: %v", err)
 	}
-	if out.ID != validID {
-		t.Errorf("out.ID = %q, want %s", out.ID, validID)
+	if out.Slug != testSlug {
+		t.Errorf("out.Slug = %q, want %s", out.Slug, testSlug)
 	}
 	if out.Status != document.StatusTriage {
 		t.Errorf("out.Status = %q, want %q (default)", out.Status, document.StatusTriage)
@@ -129,53 +123,6 @@ func TestDevTaskService_Create_RepoError(t *testing.T) {
 	_, err := svc.Create(context.Background(), 1, dto.DevTaskCreate{
 		Title: "x", Type: document.TaskTypeBug, Priority: document.PriorityP0, Scope: document.ScopeGeneral,
 	})
-	if err == nil {
-		t.Fatal("expected error, got nil")
-	}
-}
-
-// ---------- GetByID ----------
-
-func TestDevTaskService_GetByID_Success(t *testing.T) {
-	repo := &mockDevTaskRepo{
-		getByIDFn: func(ctx context.Context, id string) (*document.DevTask, error) {
-			return &document.DevTask{ID: id, Title: "Fix bug"}, nil
-		},
-	}
-	svc := newService(repo)
-
-	out, err := svc.GetByID(context.Background(), validID)
-	if err != nil {
-		t.Fatalf("GetByID: %v", err)
-	}
-	if out.Title != "Fix bug" {
-		t.Errorf("out.Title = %q, want Fix bug", out.Title)
-	}
-}
-
-func TestDevTaskService_GetByID_InvalidID(t *testing.T) {
-	repo := &mockDevTaskRepo{
-		getByIDFn: func(ctx context.Context, id string) (*document.DevTask, error) {
-			return nil, errors.New("should not be called")
-		},
-	}
-	svc := newService(repo)
-
-	_, err := svc.GetByID(context.Background(), "not-hex")
-	if !errors.Is(err, errs.ErrInvalidTaskID) {
-		t.Errorf("err = %v, want ErrInvalidTaskID", err)
-	}
-}
-
-func TestDevTaskService_GetByID_NotFound(t *testing.T) {
-	repo := &mockDevTaskRepo{
-		getByIDFn: func(ctx context.Context, id string) (*document.DevTask, error) {
-			return nil, errors.New("mongo: no documents in result")
-		},
-	}
-	svc := newService(repo)
-
-	_, err := svc.GetByID(context.Background(), validID)
 	if err == nil {
 		t.Fatal("expected error, got nil")
 	}
@@ -256,7 +203,7 @@ func TestDevTaskService_List_EmptyReturnsArray(t *testing.T) {
 func TestDevTaskService_Update_OnlySetFields(t *testing.T) {
 	var gotFields bson.M
 	repo := &mockDevTaskRepo{
-		updateFn: func(ctx context.Context, id string, fields bson.M) error {
+		updateFn: func(ctx context.Context, slug string, fields bson.M) error {
 			gotFields = fields
 			return nil
 		},
@@ -264,7 +211,7 @@ func TestDevTaskService_Update_OnlySetFields(t *testing.T) {
 	svc := newService(repo)
 
 	status := document.StatusDone
-	err := svc.Update(context.Background(), validID, dto.DevTaskUpdate{Status: &status})
+	err := svc.Update(context.Background(), testSlug, dto.DevTaskUpdate{Status: &status})
 	if err != nil {
 		t.Fatalf("Update: %v", err)
 	}
@@ -282,14 +229,14 @@ func TestDevTaskService_Update_OnlySetFields(t *testing.T) {
 func TestDevTaskService_Update_NoOp(t *testing.T) {
 	called := false
 	repo := &mockDevTaskRepo{
-		updateFn: func(ctx context.Context, id string, fields bson.M) error {
+		updateFn: func(ctx context.Context, slug string, fields bson.M) error {
 			called = true
 			return nil
 		},
 	}
 	svc := newService(repo)
 
-	err := svc.Update(context.Background(), validID, dto.DevTaskUpdate{})
+	err := svc.Update(context.Background(), testSlug, dto.DevTaskUpdate{})
 	if err != nil {
 		t.Fatalf("Update: %v", err)
 	}
@@ -298,42 +245,29 @@ func TestDevTaskService_Update_NoOp(t *testing.T) {
 	}
 }
 
-func TestDevTaskService_Update_InvalidID(t *testing.T) {
-	repo := &mockDevTaskRepo{
-		updateFn: func(ctx context.Context, id string, fields bson.M) error { return nil },
-	}
-	svc := newService(repo)
-
-	title := "x"
-	err := svc.Update(context.Background(), "bad", dto.DevTaskUpdate{Title: &title})
-	if !errors.Is(err, errs.ErrInvalidTaskID) {
-		t.Errorf("err = %v, want ErrInvalidTaskID", err)
-	}
-}
-
 // ---------- Delete ----------
 
-func TestDevTaskService_SoftDelete_InvalidID(t *testing.T) {
+func TestDevTaskService_SoftDelete_Success(t *testing.T) {
 	repo := &mockDevTaskRepo{
-		softDelFn: func(ctx context.Context, id string) error { return nil },
+		softDelFn: func(ctx context.Context, slug string) error { return nil },
 	}
 	svc := newService(repo)
 
-	err := svc.SoftDelete(context.Background(), "zzz")
-	if !errors.Is(err, errs.ErrInvalidTaskID) {
-		t.Errorf("err = %v, want ErrInvalidTaskID", err)
+	err := svc.SoftDelete(context.Background(), testSlug)
+	if err != nil {
+		t.Fatalf("SoftDelete: %v", err)
 	}
 }
 
-func TestDevTaskService_HardDelete_InvalidID(t *testing.T) {
+func TestDevTaskService_HardDelete_Success(t *testing.T) {
 	repo := &mockDevTaskRepo{
-		hardDelFn: func(ctx context.Context, id string) error { return nil },
+		hardDelFn: func(ctx context.Context, slug string) error { return nil },
 	}
 	svc := newService(repo)
 
-	err := svc.HardDelete(context.Background(), "zzz")
-	if !errors.Is(err, errs.ErrInvalidTaskID) {
-		t.Errorf("err = %v, want ErrInvalidTaskID", err)
+	err := svc.HardDelete(context.Background(), testSlug)
+	if err != nil {
+		t.Fatalf("HardDelete: %v", err)
 	}
 }
 
@@ -360,7 +294,8 @@ func TestSerializeTask(t *testing.T) {
 	due := time.Date(2026, 7, 15, 0, 0, 0, 0, time.UTC)
 	desc := "desc"
 	doc := document.DevTask{
-		ID:          validID,
+		ID:          "507f1f77bcf86cd799439011",
+		Slug:        testSlug,
 		UserID:      7,
 		Title:       "test",
 		Description: &desc,
@@ -376,7 +311,7 @@ func TestSerializeTask(t *testing.T) {
 	}
 
 	out := serializeTask(doc)
-	if out.ID != validID || out.Title != "test" || *out.Description != "desc" {
+	if out.Slug != testSlug || out.Title != "test" || *out.Description != "desc" {
 		t.Errorf("serializeTask basic fields wrong: %+v", out)
 	}
 	if out.DueDate == nil || !out.DueDate.Equal(due) {

@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -20,9 +21,10 @@ func init() {
 // ---------- mock MonitorService ----------
 
 type mockMonitorService struct {
-	overviewFn   func(ctx context.Context, days int) (dto.Overview, error)
-	visitorsFn   func(ctx context.Context, days, page, pageSize int) (dto.Visitors, error)
-	userLoginsFn func(ctx context.Context, days, page, pageSize int) (dto.UserLogins, error)
+	overviewFn     func(ctx context.Context, days int) (dto.Overview, error)
+	visitorsFn     func(ctx context.Context, days, page, pageSize int) (dto.Visitors, error)
+	userLoginsFn   func(ctx context.Context, days, page, pageSize int) (dto.UserLogins, error)
+	serverStatusFn func() (dto.ServerStatus, error)
 }
 
 func (m *mockMonitorService) GetOverview(ctx context.Context, days int) (dto.Overview, error) {
@@ -35,6 +37,24 @@ func (m *mockMonitorService) GetVisitors(ctx context.Context, days, page, pageSi
 
 func (m *mockMonitorService) GetUserLogins(ctx context.Context, days, page, pageSize int) (dto.UserLogins, error) {
 	return m.userLoginsFn(ctx, days, page, pageSize)
+}
+
+func (m *mockMonitorService) GetServerStatus() (dto.ServerStatus, error) {
+	if m.serverStatusFn != nil {
+		return m.serverStatusFn()
+	}
+	return dto.ServerStatus{}, nil
+}
+
+func (m *mockMonitorService) StreamServerStatus(ctx context.Context) (<-chan dto.ServerStatus, error) {
+	ch := make(chan dto.ServerStatus, 1)
+	if m.serverStatusFn != nil {
+		if s, err := m.serverStatusFn(); err == nil {
+			ch <- s
+		}
+	}
+	close(ch)
+	return ch, nil
 }
 
 // ---------- helpers ----------
@@ -199,5 +219,83 @@ func TestGetOverview_ServiceError(t *testing.T) {
 	w := requestGet(t, r, "/api/v3/status/overview")
 	if w.Code != http.StatusInternalServerError {
 		t.Fatalf("expected 500 on service error, got %d", w.Code)
+	}
+}
+
+// ---------- server/status ----------
+
+func TestGetServerStatus_ReturnsPayload(t *testing.T) {
+	svc := &mockMonitorService{
+		serverStatusFn: func() (dto.ServerStatus, error) {
+			return dto.ServerStatus{CPUPercent: 23.5, CPUCores: 8, MemTotal: 16384}, nil
+		},
+	}
+	adminAllow := func(c *gin.Context) { c.Next() }
+	r := setupMonitor(svc, adminAllow)
+
+	w := requestGet(t, r, "/api/v3/status/server/status")
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
+	}
+	if !strings.Contains(w.Body.String(), `"cpu_percent":23.5`) {
+		t.Fatalf("unexpected body: %s", w.Body.String())
+	}
+	if !strings.Contains(w.Body.String(), `"cpu_cores":8`) {
+		t.Fatalf("unexpected body: %s", w.Body.String())
+	}
+	if !strings.Contains(w.Body.String(), `"message":"Server status retrieved successfully"`) {
+		t.Fatalf("unexpected message: %s", w.Body.String())
+	}
+}
+
+func TestServerStatusStream_ReturnsSSEFrames(t *testing.T) {
+	svc := &mockMonitorService{
+		serverStatusFn: func() (dto.ServerStatus, error) {
+			return dto.ServerStatus{CPUPercent: 12.3, CPUCores: 4}, nil
+		},
+	}
+	adminAllow := func(c *gin.Context) { c.Next() }
+	r := setupMonitor(svc, adminAllow)
+
+	// c.Stream 需要真实 ResponseWriter（httptest.NewRecorder 未实现
+	// http.CloseNotifier 会 panic），所以用 httptest.NewServer + 真实客户端。
+	srv := httptest.NewServer(r)
+	defer srv.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, srv.URL+"/api/v3/status/server/status/stream", nil)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("request failed: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+	if ct := resp.Header.Get("Content-Type"); !strings.Contains(ct, "text/event-stream") {
+		t.Fatalf("expected text/event-stream, got %q", ct)
+	}
+	// 读一个 SSE 帧后取消 ctx，驱动服务端 goroutine 退出。
+	buf := make([]byte, 4096)
+	n, _ := resp.Body.Read(buf)
+	body := string(buf[:n])
+	if !strings.Contains(body, `"cpu_percent":12.3`) {
+		t.Fatalf("SSE body missing payload: %q", body)
+	}
+	if !strings.Contains(body, "data:") {
+		t.Fatalf("expected SSE data: frame, got: %q", body)
+	}
+}
+
+func TestServerStatus_RequiresAdmin(t *testing.T) {
+	svc := &mockMonitorService{}
+	adminReject := func(c *gin.Context) { c.AbortWithStatusJSON(403, gin.H{"error": "Admin access required"}) }
+	r := setupMonitor(svc, adminReject)
+
+	w := requestGet(t, r, "/api/v3/status/server/status")
+	if w.Code != http.StatusForbidden {
+		t.Fatalf("expected 403 for non-admin, got %d", w.Code)
 	}
 }

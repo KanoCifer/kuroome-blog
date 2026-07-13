@@ -3,6 +3,7 @@ package document
 import "time"
 
 // 任务类型
+// 问题、功能需求、优化、技术债
 type DevTaskType string
 
 const (
@@ -13,6 +14,7 @@ const (
 )
 
 // 优先级
+// P0, P1, P2, P3
 type DevTaskPriority string
 
 const (
@@ -36,7 +38,8 @@ const (
 	ScopeGeneral  DevTaskScope = "通用"
 )
 
-// 状态
+// 5 状态
+// 待评估、待排期、进行中、已搁置、已完成
 type DevTaskStatus string
 
 const (
@@ -47,6 +50,16 @@ const (
 	StatusDone       DevTaskStatus = "已完成"
 )
 
+// 任务角色 —— 对应 devtask-plan 技能的 spec → subtask 模式。
+// 零值（空串）= 老文档兜底为 spec，避免迁移。
+type TaskKind string
+
+const (
+	TaskKindSpec    TaskKind = "spec"
+	TaskKindSubTask TaskKind = "subtask"
+)
+
+// DevTask 任务数据结构
 type DevTask struct {
 	ID          string          `bson:"_id,omitempty" json:"id"`
 	UserID      int             `bson:"user_id" json:"user_id"`
@@ -74,12 +87,22 @@ type DevTask struct {
 	// false = 默认（未规格化或给人做的）；true = agent 可认领。
 	ForAgent bool `bson:"for_agent" json:"for_agent"`
 
-	// BlockedBy —— 本任务被哪些任务阻塞（存 ObjectID hex 数组）。
+	// BlockedBy —— 本任务被哪些任务阻塞（存 slug 数组）。
 	// 为空数组 = 无阻塞，可以执行。
 	BlockedBy []string `bson:"blocked_by,omitempty" json:"blocked_by"`
 
 	// Slug —— 人类可读的短标识（task-1, task-2...），由 counters 集合自增生
-	// 成。创建后不变，MCP tool / 看板 UI / 口头引用都用 slug。内部依赖引用
-	// (blocked_by) 一律保持 ObjectID，不随 slug 走。
+	// 成。创建后不变，MCP tool / 看板 UI / 口头引用，内部依赖引用
 	Slug string `bson:"slug" json:"slug"`
+
+	// Kind —— 任务角色：spec（可被 devtask-plan 拆解为子任务）或 subtask
+	// （spec 拆解出的可执行子任务）。
+	// 零值（空串）= spec，兼容老文档。devtask-plan 技能拆分子任务时显式设
+	// 为 TaskKindSubTask。
+	Kind TaskKind `bson:"kind,omitempty" json:"kind,omitempty"`
+
+	// ParentSlug —— 子任务归属的 spec slug。nil = 无归属（spec 自身或独立
+	// 任务），不落库。与 blocked_by 分离：blocked_by 只管执行依赖，parent_slug
+	// 只管结构归属。devtask-plan 创建子任务时同步写入。
+	ParentSlug *string `bson:"parent_slug,omitempty" json:"parent_slug,omitempty"`
 }

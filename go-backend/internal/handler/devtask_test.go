@@ -25,21 +25,16 @@ func init() {
 
 type mockDevTaskService struct {
 	createFn       func(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error)
-	getByIDFn      func(ctx context.Context, id string) (*dto.DevTaskOut, error)
 	getBySlugFn    func(ctx context.Context, slug string) (*dto.DevTaskOut, error)
 	listFn         func(ctx context.Context, filter mongodb.ListFilter, page, perPage int) (*dto.DevTaskListOut, error)
-	updateFn       func(ctx context.Context, id string, req dto.DevTaskUpdate) error
-	softDelFn      func(ctx context.Context, id string) error
-	hardDelFn      func(ctx context.Context, id string) error
+	updateFn       func(ctx context.Context, slug string, req dto.DevTaskUpdate) error
+	softDelFn      func(ctx context.Context, slug string) error
+	hardDelFn      func(ctx context.Context, slug string) error
 	findFrontierFn func(ctx context.Context, limit int) ([]dto.DevTaskOut, error)
 }
 
 func (m *mockDevTaskService) Create(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error) {
 	return m.createFn(ctx, userID, req)
-}
-
-func (m *mockDevTaskService) GetByID(ctx context.Context, id string) (*dto.DevTaskOut, error) {
-	return m.getByIDFn(ctx, id)
 }
 
 func (m *mockDevTaskService) GetBySlug(ctx context.Context, slug string) (*dto.DevTaskOut, error) {
@@ -53,16 +48,16 @@ func (m *mockDevTaskService) List(ctx context.Context, filter mongodb.ListFilter
 	return m.listFn(ctx, filter, page, perPage)
 }
 
-func (m *mockDevTaskService) Update(ctx context.Context, id string, req dto.DevTaskUpdate) error {
-	return m.updateFn(ctx, id, req)
+func (m *mockDevTaskService) Update(ctx context.Context, slug string, req dto.DevTaskUpdate) error {
+	return m.updateFn(ctx, slug, req)
 }
 
-func (m *mockDevTaskService) SoftDelete(ctx context.Context, id string) error {
-	return m.softDelFn(ctx, id)
+func (m *mockDevTaskService) SoftDelete(ctx context.Context, slug string) error {
+	return m.softDelFn(ctx, slug)
 }
 
-func (m *mockDevTaskService) HardDelete(ctx context.Context, id string) error {
-	return m.hardDelFn(ctx, id)
+func (m *mockDevTaskService) HardDelete(ctx context.Context, slug string) error {
+	return m.hardDelFn(ctx, slug)
 }
 
 func (m *mockDevTaskService) FindFrontier(ctx context.Context, limit int) ([]dto.DevTaskOut, error) {
@@ -100,14 +95,14 @@ func decodeResp(t *testing.T, body []byte) (data map[string]any, message string)
 	return resp.Data, resp.Message
 }
 
-const validID = "507f1f77bcf86cd799439011"
+const testSlug = "task-1"
 
 // ---------- CreateTask ----------
 
 func TestDevTask_CreateTask_Success(t *testing.T) {
 	svc := &mockDevTaskService{
 		createFn: func(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error) {
-			return &dto.DevTaskOut{ID: validID, Title: req.Title, Status: document.StatusTriage}, nil
+			return &dto.DevTaskOut{Title: req.Title, Status: document.StatusTriage, Slug: testSlug}, nil
 		},
 	}
 	r := newDevTaskHandler(svc)
@@ -123,8 +118,8 @@ func TestDevTask_CreateTask_Success(t *testing.T) {
 		t.Errorf("status = %d, want %d; body=%s", w.Code, http.StatusOK, w.Body.String())
 	}
 	data, msg := decodeResp(t, w.Body.Bytes())
-	if data["id"] != validID {
-		t.Errorf("data.id = %v, want %s", data["id"], validID)
+	if data["slug"] != testSlug {
+		t.Errorf("data.slug = %v, want %s", data["slug"], testSlug)
 	}
 	if msg != "Task created successfully" {
 		t.Errorf("message = %q", msg)
@@ -169,56 +164,39 @@ func TestDevTask_CreateTask_ServerError(t *testing.T) {
 	}
 }
 
-// ---------- GetTask ----------
+// ---------- GetTaskBySlug ----------
 
-func TestDevTask_GetTask_Success(t *testing.T) {
+func TestDevTask_GetTaskBySlug_Success(t *testing.T) {
 	svc := &mockDevTaskService{
-		getByIDFn: func(ctx context.Context, id string) (*dto.DevTaskOut, error) {
-			return &dto.DevTaskOut{ID: id, Title: "Fix bug"}, nil
+		getBySlugFn: func(ctx context.Context, slug string) (*dto.DevTaskOut, error) {
+			return &dto.DevTaskOut{Title: "Fix bug", Slug: slug}, nil
 		},
 	}
 	r := newDevTaskHandler(svc)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks/"+validID, nil)
+	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks/"+testSlug, nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
 		t.Errorf("status = %d, want %d; body=%s", w.Code, http.StatusOK, w.Body.String())
 	}
 	data, _ := decodeResp(t, w.Body.Bytes())
-	if data["id"] != validID {
-		t.Errorf("data.id = %v, want %s", data["id"], validID)
+	if data["slug"] != testSlug {
+		t.Errorf("data.slug = %v, want %s", data["slug"], testSlug)
 	}
 }
 
-func TestDevTask_GetTask_InvalidID(t *testing.T) {
+func TestDevTask_GetTaskBySlug_NotFound(t *testing.T) {
 	svc := &mockDevTaskService{
-		getByIDFn: func(ctx context.Context, id string) (*dto.DevTaskOut, error) {
-			return nil, errs.ErrInvalidTaskID
-		},
-	}
-	r := newDevTaskHandler(svc)
-
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks/not-hex", nil)
-	r.ServeHTTP(w, req)
-
-	if w.Code != http.StatusBadRequest {
-		t.Errorf("status = %d, want %d", w.Code, http.StatusBadRequest)
-	}
-}
-
-func TestDevTask_GetTask_NotFound(t *testing.T) {
-	svc := &mockDevTaskService{
-		getByIDFn: func(ctx context.Context, id string) (*dto.DevTaskOut, error) {
+		getBySlugFn: func(ctx context.Context, slug string) (*dto.DevTaskOut, error) {
 			return nil, errs.ErrTaskNotFound
 		},
 	}
 	r := newDevTaskHandler(svc)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks/"+validID, nil)
+	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks/"+testSlug, nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusNotFound {
@@ -302,12 +280,12 @@ func TestDevTask_ListTasks_WithFilters(t *testing.T) {
 
 func TestDevTask_UpdateTask_Success(t *testing.T) {
 	svc := &mockDevTaskService{
-		updateFn: func(ctx context.Context, id string, req dto.DevTaskUpdate) error { return nil },
+		updateFn: func(ctx context.Context, slug string, req dto.DevTaskUpdate) error { return nil },
 	}
 	r := newDevTaskHandler(svc)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPatch, "/api/v3/dev-tasks/"+validID, taskJSONBody(t, gin.H{
+	req, _ := http.NewRequest(http.MethodPatch, "/api/v3/dev-tasks/"+testSlug, taskJSONBody(t, gin.H{
 		"status": document.StatusDone,
 	}))
 	req.Header.Set("Content-Type", "application/json")
@@ -320,30 +298,12 @@ func TestDevTask_UpdateTask_Success(t *testing.T) {
 
 func TestDevTask_UpdateTask_InvalidBody(t *testing.T) {
 	svc := &mockDevTaskService{
-		updateFn: func(ctx context.Context, id string, req dto.DevTaskUpdate) error { return nil },
+		updateFn: func(ctx context.Context, slug string, req dto.DevTaskUpdate) error { return nil },
 	}
 	r := newDevTaskHandler(svc)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPatch, "/api/v3/dev-tasks/"+validID, bytes.NewReader([]byte("bad")))
-	req.Header.Set("Content-Type", "application/json")
-	r.ServeHTTP(w, req)
-
-	if w.Code != http.StatusBadRequest {
-		t.Errorf("status = %d, want %d", w.Code, http.StatusBadRequest)
-	}
-}
-
-func TestDevTask_UpdateTask_InvalidID(t *testing.T) {
-	svc := &mockDevTaskService{
-		updateFn: func(ctx context.Context, id string, req dto.DevTaskUpdate) error {
-			return errs.ErrInvalidTaskID
-		},
-	}
-	r := newDevTaskHandler(svc)
-
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPatch, "/api/v3/dev-tasks/bad-id", taskJSONBody(t, gin.H{"status": document.StatusDone}))
+	req, _ := http.NewRequest(http.MethodPatch, "/api/v3/dev-tasks/"+testSlug, bytes.NewReader([]byte("bad")))
 	req.Header.Set("Content-Type", "application/json")
 	r.ServeHTTP(w, req)
 
@@ -356,31 +316,16 @@ func TestDevTask_UpdateTask_InvalidID(t *testing.T) {
 
 func TestDevTask_SoftDelete_Success(t *testing.T) {
 	svc := &mockDevTaskService{
-		softDelFn: func(ctx context.Context, id string) error { return nil },
+		softDelFn: func(ctx context.Context, slug string) error { return nil },
 	}
 	r := newDevTaskHandler(svc)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodDelete, "/api/v3/dev-tasks/"+validID, nil)
+	req, _ := http.NewRequest(http.MethodDelete, "/api/v3/dev-tasks/"+testSlug, nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
 		t.Errorf("status = %d, want %d", w.Code, http.StatusOK)
-	}
-}
-
-func TestDevTask_SoftDelete_InvalidID(t *testing.T) {
-	svc := &mockDevTaskService{
-		softDelFn: func(ctx context.Context, id string) error { return errs.ErrInvalidTaskID },
-	}
-	r := newDevTaskHandler(svc)
-
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodDelete, "/api/v3/dev-tasks/zzz", nil)
-	r.ServeHTTP(w, req)
-
-	if w.Code != http.StatusBadRequest {
-		t.Errorf("status = %d, want %d", w.Code, http.StatusBadRequest)
 	}
 }
 
@@ -388,31 +333,16 @@ func TestDevTask_SoftDelete_InvalidID(t *testing.T) {
 
 func TestDevTask_HardDelete_Success(t *testing.T) {
 	svc := &mockDevTaskService{
-		hardDelFn: func(ctx context.Context, id string) error { return nil },
+		hardDelFn: func(ctx context.Context, slug string) error { return nil },
 	}
 	r := newDevTaskHandler(svc)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodDelete, "/api/v3/dev-tasks/"+validID+"/permanent", nil)
+	req, _ := http.NewRequest(http.MethodDelete, "/api/v3/dev-tasks/"+testSlug+"/permanent", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
 		t.Errorf("status = %d, want %d", w.Code, http.StatusOK)
-	}
-}
-
-func TestDevTask_HardDelete_InvalidID(t *testing.T) {
-	svc := &mockDevTaskService{
-		hardDelFn: func(ctx context.Context, id string) error { return errs.ErrInvalidTaskID },
-	}
-	r := newDevTaskHandler(svc)
-
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodDelete, "/api/v3/dev-tasks/nope/permanent", nil)
-	r.ServeHTTP(w, req)
-
-	if w.Code != http.StatusBadRequest {
-		t.Errorf("status = %d, want %d", w.Code, http.StatusBadRequest)
 	}
 }
 

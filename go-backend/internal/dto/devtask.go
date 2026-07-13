@@ -25,6 +25,10 @@ type DevTaskCreate struct {
 	ForAgent bool `json:"for_agent"`
 	// Dependencies: 必须在哪些任务完成后才能开始。
 	BlockedBy []string `json:"blocked_by"`
+	// Kind: spec（默认）或 subtask。零值 = spec。
+	Kind document.TaskKind `json:"kind"`
+	// ParentSlug: 子任务归属的 spec slug。nil = 无归属。
+	ParentSlug *string `json:"parent_slug"`
 }
 
 // DevTaskUpdate 更新任务请求（全字段可选，有值才更新）
@@ -46,6 +50,10 @@ type DevTaskUpdate struct {
 	ForAgent *bool `json:"for_agent"`
 	// Dependencies: 传了覆盖，不传不动。
 	BlockedBy *[]string `json:"blocked_by"`
+	// Kind: 传了覆盖，不传不动。spec / subtask。
+	Kind *document.TaskKind `json:"kind"`
+	// ParentSlug: 传了覆盖，不传不动。子任务归属的 spec slug。
+	ParentSlug *string `json:"parent_slug"`
 }
 
 // DevTaskOut 任务输出
@@ -73,6 +81,10 @@ type DevTaskOut struct {
 	ForAgent bool `json:"for_agent"`
 	// Dependencies
 	BlockedBy []string `json:"blocked_by"`
+	// Kind: spec / subtask。omitempty 让老文档（空串）不序列化。
+	Kind document.TaskKind `json:"kind,omitempty"`
+	// ParentSlug: 子任务归属的 spec slug。omitempty = 无归属。
+	ParentSlug *string `json:"parent_slug,omitempty"`
 }
 
 // DevTaskListOut 任务列表响应
@@ -102,8 +114,10 @@ func ToDevTaskOut(t document.DevTask) DevTaskOut {
 		Constraints:        t.Constraints,
 		ContextPointers:    t.ContextPointers,
 		ForAgent:  t.ForAgent,
-		BlockedBy: t.BlockedBy,
-		Slug:      t.Slug,
+		BlockedBy:   t.BlockedBy,
+		Slug:        t.Slug,
+		Kind:        t.Kind,
+		ParentSlug:  t.ParentSlug,
 	}
 }
 
