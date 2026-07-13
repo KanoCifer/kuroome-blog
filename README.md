@@ -56,7 +56,7 @@
 | **钓点智能分析** | 专家规则（9 特征加权）→ ML 残差校准（Ridge 回归），融合天气/潮汐数据，反馈闭环自动训练              |
 | **订阅管理**     | 付费订阅追踪、账单周期计算、月度费用统计、到期提醒（飞书/Bark/邮件，可配多渠道）                    |
 | **设备管理**     | 设备资产跟踪、里程碑提醒（100 天/1 年等）、每日成本分析、价格趋势图                                 |
-| **开发任务看板** | Kanban 三列（待办/进行中/完成），优先级排序、拖拽排序                                               |
+| **开发任务工作台** | 三视角工作台（推进/规划/回顾），优先级 P0-P3、类型与范围、验收标准与约束、依赖阻塞与 frontier 全局悬浮抽屉，Vue 桌面端                                  |
 | **留言板**       | 访客留言、审核管理                                                                                  |
 | **友链管理**     | 友链 CRUD、排序、每日精选轮换、友链申请表单                                                         |
 | **图库管理**     | 图片上传、瀑布流布局、全屏查看，DB + Redis 双写持久化存储                                           |
@@ -200,8 +200,8 @@ frontend/src/
 │   ├── moments/              # 碎碎念 API
 │   ├── public/               # 公共接口 API
 │   ├── rss/                  # RSS API
+│   ├── devtask/              # 开发任务 v3 API
 │   ├── shared/               # 共享请求封装
-│   ├── todo/                 # 待办 API
 │   └── weread/               # 微信读书 API
 ├── assets/                   # 静态资源 (CSS、图片、Lottie 动画)
 ├── auth/                     # 认证逻辑 (sideEffects)
@@ -228,7 +228,7 @@ frontend/src/
 │   ├── pic/                  # 图库 composables
 │   ├── rss/                  # RSS composables
 │   ├── shared/               # 共享 composables
-│   ├── todo/                 # 待办 composables
+│   ├── todo/                 # 开发任务 composables (drawer state)
 │   └── weread/               # 微信读书 composables
 ├── data/                     # 静态数据
 ├── layouts/                  # 布局组件
@@ -246,7 +246,7 @@ frontend/src/
 │   ├── readStats.ts          # 阅读统计状态
 │   ├── theme.ts              # 主题状态
 │   ├── tidePanel.ts          # 潮汐面板状态
-│   ├── todos.ts              # 待办状态
+│   ├── v3devtasks.ts         # 开发任务 v3 状态 (workspace store)
 │   └── visitorCount.ts       # 访客计数状态
 ├── types/                    # TypeScript 类型定义
 ├── utils/                    # 工具函数
@@ -265,7 +265,7 @@ frontend/src/
     ├── pic/                  # 图库管理 (瀑布流)
     ├── rss/                  # RSS 阅读器
     ├── subscription/         # 订阅管理 (费用/提醒)
-    ├── todos/                # 开发任务看板
+    ├── todos/                # 开发任务工作台 (推进/规划/回顾)
     └── toolbox/              # 图片工具箱 (压缩/格式转换)
 
 react-app/src/
@@ -439,18 +439,19 @@ flowchart LR
 | `/api/v2/device`        | 设备管理 (CRUD/里程碑/提醒)             |
 | `/api/v2/weather`       | 天气数据 (潮汐/完整天气)                |
 | `/api/v2/friend-links`  | 友链管理 (CRUD/排序)                    |
-| `/api/v2/devtasks`      | 开发任务看板 (CRUD/排序)                |
 | `/api/v2/system`        | 系统探活与日志 (/, /log)                |
 | `/api/v2/publicv2/ws`   | WebSocket 实时访客统计                  |
 | `/api/v3/auth`          | Go 后端认证 (登录/注册/Passkey/OAuth)   |
 | `/api/v3/blog`          | Go 后端博客只读接口                     |
 | `/api/v3/admin`         | Go 后端管理接口                         |
+| `/api/v3/dev-tasks`     | 开发任务工作台 (CRUD/排序/依赖/归档)    |
 | `/api/v3/system/events` | Go 后端事件日志查询                     |
 
-## 最近改动（v4.1.0 – v4.5.0）
+## 最近改动（v4.1.0 – v4.6.0）
 
 | 版本       | 日期  | 主要变更                                                                                       |
 | ---------- | ----- | ---------------------------------------------------------------------------------------------- |
+| **v4.6.0** | 07-13 | 开发任务 v2→v3 迁移：三视角工作台（推进/规划/回顾）、全局抽屉、spec/依赖字段，删除废弃 v2 栈 |
 | **v4.5.0** | 07-11 | DI 依赖注入改造（AppState + session 参数化）、slog access log 中间件、部署/飞书修复            |
 | **v4.4.0** | 07-10 | CORS 官方中间件替换、Blog 只读接口迁移 Go、启动飞书通知、duration middleware                   |
 | **v4.3.0** | 07-08 | slog 结构化日志体系落地（双文件路由 + trace_id + lumberjack）、event 表替代 access.log         |
