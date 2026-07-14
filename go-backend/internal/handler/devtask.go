@@ -14,15 +14,17 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/mongo/document"
 	"github.com/KanoCifer/kuroome-blog/internal/repository/mongodb"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
+	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
 // DevTaskService devtask 读表面 —— handler 依赖接口，便于 mock 测试。
 // 所有接口一律使用 slug 作为任务标识，不暴露 ObjectID。
 type DevTaskService interface {
 	Create(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error)
-	GetBySlug(ctx context.Context, slug string) (*dto.DevTaskOut, error)
+	GetBySlug(ctx context.Context, slug string, withParent bool) (*dto.DevTaskOut, error)
 	List(ctx context.Context, filter mongodb.ListFilter, page, perPage int) (*dto.DevTaskListOut, error)
 	Update(ctx context.Context, slug string, req dto.DevTaskUpdate) error
+	BatchUpdateStatus(ctx context.Context, slugs []string, status document.DevTaskStatus) (*service.BatchStatusResult, error)
 	SoftDelete(ctx context.Context, slug string) error
 	HardDelete(ctx context.Context, slug string) error
 	FindFrontier(ctx context.Context, limit int) ([]dto.DevTaskOut, error)
@@ -62,10 +64,12 @@ func (h *DevTaskHandler) CreateTask(c *gin.Context) {
 }
 
 // GetTaskBySlug 按 slug 查单条任务  GET /api/v3/dev-tasks/:slug
+// 可选查询参数 with_parent=true 触发附带父 spec 数据（仅当任务有 parent_slug 时）。
 func (h *DevTaskHandler) GetTaskBySlug(c *gin.Context) {
 	slug := c.Param("slug")
+	withParent := c.Query("with_parent") == "true"
 
-	data, err := h.svc.GetBySlug(c.Request.Context(), slug)
+	data, err := h.svc.GetBySlug(c.Request.Context(), slug, withParent)
 	if err != nil {
 		switch {
 		case errors.Is(err, errs.ErrTaskNotFound):
@@ -186,6 +190,27 @@ func (h *DevTaskHandler) HardDeleteTask(c *gin.Context) {
 	response.Success(c, nil, "Task permanently deleted")
 }
 
+// BatchStatus 批量修改任务状态  POST /api/v3/dev-tasks/batch-status
+// 一次把多个 slug（含 spec 父任务）翻到同一状态。
+func (h *DevTaskHandler) BatchStatus(c *gin.Context) {
+	var req dto.BatchStatusRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.APIError(c, err.Error())
+		return
+	}
+
+	result, err := h.svc.BatchUpdateStatus(c.Request.Context(), req.Slugs, req.Status)
+	if err != nil {
+		slog.ErrorContext(c.Request.Context(), "batch status update", "error", err)
+		response.APIError(c, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	response.Success(c, dto.BatchStatusResult{
+		Succeeded: result.Succeeded,
+		Failed:    result.Failed,
+	}, "Batch status update completed")
+}
+
 // RegisterRoutes 挂载 devtask 路由（service-JWT 鉴权）。全链路使用 slug 标识。
 func (h *DevTaskHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFunc) {
 	g := r.Group("/dev-tasks", authMW)
@@ -193,6 +218,7 @@ func (h *DevTaskHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFu
 	g.GET("", h.ListTasks)
 	// 静态前缀必须注册在 :slug 之前 —— Gin 路由按注册顺序匹配，:slug 会吞掉同级的静态 path。
 	g.GET("/frontier", h.FrontierTasks)
+	g.POST("/batch-status", h.BatchStatus)
 	g.GET("/:slug", h.GetTaskBySlug)
 	g.PATCH("/:slug", h.UpdateTask)
 	g.DELETE("/:slug", h.SoftDeleteTask)

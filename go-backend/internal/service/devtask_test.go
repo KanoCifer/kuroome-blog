@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/mongo/document"
@@ -22,9 +23,10 @@ type mockDevTaskRepo struct {
 	updateFn       func(ctx context.Context, slug string, fields bson.M) error
 	softDelFn      func(ctx context.Context, slug string) error
 	hardDelFn      func(ctx context.Context, slug string) error
-	archiveFn      func(ctx context.Context) (int64, error)
-	findFrontierFn func(ctx context.Context, limit int) ([]document.DevTask, error)
-	nextSlugSeqFn  func(ctx context.Context) (int, error)
+	archiveFn         func(ctx context.Context) (int64, error)
+	findFrontierFn    func(ctx context.Context, limit int) ([]document.DevTask, error)
+	nextSlugSeqFn     func(ctx context.Context) (int, error)
+	batchStatusFn     func(ctx context.Context, slugs []string, status document.DevTaskStatus) (int64, error)
 }
 
 func (m *mockDevTaskRepo) Create(ctx context.Context, task *document.DevTask) error {
@@ -68,6 +70,17 @@ func (m *mockDevTaskRepo) FindFrontier(ctx context.Context, limit int) ([]docume
 func (m *mockDevTaskRepo) NextSlugSeq(ctx context.Context) (int, error) {
 	if m.nextSlugSeqFn != nil {
 		return m.nextSlugSeqFn(ctx)
+	}
+	return 0, nil
+}
+
+func (m *mockDevTaskRepo) BatchUpdateStatus(
+	ctx context.Context,
+	slugs []string,
+	status document.DevTaskStatus,
+) (int64, error) {
+	if m.batchStatusFn != nil {
+		return m.batchStatusFn(ctx, slugs, status)
 	}
 	return 0, nil
 }
@@ -285,6 +298,218 @@ func TestDevTaskService_ArchiveDoneTasks(t *testing.T) {
 	}
 	if n != 5 {
 		t.Errorf("n = %d, want 5", n)
+	}
+}
+
+// ---------- GetBySlug ----------
+
+func TestDevTaskService_GetBySlug_NoParent(t *testing.T) {
+	repo := &mockDevTaskRepo{
+		getBySlugFn: func(ctx context.Context, slug string) (*document.DevTask, error) {
+			return &document.DevTask{Slug: slug, Title: "spec task"}, nil
+		},
+	}
+	svc := newService(repo)
+
+	out, err := svc.GetBySlug(context.Background(), testSlug, false)
+	if err != nil {
+		t.Fatalf("GetBySlug: %v", err)
+	}
+	if out.Parent != nil {
+		t.Errorf("Parent = %+v, want nil (no parent_slug)", out.Parent)
+	}
+}
+
+func TestDevTaskService_GetBySlug_WithParent(t *testing.T) {
+	repo := &mockDevTaskRepo{
+		getBySlugFn: func(ctx context.Context, slug string) (*document.DevTask, error) {
+			switch slug {
+			case "child-1":
+				parent := "task-1"
+				return &document.DevTask{
+					Slug: "child-1", Title: "subtask", Kind: document.TaskKindSubTask, ParentSlug: &parent,
+				}, nil
+			case "task-1":
+				return &document.DevTask{Slug: "task-1", Title: "parent spec", Kind: document.TaskKindSpec}, nil
+			default:
+				return nil, errors.New("not found")
+			}
+		},
+	}
+	svc := newService(repo)
+
+	out, err := svc.GetBySlug(context.Background(), "child-1", true)
+	if err != nil {
+		t.Fatalf("GetBySlug: %v", err)
+	}
+	if out.Parent == nil {
+		t.Fatal("Parent = nil, want parent spec data")
+	}
+	if out.Parent.Slug != "task-1" || out.Parent.Title != "parent spec" {
+		t.Errorf("Parent = %+v, want slug=task-1 title=parent spec", out.Parent)
+	}
+}
+
+func TestDevTaskService_GetBySlug_TrueButNoParentSlug(t *testing.T) {
+	// withParent=true 但任务本身没有 parent_slug 时，只查一次 DB，Parent=nil。
+	queryCount := 0
+	repo := &mockDevTaskRepo{
+		getBySlugFn: func(ctx context.Context, slug string) (*document.DevTask, error) {
+			queryCount++
+			return &document.DevTask{Slug: slug, Title: "plain spec", Kind: document.TaskKindSpec}, nil
+		},
+	}
+	svc := newService(repo)
+
+	out, err := svc.GetBySlug(context.Background(), testSlug, true)
+	if err != nil {
+		t.Fatalf("GetBySlug: %v", err)
+	}
+	if queryCount != 1 {
+		t.Errorf("repo.GetBySlug called %d times, want 1 (no parent_slug should skip second query)", queryCount)
+	}
+	if out.Parent != nil {
+		t.Errorf("Parent = %+v, want nil", out.Parent)
+	}
+}
+
+func TestDevTaskService_GetBySlug_SkipWhenFalse(t *testing.T) {
+	// withParent=false 即使有 parent_slug 也不触发第二次查询。
+	queryCount := 0
+	parent := "task-1"
+	repo := &mockDevTaskRepo{
+		getBySlugFn: func(ctx context.Context, slug string) (*document.DevTask, error) {
+			queryCount++
+			return &document.DevTask{Slug: slug, ParentSlug: &parent}, nil
+		},
+	}
+	svc := newService(repo)
+
+	out, err := svc.GetBySlug(context.Background(), "child-1", false)
+	if err != nil {
+		t.Fatalf("GetBySlug: %v", err)
+	}
+	if queryCount != 1 {
+		t.Errorf("repo.GetBySlug called %d times, want 1 (withParent=false skips parent lookup)", queryCount)
+	}
+	if out.Parent != nil {
+		t.Errorf("Parent = %+v, want nil", out.Parent)
+	}
+}
+
+func TestDevTaskService_GetBySlug_ParentNotFound(t *testing.T) {
+	// 父任务不存在时仍然返回子任务，Parent 为 nil（不阻塞主流程）。
+	repo := &mockDevTaskRepo{
+		getBySlugFn: func(ctx context.Context, slug string) (*document.DevTask, error) {
+			switch slug {
+			case "child-99":
+				parent := "ghost"
+				return &document.DevTask{Slug: "child-99", ParentSlug: &parent}, nil
+			default:
+				return nil, mongo.ErrNoDocuments
+			}
+		},
+	}
+	svc := newService(repo)
+
+	out, err := svc.GetBySlug(context.Background(), "child-99", true)
+	if err != nil {
+		t.Fatalf("GetBySlug: %v", err)
+	}
+	if out.Parent != nil {
+		t.Errorf("Parent = %+v, want nil (parent doc not found)", out.Parent)
+	}
+}
+
+// ---------- BatchUpdateStatus ----------
+
+func TestDevTaskService_BatchStatus_AllFound(t *testing.T) {
+	repo := &mockDevTaskRepo{
+		getBySlugFn: func(ctx context.Context, slug string) (*document.DevTask, error) {
+			return &document.DevTask{Slug: slug, Status: document.StatusTriage}, nil
+		},
+		batchStatusFn: func(ctx context.Context, slugs []string, status document.DevTaskStatus) (int64, error) {
+			return int64(len(slugs)), nil
+		},
+	}
+	svc := newService(repo)
+
+	result, err := svc.BatchUpdateStatus(context.Background(), []string{"task-5", "task-6"}, document.StatusBacklog)
+	if err != nil {
+		t.Fatalf("BatchUpdateStatus: %v", err)
+	}
+	if len(result.Succeeded) != 2 || len(result.Failed) != 0 {
+		t.Errorf("result = %+v, want 2 succeeded + 0 failed", result)
+	}
+}
+
+func TestDevTaskService_BatchStatus_SomeMissing(t *testing.T) {
+	repo := &mockDevTaskRepo{
+		getBySlugFn: func(ctx context.Context, slug string) (*document.DevTask, error) {
+			if slug == "ghost" {
+				return nil, mongo.ErrNoDocuments
+			}
+			return &document.DevTask{Slug: slug, Status: document.StatusTriage}, nil
+		},
+		batchStatusFn: func(ctx context.Context, slugs []string, status document.DevTaskStatus) (int64, error) {
+			return int64(len(slugs)), nil
+		},
+	}
+	svc := newService(repo)
+
+	result, err := svc.BatchUpdateStatus(context.Background(), []string{"task-5", "ghost", "task-6"}, "待排期")
+	if err != nil {
+		t.Fatalf("BatchUpdateStatus: %v", err)
+	}
+	if len(result.Succeeded) != 2 {
+		t.Errorf("succeeded = %v, want 2", result.Succeeded)
+	}
+	if result.Failed["ghost"] == "" {
+		t.Errorf("ghost should be in failed, got %v", result.Failed)
+	}
+}
+
+func TestDevTaskService_BatchStatus_AlreadyTarget(t *testing.T) {
+	// 已经是目标状态 → 不进 pending，不写 DB，仍视为 succeeded。
+	repoCalls := 0
+	repo := &mockDevTaskRepo{
+		getBySlugFn: func(ctx context.Context, slug string) (*document.DevTask, error) {
+			repoCalls++
+			return &document.DevTask{Slug: slug, Status: document.StatusBacklog}, nil
+		},
+		batchStatusFn: func(ctx context.Context, slugs []string, status document.DevTaskStatus) (int64, error) {
+			repoCalls++
+			return 0, nil
+		},
+	}
+	svc := newService(repo)
+
+	result, err := svc.BatchUpdateStatus(context.Background(), []string{"task-5"}, document.StatusBacklog)
+	if err != nil {
+		t.Fatalf("BatchUpdateStatus: %v", err)
+	}
+	if len(result.Succeeded) != 1 {
+		t.Errorf("succeeded = %v, want [task-5]", result.Succeeded)
+	}
+	if repoCalls != 1 {
+		t.Errorf("repo called %d times, want 1 (no-op for already-target)", repoCalls)
+	}
+}
+
+func TestDevTaskService_BatchStatus_RepoError(t *testing.T) {
+	repo := &mockDevTaskRepo{
+		getBySlugFn: func(ctx context.Context, slug string) (*document.DevTask, error) {
+			return &document.DevTask{Slug: slug, Status: document.StatusTriage}, nil
+		},
+		batchStatusFn: func(ctx context.Context, slugs []string, status document.DevTaskStatus) (int64, error) {
+			return 0, errors.New("mongo down")
+		},
+	}
+	svc := newService(repo)
+
+	_, err := svc.BatchUpdateStatus(context.Background(), []string{"task-5"}, document.StatusBacklog)
+	if err == nil {
+		t.Fatal("expected error, got nil")
 	}
 }
 

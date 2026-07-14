@@ -23,6 +23,7 @@ type DevTaskRepository interface {
 	GetBySlug(ctx context.Context, slug string) (*document.DevTask, error)
 	List(ctx context.Context, filter mongodb.ListFilter, page, perPage int) ([]document.DevTask, int64, error)
 	Update(ctx context.Context, slug string, fields bson.M) error
+	BatchUpdateStatus(ctx context.Context, slugs []string, status document.DevTaskStatus) (int64, error)
 	SoftDelete(ctx context.Context, slug string) error
 	HardDelete(ctx context.Context, slug string) error
 	ArchiveDoneTasks(ctx context.Context) (int64, error)
@@ -222,6 +223,57 @@ func (s *DevTaskService) Update(ctx context.Context, slug string, req dto.DevTas
 	return nil
 }
 
+// BatchStatusResult 批量状态修改结果 —— service 返回给 handler 的分组。
+type BatchStatusResult struct {
+	Succeeded []string
+	Failed    map[string]string
+}
+
+// BatchUpdateStatus 批量按 slug 改状态。
+// 先把 caller 传入的 slug 分成两组：DB 中能找到（未软删）的 → 调用 repo 写一次
+// UpdateMany；找不到的 → 失败。返回 succeeded 列表 + 失败 map。
+func (s *DevTaskService) BatchUpdateStatus(
+	ctx context.Context,
+	slugs []string,
+	status document.DevTaskStatus,
+) (*BatchStatusResult, error) {
+	result := &BatchStatusResult{
+		Succeeded: make([]string, 0, len(slugs)),
+		Failed:    make(map[string]string),
+	}
+
+	// existence probe —— 确定每个 slug 是否能被更新。
+	pending := make([]string, 0, len(slugs))
+	for _, slug := range slugs {
+		task, err := s.repo.GetBySlug(ctx, slug)
+		if err != nil {
+			if errors.Is(err, mongo.ErrNoDocuments) {
+				result.Failed[slug] = "task not found"
+				continue
+			}
+			slog.Error("batch status: probe slug", "error", err, "slug", slug)
+			return nil, err
+		}
+		// 已经是目标状态 → 视为成功，无需再写一次（避免无谓 updated_at 推进）。
+		if task.Status == status {
+			result.Succeeded = append(result.Succeeded, slug)
+			continue
+		}
+		pending = append(pending, slug)
+	}
+
+	if len(pending) > 0 {
+		_, err := s.repo.BatchUpdateStatus(ctx, pending, status)
+		if err != nil {
+			slog.Error("batch status: update many", "error", err, "status", status)
+			return nil, err
+		}
+		result.Succeeded = append(result.Succeeded, pending...)
+	}
+
+	return result, nil
+}
+
 // SoftDelete 逻辑删除。
 func (s *DevTaskService) SoftDelete(ctx context.Context, slug string) error {
 	if err := s.repo.SoftDelete(ctx, slug); err != nil {
@@ -252,7 +304,10 @@ func (s *DevTaskService) ArchiveDoneTasks(ctx context.Context) (int64, error) {
 }
 
 // GetBySlug 按 slug 查单条任务（slug 用 task-N 格式）。
-func (s *DevTaskService) GetBySlug(ctx context.Context, slug string) (*dto.DevTaskOut, error) {
+// withParent=true 且任务有 parent_slug 时，额外附带父 spec 的 DevTaskOut 到
+// Parent 字段，便于前端一次拿到子任务 + spec 上下文；父任务不存在仅 warn
+// 不阻塞返回。withParent=false 跳过第二次查询。
+func (s *DevTaskService) GetBySlug(ctx context.Context, slug string, withParent bool) (*dto.DevTaskOut, error) {
 	if slug == "" {
 		return nil, errs.ErrTaskNotFound
 	}
@@ -265,6 +320,17 @@ func (s *DevTaskService) GetBySlug(ctx context.Context, slug string) (*dto.DevTa
 		return nil, err
 	}
 	out := serializeTask(*task)
+
+	if withParent && task.ParentSlug != nil {
+		parent, err := s.repo.GetBySlug(ctx, *task.ParentSlug)
+		if err != nil {
+			slog.Warn("get parent dev task", "error", err, "slug", *task.ParentSlug)
+		} else {
+			parentOut := serializeTask(*parent)
+			out.Parent = &parentOut
+		}
+	}
+
 	return &out, nil
 }
 

@@ -85,6 +85,25 @@ type DevTaskOut struct {
 	Kind document.TaskKind `json:"kind,omitempty"`
 	// ParentSlug: 子任务归属的 spec slug。omitempty = 无归属。
 	ParentSlug *string `json:"parent_slug,omitempty"`
+	// Parent: 当 ParentSlug 存在时，附带父 spec 的数据。omitempty = 子任务/
+	//         无父任务时无该字段。自引用结构，便于前端一次拿到上下文。
+	Parent *DevTaskOut `json:"parent,omitempty"`
+}
+
+// BatchStatusRequest 批量修改任务状态请求
+type BatchStatusRequest struct {
+	// Slugs 要修改状态的任务 slug 列表（1..20）。
+	Slugs []string `json:"slugs" binding:"required,min=1,max=20"`
+	// Status 目标状态（"待评估" / "待排期" / "进行中" / "已搁置" / "已完成"）。
+	Status document.DevTaskStatus `json:"status" binding:"required"`
+}
+
+// BatchStatusResult 批量修改任务状态响应
+type BatchStatusResult struct {
+	// Succeeded 已更新状态的任务 slug 列表。
+	Succeeded []string `json:"succeeded"`
+	// Failed 失败的任务 slug → 原因。
+	Failed map[string]string `json:"failed"`
 }
 
 // DevTaskListOut 任务列表响应
@@ -115,9 +134,9 @@ func ToDevTaskOut(t document.DevTask) DevTaskOut {
 		ContextPointers:    t.ContextPointers,
 		ForAgent:  t.ForAgent,
 		BlockedBy:   t.BlockedBy,
-		Slug:        t.Slug,
-		Kind:        t.Kind,
-		ParentSlug:  t.ParentSlug,
+		Slug:       t.Slug,
+		Kind:       t.Kind,
+		ParentSlug: t.ParentSlug,
 	}
 }
 

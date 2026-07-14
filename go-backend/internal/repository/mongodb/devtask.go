@@ -105,6 +105,31 @@ func (r *DevTaskRepository) List(
 	return tasks, total, nil
 }
 
+// BatchUpdateStatus 批量按 slug 改状态 + touched_at。
+// filter 含 slug∈slugs，故只更新匹配的文档。返回 modifiedCount 由 service 层
+// 用于构造 succeeded 列表；不在库是因为库不感知"哪些 slug 是 caller 传入的"。
+func (r *DevTaskRepository) BatchUpdateStatus(
+	ctx context.Context,
+	slugs []string,
+	status document.DevTaskStatus,
+) (modified int64, err error) {
+	if len(slugs) == 0 {
+		return 0, nil
+	}
+	res, err := r.db.UpdateMany(
+		ctx,
+		bson.M{"slug": bson.M{"$in": slugs}, "is_deleted": false},
+		bson.M{"$set": bson.M{
+			"status":     status,
+			"updated_at": time.Now(),
+		}},
+	)
+	if err != nil {
+		return 0, err
+	}
+	return res.ModifiedCount, nil
+}
+
 // Update 部分更新任务；fields 已由 service 层组装好（含 updated_at）。
 func (r *DevTaskRepository) Update(ctx context.Context, slug string, fields bson.M) error {
 	_, err := r.db.UpdateOne(
