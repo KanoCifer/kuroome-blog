@@ -1,5 +1,36 @@
 [
   {
+    "version": "4.7.0",
+    "date": "2026-07-14",
+    "title": "开发任务看板 v3 全栈上线与双前端监控迁移",
+    "changes": [
+      {
+        "type": "feature",
+        "content": "开发任务看板 v3 全栈上线:三视角工作台(推进/规划/回顾)+ 分屏详情面板(四步状态流转主线、已搁置旁路);新增 spec/slug/dependency 字段、scope 去 enum、frontier 查询;markdown 渲染贯穿卡片/详情、批量状态端点、MCP service-token 鉴权与 DevTaskMiddleware"
+      },
+      {
+        "type": "feature",
+        "content": "双前端监控迁移至 Go v3:server/status SSE 流(gopsutil)、DB 查询端点(overview/visitors/user-logins);Vue + React analytics gateway 统一迁入 /api/v3"
+      },
+      {
+        "type": "feature",
+        "content": "博客新增阅读量计数与点赞接口,post-views 聚合图表"
+      },
+      {
+        "type": "fix",
+        "content": "修复 devtask fetch 鉴权守卫与登出空态;图表无限 resize、表名错误、WS 跨域;博客审计问题(孤立内容/阴影/token);主题 muted-text 对比度与日志终端镜像输出"
+      },
+      {
+        "type": "refactor",
+        "content": "移除 mongo-backed 管理/普通接口 session 依赖;对齐 Python WS Redis 键至 ws: 命名空间;visitor tracks 由 Go 直写 PostgreSQL"
+      },
+      {
+        "type": "style",
+        "content": "首页/books/fishing/后台监控等多页面样式打磨与响应式 & a11y 优化"
+      }
+    ]
+  },
+  {
     "version": "4.6.1",
     "date": "2026-07-12",
     "title": "访客追踪链路改造:直写 PostgreSQL,移除反复失败的 Redis 缓冲层",
