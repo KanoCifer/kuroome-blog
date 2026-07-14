@@ -209,7 +209,7 @@ func runDeployment() {
 // days 可选，1..365，默认 1h（兼容看板自身短期 token）；传 days 后按整天计算，
 // 用于 MCP server 等长期服务鉴权。
 func (h *AdminHandler) DevTaskToken(c *gin.Context) {
-	if config.Cfg.Security.DevTaskSecret == "" {
+	if h.cfg.Security.DevTaskSecret == "" {
 		response.APIError(c, "devtask secret not configured", http.StatusServiceUnavailable)
 		return
 	}
@@ -224,7 +224,7 @@ func (h *AdminHandler) DevTaskToken(c *gin.Context) {
 		expiresAt = time.Now().AddDate(0, 0, days)
 	}
 
-	token, err := jwt.GenerateServiceToken(expiresAt, config.Cfg.Security.DevTaskSecret)
+	token, err := jwt.GenerateServiceToken(expiresAt, h.cfg.Security.DevTaskSecret)
 	if err != nil {
 		slog.ErrorContext(c.Request.Context(), "generate devtask service token", "error", err)
 		response.APIError(c, "failed to generate token", http.StatusInternalServerError)
