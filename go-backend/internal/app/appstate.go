@@ -1,6 +1,10 @@
 package app
 
 import (
+	"github.com/go-webauthn/webauthn/webauthn"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"gorm.io/gorm"
+
 	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
@@ -21,29 +25,35 @@ type AppState struct {
 }
 
 // NewAppState 组装所有 service，作为唯一的组合根入口。
+//
+// main.go 仅负责构造基础依赖 (db / mongo / redis / webauthn) 并传入；
+// 所有 service 在此统一构造，不再散落 main.go。
 func NewAppState(
 	cfg *config.Config,
-	userRepo *postgres.UserRepo,
-	adminRepo *postgres.AdminRepo,
-	visitorRepo *postgres.VisitorRepo,
-	eventRepo *postgres.EventRepo,
-	blogSvc *service.BlogService,
-	devTaskSvc *service.DevTaskService,
+	db *gorm.DB,
+	mongoDB *mongo.Database,
 	redis *redis.Client,
-	passkeySvc *service.PasskeyService,
-	wssvc *service.WSService,
+	wa *webauthn.WebAuthn,
 ) *AppState {
+	// -- repos ------------------------------------------------------- //
+	userRepo := postgres.NewUserRepo(db)
+	adminRepo := postgres.NewAdminRepo(mongoDB)
+	visitorRepo := postgres.NewVisitorRepo(db)
+	eventRepo := postgres.NewEventRepo(db)
+	passkeyRepo := postgres.NewPasskeyRepo(db)
+
+	// -- services ---------------------------------------------------- //
 	userSvc := service.NewUserService(userRepo, redis, cfg.Admin.UserIDs)
 	return &AppState{
 		config:     cfg,
 		userSvc:    userSvc,
 		adminSvc:   service.NewAdminService(adminRepo, visitorRepo, redis),
-		blogSvc:    blogSvc,
-		devTaskSvc: devTaskSvc,
-		passkeySvc: passkeySvc,
+		blogSvc:    service.NewBlogService(mongoDB),
+		devTaskSvc: service.NewDevTaskService(mongoDB),
+		passkeySvc: service.NewPasskeyService(wa, redis, passkeyRepo, userRepo),
 		monitorSvc: service.NewMonitorService(visitorRepo, userRepo),
 		systemSvc:  service.NewSystemService(eventRepo),
-		wssvc:      wssvc,
+		wssvc:      service.NewWSService(redis),
 		githubOAuth: service.NewGitHubOAuth(
 			redis, userRepo, userSvc,
 			cfg.GitHub.ClientID, cfg.GitHub.ClientSecret, cfg.GitHub.RedirectURI,

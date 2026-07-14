@@ -11,7 +11,6 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/db"
 	"github.com/KanoCifer/kuroome-blog/internal/logger"
-	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 	"github.com/KanoCifer/kuroome-blog/internal/router"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 	"github.com/KanoCifer/kuroome-blog/pkg/notification"
@@ -65,22 +64,13 @@ func main() {
 	if err != nil {
 		slog.Error("init webauthn", "error", err)
 	}
-	passkeySvc := service.NewPasskeyService(wa, db.GetRedis(), postgres.NewPasskeyRepo(db.GetDB()), postgres.NewUserRepo(db.GetDB()))
-	blogSvc := service.NewBlogService(db.GetMongoDB())
-	devTaskSvc := service.NewDevTaskService(db.GetMongoDB())
-	wssvc := service.NewWSService(db.GetRedis())
 
 	state := app.NewAppState(
 		config.Cfg,
-		postgres.NewUserRepo(db.GetDB()),
-		postgres.NewAdminRepo(db.GetMongoDB()),
-		postgres.NewVisitorRepo(db.GetDB()),
-		postgres.NewEventRepo(db.GetDB()),
-		blogSvc,
-		devTaskSvc,
+		db.GetDB(),
+		db.GetMongoDB(),
 		db.GetRedis(),
-		passkeySvc,
-		wssvc,
+		wa,
 	)
 
 	router.Setup(r, state, db.GetRedis())
