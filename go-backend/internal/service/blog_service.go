@@ -60,7 +60,7 @@ func serializePosts(posts []document.Post) []dto.PostOut {
 	return out
 }
 
-func pagination(page, perPage, total int) dto.PaginationOut {
+func pagination(page, perPage, total int) dto.Pagination {
 	pages := 0
 	if perPage > 0 {
 		pages = (total + perPage - 1) / perPage
@@ -74,7 +74,7 @@ func pagination(page, perPage, total int) dto.PaginationOut {
 		v := page + 1
 		next = &v
 	}
-	return dto.PaginationOut{
+	return dto.Pagination{
 		Page:    page,
 		PerPage: perPage,
 		Total:   total,

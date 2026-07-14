@@ -109,7 +109,7 @@ type BatchStatusResult struct {
 // DevTaskListOut 任务列表响应
 type DevTaskListOut struct {
 	Tasks      []DevTaskOut   `json:"tasks"`
-	Pagination PaginationOut  `json:"pagination"`
+	Pagination Pagination  `json:"pagination"`
 }
 
 // ToDevTaskOut 从 document.DevTask 转换为 DTO

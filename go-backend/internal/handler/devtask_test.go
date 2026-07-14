@@ -248,7 +248,7 @@ func TestDevTask_ListTasks_Success(t *testing.T) {
 					{ID: "1", Title: "a"},
 					{ID: "2", Title: "b"},
 				},
-				Pagination: dto.PaginationOut{Page: 1, PerPage: 10, Total: 2, Pages: 1},
+				Pagination: dto.Pagination{Page: 1, PerPage: 10, Total: 2, Pages: 1},
 			}, nil
 		},
 	}
@@ -271,7 +271,7 @@ func TestDevTask_ListTasks_Success(t *testing.T) {
 func TestDevTask_ListTasks_Empty(t *testing.T) {
 	svc := &mockDevTaskService{
 		listFn: func(ctx context.Context, filter mongodb.ListFilter, page, perPage int) (*dto.DevTaskListOut, error) {
-			return &dto.DevTaskListOut{Tasks: []dto.DevTaskOut{}, Pagination: dto.PaginationOut{Page: 1}}, nil
+			return &dto.DevTaskListOut{Tasks: []dto.DevTaskOut{}, Pagination: dto.Pagination{Page: 1}}, nil
 		},
 	}
 	r := newDevTaskHandler(svc)

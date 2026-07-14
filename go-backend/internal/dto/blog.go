@@ -26,23 +26,11 @@ type TagOut struct {
 	Count int    `json:"count"`
 }
 
-// PaginationOut 分页元数据 —— 与 Python get_blogs.pagination 形状一致。
-type PaginationOut struct {
-	Page    int  `json:"page"`
-	PerPage int  `json:"per_page"`
-	Total   int  `json:"total"`
-	Pages   int  `json:"pages"`
-	HasPrev bool `json:"has_prev"`
-	HasNext bool `json:"has_next"`
-	PrevNum *int `json:"prev_num"`
-	NextNum *int `json:"next_num"`
-}
-
 // BlogListOut 博客列表响应 —— 与 Python get_blogs 返回形状一致。
 type BlogListOut struct {
-	Posts      []PostOut     `json:"posts"`
-	Tags       []TagOut      `json:"tags"`
-	Pagination PaginationOut `json:"pagination"`
+	Posts      []PostOut  `json:"posts"`
+	Tags       []TagOut   `json:"tags"`
+	Pagination Pagination `json:"pagination"`
 }
 
 // PostsByTagOut 标签筛选响应 —— 与 Python get_posts_by_tag 返回形状一致。
