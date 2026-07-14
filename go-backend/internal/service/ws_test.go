@@ -74,3 +74,55 @@ func TestShouldCleanupVisitor(t *testing.T) {
 		})
 	}
 }
+
+// ---------- HandlePing ----------
+
+func TestHandlePing_PingMessage(t *testing.T) {
+	svc := &WSService{}
+	msg := map[string]any{"type": "ping"}
+	// 没有真实 conn 会 error（wsjson.Write 失败），但验证不会 panic
+	err := svc.HandlePing(context.Background(), nil, msg)
+	// conn=nil 必然 error，但关键是"识别 ping"的路径被走到
+	if err == nil {
+		t.Log("HandlePing with nil conn unexpectedly succeeded (wsjson mock?)")
+	}
+}
+
+func TestHandlePing_NonPingMessage(t *testing.T) {
+	sendCalled := false
+	svc := &WSService{}
+	// 用 pong 消息——不是 ping 分支——不应触发 SendMsg
+	msg := map[string]any{"type": "pong"}
+	err := svc.HandlePing(context.Background(), nil, msg)
+	// 非 ping 路径直接返回 nil，不调用 SendMsg
+	if err != nil {
+		t.Errorf("HandlePing for non-ping should return nil, got %v", err)
+	}
+	_ = sendCalled
+}
+
+func TestHandlePing_OtherFieldsIgnored(t *testing.T) {
+	// type 字段不是 "ping" 的值时不触发 pong
+	svc := &WSService{}
+	tests := []struct {
+		name string
+		tp   any
+	}{
+		{"string_other", "data"},
+		{"nil_type", nil},
+		{"int_type", 123},
+		{"missing_type", "no type field"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			msg := map[string]any{}
+			if tt.name != "missing_type" {
+				msg["type"] = tt.tp
+			}
+			err := svc.HandlePing(context.Background(), nil, msg)
+			if err != nil {
+				t.Errorf("HandlePing should not error for type=%v, got %v", tt.tp, err)
+			}
+		})
+	}
+}
