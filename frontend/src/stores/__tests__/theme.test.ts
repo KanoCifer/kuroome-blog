@@ -1,9 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  isColorScheme,
-  COLOR_SCHEMES,
-  type ColorScheme,
-} from '../theme';
+import { isColorScheme, COLOR_SCHEMES, type ColorScheme } from '../theme';
 
 describe('theme utils', () => {
   describe('isColorScheme', () => {

@@ -25,10 +25,7 @@ function getProbe(): CanvasRenderingContext2D | null {
  * 仅用在客户端(onMounted)——CSS 变量在此时已存在,解析到对应 rgb。
  * fallback 供解析失败或 SSR 兜底;默认黑色,保证 ECharts 一定拿到合法色值。
  */
-export function resolveCssColor(
-  cssVar: string,
-  fallback = '#000000',
-): string {
+export function resolveCssColor(cssVar: string, fallback = '#000000'): string {
   if (typeof document === 'undefined') return fallback;
   const raw = getComputedStyle(document.documentElement)
     .getPropertyValue(cssVar)

@@ -2,7 +2,9 @@
   <div
     class="border-border/60 bg-background h-full rounded-3xl border p-6 shadow-sm"
   >
-    <h2 class="text-foreground mb-2 flex items-center gap-2 text-sm font-medium">
+    <h2
+      class="text-foreground mb-2 flex items-center gap-2 text-sm font-medium"
+    >
       <icon-document-text class="size-5" /> 文章阅读量
     </h2>
     <p class="text-muted-foreground mb-4 text-xs">
@@ -24,11 +26,7 @@
       </p>
     </div>
     <div v-else class="h-80 w-full overflow-hidden">
-      <v-chart
-        :option="chartOption"
-        autoresize
-        class="h-full w-full"
-      />
+      <v-chart :option="chartOption" autoresize class="h-full w-full" />
     </div>
   </div>
 </template>

@@ -14,7 +14,9 @@
         <slot name="icon" />
       </div>
     </div>
-    <span class="text-foreground block text-2xl leading-tight font-medium tabular-nums">
+    <span
+      class="text-foreground block text-2xl leading-tight font-medium tabular-nums"
+    >
       {{ formattedValue }}
     </span>
     <div v-if="$slots.footer" class="text-xs">

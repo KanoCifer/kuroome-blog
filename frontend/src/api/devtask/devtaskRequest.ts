@@ -32,8 +32,7 @@ devtaskRequest.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<ApiResponse>) => {
     const cfg = error.config as
-      | (typeof error.config & { _retry?: boolean })
-      | undefined;
+      (typeof error.config & { _retry?: boolean }) | undefined;
 
     if (error.response?.status === 401 && cfg && !cfg._retry) {
       cfg._retry = true;

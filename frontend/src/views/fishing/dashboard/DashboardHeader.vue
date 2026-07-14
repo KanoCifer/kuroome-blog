@@ -26,7 +26,7 @@ defineEmits<{
       class="mx-auto flex max-w-screen-2xl items-center justify-between px-4 py-3 sm:px-6"
     >
       <div class="flex items-baseline gap-3">
-        <h1 class="text-foreground font-serif text-xl text-wrap-balance">
+        <h1 class="text-foreground text-wrap-balance font-serif text-xl">
           钓鱼地图
         </h1>
         <span

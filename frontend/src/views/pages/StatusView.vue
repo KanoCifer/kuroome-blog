@@ -838,7 +838,9 @@ onUnmounted(() => {
             v-for="(event, idx) in recentEvents"
             :key="event.id"
             class="border-border flex items-start gap-3 px-4 py-2.5"
-            :class="idx < recentEvents.length - 1 ? 'border-b border-dashed' : ''"
+            :class="
+              idx < recentEvents.length - 1 ? 'border-b border-dashed' : ''
+            "
           >
             <span class="text-muted-foreground shrink-0 tabular-nums">
               {{ formatLogTime(event.timestamp) }}

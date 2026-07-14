@@ -51,12 +51,24 @@ Object.defineProperty(window, 'matchMedia', {
 // happy-dom 默认不提供 localStorage，用内存模拟
 class MockLocalStorage implements Storage {
   private store = new Map<string, string>();
-  get length() { return this.store.size; }
-  clear() { this.store.clear(); }
-  getItem(key: string) { return this.store.get(key) ?? null; }
-  setItem(key: string, value: string) { this.store.set(key, String(value)); }
-  removeItem(key: string) { this.store.delete(key); }
-  key(index: number) { return [...this.store.keys()][index] ?? null; }
+  get length() {
+    return this.store.size;
+  }
+  clear() {
+    this.store.clear();
+  }
+  getItem(key: string) {
+    return this.store.get(key) ?? null;
+  }
+  setItem(key: string, value: string) {
+    this.store.set(key, String(value));
+  }
+  removeItem(key: string) {
+    this.store.delete(key);
+  }
+  key(index: number) {
+    return [...this.store.keys()][index] ?? null;
+  }
 }
 if (typeof localStorage === 'undefined') {
   Object.defineProperty(global, 'localStorage', {

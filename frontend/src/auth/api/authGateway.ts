@@ -156,10 +156,10 @@ export function createAuthGateway(): AuthGateway {
     },
 
     async login(username: string, password: string): Promise<LoginResult> {
-      const res = await request.post<Envelope<LoginResponseData>>(
-        'v3/login',
-        { username, password },
-      );
+      const res = await request.post<Envelope<LoginResponseData>>('v3/login', {
+        username,
+        password,
+      });
       const data = unwrapEnvelope(res);
       return data ? buildLoginResult(data) : emptyLoginResult();
     },

@@ -165,246 +165,246 @@ const handleSubmit = async () => {
       </div>
     </template>
 
-        <!-- 注册表单 -->
-        <form @submit.prevent="handleSubmit" class="w-full">
-          <!-- 用户名 -->
-          <div>
-            <div class="relative my-4">
-              <div
-                class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
-              >
-                <ShieldUser class="size-6" />
-              </div>
-              <input
-                v-model="form.username"
-                type="text"
-                autocomplete="off"
-                placeholder="username"
-                class="form-control border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
-                :class="{
-                  'border-destructive focus:border-destructive focus:ring-destructive/30':
-                    errors.username,
-                }"
-                required
-              />
-            </div>
-            <span
-              v-if="errors.username"
-              class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
-            >
-              <svg
-                class="size-4 shrink-0"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              {{ errors.username }}
-            </span>
-          </div>
-
-          <!-- 邮箱 -->
-          <div>
-            <div class="relative my-4">
-              <div
-                class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
-              >
-                <Mail class="size-6" />
-              </div>
-              <input
-                v-model="form.email"
-                type="email"
-                autocomplete="off"
-                placeholder="email"
-                class="form-control border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
-                :class="{
-                  'border-destructive focus:border-destructive focus:ring-destructive/30':
-                    errors.email,
-                }"
-                required
-              />
-            </div>
-            <span
-              v-if="errors.email"
-              class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
-            >
-              <svg
-                class="size-4 shrink-0"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              {{ errors.email }}
-            </span>
-          </div>
-
-          <!-- 密码 -->
-          <div>
-            <div class="relative my-4">
-              <div
-                class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
-              >
-                <IconLock class="size-6" />
-              </div>
-              <input
-                v-model="form.password"
-                type="password"
-                autocomplete="off"
-                placeholder="password"
-                class="form-control border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
-                :class="{
-                  'border-destructive focus:border-destructive focus:ring-destructive/30':
-                    errors.password,
-                }"
-                required
-              />
-            </div>
-            <span
-              v-if="errors.password"
-              class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
-            >
-              <svg
-                class="size-4 shrink-0"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              {{ errors.password }}
-            </span>
-          </div>
-
-          <!-- 确认密码 -->
-          <div>
-            <div class="relative my-4">
-              <div
-                class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
-              >
-                <IconLock class="size-6" />
-              </div>
-              <input
-                v-model="form.confirmPassword"
-                type="password"
-                autocomplete="off"
-                placeholder="confirm password"
-                class="form-control border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
-                :class="{
-                  'border-destructive focus:border-destructive focus:ring-destructive/30':
-                    errors.confirmPassword,
-                }"
-                required
-              />
-            </div>
-            <span
-              v-if="errors.confirmPassword"
-              class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
-            >
-              <svg
-                class="size-4 shrink-0"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              {{ errors.confirmPassword }}
-            </span>
-          </div>
-
-          <!-- 邮箱验证码 -->
-          <div>
-            <div class="relative my-4">
-              <div
-                class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
-              >
-                <Mail class="size-6" />
-              </div>
-              <input
-                v-model="form.emailCode"
-                type="text"
-                autocomplete="off"
-                placeholder="email code"
-                class="form-control border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-24 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
-                :class="{
-                  'border-destructive focus:border-destructive focus:ring-destructive/30':
-                    errors.emailCode,
-                }"
-                required
-              />
-              <button
-                type="button"
-                class="bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary/30 disabled:bg-primary/50 absolute top-1/2 right-2 z-10 -translate-y-1/2 rounded-lg px-4 py-1.5 text-sm font-bold transition-colors focus:ring-2 focus:outline-none disabled:cursor-progress"
-                :disabled="isSendingCode || isSent"
-                @click="sendEmailCode"
-              >
-                {{ sendCodeText }}
-              </button>
-            </div>
-            <span
-              v-if="errors.emailCode"
-              class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
-            >
-              <svg
-                class="size-4 shrink-0"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              {{ errors.emailCode }}
-            </span>
-          </div>
-
-          <!-- 提交按钮 -->
-          <div class="mt-6">
-            <button
-              type="submit"
-              class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-primary/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-              :disabled="isSubmitting"
-            >
-              <Loader2 v-if="isSubmitting" class="h-5 w-5 animate-spin" />
-              {{ isSubmitting ? '注册中...' : '注册' }}
-            </button>
-          </div>
-
-          <span
-            v-if="errors.submit"
-            class="text-destructive mt-3 flex items-center justify-center gap-1.5 text-center text-sm"
+    <!-- 注册表单 -->
+    <form @submit.prevent="handleSubmit" class="w-full">
+      <!-- 用户名 -->
+      <div>
+        <div class="relative my-4">
+          <div
+            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
           >
-            <svg
-              class="size-4 shrink-0"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="8" x2="12" y2="12" />
-              <line x1="12" y1="16" x2="12.01" y2="16" />
-            </svg>
-            {{ errors.submit }}
-          </span>
-        </form>
+            <ShieldUser class="size-6" />
+          </div>
+          <input
+            v-model="form.username"
+            type="text"
+            autocomplete="off"
+            placeholder="username"
+            class="form-control border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            :class="{
+              'border-destructive focus:border-destructive focus:ring-destructive/30':
+                errors.username,
+            }"
+            required
+          />
+        </div>
+        <span
+          v-if="errors.username"
+          class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
+        >
+          <svg
+            class="size-4 shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          {{ errors.username }}
+        </span>
+      </div>
+
+      <!-- 邮箱 -->
+      <div>
+        <div class="relative my-4">
+          <div
+            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
+          >
+            <Mail class="size-6" />
+          </div>
+          <input
+            v-model="form.email"
+            type="email"
+            autocomplete="off"
+            placeholder="email"
+            class="form-control border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            :class="{
+              'border-destructive focus:border-destructive focus:ring-destructive/30':
+                errors.email,
+            }"
+            required
+          />
+        </div>
+        <span
+          v-if="errors.email"
+          class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
+        >
+          <svg
+            class="size-4 shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          {{ errors.email }}
+        </span>
+      </div>
+
+      <!-- 密码 -->
+      <div>
+        <div class="relative my-4">
+          <div
+            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
+          >
+            <IconLock class="size-6" />
+          </div>
+          <input
+            v-model="form.password"
+            type="password"
+            autocomplete="off"
+            placeholder="password"
+            class="form-control border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            :class="{
+              'border-destructive focus:border-destructive focus:ring-destructive/30':
+                errors.password,
+            }"
+            required
+          />
+        </div>
+        <span
+          v-if="errors.password"
+          class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
+        >
+          <svg
+            class="size-4 shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          {{ errors.password }}
+        </span>
+      </div>
+
+      <!-- 确认密码 -->
+      <div>
+        <div class="relative my-4">
+          <div
+            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
+          >
+            <IconLock class="size-6" />
+          </div>
+          <input
+            v-model="form.confirmPassword"
+            type="password"
+            autocomplete="off"
+            placeholder="confirm password"
+            class="form-control border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            :class="{
+              'border-destructive focus:border-destructive focus:ring-destructive/30':
+                errors.confirmPassword,
+            }"
+            required
+          />
+        </div>
+        <span
+          v-if="errors.confirmPassword"
+          class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
+        >
+          <svg
+            class="size-4 shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          {{ errors.confirmPassword }}
+        </span>
+      </div>
+
+      <!-- 邮箱验证码 -->
+      <div>
+        <div class="relative my-4">
+          <div
+            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
+          >
+            <Mail class="size-6" />
+          </div>
+          <input
+            v-model="form.emailCode"
+            type="text"
+            autocomplete="off"
+            placeholder="email code"
+            class="form-control border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-24 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            :class="{
+              'border-destructive focus:border-destructive focus:ring-destructive/30':
+                errors.emailCode,
+            }"
+            required
+          />
+          <button
+            type="button"
+            class="bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary/30 disabled:bg-primary/50 absolute top-1/2 right-2 z-10 -translate-y-1/2 rounded-lg px-4 py-1.5 text-sm font-bold transition-colors focus:ring-2 focus:outline-none disabled:cursor-progress"
+            :disabled="isSendingCode || isSent"
+            @click="sendEmailCode"
+          >
+            {{ sendCodeText }}
+          </button>
+        </div>
+        <span
+          v-if="errors.emailCode"
+          class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
+        >
+          <svg
+            class="size-4 shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          {{ errors.emailCode }}
+        </span>
+      </div>
+
+      <!-- 提交按钮 -->
+      <div class="mt-6">
+        <button
+          type="submit"
+          class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-primary/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          :disabled="isSubmitting"
+        >
+          <Loader2 v-if="isSubmitting" class="h-5 w-5 animate-spin" />
+          {{ isSubmitting ? '注册中...' : '注册' }}
+        </button>
+      </div>
+
+      <span
+        v-if="errors.submit"
+        class="text-destructive mt-3 flex items-center justify-center gap-1.5 text-center text-sm"
+      >
+        <svg
+          class="size-4 shrink-0"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        {{ errors.submit }}
+      </span>
+    </form>
 
     <template #footer>
       <!-- 登录链接 -->

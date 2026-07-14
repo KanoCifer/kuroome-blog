@@ -1,9 +1,5 @@
 <template>
   <BentoCard class="group relative overflow-hidden">
-    <!-- 背景水波纹效果 -->
-    <div
-      class="absolute inset-0 bg-linear-to-br from-violet-500/10 via-fuchsia-500/5 to-pink-500/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-    />
     <div class="relative">
       <!-- Header -->
       <div class="mx-3 flex items-center justify-between">
@@ -50,22 +46,15 @@
 import BentoCard from '@/components/bento/BentoCard.vue';
 
 const techStack = [
-  { name: 'TaskIQ', color: 'green' },
-  { name: 'Vue', color: 'rose' },
-  { name: 'React', color: 'teal' },
-  { name: 'Postgre', color: 'indigo' },
-  { name: 'SQLAlchemy', color: 'cyan' },
+  { name: 'Vue3', color: 'rose' },
+  { name: 'React19', color: 'teal' },
+  { name: 'Postgres@18', color: 'indigo' },
   { name: 'FastAPI', color: 'indigo' },
-  { name: 'Redis', color: 'teal' },
+  { name: 'Redis8', color: 'teal' },
   { name: 'MongoDB', color: 'fuchsia' },
+  { name: 'Golang', color: 'blue' },
 ];
 
-// TODO(human): Replace hardcoded color classes with theme-aware semantic tokens.
-// Each entry currently uses a hand-picked color (green, rose, teal, etc.) that doesn't
-// adapt when the user switches themes. Choose an approach:
-// 1. Use theme accent tokens (accent-*, accessible via CSS vars like bg-muted-amber/10)
-// 2. Use opacity variants of bg-primary/accent (keeps variety, follows theme)
-// 3. Derive colors from CSS custom properties with hue rotation
 const colorClasses: Record<string, string> = {
   green:
     'bg-success/15 text-success hover:bg-success/25 dark:bg-success/10 dark:text-success dark:hover:bg-success/20',
@@ -76,5 +65,6 @@ const colorClasses: Record<string, string> = {
   cyan: 'bg-chart-1/15 text-chart-1 hover:bg-chart-1/25 dark:bg-chart-1/10 dark:text-chart-1 dark:hover:bg-chart-1/20',
   fuchsia:
     'bg-chart-5/15 text-chart-5 hover:bg-chart-5/25 dark:bg-chart-5/10 dark:text-chart-5 dark:hover:bg-chart-5/20',
+  blue: 'bg-chart-4/15 text-chart-4 hover:bg-chart-4/25 dark:bg-chart-4/10 dark:text-chart-4 dark:hover:bg-chart-4/20',
 };
 </script>

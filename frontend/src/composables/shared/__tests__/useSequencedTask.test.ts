@@ -50,9 +50,7 @@ describe('useSequencedTask', () => {
     const delays = [50, 20, 40];
 
     const results = await Promise.all(
-      delays.map((d, i) =>
-        seq.run(() => delay(d).then(() => i)),
-      ),
+      delays.map((d, i) => seq.run(() => delay(d).then(() => i))),
     );
 
     // i=2 最后 begin，所以胜出（无论它何时 resolve）

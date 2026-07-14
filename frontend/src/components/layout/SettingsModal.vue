@@ -17,7 +17,6 @@
         <div
           class="bg-background relative z-10 flex h-full w-full max-w-[480px] flex-col shadow-[inset_3px_0_0_0_var(--color-primary)]"
         >
-
           <!-- 标题区 -->
           <header class="relative px-8 pt-10 pb-6 text-center">
             <button

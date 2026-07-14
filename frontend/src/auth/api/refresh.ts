@@ -1,4 +1,7 @@
-import axios, { type CreateAxiosDefaults, type InternalAxiosRequestConfig } from 'axios';
+import axios, {
+  type CreateAxiosDefaults,
+  type InternalAxiosRequestConfig,
+} from 'axios';
 import { setAccessToken } from '@/auth/tokenService';
 
 const refreshTokenEndpoint = 'v3/refresh-token';

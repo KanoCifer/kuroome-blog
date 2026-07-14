@@ -1,11 +1,11 @@
 <template>
   <div class="flex flex-col">
-    <h3 class="text-foreground mb-2 flex items-center gap-2 text-sm font-medium">
+    <h3
+      class="text-foreground mb-2 flex items-center gap-2 text-sm font-medium"
+    >
       <icon-analytics class="size-4" /> 操作系统分布
     </h3>
-    <p class="text-muted-foreground mb-3 text-xs">
-      按操作系统分类的访问占比
-    </p>
+    <p class="text-muted-foreground mb-3 text-xs">按操作系统分类的访问占比</p>
     <div
       v-if="loading && !hasOsData"
       class="bg-muted h-56 animate-pulse rounded-xl"

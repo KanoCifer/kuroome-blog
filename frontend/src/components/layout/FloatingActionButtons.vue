@@ -36,7 +36,6 @@
           <path d="M12 5v14M5 12h14" />
         </svg>
         <span class="fab-label text-primary-foreground">新建</span>
-
       </button>
     </div>
 
@@ -150,7 +149,9 @@
         class="fab group bg-secondary hover:bg-primary"
         aria-label="RSS"
       >
-        <RssIcon class="fab-icon text-primary group-hover:text-primary-foreground" />
+        <RssIcon
+          class="fab-icon text-primary group-hover:text-primary-foreground"
+        />
         <span class="fab-label">RSS</span>
       </button>
     </div>
@@ -162,7 +163,9 @@
         class="fab group bg-secondary hover:bg-primary"
         aria-label="订阅管理"
       >
-        <CreditCard class="fab-icon text-primary group-hover:text-primary-foreground" />
+        <CreditCard
+          class="fab-icon text-primary group-hover:text-primary-foreground"
+        />
         <span class="fab-label">订阅</span>
       </button>
     </div>
@@ -174,7 +177,9 @@
         class="fab group bg-secondary hover:bg-primary"
         aria-label="图片工具"
       >
-        <IconTooling class="fab-icon text-primary group-hover:text-primary-foreground" />
+        <IconTooling
+          class="fab-icon text-primary group-hover:text-primary-foreground"
+        />
         <span class="fab-label">图片工具</span>
       </button>
     </div>

@@ -14,7 +14,7 @@
       <button
         type="button"
         :class="[
-          'bg-background/90 text-foreground hover:bg-background border-border/40 absolute right-2.5 bottom-5 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-all duration-200 ease-out disabled:opacity-50 active:scale-95',
+          'bg-background/90 text-foreground hover:bg-background border-border/40 absolute right-2.5 bottom-5 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-all duration-200 ease-out active:scale-95 disabled:opacity-50',
           isLocating && 'text-primary',
         ]"
         :disabled="isLocating"
@@ -22,21 +22,37 @@
         @click="handleLocateClick"
       >
         <!-- 图标交叉淡入淡出(非 motion 库:cubic-bezier 过渡 + 缩放 + 模糊) -->
-        <span class="icon-crossfade" :class="{ 'is-active': isLocating }" aria-hidden="true">
-          <Locate class="h-4 w-4 icon-crossfade__item icon-crossfade__item--enter" />
-          <Loader2 class="h-4 w-4 icon-crossfade__item icon-crossfade__item--exit" />
+        <span
+          class="icon-crossfade"
+          :class="{ 'is-active': isLocating }"
+          aria-hidden="true"
+        >
+          <Locate
+            class="icon-crossfade__item icon-crossfade__item--enter h-4 w-4"
+          />
+          <Loader2
+            class="icon-crossfade__item icon-crossfade__item--exit h-4 w-4"
+          />
         </span>
       </button>
 
       <!-- 地图全屏按钮 -->
       <button
         type="button"
-        class="bg-background/90 text-foreground hover:bg-background border-border/40 absolute right-2.5 bottom-20 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-all duration-200 ease-out disabled:opacity-50 active:scale-95"
+        class="bg-background/90 text-foreground hover:bg-background border-border/40 absolute right-2.5 bottom-20 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-all duration-200 ease-out active:scale-95 disabled:opacity-50"
         @click="handleFullscreen"
       >
-        <span class="icon-crossfade" :class="{ 'is-active': isFullscreen }" aria-hidden="true">
-          <Maximize class="h-4 w-4 icon-crossfade__item icon-crossfade__item--enter" />
-          <Minimize class="h-4 w-4 icon-crossfade__item icon-crossfade__item--exit" />
+        <span
+          class="icon-crossfade"
+          :class="{ 'is-active': isFullscreen }"
+          aria-hidden="true"
+        >
+          <Maximize
+            class="icon-crossfade__item icon-crossfade__item--enter h-4 w-4"
+          />
+          <Minimize
+            class="icon-crossfade__item icon-crossfade__item--exit h-4 w-4"
+          />
         </span>
       </button>
 

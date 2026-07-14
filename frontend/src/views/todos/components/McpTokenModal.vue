@@ -2,9 +2,13 @@
   <UiModal :open="open" size="md" @close="emit('close')">
     <div class="flex flex-col">
       <!-- ── 头部 ── -->
-      <header class="border-border flex items-start justify-between gap-3 border-b px-6 pt-5 pb-4">
+      <header
+        class="border-border flex items-start justify-between gap-3 border-b px-6 pt-5 pb-4"
+      >
         <div>
-          <h2 class="text-foreground text-lg font-semibold">签发 MCP 服务 Token</h2>
+          <h2 class="text-foreground text-lg font-semibold">
+            签发 MCP 服务 Token
+          </h2>
           <p class="text-muted-foreground mt-0.5 text-xs">
             生成长期有效的 service-JWT，供 MCP server 调用 devtask 接口。
           </p>
@@ -14,8 +18,18 @@
           aria-label="关闭"
           @click="emit('close')"
         >
-          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          <svg
+            class="h-4 w-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </header>
@@ -24,7 +38,9 @@
       <div class="px-6 py-5">
         <!-- 时长选择 -->
         <div class="mb-5">
-          <span class="text-muted-foreground mb-2 block text-xs font-medium">有效期</span>
+          <span class="text-muted-foreground mb-2 block text-xs font-medium"
+            >有效期</span
+          >
           <div class="flex flex-wrap gap-2">
             <button
               v-for="opt in DAY_OPTIONS"
@@ -57,7 +73,13 @@
             fill="none"
             stroke="currentColor"
           >
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke-width="4" />
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke-width="4"
+            />
             <path
               class="opacity-75"
               fill="currentColor"
@@ -71,7 +93,13 @@
         <p
           v-if="error"
           class="text-destructive mt-3 rounded-lg border px-3 py-2 text-xs"
-          style="border-color: color-mix(in oklch, var(--destructive) 40%, transparent)"
+          style="
+            border-color: color-mix(
+              in oklch,
+              var(--destructive) 40%,
+              transparent
+            );
+          "
         >
           {{ error }}
         </p>
@@ -79,9 +107,14 @@
         <!-- 结果 -->
         <div v-if="result" class="mt-5 space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-muted-foreground block text-xs font-medium">Token</span>
+            <span class="text-muted-foreground block text-xs font-medium"
+              >Token</span
+            >
             <span class="text-muted-foreground text-[11px]">
-              有效期至 {{ formatDate(result.expires_at) }}（{{ result.days }} 天）
+              有效期至 {{ formatDate(result.expires_at) }}（{{
+                result.days
+              }}
+              天）
             </span>
           </div>
 
@@ -98,11 +131,36 @@
               :title="copied ? '已复制' : '复制'"
               @click="handleCopy"
             >
-              <svg v-if="copied" class="h-3.5 w-3.5 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              <svg
+                v-if="copied"
+                class="text-success h-3.5 w-3.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
-              <svg v-else class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke-width="2" />
+              <svg
+                v-else
+                class="h-3.5 w-3.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <rect
+                  x="9"
+                  y="9"
+                  width="13"
+                  height="13"
+                  rx="2"
+                  ry="2"
+                  stroke-width="2"
+                />
                 <path
                   d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
                   stroke-width="2"
@@ -114,8 +172,11 @@
 
           <!-- 安全提示 -->
           <p class="text-muted-foreground text-[11px] leading-relaxed">
-            Token 拥有完整的 devtask 读写权限。生成后请妥善保管，泄露后请尽快在服务端轮换
-            <code class="bg-muted px-1 py-0.5 font-mono text-[10px]">DEV_TASK_SECRET</code>
+            Token 拥有完整的 devtask
+            读写权限。生成后请妥善保管，泄露后请尽快在服务端轮换
+            <code class="bg-muted px-1 py-0.5 font-mono text-[10px]"
+              >DEV_TASK_SECRET</code
+            >
             。
           </p>
         </div>
@@ -178,6 +239,10 @@ async function handleCopy() {
 function formatDate(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
-  return d.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+  return d.toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
 }
 </script>

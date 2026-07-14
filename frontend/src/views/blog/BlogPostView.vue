@@ -59,8 +59,7 @@ const fetchPost = async () => {
     post.value = res as unknown as Post;
 
     likesCount.value = (res as unknown as Post).likes ?? 0;
-    isLiked.value =
-      localStorage.getItem(LIKED_KEY(postId.value)) === '1';
+    isLiked.value = localStorage.getItem(LIKED_KEY(postId.value)) === '1';
   } catch (err: unknown) {
     console.error(err);
     errorMessage.value =
@@ -438,7 +437,9 @@ onUnmounted(() => {
             :alt="`${post.title} 封面`"
             class="h-full w-full object-cover"
             loading="lazy"
-            style="box-shadow: inset 0 0 0 1px oklch(from var(--ink) l c h / 0.08)"
+            style="
+              box-shadow: inset 0 0 0 1px oklch(from var(--ink) l c h / 0.08);
+            "
           />
         </div>
         <figcaption
@@ -491,7 +492,9 @@ onUnmounted(() => {
             <button
               type="button"
               :aria-label="
-                isLiked ? `已喜欢 · 当前 ${likesCount}` : `喜欢 · 当前 ${likesCount}`
+                isLiked
+                  ? `已喜欢 · 当前 ${likesCount}`
+                  : `喜欢 · 当前 ${likesCount}`
               "
               :disabled="isLiked || isLiking"
               class="inline-flex cursor-pointer items-center gap-1 rounded transition-colors duration-150 active:scale-[0.96] disabled:cursor-default"

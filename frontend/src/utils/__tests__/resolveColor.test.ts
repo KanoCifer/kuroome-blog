@@ -26,9 +26,12 @@ describe('resolveCssColor', () => {
       getPropertyValue: () => '',
     } as unknown as CSSStyleDeclaration);
 
-    vi.spyOn(document, 'createElement').mockImplementation(() => ({
-      getContext: () => createMockCtx(''),
-    } as unknown as HTMLCanvasElement));
+    vi.spyOn(document, 'createElement').mockImplementation(
+      () =>
+        ({
+          getContext: () => createMockCtx(''),
+        }) as unknown as HTMLCanvasElement,
+    );
   });
 
   afterEach(() => {

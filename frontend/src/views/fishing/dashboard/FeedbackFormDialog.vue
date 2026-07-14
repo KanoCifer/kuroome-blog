@@ -124,64 +124,62 @@ const handleSubmit = async () => {
       @click.self="handleCancel"
     >
       <div class="t-modal" :class="{ 'is-open': isOpen }">
-          <h3 class="text-foreground mb-4 text-lg font-semibold">
-            钓鱼反馈
-            <span class="text-muted-foreground ml-2 text-sm font-normal"
-              >你的反馈会帮助我们改进</span
+        <h3 class="text-foreground mb-4 text-lg font-semibold">
+          钓鱼反馈
+          <span class="text-muted-foreground ml-2 text-sm font-normal"
+            >你的反馈会帮助我们改进</span
+          >
+        </h3>
+
+        <div class="bg-muted mb-4 rounded-lg p-3 text-sm">
+          <p class="text-muted-foreground">地点: {{ locationName }}</p>
+          <p class="text-muted-foreground">
+            当前指数: {{ fishingData.fishing_index }} ({{ fishingData.level }})
+          </p>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="text-foreground mb-2 block text-sm font-medium"
+              >您的钓鱼体验</label
             >
-          </h3>
-
-          <div class="bg-muted mb-4 rounded-lg p-3 text-sm">
-            <p class="text-muted-foreground">地点: {{ locationName }}</p>
-            <p class="text-muted-foreground">
-              当前指数: {{ fishingData.fishing_index }} ({{
-                fishingData.level
-              }})
-            </p>
-          </div>
-
-          <div class="space-y-4">
-            <div>
-              <label class="text-foreground mb-2 block text-sm font-medium"
-                >您的钓鱼体验</label
-              >
-              <div class="grid grid-cols-3 gap-2">
-                <button
-                  v-for="option in FEEDBACK_OPTIONS"
-                  :key="option.value"
-                  type="button"
-                  class="rounded-lg px-3 py-2 text-sm font-medium transition-colors"
-                  :class="
-                    selectedFeedback === option.value
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-foreground hover:bg-muted'
-                  "
-                  @click="selectedFeedback = option.value"
-                >
-                  {{ option.label }}
-                </button>
-              </div>
-            </div>
-
-            <div class="flex gap-3 pt-2">
+            <div class="grid grid-cols-3 gap-2">
               <button
+                v-for="option in FEEDBACK_OPTIONS"
+                :key="option.value"
                 type="button"
-                class="border-border text-foreground hover:bg-muted flex-1 rounded-lg border px-4 py-2 text-sm font-medium"
-                :disabled="loading"
-                @click="$emit('cancel')"
+                class="rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+                :class="
+                  selectedFeedback === option.value
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-foreground hover:bg-muted'
+                "
+                @click="selectedFeedback = option.value"
               >
-                取消
-              </button>
-              <button
-                type="button"
-                class="bg-primary text-primary-foreground hover:bg-primary/90 flex-1 rounded-lg px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
-                :disabled="!selectedFeedback || loading"
-                @click="handleSubmit"
-              >
-                {{ loading ? '提交中...' : '确认提交' }}
+                {{ option.label }}
               </button>
             </div>
           </div>
+
+          <div class="flex gap-3 pt-2">
+            <button
+              type="button"
+              class="border-border text-foreground hover:bg-muted flex-1 rounded-lg border px-4 py-2 text-sm font-medium"
+              :disabled="loading"
+              @click="$emit('cancel')"
+            >
+              取消
+            </button>
+            <button
+              type="button"
+              class="bg-primary text-primary-foreground hover:bg-primary/90 flex-1 rounded-lg px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+              :disabled="!selectedFeedback || loading"
+              @click="handleSubmit"
+            >
+              {{ loading ? '提交中...' : '确认提交' }}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </teleport>

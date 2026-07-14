@@ -7,10 +7,7 @@
         Tags
       </h3>
       <p v-if="isLoading" class="text-muted-foreground text-xs">加载中…</p>
-      <p
-        v-else-if="tags.length === 0"
-        class="text-muted-foreground text-xs"
-      >
+      <p v-else-if="tags.length === 0" class="text-muted-foreground text-xs">
         暂无标签
       </p>
       <ul v-else class="space-y-1">

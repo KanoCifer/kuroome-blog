@@ -120,8 +120,12 @@
                 <span
                   class="text-muted-foreground text-xs font-medium tabular-nums"
                 >
-                  {{ serverStatus ? serverStatus.mem_used.toFixed(0) : '—' }} MB /
-                  {{ serverStatus ? serverStatus.mem_total.toFixed(0) : '—' }} MB
+                  {{ serverStatus ? serverStatus.mem_used.toFixed(0) : '—' }} MB
+                  /
+                  {{
+                    serverStatus ? serverStatus.mem_total.toFixed(0) : '—'
+                  }}
+                  MB
                 </span>
               </div>
               <div class="h-44">
@@ -161,7 +165,9 @@
                 </h3>
                 <span
                   class="text-xs font-medium tabular-nums"
-                  :style="{ color: getStatusColor(serverStatus?.disk_usage ?? 0) }"
+                  :style="{
+                    color: getStatusColor(serverStatus?.disk_usage ?? 0),
+                  }"
                 >
                   {{ serverStatus ? serverStatus.disk_usage.toFixed(1) : '—' }}%
                 </span>
@@ -235,7 +241,9 @@
     </div>
 
     <!-- Sticky status bar row (always visible) -->
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div
+      class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+    >
       <div class="flex items-center gap-4">
         <h2 class="text-foreground flex items-center gap-2 text-sm font-medium">
           <svg
@@ -256,7 +264,10 @@
         <div class="flex items-center gap-3">
           <!-- CPU -->
           <div class="flex items-center gap-1.5">
-            <span class="h-1.5 w-1.5 rounded-full" :style="{ backgroundColor: chartColors.cpu }"></span>
+            <span
+              class="h-1.5 w-1.5 rounded-full"
+              :style="{ backgroundColor: chartColors.cpu }"
+            ></span>
             <span class="text-muted-foreground text-xs">CPU</span>
             <span class="text-foreground text-xs font-medium tabular-nums">
               {{ serverStatus ? serverStatus.cpu_percent.toFixed(0) : '—' }}%
@@ -264,7 +275,10 @@
           </div>
           <!-- Memory -->
           <div class="flex items-center gap-1.5">
-            <span class="h-1.5 w-1.5 rounded-full" :style="{ backgroundColor: chartColors.mem }"></span>
+            <span
+              class="h-1.5 w-1.5 rounded-full"
+              :style="{ backgroundColor: chartColors.mem }"
+            ></span>
             <span class="text-muted-foreground text-xs">内存</span>
             <span class="text-foreground text-xs font-medium tabular-nums">
               {{ serverStatus ? serverStatus.mem_usage.toFixed(0) : '—' }}%
@@ -274,7 +288,9 @@
           <div class="flex items-center gap-1.5">
             <span
               class="h-1.5 w-1.5 rounded-full"
-              :style="{ backgroundColor: getStatusColor(serverStatus?.disk_usage ?? 0) }"
+              :style="{
+                backgroundColor: getStatusColor(serverStatus?.disk_usage ?? 0),
+              }"
             ></span>
             <span class="text-muted-foreground text-xs">磁盘</span>
             <span class="text-foreground text-xs font-medium tabular-nums">
@@ -448,11 +464,7 @@ const cardClass = computed(() =>
 );
 
 const connectionLabel = computed(() =>
-  isSSEConnected.value
-    ? '自动刷新中'
-    : sseError.value
-      ? '重连中…'
-      : '已暂停',
+  isSSEConnected.value ? '自动刷新中' : sseError.value ? '重连中…' : '已暂停',
 );
 
 const hasHistory = computed(() => history.value.length > 0);

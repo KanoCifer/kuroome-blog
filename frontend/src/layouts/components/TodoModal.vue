@@ -109,136 +109,136 @@
 
             <!-- 已登录后的可交互内容 -->
             <div v-else>
-            <!-- Collapsed add button -->
-            <button
-              v-if="!showAddForm"
-              @click="showAddForm = true"
-              class="border-border/60 bg-background/60 hover:border-primary/30 text-muted-foreground hover:text-foreground mb-5 flex w-full cursor-pointer items-center gap-2 rounded-xl border p-3 text-sm shadow-sm transition-all"
-            >
-              <svg
-                class="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+              <!-- Collapsed add button -->
+              <button
+                v-if="!showAddForm"
+                @click="showAddForm = true"
+                class="border-border/60 bg-background/60 hover:border-primary/30 text-muted-foreground hover:text-foreground mb-5 flex w-full cursor-pointer items-center gap-2 rounded-xl border p-3 text-sm shadow-sm transition-all"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              添加任务...
-            </button>
-
-            <!-- Expanded add form -->
-            <div
-              v-else
-              class="border-border bg-background mb-5 rounded-xl border p-4 shadow-sm"
-            >
-              <input
-                ref="addTitleInput"
-                v-model="newTaskForm.title"
-                type="text"
-                placeholder="任务标题..."
-                class="placeholder:text-muted-foreground/50 text-foreground bg-muted focus:border-primary w-full rounded-lg border px-3 py-2 text-sm font-medium outline-none"
-                @keydown.enter="submitCreateTask"
-              />
-              <div class="mt-3 space-y-3">
-                <textarea
-                  v-model="newTaskForm.description"
-                  placeholder="描述... (可选)"
-                  rows="3"
-                  class="border-border bg-muted focus:border-primary placeholder:text-muted-foreground/50 text-foreground w-full resize-none rounded-lg border p-2.5 text-sm outline-none"
-                ></textarea>
-                <div class="flex flex-wrap items-center gap-2">
-                  <select
-                    v-model="newTaskForm.type"
-                    class="border-border bg-muted text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
-                  >
-                    <option v-for="t in TASK_TYPES" :key="t" :value="t">
-                      {{ t }}
-                    </option>
-                  </select>
-                  <select
-                    v-model="newTaskForm.priority"
-                    class="border-border bg-muted text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
-                  >
-                    <option v-for="p in PRIORITIES" :key="p" :value="p">
-                      {{ p }}
-                    </option>
-                  </select>
-                </div>
-                <div class="flex items-center gap-2">
-                  <input
-                    v-model="newTaskForm.due_date"
-                    type="date"
-                    class="border-border bg-muted text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 4v16m8-8H4"
                   />
-                  <div class="ml-auto flex gap-2">
-                    <button
-                      @click="cancelAdd"
-                      class="bg-muted text-foreground hover:bg-muted/80 cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
+                </svg>
+                添加任务...
+              </button>
+
+              <!-- Expanded add form -->
+              <div
+                v-else
+                class="border-border bg-background mb-5 rounded-xl border p-4 shadow-sm"
+              >
+                <input
+                  ref="addTitleInput"
+                  v-model="newTaskForm.title"
+                  type="text"
+                  placeholder="任务标题..."
+                  class="placeholder:text-muted-foreground/50 text-foreground bg-muted focus:border-primary w-full rounded-lg border px-3 py-2 text-sm font-medium outline-none"
+                  @keydown.enter="submitCreateTask"
+                />
+                <div class="mt-3 space-y-3">
+                  <textarea
+                    v-model="newTaskForm.description"
+                    placeholder="描述... (可选)"
+                    rows="3"
+                    class="border-border bg-muted focus:border-primary placeholder:text-muted-foreground/50 text-foreground w-full resize-none rounded-lg border p-2.5 text-sm outline-none"
+                  ></textarea>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <select
+                      v-model="newTaskForm.type"
+                      class="border-border bg-muted text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
                     >
-                      取消
-                    </button>
-                    <button
-                      @click="submitCreateTask"
-                      :disabled="!newTaskForm.title.trim()"
-                      class="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer rounded-lg px-4 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                      <option v-for="t in TASK_TYPES" :key="t" :value="t">
+                        {{ t }}
+                      </option>
+                    </select>
+                    <select
+                      v-model="newTaskForm.priority"
+                      class="border-border bg-muted text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
                     >
-                      添加
-                    </button>
+                      <option v-for="p in PRIORITIES" :key="p" :value="p">
+                        {{ p }}
+                      </option>
+                    </select>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <input
+                      v-model="newTaskForm.due_date"
+                      type="date"
+                      class="border-border bg-muted text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
+                    />
+                    <div class="ml-auto flex gap-2">
+                      <button
+                        @click="cancelAdd"
+                        class="bg-muted text-foreground hover:bg-muted/80 cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
+                      >
+                        取消
+                      </button>
+                      <button
+                        @click="submitCreateTask"
+                        :disabled="!newTaskForm.title.trim()"
+                        class="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer rounded-lg px-4 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        添加
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Status sections -->
-            <div v-for="section in sections" :key="section.key" class="mb-5">
-              <div class="mb-2 flex items-center gap-2 px-1">
-                <span
-                  class="h-2.5 w-2.5 shrink-0 rounded-full"
-                  :class="section.dotClass"
-                />
-                <h4 class="text-foreground text-sm font-semibold">
-                  {{ section.title }}
-                </h4>
-                <span
-                  class="text-muted-foreground bg-muted rounded-full px-2 py-0.5 text-xs tabular-nums"
+              <!-- Status sections -->
+              <div v-for="section in sections" :key="section.key" class="mb-5">
+                <div class="mb-2 flex items-center gap-2 px-1">
+                  <span
+                    class="h-2.5 w-2.5 shrink-0 rounded-full"
+                    :class="section.dotClass"
+                  />
+                  <h4 class="text-foreground text-sm font-semibold">
+                    {{ section.title }}
+                  </h4>
+                  <span
+                    class="text-muted-foreground bg-muted rounded-full px-2 py-0.5 text-xs tabular-nums"
+                  >
+                    {{ section.tasks.length }}
+                  </span>
+                </div>
+
+                <TransitionGroup
+                  tag="div"
+                  class="space-y-2.5"
+                  enter-active-class="transition-all duration-300 ease-out"
+                  enter-from-class="opacity-0 translate-y-2"
+                  enter-to-class="opacity-100 translate-y-0"
+                  leave-active-class="transition-all duration-200 ease-in"
+                  leave-from-class="opacity-100 scale-100"
+                  leave-to-class="opacity-0 scale-95"
+                  move-class="transition-transform duration-300"
                 >
-                  {{ section.tasks.length }}
-                </span>
+                  <DrawerTaskCard
+                    v-for="task in section.tasks"
+                    :key="task.id"
+                    :task="task"
+                    :done="section.key === 'done'"
+                    @cycle-status="store.cycleStatus"
+                    @delete-task="store.deleteTask"
+                  />
+                </TransitionGroup>
+
+                <p
+                  v-if="section.tasks.length === 0"
+                  class="text-muted-foreground/60 py-4 text-center text-xs"
+                >
+                  {{ section.emptyText }}
+                </p>
               </div>
-
-              <TransitionGroup
-                tag="div"
-                class="space-y-2.5"
-                enter-active-class="transition-all duration-300 ease-out"
-                enter-from-class="opacity-0 translate-y-2"
-                enter-to-class="opacity-100 translate-y-0"
-                leave-active-class="transition-all duration-200 ease-in"
-                leave-from-class="opacity-100 scale-100"
-                leave-to-class="opacity-0 scale-95"
-                move-class="transition-transform duration-300"
-              >
-                <DrawerTaskCard
-                  v-for="task in section.tasks"
-                  :key="task.id"
-                  :task="task"
-                  :done="section.key === 'done'"
-                  @cycle-status="store.cycleStatus"
-                  @delete-task="store.deleteTask"
-                />
-              </TransitionGroup>
-
-              <p
-                v-if="section.tasks.length === 0"
-                class="text-muted-foreground/60 py-4 text-center text-xs"
-              >
-                {{ section.emptyText }}
-              </p>
-            </div>
             </div>
           </div>
         </div>

@@ -57,7 +57,9 @@ describe('cardLayout store', () => {
     store.saveEditing();
     expect(store.isEditing).toBe(false);
     expect(store.snapshot).toBeNull();
-    expect(JSON.parse(localStorage.getItem('readinglist_card_offsets')!)).toEqual({
+    expect(
+      JSON.parse(localStorage.getItem('readinglist_card_offsets')!),
+    ).toEqual({
       'card-b': { x: 3, y: 4 },
     });
   });

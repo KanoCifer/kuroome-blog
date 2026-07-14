@@ -298,389 +298,381 @@ onMounted(() => {
       </div>
     </template>
 
-        <div class="mb-8 flex flex-col items-center gap-3">
-          <div class="group relative">
-            <div
-              class="border-border h-24 w-24 overflow-hidden rounded-full border-4 shadow-lg"
-            >
-              <img
-                :src="avatarUrl"
-                alt="Avatar"
-                class="h-full w-full object-cover"
-              />
-            </div>
-            <input
-              id="photo-upload"
-              type="file"
-              accept=".jpg,.jpeg,.png,.gif"
-              class="sr-only"
-              @change="handlePhotoUpload"
-            />
-            <label
-              for="photo-upload"
-              class="bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary/30 absolute -right-1 -bottom-1 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
-            >
-              <Camera class="size-4" />
-            </label>
-          </div>
-          <p class="text-muted-foreground text-xs">
-            Click the camera to update
-          </p>
+    <div class="mb-8 flex flex-col items-center gap-3">
+      <div class="group relative">
+        <div
+          class="border-border h-24 w-24 overflow-hidden rounded-full border-4 shadow-lg"
+        >
+          <img
+            :src="avatarUrl"
+            alt="Avatar"
+            class="h-full w-full object-cover"
+          />
         </div>
+        <input
+          id="photo-upload"
+          type="file"
+          accept=".jpg,.jpeg,.png,.gif"
+          class="sr-only"
+          @change="handlePhotoUpload"
+        />
+        <label
+          for="photo-upload"
+          class="bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary/30 absolute -right-1 -bottom-1 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
+        >
+          <Camera class="size-4" />
+        </label>
+      </div>
+      <p class="text-muted-foreground text-xs">Click the camera to update</p>
+    </div>
 
-        <form @submit.prevent="handleSubmit" class="w-full">
-          <div>
-            <div class="relative my-3">
-              <div
-                class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
-              >
-                <User class="size-6" />
-              </div>
-              <input
-                v-model="form.name"
-                type="text"
-                autocomplete="off"
-                placeholder="display name"
-                class="border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
-                :class="{
-                  'border-destructive focus:border-destructive focus:ring-destructive/30':
-                    errors.name,
-                }"
-              />
-            </div>
-            <span
-              v-if="errors.name"
-              class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
-            >
-              <AlertCircle class="size-4 shrink-0" />
-              {{ errors.name }}
-            </span>
-          </div>
-
-          <div>
-            <div class="relative my-3">
-              <div
-                class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
-              >
-                <AtSign class="size-6" />
-              </div>
-              <input
-                v-model="form.username"
-                type="text"
-                autocomplete="off"
-                placeholder="username"
-                class="border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
-                :class="{
-                  'border-destructive focus:border-destructive focus:ring-destructive/30':
-                    errors.username,
-                }"
-              />
-            </div>
-            <span
-              v-if="errors.username"
-              class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
-            >
-              <AlertCircle class="size-4 shrink-0" />
-              {{ errors.username }}
-            </span>
-          </div>
-
-          <div class="my-3">
-            <div
-              class="text-muted-foreground/60 flex items-center gap-2 text-sm"
-            >
-              <ShieldUser class="size-5" />
-              <span>Gender</span>
-            </div>
-            <div class="mt-2 grid grid-cols-2 gap-3">
-              <label class="group relative cursor-pointer">
-                <input
-                  v-model="form.gender"
-                  type="radio"
-                  value="male"
-                  class="peer sr-only"
-                  @click="toggleGender('male')"
-                />
-                <div
-                  class="border-border bg-muted peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-primary/10 hover:border-primary/30 flex items-center justify-center rounded-xl border-2 px-4 py-2.5 transition-all duration-200 select-none group-active:scale-95"
-                >
-                  <span
-                    class="text-muted-foreground peer-checked:text-primary text-sm font-bold transition-colors"
-                    >Male</span
-                  >
-                </div>
-              </label>
-              <label class="group relative cursor-pointer">
-                <input
-                  v-model="form.gender"
-                  type="radio"
-                  value="female"
-                  class="peer sr-only"
-                  @click="toggleGender('female')"
-                />
-                <div
-                  class="border-border bg-muted peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-primary/10 hover:border-primary/30 flex items-center justify-center rounded-xl border-2 px-4 py-2.5 transition-all duration-200 select-none group-active:scale-95"
-                >
-                  <span
-                    class="text-muted-foreground peer-checked:text-primary text-sm font-bold transition-colors"
-                    >Female</span
-                  >
-                </div>
-              </label>
-            </div>
-          </div>
-
-          <div>
-            <div class="relative my-3">
-              <div
-                class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
-              >
-                <Mail class="size-6" />
-              </div>
-              <input
-                v-model="form.email"
-                type="email"
-                autocomplete="off"
-                placeholder="email"
-                class="border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
-                :class="{
-                  'border-destructive focus:border-destructive focus:ring-destructive/30':
-                    errors.email,
-                }"
-              />
-            </div>
-            <span
-              v-if="errors.email"
-              class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
-            >
-              <AlertCircle class="size-4 shrink-0" />
-              {{ errors.email }}
-            </span>
-          </div>
-
-          <div>
-            <div class="relative my-3">
-              <div
-                class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
-              >
-                <Phone class="size-6" />
-              </div>
-              <input
-                v-model="form.mobile"
-                type="tel"
-                autocomplete="off"
-                placeholder="mobile"
-                class="border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
-                :class="{
-                  'border-destructive focus:border-destructive focus:ring-destructive/30':
-                    errors.mobile,
-                }"
-              />
-            </div>
-            <span
-              v-if="errors.mobile"
-              class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
-            >
-              <AlertCircle class="size-4 shrink-0" />
-              {{ errors.mobile }}
-            </span>
-          </div>
-
-          <div>
-            <div class="relative my-3">
-              <div
-                class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
-              >
-                <Lock class="size-6" />
-              </div>
-              <input
-                v-model="form.password"
-                type="password"
-                autocomplete="off"
-                placeholder="new password (leave empty to keep current)"
-                class="border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
-                :class="{
-                  'border-destructive focus:border-destructive focus:ring-destructive/30':
-                    errors.password,
-                }"
-              />
-            </div>
-            <span
-              v-if="errors.password"
-              class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
-            >
-              <AlertCircle class="size-4 shrink-0" />
-              {{ errors.password }}
-            </span>
-          </div>
-
-          <div class="mt-6">
-            <button
-              type="submit"
-              class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-primary/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-              :disabled="saving"
-            >
-              <Loader2 v-if="saving" class="h-5 w-5 animate-spin" />
-              <Save v-else class="h-5 w-5" />
-              {{ saving ? 'Saving Changes...' : 'Save Changes' }}
-            </button>
-          </div>
-
+    <form @submit.prevent="handleSubmit" class="w-full">
+      <div>
+        <div class="relative my-3">
           <div
-            v-if="message"
-            :class="[
-              messageType === 'success' ? 'text-success' : 'text-destructive',
-              'mt-3 flex items-center justify-center gap-1.5 text-center text-sm',
-            ]"
+            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
           >
-            <Check v-if="messageType === 'success'" class="h-4 w-4" />
-            <AlertCircle v-else class="h-4 w-4" />
-            {{ message }}
+            <User class="size-6" />
           </div>
-        </form>
-
-        <div class="relative mt-8">
-          <div class="absolute inset-0 flex items-center">
-            <span class="border-border w-full border-t"></span>
-          </div>
-          <div class="relative flex justify-center text-xs uppercase">
-            <span class="bg-background text-muted-foreground px-2">
-              Security
-            </span>
-          </div>
+          <input
+            v-model="form.name"
+            type="text"
+            autocomplete="off"
+            placeholder="display name"
+            class="border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            :class="{
+              'border-destructive focus:border-destructive focus:ring-destructive/30':
+                errors.name,
+            }"
+          />
         </div>
+        <span
+          v-if="errors.name"
+          class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
+        >
+          <AlertCircle class="size-4 shrink-0" />
+          {{ errors.name }}
+        </span>
+      </div>
 
-        <div class="mt-6">
-          <button
-            v-if="!hasPasskey"
-            type="button"
-            @click="handleAddPasskey"
-            :disabled="addingPasskey"
-            class="bg-success text-primary-foreground shadow-success/30 hover:bg-success/90 focus:ring-success/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+      <div>
+        <div class="relative my-3">
+          <div
+            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
           >
-            <Loader2 v-if="addingPasskey" class="h-5 w-5 animate-spin" />
-            <KeyRound v-else class="h-5 w-5" />
-            {{ addingPasskey ? 'Adding Passkey...' : 'Add Passkey' }}
-          </button>
-          <AlertDialog v-else>
-            <AlertDialogTrigger as-child>
-              <button
-                type="button"
-                :disabled="deletingPasskey"
-                class="bg-destructive text-primary-foreground shadow-destructive/30 hover:bg-destructive/90 focus:ring-destructive/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <Loader2 v-if="deletingPasskey" class="h-5 w-5 animate-spin" />
-                <Trash2 v-else class="h-5 w-5" />
-                {{ deletingPasskey ? 'Deleting Passkey...' : 'Delete Passkey' }}
-              </button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. You will need to use your
-                  password to log in after deleting your passkey.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction @click="handleDeletePasskey">
-                  Confirm
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-
-          <p
-            v-if="passkeyMessage"
-            :class="[
-              passkeyMessageType === 'success'
-                ? 'text-success'
-                : 'text-destructive',
-              'mt-2 flex items-center justify-center gap-1.5 text-center text-sm',
-            ]"
-          >
-            <Check v-if="passkeyMessageType === 'success'" class="h-4 w-4" />
-            <AlertCircle v-else class="h-4 w-4" />
-            {{ passkeyMessage }}
-          </p>
-        </div>
-
-        <div class="relative mt-8">
-          <div class="absolute inset-0 flex items-center">
-            <span class="border-border w-full border-t"></span>
+            <AtSign class="size-6" />
           </div>
-          <div class="relative flex justify-center text-xs uppercase">
-            <span class="bg-background text-muted-foreground px-2">
-              Connected Accounts
-            </span>
-          </div>
+          <input
+            v-model="form.username"
+            type="text"
+            autocomplete="off"
+            placeholder="username"
+            class="border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            :class="{
+              'border-destructive focus:border-destructive focus:ring-destructive/30':
+                errors.username,
+            }"
+          />
         </div>
+        <span
+          v-if="errors.username"
+          class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
+        >
+          <AlertCircle class="size-4 shrink-0" />
+          {{ errors.username }}
+        </span>
+      </div>
 
-        <div class="mt-6">
-          <button
-            v-if="!hasGitHubBound"
-            type="button"
-            @click="handleBindGitHub"
-            :disabled="bindingGitHub"
-            class="text-primary-foreground focus:ring-primary inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-black px-8 py-2.5 font-bold shadow-lg transition-colors hover:bg-black/90 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <Loader2 v-if="bindingGitHub" class="h-5 w-5 animate-spin" />
-            <svg
-              v-else
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-5 w-5"
-              fill="currentColor"
-              viewBox="0 0 24 24"
+      <div class="my-3">
+        <div class="text-muted-foreground/60 flex items-center gap-2 text-sm">
+          <ShieldUser class="size-5" />
+          <span>Gender</span>
+        </div>
+        <div class="mt-2 grid grid-cols-2 gap-3">
+          <label class="group relative cursor-pointer">
+            <input
+              v-model="form.gender"
+              type="radio"
+              value="male"
+              class="peer sr-only"
+              @click="toggleGender('male')"
+            />
+            <div
+              class="border-border bg-muted peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-primary/10 hover:border-primary/30 flex items-center justify-center rounded-xl border-2 px-4 py-2.5 transition-all duration-200 select-none group-active:scale-95"
             >
-              <path
-                d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
-              />
-            </svg>
-            {{ bindingGitHub ? 'Binding GitHub...' : 'Bind GitHub Account' }}
-          </button>
-          <AlertDialog v-else>
-            <AlertDialogTrigger as-child>
-              <button
-                type="button"
-                :disabled="unbindingGitHub"
-                class="text-primary-foreground focus:ring-primary inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-black px-8 py-2.5 font-bold shadow-lg transition-colors hover:bg-black/90 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:text-white"
+              <span
+                class="text-muted-foreground peer-checked:text-primary text-sm font-bold transition-colors"
+                >Male</span
               >
-                <Loader2 v-if="unbindingGitHub" class="h-5 w-5 animate-spin" />
-                <Trash2 v-else class="h-5 w-5" />
-                {{ unbindingGitHub ? 'Unbinding...' : 'Unbind GitHub Account' }}
-              </button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action will unbind your GitHub account from your profile.
-                  You will no longer be able to log in with GitHub after this.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction @click="handleUnbindGitHub">
-                  Confirm
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-
-          <p
-            v-if="githubMessage"
-            :class="[
-              githubMessageType === 'success'
-                ? 'text-success'
-                : 'text-destructive',
-              'mt-2 flex items-center justify-center gap-1.5 text-center text-sm',
-            ]"
-          >
-            <Check v-if="githubMessageType === 'success'" class="h-4 w-4" />
-            <AlertCircle v-else class="h-4 w-4" />
-            {{ githubMessage }}
-          </p>
+            </div>
+          </label>
+          <label class="group relative cursor-pointer">
+            <input
+              v-model="form.gender"
+              type="radio"
+              value="female"
+              class="peer sr-only"
+              @click="toggleGender('female')"
+            />
+            <div
+              class="border-border bg-muted peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-primary/10 hover:border-primary/30 flex items-center justify-center rounded-xl border-2 px-4 py-2.5 transition-all duration-200 select-none group-active:scale-95"
+            >
+              <span
+                class="text-muted-foreground peer-checked:text-primary text-sm font-bold transition-colors"
+                >Female</span
+              >
+            </div>
+          </label>
         </div>
+      </div>
+
+      <div>
+        <div class="relative my-3">
+          <div
+            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
+          >
+            <Mail class="size-6" />
+          </div>
+          <input
+            v-model="form.email"
+            type="email"
+            autocomplete="off"
+            placeholder="email"
+            class="border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            :class="{
+              'border-destructive focus:border-destructive focus:ring-destructive/30':
+                errors.email,
+            }"
+          />
+        </div>
+        <span
+          v-if="errors.email"
+          class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
+        >
+          <AlertCircle class="size-4 shrink-0" />
+          {{ errors.email }}
+        </span>
+      </div>
+
+      <div>
+        <div class="relative my-3">
+          <div
+            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
+          >
+            <Phone class="size-6" />
+          </div>
+          <input
+            v-model="form.mobile"
+            type="tel"
+            autocomplete="off"
+            placeholder="mobile"
+            class="border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            :class="{
+              'border-destructive focus:border-destructive focus:ring-destructive/30':
+                errors.mobile,
+            }"
+          />
+        </div>
+        <span
+          v-if="errors.mobile"
+          class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
+        >
+          <AlertCircle class="size-4 shrink-0" />
+          {{ errors.mobile }}
+        </span>
+      </div>
+
+      <div>
+        <div class="relative my-3">
+          <div
+            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
+          >
+            <Lock class="size-6" />
+          </div>
+          <input
+            v-model="form.password"
+            type="password"
+            autocomplete="off"
+            placeholder="new password (leave empty to keep current)"
+            class="border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            :class="{
+              'border-destructive focus:border-destructive focus:ring-destructive/30':
+                errors.password,
+            }"
+          />
+        </div>
+        <span
+          v-if="errors.password"
+          class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
+        >
+          <AlertCircle class="size-4 shrink-0" />
+          {{ errors.password }}
+        </span>
+      </div>
+
+      <div class="mt-6">
+        <button
+          type="submit"
+          class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-primary/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          :disabled="saving"
+        >
+          <Loader2 v-if="saving" class="h-5 w-5 animate-spin" />
+          <Save v-else class="h-5 w-5" />
+          {{ saving ? 'Saving Changes...' : 'Save Changes' }}
+        </button>
+      </div>
+
+      <div
+        v-if="message"
+        :class="[
+          messageType === 'success' ? 'text-success' : 'text-destructive',
+          'mt-3 flex items-center justify-center gap-1.5 text-center text-sm',
+        ]"
+      >
+        <Check v-if="messageType === 'success'" class="h-4 w-4" />
+        <AlertCircle v-else class="h-4 w-4" />
+        {{ message }}
+      </div>
+    </form>
+
+    <div class="relative mt-8">
+      <div class="absolute inset-0 flex items-center">
+        <span class="border-border w-full border-t"></span>
+      </div>
+      <div class="relative flex justify-center text-xs uppercase">
+        <span class="bg-background text-muted-foreground px-2"> Security </span>
+      </div>
+    </div>
+
+    <div class="mt-6">
+      <button
+        v-if="!hasPasskey"
+        type="button"
+        @click="handleAddPasskey"
+        :disabled="addingPasskey"
+        class="bg-success text-primary-foreground shadow-success/30 hover:bg-success/90 focus:ring-success/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <Loader2 v-if="addingPasskey" class="h-5 w-5 animate-spin" />
+        <KeyRound v-else class="h-5 w-5" />
+        {{ addingPasskey ? 'Adding Passkey...' : 'Add Passkey' }}
+      </button>
+      <AlertDialog v-else>
+        <AlertDialogTrigger as-child>
+          <button
+            type="button"
+            :disabled="deletingPasskey"
+            class="bg-destructive text-primary-foreground shadow-destructive/30 hover:bg-destructive/90 focus:ring-destructive/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Loader2 v-if="deletingPasskey" class="h-5 w-5 animate-spin" />
+            <Trash2 v-else class="h-5 w-5" />
+            {{ deletingPasskey ? 'Deleting Passkey...' : 'Delete Passkey' }}
+          </button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. You will need to use your password
+              to log in after deleting your passkey.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction @click="handleDeletePasskey">
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <p
+        v-if="passkeyMessage"
+        :class="[
+          passkeyMessageType === 'success'
+            ? 'text-success'
+            : 'text-destructive',
+          'mt-2 flex items-center justify-center gap-1.5 text-center text-sm',
+        ]"
+      >
+        <Check v-if="passkeyMessageType === 'success'" class="h-4 w-4" />
+        <AlertCircle v-else class="h-4 w-4" />
+        {{ passkeyMessage }}
+      </p>
+    </div>
+
+    <div class="relative mt-8">
+      <div class="absolute inset-0 flex items-center">
+        <span class="border-border w-full border-t"></span>
+      </div>
+      <div class="relative flex justify-center text-xs uppercase">
+        <span class="bg-background text-muted-foreground px-2">
+          Connected Accounts
+        </span>
+      </div>
+    </div>
+
+    <div class="mt-6">
+      <button
+        v-if="!hasGitHubBound"
+        type="button"
+        @click="handleBindGitHub"
+        :disabled="bindingGitHub"
+        class="text-primary-foreground focus:ring-primary inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-black px-8 py-2.5 font-bold shadow-lg transition-colors hover:bg-black/90 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <Loader2 v-if="bindingGitHub" class="h-5 w-5 animate-spin" />
+        <svg
+          v-else
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
+          />
+        </svg>
+        {{ bindingGitHub ? 'Binding GitHub...' : 'Bind GitHub Account' }}
+      </button>
+      <AlertDialog v-else>
+        <AlertDialogTrigger as-child>
+          <button
+            type="button"
+            :disabled="unbindingGitHub"
+            class="text-primary-foreground focus:ring-primary inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-black px-8 py-2.5 font-bold shadow-lg transition-colors hover:bg-black/90 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:text-white"
+          >
+            <Loader2 v-if="unbindingGitHub" class="h-5 w-5 animate-spin" />
+            <Trash2 v-else class="h-5 w-5" />
+            {{ unbindingGitHub ? 'Unbinding...' : 'Unbind GitHub Account' }}
+          </button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action will unbind your GitHub account from your profile. You
+              will no longer be able to log in with GitHub after this.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction @click="handleUnbindGitHub">
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <p
+        v-if="githubMessage"
+        :class="[
+          githubMessageType === 'success' ? 'text-success' : 'text-destructive',
+          'mt-2 flex items-center justify-center gap-1.5 text-center text-sm',
+        ]"
+      >
+        <Check v-if="githubMessageType === 'success'" class="h-4 w-4" />
+        <AlertCircle v-else class="h-4 w-4" />
+        {{ githubMessage }}
+      </p>
+    </div>
   </AuthLayout>
 </template>
