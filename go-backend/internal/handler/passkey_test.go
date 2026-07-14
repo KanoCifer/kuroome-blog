@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -23,52 +24,52 @@ func init() {
 // ---------- mock PasskeyService ----------
 
 type mockPasskeyService struct {
-	beginRegistrationFn  func(userID uint) (map[string]any, error)
-	finishRegistrationFn func(userID uint, response map[string]any) error
-	beginLoginFn         func() (map[string]any, error)
-	finishLoginFn        func(response map[string]any) (*model.User, error)
-	deletePasskeyFn      func(userID uint) error
-	hasPasskeyFn         func(userID uint) bool
+	beginRegistrationFn  func(ctx context.Context, userID uint) (map[string]any, error)
+	finishRegistrationFn func(ctx context.Context, userID uint, response map[string]any) error
+	beginLoginFn         func(ctx context.Context) (map[string]any, error)
+	finishLoginFn        func(ctx context.Context, response map[string]any) (*model.User, error)
+	deletePasskeyFn      func(ctx context.Context, userID uint) error
+	hasPasskeyFn         func(ctx context.Context, userID uint) bool
 }
 
-func (m *mockPasskeyService) BeginRegistration(userID uint) (map[string]any, error) {
+func (m *mockPasskeyService) BeginRegistration(ctx context.Context, userID uint) (map[string]any, error) {
 	if m.beginRegistrationFn != nil {
-		return m.beginRegistrationFn(userID)
+		return m.beginRegistrationFn(ctx, userID)
 	}
 	return map[string]any{"challenge": "abc"}, nil
 }
 
-func (m *mockPasskeyService) FinishRegistration(userID uint, response map[string]any) error {
+func (m *mockPasskeyService) FinishRegistration(ctx context.Context, userID uint, response map[string]any) error {
 	if m.finishRegistrationFn != nil {
-		return m.finishRegistrationFn(userID, response)
+		return m.finishRegistrationFn(ctx, userID, response)
 	}
 	return nil
 }
 
-func (m *mockPasskeyService) BeginLogin() (map[string]any, error) {
+func (m *mockPasskeyService) BeginLogin(ctx context.Context) (map[string]any, error) {
 	if m.beginLoginFn != nil {
-		return m.beginLoginFn()
+		return m.beginLoginFn(ctx)
 	}
 	return map[string]any{"challenge": "xyz"}, nil
 }
 
-func (m *mockPasskeyService) FinishLogin(response map[string]any) (*model.User, error) {
+func (m *mockPasskeyService) FinishLogin(ctx context.Context, response map[string]any) (*model.User, error) {
 	if m.finishLoginFn != nil {
-		return m.finishLoginFn(response)
+		return m.finishLoginFn(ctx, response)
 	}
 	return &model.User{Model: passkeyGormModel(1), Username: "alice"}, nil
 }
 
-func (m *mockPasskeyService) DeletePasskey(userID uint) error {
+func (m *mockPasskeyService) DeletePasskey(ctx context.Context, userID uint) error {
 	if m.deletePasskeyFn != nil {
-		return m.deletePasskeyFn(userID)
+		return m.deletePasskeyFn(ctx, userID)
 	}
 	return nil
 }
 
-func (m *mockPasskeyService) HasPasskey(userID uint) bool {
+func (m *mockPasskeyService) HasPasskey(ctx context.Context, userID uint) bool {
 	if m.hasPasskeyFn != nil {
-		return m.hasPasskeyFn(userID)
+		return m.hasPasskeyFn(ctx, userID)
 	}
 	return false
 }
@@ -115,7 +116,7 @@ func parsePasskeyMessage(t *testing.T, body []byte) string {
 
 func TestRegistrationOptions_Success(t *testing.T) {
 	svc := &mockPasskeyService{
-		beginRegistrationFn: func(userID uint) (map[string]any, error) {
+		beginRegistrationFn: func(ctx context.Context, userID uint) (map[string]any, error) {
 			return map[string]any{"challenge": "abc", "rp": "test"}, nil
 		},
 	}
@@ -133,7 +134,7 @@ func TestRegistrationOptions_Success(t *testing.T) {
 
 func TestRegistrationOptions_AlreadyExists(t *testing.T) {
 	svc := &mockPasskeyService{
-		beginRegistrationFn: func(userID uint) (map[string]any, error) {
+		beginRegistrationFn: func(ctx context.Context, userID uint) (map[string]any, error) {
 			return nil, errs.ErrPasskeyExists
 		},
 	}
@@ -149,7 +150,7 @@ func TestRegistrationOptions_AlreadyExists(t *testing.T) {
 
 func TestPasskeyRegister_Success(t *testing.T) {
 	svc := &mockPasskeyService{
-		finishRegistrationFn: func(userID uint, response map[string]any) error {
+		finishRegistrationFn: func(ctx context.Context, userID uint, response map[string]any) error {
 			return nil
 		},
 	}
@@ -166,7 +167,7 @@ func TestPasskeyRegister_Success(t *testing.T) {
 
 func TestPasskeyRegister_InvalidResponse(t *testing.T) {
 	svc := &mockPasskeyService{
-		finishRegistrationFn: func(userID uint, response map[string]any) error {
+		finishRegistrationFn: func(ctx context.Context, userID uint, response map[string]any) error {
 			return errs.ErrInvalidPasskey
 		},
 	}
@@ -185,7 +186,7 @@ func TestPasskeyRegister_InvalidResponse(t *testing.T) {
 
 func TestAuthenticationOptions_Success(t *testing.T) {
 	svc := &mockPasskeyService{
-		beginLoginFn: func() (map[string]any, error) {
+		beginLoginFn: func(ctx context.Context) (map[string]any, error) {
 			return map[string]any{"challenge": "xyz"}, nil
 		},
 	}
@@ -205,13 +206,13 @@ func TestAuthenticationOptions_Success(t *testing.T) {
 
 func TestAuthenticate_Success(t *testing.T) {
 	svc := &mockPasskeyService{
-		finishLoginFn: func(response map[string]any) (*model.User, error) {
+		finishLoginFn: func(ctx context.Context, response map[string]any) (*model.User, error) {
 			// 与 GetByCredentialID 预加载行为一致:返回含 PasskeyCredential 的用户
 			return &model.User{Model: passkeyGormModel(1), Username: "alice", PasskeyCredential: &model.PasskeyCredential{}}, nil
 		},
 	}
 	mockUserSvc := &mockUserService{
-		createTokensFn: func(u *model.User) (*dto.Tokens, error) {
+		createTokensFn: func(ctx context.Context, u *model.User) (*dto.Tokens, error) {
 			return &dto.Tokens{AccessToken: "access", RefreshToken: "refresh"}, nil
 		},
 	}
@@ -238,7 +239,7 @@ func TestAuthenticate_Success(t *testing.T) {
 
 func TestAuthenticate_InvalidPasskey(t *testing.T) {
 	svc := &mockPasskeyService{
-		finishLoginFn: func(response map[string]any) (*model.User, error) {
+		finishLoginFn: func(ctx context.Context, response map[string]any) (*model.User, error) {
 			return nil, errs.ErrInvalidPasskey
 		},
 	}
@@ -257,7 +258,7 @@ func TestAuthenticate_InvalidPasskey(t *testing.T) {
 
 func TestDeletePasskey_Success(t *testing.T) {
 	svc := &mockPasskeyService{
-		deletePasskeyFn: func(userID uint) error {
+		deletePasskeyFn: func(ctx context.Context, userID uint) error {
 			return nil
 		},
 	}
@@ -271,7 +272,7 @@ func TestDeletePasskey_Success(t *testing.T) {
 
 func TestDeletePasskey_NotFound(t *testing.T) {
 	svc := &mockPasskeyService{
-		deletePasskeyFn: func(userID uint) error {
+		deletePasskeyFn: func(ctx context.Context, userID uint) error {
 			return errs.ErrPasskeyNotFound
 		},
 	}

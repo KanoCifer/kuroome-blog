@@ -5,26 +5,18 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/KanoCifer/kuroome-blog/internal/service"
 	"github.com/coder/websocket"
 	"github.com/gin-gonic/gin"
 )
 
-// WSService 定义 handler 层依赖的 WS 能力集合。
-// 由 service.WSService 实现；handler 仅依赖此接口，便于测试替换。
-type WSService interface {
-	ReadMsg(ctx context.Context, conn *websocket.Conn, msg interface{}) error
-	HandleFirstMessage(ctx context.Context, conn *websocket.Conn, msg map[string]interface{}) (bool, error)
-	RedisListener(ctx context.Context, conn *websocket.Conn) error
-	WSReceiver(ctx context.Context, conn *websocket.Conn) error
-	RemoveVisitor(ctx context.Context, visitorId string) error
-	PublishCount(ctx context.Context) error
-}
+
 
 type WSHandler struct {
-	Svc WSService
+	Svc service.WSer
 }
 
-func NewWSHandler(svc WSService) *WSHandler {
+func NewWSHandler(svc service.WSer) *WSHandler {
 	return &WSHandler{
 		Svc: svc,
 	}
@@ -43,7 +35,7 @@ func (h *WSHandler) HandleWS(c *gin.Context) {
 	reqCtx := c.Request.Context()
 	slog.InfoContext(reqCtx, "websocket connected", "remote", c.Request.RemoteAddr)
 
-	readCtx, readCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	readCtx, readCancel := context.WithTimeout(reqCtx, 10*time.Second)
 	defer readCancel()
 
 	var msg map[string]interface{}
@@ -71,7 +63,7 @@ func (h *WSHandler) HandleWS(c *gin.Context) {
 	slog.InfoContext(reqCtx, "visitor registered", "visitor_id", visitorId, "registered", registered)
 
 	// 连接生命周期 context：任一 goroutine 结束即取消，驱动另一方退出
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(reqCtx)
 	defer cancel()
 
 	errc := make(chan error, 2)
@@ -93,7 +85,7 @@ func (h *WSHandler) HandleWS(c *gin.Context) {
 
 	// 清理访客计数并广播更新
 	if registered && visitorId != "" {
-		cleanupCtx, cleanupCancel := context.WithTimeout(context.Background(), 5*time.Second)
+		cleanupCtx, cleanupCancel := context.WithTimeout(reqCtx, 5*time.Second)
 		defer cleanupCancel()
 		if err := h.Svc.RemoveVisitor(cleanupCtx, visitorId); err != nil {
 			slog.ErrorContext(reqCtx, "failed to remove visitor", "error", err, "visitor_id", visitorId)

@@ -14,8 +14,8 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 )
 
-// BlogService 博客读表面 —— handler 依赖接口，便于 mock 测试。
-type BlogService interface {
+// BlogServiceer 博客读表面 —— handler 依赖接口，便于 mock 测试。
+type BlogServiceer interface {
 	ListPosts(ctx context.Context, page int, search string) (*dto.BlogListOut, error)
 	GetPost(ctx context.Context, id string) (*dto.PostOut, error)
 	IncrementViews(ctx context.Context, id string) error
@@ -26,10 +26,10 @@ type BlogService interface {
 
 // BlogHandler 处理博客读请求（公开接口，无需鉴权）。
 type BlogHandler struct {
-	blogSvc BlogService
+	blogSvc BlogServiceer
 }
 
-func NewBlogHandler(blogSvc BlogService) *BlogHandler {
+func NewBlogHandler(blogSvc BlogServiceer) *BlogHandler {
 	return &BlogHandler{blogSvc: blogSvc}
 }
 

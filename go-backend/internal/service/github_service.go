@@ -24,8 +24,20 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
-	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 )
+
+// UserSvcer 定义 github 服务依赖的用户业务能力。
+type UserSvcer interface {
+	CreateTokens(ctx context.Context, u *model.User) (*dto.Tokens, error)
+	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
+}
+
+// GitHubOAuther 定义 github handler 依赖的业务能力。
+type GitHubOAuther interface {
+	AuthURL(ctx context.Context, mode string, userID uint) (string, error)
+	HandleCallback(ctx context.Context, state, code string) (*model.User, *dto.Tokens, error)
+	UnbindGitHub(ctx context.Context, userID uint) error
+}
 
 // GitHubOAuth 封装 GitHub OAuth 业务逻辑。
 //
@@ -33,19 +45,19 @@ import (
 // 直接读取全局 config.Cfg。
 type GitHubOAuth struct {
 	redis        *redis.Client
-	userRepo     *postgres.UserRepo
-	userSvc      *UserService
+	userRepo     UserRepositoryer
+	userSvc      UserSvcer
 	httpCli      *http.Client
 	clientID     string
 	clientSecret string
 	redirectURI  string
 }
 
-// NewGitHubOAuth 构造一个 GitHubOAuth 实例, state TTL 10 分钟。
+// NewGitHubOAuth 构造一个 gitHubOAuth 实例, state TTL 10 分钟。
 func NewGitHubOAuth(
 	redis *redis.Client,
-	userRepo *postgres.UserRepo,
-	userSvc *UserService,
+	userRepo UserRepositoryer,
+	userSvc UserSvcer,
 	clientID, clientSecret, redirectURI string,
 ) *GitHubOAuth {
 	return &GitHubOAuth{
@@ -88,7 +100,7 @@ func randomState() (string, error) {
 //
 // mode="login" 时 userID=0, mode="bind" 时 userID 为当前登录用户。
 // 返回的 URL 应由 handler 发起 302 重定向。
-func (g *GitHubOAuth) AuthURL(mode string, userID uint) (string, error) {
+func (g *GitHubOAuth) AuthURL(ctx context.Context, mode string, userID uint) (string, error) {
 	if g.clientID == "" {
 		return "", errs.ErrGitHubNotConfigured
 	}
@@ -98,7 +110,7 @@ func (g *GitHubOAuth) AuthURL(mode string, userID uint) (string, error) {
 	}
 	if g.redis != nil {
 		if err := g.redis.Set(
-			context.Background(),
+			ctx,
 			statePrefix+state,
 			strconv.FormatUint(uint64(userID), 10),
 			stateTTL,
@@ -124,44 +136,44 @@ func (g *GitHubOAuth) AuthURL(mode string, userID uint) (string, error) {
 // bind 模式(userID>0): 把 github_id 绑到该用户, 返回 (user, nil, nil)。
 //
 // 出错时返回 (nil, nil, err)。
-func (g *GitHubOAuth) HandleCallback(state, code string) (*model.User, *dto.Tokens, error) {
+func (g *GitHubOAuth) HandleCallback(ctx context.Context, state, code string) (*model.User, *dto.Tokens, error) {
 	// 1. 校验 state
 	if state == "" || code == "" {
 		return nil, nil, errs.ErrInvalidOAuthState
 	}
-	userIDVal, err := g.redis.Get(context.Background(), statePrefix+state).Result()
+	userIDVal, err := g.redis.Get(ctx, statePrefix+state).Result()
 	if err != nil {
 		return nil, nil, errs.ErrInvalidOAuthState
 	}
-	g.redis.Del(context.Background(), statePrefix+state) // 一次性
+	g.redis.Del(ctx, statePrefix+state) // 一次性
 	userID, _ := strconv.ParseUint(userIDVal, 10, 64)
 
 	// 2. code → access_token
-	accessToken, err := g.exchangeCode(code)
+	accessToken, err := g.exchangeCode(ctx, code)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	// 3. 取 GitHub 用户信息
-	gh, err := g.fetchUser(accessToken)
+	gh, err := g.fetchUser(ctx, accessToken)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	if userID == 0 {
-		return g.loginByGitHub(gh)
+		return g.loginByGitHub(ctx, gh)
 	}
-	return g.bindGitHub(uint(userID), gh)
+	return g.bindGitHub(ctx, uint(userID), gh)
 }
 
 // loginByGitHub 按 github_id 查找或自动创建用户, 并签发 token。
-func (g *GitHubOAuth) loginByGitHub(gh *ghUser) (*model.User, *dto.Tokens, error) {
-	existing, err := g.userRepo.GetByGithubID(gh.ID)
+func (g *GitHubOAuth) loginByGitHub(ctx context.Context, gh *ghUser) (*model.User, *dto.Tokens, error) {
+	existing, err := g.userRepo.GetByGithubID(ctx, gh.ID)
 	if err != nil {
 		return nil, nil, err
 	}
 	if existing != nil {
-		tokens, err := g.userSvc.CreateTokens(existing)
+		tokens, err := g.userSvc.CreateTokens(ctx, existing)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -169,20 +181,20 @@ func (g *GitHubOAuth) loginByGitHub(gh *ghUser) (*model.User, *dto.Tokens, error
 	}
 
 	// 自动创建用户(与 Python 端 handle_github_login_callback 行为一致)
-	username := uniqueUsername(gh.Login, g.userRepo.UsernameExists)
+	username := uniqueUsername(gh.Login, func(s string) bool { return g.userRepo.UsernameExists(ctx, s) })
 	email := gh.Email
 	if email == "" {
 		email = gh.Login + "@github.com"
 	}
 	avatarURL := gh.AvatarURL
-	u, _, err := g.userSvc.CreateUser(username, randomPassword(), email, "", avatarURL)
+	u, _, err := g.userSvc.CreateUser(ctx, username, randomPassword(), email, "", avatarURL)
 	if err != nil {
 		return nil, nil, err
 	}
-	if err := g.userRepo.SetGithubID(u.ID, gh.ID); err != nil {
+	if err := g.userRepo.SetGithubID(ctx, u.ID, gh.ID); err != nil {
 		return nil, nil, err
 	}
-	tokens, err := g.userSvc.CreateTokens(u)
+	tokens, err := g.userSvc.CreateTokens(ctx, u)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -190,18 +202,18 @@ func (g *GitHubOAuth) loginByGitHub(gh *ghUser) (*model.User, *dto.Tokens, error
 }
 
 // bindGitHub 把 github_id 绑到指定用户。
-func (g *GitHubOAuth) bindGitHub(userID uint, gh *ghUser) (*model.User, *dto.Tokens, error) {
-	existing, err := g.userRepo.GetByGithubID(gh.ID)
+func (g *GitHubOAuth) bindGitHub(ctx context.Context, userID uint, gh *ghUser) (*model.User, *dto.Tokens, error) {
+	existing, err := g.userRepo.GetByGithubID(ctx, gh.ID)
 	if err != nil {
 		return nil, nil, err
 	}
 	if existing != nil {
 		return nil, nil, errs.ErrGitHubAlreadyBound
 	}
-	if err := g.userRepo.SetGithubID(userID, gh.ID); err != nil {
+	if err := g.userRepo.SetGithubID(ctx, userID, gh.ID); err != nil {
 		return nil, nil, err
 	}
-	user, err := g.userRepo.GetByID(userID)
+	user, err := g.userRepo.GetByID(ctx, userID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -209,19 +221,19 @@ func (g *GitHubOAuth) bindGitHub(userID uint, gh *ghUser) (*model.User, *dto.Tok
 }
 
 // UnbindGitHub 解除用户与 GitHub 的绑定。
-func (g *GitHubOAuth) UnbindGitHub(userID uint) error {
-	return g.userRepo.ClearGithubID(userID)
+func (g *GitHubOAuth) UnbindGitHub(ctx context.Context, userID uint) error {
+	return g.userRepo.ClearGithubID(ctx, userID)
 }
 
 // exchangeCode 用 GitHub 授权码换 access_token。
-func (g *GitHubOAuth) exchangeCode(code string) (string, error) {
+func (g *GitHubOAuth) exchangeCode(ctx context.Context, code string) (string, error) {
 	data := url.Values{}
 	data.Set("client_id", g.clientID)
 	data.Set("client_secret", g.clientSecret)
 	data.Set("code", code)
 	data.Set("redirect_uri", g.redirectURI)
 
-	req, err := http.NewRequest(http.MethodPost, githubTokenURL, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, githubTokenURL, nil)
 	if err != nil {
 		return "", err
 	}
@@ -252,8 +264,8 @@ func (g *GitHubOAuth) exchangeCode(code string) (string, error) {
 }
 
 // fetchUser 用 access_token 取 GitHub 用户信息。
-func (g *GitHubOAuth) fetchUser(accessToken string) (*ghUser, error) {
-	req, err := http.NewRequest(http.MethodGet, githubUserURL, nil)
+func (g *GitHubOAuth) fetchUser(ctx context.Context, accessToken string) (*ghUser, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, githubUserURL, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -16,7 +16,6 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
-	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 	"github.com/KanoCifer/kuroome-blog/pkg/jwt"
 	"github.com/KanoCifer/kuroome-blog/pkg/notification"
 )
@@ -32,23 +31,55 @@ type LoginResponse struct {
 	IsAdmin  bool   `json:"is_admin"`
 }
 
-// UserService 持有 repo 和 redis，负责编排业务逻辑。
+// UserRepositoryer 定义 Userer 依赖的持久层能力集合。
+// 由 postgres.UserRepo 实现；service 仅依赖此接口，便于测试替换。
+type UserRepositoryer interface {
+	Create(ctx context.Context, user *model.User, profile *model.Profile) error
+	GetByID(ctx context.Context, id uint) (*model.User, error)
+	GetByUsername(ctx context.Context, username string) (*model.User, error)
+	GetByEmail(ctx context.Context, email string) (*model.User, *model.Profile, error)
+	GetByGithubID(ctx context.Context, githubID int) (*model.User, error)
+	SetGithubID(ctx context.Context, userID uint, githubID int) error
+	ClearGithubID(ctx context.Context, userID uint) error
+	UsernameExists(ctx context.Context, username string) bool
+	EmailExists(ctx context.Context, email string) bool
+	ListUsersWithLoginRecords(ctx context.Context) ([]model.User, error)
+	Update(ctx context.Context, user *model.User) error
+	UpdateProfile(ctx context.Context, profile *model.Profile) error
+	Delete(ctx context.Context, user *model.User) error
+}
+
+// Userer 定义 user handler 依赖的业务能力集合。
+// 由 *userService 实现；handler 仅依赖此接口，便于测试替换。
+type Userer interface {
+	GetByID(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
+	GetByUsername(ctx context.Context, username string) (*model.User, *model.Profile, error)
+	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
+	SendEmailCode(ctx context.Context, email string) bool
+	Authenticate(ctx context.Context, username, password string) (*model.User, error)
+	CreateTokens(ctx context.Context, u *model.User) (*dto.Tokens, error)
+	RefreshTokens(ctx context.Context, refreshToken string) (*dto.Tokens, error)
+	Logout(ctx context.Context, userID uint)
+	UserToDict(u *model.User, p *model.Profile) map[string]any
+}
+
+// userService 持有 repo 和 redis，负责编排业务逻辑。
 //
 // adminUserIDs 由调用方从 config 注入，避免本包直接读取全局 config.Cfg。
-type UserService struct {
-	repo         *postgres.UserRepo
+type userService struct {
+	repo         UserRepositoryer
 	redis        *redis.Client
 	adminUserIDs []int
 }
 
-func NewUserService(repo *postgres.UserRepo, redis *redis.Client, adminUserIDs []int) *UserService {
-	return &UserService{repo: repo, redis: redis, adminUserIDs: adminUserIDs}
+func NewUserService(repo UserRepositoryer, redis *redis.Client, adminUserIDs []int) *userService {
+	return &userService{repo: repo, redis: redis, adminUserIDs: adminUserIDs}
 }
 
 // ---------- 查询 ----------
 
-func (s *UserService) GetByID(userID uint) (*model.User, *model.Profile, error) {
-	u, err := s.repo.GetByID(userID)
+func (s *userService) GetByID(ctx context.Context, userID uint) (*model.User, *model.Profile, error) {
+	u, err := s.repo.GetByID(ctx, userID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -58,8 +89,8 @@ func (s *UserService) GetByID(userID uint) (*model.User, *model.Profile, error) 
 	return u, u.Profile, nil
 }
 
-func (s *UserService) GetByUsername(username string) (*model.User, *model.Profile, error) {
-	u, err := s.repo.GetByUsername(username)
+func (s *userService) GetByUsername(ctx context.Context, username string) (*model.User, *model.Profile, error) {
+	u, err := s.repo.GetByUsername(ctx, username)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -71,16 +102,16 @@ func (s *UserService) GetByUsername(username string) (*model.User, *model.Profil
 
 // ---------- 注册 ----------
 
-func (s *UserService) CreateUser(username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
-	if s.repo.UsernameExists(username) {
+func (s *userService) CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
+	if s.repo.UsernameExists(ctx, username) {
 		return nil, nil, errs.ErrUserExists
 	}
-	if email != "" && s.repo.EmailExists(email) {
+	if email != "" && s.repo.EmailExists(ctx, email) {
 		return nil, nil, errs.ErrEmailExists
 	}
 
 	if emailCode != "" {
-		if !s.verifyEmailCode(email, emailCode) {
+		if !s.verifyEmailCode(ctx, email, emailCode) {
 			return nil, nil, errs.ErrInvalidEmailCode
 		}
 	}
@@ -101,17 +132,15 @@ func (s *UserService) CreateUser(username, password, email, emailCode, avatarURL
 	if avatarURL != "" {
 		p = &model.Profile{Photo: avatarURL}
 	}
-	if err := s.repo.Create(u, p); err != nil {
+	if err := s.repo.Create(ctx, u, p); err != nil {
 		return nil, nil, err
 	}
 	return u, p, nil
 }
 
-func (s *UserService) SendEmailCode(email string) bool {
+func (s *userService) SendEmailCode(ctx context.Context, email string) bool {
 	var ch notification.Channel = &notification.EmailChannel{}
 	code := generateCode()
-
-	ctx := context.Background()
 
 	key := emailCodePrefix + email
 	s.redis.Set(ctx, key, code, emailCodeExpire)
@@ -132,13 +161,13 @@ func buildVerificationEmail(code string) notification.Message {
 
 // ---------- 登录 / 鉴权 ----------
 
-func (s *UserService) CheckPassword(u *model.User, password string) bool {
+func (s *userService) CheckPassword(u *model.User, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(password))
 	return err == nil
 }
 
-func (s *UserService) Authenticate(username, password string) (*model.User, error) {
-	u, _, err := s.GetByUsername(username)
+func (s *userService) Authenticate(ctx context.Context, username, password string) (*model.User, error) {
+	u, _, err := s.GetByUsername(ctx, username)
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +181,7 @@ func (s *UserService) Authenticate(username, password string) (*model.User, erro
 }
 
 // CreateTokens 生成 access + refresh token，refresh 入库 Redis
-func (s *UserService) CreateTokens(u *model.User) (*dto.Tokens, error) {
+func (s *userService) CreateTokens(ctx context.Context, u *model.User) (*dto.Tokens, error) {
 	refreshTTL := 7 * 24 * time.Hour
 	accessExpiry := time.Now().Add(15 * time.Minute)
 	refreshExpiry := time.Now().Add(refreshTTL)
@@ -168,7 +197,6 @@ func (s *UserService) CreateTokens(u *model.User) (*dto.Tokens, error) {
 
 	// refresh token 写入 Redis，key = refresh:{userID}
 	if s.redis != nil {
-		ctx := context.Background()
 		s.redis.Set(ctx, "refresh:"+itoa(int(u.ID)), refreshToken, refreshTTL)
 	}
 
@@ -179,7 +207,7 @@ func (s *UserService) CreateTokens(u *model.User) (*dto.Tokens, error) {
 }
 
 // RefreshTokens 校验 refresh token 并轮换
-func (s *UserService) RefreshTokens(refreshToken string) (*dto.Tokens, error) {
+func (s *userService) RefreshTokens(ctx context.Context, refreshToken string) (*dto.Tokens, error) {
 	claims, err := jwt.ParseToken(refreshToken)
 	if err != nil {
 		return nil, errs.ErrInvalidToken
@@ -191,29 +219,29 @@ func (s *UserService) RefreshTokens(refreshToken string) (*dto.Tokens, error) {
 
 	// 校验 Redis 里存的和传入的是否一致（防止重放/盗用）
 	if s.redis != nil {
-		stored, err := s.redis.Get(context.Background(), "refresh:"+claims.Subject).Result()
+		stored, err := s.redis.Get(ctx, "refresh:"+claims.Subject).Result()
 		if err != nil || stored != refreshToken {
 			return nil, errs.ErrInvalidToken
 		}
 	}
 
-	return s.CreateTokens(&model.User{Model: gormModel(userID)})
+	return s.CreateTokens(ctx, &model.User{Model: gormModel(userID)})
 }
 
 // Logout 登出：从 Redis 删掉 refresh token
-func (s *UserService) Logout(userID uint) {
+func (s *userService) Logout(ctx context.Context, userID uint) {
 	if s.redis != nil {
-		s.redis.Del(context.Background(), "refresh:"+itoa(int(userID)))
+		s.redis.Del(ctx, "refresh:"+itoa(int(userID)))
 	}
 }
 
 // ---------- 响应构造 ----------
 
-func (s *UserService) IsAdmin(u *model.User) bool {
+func (s *userService) IsAdmin(u *model.User) bool {
 	return slices.Contains(s.adminUserIDs, int(u.ID))
 }
 
-func (s *UserService) UserToDict(u *model.User, p *model.Profile) map[string]any {
+func (s *userService) UserToDict(u *model.User, p *model.Profile) map[string]any {
 	d := map[string]any{
 		"id":           u.ID,
 		"username":     u.Username,
@@ -306,11 +334,10 @@ func gormModel(id uint) gorm.Model {
 }
 
 // verifyEmailCode 校验 Redis 中的注册验证码（signup_code:{email}）。
-func (s *UserService) verifyEmailCode(email, code string) bool {
+func (s *userService) verifyEmailCode(ctx context.Context, email, code string) bool {
 	if s.redis == nil || email == "" {
 		return false
 	}
-	ctx := context.Background()
 	key := "signup_code:" + email
 	stored, err := s.redis.Get(ctx, key).Result()
 	if err != nil || stored != code {

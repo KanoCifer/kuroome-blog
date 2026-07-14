@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -17,25 +16,12 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
-// DevTaskService devtask 读表面 —— handler 依赖接口，便于 mock 测试。
-// 所有接口一律使用 slug 作为任务标识，不暴露 ObjectID。
-type DevTaskService interface {
-	Create(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error)
-	GetBySlug(ctx context.Context, slug string, withParent bool) (*dto.DevTaskOut, error)
-	List(ctx context.Context, filter mongodb.ListFilter, page, perPage int) (*dto.DevTaskListOut, error)
-	Update(ctx context.Context, slug string, req dto.DevTaskUpdate) error
-	BatchUpdateStatus(ctx context.Context, slugs []string, status document.DevTaskStatus) (*service.BatchStatusResult, error)
-	SoftDelete(ctx context.Context, slug string) error
-	HardDelete(ctx context.Context, slug string) error
-	FindFrontier(ctx context.Context, limit int) ([]dto.DevTaskOut, error)
-}
-
 // DevTaskHandler 处理开发与需求看板请求（需登录 + admin）。
 type DevTaskHandler struct {
-	svc DevTaskService
+	svc service.DevTasker
 }
 
-func NewDevTaskHandler(svc DevTaskService) *DevTaskHandler {
+func NewDevTaskHandler(svc service.DevTasker) *DevTaskHandler {
 	return &DevTaskHandler{svc: svc}
 }
 

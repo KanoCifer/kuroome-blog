@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -26,36 +27,36 @@ func init() {
 // ---------- mock AdminService ----------
 
 type mockAdminService struct {
-	addPostFn       func(post dto.PostIn) (string, error)
-	updatePostFn    func(id string, post dto.PostUpdate) error
-	deletePostFn    func(id string) error
-	trackFn         func(data dto.VisitorData) error
-	listViewsDataFn func() ([]dto.PostViewData, error)
+	addPostFn       func(ctx context.Context, post dto.PostIn) (string, error)
+	updatePostFn    func(ctx context.Context, id string, post dto.PostUpdate) error
+	deletePostFn    func(ctx context.Context, id string) error
+	trackFn         func(ctx context.Context, data dto.VisitorData) error
+	listViewsDataFn func(ctx context.Context) ([]dto.PostViewData, error)
 }
 
-func (m *mockAdminService) AddPost(post dto.PostIn) (string, error) {
-	return m.addPostFn(post)
+func (m *mockAdminService) AddPost(ctx context.Context, post dto.PostIn) (string, error) {
+	return m.addPostFn(ctx, post)
 }
 
-func (m *mockAdminService) UpdatePost(id string, post dto.PostUpdate) error {
-	return m.updatePostFn(id, post)
+func (m *mockAdminService) UpdatePost(ctx context.Context, id string, post dto.PostUpdate) error {
+	return m.updatePostFn(ctx, id, post)
 }
 
-func (m *mockAdminService) DeletePost(id string) error {
-	return m.deletePostFn(id)
+func (m *mockAdminService) DeletePost(ctx context.Context, id string) error {
+	return m.deletePostFn(ctx, id)
 }
 
-func (m *mockAdminService) TrackVisitor(data dto.VisitorData) error {
-	return m.trackFn(data)
+func (m *mockAdminService) TrackVisitor(ctx context.Context, data dto.VisitorData) error {
+	return m.trackFn(ctx, data)
 }
 
-func (m *mockAdminService) ListPostViewsData() ([]dto.PostViewData, error) {
-	return m.listViewsDataFn()
+func (m *mockAdminService) ListPostViewsData(ctx context.Context) ([]dto.PostViewData, error) {
+	return m.listViewsDataFn(ctx)
 }
 
 // ---------- helpers ----------
 
-func newAdminHandler(svc AdminService) (*AdminHandler, *gin.Engine) {
+func newAdminHandler(svc AdminServiceer) (*AdminHandler, *gin.Engine) {
 	h := NewAdminHandler(svc, config.Cfg)
 	r := gin.New()
 	g := r.Group("/api/v3")
@@ -160,7 +161,7 @@ func realAdminAuthMiddleware() gin.HandlerFunc {
 
 func TestAdmin_AddPost_Success(t *testing.T) {
 	svc := &mockAdminService{
-		addPostFn: func(post dto.PostIn) (string, error) {
+		addPostFn: func(ctx context.Context, post dto.PostIn) (string, error) {
 			return "507f1f77bcf86cd799439011", nil
 		},
 	}
@@ -186,7 +187,7 @@ func TestAdmin_AddPost_Success(t *testing.T) {
 
 func TestAdmin_AddPost_Error(t *testing.T) {
 	svc := &mockAdminService{
-		addPostFn: func(post dto.PostIn) (string, error) {
+		addPostFn: func(ctx context.Context, post dto.PostIn) (string, error) {
 			return "", errors.New("db down")
 		},
 	}
@@ -200,7 +201,7 @@ func TestAdmin_AddPost_Error(t *testing.T) {
 }
 
 func TestAdmin_AddPost_InvalidBody(t *testing.T) {
-	svc := &mockAdminService{addPostFn: func(dto.PostIn) (string, error) { return "", nil }}
+	svc := &mockAdminService{addPostFn: func(context.Context, dto.PostIn) (string, error) { return "", nil }}
 	_, r := newAdminHandler(svc)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/v3/post/add", bytes.NewReader([]byte("not json")))
@@ -216,7 +217,7 @@ func TestAdmin_AddPost_InvalidBody(t *testing.T) {
 
 func TestAdmin_UpdatePost_InvalidID(t *testing.T) {
 	svc := &mockAdminService{
-		updatePostFn: func(id string, post dto.PostUpdate) error { return errs.ErrInvalidPostID },
+		updatePostFn: func(ctx context.Context, id string, post dto.PostUpdate) error { return errs.ErrInvalidPostID },
 	}
 	_, r := newAdminHandler(svc)
 	w, req := putJSON(t, "/api/v3/post/update", dto.PostUpdate{
@@ -232,7 +233,7 @@ func TestAdmin_UpdatePost_InvalidID(t *testing.T) {
 
 func TestAdmin_UpdatePost_NotFound(t *testing.T) {
 	svc := &mockAdminService{
-		updatePostFn: func(id string, post dto.PostUpdate) error {
+		updatePostFn: func(ctx context.Context, id string, post dto.PostUpdate) error {
 			return errs.ErrPostNotFound
 		},
 	}
@@ -250,7 +251,7 @@ func TestAdmin_UpdatePost_NotFound(t *testing.T) {
 
 func TestAdmin_UpdatePost_MissingID(t *testing.T) {
 	svc := &mockAdminService{
-		updatePostFn: func(id string, post dto.PostUpdate) error { return nil },
+		updatePostFn: func(ctx context.Context, id string, post dto.PostUpdate) error { return nil },
 	}
 	_, r := newAdminHandler(svc)
 	// _id 缺失 → binding 失败
@@ -266,7 +267,7 @@ func TestAdmin_UpdatePost_MissingID(t *testing.T) {
 
 func TestAdmin_UpdatePost_ServerError(t *testing.T) {
 	svc := &mockAdminService{
-		updatePostFn: func(id string, post dto.PostUpdate) error {
+		updatePostFn: func(ctx context.Context, id string, post dto.PostUpdate) error {
 			return errors.New("boom")
 		},
 	}
@@ -285,7 +286,7 @@ func TestAdmin_UpdatePost_ServerError(t *testing.T) {
 // ---------- DeletePost ----------
 
 func TestAdmin_DeletePost_InvalidID(t *testing.T) {
-	svc := &mockAdminService{deletePostFn: func(id string) error { return errs.ErrInvalidPostID }}
+	svc := &mockAdminService{deletePostFn: func(ctx context.Context, id string) error { return errs.ErrInvalidPostID }}
 	_, r := newAdminHandler(svc)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodDelete, "/api/v3/post/bad-id/delete", nil)
@@ -297,7 +298,7 @@ func TestAdmin_DeletePost_InvalidID(t *testing.T) {
 }
 
 func TestAdmin_DeletePost_NotFound(t *testing.T) {
-	svc := &mockAdminService{deletePostFn: func(id string) error { return errs.ErrPostNotFound }}
+	svc := &mockAdminService{deletePostFn: func(ctx context.Context, id string) error { return errs.ErrPostNotFound }}
 	_, r := newAdminHandler(svc)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodDelete, "/api/v3/post/507f1f77bcf86cd799439011/delete", nil)
@@ -309,7 +310,7 @@ func TestAdmin_DeletePost_NotFound(t *testing.T) {
 }
 
 func TestAdmin_DeletePost_Success(t *testing.T) {
-	svc := &mockAdminService{deletePostFn: func(id string) error { return nil }}
+	svc := &mockAdminService{deletePostFn: func(ctx context.Context, id string) error { return nil }}
 	_, r := newAdminHandler(svc)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodDelete, "/api/v3/post/507f1f77bcf86cd799439011/delete", nil)
@@ -324,7 +325,7 @@ func TestAdmin_DeletePost_Success(t *testing.T) {
 
 func TestAdmin_TrackVisitor_Disabled(t *testing.T) {
 	config.Cfg = &config.Config{Admin: config.AdminConfig{EnableTracking: false}}
-	svc := &mockAdminService{trackFn: func(dto.VisitorData) error { return nil }}
+	svc := &mockAdminService{trackFn: func(ctx context.Context, data dto.VisitorData) error { return nil }}
 	_, r := newAdminHandler(svc)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/v3/track", bytes.NewReader([]byte(`{"visitor_id":"v","page_path":"/","page_url":"u"}`)))
@@ -338,7 +339,7 @@ func TestAdmin_TrackVisitor_Disabled(t *testing.T) {
 
 func TestAdmin_TrackVisitor_Success(t *testing.T) {
 	config.Cfg = &config.Config{Admin: config.AdminConfig{EnableTracking: true}}
-	svc := &mockAdminService{trackFn: func(dto.VisitorData) error { return nil }}
+	svc := &mockAdminService{trackFn: func(ctx context.Context, data dto.VisitorData) error { return nil }}
 	_, r := newAdminHandler(svc)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/v3/track", bytes.NewReader([]byte(`{"visitor_id":"v","page_path":"/","page_url":"u"}`)))

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"errors"
 	"log/slog"
 
@@ -11,32 +12,27 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
+	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
-// PasskeyService 定义 handler 依赖的 Passkey 业务接口。
-type PasskeyService interface {
-	BeginRegistration(userID uint) (map[string]any, error)
-	FinishRegistration(userID uint, response map[string]any) error
-	BeginLogin() (map[string]any, error)
-	FinishLogin(response map[string]any) (*model.User, error)
-	DeletePasskey(userID uint) error
-	HasPasskey(userID uint) bool
+// PasskeyServiceer 定义 handler 依赖的 Passkey 业务接口。
+type PasskeyServiceer interface {
+	HasPasskey(ctx context.Context, userID uint) bool
+	BeginRegistration(ctx context.Context, userID uint) (map[string]any, error)
+	FinishRegistration(ctx context.Context, userID uint, response map[string]any) error
+	BeginLogin(ctx context.Context) (map[string]any, error)
+	FinishLogin(ctx context.Context, response map[string]any) (*model.User, error)
+	DeletePasskey(ctx context.Context, userID uint) error
 }
 
-// PasskeyHandler 持有 PasskeyService 和 UserService（登录后构造 token）。
+// PasskeyHandler 持有 PasskeyServiceer 和 Userer（登录后构造 token）。
 type PasskeyHandler struct {
-	passkeySvc PasskeyService
-	userSvc    interface {
-		CreateTokens(u *model.User) (*dto.Tokens, error)
-		UserToDict(u *model.User, p *model.Profile) map[string]any
-	}
-	cfg *config.Config
+	passkeySvc PasskeyServiceer
+	userSvc    service.Userer
+	cfg        *config.Config
 }
 
-func NewPasskeyHandler(passkeySvc PasskeyService, userSvc interface {
-	CreateTokens(u *model.User) (*dto.Tokens, error)
-	UserToDict(u *model.User, p *model.Profile) map[string]any
-}, cfg *config.Config) *PasskeyHandler {
+func NewPasskeyHandler(passkeySvc PasskeyServiceer, userSvc service.Userer, cfg *config.Config) *PasskeyHandler {
 	return &PasskeyHandler{passkeySvc: passkeySvc, userSvc: userSvc, cfg: cfg}
 }
 
@@ -44,7 +40,7 @@ func NewPasskeyHandler(passkeySvc PasskeyService, userSvc interface {
 func (h *PasskeyHandler) RegistrationOptions(c *gin.Context) {
 	userID := c.GetInt("user_id")
 
-	options, err := h.passkeySvc.BeginRegistration(uint(userID))
+	options, err := h.passkeySvc.BeginRegistration(c.Request.Context(), uint(userID))
 	if err != nil {
 		if errors.Is(err, errs.ErrPasskeyExists) {
 			slog.WarnContext(c.Request.Context(), "passkey registration begin failed", "reason", "passkey_exists", "user_id", userID)
@@ -68,7 +64,7 @@ func (h *PasskeyHandler) Register(c *gin.Context) {
 		return
 	}
 
-	if err := h.passkeySvc.FinishRegistration(uint(userID), req.Response); err != nil {
+	if err := h.passkeySvc.FinishRegistration(c.Request.Context(), uint(userID), req.Response); err != nil {
 		if errors.Is(err, errs.ErrInvalidPasskey) {
 			slog.WarnContext(c.Request.Context(), "passkey registration finish failed", "reason", "invalid_passkey", "user_id", userID)
 			response.APIError(c, err.Error(), 400)
@@ -84,7 +80,7 @@ func (h *PasskeyHandler) Register(c *gin.Context) {
 
 // AuthenticationOptions GET /passkey/authentication-options (public)
 func (h *PasskeyHandler) AuthenticationOptions(c *gin.Context) {
-	options, err := h.passkeySvc.BeginLogin()
+	options, err := h.passkeySvc.BeginLogin(c.Request.Context())
 	if err != nil {
 		response.APIError(c, err.Error(), 500)
 		return
@@ -100,7 +96,7 @@ func (h *PasskeyHandler) Authenticate(c *gin.Context) {
 		return
 	}
 
-	user, err := h.passkeySvc.FinishLogin(req.Assertion)
+	user, err := h.passkeySvc.FinishLogin(c.Request.Context(), req.Assertion)
 	if err != nil {
 		if errors.Is(err, errs.ErrInvalidPasskey) || errors.Is(err, errs.ErrPasskeyNotFound) {
 			slog.WarnContext(c.Request.Context(), "passkey login failed", "reason", "invalid_passkey")
@@ -112,7 +108,7 @@ func (h *PasskeyHandler) Authenticate(c *gin.Context) {
 		return
 	}
 
-	tokens, err := h.userSvc.CreateTokens(user)
+	tokens, err := h.userSvc.CreateTokens(c.Request.Context(), user)
 	if err != nil {
 		slog.ErrorContext(c.Request.Context(), "create tokens error", "error", err, "user_id", user.ID)
 		response.APIError(c, "server error", 500)
@@ -135,7 +131,7 @@ func (h *PasskeyHandler) Authenticate(c *gin.Context) {
 func (h *PasskeyHandler) DeletePasskey(c *gin.Context) {
 	userID := c.GetInt("user_id")
 
-	if err := h.passkeySvc.DeletePasskey(uint(userID)); err != nil {
+	if err := h.passkeySvc.DeletePasskey(c.Request.Context(), uint(userID)); err != nil {
 		if errors.Is(err, errs.ErrPasskeyNotFound) {
 			slog.WarnContext(c.Request.Context(), "passkey delete failed", "reason", "passkey_not_found", "user_id", userID)
 			response.APIError(c, "您的账户尚未绑定Passkey", 400)

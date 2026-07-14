@@ -13,7 +13,7 @@ func TestCheckPassword_Correct(t *testing.T) {
 	if err != nil {
 		t.Fatalf("hash error: %v", err)
 	}
-	svc := &UserService{}
+	svc := &userService{}
 	u := &model.User{PasswordHash: string(hash)}
 	if !svc.CheckPassword(u, "secret123") {
 		t.Error("CheckPassword should return true for correct password")
@@ -25,7 +25,7 @@ func TestCheckPassword_Wrong(t *testing.T) {
 	if err != nil {
 		t.Fatalf("hash error: %v", err)
 	}
-	svc := &UserService{}
+	svc := &userService{}
 	u := &model.User{PasswordHash: string(hash)}
 	if svc.CheckPassword(u, "wrong") {
 		t.Error("CheckPassword should return false for wrong password")
@@ -33,7 +33,7 @@ func TestCheckPassword_Wrong(t *testing.T) {
 }
 
 func TestCheckPassword_EmptyHash(t *testing.T) {
-	svc := &UserService{}
+	svc := &userService{}
 	u := &model.User{PasswordHash: ""}
 	if svc.CheckPassword(u, "anything") {
 		t.Error("CheckPassword should return false when hash is empty")

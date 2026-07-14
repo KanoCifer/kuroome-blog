@@ -10,9 +10,20 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 )
 
-//EventRepository 定义 SystemService 依赖的持久层能力集合。
+// Systemer 定义 system handler 依赖的能力集合。
+// 由 service.Systemer 实现；handler 仅依赖此接口，便于测试替换。
+type Systemer interface {
+	ListEvents(
+		ctx context.Context,
+		page, perPage int,
+		eventType *string,
+		start, end *time.Time,
+	) (dto.Events, error)
+}
+
+//EventRepositoryer 定义 SystemService 依赖的持久层能力集合。
 // 由 postgres.EventRepo 实现；service 仅依赖此接口，便于测试替换。
-type EventRepository interface {
+type EventRepositoryer interface {
 	Count(ctx context.Context, f postgres.EventFilter) (int, error)
 	List(ctx context.Context, f postgres.EventFilter, offset, limit int) ([]model.Event, error)
 }
@@ -20,10 +31,10 @@ type EventRepository interface {
 // SystemService 承载 system 端点的业务逻辑（事件分页查询）。
 // 对齐 Python backend/app/services/system 的 SystemService.list_events。
 type SystemService struct {
-	repo EventRepository
+	repo EventRepositoryer
 }
 
-func NewSystemService(repo EventRepository) *SystemService {
+func NewSystemService(repo EventRepositoryer) *SystemService {
 	return &SystemService{repo: repo}
 }
 

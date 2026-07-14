@@ -15,8 +15,8 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/mongo/document"
 )
 
-// BlogRepository 定义博客读表面对 posts 集合的读写契约。
-type BlogRepository interface {
+// BlogRepositoryer 定义博客读表面对 posts 集合的读写契约。
+type BlogRepositoryer interface {
 	ListPosts(ctx context.Context, page, perPage int, search string) ([]document.Post, int64, error)
 	AggregateTagCounts(ctx context.Context) ([]dto.TagOut, error)
 	GetPostByID(ctx context.Context, id string) (*document.Post, error)
@@ -25,8 +25,8 @@ type BlogRepository interface {
 	ListPostsByTag(ctx context.Context, tag string, page, perPage int) ([]document.Post, int64, error)
 }
 
-// BlogService 定义博客读表面的用例契约。
-type BlogService interface {
+// Bloger 定义博客读表面的用例契约。
+type Bloger interface {
 	ListPosts(ctx context.Context, page int, search string) (*dto.BlogListOut, error)
 	GetPost(ctx context.Context, id string) (*dto.PostOut, error)
 	IncrementViews(ctx context.Context, id string) error
@@ -36,10 +36,10 @@ type BlogService interface {
 }
 
 type blogService struct {
-	repo BlogRepository
+	repo BlogRepositoryer
 }
 
-func NewBlogService(repo BlogRepository) *blogService {
+func NewBlogService(repo BlogRepositoryer) *blogService {
 	return &blogService{repo: repo}
 }
 

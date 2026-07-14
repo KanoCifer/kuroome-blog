@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -16,8 +17,8 @@ import (
 // 校验分支不依赖 repo，repo 为 nil 也能覆盖（在调用 repo 前返回）。
 
 func TestAdminService_UpdatePost_InvalidID(t *testing.T) {
-	svc := &AdminService{} // repo/redis 均为 nil
-	err := svc.UpdatePost("not-a-hex", dto.PostUpdate{
+	svc := &adminService{} // repo/redis 均为 nil
+	err := svc.UpdatePost(context.Background(), "not-a-hex", dto.PostUpdate{
 		PostIn: dto.PostIn{Title: "t", Body: "b"},
 		ID:     "not-a-hex",
 	})
@@ -27,8 +28,8 @@ func TestAdminService_UpdatePost_InvalidID(t *testing.T) {
 }
 
 func TestAdminService_DeletePost_InvalidID(t *testing.T) {
-	svc := &AdminService{}
-	err := svc.DeletePost("%%%")
+	svc := &adminService{}
+	err := svc.DeletePost(context.Background(), "%%%")
 	if !errors.Is(err, errs.ErrInvalidPostID) {
 		t.Errorf("err = %v, want ErrInvalidPostID", err)
 	}
@@ -54,7 +55,7 @@ func TestAdminService_TrackVisitor_WritesToPostgres(t *testing.T) {
 		BrowserName: "Chrome",
 		// Referrer / Browser / ScreenResolution / Language 留空 → 期望入库 NULL
 	}
-	if err := svc.TrackVisitor(data); err != nil {
+	if err := svc.TrackVisitor(context.Background(), data); err != nil {
 		t.Fatalf("TrackVisitor: %v", err)
 	}
 

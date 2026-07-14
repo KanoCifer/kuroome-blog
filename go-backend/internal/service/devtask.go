@@ -16,9 +16,23 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/repository/mongodb"
 )
 
-// DevTaskRepository devtask 持久层接口 —— service 依赖接口，便于 mock 测试。
+// DevTaskServiceer devtask 读表面 —— handler 依赖接口，便于 mock 测试。
 // 所有接口一律使用 slug 作为任务标识，不暴露 ObjectID。
-type DevTaskRepository interface {
+type DevTasker interface {
+	Create(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error)
+	GetBySlug(ctx context.Context, slug string, withParent bool) (*dto.DevTaskOut, error)
+	List(ctx context.Context, filter mongodb.ListFilter, page, perPage int) (*dto.DevTaskListOut, error)
+	Update(ctx context.Context, slug string, req dto.DevTaskUpdate) error
+	BatchUpdateStatus(ctx context.Context, slugs []string, status document.DevTaskStatus) (*BatchStatusResult, error)
+	SoftDelete(ctx context.Context, slug string) error
+	HardDelete(ctx context.Context, slug string) error
+	FindFrontier(ctx context.Context, limit int) ([]dto.DevTaskOut, error)
+}
+
+
+// DevTaskRepositoryer devtask 持久层接口 —— service 依赖接口，便于 mock 测试。
+// 所有接口一律使用 slug 作为任务标识，不暴露 ObjectID。
+type DevTaskRepositoryer interface {
 	Create(ctx context.Context, task *document.DevTask) error
 	GetBySlug(ctx context.Context, slug string) (*document.DevTask, error)
 	List(ctx context.Context, filter mongodb.ListFilter, page, perPage int) ([]document.DevTask, int64, error)
@@ -32,7 +46,7 @@ type DevTaskRepository interface {
 }
 
 type DevTaskService struct {
-	repo DevTaskRepository
+	repo DevTaskRepositoryer
 }
 
 func NewDevTaskService(db *mongo.Database) *DevTaskService {

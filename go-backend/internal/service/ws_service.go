@@ -10,6 +10,17 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// WSer 定义 handler 层依赖的 WS 能力集合。
+// 由 service.WSer 实现；handler 仅依赖此接口，便于测试替换。
+type WSer interface {
+	ReadMsg(ctx context.Context, conn *websocket.Conn, msg interface{}) error
+	HandleFirstMessage(ctx context.Context, conn *websocket.Conn, msg map[string]interface{}) (bool, error)
+	RedisListener(ctx context.Context, conn *websocket.Conn) error
+	WSReceiver(ctx context.Context, conn *websocket.Conn) error
+	RemoveVisitor(ctx context.Context, visitorId string) error
+	PublishCount(ctx context.Context) error
+}
+
 const (
 	visitorHashKey = "ws:visitor:conns"
 	visitorChannel = "ws:visitor_count_changed"

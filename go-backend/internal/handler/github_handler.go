@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -14,33 +15,33 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 )
 
-// GitHubOAuthService 定义 handler 依赖的 GitHub OAuth 业务接口。
-type GitHubOAuthService interface {
+// GitHubOAuthServiceer 定义 handler 依赖的 GitHub OAuth 业务接口。
+type GitHubOAuthServiceer interface {
 	// AuthURL 构造 GitHub 授权地址。 mode="login" | "bind"。
-	AuthURL(mode string, userID uint) (string, error)
+	AuthURL(ctx context.Context, mode string, userID uint) (string, error)
 
 	// HandleCallback 处理 GitHub 回调。
 	// login 模式返回 (user, tokens, nil); bind 模式返回 (user, nil, nil)。
-	HandleCallback(state, code string) (*model.User, *dto.Tokens, error)
+	HandleCallback(ctx context.Context, state, code string) (*model.User, *dto.Tokens, error)
 
 	// UnbindGitHub 解除用户与 GitHub 的绑定。
-	UnbindGitHub(userID uint) error
+	UnbindGitHub(ctx context.Context, userID uint) error
 }
 
 // GitHubHandler 持有 GitHub OAuth 服务。
 type GitHubHandler struct {
-	githubSvc GitHubOAuthService
+	githubSvc GitHubOAuthServiceer
 	cfg       *config.Config
 }
 
 // NewGitHubHandler 构造一个 GitHubHandler。
-func NewGitHubHandler(githubSvc GitHubOAuthService, cfg *config.Config) *GitHubHandler {
+func NewGitHubHandler(githubSvc GitHubOAuthServiceer, cfg *config.Config) *GitHubHandler {
 	return &GitHubHandler{githubSvc: githubSvc, cfg: cfg}
 }
 
 // Login GET /auth/github — 重定向到 GitHub 授权页(公开)。
 func (h *GitHubHandler) Login(c *gin.Context) {
-	url, err := h.githubSvc.AuthURL("login", 0)
+	url, err := h.githubSvc.AuthURL(c.Request.Context(), "login", 0)
 	if err != nil {
 		redirectWithError(c, h.cfg, "github_not_configured")
 		return
@@ -55,7 +56,7 @@ func (h *GitHubHandler) Bind(c *gin.Context) {
 		response.APIError(c, "未授权", 401)
 		return
 	}
-	url, err := h.githubSvc.AuthURL("bind", uint(userID))
+	url, err := h.githubSvc.AuthURL(c.Request.Context(), "bind", uint(userID))
 	if err != nil {
 		redirectWithError(c, h.cfg, "github_not_configured")
 		return
@@ -68,7 +69,7 @@ func (h *GitHubHandler) Callback(c *gin.Context) {
 	state := c.Query("state")
 	code := c.Query("code")
 
-	_, tokens, err := h.githubSvc.HandleCallback(state, code)
+	_, tokens, err := h.githubSvc.HandleCallback(c.Request.Context(), state, code)
 	if err != nil {
 		switch {
 		case errors.Is(err, errs.ErrInvalidOAuthState):
@@ -115,7 +116,7 @@ func (h *GitHubHandler) Unbind(c *gin.Context) {
 		response.APIError(c, "未授权", 401)
 		return
 	}
-	if err := h.githubSvc.UnbindGitHub(uint(userID)); err != nil {
+	if err := h.githubSvc.UnbindGitHub(c.Request.Context(), uint(userID)); err != nil {
 		response.APIError(c, "server error", 500)
 		return
 	}

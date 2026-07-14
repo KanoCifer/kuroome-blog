@@ -17,9 +17,9 @@ func NewUserRepo(db *gorm.DB) *UserRepo {
 	return &UserRepo{db: db}
 }
 
-func (r *UserRepo) GetByID(id uint) (*model.User, error) {
+func (r *UserRepo) GetByID(ctx context.Context, id uint) (*model.User, error) {
 	var u model.User
-	err := r.db.Preload("Profile").Preload("PasskeyCredential").First(&u, id).Error
+	err := r.db.WithContext(ctx).Preload("Profile").Preload("PasskeyCredential").First(&u, id).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil
 	}
@@ -30,9 +30,9 @@ func (r *UserRepo) GetByID(id uint) (*model.User, error) {
 	return &u, nil
 }
 
-func (r *UserRepo) GetByUsername(username string) (*model.User, error) {
+func (r *UserRepo) GetByUsername(ctx context.Context, username string) (*model.User, error) {
 	var u model.User
-	err := r.db.Preload("Profile").Preload("PasskeyCredential").Where("username = ?", username).First(&u).Error
+	err := r.db.WithContext(ctx).Preload("Profile").Preload("PasskeyCredential").Where("username = ?", username).First(&u).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil
 	}
@@ -42,25 +42,25 @@ func (r *UserRepo) GetByUsername(username string) (*model.User, error) {
 	return &u, nil
 }
 
-func (r *UserRepo) GetByEmail(email string) (*model.User, *model.Profile, error) {
+func (r *UserRepo) GetByEmail(ctx context.Context, email string) (*model.User, *model.Profile, error) {
 	var p model.Profile
-	err := r.db.Where("email = ?", email).First(&p).Error
+	err := r.db.WithContext(ctx).Where("email = ?", email).First(&p).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil, nil
 	}
 	if err != nil {
 		return nil, nil, err
 	}
-	u, err := r.GetByID(p.UserID)
+	u, err := r.GetByID(ctx, p.UserID)
 	if err != nil {
 		return nil, nil, err
 	}
 	return u, &p, nil
 }
 
-func (r *UserRepo) GetByGithubID(githubID int) (*model.User, error) {
+func (r *UserRepo) GetByGithubID(ctx context.Context, githubID int) (*model.User, error) {
 	var u model.User
-	err := r.db.Preload("Profile").Where("github_id = ?", githubID).First(&u).Error
+	err := r.db.WithContext(ctx).Preload("Profile").Where("github_id = ?", githubID).First(&u).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil
 	}
@@ -70,27 +70,27 @@ func (r *UserRepo) GetByGithubID(githubID int) (*model.User, error) {
 	return &u, nil
 }
 
-func (r *UserRepo) SetGithubID(userID uint, githubID int) error {
-	return r.db.Model(&model.User{}).
+func (r *UserRepo) SetGithubID(ctx context.Context, userID uint, githubID int) error {
+	return r.db.WithContext(ctx).Model(&model.User{}).
 		Where("id = ?", userID).
 		Update("github_id", githubID).Error
 }
 
-func (r *UserRepo) ClearGithubID(userID uint) error {
-	return r.db.Model(&model.User{}).
+func (r *UserRepo) ClearGithubID(ctx context.Context, userID uint) error {
+	return r.db.WithContext(ctx).Model(&model.User{}).
 		Where("id = ?", userID).
 		Update("github_id", nil).Error
 }
 
-func (r *UserRepo) UsernameExists(username string) bool {
+func (r *UserRepo) UsernameExists(ctx context.Context, username string) bool {
 	var count int64
-	r.db.Model(&model.User{}).Where("username = ?", username).Count(&count)
+	r.db.WithContext(ctx).Model(&model.User{}).Where("username = ?", username).Count(&count)
 	return count > 0
 }
 
-func (r *UserRepo) EmailExists(email string) bool {
+func (r *UserRepo) EmailExists(ctx context.Context, email string) bool {
 	var count int64
-	r.db.Model(&model.Profile{}).Where("email = ?", email).Count(&count)
+	r.db.WithContext(ctx).Model(&model.Profile{}).Where("email = ?", email).Count(&count)
 	return count > 0
 }
 
@@ -110,8 +110,8 @@ func (r *UserRepo) ListUsersWithLoginRecords(ctx context.Context) ([]model.User,
 	return users, err
 }
 
-func (r *UserRepo) Create(user *model.User, profile *model.Profile) error {
-	return r.db.Transaction(func(tx *gorm.DB) error {
+func (r *UserRepo) Create(ctx context.Context, user *model.User, profile *model.Profile) error {
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(user).Error; err != nil {
 			return err
 		}
@@ -125,14 +125,14 @@ func (r *UserRepo) Create(user *model.User, profile *model.Profile) error {
 	})
 }
 
-func (r *UserRepo) Update(user *model.User) error {
-	return r.db.Save(user).Error
+func (r *UserRepo) Update(ctx context.Context, user *model.User) error {
+	return r.db.WithContext(ctx).Save(user).Error
 }
 
-func (r *UserRepo) UpdateProfile(profile *model.Profile) error {
-	return r.db.Save(profile).Error
+func (r *UserRepo) UpdateProfile(ctx context.Context, profile *model.Profile) error {
+	return r.db.WithContext(ctx).Save(profile).Error
 }
 
-func (r *UserRepo) Delete(user *model.User) error {
-	return r.db.Delete(user).Error
+func (r *UserRepo) Delete(ctx context.Context, user *model.User) error {
+	return r.db.WithContext(ctx).Delete(user).Error
 }

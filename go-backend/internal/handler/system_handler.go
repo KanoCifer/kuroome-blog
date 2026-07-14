@@ -1,33 +1,23 @@
 package handler
 
 import (
-	"context"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
+	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
-// SystemService 定义 system handler 依赖的能力集合。
-// 由 service.SystemService 实现；handler 仅依赖此接口，便于测试替换。
-type SystemService interface {
-	ListEvents(
-		ctx context.Context,
-		page, perPage int,
-		eventType *string,
-		start, end *time.Time,
-	) (dto.Events, error)
-}
+
 
 type SystemHandler struct {
-	svc SystemService
+	svc service.Systemer
 }
 
-func NewSystemHandler(svc SystemService) *SystemHandler {
+func NewSystemHandler(svc service.Systemer) *SystemHandler {
 	return &SystemHandler{svc: svc}
 }
 

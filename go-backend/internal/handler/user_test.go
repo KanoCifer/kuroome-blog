@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -24,48 +25,56 @@ func init() {
 // ---------- mock UserService ----------
 
 type mockUserService struct {
-	authenticateFn  func(username, password string) (*model.User, error)
-	createTokensFn  func(u *model.User) (*dto.Tokens, error)
-	createUserFn    func(username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
-	getByIDFn       func(userID uint) (*model.User, *model.Profile, error)
-	logoutFn        func(userID uint)
-	refreshFn       func(refreshToken string) (*dto.Tokens, error)
-	sendEmailCodeFn func(email string) bool
-	userToDictFn    func(u *model.User, p *model.Profile) map[string]any
+	authenticateFn   func(ctx context.Context, username, password string) (*model.User, error)
+	createTokensFn   func(ctx context.Context, u *model.User) (*dto.Tokens, error)
+	createUserFn     func(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
+	getByIDFn        func(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
+	getByUsernameFn  func(ctx context.Context, username string) (*model.User, *model.Profile, error)
+	logoutFn         func(ctx context.Context, userID uint)
+	refreshFn        func(ctx context.Context, refreshToken string) (*dto.Tokens, error)
+	sendEmailCodeFn  func(ctx context.Context, email string) bool
+	userToDictFn     func(u *model.User, p *model.Profile) map[string]any
 }
 
-func (m *mockUserService) Authenticate(username, password string) (*model.User, error) {
-	return m.authenticateFn(username, password)
+func (m *mockUserService) Authenticate(ctx context.Context, username, password string) (*model.User, error) {
+	return m.authenticateFn(ctx, username, password)
 }
 
-func (m *mockUserService) CreateTokens(u *model.User) (*dto.Tokens, error) {
+func (m *mockUserService) CreateTokens(ctx context.Context, u *model.User) (*dto.Tokens, error) {
 	if m.createTokensFn != nil {
-		return m.createTokensFn(u)
+		return m.createTokensFn(ctx, u)
 	}
 	return &dto.Tokens{AccessToken: "access", RefreshToken: "refresh"}, nil
 }
 
-func (m *mockUserService) CreateUser(username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
-	return m.createUserFn(username, password, email, emailCode, avatarURL)
+func (m *mockUserService) CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
+	return m.createUserFn(ctx, username, password, email, emailCode, avatarURL)
 }
 
-func (m *mockUserService) GetByID(userID uint) (*model.User, *model.Profile, error) {
-	return m.getByIDFn(userID)
+func (m *mockUserService) GetByID(ctx context.Context, userID uint) (*model.User, *model.Profile, error) {
+	return m.getByIDFn(ctx, userID)
 }
 
-func (m *mockUserService) Logout(userID uint) {
+func (m *mockUserService) GetByUsername(ctx context.Context, username string) (*model.User, *model.Profile, error) {
+	if m.getByUsernameFn != nil {
+		return m.getByUsernameFn(ctx, username)
+	}
+	return nil, nil, nil
+}
+
+func (m *mockUserService) Logout(ctx context.Context, userID uint) {
 	if m.logoutFn != nil {
-		m.logoutFn(userID)
+		m.logoutFn(ctx, userID)
 	}
 }
 
-func (m *mockUserService) RefreshTokens(refreshToken string) (*dto.Tokens, error) {
-	return m.refreshFn(refreshToken)
+func (m *mockUserService) RefreshTokens(ctx context.Context, refreshToken string) (*dto.Tokens, error) {
+	return m.refreshFn(ctx, refreshToken)
 }
 
-func (m *mockUserService) SendEmailCode(email string) bool {
+func (m *mockUserService) SendEmailCode(ctx context.Context, email string) bool {
 	if m.sendEmailCodeFn != nil {
-		return m.sendEmailCodeFn(email)
+		return m.sendEmailCodeFn(ctx, email)
 	}
 	return true
 }
@@ -130,7 +139,7 @@ func findCookie(w *httptest.ResponseRecorder, name string) *http.Cookie {
 
 func TestLogin_Success(t *testing.T) {
 	svc := &mockUserService{
-		authenticateFn: func(username, password string) (*model.User, error) {
+		authenticateFn: func(ctx context.Context, username, password string) (*model.User, error) {
 			return &model.User{Model: gormModel(1), Username: "alice"}, nil
 		},
 	}
@@ -161,7 +170,7 @@ func TestLogin_Success(t *testing.T) {
 
 func TestLogin_InvalidCredentials(t *testing.T) {
 	svc := &mockUserService{
-		authenticateFn: func(username, password string) (*model.User, error) {
+		authenticateFn: func(ctx context.Context, username, password string) (*model.User, error) {
 			return nil, errs.ErrInvalidCredentials
 		},
 	}
@@ -179,7 +188,7 @@ func TestLogin_InvalidCredentials(t *testing.T) {
 
 func TestLogin_InvalidBody(t *testing.T) {
 	svc := &mockUserService{
-		authenticateFn: func(username, password string) (*model.User, error) {
+		authenticateFn: func(ctx context.Context, username, password string) (*model.User, error) {
 			return &model.User{}, nil
 		},
 	}
@@ -194,10 +203,10 @@ func TestLogin_InvalidBody(t *testing.T) {
 
 func TestLogin_TokenError(t *testing.T) {
 	svc := &mockUserService{
-		authenticateFn: func(username, password string) (*model.User, error) {
+		authenticateFn: func(ctx context.Context, username, password string) (*model.User, error) {
 			return &model.User{Model: gormModel(1)}, nil
 		},
-		createTokensFn: func(u *model.User) (*dto.Tokens, error) {
+		createTokensFn: func(ctx context.Context, u *model.User) (*dto.Tokens, error) {
 			return nil, errors.New("jwt error")
 		},
 	}
@@ -217,7 +226,7 @@ func TestLogin_TokenError(t *testing.T) {
 
 func TestRegister_Success(t *testing.T) {
 	svc := &mockUserService{
-		createUserFn: func(username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
+		createUserFn: func(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
 			return &model.User{Model: gormModel(5), Username: username}, nil, nil
 		},
 	}
@@ -241,7 +250,7 @@ func TestRegister_Success(t *testing.T) {
 
 func TestRegister_UserExists(t *testing.T) {
 	svc := &mockUserService{
-		createUserFn: func(username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
+		createUserFn: func(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
 			return nil, nil, errs.ErrUserExists
 		},
 	}
@@ -261,7 +270,7 @@ func TestRegister_UserExists(t *testing.T) {
 
 func TestRegister_EmailExists(t *testing.T) {
 	svc := &mockUserService{
-		createUserFn: func(username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
+		createUserFn: func(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
 			return nil, nil, errs.ErrEmailExists
 		},
 	}
@@ -281,7 +290,7 @@ func TestRegister_EmailExists(t *testing.T) {
 
 func TestRegister_InvalidEmailCode(t *testing.T) {
 	svc := &mockUserService{
-		createUserFn: func(username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
+		createUserFn: func(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
 			return nil, nil, errs.ErrInvalidEmailCode
 		},
 	}
@@ -301,7 +310,7 @@ func TestRegister_InvalidEmailCode(t *testing.T) {
 
 func TestRegister_InvalidBody(t *testing.T) {
 	svc := &mockUserService{
-		createUserFn: func(username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
+		createUserFn: func(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
 			return &model.User{}, nil, nil
 		},
 	}
@@ -318,7 +327,7 @@ func TestRegister_InvalidBody(t *testing.T) {
 
 func TestMe_Success(t *testing.T) {
 	svc := &mockUserService{
-		getByIDFn: func(userID uint) (*model.User, *model.Profile, error) {
+		getByIDFn: func(ctx context.Context, userID uint) (*model.User, *model.Profile, error) {
 			return &model.User{Model: gormModel(7), Username: "alice"}, nil, nil
 		},
 	}
@@ -337,7 +346,7 @@ func TestMe_Success(t *testing.T) {
 
 func TestMe_UserNotFound(t *testing.T) {
 	svc := &mockUserService{
-		getByIDFn: func(userID uint) (*model.User, *model.Profile, error) {
+		getByIDFn: func(ctx context.Context, userID uint) (*model.User, *model.Profile, error) {
 			return nil, nil, errs.ErrUserNotFound
 		},
 	}
@@ -359,7 +368,7 @@ func TestMe_UserNotFound(t *testing.T) {
 func TestLogout_CallsService(t *testing.T) {
 	var calledWith uint
 	svc := &mockUserService{
-		logoutFn: func(userID uint) { calledWith = userID },
+		logoutFn: func(ctx context.Context, userID uint) { calledWith = userID },
 	}
 	h := NewUserHandler(svc, config.Cfg)
 
@@ -381,7 +390,7 @@ func TestLogout_CallsService(t *testing.T) {
 
 func TestRefreshToken_Success(t *testing.T) {
 	svc := &mockUserService{
-		refreshFn: func(refreshToken string) (*dto.Tokens, error) {
+		refreshFn: func(ctx context.Context, refreshToken string) (*dto.Tokens, error) {
 			return &dto.Tokens{AccessToken: "new-access", RefreshToken: "new-refresh"}, nil
 		},
 	}
@@ -401,7 +410,7 @@ func TestRefreshToken_Success(t *testing.T) {
 
 func TestRefreshToken_InvalidToken(t *testing.T) {
 	svc := &mockUserService{
-		refreshFn: func(refreshToken string) (*dto.Tokens, error) {
+		refreshFn: func(ctx context.Context, refreshToken string) (*dto.Tokens, error) {
 			return nil, errs.ErrInvalidToken
 		},
 	}
@@ -417,7 +426,7 @@ func TestRefreshToken_InvalidToken(t *testing.T) {
 
 func TestRefreshToken_MissingField(t *testing.T) {
 	svc := &mockUserService{
-		refreshFn: func(refreshToken string) (*dto.Tokens, error) {
+		refreshFn: func(ctx context.Context, refreshToken string) (*dto.Tokens, error) {
 			t.Errorf("refreshFn should not be called when no token present")
 			return &dto.Tokens{}, nil
 		},
@@ -435,7 +444,7 @@ func TestRefreshToken_MissingField(t *testing.T) {
 
 func TestRefreshToken_FromCookie(t *testing.T) {
 	svc := &mockUserService{
-		refreshFn: func(refreshToken string) (*dto.Tokens, error) {
+		refreshFn: func(ctx context.Context, refreshToken string) (*dto.Tokens, error) {
 			if refreshToken != "cookie-refresh" {
 				t.Errorf("refreshToken = %q, want cookie-refresh", refreshToken)
 			}

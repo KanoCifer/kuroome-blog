@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"strings"
 	"testing"
 
@@ -17,7 +18,7 @@ func TestAuthURL_ContainsRequiredParams(t *testing.T) {
 
 	svc := NewGitHubOAuth(nil, nil, nil, "test-client-id", "", "http://localhost:5555/api/v3/auth/github/callback")
 
-	url, err := svc.AuthURL("login", 0)
+	url, err := svc.AuthURL(context.Background(), "login", 0)
 	if err != nil {
 		t.Fatalf("AuthURL returned error: %v", err)
 	}
@@ -39,7 +40,7 @@ func TestAuthURL_ContainsRequiredParams(t *testing.T) {
 func TestAuthURL_RejectsWhenNotConfigured(t *testing.T) {
 	svc := NewGitHubOAuth(nil, nil, nil, "", "", "")
 
-	_, err := svc.AuthURL("login", 0)
+	_, err := svc.AuthURL(context.Background(), "login", 0)
 	if err == nil {
 		t.Fatal("expected error when GITHUB_CLIENT_ID is empty")
 	}

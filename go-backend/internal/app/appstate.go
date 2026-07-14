@@ -14,19 +14,18 @@ import (
 
 type AppState struct {
 	config      *config.Config
-	userSvc     *service.UserService
-	adminSvc    *service.AdminService
-	blogSvc     *service.BlogService
-	devTaskSvc  *service.DevTaskService
-	passkeySvc  *service.PasskeyService
-	githubOAuth *service.GitHubOAuth
-	monitorSvc  *service.MonitorService
-	systemSvc   *service.SystemService
-	wssvc       *service.WSService
+	userSvc     service.Userer
+	adminSvc    service.Adminer
+	blogSvc     service.Bloger
+	devTaskSvc  service.DevTasker
+	passkeySvc  service.Passkeyer
+	githubOAuth service.GitHubOAuther
+	monitorSvc  service.Monitorer
+	systemSvc   service.Systemer
+	wsSvc       service.WSer
 }
 
 // NewAppState 组装所有 service，作为唯一的组合根入口。
-//
 // main.go 仅负责构造基础依赖 (db / mongo / redis / webauthn) 并传入；
 // 所有 service 在此统一构造，不再散落 main.go。
 func NewAppState(
@@ -37,11 +36,14 @@ func NewAppState(
 	wa *webauthn.WebAuthn,
 ) *AppState {
 	// -- repos ------------------------------------------------------- //
+	// postgres
 	userRepo := postgres.NewUserRepo(db)
-	adminRepo := mongodb.NewAdminRepo(mongoDB)
 	visitorRepo := postgres.NewVisitorRepo(db)
 	eventRepo := postgres.NewEventRepo(db)
 	passkeyRepo := postgres.NewPasskeyRepo(db)
+
+	// mongodb
+	adminRepo := mongodb.NewAdminRepo(mongoDB)
 	blogRepo := mongodb.NewBlogRepository(mongoDB)
 
 	// -- services ---------------------------------------------------- //
@@ -55,7 +57,7 @@ func NewAppState(
 		passkeySvc: service.NewPasskeyService(wa, redis, passkeyRepo, userRepo),
 		monitorSvc: service.NewMonitorService(visitorRepo, userRepo),
 		systemSvc:  service.NewSystemService(eventRepo),
-		wssvc:      service.NewWSService(redis),
+		wsSvc:      service.NewWSService(redis),
 		githubOAuth: service.NewGitHubOAuth(
 			redis, userRepo, userSvc,
 			cfg.GitHub.ClientID, cfg.GitHub.ClientSecret, cfg.GitHub.RedirectURI,
@@ -63,13 +65,14 @@ func NewAppState(
 	}
 }
 
-func (a *AppState) UserSvc() *service.UserService       { return a.userSvc }
-func (a *AppState) AdminSvc() *service.AdminService     { return a.adminSvc }
-func (a *AppState) BlogSvc() *service.BlogService         { return a.blogSvc }
-func (a *AppState) DevTaskSvc() *service.DevTaskService   { return a.devTaskSvc }
-func (a *AppState) PasskeySvc() *service.PasskeyService   { return a.passkeySvc }
-func (a *AppState) WSSvc() *service.WSService           { return a.wssvc }
-func (a *AppState) MonitorSvc() *service.MonitorService { return a.monitorSvc }
-func (a *AppState) SystemSvc() *service.SystemService   { return a.systemSvc }
-func (a *AppState) GitHubOAuth() *service.GitHubOAuth   { return a.githubOAuth }
+// Dependency Injection
+func (a *AppState) UserSvc() service.Userer         { return a.userSvc }
+func (a *AppState) AdminSvc() service.Adminer       { return a.adminSvc }
+func (a *AppState) BlogSvc() service.Bloger         { return a.blogSvc }
+func (a *AppState) DevTaskSvc() service.DevTasker   { return a.devTaskSvc }
+func (a *AppState) PasskeySvc() service.Passkeyer   { return a.passkeySvc }
+func (a *AppState) WSSvc() service.WSer            { return a.wsSvc }
+func (a *AppState) MonitorSvc() service.Monitorer  { return a.monitorSvc }
+func (a *AppState) SystemSvc() service.Systemer    { return a.systemSvc }
+func (a *AppState) GitHubOAuth() service.GitHubOAuther { return a.githubOAuth }
 func (a *AppState) Cfg() *config.Config                 { return a.config }

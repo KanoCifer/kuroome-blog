@@ -22,20 +22,20 @@ import (
 	"github.com/KanoCifer/kuroome-blog/pkg/jwt"
 )
 
-type AdminService interface {
-	AddPost(post dto.PostIn) (id string, err error)
-	UpdatePost(id string, post dto.PostUpdate) error
-	DeletePost(id string) error
-	TrackVisitor(data dto.VisitorData) error
-	ListPostViewsData() ([]dto.PostViewData, error)
+type AdminServiceer interface {
+	AddPost(ctx context.Context, post dto.PostIn) (id string, err error)
+	UpdatePost(ctx context.Context, id string, post dto.PostUpdate) error
+	DeletePost(ctx context.Context, id string) error
+	TrackVisitor(ctx context.Context, data dto.VisitorData) error
+	ListPostViewsData(ctx context.Context) ([]dto.PostViewData, error)
 }
 
 type AdminHandler struct {
-	adminSvc AdminService
+	adminSvc AdminServiceer
 	cfg      *config.Config
 }
 
-func NewAdminHandler(adminSvc AdminService, cfg *config.Config) *AdminHandler {
+func NewAdminHandler(adminSvc AdminServiceer, cfg *config.Config) *AdminHandler {
 	return &AdminHandler{adminSvc: adminSvc, cfg: cfg}
 }
 
@@ -45,7 +45,7 @@ func (h *AdminHandler) AddPost(c *gin.Context) {
 		response.APIError(c, err.Error())
 		return
 	}
-	id, err := h.adminSvc.AddPost(req)
+	id, err := h.adminSvc.AddPost(c.Request.Context(), req)
 	if err != nil {
 		slog.ErrorContext(c.Request.Context(), "add post error", "error", err)
 		response.APIError(c, err.Error(), 500)
@@ -65,7 +65,7 @@ func (h *AdminHandler) UpdatePost(c *gin.Context) {
 		response.APIError(c, "_id is required")
 		return
 	}
-	if err := h.adminSvc.UpdatePost(req.ID, req); err != nil {
+	if err := h.adminSvc.UpdatePost(c.Request.Context(), req.ID, req); err != nil {
 		switch {
 		case errors.Is(err, errs.ErrPostNotFound):
 			slog.WarnContext(c.Request.Context(), "update post failed", "reason", "post_not_found", "post_id", req.ID)
@@ -85,7 +85,7 @@ func (h *AdminHandler) UpdatePost(c *gin.Context) {
 
 func (h *AdminHandler) DeletePost(c *gin.Context) {
 	postID := c.Param("post_id")
-	if err := h.adminSvc.DeletePost(postID); err != nil {
+	if err := h.adminSvc.DeletePost(c.Request.Context(), postID); err != nil {
 		switch {
 		case errors.Is(err, errs.ErrPostNotFound):
 			slog.WarnContext(c.Request.Context(), "delete post failed", "reason", "post_not_found", "post_id", postID)
@@ -104,7 +104,7 @@ func (h *AdminHandler) DeletePost(c *gin.Context) {
 }
 
 func (h *AdminHandler) ListPostViewsData(c *gin.Context) {
-	data, err := h.adminSvc.ListPostViewsData()
+	data, err := h.adminSvc.ListPostViewsData(c.Request.Context())
 	if err != nil {
 		slog.ErrorContext(c.Request.Context(), "list post views data", "error", err)
 		response.APIError(c, err.Error(), http.StatusInternalServerError)
@@ -124,7 +124,7 @@ func (h *AdminHandler) TrackVisitor(c *gin.Context) {
 		return
 	}
 	req.IpAddress = c.ClientIP()
-	if err := h.adminSvc.TrackVisitor(req); err != nil {
+	if err := h.adminSvc.TrackVisitor(c.Request.Context(), req); err != nil {
 		response.APIError(c, err.Error(), 500)
 		return
 	}
@@ -234,7 +234,7 @@ func (h *AdminHandler) DevTaskToken(c *gin.Context) {
 	response.Success(c, gin.H{
 		"token":      token,
 		"expires_at": expiresAt.Format(time.RFC3339),
-		"days":       int(expiresAt.Sub(time.Now()).Hours() / 24),
+		"days":       int(time.Until(expiresAt).Hours() / 24),
 	}, "DevTask token issued successfully")
 }
 

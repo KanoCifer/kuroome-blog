@@ -1,34 +1,25 @@
 package handler
 
 import (
-	"context"
 	"errors"
 	"io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
+	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
 var errNotNumber = errors.New("not a number")
 
-// MonitorService 定义 monitor handler 依赖的能力集合。
-// 由 service.MonitorService 实现；handler 仅依赖此接口，便于测试替换。
-type MonitorService interface {
-	GetOverview(ctx context.Context, days int) (dto.Overview, error)
-	GetVisitors(ctx context.Context, days, page, pageSize int) (dto.Visitors, error)
-	GetUserLogins(ctx context.Context, days, page, pageSize int) (dto.UserLogins, error)
-	GetServerStatus() (dto.ServerStatus, error)
-	StreamServerStatus(ctx context.Context) (<-chan dto.ServerStatus, error)
-}
+
 
 type MonitorHandler struct {
-	svc MonitorService
+	svc service.Monitorer
 }
 
-func NewMonitorHandler(svc MonitorService) *MonitorHandler {
+func NewMonitorHandler(svc service.Monitorer) *MonitorHandler {
 	return &MonitorHandler{svc: svc}
 }
 
@@ -181,4 +172,3 @@ func (h *MonitorHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFu
 	r.GET("/status/server/status", authMW, adminMW, h.ServerStatus)
 	r.GET("/status/server/status/stream", authMW, adminMW, h.ServerStatusStream)
 }
-

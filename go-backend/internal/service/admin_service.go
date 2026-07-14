@@ -12,21 +12,43 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/mongo/document"
-	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 )
 
-type AdminService struct {
-	repo    *postgres.AdminRepo
-	visitor *postgres.VisitorRepo
+// AdminRepositoryer 定义 admin 后台对 posts 集合的读写契约。
+type AdminRepositoryer interface {
+	CreatePost(ctx context.Context, post *document.Post) (string, error)
+	GetPostByID(ctx context.Context, id string) (*document.Post, error)
+	UpdatePostByID(ctx context.Context, id string, update bson.M) error
+	DeletePostByID(ctx context.Context, id string) error
+	ListPostViewsData(ctx context.Context) ([]dto.PostViewData, error)
+}
+
+// VisitorRepositoryer 定义 visitor_track 表的写入契约。
+type VisitorRepositoryer interface {
+	Insert(ctx context.Context, v *model.VisitorTrack) error
+}
+
+// Adminer 定义 admin 后台的用例契约。
+type Adminer interface {
+	AddPost(ctx context.Context, post dto.PostIn) (id string, err error)
+	UpdatePost(ctx context.Context, id string, post dto.PostUpdate) error
+	DeletePost(ctx context.Context, id string) error
+	TrackVisitor(ctx context.Context, data dto.VisitorData) error
+	ListPostViewsData(ctx context.Context) ([]dto.PostViewData, error)
+}
+
+type adminService struct {
+	repo    AdminRepositoryer
+	visitor VisitorRepositoryer
 	redis   *redis.Client
 }
 
 func NewAdminService(
-	repo *postgres.AdminRepo,
-	visitor *postgres.VisitorRepo,
+	repo AdminRepositoryer,
+	visitor VisitorRepositoryer,
 	redis *redis.Client,
-) *AdminService {
-	return &AdminService{
+) *adminService {
+	return &adminService{
 		repo:    repo,
 		visitor: visitor,
 		redis:   redis,
@@ -43,7 +65,7 @@ func ptrIf(s string) *string {
 	return nil
 }
 
-func (s *AdminService) AddPost(post dto.PostIn) (string, error) {
+func (s *adminService) AddPost(ctx context.Context, post dto.PostIn) (string, error) {
 	doc := &document.Post{
 		Title:    post.Title,
 		Body:     post.Body,
@@ -56,19 +78,19 @@ func (s *AdminService) AddPost(post dto.PostIn) (string, error) {
 	if post.Cover != "" {
 		doc.Cover = &post.Cover
 	}
-	id, err := s.repo.CreatePost(context.Background(), doc)
+	id, err := s.repo.CreatePost(ctx, doc)
 	if err != nil {
 		return "", err
 	}
-	s.invalidateBlogCache()
+	s.invalidateBlogCache(ctx)
 	return id, nil
 }
 
-func (s *AdminService) UpdatePost(id string, post dto.PostUpdate) error {
+func (s *adminService) UpdatePost(ctx context.Context, id string, post dto.PostUpdate) error {
 	if _, err := bson.ObjectIDFromHex(id); err != nil {
 		return errs.ErrInvalidPostID
 	}
-	_, err := s.repo.GetPostByID(context.Background(), id)
+	_, err := s.repo.GetPostByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return errs.ErrPostNotFound
@@ -84,18 +106,18 @@ func (s *AdminService) UpdatePost(id string, post dto.PostUpdate) error {
 		"tags":      post.Tags,
 		"is_pinned": boolToInt(post.IsPinned),
 	}
-	if err := s.repo.UpdatePostByID(context.Background(), id, update); err != nil {
+	if err := s.repo.UpdatePostByID(ctx, id, update); err != nil {
 		return err
 	}
-	s.invalidateBlogCache()
+	s.invalidateBlogCache(ctx)
 	return nil
 }
 
-func (s *AdminService) DeletePost(id string) error {
+func (s *adminService) DeletePost(ctx context.Context, id string) error {
 	if _, err := bson.ObjectIDFromHex(id); err != nil {
 		return errs.ErrInvalidPostID
 	}
-	_, err := s.repo.GetPostByID(context.Background(), id)
+	_, err := s.repo.GetPostByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return errs.ErrPostNotFound
@@ -103,22 +125,20 @@ func (s *AdminService) DeletePost(id string) error {
 		return err
 	}
 
-	if err := s.repo.DeletePostByID(context.Background(), id); err != nil {
+	if err := s.repo.DeletePostByID(ctx, id); err != nil {
 		return err
 	}
-	s.invalidateBlogCache()
+	s.invalidateBlogCache(ctx)
 	return nil
 }
 
-
-func (s *AdminService) ListPostViewsData() ([]dto.PostViewData, error) {
-	data, err := s.repo.ListPostViewsData(context.Background())
+func (s *adminService) ListPostViewsData(ctx context.Context) ([]dto.PostViewData, error) {
+	data, err := s.repo.ListPostViewsData(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return data, nil
 }
-
 
 // TrackVisitor 把一次访问同步写入 PostgreSQL。
 //
@@ -126,7 +146,7 @@ func (s *AdminService) ListPostViewsData() ([]dto.PostViewData, error) {
 // 定时任务消费落库——那条链路久经失败（缺显式 commit、browser 列约束、
 // DTO 与 schema 不对齐），所以此处改为 Go 端直写，不再依赖 Redis 跨语言消费。
 // visit_time 不使用前端传的值，由 PG default current_timestamp 填充。
-func (s *AdminService) TrackVisitor(data dto.VisitorData) error {
+func (s *adminService) TrackVisitor(ctx context.Context, data dto.VisitorData) error {
 	track := &model.VisitorTrack{
 		VisitorID:        data.VisitorID,
 		PageURL:          data.PageURL,
@@ -143,11 +163,10 @@ func (s *AdminService) TrackVisitor(data dto.VisitorData) error {
 		CPU:              ptrIf(data.Cpu),
 		DeviceType:       ptrIf(data.DeviceType),
 	}
-	return s.visitor.Insert(context.Background(), track)
+	return s.visitor.Insert(ctx, track)
 }
 
-func (s *AdminService) invalidateBlogCache() {
-	ctx := context.Background()
+func (s *adminService) invalidateBlogCache(ctx context.Context) {
 	keys := []string{"cache:get_blogs", "cache:get_blog_post", "cache:get_blog"}
 	s.redis.Del(ctx, keys...)
 }

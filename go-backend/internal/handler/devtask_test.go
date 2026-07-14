@@ -82,7 +82,7 @@ func (m *mockDevTaskService) BatchUpdateStatus(
 
 // ---------- helpers ----------
 
-func newDevTaskHandler(svc DevTaskService) *gin.Engine {
+func newDevTaskHandler(svc *mockDevTaskService) *gin.Engine {
 	h := NewDevTaskHandler(svc)
 	r := gin.New()
 	g := r.Group("/api/v3")

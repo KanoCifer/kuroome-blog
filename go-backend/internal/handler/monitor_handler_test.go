@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
+	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
 func init() {
@@ -59,7 +60,7 @@ func (m *mockMonitorService) StreamServerStatus(ctx context.Context) (<-chan dto
 
 // ---------- helpers ----------
 
-func setupMonitor(svc MonitorService, adminMW gin.HandlerFunc) *gin.Engine {
+func setupMonitor(svc service.Monitorer, adminMW gin.HandlerFunc) *gin.Engine {
 	h := NewMonitorHandler(svc)
 	r := gin.New()
 	g := r.Group("/api/v3")

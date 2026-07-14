@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"errors"
 	"log/slog"
 
@@ -13,24 +14,24 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 )
 
-type UserService interface {
-	Authenticate(username, password string) (*model.User, error)
-	CreateTokens(u *model.User) (*dto.Tokens, error)
-	CreateUser(username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
-	GetByID(userID uint) (*model.User, *model.Profile, error)
-	Logout(userID uint)
-	RefreshTokens(refreshToken string) (*dto.Tokens, error)
+type Userer interface {
+	Authenticate(ctx context.Context, username, password string) (*model.User, error)
+	CreateTokens(ctx context.Context, u *model.User) (*dto.Tokens, error)
+	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
+	GetByID(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
+	Logout(ctx context.Context, userID uint)
+	RefreshTokens(ctx context.Context, refreshToken string) (*dto.Tokens, error)
 	UserToDict(u *model.User, p *model.Profile) map[string]any
-	SendEmailCode(email string) bool
+	SendEmailCode(ctx context.Context, email string) bool
 }
 
 // UserHandler 持有业务服务，gin 路由方法挂在其上。
 type UserHandler struct {
-	userSvc UserService
+	userSvc Userer
 	cfg     *config.Config
 }
 
-func NewUserHandler(userSvc UserService, cfg *config.Config) *UserHandler {
+func NewUserHandler(userSvc Userer, cfg *config.Config) *UserHandler {
 	return &UserHandler{userSvc: userSvc, cfg: cfg}
 }
 
@@ -41,7 +42,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userSvc.Authenticate(req.Username, req.Password)
+	user, err := h.userSvc.Authenticate(c.Request.Context(), req.Username, req.Password)
 	if err != nil {
 		if errors.Is(err, errs.ErrInvalidCredentials) {
 			slog.WarnContext(c.Request.Context(), "login failed", "reason", "invalid_credentials", "username", req.Username)
@@ -53,7 +54,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	tokens, err := h.userSvc.CreateTokens(user)
+	tokens, err := h.userSvc.CreateTokens(c.Request.Context(), user)
 	if err != nil {
 		slog.ErrorContext(c.Request.Context(), "create tokens error", "error", err, "user_id", user.ID)
 		response.APIError(c, "server error", 500)
@@ -80,7 +81,7 @@ func (h *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
-	u, _, err := h.userSvc.CreateUser(req.Username, req.Password, req.Email, req.EmailCode, "")
+	u, _, err := h.userSvc.CreateUser(c.Request.Context(), req.Username, req.Password, req.Email, req.EmailCode, "")
 	if err != nil {
 		switch {
 		case errors.Is(err, errs.ErrUserExists):
@@ -111,7 +112,7 @@ func (h *UserHandler) Me(c *gin.Context) {
 		return
 	}
 
-	u, p, err := h.userSvc.GetByID(uint(c.GetInt("user_id")))
+	u, p, err := h.userSvc.GetByID(c.Request.Context(), uint(c.GetInt("user_id")))
 	if err != nil {
 		if errors.Is(err, errs.ErrUserNotFound) {
 			slog.WarnContext(c.Request.Context(), "get user failed", "reason", "user_not_found", "user_id", c.GetInt("user_id"))
@@ -133,7 +134,7 @@ func (h *UserHandler) Logout(c *gin.Context) {
 		return
 	}
 
-	h.userSvc.Logout(uint(c.GetInt("user_id")))
+	h.userSvc.Logout(c.Request.Context(), uint(c.GetInt("user_id")))
 	// 清除 refresh_token cookie（与 Python 端一致）。
 	clearRefreshCookie(c, h.cfg)
 	response.Success(c, nil, "已退出登录")
@@ -157,7 +158,7 @@ func (h *UserHandler) RefreshToken(c *gin.Context) {
 		return
 	}
 
-	tokens, err := h.userSvc.RefreshTokens(refreshToken)
+	tokens, err := h.userSvc.RefreshTokens(c.Request.Context(), refreshToken)
 	if err != nil {
 		slog.WarnContext(c.Request.Context(), "refresh token failed", "reason", "invalid_token")
 		response.APIError(c, err.Error(), 401)
@@ -185,7 +186,7 @@ func (h *UserHandler) EmailCode(c *gin.Context) {
 		response.APIError(c, "邮箱不能为空", 400)
 		return
 	}
-	go h.userSvc.SendEmailCode(req.Email)
+	go h.userSvc.SendEmailCode(c.Request.Context(), req.Email)
 	response.Success(c, nil, "验证码已发送")
 }
 

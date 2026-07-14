@@ -86,7 +86,7 @@ func (m *mockDevTaskRepo) BatchUpdateStatus(
 }
 
 // newService 用 mock repo 构造 service。
-func newService(repo DevTaskRepository) *DevTaskService {
+func newService(repo DevTaskRepositoryer) *DevTaskService {
 	return &DevTaskService{repo: repo}
 }
 

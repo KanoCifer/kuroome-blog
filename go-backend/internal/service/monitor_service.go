@@ -14,6 +14,17 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 )
 
+// Monitorer 定义 monitor handler 依赖的能力集合。
+// 由 service.Monitorer 实现；handler 仅依赖此接口，便于测试替换。
+type Monitorer interface {
+	GetOverview(ctx context.Context, days int) (dto.Overview, error)
+	GetVisitors(ctx context.Context, days, page, pageSize int) (dto.Visitors, error)
+	GetUserLogins(ctx context.Context, days, page, pageSize int) (dto.UserLogins, error)
+	GetServerStatus() (dto.ServerStatus, error)
+	StreamServerStatus(ctx context.Context) (<-chan dto.ServerStatus, error)
+}
+
+
 // MonitorService 实现 monitor 端点的业务逻辑（overview / visitors / user-logins）。
 //
 // server/status + stream 在 task-7 中追加，复用同一个 service 实例。
