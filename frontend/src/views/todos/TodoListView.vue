@@ -39,6 +39,28 @@
           </button>
 
           <button
+            class="text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring border-border inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-2 text-sm transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-50"
+            :disabled="store.loading"
+            title="刷新任务列表"
+            @click="store.fetchTasks()"
+          >
+            <svg
+              class="h-4 w-4"
+              :class="store.loading ? 'animate-spin' : ''"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+          </button>
+
+          <button
             class="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
             @click="openCreate"
           >
