@@ -16,3 +16,15 @@ type Post struct {
 	Likes      int       `bson:"likes"`
 	Views      int       `bson:"views"`
 }
+
+// TagCount 标签聚合结果 —— 从 $group 管道解码，在 service 层映射为 DTO。
+type TagCount struct {
+	Name  string `bson:"_id"`
+	Count int    `bson:"count"`
+}
+
+// PostViewData 文章浏览数据投影 —— 只查询 title / views 两个字段。
+type PostViewData struct {
+	Title string `bson:"title"`
+	Views int    `bson:"views"`
+}

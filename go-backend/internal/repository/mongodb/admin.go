@@ -9,7 +9,6 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 
-	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/mongo/document"
 )
 
@@ -75,7 +74,7 @@ func (r *AdminRepo) DeletePostByID(ctx context.Context, id string) error {
 	return err
 }
 
-func (r *AdminRepo) ListPostViewsData(ctx context.Context) ([]dto.PostViewData, error) {
+func (r *AdminRepo) ListPostViewsData(ctx context.Context) ([]document.PostViewData, error) {
 	projection := bson.D{
 		{Key: "title", Value: 1},
 		{Key: "views", Value: 1},
@@ -85,7 +84,7 @@ func (r *AdminRepo) ListPostViewsData(ctx context.Context) ([]dto.PostViewData, 
 	if err != nil {
 		return nil, err
 	}
-	var result []dto.PostViewData
+	var result []document.PostViewData
 	if err := cursor.All(ctx, &result); err != nil {
 		return nil, err
 	}

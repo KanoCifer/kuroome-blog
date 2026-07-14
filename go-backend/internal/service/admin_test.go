@@ -68,7 +68,7 @@ type mockAdminRepo struct {
 	getPostByIDFn     func(ctx context.Context, id string) (*document.Post, error)
 	updatePostByIDFn  func(ctx context.Context, id string, update bson.M) error
 	deletePostByIDFn  func(ctx context.Context, id string) error
-	listPostViewsData func(ctx context.Context) ([]dto.PostViewData, error)
+	listPostViewsData func(ctx context.Context) ([]document.PostViewData, error)
 }
 
 func (m *mockAdminRepo) CreatePost(ctx context.Context, post *document.Post) (string, error) {
@@ -99,7 +99,7 @@ func (m *mockAdminRepo) DeletePostByID(ctx context.Context, id string) error {
 	return nil
 }
 
-func (m *mockAdminRepo) ListPostViewsData(ctx context.Context) ([]dto.PostViewData, error) {
+func (m *mockAdminRepo) ListPostViewsData(ctx context.Context) ([]document.PostViewData, error) {
 	if m.listPostViewsData != nil {
 		return m.listPostViewsData(ctx)
 	}
@@ -219,8 +219,8 @@ func TestAdminService_UpdatePost_NotFound(t *testing.T) {
 
 func TestAdminService_ListPostViewsData_Passthrough(t *testing.T) {
 	repo := &mockAdminRepo{
-		listPostViewsData: func(ctx context.Context) ([]dto.PostViewData, error) {
-			return []dto.PostViewData{
+		listPostViewsData: func(ctx context.Context) ([]document.PostViewData, error) {
+			return []document.PostViewData{
 				{Title: "Post A", Views: 100},
 				{Title: "Post B", Views: 50},
 			}, nil
@@ -242,7 +242,7 @@ func TestAdminService_ListPostViewsData_Passthrough(t *testing.T) {
 
 func TestAdminService_ListPostViewsData_Error(t *testing.T) {
 	repo := &mockAdminRepo{
-		listPostViewsData: func(ctx context.Context) ([]dto.PostViewData, error) {
+		listPostViewsData: func(ctx context.Context) ([]document.PostViewData, error) {
 			return nil, errors.New("mongo error")
 		},
 	}

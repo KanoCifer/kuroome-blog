@@ -18,7 +18,7 @@ import (
 // BlogRepositoryer 定义博客读表面对 posts 集合的读写契约。
 type BlogRepositoryer interface {
 	ListPosts(ctx context.Context, page, perPage int, search string) ([]document.Post, int64, error)
-	AggregateTagCounts(ctx context.Context) ([]dto.TagOut, error)
+	AggregateTagCounts(ctx context.Context) ([]document.TagCount, error)
 	GetPostByID(ctx context.Context, id string) (*document.Post, error)
 	IncrementViews(ctx context.Context, id string) error
 	IncrementLikes(ctx context.Context, id string) (int, error)
@@ -118,10 +118,15 @@ func (s *blogService) ListPosts(ctx context.Context, page int, search string) (*
 		return nil, err
 	}
 
-	tags, err := s.repo.AggregateTagCounts(ctx)
+	tagCounts, err := s.repo.AggregateTagCounts(ctx)
 	if err != nil {
 		slog.ErrorContext(ctx, "aggregate tag counts", "error", err)
 		return nil, err
+	}
+
+	tags := make([]dto.TagOut, 0, len(tagCounts))
+	for _, tc := range tagCounts {
+		tags = append(tags, dto.TagOut{Name: tc.Name, Count: tc.Count})
 	}
 
 	return &dto.BlogListOut{
@@ -175,10 +180,14 @@ func (s *blogService) LikePost(ctx context.Context, id string) (int, error) {
 
 // ListTags 列出所有标签及文章数 —— 与 Python list_tags 对齐。
 func (s *blogService) ListTags(ctx context.Context) ([]dto.TagOut, error) {
-	tags, err := s.repo.AggregateTagCounts(ctx)
+	tagCounts, err := s.repo.AggregateTagCounts(ctx)
 	if err != nil {
 		slog.ErrorContext(ctx, "aggregate tag counts", "error", err)
 		return nil, err
+	}
+	tags := make([]dto.TagOut, 0, len(tagCounts))
+	for _, tc := range tagCounts {
+		tags = append(tags, dto.TagOut{Name: tc.Name, Count: tc.Count})
 	}
 	return tags, nil
 }

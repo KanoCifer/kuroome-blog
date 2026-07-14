@@ -7,7 +7,6 @@ import (
 
 	"go.mongodb.org/mongo-driver/v2/mongo"
 
-	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/mongo/document"
 )
@@ -15,12 +14,12 @@ import (
 // ---------- mock BlogRepository ----------
 
 type mockBlogRepo struct {
-	listPostsFn     func(ctx context.Context, page, perPage int, search string) ([]document.Post, int64, error)
-	aggregateTagsFn func(ctx context.Context) ([]dto.TagOut, error)
-	getPostByIDFn   func(ctx context.Context, id string) (*document.Post, error)
-	incrementViewsFn func(ctx context.Context, id string) error
-	incrementLikesFn func(ctx context.Context, id string) (int, error)
-	listPostsByTagFn func(ctx context.Context, tag string, page, perPage int) ([]document.Post, int64, error)
+	listPostsFn       func(ctx context.Context, page, perPage int, search string) ([]document.Post, int64, error)
+	aggregateTagsFn   func(ctx context.Context) ([]document.TagCount, error)
+	getPostByIDFn     func(ctx context.Context, id string) (*document.Post, error)
+	incrementViewsFn  func(ctx context.Context, id string) error
+	incrementLikesFn  func(ctx context.Context, id string) (int, error)
+	listPostsByTagFn  func(ctx context.Context, tag string, page, perPage int) ([]document.Post, int64, error)
 }
 
 func (m *mockBlogRepo) ListPosts(ctx context.Context, page, perPage int, search string) ([]document.Post, int64, error) {
@@ -30,7 +29,7 @@ func (m *mockBlogRepo) ListPosts(ctx context.Context, page, perPage int, search 
 	return nil, 0, nil
 }
 
-func (m *mockBlogRepo) AggregateTagCounts(ctx context.Context) ([]dto.TagOut, error) {
+func (m *mockBlogRepo) AggregateTagCounts(ctx context.Context) ([]document.TagCount, error) {
 	if m.aggregateTagsFn != nil {
 		return m.aggregateTagsFn(ctx)
 	}
@@ -235,8 +234,8 @@ func TestBlogService_ListPostsByTag_InvalidPagination(t *testing.T) {
 
 func TestBlogService_ListTags_Passthrough(t *testing.T) {
 	repo := &mockBlogRepo{
-		aggregateTagsFn: func(ctx context.Context) ([]dto.TagOut, error) {
-			return []dto.TagOut{{Name: "go", Count: 5}, {Name: "vue", Count: 3}}, nil
+		aggregateTagsFn: func(ctx context.Context) ([]document.TagCount, error) {
+			return []document.TagCount{{Name: "go", Count: 5}, {Name: "vue", Count: 3}}, nil
 		},
 	}
 	svc := newBlogService(repo)
@@ -259,7 +258,7 @@ func TestBlogService_ListPosts_NormalizesPage(t *testing.T) {
 			gotPage = page
 			return nil, 0, nil
 		},
-		aggregateTagsFn: func(ctx context.Context) ([]dto.TagOut, error) { return nil, nil },
+		aggregateTagsFn: func(ctx context.Context) ([]document.TagCount, error) { return nil, nil },
 	}
 	svc := newBlogService(repo)
 
@@ -302,11 +301,11 @@ func TestSerializePosts_Empty(t *testing.T) {
 
 func TestPagination(t *testing.T) {
 	tests := []struct {
-		name          string
+		name              string
 		page, perPage, total int
-		wantPages     int
-		wantHasPrev   bool
-		wantHasNext   bool
+		wantPages         int
+		wantHasPrev       bool
+		wantHasNext       bool
 	}{
 		{"first_page", 1, 10, 25, 3, false, true},
 		{"middle_page", 2, 10, 25, 3, true, true},

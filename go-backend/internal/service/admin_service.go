@@ -20,7 +20,7 @@ type AdminRepositoryer interface {
 	GetPostByID(ctx context.Context, id string) (*document.Post, error)
 	UpdatePostByID(ctx context.Context, id string, update bson.M) error
 	DeletePostByID(ctx context.Context, id string) error
-	ListPostViewsData(ctx context.Context) ([]dto.PostViewData, error)
+	ListPostViewsData(ctx context.Context) ([]document.PostViewData, error)
 }
 
 // VisitorRepositoryer 定义 visitor_track 表的写入契约。
@@ -133,9 +133,13 @@ func (s *adminService) DeletePost(ctx context.Context, id string) error {
 }
 
 func (s *adminService) ListPostViewsData(ctx context.Context) ([]dto.PostViewData, error) {
-	data, err := s.repo.ListPostViewsData(ctx)
+	docs, err := s.repo.ListPostViewsData(ctx)
 	if err != nil {
 		return nil, err
+	}
+	data := make([]dto.PostViewData, 0, len(docs))
+	for _, d := range docs {
+		data = append(data, dto.PostViewData{Title: d.Title, Views: d.Views})
 	}
 	return data, nil
 }
@@ -167,6 +171,9 @@ func (s *adminService) TrackVisitor(ctx context.Context, data dto.VisitorData) e
 }
 
 func (s *adminService) invalidateBlogCache(ctx context.Context) {
+	if s.redis == nil {
+		return
+	}
 	keys := []string{"cache:get_blogs", "cache:get_blog_post", "cache:get_blog"}
 	s.redis.Del(ctx, keys...)
 }

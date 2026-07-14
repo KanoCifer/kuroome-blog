@@ -8,7 +8,6 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 
-	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/mongo/document"
 )
 
@@ -68,7 +67,7 @@ func (r *BlogRepository) ListPosts(
 }
 
 // AggregateTagCounts 聚合每个标签的文章数，按数量降序、标签名升序。
-func (r *BlogRepository) AggregateTagCounts(ctx context.Context) ([]dto.TagOut, error) {
+func (r *BlogRepository) AggregateTagCounts(ctx context.Context) ([]document.TagCount, error) {
 	pipeline := mongo.Pipeline{
 		{{Key: "$unwind", Value: "$tags"}},
 		{{Key: "$group", Value: bson.M{
@@ -87,21 +86,11 @@ func (r *BlogRepository) AggregateTagCounts(ctx context.Context) ([]dto.TagOut, 
 	}
 	defer cursor.Close(ctx)
 
-	results := []dto.TagOut{}
-	for cursor.Next(ctx) {
-		var doc struct {
-			ID    string `bson:"_id"`
-			Count int    `bson:"count"`
-		}
-		if err := cursor.Decode(&doc); err != nil {
-			return nil, err
-		}
-		if doc.ID == "" {
-			continue
-		}
-		results = append(results, dto.TagOut{Name: doc.ID, Count: doc.Count})
+	var results []document.TagCount
+	if err := cursor.All(ctx, &results); err != nil {
+		return nil, err
 	}
-	return results, cursor.Err()
+	return results, nil
 }
 
 // GetPostByID 按 ObjectId 查找单篇文章。id 格式非法时返回 nil, error。
