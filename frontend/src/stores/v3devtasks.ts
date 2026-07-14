@@ -21,11 +21,11 @@ export const V3_STATUSES: DevTaskStatus[] = [
 
 // 默认状态推进（跳开"已搁置"——搁置与恢复是用户主动选择，不在循环里）。
 const STATUS_CYCLE: Record<DevTaskStatus, DevTaskStatus> = {
-  '待评估': '待排期',
-  '待排期': '进行中',
-  '进行中': '已完成',
-  '已搁置': '待排期',
-  '已完成': '待评估',
+  待评估: '待排期',
+  待排期: '进行中',
+  进行中: '已完成',
+  已搁置: '待排期',
+  已完成: '待评估',
 };
 
 export const useV3DevTaskStore = defineStore('v3-devtasks', () => {
@@ -55,7 +55,9 @@ export const useV3DevTaskStore = defineStore('v3-devtasks', () => {
     }
   }
 
-  async function createTask(payload: CreateDevTaskPayload): Promise<DevTask | null> {
+  async function createTask(
+    payload: CreateDevTaskPayload,
+  ): Promise<DevTask | null> {
     try {
       const task = await devTaskGateway.create(payload);
       tasks.value = [task, ...tasks.value];
@@ -68,13 +70,13 @@ export const useV3DevTaskStore = defineStore('v3-devtasks', () => {
   }
 
   async function updateTask(
-    id: string,
+    slug: string,
     patch: UpdateDevTaskPayload,
   ): Promise<boolean> {
     try {
-      await devTaskGateway.update(id, patch);
+      await devTaskGateway.update(slug, patch);
       tasks.value = tasks.value.map((t) =>
-        t.id === id ? { ...t, ...patch } : t,
+        t.slug === slug ? { ...t, ...patch } : t,
       );
       return true;
     } catch (err) {
@@ -84,28 +86,28 @@ export const useV3DevTaskStore = defineStore('v3-devtasks', () => {
     }
   }
 
-  async function cycleStatus(id: string): Promise<void> {
-    const t = tasks.value.find((x) => x.id === id);
+  async function cycleStatus(slug: string): Promise<void> {
+    const t = tasks.value.find((x) => x.slug === slug);
     if (!t) return;
     const nextStatus = STATUS_CYCLE[t.status];
-    await updateTask(id, { status: nextStatus });
+    await updateTask(slug, { status: nextStatus });
   }
 
   /** 软删除（默认删除语义）。UI 上"永久删除"调用 hardDeleteTask。 */
-  async function deleteTask(id: string): Promise<void> {
+  async function deleteTask(slug: string): Promise<void> {
     try {
-      await devTaskGateway.remove(id);
-      tasks.value = tasks.value.filter((t) => t.id !== id);
+      await devTaskGateway.remove(slug);
+      tasks.value = tasks.value.filter((t) => t.slug !== slug);
     } catch (err) {
       console.error('delete v3 devtask error:', err);
       notifier.error('删除任务失败');
     }
   }
 
-  async function hardDeleteTask(id: string): Promise<void> {
+  async function hardDeleteTask(slug: string): Promise<void> {
     try {
-      await devTaskGateway.hardDelete(id);
-      tasks.value = tasks.value.filter((t) => t.id !== id);
+      await devTaskGateway.hardDelete(slug);
+      tasks.value = tasks.value.filter((t) => t.slug !== slug);
     } catch (err) {
       console.error('hard delete v3 devtask error:', err);
       notifier.error('永久删除失败');
@@ -115,18 +117,18 @@ export const useV3DevTaskStore = defineStore('v3-devtasks', () => {
   /** 拖拽跨列后批量同步：先改 status，再按每列可见顺序写 sort_order。 */
   async function syncColumn(
     status: DevTaskStatus,
-    orderedIds: string[],
+    orderedSlugs: string[],
   ): Promise<void> {
     // 先做本地乐观更新，保证拖拽后立刻重排
-    const idSet = new Set(orderedIds);
+    const slugSet = new Set(orderedSlugs);
     const reordered: DevTask[] = [];
     const others: DevTask[] = [];
     for (const t of tasks.value) {
-      if (idSet.has(t.id)) reordered.push(t);
+      if (slugSet.has(t.slug)) reordered.push(t);
       else others.push(t);
     }
-    orderedIds.forEach((id, idx) => {
-      const t = reordered.find((x) => x.id === id);
+    orderedSlugs.forEach((slug, idx) => {
+      const t = reordered.find((x) => x.slug === slug);
       if (t) {
         t.status = status;
         t.sort_order = idx;
@@ -137,15 +139,15 @@ export const useV3DevTaskStore = defineStore('v3-devtasks', () => {
     );
 
     // 远端同步：逐个 update（v3 无批量排序接口）
-    for (const [idx, id] of orderedIds.entries()) {
-      const t = reordered.find((x) => x.id === id);
+    for (const [idx, slug] of orderedSlugs.entries()) {
+      const t = reordered.find((x) => x.slug === slug);
       if (!t) continue;
       // 仅在真正变化时打后端，避免无谓请求
-      const original = tasks.value.find((x) => x.id === id);
+      const original = tasks.value.find((x) => x.slug === slug);
       if (original && original.status === status && original.sort_order === idx)
         continue;
       try {
-        await devTaskGateway.update(id, { status, sort_order: idx });
+        await devTaskGateway.update(slug, { status, sort_order: idx });
       } catch (err) {
         console.error('sync column error:', err);
         notifier.error('排序同步失败');
@@ -162,14 +164,15 @@ export const useV3DevTaskStore = defineStore('v3-devtasks', () => {
    */
   const frontier = computed<DevTask[]>(() => {
     const weight = (p: DevTask['priority']) =>
-      ({ 'P0 紧急': 0, 'P1 高': 1, 'P2 中': 2, 'P3 低': 3 }[p] ?? 9);
+      ({ 'P0 紧急': 0, 'P1 高': 1, 'P2 中': 2, 'P3 低': 3 })[p] ?? 9;
     return tasks.value
       .filter((t) => t.status !== '已完成' && !t.is_deleted)
       .filter((t) => !t.blocked_by || t.blocked_by.length === 0)
       .sort((a, b) => {
         const w = weight(a.priority) - weight(b.priority);
         if (w !== 0) return w;
-        if (a.due_date && b.due_date) return a.due_date.localeCompare(b.due_date);
+        if (a.due_date && b.due_date)
+          return a.due_date.localeCompare(b.due_date);
         if (a.due_date) return -1;
         if (b.due_date) return 1;
         return 0;
@@ -188,28 +191,29 @@ export const useV3DevTaskStore = defineStore('v3-devtasks', () => {
       .sort((a, b) => (b.updated_at ?? '').localeCompare(a.updated_at ?? ''));
   });
 
-  const inProgress = computed<DevTask[]>(() =>
-    tasksByStatus('进行中'),
-  );
+  const inProgress = computed<DevTask[]>(() => tasksByStatus('进行中'));
 
   const totalActive = computed(
-    () => tasks.value.filter((t) => !t.is_deleted && t.status !== '已完成').length,
+    () =>
+      tasks.value.filter((t) => !t.is_deleted && t.status !== '已完成').length,
   );
 
   const completedCount = computed(
-    () => tasks.value.filter((t) => !t.is_deleted && t.status === '已完成').length,
+    () =>
+      tasks.value.filter((t) => !t.is_deleted && t.status === '已完成').length,
   );
 
   const urgentActive = computed(
     () =>
       tasks.value.filter(
-        (t) => !t.is_deleted && t.priority === 'P0 紧急' && t.status !== '已完成',
+        (t) =>
+          !t.is_deleted && t.priority === 'P0 紧急' && t.status !== '已完成',
       ).length,
   );
 
   const typeDistribution = computed<Record<DevTaskType, number>>(() => {
     const dist: Record<string, number> = {
-      '功能需求': 0,
+      功能需求: 0,
       问题: 0,
       优化: 0,
       技术债: 0,

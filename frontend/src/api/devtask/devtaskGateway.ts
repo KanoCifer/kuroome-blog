@@ -38,8 +38,8 @@ export interface DevTask {
   // Who / Dependencies
   for_agent?: boolean;
   blocked_by?: string[];
-  // Slug —— task-N，人类可读引用
-  slug?: string;
+  // Slug —— task-N，人类可读引用（后端操作标识，所有路由以 slug 定位任务）
+  slug: string;
   // 任务角色：spec（可拆解为子任务）/ subtask（spec 拆解出的子任务）。空串 = spec。
   kind?: DevTaskKind;
   // 子任务归属的 spec slug。spec / 独立任务为 null。
@@ -123,12 +123,11 @@ export interface McpTokenResult {
 
 export interface DevTaskGateway {
   list(params?: ListDevTasksParams): Promise<DevTaskListResponse>;
-  get(id: string): Promise<DevTask>;
-  getBySlug(slug: string): Promise<DevTask>;
+  get(slug: string): Promise<DevTask>;
   create(payload: CreateDevTaskPayload): Promise<DevTask>;
-  update(id: string, payload: UpdateDevTaskPayload): Promise<void>;
-  remove(id: string): Promise<void>;
-  hardDelete(id: string): Promise<void>;
+  update(slug: string, payload: UpdateDevTaskPayload): Promise<void>;
+  remove(slug: string): Promise<void>;
+  hardDelete(slug: string): Promise<void>;
   // 签发 MCP / 长期服务 JWT。days: 1..365。
   issueMcpToken(days: number): Promise<McpTokenResult>;
 }
@@ -144,16 +143,9 @@ export const devTaskGateway: DevTaskGateway = {
     return res.data.data;
   },
 
-  async get(id: string): Promise<DevTask> {
+  async get(slug: string): Promise<DevTask> {
     const res = await devtaskRequest.get<{ data: DevTask }>(
-      `v3/dev-tasks/${id}`,
-    );
-    return res.data.data;
-  },
-
-  async getBySlug(slug: string): Promise<DevTask> {
-    const res = await devtaskRequest.get<{ data: DevTask }>(
-      `v3/dev-tasks/by-slug/${slug}`,
+      `v3/dev-tasks/${slug}`,
     );
     return res.data.data;
   },
@@ -166,16 +158,16 @@ export const devTaskGateway: DevTaskGateway = {
     return res.data.data;
   },
 
-  async update(id: string, payload: UpdateDevTaskPayload): Promise<void> {
-    await devtaskRequest.patch(`v3/dev-tasks/${id}`, payload);
+  async update(slug: string, payload: UpdateDevTaskPayload): Promise<void> {
+    await devtaskRequest.patch(`v3/dev-tasks/${slug}`, payload);
   },
 
-  async remove(id: string): Promise<void> {
-    await devtaskRequest.delete(`v3/dev-tasks/${id}`);
+  async remove(slug: string): Promise<void> {
+    await devtaskRequest.delete(`v3/dev-tasks/${slug}`);
   },
 
-  async hardDelete(id: string): Promise<void> {
-    await devtaskRequest.delete(`v3/dev-tasks/${id}/permanent`);
+  async hardDelete(slug: string): Promise<void> {
+    await devtaskRequest.delete(`v3/dev-tasks/${slug}/permanent`);
   },
 
   async issueMcpToken(days: number): Promise<McpTokenResult> {

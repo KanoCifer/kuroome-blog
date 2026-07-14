@@ -41,7 +41,9 @@
       <span
         v-if="task.due_date"
         class="flex items-center gap-1 text-[10px]"
-        :class="overdue(task.due_date) ? 'text-destructive' : 'text-muted-foreground'"
+        :class="
+          overdue(task.due_date) ? 'text-destructive' : 'text-muted-foreground'
+        "
       >
         <svg class="h-2.5 w-2.5" viewBox="0 0 20 20" fill="currentColor">
           <path
@@ -60,12 +62,18 @@
       >
         <button
           v-if="!done"
-          @click="$emit('cycle-status', task.id)"
-          class="text-muted-foreground hover:bg-muted hover:text-primary cursor-pointer rounded-md p-1 transition-colors"
+          type="button"
+          @click="$emit('cycle-status', task.slug)"
+          class="text-muted-foreground hover:bg-muted hover:text-primary focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96] active:not-focus-visible:ring-0"
           title="推进状态"
           aria-label="推进状态"
         >
-          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <svg
+            class="h-4 w-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -75,17 +83,23 @@
           </svg>
         </button>
         <button
-          @click="$emit('delete-task', task.id)"
-          class="text-muted-foreground hover:bg-destructive/10 hover:text-destructive cursor-pointer rounded-md p-1 transition-colors"
+          type="button"
+          @click="$emit('delete-task', task.slug)"
+          class="text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96] active:not-focus-visible:ring-0"
           title="删除"
           aria-label="删除"
         >
-          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <svg
+            class="h-4 w-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6m6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
             />
           </svg>
         </button>
@@ -107,30 +121,37 @@ const props = withDefaults(
 );
 
 defineEmits<{
-  'cycle-status': [id: string];
-  'delete-task': [id: string];
+  'cycle-status': [slug: string];
+  'delete-task': [slug: string];
 }>();
 
 const TYPE_CLASS: Record<DevTaskType, string> = {
-  '问题': 'border-rose-200 bg-rose-50/60 text-rose-700 dark:border-rose-800/60 dark:bg-rose-950/30 dark:text-rose-400',
-  '功能需求': 'border-blue-200 bg-blue-50/60 text-blue-700 dark:border-blue-800/60 dark:bg-blue-950/30 dark:text-blue-400',
-  '优化': 'border-amber-200 bg-amber-50/60 text-amber-700 dark:border-amber-800/60 dark:bg-amber-950/30 dark:text-amber-400',
-  '技术债': 'border-purple-200 bg-purple-50/60 text-purple-700 dark:border-purple-800/60 dark:bg-purple-950/30 dark:text-purple-400',
+  问题: 'border-rose-200 bg-rose-50/60 text-rose-700 dark:border-rose-800/60 dark:bg-rose-950/30 dark:text-rose-400',
+  功能需求:
+    'border-blue-200 bg-blue-50/60 text-blue-700 dark:border-blue-800/60 dark:bg-blue-950/30 dark:text-blue-400',
+  优化: 'border-amber-200 bg-amber-50/60 text-amber-700 dark:border-amber-800/60 dark:bg-amber-950/30 dark:text-amber-400',
+  技术债:
+    'border-purple-200 bg-purple-50/60 text-purple-700 dark:border-purple-800/60 dark:bg-purple-950/30 dark:text-purple-400',
 };
 
 const PRIORITY_CLASS: Record<DevTaskPriority, string> = {
   'P0 紧急': 'border-destructive/40 bg-destructive/10 text-destructive',
-  'P1 高': 'border-orange-200 bg-orange-50/60 text-orange-700 dark:border-orange-800/60 dark:bg-orange-950/30 dark:text-orange-400',
+  'P1 高':
+    'border-orange-200 bg-orange-50/60 text-orange-700 dark:border-orange-800/60 dark:bg-orange-950/30 dark:text-orange-400',
   'P2 中': 'border-border text-muted-foreground',
   'P3 低': 'border-border text-muted-foreground/70',
 };
 
-const typeCls = TYPE_CLASS[props.task.type] ?? 'border-border text-muted-foreground';
-const priorityCls = PRIORITY_CLASS[props.task.priority] ?? 'border-border text-muted-foreground';
+const typeCls =
+  TYPE_CLASS[props.task.type] ?? 'border-border text-muted-foreground';
+const priorityCls =
+  PRIORITY_CLASS[props.task.priority] ?? 'border-border text-muted-foreground';
 
 function overdue(dateStr: string): string {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  return new Date(dateStr) < today ? 'text-destructive' : 'text-muted-foreground';
+  return new Date(dateStr) < today
+    ? 'text-destructive'
+    : 'text-muted-foreground';
 }
 </script>

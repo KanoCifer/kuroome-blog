@@ -3,7 +3,7 @@
     <!-- 外层 flex 列：限制总高度，让表单区独立滚动 -->
     <div class="flex max-h-[85vh] w-full flex-col">
       <!-- ── 头部 ── -->
-      <div class="bg-background border-b px-6 pt-5 pb-4">
+      <div class="bg-background border-border border-b px-6 pt-5 pb-4">
         <div class="flex items-start gap-3">
           <span
             class="bg-primary/10 text-primary mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
@@ -24,7 +24,7 @@
           </span>
           <div class="min-w-0 flex-1">
             <h2 class="text-foreground text-lg font-semibold">
-              {{ form.id ? '编辑任务' : '新建任务' }}
+              {{ form.slug ? '编辑任务' : '新建任务' }}
             </h2>
             <p class="text-muted-foreground mt-0.5 text-xs">
               记录一个待开发的需求、问题或技术债。带
@@ -37,208 +37,225 @@
       <!-- ── 表单 (可滚动) ── -->
       <div class="min-h-0 flex-1 overflow-y-auto px-6 py-5">
         <div class="space-y-5">
-        <!-- ── 标题 ── -->
-        <label class="block">
-          <span class="text-muted-foreground mb-1.5 block text-xs font-medium">
-            标题 <span class="text-destructive">*</span>
-          </span>
-          <input
-            v-model="form.title"
-            class="border-border bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/50 w-full rounded-lg border px-3 py-2 text-sm outline-none"
-            placeholder="例如：重构首页响应式布局"
-          />
-        </label>
-
-        <!-- ── 类型 ── -->
-        <div>
-          <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
-            >类型</span
-          >
-          <div class="flex flex-wrap gap-2">
-            <button
-              v-for="t in TASK_TYPES"
-              :key="t"
-              type="button"
-              @click="form.type = t"
-              class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors"
-              :class="
-                form.type === t
-                  ? typeChipActive(t)
-                  : 'border-border text-muted-foreground hover:bg-muted'
-              "
-            >
-              {{ t }}
-            </button>
-          </div>
-        </div>
-
-        <!-- ── 优先级 ── -->
-        <div>
-          <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
-            >优先级</span
-          >
-          <div class="flex flex-wrap gap-2">
-            <button
-              v-for="p in PRIORITIES"
-              :key="p"
-              type="button"
-              @click="form.priority = p"
-              class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors"
-              :class="
-                form.priority === p
-                  ? priorityChipActive(p)
-                  : 'border-border text-muted-foreground hover:bg-muted'
-              "
-            >
-              {{ p }}
-            </button>
-          </div>
-        </div>
-
-        <!-- ── 范围 + 截止日 ── -->
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
-              >范围 <span class="text-muted-foreground/60 font-normal">（自由格式 — 例: 前端-React, 后端-Go, AI-LangChain）</span></span
-            >
-            <input
-              v-model="form.scope"
-              class="border-border bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/50 w-full rounded-lg border px-3 py-2 text-sm outline-none"
-              placeholder="例如：前端-React"
-            />
-          </div>
+          <!-- ── 标题 ── -->
           <label class="block">
-            <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
-              >截止日</span
+            <span
+              class="text-muted-foreground mb-1.5 block text-xs font-medium"
             >
+              标题 <span class="text-destructive">*</span>
+            </span>
             <input
-              v-model="form.due_date"
-              type="date"
-              class="border-border bg-background text-foreground focus:border-primary w-full cursor-pointer rounded-lg border px-3 py-2 text-sm outline-none"
+              v-model="form.title"
+              class="border-border bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/50 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+              placeholder="例如：重构首页响应式布局"
             />
           </label>
-        </div>
 
-        <!-- ── 状态（仅编辑时显示） ── -->
-        <div v-if="form.id">
-          <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
-            >状态</span
-          >
-          <div class="flex flex-wrap gap-1.5">
-            <button
-              v-for="s in STATUSES"
-              :key="s"
-              type="button"
-              @click="form.status = s"
-              class="cursor-pointer rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors"
-              :class="
-                form.status === s
-                  ? 'border-primary/40 bg-primary/10 text-primary'
-                  : 'border-border text-muted-foreground hover:bg-muted'
-              "
+          <!-- ── 类型 ── -->
+          <div>
+            <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
+              >类型</span
             >
-              {{ s }}
-            </button>
+            <div class="flex flex-wrap gap-2">
+              <button
+                v-for="t in TASK_TYPES"
+                :key="t"
+                type="button"
+                @click="form.type = t"
+                class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors"
+                :class="
+                  form.type === t
+                    ? typeChipActive(t)
+                    : 'border-border text-muted-foreground hover:bg-muted'
+                "
+              >
+                {{ t }}
+              </button>
+            </div>
           </div>
+
+          <!-- ── 优先级 ── -->
+          <div>
+            <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
+              >优先级</span
+            >
+            <div class="flex flex-wrap gap-2">
+              <button
+                v-for="p in PRIORITIES"
+                :key="p"
+                type="button"
+                @click="form.priority = p"
+                class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors"
+                :class="
+                  form.priority === p
+                    ? priorityChipActive(p)
+                    : 'border-border text-muted-foreground hover:bg-muted'
+                "
+              >
+                {{ p }}
+              </button>
+            </div>
+          </div>
+
+          <!-- ── 范围 + 截止日 ── -->
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <span
+                class="text-muted-foreground mb-1.5 block text-xs font-medium"
+                >范围
+                <span class="text-muted-foreground/60 font-normal"
+                  >（自由格式 — 例: 前端-React, 后端-Go, AI-LangChain）</span
+                ></span
+              >
+              <input
+                v-model="form.scope"
+                class="border-border bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/50 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+                placeholder="例如：前端-React"
+              />
+            </div>
+            <label class="block">
+              <span
+                class="text-muted-foreground mb-1.5 block text-xs font-medium"
+                >截止日</span
+              >
+              <input
+                v-model="form.due_date"
+                type="date"
+                class="border-border bg-background text-foreground focus:border-primary w-full cursor-pointer rounded-lg border px-3 py-2 text-sm outline-none"
+              />
+            </label>
+          </div>
+
+          <!-- ── 状态（仅编辑时显示） ── -->
+          <div v-if="form.slug">
+            <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
+              >状态</span
+            >
+            <div class="flex flex-wrap gap-1.5">
+              <button
+                v-for="s in STATUSES"
+                :key="s"
+                type="button"
+                @click="form.status = s"
+                class="cursor-pointer rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors"
+                :class="
+                  form.status === s
+                    ? 'border-primary/40 bg-primary/10 text-primary'
+                    : 'border-border text-muted-foreground hover:bg-muted'
+                "
+              >
+                {{ s }}
+              </button>
+            </div>
+          </div>
+
+          <!-- ── 描述 ── -->
+          <label class="block">
+            <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
+              >描述</span
+            >
+            <textarea
+              v-model="form.description"
+              rows="3"
+              class="border-border bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+              placeholder="一两句话说清楚要做什么、为什么..."
+            ></textarea>
+          </label>
+
+          <!-- ── 详情 ── -->
+          <label class="block">
+            <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
+              >详情</span
+            >
+            <textarea
+              v-model="form.detail"
+              rows="6"
+              class="border-border bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+              placeholder="实现思路、参考链接、验收标准等，可较长..."
+            ></textarea>
+            <span class="text-muted-foreground/60 mt-1 block text-[11px]"
+              >支持比描述更长的自由文本</span
+            >
+          </label>
+
+          <!-- ── Spec：验收标准 ── -->
+          <label class="block">
+            <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
+              >验收标准
+              <span class="text-muted-foreground/60 font-normal"
+                >（满足这几条算完成 — agent 会逐条自检）</span
+              ></span
+            >
+            <textarea
+              v-model="form.acceptance_criteria"
+              rows="4"
+              class="border-border bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+              placeholder="- 所有接口有单测覆盖&#10;- 文档同步更新&#10;- 性能基准不降级"
+            ></textarea>
+          </label>
+
+          <!-- ── Spec：约束 ── -->
+          <label class="block">
+            <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
+              >约束
+              <span class="text-muted-foreground/60 font-normal"
+                >（agent 不可违反的硬性边界）</span
+              ></span
+            >
+            <textarea
+              v-model="form.constraints"
+              rows="4"
+              class="border-border bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+              placeholder="- 不动 src/legacy/ 目录&#10;- 后端继续用 Gin，不换框架&#10;- API 响应格式保持不变"
+            ></textarea>
+          </label>
+
+          <!-- ── Spec：上下文指针 ── -->
+          <label class="block">
+            <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
+              >上下文指针
+              <span class="text-muted-foreground/60 font-normal"
+                >（相关代码 / 文档路径，减少 agent 找文件的往返）</span
+              ></span
+            >
+            <textarea
+              v-model="form.context_pointers"
+              rows="4"
+              class="border-border bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+              placeholder="internal/auth/, docs/adr/0003, src/middleware/session.ts"
+            ></textarea>
+          </label>
         </div>
-
-        <!-- ── 描述 ── -->
-        <label class="block">
-          <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
-            >描述</span
-          >
-          <textarea
-            v-model="form.description"
-            rows="3"
-            class="border-border bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
-            placeholder="一两句话说清楚要做什么、为什么..."
-          ></textarea>
-        </label>
-
-        <!-- ── 详情 ── -->
-        <label class="block">
-          <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
-            >详情</span
-          >
-          <textarea
-            v-model="form.detail"
-            rows="6"
-            class="border-border bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
-            placeholder="实现思路、参考链接、验收标准等，可较长..."
-          ></textarea>
-          <span class="text-muted-foreground/60 mt-1 block text-[11px]"
-            >支持比描述更长的自由文本</span
-          >
-        </label>
-
-        <!-- ── Spec：验收标准 ── -->
-        <label class="block">
-          <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
-            >验收标准 <span class="text-muted-foreground/60 font-normal">（满足这几条算完成 — agent 会逐条自检）</span></span
-          >
-          <textarea
-            v-model="form.acceptance_criteria"
-            rows="4"
-            class="border-border bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
-            placeholder="- 所有接口有单测覆盖&#10;- 文档同步更新&#10;- 性能基准不降级"
-          ></textarea>
-        </label>
-
-        <!-- ── Spec：约束 ── -->
-        <label class="block">
-          <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
-            >约束 <span class="text-muted-foreground/60 font-normal">（agent 不可违反的硬性边界）</span></span
-          >
-          <textarea
-            v-model="form.constraints"
-            rows="4"
-            class="border-border bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
-            placeholder="- 不动 src/legacy/ 目录&#10;- 后端继续用 Gin，不换框架&#10;- API 响应格式保持不变"
-          ></textarea>
-        </label>
-
-        <!-- ── Spec：上下文指针 ── -->
-        <label class="block">
-          <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
-            >上下文指针 <span class="text-muted-foreground/60 font-normal">（相关代码 / 文档路径，减少 agent 找文件的往返）</span></span
-          >
-          <textarea
-            v-model="form.context_pointers"
-            rows="4"
-            class="border-border bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
-            placeholder="internal/auth/, docs/adr/0003, src/middleware/session.ts"
-          ></textarea>
-        </label>
       </div>
 
-    </div>
-
-    <!-- ── 底部按钮 ── -->
-    <div class="bg-background flex shrink-0 items-center justify-between border-t px-6 pt-4 pb-5">
-      <button
-        v-if="form.id"
-        @click="confirmOpen = true"
-        class="text-destructive hover:bg-destructive/10 focus-visible:ring-destructive/30 cursor-pointer rounded-lg px-3 py-1.5 text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+      <!-- ── 底部按钮 ── -->
+      <div
+        class="bg-background border-border flex shrink-0 items-center justify-between border-t px-6 pt-4 pb-5"
       >
-        永久删除
-      </button>
-      <span v-else></span>
-      <div class="flex items-center gap-2">
         <button
-          @click="emit('close')"
-          class="text-muted-foreground hover:bg-muted focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+          v-if="form.slug"
+          @click="confirmOpen = true"
+          class="text-destructive hover:bg-destructive/10 focus-visible:ring-destructive/30 cursor-pointer rounded-lg px-3 py-1.5 text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         >
-          取消
+          永久删除
         </button>
-        <button
-          @click="handleSave"
-          :disabled="!form.title.trim()"
-          class="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {{ form.id ? '保存' : '创建' }}
-        </button>
+        <span v-else></span>
+        <div class="flex items-center gap-2">
+          <button
+            @click="emit('close')"
+            class="text-muted-foreground hover:bg-muted focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+          >
+            取消
+          </button>
+          <button
+            @click="handleSave"
+            :disabled="!form.title.trim()"
+            class="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {{ form.slug ? '保存' : '创建' }}
+          </button>
+        </div>
       </div>
-    </div>
     </div>
 
     <!-- 永久删除确认 -->
@@ -305,7 +322,7 @@ function priorityChipActive(p: DevTaskPriority): string {
 }
 
 interface FormState {
-  id?: string;
+  slug?: string;
   title: string;
   description: string;
   detail: string;
@@ -327,8 +344,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   close: [];
   saveCreate: [payload: CreateDevTaskPayload];
-  saveUpdate: [id: string, payload: UpdateDevTaskPayload];
-  hardDelete: [id: string];
+  saveUpdate: [slug: string, payload: UpdateDevTaskPayload];
+  hardDelete: [slug: string];
 }>();
 
 function defaultForm(): FormState {
@@ -354,7 +371,7 @@ watch(
   (t) => {
     if (t) {
       Object.assign(form, {
-        id: t.id,
+        slug: t.slug,
         title: t.title ?? '',
         description: t.description ?? '',
         detail: t.detail ?? '',
@@ -388,8 +405,8 @@ function handleSave() {
     constraints: form.constraints.trim() || undefined,
     context_pointers: form.context_pointers.trim() || undefined,
   };
-  if (form.id) {
-    emit('saveUpdate', form.id, { ...base, status: form.status });
+  if (form.slug) {
+    emit('saveUpdate', form.slug, { ...base, status: form.status });
   } else {
     // 新建时 status 由后端默认（待评估），不写入 payload
     emit('saveCreate', base);
@@ -399,7 +416,7 @@ function handleSave() {
 const confirmOpen = ref(false);
 
 function handleHardDelete() {
-  if (!form.id) return;
-  emit('hardDelete', form.id);
+  if (!form.slug) return;
+  emit('hardDelete', form.slug);
 }
 </script>
