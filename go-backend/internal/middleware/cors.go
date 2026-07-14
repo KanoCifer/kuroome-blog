@@ -36,7 +36,7 @@ func CORS() gin.HandlerFunc {
 		if allowed {
 			c.Header("Access-Control-Allow-Origin", origin)
 			c.Header("Access-Control-Allow-Credentials", "true")
-			c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
 			// 预检回显客户端请求的 header，非预检给默认白名单。
 			// 注意：credentials: true 下 "*" 不会被当作通配符，必须显式列出。
 			if requested := c.GetHeader("Access-Control-Request-Headers"); requested != "" {
