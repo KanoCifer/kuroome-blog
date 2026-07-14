@@ -19,8 +19,6 @@ describe('formatDate', () => {
   });
 
   it('仅日期格式', () => {
-    expect(formatDate('2026-07-03T08:00:00Z', 'YYYY-MM-DD')).toBe(
-      '2026-07-03',
-    );
+    expect(formatDate('2026-07-03T08:00:00Z', 'YYYY-MM-DD')).toBe('2026-07-03');
   });
 });

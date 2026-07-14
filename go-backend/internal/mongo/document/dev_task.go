@@ -7,10 +7,10 @@ import "time"
 type DevTaskType string
 
 const (
-	TaskTypeBug       DevTaskType = "问题"
-	TaskTypeFeature   DevTaskType = "功能需求"
-	TaskTypeImprove   DevTaskType = "优化"
-	TaskTypeTechDebt  DevTaskType = "技术债"
+	TaskTypeBug      DevTaskType = "问题"
+	TaskTypeFeature  DevTaskType = "功能需求"
+	TaskTypeImprove  DevTaskType = "优化"
+	TaskTypeTechDebt DevTaskType = "技术债"
 )
 
 // 优先级
@@ -31,11 +31,11 @@ type DevTaskScope string
 // 仅作为示例参考，不是枚举约束。自定义值（如 "AI-LangChain"、"Docs-用户手册"）随意传。
 // 看板 UI 建议把这些放在输入框 placeholder 里，而不是下拉列表。
 const (
-	ScopeVueUI    DevTaskScope = "前端-Vue"
-	ScopeReactUI  DevTaskScope = "前端-React"
-	ScopePython   DevTaskScope = "后端-Python"
-	ScopeGo       DevTaskScope = "后端-Go"
-	ScopeGeneral  DevTaskScope = "通用"
+	ScopeVueUI   DevTaskScope = "前端-Vue"
+	ScopeReactUI DevTaskScope = "前端-React"
+	ScopePython  DevTaskScope = "后端-Python"
+	ScopeGo      DevTaskScope = "后端-Go"
+	ScopeGeneral DevTaskScope = "通用"
 )
 
 // 5 状态

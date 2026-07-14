@@ -391,7 +391,9 @@ export default function BlogPostView() {
                 <button
                   type="button"
                   aria-label={
-                    isLiked ? `已喜欢 · 当前 ${likesCount}` : `喜欢 · 当前 ${likesCount}`
+                    isLiked
+                      ? `已喜欢 · 当前 ${likesCount}`
+                      : `喜欢 · 当前 ${likesCount}`
                   }
                   disabled={isLiked || isLiking}
                   onClick={handleLike}

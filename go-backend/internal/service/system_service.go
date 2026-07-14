@@ -21,7 +21,7 @@ type Systemer interface {
 	) (dto.Events, error)
 }
 
-//EventRepositoryer 定义 SystemService 依赖的持久层能力集合。
+// EventRepositoryer 定义 SystemService 依赖的持久层能力集合。
 // 由 postgres.EventRepo 实现；service 仅依赖此接口，便于测试替换。
 type EventRepositoryer interface {
 	Count(ctx context.Context, f postgres.EventFilter) (int, error)

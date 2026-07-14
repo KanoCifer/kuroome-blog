@@ -11,8 +11,6 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
-
-
 type SystemHandler struct {
 	svc service.Systemer
 }

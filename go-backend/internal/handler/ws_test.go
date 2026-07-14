@@ -103,8 +103,8 @@ func (m *mockWSService) firstCalls() int {
 }
 
 // TestHandleWS_Lifecycle 端到端验证完整的连接生命周期：
-//   1) HandleFirstMessage 被调用一次;
-//   2) 客户端断开后，RemoveVisitor + PublishCount 被调用 —— 原实现缺失此清理，导致访客计数只增不减。
+//  1. HandleFirstMessage 被调用一次;
+//  2. 客户端断开后，RemoveVisitor + PublishCount 被调用 —— 原实现缺失此清理，导致访客计数只增不减。
 //
 // 通过 httptest.Server + coder/websocket 真实客户端驱动，gin 路由挂载 WSHandler。
 func TestHandleWS_Lifecycle(t *testing.T) {

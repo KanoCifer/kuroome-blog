@@ -24,7 +24,6 @@ type Monitorer interface {
 	StreamServerStatus(ctx context.Context) (<-chan dto.ServerStatus, error)
 }
 
-
 // MonitorService 实现 monitor 端点的业务逻辑（overview / visitors / user-logins）。
 //
 // server/status + stream 在 task-7 中追加，复用同一个 service 实例。
@@ -224,13 +223,13 @@ func (s *MonitorService) GetServerStatus() (dto.ServerStatus, error) {
 
 	return dto.ServerStatus{
 		CPUPercent: cpuPercent,
-		CPUCores:  cpuCores,
-		MemTotal:  int(math.Round(float64(vm.Total) / 1024 / 1024)),
-		MemUsed:   int(math.Round(float64(vm.Used) / 1024 / 1024)),
-		MemUsage:  round2(vm.UsedPercent),
-		DiskTotal: round2(float64(du.Total) / 1024 / 1024 / 1024),
-		DiskUsed:  round2(float64(du.Used) / 1024 / 1024 / 1024),
-		DiskUsage: round2(du.UsedPercent),
+		CPUCores:   cpuCores,
+		MemTotal:   int(math.Round(float64(vm.Total) / 1024 / 1024)),
+		MemUsed:    int(math.Round(float64(vm.Used) / 1024 / 1024)),
+		MemUsage:   round2(vm.UsedPercent),
+		DiskTotal:  round2(float64(du.Total) / 1024 / 1024 / 1024),
+		DiskUsed:   round2(float64(du.Used) / 1024 / 1024 / 1024),
+		DiskUsage:  round2(du.UsedPercent),
 	}, nil
 }
 

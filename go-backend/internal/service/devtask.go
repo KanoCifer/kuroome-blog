@@ -29,7 +29,6 @@ type DevTasker interface {
 	FindFrontier(ctx context.Context, limit int) ([]dto.DevTaskOut, error)
 }
 
-
 // DevTaskRepositoryer devtask 持久层接口 —— service 依赖接口，便于 mock 测试。
 // 所有接口一律使用 slug 作为任务标识，不暴露 ObjectID。
 type DevTaskRepositoryer interface {
@@ -66,28 +65,28 @@ func blockedByOrEmpty(s []string) []string {
 // serializeTask 将文档转为输出 DTO。
 func serializeTask(t document.DevTask) dto.DevTaskOut {
 	return dto.DevTaskOut{
-		ID:          t.ID,
-		UserID:      t.UserID,
-		Title:       t.Title,
-		Description: t.Description,
-		Detail:      t.Detail,
-		Type:        t.Type,
-		Priority:    t.Priority,
-		Scope:       t.Scope,
-		Status:      t.Status,
-		SortOrder:   t.SortOrder,
-		DueDate:     t.DueDate,
-		IsDeleted:   t.IsDeleted,
-		CreatedAt:   t.CreatedAt,
-		UpdatedAt:   t.UpdatedAt,
+		ID:                 t.ID,
+		UserID:             t.UserID,
+		Title:              t.Title,
+		Description:        t.Description,
+		Detail:             t.Detail,
+		Type:               t.Type,
+		Priority:           t.Priority,
+		Scope:              t.Scope,
+		Status:             t.Status,
+		SortOrder:          t.SortOrder,
+		DueDate:            t.DueDate,
+		IsDeleted:          t.IsDeleted,
+		CreatedAt:          t.CreatedAt,
+		UpdatedAt:          t.UpdatedAt,
 		AcceptanceCriteria: t.AcceptanceCriteria,
 		Constraints:        t.Constraints,
 		ContextPointers:    t.ContextPointers,
-		ForAgent:   t.ForAgent,
-		BlockedBy:  t.BlockedBy,
-		Slug:       t.Slug,
-		Kind:       t.Kind,
-		ParentSlug: t.ParentSlug,
+		ForAgent:           t.ForAgent,
+		BlockedBy:          t.BlockedBy,
+		Slug:               t.Slug,
+		Kind:               t.Kind,
+		ParentSlug:         t.ParentSlug,
 	}
 }
 
@@ -115,25 +114,25 @@ func (s *DevTaskService) Create(ctx context.Context, userID int, req dto.DevTask
 
 	now := time.Now()
 	task := &document.DevTask{
-		UserID:      userID,
-		Title:       req.Title,
-		Description: req.Description,
-		Detail:      req.Detail,
-		Type:        req.Type,
-		Priority:    req.Priority,
-		Scope:       req.Scope,
-		Status:      document.StatusTriage,
-		DueDate:     req.DueDate,
-		CreatedAt:   now,
-		UpdatedAt:   now,
+		UserID:             userID,
+		Title:              req.Title,
+		Description:        req.Description,
+		Detail:             req.Detail,
+		Type:               req.Type,
+		Priority:           req.Priority,
+		Scope:              req.Scope,
+		Status:             document.StatusTriage,
+		DueDate:            req.DueDate,
+		CreatedAt:          now,
+		UpdatedAt:          now,
 		AcceptanceCriteria: req.AcceptanceCriteria,
 		Constraints:        req.Constraints,
 		ContextPointers:    req.ContextPointers,
-		ForAgent:   req.ForAgent,
-		BlockedBy:  blockedByOrEmpty(req.BlockedBy),
-		Slug:       slug,
-		Kind:       req.Kind,
-		ParentSlug: req.ParentSlug,
+		ForAgent:           req.ForAgent,
+		BlockedBy:          blockedByOrEmpty(req.BlockedBy),
+		Slug:               slug,
+		Kind:               req.Kind,
+		ParentSlug:         req.ParentSlug,
 	}
 
 	if err := s.repo.Create(ctx, task); err != nil {

@@ -122,9 +122,7 @@
                 >
                   {{ serverStatus ? serverStatus.mem_used.toFixed(0) : '—' }} MB
                   /
-                  {{
-                    serverStatus ? serverStatus.mem_total.toFixed(0) : '—'
-                  }}
+                  {{ serverStatus ? serverStatus.mem_total.toFixed(0) : '—' }}
                   MB
                 </span>
               </div>

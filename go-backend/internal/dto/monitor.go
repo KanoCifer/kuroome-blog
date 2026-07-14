@@ -4,14 +4,14 @@ import "time"
 
 // Overview 对齐 Python monitor_service.get_overview 的返回结构。
 type Overview struct {
-	TotalVisits      int                      `json:"total_visits"`
-	UniqueVisitors   int                      `json:"unique_visitors"`
-	UniqueVisitorIDs int                      `json:"unique_visitor_ids"`
-	TopPages         []map[string]any         `json:"top_pages"`
-	BrowserStats     []map[string]any         `json:"browser_stats"`
-	OSSStats         []map[string]any         `json:"os_stats"`
-	DailyTrend       []map[string]any         `json:"daily_trend"`
-	PeriodDays       int                      `json:"period_days"`
+	TotalVisits      int              `json:"total_visits"`
+	UniqueVisitors   int              `json:"unique_visitors"`
+	UniqueVisitorIDs int              `json:"unique_visitor_ids"`
+	TopPages         []map[string]any `json:"top_pages"`
+	BrowserStats     []map[string]any `json:"browser_stats"`
+	OSSStats         []map[string]any `json:"os_stats"`
+	DailyTrend       []map[string]any `json:"daily_trend"`
+	PeriodDays       int              `json:"period_days"`
 }
 
 // VisitorItem 单条访客记录，字段名与 Python visit 字典对齐。
@@ -62,11 +62,11 @@ type UserLogins struct {
 // ServerStatus 对齐 Python _get_server_status_payload 字段名。
 type ServerStatus struct {
 	CPUPercent float64 `json:"cpu_percent"`
-	CPUCores  int     `json:"cpu_cores"`
-	MemTotal  int     `json:"mem_total"`
-	MemUsed   int     `json:"mem_used"`
-	MemUsage  float64 `json:"mem_usage"`
-	DiskTotal float64 `json:"disk_total"`
-	DiskUsed  float64 `json:"disk_used"`
-	DiskUsage float64 `json:"disk_usage"`
+	CPUCores   int     `json:"cpu_cores"`
+	MemTotal   int     `json:"mem_total"`
+	MemUsed    int     `json:"mem_used"`
+	MemUsage   float64 `json:"mem_usage"`
+	DiskTotal  float64 `json:"disk_total"`
+	DiskUsed   float64 `json:"disk_used"`
+	DiskUsage  float64 `json:"disk_usage"`
 }

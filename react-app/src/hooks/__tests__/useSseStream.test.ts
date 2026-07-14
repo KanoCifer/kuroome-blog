@@ -73,10 +73,7 @@ describe('consumeSseStream', () => {
     const onData = vi.fn();
     const onDone = vi.fn();
 
-    await consumeSseStream(
-      { url: '/api/test', body: {} },
-      { onData, onDone },
-    );
+    await consumeSseStream({ url: '/api/test', body: {} }, { onData, onDone });
 
     // 只有 [DONE] 之前的帧被处理
     expect(onData).toHaveBeenCalledTimes(1);
@@ -93,10 +90,7 @@ describe('consumeSseStream', () => {
     );
 
     await expect(
-      consumeSseStream(
-        { url: '/api/test', body: {} },
-        { onData: vi.fn() },
-      ),
+      consumeSseStream({ url: '/api/test', body: {} }, { onData: vi.fn() }),
     ).rejects.toThrow('网络连接失败，请重试');
 
     vi.unstubAllGlobals();
@@ -109,10 +103,7 @@ describe('consumeSseStream', () => {
     );
 
     await expect(
-      consumeSseStream(
-        { url: '/api/test', body: {} },
-        { onData: vi.fn() },
-      ),
+      consumeSseStream({ url: '/api/test', body: {} }, { onData: vi.fn() }),
     ).rejects.toThrow('无法读取响应流');
 
     vi.unstubAllGlobals();

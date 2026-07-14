@@ -10,8 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
-
 type WSHandler struct {
 	Svc service.WSer
 }

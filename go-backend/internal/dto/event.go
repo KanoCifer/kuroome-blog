@@ -15,14 +15,14 @@ type Event struct {
 
 // Pagination 分页元数据，字段名对齐 Python PaginationSchema。
 type Pagination struct {
-	Page     int  `json:"page"`
-	PerPage  int  `json:"per_page"`
-	Total    int  `json:"total"`
-	Pages    int  `json:"pages"`
-	HasPrev  bool `json:"has_prev"`
-	HasNext  bool `json:"has_next"`
-	PrevNum  *int `json:"prev_num"`
-	NextNum  *int `json:"next_num"`
+	Page    int  `json:"page"`
+	PerPage int  `json:"per_page"`
+	Total   int  `json:"total"`
+	Pages   int  `json:"pages"`
+	HasPrev bool `json:"has_prev"`
+	HasNext bool `json:"has_next"`
+	PrevNum *int `json:"prev_num"`
+	NextNum *int `json:"next_num"`
 }
 
 // Events /api/v3/system/events 的响应信封内层结构。

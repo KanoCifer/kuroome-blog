@@ -20,19 +20,27 @@ const extractData = <T>(res: { data: { data: T } }): T => res.data.data;
 
 export const devTaskService = (): DevTaskService => ({
   async list(params): Promise<DevTaskListResponse> {
-    const res = await devtaskRequest.get<{ data: DevTaskListResponse }>('v3/dev-tasks', {
-      params,
-    });
+    const res = await devtaskRequest.get<{ data: DevTaskListResponse }>(
+      'v3/dev-tasks',
+      {
+        params,
+      },
+    );
     return extractData(res);
   },
 
   async get(id: string): Promise<DevTask> {
-    const res = await devtaskRequest.get<{ data: DevTask }>(`v3/dev-tasks/${id}`);
+    const res = await devtaskRequest.get<{ data: DevTask }>(
+      `v3/dev-tasks/${id}`,
+    );
     return extractData(res);
   },
 
   async create(payload: CreateDevTaskPayload): Promise<DevTask> {
-    const res = await devtaskRequest.post<{ data: DevTask }>('v3/dev-tasks', payload);
+    const res = await devtaskRequest.post<{ data: DevTask }>(
+      'v3/dev-tasks',
+      payload,
+    );
     return extractData(res);
   },
 

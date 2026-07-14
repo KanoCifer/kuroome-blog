@@ -41,9 +41,9 @@ func (r *DevTaskRepository) GetBySlug(ctx context.Context, slug string) (*docume
 
 // ListFilter 列表查询过滤条件。
 type ListFilter struct {
-	Status   *document.DevTaskStatus
-	Priority *document.DevTaskPriority
-	Type     *document.DevTaskType
+	Status    *document.DevTaskStatus
+	Priority  *document.DevTaskPriority
+	Type      *document.DevTaskType
 	IsDeleted *bool
 	ForAgent  *bool              // 按"是否可给 agent"过滤
 	Kind      *document.TaskKind // 按任务角色过滤：spec / subtask

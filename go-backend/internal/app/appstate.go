@@ -66,13 +66,13 @@ func NewAppState(
 }
 
 // Dependency Injection
-func (a *AppState) UserSvc() service.Userer         { return a.userSvc }
-func (a *AppState) AdminSvc() service.Adminer       { return a.adminSvc }
-func (a *AppState) BlogSvc() service.Bloger         { return a.blogSvc }
-func (a *AppState) DevTaskSvc() service.DevTasker   { return a.devTaskSvc }
-func (a *AppState) PasskeySvc() service.Passkeyer   { return a.passkeySvc }
-func (a *AppState) WSSvc() service.WSer            { return a.wsSvc }
-func (a *AppState) MonitorSvc() service.Monitorer  { return a.monitorSvc }
-func (a *AppState) SystemSvc() service.Systemer    { return a.systemSvc }
+func (a *AppState) UserSvc() service.Userer            { return a.userSvc }
+func (a *AppState) AdminSvc() service.Adminer          { return a.adminSvc }
+func (a *AppState) BlogSvc() service.Bloger            { return a.blogSvc }
+func (a *AppState) DevTaskSvc() service.DevTasker      { return a.devTaskSvc }
+func (a *AppState) PasskeySvc() service.Passkeyer      { return a.passkeySvc }
+func (a *AppState) WSSvc() service.WSer                { return a.wsSvc }
+func (a *AppState) MonitorSvc() service.Monitorer      { return a.monitorSvc }
+func (a *AppState) SystemSvc() service.Systemer        { return a.systemSvc }
 func (a *AppState) GitHubOAuth() service.GitHubOAuther { return a.githubOAuth }
-func (a *AppState) Cfg() *config.Config                 { return a.config }
+func (a *AppState) Cfg() *config.Config                { return a.config }

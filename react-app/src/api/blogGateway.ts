@@ -37,9 +37,7 @@ export interface blogGateway {
   getBlogPost(postId: string): Promise<AxiosResponse<BlogPostResponse>>;
   likePost(postId: string): Promise<AxiosResponse<{ likes: number }>>;
   getTags(): Promise<AxiosResponse<{ tags: TagItem[] }>>;
-  getPostsByTag(
-    tag: string,
-  ): Promise<AxiosResponse<PostsByTagResponse>>;
+  getPostsByTag(tag: string): Promise<AxiosResponse<PostsByTagResponse>>;
   // Legacy endpoints
   getLegacyPost(postId: string): Promise<AxiosResponse<BlogPostResponse>>;
   createLegacyPost(payload: {
@@ -87,9 +85,9 @@ export const blogGateway = (): blogGateway => {
     },
 
     async getPostsByTag(tag: string) {
-      return request.get(
-        `v3/tags/${encodeURIComponent(tag)}/posts`,
-      ) as Promise<AxiosResponse<PostsByTagResponse>>;
+      return request.get(`v3/tags/${encodeURIComponent(tag)}/posts`) as Promise<
+        AxiosResponse<PostsByTagResponse>
+      >;
     },
 
     async getLegacyPost(postId: string) {

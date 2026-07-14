@@ -75,7 +75,6 @@ func (r *AdminRepo) DeletePostByID(ctx context.Context, id string) error {
 	return err
 }
 
-
 func (r *AdminRepo) ListPostViewsData(ctx context.Context) ([]dto.PostViewData, error) {
 	projection := bson.D{
 		{Key: "title", Value: 1},

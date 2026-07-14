@@ -120,7 +120,9 @@ export const blogService = (): BlogService => {
 
     async getTags() {
       const res = await gateway.getTags();
-      const data = extractData(res as unknown as { data: ApiResponse<unknown> });
+      const data = extractData(
+        res as unknown as { data: ApiResponse<unknown> },
+      );
       // gateway 返回 { data: { tags: [...] } } — unwrap
       return (data as unknown as { tags: TagItem[] }).tags ?? [];
     },

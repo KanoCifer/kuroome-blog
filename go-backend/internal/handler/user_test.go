@@ -25,15 +25,15 @@ func init() {
 // ---------- mock UserService ----------
 
 type mockUserService struct {
-	authenticateFn   func(ctx context.Context, username, password string) (*model.User, error)
-	createTokensFn   func(ctx context.Context, u *model.User) (*dto.Tokens, error)
-	createUserFn     func(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
-	getByIDFn        func(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
-	getByUsernameFn  func(ctx context.Context, username string) (*model.User, *model.Profile, error)
-	logoutFn         func(ctx context.Context, userID uint)
-	refreshFn        func(ctx context.Context, refreshToken string) (*dto.Tokens, error)
-	sendEmailCodeFn  func(ctx context.Context, email string) bool
-	userToDictFn     func(u *model.User, p *model.Profile) map[string]any
+	authenticateFn  func(ctx context.Context, username, password string) (*model.User, error)
+	createTokensFn  func(ctx context.Context, u *model.User) (*dto.Tokens, error)
+	createUserFn    func(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
+	getByIDFn       func(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
+	getByUsernameFn func(ctx context.Context, username string) (*model.User, *model.Profile, error)
+	logoutFn        func(ctx context.Context, userID uint)
+	refreshFn       func(ctx context.Context, refreshToken string) (*dto.Tokens, error)
+	sendEmailCodeFn func(ctx context.Context, email string) bool
+	userToDictFn    func(u *model.User, p *model.Profile) map[string]any
 }
 
 func (m *mockUserService) Authenticate(ctx context.Context, username, password string) (*model.User, error) {

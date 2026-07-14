@@ -82,11 +82,7 @@ describe('CategorySidebar (React — tags)', () => {
 
   it('does not render tag buttons when tags is empty and not loading', () => {
     render(
-      <CategorySidebar
-        tags={[]}
-        activeTag={null}
-        onSelectTag={() => {}}
-      />,
+      <CategorySidebar tags={[]} activeTag={null} onSelectTag={() => {}} />,
     );
 
     expect(screen.queryByText('python')).toBeNull();

@@ -1,8 +1,9 @@
 // Command gen-devtask-token 生成 devtask / MCP 专用 service-JWT。
 //
 // 用法:
-//   DEV_TASK_SECRET=your-secret go run ./cmd/gen-devtask-token
-//   DEV_TASK_SECRET=your-secret go run ./cmd/gen-devtask-token -days 30
+//
+//	DEV_TASK_SECRET=your-secret go run ./cmd/gen-devtask-token
+//	DEV_TASK_SECRET=your-secret go run ./cmd/gen-devtask-token -days 30
 //
 // 直接读取环境变量 DEV_TASK_SECRET，不依赖 config 包或 .env 加载。
 package main

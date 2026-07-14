@@ -22,7 +22,7 @@ vi.mock('@/api/request', async (importOriginal) => {
     ...actual,
     // Real extractData does res.data.data (AxiosResponse → ApiResponse).
     // Our mocks return { data: { data: T } } to match that shape.
-    extractData: <T,>(res: unknown): T =>
+    extractData: <T>(res: unknown): T =>
       (res as { data: { data: T } }).data.data as T,
   };
 });

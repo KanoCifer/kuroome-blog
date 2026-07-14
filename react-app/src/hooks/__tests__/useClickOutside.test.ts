@@ -21,7 +21,9 @@ describe('useClickOutside', () => {
     renderHook(() => useClickOutside(ref, callback));
 
     // 点击 body（外部区域）
-    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    document.body.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true }),
+    );
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
@@ -32,7 +34,9 @@ describe('useClickOutside', () => {
     renderHook(() => useClickOutside(ref, callback));
 
     // 点击元素内部
-    ref.current!.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    ref.current!.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true }),
+    );
     expect(callback).not.toHaveBeenCalled();
   });
 });

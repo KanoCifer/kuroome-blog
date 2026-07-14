@@ -111,9 +111,7 @@
               >Token</span
             >
             <span class="text-muted-foreground text-[11px]">
-              有效期至 {{ formatDate(result.expires_at) }}（{{
-                result.days
-              }}
+              有效期至 {{ formatDate(result.expires_at) }}（{{ result.days }}
               天）
             </span>
           </div>

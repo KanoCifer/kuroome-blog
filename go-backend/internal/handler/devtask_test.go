@@ -31,8 +31,8 @@ type mockDevTaskService struct {
 	updateFn       func(ctx context.Context, slug string, req dto.DevTaskUpdate) error
 	softDelFn      func(ctx context.Context, slug string) error
 	hardDelFn      func(ctx context.Context, slug string) error
-	findFrontierFn     func(ctx context.Context, limit int) ([]dto.DevTaskOut, error)
-	batchStatusFn      func(ctx context.Context, slugs []string, status document.DevTaskStatus) (*service.BatchStatusResult, error)
+	findFrontierFn func(ctx context.Context, limit int) ([]dto.DevTaskOut, error)
+	batchStatusFn  func(ctx context.Context, slugs []string, status document.DevTaskStatus) (*service.BatchStatusResult, error)
 }
 
 func (m *mockDevTaskService) Create(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error) {

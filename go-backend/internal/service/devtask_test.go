@@ -23,10 +23,10 @@ type mockDevTaskRepo struct {
 	updateFn       func(ctx context.Context, slug string, fields bson.M) error
 	softDelFn      func(ctx context.Context, slug string) error
 	hardDelFn      func(ctx context.Context, slug string) error
-	archiveFn         func(ctx context.Context) (int64, error)
-	findFrontierFn    func(ctx context.Context, limit int) ([]document.DevTask, error)
-	nextSlugSeqFn     func(ctx context.Context) (int, error)
-	batchStatusFn     func(ctx context.Context, slugs []string, status document.DevTaskStatus) (int64, error)
+	archiveFn      func(ctx context.Context) (int64, error)
+	findFrontierFn func(ctx context.Context, limit int) ([]document.DevTask, error)
+	nextSlugSeqFn  func(ctx context.Context) (int, error)
+	batchStatusFn  func(ctx context.Context, slugs []string, status document.DevTaskStatus) (int64, error)
 }
 
 func (m *mockDevTaskRepo) Create(ctx context.Context, task *document.DevTask) error {

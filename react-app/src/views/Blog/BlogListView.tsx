@@ -1,9 +1,6 @@
 import type { BlogListItem } from '@/services/blogService';
 import { blogService } from '@/services/blogService';
-import type {
-  BlogPagination as BlogPaginationType,
-  TagItem,
-} from '@/types';
+import type { BlogPagination as BlogPaginationType, TagItem } from '@/types';
 import { formatDate } from '@/utils/formatdate';
 import { useOrigin } from '@/hooks/useOrigin';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -302,10 +299,7 @@ export default function BlogListView() {
           ) : error ? (
             <BlogErrorState key="error" message={error} onRetry={handleRetry} />
           ) : posts.length === 0 ? (
-            <BlogEmptyState
-              key="empty"
-              hasTag={activeTag !== null}
-            />
+            <BlogEmptyState key="empty" hasTag={activeTag !== null} />
           ) : (
             <motion.div
               key="posts"

@@ -13,8 +13,6 @@ import (
 
 var errNotNumber = errors.New("not a number")
 
-
-
 type MonitorHandler struct {
 	svc service.Monitorer
 }

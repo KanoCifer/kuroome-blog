@@ -15,10 +15,9 @@ type PostUpdate struct {
 }
 
 type PostViewData struct {
-	Title   string `json:"title"`
-	Views   int    `json:"views"`
+	Title string `json:"title"`
+	Views int    `json:"views"`
 }
-
 
 type VisitorData struct {
 	VisitorID        string `json:"visitor_id" binding:"required"`
