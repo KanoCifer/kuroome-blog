@@ -57,4 +57,8 @@ func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
 
 	wsH := handler.NewWSHandler(state.WSSvc())
 	wsH.RegisterRoutes(v3)
+
+	fishH := handler.NewFishHandler(state.FishSvc())
+	// fish：GET 列表/详情公开；POST / PATCH / DELETE 需 admin 中间件。
+	fishH.RegisterRoutes(v3, middleware.AdminMiddleware(state.Cfg().Admin.UserIDs))
 }

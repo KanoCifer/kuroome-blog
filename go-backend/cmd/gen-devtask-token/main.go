@@ -27,7 +27,7 @@ func main() {
 		log.Fatal("DEV_TASK_SECRET environment variable is not set")
 	}
 
-	expiresAt := time.Now().AddDate(0, 0, *days)
+	expiresAt := time.Now().UTC().AddDate(0, 0, *days)
 	token, err := jwt.GenerateServiceToken(expiresAt, secret)
 	if err != nil {
 		log.Fatalf("generate token: %v", err)

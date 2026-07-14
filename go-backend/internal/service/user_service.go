@@ -183,8 +183,8 @@ func (s *userService) Authenticate(ctx context.Context, username, password strin
 // CreateTokens 生成 access + refresh token，refresh 入库 Redis
 func (s *userService) CreateTokens(ctx context.Context, u *model.User) (*dto.Tokens, error) {
 	refreshTTL := 7 * 24 * time.Hour
-	accessExpiry := time.Now().Add(15 * time.Minute)
-	refreshExpiry := time.Now().Add(refreshTTL)
+	accessExpiry := time.Now().UTC().Add(15 * time.Minute)
+	refreshExpiry := time.Now().UTC().Add(refreshTTL)
 
 	accessToken, err := jwt.GenerateToken(u.ID, accessExpiry)
 	if err != nil {

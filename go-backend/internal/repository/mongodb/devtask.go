@@ -121,7 +121,7 @@ func (r *DevTaskRepository) BatchUpdateStatus(
 		bson.M{"slug": bson.M{"$in": slugs}, "is_deleted": false},
 		bson.M{"$set": bson.M{
 			"status":     status,
-			"updated_at": time.Now(),
+			"updated_at": time.Now().UTC(),
 		}},
 	)
 	if err != nil {
@@ -147,7 +147,7 @@ func (r *DevTaskRepository) SoftDelete(ctx context.Context, slug string) error {
 		bson.M{"slug": slug},
 		bson.M{"$set": bson.M{
 			"is_deleted":  true,
-			"archived_at": time.Now(),
+			"archived_at": time.Now().UTC(),
 		}},
 	)
 	return err
@@ -160,7 +160,7 @@ func (r *DevTaskRepository) ArchiveDoneTasks(ctx context.Context) (int64, error)
 		bson.M{"status": document.StatusDone, "is_deleted": false},
 		bson.M{"$set": bson.M{
 			"is_deleted":  true,
-			"archived_at": time.Now(),
+			"archived_at": time.Now().UTC(),
 		}},
 	)
 	if err != nil {

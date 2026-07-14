@@ -22,7 +22,7 @@ func SlogMiddleware(logger *slog.Logger) gin.HandlerFunc {
 			return
 		}
 
-		start := time.Now()
+		start := time.Now().UTC()
 		path := c.Request.URL.Path
 		query := c.Request.URL.RawQuery
 

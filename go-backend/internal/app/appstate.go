@@ -23,6 +23,7 @@ type AppState struct {
 	monitorSvc  service.Monitorer
 	systemSvc   service.Systemer
 	wsSvc       service.WSer
+	fishSvc     service.Fisher
 }
 
 // NewAppState 组装所有 service，作为唯一的组合根入口。
@@ -43,6 +44,7 @@ func NewAppState(
 	passkeyRepo := postgres.NewPasskeyRepo(db)
 
 	// mongodb
+	fishRepo := mongodb.NewFishRepo(mongoDB)
 	adminRepo := mongodb.NewAdminRepo(mongoDB)
 	blogRepo := mongodb.NewBlogRepository(mongoDB)
 
@@ -62,6 +64,7 @@ func NewAppState(
 			redis, userRepo, userSvc,
 			cfg.GitHub.ClientID, cfg.GitHub.ClientSecret, cfg.GitHub.RedirectURI,
 		),
+		fishSvc: service.NewFishService(fishRepo),
 	}
 }
 
@@ -75,4 +78,6 @@ func (a *AppState) WSSvc() service.WSer                { return a.wsSvc }
 func (a *AppState) MonitorSvc() service.Monitorer      { return a.monitorSvc }
 func (a *AppState) SystemSvc() service.Systemer        { return a.systemSvc }
 func (a *AppState) GitHubOAuth() service.GitHubOAuther { return a.githubOAuth }
-func (a *AppState) Cfg() *config.Config                { return a.config }
+func (a *AppState) FishSvc() service.Fisher            { return a.fishSvc }
+
+func (a *AppState) Cfg() *config.Config { return a.config }

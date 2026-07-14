@@ -9,10 +9,9 @@ type FishingSpot struct {
 	Description string    `bson:"description"`
 	Tags        []string  `bson:"tags"`
 
-	CreatedAt   time.Time `bson:"createdAt"`
-	UpdatedAt   time.Time `bson:"updatedAt"`
-	DeletedAt   *time.Time `bson:"deletedAt"`
-
+	CreatedAt time.Time  `bson:"createdAt"`
+	UpdatedAt time.Time  `bson:"updatedAt"`
+	DeletedAt *time.Time `bson:"deletedAt"`
 
 	// 1-5 Star rating
 	Rating float64 `bson:"rating"`

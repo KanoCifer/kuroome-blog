@@ -20,6 +20,9 @@ type FishRepoer interface {
 type Fisher interface {
 	GetFishingSpots(ctx context.Context) ([]*dto.FishingSpotOut, error)
 	GetFishingSpotByID(ctx context.Context, id string) (*dto.FishingSpotOut, error)
+	CreateFishingSpot(ctx context.Context, spot *dto.FishingSpotIn) error
+	UpdateFishingSpot(ctx context.Context, id string, spot *dto.FishingSpotUpdate) error
+	Delete(ctx context.Context, id string, hardDelete ...bool) error
 }
 
 type FishService struct {
@@ -96,4 +99,24 @@ func (s *FishService) UpdateFishingSpot(ctx context.Context, id string, spot *dt
 	}
 	data["updated_at"] = time.Now().UTC()
 	return s.repo.Update(ctx, id, data)
+}
+
+func (s *FishService) CreateFishingSpot(ctx context.Context, spot *dto.FishingSpotIn) error {
+	doc := &document.FishingSpot{
+		Name:        spot.Name,
+		Description: spot.Description,
+		Tags:        spot.Tags,
+		Rating:      spot.Rating,
+		Location:    spot.Location,
+		CreatedAt:   time.Now().UTC(),
+		UpdatedAt:   time.Now().UTC(),
+		Images:      spot.Images,
+	}
+	return s.repo.Create(ctx, doc)
+}
+
+// Delete 删除钓点 —— 默认软删（设 DeletedAt），hardDelete=true 时物理删除。
+// 签名对齐 repo 层 Delete(id, hardDelete ...bool)。
+func (s *FishService) Delete(ctx context.Context, id string, hardDelete ...bool) error {
+	return s.repo.Delete(ctx, id, hardDelete...)
 }

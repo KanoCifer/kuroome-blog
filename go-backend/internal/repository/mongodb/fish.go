@@ -15,9 +15,9 @@ type FishRepo struct {
 
 const FishCollectionName = "fish"
 
-func NewFishRepo(coll *mongo.Database) *FishRepo {
+func NewFishRepo(db *mongo.Database) *FishRepo {
 	return &FishRepo{
-		coll: coll.Collection(FishCollectionName),
+		coll: db.Collection(FishCollectionName),
 	}
 }
 

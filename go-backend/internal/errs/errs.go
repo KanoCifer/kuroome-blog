@@ -14,9 +14,8 @@ var (
 	ErrInvalidToken       = errors.New("无效的令牌")
 
 	// mongodb
-	ErrPostNotFound       = errors.New("blog post not found")
-	ErrInvalidPostID      = errors.New("invalid post id")
-
+	ErrPostNotFound  = errors.New("blog post not found")
+	ErrInvalidPostID = errors.New("invalid post id")
 
 	ErrInvalidObjectID = errors.New("Invalid ObjectID")
 

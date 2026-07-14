@@ -214,14 +214,14 @@ func (h *AdminHandler) DevTaskToken(c *gin.Context) {
 		return
 	}
 
-	expiresAt := time.Now().Add(1 * time.Hour)
+	expiresAt := time.Now().UTC().Add(1 * time.Hour)
 	if d := c.Query("days"); d != "" {
 		days, err := strconv.Atoi(d)
 		if err != nil || days < 1 || days > 365 {
 			response.APIError(c, "days must be an integer between 1 and 365", http.StatusBadRequest)
 			return
 		}
-		expiresAt = time.Now().AddDate(0, 0, days)
+		expiresAt = time.Now().UTC().AddDate(0, 0, days)
 	}
 
 	token, err := jwt.GenerateServiceToken(expiresAt, h.cfg.Security.DevTaskSecret)

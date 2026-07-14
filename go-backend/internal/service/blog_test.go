@@ -14,12 +14,12 @@ import (
 // ---------- mock BlogRepository ----------
 
 type mockBlogRepo struct {
-	listPostsFn       func(ctx context.Context, page, perPage int, search string) ([]document.Post, int64, error)
-	aggregateTagsFn   func(ctx context.Context) ([]document.TagCount, error)
-	getPostByIDFn     func(ctx context.Context, id string) (*document.Post, error)
-	incrementViewsFn  func(ctx context.Context, id string) error
-	incrementLikesFn  func(ctx context.Context, id string) (int, error)
-	listPostsByTagFn  func(ctx context.Context, tag string, page, perPage int) ([]document.Post, int64, error)
+	listPostsFn      func(ctx context.Context, page, perPage int, search string) ([]document.Post, int64, error)
+	aggregateTagsFn  func(ctx context.Context) ([]document.TagCount, error)
+	getPostByIDFn    func(ctx context.Context, id string) (*document.Post, error)
+	incrementViewsFn func(ctx context.Context, id string) error
+	incrementLikesFn func(ctx context.Context, id string) (int, error)
+	listPostsByTagFn func(ctx context.Context, tag string, page, perPage int) ([]document.Post, int64, error)
 }
 
 func (m *mockBlogRepo) ListPosts(ctx context.Context, page, perPage int, search string) ([]document.Post, int64, error) {
@@ -301,11 +301,11 @@ func TestSerializePosts_Empty(t *testing.T) {
 
 func TestPagination(t *testing.T) {
 	tests := []struct {
-		name              string
+		name                 string
 		page, perPage, total int
-		wantPages         int
-		wantHasPrev       bool
-		wantHasNext       bool
+		wantPages            int
+		wantHasPrev          bool
+		wantHasNext          bool
 	}{
 		{"first_page", 1, 10, 25, 3, false, true},
 		{"middle_page", 2, 10, 25, 3, true, true},

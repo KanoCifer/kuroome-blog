@@ -1,13 +1,13 @@
 package dto
 
 type FishingSpotOut struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
 	Location    []float64 `json:"location"`
-	Tags        []string `json:"tags"`
-	Rating      float64 `json:"rating"`
-	Images      []string `json:"images"`
+	Tags        []string  `json:"tags"`
+	Rating      float64   `json:"rating"`
+	Images      []string  `json:"images"`
 }
 
 // FishingSpotIn 创建钓点请求 —— 全字段非指针，Name / Location 必填。

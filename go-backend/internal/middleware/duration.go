@@ -15,7 +15,7 @@ const RequestStart = "request_start"
 // X-Process-Time 头。放在路由组最外层以覆盖完整链路。
 func Duration() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Set(RequestStart, time.Now())
+		c.Set(RequestStart, time.Now().UTC())
 		c.Next()
 	}
 }

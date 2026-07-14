@@ -14,7 +14,7 @@ import (
 func GenerateToken(userID uint, expiresAt time.Time) (string, error) {
 	claims := jwt.RegisteredClaims{
 		ExpiresAt: jwt.NewNumericDate(expiresAt),
-		IssuedAt:  jwt.NewNumericDate(time.Now()),
+		IssuedAt:  jwt.NewNumericDate(time.Now().UTC()),
 		Subject:   strconv.FormatUint(uint64(userID), 10),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -54,7 +54,7 @@ func GenerateServiceToken(expiresAt time.Time, secret string) (string, error) {
 	claims := serviceClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			IssuedAt:  jwt.NewNumericDate(time.Now().UTC()),
 			Subject:   "devtask-service",
 		},
 		Role: "service",

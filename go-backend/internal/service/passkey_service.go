@@ -30,7 +30,7 @@ type passkeyUser struct {
 }
 
 func (u passkeyUser) WebAuthnID() []byte {
-	return []byte(fmt.Sprintf("%d", u.userID))
+	return fmt.Appendf(nil, "%d", u.userID)
 }
 
 func (u passkeyUser) WebAuthnName() string {

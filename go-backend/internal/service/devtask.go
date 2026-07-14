@@ -112,7 +112,7 @@ func (s *DevTaskService) Create(ctx context.Context, userID int, req dto.DevTask
 	}
 	slug := fmt.Sprintf("task-%d", seq)
 
-	now := time.Now()
+	now := time.Now().UTC()
 	task := &document.DevTask{
 		UserID:             userID,
 		Title:              req.Title,
@@ -227,7 +227,7 @@ func (s *DevTaskService) Update(ctx context.Context, slug string, req dto.DevTas
 
 	// updated_at 总由 service 层刷新（与 blog service touch() 一致），
 	// 确保"仅仅调了 Update"也能推进时间戳。
-	fields["updated_at"] = time.Now()
+	fields["updated_at"] = time.Now().UTC()
 
 	if err := s.repo.Update(ctx, slug, fields); err != nil {
 		slog.Error("update dev task", "error", err, "slug", slug)

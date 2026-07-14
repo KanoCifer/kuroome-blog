@@ -35,7 +35,7 @@ func (m *mockEventRepo) List(ctx context.Context, f postgres.EventFilter, offset
 
 func TestClamp(t *testing.T) {
 	tests := []struct {
-		name string
+		name            string
 		x, lo, hi, want int
 	}{
 		{"zero_passthrough", 0, 1, 200, 0},
@@ -228,7 +228,9 @@ func TestListEvents_ListError(t *testing.T) {
 func TestListEvents_HasPrevHasNext(t *testing.T) {
 	repo := &mockEventRepo{
 		countFn: func(ctx context.Context, f postgres.EventFilter) (int, error) { return 30, nil },
-		listFn:  func(ctx context.Context, f postgres.EventFilter, offset, limit int) ([]model.Event, error) { return nil, nil },
+		listFn: func(ctx context.Context, f postgres.EventFilter, offset, limit int) ([]model.Event, error) {
+			return nil, nil
+		},
 	}
 	svc := NewSystemService(repo)
 
