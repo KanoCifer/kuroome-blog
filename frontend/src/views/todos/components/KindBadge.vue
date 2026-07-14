@@ -18,7 +18,7 @@ const KIND_CLASS: Record<DevTaskKind, string> = {
   subtask: 'border-primary/30 bg-primary/5 text-primary',
 };
 
-console.log('props.kind', props.kind);
+// console.log('props.kind', props.kind);
 
 const cls = KIND_CLASS[props.kind === 'subtask' ? 'subtask' : 'spec'];
 </script>

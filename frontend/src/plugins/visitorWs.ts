@@ -21,7 +21,7 @@ function buildWsUrl(): string {
   }
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const host = window.location.host;
-  console.log('WebSocket URL:', `${protocol}//${host}${apiBase}/v3/public/ws`);
+  // console.log('WebSocket URL:', `${protocol}//${host}${apiBase}/v3/public/ws`);
   return `${protocol}//${host}${apiBase}/v3/public/ws`;
 }
 
