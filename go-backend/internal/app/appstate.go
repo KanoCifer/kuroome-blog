@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/KanoCifer/kuroome-blog/internal/config"
+	"github.com/KanoCifer/kuroome-blog/internal/repository/mongodb"
 	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 	"github.com/redis/go-redis/v9"
@@ -37,10 +38,11 @@ func NewAppState(
 ) *AppState {
 	// -- repos ------------------------------------------------------- //
 	userRepo := postgres.NewUserRepo(db)
-	adminRepo := postgres.NewAdminRepo(mongoDB)
+	adminRepo := mongodb.NewAdminRepo(mongoDB)
 	visitorRepo := postgres.NewVisitorRepo(db)
 	eventRepo := postgres.NewEventRepo(db)
 	passkeyRepo := postgres.NewPasskeyRepo(db)
+	blogRepo := mongodb.NewBlogRepository(mongoDB)
 
 	// -- services ---------------------------------------------------- //
 	userSvc := service.NewUserService(userRepo, redis, cfg.Admin.UserIDs)
@@ -48,7 +50,7 @@ func NewAppState(
 		config:     cfg,
 		userSvc:    userSvc,
 		adminSvc:   service.NewAdminService(adminRepo, visitorRepo, redis),
-		blogSvc:    service.NewBlogService(mongoDB),
+		blogSvc:    service.NewBlogService(blogRepo),
 		devTaskSvc: service.NewDevTaskService(mongoDB),
 		passkeySvc: service.NewPasskeyService(wa, redis, passkeyRepo, userRepo),
 		monitorSvc: service.NewMonitorService(visitorRepo, userRepo),

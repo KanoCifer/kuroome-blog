@@ -13,15 +13,34 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/mongo/document"
-	"github.com/KanoCifer/kuroome-blog/internal/repository/mongodb"
 )
 
-type BlogService struct {
-	repo *mongodb.BlogRepository
+// BlogRepository 定义博客读表面对 posts 集合的读写契约。
+type BlogRepository interface {
+	ListPosts(ctx context.Context, page, perPage int, search string) ([]document.Post, int64, error)
+	AggregateTagCounts(ctx context.Context) ([]dto.TagOut, error)
+	GetPostByID(ctx context.Context, id string) (*document.Post, error)
+	IncrementViews(ctx context.Context, id string) error
+	IncrementLikes(ctx context.Context, id string) (int, error)
+	ListPostsByTag(ctx context.Context, tag string, page, perPage int) ([]document.Post, int64, error)
 }
 
-func NewBlogService(db *mongo.Database) *BlogService {
-	return &BlogService{repo: mongodb.NewBlogRepository(db)}
+// BlogService 定义博客读表面的用例契约。
+type BlogService interface {
+	ListPosts(ctx context.Context, page int, search string) (*dto.BlogListOut, error)
+	GetPost(ctx context.Context, id string) (*dto.PostOut, error)
+	IncrementViews(ctx context.Context, id string) error
+	LikePost(ctx context.Context, id string) (int, error)
+	ListTags(ctx context.Context) ([]dto.TagOut, error)
+	ListPostsByTag(ctx context.Context, tag string, page, perPage int) (*dto.PostsByTagOut, error)
+}
+
+type blogService struct {
+	repo BlogRepository
+}
+
+func NewBlogService(repo BlogRepository) *blogService {
+	return &blogService{repo: repo}
 }
 
 // serializePost 将文档转为输出 DTO —— 与 Python _serialize_post 对齐。
@@ -87,21 +106,21 @@ func pagination(page, perPage, total int) dto.Pagination {
 }
 
 // ListPosts 分页列出博客（含标签聚合）—— 与 Python get_blogs 对齐。
-func (s *BlogService) ListPosts(page int, search string) (*dto.BlogListOut, error) {
+func (s *blogService) ListPosts(ctx context.Context, page int, search string) (*dto.BlogListOut, error) {
 	if page < 1 {
 		page = 1
 	}
 	const perPage = 10
 
-	posts, total, err := s.repo.ListPosts(context.Background(), page, perPage, search)
+	posts, total, err := s.repo.ListPosts(ctx, page, perPage, search)
 	if err != nil {
-		slog.Error("list posts", "error", err)
+		slog.ErrorContext(ctx, "list posts", "error", err)
 		return nil, err
 	}
 
-	tags, err := s.repo.AggregateTagCounts(context.Background())
+	tags, err := s.repo.AggregateTagCounts(ctx)
 	if err != nil {
-		slog.Error("aggregate tag counts", "error", err)
+		slog.ErrorContext(ctx, "aggregate tag counts", "error", err)
 		return nil, err
 	}
 
@@ -113,7 +132,7 @@ func (s *BlogService) ListPosts(page int, search string) (*dto.BlogListOut, erro
 }
 
 // GetPost 按 ID 获取单篇博客 —— 与 Python get_blog_post 对齐。
-func (s *BlogService) GetPost(id string) (*dto.PostOut, error) {
+func (s *blogService) GetPost(ctx context.Context, id string) (*dto.PostOut, error) {
 	if id == "" {
 		return nil, errs.ErrInvalidPostID
 	}
@@ -121,12 +140,12 @@ func (s *BlogService) GetPost(id string) (*dto.PostOut, error) {
 		return nil, errs.ErrInvalidPostID
 	}
 
-	post, err := s.repo.GetPostByID(context.Background(), id)
+	post, err := s.repo.GetPostByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, errs.ErrPostNotFound
 		}
-		slog.Error("get post by id", "error", err, "id", id)
+		slog.ErrorContext(ctx, "get post by id", "error", err, "id", id)
 		return nil, err
 	}
 	out := serializePost(*post)
@@ -135,37 +154,37 @@ func (s *BlogService) GetPost(id string) (*dto.PostOut, error) {
 
 // IncrementViews 原子递增单篇文章的浏览量。
 // 调用方以 fire-and-forget goroutine 触发，不阻塞读取路径。
-func (s *BlogService) IncrementViews(id string) error {
+func (s *blogService) IncrementViews(ctx context.Context, id string) error {
 	if id == "" {
 		return errs.ErrInvalidPostID
 	}
-	return s.repo.IncrementViews(context.Background(), id)
+	return s.repo.IncrementViews(ctx, id)
 }
 
 // LikePost 原子递增单篇文章的喜欢数并返回递增后的值。
 // 一次性表态：调用方（handler / 客户端）负责幂等，服务端不做重复判定。
-func (s *BlogService) LikePost(id string) (int, error) {
+func (s *blogService) LikePost(ctx context.Context, id string) (int, error) {
 	if id == "" {
 		return 0, errs.ErrInvalidPostID
 	}
 	if _, err := bson.ObjectIDFromHex(id); err != nil {
 		return 0, errs.ErrInvalidPostID
 	}
-	return s.repo.IncrementLikes(context.Background(), id)
+	return s.repo.IncrementLikes(ctx, id)
 }
 
 // ListTags 列出所有标签及文章数 —— 与 Python list_tags 对齐。
-func (s *BlogService) ListTags() ([]dto.TagOut, error) {
-	tags, err := s.repo.AggregateTagCounts(context.Background())
+func (s *blogService) ListTags(ctx context.Context) ([]dto.TagOut, error) {
+	tags, err := s.repo.AggregateTagCounts(ctx)
 	if err != nil {
-		slog.Error("aggregate tag counts", "error", err)
+		slog.ErrorContext(ctx, "aggregate tag counts", "error", err)
 		return nil, err
 	}
 	return tags, nil
 }
 
 // ListPostsByTag 按标签分页列出博客 —— 与 Python get_posts_by_tag 对齐。
-func (s *BlogService) ListPostsByTag(tag string, page, perPage int) (*dto.PostsByTagOut, error) {
+func (s *blogService) ListPostsByTag(ctx context.Context, tag string, page, perPage int) (*dto.PostsByTagOut, error) {
 	tag = strings.TrimSpace(tag)
 	if tag == "" {
 		return nil, errs.ErrInvalidPostID
@@ -177,9 +196,9 @@ func (s *BlogService) ListPostsByTag(tag string, page, perPage int) (*dto.PostsB
 		perPage = 10
 	}
 
-	posts, total, err := s.repo.ListPostsByTag(context.Background(), tag, page, perPage)
+	posts, total, err := s.repo.ListPostsByTag(ctx, tag, page, perPage)
 	if err != nil {
-		slog.Error("list posts by tag", "error", err, "tag", tag)
+		slog.ErrorContext(ctx, "list posts by tag", "error", err, "tag", tag)
 		return nil, err
 	}
 

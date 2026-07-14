@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -15,12 +16,12 @@ import (
 
 // BlogService 博客读表面 —— handler 依赖接口，便于 mock 测试。
 type BlogService interface {
-	ListPosts(page int, search string) (*dto.BlogListOut, error)
-	GetPost(id string) (*dto.PostOut, error)
-	IncrementViews(id string) error
-	LikePost(id string) (int, error)
-	ListTags() ([]dto.TagOut, error)
-	ListPostsByTag(tag string, page, perPage int) (*dto.PostsByTagOut, error)
+	ListPosts(ctx context.Context, page int, search string) (*dto.BlogListOut, error)
+	GetPost(ctx context.Context, id string) (*dto.PostOut, error)
+	IncrementViews(ctx context.Context, id string) error
+	LikePost(ctx context.Context, id string) (int, error)
+	ListTags(ctx context.Context) ([]dto.TagOut, error)
+	ListPostsByTag(ctx context.Context, tag string, page, perPage int) (*dto.PostsByTagOut, error)
 }
 
 // BlogHandler 处理博客读请求（公开接口，无需鉴权）。
@@ -36,7 +37,7 @@ func (h *BlogHandler) GetBlogs(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	search := c.Query("search")
 
-	data, err := h.blogSvc.ListPosts(page, search)
+	data, err := h.blogSvc.ListPosts(c.Request.Context(), page, search)
 	if err != nil {
 		slog.ErrorContext(c.Request.Context(), "get blogs", "error", err)
 		response.APIError(c, err.Error(), http.StatusInternalServerError)
@@ -51,7 +52,7 @@ func (h *BlogHandler) GetBlogPost(c *gin.Context) {
 		_id = c.Query("_id")
 	}
 
-	data, err := h.blogSvc.GetPost(_id)
+	data, err := h.blogSvc.GetPost(c.Request.Context(), _id)
 	if err != nil {
 		switch {
 		case errors.Is(err, errs.ErrInvalidPostID):
@@ -66,7 +67,7 @@ func (h *BlogHandler) GetBlogPost(c *gin.Context) {
 	}
 	// Fire-and-forget view increment —— 阅读量计数，不阻塞返回响应。
 	go func() {
-		if err := h.blogSvc.IncrementViews(_id); err != nil {
+		if err := h.blogSvc.IncrementViews(c.Request.Context(), _id); err != nil {
 			slog.ErrorContext(c.Request.Context(), "increment views", "error", err, "id", _id)
 		}
 	}()
@@ -74,7 +75,7 @@ func (h *BlogHandler) GetBlogPost(c *gin.Context) {
 }
 
 func (h *BlogHandler) GetTags(c *gin.Context) {
-	tags, err := h.blogSvc.ListTags()
+	tags, err := h.blogSvc.ListTags(c.Request.Context())
 	if err != nil {
 		slog.ErrorContext(c.Request.Context(), "get tags", "error", err)
 		response.APIError(c, err.Error(), http.StatusInternalServerError)
@@ -88,7 +89,7 @@ func (h *BlogHandler) GetPostsByTag(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	perPage, _ := strconv.Atoi(c.DefaultQuery("per_page", "10"))
 
-	data, err := h.blogSvc.ListPostsByTag(tag, page, perPage)
+	data, err := h.blogSvc.ListPostsByTag(c.Request.Context(), tag, page, perPage)
 	if err != nil {
 		if errors.Is(err, errs.ErrInvalidPostID) {
 			response.APIError(c, "Tag is required", http.StatusBadRequest)
@@ -105,7 +106,7 @@ func (h *BlogHandler) GetPostsByTag(c *gin.Context) {
 func (h *BlogHandler) LikePost(c *gin.Context) {
 	id := c.Param("id")
 
-	likes, err := h.blogSvc.LikePost(id)
+	likes, err := h.blogSvc.LikePost(c.Request.Context(), id)
 	if err != nil {
 		switch {
 		case errors.Is(err, errs.ErrInvalidPostID):
