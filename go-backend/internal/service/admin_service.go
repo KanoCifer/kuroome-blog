@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -86,6 +87,9 @@ func (s *adminService) AddPost(ctx context.Context, post dto.PostIn) (string, er
 	return id, nil
 }
 
+// UpdatePost 部分更新文章 —— 与 DevTaskService.Update / FishService.UpdateFishingSpot 同模式：
+// 只把前端实际传了的字段塞进 bson.M，避免未传字段被静默覆盖为零值。
+// updated_at 由 service 层刷新（不再由 repo 负责），与项目其它 update 路径对齐。
 func (s *adminService) UpdatePost(ctx context.Context, id string, post dto.PostUpdate) error {
 	if _, err := bson.ObjectIDFromHex(id); err != nil {
 		return errs.ErrInvalidPostID
@@ -98,14 +102,30 @@ func (s *adminService) UpdatePost(ctx context.Context, id string, post dto.PostU
 		return err
 	}
 
-	update := bson.M{
-		"title":     post.Title,
-		"body":      post.Body,
-		"summary":   post.Summary,
-		"cover":     post.Cover,
-		"tags":      post.Tags,
-		"is_pinned": boolToInt(post.IsPinned),
+	update := bson.M{}
+	if post.Title != nil {
+		update["title"] = *post.Title
 	}
+	if post.Body != nil {
+		update["body"] = *post.Body
+	}
+	if post.Summary != nil {
+		update["summary"] = *post.Summary
+	}
+	if post.Cover != nil {
+		update["cover"] = *post.Cover
+	}
+	if post.Tags != nil {
+		update["tags"] = *post.Tags
+	}
+	if post.IsPinned != nil {
+		update["is_pinned"] = boolToInt(*post.IsPinned)
+	}
+	if len(update) == 0 {
+		return nil
+	}
+	update["updated_at"] = time.Now().UTC()
+
 	if err := s.repo.UpdatePostByID(ctx, id, update); err != nil {
 		return err
 	}

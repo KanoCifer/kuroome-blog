@@ -17,13 +17,17 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 )
 
+// ptr 返回值变量的指针，用于构造指针字段 DTO 字面量。
+func ptr[T any](v T) *T { return &v }
+
 // 校验分支不依赖 repo，repo 为 nil 也能覆盖（在调用 repo 前返回）。
 
 func TestAdminService_UpdatePost_InvalidID(t *testing.T) {
 	svc := &adminService{} // repo/redis 均为 nil
 	err := svc.UpdatePost(context.Background(), "not-a-hex", dto.PostUpdate{
-		PostIn: dto.PostIn{Title: "t", Body: "b"},
-		ID:     "not-a-hex",
+		Title: ptr("t"),
+		Body:  ptr("b"),
+		ID:    "not-a-hex",
 	})
 	if !errors.Is(err, errs.ErrInvalidPostID) {
 		t.Errorf("err = %v, want ErrInvalidPostID", err)
@@ -208,7 +212,8 @@ func TestAdminService_UpdatePost_NotFound(t *testing.T) {
 	svc := &adminService{repo: repo, redis: nil}
 
 	err := svc.UpdatePost(context.Background(), "507f1f77bcf86cd799439011", dto.PostUpdate{
-		PostIn: dto.PostIn{Title: "t", Body: "b"},
+		Title: ptr("t"),
+		Body:  ptr("b"),
 	})
 	if !errors.Is(err, errs.ErrPostNotFound) {
 		t.Errorf("err = %v, want ErrPostNotFound", err)

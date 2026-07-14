@@ -56,7 +56,6 @@ func (r *AdminRepo) UpdatePostByID(ctx context.Context, id string, update bson.M
 	if err != nil {
 		return fmt.Errorf("invalid post id: %w", err)
 	}
-	update["updated_at"] = time.Now().UTC()
 	_, err = r.db.UpdateOne(
 		ctx,
 		bson.M{"_id": oid},

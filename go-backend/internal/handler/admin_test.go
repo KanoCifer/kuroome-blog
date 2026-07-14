@@ -84,6 +84,19 @@ func putJSON(t *testing.T, path string, body any) (*httptest.ResponseRecorder, *
 	return w, req
 }
 
+// ptr 返回值变量的指针，用于构造指针字段 DTO 字面量。
+func ptr[T any](v T) *T { return &v }
+
+// postUpdate 是 handler 测试用的 PostUpdate 构造辅助 —— 只填 Title / Body / ID 即可，
+// 避免每个测试都写一堆 `Title: ptr("t")`。
+func postUpdate(id, title, body string) dto.PostUpdate {
+	return dto.PostUpdate{
+		Title: ptr(title),
+		Body:  ptr(body),
+		ID:    id,
+	}
+}
+
 // ---------- DevTaskToken ----------
 
 func TestAdmin_DevTaskToken_Success(t *testing.T) {
@@ -220,10 +233,7 @@ func TestAdmin_UpdatePost_InvalidID(t *testing.T) {
 		updatePostFn: func(ctx context.Context, id string, post dto.PostUpdate) error { return errs.ErrInvalidPostID },
 	}
 	_, r := newAdminHandler(svc)
-	w, req := putJSON(t, "/api/v3/post/update", dto.PostUpdate{
-		PostIn: dto.PostIn{Title: "t", Body: "b"},
-		ID:     "bad-id",
-	})
+	w, req := putJSON(t, "/api/v3/post/update", postUpdate("bad-id", "t", "b"))
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusBadRequest {
@@ -238,10 +248,7 @@ func TestAdmin_UpdatePost_NotFound(t *testing.T) {
 		},
 	}
 	_, r := newAdminHandler(svc)
-	w, req := putJSON(t, "/api/v3/post/update", dto.PostUpdate{
-		PostIn: dto.PostIn{Title: "t", Body: "b"},
-		ID:     "507f1f77bcf86cd799439011",
-	})
+	w, req := putJSON(t, "/api/v3/post/update", postUpdate("507f1f77bcf86cd799439011", "t", "b"))
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusNotFound {
@@ -256,7 +263,8 @@ func TestAdmin_UpdatePost_MissingID(t *testing.T) {
 	_, r := newAdminHandler(svc)
 	// _id 缺失 → binding 失败
 	w, req := putJSON(t, "/api/v3/post/update", dto.PostUpdate{
-		PostIn: dto.PostIn{Title: "t", Body: "b"},
+		Title: ptr("t"),
+		Body:  ptr("b"),
 	})
 	r.ServeHTTP(w, req)
 
@@ -272,10 +280,7 @@ func TestAdmin_UpdatePost_ServerError(t *testing.T) {
 		},
 	}
 	_, r := newAdminHandler(svc)
-	w, req := putJSON(t, "/api/v3/post/update", dto.PostUpdate{
-		PostIn: dto.PostIn{Title: "t", Body: "b"},
-		ID:     "507f1f77bcf86cd799439011",
-	})
+	w, req := putJSON(t, "/api/v3/post/update", postUpdate("507f1f77bcf86cd799439011", "t", "b"))
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusInternalServerError {

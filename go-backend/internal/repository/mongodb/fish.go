@@ -58,12 +58,12 @@ func (r *FishRepo) GetByID(ctx context.Context, id string) (*document.FishingSpo
 	return &spot, nil
 }
 
-func (r *FishRepo) Update(ctx context.Context, id string, spot *document.FishingSpot) error {
+func (r *FishRepo) Update(ctx context.Context, id string, data bson.M) error {
 	oid, err := validateObjectID(id)
 	if err != nil {
 		return err
 	}
-	_, err = r.coll.UpdateOne(ctx, bson.M{"_id": oid}, bson.M{"$set": spot})
+	_, err = r.coll.UpdateOne(ctx, bson.M{"_id": oid}, bson.M{"$set": data})
 	if err != nil {
 		return err
 	}
