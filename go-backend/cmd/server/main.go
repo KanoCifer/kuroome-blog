@@ -75,6 +75,7 @@ func main() {
 		postgres.NewUserRepo(db.GetDB()),
 		postgres.NewAdminRepo(db.GetMongoDB()),
 		postgres.NewVisitorRepo(db.GetDB()),
+		postgres.NewEventRepo(db.GetDB()),
 		blogSvc,
 		devTaskSvc,
 		db.GetRedis(),

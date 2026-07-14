@@ -45,6 +45,7 @@ func InitDB() error {
 		&model.DeviceTrack{},
 		&model.GalleryImage{},
 		&model.Log{},
+		&model.Event{},
 	)
 }
 

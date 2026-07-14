@@ -52,6 +52,9 @@ func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
 	monitorH := handler.NewMonitorHandler(state.MonitorSvc())
 	monitorH.RegisterRoutes(v3, middleware.AuthMiddleware(), middleware.AdminMiddleware(state.Cfg().Admin.UserIDs))
 
+	systemH := handler.NewSystemHandler(state.SystemSvc())
+	systemH.RegisterRoutes(v3)
+
 	wsH := handler.NewWSHandler(state.WSSvc())
 	wsH.RegisterRoutes(v3)
 }
