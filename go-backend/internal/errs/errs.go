@@ -31,4 +31,9 @@ var (
 	ErrGitHubNotConfigured = errors.New("GitHub OAuth 未配置")
 	ErrInvalidOAuthState   = errors.New("state 无效或已过期")
 	ErrGitHubAlreadyBound  = errors.New("该 GitHub 账户已被绑定")
+
+	// 上传 / 媒体错误
+	ErrUnsupportedImageType = errors.New("不支持的图片类型")
+	ErrImageTooLarge        = errors.New("图片过大")
+	ErrInvalidImageData     = errors.New("无效的图片数据")
 )

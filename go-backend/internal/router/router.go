@@ -61,4 +61,10 @@ func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
 	fishH := handler.NewFishHandler(state.FishSvc())
 	// fish：GET 列表/详情公开；POST / PATCH / DELETE 需 admin 中间件。
 	fishH.RegisterRoutes(v3, middleware.AdminMiddleware(state.Cfg().Admin.UserIDs))
+
+	uploadH := handler.NewUploadHandler(state.UploadSvc(), state.UserSvc())
+	uploadH.RegisterRoutes(v3, middleware.AuthMiddleware())
+
+	// 媒体静态服务：把上传的文件以 /api/v3/media/* 暴露，对齐 handler 返回的 url。
+	r.Static("/api/v3/media", state.Cfg().Upload.UploadDir)
 }

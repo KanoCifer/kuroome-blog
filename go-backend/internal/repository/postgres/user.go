@@ -133,6 +133,28 @@ func (r *UserRepo) UpdateProfile(ctx context.Context, profile *model.Profile) er
 	return r.db.WithContext(ctx).Save(profile).Error
 }
 
+// GetProfile 按 userID 查单个 profile，不存在返回 nil, nil。
+func (r *UserRepo) GetProfile(ctx context.Context, userID uint) (*model.Profile, error) {
+	var p model.Profile
+	err := r.db.WithContext(ctx).Where("user_id = ?", userID).First(&p).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &p, nil
+}
+
+// CreateProfile 为指定 user 新建 profile 并返回。
+func (r *UserRepo) CreateProfile(ctx context.Context, userID uint) (*model.Profile, error) {
+	p := &model.Profile{UserID: userID}
+	if err := r.db.WithContext(ctx).Create(p).Error; err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
 func (r *UserRepo) Delete(ctx context.Context, user *model.User) error {
 	return r.db.WithContext(ctx).Delete(user).Error
 }

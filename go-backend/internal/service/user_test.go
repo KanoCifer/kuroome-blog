@@ -232,6 +232,14 @@ func (m *mockUserRepo) UpdateProfile(ctx context.Context, profile *model.Profile
 	return nil
 }
 
+func (m *mockUserRepo) GetProfile(ctx context.Context, userID uint) (*model.Profile, error) {
+	return nil, nil
+}
+
+func (m *mockUserRepo) CreateProfile(ctx context.Context, userID uint) (*model.Profile, error) {
+	return &model.Profile{UserID: userID}, nil
+}
+
 func (m *mockUserRepo) Delete(ctx context.Context, user *model.User) error {
 	return nil
 }

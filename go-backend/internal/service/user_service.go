@@ -46,6 +46,8 @@ type UserRepositoryer interface {
 	ListUsersWithLoginRecords(ctx context.Context) ([]model.User, error)
 	Update(ctx context.Context, user *model.User) error
 	UpdateProfile(ctx context.Context, profile *model.Profile) error
+	GetProfile(ctx context.Context, userID uint) (*model.Profile, error)
+	CreateProfile(ctx context.Context, userID uint) (*model.Profile, error)
 	Delete(ctx context.Context, user *model.User) error
 }
 

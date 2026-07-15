@@ -32,6 +32,8 @@
 | `MONGO_URI`      | MongoDB connection string                                                                     |
 | `REDIS_URL`      | Redis connection string                                                                       |
 | `RABBITMQ_URL`   | RabbitMQ connection string (Taskiq broker)                                                    |
+| `MEDIA_PATH`     | 上传文件存储根目录（绝对路径或相对路径）。默认 `./media`；设成同一绝对路径可使 Python / Go 端共享同一份上传文件 |
+| `MAX_UPLOAD_MB`  | 单文件上传上限（MB），默认 `10`；超出返回 413                                                  |
 
 ### Go 端额外变量
 

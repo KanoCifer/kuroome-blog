@@ -24,6 +24,7 @@ type AppState struct {
 	systemSvc   service.Systemer
 	wsSvc       service.WSer
 	fishSvc     service.Fisher
+	uploadSvc   service.Uploader
 }
 
 // NewAppState 组装所有 service，作为唯一的组合根入口。
@@ -64,7 +65,8 @@ func NewAppState(
 			redis, userRepo, userSvc,
 			cfg.GitHub.ClientID, cfg.GitHub.ClientSecret, cfg.GitHub.RedirectURI,
 		),
-		fishSvc: service.NewFishService(fishRepo),
+		fishSvc:   service.NewFishService(fishRepo),
+		uploadSvc: service.NewUploadService(userRepo, cfg),
 	}
 }
 
@@ -79,5 +81,6 @@ func (a *AppState) MonitorSvc() service.Monitorer      { return a.monitorSvc }
 func (a *AppState) SystemSvc() service.Systemer        { return a.systemSvc }
 func (a *AppState) GitHubOAuth() service.GitHubOAuther { return a.githubOAuth }
 func (a *AppState) FishSvc() service.Fisher            { return a.fishSvc }
+func (a *AppState) UploadSvc() service.Uploader        { return a.uploadSvc }
 
 func (a *AppState) Cfg() *config.Config { return a.config }

@@ -27,6 +27,7 @@ type Config struct {
 	Amap     AmapConfig
 	API      APIConfig
 	Weather  WeatherConfig
+	Upload   UploadConfig
 }
 
 // ServerConfig 服务运行与日志。
@@ -123,6 +124,14 @@ type WeatherConfig struct {
 	QweatherBaseURL string `mapstructure:"QWEATHER_BASE_URL"`
 }
 
+// UploadConfig 上传 / 媒体存储相关。
+type UploadConfig struct {
+	// UploadDir 文件存储根目录，默认 ./media（与 Python 端 MEDIA_PATH 对齐）。
+	UploadDir string `mapstructure:"MEDIA_PATH"`
+	// MaxUploadMB 单文件上限（MB），默认 10。
+	MaxUploadMB int `mapstructure:"MAX_UPLOAD_MB"`
+}
+
 // 缺省值映射；viper 按 key 查找，嵌套 struct 的 key 与根级一致（viper 不自动
 // 加前缀），所以这里仍然用扁平 key。
 var defaults = map[string]any{
@@ -165,6 +174,8 @@ var defaults = map[string]any{
 	"API_TITLE":                "Reading List API",
 	"API_DESCRIPTION":          "API文档。Personal reading tracker API built with FastAPI, PostgreSQL, and MongoDB.",
 	"QWEATHER_BASE_URL":        "",
+	"MEDIA_PATH":               "./media",
+	"MAX_UPLOAD_MB":            10,
 }
 
 var Cfg *Config
