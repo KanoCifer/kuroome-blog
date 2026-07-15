@@ -1,361 +1,37 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-11T00:00:00.000Z",
+  "generatedAt": "2026-07-15T00:00:00.000Z",
   "title": "Design System: kanocifer.chat",
   "extensions": {
     "colorMeta": {
-      "ink": {
-        "role": "neutral",
-        "displayName": "Ink (foreground)",
-        "canonical": "oklch(0.2 0.018 50)",
-        "tonalRamp": [
-          "oklch(0.12 0.028 50)",
-          "oklch(0.2 0.025 50)",
-          "oklch(0.32 0.025 50)",
-          "oklch(0.45 0.025 50)",
-          "oklch(0.55 0.025 50)",
-          "oklch(0.7 0.02 50)",
-          "oklch(0.85 0.015 50)",
-          "oklch(0.95 0.01 50)"
-        ]
-      },
-      "paper": {
-        "role": "neutral",
-        "displayName": "Paper (page background)",
-        "canonical": "oklch(0.97 0.013 50)",
-        "tonalRamp": [
-          "oklch(0.13 0.02 50)",
-          "oklch(0.25 0.02 50)",
-          "oklch(0.4 0.02 50)",
-          "oklch(0.55 0.018 50)",
-          "oklch(0.7 0.018 50)",
-          "oklch(0.85 0.015 50)",
-          "oklch(0.94 0.013 50)",
-          "oklch(0.97 0.013 50)"
-        ]
-      },
-      "surface": {
-        "role": "neutral",
-        "displayName": "Surface (translucent floating layer)",
-        "canonical": "oklch(0.97 0.013 260 / 0.75)",
-        "tonalRamp": [
-          "oklch(0.97 0.013 260 / 0.95)",
-          "oklch(0.97 0.013 260 / 0.85)",
-          "oklch(0.97 0.013 260 / 0.75)",
-          "oklch(0.97 0.013 260 / 0.65)",
-          "oklch(0.97 0.013 260 / 0.5)",
-          "oklch(0.97 0.013 260 / 0.35)",
-          "oklch(0.97 0.013 260 / 0.2)",
-          "oklch(0.97 0.013 260 / 0.1)"
-        ]
-      },
-      "warm-gray": {
-        "role": "neutral",
-        "displayName": "Warm Gray (low-weight surface)",
-        "canonical": "oklch(0.95 0.018 50)",
-        "tonalRamp": [
-          "oklch(0.34 0.03 50)",
-          "oklch(0.5 0.025 50)",
-          "oklch(0.65 0.022 50)",
-          "oklch(0.78 0.02 50)",
-          "oklch(0.88 0.018 50)",
-          "oklch(0.92 0.018 50)",
-          "oklch(0.95 0.018 50)",
-          "oklch(0.97 0.015 50)"
-        ]
-      },
-      "secondary": {
-        "role": "neutral",
-        "displayName": "Secondary (step up from warm-gray)",
-        "canonical": "oklch(0.92 0.022 50)",
-        "tonalRamp": [
-          "oklch(0.4 0.04 50)",
-          "oklch(0.55 0.035 50)",
-          "oklch(0.7 0.03 50)",
-          "oklch(0.82 0.025 50)",
-          "oklch(0.88 0.022 50)",
-          "oklch(0.9 0.022 50)",
-          "oklch(0.92 0.022 50)",
-          "oklch(0.95 0.02 50)"
-        ]
-      },
-      "muted-text": {
-        "role": "neutral",
-        "displayName": "Muted Text (auxiliary, ≥4.5:1)",
-        "canonical": "oklch(0.42 0.015 50)",
-        "tonalRamp": [
-          "oklch(0.2 0.018 50)",
-          "oklch(0.3 0.018 50)",
-          "oklch(0.4 0.015 50)",
-          "oklch(0.42 0.015 50)",
-          "oklch(0.55 0.015 50)",
-          "oklch(0.7 0.015 50)",
-          "oklch(0.85 0.012 50)",
-          "oklch(0.95 0.01 50)"
-        ]
-      },
-      "border": {
-        "role": "neutral",
-        "displayName": "Border (hairline divider)",
-        "canonical": "oklch(0.88 0.02 50)",
-        "tonalRamp": [
-          "oklch(0.18 0.025 50)",
-          "oklch(0.3 0.025 50)",
-          "oklch(0.45 0.022 50)",
-          "oklch(0.6 0.022 50)",
-          "oklch(0.75 0.02 50)",
-          "oklch(0.88 0.02 50)",
-          "oklch(0.93 0.018 50)",
-          "oklch(0.97 0.015 50)"
-        ]
-      },
-      "accent": {
-        "role": "primary",
-        "displayName": "Copper (paper accent)",
-        "canonical": "oklch(0.5 0.08 50)",
-        "tonalRamp": [
-          "oklch(0.25 0.06 50)",
-          "oklch(0.35 0.07 50)",
-          "oklch(0.45 0.08 50)",
-          "oklch(0.5 0.08 50)",
-          "oklch(0.6 0.08 50)",
-          "oklch(0.72 0.07 50)",
-          "oklch(0.82 0.06 50)",
-          "oklch(0.92 0.04 50)"
-        ]
-      },
-      "accent-slate": {
-        "role": "secondary",
-        "displayName": "Soft Blue (focus ring)",
-        "canonical": "oklch(0.55 0.025 245)",
-        "tonalRamp": [
-          "oklch(0.25 0.025 245)",
-          "oklch(0.4 0.025 245)",
-          "oklch(0.55 0.025 245)",
-          "oklch(0.65 0.025 245)",
-          "oklch(0.75 0.022 245)",
-          "oklch(0.8 0.018 245)",
-          "oklch(0.88 0.015 245)",
-          "oklch(0.95 0.012 245)"
-        ]
-      },
-      "accent-rose": {
-        "role": "destructive",
-        "displayName": "Vermillion Rose (destructive)",
-        "canonical": "oklch(0.577 0.245 27.325)",
-        "tonalRamp": [
-          "oklch(0.22 0.1 27.325)",
-          "oklch(0.32 0.13 27.325)",
-          "oklch(0.42 0.16 27.325)",
-          "oklch(0.5 0.2 27.325)",
-          "oklch(0.577 0.245 27.325)",
-          "oklch(0.68 0.2 27.325)",
-          "oklch(0.78 0.15 27.325)",
-          "oklch(0.9 0.08 27.325)"
-        ]
-      },
-      "chart-1": {
-        "role": "chart",
-        "displayName": "Chart 1 (Indigo)",
-        "canonical": "oklch(0.626 0.202 261)"
-      },
-      "chart-2": {
-        "role": "chart",
-        "displayName": "Chart 2 (Cyan)",
-        "canonical": "oklch(0.6 0.118 185)"
-      },
-      "chart-3": {
-        "role": "chart",
-        "displayName": "Chart 3 (Slate)",
-        "canonical": "oklch(0.398 0.07 227)"
-      },
-      "chart-4": {
-        "role": "chart",
-        "displayName": "Chart 4 (Amber)",
-        "canonical": "oklch(0.828 0.189 84)"
-      },
-      "chart-5": {
-        "role": "chart",
-        "displayName": "Chart 5 (Orange)",
-        "canonical": "oklch(0.769 0.188 70)"
-      }
-    },
-    "themes": {
-      "paper": {
-        "displayName": "Paper (纸色暖调, default)",
-        "hueBase": 50,
-        "accent": "oklch(0.5 0.08 50)",
-        "ink": "oklch(0.2 0.018 50)",
-        "paper": "oklch(0.97 0.013 50)",
-        "character": "私人书房; parchment-and-copper. The literary register's home. Default theme."
-      },
-      "sage": {
-        "displayName": "Sage (鼠尾草绿)",
-        "hueBase": 145,
-        "accent": "oklch(0.5 0.08 145)",
-        "ink": "oklch(0.2 0.018 145)",
-        "paper": "oklch(0.97 0.013 145)",
-        "character": "Herb-garden green; muted and slightly cool."
-      },
-      "mist": {
-        "displayName": "Mist (雾蓝冷调)",
-        "hueBase": 225,
-        "accent": "oklch(0.5 0.06 225)",
-        "ink": "oklch(0.2 0.018 225)",
-        "paper": "oklch(0.97 0.01 225)",
-        "character": "Cool dusk-blue over cool paper."
-      },
-      "blush": {
-        "displayName": "Blush (薄红陶色)",
-        "hueBase": 355,
-        "accent": "oklch(0.55 0.09 355)",
-        "ink": "oklch(0.22 0.022 355)",
-        "paper": "oklch(0.97 0.013 355)",
-        "character": "Dusty rose; warm without being loud."
-      }
-    },
-    "typographyMeta": {
-      "display": {
-        "displayName": "Display (Latin)",
-        "purpose": "Latin display only — bento greeting, clock time, polaroid date, fishing subtitle. Never applied to CJK content."
-      },
-      "display-cjk": {
-        "displayName": "Display (CJK)",
-        "purpose": "CJK display — device card label, polaroid memo body, fishing header. Used exclusively for Chinese content."
-      },
-      "serif": {
-        "displayName": "Serif (blog + literary)",
-        "purpose": "Blog list, blog post, login hero, settings modal, profile views. The literary register lives here."
-      },
-      "body": {
-        "displayName": "Body (font-sans default)",
-        "purpose": "Primary body text. Resolves to font-sans, which is the system CJK stack — 'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, 'Segoe UI', sans-serif. Default state; works on every modern OS without preloading fonts."
-      },
-      "body-harmonyos": {
-        "displayName": "Body (HarmonyOS Sans toggle)",
-        "purpose": "Toggled at runtime by the user via Settings → Appearance → Font. :root[data-font='harmonyos'] overrides --font-sans and --default-font-family to 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif. The three .ttf files are preloaded so the switch is instant. This is a user-level opt-in, not a theme default — new components must NOT assume HarmonyOS is active."
-      },
-      "mono": {
-        "displayName": "Mono (terminal chrome)",
-        "purpose": "Tabular-nums timestamps, version strings, status labels, terminal/console chrome."
-      },
-      "label": {
-        "displayName": "Label (uppercase tracked)",
-        "purpose": "Eyebrows, kickers, version chips, status badges. Reserved for short labels, never applied to body."
-      },
-      "hero": {
-        "displayName": "Hero (clamp serif)",
-        "purpose": "Page titles on BasicDetail and PageHero. clamp(1.875rem, 4vw + 1rem, 4.5rem); ceiling 4.5rem."
-      }
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "oklch(0.2 0.018 50)" },
+      "paper": { "role": "neutral", "displayName": "Paper", "canonical": "oklch(0.97 0.013 50)" },
+      "surface": { "role": "neutral", "displayName": "Surface (translucent)", "canonical": "oklch(0.97 0.013 50 / 0.75)" },
+      "warm-gray": { "role": "neutral", "displayName": "Warm Gray", "canonical": "oklch(0.95 0.018 50)" },
+      "secondary": { "role": "neutral", "displayName": "Secondary", "canonical": "oklch(0.92 0.022 50)" },
+      "muted-text": { "role": "neutral", "displayName": "Muted Text", "canonical": "oklch(0.42 0.015 50)" },
+      "border": { "role": "neutral", "displayName": "Border", "canonical": "oklch(0.88 0.02 50)" },
+      "accent": { "role": "primary", "displayName": "Copper", "canonical": "oklch(0.5 0.08 50)" },
+      "accent-slate": { "role": "secondary", "displayName": "Soft Blue", "canonical": "oklch(0.55 0.025 245)" },
+      "accent-rose": { "role": "tertiary", "displayName": "Vermillion Rose", "canonical": "oklch(0.58 0.13 28)" },
+      "accent-contrast": { "role": "neutral", "displayName": "Accent Contrast", "canonical": "oklch(0.99 0.003 50)" },
+      "card-bg": { "role": "neutral", "displayName": "Card Bg", "canonical": "oklch(0.99 0.008 50)" },
+      "chart-5": { "role": "neutral", "displayName": "Chart 5", "canonical": "oklch(0.7 0.13 85)" }
     },
     "shadows": [
-      {
-        "name": "card-ambient",
-        "value": "0 1px 1px color-mix(in oklch, var(--ink) 6%, transparent), 0 6px 14px color-mix(in oklch, var(--ink) 10%, transparent), 0 18px 32px color-mix(in oklch, var(--ink) 8%, transparent)",
-        "purpose": "Polaroid cards, plain cards. Adapts to theme via color-mix."
-      },
-      {
-        "name": "bento-layered",
-        "value": "color-mix(in srgb, var(--color-foreground) 12%, transparent) 0px 40px 50px -32px, color-mix(in srgb, var(--color-foreground) 8%, transparent) 0px 60px 80px -48px, rgba(255, 255, 255, 0.35) 0px 0px 20px 0px inset",
-        "purpose": "The home-page bento card signature. Two-layer ambient + inset white highlight."
-      },
-      {
-        "name": "nav-squircle-light",
-        "value": "inset rgba(255,255,255,0.35) 0 0 20px 0, 0 6px 16px -4px rgba(0,0,0,0.12), 0 4px 8px -2px rgba(0,0,0,0.08)",
-        "purpose": "Floating pill nav (light mode). Inset white reflection + soft outer drop."
-      },
-      {
-        "name": "nav-squircle-dark",
-        "value": "inset rgba(255,255,255,0.06) 0 0 20px 0, 0 0 24px -4px rgba(255,255,255,0.12), 0 0 8px -2px rgba(255,255,255,0.08)",
-        "purpose": "Floating pill nav (dark mode). Inset + outer white at low alpha."
-      },
-      {
-        "name": "modal-panel",
-        "value": "0 12px 32px color-mix(in oklch, var(--ink) 10%, transparent)",
-        "purpose": "Standard modal panel lift. Heavy modals add a second layer."
-      },
-      {
-        "name": "modal-backdrop",
-        "value": "bg-black/45 backdrop-blur-[10px]",
-        "purpose": "Standard modal mask. In active cleanup toward theme-aware values."
-      },
-      {
-        "name": "primary-cta-tint",
-        "value": "shadow-primary/30",
-        "purpose": "Color-tinted shadow for primary CTAs. 30% alpha ceiling."
-      },
-      {
-        "name": "layered-ambient",
-        "value": "0 1px 1px color-mix(in oklch, var(--ink) 6%, transparent), 0 6px 14px color-mix(in oklch, var(--ink) 10%, transparent), 0 18px 32px color-mix(in oklch, var(--ink) 8%, transparent)",
-        "purpose": "Canonical three-layer ambient shadow. Theme-adaptive via ink token."
-      },
-      {
-        "name": "layered-lifted-paper",
-        "value": "0 1px 0 0 oklch(from var(--paper) l c h / 0.6) inset, 0 2px 4px -1px oklch(from var(--ink) l c h / 0.04), 0 8px 24px -8px oklch(from var(--ink) l c h / 0.12)",
-        "purpose": "Writing canvas — inset white highlight + ambient occlusion. Theme adaptive."
-      },
-      {
-        "name": "decorative-h-line",
-        "value": "bg-primary/40, h-px or w-px",
-        "purpose": "Section dividers and book-chapter decorations. Single canonical alpha (40%)."
-      }
+      { "name": "card-ambient", "value": "0 1px 1px color-mix(in oklch, var(--ink) 6%, transparent), 0 6px 14px color-mix(in oklch, var(--ink) 10%, transparent), 0 18px 32px color-mix(in oklch, var(--ink) 8%, transparent)", "purpose": "Standard / Polaroid cards." },
+      { "name": "bento-card", "value": "color-mix(in srgb, var(--ink) 12%, transparent) 0px 40px 50px -32px, color-mix(in srgb, var(--ink) 8%, transparent) 0px 60px 80px -48px, rgba(255,255,255,0.35) 0px 0px 20px 0px inset", "purpose": "Home-page bento card layered ambient + inset white." },
+      { "name": "modal-panel", "value": "0 12px 32px color-mix(in oklch, var(--ink) 10%, transparent)", "purpose": "Default modal lift." },
+      { "name": "nav-liquid-glass", "value": "inset 0 0 2px 1px rgb(255 255 255 / 0.55), inset 0 0 10px 4px rgb(255 255 255 / 0.22), 0 6px 24px rgb(17 17 26 / 0.06), 0 12px 40px rgb(17 17 26 / 0.05)", "purpose": "Floating nav: pill glass (paired light/dark blocks, SVG url filter)." },
+      { "name": "drawer-settings", "value": "0 -1px 1px color-mix(in oklch, var(--ink) 6%, transparent), 0 -8px 18px color-mix(in oklch, var(--ink) 8%, transparent), 0 -24px 40px color-mix(in oklch, var(--ink) 5%, transparent), inset 0 1px 0 0 oklch(from var(--paper) l c h / 0.6)", "purpose": "Settings drawer: 3-layer right/up ambient + top paper highlight." }
     ],
     "motion": [
-      {
-        "name": "ease-out-quart",
-        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
-        "purpose": "Title word-in stagger and slow state transitions. 600ms default."
-      },
-      {
-        "name": "ease-out-smooth",
-        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
-        "purpose": "PicUploadModal enter and modal-scale easings. Slightly faster than ease-out-quart."
-      },
-      {
-        "name": "spring-modal",
-        "value": "stiffness: 340, damping: 32, mass: 0.8",
-        "purpose": "Vue Modal panel entry (scale 0.95→1, y 12→0)."
-      },
-      {
-        "name": "spring-nav-indicator",
-        "value": "stiffness: 320, damping: 30",
-        "purpose": "Floating nav indicator slide. Fast enough to feel responsive, soft enough to feel paper."
-      },
-      {
-        "name": "spring-bento-entry",
-        "value": "bounce: 0.3, duration: 0.5",
-        "purpose": "BentoCard entry animation (motion-v)."
-      },
-      {
-        "name": "spring-bento-recent-drag",
-        "value": "stiffness: 400, damping: 25",
-        "purpose": "BentoRecent drag spring (tighter for direct manipulation)."
-      },
-      {
-        "name": "keyframes-title-word-in",
-        "value": "opacity 0→1, translateY 12px→0, 600ms cubic-bezier(0.22, 1, 0.36, 1)",
-        "purpose": "Hero title word-by-word reveal on BasicDetail. Gated on prefers-reduced-motion."
-      },
-      {
-        "name": "keyframes-message-pop",
-        "value": "0.5s ease-out: fade + translateY(-10px) + rotateX(-16deg) + scale(0.92→1) + blur(32px→0) + brightness(0.1→1)",
-        "purpose": "Toast / message pop-in. In @theme (frontend and react-app base.css)."
-      },
-      {
-        "name": "keyframes-breathe",
-        "value": "1s infinite: opacity 1→0→1",
-        "purpose": "Bento entry breath effect. In @theme."
-      },
-      {
-        "name": "keyframes-card-breathe",
-        "value": "2s ease-in-out infinite: border-color pulse with primary",
-        "purpose": "React-side bento card breathing border (react-app base.css line 501)."
-      },
-      {
-        "name": "theme-transition",
-        "value": "clip-path: circle(0% at cx,cy) → circle(150% at cx,cy), 0.6s ease-in-out, z-99999",
-        "purpose": "Theme-switching radial reveal with sun/moon/monitor SVG at center."
-      }
+      { "name": "spring-modal", "value": "{ type:'spring', stiffness:340, damping:32, mass:0.8 }", "purpose": "UiModal: scale 0.95→1, y 12→0." },
+      { "name": "spring-drawer", "value": "{ type:'spring', stiffness:320, damping:32, mass:0.8 }", "purpose": "Settings drawer / TodoModal: x 40→0." },
+      { "name": "spring-pic", "value": "{ type:'spring', stiffness:300, damping:26 }", "purpose": "Pic-detail family." },
+      { "name": "nav-indicator", "value": "transform translateX() · 280ms · cubic-bezier(0.32, 0.72, 0, 1)", "purpose": "Floating nav indicator slide (glass-button track, NOT a spring bg fill)." },
+      { "name": "ease-hero-word", "value": "cubic-bezier(0.22, 1, 0.36, 1) · 600ms · stagger 80ms", "purpose": "Hero h1 word reveal." },
+      { "name": "ease-card-enter", "value": "cubic-bezier(0.25, 0.46, 0.45, 0.94) · 800ms", "purpose": "Card / list-item stagger." }
     ],
     "breakpoints": [
       { "name": "sm", "value": "640px" },
@@ -363,222 +39,117 @@
       { "name": "lg", "value": "1024px" },
       { "name": "xl", "value": "1280px" },
       { "name": "2xl", "value": "1536px" }
-    ],
-    "zIndex": {
-      "base": 0,
-      "sticky": 10,
-      "modal": 50,
-      "drawer": 100,
-      "nav": 9999,
-      "theme-transition": 99999
-    }
+    ]
   },
   "components": [
     {
       "name": "Button (primary)",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The single accent on the page. Use once per screen.",
+      "description": "Single accent CTA per screen.",
       "html": "<button class=\"ds-btn-primary\">Continue Reading</button>",
-      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--accent, oklch(0.5 0.08 50)); color: var(--accent-contrast, oklch(0.97 0.013 50)); border: none; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; line-height: 1.25; cursor: pointer; transition: background 0.18s ease-out, transform 0.18s cubic-bezier(0.22, 1, 0.36, 1); outline: none; } .ds-btn-primary:hover { background: color-mix(in oklch, var(--accent) 88%, transparent); } .ds-btn-primary:focus-visible { box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent-slate) 50%, transparent); } .ds-btn-primary:active { transform: scale(0.98); } .ds-btn-primary:disabled { opacity: 0.5; pointer-events: none; }"
+      "css": ".ds-btn-primary { padding: 0.5rem 1rem; background: var(--accent); color: var(--accent-contrast); border-radius: 0.5rem; font-weight: 500; transition: background 180ms ease-out, box-shadow 180ms ease-out; } .ds-btn-primary:hover { background: color-mix(in oklch, var(--accent) 90%, transparent); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent-slate) 50%, transparent); }"
     },
     {
-      "name": "Button (secondary)",
-      "kind": "button",
-      "refersTo": "button-secondary",
-      "description": "Quieter voice for the second action. Step up from ghost.",
-      "html": "<button class=\"ds-btn-secondary\">Cancel</button>",
-      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--secondary, oklch(0.92 0.022 260)); color: var(--ink, oklch(0.2 0.018 50)); border: none; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; line-height: 1.25; cursor: pointer; transition: background 0.18s ease-out; outline: none; } .ds-btn-secondary:hover { background: color-mix(in oklch, var(--secondary) 80%, transparent); } .ds-btn-secondary:focus-visible { box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent-slate) 50%, transparent); } .ds-btn-secondary:disabled { opacity: 0.5; pointer-events: none; }"
+      "name": "Floating Nav (liquid glass)",
+      "kind": "custom",
+      "description": "The one sanctioned glass surface: SVG color-dispersion filter + backdrop-blur pill with a sliding glass-button indicator.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item\"><span class=\"ds-nav-ico\"></span><span>Home</span></a><span class=\"ds-nav-indicator\"></span></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 2.25rem; border-radius: 999px; background: rgb(255 255 255 / 0.06); backdrop-filter: blur(7px) saturate(1.4); border: 1px solid rgb(21 20 15 / 0.08); box-shadow: inset 0 0 2px 1px rgb(255 255 255 / 0.55), inset 0 0 10px 4px rgb(255 255 255 / 0.22), 0 6px 24px rgb(17 17 26 / 0.06), 0 12px 40px rgb(17 17 26 / 0.05); }.ds-nav-item { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem; width: 5rem; height: 2.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: 999px; }.ds-nav-indicator { position: absolute; top: 50%; left: 0; z-index: 1; width: 5rem; height: 2.75rem; border-radius: 999px; transform: translateY(-50%); background: rgb(255 255 255 / 0.28); border: 1px solid rgb(255 255 255 / 0.4); box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.6), inset 0 -1px 2px rgb(0 0 0 / 0.04), 0 2px 6px rgb(0 0 0 / 0.06), 0 1px 2px rgb(0 0 0 / 0.04); transition: transform 280ms cubic-bezier(0.32, 0.72, 0, 1); }.ds-nav-ico { width: 1.25rem; height: 1.25rem; }"
     },
     {
-      "name": "Button (ghost)",
-      "kind": "button",
-      "refersTo": "button-ghost",
-      "description": "No chrome until hover. The 'no commitment' button.",
-      "html": "<button class=\"ds-btn-ghost\">Skip</button>",
-      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1rem; background: transparent; color: var(--ink, oklch(0.2 0.018 50)); border: none; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; line-height: 1.25; cursor: pointer; transition: background 0.18s ease-out, color 0.18s ease-out; outline: none; } .ds-btn-ghost:hover { background: var(--warm-gray, oklch(0.95 0.018 260)); } .ds-btn-ghost:focus-visible { box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent-slate) 50%, transparent); }"
+      "name": "Drawer Panel (settings)",
+      "kind": "custom",
+      "refersTo": "drawer-settings",
+      "description": "Right-side settings drawer — flagship panel. Slides from right with spring, 4-layer asymmetric shadow, rounded-3xl.",
+      "html": "<div class=\"ds-drawer\"><header><h1>偏好设置</h1><p>Customize your reading experience</p><div class=\"ds-bookmark\"><span class=\"ds-dot\"></span><span class=\"ds-bookmark-line\"></span><span class=\"ds-dot\"></span></div></header><nav class=\"ds-segmented\"><button class=\"ds-active\">外观</button><button>背景</button><button>卡片</button></nav></div>",
+      "css": ".ds-drawer { background: var(--paper); border: 1px solid color-mix(in oklch, var(--border) 60%, transparent); border-radius: 1.5rem; box-shadow: 0 -1px 1px color-mix(in oklch, var(--ink) 6%, transparent), 0 -8px 18px color-mix(in oklch, var(--ink) 8%, transparent), 0 -24px 40px color-mix(in oklch, var(--ink) 5%, transparent), inset 0 1px 0 0 oklch(from var(--paper) l c h / 0.6); }.ds-drawer header { padding: 3rem 2rem 1.25rem; text-align: center; }.ds-drawer h1 { font-family: ui-serif, Georgia, serif; font-size: 1.75rem; font-weight: 600; }.ds-bookmark { display: flex; align-items: center; gap: 0.5rem; padding: 0 4rem; margin-top: 1.25rem; }.ds-dot { width: 0.25rem; height: 0.25rem; border-radius: 9999px; background: color-mix(in oklch, var(--accent) 70%, transparent); }.ds-bookmark-line { flex: 1; height: 1px; background: linear-gradient(to right, var(--gradient-decorative-from), var(--gradient-decorative-to)); }.ds-segmented { display: flex; gap: 0.25rem; background: var(--warm-gray); padding: 0.25rem; border-radius: 0.75rem; margin: 0 2rem; }.ds-segmented button { flex: 1; padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; color: color-mix(in oklch, var(--ink) 55%, transparent); transition: all 200ms ease-out; }.ds-segmented .ds-active { background: var(--paper); color: var(--accent); box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 8%, transparent); }"
     },
     {
-      "name": "Card (default)",
-      "kind": "card",
-      "refersTo": "card-default",
-      "description": "Static content panel. Border + light shadow. The workhorse.",
-      "html": "<article class=\"ds-card-default\"><h3>Reading progress</h3><p>You've finished 4 of 12 books this quarter.</p></article>",
-      "css": ".ds-card-default { display: flex; flex-direction: column; gap: 1.5rem; padding: 1.5rem 0; background: var(--paper, oklch(0.97 0.013 50)); color: var(--ink, oklch(0.2 0.018 50)); border: 1px solid var(--border, oklch(0.88 0.02 260)); border-radius: 0.875rem; box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 6%, transparent); } .ds-card-default h3 { margin: 0; font-size: 1.125rem; font-weight: 600; } .ds-card-default p { margin: 0; font-size: 0.9375rem; line-height: 1.65; color: var(--muted-text, oklch(0.42 0.015 50)); }"
+      "name": "Segmented Control",
+      "kind": "custom",
+      "description": "Capsule section switcher — muted track + lifted active tile.",
+      "html": "<div class=\"ds-seg\"><button class=\"ds-active\">外观</button><button>背景</button><button>卡片</button></div>",
+      "css": ".ds-seg { display: flex; gap: 0.25rem; background: var(--warm-gray); padding: 0.25rem; border-radius: 0.75rem; }.ds-seg button { flex: 1; padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; color: color-mix(in oklch, var(--ink) 55%, transparent); transition: all 200ms ease-out; }.ds-seg .ds-active { background: var(--paper); color: var(--accent); box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 8%, transparent); }"
     },
     {
-      "name": "Bento card (signature)",
+      "name": "Slider (custom)",
+      "kind": "custom",
+      "description": "Themed range with accent track-fill, paper thumb, live value chip.",
+      "html": "<div class=\"ds-slider-row\"><span class=\"ds-slider-label\"><svg class=\"ds-ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><circle cx=\"12\" cy=\"12\" r=\"10\"/></svg>背景模糊</span><span class=\"ds-value-chip\">8 px</span></div><input type=\"range\" min=\"5\" max=\"70\" class=\"ds-slider\" />",
+      "css": ".ds-slider-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 0.5rem; }.ds-slider-label { display: flex; align-items: center; gap: 0.375rem; font-size: 0.875rem; font-weight: 500; }.ds-ico { width: 1rem; height: 1rem; color: var(--muted-text); }.ds-value-chip { font-family: ui-monospace, monospace; font-size: 0.75rem; font-weight: 500; background: var(--warm-gray); color: var(--ink); padding: 0.125rem 0.5rem; border-radius: 9999px; font-variant-numeric: tabular-nums; }.ds-slider { -webkit-appearance: none; appearance: none; background: transparent; width: 100%; height: 24px; }.ds-slider::-webkit-slider-runnable-track { height: 6px; border-radius: 9999px; background: linear-gradient(to right, var(--accent) 0%, var(--accent) 50%, var(--warm-gray) 50%, var(--warm-gray) 100%); }.ds-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; margin-top: -6px; border-radius: 9999px; background: var(--paper); border: 2px solid var(--accent); box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 12%, transparent); transition: transform 150ms ease-out; cursor: pointer; }.ds-slider::-webkit-slider-thumb:hover { transform: scale(1.12); box-shadow: 0 2px 6px color-mix(in oklch, var(--ink) 16%, transparent), 0 0 0 4px color-mix(in oklch, var(--accent) 15%, transparent); }.ds-slider:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px color-mix(in oklch, var(--accent) 30%, transparent); }.ds-slider::-moz-range-track { height: 6px; border-radius: 9999px; background: linear-gradient(to right, var(--accent) 0%, var(--accent) 50%, var(--warm-gray) 50%, var(--warm-gray) 100%); }.ds-slider::-moz-range-thumb { width: 18px; height: 18px; border-radius: 9999px; background: var(--paper); border: 2px solid var(--accent); }"
+    },
+    {
+      "name": "Bento Card (signature)",
       "kind": "card",
       "refersTo": "bento-card",
-      "description": "Squircle floating card with layered ambient + inset white highlight. The home-page signature.",
-      "html": "<div class=\"ds-bento-card\"><span class=\"ds-bento-eyebrow\">TODAY</span><h3>Three books on the desk</h3></div>",
-      "css": ".ds-bento-card { position: relative; padding: 1.25rem; background: var(--paper, oklch(0.97 0.013 50)); color: var(--ink, oklch(0.2 0.018 50)); border-radius: 90px; corner-shape: squircle; box-shadow: color-mix(in srgb, var(--color-foreground, var(--ink)) 12%, transparent) 0px 40px 50px -32px, color-mix(in srgb, var(--color-foreground, var(--ink)) 8%, transparent) 0px 60px 80px -48px, rgba(255, 255, 255, 0.35) 0px 0px 20px 0px inset; } .ds-bento-eyebrow { display: inline-block; font-family: ui-monospace, monospace; font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; color: var(--muted-text, oklch(0.42 0.015 50)); } .ds-bento-card h3 { margin: 0.5rem 0 0; font-family: 'Averia Gruesa Libre', system-ui, sans-serif; font-size: 1.5rem; font-weight: 400; letter-spacing: -0.02em; } @supports not (corner-shape: squircle) { .ds-bento-card { border-radius: 48px; } }"
+      "description": "Squircle home-page card with layered ambient + inset white. Squircle = 48px base / 64px @supports.",
+      "html": "<div class=\"ds-bento-card\">Home</div>",
+      "css": ".ds-bento-card { padding: 1.25rem; background: var(--paper); color: var(--ink); border-radius: 48px; box-shadow: color-mix(in srgb, var(--ink) 12%, transparent) 0px 40px 50px -32px, color-mix(in srgb, var(--ink) 8%, transparent) 0px 60px 80px -48px, rgba(255,255,255,0.35) 0px 0px 20px 0px inset; } @supports (corner-shape: squircle) { .ds-bento-card { corner-shape: squircle; border-radius: 64px; } }"
     },
     {
-      "name": "Input (search + login)",
-      "kind": "input",
-      "refersTo": "input-field",
-      "description": "Rounded-xl, bg-muted, literary placeholder. Used in search and login flows.",
-      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Search the library…\" />",
-      "css": ".ds-input { width: 100%; padding: 0.75rem 1rem; background: var(--warm-gray, oklch(0.95 0.018 260)); color: var(--ink, oklch(0.2 0.018 50)); border: 1px solid var(--border, oklch(0.88 0.02 260)); border-radius: 0.875rem; font-size: 0.875rem; line-height: 1.25; outline: none; transition: border-color 0.18s ease-out, box-shadow 0.18s ease-out; } .ds-input::placeholder { font-family: ui-serif, Georgia, serif; font-style: italic; color: var(--muted-text, oklch(0.42 0.015 50)); } .ds-input:hover { border-color: color-mix(in oklch, var(--border) 70%, var(--ink)); } .ds-input:focus { border-color: var(--accent, oklch(0.5 0.08 50)); box-shadow: 0 0 0 2px color-mix(in oklch, var(--accent) 30%, transparent); } .ds-input:disabled { opacity: 0.5; cursor: not-allowed; }"
-    },
-    {
-      "name": "Navigation (floating pill, Vue)",
-      "kind": "nav",
-      "refersTo": "nav-floating-pill",
-      "description": "Squircle floating pill with spring-animated accent indicator. Vue desktop nav.",
-      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item is-active\">Home</a><a class=\"ds-nav-item\">Books</a><a class=\"ds-nav-item\">Moments</a></nav>",
-      "css": ".ds-nav { position: fixed; top: 1rem; left: 50%; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.375rem; background: color-mix(in oklch, var(--paper, oklch(0.97 0.013 50)) 90%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-radius: 90px; corner-shape: squircle; box-shadow: inset rgba(255, 255, 255, 0.35) 0 0 20px 0, 0 6px 16px -4px rgba(0, 0, 0, 0.12), 0 4px 8px -2px rgba(0, 0, 0, 0.08); z-index: 9999; } .ds-nav-item { position: relative; padding: 0.625rem 1rem; font-size: 0.875rem; font-weight: 500; color: var(--muted-text, oklch(0.42 0.015 50)); text-decoration: none; border-radius: 9999px; transition: color 0.18s ease-out; cursor: pointer; } .ds-nav-item.is-active { color: var(--ink, oklch(0.2 0.018 50)); } .ds-nav-item.is-active::before { content: ''; position: absolute; inset: 0; background: color-mix(in oklch, var(--accent, oklch(0.5 0.08 50)) 20%, transparent); border-radius: 9999px; z-index: -1; } @supports not (corner-shape: squircle) { .ds-nav { border-radius: 48px; } }"
-    },
-    {
-      "name": "Modal panel",
+      "name": "Modal Panel",
       "kind": "card",
       "refersTo": "modal-panel",
-      "description": "rounded-2xl paper panel over a bg-black/45 backdrop-blur-[10px] mask. Standard modal.",
-      "html": "<div class=\"ds-modal-panel\"><h2>Settings</h2><p>Choose a theme to switch the study's paint.</p></div>",
-      "css": ".ds-modal-panel { position: relative; width: 100%; max-width: 560px; padding: 1.5rem; background: var(--paper, oklch(0.97 0.013 50)); color: var(--ink, oklch(0.2 0.018 50)); border: 1px solid color-mix(in oklch, var(--border, oklch(0.88 0.02 260)) 60%, transparent); border-radius: 1.125rem; box-shadow: 0 12px 32px color-mix(in oklch, var(--ink) 10%, transparent); } .ds-modal-panel h2 { margin: 0 0 0.5rem; font-family: ui-serif, Georgia, serif; font-size: 1.5rem; font-weight: 500; letter-spacing: -0.02em; } .ds-modal-panel p { margin: 0; color: var(--muted-text, oklch(0.42 0.015 50)); line-height: 1.65; }"
+      "description": "Standard centered modal — rounded-2xl, single-layer shadow.",
+      "html": "<div class=\"ds-modal-panel\"><h2>Settings</h2><p>Choose a theme.</p></div>",
+      "css": ".ds-modal-panel { width: 100%; max-width: 560px; padding: 1.5rem; background: var(--paper); color: var(--ink); border: 1px solid color-mix(in oklch, var(--border) 60%, transparent); border-radius: 1.125rem; box-shadow: 0 12px 32px color-mix(in oklch, var(--ink) 10%, transparent); }"
     },
     {
-      "name": "Tag pill (label / chip)",
+      "name": "Tag Pill",
       "kind": "chip",
       "refersTo": "tag-pill",
-      "description": "Muted background, rounded-full, 11px tracked. Used for blog categories, version chips, status labels.",
+      "description": "Muted rounded pill for categories / status. NOT uppercase (the uppercase tracked style is for Labels only).",
       "html": "<span class=\"ds-tag-pill\">Reading</span>",
-      "css": ".ds-tag-pill { display: inline-flex; align-items: center; padding: 0.25rem 0.625rem; background: var(--warm-gray, oklch(0.95 0.018 260)); color: var(--muted-text, oklch(0.42 0.015 50)); border-radius: 9999px; font-family: 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; }"
-    },
-    {
-      "name": "Hero h1 (clamp serif)",
-      "kind": "custom",
-      "refersTo": "hero",
-      "description": "The page h1 — clamp(1.875rem, 4vw + 1rem, 4.5rem), serif, weight 500, letter-spacing -0.025em. Used on BasicDetail.",
-      "html": "<h1 class=\"ds-hero\">私人书房 · The Study</h1>",
-      "css": ".ds-hero { margin: 0; font-family: ui-serif, Georgia, 'Times New Roman', serif; font-size: clamp(1.875rem, 4vw + 1rem, 4.5rem); font-weight: 500; line-height: 1.1; letter-spacing: -0.025em; color: var(--ink, oklch(0.2 0.018 50)); text-wrap: balance; max-width: 72rem; margin-inline: auto; text-align: center; padding-inline: 1.5rem; } @media (prefers-reduced-motion: no-preference) { .ds-hero .word { display: inline-block; opacity: 0; transform: translateY(12px); animation: title-word-in 600ms cubic-bezier(0.22, 1, 0.36, 1) forwards; } .ds-hero .word:nth-child(2) { animation-delay: 80ms; } .ds-hero .word:nth-child(3) { animation-delay: 160ms; } .ds-hero .word:nth-child(4) { animation-delay: 240ms; } } @keyframes title-word-in { to { opacity: 1; transform: translateY(0); } }"
+      "css": ".ds-tag-pill { padding: 0.25rem 0.625rem; background: var(--warm-gray); color: var(--muted-text); border-radius: 9999px; font-size: 0.75rem; font-weight: 500; }"
     }
   ],
   "narrative": {
-    "northStar": "The Black Cat's Study — Four Rooms, Eight Surfaces.",
-    "overview": "kanocifer.chat is a personal study with a paint box. One author (Kuroome) reads, fishes, and writes; the site tracks all three and publishes the last. The interface reads as a quiet, deliberate workshop — paper-fold heroes, literary typography, and a single black cat (kuro neko, 黒猫) sitting in the corner. The brand voice is 书卷气 · 准 · 适 (literary register, exact, measured): every token name is opinionated, every decision is committed, and nothing is performed for an audience.\n\nThe system ships four complete color schemes — paper, sage, mist, blush — each with its own light and dark variant. Eight surfaces total, all sharing one token architecture. The palette is the brand: changing themes is not decoration but identity. data-color-scheme=\"<name>\" on <html> swaps the entire surface vocabulary atomically, with a 600ms clip-path sun/moon/monitor transition as the visible \"click\" of the toggle. The default (paper) is what visitors first see; the others are how the author lives in the site.\n\nDensity is comfortable, not tight. The dominant surface is paper; the dominant type is Chinese-set HarmonyOS Sans with Averia Gruesa Libre accents for English display. Shadows are layered ambient + inset white highlight (the \"lifted paper\" treatment), never flat, never glassmorphism. The system is explicitly not a SaaS cream-bg dashboard, an AI bento grid, an editorial-magazine layout, or a tech-company marketing site — those lanes are documented in PRODUCT.md as anti-references and in §6 as Don'ts. The site is the author's, used every day, and that single-author / multi-reader shape is what every choice serves.",
+    "northStar": "The Black Cat's Study — Four Rooms, Twenty Surfaces.",
+    "overview": "kanocifer.chat is a personal study with a paint box. One author (Kuroome) reads, fishes, and writes. The interface reads as a quiet, deliberate workshop — a liquid-glass nav, literary typography, and a single black cat. Four themes × dark/light = 8 surfaces, one token architecture. The right-side settings drawer is the flagship panel: rounded-3xl, 4-layer asymmetric shadow, capsule segmented controls, custom pseudo-element sliders. Squircle (48px / 64px @supports) is the signature card shape; the liquid-glass nav is the one sanctioned glass surface.",
     "keyCharacteristics": [
-      "4 named themes × light/dark = 8 distinct surfaces, sharing one token architecture",
-      "OKLCH color space throughout; color-mix(in oklch, var(--ink) N%, transparent) for shadow/rgba synthesis",
-      "Three-layer token contract: raw theme vars → data-color-scheme activation → semantic Tailwind utilities (bg-background, text-foreground, etc.)",
-      "Chinese-first typography; system CJK stack (PingFang SC / Microsoft YaHei) is the default body, with HarmonyOS Sans available as a user-level toggle",
-      "Latin display fonts (Averia Gruesa Libre + 东方大楷) carry the literary register without competing with CJK body",
-      "Squircle (corner-shape: squircle; border-radius: 90px) is the signature card shape — iOS-adjacent but committed, not generic",
-      "Inset white highlight + layered ambient shadow = \"lifted paper\" depth, not glassmorphism",
-      "motion-v (Vue) + framer-motion (React) with explicit prefers-reduced-motion degradation",
-      "Vue desktop + React mobile share the same token system; the mobile side is not a stripped-down mirror"
+      "4 themes × dark/light = 8 surfaces",
+      "OKLCH + color-mix shadow synthesis",
+      "Three-layer token contract",
+      "Chinese-first typography, HarmonyOS opt-in",
+      "Squircle signature card shape (48px / 64px @supports)",
+      "Liquid-glass floating nav (SVG color-dispersion filter) — the one sanctioned glass",
+      "Lifted-paper depth (ambient + inset highlight)",
+      "motion-v (Vue) + framer-motion (React)",
+      "Settings drawer: rounded-3xl + 4-layer right-shadow + spring x-entry",
+      "Custom CSS-pseudo sliders with accent-track gradient fill"
     ],
     "rules": [
-      {
-        "name": "The Four-Rooms Rule",
-        "section": "colors",
-        "body": "Every theme is a complete identity, not a recolor. Switching data-color-scheme swaps the entire token graph atomically — ink, paper, accent, gradients, charts all change together. The site is not a SaaS with a 'dark mode toggle'; it is a study with four rooms, each with its own paint."
-      },
-      {
-        "name": "The One-Voice Rule",
-        "section": "colors",
-        "body": "A given screen uses ONE accent value, at ≤15% surface coverage. Bento nav indicator (bg-primary/20), primary CTA, focused ring, and one highlighted card are the entire accent vocabulary per view. The accent's rarity is the point."
-      },
-      {
-        "name": "The Theme-Not-Warmth Rule",
-        "section": "colors",
-        "body": "Tinted neutrals add 0.005–0.015 chroma toward the theme's own hue, not toward warm or cool 'because the brand feels that way.' Paper paper is tinted toward orange, not toward warmth; mist paper is tinted toward blue, not toward red. There is no 'always warm' or 'always cool' paper."
-      },
-      {
-        "name": "The CJK-First Rule",
-        "section": "typography",
-        "body": "The body stack must be CJK-capable on day one. The default is PingFang SC / Microsoft YaHei (every modern OS has one of these), and the HarmonyOS toggle adds 'HarmonyOS Sans' at the front. Averia is Latin-only and must NEVER be set as font-sans or applied to CJK content. CJK display lives in font-family-dongfang; CJK body lives in the body stack (default or harmonyos, both fine for CJK)."
-      },
-      {
-        "name": "The HarmonyOS-Is-An-Opt-In Rule",
-        "section": "typography",
-        "body": "HarmonyOS Sans is not the default body font — it is a user-level runtime toggle exposed in Settings → Appearance → Font. Default visitors never load the three .ttf files for visible content; they only pay the preload cost. New components must not assume HarmonyOS is the active body font. If a feature is meant to use HarmonyOS for non-display purposes (e.g. clock numerals), use font-family-harmonyos explicitly rather than relying on the toggle."
-      },
-      {
-        "name": "The One-Display-Font-Per-Moment Rule",
-        "section": "typography",
-        "body": "Averia and 东方大楷 do not appear in the same line of text. Averia carries Latin display, 东方大楷 carries CJK display. If a heading mixes scripts, the CJK portion uses 东方大楷 and the Latin portion uses Averia via font-family-{averia|dongfang} toggles per element."
-      },
-      {
-        "name": "The Label-Is-Label Rule",
-        "section": "typography",
-        "body": "Uppercase tracked labels (the Label row above) appear as eyebrows, kickers, version chips, and status badges. They are NEVER applied to body or paragraph text. One kicker per major section is voice; eyebrow-on-every-section is the AI scaffolding reflex."
-      },
-      {
-        "name": "The 4.5-Not-3 Rule",
-        "section": "typography",
-        "body": "Body text hits ≥4.5:1 against its surface; large display text (≥18px or bold ≥14px) hits ≥3:1. Muted gray 'for elegance' is the single biggest reason AI designs feel hard to read; the muted-text token is the floor, and any proposed token darker than that must justify itself."
-      },
-      {
-        "name": "The Lift-From-Below Rule",
-        "section": "elevation",
-        "body": "Surfaces lift by ambient occlusion underneath and a soft white inset highlight on top. They do not float by glassmorphism. backdrop-blur-* is reserved for floating UI over imagery (nav, dropdowns, modals); never for content cards on solid backgrounds."
-      },
-      {
-        "name": "The Reduced-Motion-Honors-Depth Rule",
-        "section": "elevation",
-        "body": "Every entrance animation gated on prefers-reduced-motion: reduce MUST still complete with the depth visible. Card entry by spring is fine; if reduced-motion is on, the card snaps in with its shadow intact. The shadow is the depth, not the entry."
-      },
-      {
-        "name": "The 12% Ceiling",
-        "section": "elevation",
-        "body": "Color-tinted shadows on primary actions use ≤30% alpha (shadow-primary/30). The shadow is the hint of an accent, not the accent itself. Going past 30% reads as a colored outline pretending to be a shadow."
-      },
-      {
-        "name": "The Inset-White-Highlight Rule",
-        "section": "elevation",
-        "body": "Bento cards, the floating nav, and the BasicDetail inner section all carry an inset white highlight at rgba(255,255,255,0.35) (light) or rgba(255,255,255,0.06) (dark). This is the 'paper held under a lamp' effect. The highlight is what separates this system from flat SaaS cards with one drop shadow."
-      },
-      {
-        "name": "The Layered-Shadow Rule",
-        "section": "elevation",
-        "body": "Theme-adaptive shadows are built from multiple color-mix(in oklch, var(--ink) N%, transparent) layers at increasing blur radius and decreasing alpha — never a fixed rgba(0,0,0,…). Reference implementations: BlogEditorView writing canvas (line 745) and BlogListItem card (resting)."
-      },
-      {
-        "name": "The No-Fixed-RGBA Rule",
-        "section": "elevation",
-        "body": "Hard-coded rgba(255,255,255,…) or rgba(0,0,0,…) shadows are a code-review red flag — they read as dark-on-dark halos in light themes and vanish in dark themes. Every surface shadow MUST derive from var(--ink) or var(--paper) through color-mix or oklch(from …). Use Tailwind's shadow-xs/sm/md utilities only for surfaces that don't need theme adaptation."
-      }
+      { "name": "The Four-Rooms Rule", "section": "colors", "body": "Every theme is a complete identity, not a recolor." },
+      { "name": "The One-Voice Rule", "section": "colors", "body": "ONE accent per screen, ≤15% coverage." },
+      { "name": "The Theme-Not-Warmth Rule", "section": "colors", "body": "Tinted neutrals lean toward the theme's own hue, not warm/cool by default." },
+      { "name": "The CJK-First Rule", "section": "typography", "body": "Body stack must be CJK-capable; Averia never renders CJK." },
+      { "name": "The Muted-Text-Is-A-Floor Rule", "section": "colors", "body": "Muted-text is the readability floor; re-audit against --paper whenever paper changes." },
+      { "name": "The Lift-From-Below Rule", "section": "elevation", "body": "Ambient occlusion + soft white inset highlight. The liquid-glass nav is the one sanctioned glass exception." },
+      { "name": "The No-Fixed-RGBA Rule", "section": "elevation", "body": "Shadows derive from --ink / --paper via color-mix (nav glass blocks are the sanctioned exception)." },
+      { "name": "The Directional-Shadow Exception", "section": "elevation", "body": "The settings drawer shadow falls left/up; all other surfaces are top-down symmetric." },
+      { "name": "The Height-Difference Selection Principle", "section": "components", "body": "Selection = border + bg-tint + shadow, never border-width alone." },
+      { "name": "The Drawer-Parity Rule", "section": "components", "body": "Vue + React settings drawers share identical visual specs (parity-migrated 2026-07)." }
     ],
     "dos": [
-      "Do use the semantic Tailwind utilities (bg-background, text-foreground, bg-primary, bg-muted, border-border, ring-ring, bg-chart-1..5, from-gradient-primary-from, bg-surface, bg-brand-devices). These are the Layer 3 contract. The project lints for hardcoded colors at the layer above.",
-      "Do declare new colors as a new theme in packages/brand/themes/<name>.css with the same 41-variable schema. Themes are the only way to add a color to the system.",
-      "Do use color-mix(in oklch, var(--ink) N%, transparent) for shadows that should adapt to the theme. Hardcoded rgba(0,0,0,0.X) shadows are a code review red flag.",
-      "Do apply prefers-reduced-motion to every entrance animation. motion-v and framer-motion degrade whileHover etc. automatically; custom keyframes (title-word-in, message-pop, card-breathe) need an explicit matchMedia check.",
-      "Do cap body line length at max-w-6xl (72rem). The blog, fishing, and bookshelf surfaces all use it.",
-      "Do use the squircle (corner-shape: squircle; border-radius: 90px) for primary floating surfaces (nav, bento cards, hero back button). The 48px fallback works without corner-shape support.",
-      "Do treat font-family-averia and font-family-dongfang as display-only. Body stays in the default stack.",
-      "Do make the active nav indicator a soft accent fill (bg-primary/20), not a colored bar, not an underline.",
-      "Do use the Label type style (uppercase, tracked, 11px) for short eyebrows, kickers, version chips. One kicker per major section.",
-      "Do keep the modal backdrop at bg-black/45 backdrop-blur-[10px] or lighter. Anything heavier is glassmorphism-as-decoration, banned.",
-      "Do when adding a new accent role (success, warning, destructive), match the existing oklch(0.696 0.17 162) / oklch(0.769 0.188 70) / oklch(0.577 0.245 27) values exactly across all ten themes. Semantic colors do not shift with the theme.",
-      "Do round modal panels to rounded-2xl (18px) or larger. Smaller radii feel like alert dialogs.",
-      "Do extend the squircle.css utility rather than redefining border-radius: 90px inline. One source for the signature shape."
+      "Do use semantic Tailwind utilities (bg-primary, text-foreground, bg-muted, border-border)",
+      "Do use color-mix(in oklch, var(--ink) N%, transparent) for theme-adaptive shadows",
+      "Do use the squircle (48px / 64px @supports corner-shape) for bento-style cards",
+      "Do use the liquid-glass nav (SVG url filter + backdrop-blur, 999px pill) for the floating nav only",
+      "Do use the nav's glass-button indicator (translateX slide, cubic-bezier(0.32, 0.72, 0, 1)), not a spring bg fill",
+      "Do use rounded-3xl for the settings drawer panel (only sanctioned radius above rounded-2xl)",
+      "Do use the asymmetric right-facing 4-layer shadow for the settings drawer only",
+      "Do carry live value-chips on the right of slider labels",
+      "Do use the capsule segmented control for 2–4 section switching"
     ],
     "donts": [
-      "Don't hardcode color values in component code. bg-black/75, text-white/90, from-violet-500/10 via-fuchsia-500/5 to-pink-500/10 are all banned by docs/rules/design-system.md. The @theme incline typo in frontend/src/assets/base.css:76 is a pre-existing bug — when fixed, those Tailwind classes will start working; the hex/rgba bans stay.",
-      "Don't ship a SaaS cream-bg dashboard. No bg-amber-50 body, no navy-and-gold fintech palette, no Tailwind starter look. The 10-theme oklch palette exists precisely to make 'cream default' impossible.",
-      "Don't ship AI-bento / eyebrow / glass cards. No text-xs tracking-[0.3em] uppercase eyebrow above every section. No bg-black/45 backdrop-blur-md decorative glass on user content. No bg-linear-to-br from-violet-500/10 via-fuchsia-500/5 to-pink-500/10 hover-glow on every card. The 13-card bento home is the only bento, and it is the kitchen, not the wallpaper.",
-      "Don't ship a tech-company marketing site aesthetic. No /pricing, no /enterprise, no comparison tables, no 'trusted by N teams' social proof. The site has no customers and does not want to look like it does.",
-      "Don't ship a generic editorial-magazine layout. Display serif + italic + drop caps + broadsheet grid is a saturated 2026 lane; if the brief is not literally magazine-shaped, do not translate to it.",
-      "Don't ship side-stripe borders. border-left or border-right greater than 1px as a colored accent on cards, list items, callouts, or alerts is banned. Use full borders, background tints, leading numbers, or nothing.",
-      "Don't ship gradient text. background-clip: text combined with a gradient background is decorative, never meaningful. Use a single solid color; emphasis comes from weight or size.",
-      "Don't ship the hero-metric template (big number, small label, supporting stats, gradient accent) — it is the SaaS cliché. Stats live as a chart or a list, not as a hero block.",
-      "Don't ship identical card grids. Same-sized cards with icon + heading + text, repeated endlessly, is the AI-default card pattern. Vary the surface: a list, a table, a chart, a single emphasized card, or nothing.",
-      "Don't ship the tiny uppercase tracked eyebrow above every section. One named kicker as a deliberate brand system is voice; an eyebrow on every section is AI grammar.",
-      "Don't ship numbered section markers (01 / 02 / 03) as default scaffolding. Numbers earn their place when the section IS a sequence (a real 3-step process, an ordered flow, a typed timeline) and the order carries information the reader needs. One deliberate numbered sequence on one page is voice; numbered eyebrows on every section across the site is AI grammar.",
-      "Don't ship text that overflows its container. Test heading copy at every breakpoint; if it overflows, reduce the clamp max or rewrite the copy. The viewport is part of the design.",
-      "Don't ship a specific rejected direction. The settings modal 文学手账 / 季节面板 / 命令中心 three-way (design-demos/), moments page v1/v2/v3, fishing weather card 诗意气象 / 天空剧场 (weather-card-redesign/) — these were walked and walked back. Do not propose them again.",
-      "Don't animate CSS layout properties unless truly needed. Translate, scale, opacity are the defaults; clip-path, mask, and shadow/glow are the premium materials when they materially improve the effect. Width/height/margin/padding transitions are layout, not motion.",
-      "Don't use motion as a fallback for missing depth. The lift-from-below shadow is the depth; motion is the acknowledgment of state change. If the shadow is missing, motion will not save it.",
-      "Don't ship bg-background or text-card-foreground in Vue. The Vue @theme incline typo means those classes have no Tailwind source. They work in React (the @theme inline block exposes them) but not in Vue. Use bg-background and text-foreground on the Vue side.",
-      "Don't ship the 阿里妈妈方圆体 (alibaba) font. It is defined in @theme but has zero component references. The display font is Averia (Latin) and 东方大楷 (CJK); the body font is HarmonyOS Sans.",
-      "Don't set font-family-averia on CJK content. Averia has no CJK glyphs; it will fall back to the body stack and look broken.",
-      "Don't ship a hero heading above 4.5rem (72px). clamp(1.875rem, 4vw + 1rem, 4.5rem) is the ceiling. Above that the page is shouting, not designing.",
-      "Don't ship tracking tighter than -0.04em on display headings. Letters touch; cramped, not 'designed.'",
-      "Don't ship z-index values like 999 or 9999 arbitrarily. The scale: z-0 base → z-10 sticky → z-50 modals/dropdowns → z-100 sidebar drawer → z-9999 nav (sits above modals) → z-99999 theme transition overlay. New layers pick from this scale.",
-      "Don't ship content visibility gated on a class-triggered transition. Reveal animations must enhance an already-visible default; transitions pause on hidden tabs and headless renderers, so the reveal never fires and the section ships blank."
+      "Don't hardcode color values (#hex, rgba(0,0,0,…)) in component code",
+      "Don't ship side-stripe borders (border-left/right > 1px as accent)",
+      "Don't ship graduated-numeral section markers — use clean capsule segments",
+      "Don't recreate the drawer from an outdated mental model (left-slide / spine / border-t)",
+      "Don't use modal/drawer radii below rounded-2xl for panels, rounded-3xl for the settings drawer",
+      "Don't conflate Tag Pills (lowercase, untracked) with Labels (uppercase, 0.18em tracked)",
+      "Don't extend the nav liquid-glass treatment to other surfaces — it is the one sanctioned glass"
     ]
   }
 }

@@ -57,14 +57,14 @@ class UserService:
     async def create_tokens(
         self, user: User, redis: AsyncRedis | None = None
     ) -> dict[str, str]:
-        """Generate access (1h) and refresh (7d) tokens.
+        """Generate access (24h) and refresh (7d) tokens.
 
         When *redis* is provided, the refresh token is stored at
         ``refresh:{user_id}`` so that logout / rotation can invalidate it.
         Passing ``None`` degrades gracefully (stateless, same as before).
         """
         access_token = create_access_token(
-            sub=str(user.id), expires=timedelta(hours=1)
+            sub=str(user.id), expires=timedelta(hours=24)
         )
         refresh_token = create_access_token(
             sub=str(user.id), expires=timedelta(days=7)
