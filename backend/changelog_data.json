@@ -1,5 +1,40 @@
 [
   {
+    "version": "4.8.0",
+    "date": "2026-07-16",
+    "title": "钓点详情与新建表单上线、偏好设置双端重构、Go 后端接口扩展",
+    "changes": [
+      {
+        "type": "feature",
+        "content": "钓点详情书房纸卡(照片墙+迷你地图+路线规划+内联编辑/删除)与新建钓点表单(交互地图选点+全字段,三面板互斥),重构 FishingMap 页面层次、分区入场动效与 color-mix 阴影语系"
+      },
+      {
+        "type": "feature",
+        "content": "偏好设置页重构并迁移 React 端设置抽屉,与 Vue SettingsModal 书房手账风格 1:1 对齐"
+      },
+      {
+        "type": "feature",
+        "content": "上传端点迁移至 Go v3 并新增 /upload 与 /upload-pic;Fish CRUD 端点、partial-update 指针 DTO 及 UTC 时间标准化"
+      },
+      {
+        "type": "feature",
+        "content": "开发任务看板新增手动刷新按钮"
+      },
+      {
+        "type": "fix",
+        "content": "修复 403 拦截器通知;Go 媒体文件缓存失效与 media path 错误;Patch 方法 CORS;DevTask 管理端点 cfg 注入"
+      },
+      {
+        "type": "refactor",
+        "content": "Repo 层统一 document types;Go service 接口化 + blog 双接口与 ctx 线程;Pagination 去重、service 构建收敛至 appstate、handler/service snake_case 重命名"
+      },
+      {
+        "type": "style",
+        "content": "前端多组件样式与 UI 打磨"
+      }
+    ]
+  },
+  {
     "version": "4.7.0",
     "date": "2026-07-14",
     "title": "开发任务看板 v3 全栈上线与双前端监控迁移",
