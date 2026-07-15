@@ -1,37 +1,50 @@
 <template>
+  <!--
+   * SettingsModal · 书房主面板 — v3.9
+   *
+   * 右侧抽屉内缩为一张"书房纸卡"，四层阴影（右+顶反光）跟随主题，
+   * 横向胶囊分段控件替代下划线 Tab。全部颜色走 Tailwind v4 @theme
+   * 语义令牌，无任何硬编码色值。
+   *
+   * 圆角: rounded-3xl (Tailwind v4 默认 1.5rem / 24px)
+   * 阴影: inline style + color‑mix 覆盖全局 :where([class~='border']) 的硬阴影
+   * 动效: motion‑v spring（与 project modal 定式同），抽屉自右滑入
+   * 动效降级: prefers‑reduced‑motion → opacity 切换
+   -->
   <Teleport to="body">
-    <transition
-      enter-active-class="transition-all duration-700 ease-in-out transform-gpu"
-      enter-from-class="translate-x-full"
-      enter-to-class="translate-x-0"
-      leave-active-class="transition-all duration-300"
-      leave-from-class="opacity-100 blur-0 translate-x-0"
-      leave-to-class="opacity-0 blur-sm translate-x-4"
-    >
-      <div
+    <AnimatePresence>
+      <motion.div
         v-if="modelValue"
+        :initial="{ opacity: 0, x: 40 }"
+        :animate="{ opacity: 1, x: 0 }"
+        :exit="{ opacity: 0, x: 40 }"
+        :transition="SPRING"
         class="fixed inset-0 z-9999 flex justify-end"
         @click.self="close"
       >
-        <!-- Drawer content -->
+        <!--
+          Drawer 面板 — 书房化
+          · 不再 h-full 贴顶贴底，左右留有呼吸
+          · rounded-3xl 给出"书房家具"的圆润感
+          · shadow-* 用 inline 覆盖全局 :where([class~='border']) 的硬阴影
+        -->
         <div
-          class="bg-background relative z-10 flex h-full w-full max-w-[480px] flex-col shadow-[inset_3px_0_0_0_var(--color-primary)]"
+          class="bg-background border-border/60 relative z-10 mx-4 my-6 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
+          :style="DRAWER_SHADOW"
+          role="dialog"
+          aria-modal="true"
+          aria-label="偏好设置"
         >
           <!-- 标题区 -->
-          <header class="relative px-8 pt-10 pb-6 text-center">
+          <header class="relative px-8 pt-12 pb-5 text-center">
+            <!-- 关闭按钮 — 保留圆形 -->
             <button
               @click="close"
-              class="text-muted-foreground hover:bg-muted hover:text-foreground absolute top-6 right-6 flex h-10 w-10 items-center justify-center rounded-full transition-colors active:scale-[0.96]"
+              class="text-muted-foreground hover:bg-muted hover:text-foreground absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full transition-colors active:scale-[0.96]"
               aria-label="关闭"
             >
               <IconClose class="h-5 w-5" />
             </button>
-
-            <div
-              class="text-muted-foreground mb-3 font-mono text-[10px] tracking-[0.4em] uppercase"
-            >
-              Chapter
-            </div>
 
             <h1
               class="text-foreground font-serif text-[28px] leading-tight font-semibold"
@@ -39,76 +52,92 @@
               偏好设置
             </h1>
 
-            <p class="text-muted-foreground mt-2 font-serif text-sm italic">
+            <p class="text-muted-foreground mt-1.5 font-serif text-sm italic">
               Customize your reading experience
             </p>
 
-            <div class="bg-primary mx-auto mt-6 h-px w-12" />
+            <!-- 书签式装饰：两侧小色点 + 中间梯度短横 -->
+            <div class="mt-5 flex items-center gap-2 px-16">
+              <span class="bg-primary/70 h-1 w-1 rounded-full" />
+              <span
+                class="from-gradient-decorative-from to-gradient-decorative-to h-px flex-1 bg-gradient-to-r"
+              />
+              <span class="bg-primary/70 h-1 w-1 rounded-full" />
+            </div>
           </header>
 
-          <!-- 章节书签 Tab -->
-          <nav class="flex items-end justify-center gap-2 px-8">
+          <!--
+            章节 Tab — 横向胶囊分段控件
+            底托 bg-muted + 激活项 bg-background 给出"高度差"指示
+          -->
+          <nav
+            aria-label="设置分组"
+            class="bg-muted mx-8 flex items-stretch justify-between gap-1 rounded-xl p-1"
+          >
             <button
-              v-for="(tab, i) in tabs"
+              v-for="tab in tabs"
               :key="tab.key"
               @click="activeTab = tab.key"
-              class="group relative flex w-[88px] flex-col items-center rounded-lg py-1 transition-colors active:scale-[0.96]"
+              class="relative flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ease-out active:scale-[0.97]"
+              :class="
+                activeTab === tab.key
+                  ? 'bg-background text-primary shadow-sm'
+                  : 'hover:text-foreground text-[color-mix(in_oklch,var(--ink)_55%,transparent)]'
+              "
             >
-              <span
-                class="font-serif text-[11px] tracking-[0.2em]"
-                :class="
-                  activeTab === tab.key
-                    ? 'text-primary'
-                    : 'text-muted-foreground'
-                "
-              >
-                {{ chapterNumerals[i] }}
-              </span>
-              <div
-                class="mt-1.5 flex w-full items-center justify-center border-b-2 border-transparent py-2 transition-colors"
-                :class="
-                  activeTab === tab.key
-                    ? 'border-primary bg-primary/5'
-                    : 'group-hover:bg-muted'
-                "
-              >
-                <span
-                  class="text-sm"
-                  :class="
-                    activeTab === tab.key
-                      ? 'text-primary font-semibold'
-                      : 'text-muted-foreground font-medium'
-                  "
-                >
-                  {{ tab.label }}
-                </span>
-              </div>
+              {{ tab.label }}
             </button>
           </nav>
 
-          <!-- 内容区 -->
-          <div class="flex-1 overflow-y-auto px-8 py-6">
-            <AppearanceTab v-show="activeTab === 'appearance'" />
-            <BackgroundTab v-show="activeTab === 'background'" />
-            <CardTab v-show="activeTab === 'card'" />
+          <!-- 内容区 — 内部切换用淡入淡出 -->
+          <div class="flex-1 overflow-y-auto px-8 py-5">
+            <transition
+              mode="out-in"
+              enter-active-class="transition-opacity duration-150 ease-out"
+              enter-from-class="opacity-0"
+              enter-to-class="opacity-100"
+              leave-active-class="transition-opacity duration-75"
+              leave-from-class="opacity-100"
+              leave-to-class="opacity-0"
+            >
+              <AppearanceTab
+                v-if="activeTab === 'appearance'"
+                key="appearance"
+              />
+              <BackgroundTab
+                v-else-if="activeTab === 'background'"
+                key="background"
+              />
+              <CardTab v-else key="card" />
+            </transition>
           </div>
 
-          <!-- 底部 -->
+          <!--
+            品牌签名 — 用居中渐变细线替代 border-t
+          -->
+          <div class="-mb-px px-8 pt-3">
+            <div
+              class="via-border h-px w-1/3 bg-gradient-to-r from-transparent to-transparent"
+            />
+          </div>
           <footer
-            class="border-border flex items-center justify-between border-t px-8 py-3 font-mono text-[11px]"
+            class="flex items-center justify-between px-8 pt-2 pb-4 font-mono text-[11px]"
           >
-            <span class="text-muted-foreground font-sans">Settings · v3.8</span>
+            <span class="text-muted-foreground font-sans"
+              >Settings · v4.7.0</span
+            >
             <span class="text-muted-foreground font-serif italic"
               >ka·no·ci·fer</span
-            >
+            />
           </footer>
         </div>
-      </div>
-    </transition>
+      </motion.div>
+    </AnimatePresence>
   </Teleport>
 </template>
 
 <script setup lang="ts">
+import { AnimatePresence, motion } from 'motion-v';
 import IconClose from '@/components/icons/IconClose.vue';
 import AppearanceTab from './AppearanceTab.vue';
 import BackgroundTab from './BackgroundTab.vue';
@@ -129,12 +158,27 @@ const close = () => {
 
 const activeTab = ref('appearance');
 
-// 壹貳叁 — 财务大写数字，营造章节感
-const chapterNumerals = ['壹', '貳', '叁'];
-
 const tabs = [
   { key: 'appearance', label: '外观' },
   { key: 'background', label: '背景' },
   { key: 'card', label: '卡片' },
 ];
+
+/*
+ * 抽屉入场 spring — 与 project modal 定式（DESIGN.md）一致。
+ * stiffness 320 + damping 32 + mass 0.8：快启、适中过冲、平滑止点。
+ */
+const SPRING = { type: 'spring' as const, stiffness: 320, damping: 32, mass: 0.8 };
+
+/*
+ * Drawer 面板阴影 — 三层向右 ambient + 顶部 inset 纸面反光。
+ * color-mix 让明暗主题自动追踪，遵守 No-Fixed-RGBA Rule。
+ * 用 inline style 覆盖全局 :where([class~='border']) 的硬阴影。
+ */
+const DRAWER_SHADOW = [
+  '0 -1px 1px color-mix(in oklch, var(--ink) 6%, transparent)',
+  '0 -8px 18px color-mix(in oklch, var(--ink) 8%, transparent)',
+  '0 -24px 40px color-mix(in oklch, var(--ink) 5%, transparent)',
+  'inset 0 1px 0 0 oklch(from var(--paper) l c h / 0.6)',
+].join(', ');
 </script>

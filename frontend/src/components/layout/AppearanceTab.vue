@@ -56,6 +56,19 @@ const schemes: {
     desc: '桃夭未央 · 3 色',
   },
 ];
+
+/*
+ * 共享卡片 class：border-2 → border、rounded-md → rounded-xl、
+ * active 态用 shadow-sm 给出高度差而非加粗边框。
+ * !shadow-sm 覆盖全局 :where([class~='border']) 硬阴影。
+ */
+const cardBase =
+  'flex w-full cursor-pointer items-stretch overflow-hidden rounded-xl border transition-colors';
+const cardDefault = 'border-border bg-background hover:border-primary';
+const cardActive = 'border-primary bg-primary/5 !shadow-sm';
+
+const smallCardBase =
+  'flex flex-col items-center gap-2 rounded-xl border p-3 transition-colors';
 </script>
 
 <template>
@@ -69,11 +82,11 @@ const schemes: {
         Display the page footer
       </p>
 
-      <div
+      <button
         @click="themeStore.toggleFooter()"
-        class="border-border bg-background hover:border-primary flex cursor-pointer items-center justify-between rounded-md border px-4 py-3 transition-colors"
+        class="flex w-full cursor-pointer items-center justify-between rounded-xl border border-border bg-background px-4 py-3 transition-colors hover:border-primary"
       >
-        <div>
+        <div class="text-left">
           <div class="text-foreground text-sm font-medium">显示页脚</div>
           <div class="text-muted-foreground mt-0.5 text-xs">
             Show footer on every page
@@ -81,7 +94,9 @@ const schemes: {
         </div>
         <div
           class="h-6 w-11 rounded-full p-0.5 transition-colors"
-          :class="themeStore.showFooter === 'true' ? 'bg-primary' : 'bg-muted'"
+          :class="
+            themeStore.showFooter === 'true' ? 'bg-primary' : 'bg-muted'
+          "
         >
           <div
             class="bg-background h-5 w-5 rounded-full shadow-md transition-transform"
@@ -92,7 +107,7 @@ const schemes: {
             "
           />
         </div>
-      </div>
+      </button>
     </div>
 
     <!-- 主题模式 -->
@@ -107,12 +122,12 @@ const schemes: {
           v-for="theme in themes"
           :key="theme.value"
           @click="selectTheme(theme.value as Theme, $event)"
-          class="flex flex-col items-center gap-2 rounded-md border-2 p-3 transition-colors"
-          :class="
+          :class="[
+            smallCardBase,
             themeStore.theme === theme.value
-              ? 'border-primary bg-primary/5'
-              : 'border-border bg-background hover:border-primary'
-          "
+              ? cardActive
+              : 'border-border bg-background hover:border-primary',
+          ]"
         >
           <span
             v-html="theme.icon"
@@ -146,17 +161,19 @@ const schemes: {
       <div class="grid grid-cols-2 gap-3">
         <button
           @click="themeStore.applyFont('default')"
-          class="flex flex-col items-center gap-1 rounded-md border-2 p-3 transition-colors"
-          :class="
+          :class="[
+            smallCardBase,
             themeStore.font === 'default'
-              ? 'border-primary bg-primary/5'
-              : 'border-border bg-background hover:border-primary'
-          "
+              ? cardActive
+              : 'border-border bg-background hover:border-primary',
+          ]"
         >
           <span
             class="text-sm font-semibold"
             :class="
-              themeStore.font === 'default' ? 'text-primary' : 'text-foreground'
+              themeStore.font === 'default'
+                ? 'text-primary'
+                : 'text-foreground'
             "
           >
             默认字体
@@ -167,15 +184,20 @@ const schemes: {
         </button>
         <button
           @click="themeStore.applyFont('harmonyos')"
-          class="flex flex-col items-center gap-1 rounded-md border-2 p-3 transition-colors"
-          :class="
+          :class="[
+            smallCardBase,
             themeStore.font === 'harmonyos'
-              ? 'border-primary bg-primary/5'
-              : 'border-border bg-background hover:border-primary'
-          "
+              ? cardActive
+              : 'border-border bg-background hover:border-primary',
+          ]"
         >
           <span
-            class="text-foreground text-sm font-semibold"
+            class="text-sm font-semibold"
+            :class="
+              themeStore.font === 'harmonyos'
+                ? 'text-primary'
+                : 'text-foreground'
+            "
             style="font-family: 'Noto Sans SC', sans-serif; font-weight: 500"
           >
             HarmonyOS Sans
@@ -196,19 +218,20 @@ const schemes: {
         Color scheme · 四种调性
       </p>
 
-      <div class="space-y-2.5">
+      <div class="space-y-2">
         <button
           v-for="scheme in schemes"
           :key="scheme.value"
           @click="themeStore.setScheme(scheme.value)"
-          class="flex w-full items-stretch overflow-hidden rounded-md border-2 transition-colors"
-          :class="
-            themeStore.scheme === scheme.value
-              ? 'border-primary bg-primary/5'
-              : 'border-border bg-background hover:border-primary'
-          "
+          :class="[
+            cardBase,
+            themeStore.scheme === scheme.value ? cardActive : cardDefault,
+          ]"
         >
-          <div v-if="scheme.colors.length > 1" class="flex w-[72px] flex-col">
+          <div
+            v-if="scheme.colors.length > 1"
+            class="flex w-[72px] flex-col overflow-hidden"
+          >
             <div
               v-for="(color, i) in scheme.colors"
               :key="i"

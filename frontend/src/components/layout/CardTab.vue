@@ -11,17 +11,35 @@ const { cardIndex, cardImages, setCardIndex } = useCardImage();
         卡片配图
       </h2>
       <p class="text-muted-foreground mb-4 text-xs italic">Card cover image</p>
-      <div class="grid grid-cols-3 gap-2.5">
+
+      <!-- 当前选中卡片预览 — 横版 -->
+      <div
+        class="relative mx-auto aspect-[16/9] w-full max-w-xs overflow-hidden rounded-xl border border-border/60 shadow-sm transition-all duration-200"
+      >
+        <div
+          class="h-full w-full transition-[background] duration-300"
+          :style="{
+            backgroundImage: `url(${cardImages[cardIndex]})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }"
+        />
+      </div>
+
+      <!-- 三选一切换器 — 横排缩略图 -->
+      <div class="mt-4 flex justify-center gap-3">
         <button
           v-for="(image, i) in cardImages"
           :key="i"
           @click="setCardIndex(i)"
-          class="aspect-[3/4] overflow-hidden rounded-md border-2 transition-colors"
+          class="aspect-[16/9] w-16 overflow-hidden rounded-lg border transition-all duration-200"
           :class="
             cardIndex === i
-              ? 'border-primary'
-              : 'border-border hover:border-primary'
+              ? 'border-primary !shadow-sm scale-105'
+              : 'border-border/60 opacity-70 hover:opacity-100 hover:border-primary'
           "
+          :aria-label="`卡片 ${i + 1}`"
+          :aria-pressed="cardIndex === i"
         >
           <div
             class="h-full w-full"

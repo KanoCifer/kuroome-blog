@@ -1,14 +1,13 @@
 import { computed, ref } from 'vue';
 
-const STATIC_IMAGES = Array.from(
+/*
+ * 卡片封面图库 — 三张本地静态图。
+ * 顺序与 /card/card-{1,2,3}-thumb.jpeg 一一对应。
+ */
+const CARD_IMAGES: readonly string[] = Array.from(
   { length: 3 },
   (_, i) => `/card/card-${i + 1}-thumb.jpeg`,
 );
-
-const CARD_IMAGES: readonly string[] = [
-  ...STATIC_IMAGES,
-  `https://picsum.photos/300/200`,
-];
 
 const CARD_KEY = 'readinglist_card_imgae_index';
 
