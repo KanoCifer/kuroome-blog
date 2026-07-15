@@ -31,6 +31,7 @@ from app.api.v2 import public as public_v2
 from app.api.v2 import (
     weread as weread_v2,
 )
+from app.utils.media import _get_media_root
 
 if TYPE_CHECKING:
     from fastapi import FastAPI
@@ -62,7 +63,7 @@ def register_router(app: FastAPI):
 
 
 def setup_media(app: FastAPI) -> None:
-    media_dir: Path = Path(__file__).resolve().parent.parent / "media"
+    media_dir: Path = _get_media_root()
     app.mount(
         path="/api/v1/media/",
         app=StaticFiles(directory=media_dir),

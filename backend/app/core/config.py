@@ -63,6 +63,8 @@ class Settings(BaseSettings):
     # DB 持久化阈值：仅 ≥ 此级别入库，避免 Log 表随业务量膨胀（默认 WARNING）
     DB_LOG_LEVEL: str = "WARNING"
 
+    MEDIA_PATH: str = ""
+
     model_config = SettingsConfigDict(
         env_file=get_env_file_path(),
         env_file_encoding="utf-8",

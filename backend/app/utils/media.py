@@ -9,6 +9,7 @@ from pathlib import Path
 import pillow_heif
 from fastapi import UploadFile, status
 
+from app.core.config import get_settings
 from app.core.exceptions import APIError
 
 # 注册 HEIF 解码器,使 PIL.Image 能打开 .heic/.heif 文件
@@ -34,8 +35,8 @@ _HEIF_EXT_BY_TYPE = {
 
 
 def _get_media_root() -> Path:
-    env_media = os.environ.get("MEDIA_PATH")
-    if env_media:
+    env_media = get_settings().MEDIA_PATH
+    if env_media != "":
         return Path(env_media)
     return Path(__file__).resolve().parent.parent.parent / "media"
 

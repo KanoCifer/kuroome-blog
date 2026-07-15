@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from fastapi import APIRouter, Depends, WebSocket
-from redis.asyncio import Redis
+
+if TYPE_CHECKING:
+    from redis.asyncio import Redis
 
 from app.api.des.appstate import get_app_state
 from app.appstate import AppState
