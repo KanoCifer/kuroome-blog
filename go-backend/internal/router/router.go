@@ -66,5 +66,7 @@ func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
 	uploadH.RegisterRoutes(v3, middleware.AuthMiddleware())
 
 	// 媒体静态服务：把上传的文件以 /api/v3/media/* 暴露，对齐 handler 返回的 url。
+	// 挂在 Static 前，给响应打上公共缓存头，让 CDN 缓存命中（7d，uuid 命名不可变）。
+	r.Use(middleware.MediaCacheMiddleware())
 	r.Static("/api/v3/media", state.Cfg().Upload.UploadDir)
 }
