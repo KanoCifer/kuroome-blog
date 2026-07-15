@@ -9,9 +9,10 @@ import HourlyChartCard from '@/views/fishing/dashboard/HourlyChartCard.vue';
 import IndexHeroCard from '@/views/fishing/dashboard/IndexHeroCard.vue';
 import MapContainer from '@/views/fishing/map/MapContainer.vue';
 import SpotDetailPanel from '@/views/fishing/map/SpotDetailPanel.vue';
-import SpotFormModal from '@/views/fishing/map/SpotFormModal.vue';
 import QuickFeedbackBanner from '@/views/fishing/dashboard/QuickFeedbackBanner.vue';
+import SpotFormPanel from '@/views/fishing/map/SpotFormPanel.vue';
 import { useFishingDashboard } from '@/views/fishing/composables/useFishingDashboard';
+import { MapPin } from '@lucide/vue';
 import { onMounted } from 'vue';
 
 const dash = useFishingDashboard();
@@ -25,8 +26,8 @@ onMounted(dash.init);
     <DashboardHeader
       :analysis-open="dash.analysisOpen.value"
       :analysis-has-data="dash.analysisHasData.value"
-      @toggle-analysis="analysis.toggle"
-      @add-spot="dash.openAddModal"
+      @toggle-analysis="dash.toggleAnalysis"
+      @add-spot="dash.openSpotForm"
     />
 
     <main
@@ -52,7 +53,7 @@ onMounted(dash.init);
             @map-ready="dash.onMapReady"
             @clear-route="dash.onClearRoute"
             @error="dash.onMapError"
-            @add-spot="dash.openAddModal"
+            @add-spot="dash.openSpotForm"
           />
         </div>
 
@@ -111,31 +112,43 @@ onMounted(dash.init);
       @spot-deleted="dash.onSpotDeleted"
     />
 
-    <SpotFormModal
-      :open="dash.addModalOpen.value"
+    <SpotFormPanel
+      :open="dash.formOpen.value"
       :initial-center="dash.activeLocation.value"
-      @close="dash.closeAddModal"
+      @close="dash.closeSpotForm"
       @created="dash.onSpotCreated"
     />
   </div>
 </template>
 
 <style scoped>
+/*
+ * 地图容器阴影 —— 与右侧书房纸卡共享 color-mix 阴影语系。
+ * 静止态仅薄边 + 极轻 ambient;hover 抬起两层向右 ambient。
+ * 全部走 color-mix,遵守 No-Fixed-RGBA Rule。
+ */
 .fishing-map-wrapper {
   position: relative;
   transition:
     transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 240ms cubic-bezier(0.22, 1, 0.36, 1),
     border-color 240ms ease;
+  box-shadow:
+    0 -1px 1px color-mix(in oklch, var(--ink) 4%, transparent),
+    0 -4px 8px color-mix(in oklch, var(--ink) 3%, transparent);
 }
 .fishing-map-wrapper:hover {
   transform: translateY(-2px);
   box-shadow:
-    0 8px 22px -8px oklch(0% 0 0 / 0.14),
-    0 2px 6px -2px oklch(0% 0 0 / 0.06);
+    0 -8px 18px color-mix(in oklch, var(--ink) 8%, transparent),
+    0 -24px 40px color-mix(in oklch, var(--ink) 5%, transparent);
 }
 
-@keyframes fishing-dashboard-rise {
+/* —— 分区入场 stagger ——
+ * 不再整体 grid 统一 rise;每个子区块按阅读序淡入上滑,
+ * 给出从容的书斋节奏。prefers-reduced-motion → opacity 切换。
+ */
+@keyframes fishing-section-rise {
   from {
     opacity: 0;
     transform: translateY(10px);
@@ -146,8 +159,23 @@ onMounted(dash.init);
   }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .fishing-dashboard {
-    animation: fishing-dashboard-rise 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  .fishing-dashboard > * {
+    animation: fishing-section-rise 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .fishing-dashboard > *:nth-child(1) {
+    animation-delay: 0ms;
+  }
+  .fishing-dashboard > *:nth-child(2) {
+    animation-delay: 70ms;
+  }
+  .fishing-dashboard > *:nth-child(3) {
+    animation-delay: 140ms;
+  }
+  .fishing-dashboard > *:nth-child(4) {
+    animation-delay: 210ms;
+  }
+  .fishing-dashboard > *:nth-child(5) {
+    animation-delay: 280ms;
   }
 }
 
@@ -165,7 +193,7 @@ onMounted(dash.init);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fishing-dashboard {
+  .fishing-dashboard > * {
     animation: none;
   }
   .fishing-map-wrapper:hover {

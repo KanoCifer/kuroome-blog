@@ -6,7 +6,7 @@
  * - 静态(默认):单标记、无交互(缩放/拖拽/滚轮全部禁用),仅作位置示意。
  *   SpotDetailPanel 用法,保持不变。
  * - 交互:允许缩放 / 拖拽 / 点击;点击地图放置 / 移动图钉,emit update:position。
- *   SpotFormModal 添加钓点小地图用法。
+ *   SpotFormPanel 添加钓点小地图用法。
  *
  * 复用主地图的 loadAMapNamespace(脚本已缓存,二次调用直接返回)与标记 SVG。
  */

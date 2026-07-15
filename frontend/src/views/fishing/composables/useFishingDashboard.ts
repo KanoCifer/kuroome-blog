@@ -50,6 +50,9 @@ export function useFishingDashboard() {
    */
   const activePanelMarker = ref<MapMarker | null>(null);
   function openSpotPanel(marker: MapMarker): void {
+    // 三面板互斥:打开详情前关闭表单 + AI 分析
+    closeSpotForm();
+    analysis.close();
     activePanelMarker.value = marker;
     panelOpen.value = true;
   }
@@ -72,13 +75,16 @@ export function useFishingDashboard() {
     );
   }
 
-  // ── 新增钓点 Modal ──
-  const addModalOpen = ref(false);
-  function openAddModal(): void {
-    addModalOpen.value = true;
+  // ── 新增钓点 Panel ──
+  const formOpen = ref(false);
+  function openSpotForm(): void {
+    // 三面板互斥:打开表单前关闭详情 + AI 分析
+    closeSpotPanel();
+    analysis.close();
+    formOpen.value = true;
   }
-  function closeAddModal(): void {
-    addModalOpen.value = false;
+  function closeSpotForm(): void {
+    formOpen.value = false;
   }
   /**
    * 新增钓点后端 create 不返回实体,按名称匹配新钓点 → 同步列表 → 打开详情面板。
@@ -106,6 +112,13 @@ export function useFishingDashboard() {
    * 规划路线操作内嵌到 Panel 内(由 Panel 回调 marker 触发 planFromMarker),
    * 保留 index ↔ spot 双引用供路线规划使用。
    */
+  /** AI 分析开关 —— 三面板互斥:打开前关闭表单 + 详情 */
+  function toggleAnalysis(): void {
+    closeSpotForm();
+    closeSpotPanel();
+    analysis.toggle();
+  }
+
   function onMarkerClick(payload: MarkerClickPayload): void {
     if (!payload.spot.extraData) return;
     route.selectedSpotIndex.value = payload.index;
@@ -169,10 +182,9 @@ export function useFishingDashboard() {
     activeLocation,
     indexData,
 
-    // 新增钓点 Modal
-    addModalOpen,
-    openAddModal,
-    closeAddModal,
+    // 新增钓点 Panel
+    formOpen,
+    closeSpotForm,
     onSpotCreated,
 
     // 钓点详情 Panel
@@ -207,6 +219,8 @@ export function useFishingDashboard() {
     showFeedbackBanner,
 
     // handlers
+    openSpotForm,
+    toggleAnalysis,
     onMarkerClick,
     onClearRoute,
     onFeedbackClick,
