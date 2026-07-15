@@ -1,5 +1,8 @@
 <template>
-  <motion.nav class="nav liquid-glass z-9999 px-7 py-1">
+  <motion.nav
+    aria-label="主导航"
+    class="nav liquid-glass px-9 py-1"
+  >
     <ul class="flex items-center gap-2 font-medium">
       <!-- Brand: avatar + 文字 logo -->
       <li class="ml-1 flex shrink-0 items-center gap-2 pr-2">
@@ -8,13 +11,13 @@
             v-if="auth.isAuthenticated && auth.user?.photo"
             :src="avatarUrl"
             :alt="currentUserName"
-            class="h-10 w-10 rounded-full object-cover ring-2 ring-white/50 transition-transform hover:scale-105 dark:ring-gray-700/50"
+            class="h-10 w-10 rounded-full object-cover ring-2 ring-white/50 outline -outline-offset-1 outline-black/10 transition-[transform] duration-150 ease-out active:scale-[0.96] dark:ring-gray-700/50 dark:outline-white/10"
           />
           <img
             v-else
             src="/images/about-thumb.webp"
             alt="Default Avatar"
-            class="h-10 w-10 rounded-full object-cover ring-2 ring-white/50 transition-transform hover:scale-105 dark:ring-gray-700/50"
+            class="h-10 w-10 rounded-full object-cover ring-2 ring-white/50 outline -outline-offset-1 outline-black/10 transition-[transform] duration-150 ease-out active:scale-[0.96] dark:ring-gray-700/50 dark:outline-white/10"
           />
         </RouterLink>
         <RouterLink
@@ -25,28 +28,85 @@
         </RouterLink>
       </li>
       <!-- Navigation Labels (圆中文字) -->
-      <li class="relative ml-20 flex items-center gap-5 px-2">
+      <li class="relative ml-16 flex items-center gap-2 px-5">
         <!-- Indicator -->
-        <motion.div
-          class="bg-primary/10 pointer-events-none absolute top-1/2 left-0 z-1 h-12 w-[64px] -translate-y-1/2 rounded-full shadow-sm"
-          :animate="{ x: indicatorX }"
-          :transition="{ type: 'spring', stiffness: 320, damping: 30 }"
+        <span
+          class="indicator liquid-glass-button absolute top-1/2 left-0 z-1 h-11 w-20 -translate-y-1/2 rounded-full"
+          :style="{ transform: `translateX(${indicatorX}px)` }"
         />
-        <!-- Nav Items: 英文标签 -->
+        <!-- Nav Items: icon + 英文标签 -->
         <RouterLink
-          v-for="(item, index) in navItems"
+          v-for="item in navItems"
           :key="item.to"
           :to="item.to"
-          class="nav-text relative z-10 flex h-12 w-[64px] items-center justify-center rounded-full font-serif text-sm leading-none transition-colors"
-          :class="{
-            'font-semibold': isActive(item.to),
-          }"
           :aria-label="item.ariaLabel"
-          @mouseenter="hoveredIndex = index"
-          @mouseleave="hoveredIndex = activeIndex"
+          :aria-current="isActive(item.to) ? 'page' : undefined"
+          class="nav-text nav-link relative z-10 flex h-11 w-20 flex-col items-center justify-center gap-1 text-[13px] leading-none transition-[transform,background-color,color,opacity] duration-150 ease-out active:scale-[0.96]"
+          :class="{ 'opacity-40 hover:opacity-70': !isActive(item.to) }"
         >
-          {{ item.label }}
+          <component :is="item.icon" :size="20" stroke-width="1.75" />
+          <span>{{ item.label }}</span>
         </RouterLink>
+      </li>
+      <!-- Others: hover dropdown — routes not shown in the pill strip -->
+      <li class="relative flex items-center">
+        <button
+          type="button"
+          @mouseenter="openOthers"
+          @mouseleave="closeOthers"
+          :aria-expanded="isOthersOpen || undefined"
+          aria-haspopup="true"
+          class="nav-text nav-link liquid-glass-button relative flex h-11 items-center gap-1.5 rounded-full px-4 text-[13px] leading-none transition-[transform,background-color,color] duration-150 ease-out active:scale-[0.96]"
+          :class="{
+            'opacity-100': isOthersActive,
+            'opacity-40 hover:opacity-70': !isOthersActive,
+          }"
+        >
+          <Ellipsis :size="18" stroke-width="1.75" />
+          <span>Others</span>
+          <ChevronDown
+            :size="12"
+            class="transition-transform duration-150"
+            :class="{ 'rotate-180': isOthersOpen }"
+          />
+        </button>
+        <transition
+          enter-active-class="transition-all transform-gpu duration-200 ease-out"
+          enter-from-class="opacity-0 scale-95 -translate-y-1"
+          enter-to-class="opacity-100 scale-100 translate-y-0"
+          leave-active-class="transition-all transform-gpu duration-150 ease-in"
+          leave-from-class="opacity-100 scale-100 translate-y-0"
+          leave-to-class="opacity-0 scale-95 -translate-y-1"
+        >
+          <div
+            v-if="isOthersOpen"
+            @mouseenter="openOthers"
+            @mouseleave="closeOthers"
+            class="absolute top-full right-0 z-50 mt-2 w-52 rounded-2xl p-1.5 ring-1 ring-black/5 dark:ring-white/10"
+            style="background: rgb(255 255 255 / 0.72); -webkit-backdrop-filter: blur(10px) saturate(1.4); backdrop-filter: blur(10px) saturate(1.4);"
+          >
+            <RouterLink
+              v-for="item in othersRouteItems"
+              :key="item.to"
+              :to="item.to"
+              @click="closeOthersImmediately"
+              class="nav-text flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition-colors duration-150 hover:bg-black/5 dark:hover:bg-white/10"
+            >
+              <component :is="item.icon" :size="16" stroke-width="1.75" />
+              <span>{{ item.label }}</span>
+            </RouterLink>
+            <button
+              v-for="item in othersActionItems"
+              :key="item.label"
+              type="button"
+              @click="item.action"
+              class="nav-text flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition-colors duration-150 hover:bg-black/5 dark:hover:bg-white/10"
+            >
+              <component :is="item.icon" :size="16" stroke-width="1.75" />
+              <span>{{ item.label }}</span>
+            </button>
+          </div>
+        </transition>
       </li>
     </ul>
   </motion.nav>
@@ -54,31 +114,142 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '@/auth/stores/auth';
-import { useDebounce } from '@vueuse/core';
+import {
+  BookOpenText,
+  ChevronDown,
+  Ellipsis,
+  CreditCard,
+  Globe,
+  House,
+  Images,
+  Info,
+  Link,
+  ListChecks,
+  Map,
+  MessageCircleHeart,
+  Newspaper,
+  Rss,
+  ScrollText,
+  Shield,
+  Smartphone,
+  Wrench,
+} from '@lucide/vue';
 import { motion } from 'motion-v';
-import { computed, ref, watch } from 'vue';
+import type { Component } from 'vue';
+import { computed, onUnmounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
+
+interface NavItem {
+  to: string;
+  label: string;
+  icon: Component;
+  ariaLabel: string;
+}
 
 const auth = useAuthStore();
 const route = useRoute();
 
 // Navigation items config
-// 英文标签 + 完整 ariaLabel 给屏幕阅读器
-const navItems = [
-  { to: '/', label: 'Home', ariaLabel: 'Home' },
-  { to: '/blog', label: 'Blog', ariaLabel: 'Blog' },
-  { to: '/moments', label: 'Moments', ariaLabel: 'Moments' },
-  { to: '/bookshelf', label: 'Bookshelf', ariaLabel: 'Bookshelf' },
-  { to: '/gallery', label: 'Gallery', ariaLabel: 'Gallery' },
-  { to: '/version-log', label: 'Log', ariaLabel: 'Changelog' },
+// icon + 英文标签 + 完整 ariaLabel 给屏幕阅读器
+const navItems: NavItem[] = [
+  { to: '/', label: 'Home', icon: House, ariaLabel: 'Home' },
+  { to: '/blog', label: 'Blog', icon: Newspaper, ariaLabel: 'Blog' },
+  {
+    to: '/moments',
+    label: 'Moments',
+    icon: MessageCircleHeart,
+    ariaLabel: 'Moments',
+  },
+  {
+    to: '/bookshelf',
+    label: 'Bookshelf',
+    icon: BookOpenText,
+    ariaLabel: 'Bookshelf',
+  },
+  { to: '/gallery', label: 'Gallery', icon: Images, ariaLabel: 'Gallery' },
+  {
+    to: '/version-log',
+    label: 'Log',
+    icon: ScrollText,
+    ariaLabel: 'Changelog',
+  },
+];
+
+// Others dropdown: orphan routes + utility entries not given a pill in the strip.
+// `to` = 路由链接；`action` = 按钮行为（如外部跳转移动版）
+interface OthersItem {
+  label: string;
+  icon: Component;
+  to?: string;
+  action?: () => void;
+}
+
+const othersItems: OthersItem[] = [
+  { to: '/about', label: 'About', icon: Info },
+  { to: '/websites', label: 'Websites', icon: Globe },
+  { to: '/friend-links', label: 'Friends', icon: Link },
+  { to: '/privacy', label: 'Privacy', icon: Shield },
+  { to: '/toolbox/image-toolbox', label: 'Image Tool', icon: Wrench },
+  { to: '/status', label: 'Status', icon: ListChecks },
+  { to: '/todos', label: 'Dev Tasks', icon: ListChecks },
+  { to: '/fishing-map', label: 'Fishing', icon: Map },
+  { to: '/rss', label: 'RSS', icon: Rss },
+  { to: '/subscription', label: 'Subscription', icon: CreditCard },
+  { label: 'Mobile', icon: Smartphone, action: switchToMobile },
 ];
 
 // State
-const hoveredIndex = ref(0);
 const activeIndex = ref(0);
-const debouncedHoveredIndex = useDebounce(hoveredIndex, 40);
-// 按钮宽 64 + li gap 8 = 72；li 内边距 8 (px-2)
-const indicatorX = computed(() => debouncedHoveredIndex.value * 84 + 8);
+// 按钮宽 80 + li gap 8 = 88；li 内边距 20 (px-5)
+const indicatorX = computed(() => activeIndex.value * 88 + 20);
+
+// Others dropdown state
+const isOthersOpen = ref(false);
+let othersCloseTimeout: ReturnType<typeof setTimeout> | null = null;
+
+const isOthersActive = computed(() =>
+  othersItems.some((item) => item.to && isActive(item.to)),
+);
+
+const othersRouteItems = computed(
+  () => othersItems.filter((item): item is OthersItem & { to: string } => !!item.to),
+);
+
+const othersActionItems = computed(
+  () => othersItems.filter((item): item is OthersItem & { action: () => void } => !!item.action),
+);
+
+// 切换到移动版：写 device_force=react cookie 后跳转到 m.kanocifer.chat
+// 与 FloatingActionButtons.switchToMobile 保持同源逻辑
+function switchToMobile() {
+  closeOthersImmediately();
+  const expires = new Date();
+  expires.setTime(expires.getTime() + 30 * 24 * 60 * 60 * 1000);
+  document.cookie = `device_force=react;expires=${expires.toUTCString()};path=/;domain=.kanocifer.chat`;
+  window.location.href = 'https://m.kanocifer.chat';
+}
+
+const openOthers = () => {
+  if (othersCloseTimeout) {
+    clearTimeout(othersCloseTimeout);
+    othersCloseTimeout = null;
+  }
+  isOthersOpen.value = true;
+};
+
+const closeOthers = () => {
+  othersCloseTimeout = setTimeout(() => {
+    isOthersOpen.value = false;
+  }, 150);
+};
+
+const closeOthersImmediately = () => {
+  if (othersCloseTimeout) {
+    clearTimeout(othersCloseTimeout);
+    othersCloseTimeout = null;
+  }
+  isOthersOpen.value = false;
+};
 
 // Check if route is active
 const isActive = (path: string) => {
@@ -96,11 +267,16 @@ watch(
     const index = navItems.findIndex((item) => isActive(item.to));
     if (index !== -1) {
       activeIndex.value = index;
-      hoveredIndex.value = index;
     }
   },
   { immediate: true },
 );
+
+onUnmounted(() => {
+  if (othersCloseTimeout) {
+    clearTimeout(othersCloseTimeout);
+  }
+});
 
 // Computed
 const currentUserName = computed(() => auth.user?.name || '未登录');
@@ -116,17 +292,61 @@ const avatarUrl = computed(() => {
 </script>
 
 <style scoped>
+.indicator {
+  pointer-events: none;
+
+  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
 .nav-text {
   color: black;
+  font-weight: 600;
 }
+
+/* 键盘焦点环：项目标准 3px ring-ring，仅 focus-visible 时出现 */
+.nav-link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+  border-radius: 999px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .indicator {
+    transition: none;
+  }
+}
+
 .dark .nav-text {
   color: white;
+}
+
+/* 选中指示器：玻璃凸起的"按键"，与父容器 liquid-glass 同质但层次更亮
+   半透白底 + 上侧内侧高光(玻璃受光面) + 下侧环境阴影(浮起投影) */
+.liquid-glass-button {
+  background: rgb(255 255 255 / 0.28);
+  border: 1px solid rgb(255 255 255 / 0.4);
+  box-shadow:
+    inset 0 1px 1px rgb(255 255 255 / 0.6),
+    inset 0 -1px 2px rgb(0 0 0 / 0.04),
+    0 2px 6px rgb(0 0 0 / 0.06),
+    0 1px 2px rgb(0 0 0 / 0.04);
+}
+
+.dark .liquid-glass-button {
+  background: rgb(255 255 255 / 0.1);
+  border-color: rgb(255 255 255 / 0.12);
+  box-shadow:
+    inset 0 1px 1px rgb(255 255 255 / 0.12),
+    inset 0 -1px 2px rgb(0 0 0 / 0.1),
+    0 2px 6px rgb(0 0 0 / 0.2),
+    0 1px 2px rgb(0 0 0 / 0.15);
 }
 
 /* 液态玻璃效果：SVG 色散 + 毛玻璃 + 饱和度补偿 + 双层内阴影模拟玻璃厚度
    详见 index.html 中 #nav-liquid-glass filter 定义
    浅色模式用半透白做光雾，深色模式切到半透 paper (var(--paper)/40) 透出深色背景
    — 跟随主题自动切基色，深/浅都通透 */
+
 .liquid-glass {
   border-radius: 999px;
   background: rgb(255 255 255 / 0.06);

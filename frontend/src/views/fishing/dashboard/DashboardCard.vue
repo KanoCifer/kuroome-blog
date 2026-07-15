@@ -78,7 +78,7 @@ const whileHover = computed(() => {
     :transition="{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }"
     class="group fishing-card bg-background border-border relative flex h-full flex-col overflow-hidden rounded-3xl border shadow-sm"
     :class="[
-      tone === 'hero' && 'fishing-card--hero shadow-md',
+      tone === 'hero' && 'border-border shadow-md',
       interactive && 'fishing-card--interactive cursor-pointer',
       padding === 'default' && 'p-6',
       padding === 'tight' && 'p-4',
@@ -100,17 +100,6 @@ const whileHover = computed(() => {
 .fishing-card {
   transition: border-color 240ms ease;
   will-change: transform;
-}
-
-/*
- * Hero 卡片:渐变描边 (.hero-glow) + 斜向扫光 (.hero-sweep)
- * 父级 .fishing-card--hero:hover 触发,与 motion-v 浮起同步出现
- */
-.fishing-card--hero {
-  border-color: oklch(from var(--primary) l c h / 0.3);
-}
-.fishing-card--hero:hover {
-  border-color: oklch(from var(--primary) l c h / 0.6);
 }
 
 .hero-glow {

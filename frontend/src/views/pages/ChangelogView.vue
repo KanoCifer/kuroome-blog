@@ -55,7 +55,7 @@ const getTypeClass = (type: string): string => {
 <template>
   <div
     id="changelogView"
-    class="my-12 flex min-h-full w-full flex-col items-center justify-center py-12"
+    class="my-12 flex min-h-screen w-full flex-col items-center justify-center py-12"
   >
     <div class="w-full max-w-6xl px-4">
       <!-- Header Section -->

@@ -15,7 +15,6 @@ const bgStore = useBackgroundStore();
 const themeStore = useThemeStore();
 
 const route = useRoute();
-const layoutContainer = ref<HTMLElement | null>(null);
 const isEntryView = ref<boolean>(false);
 const isAboutView = ref<boolean>(false);
 // 延迟初始值：首次 watch immediate 执行前不渲染任何导航组件，
@@ -61,10 +60,10 @@ const transitionName = computed(
       aria-hidden="true"
     >
       <Transition
-        enter-active-class="transition-opacity duration-500 ease-in-out"
+        enter-active-class="transition-opacity duration-300 ease-out"
         enter-from-class="opacity-0"
         enter-to-class="opacity-100"
-        leave-active-class="transition-opacity duration-500 ease-in-out"
+        leave-active-class="transition-opacity duration-300 ease-in"
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
@@ -129,7 +128,7 @@ const transitionName = computed(
         :initial="{ opacity: 0, y: -40, left: '50%' }"
         :exit="{ opacity: 0, y: -40 }"
         :transition="{ type: 'spring', bounce: 0.3, duration: 0.5 }"
-        class="group fixed top-12 z-50 -translate-x-1/2 -translate-y-1/2"
+        class="group fixed top-12 z-9999 -translate-x-1/2 -translate-y-1/2"
       />
     </AnimatePresence>
 
@@ -139,55 +138,69 @@ const transitionName = computed(
 </template>
 
 <style scoped>
-/* fade — login */
+/* 页面切换动画: 精确属性 + 统一缓动 + 进出对称 + GPU 提示 + 减动守卫 */
+
+/* fade — login: 纯淡入淡出 */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s ease;
+  transition: opacity 0.15s cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: opacity;
+}
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
 }
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
 }
 
-/* slide-up — register / default */
-.slide-up-enter-active,
+/* slide-up — register / default: jg-tab-in 缓动 (snap in, soft out) */
+@keyframes tab-in {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes tab-out {
+  0% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+.slide-up-enter-active {
+  animation: tab-in 0.28s cubic-bezier(0.32, 0.72, 0, 1) both;
+  will-change: transform, opacity;
+}
 .slide-up-leave-active {
-  transition: all 0.3s ease-out;
-}
-.slide-up-enter-from {
-  transform: translateY(20px);
-  opacity: 0;
-}
-.slide-up-leave-to {
-  transform: translateY(-10px);
-  opacity: 0;
+  animation: tab-out 0.28s cubic-bezier(0.32, 0.72, 0, 1) both;
+  will-change: transform, opacity;
 }
 
-/* slide-left — settings */
-.slide-left-enter-active,
-.slide-left-leave-active {
-  transition: all 0.3s ease-out;
-}
-.slide-left-enter-from {
-  transform: translateX(30px);
-  opacity: 0;
-}
-.slide-left-leave-to {
-  transform: translateX(-30px);
-  opacity: 0;
-}
-
-/* scale — bookshelf */
-.scale-enter-active,
-.scale-leave-active {
-  transition: all 0.35s ease-out;
-}
-.scale-enter-from {
-  transform: scale(0.95);
-  opacity: 0;
-}
-.scale-leave-to {
-  transform: scale(1.02);
-  opacity: 0;
+/* 减动偏好: 用户要求减少动画时禁用所有过渡和动画 */
+@media (prefers-reduced-motion: reduce) {
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: none !important;
+  }
+  .slide-up-enter-active,
+  .slide-up-leave-active {
+    animation: none !important;
+  }
+  .fade-enter-from,
+  .fade-leave-to,
+  .slide-up-enter-from,
+  .slide-up-leave-to {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 </style>

@@ -14,7 +14,7 @@
       </Button>
       <button
         @click="$emit('shuffle')"
-        class="border-border/60 text-primary-foreground bg-secondary flex h-9 items-center gap-2 rounded-lg px-4 shadow-sm"
+        class="border-border/60 text-primary-foreground bg-primary flex h-9 items-center gap-2 rounded-lg px-4 shadow-sm"
       >
         <Shuffle class="h-4 w-4" />
         重排

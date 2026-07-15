@@ -13,12 +13,30 @@ import { motion } from 'motion-v';
 <style scoped>
 @reference "@/assets/base.css";
 
-.card {
+/*.card {
   box-shadow:
     color-mix(in srgb, var(--color-foreground) 12%, transparent) 0px 40px
       50px -32px,
     color-mix(in srgb, var(--color-foreground) 8%, transparent) 0px 60px
       80px -48px,
     rgba(255, 255, 255, 0.35) 0px 0px 20px 0px inset;
+}*/
+
+.card {
+  border: 1px solid rgb(255 255 255 / 0.6);
+  box-shadow:
+    inset 0 1px 1px rgb(255 255 255 / 0.7),
+    inset 0 -1px 2px rgb(0 0 0 / 0.03),
+    0 3px 8px rgb(0 0 0 / 0.06),
+    0 1px 3px rgb(0 0 0 / 0.04);
+}
+
+.dark .card {
+  border-color: rgb(255 255 255 / 0.12);
+  box-shadow:
+    inset 0 1px 1px rgb(255 255 255 / 0.12),
+    inset 0 -1px 2px rgb(0 0 0 / 0.1),
+    0 3px 8px rgb(0 0 0 / 0.2),
+    0 1px 3px rgb(0 0 0 / 0.15);
 }
 </style>

@@ -5,14 +5,14 @@
   >
     <!-- 背景水波纹效果 -->
     <div
-      class="absolute inset-0 bg-linear-to-br from-cyan-500/10 via-teal-500/5 to-blue-500/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+      class="from-primary/70 via-secondary to-secondary absolute inset-0 bg-linear-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-100"
     />
     <div class="relative flex flex-col items-center justify-center text-center">
       <!-- Avatar with Glow + Active Badge -->
       <div class="group relative mb-4">
         <!-- 青/蓝色渐变 -->
         <div
-          class="absolute -inset-1 rounded-full bg-linear-to-br from-cyan-300 to-blue-400 opacity-50 blur"
+          class="from-primary to-secondary absolute -inset-1 rounded-full bg-linear-to-br opacity-50 blur"
         ></div>
         <img
           src="/images/about-thumb.webp"

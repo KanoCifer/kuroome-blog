@@ -64,6 +64,8 @@ const trendChartOption = computed(() => {
   const stroke = p.series[0];
 
   return {
+    // 禁用 animation 避免 setOption 渐变动画时 echarts interpolate1DArray 崩
+    animation: false,
     tooltip: {
       trigger: 'axis',
       confine: true,

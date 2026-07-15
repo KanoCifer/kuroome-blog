@@ -540,6 +540,8 @@ const memoryGaugeOption = computed(() => {
 const historyChartOption = computed(() => {
   const c = chartColors.value;
   return {
+    // 禁用 animation 避免 setOption 渐变动画时 echarts interpolate1DArray 崩
+    animation: false,
     tooltip: {
       trigger: 'axis',
       backgroundColor: c.tooltipBg,

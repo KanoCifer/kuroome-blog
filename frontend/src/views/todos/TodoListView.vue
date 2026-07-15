@@ -95,25 +95,31 @@
             >工作台</span
           >
         </div>
-        <nav role="tablist" aria-label="工作台视角" class="space-y-0.5">
+        <nav role="tablist" aria-label="工作台视角" class="relative">
+          <!-- 滑动指示器：纯 CSS transition，与 BasicNav 同方案 -->
+          <span
+            class="tab-indicator bg-primary/10 absolute top-0 left-0 z-0 h-9 w-full rounded-lg shadow-[inset_0_1px_0_0_oklch(from_var(--paper)_l_c_h_/_0.5),inset_0_-1px_1px_oklch(0_0_0_/_0.04)]"
+            :style="{ transform: `translateY(${indicatorY}px)` }"
+          />
           <button
-            v-for="tab in tabs"
+            v-for="(tab, index) in tabs"
             :key="tab.id"
             role="tab"
             :aria-selected="activeTab === tab.id"
-            class="focus-visible:ring-ring flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.96]"
+            class="focus-visible:ring-ring relative z-10 flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-[color,transform] duration-150 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.96]"
             :class="
               activeTab === tab.id
-                ? 'bg-primary/10 text-foreground'
-                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                ? 'text-foreground'
+                : 'text-muted-foreground hover:text-foreground'
             "
             @click="activeTab = tab.id"
+            @mouseenter="activeTab = tab.id"
           >
             <span>{{ tab.label }}</span>
             <span
-              class="ml-3 inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[10px] font-medium tabular-nums"
+              class="ml-3 inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[10px] font-medium tabular-nums transition-[background-color,color] duration-150"
               :class="
-                activeTab === tab.id
+                index === activeTabIndex
                   ? 'bg-primary/15 text-foreground'
                   : 'bg-muted-foreground/10 text-muted-foreground'
               "
@@ -630,6 +636,13 @@ const PRIORITIES: DevTaskPriority[] = ['P0 紧急', 'P1 高', 'P2 中', 'P3 低'
 type TabId = 'frontier' | 'planning' | 'review';
 const activeTab = ref<TabId>('frontier');
 
+// 侧边栏 indicator 位置：每项高 34px
+const TAB_ITEM_HEIGHT = 36;
+const activeTabIndex = computed(() =>
+  tabs.value.findIndex((t) => t.id === activeTab.value),
+);
+const indicatorY = computed(() => activeTabIndex.value * TAB_ITEM_HEIGHT);
+
 const tabs = computed(() => [
   { id: 'frontier' as const, label: '推进', count: store.frontier.length },
   { id: 'planning' as const, label: '规划', count: store.totalActive },
@@ -778,3 +791,17 @@ onMounted(() => {
   }
 });
 </script>
+
+<style scoped>
+/* Tab 指示器滑动过渡：与 BasicNav indicator 同缓动 cubic-bezier(.32,.72,0,1) */
+.tab-indicator {
+  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab-indicator {
+    transition: none;
+  }
+}
+</style>

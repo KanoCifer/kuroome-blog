@@ -126,18 +126,9 @@
         class="fab group bg-secondary hover:bg-primary"
         aria-label="切换到移动版"
       >
-        <svg
+        <Smartphone
           class="fab-icon text-primary group-hover:text-primary-foreground"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-          <line x1="12" y1="18" x2="12.01" y2="18" />
-        </svg>
+        />
         <span class="fab-label">移动版</span>
       </button>
     </div>
@@ -149,7 +140,7 @@
         class="fab group bg-secondary hover:bg-primary"
         aria-label="RSS"
       >
-        <RssIcon
+        <Rss
           class="fab-icon text-primary group-hover:text-primary-foreground"
         />
         <span class="fab-label">RSS</span>
@@ -177,7 +168,7 @@
         class="fab group bg-secondary hover:bg-primary"
         aria-label="图片工具"
       >
-        <IconTooling
+        <Wrench
           class="fab-icon text-primary group-hover:text-primary-foreground"
         />
         <span class="fab-label">图片工具</span>
@@ -187,13 +178,12 @@
 </template>
 
 <script setup lang="ts">
-import { IconTooling, RssIcon } from '@/components/icons';
 import { socialGateway } from '@/api/blog';
 import { useCardLayoutStore } from '@/stores/cardLayout';
 import { useNotificationStore } from '@/stores/notification';
 import SettingIcon from '@/components/icons/SettingIcon.vue';
 import { AxiosError } from 'axios';
-import { CreditCard } from '@lucide/vue';
+import { CreditCard, Rss, Smartphone, Wrench } from '@lucide/vue';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 

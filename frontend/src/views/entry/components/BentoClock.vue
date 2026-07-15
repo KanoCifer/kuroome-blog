@@ -4,7 +4,7 @@
   >
     <!-- 背景水波纹效果 -->
     <div
-      class="absolute inset-0 bg-linear-to-br from-indigo-500/10 via-blue-500/5 to-purple-500/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+      class="from-primary/30 via-secondary/30 to-secondary/30 absolute inset-0 bg-linear-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-100"
     />
     <p
       class="text-muted-foreground relative text-sm font-medium tracking-wider"

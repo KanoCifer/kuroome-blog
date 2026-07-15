@@ -20,7 +20,7 @@
     <div class="relative">
       <!-- 导航指示器 -->
       <Motion
-        class="bg-primary absolute top-0 left-0 z-0 h-[52px] w-full transform-gpu rounded-3xl shadow-sm will-change-transform"
+        class="nav-indicator absolute top-0 left-0 z-0 h-[52px] w-full transform-gpu rounded-3xl will-change-transform"
         :animate="{ y: hoverNavIndex * 56 }"
         :transition="{ visualDuration: 0.3, bounce: 0.15, type: 'spring' }"
       />
@@ -36,8 +36,8 @@
             class="relative z-10 flex items-center gap-4 rounded-3xl px-6 py-3.5 font-medium transition-colors duration-150 active:scale-[0.98]"
             :class="
               hoverNavIndex === index
-                ? 'text-primary-foreground'
-                : 'text-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-foreground'
+                ? 'text-foreground'
+                : 'text-foreground/70 hover:text-foreground dark:text-muted-foreground dark:hover:text-foreground'
             "
           >
             <component :is="item.icon" class="h-6 w-6" />
@@ -54,24 +54,21 @@ import BentoCard from '@/components/bento/BentoCard.vue';
 import {
   AboutIcon,
   BlogIcon,
-  BookshelfIcon,
   HomeIcon,
   IconAnalytics,
   IconUser,
   ImportIcon,
   LoginIcon,
   LogoutIcon,
-  MessageIcon,
   RegisterIcon,
 } from '@/components/icons';
 import { useAuthStore } from '@/auth/stores/auth';
-import { Image } from '@lucide/vue';
+import { Images, MessageCircleHeart, BookOpenText } from '@lucide/vue';
 import { Motion, type MotionProps } from 'motion-v';
 import { onUnmounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import type { DropdownItem } from './UserDropdown.vue';
 import UserDropdown from './UserDropdown.vue';
-import MomentIcon from '@/components/moments/MomentIcon.vue';
 
 const auth = useAuthStore();
 const route = useRoute();
@@ -120,9 +117,9 @@ const guestMenuItems: DropdownItem[] = [
 const navItems = [
   { path: '/', label: '首页', icon: HomeIcon },
   { path: '/blog', label: '近期文章', icon: BlogIcon },
-  { path: '/bookshelf', label: '我的书架', icon: BookshelfIcon },
-  { path: '/moments', label: '碎碎念', icon: MomentIcon },
-  { path: '/gallery', label: '照片墙', icon: Image },
+  { path: '/bookshelf', label: '我的书架', icon: BookOpenText },
+  { path: '/moments', label: '碎碎念', icon: MessageCircleHeart },
+  { path: '/gallery', label: '照片墙', icon: Images },
   { path: '/about', label: '关于网站', icon: AboutIcon },
 ];
 
@@ -152,3 +149,27 @@ onUnmounted(() => {
 // 监听路由变化
 watch(() => route.path, updateNavIndex, { immediate: true });
 </script>
+
+<style scoped>
+/* 选中指示器：玻璃凸起的圆角药丸
+   半透白底 + 顶部内侧高光 + 底部环境阴影 = 浮在卡片上的玻璃按键感 */
+.nav-indicator {
+  background: rgb(255 255 255 / 0.5);
+  border: 1px solid rgb(255 255 255 / 0.6);
+  box-shadow:
+    inset 0 1px 1px rgb(255 255 255 / 0.7),
+    inset 0 -1px 2px rgb(0 0 0 / 0.03),
+    0 3px 8px rgb(0 0 0 / 0.06),
+    0 1px 3px rgb(0 0 0 / 0.04);
+}
+
+.dark .nav-indicator {
+  background: rgb(255 255 255 / 0.1);
+  border-color: rgb(255 255 255 / 0.12);
+  box-shadow:
+    inset 0 1px 1px rgb(255 255 255 / 0.12),
+    inset 0 -1px 2px rgb(0 0 0 / 0.1),
+    0 3px 8px rgb(0 0 0 / 0.2),
+    0 1px 3px rgb(0 0 0 / 0.15);
+}
+</style>
