@@ -39,8 +39,8 @@ Vue (`frontend/`) and React (`react-app/`) share backend services but maintain i
 
 ## API Conventions
 
-- **Base path**: `/api/v1/` (stable), `/api/v2/` (extensions)
+- **Base path**: `/api/v1/` (stable), `/api/v2/` (extensions), `/api/v3/` (Go 后端: 鉴权/Blog/Admin/DevTask/Monitor 等已迁移路由)
 - **Response format**: unified `APIResponse(message, data)` envelope
-- **Auth**: JWT (12h access + 30d refresh) + SameSite Cookie (CSRF removed in favor of SameSite)
+- **Auth**: JWT (24h access + 7d refresh) + SameSite Cookie (CSRF removed in favor of SameSite)
 - **Task queue**: Taskiq + RabbitMQ for async background jobs
 - **Logging**: structlog → stdlib `ProcessorFormatter` → 双文件 (info/error)；关键业务事件走 `event` 表（startup/deploy/notify_failure），不再通过 HTTP 端点分页查询日志

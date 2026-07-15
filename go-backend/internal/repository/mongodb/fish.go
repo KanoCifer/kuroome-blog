@@ -21,19 +21,17 @@ func NewFishRepo(db *mongo.Database) *FishRepo {
 	}
 }
 
-func (r *FishRepo) List(ctx context.Context) ([]*document.FishingSpot, error) {
-	cur, err := r.coll.Find(ctx, nil)
+func (r *FishRepo) List(ctx context.Context) ([]document.FishingSpot, error) {
+	cur, err := r.coll.Find(ctx, bson.D{})
 	if err != nil {
 		return nil, err
 	}
 	defer cur.Close(ctx)
-	var spots []*document.FishingSpot
-	for cur.Next(ctx) {
-		var spot document.FishingSpot
-		if err := cur.Decode(&spot); err != nil {
-			return nil, err
-		}
-		spots = append(spots, &spot)
+
+	// cur.All 一次性把整个 cursor 解码成 slice,避免在 Next 循环里逐条 Decode。
+	var spots []document.FishingSpot
+	if err := cur.All(ctx, &spots); err != nil {
+		return nil, err
 	}
 	return spots, nil
 }

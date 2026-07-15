@@ -71,8 +71,7 @@
 <script setup lang="ts">
 import BentoCard from '@/components/bento/BentoCard.vue';
 import { useAnimateNumber } from '@/composables/shared';
-import fishingSpots from '@/data/fishing-spots.json';
-import { fishingGateway } from '@/api/fishing';
+import { fishingGateway, fishingSpotsGateway } from '@/api/fishing';
 import { DEFAULT_MAP_CENTER, useFishingMapStore } from '@/stores/fishingMap';
 import type { TideData } from '@/types/weather';
 import { formatRelative } from '@/utils/format/relative';
@@ -135,12 +134,11 @@ onMounted(() => {
 });
 
 async function runMapInit() {
-  animateTo(fishingSpots.length);
-
-  // Fire both requests in parallel — no need to wait sequentially
-  const [, statsRes] = await Promise.allSettled([
+  // Fire all requests in parallel — no need to wait sequentially
+  const [, statsRes, spotsRes] = await Promise.allSettled([
     store.fetchWeatherAndFishing(DEFAULT_MAP_CENTER),
     fishingGateway.getFishingStats(),
+    fishingSpotsGateway.list(),
   ]);
 
   if (statsRes.status === 'fulfilled') {
@@ -148,6 +146,11 @@ async function runMapInit() {
     if (statsRes.value.latest_record_time) {
       lastRecord.value = formatRelative(statsRes.value.latest_record_time);
     }
+  }
+
+  // API 拿到后再做一次完整的首跳到目标 count 动画
+  if (spotsRes.status === 'fulfilled') {
+    animateTo(spotsRes.value.length);
   }
 }
 </script>

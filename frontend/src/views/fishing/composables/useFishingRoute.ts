@@ -15,6 +15,8 @@ export interface FishingMapInstance {
   ) => Promise<RouteInfo>;
   clearRoute: () => void;
   getCurrentPosition: () => Promise<[number, number]>;
+  /** 地图视角移动到指定坐标并缩放 */
+  setZoomAndCenter: (zoom: number, center: [number, number]) => void;
 }
 
 /** 米 → "xxx 米 / x.x 公里" */

@@ -10,6 +10,16 @@
       <!-- 地图实例 -->
       <div ref="containerRef" class="map-container shadow-md"></div>
 
+      <!-- 添加钓点按钮 -->
+      <button
+        type="button"
+        class="bg-secondary/90 text-primary-foreground hover:bg-primary absolute right-2.5 bottom-36 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm transition-all duration-200 ease-out active:scale-95"
+        aria-label="添加钓点"
+        @click="emit('addSpot')"
+      >
+        <Plus class="text-primary h-5 w-5" />
+      </button>
+
       <!-- 定位按钮：浏览器原生方式获取 -->
       <button
         type="button"
@@ -109,15 +119,16 @@
         v-if="!isPlanning && !routeInfo"
         class="text-muted-foreground/90 bg-background/70 absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full px-4 py-1.5 text-xs backdrop-blur-md"
       >
-        点击地图标记，自动规划路线
+        点击地图标记，查看钓点信息
       </p>
     </div>
   </Teleport>
 </template>
 
 <script setup lang="ts">
-import { Loader2, Locate, Maximize, Minimize } from '@lucide/vue';
+import { Loader2, Locate, Maximize, Minimize, Plus } from '@lucide/vue';
 import type { MapMarker } from '@/types/marker';
+import type { MarkerClickPayload } from '@/views/fishing/map/fishingMapRuntime';
 import { loadAMapNamespace } from '@/views/fishing/map/amapNamespace';
 import { FishingMapRuntime } from '@/views/fishing/map/fishingMapRuntime';
 import {
@@ -165,10 +176,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   (e: 'click', event: unknown): void;
-  (e: 'markerClick', index: number): void;
+  (e: 'markerClick', payload: MarkerClickPayload): void;
   (e: 'mapReady'): void;
   (e: 'error', message: string): void;
   (e: 'clearRoute'): void;
+  (e: 'addSpot'): void;
 }>();
 
 let map: AMap.Map | null = null;
@@ -196,7 +208,7 @@ onMounted(async () => {
 
     // 行为下沉到 runtime;map 实例由本组件持有,卸载时销毁
     runtime = new FishingMapRuntime(map, AMap);
-    runtime.onMarkerClick = (index) => emit('markerClick', index);
+    runtime.onMarkerClick = (payload) => emit('markerClick', payload);
     runtime.renderMarkers(props.markers);
 
     clickHandler = (e: unknown) => emit('click', e);
@@ -218,7 +230,7 @@ watch(
 );
 
 // 全屏按钮点击:Teleport 后容器被重新挂载,AMap 不会自动重新测量尺寸
-watch(isFullscreen, async (fullscreen) => {
+watch(isFullscreen, async () => {
   await nextTick();
   if (map) {
     runtime?.resize();
@@ -258,6 +270,10 @@ defineExpose<FishingMapInstance>({
   getCurrentPosition: () => {
     if (!runtime) return Promise.reject(new Error('地图未就绪'));
     return runtime.getCurrentPosition();
+  },
+  setZoomAndCenter: (zoom, center) => {
+    if (!runtime) return;
+    runtime.setZoomAndCenter(zoom, center);
   },
 });
 

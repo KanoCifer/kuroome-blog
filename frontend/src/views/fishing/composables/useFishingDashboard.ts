@@ -1,8 +1,10 @@
-import fishingSpotsData from '@/data/fishing-spots.json';
 import { DEFAULT_MAP_CENTER, useFishingMapStore } from '@/stores/fishingMap';
 import { useNotificationStore } from '@/stores/notification';
+import { fishingSpotsGateway } from '@/api/fishing';
 import type { FishingIndexData } from '@/types/fishing';
 import type { MapMarker } from '@/types/marker';
+import { toMapMarker, toMapMarkers } from '@/types/marker';
+import type { MarkerClickPayload } from '@/views/fishing/map/fishingMapRuntime';
 import { useFishingAnalysis } from '@/views/fishing/composables/useFishingAnalysis';
 import { useFishingFeedback } from '@/views/fishing/composables/useFishingFeedback';
 import {
@@ -13,7 +15,21 @@ import { storeToRefs } from 'pinia';
 import { computed, ref, useTemplateRef } from 'vue';
 
 export function useFishingDashboard() {
-  const fishingSpots = ref<MapMarker[]>(fishingSpotsData as MapMarker[]);
+  const fishingSpots = ref<MapMarker[]>([]);
+  const spotsLoading = ref(true);
+  const spotsError = ref<Error | null>(null);
+
+  // 启动即拉 API —— 失败静默降级（不弹窗，避免破坏首屏）
+  void (async () => {
+    try {
+      const spots = await fishingSpotsGateway.list();
+      fishingSpots.value = toMapMarkers(spots);
+    } catch (err) {
+      spotsError.value = err instanceof Error ? err : new Error(String(err));
+    } finally {
+      spotsLoading.value = false;
+    }
+  })();
   const mapTileRef = useTemplateRef<FishingMapInstance>('mapTileRef');
 
   const fishingMapStore = useFishingMapStore();
@@ -25,6 +41,58 @@ export function useFishingDashboard() {
     () => userPosition.value ?? DEFAULT_MAP_CENTER,
   );
 
+  // —— 钓点详情 Panel ——
+  const panelOpen = ref(false);
+  /**
+   * 当前 Panel 展示的完整 MapMarker。
+   * position 供迷你地图 / 路线规划;extraData 供详情展示。
+   * 来源: MarkerClickPayload.spot(地图点击时即含 position)。
+   */
+  const activePanelMarker = ref<MapMarker | null>(null);
+  function openSpotPanel(marker: MapMarker): void {
+    activePanelMarker.value = marker;
+    panelOpen.value = true;
+  }
+  function closeSpotPanel(): void {
+    panelOpen.value = false;
+    activePanelMarker.value = null;
+  }
+  /** 钓点被 Panel 内编辑后:同步 marker 引用(触发地图重渲染) */
+  function onSpotUpdated(marker: MapMarker): void {
+    activePanelMarker.value = marker;
+    const idx = fishingSpots.value.findIndex(
+      (m) => m.extraData?.id === marker.extraData?.id,
+    );
+    if (idx >= 0) fishingSpots.value[idx] = marker;
+  }
+  /** 钓点被 Panel 内删除后:从 markers 移除并重渲染地图 */
+  function onSpotDeleted(id: string): void {
+    fishingSpots.value = fishingSpots.value.filter(
+      (m) => m.extraData?.id !== id,
+    );
+  }
+
+  // ── 新增钓点 Modal ──
+  const addModalOpen = ref(false);
+  function openAddModal(): void {
+    addModalOpen.value = true;
+  }
+  function closeAddModal(): void {
+    addModalOpen.value = false;
+  }
+  /**
+   * 新增钓点后端 create 不返回实体,按名称匹配新钓点 → 同步列表 → 打开详情面板。
+   */
+  async function onSpotCreated(name: string): Promise<void> {
+    const spots = await fishingSpotsGateway.list();
+    fishingSpots.value = toMapMarkers(spots);
+    const created = spots.find((s) => s.name === name);
+    if (created) {
+      openSpotPanel(toMapMarker(created));
+      notifier.success(`钓点「${name}」已添加`);
+    }
+  }
+
   const route = useFishingRoute(() => mapTileRef.value);
   const feedback = useFishingFeedback();
   const analysis = useFishingAnalysis();
@@ -33,10 +101,17 @@ export function useFishingDashboard() {
     () => !route.isPlanning.value && !route.routeInfo.value,
   );
 
-  async function onMarkerClick(index: number): Promise<void> {
-    const spot = fishingSpots.value?.[index];
-    if (!spot) return;
-    await route.planFromMarker(index, spot);
+  /**
+   * marker 点击 → 滑入钓点详情 Panel。
+   * 规划路线操作内嵌到 Panel 内(由 Panel 回调 marker 触发 planFromMarker),
+   * 保留 index ↔ spot 双引用供路线规划使用。
+   */
+  function onMarkerClick(payload: MarkerClickPayload): void {
+    if (!payload.spot.extraData) return;
+    route.selectedSpotIndex.value = payload.index;
+    // 地图视角跟随被点击的钓点(覆盖已打开 Panel 的场景)
+    mapTileRef.value?.setZoomAndCenter(15, payload.spot.position);
+    openSpotPanel(payload.spot);
   }
 
   function onClearRoute(): void {
@@ -89,8 +164,28 @@ export function useFishingDashboard() {
     // refs / state
     mapTileRef,
     fishingSpots,
+    spotsLoading,
+    spotsError,
     activeLocation,
     indexData,
+
+    // 新增钓点 Modal
+    addModalOpen,
+    openAddModal,
+    closeAddModal,
+    onSpotCreated,
+
+    // 钓点详情 Panel
+    panelOpen,
+    activePanelMarker,
+    closeSpotPanel,
+    onSpotUpdated,
+    onSpotDeleted,
+    // Panel 路线按钮 → 直接从 emitted marker 取 position → planFromMarker。
+    onRouteFromSpot: (marker: MapMarker) => {
+      const idx = route.selectedSpotIndex.value;
+      if (idx != null) void route.planFromMarker(idx, marker);
+    },
 
     // 拍平的子 composable refs (模板里直接 dash.isPlanning 等,避免三层点链)
     isPlanning: route.isPlanning,

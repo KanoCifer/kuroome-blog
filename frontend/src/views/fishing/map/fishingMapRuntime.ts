@@ -30,7 +30,7 @@ interface DrivingService {
 }
 
 /** 钓点标记 SVG —— 24×32 极简几何:圆头 + 下方三角,蓝描边。 */
-const FISHING_MARKER_CONTENT = `
+export const FISHING_MARKER_CONTENT = `
   <div style="width:24px;height:32px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 1px 2px rgba(37,99,235,0.3));">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 32" width="24" height="32" aria-hidden="true">
       <path
@@ -45,17 +45,29 @@ const FISHING_MARKER_CONTENT = `
   </div>
 `;
 
+/** marker 点击时抛出的载荷 —— 闭包从 MapMarker 带下来,上层无需再按 index 反查 */
+export interface MarkerClickPayload {
+  index: number;
+  spot: MapMarker;
+}
+
 export class FishingMapRuntime {
   private readonly map: AMap.Map;
   private readonly ns: AMapWithPlugins;
 
   private readonly converter: CoordConverter;
   private markers: AMap.Marker[] = [];
+  /** 与 this.markers 一一对应,保留 source MapMarker(含 extraData)供点击回调带回 */
+  private markerSources: MapMarker[] = [];
   private userLocationMarker: AMap.Marker | null = null;
   private driving: DrivingService | null = null;
 
-  /** 标记点击回调(由组件注入,转发到上层 emit) */
-  onMarkerClick: ((index: number) => void) | null = null;
+  /**
+   * 标记点击回调(由组件注入,转发到上层 emit)。
+   * payload.spot.extraData 含钓点业务字段(name/description/tags/rating/images…),
+   * payload.position 为经纬度 —— 规划路线 / 详情 Modal 各取所需。
+   */
+  onMarkerClick: ((payload: MarkerClickPayload) => void) | null = null;
 
   constructor(map: AMap.Map, ns: AMapWithPlugins) {
     this.map = map;
@@ -78,9 +90,17 @@ export class FishingMapRuntime {
         offset: new ns.Pixel(-13, -30),
       });
 
-      marker.on('click', () => this.onMarkerClick?.(index));
+      marker.on('click', () => {
+        // 1. 获取当前点击的 Marker 位置
+        // const position = marker.getPosition(); // 返回 AMap.LngLat 对象
+
+        // // 2. 地图视角移动到该点并放大
+        // map.setZoomAndCenter(15, position as AMap.LocationValue);
+        this.onMarkerClick?.({ index, spot: this.markerSources[index] });
+      });
       marker.setMap(map);
       this.markers.push(marker);
+      this.markerSources.push(markerData);
     });
   }
 
@@ -88,6 +108,7 @@ export class FishingMapRuntime {
   clearMarkers(): void {
     this.markers.forEach((m) => m.setMap(null));
     this.markers = [];
+    this.markerSources = [];
   }
 
   /** 容器尺寸变化后通知 AMap 重新测量(运行时方法,类型未声明) */
@@ -129,6 +150,11 @@ export class FishingMapRuntime {
   /** 清除当前路线(Driving 绑定 map,由官方渲染,用 driving.clear 移除) */
   clearRoute(): void {
     this.driving?.clear();
+  }
+
+  /** 地图视角移动到指定坐标并缩放 */
+  setZoomAndCenter(zoom: number, center: [number, number]): void {
+    this.map.setZoomAndCenter(zoom, center);
   }
 
   /** 当前位置 [lng,lat](GCJ-02);委托给 LocationResolver */

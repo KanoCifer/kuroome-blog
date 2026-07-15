@@ -2,12 +2,14 @@
 defineOptions({ name: 'FishingMapView' });
 import TideCard from '@/views/fishing/dashboard/TideCard.vue';
 import WeatherCard from '@/views/fishing/dashboard/WeatherCard.vue';
-import AnalysisDrawer from '@/views/fishing/dashboard/AnalysisDrawer.vue';
+import AnalysisPanel from '@/views/fishing/map/AnalysisPanel.vue';
 import DashboardHeader from '@/views/fishing/dashboard/DashboardHeader.vue';
 import FeedbackFormDialog from '@/views/fishing/dashboard/FeedbackFormDialog.vue';
 import HourlyChartCard from '@/views/fishing/dashboard/HourlyChartCard.vue';
 import IndexHeroCard from '@/views/fishing/dashboard/IndexHeroCard.vue';
 import MapContainer from '@/views/fishing/map/MapContainer.vue';
+import SpotDetailPanel from '@/views/fishing/map/SpotDetailPanel.vue';
+import SpotFormModal from '@/views/fishing/map/SpotFormModal.vue';
 import QuickFeedbackBanner from '@/views/fishing/dashboard/QuickFeedbackBanner.vue';
 import { useFishingDashboard } from '@/views/fishing/composables/useFishingDashboard';
 import { onMounted } from 'vue';
@@ -24,6 +26,7 @@ onMounted(dash.init);
       :analysis-open="dash.analysisOpen.value"
       :analysis-has-data="dash.analysisHasData.value"
       @toggle-analysis="analysis.toggle"
+      @add-spot="dash.openAddModal"
     />
 
     <main
@@ -49,6 +52,7 @@ onMounted(dash.init);
             @map-ready="dash.onMapReady"
             @clear-route="dash.onClearRoute"
             @error="dash.onMapError"
+            @add-spot="dash.openAddModal"
           />
         </div>
 
@@ -92,10 +96,26 @@ onMounted(dash.init);
       @success="feedback.closeFeedback"
     />
 
-    <AnalysisDrawer
+    <AnalysisPanel
       :open="dash.analysisOpen.value"
       :payload="dash.analysisPayload.value"
       @close="analysis.close"
+    />
+
+    <SpotDetailPanel
+      :open="dash.panelOpen.value"
+      :marker="dash.activePanelMarker.value"
+      @close="dash.closeSpotPanel"
+      @route="dash.onRouteFromSpot"
+      @spot-updated="dash.onSpotUpdated"
+      @spot-deleted="dash.onSpotDeleted"
+    />
+
+    <SpotFormModal
+      :open="dash.addModalOpen.value"
+      :initial-center="dash.activeLocation.value"
+      @close="dash.closeAddModal"
+      @created="dash.onSpotCreated"
     />
   </div>
 </template>

@@ -10,7 +10,7 @@ import (
 )
 
 type FishRepoer interface {
-	List(ctx context.Context) ([]*document.FishingSpot, error)
+	List(ctx context.Context) ([]document.FishingSpot, error)
 	Create(ctx context.Context, spot *document.FishingSpot) error
 	Update(ctx context.Context, id string, data bson.M) error
 	Delete(ctx context.Context, id string, hardDelete ...bool) error

@@ -1,8 +1,5 @@
 <template>
-  <motion.nav
-    aria-label="主导航"
-    class="nav liquid-glass px-9 py-1"
-  >
+  <motion.nav aria-label="主导航" class="nav liquid-glass px-9 py-1">
     <ul class="flex items-center gap-2 font-medium">
       <!-- Brand: avatar + 文字 logo -->
       <li class="ml-1 flex shrink-0 items-center gap-2 pr-2">
@@ -82,8 +79,7 @@
             v-if="isOthersOpen"
             @mouseenter="openOthers"
             @mouseleave="closeOthers"
-            class="absolute top-full right-0 z-50 mt-2 w-52 rounded-2xl p-1.5 ring-1 ring-black/5 dark:ring-white/10"
-            style="background: rgb(255 255 255 / 0.72); -webkit-backdrop-filter: blur(10px) saturate(1.4); backdrop-filter: blur(10px) saturate(1.4);"
+            class="bg-background/80 absolute top-full right-0 z-50 mt-2 w-52 rounded-2xl p-1.5 ring-1 ring-black/5 backdrop-blur-xs dark:ring-white/10"
           >
             <RouterLink
               v-for="item in othersRouteItems"
@@ -211,12 +207,14 @@ const isOthersActive = computed(() =>
   othersItems.some((item) => item.to && isActive(item.to)),
 );
 
-const othersRouteItems = computed(
-  () => othersItems.filter((item): item is OthersItem & { to: string } => !!item.to),
+const othersRouteItems = computed(() =>
+  othersItems.filter((item): item is OthersItem & { to: string } => !!item.to),
 );
 
-const othersActionItems = computed(
-  () => othersItems.filter((item): item is OthersItem & { action: () => void } => !!item.action),
+const othersActionItems = computed(() =>
+  othersItems.filter(
+    (item): item is OthersItem & { action: () => void } => !!item.action,
+  ),
 );
 
 // 切换到移动版：写 device_force=react cookie 后跳转到 m.kanocifer.chat

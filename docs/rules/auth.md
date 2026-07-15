@@ -17,7 +17,7 @@
 | ----------------- | ------------------------ |
 | 算法              | JWT `HS256`(HMAC-SHA256) |
 | 签名密钥          | `SECRET_KEY`             |
-| Access token TTL  | **1 小时**               |
+| Access token TTL  | **24 小时**              |
 | Refresh token TTL | **7 天**                 |
 
 ### 2.1 JWT Claims
@@ -77,7 +77,7 @@ logout
 | 场景                   | Python 行为                            | Go 行为                       |
 | ---------------------- | -------------------------------------- | ----------------------------- |
 | Redis 可用             | 正常写 / 校验 / 删除                   | 正常写 / 校验 / 删除          |
-| Redis 不可用           | `redis=None`, 回退 stateless(向后兼容) | 安全失败(refuse),拒绝 refresh |
+| Redis 不可用           | `redis=None`, 回退 stateless(向后兼容) | `redis=nil` 时**跳过**白名单校验(刷新放行,等同 stateless 回退),不拒绝 |
 | 旧 token(无白名单条目) | `ENFORCE_REDIS_REFRESH` 开关控制       | 默认拒绝(当前实现)            |
 
 > **Python 配置项**: `ENFORCE_REDIS_REFRESH`(bool,默认 `False`)。部署稳定后置 `True`,强制所有 refresh 走 Redis 校验。

@@ -64,11 +64,9 @@ type UserHandler struct { svc UserService }
 | 5 | repo 外部注入 | service 无 `mongodb.NewXxx(db)` 内嵌 |
 | 6 | errors.Is 分流 | handler 用 `errors.Is(err, errs.ErrX)` 分 404/400/500 |
 | 7 | config 注入 | 无 `config.Cfg` 在 handler/service 非注释代码 |
-| 8 | DTO 命名统一 | 入参 `XRequest`/出参 `XResponse`，无 `XOut`/`XIn`/`PostIn` |
+| 8 | DTO 命名统一 | 入参 `XRequest`/出参 `XResponse`（目标态；当前仍残留 `PostIn`/`PostOut`/`XOut` 等，待清理） |
 | 9 | 重复代码清除 | 无 `PaginationOut`；cookie helpers 仅 github_handler.go 一份 |
 | 10 | repo 包归属正确 | Mongo repo 在 `package mongodb` |
-
-## 框架 & 分层
 
 ## 鉴权
 
@@ -104,6 +102,6 @@ type UserHandler struct { svc UserService }
 
 ## 已知遗留
 
-- `internal/repository/mongo/`、`internal/domain/`、`internal/infra/` 仅规划、尚未创建目录
-- task-18 (passkey + github 层对齐) 尚未完成，`github_service.go` 仍引用 concrete 类型，导致 build 失败
-- DTO 命名 (`PostIn`/`PostUpdate`) 与约定 (`XRequest`/`XResponse`) 不统一，待后续清理
+- `internal/repository/mongodb/`、`internal/repository/postgres/` 已创建；`internal/domain/`、`internal/infra/` 仅规划、尚未创建目录
+- ~~task-18 (passkey + github 层对齐) 尚未完成~~ (已修复: `github_service.go` 已改用 `UserRepositoryer` 接口,`go build ./...` 清洁)
+- DTO 命名 (`PostIn`/`PostUpdate` 等) 与约定 (`XRequest`/`XResponse`) 不统一，待后续清理（参见「十条判定规则」#8）
