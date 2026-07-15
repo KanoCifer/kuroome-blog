@@ -107,7 +107,9 @@ watch(
           class="border-border flex items-start justify-between gap-3 border-b px-6 pt-6 pb-5"
         >
           <div class="min-w-0">
-            <h2 class="text-foreground font-family-averia text-2xl leading-snug">
+            <h2
+              class="text-foreground font-family-averia text-2xl leading-snug"
+            >
               AI 分析
             </h2>
             <p class="text-muted-foreground mt-0.5 text-xs">

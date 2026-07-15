@@ -55,7 +55,9 @@ export interface FishingSpotsGateway {
 
 export const fishingSpotsGateway: FishingSpotsGateway = {
   async list(): Promise<FishingSpot[]> {
-    const res = await request.get<{ data: FishingSpot[] }>(`${ApiUrlBase}spots`);
+    const res = await request.get<{ data: FishingSpot[] }>(
+      `${ApiUrlBase}spots`,
+    );
     return res.data.data;
   },
 
@@ -70,10 +72,7 @@ export const fishingSpotsGateway: FishingSpotsGateway = {
     await request.post(`${ApiUrlBase}spots`, payload);
   },
 
-  async update(
-    id: string,
-    payload: UpdateFishingSpotPayload,
-  ): Promise<void> {
+  async update(id: string, payload: UpdateFishingSpotPayload): Promise<void> {
     await request.patch(`${ApiUrlBase}spots/${id}`, payload);
   },
 
@@ -86,4 +85,3 @@ export const fishingSpotsGateway: FishingSpotsGateway = {
     });
   },
 };
-

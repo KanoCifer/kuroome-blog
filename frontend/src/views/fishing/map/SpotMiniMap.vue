@@ -39,8 +39,9 @@ let marker: AMap.Marker | null = null;
 
 /** 交互模式:点击地图 → 放置 / 移动图钉 + 抛出坐标 */
 function handleMapClick(e: unknown): void {
-  const lnglat = (e as { lnglat: { getLng: () => number; getLat: () => number } })
-    .lnglat;
+  const lnglat = (
+    e as { lnglat: { getLng: () => number; getLat: () => number } }
+  ).lnglat;
   const pos: [number, number] = [lnglat.getLng(), lnglat.getLat()];
   if (marker) {
     marker.setPosition(pos);

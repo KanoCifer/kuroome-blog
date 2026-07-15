@@ -177,7 +177,9 @@ watch(
           class="border-border flex items-start justify-between gap-3 border-b px-6 pt-6 pb-5"
         >
           <div class="min-w-0">
-            <h2 class="text-foreground font-family-averia text-2xl leading-snug">
+            <h2
+              class="text-foreground font-family-averia text-2xl leading-snug"
+            >
               新增钓点
             </h2>
             <p class="text-muted-foreground mt-0.5 text-xs">
@@ -282,7 +284,9 @@ watch(
                 placeholder="矶钓, 海鲈, 夜钓(逗号分隔)"
                 class="bg-muted text-foreground placeholder:text-muted-foreground/60 focus:ring-primary/30 w-full rounded-xl border-0 px-4 py-3 text-sm focus:ring-2 focus:outline-none"
               />
-              <p class="text-muted-foreground mt-1 text-xs">多个标签以逗号分隔</p>
+              <p class="text-muted-foreground mt-1 text-xs">
+                多个标签以逗号分隔
+              </p>
             </div>
 
             <!-- 评分 -->
@@ -329,7 +333,7 @@ watch(
                 v-model="images"
                 rows="3"
                 placeholder="https://example.com/photo1.jpg&#10;https://example.com/photo2.jpg"
-                class="bg-muted text-foreground font-mono placeholder:text-muted-foreground/60 focus:ring-primary/30 w-full resize-none rounded-xl border-0 px-4 py-3 text-xs focus:ring-2 focus:outline-none"
+                class="bg-muted text-foreground placeholder:text-muted-foreground/60 focus:ring-primary/30 w-full resize-none rounded-xl border-0 px-4 py-3 font-mono text-xs focus:ring-2 focus:outline-none"
               />
               <p class="text-muted-foreground mt-1 text-xs">每行一个图片地址</p>
             </div>

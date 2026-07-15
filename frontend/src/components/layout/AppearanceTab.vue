@@ -84,7 +84,7 @@ const smallCardBase =
 
       <button
         @click="themeStore.toggleFooter()"
-        class="flex w-full cursor-pointer items-center justify-between rounded-xl border border-border bg-background px-4 py-3 transition-colors hover:border-primary"
+        class="border-border bg-background hover:border-primary flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-3 transition-colors"
       >
         <div class="text-left">
           <div class="text-foreground text-sm font-medium">显示页脚</div>
@@ -94,9 +94,7 @@ const smallCardBase =
         </div>
         <div
           class="h-6 w-11 rounded-full p-0.5 transition-colors"
-          :class="
-            themeStore.showFooter === 'true' ? 'bg-primary' : 'bg-muted'
-          "
+          :class="themeStore.showFooter === 'true' ? 'bg-primary' : 'bg-muted'"
         >
           <div
             class="bg-background h-5 w-5 rounded-full shadow-md transition-transform"
@@ -171,9 +169,7 @@ const smallCardBase =
           <span
             class="text-sm font-semibold"
             :class="
-              themeStore.font === 'default'
-                ? 'text-primary'
-                : 'text-foreground'
+              themeStore.font === 'default' ? 'text-primary' : 'text-foreground'
             "
           >
             默认字体

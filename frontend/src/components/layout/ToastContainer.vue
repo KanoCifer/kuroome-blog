@@ -61,10 +61,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div
-    class="fixed top-4 left-1/2 z-9999 w-full -translate-x-1/2 sm:w-96"
-    style="perspective: 1000px"
-  >
+  <div class="fixed top-4 left-1/2 z-9999 w-full -translate-x-1/2 sm:w-96">
     <AnimatePresence mode="popLayout">
       <motion.div
         v-for="(t, i) in toasts"
@@ -80,8 +77,9 @@ onUnmounted(() => {
         }"
         :exit="{ opacity: 0, y: -40, scale: 0.9 }"
         :transition="{ type: 'spring', damping: 30, stiffness: 500 }"
+        class="card"
         :class="[
-          'squircle border-border/20 bg-background/80 text-foreground dark:border-border/80 dark:bg-background/80 dark:text-foreground absolute top-0 left-0 flex h-20 w-full items-center justify-between gap-3 border shadow-xl backdrop-blur-sm transition-colors duration-200',
+          'squircle bg-background/80 text-foreground dark:bg-background/80 dark:text-foreground absolute top-0 left-0 flex h-20 w-full items-center justify-between gap-3 backdrop-blur-sm transition-colors duration-300',
         ]"
       >
         <component
@@ -127,7 +125,7 @@ onUnmounted(() => {
           {{ t.message }}
         </div>
         <button
-          class="mr-2 shrink-0 cursor-pointer rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+          class="bg-secondary/60 text-foreground/80 hover:bg-secondary mr-2 ml-auto shrink-0 cursor-pointer rounded-full p-2 transition-colors"
           @click="() => store.dismiss(t.id)"
           aria-label="dismiss"
         >
@@ -137,3 +135,23 @@ onUnmounted(() => {
     </AnimatePresence>
   </div>
 </template>
+
+<style scoped>
+.card {
+  border: 1px solid rgb(255 255 255 / 0.6);
+  box-shadow:
+    inset 0 1px 1px rgb(255 255 255 / 0.7),
+    inset 0 -1px 2px rgb(0 0 0 / 0.03),
+    0 3px 8px rgb(0 0 0 / 0.06),
+    0 1px 3px rgb(0 0 0 / 0.04);
+}
+
+.dark .card {
+  border-color: rgb(255 255 255 / 0.12);
+  box-shadow:
+    inset 0 1px 1px rgb(255 255 255 / 0.12),
+    inset 0 -1px 2px rgb(0 0 0 / 0.1),
+    0 3px 8px rgb(0 0 0 / 0.2),
+    0 1px 3px rgb(0 0 0 / 0.15);
+}
+</style>

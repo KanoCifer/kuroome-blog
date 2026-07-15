@@ -60,9 +60,7 @@ const resetBackground = () => {
   debouncedSet('bg-scale', String(BG_DEFAULTS.scale));
 };
 
-const blurFill = computed(() =>
-  sliderFill(themeStore.bgBlur, 5, 70),
-);
+const blurFill = computed(() => sliderFill(themeStore.bgBlur, 5, 70));
 const brightnessFill = computed(() =>
   sliderFill(Math.round(themeStore.bgBrightness * 100), 30, 100),
 );
@@ -103,15 +101,15 @@ const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
         Adjust background appearance
       </p>
 
-      <div
-        class="rounded-xl border border-border/60 bg-background p-5"
-      >
+      <div class="border-border/60 bg-background rounded-xl border p-5">
         <!-- 滑块行 -->
         <div class="relative space-y-5">
           <!-- 背景模糊 -->
           <div>
             <div class="mb-2 flex items-center justify-between">
-              <span class="text-foreground flex items-center gap-1.5 text-sm font-medium">
+              <span
+                class="text-foreground flex items-center gap-1.5 text-sm font-medium"
+              >
                 <!-- 模糊图标 -->
                 <svg
                   class="text-muted-foreground h-4 w-4"
@@ -149,7 +147,9 @@ const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
           <!-- 背景亮度 -->
           <div>
             <div class="mb-2 flex items-center justify-between">
-              <span class="text-foreground flex items-center gap-1.5 text-sm font-medium">
+              <span
+                class="text-foreground flex items-center gap-1.5 text-sm font-medium"
+              >
                 <!-- 亮度图标 -->
                 <svg
                   class="text-muted-foreground h-4 w-4"
@@ -161,7 +161,9 @@ const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
                   stroke-linejoin="round"
                 >
                   <circle cx="12" cy="12" r="4" />
-                  <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+                  <path
+                    d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
+                  />
                 </svg>
                 背景亮度
               </span>
@@ -186,7 +188,9 @@ const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
           <!-- 背景缩放 -->
           <div>
             <div class="mb-2 flex items-center justify-between">
-              <span class="text-foreground flex items-center gap-1.5 text-sm font-medium">
+              <span
+                class="text-foreground flex items-center gap-1.5 text-sm font-medium"
+              >
                 <!-- 缩放图标 -->
                 <svg
                   class="text-muted-foreground h-4 w-4"
@@ -469,5 +473,4 @@ const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
     0 2px 6px color-mix(in oklch, var(--ink) 16%, transparent),
     0 0 0 4px color-mix(in oklch, var(--accent) 30%, transparent);
 }
-
 </style>

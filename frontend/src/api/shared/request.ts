@@ -78,6 +78,8 @@ request.interceptors.response.use(
         error.message = '请求参数错误，请检查后重试';
       } else if (status === 500) {
         error.message = '服务器内部错误，请稍后重试';
+      } else if (status === 403) {
+        error.message = '需要管理员账户';
       } else if (status && status >= 400) {
         error.message = `请求出错 (${status})，请稍后重试`;
       }

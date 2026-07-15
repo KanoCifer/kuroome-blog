@@ -32,6 +32,8 @@ const CARD_SHADOW = [
   'inset 0 1px 0 0 oklch(from var(--paper) l c h / 0.6)',
 ].join(', ');
 import { MapPin, Navigation, Pencil, Star, Trash2, X } from '@lucide/vue';
+import { useNotificationStore } from '@/stores/notification';
+import type { AxiosError } from 'axios';
 
 const props = defineProps<{
   open: boolean;
@@ -126,8 +128,10 @@ async function saveEdit(): Promise<void> {
       },
     };
     emit('spot-updated', updated);
-  } catch (err) {
-    console.error('更新钓点失败:', err);
+  } catch (err: unknown) {
+    useNotificationStore().error(
+      err instanceof Error ? err.message : '更新钓点失败',
+    );
   } finally {
     saving.value = false;
   }
