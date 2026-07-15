@@ -49,7 +49,7 @@ export const galleryService = (): GalleryService => ({
   },
 
   async uploadGalleryImage(formData: FormData) {
-    const res = await request.post('v1/upload-gallery-image', formData, {
+    const res = await request.post('v3/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     const data = extractData(res) as { url?: string } | undefined;

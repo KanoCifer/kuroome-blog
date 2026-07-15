@@ -55,9 +55,9 @@ const avatarUrl = computed(() => {
     return authStore.user.photo;
   }
   if (authStore.user?.photo) {
-    return `/api/v1/media/${authStore.user.photo}`;
+    return `/api/v3/media/${authStore.user.photo}`;
   }
-  return '/api/v1/media/default.png';
+  return '/api/v3/media/default.png';
 });
 
 const loadUserData = () => {

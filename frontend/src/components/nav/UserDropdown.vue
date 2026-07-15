@@ -148,9 +148,9 @@ const avatarUrl = computed(() => {
     return auth.user.photo;
   }
   if (auth.user?.photo) {
-    return `/api/v1/media/${auth.user.photo}`;
+    return `/api/v3/media/${auth.user.photo}`;
   }
-  return '/api/v1/media/default.png';
+  return '/api/v3/media/default.png';
 });
 
 onUnmounted(() => {

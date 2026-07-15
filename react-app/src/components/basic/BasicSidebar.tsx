@@ -152,7 +152,7 @@ export const BentoNavSidebar: React.FC = () => {
     auth.isAuthenticated && auth.user?.photo
       ? auth.user.photo.startsWith('http')
         ? auth.user.photo
-        : `/api/v1/media/${auth.user.photo}`
+        : `/api/v3/media/${auth.user.photo}`
       : '/images/about.webp';
 
   useEffect(() => {

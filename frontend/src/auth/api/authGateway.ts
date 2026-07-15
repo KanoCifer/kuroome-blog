@@ -75,7 +75,7 @@ export const authGateway = {
   uploadAvatar(
     formData: FormData,
   ): Promise<AxiosResponse<ApiResponse<Record<string, unknown>>>> {
-    return request.put('v1/auth/upload-pic', formData, {
+    return request.put('v3/upload-pic', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   },

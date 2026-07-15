@@ -40,7 +40,7 @@ export default function ProfileSettingView() {
   const [messageType, setMessageType] = useState<'success' | 'error'>(
     'success',
   );
-  const [avatarUrl, setAvatarUrl] = useState('/api/v1/media/default.png');
+  const [avatarUrl, setAvatarUrl] = useState('/api/v3/media/default.png');
   const [showPassword, setShowPassword] = useState(false);
 
   const [hasPasskey, setHasPasskey] = useState(false);
@@ -79,7 +79,7 @@ export default function ProfileSettingView() {
       if (auth.user.photo?.startsWith('http')) {
         setAvatarUrl(auth.user.photo);
       } else if (auth.user.photo) {
-        setAvatarUrl(`/api/v1/media/${auth.user.photo}`);
+        setAvatarUrl(`/api/v3/media/${auth.user.photo}`);
       }
     }
   }, [auth.user]);
@@ -133,7 +133,7 @@ export default function ProfileSettingView() {
     formData.append('image', file);
 
     try {
-      const response = await request.put('/auth/upload-pic', formData, {
+      const response = await request.put('v3/upload-pic', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
