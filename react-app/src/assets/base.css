@@ -208,6 +208,69 @@ footer {
 
 @import '../../../packages/brand/prose.css';
 
+/* ── 書房設定滑塊 ── driven by --track-fill custom prop ── */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  height: 24px;
+}
+.slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--track-fill);
+}
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -6px;
+  border-radius: 9999px;
+  background: var(--paper);
+  border: 2px solid var(--accent);
+  box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 12%, transparent);
+  transition: box-shadow 150ms ease-out, transform 150ms ease-out;
+  cursor: pointer;
+}
+.slider::-webkit-slider-thumb:hover {
+  transform: scale(1.12);
+  box-shadow:
+    0 2px 6px color-mix(in oklch, var(--ink) 16%, transparent),
+    0 0 0 4px color-mix(in oklch, var(--accent) 15%, transparent);
+}
+.slider::-webkit-slider-thumb:active {
+  transform: scale(1.05);
+}
+.slider::-moz-range-track {
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--track-fill);
+}
+.slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: var(--paper);
+  border: 2px solid var(--accent);
+  box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 12%, transparent);
+  transition: box-shadow 150ms ease-out, transform 150ms ease-out;
+  cursor: pointer;
+}
+.slider:focus-visible {
+  outline: none;
+}
+.slider:focus-visible::-webkit-slider-thumb {
+  box-shadow:
+    0 2px 6px color-mix(in oklch, var(--ink) 16%, transparent),
+    0 0 0 4px color-mix(in oklch, var(--accent) 30%, transparent);
+}
+.slider:focus-visible::-moz-range-thumb {
+  box-shadow:
+    0 2px 6px color-mix(in oklch, var(--ink) 16%, transparent),
+    0 0 0 4px color-mix(in oklch, var(--accent) 30%, transparent);
+}
+
 /* Summary card animations */
 .summary-card {
   transition:

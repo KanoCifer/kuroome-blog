@@ -23,9 +23,18 @@ interface ThemeState {
   font: FontFamily;
   scheme: ColorScheme;
   showFooter: boolean;
+  bgBlur: number;
+  bgBrightness: number;
+  bgScale: number;
+  cardIndex: number;
   setTheme: (theme: Theme) => void;
   setFont: (font: FontFamily) => void;
   setScheme: (scheme: ColorScheme) => void;
+  setBgBlur: (val: number) => void;
+  setBgBrightness: (val: number) => void;
+  setBgScale: (val: number) => void;
+  setCardIndex: (val: number) => void;
+  resetBackground: () => void;
   toggleTheme: () => void;
   toggleThemeWithAnimation: (event: {
     clientX: number;
@@ -33,6 +42,8 @@ interface ThemeState {
   }) => void;
   toggleFooter: () => void;
 }
+
+const BG_DEFAULTS = { blur: 8, brightness: 1.0, scale: 1.05 } as const;
 
 export type { Theme, FontFamily, ColorScheme };
 
@@ -70,6 +81,11 @@ export const useThemeState = create<ThemeState>()(
       font: 'default',
       scheme: 'paper',
       showFooter: localStorage.getItem('show-footer') !== 'false',
+      bgBlur: Number(localStorage.getItem('bg-blur')) || BG_DEFAULTS.blur,
+      bgBrightness:
+        Number(localStorage.getItem('bg-brightness')) || BG_DEFAULTS.brightness,
+      bgScale: Number(localStorage.getItem('bg-scale')) || BG_DEFAULTS.scale,
+      cardIndex: Number(localStorage.getItem('card-image-index')) || 0,
 
       setTheme: (theme) => {
         applyTheme(theme);
@@ -108,6 +124,33 @@ export const useThemeState = create<ThemeState>()(
         set({ showFooter: next });
         localStorage.setItem('show-footer', String(next));
       },
+
+      setBgBlur: (val) => {
+        set({ bgBlur: val });
+        localStorage.setItem('bg-blur', String(val));
+      },
+      setBgBrightness: (val) => {
+        set({ bgBrightness: val });
+        localStorage.setItem('bg-brightness', String(val));
+      },
+      setBgScale: (val) => {
+        set({ bgScale: val });
+        localStorage.setItem('bg-scale', String(val));
+      },
+      setCardIndex: (val) => {
+        set({ cardIndex: val });
+        localStorage.setItem('card-image-index', String(val));
+      },
+      resetBackground: () => {
+        set({
+          bgBlur: BG_DEFAULTS.blur,
+          bgBrightness: BG_DEFAULTS.brightness,
+          bgScale: BG_DEFAULTS.scale,
+        });
+        localStorage.setItem('bg-blur', String(BG_DEFAULTS.blur));
+        localStorage.setItem('bg-brightness', String(BG_DEFAULTS.brightness));
+        localStorage.setItem('bg-scale', String(BG_DEFAULTS.scale));
+      },
     }),
     {
       name: 'theme-storage',
@@ -127,6 +170,10 @@ export const useThemeState = create<ThemeState>()(
         font: state.font,
         scheme: state.scheme,
         showFooter: state.showFooter,
+        bgBlur: state.bgBlur,
+        bgBrightness: state.bgBrightness,
+        bgScale: state.bgScale,
+        cardIndex: state.cardIndex,
       }),
 
       // Storage written by older versions may contain a removed scheme
