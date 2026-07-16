@@ -186,8 +186,18 @@ func (h *MonitorHandler) TrackVisitor(c *gin.Context) {
 	c.Status(204)
 }
 
+// GetStatusDetail 处理 GET /status/detail —— 返回版本、服务、系统状态概览（公开）。
+func (h *MonitorHandler) GetStatusDetail(c *gin.Context) {
+	data, err := h.svc.GetStatusDetail(c.Request.Context())
+	if err != nil {
+		response.APIError(c, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	response.Success(c, data, "Status detail retrieved successfully")
+}
+
 // RegisterRoutes 挂载 monitor 端点。
-// 监控统计走 auth + admin 鉴权；访客追踪（/status/track）公开。
+// 监控统计走 auth + admin 鉴权；访客追踪（/status/track）和状态详情（/status/detail）公开。
 func (h *MonitorHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFunc, adminMW gin.HandlerFunc) {
 	r.GET("/status/overview", authMW, adminMW, h.GetOverview)
 	r.GET("/status/visitors", authMW, adminMW, h.GetVisitors)
@@ -195,4 +205,5 @@ func (h *MonitorHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFu
 	r.GET("/status/server/status", authMW, adminMW, h.ServerStatus)
 	r.GET("/status/server/status/stream", authMW, adminMW, h.ServerStatusStream)
 	r.POST("/status/track", h.TrackVisitor)
+	r.GET("/status/detail", h.GetStatusDetail)
 }

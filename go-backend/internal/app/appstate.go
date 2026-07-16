@@ -58,7 +58,7 @@ func NewAppState(
 		blogSvc:    service.NewBlogService(blogRepo),
 		devTaskSvc: service.NewDevTaskService(mongoDB),
 		passkeySvc: service.NewPasskeyService(wa, redis, passkeyRepo, userRepo),
-		monitorSvc: service.NewMonitorService(visitorRepo, userRepo),
+		monitorSvc: service.NewMonitorService(visitorRepo, userRepo, cfg.API.Version),
 		systemSvc:  service.NewSystemService(eventRepo),
 		wsSvc:      service.NewWSService(redis),
 		githubOAuth: service.NewGitHubOAuth(

@@ -23,11 +23,12 @@ func init() {
 // ---------- mock MonitorService ----------
 
 type mockMonitorService struct {
-	overviewFn      func(ctx context.Context, days int) (dto.Overview, error)
-	visitorsFn      func(ctx context.Context, days, page, pageSize int) (dto.Visitors, error)
-	userLoginsFn    func(ctx context.Context, days, page, pageSize int) (dto.UserLogins, error)
-	serverStatusFn  func() (dto.ServerStatus, error)
-	trackVisitorFn  func(ctx context.Context, data dto.VisitorData) error
+	overviewFn       func(ctx context.Context, days int) (dto.Overview, error)
+	visitorsFn       func(ctx context.Context, days, page, pageSize int) (dto.Visitors, error)
+	userLoginsFn     func(ctx context.Context, days, page, pageSize int) (dto.UserLogins, error)
+	serverStatusFn   func() (dto.ServerStatus, error)
+	trackVisitorFn   func(ctx context.Context, data dto.VisitorData) error
+	getStatusDetailFn func(ctx context.Context) (dto.StatusDetail, error)
 }
 
 func (m *mockMonitorService) GetOverview(ctx context.Context, days int) (dto.Overview, error) {
@@ -47,6 +48,13 @@ func (m *mockMonitorService) GetServerStatus() (dto.ServerStatus, error) {
 		return m.serverStatusFn()
 	}
 	return dto.ServerStatus{}, nil
+}
+
+func (m *mockMonitorService) GetStatusDetail(ctx context.Context) (dto.StatusDetail, error) {
+	if m.getStatusDetailFn != nil {
+		return m.getStatusDetailFn(ctx)
+	}
+	return dto.StatusDetail{}, nil
 }
 
 func (m *mockMonitorService) TrackVisitor(ctx context.Context, data dto.VisitorData) error {
@@ -364,5 +372,37 @@ func TestOldTrackRedirect(t *testing.T) {
 
 	if w.Code != http.StatusNoContent {
 		t.Errorf("old /track: status = %d, want %d", w.Code, http.StatusNoContent)
+	}
+}
+
+// ---------- status detail ----------
+
+func TestGetStatusDetail_ReturnsPayload(t *testing.T) {
+	svc := &mockMonitorService{
+		getStatusDetailFn: func(ctx context.Context) (dto.StatusDetail, error) {
+			return dto.StatusDetail{
+				Version: dto.VersionInfoOut{RepoURL: "https://github.com/KanoCifer/kuroome-blog", CurrentVersion: "4.0.0"},
+				Service: dto.ServiceInfoOut{Runtime: "go1.26", DbOk: true, ApiOk: true},
+				System:  dto.SystemInfoOut{OsName: "darwin", CpuCountLogical: 8},
+			}, nil
+		},
+	}
+	r := setupMonitor(svc, func(c *gin.Context) { c.Next() })
+
+	w := requestGet(t, r, "/api/v3/status/detail")
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
+	}
+	if !strings.Contains(w.Body.String(), `"repo_url"`) {
+		t.Fatalf("expected version.repo_url in body: %s", w.Body.String())
+	}
+	if !strings.Contains(w.Body.String(), `"db_ok":true`) {
+		t.Fatalf("expected db_ok:true in body: %s", w.Body.String())
+	}
+	if !strings.Contains(w.Body.String(), `"os_name":"darwin"`) {
+		t.Fatalf("expected os_name in body: %s", w.Body.String())
+	}
+	if !strings.Contains(w.Body.String(), `"message":"Status detail retrieved successfully"`) {
+		t.Fatalf("unexpected message: %s", w.Body.String())
 	}
 }

@@ -21,6 +21,17 @@ func NewVisitorRepo(db *gorm.DB) *VisitorRepo {
 	return &VisitorRepo{db: db}
 }
 
+// Ping 检测数据库连接是否正常（3s 超时）。
+func (r *VisitorRepo) Ping(ctx context.Context) error {
+	sqlDB, err := r.db.DB()
+	if err != nil {
+		return err
+	}
+	pingCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
+	defer cancel()
+	return sqlDB.PingContext(pingCtx)
+}
+
 // Insert 写入一条 visitor_track 记录。
 func (r *VisitorRepo) Insert(ctx context.Context, v *model.VisitorTrack) error {
 	return r.db.WithContext(ctx).Create(v).Error

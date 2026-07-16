@@ -9,9 +9,9 @@ export interface VersionInfo {
 
 export interface ServiceInfo {
   runtime: string;
-  python_version: string;
-  coroutines: number;
-  gc_count: number[];
+  go_version: string;
+  goroutines: number;
+  gc_count: number;
   start_time: number;
   heap_memory_bytes: number;
   total_memory_bytes: number;
@@ -52,7 +52,7 @@ export interface StatusGateway {
 export const statusGateway = (): StatusGateway => {
   return {
     async getStatusDetail() {
-      return request.get('v1/status-detail') as Promise<
+      return request.get('v3/status/detail') as Promise<
         AxiosResponse<StatusDetailApiData>
       >;
     },

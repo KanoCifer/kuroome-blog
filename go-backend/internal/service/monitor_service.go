@@ -3,10 +3,12 @@ package service
 import (
 	"context"
 	"math"
+	"runtime"
 	"time"
 
 	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/shirou/gopsutil/v4/disk"
+	"github.com/shirou/gopsutil/v4/load"
 	"github.com/shirou/gopsutil/v4/mem"
 
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
@@ -26,16 +28,17 @@ type Monitorer interface {
 	GetStatusDetail(ctx context.Context) (dto.StatusDetail, error)
 }
 
-// MonitorService 实现 monitor 端点的业务逻辑（overview / visitors / user-logins）。
-//
-// server/status + stream 在 task-7 中追加，复用同一个 service 实例。
+// MonitorService 实现 monitor 端点的业务逻辑（overview / visitors / user-logins
+// / status-detail）。
 type MonitorService struct {
-	visitor *postgres.VisitorRepo
-	user    *postgres.UserRepo
+	visitor   *postgres.VisitorRepo
+	user      *postgres.UserRepo
+	version   string
+	startTime time.Time
 }
 
-func NewMonitorService(visitor *postgres.VisitorRepo, user *postgres.UserRepo) *MonitorService {
-	return &MonitorService{visitor: visitor, user: user}
+func NewMonitorService(visitor *postgres.VisitorRepo, user *postgres.UserRepo, version string) *MonitorService {
+	return &MonitorService{visitor: visitor, user: user, version: version, startTime: time.Now()}
 }
 
 // TrackVisitor 记录访客追踪数据（公开接口）。visit_time 由 PG default current_timestamp 填充。
@@ -57,6 +60,82 @@ func (s *MonitorService) TrackVisitor(ctx context.Context, data dto.VisitorData)
 		DeviceType:       ptrIf(data.DeviceType),
 	}
 	return s.visitor.Insert(ctx, track)
+}
+
+// GetStatusDetail 返回服务器运行时状态概览，对齐 Python
+// PublicService.get_status_detail 的 {version, service, system} 三元组。
+func (s *MonitorService) GetStatusDetail(ctx context.Context) (dto.StatusDetail, error) {
+	// --- system info --------------------------------------------------- //
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+	cpuCountL, _ := cpu.Counts(true)
+	cpuCountP, _ := cpu.Counts(false)
+
+	cpuPercent := 0.0
+	if p, err := cpu.Percent(0, false); err == nil && len(p) > 0 {
+		cpuPercent = math.Round(p[0])
+	}
+
+	loadAvg := &load.AvgStat{}
+	if la, err := load.Avg(); err == nil {
+		loadAvg = la
+	}
+
+	// 2. 获取CPU信息
+	cpuInfo, _ := cpu.Info()
+
+
+	vm, _ := mem.VirtualMemory()
+
+	sysInfo := dto.SystemInfoOut{
+		SystemTime:         time.Now().Format("2006/01/02 15:04:05"),
+		SystemTimezone:     "GMT+8",
+		OsName:             runtime.GOOS,
+		OsVersion:          runtime.GOARCH,
+		KernelVersion:      runtime.GOARCH,
+		CpuModel:           cpuInfo[0].ModelName,
+		CpuCountPhysical:   cpuCountP,
+		CpuCountLogical:    cpuCountL,
+		LoadAverage: map[string]float64{
+			"1m":  math.Round(loadAvg.Load1*100) / 100,
+			"5m":  math.Round(loadAvg.Load5*100) / 100,
+			"15m": math.Round(loadAvg.Load15*100) / 100,
+		},
+		CpuPercent:         cpuPercent,
+		MemoryUsagePercent: round2(vm.UsedPercent),
+		MemoryUsedBytes:    vm.Used,
+		MemoryTotalBytes:   vm.Total,
+	}
+
+	// --- service info -------------------------------------------------- //
+	dbOk := true
+	if err := s.visitor.Ping(ctx); err != nil {
+		dbOk = false
+	}
+
+	svcInfo := dto.ServiceInfoOut{
+		Runtime:          runtime.Version() + " " + runtime.GOOS + "/" + runtime.GOARCH,
+		GoVersion:        runtime.Version(),
+		Goroutines:       runtime.NumGoroutine(),
+		GcCount:          m.NumGC,
+		StartTime:        s.startTime.Unix(),
+		HeapMemoryBytes:  m.Alloc,
+		TotalMemoryBytes: m.TotalAlloc,
+		DbOk:             dbOk,
+		ApiOk:            true,
+	}
+
+	// --- version info -------------------------------------------------- //
+	verInfo := dto.VersionInfoOut{
+		RepoURL:        "https://github.com/KanoCifer/kuroome-blog",
+		CurrentVersion: s.version,
+	}
+
+	return dto.StatusDetail{
+		Version: verInfo,
+		Service: svcInfo,
+		System:  sysInfo,
+	}, nil
 }
 
 // GetOverview 返回 days 天内的访客总览统计，对齐 Python MonitorService.get_overview。

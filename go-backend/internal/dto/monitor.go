@@ -70,3 +70,43 @@ type ServerStatus struct {
 	DiskUsed   float64 `json:"disk_used"`
 	DiskUsage  float64 `json:"disk_usage"`
 }
+
+
+type StatusDetail struct {
+	Version VersionInfoOut `json:"version"`
+	Service ServiceInfoOut `json:"service"`
+	System  SystemInfoOut  `json:"system"`
+}
+
+type VersionInfoOut struct {
+	RepoURL        string `json:"repo_url"`
+	CurrentVersion string `json:"current_version"`
+}
+
+type ServiceInfoOut struct {
+	Runtime          string `json:"runtime"`
+	GoVersion        string `json:"go_version"`
+	Goroutines       int    `json:"goroutines"`
+	GcCount          uint32 `json:"gc_count"`
+	StartTime        int64  `json:"start_time"`
+	HeapMemoryBytes  uint64 `json:"heap_memory_bytes"`
+	TotalMemoryBytes uint64 `json:"total_memory_bytes"`
+	DbOk             bool   `json:"db_ok"`
+	ApiOk            bool   `json:"api_ok"`
+}
+
+type SystemInfoOut struct {
+	SystemTime         string             `json:"system_time"`
+	SystemTimezone     string             `json:"system_timezone"`
+	OsName             string             `json:"os_name"`
+	OsVersion          string             `json:"os_version"`
+	KernelVersion      string             `json:"kernel_version"`
+	CpuModel           string             `json:"cpu_model"`
+	CpuCountPhysical   int                `json:"cpu_count_physical"`
+	CpuCountLogical    int                `json:"cpu_count_logical"`
+	LoadAverage        map[string]float64 `json:"load_average"`
+	CpuPercent         float64            `json:"cpu_percent"`
+	MemoryUsagePercent float64            `json:"memory_usage_percent"`
+	MemoryUsedBytes    uint64             `json:"memory_used_bytes"`
+	MemoryTotalBytes   uint64             `json:"memory_total_bytes"`
+}

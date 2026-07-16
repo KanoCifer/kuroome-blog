@@ -84,7 +84,7 @@ async function pingApi() {
   const base = import.meta.env.VITE_API_BASE || '/api';
   const start = performance.now();
   try {
-    const res = await fetch(`${base}/v1/status`, {
+    const res = await fetch(`${base}/v3/status/detail`, {
       method: 'GET',
       cache: 'no-store',
       signal: AbortSignal.timeout(5000),
@@ -772,7 +772,7 @@ onUnmounted(() => {
               >协程</span
             >
             <span class="text-foreground tabular-nums">{{
-              serverStatus.service.coroutines
+              serverStatus.service.goroutines
             }}</span>
           </div>
           <div
@@ -783,7 +783,7 @@ onUnmounted(() => {
               >GC 次数</span
             >
             <span class="text-foreground tabular-nums">{{
-              serverStatus.service.gc_count[0]
+              serverStatus.service.gc_count
             }}</span>
           </div>
           <div

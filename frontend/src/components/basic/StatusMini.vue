@@ -80,7 +80,7 @@ async function pingApi() {
   const base = import.meta.env.VITE_API_BASE || '/api';
   const start = performance.now();
   try {
-    const res = await fetch(`${base}/v1/status`, {
+    const res = await fetch(`${base}/v3/status/detail`, {
       method: 'GET',
       cache: 'no-store',
       signal: AbortSignal.timeout(5000),
