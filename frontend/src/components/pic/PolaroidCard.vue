@@ -39,6 +39,7 @@
             class="pointer-events-none h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
             loading="lazy"
             draggable="false"
+            @load="emit('imageLoad')"
           />
 
           <!-- Hover 胶片闪光点：克制的中央白点，不遮挡画面 -->
@@ -123,6 +124,7 @@ const emit = defineEmits<{
   select: [image: Picture, index: number];
   toggleSelect: [id: string];
   delete: [id: string];
+  imageLoad: [];
 }>();
 
 // 拍立得底部日期：若图片有 uploadedAt / createdAt / date 字段则显示，否则留空槽

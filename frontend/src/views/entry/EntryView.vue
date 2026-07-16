@@ -17,8 +17,8 @@
         :animate="{ scale: 1, opacity: 1 }"
         :transition="{
           type: 'spring',
-          bounce: 0.3,
-          duration: 0.5,
+          stiffness: 520,
+          damping: 38,
         }"
         class="w-68"
       />
@@ -31,8 +31,8 @@
         :animate="{ scale: 1, opacity: 1 }"
         :transition="{
           type: 'spring',
-          stiffness: 300,
-          damping: 20,
+          stiffness: 520,
+          damping: 38,
           delay: DELAY.BentoMap,
         }"
         class="h-auto w-2xs min-w-fit"
@@ -45,8 +45,8 @@
         :animate="{ scale: 1, opacity: 1 }"
         :transition="{
           type: 'spring',
-          stiffness: 300,
-          damping: 20,
+          stiffness: 520,
+          damping: 38,
           delay: DELAY.BentoProfileCard,
         }"
         class="h-70 w-90 min-w-fit"
@@ -67,8 +67,8 @@
         :animate="{ scale: 1, opacity: 1 }"
         :transition="{
           type: 'spring',
-          stiffness: 300,
-          damping: 20,
+          stiffness: 520,
+          damping: 38,
           delay: DELAY.BentoClock,
         }"
         class="w-auto"
@@ -81,8 +81,8 @@
         :animate="{ scale: 1, opacity: 1 }"
         :transition="{
           type: 'spring',
-          stiffness: 300,
-          damping: 20,
+          stiffness: 520,
+          damping: 38,
           delay: DELAY.BentoCalendar,
         }"
         class="w-auto"
@@ -95,8 +95,8 @@
         :animate="{ scale: 1, opacity: 1 }"
         :transition="{
           type: 'spring',
-          stiffness: 300,
-          damping: 20,
+          stiffness: 520,
+          damping: 38,
           delay: DELAY.BentoTech,
         }"
         class="h-2xs w-68 p-4!"
@@ -110,8 +110,8 @@
         :animate="{ scale: 1, opacity: 1 }"
         :transition="{
           type: 'spring',
-          stiffness: 300,
-          damping: 20,
+          stiffness: 520,
+          damping: 38,
           delay: DELAY.BentoReadingList,
         }"
         class="w-60 cursor-pointer"
@@ -125,8 +125,8 @@
         :animate="{ scale: 1, opacity: 1 }"
         :transition="{
           type: 'spring',
-          stiffness: 300,
-          damping: 20,
+          stiffness: 520,
+          damping: 38,
           delay: DELAY.TodoCard,
         }"
         class="w-52"
@@ -142,8 +142,8 @@
         :animate="{ scale: 1, opacity: 1 }"
         :transition="{
           type: 'spring',
-          stiffness: 300,
-          damping: 20,
+          stiffness: 520,
+          damping: 38,
           delay: DELAY.BentoPic,
         }"
         class="cursor-pointer p-2!"

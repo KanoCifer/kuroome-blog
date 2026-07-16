@@ -25,20 +25,31 @@
       @delete-selected="deleteSelected"
     />
 
-    <!-- Gallery Container — columns 瀑布流，整页纵向滚动 -->
+    <!-- Gallery Container — 最短列优先瀑布流 (masonry) -->
     <div
-      class="gallery-columns relative z-10 mx-auto w-full max-w-[1400px] px-4 pt-24 pb-32 sm:px-6"
-      :style="{
-        columnCount: columnsCount,
-        columnGap: columnsGap + 'px',
-      }"
+      ref="masonry.containerEl"
+      class="gallery-masonry bg-background relative z-10 mx-auto w-full max-w-[1400px] px-4 pt-24 pb-32 sm:px-6"
+      :style="{ height: masonry.state.containerHeight + 'px' }"
     >
       <!-- Polaroid Cards -->
-      <div
+      <motion.div
         v-for="(image, index) in images"
         :key="image.id"
-        class="mb-4 inline-block w-full break-inside-avoid"
-        :style="{ breakInside: 'avoid' }"
+        :ref="(el) => masonry.setItemRef(el, index)"
+        class="gallery-item absolute top-0 left-0"
+        :style="{
+          width: masonry.state.colWidth + 'px',
+          transform: `translate3d(${masonry.state.positions[index]?.x ?? 0}px, ${masonry.state.positions[index]?.y ?? 0}px, 0)`,
+        }"
+        :initial="{ opacity: 0, y: 24 }"
+        :animate="{ opacity: 1, y: 0 }"
+        :transition="{
+          duration: 0.5,
+          delay: Math.min(index * 0.03, 0.4),
+          type: 'spring',
+          stiffness: 220,
+          damping: 24,
+        }"
       >
         <PolaroidCard
           :image="image"
@@ -50,19 +61,16 @@
           @select="openImageDetail"
           @toggle-select="toggleSelect"
           @delete="onDeleteImage"
+          @image-load="onImageLoad"
         />
-      </div>
+      </motion.div>
 
       <!-- Empty State -->
       <div
         v-if="images.length === 0"
-        class="flex h-[60vh] flex-col items-center justify-center"
-        style="column-span: all"
+        class="absolute inset-x-0 top-0 flex h-[60vh] flex-col items-center justify-center"
       >
-        <motion.div
-          initial="{ opacity: 0, y: 20 }"
-          animate="{ opacity: 1, y: 0 }"
-          :transition="{ duration: 0.8, type: 'spring' }"
+        <div
           class="bg-background border-border relative max-w-md rounded-3xl border p-10 text-center shadow-2xl"
         >
           <div
@@ -83,7 +91,7 @@
           >
             开始上传
           </Button>
-        </motion.div>
+        </div>
       </div>
     </div>
 
@@ -116,7 +124,12 @@ import PicDetailModal from '@/components/pic/PicDetailModal.vue';
 import PicUploadModal from '@/components/pic/PicUploadModal.vue';
 import PolaroidCard from '@/components/pic/PolaroidCard.vue';
 import { Button } from '@/components/ui/button';
-import { useGallery, usePolaroidLayout, type Picture } from '@/composables/pic';
+import {
+  useGallery,
+  useMasonry,
+  usePolaroidLayout,
+  type Picture,
+} from '@/composables/pic';
 import { useAuthStore } from '@/auth/stores/auth';
 import { useNotificationStore } from '@/stores/notification';
 import { ImageOff } from '@lucide/vue';
@@ -143,9 +156,6 @@ const { generateLayoutSeeds, shuffleImages, getAspectRatio, getRotation } =
 const viewportWidth = ref(
   typeof window !== 'undefined' ? window.innerWidth : 1280,
 );
-const onResize = () => {
-  viewportWidth.value = window.innerWidth;
-};
 const columnsCount = computed(() => {
   const w = viewportWidth.value;
   if (w < 480) return 2; // 小屏 2 列
@@ -155,6 +165,24 @@ const columnsCount = computed(() => {
   return 6; // 宽屏 6 列
 });
 const columnsGap = computed(() => (viewportWidth.value < 640 ? 10 : 14));
+
+// --- masonry 瀑布流 ---
+const masonry = useMasonry({ columnsCount, columnsGap });
+
+// 图片加载完成后重排（高度可能因真实图片尺寸变化）
+const onImageLoad = () => {
+  masonry.reflow();
+};
+
+// 照片增删后重排
+watch(
+  () => images.value.length,
+  () => {
+    // 先清空旧节点引用（避免 stale ref 留在旧下标），再等 DOM 更新后重排
+    masonry.clearRefs();
+    masonry.reflow();
+  },
+);
 
 // --- edit mode ---
 const isEditMode = ref(false);
@@ -265,20 +293,29 @@ onMounted(async () => {
   window.addEventListener('resize', onResize);
   await fetchGalleryImages();
   generateLayoutSeeds();
+  masonry.reflow();
 });
 
 onUnmounted(() => {
   window.removeEventListener('resize', onResize);
 });
+
+const onResize = () => {
+  viewportWidth.value = window.innerWidth;
+};
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Kalam:wght@400;700&display=swap');
+/* 瀑布流卡片过渡：列宽/位置变化时丝滑移动，不做 transform 动画（已用于定位） */
+.gallery-item {
+  transition:
+    opacity 0.4s ease,
+    width 0.3s ease;
+}
 
-/* 瀑布流断点细化：小屏 2 列已在 JS 控制，这里补防内嵌预览极窄情况 */
-@media (max-width: 380px) {
-  .gallery-columns {
-    column-count: 1 !important;
+@media (prefers-reduced-motion: reduce) {
+  .gallery-item {
+    transition: none;
   }
 }
 </style>
