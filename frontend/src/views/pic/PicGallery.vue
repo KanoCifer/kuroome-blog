@@ -25,22 +25,19 @@
       @delete-selected="deleteSelected"
     />
 
-    <!-- Gallery Container — 最短列优先瀑布流 (masonry) -->
+    <!--
+      Gallery Container — 最短列优先瀑布流
+      Native CSS grid masonry 优先（现代浏览器左→右填充），不支持时回退到多列布局。
+      卡片已通过 aspect-ratio 预留图片高度，加载时不跳动。
+    -->
     <div
-      ref="masonry.containerEl"
-      class="gallery-masonry bg-background relative z-10 mx-auto w-full max-w-[1400px] px-4 pt-24 pb-32 sm:px-6"
-      :style="{ height: masonry.state.containerHeight + 'px' }"
+      class="gallery-masonry relative z-10 mx-auto w-full max-w-[1400px] px-4 pt-24 pb-32 sm:px-6"
     >
       <!-- Polaroid Cards -->
       <motion.div
         v-for="(image, index) in images"
         :key="image.id"
-        :ref="(el) => masonry.setItemRef(el, index)"
-        class="gallery-item absolute top-0 left-0"
-        :style="{
-          width: masonry.state.colWidth + 'px',
-          transform: `translate3d(${masonry.state.positions[index]?.x ?? 0}px, ${masonry.state.positions[index]?.y ?? 0}px, 0)`,
-        }"
+        class="gallery-item"
         :initial="{ opacity: 0, y: 24 }"
         :animate="{ opacity: 1, y: 0 }"
         :transition="{
@@ -61,14 +58,13 @@
           @select="openImageDetail"
           @toggle-select="toggleSelect"
           @delete="onDeleteImage"
-          @image-load="onImageLoad"
         />
       </motion.div>
 
       <!-- Empty State -->
       <div
         v-if="images.length === 0"
-        class="absolute inset-x-0 top-0 flex h-[60vh] flex-col items-center justify-center"
+        class="gallery-empty flex h-[60vh] flex-col items-center justify-center"
       >
         <div
           class="bg-background border-border relative max-w-md rounded-3xl border p-10 text-center shadow-2xl"
@@ -126,7 +122,6 @@ import PolaroidCard from '@/components/pic/PolaroidCard.vue';
 import { Button } from '@/components/ui/button';
 import {
   useGallery,
-  useMasonry,
   usePolaroidLayout,
   type Picture,
 } from '@/composables/pic';
@@ -134,7 +129,7 @@ import { useAuthStore } from '@/auth/stores/auth';
 import { useNotificationStore } from '@/stores/notification';
 import { ImageOff } from '@lucide/vue';
 import { motion } from 'motion-v';
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 const authStore = useAuthStore();
 const canEdit = computed(() => authStore.isAdmin);
@@ -151,38 +146,6 @@ const {
 
 const { generateLayoutSeeds, shuffleImages, getAspectRatio, getRotation } =
   usePolaroidLayout({ images });
-
-// --- 响应式列数：依据视口宽度决定瀑布流列数 ---
-const viewportWidth = ref(
-  typeof window !== 'undefined' ? window.innerWidth : 1280,
-);
-const columnsCount = computed(() => {
-  const w = viewportWidth.value;
-  if (w < 480) return 2; // 小屏 2 列
-  if (w < 768) return 3; // 移动端 3 列
-  if (w < 1100) return 4; // 平板 4 列
-  if (w < 1400) return 5; // 桌面 5 列
-  return 6; // 宽屏 6 列
-});
-const columnsGap = computed(() => (viewportWidth.value < 640 ? 10 : 14));
-
-// --- masonry 瀑布流 ---
-const masonry = useMasonry({ columnsCount, columnsGap });
-
-// 图片加载完成后重排（高度可能因真实图片尺寸变化）
-const onImageLoad = () => {
-  masonry.reflow();
-};
-
-// 照片增删后重排
-watch(
-  () => images.value.length,
-  () => {
-    // 先清空旧节点引用（避免 stale ref 留在旧下标），再等 DOM 更新后重排
-    masonry.clearRefs();
-    masonry.reflow();
-  },
-);
 
 // --- edit mode ---
 const isEditMode = ref(false);
@@ -290,32 +253,93 @@ const onImageUploaded = async (image: Picture) => {
 };
 
 onMounted(async () => {
-  window.addEventListener('resize', onResize);
   await fetchGalleryImages();
   generateLayoutSeeds();
-  masonry.reflow();
 });
-
-onUnmounted(() => {
-  window.removeEventListener('resize', onResize);
-});
-
-const onResize = () => {
-  viewportWidth.value = window.innerWidth;
-};
 </script>
 
 <style scoped>
-/* 瀑布流卡片过渡：列宽/位置变化时丝滑移动，不做 transform 动画（已用于定位） */
+/* ============================================================
+   瀑布流布局：native CSS grid masonry 优先 + 多列回退
+   - 现代浏览器：grid-template-rows: masonry（左→右最短列填充）
+   - 旧浏览器：CSS multi-column（上→右排列，每卡片 break-inside: avoid）
+   - 响应式列数通过 CSS 变量 + 媒体查询集中管理
+   - 卡片已在组件内通过 aspect-ratio 预留高度，加载无跳动
+   ============================================================ */
+
+.gallery-masonry {
+  /* 间距：小屏 10px，≥640px 14px */
+  --gallery-gap: 10px;
+  /* 列数响应式：<480→2, <768→3, <1100→4, <1400→5, ≥1400→6 */
+  --gallery-cols: 2;
+
+  /* 回退：CSS multi-column（旧浏览器上→右排列） */
+  columns: var(--gallery-cols);
+  column-gap: var(--gallery-gap);
+}
+
 .gallery-item {
-  transition:
-    opacity 0.4s ease,
-    width 0.3s ease;
+  break-inside: avoid;
+  margin-bottom: var(--gallery-gap);
+}
+
+.gallery-empty {
+  /* 空状态占满整行 */
+  column-span: all;
+}
+
+@supports (grid-template-rows: masonry) {
+  .gallery-masonry {
+    display: grid;
+    grid-template-columns: repeat(var(--gallery-cols), 1fr);
+    grid-template-rows: masonry;
+    gap: var(--gallery-gap);
+    columns: unset;
+  }
+
+  .gallery-item {
+    margin-bottom: 0;
+  }
+
+  .gallery-empty {
+    grid-column: 1 / -1;
+  }
+}
+
+/* 响应式列数与间距（native masonry 与多列回退共用变量） */
+@media (min-width: 480px) {
+  .gallery-masonry {
+    --gallery-cols: 3;
+  }
+}
+
+@media (min-width: 640px) {
+  .gallery-masonry {
+    --gallery-gap: 14px;
+  }
+}
+
+@media (min-width: 768px) {
+  .gallery-masonry {
+    --gallery-cols: 4;
+  }
+}
+
+@media (min-width: 1100px) {
+  .gallery-masonry {
+    --gallery-cols: 5;
+  }
+}
+
+@media (min-width: 1400px) {
+  .gallery-masonry {
+    --gallery-cols: 6;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .gallery-item {
-    transition: none;
+    animation: none;
   }
 }
 </style>
