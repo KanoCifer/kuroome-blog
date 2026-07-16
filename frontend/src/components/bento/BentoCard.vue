@@ -1,5 +1,12 @@
 <template>
   <motion.div
+    :initial="{ scale: 0, opacity: 0, filter: 'blur(4px)' }"
+    :animate="{ scale: 1, opacity: 1, filter: 'blur(0)' }"
+    :transition="{
+      type: 'spring',
+      stiffness: 520,
+      damping: 38,
+    }"
     class="card group border-border squircle bg-background/95 relative overflow-hidden border p-6"
   >
     <slot></slot>

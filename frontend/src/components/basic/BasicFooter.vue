@@ -20,49 +20,6 @@
         >
       </div>
 
-      <!-- 中：实时状态（延迟 + 在线） -->
-      <div class="flex items-center gap-3">
-        <StatusHoverPopover>
-          <template #trigger>
-            <router-link
-              to="/status"
-              class="hover:text-foreground inline-flex items-center gap-1.5 transition-colors"
-            >
-              <span class="status-dot relative flex h-1.5 w-1.5">
-                <span
-                  class="absolute inline-flex h-full w-full animate-ping rounded-full"
-                  :class="delayStatus.dotClass"
-                />
-                <span
-                  class="relative inline-flex h-1.5 w-1.5 rounded-full"
-                  :class="delayStatus.dotClass"
-                />
-              </span>
-              <span class="font-mono tracking-[0.1em]">延迟</span>
-              <span
-                :class="delayStatus.textClass"
-                class="font-mono tabular-nums"
-                >{{ delayStatus.label }}</span
-              >
-            </router-link>
-          </template>
-        </StatusHoverPopover>
-        <span aria-hidden="true" class="text-border/50">·</span>
-        <span class="inline-flex items-center gap-1.5">
-          <span class="relative flex h-1.5 w-1.5">
-            <span
-              class="bg-success absolute inline-flex h-full w-full animate-ping rounded-full opacity-60"
-            />
-            <span
-              class="bg-success relative inline-flex h-1.5 w-1.5 rounded-full"
-            />
-          </span>
-          <span class="font-mono tabular-nums"
-            >{{ visitorCount.count }} 人在线</span
-          >
-        </span>
-      </div>
-
       <!-- 右：链接组 -->
       <div class="flex items-center gap-3">
         <a
@@ -99,24 +56,6 @@
 </template>
 
 <script setup lang="ts">
-import { connectionDelay } from '@/plugins/visitorWs';
-import StatusHoverPopover from '@/components/basic/StatusHoverPopover.vue';
-import { useVisitorCountStore } from '@/stores/visitorCount';
-import { computed } from 'vue';
-
-const visitorCount = useVisitorCountStore();
-
-const delayStatus = computed(() => {
-  const ms = connectionDelay?.value ?? 0;
-  if (!ms) return { label: '-- ms', dotClass: 'bg-muted-foreground/40' };
-  const label = `${Math.round(ms)} ms`;
-  if (ms < 200)
-    return { label, dotClass: 'bg-emerald-500', textClass: 'text-emerald-500' };
-  if (ms < 2000)
-    return { label, dotClass: 'bg-yellow-500', textClass: 'text-yellow-500' };
-  return { label, dotClass: 'bg-red-500', textClass: 'text-red-500' };
-});
-
 defineProps<{
   isEntryView: boolean;
 }>();

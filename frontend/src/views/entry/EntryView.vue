@@ -16,9 +16,7 @@
         :initial="{ scale: 0.5, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
         :transition="{
-          type: 'spring',
-          stiffness: 520,
-          damping: 38,
+          delay: 0.05,
         }"
         class="w-68"
       />
@@ -27,12 +25,7 @@
     <DragWrapper :position="greetingPosition" card-name="BentoMap">
       <BentoMap
         v-if="show.BentoMap"
-        :initial="{ scale: 0, opacity: 0 }"
-        :animate="{ scale: 1, opacity: 1 }"
         :transition="{
-          type: 'spring',
-          stiffness: 520,
-          damping: 38,
           delay: DELAY.BentoMap,
         }"
         class="h-auto w-2xs min-w-fit"
@@ -41,12 +34,7 @@
     <DragWrapper :position="profilePosition" card-name="BentoProfileCard">
       <BentoProfileCard
         v-if="show.BentoProfileCard"
-        :initial="{ scale: 0.5, opacity: 0 }"
-        :animate="{ scale: 1, opacity: 1 }"
         :transition="{
-          type: 'spring',
-          stiffness: 520,
-          damping: 38,
           delay: DELAY.BentoProfileCard,
         }"
         class="h-70 w-90 min-w-fit"
@@ -63,12 +51,7 @@
     <DragWrapper :position="clockCardPosition" card-name="BentoClock">
       <BentoClock
         v-if="show.BentoClock"
-        :initial="{ scale: 0, opacity: 0 }"
-        :animate="{ scale: 1, opacity: 1 }"
         :transition="{
-          type: 'spring',
-          stiffness: 520,
-          damping: 38,
           delay: DELAY.BentoClock,
         }"
         class="w-auto"
@@ -77,12 +60,7 @@
     <DragWrapper :position="calendarPosition" card-name="BentoCalendar">
       <BentoCalendar
         v-if="show.BentoCalendar"
-        :initial="{ scale: 0, opacity: 0 }"
-        :animate="{ scale: 1, opacity: 1 }"
         :transition="{
-          type: 'spring',
-          stiffness: 520,
-          damping: 38,
           delay: DELAY.BentoCalendar,
         }"
         class="w-auto"
@@ -91,12 +69,7 @@
     <DragWrapper :position="techPosition" card-name="BentoTech">
       <BentoTech
         v-if="show.BentoTech"
-        :initial="{ scale: 0.5, opacity: 0 }"
-        :animate="{ scale: 1, opacity: 1 }"
         :transition="{
-          type: 'spring',
-          stiffness: 520,
-          damping: 38,
           delay: DELAY.BentoTech,
         }"
         class="h-2xs w-68 p-4!"
@@ -106,12 +79,7 @@
     <DragWrapper :position="listCardPosition" card-name="BentoReadingList">
       <BentoReadingList
         v-if="show.BentoReadingList"
-        :initial="{ scale: 0, opacity: 0 }"
-        :animate="{ scale: 1, opacity: 1 }"
         :transition="{
-          type: 'spring',
-          stiffness: 520,
-          damping: 38,
           delay: DELAY.BentoReadingList,
         }"
         class="w-60 cursor-pointer"
@@ -121,12 +89,7 @@
     <DragWrapper :position="todoCardPosition" card-name="TodoCard">
       <TodoCard
         v-if="show.TodoCard"
-        :initial="{ scale: 0.5, opacity: 0 }"
-        :animate="{ scale: 1, opacity: 1 }"
         :transition="{
-          type: 'spring',
-          stiffness: 520,
-          damping: 38,
           delay: DELAY.TodoCard,
         }"
         class="w-52"
@@ -138,12 +101,7 @@
       <!-- 新增照片卡片的拖拽容器 -->
       <BentoPic
         v-if="show.BentoPic"
-        :initial="{ scale: 0, opacity: 0 }"
-        :animate="{ scale: 1, opacity: 1 }"
         :transition="{
-          type: 'spring',
-          stiffness: 520,
-          damping: 38,
           delay: DELAY.BentoPic,
         }"
         class="cursor-pointer p-2!"
@@ -295,7 +253,7 @@ const show = {
   BentoPic: true,
 } as const satisfies Record<CardName, true>;
 
-const ANIMATION_DELAY = 0.1;
+const ANIMATION_DELAY = 0.08;
 
 function buildDelays(): Record<CardName, number> {
   const delays = {} as Record<CardName, number>;
