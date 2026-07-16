@@ -21,7 +21,7 @@ import (
 type DevTasker interface {
 	Create(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error)
 	GetBySlug(ctx context.Context, slug string, withParent bool) (*dto.DevTaskOut, error)
-	List(ctx context.Context, filter mongodb.ListFilter, page, perPage int) (*dto.DevTaskListOut, error)
+	List(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListOut, error)
 	Update(ctx context.Context, slug string, req dto.DevTaskUpdate) error
 	BatchUpdateStatus(ctx context.Context, slugs []string, status document.DevTaskStatus) (*BatchStatusResult, error)
 	SoftDelete(ctx context.Context, slug string) error
@@ -145,9 +145,30 @@ func (s *DevTaskService) Create(ctx context.Context, userID int, req dto.DevTask
 }
 
 // List 分页列出任务，支持过滤。
+// toRepoFilter 把 handler 层的 string-based filter 转换为 repository 层的领域类型 filter。
+func toRepoFilter(filter dto.DevTaskFilter) mongodb.ListFilter {
+	repoFilter := mongodb.ListFilter{
+		IsDeleted: filter.IncludeDeleted,
+		ForAgent:  filter.ForAgent,
+	}
+	if filter.Status != "" {
+		st := document.DevTaskStatus(filter.Status)
+		repoFilter.Status = &st
+	}
+	if filter.Priority != "" {
+		pri := document.DevTaskPriority(filter.Priority)
+		repoFilter.Priority = &pri
+	}
+	if filter.Type != "" {
+		ty := document.DevTaskType(filter.Type)
+		repoFilter.Type = &ty
+	}
+	return repoFilter
+}
+
 func (s *DevTaskService) List(
 	ctx context.Context,
-	filter mongodb.ListFilter,
+	filter dto.DevTaskFilter,
 	page, perPage int,
 ) (*dto.DevTaskListOut, error) {
 	if page < 1 {
@@ -157,7 +178,7 @@ func (s *DevTaskService) List(
 		perPage = 10
 	}
 
-	tasks, total, err := s.repo.List(ctx, filter, page, perPage)
+	tasks, total, err := s.repo.List(ctx, toRepoFilter(filter), page, perPage)
 	if err != nil {
 		slog.Error("list dev tasks", "error", err)
 		return nil, err

@@ -12,7 +12,6 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
-	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
 // PasskeyServiceer 定义 handler 依赖的 Passkey 业务接口。
@@ -25,14 +24,21 @@ type PasskeyServiceer interface {
 	DeletePasskey(ctx context.Context, userID uint) error
 }
 
-// PasskeyHandler 持有 PasskeyServiceer 和 Userer（登录后构造 token）。
+// passkeyTokenCreator 是 PasskeyHandler 为签发 token 所需的窄接口。
+// handler 自定接口，不直接依赖 service.Userer，便于 mock 测试。
+type passkeyTokenCreator interface {
+	CreateTokens(ctx context.Context, u *model.User) (*dto.Tokens, error)
+	UserToDict(u *model.User, p *model.Profile) map[string]any
+}
+
+// PasskeyHandler 持有 PasskeyServiceer 和 passkeyTokenCreator（登录后构造 token）。
 type PasskeyHandler struct {
 	passkeySvc PasskeyServiceer
-	userSvc    service.Userer
+	userSvc    passkeyTokenCreator
 	cfg        *config.Config
 }
 
-func NewPasskeyHandler(passkeySvc PasskeyServiceer, userSvc service.Userer, cfg *config.Config) *PasskeyHandler {
+func NewPasskeyHandler(passkeySvc PasskeyServiceer, userSvc passkeyTokenCreator, cfg *config.Config) *PasskeyHandler {
 	return &PasskeyHandler{passkeySvc: passkeySvc, userSvc: userSvc, cfg: cfg}
 }
 

@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
@@ -22,10 +23,11 @@ func init() {
 // ---------- mock MonitorService ----------
 
 type mockMonitorService struct {
-	overviewFn     func(ctx context.Context, days int) (dto.Overview, error)
-	visitorsFn     func(ctx context.Context, days, page, pageSize int) (dto.Visitors, error)
-	userLoginsFn   func(ctx context.Context, days, page, pageSize int) (dto.UserLogins, error)
-	serverStatusFn func() (dto.ServerStatus, error)
+	overviewFn      func(ctx context.Context, days int) (dto.Overview, error)
+	visitorsFn      func(ctx context.Context, days, page, pageSize int) (dto.Visitors, error)
+	userLoginsFn    func(ctx context.Context, days, page, pageSize int) (dto.UserLogins, error)
+	serverStatusFn  func() (dto.ServerStatus, error)
+	trackVisitorFn  func(ctx context.Context, data dto.VisitorData) error
 }
 
 func (m *mockMonitorService) GetOverview(ctx context.Context, days int) (dto.Overview, error) {
@@ -47,6 +49,13 @@ func (m *mockMonitorService) GetServerStatus() (dto.ServerStatus, error) {
 	return dto.ServerStatus{}, nil
 }
 
+func (m *mockMonitorService) TrackVisitor(ctx context.Context, data dto.VisitorData) error {
+	if m.trackVisitorFn != nil {
+		return m.trackVisitorFn(ctx, data)
+	}
+	return nil
+}
+
 func (m *mockMonitorService) StreamServerStatus(ctx context.Context) (<-chan dto.ServerStatus, error) {
 	ch := make(chan dto.ServerStatus, 1)
 	if m.serverStatusFn != nil {
@@ -61,7 +70,7 @@ func (m *mockMonitorService) StreamServerStatus(ctx context.Context) (<-chan dto
 // ---------- helpers ----------
 
 func setupMonitor(svc service.Monitorer, adminMW gin.HandlerFunc) *gin.Engine {
-	h := NewMonitorHandler(svc)
+	h := NewMonitorHandler(svc, config.Cfg)
 	r := gin.New()
 	g := r.Group("/api/v3")
 	noopAuth := func(c *gin.Context) { c.Set("user_id", 1); c.Next() }
@@ -298,5 +307,62 @@ func TestServerStatus_RequiresAdmin(t *testing.T) {
 	w := requestGet(t, r, "/api/v3/status/server/status")
 	if w.Code != http.StatusForbidden {
 		t.Fatalf("expected 403 for non-admin, got %d", w.Code)
+	}
+}
+
+// ---------- TrackVisitor ----------
+
+func TestTrackVisitor_Disabled(t *testing.T) {
+	config.Cfg = &config.Config{Admin: config.AdminConfig{EnableTracking: false}}
+	svc := &mockMonitorService{}
+	r := setupMonitor(svc, func(c *gin.Context) { c.Next() })
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/v3/status/track",
+		strings.NewReader(`{"visitor_id":"v","page_path":"/","page_url":"u"}`))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusNoContent {
+		t.Errorf("status = %d, want %d (tracking disabled)", w.Code, http.StatusNoContent)
+	}
+}
+
+func TestTrackVisitor_Success(t *testing.T) {
+	config.Cfg = &config.Config{Admin: config.AdminConfig{EnableTracking: true}}
+	svc := &mockMonitorService{
+		trackVisitorFn: func(ctx context.Context, data dto.VisitorData) error { return nil },
+	}
+	r := setupMonitor(svc, func(c *gin.Context) { c.Next() })
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/v3/status/track",
+		strings.NewReader(`{"visitor_id":"v","page_path":"/","page_url":"u"}`))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusNoContent {
+		t.Errorf("status = %d, want %d", w.Code, http.StatusNoContent)
+	}
+}
+
+func TestOldTrackRedirect(t *testing.T) {
+	config.Cfg = &config.Config{Admin: config.AdminConfig{EnableTracking: true}}
+	svc := &mockMonitorService{
+		trackVisitorFn: func(ctx context.Context, data dto.VisitorData) error { return nil },
+	}
+	h := NewMonitorHandler(svc, config.Cfg)
+	r := gin.New()
+	g := r.Group("/api/v3")
+	h.RegisterRoutes(g, func(c *gin.Context) { c.Set("user_id", 1); c.Next() }, func(c *gin.Context) { c.Next() })
+	// 旧路由 POST /track（对齐 router.go 中的 v3.POST）
+	g.POST("/track", h.TrackVisitor)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/v3/track",
+		strings.NewReader(`{"visitor_id":"v","page_path":"/","page_url":"u"}`))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusNoContent {
+		t.Errorf("old /track: status = %d, want %d", w.Code, http.StatusNoContent)
 	}
 }

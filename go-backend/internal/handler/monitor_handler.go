@@ -3,10 +3,13 @@ package handler
 import (
 	"errors"
 	"io"
+	"log/slog"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/KanoCifer/kuroome-blog/internal/config"
+	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
@@ -15,10 +18,11 @@ var errNotNumber = errors.New("not a number")
 
 type MonitorHandler struct {
 	svc service.Monitorer
+	cfg *config.Config
 }
 
-func NewMonitorHandler(svc service.Monitorer) *MonitorHandler {
-	return &MonitorHandler{svc: svc}
+func NewMonitorHandler(svc service.Monitorer, cfg *config.Config) *MonitorHandler {
+	return &MonitorHandler{svc: svc, cfg: cfg}
 }
 
 const (
@@ -162,11 +166,33 @@ func (h *MonitorHandler) ServerStatusStream(c *gin.Context) {
 	})
 }
 
-// RegisterRoutes 挂载 monitor 端点，全部走 auth + admin 中间件。
+// TrackVisitor 处理 POST /status/track —— 记录访客追踪数据（公开，无需鉴权）。
+func (h *MonitorHandler) TrackVisitor(c *gin.Context) {
+	if !h.cfg.Admin.EnableTracking {
+		c.Status(204)
+		return
+	}
+	var req dto.VisitorData
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.APIError(c, err.Error())
+		return
+	}
+	req.IpAddress = c.ClientIP()
+	if err := h.svc.TrackVisitor(c.Request.Context(), req); err != nil {
+		slog.ErrorContext(c.Request.Context(), "track visitor", "error", err)
+		response.APIError(c, err.Error(), 500)
+		return
+	}
+	c.Status(204)
+}
+
+// RegisterRoutes 挂载 monitor 端点。
+// 监控统计走 auth + admin 鉴权；访客追踪（/status/track）公开。
 func (h *MonitorHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFunc, adminMW gin.HandlerFunc) {
 	r.GET("/status/overview", authMW, adminMW, h.GetOverview)
 	r.GET("/status/visitors", authMW, adminMW, h.GetVisitors)
 	r.GET("/status/user-logins", authMW, adminMW, h.GetUserLogins)
 	r.GET("/status/server/status", authMW, adminMW, h.ServerStatus)
 	r.GET("/status/server/status/stream", authMW, adminMW, h.ServerStatusStream)
+	r.POST("/status/track", h.TrackVisitor)
 }

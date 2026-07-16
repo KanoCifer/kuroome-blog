@@ -22,6 +22,8 @@ type Monitorer interface {
 	GetUserLogins(ctx context.Context, days, page, pageSize int) (dto.UserLogins, error)
 	GetServerStatus() (dto.ServerStatus, error)
 	StreamServerStatus(ctx context.Context) (<-chan dto.ServerStatus, error)
+	TrackVisitor(ctx context.Context, data dto.VisitorData) error
+	GetStatusDetail(ctx context.Context) (dto.StatusDetail, error)
 }
 
 // MonitorService 实现 monitor 端点的业务逻辑（overview / visitors / user-logins）。
@@ -34,6 +36,27 @@ type MonitorService struct {
 
 func NewMonitorService(visitor *postgres.VisitorRepo, user *postgres.UserRepo) *MonitorService {
 	return &MonitorService{visitor: visitor, user: user}
+}
+
+// TrackVisitor 记录访客追踪数据（公开接口）。visit_time 由 PG default current_timestamp 填充。
+func (s *MonitorService) TrackVisitor(ctx context.Context, data dto.VisitorData) error {
+	track := &model.VisitorTrack{
+		VisitorID:        data.VisitorID,
+		PageURL:          data.PageURL,
+		PagePath:         data.PagePath,
+		Referrer:         ptrIf(data.Referrer),
+		Browser:          ptrIf(data.Browser),
+		ScreenResolution: ptrIf(data.ScreenResolution),
+		Language:         ptrIf(data.Language),
+		IPAddress:        data.IpAddress,
+		BrowserName:      ptrIf(data.BrowserName),
+		BrowserVersion:   ptrIf(data.BrowserVersion),
+		OSName:           ptrIf(data.OSName),
+		OSVersion:        ptrIf(data.OSVersion),
+		CPU:              ptrIf(data.Cpu),
+		DeviceType:       ptrIf(data.DeviceType),
+	}
+	return s.visitor.Insert(ctx, track)
 }
 
 // GetOverview 返回 days 天内的访客总览统计，对齐 Python MonitorService.get_overview。
@@ -222,7 +245,7 @@ func (s *MonitorService) GetServerStatus() (dto.ServerStatus, error) {
 	}
 
 	return dto.ServerStatus{
-		CPUPercent: cpuPercent,
+		CPUPercent: math.Round(cpuPercent),
 		CPUCores:   cpuCores,
 		MemTotal:   int(math.Round(float64(vm.Total) / 1024 / 1024)),
 		MemUsed:    int(math.Round(float64(vm.Used) / 1024 / 1024)),

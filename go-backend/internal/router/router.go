@@ -45,12 +45,17 @@ func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
 	blogH := handler.NewBlogHandler(state.BlogSvc())
 	blogH.RegisterRoutes(v3)
 
-	devTaskH := handler.NewDevTaskHandler(state.DevTaskSvc())
-	// devtask 走独立的 service-JWT 鉴权，不再依赖用户 JWT + admin 白名单。
-	devTaskH.RegisterRoutes(v3, middleware.DevTaskMiddleware())
+	deployH := handler.NewDeployHandler(state.Cfg())
+	deployH.RegisterRoutes(v3)
 
-	monitorH := handler.NewMonitorHandler(state.MonitorSvc())
+	devTaskH := handler.NewDevTaskHandler(state.DevTaskSvc(), state.Cfg())
+	devTaskH.RegisterRoutes(v3, middleware.DevTaskMiddleware(), middleware.AuthMiddleware(), middleware.AdminMiddleware(state.Cfg().Admin.UserIDs))
+
+	monitorH := handler.NewMonitorHandler(state.MonitorSvc(), state.Cfg())
 	monitorH.RegisterRoutes(v3, middleware.AuthMiddleware(), middleware.AdminMiddleware(state.Cfg().Admin.UserIDs))
+
+	// 向后兼容：旧版 /track → 新的 /status/track
+	v3.POST("/track", monitorH.TrackVisitor)
 
 	systemH := handler.NewSystemHandler(state.SystemSvc())
 	systemH.RegisterRoutes(v3)

@@ -154,7 +154,7 @@ func TestDevTaskService_List_Pagination(t *testing.T) {
 	}
 	svc := newService(repo)
 
-	out, err := svc.List(context.Background(), mongodb.ListFilter{}, 2, 10)
+	out, err := svc.List(context.Background(), dto.DevTaskFilter{}, 2, 10)
 	if err != nil {
 		t.Fatalf("List: %v", err)
 	}
@@ -179,7 +179,7 @@ func TestDevTaskService_List_Defaults(t *testing.T) {
 	}
 	svc := newService(repo)
 
-	_, err := svc.List(context.Background(), mongodb.ListFilter{}, 0, 0)
+	_, err := svc.List(context.Background(), dto.DevTaskFilter{}, 0, 0)
 	if err != nil {
 		t.Fatalf("List: %v", err)
 	}
@@ -199,7 +199,7 @@ func TestDevTaskService_List_EmptyReturnsArray(t *testing.T) {
 	}
 	svc := newService(repo)
 
-	out, err := svc.List(context.Background(), mongodb.ListFilter{}, 1, 10)
+	out, err := svc.List(context.Background(), dto.DevTaskFilter{}, 1, 10)
 	if err != nil {
 		t.Fatalf("List: %v", err)
 	}

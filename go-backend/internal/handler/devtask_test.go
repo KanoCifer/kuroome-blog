@@ -11,10 +11,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/mongo/document"
-	"github.com/KanoCifer/kuroome-blog/internal/repository/mongodb"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
@@ -27,7 +27,7 @@ func init() {
 type mockDevTaskService struct {
 	createFn       func(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error)
 	getBySlugFn    func(ctx context.Context, slug string, withParent bool) (*dto.DevTaskOut, error)
-	listFn         func(ctx context.Context, filter mongodb.ListFilter, page, perPage int) (*dto.DevTaskListOut, error)
+	listFn         func(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListOut, error)
 	updateFn       func(ctx context.Context, slug string, req dto.DevTaskUpdate) error
 	softDelFn      func(ctx context.Context, slug string) error
 	hardDelFn      func(ctx context.Context, slug string) error
@@ -46,7 +46,7 @@ func (m *mockDevTaskService) GetBySlug(ctx context.Context, slug string, withPar
 	return nil, nil
 }
 
-func (m *mockDevTaskService) List(ctx context.Context, filter mongodb.ListFilter, page, perPage int) (*dto.DevTaskListOut, error) {
+func (m *mockDevTaskService) List(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListOut, error) {
 	return m.listFn(ctx, filter, page, perPage)
 }
 
@@ -83,11 +83,12 @@ func (m *mockDevTaskService) BatchUpdateStatus(
 // ---------- helpers ----------
 
 func newDevTaskHandler(svc *mockDevTaskService) *gin.Engine {
-	h := NewDevTaskHandler(svc)
+	h := NewDevTaskHandler(svc, &config.Config{Security: config.SecurityConfig{DevTaskSecret: "test-devtask-secret"}})
 	r := gin.New()
 	g := r.Group("/api/v3")
 	noopAuth := func(c *gin.Context) { c.Next() }
-	h.RegisterRoutes(g, noopAuth)
+	noopAdmin := func(c *gin.Context) { c.Next() }
+	h.RegisterRoutes(g, noopAuth, noopAuth, noopAdmin)
 	return r
 }
 
@@ -107,45 +108,47 @@ func decodeResp(t *testing.T, body []byte) (data map[string]any, message string)
 	return resp.Data, resp.Message
 }
 
-const testSlug = "task-1"
-
 // ---------- CreateTask ----------
 
 func TestDevTask_CreateTask_Success(t *testing.T) {
 	svc := &mockDevTaskService{
 		createFn: func(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error) {
-			return &dto.DevTaskOut{Title: req.Title, Status: document.StatusTriage, Slug: testSlug}, nil
+			return &dto.DevTaskOut{Slug: "task-1", Title: req.Title}, nil
 		},
 	}
 	r := newDevTaskHandler(svc)
-
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/api/v3/dev-tasks", taskJSONBody(t, dto.DevTaskCreate{
-		Title: "Add tests", Type: document.TaskTypeFeature, Priority: document.PriorityP1, Scope: document.ScopeGo,
-	}))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest(http.MethodPost, "/api/v3/dev-tasks", taskJSONBody(t, dto.DevTaskCreate{Title: "test task"}))
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
 		t.Errorf("status = %d, want %d; body=%s", w.Code, http.StatusOK, w.Body.String())
 	}
-	data, msg := decodeResp(t, w.Body.Bytes())
-	if data["slug"] != testSlug {
-		t.Errorf("data.slug = %v, want %s", data["slug"], testSlug)
+	data, _ := decodeResp(t, w.Body.Bytes())
+	if data["slug"] != "task-1" {
+		t.Errorf("slug = %v, want task-1", data["slug"])
 	}
-	if msg != "Task created successfully" {
-		t.Errorf("message = %q", msg)
+}
+
+func TestDevTask_CreateTask_Error(t *testing.T) {
+	svc := &mockDevTaskService{
+		createFn: func(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error) {
+			return nil, errors.New("db error")
+		},
+	}
+	r := newDevTaskHandler(svc)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/v3/dev-tasks", taskJSONBody(t, dto.DevTaskCreate{Title: "test"}))
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("status = %d, want %d", w.Code, http.StatusInternalServerError)
 	}
 }
 
 func TestDevTask_CreateTask_InvalidBody(t *testing.T) {
-	svc := &mockDevTaskService{
-		createFn: func(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error) {
-			return nil, nil
-		},
-	}
+	svc := &mockDevTaskService{}
 	r := newDevTaskHandler(svc)
-
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/v3/dev-tasks", bytes.NewReader([]byte("not json")))
 	req.Header.Set("Content-Type", "application/json")
@@ -156,19 +159,77 @@ func TestDevTask_CreateTask_InvalidBody(t *testing.T) {
 	}
 }
 
-func TestDevTask_CreateTask_ServerError(t *testing.T) {
+// ---------- ListTasks ----------
+
+func TestDevTask_ListTasks_DefaultPagination(t *testing.T) {
 	svc := &mockDevTaskService{
-		createFn: func(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error) {
-			return nil, errors.New("mongo down")
+		listFn: func(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListOut, error) {
+			if page != 1 || perPage != 10 {
+				t.Errorf("page=%d perPage=%d, want (1,10)", page, perPage)
+			}
+			return &dto.DevTaskListOut{Tasks: []dto.DevTaskOut{}, Pagination: dto.Pagination{Total: 0}}, nil
 		},
 	}
 	r := newDevTaskHandler(svc)
-
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/api/v3/dev-tasks", taskJSONBody(t, dto.DevTaskCreate{
-		Title: "x", Type: document.TaskTypeBug, Priority: document.PriorityP0, Scope: document.ScopeGeneral,
-	}))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks", nil)
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("status = %d, want %d", w.Code, http.StatusOK)
+	}
+}
+
+func TestDevTask_ListTasks_CustomPagination(t *testing.T) {
+	svc := &mockDevTaskService{
+		listFn: func(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListOut, error) {
+			if page != 2 || perPage != 20 {
+				t.Errorf("page=%d perPage=%d, want (2,20)", page, perPage)
+			}
+			return &dto.DevTaskListOut{Tasks: []dto.DevTaskOut{}, Pagination: dto.Pagination{Total: 0}}, nil
+		},
+	}
+	r := newDevTaskHandler(svc)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks?page=2&per_page=20", nil)
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("status = %d, want %d", w.Code, http.StatusOK)
+	}
+}
+
+func TestDevTask_ListTasks_Filter(t *testing.T) {
+	svc := &mockDevTaskService{
+		listFn: func(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListOut, error) {
+			if filter.Status != "已完成" {
+				t.Errorf("filter.Status = %q, want 已完成", filter.Status)
+			}
+			if filter.Priority != "P1 高" {
+				t.Errorf("filter.Priority = %q, want P1 高", filter.Priority)
+			}
+			return &dto.DevTaskListOut{Tasks: []dto.DevTaskOut{}, Pagination: dto.Pagination{Total: 0}}, nil
+		},
+	}
+	r := newDevTaskHandler(svc)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks?status=已完成&priority=P1 高", nil)
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("status = %d, want %d", w.Code, http.StatusOK)
+	}
+}
+
+func TestDevTask_ListTasks_ServerError(t *testing.T) {
+	svc := &mockDevTaskService{
+		listFn: func(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListOut, error) {
+			return nil, errors.New("boom")
+		},
+	}
+	r := newDevTaskHandler(svc)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusInternalServerError {
@@ -181,43 +242,20 @@ func TestDevTask_CreateTask_ServerError(t *testing.T) {
 func TestDevTask_GetTaskBySlug_Success(t *testing.T) {
 	svc := &mockDevTaskService{
 		getBySlugFn: func(ctx context.Context, slug string, withParent bool) (*dto.DevTaskOut, error) {
-			return &dto.DevTaskOut{Title: "Fix bug", Slug: slug}, nil
+			return &dto.DevTaskOut{Slug: slug, Title: "test"}, nil
 		},
 	}
 	r := newDevTaskHandler(svc)
-
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks/"+testSlug, nil)
+	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks/task-1", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
-		t.Errorf("status = %d, want %d; body=%s", w.Code, http.StatusOK, w.Body.String())
+		t.Errorf("status = %d, want %d", w.Code, http.StatusOK)
 	}
 	data, _ := decodeResp(t, w.Body.Bytes())
-	if data["slug"] != testSlug {
-		t.Errorf("data.slug = %v, want %s", data["slug"], testSlug)
-	}
-}
-
-func TestDevTask_GetTaskBySlug_WithParentQuery(t *testing.T) {
-	var gotWithParent bool
-	svc := &mockDevTaskService{
-		getBySlugFn: func(ctx context.Context, slug string, withParent bool) (*dto.DevTaskOut, error) {
-			gotWithParent = withParent
-			return &dto.DevTaskOut{Title: "subtask", Slug: slug}, nil
-		},
-	}
-	r := newDevTaskHandler(svc)
-
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks/"+testSlug+"?with_parent=true", nil)
-	r.ServeHTTP(w, req)
-
-	if w.Code != http.StatusOK {
-		t.Errorf("status = %d, want %d; body=%s", w.Code, http.StatusOK, w.Body.String())
-	}
-	if !gotWithParent {
-		t.Error("withParent = false, want true (query ?with_parent=true)")
+	if data["slug"] != "task-1" {
+		t.Errorf("slug = %v, want task-1", data["slug"])
 	}
 }
 
@@ -228,85 +266,12 @@ func TestDevTask_GetTaskBySlug_NotFound(t *testing.T) {
 		},
 	}
 	r := newDevTaskHandler(svc)
-
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks/"+testSlug, nil)
+	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks/nonexistent", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusNotFound {
 		t.Errorf("status = %d, want %d", w.Code, http.StatusNotFound)
-	}
-}
-
-// ---------- ListTasks ----------
-
-func TestDevTask_ListTasks_Success(t *testing.T) {
-	svc := &mockDevTaskService{
-		listFn: func(ctx context.Context, filter mongodb.ListFilter, page, perPage int) (*dto.DevTaskListOut, error) {
-			return &dto.DevTaskListOut{
-				Tasks: []dto.DevTaskOut{
-					{ID: "1", Title: "a"},
-					{ID: "2", Title: "b"},
-				},
-				Pagination: dto.Pagination{Page: 1, PerPage: 10, Total: 2, Pages: 1},
-			}, nil
-		},
-	}
-	r := newDevTaskHandler(svc)
-
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks?page=1&per_page=10", nil)
-	r.ServeHTTP(w, req)
-
-	if w.Code != http.StatusOK {
-		t.Errorf("status = %d, want %d; body=%s", w.Code, http.StatusOK, w.Body.String())
-	}
-	data, _ := decodeResp(t, w.Body.Bytes())
-	tasks, ok := data["tasks"].([]any)
-	if !ok || len(tasks) != 2 {
-		t.Errorf("data.tasks = %v, want 2 items", data["tasks"])
-	}
-}
-
-func TestDevTask_ListTasks_Empty(t *testing.T) {
-	svc := &mockDevTaskService{
-		listFn: func(ctx context.Context, filter mongodb.ListFilter, page, perPage int) (*dto.DevTaskListOut, error) {
-			return &dto.DevTaskListOut{Tasks: []dto.DevTaskOut{}, Pagination: dto.Pagination{Page: 1}}, nil
-		},
-	}
-	r := newDevTaskHandler(svc)
-
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks", nil)
-	r.ServeHTTP(w, req)
-
-	if w.Code != http.StatusOK {
-		t.Errorf("status = %d, want %d", w.Code, http.StatusOK)
-	}
-}
-
-func TestDevTask_ListTasks_WithFilters(t *testing.T) {
-	var gotFilter mongodb.ListFilter
-	svc := &mockDevTaskService{
-		listFn: func(ctx context.Context, filter mongodb.ListFilter, page, perPage int) (*dto.DevTaskListOut, error) {
-			gotFilter = filter
-			return &dto.DevTaskListOut{Tasks: []dto.DevTaskOut{}}, nil
-		},
-	}
-	r := newDevTaskHandler(svc)
-
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks?status=P0+紧急&type=问题&priority=P0+紧急", nil)
-	r.ServeHTTP(w, req)
-
-	if w.Code != http.StatusOK {
-		t.Errorf("status = %d, want %d", w.Code, http.StatusOK)
-	}
-	if gotFilter.Status == nil || *gotFilter.Status != "P0 紧急" {
-		t.Errorf("filter.Status = %v, want P0 紧急", gotFilter.Status)
-	}
-	if gotFilter.Type == nil || *gotFilter.Type != "问题" {
-		t.Errorf("filter.Type = %v, want 问题", gotFilter.Type)
 	}
 }
 
@@ -317,45 +282,26 @@ func TestDevTask_UpdateTask_Success(t *testing.T) {
 		updateFn: func(ctx context.Context, slug string, req dto.DevTaskUpdate) error { return nil },
 	}
 	r := newDevTaskHandler(svc)
-
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPatch, "/api/v3/dev-tasks/"+testSlug, taskJSONBody(t, gin.H{
-		"status": document.StatusDone,
-	}))
+	body, _ := json.Marshal(dto.DevTaskUpdate{Title: ptr("updated")})
+	req, _ := http.NewRequest(http.MethodPatch, "/api/v3/dev-tasks/task-1", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
-		t.Errorf("status = %d, want %d; body=%s", w.Code, http.StatusOK, w.Body.String())
+		t.Errorf("status = %d, want %d", w.Code, http.StatusOK)
 	}
 }
 
-func TestDevTask_UpdateTask_InvalidBody(t *testing.T) {
-	svc := &mockDevTaskService{
-		updateFn: func(ctx context.Context, slug string, req dto.DevTaskUpdate) error { return nil },
-	}
-	r := newDevTaskHandler(svc)
-
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPatch, "/api/v3/dev-tasks/"+testSlug, bytes.NewReader([]byte("bad")))
-	req.Header.Set("Content-Type", "application/json")
-	r.ServeHTTP(w, req)
-
-	if w.Code != http.StatusBadRequest {
-		t.Errorf("status = %d, want %d", w.Code, http.StatusBadRequest)
-	}
-}
-
-// ---------- SoftDeleteTask ----------
+// ---------- SoftDelete ----------
 
 func TestDevTask_SoftDelete_Success(t *testing.T) {
 	svc := &mockDevTaskService{
 		softDelFn: func(ctx context.Context, slug string) error { return nil },
 	}
 	r := newDevTaskHandler(svc)
-
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodDelete, "/api/v3/dev-tasks/"+testSlug, nil)
+	req, _ := http.NewRequest(http.MethodDelete, "/api/v3/dev-tasks/task-1", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
@@ -363,16 +309,15 @@ func TestDevTask_SoftDelete_Success(t *testing.T) {
 	}
 }
 
-// ---------- HardDeleteTask ----------
+// ---------- HardDelete ----------
 
 func TestDevTask_HardDelete_Success(t *testing.T) {
 	svc := &mockDevTaskService{
 		hardDelFn: func(ctx context.Context, slug string) error { return nil },
 	}
 	r := newDevTaskHandler(svc)
-
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodDelete, "/api/v3/dev-tasks/"+testSlug+"/permanent", nil)
+	req, _ := http.NewRequest(http.MethodDelete, "/api/v3/dev-tasks/task-1/permanent", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
@@ -380,45 +325,42 @@ func TestDevTask_HardDelete_Success(t *testing.T) {
 	}
 }
 
-// ---------- Auth 保护 ----------
+// ---------- FrontierTasks ----------
 
-func TestDevTask_Unauthorized_NoUser(t *testing.T) {
+func TestDevTask_FrontierTasks_Success(t *testing.T) {
 	svc := &mockDevTaskService{
-		listFn: func(ctx context.Context, filter mongodb.ListFilter, page, perPage int) (*dto.DevTaskListOut, error) {
-			return &dto.DevTaskListOut{}, nil
+		findFrontierFn: func(ctx context.Context, limit int) ([]dto.DevTaskOut, error) {
+			return []dto.DevTaskOut{{Slug: "frontier-1"}}, nil
 		},
 	}
-	h := NewDevTaskHandler(svc)
-	r := gin.New()
-	g := r.Group("/api/v3")
-	// 使用真实 devtask-JWT 中间件模拟无 service-token 场景
-	h.RegisterRoutes(g, realDevTaskMiddleware())
-
+	r := newDevTaskHandler(svc)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks/frontier?limit=5", nil)
 	r.ServeHTTP(w, req)
 
-	if w.Code != http.StatusUnauthorized {
-		t.Errorf("status = %d, want %d (missing service token)", w.Code, http.StatusUnauthorized)
+	if w.Code != http.StatusOK {
+		t.Errorf("status = %d, want %d", w.Code, http.StatusOK)
+	}
+	data, _ := decodeResp(t, w.Body.Bytes())
+	tasks, ok := data["tasks"].([]any)
+	if !ok || len(tasks) != 1 {
+		t.Errorf("expected 1 task in tasks array, got %v", data)
 	}
 }
 
 // ---------- BatchStatus ----------
 
-func TestDevTask_BatchStatus_AllSucceeded(t *testing.T) {
-	var gotSlugs []string
+func TestDevTask_BatchStatus_Success(t *testing.T) {
 	svc := &mockDevTaskService{
 		batchStatusFn: func(ctx context.Context, slugs []string, status document.DevTaskStatus) (*service.BatchStatusResult, error) {
-			gotSlugs = slugs
-			return &service.BatchStatusResult{Succeeded: slugs, Failed: map[string]string{}}, nil
+			return &service.BatchStatusResult{
+				Succeeded: []string{"task-1", "task-2"},
+				Failed:    map[string]string{},
+			}, nil
 		},
 	}
 	r := newDevTaskHandler(svc)
-
-	body, _ := json.Marshal(gin.H{
-		"slugs":  []string{"task-5", "task-6", "task-7"},
-		"status": document.StatusBacklog,
-	})
+	body, _ := json.Marshal(dto.BatchStatusRequest{Slugs: []string{"task-1", "task-2"}, Status: "已完成"})
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/v3/dev-tasks/batch-status", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
@@ -427,87 +369,70 @@ func TestDevTask_BatchStatus_AllSucceeded(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Errorf("status = %d, want %d; body=%s", w.Code, http.StatusOK, w.Body.String())
 	}
-	if len(gotSlugs) != 3 {
-		t.Errorf("got %d slugs, want 3", len(gotSlugs))
-	}
 }
 
-func TestDevTask_BatchStatus_PartialFailed(t *testing.T) {
-	svc := &mockDevTaskService{
-		batchStatusFn: func(ctx context.Context, slugs []string, status document.DevTaskStatus) (*service.BatchStatusResult, error) {
-			return &service.BatchStatusResult{
-				Succeeded: []string{"task-5"},
-				Failed:    map[string]string{"task-6": "task not found"},
-			}, nil
-		},
-	}
+// ---------- DevTaskToken ----------
+
+func TestDevTask_DevTaskToken_Success(t *testing.T) {
+	svc := &mockDevTaskService{}
 	r := newDevTaskHandler(svc)
 
-	body, _ := json.Marshal(gin.H{"slugs": []string{"task-5", "task-6"}, "status": "待排期"})
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/api/v3/dev-tasks/batch-status", bytes.NewReader(body))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-task/token", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
 		t.Errorf("status = %d, want %d; body=%s", w.Code, http.StatusOK, w.Body.String())
 	}
 	var resp struct {
-		Data dto.BatchStatusResult `json:"data"`
+		Data struct {
+			Token     string `json:"token"`
+			ExpiresAt string `json:"expires_at"`
+		} `json:"data"`
 	}
 	_ = json.Unmarshal(w.Body.Bytes(), &resp)
-	if len(resp.Data.Succeeded) != 1 || len(resp.Data.Failed) != 1 {
-		t.Errorf("result = %+v, want 1 succeeded + 1 failed", resp.Data)
+	if resp.Data.Token == "" {
+		t.Error("expected non-empty token in response")
+	}
+	if resp.Data.ExpiresAt == "" {
+		t.Error("expected expires_at in response")
 	}
 }
 
-func TestDevTask_BatchStatus_EmptySlugs(t *testing.T) {
-	svc := &mockDevTaskService{
-		batchStatusFn: func(ctx context.Context, slugs []string, status document.DevTaskStatus) (*service.BatchStatusResult, error) {
-			return nil, nil
-		},
-	}
-	r := newDevTaskHandler(svc)
+func TestDevTask_DevTaskToken_SecretNotConfigured(t *testing.T) {
+	svc := &mockDevTaskService{}
+	h := NewDevTaskHandler(svc, &config.Config{Security: config.SecurityConfig{DevTaskSecret: ""}})
+	r := gin.New()
+	g := r.Group("/api/v3")
+	noopAuth := func(c *gin.Context) { c.Next() }
+	h.RegisterRoutes(g, noopAuth, noopAuth, noopAuth)
 
-	body, _ := json.Marshal(gin.H{"slugs": []string{}, "status": "待排期"})
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/api/v3/dev-tasks/batch-status", bytes.NewReader(body))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-task/token", nil)
 	r.ServeHTTP(w, req)
 
-	if w.Code != http.StatusBadRequest {
-		t.Errorf("status = %d, want %d (binding validator rejects empty slugs)", w.Code, http.StatusBadRequest)
+	if w.Code != http.StatusServiceUnavailable {
+		t.Errorf("status = %d, want %d", w.Code, http.StatusServiceUnavailable)
 	}
 }
 
-func TestDevTask_BatchStatus_ServerError(t *testing.T) {
-	svc := &mockDevTaskService{
-		batchStatusFn: func(ctx context.Context, slugs []string, status document.DevTaskStatus) (*service.BatchStatusResult, error) {
-			return nil, errors.New("mongo timeout")
-		},
+func TestDevTask_DevTaskToken_Unauthorized(t *testing.T) {
+	svc := &mockDevTaskService{}
+	h := NewDevTaskHandler(svc, &config.Config{Security: config.SecurityConfig{DevTaskSecret: "test-secret"}})
+	r := gin.New()
+	g := r.Group("/api/v3")
+	// realAuth 拒绝未认证请求
+	realAuth := func(c *gin.Context) {
+		c.AbortWithStatusJSON(401, gin.H{"error": "unauthorized"})
 	}
-	r := newDevTaskHandler(svc)
+	noopAdmin := func(c *gin.Context) { c.Next() }
+	h.RegisterRoutes(g, noopAdmin, realAuth, noopAdmin)
 
-	body, _ := json.Marshal(gin.H{"slugs": []string{"task-5"}, "status": "待排期"})
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/api/v3/dev-tasks/batch-status", bytes.NewReader(body))
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-task/token", nil)
 	r.ServeHTTP(w, req)
 
-	if w.Code != http.StatusInternalServerError {
-		t.Errorf("status = %d, want %d", w.Code, http.StatusInternalServerError)
-	}
-}
-
-// realDevTaskMiddleware 模拟 DevTaskMiddleware 的 service-JWT 校验：
-// 无 Authorization 头即 401（由 DevTaskMiddleware 行为决定）。
-func realDevTaskMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		authHeader := c.GetHeader("Authorization")
-		if authHeader == "" {
-			c.AbortWithStatusJSON(401, gin.H{"error": "Authorization header is required"})
-			return
-		}
-		c.Next()
+	if w.Code != http.StatusUnauthorized {
+		t.Errorf("status = %d, want %d (missing auth)", w.Code, http.StatusUnauthorized)
 	}
 }

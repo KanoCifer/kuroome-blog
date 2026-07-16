@@ -106,6 +106,16 @@ type BatchStatusResult struct {
 	Failed map[string]string `json:"failed"`
 }
 
+// DevTaskFilter 任务列表筛选条件（handler→service 的 string-based DTO，
+// handler 不感知领域类型，由 service 层做 string→domain 映射）。
+type DevTaskFilter struct {
+	Status         string `json:"status,omitempty"`
+	Priority       string `json:"priority,omitempty"`
+	Type           string `json:"type,omitempty"`
+	IncludeDeleted *bool  `json:"include_deleted,omitempty"`
+	ForAgent       *bool  `json:"for_agent,omitempty"`
+}
+
 // DevTaskListOut 任务列表响应
 type DevTaskListOut struct {
 	Tasks      []DevTaskOut `json:"tasks"`

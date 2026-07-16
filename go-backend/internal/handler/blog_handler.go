@@ -123,6 +123,9 @@ func (h *BlogHandler) LikePost(c *gin.Context) {
 }
 
 // RegisterRoutes 挂载博客读路由到 v3 组。
+//
+// 注意：/post 是 /blogs/:id 的双路由别名（前端 blogGateway 仍使用 v3/post?_id=xxx），
+// 不可删除。若前端迁移到 /blogs/:id 后可清理。
 func (h *BlogHandler) RegisterRoutes(r *gin.RouterGroup) {
 	r.GET("/blogs", h.GetBlogs)
 	r.GET("/blogs/:id", h.GetBlogPost)
