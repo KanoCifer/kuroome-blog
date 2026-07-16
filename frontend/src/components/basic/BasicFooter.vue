@@ -9,7 +9,7 @@
     "
   >
     <div
-      class="text-muted-foreground mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-5 gap-y-1.5 px-6 py-2.5 text-[11px]"
+      class="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-5 gap-y-1.5 px-6 py-2.5 text-[11px] text-white mix-blend-difference"
     >
       <!-- 左：站名 + 版权章回标 -->
       <div class="flex items-baseline gap-2.5">
@@ -30,7 +30,7 @@
         >
           <img
             src="https://github.githubassets.com/favicons/favicon.svg"
-            class="h-3.5 w-3.5 opacity-60 grayscale"
+            class="h-3.5 w-3.5 opacity-60 grayscale mix-blend-normal"
             alt="Github"
           />
           <span class="font-mono tracking-[0.1em]">GitHub</span>
@@ -63,8 +63,7 @@ defineProps<{
 
 <style lang="scss" scoped>
 footer {
-  :deep(*) {
-    color: var(--color-foreground);
-  }
+  /* mix-blend-difference on inner container handles auto-contrast */
 }
 </style>
+
