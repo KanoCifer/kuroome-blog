@@ -80,18 +80,18 @@ export default defineConfig({
     port: 5174, // 避免与 Vue 项目冲突
     proxy: {
       // Python 后端（FastAPI）— v1 / v2 接口
-      '/api/v1/': {
+      '/v1/': {
         target: 'http://localhost:5555',
         changeOrigin: true,
         ws: true,
       },
-      '/api/v2/': {
+      '/v2/': {
         target: 'http://localhost:5555',
         changeOrigin: true,
         ws: true,
       },
       // Go 后端 — v3 接口
-      '/api/v3/': {
+      '/v3/': {
         target: 'http://localhost:5556',
         changeOrigin: true,
         ws: true,

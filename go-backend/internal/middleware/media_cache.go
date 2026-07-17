@@ -14,7 +14,7 @@ import (
 func MediaCacheMiddleware() gin.HandlerFunc {
 	const cc = "public, max-age=604800" // 7d
 	return func(c *gin.Context) {
-		if strings.HasPrefix(c.Request.URL.Path, "/api/v3/media") {
+		if strings.HasPrefix(c.Request.URL.Path, "/v3/media") {
 			c.Header("Cache-Control", cc)
 		}
 		c.Next()

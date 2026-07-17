@@ -18,9 +18,9 @@ describe('useOrigin', () => {
   it('相对路径在 https 环境下拼上 API 前缀', () => {
     // 测试环境 happy-dom 默认 protocol 为 http:// —— 直接返回原值
     // 如果要测试 https 分支，需要 mock window.location
-    const result = useOrigin('/api/v1/media/abc.png');
+    const result = useOrigin('/v1/media/abc.png');
     // happy-dom 默认 location.protocol = 'http:'，所以直接返回
-    expect(result).toBe('/api/v1/media/abc.png');
+    expect(result).toBe('/v1/media/abc.png');
   });
 
   it('无前导 / 的路径也能正确拼接（https 环境）', () => {

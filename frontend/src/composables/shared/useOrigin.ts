@@ -1,6 +1,6 @@
 // API base URL for constructing full media URLs and origin detection.
 // 默认 '/api' 走同源（Vite 代理），生产环境通过 VITE_API_BASE 切到 CDN/独立 API 域。
-const API_BASE = import.meta.env.VITE_API_BASE || '/api';
+const API_BASE = import.meta.env.VITE_API_BASE || '/';
 
 // 当前 API 域的 origin（用于重写数据库里存的历史跨域 URL）。
 // 模块顶层计算一次，避免每次调用都 new URL。

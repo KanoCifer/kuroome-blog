@@ -63,6 +63,6 @@ def register_middleware(app: FastAPI) -> None:
     async def add_media_cache(request: Request, call_next):
         cc = "public, max-age=604800"
         response = await call_next(request)
-        if request.url.path.startswith("/api/v1/media"):
+        if request.url.path.startswith("/v1/media"):
             response.headers["Cache-Control"] = cc
         return response

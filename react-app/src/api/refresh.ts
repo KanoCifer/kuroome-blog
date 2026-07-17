@@ -5,7 +5,7 @@ const refreshTokenEndpoint = '/v3/refresh-token';
 
 // 创建独立的axios实例，不使用全局拦截器，避免循环拦截
 const refreshRequest = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE || '/api',
+  baseURL: import.meta.env.VITE_API_BASE || '/',
   timeout: 10000,
   withCredentials: true,
   _isRefreshToken: false, // 标记这是刷新token的请求

@@ -16,7 +16,7 @@
 import { useNotificationStore } from '@/stores/notification';
 import { formatDate } from '@/utils/formatdate';
 import dayjs from 'dayjs';
-const apiBase = import.meta.env.VITE_API_BASE || '/api';
+const apiBase = import.meta.env.VITE_API_BASE || '/';
 import { renderMarkdown } from '@/composables/shared';
 import { AnimatePresence, motion } from 'motion-v';
 import { computed, onUnmounted, ref, watch } from 'vue';

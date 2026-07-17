@@ -283,7 +283,7 @@ const avatarUrl = computed(() => {
     return auth.user.photo;
   }
   if (auth.user?.photo) {
-    return `/api/v3/media/${auth.user.photo}`;
+    return `/v3/media/${auth.user.photo}`;
   }
   return '/images/about-thumb.webp';
 });

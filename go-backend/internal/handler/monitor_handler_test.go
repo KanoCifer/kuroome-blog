@@ -80,7 +80,7 @@ func (m *mockMonitorService) StreamServerStatus(ctx context.Context) (<-chan dto
 func setupMonitor(svc service.Monitorer, adminMW gin.HandlerFunc) *gin.Engine {
 	h := NewMonitorHandler(svc, config.Cfg)
 	r := gin.New()
-	g := r.Group("/api/v3")
+	g := r.Group("/v3")
 	noopAuth := func(c *gin.Context) { c.Set("user_id", 1); c.Next() }
 	h.RegisterRoutes(g, noopAuth, adminMW)
 	return r
@@ -105,7 +105,7 @@ func TestGetOverview_ReturnsData(t *testing.T) {
 	adminAllow := func(c *gin.Context) { c.Next() }
 	r := setupMonitor(svc, adminAllow)
 
-	w := requestGet(t, r, "/api/v3/status/overview?days=7")
+	w := requestGet(t, r, "/v3/status/overview?days=7")
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
 	}
@@ -126,7 +126,7 @@ func TestGetOverview_DefaultsDaysTo7(t *testing.T) {
 	adminAllow := func(c *gin.Context) { c.Next() }
 	r := setupMonitor(svc, adminAllow)
 
-	w := requestGet(t, r, "/api/v3/status/overview")
+	w := requestGet(t, r, "/v3/status/overview")
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d", w.Code)
 	}
@@ -140,12 +140,12 @@ func TestGetOverview_InvalidDays(t *testing.T) {
 	adminAllow := func(c *gin.Context) { c.Next() }
 	r := setupMonitor(svc, adminAllow)
 
-	w := requestGet(t, r, "/api/v3/status/overview?days=0")
+	w := requestGet(t, r, "/v3/status/overview?days=0")
 	if w.Code != http.StatusBadRequest {
 		t.Fatalf("expected 400 for days=0, got %d", w.Code)
 	}
 
-	w = requestGet(t, r, "/api/v3/status/overview?days=91")
+	w = requestGet(t, r, "/v3/status/overview?days=91")
 	if w.Code != http.StatusBadRequest {
 		t.Fatalf("expected 400 for days=91, got %d", w.Code)
 	}
@@ -162,7 +162,7 @@ func TestGetVisitors_ReturnsPaginatedList(t *testing.T) {
 	adminAllow := func(c *gin.Context) { c.Next() }
 	r := setupMonitor(svc, adminAllow)
 
-	w := requestGet(t, r, "/api/v3/status/visitors?days=7&page=1&page_size=20")
+	w := requestGet(t, r, "/v3/status/visitors?days=7&page=1&page_size=20")
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d", w.Code)
 	}
@@ -176,7 +176,7 @@ func TestGetVisitors_InvalidPageSize(t *testing.T) {
 	adminAllow := func(c *gin.Context) { c.Next() }
 	r := setupMonitor(svc, adminAllow)
 
-	w := requestGet(t, r, "/api/v3/status/visitors?page_size=101")
+	w := requestGet(t, r, "/v3/status/visitors?page_size=101")
 	if w.Code != http.StatusBadRequest {
 		t.Fatalf("expected 400 for page_size=101, got %d", w.Code)
 	}
@@ -193,7 +193,7 @@ func TestGetUserLogins_ReturnsList(t *testing.T) {
 	adminAllow := func(c *gin.Context) { c.Next() }
 	r := setupMonitor(svc, adminAllow)
 
-	w := requestGet(t, r, "/api/v3/status/user-logins?days=7&page=1&page_size=20")
+	w := requestGet(t, r, "/v3/status/user-logins?days=7&page=1&page_size=20")
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d", w.Code)
 	}
@@ -211,9 +211,9 @@ func TestMonitorEndpoints_RequireAdmin(t *testing.T) {
 	r := setupMonitor(svc, adminReject)
 
 	paths := []string{
-		"/api/v3/status/overview",
-		"/api/v3/status/visitors",
-		"/api/v3/status/user-logins",
+		"/v3/status/overview",
+		"/v3/status/visitors",
+		"/v3/status/user-logins",
 	}
 	for _, p := range paths {
 		w := requestGet(t, r, p)
@@ -234,7 +234,7 @@ func TestGetOverview_ServiceError(t *testing.T) {
 	adminAllow := func(c *gin.Context) { c.Next() }
 	r := setupMonitor(svc, adminAllow)
 
-	w := requestGet(t, r, "/api/v3/status/overview")
+	w := requestGet(t, r, "/v3/status/overview")
 	if w.Code != http.StatusInternalServerError {
 		t.Fatalf("expected 500 on service error, got %d", w.Code)
 	}
@@ -251,7 +251,7 @@ func TestGetServerStatus_ReturnsPayload(t *testing.T) {
 	adminAllow := func(c *gin.Context) { c.Next() }
 	r := setupMonitor(svc, adminAllow)
 
-	w := requestGet(t, r, "/api/v3/status/server/status")
+	w := requestGet(t, r, "/v3/status/server/status")
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
 	}
@@ -282,7 +282,7 @@ func TestServerStatusStream_ReturnsSSEFrames(t *testing.T) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, srv.URL+"/api/v3/status/server/status/stream", nil)
+	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, srv.URL+"/v3/status/server/status/stream", nil)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		t.Fatalf("request failed: %v", err)
@@ -312,7 +312,7 @@ func TestServerStatus_RequiresAdmin(t *testing.T) {
 	adminReject := func(c *gin.Context) { c.AbortWithStatusJSON(403, gin.H{"error": "Admin access required"}) }
 	r := setupMonitor(svc, adminReject)
 
-	w := requestGet(t, r, "/api/v3/status/server/status")
+	w := requestGet(t, r, "/v3/status/server/status")
 	if w.Code != http.StatusForbidden {
 		t.Fatalf("expected 403 for non-admin, got %d", w.Code)
 	}
@@ -325,7 +325,7 @@ func TestTrackVisitor_Disabled(t *testing.T) {
 	svc := &mockMonitorService{}
 	r := setupMonitor(svc, func(c *gin.Context) { c.Next() })
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/api/v3/status/track",
+	req, _ := http.NewRequest(http.MethodPost, "/v3/status/track",
 		strings.NewReader(`{"visitor_id":"v","page_path":"/","page_url":"u"}`))
 	req.Header.Set("Content-Type", "application/json")
 	r.ServeHTTP(w, req)
@@ -342,7 +342,7 @@ func TestTrackVisitor_Success(t *testing.T) {
 	}
 	r := setupMonitor(svc, func(c *gin.Context) { c.Next() })
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/api/v3/status/track",
+	req, _ := http.NewRequest(http.MethodPost, "/v3/status/track",
 		strings.NewReader(`{"visitor_id":"v","page_path":"/","page_url":"u"}`))
 	req.Header.Set("Content-Type", "application/json")
 	r.ServeHTTP(w, req)
@@ -359,13 +359,13 @@ func TestOldTrackRedirect(t *testing.T) {
 	}
 	h := NewMonitorHandler(svc, config.Cfg)
 	r := gin.New()
-	g := r.Group("/api/v3")
+	g := r.Group("/v3")
 	h.RegisterRoutes(g, func(c *gin.Context) { c.Set("user_id", 1); c.Next() }, func(c *gin.Context) { c.Next() })
 	// 旧路由 POST /track（对齐 router.go 中的 v3.POST）
 	g.POST("/track", h.TrackVisitor)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/api/v3/track",
+	req, _ := http.NewRequest(http.MethodPost, "/v3/track",
 		strings.NewReader(`{"visitor_id":"v","page_path":"/","page_url":"u"}`))
 	req.Header.Set("Content-Type", "application/json")
 	r.ServeHTTP(w, req)
@@ -389,7 +389,7 @@ func TestGetStatusDetail_ReturnsPayload(t *testing.T) {
 	}
 	r := setupMonitor(svc, func(c *gin.Context) { c.Next() })
 
-	w := requestGet(t, r, "/api/v3/status/detail")
+	w := requestGet(t, r, "/v3/status/detail")
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
 	}

@@ -15,7 +15,7 @@ export const extractData = (res: { data: ApiResponse<unknown> }): unknown => {
 };
 
 const request = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE || '/api',
+  baseURL: import.meta.env.VITE_API_BASE || '/',
   timeout: 10000,
   withCredentials: true,
 });

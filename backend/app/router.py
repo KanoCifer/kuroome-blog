@@ -40,32 +40,32 @@ if TYPE_CHECKING:
 def register_router(app: FastAPI):
     # Include routers
     # v1 版本API
-    app.include_router(router=admin.router, prefix="/api/v1")
-    app.include_router(router=auth.router, prefix="/api/v1")
-    app.include_router(router=blog.router, prefix="/api/v1")
-    app.include_router(router=moments.router, prefix="/api/v1")
-    app.include_router(router=public.router, prefix="/api/v1")
-    app.include_router(router=rss.router, prefix="/api/v1")
-    app.include_router(router=monitor.router, prefix="/api/v1")
-    app.include_router(router=publish.router, prefix="/api/v1")
+    app.include_router(router=admin.router, prefix="/v1")
+    app.include_router(router=auth.router, prefix="/v1")
+    app.include_router(router=blog.router, prefix="/v1")
+    app.include_router(router=moments.router, prefix="/v1")
+    app.include_router(router=public.router, prefix="/v1")
+    app.include_router(router=rss.router, prefix="/v1")
+    app.include_router(router=monitor.router, prefix="/v1")
+    app.include_router(router=publish.router, prefix="/v1")
 
     # v2 版本API
-    app.include_router(router=subscriptions.router, prefix="/api/v2")
-    app.include_router(router=llm.router, prefix="/api/v2")
-    app.include_router(router=device.router, prefix="/api/v2")
-    app.include_router(router=fishing.router, prefix="/api/v2")
-    app.include_router(router=weather.router, prefix="/api/v2")
-    app.include_router(router=public_v2.router, prefix="/api/v2")
-    app.include_router(router=friendlinks.router, prefix="/api/v2")
-    app.include_router(router=devtasks_v2.router, prefix="/api/v2")
-    app.include_router(router=weread_v2.router, prefix="/api/v2")
-    app.include_router(router=system.router, prefix="/api/v2")
+    app.include_router(router=subscriptions.router, prefix="/v2")
+    app.include_router(router=llm.router, prefix="/v2")
+    app.include_router(router=device.router, prefix="/v2")
+    app.include_router(router=fishing.router, prefix="/v2")
+    app.include_router(router=weather.router, prefix="/v2")
+    app.include_router(router=public_v2.router, prefix="/v2")
+    app.include_router(router=friendlinks.router, prefix="/v2")
+    app.include_router(router=devtasks_v2.router, prefix="/v2")
+    app.include_router(router=weread_v2.router, prefix="/v2")
+    app.include_router(router=system.router, prefix="/v2")
 
 
 def setup_media(app: FastAPI) -> None:
     media_dir: Path = _get_media_root()
     app.mount(
-        path="/api/v1/media/",
+        path="/v1/media/",
         app=StaticFiles(directory=media_dir),
         name="media",
     )

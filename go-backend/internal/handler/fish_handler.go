@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
+	"github.com/KanoCifer/kuroome-blog/internal/middleware"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
@@ -88,11 +89,13 @@ func (h *FishHandler) DeleteFishingSpot(c *gin.Context) {
 }
 
 // RegisterRoutes 在 r 下挂载钓点路由。
-// GET 公开（列表 / 详情）；POST / PATCH / DELETE 需 admin 中间件保护。
+// GET 公开（列表 / 详情）加 1h 缓存；POST / PATCH / DELETE 需 admin 中间件保护。
 func (h *FishHandler) RegisterRoutes(r *gin.RouterGroup, adminMW gin.HandlerFunc) {
+	cacheH1 := middleware.CacheController("public, max-age=3600")
+
 	f := r.Group("/fish")
-	f.GET("/spots", h.GetFishingSpotsList)
-	f.GET("/spots/:id", h.GetFishingSpot)
+	f.GET("/spots", cacheH1, h.GetFishingSpotsList)
+	f.GET("/spots/:id", cacheH1, h.GetFishingSpot)
 	f.POST("/spots", adminMW, h.CreateFishingSpot)
 	f.PATCH("/spots/:id", adminMW, h.UpdateFishingSpot)
 	f.DELETE("/spots/:id", adminMW, h.DeleteFishingSpot)

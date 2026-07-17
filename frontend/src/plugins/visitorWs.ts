@@ -15,7 +15,7 @@ export let isConnected: ReturnType<typeof useWebSocket>['isConnected'] | null =
   null;
 
 function buildWsUrl(): string {
-  const apiBase = import.meta.env.VITE_API_BASE || '/api';
+  const apiBase = import.meta.env.VITE_API_BASE || '/';
   if (apiBase.startsWith('http')) {
     return apiBase.replace(/^http/, 'ws') + '/v3/public/ws';
   }

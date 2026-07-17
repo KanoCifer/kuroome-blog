@@ -24,7 +24,7 @@ func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
 	r.Use(middleware.SlogMiddleware(slog.Default()))
 	r.Use(middleware.CORS())
 
-	v3 := r.Group("/api/v3")
+	v3 := r.Group("/v3")
 
 	// 限流: 登录 / 注册各 5 次 / 分钟。
 	loginLimiter := middleware.NewRateLimiter(redis, "login", 5, 60*time.Second)
@@ -73,5 +73,5 @@ func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
 	// 媒体静态服务：把上传的文件以 /api/v3/media/* 暴露，对齐 handler 返回的 url。
 	// 挂在 Static 前，给响应打上公共缓存头，让 CDN 缓存命中（7d，uuid 命名不可变）。
 	r.Use(middleware.MediaCacheMiddleware())
-	r.Static("/api/v3/media", state.Cfg().Upload.UploadDir)
+	r.Static("/v3/media", state.Cfg().Upload.UploadDir)
 }

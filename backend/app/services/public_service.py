@@ -120,7 +120,9 @@ class PublicService:
     def get_robots_txt() -> str:
         sitemap_url = f"{_FRONTEND_URL}/sitemap.xml"
         return f"""User-agent: *
-Disallow: /api/
+Disallow: /v1/
+Disallow: /v2/
+Disallow: /v3/
 Disallow: /admin/
 Allow: /
 

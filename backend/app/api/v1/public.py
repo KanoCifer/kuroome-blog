@@ -231,7 +231,7 @@ async def upload_file(
 
     return APIResponse(
         data={
-            "url": f"/api/v1/media/{relative_path}",
+            "url": f"/v1/media/{relative_path}",
             "filename": relative_path,
         },
         message="Image uploaded successfully.",
@@ -254,7 +254,7 @@ async def upload_blog_image(
 
     return APIResponse(
         data={
-            "url": f"/api/v1/media/{relative_path}",
+            "url": f"/v1/media/{relative_path}",
             "filename": relative_path,
         },
         message="Image uploaded successfully.",

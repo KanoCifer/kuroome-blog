@@ -20,7 +20,7 @@ function rewriteImageUrls(doc: Document, base: string): void {
     }
     img.setAttribute(
       'src',
-      `/api/v1/rss/image-proxy?url=${encodeURIComponent(resolved)}`,
+      `/v1/rss/image-proxy?url=${encodeURIComponent(resolved)}`,
     );
   });
 }

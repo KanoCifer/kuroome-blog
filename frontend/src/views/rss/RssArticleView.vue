@@ -51,7 +51,7 @@ const buildProxyImageUrl = (rawUrl: string): string => {
     resolved = trimmed;
   }
 
-  return `/api/v1/rss/image-proxy?url=${encodeURIComponent(resolved)}`;
+  return `/v1/rss/image-proxy?url=${encodeURIComponent(resolved)}`;
 };
 
 const rewriteHtmlImageUrls = (html: string): string => {

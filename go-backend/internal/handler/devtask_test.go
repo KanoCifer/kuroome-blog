@@ -85,7 +85,7 @@ func (m *mockDevTaskService) BatchUpdateStatus(
 func newDevTaskHandler(svc *mockDevTaskService) *gin.Engine {
 	h := NewDevTaskHandler(svc, &config.Config{Security: config.SecurityConfig{DevTaskSecret: "test-devtask-secret"}})
 	r := gin.New()
-	g := r.Group("/api/v3")
+	g := r.Group("/v3")
 	noopAuth := func(c *gin.Context) { c.Next() }
 	noopAdmin := func(c *gin.Context) { c.Next() }
 	h.RegisterRoutes(g, noopAuth, noopAuth, noopAdmin)
@@ -118,7 +118,12 @@ func TestDevTask_CreateTask_Success(t *testing.T) {
 	}
 	r := newDevTaskHandler(svc)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/api/v3/dev-tasks", taskJSONBody(t, dto.DevTaskCreate{Title: "test task"}))
+	req, _ := http.NewRequest(http.MethodPost, "/v3/dev-tasks", taskJSONBody(t, dto.DevTaskCreate{
+		Title:    "test task",
+		Type:     document.TaskTypeFeature,
+		Priority: document.PriorityP2,
+		Scope:    document.ScopeGeneral,
+	}))
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
@@ -138,7 +143,12 @@ func TestDevTask_CreateTask_Error(t *testing.T) {
 	}
 	r := newDevTaskHandler(svc)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/api/v3/dev-tasks", taskJSONBody(t, dto.DevTaskCreate{Title: "test"}))
+	req, _ := http.NewRequest(http.MethodPost, "/v3/dev-tasks", taskJSONBody(t, dto.DevTaskCreate{
+		Title:    "test",
+		Type:     document.TaskTypeFeature,
+		Priority: document.PriorityP2,
+		Scope:    document.ScopeGeneral,
+	}))
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusInternalServerError {
@@ -150,7 +160,7 @@ func TestDevTask_CreateTask_InvalidBody(t *testing.T) {
 	svc := &mockDevTaskService{}
 	r := newDevTaskHandler(svc)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/api/v3/dev-tasks", bytes.NewReader([]byte("not json")))
+	req, _ := http.NewRequest(http.MethodPost, "/v3/dev-tasks", bytes.NewReader([]byte("not json")))
 	req.Header.Set("Content-Type", "application/json")
 	r.ServeHTTP(w, req)
 
@@ -172,7 +182,7 @@ func TestDevTask_ListTasks_DefaultPagination(t *testing.T) {
 	}
 	r := newDevTaskHandler(svc)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/v3/dev-tasks", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
@@ -191,7 +201,7 @@ func TestDevTask_ListTasks_CustomPagination(t *testing.T) {
 	}
 	r := newDevTaskHandler(svc)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks?page=2&per_page=20", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/v3/dev-tasks?page=2&per_page=20", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
@@ -213,7 +223,7 @@ func TestDevTask_ListTasks_Filter(t *testing.T) {
 	}
 	r := newDevTaskHandler(svc)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks?status=已完成&priority=P1 高", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/v3/dev-tasks?status=已完成&priority=P1 高", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
@@ -229,7 +239,7 @@ func TestDevTask_ListTasks_ServerError(t *testing.T) {
 	}
 	r := newDevTaskHandler(svc)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/v3/dev-tasks", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusInternalServerError {
@@ -247,7 +257,7 @@ func TestDevTask_GetTaskBySlug_Success(t *testing.T) {
 	}
 	r := newDevTaskHandler(svc)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks/task-1", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/v3/dev-tasks/task-1", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
@@ -267,7 +277,7 @@ func TestDevTask_GetTaskBySlug_NotFound(t *testing.T) {
 	}
 	r := newDevTaskHandler(svc)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks/nonexistent", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/v3/dev-tasks/nonexistent", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusNotFound {
@@ -284,7 +294,7 @@ func TestDevTask_UpdateTask_Success(t *testing.T) {
 	r := newDevTaskHandler(svc)
 	w := httptest.NewRecorder()
 	body, _ := json.Marshal(dto.DevTaskUpdate{Title: ptr("updated")})
-	req, _ := http.NewRequest(http.MethodPatch, "/api/v3/dev-tasks/task-1", bytes.NewReader(body))
+	req, _ := http.NewRequest(http.MethodPatch, "/v3/dev-tasks/task-1", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	r.ServeHTTP(w, req)
 
@@ -301,7 +311,7 @@ func TestDevTask_SoftDelete_Success(t *testing.T) {
 	}
 	r := newDevTaskHandler(svc)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodDelete, "/api/v3/dev-tasks/task-1", nil)
+	req, _ := http.NewRequest(http.MethodDelete, "/v3/dev-tasks/task-1", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
@@ -317,7 +327,7 @@ func TestDevTask_HardDelete_Success(t *testing.T) {
 	}
 	r := newDevTaskHandler(svc)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodDelete, "/api/v3/dev-tasks/task-1/permanent", nil)
+	req, _ := http.NewRequest(http.MethodDelete, "/v3/dev-tasks/task-1/permanent", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
@@ -335,16 +345,21 @@ func TestDevTask_FrontierTasks_Success(t *testing.T) {
 	}
 	r := newDevTaskHandler(svc)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-tasks/frontier?limit=5", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/v3/dev-tasks/frontier?limit=5", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
 		t.Errorf("status = %d, want %d", w.Code, http.StatusOK)
 	}
-	data, _ := decodeResp(t, w.Body.Bytes())
-	tasks, ok := data["tasks"].([]any)
-	if !ok || len(tasks) != 1 {
-		t.Errorf("expected 1 task in tasks array, got %v", data)
+	// frontier 直接返回数组（无分页 envelope），data 字段即 []any
+	body := w.Body.Bytes()
+	var resp struct {
+		Data    []any  `json:"data"`
+		Message string `json:"message"`
+	}
+	_ = json.Unmarshal(body, &resp)
+	if len(resp.Data) != 1 {
+		t.Errorf("expected 1 task in data array, got %v", resp.Data)
 	}
 }
 
@@ -362,7 +377,7 @@ func TestDevTask_BatchStatus_Success(t *testing.T) {
 	r := newDevTaskHandler(svc)
 	body, _ := json.Marshal(dto.BatchStatusRequest{Slugs: []string{"task-1", "task-2"}, Status: "已完成"})
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/api/v3/dev-tasks/batch-status", bytes.NewReader(body))
+	req, _ := http.NewRequest(http.MethodPost, "/v3/dev-tasks/batch-status", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	r.ServeHTTP(w, req)
 
@@ -378,7 +393,7 @@ func TestDevTask_DevTaskToken_Success(t *testing.T) {
 	r := newDevTaskHandler(svc)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-task/token", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/v3/dev-task/token", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
@@ -403,12 +418,12 @@ func TestDevTask_DevTaskToken_SecretNotConfigured(t *testing.T) {
 	svc := &mockDevTaskService{}
 	h := NewDevTaskHandler(svc, &config.Config{Security: config.SecurityConfig{DevTaskSecret: ""}})
 	r := gin.New()
-	g := r.Group("/api/v3")
+	g := r.Group("/v3")
 	noopAuth := func(c *gin.Context) { c.Next() }
 	h.RegisterRoutes(g, noopAuth, noopAuth, noopAuth)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-task/token", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/v3/dev-task/token", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusServiceUnavailable {
@@ -420,7 +435,7 @@ func TestDevTask_DevTaskToken_Unauthorized(t *testing.T) {
 	svc := &mockDevTaskService{}
 	h := NewDevTaskHandler(svc, &config.Config{Security: config.SecurityConfig{DevTaskSecret: "test-secret"}})
 	r := gin.New()
-	g := r.Group("/api/v3")
+	g := r.Group("/v3")
 	// realAuth 拒绝未认证请求
 	realAuth := func(c *gin.Context) {
 		c.AbortWithStatusJSON(401, gin.H{"error": "unauthorized"})
@@ -429,7 +444,7 @@ func TestDevTask_DevTaskToken_Unauthorized(t *testing.T) {
 	h.RegisterRoutes(g, noopAdmin, realAuth, noopAdmin)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/v3/dev-task/token", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/v3/dev-task/token", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusUnauthorized {

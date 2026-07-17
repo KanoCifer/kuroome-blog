@@ -51,7 +51,7 @@ func (m *mockAdminService) ListPostViewsData(ctx context.Context) ([]dto.PostVie
 func newAdminHandler(svc AdminServiceer) (*AdminHandler, *gin.Engine) {
 	h := NewAdminHandler(svc, config.Cfg)
 	r := gin.New()
-	g := r.Group("/api/v3")
+	g := r.Group("/v3")
 	noopAuth := func(c *gin.Context) { c.Set("user_id", 1); c.Next() }
 	noopAdmin := func(c *gin.Context) { c.Next() }
 	h.RegisterRoutes(g, noopAuth, noopAdmin)
@@ -98,7 +98,7 @@ func TestAdmin_AddPost_Success(t *testing.T) {
 		},
 	}
 	_, r := newAdminHandler(svc)
-	w, req := postJSON(t, "/api/v3/post/add", dto.PostIn{Title: "t", Body: "b", Tags: []string{"go"}})
+	w, req := postJSON(t, "/v3/post/add", dto.PostIn{Title: "t", Body: "b", Tags: []string{"go"}})
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
@@ -124,7 +124,7 @@ func TestAdmin_AddPost_Error(t *testing.T) {
 		},
 	}
 	_, r := newAdminHandler(svc)
-	w, req := postJSON(t, "/api/v3/post/add", dto.PostIn{Title: "t", Body: "b"})
+	w, req := postJSON(t, "/v3/post/add", dto.PostIn{Title: "t", Body: "b"})
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusInternalServerError {
@@ -136,7 +136,7 @@ func TestAdmin_AddPost_InvalidBody(t *testing.T) {
 	svc := &mockAdminService{addPostFn: func(context.Context, dto.PostIn) (string, error) { return "", nil }}
 	_, r := newAdminHandler(svc)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/api/v3/post/add", bytes.NewReader([]byte("not json")))
+	req, _ := http.NewRequest(http.MethodPost, "/v3/post/add", bytes.NewReader([]byte("not json")))
 	req.Header.Set("Content-Type", "application/json")
 	r.ServeHTTP(w, req)
 
@@ -152,7 +152,7 @@ func TestAdmin_UpdatePost_InvalidID(t *testing.T) {
 		updatePostFn: func(ctx context.Context, id string, post dto.PostUpdate) error { return errs.ErrInvalidPostID },
 	}
 	_, r := newAdminHandler(svc)
-	w, req := putJSON(t, "/api/v3/post/update", postUpdate("bad-id", "t", "b"))
+	w, req := putJSON(t, "/v3/post/update", postUpdate("bad-id", "t", "b"))
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusBadRequest {
@@ -167,7 +167,7 @@ func TestAdmin_UpdatePost_NotFound(t *testing.T) {
 		},
 	}
 	_, r := newAdminHandler(svc)
-	w, req := putJSON(t, "/api/v3/post/update", postUpdate("507f1f77bcf86cd799439011", "t", "b"))
+	w, req := putJSON(t, "/v3/post/update", postUpdate("507f1f77bcf86cd799439011", "t", "b"))
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusNotFound {
@@ -181,7 +181,7 @@ func TestAdmin_UpdatePost_MissingID(t *testing.T) {
 	}
 	_, r := newAdminHandler(svc)
 	// _id 缺失 → binding 失败
-	w, req := putJSON(t, "/api/v3/post/update", dto.PostUpdate{
+	w, req := putJSON(t, "/v3/post/update", dto.PostUpdate{
 		Title: ptr("t"),
 		Body:  ptr("b"),
 	})
@@ -199,7 +199,7 @@ func TestAdmin_UpdatePost_ServerError(t *testing.T) {
 		},
 	}
 	_, r := newAdminHandler(svc)
-	w, req := putJSON(t, "/api/v3/post/update", postUpdate("507f1f77bcf86cd799439011", "t", "b"))
+	w, req := putJSON(t, "/v3/post/update", postUpdate("507f1f77bcf86cd799439011", "t", "b"))
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusInternalServerError {
@@ -213,7 +213,7 @@ func TestAdmin_DeletePost_InvalidID(t *testing.T) {
 	svc := &mockAdminService{deletePostFn: func(ctx context.Context, id string) error { return errs.ErrInvalidPostID }}
 	_, r := newAdminHandler(svc)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodDelete, "/api/v3/post/bad-id/delete", nil)
+	req, _ := http.NewRequest(http.MethodDelete, "/v3/post/bad-id/delete", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusBadRequest {
@@ -225,7 +225,7 @@ func TestAdmin_DeletePost_NotFound(t *testing.T) {
 	svc := &mockAdminService{deletePostFn: func(ctx context.Context, id string) error { return errs.ErrPostNotFound }}
 	_, r := newAdminHandler(svc)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodDelete, "/api/v3/post/507f1f77bcf86cd799439011/delete", nil)
+	req, _ := http.NewRequest(http.MethodDelete, "/v3/post/507f1f77bcf86cd799439011/delete", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusNotFound {
@@ -237,7 +237,7 @@ func TestAdmin_DeletePost_Success(t *testing.T) {
 	svc := &mockAdminService{deletePostFn: func(ctx context.Context, id string) error { return nil }}
 	_, r := newAdminHandler(svc)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodDelete, "/api/v3/post/507f1f77bcf86cd799439011/delete", nil)
+	req, _ := http.NewRequest(http.MethodDelete, "/v3/post/507f1f77bcf86cd799439011/delete", nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {

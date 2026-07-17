@@ -56,7 +56,7 @@ export interface ApiResponse<T = unknown> {
 }
 
 const devtaskRequest = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE || '/api',
+  baseURL: import.meta.env.VITE_API_BASE || '/',
   timeout: 10_000,
   withCredentials: true,
 });

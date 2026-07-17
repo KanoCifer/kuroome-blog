@@ -81,7 +81,7 @@ const apiLatency = ref(0);
 const apiHealthy = ref(true);
 
 async function pingApi() {
-  const base = import.meta.env.VITE_API_BASE || '/api';
+  const base = import.meta.env.VITE_API_BASE || '/';
   const start = performance.now();
   try {
     const res = await fetch(`${base}/v3/status/detail`, {

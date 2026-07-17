@@ -73,7 +73,7 @@ func (m *mockFishService) Delete(ctx context.Context, id string, hard ...bool) e
 func newFishHandler(svc *mockFishService) (*FishHandler, *gin.Engine) {
 	h := NewFishHandler(svc)
 	r := gin.New()
-	g := r.Group("/api/v3")
+	g := r.Group("/v3")
 	noopAdmin := func(c *gin.Context) { c.Next() }
 	h.RegisterRoutes(g, noopAdmin)
 	return h, r
@@ -121,7 +121,7 @@ func TestFishHandler_GetFishingSpotsList_Success(t *testing.T) {
 	}
 	_, r := newFishHandler(svc)
 
-	w := fishDo(t, r, http.MethodGet, "/api/v3/fish/spots", nil)
+	w := fishDo(t, r, http.MethodGet, "/v3/fish/spots", nil)
 	if w.Code != http.StatusOK {
 		t.Fatalf("status = %d, want 200; body=%s", w.Code, w.Body.String())
 	}
@@ -143,7 +143,7 @@ func TestFishHandler_GetFishingSpotsList_Error(t *testing.T) {
 	}
 	_, r := newFishHandler(svc)
 
-	w := fishDo(t, r, http.MethodGet, "/api/v3/fish/spots", nil)
+	w := fishDo(t, r, http.MethodGet, "/v3/fish/spots", nil)
 	if w.Code != http.StatusBadRequest {
 		t.Errorf("status = %d, want 400; body=%s", w.Code, w.Body.String())
 	}
@@ -157,7 +157,7 @@ func TestFishHandler_GetFishingSpotsList_EmptyNoPanic(t *testing.T) {
 	}
 	_, r := newFishHandler(svc)
 
-	w := fishDo(t, r, http.MethodGet, "/api/v3/fish/spots", nil)
+	w := fishDo(t, r, http.MethodGet, "/v3/fish/spots", nil)
 	if w.Code != http.StatusOK {
 		t.Fatalf("status = %d, want 200", w.Code)
 	}
@@ -180,7 +180,7 @@ func TestFishHandler_GetFishingSpot_Success(t *testing.T) {
 	}
 	_, r := newFishHandler(svc)
 
-	w := fishDo(t, r, http.MethodGet, "/api/v3/fish/spots/507f1f77bcf86cd799439011", nil)
+	w := fishDo(t, r, http.MethodGet, "/v3/fish/spots/507f1f77bcf86cd799439011", nil)
 	if w.Code != http.StatusOK {
 		t.Fatalf("status = %d, want 200; body=%s", w.Code, w.Body.String())
 	}
@@ -202,7 +202,7 @@ func TestFishHandler_GetFishingSpot_Error(t *testing.T) {
 	}
 	_, r := newFishHandler(svc)
 
-	w := fishDo(t, r, http.MethodGet, "/api/v3/fish/spots/not-found", nil)
+	w := fishDo(t, r, http.MethodGet, "/v3/fish/spots/not-found", nil)
 	if w.Code != http.StatusBadRequest {
 		t.Errorf("status = %d, want 400", w.Code)
 	}
@@ -221,7 +221,7 @@ func TestFishHandler_CreateFishingSpot_Success(t *testing.T) {
 	_, r := newFishHandler(svc)
 
 	body := dto.FishingSpotIn{Name: "新钓点", Location: []float64{120.1, 30.2}}
-	w := fishDo(t, r, http.MethodPost, "/api/v3/fish/spots", body)
+	w := fishDo(t, r, http.MethodPost, "/v3/fish/spots", body)
 	if w.Code != http.StatusOK {
 		t.Fatalf("status = %d, want 200; body=%s", w.Code, w.Body.String())
 	}
@@ -234,7 +234,7 @@ func TestFishHandler_CreateFishingSpot_InvalidJSON(t *testing.T) {
 	svc := &mockFishService{}
 	_, r := newFishHandler(svc)
 
-	req, _ := http.NewRequest(http.MethodPost, "/api/v3/fish/spots", bytes.NewReader([]byte("not json")))
+	req, _ := http.NewRequest(http.MethodPost, "/v3/fish/spots", bytes.NewReader([]byte("not json")))
 	req.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
@@ -250,7 +250,7 @@ func TestFishHandler_CreateFishingSpot_MissingRequiredFields(t *testing.T) {
 
 	// 缺 name / location → binding:"required" 失败。ptr 复用 admin_test.go 的通用 helper。
 	body := dto.FishingSpotIn{}
-	w := fishDo(t, r, http.MethodPost, "/api/v3/fish/spots", body)
+	w := fishDo(t, r, http.MethodPost, "/v3/fish/spots", body)
 	if w.Code != http.StatusBadRequest {
 		t.Errorf("status = %d, want 400 (missing required field)", w.Code)
 	}
@@ -265,7 +265,7 @@ func TestFishHandler_CreateFishingSpot_ServiceError(t *testing.T) {
 	_, r := newFishHandler(svc)
 
 	body := dto.FishingSpotIn{Name: "t", Location: []float64{1, 2}}
-	w := fishDo(t, r, http.MethodPost, "/api/v3/fish/spots", body)
+	w := fishDo(t, r, http.MethodPost, "/v3/fish/spots", body)
 	if w.Code != http.StatusBadRequest {
 		t.Errorf("status = %d, want 400", w.Code)
 	}
@@ -287,7 +287,7 @@ func TestFishHandler_UpdateFishingSpot_Partial(t *testing.T) {
 
 	// 只传 name —— 其余字段不动
 	body := dto.FishingSpotUpdate{Name: ptr("新名字")}
-	w := fishDo(t, r, http.MethodPatch, "/api/v3/fish/spots/507f1f77bcf86cd799439011", body)
+	w := fishDo(t, r, http.MethodPatch, "/v3/fish/spots/507f1f77bcf86cd799439011", body)
 	if w.Code != http.StatusOK {
 		t.Fatalf("status = %d, want 200; body=%s", w.Code, w.Body.String())
 	}
@@ -314,7 +314,7 @@ func TestFishHandler_UpdateFishingSpot_ExplicitZeroValue(t *testing.T) {
 
 	// 显式传 rating: 0 应该被保留（非 nil → 覆盖）
 	body := dto.FishingSpotUpdate{Rating: ptr(0.0)}
-	w := fishDo(t, r, http.MethodPatch, "/api/v3/fish/spots/abc", body)
+	w := fishDo(t, r, http.MethodPatch, "/v3/fish/spots/abc", body)
 	if w.Code != http.StatusOK {
 		t.Fatalf("status = %d, want 200", w.Code)
 	}
@@ -330,7 +330,7 @@ func TestFishHandler_UpdateFishingSpot_InvalidJSON(t *testing.T) {
 	svc := &mockFishService{}
 	_, r := newFishHandler(svc)
 
-	req, _ := http.NewRequest(http.MethodPatch, "/api/v3/fish/spots/abc", bytes.NewReader([]byte("{bad")))
+	req, _ := http.NewRequest(http.MethodPatch, "/v3/fish/spots/abc", bytes.NewReader([]byte("{bad")))
 	req.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
@@ -349,7 +349,7 @@ func TestFishHandler_UpdateFishingSpot_ServiceError(t *testing.T) {
 	_, r := newFishHandler(svc)
 
 	body := dto.FishingSpotUpdate{Name: ptr("x")}
-	w := fishDo(t, r, http.MethodPatch, "/api/v3/fish/spots/abc", body)
+	w := fishDo(t, r, http.MethodPatch, "/v3/fish/spots/abc", body)
 	if w.Code != http.StatusBadRequest {
 		t.Errorf("status = %d, want 400", w.Code)
 	}
@@ -367,7 +367,7 @@ func TestFishHandler_DeleteFishingSpot_SoftDelete(t *testing.T) {
 	}
 	_, r := newFishHandler(svc)
 
-	w := fishDo(t, r, http.MethodDelete, "/api/v3/fish/spots/abc", nil)
+	w := fishDo(t, r, http.MethodDelete, "/v3/fish/spots/abc", nil)
 	if w.Code != http.StatusOK {
 		t.Fatalf("status = %d, want 200", w.Code)
 	}
@@ -388,7 +388,7 @@ func TestFishHandler_DeleteFishingSpot_HardDelete(t *testing.T) {
 	}
 	_, r := newFishHandler(svc)
 
-	w := fishDo(t, r, http.MethodDelete, "/api/v3/fish/spots/abc?hard=true", nil)
+	w := fishDo(t, r, http.MethodDelete, "/v3/fish/spots/abc?hard=true", nil)
 	if w.Code != http.StatusOK {
 		t.Fatalf("status = %d, want 200", w.Code)
 	}
@@ -405,7 +405,7 @@ func TestFishHandler_DeleteFishingSpot_Error(t *testing.T) {
 	}
 	_, r := newFishHandler(svc)
 
-	w := fishDo(t, r, http.MethodDelete, "/api/v3/fish/spots/abc", nil)
+	w := fishDo(t, r, http.MethodDelete, "/v3/fish/spots/abc", nil)
 	if w.Code != http.StatusBadRequest {
 		t.Errorf("status = %d, want 400", w.Code)
 	}

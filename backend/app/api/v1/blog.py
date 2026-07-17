@@ -32,7 +32,7 @@ async def upload_blog_image(
     relative_path = save_upload_image(file, f"posts/{user}")
     return APIResponse(
         data={
-            "url": f"/api/v1/media/{relative_path}",
+            "url": f"/v1/media/{relative_path}",
             "filename": relative_path,
         },
         message="Image uploaded successfully.",

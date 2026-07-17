@@ -69,7 +69,7 @@ func setupUpload(t *testing.T, up service.Uploader, view avatarViewer) *gin.Engi
 	t.Helper()
 	h := NewUploadHandler(up, view)
 	r := gin.New()
-	g := r.Group("/api/v3")
+	g := r.Group("/v3")
 	noopAuth := func(c *gin.Context) { c.Set("user_id", 1); c.Next() }
 	h.RegisterRoutes(g, noopAuth)
 	return r
@@ -108,11 +108,11 @@ func TestUpload_Success(t *testing.T) {
 	}
 	r := setupUpload(t, up, nil)
 
-	w := requestUpload(t, r, "/api/v3/upload", "file", "test.png", "image/png", mustPNG(t))
+	w := requestUpload(t, r, "/v3/upload", "file", "test.png", "image/png", mustPNG(t))
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
 	}
-	if !strings.Contains(w.Body.String(), `"url":"/api/v3/media/uploads/1/abc.png"`) {
+	if !strings.Contains(w.Body.String(), `"url":"/v3/media/uploads/1/abc.png"`) {
 		t.Fatalf("unexpected url in body: %s", w.Body.String())
 	}
 }
@@ -124,7 +124,7 @@ func TestUpload_NoFile(t *testing.T) {
 	r := setupUpload(t, up, nil)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/api/v3/upload", nil)
+	req, _ := http.NewRequest(http.MethodPost, "/v3/upload", nil)
 	req.Header.Set("Content-Type", "multipart/form-data; boundary=BOUNDARY")
 	r.ServeHTTP(w, req)
 
@@ -140,7 +140,7 @@ func TestUpload_SvcError(t *testing.T) {
 		},
 	}
 	r := setupUpload(t, up, nil)
-	w := requestUpload(t, r, "/api/v3/upload", "file", "a.png", "image/png", mustPNG(t))
+	w := requestUpload(t, r, "/v3/upload", "file", "a.png", "image/png", mustPNG(t))
 	if w.Code != http.StatusInternalServerError {
 		t.Fatalf("expected 500, got %d", w.Code)
 	}
@@ -156,7 +156,7 @@ func TestUploadPic_Success(t *testing.T) {
 	}
 	r := setupUpload(t, up, &mockAvatarView{photo: "pics/1/abc-256.jpg"})
 
-	w := requestUpload(t, r, "/api/v3/upload-pic", "image", "avatar.png", "image/png", mustPNG(t))
+	w := requestUpload(t, r, "/v3/upload-pic", "image", "avatar.png", "image/png", mustPNG(t))
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
 	}
@@ -172,7 +172,7 @@ func TestUploadPic_SvcBadRequest(t *testing.T) {
 		},
 	}
 	r := setupUpload(t, up, nil)
-	w := requestUpload(t, r, "/api/v3/upload-pic", "image", "big.png", "image/png", mustPNG(t))
+	w := requestUpload(t, r, "/v3/upload-pic", "image", "big.png", "image/png", mustPNG(t))
 	if w.Code != http.StatusBadRequest {
 		t.Fatalf("expected 400 for image-too-large, got %d", w.Code)
 	}

@@ -46,7 +46,7 @@ export interface FishingMapService {
   ): Promise<FishingFeedbackResponse>;
 }
 
-const apiBase = import.meta.env.VITE_API_BASE || '/api';
+const apiBase = import.meta.env.VITE_API_BASE || '/';
 
 export const fishingMapService = (): FishingMapService => {
   const gateway = fishingMapGateway();

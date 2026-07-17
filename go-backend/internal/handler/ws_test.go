@@ -112,13 +112,13 @@ func TestHandleWS_Lifecycle(t *testing.T) {
 	h := NewWSHandler(mock)
 
 	engine := gin.New()
-	group := engine.Group("/api/v3")
+	group := engine.Group("/v3")
 	h.RegisterRoutes(group)
 
 	srv := httptest.NewServer(engine)
 	defer srv.Close()
 
-	wsURL := strings.Replace(srv.URL, "http", "ws", 1) + "/api/v3/public/ws"
+	wsURL := strings.Replace(srv.URL, "http", "ws", 1) + "/v3/public/ws"
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -169,13 +169,13 @@ func TestHandleWS_NoVisitorId(t *testing.T) {
 	h := NewWSHandler(mock)
 
 	engine := gin.New()
-	group := engine.Group("/api/v3")
+	group := engine.Group("/v3")
 	h.RegisterRoutes(group)
 
 	srv := httptest.NewServer(engine)
 	defer srv.Close()
 
-	wsURL := strings.Replace(srv.URL, "http", "ws", 1) + "/api/v3/public/ws"
+	wsURL := strings.Replace(srv.URL, "http", "ws", 1) + "/v3/public/ws"
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

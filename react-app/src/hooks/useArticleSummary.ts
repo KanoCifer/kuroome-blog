@@ -36,7 +36,7 @@ export function useArticleSummary() {
     MODEL_OPTIONS[0].value,
   );
 
-  const apiBase = import.meta.env.VITE_API_BASE || '/api';
+  const apiBase = import.meta.env.VITE_API_BASE || '/';
 
   const generateSummary = useCallback(
     async ({ title, content }: ArticleContext) => {

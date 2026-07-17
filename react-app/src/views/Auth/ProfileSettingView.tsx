@@ -40,7 +40,7 @@ export default function ProfileSettingView() {
   const [messageType, setMessageType] = useState<'success' | 'error'>(
     'success',
   );
-  const [avatarUrl, setAvatarUrl] = useState('/api/v3/media/default.png');
+  const [avatarUrl, setAvatarUrl] = useState('/v3/media/default.png');
   const [showPassword, setShowPassword] = useState(false);
 
   const [hasPasskey, setHasPasskey] = useState(false);
@@ -79,7 +79,7 @@ export default function ProfileSettingView() {
       if (auth.user.photo?.startsWith('http')) {
         setAvatarUrl(auth.user.photo);
       } else if (auth.user.photo) {
-        setAvatarUrl(`/api/v3/media/${auth.user.photo}`);
+        setAvatarUrl(`/v3/media/${auth.user.photo}`);
       }
     }
   }, [auth.user]);
@@ -201,7 +201,7 @@ export default function ProfileSettingView() {
   const handleBindGitHub = () => {
     setBindingGitHub(true);
     setGithubMessage('');
-    window.location.href = '/api/v3/github/bind';
+    window.location.href = '/v3/github/bind';
   };
 
   const handleUnbindGitHub = async () => {

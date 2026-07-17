@@ -55,9 +55,9 @@ const avatarUrl = computed(() => {
     return authStore.user.photo;
   }
   if (authStore.user?.photo) {
-    return `/api/v3/media/${authStore.user.photo}`;
+    return `/v3/media/${authStore.user.photo}`;
   }
-  return '/api/v3/media/default.png';
+  return '/v3/media/default.png';
 });
 
 const loadUserData = () => {
@@ -166,7 +166,7 @@ const handleDeletePasskey = async () => {
 const handleBindGitHub = () => {
   bindingGitHub.value = true;
   githubMessage.value = '';
-  window.location.href = '/api/v3/github/bind';
+  window.location.href = '/v3/github/bind';
 };
 
 const handleUnbindGitHub = async () => {

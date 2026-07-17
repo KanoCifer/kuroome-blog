@@ -47,7 +47,7 @@ func (m *mockSystemService) ListEvents(
 func setupSystem(svc service.Systemer) *gin.Engine {
 	h := NewSystemHandler(svc)
 	r := gin.New()
-	v3 := r.Group("/api/v3")
+	v3 := r.Group("/v3")
 	h.RegisterRoutes(v3)
 	return r
 }
@@ -65,7 +65,7 @@ func systemRequestGet(t *testing.T, r *gin.Engine, path string) *httptest.Respon
 func TestPing_ReturnsStatusOK(t *testing.T) {
 	r := setupSystem(&mockSystemService{})
 
-	w := systemRequestGet(t, r, "/api/v3/system/")
+	w := systemRequestGet(t, r, "/v3/system/")
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
 	}
@@ -96,7 +96,7 @@ func TestEvents_DefaultParamsReturnsItemsAndPagination(t *testing.T) {
 	}
 	r := setupSystem(svc)
 
-	w := systemRequestGet(t, r, "/api/v3/system/events")
+	w := systemRequestGet(t, r, "/v3/system/events")
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
 	}
@@ -134,7 +134,7 @@ func TestEvents_PassesPageAndTypeToService(t *testing.T) {
 	}
 	r := setupSystem(svc)
 
-	w := systemRequestGet(t, r, "/api/v3/system/events?page=2&per_page=5&type=deploy")
+	w := systemRequestGet(t, r, "/v3/system/events?page=2&per_page=5&type=deploy")
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d", w.Code)
 	}
@@ -151,12 +151,12 @@ func TestEvents_PassesPageAndTypeToService(t *testing.T) {
 func TestEvents_InvalidPage(t *testing.T) {
 	r := setupSystem(&mockSystemService{})
 
-	w := systemRequestGet(t, r, "/api/v3/system/events?page=0")
+	w := systemRequestGet(t, r, "/v3/system/events?page=0")
 	if w.Code != http.StatusBadRequest {
 		t.Fatalf("expected 400 for page=0, got %d", w.Code)
 	}
 
-	w = systemRequestGet(t, r, "/api/v3/system/events?page=abc")
+	w = systemRequestGet(t, r, "/v3/system/events?page=abc")
 	if w.Code != http.StatusBadRequest {
 		t.Fatalf("expected 400 for page=abc, got %d", w.Code)
 	}
@@ -165,12 +165,12 @@ func TestEvents_InvalidPage(t *testing.T) {
 func TestEvents_InvalidPerPage(t *testing.T) {
 	r := setupSystem(&mockSystemService{})
 
-	w := systemRequestGet(t, r, "/api/v3/system/events?per_page=0")
+	w := systemRequestGet(t, r, "/v3/system/events?per_page=0")
 	if w.Code != http.StatusBadRequest {
 		t.Fatalf("expected 400 for per_page=0, got %d", w.Code)
 	}
 
-	w = systemRequestGet(t, r, "/api/v3/system/events?per_page=201")
+	w = systemRequestGet(t, r, "/v3/system/events?per_page=201")
 	if w.Code != http.StatusBadRequest {
 		t.Fatalf("expected 400 for per_page=201, got %d", w.Code)
 	}
@@ -179,7 +179,7 @@ func TestEvents_InvalidPerPage(t *testing.T) {
 func TestEvents_InvalidStartFormat(t *testing.T) {
 	r := setupSystem(&mockSystemService{})
 
-	w := systemRequestGet(t, r, "/api/v3/system/events?start=not-a-date")
+	w := systemRequestGet(t, r, "/v3/system/events?start=not-a-date")
 	if w.Code != http.StatusBadRequest {
 		t.Fatalf("expected 400 for invalid start, got %d", w.Code)
 	}
@@ -197,7 +197,7 @@ func TestEvents_ServiceError(t *testing.T) {
 	}
 	r := setupSystem(svc)
 
-	w := systemRequestGet(t, r, "/api/v3/system/events")
+	w := systemRequestGet(t, r, "/v3/system/events")
 	if w.Code != http.StatusInternalServerError {
 		t.Fatalf("expected 500 on service error, got %d", w.Code)
 	}

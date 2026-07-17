@@ -68,7 +68,7 @@ func (h *UploadHandler) Upload(c *gin.Context) {
 	}
 
 	response.Success(c, gin.H{
-		"url":      "/api/v3/media/" + rel,
+		"url":      "/v3/media/" + rel,
 		"filename": rel,
 	}, "文件上传成功")
 }

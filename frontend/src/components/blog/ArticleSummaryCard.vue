@@ -22,7 +22,7 @@ const props = defineProps<{
 }>();
 
 const notifier = useNotificationStore();
-const apiBase = import.meta.env.VITE_API_BASE || '/api';
+const apiBase = import.meta.env.VITE_API_BASE || '/';
 
 const articleCtx = { title: props.title, content: props.content };
 const {

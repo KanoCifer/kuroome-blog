@@ -30,7 +30,7 @@ export function useArticleChat(ctx: ArticleContext) {
   const [errorMessage, setErrorMessage] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const apiBase = import.meta.env.VITE_API_BASE || '/api';
+  const apiBase = import.meta.env.VITE_API_BASE || '/';
 
   const canChat = chatInput.trim().length > 0 && !loading;
 
