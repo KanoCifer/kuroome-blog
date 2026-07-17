@@ -1,6 +1,7 @@
 import { BasicLayout } from '@/components/basic/BasicLayout';
 import { Suspense } from 'react';
 import { createBrowserRouter, redirect } from 'react-router-dom';
+import { useAuthStore } from '@/stores/authState';
 import {
   About,
   BlogList,
@@ -26,7 +27,6 @@ import {
 
 // 认证守卫 loader
 async function authLoader() {
-  const { useAuthStore } = await import('../stores/authState');
   const store = useAuthStore.getState();
 
   if (!store.isHydrated) {
@@ -42,7 +42,6 @@ async function authLoader() {
 // 已登录用户守卫 loader：用于 /login 和 /register
 // 已登录状态下访问这两个路由会被重定向到首页或 ?redirect= 指定路径
 async function guestOnlyLoader({ request }: { request: Request }) {
-  const { useAuthStore } = await import('../stores/authState');
   const store = useAuthStore.getState();
 
   if (!store.isHydrated) {

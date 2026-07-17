@@ -24,6 +24,8 @@ export default defineConfig({
     minify: 'oxc',
     cssMinify: true,
     sourcemap: false,
+    // chunk 超过此大小时发出警告（twikoo 评论组件近 1MB，适度放宽）
+    chunkSizeWarningLimit: 1200,
     terserOptions: {
       compress: {
         drop_console: true, // 删除 console
@@ -38,7 +40,17 @@ export default defineConfig({
             manualChunks(id) {
               if (!id.includes('node_modules')) return;
 
-              // ✅ 富文本（最大优先级）
+              // ✅ 评论组件（最大，~1MB）— 独立拆出，仅文章页按需加载
+              if (id.includes('twikoo')) {
+                return 'twikoo';
+              }
+
+              // ✅ 图表
+              if (id.includes('echarts')) {
+                return 'echarts';
+              }
+
+              // ✅ 富文本
               if (id.includes('@tiptap')) {
                 return 'tiptap';
               }
@@ -51,6 +63,11 @@ export default defineConfig({
               // ✅ 动画
               if (id.includes('lottie-web')) {
                 return 'lottie';
+              }
+
+              // ✅ 动效库
+              if (id.includes('motion-v') || id.includes('framer-motion')) {
+                return 'motion';
               }
 
               // ✅ Vue 生态（注意顺序！）

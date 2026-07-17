@@ -15,10 +15,22 @@ export default defineConfig({
     minify: 'oxc',
     cssMinify: true,
     sourcemap: false,
+    // chunk 超过此大小时发出警告（twikoo 评论组件近 1MB，适度放宽）
+    chunkSizeWarningLimit: 1200,
     rollupOptions: {
       output: {
         manualChunks(id) {
           if (!id.includes('node_modules')) return;
+
+          // ✅ 评论组件（最大，~1MB）— 独立拆出，仅文章页按需加载
+          if (id.includes('twikoo')) {
+            return 'twikoo';
+          }
+
+          // ✅ 图表（体积大，单独打包）
+          if (id.includes('echarts') || id.includes('echarts-for-react')) {
+            return 'echarts';
+          }
 
           // ✅ 代码高亮
           if (id.includes('highlight.js')) {
@@ -44,6 +56,11 @@ export default defineConfig({
           if (id.includes('node_modules/react/')) return 'react';
           if (id.includes('node_modules/react-dom/')) return 'react-dom';
 
+          // ✅ Markdown
+          if (id.includes('marked') || id.includes('markdown-it')) {
+            return 'markdown';
+          }
+
           // ✅ 工具库
           if (
             id.includes('axios') ||
@@ -57,11 +74,6 @@ export default defineConfig({
             id.includes('moment')
           )
             return 'date';
-
-          // ✅ ECharts（体积大，单独打包）
-          if (id.includes('echarts') || id.includes('echarts-for-react')) {
-            return 'echarts';
-          }
         },
       },
       // 忽略 lottie-web 的 eval 警告
