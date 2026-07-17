@@ -6,14 +6,7 @@
     class="mb-8 flex items-center gap-4 rounded-3xl p-2 px-2 transition-colors"
   >
     <!-- 下拉菜单 -->
-    <transition
-      enter-active-class="transition-all transform-gpu duration-200 ease-out"
-      enter-from-class="opacity-0 scale-95 -translate-y-1"
-      enter-to-class="opacity-100 scale-100 translate-y-0"
-      leave-active-class="transition-all transform-gpu duration-150 ease-in"
-      leave-from-class="opacity-100 scale-100 translate-y-0"
-      leave-to-class="opacity-0 scale-95 -translate-y-1"
-    >
+    <DropdownTransition>
       <div
         v-if="isUserMenuOpen"
         class="bg-background absolute top-16 right-0 z-9999 mt-2 w-auto rounded-2xl p-1 shadow-xl ring-1 ring-black/5 dark:ring-white/10"
@@ -47,7 +40,7 @@
           </li>
         </ol>
       </div>
-    </transition>
+    </DropdownTransition>
 
     <!-- 头像 -->
     <img
@@ -79,6 +72,7 @@
 </template>
 
 <script setup lang="ts">
+import { DropdownTransition } from '@/components/ui/dropdown-transition';
 import { ChevronDownIcon } from '@/components/icons';
 import { useAuthStore } from '@/auth/stores/auth';
 import type { Component } from 'vue';

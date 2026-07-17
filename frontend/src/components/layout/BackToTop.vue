@@ -58,10 +58,10 @@ const scrollToTop = () => {
 
 <template>
   <transition
-    enter-active-class="transition-all transform-gpu duration-300 ease-out"
+    enter-active-class="transition-[transform,opacity] transform-gpu duration-300 ease-out"
     enter-from-class="opacity-0 translate-y-10 scale-75"
     enter-to-class="opacity-100 translate-y-0 scale-100"
-    leave-active-class="transition-all transform-gpu duration-200 ease-in"
+    leave-active-class="transition-all transform-gpu duration-200 ease-out"
     leave-from-class="opacity-100 translate-y-0 scale-100"
     leave-to-class="opacity-0 translate-y-10 scale-75"
   >
@@ -70,7 +70,7 @@ const scrollToTop = () => {
       @click="scrollToTop"
       @mouseenter="isHovered = true"
       @mouseleave="isHovered = false"
-      class="fixed z-50 flex h-14 w-14 -translate-x-1/2 transform-gpu cursor-pointer items-center justify-center overflow-hidden rounded-full shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:shadow-2xl focus:outline-none"
+      class="fixed z-50 flex h-14 w-14 -translate-x-1/2 transform-gpu cursor-pointer items-center justify-center overflow-hidden rounded-full shadow-lg backdrop-blur-sm transition-[transform,box-shadow,background-color,color] duration-300 hover:scale-110 hover:shadow-2xl focus:outline-none"
       :class="[
         isHovered
           ? 'bg-primary/30 dark:bg-primary/10 text-white'
@@ -106,7 +106,7 @@ const scrollToTop = () => {
           stroke-linecap="round"
           :stroke-dasharray="163.36"
           :stroke-dashoffset="163.36 - (scrollProgress / 100) * 163.36"
-          class="transition-all duration-100"
+          class="transition-[stroke-dashoffset,color] duration-100"
           :class="isHovered ? 'text-white' : 'text-primary dark:text-primary'"
         />
       </svg>

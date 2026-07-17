@@ -1,11 +1,21 @@
 <template>
   <motion.div
-    :initial="{ scale: 0, opacity: 0, filter: 'blur(4px)' }"
+    :initial="{ scale: 0, opacity: 0, filter: 'blur(2px)' }"
     :animate="{ scale: 1, opacity: 1, filter: 'blur(0)' }"
     :transition="{
-      type: 'spring',
-      stiffness: 520,
-      damping: 38,
+      scale: {
+        type: 'spring',
+        stiffness: 320,
+        damping: 28,
+      },
+      opacity: {
+        duration: 0.4,
+        ease: 'easeOut',
+      },
+      filter: {
+        duration: 0.5,
+        ease: 'easeOut',
+      },
     }"
     class="card group border-border squircle bg-background/95 relative overflow-hidden border p-6"
   >
@@ -30,6 +40,7 @@ import { motion } from 'motion-v';
 }*/
 
 .card {
+  will-change: transform, filter;
   border: 1px solid rgb(255 255 255 / 0.6);
   box-shadow:
     inset 0 1px 1px rgb(255 255 255 / 0.7),

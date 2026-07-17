@@ -48,9 +48,9 @@ const sliderFill = (val: number, min: number, max: number) =>
 
 /*
  * 重置背景参数到默认值。
- * blur=8, brightness=1.0, scale=1.05 — 与 theme store 初始一致。
+ * blur=0, brightness=1.0, scale=1.05 — 与 theme store 初始一致。
  */
-const BG_DEFAULTS = { blur: 8, brightness: 1.0, scale: 1.05 } as const;
+const BG_DEFAULTS = { blur: 0, brightness: 1.0, scale: 1.05 } as const;
 const resetBackground = () => {
   themeStore.bgBlur = BG_DEFAULTS.blur;
   themeStore.bgBrightness = BG_DEFAULTS.brightness;
@@ -134,7 +134,7 @@ const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
             </div>
             <input
               type="range"
-              min="5"
+              min="0"
               max="70"
               step="1"
               :value="themeStore.bgBlur"
@@ -369,7 +369,7 @@ const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
         Choose a fixed background
       </p>
       <ImageGrid
-        :images="backgroundStore.backgroundThumbs"
+        :images="backgroundStore.backgrounds"
         :selected="backgroundStore.fixedIndex"
         @select="backgroundStore.selectFixed($event)"
       />

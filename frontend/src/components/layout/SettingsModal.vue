@@ -71,9 +71,12 @@
             底托 bg-muted + 激活项 bg-background 给出"高度差"指示
           -->
           <nav
+            ref="navRef"
             aria-label="设置分组"
-            class="bg-muted mx-8 flex items-stretch justify-between gap-1 rounded-xl p-1"
+            class="bg-muted relative mx-8 flex items-stretch justify-between gap-1 rounded-xl p-1"
           >
+            <!-- Sliding pill indicator (transitions translateX + width). -->
+            <span ref="pillRef" class="settings-tab-pill" aria-hidden="true" />
             <button
               v-for="tab in tabs"
               :key="tab.key"
@@ -142,7 +145,7 @@ import IconClose from '@/components/icons/IconClose.vue';
 import AppearanceTab from './AppearanceTab.vue';
 import BackgroundTab from './BackgroundTab.vue';
 import CardTab from './CardTab.vue';
-import { ref } from 'vue';
+import { nextTick, onMounted, onUnmounted, useTemplateRef, ref, watch } from 'vue';
 
 defineProps<{
   modelValue: boolean;
@@ -164,6 +167,50 @@ const tabs = [
   { key: 'card', label: '卡片' },
 ];
 
+const navRef = useTemplateRef<HTMLElement>('navRef');
+const pillRef = useTemplateRef<HTMLElement>('pillRef');
+
+function activeTabIndex(): number {
+  return tabs.findIndex((t) => t.key === activeTab.value);
+}
+
+/* Position the pill over the active button.
+   animate=false → suspend the transition, write values, force reflow,
+   restore → pill snaps with no tween (used on mount + resize). */
+function positionPill(animate = true) {
+  const nav = navRef.value;
+  const pill = pillRef.value;
+  if (!nav || !pill) return;
+
+  const idx = activeTabIndex();
+  if (idx === -1) return;
+  // children[0] is the pill; buttons start at index 1
+  const btn = nav.children[idx + 1] as HTMLElement | undefined;
+  if (!btn) return;
+
+  if (!animate) {
+    pill.style.transition = 'none';
+  }
+  pill.style.width = `${btn.offsetWidth}px`;
+  pill.style.transform = `translateX(${btn.offsetLeft}px)`;
+  if (!animate) {
+    void pill.offsetHeight; // commit before restoring transition
+    pill.style.transition = '';
+  }
+}
+
+// Reposition on tab change (animated).
+watch(activeTab, () => void nextTick(() => positionPill(true)));
+
+let resizeObserver: ResizeObserver | null = null;
+onMounted(() => {
+  positionPill(false); // snap into place on first paint
+  resizeObserver = new ResizeObserver(() => positionPill(false));
+  if (navRef.value) resizeObserver.observe(navRef.value);
+});
+
+onUnmounted(() => resizeObserver?.disconnect());
+
 /*
  * 抽屉入场 spring — 与 project modal 定式（DESIGN.md）一致。
  * stiffness 320 + damping 32 + mass 0.8：快启、适中过冲、平滑止点。
@@ -182,3 +229,30 @@ const DRAWER_SHADOW = [
   'inset 0 1px 0 0 oklch(from var(--paper) l c h / 0.6)',
 ].join(', ');
 </script>
+
+<style scoped>
+/* Sliding tab pill — transitions translateX + width to track the active
+   button. Same curve + snap idiom as BasicNav's indicator. */
+.settings-tab-pill {
+  position: absolute;
+  top: 4px; /* match nav padding (p-1 = 4px) */
+  left: 0;
+  height: calc(100% - 8px); /* fill nav minus vertical padding */
+  z-index: 0;
+  background: var(--background);
+  border-radius: 0.5rem; /* rounded-lg, matches the buttons */
+  box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 8%, transparent);
+  transform: translateX(0);
+  transition:
+    transform 250ms cubic-bezier(0.32, 0.72, 0, 1),
+    width 250ms cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform, width;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-tab-pill {
+    transition: none;
+  }
+}
+</style>

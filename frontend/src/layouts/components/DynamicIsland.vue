@@ -2,10 +2,25 @@
 import { connectionDelay } from '@/plugins/visitorWs';
 import { useVisitorCountStore } from '@/stores/visitorCount';
 import { motion } from 'motion-v';
-import { computed, ref } from 'vue';
+import { computed, onUnmounted, ref } from 'vue';
 
 const visitorCount = useVisitorCountStore();
 const islandExpanded = ref(false);
+const timer = ref<number | null>(null);
+
+const handleMouseLeave = () => {
+  if (!islandExpanded.value) return;
+  if (timer.value) {
+    clearTimeout(timer.value);
+    timer.value = null;
+  }
+
+  timer.value = setTimeout(() => (islandExpanded.value = false), 1500);
+};
+
+onUnmounted(() => {
+  if (timer.value) clearTimeout(timer.value);
+});
 
 const delayStatus = computed(() => {
   const ms = connectionDelay?.value ?? 0;
@@ -85,6 +100,7 @@ const delayStatus = computed(() => {
       :transition="{ type: 'spring', duration: 0.3, bounce: 0 }"
       class="absolute inset-0 flex flex-col justify-between px-4 py-3"
       :class="{ 'pointer-events-none': !islandExpanded }"
+      @mouseleave="handleMouseLeave"
     >
       <router-link
         to="/status"

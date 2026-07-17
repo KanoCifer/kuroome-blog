@@ -2,7 +2,7 @@
   <div ref="dropdownRef" class="relative">
     <button
       @click.stop="isOpen = !isOpen"
-      class="squircle hover:bg-muted rounded-xl p-2 transition-all hover:scale-110"
+      class="squircle hover:bg-muted rounded-xl p-2 transition-[background-color,transform] hover:scale-110"
       title="选择背景图"
     >
       <svg
@@ -20,14 +20,7 @@
       </svg>
     </button>
 
-    <transition
-      enter-active-class="transition-all duration-200 ease-out"
-      enter-from-class="opacity-0 scale-95 -translate-y-1"
-      enter-to-class="opacity-100 scale-100 translate-y-0"
-      leave-active-class="transition-all duration-150 ease-in"
-      leave-from-class="opacity-100 scale-100 translate-y-0"
-      leave-to-class="opacity-0 scale-95 -translate-y-1"
-    >
+    <DropdownTransition>
       <div
         v-if="isOpen"
         class="border-border bg-background absolute top-full right-0 z-9999 mt-2 w-48 rounded-lg shadow-lg"
@@ -78,24 +71,24 @@
 
         <div class="max-h-60 overflow-y-auto">
           <button
-            v-for="(img, index) in store.backgroundImages"
-            :key="index"
+            v-for="(bg, index) in store.backgrounds"
+            :key="bg.id"
             @click="store.selectFixed(index)"
             class="text-foreground hover:bg-muted flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm transition-colors"
             :class="{
               'bg-muted': store.mode === 'fixed' && store.fixedIndex === index,
-              'rounded-b-lg': index === store.backgroundImages.length - 1,
+              'rounded-b-lg': index === store.backgrounds.length - 1,
             }"
           >
             <div
-              class="flex-shrink-0 overflow-hidden rounded-md bg-cover bg-center"
+              :class="bg.className"
+              class="flex-shrink-0 overflow-hidden rounded-md"
               :style="{
-                backgroundImage: `url('${img}')`,
                 width: '40px',
                 height: '24px',
               }"
             />
-            <span class="flex-1 text-left">背景 {{ index + 1 }}</span>
+            <span class="flex-1 text-left">{{ bg.name }}</span>
             <svg
               v-if="store.mode === 'fixed' && store.fixedIndex === index"
               xmlns="http://www.w3.org/2000/svg"
@@ -114,11 +107,12 @@
           </button>
         </div>
       </div>
-    </transition>
+    </DropdownTransition>
   </div>
 </template>
 
 <script setup lang="ts">
+import { DropdownTransition } from '@/components/ui/dropdown-transition';
 import { onMounted, onUnmounted, ref } from 'vue';
 import { useBackgroundStore } from '@/stores/background';
 

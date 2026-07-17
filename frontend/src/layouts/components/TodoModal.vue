@@ -217,7 +217,7 @@
                   enter-active-class="transition-all duration-300 ease-out"
                   enter-from-class="opacity-0 translate-y-2"
                   enter-to-class="opacity-100 translate-y-0"
-                  leave-active-class="transition-all duration-200 ease-in"
+                  leave-active-class="transition-all duration-200 ease-out"
                   leave-from-class="opacity-100 scale-100"
                   leave-to-class="opacity-0 scale-95"
                   move-class="transition-transform duration-300"

@@ -1,11 +1,11 @@
 {
-  "BentoProfileCard": { "order": 1, "height": 280 },
+  "BentoProfileCard": { "width": 360, "order": 1, "height": 280 },
   "BentoNavCard": { "width": 272, "order": 2, "height": 344 },
-  "BentoPic": { "order": 3, "height": 280 },
-  "BentoMap": { "order": 4, "height": 168 },
+  "BentoPic": { "width": 344, "order": 3, "height": 280 },
+  "BentoMap": { "width": 240, "order": 4, "height": 168 },
   "BentoClock": { "width": 256, "order": 5, "height": 168 },
-  "BentoCalendar": { "order": 6, "height": 280 },
-  "BentoReadingList": { "order": 7, "height": 180 },
-  "BentoTech": { "order": 8, "height": 128 },
-  "TodoCard": { "order": 9, "height": 56 }
+  "BentoCalendar": { "width": 332, "order": 6, "height": 280 },
+  "BentoReadingList": { "width": 240, "order": 7, "height": 180 },
+  "BentoTech": { "width": 272, "order": 8, "height": 128 },
+  "TodoCard": { "width": 208, "order": 9, "height": 56 }
 }

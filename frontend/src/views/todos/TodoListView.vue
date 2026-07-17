@@ -212,7 +212,7 @@
                一次干净的 enter/leave，不会多面板同时参与过渡。 -->
           <Transition
             enter-active-class="transition-all duration-280 ease-out"
-            leave-active-class="transition-all duration-200 ease-in"
+            leave-active-class="transition-all duration-200 ease-out"
             enter-from-class="opacity-0 translate-y-1"
             enter-to-class="opacity-100 translate-y-0"
             leave-from-class="opacity-100 translate-y-0"

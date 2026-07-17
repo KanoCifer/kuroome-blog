@@ -191,7 +191,7 @@ const goToChangelog = () => {
 }
 
 .animate-toast-out {
-  animation: toast-out 0.2s ease-in forwards;
+  animation: toast-out 0.2s ease-out forwards;
 }
 
 .animate-icon-glow {

@@ -69,14 +69,7 @@
             :class="{ 'rotate-180': isOthersOpen }"
           />
         </button>
-        <transition
-          enter-active-class="transition-all transform-gpu duration-200 ease-out"
-          enter-from-class="opacity-0 scale-95 -translate-y-1"
-          enter-to-class="opacity-100 scale-100 translate-y-0"
-          leave-active-class="transition-all transform-gpu duration-150 ease-in"
-          leave-from-class="opacity-100 scale-100 translate-y-0"
-          leave-to-class="opacity-0 scale-95 -translate-y-1"
-        >
+        <DropdownTransition>
           <div
             v-if="isOthersOpen"
             @mouseenter="openOthers"
@@ -104,13 +97,14 @@
               <span>{{ item.label }}</span>
             </button>
           </div>
-        </transition>
+        </DropdownTransition>
       </li>
     </ul>
   </motion.nav>
 </template>
 
 <script setup lang="ts">
+import { DropdownTransition } from '@/components/ui/dropdown-transition';
 import { useAuthStore } from '@/auth/stores/auth';
 import {
   BookOpenText,

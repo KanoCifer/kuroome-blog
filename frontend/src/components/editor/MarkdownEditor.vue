@@ -369,7 +369,7 @@ defineExpose({
       enter-active-class="transition-all duration-300 ease-out"
       enter-from-class="opacity-0 w-0"
       enter-to-class="opacity-100"
-      leave-active-class="transition-all duration-200 ease-in"
+      leave-active-class="transition-all duration-200 ease-out"
       leave-from-class="opacity-100"
       leave-to-class="opacity-0 w-0"
     >

@@ -3,14 +3,15 @@ import { BasicFooter } from '@/components/basic';
 import BackToTop from '@/components/layout/BackToTop.vue';
 import CookieConsent from '@/components/layout/CookieConsent.vue';
 import ToastContainer from '@/components/layout/ToastContainer.vue';
+import { RouteTransition } from '@/components/ui/route-transition';
 import BasicNav from '@/components/nav/BasicNav.vue';
 import TodoModal from '@/layouts/components/TodoModal.vue';
 import DynamicIsland from '@/layouts/components/DynamicIsland.vue';
 import { AnimatePresence } from 'motion-v';
 import { useBackgroundStore } from '@/stores/background';
 import { useThemeStore } from '@/stores/theme';
-import { computed, ref, watch } from 'vue';
-import { RouterView, useRoute } from 'vue-router';
+import { ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 
 const bgStore = useBackgroundStore();
 const themeStore = useThemeStore();
@@ -18,8 +19,7 @@ const themeStore = useThemeStore();
 const route = useRoute();
 const isEntryView = ref<boolean>(false);
 const isAboutView = ref<boolean>(false);
-// 延迟初始值：首次 watch immediate 执行前不渲染任何导航组件，
-// 避免刷新时 BentoNavCard 先闪现再消失
+
 const showBasicNav = ref<boolean | null>(null);
 
 // 监听路由变化
@@ -38,11 +38,6 @@ watch(
   },
   { immediate: true },
 );
-
-// 路由过渡动画：从 meta.transition 读取，未定义时用默认 slide-up
-const transitionName = computed(
-  () => (route.meta.transition as string) ?? 'slide-up',
-);
 </script>
 
 <template>
@@ -55,24 +50,22 @@ const transitionName = computed(
         : 'grid min-h-dvh grid-rows-[auto_1fr_auto]'
     "
   >
-    <!-- 背景层：img 只做位图，模糊/亮度通过独立蒙版层处理，避免 filter 翻倍占用 -->
     <div
       class="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
       aria-hidden="true"
     >
       <Transition
-        enter-active-class="transition-opacity duration-300 ease-out"
+        enter-active-class="transition-opacity duration-1000 ease-out"
         enter-from-class="opacity-0"
         enter-to-class="opacity-100"
-        leave-active-class="transition-opacity duration-300 ease-in"
+        leave-active-class="transition-opacity duration-200 ease-out"
         leave-from-class="opacity-100"
-        leave-to-class="opacity-0"
+        leave-to-class="opacity-90"
       >
-        <img
-          :key="bgStore.backgroundUrl"
-          :src="bgStore.backgroundUrl"
-          decoding="async"
-          class="absolute inset-0 h-full w-full transform-gpu object-cover"
+        <div
+          :key="bgStore.backgroundClass"
+          :class="bgStore.backgroundClass"
+          class="absolute inset-0 h-full w-full transform-gpu"
           :style="{ transform: `scale(${themeStore.bgScale})` }"
         />
       </Transition>
@@ -100,16 +93,7 @@ const transitionName = computed(
     <!-- Main Content -->
     <main class="relative flex-1 scroll-smooth">
       <!-- 路由出口 -->
-      <RouterView v-slot="{ Component }">
-        <template v-if="isEntryView">
-          <component :is="Component" :key="$route.path" />
-        </template>
-        <Transition v-else :name="transitionName" mode="out-in">
-          <div :key="$route.path">
-            <component :is="Component" />
-          </div>
-        </Transition>
-      </RouterView>
+      <RouteTransition />
     </main>
 
     <!-- Footer -->
@@ -140,71 +124,3 @@ const transitionName = computed(
     <TodoModal />
   </div>
 </template>
-
-<style scoped>
-/* 页面切换动画: 精确属性 + 统一缓动 + 进出对称 + GPU 提示 + 减动守卫 */
-
-/* fade — login: 纯淡入淡出 */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.15s cubic-bezier(0.32, 0.72, 0, 1);
-  will-change: opacity;
-}
-.fade-enter-to,
-.fade-leave-from {
-  opacity: 1;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-/* slide-up — register / default: jg-tab-in 缓动 (snap in, soft out) */
-@keyframes tab-in {
-  0% {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes tab-out {
-  0% {
-    opacity: 1;
-    transform: none;
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-}
-.slide-up-enter-active {
-  animation: tab-in 0.28s cubic-bezier(0.32, 0.72, 0, 1) both;
-  will-change: transform, opacity;
-}
-.slide-up-leave-active {
-  animation: tab-out 0.28s cubic-bezier(0.32, 0.72, 0, 1) both;
-  will-change: transform, opacity;
-}
-
-/* 减动偏好: 用户要求减少动画时禁用所有过渡和动画 */
-@media (prefers-reduced-motion: reduce) {
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: none !important;
-  }
-  .slide-up-enter-active,
-  .slide-up-leave-active {
-    animation: none !important;
-  }
-  .fade-enter-from,
-  .fade-leave-to,
-  .slide-up-enter-from,
-  .slide-up-leave-to {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-}
-</style>

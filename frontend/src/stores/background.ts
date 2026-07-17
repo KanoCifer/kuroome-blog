@@ -3,22 +3,23 @@ import { defineStore } from 'pinia';
 
 export type BackgroundMode = 'fixed' | 'random';
 
-const BACKGROUND_IMAGES = [
-  '/background/bg-4.webp',
-  '/background/bg-6.webp',
-  '/background/bg-7.webp',
-  '/background/bg-8.webp',
-  '/background/bg-11.webp',
-  '/background/bg-14.webp',
-];
+export interface BackgroundOption {
+  /** 唯一标识 */
+  id: string;
+  /** 显示名 */
+  name: string;
+  /** 对应的 CSS 渐变类名 */
+  className: string;
+}
 
-const BACKGROUND_THUMBS = [
-  '/background/thumb/bg-4.webp',
-  '/background/thumb/bg-6.webp',
-  '/background/thumb/bg-7.webp',
-  '/background/thumb/bg-8.webp',
-  '/background/thumb/bg-11.webp',
-  '/background/thumb/bg-14.webp',
+/*
+ * 背景渐变定义 —— 每项对应一个 .gradient-* CSS 类。
+ * 渐变本身（含 ::after 纹理层）在 base.css 中定义，这里只保存元数据。
+ */
+export const BACKGROUNDS: BackgroundOption[] = [
+  { id: 'saiun', name: 'Saiun', className: 'gradient-saiun' },
+  { id: 'hisui', name: 'Hisui', className: 'gradient-hisui' },
+  { id: 'sangoshou', name: 'Sangoshou', className: 'gradient-sangoshou' },
 ];
 
 export const useBackgroundStore = defineStore('background', () => {
@@ -30,21 +31,22 @@ export const useBackgroundStore = defineStore('background', () => {
     (() => {
       const stored = localStorage.getItem('readinglist_bg_index');
       const n = stored ? Number.parseInt(stored, 10) : NaN;
-      return Number.isFinite(n) && n >= 0 && n < BACKGROUND_IMAGES.length
-        ? n
-        : 0;
+      return Number.isFinite(n) && n >= 0 && n < BACKGROUNDS.length ? n : 0;
     })(),
   );
 
   const randomIndex = ref<number>(
-    Math.floor(Math.random() * BACKGROUND_IMAGES.length),
+    Math.floor(Math.random() * BACKGROUNDS.length),
   );
 
   const effectiveIndex = computed(() =>
     mode.value === 'random' ? randomIndex.value : fixedIndex.value,
   );
 
-  const backgroundUrl = computed(() => BACKGROUND_IMAGES[effectiveIndex.value]);
+  /** 当前生效的渐变类名 */
+  const backgroundClass = computed(
+    () => BACKGROUNDS[effectiveIndex.value].className,
+  );
 
   const selectFixed = (index: number) => {
     fixedIndex.value = index;
@@ -54,14 +56,14 @@ export const useBackgroundStore = defineStore('background', () => {
   };
 
   const randomize = () => {
-    randomIndex.value = Math.floor(Math.random() * BACKGROUND_IMAGES.length);
+    randomIndex.value = Math.floor(Math.random() * BACKGROUNDS.length);
     mode.value = 'random';
     localStorage.setItem('readinglist_bg_mode', 'random');
   };
 
   const reroll = () => {
     if (mode.value === 'random') {
-      randomIndex.value = Math.floor(Math.random() * BACKGROUND_IMAGES.length);
+      randomIndex.value = Math.floor(Math.random() * BACKGROUNDS.length);
     }
   };
 
@@ -78,9 +80,7 @@ export const useBackgroundStore = defineStore('background', () => {
     }
     if (mode.value === 'random' && autoSwitchInterval.value > 0) {
       autoSwitchTimer = setInterval(() => {
-        randomIndex.value = Math.floor(
-          Math.random() * BACKGROUND_IMAGES.length,
-        );
+        randomIndex.value = Math.floor(Math.random() * BACKGROUNDS.length);
       }, autoSwitchInterval.value * 1000);
     }
   };
@@ -106,13 +106,12 @@ export const useBackgroundStore = defineStore('background', () => {
   document.addEventListener('visibilitychange', handleVisibilityChange);
 
   return {
-    backgroundImages: BACKGROUND_IMAGES,
-    backgroundThumbs: BACKGROUND_THUMBS,
+    backgrounds: BACKGROUNDS,
     mode,
     fixedIndex,
     randomIndex,
     effectiveIndex,
-    backgroundUrl,
+    backgroundClass,
     selectFixed,
     randomize,
     reroll,

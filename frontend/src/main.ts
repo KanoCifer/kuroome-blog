@@ -8,6 +8,7 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import { isColorScheme } from '@/stores/theme';
 import './assets/base.css'; // Tailwind v4 入口
+import './assets/backgrounds.css'; // 背景渐变
 import './assets/base.scss'; // font-face sass
 import './assets/squircle.css';
 import './lib/echarts';

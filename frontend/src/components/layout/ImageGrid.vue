@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import type { BackgroundOption } from '@/stores/background';
+
 defineProps<{
-  images: string[];
+  images: BackgroundOption[];
   selected: number;
 }>();
 
@@ -12,13 +14,13 @@ defineEmits<{
 <template>
   <div class="grid grid-cols-2 gap-3">
     <button
-      v-for="(img, index) in images"
-      :key="index"
+      v-for="(bg, index) in images"
+      :key="bg.id"
       @click="$emit('select', index)"
       class="border-border hover:border-primary relative overflow-hidden rounded-xl border-2 transition-all"
       :class="{ 'border-primary': selected === index }"
     >
-      <img :src="img" loading="lazy" class="h-24 w-full object-cover" />
+      <div :class="bg.className" class="h-24 w-full" />
       <div
         v-if="selected === index"
         class="absolute inset-0 flex items-center justify-center bg-black/30"

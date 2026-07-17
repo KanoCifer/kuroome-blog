@@ -27,7 +27,7 @@ export const useThemeStore = defineStore('theme', () => {
   // 背景模糊值（px），兼容旧版 blur-* 字符串存储
   const storedBlur = localStorage.getItem('bg-blur');
   const bgBlur = ref<number>(
-    storedBlur && !storedBlur.startsWith('blur-') ? Number(storedBlur) : 8,
+    storedBlur && !storedBlur.startsWith('blur-') ? Number(storedBlur) : 0,
   );
 
   const saveBgBlur = (newBlur: number) => {

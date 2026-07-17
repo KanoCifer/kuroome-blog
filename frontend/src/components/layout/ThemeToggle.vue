@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { DropdownTransition } from '@/components/ui/dropdown-transition';
 import { useThemeStore, type Theme, type ColorScheme } from '@/stores/theme';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 
@@ -123,14 +124,7 @@ onUnmounted(() => {
         </svg>
       </button>
 
-      <transition
-        enter-active-class="transition-all duration-200 ease-out"
-        enter-from-class="opacity-0 scale-95 -translate-y-1"
-        enter-to-class="opacity-100 scale-100 translate-y-0"
-        leave-active-class="transition-all duration-150 ease-in"
-        leave-from-class="opacity-100 scale-100 translate-y-0"
-        leave-to-class="opacity-0 scale-95 -translate-y-1"
-      >
+      <DropdownTransition>
         <div
           v-if="isSchemeOpen"
           class="border-border bg-background dark:border-border dark:bg-background absolute top-full right-0 z-9999 mt-2 w-40 rounded-lg shadow-lg"
@@ -173,7 +167,7 @@ onUnmounted(() => {
             </svg>
           </button>
         </div>
-      </transition>
+      </DropdownTransition>
     </div>
 
     <!-- Light/Dark Mode Toggle -->
@@ -206,14 +200,7 @@ onUnmounted(() => {
         </svg>
       </button>
 
-      <transition
-        enter-active-class="transition-all duration-200 ease-out"
-        enter-from-class="opacity-0 scale-95 -translate-y-1"
-        enter-to-class="opacity-100 scale-100 translate-y-0"
-        leave-active-class="transition-all duration-150 ease-in"
-        leave-from-class="opacity-100 scale-100 translate-y-0"
-        leave-to-class="opacity-0 scale-95 -translate-y-1"
-      >
+      <DropdownTransition>
         <div
           v-if="isOpen"
           class="border-border bg-background dark:border-border dark:bg-background absolute top-full right-0 z-9999 mt-2 w-36 rounded-lg shadow-lg"
@@ -249,7 +236,7 @@ onUnmounted(() => {
             </svg>
           </button>
         </div>
-      </transition>
+      </DropdownTransition>
     </div>
   </div>
 </template>

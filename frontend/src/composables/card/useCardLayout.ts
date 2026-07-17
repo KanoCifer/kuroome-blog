@@ -1,10 +1,12 @@
 import cardStyles from '@/data/card-styles.json';
 import { useCardLayoutStore } from '@/stores/cardLayout';
 import {
-  computed,
+  onMounted,
+  onUnmounted,
+  provide,
+  reactive,
   shallowRef,
   watch,
-  type ComputedRef,
   type CSSProperties,
   type Ref,
 } from 'vue';
@@ -25,117 +27,87 @@ const cardNamesByOrder = Object.entries(styles)
 
 const maxOrder = Math.max(...Object.values(styles).map((s) => s.order));
 
-/** Structural layout constants (px). Per-card tuning lives in `cardSpecs`. */
-const cardSpacing = 12;
-const verticalGap = 16;
-const sideColumnGap = 224;
-
-/** Safe width accessor — anchors only depend on cards that always declare one. */
-function widthOf(name: string): number {
-  return styles[name].width ?? 0;
-}
-
 // ── Declarative card layout ─────────────────────────────
-// Each card declares its column, X offset from that column's anchor, and a Y
-// source: either a top-ratio (first row) or a cascade-from another card.
-// prevHeight / thisHeight for cascades are derived from `styles`, so a card's
-// vertical placement is fully determined by this table.
-
-type Column = 'left' | 'center' | 'right';
+// Flat absolute model: every card declares its home position as an offset
+// from the viewport center (centerX, centerY). No cascade — dragging any
+// card moves only that card. On resize, cards automatically follow the
+// viewport center since home = center + offset.
+//
+// Offsets were derived from the previous cascade layout evaluated at
+// layoutHeight = 820 (the container min-height), then baked as constants.
 
 interface CardSpec {
   /** Export name used by consumers (the `*Position` ref). */
   as: string;
   /** Card name (key into `styles` / drag offsets). */
   name: string;
-  column: Column;
-  /** Horizontal offset from the column anchor (px). */
+  /** Horizontal offset from viewport center X (px). Negative = left. */
   xOffset: number;
-  /** First-row cards: center Y = layoutHeight * topRatio + yOffset. */
-  topRatio?: number;
-  /** Cascaded cards: placed below this card's center Y. */
-  cascadeFrom?: string;
-  /** Extra Y (px) added after the ratio/cascade base + drag offset. */
-  yOffset?: number;
+  /** Vertical offset from viewport center Y (px). Negative = up. */
+  yOffset: number;
 }
 
-// Ordered so every `cascadeFrom` target appears before its dependents.
 const cardSpecs: CardSpec[] = [
-  // ── First row (ratio-anchored) ──
-  {
-    as: 'greetingPosition',
-    name: 'BentoMap',
-    column: 'right',
-    xOffset: -30,
-    topRatio: 0.16,
-  },
-  {
-    as: 'picPosition',
-    name: 'BentoPic',
-    column: 'center',
-    xOffset: 0,
-    topRatio: 0.19,
-    yOffset: -20,
-  },
+  // ── Left column ──
   {
     as: 'navCardPosition',
     name: 'BentoNavCard',
-    column: 'left',
-    xOffset: 20,
-    topRatio: 0.43,
-    yOffset: -40,
+    xOffset: -352,
+    yOffset: -97,
+  },
+  {
+    as: 'techPosition',
+    name: 'BentoTech',
+    xOffset: -270,
+    yOffset: 265,
   },
 
-  // ── Right column: Map → Clock → Calendar ──
+  // ── Right column ──
+  {
+    as: 'greetingPosition',
+    name: 'BentoMap',
+    xOffset: 334,
+    yOffset: -279,
+  },
   {
     as: 'clockCardPosition',
     name: 'BentoClock',
-    column: 'right',
-    xOffset: -46,
-    cascadeFrom: 'BentoMap',
+    xOffset: 318,
+    yOffset: -95,
   },
   {
     as: 'calendarPosition',
     name: 'BentoCalendar',
-    column: 'right',
-    xOffset: 4,
-    cascadeFrom: 'BentoClock',
+    xOffset: 368,
+    yOffset: 145,
   },
 
-  // ── Center column: Pic → ProfileCard → ReadingList ──
+  // ── Center column ──
+  {
+    as: 'picPosition',
+    name: 'BentoPic',
+    xOffset: 0,
+    yOffset: -274,
+  },
   {
     as: 'profilePosition',
     name: 'BentoProfileCard',
-    column: 'center',
     xOffset: 0,
-    cascadeFrom: 'BentoPic',
-    yOffset: -20,
+    yOffset: 2,
   },
   {
     as: 'listCardPosition',
     name: 'BentoReadingList',
-    column: 'center',
     xOffset: 40,
-    cascadeFrom: 'BentoProfileCard',
+    yOffset: 248,
   },
 
-  // ── Left column: NavCard → Tech ──
-  {
-    as: 'techPosition',
-    name: 'BentoTech',
-    column: 'left',
-    xOffset: 102,
-    cascadeFrom: 'BentoNavCard',
-    yOffset: 110,
-  },
-
-  // ── Floating card: Todo cascades from the Calendar row ──
+  // ── Floating card ──
   {
     as: 'todoCardPosition',
     name: 'TodoCard',
-    column: 'center',
     xOffset: 300,
-    cascadeFrom: 'BentoCalendar',
+    yOffset: 329,
   },
 ];
 
@@ -145,19 +117,29 @@ function px(value: number): string {
   return `${value}px`;
 }
 
-/** Build {top, left} style object for absolute-positioned cards */
-function position(top: number, left: number): CSSProperties {
-  return { top: px(top), left: px(left) };
-}
-
-/** Center-top of a card placed below `prevCenterY`, separated by `gap`. */
-function cascadeTop(
-  prevCenterY: number,
-  prevHeight: number,
-  thisHeight: number,
-  gap: number,
-): number {
-  return prevCenterY + prevHeight / 2 + gap + thisHeight / 2;
+/**
+ * Convert a card's center point into a top-left style object.
+ *
+ * Home positions are stored as offsets from the viewport center. To position
+ * with `top`/`left` (which the browser treats as the element's top-left
+ * corner), we subtract half the card's dimensions.
+ *
+ * Dimensions come from runtime measurement (via registerCardSize) when
+ * available — needed for `w-auto` cards whose width is content-determined.
+ * Falls back to the declared `card-styles.json` values for the first paint
+ * before measurement lands.
+ */
+function position(
+  centerY: number,
+  centerX: number,
+  cardName: string,
+  cardSizes: Map<string, { width: number; height: number }>,
+): CSSProperties {
+  const measured = cardSizes.get(cardName);
+  const fallback = styles[cardName];
+  const w = measured?.width ?? fallback?.width ?? 0;
+  const h = measured?.height ?? fallback?.height ?? 0;
+  return { top: px(centerY - h / 2), left: px(centerX - w / 2) };
 }
 
 /** Create a shallowRef<CSSProperties> that only updates when top/left actually change */
@@ -180,61 +162,54 @@ function usePositionRef(source: () => CSSProperties): Ref<CSSProperties> {
 // ── Composable ──────────────────────────────────────────
 
 export function useCardLayout(containerRef: Ref<HTMLElement | null>) {
-  const { centerX, layoutHeight, containerStyle } =
-    useLayoutCenter(containerRef);
+  const { centerX, centerY, containerStyle } = useLayoutCenter(containerRef);
   const layoutStore = useCardLayoutStore();
-
-  // Column anchors
-  const leftAnchor = computed(
-    () =>
-      centerX.value - widthOf('BentoNavCard') / 2 - cardSpacing - sideColumnGap,
-  );
-  const rightAnchor = computed(
-    () =>
-      centerX.value + widthOf('BentoClock') / 2 + cardSpacing + sideColumnGap,
-  );
 
   const dragY = (name: string) => layoutStore.getOffset(name).y;
   const dragX = (name: string) => layoutStore.getOffset(name).x;
 
-  // Center Y per card, resolved in spec order (parents before children).
-  const centerY = new Map<string, ComputedRef<number>>();
-  for (const spec of cardSpecs) {
-    centerY.set(
-      spec.name,
-      spec.topRatio != null
-        ? computed(
-            () =>
-              layoutHeight.value * spec.topRatio! +
-              (spec.yOffset ?? 0) +
-              dragY(spec.name),
-          )
-        : computed(() => {
-            const prev = spec.cascadeFrom!;
-            return (
-              cascadeTop(
-                centerY.get(prev)!.value,
-                styles[prev].height,
-                styles[spec.name].height,
-                verticalGap,
-              ) +
-              (spec.yOffset ?? 0) +
-              dragY(spec.name)
-            );
-          }),
-    );
+  // ── Runtime-measured card sizes (for centering) ────────
+  // Populated by DragWrapper instances via registerCardSize. Needed so the
+  // center→top-left conversion in `position()` knows each card's true
+  // dimensions — especially `w-auto` cards whose width is content-determined
+  // and can't be known from card-styles.json alone.
+  const cardSizes = reactive(new Map<string, { width: number; height: number }>());
+  const observers = new Map<string, ResizeObserver>();
+
+  function registerCardSize(cardName: string, el: HTMLElement) {
+    observers.get(cardName)?.disconnect();
+    const measure = () => {
+      if (!el.isConnected) return;
+      cardSizes.set(cardName, { width: el.offsetWidth, height: el.offsetHeight });
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    observers.set(cardName, ro);
   }
 
-  const anchorFor = (col: Column): Ref<number> =>
-    col === 'left' ? leftAnchor : col === 'right' ? rightAnchor : centerX;
+  // Expose registerCardSize to descendant DragWrappers via inject — they call
+  // it on mount (and the ResizeObserver re-measures on resize) so this
+  // composable can resolve each card's true dimensions for centering.
+  provide('cardLayout.registerCardSize', registerCardSize);
 
-  // Build one stable position ref per card, keyed by the exported name.
+  onUnmounted(() => {
+    for (const ro of observers.values()) ro.disconnect();
+  });
+
+  // ── Flat absolute positioning ──────────────────────────
+  // Each card's home position is viewport center + (xOffset, yOffset). Drag
+  // offsets are per-card and independent — no cascade, so dragging one card
+  // cannot move another.
   const positions: Record<string, Ref<CSSProperties>> = {};
   for (const spec of cardSpecs) {
-    const y = centerY.get(spec.name)!;
-    const anchor = anchorFor(spec.column);
     positions[spec.as] = usePositionRef(() =>
-      position(y.value, anchor.value + spec.xOffset + dragX(spec.name)),
+      position(
+        centerY.value + spec.yOffset + dragY(spec.name),
+        centerX.value + spec.xOffset + dragX(spec.name),
+        spec.name,
+        cardSizes,
+      ),
     );
   }
 
@@ -253,5 +228,6 @@ export function useCardLayout(containerRef: Ref<HTMLElement | null>) {
     cardStyles: styles,
     cardNamesByOrder,
     maxOrder,
+    registerCardSize,
   };
 }

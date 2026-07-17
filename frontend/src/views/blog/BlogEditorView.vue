@@ -644,7 +644,7 @@ onBeforeUnmount(() => {
           enter-active-class="transition duration-200 ease-out motion-reduce:transition-none motion-reduce:opacity-100"
           enter-from-class="opacity-0 motion-reduce:opacity-100"
           enter-to-class="opacity-100"
-          leave-active-class="transition duration-150 ease-in motion-reduce:transition-none"
+          leave-active-class="transition duration-150 ease-out motion-reduce:transition-none"
           leave-from-class="opacity-100"
           leave-to-class="opacity-0 motion-reduce:opacity-100"
         >

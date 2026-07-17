@@ -4,7 +4,7 @@
       enter-active-class="transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1)"
       enter-from-class="opacity-0 backdrop-blur-none"
       enter-to-class="opacity-100 backdrop-blur-xl"
-      leave-active-class="transition-all duration-200 ease-in"
+      leave-active-class="transition-all duration-200 ease-out"
       leave-from-class="opacity-100 backdrop-blur-xl"
       leave-to-class="opacity-0 backdrop-blur-none"
     >
