@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed bottom-4 left-1/2 z-30 w-fit -translate-x-1/2">
+  <div class="fixed bottom-16 left-1/2 z-30 w-fit -translate-x-1/2">
     <div class="flex items-center gap-3">
       <Button
         v-if="canEdit"

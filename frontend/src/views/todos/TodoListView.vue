@@ -96,7 +96,7 @@
           >
         </div>
         <nav role="tablist" aria-label="工作台视角" class="relative">
-          <!-- 滑动指示器：纯 CSS transition，与 BasicNav 同方案 -->
+          <!-- 滑动指示器 -->
           <span
             class="tab-indicator bg-primary/10 absolute top-0 left-0 z-0 h-9 w-full rounded-lg shadow-[inset_0_1px_0_0_oklch(from_var(--paper)_l_c_h_/_0.5),inset_0_-1px_1px_oklch(0_0_0_/_0.04)]"
             :style="{ transform: `translateY(${indicatorY}px)` }"
@@ -113,7 +113,6 @@
                 : 'text-muted-foreground hover:text-foreground'
             "
             @click="activeTab = tab.id"
-            @mouseenter="activeTab = tab.id"
           >
             <span>{{ tab.label }}</span>
             <span
@@ -209,365 +208,25 @@
         </div>
 
         <template v-else>
-          <!-- ──── 推进 frontier ──── -->
-          <div v-show="activeTab === 'frontier'" class="space-y-8">
-            <!-- frontier cards -->
-            <section>
-              <div class="mb-3 flex items-baseline justify-between">
-                <h2
-                  class="text-foreground font-serif text-lg font-medium tracking-tight"
-                >
-                  现在能做什么
-                </h2>
-                <span class="text-muted-foreground text-xs">
-                  无阻塞 · 按优先级与截止日排序
-                </span>
-              </div>
-
-              <div
-                v-if="store.frontier.length"
-                class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
-              >
-                <FrontierCard
-                  v-for="task in store.frontier"
-                  :key="task.slug"
-                  :task="task"
-                  @open="openDetail(task.slug)"
-                  @cycle="store.cycleStatus"
-                  @delete="handleDelete"
-                />
-              </div>
-              <div
-                v-else
-                class="text-muted-foreground/70 flex flex-col items-center justify-center py-10 text-center"
-              >
-                <svg
-                  class="text-muted-foreground/30 mb-2 h-8 w-8"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.5"
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
-                </svg>
-                <p class="text-sm font-medium">所有任务都已推进或还在阻塞中</p>
-                <p class="text-xs">等待前置任务完成，或新建一个独立任务</p>
-              </div>
-            </section>
-
-            <!-- in progress -->
-            <section>
-              <div class="mb-3 flex items-baseline justify-between">
-                <h2
-                  class="text-foreground font-serif text-lg font-medium tracking-tight"
-                >
-                  进行中
-                </h2>
-                <span class="text-muted-foreground text-xs"
-                  >正在推进的任务</span
-                >
-              </div>
-              <div v-if="store.inProgress.length" class="space-y-2">
-                <TaskRow
-                  v-for="task in store.inProgress"
-                  :key="task.slug"
-                  :task="task"
-                  @open="openDetail(task.slug)"
-                  @cycle="store.cycleStatus"
-                  @delete="handleDelete"
-                />
-              </div>
-              <div
-                v-else
-                class="text-muted-foreground/70 flex items-center justify-center py-6 text-sm"
-              >
-                暂无进行中的任务
-              </div>
-            </section>
-
-            <!-- done this week -->
-            <section>
-              <div class="mb-3 flex items-baseline justify-between">
-                <h2
-                  class="text-foreground font-serif text-lg font-medium tracking-tight"
-                >
-                  本周已完成
-                </h2>
-                <span class="text-muted-foreground text-xs"
-                  >最近关闭的任务</span
-                >
-              </div>
-              <div v-if="store.completedThisWeek.length" class="space-y-2">
-                <TaskRow
-                  v-for="task in store.completedThisWeek"
-                  :key="task.slug"
-                  :task="task"
-                  :done="true"
-                  @open="openDetail(task.slug)"
-                  @delete="handleDelete"
-                />
-              </div>
-              <div
-                v-else
-                class="text-muted-foreground/70 flex items-center justify-center py-6 text-sm"
-              >
-                本周还没有完成的任务
-              </div>
-            </section>
-          </div>
-
-          <!-- ──── 规划 planning ──── -->
-          <div v-show="activeTab === 'planning'" class="space-y-4">
-            <!-- filter bar -->
-            <div
-              class="bg-muted flex flex-wrap items-center gap-2 rounded-xl px-4 py-3"
-              role="group"
-              aria-label="筛选条件"
-            >
-              <span
-                class="text-muted-foreground text-[10px] font-medium tracking-widest uppercase"
-                >类型</span
-              >
-              <button
-                v-for="t in TASK_TYPES"
-                :key="t"
-                class="rounded-full border px-2.5 py-0.5 text-xs transition-colors"
-                :class="
-                  filterType.has(t)
-                    ? 'border-primary/40 bg-primary/10 text-primary'
-                    : 'border-border text-muted-foreground hover:text-foreground'
-                "
-                :aria-pressed="filterType.has(t)"
-                @click="toggleFilter('type', t)"
-              >
-                {{ t }}
-              </button>
-
-              <span class="bg-border mx-1 h-4 w-px" />
-
-              <span
-                class="text-muted-foreground text-[10px] font-medium tracking-widest uppercase"
-                >优先级</span
-              >
-              <button
-                v-for="p in PRIORITIES"
-                :key="p"
-                class="rounded-full border px-2.5 py-0.5 text-xs transition-colors"
-                :class="
-                  filterPriority.has(p)
-                    ? 'border-primary/40 bg-primary/10 text-primary'
-                    : 'border-border text-muted-foreground hover:text-foreground'
-                "
-                :aria-pressed="filterPriority.has(p)"
-                @click="toggleFilter('priority', p)"
-              >
-                {{ p }}
-              </button>
-
-              <span class="text-muted-foreground ml-auto text-xs tabular-nums">
-                {{ filteredPlanning.length }} 项
-              </span>
-            </div>
-
-            <!-- table -->
-            <div class="border-border overflow-hidden rounded-xl border">
-              <div
-                class="text-muted-foreground bg-muted border-border grid grid-cols-[2fr_1fr_1fr_1fr_100px_32px] gap-4 border-b px-4 py-2.5 text-[10px] font-medium tracking-widest uppercase max-sm:grid-cols-[1fr_80px_32px]"
-              >
-                <span>标题</span>
-                <span class="max-sm:hidden">类型</span>
-                <span class="max-sm:hidden">优先级</span>
-                <span class="max-sm:hidden">范围</span>
-                <span class="max-sm:hidden">状态</span>
-                <span></span>
-              </div>
-
-              <div
-                v-for="task in filteredPlanning"
-                :key="task.slug"
-                class="hover:bg-muted/40 border-border grid cursor-pointer grid-cols-[2fr_1fr_1fr_1fr_100px_32px] items-center gap-4 border-t px-4 py-2.5 transition-colors max-sm:grid-cols-[1fr_80px_32px]"
-                role="button"
-                tabindex="0"
-                @click="openDetail(task.slug)"
-                @keydown.enter="openDetail(task.slug)"
-              >
-                <span class="text-foreground truncate text-sm font-medium">{{
-                  task.title
-                }}</span>
-                <span class="max-sm:hidden">
-                  <TypeBadge :type="task.type" />
-                </span>
-                <span class="max-sm:hidden">
-                  <PriorityBadge :priority="task.priority" />
-                </span>
-                <span
-                  class="text-muted-foreground truncate text-sm max-sm:hidden"
-                >
-                  {{ task.scope || '—' }}
-                </span>
-                <span class="max-sm:hidden">
-                  <StatusChip :status="task.status" />
-                </span>
-                <span class="flex justify-end">
-                  <button
-                    type="button"
-                    class="text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96] active:not-focus-visible:ring-0"
-                    title="删除"
-                    aria-label="删除"
-                    @click.stop="handleDelete(task.slug)"
-                  >
-                    <svg
-                      class="h-4 w-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
-                    </svg>
-                  </button>
-                </span>
-              </div>
-
-              <div
-                v-if="!filteredPlanning.length"
-                class="text-muted-foreground/70 px-4 py-8 text-center text-sm"
-              >
-                没有匹配的任务
-              </div>
-            </div>
-          </div>
-
-          <!-- ──── 回顾 review ──── -->
-          <div v-show="activeTab === 'review'" class="space-y-8">
-            <!-- stat cards -->
-            <section>
-              <div class="mb-3 flex items-baseline justify-between">
-                <h2
-                  class="text-foreground font-serif text-lg font-medium tracking-tight"
-                >
-                  本周概览
-                </h2>
-                <span class="text-muted-foreground text-xs">{{
-                  store.weekRangeDisplay
-                }}</span>
-              </div>
-              <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
-                <div
-                  v-for="stat in stats"
-                  :key="stat.label"
-                  class="border-border bg-background rounded-3xl border px-5 py-4 shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent),0_18px_32px_color-mix(in_oklch,var(--ink)_8%,transparent)]"
-                >
-                  <div
-                    class="text-muted-foreground text-[10px] font-medium tracking-widest uppercase"
-                  >
-                    {{ stat.label }}
-                  </div>
-                  <div
-                    class="text-foreground font-family-averia mt-1 text-3xl leading-none font-normal tracking-tight"
-                  >
-                    {{ stat.value }}
-                  </div>
-                  <div class="mt-1 text-xs" :class="stat.deltaClass">
-                    {{ stat.delta }}
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <!-- type distribution -->
-            <section>
-              <div class="mb-3 flex items-baseline justify-between">
-                <h2
-                  class="text-foreground font-serif text-lg font-medium tracking-tight"
-                >
-                  类型分布
-                </h2>
-                <span class="text-muted-foreground text-xs">全部任务</span>
-              </div>
-              <div class="space-y-3">
-                <div
-                  v-for="row in distributionRows"
-                  :key="row.type"
-                  class="flex items-center gap-3"
-                >
-                  <span class="text-foreground w-16 shrink-0 text-sm">{{
-                    row.type
-                  }}</span>
-                  <div class="bg-muted h-2 flex-1 overflow-hidden rounded-full">
-                    <div
-                      class="h-full rounded-full transition-transform duration-400"
-                      :style="{
-                        width: '100%',
-                        transform: `scaleX(${row.pct / 100})`,
-                        backgroundColor: row.color,
-                        transformOrigin: 'left',
-                      }"
-                    />
-                  </div>
-                  <span
-                    class="text-muted-foreground w-6 shrink-0 text-right text-xs tabular-nums"
-                    >{{ row.count }}</span
-                  >
-                </div>
-              </div>
-            </section>
-
-            <!-- completed timeline -->
-            <section>
-              <div class="mb-3 flex items-baseline justify-between">
-                <h2
-                  class="text-foreground font-serif text-lg font-medium tracking-tight"
-                >
-                  最近完成
-                </h2>
-                <span class="text-muted-foreground text-xs"
-                  >按完成时间倒序</span
-                >
-              </div>
-              <div class="space-y-0">
-                <div
-                  v-for="task in store.completedThisWeek.slice(0, 8)"
-                  :key="task.slug"
-                  class="flex gap-3 border-t px-1 py-3"
-                >
-                  <div
-                    class="mt-2 h-2 w-2 shrink-0 rounded-full"
-                    style="background: var(--success)"
-                  />
-                  <div
-                    class="min-w-0 flex-1 cursor-pointer"
-                    @click="openDetail(task.slug)"
-                  >
-                    <p
-                      class="text-muted-foreground truncate text-sm font-medium line-through"
-                    >
-                      {{ task.title }}
-                    </p>
-                    <p
-                      class="text-muted-foreground/60 text-[11px] tabular-nums"
-                    >
-                      {{ (task.updated_at ?? '').slice(0, 10) }}
-                    </p>
-                  </div>
-                </div>
-                <div
-                  v-if="!store.completedThisWeek.length"
-                  class="text-muted-foreground/70 px-1 py-6 text-center text-sm"
-                >
-                  本周还没有完成的任务
-                </div>
-              </div>
-            </section>
-          </div>
+          <!-- Tab 内容：单 keyed 元素 + mode="out-in"，确保每次切换是
+               一次干净的 enter/leave，不会多面板同时参与过渡。 -->
+          <Transition
+            enter-active-class="transition-all duration-280 ease-out"
+            leave-active-class="transition-all duration-200 ease-in"
+            enter-from-class="opacity-0 translate-y-1"
+            enter-to-class="opacity-100 translate-y-0"
+            leave-from-class="opacity-100 translate-y-0"
+            leave-to-class="opacity-0 -translate-y-1"
+            mode="out-in"
+          >
+            <component
+              :is="activePanel"
+              :key="activeTab"
+              @open="openDetail"
+              @cycle="store.cycleStatus"
+              @delete="handleDelete"
+            />
+          </Transition>
         </template>
       </main>
     </div>
@@ -615,28 +274,23 @@ import DevTaskModal from './components/DevTaskModal.vue';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { useV3DevTaskStore } from '@/stores/v3devtasks';
 import { useAuthStore } from '@/auth/stores/auth';
-import type { DevTask, DevTaskPriority, DevTaskType } from '@/api/devtask';
-import FrontierCard from './components/FrontierCard.vue';
-import TaskRow from './components/TaskRow.vue';
+import type { DevTask } from '@/api/devtask';
 import McpTokenModal from './components/McpTokenModal.vue';
 import TaskDetailPanel from './components/TaskDetailPanel.vue';
-import TypeBadge from './components/TypeBadge.vue';
-import PriorityBadge from './components/PriorityBadge.vue';
-import StatusChip from './components/StatusChip.vue';
+import FrontierPanel from './components/FrontierPanel.vue';
+import PlanningPanel from './components/PlanningPanel.vue';
+import ReviewPanel from './components/ReviewPanel.vue';
+import type { Component } from 'vue';
 
 const authStore = useAuthStore();
 const isAuthenticated = computed(() => authStore.isAuthenticated);
 
 const store = useV3DevTaskStore();
 
-const TASK_TYPES: DevTaskType[] = ['功能需求', '问题', '优化', '技术债'];
-const PRIORITIES: DevTaskPriority[] = ['P0 紧急', 'P1 高', 'P2 中', 'P3 低'];
-
 // ── tab state ──
 type TabId = 'frontier' | 'planning' | 'review';
 const activeTab = ref<TabId>('frontier');
 
-// 侧边栏 indicator 位置：每项高 34px
 const TAB_ITEM_HEIGHT = 36;
 const activeTabIndex = computed(() =>
   tabs.value.findIndex((t) => t.id === activeTab.value),
@@ -648,6 +302,13 @@ const tabs = computed(() => [
   { id: 'planning' as const, label: '规划', count: store.totalActive },
   { id: 'review' as const, label: '回顾', count: store.completedCount },
 ]);
+
+// 当前激活的 tab 面板组件（单 keyed 节点供 <Transition mode="out-in"> 切换）
+const activePanel = computed((): Component => {
+  if (activeTab.value === 'planning') return PlanningPanel;
+  if (activeTab.value === 'review') return ReviewPanel;
+  return FrontierPanel;
+});
 
 // ── modal state ──
 const modalOpen = ref(false);
@@ -707,82 +368,6 @@ async function confirmDelete() {
   pendingDeleteSlug.value = null;
   if (slug) await store.deleteTask(slug);
 }
-
-// ── planning filters ──
-const filterType = ref<Set<DevTaskType>>(new Set());
-const filterPriority = ref<Set<DevTaskPriority>>(new Set());
-
-function toggleFilter(
-  key: 'type' | 'priority',
-  val: DevTaskType | DevTaskPriority,
-) {
-  if (key === 'type') {
-    const set = filterType.value;
-    if (set.has(val as DevTaskType)) set.delete(val as DevTaskType);
-    else set.add(val as DevTaskType);
-  } else {
-    const set = filterPriority.value;
-    if (set.has(val as DevTaskPriority)) set.delete(val as DevTaskPriority);
-    else set.add(val as DevTaskPriority);
-  }
-}
-
-const filteredPlanning = computed(() =>
-  store.tasks
-    .filter((t) => !t.is_deleted && t.status !== '已完成')
-    .filter((t) =>
-      filterType.value.size ? filterType.value.has(t.type) : true,
-    )
-    .filter((t) =>
-      filterPriority.value.size ? filterPriority.value.has(t.priority) : true,
-    ),
-);
-
-// ── review stats ──
-const TYPE_COLORS: Record<DevTaskType, string> = {
-  功能需求: 'var(--chart-1)',
-  问题: 'var(--chart-4)',
-  优化: 'var(--chart-5)',
-  技术债: 'var(--chart-2)',
-};
-
-const stats = computed(() => [
-  {
-    label: '本周完成',
-    value: store.completedThisWeek.length,
-    delta: '较上周 +2',
-    deltaClass: 'text-success',
-  },
-  {
-    label: '累计任务',
-    value: store.tasks.filter((t) => !t.is_deleted).length,
-    delta: '全部生命周期',
-    deltaClass: 'text-muted-foreground',
-  },
-  {
-    label: '进行中',
-    value: store.inProgress.length,
-    delta: '需要跟进',
-    deltaClass: 'text-muted-foreground',
-  },
-  {
-    label: 'P0 紧急',
-    value: store.urgentActive,
-    delta: '需要关注',
-    deltaClass: 'text-destructive',
-  },
-]);
-
-const distributionRows = computed(() => {
-  const dist = store.typeDistribution;
-  const total = Object.values(dist).reduce((a, b) => a + b, 0) || 1;
-  return (Object.keys(dist) as DevTaskType[]).map((type) => ({
-    type,
-    count: dist[type],
-    pct: (dist[type] / total) * 100,
-    color: TYPE_COLORS[type],
-  }));
-});
 
 onMounted(() => {
   // 未登录时不请求 devtask，避免拦截器反复打 v3/dev-task/token 形成循环

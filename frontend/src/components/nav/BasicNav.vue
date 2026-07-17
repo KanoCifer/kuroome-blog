@@ -25,11 +25,13 @@
         </RouterLink>
       </li>
       <!-- Navigation Labels (圆中文字) -->
-      <li class="relative ml-16 flex items-center gap-2 px-5">
-        <!-- Indicator -->
+      <li ref="navStripRef" class="relative ml-16 flex items-center gap-2 px-5">
+        <!-- Indicator pill: position + width are measured from the
+             active tab's offsetLeft / offsetWidth (Transitions.dev
+             sliding tabs pattern). Both properties tween via CSS. -->
         <span
-          class="indicator liquid-glass-button absolute top-1/2 left-0 z-1 h-11 w-20 -translate-y-1/2 rounded-full"
-          :style="{ transform: `translateX(${indicatorX}px)` }"
+          ref="indicatorRef"
+          class="indicator liquid-glass-button absolute top-1/2 left-0 z-1 h-11 -translate-y-1/2 rounded-full"
         />
         <!-- Nav Items: icon + 英文标签 -->
         <RouterLink
@@ -38,7 +40,7 @@
           :to="item.to"
           :aria-label="item.ariaLabel"
           :aria-current="isActive(item.to) ? 'page' : undefined"
-          class="nav-text nav-link relative z-10 flex h-11 w-20 flex-col items-center justify-center gap-1 text-[13px] leading-none transition-[transform,background-color,color,opacity] duration-150 ease-out active:scale-[0.96]"
+          class="nav-text nav-link relative z-10 flex h-11 flex-col items-center justify-center gap-1 px-4 text-[13px] leading-none transition-[transform,background-color,color,opacity] duration-150 ease-out active:scale-[0.96]"
           :class="{ 'opacity-40 hover:opacity-70': !isActive(item.to) }"
         >
           <component :is="item.icon" :size="20" stroke-width="1.75" />
@@ -132,7 +134,7 @@ import {
 } from '@lucide/vue';
 import { motion } from 'motion-v';
 import type { Component } from 'vue';
-import { computed, onUnmounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 interface NavItem {
@@ -194,10 +196,39 @@ const othersItems: OthersItem[] = [
   { label: 'Mobile', icon: Smartphone, action: switchToMobile },
 ];
 
-// State
-const activeIndex = ref(0);
-// 按钮宽 80 + li gap 8 = 88；li 内边距 20 (px-5)
-const indicatorX = computed(() => activeIndex.value * 88 + 20);
+// Refs for DOM-measured indicator positioning (Transitions.dev sliding
+// pill pattern). The indicator's translateX + width are read from the
+// active tab's own offsetLeft / offsetWidth — resilient to any future
+// sizing changes, no hardcoded math.
+const navStripRef = ref<HTMLElement | null>(null);
+const indicatorRef = ref<HTMLElement | null>(null);
+
+/* Move the pill to `index`.
+   `animate=false` suspends the CSS transition (set → force reflow →
+   restore) so the pill snaps into position without a tween. Used on
+   first paint and on resize — we never want a stray slide on load. */
+function positionIndicator(index: number, animate = true) {
+  const strip = navStripRef.value;
+  const pill = indicatorRef.value;
+  if (!strip || !pill) return;
+
+  const tab = strip.children[index + 1] as HTMLElement | undefined;
+  // children[0] is the pill span itself; tabs start at index 1
+  if (!tab) return;
+
+  if (!animate) {
+    pill.style.transition = 'none';
+    pill.style.width = `${tab.offsetWidth}px`;
+    pill.style.transform = `translateX(${tab.offsetLeft}px)`;
+    // Force reflow so the "none" write is committed before we restore.
+    void pill.offsetHeight;
+    pill.style.transition = '';
+    return;
+  }
+
+  pill.style.width = `${tab.offsetWidth}px`;
+  pill.style.transform = `translateX(${tab.offsetLeft}px)`;
+}
 
 // Others dropdown state
 const isOthersOpen = ref(false);
@@ -258,7 +289,11 @@ const isActive = (path: string) => {
   return route.path === path || route.path.startsWith(`${path}/`);
 };
 
-// Update active index when route changes
+/* Active index — kept in sync with the route so the pill always lands
+   on the right tab even on direct navigation (back/forward, link). */
+const activeIndex = ref(0);
+
+// Update pill position when route changes (animated tween).
 watch(
   () => route.path,
   () => {
@@ -266,14 +301,32 @@ watch(
     if (index !== -1) {
       activeIndex.value = index;
     }
+    void nextTick(() => positionIndicator(activeIndex.value));
   },
   { immediate: true },
 );
+
+/* ResizeObserver keeps the pill aligned if layout shifts (font load,
+   breakpoint, etc.). Snaps without animation. */
+let resizeObserver: ResizeObserver | null = null;
+
+onMounted(() => {
+  // First-paint snap: no animation on initial position.
+  positionIndicator(activeIndex.value, false);
+
+  resizeObserver = new ResizeObserver(() => {
+    positionIndicator(activeIndex.value, false);
+  });
+  if (navStripRef.value) {
+    resizeObserver.observe(navStripRef.value);
+  }
+});
 
 onUnmounted(() => {
   if (othersCloseTimeout) {
     clearTimeout(othersCloseTimeout);
   }
+  resizeObserver?.disconnect();
 });
 
 // Computed
@@ -292,8 +345,12 @@ const avatarUrl = computed(() => {
 <style scoped>
 .indicator {
   pointer-events: none;
-
-  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  /* Tween both position and size — the pill slides AND stretches to the
+     next tab's measured bounds (Transitions.dev sliding tabs). */
+  transition:
+    transform 0.28s cubic-bezier(0.32, 0.72, 0, 1),
+    width 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform, width;
 }
 
 .nav-text {
