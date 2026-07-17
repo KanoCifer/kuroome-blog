@@ -4,7 +4,7 @@ import type { RssArticle } from '@/types';
 import { formatDate } from '@/utils/formatdate';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, Rss } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const ARTICLE_LIMIT = 20;
@@ -20,7 +20,16 @@ export default function RssWorkspaceView() {
   const [totalItems, setTotalItems] = useState(0);
   const [loadingSubs, setLoadingSubs] = useState(true);
   const [loadingArticles, setLoadingArticles] = useState(true);
+  const [subsError, setSubsError] = useState<string | null>(null);
+  const [articlesError, setArticlesError] = useState<string | null>(null);
   const [showFeedPicker, setShowFeedPicker] = useState(false);
+
+  // 用 ref 让 fetch 闭包读到最新值，同时保持 useCallback 引用稳定，打破 useEffect 依赖循环
+  const selectedFeedUrlRef = useRef(selectedFeedUrl);
+  selectedFeedUrlRef.current = selectedFeedUrl;
+
+  const currentPageRef = useRef(currentPage);
+  currentPageRef.current = currentPage;
 
   const totalPages = useMemo(
     () => Math.ceil(totalItems / ARTICLE_LIMIT),
@@ -33,49 +42,55 @@ export default function RssWorkspaceView() {
 
   const fetchSubscriptions = useCallback(async () => {
     setLoadingSubs(true);
+    setSubsError(null);
     try {
       const subs = await service.getSubscriptions();
       setSubscriptions(subs);
-      if (subs.length > 0 && !selectedFeedUrl) {
-        setSelectedFeedUrl(subs[0].rssUrl);
+      // 通过 ref 读取，不在 useCallback 依赖列表
+      if (subs.length > 0 && !selectedFeedUrlRef.current) {
+        const url = subs[0].rssUrl;
+        selectedFeedUrlRef.current = url;
+        setSelectedFeedUrl(url);
       }
     } catch (err) {
-      notifier.error(err instanceof Error ? err.message : '加载订阅失败');
+      const msg = err instanceof Error ? err.message : '加载订阅失败';
+      setSubsError(msg);
+      notifier.error(msg);
     } finally {
       setLoadingSubs(false);
     }
-  }, [notifier, service, selectedFeedUrl]);
+  }, [notifier, service]);
 
-  const fetchArticles = useCallback(
-    async (page: number, feedUrl: string) => {
-      setLoadingArticles(true);
-      try {
-        const response = await service.getArticles({
-          page,
-          limit: ARTICLE_LIMIT,
-          feed_url: feedUrl || undefined,
-        });
-        setArticles(response.items);
-        setTotalItems(response.total);
-        setCurrentPage(response.page);
-      } catch (err) {
-        notifier.error(err instanceof Error ? err.message : '加载文章失败');
-      } finally {
-        setLoadingArticles(false);
-      }
-    },
-    [notifier, service],
-  );
+  const fetchArticles = useCallback(async () => {
+    const feedUrl = selectedFeedUrlRef.current;
+    const page = currentPageRef.current;
+    setLoadingArticles(true);
+    setArticlesError(null);
+    try {
+      const response = await service.getArticles({
+        page,
+        limit: ARTICLE_LIMIT,
+        feed_url: feedUrl || undefined,
+      });
+      setArticles(response.items);
+      setTotalItems(response.total);
+      setCurrentPage(response.page);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '加载文章失败';
+      setArticlesError(msg);
+      notifier.error(msg);
+    } finally {
+      setLoadingArticles(false);
+    }
+  }, [notifier, service]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     void fetchSubscriptions();
   }, [fetchSubscriptions]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    void fetchArticles(currentPage, selectedFeedUrl);
-  }, [currentPage, fetchArticles, selectedFeedUrl]);
+    void fetchArticles();
+  }, [fetchArticles]);
 
   const handleSelectFeed = (feedUrl: string) => {
     setSelectedFeedUrl(feedUrl);
@@ -157,6 +172,17 @@ export default function RssWorkspaceView() {
               </div>
             ))}
           </div>
+        ) : subsError ? (
+          <div className="flex flex-col items-center justify-center pt-16 text-center">
+            <p className="text-muted-foreground text-sm">{subsError}</p>
+            <button
+              type="button"
+              onClick={() => void fetchSubscriptions()}
+              className="text-primary mt-3 cursor-pointer text-sm font-medium underline underline-offset-4"
+            >
+              重试
+            </button>
+          </div>
         ) : subscriptions.length === 0 ? (
           <div className="flex flex-col items-center justify-center pt-24 text-center">
             <Rss className="text-muted-foreground/40 mb-4 h-12 w-12" />
@@ -172,6 +198,17 @@ export default function RssWorkspaceView() {
                 <div className="bg-muted h-20 rounded-xl" />
               </div>
             ))}
+          </div>
+        ) : articlesError ? (
+          <div className="flex flex-col items-center justify-center pt-16 text-center">
+            <p className="text-muted-foreground text-sm">{articlesError}</p>
+            <button
+              type="button"
+              onClick={() => void fetchArticles()}
+              className="text-primary mt-3 cursor-pointer text-sm font-medium underline underline-offset-4"
+            >
+              重试
+            </button>
           </div>
         ) : articles.length === 0 ? (
           <p className="text-muted-foreground pt-16 text-center text-sm">

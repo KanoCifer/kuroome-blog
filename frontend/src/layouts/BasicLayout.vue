@@ -54,21 +54,11 @@ watch(
       class="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
       aria-hidden="true"
     >
-      <Transition
-        enter-active-class="transition-opacity duration-1000 ease-out"
-        enter-from-class="opacity-0"
-        enter-to-class="opacity-100"
-        leave-active-class="transition-opacity duration-200 ease-out"
-        leave-from-class="opacity-100"
-        leave-to-class="opacity-90"
-      >
-        <div
-          :key="bgStore.backgroundClass"
-          :class="bgStore.backgroundClass"
-          class="absolute inset-0 h-full w-full transform-gpu"
-          :style="{ transform: `scale(${themeStore.bgScale})` }"
-        />
-      </Transition>
+      <div
+        :class="bgStore.backgroundClass"
+        class="hero-gradient absolute inset-0 h-full w-full transform-gpu"
+        :style="{ transform: `scale(${themeStore.bgScale})` }"
+      />
 
       <!-- 模糊 + 亮度蒙版层：用 backdrop-filter 作用在下方 img 上，避免 filter 在 img 自身上翻倍占用 GPU 纹理 -->
       <div

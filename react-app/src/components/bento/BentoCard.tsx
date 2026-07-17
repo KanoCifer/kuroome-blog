@@ -6,18 +6,17 @@ interface BentoCardProps {
   onClick?: () => void;
 }
 
+// 平整纸感卡片 — 轻边框 + 微阴影，Apple 式留白与克制。
+// 圆角按宽度分级由调用方通过 --bento-radius 控制。
 export function BentoCard({ children, className, onClick }: BentoCardProps) {
   return (
     <div
-      style={{
-        boxShadow: `
-          color-mix(in srgb, var(--color-foreground) 12%, transparent) 0px 40px 50px -32px,
-          color-mix(in srgb, var(--color-foreground) 8%, transparent) 0px 60px 80px -48px,
-          rgba(255, 255, 255, 0.35) 0px 0px 20px 0px inset
-        `,
-      }}
-      className={`bento-card border-border/60 bg-background/75 squircle border p-6 ${className || ''}`}
+      className={`squircle border-border/50 bg-card border p-6 ${className || ''}`}
       onClick={onClick}
+      style={{
+        boxShadow:
+          '0 1px 2px color-mix(in oklch, var(--ink) 4%, transparent), 0 4px 12px color-mix(in oklch, var(--ink) 3%, transparent)',
+      }}
     >
       {children}
     </div>

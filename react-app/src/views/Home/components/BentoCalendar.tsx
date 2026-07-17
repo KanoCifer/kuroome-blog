@@ -1,67 +1,152 @@
 import { BentoCard } from '@/components/bento/BentoCard';
+import { GlassSheet } from '@/components/home/GlassSheet';
 import dayjs from 'dayjs';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { SPRING } from '@/constants/springs';
 
 export function BentoCalendar() {
+  const [expanded, setExpanded] = useState(false);
   const now = dayjs();
+
   const monthLabel = now.format('MMMM');
   const yearLabel = now.format('YYYY');
-
-  const weekday = now.day(); // 0-6, 0是周日
   const weekdayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const weekdayHeaders = weekdayLabels.map((label, idx) => (
-    <span
-      key={idx}
-      className={`py-1 text-xs font-medium tabular-nums ${
-        idx === weekday ? 'bg-primary/10 text-primary rounded-xl font-bold' : ''
-      }`}
-    >
-      {label}
-    </span>
-  ));
 
-  const startOffset = () => {
-    const offset = now.startOf('month').day();
+  // 本周日期
+  const weekStart = now.startOf('week');
+  const weekDays = Array.from({ length: 7 }, (_, i) => weekStart.add(i, 'day'));
 
-    const offsetArray = Array.from({ length: offset });
-
-    return offsetArray.map((_, idx) => <span key={idx}></span>);
-  };
-
-  const daysInMonthArray = Array.from({ length: now.daysInMonth() });
-  const daysInMonth = daysInMonthArray.map((_, idx) => {
-    const dayNum = idx + 1;
-    const isToday = dayNum === now.date();
-
-    return (
-      <span
-        key={idx}
-        className={`mx-auto flex aspect-square w-full max-w-8 items-center justify-center rounded-full text-sm transition-colors ${
-          isToday
-            ? 'bg-primary text-primary-foreground font-bold'
-            : 'text-card-foreground hover:bg-primary/10'
-        }`}
-      >
-        {dayNum}
-      </span>
-    );
-  });
+  // 月份网格
+  const startOffset = now.startOf('month').day();
+  const daysInMonth = now.daysInMonth();
 
   return (
-    <BentoCard className="flex flex-col">
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-foreground text-lg font-semibold">{monthLabel}</h3>
-        <span className="text-muted-foreground text-sm tabular-nums">
-          {yearLabel}
-        </span>
-      </div>
-      {/* 表头 */}
-      <div className="mb-1 grid grid-cols-7 text-center">{weekdayHeaders}</div>
+    <>
+      <BentoCard className="flex flex-col">
+        {/* 标题行 */}
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="text-foreground text-lg font-semibold">{monthLabel}</h3>
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground text-sm tabular-nums">
+              {yearLabel}
+            </span>
+            <motion.button
+              whileTap={{ scale: 0.94 }}
+              transition={SPRING.snappy}
+              onClick={() => setExpanded(true)}
+              className="text-muted-foreground hover:bg-muted rounded-full p-1.5 transition-colors"
+              aria-label="展开日历"
+            >
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                />
+              </svg>
+            </motion.button>
+          </div>
+        </div>
 
-      {/* 日期部分 */}
-      <div className="grid grid-cols-7 text-center">
-        {startOffset()}
-        {daysInMonth}
-      </div>
-    </BentoCard>
+        {/* 表头 */}
+        <div className="mb-1 grid grid-cols-7 text-center">
+          {weekdayLabels.map((label, idx) => (
+            <span
+              key={idx}
+              className="text-muted-foreground py-1 text-xs font-medium tabular-nums"
+            >
+              {label}
+            </span>
+          ))}
+        </div>
+
+        {/* 本周视图 */}
+        <div className="grid grid-cols-7 text-center">
+          {weekDays.map((day, idx) => {
+            const isToday = day.date() === now.date();
+            return (
+              <span
+                key={idx}
+                className={`mx-auto flex aspect-square w-full max-w-8 items-center justify-center rounded-full text-sm transition-colors ${
+                  isToday
+                    ? 'bg-primary text-primary-foreground font-bold'
+                    : 'text-card-foreground hover:bg-primary/10'
+                }`}
+              >
+                {day.date()}
+              </span>
+            );
+          })}
+        </div>
+      </BentoCard>
+
+      {/* 展开态 — 整月网格（GlassSheet 浮层） */}
+      <GlassSheet
+        open={expanded}
+        onClose={() => setExpanded(false)}
+        title={`${monthLabel} ${yearLabel}`}
+      >
+        <div className="flex flex-col">
+          {/* 表头 */}
+          <div className="mb-2 grid grid-cols-7 text-center">
+            {weekdayLabels.map((label, idx) => (
+              <span
+                key={idx}
+                className="text-muted-foreground py-1 text-xs font-medium tabular-nums"
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+
+          {/* 月份网格 */}
+          <motion.div
+            className="grid grid-cols-7 text-center"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              visible: {
+                transition: { staggerChildren: 0.02 },
+              },
+            }}
+          >
+            {/* 月初偏移 */}
+            {Array.from({ length: startOffset }).map((_, idx) => (
+              <span key={`offset-${idx}`} />
+            ))}
+
+            {/* 日期 */}
+            {Array.from({ length: daysInMonth }).map((_, idx) => {
+              const dayNum = idx + 1;
+              const isToday = dayNum === now.date();
+              return (
+                <motion.span
+                  key={dayNum}
+                  variants={{
+                    hidden: { opacity: 0, scale: 0.9 },
+                    visible: { opacity: 1, scale: 1 },
+                  }}
+                  transition={SPRING.reveal}
+                  className={`mx-auto flex aspect-square w-full max-w-8 items-center justify-center rounded-full text-sm ${
+                    isToday
+                      ? 'bg-primary text-primary-foreground font-bold'
+                      : 'text-foreground'
+                  }`}
+                >
+                  {dayNum}
+                </motion.span>
+              );
+            })}
+          </motion.div>
+        </div>
+      </GlassSheet>
+    </>
   );
 }

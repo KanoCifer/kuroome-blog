@@ -1,4 +1,3 @@
-import { BentoCard } from '@/components/bento/BentoCard';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 
@@ -13,37 +12,22 @@ export function BentoClock() {
       setDateLabel(now.format('YYYY-MM-DD'));
     };
 
-    updateTime(); // 初始化时立即更新一次
-    const timerId = setInterval(updateTime, 1000); // 每秒更新一次
-
-    return () => clearInterval(timerId); // 组件卸载时清除定时器
+    updateTime();
+    const timerId = setInterval(updateTime, 1000);
+    return () => clearInterval(timerId);
   }, []);
 
   return (
-    <BentoCard className="h-full">
-      <div>
-        <svg
-          className="text-primary h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      </div>
-      <div>
-        <div className="text-foreground font-serif text-4xl font-extrabold tracking-tighter tabular-nums">
-          {timeLabel}
-        </div>
-        <div className="text-muted-foreground mt-1 text-sm font-medium">
-          {dateLabel}
-        </div>
-      </div>
-    </BentoCard>
+    <div className="flex items-center justify-between px-2">
+      {/* 左侧：日期 */}
+      <span className="text-muted-foreground text-sm font-medium">
+        {dateLabel}
+      </span>
+
+      {/* 右侧：大数字时间 */}
+      <span className="text-foreground font-serif text-2xl font-extrabold tracking-tight tabular-nums">
+        {timeLabel}
+      </span>
+    </div>
   );
 }

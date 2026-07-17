@@ -1,38 +1,24 @@
 import { BentoCard } from '@/components/bento/BentoCard';
+import { motion } from 'framer-motion';
+import { SPRING } from '@/constants/springs';
 
 export function BentoTech() {
   const techStack = [
-    { name: 'Python', color: 'blue' },
-    { name: 'TaskIQ', color: 'green' },
-    { name: 'Vue', color: 'rose' },
-    { name: 'Postgre', color: 'indigo' },
-    { name: 'SQLAlchemy', color: 'cyan' },
-    { name: 'FastAPI', color: 'indigo' },
-    { name: 'Redis', color: 'teal' },
-    { name: 'MongoDB', color: 'fuchsia' },
-    { name: 'React', color: 'blue' },
+    'Python',
+    'TaskIQ',
+    'Vue',
+    'Postgre',
+    'SQLAlchemy',
+    'FastAPI',
+    'Redis',
+    'MongoDB',
+    'React',
   ];
 
-  const colorClasses: Record<string, string> = {
-    blue: 'border-blue-200 bg-blue-100 text-blue-700 hover:bg-blue-200',
-    yellow:
-      'border-yellow-200 bg-yellow-100 text-yellow-700 hover:bg-yellow-200',
-    green: 'border-green-200 bg-green-100 text-green-700 hover:bg-green-200',
-    rose: 'border-rose-200 bg-rose-100 text-rose-700 hover:bg-rose-200',
-    teal: 'border-teal-200 bg-teal-100 text-teal-700 hover:bg-teal-200',
-    purple:
-      'border-purple-200 bg-purple-100 text-purple-700 hover:bg-purple-200',
-    indigo:
-      'border-indigo-200 bg-indigo-100 text-indigo-700 hover:bg-indigo-200',
-    cyan: 'border-cyan-200 bg-cyan-100 text-cyan-700 hover:bg-cyan-200',
-    fuchsia:
-      'border-fuchsia-200 bg-fuchsia-100 text-fuchsia-700 hover:bg-fuchsia-200',
-  };
-
   return (
-    <BentoCard>
-      <div className="squircle p-2">
-        <h3 className="text-foreground mb-4 flex items-center gap-2 font-serif text-sm font-bold">
+    <BentoCard className="h-full">
+      <div className="h-full p-2">
+        <h3 className="text-foreground mb-3 flex items-center gap-2 text-sm font-bold">
           <svg
             className="text-primary h-5 w-5"
             fill="none"
@@ -48,14 +34,16 @@ export function BentoTech() {
           </svg>
           Tech Stack
         </h3>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {techStack.map((tech) => (
-            <span
-              key={tech.name}
-              className={`cursor-default rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${colorClasses[tech.color]}`}
+            <motion.span
+              key={tech}
+              whileTap={{ scale: 0.95 }}
+              transition={SPRING.snappy}
+              className="cursor-default rounded-full border border-border/60 bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground"
             >
-              {tech.name}
-            </span>
+              {tech}
+            </motion.span>
           ))}
         </div>
       </div>

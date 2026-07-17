@@ -1,30 +1,39 @@
-import { devTaskService, type DevTaskService } from '@/services/todoService';
+import {
+  devTaskService,
+  type DevTaskService,
+} from '@/services/devtaskService';
 import { create } from 'zustand';
 import type {
   CreateDevTaskPayload,
   DevTask,
   DevTaskStatus,
-} from '@/services/todoService/types';
+} from '@/services/devtaskService/types';
 
+// v3 全量状态标签
 export const STATUS_LABELS: Record<DevTaskStatus, string> = {
-  todo: '待开发',
-  'in-progress': '开发中',
-  done: '已完成',
+  '待评估': '待评估',
+  '待排期': '待排期',
+  '进行中': '进行中',
+  '已搁置': '已搁置',
+  '已完成': '已完成',
 };
 
+// 状态推进：跳开"已搁置"——搁置与恢复是用户主动选择，不在循环里
 const STATUS_CYCLE: Record<DevTaskStatus, DevTaskStatus> = {
-  todo: 'in-progress',
-  'in-progress': 'done',
-  done: 'todo',
+  '待评估': '待排期',
+  '待排期': '进行中',
+  '进行中': '已完成',
+  '已搁置': '待排期',
+  '已完成': '待评估',
 };
 
 interface DevTaskState {
   tasks: DevTask[];
   hydrateTasks: () => void;
   createTask: (payload: CreateDevTaskPayload) => Promise<void>;
-  cycleStatus: (id: string) => Promise<void>;
-  updateTask: (id: string, patch: Partial<DevTask>) => Promise<void>;
-  deleteTask: (id: string) => Promise<void>;
+  cycleStatus: (slug: string) => Promise<void>;
+  updateTask: (slug: string, patch: Partial<DevTask>) => Promise<void>;
+  deleteTask: (slug: string) => Promise<void>;
 }
 
 const service: DevTaskService = devTaskService();
@@ -33,43 +42,41 @@ export const useTodoState = create<DevTaskState>((set, get) => ({
   tasks: [],
 
   hydrateTasks: () => {
-    service.fetchTasks().then((grouped) =>
-      set({
-        tasks: [...grouped.todo, ...grouped['in-progress'], ...grouped.done],
-      }),
+    service.list({ per_page: 200 }).then((res) =>
+      set({ tasks: res.tasks.filter((t) => !t.is_deleted) }),
     );
   },
 
   createTask: async (payload) => {
-    const newTask = await service.createTask(payload);
+    const newTask = await service.create(payload);
     if (newTask) {
       set((state) => ({ tasks: [newTask, ...state.tasks] }));
     }
   },
 
-  cycleStatus: async (id) => {
-    const task = get().tasks.find((t) => t.id === id);
+  cycleStatus: async (slug) => {
+    const task = get().tasks.find((t) => t.slug === slug);
     if (!task) return;
     const nextStatus = STATUS_CYCLE[task.status];
-    const updated = await service.updateTask(id, { status: nextStatus });
-    if (updated) {
-      set((state) => ({
-        tasks: state.tasks.map((t) => (t.id === id ? { ...t, ...updated } : t)),
-      }));
-    }
+    await service.update(slug, { status: nextStatus });
+    set((state) => ({
+      tasks: state.tasks.map((t) =>
+        t.slug === slug ? { ...t, status: nextStatus } : t,
+      ),
+    }));
   },
 
-  updateTask: async (id, patch) => {
-    const updated = await service.updateTask(id, patch);
-    if (updated) {
-      set((state) => ({
-        tasks: state.tasks.map((t) => (t.id === id ? { ...t, ...updated } : t)),
-      }));
-    }
+  updateTask: async (slug, patch) => {
+    await service.update(slug, patch);
+    set((state) => ({
+      tasks: state.tasks.map((t) =>
+        t.slug === slug ? { ...t, ...patch } : t,
+      ),
+    }));
   },
 
-  deleteTask: async (id) => {
-    await service.deleteTask(id);
-    set((state) => ({ tasks: state.tasks.filter((t) => t.id !== id) }));
+  deleteTask: async (slug) => {
+    await service.remove(slug);
+    set((state) => ({ tasks: state.tasks.filter((t) => t.slug !== slug) }));
   },
 }));

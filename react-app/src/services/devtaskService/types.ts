@@ -28,6 +28,8 @@ export interface DevTask {
   is_deleted: boolean;
   created_at: string;
   updated_at: string;
+  // Slug —— task-N，人类可读引用（后端操作标识，所有路由以 slug 定位任务）
+  slug: string;
   // 任务角色：spec（可拆解为子任务）/ subtask（spec 拆解出的子任务）。空串 = spec。
   kind?: DevTaskKind;
   // 子任务归属的 spec slug。spec / 独立任务为 null。
@@ -67,6 +69,7 @@ export interface CreateDevTaskPayload {
   type: DevTaskType;
   priority: DevTaskPriority;
   scope: DevTaskScope;
+  status?: DevTaskStatus;
   due_date?: string | null;
 }
 

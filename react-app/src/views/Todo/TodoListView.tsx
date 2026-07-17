@@ -3,13 +3,13 @@ import type {
   CreateDevTaskPayload,
   DevTaskPriority,
   DevTaskStatus,
-} from '@/services/todoService/types';
+} from '@/services/devtaskService/types';
 import { useTodoState, STATUS_LABELS } from '@/stores/todoState';
-import type { DevTask } from '@/services/todoService/types';
+import type { DevTask } from '@/services/devtaskService/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useMemo, useState } from 'react';
 
-// Column definitions
+// Column definitions — v3 全量状态
 interface ColumnDef {
   status: DevTaskStatus;
   title: string;
@@ -20,21 +20,35 @@ interface ColumnDef {
 
 const COLUMNS: ColumnDef[] = [
   {
-    status: 'todo',
-    title: '待办',
+    status: '待评估',
+    title: '待评估',
     dotClass: 'bg-primary',
     bgClass: 'bg-primary/10',
-    emptyText: '没有待开发任务',
+    emptyText: '没有待评估任务',
   },
   {
-    status: 'in-progress',
-    title: '开发中',
+    status: '待排期',
+    title: '待排期',
     dotClass: 'bg-warning',
     bgClass: 'bg-warning/10',
-    emptyText: '没有开发中任务',
+    emptyText: '没有待排期任务',
   },
   {
-    status: 'done',
+    status: '进行中',
+    title: '进行中',
+    dotClass: 'bg-info',
+    bgClass: 'bg-info/10',
+    emptyText: '没有进行中任务',
+  },
+  {
+    status: '已搁置',
+    title: '已搁置',
+    dotClass: 'bg-muted-foreground',
+    bgClass: 'bg-muted-foreground/10',
+    emptyText: '没有已搁置任务',
+  },
+  {
+    status: '已完成',
     title: '已完成',
     dotClass: 'bg-success',
     bgClass: 'bg-success/10',
@@ -42,22 +56,32 @@ const COLUMNS: ColumnDef[] = [
   },
 ];
 
-// Semantic status badge styles (replaces hardcoded hex values)
+// Semantic status badge styles
 const STATUS_STYLES: Record<
   DevTaskStatus,
   { bg: string; border: string; text: string }
 > = {
-  todo: {
+  '待评估': {
     bg: 'bg-primary/10',
     border: 'border-primary/30',
     text: 'text-primary',
   },
-  'in-progress': {
+  '待排期': {
     bg: 'bg-warning/10',
     border: 'border-warning/30',
     text: 'text-warning',
   },
-  done: {
+  '进行中': {
+    bg: 'bg-info/10',
+    border: 'border-info/30',
+    text: 'text-info',
+  },
+  '已搁置': {
+    bg: 'bg-muted-foreground/10',
+    border: 'border-muted-foreground/30',
+    text: 'text-muted-foreground',
+  },
+  '已完成': {
     bg: 'bg-success/10',
     border: 'border-success/30',
     text: 'text-success',
@@ -70,14 +94,15 @@ function statusBadgeClasses(status: DevTaskStatus): string {
 }
 
 function priorityLabel(p: DevTaskPriority): string {
-  return { low: '低', high: '高', default: '默认' }[p];
+  return { 'P0 紧急': '紧急', 'P1 高': '高', 'P2 中': '中', 'P3 低': '低' }[p];
 }
 
 function priorityBadgeClass(p: DevTaskPriority): string {
   const map: Record<DevTaskPriority, string> = {
-    low: 'border-primary/20 bg-primary/10 text-primary',
-    high: 'border-destructive/20 bg-destructive/10 text-destructive',
-    default: 'border-border bg-secondary text-card-foreground',
+    'P0 紧急': 'border-destructive/20 bg-destructive/10 text-destructive',
+    'P1 高': 'border-warning/20 bg-warning/10 text-warning',
+    'P2 中': 'border-primary/20 bg-primary/10 text-primary',
+    'P3 低': 'border-border bg-secondary text-card-foreground',
   };
   return map[p];
 }
@@ -90,14 +115,14 @@ function TaskCard({
   onDelete,
 }: {
   task: DevTask;
-  onCycle: (id: string) => void;
+  onCycle: (slug: string) => void;
   onCardClick: (task: DevTask) => void;
-  onDelete: (id: string) => void;
+  onDelete: (slug: string) => void;
 }) {
-  const isDone = task.status === 'done';
+  const isDone = task.status === '已完成';
   const isOverdue =
-    task.dueDate &&
-    new Date(task.dueDate) < new Date(new Date().setHours(0, 0, 0, 0));
+    task.due_date &&
+    new Date(task.due_date) < new Date(new Date().setHours(0, 0, 0, 0));
 
   return (
     <motion.div
@@ -114,7 +139,7 @@ function TaskCard({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            onCycle(task.id);
+            onCycle(task.slug);
           }}
           className={`mt-0.5 shrink-0 cursor-pointer rounded-md border px-2 py-0.5 text-[11px] font-medium transition-all duration-300 ease-out ${statusBadgeClasses(task.status)}`}
         >
@@ -142,11 +167,16 @@ function TaskCard({
 
           <div className="mt-2 flex flex-wrap items-center gap-1.5">
             <span
-              className={`rounded-full border px-1.5 py-px text-[10px] font-medium ${priorityBadgeClass(task.priority || 'default')}`}
+              className={`rounded-full border px-1.5 py-px text-[10px] font-medium ${priorityBadgeClass(task.priority)}`}
             >
-              {priorityLabel(task.priority || 'default')}
+              {priorityLabel(task.priority)}
             </span>
-            {task.dueDate && (
+            {task.type && (
+              <span className="rounded-full border border-border bg-secondary px-1.5 py-px text-[10px] font-medium text-card-foreground">
+                {task.type}
+              </span>
+            )}
+            {task.due_date && (
               <span
                 className={`flex items-center gap-1 text-[10px] ${
                   isOverdue && !isDone
@@ -165,7 +195,7 @@ function TaskCard({
                     clipRule="evenodd"
                   />
                 </svg>
-                {task.dueDate}
+                {task.due_date}
               </span>
             )}
           </div>
@@ -176,7 +206,7 @@ function TaskCard({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onDelete(task.id);
+              onDelete(task.slug);
             }}
             className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive flex h-8 w-8 cursor-pointer items-center justify-center rounded-md transition-colors"
             title="删除"
@@ -209,22 +239,22 @@ function EditBottomSheet({
 }: {
   task: DevTask;
   onClose: () => void;
-  onSave: (id: string, data: Partial<DevTask>) => void;
+  onSave: (slug: string, data: Partial<DevTask>) => void;
 }) {
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description || '');
-  const [priority, setPriority] = useState<DevTaskPriority>(
-    task.priority || 'default',
-  );
-  const [dueDate, setDueDate] = useState(task.dueDate || '');
+  const [priority, setPriority] = useState<DevTaskPriority>(task.priority);
+  const [status, setStatus] = useState<DevTaskStatus>(task.status);
+  const [dueDate, setDueDate] = useState(task.due_date || '');
 
   const handleSave = () => {
     if (title.trim()) {
-      onSave(task.id, {
+      onSave(task.slug, {
         title: title.trim(),
         description: description.trim() || undefined,
-        dueDate: dueDate || undefined,
+        due_date: dueDate || undefined,
         priority,
+        status,
       });
     }
     onClose();
@@ -289,6 +319,23 @@ function EditBottomSheet({
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
               <label className="text-muted-foreground text-sm font-medium">
+                状态
+              </label>
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value as DevTaskStatus)}
+                className="border-border bg-background cursor-pointer rounded-lg border px-3 py-2 text-sm"
+              >
+                <option value="待评估">待评估</option>
+                <option value="待排期">待排期</option>
+                <option value="进行中">进行中</option>
+                <option value="已搁置">已搁置</option>
+                <option value="已完成">已完成</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <label className="text-muted-foreground text-sm font-medium">
                 优先级
               </label>
               <select
@@ -296,9 +343,10 @@ function EditBottomSheet({
                 onChange={(e) => setPriority(e.target.value as DevTaskPriority)}
                 className="border-border bg-background cursor-pointer rounded-lg border px-3 py-2 text-sm"
               >
-                <option value="default">默认</option>
-                <option value="low">低</option>
-                <option value="high">高</option>
+                <option value="P0 紧急">紧急</option>
+                <option value="P1 高">高</option>
+                <option value="P2 中">中</option>
+                <option value="P3 低">低</option>
               </select>
             </div>
 
@@ -346,9 +394,9 @@ function ColumnContent({
 }: {
   col: ColumnDef;
   tasks: DevTask[];
-  onCycle: (id: string) => void;
+  onCycle: (slug: string) => void;
   onCardClick: (task: DevTask) => void;
-  onDelete: (id: string) => void;
+  onDelete: (slug: string) => void;
 }) {
   return (
     <>
@@ -357,7 +405,7 @@ function ColumnContent({
         <AnimatePresence mode="popLayout">
           {tasks.map((task) => (
             <TaskCard
-              key={task.id}
+              key={task.slug}
               task={task}
               onCycle={onCycle}
               onCardClick={onCardClick}
@@ -384,17 +432,21 @@ export default function TodoListView() {
   const { tasks } = todoState;
 
   const [editingTask, setEditingTask] = useState<DevTask | null>(null);
-  const [activeTab, setActiveTab] = useState<DevTaskStatus>('todo');
+  const [activeTab, setActiveTab] = useState<DevTaskStatus>('待评估');
 
   // Group tasks by status
   const grouped = useMemo(() => {
     const g: Record<DevTaskStatus, DevTask[]> = {
-      todo: [],
-      'in-progress': [],
-      done: [],
+      '待评估': [],
+      '待排期': [],
+      '进行中': [],
+      '已搁置': [],
+      '已完成': [],
     };
     for (const t of tasks) {
-      g[t.status]?.push(t);
+      if (!t.is_deleted && g[t.status]) {
+        g[t.status].push(t);
+      }
     }
     return g;
   }, [tasks]);
@@ -405,8 +457,8 @@ export default function TodoListView() {
     setEditingTask(task);
   };
 
-  const handleSaveEdit = async (id: string, data: Partial<DevTask>) => {
-    await todoState.updateTask(id, data);
+  const handleSaveEdit = async (slug: string, data: Partial<DevTask>) => {
+    await todoState.updateTask(slug, data);
     showNav();
     setEditingTask(null);
   };
@@ -420,23 +472,25 @@ export default function TodoListView() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newDescription, setNewDescription] = useState('');
-  const [newPriority, setNewPriority] = useState<DevTaskPriority>('default');
+  const [newPriority, setNewPriority] = useState<DevTaskPriority>('P2 中');
+  const [newStatus, setNewStatus] = useState<DevTaskStatus>('待评估');
   const [newDueDate, setNewDueDate] = useState('');
-  const [newStatus, setNewStatus] = useState<DevTaskStatus>('todo');
 
   const handleCreateTask = async () => {
     if (!newTitle.trim()) return;
     const payload: CreateDevTaskPayload = {
       title: newTitle.trim(),
       description: newDescription.trim() || undefined,
-      dueDate: newDueDate || undefined,
+      due_date: newDueDate || undefined,
       priority: newPriority,
       status: newStatus,
+      type: '功能需求',
+      scope: '前端-React',
     };
     await todoState.createTask(payload);
     setNewTitle('');
     setNewDescription('');
-    setNewPriority('default');
+    setNewPriority('P2 中');
     setNewDueDate('');
     closeAddForm();
   };
@@ -467,7 +521,7 @@ export default function TodoListView() {
       <div className="bg-background sticky top-0 z-10 ml-12 flex items-center justify-between px-4 py-4">
         <div>
           <h1 className="text-foreground text-xl font-semibold">开发任务</h1>
-          <p className="text-muted-foreground text-sm">{tasks.length} 项任务</p>
+          <p className="text-muted-foreground text-sm">{tasks.filter((t) => !t.is_deleted).length} 项任务</p>
         </div>
       </div>
 
@@ -619,9 +673,11 @@ export default function TodoListView() {
                       }
                       className="border-border bg-background cursor-pointer rounded-lg border px-3 py-2 text-sm"
                     >
-                      <option value="todo">待办</option>
-                      <option value="in-progress">开发中</option>
-                      <option value="done">已完成</option>
+                      <option value="待评估">待评估</option>
+                      <option value="待排期">待排期</option>
+                      <option value="进行中">进行中</option>
+                      <option value="已搁置">已搁置</option>
+                      <option value="已完成">已完成</option>
                     </select>
                   </div>
 
@@ -636,9 +692,10 @@ export default function TodoListView() {
                       }
                       className="border-border bg-background cursor-pointer rounded-lg border px-3 py-2 text-sm"
                     >
-                      <option value="default">默认</option>
-                      <option value="low">低</option>
-                      <option value="high">高</option>
+                      <option value="P0 紧急">紧急</option>
+                      <option value="P1 高">高</option>
+                      <option value="P2 中">中</option>
+                      <option value="P3 低">低</option>
                     </select>
                   </div>
 
