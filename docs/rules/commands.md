@@ -1,5 +1,7 @@
 # Commands
 
+> **代码质量检查已自动化**：per-edit 由 `.claude/settings.json` 的 PostToolUse hook 触发 prettier / oxlint / ruff / gofmt + go vet；commit 时由 `.git/hooks/pre-commit` 闸门跑 type-check / ruff check / go vet / go build。下方命令保留作为手动覆盖 / 调试参考。
+
 ## Backend
 
 ```bash

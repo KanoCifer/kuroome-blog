@@ -2,12 +2,9 @@
 
 ## 1) Rules (Highest Priority)
 
-- 修改前端代码后，必须运行类型检查：
-  - Vue: `cd frontend && pnpm type-check`
-  - React: `cd react-app && pnpm type-check`
-- **提交前必跑**：(1) 改前端 → `pnpm type-check` (2) 改后端 → `ruff check .` (3) 各自语言的 lint + format
+- **代码质量检查已自动化**：per-edit 触发 prettier / oxlint / ruff format / ruff check / gofmt / go vet（见 `.claude/settings.json` 的 PostToolUse hook），commit 时跑 `pnpm type-check` / `ruff check` / `go vet` / `go build`（见 `.git/hooks/pre-commit`）。Claude 不必主动运行这些命令。
 - 样式必须使用语义化 Tailwind class，禁止硬编码颜色。
-- 用户没有特殊要求，禁止执行`pnpm build`
+- 用户没有特殊要求，禁止执行 `pnpm build`
 - 后端使用 `uv` 管理依赖。
 
 ## 2) Project Overview

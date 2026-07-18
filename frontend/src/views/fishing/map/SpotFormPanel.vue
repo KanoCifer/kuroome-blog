@@ -14,7 +14,16 @@ import SpotMiniMap from '@/views/fishing/map/SpotMiniMap.vue';
 import type { CreateFishingSpotPayload } from '@/api/fishing';
 import { fishingSpotsGateway } from '@/api/fishing';
 import { DEFAULT_MAP_CENTER } from '@/stores/fishingMap';
-import { Loader2, MapPin, Star, X } from '@lucide/vue';
+import { useGalleryUpload, type Picture } from '@/composables/pic';
+import {
+  ImagePlus,
+  ImageOff,
+  Loader2,
+  MapPin,
+  RefreshCw,
+  Star,
+  X,
+} from '@lucide/vue';
 import { computed, nextTick, ref, watch } from 'vue';
 
 const props = withDefaults(
@@ -48,8 +57,26 @@ const name = ref('');
 const description = ref('');
 const tags = ref('');
 const rating = ref(0);
-const images = ref('');
 const coordinate = ref<[number, number] | null>(null);
+
+// ── 图片上传:复用 useGalleryUpload composable,串行上传,单钓点最多 9 张 ──
+const MAX_PICTURES = 9;
+const pictures = ref<Picture[]>([]);
+const pendingError = ref<string | null>(null);
+
+const upload = useGalleryUpload();
+const {
+  fileInputRef,
+  previewUrl,
+  isUploading,
+  isDragging,
+  triggerFileInput,
+  handleFileSelect,
+  handleDrop,
+  uploadImage,
+} = upload;
+
+const canAddMore = computed(() => pictures.value.length < MAX_PICTURES);
 
 // ── 提交状态 ──
 const submitting = ref(false);
@@ -57,8 +84,29 @@ const error = ref('');
 
 // ── 校验 ──
 const canSubmit = computed(
-  () => name.value.trim().length > 0 && coordinate.value !== null,
+  () =>
+    name.value.trim().length > 0 &&
+    coordinate.value !== null &&
+    !isUploading.value,
 );
+
+// ── 上传流:composable 选中文件后立刻触发 uploadImage ──
+watch(upload.selectedFile, async (file) => {
+  if (!file) return;
+  if (!canAddMore.value) {
+    // 防御性:上限后不应再有 selectedFile(+ 瓦片已隐藏),清空避免残留预览
+    upload.selectedFile.value = null;
+    upload.previewUrl.value = null;
+    return;
+  }
+  pendingError.value = null;
+  const result = await uploadImage();
+  if (result) {
+    pictures.value.push(result);
+  } else {
+    pendingError.value = '图片上传失败,请重试';
+  }
+});
 
 /** 打开时重置草稿 */
 watch(
@@ -69,9 +117,12 @@ watch(
       description.value = '';
       tags.value = '';
       rating.value = 0;
-      images.value = '';
       coordinate.value = null;
       error.value = '';
+      pictures.value = [];
+      pendingError.value = null;
+      upload.selectedFile.value = null;
+      upload.previewUrl.value = null;
     }
   },
 );
@@ -85,17 +136,13 @@ async function handleSubmit(): Promise<void> {
       .split(',')
       .map((t) => t.trim())
       .filter(Boolean);
-    const imagesArr = images.value
-      .split('\n')
-      .map((line) => line.trim())
-      .filter(Boolean);
     const payload: CreateFishingSpotPayload = {
       name: name.value.trim(),
       location: coordinate.value!,
       description: description.value.trim(),
       tags: tagsArr,
       rating: rating.value,
-      images: imagesArr,
+      images: pictures.value.map((p) => p.url),
     };
     await fishingSpotsGateway.create(payload);
     emit('created', payload.name);
@@ -106,6 +153,34 @@ async function handleSubmit(): Promise<void> {
   } finally {
     submitting.value = false;
   }
+}
+
+// ── 图片操作 ──
+async function retryUpload(): Promise<void> {
+  if (!upload.selectedFile.value || isUploading.value) return;
+  pendingError.value = null;
+  const result = await uploadImage();
+  if (result) {
+    pictures.value.push(result);
+  } else {
+    pendingError.value = '图片上传失败,请重试';
+  }
+}
+
+function removePicture(p: Picture): void {
+  pictures.value = pictures.value.filter((x) => x.id !== p.id);
+}
+
+function removeFailed(): void {
+  upload.selectedFile.value = null;
+  upload.previewUrl.value = null;
+  pendingError.value = null;
+}
+
+function onPickerChange(event: Event): void {
+  handleFileSelect(event);
+  // 重置 input value,使再次选择同一文件能触发 change
+  (event.target as HTMLInputElement).value = '';
 }
 
 // ── 无障碍:focus trap + Esc + restore focus ──
@@ -321,21 +396,148 @@ watch(
               </div>
             </div>
 
-            <!-- 图片(v1: URL 文本,每行一址) -->
+            <!-- 图片(上传:3 列缩略图网格 + 末尾 + 瓦片,最多 9 张) -->
             <div>
-              <label
-                class="text-foreground mb-1.5 block text-sm font-medium"
-                for="spot-form-images"
-                >图片</label
+              <span class="text-foreground mb-1.5 block text-sm font-medium"
+                >图片</span
               >
-              <textarea
-                id="spot-form-images"
-                v-model="images"
-                rows="3"
-                placeholder="https://example.com/photo1.jpg&#10;https://example.com/photo2.jpg"
-                class="bg-muted text-foreground placeholder:text-muted-foreground/60 focus:ring-primary/30 w-full resize-none rounded-xl border-0 px-4 py-3 font-mono text-xs focus:ring-2 focus:outline-none"
+
+              <!-- 隐藏 file input:由空态按钮 / + 瓦片 click() 触发 -->
+              <input
+                ref="fileInputRef"
+                type="file"
+                accept="image/*"
+                class="hidden"
+                @change="onPickerChange"
               />
-              <p class="text-muted-foreground mt-1 text-xs">每行一个图片地址</p>
+
+              <!-- 空态:大块 drop-zone -->
+              <button
+                v-if="pictures.length === 0 && !previewUrl"
+                type="button"
+                class="border-border bg-muted hover:bg-muted/70 group flex w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed py-10 transition-colors"
+                :class="{ 'border-foreground bg-muted': isDragging }"
+                @click="triggerFileInput"
+                @dragover.prevent
+                @dragleave.prevent="isDragging = false"
+                @drop.prevent="handleDrop"
+              >
+                <div
+                  class="bg-background ring-border/5 mb-3 flex h-12 w-12 items-center justify-center rounded-full shadow-sm ring-1 transition-transform group-hover:scale-110"
+                >
+                  <ImagePlus
+                    class="text-muted-foreground group-hover:text-primary h-5 w-5 transition-colors"
+                    :stroke-width="1.5"
+                  />
+                </div>
+                <p class="text-foreground text-sm font-medium">
+                  点击或拖拽图片到此处
+                </p>
+                <p class="text-muted-foreground mt-1.5 text-xs">
+                  最多 {{ MAX_PICTURES }} 张,单张 ≤5MB
+                </p>
+              </button>
+
+              <!-- 非空态:3 列缩略图网格 -->
+              <div v-else class="grid grid-cols-3 gap-2">
+                <!-- 已上传图片 -->
+                <div
+                  v-for="p in pictures"
+                  :key="p.id"
+                  class="group bg-muted relative aspect-square overflow-hidden rounded-xl"
+                >
+                  <img :src="p.url" alt="" class="h-full w-full object-cover" />
+                  <button
+                    type="button"
+                    class="bg-background/80 text-foreground hover:bg-background absolute top-1.5 right-1.5 inline-flex h-6 w-6 items-center justify-center rounded-full opacity-0 shadow-sm backdrop-blur-md transition-opacity group-hover:opacity-100"
+                    aria-label="移除图片"
+                    @click="removePicture(p)"
+                  >
+                    <X class="h-3.5 w-3.5" />
+                  </button>
+                </div>
+
+                <!-- 上传中 / 失败瓦片 -->
+                <div
+                  v-if="previewUrl"
+                  class="bg-muted relative aspect-square overflow-hidden rounded-xl"
+                  :class="pendingError ? '' : 'opacity-60'"
+                  aria-busy="true"
+                >
+                  <img
+                    :src="previewUrl"
+                    alt=""
+                    class="h-full w-full object-cover"
+                  />
+
+                  <!-- 上传中:中央 spinner -->
+                  <div
+                    v-if="!pendingError"
+                    class="absolute inset-0 flex items-center justify-center bg-black/30"
+                  >
+                    <Loader2 class="h-5 w-5 animate-spin text-white" />
+                  </div>
+
+                  <!-- 失败:错误态 -->
+                  <div
+                    v-else
+                    class="border-destructive bg-background/95 absolute inset-0 flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 p-2 text-center backdrop-blur-md"
+                    role="alert"
+                  >
+                    <ImageOff class="text-destructive h-5 w-5" />
+                    <p
+                      class="text-destructive text-xs leading-tight font-medium"
+                    >
+                      {{ pendingError }}
+                    </p>
+                    <div class="flex gap-1.5">
+                      <button
+                        type="button"
+                        class="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium"
+                        @click="retryUpload"
+                      >
+                        <RefreshCw class="h-3 w-3" />
+                        重试
+                      </button>
+                      <button
+                        type="button"
+                        class="bg-muted text-foreground hover:bg-muted/70 rounded-md px-2 py-1 text-xs font-medium"
+                        @click="removeFailed"
+                      >
+                        移除
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- + 瓦片 -->
+                <button
+                  v-if="canAddMore && !previewUrl"
+                  type="button"
+                  class="border-border bg-muted hover:bg-muted/70 group relative aspect-square overflow-hidden rounded-xl border-2 border-dashed transition-colors"
+                  :class="{ 'border-foreground': isDragging }"
+                  :aria-label="'添加图片'"
+                  :title="`还可上传 ${MAX_PICTURES - pictures.length} 张`"
+                  @click="triggerFileInput"
+                  @dragover.prevent
+                  @dragleave.prevent="isDragging = false"
+                  @drop.prevent="handleDrop"
+                >
+                  <div
+                    class="absolute inset-0 flex flex-col items-center justify-center"
+                  >
+                    <ImagePlus
+                      class="text-muted-foreground group-hover:text-foreground h-5 w-5 transition-colors"
+                      :stroke-width="1.5"
+                    />
+                    <span class="text-muted-foreground mt-1 text-xs">添加</span>
+                  </div>
+                </button>
+              </div>
+
+              <p class="text-muted-foreground mt-1.5 text-xs tabular-nums">
+                {{ pictures.length }} / {{ MAX_PICTURES }}
+              </p>
             </div>
           </div>
         </div>

@@ -280,6 +280,7 @@ import TaskDetailPanel from './components/TaskDetailPanel.vue';
 import FrontierPanel from './components/FrontierPanel.vue';
 import PlanningPanel from './components/PlanningPanel.vue';
 import ReviewPanel from './components/ReviewPanel.vue';
+import KanbanPanel from './components/KanbanPanel.vue';
 import type { Component } from 'vue';
 
 const authStore = useAuthStore();
@@ -288,7 +289,7 @@ const isAuthenticated = computed(() => authStore.isAuthenticated);
 const store = useV3DevTaskStore();
 
 // ── tab state ──
-type TabId = 'frontier' | 'planning' | 'review';
+type TabId = 'frontier' | 'planning' | 'review' | 'kanban';
 const activeTab = ref<TabId>('frontier');
 
 const TAB_ITEM_HEIGHT = 36;
@@ -300,6 +301,7 @@ const indicatorY = computed(() => activeTabIndex.value * TAB_ITEM_HEIGHT);
 const tabs = computed(() => [
   { id: 'frontier' as const, label: '推进', count: store.frontier.length },
   { id: 'planning' as const, label: '规划', count: store.totalActive },
+  { id: 'kanban' as const, label: '看板', count: store.totalActive },
   { id: 'review' as const, label: '回顾', count: store.completedCount },
 ]);
 
@@ -307,6 +309,7 @@ const tabs = computed(() => [
 const activePanel = computed((): Component => {
   if (activeTab.value === 'planning') return PlanningPanel;
   if (activeTab.value === 'review') return ReviewPanel;
+  if (activeTab.value === 'kanban') return KanbanPanel;
   return FrontierPanel;
 });
 

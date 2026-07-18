@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { useThemeStore, type Theme, type ColorScheme } from '@/stores/theme';
+import { Laptop, Moon, Sun } from '@lucide/vue';
+import type { Component } from 'vue';
 
 const themeStore = useThemeStore();
 
@@ -7,21 +9,21 @@ const selectTheme = (theme: Theme, event: MouseEvent) => {
   themeStore.setThemeWithAnimation(event, theme);
 };
 
-const themes: { value: Theme; label: string; icon: string }[] = [
+const themes: { value: Theme; label: string; icon: Component }[] = [
   {
     value: 'system',
     label: '系统',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+    icon: Laptop,
   },
   {
     value: 'light',
     label: '浅色',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/></svg>`,
+    icon: Sun,
   },
   {
     value: 'dark',
     label: '深色',
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
+    icon: Moon,
   },
 ];
 
@@ -127,8 +129,8 @@ const smallCardBase =
               : 'border-border bg-background hover:border-primary',
           ]"
         >
-          <span
-            v-html="theme.icon"
+          <component
+            :is="theme.icon"
             :class="
               themeStore.theme === theme.value
                 ? 'text-primary'
