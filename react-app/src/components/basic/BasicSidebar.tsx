@@ -236,7 +236,7 @@ export const BentoNavSidebar: React.FC = () => {
                 className="h-14 w-14 rounded-full object-cover shadow-[0_0_14px_rgba(0,0,0,0.8)] ring-4 ring-(--warm-gray)"
               />
               <div className="ml-4 flex items-baseline gap-2">
-                <span className="text-base-content font-serif text-2xl font-bold select-none">
+                <span className="text-base-content truncate font-serif text-2xl font-bold text-nowrap select-none">
                   {currentUserName}
                 </span>
                 <ChevronDown className="text-base-content/70 h-4 w-4" />

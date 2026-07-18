@@ -147,7 +147,10 @@ export function BentoHero() {
         animate="visible"
       >
         {/* 头像 + 问候 */}
-        <motion.div variants={heroItemVariants} className="flex items-center gap-5">
+        <motion.div
+          variants={heroItemVariants}
+          className="flex items-center gap-5"
+        >
           <div className="relative shrink-0">
             <div className="ring-primary-foreground/40 relative h-20 w-20 overflow-hidden rounded-full ring-4">
               <img
@@ -158,16 +161,6 @@ export function BentoHero() {
                 className="h-full w-full object-cover"
               />
             </div>
-            <div className="bg-primary-foreground/20 border-primary-foreground ring-primary absolute right-0 bottom-0 flex h-6 w-6 items-center justify-center rounded-full border-2 ring-2">
-              <svg
-                className="text-primary h-3 w-3"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
-              </svg>
-            </div>
-            <Link to="/about" className="absolute inset-0 rounded-full"></Link>
           </div>
 
           <div className="min-w-0 flex-1">
@@ -236,7 +229,7 @@ export function BentoHero() {
         {/* 装饰：日月图标 */}
         <motion.div
           variants={heroItemVariants}
-          className="absolute top-6 right-6 opacity-20"
+          className="absolute top-1/2 right-6 -translate-y-1/2 opacity-20"
         >
           {isEvening ? (
             <svg

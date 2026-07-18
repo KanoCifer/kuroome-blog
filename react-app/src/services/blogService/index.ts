@@ -17,6 +17,7 @@ export interface BlogListItem {
   cover?: string | null;
   tags: string[];
   is_pinned: boolean;
+  views?: number;
   created_at: string;
   updated_at: string;
 }
@@ -92,6 +93,7 @@ export const blogService = (): BlogService => {
         cover: post.cover,
         tags: post.tags || [],
         is_pinned: post.is_pinned || false,
+        views: post.views,
         created_at: post.created_at,
         updated_at: post.updated_at,
       }));
