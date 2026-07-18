@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 const ARTICLE_LIMIT = 20;
 
 export default function RssWorkspaceView() {
-  const notifier = useNotificationStore();
+  const push = useNotificationStore((s) => s.push);
   const service = useMemo(() => rssService(), []);
 
   const [subscriptions, setSubscriptions] = useState<SubscriptionItem[]>([]);
@@ -55,11 +55,11 @@ export default function RssWorkspaceView() {
     } catch (err) {
       const msg = err instanceof Error ? err.message : '加载订阅失败';
       setSubsError(msg);
-      notifier.error(msg);
+      void push(msg, 'error');
     } finally {
       setLoadingSubs(false);
     }
-  }, [notifier, service]);
+  }, [push, service]);
 
   const fetchArticles = useCallback(async () => {
     const feedUrl = selectedFeedUrlRef.current;
@@ -78,11 +78,11 @@ export default function RssWorkspaceView() {
     } catch (err) {
       const msg = err instanceof Error ? err.message : '加载文章失败';
       setArticlesError(msg);
-      notifier.error(msg);
+      void push(msg, 'error');
     } finally {
       setLoadingArticles(false);
     }
-  }, [notifier, service]);
+  }, [push, service]);
 
   useEffect(() => {
     void fetchSubscriptions();
