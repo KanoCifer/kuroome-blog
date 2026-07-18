@@ -1,11 +1,25 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
+import reactScan from '@react-scan/vite-plugin-react-scan';
+import { reactClickToComponent } from 'vite-plugin-react-click-to-component';
 import path from 'path';
 import { defineConfig } from 'vite';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  devtools: {
+    enabled: true,
+  },
+  plugins: [
+    react(),
+    tailwindcss(),
+    reactClickToComponent(),
+    reactScan({
+      enable: true,
+      autoDisplayNames: true,
+      scanOptions: {}, // React Scan specific options
+    }),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),

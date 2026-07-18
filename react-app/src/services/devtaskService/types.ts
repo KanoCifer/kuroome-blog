@@ -28,6 +28,13 @@ export interface DevTask {
   is_deleted: boolean;
   created_at: string;
   updated_at: string;
+  // Spec
+  acceptance_criteria?: string | null;
+  constraints?: string | null;
+  context_pointers?: string | null;
+  // Who / Dependencies
+  for_agent?: boolean;
+  blocked_by?: string[] | null;
   // Slug —— task-N，人类可读引用（后端操作标识，所有路由以 slug 定位任务）
   slug: string;
   // 任务角色：spec（可拆解为子任务）/ subtask（spec 拆解出的子任务）。空串 = spec。
@@ -71,6 +78,16 @@ export interface CreateDevTaskPayload {
   scope: DevTaskScope;
   status?: DevTaskStatus;
   due_date?: string | null;
+  // Spec
+  acceptance_criteria?: string | null;
+  constraints?: string | null;
+  context_pointers?: string | null;
+  // Who / Dependencies
+  for_agent?: boolean;
+  blocked_by?: string[] | null;
+  // 任务角色 / 结构归属
+  kind?: DevTaskKind;
+  parent_slug?: string | null;
 }
 
 export interface UpdateDevTaskPayload {
@@ -83,6 +100,20 @@ export interface UpdateDevTaskPayload {
   status?: DevTaskStatus;
   sort_order?: number;
   due_date?: string | null;
+  // Spec
+  acceptance_criteria?: string | null;
+  constraints?: string | null;
+  context_pointers?: string | null;
+  // Who / Dependencies
+  for_agent?: boolean;
+  blocked_by?: string[] | null;
+  // 任务角色 / 结构归属
   kind?: DevTaskKind;
   parent_slug?: string | null;
+}
+
+export interface McpTokenResult {
+  token: string;
+  expires_at: string;
+  days: number;
 }

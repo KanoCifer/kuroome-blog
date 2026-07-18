@@ -1,30 +1,47 @@
 import { BentoCard } from '@/components/bento/BentoCard';
-import { useTodoState, STATUS_LABELS } from '@/stores/todoState';
-import type { DevTaskStatus } from '@/services/devtaskService/types';
+import {
+  useTodoState,
+  STATUS_STYLES,
+  selectFrontier,
+} from '@/stores/todoState';
+import type { DevTask, DevTaskStatus } from '@/services/devtaskService/types';
 import { BookCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { SPRING } from '@/constants/springs';
+import { useEffect, useMemo } from 'react';
 
-function statusClass(status: DevTaskStatus): string {
-  const map: Record<DevTaskStatus, string> = {
-    '待评估': 'border-primary/20 bg-primary/5 text-primary',
-    '待排期': 'border-warning/20 bg-warning/5 text-warning',
-    '进行中': 'border-info/20 bg-info/5 text-info',
-    '已搁置': 'border-muted-foreground/20 bg-muted-foreground/5 text-muted-foreground',
-    '已完成': 'border-success/20 bg-success/5 text-success',
-  };
-  return map[status];
+function statusChipClasses(status: DevTaskStatus): string {
+  const s = STATUS_STYLES[status];
+  return `${s.bg} ${s.border} ${s.text}`;
+}
+
+function isOverdue(task: DevTask): boolean {
+  if (!task.due_date) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return new Date(task.due_date) < today;
 }
 
 export function BentoTodo() {
-  const todo = useTodoState();
-  const title = '开发任务';
-  const tasks = todo.tasks;
-  const doneCount = tasks.filter((t) => t.status === '已完成').length;
-  const progress = tasks.length > 0 ? (doneCount / tasks.length) * 100 : 0;
+  const tasks = useTodoState((s) => s.tasks);
+  const hydrateTasks = useTodoState((s) => s.hydrateTasks);
+  const cycleStatus = useTodoState((s) => s.cycleStatus);
 
-  const taskList = tasks.slice(0, 3).map((t) => (
+  // 挂载时取一次最新数据 — 确保首页快照不是空的
+  useEffect(() => {
+    hydrateTasks();
+  }, [hydrateTasks]);
+
+  const title = '开发任务';
+  const activeTasks = useMemo(() => tasks.filter((t) => !t.is_deleted), [tasks]);
+  const doneCount = activeTasks.filter((t) => t.status === '已完成').length;
+  const progress =
+    activeTasks.length > 0 ? (doneCount / activeTasks.length) * 100 : 0;
+
+  const frontier = useMemo(() => selectFrontier(tasks).slice(0, 3), [tasks]);
+
+  const taskList = frontier.map((t) => (
     <motion.div
       key={t.slug}
       layout
@@ -34,20 +51,35 @@ export function BentoTodo() {
       <motion.button
         whileTap={{ scale: 0.94 }}
         transition={SPRING.snappy}
-        className={`mt-0.5 shrink-0 cursor-pointer rounded border px-1.5 py-0.5 text-xs font-medium ${statusClass(t.status)}`}
-        onClick={() => todo.cycleStatus(t.slug)}
+        onClick={() => cycleStatus(t.slug)}
+        className={`mt-0.5 shrink-0 cursor-pointer rounded-md border px-2 py-0.5 text-[11px] font-medium transition-all duration-300 ease-out ${statusChipClasses(t.status)}`}
       >
-        {STATUS_LABELS[t.status]}
+        {t.status}
       </motion.button>
-      <span
-        className={`text-sm leading-tight transition-colors duration-200 select-none ${
-          t.status === '已完成'
-            ? 'text-muted-foreground line-through'
-            : 'text-foreground'
-        }`}
-      >
-        {t.title}
-      </span>
+
+      <div className="min-w-0 flex-1">
+        <span
+          className={`text-sm leading-tight transition-colors duration-200 select-none ${
+            t.status === '已完成'
+              ? 'text-muted-foreground line-through'
+              : 'text-foreground'
+          }`}
+        >
+          {t.title}
+        </span>
+
+        {t.due_date && (
+          <span
+            className={`ml-1.5 text-[10px] tabular-nums ${
+              isOverdue(t) && t.status !== '已完成'
+                ? 'text-destructive'
+                : 'text-muted-foreground'
+            }`}
+          >
+            {t.due_date}
+          </span>
+        )}
+      </div>
     </motion.div>
   ));
 
@@ -61,7 +93,7 @@ export function BentoTodo() {
           </h3>
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground text-xs font-medium tabular-nums">
-              {doneCount} / {tasks.length}
+              {doneCount} / {activeTasks.length}
             </span>
             <Link
               to="/todos"
@@ -102,7 +134,7 @@ export function BentoTodo() {
               {taskList}
             </AnimatePresence>
 
-            {tasks.length === 0 && (
+            {activeTasks.length === 0 && (
               <div className="flex h-full flex-col items-center justify-center py-6">
                 <p className="text-md text-muted-foreground flex flex-col items-center gap-2 font-medium tracking-wide">
                   <BookCheck className="size-12" />

@@ -1,9 +1,11 @@
 import devtaskRequest from './devtaskRequest.ts';
+import request from '@/api/request';
 import type {
   CreateDevTaskPayload,
   DevTask,
   DevTaskListResponse,
   ListDevTasksParams,
+  McpTokenResult,
   UpdateDevTaskPayload,
 } from './types';
 
@@ -14,6 +16,8 @@ export interface DevTaskService {
   update(id: string, payload: UpdateDevTaskPayload): Promise<void>;
   remove(id: string): Promise<void>;
   hardDelete(id: string): Promise<void>;
+  /** 签发 MCP 服务 Token — 走用户 JWT 的 request（非 service-token） */
+  issueMcpToken(days: number): Promise<McpTokenResult>;
 }
 
 const extractData = <T>(res: { data: { data: T } }): T => res.data.data;
@@ -54,5 +58,13 @@ export const devTaskService = (): DevTaskService => ({
 
   async hardDelete(id: string): Promise<void> {
     await devtaskRequest.delete(`v3/dev-tasks/${id}/permanent`);
+  },
+
+  async issueMcpToken(days: number): Promise<McpTokenResult> {
+    const res = await request.get<{ data: McpTokenResult }>(
+      'v3/dev-task/token',
+      { params: { days } },
+    );
+    return extractData(res);
   },
 });
