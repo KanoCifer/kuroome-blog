@@ -1,5 +1,8 @@
 import { computed, ref, watch } from 'vue';
 import { defineStore } from 'pinia';
+import Emerald from '@/assets/Emerald.svg';
+import IridescentCloud from '@/assets/Iridescent cloud.svg';
+import Lagoon from '@/assets/Lagoon.svg';
 
 export type BackgroundMode = 'fixed' | 'random';
 
@@ -8,18 +11,15 @@ export interface BackgroundOption {
   id: string;
   /** 显示名 */
   name: string;
-  /** 对应的 CSS 渐变类名 */
-  className: string;
+  /** SVG 图片 URL */
+  url: string;
 }
 
-/*
- * 背景渐变定义 —— 每项对应一个 .gradient-* CSS 类。
- * 渐变本身（含 ::after 纹理层）在 base.css 中定义，这里只保存元数据。
- */
+/** 背景图定义 —— 三个 SVG 背景图 */
 export const BACKGROUNDS: BackgroundOption[] = [
-  { id: 'saiun', name: 'Saiun', className: 'gradient-saiun' },
-  { id: 'hisui', name: 'Hisui', className: 'gradient-hisui' },
-  { id: 'sangoshou', name: 'Sangoshou', className: 'gradient-sangoshou' },
+  { id: 'emerald', name: 'Emerald', url: Emerald },
+  { id: 'iridescent', name: 'Iridescent Cloud', url: IridescentCloud },
+  { id: 'lagoon', name: 'Lagoon', url: Lagoon },
 ];
 
 export const useBackgroundStore = defineStore('background', () => {
@@ -43,10 +43,13 @@ export const useBackgroundStore = defineStore('background', () => {
     mode.value === 'random' ? randomIndex.value : fixedIndex.value,
   );
 
-  /** 当前生效的渐变类名 */
-  const backgroundClass = computed(
-    () => BACKGROUNDS[effectiveIndex.value].className,
-  );
+  /** 当前生效的背景图样式 */
+  const backgroundStyle = computed(() => ({
+    backgroundImage: `url(${BACKGROUNDS[effectiveIndex.value].url})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+  }));
 
   const selectFixed = (index: number) => {
     fixedIndex.value = index;
@@ -111,7 +114,7 @@ export const useBackgroundStore = defineStore('background', () => {
     fixedIndex,
     randomIndex,
     effectiveIndex,
-    backgroundClass,
+    backgroundStyle,
     selectFixed,
     randomize,
     reroll,

@@ -80,13 +80,11 @@
               'rounded-b-lg': index === store.backgrounds.length - 1,
             }"
           >
-            <div
-              :class="bg.className"
-              class="flex-shrink-0 overflow-hidden rounded-md"
-              :style="{
-                width: '40px',
-                height: '24px',
-              }"
+            <img
+              :src="bg.url"
+              :alt="bg.name"
+              class="flex-shrink-0 rounded-md object-cover"
+              style="width: 40px; height: 24px;"
             />
             <span class="flex-1 text-left">{{ bg.name }}</span>
             <svg

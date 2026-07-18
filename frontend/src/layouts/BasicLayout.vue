@@ -12,6 +12,7 @@ import { useBackgroundStore } from '@/stores/background';
 import { useThemeStore } from '@/stores/theme';
 import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import type { Filter } from '@lucide/vue';
 
 const bgStore = useBackgroundStore();
 const themeStore = useThemeStore();
@@ -55,9 +56,12 @@ watch(
       aria-hidden="true"
     >
       <div
-        :class="bgStore.backgroundClass"
+        :style="{
+          ...bgStore.backgroundStyle,
+          transform: `scale(${themeStore.bgScale})`,
+          animationPlayState: isEntryView ? 'running' : 'paused',
+        }"
         class="hero-gradient absolute inset-0 h-full w-full transform-gpu"
-        :style="{ transform: `scale(${themeStore.bgScale})` }"
       />
 
       <!-- 模糊 + 亮度蒙版层：用 backdrop-filter 作用在下方 img 上，避免 filter 在 img 自身上翻倍占用 GPU 纹理 -->
@@ -99,10 +103,10 @@ watch(
     <AnimatePresence>
       <BasicNav
         v-if="showBasicNav === true"
-        :animate="{ opacity: 1, y: 0, left: '50%' }"
-        :initial="{ opacity: 0, y: -40, left: '50%' }"
-        :exit="{ opacity: 0, y: -40 }"
-        :transition="{ type: 'spring', bounce: 0.3, duration: 0.5 }"
+        :animate="{ opacity: 1, y: 0, left: '50%', filter: 'blur(0px)' }"
+        :initial="{ opacity: 0, y: -40, left: '50%', filter: 'blur(2px)' }"
+        :exit="{ opacity: 0, y: -40, filter: 'blur(2px)' }"
+        :transition="{ type: 'spring', stiffness: 320, damping: 28 }"
         class="group fixed top-12 z-9999 -translate-x-1/2 -translate-y-1/2"
       />
     </AnimatePresence>

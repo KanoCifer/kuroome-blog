@@ -20,7 +20,7 @@ defineEmits<{
       class="border-border hover:border-primary relative overflow-hidden rounded-xl border-2 transition-all"
       :class="{ 'border-primary': selected === index }"
     >
-      <div :class="bg.className" class="h-24 w-full" />
+      <img :src="bg.url" :alt="bg.name" class="h-24 w-full object-cover" />
       <div
         v-if="selected === index"
         class="absolute inset-0 flex items-center justify-center bg-black/30"

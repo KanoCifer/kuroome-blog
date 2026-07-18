@@ -63,7 +63,7 @@ const delayStatus = computed(() => {
     >
       <span class="relative flex h-1.5 w-1.5">
         <span
-          class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
+          class="absolute inline-flex h-full w-full rounded-full opacity-75"
           :class="delayStatus.dotClass"
         />
         <span
@@ -77,7 +77,7 @@ const delayStatus = computed(() => {
       <span class="text-white/30">·</span>
       <span class="relative flex h-1.5 w-1.5">
         <span
-          class="bg-success absolute inline-flex h-full w-full animate-ping rounded-full opacity-60"
+          class="bg-success absolute inline-flex h-full w-full rounded-full opacity-60"
         />
         <span
           class="bg-success relative inline-flex h-1.5 w-1.5 rounded-full"
