@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useLottie } from 'lottie-react';
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { SPRING, EASE } from '@/constants/springs';
 
