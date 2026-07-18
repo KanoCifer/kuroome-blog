@@ -8,6 +8,7 @@ import { formatDate } from '@/utils/formatdate';
 import { useScroll } from '@vueuse/core';
 import DOMPurify from 'dompurify';
 import { motion } from 'motion-v';
+import { SPRING } from '@/constants/motionPresets';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -361,7 +362,7 @@ watch(
       v-if="percent > 0"
       :initial="{ opacity: 0, y: 20 }"
       :animate="{ opacity: 1, y: 0 }"
-      :transition="{ type: 'spring' }"
+      :transition="SPRING"
       class="bg-primary/15 text-foreground fixed right-4 bottom-4 w-2xs rounded-lg px-4 py-2 text-sm opacity-90 shadow-lg"
     >
       {{ percent }}% 阅读进度

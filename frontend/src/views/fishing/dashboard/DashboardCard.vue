@@ -16,6 +16,7 @@
  * Hero 专属的渐变描边/扫光是装饰层,父级 hover 触发,继续用 CSS :hover 串联。
  */
 import { motion } from 'motion-v';
+import { EASE } from '@/constants/motionPresets';
 import { computed } from 'vue';
 
 interface Props {
@@ -75,7 +76,7 @@ const whileHover = computed(() => {
   <component
     :is="motionMap[as]"
     :while-hover="whileHover"
-    :transition="{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }"
+    :transition="EASE"
     class="group fishing-card bg-background border-border relative flex h-full flex-col overflow-hidden rounded-3xl border shadow-sm"
     :class="[
       tone === 'hero' && 'border-border shadow-md',

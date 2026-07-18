@@ -40,13 +40,7 @@
         class="gallery-item"
         :initial="{ opacity: 0, y: 24 }"
         :animate="{ opacity: 1, y: 0 }"
-        :transition="{
-          duration: 0.5,
-          delay: Math.min(index * 0.03, 0.4),
-          type: 'spring',
-          stiffness: 220,
-          damping: 24,
-        }"
+        :transition="{ type: 'spring', stiffness: 220, damping: 24, duration: 0.5, delay: Math.min(index * 0.03, 0.4) }"
       >
         <PolaroidCard
           :image="image"

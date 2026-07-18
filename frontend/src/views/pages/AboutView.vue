@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, nextTick } from 'vue';
 import { motion } from 'motion-v';
+import { SPRING } from '@/constants/motionPresets';
 import { useTypewriter } from '@/composables/shared';
 
 const AboutIMG = '/images/about-thumb.webp';
@@ -65,7 +66,7 @@ onMounted(() => {
       <motion.div
         :initial="{ scale: 0, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
-        :transition="{ type: 'spring' }"
+        :transition="SPRING"
         class="avatar-wrapper relative"
       >
         <div class="avatar-glow"></div>

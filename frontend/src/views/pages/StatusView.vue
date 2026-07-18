@@ -10,6 +10,7 @@ import {
 import { useChartColors, withAlpha } from '@/composables/shared/useChartColors';
 import { computed, onMounted, onUnmounted, ref, watchEffect } from 'vue';
 import { motion } from 'motion-v';
+import { EASE_SLOW } from '@/constants/motionPresets';
 import VChart from 'vue-echarts';
 
 /* ── Stores ── */
@@ -296,7 +297,7 @@ onUnmounted(() => {
     <motion.div
       :initial="{ opacity: 0, y: 12 }"
       :animate="{ opacity: 1, y: 0 }"
-      :transition="{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }"
+      :transition="EASE_SLOW"
       class="w-full max-w-6xl space-y-5"
     >
       <!-- ── Masthead ── -->

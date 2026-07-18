@@ -6,7 +6,7 @@
       :initial="{ opacity: 0 }"
       :animate="{ opacity: 1 }"
       :exit="{ opacity: 0 }"
-      :transition="{ duration: 0.18 }"
+      :transition="FADE_FAST"
       class="bg-ink/35 fixed inset-0 z-[9998] backdrop-blur-[6px]"
       @click="$emit('close')"
     />
@@ -18,7 +18,7 @@
         :initial="{ x: '100%' }"
         :animate="{ x: 0 }"
         :exit="{ x: '100%' }"
-        :transition="{ type: 'spring', stiffness: 320, damping: 32, mass: 0.8 }"
+        :transition="SPRING_SNUG"
         class="bg-background border-border fixed top-0 right-0 z-[9999] flex h-full w-full max-w-[min(640px,52vw)] flex-col border-l shadow-[0_12px_32px_color-mix(in_oklch,var(--ink)_10%,transparent)] max-sm:max-w-full"
         role="dialog"
         aria-modal="true"
@@ -328,6 +328,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { AnimatePresence, motion } from 'motion-v';
+import { FADE_FAST, SPRING_SNUG } from '@/constants/motionPresets';
 import type { DevTask, DevTaskStatus } from '@/api/devtask';
 import { renderMarkdown } from '@/composables/shared';
 import TypeBadge from './TypeBadge.vue';

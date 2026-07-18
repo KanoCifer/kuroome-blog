@@ -6,7 +6,7 @@
         :initial="{ opacity: 0, scale: 0.95, y: -20 }"
         :animate="{ opacity: 1, scale: 1, y: 0 }"
         :exit="{ opacity: 0, scale: 0.95, y: -20 }"
-        :transition="{ type: 'spring' }"
+        :transition="SPRING"
         class="fixed inset-0 z-9999 flex items-center justify-center"
       >
         <!-- 背景遮罩 -->
@@ -70,6 +70,7 @@
 
 <script setup lang="ts">
 import { AnimatePresence, motion } from 'motion-v';
+import { SPRING } from '@/constants/motionPresets';
 const emit = defineEmits(['close', 'update:isMobileWarningVisible']);
 const props = defineProps<{
   isMobileWarningVisible: boolean;

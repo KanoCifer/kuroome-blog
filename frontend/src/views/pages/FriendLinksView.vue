@@ -156,14 +156,9 @@
             v-for="link in links"
             :key="link.id"
             :initial="{ opacity: 0, y: 10 }"
-            :whileInView="{ opacity: 1, y: 0 }"
-            :transition="{
-              type: 'spring',
-              duration: 1,
-              stiffness: 100,
-              damping: 20,
-            }"
-            :whileHover="{ y: -4 }"
+            :whileInView="WHILE_IN_VIEW_FADE_UP"
+            :transition="SPRING_REVEAL"
+            :whileHover="HOVER_LIFT"
             :href="link.url"
             target="_blank"
             rel="noopener noreferrer"
@@ -329,6 +324,7 @@ import websitesData from '@/data/websites.json';
 import { useNotificationStore } from '@/stores/notification';
 import type { Website } from '@/types';
 import { motion } from 'motion-v';
+import { SPRING_REVEAL, WHILE_IN_VIEW_FADE_UP, HOVER_LIFT } from '@/constants/motionPresets';
 import { onMounted, ref } from 'vue';
 import IconCopy from '@/components/icons/IconCopy.vue';
 import IconDocumentText from '@/components/icons/IconDocumentText.vue';

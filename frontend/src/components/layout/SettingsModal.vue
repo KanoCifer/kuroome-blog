@@ -18,7 +18,7 @@
         :initial="{ opacity: 0, x: 40 }"
         :animate="{ opacity: 1, x: 0 }"
         :exit="{ opacity: 0, x: 40 }"
-        :transition="SPRING"
+        :transition="SPRING_SNUG"
         class="fixed inset-0 z-9999 flex justify-end"
         @click.self="close"
       >
@@ -141,6 +141,7 @@
 
 <script setup lang="ts">
 import { AnimatePresence, motion } from 'motion-v';
+import { SPRING_SNUG } from '@/constants/motionPresets';
 import IconClose from '@/components/icons/IconClose.vue';
 import AppearanceTab from './AppearanceTab.vue';
 import BackgroundTab from './BackgroundTab.vue';
@@ -213,9 +214,8 @@ onUnmounted(() => resizeObserver?.disconnect());
 
 /*
  * 抽屉入场 spring — 与 project modal 定式（DESIGN.md）一致。
- * stiffness 320 + damping 32 + mass 0.8：快启、适中过冲、平滑止点。
+ * 从 motionPresets 导入 SPRING_SNUG。
  */
-const SPRING = { type: 'spring' as const, stiffness: 320, damping: 32, mass: 0.8 };
 
 /*
  * Drawer 面板阴影 — 三层向右 ambient + 顶部 inset 纸面反光。

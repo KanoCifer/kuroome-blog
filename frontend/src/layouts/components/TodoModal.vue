@@ -38,7 +38,7 @@
         :initial="{ opacity: 0, x: 40 }"
         :animate="{ opacity: 1, x: 0 }"
         :exit="{ opacity: 0, x: 40 }"
-        :transition="{ type: 'spring', stiffness: 320, damping: 32, mass: 0.8 }"
+        :transition="SPRING_SNUG"
         class="bg-background border-border/60 fixed top-1/2 right-20 z-9999 flex max-w-lg min-w-90 -translate-y-1/2 justify-end rounded-2xl border shadow-2xl max-sm:right-2 max-sm:min-w-0"
         @click.self="close"
       >
@@ -249,6 +249,7 @@
 
 <script setup lang="ts">
 import { AnimatePresence, motion } from 'motion-v';
+import { SPRING_SNUG } from '@/constants/motionPresets';
 import DrawerTaskCard from '@/views/todos/components/DrawerTaskCard.vue';
 import { useV3DevTaskStore } from '@/stores/v3devtasks';
 import type { DevTaskPriority, DevTaskType } from '@/api/devtask';

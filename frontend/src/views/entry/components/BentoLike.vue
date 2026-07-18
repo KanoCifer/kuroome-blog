@@ -2,7 +2,7 @@
   <motion.div
     :initial="{ scale: 0 }"
     :animate="{ scale: 1 }"
-    :whileHover="{ scale: 1.1 }"
+    :whileHover="HOVER_SCALE_UP"
     :whilePress="{ scale: 0.9 }"
     class="bg-background/55 ring-border/30 relative cursor-pointer rounded-full ring"
     @click="playAnimation"
@@ -21,6 +21,7 @@ import { useNotificationStore } from '@/stores/notification';
 import { AxiosError } from 'axios';
 import type { AnimationItem } from 'lottie-web';
 import { motion } from 'motion-v';
+import { HOVER_SCALE_UP } from '@/constants/motionPresets';
 import { onMounted, onUnmounted, ref } from 'vue';
 
 const notifier = useNotificationStore();

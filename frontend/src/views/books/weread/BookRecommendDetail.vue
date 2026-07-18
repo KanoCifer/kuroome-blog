@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { BookRecommendItem } from '@/api/weread';
 import { AnimatePresence, Motion } from 'motion-v';
+import { FADE, SPRING_BOUNCE } from '@/constants/motionPresets';
 import { onMounted, onUnmounted, watch } from 'vue';
 import { RECOMMEND_COVER_LAYOUT_ID_PREFIX } from './recommendLayoutId';
 
@@ -62,7 +63,7 @@ onUnmounted(() => {
         :initial="{ opacity: 0 }"
         :animate="{ opacity: 1 }"
         :exit="{ opacity: 0 }"
-        :transition="{ duration: 0.25 }"
+        :transition="FADE"
         class="fixed inset-0 z-[100] flex items-end justify-center overflow-y-auto bg-black/70 p-0 backdrop-blur-md sm:items-center sm:p-6"
         @click.self="emit('close')"
         role="dialog"
@@ -74,11 +75,7 @@ onUnmounted(() => {
           :initial="{ scale: 0.6, opacity: 0.6 }"
           :animate="{ scale: 1, opacity: 1 }"
           :exit="{ scale: 0.6, opacity: 0 }"
-          :transition="{
-            type: 'spring',
-            bounce: 0.1,
-            visualDuration: 0.5,
-          }"
+          :transition="SPRING_BOUNCE"
           class="bg-background border-border relative w-full max-w-3xl overflow-hidden rounded-t-3xl border shadow-2xl sm:rounded-3xl"
         >
           <div class="grid grid-cols-1 sm:grid-cols-[200px_1fr]">

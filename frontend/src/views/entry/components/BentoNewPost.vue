@@ -2,7 +2,7 @@
   <motion.div
     :initial="{ scale: 0 }"
     :animate="{ scale: 1 }"
-    :while-hover="{ scale: 1.1 }"
+    :while-hover="HOVER_SCALE_UP"
     :while-press="{ scale: 0.9 }"
     class="w-auto"
   >
@@ -29,6 +29,7 @@
 
 <script setup lang="ts">
 import { motion } from 'motion-v';
+import { HOVER_SCALE_UP } from '@/constants/motionPresets';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 

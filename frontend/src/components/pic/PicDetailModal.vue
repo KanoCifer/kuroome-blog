@@ -4,7 +4,7 @@
       v-if="image"
       :initial="{ opacity: 0, backdropFilter: 'blur(0px)' }"
       :animate="{ opacity: 1, backdropFilter: 'blur(8px)' }"
-      :transition="{ duration: 0.3 }"
+      :transition="FADE"
       class="fixed inset-0 bg-black/45"
     >
     </motion.div>
@@ -444,6 +444,7 @@
 
 <script setup lang="ts">
 import { motion } from 'motion-v';
+import { FADE } from '@/constants/motionPresets';
 import { computed, nextTick, ref, watch } from 'vue';
 import type { ExifInfo, Picture } from '@/composables/pic';
 

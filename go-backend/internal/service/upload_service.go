@@ -2,6 +2,8 @@
 //
 // Uploader 负责把客户端上传的表单文件落盘：
 //   - UploadFile：通用文件，保存到 uploads/{userID}/ 并返回相对路径。
+//   - UploadBlogImage：博客图片，校验类型后保存到 posts/{userID}/ 并返回相对路径。
+//   - UploadGalleryImage：图片墙图片，校验类型后保存到 gallery/{userID}/ 并返回相对路径。
 //   - UploadAvatar：图片校验 + 原图保存 + 256px 缩略图 + 回写 profile.photo。
 //
 // 与 Python 端的差异：缩略图输出为 JPEG（Go 零依赖，x/image/draw 缩放）；
@@ -42,6 +44,12 @@ type Uploader interface {
 	// UploadFile 保存通用文件，返回相对存储根的路径（如 uploads/1/xxx.png）。
 	UploadFile(ctx context.Context, userID uint, filename string, src io.Reader) (string, error)
 
+	// UploadBlogImage 保存博客文章图片，校验类型后保存到 posts/{userID}/ 并返回相对路径。
+	UploadBlogImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
+
+	// UploadGalleryImage 保存图片墙图片，校验类型后保存到 gallery/{userID}/ 并返回相对路径。
+	UploadGalleryImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
+
 	// UploadAvatar 保存头像图片，回写 profile.photo 后返回相对路径。
 	UploadAvatar(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
 }
@@ -71,6 +79,42 @@ func (s *uploadService) UploadFile(ctx context.Context, userID uint, filename st
 	ext := strings.ToLower(filepath.Ext(filename))
 	name := uuid.New().String() + ext
 	rel := filepath.Join("uploads", fmt.Sprint(userID), name)
+
+	full := filepath.Join(s.cfg.UploadDir, rel)
+	if err := writeFile(full, src, s.maxBytes()); err != nil {
+		return "", err
+	}
+	return rel, nil
+}
+
+// UploadBlogImage 校验图片类型后保存到 {UploadDir}/posts/{userID}/{uuid}{ext}。
+// 与 Python 端 save_upload_image 行为一致：校验 content-type + 大小限制，不缩略。
+func (s *uploadService) UploadBlogImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
+	if !slices.Contains(allowedImageTypes, contentType) {
+		return "", errs.ErrUnsupportedImageType
+	}
+
+	ext := strings.ToLower(filepath.Ext(filename))
+	name := uuid.New().String() + ext
+	rel := filepath.Join("posts", fmt.Sprint(userID), name)
+
+	full := filepath.Join(s.cfg.UploadDir, rel)
+	if err := writeFile(full, src, s.maxBytes()); err != nil {
+		return "", err
+	}
+	return rel, nil
+}
+
+// UploadGalleryImage 校验图片类型后保存到 {UploadDir}/gallery/{userID}/{uuid}{ext}。
+// 与 Python 端 save_upload_image 行为一致：校验 content-type + 大小限制，不缩略。
+func (s *uploadService) UploadGalleryImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
+	if !slices.Contains(allowedImageTypes, contentType) {
+		return "", errs.ErrUnsupportedImageType
+	}
+
+	ext := strings.ToLower(filepath.Ext(filename))
+	name := uuid.New().String() + ext
+	rel := filepath.Join("gallery", fmt.Sprint(userID), name)
 
 	full := filepath.Join(s.cfg.UploadDir, rel)
 	if err := writeFile(full, src, s.maxBytes()); err != nil {

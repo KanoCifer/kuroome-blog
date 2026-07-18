@@ -4,6 +4,7 @@ import { useArticleChat } from '@/composables/article';
 import { useArticleSummary } from '@/composables/article';
 import { useShimmerTips } from '@/composables/shared';
 import { AnimatePresence, motion } from 'motion-v';
+import { FADE } from '@/constants/motionPresets';
 import { computed, onMounted, ref, watch } from 'vue';
 import { renderMarkdown } from '@/composables/shared';
 
@@ -127,7 +128,7 @@ async function switchToChat() {
             :initial="{ opacity: 0, y: 6 }"
             :animate="{ opacity: 1, y: 0 }"
             :exit="{ opacity: 0, y: -6 }"
-            :transition="{ duration: 0.25 }"
+            :transition="FADE"
             class="text-muted-foreground text-sm"
           >
             {{ textShimmer[0] }}

@@ -2,6 +2,7 @@
 import { computed, watch } from 'vue';
 import { BookOpen, Eye, EyeOff, RefreshCw, X } from '@lucide/vue';
 import { AnimatePresence, motion } from 'motion-v';
+import { FADE_FAST, FADE, SPRING_SNUG, EASE_SLOW } from '@/constants/motionPresets';
 import type { WereadBookProgress, WereadUserBook } from '@/api/weread';
 import { useWereadBookProgress } from '../composables/useWereadBookProgress';
 import {
@@ -98,7 +99,7 @@ const coverGradient = computed(() =>
         :initial="{ opacity: 0 }"
         :animate="{ opacity: 1 }"
         :exit="{ opacity: 0 }"
-        :transition="{ duration: 0.2 }"
+        :transition="FADE_FAST"
         class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8"
       >
         <!-- 背景遮罩 + blur -->
@@ -106,7 +107,7 @@ const coverGradient = computed(() =>
           :initial="{ backdropFilter: 'blur(0px)' }"
           :animate="{ backdropFilter: 'blur(12px)' }"
           :exit="{ backdropFilter: 'blur(0px)' }"
-          :transition="{ duration: 0.25 }"
+          :transition="FADE"
           class="absolute inset-0 bg-black/45"
           @click="emit('close')"
         />
@@ -116,12 +117,7 @@ const coverGradient = computed(() =>
           :initial="{ scale: 0.94, y: 16, opacity: 0 }"
           :animate="{ scale: 1, y: 0, opacity: 1 }"
           :exit="{ scale: 0.97, y: 8, opacity: 0 }"
-          :transition="{
-            type: 'spring',
-            stiffness: 340,
-            damping: 32,
-            mass: 0.8,
-          }"
+          :transition="SPRING_SNUG"
           class="bg-background border-border/60 relative w-full max-w-4xl overflow-hidden rounded-3xl border shadow-2xl"
         >
           <!-- 关闭按钮 -->
@@ -216,11 +212,7 @@ const coverGradient = computed(() =>
                   <motion.div
                     :initial="{ width: '0%' }"
                     :animate="{ width: `${livePercent}%` }"
-                    :transition="{
-                      delay: 0.28,
-                      duration: 0.6,
-                      ease: [0.16, 1, 0.3, 1],
-                    }"
+                    :transition="{ ...EASE_SLOW, delay: 0.28, duration: 0.6 }"
                     class="bg-primary absolute inset-y-0 left-0 rounded-full"
                   />
                 </div>

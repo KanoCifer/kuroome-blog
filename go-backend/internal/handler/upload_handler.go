@@ -44,6 +44,68 @@ func NewUploadHandler(uploadSvc service.Uploader, avatarView avatarViewer) *Uplo
 	return &UploadHandler{uploadSvc: uploadSvc, avatarView: avatarView}
 }
 
+// UploadBlogImage POST /upload-image 和 POST /blog/upload-image —— 博客文章图片上传。
+// 校验图片类型后保存到 posts/{userID}/，返回公开访问 URL。需登录。
+// multipart form field: file。
+func (h *UploadHandler) UploadBlogImage(c *gin.Context) {
+	fileHeader, err := c.FormFile("file")
+	if err != nil {
+		response.APIError(c, "未收到上传图片", http.StatusBadRequest)
+		return
+	}
+
+	f, err := fileHeader.Open()
+	if err != nil {
+		response.APIError(c, "读取图片失败", http.StatusBadRequest)
+		return
+	}
+	defer f.Close()
+
+	userID := uint(c.GetInt("user_id"))
+	rel, err := h.uploadSvc.UploadBlogImage(c.Request.Context(), userID, fileHeader.Filename, fileHeader.Header.Get("Content-Type"), f)
+	if err != nil {
+		slog.ErrorContext(c.Request.Context(), "upload blog image", "error", err)
+		response.APIError(c, err.Error(), uploadStatus(err))
+		return
+	}
+
+	response.Success(c, gin.H{
+		"url":      "/v3/media/" + rel,
+		"filename": rel,
+	}, "图片上传成功")
+}
+
+// UploadGalleryImage POST /upload-gallery-image —— 图片墙上传。
+// 校验图片类型后保存到 gallery/{userID}/，返回公开访问 URL。需登录。
+// multipart form field: file。
+func (h *UploadHandler) UploadGalleryImage(c *gin.Context) {
+	fileHeader, err := c.FormFile("file")
+	if err != nil {
+		response.APIError(c, "未收到上传图片", http.StatusBadRequest)
+		return
+	}
+
+	f, err := fileHeader.Open()
+	if err != nil {
+		response.APIError(c, "读取图片失败", http.StatusBadRequest)
+		return
+	}
+	defer f.Close()
+
+	userID := uint(c.GetInt("user_id"))
+	rel, err := h.uploadSvc.UploadGalleryImage(c.Request.Context(), userID, fileHeader.Filename, fileHeader.Header.Get("Content-Type"), f)
+	if err != nil {
+		slog.ErrorContext(c.Request.Context(), "upload gallery image", "error", err)
+		response.APIError(c, err.Error(), uploadStatus(err))
+		return
+	}
+
+	response.Success(c, gin.H{
+		"url":      "/v3/media/" + rel,
+		"filename": rel,
+	}, "图片上传成功")
+}
+
 // Upload POST /upload —— 通用文件上传（任意类型），保存到 uploads/{userID}/。
 // multipart form field: file。
 func (h *UploadHandler) Upload(c *gin.Context) {
@@ -112,6 +174,9 @@ func (h *UploadHandler) UploadPic(c *gin.Context) {
 func (h *UploadHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFunc) {
 	r.POST("/upload", authMW, h.Upload)
 	r.PUT("/upload", authMW, h.Upload)
+	r.POST("/upload-image", authMW, h.UploadBlogImage)
+	r.POST("/blog/upload-image", authMW, h.UploadBlogImage)
+	r.POST("/upload-gallery-image", authMW, h.UploadGalleryImage)
 	r.POST("/upload-pic", authMW, h.UploadPic)
 	r.PUT("/upload-pic", authMW, h.UploadPic)
 }

@@ -2,14 +2,9 @@
   <BasicDetail title="推荐网站" subtitle="发现有趣的网站和工具">
     <motion.a
       :initial="{ opacity: 0, y: 10 }"
-      :whileInView="{ opacity: 1, y: 0 }"
-      :transition="{
-        type: 'spring',
-        duration: 1,
-        stiffness: 100,
-        damping: 20,
-      }"
-      :while-hover="{ y: -5 }"
+      :whileInView="WHILE_IN_VIEW_FADE_UP"
+      :transition="SPRING_REVEAL"
+      :while-hover="HOVER_LIFT"
       v-for="site in sites"
       :key="site.id"
       :href="site.url"
@@ -103,6 +98,7 @@ import type { Website } from '@/types';
 import { useImageError } from '@/composables/shared';
 import { onMounted, ref } from 'vue';
 import { motion } from 'motion-v';
+import { SPRING_REVEAL, WHILE_IN_VIEW_FADE_UP, HOVER_LIFT } from '@/constants/motionPresets';
 
 const sites = ref<Website[]>([]);
 

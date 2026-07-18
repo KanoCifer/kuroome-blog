@@ -6,13 +6,9 @@ from typing import TYPE_CHECKING
 from fastapi.staticfiles import StaticFiles
 
 from app.api.v1 import (
-    admin,
-    auth,
     blog,
     moments,
-    monitor,
     public,
-    publish,
     rss,
 )
 from app.api.v2 import (
@@ -21,7 +17,6 @@ from app.api.v2 import (
     friendlinks,
     llm,
     subscriptions,
-    system,
     weather,
 )
 from app.api.v2 import (
@@ -40,14 +35,14 @@ if TYPE_CHECKING:
 def register_router(app: FastAPI):
     # Include routers
     # v1 版本API
-    app.include_router(router=admin.router, prefix="/v1")
-    app.include_router(router=auth.router, prefix="/v1")
-    app.include_router(router=blog.router, prefix="/v1")
+    # app.include_router(router=admin.router, prefix="/v1")
+    # app.include_router(router=auth.router, prefix="/v1")
+    # app.include_router(router=blog.router, prefix="/v1")
     app.include_router(router=moments.router, prefix="/v1")
     app.include_router(router=public.router, prefix="/v1")
     app.include_router(router=rss.router, prefix="/v1")
-    app.include_router(router=monitor.router, prefix="/v1")
-    app.include_router(router=publish.router, prefix="/v1")
+    # app.include_router(router=monitor.router, prefix="/v1")
+    # app.include_router(router=publish.router, prefix="/v1")
 
     # v2 版本API
     app.include_router(router=subscriptions.router, prefix="/v2")
@@ -59,7 +54,7 @@ def register_router(app: FastAPI):
     app.include_router(router=friendlinks.router, prefix="/v2")
     app.include_router(router=devtasks_v2.router, prefix="/v2")
     app.include_router(router=weread_v2.router, prefix="/v2")
-    app.include_router(router=system.router, prefix="/v2")
+    # app.include_router(router=system.router, prefix="/v2")
 
 
 def setup_media(app: FastAPI) -> None:

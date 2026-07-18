@@ -22,7 +22,7 @@
       <Motion
         class="nav-indicator absolute top-0 left-0 z-0 h-[52px] w-full transform-gpu rounded-3xl will-change-transform"
         :animate="{ y: hoverNavIndex * 56 }"
-        :transition="{ visualDuration: 0.3, bounce: 0.15, type: 'spring' }"
+        :transition="SPRING_BOUNCE"
       />
 
       <ol class="flex flex-col gap-1">
@@ -65,6 +65,7 @@ import {
 import { useAuthStore } from '@/auth/stores/auth';
 import { Images, MessageCircleHeart, BookOpenText } from '@lucide/vue';
 import { Motion, type MotionProps } from 'motion-v';
+import { SPRING_BOUNCE } from '@/constants/motionPresets';
 import { onUnmounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import type { DropdownItem } from './UserDropdown.vue';

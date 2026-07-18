@@ -8,6 +8,7 @@ import BasicNav from '@/components/nav/BasicNav.vue';
 import TodoModal from '@/layouts/components/TodoModal.vue';
 import DynamicIsland from '@/layouts/components/DynamicIsland.vue';
 import { AnimatePresence } from 'motion-v';
+import { SPRING_BOUNCE } from '@/constants/motionPresets';
 import { useBackgroundStore } from '@/stores/background';
 import { useThemeStore } from '@/stores/theme';
 import { ref, watch } from 'vue';
@@ -106,7 +107,7 @@ watch(
         :animate="{ opacity: 1, y: 0, left: '50%', filter: 'blur(0px)' }"
         :initial="{ opacity: 0, y: -40, left: '50%', filter: 'blur(2px)' }"
         :exit="{ opacity: 0, y: -40, filter: 'blur(2px)' }"
-        :transition="{ type: 'spring', stiffness: 320, damping: 28 }"
+        :transition="SPRING_BOUNCE"
         class="group fixed top-12 z-9999 -translate-x-1/2 -translate-y-1/2"
       />
     </AnimatePresence>

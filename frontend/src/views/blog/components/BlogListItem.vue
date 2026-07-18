@@ -1,7 +1,7 @@
 <template>
   <motion.div
     :initial="{ opacity: 0, y: 20 }"
-    :whileInView="{ opacity: 1, y: 0 }"
+    :whileInView="WHILE_IN_VIEW_FADE_UP"
     :transition="{ type: 'spring', duration: 0.5 }"
   >
     <router-link
@@ -186,6 +186,7 @@
 import type { Post } from '@/types';
 import { formatDate } from '@/utils/formatdate';
 import { motion } from 'motion-v';
+import { WHILE_IN_VIEW_FADE_UP } from '@/constants/motionPresets';
 import { computed } from 'vue';
 import BlogCover from './BlogCover.vue';
 

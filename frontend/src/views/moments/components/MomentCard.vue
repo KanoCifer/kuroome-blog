@@ -1,7 +1,7 @@
 <template>
   <motion.article
     :initial="{ opacity: 0, y: 16 }"
-    :whileInView="{ opacity: 1, y: 0 }"
+    :whileInView="WHILE_IN_VIEW_FADE_UP"
     :viewport="{ once: true, margin: '-40px' }"
     :transition="{ type: 'spring', stiffness: 280, damping: 24 }"
     class="relative"
@@ -96,6 +96,7 @@ import IconDel from '@/components/icons/IconDel.vue';
 import PinIcon from '@/components/icons/PinIcon.vue';
 import type { Moment } from '@/types';
 import { motion } from 'motion-v';
+import { WHILE_IN_VIEW_FADE_UP } from '@/constants/motionPresets';
 import MomentMeta from './MomentMeta.vue';
 import MomentTagChip from './MomentTagChip.vue';
 

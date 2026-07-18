@@ -39,12 +39,22 @@ func mustPNG(t *testing.T) []byte {
 // ---------- mocks ----------
 
 type mockUpload struct {
-	fileFn   func(ctx context.Context, userID uint, filename string, src io.Reader) (string, error)
-	avatarFn func(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
+	fileFn    func(ctx context.Context, userID uint, filename string, src io.Reader) (string, error)
+	blogFn    func(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
+	galleryFn func(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
+	avatarFn  func(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
 }
 
 func (m *mockUpload) UploadFile(ctx context.Context, userID uint, filename string, src io.Reader) (string, error) {
 	return m.fileFn(ctx, userID, filename, src)
+}
+
+func (m *mockUpload) UploadBlogImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
+	return m.blogFn(ctx, userID, filename, contentType, src)
+}
+
+func (m *mockUpload) UploadGalleryImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
+	return m.galleryFn(ctx, userID, filename, contentType, src)
 }
 
 func (m *mockUpload) UploadAvatar(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {

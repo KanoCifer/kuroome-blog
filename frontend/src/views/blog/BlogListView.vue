@@ -275,7 +275,7 @@
               :initial="{ opacity: 0, y: 12 }"
               :animate="{ opacity: 1, y: 0 }"
               :exit="{ opacity: 0, y: -12 }"
-              :transition="{ duration: 0.25, ease: 'easeInOut' }"
+              :transition="EASE_INOUT"
               class="space-y-5"
             >
               <BlogListItem
@@ -427,6 +427,7 @@ import BentoCalendar from '@/views/entry/components/BentoCalendar.vue';
 import BentoProfileCard from '@/views/entry/components/BentoProfileCard.vue';
 import { useHead } from '@vueuse/head';
 import { AnimatePresence, motion } from 'motion-v';
+import { EASE_INOUT } from '@/constants/motionPresets';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import BentoCategory from './components/BentoCategory.vue';

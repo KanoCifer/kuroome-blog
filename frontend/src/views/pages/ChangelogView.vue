@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { motion } from 'motion-v';
+import { SPRING_REVEAL, WHILE_IN_VIEW_FADE_UP } from '@/constants/motionPresets';
 import { changelogGateway, type Changelog } from '@/api/public';
 
 const changelog = ref<Changelog[]>([]);
@@ -102,13 +103,8 @@ const getTypeClass = (type: string): string => {
         <div class="space-y-12">
           <motion.div
             :initial="{ opacity: 0, y: 40 }"
-            :whileInView="{ opacity: 1, y: 0 }"
-            :transition="{
-              type: 'spring',
-              duration: 1,
-              stiffness: 100,
-              damping: 20,
-            }"
+            :whileInView="WHILE_IN_VIEW_FADE_UP"
+            :transition="SPRING_REVEAL"
             v-for="(r, i) in changelog"
             :key="r.version"
             :class="[

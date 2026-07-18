@@ -2,6 +2,7 @@
 import { connectionDelay } from '@/plugins/visitorWs';
 import { useVisitorCountStore } from '@/stores/visitorCount';
 import { motion } from 'motion-v';
+import { SPRING_CRISP } from '@/constants/motionPresets';
 import { computed, onUnmounted, ref } from 'vue';
 
 const visitorCount = useVisitorCountStore();
@@ -41,7 +42,7 @@ const delayStatus = computed(() => {
       width: islandExpanded ? 220 : 160,
       borderRadius: islandExpanded ? 24 : 14,
     }"
-    :transition="{ type: 'spring', stiffness: 400, damping: 30, bounce: 0 }"
+    :transition="SPRING_CRISP"
     class="fixed bottom-6 left-1/2 z-40 -translate-x-1/2 cursor-pointer overflow-hidden bg-black text-white shadow-lg shadow-black/20"
     @click="islandExpanded = !islandExpanded"
     role="button"

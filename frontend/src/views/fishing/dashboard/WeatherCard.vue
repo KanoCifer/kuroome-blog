@@ -5,6 +5,7 @@ import DashboardCard from './DashboardCard.vue';
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
 import { motion } from 'motion-v';
+import { EASE } from '@/constants/motionPresets';
 
 defineProps<{
   location?: [number, number];
@@ -116,7 +117,7 @@ const forecastIconClass = (textDay: string): string => {
           <motion.span
             :initial="{ opacity: 0, y: 8 }"
             :animate="{ opacity: 1, y: 0 }"
-            :transition="{ duration: 0.48, ease: [0.22, 1, 0.36, 1], delay: 0 }"
+            :transition="{ ...EASE, delay: 0 }"
             class="text-foreground text-7xl leading-none font-bold tracking-tight tabular-nums"
           >
             {{ liveWeather.temp }}
@@ -124,11 +125,7 @@ const forecastIconClass = (textDay: string): string => {
           <motion.span
             :initial="{ opacity: 0, y: 8 }"
             :animate="{ opacity: 1, y: 0 }"
-            :transition="{
-              duration: 0.48,
-              ease: [0.22, 1, 0.36, 1],
-              delay: 0.06,
-            }"
+            :transition="{ ...EASE, delay: 0.06 }"
             class="text-foreground/60 text-2xl font-light"
           >
             °C
@@ -137,11 +134,7 @@ const forecastIconClass = (textDay: string): string => {
         <motion.p
           :initial="{ opacity: 0, y: 8 }"
           :animate="{ opacity: 1, y: 0 }"
-          :transition="{
-            duration: 0.48,
-            ease: [0.22, 1, 0.36, 1],
-            delay: 0.12,
-          }"
+          :transition="{ ...EASE, delay: 0.12 }"
           class="text-foreground mt-3 text-lg font-medium"
         >
           {{ liveWeather.text }}
@@ -152,7 +145,7 @@ const forecastIconClass = (textDay: string): string => {
       <motion.div
         :initial="{ opacity: 0, y: 8 }"
         :animate="{ opacity: 1, y: 0 }"
-        :transition="{ duration: 0.48, ease: [0.22, 1, 0.36, 1], delay: 0.18 }"
+        :transition="{ ...EASE, delay: 0.18 }"
         class="mx-1 flex items-stretch justify-around py-3"
       >
         <div class="flex flex-1 flex-col items-center">
@@ -201,11 +194,7 @@ const forecastIconClass = (textDay: string): string => {
             :key="day.fxDate"
             :initial="{ opacity: 0, y: 8 }"
             :animate="{ opacity: 1, y: 0 }"
-            :transition="{
-              duration: 0.48,
-              ease: [0.22, 1, 0.36, 1],
-              delay: 0.18 + i * 0.06,
-            }"
+            :transition="{ ...EASE, delay: 0.18 + i * 0.06 }"
             class="flex flex-col items-center py-2"
           >
             <span

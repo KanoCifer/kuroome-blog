@@ -7,7 +7,7 @@
         :initial="{ opacity: 0 }"
         :animate="{ opacity: 1 }"
         :exit="{ opacity: 0 }"
-        :transition="{ duration: 0.18 }"
+        :transition="FADE_FAST"
         class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8"
         @click.self="onMaskClick"
       >
@@ -22,12 +22,7 @@
           :initial="{ scale: 0.95, y: 12, opacity: 0 }"
           :animate="{ scale: 1, y: 0, opacity: 1 }"
           :exit="{ scale: 0.97, y: 6, opacity: 0 }"
-          :transition="{
-            type: 'spring',
-            stiffness: 340,
-            damping: 32,
-            mass: 0.8,
-          }"
+          :transition="SPRING_SNUG"
           :class="[
             'bg-background border-border/60 relative w-full overflow-hidden rounded-2xl border shadow-2xl',
             sizeClass,
@@ -44,6 +39,7 @@
 
 <script setup lang="ts">
 import { AnimatePresence, motion } from 'motion-v';
+import { FADE_FAST, SPRING_SNUG } from '@/constants/motionPresets';
 import { computed, onBeforeUnmount, watch } from 'vue';
 
 defineOptions({ name: 'UiModal' });
