@@ -1,4 +1,3 @@
-import { AnimatePresence, motion } from 'framer-motion';
 import { Moon, Monitor, Sun, X } from 'lucide-react';
 import {
   useThemeState,
@@ -7,8 +6,8 @@ import {
 } from '@/stores/themeState';
 import { useShallow } from 'zustand/shallow';
 import { playThemeTransition } from '@/utils/themeTransition';
-import { SPRING } from '@/constants/springs';
 import { useEffect } from 'react';
+import { BottomSheet } from './BottomSheet';
 
 /* ───────────────────────── static data ───────────────────────── */
 
@@ -61,146 +60,121 @@ export function SettingModal({
   }, [isOpen, onClose]);
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* 背景遮罩 */}
-          <motion.div
-            key="setting-overlay"
-            className="bg-ink/35 fixed inset-0 z-[9998] backdrop-blur-[6px]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
-            onClick={onClose}
-          />
-
-          {/* 底部抽屉 */}
-          <motion.aside
-            key="setting-sheet"
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={SPRING.modal}
-            className="bg-background fixed right-0 bottom-0 left-0 z-[9999] flex max-h-[88vh] flex-col rounded-t-3xl shadow-[0_-12px_32px_color-mix(in_oklch,var(--ink)_10%,transparent)]"
-            role="dialog"
-            aria-modal="true"
-            aria-label="偏好设置"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* 拖拽把手 + 标题 */}
-            <header className="shrink-0 px-5 pt-3 pb-4">
-              <div className="bg-muted mx-auto mb-4 h-1.5 w-10 rounded-full" />
-              <div className="flex items-center justify-between">
-                <h1 className="text-foreground font-serif text-lg font-semibold">偏好设置</h1>
-                <button
-                  onClick={onClose}
-                  className="text-muted-foreground hover:bg-muted hover:text-foreground flex h-9 w-9 items-center justify-center rounded-full transition-colors active:scale-[0.96]"
-                  aria-label="关闭"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-            </header>
-
-            {/* 内容区 — 单页滚动 */}
-            <div className="flex-1 overflow-y-auto px-5 pb-8">
-              <div className="space-y-8">
-                {/* 页面元素 */}
-                <section>
-                  <h2 className="text-foreground mb-3 font-serif text-base font-semibold">页面元素</h2>
-                  <button
-                    onClick={toggleFooter}
-                    className="border-border hover:border-primary bg-background flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-3 transition-colors"
-                  >
-                    <div className="text-left">
-                      <div className="text-foreground text-sm font-medium">显示页脚</div>
-                      <div className="text-muted-foreground mt-0.5 text-xs">Show footer on every page</div>
-                    </div>
-                    <div className={`h-6 w-11 shrink-0 rounded-full p-0.5 transition-colors ${showFooter ? 'bg-primary' : 'bg-muted'}`}>
-                      <div className={`bg-background h-5 w-5 rounded-full shadow-md transition-transform ${showFooter ? 'translate-x-5' : ''}`} />
-                    </div>
-                  </button>
-                </section>
-
-                {/* 主题模式 */}
-                <section>
-                  <h2 className="text-foreground mb-3 font-serif text-base font-semibold">主题模式</h2>
-                  <div className="grid grid-cols-3 gap-3">
-                    {THEMES.map(({ value, label, Icon }) => (
-                      <button
-                        key={value}
-                        onClick={(e) => { setTheme(value); playThemeTransition(e as unknown as MouseEvent, value); }}
-                        className={`flex flex-col items-center gap-2 rounded-xl border p-3 transition-colors ${
-                          theme === value ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-primary bg-background'
-                        }`}
-                      >
-                        <Icon className={`h-5 w-5 ${theme === value ? 'text-primary' : 'text-foreground'}`} />
-                        <span className={`text-xs ${theme === value ? 'font-semibold text-primary' : 'text-foreground'}`}>{label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </section>
-
-                {/* 字体 */}
-                <section>
-                  <h2 className="text-foreground mb-3 font-serif text-base font-semibold">字体</h2>
-                  <div className="grid grid-cols-2 gap-3">
-                    {[
-                      { value: 'default' as const, label: '默认字体', sub: 'PingFang SC' },
-                      { value: 'harmonyos' as const, label: 'HarmonyOS Sans', sub: '鸿蒙字体' },
-                    ].map(o => (
-                      <button
-                        key={o.value}
-                        onClick={() => setFont(o.value)}
-                        className={`flex flex-col items-center gap-1 rounded-xl border p-3 transition-colors ${
-                          font === o.value ? 'border-primary bg-primary/5 !shadow-sm' : 'border-border bg-background hover:border-primary'
-                        }`}
-                      >
-                        <span className={`text-sm font-semibold ${font === o.value ? 'text-primary' : 'text-foreground'}`}
-                          style={o.value === 'harmonyos' ? { fontFamily: 'Noto Sans SC, sans-serif', fontWeight: 500 } : undefined}>
-                          {o.label}
-                        </span>
-                        <span className="text-muted-foreground font-mono text-[10px]">{o.sub}</span>
-                      </button>
-                    ))}
-                  </div>
-                </section>
-
-                {/* 配色方案 */}
-                <section>
-                  <h2 className="text-foreground mb-3 font-serif text-base font-semibold">配色方案</h2>
-                  <div className="space-y-2">
-                    {COLOR_SCHEMES.map(s => (
-                      <button
-                        key={s.value}
-                        onClick={() => setScheme(s.value)}
-                        className={`flex w-full items-stretch overflow-hidden rounded-xl border transition-colors ${
-                          scheme === s.value ? 'border-primary bg-primary/5 !shadow-sm' : 'border-border bg-background hover:border-primary'
-                        }`}
-                      >
-                        <div className="flex w-[72px] flex-col">
-                          {s.colors.map((c, i) => <div key={i} className="flex-1" style={{ backgroundColor: c }} />)}
-                        </div>
-                        <div className="flex-1 px-4 py-3 text-left">
-                          <div className="text-foreground text-sm font-semibold">{s.label}</div>
-                          <div className="text-muted-foreground mt-0.5 text-[11px] italic">{s.desc}</div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </section>
-              </div>
-
-              {/* 品牌签名 */}
-              <footer className="mt-10 flex items-center justify-between font-mono text-[11px]">
-                <span className="text-muted-foreground font-sans">Settings · v4.7.0</span>
-                <span className="text-muted-foreground font-serif italic">ka·no·ci·fer</span>
-              </footer>
-            </div>
-          </motion.aside>
-        </>
+    <BottomSheet
+      open={isOpen}
+      onClose={onClose}
+      maxH="88vh"
+      lockScroll
+      renderHeader={() => (
+        <header className="shrink-0 px-5 pt-3 pb-4">
+          <div className="bg-muted mx-auto mb-4 h-1.5 w-10 rounded-full" />
+          <div className="flex items-center justify-between">
+            <h1 className="text-foreground font-serif text-lg font-semibold">偏好设置</h1>
+            <button
+              onClick={onClose}
+              className="text-muted-foreground hover:bg-muted hover:text-foreground flex h-9 w-9 items-center justify-center rounded-full transition-colors active:scale-[0.96]"
+              aria-label="关闭"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        </header>
       )}
-    </AnimatePresence>
+    >
+      <div className="px-5 pb-8">
+        <div className="space-y-8">
+          {/* 页面元素 */}
+          <section>
+            <h2 className="text-foreground mb-3 font-serif text-base font-semibold">页面元素</h2>
+            <button
+              onClick={toggleFooter}
+              className="border-border hover:border-primary bg-background flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-3 transition-colors"
+            >
+              <div className="text-left">
+                <div className="text-foreground text-sm font-medium">显示页脚</div>
+                <div className="text-muted-foreground mt-0.5 text-xs">Show footer on every page</div>
+              </div>
+              <div className={`h-6 w-11 shrink-0 rounded-full p-0.5 transition-colors ${showFooter ? 'bg-primary' : 'bg-muted'}`}>
+                <div className={`bg-background h-5 w-5 rounded-full shadow-md transition-transform ${showFooter ? 'translate-x-5' : ''}`} />
+              </div>
+            </button>
+          </section>
+
+          {/* 主题模式 */}
+          <section>
+            <h2 className="text-foreground mb-3 font-serif text-base font-semibold">主题模式</h2>
+            <div className="grid grid-cols-3 gap-3">
+              {THEMES.map(({ value, label, Icon }) => (
+                <button
+                  key={value}
+                  onClick={(e) => { setTheme(value); playThemeTransition(e as unknown as MouseEvent, value); }}
+                  className={`flex flex-col items-center gap-2 rounded-xl border p-3 transition-colors ${
+                    theme === value ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-primary bg-background'
+                  }`}
+                >
+                  <Icon className={`h-5 w-5 ${theme === value ? 'text-primary' : 'text-foreground'}`} />
+                  <span className={`text-xs ${theme === value ? 'font-semibold text-primary' : 'text-foreground'}`}>{label}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* 字体 */}
+          <section>
+            <h2 className="text-foreground mb-3 font-serif text-base font-semibold">字体</h2>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { value: 'default' as const, label: '默认字体', sub: 'PingFang SC' },
+                { value: 'harmonyos' as const, label: 'HarmonyOS Sans', sub: '鸿蒙字体' },
+              ].map(o => (
+                <button
+                  key={o.value}
+                  onClick={() => setFont(o.value)}
+                  className={`flex flex-col items-center gap-1 rounded-xl border p-3 transition-colors ${
+                    font === o.value ? 'border-primary bg-primary/5 !shadow-sm' : 'border-border bg-background hover:border-primary'
+                  }`}
+                >
+                  <span className={`text-sm font-semibold ${font === o.value ? 'text-primary' : 'text-foreground'}`}
+                    style={o.value === 'harmonyos' ? { fontFamily: 'Noto Sans SC, sans-serif', fontWeight: 500 } : undefined}>
+                    {o.label}
+                  </span>
+                  <span className="text-muted-foreground font-mono text-[10px]">{o.sub}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* 配色方案 */}
+          <section>
+            <h2 className="text-foreground mb-3 font-serif text-base font-semibold">配色方案</h2>
+            <div className="space-y-2">
+              {COLOR_SCHEMES.map(s => (
+                <button
+                  key={s.value}
+                  onClick={() => setScheme(s.value)}
+                  className={`flex w-full items-stretch overflow-hidden rounded-xl border transition-colors ${
+                    scheme === s.value ? 'border-primary bg-primary/5 !shadow-sm' : 'border-border bg-background hover:border-primary'
+                  }`}
+                >
+                  <div className="flex w-[72px] flex-col">
+                    {s.colors.map((c, i) => <div key={i} className="flex-1" style={{ backgroundColor: c }} />)}
+                  </div>
+                  <div className="flex-1 px-4 py-3 text-left">
+                    <div className="text-foreground text-sm font-semibold">{s.label}</div>
+                    <div className="text-muted-foreground mt-0.5 text-[11px] italic">{s.desc}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+        </div>
+
+        {/* 品牌签名 */}
+        <footer className="mt-10 flex items-center justify-between font-mono text-[11px]">
+          <span className="text-muted-foreground font-sans">Settings · v4.7.0</span>
+          <span className="text-muted-foreground font-serif italic">ka·no·ci·fer</span>
+        </footer>
+      </div>
+    </BottomSheet>
   );
 }

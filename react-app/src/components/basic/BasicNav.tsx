@@ -1,88 +1,42 @@
-import {
-  IconArticleFilled,
-  IconCategoryFilled,
-  IconFileRssFilled,
-  IconHomeFilled,
-  IconDeviceDesktop,
-} from '@tabler/icons-react';
-import { Newspaper, Rss } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { Fragment, useMemo, useState, useRef } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import {
+  BookOpen,
+  FileText,
+  Grid2x2,
+  Home,
+  Info,
+  LogIn,
+  LogOut,
+  MessageCircle,
+  Monitor,
+  MoreHorizontal,
+  Newspaper,
+  Palette,
+  Rss,
+  Settings,
+  UserPlus,
+} from 'lucide-react';
 import { useAuthStore } from '../../stores/authState';
 import { useThemeState } from '../../stores/themeState';
-import { AboutIcon } from './icon/AboutIcon';
-import { BookshelfIcon } from './icon/BookshelfIcon';
-import { HomeIcon } from './icon/HomeIcon';
-import { LoginIcon } from './icon/LoginIcon';
-import { LogoutIcon } from './icon/LogoutIcon';
-import { MessagesIcon } from './icon/MessagesIcon';
-import { MomentIcon } from './icon/MomentIcon';
-import { MoreIcon } from './icon/MoreIcon';
-import { RegisterIcon } from './icon/RegisterIcon';
-import { Settings } from './icon/Settings';
-import { ThemeIcon } from './icon/ThemeIcon';
 import { useNavVisibility } from './NavVisibilityContext';
-import { useClickOutside } from '@/hooks/useClickOutside';
+import { BottomSheet } from './BottomSheet';
 
 interface MenuItemProps {
   icon: React.ReactNode;
   label: string;
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  iconColor: string;
-  iconBg: string;
 }
 
 interface NavItemProps {
   icon: React.ReactNode;
   to: string;
-  isActive: boolean;
-  isMore?: boolean;
-  activeIcon?: React.ReactNode;
 }
 
-function NavItem({ icon, to, isActive, activeIcon }: NavItemProps) {
-  return (
-    <>
-      <div className="flex items-center justify-center">
-        <Link
-          to={to}
-          className={`flex h-14 w-16 items-center justify-center rounded-full transition duration-300 hover:scale-110 active:scale-[0.96] ${
-            isActive
-              ? 'bg-primary/10 text-primary'
-              : 'text-muted-foreground hover:text-primary'
-          }`}
-        >
-          {isActive && activeIcon ? activeIcon : icon}
-        </Link>
-      </div>
-    </>
-  );
-}
-
-function MenuItem({ icon, label, onClick, iconColor, iconBg }: MenuItemProps) {
-  return (
-    <motion.button
-      variants={{
-        hidden: { opacity: 0 },
-        visible: { opacity: 1, transition: { duration: 0.2 } },
-        exit: { opacity: 0, transition: { duration: 0.15 } },
-      }}
-      className="border-border/20 bg-background/40 flex items-center gap-2 rounded-xl border p-4 transition-transform active:scale-[0.96]"
-      onClick={(e) => onClick(e)}
-    >
-      <div
-        className={`flex h-12 w-12 items-center justify-center rounded-full ${iconBg}`}
-      >
-        <span className={iconColor}>{icon}</span>
-      </div>
-      <span className="text-xs font-bold">{label}</span>
-    </motion.button>
-  );
-}
-
-const DesktopIcon = IconDeviceDesktop;
+const ICON_SIZE = 'size-[22px]';
+const NAV_ITEM_WIDTH = 64; // px, matches NavItem link w-16
 
 function setCookie(name: string, value: string, days: number = 30) {
   const expires = new Date();
@@ -93,6 +47,36 @@ function setCookie(name: string, value: string, days: number = 30) {
 function switchToVue() {
   setCookie('device_force', 'vue', 30);
   window.location.href = 'https://kanocifer.chat';
+}
+
+function NavItem({ icon, to }: NavItemProps) {
+  return (
+    <div className="flex items-center justify-center">
+      <Link
+        to={to}
+        className="text-muted-foreground hover:text-primary flex h-14 w-16 items-center justify-center rounded-full transition duration-300 hover:scale-110 active:scale-[0.96]"
+      >
+        {icon}
+      </Link>
+    </div>
+  );
+}
+
+function MenuItem({ icon, label, onClick }: MenuItemProps) {
+  return (
+    <motion.button
+      variants={{
+        hidden: { opacity: 0 },
+        visible: { opacity: 1, transition: { duration: 0.2 } },
+        exit: { opacity: 0, transition: { duration: 0.15 } },
+      }}
+      className="border-border/20 bg-background/40 flex items-center gap-3 rounded-xl border p-4 transition-transform active:scale-[0.96]"
+      onClick={(e) => onClick(e)}
+    >
+      <span className="text-foreground shrink-0">{icon}</span>
+      <span className="text-foreground text-sm font-bold">{label}</span>
+    </motion.button>
+  );
 }
 
 export function BasicNav() {
@@ -122,143 +106,88 @@ export function BasicNav() {
     return !['/', '/blog', '/rss', '/moments'].includes(location.pathname);
   }, [location.pathname]);
 
-  const ref = useRef<HTMLDivElement>(null);
-  useClickOutside(ref, () => {
-    setShowMenu(false);
-  });
+  // 当前激活的导航索引（0-2 为主线，3 为「更多」）
+  const activeIndex = useMemo(() => {
+    if (showMenu) return 3;
+    if (location.pathname === '/') return 0;
+    if (location.pathname === '/blog') return 1;
+    if (location.pathname === '/rss') return 2;
+    return 3;
+  }, [location.pathname, showMenu]);
 
   return (
     <Fragment>
-      {/* Backdrop Overlay */}
-      {createPortal(
-        <AnimatePresence>
-          {showMenu && (
-            <motion.div
-              className="bg-foreground/30 fixed inset-0 isolate z-0 backdrop-blur-[2px]"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              onClick={() => setShowMenu(false)}
-            />
-          )}
-        </AnimatePresence>,
-        document.body,
-      )}
-
-      {/* More Menu Bottom Sheet */}
-      {createPortal(
-        <AnimatePresence>
-          {showMenu && (
-            <motion.div
-              key="more-menu"
-              className="scrollbar-hide bg-background/80 border-border/20 fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] left-1/2 isolate z-100 grid w-full max-w-[calc(100vw-4rem)] grid-cols-2 gap-2 overflow-hidden rounded-4xl border p-5 shadow-lg backdrop-blur-sm"
-              initial="hidden"
-              animate="visible"
-              ref={ref}
-              exit="exit"
-              variants={{
-                hidden: { opacity: 0, y: 24, x: '-50%' },
-                visible: {
-                  opacity: 1,
-                  y: 0,
-                  x: '-50%',
-                  transition: {
-                    duration: 0.28,
-                    ease: [0.2, 0, 0, 1],
-                    staggerChildren: 0.04,
-                    delayChildren: 0.05,
-                  },
-                },
-                exit: {
-                  opacity: 0,
-                  y: 16,
-                  x: '-50%',
-                  transition: { duration: 0.2, ease: 'easeIn' },
-                },
-              }}
-            >
-              <MenuItem
-                icon={<BookshelfIcon className="h-6 w-6" />}
-                label="Bookshelf"
-                onClick={() => handleNav('/bookshelf')}
-                iconColor="text-orange-500"
-                iconBg="bg-orange-100"
-              />
-              <MenuItem
-                icon={<MomentIcon className="h-6 w-6" />}
-                label="Moments"
-                onClick={() => handleNav('/moments')}
-                iconColor="text-amber-500"
-                iconBg="bg-amber-100"
-              />
-              <MenuItem
-                icon={<MessagesIcon className="h-6 w-6" />}
-                label="Messages"
-                onClick={() => handleNav('/messages')}
-                iconColor="text-emerald-500"
-                iconBg="bg-emerald-100"
-              />
-              <MenuItem
-                icon={<Settings className="h-6 w-6" />}
-                label="Settings"
-                onClick={() => handleNav('/settings')}
-                iconColor="text-primary"
-                iconBg="bg-primary/10"
-              />
-              <MenuItem
-                icon={<ThemeIcon className="h-6 w-6" />}
-                label="Theme"
-                onClick={(e) => toggleTheme(e)}
-                iconColor="text-primary"
-                iconBg="bg-muted"
-              />
-              <MenuItem
-                icon={<AboutIcon className="h-6 w-6" />}
-                label="About"
-                onClick={() => handleNav('/about')}
-                iconColor="text-warning"
-                iconBg="bg-warning/10"
-              />
-              {/* Auth section */}
-              {!auth.isAuthenticated ? (
-                <>
+      {/* More Menu — 底部抽屉 */}
+      <BottomSheet
+        open={showMenu}
+        onClose={() => setShowMenu(false)}
+        renderHeader={() => (
+          <div className="shrink-0 px-5 pt-3 pb-2">
+            <div className="bg-muted mx-auto h-1.5 w-10 rounded-full" />
+          </div>
+        )}
+      >
+        <div className="px-5 pb-8">
+          <div className="grid grid-cols-1 gap-2">
                   <MenuItem
-                    icon={<LoginIcon className="h-6 w-6" />}
-                    label="Login"
-                    onClick={() => handleNav('/login')}
-                    iconColor="text-success"
-                    iconBg="bg-success/10"
+                    icon={<BookOpen className="h-6 w-6" />}
+                    label="Bookshelf"
+                    onClick={() => handleNav('/bookshelf')}
                   />
                   <MenuItem
-                    icon={<RegisterIcon className="h-6 w-6" />}
-                    label="Register"
-                    onClick={() => handleNav('/register')}
-                    iconColor="text-primary"
-                    iconBg="bg-primary/10"
+                    icon={<FileText className="h-6 w-6" />}
+                    label="Moments"
+                    onClick={() => handleNav('/moments')}
                   />
-                </>
-              ) : (
-                <MenuItem
-                  icon={<LogoutIcon className="h-6 w-6" />}
-                  label="Logout"
-                  onClick={handleLogout}
-                  iconColor="text-destructive"
-                  iconBg="bg-destructive/10"
-                />
-              )}
-              <MenuItem
-                icon={<DesktopIcon className="h-6 w-6" />}
-                label="Desktop"
-                onClick={switchToVue}
-                iconColor="text-teal-500"
-                iconBg="bg-teal-100"
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>,
-        document.body,
-      )}
+                  <MenuItem
+                    icon={<MessageCircle className="h-6 w-6" />}
+                    label="Messages"
+                    onClick={() => handleNav('/messages')}
+                  />
+                  <MenuItem
+                    icon={<Settings className="h-6 w-6" />}
+                    label="Settings"
+                    onClick={() => handleNav('/settings')}
+                  />
+                  <MenuItem
+                    icon={<Palette className="h-6 w-6" />}
+                    label="Theme"
+                    onClick={(e) => toggleTheme(e)}
+                  />
+                  <MenuItem
+                    icon={<Info className="h-6 w-6" />}
+                    label="About"
+                    onClick={() => handleNav('/about')}
+                  />
+                  {/* Auth section */}
+                  {!auth.isAuthenticated ? (
+                    <>
+                      <MenuItem
+                        icon={<LogIn className="h-6 w-6" />}
+                        label="Login"
+                        onClick={() => handleNav('/login')}
+                      />
+                      <MenuItem
+                        icon={<UserPlus className="h-6 w-6" />}
+                        label="Register"
+                        onClick={() => handleNav('/register')}
+                      />
+                    </>
+                  ) : (
+                    <MenuItem
+                      icon={<LogOut className="h-6 w-6" />}
+                      label="Logout"
+                      onClick={handleLogout}
+                    />
+                  )}
+                  <MenuItem
+                    icon={<Monitor className="h-6 w-6" />}
+                    label="Desktop"
+                    onClick={switchToVue}
+                  />
+                </div>
+              </div>
+            </BottomSheet>
 
       {/* Bottom Navigation Bar */}
       {createPortal(
@@ -272,43 +201,31 @@ export function BasicNav() {
               exit={{ y: 80, opacity: 0 }}
               transition={{ type: 'spring', damping: 20, stiffness: 300 }}
             >
-              <NavItem
-                icon={<HomeIcon className="size-6" />}
-                activeIcon={<IconHomeFilled className="size-6" />}
-                to="/"
-                isActive={location.pathname === '/'}
+              {/* 滑动指示器 — 圆形 pills，跟随 activeIndex */}
+              <motion.span
+                className="bg-primary/10 absolute top-1/2 left-6 h-14 w-16 rounded-full"
+                animate={{ x: activeIndex * NAV_ITEM_WIDTH, y: '-50%' }}
+                transition={{ type: 'spring', stiffness: 350, damping: 30 }}
               />
 
-              {/* Blog */}
-              <NavItem
-                icon={<Newspaper className="size-6" />}
-                activeIcon={<IconArticleFilled className="size-6" />}
-                to="/blog"
-                isActive={location.pathname === '/blog'}
-              />
+              <NavItem icon={<Home className={ICON_SIZE} />} to="/" />
 
-              {/* RSS */}
-              <NavItem
-                icon={<Rss className="size-6" />}
-                activeIcon={<IconFileRssFilled className="size-6" />}
-                to="/rss"
-                isActive={location.pathname === '/rss'}
-              />
+              <NavItem icon={<Newspaper className={ICON_SIZE} />} to="/blog" />
+
+              <NavItem icon={<Rss className={ICON_SIZE} />} to="/rss" />
 
               {/* More */}
               <div className="flex items-center justify-center">
                 <button
                   onClick={() => setShowMenu((v) => !v)}
-                  className={`flex h-14 w-16 items-center justify-center rounded-full transition duration-200 hover:scale-110 active:scale-[0.96] ${
-                    showMenu || isMore
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-muted-foreground hover:text-primary'
-                  }`}
+                  className="text-muted-foreground hover:text-primary flex h-14 w-16 items-center justify-center rounded-full transition duration-200 hover:scale-110 active:scale-[0.96]"
+                  aria-label="更多导航"
+                  aria-expanded={showMenu}
                 >
                   {showMenu || isMore ? (
-                    <IconCategoryFilled className="size-6" />
+                    <Grid2x2 className={ICON_SIZE} />
                   ) : (
-                    <MoreIcon className="size-6" />
+                    <MoreHorizontal className={ICON_SIZE} />
                   )}
                 </button>
               </div>

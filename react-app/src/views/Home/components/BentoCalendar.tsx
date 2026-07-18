@@ -1,5 +1,5 @@
 import { BentoCard } from '@/components/bento/BentoCard';
-import { GlassSheet } from '@/components/home/GlassSheet';
+import { BottomSheet } from '@/components/basic/BottomSheet';
 import dayjs from 'dayjs';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
@@ -87,12 +87,13 @@ export function BentoCalendar() {
         </div>
       </BentoCard>
 
-      {/* 展开态 — 整月网格（GlassSheet 浮层） */}
-      <GlassSheet
+      {/* 展开态 — 整月网格（底部浮层） */}
+      <BottomSheet
         open={expanded}
         onClose={() => setExpanded(false)}
         title={`${monthLabel} ${yearLabel}`}
       >
+        <div className="px-5 pb-8">
         <div className="flex flex-col">
           {/* 表头 */}
           <div className="mb-2 grid grid-cols-7 text-center">
@@ -146,7 +147,8 @@ export function BentoCalendar() {
             })}
           </motion.div>
         </div>
-      </GlassSheet>
+        </div>
+      </BottomSheet>
     </>
   );
 }
