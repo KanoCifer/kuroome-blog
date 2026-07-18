@@ -8,7 +8,7 @@ import { defineConfig } from 'vite';
 // https://vite.dev/config/
 export default defineConfig({
   devtools: {
-    enabled: true,
+    enabled: false,
   },
   plugins: [
     react(),
