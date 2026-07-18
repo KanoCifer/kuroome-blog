@@ -7,19 +7,7 @@ import { defineConfig } from 'vite';
 
 // https://vite.dev/config/
 export default defineConfig({
-  devtools: {
-    enabled: false,
-  },
-  plugins: [
-    react(),
-    tailwindcss(),
-    reactClickToComponent(),
-    reactScan({
-      enable: true,
-      autoDisplayNames: true,
-      scanOptions: {}, // React Scan specific options
-    }),
-  ],
+  plugins: [react(), tailwindcss(), reactClickToComponent(), reactScan()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
