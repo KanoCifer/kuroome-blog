@@ -40,7 +40,7 @@ export function BentoTech() {
               key={tech}
               whileTap={{ scale: 0.95 }}
               transition={SPRING.snappy}
-              className="cursor-default rounded-full border border-border/60 bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground"
+              className="border-border/60 bg-muted text-muted-foreground cursor-default rounded-full border px-2.5 py-1 text-xs font-semibold"
             >
               {tech}
             </motion.span>

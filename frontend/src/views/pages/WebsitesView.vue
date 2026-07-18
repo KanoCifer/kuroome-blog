@@ -98,7 +98,11 @@ import type { Website } from '@/types';
 import { useImageError } from '@/composables/shared';
 import { onMounted, ref } from 'vue';
 import { motion } from 'motion-v';
-import { SPRING_REVEAL, WHILE_IN_VIEW_FADE_UP, HOVER_LIFT } from '@/constants/motionPresets';
+import {
+  SPRING_REVEAL,
+  WHILE_IN_VIEW_FADE_UP,
+  HOVER_LIFT,
+} from '@/constants/motionPresets';
 
 const sites = ref<Website[]>([]);
 

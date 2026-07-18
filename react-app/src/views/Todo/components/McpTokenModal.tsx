@@ -1,8 +1,5 @@
 import { useState } from 'react';
-import {
-  devTaskService,
-  type DevTaskService,
-} from '@/services/devtaskService';
+import { devTaskService, type DevTaskService } from '@/services/devtaskService';
 import { TodoModal } from './TodoModal';
 
 const DAY_OPTIONS = [
@@ -157,7 +154,8 @@ export function McpTokenModal({ open, onClose }: McpTokenModalProps) {
             <p
               className="text-destructive mt-3 rounded-lg border px-3 py-2 text-xs"
               style={{
-                borderColor: 'color-mix(in oklch, var(--destructive) 40%, transparent)',
+                borderColor:
+                  'color-mix(in oklch, var(--destructive) 40%, transparent)',
               }}
             >
               {error}

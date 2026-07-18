@@ -46,9 +46,7 @@
         {{ p }}
       </button>
 
-      <span
-        class="bg-border mx-1 hidden h-4 w-px sm:inline-block"
-      />
+      <span class="bg-border mx-1 hidden h-4 w-px sm:inline-block" />
 
       <template>
         <span
@@ -116,7 +114,7 @@
         class="bg-muted/40 border-border flex min-h-96 flex-col rounded-xl border p-3 transition-colors"
         :class="
           dragOverColumn === col.id
-            ? 'border-primary/60 bg-primary/5 ring-1 ring-primary/30'
+            ? 'border-primary/60 bg-primary/5 ring-primary/30 ring-1'
             : ''
         "
         @dragover.prevent="onDragOver(col.id)"

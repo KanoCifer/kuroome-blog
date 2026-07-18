@@ -59,7 +59,10 @@ export function BentoWeb() {
     // 速度传递 + 动量投影：快速轻扫或超过阈值 → 切换
     if (info.offset.x < -threshold || info.velocity.x < -velocityThreshold) {
       navigate(1); // 向左滑 → 下一个
-    } else if (info.offset.x > threshold || info.velocity.x > velocityThreshold) {
+    } else if (
+      info.offset.x > threshold ||
+      info.velocity.x > velocityThreshold
+    ) {
       navigate(-1); // 向右滑 → 上一个
     }
     // 否则弹簧回原位（offset.x 自动归零）

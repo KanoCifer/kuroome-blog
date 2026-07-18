@@ -17,10 +17,30 @@ const COLOR_SCHEMES: {
   colors: string[];
   desc: string;
 }[] = [
-  { value: 'paper', label: 'Paper · 纸', colors: ['#a87649', '#7a8e6b', '#5a6b7a'], desc: '落纸烟云 · 3 色' },
-  { value: 'sage', label: 'Sage', colors: ['#6e8d6e', '#a89968', '#7d8a9b'], desc: '清隽素雅 · 3 色' },
-  { value: 'mist', label: 'Mist', colors: ['#6c8aa4', '#7d9d8a', '#b09878'], desc: '烟岚氤氲 · 3 色' },
-  { value: 'blush', label: 'Blush', colors: ['#a87180', '##7d9080', '#8a7474'], desc: '桃夭未央 · 3 色' },
+  {
+    value: 'paper',
+    label: 'Paper · 纸',
+    colors: ['#a87649', '#7a8e6b', '#5a6b7a'],
+    desc: '落纸烟云 · 3 色',
+  },
+  {
+    value: 'sage',
+    label: 'Sage',
+    colors: ['#6e8d6e', '#a89968', '#7d8a9b'],
+    desc: '清隽素雅 · 3 色',
+  },
+  {
+    value: 'mist',
+    label: 'Mist',
+    colors: ['#6c8aa4', '#7d9d8a', '#b09878'],
+    desc: '烟岚氤氲 · 3 色',
+  },
+  {
+    value: 'blush',
+    label: 'Blush',
+    colors: ['#a87180', '##7d9080', '#8a7474'],
+    desc: '桃夭未央 · 3 色',
+  },
 ];
 
 const THEMES: { value: Theme; label: string; Icon: typeof Sun }[] = [
@@ -39,19 +59,35 @@ export function SettingModal({
   onClose: () => void;
 }) {
   const {
-    theme, font, scheme, showFooter,
-    setTheme, setFont, setScheme, toggleFooter,
-  } = useThemeState(useShallow(s => ({
-    theme: s.theme, font: s.font, scheme: s.scheme, showFooter: s.showFooter,
-    setTheme: s.setTheme, setFont: s.setFont, setScheme: s.setScheme, toggleFooter: s.toggleFooter,
-  })));
+    theme,
+    font,
+    scheme,
+    showFooter,
+    setTheme,
+    setFont,
+    setScheme,
+    toggleFooter,
+  } = useThemeState(
+    useShallow((s) => ({
+      theme: s.theme,
+      font: s.font,
+      scheme: s.scheme,
+      showFooter: s.showFooter,
+      setTheme: s.setTheme,
+      setFont: s.setFont,
+      setScheme: s.setScheme,
+      toggleFooter: s.toggleFooter,
+    })),
+  );
 
   // 锁滚动
   useEffect(() => {
     if (!isOpen) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
     window.addEventListener('keydown', onKey);
     return () => {
       document.body.style.overflow = prev;
@@ -69,7 +105,9 @@ export function SettingModal({
         <header className="shrink-0 px-5 pt-3 pb-4">
           <div className="bg-muted mx-auto mb-4 h-1.5 w-10 rounded-full" />
           <div className="flex items-center justify-between">
-            <h1 className="text-foreground font-serif text-lg font-semibold">偏好设置</h1>
+            <h1 className="text-foreground font-serif text-lg font-semibold">
+              偏好设置
+            </h1>
             <button
               onClick={onClose}
               className="text-muted-foreground hover:bg-muted hover:text-foreground flex h-9 w-9 items-center justify-center rounded-full transition-colors active:scale-[0.96]"
@@ -85,35 +123,58 @@ export function SettingModal({
         <div className="space-y-8">
           {/* 页面元素 */}
           <section>
-            <h2 className="text-foreground mb-3 font-serif text-base font-semibold">页面元素</h2>
+            <h2 className="text-foreground mb-3 font-serif text-base font-semibold">
+              页面元素
+            </h2>
             <button
               onClick={toggleFooter}
               className="border-border hover:border-primary bg-background flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-3 transition-colors"
             >
               <div className="text-left">
-                <div className="text-foreground text-sm font-medium">显示页脚</div>
-                <div className="text-muted-foreground mt-0.5 text-xs">Show footer on every page</div>
+                <div className="text-foreground text-sm font-medium">
+                  显示页脚
+                </div>
+                <div className="text-muted-foreground mt-0.5 text-xs">
+                  Show footer on every page
+                </div>
               </div>
-              <div className={`h-6 w-11 shrink-0 rounded-full p-0.5 transition-colors ${showFooter ? 'bg-primary' : 'bg-muted'}`}>
-                <div className={`bg-background h-5 w-5 rounded-full shadow-md transition-transform ${showFooter ? 'translate-x-5' : ''}`} />
+              <div
+                className={`h-6 w-11 shrink-0 rounded-full p-0.5 transition-colors ${showFooter ? 'bg-primary' : 'bg-muted'}`}
+              >
+                <div
+                  className={`bg-background h-5 w-5 rounded-full shadow-md transition-transform ${showFooter ? 'translate-x-5' : ''}`}
+                />
               </div>
             </button>
           </section>
 
           {/* 主题模式 */}
           <section>
-            <h2 className="text-foreground mb-3 font-serif text-base font-semibold">主题模式</h2>
+            <h2 className="text-foreground mb-3 font-serif text-base font-semibold">
+              主题模式
+            </h2>
             <div className="grid grid-cols-3 gap-3">
               {THEMES.map(({ value, label, Icon }) => (
                 <button
                   key={value}
-                  onClick={(e) => { setTheme(value); playThemeTransition(e as unknown as MouseEvent, value); }}
+                  onClick={(e) => {
+                    setTheme(value);
+                    playThemeTransition(e as unknown as MouseEvent, value);
+                  }}
                   className={`flex flex-col items-center gap-2 rounded-xl border p-3 transition-colors ${
-                    theme === value ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-primary bg-background'
+                    theme === value
+                      ? 'border-primary bg-primary/5 shadow-sm'
+                      : 'border-border hover:border-primary bg-background'
                   }`}
                 >
-                  <Icon className={`h-5 w-5 ${theme === value ? 'text-primary' : 'text-foreground'}`} />
-                  <span className={`text-xs ${theme === value ? 'font-semibold text-primary' : 'text-foreground'}`}>{label}</span>
+                  <Icon
+                    className={`h-5 w-5 ${theme === value ? 'text-primary' : 'text-foreground'}`}
+                  />
+                  <span
+                    className={`text-xs ${theme === value ? 'text-primary font-semibold' : 'text-foreground'}`}
+                  >
+                    {label}
+                  </span>
                 </button>
               ))}
             </div>
@@ -121,24 +182,47 @@ export function SettingModal({
 
           {/* 字体 */}
           <section>
-            <h2 className="text-foreground mb-3 font-serif text-base font-semibold">字体</h2>
+            <h2 className="text-foreground mb-3 font-serif text-base font-semibold">
+              字体
+            </h2>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { value: 'default' as const, label: '默认字体', sub: 'PingFang SC' },
-                { value: 'harmonyos' as const, label: 'HarmonyOS Sans', sub: '鸿蒙字体' },
-              ].map(o => (
+                {
+                  value: 'default' as const,
+                  label: '默认字体',
+                  sub: 'PingFang SC',
+                },
+                {
+                  value: 'harmonyos' as const,
+                  label: 'HarmonyOS Sans',
+                  sub: '鸿蒙字体',
+                },
+              ].map((o) => (
                 <button
                   key={o.value}
                   onClick={() => setFont(o.value)}
                   className={`flex flex-col items-center gap-1 rounded-xl border p-3 transition-colors ${
-                    font === o.value ? 'border-primary bg-primary/5 !shadow-sm' : 'border-border bg-background hover:border-primary'
+                    font === o.value
+                      ? 'border-primary bg-primary/5 !shadow-sm'
+                      : 'border-border bg-background hover:border-primary'
                   }`}
                 >
-                  <span className={`text-sm font-semibold ${font === o.value ? 'text-primary' : 'text-foreground'}`}
-                    style={o.value === 'harmonyos' ? { fontFamily: 'Noto Sans SC, sans-serif', fontWeight: 500 } : undefined}>
+                  <span
+                    className={`text-sm font-semibold ${font === o.value ? 'text-primary' : 'text-foreground'}`}
+                    style={
+                      o.value === 'harmonyos'
+                        ? {
+                            fontFamily: 'Noto Sans SC, sans-serif',
+                            fontWeight: 500,
+                          }
+                        : undefined
+                    }
+                  >
                     {o.label}
                   </span>
-                  <span className="text-muted-foreground font-mono text-[10px]">{o.sub}</span>
+                  <span className="text-muted-foreground font-mono text-[10px]">
+                    {o.sub}
+                  </span>
                 </button>
               ))}
             </div>
@@ -146,22 +230,36 @@ export function SettingModal({
 
           {/* 配色方案 */}
           <section>
-            <h2 className="text-foreground mb-3 font-serif text-base font-semibold">配色方案</h2>
+            <h2 className="text-foreground mb-3 font-serif text-base font-semibold">
+              配色方案
+            </h2>
             <div className="space-y-2">
-              {COLOR_SCHEMES.map(s => (
+              {COLOR_SCHEMES.map((s) => (
                 <button
                   key={s.value}
                   onClick={() => setScheme(s.value)}
                   className={`flex w-full items-stretch overflow-hidden rounded-xl border transition-colors ${
-                    scheme === s.value ? 'border-primary bg-primary/5 !shadow-sm' : 'border-border bg-background hover:border-primary'
+                    scheme === s.value
+                      ? 'border-primary bg-primary/5 !shadow-sm'
+                      : 'border-border bg-background hover:border-primary'
                   }`}
                 >
                   <div className="flex w-[72px] flex-col">
-                    {s.colors.map((c, i) => <div key={i} className="flex-1" style={{ backgroundColor: c }} />)}
+                    {s.colors.map((c, i) => (
+                      <div
+                        key={i}
+                        className="flex-1"
+                        style={{ backgroundColor: c }}
+                      />
+                    ))}
                   </div>
                   <div className="flex-1 px-4 py-3 text-left">
-                    <div className="text-foreground text-sm font-semibold">{s.label}</div>
-                    <div className="text-muted-foreground mt-0.5 text-[11px] italic">{s.desc}</div>
+                    <div className="text-foreground text-sm font-semibold">
+                      {s.label}
+                    </div>
+                    <div className="text-muted-foreground mt-0.5 text-[11px] italic">
+                      {s.desc}
+                    </div>
                   </div>
                 </button>
               ))}
@@ -171,8 +269,12 @@ export function SettingModal({
 
         {/* 品牌签名 */}
         <footer className="mt-10 flex items-center justify-between font-mono text-[11px]">
-          <span className="text-muted-foreground font-sans">Settings · v4.7.0</span>
-          <span className="text-muted-foreground font-serif italic">ka·no·ci·fer</span>
+          <span className="text-muted-foreground font-sans">
+            Settings · v4.7.0
+          </span>
+          <span className="text-muted-foreground font-serif italic">
+            ka·no·ci·fer
+          </span>
         </footer>
       </div>
     </BottomSheet>

@@ -82,9 +82,7 @@
         <span class="max-sm:hidden">
           <PriorityBadge :priority="task.priority" />
         </span>
-        <span
-          class="text-muted-foreground truncate text-sm max-sm:hidden"
-        >
+        <span class="text-muted-foreground truncate text-sm max-sm:hidden">
           {{ task.scope || '—' }}
         </span>
         <span class="max-sm:hidden">

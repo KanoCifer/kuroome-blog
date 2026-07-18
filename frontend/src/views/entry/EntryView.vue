@@ -11,8 +11,11 @@
     />
     <!-- Greeting 弹窗 -->
     <GreetingToast />
-    <DragWrapper :position="navCardPosition" card-name="BentoNavCard"
-      :wiggle-delay="WIGGLE_DELAY.BentoNavCard">
+    <DragWrapper
+      :position="navCardPosition"
+      card-name="BentoNavCard"
+      :wiggle-delay="WIGGLE_DELAY.BentoNavCard"
+    >
       <BentoNavCard
         :initial="{ scale: 0.5, opacity: 0 }"
         :animate="{ scale: 1, opacity: 1 }"
@@ -23,8 +26,11 @@
       />
     </DragWrapper>
     <!-- 钓点卡片 -->
-    <DragWrapper :position="greetingPosition" card-name="BentoMap"
-      :wiggle-delay="WIGGLE_DELAY.BentoMap">
+    <DragWrapper
+      :position="greetingPosition"
+      card-name="BentoMap"
+      :wiggle-delay="WIGGLE_DELAY.BentoMap"
+    >
       <BentoMap
         v-if="show.BentoMap"
         :transition="{
@@ -33,8 +39,11 @@
         class="h-auto w-2xs min-w-fit"
       />
     </DragWrapper>
-    <DragWrapper :position="profilePosition" card-name="BentoProfileCard"
-      :wiggle-delay="WIGGLE_DELAY.BentoProfileCard">
+    <DragWrapper
+      :position="profilePosition"
+      card-name="BentoProfileCard"
+      :wiggle-delay="WIGGLE_DELAY.BentoProfileCard"
+    >
       <BentoProfileCard
         v-if="show.BentoProfileCard"
         :transition="{
@@ -51,8 +60,11 @@
       class="absolute w-auto -translate-x-1/2 -translate-y-1/2 p-0!"
       :style="[websitesPosition]"
     /> -->
-    <DragWrapper :position="clockCardPosition" card-name="BentoClock"
-      :wiggle-delay="WIGGLE_DELAY.BentoClock">
+    <DragWrapper
+      :position="clockCardPosition"
+      card-name="BentoClock"
+      :wiggle-delay="WIGGLE_DELAY.BentoClock"
+    >
       <BentoClock
         v-if="show.BentoClock"
         :transition="{
@@ -61,8 +73,11 @@
         class="w-auto"
       />
     </DragWrapper>
-    <DragWrapper :position="calendarPosition" card-name="BentoCalendar"
-      :wiggle-delay="WIGGLE_DELAY.BentoCalendar">
+    <DragWrapper
+      :position="calendarPosition"
+      card-name="BentoCalendar"
+      :wiggle-delay="WIGGLE_DELAY.BentoCalendar"
+    >
       <BentoCalendar
         v-if="show.BentoCalendar"
         :transition="{
@@ -71,8 +86,11 @@
         class="w-auto"
       />
     </DragWrapper>
-    <DragWrapper :position="techPosition" card-name="BentoTech"
-      :wiggle-delay="WIGGLE_DELAY.BentoTech">
+    <DragWrapper
+      :position="techPosition"
+      card-name="BentoTech"
+      :wiggle-delay="WIGGLE_DELAY.BentoTech"
+    >
       <BentoTech
         v-if="show.BentoTech"
         :transition="{
@@ -82,8 +100,11 @@
       />
     </DragWrapper>
 
-    <DragWrapper :position="listCardPosition" card-name="BentoReadingList"
-      :wiggle-delay="WIGGLE_DELAY.BentoReadingList">
+    <DragWrapper
+      :position="listCardPosition"
+      card-name="BentoReadingList"
+      :wiggle-delay="WIGGLE_DELAY.BentoReadingList"
+    >
       <BentoReadingList
         v-if="show.BentoReadingList"
         :transition="{
@@ -93,8 +114,11 @@
       />
     </DragWrapper>
 
-    <DragWrapper :position="todoCardPosition" card-name="TodoCard"
-      :wiggle-delay="WIGGLE_DELAY.TodoCard">
+    <DragWrapper
+      :position="todoCardPosition"
+      card-name="TodoCard"
+      :wiggle-delay="WIGGLE_DELAY.TodoCard"
+    >
       <TodoCard
         v-if="show.TodoCard"
         :transition="{
@@ -105,8 +129,11 @@
     </DragWrapper>
     <!-- <BentoCat v-if="show.BentoCat" :style="[catPosition]" class="absolute w-2xs -translate-x-1/2 -translate-y-1/2" /> -->
 
-    <DragWrapper :position="picPosition" card-name="BentoPic"
-      :wiggle-delay="WIGGLE_DELAY.BentoPic">
+    <DragWrapper
+      :position="picPosition"
+      card-name="BentoPic"
+      :wiggle-delay="WIGGLE_DELAY.BentoPic"
+    >
       <!-- 新增照片卡片的拖拽容器 -->
       <BentoPic
         v-if="show.BentoPic"

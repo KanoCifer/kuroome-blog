@@ -34,7 +34,10 @@ export function BentoTodo() {
   }, [hydrateTasks]);
 
   const title = '开发任务';
-  const activeTasks = useMemo(() => tasks.filter((t) => !t.is_deleted), [tasks]);
+  const activeTasks = useMemo(
+    () => tasks.filter((t) => !t.is_deleted),
+    [tasks],
+  );
   const doneCount = activeTasks.filter((t) => t.status === '已完成').length;
   const progress =
     activeTasks.length > 0 ? (doneCount / activeTasks.length) * 100 : 0;
@@ -130,9 +133,7 @@ export function BentoTodo() {
         {/* 任务列表 */}
         <div className="contents">
           <div className="no-scrollbar mx-3 flex-1 overflow-y-auto">
-            <AnimatePresence mode="popLayout">
-              {taskList}
-            </AnimatePresence>
+            <AnimatePresence mode="popLayout">{taskList}</AnimatePresence>
 
             {activeTasks.length === 0 && (
               <div className="flex h-full flex-col items-center justify-center py-6">

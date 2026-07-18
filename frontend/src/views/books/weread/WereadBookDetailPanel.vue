@@ -2,7 +2,12 @@
 import { computed, watch } from 'vue';
 import { BookOpen, Eye, EyeOff, RefreshCw, X } from '@lucide/vue';
 import { AnimatePresence, motion } from 'motion-v';
-import { FADE_FAST, FADE, SPRING_SNUG, EASE_SLOW } from '@/constants/motionPresets';
+import {
+  FADE_FAST,
+  FADE,
+  SPRING_SNUG,
+  EASE_SLOW,
+} from '@/constants/motionPresets';
 import type { WereadBookProgress, WereadUserBook } from '@/api/weread';
 import { useWereadBookProgress } from '../composables/useWereadBookProgress';
 import {

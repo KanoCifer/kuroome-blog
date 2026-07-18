@@ -79,7 +79,12 @@ export function TaskDetailPanel({
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
-          transition={{ type: 'spring', stiffness: 320, damping: 32, mass: 0.8 }}
+          transition={{
+            type: 'spring',
+            stiffness: 320,
+            damping: 32,
+            mass: 0.8,
+          }}
           className="bg-background fixed right-0 bottom-0 left-0 z-[9999] flex max-h-[85vh] flex-col rounded-t-3xl shadow-[0_-12px_32px_color-mix(in_oklch,var(--ink)_10%,transparent)]"
           role="dialog"
           aria-modal="true"

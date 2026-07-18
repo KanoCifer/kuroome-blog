@@ -46,7 +46,9 @@ export function FrontierCard({
           )}
         </span>
 
-        <span className="text-foreground text-sm font-medium">{task.title}</span>
+        <span className="text-foreground text-sm font-medium">
+          {task.title}
+        </span>
 
         {task.description && (
           <span

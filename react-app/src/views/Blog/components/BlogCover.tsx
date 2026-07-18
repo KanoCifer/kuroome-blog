@@ -37,7 +37,8 @@ export function BlogCover({
 
   const coverSrc = useOrigin(cover ?? '');
 
-  const [w, h] = size === 'lg' ? [600, 800] : size === 'sm' ? [300, 400] : [400, 533];
+  const [w, h] =
+    size === 'lg' ? [600, 800] : size === 'sm' ? [300, 400] : [400, 533];
   const placeholderUrl = `https://picsum.photos/seed/${hash}/${w}/${h}`;
 
   // 章节序号 No.001 / No.002 ... 稳定来自 seed

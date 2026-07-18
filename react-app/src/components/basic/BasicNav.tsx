@@ -129,65 +129,65 @@ export function BasicNav() {
       >
         <div className="px-5 pb-8">
           <div className="grid grid-cols-1 gap-2">
-                  <MenuItem
-                    icon={<BookOpen className="h-6 w-6" />}
-                    label="Bookshelf"
-                    onClick={() => handleNav('/bookshelf')}
-                  />
-                  <MenuItem
-                    icon={<FileText className="h-6 w-6" />}
-                    label="Moments"
-                    onClick={() => handleNav('/moments')}
-                  />
-                  <MenuItem
-                    icon={<MessageCircle className="h-6 w-6" />}
-                    label="Messages"
-                    onClick={() => handleNav('/messages')}
-                  />
-                  <MenuItem
-                    icon={<Settings className="h-6 w-6" />}
-                    label="Settings"
-                    onClick={() => handleNav('/settings')}
-                  />
-                  <MenuItem
-                    icon={<Palette className="h-6 w-6" />}
-                    label="Theme"
-                    onClick={(e) => toggleTheme(e)}
-                  />
-                  <MenuItem
-                    icon={<Info className="h-6 w-6" />}
-                    label="About"
-                    onClick={() => handleNav('/about')}
-                  />
-                  {/* Auth section */}
-                  {!auth.isAuthenticated ? (
-                    <>
-                      <MenuItem
-                        icon={<LogIn className="h-6 w-6" />}
-                        label="Login"
-                        onClick={() => handleNav('/login')}
-                      />
-                      <MenuItem
-                        icon={<UserPlus className="h-6 w-6" />}
-                        label="Register"
-                        onClick={() => handleNav('/register')}
-                      />
-                    </>
-                  ) : (
-                    <MenuItem
-                      icon={<LogOut className="h-6 w-6" />}
-                      label="Logout"
-                      onClick={handleLogout}
-                    />
-                  )}
-                  <MenuItem
-                    icon={<Monitor className="h-6 w-6" />}
-                    label="Desktop"
-                    onClick={switchToVue}
-                  />
-                </div>
-              </div>
-            </BottomSheet>
+            <MenuItem
+              icon={<BookOpen className="h-6 w-6" />}
+              label="Bookshelf"
+              onClick={() => handleNav('/bookshelf')}
+            />
+            <MenuItem
+              icon={<FileText className="h-6 w-6" />}
+              label="Moments"
+              onClick={() => handleNav('/moments')}
+            />
+            <MenuItem
+              icon={<MessageCircle className="h-6 w-6" />}
+              label="Messages"
+              onClick={() => handleNav('/messages')}
+            />
+            <MenuItem
+              icon={<Settings className="h-6 w-6" />}
+              label="Settings"
+              onClick={() => handleNav('/settings')}
+            />
+            <MenuItem
+              icon={<Palette className="h-6 w-6" />}
+              label="Theme"
+              onClick={(e) => toggleTheme(e)}
+            />
+            <MenuItem
+              icon={<Info className="h-6 w-6" />}
+              label="About"
+              onClick={() => handleNav('/about')}
+            />
+            {/* Auth section */}
+            {!auth.isAuthenticated ? (
+              <>
+                <MenuItem
+                  icon={<LogIn className="h-6 w-6" />}
+                  label="Login"
+                  onClick={() => handleNav('/login')}
+                />
+                <MenuItem
+                  icon={<UserPlus className="h-6 w-6" />}
+                  label="Register"
+                  onClick={() => handleNav('/register')}
+                />
+              </>
+            ) : (
+              <MenuItem
+                icon={<LogOut className="h-6 w-6" />}
+                label="Logout"
+                onClick={handleLogout}
+              />
+            )}
+            <MenuItem
+              icon={<Monitor className="h-6 w-6" />}
+              label="Desktop"
+              onClick={switchToVue}
+            />
+          </div>
+        </div>
+      </BottomSheet>
 
       {/* Bottom Navigation Bar */}
       {createPortal(

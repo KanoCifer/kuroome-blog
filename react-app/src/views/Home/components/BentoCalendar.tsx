@@ -26,7 +26,9 @@ export function BentoCalendar() {
       <BentoCard className="flex flex-col">
         {/* 标题行 */}
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-foreground text-lg font-semibold">{monthLabel}</h3>
+          <h3 className="text-foreground text-lg font-semibold">
+            {monthLabel}
+          </h3>
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground text-sm tabular-nums">
               {yearLabel}
@@ -94,59 +96,59 @@ export function BentoCalendar() {
         title={`${monthLabel} ${yearLabel}`}
       >
         <div className="px-5 pb-8">
-        <div className="flex flex-col">
-          {/* 表头 */}
-          <div className="mb-2 grid grid-cols-7 text-center">
-            {weekdayLabels.map((label, idx) => (
-              <span
-                key={idx}
-                className="text-muted-foreground py-1 text-xs font-medium tabular-nums"
-              >
-                {label}
-              </span>
-            ))}
-          </div>
-
-          {/* 月份网格 */}
-          <motion.div
-            className="grid grid-cols-7 text-center"
-            initial="hidden"
-            animate="visible"
-            variants={{
-              visible: {
-                transition: { staggerChildren: 0.02 },
-              },
-            }}
-          >
-            {/* 月初偏移 */}
-            {Array.from({ length: startOffset }).map((_, idx) => (
-              <span key={`offset-${idx}`} />
-            ))}
-
-            {/* 日期 */}
-            {Array.from({ length: daysInMonth }).map((_, idx) => {
-              const dayNum = idx + 1;
-              const isToday = dayNum === now.date();
-              return (
-                <motion.span
-                  key={dayNum}
-                  variants={{
-                    hidden: { opacity: 0, scale: 0.9 },
-                    visible: { opacity: 1, scale: 1 },
-                  }}
-                  transition={SPRING.reveal}
-                  className={`mx-auto flex aspect-square w-full max-w-8 items-center justify-center rounded-full text-sm ${
-                    isToday
-                      ? 'bg-primary text-primary-foreground font-bold'
-                      : 'text-foreground'
-                  }`}
+          <div className="flex flex-col">
+            {/* 表头 */}
+            <div className="mb-2 grid grid-cols-7 text-center">
+              {weekdayLabels.map((label, idx) => (
+                <span
+                  key={idx}
+                  className="text-muted-foreground py-1 text-xs font-medium tabular-nums"
                 >
-                  {dayNum}
-                </motion.span>
-              );
-            })}
-          </motion.div>
-        </div>
+                  {label}
+                </span>
+              ))}
+            </div>
+
+            {/* 月份网格 */}
+            <motion.div
+              className="grid grid-cols-7 text-center"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                visible: {
+                  transition: { staggerChildren: 0.02 },
+                },
+              }}
+            >
+              {/* 月初偏移 */}
+              {Array.from({ length: startOffset }).map((_, idx) => (
+                <span key={`offset-${idx}`} />
+              ))}
+
+              {/* 日期 */}
+              {Array.from({ length: daysInMonth }).map((_, idx) => {
+                const dayNum = idx + 1;
+                const isToday = dayNum === now.date();
+                return (
+                  <motion.span
+                    key={dayNum}
+                    variants={{
+                      hidden: { opacity: 0, scale: 0.9 },
+                      visible: { opacity: 1, scale: 1 },
+                    }}
+                    transition={SPRING.reveal}
+                    className={`mx-auto flex aspect-square w-full max-w-8 items-center justify-center rounded-full text-sm ${
+                      isToday
+                        ? 'bg-primary text-primary-foreground font-bold'
+                        : 'text-foreground'
+                    }`}
+                  >
+                    {dayNum}
+                  </motion.span>
+                );
+              })}
+            </motion.div>
+          </div>
         </div>
       </BottomSheet>
     </>

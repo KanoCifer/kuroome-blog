@@ -3,7 +3,13 @@
     class="polaroid-card group relative block w-full cursor-pointer"
     :initial="{ opacity: 0, y: 24 }"
     :animate="{ opacity: 1, y: 0 }"
-    :transition="{ type: 'spring', stiffness: 220, damping: 24, duration: 0.5, delay: Math.min(index * 0.03, 0.4) }"
+    :transition="{
+      type: 'spring',
+      stiffness: 220,
+      damping: 24,
+      duration: 0.5,
+      delay: Math.min(index * 0.03, 0.4),
+    }"
     :whileHover="{ y: -6, rotate: 0, transition: { duration: 0.2 } }"
     :style="{ rotate: `${rotation}deg` }"
     @click="onClick"

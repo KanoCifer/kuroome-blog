@@ -1,4 +1,7 @@
-import type { DevTaskPriority, DevTaskType } from '@/services/devtaskService/types';
+import type {
+  DevTaskPriority,
+  DevTaskType,
+} from '@/services/devtaskService/types';
 import {
   selectCompletedThisWeek,
   selectInProgress,
@@ -11,11 +14,7 @@ import {
 import { useMemo, useState } from 'react';
 import { FrontierCard } from './FrontierCard';
 import { TaskRow } from './TaskRow';
-import {
-  PriorityBadge,
-  StatusChip,
-  TypeBadge,
-} from './Badges';
+import { PriorityBadge, StatusChip, TypeBadge } from './Badges';
 
 // ── 推进 ──
 interface PanelEmit {
@@ -155,7 +154,10 @@ export function PlanningPanel({ onOpen, onDelete }: PanelEmit) {
     [tasks, filterType, filterPriority],
   );
 
-  function toggle(key: 'type' | 'priority', val: DevTaskType | DevTaskPriority) {
+  function toggle(
+    key: 'type' | 'priority',
+    val: DevTaskType | DevTaskPriority,
+  ) {
     if (key === 'type') {
       setFilterType((prev) => {
         const next = new Set(prev);
@@ -426,10 +428,7 @@ export function ReviewPanel({ onOpen }: Pick<PanelEmit, 'onOpen'>) {
         </div>
         <div className="space-y-0">
           {completedThisWeek.slice(0, 8).map((task) => (
-            <div
-              key={task.slug}
-              className="flex gap-3 border-t px-1 py-3"
-            >
+            <div key={task.slug} className="flex gap-3 border-t px-1 py-3">
               <div
                 className="mt-2 h-2 w-2 shrink-0 rounded-full"
                 style={{ background: 'var(--success)' }}

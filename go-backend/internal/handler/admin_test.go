@@ -41,7 +41,6 @@ func (m *mockAdminService) DeletePost(ctx context.Context, id string) error {
 	return m.deletePostFn(ctx, id)
 }
 
-
 func (m *mockAdminService) ListPostViewsData(ctx context.Context) ([]dto.PostViewData, error) {
 	return m.listViewsDataFn(ctx)
 }
@@ -244,4 +243,3 @@ func TestAdmin_DeletePost_Success(t *testing.T) {
 		t.Errorf("status = %d, want %d", w.Code, http.StatusOK)
 	}
 }
-

@@ -173,14 +173,19 @@ export function useCardLayout(containerRef: Ref<HTMLElement | null>) {
   // center→top-left conversion in `position()` knows each card's true
   // dimensions — especially `w-auto` cards whose width is content-determined
   // and can't be known from card-styles.json alone.
-  const cardSizes = reactive(new Map<string, { width: number; height: number }>());
+  const cardSizes = reactive(
+    new Map<string, { width: number; height: number }>(),
+  );
   const observers = new Map<string, ResizeObserver>();
 
   function registerCardSize(cardName: string, el: HTMLElement) {
     observers.get(cardName)?.disconnect();
     const measure = () => {
       if (!el.isConnected) return;
-      cardSizes.set(cardName, { width: el.offsetWidth, height: el.offsetHeight });
+      cardSizes.set(cardName, {
+        width: el.offsetWidth,
+        height: el.offsetHeight,
+      });
     };
     measure();
     const ro = new ResizeObserver(measure);

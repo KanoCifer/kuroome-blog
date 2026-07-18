@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { connectionDelay, isConnected, sendPing } from '@/plugins/visitorWs';
-import { useVisitorCountStore } from '@/stores/visitorCount';
 import {
   fetchStatusDetail,
   type StatusDetailData,
@@ -8,13 +7,57 @@ import {
   type EventItem,
 } from '@/api/shared';
 import { useChartColors, withAlpha } from '@/composables/shared/useChartColors';
-import { computed, onMounted, onUnmounted, ref, watchEffect } from 'vue';
-import { motion } from 'motion-v';
-import { EASE_SLOW } from '@/constants/motionPresets';
+import {
+  computed,
+  defineComponent,
+  h,
+  onMounted,
+  onUnmounted,
+  ref,
+  watchEffect,
+  type PropType,
+} from 'vue';
+import { motion, AnimatePresence } from 'motion-v';
+import { EASE, EASE_SLOW } from '@/constants/motionPresets';
 import VChart from 'vue-echarts';
 
+/* ── 类型 ── */
+type Tone = 'success' | 'warning' | 'destructive';
+type StatusKey = 'ok' | 'warn' | 'danger';
+
+/* ── 语义 Tailwind 类静态映射(JIT 可扫描) ── */
+const TONE_BG: Record<Tone, string> = {
+  success: 'bg-success/8',
+  warning: 'bg-warning/8',
+  destructive: 'bg-destructive/8',
+};
+const TONE_BG_DEEP: Record<Tone, string> = {
+  success: 'bg-success/15',
+  warning: 'bg-warning/15',
+  destructive: 'bg-destructive/15',
+};
+const TONE_TEXT: Record<Tone, string> = {
+  success: 'text-success',
+  warning: 'text-warning',
+  destructive: 'text-destructive',
+};
+const TONE_BORDER: Record<Tone, string> = {
+  success: 'border-success/20',
+  warning: 'border-warning/25',
+  destructive: 'border-destructive/25',
+};
+const TONE_DOT: Record<Tone, string> = {
+  success: 'bg-success',
+  warning: 'bg-warning',
+  destructive: 'bg-destructive',
+};
+const STATUS_KEY_TO_TONE: Record<StatusKey, Tone> = {
+  ok: 'success',
+  warn: 'warning',
+  danger: 'destructive',
+};
+
 /* ── Stores ── */
-const visitorCount = useVisitorCountStore();
 const { palette } = useChartColors();
 
 /* ── Server metrics ── */
@@ -41,25 +84,6 @@ async function loadRecentEvents() {
   } catch {
     /* silent */
   }
-}
-
-/* type → 语义色（用 chart palette 的语义色，不引未定义 token） */
-const typeClass: Record<string, string> = {
-  startup: 'text-success bg-success/10',
-  deploy: 'text-primary bg-primary/10',
-  notify_failure: 'text-danger bg-danger/10',
-};
-
-function typeChipClass(type: string): string {
-  return typeClass[type] ?? 'text-muted-foreground bg-muted';
-}
-
-function formatLogTime(iso: string): string {
-  const d = new Date(iso);
-  return (
-    `${pad2(d.getMonth() + 1)}/${pad2(d.getDate())} ` +
-    `${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`
-  );
 }
 
 /* ── Latency history ── */
@@ -100,6 +124,12 @@ async function pingApi() {
 
 let apiTimer: ReturnType<typeof setInterval> | null = null;
 
+/* ── Reduced motion ── */
+const prefersReducedMotion = computed(() => {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+});
+
 /* ── Time formatters ── */
 function pad2(n: number) {
   return n < 10 ? '0' + n : '' + n;
@@ -117,7 +147,6 @@ function formatUptime(ms: number): string {
   const d = Math.floor(s / 86400);
   const h = Math.floor((s % 86400) / 3600);
   const m = Math.floor((s % 3600) / 60);
-  // 不足 1 分钟时显示秒级，避免 "0d 00h 00m" 看起来像显示异常
   if (d === 0 && h === 0 && m === 0) {
     return `${d}d ${pad2(h)}h ${pad2(m)}m ${pad2(s % 60)}s`;
   }
@@ -133,55 +162,114 @@ function bytesToMB(bytes: number): string {
 function bytesToGB(bytes: number): string {
   return `${(bytes / 1024 / 1024 / 1024).toFixed(2)} GB`;
 }
+function formatLogTime(iso: string): string {
+  const d = new Date(iso);
+  return (
+    `${pad2(d.getMonth() + 1)}/${pad2(d.getDate())} ` +
+    `${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`
+  );
+}
 
-/* ── Status helpers ── */
-type StatusKey = 'ok' | 'warn' | 'danger' | 'idle';
+/* ── 事件类型映射 ── */
+const EVENT_TONE: Record<string, Tone> = {
+  startup: 'success',
+  deploy: 'success',
+  notify_failure: 'destructive',
+};
+const EVENT_LABEL: Record<string, string> = {
+  startup: '启动',
+  deploy: '部署',
+  notify_failure: '通知失败',
+};
 
+/* ── 状态聚合 ── */
 const overallStatus = computed<{
-  label: string;
-  dotClass: StatusKey;
+  key: StatusKey;
+  tone: Tone;
+  title: string;
   sub: string;
 }>(() => {
   if (!apiHealthy.value) {
-    return { label: '服务中断', dotClass: 'danger', sub: '请稍后重试' };
+    return {
+      key: 'danger',
+      tone: 'destructive',
+      title: '正在重新连接',
+      sub: '请稍后重试,我们已记录问题',
+    };
   }
   const delay = connectionDelay?.value ?? 0;
   if (!isConnected?.value || delay > 2000) {
-    return { label: '性能降级', dotClass: 'warn', sub: '响应存在延迟' };
+    return {
+      key: 'warn',
+      tone: 'warning',
+      title: '略感疲倦',
+      sub: '响应正在变慢,可能影响加载',
+    };
   }
-  return { label: '运行正常', dotClass: 'ok', sub: '所有系统运行中' };
+  return {
+    key: 'ok',
+    tone: 'success',
+    title: '一切如常',
+    sub: '所有系统按预期运行',
+  };
 });
 
 const wsLatency = computed(() => {
   const ms = connectionDelay?.value ?? 0;
   return ms ? Math.round(ms) : 0;
 });
-const wsDot = computed<StatusKey>(() => {
+const wsStatus = computed<{ key: StatusKey; label: string }>(() => {
+  if (!isConnected?.value) return { key: 'warn', label: '静默' };
   const ms = connectionDelay?.value ?? 0;
-  if (!ms) return 'idle';
-  if (ms < 200) return 'ok';
-  if (ms < 2000) return 'warn';
-  return 'danger';
+  if (ms > 2000) return { key: 'danger', label: '高延迟' };
+  if (ms > 200) return { key: 'warn', label: '偏慢' };
+  return { key: 'ok', label: '畅通' };
 });
+
+const dbStatus = computed<{ key: StatusKey; label: string }>(() => {
+  if (!serverStatus.value) return { key: 'warn', label: '检测中' };
+  return serverStatus.value.service.db_ok
+    ? { key: 'ok', label: '主库' }
+    : { key: 'danger', label: '未响应' };
+});
+
+/* ── 30 天可用率 + 公告(暂未接 API,占位) ── */
+const availability = ref<{
+  rate: number;
+  incidents: number;
+} | null>(null);
+const announcement = ref<string | null>(null);
+
+/* ── 详情折叠 ── */
+const showDetails = ref(false);
+
+/* ── 进度计算 ── */
+function percent(value: number, total: number): number {
+  if (!total) return 0;
+  return Math.min(100, Math.max(0, (value / total) * 100));
+}
+function resourceTone(pct: number): Tone {
+  if (pct >= 85) return 'destructive';
+  if (pct >= 65) return 'warning';
+  return 'success';
+}
 
 /* ── Latency chart (echarts) ── */
 const chartOption = computed(() => {
   const data = latencyHistory.value;
   const xData = data.map((_, i) => `${i}s`);
 
-  // ECharts 用 canvas fillStyle 喂浏览器，不解析 var() / color-mix() / oklch()。
-  // 通过 useChartColors() 拿到 design-system 颜色经 canvas 解析后的 rgb 字符串。
   const fg = palette.value.foreground;
   const muted = palette.value.mutedForeground;
   const border = palette.value.border;
   const card = palette.value.card;
   const primary = palette.value.primary;
-  const gridLine = withAlpha(palette.value.mutedForeground, 0.25);
+  const gridLine = withAlpha(palette.value.mutedForeground, 0.18);
 
   return {
     backgroundColor: 'transparent',
     textStyle: { color: muted, fontSize: 12 },
-    grid: { left: 40, right: 0, top: 10, bottom: 24, containLabel: false },
+    grid: { left: 36, right: 8, top: 8, bottom: 22, containLabel: false },
     tooltip: {
       trigger: 'axis',
       backgroundColor: card,
@@ -191,18 +279,13 @@ const chartOption = computed(() => {
       textStyle: { color: fg, fontSize: 12 },
       axisPointer: {
         type: 'line',
-        lineStyle: {
-          color: primary,
-          type: 'solid',
-          width: 1,
-          opacity: 0.4,
-        },
+        lineStyle: { color: primary, type: 'solid', width: 1, opacity: 0.4 },
       },
       formatter: (
         params: { seriesName: string; value: number; axisValue: string }[],
       ) => {
         const p = params[0];
-        return `<div style="font-size:11px;color:${muted};font-family:var(--font-mono)">${p.axisValue}</div><div style="font-size:14px;font-weight:600;color:${fg};font-family:var(--font-mono);margin-top:2px">${p.value} ms</div>`;
+        return `<div style="font-size:11px;color:${muted}">${p.axisValue}</div><div style="font-size:14px;font-weight:600;color:${fg};margin-top:2px">${p.value} ms</div>`;
       },
     },
     xAxis: {
@@ -214,7 +297,6 @@ const chartOption = computed(() => {
       axisLabel: {
         color: muted,
         fontSize: 10,
-        fontFamily: 'var(--font-mono)',
         interval: Math.max(0, Math.floor(data.length / 5) - 1),
         formatter: (v: string) => `-${v}`,
       },
@@ -227,11 +309,7 @@ const chartOption = computed(() => {
       axisLine: { show: false },
       axisTick: { show: false },
       splitLine: { lineStyle: { color: gridLine, type: 'dashed' } },
-      axisLabel: {
-        color: muted,
-        fontSize: 10,
-        fontFamily: 'var(--font-mono)',
-      },
+      axisLabel: { color: muted, fontSize: 10 },
     },
     series: [
       {
@@ -244,11 +322,7 @@ const chartOption = computed(() => {
           params.dataIndex === data.length - 1 ? 6 : 0,
         showSymbol: data.length > 0,
         lineStyle: { width: 1.6, color: primary },
-        itemStyle: {
-          color: primary,
-          borderColor: card,
-          borderWidth: 2,
-        },
+        itemStyle: { color: primary, borderColor: card, borderWidth: 2 },
         areaStyle: {
           color: {
             type: 'linear',
@@ -288,759 +362,542 @@ onUnmounted(() => {
   if (apiTimer) clearInterval(apiTimer);
   if (pingTimer) clearInterval(pingTimer);
 });
+
+/* ── 子组件:资源条 ── */
+const ResourceBar = defineComponent({
+  name: 'ResourceBar',
+  props: {
+    label: { type: String, required: true },
+    value: { type: Number, required: true },
+    tone: { type: String as PropType<Tone>, required: true },
+    unit: { type: String, default: '%' },
+    decimals: { type: Number, default: 1 },
+    cap: { type: Number, default: 100 },
+    rightDetail: { type: String, default: '' },
+  },
+  setup(props) {
+    return () => {
+      const barWidth = Math.min(
+        100,
+        Math.max(0, (props.value / props.cap) * 100),
+      );
+      return h('div', { class: 'space-y-1.5' }, [
+        h(
+          'div',
+          {
+            class: 'flex items-baseline justify-between gap-3 text-[13px]',
+          },
+          [
+            h('span', { class: 'text-foreground/85' }, props.label),
+            h(
+              'span',
+              { class: 'text-foreground font-mono tabular-nums' },
+              props.rightDetail ||
+                `${props.value.toFixed(props.decimals)}${props.unit}`,
+            ),
+          ],
+        ),
+        h(
+          'div',
+          { class: 'bg-muted relative h-1 overflow-hidden rounded-full' },
+          [
+            h('div', {
+              class: `absolute inset-y-0 left-0 rounded-full transition-[width] duration-700 ease-out ${TONE_DOT[props.tone]}`,
+              style: { width: `${barWidth}%` },
+            }),
+          ],
+        ),
+      ]);
+    };
+  },
+});
 </script>
 
 <template>
-  <div
-    class="bg-background flex min-h-screen justify-center px-4 py-12 sm:px-6"
-  >
+  <div class="bg-background min-h-screen">
     <motion.div
-      :initial="{ opacity: 0, y: 12 }"
+      :initial="prefersReducedMotion ? false : { opacity: 0, y: 8 }"
       :animate="{ opacity: 1, y: 0 }"
       :transition="EASE_SLOW"
-      class="w-full max-w-6xl space-y-5"
+      class="mx-auto w-full max-w-6xl space-y-10 px-4 py-12 sm:px-6"
     >
-      <!-- ── Masthead ── -->
-      <header
-        class="border-border flex items-end justify-between gap-6 border-b pb-4"
-        data-od-id="masthead"
-      >
-        <div>
-          <div
-            class="text-muted-foreground font-mono text-[11px] tracking-[0.1em] uppercase"
+      <!-- ─── Hero: 状态宣告 ─── -->
+      <section :aria-label="overallStatus.title">
+        <AnimatePresence mode="wait">
+          <motion.div
+            :key="overallStatus.key"
+            :initial="prefersReducedMotion ? false : { opacity: 0, y: 6 }"
+            :animate="{ opacity: 1, y: 0 }"
+            :exit="
+              prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: -6 }
+            "
+            :transition="EASE"
+            :class="[
+              'relative overflow-hidden rounded-2xl border p-6 sm:p-10',
+              TONE_BORDER[overallStatus.tone],
+              TONE_BG[overallStatus.tone],
+            ]"
           >
-            Service Status
-          </div>
-          <h1
-            class="text-foreground mt-1.5 text-[28px] leading-tight font-semibold tracking-[-0.02em]"
-          >
-            服务状态
-          </h1>
-          <p class="text-muted-foreground mt-1.5 max-w-[56ch] text-[13px]">
-            所有依赖项、运行时指标与最近事件的实时视图。延迟每 1s
-            刷新，系统指标每 30s 拉取。
-          </p>
-        </div>
-        <div class="flex flex-col items-end gap-1 text-right">
-          <span
-            class="text-success inline-flex items-center gap-1.5 font-mono text-[11px] tracking-[0.1em] uppercase"
-          >
-            <span
-              class="live-dot inline-block h-1.5 w-1.5 rounded-full bg-current"
-            />
-            Live
-          </span>
-          <span
-            class="text-muted-foreground font-mono text-[12px] tracking-[0.04em]"
-          >
-            {{ fmtClock(now) }} · {{ fmtDate(now) }}
-          </span>
-          <span
-            class="text-muted-foreground font-mono text-[12px] tracking-[0.04em]"
-          >
-            最后检测 {{ fmtClock(now) }}
-          </span>
-        </div>
-      </header>
+            <div class="grid gap-6 md:grid-cols-[1.5fr_1fr] md:items-end">
+              <!-- 状态词 -->
+              <div class="space-y-3">
+                <h1
+                  class="text-foreground font-serif text-[clamp(2.25rem,5vw+1rem,4.5rem)] leading-[1.05] tracking-[-0.025em]"
+                  style="text-wrap: balance"
+                >
+                  {{ overallStatus.title }}
+                </h1>
+                <p
+                  class="text-muted-foreground max-w-[48ch] text-[15px] leading-relaxed"
+                >
+                  {{ overallStatus.sub
+                  }}<span v-if="serverStatus">
+                    · 启动于
+                    <span class="text-foreground/80">{{
+                      formatUptime(now - serverStatus.service.start_time * 1000)
+                    }}</span
+                    >前</span
+                  >
+                </p>
 
-      <!-- ── Status banner：横向 4 列 ── -->
-      <section
-        class="border-border bg-muted grid grid-cols-1 overflow-hidden rounded-md border md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]"
-        data-od-id="status-banner"
-        aria-label="整体状态"
-      >
-        <!-- Overall -->
-        <div
-          class="border-border flex flex-col gap-2 border-b p-5 md:border-r md:border-b-0 lg:border-b-0"
-        >
-          <div class="flex items-center gap-2.5">
-            <span
-              :class="['status-dot', `status-dot--${overallStatus.dotClass}`]"
-            />
-            <span
-              class="text-muted-foreground font-mono text-[11px] tracking-[0.08em] uppercase"
-              >Overall</span
-            >
-          </div>
-          <div
-            class="text-foreground font-mono text-[26px] leading-none font-semibold tracking-[-0.02em]"
-          >
-            {{ overallStatus.label }}
-          </div>
-          <div
-            class="text-muted-foreground font-mono text-[11px] tracking-[0.04em]"
-          >
-            {{ overallStatus.sub }}
-          </div>
-        </div>
-        <!-- API -->
-        <div
-          class="border-border flex flex-col gap-2 border-b p-5 md:border-r md:border-b-0 lg:border-b-0"
-        >
-          <div class="flex items-center gap-2.5">
-            <span
-              :class="[
-                'status-dot',
-                apiHealthy ? 'status-dot--ok' : 'status-dot--danger',
-              ]"
-            />
-            <span
-              class="text-muted-foreground font-mono text-[11px] tracking-[0.08em] uppercase"
-              >API</span
-            >
-          </div>
-          <div
-            class="text-foreground font-mono text-[24px] leading-none font-semibold tracking-[-0.02em]"
-          >
-            <span>{{ apiHealthy ? apiLatency : '—' }}</span>
-            <span class="text-muted-foreground ml-1 text-[12px] font-normal"
-              >ms</span
-            >
-          </div>
-          <div
-            class="text-muted-foreground font-mono text-[11px] tracking-[0.04em]"
-          >
-            {{ apiHealthy ? `探测 ${apiLatency} ms` : '无法连接' }}
-          </div>
-        </div>
-        <!-- WebSocket -->
-        <div
-          class="border-border flex flex-col gap-2 border-b p-5 md:border-r md:border-b-0 lg:border-b-0"
-        >
-          <div class="flex items-center gap-2.5">
-            <span :class="['status-dot', `status-dot--${wsDot}`]" />
-            <span
-              class="text-muted-foreground font-mono text-[11px] tracking-[0.08em] uppercase"
-              >WebSocket</span
-            >
-          </div>
-          <div
-            class="text-foreground font-mono text-[24px] leading-none font-semibold tracking-[-0.02em]"
-          >
-            <span>{{ isConnected ? wsLatency : '—' }}</span>
-            <span class="text-muted-foreground ml-1 text-[12px] font-normal"
-              >ms</span
-            >
-          </div>
-          <div
-            class="text-muted-foreground font-mono text-[11px] tracking-[0.04em]"
-          >
-            {{ isConnected ? 'ping/pong 正常' : '未连接' }}
-          </div>
-        </div>
-        <!-- Database -->
-        <div class="flex flex-col gap-2 p-5">
-          <div class="flex items-center gap-2.5">
-            <span
-              :class="[
-                'status-dot',
-                serverStatus?.service.db_ok
-                  ? 'status-dot--ok'
-                  : 'status-dot--idle',
-              ]"
-            />
-            <span
-              class="text-muted-foreground font-mono text-[11px] tracking-[0.08em] uppercase"
-              >Database</span
-            >
-          </div>
-          <div
-            class="text-foreground font-mono text-[24px] leading-none font-semibold tracking-[-0.02em]"
-          >
-            {{ serverStatus?.service.db_ok ? 'OK' : '—' }}
-          </div>
-          <div
-            class="text-muted-foreground font-mono text-[11px] tracking-[0.04em]"
-          >
-            {{ serverStatus?.service.db_ok ? 'postgres · primary' : '检测中…' }}
-          </div>
-        </div>
+                <!-- mini 三联 -->
+                <div
+                  class="border-foreground/10 mt-5 grid grid-cols-3 gap-x-6 gap-y-1 border-t pt-4 text-[13px]"
+                >
+                  <div class="space-y-0.5">
+                    <div class="text-muted-foreground">API</div>
+                    <div class="flex items-baseline gap-1.5">
+                      <span
+                        class="text-foreground font-mono text-[15px] font-semibold tabular-nums"
+                      >
+                        <AnimatePresence mode="popLayout">
+                          <motion.span
+                            :key="apiHealthy ? apiLatency : -1"
+                            :initial="
+                              prefersReducedMotion
+                                ? false
+                                : { opacity: 0, y: 4 }
+                            "
+                            :animate="{ opacity: 1, y: 0 }"
+                            :exit="
+                              prefersReducedMotion
+                                ? { opacity: 1 }
+                                : { opacity: 0, y: -4 }
+                            "
+                            :transition="{ duration: 0.2 }"
+                          >
+                            {{ apiHealthy ? apiLatency : '—' }}
+                          </motion.span>
+                        </AnimatePresence>
+                      </span>
+                      <span class="text-muted-foreground text-[11px]">ms</span>
+                    </div>
+                  </div>
+                  <div class="space-y-0.5">
+                    <div class="text-muted-foreground">WebSocket</div>
+                    <div class="flex items-baseline gap-1.5">
+                      <span
+                        :class="[
+                          'font-mono text-[15px] font-semibold tabular-nums',
+                          TONE_TEXT[STATUS_KEY_TO_TONE[wsStatus.key]],
+                        ]"
+                      >
+                        <AnimatePresence mode="popLayout">
+                          <motion.span
+                            :key="wsLatency"
+                            :initial="
+                              prefersReducedMotion
+                                ? false
+                                : { opacity: 0, y: 4 }
+                            "
+                            :animate="{ opacity: 1, y: 0 }"
+                            :exit="
+                              prefersReducedMotion
+                                ? { opacity: 1 }
+                                : { opacity: 0, y: -4 }
+                            "
+                            :transition="{ duration: 0.2 }"
+                          >
+                            {{ isConnected ? wsLatency : '—' }}
+                          </motion.span>
+                        </AnimatePresence>
+                      </span>
+                      <span class="text-muted-foreground text-[11px]">ms</span>
+                    </div>
+                  </div>
+                  <div class="space-y-0.5">
+                    <div class="text-muted-foreground">Database</div>
+                    <div
+                      :class="[
+                        'text-[15px] font-semibold',
+                        TONE_TEXT[STATUS_KEY_TO_TONE[dbStatus.key]],
+                      ]"
+                    >
+                      {{ dbStatus.label }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 右侧:时钟 -->
+              <div class="space-y-1 text-right">
+                <div class="text-muted-foreground text-[12px]">当前时刻</div>
+                <div
+                  class="text-foreground font-mono text-[clamp(1.75rem,2.5vw+0.5rem,2.5rem)] leading-none tracking-[-0.02em] tabular-nums"
+                >
+                  {{ fmtClock(now) }}
+                </div>
+                <div class="text-muted-foreground text-[12px]">
+                  {{ fmtDate(now) }} · 最后检测 {{ fmtClock(now) }}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
       </section>
 
-      <!-- ── 资源条：CPU / 内存 / 负载 ── -->
-      <section
-        class="border-border bg-muted overflow-hidden rounded-md border"
-        data-od-id="resource-panel"
-      >
-        <header
-          class="border-border bg-background/40 flex items-center justify-between border-b px-4 py-3"
-        >
-          <div
-            class="text-foreground flex items-center gap-2 text-[13px] font-semibold tracking-[-0.01em]"
+      <!-- ─── 公告 + 30 天可用率 ─── -->
+      <section class="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-baseline">
+        <p class="text-foreground/85 text-[14px] leading-relaxed">
+          <template v-if="announcement">
+            <span
+              class="bg-warning/15 text-warning mr-2 inline-block rounded-full px-2 py-0.5 text-[11px] font-medium"
+              >公告</span
+            >
+            {{ announcement }}
+          </template>
+          <template v-else>
+            <span class="text-muted-foreground">暂无公告 ·</span>
+            一切运行平稳,变更会同步发布在此。
+          </template>
+        </p>
+        <p class="text-muted-foreground text-[13px] tabular-nums">
+          过去 30 天 ·
+          <span
+            v-if="availability"
+            class="text-foreground font-mono font-semibold"
+            >{{ availability.rate.toFixed(2) }}%</span
           >
-            <span class="bg-accent block h-3.5 w-1 rounded-sm" />
-            系统资源
-          </div>
-          <div
-            class="text-muted-foreground flex items-center gap-3 font-mono text-[11px] tracking-[0.06em] uppercase"
-          >
-            <span>host · {{ serverStatus?.system.os_name ?? '—' }}</span>
-            <span class="inline-flex items-center gap-1.5">
-              <span
-                class="bg-success inline-block h-1.5 w-1.5 animate-[livePulse_1.6s_ease-out_infinite] rounded-full"
-              />
-              30s
-            </span>
-          </div>
-        </header>
-        <div class="space-y-1.5 px-5 py-4" v-if="serverStatus">
-          <div
-            class="grid grid-cols-[180px_1fr_120px] items-center gap-4 py-1.5"
-          >
-            <span
-              class="text-muted-foreground font-mono text-[11px] tracking-[0.06em] uppercase"
-              >CPU 使用率</span
-            >
-            <div class="bg-warm-gray h-1.5 overflow-hidden rounded-full">
-              <div
-                class="bg-accent h-full rounded-full transition-all duration-700"
-                :style="{ width: serverStatus.system.cpu_percent + '%' }"
-              />
-            </div>
-            <span
-              class="text-foreground text-right font-mono text-[13px] tabular-nums"
-            >
-              {{ serverStatus.system.cpu_percent.toFixed(1) }}%
-            </span>
-          </div>
-          <div
-            class="grid grid-cols-[180px_1fr_120px] items-center gap-4 py-1.5"
-          >
-            <span
-              class="text-muted-foreground font-mono text-[11px] tracking-[0.06em] uppercase"
-              >内存使用率</span
-            >
-            <div class="bg-warm-gray h-1.5 overflow-hidden rounded-full">
-              <div
-                class="bg-accent h-full rounded-full transition-all duration-700"
-                :style="{
-                  width: serverStatus.system.memory_usage_percent + '%',
-                }"
-              />
-            </div>
-            <span
-              class="text-foreground text-right font-mono text-[13px] tabular-nums"
-            >
-              {{ serverStatus.system.memory_usage_percent.toFixed(1) }}%
-            </span>
-          </div>
-          <div
-            class="grid grid-cols-[180px_1fr_120px] items-center gap-4 py-1.5"
-          >
-            <span
-              class="text-muted-foreground font-mono text-[11px] tracking-[0.06em] uppercase"
-            >
-              负载 (1m / 5m / 15m)
-            </span>
-            <div class="bg-warm-gray h-1.5 overflow-hidden rounded-full">
-              <div
-                class="bg-accent h-full rounded-full transition-all duration-700"
-                :style="{
-                  width:
-                    Math.min(
-                      (serverStatus.system.load_average['1m'] / 4) * 100,
-                      100,
-                    ) + '%',
-                }"
-              />
-            </div>
-            <span
-              class="text-foreground text-right font-mono text-[12px] tabular-nums"
-            >
-              {{ serverStatus.system.load_average['1m'].toFixed(2) }}
-              <span class="text-muted-foreground">/</span>
-              {{ serverStatus.system.load_average['5m'].toFixed(2) }}
-              <span class="text-muted-foreground">/</span>
-              {{ serverStatus.system.load_average['15m'].toFixed(2) }}
-            </span>
-          </div>
-          <div
-            class="grid grid-cols-[180px_1fr_120px] items-center gap-4 py-1.5"
-          >
-            <span
-              class="text-muted-foreground font-mono text-[11px] tracking-[0.06em] uppercase"
-              >堆 / 总占用</span
-            >
-            <div class="bg-warm-gray h-1.5 overflow-hidden rounded-full">
-              <div
-                class="bg-accent h-full rounded-full transition-all duration-700"
-                :style="{
-                  width:
-                    (serverStatus.service.heap_memory_bytes /
-                      serverStatus.service.total_memory_bytes) *
-                      100 +
-                    '%',
-                }"
-              />
-            </div>
-            <span
-              class="text-foreground text-right font-mono text-[12px] tabular-nums"
-            >
-              {{ bytesToMB(serverStatus.service.heap_memory_bytes) }}
-              <span class="text-muted-foreground">/</span>
-              {{ bytesToMB(serverStatus.service.total_memory_bytes) }}
-            </span>
-          </div>
-        </div>
-        <div v-else class="space-y-3 px-5 py-4">
-          <div class="bg-warm-gray h-2 w-3/4 animate-pulse rounded" />
-          <div class="bg-warm-gray h-2 w-1/2 animate-pulse rounded" />
-          <div class="bg-warm-gray h-2 w-2/3 animate-pulse rounded" />
-        </div>
+          <span v-else class="text-foreground/60">—</span>
+          可用
+          <template v-if="availability && availability.incidents > 0">
+            · {{ availability.incidents }} 次中断
+          </template>
+          <template v-else-if="availability"> · 无中断 </template>
+          <template v-else> · 历史数据收集中 </template>
+        </p>
       </section>
 
-      <!-- ── 延迟图 + 系统信息（两列） ── -->
-      <div class="grid grid-cols-1 gap-5 lg:grid-cols-[1.6fr_1fr]">
-        <section
-          class="border-border bg-muted overflow-hidden rounded-md border"
-          data-od-id="latency-panel"
-        >
-          <header
-            class="border-border bg-background/40 flex items-center justify-between border-b px-4 py-3"
-          >
-            <div
-              class="text-foreground flex items-center gap-2 text-[13px] font-semibold tracking-[-0.01em]"
+      <!-- ─── 资源 + 延迟(双列) ─── -->
+      <div class="grid gap-10 lg:grid-cols-[1fr_1.4fr]">
+        <!-- 资源 -->
+        <section class="space-y-5" aria-label="系统资源">
+          <header class="flex items-baseline justify-between">
+            <h2
+              class="text-foreground font-serif text-[20px] tracking-[-0.01em]"
             >
-              <span class="bg-accent block h-3.5 w-1 rounded-sm" />
-              API 延迟趋势
-            </div>
-            <div
-              class="text-muted-foreground flex items-center gap-3 font-mono text-[11px] tracking-[0.06em] uppercase"
+              系统资源
+            </h2>
+            <span
+              v-if="serverStatus"
+              class="text-muted-foreground text-[12px] tabular-nums"
             >
-              <span class="inline-flex items-center gap-1.5">
-                <span
-                  class="bg-success inline-block h-1.5 w-1.5 animate-[livePulse_1.6s_ease-out_infinite] rounded-full"
-                />
-                实时
-              </span>
-              <span>60s · ms</span>
-            </div>
+              {{ serverStatus.system.os_name }}
+            </span>
           </header>
-          <div class="px-2 pt-2 pb-3">
-            <div v-if="latencyHistory.length > 1" class="h-[220px]">
-              <v-chart :option="chartOption" autoresize />
-            </div>
+
+          <div v-if="serverStatus" class="space-y-4">
+            <ResourceBar
+              label="CPU 使用率"
+              :value="serverStatus.system.cpu_percent"
+              :tone="resourceTone(serverStatus.system.cpu_percent)"
+              :decimals="1"
+            />
+            <ResourceBar
+              label="内存使用率"
+              :value="serverStatus.system.memory_usage_percent"
+              :tone="resourceTone(serverStatus.system.memory_usage_percent)"
+              :decimals="1"
+            />
+            <ResourceBar
+              label="负载 (1m)"
+              :value="serverStatus.system.load_average['1m']"
+              :tone="
+                resourceTone(percent(serverStatus.system.load_average['1m'], 4))
+              "
+              unit=""
+              :decimals="2"
+              :cap="4"
+            />
+            <ResourceBar
+              label="堆 / 总占用"
+              :value="
+                percent(
+                  serverStatus.service.heap_memory_bytes,
+                  serverStatus.service.total_memory_bytes,
+                )
+              "
+              :tone="
+                resourceTone(
+                  percent(
+                    serverStatus.service.heap_memory_bytes,
+                    serverStatus.service.total_memory_bytes,
+                  ),
+                )
+              "
+              :decimals="1"
+              :right-detail="`${bytesToMB(serverStatus.service.heap_memory_bytes)} / ${bytesToMB(serverStatus.service.total_memory_bytes)}`"
+            />
+          </div>
+          <div v-else class="space-y-4">
+            <div class="bg-muted h-3 w-full animate-pulse rounded" />
+            <div class="bg-muted h-3 w-2/3 animate-pulse rounded" />
+            <div class="bg-muted h-3 w-1/2 animate-pulse rounded" />
+          </div>
+        </section>
+
+        <!-- 延迟图 -->
+        <section class="space-y-5" aria-label="API 延迟趋势">
+          <header class="flex items-baseline justify-between">
+            <h2
+              class="text-foreground font-serif text-[20px] tracking-[-0.01em]"
+            >
+              API 延迟趋势
+            </h2>
+            <span class="text-muted-foreground text-[12px] tabular-nums">
+              最近 60s · 毫秒
+            </span>
+          </header>
+          <div class="h-[220px]">
+            <v-chart
+              v-if="latencyHistory.length > 1"
+              :option="chartOption"
+              autoresize
+            />
             <div
               v-else
-              class="text-muted-foreground flex h-[220px] items-center justify-center font-mono text-[12px]"
+              class="text-muted-foreground flex h-full items-center justify-center text-[13px]"
             >
               等待数据…
             </div>
           </div>
         </section>
-
-        <section
-          class="border-border bg-muted overflow-hidden rounded-md border"
-          data-od-id="system-panel"
-        >
-          <header
-            class="border-border bg-background/40 flex items-center justify-between border-b px-4 py-3"
-          >
-            <div
-              class="text-foreground flex items-center gap-2 text-[13px] font-semibold tracking-[-0.01em]"
-            >
-              <span class="bg-accent block h-3.5 w-1 rounded-sm" />
-              主机信息
-            </div>
-            <span
-              class="text-muted-foreground font-mono text-[11px] tracking-[0.06em] uppercase"
-            >
-              linux · amd64
-            </span>
-          </header>
-          <div v-if="serverStatus" class="font-mono text-[12px]">
-            <div
-              class="border-border flex items-center justify-between border-b border-dashed px-4 py-2"
-            >
-              <span
-                class="text-muted-foreground text-[11px] tracking-[0.06em] uppercase"
-                >OS / Kernel</span
-              >
-              <span class="text-foreground text-right"
-                >{{ serverStatus.system.os_name }} ·
-                {{ serverStatus.system.kernel_version }}</span
-              >
-            </div>
-            <div
-              class="border-border flex items-center justify-between border-b border-dashed px-4 py-2"
-            >
-              <span
-                class="text-muted-foreground text-[11px] tracking-[0.06em] uppercase"
-                >CPU 型号</span
-              >
-              <span
-                class="text-foreground truncate text-right"
-                :title="serverStatus.system.cpu_model"
-                >{{ serverStatus.system.cpu_model }}</span
-              >
-            </div>
-            <div
-              class="border-border flex items-center justify-between border-b border-dashed px-4 py-2"
-            >
-              <span
-                class="text-muted-foreground text-[11px] tracking-[0.06em] uppercase"
-                >核心 (逻辑/物理)</span
-              >
-              <span class="text-foreground"
-                >{{ serverStatus.system.cpu_count_logical }} /
-                {{ serverStatus.system.cpu_count_physical }}</span
-              >
-            </div>
-            <div
-              class="border-border flex items-center justify-between border-b border-dashed px-4 py-2"
-            >
-              <span
-                class="text-muted-foreground text-[11px] tracking-[0.06em] uppercase"
-                >总内存</span
-              >
-              <span class="text-foreground tabular-nums">{{
-                bytesToGB(serverStatus.system.memory_total_bytes)
-              }}</span>
-            </div>
-            <div
-              class="border-border flex items-center justify-between border-b border-dashed px-4 py-2"
-            >
-              <span
-                class="text-muted-foreground text-[11px] tracking-[0.06em] uppercase"
-                >已用</span
-              >
-              <span class="text-foreground tabular-nums">{{
-                bytesToMB(serverStatus.system.memory_used_bytes)
-              }}</span>
-            </div>
-            <div class="flex items-center justify-between px-4 py-2">
-              <span
-                class="text-muted-foreground text-[11px] tracking-[0.06em] uppercase"
-                >时区</span
-              >
-              <span class="text-foreground">{{
-                serverStatus.system.system_timezone
-              }}</span>
-            </div>
-          </div>
-          <div v-else class="space-y-2 px-4 py-3">
-            <div class="bg-warm-gray h-2 w-3/4 animate-pulse rounded" />
-            <div class="bg-warm-gray h-2 w-1/2 animate-pulse rounded" />
-            <div class="bg-warm-gray h-2 w-2/3 animate-pulse rounded" />
-          </div>
-        </section>
       </div>
 
-      <!-- ── 服务运行时（紧凑 key-value 表） ── -->
-      <section
-        class="border-border bg-muted overflow-hidden rounded-md border"
-        data-od-id="runtime-panel"
-      >
-        <header
-          class="border-border bg-background/40 flex items-center justify-between border-b px-4 py-3"
+      <!-- ─── 详情面板(折叠) ─── -->
+      <section>
+        <button
+          type="button"
+          class="text-muted-foreground hover:text-foreground group inline-flex items-center gap-2 text-[13px] transition-colors"
+          :aria-expanded="showDetails"
+          aria-controls="status-details-panel"
+          @click="showDetails = !showDetails"
         >
-          <div
-            class="text-foreground flex items-center gap-2 text-[13px] font-semibold tracking-[-0.01em]"
-          >
-            <span class="bg-accent block h-3.5 w-1 rounded-sm" />
-            服务运行时
-          </div>
           <span
-            class="text-muted-foreground font-mono text-[11px] tracking-[0.06em] uppercase"
-            v-if="serverStatus"
-          >
-            运行
-            <span class="text-foreground">{{
-              formatUptime(now - serverStatus.service.start_time * 1000)
-            }}</span>
-          </span>
-        </header>
-        <div
-          v-if="serverStatus"
-          class="grid grid-cols-1 font-mono text-[12px] md:grid-cols-2"
-        >
-          <div
-            class="border-border flex items-center justify-between border-b border-dashed px-4 py-2.5"
-          >
-            <span
-              class="text-muted-foreground text-[11px] tracking-[0.06em] uppercase"
-              >Runtime</span
-            >
-            <span class="text-foreground">{{
-              serverStatus.service.runtime
-            }}</span>
-          </div>
-          <div
-            class="border-border flex items-center justify-between border-b border-dashed px-4 py-2.5"
-          >
-            <span
-              class="text-muted-foreground text-[11px] tracking-[0.06em] uppercase"
-              >协程</span
-            >
-            <span class="text-foreground tabular-nums">{{
-              serverStatus.service.goroutines
-            }}</span>
-          </div>
-          <div
-            class="border-border flex items-center justify-between border-b border-dashed px-4 py-2.5"
-          >
-            <span
-              class="text-muted-foreground text-[11px] tracking-[0.06em] uppercase"
-              >GC 次数</span
-            >
-            <span class="text-foreground tabular-nums">{{
-              serverStatus.service.gc_count
-            }}</span>
-          </div>
-          <div
-            class="border-border flex items-center justify-between border-b border-dashed px-4 py-2.5"
-          >
-            <span
-              class="text-muted-foreground text-[11px] tracking-[0.06em] uppercase"
-              >启动时间</span
-            >
-            <span class="text-foreground"
-              >{{
-                formatStartTime(serverStatus.service.start_time)
-              }}
-              (GMT+8)</span
-            >
-          </div>
-        </div>
-        <div v-else class="space-y-2 px-4 py-3">
-          <div class="bg-warm-gray h-2 w-3/4 animate-pulse rounded" />
-          <div class="bg-warm-gray h-2 w-1/2 animate-pulse rounded" />
-        </div>
-      </section>
-
-      <!-- ── 最近事件 ── -->
-      <section
-        class="border-border bg-muted overflow-hidden rounded-md border"
-        data-od-id="events-panel"
-      >
-        <header
-          class="border-border bg-background/40 flex items-center justify-between border-b px-4 py-3"
-        >
-          <div
-            class="text-foreground flex items-center gap-2 text-[13px] font-semibold tracking-[-0.01em]"
-          >
-            <span class="bg-accent block h-3.5 w-1 rounded-sm" />
-            最近事件
-          </div>
-          <div
-            class="text-muted-foreground flex items-center gap-3 font-mono text-[11px] tracking-[0.06em] uppercase"
-          >
-            <span class="inline-flex items-center gap-1.5">
-              <span
-                class="bg-success inline-block h-1.5 w-1.5 animate-[livePulse_1.6s_ease-out_infinite] rounded-full"
-              />
-              30s
-            </span>
-            <span>最近 {{ recentEvents.length }} 条</span>
-          </div>
-        </header>
-        <div v-if="recentEvents.length" class="font-mono text-[12px]">
-          <div
-            v-for="(event, idx) in recentEvents"
-            :key="event.id"
-            class="border-border flex items-start gap-3 px-4 py-2.5"
-            :class="
-              idx < recentEvents.length - 1 ? 'border-b border-dashed' : ''
-            "
-          >
-            <span class="text-muted-foreground shrink-0 tabular-nums">
-              {{ formatLogTime(event.timestamp) }}
-            </span>
-            <span
-              :class="[
-                'shrink-0 rounded-sm px-1.5 py-0.5 text-[10px] font-medium tracking-[0.06em] uppercase',
-                typeChipClass(event.type),
-              ]"
-            >
-              {{ event.type }}
-            </span>
-            <span class="text-foreground min-w-0 flex-1 break-words">
-              {{ event.title }}
-            </span>
-          </div>
-        </div>
-        <div v-else class="space-y-2 px-4 py-3">
-          <div class="bg-warm-gray h-2 w-3/4 animate-pulse rounded" />
-          <div class="bg-warm-gray h-2 w-1/2 animate-pulse rounded" />
-          <div class="bg-warm-gray h-2 w-2/3 animate-pulse rounded" />
-        </div>
-      </section>
-
-      <!-- ── 版本信息 ── -->
-      <section
-        class="border-border bg-muted overflow-hidden rounded-md border"
-        data-od-id="version-panel"
-      >
-        <header
-          class="border-border bg-background/40 flex items-center justify-between border-b px-4 py-3"
-        >
-          <div
-            class="text-foreground flex items-center gap-2 text-[13px] font-semibold tracking-[-0.01em]"
-          >
-            <span class="bg-accent block h-3.5 w-1 rounded-sm" />
-            版本信息
-          </div>
-          <button
-            class="text-muted-foreground hover:text-foreground transition-colors"
-            title="刷新"
-            @click="loadStatus"
-          >
-            <svg
-              class="h-3.5 w-3.5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
-          </button>
-        </header>
-        <div
-          v-if="serverStatus"
-          class="grid grid-cols-1 font-mono text-[12px] md:grid-cols-2"
-        >
-          <div
-            class="border-border flex items-center justify-between border-b border-dashed px-4 py-2.5"
-          >
-            <span
-              class="text-muted-foreground text-[11px] tracking-[0.06em] uppercase"
-              >当前版本</span
-            >
-            <span class="text-foreground">
-              <code
-                class="bg-warm-gray text-accent rounded-sm px-1.5 py-0.5 font-mono"
-                >v{{ serverStatus.version.current_version }}</code
-              >
-            </span>
-          </div>
-          <div
-            class="border-border flex items-center justify-between border-b border-dashed px-4 py-2.5"
-          >
-            <span
-              class="text-muted-foreground text-[11px] tracking-[0.06em] uppercase"
-              >仓库</span
-            >
-            <a
-              :href="serverStatus.version.repo_url"
-              target="_blank"
-              class="text-accent underline underline-offset-4 hover:opacity-80"
-              >GitHub 仓库</a
-            >
-          </div>
-        </div>
-      </section>
-
-      <!-- ── Footer strip ── -->
-      <footer
-        class="text-muted-foreground border-border bg-muted flex flex-wrap items-center gap-x-6 gap-y-2 rounded-md border px-4 py-3 font-mono text-[11px] tracking-[0.08em] uppercase"
-        data-od-id="footer-strip"
-      >
-        <span class="inline-flex items-center gap-2">
-          <span
-            class="bg-success inline-block h-1.5 w-1.5 animate-[livePulse_1.6s_ease-out_infinite] rounded-full"
+            class="bg-border inline-block h-px w-6 transition-all duration-300 group-hover:w-8"
           />
-          <strong
-            class="text-foreground font-medium tracking-[-0.01em] normal-case"
-            >{{ visitorCount.count }}</strong
+          {{ showDetails ? '收起详细信息' : '展开详细信息' }}
+          <svg
+            :class="[
+              'h-3 w-3 transition-transform duration-300',
+              showDetails ? 'rotate-180' : '',
+            ]"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-          在线
-        </span>
-        <span v-if="serverStatus"
-          >CPU
-          <strong
-            class="text-foreground font-medium tracking-[-0.01em] normal-case"
-            >{{ serverStatus.system.cpu_percent.toFixed(0) }}%</strong
-          ></span
-        >
-        <span v-if="serverStatus"
-          >内存
-          <strong
-            class="text-foreground font-medium tracking-[-0.01em] normal-case"
-            >{{ serverStatus.system.memory_usage_percent.toFixed(0) }}%</strong
-          ></span
-        >
-        <span v-if="serverStatus"
-          >运行时
-          <strong
-            class="text-foreground font-medium tracking-[-0.01em] normal-case"
-            >{{
-              formatUptime(now - serverStatus.service.start_time * 1000)
-            }}</strong
-          ></span
-        >
-      </footer>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </button>
+
+        <AnimatePresence>
+          <motion.div
+            v-if="showDetails"
+            id="status-details-panel"
+            :initial="prefersReducedMotion ? false : { opacity: 0, height: 0 }"
+            :animate="{ opacity: 1, height: 'auto' }"
+            :exit="
+              prefersReducedMotion ? { opacity: 0 } : { opacity: 0, height: 0 }
+            "
+            :transition="EASE"
+            class="overflow-hidden"
+          >
+            <div
+              class="bg-card squircle border-border mt-6 grid gap-8 border p-6 shadow-[inset_0_0_20px_0px_rgba(255,255,255,0.35)] sm:p-8 md:grid-cols-2"
+            >
+              <!-- 主机信息 -->
+              <div class="space-y-4">
+                <h3
+                  class="text-foreground font-serif text-[17px] tracking-[-0.01em]"
+                >
+                  主机信息
+                </h3>
+                <div v-if="serverStatus" class="text-[13px]">
+                  <dl class="divide-border divide-y">
+                    <div class="flex items-center justify-between py-2">
+                      <dt class="text-muted-foreground">操作系统 / 内核</dt>
+                      <dd class="text-foreground text-right">
+                        {{ serverStatus.system.os_name }} ·
+                        {{ serverStatus.system.kernel_version }}
+                      </dd>
+                    </div>
+                    <div class="flex items-center justify-between gap-4 py-2">
+                      <dt class="text-muted-foreground shrink-0">CPU 型号</dt>
+                      <dd
+                        class="text-foreground truncate text-right"
+                        :title="serverStatus.system.cpu_model"
+                      >
+                        {{ serverStatus.system.cpu_model }}
+                      </dd>
+                    </div>
+                    <div class="flex items-center justify-between py-2">
+                      <dt class="text-muted-foreground">核心(逻辑 / 物理)</dt>
+                      <dd class="text-foreground tabular-nums">
+                        {{ serverStatus.system.cpu_count_logical }} /
+                        {{ serverStatus.system.cpu_count_physical }}
+                      </dd>
+                    </div>
+                    <div class="flex items-center justify-between py-2">
+                      <dt class="text-muted-foreground">总内存</dt>
+                      <dd class="text-foreground tabular-nums">
+                        {{ bytesToGB(serverStatus.system.memory_total_bytes) }}
+                      </dd>
+                    </div>
+                    <div class="flex items-center justify-between py-2">
+                      <dt class="text-muted-foreground">已用</dt>
+                      <dd class="text-foreground tabular-nums">
+                        {{ bytesToMB(serverStatus.system.memory_used_bytes) }}
+                      </dd>
+                    </div>
+                    <div class="flex items-center justify-between py-2">
+                      <dt class="text-muted-foreground">时区</dt>
+                      <dd class="text-foreground">
+                        {{ serverStatus.system.system_timezone }}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+                <div v-else class="space-y-2">
+                  <div class="bg-muted h-3 w-3/4 animate-pulse rounded" />
+                  <div class="bg-muted h-3 w-1/2 animate-pulse rounded" />
+                </div>
+              </div>
+
+              <!-- 运行时 -->
+              <div class="space-y-4">
+                <h3
+                  class="text-foreground font-serif text-[17px] tracking-[-0.01em]"
+                >
+                  服务运行时
+                </h3>
+                <div v-if="serverStatus" class="text-[13px]">
+                  <dl class="divide-border divide-y">
+                    <div class="flex items-center justify-between py-2">
+                      <dt class="text-muted-foreground">运行时</dt>
+                      <dd class="text-foreground">
+                        {{ serverStatus.service.runtime }}
+                      </dd>
+                    </div>
+                    <div class="flex items-center justify-between py-2">
+                      <dt class="text-muted-foreground">协程数</dt>
+                      <dd class="text-foreground tabular-nums">
+                        {{ serverStatus.service.goroutines }}
+                      </dd>
+                    </div>
+                    <div class="flex items-center justify-between py-2">
+                      <dt class="text-muted-foreground">GC 次数</dt>
+                      <dd class="text-foreground tabular-nums">
+                        {{ serverStatus.service.gc_count }}
+                      </dd>
+                    </div>
+                    <div class="flex items-center justify-between py-2">
+                      <dt class="text-muted-foreground">启动时间</dt>
+                      <dd class="text-foreground tabular-nums">
+                        {{ formatStartTime(serverStatus.service.start_time) }}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+                <div v-else class="space-y-2">
+                  <div class="bg-muted h-3 w-3/4 animate-pulse rounded" />
+                  <div class="bg-muted h-3 w-1/2 animate-pulse rounded" />
+                </div>
+              </div>
+
+              <!-- 最近事件(跨双列) -->
+              <div class="space-y-4 md:col-span-2">
+                <h3
+                  class="text-foreground font-serif text-[17px] tracking-[-0.01em]"
+                >
+                  最近事件
+                </h3>
+                <div v-if="recentEvents.length" class="text-[13px]">
+                  <ol class="divide-border divide-y">
+                    <li
+                      v-for="event in recentEvents"
+                      :key="event.id"
+                      class="grid grid-cols-[auto_auto_1fr] items-baseline gap-3 py-2.5"
+                    >
+                      <span
+                        class="text-muted-foreground font-mono text-[12px] tabular-nums"
+                      >
+                        {{ formatLogTime(event.timestamp) }}
+                      </span>
+                      <span
+                        :class="[
+                          'inline-flex items-center gap-1.5 text-[11px]',
+                          TONE_TEXT[EVENT_TONE[event.type] ?? 'success'],
+                        ]"
+                      >
+                        <span
+                          :class="[
+                            'inline-block h-1.5 w-1.5 rounded-full',
+                            TONE_DOT[EVENT_TONE[event.type] ?? 'success'],
+                          ]"
+                        />
+                        {{ EVENT_LABEL[event.type] ?? event.type }}
+                      </span>
+                      <span class="text-foreground min-w-0 truncate">
+                        {{ event.title }}
+                      </span>
+                    </li>
+                  </ol>
+                </div>
+                <div v-else class="space-y-2">
+                  <div class="bg-muted h-3 w-3/4 animate-pulse rounded" />
+                  <div class="bg-muted h-3 w-1/2 animate-pulse rounded" />
+                </div>
+              </div>
+
+              <!-- 版本(跨双列) -->
+              <div
+                v-if="serverStatus"
+                class="border-border text-muted-foreground flex items-center justify-between border-t pt-4 text-[12px] md:col-span-2"
+              >
+                <span>
+                  当前版本
+                  <code
+                    class="bg-muted text-foreground ml-1.5 rounded px-1.5 py-0.5 font-mono"
+                    >v{{ serverStatus.version.current_version }}</code
+                  >
+                </span>
+                <a
+                  :href="serverStatus.version.repo_url"
+                  target="_blank"
+                  rel="noopener"
+                  class="hover:text-foreground underline underline-offset-4 transition-colors"
+                  >查看仓库</a
+                >
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </section>
     </motion.div>
   </div>
 </template>
-
-<style scoped>
-/* 状态点（ok / warn / danger / idle）—— Datadog 风的发光小点 + 周期 ripple */
-.status-dot {
-  position: relative;
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.status-dot::after {
-  content: '';
-  position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  border: 2px solid currentColor;
-  opacity: 0;
-  animation: dotRipple 1.8s ease-out infinite;
-}
-.status-dot--ok {
-  color: var(--color-success);
-  background: var(--color-success);
-}
-.status-dot--warn {
-  color: var(--color-warning);
-  background: var(--color-warning);
-}
-.status-dot--danger {
-  color: var(--color-danger);
-  background: var(--color-danger);
-}
-.status-dot--idle {
-  color: var(--color-muted-foreground);
-  background: var(--color-muted-foreground);
-  opacity: 0.5;
-}
-
-@keyframes dotRipple {
-  0% {
-    opacity: 0.5;
-    transform: scale(0.6);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.4);
-  }
-}
-
-/* Live 圆点呼吸 */
-.live-dot {
-  position: relative;
-  box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 60%, transparent);
-  animation: livePulse 1.6s ease-out infinite;
-}
-@keyframes livePulse {
-  0% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 60%, transparent);
-  }
-  70% {
-    box-shadow: 0 0 0 6px color-mix(in srgb, currentColor 0%, transparent);
-  }
-  100% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 0%, transparent);
-  }
-}
-</style>

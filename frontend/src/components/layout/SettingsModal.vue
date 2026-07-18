@@ -126,12 +126,10 @@
           <footer
             class="flex items-center justify-between px-8 pt-2 pb-4 font-mono text-[11px]"
           >
-            <span class="text-muted-foreground font-sans"
-              >Settings · v4.7.0</span
-            >
+            <span class="text-muted-foreground font-sans">Settings</span>
             <span class="text-muted-foreground font-serif italic"
               >ka·no·ci·fer</span
-            />
+            >
           </footer>
         </div>
       </motion.div>
@@ -146,7 +144,14 @@ import IconClose from '@/components/icons/IconClose.vue';
 import AppearanceTab from './AppearanceTab.vue';
 import BackgroundTab from './BackgroundTab.vue';
 import CardTab from './CardTab.vue';
-import { nextTick, onMounted, onUnmounted, useTemplateRef, ref, watch } from 'vue';
+import {
+  nextTick,
+  onMounted,
+  onUnmounted,
+  useTemplateRef,
+  ref,
+  watch,
+} from 'vue';
 
 defineProps<{
   modelValue: boolean;

@@ -71,7 +71,6 @@ type ServerStatus struct {
 	DiskUsage  float64 `json:"disk_usage"`
 }
 
-
 type StatusDetail struct {
 	Version VersionInfoOut `json:"version"`
 	Service ServiceInfoOut `json:"service"`

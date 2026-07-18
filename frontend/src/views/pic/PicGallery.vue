@@ -40,7 +40,13 @@
         class="gallery-item"
         :initial="{ opacity: 0, y: 24 }"
         :animate="{ opacity: 1, y: 0 }"
-        :transition="{ type: 'spring', stiffness: 220, damping: 24, duration: 0.5, delay: Math.min(index * 0.03, 0.4) }"
+        :transition="{
+          type: 'spring',
+          stiffness: 220,
+          damping: 24,
+          duration: 0.5,
+          delay: Math.min(index * 0.03, 0.4),
+        }"
       >
         <PolaroidCard
           :image="image"
@@ -114,11 +120,7 @@ import PicDetailModal from '@/components/pic/PicDetailModal.vue';
 import PicUploadModal from '@/components/pic/PicUploadModal.vue';
 import PolaroidCard from '@/components/pic/PolaroidCard.vue';
 import { Button } from '@/components/ui/button';
-import {
-  useGallery,
-  usePolaroidLayout,
-  type Picture,
-} from '@/composables/pic';
+import { useGallery, usePolaroidLayout, type Picture } from '@/composables/pic';
 import { useAuthStore } from '@/auth/stores/auth';
 import { useNotificationStore } from '@/stores/notification';
 import { ImageOff } from '@lucide/vue';

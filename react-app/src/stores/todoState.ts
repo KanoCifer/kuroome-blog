@@ -1,7 +1,4 @@
-import {
-  devTaskService,
-  type DevTaskService,
-} from '@/services/devtaskService';
+import { devTaskService, type DevTaskService } from '@/services/devtaskService';
 import { create } from 'zustand';
 import type {
   CreateDevTaskPayload,
@@ -12,11 +9,11 @@ import type {
 
 // v3 全量状态标签
 export const STATUS_LABELS: Record<DevTaskStatus, string> = {
-  '待评估': '待评估',
-  '待排期': '待排期',
-  '进行中': '进行中',
-  '已搁置': '已搁置',
-  '已完成': '已完成',
+  待评估: '待评估',
+  待排期: '待排期',
+  进行中: '进行中',
+  已搁置: '已搁置',
+  已完成: '已完成',
 };
 
 // Semantic status badge styles（与 TaskDetailPanel / BentoTodo chip 共用）
@@ -24,27 +21,27 @@ export const STATUS_STYLES: Record<
   DevTaskStatus,
   { bg: string; border: string; text: string }
 > = {
-  '待评估': {
+  待评估: {
     bg: 'bg-primary/10',
     border: 'border-primary/30',
     text: 'text-primary',
   },
-  '待排期': {
+  待排期: {
     bg: 'bg-warning/10',
     border: 'border-warning/30',
     text: 'text-warning',
   },
-  '进行中': {
+  进行中: {
     bg: 'bg-info/10',
     border: 'border-info/30',
     text: 'text-info',
   },
-  '已搁置': {
+  已搁置: {
     bg: 'bg-amber-500/10',
     border: 'border-amber-500/30',
     text: 'text-amber-600 dark:text-amber-400',
   },
-  '已完成': {
+  已完成: {
     bg: 'bg-success/10',
     border: 'border-success/30',
     text: 'text-success',
@@ -53,11 +50,11 @@ export const STATUS_STYLES: Record<
 
 // 状态推进：跳开"已搁置"——搁置与恢复是用户主动选择，不在循环里
 const STATUS_CYCLE: Record<DevTaskStatus, DevTaskStatus> = {
-  '待评估': '待排期',
-  '待排期': '进行中',
-  '进行中': '已完成',
-  '已搁置': '待排期',
-  '已完成': '待评估',
+  待评估: '待排期',
+  待排期: '进行中',
+  进行中: '已完成',
+  已搁置: '待排期',
+  已完成: '待评估',
 };
 
 // 主线状态流转（有顺序）：已搁置是旁路，不进主线
@@ -84,9 +81,9 @@ export const useTodoState = create<DevTaskState>((set, get) => ({
   tasks: [],
 
   hydrateTasks: () => {
-    service.list({ per_page: 200 }).then((res) =>
-      set({ tasks: res.tasks.filter((t) => !t.is_deleted) }),
-    );
+    service
+      .list({ per_page: 200 })
+      .then((res) => set({ tasks: res.tasks.filter((t) => !t.is_deleted) }));
   },
 
   createTask: async (payload) => {
@@ -111,9 +108,7 @@ export const useTodoState = create<DevTaskState>((set, get) => ({
   updateTask: async (slug, patch) => {
     await service.update(slug, patch);
     set((state) => ({
-      tasks: state.tasks.map((t) =>
-        t.slug === slug ? { ...t, ...patch } : t,
-      ),
+      tasks: state.tasks.map((t) => (t.slug === slug ? { ...t, ...patch } : t)),
     }));
   },
 
@@ -131,7 +126,7 @@ export const useTodoState = create<DevTaskState>((set, get) => ({
 // ── Derived selectors（与 Vue v3devtasks store 对齐） ──
 
 function priorityWeight(p: DevTask['priority']): number {
-  return ({ 'P0 紧急': 0, 'P1 高': 1, 'P2 中': 2, 'P3 低': 3 })[p] ?? 9;
+  return { 'P0 紧急': 0, 'P1 高': 1, 'P2 中': 2, 'P3 低': 3 }[p] ?? 9;
 }
 
 /** frontier = 非已完成 且 无阻塞依赖 的任务。按优先级权重 + 截止日排序。 */

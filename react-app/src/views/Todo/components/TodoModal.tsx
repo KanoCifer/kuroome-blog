@@ -55,7 +55,12 @@ export function TodoModal({
             initial={{ scale: 0.95, y: 12, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.97, y: 6, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 340, damping: 32, mass: 0.8 }}
+            transition={{
+              type: 'spring',
+              stiffness: 340,
+              damping: 32,
+              mass: 0.8,
+            }}
             onClick={(e) => e.stopPropagation()}
             className={`bg-background border-border/60 relative max-h-[85vh] w-full overflow-hidden rounded-2xl border shadow-2xl ${SIZE_CLASS[size]}`}
             role="dialog"

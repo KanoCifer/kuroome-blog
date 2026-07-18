@@ -21,8 +21,7 @@ const STATUSES: DevTaskStatus[] = [
 ];
 
 const TYPE_ACTIVE: Record<DevTaskType, string> = {
-  问题:
-    'border-rose-300/60 bg-rose-50 text-rose-700 dark:border-rose-700/60 dark:bg-rose-950/30 dark:text-rose-400',
+  问题: 'border-rose-300/60 bg-rose-50 text-rose-700 dark:border-rose-700/60 dark:bg-rose-950/30 dark:text-rose-400',
   功能需求:
     'border-blue-300/60 bg-blue-50 text-blue-700 dark:border-blue-700/60 dark:bg-blue-950/30 dark:text-blue-400',
   优化: 'border-amber-300/60 bg-amber-50 text-amber-700 dark:border-amber-700/60 dark:bg-amber-950/30 dark:text-amber-400',
@@ -327,7 +326,9 @@ export function DevTaskModal({
                 value={form.acceptance_criteria}
                 onChange={(e) => set('acceptance_criteria', e.target.value)}
                 rows={4}
-                placeholder={'- 所有接口有单测覆盖\n- 文档同步更新\n- 性能基准不降级'}
+                placeholder={
+                  '- 所有接口有单测覆盖\n- 文档同步更新\n- 性能基准不降级'
+                }
                 className="border-border bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               />
             </label>
@@ -343,7 +344,9 @@ export function DevTaskModal({
                 value={form.constraints}
                 onChange={(e) => set('constraints', e.target.value)}
                 rows={4}
-                placeholder={'- 不动 src/legacy/ 目录\n- 后端继续用 Gin，不换框架\n- API 响应格式保持不变'}
+                placeholder={
+                  '- 不动 src/legacy/ 目录\n- 后端继续用 Gin，不换框架\n- API 响应格式保持不变'
+                }
                 className="border-border bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               />
             </label>

@@ -30,7 +30,7 @@
         >
           <img
             src="https://github.githubassets.com/favicons/favicon.svg"
-            class="h-3.5 w-3.5 opacity-60 grayscale mix-blend-normal"
+            class="h-3.5 w-3.5 opacity-60 mix-blend-normal grayscale"
             alt="Github"
           />
           <span class="font-mono tracking-[0.1em]">GitHub</span>
@@ -66,4 +66,3 @@ footer {
   /* mix-blend-difference on inner container handles auto-contrast */
 }
 </style>
-

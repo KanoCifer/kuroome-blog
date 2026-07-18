@@ -84,18 +84,17 @@ func (s *MonitorService) GetStatusDetail(ctx context.Context) (dto.StatusDetail,
 	// 2. 获取CPU信息
 	cpuInfo, _ := cpu.Info()
 
-
 	vm, _ := mem.VirtualMemory()
 
 	sysInfo := dto.SystemInfoOut{
-		SystemTime:         time.Now().Format("2006/01/02 15:04:05"),
-		SystemTimezone:     "GMT+8",
-		OsName:             runtime.GOOS,
-		OsVersion:          runtime.GOARCH,
-		KernelVersion:      runtime.GOARCH,
-		CpuModel:           cpuInfo[0].ModelName,
-		CpuCountPhysical:   cpuCountP,
-		CpuCountLogical:    cpuCountL,
+		SystemTime:       time.Now().Format("2006/01/02 15:04:05"),
+		SystemTimezone:   "GMT+8",
+		OsName:           runtime.GOOS,
+		OsVersion:        runtime.GOARCH,
+		KernelVersion:    runtime.GOARCH,
+		CpuModel:         cpuInfo[0].ModelName,
+		CpuCountPhysical: cpuCountP,
+		CpuCountLogical:  cpuCountL,
 		LoadAverage: map[string]float64{
 			"1m":  math.Round(loadAvg.Load1*100) / 100,
 			"5m":  math.Round(loadAvg.Load5*100) / 100,

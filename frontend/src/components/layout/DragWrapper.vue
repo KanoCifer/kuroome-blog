@@ -62,7 +62,7 @@ const isThisCardDragging = computed(
 watch(
   () => layoutStore.isEditing,
   (editing, wasEditing) => {
-    if (!editing || wasEditing) return;     // only on the off->on edge
+    if (!editing || wasEditing) return; // only on the off->on edge
     const el = wrapperEl.value;
     if (!el) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -127,9 +127,13 @@ function onPointerDown(e: PointerEvent) {
 
 @media (prefers-reduced-motion: reduce) {
   .drag-wrapper {
-    transition: outline-color 200ms ease, outline-offset 200ms ease;
+    transition:
+      outline-color 200ms ease,
+      outline-offset 200ms ease;
   }
-  .card-wiggle { animation: none; }
+  .card-wiggle {
+    animation: none;
+  }
   /* lift is dropped; border ring still transitions */
 }
 
@@ -137,12 +141,24 @@ function onPointerDown(e: PointerEvent) {
    on the wrapper), so the wiggle only needs to apply rotate — composing
    cleanly with the .is-dragging scale override. */
 @keyframes card-wiggle {
-  0%   { transform: rotate(0deg); }
-  20%  { transform: rotate(-1.6deg); }
-  40%  { transform: rotate(1.3deg); }
-  60%  { transform: rotate(-0.8deg); }
-  80%  { transform: rotate(0.4deg); }
-  100% { transform: rotate(0deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-1.6deg);
+  }
+  40% {
+    transform: rotate(1.3deg);
+  }
+  60% {
+    transform: rotate(-0.8deg);
+  }
+  80% {
+    transform: rotate(0.4deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
 }
 
 .card-wiggle {

@@ -84,7 +84,7 @@
               :src="bg.url"
               :alt="bg.name"
               class="flex-shrink-0 rounded-md object-cover"
-              style="width: 40px; height: 24px;"
+              style="width: 40px; height: 24px"
             />
             <span class="flex-1 text-left">{{ bg.name }}</span>
             <svg

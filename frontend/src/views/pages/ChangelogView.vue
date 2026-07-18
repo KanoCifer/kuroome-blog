@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { motion } from 'motion-v';
-import { SPRING_REVEAL, WHILE_IN_VIEW_FADE_UP } from '@/constants/motionPresets';
+import {
+  SPRING_REVEAL,
+  WHILE_IN_VIEW_FADE_UP,
+} from '@/constants/motionPresets';
 import { changelogGateway, type Changelog } from '@/api/public';
 
 const changelog = ref<Changelog[]>([]);

@@ -2,7 +2,6 @@ package middleware
 
 import "github.com/gin-gonic/gin"
 
-
 func CacheController(cache ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if len(cache) == 0 {

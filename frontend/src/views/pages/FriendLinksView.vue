@@ -324,7 +324,11 @@ import websitesData from '@/data/websites.json';
 import { useNotificationStore } from '@/stores/notification';
 import type { Website } from '@/types';
 import { motion } from 'motion-v';
-import { SPRING_REVEAL, WHILE_IN_VIEW_FADE_UP, HOVER_LIFT } from '@/constants/motionPresets';
+import {
+  SPRING_REVEAL,
+  WHILE_IN_VIEW_FADE_UP,
+  HOVER_LIFT,
+} from '@/constants/motionPresets';
 import { onMounted, ref } from 'vue';
 import IconCopy from '@/components/icons/IconCopy.vue';
 import IconDocumentText from '@/components/icons/IconDocumentText.vue';

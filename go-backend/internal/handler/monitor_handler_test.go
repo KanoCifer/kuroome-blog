@@ -23,11 +23,11 @@ func init() {
 // ---------- mock MonitorService ----------
 
 type mockMonitorService struct {
-	overviewFn       func(ctx context.Context, days int) (dto.Overview, error)
-	visitorsFn       func(ctx context.Context, days, page, pageSize int) (dto.Visitors, error)
-	userLoginsFn     func(ctx context.Context, days, page, pageSize int) (dto.UserLogins, error)
-	serverStatusFn   func() (dto.ServerStatus, error)
-	trackVisitorFn   func(ctx context.Context, data dto.VisitorData) error
+	overviewFn        func(ctx context.Context, days int) (dto.Overview, error)
+	visitorsFn        func(ctx context.Context, days, page, pageSize int) (dto.Visitors, error)
+	userLoginsFn      func(ctx context.Context, days, page, pageSize int) (dto.UserLogins, error)
+	serverStatusFn    func() (dto.ServerStatus, error)
+	trackVisitorFn    func(ctx context.Context, data dto.VisitorData) error
 	getStatusDetailFn func(ctx context.Context) (dto.StatusDetail, error)
 }
 
