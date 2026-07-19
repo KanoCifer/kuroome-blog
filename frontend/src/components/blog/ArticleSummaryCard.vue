@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'motion-v';
 import { FADE } from '@/constants/motionPresets';
 import { computed, onMounted, ref, watch } from 'vue';
 import { renderMarkdown } from '@/composables/shared';
+import { ModalFadeTransition } from '@/components/ui/modal-fade-transition';
 
 const renderedSummary = computed(() =>
   summary.value ? renderMarkdown(summary.value) : '',
@@ -240,7 +241,7 @@ async function switchToChat() {
     <!-- Summary content -->
     <template v-if="cardMode === CardMode.SUMMARY">
       <div class="border-border/40 border-t px-5 pt-4 pb-5">
-        <Transition name="summary-fade" mode="out-in">
+        <ModalFadeTransition mode="out-in">
           <div
             v-if="summary"
             key="result"
@@ -278,7 +279,7 @@ async function switchToChat() {
               点击「生成总结」，快速提炼文章核心要点
             </p>
           </div>
-        </Transition>
+        </ModalFadeTransition>
       </div>
     </template>
 

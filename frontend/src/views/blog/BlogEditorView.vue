@@ -6,6 +6,7 @@ import { blogGateway } from '@/api/public';
 import { uploadGateway } from '@/api/blog';
 import { useOrigin } from '@/composables/shared';
 import { useNotificationStore } from '@/stores/notification';
+import { ModalFadeTransition } from '@/components/ui/modal-fade-transition';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -640,14 +641,7 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- ─── Meta drawer: summary + cover ─── -->
-        <transition
-          enter-active-class="transition duration-200 ease-out motion-reduce:transition-none motion-reduce:opacity-100"
-          enter-from-class="opacity-0 motion-reduce:opacity-100"
-          enter-to-class="opacity-100"
-          leave-active-class="transition duration-150 ease-out motion-reduce:transition-none"
-          leave-from-class="opacity-100"
-          leave-to-class="opacity-0 motion-reduce:opacity-100"
-        >
+        <ModalFadeTransition>
           <div
             v-if="metaOpen"
             id="meta-drawer"
@@ -734,7 +728,7 @@ onBeforeUnmount(() => {
               </div>
             </div>
           </div>
-        </transition>
+        </ModalFadeTransition>
 
         <!-- ─── The writing canvas ─── -->
         <!--

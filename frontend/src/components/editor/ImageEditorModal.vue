@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { ModalFadeTransition } from '@/components/ui/modal-fade-transition';
 
 defineProps<{
   isOpen: boolean;
@@ -27,14 +28,7 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
 
 <template>
   <teleport to="body">
-    <transition
-      enter-active-class="transition duration-300 ease-out"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="transition duration-200 ease-out"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
-    >
+    <ModalFadeTransition>
       <div
         v-if="isOpen"
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
@@ -137,6 +131,6 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
           </div>
         </div>
       </div>
-    </transition>
+    </ModalFadeTransition>
   </teleport>
 </template>

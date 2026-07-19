@@ -33,6 +33,7 @@ const CARD_SHADOW = [
 ].join(', ');
 import { MapPin, Navigation, Pencil, Star, Trash2, X } from '@lucide/vue';
 import { useNotificationStore } from '@/stores/notification';
+import { SlideFadeTransitionX } from '@/components/ui/slide-fade-transition-x';
 import type { AxiosError } from 'axios';
 
 const props = defineProps<{
@@ -207,14 +208,7 @@ watch(
       · 无背景模糊;点击遮罩不关闭(仅 × 按钮关闭)
     -->
 
-    <Transition
-      enter-active-class="transition-all duration-300 ease-out"
-      enter-from-class="opacity-0 translate-x-8"
-      enter-to-class="opacity-100 translate-x-0"
-      leave-active-class="transition-all duration-200 ease-out"
-      leave-from-class="opacity-100 translate-x-0"
-      leave-to-class="opacity-0 translate-x-8"
-    >
+    <SlideFadeTransitionX>
       <aside
         v-if="open"
         ref="panelRef"
@@ -453,7 +447,7 @@ watch(
           </div>
         </footer>
       </aside>
-    </Transition>
+    </SlideFadeTransitionX>
 
     <!-- 照片灯箱 -->
     <SpotPhotoLightbox

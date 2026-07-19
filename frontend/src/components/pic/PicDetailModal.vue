@@ -10,14 +10,7 @@
     </motion.div>
   </Teleport>
   <Teleport to="body">
-    <transition
-      enter-active-class="transition-all duration-300 ease-out"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="transition-all duration-300 ease-out"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
-    >
+    <ModalFadeTransition>
       <div
         v-if="image"
         class="fixed inset-0 z-9999 flex items-center justify-center p-4 md:p-8"
@@ -438,13 +431,14 @@
           </section>
         </motion.div>
       </div>
-    </transition>
+    </ModalFadeTransition>
   </Teleport>
 </template>
 
 <script setup lang="ts">
 import { motion } from 'motion-v';
 import { FADE } from '@/constants/motionPresets';
+import { ModalFadeTransition } from '@/components/ui/modal-fade-transition';
 import { computed, nextTick, ref, watch } from 'vue';
 import type { ExifInfo, Picture } from '@/composables/pic';
 

@@ -67,11 +67,9 @@
       </button>
 
       <!-- 路线浮层（原 MapTile 折叠进来） -->
-      <Transition
-        enter-active-class="transition-all duration-300 ease-out"
+      <SlideFadeTransitionX
         enter-from-class="opacity-0 translate-y-2"
         enter-to-class="opacity-100 translate-y-0"
-        leave-active-class="transition-all duration-200 ease-out"
         leave-from-class="opacity-100 translate-y-0"
         leave-to-class="opacity-0 translate-y-2"
       >
@@ -113,7 +111,7 @@
             </button>
           </div>
         </div>
-      </Transition>
+      </SlideFadeTransitionX>
 
       <p
         v-if="!isPlanning && !routeInfo"
@@ -137,6 +135,7 @@ import {
   type RouteInfo,
 } from '@/views/fishing/composables/useFishingRoute';
 import { formatDuration } from '@/utils/format/duration';
+import { SlideFadeTransitionX } from '@/components/ui/slide-fade-transition-x';
 import { DEFAULT_MAP_CENTER } from '@/stores/fishingMap';
 import {
   nextTick,

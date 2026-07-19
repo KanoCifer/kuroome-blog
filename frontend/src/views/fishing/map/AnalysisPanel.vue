@@ -13,6 +13,7 @@
 import WeatherAnalysis from '@/components/ai/WeatherAnalysis.vue';
 import type { WeatherAnalysisPayload } from '@/types/fishing';
 import { X } from '@lucide/vue';
+import { SlideFadeTransitionX } from '@/components/ui/slide-fade-transition-x';
 import { nextTick, ref, watch } from 'vue';
 
 const props = defineProps<{
@@ -83,14 +84,7 @@ watch(
       · 无背景模糊;点击遮罩不关闭(仅 ✕ / Esc / header 按钮关闭)
     -->
 
-    <Transition
-      enter-active-class="transition-all duration-300 ease-out"
-      enter-from-class="opacity-0 translate-x-8"
-      enter-to-class="opacity-100 translate-x-0"
-      leave-active-class="transition-all duration-200 ease-out"
-      leave-from-class="opacity-100 translate-x-0"
-      leave-to-class="opacity-0 translate-x-8"
-    >
+    <SlideFadeTransitionX>
       <aside
         v-if="open"
         ref="panelRef"
@@ -131,6 +125,6 @@ watch(
           <WeatherAnalysis :weather_data="payload" :auto-analyze="open" />
         </div>
       </aside>
-    </Transition>
+    </SlideFadeTransitionX>
   </Teleport>
 </template>

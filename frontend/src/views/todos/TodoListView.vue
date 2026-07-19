@@ -210,12 +210,8 @@
         <template v-else>
           <!-- Tab 内容：单 keyed 元素 + mode="out-in"，确保每次切换是
                一次干净的 enter/leave，不会多面板同时参与过渡。 -->
-          <Transition
+          <SlideFadeTransition
             enter-active-class="transition-all duration-280 ease-out"
-            leave-active-class="transition-all duration-200 ease-out"
-            enter-from-class="opacity-0 translate-y-1"
-            enter-to-class="opacity-100 translate-y-0"
-            leave-from-class="opacity-100 translate-y-0"
             leave-to-class="opacity-0 -translate-y-1"
             mode="out-in"
           >
@@ -226,7 +222,7 @@
               @cycle="store.cycleStatus"
               @delete="handleDelete"
             />
-          </Transition>
+          </SlideFadeTransition>
         </template>
       </main>
     </div>
@@ -272,6 +268,7 @@
 import { computed, onMounted, ref } from 'vue';
 import DevTaskModal from './components/DevTaskModal.vue';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { SlideFadeTransition } from '@/components/ui/slide-fade-transition';
 import { useV3DevTaskStore } from '@/stores/v3devtasks';
 import { useAuthStore } from '@/auth/stores/auth';
 import type { DevTask } from '@/api/devtask';

@@ -1,6 +1,6 @@
 <template>
   <Teleport to="body">
-    <Transition name="fade">
+    <ModalFadeTransition>
       <div
         v-if="isOpen"
         class="fixed inset-0 z-10 flex items-center justify-center bg-black/50 backdrop-blur-sm"
@@ -13,7 +13,7 @@
           <v-chart :option="chartOption" autoresize class="h-full w-full" />
         </div>
       </div>
-    </Transition>
+    </ModalFadeTransition>
   </Teleport>
 </template>
 
@@ -22,6 +22,7 @@ import { useChartColors } from '@/composables/shared';
 import type { Device } from '@/api/shared';
 import { computed } from 'vue';
 import VChart from 'vue-echarts';
+import { ModalFadeTransition } from '@/components/ui/modal-fade-transition';
 
 const props = defineProps<{
   data: Device[];
@@ -78,14 +79,3 @@ const chartOption = computed(() => {
   };
 });
 </script>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>

@@ -1,16 +1,16 @@
 <template>
   <Teleport to="body">
     <!-- Backdrop -->
-    <Transition name="fade">
+    <ModalFadeTransition>
       <div
         v-if="modelValue"
         class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
         @click="handleClose"
       />
-    </Transition>
+    </ModalFadeTransition>
 
     <!-- Modal -->
-    <Transition name="modal">
+    <ModalScaleTransition>
       <div
         v-if="modelValue"
         class="fixed inset-x-4 inset-y-24 z-50 flex items-center justify-center sm:inset-x-auto sm:inset-y-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2"
@@ -437,7 +437,7 @@
           </form>
         </div>
       </div>
-    </Transition>
+    </ModalScaleTransition>
   </Teleport>
 </template>
 
@@ -445,6 +445,8 @@
 import { deviceGateway, type Device } from '@/api/shared';
 import { useNotificationStore } from '@/stores/notification';
 import { reactive, ref, watch, onMounted } from 'vue';
+import { ModalFadeTransition } from '@/components/ui/modal-fade-transition';
+import { ModalScaleTransition } from '@/components/ui/modal-scale-transition';
 
 type Channel = 'email' | 'feishu' | 'bark';
 
@@ -673,24 +675,3 @@ watch(
   },
 );
 </script>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.modal-enter-active,
-.modal-leave-active {
-  transition: all 0.3s ease;
-}
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
-  transform: scale(0.95);
-}
-</style>

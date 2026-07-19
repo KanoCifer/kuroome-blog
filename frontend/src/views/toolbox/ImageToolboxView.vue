@@ -479,14 +479,7 @@
 
       <!-- 全屏预览 -->
       <teleport to="body">
-        <transition
-          enter-active-class="transition duration-300 ease-out"
-          enter-from-class="opacity-0"
-          enter-to-class="opacity-100"
-          leave-active-class="transition duration-200 ease-out"
-          leave-from-class="opacity-100"
-          leave-to-class="opacity-0"
-        >
+        <ModalFadeTransition>
           <div
             v-if="isPreviewDialogOpen"
             class="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 backdrop-blur-md"
@@ -505,7 +498,7 @@
               class="max-h-[90vh] max-w-[90vw] rounded-lg object-contain shadow-2xl"
             />
           </div>
-        </transition>
+        </ModalFadeTransition>
       </teleport>
     </div>
   </BasicDetail>
@@ -514,6 +507,7 @@
 <script setup lang="ts">
 import { BasicDetail } from '@/components/basic';
 import { Slider } from '@/components/ui/slider';
+import { ModalFadeTransition } from '@/components/ui/modal-fade-transition';
 import { useImageProcessor } from '@/composables/shared';
 import { usePreviewDialog } from '@/composables/card';
 import { formatBytes } from '@/utils/handlePic';

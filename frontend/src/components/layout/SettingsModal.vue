@@ -94,15 +94,7 @@
 
           <!-- 内容区 — 内部切换用淡入淡出 -->
           <div class="flex-1 overflow-y-auto px-8 py-5">
-            <transition
-              mode="out-in"
-              enter-active-class="transition-opacity duration-150 ease-out"
-              enter-from-class="opacity-0"
-              enter-to-class="opacity-100"
-              leave-active-class="transition-opacity duration-75"
-              leave-from-class="opacity-100"
-              leave-to-class="opacity-0"
-            >
+            <ModalFadeTransition mode="out-in">
               <AppearanceTab
                 v-if="activeTab === 'appearance'"
                 key="appearance"
@@ -112,7 +104,7 @@
                 key="background"
               />
               <CardTab v-else key="card" />
-            </transition>
+            </ModalFadeTransition>
           </div>
 
           <!--
@@ -141,6 +133,7 @@
 import { AnimatePresence, motion } from 'motion-v';
 import { SPRING_SNUG } from '@/constants/motionPresets';
 import IconClose from '@/components/icons/IconClose.vue';
+import { ModalFadeTransition } from '@/components/ui/modal-fade-transition';
 import AppearanceTab from './AppearanceTab.vue';
 import BackgroundTab from './BackgroundTab.vue';
 import CardTab from './CardTab.vue';

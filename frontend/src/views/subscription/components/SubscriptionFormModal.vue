@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { reactive, watch } from 'vue';
 import type { SubscriptionFormState } from '@/views/subscription/types';
+import { ModalFadeTransition } from '@/components/ui/modal-fade-transition';
 import {
   cycleOptions,
   statusOptions,
@@ -77,7 +78,7 @@ watch(
 
 <template>
   <teleport to="body">
-    <transition name="modal-fade">
+    <ModalFadeTransition>
       <div
         v-if="isOpen"
         class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
@@ -259,6 +260,6 @@ watch(
           </form>
         </section>
       </div>
-    </transition>
+    </ModalFadeTransition>
   </teleport>
 </template>

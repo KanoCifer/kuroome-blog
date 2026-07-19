@@ -1,16 +1,16 @@
 <template>
   <Teleport to="body">
     <!-- Backdrop -->
-    <Transition name="fade">
+    <ModalFadeTransition>
       <div
         v-if="modelValue"
         class="bg-background/50 fixed inset-0 z-50 backdrop-blur-sm"
         @click="handleClose"
       />
-    </Transition>
+    </ModalFadeTransition>
 
     <!-- Form Container -->
-    <Transition name="modal">
+    <ModalScaleTransition>
       <div
         v-if="modelValue"
         class="fixed inset-x-8 inset-y-24 z-50 flex items-center justify-center"
@@ -160,7 +160,7 @@
           </form>
         </div>
       </div>
-    </Transition>
+    </ModalScaleTransition>
   </Teleport>
 </template>
 
@@ -170,6 +170,8 @@ import { useNotificationStore } from '@/stores/notification';
 import type { DeviceInput } from '@/api/shared';
 import { reactive, ref, watch } from 'vue';
 import dayjs from 'dayjs';
+import { ModalFadeTransition } from '@/components/ui/modal-fade-transition';
+import { ModalScaleTransition } from '@/components/ui/modal-scale-transition';
 
 interface Props {
   modelValue: boolean;
@@ -276,24 +278,3 @@ async function handleSubmit() {
   }
 }
 </script>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.modal-enter-active,
-.modal-leave-active {
-  transition: all 0.3s ease;
-}
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
-  transform: scale(0.95);
-}
-</style>
