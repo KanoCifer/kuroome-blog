@@ -1,0 +1,73 @@
+/*
+ * 路由过渡动画全局样式 —— 与 composables/route-transition/routeTransitionPolicy.ts
+ * 中的 TRANSITION_SPECS 一一对应。duration / easing 必须保持同步。
+ *
+ * 设计要点：
+ * - 精确属性（opacity / transform）而非 all，避免布局抖动
+ * - 统一缓动 cubic-bezier(0.32, 0.72, 0, 1)（snap in, soft out）
+ * - 进出对称 + GPU 提示（will-change）
+ * - 减动守卫：尊重 prefers-reduced-motion
+ */
+
+/* fade — login / register / settings / gallery：纯淡入淡出 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.15s cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: opacity;
+}
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* slide-up — 默认动画：jelly tab 风格 */
+@keyframes tab-in {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes tab-out {
+  0% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+.slide-up-enter-active {
+  animation: tab-in 0.28s cubic-bezier(0.32, 0.72, 0, 1) both;
+  will-change: transform, opacity;
+}
+.slide-up-leave-active {
+  animation: tab-out 0.28s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+/* 减动偏好：用户要求减少动画时禁用所有过渡和动画 */
+@media (prefers-reduced-motion: reduce) {
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: none !important;
+  }
+  .slide-up-enter-active,
+  .slide-up-leave-active {
+    animation: none !important;
+  }
+  .fade-enter-from,
+  .fade-leave-to,
+  .slide-up-enter-from,
+  .slide-up-leave-to {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

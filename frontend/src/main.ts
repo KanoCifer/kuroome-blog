@@ -10,6 +10,7 @@ import { isColorScheme } from '@/stores/theme';
 import './assets/base.css'; // Tailwind v4 入口
 import './assets/backgrounds.css'; // 背景渐变
 import './assets/base.scss'; // font-face sass
+import './assets/route-transitions.css'; // 路由过渡动画 keyframes
 import './assets/squircle.css';
 import './lib/echarts';
 import { initVisitorWebSocket } from './plugins/visitorWs';
