@@ -7,7 +7,8 @@
       "url": "https://github.com",
       "icon": "https://github.githubassets.com/favicons/favicon.svg",
       "category": "开发",
-      "tags": ["代码", "开源", "协作"]
+      "tags": ["代码", "开源", "协作"],
+      "note": "代码世界的大本营。"
     },
     {
       "id": "2",
@@ -16,7 +17,8 @@
       "url": "https://github.com/KanoCifer/aish",
       "icon": "https://github.githubassets.com/favicons/favicon.svg",
       "category": "个人项目",
-      "tags": ["技术"]
+      "tags": ["技术"],
+      "note": "自己写的命令行 AI。"
     },
     {
       "id": "3",
@@ -25,7 +27,8 @@
       "url": "https://developer.mozilla.org",
       "icon": "https://developer.mozilla.org/favicon.ico",
       "category": "文档",
-      "tags": ["文档", "前端", "参考"]
+      "tags": ["文档", "前端", "参考"],
+      "note": "前端翻得最多的一本字典。"
     },
     {
       "id": "4",
@@ -34,7 +37,8 @@
       "url": "https://rgbacolorpicker.com/",
       "icon": "https://rgbacolorpicker.com/favicon.svg",
       "category": "工具",
-      "tags": ["工具", "设计", "颜色"]
+      "tags": ["工具", "设计", "颜色"],
+      "note": "调色时最常打开的一把尺。"
     },
     {
       "id": "5",
@@ -43,7 +47,8 @@
       "url": "https://github.com/KanoCifer/image-convert-skill",
       "icon": "https://github.githubassets.com/favicons/favicon.svg",
       "category": "个人项目",
-      "tags": ["技术", "工具", "AI"]
+      "tags": ["技术", "工具", "AI"],
+      "note": "图片转 WebP 的小工具，省一行部署。"
     },
     {
       "id": "6",
@@ -52,7 +57,8 @@
       "url": "https://typer.fastapi.org.cn/",
       "icon": "https://typer.fastapi.org.cn/img/favicon.png",
       "category": "工具",
-      "tags": ["工具", "Python", "命令行"]
+      "tags": ["工具", "Python", "命令行"],
+      "note": "写 CLI 不再劝退。"
     },
     {
       "id": "7",
@@ -61,7 +67,8 @@
       "url": "https://fastapi.tiangolo.com/",
       "icon": "https://fastapi.tiangolo.com/img/favicon.png",
       "category": "工具",
-      "tags": ["工具", "Python", "Web 框架"]
+      "tags": ["工具", "Python", "Web 框架"],
+      "note": "本站也跑在它上面。"
     },
     {
       "id": "8",
@@ -70,7 +77,8 @@
       "url": "https://beanie-odm.dev/",
       "icon": "https://beanie-odm.dev/assets/favicon.png",
       "category": "工具",
-      "tags": ["工具", "Python", "MongoDB"]
+      "tags": ["工具", "Python", "MongoDB"],
+      "note": "MongoDB 在本站的搭子。"
     },
     {
       "id": "9",
@@ -79,7 +87,8 @@
       "url": "https://tinypng.com/",
       "icon": "https://tinypng.com/images/apple-touch-icon.png",
       "category": "工具",
-      "tags": ["工具", "设计", "图片"]
+      "tags": ["工具", "设计", "图片"],
+      "note": "图大先过它一手。"
     },
     {
       "id": "10",
@@ -88,7 +97,8 @@
       "url": "https://unsplash.com/",
       "icon": "https://unsplash.com/favicon-32x32.png",
       "category": "资源",
-      "tags": ["资源", "设计", "图片"]
+      "tags": ["资源", "设计", "图片"],
+      "note": "找图的第一站。"
     },
     {
       "id": "11",
@@ -97,7 +107,8 @@
       "url": "https://picsum.photos/",
       "icon": "https://picsum.photos/assets/images/favicon/favicon-32x32.png",
       "category": "工具",
-      "tags": ["工具", "开发", "图片"]
+      "tags": ["工具", "开发", "图片"],
+      "note": "占位图的瑞士军刀。"
     },
     {
       "id": "12",
@@ -106,7 +117,8 @@
       "url": "https://easings.net/zh-cn#",
       "icon": "https://easings.net/96.8aa68ac4.png",
       "category": "工具",
-      "tags": ["工具", "设计", "动画"]
+      "tags": ["工具", "设计", "动画"],
+      "note": "挑缓动曲线的视觉字典。"
     },
     {
       "id": "13",
@@ -115,7 +127,8 @@
       "url": "/toolbox/image-toolbox",
       "icon": "/about.webp",
       "category": "工具",
-      "tags": ["工具", "图片", "优化"]
+      "tags": ["工具", "图片", "优化"],
+      "note": "本站自带的同款工具。"
     },
     {
       "id": "14",
@@ -124,7 +137,8 @@
       "url": "https://iconpark.oceanengine.com/home",
       "icon": "https://lf-iconpark-cdn-cn.bytetos.com/obj/iconpark-site/bydesign/iconparksite/logo.svg",
       "category": "资源",
-      "tags": ["资源", "设计", "图标"]
+      "tags": ["资源", "设计", "图标"],
+      "note": "图标够用、不花哨。"
     }
   ]
 }

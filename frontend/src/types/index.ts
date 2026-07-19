@@ -161,6 +161,8 @@ export interface Website {
   icon: string;
   category: string;
   tags: string[];
+  /** 主人手写的一句荐语（书房语气） */
+  note: string;
 }
 
 // RSS 文章分页响应类型

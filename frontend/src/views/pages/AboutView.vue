@@ -3,6 +3,7 @@ import { computed, onMounted, ref, nextTick } from 'vue';
 import { motion } from 'motion-v';
 import { SPRING } from '@/constants/motionPresets';
 import { useTypewriter } from '@/composables/shared';
+import { IconExternalLink } from '@/components/icons';
 
 const AboutIMG = '/images/about-thumb.webp';
 
@@ -16,11 +17,11 @@ const bioLines = [
   { hook: useTypewriter(), text: '我是 Kuroome。', class: 'font-bold' },
   {
     hook: useTypewriter(),
-    text: '技术栈包括 Python、React、TaskIQ、FastAPI、PostgreSQL、Vue3、Redis、MongoDB 等。',
+    text: '技术栈包括 Go、Python、React、TaskIQ、FastAPI、PostgreSQL、Vue3、Redis、MongoDB 等。',
   },
   {
     hook: useTypewriter(),
-    text: '技术方向包含 Web 开发、前后端、Python 数据分析等。',
+    text: '技术方向包含 Web 开发、前后端等。',
   },
   {
     hook: useTypewriter(),
@@ -38,6 +39,45 @@ const BIO_SPEED = 1; // 1 char/frame ≈ 60 chars/sec
 const allBioDone = computed(
   () => bioLines.length > 0 && bioLines.every((l) => l.hook.isDone.value),
 );
+
+// 社交网络卡片组 —— 顺序按"阅读优先 → 视频娱乐"：
+// 微信读书 → 小红书 → Bilibili → 抖音
+// URL 与 handle 均为占位，待真实数据替换
+// logo 全部引用 public/brand/ 下的真实品牌 logo
+const socialLinks = [
+  {
+    name: '微信读书',
+    handle: '@喂鱼佬一枚🐟',
+    description: '我的微信读书',
+    url: 'https://weread.qq.com/',
+    accent: 'oklch(0.62 0.16 145)',
+    logo: '/brand/weread.webp',
+  },
+  {
+    name: '小红书',
+    handle: '@北冥真的没有🐟',
+    description: '我的xhs',
+    url: 'https://www.xiaohongshu.com/user/profile/604d80c5000000000100973d',
+    accent: 'oklch(0.62 0.2 25)',
+    logo: '/brand/xiaohongshu.webp',
+  },
+  {
+    name: 'Bilibili',
+    handle: '@Kano_Cifer',
+    description: '我的日常',
+    url: 'https://space.bilibili.com/52697386',
+    accent: 'oklch(0.66 0.16 235)',
+    logo: '/brand/bilibili.webp',
+  },
+  {
+    name: '抖音',
+    handle: '@Kuroome5508',
+    description: '我的抖音',
+    url: 'https://www.douyin.com',
+    accent: 'oklch(0.35 0.02 280)',
+    logo: '/brand/douyin.webp',
+  },
+] as const;
 
 function typeNextLine(idx: number) {
   if (idx >= bioLines.length) return;
@@ -146,6 +186,44 @@ onMounted(() => {
         </svg>
       </a>
     </motion.div>
+
+    <!-- Social cards: 微信读书 / 小红书 / B站 / 抖音 -->
+    <motion.div
+      :initial="{ opacity: 0, y: 12 }"
+      :animate="allBioDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }"
+      :transition="{ duration: 0.6, delay: 0.15 }"
+      class="social-cards mt-12 grid w-full max-w-5xl grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
+    >
+      <a
+        v-for="link in socialLinks"
+        :key="link.name"
+        :href="link.url"
+        target="_blank"
+        rel="noopener"
+        class="social-card group"
+        :style="{ '--card-accent': link.accent }"
+        :aria-label="`在 ${link.name} 上访问 Kuroome`"
+      >
+        <span class="social-card__hairline" aria-hidden="true"></span>
+        <div class="social-card__row">
+          <span class="social-card__logo" aria-hidden="true">
+            <img
+              :src="link.logo"
+              :alt="`${link.name} logo`"
+              class="social-card__logo-img"
+              loading="lazy"
+              decoding="async"
+            />
+          </span>
+          <span class="social-card__head">
+            <span class="social-card__name">{{ link.name }}</span>
+            <span class="social-card__handle">{{ link.handle }}</span>
+          </span>
+          <IconExternalLink class="social-card__arrow" aria-hidden="true" />
+        </div>
+        <p class="social-card__desc">{{ link.description }}</p>
+      </a>
+    </motion.div>
   </div>
 </template>
 
@@ -208,7 +286,7 @@ onMounted(() => {
 .avatar-glow {
   position: absolute;
   inset: -4px;
-  border-radius: 9999px;
+  border-radius: 50%;
   background: linear-gradient(135deg, var(--color-primary), var(--color-muted));
   opacity: 0.25;
   filter: blur(14px);
@@ -227,5 +305,164 @@ onMounted(() => {
 
 .social-link:hover {
   transform: scale(1.15);
+}
+
+/* ============================================================
+   Social cards —— 微信读书 / 小红书 / B站 / 抖音
+   - 顶部 1.5px 平台色 hairline(<=5% 表面)
+   - lifted paper shadow + inset 白边高光(继承 Polaroid 词汇)
+   - hover: translateY(-2px) + 阴影加深 + 箭头右移
+   - prefers-reduced-motion: 关闭位移,保留阴影
+   ============================================================ */
+.social-cards {
+  --card-accent: var(--accent);
+}
+
+.social-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  padding: 1.125rem 1.125rem 1rem;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  border-radius: 0.875rem; /* rounded-xl —— DESIGN.md */
+  text-decoration: none;
+  outline: none;
+  box-shadow:
+    0 1px 1px color-mix(in oklch, var(--ink) 6%, transparent),
+    0 6px 14px color-mix(in oklch, var(--ink) 10%, transparent),
+    0 18px 32px color-mix(in oklch, var(--ink) 8%),
+    inset 0 1px 0 0 color-mix(in oklch, var(--paper) 70%, transparent);
+  transition:
+    transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, box-shadow;
+}
+
+.social-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 2px 2px color-mix(in oklch, var(--ink) 8%, transparent),
+    0 12px 24px color-mix(in oklch, var(--ink) 18%, transparent),
+    0 28px 48px color-mix(in oklch, var(--ink) 14%),
+    inset 0 1px 0 0 color-mix(in oklch, var(--paper) 70%, transparent);
+}
+
+.social-card:focus-visible {
+  box-shadow:
+    0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent),
+    0 6px 14px color-mix(in oklch, var(--ink) 10%, transparent),
+    0 18px 32px color-mix(in oklch, var(--ink) 8%),
+    inset 0 1px 0 0 color-mix(in oklch, var(--paper) 70%, transparent);
+}
+
+.social-card__hairline {
+  position: absolute;
+  top: 0;
+  left: 0.875rem;
+  right: 0.875rem;
+  height: 1.5px;
+  background: var(--card-accent, var(--accent));
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.social-card__row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.social-card__logo {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.625rem; /* rounded-lg —— DESIGN.md */
+  overflow: hidden;
+  background: transparent;
+}
+
+.social-card__logo-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.social-card__head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.social-card__name {
+  font-family: ui-serif, Georgia, 'Times New Roman', serif;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  color: var(--color-foreground);
+  line-height: 1.25;
+}
+
+.social-card__handle {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.75rem;
+  color: var(--color-muted-foreground);
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.social-card__desc {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-muted-foreground);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.social-card__arrow {
+  flex: none;
+  width: 0.95rem;
+  height: 0.95rem;
+  color: var(--color-muted-foreground);
+  opacity: 0.5;
+  transition:
+    transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.2s ease,
+    color 0.2s ease;
+}
+
+.social-card:hover .social-card__arrow,
+.social-card:focus-visible .social-card__arrow {
+  transform: translate(2px, -2px);
+  opacity: 1;
+  color: var(--color-foreground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .social-card,
+  .social-card__arrow {
+    transition: box-shadow 0.2s ease;
+  }
+  .social-card:hover,
+  .social-card:focus-visible {
+    transform: none;
+  }
+  .social-card:hover .social-card__arrow,
+  .social-card:focus-visible .social-card__arrow {
+    transform: none;
+  }
 }
 </style>

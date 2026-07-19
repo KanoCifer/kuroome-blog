@@ -1,114 +1,282 @@
 <template>
-  <BasicDetail title="推荐网站" subtitle="发现有趣的网站和工具">
-    <motion.a
-      :initial="{ opacity: 0, y: 10 }"
-      :whileInView="WHILE_IN_VIEW_FADE_UP"
-      :transition="SPRING_REVEAL"
-      :while-hover="HOVER_LIFT"
-      v-for="site in sites"
-      :key="site.id"
-      :href="site.url"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="group squircle relative cursor-pointer overflow-hidden border border-gray-200/60 bg-white/30 p-6 shadow-sm hover:shadow-lg dark:border-gray-800 dark:bg-gray-900/70"
-    >
-      <div class="mb-4 flex items-start gap-4">
-        <div
-          class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-700"
-        >
-          <img
-            v-if="site.icon"
-            :src="site.icon"
-            :alt="site.name"
-            class="h-8 w-8 object-contain"
-            @error="handleImageError"
-          />
-          <svg
-            v-else
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-8 w-8 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
-            />
-          </svg>
-        </div>
-        <div class="min-w-0 flex-1">
-          <h3
-            class="truncate text-lg font-bold text-gray-900 transition-colors duration-300 group-hover:text-gray-700 dark:text-gray-100 dark:group-hover:text-gray-300"
-          >
-            {{ site.name }}
-          </h3>
-          <span
-            class="inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400"
-          >
-            {{ site.category }}
-          </span>
-        </div>
-      </div>
-
-      <p
-        class="line-clamp-3 text-sm leading-relaxed text-gray-600 dark:text-gray-400"
-      >
-        {{ site.description }}
-      </p>
-
-      <div class="mt-4 flex flex-wrap gap-2">
-        <span
-          v-for="tag in site.tags"
-          :key="tag"
-          class="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400"
-        >
-          {{ tag }}
-        </span>
-      </div>
-
+  <BasicDetail :title="heroTitle" :subtitle="heroSubtitle">
+    <div class="col-span-full mx-auto w-full max-w-6xl">
+      <!-- 分类筛选条 -->
       <div
-        class="absolute top-4 right-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        role="tablist"
+        aria-label="网站分类"
+        class="border-border bg-background/40 mb-10 flex flex-wrap items-center gap-2 rounded-full border p-1.5 shadow-sm sm:mb-12"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5 text-gray-500"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+        <button
+          v-for="opt in filterOptions"
+          :key="opt.slug"
+          type="button"
+          role="tab"
+          :aria-selected="activeSlug === opt.slug"
+          :tabindex="activeSlug === opt.slug ? 0 : -1"
+          class="focus-visible:ring-ring inline-flex cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-[background-color,color] duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none sm:px-4 sm:text-[0.9375rem]"
+          :class="
+            activeSlug === opt.slug
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+          "
+          @click="setCategory(opt.slug)"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-          />
-        </svg>
+          <span>{{ opt.label }}</span>
+          <span
+            class="text-xs tabular-nums"
+            :class="
+              activeSlug === opt.slug
+                ? 'text-primary-foreground/70'
+                : 'text-muted-foreground/70'
+            "
+          >
+            {{ opt.count }}
+          </span>
+        </button>
       </div>
-    </motion.a>
+
+      <!-- 空状态 -->
+      <div
+        v-if="visibleSites.length === 0"
+        class="border-border bg-background/30 flex flex-col items-center justify-center rounded-4xl border py-20"
+      >
+        <IconGlobeOutline class="text-muted-foreground mb-5 h-16 w-16" />
+        <p class="text-foreground font-serif text-lg">这个抽屉还没添东西。</p>
+        <p class="text-muted-foreground mt-2 text-sm">
+          试试别的分类，或者
+          <button
+            type="button"
+            class="text-primary focus-visible:ring-ring rounded-sm underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:outline-none"
+            @click="setCategory('all')"
+          >
+            全部展开
+          </button>
+          。
+        </p>
+      </div>
+
+      <!-- 按分类分组渲染 -->
+      <section
+        v-for="group in groupedSites"
+        :key="group.category"
+        :aria-labelledby="`group-${group.slug}`"
+        class="mb-12 last:mb-0"
+      >
+        <header class="mb-6 flex items-baseline gap-3">
+          <h2
+            :id="`group-${group.slug}`"
+            class="text-foreground font-serif text-2xl font-medium tracking-tight sm:text-[1.625rem]"
+          >
+            {{ group.category }}
+          </h2>
+          <span
+            class="bg-border h-px flex-1 translate-y-[-2px]"
+            aria-hidden="true"
+          ></span>
+          <span
+            class="text-muted-foreground text-xs font-medium tracking-wide tabular-nums"
+          >
+            {{ group.sites.length }} 个
+          </span>
+        </header>
+
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <motion.a
+            v-for="site in group.sites"
+            :key="site.id"
+            :initial="{ opacity: 0, y: 10 }"
+            :whileInView="WHILE_IN_VIEW_FADE_UP"
+            :transition="SPRING_REVEAL"
+            :while-hover="HOVER_LIFT"
+            :href="site.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group border-border bg-background/40 hover:border-primary/40 hover:bg-background/60 focus-visible:ring-ring relative block cursor-pointer overflow-hidden rounded-3xl border p-6 shadow-sm transition-[background-color,border-color,box-shadow] duration-300 hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+          >
+            <!-- 顶部：图标 + 名称 + 分类 chip -->
+            <div class="mb-4 flex items-start gap-3">
+              <div
+                class="bg-muted flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl transition-transform duration-300 group-hover:scale-105"
+              >
+                <img
+                  v-if="site.icon"
+                  :src="site.icon"
+                  :alt="site.name"
+                  class="h-7 w-7 object-contain"
+                  @error="handleImageError"
+                />
+                <IconGlobeOutline
+                  v-else
+                  class="text-muted-foreground h-6 w-6"
+                />
+              </div>
+              <div class="min-w-0 flex-1">
+                <h3
+                  class="text-foreground font-serif text-lg leading-snug font-medium"
+                >
+                  {{ site.name }}
+                </h3>
+                <span
+                  class="bg-primary/10 text-primary mt-1.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                >
+                  {{ site.category }}
+                </span>
+              </div>
+            </div>
+
+            <!-- 中段：note（书房语气的视觉重心） -->
+            <p
+              class="text-foreground/85 mb-3 text-sm leading-relaxed text-pretty"
+            >
+              <span class="text-primary/70 font-serif" aria-hidden="true"
+                >「</span
+              >
+              {{ site.note }}
+              <span class="text-primary/70 font-serif" aria-hidden="true"
+                >」</span
+              >
+            </p>
+
+            <!-- 底段：description + tags -->
+            <p
+              class="text-muted-foreground mb-4 line-clamp-2 text-xs leading-relaxed"
+            >
+              {{ site.description }}
+            </p>
+
+            <div v-if="site.tags?.length" class="flex flex-wrap gap-1.5">
+              <TagPill v-for="tag in site.tags.slice(0, 4)" :key="tag" compact>
+                {{ tag }}
+              </TagPill>
+            </div>
+
+            <!-- 外链箭头 -->
+            <IconExternalLink
+              class="text-muted-foreground/60 group-hover:text-foreground/80 absolute top-5 right-5 h-4 w-4 shrink-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              aria-hidden="true"
+            />
+          </motion.a>
+        </div>
+      </section>
+    </div>
   </BasicDetail>
 </template>
 
 <script setup lang="ts">
 import { BasicDetail } from '@/components/basic';
+import { TagPill } from '@/components/ui/tag-pill';
 import websitesData from '@/data/websites.json';
-import type { Website } from '@/types';
 import { useImageError } from '@/composables/shared';
-import { onMounted, ref } from 'vue';
 import { motion } from 'motion-v';
 import {
   SPRING_REVEAL,
   WHILE_IN_VIEW_FADE_UP,
   HOVER_LIFT,
 } from '@/constants/motionPresets';
+import { computed, ref } from 'vue';
+import { useUrlSearchParams } from '@vueuse/core';
+import IconExternalLink from '@/components/icons/IconExternalLink.vue';
+import IconGlobeOutline from '@/components/icons/IconGlobeOutline.vue';
+import type { Website } from '@/types';
 
-const sites = ref<Website[]>([]);
-
-onMounted(() => {
-  sites.value = websitesData.sites;
-});
+interface CategoryOption {
+  slug: string;
+  label: string;
+  category: string;
+}
 
 const { handleImageError } = useImageError();
+
+const sites: Website[] = websitesData.sites as Website[];
+
+// 分类顺序按数据原序去重（保持JSON顺序），并把"全部"作为首位
+const filterOptions = computed<Array<CategoryOption & { count: number }>>(
+  () => {
+    const seen = new Map<string, { label: string; order: number }>();
+    sites.forEach((s, i) => {
+      if (!seen.has(s.category)) {
+        seen.set(s.category, { label: s.category, order: i });
+      }
+    });
+    const ordered = Array.from(seen.entries())
+      .sort(([, a], [, b]) => a.order - b.order)
+      .map(([category, { label }]) => ({
+        slug: slugify(category),
+        label,
+        category,
+      }));
+
+    return [
+      { slug: 'all', label: '全部', category: 'all', count: sites.length },
+      ...ordered.map((o) => ({
+        ...o,
+        count: sites.filter((s) => s.category === o.category).length,
+      })),
+    ];
+  },
+);
+
+// URL 同步 ?category=
+const params = useUrlSearchParams('history');
+const activeSlug = ref<string>(
+  typeof params.category === 'string' ? params.category : 'all',
+);
+
+const setCategory = (slug: string) => {
+  activeSlug.value = slug;
+  if (slug === 'all') {
+    delete params.category;
+  } else {
+    params.category = slug;
+  }
+};
+
+// 按 slug 过滤 + 按分类分组
+const visibleSites = computed<Website[]>(() => {
+  if (activeSlug.value === 'all') return sites;
+  const opt = filterOptions.value.find((o) => o.slug === activeSlug.value);
+  if (!opt || opt.category === 'all') return sites;
+  return sites.filter((s) => s.category === opt.category);
+});
+
+const groupedSites = computed<
+  Array<{ slug: string; category: string; sites: Website[] }>
+>(() => {
+  const buckets = new Map<string, Website[]>();
+  visibleSites.value.forEach((s) => {
+    if (!buckets.has(s.category)) buckets.set(s.category, []);
+    buckets.get(s.category)!.push(s);
+  });
+  return Array.from(buckets.entries()).map(([category, list]) => ({
+    slug: slugify(category),
+    category,
+    sites: list,
+  }));
+});
+
+// Hero 文案：总数 + 当前分类
+const heroTitle = '推荐网站';
+const heroSubtitle = computed(() => {
+  const total = `${sites.length} 个`;
+  const opt = filterOptions.value.find((o) => o.slug === activeSlug.value);
+  if (!opt || opt.slug === 'all') {
+    return `网站推介 · ${total} · 慢慢翻`;
+  }
+  return `网站推介 · ${total} · 当前：${opt.label}`;
+});
+
+// 工具：把中文分类转拼音/英文 slug 太重，这里用类目自身的稳定 key
+// 用类目字符串本身作为 fallback slug（如果用户未通过筛选条点过，无 ?category= 也无需 slug）
+function slugify(category: string): string {
+  const map: Record<string, string> = {
+    全部: 'all',
+    工具: 'tools',
+    资源: 'resources',
+    个人项目: 'personal',
+    文档: 'docs',
+    开发: 'dev',
+  };
+  return map[category] ?? category;
+}
 </script>
