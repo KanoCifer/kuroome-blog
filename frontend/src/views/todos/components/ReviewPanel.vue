@@ -8,9 +8,7 @@
         >
           本周概览
         </h2>
-        <span class="text-muted-foreground text-xs">{{
-          store.weekRangeDisplay
-        }}</span>
+        <span class="text-muted-foreground text-xs">{{ weekRange }}</span>
       </div>
       <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div
@@ -85,7 +83,7 @@
       </div>
       <div class="space-y-0">
         <div
-          v-for="task in store.completedThisWeek.slice(0, 8)"
+          v-for="task in doneThisWeek.slice(0, 8)"
           :key="task.slug"
           class="flex gap-3 border-t px-1 py-3"
         >
@@ -108,7 +106,7 @@
           </div>
         </div>
         <div
-          v-if="!store.completedThisWeek.length"
+          v-if="!doneThisWeek.length"
           class="text-muted-foreground/70 px-1 py-6 text-center text-sm"
         >
           本周还没有完成的任务
@@ -121,6 +119,13 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useV3DevTaskStore } from '@/stores/v3devtasks';
+import {
+  completedThisWeek,
+  inProgress,
+  urgentActive,
+  typeDistribution,
+} from '@/composables/todo';
+import { formatCurrentWeekRange } from '@/lib/date';
 import type { DevTaskType } from '@/api/devtask';
 
 const store = useV3DevTaskStore();
@@ -132,10 +137,13 @@ const TYPE_COLORS: Record<DevTaskType, string> = {
   技术债: 'var(--chart-2)',
 };
 
+const doneThisWeek = computed(() => completedThisWeek(store.tasks));
+const weekRange = formatCurrentWeekRange();
+
 const stats = computed(() => [
   {
     label: '本周完成',
-    value: store.completedThisWeek.length,
+    value: doneThisWeek.value.length,
     delta: '较上周 +2',
     deltaClass: 'text-success',
   },
@@ -147,20 +155,20 @@ const stats = computed(() => [
   },
   {
     label: '进行中',
-    value: store.inProgress.length,
+    value: inProgress(store.tasks).length,
     delta: '需要跟进',
     deltaClass: 'text-muted-foreground',
   },
   {
     label: 'P0 紧急',
-    value: store.urgentActive,
+    value: urgentActive(store.tasks),
     delta: '需要关注',
     deltaClass: 'text-destructive',
   },
 ]);
 
 const distributionRows = computed(() => {
-  const dist = store.typeDistribution;
+  const dist = typeDistribution(store.tasks);
   const total = Object.values(dist).reduce((a, b) => a + b, 0) || 1;
   return (Object.keys(dist) as DevTaskType[]).map((type) => ({
     type,

@@ -278,6 +278,11 @@ import FrontierPanel from './components/FrontierPanel.vue';
 import PlanningPanel from './components/PlanningPanel.vue';
 import ReviewPanel from './components/ReviewPanel.vue';
 import KanbanPanel from './components/KanbanPanel.vue';
+import {
+  frontier,
+  totalActive,
+  completedCount,
+} from '@/composables/todo';
 import type { Component } from 'vue';
 
 const authStore = useAuthStore();
@@ -296,10 +301,10 @@ const activeTabIndex = computed(() =>
 const indicatorY = computed(() => activeTabIndex.value * TAB_ITEM_HEIGHT);
 
 const tabs = computed(() => [
-  { id: 'frontier' as const, label: '推进', count: store.frontier.length },
-  { id: 'planning' as const, label: '规划', count: store.totalActive },
-  { id: 'kanban' as const, label: '看板', count: store.totalActive },
-  { id: 'review' as const, label: '回顾', count: store.completedCount },
+  { id: 'frontier' as const, label: '推进', count: frontier(store.tasks).length },
+  { id: 'planning' as const, label: '规划', count: totalActive(store.tasks) },
+  { id: 'kanban' as const, label: '看板', count: totalActive(store.tasks) },
+  { id: 'review' as const, label: '回顾', count: completedCount(store.tasks) },
 ]);
 
 // 当前激活的 tab 面板组件（单 keyed 节点供 <Transition mode="out-in"> 切换）

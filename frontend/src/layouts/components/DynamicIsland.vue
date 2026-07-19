@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import { connectionDelay } from '@/plugins/visitorWs';
 import { useVisitorCountStore } from '@/stores/visitorCount';
+import { useV3DevTaskStore } from '@/stores/v3devtasks';
+import { useDevTaskSections } from '@/composables/todo';
 import { motion } from 'motion-v';
 import { SPRING_CRISP } from '@/constants/motionPresets';
+import { storeToRefs } from 'pinia';
 import { computed, onUnmounted, ref } from 'vue';
 
 const visitorCount = useVisitorCountStore();
+const devTaskStore = useV3DevTaskStore();
+const { tasks } = storeToRefs(devTaskStore);
+
+const { activeCount } = useDevTaskSections(tasks);
+
 const islandExpanded = ref(false);
 const timer = ref<number | null>(null);
 
@@ -39,7 +47,7 @@ const delayStatus = computed(() => {
   <motion.div
     :animate="{
       height: islandExpanded ? 96 : 28,
-      width: islandExpanded ? 220 : 160,
+      width: islandExpanded ? 240 : 180,
       borderRadius: islandExpanded ? 24 : 14,
     }"
     :transition="SPRING_CRISP"
@@ -86,6 +94,18 @@ const delayStatus = computed(() => {
       </span>
       <span class="text-[10px] tracking-wider tabular-nums"
         >{{ visitorCount.count }} 在线</span
+      >
+      <span class="text-white/30">·</span>
+      <span class="relative flex h-1.5 w-1.5">
+        <span
+          class="bg-amber-400 absolute inline-flex h-full w-full rounded-full opacity-60"
+        />
+        <span
+          class="bg-amber-400 relative inline-flex h-1.5 w-1.5 rounded-full"
+        />
+      </span>
+      <span class="text-[10px] tracking-wider tabular-nums"
+        >{{ activeCount }} 任务</span
       >
     </motion.div>
 
@@ -142,6 +162,14 @@ const delayStatus = computed(() => {
           >
           <span class="font-mono text-sm font-semibold tabular-nums">{{
             visitorCount.count
+          }}</span>
+        </div>
+        <div class="flex flex-col items-end gap-0.5">
+          <span class="text-[9px] tracking-[0.15em] uppercase opacity-50"
+            >Tasks</span
+          >
+          <span class="font-mono text-sm font-semibold tabular-nums">{{
+            activeCount
           }}</span>
         </div>
       </div>

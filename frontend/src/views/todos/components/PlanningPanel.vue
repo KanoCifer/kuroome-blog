@@ -127,6 +127,7 @@
 import { computed, ref } from 'vue';
 import { useV3DevTaskStore } from '@/stores/v3devtasks';
 import type { DevTaskPriority, DevTaskType } from '@/api/devtask';
+import { PRIORITIES } from '@/composables/todo';
 import TypeBadge from './TypeBadge.vue';
 import PriorityBadge from './PriorityBadge.vue';
 import StatusChip from './StatusChip.vue';
@@ -134,7 +135,6 @@ import StatusChip from './StatusChip.vue';
 const store = useV3DevTaskStore();
 
 const TASK_TYPES: DevTaskType[] = ['功能需求', '问题', '优化', '技术债'];
-const PRIORITIES: DevTaskPriority[] = ['P0 紧急', 'P1 高', 'P2 中', 'P3 低'];
 
 const filterType = ref<Set<DevTaskType>>(new Set());
 const filterPriority = ref<Set<DevTaskPriority>>(new Set());

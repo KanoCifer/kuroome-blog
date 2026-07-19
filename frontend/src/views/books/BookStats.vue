@@ -166,10 +166,10 @@
 
           <!-- ── 段落 4.5：接下来读什么（推荐） ───────────────────── -->
           <StatsRecommendSection
-            :books="statsStore.recommends"
-            :loading="statsStore.isLoadingRecommends"
-            :has-more="statsStore.hasMoreRecommends"
-            :error="statsStore.recommendError"
+            :books="recommends"
+            :loading="isLoadingRecommends"
+            :has-more="hasMoreRecommends"
+            :error="recommendError"
             @refresh="reloadRecommends"
             @load-more="loadMoreRecommends"
           />
@@ -214,6 +214,8 @@
 <script setup lang="ts">
 import type { ReadStatsMode } from '@/api/weread';
 import { useReadStatsStore } from '@/stores/readStats';
+import { useHeatmap } from '@/composables/weread/useHeatmap';
+import { useRecommends } from '@/composables/weread/useRecommends';
 import { formatDuration } from '@/utils/format/duration';
 import PageHero from '@/components/shared/PageHero.vue';
 import dayjs from 'dayjs';
@@ -239,6 +241,17 @@ const MODES = [
 ] as const satisfies ReadonlyArray<{ key: ReadStatsMode; label: string }>;
 
 const statsStore = useReadStatsStore();
+const {
+  yearlyHeatmap,
+  fetchYearlyHeatmap,
+} = useHeatmap();
+const {
+  recommends,
+  isLoadingRecommends,
+  hasMoreRecommends,
+  recommendError,
+  fetchRecommends,
+} = useRecommends();
 
 // 解构出顶层 ref / 函数，模板里直接用(自动 unwrap)
 const {
@@ -273,7 +286,7 @@ const { hasData: hasPreferenceData } = usePreferenceView(activeSnapshot);
 // ── 年视图热力图 ──────────────────────────────────────────────
 const currentYear = computed(() => new Date().getFullYear());
 const currentHeatmap = computed(
-  () => statsStore.yearlyHeatmap[currentYear.value] ?? null,
+  () => yearlyHeatmap.value[currentYear.value] ?? null,
 );
 // heatmap 改为纯 CSS grid,composable 不再依赖 ECharts theme
 const { hasData: hasYearHeatmapData } = useYearHeatmapView(
@@ -308,7 +321,7 @@ watch(
   () => activeMode.value,
   (m) => {
     if (m === 'annually') {
-      statsStore.fetchYearlyHeatmap(currentYear.value);
+      fetchYearlyHeatmap(currentYear.value);
     }
   },
   { immediate: true },
@@ -320,16 +333,16 @@ onMounted(() => {
     statsStore.fetchPeriod(activeMode.value, null);
   }
   // 推荐独立拉取（不绑定 mode）
-  if (statsStore.recommends.length === 0) {
-    statsStore.fetchRecommends(true);
+  if (recommends.value.length === 0) {
+    fetchRecommends(true);
   }
 });
 
 function reloadRecommends() {
-  statsStore.fetchRecommends(true);
+  fetchRecommends(true);
 }
 
 function loadMoreRecommends() {
-  statsStore.fetchRecommends(false);
+  fetchRecommends(false);
 }
 </script>

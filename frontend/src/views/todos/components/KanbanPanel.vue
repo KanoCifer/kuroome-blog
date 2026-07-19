@@ -197,6 +197,7 @@ import type {
   DevTaskStatus,
   DevTaskType,
 } from '@/api/devtask';
+import { PRIORITIES } from '@/composables/todo';
 import KanbanCard from './KanbanCard.vue';
 import MemberAvatar from './MemberAvatar.vue';
 
@@ -255,7 +256,6 @@ const KANBAN_COLUMNS: KanbanColumn[] = [
 ];
 
 const TASK_TYPES: DevTaskType[] = ['功能需求', '问题', '优化', '技术债'];
-const PRIORITIES: DevTaskPriority[] = ['P0 紧急', 'P1 高', 'P2 中', 'P3 低'];
 
 const store = useV3DevTaskStore();
 

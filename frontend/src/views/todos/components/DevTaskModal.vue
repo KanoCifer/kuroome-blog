@@ -284,16 +284,10 @@ import type {
   DevTaskType,
   UpdateDevTaskPayload,
 } from '@/api/devtask';
+import { PRIORITIES, V3_STATUSES } from '@/composables/todo';
 
 const TASK_TYPES: DevTaskType[] = ['问题', '功能需求', '优化', '技术债'];
-const PRIORITIES: DevTaskPriority[] = ['P0 紧急', 'P1 高', 'P2 中', 'P3 低'];
-const STATUSES: DevTaskStatus[] = [
-  '待评估',
-  '待排期',
-  '进行中',
-  '已搁置',
-  '已完成',
-];
+const STATUSES = V3_STATUSES;
 
 // 类型 chip 激活态颜色（token + opacity，无硬编码 hex）
 const TYPE_ACTIVE: Record<DevTaskType, string> = {

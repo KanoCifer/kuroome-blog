@@ -71,7 +71,7 @@
       </div>
 
       <!-- 加载骨架 -->
-      <div v-if="loading && !publicList.length" class="space-y-4">
+      <div v-if="publicLoading && !publicList.length" class="space-y-4">
         <div
           v-for="i in 4"
           :key="i"
@@ -204,7 +204,7 @@
     <MomentEditorModal
       :open="editorOpen"
       :moment="editingMoment"
-      :submitting="store.submitting"
+      :submitting="submitting"
       :last-saved-at="lastSavedAtLabel"
       @update:open="editorOpen = $event"
       @submit="handleEditorSubmit"
@@ -254,6 +254,7 @@
 import BasicDetail from '@/components/basic/BasicDetail.vue';
 import { useAuthStore } from '@/auth/stores/auth';
 import Modal from '@/components/ui/modal/Modal.vue';
+import { MomentComposer } from '@/composables/moments';
 import { useMomentsStore } from '@/stores/moments';
 import { useNotificationStore } from '@/stores/notification';
 import type { Moment, MomentUpdatePayload } from '@/types';
@@ -280,7 +281,7 @@ const {
   publicPage,
   publicPageSize,
   publicActiveTag,
-  loading,
+  publicLoading,
 } = storeToRefs(store);
 
 const isAdmin = computed(() => auth.isAdmin);
@@ -408,6 +409,21 @@ const lastSavedAtLabel = computed(() =>
   lastSavedAt.value ? dayjs(lastSavedAt.value).format('HH:mm:ss') : null,
 );
 
+const submitting = ref(false);
+
+// 提交编排 —— 视图只关心 disable 按钮，normalize / refresh / navigate 全交给 composer。
+const composer = new MomentComposer({
+  create: store.create.bind(store),
+  update: store.update.bind(store),
+  refreshPublicList: (tag) => load(1, tag),
+  openDetail: (id) => {
+    detailId.value = id;
+    detailOpen.value = true;
+  },
+  notify: (msg) => notifier.success(msg),
+  notifyError: (msg) => notifier.error(msg),
+});
+
 function openEditor(moment: Moment | null) {
   editingMoment.value = moment;
   editorOpen.value = true;
@@ -416,35 +432,20 @@ function openEditor(moment: Moment | null) {
 }
 
 async function handleEditorSubmit(payload: MomentUpdatePayload) {
-  const isEdit = !!editingMoment.value;
+  if (submitting.value) return;
+  submitting.value = true;
   try {
-    if (isEdit && editingMoment.value) {
-      await store.update(editingMoment.value.id, payload);
-      notifier.success('已保存修改');
-    } else {
-      const created = await store.create({
-        content: payload.content ?? '',
-        summary: payload.summary ?? null,
-        visibility: payload.visibility ?? 'public',
-        status: payload.status ?? 'published',
-        mood: payload.mood ?? null,
-        tags: payload.tags ?? [],
-        attachments: payload.attachments,
-        location: payload.location,
-        source: payload.source,
-        is_pinned: payload.is_pinned ?? false,
-        allow_comment: payload.allow_comment ?? true,
-        published_at: payload.published_at ?? null,
-      });
-      notifier.success('发布成功');
-      // 刷新列表头一条
-      await load(1, activeTag.value);
-      // 同时把 detailId 切到新建这条
-      if (created?.id) detailId.value = created.id;
+    const editing = editingMoment.value;
+    const result = await composer.submit(
+      editing
+        ? { kind: 'update', id: editing.id, payload }
+        : { kind: 'create', payload, activeTag: activeTag.value },
+    );
+    if (result.kind !== 'failed') {
+      editorOpen.value = false;
     }
-    editorOpen.value = false;
-  } catch (err: unknown) {
-    notifier.error(err instanceof Error ? err.message : '保存失败');
+  } finally {
+    submitting.value = false;
   }
 }
 

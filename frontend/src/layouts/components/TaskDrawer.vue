@@ -3,7 +3,7 @@
   <Teleport to="body">
     <div class="fixed right-4 bottom-40 z-50">
       <button
-        @click="toggleDrawer"
+        @click="toggle"
         class="group bg-secondary hover:bg-primary flex h-10 cursor-pointer items-center overflow-hidden rounded-full px-2.5 shadow-md transition-all duration-300 ease-out hover:shadow-lg"
         title="开发任务"
       >
@@ -253,14 +253,13 @@ import { SPRING_SNUG } from '@/constants/motionPresets';
 import DrawerTaskCard from '@/views/todos/components/DrawerTaskCard.vue';
 import { useV3DevTaskStore } from '@/stores/v3devtasks';
 import type { DevTaskPriority, DevTaskType } from '@/api/devtask';
-import { useTaskDrawer } from '@/composables/todo/useTaskDrawer';
+import { useTaskDrawer, useDevTaskSections, PRIORITIES } from '@/composables/todo';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref } from 'vue';
 import { useAuthStore } from '@/auth/stores/auth';
 import router from '@/router';
 
 const TASK_TYPES: DevTaskType[] = ['功能需求', '问题', '优化', '技术债'];
-const PRIORITIES: DevTaskPriority[] = ['P0 紧急', 'P1 高', 'P2 中', 'P3 低'];
 
 const authStore = useAuthStore();
 const isAuthenticated = computed(() => authStore.isAuthenticated);
@@ -269,56 +268,12 @@ const store = useV3DevTaskStore();
 const { tasks } = storeToRefs(store);
 
 const { isOpen, close, toggle } = useTaskDrawer();
-const toggleDrawer = toggle;
+const { activeCount, sections } = useDevTaskSections(tasks);
 
 function handleLogin() {
   close();
   router.push('/login');
 }
-
-const activeCount = computed(
-  () =>
-    tasks.value.filter((t) => !t.is_deleted && t.status !== '已完成').length,
-);
-
-// v3 status → 三个视觉分组：开发中 / 待排期 / 已完成
-const sections = computed(() => [
-  {
-    key: 'in-progress',
-    title: '开发中',
-    tasks: store.inProgress,
-    dotClass: 'bg-primary',
-    emptyText: '没有进行中的任务',
-  },
-  {
-    key: 'upcoming',
-    title: '待排期',
-    tasks: tasks.value
-      .filter(
-        (t) =>
-          !t.is_deleted &&
-          (t.status === '待评估' ||
-            t.status === '待排期' ||
-            t.status === '已搁置'),
-      )
-      .sort((a, b) => {
-        const w = (p: DevTaskPriority) =>
-          ({ 'P0 紧急': 0, 'P1 高': 1, 'P2 中': 2, 'P3 低': 3 })[p] ?? 9;
-        return w(a.priority) - w(b.priority);
-      }),
-    dotClass: 'bg-chart-3',
-    emptyText: '没有待排期任务',
-  },
-  {
-    key: 'done',
-    title: '已完成',
-    tasks: tasks.value
-      .filter((t) => !t.is_deleted && t.status === '已完成')
-      .slice(0, 8),
-    dotClass: 'bg-emerald-500',
-    emptyText: '没有已完成任务',
-  },
-]);
 
 // 新建表单（折叠态）
 const showAddForm = ref(false);

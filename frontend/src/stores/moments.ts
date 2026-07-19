@@ -20,6 +20,10 @@ const EMPTY_LIST: MomentListResponse = {
   page_size: 20,
 };
 
+/**
+ * 纯 list-state store：公共 / 管理员两套列表各自维护 loading 标志，
+ * 提交态（submitting）由 [[MomentComposer]] 与视图共同管理，store 不再背锅。
+ */
 export const useMomentsStore = defineStore('moments', () => {
   // ───────────── 公共列表状态 ─────────────
   const publicList = ref<Moment[]>([]);
@@ -27,6 +31,7 @@ export const useMomentsStore = defineStore('moments', () => {
   const publicPage = ref(1);
   const publicPageSize = ref(20);
   const publicActiveTag = ref<string | null>(null);
+  const publicLoading = ref(false);
 
   // ───────────── 管理员列表状态 ─────────────
   const adminList = ref<Moment[]>([]);
@@ -34,14 +39,10 @@ export const useMomentsStore = defineStore('moments', () => {
   const adminPage = ref(1);
   const adminPageSize = ref(20);
   const adminStatus = ref<MomentStatus | null>(null);
+  const adminLoading = ref(false);
 
   // ───────────── 当前条目 ─────────────
   const current = ref<Moment | null>(null);
-
-  // ───────────── 通用状态 ─────────────
-  const loading = ref(false);
-  const submitting = ref(false);
-  const error = ref<string | null>(null);
 
   function resetPublic() {
     publicList.value = EMPTY_LIST.moments;
@@ -60,8 +61,7 @@ export const useMomentsStore = defineStore('moments', () => {
   }
 
   async function fetchPublic(params: ListPublicMomentsParams = {}) {
-    loading.value = true;
-    error.value = null;
+    publicLoading.value = true;
     try {
       const page = params.page ?? publicPage.value;
       const page_size = params.page_size ?? publicPageSize.value;
@@ -77,17 +77,13 @@ export const useMomentsStore = defineStore('moments', () => {
       publicPageSize.value = data.page_size;
       publicActiveTag.value = tag ?? null;
       return data;
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : '加载碎碎念失败';
-      throw err;
     } finally {
-      loading.value = false;
+      publicLoading.value = false;
     }
   }
 
   async function fetchAdmin(params: ListAdminMomentsParams = {}) {
-    loading.value = true;
-    error.value = null;
+    adminLoading.value = true;
     try {
       const page = params.page ?? adminPage.value;
       const page_size = params.page_size ?? adminPageSize.value;
@@ -104,98 +100,67 @@ export const useMomentsStore = defineStore('moments', () => {
       adminPageSize.value = data.page_size;
       adminStatus.value = status ?? null;
       return data;
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : '加载碎碎念失败';
-      throw err;
     } finally {
-      loading.value = false;
+      adminLoading.value = false;
     }
   }
 
   async function fetchOne(id: string, admin = false) {
-    loading.value = true;
-    error.value = null;
-    try {
-      const data = admin
-        ? await momentsGateway.getAdmin(id)
-        : await momentsGateway.get(id);
+    const data = admin
+      ? await momentsGateway.getAdmin(id)
+      : await momentsGateway.get(id);
+    current.value = data.moment;
+    return data.moment;
+  }
+
+  /**
+   * 落库即返回新 Moment；列表回写由调用方（[[MomentComposer]]）触发刷新。
+   * 不在此处写 `publicList` —— 那是耦合来源。
+   */
+  async function create(payload: MomentCreatePayload): Promise<Moment> {
+    const data = await momentsGateway.create(payload);
+    return data.moment;
+  }
+
+  /** 编辑：落库即返回；当前条目同步（用于 detailModal 立即反映）。 */
+  async function update(
+    id: string,
+    payload: MomentUpdatePayload,
+  ): Promise<Moment> {
+    const data = await momentsGateway.update(id, payload);
+    if (current.value?.id === id) {
       current.value = data.moment;
-      return data.moment;
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : '加载碎碎念失败';
-      throw err;
-    } finally {
-      loading.value = false;
     }
+    return data.moment;
   }
 
-  async function create(payload: MomentCreatePayload) {
-    submitting.value = true;
-    error.value = null;
-    try {
-      const data = await momentsGateway.create(payload);
-      return data.moment;
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : '发布碎碎念失败';
-      throw err;
-    } finally {
-      submitting.value = false;
-    }
-  }
-
-  async function update(id: string, payload: MomentUpdatePayload) {
-    submitting.value = true;
-    error.value = null;
-    try {
-      const data = await momentsGateway.update(id, payload);
-      // 同步刷新当前条目
-      if (current.value?.id === id) {
-        current.value = data.moment;
-      }
-      return data.moment;
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : '更新碎碎念失败';
-      throw err;
-    } finally {
-      submitting.value = false;
-    }
-  }
-
-  async function remove(id: string) {
-    submitting.value = true;
-    error.value = null;
-    try {
-      await momentsGateway.remove(id);
-      // 同步从两侧列表里剔除
-      publicList.value = publicList.value.filter((m) => m.id !== id);
-      adminList.value = adminList.value.filter((m) => m.id !== id);
-      if (current.value?.id === id) {
-        current.value = null;
-      }
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : '删除碎碎念失败';
-      throw err;
-    } finally {
-      submitting.value = false;
+  /** 软删除：从两侧列表剔除 + 清空 current（若指向该条）。 */
+  async function remove(id: string): Promise<void> {
+    await momentsGateway.remove(id);
+    publicList.value = publicList.value.filter((m) => m.id !== id);
+    adminList.value = adminList.value.filter((m) => m.id !== id);
+    if (current.value?.id === id) {
+      current.value = null;
     }
   }
 
   return {
-    // state
+    // state — public
     publicList,
     publicTotal,
     publicPage,
     publicPageSize,
     publicActiveTag,
+    publicLoading,
+    // state — admin
     adminList,
     adminTotal,
     adminPage,
     adminPageSize,
     adminStatus,
+    adminLoading,
+    // state — current
     current,
-    loading,
-    submitting,
-    error,
     // actions
     resetPublic,
     resetAdmin,

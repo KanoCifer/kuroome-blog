@@ -14,11 +14,11 @@
       </div>
 
       <div
-        v-if="store.frontier.length"
+        v-if="frontierTasks.length"
         class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
       >
         <FrontierCard
-          v-for="task in store.frontier"
+          v-for="task in frontierTasks"
           :key="task.slug"
           :task="task"
           @open="$emit('open', $event)"
@@ -58,9 +58,9 @@
         </h2>
         <span class="text-muted-foreground text-xs">正在推进的任务</span>
       </div>
-      <div v-if="store.inProgress.length" class="space-y-2">
+      <div v-if="inProgressTasks.length" class="space-y-2">
         <TaskRow
-          v-for="task in store.inProgress"
+          v-for="task in inProgressTasks"
           :key="task.slug"
           :task="task"
           @open="$emit('open', $event)"
@@ -86,9 +86,9 @@
         </h2>
         <span class="text-muted-foreground text-xs">最近关闭的任务</span>
       </div>
-      <div v-if="store.completedThisWeek.length" class="space-y-2">
+      <div v-if="doneThisWeek.length" class="space-y-2">
         <TaskRow
-          v-for="task in store.completedThisWeek"
+          v-for="task in doneThisWeek"
           :key="task.slug"
           :task="task"
           :done="true"
@@ -107,11 +107,21 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import FrontierCard from './FrontierCard.vue';
 import TaskRow from './TaskRow.vue';
 import { useV3DevTaskStore } from '@/stores/v3devtasks';
+import {
+  frontier,
+  inProgress,
+  completedThisWeek,
+} from '@/composables/todo';
 
 const store = useV3DevTaskStore();
+
+const frontierTasks = computed(() => frontier(store.tasks));
+const inProgressTasks = computed(() => inProgress(store.tasks));
+const doneThisWeek = computed(() => completedThisWeek(store.tasks));
 
 defineEmits<{
   open: [slug: string];

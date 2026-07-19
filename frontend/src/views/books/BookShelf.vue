@@ -41,10 +41,10 @@
           <!-- 「接下来读什么」推荐 rail:同样仅 filter=all 且非搜索状态时显示 -->
           <BookShelfRecommendRail
             v-if="showRecommendRail"
-            :books="statsStore.recommends"
-            :loading="statsStore.isLoadingRecommends"
-            :has-more="statsStore.hasMoreRecommends"
-            :error="statsStore.recommendError"
+            :books="recommends"
+            :loading="isLoadingRecommends"
+            :has-more="hasMoreRecommends"
+            :error="recommendError"
             @refresh="reloadRecommends"
             @load-more="loadMoreRecommends"
           />
@@ -107,6 +107,7 @@
 
 <script setup lang="ts">
 import { useWereadShelf } from '@/composables/weread';
+import { useRecommends } from '@/composables/weread/useRecommends';
 import { useReadStatsStore } from '@/stores/readStats';
 import WereadBookCard from '@/views/books/weread/WereadBookCard.vue';
 import WereadBookDetailPanel from '@/views/books/weread/WereadBookDetailPanel.vue';
@@ -121,6 +122,13 @@ import BookShelfToolbar from './components/BookShelfToolbar.vue';
 import { useShelfView } from './composables/useShelfView';
 
 const statsStore = useReadStatsStore();
+const {
+  recommends,
+  isLoadingRecommends,
+  recommendError,
+  hasMoreRecommends,
+  fetchRecommends,
+} = useRecommends();
 
 const {
   isLoading,
@@ -151,17 +159,17 @@ const {
 } = useShelfView(visibleBooks);
 
 function reloadRecommends() {
-  statsStore.fetchRecommends(true);
+  fetchRecommends(true);
 }
 function loadMoreRecommends() {
-  statsStore.fetchRecommends(false);
+  fetchRecommends(false);
 }
 
 onMounted(async () => {
   await Promise.all([fetchBooks(), statsStore.fetchCurrentAll()]);
   // 推荐独立拉取(已被 BookStats 拉过则不重复)
-  if (statsStore.recommends.length === 0) {
-    statsStore.fetchRecommends(true);
+  if (recommends.value.length === 0) {
+    fetchRecommends(true);
   }
 });
 </script>
