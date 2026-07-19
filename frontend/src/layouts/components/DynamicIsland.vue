@@ -47,7 +47,7 @@ const delayStatus = computed(() => {
   <motion.div
     :animate="{
       height: islandExpanded ? 96 : 28,
-      width: islandExpanded ? 240 : 180,
+      width: islandExpanded ? 260 : 220,
       borderRadius: islandExpanded ? 24 : 14,
     }"
     :transition="SPRING_CRISP"
@@ -67,7 +67,7 @@ const delayStatus = computed(() => {
       }"
       :exit="{ opacity: 0, scale: 0.25, filter: 'blur(4px)' }"
       :transition="{ type: 'spring', duration: 0.3, bounce: 0 }"
-      class="flex h-7 items-center justify-center gap-2 px-3"
+      class="flex h-7 items-center justify-center gap-1.5 px-3 whitespace-nowrap"
       :class="{ 'pointer-events-none': islandExpanded }"
     >
       <span class="relative flex h-1.5 w-1.5">
@@ -98,10 +98,10 @@ const delayStatus = computed(() => {
       <span class="text-white/30">·</span>
       <span class="relative flex h-1.5 w-1.5">
         <span
-          class="bg-amber-400 absolute inline-flex h-full w-full rounded-full opacity-60"
+          class="absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-60"
         />
         <span
-          class="bg-amber-400 relative inline-flex h-1.5 w-1.5 rounded-full"
+          class="relative inline-flex h-1.5 w-1.5 rounded-full bg-amber-400"
         />
       </span>
       <span class="text-[10px] tracking-wider tabular-nums"
