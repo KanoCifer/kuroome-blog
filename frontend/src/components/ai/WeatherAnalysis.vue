@@ -15,9 +15,9 @@
  */
 import { useNotificationStore } from '@/stores/notification';
 import { formatDate } from '@/utils/formatdate';
-import dayjs from 'dayjs';
-const apiBase = import.meta.env.VITE_API_BASE || '/';
+import { llmGateway } from '@/api/llm';
 import { renderMarkdown } from '@/composables/shared';
+import dayjs from 'dayjs';
 import { AnimatePresence, motion } from 'motion-v';
 import { computed, onUnmounted, ref, watch } from 'vue';
 
@@ -178,50 +178,22 @@ const _doFetch = async () => {
   hasGenerated.value = false;
 
   try {
-    const response = await fetch(`${apiBase}/v2/llm/weather-analysis`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    await llmGateway.weatherAnalysis(
+      {
         weather_data: payload.value,
         model_id: selectedModel.value,
-      }),
-      signal: abortController.signal,
-    });
-
-    if (!response.ok)
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-
-    const reader = response.body?.getReader();
-    if (!reader) throw new Error('无法获取响应体');
-
-    const decoder = new TextDecoder('utf-8');
-    let buffer = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const parts = buffer.split('\n\n');
-      buffer = parts.pop() || '';
-
-      for (const part of parts) {
-        if (!part.trim() || !part.startsWith('data:')) continue;
-        const jsonStr = part.replace(/^data:\s*/, '').trim();
-        if (jsonStr === '[DONE]') {
-          hasGenerated.value = true;
-          break;
-        }
-        try {
-          const data = JSON.parse(jsonStr);
+      },
+      {
+        onData: (data) => {
           if (data.content) summary.value += data.content;
           if (data.is_end) hasGenerated.value = true;
-        } catch {
-          // ignore parse errors
-        }
-      }
-    }
+        },
+        onDone: () => {
+          hasGenerated.value = true;
+        },
+      },
+      abortController.signal,
+    );
     if (summary.value && !hasGenerated.value) hasGenerated.value = true;
   } catch (error: unknown) {
     if (error instanceof DOMException && error.name === 'AbortError') return;

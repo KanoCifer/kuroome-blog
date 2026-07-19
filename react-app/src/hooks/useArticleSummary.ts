@@ -1,6 +1,6 @@
 import { useNotificationStore } from '@/stores/notificationState';
 import { useCallback, useState } from 'react';
-import { consumeSseStream } from './useSseStream';
+import { llmService } from '@/services/llm';
 
 export interface ArticleContext {
   title?: string;
@@ -36,8 +36,6 @@ export function useArticleSummary() {
     MODEL_OPTIONS[0].value,
   );
 
-  const apiBase = import.meta.env.VITE_API_BASE || '/';
-
   const generateSummary = useCallback(
     async ({ title, content }: ArticleContext) => {
       const pureContent = content.trim();
@@ -54,15 +52,8 @@ export function useArticleSummary() {
       });
 
       try {
-        await consumeSseStream<{ content?: string }>(
-          {
-            url: `${apiBase}/v2/llm/summary/stream`,
-            body: {
-              title: title || '',
-              content: pureContent,
-              model: selectedModel,
-            },
-          },
+        await llmService().streamSummary(
+          { title, content: pureContent, model: selectedModel },
           {
             onData: (data) => {
               if (data.content) {
@@ -82,7 +73,7 @@ export function useArticleSummary() {
         setState((prev) => ({ ...prev, errorMessage, loading: false }));
       }
     },
-    [apiBase, notifier, selectedModel],
+    [notifier, selectedModel],
   );
 
   return {

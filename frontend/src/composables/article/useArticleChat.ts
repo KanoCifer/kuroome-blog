@@ -1,5 +1,6 @@
 import { computed, nextTick, ref } from 'vue';
-import { consumeSseStream } from './useSseStream';
+import { llmGateway } from '@/api/llm';
+import { stripHtml } from '@/lib/text/stripHtml';
 
 export interface ArticleContext {
   title?: string;
@@ -11,17 +12,6 @@ export interface ChatMessage {
   content: string;
 }
 
-interface CachedChatResponse {
-  cached?: boolean;
-  messages?: ChatMessage[];
-  session_id?: string;
-}
-
-interface ChatStreamFrame {
-  content?: string;
-  is_end?: boolean;
-}
-
 function generateSessionId() {
   return `summary_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 }
@@ -30,11 +20,11 @@ function generateSessionId() {
  * 封装"AI 对话"的状态：历史加载、会话管理、消息发送、流式追加、自动滚屏。
  *
  * 用法：
- *   const chat = useArticleChat(ctx, apiBase);
+ *   const chat = useArticleChat(ctx);
  *   <div :ref="chat.bindContainer" />
  *   await chat.send(notifier.error)
  */
-export function useArticleChat(ctx: ArticleContext, apiBase: string) {
+export function useArticleChat(ctx: ArticleContext) {
   const messages = ref<ChatMessage[]>([]);
   const chatInput = ref('');
   const sessionId = ref('');
@@ -65,20 +55,13 @@ export function useArticleChat(ctx: ArticleContext, apiBase: string) {
   /** 静默查询历史对话，命中则恢复上下文。未登录也会发起，命中即恢复。 */
   async function loadHistory() {
     if (!ctx.content) return;
-    const pureContent = ctx.content.replaceAll(/<[^>]+>/g, '').trim();
+    const pureContent = stripHtml(ctx.content);
     if (!pureContent) return;
     try {
-      const res = await fetch(`${apiBase}/v2/llm/history/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          article_content: pureContent,
-          article_title: ctx.title || undefined,
-        }),
+      const data = await llmGateway.getCachedChat({
+        article_content: pureContent,
+        ...(ctx.title ? { article_title: ctx.title } : {}),
       });
-      if (!res.ok) return;
-      const data = (await res.json()) as CachedChatResponse;
       if (data.cached && data.messages && data.messages.length > 0) {
         messages.value = data.messages;
         if (data.session_id) sessionId.value = data.session_id;
@@ -127,18 +110,20 @@ export function useArticleChat(ctx: ArticleContext, apiBase: string) {
     const isFirstMessage =
       messages.value.filter((m) => m.role === 'user').length === 1;
 
-    const body: Record<string, string> = {
+    const body = {
       message: userMessage,
       session_id: sessionId.value,
+      ...(isFirstMessage
+        ? {
+            article_content: ctx.content,
+            article_title: ctx.title || '',
+          }
+        : {}),
     };
-    if (isFirstMessage) {
-      body.article_content = ctx.content;
-      body.article_title = ctx.title || '';
-    }
 
     try {
-      await consumeSseStream<ChatStreamFrame>(
-        { url: `${apiBase}/v2/llm/chat/stream`, body },
+      await llmGateway.streamChat(
+        body,
         {
           onData: async (data) => {
             if (data.content) {

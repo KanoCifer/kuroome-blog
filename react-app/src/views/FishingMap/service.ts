@@ -1,3 +1,4 @@
+import { llmService } from '@/services/llm';
 import { fishingMapGateway } from './gateway';
 import type {
   AnalysisPayload,
@@ -12,10 +13,6 @@ import type {
   WeatherIndex,
   WeatherNow,
 } from './types';
-
-interface AnalysisChunk {
-  content?: string;
-}
 
 export interface FishingMapService {
   getSecurityJsCode(): Promise<string>;
@@ -46,8 +43,6 @@ export interface FishingMapService {
   ): Promise<FishingFeedbackResponse>;
 }
 
-const apiBase = import.meta.env.VITE_API_BASE || '/';
-
 export const fishingMapService = (): FishingMapService => {
   const gateway = fishingMapGateway();
 
@@ -73,59 +68,11 @@ export const fishingMapService = (): FishingMapService => {
       onChunk: (content: string) => void,
       signal?: AbortSignal,
     ): Promise<void> {
-      const response = await fetch(`${apiBase}/v2/llm/weather-analysis`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ weather_data: payload }),
+      await llmService().weatherAnalysis(
+        { weather_data: payload },
+        onChunk,
         signal,
-      });
-
-      if (!response.ok) {
-        throw new Error(`AI 服务异常: HTTP ${response.status}`);
-      }
-
-      const reader = response.body?.getReader();
-      if (!reader) {
-        throw new Error('AI 响应不可读');
-      }
-
-      const decoder = new TextDecoder('utf-8');
-      let buffer = '';
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) {
-          break;
-        }
-
-        buffer += decoder.decode(value, { stream: true });
-        const chunks = buffer.split('\n\n');
-        buffer = chunks.pop() ?? '';
-
-        for (const chunk of chunks) {
-          if (!chunk.startsWith('data:')) {
-            continue;
-          }
-
-          const payloadText = chunk.replace(/^data:\s*/, '').trim();
-          if (payloadText === '[DONE]') {
-            continue;
-          }
-
-          try {
-            const parsed = JSON.parse(payloadText) as AnalysisChunk;
-            if (parsed.content) {
-              onChunk(parsed.content);
-              // console.log('Received chunk:', parsed.content);
-            }
-          } catch {
-            continue;
-          }
-        }
-      }
+      );
     },
 
     async fetchWeatherFull(payload: { location: [number, number] }): Promise<{

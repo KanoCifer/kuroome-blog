@@ -1,17 +1,11 @@
 import { useNotificationStore } from '@/stores/notificationState';
 import { useCallback, useRef, useState } from 'react';
-import { consumeSseStream } from './useSseStream';
+import { llmService } from '@/services/llm';
 import type { ArticleContext } from './useArticleSummary';
 
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
-}
-
-interface CachedChatResponse {
-  cached?: boolean;
-  messages?: ChatMessage[];
-  session_id?: string;
 }
 
 function generateSessionId() {
@@ -30,8 +24,6 @@ export function useArticleChat(ctx: ArticleContext) {
   const [errorMessage, setErrorMessage] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const apiBase = import.meta.env.VITE_API_BASE || '/';
-
   const canChat = chatInput.trim().length > 0 && !loading;
 
   const scrollToBottom = useCallback(() => {
@@ -48,17 +40,10 @@ export function useArticleChat(ctx: ArticleContext) {
     const pureContent = ctx.content.replaceAll(/<[^>]+>/g, '').trim();
     if (!pureContent) return;
     try {
-      const res = await fetch(`${apiBase}/v2/llm/history/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          article_content: pureContent,
-          article_title: ctx.title || undefined,
-        }),
+      const data = await llmService().getCachedChat({
+        article_content: pureContent,
+        article_title: ctx.title,
       });
-      if (!res.ok) return;
-      const data = (await res.json()) as CachedChatResponse;
       if (data.cached && data.messages && data.messages.length > 0) {
         setMessages(data.messages);
         if (data.session_id) setSessionId(data.session_id);
@@ -66,7 +51,7 @@ export function useArticleChat(ctx: ArticleContext) {
     } catch {
       // 静默忽略
     }
-  }, [apiBase, ctx.content, ctx.title]);
+  }, [ctx.content, ctx.title]);
 
   /** 切换到对话模式：尝试加载历史，没有则创建新会话 */
   const enterChat = useCallback(async () => {
@@ -103,18 +88,18 @@ export function useArticleChat(ctx: ArticleContext) {
     const isFirstMessage =
       messages.filter((m) => m.role === 'user').length === 0;
 
-    const body: Record<string, string> = {
-      message: userMessage,
-      session_id: currentSessionId,
-    };
-    if (isFirstMessage) {
-      body.article_content = ctx.content;
-      body.article_title = ctx.title || '';
-    }
-
     try {
-      await consumeSseStream<{ content?: string }>(
-        { url: `${apiBase}/v2/llm/chat/stream`, body },
+      await llmService().streamChat(
+        {
+          message: userMessage,
+          session_id: currentSessionId,
+          ...(isFirstMessage
+            ? {
+                article_content: ctx.content,
+                article_title: ctx.title,
+              }
+            : {}),
+        },
         {
           onData: (data) => {
             if (data.content) {
@@ -154,7 +139,6 @@ export function useArticleChat(ctx: ArticleContext) {
       setLoading(false);
     }
   }, [
-    apiBase,
     canChat,
     chatInput,
     ctx.content,

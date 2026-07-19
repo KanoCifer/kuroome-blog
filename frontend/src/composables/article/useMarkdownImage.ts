@@ -1,152 +1,56 @@
-import { onBeforeUnmount, ref } from 'vue';
+import { onBeforeUnmount } from 'vue';
 import { uploadGateway } from '@/api/blog';
+import { MarkdownImageEditor } from './markdownImageRuntime';
 
+/**
+ * Markdown 图像编辑器的 Vue 入口(ADR-0002 facade 模板)。
+ *
+ * 行为委托给 `MarkdownImageEditor` runtime;fascade 仅负责:
+ * - 把 runtime refs 透传给组件模板
+ * - 在组件卸载时调用 `dispose()` 释放 blob URL
+ *
+ * 隐藏 runtime 内部状态(`blobFileMap`、`addImageFile` 不外泄)。
+ *
+ * 用法:
+ * ```vue
+ * <script setup>
+ * const image = useMarkdownImage();
+ * </script>
+ * <template>
+ *   <input ref="image.fileInputRef" type="file" hidden />
+ * </template>
+ * ```
+ */
 export function useMarkdownImage() {
-  const blobFileMap = ref<Map<string, File>>(new Map());
-  const fileInputRef = ref<HTMLInputElement | null>(null);
-
-  // Image editor state
-  const isImageEditorOpen = ref(false);
-  const editingImageUrl = ref('');
-  const editingImageAlt = ref('');
-  const editingImageTitle = ref('');
-  const editingImageWidth = ref('');
-  const editingImageHeight = ref('');
-  const editingImageAlign = ref<'left' | 'center' | 'right'>('center');
-  const editingImageFile = ref<File | null>(null);
-
-  // Create blob URL from file, store in map, return Markdown
-  function addImageFile(file: File): string {
-    const blobUrl = URL.createObjectURL(file);
-    blobFileMap.value.set(blobUrl, file);
-    return `![image](${blobUrl})`;
-  }
-
-  // Handle toolbar image upload → returns Markdown or null
-  function handleImageUpload(event: Event): string | null {
-    const target = event.target as HTMLInputElement;
-    if (!target.files || target.files.length === 0) return null;
-    const file = target.files[0];
-    const md = addImageFile(file);
-    target.value = '';
-    return md;
-  }
-
-  // Handle drag-and-drop → returns Markdown strings
-  function handleDrop(event: DragEvent): string[] {
-    const results: string[] = [];
-    const files = event.dataTransfer?.files;
-    if (!files || files.length === 0) return results;
-    for (const file of files) {
-      if (!file.type.startsWith('image/')) continue;
-      results.push(addImageFile(file));
-    }
-    return results;
-  }
-
-  // Handle clipboard paste → returns Markdown strings
-  function handlePaste(event: ClipboardEvent): string[] {
-    const results: string[] = [];
-    const items = event.clipboardData?.items;
-    if (!items) return results;
-    for (const item of items) {
-      if (item.type.startsWith('image/')) {
-        const file = item.getAsFile();
-        if (file) {
-          results.push(addImageFile(file));
-        }
-      }
-    }
-    return results;
-  }
-
-  function openImageEditor(img: HTMLImageElement) {
-    editingImageUrl.value = img.currentSrc || img.src;
-    editingImageAlt.value = img.alt || '';
-    editingImageTitle.value = img.getAttribute('title') || '';
-    editingImageWidth.value = img.getAttribute('width') || '';
-    editingImageHeight.value = img.getAttribute('height') || '';
-    editingImageAlign.value = 'center';
-    editingImageFile.value = null;
-    isImageEditorOpen.value = true;
-  }
-
-  function closeImageEditor() {
-    isImageEditorOpen.value = false;
-    editingImageUrl.value = '';
-    editingImageAlt.value = '';
-    editingImageTitle.value = '';
-    editingImageWidth.value = '';
-    editingImageHeight.value = '';
-    editingImageAlign.value = 'center';
-    editingImageFile.value = null;
-  }
-
-  function handleReplaceImageUpload(event: Event) {
-    const target = event.target as HTMLInputElement;
-    if (!target.files || target.files.length === 0) return;
-    const file = target.files[0];
-    const newBlobUrl = URL.createObjectURL(file);
-    blobFileMap.value.set(newBlobUrl, file);
-    editingImageUrl.value = newBlobUrl;
-    editingImageFile.value = file;
-    if (!editingImageAlt.value) {
-      editingImageAlt.value = file.name;
-    }
-    target.value = '';
-  }
-
-  function openImageInNewTab(url: string) {
-    window.open(url);
-  }
-
-  // Upload all blob images to server and replace URLs in content
-  async function getContentForPublish(content: string): Promise<string> {
-    const entries = [...blobFileMap.value.entries()];
-    const results = await Promise.all(
-      entries.map(async ([blobUrl, file]) => {
-        const formData = new FormData();
-        formData.append('file', file);
-        const response = await uploadGateway.uploadEditorImage(formData);
-        URL.revokeObjectURL(blobUrl);
-        return { blobUrl, serverUrl: response.url };
-      }),
-    );
-
-    let result = content;
-    for (const { blobUrl, serverUrl } of results) {
-      result = result.replaceAll(blobUrl, serverUrl);
-    }
-    blobFileMap.value.clear();
-    return result;
-  }
+  const editor = new MarkdownImageEditor({
+    uploadImage: uploadGateway.uploadEditorImage,
+  });
 
   onBeforeUnmount(() => {
-    for (const blobUrl of blobFileMap.value.keys()) {
-      URL.revokeObjectURL(blobUrl);
-    }
-    blobFileMap.value.clear();
+    editor.dispose();
   });
 
   return {
-    blobFileMap,
-    fileInputRef,
-    isImageEditorOpen,
-    editingImageUrl,
-    editingImageAlt,
-    editingImageTitle,
-    editingImageWidth,
-    editingImageHeight,
-    editingImageAlign,
-    editingImageFile,
-    addImageFile,
-    handleImageUpload,
-    handleDrop,
-    handlePaste,
-    openImageEditor,
-    closeImageEditor,
-    handleReplaceImageUpload,
-    openImageInNewTab,
-    getContentForPublish,
+    // 透传 runtime refs(模板需要的最小集)
+    fileInputRef: editor.fileInputRef,
+    isImageEditorOpen: editor.isImageEditorOpen,
+    editingImageUrl: editor.editingImageUrl,
+    editingImageAlt: editor.editingImageAlt,
+    editingImageTitle: editor.editingImageTitle,
+    editingImageWidth: editor.editingImageWidth,
+    editingImageHeight: editor.editingImageHeight,
+    editingImageAlign: editor.editingImageAlign,
+    editingImageFile: editor.editingImageFile,
+    // 透传 handlers(参数签名与原 composable 完全一致)
+    handleImageUpload: (event: Event) => editor.handleImageUpload(event),
+    handleDrop: (event: DragEvent) => editor.handleDrop(event),
+    handlePaste: (event: ClipboardEvent) => editor.handlePaste(event),
+    openImageEditor: (img: HTMLImageElement) => editor.openImageEditor(img),
+    closeImageEditor: () => editor.closeImageEditor(),
+    handleReplaceImageUpload: (event: Event) =>
+      editor.handleReplaceImageUpload(event),
+    openImageInNewTab: (url: string) => editor.openImageInNewTab(url),
+    getContentForPublish: (content: string) =>
+      editor.getContentForPublish(content),
   };
 }

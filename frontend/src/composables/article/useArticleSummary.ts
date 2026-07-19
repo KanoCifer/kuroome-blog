@@ -1,20 +1,11 @@
 import { computed, ref } from 'vue';
-import { consumeSseStream } from './useSseStream';
+import { llmGateway } from '@/api/llm';
 import { useTypewriter } from '@/composables/shared/useTypewriter';
+import { stripHtml } from '@/lib/text/stripHtml';
 
 export interface ArticleContext {
   title?: string;
   content: string;
-}
-
-interface CachedSummaryResponse {
-  cached?: boolean;
-  summary?: string;
-}
-
-interface SummaryStreamFrame {
-  content?: string;
-  is_end?: boolean;
 }
 
 /** 可选模型列表 */
@@ -27,7 +18,7 @@ export const MODEL_OPTIONS = [
  * 封装"AI 文章总结"的状态：缓存检查、生成、流式拼接、错误提示。
  * 组件只需绑定 loading/summary/hasGenerated/errorMessage，配合 canSummarize 控制按钮。
  */
-export function useArticleSummary(ctx: ArticleContext, apiBase: string) {
+export function useArticleSummary(ctx: ArticleContext) {
   const loading = ref(false);
   const tw = useTypewriter();
   const summary = tw.text;
@@ -35,9 +26,7 @@ export function useArticleSummary(ctx: ArticleContext, apiBase: string) {
   const errorMessage = ref('');
   const selectedModel = ref<string>(MODEL_OPTIONS[0].value);
 
-  const pureContent = computed(() =>
-    ctx.content.replaceAll(/<[^>]+>/g, '').trim(),
-  );
+  const pureContent = computed(() => stripHtml(ctx.content));
 
   const canSummarize = computed(
     () => pureContent.value.length > 0 && !loading.value,
@@ -47,17 +36,10 @@ export function useArticleSummary(ctx: ArticleContext, apiBase: string) {
   async function checkCachedSummary() {
     if (!pureContent.value) return;
     try {
-      const res = await fetch(`${apiBase}/v2/llm/history/summary`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          article_content: pureContent.value,
-          article_title: ctx.title || undefined,
-        }),
+      const data = await llmGateway.getCachedSummary({
+        article_content: pureContent.value,
+        ...(ctx.title ? { article_title: ctx.title } : {}),
       });
-      if (!res.ok) return;
-      const data = (await res.json()) as CachedSummaryResponse;
       if (data.cached && data.summary) {
         summary.value = data.summary;
         hasGenerated.value = true;
@@ -78,14 +60,11 @@ export function useArticleSummary(ctx: ArticleContext, apiBase: string) {
     tw.reset();
 
     try {
-      await consumeSseStream<SummaryStreamFrame>(
+      await llmGateway.streamSummary(
         {
-          url: `${apiBase}/v2/llm/summary/stream`,
-          body: {
-            title: ctx.title || '',
-            content: pureContent.value,
-            model: model || selectedModel.value,
-          },
+          title: ctx.title || '',
+          content: pureContent.value,
+          model: model || selectedModel.value,
         },
         {
           onData: (data) => {
