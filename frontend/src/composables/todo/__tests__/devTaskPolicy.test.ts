@@ -21,7 +21,7 @@ import type { DevTask } from '@/api/devtask';
 
 function makeTask(overrides: Partial<DevTask> = {}): DevTask {
   return {
-    id: 1,
+    id: '1',
     slug: 'task-1',
     title: 'task',
     type: '功能需求',
@@ -31,6 +31,8 @@ function makeTask(overrides: Partial<DevTask> = {}): DevTask {
     user_id: 1,
     sort_order: 0,
     is_deleted: false,
+    created_at: '2026-01-01T00:00:00.000Z',
+    updated_at: '2026-01-01T00:00:00.000Z',
     ...overrides,
   };
 }
@@ -102,7 +104,12 @@ describe('tasksByStatus', () => {
     const tasks = [
       makeTask({ slug: 'a', status: '进行中', sort_order: 2 }),
       makeTask({ slug: 'b', status: '进行中', sort_order: 0 }),
-      makeTask({ slug: 'c', status: '进行中', is_deleted: true, sort_order: 1 }),
+      makeTask({
+        slug: 'c',
+        status: '进行中',
+        is_deleted: true,
+        sort_order: 1,
+      }),
       makeTask({ slug: 'd', status: '待评估' }),
     ];
     const result = tasksByStatus(tasks, '进行中');
