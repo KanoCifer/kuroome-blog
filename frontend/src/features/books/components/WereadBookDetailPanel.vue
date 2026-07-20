@@ -8,15 +8,12 @@ import {
   SPRING_SNUG,
   EASE_SLOW,
 } from '@/shared/constants/motionPresets';
-import type {
-  WereadBookProgress,
-  WereadUserBook,
-} from '@/features/books/api';
+import type { WereadBookProgress, WereadUserBook } from '@/features/books/api';
 import { useWereadBookProgress } from '../composables/useWereadBookProgress';
 import {
   deterministicCoverGradient,
   formatProgressPercent,
-} from '../format';
+} from '../helper/format';
 import { formatDuration } from '@/utils/date';
 import { formatRelative } from '@/utils/date';
 

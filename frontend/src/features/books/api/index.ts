@@ -1,5 +1,5 @@
-export { wereadGateway } from './wereadGateway';
-export type { WereadGateway } from './wereadGateway';
+export { wereadGateway } from './wereadApi';
+export type { WereadGateway } from './wereadApi';
 
 // Weread 领域类型 —— 真源在 @/features/books/types，桶重新导出以保持兼容
 export type {
