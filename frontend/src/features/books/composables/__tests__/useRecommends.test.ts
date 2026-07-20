@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useRecommends } from '../useRecommends';
-import type { BookRecommendItem } from '@/features/books/api/weread';
+import type { BookRecommendItem } from '@/features/books/api';
 
 // ── gateway mock ─────────────────────────────────────────────────
 const getBooksRecommend = vi.fn();
-vi.mock('@/features/books/api/weread', () => ({
+vi.mock('@/features/books/api', () => ({
   wereadGateway: {
     getBooksRecommend: (...args: unknown[]) => getBooksRecommend(...args),
   },

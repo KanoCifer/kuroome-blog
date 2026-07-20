@@ -316,20 +316,15 @@
 </template>
 
 <script setup lang="ts">
-import { BasicDetail } from '@/shared/components/basic';
+import { BasicDetail } from '@/features/status/components';
 import { TagPill } from '@/shared/components/ui/tag-pill';
-import { useImageError } from '@/shared/composables';
-import friendLinksData from '@/features/friend-links/data/friendlinks.json';
-import websitesData from '@/shared/data/websites.json';
-import { useNotificationStore } from '@/shared/stores/notification';
-import type { Website } from '@/shared/types';
+import { useFriendLinks } from '@/features/friend-links/composables';
 import { motion } from 'motion-v';
 import {
   SPRING_REVEAL,
   WHILE_IN_VIEW_FADE_UP,
   HOVER_LIFT,
 } from '@/shared/constants/motionPresets';
-import { onMounted, ref } from 'vue';
 import IconCopy from '@/shared/components/icons/IconCopy.vue';
 import IconDocumentText from '@/shared/components/icons/IconDocumentText.vue';
 import IconExternalLink from '@/shared/components/icons/IconExternalLink.vue';
@@ -340,70 +335,14 @@ import IconRefresh from '@/shared/components/icons/IconRefresh.vue';
 import IconUsersGroup from '@/shared/components/icons/IconUsersGroup.vue';
 import TwikooComments from '@/features/blog/components/TwikooComments.vue';
 
-interface FriendLink {
-  id: string;
-  name: string;
-  description: string;
-  url: string;
-  icon: string;
-  tags: string[];
-}
-
-interface SelfInfo {
-  name: string;
-  description: string;
-  url: string;
-  icon: string;
-  tags: string[];
-}
-
-const dailyPick = ref<Website | null>(null);
-const links = ref<FriendLink[]>([]);
-const selfInfo = ref<SelfInfo>({
-  name: '',
-  description: '',
-  url: '',
-  icon: '',
-  tags: [],
-});
-
-const refreshDailyPick = () => {
-  if (websitesData.sites.length === 0) return;
-  if (websitesData.sites.length === 1) {
-    dailyPick.value = websitesData.sites[0] as Website;
-    return;
-  }
-  let idx: number;
-  do {
-    idx = Math.floor(Math.random() * websitesData.sites.length);
-  } while (websitesData.sites[idx].id === dailyPick.value?.id);
-  dailyPick.value = websitesData.sites[idx] as Website;
-};
-
-onMounted(async () => {
-  links.value = friendLinksData.links;
-  selfInfo.value = friendLinksData.self as SelfInfo;
-  refreshDailyPick();
-});
-
-const { handleImageError } = useImageError();
-
-const copySelfInfo = async () => {
-  const md = [
-    `- **站点名称**：${selfInfo.value.name}`,
-    `- **描述**：${selfInfo.value.description}`,
-    `- **URL**：${selfInfo.value.url}`,
-    `- **头像**：${selfInfo.value.icon}`,
-  ].join('\n');
-
-  const notice = useNotificationStore();
-  try {
-    await navigator.clipboard.writeText(md);
-    notice.success('友链信息已复制到剪贴板');
-  } catch {
-    notice.error('复制失败，请手动复制');
-  }
-};
+const {
+  dailyPick,
+  links,
+  selfInfo,
+  handleImageError,
+  refreshDailyPick,
+  copySelfInfo,
+} = useFriendLinks();
 </script>
 
 <style scoped>

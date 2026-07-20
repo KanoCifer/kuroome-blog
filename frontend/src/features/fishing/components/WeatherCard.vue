@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useFishingMapStore } from '@/features/fishing/stores/fishingMap';
-import { formatDate } from '@/utils/formatdate';
+import { formatDate } from '@/utils/date';
 import DashboardCard from './DashboardCard.vue';
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';

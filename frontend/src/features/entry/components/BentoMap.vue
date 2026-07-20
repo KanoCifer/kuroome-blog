@@ -32,12 +32,12 @@
           <FishingRod class="size-5 text-teal-600" />
         </div>
         <div
-          v-if="weatherStatus"
+          v-if="weatherText"
           class="flex items-center gap-1 rounded-full bg-teal-500/10 px-2 py-0.5"
         >
-          <component :is="weatherStatus.icon" class="size-3 text-teal-600" />
+          <component :is="weatherIcon" class="size-3 text-teal-600" />
           <span class="text-[10px] font-medium text-teal-700">{{
-            weatherStatus.text
+            weatherText
           }}</span>
         </div>
       </div>
@@ -61,7 +61,7 @@
           }}</span>
         </div>
         <span class="text-[10px] font-medium text-teal-600">{{
-          lastRecord
+          lastRecordText
         }}</span>
       </div>
     </RouterLink>
@@ -71,18 +71,12 @@
 <script setup lang="ts">
 import BentoCard from './BentoCard.vue';
 import { useAnimateNumber } from '@/shared/composables';
-import { fishingGateway, fishingSpotsGateway } from '@/features/fishing/api/fishing';
-import { DEFAULT_MAP_CENTER, useFishingMapStore } from '@/features/fishing/stores/fishingMap';
-import type { TideData } from '@/features/fishing/types';
-import { formatRelative } from '@/utils/format/relative';
-import dayjs from 'dayjs';
+import { useFishingMapSummary } from '@/features/fishing';
 import { Cloud, CloudRain, FishingRod, Sun, Waves, Wind } from '@lucide/vue';
-import { computed, onMounted, ref, type Component } from 'vue';
+import { computed, onMounted, watch, type Component } from 'vue';
 
 const { displayValue: displaySpots, animateTo } = useAnimateNumber();
-const store = useFishingMapStore();
-const lastRecord = ref('--');
-const totalRecords = ref(0);
+const { spotCount, lastRecordText, weatherText, tideStatus, refresh } = useFishingMapSummary();
 
 const WEATHER_ICON_MAP: Record<string, Component> = {
   晴: Sun,
@@ -98,59 +92,11 @@ const WEATHER_ICON_MAP: Record<string, Component> = {
   霾: Wind,
 };
 
-const weatherStatus = computed(() => {
-  const text = store.liveWeather?.text || '晴';
-  return { icon: WEATHER_ICON_MAP[text] || Sun, text };
-});
+const weatherIcon = computed(() => WEATHER_ICON_MAP[weatherText.value] || Sun);
 
-const tideStatus = computed(() => {
-  return deriveTideStatus(store.tideData);
-});
-
-function deriveTideStatus(tideData: TideData | null): string {
-  if (!tideData?.tideTable?.length) return '未知潮汐';
-
-  const now = dayjs();
-  const table = tideData.tideTable;
-
-  for (let i = 0; i < table.length; i++) {
-    const tideTime = dayjs(table[i].fxTime);
-    if (tideTime.isAfter(now)) {
-      return table[i].type === 'H' ? '退潮中' : '涨潮中';
-    }
-  }
-
-  return '未知潮汐';
-}
+watch(spotCount, (val) => animateTo(val));
 
 onMounted(() => {
-  // Defer to idle — let the spring entrance animation finish first
-  // before kicking off the count-up rAF + network requests
-  if (requestIdleCallback) {
-    requestIdleCallback(() => runMapInit());
-  } else {
-    setTimeout(runMapInit, 200);
-  }
+  refresh();
 });
-
-async function runMapInit() {
-  // Fire all requests in parallel — no need to wait sequentially
-  const [, statsRes, spotsRes] = await Promise.allSettled([
-    store.fetchWeatherAndFishing(DEFAULT_MAP_CENTER),
-    fishingGateway.getFishingStats(),
-    fishingSpotsGateway.list(),
-  ]);
-
-  if (statsRes.status === 'fulfilled') {
-    totalRecords.value = statsRes.value.total_records;
-    if (statsRes.value.latest_record_time) {
-      lastRecord.value = formatRelative(statsRes.value.latest_record_time);
-    }
-  }
-
-  // API 拿到后再做一次完整的首跳到目标 count 动画
-  if (spotsRes.status === 'fulfilled') {
-    animateTo(spotsRes.value.length);
-  }
-}
 </script>

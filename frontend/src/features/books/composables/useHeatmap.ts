@@ -3,7 +3,7 @@
 // module 单例形态(与 useTaskDrawer 同)—— 整个应用视图共享同一份缓存。
 // 之所以从原 useReadStatsStore 拆出: store 不该替 3 个无关 fetch 共用 1 个 isLoading;
 // heatmap 只需 1 套状态(按 year 缓存),不应再与 snapshot 域耦合。
-import { wereadGateway } from '@/features/books/api/weread';
+import { wereadGateway } from '@/features/books/api';
 import { ref } from 'vue';
 
 /** key = 年份,value = 该年 dayUnixSec(字符串) -> 当日阅读秒数 */

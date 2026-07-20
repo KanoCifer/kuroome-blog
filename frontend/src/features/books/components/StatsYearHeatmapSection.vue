@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ReadStatsMode } from '@/features/books/api/weread';
+import type { ReadStatsMode } from '@/features/books/api';
 import dayjs from 'dayjs';
 import { ref, toRef } from 'vue';
 import {

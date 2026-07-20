@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ReadDetailSnapshot } from '@/features/books/api/weread';
+import type { ReadDetailSnapshot } from '@/features/books/api';
 import { toRef } from 'vue';
 import { usePreferenceView } from '../composables/usePreferenceView';
 

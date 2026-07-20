@@ -1,13 +1,13 @@
 import { ref } from 'vue';
 
-import { devTaskGateway } from '@/features/todos/api/devtask';
+import { devTaskGateway } from '@/features/todos/api';
 import type {
   CreateDevTaskPayload,
   DevTask,
   DevTaskListResponse,
   ListDevTasksParams,
   UpdateDevTaskPayload,
-} from '@/features/todos/api/devtask';
+} from '@/features/todos/api';
 import { useNotificationStore } from '@/shared/stores/notification';
 
 export const useDevTasks = () => {

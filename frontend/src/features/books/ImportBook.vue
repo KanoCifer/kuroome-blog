@@ -198,7 +198,7 @@
 </template>
 
 <script setup lang="ts">
-import { wereadGateway } from '@/features/books/api/weread';
+import { wereadGateway } from '@/features/books/api';
 import { useNotificationStore } from '@/shared/stores/notification';
 import { computed, ref } from 'vue';
 

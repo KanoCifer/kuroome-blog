@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { rssGateway } from '@/features/rss/api/rss';
-import BasicDetail from '@/shared/components/basic/BasicDetail.vue';
-import ArticleSummaryCard from '@/shared/components/blog/ArticleSummaryCard.vue';
+import { rssGateway } from '@/features/rss/api';
+import BasicDetail from '@/features/status/components/BasicDetail.vue';
+import { AISummary } from '@/features/blog/components/ai-summary';
 import { useNotificationStore } from '@/shared/stores/notification';
 import type { RssArticle } from '@/features/rss/types';
-import { formatDate } from '@/utils/formatdate';
+import { formatDate } from '@/utils/date';
 import { useScroll } from '@vueuse/core';
 import DOMPurify from 'dompurify';
 import { motion } from 'motion-v';
@@ -347,7 +347,7 @@ watch(
           </div>
 
           <div class="p-8">
-            <ArticleSummaryCard
+            <AISummary
               :title="article.title"
               :content="article.content || article.summary || ''"
             />

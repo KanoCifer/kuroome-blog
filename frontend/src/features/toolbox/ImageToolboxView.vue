@@ -505,12 +505,12 @@
 </template>
 
 <script setup lang="ts">
-import { BasicDetail } from '@/shared/components/basic';
+import { BasicDetail } from '@/features/status/components';
 import { Slider } from '@/shared/components/ui/slider';
 import { ModalFadeTransition } from '@/shared/components/ui/modal-fade-transition';
 import { useImageProcessor } from '@/shared/composables';
 import { usePreviewDialog } from '@/features/entry/composables';
-import { formatBytes } from '@/utils/handlePic';
+import { formatBytes } from '@/utils/image';
 import { useDropZone } from '@vueuse/core';
 import { computed, useTemplateRef } from 'vue';
 

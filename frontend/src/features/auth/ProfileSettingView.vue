@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { authGateway } from '@/shared/auth/api/authGateway';
-import { useAuthStore } from '@/shared/auth/stores/auth';
+import { authGateway, useAuthStore, useProfileForm } from '@/features/auth';
 import AuthLayout from './AuthLayout.vue';
 import IconCloud from '@/shared/components/icons/IconCloud.vue';
-import type { ProfileForm } from '@/features/auth/types';
 import {
   AlertCircle,
   AtSign,
@@ -35,20 +33,16 @@ import {
 } from '@/shared/components/ui/alert-dialog';
 
 const authStore = useAuthStore();
-
-const form = ref<ProfileForm>({
-  name: '',
-  username: '',
-  gender: '',
-  email: '',
-  mobile: '',
-  password: '',
-});
-
-const errors = ref<Record<string, string>>({});
-const saving = ref(false);
-const message = ref('');
-const messageType = ref<'success' | 'error'>('success');
+const {
+  form,
+  errors,
+  saving,
+  message,
+  messageType,
+  loadUserData,
+  toggleGender,
+  handleSubmit,
+} = useProfileForm();
 
 const avatarUrl = computed(() => {
   if (authStore.user?.photo?.startsWith('http')) {
@@ -59,29 +53,6 @@ const avatarUrl = computed(() => {
   }
   return '/v3/media/default.png';
 });
-
-const loadUserData = () => {
-  if (authStore.user) {
-    form.value.name = authStore.user.name || '';
-    form.value.username = authStore.user.username || '';
-    form.value.gender = authStore.user.gender || '';
-    form.value.email = authStore.user.email || '';
-    const userWithMobile = authStore.user as { mobile?: string } | null;
-    form.value.mobile = userWithMobile?.mobile || '';
-    const userWithPasskey = authStore.user as { has_passkey?: boolean } | null;
-    hasPasskey.value = !!userWithPasskey?.has_passkey;
-    const userWithGitHub = authStore.user as { github_bound?: boolean } | null;
-    hasGitHubBound.value = !!userWithGitHub?.github_bound;
-  }
-};
-
-const toggleGender = (value: string) => {
-  if (form.value.gender === value) {
-    form.value.gender = '';
-  } else {
-    form.value.gender = value;
-  }
-};
 
 const handlePhotoUpload = async (event: Event) => {
   const input = event.target as HTMLInputElement;
@@ -188,37 +159,15 @@ const handleUnbindGitHub = async () => {
   }
 };
 
-const handleSubmit = async () => {
-  saving.value = true;
-  errors.value = {};
-  message.value = '';
-
-  try {
-    const payload = {
-      name: form.value.name || '',
-      username: form.value.username || '',
-      gender: form.value.gender || null,
-      email: form.value.email || null,
-      mobile: form.value.mobile || null,
-      password: form.value.password || null,
-    };
-
-    await authGateway.updateProfileSettings(payload);
-    await authStore.fetchUser();
-    form.value.password = '';
-    message.value = 'Profile updated successfully!';
-    messageType.value = 'success';
-  } catch (error) {
-    console.error('Settings update error:', error);
-    message.value = 'Network error, please try again';
-    messageType.value = 'error';
-  } finally {
-    saving.value = false;
-  }
-};
-
 onMounted(() => {
   loadUserData();
+
+  if (authStore.user) {
+    const userWithPasskey = authStore.user as { has_passkey?: boolean } | null;
+    hasPasskey.value = !!userWithPasskey?.has_passkey;
+    const userWithGitHub = authStore.user as { github_bound?: boolean } | null;
+    hasGitHubBound.value = !!userWithGitHub?.github_bound;
+  }
 
   const urlParams = new URLSearchParams(window.location.search);
   const error = urlParams.get('error');

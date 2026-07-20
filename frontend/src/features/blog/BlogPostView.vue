@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ArticleSummaryCard from '@/shared/components/blog/ArticleSummaryCard.vue';
+import { AISummary } from '@/features/blog/components/ai-summary';
 import TwikooComments from './components/TwikooComments.vue';
 import {
   AlertDialog,
@@ -15,11 +15,11 @@ import DelIcon from '@/shared/components/icons/DelIcon.vue';
 import EditIcon from '@/shared/components/icons/EditIcon.vue';
 import { Eye, Heart } from '@lucide/vue';
 import { blogGateway } from '@/features/blog/api/blogGateway';
-import { useAuthStore } from '@/shared/auth/stores/auth';
+import { useAuthStore } from '@/features/auth';
 import { useOrigin } from '@/shared/composables';
 import { useNotificationStore } from '@/shared/stores/notification';
 import type { Post } from '@/features/blog/types';
-import { formatDate } from '@/utils/formatdate';
+import { formatDate } from '@/utils/date';
 import { useHead } from '@vueuse/head';
 import hljs from 'highlight.js/lib/common';
 import 'highlight.js/scss/rainbow.scss';
@@ -537,7 +537,7 @@ onUnmounted(() => {
 
       <!-- 正文 -->
       <div class="prose prose-lg max-w-none">
-        <ArticleSummaryCard :title="post.title" :content="post.body || ''" />
+        <AISummary :title="post.title" :content="post.body || ''" />
         <div
           class="prose-body whitespace-pre-wrap"
           v-if="post.body"

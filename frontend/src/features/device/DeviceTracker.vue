@@ -195,7 +195,7 @@ import { deviceGateway } from '@/features/device/api/deviceGateway';
 import { useNotificationStore } from '@/shared/stores/notification';
 import { ref } from 'vue';
 
-import BasicDetail from '@/shared/components/basic/BasicDetail.vue';
+import BasicDetail from '@/features/status/components/BasicDetail.vue';
 import AddDeviceModal from './AddDeviceModal.vue';
 import DailyCostChart from './DailyCostChart.vue';
 import DeviceList from './DeviceList.vue';

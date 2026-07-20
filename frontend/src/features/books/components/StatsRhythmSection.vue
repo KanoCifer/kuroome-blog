@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { ReadDetailSnapshot, ReadStatsMode } from '@/features/books/api/weread';
-import { formatDuration } from '@/utils/format/duration';
+import type { ReadDetailSnapshot, ReadStatsMode } from '@/features/books/api';
+import { formatDuration } from '@/utils/date';
 import { computed, toRef } from 'vue';
 import VChart from 'vue-echarts';
 import { useEChartsTheme } from '../composables/useEChartsTheme';

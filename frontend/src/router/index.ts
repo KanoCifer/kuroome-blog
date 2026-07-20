@@ -1,5 +1,5 @@
-import { useAuthStore } from '@/shared/auth/stores/auth';
-import { reportVisitorData } from '@/lib/visitorTracker';
+import { useAuthStore } from '@/features/auth';
+import { reportVisitorData } from '@/utils/visitor';
 import {
   createMemoryHistory,
   createRouter,
@@ -53,7 +53,7 @@ const router = createRouter({
     {
       path: '/about',
       name: 'about',
-      component: () => import('@/layouts/AboutView.vue'),
+      component: () => import('@/features/pages/about/AboutView.vue'),
       meta: {
         title: "关于我 - Kuroome's Blog",
         description: "关于 Kuroome's Blog 项目和作者的介绍",
@@ -93,7 +93,7 @@ const router = createRouter({
     {
       path: '/privacy',
       name: 'privacy',
-      component: () => import('@/layouts/PrivacyPolicyView.vue'),
+      component: () => import('@/features/pages/privacy/PrivacyPolicyView.vue'),
       meta: {
         title: "隐私政策 - Kuroome's Blog",
         description: '了解本站如何收集、使用和保护您的个人信息',
@@ -348,17 +348,6 @@ const router = createRouter({
       },
     },
     {
-      path: '/dev/book-detail',
-      name: 'dev-book-detail',
-      component: () => import('@/features/books/dev/BookDetailDemo.vue'),
-      meta: {
-        title: '书籍详情面板演示 - Kuroome',
-        description:
-          '书籍卡片点击打开浮层详情面板的演示,展示进度条、阅读统计、继续阅读入口。',
-        keywords: '书籍详情,浮层,面板,演示',
-      },
-    },
-    {
       path: '/status',
       name: 'status',
       component: () => import('@/features/status/StatusView.vue'),
@@ -372,7 +361,7 @@ const router = createRouter({
       // 通配符匹配所有未定义的路径
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
-      component: () => import('@/layouts/NotFound.vue'),
+      component: () => import('@/features/pages/not-found/NotFound.vue'),
     },
   ],
 });

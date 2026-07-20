@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { connectionDelay } from '@/lib/visitorWs';
+import { connectionDelay } from '@/utils/visitor';
 import { useVisitorCountStore } from '@/shared/stores/visitorCount';
 import { useV3DevTaskStore } from '@/features/todos/stores/v3devtasks';
 import { useDevTaskSections } from '@/features/todos/composables';

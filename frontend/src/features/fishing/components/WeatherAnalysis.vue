@@ -14,7 +14,7 @@
  * - 严格使用 semantic token,无装饰性光晕
  */
 import { useNotificationStore } from '@/shared/stores/notification';
-import { formatDate } from '@/utils/formatdate';
+import { formatDate } from '@/utils/date';
 import { llmGateway } from '@/features/blog/api';
 import { renderMarkdown } from '@/shared/composables';
 import dayjs from 'dayjs';

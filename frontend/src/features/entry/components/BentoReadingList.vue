@@ -61,40 +61,18 @@
 <script setup lang="ts">
 import BentoCard from './BentoCard.vue';
 import { useAnimateNumber } from '@/shared/composables';
-import { wereadGateway } from '@/features/books/api/weread';
-import { useReadStatsStore } from '@/features/books/stores/readStats';
-import { formatDuration } from '@/utils/format/duration';
+import { useReadingSummary } from '@/features/books';
+import { formatDuration } from '@/utils/date';
 import { BookOpen } from '@lucide/vue';
-import { onMounted, computed } from 'vue';
+import { onMounted, watch } from 'vue';
 
 const { displayValue: displayCount, animateTo } = useAnimateNumber();
-const readStats = useReadStatsStore();
+const { readingCount, weeklyMinutes, monthlyMinutes, refresh } = useReadingSummary();
 const bookCovers = ['bg-red-400', 'bg-blue-400', 'bg-green-400'];
 
-const weeklyMinutes = computed(
-  () => readStats.weeklySnapshot?.totalReadTime ?? 0,
-);
-const monthlyMinutes = computed(
-  () => readStats.monthlySnapshot?.totalReadTime ?? 0,
-);
+watch(readingCount, (val) => animateTo(val));
 
-onMounted(async () => {
-  try {
-    // Only fetch shelf for the count — stats are non-critical for first paint
-    const shelfRes = await wereadGateway.getUserShelf();
-    const books = shelfRes.data?.user_books ?? [];
-    const readingBooks = books.filter((b) => !b.finishReading);
-    animateTo(readingBooks.length || 10);
-  } catch {
-    console.warn('Failed to fetch reading data, using default count');
-    animateTo(5);
-  }
-
-  // Defer stats fetch — weekly/monthly reading time is secondary data
-  if (requestIdleCallback) {
-    requestIdleCallback(() => readStats.fetchCurrentAll());
-  } else {
-    setTimeout(() => readStats.fetchCurrentAll(), 0);
-  }
+onMounted(() => {
+  refresh();
 });
 </script>

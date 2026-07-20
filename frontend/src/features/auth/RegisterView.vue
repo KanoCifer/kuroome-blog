@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { authGateway } from '@/shared/auth/api/authGateway';
+import { authGateway } from '@/features/auth';
 import AuthLayout from './AuthLayout.vue';
 import IconCloud from '@/shared/components/icons/IconCloud.vue';
 import IconLock from '@/shared/components/icons/IconLock.vue';

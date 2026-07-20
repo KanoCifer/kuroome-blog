@@ -1,4 +1,4 @@
-import { getFileExtension, processImage } from '@/utils/handlePic';
+import { getFileExtension, processImage } from '@/utils/image';
 import { computed, onUnmounted, ref } from 'vue';
 
 interface OutputTypeOption {

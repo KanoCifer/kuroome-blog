@@ -255,7 +255,6 @@ frontend/src/
     ├── auth/                 # 认证页面 (登录/注册/设置)
     ├── blog/                 # 博客页面 (列表/文章/编辑器)
     ├── books/                # 微信读书 (书架/统计/导入)
-    ├── dev/                  # 开发演示页面 (BookDetailDemo)
     ├── device/               # 设备管理 (资产跟踪/成本分析)
     ├── entry/                # Bento 首页 (可拖拽卡片)
     ├── fishing/              # 钓鱼地图 (指数/反馈/天气)

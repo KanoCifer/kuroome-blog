@@ -255,7 +255,7 @@ import { useV3DevTaskStore } from '@/features/todos/stores/v3devtasks';
 import type {
   DevTaskPriority,
   DevTaskType,
-} from '@/features/todos/api/devtask';
+} from '@/features/todos/api';
 import {
   useTaskDrawer,
   useDevTaskSections,
@@ -263,7 +263,7 @@ import {
 } from '@/features/todos/composables';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref } from 'vue';
-import { useAuthStore } from '@/shared/auth/stores/auth';
+import { useAuthStore } from '@/features/auth';
 import router from '@/router';
 
 const TASK_TYPES: DevTaskType[] = ['功能需求', '问题', '优化', '技术债'];

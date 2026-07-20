@@ -1,4 +1,4 @@
-import type { ReadStatsMode } from '@/features/books/api/weread';
+import type { ReadStatsMode } from '@/features/books/api';
 
 const COMPARE_REF: Record<ReadStatsMode, string> = {
   weekly: '上周',

@@ -1,6 +1,6 @@
 import { computed, type ComputedRef, type Ref } from 'vue';
 
-import type { DevTask } from '@/features/todos/api/devtask';
+import type { DevTask } from '@/features/todos/api';
 import { inProgress, priorityWeight } from './devTaskPolicy';
 
 /** Drawer / island 共用的三段 section 派生。 */

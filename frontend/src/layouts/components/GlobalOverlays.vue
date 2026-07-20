@@ -15,8 +15,8 @@
 </template>
 
 <script setup lang="ts">
-import CookieConsent from '@/shared/components/layout/CookieConsent.vue';
-import ToastContainer from '@/shared/components/layout/ToastContainer.vue';
+import CookieConsent from '@/layouts/components/CookieConsent.vue';
+import ToastContainer from '@/layouts/components/ToastContainer.vue';
 import DynamicIsland from '@/layouts/components/DynamicIsland.vue';
 import TaskDrawer from '@/layouts/components/TaskDrawer.vue';
 </script>

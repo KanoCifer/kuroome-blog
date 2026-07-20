@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useReadStatsStore } from '../readStats';
-import type { ReadDetailSnapshot } from '@/features/books/api/weread';
+import type { ReadDetailSnapshot } from '@/features/books/api';
 
 // ── gateway mock ─────────────────────────────────────────────────
 const getReadProgress = vi.fn();
-vi.mock('@/features/books/api/weread', () => ({
+vi.mock('@/features/books/api', () => ({
   wereadGateway: {
     getReadProgress: (...args: unknown[]) => getReadProgress(...args),
   },

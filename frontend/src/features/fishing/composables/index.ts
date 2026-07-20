@@ -7,3 +7,4 @@ export * from './useFishingAnalysis';
 export * from './useFishingDashboard';
 export * from './useFishingFeedback';
 export * from './useFishingRoute';
+export * from './useFishingMapSummary';

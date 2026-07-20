@@ -1,10 +1,10 @@
-import { devTaskGateway } from '@/features/todos/api/devtask';
+import { devTaskGateway } from '@/features/todos/api';
 import type {
   CreateDevTaskPayload,
   DevTask,
   DevTaskStatus,
   UpdateDevTaskPayload,
-} from '@/features/todos/api/devtask';
+} from '@/features/todos/api';
 import { useNotificationStore } from '@/shared/stores/notification';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';

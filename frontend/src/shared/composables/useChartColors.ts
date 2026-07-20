@@ -1,4 +1,4 @@
-import { resolveCssColor } from '@/utils/resolveColor';
+import { resolveCssColor } from '@/utils/color';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 
 export interface ChartPalette {

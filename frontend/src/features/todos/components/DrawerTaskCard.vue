@@ -109,7 +109,7 @@
 </template>
 
 <script setup lang="ts">
-import type { DevTask, DevTaskPriority, DevTaskType } from '@/features/todos/api/devtask';
+import type { DevTask, DevTaskPriority, DevTaskType } from '@/features/todos/api';
 import KindBadge from './KindBadge.vue';
 
 const props = withDefaults(

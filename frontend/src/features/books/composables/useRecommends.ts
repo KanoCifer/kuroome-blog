@@ -3,7 +3,7 @@
 // module 单例形态(与 useTaskDrawer 同)—— 整个应用共享同一份 recommend 列表 + 游标。
 // 之所以从原 useReadStatsStore 拆出: 推荐 fetch 不应阻塞 snapshot fetch 的 isLoading;
 // cursor + dedup 逻辑在 view 之外可单测;新增 admin export 等第二消费者无需引 store。
-import { wereadGateway, type BookRecommendItem } from '@/features/books/api/weread';
+import { wereadGateway, type BookRecommendItem } from '@/features/books/api';
 import { ref } from 'vue';
 
 const recommends = ref<BookRecommendItem[]>([]);

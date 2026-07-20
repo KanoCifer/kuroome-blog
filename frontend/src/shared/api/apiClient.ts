@@ -2,8 +2,8 @@ import axios, { AxiosError } from 'axios';
 import {
   isrefreshTokenRequest,
   refreshAccessToken,
-} from '@/shared/auth/api/refresh';
-import { getAccessToken } from '@/shared/auth/tokenService';
+} from '@/features/auth/api/refresh';
+import { getAccessToken } from '@/features/auth/tokenService';
 
 export interface ApiResponse<T = unknown> {
   message: string;

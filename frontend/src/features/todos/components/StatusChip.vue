@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import type { DevTaskStatus } from '@/features/todos/api/devtask';
+import type { DevTaskStatus } from '@/features/todos/api';
 
 const props = defineProps<{ status: DevTaskStatus }>();
 

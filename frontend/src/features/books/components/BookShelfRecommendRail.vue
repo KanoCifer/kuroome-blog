@@ -113,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import type { BookRecommendItem } from '@/features/books/api/weread';
+import type { BookRecommendItem } from '@/features/books/api';
 import { ArrowRight, RefreshCw, Star } from '@lucide/vue';
 import { Motion } from 'motion-v';
 import BookRecommendGrid from '@/features/books/components/BookRecommendGrid.vue';

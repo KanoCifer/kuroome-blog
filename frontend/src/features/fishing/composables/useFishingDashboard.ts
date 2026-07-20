@@ -1,6 +1,6 @@
 import { DEFAULT_MAP_CENTER, useFishingMapStore } from '@/features/fishing/stores/fishingMap';
 import { useNotificationStore } from '@/shared/stores/notification';
-import { fishingSpotsGateway } from '@/features/fishing/api/fishing';
+import { fishingSpotsGateway } from '@/features/fishing/api';
 import type { FishingIndexData } from '@/features/fishing/types';
 import type { MapMarker } from '@/features/fishing/types';
 import { toMapMarker, toMapMarkers } from '@/features/fishing/types';

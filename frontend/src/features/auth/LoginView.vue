@@ -7,7 +7,7 @@ import type { LoginForm } from '@/shared/types';
 import { ShieldUser } from '@lucide/vue';
 import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
-import { useAuthenticate } from '@/shared/auth/composables/useAuthenticate';
+import { useAuthenticate } from '@/features/auth';
 
 const {
   errors,

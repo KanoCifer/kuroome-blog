@@ -62,7 +62,7 @@ import {
   LogoutIcon,
   RegisterIcon,
 } from '@/shared/components/icons';
-import { useAuthStore } from '@/shared/auth/stores/auth';
+import { useAuthStore } from '@/features/auth';
 import { Images, MessageCircleHeart, BookOpenText } from '@lucide/vue';
 import { Motion, type MotionProps } from 'motion-v';
 import { SPRING_BOUNCE } from '@/shared/constants/motionPresets';

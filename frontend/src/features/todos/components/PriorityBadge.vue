@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import type { DevTaskPriority } from '@/features/todos/api/devtask';
+import type { DevTaskPriority } from '@/features/todos/api';
 
 const props = defineProps<{ priority: DevTaskPriority }>();
 

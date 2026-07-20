@@ -283,7 +283,7 @@ import type {
   DevTaskStatus,
   DevTaskType,
   UpdateDevTaskPayload,
-} from '@/features/todos/api/devtask';
+} from '@/features/todos/api';
 import { PRIORITIES, V3_STATUSES } from '@/features/todos/composables';
 
 const TASK_TYPES: DevTaskType[] = ['问题', '功能需求', '优化', '技术债'];

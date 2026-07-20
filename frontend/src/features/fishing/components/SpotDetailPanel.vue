@@ -15,8 +15,8 @@ import SpotMiniMap from '@/features/fishing/components/SpotMiniMap.vue';
 import SpotPhotoLightbox from '@/features/fishing/components/SpotPhotoLightbox.vue';
 import type { MapMarker } from '@/features/fishing/types';
 import type { SpotDetail } from '@/features/fishing/types';
-import type { UpdateFishingSpotPayload } from '@/features/fishing/api/fishing';
-import { fishingSpotsGateway } from '@/features/fishing/api/fishing';
+import type { UpdateFishingSpotPayload } from '@/features/fishing/api';
+import { fishingSpotsGateway } from '@/features/fishing/api';
 import dayjs from 'dayjs';
 import { computed, nextTick, ref, watch } from 'vue';
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { formatDate } from '@/utils/formatdate';
+import { formatDate } from '@/utils/date';
 import { useScroll } from '@vueuse/core';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';

@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useHeatmap } from '../useHeatmap';
-import type { WereadYearlyHeatmap } from '@/features/books/api/weread';
+import type { WereadYearlyHeatmap } from '@/features/books/api';
 
 // ── gateway mock ─────────────────────────────────────────────────
 const getYearlyHeatmap = vi.fn();
-vi.mock('@/features/books/api/weread', () => ({
+vi.mock('@/features/books/api', () => ({
   wereadGateway: {
     getYearlyHeatmap: (...args: unknown[]) => getYearlyHeatmap(...args),
   },

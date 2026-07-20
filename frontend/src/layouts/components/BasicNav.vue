@@ -105,7 +105,7 @@
 
 <script setup lang="ts">
 import { DropdownTransition } from '@/shared/components/ui/dropdown-transition';
-import { useAuthStore } from '@/shared/auth/stores/auth';
+import { useAuthStore } from '@/features/auth';
 import {
   BookOpenText,
   ChevronDown,

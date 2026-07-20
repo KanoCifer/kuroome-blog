@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { BookRecommendItem } from '@/features/books/api/weread';
+import type { BookRecommendItem } from '@/features/books/api';
 import { AnimatePresence, Motion } from 'motion-v';
 import { FADE, SPRING_BOUNCE } from '@/shared/constants/motionPresets';
 import { onMounted, onUnmounted, watch } from 'vue';

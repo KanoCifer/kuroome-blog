@@ -4,7 +4,7 @@ import type {
   DevTaskPriority,
   DevTaskStatus,
   DevTaskType,
-} from '@/features/todos/api/devtask';
+} from '@/features/todos/api';
 
 /** v3 全量状态，顺序即看板从左到右的阅读流。 */
 export const V3_STATUSES: readonly DevTaskStatus[] = [

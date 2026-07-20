@@ -196,7 +196,7 @@ import type {
   DevTaskPriority,
   DevTaskStatus,
   DevTaskType,
-} from '@/features/todos/api/devtask';
+} from '@/features/todos/api';
 import { PRIORITIES } from '@/features/todos/composables';
 import KanbanCard from './KanbanCard.vue';
 import MemberAvatar from './MemberAvatar.vue';

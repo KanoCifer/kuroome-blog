@@ -212,11 +212,11 @@
 </template>
 
 <script setup lang="ts">
-import type { ReadStatsMode } from '@/features/books/api/weread';
+import type { ReadStatsMode } from '@/features/books/api';
 import { useReadStatsStore } from '@/features/books/stores/readStats';
 import { useHeatmap } from '@/features/books/composables/useHeatmap';
 import { useRecommends } from '@/features/books/composables/useRecommends';
-import { formatDuration } from '@/utils/format/duration';
+import { formatDuration } from '@/utils/date';
 import PageHero from '@/shared/components/shared/PageHero.vue';
 import dayjs from 'dayjs';
 import { computed, onMounted, ref, watch } from 'vue';

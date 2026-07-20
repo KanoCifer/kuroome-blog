@@ -1,4 +1,4 @@
-import { playThemeTransition } from '@/utils/themeTransition';
+import { playThemeTransition } from '@/utils/dom';
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
 

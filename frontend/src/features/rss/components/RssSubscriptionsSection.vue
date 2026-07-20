@@ -112,8 +112,8 @@
 
 <script setup lang="ts">
 import { getSubscriptionTitle, getFeedProtocol } from '../rssUtils';
-import { formatDate } from '@/utils/formatdate';
-import type { SubscriptionItem } from '@/features/rss/api/rss';
+import { formatDate } from '@/utils/date';
+import type { SubscriptionItem } from '@/features/rss/api';
 
 defineProps<{
   subscriptions: SubscriptionItem[];

@@ -447,7 +447,7 @@ import IconUser from '@/shared/components/icons/IconUser.vue';
 import IconAnalytics from '@/shared/components/icons/IconAnalytics.vue';
 import { analyticsGateway } from '@/features/analytics/api/analyticsGateway';
 import type { PostViewData } from '@/features/analytics/types';
-import { useAuthStore } from '@/shared/auth/stores/auth';
+import { useAuthStore } from '@/features/auth';
 import dayjs from 'dayjs';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';

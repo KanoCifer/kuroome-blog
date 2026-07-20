@@ -4,8 +4,8 @@
  * - deterministicCoverGradient: 无封面兜底的稳定渐变色(依赖 bookId 域)
  * - formatProgressPercent:      0-100 进度 → "45%"
  *
- * 通用时长/相对时间格式化已上移到 `utils/format/duration.ts` 与
- * `utils/format/relative.ts`,本文件不再重复。
+ * 通用时长/相对时间格式化已上移到 `utils/date/duration.ts` 与
+ * `utils/date/relative.ts`,本文件不再重复。
  */
 
 export function formatProgressPercent(

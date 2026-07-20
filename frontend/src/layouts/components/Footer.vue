@@ -60,9 +60,3 @@ defineProps<{
   isEntryView: boolean;
 }>();
 </script>
-
-<style lang="scss" scoped>
-footer {
-  /* mix-blend-difference on inner container handles auto-contrast */
-}
-</style>

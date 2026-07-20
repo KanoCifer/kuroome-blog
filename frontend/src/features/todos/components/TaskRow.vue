@@ -81,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import type { DevTask } from '@/features/todos/api/devtask';
+import type { DevTask } from '@/features/todos/api';
 import TypeBadge from './TypeBadge.vue';
 import PriorityBadge from './PriorityBadge.vue';
 import KindBadge from './KindBadge.vue';

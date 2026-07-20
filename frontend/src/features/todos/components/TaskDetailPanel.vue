@@ -329,7 +329,7 @@
 import { computed } from 'vue';
 import { AnimatePresence, motion } from 'motion-v';
 import { FADE_FAST, SPRING_SNUG } from '@/shared/constants/motionPresets';
-import type { DevTask, DevTaskStatus } from '@/features/todos/api/devtask';
+import type { DevTask, DevTaskStatus } from '@/features/todos/api';
 import { renderMarkdown } from '@/shared/composables';
 import TypeBadge from './TypeBadge.vue';
 import PriorityBadge from './PriorityBadge.vue';

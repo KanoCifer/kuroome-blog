@@ -1,4 +1,4 @@
-import type { ReadStatsMode } from '@/features/books/api/weread';
+import type { ReadStatsMode } from '@/features/books/api';
 import type { useReadStatsStore } from '@/features/books/stores/readStats';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';

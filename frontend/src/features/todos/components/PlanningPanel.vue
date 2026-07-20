@@ -126,7 +126,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useV3DevTaskStore } from '@/features/todos/stores/v3devtasks';
-import type { DevTaskPriority, DevTaskType } from '@/features/todos/api/devtask';
+import type { DevTaskPriority, DevTaskType } from '@/features/todos/api';
 import { PRIORITIES } from '@/features/todos/composables';
 import TypeBadge from './TypeBadge.vue';
 import PriorityBadge from './PriorityBadge.vue';

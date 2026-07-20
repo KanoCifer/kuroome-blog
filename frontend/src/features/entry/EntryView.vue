@@ -200,9 +200,9 @@ import {
   BentoTech,
   TodoCard,
 } from '@/features/entry/components';
-import DragWrapper from '@/shared/components/layout/DragWrapper.vue';
-import FloatingActionButtons from '@/shared/components/layout/FloatingActionButtons.vue';
-import SettingsModal from '@/shared/components/layout/SettingsModal.vue';
+import DragWrapper from '@/layouts/components/DragWrapper.vue';
+import FloatingActionButtons from '@/layouts/components/FloatingActionButtons.vue';
+import SettingsModal from '@/layouts/components/SettingsModal.vue';
 import { useCardLayout } from '@/features/entry/composables';
 import { useCardLayoutStore } from '@/features/entry/stores/cardLayout';
 import { useThemeStore } from '@/shared/stores/theme';

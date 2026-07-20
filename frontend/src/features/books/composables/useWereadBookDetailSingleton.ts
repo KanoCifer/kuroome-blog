@@ -5,7 +5,7 @@
  *
  * 这是 **应用全局共享** 的状态:模块加载时创建一个 `_selectedBook` 和
  * `_isOpen` ref,所有调用 `useWereadBookDetailSingleton()` 的组件
- * (BookShelf、BookDetailDemo 等) 看到的是 **同一份状态**。
+ * (BookShelf 等) 看到的是 **同一份状态**。
  *
  * 函数名后缀 `Singleton` 是显式契约的一部分:
  * - 不要在测试里连续调用两次并期望隔离 — 这是**故意的**全局共享
@@ -27,7 +27,7 @@
  * - `clearAfterClose()` 在 @after-leave 钩子里清空 selectedBook
  */
 import { computed, ref } from 'vue';
-import type { WereadUserBook } from '@/features/books/api/weread';
+import type { WereadUserBook } from '@/features/books/api';
 
 const _selectedBook = ref<WereadUserBook | null>(null);
 const _isOpen = ref(false);

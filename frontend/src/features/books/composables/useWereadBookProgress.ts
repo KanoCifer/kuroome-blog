@@ -6,7 +6,7 @@
  * - refresh(true) 强制绕过 cache 走远端
  */
 import { ref, watch, type Ref } from 'vue';
-import { wereadGateway, type WereadBookProgress } from '@/features/books/api/weread';
+import { wereadGateway, type WereadBookProgress } from '@/features/books/api';
 
 interface CacheEntry {
   progress: WereadBookProgress;

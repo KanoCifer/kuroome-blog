@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { ref } from 'vue';
 
 import { useDevTaskSections } from '../useDevTaskSections';
-import type { DevTask } from '@/features/todos/api/devtask';
+import type { DevTask } from '@/features/todos/api';
 
 // ── 测试夹具 ─────────────────────────────────────────────────────────────
 

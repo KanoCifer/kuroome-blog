@@ -1,5 +1,5 @@
-import type { ReadDetailSnapshot, ReadStatsMode } from '@/features/books/api/weread';
-import { formatDuration } from '@/utils/format/duration';
+import type { ReadDetailSnapshot, ReadStatsMode } from '@/features/books/api';
+import { formatDuration } from '@/utils/date';
 import type { ComputedRef, Ref } from 'vue';
 import { computed } from 'vue';
 import { formatCompareSentence } from './useStatsFormat';

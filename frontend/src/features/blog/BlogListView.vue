@@ -419,7 +419,7 @@
 </template>
 
 <script setup lang="ts">
-import BasicDetail from '@/shared/components/basic/BasicDetail.vue';
+import BasicDetail from '@/features/status/components/BasicDetail.vue';
 import { blogGateway } from '@/features/blog/api/blogGateway';
 import { useNotificationStore } from '@/shared/stores/notification';
 import type { BlogPagination, Post } from '@/features/blog/types';

@@ -65,9 +65,9 @@ import { ChevronRight } from '@lucide/vue';
 import dayjs from 'dayjs';
 import { computed, h } from 'vue';
 import { useRouter } from 'vue-router';
-import type { ReadDetailSnapshot } from '@/features/books/api/weread';
-import { formatDuration } from '@/utils/format/duration';
-import { formatRelative } from '@/utils/format/relative';
+import type { ReadDetailSnapshot } from '@/features/books/api';
+import { formatDuration } from '@/utils/date';
+import { formatRelative } from '@/utils/date';
 
 const props = defineProps<{
   weeklySnapshot: ReadDetailSnapshot | null;

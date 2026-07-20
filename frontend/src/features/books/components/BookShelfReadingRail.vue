@@ -55,9 +55,9 @@
 </template>
 
 <script setup lang="ts">
-import type { WereadUserBook } from '@/features/books/api/weread';
+import type { WereadUserBook } from '@/features/books/api';
 import WereadBookCard from '@/features/books/components/WereadBookCard.vue';
-import { formatRelative } from '@/utils/format/relative';
+import { formatRelative } from '@/utils/date';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 
 defineProps<{

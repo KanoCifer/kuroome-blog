@@ -6,6 +6,7 @@ export * from './useLongestView';
 export * from './useOverviewView';
 export * from './usePeriodNavigation';
 export * from './usePreferenceView';
+export * from './useReadingSummary';
 export * from './useRecommends';
 export * from './useRhythmView';
 export * from './useShelfView';

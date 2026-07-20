@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Footer } from '@/layouts/components';
-import BackToTop from '@/shared/components/layout/BackToTop.vue';
+import BackToTop from '@/layouts/components/BackToTop.vue';
 import BasicNav from '@/layouts/components/BasicNav.vue';
 import { AnimatePresence } from 'motion-v';
 import { SPRING_BOUNCE } from '@/shared/constants/motionPresets';

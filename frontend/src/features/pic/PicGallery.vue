@@ -121,7 +121,7 @@ import PicUploadModal from './PicUploadModal.vue';
 import PolaroidCard from './PolaroidCard.vue';
 import { Button } from '@/shared/components/ui/button';
 import { useGallery, usePolaroidLayout, type Picture } from '@/features/pic/composables';
-import { useAuthStore } from '@/shared/auth/stores/auth';
+import { useAuthStore } from '@/features/auth';
 import { useNotificationStore } from '@/shared/stores/notification';
 import { ImageOff } from '@lucide/vue';
 import { motion } from 'motion-v';

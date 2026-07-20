@@ -15,7 +15,7 @@ import {
   typeDistribution,
   planSyncColumn,
 } from '../devTaskPolicy';
-import type { DevTask } from '@/features/todos/api/devtask';
+import type { DevTask } from '@/features/todos/api';
 
 // ── 测试夹具 ─────────────────────────────────────────────────────────────
 

@@ -184,7 +184,7 @@
 
 <script setup lang="ts">
 import type { Post } from '@/features/blog/types';
-import { formatDate } from '@/utils/formatdate';
+import { formatDate } from '@/utils/date';
 import { motion } from 'motion-v';
 import { WHILE_IN_VIEW_FADE_UP } from '@/shared/constants/motionPresets';
 import { computed } from 'vue';

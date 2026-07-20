@@ -9,7 +9,7 @@ import {
   READ_STATS_MODES,
   type ReadDetailSnapshot,
   type ReadStatsMode,
-} from '@/features/books/api/weread';
+} from '@/features/books/api';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 

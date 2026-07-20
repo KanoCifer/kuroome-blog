@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { weatherGateway } from '@/features/fishing/api/fishing';
+import { weatherGateway } from '@/features/fishing/api';
 import { useNotificationStore } from '@/shared/stores/notification';
 import dayjs from 'dayjs';
 import { computed, onMounted, ref, watch } from 'vue';

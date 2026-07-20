@@ -11,14 +11,14 @@ import {
 import type {
   WereadBookProgress,
   WereadUserBook,
-} from '@/features/books/api/weread';
+} from '@/features/books/api';
 import { useWereadBookProgress } from '../composables/useWereadBookProgress';
 import {
   deterministicCoverGradient,
   formatProgressPercent,
 } from '../format';
-import { formatDuration } from '@/utils/format/duration';
-import { formatRelative } from '@/utils/format/relative';
+import { formatDuration } from '@/utils/date';
+import { formatRelative } from '@/utils/date';
 
 /**
  * 书籍详情浮层 — 点击卡片后的详情面板

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CookieConsent from '@/shared/components/layout/CookieConsent.vue';
+import CookieConsent from '@/layouts/components/CookieConsent.vue';
 </script>
 
 <template>

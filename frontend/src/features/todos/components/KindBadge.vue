@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import type { DevTaskKind } from '@/features/todos/api/devtask';
+import type { DevTaskKind } from '@/features/todos/api';
 
 const props = defineProps<{ kind?: DevTaskKind | '' | null }>();
 
