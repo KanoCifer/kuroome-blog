@@ -1,4 +1,4 @@
-import type { Theme } from '@/stores/theme';
+import type { Theme } from '@/shared/stores/theme';
 
 function getCssVar(
   isDark: boolean,

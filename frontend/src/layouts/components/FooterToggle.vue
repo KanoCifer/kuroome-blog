@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { BasicFooter } from '@/components/basic';
-import BackToTop from '@/components/layout/BackToTop.vue';
-import BasicNav from '@/components/nav/BasicNav.vue';
+import { BasicFooter } from '@/shared/components/basic';
+import BackToTop from '@/shared/components/layout/BackToTop.vue';
+import BasicNav from '@/layouts/components/BasicNav.vue';
 import { AnimatePresence } from 'motion-v';
-import { SPRING_BOUNCE } from '@/constants/motionPresets';
-import { useThemeStore } from '@/stores/theme';
+import { SPRING_BOUNCE } from '@/shared/constants/motionPresets';
+import { useThemeStore } from '@/shared/stores/theme';
 import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 

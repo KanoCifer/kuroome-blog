@@ -249,14 +249,21 @@
 
 <script setup lang="ts">
 import { AnimatePresence, motion } from 'motion-v';
-import { SPRING_SNUG } from '@/constants/motionPresets';
-import DrawerTaskCard from '@/views/todos/components/DrawerTaskCard.vue';
-import { useV3DevTaskStore } from '@/stores/v3devtasks';
-import type { DevTaskPriority, DevTaskType } from '@/api/devtask';
-import { useTaskDrawer, useDevTaskSections, PRIORITIES } from '@/composables/todo';
+import { SPRING_SNUG } from '@/shared/constants/motionPresets';
+import DrawerTaskCard from '@/features/todos/components/DrawerTaskCard.vue';
+import { useV3DevTaskStore } from '@/features/todos/stores/v3devtasks';
+import type {
+  DevTaskPriority,
+  DevTaskType,
+} from '@/features/todos/api/devtask';
+import {
+  useTaskDrawer,
+  useDevTaskSections,
+  PRIORITIES,
+} from '@/features/todos/composables';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref } from 'vue';
-import { useAuthStore } from '@/auth/stores/auth';
+import { useAuthStore } from '@/shared/auth/stores/auth';
 import router from '@/router';
 
 const TASK_TYPES: DevTaskType[] = ['功能需求', '问题', '优化', '技术债'];

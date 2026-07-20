@@ -7,7 +7,7 @@ import {
   GlobalOverlays,
   Header,
 } from './components';
-import { RouteTransition } from '@/components/ui/route-transition';
+import { RouteTransition } from '@/shared/components/ui/route-transition';
 
 const route = useRoute();
 const isEntryView = computed(() => route.path === '/');

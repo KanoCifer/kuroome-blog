@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useBackgroundStore } from '@/stores/background';
-import { useThemeStore } from '@/stores/theme';
+import { useBackgroundStore } from '@/shared/stores/background';
+import { useThemeStore } from '@/shared/stores/theme';
 
 defineProps<{ isEntryView: boolean }>();
 

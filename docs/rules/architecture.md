@@ -11,8 +11,17 @@
 
 Vue (`frontend/`) and React (`react-app/`) share backend services but maintain independent state stores. API contract changes must sync both ends:
 
-- Backend schema change → sync `frontend/src/api/` and `react-app/src/services/`
+- Backend schema change → sync `frontend/src/features/<domain>/api/` and `react-app/src/services/`
 - Both use `packages/brand/` for shared theme tokens and prose styles
+
+### Vue 前端目录组织
+
+`frontend/src/` 采用 **features/ 按业务域聚合**（详见 [code-style.md](code-style.md)）：
+
+- `features/<domain>/` — 每个业务域把路由页（域根 `<View>.vue`）+ `api/` + `composables/` + `stores/` + `types/` + `components/` 收拢在一起；子目录内部**扁平**（禁止 `views/`、`components/<subdir>/`、`composables/<subdir>/` 等嵌套），通过 `index.ts` 桶导出；新增域在 `features/` 下建目录，禁止散落在顶层
+- `shared/` — 跨域基础设施（`api/` 聚合共享 gateway、`auth/` 全局认证、`components/` 复用 UI、`composables/` 跨域 hooks、`stores/` 跨域 store）
+- `layouts/` `router/` `lib/` `utils/` `constants/` — 全局基础设施，不迁入 features
+- 顶层已清空 `views/` `auth/` `components/` `composables/` `stores/` `api/` `plugins/`
 
 ## Data Layer
 

@@ -13,7 +13,7 @@ useHead({
     },
     {
       name: 'keywords',
-      content: '阅读追踪,阅读清单,微信读书,读书笔记,个人图书馆,阅读管理',
+      content: '阅读追踪,个人图书馆,阅读管理',
     },
     { name: 'robots', content: 'index, follow' },
     { name: 'author', content: 'Kuroome' },
