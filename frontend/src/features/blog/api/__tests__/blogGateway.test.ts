@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { blogGateway } from '@/features/blog/api/blogGateway';
 
-// Mock the underlying request module
-vi.mock('@/shared/api/request', () => ({
+// Mock the underlying apiClient module
+vi.mock('@/shared/api/apiClient', () => ({
   default: {
     get: vi.fn(),
     post: vi.fn(),
@@ -11,7 +11,7 @@ vi.mock('@/shared/api/request', () => ({
   },
 }));
 
-import request from '@/shared/api/request';
+import apiClient from '@/shared/api/apiClient';
 
 describe('blogGateway (tags migration)', () => {
   beforeEach(() => {
@@ -24,7 +24,7 @@ describe('blogGateway (tags migration)', () => {
 
   describe('getTags', () => {
     it('returns flattened tag list from response', async () => {
-      vi.mocked(request.get).mockResolvedValue({
+      vi.mocked(apiClient.get).mockResolvedValue({
         data: {
           data: {
             tags: [
@@ -37,7 +37,7 @@ describe('blogGateway (tags migration)', () => {
 
       const tags = await blogGateway.getTags();
 
-      expect(request.get).toHaveBeenCalledWith('v3/tags');
+      expect(apiClient.get).toHaveBeenCalledWith('v3/tags');
       expect(tags).toEqual([
         { name: 'python', count: 3 },
         { name: 'go', count: 1 },
@@ -47,7 +47,7 @@ describe('blogGateway (tags migration)', () => {
 
   describe('getPostsByTag', () => {
     it('URL-encodes the tag and unwraps response', async () => {
-      vi.mocked(request.get).mockResolvedValue({
+      vi.mocked(apiClient.get).mockResolvedValue({
         data: {
           data: {
             posts: [{ _id: '1', title: 'A', tags: ['C++'] }],
@@ -59,7 +59,7 @@ describe('blogGateway (tags migration)', () => {
 
       const result = await blogGateway.getPostsByTag('C++');
 
-      expect(request.get).toHaveBeenCalledWith('v3/tags/C%2B%2B/posts');
+      expect(apiClient.get).toHaveBeenCalledWith('v3/tags/C%2B%2B/posts');
       expect(result.tag).toBe('C++');
       expect(result.total).toBe(1);
     });
@@ -67,7 +67,7 @@ describe('blogGateway (tags migration)', () => {
 
   describe('createLegacyPost', () => {
     it('sends tags (not category_id) in payload', async () => {
-      vi.mocked(request.post).mockResolvedValue({
+      vi.mocked(apiClient.post).mockResolvedValue({
         data: { data: { _id: 'newid' } },
       });
 
@@ -78,7 +78,7 @@ describe('blogGateway (tags migration)', () => {
         is_pinned: 0,
       });
 
-      expect(request.post).toHaveBeenCalledWith(
+      expect(apiClient.post).toHaveBeenCalledWith(
         'v3/post/add',
         expect.objectContaining({
           title: 'Hello',
@@ -88,7 +88,7 @@ describe('blogGateway (tags migration)', () => {
         }),
       );
       // category_id must NOT be in the payload
-      expect(request.post).not.toHaveBeenCalledWith(
+      expect(apiClient.post).not.toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({ category_id: expect.anything() }),
       );
@@ -98,7 +98,7 @@ describe('blogGateway (tags migration)', () => {
 
   describe('updateLegacyPost', () => {
     it('sends tags (not category_id) in update payload', async () => {
-      vi.mocked(request.put).mockResolvedValue({
+      vi.mocked(apiClient.put).mockResolvedValue({
         data: { data: { _id: 'existing' } },
       });
 
@@ -110,14 +110,14 @@ describe('blogGateway (tags migration)', () => {
         is_pinned: 1,
       });
 
-      expect(request.put).toHaveBeenCalledWith(
+      expect(apiClient.put).toHaveBeenCalledWith(
         'v3/post/update',
         expect.objectContaining({
           _id: 'existing',
           tags: ['new-tag'],
         }),
       );
-      expect(request.put).not.toHaveBeenCalledWith(
+      expect(apiClient.put).not.toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({ category_id: expect.anything() }),
       );
@@ -126,7 +126,7 @@ describe('blogGateway (tags migration)', () => {
 
   describe('getBlogs', () => {
     it('response contains tags (not categories)', async () => {
-      vi.mocked(request.get).mockResolvedValue({
+      vi.mocked(apiClient.get).mockResolvedValue({
         data: {
           data: {
             posts: [{ _id: '1', title: 'P', tags: ['x'] }],

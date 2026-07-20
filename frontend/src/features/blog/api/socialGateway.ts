@@ -1,4 +1,4 @@
-import request from '@/shared/api/request';
+import apiClient from '@/shared/api/apiClient';
 
 export interface SocialGateway {
   getLikes(): Promise<{ likes_count: number }>;
@@ -7,13 +7,13 @@ export interface SocialGateway {
 
 export const socialGateway: SocialGateway = {
   async getLikes(): Promise<{ likes_count: number }> {
-    const res = await request.get<{ data: { likes_count: number } }>(
+    const res = await apiClient.get<{ data: { likes_count: number } }>(
       'v1/likes',
     );
     return res.data.data;
   },
 
   async likeOnce(payload: { likes_count: number }): Promise<void> {
-    await request.post('v1/like', payload);
+    await apiClient.post('v1/like', payload);
   },
 };

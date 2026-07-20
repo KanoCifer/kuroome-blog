@@ -1,23 +1,12 @@
-import request from '@/shared/api/request';
+import apiClient from '@/shared/api/apiClient';
 import type {
+  ListAdminMomentsParams,
+  ListPublicMomentsParams,
   Moment,
   MomentCreatePayload,
   MomentListResponse,
-  MomentStatus,
   MomentUpdatePayload,
 } from '@/features/moments/types';
-
-export interface ListPublicMomentsParams {
-  page?: number;
-  page_size?: number;
-  tag?: string;
-}
-
-export interface ListAdminMomentsParams {
-  page?: number;
-  page_size?: number;
-  status?: MomentStatus;
-}
 
 export interface MomentsGateway {
   listPublic(params?: ListPublicMomentsParams): Promise<MomentListResponse>;
@@ -31,14 +20,14 @@ export interface MomentsGateway {
 
 export const momentsGateway: MomentsGateway = {
   async listPublic(params) {
-    const res = await request.get<{ data: MomentListResponse }>('v1/moments', {
+    const res = await apiClient.get<{ data: MomentListResponse }>('v1/moments', {
       params,
     });
     return res.data.data;
   },
 
   async listAdmin(params) {
-    const res = await request.get<{ data: MomentListResponse }>(
+    const res = await apiClient.get<{ data: MomentListResponse }>(
       'v1/moments/admin',
       { params },
     );
@@ -46,21 +35,21 @@ export const momentsGateway: MomentsGateway = {
   },
 
   async get(id) {
-    const res = await request.get<{ data: { moment: Moment } }>(
+    const res = await apiClient.get<{ data: { moment: Moment } }>(
       `v1/moments/${id}`,
     );
     return res.data.data;
   },
 
   async getAdmin(id) {
-    const res = await request.get<{ data: { moment: Moment } }>(
+    const res = await apiClient.get<{ data: { moment: Moment } }>(
       `v1/moments/admin/${id}`,
     );
     return res.data.data;
   },
 
   async create(payload) {
-    const res = await request.post<{ data: { moment: Moment } }>(
+    const res = await apiClient.post<{ data: { moment: Moment } }>(
       'v1/moments',
       payload,
     );
@@ -68,7 +57,7 @@ export const momentsGateway: MomentsGateway = {
   },
 
   async update(id, payload) {
-    const res = await request.patch<{ data: { moment: Moment } }>(
+    const res = await apiClient.patch<{ data: { moment: Moment } }>(
       `v1/moments/${id}`,
       payload,
     );
@@ -76,6 +65,6 @@ export const momentsGateway: MomentsGateway = {
   },
 
   async remove(id) {
-    await request.delete(`v1/moments/${id}`);
+    await apiClient.delete(`v1/moments/${id}`);
   },
 };

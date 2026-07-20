@@ -1,18 +1,6 @@
-import request from '@/shared/api/request';
+import apiClient from '@/shared/api/apiClient';
 
-export type DeviceInput = {
-  name: string;
-  purchase_date: string;
-  price: number;
-  currency: string;
-  notes?: string;
-  status: 'active' | 'retired';
-  reminder_config: unknown;
-};
-
-export type Device = DeviceInput & {
-  id: number;
-};
+import type { Device, DeviceInput } from '@/features/device/types';
 
 export interface DeviceGateway {
   getUserDevices: () => Promise<Device[]>;
@@ -37,40 +25,40 @@ export interface DeviceGateway {
 
 export const deviceGateway: DeviceGateway = {
   async getUserDevices() {
-    const res = await request.get<{ data: { devices: Device[] } }>('v2/device');
+    const res = await apiClient.get<{ data: { devices: Device[] } }>('v2/device');
     return res.data.data.devices;
   },
 
   async getUserGlobalConfig() {
-    const res = await request.get<{
+    const res = await apiClient.get<{
       data: { config: Record<string, unknown> };
     }>('v2/subscriptions/global-config');
     return res.data.data;
   },
 
   async getDeviceById(device_id: number) {
-    const res = await request.get<{ data: Device }>(`v2/device/${device_id}`);
+    const res = await apiClient.get<{ data: Device }>(`v2/device/${device_id}`);
     return res.data.data;
   },
 
   async createDevice(data: DeviceInput) {
-    const res = await request.post<{ data: Device }>('v2/device', data);
+    const res = await apiClient.post<{ data: Device }>('v2/device', data);
     return res.data.data;
   },
 
   async deleteDevice(device_id: number) {
-    await request.delete(`v2/device/${device_id}`);
+    await apiClient.delete(`v2/device/${device_id}`);
   },
 
   async updateDevice(device_id: number, data) {
-    const res = await request.put<{ data: Device }>(`v2/device/${device_id}`, {
+    const res = await apiClient.put<{ data: Device }>(`v2/device/${device_id}`, {
       device_input: data,
     });
     return res.data.data;
   },
 
   async updateDeviceStatus(device_id: number, status: 'active' | 'retired') {
-    const res = await request.patch<{ data: Device }>(
+    const res = await apiClient.patch<{ data: Device }>(
       `v2/device/${device_id}/status`,
       { status },
     );
@@ -81,7 +69,7 @@ export const deviceGateway: DeviceGateway = {
     device_id: number,
     reminder_config: unknown,
   ) {
-    const res = await request.patch<{ data: Device }>(
+    const res = await apiClient.patch<{ data: Device }>(
       `v2/device/${device_id}/reminders`,
       {
         reminder_config,
@@ -91,6 +79,6 @@ export const deviceGateway: DeviceGateway = {
   },
 
   async testNotification(device_id: number) {
-    await request.post(`v2/device/${device_id}/test-notification`);
+    await apiClient.post(`v2/device/${device_id}/test-notification`);
   },
 };

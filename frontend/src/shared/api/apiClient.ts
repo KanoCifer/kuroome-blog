@@ -1,5 +1,8 @@
 import axios, { AxiosError } from 'axios';
-import { isrefreshTokenRequest, refreshAccessToken } from '@/shared/auth/api/refresh';
+import {
+  isrefreshTokenRequest,
+  refreshAccessToken,
+} from '@/shared/auth/api/refresh';
 import { getAccessToken } from '@/shared/auth/tokenService';
 
 export interface ApiResponse<T = unknown> {
@@ -9,7 +12,7 @@ export interface ApiResponse<T = unknown> {
   errors?: Record<string, unknown>;
 }
 
-const request = axios.create({
+const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE || '/',
   timeout: 10000,
   withCredentials: true,
@@ -19,7 +22,7 @@ const request = axios.create({
 });
 
 // 动态注入 Authorization header
-request.interceptors.request.use((config) => {
+apiClient.interceptors.request.use((config) => {
   const token = getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -28,7 +31,7 @@ request.interceptors.request.use((config) => {
 });
 
 // 添加401自动刷新token拦截器
-request.interceptors.response.use(
+apiClient.interceptors.response.use(
   (response) => response,
 
   async (error: AxiosError<ApiResponse>) => {
@@ -50,7 +53,7 @@ request.interceptors.response.use(
 
       try {
         await refreshAccessToken();
-        return request(_cfg);
+        return apiClient(_cfg);
       } catch (error) {
         return Promise.reject(error);
       }
@@ -61,7 +64,7 @@ request.interceptors.response.use(
 
 // 友好错误消息转换 — 在所有其他拦截器之后注册（错误链中优先执行），
 // 优先取后端返回的 message，无后端响应时按状态码映射友好文案
-request.interceptors.response.use(
+apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError<ApiResponse>) => {
     if (error.response?.data?.message) {
@@ -88,4 +91,4 @@ request.interceptors.response.use(
   },
 );
 
-export default request;
+export default apiClient;

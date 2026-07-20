@@ -1,17 +1,6 @@
-import request from '@/shared/api/request';
-import type { ExifInfo } from '@/features/pic/composables';
+import apiClient from '@/shared/api/apiClient';
 
-export interface GalleryImage {
-  id: string;
-  url: string;
-  description: string;
-  uploadedAt?: string;
-  exif?: ExifInfo | null;
-}
-
-export interface GalleryResponse {
-  images: GalleryImage[];
-}
+import type { GalleryImage, GalleryResponse } from '@/features/pic/types';
 
 export interface GalleryGateway {
   getGallery(): Promise<GalleryResponse>;
@@ -21,12 +10,12 @@ export interface GalleryGateway {
 
 export const galleryGateway: GalleryGateway = {
   async getGallery(): Promise<GalleryResponse> {
-    const res = await request.get<{ data: GalleryResponse }>('v1/pic-gallery');
+    const res = await apiClient.get<{ data: GalleryResponse }>('v1/pic-gallery');
     return res.data.data;
   },
 
   async uploadGalleryImage(formData: FormData): Promise<{ url: string }> {
-    const res = await request.post<{ data: { url: string } }>(
+    const res = await apiClient.post<{ data: { url: string } }>(
       'v3/upload',
       formData,
       {
@@ -37,6 +26,6 @@ export const galleryGateway: GalleryGateway = {
   },
 
   async saveGallery(payload: { images: GalleryImage[] }): Promise<void> {
-    await request.post('v1/set-pic-gallery', payload);
+    await apiClient.post('v1/set-pic-gallery', payload);
   },
 };

@@ -1,52 +1,11 @@
-import request from '@/shared/api/request';
+import apiClient from '@/shared/api/apiClient';
 
-/** 订阅数据类型 */
-export interface Subscription {
-  id: number;
-  name: string;
-  provider: string;
-  price: number;
-  currency: string;
-  billing_cycle: string;
-  next_billing_date: string;
-  reminder_config: Record<string, unknown> | null;
-  status: string;
-  notes: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-/** 创建订阅请求体 */
-export interface CreateSubscriptionPayload {
-  name: string;
-  provider: string;
-  price: number;
-  currency: string;
-  billing_cycle: string;
-  next_billing_date: string;
-  reminder_config?: Record<string, unknown> | null;
-  status: string;
-  notes?: string | null;
-}
-
-/** 更新订阅请求体 */
-export interface UpdateSubscriptionPayload {
-  name?: string;
-  provider?: string;
-  price?: number;
-  currency?: string;
-  billing_cycle?: string;
-  next_billing_date?: string;
-  reminder_config?: Record<string, unknown> | null;
-  status?: string;
-  notes?: string | null;
-}
-
-/** 测试通知请求体 */
-export interface TestNotificationPayload {
-  channels: string[];
-  config: Record<string, unknown>;
-}
+import type {
+  CreateSubscriptionPayload,
+  Subscription,
+  TestNotificationPayload,
+  UpdateSubscriptionPayload,
+} from '@/features/subscription/types';
 
 export interface SubscriptionGateway {
   /** 获取订阅列表 */
@@ -86,14 +45,14 @@ export interface SubscriptionGateway {
 
 export const subscriptionGateway: SubscriptionGateway = {
   async getSubscriptions(): Promise<Subscription[]> {
-    const res = await request.get<{ data: { subscriptions: Subscription[] } }>(
+    const res = await apiClient.get<{ data: { subscriptions: Subscription[] } }>(
       'v2/subscriptions',
     );
     return res.data.data.subscriptions;
   },
 
   async getSubscription(subId: number): Promise<Subscription> {
-    const res = await request.get<{ data: { subscription: Subscription } }>(
+    const res = await apiClient.get<{ data: { subscription: Subscription } }>(
       `v2/subscriptions/${subId}`,
     );
     return res.data.data.subscription;
@@ -102,7 +61,7 @@ export const subscriptionGateway: SubscriptionGateway = {
   async createSubscription(
     payload: CreateSubscriptionPayload,
   ): Promise<Subscription> {
-    const res = await request.post<{ data: { subscription: Subscription } }>(
+    const res = await apiClient.post<{ data: { subscription: Subscription } }>(
       'v2/subscriptions',
       payload,
     );
@@ -113,7 +72,7 @@ export const subscriptionGateway: SubscriptionGateway = {
     subId: number,
     payload: UpdateSubscriptionPayload,
   ): Promise<Subscription> {
-    const res = await request.put<{ data: { subscription: Subscription } }>(
+    const res = await apiClient.put<{ data: { subscription: Subscription } }>(
       `v2/subscriptions/${subId}`,
       payload,
     );
@@ -121,11 +80,11 @@ export const subscriptionGateway: SubscriptionGateway = {
   },
 
   async deleteSubscription(subId: number): Promise<void> {
-    await request.delete(`v2/subscriptions/${subId}`);
+    await apiClient.delete(`v2/subscriptions/${subId}`);
   },
 
   async updateStatus(subId: number, newStatus: string): Promise<Subscription> {
-    const res = await request.patch<{ data: { subscription: Subscription } }>(
+    const res = await apiClient.patch<{ data: { subscription: Subscription } }>(
       `v2/subscriptions/${subId}/status`,
       undefined,
       {
@@ -139,7 +98,7 @@ export const subscriptionGateway: SubscriptionGateway = {
     subId: number,
     reminderData: Record<string, unknown>,
   ): Promise<Subscription> {
-    const res = await request.patch<{ data: { subscription: Subscription } }>(
+    const res = await apiClient.patch<{ data: { subscription: Subscription } }>(
       `v2/subscriptions/${subId}/reminders`,
       reminderData,
     );
@@ -147,7 +106,7 @@ export const subscriptionGateway: SubscriptionGateway = {
   },
 
   async getUpcomingSubscriptions(): Promise<Subscription[]> {
-    const res = await request.get<{ data: { subscriptions: Subscription[] } }>(
+    const res = await apiClient.get<{ data: { subscriptions: Subscription[] } }>(
       'v2/subscriptions/upcoming',
     );
     return res.data.data.subscriptions;
@@ -157,14 +116,14 @@ export const subscriptionGateway: SubscriptionGateway = {
     subId: number,
     payload: TestNotificationPayload,
   ): Promise<Record<string, boolean>> {
-    const res = await request.post<{
+    const res = await apiClient.post<{
       data: { results: Record<string, boolean> };
     }>(`v2/subscriptions/${subId}/test-notification`, payload);
     return res.data.data.results;
   },
 
   async getUserGlobalConfig(): Promise<Record<string, unknown>> {
-    const res = await request.get<{
+    const res = await apiClient.get<{
       data: { config: Record<string, unknown> };
     }>('v2/subscriptions/global-config');
     return res.data.data.config;
@@ -173,7 +132,7 @@ export const subscriptionGateway: SubscriptionGateway = {
   async updateUserGlobalConfig(
     configData: Record<string, unknown>,
   ): Promise<Record<string, unknown>> {
-    const res = await request.put<{
+    const res = await apiClient.put<{
       data: { config: Record<string, unknown> };
     }>('v2/subscriptions/global-config', {
       config_data: configData,

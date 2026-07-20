@@ -5,7 +5,42 @@
  * 仅描述网络层数据，不夹带 view-only 派生字段。
  */
 
-import type { FishingSpot } from '@/features/fishing/api/fishing';
+// ---------------------------------------------------------------------------
+// 钓点 DTO —— 与 go-backend/internal/dto/fish.go 对齐
+// ---------------------------------------------------------------------------
+
+export interface FishingSpot {
+  id: string;
+  name: string;
+  description: string;
+  /** [lng, lat] */
+  location: [number, number];
+  tags: string[];
+  rating: number;
+  images: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * 创建钓点载荷 —— 与 dto.FishingSpotIn 对齐。
+ * Name / Location 必填（binding:"required"），其余可选。
+ */
+export interface CreateFishingSpotPayload {
+  name: string;
+  /** [lng, lat] */
+  location: [number, number];
+  description?: string;
+  tags?: string[];
+  rating?: number;
+  images?: string[];
+}
+
+/**
+ * 更新钓点载荷 —— 与 dto.FishingSpotUpdate 对齐。
+ * 全字段可选：未传 = 不动，传了 = 显式覆盖（Partial update）。
+ */
+export type UpdateFishingSpotPayload = Partial<CreateFishingSpotPayload>;
 
 // ---------------------------------------------------------------------------
 // 潮汐 / 天气
@@ -21,6 +56,11 @@ export interface TideData {
   updateTime: string;
   tideTable: TideTableItem[];
   tideHourly: Array<{ fxTime: string; height: number | string }>;
+}
+
+/** 潮汐 API 响应（TideData + 状态码）*/
+export interface TideResponse extends TideData {
+  code: string;
 }
 
 export interface WeatherHourly {

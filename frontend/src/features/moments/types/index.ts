@@ -64,3 +64,19 @@ export interface MomentCreatePayload {
 }
 
 export type MomentUpdatePayload = Partial<MomentCreatePayload>;
+
+// ---------------------------------------------------------------------------
+// 列表查询参数
+// ---------------------------------------------------------------------------
+
+export interface ListPublicMomentsParams {
+  page?: number;
+  page_size?: number;
+  tag?: string;
+}
+
+export interface ListAdminMomentsParams {
+  page?: number;
+  page_size?: number;
+  status?: MomentStatus;
+}

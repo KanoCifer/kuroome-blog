@@ -52,3 +52,75 @@ export interface BlogPagination {
   prev_num?: number | null;
   next_num?: number | null;
 }
+
+// ---------------------------------------------------------------------------
+// 博客查询 / 响应 DTO
+// ---------------------------------------------------------------------------
+
+export interface BlogQuery {
+  page?: number;
+  search?: string;
+}
+
+export interface BlogListResponse {
+  posts: BlogPost[];
+  tags: TagItem[];
+  pagination: BlogPagination;
+}
+
+export interface BlogPostResponse {
+  _id: string;
+  title: string;
+  body: string;
+  summary?: string | null;
+  cover?: string | null;
+  tags: string[];
+  is_pinned: boolean;
+  views?: number;
+  likes?: number;
+  created_at: string;
+  updated_at: string;
+}
+
+// ---------------------------------------------------------------------------
+// LLM（AI 总结 / 对话 / 天气分析）
+// ---------------------------------------------------------------------------
+
+export interface CachedLlmPayload {
+  article_content: string;
+  article_title?: string;
+}
+
+export interface CachedSummaryResponse {
+  cached?: boolean;
+  summary?: string;
+}
+
+export interface CachedChatResponse {
+  cached?: boolean;
+  messages?: Array<{ role: 'user' | 'assistant'; content: string }>;
+  session_id?: string;
+}
+
+export interface StreamSummaryBody {
+  title: string;
+  content: string;
+  model: string;
+}
+
+export interface StreamChatBody {
+  message: string;
+  session_id: string;
+  article_content?: string;
+  article_title?: string;
+}
+
+export interface WeatherAnalysisBody {
+  weather_data: unknown;
+  model_id: string;
+}
+
+export interface LlmStreamFrame {
+  content?: string;
+  is_end?: boolean;
+}

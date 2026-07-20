@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 import IconDocumentText from '@/shared/components/icons/IconDocumentText.vue';
-import type { PostViewData } from '@/features/analytics/api/analyticsGateway';
+import type { PostViewData } from '@/features/analytics/types';
 import { useChartColors } from '@/shared/composables';
 import { computed } from 'vue';
 import VChart from 'vue-echarts';

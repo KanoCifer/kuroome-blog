@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// Mock the underlying request module —— 与 blogGateway.test.ts 同模式。
-vi.mock('@/shared/api/request', () => ({
+// Mock the underlying apiClient module —— 与 blogGateway.test.ts 同模式。
+vi.mock('@/shared/api/apiClient', () => ({
   default: {
     get: vi.fn(),
     post: vi.fn(),
@@ -10,11 +10,11 @@ vi.mock('@/shared/api/request', () => ({
   },
 }));
 
-import request from '@/shared/api/request';
+import apiClient from '@/shared/api/apiClient';
 import { fishingSpotsGateway } from '@/features/fishing/api/fishing/fishingSpotsGateway';
 import type { FishingSpot } from '@/features/fishing/api/fishing/fishingSpotsGateway';
 
-const mockedRequest = vi.mocked(request);
+const mockedRequest = vi.mocked(apiClient);
 
 const sampleSpot: FishingSpot = {
   id: '64b8',

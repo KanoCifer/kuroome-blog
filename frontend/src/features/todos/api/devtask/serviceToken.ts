@@ -1,4 +1,4 @@
-import request from '@/shared/api/request';
+import apiClient from '@/shared/api/apiClient';
 import { getAccessToken } from '@/shared/auth/tokenService';
 
 // ── devtask service-JWT 缓存 ──
@@ -41,7 +41,7 @@ export async function getDevTaskToken(): Promise<string> {
   if (inflight) return inflight;
 
   inflight = (async () => {
-    const res = await request.get<{ data: DevTaskTokenRaw }>(
+    const res = await apiClient.get<{ data: DevTaskTokenRaw }>(
       'v3/dev-task/token',
     );
     const { token, expires_at } = res.data.data;

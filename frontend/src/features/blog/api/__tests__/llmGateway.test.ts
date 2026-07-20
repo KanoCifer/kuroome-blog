@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { llmGateway } from '@/features/blog/api/llmGateway';
 
-vi.mock('@/shared/api/request', () => ({
+vi.mock('@/shared/api/apiClient', () => ({
   default: {
     get: vi.fn(),
     post: vi.fn(),
@@ -14,7 +14,7 @@ vi.mock('@/features/blog/composables/useSseStream', () => ({
   consumeSseStream: vi.fn(),
 }));
 
-import request from '@/shared/api/request';
+import apiClient from '@/shared/api/apiClient';
 import { consumeSseStream } from '@/features/blog/composables/useSseStream';
 
 describe('llmGateway', () => {
@@ -29,7 +29,7 @@ describe('llmGateway', () => {
 
   describe('getCachedSummary', () => {
     it('POSTs to v2/llm/history/summary and unwraps data', async () => {
-      vi.mocked(request.post).mockResolvedValue({
+      vi.mocked(apiClient.post).mockResolvedValue({
         data: { data: { cached: true, summary: 'cached text' } },
       });
 
@@ -37,14 +37,14 @@ describe('llmGateway', () => {
         article_content: 'pure content',
       });
 
-      expect(request.post).toHaveBeenCalledWith('v2/llm/history/summary', {
+      expect(apiClient.post).toHaveBeenCalledWith('v2/llm/history/summary', {
         article_content: 'pure content',
       });
       expect(result).toEqual({ cached: true, summary: 'cached text' });
     });
 
     it('passes article_title only when provided', async () => {
-      vi.mocked(request.post).mockResolvedValue({
+      vi.mocked(apiClient.post).mockResolvedValue({
         data: { data: { cached: false } },
       });
 
@@ -53,7 +53,7 @@ describe('llmGateway', () => {
         article_title: 'Hello',
       });
 
-      expect(request.post).toHaveBeenCalledWith('v2/llm/history/summary', {
+      expect(apiClient.post).toHaveBeenCalledWith('v2/llm/history/summary', {
         article_content: 'x',
         article_title: 'Hello',
       });
@@ -62,7 +62,7 @@ describe('llmGateway', () => {
 
   describe('getCachedChat', () => {
     it('POSTs to v2/llm/history/chat and unwraps data', async () => {
-      vi.mocked(request.post).mockResolvedValue({
+      vi.mocked(apiClient.post).mockResolvedValue({
         data: {
           data: {
             cached: true,
@@ -76,7 +76,7 @@ describe('llmGateway', () => {
         article_content: 'pure',
       });
 
-      expect(request.post).toHaveBeenCalledWith('v2/llm/history/chat', {
+      expect(apiClient.post).toHaveBeenCalledWith('v2/llm/history/chat', {
         article_content: 'pure',
       });
       expect(result).toEqual({

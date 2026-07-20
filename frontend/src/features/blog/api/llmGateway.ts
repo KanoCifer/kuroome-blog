@@ -1,54 +1,24 @@
-import request from '@/shared/api/request';
+import apiClient from '@/shared/api/apiClient';
 import {
   consumeSseStream,
   type SseHandlers,
 } from '@/features/blog/composables/useSseStream';
+import type {
+  CachedChatResponse,
+  CachedLlmPayload,
+  CachedSummaryResponse,
+  LlmStreamFrame,
+  StreamChatBody,
+  StreamSummaryBody,
+  WeatherAnalysisBody,
+} from '@/features/blog/types';
 
 const API_BASE = import.meta.env.VITE_API_BASE || '/';
-
-export interface CachedLlmPayload {
-  article_content: string;
-  article_title?: string;
-}
-
-export interface CachedSummaryResponse {
-  cached?: boolean;
-  summary?: string;
-}
-
-export interface CachedChatResponse {
-  cached?: boolean;
-  messages?: Array<{ role: 'user' | 'assistant'; content: string }>;
-  session_id?: string;
-}
-
-export interface StreamSummaryBody {
-  title: string;
-  content: string;
-  model: string;
-}
-
-export interface StreamChatBody {
-  message: string;
-  session_id: string;
-  article_content?: string;
-  article_title?: string;
-}
-
-export interface WeatherAnalysisBody {
-  weather_data: unknown;
-  model_id: string;
-}
-
-export interface LlmStreamFrame {
-  content?: string;
-  is_end?: boolean;
-}
 
 /**
  * 适配 `/v2/llm/*` 端点的 gateway port。
  *
- * 沿用 `rssGateway` / `mapGateway` 模式：JSON 端点走 `@/shared/api/request`(axios)，
+ * 沿用 `rssGateway` / `mapGateway` 模式：JSON 端点走 `@/shared/api/apiClient`(axios)，
  * SSE 端点走 `consumeSseStream`(raw fetch)。所有调用方通过该 port 访问 LLM，
  * 不再直接持有 fetch。
  */
@@ -79,7 +49,7 @@ export interface LlmGateway {
 
 export const llmGateway: LlmGateway = {
   async getCachedSummary(payload) {
-    const res = await request.post<{ data: CachedSummaryResponse }>(
+    const res = await apiClient.post<{ data: CachedSummaryResponse }>(
       'v2/llm/history/summary',
       payload,
     );
@@ -87,7 +57,7 @@ export const llmGateway: LlmGateway = {
   },
 
   async getCachedChat(payload) {
-    const res = await request.post<{ data: CachedChatResponse }>(
+    const res = await apiClient.post<{ data: CachedChatResponse }>(
       'v2/llm/history/chat',
       payload,
     );

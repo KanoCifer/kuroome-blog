@@ -1,20 +1,10 @@
-import request from '@/shared/api/request';
+import apiClient from '@/shared/api/apiClient';
 
-export interface ChangelogItem {
-  type: string;
-  content: string;
-}
-
-export interface Changelog {
-  version: string;
-  date: string;
-  title: string;
-  changes: ChangelogItem[];
-}
+import type { Changelog } from '@/features/pages/types';
 
 export const changelogGateway = {
   getChangelogs: async (): Promise<Changelog[]> => {
-    const response = await request.get('v2/publicv2/changelogs');
+    const response = await apiClient.get('v2/publicv2/changelogs');
     return response.data.data;
   },
 };

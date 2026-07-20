@@ -1,4 +1,4 @@
-import request from '@/shared/api/request';
+import apiClient from '@/shared/api/apiClient';
 
 export interface MapGateway {
   getSecurityKey(): Promise<{ securityJsCode: string }>;
@@ -6,7 +6,7 @@ export interface MapGateway {
 
 export const mapGateway: MapGateway = {
   async getSecurityKey(): Promise<{ securityJsCode: string }> {
-    const res = await request.get<{ data: { securityJsCode: string } }>(
+    const res = await apiClient.get<{ data: { securityJsCode: string } }>(
       'v1/amap/security-key',
     );
     return res.data.data;

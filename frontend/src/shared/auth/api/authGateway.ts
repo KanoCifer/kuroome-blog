@@ -1,4 +1,4 @@
-import request from '@/shared/api/request';
+import apiClient from '@/shared/api/apiClient';
 import type { UserInfo } from '@/shared/auth/types';
 import type { AxiosResponse } from 'axios';
 import type {
@@ -75,7 +75,7 @@ export const authGateway = {
   uploadAvatar(
     formData: FormData,
   ): Promise<AxiosResponse<ApiResponse<Record<string, unknown>>>> {
-    return request.put('v3/upload-pic', formData, {
+    return apiClient.put('v3/upload-pic', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
@@ -83,21 +83,21 @@ export const authGateway = {
   getPasskeyRegistrationOptions(): Promise<
     AxiosResponse<ApiResponse<PublicKeyCredentialCreationOptionsJSON>>
   > {
-    return request.get('v3/passkey/registration-options');
+    return apiClient.get('v3/passkey/registration-options');
   },
 
   registerPasskey(payload: {
     response: unknown;
   }): Promise<AxiosResponse<unknown>> {
-    return request.post('v3/passkey/register', payload);
+    return apiClient.post('v3/passkey/register', payload);
   },
 
   deletePasskey(): Promise<AxiosResponse<unknown>> {
-    return request.delete('v3/passkey/delete');
+    return apiClient.delete('v3/passkey/delete');
   },
 
   unbindGithub(): Promise<AxiosResponse<unknown>> {
-    return request.post('v3/github/unbind');
+    return apiClient.post('v3/github/unbind');
   },
 
   updateProfileSettings(payload: {
@@ -108,13 +108,13 @@ export const authGateway = {
     mobile: string | null;
     password: string | null;
   }): Promise<AxiosResponse<ApiResponse<Record<string, unknown>>>> {
-    return request.put('v1/auth/settings', payload);
+    return apiClient.put('v1/auth/settings', payload);
   },
 
   sendRegisterEmailCode(payload: {
     email: string;
   }): Promise<AxiosResponse<unknown>> {
-    return request.post('v1/auth/email/code', payload);
+    return apiClient.post('v1/auth/email/code', payload);
   },
 
   register(payload: {
@@ -124,7 +124,7 @@ export const authGateway = {
     confirm_password: string;
     email_code: string;
   }): Promise<AxiosResponse<unknown>> {
-    return request.post('v1/auth/register', payload);
+    return apiClient.post('v1/auth/register', payload);
   },
 };
 
@@ -144,19 +144,19 @@ export interface AuthGateway {
 export function createAuthGateway(): AuthGateway {
   return {
     async fetchUser(): Promise<UserInfo | null> {
-      const res = await request.get<Envelope<UserInfo | null>>('v3/me');
+      const res = await apiClient.get<Envelope<UserInfo | null>>('v3/me');
       return res.data.data || null;
     },
 
     async getPasskeyAuthenticationOptions(): Promise<PublicKeyCredentialRequestOptionsJSON> {
-      const res = await request.get<
+      const res = await apiClient.get<
         Envelope<PublicKeyCredentialRequestOptionsJSON>
       >('v3/passkey/authentication-options');
       return res.data.data;
     },
 
     async login(username: string, password: string): Promise<LoginResult> {
-      const res = await request.post<Envelope<LoginResponseData>>('v3/login', {
+      const res = await apiClient.post<Envelope<LoginResponseData>>('v3/login', {
         username,
         password,
       });
@@ -165,7 +165,7 @@ export function createAuthGateway(): AuthGateway {
     },
 
     async loginWithPasskey(assertion: unknown): Promise<PasskeyLoginResult> {
-      const res = await request.post<Envelope<LoginResponseData>>(
+      const res = await apiClient.post<Envelope<LoginResponseData>>(
         'v3/passkey/authenticate',
         { assertion },
       );
@@ -174,7 +174,7 @@ export function createAuthGateway(): AuthGateway {
     },
 
     async logout(): Promise<void> {
-      await request.post('v3/logout');
+      await apiClient.post('v3/logout');
     },
 
     loginWithGitHub(): void {

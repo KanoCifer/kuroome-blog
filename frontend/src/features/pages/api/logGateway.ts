@@ -1,5 +1,5 @@
-import request from '@/shared/api/request';
-import type { ApiResponse } from '@/shared/api/request';
+import apiClient from '@/shared/api/apiClient';
+import type { ApiResponse } from '@/shared/api/apiClient';
 
 export interface EventItem {
   id: number;
@@ -41,7 +41,7 @@ export async function fetchRecentEvents(
     per_page: perPage,
   };
   if (type) params.type = type;
-  const res = await request.get<ApiResponse<EventListData>>(
+  const res = await apiClient.get<ApiResponse<EventListData>>(
     'v3/system/events',
     { params },
   );

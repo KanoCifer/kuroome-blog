@@ -1,4 +1,4 @@
-import request from '@/shared/api/request';
+import apiClient from '@/shared/api/apiClient';
 
 export interface UploadGateway {
   uploadEditorImage(formData: FormData): Promise<{ url: string }>;
@@ -6,7 +6,7 @@ export interface UploadGateway {
 
 export const uploadGateway: UploadGateway = {
   async uploadEditorImage(formData: FormData): Promise<{ url: string }> {
-    const res = await request.post<{ data: { url: string } }>(
+    const res = await apiClient.post<{ data: { url: string } }>(
       'v3/upload',
       formData,
       {
