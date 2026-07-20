@@ -63,7 +63,14 @@ export function TideCard() {
   }, [tideData]);
 
   const tideChartOption = useMemo(() => {
-    if (!tideData) return {};
+    // 始终返回 well-formed option (即便没有数据),
+    // 避免 zrender 在动画插值时撞到 undefined 数组 (graphic.js:4601 interpolate1DArray)
+    if (!tideData) {
+      return {
+        animation: false,
+        series: [],
+      };
+    }
 
     const now = dayjs();
     let currentTimeIndex = -1;
@@ -75,6 +82,7 @@ export function TideCard() {
     });
 
     return {
+      animation: false,
       tooltip: {
         trigger: 'axis',
         backgroundColor: theme.paper,

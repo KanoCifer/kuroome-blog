@@ -43,6 +43,7 @@ export function TideChart({ option }: TideChartProps) {
       option={option}
       notMerge
       lazyUpdate
+      // animation 默认在 option 里关掉 (避免 zrender 动画插值撞到 undefined 数组)
       style={{ height: '100%', width: '100%' }}
     />
   );

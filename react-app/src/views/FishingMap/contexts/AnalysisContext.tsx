@@ -2,11 +2,16 @@ import {
   createContext,
   useCallback,
   useContext,
+  useMemo,
   useRef,
   useState,
   type ReactNode,
   type RefObject,
 } from 'react';
+
+import { useShallow } from 'zustand/react/shallow';
+
+import { useFishingMapStore } from '@/stores/fishingMapStore';
 
 interface AnalysisContextValue {
   analysisOpen: boolean;
@@ -28,18 +33,31 @@ const AnalysisContext = createContext<AnalysisContextValue | null>(null);
 
 interface AnalysisProviderProps {
   children: ReactNode;
-  analysisHasData: boolean;
 }
 
-export function AnalysisContextProvider({
-  children,
-  analysisHasData,
-}: AnalysisProviderProps) {
+/**
+ * Provider 自己从 store 拉 hasData — 调用方无需把 hasData 传进来,
+ * 这样 useFishingAnalysis 可以在 provider 内部自由调用 useAnalysisContext。
+ */
+export function AnalysisContextProvider({ children }: AnalysisProviderProps) {
   const [analysisOpen, setAnalysisOpen] = useState(false);
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [analysisError, setAnalysisError] = useState('');
   const [analysisResult, setAnalysisResult] = useState('');
   const analysisAbortRef = useRef<AbortController | null>(null);
+
+  const { liveWeather, forecasts, tideData } = useFishingMapStore(
+    useShallow((s) => ({
+      liveWeather: s.liveWeather,
+      forecasts: s.forecasts,
+      tideData: s.tideData,
+    })),
+  );
+
+  const analysisHasData = useMemo(
+    () => liveWeather !== null || forecasts.length > 0 || tideData !== null,
+    [liveWeather, forecasts, tideData],
+  );
 
   const toggleAnalysis = useCallback(() => {
     setAnalysisOpen((prev) => !prev);
@@ -55,26 +73,37 @@ export function AnalysisContextProvider({
     setAnalysisLoading(false);
   }, []);
 
+  const value = useMemo<AnalysisContextValue>(
+    () => ({
+      analysisOpen,
+      analysisLoading,
+      analysisError,
+      analysisResult,
+      analysisHasData,
+      setAnalysisOpen,
+      setAnalysisLoading,
+      setAnalysisError,
+      setAnalysisResult,
+      toggleAnalysis,
+      closeAnalysis,
+      abortAnalysis,
+      analysisAbortRef,
+    }),
+    [
+      analysisOpen,
+      analysisLoading,
+      analysisError,
+      analysisResult,
+      analysisHasData,
+      setAnalysisLoading,
+      toggleAnalysis,
+      closeAnalysis,
+      abortAnalysis,
+    ],
+  );
+
   return (
-    <AnalysisContext.Provider
-      value={{
-        analysisOpen,
-        analysisLoading,
-        analysisError,
-        analysisResult,
-        analysisHasData,
-        setAnalysisOpen,
-        setAnalysisLoading,
-        setAnalysisError,
-        setAnalysisResult,
-        toggleAnalysis,
-        closeAnalysis,
-        abortAnalysis,
-        analysisAbortRef,
-      }}
-    >
-      {children}
-    </AnalysisContext.Provider>
+    <AnalysisContext.Provider value={value}>{children}</AnalysisContext.Provider>
   );
 }
 

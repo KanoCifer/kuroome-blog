@@ -1,17 +1,12 @@
 /**
- * AI 智能分析浮层。
+ * AI 分析 sheet —— 复用 BottomSheet (z-200, 盖在 DashboardSheet 之上)。
  *
- * iPhone 移动端: 底部 sheet (50dvh, drag handle, 下滑关闭)
- * 桌面端 (≥ sm): 右侧抽屉 420px
- *
- * 内容区直接复用 AIAnalysisWidget 的「内嵌 + 无 FAB」模式（embedded + hideFab），
- * 这样状态、shimmer、model select、markdown 渲染都继续走 AnalysisContext。
+ * 桌面端 (≥sm) 退化为右侧抽屉: 自定义 width + 顶部 paper 高光 + 右→左 ambient。
+ * 移动端: BottomSheet 默认 bottom-sheet 形态。
  */
-import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
-import { useEffect } from 'react';
-import { createPortal } from 'react-dom';
 
+import { BottomSheet } from '@/components/basic/BottomSheet';
 import { AIAnalysisWidget } from './AIAnalysisWidget';
 
 interface FishingAnalysisDrawerProps {
@@ -20,137 +15,100 @@ interface FishingAnalysisDrawerProps {
   onGenerate: (modelId: string) => void;
 }
 
-const SHEET_SPRING = {
-  type: 'spring' as const,
-  stiffness: 320,
-  damping: 32,
-  mass: 0.8,
-};
-
 export function FishingAnalysisDrawer({
   open,
   onClose,
   onGenerate,
 }: FishingAnalysisDrawerProps) {
-  // 锁定背景滚动
-  useEffect(() => {
-    if (!open) return undefined;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [open]);
-
-  return createPortal(
-    <AnimatePresence>
-      {open && (
-        <>
-          <motion.div
-            key="backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-            onClick={onClose}
-            className="bg-foreground/30 fixed inset-0 z-40 backdrop-blur-sm"
-            aria-hidden="true"
-          />
-          {/* 移动端: 底部 sheet */}
-          <motion.aside
-            key="sheet-mobile"
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={SHEET_SPRING}
-            className="fm-sheet fixed inset-x-0 bottom-0 z-50 flex h-[60dvh] max-h-[60dvh] flex-col rounded-t-3xl sm:hidden"
-            role="dialog"
-            aria-label="AI 分析"
-          >
-            <SheetBody onClose={onClose} onGenerate={onGenerate} />
-          </motion.aside>
-          {/* 桌面端: 右侧抽屉 */}
-          <motion.aside
-            key="drawer-desktop"
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={SHEET_SPRING}
-            className="fm-drawer-right fixed top-0 right-0 z-50 hidden h-screen w-[420px] max-w-[90vw] flex-col rounded-l-3xl sm:flex"
-            role="dialog"
-            aria-label="AI 分析"
-          >
-            <SheetBody
-              onClose={onClose}
-              onGenerate={onGenerate}
-              variant="desktop"
-            />
-          </motion.aside>
-        </>
-      )}
-    </AnimatePresence>,
-    document.body,
-  );
-}
-
-function SheetBody({
-  onClose,
-  onGenerate,
-  variant = 'mobile',
-}: {
-  onClose: () => void;
-  onGenerate: (modelId: string) => void;
-  variant?: 'mobile' | 'desktop';
-}) {
-  if (variant === 'mobile') {
+  // 桌面端 (≥sm) → 右侧抽屉样式
+  if (typeof window !== 'undefined' && window.matchMedia('(min-width: 640px)').matches) {
     return (
-      <>
-        <div className="bg-muted-foreground/40 mx-auto mt-2 h-1 w-9 rounded-full" />
-        <div className="border-border/60 flex items-center justify-between border-b px-5 py-3">
-          <div>
-            <h3 className="text-foreground text-lg font-semibold">AI 分析</h3>
-            <p className="text-muted-foreground mt-0.5 text-xs">
-              基于当前天气与潮汐综合判断
-            </p>
-          </div>
-          <button
-            type="button"
-            aria-label="关闭分析"
-            onClick={onClose}
-            className="hover:bg-muted text-muted-foreground inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
+      <BottomSheet
+        open={open}
+        onClose={onClose}
+        maxH="100vh"
+        lockScroll
+        renderHeader={() => (
+          <header className="shrink-0 px-5 pt-3 pb-4">
+            <div className="border-border/60 flex items-center justify-between border-b px-0 pb-3">
+              <div>
+                <h1 className="text-foreground font-family-averia text-lg">
+                  AI 分析
+                </h1>
+                <p className="text-muted-foreground mt-0.5 text-xs">
+                  基于当前天气与潮汐综合判断
+                </p>
+              </div>
+              <button
+                type="button"
+                aria-label="关闭分析"
+                onClick={onClose}
+                className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </header>
+        )}
+      >
+        {/* 桌面右侧抽屉样式 */}
+        <style>{`
+          [role="dialog"][aria-label="AI 分析"] {
+            left: auto !important;
+            right: 0 !important;
+            top: 0 !important;
+            bottom: 0 !important;
+            width: 420px;
+            max-width: 90vw;
+            border-radius: 24px 0 0 24px !important;
+            border-left: 1px solid var(--border-color, color-mix(in oklch, var(--ink) 12%, transparent));
+            box-shadow:
+              inset 1px 0 0 0 oklch(from var(--paper) l c h / 0.6),
+              -1px 0 1px color-mix(in oklch, var(--ink) 6%, transparent),
+              -8px 0 18px color-mix(in oklch, var(--ink) 8%, transparent),
+              -24px 0 40px color-mix(in oklch, var(--ink) 6%, transparent);
+          }
+        `}</style>
         <div className="flex flex-1 flex-col overflow-y-auto px-5 py-4">
           <AIAnalysisWidget onGenerate={onGenerate} embedded hideFab />
         </div>
-      </>
+      </BottomSheet>
     );
   }
+
+  // 移动端 → BottomSheet 默认 bottom sheet
   return (
-    <>
-      <div className="border-border/60 flex items-center justify-between border-b px-5 py-4">
-        <div>
-          <h3 className="text-foreground font-family-averia text-lg">
-            AI 分析
-          </h3>
-          <p className="text-muted-foreground mt-0.5 text-xs">
-            基于当前天气与潮汐综合判断
-          </p>
-        </div>
-        <button
-          type="button"
-          aria-label="关闭分析"
-          onClick={onClose}
-          className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
-        >
-          <X className="h-4 w-4" />
-        </button>
-      </div>
-      <div className="flex flex-1 flex-col overflow-y-auto px-5 py-4">
+    <BottomSheet
+      open={open}
+      onClose={onClose}
+      maxH="70vh"
+      lockScroll
+      renderHeader={() => (
+        <header className="shrink-0 px-5 pt-3 pb-4">
+          <div className="border-border/60 flex items-center justify-between border-b px-0 pb-3">
+            <div>
+              <h2 className="text-foreground text-base font-semibold">
+                AI 分析
+              </h2>
+              <p className="text-muted-foreground mt-0.5 text-xs">
+                基于当前天气与潮汐综合判断
+              </p>
+            </div>
+            <button
+              type="button"
+              aria-label="关闭分析"
+              onClick={onClose}
+              className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </header>
+      )}
+    >
+      <div className="flex flex-col gap-4 px-5 py-4">
         <AIAnalysisWidget onGenerate={onGenerate} embedded hideFab />
       </div>
-    </>
+    </BottomSheet>
   );
 }

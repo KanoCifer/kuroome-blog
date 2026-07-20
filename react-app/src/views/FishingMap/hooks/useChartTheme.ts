@@ -76,10 +76,19 @@ function resolveChartTheme(): ChartTheme {
   return out;
 }
 
-/** `rgb(r, g, b)` → `rgba(r, g, b, a)`（用于图表面积渐变的透明尾巴）。 */
-export function withAlpha(rgb: string, alpha: number): string {
+/** `rgb(r, g, b)` → `rgba(r, g, b, a)`（用于图表面积渐变的透明尾巴）。
+ *  防御性: 输入非字符串 / 非 rgb 格式 / undefined 时, 返回带 fallback 的 rgba,
+ *  避免 zrender 在 addColorStop 里撞到 'undefined'。*/
+export function withAlpha(rgb: string | undefined | null, alpha: number): string {
+  if (!rgb || typeof rgb !== 'string') {
+    return `rgba(120, 134, 170, ${alpha})`;
+  }
   const m = rgb.match(/rgba?\(([^)]+)\)/);
-  if (!m) return rgb;
+  if (!m) {
+    // 不是 rgb/rgba 格式 (可能是 oklch / hsl 等), 直接返回透明黑色 fallback,
+    // 比让 zrender 撞到 undefined 安全
+    return `rgba(120, 134, 170, ${alpha})`;
+  }
   const [r, g, b] = m[1].split(',').map((v) => v.trim());
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
