@@ -1,26 +1,26 @@
 import { lazy } from 'react';
 
-export const Home = lazy(() => import('../views/Home/Home'));
-export const Login = lazy(() => import('../views/Auth/Login'));
-export const Register = lazy(() => import('../views/Auth/Register'));
+export const Home = lazy(() => import('../features/home/Home'));
+export const Login = lazy(() => import('../features/auth/Login'));
+export const Register = lazy(() => import('../features/auth/Register'));
 export const ProfileSetting = lazy(
-  () => import('../views/Auth/ProfileSettingView'),
+  () => import('../features/auth/ProfileSettingView'),
 );
-export const FishingMap = lazy(() => import('../views/FishingMap/FishingMap'));
-export const NotFound = lazy(() => import('../views/NotFound/NotFound'));
-export const About = lazy(() => import('../views/general/AboutView'));
-export const Changelog = lazy(() => import('../views/general/ChangelogView'));
-export const Website = lazy(() => import('../views/Website/WebsiteView'));
-export const BlogList = lazy(() => import('../views/Blog/BlogListView'));
-export const BlogPost = lazy(() => import('../views/Blog/BlogPostView'));
-export const MomentList = lazy(() => import('../views/Moments/MomentListView'));
-export const RssWorkspace = lazy(() => import('../views/Rss/RssWorkspaceView'));
-export const RssArticle = lazy(() => import('../views/Rss/RssArticleView'));
-export const TodoList = lazy(() => import('../views/Todo/TodoListView'));
-export const PicGallery = lazy(() => import('../views/Pic/PicGalleryView'));
+export const FishingMap = lazy(() => import('../features/fishing/FishingMap'));
+export const NotFound = lazy(() => import('../features/pages/not-found/NotFound'));
+export const About = lazy(() => import('../features/pages/about/AboutView'));
+export const Changelog = lazy(() => import('../features/pages/changelog/ChangelogView'));
+export const Website = lazy(() => import('../features/pages/websites/WebsiteView'));
+export const BlogList = lazy(() => import('../features/blog/BlogListView'));
+export const BlogPost = lazy(() => import('../features/blog/BlogPostView'));
+export const MomentList = lazy(() => import('../features/moments/MomentListView'));
+export const RssWorkspace = lazy(() => import('../features/rss/RssWorkspaceView'));
+export const RssArticle = lazy(() => import('../features/rss/RssArticleView'));
+export const TodoList = lazy(() => import('../features/todo/TodoListView'));
+export const PicGallery = lazy(() => import('../features/pic/PicGalleryView'));
 export const PrivacyPolicy = lazy(
-  () => import('../views/general/PrivacyPolicyView'),
+  () => import('../features/pages/privacy/PrivacyPolicyView'),
 );
-export const FriendLinks = lazy(() => import('../views/pages/FriendLinksView'));
-export const BookShelf = lazy(() => import('../views/BookShelf/BookShelf'));
-export const BookStats = lazy(() => import('../views/BookShelf/BookStats'));
+export const FriendLinks = lazy(() => import('../features/pages/friend-links/FriendLinksView'));
+export const BookShelf = lazy(() => import('../features/books/BookShelf'));
+export const BookStats = lazy(() => import('../features/books/components/BookStats'));

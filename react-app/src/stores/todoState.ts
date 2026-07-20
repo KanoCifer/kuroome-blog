@@ -1,11 +1,11 @@
-import { devTaskService, type DevTaskService } from '@/services/devtaskService';
+import { devTaskService, type DevTaskService } from '@/features/todo/api';
 import { create } from 'zustand';
 import type {
   CreateDevTaskPayload,
   DevTask,
   DevTaskStatus,
   DevTaskType,
-} from '@/services/devtaskService/types';
+} from '@/features/todo/api/types';
 
 // v3 全量状态标签
 export const STATUS_LABELS: Record<DevTaskStatus, string> = {

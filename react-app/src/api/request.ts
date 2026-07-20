@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import { isrefreshTokenRequest, refreshAccessToken } from './refresh';
-import { tokenService } from '../auth/tokenService';
+import { tokenService } from '../features/auth/api/tokenService';
 
 export interface ApiResponse<T = unknown> {
   message: string;

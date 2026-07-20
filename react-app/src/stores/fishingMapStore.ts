@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 
 import { useNotificationStore } from '@/stores/notificationState';
 
-import { fishingMapService } from '@/views/FishingMap/service';
+import { fishingMapService } from '@/features/fishing/api/service';
 import type {
   FishingIndexData,
   TideData,
@@ -12,7 +12,7 @@ import type {
   WeatherHourly,
   WeatherIndex,
   WeatherNow,
-} from '@/views/FishingMap/types';
+} from '@/features/fishing/types';
 
 export const HARBOR_OPTIONS = [
   { code: 'P2352', name: '黄埔港' },

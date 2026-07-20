@@ -1,6 +1,6 @@
 import { useNotificationStore } from '@/stores/notificationState';
 import { useCallback, useState } from 'react';
-import { llmService } from '@/services/llm';
+import { llmService } from '@/lib/llm';
 
 export interface ArticleContext {
   title?: string;

@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 import { useNotificationStore } from '@/stores/notificationState';
 
-import type { RouteInfo } from '@/views/FishingMap/types';
+import type { RouteInfo } from '@/features/fishing/types';
 
 export interface RouteMapState {
   userPosition: [number, number] | null;
