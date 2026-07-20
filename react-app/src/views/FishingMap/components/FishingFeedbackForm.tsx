@@ -4,7 +4,7 @@
  * 移动端: 全宽 bottom sheet (BottomSheet 默认)
  * 桌面端 (≥sm): 居中 modal (max-w-md, 居中浮起)
  */
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { useNotificationStore } from '@/stores/notificationState';
 

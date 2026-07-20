@@ -117,7 +117,7 @@ import type { BookRecommendItem } from '@/features/books/api';
 import { ArrowRight, RefreshCw, Star } from '@lucide/vue';
 import { Motion } from 'motion-v';
 import BookRecommendGrid from '@/features/books/components/BookRecommendGrid.vue';
-import { RECOMMEND_COVER_LAYOUT_ID_PREFIX } from '@/features/books/recommendLayoutId';
+import { RECOMMEND_COVER_LAYOUT_ID_PREFIX } from '@/features/books/helper/recommendLayoutId';
 
 defineProps<{
   books: BookRecommendItem[];
