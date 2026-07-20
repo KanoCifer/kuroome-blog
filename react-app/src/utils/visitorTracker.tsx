@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { UAParser } from 'ua-parser-js';
 import { getVisitorId } from './visitorId';
-import request from '../api/request';
+import apiClient from '../api/apiClient';
 
 // 收集前端可获取的追踪信息
 const collectVisitorData = () => {
@@ -32,7 +32,7 @@ const reportVisitorData = async () => {
   try {
     const data = collectVisitorData();
     // 发送POST请求到FastAPI后端接口
-    await request.post('v3/track', data, {
+    await apiClient.post('v3/track', data, {
       timeout: 5000, // 超时时间5秒
       // 跨域配置（如果前端和后端域名不同，需后端配合跨域）
       withCredentials: true,

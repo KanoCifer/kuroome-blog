@@ -1,6 +1,6 @@
 import type { AxiosResponse } from 'axios';
 
-import request from '@/api/request';
+import apiClient from '@/api/apiClient';
 import type {
   RssArticle,
   RssArticleListResponse,
@@ -64,7 +64,7 @@ export interface rssGateway {
 export const rssGateway = (): rssGateway => {
   return {
     async parseRss(payload: ParseRssPayload) {
-      return request.post('v1/rss/parse-rss', payload) as Promise<
+      return apiClient.post('v1/rss/parse-rss', payload) as Promise<
         AxiosResponse<ParseRssResponse>
       >;
     },
@@ -75,51 +75,51 @@ export const rssGateway = (): rssGateway => {
       feed_url?: string;
       search?: string;
     }) {
-      return request.get('v1/rss/articles', { params }) as Promise<
+      return apiClient.get('v1/rss/articles', { params }) as Promise<
         AxiosResponse<RssArticleListResponse>
       >;
     },
 
     async getArticle(articleId: string) {
-      return request.get(`v1/rss/articles/${articleId}`) as Promise<
+      return apiClient.get(`v1/rss/articles/${articleId}`) as Promise<
         AxiosResponse<RssArticle>
       >;
     },
 
     async getSubscriptions() {
-      return request.get('v1/rss/subscriptions') as Promise<
+      return apiClient.get('v1/rss/subscriptions') as Promise<
         AxiosResponse<RssSubscription[]>
       >;
     },
 
     async refreshSubscription(subscriptionId: number) {
-      return request.post(
+      return apiClient.post(
         `v1/rss/subscriptions/${subscriptionId}/refresh`,
       ) as Promise<AxiosResponse<RefreshResult>>;
     },
 
     async deleteSubscription(subscriptionId: number) {
-      return request.delete(
+      return apiClient.delete(
         `v1/rss/subscriptions/${subscriptionId}`,
       ) as Promise<AxiosResponse<{ message: string }>>;
     },
 
     async markArticleRead(articleId: string) {
-      return request.post(`v1/rss/articles/${articleId}/read`) as Promise<
+      return apiClient.post(`v1/rss/articles/${articleId}/read`) as Promise<
         AxiosResponse<{ message: string }>
       >;
     },
 
     async markArticleUnread(articleId: string) {
-      return request.delete(`v1/rss/articles/${articleId}/read`) as Promise<
+      return apiClient.delete(`v1/rss/articles/${articleId}/read`) as Promise<
         AxiosResponse<{ message: string }>
       >;
     },
 
     async proxyImage(url: string) {
-      return request.get('v1/rss/image-proxy', { params: { url } }) as Promise<
-        AxiosResponse<unknown>
-      >;
+      return apiClient.get('v1/rss/image-proxy', {
+        params: { url },
+      }) as Promise<AxiosResponse<unknown>>;
     },
   };
 };

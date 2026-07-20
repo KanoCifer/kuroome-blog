@@ -1,4 +1,4 @@
-import request from '@/api/request';
+import apiClient from '@/api/apiClient';
 import type { UserInfo } from '@/features/auth/types';
 import { useNotificationStore } from '@/stores/notificationState';
 import type { PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/browser';
@@ -68,19 +68,19 @@ const emptyLoginResult = (): LoginResult => {
 export function createAuthGateway(): AuthGateway {
   return {
     async fetchUser(): Promise<UserInfo | null> {
-      const res = await request.get<ApiResponse<UserInfo | null>>('v3/me');
+      const res = await apiClient.get<ApiResponse<UserInfo | null>>('v3/me');
       return res.data.data || null;
     },
 
     async getPasskeyAuthenticationOptions(): Promise<PublicKeyCredentialRequestOptionsJSON> {
-      const res = await request.get<
+      const res = await apiClient.get<
         ApiResponse<PublicKeyCredentialRequestOptionsJSON>
       >('v3/passkey/authentication-options');
       return res.data.data;
     },
 
     async login(username: string, password: string): Promise<LoginResult> {
-      const res = await request.post<ApiResponse<LoginResponseData>>(
+      const res = await apiClient.post<ApiResponse<LoginResponseData>>(
         'v3/login',
         { username, password },
       );
@@ -100,7 +100,7 @@ export function createAuthGateway(): AuthGateway {
     },
 
     async loginWithPasskey(assertion: unknown): Promise<PasskeyLoginResult> {
-      const res = await request.post<ApiResponse<LoginResponseData>>(
+      const res = await apiClient.post<ApiResponse<LoginResponseData>>(
         'v3/passkey/authenticate',
         {
           assertion: assertion,
@@ -118,7 +118,7 @@ export function createAuthGateway(): AuthGateway {
     },
 
     async logout(): Promise<void> {
-      await request.post('/v3/logout');
+      await apiClient.post('/v3/logout');
       notification.success('已退出登录');
     },
 

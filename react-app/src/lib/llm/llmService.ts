@@ -1,4 +1,4 @@
-import request from '@/api/request';
+import apiClient from '@/api/apiClient';
 import { consumeSseStream } from '@/hooks/useSseStream';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -62,10 +62,7 @@ export interface LlmService {
   ): Promise<void>;
 
   /** 流式对话 */
-  streamChat(
-    payload: StreamChatPayload,
-    handlers: SseHandlers,
-  ): Promise<void>;
+  streamChat(payload: StreamChatPayload, handlers: SseHandlers): Promise<void>;
 
   /** AI 天气分析（流式） */
   weatherAnalysis(
@@ -85,7 +82,7 @@ const apiBase = import.meta.env.VITE_API_BASE || '/';
 
 export const llmService = (): LlmService => ({
   async getCachedSummary(payload) {
-    const res = await request.post<{ data: CachedSummaryResponse }>(
+    const res = await apiClient.post<{ data: CachedSummaryResponse }>(
       'v2/llm/history/summary',
       payload,
     );
@@ -93,7 +90,7 @@ export const llmService = (): LlmService => ({
   },
 
   async getCachedChat(payload) {
-    const res = await request.post<{ data: CachedChatResponse }>(
+    const res = await apiClient.post<{ data: CachedChatResponse }>(
       'v2/llm/history/chat',
       payload,
     );

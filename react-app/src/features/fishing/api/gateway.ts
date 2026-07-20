@@ -1,6 +1,6 @@
 import type { AxiosResponse } from 'axios';
 
-import request from '@/api/request';
+import apiClient from '@/api/apiClient';
 
 import type {
   ApiEnvelope,
@@ -35,33 +35,33 @@ export interface fishingMapGateway {
 export const fishingMapGateway = (): fishingMapGateway => {
   return {
     async getSecurityKey() {
-      return request.get('v1/amap/security-key') as Promise<
+      return apiClient.get('v1/amap/security-key') as Promise<
         AxiosResponse<ApiEnvelope<SecurityKeyResponse>>
       >;
     },
 
     async getTide(payload?: { harbor: string; date: string }) {
-      return request.get('v2/weather/tide', { params: payload }) as Promise<
+      return apiClient.get('v2/weather/tide', { params: payload }) as Promise<
         AxiosResponse<ApiEnvelope<TideData>>
       >;
     },
 
     async getWeatherFull(payload: { location: [number, number] }) {
       const [lng, lat] = payload.location;
-      return request.get('v2/weather/full', {
+      return apiClient.get('v2/weather/full', {
         params: { location: `${lng.toFixed(2)},${lat.toFixed(2)}` },
       }) as Promise<AxiosResponse<ApiEnvelope<WeatherFullResponse>>>;
     },
 
     async getFishingIndex(payload: { location: [number, number] }) {
       const [lng, lat] = payload.location;
-      return request.get('v2/fishing/index', {
+      return apiClient.get('v2/fishing/index', {
         params: { location: `${lng.toFixed(2)},${lat.toFixed(2)}` },
       }) as Promise<AxiosResponse<ApiEnvelope<FishingIndexData>>>;
     },
 
     async postFishingFeedback(payload: FishingFeedbackPayload) {
-      return request.post('v2/fishing/feedback', payload) as Promise<
+      return apiClient.post('v2/fishing/feedback', payload) as Promise<
         AxiosResponse<ApiEnvelope<FishingFeedbackResponse>>
       >;
     },

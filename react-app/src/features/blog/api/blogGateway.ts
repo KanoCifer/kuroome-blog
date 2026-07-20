@@ -1,6 +1,6 @@
 import type { AxiosResponse } from 'axios';
 
-import request from '@/api/request';
+import apiClient from '@/api/apiClient';
 import type {
   BlogPagination,
   BlogPost,
@@ -61,55 +61,55 @@ export interface blogGateway {
 export const blogGateway = (): blogGateway => {
   return {
     async getBlogs(query?: BlogQuery) {
-      return request.get('v3/blogs', { params: query }) as Promise<
+      return apiClient.get('v3/blogs', { params: query }) as Promise<
         AxiosResponse<BlogListResponse>
       >;
     },
 
     async getBlogPost(postId: string) {
-      return request.get(`v3/blogs/${postId}`) as Promise<
+      return apiClient.get(`v3/blogs/${postId}`) as Promise<
         AxiosResponse<BlogPostResponse>
       >;
     },
 
     async likePost(postId: string) {
-      return request.post(`v3/blogs/${postId}/like`) as Promise<
+      return apiClient.post(`v3/blogs/${postId}/like`) as Promise<
         AxiosResponse<{ likes: number }>
       >;
     },
 
     async getTags() {
-      return request.get('v3/tags') as Promise<
+      return apiClient.get('v3/tags') as Promise<
         AxiosResponse<{ tags: TagItem[] }>
       >;
     },
 
     async getPostsByTag(tag: string) {
-      return request.get(`v3/tags/${encodeURIComponent(tag)}/posts`) as Promise<
-        AxiosResponse<PostsByTagResponse>
-      >;
+      return apiClient.get(
+        `v3/tags/${encodeURIComponent(tag)}/posts`,
+      ) as Promise<AxiosResponse<PostsByTagResponse>>;
     },
 
     async getLegacyPost(postId: string) {
-      return request.get('v3/post', { params: { _id: postId } }) as Promise<
+      return apiClient.get('v3/post', { params: { _id: postId } }) as Promise<
         AxiosResponse<BlogPostResponse>
       >;
     },
 
     async createLegacyPost(payload) {
-      return request.post('v3/post/add', payload) as Promise<
+      return apiClient.post('v3/post/add', payload) as Promise<
         AxiosResponse<{ _id: string }>
       >;
     },
 
     async updateLegacyPost(payload) {
-      return request.put('v3/post/update', payload) as Promise<
+      return apiClient.put('v3/post/update', payload) as Promise<
         AxiosResponse<{ _id: string }>
       >;
     },
 
     async deleteLegacyPost(postId: string) {
-      return request.delete(`v3/post/${postId}/delete`) as Promise<
+      return apiClient.delete(`v3/post/${postId}/delete`) as Promise<
         AxiosResponse<void>
       >;
     },

@@ -1,6 +1,6 @@
 import type { AxiosResponse } from 'axios';
 
-import request from '@/api/request';
+import apiClient from '@/api/apiClient';
 import type {
   Moment,
   MomentCreatePayload,
@@ -43,43 +43,45 @@ export interface MomentsGateway {
 export const momentsGateway = (): MomentsGateway => {
   return {
     async listPublic(params) {
-      return request.get('v1/moments', { params }) as Promise<
+      return apiClient.get('v1/moments', { params }) as Promise<
         AxiosResponse<MomentListResponse>
       >;
     },
 
     async listAdmin(params) {
-      return request.get('v1/moments/admin', { params }) as Promise<
+      return apiClient.get('v1/moments/admin', { params }) as Promise<
         AxiosResponse<MomentListResponse>
       >;
     },
 
     async get(id) {
-      return request.get(`v1/moments/${id}`) as Promise<
+      return apiClient.get(`v1/moments/${id}`) as Promise<
         AxiosResponse<{ moment: Moment }>
       >;
     },
 
     async getAdmin(id) {
-      return request.get(`v1/moments/admin/${id}`) as Promise<
+      return apiClient.get(`v1/moments/admin/${id}`) as Promise<
         AxiosResponse<{ moment: Moment }>
       >;
     },
 
     async create(payload) {
-      return request.post('v1/moments', payload) as Promise<
+      return apiClient.post('v1/moments', payload) as Promise<
         AxiosResponse<{ moment: Moment }>
       >;
     },
 
     async update(id, payload) {
-      return request.patch(`v1/moments/${id}`, payload) as Promise<
+      return apiClient.patch(`v1/moments/${id}`, payload) as Promise<
         AxiosResponse<{ moment: Moment }>
       >;
     },
 
     async remove(id) {
-      return request.delete(`v1/moments/${id}`) as Promise<AxiosResponse<void>>;
+      return apiClient.delete(`v1/moments/${id}`) as Promise<
+        AxiosResponse<void>
+      >;
     },
   };
 };

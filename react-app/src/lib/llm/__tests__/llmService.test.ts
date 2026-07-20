@@ -6,7 +6,7 @@ vi.mock('@/api/request', () => ({
   },
 }));
 
-import request from '@/api/request';
+import apiClient from '@/api/apiClient';
 import { llmService } from '../llmService';
 
 /**
@@ -35,7 +35,7 @@ describe('llmService', () => {
 
   beforeEach(() => {
     service = llmService();
-    vi.mocked(request.post).mockReset();
+    vi.mocked(apiClient.post).mockReset();
   });
 
   afterEach(() => {
@@ -44,7 +44,7 @@ describe('llmService', () => {
 
   describe('getCachedSummary', () => {
     it('POSTs to v2/llm/history/summary with article payload', async () => {
-      vi.mocked(request.post).mockResolvedValue({
+      vi.mocked(apiClient.post).mockResolvedValue({
         data: { data: { cached: true, summary: 'cached text' } },
       });
 
@@ -53,15 +53,15 @@ describe('llmService', () => {
         article_title: 'Title',
       });
 
-      expect(request.post).toHaveBeenCalledWith(
-        'v2/llm/history/summary',
-        { article_content: '<p>Hello</p>', article_title: 'Title' },
-      );
+      expect(apiClient.post).toHaveBeenCalledWith('v2/llm/history/summary', {
+        article_content: '<p>Hello</p>',
+        article_title: 'Title',
+      });
       expect(result).toEqual({ cached: true, summary: 'cached text' });
     });
 
     it('returns cached=false when backend omits summary', async () => {
-      vi.mocked(request.post).mockResolvedValue({
+      vi.mocked(apiClient.post).mockResolvedValue({
         data: { data: { cached: false } },
       });
 
@@ -76,7 +76,7 @@ describe('llmService', () => {
 
   describe('getCachedChat', () => {
     it('POSTs to v2/llm/history/chat and unwraps messages', async () => {
-      vi.mocked(request.post).mockResolvedValue({
+      vi.mocked(apiClient.post).mockResolvedValue({
         data: {
           data: {
             cached: true,
@@ -91,7 +91,7 @@ describe('llmService', () => {
         article_title: 'T',
       });
 
-      expect(request.post).toHaveBeenCalledWith('v2/llm/history/chat', {
+      expect(apiClient.post).toHaveBeenCalledWith('v2/llm/history/chat', {
         article_content: 'content',
         article_title: 'T',
       });

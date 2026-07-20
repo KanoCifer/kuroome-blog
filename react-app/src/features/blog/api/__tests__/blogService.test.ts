@@ -17,7 +17,7 @@ vi.mock('@/features/blog/api/blogGateway', () => ({
 }));
 
 vi.mock('@/api/request', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/api/request')>();
+  const actual = await importOriginal<typeof import('@/api/apiClient')>();
   return {
     ...actual,
     // Real extractData does res.data.data (AxiosResponse → ApiResponse).

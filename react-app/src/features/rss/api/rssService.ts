@@ -1,8 +1,8 @@
 import type { AxiosResponse } from 'axios';
 
 import { rssGateway } from '@/features/rss/api/rssGateway';
-import { extractData } from '@/api/request';
-import type { ApiResponse } from '@/api/request';
+import { extractData } from '@/api/apiClient';
+import type { ApiResponse } from '@/api/apiClient';
 import type {
   RssArticle,
   RssArticleListResponse,

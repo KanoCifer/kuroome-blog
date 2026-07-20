@@ -1,5 +1,5 @@
 import devtaskRequest from './devtaskRequest.ts';
-import request from '@/api/request';
+import apiClient from '@/api/apiClient.ts';
 import type {
   CreateDevTaskPayload,
   DevTask,
@@ -61,7 +61,7 @@ export const devTaskService = (): DevTaskService => ({
   },
 
   async issueMcpToken(days: number): Promise<McpTokenResult> {
-    const res = await request.get<{ data: McpTokenResult }>(
+    const res = await apiClient.get<{ data: McpTokenResult }>(
       'v3/dev-task/token',
       { params: { days } },
     );

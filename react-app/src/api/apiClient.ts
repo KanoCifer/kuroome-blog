@@ -14,14 +14,14 @@ export const extractData = (res: { data: ApiResponse<unknown> }): unknown => {
   return res.data.data;
 };
 
-const request = axios.create({
+const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE || '/',
   timeout: 10000,
   withCredentials: true,
 });
 
 // 动态注入 Authorization header
-request.interceptors.request.use((config) => {
+apiClient.interceptors.request.use((config) => {
   const token = tokenService.get();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -30,7 +30,7 @@ request.interceptors.request.use((config) => {
 });
 
 // 添加401自动刷新token拦截器
-request.interceptors.response.use(
+apiClient.interceptors.response.use(
   (response) => response,
 
   async (error: AxiosError<ApiResponse>) => {
@@ -58,7 +58,7 @@ request.interceptors.response.use(
 
       try {
         await refreshAccessToken();
-        return request(_cfg);
+        return apiClient(_cfg);
       } catch (error) {
         return Promise.reject(error);
       }
@@ -67,4 +67,4 @@ request.interceptors.response.use(
   },
 );
 
-export default request;
+export default apiClient;

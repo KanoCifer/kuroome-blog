@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, ShieldUser } from 'lucide-react';
 import { useEffect } from 'react';
 import axios from 'axios';
-import request from '@/api/request';
+import apiClient from '@/api/apiClient';
 
 function IconCloud({ className }: { className?: string }) {
   return (
@@ -83,7 +83,7 @@ export default function Register() {
     setSendCodeText('Sending...');
 
     try {
-      await request.post('/auth/email/code', {
+      await apiClient.post('/auth/email/code', {
         email: form.email,
       });
       setSendCodeText('Sent!');
@@ -124,7 +124,7 @@ export default function Register() {
     setIsSubmitting(true);
 
     try {
-      const response = await request.post('/auth/register', {
+      const response = await apiClient.post('/auth/register', {
         username: form.username,
         email: form.email,
         password: form.password,

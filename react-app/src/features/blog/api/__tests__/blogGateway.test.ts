@@ -10,7 +10,7 @@ vi.mock('@/api/request', () => ({
   },
 }));
 
-import request from '@/api/request';
+import apiClient from '@/api/apiClient';
 
 describe('blogGateway (React — tags migration)', () => {
   beforeEach(() => {
@@ -23,7 +23,7 @@ describe('blogGateway (React — tags migration)', () => {
 
   describe('getTags', () => {
     it('calls /v1/tags and returns the response', async () => {
-      vi.mocked(request.get).mockResolvedValue({
+      vi.mocked(apiClient.get).mockResolvedValue({
         data: {
           tags: [
             { name: 'python', count: 2 },
@@ -35,7 +35,7 @@ describe('blogGateway (React — tags migration)', () => {
       const gateway = blogGateway();
       const resp = await gateway.getTags();
 
-      expect(request.get).toHaveBeenCalledWith('v3/tags');
+      expect(apiClient.get).toHaveBeenCalledWith('v3/tags');
       expect(resp.data).toEqual({
         tags: [
           { name: 'python', count: 2 },
@@ -47,7 +47,7 @@ describe('blogGateway (React — tags migration)', () => {
 
   describe('getPostsByTag', () => {
     it('URL-encodes the tag', async () => {
-      vi.mocked(request.get).mockResolvedValue({
+      vi.mocked(apiClient.get).mockResolvedValue({
         data: {
           posts: [{ _id: '1', title: 'A', tags: ['C++'] }],
           tag: 'C++',
@@ -58,14 +58,14 @@ describe('blogGateway (React — tags migration)', () => {
       const gateway = blogGateway();
       const resp = await gateway.getPostsByTag('C++');
 
-      expect(request.get).toHaveBeenCalledWith('v3/tags/C%2B%2B/posts');
+      expect(apiClient.get).toHaveBeenCalledWith('v3/tags/C%2B%2B/posts');
       expect(resp.data.tag).toBe('C++');
     });
   });
 
   describe('createLegacyPost', () => {
     it('sends tags, not category_id', async () => {
-      vi.mocked(request.post).mockResolvedValue({
+      vi.mocked(apiClient.post).mockResolvedValue({
         data: { _id: 'new' },
       });
 
@@ -77,11 +77,11 @@ describe('blogGateway (React — tags migration)', () => {
         is_pinned: 0,
       });
 
-      expect(request.post).toHaveBeenCalledWith(
+      expect(apiClient.post).toHaveBeenCalledWith(
         'v3/post/add',
         expect.objectContaining({ tags: ['x'] }),
       );
-      expect(request.post).not.toHaveBeenCalledWith(
+      expect(apiClient.post).not.toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({ category_id: expect.anything() }),
       );
@@ -90,7 +90,7 @@ describe('blogGateway (React — tags migration)', () => {
 
   describe('updateLegacyPost', () => {
     it('sends tags, not category_id', async () => {
-      vi.mocked(request.put).mockResolvedValue({
+      vi.mocked(apiClient.put).mockResolvedValue({
         data: { _id: 'existing' },
       });
 
@@ -103,11 +103,11 @@ describe('blogGateway (React — tags migration)', () => {
         is_pinned: 0,
       });
 
-      expect(request.put).toHaveBeenCalledWith(
+      expect(apiClient.put).toHaveBeenCalledWith(
         'v3/post/update',
         expect.objectContaining({ tags: ['y'] }),
       );
-      expect(request.put).not.toHaveBeenCalledWith(
+      expect(apiClient.put).not.toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({ category_id: expect.anything() }),
       );

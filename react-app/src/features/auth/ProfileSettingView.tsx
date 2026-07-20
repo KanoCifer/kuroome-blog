@@ -1,4 +1,4 @@
-import request from '@/api/request';
+import apiClient from '@/api/apiClient';
 import { useAuthStore } from '@/stores/authState';
 import type { ProfileForm } from '@/types';
 import { startRegistration } from '@simplewebauthn/browser';
@@ -133,7 +133,7 @@ export default function ProfileSettingView() {
     formData.append('image', file);
 
     try {
-      const response = await request.put('v3/upload-pic', formData, {
+      const response = await apiClient.put('v3/upload-pic', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
@@ -155,14 +155,14 @@ export default function ProfileSettingView() {
     setPasskeyMessage('');
 
     try {
-      const optionsRes = await request.get(
+      const optionsRes = await apiClient.get(
         '/auth/passkey/registration-options',
       );
       const options = optionsRes.data.data;
 
       const credential = await startRegistration({ optionsJSON: options });
 
-      await request.post('/auth/passkey/register', {
+      await apiClient.post('/auth/passkey/register', {
         response: credential,
       });
 
@@ -184,7 +184,7 @@ export default function ProfileSettingView() {
     setPasskeyMessage('');
 
     try {
-      await request.delete('/auth/passkey/delete');
+      await apiClient.delete('/auth/passkey/delete');
       setPasskeyMessage('Passkey deleted successfully!');
       setPasskeyMessageType('success');
       setHasPasskey(false);
@@ -209,7 +209,7 @@ export default function ProfileSettingView() {
     setGithubMessage('');
 
     try {
-      await request.post('/v3/github/unbind');
+      await apiClient.post('/v3/github/unbind');
       setGithubMessage('GitHub account unbound successfully!');
       setGithubMessageType('success');
       setHasGitHubBound(false);
@@ -239,7 +239,7 @@ export default function ProfileSettingView() {
         password: form.password || null,
       };
 
-      const response = await request.put('/auth/settings', payload);
+      const response = await apiClient.put('/auth/settings', payload);
 
       if (response.data.code === 200) {
         await auth.hydrateAuth();

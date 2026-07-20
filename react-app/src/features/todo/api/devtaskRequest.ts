@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import request from '@/api/request';
+import apiClient from '@/api/apiClient';
 
 // ── 专供 /v3/dev-tasks/* 的 axios 实例 ──
 // devtask 走 DevTaskMiddleware（service-JWT 鉴权），与用户 JWT 两套体系。
@@ -35,7 +35,7 @@ async function getDevTaskToken(): Promise<string> {
   if (inflight) return inflight;
 
   inflight = (async () => {
-    const res = await request.get<{ data: DevTaskTokenRaw }>(
+    const res = await apiClient.get<{ data: DevTaskTokenRaw }>(
       'v3/dev-task/token',
     );
     const { token, expires_at } = res.data.data;

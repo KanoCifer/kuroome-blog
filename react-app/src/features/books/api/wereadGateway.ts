@@ -1,4 +1,4 @@
-import request, { type ApiResponse } from '@/api/request';
+import apiClient, { type ApiResponse } from '@/api/apiClient';
 
 export interface WereadUserBook {
   id?: string;
@@ -187,28 +187,28 @@ export interface WereadYearlyHeatmap {
 
 export const wereadGateway = {
   async saveUserInfo(apiKey: string): Promise<ApiResponse<null>> {
-    const res = await request.post<ApiResponse<null>>('v2/weread/user-info', {
+    const res = await apiClient.post<ApiResponse<null>>('v2/weread/user-info', {
       api_key: apiKey,
     });
     return res.data;
   },
 
   async getUserShelf(): Promise<ApiResponse<WereadShelfData>> {
-    const res = await request.get<ApiResponse<WereadShelfData>>(
+    const res = await apiClient.get<ApiResponse<WereadShelfData>>(
       'v2/weread/bookshelf',
     );
     return res.data;
   },
 
   async getBookInfo(bookId: string): Promise<ApiResponse<WereadBookDetail>> {
-    const res = await request.get<ApiResponse<WereadBookDetail>>(
+    const res = await apiClient.get<ApiResponse<WereadBookDetail>>(
       `v2/weread/book/${bookId}`,
     );
     return res.data;
   },
 
   async syncMyBooks(): Promise<ApiResponse<{ imported_count: number }>> {
-    const res = await request.get<ApiResponse<{ imported_count: number }>>(
+    const res = await apiClient.get<ApiResponse<{ imported_count: number }>>(
       'v2/weread/sync-my-books',
       { timeout: 60000 },
     );
@@ -221,7 +221,7 @@ export const wereadGateway = {
   ): Promise<ApiResponse<WereadReadProgressData>> {
     const params: Record<string, string | number> = { mode };
     if (baseTime != null && mode !== 'overall') params.baseTime = baseTime;
-    const res = await request.get<ApiResponse<WereadReadProgressData>>(
+    const res = await apiClient.get<ApiResponse<WereadReadProgressData>>(
       'v2/weread/read-progress',
       { params },
     );
@@ -236,7 +236,7 @@ export const wereadGateway = {
       perDay: true,
     };
     if (year != null) params.year = year;
-    const res = await request.get<ApiResponse<WereadYearlyHeatmap>>(
+    const res = await apiClient.get<ApiResponse<WereadYearlyHeatmap>>(
       'v2/weread/read-progress',
       { params },
     );
@@ -247,7 +247,7 @@ export const wereadGateway = {
     bookId: string,
     refresh = false,
   ): Promise<ApiResponse<WereadBookProgress | null>> {
-    const res = await request.get<ApiResponse<WereadBookProgress | null>>(
+    const res = await apiClient.get<ApiResponse<WereadBookProgress | null>>(
       `v2/weread/book/${bookId}/progress`,
       { params: { refresh } },
     );
@@ -258,7 +258,7 @@ export const wereadGateway = {
     count = 12,
     maxIdx = 0,
   ): Promise<ApiResponse<BookRecommendItem[]>> {
-    const res = await request.get<ApiResponse<BookRecommendItem[]>>(
+    const res = await apiClient.get<ApiResponse<BookRecommendItem[]>>(
       'v2/weread/books-recommend',
       { params: { count, maxIdx } },
     );

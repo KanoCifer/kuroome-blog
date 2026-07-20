@@ -1,8 +1,11 @@
 import type { AxiosResponse } from 'axios';
 
-import { momentsGateway, type MomentsGateway } from '@/features/moments/api/momentsGateway';
-import type { ApiResponse } from '@/api/request';
-import { extractData } from '@/api/request';
+import {
+  momentsGateway,
+  type MomentsGateway,
+} from '@/features/moments/api/momentsGateway';
+import type { ApiResponse } from '@/api/apiClient';
+import { extractData } from '@/api/apiClient';
 import type {
   Moment,
   MomentCreatePayload,

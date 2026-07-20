@@ -1,4 +1,4 @@
-import request from '@/api/request';
+import apiClient from '@/api/apiClient';
 
 export interface ChangelogItem {
   type: string;
@@ -14,7 +14,7 @@ export interface Changelog {
 
 export const changelogGateway = {
   getChangelogs: async (): Promise<Changelog[]> => {
-    const response = await request.get('v2/publicv2/changelogs');
+    const response = await apiClient.get('v2/publicv2/changelogs');
     return (response.data as { data: Changelog[] }).data;
   },
 };
