@@ -68,7 +68,11 @@ devtaskRequest.interceptors.request.use(async (config) => {
   return config;
 });
 
-// 401 → service-token 可能已过期，清缓存后重试一次
+// 401 → service-token 可能已过期，清缓存。不在这里再 retriedevtaskRequest：
+// devtaskRequest 的重试会让 getDevTaskToken 再次走 MAIN request，而 MAIN 已经在
+// 上一层处理了 user-JWT 401。再嵌套一层重试会变成
+// dev-task/token ↔ refresh-token 交替刷屏。直接拒绝，由调用方决定是否
+// 下一次重试。Cache 清掉就够了，下次进来会拿新的 service-token。
 devtaskRequest.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<ApiResponse>) => {
@@ -78,7 +82,6 @@ devtaskRequest.interceptors.response.use(
     if (error.response?.status === 401 && cfg && !cfg._retry) {
       cfg._retry = true;
       clearDevTaskToken();
-      return devtaskRequest(cfg);
     }
 
     return Promise.reject(error);

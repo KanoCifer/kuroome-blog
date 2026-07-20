@@ -41,13 +41,19 @@ request.interceptors.response.use(
     const _cfg = cfg as typeof cfg & {
       _isRefreshToken?: boolean;
       _retry?: boolean;
+      _hadAuth?: boolean;
     };
+    // 关键约束：不重试 refresh-token 自己的请求；同一请求只重试一次；
+    // 没带 Authorization 的请求（从未登录）触发的 401 不要再走 refresh——refresh
+    // 也救不了从未认证的用户，强行重试只会让 refresh 与 dev-task/token 交替刷屏。
+    const originalHadAuth = !!cfg.headers?.Authorization;
     if (
       error.response?.status === 401 &&
       !isrefreshTokenRequest(_cfg) &&
-      !_cfg._retry
+      !_cfg._retry &&
+      originalHadAuth
     ) {
-      // 标记已重试，防止无限循环
+      _cfg._hadAuth = true;
       _cfg._retry = true;
 
       try {

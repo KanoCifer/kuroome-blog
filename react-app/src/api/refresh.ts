@@ -12,10 +12,19 @@ const refreshRequest = axios.create({
 });
 
 let promise: Promise<void> | null = null;
+let lastRefreshAt = 0;
+// Loop breaker：500 ms 内的连续 refresh 直接拒绝，避免上下游 (request / dev-task/token)
+// 同时 retry 各自挂一个 refresh 时无限交替刷屏。
+const REFRESH_COOLDOWN_MS = 500;
 export async function refreshAccessToken() {
   if (promise) {
     return promise;
   }
+  const now = Date.now();
+  if (now - lastRefreshAt < REFRESH_COOLDOWN_MS) {
+    throw new Error('refresh token throttled');
+  }
+  lastRefreshAt = now;
   promise = (async () => {
     try {
       await refreshToken();
