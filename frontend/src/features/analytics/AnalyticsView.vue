@@ -451,13 +451,13 @@ import { useAuthStore } from '@/features/auth';
 import dayjs from 'dayjs';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import TrendChartCard from './TrendChartCard.vue';
-import BrowserAnalytics from './BrowserAnalytics.vue';
-import OsCharts from './OsCharts.vue';
-import PopularPagesChartCard from './PopularPagesChartCard.vue';
-import PostViewsChartCard from './PostViewsChartCard.vue';
-import ServerMonitor from './ServerMonitor.vue';
-import StatTile from './StatTile.vue';
+import TrendChartCard from './components/TrendChartCard.vue';
+import BrowserAnalytics from './components/BrowserAnalytics.vue';
+import OsCharts from './components/OsCharts.vue';
+import PopularPagesChartCard from './components/PopularPagesChartCard.vue';
+import PostViewsChartCard from './components/PostViewsChartCard.vue';
+import ServerMonitor from './components/ServerMonitor.vue';
+import StatTile from './components/StatTile.vue';
 
 // Types
 interface OverviewData {

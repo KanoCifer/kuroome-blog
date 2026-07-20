@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useServerStatus } from '@/features/status/composables/useServerStatus';
 import { useLogStream } from '@/features/status/composables/useLogStream';
-import { StatusResourcesPanel } from '@/features/status/components/StatusResourcesPanel.vue';
-import { StatusDetailsPanel } from '@/features/status/components/StatusDetailsPanel.vue';
+import StatusResourcesPanel from '@/features/status/components/StatusResourcesPanel.vue';
+import StatusDetailsPanel from '@/features/status/components/StatusDetailsPanel.vue';
 import { computed, ref } from 'vue';
 import { motion, AnimatePresence } from 'motion-v';
 import { EASE, EASE_SLOW } from '@/shared/constants/motionPresets';

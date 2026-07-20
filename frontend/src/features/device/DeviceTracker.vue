@@ -196,11 +196,11 @@ import { useNotificationStore } from '@/shared/stores/notification';
 import { ref } from 'vue';
 
 import BasicDetail from '@/features/status/components/BasicDetail.vue';
-import AddDeviceModal from './AddDeviceModal.vue';
-import DailyCostChart from './DailyCostChart.vue';
-import DeviceList from './DeviceList.vue';
-import DeviceSummary from './DeviceSummary.vue';
-import PriceAnalyticsChart from './PriceAnalyticsChart.vue';
+import AddDeviceModal from './components/AddDeviceModal.vue';
+import DailyCostChart from './components/DailyCostChart.vue';
+import DeviceList from './components/DeviceList.vue';
+import DeviceSummary from './components/DeviceSummary.vue';
+import PriceAnalyticsChart from './components/PriceAnalyticsChart.vue';
 
 const notificationStore = useNotificationStore();
 

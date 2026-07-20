@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from './BentoCard.vue';
+import { BentoCard } from '@/features/entry';
 import IconTags from '@/shared/components/icons/IconTags.vue';
 import { blogGateway } from '@/features/blog/api/blogGateway';
 import type { BlogPost, Post, TagItem } from '@/features/blog/types';

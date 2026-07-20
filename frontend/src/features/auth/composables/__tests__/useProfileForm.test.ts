@@ -27,7 +27,7 @@ function makeUser(overrides: Partial<UserInfo> = {}): UserInfo {
     is_admin: false,
     name: 'Test User',
     email: 'test@example.com',
-    photo: null,
+    photo: undefined,
     gender: 'male',
     mobile: '13800138000',
     ...overrides,
@@ -169,7 +169,7 @@ describe('useProfileForm', () => {
   it('handleSubmit 期间 saving 为 true', async () => {
     let resolveSubmit: () => void = () => {};
     updateProfileSettings.mockImplementation(
-      () => new Promise((resolve) => (resolveSubmit = resolve)),
+      () => new Promise<void>((resolve) => (resolveSubmit = resolve)),
     );
 
     const { handleSubmit, saving } = useProfileForm();

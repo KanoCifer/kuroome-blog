@@ -1,6 +1,7 @@
 import { wereadGateway } from '@/features/books/api';
 import { useReadStatsStore } from '@/features/books/stores/readStats';
 import { computed, ref } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
 
 export interface UseReadingSummaryReturn {
   readingCount: Ref<number>;

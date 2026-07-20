@@ -75,9 +75,9 @@ import { useRssParse } from '@/features/rss/composables';
 import { useRssSubscriptions } from '@/features/rss/composables';
 import { useRssArticles } from '@/features/rss/composables';
 import { BasicDetail } from '@/features/status/components';
-import RssParseSection from './RssParseSection.vue';
-import RssSubscriptionsSection from './RssSubscriptionsSection.vue';
-import RssArticlesSection from './RssArticlesSection.vue';
+import RssParseSection from './components/RssParseSection.vue';
+import RssSubscriptionsSection from './components/RssSubscriptionsSection.vue';
+import RssArticlesSection from './components/RssArticlesSection.vue';
 import type { SubscriptionItem } from '@/features/rss/api';
 
 const route = useRoute();

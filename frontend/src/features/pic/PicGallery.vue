@@ -115,10 +115,10 @@
 </template>
 
 <script setup lang="ts">
-import PicGalleryEditBar from './PicGalleryEditBar.vue';
-import PicDetailModal from './PicDetailModal.vue';
-import PicUploadModal from './PicUploadModal.vue';
-import PolaroidCard from './PolaroidCard.vue';
+import PicGalleryEditBar from './components/PicGalleryEditBar.vue';
+import PicDetailModal from './components/PicDetailModal.vue';
+import PicUploadModal from './components/PicUploadModal.vue';
+import PolaroidCard from './components/PolaroidCard.vue';
 import { Button } from '@/shared/components/ui/button';
 import { useGallery, usePolaroidLayout, type Picture } from '@/features/pic/composables';
 import { useAuthStore } from '@/features/auth';

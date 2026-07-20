@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { authGateway } from '@/features/auth';
-import AuthLayout from './AuthLayout.vue';
+import { AuthLayout } from './components';
 import IconCloud from '@/shared/components/icons/IconCloud.vue';
 import IconLock from '@/shared/components/icons/IconLock.vue';
 import { useNotificationStore } from '@/shared/stores/notification';

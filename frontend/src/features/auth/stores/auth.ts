@@ -3,10 +3,10 @@ import { refreshAccessToken } from '@/features/auth/api/refresh';
 import {
   getAccessToken as getToken,
   setAccessToken,
-} from '@/features/auth/tokenService';
+} from '@/features/auth/helper/tokenService';
 import { reconnectWs } from '@/utils/visitor';
 import type { UserInfo } from '@/features/auth/types';
-import { userCache } from '@/features/auth/userCache';
+import { userCache } from '@/features/auth/helper/userCache';
 import { useNotificationStore } from '@/shared/stores/notification';
 import router from '@/router';
 import { isAxiosError } from 'axios';

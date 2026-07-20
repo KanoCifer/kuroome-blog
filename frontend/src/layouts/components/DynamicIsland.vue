@@ -15,7 +15,7 @@ const { tasks } = storeToRefs(devTaskStore);
 const { activeCount } = useDevTaskSections(tasks);
 
 const islandExpanded = ref(false);
-const timer = ref<number | null>(null);
+const timer = ref<ReturnType<typeof setTimeout> | null>(null);
 
 const handleMouseLeave = () => {
   if (!islandExpanded.value) return;

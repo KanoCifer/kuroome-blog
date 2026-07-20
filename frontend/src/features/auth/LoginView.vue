@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AuthLayout from './AuthLayout.vue';
+import { AuthLayout } from './components';
 import IconCloud from '@/shared/components/icons/IconCloud.vue';
 import IconKey from '@/shared/components/icons/IconKey.vue';
 import IconLock from '@/shared/components/icons/IconLock.vue';

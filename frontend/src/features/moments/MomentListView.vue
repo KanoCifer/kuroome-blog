@@ -262,10 +262,10 @@ import dayjs from 'dayjs';
 import { storeToRefs } from 'pinia';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import MomentCard from './MomentCard.vue';
-import MomentDetailModal from './MomentDetailModal.vue';
-import MomentEditorModal from './MomentEditorModal.vue';
-import MomentEmptyState from './MomentEmptyState.vue';
+import MomentCard from './components/MomentCard.vue';
+import MomentDetailModal from './components/MomentDetailModal.vue';
+import MomentEditorModal from './components/MomentEditorModal.vue';
+import MomentEmptyState from './components/MomentEmptyState.vue';
 
 defineOptions({ name: 'MomentListView' });
 
