@@ -25,6 +25,17 @@ const FEEDBACK_OPTIONS: { value: FishingLevel; label: string }[] = [
   { value: '空军', label: '空军' },
 ];
 
+const SHEET_SPRING = {
+  type: 'spring' as const,
+  stiffness: 320,
+  damping: 32,
+  mass: 0.8,
+};
+
+/**
+ * 钓鱼反馈表单 — Apple HIG sheet (mobile bottom) / centered modal (desktop)。
+ * 5 选 1 用 Apple SegmentedControl 风格的容器; 提交/取消用主按钮 + secondary。
+ */
 export function FishingFeedbackForm({
   fishingData,
   locationId,
@@ -111,7 +122,7 @@ export function FishingFeedbackForm({
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
         onClick={onCancel}
-        className="bg-foreground/30 fixed inset-0 z-40 backdrop-blur-[2px]"
+        className="bg-foreground/30 fixed inset-0 z-40 backdrop-blur-sm"
         aria-hidden
       />
       <motion.aside
@@ -119,8 +130,8 @@ export function FishingFeedbackForm({
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
-        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-        className="bg-background border-border fixed inset-x-0 bottom-0 z-50 flex h-auto max-h-[90dvh] flex-col rounded-t-2xl border-t shadow-2xl sm:top-1/2 sm:right-auto sm:bottom-auto sm:left-1/2 sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl sm:border"
+        transition={SHEET_SPRING}
+        className="fm-sheet fixed inset-x-0 bottom-0 z-50 flex h-auto max-h-[90dvh] flex-col rounded-t-3xl sm:top-1/2 sm:right-auto sm:bottom-auto sm:left-1/2 sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-3xl"
         role="dialog"
         aria-label="钓鱼反馈"
       >
@@ -142,33 +153,43 @@ export function FishingFeedbackForm({
             你的反馈会帮助我们改进
           </p>
 
-          <div className="bg-secondary rounded-lg p-3 text-sm">
-            <p className="text-muted-foreground">地点: {locationName}</p>
-            <p className="text-muted-foreground">
-              当前指数: {fishingData.fishing_index} ({fishingData.level})
+          {/* Context — Apple HIG inset tile */}
+          <div className="fm-tile px-3 py-2.5">
+            <p className="text-muted-foreground text-xs">
+              地点 · {locationName}
+            </p>
+            <p className="text-foreground mt-0.5 text-sm tabular-nums">
+              当前指数 {fishingData.fishing_index}{' '}
+              <span className="text-muted-foreground">
+                ({fishingData.level})
+              </span>
             </p>
           </div>
 
           <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
             <div>
-              <label className="text-card-foreground mb-2 block text-sm font-medium">
+              <label className="text-foreground mb-2 block text-sm font-medium">
                 您的钓鱼体验
               </label>
-              <div className="grid grid-cols-5 gap-1.5">
-                {FEEDBACK_OPTIONS.map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => setSelectedFeedback(option.value)}
-                    className={`min-h-11 rounded-lg px-2 py-2 text-sm font-medium transition-colors ${
-                      selectedFeedback === option.value
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-secondary text-card-foreground hover:bg-secondary/80'
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                ))}
+              <div className="fm-segmented w-full overflow-hidden">
+                {FEEDBACK_OPTIONS.map((option) => {
+                  const isActive = selectedFeedback === option.value;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setSelectedFeedback(option.value)}
+                      aria-pressed={isActive}
+                      className={`min-h-9 flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-all duration-200 ease-out ${
+                        isActive
+                          ? 'bg-background text-foreground shadow-sm'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -176,7 +197,7 @@ export function FishingFeedbackForm({
               <button
                 type="button"
                 onClick={onCancel}
-                className="border-border text-card-foreground hover:bg-muted min-h-11 flex-1 rounded-full border px-4 text-sm font-medium transition-colors"
+                className="bg-muted text-foreground hover:bg-muted/70 min-h-11 flex-1 rounded-full px-4 text-sm font-medium transition-colors"
                 disabled={loading}
               >
                 取消

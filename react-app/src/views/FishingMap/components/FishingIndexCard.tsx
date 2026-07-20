@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { Loader } from 'lucide-react';
+import { RotateCw } from 'lucide-react';
 import { useFishingIndex } from '../hooks/useFishingIndex';
 import type { FishingIndexData } from '../types';
 import { SkeletonCard } from './SkeletonCard';
@@ -19,6 +19,13 @@ const LEVEL_COLORS: Record<string, string> = {
   空军: 'text-muted-foreground',
 };
 
+/**
+ * FishingIndexCard — Apple HIG 信息架构:
+ *   header (标题 + 副 + refresh icon button)
+ *   hero number (大字 + 等级, Apple Weather 大数字 + 单位风格)
+ *   inset-grouped 数据行 (默认权重 / 权重调整 / 综合指数)
+ *   action row (反馈主按钮 + 详情次按钮)
+ */
 export function FishingIndexCard({
   location = [113.389549, 23.050067],
   onFeedbackClick,
@@ -43,23 +50,24 @@ export function FishingIndexCard({
     : '';
 
   return (
-    <article className="border-border/40 bg-background relative rounded-2xl border p-4 shadow-sm">
-      <div className="mb-3 flex items-center justify-between">
-        <div>
+    <article className="px-1 pt-2 pb-6" aria-label="钓鱼指数">
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <div className="min-w-0">
           <h3 className="text-foreground text-sm font-semibold">钓鱼指数</h3>
-          <p className="text-muted-foreground text-xs">
+          <p className="text-muted-foreground mt-0.5 text-xs">
             基于实时天气、潮汐综合计算
           </p>
         </div>
         <button
           onClick={() => void refetch()}
-          className="bg-background/60 text-muted-foreground hover:bg-background/80 flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-sm disabled:cursor-not-allowed"
+          aria-label="刷新钓鱼指数"
           disabled={loading}
+          className="text-muted-foreground hover:text-foreground hover:bg-muted inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60"
         >
-          <Loader
-            className={`h-3 w-3 ${loading ? 'animate-spin' : 'hidden'}`}
+          <RotateCw
+            className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`}
+            aria-hidden
           />
-          {loading ? '刷新中...' : '刷新'}
         </button>
       </div>
 
@@ -68,43 +76,41 @@ export function FishingIndexCard({
           <SkeletonCard />
         </div>
       ) : error && !indexData ? (
-        <div className="min-h-[200px]">
+        <div className="flex min-h-[200px] items-center">
           <p className="text-destructive text-sm">{error}</p>
         </div>
       ) : indexData ? (
-        <div className="min-h-[200px]">
-          <div className="mb-3 flex items-end gap-3">
-            <span className={`text-5xl font-bold tabular-nums ${levelColor}`}>
+        <div className="min-h-[200px] space-y-5">
+          {/* Hero number — Apple Weather 大数字风格 */}
+          <div className="flex items-end gap-3 px-1">
+            <span
+              className={`text-[56px] leading-none font-light tabular-nums tracking-tight ${levelColor}`}
+            >
               {indexData.fishing_index}
             </span>
-            <span className={`mb-1 text-lg font-medium ${levelColor}`}>
+            <span
+              className={`mb-1.5 text-base font-medium ${levelColor}`}
+            >
               {indexData.level}
             </span>
           </div>
 
-          <div className="mb-3 grid grid-cols-3 gap-2 text-center text-xs">
-            <div className="bg-background/60 rounded-lg px-2 py-2">
-              默认权重
-              <div className="text-foreground mt-1 font-medium tabular-nums">
-                {indexData.expert_score}
-              </div>
-            </div>
-            <div className="bg-background/60 rounded-lg px-2 py-2">
-              权重调整
-              <div className="text-foreground mt-1 font-medium tabular-nums">
-                {indexData.residual > 0 ? '+' : ''}
-                {indexData.residual}
-              </div>
-            </div>
-            <div className="bg-background/60 rounded-lg px-2 py-2">
-              综合指数
-              <div className="text-foreground mt-1 font-medium tabular-nums">
-                {indexData.fishing_index}
-              </div>
-            </div>
+          {/* Inset-grouped data rows */}
+          <div className="fm-grouped divide-border/40 divide-y">
+            <DataRow label="默认权重" value={indexData.expert_score} />
+            <DataRow
+              label="权重调整"
+              value={`${indexData.residual > 0 ? '+' : ''}${indexData.residual}`}
+            />
+            <DataRow
+              label="综合指数"
+              value={indexData.fishing_index}
+              emphasis
+            />
           </div>
 
-          <div className="flex gap-2">
+          {/* Actions */}
+          <div className="flex gap-2 px-0.5">
             <button
               onClick={handleFeedback}
               className="bg-primary text-primary-foreground hover:bg-primary/90 min-h-11 flex-1 rounded-full px-3 text-sm font-medium transition-colors"
@@ -115,7 +121,7 @@ export function FishingIndexCard({
               Object.keys(indexData.feature_breakdown).length > 0 && (
                 <button
                   onClick={handleDetail}
-                  className="bg-primary/10 text-primary hover:bg-primary/15 min-h-11 rounded-full px-5 text-sm font-medium transition-colors"
+                  className="bg-muted text-foreground hover:bg-muted/70 min-h-11 rounded-full px-5 text-sm font-medium transition-colors"
                 >
                   详情
                 </button>
@@ -123,10 +129,33 @@ export function FishingIndexCard({
           </div>
         </div>
       ) : (
-        <div className="min-h-[200px]">
+        <div className="flex min-h-[200px] items-center">
           <p className="text-muted-foreground text-sm">暂无数据</p>
         </div>
       )}
     </article>
+  );
+}
+
+interface DataRowProps {
+  label: string;
+  value: number | string;
+  emphasis?: boolean;
+}
+
+function DataRow({ label, value, emphasis = false }: DataRowProps) {
+  return (
+    <div className="flex items-baseline justify-between px-4 py-2.5">
+      <span className="text-muted-foreground text-xs font-medium">
+        {label}
+      </span>
+      <span
+        className={`tabular-nums ${
+          emphasis ? 'text-base font-semibold' : 'text-sm font-semibold'
+        } text-foreground`}
+      >
+        {value}
+      </span>
+    </div>
   );
 }

@@ -22,14 +22,27 @@ const LABELS: Record<string, string> = {
   w9_indices: '指数',
 };
 
-function gaugeColor(p: number): string {
-  if (p >= 85) return '#22c55e';
-  if (p >= 70) return '#06b6d4';
-  if (p >= 50) return '#f97316';
-  if (p <= 30) return '#ef4444';
-  return '#3b82f6';
+// 分档 → 语义 token (无硬编码色、无装饰性 glow)
+function gaugeClass(p: number): string {
+  if (p >= 85) return 'bg-success';
+  if (p >= 70) return 'bg-primary';
+  if (p >= 50) return 'bg-warning';
+  if (p <= 30) return 'bg-destructive';
+  return 'bg-muted-foreground';
 }
 
+const SHEET_SPRING = {
+  type: 'spring' as const,
+  stiffness: 320,
+  damping: 32,
+  mass: 0.8,
+};
+
+/**
+ * 特征详情 sheet —— iOS HIG bottom sheet (88dvh)。
+ * 9 项子特征以 .fm-tile 双列网格呈现: tile 凹进 sheet 一层, 行内有进度条。
+ * 不再使用 AI bento 的卡片外壳。
+ */
 export function FishingIndexDetailSheet({ open, data, onClose }: Props) {
   useEffect(() => {
     if (!open) return undefined;
@@ -51,7 +64,7 @@ export function FishingIndexDetailSheet({ open, data, onClose }: Props) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
             onClick={onClose}
-            className="bg-foreground/30 fixed inset-0 z-40 backdrop-blur-[2px]"
+            className="bg-foreground/30 fixed inset-0 z-40 backdrop-blur-sm"
             aria-hidden
           />
           <motion.aside
@@ -59,12 +72,13 @@ export function FishingIndexDetailSheet({ open, data, onClose }: Props) {
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="bg-background border-border fixed inset-x-0 bottom-0 z-50 flex h-[88dvh] max-h-[88dvh] flex-col rounded-t-2xl border-t shadow-2xl"
+            transition={SHEET_SPRING}
+            className="fm-sheet fixed inset-x-0 bottom-0 z-50 flex h-[88dvh] max-h-[88dvh] flex-col rounded-t-3xl"
             role="dialog"
             aria-label="特征详情"
           >
             <div className="flex flex-col gap-3 overflow-y-auto p-5 pb-8">
+              {/* drag handle */}
               <div className="bg-muted-foreground/40 mx-auto h-1 w-9 rounded-full" />
               <div className="flex items-center justify-between">
                 <div>
@@ -90,13 +104,9 @@ export function FishingIndexDetailSheet({ open, data, onClose }: Props) {
                     const vals = Object.values(data.feature_breakdown);
                     const max = vals.length ? Math.max(...vals) : 0;
                     const pct = max > 0 ? (value / max) * 100 : 50;
-                    const color = gaugeColor(pct);
                     const label = LABELS[key] || key;
                     return (
-                      <div
-                        key={key}
-                        className="border-border/40 bg-secondary/40 rounded-2xl border p-3"
-                      >
+                      <div key={key} className="fm-tile p-3">
                         <div className="mb-2 flex items-baseline justify-between">
                           <span className="text-muted-foreground text-xs font-medium">
                             {label}
@@ -105,14 +115,10 @@ export function FishingIndexDetailSheet({ open, data, onClose }: Props) {
                             {value}
                           </span>
                         </div>
-                        <div className="bg-background relative h-1.5 w-full overflow-hidden rounded-full">
+                        <div className="bg-foreground/10 relative h-1.5 w-full overflow-hidden rounded-full">
                           <div
-                            className="absolute inset-y-0 left-0 rounded-full"
-                            style={{
-                              width: `${pct}%`,
-                              background: `linear-gradient(90deg, ${color}cc, ${color})`,
-                              boxShadow: `0 0 6px ${color}55`,
-                            }}
+                            className={`absolute inset-y-0 left-0 rounded-full ${gaugeClass(pct)}`}
+                            style={{ width: `${pct}%` }}
                           />
                         </div>
                       </div>

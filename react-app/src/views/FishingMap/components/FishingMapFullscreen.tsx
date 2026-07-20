@@ -121,9 +121,7 @@ function RouteOverlay({
     >
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0 space-y-1">
-          <p className="text-muted-foreground text-[10px] tracking-[0.2em] uppercase">
-            路线信息
-          </p>
+          <p className="text-muted-foreground text-xs font-medium">路线信息</p>
           <p className="text-foreground font-family-averia text-2xl leading-none tabular-nums">
             <span>{formatDistance(routeInfo.distance)}</span>
             <span className="text-muted-foreground mx-2 text-base">·</span>

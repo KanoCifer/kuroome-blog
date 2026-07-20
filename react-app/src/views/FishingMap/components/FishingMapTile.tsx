@@ -76,10 +76,10 @@ export function FishingMapTile({
   );
 
   return (
-    <div className="border-border/70 bg-background relative overflow-hidden rounded-2xl border shadow-md">
+    <div className="relative w-full overflow-hidden">
       <div
         ref={containerRef}
-        className="amap-mini h-[220pt] w-full rounded-2xl"
+        className="amap-mini h-[50dvh] w-full"
         aria-label="fishing map"
       />
       {!isMapReady && (
@@ -88,7 +88,7 @@ export function FishingMapTile({
         </div>
       )}
       {/* 浮按钮 — 全屏 / 定位 */}
-      <div className="absolute top-2.5 right-2.5 z-10 flex flex-col gap-2">
+      <div className="absolute top-[calc(env(safe-area-inset-top,0px)+10px)] right-2.5 z-10 flex flex-col gap-2">
         {onFullscreen && (
           <button
             type="button"
@@ -158,9 +158,7 @@ function MapOverlay({ onClearRoute }: { onClearRoute: () => void }) {
     >
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0 space-y-1">
-          <p className="text-muted-foreground text-[10px] tracking-[0.2em] uppercase">
-            路线信息
-          </p>
+          <p className="text-muted-foreground text-xs font-medium">路线信息</p>
           <p className="text-foreground font-family-averia text-2xl leading-none tabular-nums">
             <span>{formatDistance(routeInfo.distance)}</span>
             <span className="text-muted-foreground mx-2 text-base">·</span>

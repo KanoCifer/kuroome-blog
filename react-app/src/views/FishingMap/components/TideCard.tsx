@@ -3,10 +3,18 @@ import { useEffect, useMemo } from 'react';
 import dayjs from 'dayjs';
 
 import { HARBOR_OPTIONS, useFishingMapStore } from '@/stores/fishingMapStore';
+import { useChartTheme, withAlpha } from '../hooks/useChartTheme';
 import type { TideTableItem } from '../types';
 import { SkeletonCard } from './SkeletonCard';
 import { TideChart } from './TideChart';
 
+/**
+ * TideCard — Apple HIG 信息架构:
+ *   港口 SegmentedControl (5 项, 一行内可选)
+ *   日期 scroll chips (8 日, 横向滚动)
+ *   潮汐曲线 (ECharts, theme-aware)
+ *   高潮 / 低潮 inset-grouped 双列
+ */
 export function TideCard() {
   const {
     panelTideData: tideData,
@@ -18,7 +26,7 @@ export function TideCard() {
     fetchPanelTide,
   } = useFishingMapStore();
 
-  const isDarkMode = document.documentElement.classList.contains('dark');
+  const theme = useChartTheme();
 
   useEffect(() => {
     fetchPanelTide();
@@ -57,9 +65,6 @@ export function TideCard() {
   const tideChartOption = useMemo(() => {
     if (!tideData) return {};
 
-    const textColor = isDarkMode ? '#e5e7eb' : '#333';
-    const subTextColor = isDarkMode ? '#9ca3af' : '#666';
-
     const now = dayjs();
     let currentTimeIndex = -1;
     tideData.tideHourly.forEach((point, index) => {
@@ -72,25 +77,17 @@ export function TideCard() {
     return {
       tooltip: {
         trigger: 'axis',
-        backgroundColor: isDarkMode
-          ? 'rgba(30, 41, 59, 0.95)'
-          : 'rgba(255, 255, 255, 0.95)',
-        borderColor: isDarkMode ? '#475569' : '#e5e7eb',
+        backgroundColor: theme.paper,
+        borderColor: theme.border,
         borderWidth: 1,
-        borderRadius: 8,
-        padding: [12, 16],
-        textStyle: {
-          color: textColor,
-          fontSize: 13,
-        },
+        borderRadius: 12,
+        padding: [10, 14],
+        textStyle: { color: theme.ink, fontSize: 13 },
         formatter: (params: unknown[]) => {
           const param = params[0] as { axisValue: string; data: number };
-          const timeStr = param.axisValue as string;
-          // console.log('tooltip params', params);
-          // console.log('timeStr', timeStr, 'value', param.data);
-          return `<div style="padding: 2px 0;">
-          <div style="font-weight: 600; margin-bottom: 4px;">${timeStr}</div>
-          <div>潮高: <span style="color: #06b6d4; font-weight: bold;">${param.data.toFixed(2)} m</span></div>
+          return `<div style="padding:2px 0;">
+          <div style="font-weight:600;margin-bottom:4px;">${param.axisValue}</div>
+          <div>潮高: <span style="color:${theme.tide};font-weight:bold;">${param.data.toFixed(2)} m</span></div>
         </div>`;
         },
       },
@@ -101,32 +98,25 @@ export function TideCard() {
           dayjs(point.fxTime).format('HH:mm'),
         ),
         axisLabel: {
-          color: subTextColor,
+          color: theme.muted,
           fontSize: 11,
           formatter: (value: string) => value.slice(11, 16),
           interval: Math.max(1, Math.floor(tideData.tideHourly.length / 5)),
         },
-        axisLine: {
-          lineStyle: {
-            color: isDarkMode ? '#334155' : '#e5e7eb',
-          },
-        },
+        axisLine: { lineStyle: { color: theme.border } },
         axisTick: { show: false },
       },
       yAxis: {
         type: 'value',
         axisLabel: {
-          color: subTextColor,
+          color: theme.muted,
           fontSize: 11,
           formatter: (value: number) => `${value}m`,
         },
         axisLine: { show: false },
         axisTick: { show: false },
         splitLine: {
-          lineStyle: {
-            color: isDarkMode ? '#1e293b' : '#f1f5f9',
-            type: 'dashed',
-          },
+          lineStyle: { color: withAlpha(theme.border, 0.6), type: 'dashed' },
         },
       },
       series: [
@@ -135,7 +125,7 @@ export function TideCard() {
           type: 'line',
           smooth: 0.4,
           symbol: 'none',
-          lineStyle: { color: '#06b6d4', width: 2.5 },
+          lineStyle: { color: theme.tide, width: 2.5 },
           areaStyle: {
             color: {
               type: 'linear',
@@ -144,9 +134,9 @@ export function TideCard() {
               x2: 0,
               y2: 1,
               colorStops: [
-                { offset: 0, color: 'rgba(6, 182, 212, 0.25)' },
-                { offset: 0.7, color: 'rgba(6, 182, 212, 0.05)' },
-                { offset: 1, color: 'rgba(6, 182, 212, 0)' },
+                { offset: 0, color: withAlpha(theme.tide, 0.24) },
+                { offset: 0.7, color: withAlpha(theme.tide, 0.05) },
+                { offset: 1, color: withAlpha(theme.tide, 0) },
               ],
             },
           },
@@ -155,14 +145,14 @@ export function TideCard() {
               ? {
                   symbol: ['none', 'none'],
                   lineStyle: {
-                    color: '#f59e0b',
+                    color: theme.warning,
                     type: 'dashed',
                     width: 1.5,
                   },
                   label: {
                     show: true,
                     formatter: '现在',
-                    color: '#f59e0b',
+                    color: theme.warning,
                     fontWeight: '600',
                     fontSize: 12,
                   },
@@ -171,51 +161,58 @@ export function TideCard() {
               : undefined,
         },
       ],
-      textStyle: { color: textColor },
+      textStyle: { color: theme.ink },
     };
-  }, [isDarkMode, tideData]);
+  }, [theme, tideData]);
 
   return (
-    <article className="border-border/40 from-card/80 to-card/40 relative rounded-2xl border bg-linear-to-br p-4 shadow-sm backdrop-blur-sm">
-      {/* Decorative gradient orbs */}
-      <div className="from-success/20 to-success/10 pointer-events-none absolute bottom-16 left-16 h-32 w-32 overflow-hidden rounded-full bg-linear-to-tr blur-3xl transition-transform duration-700 group-hover:scale-110"></div>
-
-      <div className="mb-3 flex flex-col gap-2">
+    <article className="px-1 pt-2 pb-6" aria-label="潮汐预报">
+      <div className="mb-3">
         <h3 className="text-foreground text-sm font-semibold">潮汐预报</h3>
-        {/* 港口 — 横向 scroll chip */}
-        <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
-          {HARBOR_OPTIONS.map((opt) => (
+      </div>
+
+      {/* Harbor — Apple HIG Segmented Control (5 项, 一行) */}
+      <div className="fm-segmented mb-2 w-full overflow-x-auto" role="tablist">
+        {HARBOR_OPTIONS.map((opt) => {
+          const isActive = selectedHarbor === opt.code;
+          return (
             <button
               key={opt.code}
               type="button"
+              role="tab"
+              aria-selected={isActive}
               onClick={() => setSelectedHarbor(opt.code)}
-              className={`min-h-9 shrink-0 rounded-full px-3.5 text-xs font-medium transition-colors ${
-                selectedHarbor === opt.code
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-secondary text-card-foreground hover:bg-muted'
+              className={`min-h-8 flex-1 shrink-0 rounded-md px-3 text-xs font-medium transition-all duration-200 ease-out ${
+                isActive
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {opt.name}
             </button>
-          ))}
-        </div>
-        {/* 日期 — 横向 scroll chip */}
-        <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
-          {dateOptions.map((opt) => (
+          );
+        })}
+      </div>
+
+      {/* Date — Apple HIG scroll chips (8 日, 横向滚动) */}
+      <div className="fm-hscroll -mx-1 mb-4 flex gap-1.5 px-1">
+        {dateOptions.map((opt) => {
+          const isActive = selectedDate === opt.value;
+          return (
             <button
               key={opt.value}
               type="button"
               onClick={() => setSelectedDate(opt.value)}
-              className={`min-h-9 shrink-0 rounded-full px-3.5 text-xs font-medium transition-colors ${
-                selectedDate === opt.value
+              className={`min-h-9 shrink-0 rounded-full px-3 text-xs font-medium transition-colors ${
+                isActive
                   ? 'bg-primary text-primary-foreground'
-                  : 'bg-secondary text-card-foreground hover:bg-muted'
+                  : 'bg-muted text-foreground hover:bg-muted/70'
               }`}
             >
               {opt.label} {opt.weekday}
             </button>
-          ))}
-        </div>
+          );
+        })}
       </div>
 
       {loading ? (
@@ -223,28 +220,33 @@ export function TideCard() {
           <SkeletonCard hasChart hasBottomRow />
         </div>
       ) : tideData ? (
-        <div className="min-h-[260px]">
+        <div className="min-h-[260px] space-y-4">
           <div className="h-[200px]">
             <TideChart option={tideChartOption} />
           </div>
-          <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-            <div className="bg-background/60 rounded-lg px-3 py-2">
-              <p className="text-muted-foreground">
-                最高潮:{dayjs(highTide?.fxTime).format('HH:mm')}
-                <span className="text-primary">↗</span>
-              </p>
-              <p className="text-foreground mt-1 font-medium">
-                {highTide ? Number(highTide.height).toFixed(2) : '--'}m
-              </p>
+          {/* High / low tide — Apple HIG inset-grouped 双列 */}
+          <div className="fm-grouped grid grid-cols-2 gap-px bg-border/40">
+            <div className="bg-background flex flex-col gap-1 px-4 py-3">
+              <span className="text-muted-foreground text-xs font-medium">
+                最高潮
+                <span className="text-foreground ml-1.5 tabular-nums">
+                  {highTide ? dayjs(highTide.fxTime).format('HH:mm') : '--'}
+                </span>
+              </span>
+              <span className="text-foreground text-sm font-semibold tabular-nums">
+                {highTide ? Number(highTide.height).toFixed(2) : '--'} m
+              </span>
             </div>
-            <div className="bg-background/60 rounded-lg px-3 py-2">
-              <p className="text-muted-foreground">
-                最低潮:{dayjs(lowTide?.fxTime).format('HH:mm')}
-                <span className="text-primary">↘</span>
-              </p>
-              <p className="text-foreground mt-1 font-medium">
-                {lowTide ? Number(lowTide.height).toFixed(2) : '--'}m
-              </p>
+            <div className="bg-background flex flex-col gap-1 px-4 py-3">
+              <span className="text-muted-foreground text-xs font-medium">
+                最低潮
+                <span className="text-foreground ml-1.5 tabular-nums">
+                  {lowTide ? dayjs(lowTide.fxTime).format('HH:mm') : '--'}
+                </span>
+              </span>
+              <span className="text-foreground text-sm font-semibold tabular-nums">
+                {lowTide ? Number(lowTide.height).toFixed(2) : '--'} m
+              </span>
             </div>
           </div>
         </div>

@@ -1,7 +1,7 @@
 /**
  * AI 智能分析浮层。
  *
- * iPhone 移动端: 底部 sheet (88dvh, drag handle, 下滑关闭)
+ * iPhone 移动端: 底部 sheet (50dvh, drag handle, 下滑关闭)
  * 桌面端 (≥ sm): 右侧抽屉 420px
  *
  * 内容区直接复用 AIAnalysisWidget 的「内嵌 + 无 FAB」模式（embedded + hideFab），
@@ -19,6 +19,13 @@ interface FishingAnalysisDrawerProps {
   onClose: () => void;
   onGenerate: (modelId: string) => void;
 }
+
+const SHEET_SPRING = {
+  type: 'spring' as const,
+  stiffness: 320,
+  damping: 32,
+  mass: 0.8,
+};
 
 export function FishingAnalysisDrawer({
   open,
@@ -46,7 +53,7 @@ export function FishingAnalysisDrawer({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
             onClick={onClose}
-            className="bg-foreground/30 fixed inset-0 z-40 backdrop-blur-[2px]"
+            className="bg-foreground/30 fixed inset-0 z-40 backdrop-blur-sm"
             aria-hidden="true"
           />
           {/* 移动端: 底部 sheet */}
@@ -55,8 +62,8 @@ export function FishingAnalysisDrawer({
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="bg-background border-border fixed inset-x-0 bottom-0 z-50 flex h-[50dvh] max-h-[50dvh] flex-col rounded-t-2xl border-t shadow-2xl sm:hidden"
+            transition={SHEET_SPRING}
+            className="fm-sheet fixed inset-x-0 bottom-0 z-50 flex h-[60dvh] max-h-[60dvh] flex-col rounded-t-3xl sm:hidden"
             role="dialog"
             aria-label="AI 分析"
           >
@@ -68,8 +75,8 @@ export function FishingAnalysisDrawer({
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="bg-background border-border fixed top-0 right-0 z-50 hidden h-screen w-[420px] max-w-[90vw] flex-col border-l shadow-2xl sm:flex"
+            transition={SHEET_SPRING}
+            className="fm-drawer-right fixed top-0 right-0 z-50 hidden h-screen w-[420px] max-w-[90vw] flex-col rounded-l-3xl sm:flex"
             role="dialog"
             aria-label="AI 分析"
           >
@@ -99,7 +106,7 @@ function SheetBody({
     return (
       <>
         <div className="bg-muted-foreground/40 mx-auto mt-2 h-1 w-9 rounded-full" />
-        <div className="border-border flex items-center justify-between border-b px-5 py-3">
+        <div className="border-border/60 flex items-center justify-between border-b px-5 py-3">
           <div>
             <h3 className="text-foreground text-lg font-semibold">AI 分析</h3>
             <p className="text-muted-foreground mt-0.5 text-xs">
@@ -123,7 +130,7 @@ function SheetBody({
   }
   return (
     <>
-      <div className="border-border flex items-center justify-between border-b px-5 py-4">
+      <div className="border-border/60 flex items-center justify-between border-b px-5 py-4">
         <div>
           <h3 className="text-foreground font-family-averia text-lg">
             AI 分析

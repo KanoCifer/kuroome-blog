@@ -47,6 +47,14 @@ function renderMarkdown(content: string): string {
   }
 }
 
+/**
+ * AI 分析组件 —— Apple HIG surface。
+ *
+ * 嵌入模式 (drawer / sheet 内): 流式布局, 顶部 status chip, 主体内容区, 底部 model select + 主按钮。
+ * 浮层模式 (默认): 一个 flat solid FAB (没有 blob orbs / 没有渐变装饰),
+ * 卡片表面 `bg-background border-border/40 shadow-sm`, 不使用 AI bento 的
+ * `from-indigo-300/30 ... blur-2xl` 装饰光晕 (DESIGN.md §6 显式禁止)。
+ */
 export function AIAnalysisWidget({
   onGenerate,
   embedded = false,
@@ -98,7 +106,7 @@ export function AIAnalysisWidget({
     if (analysisLoading) return 'bg-primary/15 text-primary';
     if (analysisError) return 'bg-destructive/15 text-destructive';
     if (analysisResult) return 'bg-success/15 text-success';
-    return 'bg-muted/10 text-muted-foreground';
+    return 'bg-muted text-muted-foreground';
   })();
 
   // 内嵌模式：去掉 fixed + portal，改为流式容器
@@ -144,7 +152,7 @@ export function AIAnalysisWidget({
               <select
                 value={selectedModel}
                 onChange={(e) => setSelectedModel(e.target.value)}
-                className="border-border bg-secondary text-card-foreground flex-1 rounded-lg border px-3 py-1.5 text-xs"
+                className="bg-secondary text-foreground flex-1 rounded-xl px-3 py-2 text-xs"
               >
                 {AI_MODELS.map((model) => (
                   <option key={model.id} value={model.id}>
@@ -160,9 +168,14 @@ export function AIAnalysisWidget({
               onClick={() => {
                 abortAnalysis();
               }}
-              className="bg-destructive hover:bg-destructive/90 relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium text-white transition"
+              className="bg-destructive text-primary-foreground hover:bg-destructive/90 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors"
             >
-              <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
+              <svg
+                className="h-3.5 w-3.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden
+              >
                 <rect
                   x="6"
                   y="6"
@@ -181,7 +194,7 @@ export function AIAnalysisWidget({
                 setAnalysisLoading(true);
               }}
               disabled={!analysisHasData}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition disabled:cursor-not-allowed"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors disabled:cursor-not-allowed"
             >
               {analysisResult ? '重新分析' : '生成分析'}
             </button>
@@ -191,118 +204,119 @@ export function AIAnalysisWidget({
     );
   }
 
-  // 弹层模式（默认）：FAB + portal 居中浮层
+  // 浮层模式 (默认): flat surface 卡片 + solid FAB。
+  // 不再有 `bg-linear-to-br from-indigo-300/30 to-sky-500/20 blur-2xl` 装饰光晕,
+  // 不再有 `from-primary/90 to-primary/85` FAB 渐变 (DESIGN.md §6 显式禁止)。
   return (
     <>
       {createPortal(
-        <div className="fixed right-1/2 bottom-24 z-50 flex translate-x-1/2 flex-col items-center gap-4">
+        <div className="fixed right-1/2 bottom-28 z-50 flex translate-x-1/2 flex-col items-center gap-4 sm:bottom-24">
           <AnimatePresence mode="wait">
             {analysisOpen && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.92, y: 12 }}
+                key="analysis-card"
+                initial={{ opacity: 0, scale: 0.96, y: 12 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.92, y: 12 }}
-                transition={{ duration: 0.35, ease: 'easeOut' }}
-                className="group border-border/50 from-card/80 to-card/40 relative mb-3 w-[90vw] max-w-sm overflow-hidden rounded-3xl border bg-linear-to-br shadow-2xl backdrop-blur-sm"
+                exit={{ opacity: 0, scale: 0.96, y: 12 }}
+                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+                className="bg-background border-border/40 w-[90vw] max-w-sm overflow-hidden rounded-3xl border shadow-xl"
+                role="dialog"
+                aria-label="AI 天气分析"
               >
-                <div className="pointer-events-none absolute -top-16 -right-16 h-32 w-32 rounded-full bg-linear-to-br from-indigo-300/30 to-sky-500/20 blur-2xl transition-transform duration-700 group-hover:scale-110" />
-                <div className="pointer-events-none absolute -bottom-12 -left-12 h-24 w-24 rounded-full bg-linear-to-tr from-emerald-300/20 to-cyan-400/10 blur-2xl transition-transform duration-700 group-hover:scale-110" />
-
-                <div className="relative z-10">
-                  <div className="border-border/70 flex items-start justify-between gap-3 border-b px-4 py-3">
-                    <div>
-                      <h3 className="text-foreground text-sm font-bold tracking-tight">
-                        AI 天气分析
-                      </h3>
-                      <p className="text-muted-foreground mt-0.5 text-xs">
-                        结合实时天气与潮汐节奏给出出行建议
-                      </p>
-                    </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <span
-                        className={`${statusClass} rounded-full px-2.5 py-0.5 text-xs font-medium`}
-                      >
-                        {statusLabel}
-                      </span>
-                      <button
-                        onClick={closeAnalysis}
-                        className="text-muted-foreground hover:bg-muted rounded-full p-1"
-                        aria-label="关闭分析"
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
+                <div className="border-border/60 flex items-start justify-between gap-3 border-b px-4 py-3">
+                  <div>
+                    <h3 className="text-foreground text-sm font-semibold tracking-tight">
+                      AI 天气分析
+                    </h3>
+                    <p className="text-muted-foreground mt-0.5 text-xs">
+                      结合实时天气与潮汐节奏给出出行建议
+                    </p>
                   </div>
-
-                  <div className="space-y-3 px-4 py-3">
-                    {!analysisHasData ? (
-                      <EmptyState
-                        icon={<CloudOff className="h-6 w-6" />}
-                        title="等待天气与潮汐数据加载"
-                        subtitle="数据到位后即可生成分析"
-                      />
-                    ) : analysisLoading ? (
-                      <LoadingState shimmerText={SHIMMER_TEXTS[shimmerIndex]} />
-                    ) : analysisError ? (
-                      <ErrorState message={analysisError} />
-                    ) : analysisResult ? (
-                      <ResultState html={renderMarkdown(analysisResult)} />
-                    ) : (
-                      <PlaceholderState />
-                    )}
-
-                    {!analysisLoading && (
-                      <div className="flex items-center gap-2">
-                        <select
-                          value={selectedModel}
-                          onChange={(e) => setSelectedModel(e.target.value)}
-                          className="border-border bg-secondary text-card-foreground flex-1 rounded-lg border px-3 py-1.5 text-xs"
-                        >
-                          {AI_MODELS.map((model) => (
-                            <option key={model.id} value={model.id}>
-                              {model.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-
-                    {analysisLoading ? (
-                      <button
-                        onClick={() => {
-                          abortAnalysis();
-                        }}
-                        className="bg-destructive hover:bg-destructive/90 relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium text-white transition"
-                      >
-                        <svg
-                          className="h-3.5 w-3.5"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                        >
-                          <rect
-                            x="6"
-                            y="6"
-                            width="12"
-                            height="12"
-                            rx="1"
-                            fill="currentColor"
-                          />
-                        </svg>
-                        取消分析
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          onGenerate(selectedModel);
-                          setAnalysisLoading(true);
-                        }}
-                        disabled={!analysisHasData}
-                        className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition disabled:cursor-not-allowed"
-                      >
-                        {analysisResult ? '重新分析' : '生成分析'}
-                      </button>
-                    )}
+                  <div className="flex flex-col items-end gap-2">
+                    <span
+                      className={`${statusClass} rounded-full px-2.5 py-0.5 text-xs font-medium`}
+                    >
+                      {statusLabel}
+                    </span>
+                    <button
+                      onClick={closeAnalysis}
+                      className="text-muted-foreground hover:bg-muted rounded-full p-1"
+                      aria-label="关闭分析"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
                   </div>
+                </div>
+
+                <div className="space-y-3 px-4 py-3">
+                  {!analysisHasData ? (
+                    <EmptyState
+                      icon={<CloudOff className="h-6 w-6" />}
+                      title="等待天气与潮汐数据加载"
+                      subtitle="数据到位后即可生成分析"
+                    />
+                  ) : analysisLoading ? (
+                    <LoadingState shimmerText={SHIMMER_TEXTS[shimmerIndex]} />
+                  ) : analysisError ? (
+                    <ErrorState message={analysisError} />
+                  ) : analysisResult ? (
+                    <ResultState html={renderMarkdown(analysisResult)} />
+                  ) : (
+                    <PlaceholderState />
+                  )}
+
+                  {!analysisLoading && (
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={selectedModel}
+                        onChange={(e) => setSelectedModel(e.target.value)}
+                        className="bg-secondary text-foreground flex-1 rounded-xl px-3 py-2 text-xs"
+                      >
+                        {AI_MODELS.map((model) => (
+                          <option key={model.id} value={model.id}>
+                            {model.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {analysisLoading ? (
+                    <button
+                      onClick={() => {
+                        abortAnalysis();
+                      }}
+                      className="bg-destructive text-primary-foreground hover:bg-destructive/90 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors"
+                    >
+                      <svg
+                        className="h-3.5 w-3.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        aria-hidden
+                      >
+                        <rect
+                          x="6"
+                          y="6"
+                          width="12"
+                          height="12"
+                          rx="1"
+                          fill="currentColor"
+                        />
+                      </svg>
+                      取消分析
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        onGenerate(selectedModel);
+                        setAnalysisLoading(true);
+                      }}
+                      disabled={!analysisHasData}
+                      className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors disabled:cursor-not-allowed"
+                    >
+                      {analysisResult ? '重新分析' : '生成分析'}
+                    </button>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -314,15 +328,12 @@ export function AIAnalysisWidget({
       {!hideFab && !analysisOpen && (
         <button
           onClick={toggleAnalysis}
-          className="border-primary-foreground/50 from-primary/90 to-primary/85 text-primary-foreground fixed right-4 bottom-50 z-50 flex h-12 w-12 items-center justify-center rounded-full border bg-linear-to-br shadow-lg backdrop-blur transition-all hover:-translate-y-0.5 hover:shadow-xl sm:right-6 sm:bottom-24 sm:h-14 sm:w-14"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/85 fixed right-4 bottom-32 z-40 flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-transform hover:-translate-y-0.5 active:translate-y-0 sm:right-6 sm:bottom-28 sm:h-14 sm:w-14"
           aria-label="打开 AI 分析"
           title="AI分析"
         >
           {analysisHasData && (
-            <span className="absolute top-0.5 right-0.5 flex h-2.5 w-2.5 sm:top-0 sm:right-0">
-              <span className="bg-success absolute inline-flex h-full w-full animate-ping rounded-full opacity-70" />
-              <span className="bg-success relative inline-flex h-2.5 w-2.5 rounded-full sm:h-3 sm:w-3" />
-            </span>
+            <span className="bg-success ring-background absolute top-0.5 right-0.5 inline-flex h-2.5 w-2.5 rounded-full ring-2 sm:top-0 sm:right-0 sm:h-3 sm:w-3" />
           )}
           <Bot className="h-5 w-5 sm:h-6 sm:w-6" />
         </button>
@@ -356,9 +367,9 @@ function LoadingState({ shimmerText }: { shimmerText: string }) {
     <div className="space-y-3">
       <p className="text-muted-foreground text-sm">{shimmerText}</p>
       <div className="space-y-2">
-        <div className="bg-secondary/70 h-3 w-full animate-pulse rounded" />
-        <div className="bg-secondary/70 h-3 w-5/6 animate-pulse rounded" />
-        <div className="bg-secondary/70 h-3 w-2/3 animate-pulse rounded" />
+        <div className="bg-secondary h-3 w-full skeleton-pulse rounded" />
+        <div className="bg-secondary h-3 w-5/6 skeleton-pulse rounded" />
+        <div className="bg-secondary h-3 w-2/3 skeleton-pulse rounded" />
       </div>
     </div>
   );
@@ -375,7 +386,7 @@ function ErrorState({ message }: { message: string }) {
 function ResultState({ html }: { html: string }) {
   return (
     <div
-      className="prose prose-sm text-card-foreground max-h-[50vh] min-h-16 overflow-y-auto sm:max-h-[60vh]"
+      className="prose prose-sm text-foreground max-h-[50vh] min-h-16 overflow-y-auto sm:max-h-[60vh]"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
