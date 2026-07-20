@@ -1,4 +1,7 @@
-// 推荐网站（pages/websites + entry/BentoWebsites 共用）
+export interface LoginForm {
+  username: string;
+  password: string;
+}
 
 export interface Website {
   id: string;
@@ -8,6 +11,5 @@ export interface Website {
   icon: string;
   category: string;
   tags: string[];
-  /** 主人手写的一句荐语（书房语气） */
   note: string;
 }

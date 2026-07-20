@@ -1,6 +1,6 @@
 import apiClient from '@/shared/api/apiClient';
 
-import type { Changelog } from '@/features/pages/types';
+import type { Changelog } from '@/features/changelog/types';
 
 export const changelogGateway = {
   getChangelogs: async (): Promise<Changelog[]> => {

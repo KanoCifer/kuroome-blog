@@ -2,7 +2,7 @@
 import MarkdownEditor from './components/MarkdownEditor.vue';
 import UiButton from '@/shared/components/ui/button/Button.vue';
 import IconSave from '@/shared/components/icons/IconSave.vue';
-import { blogGateway } from '@/features/pages/api/public';
+import { blogGateway } from '@/features/blog/api/blogGateway';
 import { uploadGateway } from '@/features/blog/api';
 import { useOrigin } from '@/shared/composables';
 import { useNotificationStore } from '@/shared/stores/notification';

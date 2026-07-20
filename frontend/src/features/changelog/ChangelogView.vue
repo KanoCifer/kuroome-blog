@@ -5,7 +5,8 @@ import {
   SPRING_REVEAL,
   WHILE_IN_VIEW_FADE_UP,
 } from '@/shared/constants/motionPresets';
-import { changelogGateway, type Changelog } from '@/features/pages/api/public';
+import { changelogGateway } from '@/features/changelog/api/changelogGateway';
+import type { Changelog } from '@/features/changelog/types';
 
 const changelog = ref<Changelog[]>([]);
 

@@ -1,11 +1,8 @@
 <script setup lang="ts">
 import { connectionDelay, isConnected, sendPing } from '@/lib/visitorWs';
-import {
-  fetchStatusDetail,
-  type StatusDetailData,
-  fetchRecentEvents,
-  type EventItem,
-} from '@/shared/api';
+import { fetchStatusDetail } from '@/features/status/api/statusGateway';
+import type { StatusDetailData } from '@/features/status/types';
+import { fetchRecentEvents, type EventItem } from '@/features/status/api/logGateway';
 import { useChartColors, withAlpha } from '@/shared/composables/useChartColors';
 import {
   computed,

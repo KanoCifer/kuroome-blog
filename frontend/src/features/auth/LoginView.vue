@@ -3,7 +3,7 @@ import AuthLayout from './AuthLayout.vue';
 import IconCloud from '@/shared/components/icons/IconCloud.vue';
 import IconKey from '@/shared/components/icons/IconKey.vue';
 import IconLock from '@/shared/components/icons/IconLock.vue';
-import type { LoginForm } from '@/shared/types/auth-forms';
+import type { LoginForm } from '@/shared/types';
 import { ShieldUser } from '@lucide/vue';
 import { ref } from 'vue';
 import { RouterLink } from 'vue-router';

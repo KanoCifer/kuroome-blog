@@ -90,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Device } from '@/shared/api';
+import type { Device } from '@/features/device/types';
 import { computed } from 'vue';
 
 interface Props {

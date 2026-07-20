@@ -14,7 +14,7 @@ import {
 import DelIcon from '@/shared/components/icons/DelIcon.vue';
 import EditIcon from '@/shared/components/icons/EditIcon.vue';
 import { Eye, Heart } from '@lucide/vue';
-import { blogGateway } from '@/features/pages/api/public';
+import { blogGateway } from '@/features/blog/api/blogGateway';
 import { useAuthStore } from '@/shared/auth/stores/auth';
 import { useOrigin } from '@/shared/composables';
 import { useNotificationStore } from '@/shared/stores/notification';

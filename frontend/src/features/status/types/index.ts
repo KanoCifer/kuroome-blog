@@ -1,16 +1,4 @@
-// 公共页（Pages）领域类型 ——  changelog / 状态页
-
-export interface ChangelogItem {
-  type: string;
-  content: string;
-}
-
-export interface Changelog {
-  version: string;
-  date: string;
-  title: string;
-  changes: ChangelogItem[];
-}
+// Status 领域类型
 
 export interface VersionInfo {
   repo_url: string;

@@ -166,7 +166,7 @@
 <script setup lang="ts">
 import { BasicDetail } from '@/shared/components/basic';
 import { TagPill } from '@/shared/components/ui/tag-pill';
-import websitesData from '@/features/pages/data/websites.json';
+import websitesData from '@/shared/data/websites.json';
 import { useImageError } from '@/shared/composables';
 import { motion } from 'motion-v';
 import {
@@ -178,7 +178,7 @@ import { computed, ref } from 'vue';
 import { useUrlSearchParams } from '@vueuse/core';
 import IconExternalLink from '@/shared/components/icons/IconExternalLink.vue';
 import IconGlobeOutline from '@/shared/components/icons/IconGlobeOutline.vue';
-import type { Website } from '@/shared/types/website';
+import type { Website } from '@/shared/types';
 
 interface CategoryOption {
   slug: string;

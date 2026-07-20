@@ -56,7 +56,8 @@
 </template>
 
 <script setup lang="ts">
-import { fetchStatusDetail, type StatusDetailData } from '@/shared/api';
+import { fetchStatusDetail } from '@/features/status/api/statusGateway';
+import type { StatusDetailData } from '@/features/status/types';
 import { connectionDelay, isConnected, sendPing } from '@/lib/visitorWs';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 

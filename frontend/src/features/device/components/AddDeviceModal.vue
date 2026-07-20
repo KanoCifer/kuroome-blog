@@ -165,9 +165,9 @@
 </template>
 
 <script setup lang="ts">
-import { deviceGateway } from '@/shared/api';
+import { deviceGateway } from '@/features/device/api/deviceGateway';
 import { useNotificationStore } from '@/shared/stores/notification';
-import type { DeviceInput } from '@/shared/api';
+import type { DeviceInput } from '@/features/device/types';
 import { reactive, ref, watch } from 'vue';
 import dayjs from 'dayjs';
 import { ModalFadeTransition } from '@/shared/components/ui/modal-fade-transition';

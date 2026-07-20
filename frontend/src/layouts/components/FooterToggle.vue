@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BasicFooter } from '@/shared/components/basic';
+import { Footer } from '@/layouts/components';
 import BackToTop from '@/shared/components/layout/BackToTop.vue';
 import BasicNav from '@/layouts/components/BasicNav.vue';
 import { AnimatePresence } from 'motion-v';
@@ -26,7 +26,7 @@ watch(
 
 <template>
   <!-- Footer -->
-  <BasicFooter
+  <Footer
     v-if="themeStore.showFooter === 'true' && !isEntryView"
     :is-entry-view="isEntryView"
   />

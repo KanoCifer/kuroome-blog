@@ -52,14 +52,6 @@
         class="h-70 w-90 min-w-fit"
       />
     </DragWrapper>
-    <!-- <BentoWebsites
-      v-if="show.BentoWebsites"
-      :initial="{ scale: 0 }"
-      :animate="{ scale: 1 }"
-      ref="webRef"
-      class="absolute w-auto -translate-x-1/2 -translate-y-1/2 p-0!"
-      :style="[websitesPosition]"
-    /> -->
     <DragWrapper
       :position="clockCardPosition"
       card-name="BentoClock"
@@ -148,7 +140,7 @@
     <!-- Settings Modal -->
     <SettingsModal v-model="isSettingsOpen" />
     <!-- Footer -->
-    <BasicFooter
+    <Footer
       class="absolute right-0 bottom-0 left-0"
       v-if="themeStore.showFooter === 'true'"
       :isEntryView="isEntryView"
@@ -198,7 +190,7 @@
 </template>
 
 <script setup lang="ts">
-import { BasicFooter } from '@/shared/components/basic';
+import { Footer } from '@/layouts/components';
 import {
   BentoCalendar,
   BentoClock,

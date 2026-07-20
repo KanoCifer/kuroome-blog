@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import { useChartColors } from '@/shared/composables';
-import type { Device } from '@/shared/api';
+import type { Device } from '@/features/device/types';
 import { computed } from 'vue';
 import VChart from 'vue-echarts';
 import { ModalFadeTransition } from '@/shared/components/ui/modal-fade-transition';

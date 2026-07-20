@@ -1,7 +1,7 @@
 import apiClient from '@/shared/api/apiClient';
 import type { ApiResponse } from '@/shared/api/apiClient';
 
-import type { StatusDetailData } from '@/features/pages/types';
+import type { StatusDetailData } from '@/features/status/types';
 
 export async function fetchStatusDetail(): Promise<StatusDetailData> {
   const res =

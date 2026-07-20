@@ -319,10 +319,10 @@
 import { BasicDetail } from '@/shared/components/basic';
 import { TagPill } from '@/shared/components/ui/tag-pill';
 import { useImageError } from '@/shared/composables';
-import friendLinksData from '@/features/pages/data/friendlinks.json';
-import websitesData from '@/features/pages/data/websites.json';
+import friendLinksData from '@/features/friend-links/data/friendlinks.json';
+import websitesData from '@/shared/data/websites.json';
 import { useNotificationStore } from '@/shared/stores/notification';
-import type { Website } from '@/shared/types/website';
+import type { Website } from '@/shared/types';
 import { motion } from 'motion-v';
 import {
   SPRING_REVEAL,

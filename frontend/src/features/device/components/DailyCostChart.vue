@@ -37,7 +37,7 @@
 
 <script setup lang="ts">
 import { useChartColors, withAlpha } from '@/shared/composables';
-import type { Device } from '@/shared/api';
+import type { Device } from '@/features/device/types';
 import dayjs from 'dayjs';
 import { computed } from 'vue';
 import VChart from 'vue-echarts';

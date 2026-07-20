@@ -53,7 +53,7 @@ const router = createRouter({
     {
       path: '/about',
       name: 'about',
-      component: () => import('@/features/pages/AboutView.vue'),
+      component: () => import('@/layouts/AboutView.vue'),
       meta: {
         title: "关于我 - Kuroome's Blog",
         description: "关于 Kuroome's Blog 项目和作者的介绍",
@@ -63,7 +63,7 @@ const router = createRouter({
     {
       path: '/version-log',
       name: 'version-log',
-      component: () => import('@/features/pages/ChangelogView.vue'),
+      component: () => import('@/features/changelog/ChangelogView.vue'),
       meta: {
         title: "变更日志 - Kuroome's Blog",
         description: '网站更新历史与变更记录',
@@ -73,7 +73,7 @@ const router = createRouter({
     {
       path: '/websites',
       name: 'websites',
-      component: () => import('@/features/pages/WebsitesView.vue'),
+      component: () => import('@/features/websites/WebsitesView.vue'),
       meta: {
         title: "推荐网站 - Kuroome's Blog",
         description: '发现有趣的网站和工具',
@@ -83,7 +83,7 @@ const router = createRouter({
     {
       path: '/friend-links',
       name: 'friend-links',
-      component: () => import('@/features/pages/FriendLinksView.vue'),
+      component: () => import('@/features/friend-links/FriendLinksView.vue'),
       meta: {
         title: "友情链接 - Kuroome's Blog",
         description: '与志同道合的朋友交换链接',
@@ -93,7 +93,7 @@ const router = createRouter({
     {
       path: '/privacy',
       name: 'privacy',
-      component: () => import('@/features/pages/PrivacyPolicyView.vue'),
+      component: () => import('@/layouts/PrivacyPolicyView.vue'),
       meta: {
         title: "隐私政策 - Kuroome's Blog",
         description: '了解本站如何收集、使用和保护您的个人信息',
@@ -361,7 +361,7 @@ const router = createRouter({
     {
       path: '/status',
       name: 'status',
-      component: () => import('@/features/pages/StatusView.vue'),
+      component: () => import('@/features/status/StatusView.vue'),
       meta: {
         title: "服务状态 - Kuroome's Blog",
         description: '查看 Kuroome Blog 各项服务的实时运行状况',
@@ -372,7 +372,7 @@ const router = createRouter({
       // 通配符匹配所有未定义的路径
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
-      component: () => import('@/features/pages/NotFound.vue'),
+      component: () => import('@/layouts/NotFound.vue'),
     },
   ],
 });
