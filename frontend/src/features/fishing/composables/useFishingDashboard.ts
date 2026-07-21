@@ -141,7 +141,7 @@ export function useFishingDashboard() {
   }
 
   /**
-   * 地图就绪后：拿用户定位 → 拉对应位置的天气 / 钓鱼指数。
+   * 地图就绪后:初始化自动定位(移图 + 打点) → 拉对应位置的天气 / 钓鱼指数。
    * 定位失败静默降级（不弹窗）—— onMounted 已经用默认中心兜底过一次。
    */
   function onMapReady(): void {
@@ -149,7 +149,9 @@ export function useFishingDashboard() {
       const map = mapTileRef.value;
       if (!map) return;
       try {
-        const position = await map.getCurrentPosition();
+        // locate() 移图 + 打点,返回坐标供复用(避免重复触发定位)
+        const position = await map.locate();
+        if (!position) return;
         userPosition.value = position;
         await fishingMapStore.fetchWeatherAndFishing(position);
       } catch {

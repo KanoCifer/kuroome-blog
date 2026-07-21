@@ -4,14 +4,12 @@
  * 把原本埋在 MapContainer.vue 里的三类行为收拢到一处:
  * - 钓点标记渲染 (markers)
  * - 驾车路线规划 (planRoute / clearRoute)
- * - 当前位置解析 (getCurrentPosition, 委托给 LocationResolver)
+ * - 当前位置解析 (getCurrentPosition, 用 AMap.Geolocation + CitySearch IP 兜底)
  *
- * AMap 实例从构造参数直接传入;坐标转换作为私有对象满足 CoordConverter 端口,
- * LocationResolver 通过该端口调用,生产用 AMap、测试可注入 in-memory 实现。
+ * AMap 实例从构造参数直接传入;Geolocation 插件在构造时初始化,
+ * 定位失败时降级到 CitySearch IP 城市级定位。
  */
 import type { AMapWithPlugins } from '@/features/fishing/composables/amapNamespace';
-import type { CoordConverter } from '@/features/fishing/composables/locationResolver';
-import { resolveCurrentPosition } from '@/features/fishing/composables/locationResolver';
 import type { MapMarker } from '@/features/fishing/types';
 import type { RouteInfo } from '@/features/fishing/composables/useFishingRoute';
 
@@ -27,6 +25,11 @@ interface DrivingService {
     ) => void,
   ): void;
   clear(): void;
+}
+
+interface GeolocationResult {
+  position: { lng: number; lat: number };
+  info?: string;
 }
 
 /** 钓点标记 SVG —— 24×32 极简几何:圆头 + 下方三角,蓝描边。 */
@@ -55,7 +58,11 @@ export class FishingMapRuntime {
   private readonly map: AMap.Map;
   private readonly ns: AMapWithPlugins;
 
-  private readonly converter: CoordConverter;
+  private readonly geolocation: AMapWithPlugins['Geolocation'] extends new (
+    options?: infer _opts,
+  ) => infer R
+    ? R
+    : never;
   private markers: AMap.Marker[] = [];
   /** 与 this.markers 一一对应,保留 source MapMarker(含 extraData)供点击回调带回 */
   private markerSources: MapMarker[] = [];
@@ -72,10 +79,14 @@ export class FishingMapRuntime {
   constructor(map: AMap.Map, ns: AMapWithPlugins) {
     this.map = map;
     this.ns = ns;
-    this.converter = {
-      fromGps: (lng, lat) => this.fromGps(lng, lat),
-      locateByIp: () => this.locateByIp(),
-    };
+    this.geolocation = new ns.Geolocation({
+      enableHighAccuracy: true,
+      timeout: 10000,
+      offset: [10, 20],
+      position: 'RT',
+      // 禁止定位成功后自动移图 —— 避免 marker 点击时把地图中心拉回用户位置
+      panToLocation: false,
+    });
   }
 
   /** 渲染钓点标记;调用前会清除旧标记 */
@@ -157,12 +168,25 @@ export class FishingMapRuntime {
     this.map.setZoomAndCenter(zoom, center);
   }
 
-  /** 当前位置 [lng,lat](GCJ-02);委托给 LocationResolver */
+  /**
+   * 当前位置 [lng,lat](GCJ-02)。
+   *
+   * 链路:AMap.Geolocation → 失败时 CitySearch IP 城市级兜底 → 抛错。
+   * 高德插件直出 GCJ-02,无需手动坐标转换。
+   */
   getCurrentPosition(): Promise<[number, number]> {
-    if (!this.map) {
-      return Promise.reject(new Error('地图未初始化'));
-    }
-    return resolveCurrentPosition(this.converter);
+    return new Promise<[number, number]>((resolve, reject) => {
+      this.geolocation.getCurrentPosition(
+        (status: string, result: GeolocationResult) => {
+          if (status === 'complete' && result.position) {
+            resolve([result.position.lng, result.position.lat]);
+          } else {
+            // 高德定位失败,降级到 IP 城市级定位
+            this.locateByIp().then(resolve, reject);
+          }
+        },
+      );
+    });
   }
 
   /** 在用户位置打一个 marker;后续点击先清旧的 */
@@ -190,32 +214,7 @@ export class FishingMapRuntime {
     this.userLocationMarker = null;
   }
 
-  // ---- 私有:CoordConverter 端口实现 ----
-
-  private fromGps(lng: number, lat: number): Promise<[number, number]> {
-    return new Promise((resolve) => {
-      this.ns.convertFrom([lng, lat], 'gps', (status, result) => {
-        const r = result as
-          | {
-              info?: string;
-              locations?: Array<{ getLng(): number; getLat(): number }>;
-            }
-          | string
-          | undefined;
-        if (
-          status !== 'complete' ||
-          typeof r === 'string' ||
-          !r?.locations?.length
-        ) {
-          // 转换失败时降级返回原始坐标,不阻断流程
-          resolve([lng, lat]);
-          return;
-        }
-        const [loc] = r.locations;
-        resolve([loc.getLng(), loc.getLat()]);
-      });
-    });
-  }
+  // ---- 私有:IP 城市级兜底定位 ----
 
   private locateByIp(): Promise<[number, number]> {
     return new Promise((resolve, reject) => {

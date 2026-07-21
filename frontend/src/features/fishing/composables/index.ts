@@ -2,7 +2,6 @@
 
 export * from './amapNamespace';
 export * from './fishingMapRuntime';
-export * from './locationResolver';
 export * from './useFishingAnalysis';
 export * from './useFishingDashboard';
 export * from './useFishingFeedback';

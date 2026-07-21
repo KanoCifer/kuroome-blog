@@ -30,14 +30,6 @@ export interface RouteInfo {
   time: number;
 }
 
-export interface GeolocationResult {
-  info?: string;
-  position?: {
-    lng: number;
-    lat: number;
-  };
-}
-
 export interface SecurityKeyResponse {
   securityJsCode?: string;
 }

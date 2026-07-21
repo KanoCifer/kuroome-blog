@@ -46,8 +46,24 @@ interface CitySearchService {
   ): void;
 }
 
+interface GeolocationService {
+  getCurrentPosition(
+    callback: (
+      status: 'complete' | string,
+      result: { position: { lng: number; lat: number }; info?: string },
+    ) => void,
+  ): void;
+}
+
 export type AMapWithPlugins = typeof AMap & {
   CitySearch: new () => CitySearchService;
+  Geolocation: new (options?: {
+    enableHighAccuracy?: boolean;
+    timeout?: number;
+    offset?: [number, number];
+    position?: string;
+    panToLocation?: boolean;
+  }) => GeolocationService;
   Driving: new (options?: {
     map?: AMap.Map;
     policy?: number;
@@ -84,6 +100,7 @@ export function loadAMapNamespace(): Promise<AMapWithPlugins> {
       plugins: [
         'AMap.Scale',
         'AMap.ToolBar',
+        'AMap.Geolocation',
         'AMap.CitySearch',
         'AMap.Driving',
       ],

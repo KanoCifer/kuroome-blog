@@ -6,6 +6,8 @@
  */
 import { useEffect, useRef } from 'react';
 
+import { Loader2, Locate } from 'lucide-react';
+
 import { useRouteMapStore } from '@/stores/routeMapStore';
 import type { MapMarker } from '@/types/marker';
 
@@ -51,7 +53,7 @@ export function FishingMapTile({
     if (marker) onMarkerSelect(marker);
   };
 
-  const { isMapReady, focusMap } = useMap(
+  const { isMapReady, isLocating, focusMap, retryLocate } = useMap(
     containerRef,
     getSecurityJsCode,
     handleMarkerClick,
@@ -72,6 +74,21 @@ export function FishingMapTile({
         className="amap-fs h-full w-full"
         aria-label="fishing map"
       />
+      {/* 定位按钮:重试定位,对齐 Vue MapContainer */}
+      <button
+        type="button"
+        className="bg-background/90 text-foreground hover:bg-background border-border/40 absolute right-2.5 bottom-5 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-all duration-200 ease-out active:scale-95 disabled:opacity-50"
+        aria-label="定位到当前位置"
+        disabled={isLocating}
+        onClick={() => void retryLocate()}
+      >
+        {isLocating ? (
+          <Loader2 className="text-primary h-4 w-4 animate-spin" />
+        ) : (
+          <Locate className="h-4 w-4" />
+        )}
+      </button>
+
       {!isMapReady && (
         <div className="text-muted-foreground absolute inset-0 z-10 flex items-center justify-center bg-background/60 text-xs backdrop-blur-[2px]">
           地图加载中…

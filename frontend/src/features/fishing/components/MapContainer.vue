@@ -240,24 +240,32 @@ const handleFullscreen = () => {
   isFullscreen.value = !isFullscreen.value;
 };
 
-// 定位按钮点击:runtime 解析位置 → setCenter + 打点
-const handleLocateClick = async () => {
-  if (!map || !runtime) return;
+// 定位:runtime 解析位置 → setCenter + 打点。失败走 IP 兜底(静默),都失败才通知。
+// 初始化(onMapReady)与按钮点击共用;按钮可重试。
+// 返回坐标供调用方复用,避免重复触发定位。
+const locate = async (): Promise<[number, number] | null> => {
+  if (!map || !runtime) return null;
   isLocating.value = true;
   try {
     const [lng, lat] = await runtime.getCurrentPosition();
-    if (!map) return;
+    if (!map) return null;
     map.setCenter([lng, lat]);
     map.setZoom(15);
     runtime.showUserLocationMarker(lng, lat);
+    return [lng, lat];
   } catch (e) {
+    // IP 兜底已在 runtime 内部处理(成功则静默);都失败才通知
     const msg = e instanceof Error ? e.message : String(e);
-    console.error('定位失败:', msg);
+    console.warn('定位失败:', msg);
     emit('error', `定位失败: ${msg}`);
+    return null;
   } finally {
     isLocating.value = false;
   }
 };
+
+// 定位按钮点击:可重试定位
+const handleLocateClick = () => void locate();
 
 // 暴露行为接口给父组件（经 FishingMapInstance 类型约束）
 defineExpose<FishingMapInstance>({
@@ -274,6 +282,8 @@ defineExpose<FishingMapInstance>({
     if (!runtime) return;
     runtime.setZoomAndCenter(zoom, center);
   },
+  /** 定位:移图 + 打点,返回坐标供调用方复用。初始化自动定位与按钮重试共用 */
+  locate,
 });
 
 onUnmounted(() => {

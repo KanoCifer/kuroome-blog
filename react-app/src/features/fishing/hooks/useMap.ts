@@ -3,9 +3,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouteMapStore } from '@/stores/routeMapStore';
 import AMapLoader from '@amap/amap-jsapi-loader';
 
-import { MAP_CENTER, MAP_ZOOM } from '../constants';
+import { MAP_CENTER, MAP_PLUGIN_LIST, MAP_ZOOM } from '../constants';
 import type { MapMarker } from '@/types/marker';
 import type { GeolocationStatusEvent, RouteInfo } from '../types';
+import { useGeolocation } from './useGeolocation';
+import { useNotificationStore } from '@/stores/notificationState';
 
 /**
  * 钓鱼点标记 SVG（对齐 frontend FISHING_MARKER_CONTENT）。
@@ -40,15 +42,6 @@ interface AMapDrivingResult {
   }>;
 }
 
-interface GeolocationService {
-  getCurrentPosition(
-    callback: (
-      status: 'complete' | string,
-      result: GeolocationStatusEvent,
-    ) => void,
-  ): void;
-}
-
 /**
  * 把官方 AMap 核心类 + 插件 ctor 合并为单一视图,
  * loader 返回 any / window.AMap 取自全局,这里用 AMapWithPlugins
@@ -60,7 +53,20 @@ type AMapWithPlugins = typeof AMap & {
     timeout?: number;
     offset?: [number, number];
     position?: string;
-  }) => GeolocationService;
+    panToLocation?: boolean;
+  }) => {
+    getCurrentPosition(
+      callback: (
+        status: 'complete' | string,
+        result: GeolocationStatusEvent,
+      ) => void,
+    ): void;
+  };
+  CitySearch: new () => {
+    getLocalCity(
+      callback: (status: 'complete' | string, result: unknown) => void,
+    ): void;
+  };
   Driving: new (options?: {
     map?: AMap.Map;
     policy?: number;
@@ -77,6 +83,9 @@ declare global {
   }
 }
 
+// StrictMode 守卫：防止 effect 双重调用时重复加载 AMap 脚本
+let amapScriptPromise: Promise<AMapWithPlugins> | null = null;
+
 export function useMap(
   containerRef: React.RefObject<HTMLDivElement | null>,
   getSecurityJsCode: () => Promise<string>,
@@ -90,32 +99,22 @@ export function useMap(
   const onMarkerClickRef = useRef(onMarkerClick);
   const getSecurityJsCodeRef = useRef(getSecurityJsCode);
   const routeActionsRef = useRef(useRouteMapStore.getState());
-  const geolocationRef = useRef<GeolocationService | null>(null);
   const markersRef = useRef<MapMarker[]>(markers);
 
   const [isMapReady, setIsMapReady] = useState(false);
-  const [userPosition, setUserPosition] = useState<[number, number] | null>(
-    null,
-  );
 
-  const getUserPosition = useCallback((): Promise<[number, number]> => {
-    if (!geolocationRef.current) {
-      return Promise.reject(new Error('地理定位未初始化'));
-    }
-
-    return new Promise((resolve) => {
-      geolocationRef.current!.getCurrentPosition(
-        (status: string, result: GeolocationStatusEvent) => {
-          if (status === 'complete' && result.position) {
-            const { lng, lat } = result.position;
-            resolve([lng, lat]);
-          } else {
-            resolve(MAP_CENTER);
-          }
-        },
-      );
-    });
+  // 定位逻辑已下沉到 useGeolocation hook,此处只负责地图渲染
+  const notifyError = useCallback((message: string) => {
+    useNotificationStore.getState().error(message);
   }, []);
+
+  const getAMap = useCallback(() => window.AMap as AMapWithPlugins | undefined, []);
+
+  const { userPosition, isLocating, retry: retryLocate } = useGeolocation(
+    getAMap,
+    notifyError,
+    { enabled: true },
+  );
 
   const clearRoute = useCallback(() => {
     if (currentRouteRef.current && mapInstanceRef.current) {
@@ -277,18 +276,19 @@ export function useMap(
         if (!mapApiKey) {
           throw new Error('缺少 VITE_JS_API 配置');
         }
-        // 加载高德地图脚本
-        AMapLoader.load({
-          key: mapApiKey,
-          version: '2.0',
-          plugins: [
-            'AMap.Scale',
-            'AMap.ToolBar',
-            'AMap.Geolocation',
-            'AMap.Driving',
-            'AMap.Marker',
-          ],
-        })
+        // 加载高德脚本（StrictMode 守卫：共享同一 Promise,不重复加载）
+        if (!amapScriptPromise) {
+          amapScriptPromise = AMapLoader.load({
+            key: mapApiKey,
+            version: '2.0',
+            plugins: MAP_PLUGIN_LIST,
+          }) as Promise<AMapWithPlugins>;
+          // 拒绝时清空槽位,允许下次挂载重试(避免网络抖动导致地图永久死亡)
+          amapScriptPromise.catch(() => {
+            amapScriptPromise = null;
+          });
+        }
+        amapScriptPromise
           .then(async (loadedAMap) => {
             const AMap = loadedAMap as AMapWithPlugins;
             map = new AMap.Map(containerElement, {
@@ -306,44 +306,31 @@ export function useMap(
             const scale = new AMap.Scale();
             map.addControl(scale);
 
-            const geolocation = new AMap.Geolocation({
-              enableHighAccuracy: true,
-              timeout: 10000,
-              offset: [10, 20],
-              position: 'RT',
-              // 禁止定位成功后自动移图 —— 避免 marker 点击时把地图中心拉回用户位置
-              panToLocation: false,
-            });
-            map.addControl(geolocation);
-
             // 将实例保存到 ref 中
             mapInstanceRef.current = map;
-            geolocationRef.current = geolocation;
-
-            // 获取用户定位
-            try {
-              const position = await getUserPosition();
-              setUserPosition(position);
-              routeActionsRef.current.setUserPosition(position);
-            } catch (err) {
-              console.warn('获取用户位置失败:', err);
-              setUserPosition(null);
-            }
-
 
             // 渲染钓点标记（数据由父组件经 markers 参数注入）
             renderMarkers(markersRef.current);
             clickHandler = () => undefined;
             // 添加地图点击事件监听
             map.on('click', clickHandler);
-          })
-          .catch
-          // 忽略加载错误，由调用方处理
-          ();
 
-        setIsMapReady(true);
-      } catch {
-        // 地图初始化错误由调用方处理
+            // 实例真正创建成功后,才标记就绪
+            setIsMapReady(true);
+          })
+          .catch((err: unknown) => {
+            // 加载失败经 Toast 提示,避免白屏无反馈
+            const message =
+              err instanceof Error ? err.message : '地图加载失败，请检查网络后重试';
+            notifyError(message);
+            setIsMapReady(false);
+          });
+      } catch (err: unknown) {
+        // 同步阶段错误(如缺少 VITE_JS_API):提示并标记未就绪
+        const message =
+          err instanceof Error ? err.message : '地图初始化失败';
+        notifyError(message);
+        setIsMapReady(false);
       }
     };
 
@@ -386,10 +373,11 @@ export function useMap(
 
   return {
     isMapReady,
+    isLocating,
     userPosition,
     planRoute,
     clearRoute,
-    getUserPosition,
     focusMap,
+    retryLocate,
   };
 }
