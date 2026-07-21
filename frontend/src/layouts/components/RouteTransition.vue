@@ -3,7 +3,7 @@
     <template v-if="isEntryView">
       <component :is="Component" :key="route.path" />
     </template>
-    <Transition v-else :name="transition.name" mode="out-in">
+    <Transition v-else :name="transitionName" mode="out-in">
       <div :key="route.path">
         <component :is="Component" />
       </div>
@@ -12,14 +12,19 @@
 </template>
 
 <script setup lang="ts">
-import { useRouteTransition } from '@/composables/route-transition';
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { resolveTransitionName } from '@/lib';
 
 defineOptions({ name: 'RouteTransition' });
 
 const { entryPath = '/' } = defineProps<{
-  /** 首页路由路径 —— 该路径下不做路由过渡动画 */
   entryPath?: string;
 }>();
 
-const { transition, isEntryView, route } = useRouteTransition({ entryPath });
+const route = useRoute();
+const transitionName = computed(() =>
+  resolveTransitionName(route.meta.transition),
+);
+const isEntryView = computed(() => route.path === entryPath);
 </script>

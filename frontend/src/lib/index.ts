@@ -4,6 +4,7 @@ export * from './request';
 export * from './websocket';
 export * from './color';
 export * from './dom';
+export * from './route-transition';
 export {
   getVisitorId,
   collectVisitorData,

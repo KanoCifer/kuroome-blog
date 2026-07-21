@@ -8,7 +8,6 @@ export * from './ui/dropdown-transition';
 export * from './ui/modal';
 export * from './ui/modal-fade-transition';
 export * from './ui/modal-scale-transition';
-export * from './ui/route-transition';
 export * from './ui/slide-fade-transition';
 export * from './ui/slide-fade-transition-x';
 export * from './ui/slider';
